@@ -16,10 +16,12 @@ abstract: "Phase A Lane 1 extraction contract: decompose GDFT.h's header-soup in
 
 ## 2 · Evidence base (3 load-bearing agents + first-hand read of GDFT.h)
 
+> Full dependency-surface inventory (17 owned arrays + `globals.h` line refs — the extern list for S1): [`gdft-surface-inventory.md`](./gdft-surface-inventory.md).
+
 ### 2.1 What GDFT.h actually contains (first-hand, new-repo line refs)
 - **`process_GDFT()`** (64-413) and **`calculate_novelty()`** (415-456). The `.ino` is the **only** includer; calls at `.ino:788` / `:828`.
 - `process_GDFT()` is **NOT pure spectral arithmetic** — a **device-I/O noise-calibration FSM is embedded mid-function** (196-266: `USBSerial` prints, `save_config()`, `save_ambient_noise_calibration()`, `save_calibration_profile()`, cal state machine).
-- In `k1_hardware`, `SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED=0` ⇒ the noise-subtract blocks (197-209, 269-278) compile out, and the residual cal FSM (210-266) touches **zero spectral arrays** — pure side-effect (flash/serial/state). **⇒ the cal FSM has no spectral coupling and is cleanly excluded from the core TU.**
+- In `k1_hardware`, `SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED=0` ⇒ the noise-subtract blocks (197-209, 269-278) compile out, and the residual cal FSM (210-266) touches **zero spectral arrays** — pure side-effect (flash/serial/state). **⇒ no spectral-DATA coupling; it is carried verbatim but rendered inert in the oracle (`noise_complete=true` + stubbed I/O). NOTE: its completion block resets AGC state (249-257) before that frame's AGC — an *ordering* coupling that makes an in-place SOURCE split non-trivial, so the split is deferred to S3 (see §3).**
 - Gated `#ifdef` ranges in GDFT.h: `K1_SPECTRAL_WINDOW_V1` (102-114, 167-171), `K1_GDFT_INT64_RECURRENCE_V1` (115-134), `K1_GDFT_INT64_MAGNITUDE_V1` (139-164), `VP_FIX_AGC_SOFT_KNEE`/`K1_LOUD_GUARD_V1` (off). `K1_GDFT_TRUE_CENTER_V1` is **not here** — it lives in `system.h` coeff precompute, arriving via `frequencies[i].coeff_q14`.
 - Cross-frame statics inside `process_GDFT`: `interlace_flip` (70), `agc_gain` (371). Plus EMA/AGC globals (`magnitudes_normalized_avg`, `agc_envelope`, `agc_noise_floor`, `agc_gated`, `*_history_index`). Fresh per `capture()` run ⇒ deterministic.
 
@@ -40,16 +42,17 @@ abstract: "Phase A Lane 1 extraction contract: decompose GDFT.h's header-soup in
 
 ## 3 · Extraction boundary
 
-**`audio/k1_gdft_core.{cpp,h}` (new TU) — IN:**
-- `k1_gdft_process_spectrum()` = `process_GDFT` body **minus** the cal FSM: Goertzel recurrence + magnitude + normalize + asymmetric-EMA (86-190) + low-pass smoothing (280-282) + broadband AGC v2 (301-412) → writes `magnitudes[]`, `magnitudes_normalized[]`, `magnitudes_final[]`, `spectrogram[]`.
-- `k1_gdft_calculate_novelty()` = `calculate_novelty` body (415-456) → `novelty_curve[]`, `spectral_history[][]`.
-- Carries all four `#ifdef` branches verbatim (int64 pair, window, true-center-coeff-consumer side is in system.h).
+> **Correction (surface inventory):** the cal FSM has no spectral-DATA coupling, but its completion block **resets AGC state** (`agc_envelope/noise_floor/gated/bands`, 249-257) *before* that frame's AGC block — an **ordering** coupling that makes an in-place SOURCE split non-trivial. So S1 does **not** source-split the cal FSM; it lifts `process_GDFT` **whole** and renders cal **inert in the oracle**. The clean cal/transform split moves to S3 (golden-protected).
+
+**`audio/k1_gdft_core.{cpp,h}` (new TU) — IN (verbatim, whole):**
+- `process_GDFT()` body **in full** (64-413), incl. the inline noise-cal FSM (196-266) carried verbatim — **behavior-identical**. In the host oracle the FSM is **inert**: the driver sets `noise_complete=true` so the `if(noise_complete==false)` gate never enters, and the completion block's flash/serial symbols (`save_config`, `save_ambient_noise_calibration`, `save_calibration_profile`, `USBSerial`, `noise_cal_*`) are **no-op stubs** in `oracle_hostcompile`. Writes the 17 owned arrays (full list + `globals.h` line refs in the inventory appendix).
+- `calculate_novelty()` body (415-456) → `novelty_curve[]`, `spectral_history[][]`.
+- Carries all `#ifdef` branches verbatim (`K1_GDFT_INT64_RECURRENCE_V1`, `K1_GDFT_INT64_MAGNITUDE_V1`, `K1_SPECTRAL_WINDOW_V1`, `SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED`, `K1_LOUD_GUARD_V1`, `VP_FIX_AGC_SOFT_KNEE`, `ENABLE_GDFT_HARNESS`). Keep `IRAM_ATTR` and the two function-static accumulators (`interlace_flip` 70, `agc_gain` 371).
 
 **OUT (stays put):**
-- The noise-cal FSM (196-266) — device I/O, zero spectral coupling in `k1_hardware`. Remains in a thin `GDFT.h` wrapper / cal site called by the `.ino` at the same frame point. (Splitting it is **provably byte-identical** for the spectral path because noise-subtract is `=0`.)
 - `precompute_goertzel_constants()` / true-center (`system.h`) — coefficients arrive via `frequencies[]`; not in this TU.
 
-**Interface decision (surfaced per execution standard — chose minimal-safe over ideal):** S1 lifts the bodies reading existing globals via `extern` declarations (real firmware links real globals; host oracle links stub globals). This is the **behavior-preserving** move that unblocks both the golden and the overflow fix **without** an I/O redesign. The starter-prompt's "explicit I/O" (params/struct, no globals) is deferred to **S3 (optional, golden-gated)** — it is polish, and Theory-of-Constraints says close the overflow bug behind a locked oracle first.
+**Interface decision (surfaced per execution standard — chose minimal-safe over ideal):** S1 lifts the bodies reading existing globals via `extern` declarations (real firmware links real globals; host oracle links stub globals). Whole-lift + extern-globals is the **behavior-preserving** move that unblocks the golden and the overflow fix **without** an I/O redesign **or** a risky in-place split. The starter-prompt's "explicit I/O" (params/struct) **and** the cal/transform separation are both deferred to **S3 (optional, golden-gated)** — polish that is *safe only after* the golden exists (Theory-of-Constraints: close the overflow bug behind a locked oracle first).
 
 ## 4 · Blast radius (why the existing 4 goldens are safe)
 - `spectrogram[]` consumers: `sb_onset_beat.cpp`, `sb_audio_snapshot.cpp`, `lightshow_modes.h`, `i2s_audio.h`. `novelty_curve/magnitudes_final` consumers: `sb_audio_snapshot.cpp`, `led_utilities.h`.
@@ -65,10 +68,10 @@ abstract: "Phase A Lane 1 extraction contract: decompose GDFT.h's header-soup in
 
 ## 6 · Sequence (every step gated: `pio run -e k1_hardware` green + all goldens reproduce + Gate Fα + CI green)
 
-- **S1 — Extract.** Create `k1_gdft_core.cpp/.h` (verbatim arithmetic via extern-globals); `GDFT.h` becomes a thin wrapper (core call + cal FSM). Prove: (i) arithmetic diff-identical to GDFT.h; (ii) `pio run -e k1_hardware` green (real firmware builds through the TU); (iii) the 4 existing goldens still reproduce; (iv) `oracle_gdft.py` compiles the real TU on host.
+- **S1 — Extract.** Create `k1_gdft_core.cpp/.h` = `process_GDFT()` + `calculate_novelty()` lifted **whole & verbatim** (extern-globals); `GDFT.h` becomes a thin shim that `#include`s `k1_gdft_core.h` (the `.ino` include path is unchanged). Host stub gains no-op cal-I/O symbols; the `oracle_gdft.py` driver sets `noise_complete=true`. Prove: (i) arithmetic diff-identical to GDFT.h (review the diff — behavior-preservation rests on statement identity; there is no pre-extraction golden); (ii) `pio run -e k1_hardware` green; (iii) the 4 existing goldens still reproduce byte-identical; (iv) `oracle_gdft.py` host-compiles the real TU.
 - **S1.5 — Golden-lock.** Freeze `tests/golden/gdft.golden.jsonl` (int64-OFF baseline) + `MANIFEST.sha256`; register `oracle_gdft` in `ORACLE_MODULES`; prove Gate Fα (≥3 + overflow mutation caught); CI green. **The spectrum tap is now locked.**
 - **S2 — Promote int64 pair.** Flip `K1_GDFT_INT64_MAGNITUDE_V1` + `_RECURRENCE_V1` ON in the clean TU (env or default). Expected `gdft.golden` delta on near-resonance bins under the 16000 tone ⇒ **ticketed, human-approved re-baseline** (overflow correction); the int64 Gate-Fα mutation inverts (flip-OFF must now diverge). Other 4 goldens unchanged (host). **Device gates still OWED before production-blessed:** (a) MabuTrace Core-0 timing/margin (trace-dev; scalar soak ≠ causal frame budget); (b) production-env AGC/normalization-scale check (int64 un-wraps a scale legacy got wrong → confirm `magnitudes_normalized`/AGC consumers unaffected); (c) device eyes-on on the registry-canonical device.
-- **S3 — (optional) explicit-I/O refinement.** Replace extern-globals with params/struct; golden-gated, byte-identical.
+- **S3 — (optional) clean separation.** Source-split the cal FSM out of the transform (preserving the AGC-reset ordering) **and/or** replace extern-globals with explicit params/struct I/O. Golden-gated, byte-identical — safe now because S1.5 locked the contract.
 
 ## 7 · Non-goals
 Not promoting `K1_GDFT_TRUE_CENTER_V1` (eyes-on FAIL) or `K1_SPECTRAL_WINDOW_V1`. Not altering spectrum→colour mapping, band layout, or novelty math. Not touching onset/chord/tempo modules. Not the full ESP-IDF migration (later Phase-A lane). S2's production default-flip is **not** closed by host gate alone — the 3 device gates above are owed.
@@ -78,4 +81,5 @@ Not promoting `K1_GDFT_TRUE_CENTER_V1` (eyes-on FAIL) or `K1_SPECTRAL_WINDOW_V1`
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-06-23 | agent:claude-code | Created — GDFT decomposition extraction contract. Synthesis of 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-int64-forensics) + first-hand GDFT.h read. Locks boundary (cal-FSM excluded), oracle design (16000-tone + mag_i32), int64 promote-pair / hold-true-center, S1→S3 golden-gated sequence, blast-radius proof (4 existing goldens bypass process_GDFT). |
+| 2026-06-23 | agent:claude-code | Created — GDFT decomposition extraction contract. Synthesis of 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-int64-forensics) + first-hand GDFT.h read. Locks boundary, oracle design (16000-tone + mag_i32), int64 promote-pair / hold-true-center, S1→S3 golden-gated sequence, blast-radius proof (4 existing goldens bypass process_GDFT). |
+| 2026-06-23 | agent:claude-code | Boundary correction from surface inventory: S1 lifts `process_GDFT` **whole & verbatim** (cal FSM inert via `noise_complete=true` + stubbed I/O), NOT a source-split — the cal-completion AGC-reset (249-257) is an ordering coupling. Clean cal/transform split deferred to S3. Linked `gdft-surface-inventory.md` (17-array extern list). |
