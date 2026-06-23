@@ -42,21 +42,13 @@
 
 static i2s_chan_handle_t rx_chan = NULL;
 
-#ifndef SB_I2S_DMA_DESC_NUM_VALUE
-#define SB_I2S_DMA_DESC_NUM_VALUE 3
-#endif
-static const uint8_t SB_I2S_DMA_DESC_NUM = SB_I2S_DMA_DESC_NUM_VALUE;
-static const uint8_t SB_I2S_SLOT_BIT_WIDTH_BITS = 32;
-static const uint8_t SB_I2S_SLOT_MODE_STEREO = 2;
+// SB_I2S_* slot constants + SBAudioI2SReadDebug moved to a tiny guarded header
+// (Phase A Lane 2, S1) so the AP-capture telemetry TU can share the type/
+// constants without including this monolithic impl header. Definitions are
+// unchanged — exactly one definition each, here via the include.
+#include "sb_i2s_capture_types.h"
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-struct SBAudioI2SReadDebug {
-  uint32_t bytes_requested;
-  uint32_t bytes_read;
-  int32_t status;
-  uint32_t elapsed_us;
-};
-
 static SBAudioI2SReadDebug sb_audio_i2s_read_debug = {};
 
 SBAudioI2SReadDebug sb_audio_i2s_read_debug_read() {

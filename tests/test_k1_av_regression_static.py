@@ -11,7 +11,29 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "scripts" / "regression-harness"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
+# Phase A Lane 2 (S1): the AP novelty/cadence capture + soak telemetry unit was
+# extracted verbatim out of serial_menu.h into a dedicated, production-gated TU.
+# Assertions that pin that diagnostic code must look across the whole serial
+# command surface (serial_menu.h + the extracted TU), not serial_menu.h alone.
+AP_CAPTURE_TELEMETRY_H = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "k1_ap_capture_telemetry.h"
+AP_CAPTURE_TELEMETRY_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "k1_ap_capture_telemetry.cpp"
 sys.path.insert(0, str(HARNESS))
+
+
+def serial_command_surface() -> str:
+    """serial_menu.h + the extracted AP-capture telemetry TU, concatenated.
+
+    The capture handlers, sample structs and capacity macros moved (verbatim,
+    same gate) into k1_ap_capture_telemetry.{h,cpp}; the parse_command apcap/
+    apcad/apsoak handlers and the stop_streams reset stayed in serial_menu.h.
+    Reading the concatenation preserves the original assertions' intent — "this
+    gated diagnostic exists in the firmware's serial command surface" — without
+    weakening them.
+    """
+    return "\n".join(
+        p.read_text(encoding="utf-8")
+        for p in (SERIAL_MENU, AP_CAPTURE_TELEMETRY_H, AP_CAPTURE_TELEMETRY_CPP)
+    )
 
 import k1_av_event_quality as event_quality  # noqa: E402
 import k1_av_layer_classifier as lc  # noqa: E402
@@ -132,14 +154,14 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn("volume={float(args.playback_gain_db):.3f}dB", source)
 
     def test_apcad_dump_yields_during_large_serial_prints(self):
-        source = SERIAL_MENU.read_text(encoding="utf-8")
+        source = serial_command_surface()  # ap_cad_capture_dump moved to the extracted TU (S1)
         self.assertIn("void ap_cad_capture_dump()", source)
         self.assertIn("USBSerial.println(\",src=buf\");", source)
         self.assertIn("if ((i & 0x0F) == 0x0F)", source)
         self.assertIn("vTaskDelay(1);", source)
 
     def test_apcad_capture_records_stage_probe_field(self):
-        source = SERIAL_MENU.read_text(encoding="utf-8")
+        source = serial_command_surface()  # struct/sample writes/print moved to the extracted TU (S1)
         ino = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
         capture = (HARNESS / "device_ap_cadence_capture.py").read_text(encoding="utf-8")
         self.assertIn("uint8_t stage;", source)
@@ -185,7 +207,7 @@ class K1AvRegressionStaticTest(unittest.TestCase):
     def test_16k_acf_spread_probe_is_non_shippable_env_only(self):
         tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp").read_text(encoding="utf-8")
         tempo_h = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.h").read_text(encoding="utf-8")
-        serial = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h").read_text(encoding="utf-8")
+        serial = serial_command_surface()  # acf_spread= print moved to the extracted TU (S1)
         capture = (HARNESS / "device_ap_cadence_capture.py").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
         guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
@@ -227,12 +249,19 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn('"active_ap_work_over_7500_count":', capture)
 
     def test_apcad_compact_soak_command_is_bounded_and_abortable(self):
-        serial = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h").read_text(encoding="utf-8")
+        # Defines / soak buffer / ap_cad_soak_tick / SOAK_DONE|WORST emit moved to the
+        # extracted TU (S1); the apcad_soak* command handlers + the reset stayed in
+        # serial_menu.h. The concatenated surface covers both.
+        serial = serial_command_surface()
         ino = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
 
         self.assertIn("#define AP_CAD_SOAK_MAX_MS 600000UL", serial)
         self.assertIn("#define AP_CAD_SOAK_WORST_COUNT 16", serial)
-        self.assertIn("static uint32_t AP_CAD_SOAK_ACTIVE_HIST", serial)
+        # Soak histogram buffer: after the S1 extraction it carries external
+        # linkage (defined non-static in the .cpp, declared extern in the .h)
+        # so the moved handlers in the .cpp can reference the same storage.
+        self.assertIn("uint32_t AP_CAD_SOAK_ACTIVE_HIST[AP_CAD_SOAK_HIST_BUCKETS];", serial)
+        self.assertIn("extern uint32_t AP_CAD_SOAK_ACTIVE_HIST", serial)
         self.assertIn("void ap_cad_soak_tick", serial)
         self.assertIn("APCAD_SOAK_DONE,ver=1", serial)
         self.assertIn("APCAD_SOAK_WORST,ver=1", serial)
@@ -248,7 +277,7 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn('"compact_soak_mode": bool(args.compact_soak)', capture)
 
     def test_apcad_capture_buffers_tempo_v2_lock_fields(self):
-        source = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h").read_text(encoding="utf-8")
+        source = serial_command_surface()  # APCadenceCaptureSample fields + emit strings moved to the extracted TU (S1)
         for token in (
             "winner_bpm_q8_8",
             "top1_bpm_q8_8",
