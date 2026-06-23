@@ -20,6 +20,18 @@ NAME = "onset_beat"
 MODULE_CPPS = ["sb_onset_beat.cpp"]
 DEFINES = ["SB_ONSET_V2"]
 
+# Behaviour-changing edits PROVEN to shift this oracle's golden, spanning distinct
+# detector mechanisms (per-band threshold, per-band refractory, transient
+# peak-wait). The harness self-test (harness_selftest.py) applies each and asserts
+# the golden diverges — proving the oracle is not blind. Verified diverged lines:
+# KICK_K=228, KICK_REFR=264, HIHAT_REFR=171, PEAK_WAIT=67.
+MUTATIONS = [
+    (r"SBV2_KICK_K\s*=\s*0\.8f", "SBV2_KICK_K = 6.0f", "raise kick threshold factor (0.8->6.0)"),
+    (r"SBV2_KICK_REFR\s*=\s*6;", "SBV2_KICK_REFR = 12;", "widen kick refractory (6->12 frames)"),
+    (r"SBV2_HIHAT_REFR\s*=\s*3;", "SBV2_HIHAT_REFR = 9;", "widen hihat refractory (3->9 frames)"),
+    (r"SBV2_PEAK_WAIT\s*=\s*4;", "SBV2_PEAK_WAIT = 16;", "widen transient peak-wait (4->16 frames)"),
+]
+
 DRIVER = r"""
 #include "sb_onset_beat.h"
 #include <cstdio>

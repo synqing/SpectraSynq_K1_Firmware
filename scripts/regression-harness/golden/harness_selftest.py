@@ -1,18 +1,23 @@
 #!/usr/bin/env python3
-"""Harness self-test — the Gate Fα proof (Phase F / L1).
+"""Harness self-test — the Gate Fα proof (Phase F / L1), multi-oracle.
 
-Mutation testing OF THE HARNESS ITSELF. For each deliberate behaviour change
-planted in a *copy* of the firmware, the oracle output MUST diverge from the
-frozen golden. A mutation that slips through means the harness is blind to a real
-regression — i.e. NOT fail-proof — and the self-test fails.
+Mutation testing OF THE HARNESS ITSELF. For every registered oracle, each
+behaviour-changing edit in its MUTATIONS list (planted in a *copy* of the
+firmware) MUST make the oracle output diverge from the frozen golden. A mutation
+that slips through means the oracle is blind to a real regression — NOT
+fail-proof — and the self-test fails.
 
 This is the objective evidence that autonomous behaviour-preserving lanes can be
-trusted to ride this oracle: the oracle provably rejects injected regressions.
+trusted to ride these oracles: they provably reject injected regressions.
+
+Each oracle module is self-describing — it exports NAME, MODULE_CPPS, DEFINES,
+DRIVER, capture(), and MUTATIONS. Registering a new tap is one line below.
 
 Run:  python harness_selftest.py
 """
 from __future__ import annotations
 
+import importlib.util
 import re
 import shutil
 import sys
@@ -23,51 +28,62 @@ HARNESS = Path(__file__).resolve().parent
 sys.path.insert(0, str(HARNESS))
 
 from oracle_hostcompile import host_compile_run, FIRMWARE, ROOT  # noqa: E402
-import oracle_onset_beat as onset  # noqa: E402
 
-GOLDEN = ROOT / "tests" / "golden" / "onset_beat.golden.jsonl"
-MODULE_REL = Path("audio") / "sb_onset_beat.cpp"
+GOLDEN_DIR = ROOT / "tests" / "golden"
 
-# (regex anchor, replacement, description) — each is a behaviour-changing edit
-# PROVEN to shift the golden, spanning distinct detector mechanisms (per-band
-# threshold, per-band refractory, transient peak-wait). Verified diverged lines:
-# KICK_K=228, KICK_REFR=264, HIHAT_REFR=171, PEAK_WAIT=67.
-MUTATIONS = [
-    (r"SBV2_KICK_K\s*=\s*0\.8f", "SBV2_KICK_K = 6.0f", "raise kick threshold factor (0.8->6.0)"),
-    (r"SBV2_KICK_REFR\s*=\s*6;", "SBV2_KICK_REFR = 12;", "widen kick refractory (6->12 frames)"),
-    (r"SBV2_HIHAT_REFR\s*=\s*3;", "SBV2_HIHAT_REFR = 9;", "widen hihat refractory (3->9 frames)"),
-    (r"SBV2_PEAK_WAIT\s*=\s*4;", "SBV2_PEAK_WAIT = 16;", "widen transient peak-wait (4->16 frames)"),
+# The registry — one entry per tap. Extended as oracles land + pass Gate Fα.
+ORACLE_MODULES = [
+    "oracle_onset_beat",
 ]
 
 
-def _capture(firmware_root) -> str:
+def _load(module_name):
+    spec = importlib.util.spec_from_file_location(module_name, HARNESS / f"{module_name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _capture(mod, firmware_root):
     rc, out, err = host_compile_run(
-        onset.MODULE_CPPS, onset.DRIVER, defines=onset.DEFINES, firmware_root=firmware_root)
+        mod.MODULE_CPPS, mod.DRIVER, defines=mod.DEFINES, firmware_root=firmware_root)
     if rc != 0:
-        raise RuntimeError(f"oracle compile/run failed (rc={rc}):\n{err}")
+        raise RuntimeError(f"[{mod.NAME}] oracle compile/run failed (rc={rc}):\n{err}")
     return out
 
 
-def _mutated_capture(pattern, replacement) -> str:
+def _mutated_capture(mod, pattern, replacement):
+    """Apply a mutation to whichever source file in a firmware COPY matches it."""
     with tempfile.TemporaryDirectory() as td:
         dst = Path(td) / "SPECTRASYNQ_K1_FIRMWARE"
         shutil.copytree(FIRMWARE, dst)
-        cpp = dst / MODULE_REL
-        text = cpp.read_text(encoding="utf-8")
-        new, n = re.subn(pattern, replacement, text, count=1)
-        if n == 0:
-            raise RuntimeError(f"mutation anchor not found: {pattern}")
-        cpp.write_text(new, encoding="utf-8")
-        return _capture(dst)
+        target = None
+        for f in dst.rglob("*"):
+            if f.suffix in (".cpp", ".h") and f.is_file():
+                text = f.read_text(encoding="utf-8", errors="ignore")
+                if re.search(pattern, text):
+                    f.write_text(re.sub(pattern, replacement, text, count=1), encoding="utf-8")
+                    target = f
+                    break
+        if target is None:
+            raise RuntimeError(f"[{mod.NAME}] mutation anchor not found anywhere: {pattern}")
+        return _capture(mod, dst)
 
 
 def run_selftest():
     """Return list of (label, passed). All must pass for the harness to be trusted."""
-    golden = GOLDEN.read_text(encoding="utf-8")
-    results = [("baseline (unmutated copy) reproduces golden", _capture(FIRMWARE) == golden)]
-    for pattern, replacement, desc in MUTATIONS:
-        diverged = _mutated_capture(pattern, replacement) != golden
-        results.append((f"regression CAUGHT: {desc}", diverged))
+    results = []
+    for module_name in ORACLE_MODULES:
+        mod = _load(module_name)
+        golden = (GOLDEN_DIR / f"{mod.NAME}.golden.jsonl").read_text(encoding="utf-8")
+        results.append((f"[{mod.NAME}] baseline (unmutated copy) reproduces golden",
+                        _capture(mod, FIRMWARE) == golden))
+        if not getattr(mod, "MUTATIONS", None):
+            results.append((f"[{mod.NAME}] declares >=1 proven mutation", False))
+            continue
+        for pattern, replacement, desc in mod.MUTATIONS:
+            diverged = _mutated_capture(mod, pattern, replacement) != golden
+            results.append((f"[{mod.NAME}] regression CAUGHT: {desc}", diverged))
     return results
 
 
@@ -76,8 +92,8 @@ def main():
     for label, passed in run_selftest():
         print(f"[{'PASS' if passed else 'FAIL'}] {label}")
         ok = ok and passed
-    print("\nGATE_F-alpha:", "PROVEN — harness rejects injected regressions" if ok
-          else "FAILED — harness is BLIND to a regression, do not trust it")
+    print("\nGATE_F-alpha:", "PROVEN — every oracle rejects its injected regressions" if ok
+          else "FAILED — an oracle is BLIND to a regression, do not trust it")
     return 0 if ok else 1
 
 
