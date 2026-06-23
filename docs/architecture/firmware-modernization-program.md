@@ -7,6 +7,7 @@ abstract: "CTO program spec for the SpectraSynq K1 firmware modernization: Ardui
 **Status:** **RATIFIED 2026-06-23 by Captain** ("Full Specced, Full Send"). Phase F (harness) is executing; structural lanes (Phase A+) remain gated on **Gate Fα** (harness self-test proven).
 **Owner:** Engineering (autonomous lanes) · **Decision authority:** Captain.
 **Governing principle (Captain, 2026-06-23):** *With an autonomous multi-lane refactor, the harness IS the product. Scope and harness must be flawless up front, or we reinforce failures at scale.*
+**Generic methodology:** this program is the K1 instantiation of the project-agnostic **`autonomous-agentic-build`** skill (`~/.claude/skills/autonomous-agentic-build/` — harness-first doctrine + fill-in `handoff-template.md`, hardened v2). Reuse it for any other long-running autonomous build; this doc is its concrete fill-in.
 
 ---
 
@@ -127,3 +128,4 @@ Each unit is small, independently revertible, and gated by §3. `→` = hard dep
 |------|--------|--------|
 | 2026-06-23 | agent:claude-code (CTO) | Created DRAFT: firmware modernization program + fail-proof harness spec. Awaiting Captain ratification (Gate Fα precedes all structural lanes). |
 | 2026-06-23 | captain | RATIFIED ("Full Specced, Full Send, Take No Prisoners"). Phase F execution authorized. Structural lanes remain gated on Gate Fα. |
+| 2026-06-24 | agent:claude-code | Added cross-ref: generic methodology canonised as the `autonomous-agentic-build` skill (hardened v2 after adversarial teardown). This program = its K1 instantiation. |
