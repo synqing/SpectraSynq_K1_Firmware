@@ -270,6 +270,37 @@ CORPUS = [
     "led_type=foo",             # not a led-type token -> bad_command, NO reboot
     "led_color_order=XYZ",      # not a colour-order token -> bad_command, NO reboot
     "boot_animation=maybe",     # not a bool/default token -> bad_command, NO reboot
+
+    # ===================================================================
+    # Fα VP-TUNING EXTENSION — 17 production-live VP handlers (no save_config,
+    # no reboot). Each writes a VP inline global via vp_set_flag/float_command.
+    # config_delta now tracks the VP globals (snapshot extended above).
+    # ===================================================================
+    # ---- (7) valid VP flag sets: one representative per flag handler ----------
+    "vp_fix1=false",            # alias -> VP_FIX_AGC_SOFT_KNEE = false
+    "vp_agc_soft=true",         # primary name alias-routing check
+    "vp_fix2=false",            # -> VP_FIX_CHROMAGRAM_SPARSENESS = false
+    "vp_fix3=false",            # -> VP_FIX_PRISM_DEFAULT_OFF = false
+    "vp_fix4=true",             # -> VP_FIX_BLOOM_DECAY = true
+    "vp_fix5=false",            # -> VP_FIX_HSV_SOURCE_SAT = false
+    "vp_secondary_clean=false", # -> VP_FIX_SECONDARY_CLEAN = false
+    "vp_bloom_force_sat=false", # -> VP_BLOOM_FORCE_SATURATION = false
+
+    # ---- (8) valid VP float sets: one representative per float handler --------
+    "vp_bloom_alpha=0.90",      # VP_BLOOM_ALPHA = 0.90 (in [0.80, 1.00])
+    "vp_bloom_shift=1.5",       # VP_BLOOM_SHIFT_SCALE = 1.5 (in [0.25, 2.00])
+    "vp_wave_idle_fade=0.90",   # VP_WAVEFORM_IDLE_FADE = 0.90 (in [0.50, 0.999])
+    "vp_wave_raw_margin=2.0",   # VP_WAVEFORM_REACTIVE_RAW_MARGIN = 2.0 (in [1.00, 3.00])
+    "vp_wave_peak_floor=0.10",  # VP_WAVEFORM_REACTIVE_PEAK_FLOOR = 0.10 (in [0.00, 1.00])
+    "vp_wave_active_fade=0.10", # VP_WAVEFORM_ACTIVE_FADE_REDUCTION = 0.10 (in [0.00, 0.50])
+    "vp_wave_blend_gain=3.0",   # VP_WAVEFORM_CHROMA_BLEND_GAIN = 3.0 (in [0.00, 4.00])
+    "vp_wave_fallback=0.5",     # VP_WAVEFORM_FALLBACK_BRIGHTNESS = 0.5 (in [0.00, 1.00])
+    "vp_wave_vu_floor=0.05",    # VP_WAVEFORM_VU_FLOOR = 0.05 (in [0.00, 1.00])
+    "vp_wave_shift=120",        # VP_WAVEFORM_SHIFT_RATE = 120.0 (in [0.00, 240.00])
+
+    # ---- (9) VP float clamp boundary: prove the manual clamp bounds ----------
+    "vp_bloom_alpha=0.79",      # below 0.80 -> clamped to 0.80 (VP_BLOOM_ALPHA)
+    "vp_bloom_alpha=1.01",      # above 1.00 -> clamped to 1.00 (VP_BLOOM_ALPHA)
 ]
 
 # ---------------------------------------------------------------------------
@@ -430,6 +461,26 @@ static int snapshot(FieldSnap* out) {
   out[n++] = {"LED_COUNT",            (double)CONFIG.LED_COUNT};
   out[n++] = {"SAMPLES_PER_CHUNK",    (double)CONFIG.SAMPLES_PER_CHUNK};
   out[n++] = {"BOOT_ANIMATION",       (double)CONFIG.BOOT_ANIMATION};
+  // Fα VP-tuning extension: 17 live VP globals written by vp_set_flag/float_command.
+  // Without these the config_delta channel is BLIND to mis-routed VP writes (the
+  // globals are not in CONFIG, so CONFIG delta stays empty on every VP command).
+  out[n++] = {"VP_FIX_AGC_SOFT_KNEE",             (double)VP_FIX_AGC_SOFT_KNEE};
+  out[n++] = {"VP_FIX_CHROMAGRAM_SPARSENESS",      (double)VP_FIX_CHROMAGRAM_SPARSENESS};
+  out[n++] = {"VP_FIX_PRISM_DEFAULT_OFF",          (double)VP_FIX_PRISM_DEFAULT_OFF};
+  out[n++] = {"VP_FIX_BLOOM_DECAY",                (double)VP_FIX_BLOOM_DECAY};
+  out[n++] = {"VP_FIX_HSV_SOURCE_SAT",             (double)VP_FIX_HSV_SOURCE_SAT};
+  out[n++] = {"VP_FIX_SECONDARY_CLEAN",            (double)VP_FIX_SECONDARY_CLEAN};
+  out[n++] = {"VP_BLOOM_ALPHA",                    (double)VP_BLOOM_ALPHA};
+  out[n++] = {"VP_BLOOM_SHIFT_SCALE",              (double)VP_BLOOM_SHIFT_SCALE};
+  out[n++] = {"VP_BLOOM_FORCE_SATURATION",         (double)VP_BLOOM_FORCE_SATURATION};
+  out[n++] = {"VP_WAVEFORM_IDLE_FADE",             (double)VP_WAVEFORM_IDLE_FADE};
+  out[n++] = {"VP_WAVEFORM_REACTIVE_RAW_MARGIN",   (double)VP_WAVEFORM_REACTIVE_RAW_MARGIN};
+  out[n++] = {"VP_WAVEFORM_REACTIVE_PEAK_FLOOR",   (double)VP_WAVEFORM_REACTIVE_PEAK_FLOOR};
+  out[n++] = {"VP_WAVEFORM_ACTIVE_FADE_REDUCTION", (double)VP_WAVEFORM_ACTIVE_FADE_REDUCTION};
+  out[n++] = {"VP_WAVEFORM_CHROMA_BLEND_GAIN",     (double)VP_WAVEFORM_CHROMA_BLEND_GAIN};
+  out[n++] = {"VP_WAVEFORM_FALLBACK_BRIGHTNESS",   (double)VP_WAVEFORM_FALLBACK_BRIGHTNESS};
+  out[n++] = {"VP_WAVEFORM_VU_FLOOR",              (double)VP_WAVEFORM_VU_FLOOR};
+  out[n++] = {"VP_WAVEFORM_SHIFT_RATE",            (double)VP_WAVEFORM_SHIFT_RATE};
   return n;
 }
 
@@ -621,6 +672,30 @@ MUTATIONS = [
         r"(else if \(strcmp\(command_type, \"led_count\"\) == 0\) \{(?:.|\n)*?)save_config\(\);",
         r"\1save_config_delayed();",
         "led_count_save_class_swap_immediate_to_delayed (side-effect-flag divergence)",
+    ),
+    # ===================================================================
+    # Fα VP-TUNING MUTATIONS — 2 edits that MUST diverge the golden on the
+    # VP corpus entries. Each targets a DIFFERENT VP channel.
+    # ===================================================================
+    # 9. MIS-ROUTE the vp_bloom_alpha write to &VP_BLOOM_SHIFT_SCALE. "vp_bloom_alpha=0.90"
+    #    now writes the WRONG VP global — the echo still says "vp_bloom_alpha: 0.9000" but
+    #    the config_delta shows VP_BLOOM_ALPHA absent (unchanged) + VP_BLOOM_SHIFT_SCALE
+    #    spuriously changed. Exactly the field-routing regression text alone misses. Channel (b).
+    #    Anchored inside the vp_bloom_alpha branch (unique float bounds 0.80/1.00).
+    (
+        r"(else if \(strcmp\(command_type, \"vp_bloom_alpha\"\) == 0\) \{[^}]*)"
+        r"vp_set_float_command\(command_type, command_data, &VP_BLOOM_ALPHA, 0\.80f, 1\.00f\);",
+        r"\1vp_set_float_command(command_type, command_data, &VP_BLOOM_SHIFT_SCALE, 0.80f, 1.00f);",
+        "vp_bloom_alpha_write_misrouted_to_VP_BLOOM_SHIFT_SCALE (field-routing divergence)",
+    ),
+    # 10. CHANGE the vp_bloom_alpha low clamp from 0.80f to 0.70f. "vp_bloom_alpha=0.79"
+    #     now records VP_BLOOM_ALPHA=0.79 instead of the correct clamped value of 0.80.
+    #     Diverges channel (b) config_delta for the boundary corpus entry. Channel (b).
+    (
+        r"(else if \(strcmp\(command_type, \"vp_bloom_alpha\"\) == 0\) \{[^}]*)"
+        r"vp_set_float_command\(command_type, command_data, &VP_BLOOM_ALPHA, 0\.80f, 1\.00f\);",
+        r"\1vp_set_float_command(command_type, command_data, &VP_BLOOM_ALPHA, 0.70f, 1.00f);",
+        "vp_bloom_alpha_clamp_low_0.80_to_0.70 (CONFIG-delta divergence on boundary entry)",
     ),
 ]
 
