@@ -2586,6 +2586,11 @@ void parse_command(char* command_buf) {
       }
     }
 
+// tempo_stream stays INLINE here (ENABLE_TEMPO_STREAM-only gate — a different
+// gate level than the AP block, so keeping it inline avoids straddling two
+// gates in the dispatcher). The 11 AP-frontend-debug handlers (combined gate)
+// are lifted to serial/k1_ap_capture_telemetry.{cpp,h}; bodies statement-
+// identical, gates identical, production preprocesses to nothing.
 #if ENABLE_TEMPO_STREAM
     else if (strcmp(command_type, "tempo_stream") == 0) {
       bool value = false;
@@ -2602,137 +2607,7 @@ void parse_command(char* command_buf) {
 #endif
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    else if (strcmp(command_type, "ap_frontend_debug") == 0 || strcmp(command_type, "apdbg") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value)) {
-        AP_FRONTEND_DEBUG_ENABLED = value;
-        tx_begin();
-        USBSerial.print("AP_FRONTEND_DEBUG: ");
-        USBSerial.println(vp_bool_text(AP_FRONTEND_DEBUG_ENABLED));
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_capture") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_NOV_CAPTURE_MAX_MS && ap_nov_capture_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("NOV_CAPTURE: armed ");
-        USBSerial.print(ms);
-        USBSerial.print(" ms capacity=");
-        USBSerial.println(AP_NOV_CAPTURE_CAPACITY);
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_dump") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_dump();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_clear") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_clear();
-        ap_nov_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_capture") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_CAD_CAPTURE_MAX_MS && ap_cad_capture_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("APCAD_CAPTURE: armed ");
-        USBSerial.print(ms);
-        USBSerial.print(" ms capacity=");
-        USBSerial.println(AP_CAD_CAPTURE_CAPACITY);
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_dump") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_dump();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_clear") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_clear();
-        ap_cad_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_soak") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_CAD_SOAK_MAX_MS && ap_cad_soak_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("APCAD_SOAK: armed ");
-        USBSerial.print(ms);
-        USBSerial.println(" ms compact=1");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_soak_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_soak_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_abort") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        AP_CAD_CAPTURE_ACTIVE = false;
-        AP_CAD_SOAK_ACTIVE = false;
-        tx_begin();
-        USBSerial.println("APCAD_ABORT: stopped");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
+    else if (serial_diag_ap_dispatch(command_type, command_data)) { }
 #endif
 
 #ifdef ENABLE_AP_STREAM
