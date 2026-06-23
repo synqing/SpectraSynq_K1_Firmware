@@ -26,7 +26,10 @@ sys.path.insert(0, str(HARNESS))
 
 from harness_selftest import ORACLE_MODULES  # single source of truth for the registry
 
-FLOAT_TOL = 1e-4
+# 1e-3 absorbs last-digit float drift between host compilers (mac clang vs CI
+# clang/gcc) on long traces; real behaviour changes diverge by whole records, so
+# this stays far from masking a regression (the Gate Fα self-test proves it).
+FLOAT_TOL = 1e-3
 
 
 def _parse(text):
