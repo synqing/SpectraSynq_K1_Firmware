@@ -83,7 +83,11 @@ extern bool stream_agc_debug;
 #ifndef TEMPO_STREAM_DEFAULT_ON
 #define TEMPO_STREAM_DEFAULT_ON 1
 #endif
-static bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
+// External linkage (was static): the extracted stop_streams() in serial_tx.cpp
+// references this flag under the ENABLE_TEMPO_STREAM gate (cross-TU edge:
+// static -> extern, statement identical). serial_menu.h is the single-include
+// owner of the definition.
+bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
 #endif
 
 // AP capture/telemetry state + handlers extracted to a dedicated TU
@@ -91,71 +95,19 @@ static bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
 // ENABLE_AP_FRONTEND_DEBUG gate -> compiles to nothing in production.
 #include "k1_ap_capture_telemetry.h"
 
-// tx_begin/tx_end default args: when the AP-capture telemetry header is in
-// scope (probe gate ON) it already declares these with their defaults, so the
-// definitions below must NOT repeat the default (one default per TU). In
-// production (gate OFF) the header declares nothing, so we supply the default
-// here via a forward declaration before the (default-free) definitions.
-#if !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
-void tx_begin(bool error = false);
-void tx_end(bool error = false);
-#endif
+// Serial protocol envelope (tx_begin/tx_end/ack/bad_command/stop_streams/
+// init_serial) extracted to serial/serial_tx.{cpp,h} (Lane 2, S2 / Unit B).
+// serial_tx.h is the single source of the tx_begin/tx_end default arguments.
+#include "serial_tx.h"
 
-void tx_begin(bool error) {
-  if (error == false) {
-    USBSerial.println("sbr{{");
-  } else {
-    USBSerial.println("sberr[[");
-  }
-}
+// Command-parse leaf primitives (vp_parse_bool/float, serial_clamp_float,
+// serial_wrap_index) extracted to serial/serial_parse_helpers.{cpp,h}
+// (Lane 2, S2 / Unit C).
+#include "serial_parse_helpers.h"
 
-void tx_end(bool error) {
-  if (error == false) {
-    USBSerial.println("}}");
-  } else {
-    USBSerial.println("]]");
-  }
-}
-
-void ack() {
-  USBSerial.println("SBOK");
-}
-
-void bad_command(const char* command_type, const char* command_data) {
-  tx_begin(true);
-  USBSerial.print("Bad command: ");
-  USBSerial.print(command_type);
-  if (command_data[0] != 0) {
-    USBSerial.print("=");
-    USBSerial.print(command_data);
-  }
-
-  USBSerial.println();
-  tx_end(true);
-}
-
-void stop_streams() {
-  stream_audio = false;
-  stream_fps = false;
-  stream_max_mags = false;
-  stream_max_mags_followers = false;
-  stream_magnitudes = false;
-  stream_spectrogram = false;
-  stream_chromagram = false;
-  stream_agc_debug = false;
-  AP_STREAM_ENABLED = false;
-#if ENABLE_TEMPO_STREAM
-  TEMPO_STREAM_ENABLED = false;
-#endif
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  AP_FRONTEND_DEBUG_ENABLED = false;
-  AP_NOV_CAPTURE_ACTIVE = false;
-  AP_CAD_CAPTURE_ACTIVE = false;
-  AP_CAD_SOAK_ACTIVE = false;
-#endif
-  VP_STREAM_ENABLED = false;
-}
-
+// init_serial() is NOT extracted to serial_tx.cpp: its body references the
+// FIRMWARE_VERSION macro, which is #define'd in the .ino TU (not a header), so
+// it only compiles inside the .ino include context — it stays here (verbatim).
 void init_serial(uint32_t baud_rate) {
   USBSerial.begin(baud_rate);  // Default 500,000 baud
   bool timeout = false;
@@ -387,30 +339,9 @@ void dump_info() {
   USBSerial.println(LED_FPS);
 }
 
-bool vp_parse_bool(const char* command_data, bool* out_value) {
-  if (strcmp(command_data, "on") == 0 || strcmp(command_data, "true") == 0 || strcmp(command_data, "1") == 0) {
-    *out_value = true;
-    return true;
-  }
-  if (strcmp(command_data, "off") == 0 || strcmp(command_data, "false") == 0 || strcmp(command_data, "0") == 0) {
-    *out_value = false;
-    return true;
-  }
-  return false;
-}
-
-bool vp_parse_float(const char* command_data, float* out_value) {
-  if (command_data[0] == 0) {
-    return false;
-  }
-  char* end_ptr = nullptr;
-  float value = strtof(command_data, &end_ptr);
-  if (end_ptr == command_data || *end_ptr != 0 || !isfinite(value)) {
-    return false;
-  }
-  *out_value = value;
-  return true;
-}
+// vp_parse_bool / vp_parse_float extracted to serial/serial_parse_helpers.cpp
+// (Lane 2, S2 / Unit C) — declarations in serial_parse_helpers.h (included
+// above).
 
 const char* vp_bool_text(bool value) {
   return value ? "on" : "off";
@@ -972,19 +903,9 @@ bool vp_set_float_command(const char* command_type, const char* command_data, fl
   return true;
 }
 
-float serial_clamp_float(float value, float min_value, float max_value) {
-  if (value < min_value) return min_value;
-  if (value > max_value) return max_value;
-  return value;
-}
-
-uint8_t serial_wrap_index(uint8_t current, int8_t delta, uint8_t count) {
-  if (count == 0) return 0;
-  int16_t next = int16_t(current) + int16_t(delta);
-  while (next < 0) next += count;
-  while (next >= count) next -= count;
-  return uint8_t(next);
-}
+// serial_clamp_float / serial_wrap_index extracted to
+// serial/serial_parse_helpers.cpp (Lane 2, S2 / Unit C) — declarations in
+// serial_parse_helpers.h (included above).
 
 const char* serial_target_name() {
   return secondaryMode ? "secondary" : "primary";

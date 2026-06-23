@@ -11,28 +11,44 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "scripts" / "regression-harness"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
-# Phase A Lane 2 (S1): the AP novelty/cadence capture + soak telemetry unit was
-# extracted verbatim out of serial_menu.h into a dedicated, production-gated TU.
-# Assertions that pin that diagnostic code must look across the whole serial
-# command surface (serial_menu.h + the extracted TU), not serial_menu.h alone.
+# Phase A Lane 2: the serial_menu.h god-header is being decomposed into cohesive
+# serial/*.{h,cpp} TUs. Assertions that pin serial-command-surface code must look
+# across the WHOLE surface (serial_menu.h + the extracted TUs), not serial_menu.h
+# alone.
+#   S1 — AP novelty/cadence capture + soak telemetry (production-gated TU).
+#   S2 — serial_tx (tx_begin/tx_end/ack/bad_command/stop_streams) +
+#        serial_parse_helpers (vp_parse_bool/float, serial_clamp_float,
+#        serial_wrap_index). init_serial stayed in serial_menu.h (.ino-local
+#        FIRMWARE_VERSION macro coupling).
 AP_CAPTURE_TELEMETRY_H = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "k1_ap_capture_telemetry.h"
 AP_CAPTURE_TELEMETRY_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "k1_ap_capture_telemetry.cpp"
+SERIAL_TX_H = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_tx.h"
+SERIAL_TX_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_tx.cpp"
+SERIAL_PARSE_HELPERS_H = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_parse_helpers.h"
+SERIAL_PARSE_HELPERS_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_parse_helpers.cpp"
 sys.path.insert(0, str(HARNESS))
 
 
 def serial_command_surface() -> str:
-    """serial_menu.h + the extracted AP-capture telemetry TU, concatenated.
+    """serial_menu.h + the extracted serial/*.{h,cpp} TUs, concatenated.
 
-    The capture handlers, sample structs and capacity macros moved (verbatim,
-    same gate) into k1_ap_capture_telemetry.{h,cpp}; the parse_command apcap/
-    apcad/apsoak handlers and the stop_streams reset stayed in serial_menu.h.
-    Reading the concatenation preserves the original assertions' intent — "this
-    gated diagnostic exists in the firmware's serial command surface" — without
-    weakening them.
+    As serial_menu.h decomposes (S1 telemetry, S2 serial_tx + parse_helpers, …)
+    the diagnostic/handler/envelope code moves verbatim (same gates) into
+    dedicated TUs. Reading the concatenation preserves the original assertions'
+    intent — "this code exists in the firmware's serial command surface" —
+    without weakening them.
     """
     return "\n".join(
         p.read_text(encoding="utf-8")
-        for p in (SERIAL_MENU, AP_CAPTURE_TELEMETRY_H, AP_CAPTURE_TELEMETRY_CPP)
+        for p in (
+            SERIAL_MENU,
+            AP_CAPTURE_TELEMETRY_H,
+            AP_CAPTURE_TELEMETRY_CPP,
+            SERIAL_TX_H,
+            SERIAL_TX_CPP,
+            SERIAL_PARSE_HELPERS_H,
+            SERIAL_PARSE_HELPERS_CPP,
+        )
     )
 
 import k1_av_event_quality as event_quality  # noqa: E402

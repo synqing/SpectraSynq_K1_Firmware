@@ -33,11 +33,11 @@
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 #include <esp_heap_caps.h>
 
-// Serial TX-envelope helpers defined in serial_menu.h (Unit B). Declared here
-// so the extracted capture handlers can call them across the TU boundary; the
-// definitions (with the same default arguments) live once in serial_menu.h.
-void tx_begin(bool error = false);
-void tx_end(bool error = false);
+// Serial TX-envelope helpers (tx_begin/tx_end) now live in serial/serial_tx.*
+// (Lane 2, S2 / Unit B); include its header for the single-source declarations
+// (with default arguments) rather than re-declaring them here. vp_bool_text
+// still lives in serial_menu.h, so it stays a forward declaration.
+#include "serial_tx.h"
 const char* vp_bool_text(bool value);
 
 // ---- Capacity / bound macros (verbatim from serial_menu.h) -----------------
