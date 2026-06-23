@@ -16,6 +16,11 @@ from _fwpath import FwDir
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 SERIAL_MENU = FW / "serial_menu.h"
+# Phase A Lane 2, S4: the 23 pure CONFIG setters were lifted out of
+# parse_command's ladder into serial_cmd_handlers.cpp (dispatched via
+# serial_cmd_dispatch_pure_setter). The typed-command dispatch surface now spans
+# BOTH files, so typed-equivalence assertions check the combined source.
+SERIAL_CMD_HANDLERS = FW / "serial_cmd_handlers.cpp"
 QUEUE_HEADER = FW / "control" / "sb_effect_queue.h"
 QUEUE_IMPL = FW / "control" / "sb_effect_queue.cpp"
 LED_UTILS = FW / "led_utilities.h"
@@ -44,6 +49,10 @@ class EffectQueueKeyMapTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.menu = SERIAL_MENU.read_text()
+        # Typed-command dispatch now spans serial_menu.h (the ladder + dispatcher
+        # call) AND serial_cmd_handlers.cpp (the 23 pure-setter strcmp branches,
+        # S4). Concatenate for typed-equivalence checks (repoint, not weaken).
+        cls.dispatch = cls.menu + "\n" + SERIAL_CMD_HANDLERS.read_text()
         cls.handler = function_body(cls.menu, "serial_handle_hotkey")
         cls.immediate = re.sub(
             r"#ifdef\s+ENABLE_MOTION_PROBE\b.*?#endif", "",
@@ -105,8 +114,8 @@ class EffectQueueKeyMapTest(unittest.TestCase):
             '"temporal_dithering"',           # was '6' (global)
         ]
         for token in equivalents:
-            self.assertIn(f"strcmp(command_type, {token})", self.menu,
-                          f"typed equivalent {token} must exist in parse_command")
+            self.assertIn(f"strcmp(command_type, {token})", self.dispatch,
+                          f"typed equivalent {token} must exist in the parse_command dispatch surface")
 
     def test_queue_commands_exist(self):
         for token in ["queue_mode", "transition_style", "transition_dip_ms",

@@ -97,6 +97,12 @@ COMMON_SOURCES = [
 MODULE_CPPS = [
     "serial/serial_tx.cpp",
     "serial/serial_parse_helpers.cpp",
+    "serial/serial_cmd_handlers.cpp",  # S4: the 23 pure CONFIG setters lifted out of
+                                       # parse_command's ladder. parse_command (in
+                                       # serial_menu.h, #included by the driver) now
+                                       # calls serial_cmd_dispatch_pure_setter() here;
+                                       # the golden must reproduce byte-for-byte (the
+                                       # identity IS the S4 behaviour-preservation proof).
     "director/sb_smart_director.cpp",
     "director/sb_edgemixer_lite.cpp",
     "director/sb_visual_hooks.cpp",
