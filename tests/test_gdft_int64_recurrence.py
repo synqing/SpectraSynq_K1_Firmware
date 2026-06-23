@@ -23,7 +23,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
-GDFT_H = (FW / "audio" / "GDFT.h").read_text(encoding="utf-8")
+# GDFT.h bodies were lifted WHOLE & VERBATIM into k1_gdft_core.cpp (2026-06-23
+# Phase A Lane 1); the recurrence arithmetic asserted here now lives in the .cpp TU.
+GDFT_H = (FW / "audio" / "k1_gdft_core.cpp").read_text(encoding="utf-8")
 CONFIG_TYPES = (FW / "system" / "config_types.h").read_text(encoding="utf-8")
 SIM_PATH = ROOT / "scripts" / "regression-harness" / "gdft_true_center_scalloping.py"
 

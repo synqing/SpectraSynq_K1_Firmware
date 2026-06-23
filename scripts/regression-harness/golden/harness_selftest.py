@@ -38,6 +38,8 @@ ORACLE_MODULES = [
     "oracle_chord",
     "oracle_smart_director",
     "oracle_render",
+    "oracle_gdft",   # GDFT spectrum tap (Phase A Lane 1) — int32 baseline; the
+                     # int64-magnitude mutation proves the overflow is visible.
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform

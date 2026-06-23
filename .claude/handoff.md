@@ -7,6 +7,8 @@ Read order: this file → `docs/architecture/firmware-modernization-program.md` 
 
 ## ⏩ CURRENT ACTIVE LANE → Phase A · Lane 1: **GDFT decomposition (GDFT-first)**
 
+> **STATUS 2026-06-23 — S1 + S1.5 COMPLETE & independently verified-green.** `k1_gdft_core.cpp/.h` extracted (statement-identical to `GDFT.h@HEAD`, `diff -w -B` empty); `GDFT.h` now a shim; `oracle_gdft` registered + golden frozen; Gate Fα PROVEN (int64-magnitude mutation CAUGHT); `pio -e k1_hardware` green (RAM 33.4% / Flash 9.9%); full `pytest tests/` 562 passed. **NEXT = S2** (flip `K1_GDFT_INT64_MAGNITUDE_V1`+`_RECURRENCE_V1` ON) — owes **3 device gates**: MabuTrace Core-0 margin · prod-env AGC-scale · eyes-on on registry device. Footguns: `build_src_filter` is an ALLOWLIST (every new `k1_*.cpp` needs an entry; `director/`+`control/` still `sb_*`-only) · dead `audio/audio_transfer.h` has duplicate goertzel lines (delete in cleanup) · oracle locks `process_GDFT` given reconstructed coeffs/tilt, NOT the precompute (true-center needs its own lock).
+
 Captain-ratified re-sequencing (2026-06-23): Phase A leads with **GDFT**, NOT `.ino`/serial_menu. GDFT is the keystone — root of the audio pipeline, the **only gap in the behavior-lock net**, and it carries the open **Critical int32-overflow bug**. Do it first; it needs a fresh context window (hardest, highest-stakes lane).
 
 ### ⚑ SCOPED — full extraction contract: [`docs/architecture/gdft-decomposition-lane.md`](../docs/architecture/gdft-decomposition-lane.md) (authority for this lane; read it first)

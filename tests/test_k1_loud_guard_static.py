@@ -8,7 +8,9 @@ PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
 CONSTANTS = (FW / "system" / "constants.h").read_text(encoding="utf-8")
 I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
-GDFT = (FW / "audio" / "GDFT.h").read_text(encoding="utf-8")
+# process_GDFT() lifted WHOLE into k1_gdft_core.cpp (2026-06-23 Phase A Lane 1);
+# the loud-guard AGC arithmetic asserted here now lives in the .cpp TU.
+GDFT = (FW / "audio" / "k1_gdft_core.cpp").read_text(encoding="utf-8")
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
 SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
 LIGHTSHOW = (FW / "visual" / "lightshow_modes.h").read_text(encoding="utf-8")
