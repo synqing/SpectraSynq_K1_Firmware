@@ -76,6 +76,23 @@ abstract: "Phase A Lane 1 extraction contract: decompose GDFT.h's header-soup in
 ## 7 · Non-goals
 Not promoting `K1_GDFT_TRUE_CENTER_V1` (eyes-on FAIL) or `K1_SPECTRAL_WINDOW_V1`. Not altering spectrum→colour mapping, band layout, or novelty math. Not touching onset/chord/tempo modules. Not the full ESP-IDF migration (later Phase-A lane). S2's production default-flip is **not** closed by host gate alone — the 3 device gates above are owed.
 
+## 8 · Red-team backtest (2026-06-23 — adversarial verification of the lock)
+Attacked S1+S1.5 with red-team + inversion; target = a GREEN-but-broken failure (blind oracle / non-preserving extraction).
+
+| Attack | Result |
+|---|---|
+| Exact diff (no `-w -B`) of extracted bodies vs `GDFT.h@HEAD~1` | **clean** — only 3 trailing-whitespace blank lines, zero semantic change. Extraction is statement-identical. |
+| Golden reproducibility (independent re-capture) | `baseline == frozen golden`. |
+| **Recurrence-fix visibility** (does the golden see S2's *other* half?) | `int64_recurrence_ON` **and** `int64_both_ON` each diverge 12 frames → oracle **not blind** to either int64 half. **FIX: both added to MUTATIONS** (6 gdft Gate-Fα mutations now caught) so the net can never silently go blind to S2. |
+| Coverage census | all **80/80 bins nonzero** (leakage + broadband AGC), gate-open + novelty + tilt-bands exercised; overflow oscillation visible (`mag_i32[24]` 38201↔0). |
+
+**Residual limits (documented, not blocking S2):**
+- **MED — single-frequency/single-amplitude trace.** Misses gate-CLOSE hysteresis, mid-amplitude AGC dynamics, slow noise-floor adaptation, frequency diversity. *Follow-up:* broaden the trace (amplitude ramp + tone-off tail + bass/treble tones) + re-freeze (its own gated step).
+- **MED — coeff-precompute NOT locked.** Driver reconstructs `frequencies[]`/`spectral_tilt_lut[]` (host can't run `system.h`) → a regression in `precompute_goertzel_constants()` / a true-center change is invisible to this oracle. true-center needs its own lock when promoted.
+- **MED — host ≠ device.** Golden is `-O0 -fno-fast-math` x86 = **refactor-equivalence**, not device behavior (`-O3 -ffast-math` xtensa). The **integer** Goertzel/overflow path (S2's target) is platform-stable → S2 well-covered; **float** normalize/low-pass paths could pass host yet shift device under fast-math.
+
+**Verdict:** the lock is SOUND for its purpose (refactor-equivalence + the int64 overflow delta) and now hardened (+2 mutations). Coverage-broadening + precompute-lock are tracked follow-ups.
+
 ---
 **Document Changelog**
 
@@ -83,3 +100,4 @@ Not promoting `K1_GDFT_TRUE_CENTER_V1` (eyes-on FAIL) or `K1_SPECTRAL_WINDOW_V1`
 |------|--------|--------|
 | 2026-06-23 | agent:claude-code | Created — GDFT decomposition extraction contract. Synthesis of 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-int64-forensics) + first-hand GDFT.h read. Locks boundary, oracle design (16000-tone + mag_i32), int64 promote-pair / hold-true-center, S1→S3 golden-gated sequence, blast-radius proof (4 existing goldens bypass process_GDFT). |
 | 2026-06-23 | agent:claude-code | Boundary correction from surface inventory: S1 lifts `process_GDFT` **whole & verbatim** (cal FSM inert via `noise_complete=true` + stubbed I/O), NOT a source-split — the cal-completion AGC-reset (249-257) is an ordering coupling. Clean cal/transform split deferred to S3. Linked `gdft-surface-inventory.md` (17-array extern list). |
+| 2026-06-23 | agent:claude-code | Red-team backtest (§8): exact-diff confirms statement-identity; golden reproducible; **recurrence-fix visibility confirmed + locked** (+`int64_recurrence_ON` +`int64_both_ON` → 6 gdft Gate-Fα mutations); coverage census 80/80 bins. Residual limits documented (single-point trace, precompute not locked, host≠device float). Lock SOUND for S2. |

@@ -317,6 +317,21 @@ MUTATIONS = [
         r"#define K1_GDFT_INT64_MAGNITUDE_V1 1\n// Obscure audio magic happens here",
         "int64_magnitude_ON (un-wraps near-resonance under 16000 tone)",
     ),
+    # 5 + 6. RED-TEAM HARDENING (2026-06-23): S2 promotes BOTH int64 flags, but the
+    #    original four mutations only proved the MAGNITUDE half — leaving the oracle's
+    #    coverage of the RECURRENCE fix unasserted. Backtest confirmed both diverge
+    #    the golden (12 tone frames each); these lock that proof into Gate Fα so the
+    #    safety net can never silently go blind to either half of the S2 delta.
+    (
+        r"// Obscure audio magic happens here",
+        r"#define K1_GDFT_INT64_RECURRENCE_V1 1\n// Obscure audio magic happens here",
+        "int64_recurrence_ON (the other S2 half — q-state overflow)",
+    ),
+    (
+        r"// Obscure audio magic happens here",
+        r"#define K1_GDFT_INT64_MAGNITUDE_V1 1\n#define K1_GDFT_INT64_RECURRENCE_V1 1\n// Obscure audio magic happens here",
+        "int64_both_ON (the full S2 promotion delta)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
