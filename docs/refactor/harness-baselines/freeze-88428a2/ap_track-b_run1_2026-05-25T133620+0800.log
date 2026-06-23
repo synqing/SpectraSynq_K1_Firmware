@@ -1,0 +1,7 @@
+# freeze-88428a2 AP leg=track-b stimulus=track-B run=1 2026-05-25T133620+0800
+# NON-silence leg — captured while Captain played track-B.
+# === ap_capture=5000 (track-B) ===
+sbr{{
+AP_CAPTURE: armed 5000 ms
+}}
+[APCAP] frames=667 max_raw=1265/13610 peak_scaled=0.228/1.114 follower_mean=7693.1 spec_argmax=12 chroma_mean=0.3000 silence=0 SSL=601

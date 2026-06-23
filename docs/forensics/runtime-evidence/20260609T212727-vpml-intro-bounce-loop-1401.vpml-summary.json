@@ -1,0 +1,83 @@
+{
+  "acceptance": {
+    "chip_identity_match": true,
+    "no_dark_sample_records": true,
+    "nonzero_final_bytes_on_required_channels": false,
+    "primary_and_secondary_present": false,
+    "strict_transport_clean": false,
+    "vp_perf_no_over_or_dropped_frames": false,
+    "vpml_mode_on_all_records": false,
+    "vpml_started_and_stopped": false
+  },
+  "decoded_vpab_bytes": {
+    "channel_counts": {},
+    "channel_energy_sum_total": {},
+    "channel_max_byte": {},
+    "channel_nonzero_led_bytes_total": {},
+    "dark_sample_records": [],
+    "expected_mode": 250,
+    "frame_us": {},
+    "mode_counts": {},
+    "records": [],
+    "render_us": {},
+    "show_us": {}
+  },
+  "failures": [
+    {
+      "expected": [
+        "primary",
+        "secondary"
+      ],
+      "message": "required VPML channel missing",
+      "metric": "coverage.channel",
+      "observed": []
+    },
+    {
+      "channel": "primary",
+      "message": "channel has no nonzero final bytes",
+      "metric": "coverage.bytes"
+    },
+    {
+      "channel": "secondary",
+      "message": "channel has no nonzero final bytes",
+      "metric": "coverage.bytes"
+    }
+  ],
+  "observations": [],
+  "passed": false,
+  "result": "FAIL",
+  "runtime": {
+    "baud": 230400,
+    "expected_chip_id": "F887A500",
+    "k1df_begin": null,
+    "k1df_end": null,
+    "observed_chip_id": "F887A500",
+    "port": "/dev/tty.usbmodem1401",
+    "vp_perf_frame": null,
+    "vpab_records": null,
+    "vpml_final_status": null,
+    "vpml_initial_status": null,
+    "vpml_play_seen": false
+  },
+  "schema": "vpml_runtime_summary.v1",
+  "strict_gate": {
+    "counts": {
+      "assembled_records": 0,
+      "chunks": 0,
+      "failures": 4,
+      "issues": 2,
+      "records": 0
+    },
+    "coverage": {
+      "channels": [],
+      "kinds": [],
+      "modes": [],
+      "records": []
+    },
+    "passed": false,
+    "stream": {
+      "begin": {},
+      "end": {}
+    }
+  }
+}

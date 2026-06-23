@@ -1,0 +1,9 @@
+{
+  "baud": 115200,
+  "error": ":vpml=status missing response containing 'VPML status', 'active=1', 'intro_bounce_loop'; observed: no response",
+  "error_type": "VPMLRunError",
+  "expect_chip": "F887A500",
+  "passed": false,
+  "port": "/dev/cu.usbmodem1401",
+  "programme": "intro_bounce_loop"
+}

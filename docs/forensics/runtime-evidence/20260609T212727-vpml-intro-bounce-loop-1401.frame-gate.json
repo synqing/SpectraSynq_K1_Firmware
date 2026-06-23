@@ -1,0 +1,60 @@
+{
+  "counts": {
+    "assembled_records": 0,
+    "chunks": 0,
+    "failures": 4,
+    "issues": 2,
+    "records": 0
+  },
+  "coverage": {
+    "channels": [],
+    "kinds": [],
+    "modes": [],
+    "records": []
+  },
+  "failures": [
+    {
+      "expected": 250,
+      "message": "required mode missing",
+      "metric": "coverage.mode",
+      "observed": []
+    },
+    {
+      "expected": "primary",
+      "message": "required channel missing",
+      "metric": "coverage.channel",
+      "observed": []
+    },
+    {
+      "expected": "secondary",
+      "message": "required channel missing",
+      "metric": "coverage.channel",
+      "observed": []
+    },
+    {
+      "expected": "vpab_bytes",
+      "message": "required record kind missing",
+      "metric": "coverage.kind",
+      "observed": []
+    }
+  ],
+  "issues": [
+    {
+      "field": null,
+      "line": 0,
+      "message": "missing K1DF_BEGIN"
+    },
+    {
+      "field": null,
+      "line": 0,
+      "message": "missing K1DF_END"
+    }
+  ],
+  "passed": false,
+  "result": "FAIL",
+  "schema": "vpab_frame_gate.v1",
+  "stream": {
+    "begin": {},
+    "end": {}
+  }
+}

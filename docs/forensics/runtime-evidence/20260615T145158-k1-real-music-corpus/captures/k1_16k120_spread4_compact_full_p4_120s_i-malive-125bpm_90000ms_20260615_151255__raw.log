@@ -1,0 +1,53 @@
+# capture_start=2026-06-15T15:12:55+0800
+# port=/dev/cu.usbmodem12201 baud=115200 duration_ms=90000
+# track=/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T145158-k1-real-music-corpus/rendered/i-malive-125bpm/i-malive-125bpm.instrumental-90s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+# track_sha256=46385c780af5a238046d3c81980869e4601264760e83b994ed5ed079a37aebbf
+# player=ffplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem12201", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2", "location": "0-1.2.2", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:F8", "vid": 12346}
+SBOK
+sbr{{
+VERSION: 40103
+}}
+sbr{{
+APCAD_ABORT: stopped
+}}
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+sbr{{
+TEMPO_STREAM: off
+}}
+sbr{{
+AP_STREAM: off
+}}
+sbr{{
+APCAD_SOAK: armed 90000 ms compact=1
+}}
+# playback_cmd=ffplay -nodisp -autoexit -loglevel error -ss 0.000 -t 90.000 -i /Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T145158-k1-real-music-corpus/rendered/i-malive-125bpm/i-malive-125bpm.instrumental-90s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+APCAD_SOAK_DONE,ver=1,active=0,rows=12000,emitted=4000,start_ms=1327905,end_ms=1417905,sample_rate=16000,samples_per_chunk=120,tempo_decim=3,meas_ap_hz=133.334,meas_nov_hz=44.445,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=7040,active_max_us=7371,worst_count=16
+APCAD_SOAK_WORST,ver=1,rank=0
+,frame=186987,t=1403595,active_us=7336,total_us=7368,i2s_us=32,gdft_us=3942,novelty_us=31,tempo_acf_us=310,tempo_update_us=432,tempo_emit_us=988,emitted=1,acf_spread=1,acf_lag_cursor=28,acf_pub=1326,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=1,frame=184860,t=1387642,active_us=7335,total_us=9658,i2s_us=2323,gdft_us=3912,novelty_us=39,tempo_acf_us=297,tempo_update_us=433,tempo_emit_us=980,emitted=1,acf_spread=1,acf_lag_cursor=12,acf_pub=1311,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=2,frame=184854,t=1387597,active_us=7336,total_us=9525,i2s_us=2189,gdft_us=3921,novelty_us=37,tempo_acf_us=348,tempo_update_us=416,tempo_emit_us=1020,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=1311,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=3,frame=180504,t=1354972,active_us=7361,total_us=9563,i2s_us=2202,gdft_us=3942,novelty_us=50,tempo_acf_us=229,tempo_update_us=426,tempo_emit_us=917,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=1280,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=4,frame=178404,t=1339222,active_us=7346,total_us=9548,i2s_us=2202,gdft_us=3937,novelty_us=38,tempo_acf_us=213,tempo_update_us=430,tempo_emit_us=909,emitted=1,acf_spread=1,acf_lag_cursor=52,acf_pub=1265,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=5,frame=187119,t=1404585,active_us=7371,total_us=7404,i2s_us=33,gdft_us=3961,novelty_us=29,tempo_acf_us=298,tempo_update_us=429,tempo_emit_us=975,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=1327,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=6,frame=185310,t=1391017,active_us=7366,total_us=9700,i2s_us=2334,gdft_us=3929,novelty_us=51,tempo_acf_us=246,tempo_update_us=426,tempo_emit_us=939,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=1314,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=7,frame=186840,t=1402492,active_us=7332,total_us=9709,i2s_us=2377,gdft_us=3965,novelty_us=54,tempo_acf_us=268,tempo_update_us=431,tempo_emit_us=968,emitted=1,acf_spread=1,acf_lag_cursor=20,acf_pub=1325,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=8,frame=181329,t=1361160,active_us=7323,total_us=7362,i2s_us=39,gdft_us=3856,novelty_us=32,tempo_acf_us=380,tempo_update_us=427,tempo_emit_us=1049,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=1286,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=9,frame=186831,t=1402425,active_us=7343,total_us=7401,i2s_us=58,gdft_us=3941,novelty_us=59,tempo_acf_us=209,tempo_update_us=417,tempo_emit_us=868,emitted=1,acf_spread=1,acf_lag_cursor=8,acf_pub=1325,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=10,frame=187674,t=1408747,active_us=7368,total_us=9582,i2s_us=2214,gdft_us=3911,novelty_us=52,tempo_acf_us=308,tempo_update_us=429,tempo_emit_us=1005,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=1331,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=11,frame=180765,t=1356930,active_us=7356,total_us=7413,i2s_us=57,gdft_us=3948,novelty_us=45,tempo_acf_us=292,tempo_update_us=427,tempo_emit_us=931,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=1282,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=12,frame=186993,t=1403640,active_us=7332,total_us=7384,i2s_us=52,gdft_us=3904,novelty_us=59,tempo_acf_us=203,tempo_update_us=423,tempo_emit_us=852,emitted=1,acf_spread=1,acf_lag_cursor=36,acf_pub=1326,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=13,frame=177246,t=1330537,active_us=7351,total_us=9550,i2s_us=2199,gdft_us=3963,novelty_us=37,tempo_acf_us=255,tempo_update_us=443,tempo_emit_us=952,emitted=1,acf_spread=1,acf_lag_cursor=12,acf_pub=1257,win_bpm=95.00000,top1_bpm=112.00000
+APCAD_SOAK_WORST,ver=1,rank=14,frame=186714,t=1401547,active_us=7329,total_us=9591,i2s_us=2262,gdft_us=3918,novelty_us=47,tempo_acf_us=259,tempo_update_us=431,tempo_emit_us=963,emitted=1,acf_spread=1,acf_lag_cursor=40,acf_pub=1324,win_bpm=124.00000,top1_bpm=125.00000
+APCAD_SOAK_WORST,ver=1,rank=15,frame=185277,t=1390770,active_us=7356,total_us=7407,i2s_us=51,gdft_us=3902,novelty_us=52,tempo_acf_us=292,tempo_update_us=427,tempo_emit_us=966,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=1314,win_bpm=124.00000,top1_bpm=125.00000
+# apcad_soak_status_done=True
+sbr{{
+APCAD_ABORT: stopped
+}}
+SBOK

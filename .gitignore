@@ -1,0 +1,56 @@
+# ── SpectraSynq K1 Firmware — .gitignore ───────────────────────────────────
+# Clean-slate hygiene (audit 2026-06-23): scratch, agent state, and build
+# artefacts never enter the repo by construction.
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# PlatformIO build output + generated compile DB
+.pio/
+compile_commands.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Agent / tooling state (never commit)
+.claude/worktrees/
+.claude/skills/
+.claude/hooks/.summonaikit-task-contract.txt
+.codex/
+.codex-subagent/
+.cursor/
+.superpowers/
+.planning/
+.cache/
+.understand-anything/
+.playwright-mcp/
+graphify-out/
+.graphifyignore
+
+# Scratch / working space — ephemeral, clean up when done
+_scratch/
+__probe.txt
+
+# Heavy media / capture binaries (kept in the archive repo, not here)
+*.mp4
+*.mov
+*.pdf
+docs/**/runtime-evidence/*.mp4
+
+# Host-harness generated outputs (the synthetic control fixtures ARE tracked)
+/build/audio-semantic-metrics/*
+!/build/audio-semantic-metrics/control-fixtures/
+scripts/regression-harness/results/**/run-*/
+
+# Test-generated cross-repo artefact: the ws-registry codegen test writes into
+# the Tab5 controller path, which is a SEPARATE repo (not vendored here).
+sb-tab5-wireless-controller/

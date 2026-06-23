@@ -1,0 +1,10 @@
+{
+  "effect": "bloom",
+  "description": "Palette-diversity sweep for light_mode_bloom. The palette scheme is the ONE parameter axis that makes bloom look VISIBLY different (mood/sat/chroma micro-tweaks cluster into near-identical looks). palette_mode forced on; palette_index swept across the gradient-palette set; mood pinned to 0.6 to isolate palette as the only varying axis. For Captain's eyes-on: choose by COLOUR/look, not by proxy score (scores cluster — the look is the decision).",
+  "epistemic": "[MECHANISM] — relative ranking only; the visual choice is Captain's eye / device.",
+  "params": {
+    "palette_mode": [true],
+    "palette_index": [0, 3, 5, 7, 9, 11],
+    "mood": [0.6]
+  }
+}

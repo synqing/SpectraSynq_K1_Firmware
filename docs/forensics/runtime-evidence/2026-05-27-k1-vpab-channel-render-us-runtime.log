@@ -1,0 +1,209 @@
+#CMD :stop
+x_raw=120 follower=458 peak_scaled=-0.671 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=87 follower=458 peak_scaled=-0.674 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+SBOK
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+#CMD :vp_stream=off
+sbr{{
+VP_STREAM: off
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=3,smode=3,sec=1,acq_us=631/631,vu_us=53/53,gdft_us=4932/4932,smooth_us=113/113,pri_render_us=578/578,sec_render_us=1408/1408,pri_prep_us=146/146,sec_prep_us=61/61,quant_pri_us=114/114,quant_sec_us=108/108,show_us=1625/1625,frame_us=4239/4239,over=0,dropped=0,heap=206136
+#WAIT baseline 2.00s
+VPF,ver=1,seq=2,mode=3,smode=3,sec=1,acq_us=2767/6641,vu_us=44/66,gdft_us=4141/5638,smooth_us=162/1130,pri_render_us=594/751,sec_render_us=875/1467,pri_prep_us=134/1125,sec_prep_us=60/1046,quant_pri_us=98/139,quant_sec_us=92/228,show_us=2017/4605,frame_us=4103/6149,over=0,dropped=0,heap=206136
+VPF,ver=1,seq=3,mode=3,smode=3,sec=1,acq_us=2754/6671,vu_us=45/72,gdft_us=4112/5638,smooth_us=148/1133,pri_render_us=594/1635,sec_render_us=874/1467,pri_prep_us=132/1125,sec_prep_us=58/1046,quant_pri_us=100/224,quant_sec_us=94/228,show_us=2064/5014,frame_us=4133/6629,over=0,dropped=0,heap=206136
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 3
+VP_PERF_FRAME: avg=4092 max=6629 over=0 dropped=0
+VP_PERF_HEAP: 206136
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=3,smode=3,sec=1,acq_us=563/563,vu_us=55/55,gdft_us=5605/5605,smooth_us=114/115,pri_render_us=588/630,sec_render_us=1447/1458,pri_prep_us=141/142,sec_prep_us=58/59,quant_pri_us=104/113,quant_sec_us=102/110,show_us=1696/1696,frame_us=4384/4384,over=0,dropped=0,heap=206136
+#CMD :vpab=start,60,metrics
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#WAIT metrics 2.00s
+VPF,ver=1,seq=2,mode=3,smode=3,sec=1,acq_us=2679/6653,vu_us=44/60,gdft_us=4164/5708,smooth_us=155/1141,pri_render_us=587/734,sec_render_us=887/2372,pri_prep_us=134/1098,sec_prep_us=55/76,quant_pri_us=105/1108,quant_sec_us=94/218,show_us=1970/4649,frame_us=4059/6142,over=0,dropped=0,heap=206040
+VPF,ver=1,seq=3,mode=3,smode=3,sec=1,acq_us=2695/6653,vu_us=46/70,gdft_us=4072/5708,smooth_us=139/1141,pri_render_us=588/758,sec_render_us=873/2372,pri_prep_us=133/1098,sec_prep_us=57/76,quant_pri_us=105/1108,quant_sec_us=95/218,show_us=2135/4649,frame_us=4208/6142,over=0,dropped=0,heap=206040
+#CMD :vpab=stop
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 7
+VPAB_FRAME: 440
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=14 dropped=0 high_water=14 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+VPF,ver=1,seq=4,mode=3,smode=3,sec=1,acq_us=2680/6653,vu_us=46/70,gdft_us=4104/5708,smooth_us=132/1141,pri_render_us=584/758,sec_render_us=884/2393,pri_prep_us=133/1098,sec_prep_us=57/124,quant_pri_us=105/1108,quant_sec_us=95/218,show_us=2118/4656,frame_us=4190/6142,over=0,dropped=0,heap=206040
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 4
+VP_PERF_FRAME: avg=4202 max=6142 over=0 dropped=0
+VP_PERF_HEAP: 206040
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=60,t_ms=20961,dt_ms=0.00,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=7977,energy_b=7977,energy_delta_pct=0.00,com_a=79.52,com_b=79.52,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=734,quant_us=60,show_us=2005,frame_us=4099,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=60,t_ms=20961,dt_ms=0.00,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=44,energy_b=44,energy_delta_pct=0.00,com_a=78.27,com_b=78.27,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1488,quant_us=63,show_us=2005,frame_us=4099,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=3,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=21287,dt_ms=325.68,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3689,energy_b=3689,energy_delta_pct=0.00,com_a=79.43,com_b=79.43,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=734,quant_us=108,show_us=1968,frame_us=4060,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=4,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=21287,dt_ms=325.68,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=7,energy_b=7,energy_delta_pct=0.00,com_a=85.00,com_b=85.00,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2372,quant_us=104,show_us=1968,frame_us=4060,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=5,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=180,t_ms=21616,dt_ms=328.54,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6326,energy_b=6326,energy_delta_pct=0.00,com_a=79.48,com_b=79.48,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=734,quant_us=113,show_us=2057,frame_us=4140,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=6,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=180,t_ms=21616,dt_ms=328.54,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=66,energy_b=66,energy_delta_pct=0.00,com_a=79.58,com_b=79.58,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2372,quant_us=97,show_us=2057,frame_us=4140,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=7,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=21944,dt_ms=327.95,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5376,energy_b=5376,energy_delta_pct=0.00,com_a=79.53,com_b=79.53,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=734,quant_us=98,show_us=2114,frame_us=4186,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=8,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=21944,dt_ms=327.95,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=168,energy_b=168,energy_delta_pct=0.00,com_a=79.40,com_b=79.40,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2372,quant_us=89,show_us=2114,frame_us=4186,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=9,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=300,t_ms=22272,dt_ms=327.06,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=2896,energy_b=2896,energy_delta_pct=0.00,com_a=79.51,com_b=79.51,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=758,quant_us=113,show_us=2146,frame_us=4211,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=10,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=300,t_ms=22272,dt_ms=327.06,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=135,energy_b=135,energy_delta_pct=0.00,com_a=80.33,com_b=80.33,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2372,quant_us=109,show_us=2146,frame_us=4211,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=11,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=22605,dt_ms=333.84,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=4435,energy_b=4435,energy_delta_pct=0.00,com_a=79.57,com_b=79.57,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=758,quant_us=111,show_us=2115,frame_us=4186,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=12,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=22605,dt_ms=333.84,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=25,energy_b=25,energy_delta_pct=0.00,com_a=73.48,com_b=73.48,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2372,quant_us=108,show_us=2115,frame_us=4186,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=13,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=420,t_ms=22934,dt_ms=329.23,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=4504,energy_b=4504,energy_delta_pct=0.00,com_a=79.51,com_b=79.51,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=758,quant_us=112,show_us=2095,frame_us=4169,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=14,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=420,t_ms=22934,dt_ms=329.23,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=14,energy_b=14,energy_delta_pct=0.00,com_a=78.14,com_b=78.14,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2393,quant_us=101,show_us=2095,frame_us=4169,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+sbr{{
+VPAB_DUMP: rows=14 records=14 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=3,smode=3,sec=1,acq_us=1526/1526,vu_us=56/56,gdft_us=5070/5070,smooth_us=117/117,pri_render_us=533/553,sec_render_us=1437/1437,pri_prep_us=111/141,sec_prep_us=46/58,quant_pri_us=62/63,quant_sec_us=72/86,show_us=550/552,frame_us=3471/3962,over=0,dropped=0,heap=206040
+#CMD :vpab=start,120,bytes
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 120
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#WAIT bytes 2.00s
+VPF,ver=1,seq=2,mode=3,smode=3,sec=1,acq_us=2538/6655,vu_us=43/71,gdft_us=4251/5671,smooth_us=131/1138,pri_render_us=584/1654,sec_render_us=887/2395,pri_prep_us=133/885,sec_prep_us=56/170,quant_pri_us=106/1081,quant_sec_us=94/228,show_us=1830/4631,frame_us=3920/6157,over=0,dropped=0,heap=206040
+VPF,ver=1,seq=3,mode=3,smode=3,sec=1,acq_us=2575/6655,vu_us=43/71,gdft_us=4287/5671,smooth_us=124/1138,pri_render_us=578/1654,sec_render_us=882/2395,pri_prep_us=138/1148,sec_prep_us=57/170,quant_pri_us=104/1081,quant_sec_us=94/228,show_us=1889/4631,frame_us=3959/6157,over=0,dropped=0,heap=206040
+#CMD :vpab=stop
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 3
+VPAB_FRAME: 435
+VPAB_EVERY_N: 120
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=6 dropped=0 high_water=6 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+VPF,ver=1,seq=4,mode=3,smode=3,sec=1,acq_us=2642/6679,vu_us=44/71,gdft_us=4223/5673,smooth_us=127/1138,pri_render_us=581/1654,sec_render_us=880/2395,pri_prep_us=136/1148,sec_prep_us=57/173,quant_pri_us=104/1081,quant_sec_us=95/228,show_us=1952/4638,frame_us=4019/6157,over=0,dropped=0,heap=206040
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 4
+VP_PERF_FRAME: avg=4042 max=6157 over=0 dropped=0
+VP_PERF_HEAP: 206040
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=27385,dt_ms=0.00,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5153,energy_b=5153,energy_delta_pct=0.00,com_a=79.49,com_b=79.49,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1654,quant_us=114,show_us=1835,frame_us=3923,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=27385,dt_ms=0.00,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=67,energy_b=67,energy_delta_pct=0.00,com_a=80.10,com_b=80.10,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2395,quant_us=110,show_us=1835,frame_us=3923,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=3,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=28060,dt_ms=675.03,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3456,energy_b=3456,energy_delta_pct=0.00,com_a=79.44,com_b=79.44,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1654,quant_us=114,show_us=1882,frame_us=3956,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=4,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=28060,dt_ms=675.03,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=23,energy_b=23,energy_delta_pct=0.00,com_a=79.70,com_b=79.70,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2395,quant_us=103,show_us=1882,frame_us=3956,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=5,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=28710,dt_ms=650.26,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3160,energy_b=3160,energy_delta_pct=0.00,com_a=79.44,com_b=79.44,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1654,quant_us=105,show_us=1927,frame_us=3998,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+VPAB,ver=1,seq=6,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=28710,dt_ms=650.26,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=12,energy_b=12,energy_delta_pct=0.00,com_a=79.33,com_b=79.33,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2395,quant_us=100,show_us=1927,frame_us=3998,over=0,dropped=0,cal_source=config,cal_valid=1,heap=0
+sbr{{
+VPAB_DUMP: rows=6 records=6 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :diag=status
+sbr{{
+DIAG: frozen
+DIAG_RECORDS: count=6 capacity=64 high_water=6
+DIAG_COUNTERS: captured=6 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+}}
+#CMD :stop
+SBOK

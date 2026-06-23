@@ -1,0 +1,52 @@
+# capture_start=2026-06-15T16:38:39+0800
+# port=/dev/cu.usbmodem12201 baud=115200 duration_ms=120000
+# track=/Users/spectrasynq/SensoryBridge-main 9/build/k1-real-music-rendered/20260615T-ziggy-repro-k1-real-music-corpus/ziggyx-summer-rave-155bpm/ziggyx-summer-rave-155bpm.steady-drums-120s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+# track_sha256=30924e12d5423e2d22522052f191513ff2b2590564164f799b6009b2de8c12a7
+# player=ffplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem12201", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2", "location": "0-1.2.2", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:F8", "vid": 12346}
+SBOK
+sbr{{
+VERSION: 40103
+}}
+sbr{{
+APCAD_ABORT: stopped
+}}
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+sbr{{
+TEMPO_STREAM: off
+}}
+sbr{{
+AP_STREAM: off
+}}
+sbr{{
+APCAD_SOAK: armed 120000 ms compact=1
+}}
+# playback_cmd=ffplay -nodisp -autoexit -loglevel error -ss 0.000 -t 120.000 -i /Users/spectrasynq/SensoryBridge-main 9/build/k1-real-music-rendered/20260615T-ziggy-repro-k1-real-music-corpus/ziggyx-summer-rave-155bpm/ziggyx-summer-rave-155bpm.steady-drums-120s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+APCAD_SOAK_DONE,ver=1,active=0,rows=16000,emitted=5333,start_ms=33180,end_ms=153180,sample_rate=16000,samples_per_chunk=120,tempo_decim=3,meas_ap_hz=133.334,meas_nov_hz=44.444,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=7040,active_max_us=7391,worst_count=16
+APCAD_SOAK_WORST,ver=1,rank=0,frame=7083,t=54315,active_us=7347,total_us=7386,i2s_us=39,gdft_us=4001,novelty_us=51,tempo_acf_us=243,tempo_update_us=416,tempo_emit_us=917,emitted=1,acf_spread=1,acf_lag_cursor=44,acf_pub=50,win_bpm=78.00000,top1_bpm=78.00000
+APCAD_SOAK_WORST,ver=1,rank=1,frame=9060,t=69142,active_us=7321,total_us=9486,i2s_us=2165,gdft_us=3961,novelty_us=58,tempo_acf_us=283,tempo_update_us=433,tempo_emit_us=972,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=64,win_bpm=103.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=2,frame=13695,t=103905,active_us=7340,total_us=7401,i2s_us=61,gdft_us=3894,novelty_us=75,tempo_acf_us=210,tempo_update_us=448,tempo_emit_us=890,emitted=1,acf_spread=1,acf_lag_cursor=24,acf_pub=97,win_bpm=103.00000,top1_bpm=78.00000
+APCAD_SOAK_WORST,ver=1,rank=3,frame=19461,t=147150,active_us=7359,total_us=7415,i2s_us=56,gdft_us=3929,novelty_us=36,tempo_acf_us=302,tempo_update_us=420,tempo_emit_us=990,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=138,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=4,frame=19902,t=150457,active_us=7334,total_us=9622,i2s_us=2288,gdft_us=3932,novelty_us=48,tempo_acf_us=205,tempo_update_us=432,tempo_emit_us=912,emitted=1,acf_spread=1,acf_lag_cursor=28,acf_pub=141,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=5,frame=11601,t=88200,active_us=7391,total_us=7432,i2s_us=41,gdft_us=4012,novelty_us=48,tempo_acf_us=199,tempo_update_us=437,tempo_emit_us=835,emitted=1,acf_spread=1,acf_lag_cursor=52,acf_pub=82,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=6,frame=11589,t=88110,active_us=7313,total_us=7351,i2s_us=38,gdft_us=3935,novelty_us=53,tempo_acf_us=215,tempo_update_us=418,tempo_emit_us=892,emitted=1,acf_spread=1,acf_lag_cursor=36,acf_pub=82,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=7,frame=12411,t=94275,active_us=7349,total_us=7398,i2s_us=49,gdft_us=3881,novelty_us=36,tempo_acf_us=335,tempo_update_us=443,tempo_emit_us=1016,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=88,win_bpm=103.00000,top1_bpm=103.00000
+APCAD_SOAK_WORST,ver=1,rank=8,frame=13161,t=99900,active_us=7322,total_us=7379,i2s_us=57,gdft_us=4003,novelty_us=43,tempo_acf_us=192,tempo_update_us=431,tempo_emit_us=827,emitted=1,acf_spread=1,acf_lag_cursor=64,acf_pub=93,win_bpm=103.00000,top1_bpm=103.00000
+APCAD_SOAK_WORST,ver=1,rank=9,frame=7071,t=54225,active_us=7322,total_us=7377,i2s_us=55,gdft_us=3953,novelty_us=56,tempo_acf_us=207,tempo_update_us=429,tempo_emit_us=877,emitted=1,acf_spread=1,acf_lag_cursor=28,acf_pub=50,win_bpm=78.00000,top1_bpm=78.00000
+APCAD_SOAK_WORST,ver=1,rank=10,frame=19332,t=146182,active_us=7316,total_us=9489,i2s_us=2173,gdft_us=3940,novelty_us=49,tempo_acf_us=214,tempo_update_us=428,tempo_emit_us=902,emitted=1,acf_spread=1,acf_lag_cursor=20,acf_pub=137,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=11,frame=13194,t=100147,active_us=7373,total_us=9527,i2s_us=2154,gdft_us=4003,novelty_us=49,tempo_acf_us=193,tempo_update_us=412,tempo_emit_us=871,emitted=1,acf_spread=1,acf_lag_cursor=108,acf_pub=93,win_bpm=103.00000,top1_bpm=103.00000
+APCAD_SOAK_WORST,ver=1,rank=12,frame=19743,t=149265,active_us=7315,total_us=7372,i2s_us=57,gdft_us=3975,novelty_us=41,tempo_acf_us=291,tempo_update_us=437,tempo_emit_us=936,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=140,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=13,frame=13689,t=103860,active_us=7354,total_us=7412,i2s_us=58,gdft_us=3915,novelty_us=57,tempo_acf_us=207,tempo_update_us=437,tempo_emit_us=850,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=97,win_bpm=103.00000,top1_bpm=78.00000
+APCAD_SOAK_WORST,ver=1,rank=14,frame=10188,t=77602,active_us=7319,total_us=9564,i2s_us=2245,gdft_us=4015,novelty_us=47,tempo_acf_us=207,tempo_update_us=443,tempo_emit_us=915,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=72,win_bpm=77.00000,top1_bpm=77.00000
+APCAD_SOAK_WORST,ver=1,rank=15,frame=6489,t=49860,active_us=7316,total_us=7349,i2s_us=33,gdft_us=3949,novelty_us=30,tempo_acf_us=383,tempo_update_us=445,tempo_emit_us=1071,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=46,win_bpm=78.00000,top1_bpm=78.00000
+# apcad_soak_status_done=True
+sbr{{
+APCAD_ABORT: stopped
+}}
+SBOK

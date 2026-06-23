@@ -1,0 +1,251 @@
+<!doctype html>
+<!--
+  lgp_shader_ref.html — minimal self-contained reference render of the DEPLOYED
+  K1 edge-lit optics shader (K1Optics_v1, PHYSICAL mode), for validating the
+  NumPy port in scripts/regression-harness/lgp_optics.py.
+
+  The vertex + fragment GLSL below is COPIED VERBATIM from the shipping source:
+    fragment : app/k1/core/optics/edgeLitShader.ts
+    sampleStrip + gaussian : app/engine/shaders/common.ts
+    vertex   : app/engine/shaders/common.ts (commonShaderPartials.vertex)
+  Uniform defaults match presets.ts:K1_PHYSICAL_V1 + K1CoreScene.tsx deploy values.
+
+  Driven headless by lgp_validate.mjs: that script sets the two LED strips and the
+  output size via window.__renderLGP(bottomFloats, topFloats, W, H) and reads the
+  canvas pixels back. No GPU dependency beyond Chromium's ANGLE/SwiftShader.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>K1 LGP shader reference</title>
+    <style>
+      html, body { margin: 0; padding: 0; background: #000; }
+      #c { display: block; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="512" height="256"></canvas>
+    <script type="importmap">
+      { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+
+      const RESOLUTION = 160; // uResolution = ledCount (K1 = 160)
+
+      // ---- GLSL: vertex (common.ts commonShaderPartials.vertex) ----
+      const VERT = `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `;
+
+      // ---- GLSL partials (common.ts) — gaussian + sampleStrip, VERBATIM ----
+      const GAUSSIAN = `
+        float gaussian(float x, float sigma) {
+          return exp(-(x * x) / (2.0 * sigma * sigma));
+        }
+      `;
+      const SAMPLE_STRIP = `
+        vec3 sampleStrip(sampler2D strip, vec2 uv, float spreadBase, float resolution) {
+          vec3 accumulatedColor = vec3(0.0);
+          float totalWeight = 0.0;
+          float samples = 7.0;
+          float pixelWidth = 1.0 / resolution;
+          float currentSigma = spreadBase;
+
+          for(float i = -samples; i <= samples; i++) {
+            float offset = i * pixelWidth;
+            float weight = gaussian(offset, currentSigma);
+
+            vec2 sampleUv = vec2(clamp(uv.x + offset, 0.0, 1.0), 0.5);
+
+            accumulatedColor += texture2D(strip, sampleUv).rgb * weight;
+            totalWeight += weight;
+          }
+
+          return accumulatedColor / max(totalWeight, 1e-5);
+        }
+      `;
+
+      // ---- GLSL: fragment (edgeLitShader.ts) — VERBATIM, full file ----
+      const FRAG = `
+        uniform sampler2D uLedStateBottom;
+        uniform sampler2D uLedStateTop;
+        uniform float uResolution;
+        uniform float uTime;
+
+        uniform float uExposure;
+        uniform float uBaseLevel;
+        uniform vec3 uTint;
+
+        uniform float uTopFalloff;
+        uniform float uBottomFalloff;
+
+        uniform float uTopSpreadNear;
+        uniform float uTopSpreadFar;
+        uniform float uBottomSpreadNear;
+        uniform float uBottomSpreadFar;
+
+        uniform float uColumnBoostStrength;
+        uniform float uColumnBoostExponent;
+
+        uniform float uEdgeHotspotStrength;
+        uniform float uEdgeHotspotWidth;
+        uniform float uRailInner;
+        uniform float uRailOuter;
+        uniform float uRailSigma;
+        uniform float uGrainStrength;
+        uniform float uHotspotGain;
+
+        uniform float uOpticsMode;
+
+        varying vec2 vUv;
+
+        ${GAUSSIAN}
+        ${SAMPLE_STRIP}
+
+        float rand(vec2 st) {
+          return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+        }
+
+        void main() {
+          if (uOpticsMode < 0.5) {
+            float bottomSpread = uBottomSpreadNear * (0.5 + vUv.y * 6.0);
+            float topSpread = uTopSpreadNear * (0.5 + (1.0 - vUv.y) * 6.0);
+
+            float bottomInfluence = pow(1.0 - vUv.y, uBottomFalloff);
+            float topInfluence = pow(vUv.y, uTopFalloff);
+
+            vec3 colorBottom = sampleStrip(uLedStateBottom, vUv, bottomSpread, uResolution);
+            vec3 colorTop = sampleStrip(uLedStateTop, vUv, topSpread, uResolution);
+
+            vec3 finalColor = (colorBottom * bottomInfluence) + (colorTop * topInfluence);
+
+            float bottomHotspot = smoothstep(0.02, 0.0, vUv.y);
+            float topHotspot = smoothstep(0.98, 1.0, vUv.y);
+            float totalHotspot = (bottomHotspot * length(colorBottom)) + (topHotspot * length(colorTop));
+
+            float grain = rand(vUv * 20.0 + uTime * 0.2) * uGrainStrength;
+            vec3 outColor = finalColor + uBaseLevel;
+            outColor += vec3(grain);
+            outColor = outColor * uExposure + (vec3(1.0) * totalHotspot * uHotspotGain);
+            outColor *= uTint;
+
+            gl_FragColor = vec4(outColor, 1.0);
+            return;
+          }
+          // HERO/EXPERIMENTAL branch omitted from this reference (PHYSICAL only).
+          gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        }
+      `;
+
+      const canvas = document.getElementById('c');
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: false,
+        preserveDrawingBuffer: true,
+        alpha: false,
+      });
+      renderer.setPixelRatio(1);
+      // CRITICAL: no tone mapping, no output colour-space transform, so the canvas
+      // pixels equal gl_FragColor exactly (the deployed shader writes linear and the
+      // PHYSICAL branch has no internal tone curve; we compare raw fragment output).
+      renderer.toneMapping = THREE.NoToneMapping;
+      if ('outputColorSpace' in renderer) renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+      else if ('outputEncoding' in renderer) renderer.outputEncoding = THREE.LinearEncoding;
+
+      const scene = new THREE.Scene();
+      // Orthographic full-screen quad so vUv spans [0,1]x[0,1] across the canvas.
+      const camera = new THREE.OrthographicCamera(-0.5, 0.5, 0.5, -0.5, 0, 1);
+
+      function makeStripTexture(floatsRGB) {
+        // floatsRGB: Float32Array length RESOLUTION*3, RGB per LED.
+        const data = new Float32Array(RESOLUTION * 4);
+        for (let i = 0; i < RESOLUTION; i++) {
+          data[i * 4 + 0] = floatsRGB[i * 3 + 0];
+          data[i * 4 + 1] = floatsRGB[i * 3 + 1];
+          data[i * 4 + 2] = floatsRGB[i * 3 + 2];
+          data[i * 4 + 3] = 1.0;
+        }
+        const tex = new THREE.DataTexture(data, RESOLUTION, 1, THREE.RGBAFormat, THREE.FloatType);
+        tex.minFilter = THREE.NearestFilter;
+        tex.magFilter = THREE.NearestFilter;
+        tex.wrapS = THREE.ClampToEdgeWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        if ('colorSpace' in tex) tex.colorSpace = THREE.NoColorSpace; // raw floats, no sRGB decode
+        tex.needsUpdate = true;
+        return tex;
+      }
+
+      const uniforms = {
+        uLedStateBottom: { value: null },
+        uLedStateTop: { value: null },
+        uResolution: { value: RESOLUTION },
+        uTime: { value: 0 },
+        uExposure: { value: 4.0 },       // presets.ts:33
+        uBaseLevel: { value: 0.0 },      // presets.ts:34
+        uTint: { value: new THREE.Color(1, 1, 1) }, // presets.ts:35 #ffffff
+        uTopFalloff: { value: 1.5 },     // presets.ts:45
+        uBottomFalloff: { value: 1.5 },  // presets.ts:46
+        uTopSpreadNear: { value: 0.015 },     // presets.ts:41
+        uTopSpreadFar: { value: 0.015 },      // presets.ts:42 (unused in PHYSICAL)
+        uBottomSpreadNear: { value: 0.015 },  // presets.ts:43
+        uBottomSpreadFar: { value: 0.015 },   // presets.ts:44 (unused in PHYSICAL)
+        uColumnBoostStrength: { value: 0.0 },
+        uColumnBoostExponent: { value: 1.0 },
+        uEdgeHotspotStrength: { value: 0.0 },
+        uEdgeHotspotWidth: { value: 0.02 },
+        uRailInner: { value: 0.0 },
+        uRailOuter: { value: 0.0 },
+        uRailSigma: { value: 1.0 },
+        uGrainStrength: { value: 0.0 },  // K1CoreScene.tsx:126 grain OFF
+        uHotspotGain: { value: 4.0 },    // K1CoreScene.tsx:127
+        uOpticsMode: { value: 0.0 },     // PHYSICAL
+      };
+
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: VERT,
+        fragmentShader: FRAG,
+      });
+      const quad = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+      scene.add(quad);
+
+      // Expose a render entrypoint for the headless driver.
+      // bottomRGB / topRGB: plain JS arrays length RESOLUTION*3 (RGB per LED,
+      // render-index order; TOP is reversed HERE to mirror the deployed upload).
+      window.__renderLGP = function (bottomRGB, topRGB, W, H) {
+        if (canvas.width !== W || canvas.height !== H) {
+          renderer.setSize(W, H, false);
+        }
+        const bf = Float32Array.from(bottomRGB);
+        // mirror-mounted top edge -> index-reverse before upload
+        const topRev = new Float32Array(RESOLUTION * 3);
+        for (let i = 0; i < RESOLUTION; i++) {
+          const src = (RESOLUTION - 1 - i) * 3;
+          topRev[i * 3 + 0] = topRGB[src + 0];
+          topRev[i * 3 + 1] = topRGB[src + 1];
+          topRev[i * 3 + 2] = topRGB[src + 2];
+        }
+        if (uniforms.uLedStateBottom.value) uniforms.uLedStateBottom.value.dispose();
+        if (uniforms.uLedStateTop.value) uniforms.uLedStateTop.value.dispose();
+        uniforms.uLedStateBottom.value = makeStripTexture(bf);
+        uniforms.uLedStateTop.value = makeStripTexture(topRev);
+
+        renderer.render(scene, camera);
+
+        const gl = renderer.getContext();
+        const px = new Uint8Array(W * H * 4);
+        gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        // gl.readPixels origin is bottom-left (row 0 = bottom of plate). Return as-is;
+        // the Python side flips to match plate_image's top-row-0 orientation.
+        return Array.from(px);
+      };
+
+      window.__lgpReady = true;
+    </script>
+  </body>
+</html>

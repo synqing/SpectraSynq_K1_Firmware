@@ -1,0 +1,60 @@
+#CMD :vp_status
+sbr{{
+VP_PROFILE: candidate
+VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+VP_STREAM: off
+AP_STREAM: off
+VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+VP_CHROMA: seq=21484 range=60 profile=0 gate_gain=1.0000 pre_max=0.4026 pre_mean=0.2135 norm_max=0.9747 norm_mean=0.5167 flatness=0.4580 final_max=0.8747 final_mean=0.4193
+VP_AGC: gain=1.7730 envelope=0.1488 floor=0.0010 gated=false
+VP_RENDER_US: last=3512 avg=2535 max=4023
+VPS,ver=1,prim_mode=5,prim_name=KALEIDOSCOPE,sec_mode=3,sec_name=BLOOM,prim_pal=2,sec_pal=0,prim_pal_en=1,sec_pal_en=0,active_chan=primary,rp_depth=-1,rp_source=live_config,fx_p_max=0.0100,fx_p_kal=10712.0391,fx_s_max=0.0100,fx_s_kal=0.0000
+}}
+#CMD :secondary_status
+sbr{{
+SECONDARY_ENABLED: true
+SECONDARY_CONTROL: false (encoders control primary channel)
+SECONDARY_MODE: 3 (BLOOM)
+SECONDARY_PHOTONS: 1.000000
+SECONDARY_CHROMA: 0.000000
+SECONDARY_MOOD: 0.050000
+SECONDARY_SATURATION: 1.000000
+SECONDARY_PRISM_COUNT: 1.00
+SECONDARY_MIRROR_ENABLED: true
+SECONDARY_REVERSE_ORDER: false
+SECONDARY_BASE_COAT: false
+SECONDARY_PALETTE_MODE_ENABLED: false
+SECONDARY_PALETTE_INDEX: 0
+NOTE: This command is deprecated, please use secondary_status instead
+}}
+#CMD :get_knobs
+{"PHOTONS":1.00,"CHROMA":0.15,"MOOD":0.55}
+#CMD :fps
+sbr{{
+SYSTEM_FPS: 145.77
+}}
+#CMD :led_fps
+sbr{{
+LED_FPS: 172.96
+}}
+#CMD :diag=status
+sbr{{
+DIAG: frozen
+DIAG_RECORDS: count=18 capacity=64 high_water=18
+DIAG_COUNTERS: captured=18 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+}}
+#CMD :vpab=status
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 9
+VPAB_FRAME: 1158
+VPAB_EVERY_N: 120
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=18 dropped=0 high_water=18 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :stop
+SBOK

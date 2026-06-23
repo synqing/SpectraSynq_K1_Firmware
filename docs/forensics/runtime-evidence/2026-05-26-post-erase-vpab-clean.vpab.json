@@ -1,0 +1,4392 @@
+{
+  "counts": {
+    "failures": 18,
+    "ignored_lines": 166,
+    "issues": 0,
+    "passed_records": 36,
+    "vpab_records": 54,
+    "warnings": 108
+  },
+  "failures": [
+    {
+      "channel": "primary",
+      "frame": 120,
+      "line": 97,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 120,
+      "line": 98,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 300,
+      "line": 103,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2222,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 300,
+      "line": 104,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2222,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 120,
+      "line": 191,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2244,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 120,
+      "line": 192,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2244,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 240,
+      "line": 193,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2332,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 240,
+      "line": 194,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2332,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 360,
+      "line": 195,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3086,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 360,
+      "line": 196,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3086,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 480,
+      "line": 197,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 480,
+      "line": 198,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 720,
+      "line": 201,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2223,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 720,
+      "line": 202,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2223,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 960,
+      "line": 205,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2266,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 960,
+      "line": 206,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2266,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1080,
+      "line": 207,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2343,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1080,
+      "line": 208,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2343,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    }
+  ],
+  "issues": [],
+  "passed": false,
+  "records": [
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 1736,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.59,
+        "com_b": 79.59,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 1840,
+        "energy_b": 1840,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1840,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 4146,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 1736,
+        "quant_us": 100,
+        "render_us": 1243,
+        "sat_delta_p95": 0,
+        "scaled_energy": 1736,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1329,
+        "source_energy": 1736,
+        "t_ms": 86986,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 95,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 95,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 95,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.12,
+        "com_b": 79.12,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 204,
+        "energy_b": 204,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 204,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 4146,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 90,
+        "render_us": 1243,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1329,
+        "source_energy": 0,
+        "t_ms": 86986,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 96,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 96,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 96,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 120,
+          "line": 97,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 26126,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 362.91,
+        "energy_a": 26046,
+        "energy_b": 26046,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 26046,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 4326,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 26126,
+        "quant_us": 57,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scaled_energy": 26126,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1338,
+        "source_energy": 26126,
+        "t_ms": 87349,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 97,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 97,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 97,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 120,
+          "line": 98,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.39,
+        "com_b": 79.39,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 362.91,
+        "energy_a": 1035,
+        "energy_b": 1035,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1035,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 4326,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 53,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1338,
+        "source_energy": 0,
+        "t_ms": 87349,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 98,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 98,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 98,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 19586,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 357.12,
+        "energy_a": 19566,
+        "energy_b": 19566,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 19566,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 4359,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 19586,
+        "quant_us": 86,
+        "render_us": 1327,
+        "sat_delta_p95": 0,
+        "scaled_energy": 19586,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1314,
+        "source_energy": 19586,
+        "t_ms": 87706,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 99,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 99,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 99,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.41,
+        "com_b": 79.41,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 357.12,
+        "energy_a": 501,
+        "energy_b": 501,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 501,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 4359,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 82,
+        "render_us": 1327,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1314,
+        "source_energy": 0,
+        "t_ms": 87707,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 100,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 100,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 100,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 1854,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.6,
+        "com_b": 79.6,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.99,
+        "energy_a": 1968,
+        "energy_b": 1968,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1968,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 4388,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 1854,
+        "quant_us": 85,
+        "render_us": 1270,
+        "sat_delta_p95": 0,
+        "scaled_energy": 1854,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1327,
+        "source_energy": 1854,
+        "t_ms": 88066,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 101,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 101,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 101,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.14,
+        "com_b": 79.14,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.99,
+        "energy_a": 71,
+        "energy_b": 71,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 71,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 4388,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 83,
+        "render_us": 1270,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1327,
+        "source_energy": 0,
+        "t_ms": 88066,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 102,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 102,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 102,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 300,
+          "line": 103,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2222,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 2328,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 361.83,
+        "energy_a": 2420,
+        "energy_b": 2420,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 2420,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 4436,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 2328,
+        "quant_us": 56,
+        "render_us": 2222,
+        "sat_delta_p95": 0,
+        "scaled_energy": 2328,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1327,
+        "source_energy": 2328,
+        "t_ms": 88428,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 103,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 103,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 103,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 300,
+          "line": 104,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2222,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 361.83,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 4436,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 60,
+        "render_us": 2222,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1327,
+        "source_energy": 0,
+        "t_ms": 88428,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 104,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 104,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 104,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 4728,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 356.28,
+        "energy_a": 4802,
+        "energy_b": 4802,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 4802,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 4442,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 4728,
+        "quant_us": 107,
+        "render_us": 1296,
+        "sat_delta_p95": 0,
+        "scaled_energy": 4728,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1314,
+        "source_energy": 4728,
+        "t_ms": 88784,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 105,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 105,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 105,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 356.28,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 4442,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 97,
+        "render_us": 1296,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1314,
+        "source_energy": 0,
+        "t_ms": 88785,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 106,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 106,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 106,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 3210,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.93,
+        "energy_a": 3316,
+        "energy_b": 3316,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 3316,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 4468,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 3210,
+        "quant_us": 87,
+        "render_us": 1276,
+        "sat_delta_p95": 0,
+        "scaled_energy": 3210,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1310,
+        "source_energy": 3210,
+        "t_ms": 89144,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 107,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 107,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 107,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.93,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 4468,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 84,
+        "render_us": 1276,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1310,
+        "source_energy": 0,
+        "t_ms": 89145,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 108,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 108,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 108,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 2872,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.41,
+        "com_b": 79.41,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.01,
+        "energy_a": 2968,
+        "energy_b": 2968,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 2968,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 4484,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 2872,
+        "quant_us": 87,
+        "render_us": 1264,
+        "sat_delta_p95": 0,
+        "scaled_energy": 2872,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1299,
+        "source_energy": 2872,
+        "t_ms": 89504,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 109,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 109,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 109,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.01,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 4484,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 88,
+        "render_us": 1264,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1299,
+        "source_energy": 0,
+        "t_ms": 89505,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 110,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 110,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 110,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 3724,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.97,
+        "energy_a": 3831,
+        "energy_b": 3831,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 3831,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 4501,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 3724,
+        "quant_us": 91,
+        "render_us": 1267,
+        "sat_delta_p95": 0,
+        "scaled_energy": 3724,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1295,
+        "source_energy": 3724,
+        "t_ms": 89864,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 111,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 111,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 111,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.97,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 4501,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 88,
+        "render_us": 1267,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1295,
+        "source_energy": 0,
+        "t_ms": 89865,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 112,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 112,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 112,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 6468,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.56,
+        "com_b": 79.56,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.07,
+        "energy_a": 6527,
+        "energy_b": 6527,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 6527,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 4514,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 6468,
+        "quant_us": 108,
+        "render_us": 1302,
+        "sat_delta_p95": 0,
+        "scaled_energy": 6468,
+        "scenario": "self_shadow",
+        "seq": 19,
+        "shadow": "self",
+        "show_us": 1294,
+        "source_energy": 6468,
+        "t_ms": 90224,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 113,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 113,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 113,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.07,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 4514,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 98,
+        "render_us": 1302,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 20,
+        "shadow": "self",
+        "show_us": 1294,
+        "source_energy": 0,
+        "t_ms": 90225,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 114,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 114,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 114,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 5512,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.01,
+        "energy_a": 5581,
+        "energy_b": 5581,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 5581,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 4513,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 5512,
+        "quant_us": 101,
+        "render_us": 1313,
+        "sat_delta_p95": 0,
+        "scaled_energy": 5512,
+        "scenario": "self_shadow",
+        "seq": 21,
+        "shadow": "self",
+        "show_us": 1290,
+        "source_energy": 5512,
+        "t_ms": 90583,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 115,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 115,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 115,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 359.01,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 4513,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 99,
+        "render_us": 1313,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 22,
+        "shadow": "self",
+        "show_us": 1290,
+        "source_energy": 0,
+        "t_ms": 90584,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 116,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 116,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 116,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 6422,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 6487,
+        "energy_b": 6487,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 6487,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 4511,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 6422,
+        "quant_us": 96,
+        "render_us": 1324,
+        "sat_delta_p95": 0,
+        "scaled_energy": 6422,
+        "scenario": "self_shadow",
+        "seq": 23,
+        "shadow": "self",
+        "show_us": 1307,
+        "source_energy": 6422,
+        "t_ms": 90943,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 117,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 117,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 117,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 4511,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 98,
+        "render_us": 1324,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 24,
+        "shadow": "self",
+        "show_us": 1307,
+        "source_energy": 0,
+        "t_ms": 90944,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 118,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 118,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 118,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 23364,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 23289,
+        "energy_b": 23289,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 23289,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 4508,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 23364,
+        "quant_us": 89,
+        "render_us": 1313,
+        "sat_delta_p95": 0,
+        "scaled_energy": 23364,
+        "scenario": "self_shadow",
+        "seq": 25,
+        "shadow": "self",
+        "show_us": 1318,
+        "source_energy": 23364,
+        "t_ms": 91303,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 119,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 119,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 119,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 80.2,
+        "com_b": 80.2,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 65,
+        "energy_b": 65,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 65,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 4508,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 97,
+        "render_us": 1313,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 26,
+        "shadow": "self",
+        "show_us": 1318,
+        "source_energy": 0,
+        "t_ms": 91304,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 120,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 120,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 120,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 2532,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.66,
+        "com_b": 79.66,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.96,
+        "energy_a": 2619,
+        "energy_b": 2619,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 2619,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 4520,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 2532,
+        "quant_us": 106,
+        "render_us": 1330,
+        "sat_delta_p95": 0,
+        "scaled_energy": 2532,
+        "scenario": "self_shadow",
+        "seq": 27,
+        "shadow": "self",
+        "show_us": 1319,
+        "source_energy": 2532,
+        "t_ms": 91664,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 121,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 121,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 121,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 80.0,
+        "com_b": 80.0,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.96,
+        "energy_a": 4,
+        "energy_b": 4,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 4,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 4520,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 91,
+        "render_us": 1330,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 28,
+        "shadow": "self",
+        "show_us": 1319,
+        "source_energy": 0,
+        "t_ms": 91666,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 122,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 122,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 122,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 1722,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.66,
+        "com_b": 79.66,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 1829,
+        "energy_b": 1829,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1829,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 4527,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 1722,
+        "quant_us": 91,
+        "render_us": 1360,
+        "sat_delta_p95": 0,
+        "scaled_energy": 1722,
+        "scenario": "self_shadow",
+        "seq": 29,
+        "shadow": "self",
+        "show_us": 1316,
+        "source_energy": 1722,
+        "t_ms": 92024,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 123,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 123,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 123,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.0,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 4527,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 87,
+        "render_us": 1360,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 30,
+        "shadow": "self",
+        "show_us": 1316,
+        "source_energy": 0,
+        "t_ms": 92024,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 124,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 124,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 124,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 11580,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.48,
+        "com_b": 79.48,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.38,
+        "energy_a": 11617,
+        "energy_b": 11617,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 11617,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 4525,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 11580,
+        "quant_us": 107,
+        "render_us": 1403,
+        "sat_delta_p95": 0,
+        "scaled_energy": 11580,
+        "scenario": "self_shadow",
+        "seq": 31,
+        "shadow": "self",
+        "show_us": 1320,
+        "source_energy": 11580,
+        "t_ms": 92386,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 125,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 125,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 125,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.57,
+        "com_b": 79.57,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.38,
+        "energy_a": 14,
+        "energy_b": 14,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 14,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 4525,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 87,
+        "render_us": 1403,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 32,
+        "shadow": "self",
+        "show_us": 1320,
+        "source_energy": 0,
+        "t_ms": 92386,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 126,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 126,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 126,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 3326,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.6,
+        "com_b": 79.6,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 357.24,
+        "energy_a": 3413,
+        "energy_b": 3413,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 3413,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 4522,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 3326,
+        "quant_us": 100,
+        "render_us": 1444,
+        "sat_delta_p95": 0,
+        "scaled_energy": 3326,
+        "scenario": "self_shadow",
+        "seq": 33,
+        "shadow": "self",
+        "show_us": 1312,
+        "source_energy": 3326,
+        "t_ms": 92742,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 127,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 127,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 127,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 357.24,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 4522,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 91,
+        "render_us": 1444,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 34,
+        "shadow": "self",
+        "show_us": 1312,
+        "source_energy": 0,
+        "t_ms": 92742,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 128,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 128,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 128,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 3520,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.44,
+        "com_b": 79.44,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.01,
+        "energy_a": 3598,
+        "energy_b": 3598,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 3598,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 4529,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 3520,
+        "quant_us": 107,
+        "render_us": 1445,
+        "sat_delta_p95": 0,
+        "scaled_energy": 3520,
+        "scenario": "self_shadow",
+        "seq": 35,
+        "shadow": "self",
+        "show_us": 1311,
+        "source_energy": 3520,
+        "t_ms": 93102,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 129,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 129,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 129,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 360.01,
+        "energy_a": 0,
+        "energy_b": 0,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 4529,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 101,
+        "render_us": 1445,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 36,
+        "shadow": "self",
+        "show_us": 1311,
+        "source_energy": 0,
+        "t_ms": 93102,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 130,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 130,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 130,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 120,
+          "line": 191,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2244,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 9122,
+        "energy_b": 9122,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 9122,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 4175,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 57,
+        "render_us": 2244,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1195,
+        "source_energy": 7566,
+        "t_ms": 96918,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 191,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 191,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 191,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 120,
+          "line": 192,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2244,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 4722,
+        "energy_b": 4722,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 4722,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 4175,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 57,
+        "render_us": 2244,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1195,
+        "source_energy": 0,
+        "t_ms": 96918,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 192,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 192,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 192,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 240,
+          "line": 193,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2332,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 711.37,
+        "energy_a": 5599,
+        "energy_b": 5599,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 5599,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 4277,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 58,
+        "render_us": 2332,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1194,
+        "source_energy": 7566,
+        "t_ms": 97629,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 193,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 193,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 193,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 240,
+          "line": 194,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2332,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 80.08,
+        "com_b": 80.08,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 711.37,
+        "energy_a": 329,
+        "energy_b": 329,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 329,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 4277,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 57,
+        "render_us": 2332,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1194,
+        "source_energy": 0,
+        "t_ms": 97629,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 194,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 194,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 194,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 360,
+          "line": 195,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3086,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.44,
+        "com_b": 79.44,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 717.17,
+        "energy_a": 7113,
+        "energy_b": 7113,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 7113,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 4343,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 58,
+        "render_us": 3086,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1183,
+        "source_energy": 7566,
+        "t_ms": 98346,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 195,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 195,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 195,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 360,
+          "line": 196,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3086,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.37,
+        "com_b": 79.37,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 717.17,
+        "energy_a": 774,
+        "energy_b": 774,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 774,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 4343,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 56,
+        "render_us": 3086,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1183,
+        "source_energy": 0,
+        "t_ms": 98346,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 196,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 196,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 196,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 480,
+          "line": 197,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 716.51,
+        "energy_a": 6189,
+        "energy_b": 6189,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 6189,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 4399,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 57,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1195,
+        "source_energy": 7566,
+        "t_ms": 99063,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 197,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 197,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 197,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 480,
+          "line": 198,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.69,
+        "com_b": 79.69,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 716.51,
+        "energy_a": 484,
+        "energy_b": 484,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 484,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 4399,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 60,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1195,
+        "source_energy": 0,
+        "t_ms": 99063,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 198,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 198,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 198,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 713.69,
+        "energy_a": 5147,
+        "energy_b": 5147,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 5147,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 4407,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 64,
+        "render_us": 1935,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1187,
+        "source_energy": 7566,
+        "t_ms": 99777,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 199,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 199,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 199,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.42,
+        "com_b": 79.42,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 713.69,
+        "energy_a": 1525,
+        "energy_b": 1525,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1525,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 4407,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 54,
+        "render_us": 1935,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1187,
+        "source_energy": 0,
+        "t_ms": 99777,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 200,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 200,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 200,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 720,
+          "line": 201,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2223,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 719.96,
+        "energy_a": 6824,
+        "energy_b": 6824,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 6824,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 4419,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 56,
+        "render_us": 2223,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1192,
+        "source_energy": 7566,
+        "t_ms": 100496,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 201,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 201,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 201,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 720,
+          "line": 202,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2223,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 719.96,
+        "energy_a": 1358,
+        "energy_b": 1358,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 1358,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 4419,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 50,
+        "render_us": 2223,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1192,
+        "source_energy": 0,
+        "t_ms": 100496,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 202,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 202,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 202,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 706.02,
+        "energy_a": 7104,
+        "energy_b": 7104,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 7104,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 4414,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 88,
+        "render_us": 1338,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1193,
+        "source_energy": 7566,
+        "t_ms": 101203,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 203,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 203,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 203,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 706.02,
+        "energy_a": 3332,
+        "energy_b": 3332,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 3332,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 4414,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 82,
+        "render_us": 1338,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1193,
+        "source_energy": 0,
+        "t_ms": 101203,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 204,
+      "status": "PASS",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 204,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 204,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 960,
+          "line": 205,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2266,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 705.18,
+        "energy_a": 5791,
+        "energy_b": 5791,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 5791,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 4415,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 58,
+        "render_us": 2266,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1184,
+        "source_energy": 7566,
+        "t_ms": 101908,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 205,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 205,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 205,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 960,
+          "line": 206,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2266,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.48,
+        "com_b": 79.48,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 705.18,
+        "energy_a": 2404,
+        "energy_b": 2404,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 2404,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 4415,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 68,
+        "render_us": 2266,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1184,
+        "source_energy": 0,
+        "t_ms": 101908,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 206,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 206,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 206,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1080,
+          "line": 207,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2343,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 7566,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 716.49,
+        "energy_a": 6020,
+        "energy_b": 6020,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 6020,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 4423,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 7566,
+        "quant_us": 58,
+        "render_us": 2343,
+        "sat_delta_p95": 0,
+        "scaled_energy": 7566,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1178,
+        "source_energy": 7566,
+        "t_ms": 102624,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 207,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 207,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 207,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1080,
+          "line": 208,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2343,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "brightness_energy": 0,
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.68,
+        "com_b": 79.68,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 716.49,
+        "energy_a": 996,
+        "energy_b": 996,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "final_energy": 996,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 4423,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "pre_energy": 0,
+        "quant_us": 56,
+        "render_us": 2343,
+        "sat_delta_p95": 0,
+        "scaled_energy": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1178,
+        "source_energy": 0,
+        "t_ms": 102624,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [],
+      "line": 208,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 208,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 208,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    }
+  ],
+  "result": "FAIL",
+  "schema": "vpab_gate.v1",
+  "summary": "VPAB gate FAIL: 36/54 records passed; 0 issue(s); 18 failure(s); 108 warning(s)",
+  "thresholds": {
+    "changed_channel_pct": 2.0,
+    "changed_led_pct": 2.0,
+    "com_delta_leds": 1.0,
+    "dropped": 0,
+    "frame_us": 8333.33,
+    "mae8": 0.5,
+    "max_abs8": 8.0,
+    "over": 0,
+    "p95_abs8": 1.0,
+    "render_us": 2000.0,
+    "tail_integral_delta_pct_abs": 10.0,
+    "trail_delta_frames": 2.0
+  },
+  "valid": true,
+  "warnings": [
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 95,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 95,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 96,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 96,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 97,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 97,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 98,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 98,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 99,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 99,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 100,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 100,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 101,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 101,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 102,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 102,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 103,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 103,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 104,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 104,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 105,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 105,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 106,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 106,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 107,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 107,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 108,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 108,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 109,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 109,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 110,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 110,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 111,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 111,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 112,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 112,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 113,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 113,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 114,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 114,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 115,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 115,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 116,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 116,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 117,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 117,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 118,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 118,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 119,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 119,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 120,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 120,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 121,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 121,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 122,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 122,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 123,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 123,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 124,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 124,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 125,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 125,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 126,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 126,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 127,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 127,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 128,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 128,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 129,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 129,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 130,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 130,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 191,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 191,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 192,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 192,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 193,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 193,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 194,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 194,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 195,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 195,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 196,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 196,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 197,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 197,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 198,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 198,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 199,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 199,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 200,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 200,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 201,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 201,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 202,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 202,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 203,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 203,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 204,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 204,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 205,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 205,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 206,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 206,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 207,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 207,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 208,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 208,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    }
+  ]
+}

@@ -1,0 +1,405 @@
+[1781525982.591] #DEVICE role=bench-reference name=bench-12201 port=/dev/cu.usbmodem12401 expected_chip_id=B489A500 env=k1_bench_reference
+[1781525982.591] >>> :version
+[1781525982.605] sbr{{
+[1781525982.605] VERSION: 40103
+[1781525982.605] }}
+[1781525983.392] >>> :chip_id
+[1781525983.396] sbr{{
+[1781525983.397] B489A500
+[1781525983.397] }}
+[1781525984.548] >>> :stop
+[1781525984.551] SBOK
+[1781525985.706] >>> :vp_stream=off
+[1781525985.710] sbr{{
+[1781525985.710] VP_STREAM: off
+[1781525985.710] }}
+[1781525987.315] >>> :ap_stream=off
+[1781525987.330] sbr{{
+[1781525987.330] AP_STREAM: off
+[1781525987.330] }}
+[1781525990.624] >>> :smart_status
+[1781525990.626] sbr{{
+[1781525990.626] SMART_ASSIST: off
+[1781525990.626] SMART_SWITCHING: off
+[1781525990.626] SMART_DIRECTOR_AUTONOMY: off
+[1781525990.626] SMART_HOOKS: off
+[1781525990.627] SMART_CONFIDENCE_FLOOR: 0.080
+[1781525990.627] SMART_APPLIED_MODE: 3
+[1781525990.627] SMART_LAST_REQUESTED_MODE: 3
+[1781525990.627] SMART_SWITCHES_IN_WINDOW: 0
+[1781525990.627] SMART_MANUAL_OWNER_ACTIVE: 0
+[1781525990.627] SMART_LAST_REASON: 0
+[1781525990.627] SMART_STATE: 0
+[1781525990.627] SMART_INTENT_MODE: 3
+[1781525990.627] SMART_INTENT_CONFIDENCE: 0.000
+[1781525990.627] SMART_INTENT_WANTS_SWITCH: 0
+[1781525990.628] SMART_SCALAR_PHOTONS: 1.000
+[1781525990.628] SMART_SCALAR_CHROMA: 1.000
+[1781525990.628] SMART_SCALAR_MOOD: 1.000
+[1781525990.628] SMART_SCALAR_SATURATION: 1.000
+[1781525990.628] SMART_PALETTE_OVERLAY: 0
+[1781525990.628] SMART_PALETTE_INDEX: 0
+[1781525990.628] SMART_AUTO_COLOUR_SHIFT: 0
+[1781525990.628] SMART_MIN_DWELL_MS: 8000
+[1781525990.628] SMART_COOLDOWN_MS: 20000
+[1781525990.629] SMART_SWITCH_WINDOW_MS: 60000
+[1781525990.629] SMART_MAX_SWITCHES: 2
+[1781525990.629] SMART_AUDIO_NOVELTY: 0.0400
+[1781525990.629] SMART_AUDIO_ENERGY: 0.2109
+[1781525990.629] SMART_EVENT_ID: 105252
+[1781525990.629] SMART_EVENT_AGE_MS: 75
+[1781525990.629] SMART_ONSET: 0
+[1781525990.629] SMART_BASS_ONSET: 1
+[1781525990.629] SMART_BEAT_CONFIDENCE: 0.000
+[1781525990.629] SMART_TRANSIENT: 0
+[1781525990.629] SMART_KICK: 0
+[1781525990.630] SMART_SNARE: 0
+[1781525990.630] SMART_HIHAT: 0
+[1781525990.630] SMART_TRANSIENT_LEVEL: 0.027
+[1781525990.630] SMART_KICK_LEVEL: 0.007
+[1781525990.630] SMART_SNARE_LEVEL: 0.008
+[1781525990.630] SMART_HIHAT_LEVEL: 0.002
+[1781525990.630] SMART_SNARE_EVENT_ID: 46764
+[1781525990.630] SMART_HIHAT_EVENT_ID: 102230
+[1781525990.630] }}
+[1781525994.331] >>> :vp_status
+[1781525994.331] sbr{{
+[1781525994.332] VP_PROFILE: candidate
+[1781525994.332] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1781525994.332] VP_STREAM: off
+[1781525994.332] AP_STREAM: off
+[1781525994.332] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1781525994.334] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1781525994.336] VP_CHROMA: seq=1803535 range=60 profile=0 gate_gain=0.4117 pre_max=0.3574 pre_mean=0.2900 norm_max=0.8600 norm_mean=0.6977 flatness=0.1623 final_max=0.3129 final_mean=0.2460
+[1781525994.336] VP_AGC: gain=0.1862 envelope=1.5209 floor=0.0010 gated=false
+[1781525994.336] VP_RENDER_US: last=762 avg=723 max=1689
+[1781525994.336] }}
+[1781525996.341] >>> :vp_perf=status
+[1781525996.357] sbr{{
+[1781525996.357] VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+[1781525996.357] }}
+[1781525997.947] >>> :ap_stream=on
+[1781525997.951] sbr{{
+[1781525997.951] AP_STREAM: on
+[1781525997.951] }}
+[1781525997.953] [AP] SSL=424 DC=-812 max_raw=1414 follower=2379 peak_scaled=0.374 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.59 lock=0 phase=0.72 beat=0 bstr=0.74 | onset=0 bass=0 ostr=0.00
+[1781525998.965] [AP] SSL=424 DC=-812 max_raw=885 follower=2013 peak_scaled=0.211 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.68 lock=1 phase=0.26 beat=0 bstr=0.35 | onset=0 bass=0 ostr=0.00
+[1781525999.969] [AP] SSL=424 DC=-812 max_raw=654 follower=2140 peak_scaled=0.264 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.69 lock=1 phase=0.55 beat=0 bstr=0.32 | onset=0 bass=0 ostr=0.00
+[1781526000.974] [AP] SSL=424 DC=-812 max_raw=1511 follower=3095 peak_scaled=0.838 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.65 lock=1 phase=0.02 beat=0 bstr=0.31 | onset=0 bass=1 ostr=0.06
+[1781526001.253] >>> :smart_status
+[1781526001.262] sbr{{
+[1781526001.262] SMART_ASSIST: off
+[1781526001.262] SMART_SWITCHING: off
+[1781526001.262] SMART_DIRECTOR_AUTONOMY: off
+[1781526001.262] SMART_HOOKS: off
+[1781526001.263] SMART_CONFIDENCE_FLOOR: 0.080
+[1781526001.263] SMART_APPLIED_MODE: 3
+[1781526001.263] SMART_LAST_REQUESTED_MODE: 3
+[1781526001.263] SMART_SWITCHES_IN_WINDOW: 0
+[1781526001.263] SMART_MANUAL_OWNER_ACTIVE: 0
+[1781526001.263] SMART_LAST_REASON: 0
+[1781526001.263] SMART_STATE: 0
+[1781526001.263] SMART_INTENT_MODE: 3
+[1781526001.263] SMART_INTENT_CONFIDENCE: 0.000
+[1781526001.263] SMART_INTENT_WANTS_SWITCH: 0
+[1781526001.264] SMART_SCALAR_PHOTONS: 1.000
+[1781526001.264] SMART_SCALAR_CHROMA: 1.000
+[1781526001.264] SMART_SCALAR_MOOD: 1.000
+[1781526001.264] SMART_SCALAR_SATURATION: 1.000
+[1781526001.264] SMART_PALETTE_OVERLAY: 0
+[1781526001.264] SMART_PALETTE_INDEX: 0
+[1781526001.264] SMART_AUTO_COLOUR_SHIFT: 0
+[1781526001.264] SMART_MIN_DWELL_MS: 8000
+[1781526001.265] SMART_COOLDOWN_MS: 20000
+[1781526001.265] SMART_SWITCH_WINDOW_MS: 60000
+[1781526001.265] SMART_MAX_SWITCHES: 2
+[1781526001.265] SMART_AUDIO_NOVELTY: 0.0415
+[1781526001.265] SMART_AUDIO_ENERGY: 0.2081
+[1781526001.265] SMART_EVENT_ID: 105365
+[1781526001.265] SMART_EVENT_AGE_MS: 9
+[1781526001.265] SMART_ONSET: 1
+[1781526001.265] SMART_BASS_ONSET: 0
+[1781526001.265] SMART_BEAT_CONFIDENCE: 0.000
+[1781526001.266] SMART_TRANSIENT: 0
+[1781526001.266] SMART_KICK: 0
+[1781526001.266] SMART_SNARE: 0
+[1781526001.266] SMART_HIHAT: 0
+[1781526001.266] SMART_TRANSIENT_LEVEL: 0.072
+[1781526001.266] SMART_KICK_LEVEL: 0.001
+[1781526001.266] SMART_SNARE_LEVEL: 0.000
+[1781526001.266] SMART_HIHAT_LEVEL: 0.001
+[1781526001.266] SMART_SNARE_EVENT_ID: 46810
+[1781526001.266] SMART_HIHAT_EVENT_ID: 102307
+[1781526001.266] }}
+[1781526001.979] [AP] SSL=424 DC=-812 max_raw=2178 follower=2988 peak_scaled=0.583 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.66 lock=1 phase=0.47 beat=0 bstr=0.45 | onset=1 bass=0 ostr=0.00
+[1781526002.985] [AP] SSL=424 DC=-812 max_raw=1396 follower=2783 peak_scaled=0.394 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.45 lock=0 phase=0.91 beat=0 bstr=0.69 | onset=0 bass=0 ostr=0.00
+[1781526003.989] [AP] SSL=424 DC=-812 max_raw=1550 follower=2081 peak_scaled=0.472 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.65 lock=1 phase=0.31 beat=0 bstr=0.61 | onset=1 bass=0 ostr=0.00
+[1781526004.994] [AP] SSL=424 DC=-812 max_raw=649 follower=1645 peak_scaled=0.131 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.67 lock=1 phase=0.82 beat=0 bstr=0.46 | onset=0 bass=0 ostr=0.00
+[1781526005.999] [AP] SSL=424 DC=-812 max_raw=2033 follower=2679 peak_scaled=0.646 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.63 lock=1 phase=0.27 beat=0 bstr=0.40 | onset=0 bass=0 ostr=0.00
+[1781526007.004] [AP] SSL=424 DC=-812 max_raw=3109 follower=3356 peak_scaled=0.999 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.66 lock=1 phase=0.87 beat=0 bstr=0.45 | onset=0 bass=1 ostr=0.09
+[1781526008.010] [AP] SSL=424 DC=-812 max_raw=2152 follower=3603 peak_scaled=0.657 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.34 lock=0 phase=0.26 beat=0 bstr=0.64 | onset=0 bass=1 ostr=0.03
+[1781526009.015] [AP] SSL=424 DC=-812 max_raw=605 follower=2247 peak_scaled=0.120 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.55 lock=0 phase=0.69 beat=0 bstr=0.55 | onset=0 bass=0 ostr=0.00
+[1781526010.020] [AP] SSL=424 DC=-812 max_raw=1290 follower=1416 peak_scaled=0.495 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.75 lock=1 phase=0.17 beat=0 bstr=0.52 | onset=1 bass=0 ostr=0.00
+[1781526011.025] [AP] SSL=424 DC=-812 max_raw=657 follower=885 peak_scaled=0.407 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.85 lock=1 phase=0.55 beat=0 bstr=0.61 | onset=0 bass=0 ostr=0.00
+[1781526012.030] [AP] SSL=424 DC=-812 max_raw=324 follower=785 peak_scaled=0.304 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.83 lock=1 phase=0.11 beat=0 bstr=0.39 | onset=0 bass=0 ostr=0.00
+[1781526013.034] [AP] SSL=424 DC=-812 max_raw=1087 follower=1320 peak_scaled=0.599 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.84 lock=1 phase=0.68 beat=0 bstr=0.71 | onset=0 bass=1 ostr=0.04
+[1781526014.039] [AP] SSL=424 DC=-812 max_raw=1140 follower=2143 peak_scaled=0.429 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.81 lock=1 phase=0.13 beat=0 bstr=0.35 | onset=0 bass=0 ostr=0.00
+[1781526015.045] [AP] SSL=424 DC=-812 max_raw=1391 follower=1884 peak_scaled=0.542 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.81 lock=1 phase=0.48 beat=0 bstr=0.40 | onset=1 bass=0 ostr=0.00
+[1781526016.049] [AP] SSL=424 DC=-812 max_raw=1945 follower=1642 peak_scaled=0.665 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.84 lock=1 phase=0.92 beat=0 bstr=0.40 | onset=1 bass=0 ostr=0.00
+[1781526017.055] [AP] SSL=424 DC=-812 max_raw=609 follower=1892 peak_scaled=0.233 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.81 lock=1 phase=0.34 beat=0 bstr=0.62 | onset=0 bass=0 ostr=0.00
+[1781526018.059] [AP] SSL=424 DC=-812 max_raw=1773 follower=1966 peak_scaled=1.002 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.77 lock=1 phase=0.82 beat=0 bstr=0.62 | onset=0 bass=1 ostr=0.10
+[1781526019.065] [AP] SSL=424 DC=-812 max_raw=1039 follower=2013 peak_scaled=0.591 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.73 lock=1 phase=0.20 beat=0 bstr=0.44 | onset=0 bass=1 ostr=0.06
+[1781526020.070] [AP] SSL=424 DC=-812 max_raw=562 follower=1617 peak_scaled=0.422 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.74 lock=1 phase=0.70 beat=0 bstr=0.46 | onset=1 bass=0 ostr=0.00
+[1781526021.074] [AP] SSL=424 DC=-812 max_raw=2649 follower=1971 peak_scaled=1.103 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.68 lock=1 phase=0.19 beat=0 bstr=0.38 | onset=1 bass=0 ostr=0.00
+[1781526022.080] [AP] SSL=424 DC=-812 max_raw=1232 follower=1713 peak_scaled=0.369 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.69 lock=1 phase=0.56 beat=0 bstr=0.40 | onset=0 bass=0 ostr=0.00
+[1781526023.084] [AP] SSL=424 DC=-812 max_raw=1628 follower=2190 peak_scaled=0.897 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.63 lock=1 phase=0.08 beat=0 bstr=0.50 | onset=0 bass=0 ostr=0.00
+[1781526024.090] [AP] SSL=424 DC=-812 max_raw=827 follower=1716 peak_scaled=0.285 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.62 lock=1 phase=0.50 beat=0 bstr=0.26 | onset=1 bass=0 ostr=0.00
+[1781526025.095] [AP] SSL=424 DC=-812 max_raw=1136 follower=2292 peak_scaled=0.392 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.58 lock=0 phase=0.93 beat=0 bstr=0.26 | onset=0 bass=0 ostr=0.00
+[1781526026.100] [AP] SSL=424 DC=-812 max_raw=1260 follower=2007 peak_scaled=0.510 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.59 lock=0 phase=0.40 beat=0 bstr=0.25 | onset=1 bass=0 ostr=0.00
+[1781526027.105] [AP] SSL=424 DC=-812 max_raw=860 follower=1692 peak_scaled=0.812 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.63 lock=1 phase=0.80 beat=0 bstr=0.35 | onset=1 bass=0 ostr=0.00
+[1781526028.110] [AP] SSL=424 DC=-812 max_raw=610 follower=1839 peak_scaled=0.218 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.61 lock=1 phase=0.31 beat=0 bstr=0.36 | onset=0 bass=0 ostr=0.00
+[1781526029.115] [AP] SSL=424 DC=-812 max_raw=1835 follower=2022 peak_scaled=0.842 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.62 lock=1 phase=0.86 beat=0 bstr=0.24 | onset=0 bass=0 ostr=0.00
+[1781526030.121] [AP] SSL=424 DC=-812 max_raw=942 follower=2042 peak_scaled=0.497 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.60 lock=1 phase=0.21 beat=0 bstr=0.28 | onset=0 bass=1 ostr=0.05
+[1781526031.125] [AP] SSL=424 DC=-812 max_raw=481 follower=1342 peak_scaled=0.526 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.64 lock=1 phase=0.54 beat=0 bstr=0.25 | onset=1 bass=0 ostr=0.00
+[1781526032.130] [AP] SSL=424 DC=-812 max_raw=1945 follower=1210 peak_scaled=1.164 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.67 lock=1 phase=0.04 beat=0 bstr=0.43 | onset=1 bass=0 ostr=0.00
+[1781526033.135] [AP] SSL=424 DC=-812 max_raw=1318 follower=1079 peak_scaled=0.817 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.73 lock=1 phase=0.41 beat=0 bstr=0.62 | onset=1 bass=0 ostr=0.00
+[1781526034.140] [AP] SSL=424 DC=-812 max_raw=324 follower=668 peak_scaled=0.078 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.78 lock=1 phase=0.95 beat=0 bstr=0.68 | onset=0 bass=0 ostr=0.00
+[1781526035.145] [AP] SSL=424 DC=-812 max_raw=635 follower=884 peak_scaled=0.784 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.85 lock=1 phase=0.50 beat=0 bstr=0.71 | onset=0 bass=0 ostr=0.00
+[1781526036.150] [AP] SSL=424 DC=-812 max_raw=750 follower=2023 peak_scaled=0.208 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.90 lock=1 phase=0.00 beat=0 bstr=0.66 | onset=0 bass=0 ostr=0.00
+[1781526037.155] [AP] SSL=424 DC=-812 max_raw=600 follower=1121 peak_scaled=0.287 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.93 lock=1 phase=0.31 beat=0 bstr=0.41 | onset=1 bass=0 ostr=0.00
+[1781526038.160] [AP] SSL=424 DC=-812 max_raw=880 follower=623 peak_scaled=0.536 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.93 lock=1 phase=0.87 beat=0 bstr=0.32 | onset=1 bass=0 ostr=0.00
+[1781526039.165] [AP] SSL=424 DC=-812 max_raw=574 follower=424 peak_scaled=0.312 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.35 lock=0 phase=0.28 beat=0 bstr=0.22 | onset=0 bass=0 ostr=0.00
+[1781526040.170] [AP] SSL=424 DC=-812 max_raw=436 follower=424 peak_scaled=0.122 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.35 lock=0 phase=0.75 beat=0 bstr=0.52 | onset=0 bass=0 ostr=0.00
+[1781526041.175] [AP] SSL=424 DC=-812 max_raw=693 follower=532 peak_scaled=0.502 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.75 lock=0 phase=0.22 beat=0 bstr=0.20 | onset=1 bass=0 ostr=0.00
+[1781526042.180] [AP] SSL=424 DC=-812 max_raw=1237 follower=677 peak_scaled=1.075 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.75 lock=0 phase=0.65 beat=0 bstr=0.27 | onset=1 bass=0 ostr=0.00
+[1781526043.185] [AP] SSL=424 DC=-812 max_raw=807 follower=610 peak_scaled=0.761 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.75 lock=0 phase=0.12 beat=0 bstr=0.14 | onset=0 bass=0 ostr=0.00
+[1781526044.190] [AP] SSL=424 DC=-812 max_raw=832 follower=968 peak_scaled=0.587 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.69 lock=0 phase=0.59 beat=0 bstr=0.16 | onset=1 bass=0 ostr=0.00
+[1781526045.196] [AP] SSL=424 DC=-812 max_raw=665 follower=773 peak_scaled=0.584 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.68 lock=0 phase=0.03 beat=0 bstr=0.15 | onset=0 bass=0 ostr=0.00
+[1781526046.200] [AP] SSL=424 DC=-812 max_raw=534 follower=593 peak_scaled=0.406 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.68 lock=0 phase=0.49 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526047.206] [AP] SSL=424 DC=-812 max_raw=601 follower=436 peak_scaled=0.635 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.16 lock=0 phase=0.96 beat=0 bstr=0.06 | onset=1 bass=0 ostr=0.00
+[1781526048.211] [AP] SSL=424 DC=-812 max_raw=649 follower=424 peak_scaled=0.490 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.05 lock=0 phase=0.40 beat=0 bstr=0.06 | onset=0 bass=1 ostr=0.02
+[1781526049.216] [AP] SSL=424 DC=-812 max_raw=557 follower=424 peak_scaled=0.258 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.00 lock=0 phase=0.86 beat=0 bstr=0.08 | onset=1 bass=1 ostr=0.02
+[1781526050.222] [AP] SSL=424 DC=-812 max_raw=547 follower=424 peak_scaled=0.595 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.00 lock=0 phase=0.33 beat=0 bstr=0.12 | onset=1 bass=0 ostr=0.00
+[1781526051.226] [AP] SSL=424 DC=-812 max_raw=335 follower=424 peak_scaled=0.381 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.14 lock=0 phase=0.16 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526052.232] [AP] SSL=424 DC=-812 max_raw=394 follower=424 peak_scaled=0.141 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.13 lock=0 phase=0.11 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526053.237] [AP] SSL=424 DC=-812 max_raw=310 follower=424 peak_scaled=0.214 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.15 lock=0 phase=0.07 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526054.240] [AP] SSL=424 DC=-812 max_raw=490 follower=424 peak_scaled=0.465 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.00 lock=0 phase=0.99 beat=0 bstr=0.11 | onset=1 bass=0 ostr=0.00
+[1781526055.246] [AP] SSL=424 DC=-812 max_raw=780 follower=594 peak_scaled=0.489 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.00 lock=0 phase=0.94 beat=0 bstr=0.09 | onset=1 bass=0 ostr=0.00
+[1781526056.252] [AP] SSL=424 DC=-812 max_raw=411 follower=484 peak_scaled=0.112 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.00 lock=0 phase=0.90 beat=0 bstr=0.08 | onset=1 bass=0 ostr=0.00
+[1781526057.256] [AP] SSL=424 DC=-812 max_raw=467 follower=424 peak_scaled=0.442 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.00 lock=0 phase=0.82 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00
+[1781526058.261] [AP] SSL=424 DC=-812 max_raw=1531 follower=2347 peak_scaled=0.614 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.75 lock=1 phase=0.38 beat=0 bstr=0.06 | onset=1 bass=0 ostr=0.00
+[1781526059.266] [AP] SSL=424 DC=-812 max_raw=450 follower=1315 peak_scaled=0.161 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.94 lock=1 phase=0.85 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781526060.271] [AP] SSL=424 DC=-812 max_raw=472 follower=730 peak_scaled=0.353 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.94 lock=1 phase=0.16 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.04
+[1781526061.276] [AP] SSL=424 DC=-812 max_raw=336 follower=424 peak_scaled=0.433 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.93 lock=1 phase=0.56 beat=0 bstr=0.09 | onset=0 bass=1 ostr=0.03
+[1781526062.282] [AP] SSL=424 DC=-812 max_raw=885 follower=474 peak_scaled=0.817 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.63 lock=0 phase=0.13 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526063.286] [AP] SSL=424 DC=-812 max_raw=297 follower=666 peak_scaled=0.087 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.62 lock=0 phase=0.57 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526064.291] [AP] SSL=424 DC=-812 max_raw=350 follower=1659 peak_scaled=0.087 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.82 lock=1 phase=0.03 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526065.296] [AP] SSL=424 DC=-812 max_raw=385 follower=931 peak_scaled=0.148 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.84 lock=1 phase=0.42 beat=0 bstr=0.25 | onset=0 bass=0 ostr=0.00
+[1781526066.301] [AP] SSL=424 DC=-812 max_raw=354 follower=532 peak_scaled=0.242 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.86 lock=1 phase=0.91 beat=0 bstr=0.43 | onset=0 bass=1 ostr=0.07
+[1781526067.307] [AP] SSL=424 DC=-812 max_raw=1067 follower=617 peak_scaled=1.072 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.79 lock=0 phase=0.30 beat=0 bstr=0.16 | onset=1 bass=0 ostr=0.00
+[1781526068.312] [AP] SSL=424 DC=-812 max_raw=442 follower=589 peak_scaled=0.090 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.72 lock=0 phase=0.77 beat=0 bstr=0.20 | onset=0 bass=0 ostr=0.00
+[1781526069.317] [AP] SSL=424 DC=-812 max_raw=420 follower=2011 peak_scaled=0.154 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.70 lock=0 phase=0.20 beat=0 bstr=0.16 | onset=0 bass=0 ostr=0.00
+[1781526070.322] [AP] SSL=424 DC=-812 max_raw=623 follower=1166 peak_scaled=0.290 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.70 lock=0 phase=0.67 beat=0 bstr=0.13 | onset=0 bass=0 ostr=0.00
+[1781526071.327] [AP] SSL=424 DC=-812 max_raw=416 follower=685 peak_scaled=0.154 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.73 lock=0 phase=0.14 beat=0 bstr=0.05 | onset=0 bass=1 ostr=0.03
+[1781526072.332] [AP] SSL=424 DC=-812 max_raw=1212 follower=1889 peak_scaled=0.402 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.81 lock=0 phase=0.58 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.03
+[1781526073.336] [AP] SSL=424 DC=-812 max_raw=837 follower=1100 peak_scaled=0.519 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.87 lock=1 phase=0.04 beat=0 bstr=0.07 | onset=1 bass=0 ostr=0.00
+[1781526074.341] [AP] SSL=424 DC=-812 max_raw=780 follower=747 peak_scaled=0.779 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.92 lock=1 phase=0.37 beat=0 bstr=0.22 | onset=1 bass=0 ostr=0.00
+[1781526075.347] [AP] SSL=424 DC=-812 max_raw=490 follower=1586 peak_scaled=0.182 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.89 lock=1 phase=0.80 beat=0 bstr=0.12 | onset=0 bass=0 ostr=0.00
+[1781526076.352] [AP] SSL=424 DC=-812 max_raw=666 follower=1319 peak_scaled=0.395 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.90 lock=1 phase=0.17 beat=0 bstr=0.24 | onset=0 bass=1 ostr=0.07
+[1781526077.356] [AP] SSL=424 DC=-812 max_raw=2481 follower=2377 peak_scaled=1.076 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.91 lock=1 phase=0.70 beat=0 bstr=0.29 | onset=0 bass=1 ostr=0.07
+[1781526078.361] [AP] SSL=424 DC=-812 max_raw=582 follower=1561 peak_scaled=0.189 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.93 lock=1 phase=0.23 beat=0 bstr=0.26 | onset=0 bass=1 ostr=0.03
+[1781526079.368] [AP] SSL=424 DC=-812 max_raw=1216 follower=1347 peak_scaled=0.876 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.94 lock=1 phase=0.63 beat=0 bstr=0.17 | onset=1 bass=0 ostr=0.00
+[1781526080.372] [AP] SSL=424 DC=-812 max_raw=846 follower=1090 peak_scaled=0.274 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.97 lock=1 phase=0.20 beat=0 bstr=0.07 | onset=1 bass=0 ostr=0.00
+[1781526081.376] [AP] SSL=424 DC=-812 max_raw=235 follower=865 peak_scaled=0.104 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.97 lock=1 phase=0.57 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00
+[1781526082.382] [AP] SSL=424 DC=-812 max_raw=1483 follower=1102 peak_scaled=1.189 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.96 lock=1 phase=0.06 beat=0 bstr=0.03 | onset=0 bass=1 ostr=0.15
+[1781526083.387] [AP] SSL=424 DC=-812 max_raw=1232 follower=1246 peak_scaled=0.825 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.94 lock=1 phase=0.52 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00
+[1781526084.392] [AP] SSL=424 DC=-812 max_raw=1221 follower=1752 peak_scaled=0.446 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.94 lock=1 phase=0.05 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00
+[1781526085.396] [AP] SSL=424 DC=-812 max_raw=2270 follower=1645 peak_scaled=0.973 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.71 lock=0 phase=0.48 beat=0 bstr=0.31 | onset=0 bass=0 ostr=0.00
+[1781526086.403] [AP] SSL=424 DC=-812 max_raw=533 follower=1010 peak_scaled=0.080 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.58 lock=0 phase=0.95 beat=0 bstr=0.21 | onset=1 bass=0 ostr=0.00
+[1781526087.407] [AP] SSL=424 DC=-812 max_raw=239 follower=943 peak_scaled=0.275 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.89 lock=1 phase=0.36 beat=0 bstr=0.45 | onset=0 bass=0 ostr=0.00
+[1781526088.413] [AP] SSL=424 DC=-812 max_raw=1975 follower=1348 peak_scaled=1.136 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.82 lock=1 phase=0.84 beat=0 bstr=0.32 | onset=0 bass=1 ostr=0.09
+[1781526089.418] [AP] SSL=424 DC=-812 max_raw=1163 follower=1466 peak_scaled=0.727 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.79 lock=1 phase=0.19 beat=0 bstr=0.50 | onset=0 bass=1 ostr=0.05
+[1781526090.422] [AP] SSL=424 DC=-812 max_raw=65 follower=1201 peak_scaled=0.004 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.73 lock=1 phase=0.72 beat=0 bstr=0.68 | onset=0 bass=0 ostr=0.00
+[1781526091.427] [AP] SSL=424 DC=-812 max_raw=113 follower=613 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.56 lock=1 phase=0.32 beat=0 bstr=0.54 | onset=1 bass=0 ostr=0.00
+[1781526092.433] [AP] SSL=424 DC=-812 max_raw=187 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.52 lock=1 phase=0.77 beat=0 bstr=0.40 | onset=0 bass=1 ostr=0.02
+[1781526093.437] [AP] SSL=424 DC=-812 max_raw=227 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.15 lock=0 phase=0.15 beat=0 bstr=0.33 | onset=0 bass=0 ostr=0.00
+[1781526094.442] [AP] SSL=424 DC=-812 max_raw=104 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.16 lock=0 phase=0.61 beat=0 bstr=0.36 | onset=0 bass=0 ostr=0.00
+[1781526095.447] [AP] SSL=424 DC=-812 max_raw=157 follower=424 peak_scaled=0.002 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.19 lock=0 phase=0.08 beat=0 bstr=0.64 | onset=0 bass=0 ostr=0.00
+[1781526096.453] [AP] SSL=424 DC=-812 max_raw=133 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.19 lock=0 phase=0.52 beat=0 bstr=0.37 | onset=0 bass=1 ostr=0.01
+[1781526097.457] [AP] SSL=424 DC=-812 max_raw=147 follower=424 peak_scaled=0.004 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=87.0 conf=0.19 lock=0 phase=0.98 beat=0 bstr=0.49 | onset=0 bass=0 ostr=0.00
+[1781526098.463] [AP] SSL=424 DC=-812 max_raw=90 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=115.0 conf=0.00 lock=0 phase=0.46 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00
+[1781526099.467] [AP] SSL=424 DC=-812 max_raw=191 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=89.0 conf=0.00 lock=0 phase=0.33 beat=0 bstr=0.41 | onset=0 bass=1 ostr=0.02
+[1781526100.473] [AP] SSL=424 DC=-812 max_raw=213 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=89.0 conf=0.00 lock=0 phase=0.84 beat=0 bstr=0.21 | onset=0 bass=1 ostr=0.02
+[1781526101.477] [AP] SSL=424 DC=-812 max_raw=191 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=120.0 conf=0.00 lock=0 phase=0.81 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00
+[1781526102.483] [AP] SSL=424 DC=-812 max_raw=174 follower=424 peak_scaled=0.001 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=120.0 conf=0.31 lock=0 phase=0.79 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00
+[1781526103.488] [AP] SSL=424 DC=-812 max_raw=670 follower=424 peak_scaled=0.665 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=116.0 conf=0.36 lock=0 phase=0.77 beat=0 bstr=0.42 | onset=0 bass=1 ostr=0.06
+[1781526104.493] [AP] SSL=424 DC=-812 max_raw=187 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=86.0 conf=0.23 lock=0 phase=0.33 beat=0 bstr=0.16 | onset=0 bass=0 ostr=0.00
+[1781526105.499] [AP] SSL=424 DC=-812 max_raw=258 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=114.0 conf=0.39 lock=0 phase=0.81 beat=0 bstr=0.15 | onset=0 bass=0 ostr=0.00
+[1781526106.502] [AP] SSL=424 DC=-812 max_raw=214 follower=424 peak_scaled=0.067 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=114.0 conf=0.40 lock=0 phase=0.73 beat=0 bstr=0.14 | onset=0 bass=1 ostr=0.02
+[1781526107.508] [AP] SSL=424 DC=-812 max_raw=302 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=114.0 conf=0.18 lock=0 phase=0.65 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.02
+[1781526108.513] [AP] SSL=424 DC=-812 max_raw=103 follower=424 peak_scaled=0.001 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=114.0 conf=0.09 lock=0 phase=0.53 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526109.518] [AP] SSL=424 DC=-812 max_raw=148 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=114.0 conf=0.22 lock=0 phase=0.45 beat=0 bstr=0.16 | onset=1 bass=0 ostr=0.00
+[1781526110.523] [AP] SSL=424 DC=-812 max_raw=283 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=86.0 conf=0.12 lock=0 phase=0.12 beat=0 bstr=0.66 | onset=0 bass=0 ostr=0.00
+[1781526111.528] [AP] SSL=424 DC=-812 max_raw=282 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.75 lock=0 phase=0.44 beat=0 bstr=0.24 | onset=0 bass=0 ostr=0.00
+[1781526112.533] [AP] SSL=424 DC=-812 max_raw=112 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.70 lock=0 phase=0.71 beat=0 bstr=0.29 | onset=0 bass=0 ostr=0.00
+[1781526113.538] [AP] SSL=424 DC=-812 max_raw=148 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.63 lock=0 phase=0.98 beat=0 bstr=0.62 | onset=0 bass=0 ostr=0.00
+[1781526114.543] [AP] SSL=424 DC=-812 max_raw=258 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.10 lock=0 phase=0.21 beat=0 bstr=0.41 | onset=0 bass=0 ostr=0.00
+[1781526115.548] [AP] SSL=424 DC=-812 max_raw=121 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.06 lock=0 phase=0.48 beat=0 bstr=0.28 | onset=0 bass=1 ostr=0.02
+[1781526116.553] [AP] SSL=424 DC=-812 max_raw=266 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.06 lock=0 phase=0.74 beat=0 bstr=0.43 | onset=0 bass=0 ostr=0.00
+[1781526117.559] [AP] SSL=424 DC=-812 max_raw=81 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.07 lock=0 phase=0.98 beat=0 bstr=0.42 | onset=0 bass=1 ostr=0.02
+[1781526118.563] [AP] SSL=424 DC=-812 max_raw=200 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.00 lock=0 phase=0.24 beat=0 bstr=0.26 | onset=0 bass=1 ostr=0.02
+[1781526119.568] [AP] SSL=424 DC=-812 max_raw=148 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.07 lock=0 phase=0.51 beat=0 bstr=0.28 | onset=1 bass=0 ostr=0.00
+[1781526120.574] [AP] SSL=424 DC=-812 max_raw=59 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=75.0 conf=0.06 lock=0 phase=0.75 beat=0 bstr=0.24 | onset=1 bass=0 ostr=0.00
+[1781526121.578] [AP] SSL=424 DC=-812 max_raw=385 follower=447 peak_scaled=0.089 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=95.0 conf=0.07 lock=0 phase=0.14 beat=0 bstr=0.03 | onset=0 bass=0 ostr=0.00
+[1781526122.583] [AP] SSL=424 DC=-812 max_raw=129 follower=424 peak_scaled=0.002 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=95.0 conf=0.37 lock=0 phase=0.74 beat=0 bstr=0.05 | onset=1 bass=0 ostr=0.00
+[1781526123.588] [AP] SSL=424 DC=-812 max_raw=243 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=95.0 conf=0.39 lock=0 phase=0.31 beat=0 bstr=0.03 | onset=0 bass=0 ostr=0.00
+[1781526124.593] [AP] SSL=424 DC=-812 max_raw=293 follower=424 peak_scaled=0.259 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=95.0 conf=0.29 lock=0 phase=0.91 beat=0 bstr=0.02 | onset=0 bass=1 ostr=0.03
+[1781526125.599] [AP] SSL=424 DC=-812 max_raw=335 follower=424 peak_scaled=0.006 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=121.0 conf=0.11 lock=0 phase=0.53 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781526126.303] >>> :smart_status
+[1781526126.315] sbr{{
+[1781526126.315] SMART_ASSIST: off
+[1781526126.315] SMART_SWITCHING: off
+[1781526126.315] SMART_DIRECTOR_AUTONOMY: off
+[1781526126.316] SMART_HOOKS: off
+[1781526126.316] SMART_CONFIDENCE_FLOOR: 0.080
+[1781526126.316] SMART_APPLIED_MODE: 3
+[1781526126.316] SMART_LAST_REQUESTED_MODE: 3
+[1781526126.316] SMART_SWITCHES_IN_WINDOW: 0
+[1781526126.316] SMART_MANUAL_OWNER_ACTIVE: 0
+[1781526126.316] SMART_LAST_REASON: 0
+[1781526126.316] SMART_STATE: 0
+[1781526126.316] SMART_INTENT_MODE: 3
+[1781526126.316] SMART_INTENT_CONFIDENCE: 0.000
+[1781526126.317] SMART_INTENT_WANTS_SWITCH: 0
+[1781526126.317] SMART_SCALAR_PHOTONS: 1.000
+[1781526126.317] SMART_SCALAR_CHROMA: 1.000
+[1781526126.317] SMART_SCALAR_MOOD: 1.000
+[1781526126.317] SMART_SCALAR_SATURATION: 1.000
+[1781526126.317] SMART_PALETTE_OVERLAY: 0
+[1781526126.317] SMART_PALETTE_INDEX: 0
+[1781526126.317] SMART_AUTO_COLOUR_SHIFT: 0
+[1781526126.317] SMART_MIN_DWELL_MS: 8000
+[1781526126.317] SMART_COOLDOWN_MS: 20000
+[1781526126.317] SMART_SWITCH_WINDOW_MS: 60000
+[1781526126.317] SMART_MAX_SWITCHES: 2
+[1781526126.318] SMART_AUDIO_NOVELTY: 0.0735
+[1781526126.318] SMART_AUDIO_ENERGY: 0.2354
+[1781526126.318] SMART_EVENT_ID: 106610
+[1781526126.318] SMART_EVENT_AGE_MS: 29
+[1781526126.318] SMART_ONSET: 1
+[1781526126.318] SMART_BASS_ONSET: 0
+[1781526126.318] SMART_BEAT_CONFIDENCE: 0.000
+[1781526126.318] SMART_TRANSIENT: 0
+[1781526126.319] SMART_KICK: 0
+[1781526126.319] SMART_SNARE: 0
+[1781526126.319] SMART_HIHAT: 0
+[1781526126.319] SMART_TRANSIENT_LEVEL: 0.117
+[1781526126.319] SMART_KICK_LEVEL: 0.000
+[1781526126.319] SMART_SNARE_LEVEL: 0.029
+[1781526126.320] SMART_HIHAT_LEVEL: 0.020
+[1781526126.320] SMART_SNARE_EVENT_ID: 47343
+[1781526126.320] SMART_HIHAT_EVENT_ID: 103491
+[1781526126.320] }}
+[1781526126.604] [AP] SSL=424 DC=-812 max_raw=292 follower=424 peak_scaled=0.008 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=121.0 conf=0.09 lock=0 phase=0.52 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00
+[1781526127.608] [AP] SSL=424 DC=-812 max_raw=420 follower=424 peak_scaled=0.327 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=121.0 conf=0.10 lock=0 phase=0.55 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781526128.613] [AP] SSL=424 DC=-812 max_raw=601 follower=424 peak_scaled=0.271 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=76.0 conf=0.42 lock=0 phase=0.96 beat=0 bstr=0.22 | onset=0 bass=1 ostr=0.01
+[1781526129.619] [AP] SSL=424 DC=-812 max_raw=204 follower=424 peak_scaled=0.001 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=82.0 conf=0.57 lock=0 phase=0.23 beat=0 bstr=0.12 | onset=0 bass=0 ostr=0.00
+[1781526130.623] [AP] SSL=424 DC=-812 max_raw=239 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=82.0 conf=0.52 lock=0 phase=0.42 beat=0 bstr=0.08 | onset=0 bass=1 ostr=0.02
+[1781526131.629] [AP] SSL=424 DC=-812 max_raw=282 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=82.0 conf=0.47 lock=0 phase=0.81 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781526132.634] [AP] SSL=424 DC=-812 max_raw=156 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=82.0 conf=0.15 lock=0 phase=0.16 beat=0 bstr=0.06 | onset=1 bass=0 ostr=0.00
+[1781526133.639] [AP] SSL=424 DC=-812 max_raw=103 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=78.0 conf=0.18 lock=0 phase=0.39 beat=0 bstr=0.15 | onset=0 bass=0 ostr=0.00
+[1781526134.643] [AP] SSL=424 DC=-812 max_raw=441 follower=605 peak_scaled=0.073 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=78.0 conf=0.78 lock=1 phase=0.71 beat=0 bstr=0.17 | onset=0 bass=0 ostr=0.00
+[1781526134.807] >>> :dump
+[1781526134.811] sbr{{
+[1781526134.811] FIRMWARE_VERSION: 40103
+[1781526134.812] CHIP ID: B489A500
+[1781526134.812] noise_button.pressed: 0
+[1781526134.812] noise_button.last_down: 0
+[1781526134.812] noise_button.last_up: 0
+[1781526134.812] noise_button.pin: 255
+[1781526134.812] mode_button.pressed: 0
+[1781526134.812] mode_button.last_down: 0
+[1781526134.812] mode_button.last_up: 0
+[1781526134.812] mode_button.pin: 255
+[1781526134.812] CONFIG.PHOTONS: 0.480000
+[1781526134.812] CONFIG.CHROMA: 0.400000
+[1781526134.813] CONFIG.MOOD: 0.100000
+[1781526134.813] CONFIG.LIGHTSHOW_MODE: 8
+[1781526134.813] CONFIG.MIRROR_ENABLED: 1
+[1781526134.813] CONFIG.CHROMAGRAM_RANGE: 60
+[1781526134.813] CONFIG.SAMPLE_RATE: 12800
+[1781526134.813] CONFIG.NOTE_OFFSET: 12
+[1781526134.813] CONFIG.SQUARE_ITER: 0.00
+[1781526134.813] CONFIG.LED_TYPE: 0
+[1781526134.813] CONFIG.LED_COUNT: 160
+[1781526134.814] CONFIG.LED_COLOR_ORDER: 66
+[1781526134.814] CONFIG.SAMPLES_PER_CHUNK: 96
+[1781526134.814] CONFIG.SENSITIVITY: 2.300000
+[1781526134.814] AUDIO_RESPONSE_GAIN: 1.000000
+[1781526134.814] CONFIG.BOOT_ANIMATION: 1
+[1781526134.814] CONFIG.SWEET_SPOT_MIN_LEVEL: 424
+[1781526134.815] CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+[1781526134.815] CONFIG.DC_OFFSET: -812
+[1781526134.815] CAL_SOURCE: measured
+[1781526134.815] CAL_VALID: 1
+[1781526134.815] CAL_PROFILE_LOADED: 1
+[1781526134.815] NOISE_CAL_REASON: none
+[1781526134.815] NOISE_CAL_DC_SAMPLES: 12288
+[1781526134.815] NOISE_CAL_SSL_P50: 235.0
+[1781526134.815] NOISE_CAL_SSL_P90: 385.0
+[1781526134.815] CONFIG.STANDBY_DIMMING: 0
+[1781526134.816] CONFIG.REVERSE_ORDER: 0
+[1781526134.816] CONFIG.MAX_CURRENT_MA: 1500
+[1781526134.816] CONFIG.TEMPORAL_DITHERING: 1
+[1781526134.816] CONFIG.AUTO_COLOR_SHIFT: 1
+[1781526134.816] CONFIG.INCANDESCENT_FILTER: 0.00
+[1781526134.816] CONFIG.INCANDESCENT_MODE: 0
+[1781526134.816] CONFIG.BULB_OPACITY: 0.00
+[1781526134.816] CONFIG.SATURATION: 1.00
+[1781526134.816] CONFIG.PRISM_COUNT: 1.00
+[1781526134.816] CONFIG.BASE_COAT: 1
+[1781526134.817] CONFIG.BASE_COAT_INTENSITY: 0.000
+[1781526134.817] MASTER_BRIGHTNESS: 1.00
+[1781526134.817] stream_audio: 0
+[1781526134.817] stream_fps: 0
+[1781526134.817] stream_max_mags: 0
+[1781526134.817] stream_max_mags_followers: 0
+[1781526134.817] stream_magnitudes: 0
+[1781526134.817] stream_spectrogram: 0
+[1781526134.817] stream_chromagram: 0
+[1781526134.817] debug_mode: 0
+[1781526134.817] noise_complete: 1
+[1781526134.817] noise_iterations: 256
+[1781526134.817] next_save_time: 0
+[1781526134.817] settings_updated: 0
+[1781526134.817] I2S_PORT: 0
+[1781526134.817] SAMPLE_HISTORY_LENGTH: 4096
+[1781526134.817] silence: 0
+[1781526134.818] mode_destination: -1
+[1781526134.818] SYSTEM_FPS: 154.88
+[1781526134.818] LED_FPS: 0.00
+[1781526134.818] }}
+[1781526135.649] [AP] SSL=424 DC=-812 max_raw=129 follower=1881 peak_scaled=0.066 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=72.0 conf=0.94 lock=1 phase=0.02 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781526136.654] [AP] SSL=424 DC=-812 max_raw=117 follower=982 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=72.0 conf=0.97 lock=1 phase=0.19 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00
+[1781526137.659] [AP] SSL=424 DC=-812 max_raw=120 follower=502 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=72.0 conf=0.85 lock=0 phase=0.26 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+[1781526138.664] [AP] SSL=424 DC=-812 max_raw=231 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.56 lock=0 phase=0.44 beat=0 bstr=0.17 | onset=0 bass=1 ostr=0.02
+[1781526139.669] [AP] SSL=424 DC=-812 max_raw=142 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.52 lock=0 phase=0.64 beat=0 bstr=0.24 | onset=0 bass=1 ostr=0.02
+[1781526140.675] [AP] SSL=424 DC=-812 max_raw=283 follower=424 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.53 lock=0 phase=0.84 beat=0 bstr=0.13 | onset=1 bass=0 ostr=0.00
+[1781526141.617] >>> :ap_stream=off
+[1781526141.622] sbr{{
+[1781526141.622] AP_STREAM: off
+[1781526141.622] }}
+[1781526143.073] >>> :ap_stream=off
+[1781526143.081] sbr{{
+[1781526143.081] AP_STREAM: off
+[1781526143.081] }}
+[1781526143.227] >>> :vp_stream=off
+[1781526143.242] sbr{{
+[1781526143.242] VP_STREAM: off
+[1781526143.242] }}
+[1781526143.381] >>> :vp_perf=stop
+[1781526143.396] sbr{{
+[1781526143.396] VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+[1781526143.396] }}
+[1781526143.536] >>> :stop
+[1781526143.542] SBOK

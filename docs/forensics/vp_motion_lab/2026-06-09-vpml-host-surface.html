@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VPML Host Surface</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 32px; color: #1f2933; }
+    section { margin: 0 0 28px; }
+    table { border-collapse: collapse; width: 100%; table-layout: fixed; }
+    th, td { border: 1px solid #c8d1dc; padding: 8px 10px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+    th { width: 220px; background: #eef3f8; }
+    .notice { margin: 16px 0 24px; padding: 12px; border-left: 4px solid #b45309; background: #fff8eb; }
+  </style>
+</head>
+<body>
+  <h1>VPML Host Surface</h1>
+  <div class="notice">Byte proof only. Eyes-on pending until Captain visual acceptance is explicitly recorded.</div>
+  
+    <section>
+      <h2>VPML Run Console</h2>
+      <p><strong>State:</strong> offline evidence loaded</p>
+      <p>Run the existing VPML built-ins on a verified K1 and generate evidence from the live serial capture loop.</p>
+      <table><tr><th>evidence dir</th><td>docs/forensics/runtime-evidence</td></tr>
+<tr><th>capture count</th><td>5</td></tr>
+<tr><th>latest capture</th><td>20260609T213624-vpml-live-intro-bounce-loop-em1401</td></tr>
+<tr><th>latest byte clean capture</th><td>20260609T213624-vpml-live-intro-bounce-loop-em1401</td></tr>
+<tr><th>latest visual status</th><td>eyes_on_pending</td></tr>
+<tr><th>latest byte status</th><td>byte_clean</td></tr>
+<tr><th>programme</th><td>intro_bounce_loop</td></tr>
+<tr><th>port</th><td>/dev/cu.usbmodem1401</td></tr>
+<tr><th>expected chip id</th><td>F887A500</td></tr>
+<tr><th>observed chip id</th><td>F887A500</td></tr>
+<tr><th>runner commands</th><td>{&quot;capture_loop&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py capture --port &lt;port&gt; --programme intro_bounce_loop --expect-chip-id F887A500&quot;, &quot;identify&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py identify --port &lt;port&gt; --expect-chip-id F887A500&quot;, &quot;play_loop&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py play --port &lt;port&gt; --programme intro_bounce_loop --expect-chip-id F887A500&quot;, &quot;scan&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py scan&quot;, &quot;status&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py status --port &lt;port&gt; --expect-chip-id F887A500&quot;, &quot;stop&quot;: &quot;python3 scripts/regression-harness/vpml_live_runner.py stop --port &lt;port&gt; --expect-chip-id F887A500&quot;}</td></tr></table>
+    </section>
+            
+
+    <section>
+      <h2>Programme + Parameter Picker</h2>
+      <p><strong>State:</strong> fixed builtins only</p>
+      <p>Choose one of the current VPML built-ins without implying authoring support.</p>
+      <table><tr><th>programmes</th><td>[{&quot;default&quot;: true, &quot;frames&quot;: 96, &quot;label&quot;: &quot;Intro Bounce Loop&quot;, &quot;notes&quot;: &quot;Loop-safe built-in preview; byte-clean evidence exists, eyes-on pending.&quot;, &quot;play_command&quot;: &quot;:vpml=play_builtin,intro_bounce_loop&quot;, &quot;programme&quot;: &quot;intro_bounce_loop&quot;}, {&quot;default&quot;: false, &quot;frames&quot;: 112, &quot;label&quot;: &quot;Intro Bounce&quot;, &quot;notes&quot;: &quot;Boot-shaped reference; may include fade-trough dark samples when looped.&quot;, &quot;play_command&quot;: &quot;:vpml=play_builtin,intro_bounce&quot;, &quot;programme&quot;: &quot;intro_bounce&quot;}]</td></tr>
+<tr><th>default programme</th><td>intro_bounce_loop</td></tr>
+<tr><th>parameter model</th><td>none_current_mvp</td></tr>
+<tr><th>supported commands</th><td>[&quot;:vpml=play_builtin,intro_bounce_loop&quot;, &quot;:vpml=play_builtin,intro_bounce&quot;]</td></tr></table>
+    </section>
+            
+
+    <section>
+      <h2>Evidence Gate / Motion Readability</h2>
+      <p><strong>State:</strong> byte clean pending visual</p>
+      <p>Separate transport proof, final-byte readability, and visual acceptance status.</p>
+      <table><tr><th>capture count</th><td>5</td></tr>
+<tr><th>byte clean captures</th><td>[&quot;20260609T193511-vpml-intro-bounce-loop-1401&quot;, &quot;20260609T213624-vpml-live-intro-bounce-loop-em1401&quot;]</td></tr>
+<tr><th>transport failed captures</th><td>[&quot;20260609T193419-vpml-intro-bounce-loop-1401&quot;, &quot;20260609T212727-vpml-intro-bounce-loop-1401&quot;]</td></tr>
+<tr><th>dark sample captures</th><td>[&quot;20260609T190853-vpml-intro-bounce-1401&quot;]</td></tr>
+<tr><th>captures</th><td>[{&quot;byte_status&quot;: &quot;byte_clean_with_observations&quot;, &quot;capture_id&quot;: &quot;20260609T190853-vpml-intro-bounce-1401&quot;, &quot;motion_source&quot;: &quot;frames_log&quot;, &quot;page_state&quot;: &quot;dark_sample_warning&quot;, &quot;profile_count&quot;: 48, &quot;programme&quot;: &quot;intro_bounce&quot;, &quot;visual_status&quot;: &quot;eyes_on_pending&quot;}, {&quot;byte_status&quot;: &quot;transport_failed&quot;, &quot;capture_id&quot;: &quot;20260609T193419-vpml-intro-bounce-loop-1401&quot;, &quot;motion_source&quot;: &quot;frames_log&quot;, &quot;page_state&quot;: &quot;transport_failed&quot;, &quot;profile_count&quot;: 64, &quot;programme&quot;: &quot;intro_bounce_loop&quot;, &quot;visual_status&quot;: &quot;eyes_on_pending&quot;}, {&quot;byte_status&quot;: &quot;byte_clean&quot;, &quot;capture_id&quot;: &quot;20260609T193511-vpml-intro-bounce-loop-1401&quot;, &quot;motion_source&quot;: &quot;frames_log&quot;, &quot;page_state&quot;: &quot;byte_clean&quot;, &quot;profile_count&quot;: 30, &quot;programme&quot;: &quot;intro_bounce_loop&quot;, &quot;visual_status&quot;: &quot;eyes_on_pending&quot;}, {&quot;byte_status&quot;: &quot;transport_failed&quot;, &quot;capture_id&quot;: &quot;20260609T212727-vpml-intro-bounce-loop-1401&quot;, &quot;motion_source&quot;: &quot;summary_aggregate&quot;, &quot;page_state&quot;: &quot;transport_failed&quot;, &quot;profile_count&quot;: 0, &quot;programme&quot;: &quot;intro_bounce_loop&quot;, &quot;visual_status&quot;: &quot;eyes_on_pending&quot;}, {&quot;byte_status&quot;: &quot;byte_clean&quot;, &quot;capture_id&quot;: &quot;20260609T213624-vpml-live-intro-bounce-loop-em1401&quot;, &quot;motion_source&quot;: &quot;frames_log&quot;, &quot;page_state&quot;: &quot;byte_clean&quot;, &quot;profile_count&quot;: 32, &quot;programme&quot;: &quot;intro_bounce_loop&quot;, &quot;visual_status&quot;: &quot;eyes_on_pending&quot;}]</td></tr></table>
+    </section>
+            
+
+    <section>
+      <h2>Protocol Readiness / Authoring Lock</h2>
+      <p><strong>State:</strong> locked no adr</p>
+      <p>Show why authoring, upload, and raw receive remain unavailable.</p>
+      <table><tr><th>hidden controls</th><td>[&quot;programme.compile&quot;, &quot;programme.upload&quot;, &quot;raw_receive&quot;]</td></tr>
+<tr><th>available controls</th><td>[&quot;protocol.readiness.view&quot;]</td></tr>
+<tr><th>missing</th><td>[&quot;transport_adr&quot;, &quot;host_protocol_fixtures&quot;, &quot;firmware_validator_tests&quot;, &quot;live_transport_proof&quot;, &quot;captain_approval&quot;]</td></tr>
+<tr><th>reason</th><td>Protocol readiness is not proven; fixed built-ins only.</td></tr></table>
+    </section>
+            
+
+    <section>
+      <h2>Promotion + Regression Ledger</h2>
+      <p><strong>State:</strong> deferred no candidates</p>
+      <p>Keep promotion out of the MVP until there is accepted visual evidence.</p>
+      <table><tr><th>candidate count</th><td>0</td></tr>
+<tr><th>candidate ids</th><td>[]</td></tr>
+<tr><th>deferred reason</th><td>No VPML capture has Captain eyes-on acceptance.</td></tr></table>
+    </section>
+            
+</body>
+</html>

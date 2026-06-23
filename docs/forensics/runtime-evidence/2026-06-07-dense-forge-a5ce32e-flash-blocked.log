@@ -1,0 +1,22 @@
+2026-06-07T05:32:36Z
+HEAD:
+a5ce32e fix(vp): restore Dense Forge transport
+DEVICE LIST:
+/dev/cu.usbmodem12201
+---------------------
+Hardware ID: USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.2
+Description: USB JTAG/serial debug unit
+
+/dev/cu.usbmodem12401
+---------------------
+Hardware ID: USB VID:PID=303A:1001 SER=F0:F5:BD:75:A7:FC LOCATION=0-1.2.4
+Description: USB JTAG/serial debug unit
+
+/dev/cu.usbmodem1401
+--------------------
+Hardware ID: USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.4
+Description: USB JTAG/serial debug unit
+
+PORT LOCK:
+COMMAND    PID        USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+Cursor    1387 spectrasynq  144u   CHR    9,8   0t4090 1325 /dev/tty.usbmodem1401

@@ -1,0 +1,47 @@
+# freeze-88428a2 AP leg=tone stimulus=tone-1k run=2 2026-05-25T161911+0800
+# BUILD STAMP (standing rule): env=k1_hardware_harness source=feat/pio-core-bump@6f42fae (operator-flashed by CC)
+# FIRMWARE :version reply: [AP] SSL=565 DC=-4814 max_raw=3192 follower=2561 peak_scaled=0.913 silent_scale=1.000 silence=0 | sbr{{ | VERSION: 40102 | }} | [AP] SSL=565 DC=-4814 max_raw=2206 follower=2523 peak_scaled=0.677 silen
+# NON-silence leg — captured while Captain played tone-1k.
+# === dump_raw=tone ===
+sbr{{
+DUMP_RAW: armed (tone-1kHz)
+}}
+[DUMP-TONE-1KHZ]
+  f99a4000
+  f9a50000
+  f98fc000
+  f95f0000
+  f91e8000
+  f8ddc000
+  f8abc000
+  f8918000
+  f8964000
+  f8bb0000
+  f8f90000
+  f93d8000
+  f976c000
+  f99b4000
+  f9a08000
+  f9840000
+  f94e0000
+  f9090000
+  f8c50000
+  f8950000
+  f8854000
+  f8954000
+  f8c0c000
+  f9018000
+  f947c000
+  f9820000
+  f9a10000
+  f99d0000
+  f975c000
+  f9358000
+  f8ec4000
+  f8ac4000
+[DUMP-END]
+# === ap_capture=5000 (tone-1k) ===
+sbr{{
+AP_CAPTURE: armed 5000 ms
+}}
+[APCAP] frames=667 max_raw=3787/4481 peak_scaled=0.918/0.991 follower_mean=3693.8 spec_argmax=38 chroma_mean=0.6059 silence=0 SSL=565

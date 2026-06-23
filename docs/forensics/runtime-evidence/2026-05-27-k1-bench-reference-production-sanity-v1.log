@@ -1,0 +1,422 @@
+#PORT /dev/tty.usbmodem1401
+#ROLE production_bench_reference
+#CMD :stop
+scaled=0.436 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1423 follower=750 peak_scaled=0.793 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1060 follower=750 peak_scaled=0.459 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1459 follower=2183 peak_scaled=0.459 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=890 follower=2484 peak_scaled=0.074 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1147 follower=1385 peak_scaled=0.193 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1240 follower=823 peak_scaled=0.543 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=868 follower=889 peak_scaled=0.172 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1236 follower=750 peak_scaled=0.537 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=919 follower=750 peak_scaled=0.437 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=895 follower=910 peak_scaled=0.210 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1176 follower=750 peak_scaled=0.458 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=950 follower=750 peak_scaled=0.260 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1120 follower=750 peak_scaled=0.450 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=885 follower=750 peak_scaled=0.396 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=950 follower=750 peak_scaled=0.475 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1010 follower=750 peak_scaled=0.327 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=890 follower=750 peak_scaled=0.238 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1020 follower=750 peak_scaled=0.332 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1694 follower=1306 peak_scaled=0.803 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1221 follower=846 peak_scaled=0.625 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+SBOK
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+#CMD :vp_stream=off
+sbr{{
+VP_STREAM: off
+}}
+#CMD :set_mode=3
+sbr{{
+CONFIG.LIGHTSHOW_MODE: 3
+}}
+#CMD :secondary_enabled=true
+sbr{{
+SECONDARY_ENABLED: 1
+}}
+#CMD :secondary_control=false
+sbr{{
+SECONDARY_CONTROL: DISABLED (encoders control primary channel)
+}}
+#CMD :secondary_mode=7
+sbr{{
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+}}
+#CMD :secondary_palette_mode=true
+sbr{{
+SECONDARY_PALETTE_MODE_ENABLED: true
+}}
+#CMD :secondary_palette_index=24
+sbr{{
+SECONDARY_PALETTE_INDEX: 24 (fire_gp)
+}}
+#CMD :edge_mode=off
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+#CMD :edge_enabled=off
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+#CMD :edge_strength=0
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+#CMD :smart_hooks=off
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_switching=off
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_assist=off
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_confidence_floor=0.620
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_status
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :edge_status
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+#CMD :ap_stream=on
+sbr{{
+AP_STREAM: on
+}}
+[AP] SSL=750 DC=0 max_raw=360 follower=750 peak_scaled=-0.431 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+#CMD :smart_status
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+[AP] SSL=750 DC=0 max_raw=1111 follower=750 peak_scaled=0.506 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+#CMD :edge_status
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+[AP] SSL=750 DC=0 max_raw=1298 follower=750 peak_scaled=0.491 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+#WAIT ap_stream_music 8.00s
+[AP] SSL=750 DC=0 max_raw=1120 follower=750 peak_scaled=0.364 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=895 follower=750 peak_scaled=0.234 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=996 follower=750 peak_scaled=0.326 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1272 follower=1746 peak_scaled=0.201 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1248 follower=1096 peak_scaled=0.383 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=950 follower=750 peak_scaled=0.269 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=1161 follower=921 peak_scaled=0.386 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+[AP] SSL=750 DC=0 max_raw=986 follower=750 peak_scaled=0.317 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+#CMD :smart_assist=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 0
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 0.000
+SMART_SCALAR_CHROMA: 0.000
+SMART_SCALAR_MOOD: 0.000
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_hooks=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 2
+SMART_INTENT_MODE: 8
+SMART_INTENT_CONFIDENCE: 0.092
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 1.000
+SMART_SCALAR_CHROMA: 1.000
+SMART_SCALAR_MOOD: 1.000
+SMART_AUDIO_NOVELTY: 0.0726
+SMART_AUDIO_ENERGY: 0.1638
+SMART_EVENT_ID: 5
+SMART_EVENT_AGE_MS: 53
+SMART_ONSET: 0
+SMART_BASS_ONSET: 1
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_switching=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: on
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 2
+SMART_INTENT_MODE: 8
+SMART_INTENT_CONFIDENCE: 0.155
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 1.000
+SMART_SCALAR_CHROMA: 1.000
+SMART_SCALAR_MOOD: 1.000
+SMART_AUDIO_NOVELTY: 0.0421
+SMART_AUDIO_ENERGY: 0.2265
+SMART_EVENT_ID: 10
+SMART_EVENT_AGE_MS: 25
+SMART_ONSET: 0
+SMART_BASS_ONSET: 1
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_confidence_floor=0.180
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: on
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.180
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 2
+SMART_INTENT_MODE: 8
+SMART_INTENT_CONFIDENCE: 0.071
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 1.000
+SMART_SCALAR_CHROMA: 1.000
+SMART_SCALAR_MOOD: 1.000
+SMART_AUDIO_NOVELTY: 0.0550
+SMART_AUDIO_ENERGY: 0.0895
+SMART_EVENT_ID: 10
+SMART_EVENT_AGE_MS: 414
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :edge_mode=complementary
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: complementary
+EDGE_STRENGTH: 0.000
+}}
+#CMD :edge_strength=0.350
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: complementary
+EDGE_STRENGTH: 0.350
+}}
+#CMD :edge_enabled=on
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: complementary
+EDGE_STRENGTH: 0.350
+}}
+#WAIT smart_music 10.00s
+#CMD :smart_status
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: on
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.180
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 8
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 2
+SMART_INTENT_MODE: 8
+SMART_INTENT_CONFIDENCE: 0.136
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 1.000
+SMART_SCALAR_CHROMA: 1.000
+SMART_SCALAR_MOOD: 1.000
+SMART_AUDIO_NOVELTY: 0.1018
+SMART_AUDIO_ENERGY: 0.2424
+SMART_EVENT_ID: 46
+SMART_EVENT_AGE_MS: 773
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :edge_status
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: complementary
+EDGE_STRENGTH: 0.350
+}}
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}

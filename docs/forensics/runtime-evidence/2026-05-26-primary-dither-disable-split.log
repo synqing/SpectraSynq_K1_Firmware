@@ -1,0 +1,38 @@
+#CMD :temporal_dithering=false
+sbr{{
+CONFIG.TEMPORAL_DITHERING: 0
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vpab=once
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 1
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=456932,dt_ms=0.00,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1208,quant_us=55,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=456933,dt_ms=0.00,leds=160,truncated=0,dither_step=3,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=42,energy_b=42,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1208,quant_us=39,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+sbr{{
+VPAB_DUMP: rows=2 records=2 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :temporal_dithering=true
+sbr{{
+CONFIG.TEMPORAL_DITHERING: 1
+}}
+#CMD :stop
+SBOK

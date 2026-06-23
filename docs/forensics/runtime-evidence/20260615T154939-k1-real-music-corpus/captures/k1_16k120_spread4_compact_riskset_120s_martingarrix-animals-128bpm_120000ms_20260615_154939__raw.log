@@ -1,0 +1,52 @@
+# capture_start=2026-06-15T15:49:39+0800
+# port=/dev/cu.usbmodem12201 baud=115200 duration_ms=120000
+# track=/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T154939-k1-real-music-corpus/rendered/martingarrix-animals-128bpm/martingarrix-animals-128bpm.chorus-body-120s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+# track_sha256=875db49955d8cb8d53f2757738433365bdf633ab4fa8ed063dad5d4eaa10aaad
+# player=ffplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem12201", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2", "location": "0-1.2.2", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:F8", "vid": 12346}
+SBOK
+sbr{{
+VERSION: 40103
+}}
+sbr{{
+APCAD_ABORT: stopped
+}}
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+sbr{{
+TEMPO_STREAM: off
+}}
+sbr{{
+AP_STREAM: off
+}}
+sbr{{
+APCAD_SOAK: armed 120000 ms compact=1
+}}
+# playback_cmd=ffplay -nodisp -autoexit -loglevel error -ss 0.000 -t 120.000 -i /Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T154939-k1-real-music-corpus/rendered/martingarrix-animals-128bpm/martingarrix-animals-128bpm.chorus-body-120s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav
+APCAD_SOAK_DONE,ver=1,active=0,rows=16000,emitted=5333,start_ms=17150,end_ms=137150,sample_rate=16000,samples_per_chunk=120,tempo_decim=3,meas_ap_hz=133.333,meas_nov_hz=44.444,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=7040,active_max_us=7377,worst_count=16
+APCAD_SOAK_WORST,ver=1,rank=0,frame=15579,t=118160,active_us=7348,total_us=7379,i2s_us=31,gdft_us=3966,novelty_us=31,tempo_acf_us=287,tempo_update_us=574,tempo_emit_us=1105,emitted=1,acf_spread=1,acf_lag_cursor=92,acf_pub=110,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=1,frame=9513,t=72665,active_us=7312,total_us=7344,i2s_us=32,gdft_us=3913,novelty_us=31,tempo_acf_us=292,tempo_update_us=456,tempo_emit_us=1005,emitted=1,acf_spread=1,acf_lag_cursor=88,acf_pub=67,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=2,frame=15876,t=120386,active_us=7317,total_us=9631,i2s_us=2314,gdft_us=3995,novelty_us=32,tempo_acf_us=263,tempo_update_us=556,tempo_emit_us=1061,emitted=1,acf_spread=1,acf_lag_cursor=112,acf_pub=112,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=3,frame=7641,t=58625,active_us=7314,total_us=7345,i2s_us=31,gdft_us=3968,novelty_us=29,tempo_acf_us=290,tempo_update_us=569,tempo_emit_us=1095,emitted=1,acf_spread=1,acf_lag_cursor=36,acf_pub=54,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=4,frame=6639,t=51110,active_us=7377,total_us=7410,i2s_us=33,gdft_us=3935,novelty_us=32,tempo_acf_us=338,tempo_update_us=477,tempo_emit_us=1075,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=47,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=5,frame=11847,t=90170,active_us=7362,total_us=7395,i2s_us=33,gdft_us=3977,novelty_us=32,tempo_acf_us=420,tempo_update_us=590,tempo_emit_us=1236,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=84,win_bpm=128.00000,top1_bpm=85.00000
+APCAD_SOAK_WORST,ver=1,rank=6,frame=6645,t=51155,active_us=7316,total_us=7349,i2s_us=33,gdft_us=3903,novelty_us=47,tempo_acf_us=331,tempo_update_us=448,tempo_emit_us=1035,emitted=1,acf_spread=1,acf_lag_cursor=24,acf_pub=47,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=7,frame=6771,t=52099,active_us=7366,total_us=7400,i2s_us=34,gdft_us=3957,novelty_us=30,tempo_acf_us=372,tempo_update_us=636,tempo_emit_us=1237,emitted=1,acf_spread=1,acf_lag_cursor=4,acf_pub=48,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=8,frame=7767,t=59569,active_us=7315,total_us=7345,i2s_us=30,gdft_us=3999,novelty_us=37,tempo_acf_us=289,tempo_update_us=607,tempo_emit_us=1146,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=55,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=9,frame=9639,t=73610,active_us=7330,total_us=7362,i2s_us=32,gdft_us=3932,novelty_us=31,tempo_acf_us=305,tempo_update_us=435,tempo_emit_us=1009,emitted=1,acf_spread=1,acf_lag_cursor=68,acf_pub=68,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=10,frame=8256,t=63236,active_us=7322,total_us=9394,i2s_us=2072,gdft_us=3995,novelty_us=31,tempo_acf_us=248,tempo_update_us=603,tempo_emit_us=1078,emitted=1,acf_spread=1,acf_lag_cursor=104,acf_pub=58,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=11,frame=7203,t=55340,active_us=7316,total_us=7362,i2s_us=46,gdft_us=3912,novelty_us=31,tempo_acf_us=323,tempo_update_us=541,tempo_emit_us=1092,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=51,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=12,frame=8949,t=68435,active_us=7369,total_us=7403,i2s_us=34,gdft_us=3984,novelty_us=32,tempo_acf_us=280,tempo_update_us=521,tempo_emit_us=1045,emitted=1,acf_spread=1,acf_lag_cursor=88,acf_pub=63,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=13,frame=16155,t=122479,active_us=7325,total_us=7360,i2s_us=35,gdft_us=3957,novelty_us=47,tempo_acf_us=259,tempo_update_us=576,tempo_emit_us=1065,emitted=1,acf_spread=1,acf_lag_cursor=108,acf_pub=114,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=14,frame=9393,t=71765,active_us=7314,total_us=7344,i2s_us=30,gdft_us=3991,novelty_us=30,tempo_acf_us=272,tempo_update_us=563,tempo_emit_us=1085,emitted=1,acf_spread=1,acf_lag_cursor=116,acf_pub=66,win_bpm=128.00000,top1_bpm=128.00000
+APCAD_SOAK_WORST,ver=1,rank=15,frame=10470,t=79842,active_us=7326,total_us=9337,i2s_us=2011,gdft_us=3950,novelty_us=35,tempo_acf_us=310,tempo_update_us=549,tempo_emit_us=1093,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=74,win_bpm=128.00000,top1_bpm=128.00000
+# apcad_soak_status_done=True
+sbr{{
+APCAD_ABORT: stopped
+}}
+SBOK

@@ -1,0 +1,64 @@
+{
+  "baseline_scopes_us": {
+    "vp_bus_read": {
+      "count": 497,
+      "max": 173.0,
+      "mean": 25.323943661971832,
+      "min": 8.0,
+      "p95": 31.0,
+      "p99": 154.0
+    },
+    "vp_visual_hooks_tick": {
+      "count": 497,
+      "max": 1051.0,
+      "mean": 37.501006036217305,
+      "min": 17.0,
+      "p95": 38.0,
+      "p99": 186.0
+    }
+  },
+  "comparisons": {
+    "absolute_hook_p99_gate_replaced_by_baseline": true,
+    "vp_visual_hooks_tick_p99_widening_pct": -7.526881720430108,
+    "vp_visual_hooks_tick_p99_widening_threshold_pct": 10.0
+  },
+  "counters_us": {
+    "vp_primary_render_us": {
+      "count": 496,
+      "max": 2885.0,
+      "mean": 1321.7056451612902,
+      "min": 762.0,
+      "p95": 1907.0,
+      "p99": 1929.0
+    },
+    "vp_secondary_render_us": {
+      "count": 497,
+      "max": 2405.0,
+      "mean": 1075.6378269617705,
+      "min": 454.0,
+      "p95": 1792.0,
+      "p99": 2172.0
+    }
+  },
+  "issues": [],
+  "pass": true,
+  "scopes_us": {
+    "vp_bus_read": {
+      "count": 496,
+      "max": 1046.0,
+      "mean": 26.116935483870968,
+      "min": 8.0,
+      "p95": 31.0,
+      "p99": 38.0
+    },
+    "vp_visual_hooks_tick": {
+      "count": 496,
+      "max": 1054.0,
+      "mean": 42.11290322580645,
+      "min": 27.0,
+      "p95": 42.0,
+      "p99": 172.0
+    }
+  },
+  "trace_events": 5465
+}

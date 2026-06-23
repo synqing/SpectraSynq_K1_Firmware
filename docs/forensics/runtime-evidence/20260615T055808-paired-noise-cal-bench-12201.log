@@ -1,0 +1,113 @@
+[1781474288.682] #DEVICE name=bench-12201 role=bench-reference port=/dev/tty.usbmodem12401 usb_serial=B4:3A:45:A5:89:B4 expected_chip_id=B489A500 env=k1_bench_reference
+[1781474294.093] >>> :version
+[1781474294.097] sbr{{
+[1781474294.097] VERSION: 40103
+[1781474294.097] }}
+[1781474294.693] >>> :chip_id
+[1781474294.702] sbr{{
+[1781474294.702] B489A500
+[1781474294.702] }}
+[1781474295.700] >>> :ap_stream=off
+[1781474295.717] sbr{{
+[1781474295.717] AP_STREAM: off
+[1781474295.717] }}
+[1781474295.985] >>> HOTKEY N
+[1781474295.988] NOISE_CAL: armed - confirm silence, press Y within 5s
+[1781474296.403] >>> HOTKEY Y
+[1781474296.412] NOISE_CAL: queued
+[1781474298.576] NOISE CAL COMPLETE
+[1781474298.576] NOISE CAL QUALITY: reason=none dc_valid=1 dc_samples=12192 dc_rejected=0 ssl_valid=1 ssl_samples=112 ssl_rejected=0 ssl_p50=97.0 ssl_p90=164.0
+[1781474298.751] NOISE CAL ACCEPTED
+[1781474298.906] >>> :ap_stream=on
+[1781474298.908] sbr{{
+[1781474298.908] AP_STREAM: on
+[1781474298.908] }}
+[1781474298.911] [AP] SSL=180 DC=-828 max_raw=111 follower=314 peak_scaled=0.003 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.21 lock=0 phase=0.60 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00
+[1781474299.920] [AP] SSL=180 DC=-828 max_raw=189 follower=180 peak_scaled=0.036 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.27 lock=0 phase=0.17 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00
+[1781474300.930] [AP] SSL=180 DC=-828 max_raw=723 follower=594 peak_scaled=1.042 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.79 lock=1 phase=0.66 beat=0 bstr=0.06 | onset=0 bass=1 ostr=0.10
+[1781474301.934] [AP] SSL=180 DC=-828 max_raw=158 follower=420 peak_scaled=0.026 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.90 lock=1 phase=0.29 beat=0 bstr=0.10 | onset=0 bass=1 ostr=0.01
+[1781474302.939] [AP] SSL=180 DC=-828 max_raw=129 follower=221 peak_scaled=0.060 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.91 lock=1 phase=0.92 beat=0 bstr=0.14 | onset=0 bass=1 ostr=0.02
+[1781474303.945] [AP] SSL=180 DC=-828 max_raw=145 follower=180 peak_scaled=0.040 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.92 lock=1 phase=0.29 beat=0 bstr=0.15 | onset=0 bass=1 ostr=0.02
+[1781474304.949] [AP] SSL=180 DC=-828 max_raw=129 follower=180 peak_scaled=0.056 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.52 lock=0 phase=0.78 beat=0 bstr=0.12 | onset=0 bass=1 ostr=0.02
+[1781474305.955] [AP] SSL=180 DC=-828 max_raw=155 follower=180 peak_scaled=0.194 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.48 lock=0 phase=0.36 beat=0 bstr=0.05 | onset=0 bass=1 ostr=0.02
+[1781474306.960] [AP] SSL=180 DC=-828 max_raw=78 follower=180 peak_scaled=0.067 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.45 lock=0 phase=0.95 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00
+[1781474307.965] [AP] SSL=180 DC=-828 max_raw=72 follower=311 peak_scaled=0.019 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.85 lock=0 phase=0.50 beat=0 bstr=0.07 | onset=0 bass=0 ostr=0.00
+[1781474308.969] [AP] SSL=180 DC=-828 max_raw=76 follower=180 peak_scaled=0.004 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.88 lock=0 phase=0.08 beat=0 bstr=0.05 | onset=1 bass=0 ostr=0.00
+[1781474309.975] [AP] SSL=180 DC=-828 max_raw=97 follower=180 peak_scaled=0.001 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=94.0 conf=0.88 lock=0 phase=0.67 beat=0 bstr=0.04 | onset=0 bass=1 ostr=0.01
+[1781474310.979] [AP] SSL=180 DC=-828 max_raw=140 follower=216 peak_scaled=0.120 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=97.0 conf=0.34 lock=0 phase=0.24 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00
+[1781474311.868] >>> :dump
+[1781474311.888] sbr{{
+[1781474311.888] FIRMWARE_VERSION: 40103
+[1781474311.888] CHIP ID: B489A500
+[1781474311.888] noise_button.pressed: 0
+[1781474311.888] noise_button.last_down: 0
+[1781474311.888] noise_button.last_up: 0
+[1781474311.888] noise_button.pin: 255
+[1781474311.889] mode_button.pressed: 0
+[1781474311.889] mode_button.last_down: 0
+[1781474311.889] mode_button.last_up: 0
+[1781474311.889] mode_button.pin: 255
+[1781474311.889] CONFIG.PHOTONS: 0.480000
+[1781474311.889] CONFIG.CHROMA: 0.400000
+[1781474311.889] CONFIG.MOOD: 0.100000
+[1781474311.889] CONFIG.LIGHTSHOW_MODE: 8
+[1781474311.889] CONFIG.MIRROR_ENABLED: 1
+[1781474311.889] CONFIG.CHROMAGRAM_RANGE: 60
+[1781474311.890] CONFIG.SAMPLE_RATE: 12800
+[1781474311.890] CONFIG.NOTE_OFFSET: 12
+[1781474311.890] CONFIG.SQUARE_ITER: 0.00
+[1781474311.890] CONFIG.LED_TYPE: 0
+[1781474311.890] CONFIG.LED_COUNT: 160
+[1781474311.890] CONFIG.LED_COLOR_ORDER: 66
+[1781474311.890] CONFIG.SAMPLES_PER_CHUNK: 96
+[1781474311.890] CONFIG.SENSITIVITY: 2.300000
+[1781474311.890] CONFIG.BOOT_ANIMATION: 1
+[1781474311.890] CONFIG.SWEET_SPOT_MIN_LEVEL: 180
+[1781474311.891] CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+[1781474311.891] CONFIG.DC_OFFSET: -828
+[1781474311.891] CAL_SOURCE: measured
+[1781474311.891] CAL_VALID: 1
+[1781474311.891] CAL_PROFILE_LOADED: 1
+[1781474311.891] NOISE_CAL_REASON: none
+[1781474311.891] NOISE_CAL_DC_SAMPLES: 12192
+[1781474311.891] NOISE_CAL_SSL_P50: 97.0
+[1781474311.891] NOISE_CAL_SSL_P90: 164.0
+[1781474311.892] CONFIG.STANDBY_DIMMING: 0
+[1781474311.892] CONFIG.REVERSE_ORDER: 0
+[1781474311.892] CONFIG.MAX_CURRENT_MA: 1500
+[1781474311.892] CONFIG.TEMPORAL_DITHERING: 1
+[1781474311.892] CONFIG.AUTO_COLOR_SHIFT: 1
+[1781474311.892] CONFIG.INCANDESCENT_FILTER: 0.00
+[1781474311.892] CONFIG.INCANDESCENT_MODE: 0
+[1781474311.892] CONFIG.BULB_OPACITY: 0.00
+[1781474311.892] CONFIG.SATURATION: 1.00
+[1781474311.893] CONFIG.PRISM_COUNT: 1.00
+[1781474311.893] CONFIG.BASE_COAT: 1
+[1781474311.893] CONFIG.BASE_COAT_INTENSITY: 0.000
+[1781474311.893] MASTER_BRIGHTNESS: 1.00
+[1781474311.893] stream_audio: 0
+[1781474311.893] stream_fps: 0
+[1781474311.893] stream_max_mags: 0
+[1781474311.893] stream_max_mags_followers: 0
+[1781474311.893] stream_magnitudes: 0
+[1781474311.893] stream_spectrogram: 0
+[1781474311.894] stream_chromagram: 0
+[1781474311.894] debug_mode: 0
+[1781474311.894] noise_complete: 1
+[1781474311.894] noise_iterations: 256
+[1781474311.894] next_save_time: 0
+[1781474311.894] settings_updated: 0
+[1781474311.894] I2S_PORT: 0
+[1781474311.894] SAMPLE_HISTORY_LENGTH: 4096
+[1781474311.894] silence: 0
+[1781474311.894] mode_destination: -1
+[1781474311.894] SYSTEM_FPS: 166.05
+[1781474311.894] LED_FPS: 201.14
+[1781474311.894] }}
+[1781474311.985] [AP] SSL=180 DC=-828 max_raw=44 follower=364 peak_scaled=0.027 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=73.0 conf=0.48 lock=1 phase=0.47 beat=0 bstr=0.56 | onset=0 bass=0 ostr=0.00
+[1781474312.891] >>> :ap_stream=off
+[1781474312.898] sbr{{
+[1781474312.898] AP_STREAM: off
+[1781474312.898] }}
+[1781474313.046] >>> :stop
+[1781474313.058] SBOK

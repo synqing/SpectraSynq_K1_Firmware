@@ -1,0 +1,132 @@
+{
+  "freeze": "freeze-88428a2",
+  "firmware": "k1_hardware_harness@88428a2",
+  "captured_at": "2026-05-25T09:01:08+0800",
+  "tier_a_run_to_run_identical": true,
+  "modes": {
+    "0": {
+      "name": "GDFT",
+      "nondet": "0",
+      "pal_a": "39A2532D",
+      "pal_b": "9820C4D5",
+      "manual_a": "2C4CA54D",
+      "manual_b": "2B3CB7CD",
+      "pal_energy": "3772/3664",
+      "manual_energy": "23240/10224"
+    },
+    "1": {
+      "name": "CHROMAGRAM",
+      "nondet": "0",
+      "pal_a": "8F168FFD",
+      "pal_b": "FAA12A3D",
+      "manual_a": "6D45F7D",
+      "manual_b": "7F4128AD",
+      "pal_energy": "2472/2052",
+      "manual_energy": "13826/6102"
+    },
+    "2": {
+      "name": "CHROMAGRAM DOTS",
+      "nondet": "0",
+      "pal_a": "1F73F3B5",
+      "pal_b": "14C53049",
+      "manual_a": "13CD9FF9",
+      "manual_b": "2AE5E385",
+      "pal_energy": "29744/26916",
+      "manual_energy": "69672/43658"
+    },
+    "3": {
+      "name": "BLOOM",
+      "nondet": "0",
+      "pal_a": "A670620D",
+      "pal_b": "779BE6D1",
+      "manual_a": "BA4B2469",
+      "manual_b": "208DFC61",
+      "pal_energy": "84/114",
+      "manual_energy": "118/22"
+    },
+    "4": {
+      "name": "VU DOT",
+      "nondet": "0",
+      "pal_a": "52037435",
+      "pal_b": "64493EDD",
+      "manual_a": "72A62569",
+      "manual_b": "F018D9A1",
+      "pal_energy": "480/160",
+      "manual_energy": "1406/622"
+    },
+    "5": {
+      "name": "KALEIDOSCOPE",
+      "nondet": "0",
+      "pal_a": "4AAFDB65",
+      "pal_b": "143EA12D",
+      "manual_a": "6144BB25",
+      "manual_b": "8A5B7949",
+      "pal_energy": "1372/1588",
+      "manual_energy": "9076/3954"
+    },
+    "6": {
+      "name": "QUANTUM COLLAPSE",
+      "nondet": "1",
+      "pal_a": "3F4A83DD",
+      "pal_b": "BADCAB8D",
+      "manual_a": "7E9EEBF5",
+      "manual_b": "DE5A0D71",
+      "pal_energy": "776/1156",
+      "manual_energy": "5260/2270"
+    },
+    "7": {
+      "name": "WAVEFORM-FAST",
+      "nondet": "0",
+      "pal_a": "643B4AC5",
+      "pal_b": "FC8F6AAD",
+      "manual_a": "9A59BBFD",
+      "manual_b": "D9407A41",
+      "pal_energy": "94/108",
+      "manual_energy": "436/194"
+    },
+    "8": {
+      "name": "WAVEFORM",
+      "nondet": "0",
+      "pal_a": "B8FAA569",
+      "pal_b": "757DEFAD",
+      "manual_a": "DABC8579",
+      "manual_b": "12C2BF4D",
+      "pal_energy": "122/164",
+      "manual_energy": "1530/938"
+    },
+    "9": {
+      "name": "BLOOM (FAST)",
+      "nondet": "0",
+      "pal_a": "A670620D",
+      "pal_b": "779BE6D1",
+      "manual_a": "BA4B2469",
+      "manual_b": "208DFC61",
+      "pal_energy": "84/114",
+      "manual_energy": "118/22"
+    },
+    "10": {
+      "name": "VU",
+      "nondet": "0",
+      "pal_a": "620CF26D",
+      "pal_b": "2C297DCD",
+      "manual_a": "3C78DEC5",
+      "manual_b": "673C0B85",
+      "pal_energy": "15396/15386",
+      "manual_energy": "91200/40800"
+    },
+    "11": {
+      "name": "WAVEFORM_HYBRID",
+      "nondet": "0",
+      "fp_tolerant": true,
+      "fp_reason": "sqrtf + float seed-chain under -O3 -ffast-math; quantised bytes not bit-stable across TU/inline changes (88f2e3c; forensic root-cause 2026-05-26). GATE POLICY (not a baseline measurement; hashes/energies below are unchanged): Tier-A gated on energy tolerance, hash diff is INFO; motion/visual via Tier-B frame_dump bands + Captain visual smoke. CONFIRMED 2026-05-26 on refactor/main@88f2e3c (capture vp_refactor-main_20260526T130049.log): FP-reassoc delta pal 0/0, manual 6/2 (max 0.53%) — benign, NOT a visual regression; hashes avalanche as expected. Band 3%/16abs = ~5x margin over measured benign delta.",
+      "energy_tol_pct": 3.0,
+      "energy_tol_abs": 16.0,
+      "pal_a": "2F0196E1",
+      "pal_b": "7BE31359",
+      "manual_a": "F91DC661",
+      "manual_b": "5E6FD971",
+      "pal_energy": "232/272",
+      "manual_energy": "1124/492"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+# freeze-88428a2 AP leg=tone stimulus=tone-1k run=1 2026-05-25T132254+0800
+# NON-silence leg — captured while Captain played tone-1k.
+# === dump_raw=tone ===
+[APCAP] frames=267 max_raw=123/5858 peak_scaled=-0.662/0.996 follower_mean=987.5 spec_argmax=57 chroma_mean=0.1256 silence=0 SSL=601
+sbr{{
+DUMP_RAW: armed (tone-1kHz)
+}}
+[DUMP-TONE-1KHZ]
+  f9618000
+  f964c000
+  f95b0000
+  f9468000
+  f92bc000
+  f911c000
+  f8fe0000
+  f8f54000
+  f8f9c000
+  f907c000
+  f91e0000
+  f938c000
+  f94e8000
+  f95a0000
+  f9598000
+  f94d0000
+  f935c000
+  f9190000
+  f8fcc000
+  f8e98000
+  f8e3c000
+  f8eb0000
+  f8fd8000
+  f916c000
+  f931c000
+  f949c000
+  f9574000
+  f9560000
+  f9490000
+  f9344000
+  f91b4000
+  f904c000
+[DUMP-END]
+# === ap_capture=5000 (tone-1k) ===
+sbr{{
+AP_CAPTURE: armed 5000 ms
+}}
+[APCAP] frames=667 max_raw=1221/32081 peak_scaled=0.049/1.740 follower_mean=5982.9 spec_argmax=39 chroma_mean=0.2856 silence=0 SSL=601

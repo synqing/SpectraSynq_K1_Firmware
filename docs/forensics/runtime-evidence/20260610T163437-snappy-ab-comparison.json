@@ -1,0 +1,277 @@
+{
+  "duration_s": 20.0,
+  "logs": {
+    "bench-12201": "/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260610T163437-snappy-ab-bench-12201.log",
+    "main-1401": "/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260610T163437-snappy-ab-main-1401.log"
+  },
+  "metrics": {
+    "bench_12201_led_fps_mean": 177.19913,
+    "bench_12201_peak_scaled_mean": 0.475935,
+    "bench_12201_system_fps_mean": 140.154348,
+    "bench_12201_vp_render_us_max_observed": 2262,
+    "bench_12201_vp_render_us_mean": 2078.086957,
+    "main_1401_k1ws_events": 0,
+    "main_1401_peak_scaled_mean": null,
+    "main_1401_vp_render_us_max_observed": null,
+    "main_1401_vp_render_us_mean": null
+  },
+  "run_id": "20260610T163437",
+  "summaries": {
+    "bench-12201": {
+      "ap": {},
+      "counts": {
+        "ap": 0,
+        "k1ws": 0,
+        "read_error": 0,
+        "snap": 23,
+        "vp": 0
+      },
+      "dump": {},
+      "identity": {
+        "chip_id": "B489A500",
+        "version": "40103"
+      },
+      "snap": {
+        "agc_gain": {
+          "count": 23,
+          "last": 0.2091,
+          "max": 0.5165,
+          "mean": 0.235757,
+          "min": 0.101
+        },
+        "ap_stream": {
+          "count": 23,
+          "last": 0,
+          "max": 0,
+          "mean": 0,
+          "min": 0
+        },
+        "bloom_alpha": {
+          "count": 23,
+          "last": 0.99,
+          "max": 0.99,
+          "mean": 0.99,
+          "min": 0.99
+        },
+        "cal_profile_loaded": {
+          "count": 23,
+          "last": 0,
+          "max": 0,
+          "mean": 0,
+          "min": 0
+        },
+        "cal_valid": {
+          "count": 23,
+          "last": 1,
+          "max": 1,
+          "mean": 1,
+          "min": 1
+        },
+        "chroma": {
+          "count": 23,
+          "last": 0.1,
+          "max": 0.1,
+          "mean": 0.1,
+          "min": 0.1
+        },
+        "dc": {
+          "count": 23,
+          "last": -909,
+          "max": -909,
+          "mean": -909,
+          "min": -909
+        },
+        "follower": {
+          "count": 23,
+          "last": 2411.4,
+          "max": 9471.2,
+          "mean": 3424.23913,
+          "min": 1153.7
+        },
+        "fw": {
+          "count": 23,
+          "last": 40103,
+          "max": 40103,
+          "mean": 40103,
+          "min": 40103
+        },
+        "led_fps": {
+          "count": 23,
+          "last": 179.68,
+          "max": 182.7,
+          "mean": 177.19913,
+          "min": 173.67
+        },
+        "max_raw": {
+          "count": 23,
+          "last": 1536.0,
+          "max": 5616.0,
+          "mean": 1568.913043,
+          "min": 293.0
+        },
+        "mode": {
+          "count": 23,
+          "last": 18,
+          "max": 18,
+          "mean": 18,
+          "min": 18
+        },
+        "mood": {
+          "count": 23,
+          "last": 0.55,
+          "max": 0.55,
+          "mean": 0.55,
+          "min": 0.55
+        },
+        "peak_scaled": {
+          "count": 23,
+          "last": 0.5501,
+          "max": 0.8482,
+          "mean": 0.475935,
+          "min": 0.098
+        },
+        "photons": {
+          "count": 23,
+          "last": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0
+        },
+        "sample_rate": {
+          "count": 23,
+          "last": 12800,
+          "max": 12800,
+          "mean": 12800,
+          "min": 12800
+        },
+        "samples_per_chunk": {
+          "count": 23,
+          "last": 96,
+          "max": 96,
+          "mean": 96,
+          "min": 96
+        },
+        "secondary_mode": {
+          "count": 23,
+          "last": 3,
+          "max": 3,
+          "mean": 3,
+          "min": 3
+        },
+        "silence": {
+          "count": 23,
+          "last": 0,
+          "max": 0,
+          "mean": 0,
+          "min": 0
+        },
+        "silent_scale": {
+          "count": 23,
+          "last": 1.0,
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0
+        },
+        "snappy_stream": {
+          "count": 23,
+          "last": 0,
+          "max": 1,
+          "mean": 0.913043,
+          "min": 0
+        },
+        "ssl": {
+          "count": 23,
+          "last": 216,
+          "max": 216,
+          "mean": 216,
+          "min": 216
+        },
+        "system_fps": {
+          "count": 23,
+          "last": 131.36,
+          "max": 147.61,
+          "mean": 140.154348,
+          "min": 130.46
+        },
+        "uptime_ms": {
+          "count": 23,
+          "last": 2546890,
+          "max": 2546890,
+          "mean": 2535001.217391,
+          "min": 2523435
+        },
+        "ver": {
+          "count": 23,
+          "last": 1,
+          "max": 1,
+          "mean": 1,
+          "min": 1
+        },
+        "vp_render_avg": {
+          "count": 23,
+          "last": 2061,
+          "max": 2120,
+          "mean": 2020.695652,
+          "min": 1798
+        },
+        "vp_render_max": {
+          "count": 23,
+          "last": 3337,
+          "max": 3337,
+          "mean": 3337,
+          "min": 3337
+        },
+        "vp_render_us": {
+          "count": 23,
+          "last": 2240,
+          "max": 2262,
+          "mean": 2078.086957,
+          "min": 974
+        },
+        "vp_stream": {
+          "count": 23,
+          "last": 0,
+          "max": 0,
+          "mean": 0,
+          "min": 0
+        },
+        "vu_avg": {
+          "count": 23,
+          "last": 0.0221,
+          "max": 0.1033,
+          "mean": 0.027417,
+          "min": 0.0063
+        },
+        "wave_shift": {
+          "count": 23,
+          "last": 120.0,
+          "max": 120.0,
+          "mean": 120.0,
+          "min": 120.0
+        },
+        "wireless": {
+          "count": 23,
+          "last": 0,
+          "max": 0,
+          "mean": 0,
+          "min": 0
+        }
+      },
+      "vp": {}
+    },
+    "main-1401": {
+      "ap": {},
+      "counts": {
+        "ap": 0,
+        "k1ws": 0,
+        "read_error": 0,
+        "snap": 0,
+        "vp": 0
+      },
+      "dump": {},
+      "identity": {},
+      "snap": {},
+      "vp": {}
+    }
+  }
+}

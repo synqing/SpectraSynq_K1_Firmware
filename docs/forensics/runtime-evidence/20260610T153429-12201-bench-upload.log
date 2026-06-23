@@ -1,0 +1,46 @@
+In file included from /Users/spectrasynq/SensoryBridge-main 9/SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:40:
+SPECTRASYNQ_K1_FIRMWARE/system/system.h: In function 'void check_current_function()':
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:48:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+   48 |   function_hits[function_id]++;
+      |   ~~~~~~~~~~~~~~~~~~~~~~~~~^
+
+A fatal error occurred: Failed to connect to ESP32-S3: No serial data received.
+For troubleshooting steps visit: https://docs.espressif.com/projects/esptool/en/latest/troubleshooting.html
+*** [upload] Error 2
+========================= [FAILED] Took 12.33 seconds =========================
+Environment         Status    Duration
+------------------  --------  ------------
+k1_bench_reference  FAILED    00:00:12.331
+==================== 1 failed, 0 succeeded in 00:00:12.331 ====================
+Processing k1_bench_reference (platform: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip; board: esp32-s3-devkitc1-n16r8; framework: arduino)
+--------------------------------------------------------------------------------
+PLATFORM: Espressif 32 (54.3.20) > Espressif ESP32-S3-DevKitC-1-N16R8V (16 MB Flash Quad, 8 MB PSRAM Octal)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.2.0 
+ - framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a 
+ - tool-esptoolpy @ 4.8.9 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 
+ - tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 
+ - toolchain-riscv32-esp @ 14.2.0+20241119 
+ - toolchain-xtensa-esp-elf @ 14.2.0+20241119
+Converting SPECTRASYNQ_K1_FIRMWARE.ino
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 45 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- FastLED @ 3.10.3
+|-- WebSockets @ 2.7.3
+|-- FixedPoints @ 1.1.2
+|-- M5ROTATE8 @ 0.4.1
+|-- FS @ 3.2.0
+|-- LittleFS @ 3.2.0
+|-- Ticker @ 3.2.0
+|-- Wire @ 3.2.0
+|-- WiFi @ 3.2.0
+... (15 lines truncated)
+[full output: ~/Library/Application Support/rtk/tee/1781076881_pio_run_-e_k1_bench_reference_-t_upload_.log]

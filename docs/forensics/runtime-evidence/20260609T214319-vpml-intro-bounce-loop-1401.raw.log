@@ -1,0 +1,89 @@
+#VPML_CAPTURE port=/dev/cu.usbmodem1401 baud=115200 expect_chip=F887A500 programme=intro_bounce_loop every=36 seconds=2.40
+#CMD :version
+=63
+[K1WS] client 1 state.get id=64
+[K1WS] client 1 state.get id=65
+[K1WS] client 1 state.get id=66
+[K1WS] client 1 state.get id=67
+[K1WS] client 1 state.get id=68
+[K1WS] client 1 state.get id=69
+[K1WS] client 1 state.get id=70
+[K1WS] client 1 state.get id=71
+[K1WS] client 1 state.get id=72
+[K1WS] client 1 state.get id=73
+[K1WS] client 1 state.get id=74
+[K1WS] client 1 state.get id=75
+[K1WS] client 1 state.get id=76
+[K1WS] client 1 state.get id=77
+[K1WS] client 1 state.get id=78
+[K1WS] client 1 state.get id=79
+[K1WS] client 1 state.get id=80
+[K1WS] client 1 state.get id=81
+[K1WS] client 1 state.get id=82
+[K1WS] client 1 state.get id=83
+[K1WS] client 1 state.get id=84
+[K1WS] client 1 state.get id=85
+[K1WS] client 1 state.get id=86
+[K1WS] client 1 state.get id=87
+[K1WS] client 1 state.get id=88
+[K1WS] client 1 state.get id=89
+[K1WS] client 1 state.get id=90
+[K1WS] client 1 state.get id=91
+[K1WS] client 1 state.get id=92
+[K1WS] client 1 state.get id=93
+[K1WS] client 1 state.get id=94
+[K1WS] client 1 state.get id=95
+[K1WS] client 1 state.get id=96
+[K1WS] client 1 state.get id=97
+[K1WS] client 1 state.get id=98
+[K1WS] client 1 state.get id=99
+[K1WS] client 1 state.get id=100
+[K1WS] client 1 state.get id=101
+[K1WS] client 1 state.get id=102
+[K1WS] client 1 state.get id=103
+[K1WS] client 1 state.get id=104
+[K1WS] client 1 state.get id=105
+[K1WS] client 1 state.get id=106
+[K1WS] client 1 state.get id=107
+[K1WS] client 1 state.get id=108
+[K1WS] client 1 state.get id=109
+[K1WS] client 1 state.get id=110
+sbr{{
+VERSION: 40103
+}}
+#CMD :chip_id
+sbr{{
+F887A500
+}}
+#IDENTITY chip_id=F887A500 expected=F887A500
+#CMD :vpml=status
+VPML status active=0 programme=none frame=0 frames=112 loops=23 vpab_mode=250
+[K1WS] client 1 state.get id=111
+#CMD :vpml=play_builtin,intro_bounce_loop
+VPML play_builtin,intro_bounce_loop active=1
+#CMD :vpml=status
+#SESSION_ERROR RuntimeError: :vpml=status missing response containing 'VPML status', 'active=1', 'intro_bounce_loop'; observed: no response
+#CMD :vpab=stop
+VPML status active=1 programme=intro_bounce_loop frame=25 frames=96 loops=2 vpab_mode=250
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 16
+VPAB_FRAME: 595
+VPAB_EVERY_N: 36
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=32 dropped=0 high_water=32 overflowed=0
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 5
+VP_PERF_FRAME: avg=3945 max=5005 over=0 dropped=0
+VP_PERF_HEAP: 86336
+}}
+#CMD :vpml=stop
+VPML stop active=0

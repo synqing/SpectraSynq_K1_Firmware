@@ -1,0 +1,513 @@
+{
+  "harness": {
+    "edge_status_tail": [
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: complementary",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: complementary",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.000",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.000"
+    ],
+    "smart_status_tail": [
+      "SMART_SCALAR_MOOD: 1.000",
+      "SMART_AUDIO_NOVELTY: 0.0798",
+      "SMART_AUDIO_ENERGY: 0.2197",
+      "SMART_EVENT_ID: 60",
+      "SMART_EVENT_AGE_MS: 501",
+      "SMART_ONSET: 0",
+      "SMART_BASS_ONSET: 0",
+      "SMART_BEAT_CONFIDENCE: 0.000",
+      "SMART_ASSIST: off",
+      "SMART_SWITCHING: off",
+      "SMART_DIRECTOR_AUTONOMY: off",
+      "SMART_HOOKS: off",
+      "SMART_CONFIDENCE_FLOOR: 0.080",
+      "SMART_APPLIED_MODE: 3",
+      "SMART_LAST_REQUESTED_MODE: 3",
+      "SMART_SWITCHES_IN_WINDOW: 0",
+      "SMART_MANUAL_OWNER_ACTIVE: 1",
+      "SMART_LAST_REASON: 0",
+      "SMART_STATE: 2",
+      "SMART_INTENT_MODE: 8",
+      "SMART_INTENT_CONFIDENCE: 0.150",
+      "SMART_INTENT_WANTS_SWITCH: 0",
+      "SMART_SCALAR_PHOTONS: 1.000",
+      "SMART_SCALAR_CHROMA: 1.000",
+      "SMART_SCALAR_MOOD: 1.000",
+      "SMART_AUDIO_NOVELTY: 0.0798",
+      "SMART_AUDIO_ENERGY: 0.2197",
+      "SMART_EVENT_ID: 60",
+      "SMART_EVENT_AGE_MS: 501",
+      "SMART_ONSET: 0",
+      "SMART_BASS_ONSET: 0",
+      "SMART_BEAT_CONFIDENCE: 0.000"
+    ],
+    "smart_switch_path": {
+      "checked": true,
+      "group": "smart_assist_low_floor_edge_on/primary",
+      "mode_counts": {
+        "3": 13,
+        "8": 11
+      },
+      "modes": [
+        "3",
+        "8"
+      ],
+      "switched": true,
+      "switched_modes": [
+        "8"
+      ]
+    },
+    "visual_safety_failures": [],
+    "vpab_context_tail": [
+      {
+        "edge_effective_strength_milli": "0",
+        "edge_enabled": "0",
+        "edge_mode": "0",
+        "edge_strength_milli": "0",
+        "hooks_enabled": "0",
+        "manual_owner_active": "0",
+        "primary_config_mode": "3",
+        "primary_mode": "3",
+        "secondary_mode": "7",
+        "smart_enabled": "0",
+        "ver": "1"
+      },
+      {
+        "edge_effective_strength_milli": "1000",
+        "edge_enabled": "1",
+        "edge_mode": "2",
+        "edge_strength_milli": "1000",
+        "hooks_enabled": "0",
+        "manual_owner_active": "0",
+        "primary_config_mode": "3",
+        "primary_mode": "3",
+        "secondary_mode": "7",
+        "smart_enabled": "0",
+        "ver": "1"
+      },
+      {
+        "edge_effective_strength_milli": "368",
+        "edge_enabled": "1",
+        "edge_mode": "2",
+        "edge_strength_milli": "350",
+        "hooks_enabled": "1",
+        "manual_owner_active": "0",
+        "primary_config_mode": "3",
+        "primary_mode": "8",
+        "secondary_mode": "7",
+        "smart_enabled": "1",
+        "ver": "1"
+      }
+    ],
+    "vpab_record_status": [
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=50 dropped=0 high_water=50 overflowed=0",
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=48 dropped=0 high_water=48 overflowed=0",
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "VPAB_RECORDS: captured=48 dropped=0 high_water=48 overflowed=0",
+      "VPAB_RECORDS: captured=48 dropped=0 high_water=48 overflowed=0"
+    ],
+    "vpabb_groups": {
+      "baseline_features_off/primary": {
+        "b_sum": {
+          "max": 766.0,
+          "mean": 391.88,
+          "min": 142.0
+        },
+        "com": {
+          "max": 80.09,
+          "mean": 79.502,
+          "min": 78.94
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 1065.0,
+          "mean": 417.08,
+          "min": 142.0
+        },
+        "g_sum": {
+          "max": 18.0,
+          "mean": 0.8,
+          "min": 0.0
+        },
+        "mode_counts": {
+          "3": 25
+        },
+        "modes": [
+          "3"
+        ],
+        "nonzero_led_pct": {
+          "max": 82.5,
+          "mean": 71.07400000000001,
+          "min": 56.88
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 351.0,
+          "mean": 24.4,
+          "min": 0.0
+        },
+        "rows": 25,
+        "sat_avg": {
+          "max": 210.37,
+          "mean": 180.75639999999999,
+          "min": 133.59
+        },
+        "unique_hashes": 25,
+        "white_bias_avg": {
+          "max": 11.41,
+          "mean": 0.4828,
+          "min": 0.0
+        }
+      },
+      "baseline_features_off/secondary": {
+        "b_sum": {
+          "max": 27.0,
+          "mean": 1.24,
+          "min": 0.0
+        },
+        "com": {
+          "max": 81.07,
+          "mean": 79.5804,
+          "min": 78.97
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 2644.0,
+          "mean": 679.76,
+          "min": 162.0
+        },
+        "g_sum": {
+          "max": 310.0,
+          "mean": 69.24,
+          "min": 19.0
+        },
+        "mode_counts": {
+          "7": 25
+        },
+        "modes": [
+          "7"
+        ],
+        "nonzero_led_pct": {
+          "max": 52.5,
+          "mean": 37.300399999999996,
+          "min": 13.75
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 2330.0,
+          "mean": 609.28,
+          "min": 143.0
+        },
+        "rows": 25,
+        "sat_avg": {
+          "max": 133.87,
+          "mean": 95.03,
+          "min": 35.06
+        },
+        "unique_hashes": 25,
+        "white_bias_avg": {
+          "max": 1.89,
+          "mean": 0.0832,
+          "min": 0.0
+        }
+      },
+      "edge_complementary_strength_1/primary": {
+        "b_sum": {
+          "max": 822.0,
+          "mean": 430.0833333333333,
+          "min": 130.0
+        },
+        "com": {
+          "max": 80.36,
+          "mean": 79.48416666666667,
+          "min": 78.71
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 1802.0,
+          "mean": 744.375,
+          "min": 130.0
+        },
+        "g_sum": {
+          "max": 402.0,
+          "mean": 86.75,
+          "min": 0.0
+        },
+        "mode_counts": {
+          "3": 24
+        },
+        "modes": [
+          "3"
+        ],
+        "nonzero_led_pct": {
+          "max": 83.75,
+          "mean": 64.895,
+          "min": 43.75
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 821.0,
+          "mean": 227.54166666666666,
+          "min": 0.0
+        },
+        "rows": 24,
+        "sat_avg": {
+          "max": 199.95,
+          "mean": 133.69708333333332,
+          "min": 6.58
+        },
+        "unique_hashes": 24,
+        "white_bias_avg": {
+          "max": 119.31,
+          "mean": 31.689166666666665,
+          "min": 0.0
+        }
+      },
+      "edge_complementary_strength_1/secondary": {
+        "b_sum": {
+          "max": 2344.0,
+          "mean": 699.4166666666666,
+          "min": 65.0
+        },
+        "com": {
+          "max": 80.77,
+          "mean": 79.505,
+          "min": 74.69
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 5920.0,
+          "mean": 1695.625,
+          "min": 86.0
+        },
+        "g_sum": {
+          "max": 2441.0,
+          "mean": 565.5833333333334,
+          "min": 8.0
+        },
+        "mode_counts": {
+          "7": 24
+        },
+        "modes": [
+          "7"
+        ],
+        "nonzero_led_pct": {
+          "max": 38.75,
+          "mean": 25.545416666666668,
+          "min": 13.75
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 1673.0,
+          "mean": 430.625,
+          "min": 13.0
+        },
+        "rows": 24,
+        "sat_avg": {
+          "max": 85.18,
+          "mean": 49.505833333333335,
+          "min": 21.34
+        },
+        "unique_hashes": 24,
+        "white_bias_avg": {
+          "max": 46.76,
+          "mean": 15.509583333333333,
+          "min": 2.71
+        }
+      },
+      "smart_assist_low_floor_edge_on/primary": {
+        "b_sum": {
+          "max": 813.0,
+          "mean": 372.2083333333333,
+          "min": 6.0
+        },
+        "com": {
+          "max": 91.14,
+          "mean": 80.16041666666666,
+          "min": 78.0
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 1900.0,
+          "mean": 786.4583333333334,
+          "min": 6.0
+        },
+        "g_sum": {
+          "max": 310.0,
+          "mean": 91.33333333333333,
+          "min": 0.0
+        },
+        "mode_counts": {
+          "3": 13,
+          "8": 11
+        },
+        "modes": [
+          "3",
+          "8"
+        ],
+        "nonzero_led_pct": {
+          "max": 84.37,
+          "mean": 48.2275,
+          "min": 3.75
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 813.0,
+          "mean": 322.9166666666667,
+          "min": 0.0
+        },
+        "rows": 24,
+        "sat_avg": {
+          "max": 182.69,
+          "mean": 94.64291666666666,
+          "min": 9.56
+        },
+        "unique_hashes": 24,
+        "white_bias_avg": {
+          "max": 108.43,
+          "mean": 28.167083333333334,
+          "min": 0.0
+        }
+      },
+      "smart_assist_low_floor_edge_on/secondary": {
+        "b_sum": {
+          "max": 1603.0,
+          "mean": 519.4166666666666,
+          "min": 36.0
+        },
+        "com": {
+          "max": 81.57,
+          "mean": 79.71666666666667,
+          "min": 79.05
+        },
+        "dropped_max": 0,
+        "energy": {
+          "max": 8240.0,
+          "mean": 2893.875,
+          "min": 176.0
+        },
+        "g_sum": {
+          "max": 3397.0,
+          "mean": 1008.25,
+          "min": 15.0
+        },
+        "mode_counts": {
+          "7": 24
+        },
+        "modes": [
+          "7"
+        ],
+        "nonzero_led_pct": {
+          "max": 43.75,
+          "mean": 33.1775,
+          "min": 23.75
+        },
+        "over_max": 0,
+        "r_sum": {
+          "max": 3472.0,
+          "mean": 1366.2083333333333,
+          "min": 125.0
+        },
+        "rows": 24,
+        "sat_avg": {
+          "max": 93.14,
+          "mean": 62.56,
+          "min": 24.39
+        },
+        "unique_hashes": 24,
+        "white_bias_avg": {
+          "max": 46.19,
+          "mean": 21.83583333333333,
+          "min": 5.78
+        }
+      }
+    }
+  },
+  "production": {
+    "ap_follower": {
+      "max": 15729.0,
+      "mean": 12821.4,
+      "min": 9410.0
+    },
+    "ap_max_raw": {
+      "max": 11354.0,
+      "mean": 7402.533333333334,
+      "min": 4545.0
+    },
+    "ap_peak_scaled": {
+      "max": 0.773,
+      "mean": 0.5905333333333334,
+      "min": 0.395
+    },
+    "ap_rows": 15,
+    "ap_silence_rows": 0,
+    "edge_status_tail": [
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: complementary",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: complementary",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.350",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.000",
+      "EDGE_ENABLED: off",
+      "EDGE_MODE: off",
+      "EDGE_STRENGTH: 0.000"
+    ],
+    "smart_status_tail": [
+      "SMART_SCALAR_MOOD: 1.000",
+      "SMART_AUDIO_NOVELTY: 0.1200",
+      "SMART_AUDIO_ENERGY: 0.4072",
+      "SMART_EVENT_ID: 55",
+      "SMART_EVENT_AGE_MS: 1080",
+      "SMART_ONSET: 0",
+      "SMART_BASS_ONSET: 0",
+      "SMART_BEAT_CONFIDENCE: 0.000",
+      "SMART_ASSIST: off",
+      "SMART_SWITCHING: off",
+      "SMART_DIRECTOR_AUTONOMY: off",
+      "SMART_HOOKS: off",
+      "SMART_CONFIDENCE_FLOOR: 0.080",
+      "SMART_APPLIED_MODE: 3",
+      "SMART_LAST_REQUESTED_MODE: 3",
+      "SMART_SWITCHES_IN_WINDOW: 0",
+      "SMART_MANUAL_OWNER_ACTIVE: 1",
+      "SMART_LAST_REASON: 0",
+      "SMART_STATE: 2",
+      "SMART_INTENT_MODE: 8",
+      "SMART_INTENT_CONFIDENCE: 0.182",
+      "SMART_INTENT_WANTS_SWITCH: 0",
+      "SMART_SCALAR_PHOTONS: 1.000",
+      "SMART_SCALAR_CHROMA: 1.000",
+      "SMART_SCALAR_MOOD: 1.000",
+      "SMART_AUDIO_NOVELTY: 0.1200",
+      "SMART_AUDIO_ENERGY: 0.4072",
+      "SMART_EVENT_ID: 55",
+      "SMART_EVENT_AGE_MS: 1080",
+      "SMART_ONSET: 0",
+      "SMART_BASS_ONSET: 0",
+      "SMART_BEAT_CONFIDENCE: 0.000"
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+[
+  {
+    "label": "bench_k1",
+    "port": "/dev/cu.usbmodem12401",
+    "expected_chip": "B489A500",
+    "observed_chip": "B489A500",
+    "chip_match": true,
+    "expected_env": "k1_bench_reference",
+    "dump_cal_source": "config",
+    "dump_cal_valid": "1",
+    "dump_ssl": "354",
+    "dump_dc": "-1124",
+    "ap_count": 57,
+    "ap_max_raw": {
+      "min": 94.0,
+      "max": 4157.0,
+      "mean": 564.6140350877193
+    },
+    "ap_peak_scaled": {
+      "min": 0.0,
+      "max": 2.6,
+      "mean": 0.40273684210526317
+    },
+    "ap_follower": {
+      "min": 354.0,
+      "max": 2726.0,
+      "mean": 693.438596491228
+    },
+    "last_ap": "[AP] SSL=354 DC=-1124 max_raw=402 follower=702 peak_scaled=0.441 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=75.0 conf=0.51 lock=0 phase=0.46 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00",
+    "vp_chroma_last": {
+      "seq": "10739",
+      "range": "60",
+      "profile": "0",
+      "gate_gain": "0.4140",
+      "pre_max": "0.3194",
+      "pre_mean": "0.2637",
+      "norm_max": "0.9333",
+      "norm_mean": "0.7705",
+      "flatness": "0.1628",
+      "final_max": "0.3450",
+      "final_mean": "0.2776"
+    },
+    "vp_agc_last": {
+      "gain": "0.5873",
+      "envelope": "0.4224",
+      "floor": "0.0010",
+      "gated": "false"
+    },
+    "vp_lines": 38,
+    "crash_markers": [],
+    "log_path": "docs/forensics/runtime-evidence/20260615T011256-bench_k1-cu.usbmodem12401-post-spectral-bypass-response.log",
+    "error": null
+  },
+  {
+    "label": "main_k1",
+    "port": "/dev/cu.usbmodem12201",
+    "expected_chip": "F887A500",
+    "observed_chip": "F887A500",
+    "chip_match": true,
+    "expected_env": "k1_hardware",
+    "dump_cal_source": "config",
+    "dump_cal_valid": "1",
+    "dump_ssl": "319",
+    "dump_dc": "-5075",
+    "ap_count": 58,
+    "ap_max_raw": {
+      "min": 93.0,
+      "max": 4166.0,
+      "mean": 534.948275862069
+    },
+    "ap_peak_scaled": {
+      "min": 0.0,
+      "max": 2.6,
+      "mean": 0.41815517241379313
+    },
+    "ap_follower": {
+      "min": 319.0,
+      "max": 2322.0,
+      "mean": 607.4137931034483
+    },
+    "last_ap": "[AP] SSL=319 DC=-5075 max_raw=417 follower=621 peak_scaled=0.612 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=75.0 conf=0.19 lock=0 phase=0.41 beat=0 bstr=0.01 | onset=0 bass=0 ostr=0.00",
+    "vp_chroma_last": {
+      "seq": "10729",
+      "range": "60",
+      "profile": "0",
+      "gate_gain": "0.3845",
+      "pre_max": "0.2931",
+      "pre_mean": "0.2411",
+      "norm_max": "0.8857",
+      "norm_mean": "0.7288",
+      "flatness": "0.1569",
+      "final_max": "0.3021",
+      "final_mean": "0.2418"
+    },
+    "vp_agc_last": {
+      "gain": "0.6709",
+      "envelope": "0.3665",
+      "floor": "0.0010",
+      "gated": "false"
+    },
+    "vp_lines": 38,
+    "crash_markers": [],
+    "log_path": "docs/forensics/runtime-evidence/20260615T011256-main_k1-cu.usbmodem12201-post-spectral-bypass-response.log",
+    "error": null
+  }
+]

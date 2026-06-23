@@ -1,0 +1,190 @@
+led=0.665 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1556 follower=1361 peak_scaled=0.661 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1123 follower=1330 peak_scaled=0.617 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1436 follower=1608 peak_scaled=0.867 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=600 follower=1518 peak_scaled=0.198 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1344 follower=1627 peak_scaled=0.412 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=771 follower=1484 peak_scaled=0.313 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1426 follower=1402 peak_scaled=0.572 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1052 follower=1540 peak_scaled=0.569 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=895 follower=1557 peak_scaled=0.580 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=840 follower=1199 peak_scaled=0.310 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=852 follower=887 peak_scaled=0.271 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=867 follower=875 peak_scaled=0.581 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=2129 follower=1222 peak_scaled=0.979 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=584 follower=1638 peak_scaled=0.110 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=646 follower=1150 peak_scaled=0.289 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1395 follower=1193 peak_scaled=0.928 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=735 follower=1160 peak_scaled=0.243 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=725 follower=1134 peak_scaled=0.297 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=886 follower=1272 peak_scaled=0.471 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1008 follower=1544 peak_scaled=0.558 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=862 follower=1436 peak_scaled=0.422 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1179 follower=2155 peak_scaled=0.302 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=716 follower=1207 peak_scaled=0.075 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=908 follower=887 peak_scaled=0.661 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1188 follower=1669 peak_scaled=0.403 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1812 follower=1708 peak_scaled=0.564 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1288 follower=2356 peak_scaled=0.438 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+#CMD :stop
+SBOK
+#CMD :get_mode
+sbr{{
+MODE: 8
+}}
+#CMD :smart_status
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :edge_status
+sbr{{
+EDGE_ENABLED: off
+EDGE_MODE: off
+EDGE_STRENGTH: 0.000
+}}
+#CMD :set_mode=3
+sbr{{
+CONFIG.LIGHTSHOW_MODE: 3
+}}
+#CMD :secondary_enabled=true
+sbr{{
+SECONDARY_ENABLED: 1
+}}
+#CMD :secondary_mode=7
+sbr{{
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+}}
+#CMD :secondary_palette_mode=true
+sbr{{
+SECONDARY_PALETTE_MODE_ENABLED: true
+}}
+#CMD :secondary_palette_index=24
+sbr{{
+SECONDARY_PALETTE_INDEX: 24 (fire_gp)
+}}
+#CMD :edge_mode=analogous
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: analogous
+EDGE_STRENGTH: 0.000
+}}
+#CMD :edge_strength=0.35
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: analogous
+EDGE_STRENGTH: 0.350
+}}
+#CMD :edge_enabled=on
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: analogous
+EDGE_STRENGTH: 0.350
+}}
+#CMD :edge_status
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: analogous
+EDGE_STRENGTH: 0.350
+}}
+#CMD :smart_assist=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_AUDIO_NOVELTY: 0.0000
+SMART_AUDIO_ENERGY: 0.0000
+SMART_EVENT_ID: 0
+SMART_EVENT_AGE_MS: 0
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_hooks=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_AUDIO_NOVELTY: 0.1183
+SMART_AUDIO_ENERGY: 0.1874
+SMART_EVENT_ID: 8
+SMART_EVENT_AGE_MS: 7
+SMART_ONSET: 0
+SMART_BASS_ONSET: 1
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_switching=on
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: on
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_AUDIO_NOVELTY: 0.0896
+SMART_AUDIO_ENERGY: 0.1652
+SMART_EVENT_ID: 11
+SMART_EVENT_AGE_MS: 312
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :smart_status
+sbr{{
+SMART_ASSIST: on
+SMART_SWITCHING: on
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: on
+SMART_CONFIDENCE_FLOOR: 0.620
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_LAST_REASON: 0
+SMART_AUDIO_NOVELTY: 0.1221
+SMART_AUDIO_ENERGY: 0.1994
+SMART_EVENT_ID: 16
+SMART_EVENT_AGE_MS: 20
+SMART_ONSET: 0
+SMART_BASS_ONSET: 1
+SMART_BEAT_CONFIDENCE: 0.000
+}}
+#CMD :ap_stream=on
+sbr{{
+AP_STREAM: on
+}}
+[AP] SSL=458 DC=-5148 max_raw=1171 follower=1744 peak_scaled=0.822 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=1133 follower=1763 peak_scaled=0.369 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=458 DC=-5148 max_raw=831 follower=1816 peak_scaled=0.325 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}

@@ -1,0 +1,50 @@
+{
+  "clips": [
+    {
+      "duration": 25,
+      "id": "steady-groove",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Regard_Ride_It.mp3",
+      "start": 125,
+      "track": "Regard_Ride_It.mp3"
+    },
+    {
+      "duration": 25,
+      "id": "kick-drop-heavy",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "start": 75,
+      "track": "Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3"
+    },
+    {
+      "duration": 25,
+      "id": "sparse-breakdown-build",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Carte-Blanche-Mixed.mp3",
+      "start": 20,
+      "track": "Carte-Blanche-Mixed.mp3"
+    }
+  ],
+  "created_at": "2026-06-01T20:34:54.504449",
+  "devices": [
+    {
+      "chip_id": "B489A500",
+      "log": "docs/forensics/runtime-evidence/2026-06-01T203320-smart-auto-ab-main-k1v2.log",
+      "name": "main-k1v2",
+      "port": "/dev/tty.usbmodem12201",
+      "role": "l1-reference",
+      "scene": "l1",
+      "version": "40103"
+    },
+    {
+      "chip_id": "F887A500",
+      "log": "docs/forensics/runtime-evidence/2026-06-01T203320-smart-auto-ab-bench-k1-2nd.log",
+      "name": "bench-k1-2nd",
+      "port": "/dev/tty.usbmodem1401",
+      "role": "smart-auto-candidate",
+      "scene": "auto",
+      "version": "40103"
+    }
+  ],
+  "notes": "No calibration, erase, upload, or firmware source edits by this capture script.",
+  "repo": "/Users/spectrasynq/SensoryBridge-main 9",
+  "video_device": null,
+  "video_outputs": []
+}

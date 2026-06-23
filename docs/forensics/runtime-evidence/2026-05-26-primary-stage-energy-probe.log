@@ -1,0 +1,64 @@
+0
+[AP] SSL=750 DC=0 max_raw=5383 follower=5418 peak_scaled=0.870 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5239 follower=5272 peak_scaled=0.888 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5515 follower=5134 peak_scaled=0.914 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5126 follower=5113 peak_scaled=0.887 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5556 follower=5045 peak_scaled=0.923 silent_scale=1.000 silence=0
+#CMD :vp_status
+sbr{{
+VP_PROFILE: candidate
+VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+VP_STREAM: off
+AP_STREAM: on
+VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+VP_CHROMA: seq=2663 range=60 profile=0 gate_gain=1.0000 pre_max=0.1846 pre_mean=0.0814 norm_max=0.7566 norm_mean=0.3589 flatness=0.4481 final_max=0.7070 final_mean=0.2609
+VP_AGC: gain=0.6861 envelope=0.3551 floor=0.0010 gated=false
+VP_RENDER_US: last=2146 avg=1751 max=3242
+VPS,ver=1,prim_mode=3,prim_name=BLOOM,sec_mode=3,sec_name=BLOOM,prim_pal=2,sec_pal=0,prim_pal_en=1,sec_pal_en=0,active_chan=primary,rp_depth=-1,rp_source=live_config,fx_p_max=0.0100,fx_p_kal=0.0000,fx_s_max=0.0100,fx_s_kal=0.0000
+}}
+#CMD :vpab=reset
+[AP] SSL=750 DC=0 max_raw=5364 follower=5232 peak_scaled=0.883 silent_scale=1.000 silence=0
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :frame_dump=energy,3,700,35
+sbr{{
+[FDUMP] start metric=energy mode=3 dur=700 every=35
+}}
+[AP] SSL=750 DC=0 max_raw=5520 follower=4990 peak_scaled=0.931 silent_scale=1.000 silence=0
+[FDUMP] mode=3 f=35 com=79.500 energy=5368 hash=9a7ee129 fps=185.4
+[FDUMP] mode=3 f=70 com=79.500 energy=23178 hash=46ea250d fps=184.4
+[FDUMP] mode=3 f=105 com=79.500 energy=10432 hash=a3739975 fps=185.1
+[FDUMP] end
+#CMD :vpab=once
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 1
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+[AP] SSL=750 DC=0 max_raw=5736 follower=5005 peak_scaled=0.946 silent_scale=1.000 silence=0
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=17946,dt_ms=0.00,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2129,quant_us=60,show_us=0,frame_us=0,over=0,dropped=0,heap=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=17946,dt_ms=0.00,leds=160,truncated=0,dither_step=1,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=592,energy_b=592,energy_delta_pct=0.00,com_a=79.27,com_b=79.27,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2129,quant_us=57,show_us=0,frame_us=0,over=0,dropped=0,heap=0,source_energy=0,scaled_energy=0,final_energy=592
+sbr{{
+VPAB_DUMP: rows=2 records=2 dropped=0 corrupt=0 overflowed=0
+}}
+[AP] SSL=750 DC=0 max_raw=5676 follower=5111 peak_scaled=0.959 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5304 follower=5117 peak_scaled=0.900 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5020 follower=5017 peak_scaled=0.865 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5373 follower=4848 peak_scaled=0.938 silent_scale=1.000 silence=0
+#CMD :stop
+SBOK

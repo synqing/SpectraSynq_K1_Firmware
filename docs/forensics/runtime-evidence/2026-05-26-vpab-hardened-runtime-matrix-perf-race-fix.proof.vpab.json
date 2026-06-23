@@ -1,0 +1,5606 @@
+{
+  "counts": {
+    "diag_summaries": 9,
+    "failures": 40,
+    "ignored_lines": 164,
+    "issues": 56,
+    "passed_records": 0,
+    "vpab_records": 56,
+    "warnings": 112
+  },
+  "diag_summaries": [
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 18,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 50,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 70,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 38,
+        "dropped": 0,
+        "high_water": 38,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 88,
+      "raw": "VPAB_RECORDS: captured=38 dropped=0 high_water=38 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "corrupt": 0,
+        "dropped": 0,
+        "overflowed": 0,
+        "records": 38,
+        "rows": 38
+      },
+      "issues": [],
+      "line": 140,
+      "raw": "VPAB_DUMP: rows=38 records=38 dropped=0 corrupt=0 overflowed=0",
+      "tag": "VPAB_DUMP"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 149,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 169,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 18,
+        "dropped": 0,
+        "high_water": 18,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 187,
+      "raw": "VPAB_RECORDS: captured=18 dropped=0 high_water=18 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "corrupt": 0,
+        "dropped": 0,
+        "overflowed": 0,
+        "records": 18,
+        "rows": 18
+      },
+      "issues": [],
+      "line": 219,
+      "raw": "VPAB_DUMP: rows=18 records=18 dropped=0 corrupt=0 overflowed=0",
+      "tag": "VPAB_DUMP"
+    }
+  ],
+  "failures": [
+    {
+      "channel": "primary",
+      "frame": 60,
+      "line": 101,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 60,
+      "line": 102,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 120,
+      "line": 103,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2312,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 120,
+      "line": 104,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2312,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 180,
+      "line": 105,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2322,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 180,
+      "line": 106,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2322,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 240,
+      "line": 107,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2176,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 240,
+      "line": 108,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2176,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 300,
+      "line": 109,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2148,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 300,
+      "line": 110,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2148,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 420,
+      "line": 113,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2131,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 420,
+      "line": 114,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2131,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 480,
+      "line": 115,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2130,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 480,
+      "line": 116,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2130,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 540,
+      "line": 117,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2309,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 540,
+      "line": 118,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2309,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 600,
+      "line": 119,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2241,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 600,
+      "line": 120,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2241,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 660,
+      "line": 121,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2315,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 660,
+      "line": 122,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2315,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 780,
+      "line": 125,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2263,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 780,
+      "line": 126,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2263,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 840,
+      "line": 127,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2272,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 840,
+      "line": 128,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2272,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 900,
+      "line": 129,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2296,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 900,
+      "line": 130,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2296,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 960,
+      "line": 131,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2068,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 960,
+      "line": 132,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2068,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1080,
+      "line": 135,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2226,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1080,
+      "line": 136,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2226,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1140,
+      "line": 137,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2244,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1140,
+      "line": 138,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2244,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 120,
+      "line": 200,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2365,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 120,
+      "line": 201,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2365,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 600,
+      "line": 208,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2280,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 600,
+      "line": 209,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2280,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 720,
+      "line": 210,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3204,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 720,
+      "line": 211,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3204,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1080,
+      "line": 216,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2248,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1080,
+      "line": 217,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2248,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    }
+  ],
+  "issues": [
+    {
+      "field": "memory_metrics",
+      "line": 101,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 102,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 103,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 104,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 105,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 106,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 107,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 108,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 109,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 110,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 111,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 112,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 113,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 114,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 115,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 116,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 117,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 118,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 119,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 120,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 121,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 122,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 123,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 124,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 125,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 126,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 127,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 128,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 129,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 130,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 131,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 132,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 133,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 134,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 135,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 136,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 137,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 138,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 200,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 201,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 202,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 203,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 204,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 205,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 206,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 207,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 208,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 209,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 210,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 211,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 212,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 213,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 214,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 215,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 216,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 217,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    }
+  ],
+  "passed": false,
+  "records": [
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 60,
+          "line": 101,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 6558,
+        "energy_b": 6558,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 3855,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 110,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1364,
+        "t_ms": 19777,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 101,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 101,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 101,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 101,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 60,
+          "line": 102,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.44,
+        "com_b": 79.44,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 1224,
+        "energy_b": 1224,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 3855,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 108,
+        "render_us": 2310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1364,
+        "t_ms": 19777,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 102,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 102,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 102,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 102,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 120,
+          "line": 103,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2312,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 330.92,
+        "energy_a": 4718,
+        "energy_b": 4718,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3924,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 87,
+        "render_us": 2312,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1455,
+        "t_ms": 20108,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 103,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 103,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 103,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 103,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 120,
+          "line": 104,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2312,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 330.92,
+        "energy_a": 1146,
+        "energy_b": 1146,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3924,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 86,
+        "render_us": 2312,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1455,
+        "t_ms": 20108,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 104,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 104,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 104,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 104,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 180,
+          "line": 105,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2322,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.03,
+        "energy_a": 4840,
+        "energy_b": 4840,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 3923,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 91,
+        "render_us": 2322,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1460,
+        "t_ms": 20437,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 105,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 105,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 105,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 105,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 180,
+          "line": 106,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2322,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.03,
+        "energy_a": 1704,
+        "energy_b": 1704,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 3923,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 87,
+        "render_us": 2322,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1460,
+        "t_ms": 20437,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 106,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 106,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 106,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 106,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 240,
+          "line": 107,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2176,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.81,
+        "energy_a": 6117,
+        "energy_b": 6117,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3933,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 88,
+        "render_us": 2176,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1469,
+        "t_ms": 20765,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 107,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 107,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 107,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 107,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 240,
+          "line": 108,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2176,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.58,
+        "com_b": 79.58,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.81,
+        "energy_a": 3013,
+        "energy_b": 3013,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3933,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 72,
+        "render_us": 2176,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1469,
+        "t_ms": 20767,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 108,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 108,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 108,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 108,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 300,
+          "line": 109,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2148,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.89,
+        "energy_a": 5318,
+        "energy_b": 5318,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 3918,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 2148,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1452,
+        "t_ms": 21091,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 109,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 109,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 109,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 109,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 300,
+          "line": 110,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2148,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.89,
+        "energy_a": 2050,
+        "energy_b": 2050,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 3918,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 66,
+        "render_us": 2148,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1452,
+        "t_ms": 21091,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 110,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 110,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 110,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 110,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.76,
+        "energy_a": 5105,
+        "energy_b": 5105,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3911,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 56,
+        "render_us": 1767,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1445,
+        "t_ms": 21420,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 111,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 111,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 111,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 111,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.76,
+        "energy_a": 2320,
+        "energy_b": 2320,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3911,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 151,
+        "render_us": 1767,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1445,
+        "t_ms": 21420,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 112,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 112,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 112,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 112,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 420,
+          "line": 113,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2131,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.21,
+        "energy_a": 6207,
+        "energy_b": 6207,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 3893,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 63,
+        "render_us": 2131,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1429,
+        "t_ms": 21743,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 113,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 113,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 113,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 113,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 420,
+          "line": 114,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2131,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.21,
+        "energy_a": 2851,
+        "energy_b": 2851,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 3893,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 60,
+        "render_us": 2131,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1429,
+        "t_ms": 21743,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 114,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 114,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 114,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 114,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 480,
+          "line": 115,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2130,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.48,
+        "com_b": 79.48,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 324.01,
+        "energy_a": 5857,
+        "energy_b": 5857,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 68,
+        "render_us": 2130,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1409,
+        "t_ms": 22067,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 115,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 115,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 115,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 115,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 480,
+          "line": 116,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2130,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 324.01,
+        "energy_a": 1304,
+        "energy_b": 1304,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 63,
+        "render_us": 2130,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1409,
+        "t_ms": 22067,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 116,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 116,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 116,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 116,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 540,
+          "line": 117,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2309,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.84,
+        "energy_a": 6356,
+        "energy_b": 6356,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 2309,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 22393,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 117,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 117,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 117,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 117,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 540,
+          "line": 118,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2309,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.84,
+        "energy_a": 1010,
+        "energy_b": 1010,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 64,
+        "render_us": 2309,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 22393,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 118,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 118,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 118,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 118,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 600,
+          "line": 119,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2241,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.25,
+        "energy_a": 6535,
+        "energy_b": 6535,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 62,
+        "render_us": 2241,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 19,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 22718,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 119,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 119,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 119,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 119,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 600,
+          "line": 120,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2241,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.39,
+        "com_b": 79.39,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.25,
+        "energy_a": 1723,
+        "energy_b": 1723,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 62,
+        "render_us": 2241,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 20,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 22718,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 120,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 120,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 120,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 120,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 660,
+          "line": 121,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2315,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.25,
+        "energy_a": 7148,
+        "energy_b": 7148,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 3880,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 109,
+        "render_us": 2315,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 21,
+        "shadow": "self",
+        "show_us": 1404,
+        "t_ms": 23047,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 121,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 121,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 121,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 121,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 660,
+          "line": 122,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2315,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.25,
+        "energy_a": 1329,
+        "energy_b": 1329,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 3880,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 101,
+        "render_us": 2315,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 22,
+        "shadow": "self",
+        "show_us": 1404,
+        "t_ms": 23047,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 122,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 122,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 122,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 122,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.76,
+        "energy_a": 5446,
+        "energy_b": 5446,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 101,
+        "render_us": 1429,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 23,
+        "shadow": "self",
+        "show_us": 1400,
+        "t_ms": 23372,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 123,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 123,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 123,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 123,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.86,
+        "com_b": 79.86,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.76,
+        "energy_a": 1106,
+        "energy_b": 1106,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 97,
+        "render_us": 1429,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 24,
+        "shadow": "self",
+        "show_us": 1400,
+        "t_ms": 23373,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 124,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 124,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 124,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 124,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 780,
+          "line": 125,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2263,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.17,
+        "energy_a": 5729,
+        "energy_b": 5729,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 107,
+        "render_us": 2263,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 25,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 23702,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 125,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 125,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 125,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 125,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 780,
+          "line": 126,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2263,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.17,
+        "energy_a": 1843,
+        "energy_b": 1843,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 103,
+        "render_us": 2263,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 26,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 23702,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 126,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 126,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 126,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 126,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 840,
+          "line": 127,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2272,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.03,
+        "energy_a": 6978,
+        "energy_b": 6978,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3869,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 109,
+        "render_us": 2272,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 27,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 24025,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 127,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 127,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 127,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 127,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 840,
+          "line": 128,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2272,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.61,
+        "com_b": 79.61,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.03,
+        "energy_a": 1631,
+        "energy_b": 1631,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3869,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 106,
+        "render_us": 2272,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 28,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 24025,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 128,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 128,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 128,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 128,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 900,
+          "line": 129,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2296,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.56,
+        "com_b": 79.56,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.99,
+        "energy_a": 6455,
+        "energy_b": 6455,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 3867,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 108,
+        "render_us": 2296,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 29,
+        "shadow": "self",
+        "show_us": 1396,
+        "t_ms": 24352,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 129,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 129,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 129,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 129,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 900,
+          "line": 130,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2296,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.67,
+        "com_b": 79.67,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.99,
+        "energy_a": 1671,
+        "energy_b": 1671,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 3867,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 89,
+        "render_us": 2296,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 30,
+        "shadow": "self",
+        "show_us": 1396,
+        "t_ms": 24352,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 130,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 130,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 130,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 130,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 960,
+          "line": 131,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2068,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.64,
+        "energy_a": 6430,
+        "energy_b": 6430,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 66,
+        "render_us": 2068,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 31,
+        "shadow": "self",
+        "show_us": 1396,
+        "t_ms": 24677,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 131,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 131,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 131,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 131,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 960,
+          "line": 132,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2068,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.4,
+        "com_b": 79.4,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.64,
+        "energy_a": 1960,
+        "energy_b": 1960,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 56,
+        "render_us": 2068,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 32,
+        "shadow": "self",
+        "show_us": 1396,
+        "t_ms": 24677,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 132,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 132,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 132,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 132,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.34,
+        "energy_a": 7995,
+        "energy_b": 7995,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 100,
+        "render_us": 1511,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 33,
+        "shadow": "self",
+        "show_us": 1400,
+        "t_ms": 25005,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 133,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 133,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 133,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 133,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.34,
+        "energy_a": 1078,
+        "energy_b": 1078,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 98,
+        "render_us": 1511,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 34,
+        "shadow": "self",
+        "show_us": 1400,
+        "t_ms": 25005,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 134,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 134,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 134,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 134,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1080,
+          "line": 135,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2226,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.59,
+        "com_b": 79.59,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 332.0,
+        "energy_a": 5118,
+        "energy_b": 5118,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3874,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 108,
+        "render_us": 2226,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 35,
+        "shadow": "self",
+        "show_us": 1404,
+        "t_ms": 25337,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 135,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 135,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 135,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 135,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1080,
+          "line": 136,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2226,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 332.0,
+        "energy_a": 1367,
+        "energy_b": 1367,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3874,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 107,
+        "render_us": 2226,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 36,
+        "shadow": "self",
+        "show_us": 1404,
+        "t_ms": 25337,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 136,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 136,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 136,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 136,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1140,
+          "line": 137,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2244,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 324.0,
+        "energy_a": 5214,
+        "energy_b": 5214,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1140,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 82,
+        "render_us": 2244,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 37,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 25660,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 137,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 137,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 137,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 137,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1140,
+          "line": 138,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2244,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 324.0,
+        "energy_a": 2495,
+        "energy_b": 2495,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1140,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 108,
+        "render_us": 2244,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 38,
+        "shadow": "self",
+        "show_us": 1402,
+        "t_ms": 25661,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 138,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 138,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 138,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 138,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 120,
+          "line": 200,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2365,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 5108,
+        "energy_b": 5108,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3815,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 85,
+        "render_us": 2365,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1362,
+        "t_ms": 30115,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 200,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 200,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 200,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 200,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 120,
+          "line": 201,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2365,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 2023,
+        "energy_b": 2023,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3815,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 82,
+        "render_us": 2365,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1362,
+        "t_ms": 30115,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 201,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 201,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 201,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 201,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 652.91,
+        "energy_a": 6058,
+        "energy_b": 6058,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3846,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 94,
+        "render_us": 1238,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1403,
+        "t_ms": 30768,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 202,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 202,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 202,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 202,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 652.91,
+        "energy_a": 1587,
+        "energy_b": 1587,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3846,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 98,
+        "render_us": 1238,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1403,
+        "t_ms": 30768,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 203,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 203,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 203,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 203,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.48,
+        "com_b": 79.48,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.17,
+        "energy_a": 13228,
+        "energy_b": 13228,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3838,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 102,
+        "render_us": 1360,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 31419,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 204,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 204,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 204,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 204,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.44,
+        "com_b": 79.44,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.17,
+        "energy_a": 4209,
+        "energy_b": 4209,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3838,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 100,
+        "render_us": 1360,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1399,
+        "t_ms": 31419,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 205,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 205,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 205,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 205,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.9,
+        "energy_a": 5518,
+        "energy_b": 5518,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3830,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 89,
+        "render_us": 1409,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1388,
+        "t_ms": 32071,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 206,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 206,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 206,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 206,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.95,
+        "com_b": 79.95,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.9,
+        "energy_a": 630,
+        "energy_b": 630,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3830,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 85,
+        "render_us": 1409,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1388,
+        "t_ms": 32071,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 207,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 207,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 207,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 207,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 600,
+          "line": 208,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2280,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 648.98,
+        "energy_a": 5566,
+        "energy_b": 5566,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3853,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 100,
+        "render_us": 2280,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1422,
+        "t_ms": 32720,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 208,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 208,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 208,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 208,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 600,
+          "line": 209,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2280,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.41,
+        "com_b": 79.41,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 648.98,
+        "energy_a": 64,
+        "energy_b": 64,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3853,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 101,
+        "render_us": 2280,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1422,
+        "t_ms": 32720,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 209,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 209,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 209,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 209,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 720,
+          "line": 210,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3204,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.73,
+        "energy_a": 5965,
+        "energy_b": 5965,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3861,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 3204,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1428,
+        "t_ms": 33372,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 210,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 210,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 210,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 210,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 720,
+          "line": 211,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3204,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.59,
+        "com_b": 79.59,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.73,
+        "energy_a": 440,
+        "energy_b": 440,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3861,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 65,
+        "render_us": 3204,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1428,
+        "t_ms": 33372,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 211,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 211,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 211,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 211,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.22,
+        "energy_a": 6821,
+        "energy_b": 6821,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3869,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 106,
+        "render_us": 1264,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1436,
+        "t_ms": 34023,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 212,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 212,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 212,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 212,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.57,
+        "com_b": 79.57,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 651.22,
+        "energy_a": 1073,
+        "energy_b": 1073,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3869,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 83,
+        "render_us": 1264,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1436,
+        "t_ms": 34023,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 213,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 213,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 213,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 213,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.45,
+        "com_b": 79.45,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 655.6,
+        "energy_a": 7935,
+        "energy_b": 7935,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3876,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 87,
+        "render_us": 1309,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1435,
+        "t_ms": 34679,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 214,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 214,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 214,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 214,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 655.6,
+        "energy_a": 4971,
+        "energy_b": 4971,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3876,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 72,
+        "render_us": 1309,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1435,
+        "t_ms": 34679,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 215,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 215,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 215,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 215,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1080,
+          "line": 216,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2248,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 654.33,
+        "energy_a": 3749,
+        "energy_b": 3749,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 69,
+        "render_us": 2248,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1430,
+        "t_ms": 35333,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 216,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 216,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 216,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 216,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1080,
+          "line": 217,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2248,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.25,
+        "com_b": 79.25,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 0,
+        "dropped": 0,
+        "dt_ms": 654.33,
+        "energy_a": 197,
+        "energy_b": 197,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 81,
+        "render_us": 2248,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1430,
+        "t_ms": 35333,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 217,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        }
+      ],
+      "line": 217,
+      "status": "FAIL",
+      "warnings": [
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 217,
+          "message": "trail delta absent; memory threshold not evaluated"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 217,
+          "message": "tail integral delta absent; memory threshold not evaluated"
+        }
+      ]
+    }
+  ],
+  "result": "FAIL",
+  "schema": "vpab_gate.v1",
+  "summary": "VPAB gate FAIL: 0/56 records passed; 56 issue(s); 40 failure(s); 112 warning(s)",
+  "thresholds": {
+    "changed_channel_pct": 2.0,
+    "changed_led_pct": 2.0,
+    "com_delta_leds": 1.0,
+    "dropped": 0,
+    "frame_us": 8333.33,
+    "mae8": 0.5,
+    "max_abs8": 8.0,
+    "over": 0,
+    "p95_abs8": 1.0,
+    "render_us": 2000.0,
+    "tail_integral_delta_pct_abs": 10.0,
+    "trail_delta_frames": 2.0
+  },
+  "valid": false,
+  "warnings": [
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 101,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 101,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 102,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 102,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 103,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 103,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 104,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 104,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 105,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 105,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 106,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 106,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 107,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 107,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 108,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 108,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 109,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 109,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 110,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 110,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 111,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 111,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 112,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 112,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 113,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 113,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 114,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 114,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 115,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 115,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 116,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 116,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 117,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 117,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 118,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 118,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 119,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 119,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 120,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 120,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 121,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 121,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 122,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 122,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 123,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 123,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 124,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 124,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 125,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 125,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 126,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 126,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 127,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 127,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 128,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 128,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 129,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 129,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 130,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 130,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 131,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 131,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 132,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 132,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 133,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 133,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 134,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 134,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 135,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 135,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 136,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 136,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 137,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 137,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 138,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 138,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 200,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 200,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 201,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 201,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 202,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 202,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 203,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 203,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 204,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 204,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 205,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 205,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 206,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 206,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 207,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 207,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 208,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 208,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 209,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 209,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 210,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 210,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 211,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 211,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 212,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 212,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 213,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 213,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 214,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 214,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 215,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 215,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 216,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 216,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 217,
+      "message": "trail delta absent; memory threshold not evaluated"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 217,
+      "message": "tail integral delta absent; memory threshold not evaluated"
+    }
+  ]
+}

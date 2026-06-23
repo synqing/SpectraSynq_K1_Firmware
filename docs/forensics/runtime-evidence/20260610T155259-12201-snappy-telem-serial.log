@@ -1,0 +1,54 @@
+# trying /dev/cu.usbmodem12201
+>>> :version
+-909 max_raw=7239 follower=7628 peak_scaled=0.969 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=8041 follower=7424 peak_scaled=0.915 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=2597 follower=7107 peak_scaled=0.666 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=2703 follower=6681 peak_scaled=0.562 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=4921 follower=6088 peak_scaled=0.540 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=2477 follower=5491 peak_scaled=0.312 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1881 follower=5671 peak_scaled=0.394 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1866 follower=5384 peak_scaled=0.557 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1281 follower=5793 peak_scaled=0.201 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=2266 follower=5593 peak_scaled=0.230 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=765 follower=5613 peak_scaled=0.147 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1056 follower=4228 peak_scaled=0.226 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1097 follower=2602 peak_scaled=0.332 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1119 follower=1763 peak_scaled=0.526 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1339 follower=2162 peak_scaled=0.662 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=5166 follower=5336 peak_scaled=0.849 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+sbr{{
+VERSION: 40103
+}}
+>>> :chip_id
+[AP] SSL=216 DC=-909 max_raw=5079 follower=5760 peak_scaled=0.752 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+sbr{{
+B489A500
+}}
+[AP] SSL=216 DC=-909 max_raw=3927 follower=6821 peak_scaled=0.475 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=4165 follower=6695 peak_scaled=0.457 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+>>> :snappy_status
+sbr{{
+SNAP,ver=1,event=status,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=26407,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=4041.0,follower=7131.8,peak_scaled=0.7392,silent_scale=1.0000,silence=0,vu_avg=0.0992,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=1123,vp_render_avg=1918,vp_render_max=3305,system_fps=149.36,led_fps=181.17,ap_stream=1,vp_stream=0,snappy_stream=0
+}}
+[AP] SSL=216 DC=-909 max_raw=1182 follower=5847 peak_scaled=0.244 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[AP] SSL=216 DC=-909 max_raw=1963 follower=6826 peak_scaled=0.174 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+>>> :snappy_stream=on
+sbr{{
+SNAPPY_STREAM: on
+}}
+SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=28421,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=5238.0,follower=7012.2,peak_scaled=0.8904,silent_scale=1.0000,silence=0,vu_avg=0.1320,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1004,vp_render_us=2149,vp_render_avg=1894,vp_render_max=3305,system_fps=139.81,led_fps=178.08,ap_stream=1,vp_stream=0,snappy_stream=1
+[AP] SSL=216 DC=-909 max_raw=3285 follower=5742 peak_scaled=0.421 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=29428,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=6931.0,follower=6633.6,peak_scaled=1.0173,silent_scale=1.0000,silence=0,vu_avg=0.1626,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=2248,vp_render_avg=2045,vp_render_max=3305,system_fps=147.06,led_fps=174.76,ap_stream=1,vp_stream=0,snappy_stream=1
+[AP] SSL=216 DC=-909 max_raw=2707 follower=5590 peak_scaled=0.457 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=30428,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=7630.0,follower=6323.9,peak_scaled=0.9978,silent_scale=1.0000,silence=0,vu_avg=0.1366,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=2153,vp_render_avg=1907,vp_render_max=3305,system_fps=143.58,led_fps=177.63,ap_stream=1,vp_stream=0,snappy_stream=1
+[AP] SSL=216 DC=-909 max_raw=2581 follower=5614 peak_scaled=0.321 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=31435,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=5937.0,follower=5692.2,peak_scaled=0.8946,silent_scale=1.0000,silence=0,vu_avg=0.1277,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1069,vp_render_us=2212,vp_render_avg=2036,vp_render_max=3305,system_fps=136.50,led_fps=173.92,ap_stream=1,vp_stream=0,snappy_stream=1
+[AP] SSL=216 DC=-909 max_raw=2381 follower=5715 peak_scaled=0.360 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+>>> :snappy_stream=off
+SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=32443,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=6785.0,follower=5848.2,peak_scaled=0.8482,silent_scale=1.0000,silence=0,vu_avg=0.1388,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1013,vp_render_us=2271,vp_render_avg=2030,vp_render_max=3305,system_fps=143.11,led_fps=178.27,ap_stream=1,vp_stream=0,snappy_stream=1
+sbr{{
+SNAPPY_STREAM: off
+}}
+[AP] SSL=216 DC=-909 max_raw=1042 follower=5762 peak_scaled=0.180 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+>>> :stop
+SBOK

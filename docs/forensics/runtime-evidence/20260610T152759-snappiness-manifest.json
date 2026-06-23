@@ -1,0 +1,123 @@
+{
+  "comparison": {
+    "frame_us_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "gdft_us_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "max_raw_last": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "max_raw_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "peak_scaled_last": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "peak_scaled_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "render_max_last": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "render_us_last": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "render_us_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "sample_rate": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "samples_per_chunk": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "smart_applied_mode_last": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "smart_beat_confidence_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "timing_parity": true
+  },
+  "configure": false,
+  "created_at": "2026-06-10T15:28:07.485671",
+  "devices": [
+    {
+      "chip_id": "F887A500",
+      "env": "k1_hardware",
+      "expected_chip_id": "F887A500",
+      "log": "docs/forensics/runtime-evidence/20260610T152759-snappiness-main-1401.log",
+      "name": "main-1401",
+      "port": "/dev/tty.usbmodem1401",
+      "role": "main-k1",
+      "summary": {
+        "ap": {},
+        "counts": {
+          "ap": 0,
+          "vp": 0,
+          "vpf": 0
+        },
+        "dump": {},
+        "identity": {
+          "chip_id": "F887A500",
+          "version": "40103"
+        },
+        "smart": {},
+        "smart_metrics": {},
+        "vp": {},
+        "vpf": {}
+      },
+      "version": "40103"
+    },
+    {
+      "chip_id": "",
+      "env": "k1_bench_reference",
+      "expected_chip_id": "B489A500",
+      "log": "docs/forensics/runtime-evidence/20260610T152759-snappiness-bench-12201.log",
+      "name": "bench-12201",
+      "port": "/dev/tty.usbmodem12201",
+      "role": "bench-reference",
+      "summary": {
+        "ap": {},
+        "counts": {
+          "ap": 0,
+          "vp": 0,
+          "vpf": 0
+        },
+        "dump": {},
+        "identity": {
+          "chip_id": null,
+          "version": null
+        },
+        "smart": {},
+        "smart_metrics": {},
+        "vp": {},
+        "vpf": {}
+      },
+      "version": ""
+    }
+  ],
+  "duration_s": 5.0,
+  "failure": "RuntimeError: identity probe failed for /dev/tty.usbmodem12201: {'version': None, 'chip_id': None}",
+  "mode": null,
+  "notes": "No calibration, erase, upload, flash, reset, restore, or factory commands. Default configure path sends :set_mode, which persists through the firmware delayed-save path.",
+  "repo": "/Users/spectrasynq/SensoryBridge-main 9",
+  "smart_scene": null,
+  "status_period_s": 2.0,
+  "vp_perf_requested": true
+}

@@ -1,0 +1,1527 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab5 K1 Control — Hub Navigation Design Spec</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230a0a0b'/%3E%3Cpath d='M2 8h12M8 2v12' stroke='%23ffc700' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0a0a0b;
+      --bg-site: #050506;
+      --surface: #121214;
+      --surface-elevated: #1a1a1c;
+      --surface-row: #0e0e11;
+      --border: #2a2a2e;
+      --border-subtle: #1e1e24;
+      --fg: #ffffff;
+      --fg-secondary: #9ca3af;
+      --fg-dim: #4b5563;
+      --brand: #ffc700;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --cyan: #00ffff;
+      --green: #00ff99;
+      --purple: #bf00ff;
+      --blue: #6dbbe8;
+      --ink: #0a0a0b;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --pad: 20px;
+      --content-w: 1240px;
+      --header-y: 10px;
+      --header-h: 58px;
+      --body-y: 72px;
+      --body-h: 648px;
+      --state-h: 74px;
+      --composer-body-y: 82px;
+      --composer-body-h: 566px;
+      --left-w: 824px;
+      --right-w: 400px;
+      --right-x: 840px;
+      --gap: 16px;
+      --shadow-cyan: rgba(0, 255, 255, 0.16);
+      --shadow-brand: rgba(255, 199, 0, 0.14);
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(255, 199, 0, 0.07), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 85% 0%, rgba(0, 255, 255, 0.05), transparent 40%),
+        linear-gradient(180deg, #070709 0%, var(--bg-site) 100%);
+      color: var(--fg);
+      font-family: "Rajdhani", system-ui, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    button { font: inherit; cursor: pointer; }
+
+    .proposal {
+      max-width: 1620px;
+      margin: 0 auto;
+      padding: 20px 20px 48px;
+    }
+
+    .proposal-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 48px;
+      line-height: 0.92;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    .summary {
+      margin: 10px 0 0;
+      max-width: 920px;
+      color: var(--fg-secondary);
+      font-size: 17px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .meta-pill {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1280px) minmax(280px, 320px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .device-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      border: 1px solid #303038;
+      border-radius: 18px;
+      background: #040405;
+      padding: 10px;
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.62),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    }
+
+    .device-scale-wrap {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .tab5 {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: var(--bg-page);
+      transform-origin: top left;
+      transform: scale(var(--device-scale, 1));
+      overflow: hidden;
+    }
+
+    .screen-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms ease;
+    }
+
+    .screen-layer.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+  /* ---- HEADER (all pages) ---- */
+    .header {
+      position: absolute;
+      left: var(--pad);
+      top: var(--header-y);
+      width: var(--content-w);
+      height: var(--header-h);
+      display: grid;
+      grid-template-columns: 124px 168px 1fr 122px 122px 122px;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .status-pill {
+      height: 44px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+      white-space: nowrap;
+      padding: 0 8px;
+    }
+
+    .status-pill.live {
+      color: var(--success);
+      border-color: #14532d;
+    }
+
+    .title-cluster {
+      justify-self: center;
+      min-width: 220px;
+      height: 54px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 4px 18px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      transition: background 140ms, border-color 140ms, box-shadow 140ms;
+    }
+
+    .title-cluster:hover,
+    .title-cluster.open {
+      background: var(--surface);
+      border-color: var(--brand);
+      box-shadow: 0 0 24px var(--shadow-brand);
+    }
+
+    .title-cluster .main {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 40px;
+      line-height: 0.95;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+    }
+
+    .title-cluster .sub {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+    }
+
+    .title-cluster.open .sub { color: var(--brand); }
+
+    .body {
+      position: absolute;
+      left: var(--pad);
+      top: var(--body-y);
+      width: var(--content-w);
+      height: var(--body-h);
+    }
+
+    .page-back {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 120px;
+      height: 54px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      display: grid;
+      place-items: center;
+    }
+
+    .page-back:hover { border-color: var(--brand); color: var(--brand); }
+
+    .card {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .card-elevated {
+      background: var(--surface-elevated);
+      border-color: rgba(255, 199, 0, 0.12);
+    }
+
+    .section-label {
+      margin: 0 0 10px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--brand);
+    }
+
+    .section-label.muted { color: var(--fg-secondary); font-size: 18px; }
+
+  /* ---- SHOW ---- */
+    .state-band {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--content-w);
+      height: var(--state-h);
+      padding: 8px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-elevated);
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--gap);
+    }
+
+    .surface-btn {
+      height: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .surface-btn.on-cyan {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--ink);
+      box-shadow: 0 0 28px var(--shadow-cyan);
+    }
+
+    .surface-btn.on-purple {
+      border-color: rgba(191, 0, 255, 0.55);
+    }
+
+    .scene-pill {
+      position: absolute;
+      right: 14px;
+      padding: 6px 14px;
+      border-radius: 15px;
+      background: #21152a;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .composer-panels {
+      position: absolute;
+      left: 0;
+      top: var(--composer-body-y);
+      width: var(--content-w);
+      height: var(--composer-body-h);
+    }
+
+    .panel-left {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--left-w);
+      height: 100%;
+    }
+
+    .panel-right {
+      position: absolute;
+      left: var(--right-x);
+      top: 0;
+      width: var(--right-w);
+      height: 100%;
+    }
+
+    .param-row {
+      height: 112px;
+      margin-bottom: 10px;
+      border-radius: var(--radius);
+      background: var(--surface-row);
+      border: 1px solid var(--border-subtle);
+      display: grid;
+      grid-template-columns: 220px 1fr 86px;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+    }
+
+    .param-label {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .param-label.cyan { color: var(--cyan); }
+    .param-label.green { color: var(--green); }
+    .param-label.gold { color: var(--brand); }
+    .param-label.purple { color: var(--purple); }
+    .param-label.blue { color: var(--blue); }
+
+    .slider-track {
+      height: 38px;
+      border-radius: 16px;
+      background: var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slider-fill {
+      height: 100%;
+      border-radius: 16px;
+    }
+
+    .slider-fill.gold { background: var(--brand); width: 70%; }
+    .slider-fill.purple { background: var(--purple); width: 61%; }
+    .slider-fill.blue { background: var(--blue); width: 54%; }
+
+    .palette-row {
+      display: grid;
+      grid-template-columns: 78px 1fr 78px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .palette-btn {
+      height: 66px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--green);
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .palette-value {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .palette-bar {
+      height: 10px;
+      border-radius: 8px;
+      background: var(--border);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .palette-bar span {
+      display: block;
+      height: 100%;
+      width: 78%;
+      background: var(--green);
+      border-radius: 8px;
+    }
+
+    .param-value {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 38px;
+    }
+
+    .mode-chip {
+      height: 54px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.15;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 4px;
+    }
+
+    .mode-chip.on {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--ink);
+    }
+
+    .mode-meta {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .meta-chip {
+      flex: 1;
+      height: 40px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+    }
+
+    .meta-chip.live {
+      color: var(--success);
+      border-color: #14532d;
+    }
+
+  /* ---- HUB ---- */
+    .hub-page {
+      height: 100%;
+      padding: 4px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hub-heading {
+      margin: 0;
+      padding-left: 4px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .hub-row {
+      flex: 1;
+      min-height: 0;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-page);
+      display: grid;
+      grid-template-columns: 6px 1fr auto;
+      align-items: stretch;
+      overflow: hidden;
+      transition: border-color 120ms, background 120ms;
+    }
+
+    .hub-row:hover { background: var(--surface-elevated); }
+    .hub-row.current {
+      border-color: var(--brand);
+      box-shadow: inset 0 0 0 1px rgba(255, 199, 0, 0.12);
+    }
+
+    .hub-row .stripe.show { background: var(--cyan); }
+    .hub-row .stripe.health { background: var(--blue); }
+    .hub-row .stripe.edges { background: var(--green); }
+    .hub-row .stripe.more { background: var(--brand); }
+
+    .hub-copy {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .hub-copy .name {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: 0.05em;
+    }
+
+    .hub-copy .desc {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      line-height: 1.35;
+      max-width: 720px;
+    }
+
+    .hub-meta {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .badge {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .badge.here {
+      color: var(--brand);
+      border: 1px solid #3d3200;
+      background: rgba(255, 199, 0, 0.1);
+    }
+
+    .badge.live {
+      color: var(--success);
+      border: 1px solid #14532d;
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+  /* ---- HEALTH ---- */
+    .health-page {
+      padding-top: 64px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .health-banner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: var(--radius-lg);
+      border: 1px solid #14532d;
+      background: linear-gradient(90deg, rgba(34, 197, 94, 0.08), transparent);
+    }
+
+    .health-banner .title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 44px;
+      line-height: 1;
+      color: var(--success);
+      letter-spacing: 0.04em;
+    }
+
+    .health-banner .hint {
+      font-size: 15px;
+      color: var(--fg-secondary);
+      max-width: 520px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .btn-retry {
+      height: 48px;
+      padding: 0 22px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--warning);
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .health-grid {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .health-col h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .health-col dl {
+      margin: 0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--fg-secondary);
+    }
+
+    .health-col dt {
+      color: var(--fg-dim);
+      display: inline;
+    }
+
+    .health-col dt::after { content: " "; }
+    .health-col dd {
+      display: inline;
+      margin: 0;
+      color: var(--fg);
+    }
+
+    .health-col dd.ok { color: var(--success); }
+    .health-col dd.warn { color: var(--warning); }
+
+  /* ---- EDGES ---- */
+    .edges-page {
+      padding-top: 64px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scene-band {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .scene-band .label {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+      letter-spacing: 0.08em;
+    }
+
+    .scene-seg {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .scene-seg button {
+      height: 48px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .scene-seg button.on {
+      background: var(--purple);
+      border-color: var(--purple);
+      color: var(--ink);
+    }
+
+    .edge-columns {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .edge-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: border-color 120ms;
+    }
+
+    .edge-card:hover { border-color: var(--cyan); }
+    .edge-card.secondary:hover { border-color: var(--green); }
+
+    .edge-card h3 {
+      margin: 0 0 12px;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 32px;
+      letter-spacing: 0.05em;
+    }
+
+    .edge-card.primary h3 { color: var(--cyan); }
+    .edge-card.secondary h3 { color: var(--green); }
+
+    .edge-card pre {
+      margin: 0;
+      flex: 1;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--fg-secondary);
+      white-space: pre-wrap;
+    }
+
+    .edge-card .tap-hint {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--fg-dim);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+  /* ---- MORE ---- */
+    .more-page {
+      padding-top: 64px;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 16px;
+    }
+
+    .more-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .action-btn {
+      height: 54px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .action-btn.warn { color: var(--warning); border-color: rgba(245, 158, 11, 0.35); }
+    .action-btn.cyan { color: var(--cyan); border-color: rgba(0, 255, 255, 0.35); }
+    .action-btn.green { color: var(--green); border-color: rgba(0, 255, 153, 0.35); }
+    .action-btn.brand { color: var(--brand); border-color: rgba(255, 199, 0, 0.35); }
+
+    .more-detail pre {
+      margin: 12px 0 0;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--fg-secondary);
+    }
+
+  /* ---- PICKER OVERLAY ---- */
+    .overlay-dim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.62);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms;
+    }
+
+    .overlay-dim.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .overlay-picker {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0.98);
+      width: 900px;
+      height: 520px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      padding: 18px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms, transform 140ms;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .overlay-picker.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .picker-title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .picker-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .picker-tab {
+      width: 160px;
+      height: 44px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .picker-tab.on {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--ink);
+    }
+
+    .picker-tab.off-outline {
+      background: var(--surface);
+      border: 2px solid var(--cyan);
+      color: var(--cyan);
+    }
+
+    .picker-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      align-content: start;
+      overflow: hidden;
+    }
+
+    .picker-item {
+      height: 48px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      font-size: 12px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 4px;
+      line-height: 1.1;
+    }
+
+    .picker-item.on {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: var(--ink);
+    }
+
+    .picker-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+      color: var(--fg-secondary);
+      font-size: 16px;
+    }
+
+    .picker-close {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .rejected-strip {
+      position: absolute;
+      left: var(--pad);
+      top: var(--body-y);
+      width: var(--content-w);
+      height: 46px;
+      border: 2px dashed var(--error);
+      background: rgba(239, 68, 68, 0.08);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: var(--error);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .rejected-strip.visible { display: flex; }
+
+  /* ---- INSPECTOR ---- */
+    .inspector {
+      position: sticky;
+      top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .inspector-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .inspector-card h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nav-list button {
+      width: 100%;
+      text-align: left;
+      height: 40px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .nav-list button.active {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: rgba(255, 199, 0, 0.06);
+    }
+
+    .spec-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--fg-secondary);
+      font-weight: 500;
+    }
+
+    .spec-list li { margin-bottom: 8px; }
+    .spec-list strong { color: var(--fg); }
+
+    .contrast-demo {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .contrast-chip {
+      height: 40px;
+      border-radius: var(--radius);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .contrast-chip.bad {
+      background: var(--cyan);
+      color: #fff;
+      border: 1px solid var(--cyan);
+    }
+
+    .contrast-chip.good-fill {
+      background: var(--cyan);
+      color: var(--ink);
+      border: 1px solid var(--cyan);
+    }
+
+    .contrast-chip.good-outline {
+      background: var(--surface);
+      color: var(--cyan);
+      border: 2px solid var(--cyan);
+    }
+
+    .inspector-note {
+      font-size: 12px;
+      color: var(--fg-dim);
+      line-height: 1.5;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .toggle-row button {
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg-secondary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1320px) {
+      .workbench { grid-template-columns: 1fr; }
+      .inspector { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="proposal">
+    <header class="proposal-header">
+      <div>
+        <p class="eyebrow">Tab5 · 1280×720 · DesignTokens · Phase 0 hub navigation</p>
+        <h1>K1 Control Hub Navigation</h1>
+        <p class="summary">
+          Authoritative visual spec: header-only navigation, full composer body height, ink-on-accent active states.
+          No permanent SHOW/HEALTH/EDGES/MORE strip in the body.
+        </p>
+      </div>
+      <div class="meta-pills">
+        <span class="meta-pill">body-y: 72</span>
+        <span class="meta-pill">content: 1240×648</span>
+        <span class="meta-pill">RIGHT_X: 840</span>
+        <span class="meta-pill">v2 wire</span>
+      </div>
+    </header>
+
+    <div class="workbench">
+      <div class="device-shell">
+        <div class="device-scale-wrap" id="scale-wrap">
+          <div class="tab5" id="tab5">
+            <div class="rejected-strip" id="rejected-strip">Rejected — 4-button body nav strip (removed)</div>
+
+            <header class="header">
+              <div class="status-pill live">BATT 100%</div>
+              <div class="status-pill live">RSSI -42</div>
+              <button type="button" class="title-cluster" id="title-cluster" aria-label="Open destination hub">
+                <span class="main">K1 CONTROL</span>
+                <span class="sub" id="title-sub">› SHOW</span>
+              </button>
+              <div class="status-pill live">K1 AP</div>
+              <div class="status-pill live">WS</div>
+              <div class="status-pill live">201 FPS</div>
+            </header>
+
+            <!-- SHOW -->
+            <div class="screen-layer active" data-view="show">
+              <div class="body">
+                <div class="state-band">
+                  <div class="surface-btn on-cyan">PRIMARY</div>
+                  <div class="surface-btn">SECONDARY</div>
+                  <div class="surface-btn on-purple">SCENE <span class="scene-pill">ASSIST</span></div>
+                </div>
+                <div class="composer-panels">
+                  <div class="panel-left card">
+                    <h2 class="section-label">LIGHT FUNCTIONS</h2>
+                    <div class="param-row">
+                      <div class="param-label green">PALETTE</div>
+                      <div>
+                        <div class="palette-row">
+                          <button type="button" class="palette-btn">−</button>
+                          <div>
+                            <div class="palette-value">OCEAN BREEZE 036</div>
+                            <div class="palette-bar"><span></span></div>
+                          </div>
+                          <button type="button" class="palette-btn">+</button>
+                        </div>
+                      </div>
+                      <div class="param-value">25</div>
+                    </div>
+                    <div class="param-row">
+                      <div class="param-label gold">BRIGHTNESS</div>
+                      <div class="slider-track"><div class="slider-fill gold"></div></div>
+                      <div class="param-value">70%</div>
+                    </div>
+                    <div class="param-row">
+                      <div class="param-label purple">COLOUR</div>
+                      <div class="slider-track"><div class="slider-fill purple"></div></div>
+                      <div class="param-value">61%</div>
+                    </div>
+                    <div class="param-row">
+                      <div class="param-label blue">SPEED</div>
+                      <div class="slider-track"><div class="slider-fill blue"></div></div>
+                      <div class="param-value">54%</div>
+                    </div>
+                  </div>
+                  <div class="panel-right card">
+                    <h2 class="section-label muted">MODE</h2>
+                    <div class="mode-grid">
+                      <div class="mode-chip">BLOOM</div>
+                      <div class="mode-chip">WAVEFORM FAST</div>
+                      <div class="mode-chip">WAVEFORM</div>
+                      <div class="mode-chip">BLOOM FAST</div>
+                      <div class="mode-chip">WAVEFORM HYBRID</div>
+                      <div class="mode-chip">AURORA</div>
+                      <div class="mode-chip">COMET</div>
+                      <div class="mode-chip">SPECTRUM RIVER</div>
+                      <div class="mode-chip">SPECTRUM RIVER 2</div>
+                      <div class="mode-chip">EMBER FIELD</div>
+                      <div class="mode-chip on">WAVEFORM TEMPO</div>
+                      <div class="mode-chip">TEMPO RIVER</div>
+                      <div class="mode-chip">TEMPO COMET</div>
+                      <div class="mode-chip">DENSE FORGE</div>
+                      <div class="mode-chip">SNAPWAVE</div>
+                      <div class="mode-chip">PULSE PRISM</div>
+                    </div>
+                    <div class="mode-meta">
+                      <div class="meta-chip">BPM 128</div>
+                      <div class="meta-chip live">LOCKED</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HUB -->
+            <div class="screen-layer" data-view="hub">
+              <div class="body hub-page">
+                <h2 class="hub-heading">Choose destination</h2>
+                <div class="hub-row show current" data-go="show">
+                  <div class="stripe show"></div>
+                  <div class="hub-copy">
+                    <div class="name">SHOW</div>
+                    <div class="desc">Light Composer — primary surface, sliders, mode grid. First screen on boot.</div>
+                  </div>
+                  <div class="hub-meta"><span class="badge here">CURRENT</span></div>
+                </div>
+                <div class="hub-row health" data-go="health">
+                  <div class="stripe health"></div>
+                  <div class="hub-copy">
+                    <div class="name">HEALTH</div>
+                    <div class="desc">Link proof — AP, WebSocket, K1 state age, pending controls, antenna probe.</div>
+                  </div>
+                  <div class="hub-meta"><span class="badge live">LIVE</span></div>
+                </div>
+                <div class="hub-row edges" data-go="edges">
+                  <div class="stripe edges"></div>
+                  <div class="hub-copy">
+                    <div class="name">EDGES</div>
+                    <div class="desc">Dual-edge snapshot — primary &amp; secondary readout, scene segment, tap to focus.</div>
+                  </div>
+                  <div class="hub-meta"></div>
+                </div>
+                <div class="hub-row more" data-go="more">
+                  <div class="stripe more"></div>
+                  <div class="hub-copy">
+                    <div class="name">MORE</div>
+                    <div class="desc">Tab5-local only — audio feedback, volume, battery detail. No K1 controls.</div>
+                  </div>
+                  <div class="hub-meta"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HEALTH -->
+            <div class="screen-layer" data-view="health">
+              <div class="body health-page">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div class="health-banner">
+                  <div>
+                    <div class="title">HEALTH: LIVE</div>
+                    <div class="hint">Tab5 is joined to K1 AP, WebSocket handshake is ready, and K1 state is fresh.</div>
+                  </div>
+                  <button type="button" class="btn-retry">RETRY LINK</button>
+                </div>
+                <div class="health-grid">
+                  <div class="health-col card">
+                    <h3>Connection</h3>
+                    <dl>
+                      <div><dt>AP</dt><dd class="ok">OK</dd></div><br>
+                      <div><dt>WS</dt><dd class="ok">CONNECTED</dd></div><br>
+                      <div><dt>protocol</dt><dd>v2</dd></div><br>
+                      <div><dt>handshake</dt><dd class="ok">ready</dd></div><br>
+                      <div><dt>reconnects</dt><dd>1</dd></div><br>
+                      <div><dt>ws_error</dt><dd>none</dd></div>
+                    </dl>
+                  </div>
+                  <div class="health-col card">
+                    <h3>K1 proof</h3>
+                    <dl>
+                      <div><dt>k1_seen</dt><dd class="ok">1</dd></div><br>
+                      <div><dt>k1_age_ms</dt><dd>905</dd></div><br>
+                      <div><dt>pending</dt><dd class="ok">0</dd></div><br>
+                      <div><dt>last_ok</dt><dd class="ok">1</dd></div><br>
+                      <div><dt>caps</dt><dd>71</dd></div><br>
+                      <div><dt>tx_dropped</dt><dd class="ok">0</dd></div>
+                    </dl>
+                  </div>
+                  <div class="health-col card">
+                    <h3>RF &amp; runtime</h3>
+                    <dl>
+                      <div><dt>rssi</dt><dd>-42.0 dBm</dd></div><br>
+                      <div><dt>antenna</dt><dd>LOW</dd></div><br>
+                      <div><dt>probe</dt><dd class="ok">done</dd></div><br>
+                      <div><dt>ws_loop_max</dt><dd>12 ms</dd></div><br>
+                      <div><dt>lvgl_max</dt><dd>268 ms</dd></div><br>
+                      <div><dt>fps</dt><dd>201</dd></div>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EDGES -->
+            <div class="screen-layer" data-view="edges">
+              <div class="body edges-page">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div class="scene-band">
+                  <div class="label">SCENE</div>
+                  <div class="scene-seg">
+                    <button type="button">OFF</button>
+                    <button type="button" class="on">ASSIST</button>
+                    <button type="button">L1</button>
+                    <button type="button">AUTO</button>
+                  </div>
+                </div>
+                <div class="edge-columns">
+                  <div class="edge-card card primary">
+                    <h3>PRIMARY</h3>
+                    <pre>mode 18  WAVEFORM TEMPO
+palette 25  OCEAN BREEZE 036
+bright 34%  colour 61%
+speed 54%   sat 48%
+fps 201</pre>
+                    <div class="tap-hint">Tap → focus in Show</div>
+                  </div>
+                  <div class="edge-card card secondary">
+                    <h3>SECONDARY</h3>
+                    <pre>mode 18  WAVEFORM TEMPO
+palette 28  EMERALD DRAGON
+bright 52%  colour 48%
+speed 5%    enabled yes
+fps 201</pre>
+                    <div class="tap-hint">Tap → focus in Show</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MORE -->
+            <div class="screen-layer" data-view="more">
+              <div class="body more-page">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div>
+                  <h2 class="section-label">LOCAL SETTINGS</h2>
+                  <p style="margin:0;color:var(--fg-secondary);font-size:16px;font-weight:500;max-width:520px;line-height:1.45;">
+                    Tab5 comfort controls only. Nothing here sends K1 WebSocket commands.
+                  </p>
+                  <div class="more-actions" style="margin-top:16px;">
+                    <button type="button" class="action-btn warn">MUTE TOGGLE</button>
+                    <button type="button" class="action-btn cyan">VOL +</button>
+                    <button type="button" class="action-btn green">TEST CUE</button>
+                    <button type="button" class="action-btn brand" data-go="health">OPEN HEALTH</button>
+                  </div>
+                </div>
+                <div class="more-detail card card-elevated">
+                  <h3 class="section-label muted" style="font-size:16px;margin-bottom:4px;">STATUS</h3>
+                  <pre>audio enabled=1  muted=0  vol=42
+battery=100%  chg=1  usb=1
+current_ma=+180</pre>
+                </div>
+              </div>
+            </div>
+
+            <!-- PICKER overlay -->
+            <div class="overlay-dim" id="overlay-dim"></div>
+            <div class="overlay-picker" id="overlay-picker" role="dialog" aria-label="Mode and palette picker">
+              <div class="picker-title">MODE + PALETTE</div>
+              <div class="picker-tabs">
+                <button type="button" class="picker-tab on">MODE</button>
+                <button type="button" class="picker-tab off-outline">PALETTE</button>
+              </div>
+              <div class="picker-grid">
+                <div class="picker-item">BLOOM</div>
+                <div class="picker-item">WAVEFORM FAST</div>
+                <div class="picker-item">WAVEFORM</div>
+                <div class="picker-item on">WAVEFORM TEMPO</div>
+                <div class="picker-item">TEMPO RIVER</div>
+                <div class="picker-item">TEMPO COMET</div>
+                <div class="picker-item">DENSE FORGE</div>
+                <div class="picker-item">SNAPWAVE</div>
+              </div>
+              <div class="picker-footer">
+                <span>compat tables · primary surface</span>
+                <button type="button" class="picker-close" id="picker-close">CLOSE</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="inspector">
+        <div class="inspector-card">
+          <h2>Screens</h2>
+          <div class="nav-list" id="nav-list">
+            <button type="button" class="active" data-view="show">Show (composer)</button>
+            <button type="button" data-view="hub">Hub (title tap)</button>
+            <button type="button" data-view="health">Health</button>
+            <button type="button" data-view="edges">Dual edge</button>
+            <button type="button" data-view="more">More</button>
+          </div>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Overlays &amp; proof</h2>
+          <div class="toggle-row">
+            <button type="button" id="toggle-picker">Picker modal</button>
+            <button type="button" id="toggle-rejected">Rejected nav strip</button>
+          </div>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Navigation contract</h2>
+          <ul class="spec-list">
+            <li><strong>Boot</strong> → Show only. No body nav buttons.</li>
+            <li><strong>Title tap</strong> → Hub. Subtitle becomes CHOOSE DESTINATION.</li>
+            <li><strong>Hub row</strong> → destination page. Subtitle shows ‹ HEALTH etc.</li>
+            <li><strong>‹ HUB</strong> on sub-pages — 54px min touch.</li>
+            <li><strong>Page change</strong> dismisses picker/settings overlays.</li>
+          </ul>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Contrast rule</h2>
+          <div class="contrast-demo">
+            <div class="contrast-chip bad">REJECTED · white on cyan</div>
+            <div class="contrast-chip good-fill">APPROVED · ink on fill</div>
+            <div class="contrast-chip good-outline">APPROVED · outline on dark</div>
+          </div>
+          <p class="inspector-note" style="margin-top:10px;">Active fills: #0A0A0B on #00FFFF. Lists/hub: accent border + white on #121214.</p>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Geometry lock</h2>
+          <p class="inspector-note">header 10+58 · body y=72 h=648 · state 74 · panels 824+16+400 @ x=840 · matches LightComposerUI.cpp constants.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const layers = document.querySelectorAll('.screen-layer');
+    const navButtons = document.querySelectorAll('#nav-list button[data-view]');
+    const titleCluster = document.getElementById('title-cluster');
+    const titleSub = document.getElementById('title-sub');
+    const overlayDim = document.getElementById('overlay-dim');
+    const overlayPicker = document.getElementById('overlay-picker');
+    const rejectedStrip = document.getElementById('rejected-strip');
+    const tab5 = document.getElementById('tab5');
+    const scaleWrap = document.getElementById('scale-wrap');
+
+    const subtitles = {
+      show: '› SHOW',
+      hub: 'CHOOSE DESTINATION',
+      health: '‹ HEALTH',
+      edges: '‹ EDGES',
+      more: '‹ MORE'
+    };
+
+    let currentView = 'show';
+    let pickerOpen = false;
+
+    function setView(name) {
+      currentView = name;
+      layers.forEach(layer => layer.classList.toggle('active', layer.dataset.view === name));
+      navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.view === name));
+      titleSub.textContent = subtitles[name] || '› SHOW';
+      titleCluster.classList.toggle('open', name === 'hub');
+      if (name !== 'show') closePicker();
+    }
+
+    function openPicker() {
+      pickerOpen = true;
+      overlayDim.classList.add('visible');
+      overlayPicker.classList.add('visible');
+      setView('show');
+    }
+
+    function closePicker() {
+      pickerOpen = false;
+      overlayDim.classList.remove('visible');
+      overlayPicker.classList.remove('visible');
+    }
+
+    function fitDevice() {
+      const w = scaleWrap.clientWidth;
+      const scale = w / 1280;
+      tab5.style.setProperty('--device-scale', String(scale));
+      scaleWrap.style.height = `${720 * scale}px`;
+    }
+
+    navButtons.forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.view)));
+    titleCluster.addEventListener('click', () => setView(currentView === 'hub' ? 'show' : 'hub'));
+
+    document.querySelectorAll('[data-go]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        setView(el.dataset.go);
+      });
+    });
+
+    document.getElementById('toggle-picker').addEventListener('click', () => {
+      if (pickerOpen) closePicker();
+      else openPicker();
+    });
+
+    document.getElementById('picker-close').addEventListener('click', closePicker);
+    overlayDim.addEventListener('click', closePicker);
+
+    document.getElementById('toggle-rejected').addEventListener('click', (e) => {
+      rejectedStrip.classList.toggle('visible');
+      e.target.textContent = rejectedStrip.classList.contains('visible')
+        ? 'Hide rejected strip'
+        : 'Rejected nav strip';
+    });
+
+    window.addEventListener('resize', fitDevice);
+    fitDevice();
+  </script>
+</body>
+</html>

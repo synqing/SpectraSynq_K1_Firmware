@@ -1,0 +1,154 @@
+# label=bench_k1
+# port=/dev/cu.usbmodem12401
+# expected_chip=B489A500
+# expected_env=k1_bench_reference
+# action=N then Y after Captain silence confirmation
+ss=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=67 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=108.0 conf=0.92 lock=1 phase=0.92 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=107 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=108.0 conf=0.85 lock=1 phase=0.73 beat=0 bstr=0.13 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=120 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=108.0 conf=0.84 lock=1 phase=0.42 beat=0 bstr=0.33 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=141 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=107.0 conf=0.84 lock=1 phase=0.05 beat=0 bstr=0.17 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=93 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=107.0 conf=0.94 lock=1 phase=0.78 beat=0 bstr=0.09 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=146 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=75.0 conf=0.57 lock=1 phase=0.10 beat=0 bstr=0.44 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=54 follower=350 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=64.0 conf=0.33 lock=0 phase=0.05 beat=0 bstr=0.16 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=242 followerESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x42024fc7
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+SENSORY BRIDGE | VER: 40103
+---------------------------
+
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S STD INIT: PASS
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.551 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 21.825 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.066 MS
+SYSTEM INIT COMPLETE!
+WAVEFORM_HISTORY: OK @ 0x3C0909D8
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+[AP] SSL=350 DC=-872 max_raw=3457 follower=777 peak_scaled=2.600 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=502 follower=1936 peak_scaled=0.134 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=136.0 conf=0.42 lock=0 phase=0.72 beat=0 bstr=0.09 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=284 follower=1005 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=106.0 conf=0.36 lock=0 phase=0.64 beat=0 bstr=0.20 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=399 follower=531 peak_scaled=0.245 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.33 lock=0 phase=0.39 beat=0 bstr=0.22 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=356 follower=350 peak_scaled=0.419 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.30 lock=0 phase=0.04 beat=0 bstr=0.22 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=457 follower=350 peak_scaled=0.553 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.32 lock=0 phase=0.73 beat=0 bstr=0.10 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=627 follower=350 peak_scaled=0.742 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.30 lock=0 phase=0.42 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=425 follower=350 peak_scaled=0.426 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.29 lock=0 phase=0.07 beat=0 bstr=0.03 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=425 follower=350 peak_scaled=0.237 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.27 lock=0 phase=0.75 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00
+# >>> :chip_id
+sbr{{
+B489A500
+}}
+[AP] SSL=350 DC=-872 max_raw=487 follower=350 peak_scaled=0.414 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=118.0 conf=0.32 lock=0 phase=0.50 beat=0 bstr=0.35 | onset=0 bass=0 ostr=0.00
+[AP] SSL=350 DC=-872 max_raw=544 follower=350 peak_scaled=0.507 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=96.0 conf=0.34 lock=0 phase=0.11 beat=0 bstr=0.13 | onset=0 bass=0 ostr=0.00
+# >>> N
+NOISE_CAL: armed - confirm silence, press Y within 5s
+[AP] SSL=350 DC=-872 max_raw=404 follower=350 peak_scaled=0.216 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=72.0 conf=0.47 lock=0 phase=0.66 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00
+# >>> Y
+NOISE_CAL: queued
+STARTING NOISE CAL
+[AP] SSL=0 DC=0 max_raw=1285 follower=350 peak_scaled=0.190 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0 cal_reason=none | bpm=129.0 conf=0.54 lock=0 phase=0.41 beat=0 bstr=0.25 | onset=1 bass=0 ostr=0.00
+[AP] SSL=0 DC=-1124 max_raw=283 follower=350 peak_scaled=0.190 silent_scale=1.000 silence=0 cal_source=default_invalid cal_valid=0 cal_reason=none | bpm=126.0 conf=0.24 lock=0 phase=0.29 beat=0 bstr=0.84 | onset=0 bass=0 ostr=0.00
+NOISE CAL COMPLETE
+NOISE CAL QUALITY: reason=none dc_valid=1 dc_samples=12288 dc_rejected=0 ssl_valid=1 ssl_samples=112 ssl_rejected=0 ssl_p50=195.0 ssl_p90=322.0
+NOISE CAL ACCEPTED
+[AP] SSL=354 DC=-1124 max_raw=112 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.23 lock=0 phase=0.41 beat=0 bstr=0.68 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=223 follower=354 peak_scaled=0.018 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.23 lock=0 phase=0.54 beat=0 bstr=0.55 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=262 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.23 lock=0 phase=0.62 beat=0 bstr=0.47 | onset=0 bass=0 ostr=0.00
+# >>> :dump
+sbr{{
+FIRMWARE_VERSION: 40103
+CHIP ID: B489A500
+noise_button.pressed: 0
+noise_button.last_down: 0
+noise_button.last_up: 0
+noise_button.pin: 255
+mode_button.pressed: 0
+mode_button.last_down: 0
+mode_button.last_up: 0
+mode_button.pin: 255
+CONFIG.PHOTONS: 0.480000
+CONFIG.CHROMA: 0.400000
+CONFIG.MOOD: 0.100000
+CONFIG.LIGHTSHOW_MODE: 8
+CONFIG.MIRROR_ENABLED: 1
+CONFIG.CHROMAGRAM_RANGE: 60
+CONFIG.SAMPLE_RATE: 12800
+CONFIG.NOTE_OFFSET: 12
+CONFIG.SQUARE_ITER: 0.00
+CONFIG.LED_TYPE: 0
+CONFIG.LED_COUNT: 160
+CONFIG.LED_COLOR_ORDER: 66
+CONFIG.SAMPLES_PER_CHUNK: 96
+CONFIG.SENSITIVITY: 2.300000
+CONFIG.BOOT_ANIMATION: 1
+CONFIG.SWEET_SPOT_MIN_LEVEL: 354
+CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+CONFIG.DC_OFFSET: -1124
+CAL_SOURCE: measured
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 1
+NOISE_CAL_REASON: none
+NOISE_CAL_DC_SAMPLES: 12288
+NOISE_CAL_SSL_P50: 195.0
+NOISE_CAL_SSL_P90: 322.0
+CONFIG.STANDBY_DIMMING: 0
+CONFIG.REVERSE_ORDER: 0
+CONFIG.MAX_CURRENT_MA: 1500
+CONFIG.TEMPORAL_DITHERING: 1
+CONFIG.AUTO_COLOR_SHIFT: 1
+CONFIG.INCANDESCENT_FILTER: 0.00
+CONFIG.INCANDESCENT_MODE: 0
+CONFIG.BULB_OPACITY: 0.00
+CONFIG.SATURATION: 1.00
+CONFIG.PRISM_COUNT: 1.00
+CONFIG.BASE_COAT: 1
+CONFIG.BASE_COAT_INTENSITY: 0.000
+MASTER_BRIGHTNESS: 1.00
+stream_audio: 0
+stream_fps: 0
+stream_max_mags: 0
+stream_max_mags_followers: 0
+stream_magnitudes: 0
+stream_spectrogram: 0
+stream_chromagram: 0
+debug_mode: 0
+noise_complete: 1
+noise_iterations: 256
+next_save_time: 0
+settings_updated: 0
+I2S_PORT: 0
+SAMPLE_HISTORY_LENGTH: 4096
+silence: 0
+mode_destination: -1
+SYSTEM_FPS: 161.93
+LED_FPS: 200.63
+}}
+[AP] SSL=354 DC=-1124 max_raw=120 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.75 beat=0 bstr=0.38 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=170 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.87 beat=0 bstr=0.36 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=85 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.95 beat=0 bstr=0.39 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=129 follower=354 peak_scaled=0.020 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.07 beat=0 bstr=0.37 | onset=0 bass=0 ostr=0.00
+# >>> :ap_stream=on
+sbr{{
+AP_STREAM: on
+}}
+[AP] SSL=354 DC=-1124 max_raw=147 follower=354 peak_scaled=0.007 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.21 beat=0 bstr=0.35 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=218 follower=354 peak_scaled=0.037 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.28 beat=0 bstr=0.33 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=244 follower=354 peak_scaled=0.004 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.41 beat=0 bstr=0.26 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=315 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=126.0 conf=0.00 lock=0 phase=0.54 beat=0 bstr=0.17 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=112 follower=354 peak_scaled=0.000 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.00 lock=0 phase=0.27 beat=0 bstr=0.63 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=227 follower=354 peak_scaled=0.103 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.00 lock=0 phase=0.47 beat=0 bstr=0.50 | onset=0 bass=0 ostr=0.00
+[AP] SSL=354 DC=-1124 max_raw=451 follower=354 peak_scaled=0.205 silent_scale=1.000 silence=0 cal_source=measured cal_valid=1 cal_reason=none | bpm=71.0 conf=0.00 lock=0 phase=0.67 beat=0 bstr=0.40 | onset=0 bass=0 ostr=0.00

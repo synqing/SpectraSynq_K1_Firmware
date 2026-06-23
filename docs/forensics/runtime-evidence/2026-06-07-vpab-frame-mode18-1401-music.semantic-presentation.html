@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<title>K1 VPAB Music Capture - Semantic Presentation</title>
+<style>
+/* Hallmark - pre-emit critique: P4 H4 E4 S5 R4 V4 */
+:root {
+  --font-body: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --colour-paper: #05070a;
+  --colour-ink: #f5f7fb;
+  --colour-muted: #96a6b7;
+  --colour-line: #253241;
+  --colour-panel: #0d1219;
+  --colour-panel-strong: #121a24;
+  --colour-audio: #39d6c8;
+  --colour-visual: #ff4f8a;
+  --colour-transport: #ffad3d;
+  --colour-proof: #7dff9d;
+  --colour-risk: #ff7d63;
+  --colour-glow: #74d7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; overflow-x: clip; }
+body {
+  background:
+    radial-gradient(circle at 20% -10%, rgba(57, 214, 200, .18), transparent 34rem),
+    radial-gradient(circle at 92% 8%, rgba(255, 79, 138, .15), transparent 32rem),
+    var(--colour-paper);
+  color: var(--colour-ink);
+  font-family: var(--font-body);
+  line-height: 1.45;
+}
+main { max-width: 1180px; margin: 0 auto; padding: 34px 20px 56px; }
+header { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(260px, .7fr); gap: 24px; align-items: end; border-bottom: 1px solid var(--colour-line); padding-bottom: 24px; }
+h1 { font-size: clamp(2.1rem, 5vw, 5.1rem); line-height: .92; letter-spacing: 0; margin: 0; max-width: 920px; overflow-wrap: anywhere; }
+h2 { font-size: 1.35rem; margin: 0 0 14px; letter-spacing: 0; }
+h3 { font-size: .95rem; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .08em; color: var(--colour-muted); overflow-wrap: anywhere; }
+p { margin: 0 0 12px; overflow-wrap: anywhere; }
+.lede { font-size: 1.08rem; color: var(--colour-muted); max-width: 760px; }
+.stamp { font-family: var(--font-mono); font-size: .82rem; color: var(--colour-muted); overflow-wrap: anywhere; }
+.section { margin-top: 34px; }
+.grid { display: grid; gap: 14px; }
+.grid > *, .panel, .stat, .node { min-width: 0; }
+.stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat, .panel { background: linear-gradient(180deg, var(--colour-panel-strong), var(--colour-panel)); border: 1px solid var(--colour-line); border-radius: 8px; padding: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.22); }
+.stat strong { display: block; font-size: 1.9rem; line-height: 1; }
+.stat span { display: block; color: var(--colour-muted); margin-top: 6px; }
+.badge { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--colour-line); color: var(--colour-muted); font-size: .78rem; font-weight: 700; background: rgba(255,255,255,.03); }
+.badge.pass { color: var(--colour-proof); border-color: rgba(125,255,157,.42); }
+.badge.limit { color: var(--colour-risk); border-color: rgba(255,125,99,.42); }
+.pipeline { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+.node { min-height: 112px; border: 1px solid var(--colour-line); background: rgba(13,18,25,.88); border-radius: 8px; padding: 12px; position: relative; }
+.node b { display: block; font-size: .96rem; }
+.node small { display: block; color: var(--colour-muted); margin-top: 6px; }
+.node::after { content: ""; position: absolute; right: -9px; top: 50%; width: 8px; border-top: 2px solid var(--colour-muted); }
+.node:last-child::after { display: none; }
+.budget-row { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 14px; align-items: center; margin: 10px 0; }
+.budget-row span { display: block; color: var(--colour-muted); font-size: .84rem; }
+.budget-track { height: 14px; border-radius: 999px; background: #1b2430; overflow: hidden; }
+.budget-track div { height: 100%; border-radius: inherit; }
+.table-wrap { width: 100%; overflow-x: auto; }
+.data-table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: .9rem; }
+.data-table th, .data-table td { border-bottom: 1px solid var(--colour-line); padding: 9px 8px; text-align: right; }
+.data-table th:first-child, .data-table td:first-child { text-align: left; }
+.viz-frame { border: 1px solid var(--colour-line); background: #020406; border-radius: 8px; padding: 10px; box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 18px 60px rgba(0,0,0,.32); }
+.viz-canvas { display: block; width: 100%; max-width: 100%; height: 220px; border-radius: 5px; background: #000; }
+.viz-canvas.heatmap-canvas { height: 164px; image-rendering: pixelated; }
+.viz-note { color: var(--colour-muted); font-size: .88rem; margin-top: 8px; }
+.viz-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 14px; }
+.viz-toolbar button { appearance: none; border: 1px solid var(--colour-line); background: #101923; color: var(--colour-muted); border-radius: 999px; padding: 7px 11px; font: 700 .78rem var(--font-body); cursor: pointer; }
+.viz-toolbar button[aria-pressed="true"] { color: var(--colour-ink); border-color: rgba(57,214,200,.8); background: linear-gradient(90deg, rgba(57,214,200,.22), rgba(255,79,138,.2)); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 2px; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; color: var(--colour-muted); font-size: .85rem; }
+.legend-item i { width: 12px; height: 12px; display: inline-block; border-radius: 50%; }
+.line-chart { display: block; width: 100%; max-width: 100%; background: #080d13; border: 1px solid var(--colour-line); border-radius: 8px; }
+.chart-grid { stroke: #1e2b38; stroke-width: 1; }
+.axis, .axis-line { fill: var(--colour-muted); stroke: var(--colour-muted); font-size: 10px; }
+.split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.callouts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.callout { border-left: 4px solid var(--colour-audio); padding-left: 12px; }
+.callout:nth-child(2) { border-color: var(--colour-visual); }
+.callout:nth-child(3) { border-color: var(--colour-transport); }
+code { font-family: var(--font-mono); font-size: .92em; overflow-wrap: anywhere; }
+footer { margin-top: 38px; padding-top: 18px; border-top: 1px solid var(--colour-line); color: var(--colour-muted); font-size: .88rem; }
+@media (max-width: 860px) {
+  header, .split, .callouts, .pipeline { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .node::after { display: none; }
+  .budget-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  main { padding: 24px 12px 42px; }
+  .stats { grid-template-columns: 1fr; }
+  .stat strong { font-size: 1.55rem; }
+  h3 { font-size: .78rem; letter-spacing: .05em; }
+  .viz-toolbar button { flex: 1 1 auto; }
+}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div>
+    <p class="stamp">2026-06-07 &middot; K1 1401 &middot; mode 18 &middot; VPAB framed transport</p>
+    <h1>Audio-conditioned light, captured at the final-byte boundary.</h1>
+  </div>
+  <div>
+    <p class="lede">This presentation turns the live-music VPAB evidence into a readable semantic map: what the capture proves, what the final LED bytes reveal, and where this sits between K1 audio analysis and the visual pipeline.</p>
+    <span class="badge pass">Gate PASS</span>
+    <span class="badge limit">Not VME equivalence proof</span>
+  </div>
+</header>
+
+<section class="section grid stats">
+  <div class="stat"><strong>44</strong><span>framed records</span></div>
+  <div class="stat"><strong>176</strong><span>validated chunks</span></div>
+  <div class="stat"><strong>0 / 0</strong><span>issues / failures</span></div>
+  <div class="stat"><strong>2</strong><span>covered channels</span></div>
+</section>
+
+<section class="section">
+  <h2>Where The Evidence Lives In K1</h2>
+  <div class="pipeline">
+    <div class="node"><b>Music in room</b><small>Programme material was live, but the track/source was not named.</small><span class="badge limit">not replayable</span></div>
+    <div class="node"><b>I2S + GDFT</b><small>Audio pipeline is upstream of mode 18 behaviour, but raw PCM/AP stream was not captured here.</small><span class="badge limit">not captured</span></div>
+    <div class="node"><b>Audio semantics</b><small>Tempo/onset/chord state drives visual choices in K1 architecture.</small><span class="badge">source-defined</span></div>
+    <div class="node"><b>Waveform Tempo</b><small>Mode 18 renders primary and secondary channels.</small><span class="badge pass">observed</span></div>
+    <div class="node"><b>Final LED bytes</b><small>RGB bytes after render and quantisation. This is the perceptual proof surface.</small><span class="badge pass">decoded</span></div>
+    <div class="node"><b>Framed VPAB</b><small>Sequence, length, CRC, chunking, and counters passed fail-closed.</small><span class="badge pass">proved</span></div>
+  </div>
+</section>
+
+<section class="section grid split">
+  <div class="panel">
+    <h2>Runtime Timing Health</h2>
+    <div class="budget-row"><div><strong>Frame max</strong><span>5552us / 8333us</span></div><div class="budget-track"><div style="width:66.6%;background:var(--colour-proof);"></div></div></div>
+    <div class="budget-row"><div><strong>Primary render max</strong><span>795us / 2000us</span></div><div class="budget-track"><div style="width:39.8%;background:var(--colour-audio);"></div></div></div>
+    <div class="budget-row"><div><strong>Secondary render max</strong><span>291us / 2000us</span></div><div class="budget-track"><div style="width:14.5%;background:var(--colour-visual);"></div></div></div>
+    <p>Frame overrun and dropped-frame counters stayed at <code>0 / 0</code>. Heap was <code>191520</code>.</p>
+  </div>
+  <div class="panel">
+    <h2>Evidence Boundary</h2>
+    <p><strong>Proves:</strong> transport integrity, primary/secondary coverage, final-byte availability, mode 18 coverage, and runtime timing health.</p>
+    <p><strong>Does not prove:</strong> raw audio content, named-track repeatability, the full AudioSemanticState timeline, or VME final-byte parity.</p>
+  </div>
+</section>
+
+<section class="section">
+  <h2>Final LED Bytes As A Visual Signal</h2>
+  <p>The heatmaps below are actual decoded final-byte rows from each sampled frame, remapped through perceptual scalar colour maps so structure is readable. Absolute channel energy remains in the metrics table.</p>
+  <div class="viz-toolbar" aria-label="Colour map controls">
+    <button type="button" data-map="inferno" aria-pressed="true">Inferno</button>
+    <button type="button" data-map="plasma" aria-pressed="false">Plasma</button>
+    <button type="button" data-map="viridis" aria-pressed="false">Viridis</button>
+    <button type="button" data-map="magma" aria-pressed="false">Magma</button>
+    <button type="button" data-map="raw" aria-pressed="false">Raw RGB</button>
+  </div>
+  <div class="grid split">
+    <div>
+      <h3>Primary channel &middot; local luminance scale</h3>
+      <div class="viz-frame"><canvas class="viz-canvas heatmap-canvas" id="heat-primary" aria-label="Primary final-byte scalar heatmap"></canvas></div>
+    </div>
+    <div>
+      <h3>Secondary channel &middot; local luminance scale</h3>
+      <div class="viz-frame"><canvas class="viz-canvas heatmap-canvas" id="heat-secondary" aria-label="Secondary final-byte scalar heatmap"></canvas></div>
+    </div>
+  </div>
+  <p class="viz-note">These are not raw audio spectrograms. The capture has no raw PCM or GDFT-band stream; this is the K1 visual output surface over time, indexed by LED position.</p>
+</section>
+
+<section class="section">
+  <h2>Final-Byte Waterfall</h2>
+  <p>A 3D-style waterfall makes the time dimension easier to read: x-axis is LED index, y-axis is final-byte luminance, and depth is capture time. The animation uses display-interpolated line strips derived from the 11 captured rows per channel; source samples and metrics remain raw.</p>
+  <div class="grid split">
+    <div>
+      <h3>Primary channel</h3>
+      <div class="viz-frame"><canvas class="viz-canvas" id="waterfall-primary" aria-label="Primary final-byte waterfall"></canvas></div>
+    </div>
+    <div>
+      <h3>Secondary channel</h3>
+      <div class="viz-frame"><canvas class="viz-canvas" id="waterfall-secondary" aria-label="Secondary final-byte waterfall"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section class="section panel">
+  <h2>Channel Semantics</h2>
+  <div class="table-wrap"><table class="data-table"><thead><tr><th>Channel</th><th>Samples</th><th>Mean energy</th><th>Peak energy</th><th>Active LEDs</th><th>Mean centre</th><th>Mean centre distance</th><th>Saturation</th><th>White bias</th></tr></thead><tbody><tr><th>primary</th><td>11</td><td>243</td><td>1,434</td><td>31.1%</td><td>79.0</td><td>0.7</td><td>79.0</td><td>0.4</td></tr><tr><th>secondary</th><td>11</td><td>2,415</td><td>5,692</td><td>42.0%</td><td>79.5</td><td>0.1</td><td>92.7</td><td>14.4</td></tr></tbody></table></div>
+</section>
+
+<section class="section grid split">
+  <div class="panel">
+    <h2>Energy And Active LEDs</h2>
+    <div class="chart-legend"><span class="legend-item"><i style="background:var(--colour-audio)"></i>energy</span><span class="legend-item"><i style="background:var(--colour-proof)"></i>active LEDs %</span></div><svg viewBox="0 0 760 260" class="line-chart" role="img"><line x1="54.0" x2="54.0" y1="24" y2="224" class="chart-grid"/><text x="54.0" y="250" class="axis" text-anchor="middle">0.0s</text><line x1="54" x2="742" y1="24.0" y2="24.0" class="chart-grid"/><text x="46" y="28.0" class="axis" text-anchor="end">6146</text><line x1="226.0" x2="226.0" y1="24" y2="224" class="chart-grid"/><text x="226.0" y="250" class="axis" text-anchor="middle">4.5s</text><line x1="54" x2="742" y1="74.0" y2="74.0" class="chart-grid"/><text x="46" y="78.0" class="axis" text-anchor="end">4500</text><line x1="398.0" x2="398.0" y1="24" y2="224" class="chart-grid"/><text x="398.0" y="250" class="axis" text-anchor="middle">9.0s</text><line x1="54" x2="742" y1="124.0" y2="124.0" class="chart-grid"/><text x="46" y="128.0" class="axis" text-anchor="end">2855</text><line x1="570.0" x2="570.0" y1="24" y2="224" class="chart-grid"/><text x="570.0" y="250" class="axis" text-anchor="middle">13.5s</text><line x1="54" x2="742" y1="174.0" y2="174.0" class="chart-grid"/><text x="46" y="178.0" class="axis" text-anchor="end">1209</text><line x1="742.0" x2="742.0" y1="24" y2="224" class="chart-grid"/><text x="742.0" y="250" class="axis" text-anchor="middle">17.9s</text><line x1="54" x2="742" y1="224.0" y2="224.0" class="chart-grid"/><text x="46" y="228.0" class="axis" text-anchor="end">-436</text><line x1="54" y1="224" x2="742" y2="224" class="axis-line"/><line x1="54" y1="24" x2="54" y2="224" class="axis-line"/><polyline points="54.0,206.0 54.0,181.8 122.9,209.1 122.9,188.0 191.7,208.9 191.7,150.9 260.5,209.0 260.5,142.4 329.4,205.7 329.4,59.7 398.0,203.9 398.0,182.9 466.8,205.2 466.8,42.8 535.6,209.6 535.6,199.4 604.5,209.4 604.5,185.8 673.2,167.2 673.2,139.4 742.0,203.0 742.0,37.8" fill="none" stroke="var(--colour-audio)" stroke-width="2.4"/><polyline points="54.0,209.8 54.0,209.7 122.9,210.2 122.9,209.8 191.7,209.8 191.7,209.3 260.5,210.1 260.5,209.9 329.4,209.6 329.4,209.3 398.0,209.1 398.0,208.9 466.8,209.8 466.8,209.0 535.6,210.2 535.6,209.6 604.5,210.1 604.5,209.5 673.2,209.4 673.2,209.5 742.0,209.6 742.0,209.5" fill="none" stroke="var(--colour-proof)" stroke-width="2.4"/></svg>
+  </div>
+  <div class="panel">
+    <h2>Spatial Motion</h2>
+    <h3>Primary</h3>
+    <div class="chart-legend"><span class="legend-item"><i style="background:var(--colour-visual)"></i>centre of mass</span><span class="legend-item"><i style="background:var(--colour-transport)"></i>brightest LED</span></div><svg viewBox="0 0 760 260" class="line-chart" role="img"><line x1="54.0" x2="54.0" y1="24" y2="224" class="chart-grid"/><text x="54.0" y="250" class="axis" text-anchor="middle">0.0s</text><line x1="54" x2="742" y1="24.0" y2="24.0" class="chart-grid"/><text x="46" y="28.0" class="axis" text-anchor="end">158</text><line x1="226.0" x2="226.0" y1="24" y2="224" class="chart-grid"/><text x="226.0" y="250" class="axis" text-anchor="middle">4.5s</text><line x1="54" x2="742" y1="74.0" y2="74.0" class="chart-grid"/><text x="46" y="78.0" class="axis" text-anchor="end">118</text><line x1="398.0" x2="398.0" y1="24" y2="224" class="chart-grid"/><text x="398.0" y="250" class="axis" text-anchor="middle">9.0s</text><line x1="54" x2="742" y1="124.0" y2="124.0" class="chart-grid"/><text x="46" y="128.0" class="axis" text-anchor="end">77</text><line x1="570.0" x2="570.0" y1="24" y2="224" class="chart-grid"/><text x="570.0" y="250" class="axis" text-anchor="middle">13.5s</text><line x1="54" x2="742" y1="174.0" y2="174.0" class="chart-grid"/><text x="46" y="178.0" class="axis" text-anchor="end">36</text><line x1="742.0" x2="742.0" y1="24" y2="224" class="chart-grid"/><text x="742.0" y="250" class="axis" text-anchor="middle">17.9s</text><line x1="54" x2="742" y1="224.0" y2="224.0" class="chart-grid"/><text x="46" y="228.0" class="axis" text-anchor="end">-4</text><line x1="54" y1="224" x2="742" y2="224" class="axis-line"/><line x1="54" y1="24" x2="54" y2="224" class="axis-line"/><polyline points="54.0,119.5 122.9,122.4 191.7,121.6 260.5,122.0 329.4,121.1 398.0,122.3 466.8,121.1 535.6,123.3 604.5,121.6 673.2,121.2 742.0,120.6" fill="none" stroke="var(--colour-visual)" stroke-width="2.4"/><polyline points="54.0,67.3 122.9,169.6 191.7,190.5 260.5,183.1 329.4,42.7 398.0,37.8 466.8,151.1 535.6,210.2 604.5,180.7 673.2,165.9 742.0,72.3" fill="none" stroke="var(--colour-transport)" stroke-width="2.4"/></svg>
+    <h3>Secondary</h3>
+    <div class="chart-legend"><span class="legend-item"><i style="background:var(--colour-visual)"></i>centre of mass</span><span class="legend-item"><i style="background:var(--colour-transport)"></i>brightest LED</span></div><svg viewBox="0 0 760 260" class="line-chart" role="img"><line x1="54.0" x2="54.0" y1="24" y2="224" class="chart-grid"/><text x="54.0" y="250" class="axis" text-anchor="middle">0.0s</text><line x1="54" x2="742" y1="24.0" y2="24.0" class="chart-grid"/><text x="46" y="28.0" class="axis" text-anchor="end">139</text><line x1="226.0" x2="226.0" y1="24" y2="224" class="chart-grid"/><text x="226.0" y="250" class="axis" text-anchor="middle">4.5s</text><line x1="54" x2="742" y1="74.0" y2="74.0" class="chart-grid"/><text x="46" y="78.0" class="axis" text-anchor="end">102</text><line x1="398.0" x2="398.0" y1="24" y2="224" class="chart-grid"/><text x="398.0" y="250" class="axis" text-anchor="middle">9.0s</text><line x1="54" x2="742" y1="124.0" y2="124.0" class="chart-grid"/><text x="46" y="128.0" class="axis" text-anchor="end">66</text><line x1="570.0" x2="570.0" y1="24" y2="224" class="chart-grid"/><text x="570.0" y="250" class="axis" text-anchor="middle">13.5s</text><line x1="54" x2="742" y1="174.0" y2="174.0" class="chart-grid"/><text x="46" y="178.0" class="axis" text-anchor="end">29</text><line x1="742.0" x2="742.0" y1="24" y2="224" class="chart-grid"/><text x="742.0" y="250" class="axis" text-anchor="middle">17.9s</text><line x1="54" x2="742" y1="224.0" y2="224.0" class="chart-grid"/><text x="46" y="228.0" class="axis" text-anchor="end">-8</text><line x1="54" y1="224" x2="742" y2="224" class="axis-line"/><line x1="54" y1="24" x2="54" y2="224" class="axis-line"/><polyline points="54.0,104.8 122.9,104.8 191.7,104.9 260.5,105.3 329.4,104.8 398.0,105.1 466.8,104.9 535.6,104.9 604.5,105.1 673.2,104.7 742.0,105.0" fill="none" stroke="var(--colour-visual)" stroke-width="2.4"/><polyline points="54.0,43.2 122.9,37.8 191.7,153.2 260.5,166.8 329.4,191.2 398.0,134.2 466.8,127.4 535.6,141.0 604.5,210.2 673.2,153.2 742.0,136.9" fill="none" stroke="var(--colour-transport)" stroke-width="2.4"/></svg>
+  </div>
+</section>
+
+<section class="section grid callouts">
+  <div class="panel callout">
+    <h2>Why This Matters</h2>
+    <p>The previous CSV route could produce survivor rows from a corrupt stream. This capture reaches a stricter proof surface: frozen diagnostic records with seq/len/CRC and zero failed counters.</p>
+  </div>
+  <div class="panel callout">
+    <h2>Meaning For Visuals</h2>
+    <p>The useful semantic layer is not just &quot;did serial parse?&quot; It is whether final bytes carry energy, colour, channel independence, centre-aware spatial behaviour, and budget-safe timing.</p>
+  </div>
+  <div class="panel callout">
+    <h2>Next VME Layer</h2>
+    <p>VME L1 should add a candidate shadow payload beside these canonical bytes and compare final bytes for modes 7, 8, and 18 on both channels.</p>
+  </div>
+</section>
+
+<footer>
+  Sources: <code>/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/2026-06-07-vpab-frame-mode18-1401-music.frame-gate.json</code>, <code>/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/2026-06-07-vpab-frame-mode18-1401-music.raw.log</code>, <code>/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/2026-06-07-vpab-frame-mode18-1401-music.frames.log</code>,
+  <code>SPECTRASYNQ_K1_FIRMWARE/diag/vpab_capture.h</code>, <code>SPECTRASYNQ_K1_FIRMWARE/diag/vpab_capture.cpp</code>.
+  Visual grammar reference inspected: <code>https://github.com/RaidenIV/3D-Spectrogram</code> (no code copied; data contract differs).
+</footer>
+</main>
+<script id="vpab-data" type="application/json">{"channels":{"primary":{"maxLuma":28.333333333333332,"maxByte":54,"rows":[{"seconds":0.0,"frame":360,"energy":156,"luma":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,2,1,2,0,1,2,2,2,0,1,0,1,2,2,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,2,2,1,0,1,0,2,2,2,1,0,3,1,2,1,2,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,2,0,0,3,0,0,3,0,0,7,0,0,2,2,0,7,0,0,0,0,0,4,0,0,5,0,0,6,0,0,5,0,0,1,0,0,2,0,0,0,0,0,2,0,0,5,0,0,6,0,0,2,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,1,0,0,1,0,0,1,1,0,1,0,0,1,0,0,0,0,0,2,0,0,6,0,0,5,0,0,2,0,0,0,0,0,2,0,0,1,0,0,5,0,0,7,0,0,5,0,0,4,0,0,0,0,0,8,0,0,2,2,0,7,0,0,3,0,0,4,0,1,1,0,0,0,0,0,0,0,0,3,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":1.796,"frame":720,"energy":54,"luma":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,4,0,0,1,0,0,0,0,0,2,0,0,3,0,0,2,0,0,2,0,0,3,0,0,3,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,3,0,0,2,0,0,2,0,0,1,0,0,4,0,0,1,0,0,0,0,0,0,0,0,4,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":3.59,"frame":1080,"energy":62,"luma":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,1,0,0,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":5.384,"frame":1440,"energy":57,"luma":[0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,1,1,1,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,1,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0,0,0,2,0,0,2,0,0,3,0,0,2,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,0,0,0,2,0,0,3,0,0,2,0,0,2,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":7.18,"frame":1800,"energy":167,"luma":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,3,0,0,3,0,0,0,0,0,0,2,0,0,0,0,0,1,2,1,0,2,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,1,0,1,0,1,0,0,0,0,0,2,0,1,1,1,0,0,0,0,0,2,0,0,0,0,0,0,2,0,0,3,0,3,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,1,0,0,8,0,0,0,0,0,0,0,0,8,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,5,0,0,3,0,0,1,0,0,5,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,0,0,2,0,0,2,0,0,1,0,0,2,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,2,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,2,0,0,0,0,0,0,0,0,1,0,0,2,0,0,1,0,0,2,0,0,1,0,0,2,0,0,0,0,0,2,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,5,0,0,1,0,0,3,0,0,4,0,0,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,7,0,0,0,0,0,0,0,0,8,0,0,1,0,0,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":8.97,"frame":2160,"energy":224,"luma":[0,0,1,0,0,3,0,0,0,0,0,1,3,0,0,0,0,0,0,2,1,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,1,1,1,1,0,0,0,1,1,1,1,1,1,1,0,0,1,1,0,1,1,1,1,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1,1,1,1,1,1,1,0,1,1,0,0,1,1,1,1,1,1,1,0,0,0,1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,1,2,0,0,0,0,0,0,4,0,0,0,0,0,0,3,0,0,1,0,0],"rgb":[0,0,0,0,0,0,3,1,0,0,0,0,0,0,0,5,5,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,5,5,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,3,2,0,1,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,1,0,3,0,0,3,0,0,3,0,0,1,0,0,0,0,0,0,0,0,3,0,0,3,1,0,1,1,0,2,1,0,2,1,0,4,0,0,3,0,0,0,0,0,1,0,0,3,0,0,1,1,0,0,0,0,3,0,0,3,0,0,3,0,0,3,0,0,2,0,0,3,0,0,3,0,0,2,0,0,1,0,0,2,0,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,2,0,0,1,0,0,2,0,0,3,0,0,3,0,0,2,0,0,2,0,0,3,0,0,3,0,0,3,0,0,0,0,0,2,1,0,3,0,0,1,0,0,0,0,0,3,0,0,3,0,0,2,1,0,2,1,0,2,1,0,2,1,0,3,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,0,0,3,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,1,1,0,3,2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,6,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,5,0,1,0,0,0,0,0,3,1,0,0,0,0,0,0,0]},{"seconds":10.765,"frame":2520,"energy":183,"luma":[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,2,0,0,1,2,0,1,2,2,2,1,1,2,0,1,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,2,1,0,2,1,1,2,2,2,1,0,1,1,0,0,1,0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,4,0,0,0,0,0,0,0,0,5,0,1,0,0,0,0,0,0,4,0,0,5,0,0,0,0,0,4,0,0,5,0,0,5,0,0,5,0,0,4,0,0,3,0,0,5,0,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,5,0,0,4,0,0,0,0,0,5,0,0,4,0,0,4,0,0,5,0,0,5,0,0,5,0,0,4,0,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,4,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,3,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0]},{"seconds":12.558,"frame":2880,"energy":39,"luma":[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,2,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,0,0,0,2,0,0,1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":14.355,"frame":3240,"energy":45,"luma":[0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0],"rgb":[0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,3,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":16.145,"frame":3600,"energy":1434,"luma":[0,0,1,0,0,0,0,2,0,2,0,0,1,0,0,2,1,0,0,6,0,0,7,12,8,0,1,9,0,9,14,0,0,0,1,0,15,2,15,13,11,2,1,28,21,0,6,7,1,0,1,3,10,8,9,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,9,8,10,2,1,0,1,7,6,0,21,28,1,1,11,12,15,2,15,0,1,0,0,0,14,9,0,9,1,0,8,11,8,0,0,6,0,0,1,2,0,0,1,0,0,1,0,1,0,0,0,0,1,0,0],"rgb":[0,0,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,0,0,0,0,3,2,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,4,2,1,4,0,0,0,0,0,0,0,0,11,5,1,0,0,0,0,0,0,14,7,1,22,11,2,16,8,1,0,0,0,3,0,0,17,9,2,0,0,0,18,9,1,26,13,2,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,28,14,2,5,2,0,28,14,2,23,15,2,16,15,1,4,1,0,3,0,0,54,27,4,34,28,2,0,0,0,9,9,0,11,10,1,3,0,0,0,0,0,3,1,0,5,2,1,15,14,0,13,12,0,14,13,0,15,14,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,14,0,14,14,0,12,12,0,15,15,1,5,2,0,3,1,0,0,0,0,4,0,0,10,10,0,10,9,0,0,0,0,34,28,2,54,26,4,3,0,0,3,1,0,16,15,1,22,14,1,28,15,2,4,2,0,28,14,2,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,26,13,2,18,9,1,1,0,0,17,9,1,3,0,0,0,0,0,16,8,1,21,11,2,15,7,1,0,0,0,1,0,0,11,5,1,0,0,0,0,0,0,4,0,0,4,2,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,0,3,1,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,0,0,0,0,0,0,0]},{"seconds":17.94,"frame":3960,"energy":254,"luma":[0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,1,0,1,1,1,1,0,0,1,1,0,1,2,0,0,0,1,2,0,3,0,1,2,0,1,0,2,2,2,2,2,0,2,2,0,3,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,0,3,2,0,2,2,2,2,2,0,0,0,2,1,0,3,0,2,1,0,0,0,2,1,0,1,1,0,0,1,1,1,1,0,1,0,0,0,1,0,1,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,1,0,2,0,0,3,0,0,3,0,0,0,0,0,0,0,0,4,0,0,4,0,0,0,0,0,1,1,0,5,0,0,0,0,0,0,0,0,0,0,0,1,1,0,5,0,0,0,0,0,4,4,0,0,0,0,1,1,0,6,0,0,0,0,0,1,1,0,0,0,0,6,0,0,6,0,0,6,0,0,7,0,0,7,0,0,1,0,0,7,0,0,7,0,0,0,0,0,8,0,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0,0,8,0,0,0,0,0,8,0,0,7,0,0,1,0,0,7,0,0,7,0,0,6,0,0,7,0,0,6,0,0,0,0,0,1,0,0,0,0,0,6,0,0,1,1,0,0,0,0,5,5,0,0,0,0,5,0,0,1,1,0,0,0,0,0,0,0,0,0,0,5,0,0,1,1,0,0,0,0,4,0,0,4,0,0,0,0,0,0,0,0,3,0,0,3,0,0,2,0,0,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0]}]},"secondary":{"maxLuma":101.0,"maxByte":135,"rows":[{"seconds":0.0,"frame":360,"energy":954,"luma":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,2,0,2,5,7,3,15,13,14,9,10,12,5,11,4,0,4,11,12,4,2,2,0,2,0,2,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,1,0,2,1,1,2,4,12,11,4,0,4,10,5,12,10,9,14,13,16,2,7,5,3,0,2,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,1,0,6,0,0,1,0,0,7,0,0,16,0,0,20,0,0,7,1,0,43,3,0,38,1,0,40,2,0,25,1,0,28,1,0,36,1,0,14,0,0,30,2,0,11,0,0,0,0,0,12,0,0,31,2,0,34,2,0,12,0,0,5,0,0,5,0,0,0,0,0,5,0,0,0,0,0,5,0,0,5,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,5,0,0,4,0,0,0,0,0,5,0,0,1,1,0,4,0,0,5,0,0,11,0,0,34,2,0,31,1,0,12,0,0,0,0,0,12,1,0,29,1,0,14,0,0,35,1,0,28,1,0,25,1,0,41,2,0,38,1,0,44,3,0,6,0,0,21,1,0,16,0,0,8,1,0,1,0,0,7,0,0,17,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":1.796,"frame":720,"energy":747,"luma":[0,0,0,0,0,3,0,0,5,0,0,0,0,0,6,0,0,0,0,0,0,0,8,0,0,7,8,0,0,0,9,0,1,4,0,0,0,4,2,8,9,0,2,8,4,4,5,7,6,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,6,0,6,7,6,4,5,8,3,0,9,8,2,4,0,0,0,4,1,0,10,0,0,0,8,6,0,0,8,0,0,0,0,0,0,0,6,0,0,0,0,0,5,0,0,3,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,3,1,0,0,0,0,0,0,8,6,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,7,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,11,10,3,0,0,0,0,0,0,10,9,3,11,11,3,0,0,0,0,0,0,0,0,0,12,12,3,0,0,0,4,0,0,11,1,0,0,0,0,1,0,0,0,0,0,11,2,0,6,0,0,24,1,0,25,1,0,0,0,0,7,0,0,22,1,0,13,0,0,11,0,0,16,0,0,20,0,0,19,0,0,0,0,0,18,0,0,18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,18,1,0,0,0,0,19,0,0,20,0,0,16,1,0,11,0,0,14,0,0,22,1,0,8,0,0,0,0,0,25,1,0,24,1,0,6,0,0,10,2,0,0,0,0,1,0,0,0,0,0,10,1,0,4,0,0,0,0,0,13,12,4,0,0,0,0,0,0,0,0,0,11,11,3,9,8,2,0,0,0,0,0,0,11,10,3,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,9,8,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,6,2,0,0,0,0,0,0,5,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":3.59,"frame":1080,"energy":1969,"luma":[0,0,0,0,0,0,0,9,9,0,0,10,0,0,0,5,10,9,0,11,0,5,11,11,12,0,1,0,11,13,1,14,1,2,1,0,14,15,1,0,1,15,0,1,15,1,0,0,14,0,0,0,13,13,13,12,13,0,0,13,0,14,0,0,13,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,0,0,13,0,13,0,0,13,12,13,13,13,0,0,0,15,0,0,0,15,1,1,15,1,0,2,14,15,0,2,1,1,13,2,13,11,0,1,0,12,11,11,5,0,11,0,8,10,5,0,0,0,10,0,0,9,9,0,0,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,11,3,14,11,3,0,0,0,0,0,0,17,11,3,0,0,0,0,0,0,0,0,0,9,6,1,19,9,2,13,11,3,0,0,0,22,9,2,0,0,0,8,6,2,29,3,0,29,3,0,32,3,0,0,0,0,1,1,0,0,0,0,28,5,0,36,4,0,4,0,0,38,3,0,2,1,0,3,2,1,2,1,0,0,0,0,39,3,0,40,4,0,4,0,0,0,0,0,3,0,0,41,4,0,1,0,0,3,0,0,42,4,0,1,1,0,0,0,0,0,0,0,40,3,0,0,0,0,0,0,0,0,0,0,36,2,0,36,3,0,37,3,0,35,2,0,36,2,0,0,0,0,0,0,0,36,2,0,0,0,0,38,3,0,0,0,0,0,0,0,36,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,37,3,0,0,0,0,0,0,0,37,3,0,0,0,0,36,2,0,0,0,0,0,0,0,36,2,0,35,2,0,37,3,0,36,2,0,36,3,0,0,0,0,0,0,0,0,0,0,41,3,0,0,0,0,0,0,0,1,0,0,42,4,0,3,0,0,1,1,0,41,4,0,4,0,0,0,0,0,4,1,0,40,3,0,40,4,0,0,0,0,3,2,1,3,1,0,3,1,0,37,3,0,5,1,0,36,4,0,28,5,0,0,0,0,2,1,1,0,0,0,32,3,0,29,3,0,30,4,0,8,5,1,0,0,0,22,8,2,0,0,0,12,10,3,20,9,2,8,6,1,0,0,0,0,0,0,0,0,0,16,11,3,0,0,0,0,0,0,14,11,3,13,11,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":5.384,"frame":1440,"energy":2249,"luma":[0,0,0,0,0,3,0,0,0,0,0,14,15,18,19,0,3,22,12,7,4,8,2,6,0,25,0,23,25,29,26,0,29,28,29,0,0,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,28,0,0,29,27,29,0,26,29,25,23,1,25,0,6,3,8,4,7,13,22,3,0,19,17,16,14,0,0,0,0,0,2,0,0,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,14,3,28,15,3,31,17,5,34,18,5,0,0,0,8,1,0,42,20,5,22,12,3,15,6,1,10,1,0,16,7,2,5,2,0,14,4,1,0,0,0,48,22,6,0,0,0,44,20,5,54,17,3,77,9,0,60,16,3,0,0,0,72,13,1,63,17,3,67,17,3,0,0,0,0,0,0,69,13,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,69,13,1,0,0,0,0,0,0,67,17,3,63,16,3,72,13,1,0,0,0,60,16,3,77,9,0,54,17,3,44,20,5,1,1,0,47,22,5,0,0,0,13,4,0,6,2,1,16,6,1,10,2,0,15,5,1,23,12,3,42,19,5,8,1,0,0,0,0,34,18,5,31,16,4,28,15,4,26,13,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":7.18,"frame":1800,"energy":4971,"luma":[0,4,0,0,0,0,4,0,0,0,0,0,0,4,0,0,101,1,0,0,0,0,84,0,5,76,0,70,6,0,5,0,0,8,59,0,0,0,8,0,23,47,30,9,0,43,12,0,11,11,18,12,13,14,14,14,13,14,15,0,11,12,14,13,0,15,0,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,15,0,13,14,12,11,0,16,14,13,13,14,13,13,12,18,11,11,0,12,43,0,9,30,47,23,0,9,0,0,0,59,8,0,0,6,0,6,70,0,76,5,0,84,0,0,0,0,1,101,0,0,4,1,0,0,0,0,0,4,0,0,0,0,4,0],"rgb":[0,0,0,4,5,2,0,0,0,0,0,0,0,0,0,0,0,0,5,5,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,5,6,2,0,0,0,0,0,0,121,135,47,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,100,112,39,0,0,0,6,6,2,91,102,36,0,0,0,84,94,33,7,8,3,0,0,0,6,7,3,0,0,0,0,0,0,10,11,4,70,79,28,0,0,0,0,0,0,0,0,0,10,11,4,0,0,0,27,31,11,56,62,22,36,40,14,11,13,4,0,0,0,51,57,20,14,16,6,0,0,0,13,14,5,13,15,6,21,24,8,15,16,6,15,17,6,16,18,7,16,18,7,16,18,7,15,17,6,17,18,7,18,20,7,0,0,0,13,14,5,14,16,6,17,18,7,15,17,6,0,0,0,18,20,7,0,0,0,17,19,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,17,19,7,0,0,0,18,20,7,0,0,0,15,17,6,17,19,7,14,16,6,13,15,5,0,0,0,19,21,8,17,18,7,16,17,7,16,18,6,16,18,7,16,17,7,15,17,6,14,16,6,21,24,9,13,15,6,13,15,6,0,0,0,14,16,7,51,57,20,0,0,0,11,12,4,36,40,14,56,62,22,28,31,11,0,0,0,10,12,4,0,0,0,0,0,0,0,0,0,71,79,28,10,11,4,0,0,0,0,0,0,7,8,3,0,0,0,7,8,3,84,94,33,0,0,0,91,102,36,6,7,2,0,0,0,101,112,40,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,121,135,47,0,0,0,0,0,0,5,6,2,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,2,0,0,0,0,0,0,0,0,0,0,0,0,4,5,2,0,0,0]},{"seconds":8.97,"frame":2160,"energy":917,"luma":[0,0,1,0,0,4,3,3,0,0,0,0,3,0,0,3,0,0,0,3,0,0,0,0,0,0,3,0,3,0,0,2,0,3,0,0,0,4,0,1,5,7,7,2,0,2,1,7,1,2,1,0,7,0,1,7,1,0,8,6,6,7,7,6,6,6,5,3,2,2,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,2,2,2,6,5,6,6,7,7,6,6,8,0,1,7,2,0,7,0,2,1,1,7,2,1,0,1,7,7,5,1,0,4,0,0,0,3,0,2,0,0,3,0,3,0,0,0,0,0,0,3,0,0,0,3,0,0,3,0,0,0,0,3,3,3,0,0,1,0,0],"rgb":[0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,4,5,2,8,1,0,4,4,1,0,0,0,0,0,0,0,0,0,0,0,0,9,0,0,0,0,0,0,0,0,4,4,1,0,0,0,0,0,0,1,0,0,9,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,9,0,0,1,0,0,9,0,0,0,0,0,0,0,0,3,3,1,1,0,0,9,1,0,0,0,0,0,0,0,1,0,0,12,1,0,0,0,0,2,1,0,14,0,0,19,1,0,20,1,0,2,2,1,1,0,0,2,2,1,2,2,0,20,1,0,1,1,0,2,2,1,2,2,0,0,0,0,20,0,0,0,0,0,2,1,0,21,1,0,1,1,0,0,0,0,22,1,0,19,0,0,18,0,0,19,1,0,20,1,0,18,0,0,17,0,0,16,1,0,15,1,0,8,0,0,7,0,0,5,0,0,4,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,4,0,0,5,0,0,7,0,0,7,0,0,16,1,0,15,1,0,17,0,0,17,0,0,20,1,0,19,1,0,18,0,0,19,0,0,22,1,0,0,0,0,1,1,0,21,0,0,2,2,1,0,0,0,21,1,0,0,0,0,2,2,1,2,2,0,1,1,0,20,0,0,2,2,1,2,2,0,1,0,0,2,2,0,20,1,0,19,1,0,15,0,0,1,1,0,0,0,0,12,0,0,1,0,0,0,0,0,0,0,0,9,0,0,1,0,0,2,3,1,0,0,0,0,0,0,9,0,0,1,0,0,9,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,9,0,0,1,0,0,0,0,0,0,0,0,3,4,1,0,0,0,0,0,0,9,1,0,0,0,0,1,0,0,0,0,0,0,0,0,3,4,1,9,1,0,4,4,2,0,0,0,0,0,0,2,1,0,0,0,0,0,0,0]},{"seconds":10.765,"frame":2520,"energy":5527,"luma":[2,0,0,0,0,0,0,24,0,3,0,2,0,0,0,2,28,0,2,1,0,1,1,0,32,2,2,0,2,2,0,1,34,0,0,1,0,1,34,0,0,0,2,2,2,2,39,2,2,2,2,40,0,0,42,0,0,42,0,43,43,47,45,49,42,38,48,0,39,47,0,0,43,39,38,0,0,0,0,0,0,0,0,0,0,39,39,43,0,0,46,39,0,49,38,42,49,46,47,44,43,0,42,0,0,43,0,0,40,2,2,2,2,39,2,2,1,3,0,0,0,34,0,0,1,1,0,34,1,1,2,2,0,3,1,33,0,2,1,1,1,2,0,29,2,0,0,0,1,0,3,0,24,0,0,0,0,0,0,2],"rgb":[4,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,29,33,11,0,0,0,4,4,1,0,0,0,3,2,0,0,0,0,0,0,0,0,0,0,3,2,0,34,38,13,0,0,0,3,2,0,2,1,0,0,0,0,1,1,1,1,1,0,0,0,0,39,43,15,2,2,1,4,3,0,0,0,0,3,2,0,3,3,1,0,0,0,2,2,0,41,46,15,0,0,0,1,0,0,2,2,0,0,0,0,1,1,0,42,45,15,0,0,0,0,0,0,0,0,0,3,3,0,3,3,1,3,3,1,3,3,1,47,52,18,3,3,1,3,2,0,3,3,1,3,3,1,48,53,18,0,0,0,0,0,0,51,56,19,0,0,0,0,0,0,53,56,18,0,0,0,54,57,18,55,57,17,61,61,18,59,59,18,59,66,22,50,56,19,46,51,18,62,63,20,0,0,0,46,51,19,55,61,24,0,0,0,0,0,0,50,57,21,46,52,20,45,51,19,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,45,51,20,46,52,20,51,57,22,0,0,0,0,0,0,54,61,23,46,52,19,0,0,0,62,64,20,45,51,18,50,56,19,59,66,22,60,60,18,61,61,18,56,57,18,54,57,18,0,0,0,53,56,18,0,0,0,0,0,0,51,57,20,0,0,0,0,0,0,48,53,18,3,3,1,3,3,1,3,2,0,2,3,1,47,52,18,3,3,1,3,3,1,2,2,0,4,3,1,0,0,0,0,0,0,0,0,0,42,46,15,0,0,0,0,0,0,2,2,0,1,1,0,0,0,0,41,46,16,2,2,0,1,1,0,2,2,1,3,3,0,0,0,0,4,3,1,2,2,0,39,44,15,0,0,0,2,2,1,1,1,0,1,1,0,1,1,0,3,3,1,0,0,0,35,38,13,3,2,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,4,3,1,0,0,0,29,32,10,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,3,0]},{"seconds":12.558,"frame":2880,"energy":372,"luma":[0,0,0,3,0,0,0,3,0,1,0,0,0,0,4,0,4,4,1,0,0,1,0,0,0,0,4,0,0,0,0,0,4,0,0,0,0,0,0,4,0,1,0,4,0,4,4,0,0,0,5,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,0,0,5,0,0,0,4,4,0,4,0,0,0,4,0,0,0,0,0,0,4,0,0,0,0,0,4,0,0,0,0,1,0,0,1,4,4,0,4,0,0,0,0,0,0,3,1,0,0,2,0,0,0],"rgb":[0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0,0,1,0,0,9,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,11,0,0,0,0,0,11,0,0,12,1,0,1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,11,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,11,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0,0,12,0,0,0,0,0,2,0,0,1,0,0,12,0,0,0,0,0,12,0,0,13,0,0,0,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,15,0,0,15,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,15,0,0,15,0,0,0,0,0,0,0,0,14,0,0,0,0,0,0,0,0,0,0,0,13,0,0,12,0,0,0,0,0,12,0,0,1,0,0,1,0,0,0,0,0,11,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,12,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,12,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,12,0,0,11,0,0,0,0,0,11,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,9,0,0,1,1,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]},{"seconds":14.355,"frame":3240,"energy":822,"luma":[0,7,23,14,0,3,0,0,0,0,1,12,0,0,4,0,0,0,10,5,9,1,6,0,0,0,1,0,1,0,7,7,0,6,0,1,0,0,5,1,1,2,0,0,1,4,2,1,0,1,0,0,0,1,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,0,0,1,0,0,2,3,1,0,0,1,1,1,5,0,0,1,0,6,0,6,7,0,1,0,1,0,0,0,7,1,9,5,11,0,0,0,4,0,0,12,1,0,0,0,0,3,0,14,23,7,0],"rgb":[0,0,0,19,2,0,30,30,9,20,17,4,0,0,0,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0,0,17,16,4,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,0,0,0,13,14,4,15,0,0,11,12,4,1,2,1,18,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,9,10,3,20,1,0,0,0,0,7,8,3,0,0,0,1,1,0,0,0,0,0,0,0,6,7,2,1,1,0,1,1,0,2,2,1,0,0,0,0,0,0,1,1,0,4,5,2,2,2,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,1,1,0,0,0,0,2,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,1,0,1,1,0,1,0,0,1,0,0,2,1,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,2,2,1,4,4,2,1,1,0,0,0,0,0,0,0,1,2,1,1,1,0,1,1,0,6,7,3,0,0,0,0,0,0,1,1,0,0,0,0,7,8,3,0,0,0,19,0,0,9,10,3,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,19,1,0,1,1,0,12,12,4,15,0,0,13,14,5,0,0,0,0,0,0,0,0,0,12,0,0,0,0,0,0,0,0,17,16,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8,0,0,0,0,0,20,17,4,30,30,9,19,2,0,0,0,0]},{"seconds":16.145,"frame":3600,"energy":2349,"luma":[0,0,1,0,0,0,0,29,0,0,1,0,26,0,0,0,1,24,0,6,0,0,8,8,8,0,24,7,5,0,9,0,0,0,27,0,0,9,5,7,8,4,26,0,34,15,8,8,34,9,3,3,10,3,11,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9,11,3,10,3,3,9,34,8,8,15,34,0,26,3,8,7,5,9,0,0,27,0,0,0,9,0,5,7,25,0,8,8,8,0,0,6,0,24,2,0,0,0,26,0,2,0,0,29,0,0,0,0,1,0,0],"rgb":[0,0,0,0,0,0,2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,52,34,2,0,0,0,0,0,0,2,1,0,0,0,0,46,30,2,0,0,0,0,0,0,0,0,0,2,2,0,43,28,2,0,0,0,8,9,2,0,0,0,0,0,0,10,10,3,14,7,2,11,10,3,0,0,0,40,29,4,11,7,2,7,6,1,0,0,0,17,8,2,0,0,0,0,0,0,0,0,0,40,33,7,0,0,0,0,0,0,18,7,2,7,7,2,19,2,0,22,2,0,6,4,1,39,32,7,0,0,0,44,45,14,40,5,0,22,2,0,23,2,0,42,45,14,24,3,0,4,3,1,4,4,1,29,2,0,4,4,1,29,3,0,26,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26,2,0,29,3,0,4,3,1,29,2,0,4,3,1,4,3,1,24,2,0,42,45,15,23,2,0,22,2,0,40,4,0,44,45,14,0,0,0,39,32,7,5,4,1,22,2,0,19,2,0,7,7,2,18,7,2,0,0,0,0,0,0,40,34,7,0,0,0,0,0,0,0,0,0,17,8,2,0,0,0,7,7,2,11,7,2,40,29,5,0,0,0,11,10,3,14,7,2,11,10,4,0,0,0,0,0,0,8,8,2,0,0,0,43,28,2,3,2,0,0,0,0,0,0,0,0,0,0,47,30,2,0,0,0,3,2,1,0,0,0,0,0,0,52,34,2,0,0,0,0,0,0,0,0,0,0,0,0,2,1,1,0,0,0,0,0,0]},{"seconds":17.94,"frame":3960,"energy":5692,"luma":[0,1,0,0,1,0,1,0,1,0,0,0,0,0,1,1,0,20,0,0,0,0,28,0,17,30,35,0,0,41,0,46,1,51,0,0,0,1,53,0,2,1,1,57,0,0,1,0,60,63,66,69,1,0,71,75,77,75,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,75,77,75,71,0,1,69,67,63,61,0,2,0,0,57,1,1,3,0,53,1,0,0,0,51,1,45,0,41,0,0,35,30,17,0,28,0,0,0,0,20,0,1,1,0,0,0,0,0,1,0,1,0,1,0,0,1,0],"rgb":[0,0,0,1,1,0,0,0,0,0,0,0,2,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,3,0,0,0,0,0,24,27,10,0,0,0,0,0,0,0,0,0,0,0,0,33,37,13,0,0,0,20,22,8,36,40,14,42,47,17,0,0,0,0,0,0,49,54,19,0,0,0,55,61,21,3,0,0,61,68,24,0,0,0,0,0,0,0,0,0,4,0,0,64,71,25,0,1,0,7,0,0,1,1,1,1,1,0,69,76,27,0,0,0,0,0,0,4,0,0,0,0,0,72,80,29,75,84,30,79,88,32,82,91,33,3,0,0,0,0,0,85,94,34,89,100,37,91,102,38,88,99,38,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,88,99,38,91,102,38,89,99,37,85,94,35,0,0,0,4,0,0,82,91,33,80,89,33,75,84,30,72,81,29,0,0,0,4,1,0,0,0,0,0,0,0,68,76,26,1,1,1,1,1,0,7,1,0,0,0,0,64,71,25,4,0,0,0,0,0,0,0,0,0,0,0,61,68,23,3,0,0,54,60,20,0,0,0,49,54,19,0,0,0,0,0,0,42,47,17,36,40,14,20,22,8,0,0,0,33,37,13,0,0,0,0,0,0,0,0,0,0,0,0,24,27,10,0,0,0,3,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,0,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,1,1,0,0,0,0]}]}}}</script>
+<script>
+const VPAB_DATA = JSON.parse(document.getElementById('vpab-data').textContent);
+const MAPS = {
+  inferno: [[0,0,4],[31,12,72],[85,15,109],[136,34,106],[186,54,85],[227,89,51],[249,140,10],[249,201,50],[252,255,164]],
+  plasma: [[13,8,135],[75,3,161],[125,3,168],[168,34,150],[203,70,121],[229,107,93],[248,148,65],[253,195,40],[240,249,33]],
+  viridis: [[68,1,84],[71,44,122],[59,81,139],[44,113,142],[33,144,141],[39,173,129],[92,200,99],[170,220,50],[253,231,37]],
+  magma: [[0,0,4],[28,16,68],[79,18,123],[129,37,129],[181,54,122],[229,80,100],[251,135,97],[254,194,135],[252,253,191]]
+};
+let currentMap = 'inferno';
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function canvasSlot(id) {
+  const canvas = document.getElementById(id);
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, Math.round(rect.width * dpr));
+  canvas.height = Math.max(1, Math.round(rect.height * dpr));
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { canvas, ctx, width: rect.width, height: rect.height };
+}
+
+function sampleMap(name, value) {
+  const anchors = MAPS[name] || MAPS.inferno;
+  const t = Math.max(0, Math.min(1, value));
+  const scaled = t * (anchors.length - 1);
+  const index = Math.min(anchors.length - 2, Math.floor(scaled));
+  const frac = scaled - index;
+  const a = anchors[index];
+  const b = anchors[index + 1];
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * frac),
+    Math.round(a[1] + (b[1] - a[1]) * frac),
+    Math.round(a[2] + (b[2] - a[2]) * frac)
+  ];
+}
+
+function rgbCss(rgb) {
+  return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+}
+
+function drawHeatmap(channel, id) {
+  const slot = canvasSlot(id);
+  const ctx = slot.ctx;
+  const rows = VPAB_DATA.channels[channel].rows;
+  const maxLuma = VPAB_DATA.channels[channel].maxLuma || 1;
+  const maxByte = VPAB_DATA.channels[channel].maxByte || 1;
+  ctx.clearRect(0, 0, slot.width, slot.height);
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, slot.width, slot.height);
+  const rowH = slot.height / Math.max(1, rows.length);
+  const colW = slot.width / 160;
+  for (let y = 0; y < rows.length; y++) {
+    const row = rows[y];
+    for (let x = 0; x < 160; x++) {
+      let colour;
+      if (currentMap === 'raw') {
+        const base = x * 3;
+        const gain = Math.min(7, 215 / Math.max(1, maxByte));
+        colour = [
+          Math.min(255, Math.round(row.rgb[base] * gain)),
+          Math.min(255, Math.round(row.rgb[base + 1] * gain)),
+          Math.min(255, Math.round(row.rgb[base + 2] * gain))
+        ];
+      } else {
+        colour = sampleMap(currentMap, row.luma[x] / maxLuma);
+      }
+      ctx.fillStyle = rgbCss(colour);
+      ctx.fillRect(x * colW, y * rowH, Math.ceil(colW) + 0.5, Math.ceil(rowH) + 0.5);
+    }
+  }
+  ctx.strokeStyle = 'rgba(255,255,255,.78)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(slot.width * 0.5, 0);
+  ctx.lineTo(slot.width * 0.5, slot.height);
+  ctx.stroke();
+}
+
+function interpolatedRows(rows) {
+  if (rows.length < 2) return rows;
+  const out = [];
+  const steps = 6;
+  for (let r = 0; r < rows.length - 1; r++) {
+    const a = rows[r];
+    const b = rows[r + 1];
+    for (let step = 0; step < steps; step++) {
+      const t = step / steps;
+      out.push({
+        energy: a.energy + (b.energy - a.energy) * t,
+        luma: a.luma.map((value, index) => value + (b.luma[index] - value) * t)
+      });
+    }
+  }
+  out.push(rows[rows.length - 1]);
+  return out;
+}
+
+function drawWaterfall(channel, id, tick) {
+  const slot = canvasSlot(id);
+  const ctx = slot.ctx;
+  const data = VPAB_DATA.channels[channel];
+  const rows = interpolatedRows(data.rows);
+  const maxLuma = data.maxLuma || 1;
+  const maxEnergy = Math.max(1, ...rows.map(row => row.energy));
+  ctx.clearRect(0, 0, slot.width, slot.height);
+  const bg = ctx.createLinearGradient(0, 0, 0, slot.height);
+  bg.addColorStop(0, '#071019');
+  bg.addColorStop(1, '#010203');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, slot.width, slot.height);
+
+  const left = 30;
+  const width = slot.width - 82;
+  const base = slot.height * 0.78;
+  const rowGap = Math.max(2.6, slot.height * 0.009);
+  const phase = reducedMotion ? -1 : Math.floor((tick / 520) % rows.length);
+
+  ctx.strokeStyle = 'rgba(150,166,183,.25)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 6; i++) {
+    const y = base - i * rowGap;
+    ctx.beginPath();
+    ctx.moveTo(left + i * 8, y - i * 9);
+    ctx.lineTo(left + width + i * 8, y - i * 9);
+    ctx.stroke();
+  }
+
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r];
+    const depth = r / Math.max(1, rows.length - 1);
+    const yBase = base - (rows.length - 1 - r) * rowGap * .72;
+    const xLift = depth * 54;
+    const yLift = depth * 46;
+    const mean = row.luma.reduce((acc, value) => acc + value, 0) / Math.max(1, row.luma.length);
+    const stroke = sampleMap(currentMap === 'raw' ? 'inferno' : currentMap, Math.max(mean / maxLuma, row.energy / maxEnergy * .72));
+    ctx.beginPath();
+    for (let x = 0; x < 160; x += 2) {
+      const value = Math.pow(row.luma[x] / maxLuma, .65);
+      const px = left + (x / 159) * width + xLift;
+      const py = yBase - value * slot.height * .42 - yLift;
+      if (x === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.shadowColor = 'rgba(' + stroke[0] + ',' + stroke[1] + ',' + stroke[2] + ',.42)';
+    ctx.shadowBlur = 8;
+    ctx.strokeStyle = rgbCss(stroke);
+    ctx.globalAlpha = reducedMotion ? .84 : (r === phase ? 1 : .28 + depth * .42);
+    ctx.lineWidth = r === phase ? 2.1 : 1.1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
+  }
+
+  ctx.fillStyle = 'rgba(245,247,251,.72)';
+  ctx.font = '11px ui-monospace, SFMono-Regular, Menlo, monospace';
+  ctx.fillText('LED index ->', left, slot.height - 12);
+  ctx.fillText('time depth', slot.width - 108, 18);
+}
+
+function drawAll(tick) {
+  drawHeatmap('primary', 'heat-primary');
+  drawHeatmap('secondary', 'heat-secondary');
+  drawWaterfall('primary', 'waterfall-primary', tick || 0);
+  drawWaterfall('secondary', 'waterfall-secondary', tick || 0);
+}
+
+document.querySelectorAll('[data-map]').forEach(button => {
+  button.addEventListener('click', () => {
+    currentMap = button.dataset.map || 'inferno';
+    document.querySelectorAll('[data-map]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    drawAll(0);
+  });
+});
+
+let rafId = 0;
+function animate(tick) {
+  drawAll(tick);
+  if (!reducedMotion) rafId = requestAnimationFrame(animate);
+}
+window.addEventListener('resize', () => drawAll(0));
+drawAll(0);
+if (!reducedMotion) rafId = requestAnimationFrame(animate);
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+# ============================================================================
+# pre-commit gate — "commit continually, but only when it works"
+# ----------------------------------------------------------------------------
+# Tiered, fail-closed, branch-aware. Routes by what is STAGED and runs the
+# REAL check for that change-class; a non-zero exit refuses the commit.
+#
+#   docs / md / instructions / skills .... no build, no test  (instant)
+#   tests/**.py  scripts/regression-harness/**.py .... pytest only
+#   sb-tab5-wireless-controller/** + Tab5 harness .... pytest + tab5 build
+#   SPECTRASYNQ_K1_FIRMWARE/** source  +  platformio.ini .... pytest + k1 build
+#   any tier ............................. binary / oversize guard (staged blobs)
+#   on a  wip/*  branch .................. build+test SKIPPED (checkpoint freely)
+#
+# The build/test runs against your WORKING TREE: stage what you build, build
+# what you stage. Genuine broken-work checkpoints belong on a wip/* branch
+# (auto-skipped here) or via  git commit --no-verify  (the documented escape).
+# Detail: docs/git/commit-gate.md
+# ============================================================================
+set -uo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT" || exit 1
+
+BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
+MAX_MB=10
+MAX_BYTES=$((MAX_MB * 1024 * 1024))
+
+say()  { printf '%s\n' "$*" >&2; }
+hr()   { say "────────────────────────────────────────────────────────"; }
+
+# --- staged paths (NUL-safe) ------------------------------------------------
+mapfile -d '' -t STAGED < <(git diff --cached --name-only --diff-filter=ACMR -z)
+if [ "${#STAGED[@]}" -eq 0 ]; then
+  exit 0   # nothing staged (e.g. amend with no content) — let git proceed
+fi
+
+hr; say "commit-gate · branch '${BRANCH}' · ${#STAGED[@]} staged path(s)"
+
+# --- 1. binary / oversize guard (ALL branches, incl. wip) -------------------
+guard_fail=0
+DENY_EXT='mp4|mov|avi|mkv|webm|bin|elf|hex|uf2|map|o|a|so|dylib|zip|tar|gz'
+for f in "${STAGED[@]}"; do
+  [ -n "$f" ] || continue
+  ext="${f##*.}"
+  if [[ "$ext" =~ ^(${DENY_EXT})$ ]]; then
+    say "  ✗ binary not allowed in history: $f  (gitignore it / use LFS)"
+    guard_fail=1; continue
+  fi
+  sz="$(git cat-file -s ":$f" 2>/dev/null || echo 0)"
+  if [ "$sz" -gt "$MAX_BYTES" ]; then
+    say "  ✗ too large for git: $f  ($((sz/1024/1024)) MB > ${MAX_MB} MB)"
+    guard_fail=1
+  fi
+done
+if [ "$guard_fail" -ne 0 ]; then
+  hr; say "GATE BLOCKED — disallowed binary/oversize content staged."; exit 1
+fi
+
+# --- 2. wip/* branches: checkpoint freely (no build/test) -------------------
+case "$BRANCH" in
+  wip/*)
+    hr; say "wip/* branch — build+test SKIPPED. Checkpoint freely; push for backup."
+    exit 0 ;;
+esac
+
+# --- 3. classify the change-class ------------------------------------------
+tier="docs"            # default: no build, no test
+firmware=0
+tab5=0
+pyharness=0
+visual=0
+for f in "${STAGED[@]}"; do
+  case "$f" in
+    SPECTRASYNQ_K1_FIRMWARE/*.cpp|SPECTRASYNQ_K1_FIRMWARE/*.h|SPECTRASYNQ_K1_FIRMWARE/*.hpp|\
+    SPECTRASYNQ_K1_FIRMWARE/*.c|SPECTRASYNQ_K1_FIRMWARE/*.ino|platformio.ini)
+      firmware=1 ;;
+    sb-tab5-wireless-controller/*|sb-tab5-wireless-controller/**|\
+    tools/tab5_k1_dashboard_harness.py|docs/protocol/k1-ws-contract.yaml|docs/protocol/k1-rest-contract.yaml)
+      tab5=1 ;;
+    tests/*.py|scripts/regression-harness/*.py)
+      pyharness=1 ;;
+  esac
+  case "$f" in
+    *light_mode_*|*leds.*|*lightshow*|*palette*|*render_params*|*chroma*) visual=1 ;;
+  esac
+done
+if [ "$firmware" -eq 1 ] && [ "$tab5" -eq 1 ]; then
+  tier="firmware+tab5"
+elif [ "$firmware" -eq 1 ]; then
+  tier="firmware"
+elif [ "$tab5" -eq 1 ]; then
+  tier="tab5"
+elif [ "$pyharness" -eq 1 ]; then
+  tier="pyharness"
+fi
+say "  tier: ${tier}"
+
+# --- helpers: tool discovery ------------------------------------------------
+have_pytest() { python3 -c 'import pytest' >/dev/null 2>&1; }
+find_pio() {
+  if command -v pio >/dev/null 2>&1; then echo "pio";
+  elif [ -x "$HOME/.local/bin/pio" ]; then echo "$HOME/.local/bin/pio";
+  elif python3 -c 'import platformio' >/dev/null 2>&1; then echo "python3 -m platformio";
+  else echo ""; fi
+}
+
+run_pytest() {
+  if ! have_pytest; then
+    say "  ✗ pytest unavailable but tests/firmware staged — cannot verify (fail-closed)."
+    say "    install: pip install pytest   · or checkpoint on a wip/* branch."
+    return 1
+  fi
+  say "  → python3 -m pytest tests/ -q"
+  local out; out="$(python3 -m pytest tests/ -q 2>&1)"; local rc=$?
+  printf '%s\n' "$out" | tail -4 >&2
+  return $rc
+}
+
+run_build() {
+  local pio; pio="$(find_pio)"
+  if [ -z "$pio" ]; then
+    say "  ✗ PlatformIO not found but firmware staged — cannot verify (fail-closed)."
+    say "    install pio, or checkpoint on a wip/* branch."
+    return 1
+  fi
+  say "  → ${pio} run -e k1_hardware"
+  local out; out="$($pio run -e k1_hardware 2>&1)"; local rc=$?
+  printf '%s\n' "$out" | tail -4 >&2
+  return $rc
+}
+
+run_tab5_build() {
+  local pio; pio="$(find_pio)"
+  if [ -z "$pio" ]; then
+    say "  ✗ PlatformIO not found but Tab5 controller staged — cannot verify (fail-closed)."
+    say "    install pio, or checkpoint on a wip/* branch."
+    return 1
+  fi
+  say "  → ${pio} run -d sb-tab5-wireless-controller -e tab5"
+  local out; out="$($pio run -d sb-tab5-wireless-controller -e tab5 2>&1)"; local rc=$?
+  printf '%s\n' "$out" | tail -4 >&2
+  return $rc
+}
+
+# --- 3b. Gate-0 effect-framework safety greps (cheap, fail-closed) ----------
+# Runs whenever framework sources or globals.h are staged. Catches the two
+# verified crash classes: flash-write under effects/framework/ (CL-2) and an
+# empty framework-gated lock_leds() body (CL-1). See framework-safety-gate.sh.
+framework_touch=0
+for f in "${STAGED[@]}"; do
+  case "$f" in
+    SPECTRASYNQ_K1_FIRMWARE/effects/framework/*|SPECTRASYNQ_K1_FIRMWARE/system/globals.h)
+      framework_touch=1 ;;
+  esac
+done
+if [ "$framework_touch" -eq 1 ] && [ -x "$REPO_ROOT/scripts/hooks/framework-safety-gate.sh" ]; then
+  say "  → framework-safety-gate (CL-1 barrier / CL-2 fail-closed greps)"
+  if ! "$REPO_ROOT/scripts/hooks/framework-safety-gate.sh"; then
+    hr; say "GATE BLOCKED — effect-framework crash class regressed (CL-1/CL-2)."; exit 1
+  fi
+fi
+
+# --- 4. run the tier gate ---------------------------------------------------
+rc=0
+case "$tier" in
+  docs)      say "  docs/other — no build/test required." ;;
+  pyharness) run_pytest || rc=1 ;;
+  tab5)      run_pytest || rc=1
+             [ "$rc" -eq 0 ] && { run_tab5_build || rc=1; }
+             if [ "$rc" -eq 0 ] && { [ "$BRANCH" = "main" ] || case "$BRANCH" in substrate/tab5-*) true ;; *) false ;; esac; }; then
+               if [ -f "$REPO_ROOT/tools/k1_tab5_release_gate.py" ]; then
+                 say "  → python3 tools/k1_tab5_release_gate.py (Tab5 release gate on ${BRANCH})"
+                 python3 "$REPO_ROOT/tools/k1_tab5_release_gate.py" >/dev/null 2>&1 || rc=1
+               fi
+             fi ;;
+  firmware)  run_pytest || rc=1
+	     [ "$rc" -eq 0 ] && { run_build || rc=1; } ;;
+  firmware+tab5)
+             run_pytest || rc=1
+             [ "$rc" -eq 0 ] && { run_build || rc=1; }
+             [ "$rc" -eq 0 ] && { run_tab5_build || rc=1; }
+             if [ "$rc" -eq 0 ] && { [ "$BRANCH" = "main" ] || case "$BRANCH" in substrate/tab5-*) true ;; *) false ;; esac; }; then
+               if [ -f "$REPO_ROOT/tools/k1_tab5_release_gate.py" ]; then
+                 say "  → python3 tools/k1_tab5_release_gate.py (Tab5 release gate on ${BRANCH})"
+                 python3 "$REPO_ROOT/tools/k1_tab5_release_gate.py" >/dev/null 2>&1 || rc=1
+               fi
+             fi ;;
+esac
+
+# --- 5. verdict -------------------------------------------------------------
+if [ "$rc" -ne 0 ]; then
+  hr; say "GATE BLOCKED — fix it, then re-commit. (Checkpoint broken work on wip/*"
+  say "or 'git commit --no-verify' for an explicit, logged WIP escape.)"; exit 1
+fi
+
+if [ "$visual" -eq 1 ]; then
+  say "  ⚠ visual-surface change: host gate passed, but ON-DEVICE eyes-on is still"
+  say "    pending. This commit records HOST proof only — queue the bench review."
+fi
+hr; say "GATE PASSED"
+exit 0

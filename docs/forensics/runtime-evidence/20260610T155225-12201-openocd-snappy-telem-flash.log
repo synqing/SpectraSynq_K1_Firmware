@@ -1,0 +1,167 @@
+Using tool-openocd-esp32@2.1200.20250422 package
+Open On-Chip Debugger v0.12.0-esp32-20250422 (2025-04-22-13:02)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : only one transport option; autoselecting 'jtag'
+Info : esp_usb_jtag: VID set to 0x303a and PID to 0x1001
+Info : esp_usb_jtag: capabilities descriptor set to 0x2000
+Info : esp_usb_jtag: serial (B4:3A:45:A5:89:B4)
+Info : esp_usb_jtag: Device found. Base speed 40000KHz, div range 1 to 255
+Info : clock speed 40000 kHz
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] Examination succeed
+Info : [esp32s3.cpu1] Examination succeed
+Info : [esp32s3.cpu0] starting gdb server on 3333
+Info : Listening on port 3333 for gdb connections
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Target halted, PC=0x4037A0FA, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : Set GDB target to 'esp32s3.cpu0'
+Info : [esp32s3.cpu1] Target halted, PC=0x403851B6, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu1] Halt cause (4) - (Level-1 interrupt)
+Info : [esp32s3.cpu1] Halt cause (4) - (Level-1 interrupt)
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu1] Halt cause (4) - (Level-1 interrupt)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu1] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+** program_esp input args <0x0 verify> **
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu1] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+** Programming Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038CCA2, debug_reason=00000001
+Info : Flash mapping 0: 0x10020 -> 0x3c060020, 147 KB
+Info : Flash mapping 1: 0x40020 -> 0x42000020, 344 KB
+Info : Auto-detected flash bank 'esp32s3.cpu0.flash' size 16384 KB
+Info : Using flash bank 'esp32s3.cpu0.flash' size 16384 KB
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3FE, debug_reason=00000001
+You can enable `skip_loaded` to increase download speed.
+Info : [esp32s3.cpu0] Target halted, PC=0x4038C87E, debug_reason=00000001
+Info : PROF: Erased 20480 bytes in 398.656 ms
+Info : PROF: Data transferred in 168.455 ms @ 118.726 KB/s
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3EE, debug_reason=00000001
+Info : PROF: Wrote 20480 bytes in 384.373 ms (data transfer time included)
+** Programming Finished in 1090 ms **
+** Verify Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038CC52, debug_reason=00000001
+Info : PROF: Flash verified in 56.124 ms 
+** Verify OK **
+** program_esp input args <0x8000 verify> **
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu1] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+** Programming Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3FE, debug_reason=00000001
+You can enable `skip_loaded` to increase download speed.
+Info : [esp32s3.cpu0] Target halted, PC=0x4038C87E, debug_reason=00000001
+Info : PROF: Erased 4096 bytes in 117.472 ms
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3EE, debug_reason=00000001
+Info : PROF: Data transferred in 46.799 ms @ 85.4719 KB/s
+Info : PROF: Wrote 4096 bytes in 208.781 ms (data transfer time included)
+** Programming Finished in 574 ms **
+** Verify Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038CC52, debug_reason=00000001
+Info : PROF: Flash verified in 51.457 ms 
+** Verify OK **
+** program_esp input args <0xe000 verify> **
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu1] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+** Programming Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3FE, debug_reason=00000001
+You can enable `skip_loaded` to increase download speed.
+Info : [esp32s3.cpu0] Target halted, PC=0x4038C87E, debug_reason=00000001
+Info : PROF: Erased 8192 bytes in 178.054 ms
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3EE, debug_reason=00000001
+Info : PROF: Data transferred in 66.516 ms @ 120.272 KB/s
+Info : PROF: Wrote 8192 bytes in 231.601 ms (data transfer time included)
+** Programming Finished in 664 ms **
+** Verify Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038CC52, debug_reason=00000001
+Info : PROF: Flash verified in 49.578 ms 
+** Verify OK **
+** program_esp input args <0x10000 verify> **
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+Info : [esp32s3.cpu1] Target halted, PC=0x40000400, debug_reason=00000000
+Info : [esp32s3.cpu1] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+** Programming Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3FE, debug_reason=00000001
+You can enable `skip_loaded` to increase download speed.
+Info : [esp32s3.cpu0] Target halted, PC=0x4038C87E, debug_reason=00000001
+Info : PROF: Erased 598016 bytes in 2879.88 ms
+Info : PROF: Data transferred in 4672.37 ms @ 124.99 KB/s
+Info : [esp32s3.cpu0] Target halted, PC=0x4038D3EE, debug_reason=00000001
+Info : PROF: Wrote 598016 bytes in 4934.28 ms (data transfer time included)
+** Programming Finished in 8063 ms **
+** Verify Started **
+Info : [esp32s3.cpu0] Target halted, PC=0x4038CC52, debug_reason=00000001
+Info : PROF: Flash verified in 369.952 ms 
+** Verify OK **
+Info : JTAG tap: esp32s3.tap0 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : JTAG tap: esp32s3.tap1 tap/device found: 0x120034e5 (mfg: 0x272 (Tensilica), part: 0x2003, ver: 0x1)
+Info : [esp32s3.cpu0] requesting target halt and executing a soft reset
+Info : [esp32s3.cpu0] Debug controller was reset.
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu0] Target halted, PC=0x500000EF, debug_reason=00000000
+Info : [esp32s3.cpu0] Reset cause (3) - (Software core reset)
+Info : [esp32s3.cpu0] Core was reset.
+Info : [esp32s3.cpu1] Debug controller was reset.
+Info : [esp32s3.cpu1] Core was reset.
+shutdown command invoked

@@ -1,0 +1,183 @@
+{
+  "clips": [
+    {
+      "coverage": "steady groove",
+      "duration": 25.0,
+      "id": "steady-groove-regard-late",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Regard_Ride_It.mp3",
+      "reason": "Existing anchor window for stable four-on-floor groove behaviour.",
+      "start": 125.0,
+      "track": "Regard_Ride_It.mp3",
+      "window": "125s-150s"
+    },
+    {
+      "coverage": "steady groove",
+      "duration": 25.0,
+      "id": "steady-groove-lavern-mid",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Lavern_InMyMind.mp3",
+      "reason": "Adds a second steady-groove track so the gate is not overfit to Regard.",
+      "start": 45.0,
+      "track": "Lavern_InMyMind.mp3",
+      "window": "45s-70s"
+    },
+    {
+      "coverage": "drop-heavy",
+      "duration": 25.0,
+      "id": "drop-heavy-shelter-main",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "reason": "Existing anchor window that previously exposed high switch pressure.",
+      "start": 75.0,
+      "track": "Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "window": "75s-100s"
+    },
+    {
+      "coverage": "drop-heavy",
+      "duration": 25.0,
+      "id": "drop-heavy-touchme-late",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Ian Asher - Touch Me.mp3",
+      "reason": "Second drop/chorus-pressure window from a different source track.",
+      "start": 96.0,
+      "track": "Ian Asher - Touch Me.mp3",
+      "window": "96s-121s"
+    },
+    {
+      "coverage": "sparse/build",
+      "duration": 25.0,
+      "id": "sparse-build-carte-early",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Carte-Blanche-Mixed.mp3",
+      "reason": "Existing anchor window for breakdown-to-build behaviour.",
+      "start": 20.0,
+      "track": "Carte-Blanche-Mixed.mp3",
+      "window": "20s-45s"
+    },
+    {
+      "coverage": "sparse/build",
+      "duration": 25.0,
+      "id": "sparse-build-shelter-early",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "reason": "Early structural contrast against the later Shelter drop-heavy anchor.",
+      "start": 10.0,
+      "track": "Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "window": "10s-35s"
+    },
+    {
+      "coverage": "vocal/chorus",
+      "duration": 25.0,
+      "id": "vocal-chorus-touchme-mid",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Ian Asher - Touch Me.mp3",
+      "reason": "Checks whether Auto preserves vocal/chorus readability without arbitrary visual churn.",
+      "start": 48.0,
+      "track": "Ian Asher - Touch Me.mp3",
+      "window": "48s-73s"
+    },
+    {
+      "coverage": "vocal/chorus",
+      "duration": 25.0,
+      "id": "vocal-chorus-lavern-late",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Lavern_InMyMind.mp3",
+      "reason": "Second vocal/chorus-style window with different production density.",
+      "start": 70.0,
+      "track": "Lavern_InMyMind.mp3",
+      "window": "70s-95s"
+    },
+    {
+      "coverage": "high-density",
+      "duration": 25.0,
+      "id": "high-density-carte-finale",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Carte-Blanche-Mixed.mp3",
+      "reason": "Late high-density stress window within the shortest available track.",
+      "start": 55.0,
+      "track": "Carte-Blanche-Mixed.mp3",
+      "window": "55s-80s"
+    }
+  ],
+  "created_at": "2026-06-01T21:37:15.003015",
+  "devices": [
+    {
+      "chip_id": "B489A500",
+      "log": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-main-k1v2.log",
+      "name": "main-k1v2",
+      "port": "/dev/tty.usbmodem12201",
+      "role": "l1-reference",
+      "scene": "l1",
+      "version": "40103"
+    },
+    {
+      "chip_id": "F887A500",
+      "log": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-bench-k1-2nd.log",
+      "name": "bench-k1-2nd",
+      "port": "/dev/tty.usbmodem1401",
+      "role": "smart-auto-candidate",
+      "scene": "auto",
+      "version": "40103"
+    }
+  ],
+  "notes": "No calibration, erase, upload, or firmware source edits by this capture script.",
+  "repo": "/Users/spectrasynq/SensoryBridge-main 9",
+  "video_device": "1:none",
+  "video_outputs": [
+    {
+      "clip_id": "steady-groove-regard-late",
+      "frames_rc": 0,
+      "frames_stderr": "",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-steady-groove-regard-late.mp4",
+      "video_rc": 0
+    },
+    {
+      "clip_id": "steady-groove-lavern-mid",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-steady-groove-lavern-mid.mp4",
+      "video_killed": true,
+      "video_rc": -9,
+      "video_stderr": "[avfoundation @ 0x88a810000] Selected pixel format (yuv420p) is not supported by the input device.\n[avfoundation @ 0x88a810000] Supported pixel formats:\n[avfoundation @ 0x88a810000]   uyvy422\n[avfoundation @ 0x88a810000]   yuyv422\n[avfoundation @ 0x88a810000]   nv12\n[avfoundation @ 0x88a810000]   0rgb\n[avfoundation @ 0x88a810000]   bgr0\n"
+    },
+    {
+      "clip_id": "drop-heavy-shelter-main",
+      "frames_rc": 0,
+      "frames_stderr": "",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-drop-heavy-shelter-main.mp4",
+      "video_rc": 0
+    },
+    {
+      "clip_id": "drop-heavy-touchme-late",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-drop-heavy-touchme-late.mp4",
+      "video_killed": true,
+      "video_rc": -9,
+      "video_stderr": "[avfoundation @ 0xbd5408000] Selected pixel format (yuv420p) is not supported by the input device.\n[avfoundation @ 0xbd5408000] Supported pixel formats:\n[avfoundation @ 0xbd5408000]   uyvy422\n[avfoundation @ 0xbd5408000]   yuyv422\n[avfoundation @ 0xbd5408000]   nv12\n[avfoundation @ 0xbd5408000]   0rgb\n[avfoundation @ 0xbd5408000]   bgr0\n"
+    },
+    {
+      "clip_id": "sparse-build-carte-early",
+      "frames_rc": 0,
+      "frames_stderr": "",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-sparse-build-carte-early.mp4",
+      "video_rc": 0
+    },
+    {
+      "clip_id": "sparse-build-shelter-early",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-sparse-build-shelter-early.mp4",
+      "video_killed": true,
+      "video_rc": -9,
+      "video_stderr": "[avfoundation @ 0x704810000] Selected pixel format (yuv420p) is not supported by the input device.\n[avfoundation @ 0x704810000] Supported pixel formats:\n[avfoundation @ 0x704810000]   uyvy422\n[avfoundation @ 0x704810000]   yuyv422\n[avfoundation @ 0x704810000]   nv12\n[avfoundation @ 0x704810000]   0rgb\n[avfoundation @ 0x704810000]   bgr0\n"
+    },
+    {
+      "clip_id": "vocal-chorus-touchme-mid",
+      "frames_rc": 0,
+      "frames_stderr": "",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-vocal-chorus-touchme-mid.mp4",
+      "video_rc": 0
+    },
+    {
+      "clip_id": "vocal-chorus-lavern-late",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-vocal-chorus-lavern-late.mp4",
+      "video_killed": true,
+      "video_rc": -9,
+      "video_stderr": "[avfoundation @ 0xc2680c000] Selected pixel format (yuv420p) is not supported by the input device.\n[avfoundation @ 0xc2680c000] Supported pixel formats:\n[avfoundation @ 0xc2680c000]   uyvy422\n[avfoundation @ 0xc2680c000]   yuyv422\n[avfoundation @ 0xc2680c000]   nv12\n[avfoundation @ 0xc2680c000]   0rgb\n[avfoundation @ 0xc2680c000]   bgr0\n"
+    },
+    {
+      "clip_id": "high-density-carte-finale",
+      "frames_rc": 0,
+      "frames_stderr": "",
+      "video": "docs/forensics/runtime-evidence/2026-06-01T213207-smart-auto-ab-high-density-carte-finale.mp4",
+      "video_rc": 0
+    }
+  ]
+}

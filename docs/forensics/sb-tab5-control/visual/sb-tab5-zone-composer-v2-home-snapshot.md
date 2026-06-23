@@ -1,0 +1,187 @@
+- main "SensoryBridge Tab5 V2 pixel lab" [ref=e2] [box=415,16,1280,720]:
+  - generic "Persistent header" [ref=e3] [box=429,30,1256,72]:
+    - generic [ref=e4] [box=441,40,260,60]:
+      - strong [ref=e5] [box=456,52,230,18]: K1-SB
+      - generic [ref=e6] [box=456,76,230,13]: sim control · API needed
+    - generic [ref=e7] [box=713,40,520,60]:
+      - heading "SHOW CONTROL" [level=1] [ref=e8] [box=876,41,195,38]
+      - generic [ref=e9] [box=851,81,244,19]: Waveform Tempo · primary edge
+    - generic [ref=e10] [box=1245,40,428,60]:
+      - strong [ref=e11] [box=1260,52,398,18]: READY SIM
+      - generic [ref=e12] [box=1260,76,398,13]: no K1 link claimed
+  - region "Home show control" [ref=e13] [box=429,114,1256,528]:
+    - generic [ref=e14] [box=429,114,1256,220]:
+      - generic [ref=e15] [box=450,133,1214,34]:
+        - generic [ref=e16] [box=450,136,528,28]: Primary edge
+        - generic [ref=e17] [box=990,136,133,28]: centre origin
+        - generic [ref=e18] [box=1136,136,528,28]: Secondary edge
+      - generic "Dual edge LGP preview" [ref=e19] [box=450,177,1214,116]
+      - generic [ref=e22] [box=450,293,1214,36]:
+        - generic [ref=e23] [box=450,297,544,32]: "0"
+        - generic [ref=e24] [box=994,293,126,40]: 79 | 80
+        - generic [ref=e25] [box=1120,297,544,32]: "159"
+    - generic [ref=e26] [box=429,346,392,136]:
+      - heading "Mode" [level=2] [ref=e27] [box=444,361,362,26]
+      - generic [ref=e28] [box=444,399,362,74]:
+        - button "Previous mode" [ref=e29] [cursor=pointer] [box=444,399,102,74]: "-"
+        - generic [ref=e30] [box=556,399,138,74]
+        - button "Next mode" [ref=e33] [cursor=pointer] [box=704,399,102,74]: +
+    - generic [ref=e34] [box=429,494,392,136]:
+      - heading "Smart Scene" [level=2] [ref=e35] [box=444,509,362,26]
+      - group "Smart scene" [ref=e36] [box=444,549,362,76]:
+        - button "Off" [ref=e37] [cursor=pointer] [box=444,549,85,76]
+        - button "Assist" [pressed] [ref=e38] [cursor=pointer] [box=537,549,85,76]
+        - button "L1" [ref=e39] [cursor=pointer] [box=629,549,85,76]
+        - button "Auto" [ref=e40] [cursor=pointer] [box=722,549,85,76]
+    - generic [ref=e41] [box=833,346,392,88]:
+      - generic [ref=e42] [box=848,374,150,32]: Photons
+      - slider "Photons" [ref=e43] [box=1010,362,116,56]: "76"
+      - status [ref=e44] [box=1138,374,72,32]: "0.76"
+    - generic [ref=e45] [box=833,450,392,88]:
+      - generic [ref=e46] [box=848,478,150,32]: Chroma
+      - slider "Chroma" [ref=e47] [box=1010,466,116,56]: "64"
+      - status [ref=e48] [box=1138,478,72,32]: "0.64"
+    - generic [ref=e49] [box=833,554,392,88]:
+      - generic [ref=e50] [box=848,582,150,32]: Mood
+      - slider "Mood" [ref=e51] [box=1010,570,116,56]: "58"
+      - status [ref=e52] [box=1138,582,72,32]: "0.58"
+    - generic [ref=e53] [box=1237,346,448,136]:
+      - heading "K1 Pulse" [level=2] [ref=e54] [box=1252,361,418,26]
+      - generic [ref=e55] [box=1252,401,418,84]:
+        - generic [ref=e56] [box=1252,401,203,38]
+        - generic [ref=e59] [box=1467,401,203,38]
+        - generic [ref=e62] [box=1252,447,203,38]
+        - generic [ref=e65] [box=1467,447,203,38]
+    - generic [ref=e69] [box=1248,505,426,52]:
+      - button "Previous palette" [ref=e70] [cursor=pointer] [box=1248,505,92,64]: "-"
+      - strong [ref=e72] [box=1349,523,224,29]: K1 Cyan Violet
+      - button "Next palette" [ref=e73] [cursor=pointer] [box=1582,505,92,64]: +
+    - button "Open channel detail / mix" [ref=e75] [cursor=pointer] [box=1237,578,448,64]
+  - region "Channel detail mix" [box=429,120,1256,528]:
+    - generic [box=429,120,1256,200]:
+      - generic [box=450,139,1214,34]:
+        - generic [box=450,142,503,28]: Primary
+        - generic [box=965,142,184,28]: mixed from centre
+        - generic [box=1161,142,503,28]: Secondary
+      - generic "Mix preview" [box=450,183,1214,116]
+      - generic [box=450,299,1214,36]:
+        - generic [box=450,303,544,32]: primary owns base
+        - generic [box=994,299,126,40]: 79 | 80
+        - generic [box=1120,303,544,32]: secondary follows
+    - button "Secondary" [pressed] [box=429,332,184,96]:
+      - generic [box=477,341,88,23]: Secondary
+    - generic [box=625,332,412,96]:
+      - heading "Secondary Mode" [level=2] [box=638,345,386,26]
+      - generic [box=638,379,386,66]:
+        - button "Previous secondary mode" [box=638,379,82,66]: "-"
+        - generic [box=728,379,206,66]
+        - button "Next secondary mode" [box=942,379,82,66]: +
+    - generic [box=429,440,608,88]:
+      - generic [box=444,468,150,32]: Sec Photons
+      - slider "Secondary photons" [box=606,456,332,56]: "52"
+      - status [box=950,468,72,32]: "0.52"
+    - generic [box=429,540,608,108]:
+      - heading "Secondary Feel" [level=2] [box=442,553,582,26]
+      - group "Secondary feel" [box=442,593,582,76]:
+        - button "Soft" [box=442,593,189,76]
+        - button "Match" [pressed] [box=639,593,189,76]
+        - button "Wide" [box=835,593,189,76]
+    - generic [box=1049,332,636,96]:
+      - heading "EdgeMixer" [level=2] [box=1062,345,610,26]
+      - group "EdgeMixer mode" [box=1062,385,610,76]:
+        - button "Off" [box=1062,385,198,76]
+        - button "Assist" [pressed] [box=1268,385,198,76]
+        - button "Lock" [box=1474,385,198,76]
+    - generic [box=1049,440,636,88]:
+      - generic [box=1064,459,606,66]:
+        - button "Decrease EdgeMixer strength" [box=1064,459,82,66]: "-"
+        - generic [box=1154,459,426,66]
+        - button "Increase EdgeMixer strength" [box=1588,459,82,66]: +
+    - generic [box=1049,540,308,108]:
+      - heading "Palette" [level=2] [box=1062,553,282,26]
+      - button "Cycle" [box=1062,613,282,48]
+    - generic [box=1377,540,308,108]:
+      - heading "Safe Mix" [level=2] [box=1390,553,282,26]
+      - button "Reset mix only" [box=1390,591,282,58]
+  - region "Diagnostics and recovery" [box=429,120,1256,528]:
+    - generic [box=429,120,1256,256]:
+      - generic [box=441,132,299,232]:
+        - heading "Transport" [level=2] [box=458,149,265,22]
+        - strong [box=458,189,265,34]: API needed
+        - paragraph [box=458,239,265,43]: No live wireless or WebSocket state is claimed by this prototype.
+      - generic [box=752,132,299,232]:
+        - heading "Firmware" [level=2] [box=769,149,265,22]
+        - strong [box=769,189,265,34]: SB control seam
+        - paragraph [box=769,239,265,43]: Mode and parameter endpoints still need implementation.
+      - generic [box=1063,132,299,232]:
+        - heading "Render" [level=2] [box=1080,149,265,22]
+        - strong [box=1080,189,265,34]: 100 FPS target
+        - paragraph [box=1080,239,265,43]: Displayed as product target, not live measurement.
+      - generic [box=1374,132,299,232]:
+        - heading "Controller" [level=2] [box=1391,149,265,22]
+        - strong [box=1391,189,265,34]: Tab5 touch
+        - paragraph [box=1391,239,265,43]: Touch targets use 72 px floor with larger primary controls.
+    - generic [box=429,388,608,260]:
+      - heading "Audio Detail" [level=2] [box=446,405,574,26]
+      - generic [box=446,447,574,210]:
+        - generic [box=446,447,574,34]
+        - generic [box=446,491,574,34]
+        - generic [box=446,535,574,34]
+        - generic [box=446,579,574,34]
+        - generic [box=446,623,574,34]
+    - generic [box=1049,388,636,260]:
+      - heading "Recovery" [level=2] [box=1066,405,602,26]
+      - generic [box=1066,447,602,78]:
+        - generic [box=1066,447,602,34]
+        - generic [box=1066,491,602,34]
+      - generic [box=1066,541,602,164]:
+        - button "Arm noise cal" [box=1066,541,295,76]
+        - button "Confirm" [disabled] [box=1373,541,295,76]
+        - button "Cancel" [box=1066,629,295,76]
+        - button "Settings" [box=1373,629,295,76]
+  - region "Controller settings" [box=429,120,1256,528]:
+    - generic [box=429,120,608,120]:
+      - heading "Display" [level=2] [box=444,135,578,26]
+      - generic [box=444,175,578,56]:
+        - generic [box=444,192,210,23]: Brightness
+        - slider "Tab5 display brightness" [box=668,175,258,56]: "82"
+        - status [box=940,193,82,21]: "0.82"
+    - generic [box=1049,120,636,120]:
+      - heading "Audio Feedback" [level=2] [box=1064,135,606,26]
+      - generic [box=1064,175,606,64]:
+        - button "On" [pressed] [box=1064,175,210,64]
+        - slider "UI feedback volume" [box=1288,179,286,56]: "42"
+        - status [box=1588,197,82,21]: "0.42"
+    - generic [box=429,252,608,120]:
+      - heading "Touch Feedback" [level=2] [box=444,267,578,26]
+      - group "Touch feedback" [box=444,307,578,76]:
+        - button "Off" [box=444,307,187,76]
+        - button "Subtle" [pressed] [box=639,307,187,76]
+        - button "Strong" [box=835,307,187,76]
+    - generic [box=1049,252,636,120]:
+      - heading "Command Ack" [level=2] [box=1064,267,606,26]
+      - group "Command acknowledgement" [box=1064,307,606,76]:
+        - button "Quiet" [box=1064,307,197,76]
+        - button "Normal" [pressed] [box=1269,307,197,76]
+        - button "Strong" [box=1473,307,197,76]
+    - generic [box=429,384,1256,144]:
+      - heading "Controller Profiles" [level=2] [box=444,399,1226,26]
+      - generic [box=444,437,1226,82]:
+        - button "Slot 1 show" [box=444,437,298,82]
+        - button "Slot 2 studio" [box=754,437,298,82]
+        - button "Slot 3 empty" [box=1063,437,298,82]
+        - button "Slot 4 empty" [box=1373,437,298,82]
+    - generic [box=429,540,1256,108]:
+      - heading "Network" [level=2] [box=446,557,1222,26]
+      - generic [box=446,593,1222,58]:
+        - strong [box=446,608,280,29]: K1 is AP-only
+        - generic [box=744,610,646,24]: Network picker and password saving are not in the SB MVP until the control transport exists.
+        - generic [box=1408,610,260,24]: "status: read-only"
+  - generic "Persistent footer navigation" [ref=e76] [box=429,654,1256,72]:
+    - button "Show" [ref=e77] [cursor=pointer] [box=439,664,320,52]
+    - generic "K1 Pulse compact audio status" [ref=e78] [box=767,664,580,52]:
+      - strong [ref=e79] [box=786,675,140,31]: K1 Pulse
+      - generic [ref=e80] [box=936,680,246,20]: sim audio · no live K1 telemetry claimed
+      - emphasis [ref=e81] [box=1192,679,136,22]: 127 BPM
+    - button "Diagnostics" [ref=e82] [cursor=pointer] [box=1355,664,320,52]
+  - status [box=1237,610,436,40]

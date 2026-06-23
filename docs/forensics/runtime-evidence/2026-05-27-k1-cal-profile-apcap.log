@@ -1,0 +1,19 @@
+#CMD :ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+#CMD :ap_capture=1000
+sbr{{
+AP_CAPTURE: armed 1000 ms
+}}
+[APCAP] frames=134 max_raw=393/1243 peak_scaled=0.428/0.826 follower_mean=819.9 spec_argmax=19 chroma_mean=0.4612 silence=0 SSL=203 DC=-4805 cal_source=config cal_valid=1
+#CMD :diag=status
+sbr{{
+DIAG: frozen
+DIAG_RECORDS: count=6 capacity=64 high_water=6
+DIAG_COUNTERS: captured=6 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+CAL_SOURCE: config
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 1
+}}

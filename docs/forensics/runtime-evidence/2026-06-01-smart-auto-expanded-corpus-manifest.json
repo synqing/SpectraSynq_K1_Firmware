@@ -1,0 +1,102 @@
+{
+  "created_at": "2026-06-01T21:11:46+08:00",
+  "purpose": "Smart Auto expanded product A/B validation corpus",
+  "source_directory": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs",
+  "selection_notes": [
+    "No audio playback was used during corpus prep.",
+    "All file paths were checked with ffprobe for duration bounds.",
+    "The three previously used Smart Auto product A/B windows are retained as anchors."
+  ],
+  "clips": [
+    {
+      "id": "steady-groove-regard-late",
+      "coverage": "steady groove",
+      "track": "Regard_Ride_It.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Regard_Ride_It.mp3",
+      "start": 125,
+      "duration": 25,
+      "window": "125s-150s",
+      "reason": "Existing anchor window for stable four-on-floor groove behaviour."
+    },
+    {
+      "id": "steady-groove-lavern-mid",
+      "coverage": "steady groove",
+      "track": "Lavern_InMyMind.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Lavern_InMyMind.mp3",
+      "start": 45,
+      "duration": 25,
+      "window": "45s-70s",
+      "reason": "Adds a second steady-groove track so the gate is not overfit to Regard."
+    },
+    {
+      "id": "drop-heavy-shelter-main",
+      "coverage": "drop-heavy",
+      "track": "Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "start": 75,
+      "duration": 25,
+      "window": "75s-100s",
+      "reason": "Existing anchor window that previously exposed high switch pressure."
+    },
+    {
+      "id": "drop-heavy-touchme-late",
+      "coverage": "drop-heavy",
+      "track": "Ian Asher - Touch Me.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Ian Asher - Touch Me.mp3",
+      "start": 96,
+      "duration": 25,
+      "window": "96s-121s",
+      "reason": "Second drop/chorus-pressure window from a different source track."
+    },
+    {
+      "id": "sparse-build-carte-early",
+      "coverage": "sparse/build",
+      "track": "Carte-Blanche-Mixed.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Carte-Blanche-Mixed.mp3",
+      "start": 20,
+      "duration": 25,
+      "window": "20s-45s",
+      "reason": "Existing anchor window for breakdown-to-build behaviour."
+    },
+    {
+      "id": "sparse-build-shelter-early",
+      "coverage": "sparse/build",
+      "track": "Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3",
+      "start": 10,
+      "duration": 25,
+      "window": "10s-35s",
+      "reason": "Early structural contrast against the later Shelter drop-heavy anchor."
+    },
+    {
+      "id": "vocal-chorus-touchme-mid",
+      "coverage": "vocal/chorus",
+      "track": "Ian Asher - Touch Me.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Ian Asher - Touch Me.mp3",
+      "start": 48,
+      "duration": 25,
+      "window": "48s-73s",
+      "reason": "Checks whether Auto preserves vocal/chorus readability without arbitrary visual churn."
+    },
+    {
+      "id": "vocal-chorus-lavern-late",
+      "coverage": "vocal/chorus",
+      "track": "Lavern_InMyMind.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Lavern_InMyMind.mp3",
+      "start": 70,
+      "duration": 25,
+      "window": "70s-95s",
+      "reason": "Second vocal/chorus-style window with different production density."
+    },
+    {
+      "id": "high-density-carte-finale",
+      "coverage": "high-density",
+      "track": "Carte-Blanche-Mixed.mp3",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/AceStep-Eval/Songs/Carte-Blanche-Mixed.mp3",
+      "start": 55,
+      "duration": 25,
+      "window": "55s-80s",
+      "reason": "Late high-density stress window within the shortest available track."
+    }
+  ]
+}

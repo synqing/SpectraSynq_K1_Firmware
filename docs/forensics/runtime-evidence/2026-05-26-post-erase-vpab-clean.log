@@ -1,0 +1,220 @@
+#CMD :ap_stream=false
+sbr{{
+AP_STREAM: off
+}}
+#CMD :vp_stream=false
+sbr{{
+VP_STREAM: off
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=0,smode=3,sec=1,acq_us=516/516,vu_us=46/46,gdft_us=5131/5131,smooth_us=118/118,pri_render_us=761/761,sec_render_us=1462/1462,pri_prep_us=162/162,sec_prep_us=50/50,quant_pri_us=109/109,quant_sec_us=98/98,show_us=1595/1595,frame_us=4404/4404,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=2,mode=0,smode=3,sec=1,acq_us=2192/6629,vu_us=36/52,gdft_us=4697/6227,smooth_us=120/254,pri_render_us=803/1739,sec_render_us=1030/2280,pri_prep_us=176/1141,sec_prep_us=44/117,quant_pri_us=87/1088,quant_sec_us=83/1078,show_us=1345/4152,frame_us=3768/5846,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=3,mode=0,smode=3,sec=1,acq_us=2213/8227,vu_us=37/56,gdft_us=4698/6227,smooth_us=120/254,pri_render_us=801/1754,sec_render_us=1030/2280,pri_prep_us=174/1160,sec_prep_us=44/120,quant_pri_us=88/1094,quant_sec_us=83/1078,show_us=1351/5740,frame_us=3775/7458,over=0,dropped=0,heap=206776
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 3
+VP_PERF_FRAME: avg=3777 max=7458 over=0 dropped=0
+VP_PERF_HEAP: 206776
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=0,smode=3,sec=1,acq_us=589/589,vu_us=48/48,gdft_us=5061/5061,smooth_us=111/111,pri_render_us=703/703,sec_render_us=1357/1357,pri_prep_us=89/89,sec_prep_us=31/31,quant_pri_us=58/58,quant_sec_us=57/57,show_us=548/548,frame_us=4012/4012,over=0,dropped=0,heap=206776
+#CMD :vpab=start,60,metrics
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+VPF,ver=1,seq=2,mode=0,smode=3,sec=1,acq_us=2382/7505,vu_us=34/56,gdft_us=4392/6290,smooth_us=121/1109,pri_render_us=847/1746,sec_render_us=971/2363,pri_prep_us=731/1839,sec_prep_us=46/1040,quant_pri_us=106/1079,quant_sec_us=80/890,show_us=1330/4084,frame_us=4315/6369,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=3,mode=0,smode=3,sec=1,acq_us=2501/7544,vu_us=33/56,gdft_us=4322/6290,smooth_us=120/1132,pri_render_us=833/1762,sec_render_us=932/2363,pri_prep_us=891/1839,sec_prep_us=51/1050,quant_pri_us=99/1079,quant_sec_us=79/938,show_us=1331/4130,frame_us=4430/6488,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=4,mode=0,smode=3,sec=1,acq_us=2519/7544,vu_us=32/56,gdft_us=4317/6290,smooth_us=118/1132,pri_render_us=846/1762,sec_render_us=957/2363,pri_prep_us=933/1839,sec_prep_us=51/1052,quant_pri_us=93/1079,quant_sec_us=79/1074,show_us=1307/4130,frame_us=4478/6488,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=5,mode=0,smode=3,sec=1,acq_us=2533/7544,vu_us=32/56,gdft_us=4327/6479,smooth_us=116/1132,pri_render_us=865/1762,sec_render_us=989/2363,pri_prep_us=946/1839,sec_prep_us=49/1052,quant_pri_us=89/1089,quant_sec_us=77/1074,show_us=1292/4130,frame_us=4516/6488,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=6,mode=0,smode=3,sec=1,acq_us=2552/7544,vu_us=32/56,gdft_us=4307/6479,smooth_us=115/1132,pri_render_us=836/1762,sec_render_us=971/2363,pri_prep_us=965/1839,sec_prep_us=47/1052,quant_pri_us=88/1089,quant_sec_us=75/1074,show_us=1319/4130,frame_us=4508/6488,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=7,mode=0,smode=3,sec=1,acq_us=2574/7544,vu_us=32/56,gdft_us=4298/6479,smooth_us=115/1132,pri_render_us=839/1762,sec_render_us=970/2364,pri_prep_us=970/1843,sec_prep_us=54/1058,quant_pri_us=87/1089,quant_sec_us=74/1074,show_us=1321/4130,frame_us=4522/6488,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=8,mode=0,smode=3,sec=1,acq_us=2573/7544,vu_us=32/56,gdft_us=4307/6479,smooth_us=115/1132,pri_render_us=847/1762,sec_render_us=980/2365,pri_prep_us=974/1843,sec_prep_us=51/1058,quant_pri_us=87/1089,quant_sec_us=73/1074,show_us=1309/4130,frame_us=4531/6488,over=0,dropped=0,heap=206776
+#CMD :vpab=stop
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 18
+VPAB_FRAME: 1139
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=36 dropped=0 high_water=36 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 8
+VP_PERF_FRAME: avg=4469 max=6488 over=0 dropped=0
+VP_PERF_HEAP: 206776
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=60,t_ms=86986,dt_ms=0.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1840,energy_b=1840,energy_delta_pct=0.00,com_a=79.59,com_b=79.59,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1243,quant_us=100,show_us=1329,frame_us=4146,over=0,dropped=0,heap=0,pre_energy=1736,brightness_energy=1736,source_energy=1736,scaled_energy=1736,final_energy=1840
+VPAB,ver=1,seq=2,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=60,t_ms=86986,dt_ms=0.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=204,energy_b=204,energy_delta_pct=0.00,com_a=79.12,com_b=79.12,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1243,quant_us=90,show_us=1329,frame_us=4146,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=204
+VPAB,ver=1,seq=3,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=87349,dt_ms=362.91,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=26046,energy_b=26046,energy_delta_pct=0.00,com_a=79.51,com_b=79.51,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2310,quant_us=57,show_us=1338,frame_us=4326,over=0,dropped=0,heap=0,pre_energy=26126,brightness_energy=26126,source_energy=26126,scaled_energy=26126,final_energy=26046
+VPAB,ver=1,seq=4,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=87349,dt_ms=362.91,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1035,energy_b=1035,energy_delta_pct=0.00,com_a=79.39,com_b=79.39,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2310,quant_us=53,show_us=1338,frame_us=4326,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=1035
+VPAB,ver=1,seq=5,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=180,t_ms=87706,dt_ms=357.12,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=19566,energy_b=19566,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1327,quant_us=86,show_us=1314,frame_us=4359,over=0,dropped=0,heap=0,pre_energy=19586,brightness_energy=19586,source_energy=19586,scaled_energy=19586,final_energy=19566
+VPAB,ver=1,seq=6,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=180,t_ms=87707,dt_ms=357.12,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=501,energy_b=501,energy_delta_pct=0.00,com_a=79.41,com_b=79.41,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1327,quant_us=82,show_us=1314,frame_us=4359,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=501
+VPAB,ver=1,seq=7,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=88066,dt_ms=359.99,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1968,energy_b=1968,energy_delta_pct=0.00,com_a=79.60,com_b=79.60,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1270,quant_us=85,show_us=1327,frame_us=4388,over=0,dropped=0,heap=0,pre_energy=1854,brightness_energy=1854,source_energy=1854,scaled_energy=1854,final_energy=1968
+VPAB,ver=1,seq=8,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=88066,dt_ms=359.99,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=71,energy_b=71,energy_delta_pct=0.00,com_a=79.14,com_b=79.14,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1270,quant_us=83,show_us=1327,frame_us=4388,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=71
+VPAB,ver=1,seq=9,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=300,t_ms=88428,dt_ms=361.83,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=2420,energy_b=2420,energy_delta_pct=0.00,com_a=79.45,com_b=79.45,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2222,quant_us=56,show_us=1327,frame_us=4436,over=0,dropped=0,heap=0,pre_energy=2328,brightness_energy=2328,source_energy=2328,scaled_energy=2328,final_energy=2420
+VPAB,ver=1,seq=10,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=300,t_ms=88428,dt_ms=361.83,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2222,quant_us=60,show_us=1327,frame_us=4436,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=11,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=88784,dt_ms=356.28,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=4802,energy_b=4802,energy_delta_pct=0.00,com_a=79.52,com_b=79.52,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1296,quant_us=107,show_us=1314,frame_us=4442,over=0,dropped=0,heap=0,pre_energy=4728,brightness_energy=4728,source_energy=4728,scaled_energy=4728,final_energy=4802
+VPAB,ver=1,seq=12,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=88785,dt_ms=356.28,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1296,quant_us=97,show_us=1314,frame_us=4442,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=13,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=420,t_ms=89144,dt_ms=359.93,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3316,energy_b=3316,energy_delta_pct=0.00,com_a=79.46,com_b=79.46,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1276,quant_us=87,show_us=1310,frame_us=4468,over=0,dropped=0,heap=0,pre_energy=3210,brightness_energy=3210,source_energy=3210,scaled_energy=3210,final_energy=3316
+VPAB,ver=1,seq=14,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=420,t_ms=89145,dt_ms=359.93,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1276,quant_us=84,show_us=1310,frame_us=4468,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=15,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=480,t_ms=89504,dt_ms=360.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=2968,energy_b=2968,energy_delta_pct=0.00,com_a=79.41,com_b=79.41,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1264,quant_us=87,show_us=1299,frame_us=4484,over=0,dropped=0,heap=0,pre_energy=2872,brightness_energy=2872,source_energy=2872,scaled_energy=2872,final_energy=2968
+VPAB,ver=1,seq=16,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=480,t_ms=89505,dt_ms=360.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1264,quant_us=88,show_us=1299,frame_us=4484,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=17,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=540,t_ms=89864,dt_ms=359.97,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3831,energy_b=3831,energy_delta_pct=0.00,com_a=79.51,com_b=79.51,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1267,quant_us=91,show_us=1295,frame_us=4501,over=0,dropped=0,heap=0,pre_energy=3724,brightness_energy=3724,source_energy=3724,scaled_energy=3724,final_energy=3831
+VPAB,ver=1,seq=18,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=540,t_ms=89865,dt_ms=359.97,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1267,quant_us=88,show_us=1295,frame_us=4501,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=19,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=600,t_ms=90224,dt_ms=360.07,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6527,energy_b=6527,energy_delta_pct=0.00,com_a=79.56,com_b=79.56,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1302,quant_us=108,show_us=1294,frame_us=4514,over=0,dropped=0,heap=0,pre_energy=6468,brightness_energy=6468,source_energy=6468,scaled_energy=6468,final_energy=6527
+VPAB,ver=1,seq=20,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=600,t_ms=90225,dt_ms=360.07,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1302,quant_us=98,show_us=1294,frame_us=4514,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=21,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=660,t_ms=90583,dt_ms=359.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5581,energy_b=5581,energy_delta_pct=0.00,com_a=79.52,com_b=79.52,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1313,quant_us=101,show_us=1290,frame_us=4513,over=0,dropped=0,heap=0,pre_energy=5512,brightness_energy=5512,source_energy=5512,scaled_energy=5512,final_energy=5581
+VPAB,ver=1,seq=22,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=660,t_ms=90584,dt_ms=359.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1313,quant_us=99,show_us=1290,frame_us=4513,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=23,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=720,t_ms=90943,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6487,energy_b=6487,energy_delta_pct=0.00,com_a=79.46,com_b=79.46,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1324,quant_us=96,show_us=1307,frame_us=4511,over=0,dropped=0,heap=0,pre_energy=6422,brightness_energy=6422,source_energy=6422,scaled_energy=6422,final_energy=6487
+VPAB,ver=1,seq=24,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=720,t_ms=90944,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1324,quant_us=98,show_us=1307,frame_us=4511,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=25,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=780,t_ms=91303,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=23289,energy_b=23289,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1313,quant_us=89,show_us=1318,frame_us=4508,over=0,dropped=0,heap=0,pre_energy=23364,brightness_energy=23364,source_energy=23364,scaled_energy=23364,final_energy=23289
+VPAB,ver=1,seq=26,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=780,t_ms=91304,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=65,energy_b=65,energy_delta_pct=0.00,com_a=80.20,com_b=80.20,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1313,quant_us=97,show_us=1318,frame_us=4508,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=65
+VPAB,ver=1,seq=27,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=840,t_ms=91664,dt_ms=360.96,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=2619,energy_b=2619,energy_delta_pct=0.00,com_a=79.66,com_b=79.66,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1330,quant_us=106,show_us=1319,frame_us=4520,over=0,dropped=0,heap=0,pre_energy=2532,brightness_energy=2532,source_energy=2532,scaled_energy=2532,final_energy=2619
+VPAB,ver=1,seq=28,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=840,t_ms=91666,dt_ms=360.96,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=4,energy_b=4,energy_delta_pct=0.00,com_a=80.00,com_b=80.00,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1330,quant_us=91,show_us=1319,frame_us=4520,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=4
+VPAB,ver=1,seq=29,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=900,t_ms=92024,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1829,energy_b=1829,energy_delta_pct=0.00,com_a=79.66,com_b=79.66,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1360,quant_us=91,show_us=1316,frame_us=4527,over=0,dropped=0,heap=0,pre_energy=1722,brightness_energy=1722,source_energy=1722,scaled_energy=1722,final_energy=1829
+VPAB,ver=1,seq=30,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=900,t_ms=92024,dt_ms=360.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1360,quant_us=87,show_us=1316,frame_us=4527,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=31,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=960,t_ms=92386,dt_ms=360.38,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=11617,energy_b=11617,energy_delta_pct=0.00,com_a=79.48,com_b=79.48,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1403,quant_us=107,show_us=1320,frame_us=4525,over=0,dropped=0,heap=0,pre_energy=11580,brightness_energy=11580,source_energy=11580,scaled_energy=11580,final_energy=11617
+VPAB,ver=1,seq=32,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=960,t_ms=92386,dt_ms=360.38,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=14,energy_b=14,energy_delta_pct=0.00,com_a=79.57,com_b=79.57,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1403,quant_us=87,show_us=1320,frame_us=4525,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=14
+VPAB,ver=1,seq=33,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1020,t_ms=92742,dt_ms=357.24,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3413,energy_b=3413,energy_delta_pct=0.00,com_a=79.60,com_b=79.60,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1444,quant_us=100,show_us=1312,frame_us=4522,over=0,dropped=0,heap=0,pre_energy=3326,brightness_energy=3326,source_energy=3326,scaled_energy=3326,final_energy=3413
+VPAB,ver=1,seq=34,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1020,t_ms=92742,dt_ms=357.24,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1444,quant_us=91,show_us=1312,frame_us=4522,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+VPAB,ver=1,seq=35,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1080,t_ms=93102,dt_ms=360.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3598,energy_b=3598,energy_delta_pct=0.00,com_a=79.44,com_b=79.44,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1445,quant_us=107,show_us=1311,frame_us=4529,over=0,dropped=0,heap=0,pre_energy=3520,brightness_energy=3520,source_energy=3520,scaled_energy=3520,final_energy=3598
+VPAB,ver=1,seq=36,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1080,t_ms=93102,dt_ms=360.01,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1445,quant_us=101,show_us=1311,frame_us=4529,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=0
+sbr{{
+VPAB_DUMP: rows=36 records=36 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=reset
+sbr{{
+VP_PERF: reset
+}}
+#CMD :vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=0,smode=3,sec=1,acq_us=1551/1551,vu_us=52/52,gdft_us=4963/4963,smooth_us=115/115,pri_render_us=47936600/95872510,sec_render_us=514/514,pri_prep_us=1124/1124,sec_prep_us=31/32,quant_pri_us=63/68,quant_sec_us=57/64,show_us=549/549,frame_us=4173/4173,over=0,dropped=0,heap=206776
+#CMD :vpab=start,120,bytes
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 120
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+VPF,ver=1,seq=2,mode=0,smode=3,sec=1,acq_us=2346/7229,vu_us=34/58,gdft_us=4436/6222,smooth_us=130/1142,pri_render_us=545525/95872510,sec_render_us=991/2385,pri_prep_us=719/1816,sec_prep_us=74/1080,quant_pri_us=81/1066,quant_sec_us=83/1104,show_us=1209/3766,frame_us=4182/5881,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=3,mode=0,smode=3,sec=1,acq_us=2340/7229,vu_us=33/58,gdft_us=4461/6222,smooth_us=122/1142,pri_render_us=277901/95872510,sec_render_us=964/2385,pri_prep_us=889/1839,sec_prep_us=74/1080,quant_pri_us=78/1113,quant_sec_us=79/1104,show_us=1195/3766,frame_us=4300/6153,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=4,mode=0,smode=3,sec=1,acq_us=2392/7229,vu_us=34/58,gdft_us=4428/6222,smooth_us=119/1142,pri_render_us=187368/95872510,sec_render_us=980/2385,pri_prep_us=945/1839,sec_prep_us=64/1080,quant_pri_us=78/1113,quant_sec_us=77/1104,show_us=1196/3766,frame_us=4390/6153,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=5,mode=0,smode=3,sec=1,acq_us=2387/7229,vu_us=34/58,gdft_us=4430/6222,smooth_us=117/1142,pri_render_us=141224/95872510,sec_render_us=986/2385,pri_prep_us=965/1839,sec_prep_us=61/1080,quant_pri_us=77/1113,quant_sec_us=78/1104,show_us=1182/3766,frame_us=4405/6153,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=6,mode=0,smode=3,sec=1,acq_us=2406/7229,vu_us=34/58,gdft_us=4400/6222,smooth_us=116/1142,pri_render_us=113632/95872510,sec_render_us=987/2385,pri_prep_us=970/1849,sec_prep_us=61/1080,quant_pri_us=78/1113,quant_sec_us=77/1104,show_us=1205/3766,frame_us=4422/6153,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=7,mode=0,smode=3,sec=1,acq_us=2400/7229,vu_us=34/58,gdft_us=4408/6222,smooth_us=115/1142,pri_render_us=94649/95872510,sec_render_us=990/2385,pri_prep_us=981/1849,sec_prep_us=65/1081,quant_pri_us=77/1113,quant_sec_us=78/1104,show_us=1184/3766,frame_us=4415/6153,over=0,dropped=0,heap=206776
+VPF,ver=1,seq=8,mode=0,smode=3,sec=1,acq_us=2388/7229,vu_us=34/58,gdft_us=4423/6222,smooth_us=115/1142,pri_render_us=81340/95872510,sec_render_us=996/2389,pri_prep_us=984/1849,sec_prep_us=61/1081,quant_pri_us=79/1113,quant_sec_us=77/1104,show_us=1185/3766,frame_us=4425/6153,over=0,dropped=0,heap=206776
+#CMD :vpab=stop
+sbr{{
+VPAB: frozen
+VPAB_SEQ: 9
+VPAB_FRAME: 1146
+VPAB_EVERY_N: 120
+VPAB_MODE: bytes
+VPAB_RECORDS: captured=18 dropped=0 high_water=18 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 8
+VP_PERF_FRAME: avg=4387 max=6153 over=0 dropped=0
+VP_PERF_HEAP: 206776
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=96918,dt_ms=0.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=9122,energy_b=9122,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2244,quant_us=57,show_us=1195,frame_us=4175,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=9122
+VPAB,ver=1,seq=2,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=120,t_ms=96918,dt_ms=0.00,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=4722,energy_b=4722,energy_delta_pct=0.00,com_a=79.55,com_b=79.55,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2244,quant_us=57,show_us=1195,frame_us=4175,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=4722
+VPAB,ver=1,seq=3,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=97629,dt_ms=711.37,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5599,energy_b=5599,energy_delta_pct=0.00,com_a=79.52,com_b=79.52,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2332,quant_us=58,show_us=1194,frame_us=4277,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=5599
+VPAB,ver=1,seq=4,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=240,t_ms=97629,dt_ms=711.37,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=329,energy_b=329,energy_delta_pct=0.00,com_a=80.08,com_b=80.08,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2332,quant_us=57,show_us=1194,frame_us=4277,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=329
+VPAB,ver=1,seq=5,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=98346,dt_ms=717.17,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=7113,energy_b=7113,energy_delta_pct=0.00,com_a=79.44,com_b=79.44,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=3086,quant_us=58,show_us=1183,frame_us=4343,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=7113
+VPAB,ver=1,seq=6,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=360,t_ms=98346,dt_ms=717.17,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=774,energy_b=774,energy_delta_pct=0.00,com_a=79.37,com_b=79.37,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=3086,quant_us=56,show_us=1183,frame_us=4343,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=774
+VPAB,ver=1,seq=7,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=480,t_ms=99063,dt_ms=716.51,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6189,energy_b=6189,energy_delta_pct=0.00,com_a=79.51,com_b=79.51,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2310,quant_us=57,show_us=1195,frame_us=4399,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=6189
+VPAB,ver=1,seq=8,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=480,t_ms=99063,dt_ms=716.51,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=484,energy_b=484,energy_delta_pct=0.00,com_a=79.69,com_b=79.69,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2310,quant_us=60,show_us=1195,frame_us=4399,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=484
+VPAB,ver=1,seq=9,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=600,t_ms=99777,dt_ms=713.69,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5147,energy_b=5147,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1935,quant_us=64,show_us=1187,frame_us=4407,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=5147
+VPAB,ver=1,seq=10,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=600,t_ms=99777,dt_ms=713.69,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1525,energy_b=1525,energy_delta_pct=0.00,com_a=79.42,com_b=79.42,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1935,quant_us=54,show_us=1187,frame_us=4407,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=1525
+VPAB,ver=1,seq=11,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=720,t_ms=100496,dt_ms=719.96,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6824,energy_b=6824,energy_delta_pct=0.00,com_a=79.47,com_b=79.47,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2223,quant_us=56,show_us=1192,frame_us=4419,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=6824
+VPAB,ver=1,seq=12,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=720,t_ms=100496,dt_ms=719.96,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=1358,energy_b=1358,energy_delta_pct=0.00,com_a=79.47,com_b=79.47,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2223,quant_us=50,show_us=1192,frame_us=4419,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=1358
+VPAB,ver=1,seq=13,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=840,t_ms=101203,dt_ms=706.02,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=7104,energy_b=7104,energy_delta_pct=0.00,com_a=79.45,com_b=79.45,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1338,quant_us=88,show_us=1193,frame_us=4414,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=7104
+VPAB,ver=1,seq=14,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=840,t_ms=101203,dt_ms=706.02,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=3332,energy_b=3332,energy_delta_pct=0.00,com_a=79.46,com_b=79.46,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1338,quant_us=82,show_us=1193,frame_us=4414,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=3332
+VPAB,ver=1,seq=15,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=960,t_ms=101908,dt_ms=705.18,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=5791,energy_b=5791,energy_delta_pct=0.00,com_a=79.55,com_b=79.55,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2266,quant_us=58,show_us=1184,frame_us=4415,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=5791
+VPAB,ver=1,seq=16,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=960,t_ms=101908,dt_ms=705.18,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=2404,energy_b=2404,energy_delta_pct=0.00,com_a=79.48,com_b=79.48,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2266,quant_us=68,show_us=1184,frame_us=4415,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=2404
+VPAB,ver=1,seq=17,mode=0,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1080,t_ms=102624,dt_ms=716.49,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=6020,energy_b=6020,energy_delta_pct=0.00,com_a=79.55,com_b=79.55,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2343,quant_us=58,show_us=1178,frame_us=4423,over=0,dropped=0,heap=0,pre_energy=7566,brightness_energy=7566,source_energy=7566,scaled_energy=7566,final_energy=6020
+VPAB,ver=1,seq=18,mode=0,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1080,t_ms=102624,dt_ms=716.49,leds=160,truncated=0,dither_step=2,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=996,energy_b=996,energy_delta_pct=0.00,com_a=79.68,com_b=79.68,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2343,quant_us=56,show_us=1178,frame_us=4423,over=0,dropped=0,heap=0,pre_energy=0,brightness_energy=0,source_energy=0,scaled_energy=0,final_energy=996
+sbr{{
+VPAB_DUMP: rows=18 records=18 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :diag=status
+sbr{{
+DIAG: frozen
+DIAG_RECORDS: count=18 capacity=64 high_water=18
+DIAG_COUNTERS: captured=18 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+}}
+#CMD :stop
+SBOK

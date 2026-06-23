@@ -1,0 +1,47 @@
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :set_mode=3
+sbr{{
+CONFIG.LIGHTSHOW_MODE: 3
+}}
+#CMD :vp_status
+sbr{{
+VP_PROFILE: candidate
+VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+VP_STREAM: off
+AP_STREAM: off
+VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+VP_CHROMA: seq=39422 range=60 profile=0 gate_gain=1.0000 pre_max=0.2141 pre_mean=0.0916 norm_max=0.7358 norm_mean=0.3147 flatness=0.4211 final_max=0.6358 final_mean=0.2368
+VP_AGC: gain=1.1147 envelope=0.1987 floor=0.0010 gated=false
+VP_RENDER_US: last=2133 avg=1578 max=4023
+VPS,ver=1,prim_mode=3,prim_name=BLOOM,sec_mode=3,sec_name=BLOOM,prim_pal=2,sec_pal=0,prim_pal_en=1,sec_pal_en=0,active_chan=primary,rp_depth=-1,rp_source=live_config,fx_p_max=0.0100,fx_p_kal=3762.0125,fx_s_max=0.0100,fx_s_kal=0.0000
+}}
+#CMD :vpab=once
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 1
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=238957,dt_ms=0.00,leds=160,truncated=0,dither_step=0,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2192,quant_us=95,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=238958,dt_ms=0.00,leds=160,truncated=0,dither_step=0,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=400,energy_b=400,energy_delta_pct=0.00,com_a=79.28,com_b=79.28,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=2192,quant_us=104,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+sbr{{
+VPAB_DUMP: rows=2 records=2 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :stop
+SBOK

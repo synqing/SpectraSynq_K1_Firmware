@@ -1,0 +1,134 @@
+protocol: k1.ws
+version: 2
+version_compat: [1, 2]
+transport:
+  mode: wifi_ap
+  host: 192.168.4.1
+  port: 80
+  path: /ws
+auth:
+  token_field: token
+  default_build_token: k1-tab5
+  failure_code: auth
+limits:
+  max_rx_bytes: 768
+  max_tx_bytes: 1024
+  request_queue_depth: 8
+  max_requests_per_k1_loop_tick: 4
+freshness:
+  id_scope: websocket_client
+  id_encoding: unsigned decimal integer
+  rule: non-zero request ids must increase monotonically for the connected client
+  reset: tracker clears on WebSocket connect and disconnect
+  failure_code: replay
+client_requests:
+  - type: k1.hello
+    required_fields: [type, v, token]
+    optional_fields: [id]
+    response: k1.hello
+  - type: k1.state.get
+    required_fields: [type, v, id, token]
+    response: k1.state
+  - type: k1.capabilities.get
+    required_fields: [type, v, id, token]
+    response: k1.capabilities
+  - type: k1.control.set
+    required_fields: [type, v, id, token, control, value]
+    response: k1.control.result
+controls:
+  primary.mode:
+    value: integer
+    range: [0, NUM_MODES - 1]
+    behaviour: queues primary mode transition through the existing mode selector
+  primary.palette:
+    value: integer
+    range: [0, palette_count - 1]
+    behaviour: enables primary palette mode and persists the accepted value
+  primary.photons:
+    value: number
+    range: [0.05, 1.0]
+    behaviour: rejects out-of-range values; persists the accepted primary brightness energy
+  primary.chroma:
+    value: number
+    range: [0.0, 1.0]
+    behaviour: rejects out-of-range values; persists the accepted primary colour energy
+  primary.mood:
+    value: number
+    range: [0.0, 1.0]
+    behaviour: rejects out-of-range values; persists the accepted primary musical bias
+  secondary.mode:
+    value: integer
+    range: [0, NUM_MODES - 1]
+    behaviour: sets the secondary edge mode and enables the secondary edge
+  secondary.palette:
+    value: integer
+    range: [0, palette_count - 1]
+    behaviour: enables secondary palette mode
+  secondary.photons:
+    value: number
+    range: [0.0, 1.0]
+    behaviour: rejects out-of-range values; applies the accepted secondary brightness energy
+  secondary.chroma:
+    value: number
+    range: [0.0, 1.0]
+    behaviour: rejects out-of-range values; applies the accepted secondary colour energy
+  secondary.mood:
+    value: number
+    range: [0.0, 1.0]
+    behaviour: rejects out-of-range values; applies the accepted secondary musical bias
+  scene.smart:
+    value: string
+    accepted_values: [off, assist, l1, auto]
+    accepted_aliases:
+      off: [none]
+      assist: [control]
+      l1: [accent]
+      auto: [autonomy, demo]
+    behaviour: applies the same Smart Scene presets as the serial command path
+server_messages:
+  k1.hello:
+    fields: [type, v, id, ok, device, mode, token, limits, queued]
+    queued:
+      fields: [rx, tx, tx_dropped]
+  k1.capabilities:
+    fields: [type, v, id, ok, capabilities]
+    capabilities:
+      fields: [protocol, registry, control_count, tiers]
+  k1.state:
+    fields: [type, v, id, ok, seq, clients, queued, primary, secondary, scene, tempo]
+    queued:
+      fields: [rx, tx, tx_dropped]
+      tx_dropped: monotonic K1-side count of outbound frames that could not be queued
+    primary:
+      fields: [mode, palette, palette_mode, photons, chroma, mood, saturation, fps]
+      fps: measured K1 LED output frame rate for the primary strip, sourced from LED_FPS
+    secondary:
+      fields: [enabled, mode, palette, palette_mode, photons, chroma, mood, saturation, fps]
+      fps: measured K1 LED output frame rate for the secondary strip, sourced from LED_FPS
+    tempo:
+      fields: [bpm, locked]
+      bpm: detected K1 tempo in BPM, sourced from sb_tempo_read
+      locked: true when the K1 tempo tracker is phase/confidence locked
+  k1.control.result:
+    success_fields: [type, v, id, ok, control, value, seq]
+    error_fields: [type, v, id, ok, control, error]
+    semantics: control responses are correlated by id and control; Tab5 treats unmatched results as stale
+  k1.error:
+    fields: [type, v, id, ok, error]
+    semantics: generic protocol error for malformed hello/state/type/auth/queue failures outside an accepted control request
+errors:
+  size: payload size out of range
+  json: unsupported JSON payload
+  type: unsupported request type
+  version: unsupported protocol version
+  auth: control token rejected
+  id: request id required
+  control: control path required
+  unsupported: unsupported control
+  value: value required
+  number_required: number value required
+  text_required: text value required
+  finite_required: finite value required
+  range: value out of range
+  busy: K1 request queue full
+  replay: stale or replayed request id

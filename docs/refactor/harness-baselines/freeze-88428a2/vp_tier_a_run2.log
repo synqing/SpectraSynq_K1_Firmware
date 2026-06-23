@@ -1,0 +1,23 @@
+sbr{{
+VPO,ver=1,event=start
+VPO,ver=1,mode=0,name=GDFT,pal_a=39A2532D,pal_b=9820C4D5,manual_a=2C4CA54D,manual_b=2B3CB7CD,pal_energy=3772/3664,manual_energy=23240/10224,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=1,name=CHROMAGRAM,pal_a=8F168FFD,pal_b=FAA12A3D,manual_a=6D45F7D,manual_b=7F4128AD,pal_energy=2472/2052,manual_energy=13826/6102,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=2,name=CHROMAGRAM DOTS,pal_a=1F73F3B5,pal_b=14C53049,manual_a=13CD9FF9,manual_b=2AE5E385,pal_energy=29744/26916,manual_energy=69672/43658,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=3,name=BLOOM,pal_a=A670620D,pal_b=779BE6D1,manual_a=BA4B2469,manual_b=208DFC61,pal_energy=84/114,manual_energy=118/22,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=9,name=BLOOM (FAST),pal_a=A670620D,pal_b=779BE6D1,manual_a=BA4B2469,manual_b=208DFC61,pal_energy=84/114,manual_energy=118/22,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=10,name=VU,pal_a=620CF26D,pal_b=2C297DCD,manual_a=3C78DEC5,manual_b=673C0B85,pal_energy=15396/15386,manual_energy=91200/40800,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=7,name=WAVEFORM-FAST,pal_a=643B4AC5,pal_b=FC8F6AAD,manual_a=9A59BBFD,manual_b=D9407A41,pal_energy=94/108,manual_energy=436/194,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=8,name=WAVEFORM,pal_a=B8FAA569,pal_b=757DEFAD,manual_a=DABC8579,manual_b=12C2BF4D,pal_energy=122/164,manual_energy=1530/938,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=11,name=WAVEFORM_HYBRID,pal_a=2F0196E1,pal_b=7BE31359,manual_a=F91DC661,manual_b=5E6FD971,pal_energy=232/272,manual_energy=1124/492,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=4,name=VU DOT,pal_a=52037435,pal_b=64493EDD,manual_a=72A62569,manual_b=F018D9A1,pal_energy=480/160,manual_energy=1406/622,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=5,name=KALEIDOSCOPE,pal_a=4AAFDB65,pal_b=143EA12D,manual_a=6144BB25,manual_b=8A5B7949,pal_energy=1372/1588,manual_energy=9076/3954,palette_stable=0,manual_responsive=1,nondet=0
+VPO,ver=1,mode=6,name=QUANTUM COLLAPSE,pal_a=1CDB4599,pal_b=3F25E79D,manual_a=D9688F0D,manual_b=F76F97FD,pal_energy=1454/700,manual_energy=7952/3470,palette_stable=0,manual_responsive=1,nondet=1
+VPO,ver=1,event=end
+}}
+sbs((agc_debug=energy:0.03,0.03,0.03,0.03;gain:9.58,9.58,9.58,9.58;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:8.91,8.91,8.91,8.91;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:9.78,9.78,9.78,9.78;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:9.98,9.98,9.98,9.98;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:10.00,10.00,10.00,10.00;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:9.58,9.58,9.58,9.58;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+sbs((agc_debug=energy:0.02,0.02,0.02,0.02;gain:9.95,9.95,9.95,9.95;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))

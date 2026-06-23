@@ -1,0 +1,106 @@
+[
+  {
+    "label": "bench_k1",
+    "port": "/dev/cu.usbmodem12401",
+    "expected_chip": "B489A500",
+    "observed_chip": "B489A500",
+    "chip_match": true,
+    "expected_env": "k1_bench_reference",
+    "dump_cal_source": "config",
+    "dump_cal_valid": "1",
+    "dump_noise_reason": "none",
+    "dump_ssl_p50": "0.0",
+    "dump_ssl_p90": "0.0",
+    "ap_count": 48,
+    "ap_max_raw": {
+      "min": 239.0,
+      "max": 4820.0,
+      "mean": 819.75
+    },
+    "ap_peak_scaled": {
+      "min": 0.099,
+      "max": 2.6,
+      "mean": 0.5672708333333333
+    },
+    "ap_follower": {
+      "min": 354.0,
+      "max": 2952.0,
+      "mean": 914.2916666666666
+    },
+    "last_ap": "[AP] SSL=354 DC=-1124 max_raw=469 follower=354 peak_scaled=0.334 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=125.0 conf=0.96 lock=1 phase=1.00 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00",
+    "vp_chroma_last": {
+      "seq": "9276",
+      "range": "60",
+      "profile": "0",
+      "gate_gain": "1.0000",
+      "pre_max": "0.2022",
+      "pre_mean": "0.0360",
+      "norm_max": "0.5888",
+      "norm_mean": "0.1048",
+      "flatness": "0.4840",
+      "final_max": "0.4888",
+      "final_mean": "0.0810"
+    },
+    "vp_agc_last": {
+      "gain": "9.9997",
+      "envelope": "0.0043",
+      "floor": "0.0010",
+      "gated": "false"
+    },
+    "vp_lines": 33,
+    "log_path": "docs/forensics/runtime-evidence/20260615T010733-bench_k1-cu.usbmodem12401-paired-response-diagnosis.log",
+    "error": null
+  },
+  {
+    "label": "main_k1",
+    "port": "/dev/cu.usbmodem12201",
+    "expected_chip": "F887A500",
+    "observed_chip": "F887A500",
+    "chip_match": true,
+    "expected_env": "k1_hardware",
+    "dump_cal_source": "config",
+    "dump_cal_valid": "1",
+    "dump_noise_reason": "none",
+    "dump_ssl_p50": "0.0",
+    "dump_ssl_p90": "0.0",
+    "ap_count": 53,
+    "ap_max_raw": {
+      "min": 243.0,
+      "max": 3326.0,
+      "mean": 668.1509433962265
+    },
+    "ap_peak_scaled": {
+      "min": 0.097,
+      "max": 2.6,
+      "mean": 0.581754716981132
+    },
+    "ap_follower": {
+      "min": 319.0,
+      "max": 2668.0,
+      "mean": 761.188679245283
+    },
+    "last_ap": "[AP] SSL=319 DC=-5075 max_raw=547 follower=319 peak_scaled=0.746 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=78.0 conf=0.24 lock=0 phase=0.55 beat=0 bstr=0.38 | onset=0 bass=0 ostr=0.00",
+    "vp_chroma_last": {
+      "seq": "9247",
+      "range": "60",
+      "profile": "0",
+      "gate_gain": "0.0000",
+      "pre_max": "0.0000",
+      "pre_mean": "0.0000",
+      "norm_max": "0.0000",
+      "norm_mean": "0.0000",
+      "flatness": "0.0000",
+      "final_max": "0.0000",
+      "final_mean": "0.0000"
+    },
+    "vp_agc_last": {
+      "gain": "9.9882",
+      "envelope": "0.0000",
+      "floor": "0.0010",
+      "gated": "true"
+    },
+    "vp_lines": 33,
+    "log_path": "docs/forensics/runtime-evidence/20260615T010733-main_k1-cu.usbmodem12201-paired-response-diagnosis.log",
+    "error": null
+  }
+]

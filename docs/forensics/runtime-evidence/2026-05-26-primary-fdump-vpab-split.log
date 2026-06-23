@@ -1,0 +1,42 @@
+#CMD :vpab=reset
+sbr{{
+VPAB: stopped
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 60
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :frame_dump=energy,3,1200,30
+sbr{{
+[FDUMP] start metric=energy mode=3 dur=1200 every=30
+}}
+[FDUMP] mode=3 f=30 com=79.500 energy=17148 hash=9042e1b1 fps=186.2
+[FDUMP] mode=3 f=60 com=79.500 energy=16416 hash=25a9f6fd fps=182.8
+[FDUMP] mode=3 f=90 com=79.500 energy=17898 hash=5337fed9 fps=183.8
+[FDUMP] mode=3 f=120 com=79.500 energy=23010 hash=5d49a235 fps=183.2
+[FDUMP] mode=3 f=150 com=79.500 energy=11626 hash=a1c1739 fps=182.6
+[FDUMP] mode=3 f=180 com=79.500 energy=10436 hash=233421d1 fps=183.9
+[FDUMP] mode=3 f=210 com=79.500 energy=16650 hash=29ab961d fps=184.7
+[FDUMP] end
+#CMD :vpab=once
+sbr{{
+VPAB: running
+VPAB_SEQ: 0
+VPAB_FRAME: 0
+VPAB_EVERY_N: 1
+VPAB_MODE: metrics
+VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0
+VPAB_SCENARIO: self_shadow
+VPAB_SHADOW: self
+}}
+#CMD :vpab=dump
+VPAB,ver=1,seq=1,mode=3,channel=primary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=338041,dt_ms=0.00,leds=160,truncated=0,dither_step=0,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=0,energy_b=0,energy_delta_pct=0.00,com_a=79.50,com_b=79.50,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1181,quant_us=96,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+VPAB,ver=1,seq=2,mode=3,channel=secondary,scenario=self_shadow,shadow=self,memory_metrics=absent,frame=1,t_ms=338041,dt_ms=0.00,leds=160,truncated=0,dither_step=0,fastled_dither=0,mae8=0.000,p95_abs8=0,max_abs8=0,changed_led_pct=0.00,changed_channel_pct=0.00,energy_a=242,energy_b=242,energy_delta_pct=0.00,com_a=80.29,com_b=80.29,com_delta_leds=0.00,com_slope_delta_pct=0.00,hue_delta_p95=0,sat_delta_p95=0,white_bias_score=0.0000,flicker_score=0.0000,render_us=1181,quant_us=101,show_us=1392,frame_us=4584,over=0,dropped=0,heap=0
+sbr{{
+VPAB_DUMP: rows=2 records=2 dropped=0 corrupt=0 overflowed=0
+}}
+#CMD :stop
+SBOK

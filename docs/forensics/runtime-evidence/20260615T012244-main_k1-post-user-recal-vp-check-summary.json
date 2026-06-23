@@ -1,0 +1,48 @@
+{
+  "port": "/dev/cu.usbmodem12201",
+  "expected_chip": "F887A500",
+  "observed_chip": "F887A500",
+  "chip_match": true,
+  "cal_source": "config",
+  "cal_valid": "1",
+  "ssl": "154",
+  "dc": "-4746",
+  "noise_cal_reason": "none",
+  "noise_cal_ssl_p50": "0.0",
+  "noise_cal_ssl_p90": "0.0",
+  "ap_count": 32,
+  "ap_max_raw": {
+    "min": 286.0,
+    "max": 3364.0,
+    "mean": 561.46875
+  },
+  "ap_peak_scaled": {
+    "min": 0.18,
+    "max": 2.6,
+    "mean": 0.71384375
+  },
+  "last_ap": "[AP] SSL=154 DC=-4746 max_raw=306 follower=309 peak_scaled=0.546 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=68.0 conf=0.47 lock=0 phase=0.73 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00",
+  "vp_chroma_last": {
+    "seq": "6055",
+    "range": "60",
+    "profile": "0",
+    "gate_gain": "1.0000",
+    "pre_max": "0.4125",
+    "pre_mean": "0.2731",
+    "norm_max": "1.0300",
+    "norm_mean": "0.6818",
+    "flatness": "0.3482",
+    "final_max": "0.9300",
+    "final_mean": "0.5818"
+  },
+  "vp_agc_last": {
+    "gain": "0.7993",
+    "envelope": "0.3220",
+    "floor": "0.0010",
+    "gated": "false"
+  },
+  "vp_lines": 15,
+  "crash_markers": [],
+  "log_path": "docs/forensics/runtime-evidence/20260615T012244-main_k1-cu.usbmodem12201-post-user-recal-vp-check.log",
+  "error": null
+}

@@ -1,0 +1,22 @@
+{
+  "_comment": "Freeze baseline resource envelope. Measured with the RELEASE env (k1_hardware, harness flags OFF) per 03-hardware-gate-package.md §1.1/§2.2 — NOT the harness env. Regenerate with: pio run -e k1_hardware.",
+  "env": "k1_hardware",
+  "harness_flags": "OFF (ENABLE_AP_STREAM / ENABLE_FRAME_DUMP / ENABLE_VP_PROBE_CMD all absent)",
+  "commit": "88428a2",
+  "measured_at": "2026-05-25",
+  "board": "esp32-s3-devkitc1-n16r8",
+  "ram": {
+    "used_bytes": 83064,
+    "total_bytes": 327680,
+    "used_pct": 25.3
+  },
+  "flash": {
+    "used_bytes": 559314,
+    "total_bytes": 6553600,
+    "used_pct": 8.5
+  },
+  "notes": [
+    "Release env was byte-identical across pre-freeze commits #1-#6 (RAM 83064 / Flash 559314 unchanged) — confirming all harness surfaces are flag-gated and absent from release.",
+    "Tolerance for envelope drift on later refactor commits to be set in CANONICAL.md (§2.5)."
+  ]
+}

@@ -1,0 +1,9 @@
+openapi: 3.1.0
+info:
+  title: K1 REST Contract
+  version: 0.1.0
+paths: {}
+x-k1-boundary:
+  status: not implemented for this control slice
+  rationale: K1 Tab5 control uses the AP-only WebSocket contract in k1-ws-contract.yaml.
+  rule: do not add REST controls unless a future feature explicitly requires them.

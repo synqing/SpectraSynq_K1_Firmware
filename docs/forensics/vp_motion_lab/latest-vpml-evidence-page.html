@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VPML Evidence Gate</title>
+  <style>
+    :root { --ink: #16202a; --muted: #5d6b78; --line: #c8d1dc; --ok: #167348; --warn: #a05a00; --bad: #b42318; --panel: #f8fafc; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 32px; color: var(--ink); background: #ffffff; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: start; margin-bottom: 20px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 0 0 6px; font-size: 18px; }
+    h3 { margin: 20px 0 8px; }
+    h4 { margin: 8px 0; }
+    p { color: var(--muted); }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #c8d1dc; padding: 8px 10px; text-align: left; }
+    th { background: #eef3f8; }
+    .kv th { width: 260px; }
+    .notice { margin: 16px 0; padding: 12px; border-left: 4px solid #b45309; background: #fff8eb; }
+    .summary { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 12px; margin: 20px 0; }
+    .tile { border: 1px solid var(--line); background: var(--panel); padding: 14px; }
+    .tile strong { display: block; font-size: 24px; }
+    .capture { border: 1px solid var(--line); margin: 18px 0; padding: 16px; }
+    .capture-head { display: flex; justify-content: space-between; gap: 16px; align-items: start; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+    .badge { border: 1px solid var(--line); padding: 4px 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .badge.ok { color: var(--ok); border-color: var(--ok); }
+    .badge.warn { color: var(--warn); border-color: var(--warn); }
+    .badge.bad { color: var(--bad); border-color: var(--bad); }
+    details { border-top: 1px solid #e5eaf0; padding-top: 10px; margin-top: 10px; }
+    summary { cursor: pointer; font-weight: 650; }
+    pre { white-space: pre-wrap; overflow: auto; background: #0f1720; color: #e6edf3; padding: 12px; }
+    code { background: #eef3f8; padding: 1px 4px; }
+    a { color: #075985; }
+    .motion-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    @media (max-width: 900px) { header, .capture-head { display: block; } .summary, .motion-grid { grid-template-columns: 1fr; } .badges { justify-content: flex-start; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>VPML Evidence Gate / Motion Readability</h1>
+      <p>Local host-side evidence report. Fixed built-ins only.</p>
+    </div>
+    <div><strong>Schema:</strong> <code>vpml_evidence_page.v1</code></div>
+  </header>
+  <div class="notice">Byte proof only. Eyes-on pending unless Captain visual acceptance is explicitly recorded.</div>
+  <section class="summary">
+    <div class="tile"><span>Captures</span><strong>9</strong></div>
+    <div class="tile"><span>Playable built-ins</span><strong>2</strong></div>
+    <div class="tile"><span>Protocol state</span><strong>locked no adr</strong></div>
+  </section>
+  <h3>Capture Index</h3>
+  <table>
+    <thead><tr><th>Capture</th><th>Page State</th><th>Byte Status</th><th>Visual Status</th><th>Programme</th></tr></thead>
+    <tbody><tr><td>20260609T190853-vpml-intro-bounce-1401</td><td>dark sample warning</td><td>byte clean with observations</td><td>eyes on pending</td><td>intro_bounce</td></tr>
+<tr><td>20260609T193419-vpml-intro-bounce-loop-1401</td><td>transport failed</td><td>transport failed</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T193511-vpml-intro-bounce-loop-1401</td><td>byte clean</td><td>byte clean</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T212727-vpml-intro-bounce-loop-1401</td><td>transport failed</td><td>transport failed</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T213624-vpml-live-intro-bounce-loop-em1401</td><td>byte clean</td><td>byte clean</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T214319-vpml-intro-bounce-loop-1401</td><td>transport failed</td><td>transport failed</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T214319-vpml-intro-bounce-loop-1401.session-error</td><td>missing files</td><td>not evaluated</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T214857-vpml-intro-bounce-loop-1401</td><td>byte clean</td><td>byte clean</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr>
+<tr><td>20260609T220729-vpml-intro-bounce-loop-1401</td><td>byte clean</td><td>byte clean</td><td>eyes on pending</td><td>intro_bounce_loop</td></tr></tbody>
+  </table>
+  <h3>Programme Registry</h3>
+  <ul><li><code>intro_bounce_loop</code> - 96 frames - default</li><li><code>intro_bounce</code> - 112 frames</li></ul>
+  <h3>Protocol Lock</h3>
+  <p>Available control: <code>protocol.readiness.view</code>. Compile, upload, and raw receive controls are hidden.</p>
+  <p>Missing readiness gates:</p>
+  <ul><li>transport_adr</li><li>host_protocol_fixtures</li><li>firmware_validator_tests</li><li>live_transport_proof</li><li>captain_approval</li></ul>
+  
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T190853-vpml-intro-bounce-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge warn">dark sample warning</span>
+      <span class="badge warn">byte clean with observations</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 24, &quot;secondary&quot;: 24}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 99222, &quot;secondary&quot;: 125112}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 4020, &quot;secondary&quot;: 4058}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 222, &quot;secondary&quot;: 254}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 48}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>20</td><td>1</td><td>290</td></tr>
+<tr><td>2</td><td>secondary</td><td>20</td><td>0</td><td>296</td></tr>
+<tr><td>3</td><td>primary</td><td>40</td><td>34</td><td>4902</td></tr>
+<tr><td>4</td><td>secondary</td><td>40</td><td>20</td><td>5822</td></tr>
+<tr><td>5</td><td>primary</td><td>60</td><td>73</td><td>4898</td></tr>
+<tr><td>6</td><td>secondary</td><td>60</td><td>62</td><td>6422</td></tr>
+<tr><td>7</td><td>primary</td><td>80</td><td>68</td><td>5776</td></tr>
+<tr><td>8</td><td>secondary</td><td>80</td><td>78</td><td>6262</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>20</td><td>290</td><td>296</td><td>-6</td></tr>
+<tr><td>40</td><td>4902</td><td>5822</td><td>-920</td></tr>
+<tr><td>60</td><td>4898</td><td>6422</td><td>-1524</td></tr>
+<tr><td>80</td><td>5776</td><td>6262</td><td>-486</td></tr>
+<tr><td>100</td><td>5040</td><td>6558</td><td>-1518</td></tr>
+<tr><td>120</td><td>3268</td><td>5234</td><td>-1966</td></tr>
+<tr><td>140</td><td>2654</td><td>2544</td><td>110</td></tr>
+<tr><td>160</td><td>4902</td><td>6384</td><td>-1482</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T190853-vpml-intro-bounce-1401.raw.log">20260609T190853-vpml-intro-bounce-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T190853-vpml-intro-bounce-1401.frames.log">20260609T190853-vpml-intro-bounce-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T190853-vpml-intro-bounce-1401.frame-gate.json">20260609T190853-vpml-intro-bounce-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T190853-vpml-intro-bounce-1401.vpml-summary-v2.json">20260609T190853-vpml-intro-bounce-1401.vpml-summary-v2.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><p>No recorded gate failures.</p></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T193419-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge bad">transport failed</span>
+      <span class="badge bad">transport failed</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 32, &quot;secondary&quot;: 32}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 146512, &quot;secondary&quot;: 183008}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 5072, &quot;secondary&quot;: 5752}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 217, &quot;secondary&quot;: 246}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 64}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>12</td><td>23</td><td>4384</td></tr>
+<tr><td>2</td><td>secondary</td><td>12</td><td>46</td><td>6408</td></tr>
+<tr><td>3</td><td>primary</td><td>24</td><td>52</td><td>5080</td></tr>
+<tr><td>4</td><td>secondary</td><td>24</td><td>71</td><td>7304</td></tr>
+<tr><td>5</td><td>primary</td><td>36</td><td>74</td><td>6066</td></tr>
+<tr><td>6</td><td>secondary</td><td>36</td><td>78</td><td>6554</td></tr>
+<tr><td>7</td><td>primary</td><td>48</td><td>77</td><td>5958</td></tr>
+<tr><td>8</td><td>secondary</td><td>48</td><td>61</td><td>7310</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>12</td><td>4384</td><td>6408</td><td>-2024</td></tr>
+<tr><td>24</td><td>5080</td><td>7304</td><td>-2224</td></tr>
+<tr><td>36</td><td>6066</td><td>6554</td><td>-488</td></tr>
+<tr><td>48</td><td>5958</td><td>7310</td><td>-1352</td></tr>
+<tr><td>60</td><td>5202</td><td>5956</td><td>-754</td></tr>
+<tr><td>72</td><td>4562</td><td>3976</td><td>586</td></tr>
+<tr><td>84</td><td>2710</td><td>2620</td><td>90</td></tr>
+<tr><td>96</td><td>2666</td><td>5624</td><td>-2958</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193419-vpml-intro-bounce-loop-1401.raw.log">20260609T193419-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193419-vpml-intro-bounce-loop-1401.frames.log">20260609T193419-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193419-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T193419-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193419-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T193419-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><pre>[
+  {
+    &quot;message&quot;: &quot;raw K1DF stream has parser issues&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;,
+    &quot;observed&quot;: 2
+  },
+  {
+    &quot;message&quot;: &quot;strict transport gate was not clean&quot;,
+    &quot;metric&quot;: &quot;strict_transport&quot;
+  },
+  {
+    &quot;message&quot;: &quot;diagnostic transport counter must be zero&quot;,
+    &quot;metric&quot;: &quot;dropped&quot;,
+    &quot;observed&quot;: 28,
+    &quot;source&quot;: &quot;begin&quot;,
+    &quot;threshold&quot;: &quot;== 0&quot;
+  },
+  {
+    &quot;message&quot;: &quot;diagnostic transport counter must be zero&quot;,
+    &quot;metric&quot;: &quot;overflowed&quot;,
+    &quot;observed&quot;: 1,
+    &quot;source&quot;: &quot;begin&quot;,
+    &quot;threshold&quot;: &quot;== 0&quot;
+  },
+  {
+    &quot;message&quot;: &quot;diagnostic transport counter must be zero&quot;,
+    &quot;metric&quot;: &quot;dropped&quot;,
+    &quot;observed&quot;: 28,
+    &quot;source&quot;: &quot;end&quot;,
+    &quot;threshold&quot;: &quot;== 0&quot;
+  },
+  {
+    &quot;message&quot;: &quot;diagnostic transport counter must be zero&quot;,
+    &quot;metric&quot;: &quot;overflowed&quot;,
+    &quot;observed&quot;: 1,
+    &quot;source&quot;: &quot;end&quot;,
+    &quot;threshold&quot;: &quot;== 0&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 280,
+    &quot;message&quot;: &quot;unexpected line in strict frame stream&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;,
+    &quot;value&quot;: &quot;#CMD :vpml=stop&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 407,
+    &quot;message&quot;: &quot;unexpected line in strict frame stream&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;,
+    &quot;value&quot;: &quot;#CMD :vpml=status&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 280,
+    &quot;message&quot;: &quot;unexpected line in strict frame stream&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;,
+    &quot;value&quot;: &quot;#CMD :vpml=stop&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 407,
+    &quot;message&quot;: &quot;unexpected line in strict frame stream&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;,
+    &quot;value&quot;: &quot;#CMD :vpml=status&quot;
+  }
+]</pre></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T193511-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge ok">byte clean</span>
+      <span class="badge ok">byte clean</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 15, &quot;secondary&quot;: 15}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 69464, &quot;secondary&quot;: 84932}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 2492, &quot;secondary&quot;: 2728}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 220, &quot;secondary&quot;: 254}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 30}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>36</td><td>73</td><td>6020</td></tr>
+<tr><td>2</td><td>secondary</td><td>36</td><td>79</td><td>6290</td></tr>
+<tr><td>3</td><td>primary</td><td>72</td><td>30</td><td>4602</td></tr>
+<tr><td>4</td><td>secondary</td><td>72</td><td>9</td><td>4262</td></tr>
+<tr><td>5</td><td>primary</td><td>108</td><td>20</td><td>4280</td></tr>
+<tr><td>6</td><td>secondary</td><td>108</td><td>43</td><td>6296</td></tr>
+<tr><td>7</td><td>primary</td><td>144</td><td>77</td><td>5572</td></tr>
+<tr><td>8</td><td>secondary</td><td>144</td><td>64</td><td>7378</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>36</td><td>6020</td><td>6290</td><td>-270</td></tr>
+<tr><td>72</td><td>4602</td><td>4262</td><td>340</td></tr>
+<tr><td>108</td><td>4280</td><td>6296</td><td>-2016</td></tr>
+<tr><td>144</td><td>5572</td><td>7378</td><td>-1806</td></tr>
+<tr><td>180</td><td>2732</td><td>2368</td><td>364</td></tr>
+<tr><td>216</td><td>5034</td><td>7192</td><td>-2158</td></tr>
+<tr><td>252</td><td>5238</td><td>6010</td><td>-772</td></tr>
+<tr><td>288</td><td>2508</td><td>5340</td><td>-2832</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193511-vpml-intro-bounce-loop-1401.raw.log">20260609T193511-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193511-vpml-intro-bounce-loop-1401.frames.log">20260609T193511-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193511-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T193511-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T193511-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T193511-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><p>No recorded gate failures.</p></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T212727-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/tty.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge bad">transport failed</span>
+      <span class="badge bad">transport failed</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>summary_aggregate</code>. Centre pair: <code>79/80</code>. Proof: <code>presentation</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td colspan="5">No profiles.</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td colspan="4">No deltas.</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T212727-vpml-intro-bounce-loop-1401.raw.log">20260609T212727-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T212727-vpml-intro-bounce-loop-1401.frames.log">20260609T212727-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T212727-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T212727-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T212727-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T212727-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><pre>[
+  {
+    &quot;expected&quot;: [
+      &quot;primary&quot;,
+      &quot;secondary&quot;
+    ],
+    &quot;message&quot;: &quot;required VPML channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;channel&quot;: &quot;primary&quot;,
+    &quot;message&quot;: &quot;channel has no nonzero final bytes&quot;,
+    &quot;metric&quot;: &quot;coverage.bytes&quot;
+  },
+  {
+    &quot;channel&quot;: &quot;secondary&quot;,
+    &quot;message&quot;: &quot;channel has no nonzero final bytes&quot;,
+    &quot;metric&quot;: &quot;coverage.bytes&quot;
+  },
+  {
+    &quot;message&quot;: &quot;required VPML primary/secondary channel coverage is missing&quot;,
+    &quot;metric&quot;: &quot;channel_coverage&quot;,
+    &quot;missing&quot;: [
+      &quot;primary&quot;,
+      &quot;secondary&quot;
+    ],
+    &quot;observed&quot;: {}
+  },
+  {
+    &quot;expected&quot;: 250,
+    &quot;message&quot;: &quot;decoded records do not all use the VPML sentinel mode&quot;,
+    &quot;metric&quot;: &quot;vpml_mode&quot;,
+    &quot;observed&quot;: {}
+  },
+  {
+    &quot;message&quot;: &quot;strict transport gate was not clean&quot;,
+    &quot;metric&quot;: &quot;strict_transport&quot;
+  },
+  {
+    &quot;expected&quot;: 250,
+    &quot;message&quot;: &quot;required mode missing&quot;,
+    &quot;metric&quot;: &quot;coverage.mode&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;primary&quot;,
+    &quot;message&quot;: &quot;required channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;secondary&quot;,
+    &quot;message&quot;: &quot;required channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;vpab_bytes&quot;,
+    &quot;message&quot;: &quot;required record kind missing&quot;,
+    &quot;metric&quot;: &quot;coverage.kind&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 0,
+    &quot;message&quot;: &quot;missing K1DF_BEGIN&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 0,
+    &quot;message&quot;: &quot;missing K1DF_END&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;
+  }
+]</pre></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T213624-vpml-live-intro-bounce-loop-em1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge ok">byte clean</span>
+      <span class="badge ok">byte clean</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 16, &quot;secondary&quot;: 16}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 70348, &quot;secondary&quot;: 93392}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 2504, &quot;secondary&quot;: 2896}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 222, &quot;secondary&quot;: 227}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 32}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>36</td><td>37</td><td>4804</td></tr>
+<tr><td>2</td><td>secondary</td><td>36</td><td>60</td><td>6900</td></tr>
+<tr><td>3</td><td>primary</td><td>72</td><td>68</td><td>5692</td></tr>
+<tr><td>4</td><td>secondary</td><td>72</td><td>48</td><td>6648</td></tr>
+<tr><td>5</td><td>primary</td><td>108</td><td>0</td><td>1900</td></tr>
+<tr><td>6</td><td>secondary</td><td>108</td><td>7</td><td>4568</td></tr>
+<tr><td>7</td><td>primary</td><td>144</td><td>65</td><td>5450</td></tr>
+<tr><td>8</td><td>secondary</td><td>144</td><td>78</td><td>6694</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>36</td><td>4804</td><td>6900</td><td>-2096</td></tr>
+<tr><td>72</td><td>5692</td><td>6648</td><td>-956</td></tr>
+<tr><td>108</td><td>1900</td><td>4568</td><td>-2668</td></tr>
+<tr><td>144</td><td>5450</td><td>6694</td><td>-1244</td></tr>
+<tr><td>180</td><td>4914</td><td>5348</td><td>-434</td></tr>
+<tr><td>216</td><td>3776</td><td>6450</td><td>-2674</td></tr>
+<tr><td>252</td><td>4838</td><td>7536</td><td>-2698</td></tr>
+<tr><td>288</td><td>3800</td><td>2552</td><td>1248</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T213624-vpml-live-intro-bounce-loop-em1401.raw.log">20260609T213624-vpml-live-intro-bounce-loop-em1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T213624-vpml-live-intro-bounce-loop-em1401.frames.log">20260609T213624-vpml-live-intro-bounce-loop-em1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T213624-vpml-live-intro-bounce-loop-em1401.frame-gate.json">20260609T213624-vpml-live-intro-bounce-loop-em1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T213624-vpml-live-intro-bounce-loop-em1401.vpml-summary.json">20260609T213624-vpml-live-intro-bounce-loop-em1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><p>No recorded gate failures.</p></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T214319-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge bad">transport failed</span>
+      <span class="badge bad">transport failed</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>summary_aggregate</code>. Centre pair: <code>79/80</code>. Proof: <code>presentation</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td colspan="5">No profiles.</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td colspan="4">No deltas.</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214319-vpml-intro-bounce-loop-1401.raw.log">20260609T214319-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214319-vpml-intro-bounce-loop-1401.frames.log">20260609T214319-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214319-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T214319-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214319-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T214319-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><pre>[
+  {
+    &quot;expected&quot;: [
+      &quot;primary&quot;,
+      &quot;secondary&quot;
+    ],
+    &quot;message&quot;: &quot;required VPML channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;channel&quot;: &quot;secondary&quot;,
+    &quot;message&quot;: &quot;channel has no nonzero final bytes&quot;,
+    &quot;metric&quot;: &quot;coverage.bytes&quot;
+  },
+  {
+    &quot;channel&quot;: &quot;primary&quot;,
+    &quot;message&quot;: &quot;channel has no nonzero final bytes&quot;,
+    &quot;metric&quot;: &quot;coverage.bytes&quot;
+  },
+  {
+    &quot;message&quot;: &quot;required VPML primary/secondary channel coverage is missing&quot;,
+    &quot;metric&quot;: &quot;channel_coverage&quot;,
+    &quot;missing&quot;: [
+      &quot;primary&quot;,
+      &quot;secondary&quot;
+    ],
+    &quot;observed&quot;: {}
+  },
+  {
+    &quot;expected&quot;: 250,
+    &quot;message&quot;: &quot;decoded records do not all use the VPML sentinel mode&quot;,
+    &quot;metric&quot;: &quot;vpml_mode&quot;,
+    &quot;observed&quot;: {}
+  },
+  {
+    &quot;message&quot;: &quot;strict transport gate was not clean&quot;,
+    &quot;metric&quot;: &quot;strict_transport&quot;
+  },
+  {
+    &quot;expected&quot;: 250,
+    &quot;message&quot;: &quot;required mode missing&quot;,
+    &quot;metric&quot;: &quot;coverage.mode&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;primary&quot;,
+    &quot;message&quot;: &quot;required channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;secondary&quot;,
+    &quot;message&quot;: &quot;required channel missing&quot;,
+    &quot;metric&quot;: &quot;coverage.channel&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;expected&quot;: &quot;vpab_bytes&quot;,
+    &quot;message&quot;: &quot;required record kind missing&quot;,
+    &quot;metric&quot;: &quot;coverage.kind&quot;,
+    &quot;observed&quot;: []
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 0,
+    &quot;message&quot;: &quot;missing K1DF_BEGIN&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;
+  },
+  {
+    &quot;field&quot;: null,
+    &quot;line&quot;: 0,
+    &quot;message&quot;: &quot;missing K1DF_END&quot;,
+    &quot;metric&quot;: &quot;strict_parse&quot;
+  }
+]</pre></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T214319-vpml-intro-bounce-loop-1401.session-error</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>None</code> | <strong>Port:</strong> <code>None</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge bad">missing files</span>
+      <span class="badge neutral">not evaluated</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>none</code>. Centre pair: <code>79/80</code>. Proof: <code>presentation</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td colspan="5">No profiles.</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td colspan="4">No deltas.</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><p>No artefact paths.</p></details>
+  <details><summary>Failures / Issues</summary><pre>[
+  {
+    &quot;message&quot;: &quot;missing required VPML evidence artefact&quot;,
+    &quot;metric&quot;: &quot;summary&quot;
+  },
+  {
+    &quot;message&quot;: &quot;missing required VPML evidence artefact&quot;,
+    &quot;metric&quot;: &quot;frame_gate&quot;
+  },
+  {
+    &quot;message&quot;: &quot;missing required VPML evidence artefact&quot;,
+    &quot;metric&quot;: &quot;frames_log&quot;
+  },
+  {
+    &quot;message&quot;: &quot;missing required VPML evidence artefact&quot;,
+    &quot;metric&quot;: &quot;raw_log&quot;
+  },
+  {
+    &quot;message&quot;: &quot;missing VPML summary JSON&quot;,
+    &quot;metric&quot;: &quot;summary&quot;
+  }
+]</pre></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T214857-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge ok">byte clean</span>
+      <span class="badge ok">byte clean</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 25, &quot;secondary&quot;: 25}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 110180, &quot;secondary&quot;: 147706}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 3884, &quot;secondary&quot;: 4544}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 222, &quot;secondary&quot;: 223}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 50}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>36</td><td>0</td><td>3584</td></tr>
+<tr><td>2</td><td>secondary</td><td>36</td><td>29</td><td>6460</td></tr>
+<tr><td>3</td><td>primary</td><td>72</td><td>78</td><td>4962</td></tr>
+<tr><td>4</td><td>secondary</td><td>72</td><td>74</td><td>7636</td></tr>
+<tr><td>5</td><td>primary</td><td>108</td><td>16</td><td>4130</td></tr>
+<tr><td>6</td><td>secondary</td><td>108</td><td>2</td><td>2758</td></tr>
+<tr><td>7</td><td>primary</td><td>144</td><td>35</td><td>4696</td></tr>
+<tr><td>8</td><td>secondary</td><td>144</td><td>58</td><td>6778</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>36</td><td>3584</td><td>6460</td><td>-2876</td></tr>
+<tr><td>72</td><td>4962</td><td>7636</td><td>-2674</td></tr>
+<tr><td>108</td><td>4130</td><td>2758</td><td>1372</td></tr>
+<tr><td>144</td><td>4696</td><td>6778</td><td>-2082</td></tr>
+<tr><td>180</td><td>5834</td><td>6798</td><td>-964</td></tr>
+<tr><td>216</td><td>2030</td><td>4220</td><td>-2190</td></tr>
+<tr><td>252</td><td>5354</td><td>6970</td><td>-1616</td></tr>
+<tr><td>288</td><td>4942</td><td>5462</td><td>-520</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214857-vpml-intro-bounce-loop-1401.raw.log">20260609T214857-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214857-vpml-intro-bounce-loop-1401.frames.log">20260609T214857-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214857-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T214857-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T214857-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T214857-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><p>No recorded gate failures.</p></details>
+</section>
+
+
+<section class="capture">
+  <div class="capture-head">
+    <div>
+      <h2>20260609T220729-vpml-intro-bounce-loop-1401</h2>
+      <p><strong>Programme:</strong> <code>intro_bounce_loop</code> | <strong>Chip:</strong> <code>F887A500</code> | <strong>Port:</strong> <code>/dev/cu.usbmodem1401</code></p>
+    </div>
+    <div class="badges">
+      <span class="badge ok">byte clean</span>
+      <span class="badge ok">byte clean</span>
+      <span class="badge warn">eyes on pending</span>
+    </div>
+  </div>
+  <details open><summary>Readbacks</summary><table class="kv"><tbody><tr><th>channel_counts</th><td><code>{&quot;primary&quot;: 24, &quot;secondary&quot;: 24}</code></td></tr>
+<tr><th>channel_energy_sum_total</th><td><code>{&quot;primary&quot;: 106596, &quot;secondary&quot;: 141246}</code></td></tr>
+<tr><th>channel_nonzero_led_bytes_total</th><td><code>{&quot;primary&quot;: 3792, &quot;secondary&quot;: 4326}</code></td></tr>
+<tr><th>channel_max_byte</th><td><code>{&quot;primary&quot;: 222, &quot;secondary&quot;: 223}</code></td></tr>
+<tr><th>mode_counts</th><td><code>{&quot;250&quot;: 48}</code></td></tr></tbody></table></details>
+  <details><summary>Motion Readability</summary>
+<div class="motion-grid">
+  <div>
+    <h4>Centre-Origin Peaks</h4>
+    <p>Source: <code>frames_log</code>. Centre pair: <code>79/80</code>. Proof: <code>evidence</code>.</p>
+    <table><thead><tr><th>Seq</th><th>Channel</th><th>Frame</th><th>Peak Radius</th><th>Total Energy</th></tr></thead><tbody><tr><td>1</td><td>primary</td><td>36</td><td>0</td><td>3584</td></tr>
+<tr><td>2</td><td>secondary</td><td>36</td><td>29</td><td>6460</td></tr>
+<tr><td>3</td><td>primary</td><td>72</td><td>78</td><td>4962</td></tr>
+<tr><td>4</td><td>secondary</td><td>72</td><td>74</td><td>7636</td></tr>
+<tr><td>5</td><td>primary</td><td>108</td><td>16</td><td>4130</td></tr>
+<tr><td>6</td><td>secondary</td><td>108</td><td>2</td><td>2758</td></tr>
+<tr><td>7</td><td>primary</td><td>144</td><td>35</td><td>4696</td></tr>
+<tr><td>8</td><td>secondary</td><td>144</td><td>58</td><td>6778</td></tr></tbody></table>
+  </div>
+  <div>
+    <h4>Primary / Secondary Delta</h4>
+    <table><thead><tr><th>Frame</th><th>Primary</th><th>Secondary</th><th>Delta</th></tr></thead><tbody><tr><td>36</td><td>3584</td><td>6460</td><td>-2876</td></tr>
+<tr><td>72</td><td>4962</td><td>7636</td><td>-2674</td></tr>
+<tr><td>108</td><td>4130</td><td>2758</td><td>1372</td></tr>
+<tr><td>144</td><td>4696</td><td>6778</td><td>-2082</td></tr>
+<tr><td>180</td><td>5834</td><td>6798</td><td>-964</td></tr>
+<tr><td>216</td><td>2030</td><td>4220</td><td>-2190</td></tr>
+<tr><td>252</td><td>5354</td><td>6970</td><td>-1616</td></tr>
+<tr><td>288</td><td>4942</td><td>5462</td><td>-520</td></tr></tbody></table>
+  </div>
+</div>
+</details>
+  <details><summary>Evidence Artefacts</summary><ul><li>raw_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T220729-vpml-intro-bounce-loop-1401.raw.log">20260609T220729-vpml-intro-bounce-loop-1401.raw.log</a></li>
+<li>frames_log: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T220729-vpml-intro-bounce-loop-1401.frames.log">20260609T220729-vpml-intro-bounce-loop-1401.frames.log</a></li>
+<li>frame_gate: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T220729-vpml-intro-bounce-loop-1401.frame-gate.json">20260609T220729-vpml-intro-bounce-loop-1401.frame-gate.json</a></li>
+<li>summary: <a href="file:///Users/spectrasynq/SensoryBridge-main%209/docs/forensics/runtime-evidence/20260609T220729-vpml-intro-bounce-loop-1401.vpml-summary.json">20260609T220729-vpml-intro-bounce-loop-1401.vpml-summary.json</a></li></ul></details>
+  <details><summary>Failures / Issues</summary><p>No recorded gate failures.</p></details>
+</section>
+
+</body>
+</html>

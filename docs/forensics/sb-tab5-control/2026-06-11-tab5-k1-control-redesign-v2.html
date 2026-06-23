@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tab5 K1 Control — Redesign v2 (hierarchy · semantics · utility)</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230a0a0b'/%3E%3Cpath d='M2 8h12M8 2v12' stroke='%23ffc700' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0a0a0b;
+      --bg-site: #050506;
+      --surface: #121214;
+      --surface-elevated: #1a1a1c;
+      --surface-row: #0e0e11;
+      --border: #2a2a2e;
+      --border-subtle: #1e1e24;
+      --fg: #ffffff;
+      --fg-secondary: #9ca3af;
+      --fg-dim: #4b5563;
+      --brand: #ffc700;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --primary: #00ffff;     /* surface identity: PRIMARY edge */
+      --secondary: #00ff99;   /* surface identity: SECONDARY edge */
+      --scene: #bf00ff;       /* scene system */
+      --ink: #0a0a0b;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --pad: 20px;
+      --content-w: 1240px;
+      --header-y: 10px;
+      --header-h: 52px;
+      --body-y: 72px;
+      --body-h: 648px;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(255, 199, 0, 0.06), transparent 45%),
+        radial-gradient(ellipse 60% 40% at 85% 0%, rgba(0, 255, 255, 0.04), transparent 40%),
+        linear-gradient(180deg, #070709 0%, var(--bg-site) 100%);
+      color: var(--fg);
+      font-family: "Rajdhani", system-ui, sans-serif;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    button { font: inherit; cursor: pointer; }
+
+    .proposal {
+      max-width: 1640px;
+      margin: 0 auto;
+      padding: 20px 20px 48px;
+    }
+
+    .proposal-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 48px;
+      line-height: 0.92;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    .summary {
+      margin: 10px 0 0;
+      max-width: 980px;
+      color: var(--fg-secondary);
+      font-size: 17px;
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .summary strong { color: var(--fg); }
+
+    .meta-pills { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+    .meta-pill {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1280px) minmax(290px, 330px);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .device-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      border: 1px solid #303038;
+      border-radius: 18px;
+      background: #040405;
+      padding: 10px;
+      box-shadow: 0 28px 90px rgba(0, 0, 0, 0.62), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    }
+
+    .device-scale-wrap { width: 100%; height: 100%; overflow: hidden; border-radius: 10px; }
+
+    .tab5 {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      background: var(--bg-page);
+      transform-origin: top left;
+      transform: scale(var(--device-scale, 1));
+      overflow: hidden;
+    }
+
+    .screen-layer {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms ease;
+    }
+
+    .screen-layer.active { opacity: 1; pointer-events: auto; }
+
+    /* ============ HEADER — quietest zone ============ */
+    .header {
+      position: absolute;
+      left: var(--pad);
+      top: var(--header-y);
+      width: var(--content-w);
+      height: var(--header-h);
+      display: grid;
+      grid-template-columns: 170px 1fr 320px 1fr 130px;
+      align-items: center;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .link-chip {
+      height: 44px;
+      border-radius: var(--radius);
+      border: 1px solid #14532d;
+      background: rgba(34, 197, 94, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--success);
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .link-chip .dot {
+      width: 9px; height: 9px; border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .link-chip:hover { border-color: var(--success); }
+
+    .link-chip.degraded { color: var(--warning); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.06); }
+
+    .title-cluster {
+      grid-column: 3;
+      justify-self: center;
+      width: 100%;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: transparent;
+      color: var(--fg);
+      transition: background 140ms, border-color 140ms;
+    }
+
+    .title-cluster:hover, .title-cluster.open {
+      background: var(--surface);
+      border-color: var(--brand);
+    }
+
+    .title-cluster .main {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 32px;
+      line-height: 1;
+      letter-spacing: 0.06em;
+    }
+
+    .title-cluster .crumb {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--fg-secondary);
+      text-transform: uppercase;
+    }
+
+    .title-cluster .chev {
+      font-size: 16px;
+      color: var(--brand);
+      transition: transform 140ms;
+    }
+
+    .title-cluster.open .chev { transform: rotate(180deg); }
+    .title-cluster.open .crumb { color: var(--brand); }
+
+    .batt-chip {
+      grid-column: 5;
+      height: 44px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--fg-secondary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+    }
+
+    .batt-glyph {
+      width: 26px; height: 13px;
+      border: 1.5px solid var(--fg-secondary);
+      border-radius: 3px;
+      position: relative;
+    }
+    .batt-glyph::after {
+      content: ""; position: absolute; right: -4px; top: 3px;
+      width: 2.5px; height: 5px; background: var(--fg-secondary); border-radius: 1px;
+    }
+    .batt-glyph .fill {
+      position: absolute; inset: 2px; width: 90%;
+      background: var(--success); border-radius: 1px;
+    }
+
+    /* link popover — progressive disclosure */
+    .link-popover {
+      position: absolute;
+      left: var(--pad);
+      top: 60px;
+      width: 360px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      padding: 14px;
+      z-index: 60;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-4px);
+      transition: opacity 140ms, transform 140ms;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.5);
+    }
+
+    .link-popover.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+
+    .link-popover dl {
+      margin: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 16px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .link-popover dt { color: var(--fg-dim); }
+    .link-popover dd { margin: 0; color: var(--fg); text-align: right; }
+    .link-popover dd.ok { color: var(--success); }
+
+    .link-popover .open-health {
+      margin-top: 12px;
+      width: 100%;
+      height: 42px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--brand);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .body {
+      position: absolute;
+      left: var(--pad);
+      top: var(--body-y);
+      width: var(--content-w);
+      height: var(--body-h);
+    }
+
+    /* ============ COMPOSER ============ */
+
+    /* Level 1 — NOW PLAYING (loudest) */
+    .now-band {
+      position: absolute;
+      left: 0; top: 0;
+      width: var(--content-w);
+      height: 124px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, var(--surface-elevated), var(--surface));
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      padding: 0 22px;
+      gap: 20px;
+    }
+
+    .now-identity { min-width: 0; }
+
+    .now-mode {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+    }
+
+    .now-mode .name {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 56px;
+      line-height: 0.95;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .now-mode .browse {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--brand);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      align-self: center;
+    }
+    .now-mode .browse:hover { border-color: var(--brand); }
+
+    .now-palette {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--fg-secondary);
+      font-size: 19px;
+      font-weight: 600;
+    }
+
+    .pal-swatch {
+      width: 44px; height: 16px; border-radius: 4px;
+      background: linear-gradient(90deg, #013a63, #2a6f97, #61a5c2, #a9d6e5);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .pal-step {
+      width: 44px; height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .pal-step:hover { border-color: var(--brand); color: var(--brand); }
+
+    .now-perf {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .perf-chip {
+      min-width: 96px;
+      height: 64px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 0 14px;
+    }
+
+    .perf-chip .val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .perf-chip .cap {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--fg-dim);
+    }
+
+    .perf-chip.lock { border-color: #14532d; }
+    .perf-chip.lock .val { color: var(--success); }
+
+    /* Level 2 — context row */
+    .context-row {
+      position: absolute;
+      left: 0; top: 136px;
+      width: var(--content-w);
+      height: 64px;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 16px;
+    }
+
+    .seg {
+      height: 64px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      padding: 6px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .seg.surfaces { grid-template-columns: 1fr 1fr; }
+    .seg.scenes { grid-template-columns: repeat(4, 1fr); }
+
+    .seg button {
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--fg-secondary);
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .seg.surfaces button.on-primary {
+      background: var(--primary);
+      color: var(--ink);
+      box-shadow: 0 0 26px rgba(0,255,255,0.18);
+    }
+
+    .seg.surfaces button.on-secondary {
+      background: var(--secondary);
+      color: var(--ink);
+      box-shadow: 0 0 26px rgba(0,255,153,0.18);
+    }
+
+    .seg.scenes button { font-size: 19px; }
+    .seg.scenes button.on {
+      background: var(--scene);
+      color: #fff;
+      box-shadow: 0 0 22px rgba(191,0,255,0.22);
+    }
+
+    /* Level 3 — control deck */
+    .deck {
+      position: absolute;
+      left: 0; top: 212px;
+      width: var(--content-w);
+      height: 436px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .deck-row {
+      height: 124px;
+      display: grid;
+      grid-template-columns: 210px 1fr 150px;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .deck-row + .deck-row { border-top: 1px solid var(--border-subtle); }
+
+    .deck-label {
+      font-size: 27px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: var(--fg);
+    }
+
+    .deck-track {
+      height: 56px;
+      border-radius: 14px;
+      background: #0c0c0e;
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .deck-fill {
+      height: 100%;
+      border-radius: 13px;
+      background: linear-gradient(90deg, rgba(0,255,255,0.25), var(--primary));
+      box-shadow: 0 0 24px rgba(0,255,255,0.14);
+    }
+
+    .deck-readout {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .deck-value {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 27px;
+      font-weight: 700;
+    }
+
+    .ack {
+      width: 26px; height: 26px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .ack.applied { background: rgba(34,197,94,0.14); color: var(--success); border: 1px solid #14532d; }
+    .ack.pending { background: rgba(245,158,11,0.12); color: var(--warning); border: 1px solid rgba(245,158,11,0.35); animation: pulse 1.2s ease-in-out infinite; }
+
+    @keyframes pulse { 50% { opacity: 0.45; } }
+
+    /* ============ HUB ============ */
+    .hub-page {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hub-heading {
+      margin: 0;
+      padding-left: 4px;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .hub-row {
+      flex: 1;
+      min-height: 0;
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      display: grid;
+      grid-template-columns: 6px 1fr auto;
+      align-items: stretch;
+      overflow: hidden;
+      transition: border-color 120ms, background 120ms;
+    }
+
+    .hub-row:hover { background: var(--surface-elevated); }
+    .hub-row.current { border-color: var(--brand); box-shadow: inset 0 0 0 1px rgba(255,199,0,0.12); }
+
+    .stripe.show { background: var(--primary); }
+    .stripe.health { background: var(--success); }
+    .stripe.edges { background: var(--secondary); }
+    .stripe.more { background: var(--brand); }
+
+    .hub-copy {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .hub-copy .name {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 38px;
+      line-height: 1;
+      letter-spacing: 0.05em;
+    }
+
+    .hub-copy .desc {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--fg-secondary);
+      line-height: 1.35;
+      max-width: 680px;
+    }
+
+    .hub-preview {
+      padding: 16px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 6px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      color: var(--fg-secondary);
+      text-align: right;
+    }
+
+    .hub-preview .big { font-size: 17px; color: var(--fg); font-weight: 700; }
+
+    .badge {
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      font-family: "Rajdhani", sans-serif;
+    }
+    .badge.here { color: var(--brand); border: 1px solid #3d3200; background: rgba(255,199,0,0.1); }
+    .badge.live { color: var(--success); border: 1px solid #14532d; background: rgba(34,197,94,0.1); }
+
+    /* ============ HEALTH ============ */
+    .page-back {
+      position: absolute;
+      left: 0; top: 0;
+      width: 120px; height: 54px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      display: grid;
+      place-items: center;
+      z-index: 5;
+    }
+    .page-back:hover { border-color: var(--brand); color: var(--brand); }
+
+    .health-page {
+      padding-top: 66px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .health-banner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 22px;
+      border-radius: var(--radius-lg);
+      border: 1px solid #14532d;
+      background: linear-gradient(90deg, rgba(34,197,94,0.08), transparent 65%);
+    }
+
+    .health-banner .title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 46px;
+      line-height: 1;
+      color: var(--success);
+      letter-spacing: 0.04em;
+    }
+
+    .health-banner .hint {
+      font-size: 15px;
+      color: var(--fg-secondary);
+      max-width: 560px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .btn-retry {
+      height: 52px;
+      padding: 0 24px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--warning);
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+
+    .health-grid {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .health-col {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 16px;
+    }
+
+    .health-col h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 5px 12px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .kv .k { color: var(--fg-dim); }
+    .kv .v { color: var(--fg); text-align: right; }
+    .kv .v.ok { color: var(--success); }
+    .kv .v.warn { color: var(--warning); background: rgba(245,158,11,0.08); border-radius: 4px; padding: 0 6px; }
+
+    /* ============ EDGES ============ */
+    .edges-page {
+      padding-top: 66px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .scene-band {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .scene-band .label {
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+      letter-spacing: 0.08em;
+    }
+
+    .edge-columns {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .edge-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 120ms;
+    }
+
+    .edge-card.primary:hover { border-color: var(--primary); }
+    .edge-card.secondary:hover { border-color: var(--secondary); }
+
+    .edge-card h3 {
+      margin: 0 0 12px;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 34px;
+      letter-spacing: 0.05em;
+    }
+    .edge-card.primary h3 { color: var(--primary); }
+    .edge-card.secondary h3 { color: var(--secondary); }
+
+    .edge-card .kv { flex: 1; align-content: start; font-size: 15px; }
+
+    .edge-card .tap-hint {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--fg-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ============ MORE ============ */
+    .more-page {
+      padding-top: 66px;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 16px;
+    }
+
+    .more-left h2 {
+      margin: 0 0 6px;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 38px;
+      letter-spacing: 0.05em;
+    }
+
+    .more-left p {
+      margin: 0 0 18px;
+      color: var(--fg-secondary);
+      font-size: 16px;
+      font-weight: 500;
+      max-width: 540px;
+      line-height: 1.45;
+    }
+
+    .more-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      max-width: 560px;
+    }
+
+    .action-btn {
+      height: 56px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .action-btn:hover { border-color: var(--brand); }
+
+    .more-status {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface-elevated);
+      padding: 16px;
+      align-self: start;
+    }
+
+    .more-status h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    /* ============ PICKER ============ */
+    .overlay-dim {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.66);
+      z-index: 40;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms;
+    }
+    .overlay-dim.visible { opacity: 1; pointer-events: auto; }
+
+    .overlay-picker {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%) scale(0.98);
+      width: 1000px;
+      height: 560px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface-elevated);
+      padding: 20px;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 140ms, transform 140ms;
+      display: flex;
+      flex-direction: column;
+    }
+    .overlay-picker.visible { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+
+    .picker-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .picker-title {
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 36px;
+      letter-spacing: 0.05em;
+    }
+
+    .picker-tabs { display: flex; gap: 8px; justify-self: center; }
+
+    .picker-tab {
+      width: 170px; height: 48px;
+      border-radius: var(--radius);
+      border: 2px solid var(--primary);
+      background: var(--surface);
+      color: var(--primary);
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .picker-tab.on { background: var(--primary); color: var(--ink); }
+
+    .picker-close {
+      height: 48px;
+      padding: 0 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .picker-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 96px;
+      gap: 10px;
+      overflow: hidden;
+      align-content: start;
+    }
+
+    .picker-item {
+      border-radius: var(--radius);
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+      padding: 8px;
+    }
+
+    .picker-item .nm { font-size: 18px; font-weight: 700; line-height: 1.1; }
+    .picker-item .id { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--fg-dim); }
+
+    .picker-item.on {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+    .picker-item.on .nm { color: var(--ink); }
+    .picker-item.on .id { color: rgba(10,10,11,0.6); }
+
+    .picker-foot {
+      margin-top: 12px;
+      color: var(--fg-dim);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+    }
+
+    /* ============ INSPECTOR ============ */
+    .inspector { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+    .inspector-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      padding: 14px;
+    }
+
+    .inspector-card h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-secondary);
+    }
+
+    .nav-list { display: flex; flex-direction: column; gap: 6px; }
+
+    .nav-list button {
+      width: 100%; text-align: left;
+      height: 40px; padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .nav-list button.active { border-color: var(--brand); color: var(--brand); background: rgba(255,199,0,0.06); }
+
+    .spec-list {
+      margin: 0; padding: 0;
+      list-style: none;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--fg-secondary);
+      font-weight: 500;
+    }
+    .spec-list li { margin-bottom: 9px; }
+    .spec-list strong { color: var(--fg); }
+
+    .sem-row {
+      display: grid;
+      grid-template-columns: 18px 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--fg-secondary);
+    }
+
+    .sem-dot { width: 14px; height: 14px; border-radius: 4px; }
+
+    .toggle-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .toggle-row button {
+      height: 34px; padding: 0 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--surface-row);
+      color: var(--fg-secondary);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .inspector-note {
+      font-size: 12px;
+      color: var(--fg-dim);
+      line-height: 1.55;
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    @media (max-width: 1340px) {
+      .workbench { grid-template-columns: 1fr; }
+      .inspector { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <div class="proposal">
+    <header class="proposal-header">
+      <div>
+        <p class="eyebrow">Tab5 · 1280×720 · redesign v2 · hierarchy / semantics / utility</p>
+        <h1>K1 Control — Now-Playing Composer</h1>
+        <p class="summary">
+          Rethink: <strong>identity loudest</strong> (mode + palette + tempo lock as a now-playing band),
+          <strong>status by exception</strong> (one LINK chip replaces five pills),
+          <strong>colour as meaning</strong> (cyan = primary edge, green = secondary, purple = scene, gold = interactive),
+          <strong>browse tasks off-glass</strong> (mode grid moves to the picker; sliders get the room).
+        </p>
+      </div>
+      <div class="meta-pills">
+        <span class="meta-pill">body-y: 72</span>
+        <span class="meta-pill">deck sliders: 56px</span>
+        <span class="meta-pill">touch min: 54px</span>
+        <span class="meta-pill">v2 wire</span>
+      </div>
+    </header>
+
+    <div class="workbench">
+      <div class="device-shell">
+        <div class="device-scale-wrap" id="scale-wrap">
+          <div class="tab5" id="tab5">
+
+            <header class="header">
+              <button type="button" class="link-chip" id="link-chip">
+                <span class="dot"></span> LINK
+              </button>
+              <span></span>
+              <button type="button" class="title-cluster" id="title-cluster">
+                <span class="main">K1 CONTROL</span>
+                <span class="crumb" id="title-crumb">SHOW</span>
+                <span class="chev">▾</span>
+              </button>
+              <span></span>
+              <div class="batt-chip"><span class="batt-glyph"><span class="fill"></span></span> 100%</div>
+            </header>
+
+            <div class="link-popover" id="link-popover">
+              <dl>
+                <dt>AP</dt><dd class="ok">OK</dd>
+                <dt>WS</dt><dd class="ok">CONNECTED</dd>
+                <dt>protocol</dt><dd>v2</dd>
+                <dt>k1_age</dt><dd>905 ms</dd>
+                <dt>pending</dt><dd class="ok">0</dd>
+                <dt>rssi</dt><dd>-42 dBm</dd>
+              </dl>
+              <button type="button" class="open-health" data-go="health">OPEN HEALTH ›</button>
+            </div>
+
+            <!-- SHOW -->
+            <div class="screen-layer active" data-view="show">
+              <div class="body">
+                <!-- L1: now playing -->
+                <div class="now-band">
+                  <div class="now-identity">
+                    <div class="now-mode">
+                      <span class="name">WAVEFORM TEMPO</span>
+                      <button type="button" class="browse" id="browse-btn">BROWSE ▸</button>
+                    </div>
+                    <div class="now-palette">
+                      <span class="pal-swatch"></span>
+                      OCEAN BREEZE 036
+                      <button type="button" class="pal-step">−</button>
+                      <button type="button" class="pal-step">+</button>
+                    </div>
+                  </div>
+                  <div class="now-perf">
+                    <div class="perf-chip"><span class="val">201</span><span class="cap">FPS</span></div>
+                    <div class="perf-chip"><span class="val">128</span><span class="cap">BPM</span></div>
+                    <div class="perf-chip lock"><span class="val">●</span><span class="cap">LOCKED</span></div>
+                  </div>
+                </div>
+
+                <!-- L2: context -->
+                <div class="context-row">
+                  <div class="seg surfaces">
+                    <button type="button" class="on-primary">PRIMARY</button>
+                    <button type="button">SECONDARY</button>
+                  </div>
+                  <div class="seg scenes">
+                    <button type="button">OFF</button>
+                    <button type="button" class="on">ASSIST</button>
+                    <button type="button">L1</button>
+                    <button type="button">AUTO</button>
+                  </div>
+                </div>
+
+                <!-- L3: control deck -->
+                <div class="deck">
+                  <div class="deck-row">
+                    <div class="deck-label">BRIGHTNESS</div>
+                    <div class="deck-track"><div class="deck-fill" style="width:70%"></div></div>
+                    <div class="deck-readout">
+                      <span class="deck-value">70%</span>
+                      <span class="ack applied">✓</span>
+                    </div>
+                  </div>
+                  <div class="deck-row">
+                    <div class="deck-label">COLOUR</div>
+                    <div class="deck-track"><div class="deck-fill" style="width:61%"></div></div>
+                    <div class="deck-readout">
+                      <span class="deck-value">61%</span>
+                      <span class="ack applied">✓</span>
+                    </div>
+                  </div>
+                  <div class="deck-row">
+                    <div class="deck-label">SPEED</div>
+                    <div class="deck-track"><div class="deck-fill" style="width:54%"></div></div>
+                    <div class="deck-readout">
+                      <span class="deck-value">54%</span>
+                      <span class="ack pending">…</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HUB -->
+            <div class="screen-layer" data-view="hub">
+              <div class="body hub-page">
+                <h2 class="hub-heading">Choose destination</h2>
+                <div class="hub-row current" data-go="show">
+                  <div class="stripe show"></div>
+                  <div class="hub-copy">
+                    <div class="name">SHOW</div>
+                    <div class="desc">Light Composer — now-playing identity, surface context, control deck.</div>
+                  </div>
+                  <div class="hub-preview">
+                    <span class="badge here">CURRENT</span>
+                    <span class="big">WAVEFORM TEMPO</span>
+                    <span>bright 70% · 128 BPM</span>
+                  </div>
+                </div>
+                <div class="hub-row" data-go="health">
+                  <div class="stripe health"></div>
+                  <div class="hub-copy">
+                    <div class="name">HEALTH</div>
+                    <div class="desc">Link proof — AP, WebSocket, K1 state age, pending controls, antenna.</div>
+                  </div>
+                  <div class="hub-preview">
+                    <span class="badge live">LIVE</span>
+                    <span>-42 dBm · age 905 ms</span>
+                  </div>
+                </div>
+                <div class="hub-row" data-go="edges">
+                  <div class="stripe edges"></div>
+                  <div class="hub-copy">
+                    <div class="name">EDGES</div>
+                    <div class="desc">Dual-edge snapshot — both surfaces side by side, scene segment, tap to focus.</div>
+                  </div>
+                  <div class="hub-preview">
+                    <span class="big">P:18 · S:18</span>
+                    <span>scene ASSIST</span>
+                  </div>
+                </div>
+                <div class="hub-row" data-go="more">
+                  <div class="stripe more"></div>
+                  <div class="hub-copy">
+                    <div class="name">MORE</div>
+                    <div class="desc">Tab5-local only — audio cues, volume, battery detail. No K1 controls.</div>
+                  </div>
+                  <div class="hub-preview">
+                    <span>vol 42 · unmuted</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- HEALTH -->
+            <div class="screen-layer" data-view="health">
+              <div class="body">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div class="health-page">
+                  <div class="health-banner">
+                    <div>
+                      <div class="title">HEALTH: LIVE</div>
+                      <div class="hint">Joined to K1 AP, handshake ready, state fresh. One runtime metric above threshold.</div>
+                    </div>
+                    <button type="button" class="btn-retry">RETRY LINK</button>
+                  </div>
+                  <div class="health-grid">
+                    <div class="health-col">
+                      <h3>Connection</h3>
+                      <div class="kv">
+                        <span class="k">AP</span><span class="v ok">OK</span>
+                        <span class="k">WS</span><span class="v ok">CONNECTED</span>
+                        <span class="k">protocol</span><span class="v">v2</span>
+                        <span class="k">handshake</span><span class="v ok">ready</span>
+                        <span class="k">reconnects</span><span class="v">1</span>
+                        <span class="k">ws_error</span><span class="v">none</span>
+                      </div>
+                    </div>
+                    <div class="health-col">
+                      <h3>K1 proof</h3>
+                      <div class="kv">
+                        <span class="k">k1_seen</span><span class="v ok">1</span>
+                        <span class="k">k1_age</span><span class="v">905 ms</span>
+                        <span class="k">pending</span><span class="v ok">0</span>
+                        <span class="k">last_ok</span><span class="v ok">1</span>
+                        <span class="k">caps</span><span class="v">71</span>
+                        <span class="k">tx_dropped</span><span class="v ok">0</span>
+                      </div>
+                    </div>
+                    <div class="health-col">
+                      <h3>RF &amp; runtime</h3>
+                      <div class="kv">
+                        <span class="k">rssi</span><span class="v">-42.0 dBm</span>
+                        <span class="k">antenna</span><span class="v">LOW</span>
+                        <span class="k">probe</span><span class="v ok">done</span>
+                        <span class="k">ws_loop_max</span><span class="v">12 ms</span>
+                        <span class="k">lvgl_max</span><span class="v warn">268 ms</span>
+                        <span class="k">fps</span><span class="v">201</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EDGES -->
+            <div class="screen-layer" data-view="edges">
+              <div class="body">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div class="edges-page">
+                  <div class="scene-band">
+                    <div class="label">SCENE</div>
+                    <div class="seg scenes" style="height:52px;">
+                      <button type="button">OFF</button>
+                      <button type="button" class="on">ASSIST</button>
+                      <button type="button">L1</button>
+                      <button type="button">AUTO</button>
+                    </div>
+                  </div>
+                  <div class="edge-columns">
+                    <div class="edge-card primary" data-go="show">
+                      <h3>PRIMARY</h3>
+                      <div class="kv">
+                        <span class="k">mode</span><span class="v">18 · WAVEFORM TEMPO</span>
+                        <span class="k">palette</span><span class="v">25 · OCEAN BREEZE 036</span>
+                        <span class="k">bright</span><span class="v">70%</span>
+                        <span class="k">colour</span><span class="v">61%</span>
+                        <span class="k">speed</span><span class="v">54%</span>
+                        <span class="k">fps</span><span class="v">201</span>
+                      </div>
+                      <div class="tap-hint">Tap → focus in Show</div>
+                    </div>
+                    <div class="edge-card secondary" data-go="show">
+                      <h3>SECONDARY</h3>
+                      <div class="kv">
+                        <span class="k">mode</span><span class="v">18 · WAVEFORM TEMPO</span>
+                        <span class="k">palette</span><span class="v">28 · EMERALD DRAGON</span>
+                        <span class="k">bright</span><span class="v">52%</span>
+                        <span class="k">enabled</span><span class="v ok">yes</span>
+                        <span class="k">speed</span><span class="v">5%</span>
+                        <span class="k">fps</span><span class="v">201</span>
+                      </div>
+                      <div class="tap-hint">Tap → focus in Show</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- MORE -->
+            <div class="screen-layer" data-view="more">
+              <div class="body">
+                <button type="button" class="page-back" data-go="hub">‹ HUB</button>
+                <div class="more-page">
+                  <div class="more-left">
+                    <h2>LOCAL SETTINGS</h2>
+                    <p>Tab5 comfort controls only. Nothing here sends K1 WebSocket commands.</p>
+                    <div class="more-actions">
+                      <button type="button" class="action-btn">MUTE TOGGLE</button>
+                      <button type="button" class="action-btn">VOL +</button>
+                      <button type="button" class="action-btn">TEST CUE</button>
+                      <button type="button" class="action-btn" data-go="health">OPEN HEALTH</button>
+                    </div>
+                  </div>
+                  <div class="more-status">
+                    <h3>Status</h3>
+                    <div class="kv">
+                      <span class="k">audio</span><span class="v ok">enabled</span>
+                      <span class="k">muted</span><span class="v">0</span>
+                      <span class="k">volume</span><span class="v">42</span>
+                      <span class="k">battery</span><span class="v">100%</span>
+                      <span class="k">charging</span><span class="v ok">yes</span>
+                      <span class="k">usb</span><span class="v ok">yes</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PICKER -->
+            <div class="overlay-dim" id="overlay-dim"></div>
+            <div class="overlay-picker" id="overlay-picker" role="dialog" aria-label="Mode and palette browser">
+              <div class="picker-head">
+                <div class="picker-title">BROWSE — PRIMARY</div>
+                <div class="picker-tabs">
+                  <button type="button" class="picker-tab on">MODE</button>
+                  <button type="button" class="picker-tab">PALETTE</button>
+                </div>
+                <button type="button" class="picker-close" id="picker-close">CLOSE</button>
+              </div>
+              <div class="picker-grid">
+                <div class="picker-item"><span class="nm">BLOOM</span><span class="id">03</span></div>
+                <div class="picker-item"><span class="nm">WAVEFORM FAST</span><span class="id">07</span></div>
+                <div class="picker-item"><span class="nm">WAVEFORM</span><span class="id">08</span></div>
+                <div class="picker-item"><span class="nm">BLOOM FAST</span><span class="id">09</span></div>
+                <div class="picker-item"><span class="nm">WAVEFORM HYBRID</span><span class="id">11</span></div>
+                <div class="picker-item"><span class="nm">AURORA</span><span class="id">12</span></div>
+                <div class="picker-item"><span class="nm">COMET</span><span class="id">13</span></div>
+                <div class="picker-item"><span class="nm">SPECTRUM RIVER</span><span class="id">14</span></div>
+                <div class="picker-item"><span class="nm">SPECTRUM RIVER 2</span><span class="id">15</span></div>
+                <div class="picker-item"><span class="nm">EMBER FIELD</span><span class="id">16</span></div>
+                <div class="picker-item on"><span class="nm">WAVEFORM TEMPO</span><span class="id">18</span></div>
+                <div class="picker-item"><span class="nm">TEMPO RIVER</span><span class="id">19</span></div>
+                <div class="picker-item"><span class="nm">TEMPO COMET</span><span class="id">20</span></div>
+                <div class="picker-item"><span class="nm">DENSE FORGE</span><span class="id">21</span></div>
+                <div class="picker-item"><span class="nm">SNAPWAVE</span><span class="id">22</span></div>
+                <div class="picker-item"><span class="nm">PULSE PRISM</span><span class="id">23</span></div>
+              </div>
+              <div class="picker-foot">compat table · applied state requires k1.control.result match</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <aside class="inspector">
+        <div class="inspector-card">
+          <h2>Screens</h2>
+          <div class="nav-list" id="nav-list">
+            <button type="button" class="active" data-view="show">Show (composer)</button>
+            <button type="button" data-view="hub">Hub (title tap)</button>
+            <button type="button" data-view="health">Health</button>
+            <button type="button" data-view="edges">Dual edge</button>
+            <button type="button" data-view="more">More</button>
+          </div>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Overlays</h2>
+          <div class="toggle-row">
+            <button type="button" id="toggle-picker">Picker (browse)</button>
+            <button type="button" id="toggle-link">Link popover</button>
+          </div>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Hierarchy (loud → quiet)</h2>
+          <ul class="spec-list">
+            <li><strong>1 · Now playing</strong> — mode name 56px Bebas, palette, FPS/BPM/LOCK. Answers "what is the lamp doing" at a glance.</li>
+            <li><strong>2 · Control deck</strong> — three 56px sliders, the actual work surface. Result ticks: ✓ applied / … pending.</li>
+            <li><strong>3 · Context</strong> — surface + scene segmented controls.</li>
+            <li><strong>4 · Header</strong> — one LINK chip (status by exception) + battery. Five pills collapsed to one.</li>
+          </ul>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Colour semantics</h2>
+          <div class="sem-row"><span class="sem-dot" style="background:#00ffff"></span> PRIMARY edge — deck fills flip cyan</div>
+          <div class="sem-row"><span class="sem-dot" style="background:#00ff99"></span> SECONDARY edge — deck fills flip green</div>
+          <div class="sem-row"><span class="sem-dot" style="background:#bf00ff"></span> Scene system only</div>
+          <div class="sem-row"><span class="sem-dot" style="background:#ffc700"></span> Interactive emphasis (browse, nav)</div>
+          <div class="sem-row"><span class="sem-dot" style="background:#22c55e"></span> Health truth only</div>
+          <p class="inspector-note" style="margin-top:8px;">No decorative per-row neon. Colour answers "what am I editing", not "which row is this".</p>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Utility moves</h2>
+          <ul class="spec-list">
+            <li><strong>Mode grid off-glass</strong> — 16 cramped 12px chips → 96px picker cards with IDs. Composer shows current mode + BROWSE.</li>
+            <li><strong>LINK chip → popover</strong> — six diagnostics on tap, OPEN HEALTH for full page. No pill noise when healthy.</li>
+            <li><strong>Result-backed acks</strong> — per-slider ✓/… makes K1 truth visible (SSA finding).</li>
+            <li><strong>Hub rows preview live data</strong> — hub doubles as overview, not just a menu.</li>
+            <li><strong>Anomaly highlight</strong> — health flags only out-of-threshold values (see lvgl_max).</li>
+          </ul>
+        </div>
+
+        <div class="inspector-card">
+          <h2>Type ramp</h2>
+          <p class="inspector-note">Bebas 56 mode name · Bebas 38 page titles · Rajdhani 700 27 deck labels · Rajdhani 700 23 segments · Rajdhani 500 16 body · Mono 14 data. Touch ≥54px everywhere; deck tracks 56px.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const layers = document.querySelectorAll('.screen-layer');
+    const navButtons = document.querySelectorAll('#nav-list button[data-view]');
+    const titleCluster = document.getElementById('title-cluster');
+    const titleCrumb = document.getElementById('title-crumb');
+    const overlayDim = document.getElementById('overlay-dim');
+    const overlayPicker = document.getElementById('overlay-picker');
+    const linkChip = document.getElementById('link-chip');
+    const linkPopover = document.getElementById('link-popover');
+    const tab5 = document.getElementById('tab5');
+    const scaleWrap = document.getElementById('scale-wrap');
+
+    const crumbs = { show: 'SHOW', hub: 'CHOOSE', health: 'HEALTH', edges: 'EDGES', more: 'MORE' };
+    let currentView = 'show';
+    let pickerOpen = false;
+
+    function setView(name) {
+      currentView = name;
+      layers.forEach(l => l.classList.toggle('active', l.dataset.view === name));
+      navButtons.forEach(b => b.classList.toggle('active', b.dataset.view === name));
+      titleCrumb.textContent = crumbs[name] || 'SHOW';
+      titleCluster.classList.toggle('open', name === 'hub');
+      closePicker();
+      closeLink();
+    }
+
+    function openPicker() {
+      pickerOpen = true;
+      overlayDim.classList.add('visible');
+      overlayPicker.classList.add('visible');
+    }
+    function closePicker() {
+      pickerOpen = false;
+      overlayDim.classList.remove('visible');
+      overlayPicker.classList.remove('visible');
+    }
+    function closeLink() { linkPopover.classList.remove('visible'); }
+
+    navButtons.forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+    titleCluster.addEventListener('click', () => setView(currentView === 'hub' ? 'show' : 'hub'));
+
+    document.querySelectorAll('[data-go]').forEach(el => {
+      el.addEventListener('click', (e) => { e.stopPropagation(); setView(el.dataset.go); });
+    });
+
+    document.getElementById('browse-btn').addEventListener('click', openPicker);
+    document.getElementById('toggle-picker').addEventListener('click', () => pickerOpen ? closePicker() : openPicker());
+    document.getElementById('picker-close').addEventListener('click', closePicker);
+    overlayDim.addEventListener('click', closePicker);
+
+    linkChip.addEventListener('click', (e) => {
+      e.stopPropagation();
+      linkPopover.classList.toggle('visible');
+    });
+    document.getElementById('toggle-link').addEventListener('click', () => linkPopover.classList.toggle('visible'));
+    tab5.addEventListener('click', (e) => {
+      if (!linkPopover.contains(e.target) && e.target !== linkChip && !linkChip.contains(e.target)) closeLink();
+    });
+
+    function fitDevice() {
+      const w = scaleWrap.clientWidth;
+      const scale = w / 1280;
+      tab5.style.setProperty('--device-scale', String(scale));
+      scaleWrap.style.height = `${720 * scale}px`;
+    }
+    window.addEventListener('resize', fitDevice);
+    fitDevice();
+  </script>
+</body>
+</html>

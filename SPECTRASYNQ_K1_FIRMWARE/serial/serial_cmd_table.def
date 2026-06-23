@@ -1,0 +1,67 @@
+// ============================================================================
+//  serial_cmd_table.def — Row 1 dispatch-table rows (X-macro, single source).
+// ----------------------------------------------------------------------------
+//  ONE row per safety-critical bare command. This file is the SINGLE source of
+//  truth for the table contents; it is included by BOTH:
+//    - SPECTRASYNQ_K1_FIRMWARE/serial_menu.h (builds the real SERIAL_CMD_TABLE)
+//    - scripts/regression-harness/row1_dispatch_table_test.cpp (host test)
+//  so the test can never silently diverge from the shipped artifact.
+//
+//  The consumer #defines SERIAL_CMD(...) then #includes this file:
+//      SERIAL_CMD(name, hotkey, handler, safety_class, flags, input_surface)
+//    name          : string literal command token (typed form)
+//    hotkey        : single-byte form, or 0 if none (all rows here are 0 —
+//                    the keystroke surface is governed separately, see below)
+//    handler       : a token naming a `void name()` function the consumer must
+//                    have already declared (firmware: real handler; test:
+//                    a model handler that records an Effect)
+//    safety_class  : SC_SAFE | SC_TYPED_ONLY | SC_ARM_REQUIRED | SC_FORBIDDEN_SINGLE_BYTE
+//    flags         : bitwise-OR of CMD_* flags, or 0
+//    input_surface : IS_BOTH | IS_TYPED_ONLY | IS_HOTKEY_IMMEDIATE
+//                    (COMPILE-TIME metadata only — not enforced by the runtime
+//                    single-byte hotkey path, which lives in serial_handle_hotkey)
+//
+//  NB: hotkey is 0 for every row. The single-byte immediate-hotkey surface is a
+//  SEPARATE runtime path (serial_hotkey_is_immediate / serial_handle_hotkey) and
+//  is constrained there, not by this table. This table governs the typed `:cmd`
+//  surface; `input_surface` documents intent and feeds the no-dangerous-keystroke
+//  static_assert, but does not by itself route keystrokes.
+// ============================================================================
+
+// name              hotkey  handler                       safety_class               flags                              input_surface
+SERIAL_CMD("v",               0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("V",               0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("version",         0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("h",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("H",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("help",            0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("SB?",             0, cmd_sb_query,                SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("reset",           0, cmd_reset,                   SC_TYPED_ONLY,            CMD_DISRUPTIVE,                    IS_TYPED_ONLY )
+SERIAL_CMD("factory_reset",   0, cmd_factory_reset,           SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE, IS_TYPED_ONLY )
+SERIAL_CMD("restore_defaults",0, cmd_restore_defaults,        SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE | CMD_DISRUPTIVE, IS_TYPED_ONLY )
+SERIAL_CMD("clear_noise_cal", 0, cmd_clear_noise_cal,         SC_FORBIDDEN_SINGLE_BYTE, CMD_IRREVERSIBLE,                  IS_TYPED_ONLY )
+SERIAL_CMD("chip_id",         0, cmd_chip_id,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("identify",        0, cmd_identify,                SC_TYPED_ONLY,            0,                                 IS_TYPED_ONLY )
+SERIAL_CMD("start_noise_cal", 0, cmd_start_noise_cal_guidance,SC_ARM_REQUIRED,          CMD_NEEDS_SILENCE,                 IS_TYPED_ONLY )
+SERIAL_CMD("get_num_modes",   0, cmd_get_num_modes,           SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("get_mode",        0, cmd_get_mode,                SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("reset_reason",    0, cmd_reset_reason,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("dump",            0, cmd_dump,                    SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("stop",            0, cmd_stop,                    SC_SAFE,                  0,                                 IS_BOTH       )
+#if FEATURE_MABUTRACE
+SERIAL_CMD("trace",           0, cmd_trace_dump,              SC_TYPED_ONLY,            CMD_HARNESS,                       IS_TYPED_ONLY )
+#endif
+SERIAL_CMD("fps",             0, cmd_fps,                     SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("led_fps",         0, cmd_led_fps,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("vp_status",       0, cmd_vp_status,               SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("smart_status",    0, cmd_smart_status,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("edge_status",     0, cmd_edge_status,             SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("event_status",    0, cmd_event_status,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("vp_out_test",     0, cmd_vp_out_test,             SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("get_knobs",       0, cmd_get_knobs,               SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("get_buttons",     0, cmd_get_buttons,             SC_SAFE,                  0,                                 IS_BOTH       )
+// Effects queue (2026-06-11): `commit` mirrors the '\' immediate hotkey (the
+// keystroke surface lives in serial_handle_hotkey; the hotkey column stays 0),
+// `slot_list` is a read-only typed inspection command.
+SERIAL_CMD("commit",          0, cmd_queue_commit,            SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("slot_list",       0, cmd_slot_list,               SC_SAFE,                  0,                                 IS_TYPED_ONLY )

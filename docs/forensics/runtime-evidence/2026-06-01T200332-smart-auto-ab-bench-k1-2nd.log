@@ -1,0 +1,1209 @@
+# role=smart-auto-candidate name=bench-k1-2nd port=/dev/tty.usbmodem1401 scene=auto
+[1780315421.939] >>> :version
+[1780315421.939] ale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.939] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.940] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.940] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.940] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.940] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.940] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.941] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.942] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315421.955] sbr{{
+[1780315421.955] VERSION: 40103
+[1780315421.955] }}
+[1780315422.026] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315422.744] >>> :chip_id
+[1780315422.749] sbr{{
+[1780315422.749] F887A500
+[1780315422.749] }}
+[1780315423.029] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315423.545] >>> :ap_stream=on
+[1780315423.560] sbr{{
+[1780315423.560] AP_STREAM: on
+[1780315423.560] }}
+[1780315424.034] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315424.100] >>> :vp_stream=on
+[1780315424.114] sbr{{
+[1780315424.114] VP_STREAM: on
+[1780315424.114] }}
+[1780315424.124] [VP] profile=candidate fix=111011 chroma_seq=5507 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2179 render_avg=1671 render_max=3239
+[1780315424.655] >>> :vp_perf=start
+[1780315424.669] sbr{{
+[1780315424.669] VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+[1780315424.669] }}
+[1780315425.039] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315425.129] [VP] profile=candidate fix=111011 chroma_seq=5697 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2173 render_avg=1649 render_max=3239
+[1780315425.208] >>> :smart_scene=auto
+[1780315425.222] sbr{{
+[1780315425.222] SMART_ASSIST: on
+[1780315425.222] SMART_SWITCHING: on
+[1780315425.223] SMART_DIRECTOR_AUTONOMY: on
+[1780315425.223] SMART_HOOKS: on
+[1780315425.223] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315425.223] SMART_APPLIED_MODE: 3
+[1780315425.223] SMART_LAST_REQUESTED_MODE: 3
+[1780315425.223] SMART_SWITCHES_IN_WINDOW: 0
+[1780315425.223] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315425.223] SMART_LAST_REASON: 0
+[1780315425.223] SMART_STATE: 0
+[1780315425.223] SMART_INTENT_MODE: 3
+[1780315425.223] SMART_INTENT_CONFIDENCE: 0.000
+[1780315425.224] SMART_INTENT_WANTS_SWITCH: 0
+[1780315425.224] SMART_SCALAR_PHOTONS: 1.000
+[1780315425.225] SMART_SCALAR_CHROMA: 1.000
+[1780315425.225] SMART_SCALAR_MOOD: 1.000
+[1780315425.225] SMART_SCALAR_SATURATION: 1.000
+[1780315425.225] SMART_PALETTE_OVERLAY: 0
+[1780315425.225] SMART_PALETTE_INDEX: 0
+[1780315425.225] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315425.226] SMART_MIN_DWELL_MS: 12000
+[1780315425.226] SMART_COOLDOWN_MS: 12000
+[1780315425.226] SMART_SWITCH_WINDOW_MS: 90000
+[1780315425.226] SMART_MAX_SWITCHES: 3
+[1780315425.227] SMART_AUDIO_NOVELTY: 0.0000
+[1780315425.227] SMART_AUDIO_ENERGY: 0.0000
+[1780315425.227] SMART_EVENT_ID: 0
+[1780315425.227] SMART_EVENT_AGE_MS: 0
+[1780315425.227] SMART_ONSET: 0
+[1780315425.227] SMART_BASS_ONSET: 0
+[1780315425.227] SMART_BEAT_CONFIDENCE: 0.000
+[1780315425.227] }}
+[1780315425.227] sbr{{
+[1780315425.227] EDGE_ENABLED: on
+[1780315425.227] EDGE_MODE: complementary
+[1780315425.227] EDGE_STRENGTH: 0.650
+[1780315425.227] }}
+[1780315425.763] >>> :smart_status
+[1780315425.765] sbr{{
+[1780315425.765] SMART_ASSIST: on
+[1780315425.765] SMART_SWITCHING: on
+[1780315425.765] SMART_DIRECTOR_AUTONOMY: on
+[1780315425.765] SMART_HOOKS: on
+[1780315425.765] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315425.766] SMART_APPLIED_MODE: 3
+[1780315425.766] SMART_LAST_REQUESTED_MODE: 3
+[1780315425.766] SMART_SWITCHES_IN_WINDOW: 0
+[1780315425.766] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315425.766] SMART_LAST_REASON: 0
+[1780315425.766] SMART_STATE: 2
+[1780315425.766] SMART_INTENT_MODE: 11
+[1780315425.766] SMART_INTENT_CONFIDENCE: 0.038
+[1780315425.766] SMART_INTENT_WANTS_SWITCH: 0
+[1780315425.766] SMART_SCALAR_PHOTONS: 1.000
+[1780315425.767] SMART_SCALAR_CHROMA: 1.000
+[1780315425.767] SMART_SCALAR_MOOD: 1.000
+[1780315425.768] SMART_SCALAR_SATURATION: 1.000
+[1780315425.768] SMART_PALETTE_OVERLAY: 1
+[1780315425.768] SMART_PALETTE_INDEX: 11
+[1780315425.768] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315425.768] SMART_MIN_DWELL_MS: 12000
+[1780315425.768] SMART_COOLDOWN_MS: 12000
+[1780315425.769] SMART_SWITCH_WINDOW_MS: 90000
+[1780315425.769] SMART_MAX_SWITCHES: 3
+[1780315425.769] SMART_AUDIO_NOVELTY: 0.0000
+[1780315425.770] SMART_AUDIO_ENERGY: 0.1157
+[1780315425.770] SMART_EVENT_ID: 0
+[1780315425.770] SMART_EVENT_AGE_MS: 4294967295
+[1780315425.770] SMART_ONSET: 0
+[1780315425.770] SMART_BASS_ONSET: 0
+[1780315425.770] SMART_BEAT_CONFIDENCE: 0.000
+[1780315425.770] }}
+[1780315426.045] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315426.136] [VP] profile=candidate fix=111011 chroma_seq=5871 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2640 render_avg=2296 render_max=3346
+[1780315426.317] >>> :edge_status
+[1780315426.323] sbr{{
+[1780315426.323] EDGE_ENABLED: on
+[1780315426.323] EDGE_MODE: complementary
+[1780315426.323] EDGE_STRENGTH: 0.650
+[1780315426.323] }}
+[1780315426.872] >>> :vp_status
+[1780315426.875] sbr{{
+[1780315426.875] VP_PROFILE: candidate
+[1780315426.876] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315426.876] VP_STREAM: on
+[1780315426.876] AP_STREAM: on
+[1780315426.877] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315426.879] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315426.881] VP_CHROMA: seq=6000 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315426.883] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315426.883] VP_RENDER_US: last=2644 avg=2177 max=3626
+[1780315426.883] }}
+[1780315427.050] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315427.139] [VP] profile=candidate fix=111011 chroma_seq=6044 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2403 render_avg=2216 render_max=3626
+[1780315427.422] ### CLIP_START id=steady-groove track=Regard_Ride_It.mp3 start=125 duration=25
+[1780315427.534] >>> :smart_status
+[1780315427.550] sbr{{
+[1780315427.550] SMART_ASSIST: on
+[1780315427.550] SMART_SWITCHING: on
+[1780315427.550] SMART_DIRECTOR_AUTONOMY: on
+[1780315427.550] SMART_HOOKS: on
+[1780315427.551] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315427.551] SMART_APPLIED_MODE: 3
+[1780315427.551] SMART_LAST_REQUESTED_MODE: 3
+[1780315427.551] SMART_SWITCHES_IN_WINDOW: 0
+[1780315427.552] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315427.552] SMART_LAST_REASON: 0
+[1780315427.552] SMART_STATE: 2
+[1780315427.552] SMART_INTENT_MODE: 11
+[1780315427.552] SMART_INTENT_CONFIDENCE: 0.040
+[1780315427.553] SMART_INTENT_WANTS_SWITCH: 0
+[1780315427.553] SMART_SCALAR_PHOTONS: 1.000
+[1780315427.553] SMART_SCALAR_CHROMA: 1.000
+[1780315427.553] SMART_SCALAR_MOOD: 1.000
+[1780315427.553] SMART_SCALAR_SATURATION: 1.000
+[1780315427.553] SMART_PALETTE_OVERLAY: 1
+[1780315427.554] SMART_PALETTE_INDEX: 11
+[1780315427.554] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315427.554] SMART_MIN_DWELL_MS: 12000
+[1780315427.554] SMART_COOLDOWN_MS: 12000
+[1780315427.554] SMART_SWITCH_WINDOW_MS: 90000
+[1780315427.554] SMART_MAX_SWITCHES: 3
+[1780315427.554] SMART_AUDIO_NOVELTY: 0.0000
+[1780315427.554] SMART_AUDIO_ENERGY: 0.1157
+[1780315427.554] SMART_EVENT_ID: 0
+[1780315427.555] SMART_EVENT_AGE_MS: 4294967295
+[1780315427.555] SMART_ONSET: 0
+[1780315427.555] SMART_BASS_ONSET: 0
+[1780315427.555] SMART_BEAT_CONFIDENCE: 0.000
+[1780315427.555] }}
+[1780315427.589] >>> :vp_status
+[1780315427.601] sbr{{
+[1780315427.601] VP_PROFILE: candidate
+[1780315427.601] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315427.601] VP_STREAM: on
+[1780315427.601] AP_STREAM: on
+[1780315427.602] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315427.603] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315427.607] VP_CHROMA: seq=6124 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315427.607] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315427.607] VP_RENDER_US: last=2600 avg=2425 max=3645
+[1780315427.607] }}
+[1780315428.055] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315428.144] [VP] profile=candidate fix=111011 chroma_seq=6216 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2391 render_avg=2218 render_max=3645
+[1780315429.061] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315429.150] [VP] profile=candidate fix=111011 chroma_seq=6390 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2525 render_avg=2293 render_max=3645
+[1780315430.065] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315430.154] [VP] profile=candidate fix=111011 chroma_seq=6563 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2527 render_avg=2133 render_max=3645
+[1780315431.156] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315431.159] [VP] profile=candidate fix=111011 chroma_seq=6737 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2389 render_avg=2194 render_max=3645
+[1780315432.076] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315432.165] [VP] profile=candidate fix=111011 chroma_seq=6911 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2533 render_avg=2285 render_max=3645
+[1780315432.555] >>> :smart_status
+[1780315432.559] sbr{{
+[1780315432.559] SMART_ASSIST: on
+[1780315432.559] SMART_SWITCHING: on
+[1780315432.560] SMART_DIRECTOR_AUTONOMY: on
+[1780315432.560] SMART_HOOKS: on
+[1780315432.560] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315432.560] SMART_APPLIED_MODE: 3
+[1780315432.560] SMART_LAST_REQUESTED_MODE: 3
+[1780315432.560] SMART_SWITCHES_IN_WINDOW: 0
+[1780315432.560] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315432.560] SMART_LAST_REASON: 0
+[1780315432.560] SMART_STATE: 2
+[1780315432.560] SMART_INTENT_MODE: 11
+[1780315432.561] SMART_INTENT_CONFIDENCE: 0.040
+[1780315432.561] SMART_INTENT_WANTS_SWITCH: 0
+[1780315432.561] SMART_SCALAR_PHOTONS: 1.000
+[1780315432.561] SMART_SCALAR_CHROMA: 1.000
+[1780315432.561] SMART_SCALAR_MOOD: 1.000
+[1780315432.561] SMART_SCALAR_SATURATION: 1.000
+[1780315432.562] SMART_PALETTE_OVERLAY: 1
+[1780315432.562] SMART_PALETTE_INDEX: 11
+[1780315432.562] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315432.562] SMART_MIN_DWELL_MS: 12000
+[1780315432.562] SMART_COOLDOWN_MS: 12000
+[1780315432.562] SMART_SWITCH_WINDOW_MS: 90000
+[1780315432.562] SMART_MAX_SWITCHES: 3
+[1780315432.563] SMART_AUDIO_NOVELTY: 0.0000
+[1780315432.563] SMART_AUDIO_ENERGY: 0.1157
+[1780315432.563] SMART_EVENT_ID: 0
+[1780315432.564] SMART_EVENT_AGE_MS: 4294967295
+[1780315432.564] SMART_ONSET: 0
+[1780315432.564] SMART_BASS_ONSET: 0
+[1780315432.564] SMART_BEAT_CONFIDENCE: 0.000
+[1780315432.564] }}
+[1780315432.608] >>> :vp_status
+[1780315432.610] sbr{{
+[1780315432.610] VP_PROFILE: candidate
+[1780315432.611] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315432.611] VP_STREAM: on
+[1780315432.611] AP_STREAM: on
+[1780315432.612] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315432.613] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315432.615] VP_CHROMA: seq=6988 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315432.615] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315432.616] VP_RENDER_US: last=3422 avg=2293 max=3645
+[1780315432.616] }}
+[1780315433.164] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315433.167] [VP] profile=candidate fix=111011 chroma_seq=7083 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2360 render_avg=2186 render_max=3645
+[1780315434.085] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315434.172] [VP] profile=candidate fix=111011 chroma_seq=7257 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2346 render_avg=2146 render_max=3645
+[1780315435.090] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315435.176] [VP] profile=candidate fix=111011 chroma_seq=7430 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2315 render_avg=2243 render_max=3645
+[1780315436.096] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315436.178] [VP] profile=candidate fix=111011 chroma_seq=7603 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2511 render_avg=2357 render_max=3645
+[1780315437.101] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315437.184] [VP] profile=candidate fix=111011 chroma_seq=7777 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2594 render_avg=2234 render_max=3645
+[1780315437.582] >>> :smart_status
+[1780315437.588] sbr{{
+[1780315437.588] SMART_ASSIST: on
+[1780315437.588] SMART_SWITCHING: on
+[1780315437.588] SMART_DIRECTOR_AUTONOMY: on
+[1780315437.588] SMART_HOOKS: on
+[1780315437.588] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315437.588] SMART_APPLIED_MODE: 3
+[1780315437.589] SMART_LAST_REQUESTED_MODE: 3
+[1780315437.589] SMART_SWITCHES_IN_WINDOW: 0
+[1780315437.589] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315437.589] SMART_LAST_REASON: 0
+[1780315437.589] SMART_STATE: 2
+[1780315437.589] SMART_INTENT_MODE: 11
+[1780315437.589] SMART_INTENT_CONFIDENCE: 0.040
+[1780315437.589] SMART_INTENT_WANTS_SWITCH: 0
+[1780315437.590] SMART_SCALAR_PHOTONS: 1.000
+[1780315437.591] SMART_SCALAR_CHROMA: 1.000
+[1780315437.591] SMART_SCALAR_MOOD: 1.000
+[1780315437.591] SMART_SCALAR_SATURATION: 1.000
+[1780315437.591] SMART_PALETTE_OVERLAY: 1
+[1780315437.591] SMART_PALETTE_INDEX: 11
+[1780315437.592] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315437.592] SMART_MIN_DWELL_MS: 12000
+[1780315437.592] SMART_COOLDOWN_MS: 12000
+[1780315437.592] SMART_SWITCH_WINDOW_MS: 90000
+[1780315437.592] SMART_MAX_SWITCHES: 3
+[1780315437.592] SMART_AUDIO_NOVELTY: 0.0000
+[1780315437.592] SMART_AUDIO_ENERGY: 0.1157
+[1780315437.593] SMART_EVENT_ID: 0
+[1780315437.593] SMART_EVENT_AGE_MS: 4294967295
+[1780315437.593] SMART_ONSET: 0
+[1780315437.593] SMART_BASS_ONSET: 0
+[1780315437.593] SMART_BEAT_CONFIDENCE: 0.000
+[1780315437.593] }}
+[1780315437.633] >>> :vp_status
+[1780315437.645] sbr{{
+[1780315437.645] VP_PROFILE: candidate
+[1780315437.646] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315437.646] VP_STREAM: on
+[1780315437.646] AP_STREAM: on
+[1780315437.647] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315437.648] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315437.650] VP_CHROMA: seq=7857 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315437.651] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315437.652] VP_RENDER_US: last=2369 avg=2267 max=3645
+[1780315437.652] }}
+[1780315438.108] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315438.179] [VP] profile=candidate fix=111011 chroma_seq=7947 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2608 render_avg=2222 render_max=3645
+[1780315439.110] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315439.184] [VP] profile=candidate fix=111011 chroma_seq=8120 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2387 render_avg=2237 render_max=3645
+[1780315440.114] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315440.189] [VP] profile=candidate fix=111011 chroma_seq=8294 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2501 render_avg=2267 render_max=3645
+[1780315441.189] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315441.194] [VP] profile=candidate fix=111011 chroma_seq=8467 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2587 render_avg=2219 render_max=3645
+[1780315442.125] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315442.198] [VP] profile=candidate fix=111011 chroma_seq=8641 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2356 render_avg=2173 render_max=3645
+[1780315442.547] >>> :smart_status
+[1780315442.548] sbr{{
+[1780315442.548] SMART_ASSIST: on
+[1780315442.548] SMART_SWITCHING: on
+[1780315442.548] SMART_DIRECTOR_AUTONOMY: on
+[1780315442.548] SMART_HOOKS: on
+[1780315442.548] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315442.549] SMART_APPLIED_MODE: 3
+[1780315442.549] SMART_LAST_REQUESTED_MODE: 3
+[1780315442.549] SMART_SWITCHES_IN_WINDOW: 0
+[1780315442.549] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315442.549] SMART_LAST_REASON: 0
+[1780315442.549] SMART_STATE: 2
+[1780315442.549] SMART_INTENT_MODE: 10
+[1780315442.549] SMART_INTENT_CONFIDENCE: 0.040
+[1780315442.549] SMART_INTENT_WANTS_SWITCH: 0
+[1780315442.550] SMART_SCALAR_PHOTONS: 1.000
+[1780315442.551] SMART_SCALAR_CHROMA: 1.000
+[1780315442.551] SMART_SCALAR_MOOD: 1.000
+[1780315442.551] SMART_SCALAR_SATURATION: 1.000
+[1780315442.551] SMART_PALETTE_OVERLAY: 1
+[1780315442.551] SMART_PALETTE_INDEX: 22
+[1780315442.551] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315442.551] SMART_MIN_DWELL_MS: 12000
+[1780315442.551] SMART_COOLDOWN_MS: 12000
+[1780315442.551] SMART_SWITCH_WINDOW_MS: 90000
+[1780315442.552] SMART_MAX_SWITCHES: 3
+[1780315442.552] SMART_AUDIO_NOVELTY: 0.0000
+[1780315442.552] SMART_AUDIO_ENERGY: 0.1157
+[1780315442.552] SMART_EVENT_ID: 0
+[1780315442.553] SMART_EVENT_AGE_MS: 4294967295
+[1780315442.553] SMART_ONSET: 0
+[1780315442.553] SMART_BASS_ONSET: 0
+[1780315442.553] SMART_BEAT_CONFIDENCE: 0.000
+[1780315442.553] }}
+[1780315442.602] >>> :vp_status
+[1780315442.610] sbr{{
+[1780315442.610] VP_PROFILE: candidate
+[1780315442.611] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315442.611] VP_STREAM: on
+[1780315442.611] AP_STREAM: on
+[1780315442.611] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315442.613] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315442.615] VP_CHROMA: seq=8715 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315442.616] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315442.617] VP_RENDER_US: last=3083 avg=2032 max=3645
+[1780315442.617] }}
+[1780315443.131] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315443.196] [VP] profile=candidate fix=111011 chroma_seq=8817 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2603 render_avg=2015 render_max=3645
+[1780315444.134] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315444.200] [VP] profile=candidate fix=111011 chroma_seq=8995 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=1409 render_avg=1921 render_max=3645
+[1780315445.139] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315445.205] [VP] profile=candidate fix=111011 chroma_seq=9173 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=1416 render_avg=1926 render_max=3645
+[1780315446.144] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315446.203] [VP] profile=candidate fix=111011 chroma_seq=9350 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2425 render_avg=1943 render_max=3645
+[1780315447.152] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315447.210] [VP] profile=candidate fix=111011 chroma_seq=9528 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2320 render_avg=2023 render_max=3645
+[1780315447.574] >>> :smart_status
+[1780315447.577] sbr{{
+[1780315447.577] SMART_ASSIST: on
+[1780315447.577] SMART_SWITCHING: on
+[1780315447.577] SMART_DIRECTOR_AUTONOMY: on
+[1780315447.577] SMART_HOOKS: on
+[1780315447.577] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315447.577] SMART_APPLIED_MODE: 3
+[1780315447.577] SMART_LAST_REQUESTED_MODE: 3
+[1780315447.578] SMART_SWITCHES_IN_WINDOW: 0
+[1780315447.578] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315447.578] SMART_LAST_REASON: 0
+[1780315447.578] SMART_STATE: 2
+[1780315447.578] SMART_INTENT_MODE: 10
+[1780315447.578] SMART_INTENT_CONFIDENCE: 0.040
+[1780315447.578] SMART_INTENT_WANTS_SWITCH: 0
+[1780315447.578] SMART_SCALAR_PHOTONS: 1.000
+[1780315447.579] SMART_SCALAR_CHROMA: 1.000
+[1780315447.580] SMART_SCALAR_MOOD: 1.000
+[1780315447.580] SMART_SCALAR_SATURATION: 1.000
+[1780315447.580] SMART_PALETTE_OVERLAY: 1
+[1780315447.580] SMART_PALETTE_INDEX: 22
+[1780315447.580] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315447.580] SMART_MIN_DWELL_MS: 12000
+[1780315447.580] SMART_COOLDOWN_MS: 12000
+[1780315447.580] SMART_SWITCH_WINDOW_MS: 90000
+[1780315447.580] SMART_MAX_SWITCHES: 3
+[1780315447.581] SMART_AUDIO_NOVELTY: 0.0000
+[1780315447.581] SMART_AUDIO_ENERGY: 0.1157
+[1780315447.581] SMART_EVENT_ID: 0
+[1780315447.582] SMART_EVENT_AGE_MS: 4294967295
+[1780315447.582] SMART_ONSET: 0
+[1780315447.582] SMART_BASS_ONSET: 0
+[1780315447.582] SMART_BEAT_CONFIDENCE: 0.000
+[1780315447.582] }}
+[1780315447.628] >>> :vp_status
+[1780315447.639] sbr{{
+[1780315447.639] VP_PROFILE: candidate
+[1780315447.639] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315447.639] VP_STREAM: on
+[1780315447.639] AP_STREAM: on
+[1780315447.640] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315447.641] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315447.644] VP_CHROMA: seq=9605 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315447.645] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315447.646] VP_RENDER_US: last=3482 avg=2199 max=3645
+[1780315447.646] }}
+[1780315448.155] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315448.213] [VP] profile=candidate fix=111011 chroma_seq=9705 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2308 render_avg=2077 render_max=3645
+[1780315449.161] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315449.216] [VP] profile=candidate fix=111011 chroma_seq=9883 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2373 render_avg=2067 render_max=3645
+[1780315450.166] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315450.221] [VP] profile=candidate fix=111011 chroma_seq=10061 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2337 render_avg=2067 render_max=3645
+[1780315451.172] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315451.230] [VP] profile=candidate fix=111011 chroma_seq=10239 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2324 render_avg=2054 render_max=3645
+[1780315452.175] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315452.233] [VP] profile=candidate fix=111011 chroma_seq=10417 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2307 render_avg=1970 render_max=3645
+[1780315452.543] >>> :smart_status
+[1780315452.553] sbr{{
+[1780315452.553] SMART_ASSIST: on
+[1780315452.553] SMART_SWITCHING: on
+[1780315452.553] SMART_DIRECTOR_AUTONOMY: on
+[1780315452.553] SMART_HOOKS: on
+[1780315452.553] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315452.553] SMART_APPLIED_MODE: 3
+[1780315452.554] SMART_LAST_REQUESTED_MODE: 3
+[1780315452.554] SMART_SWITCHES_IN_WINDOW: 0
+[1780315452.555] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315452.555] SMART_LAST_REASON: 0
+[1780315452.555] SMART_STATE: 2
+[1780315452.555] SMART_INTENT_MODE: 10
+[1780315452.555] SMART_INTENT_CONFIDENCE: 0.040
+[1780315452.555] SMART_INTENT_WANTS_SWITCH: 0
+[1780315452.555] SMART_SCALAR_PHOTONS: 1.000
+[1780315452.555] SMART_SCALAR_CHROMA: 1.000
+[1780315452.555] SMART_SCALAR_MOOD: 1.000
+[1780315452.555] SMART_SCALAR_SATURATION: 1.000
+[1780315452.556] SMART_PALETTE_OVERLAY: 1
+[1780315452.556] SMART_PALETTE_INDEX: 22
+[1780315452.556] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315452.556] SMART_MIN_DWELL_MS: 12000
+[1780315452.556] SMART_COOLDOWN_MS: 12000
+[1780315452.556] SMART_SWITCH_WINDOW_MS: 90000
+[1780315452.557] SMART_MAX_SWITCHES: 3
+[1780315452.557] SMART_AUDIO_NOVELTY: 0.0000
+[1780315452.557] SMART_AUDIO_ENERGY: 0.1157
+[1780315452.557] SMART_EVENT_ID: 0
+[1780315452.557] SMART_EVENT_AGE_MS: 4294967295
+[1780315452.557] SMART_ONSET: 0
+[1780315452.557] SMART_BASS_ONSET: 0
+[1780315452.557] SMART_BEAT_CONFIDENCE: 0.000
+[1780315452.557] }}
+[1780315452.599] >>> :vp_status
+[1780315452.613] sbr{{
+[1780315452.614] VP_PROFILE: candidate
+[1780315452.615] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315452.615] VP_STREAM: on
+[1780315452.615] AP_STREAM: on
+[1780315452.615] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315452.618] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315452.620] VP_CHROMA: seq=10486 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315452.620] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315452.621] VP_RENDER_US: last=2474 avg=2074 max=3645
+[1780315452.621] }}
+[1780315452.760] ### CLIP_END id=steady-groove ffplay_rc=0 video_rc=None
+[1780315452.760] ### CLIP_START id=kick-drop-heavy track=Shelter-Mix-Cut-Yoel-Lewis-Remix.mp3 start=75 duration=25
+[1780315452.872] >>> :smart_status
+[1780315452.883] sbr{{
+[1780315452.883] SMART_ASSIST: on
+[1780315452.883] SMART_SWITCHING: on
+[1780315452.883] SMART_DIRECTOR_AUTONOMY: on
+[1780315452.883] SMART_HOOKS: on
+[1780315452.883] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315452.884] SMART_APPLIED_MODE: 3
+[1780315452.884] SMART_LAST_REQUESTED_MODE: 3
+[1780315452.884] SMART_SWITCHES_IN_WINDOW: 0
+[1780315452.884] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315452.884] SMART_LAST_REASON: 0
+[1780315452.884] SMART_STATE: 2
+[1780315452.884] SMART_INTENT_MODE: 10
+[1780315452.884] SMART_INTENT_CONFIDENCE: 0.040
+[1780315452.884] SMART_INTENT_WANTS_SWITCH: 0
+[1780315452.886] SMART_SCALAR_PHOTONS: 1.000
+[1780315452.886] SMART_SCALAR_CHROMA: 1.000
+[1780315452.886] SMART_SCALAR_MOOD: 1.000
+[1780315452.886] SMART_SCALAR_SATURATION: 1.000
+[1780315452.886] SMART_PALETTE_OVERLAY: 1
+[1780315452.886] SMART_PALETTE_INDEX: 22
+[1780315452.886] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315452.886] SMART_MIN_DWELL_MS: 12000
+[1780315452.886] SMART_COOLDOWN_MS: 12000
+[1780315452.886] SMART_SWITCH_WINDOW_MS: 90000
+[1780315452.887] SMART_MAX_SWITCHES: 3
+[1780315452.888] SMART_AUDIO_NOVELTY: 0.0000
+[1780315452.888] SMART_AUDIO_ENERGY: 0.1157
+[1780315452.888] SMART_EVENT_ID: 0
+[1780315452.888] SMART_EVENT_AGE_MS: 4294967295
+[1780315452.888] SMART_ONSET: 0
+[1780315452.888] SMART_BASS_ONSET: 0
+[1780315452.888] SMART_BEAT_CONFIDENCE: 0.000
+[1780315452.888] }}
+[1780315452.925] >>> :vp_status
+[1780315452.928] sbr{{
+[1780315452.928] VP_PROFILE: candidate
+[1780315452.928] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315452.928] VP_STREAM: on
+[1780315452.928] AP_STREAM: on
+[1780315452.930] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315452.932] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315452.933] VP_CHROMA: seq=10540 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315452.935] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315452.935] VP_RENDER_US: last=2476 avg=2022 max=3645
+[1780315452.935] }}
+[1780315453.182] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315453.236] [VP] profile=candidate fix=111011 chroma_seq=10593 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2355 render_avg=2066 render_max=3645
+[1780315454.187] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315454.242] [VP] profile=candidate fix=111011 chroma_seq=10771 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2397 render_avg=1983 render_max=3645
+[1780315455.190] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315455.248] [VP] profile=candidate fix=111011 chroma_seq=10949 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2318 render_avg=1994 render_max=3645
+[1780315456.197] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315456.249] [VP] profile=candidate fix=111011 chroma_seq=11126 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2545 render_avg=2038 render_max=3645
+[1780315457.200] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315457.250] [VP] profile=candidate fix=111011 chroma_seq=11304 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=1419 render_avg=1939 render_max=3645
+[1780315457.909] >>> :smart_status
+[1780315457.925] sbr{{
+[1780315457.925] SMART_ASSIST: on
+[1780315457.925] SMART_SWITCHING: on
+[1780315457.925] SMART_DIRECTOR_AUTONOMY: on
+[1780315457.925] SMART_HOOKS: on
+[1780315457.925] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315457.925] SMART_APPLIED_MODE: 3
+[1780315457.925] SMART_LAST_REQUESTED_MODE: 3
+[1780315457.925] SMART_SWITCHES_IN_WINDOW: 0
+[1780315457.925] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315457.925] SMART_LAST_REASON: 0
+[1780315457.925] SMART_STATE: 2
+[1780315457.925] SMART_INTENT_MODE: 10
+[1780315457.926] SMART_INTENT_CONFIDENCE: 0.040
+[1780315457.927] SMART_INTENT_WANTS_SWITCH: 0
+[1780315457.927] SMART_SCALAR_PHOTONS: 1.000
+[1780315457.927] SMART_SCALAR_CHROMA: 1.000
+[1780315457.927] SMART_SCALAR_MOOD: 1.000
+[1780315457.927] SMART_SCALAR_SATURATION: 1.000
+[1780315457.927] SMART_PALETTE_OVERLAY: 1
+[1780315457.927] SMART_PALETTE_INDEX: 22
+[1780315457.927] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315457.928] SMART_MIN_DWELL_MS: 12000
+[1780315457.928] SMART_COOLDOWN_MS: 12000
+[1780315457.928] SMART_SWITCH_WINDOW_MS: 90000
+[1780315457.928] SMART_MAX_SWITCHES: 3
+[1780315457.928] SMART_AUDIO_NOVELTY: 0.0000
+[1780315457.928] SMART_AUDIO_ENERGY: 0.1157
+[1780315457.928] SMART_EVENT_ID: 0
+[1780315457.928] SMART_EVENT_AGE_MS: 4294967295
+[1780315457.928] SMART_ONSET: 0
+[1780315457.928] SMART_BASS_ONSET: 0
+[1780315457.928] SMART_BEAT_CONFIDENCE: 0.000
+[1780315457.930] }}
+[1780315457.960] >>> :vp_status
+[1780315457.961] sbr{{
+[1780315457.962] VP_PROFILE: candidate
+[1780315457.962] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315457.962] VP_STREAM: on
+[1780315457.962] AP_STREAM: on
+[1780315457.962] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315457.963] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315457.964] VP_CHROMA: seq=11430 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315457.965] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315457.965] VP_RENDER_US: last=2461 avg=2067 max=3645
+[1780315457.965] }}
+[1780315458.244] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315458.247] [VP] profile=candidate fix=111011 chroma_seq=11480 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2408 render_avg=1999 render_max=3645
+[1780315459.210] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315459.252] [VP] profile=candidate fix=111011 chroma_seq=11658 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2371 render_avg=1971 render_max=3645
+[1780315460.253] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315460.257] [VP] profile=candidate fix=111011 chroma_seq=11835 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2337 render_avg=1997 render_max=3645
+[1780315461.222] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315461.263] [VP] profile=candidate fix=111011 chroma_seq=12014 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2460 render_avg=2112 render_max=3645
+[1780315462.227] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315462.268] [VP] profile=candidate fix=111011 chroma_seq=12192 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2465 render_avg=2110 render_max=3645
+[1780315462.916] >>> :smart_status
+[1780315462.922] sbr{{
+[1780315462.922] SMART_ASSIST: on
+[1780315462.922] SMART_SWITCHING: on
+[1780315462.922] SMART_DIRECTOR_AUTONOMY: on
+[1780315462.922] SMART_HOOKS: on
+[1780315462.922] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315462.922] SMART_APPLIED_MODE: 3
+[1780315462.923] SMART_LAST_REQUESTED_MODE: 3
+[1780315462.923] SMART_SWITCHES_IN_WINDOW: 0
+[1780315462.923] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315462.923] SMART_LAST_REASON: 0
+[1780315462.923] SMART_STATE: 2
+[1780315462.923] SMART_INTENT_MODE: 10
+[1780315462.923] SMART_INTENT_CONFIDENCE: 0.040
+[1780315462.923] SMART_INTENT_WANTS_SWITCH: 0
+[1780315462.923] SMART_SCALAR_PHOTONS: 1.000
+[1780315462.923] SMART_SCALAR_CHROMA: 1.000
+[1780315462.923] SMART_SCALAR_MOOD: 1.000
+[1780315462.925] SMART_SCALAR_SATURATION: 1.000
+[1780315462.925] SMART_PALETTE_OVERLAY: 1
+[1780315462.925] SMART_PALETTE_INDEX: 22
+[1780315462.925] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315462.925] SMART_MIN_DWELL_MS: 12000
+[1780315462.925] SMART_COOLDOWN_MS: 12000
+[1780315462.925] SMART_SWITCH_WINDOW_MS: 90000
+[1780315462.925] SMART_MAX_SWITCHES: 3
+[1780315462.925] SMART_AUDIO_NOVELTY: 0.0000
+[1780315462.925] SMART_AUDIO_ENERGY: 0.1157
+[1780315462.926] SMART_EVENT_ID: 0
+[1780315462.927] SMART_EVENT_AGE_MS: 4294967295
+[1780315462.927] SMART_ONSET: 0
+[1780315462.927] SMART_BASS_ONSET: 0
+[1780315462.927] SMART_BEAT_CONFIDENCE: 0.000
+[1780315462.927] }}
+[1780315462.971] >>> :vp_status
+[1780315462.972] sbr{{
+[1780315462.972] VP_PROFILE: candidate
+[1780315462.972] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315462.972] VP_STREAM: on
+[1780315462.972] AP_STREAM: on
+[1780315462.974] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315462.974] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315462.977] VP_CHROMA: seq=12317 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315462.977] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315462.978] VP_RENDER_US: last=2612 avg=2149 max=3645
+[1780315462.979] }}
+[1780315463.232] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315463.273] [VP] profile=candidate fix=111011 chroma_seq=12369 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2481 render_avg=2103 render_max=3645
+[1780315464.237] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315464.278] [VP] profile=candidate fix=111011 chroma_seq=12547 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2463 render_avg=2047 render_max=3645
+[1780315465.242] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315465.284] [VP] profile=candidate fix=111011 chroma_seq=12725 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2482 render_avg=2041 render_max=3645
+[1780315466.289] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315466.293] [VP] profile=candidate fix=111011 chroma_seq=12903 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2623 render_avg=2114 render_max=3645
+[1780315467.250] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315467.295] [VP] profile=candidate fix=111011 chroma_seq=13076 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2388 render_avg=2245 render_max=3645
+[1780315467.891] >>> :smart_status
+[1780315467.901] sbr{{
+[1780315467.901] SMART_ASSIST: on
+[1780315467.901] SMART_SWITCHING: on
+[1780315467.901] SMART_DIRECTOR_AUTONOMY: on
+[1780315467.901] SMART_HOOKS: on
+[1780315467.901] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315467.901] SMART_APPLIED_MODE: 3
+[1780315467.901] SMART_LAST_REQUESTED_MODE: 3
+[1780315467.902] SMART_SWITCHES_IN_WINDOW: 0
+[1780315467.902] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315467.902] SMART_LAST_REASON: 0
+[1780315467.902] SMART_STATE: 2
+[1780315467.902] SMART_INTENT_MODE: 11
+[1780315467.902] SMART_INTENT_CONFIDENCE: 0.040
+[1780315467.902] SMART_INTENT_WANTS_SWITCH: 0
+[1780315467.902] SMART_SCALAR_PHOTONS: 1.000
+[1780315467.902] SMART_SCALAR_CHROMA: 1.000
+[1780315467.903] SMART_SCALAR_MOOD: 1.000
+[1780315467.904] SMART_SCALAR_SATURATION: 1.000
+[1780315467.904] SMART_PALETTE_OVERLAY: 1
+[1780315467.904] SMART_PALETTE_INDEX: 11
+[1780315467.904] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315467.904] SMART_MIN_DWELL_MS: 12000
+[1780315467.904] SMART_COOLDOWN_MS: 12000
+[1780315467.904] SMART_SWITCH_WINDOW_MS: 90000
+[1780315467.904] SMART_MAX_SWITCHES: 3
+[1780315467.905] SMART_AUDIO_NOVELTY: 0.0000
+[1780315467.906] SMART_AUDIO_ENERGY: 0.1157
+[1780315467.906] SMART_EVENT_ID: 0
+[1780315467.906] SMART_EVENT_AGE_MS: 4294967295
+[1780315467.906] SMART_ONSET: 0
+[1780315467.906] SMART_BASS_ONSET: 0
+[1780315467.906] SMART_BEAT_CONFIDENCE: 0.000
+[1780315467.906] }}
+[1780315467.942] >>> :vp_status
+[1780315467.948] sbr{{
+[1780315467.948] VP_PROFILE: candidate
+[1780315467.949] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315467.949] VP_STREAM: on
+[1780315467.949] AP_STREAM: on
+[1780315467.949] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315467.953] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315467.954] VP_CHROMA: seq=13190 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315467.955] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315467.955] VP_RENDER_US: last=2611 avg=2302 max=3645
+[1780315467.955] }}
+[1780315468.295] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315468.299] [VP] profile=candidate fix=111011 chroma_seq=13248 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2350 render_avg=2230 render_max=3645
+[1780315469.261] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315469.305] [VP] profile=candidate fix=111011 chroma_seq=13422 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2380 render_avg=2200 render_max=3645
+[1780315470.266] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315470.310] [VP] profile=candidate fix=111011 chroma_seq=13596 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2381 render_avg=2289 render_max=3645
+[1780315471.271] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315471.313] [VP] profile=candidate fix=111011 chroma_seq=13769 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2598 render_avg=2286 render_max=3645
+[1780315472.278] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315472.320] [VP] profile=candidate fix=111011 chroma_seq=13944 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2466 render_avg=2234 render_max=3645
+[1780315472.921] >>> :smart_status
+[1780315472.927] sbr{{
+[1780315472.927] SMART_ASSIST: on
+[1780315472.927] SMART_SWITCHING: on
+[1780315472.927] SMART_DIRECTOR_AUTONOMY: on
+[1780315472.927] SMART_HOOKS: on
+[1780315472.927] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315472.927] SMART_APPLIED_MODE: 3
+[1780315472.927] SMART_LAST_REQUESTED_MODE: 3
+[1780315472.927] SMART_SWITCHES_IN_WINDOW: 0
+[1780315472.928] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315472.928] SMART_LAST_REASON: 0
+[1780315472.928] SMART_STATE: 2
+[1780315472.928] SMART_INTENT_MODE: 11
+[1780315472.928] SMART_INTENT_CONFIDENCE: 0.040
+[1780315472.928] SMART_INTENT_WANTS_SWITCH: 0
+[1780315472.928] SMART_SCALAR_PHOTONS: 1.000
+[1780315472.928] SMART_SCALAR_CHROMA: 1.000
+[1780315472.929] SMART_SCALAR_MOOD: 1.000
+[1780315472.930] SMART_SCALAR_SATURATION: 1.000
+[1780315472.930] SMART_PALETTE_OVERLAY: 1
+[1780315472.930] SMART_PALETTE_INDEX: 11
+[1780315472.930] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315472.930] SMART_MIN_DWELL_MS: 12000
+[1780315472.930] SMART_COOLDOWN_MS: 12000
+[1780315472.930] SMART_SWITCH_WINDOW_MS: 90000
+[1780315472.930] SMART_MAX_SWITCHES: 3
+[1780315472.931] SMART_AUDIO_NOVELTY: 0.0000
+[1780315472.932] SMART_AUDIO_ENERGY: 0.1157
+[1780315472.932] SMART_EVENT_ID: 0
+[1780315472.932] SMART_EVENT_AGE_MS: 4294967295
+[1780315472.932] SMART_ONSET: 0
+[1780315472.932] SMART_BASS_ONSET: 0
+[1780315472.932] SMART_BEAT_CONFIDENCE: 0.000
+[1780315472.932] }}
+[1780315472.976] >>> :vp_status
+[1780315472.984] sbr{{
+[1780315472.984] VP_PROFILE: candidate
+[1780315472.984] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315472.985] VP_STREAM: on
+[1780315472.985] AP_STREAM: on
+[1780315472.986] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315472.988] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315472.991] VP_CHROMA: seq=14059 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315472.992] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315472.993] VP_RENDER_US: last=3651 avg=2395 max=3651
+[1780315472.993] }}
+[1780315473.280] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315473.326] [VP] profile=candidate fix=111011 chroma_seq=14116 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2382 render_avg=2180 render_max=3651
+[1780315474.327] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315474.382] [VP] profile=candidate fix=111011 chroma_seq=14290 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2434 render_avg=2202 render_max=3651
+[1780315475.291] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315475.336] [VP] profile=candidate fix=111011 chroma_seq=14463 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2378 render_avg=2261 render_max=3651
+[1780315476.296] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315476.341] [VP] profile=candidate fix=111011 chroma_seq=14637 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2392 render_avg=2224 render_max=3651
+[1780315477.302] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315477.347] [VP] profile=candidate fix=111011 chroma_seq=14811 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2628 render_avg=2210 render_max=3651
+[1780315477.877] >>> :smart_status
+[1780315477.890] sbr{{
+[1780315477.890] SMART_ASSIST: on
+[1780315477.890] SMART_SWITCHING: on
+[1780315477.890] SMART_DIRECTOR_AUTONOMY: on
+[1780315477.890] SMART_HOOKS: on
+[1780315477.891] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315477.891] SMART_APPLIED_MODE: 3
+[1780315477.891] SMART_LAST_REQUESTED_MODE: 3
+[1780315477.891] SMART_SWITCHES_IN_WINDOW: 0
+[1780315477.891] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315477.891] SMART_LAST_REASON: 0
+[1780315477.891] SMART_STATE: 2
+[1780315477.891] SMART_INTENT_MODE: 11
+[1780315477.891] SMART_INTENT_CONFIDENCE: 0.040
+[1780315477.891] SMART_INTENT_WANTS_SWITCH: 0
+[1780315477.892] SMART_SCALAR_PHOTONS: 1.000
+[1780315477.892] SMART_SCALAR_CHROMA: 1.000
+[1780315477.893] SMART_SCALAR_MOOD: 1.000
+[1780315477.893] SMART_SCALAR_SATURATION: 1.000
+[1780315477.893] SMART_PALETTE_OVERLAY: 1
+[1780315477.893] SMART_PALETTE_INDEX: 11
+[1780315477.893] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315477.894] SMART_MIN_DWELL_MS: 12000
+[1780315477.894] SMART_COOLDOWN_MS: 12000
+[1780315477.894] SMART_SWITCH_WINDOW_MS: 90000
+[1780315477.894] SMART_MAX_SWITCHES: 3
+[1780315477.895] SMART_AUDIO_NOVELTY: 0.0000
+[1780315477.895] SMART_AUDIO_ENERGY: 0.1157
+[1780315477.895] SMART_EVENT_ID: 0
+[1780315477.895] SMART_EVENT_AGE_MS: 4294967295
+[1780315477.895] SMART_ONSET: 0
+[1780315477.895] SMART_BASS_ONSET: 0
+[1780315477.895] SMART_BEAT_CONFIDENCE: 0.000
+[1780315477.895] }}
+[1780315477.927] >>> :vp_status
+[1780315477.941] sbr{{
+[1780315477.941] VP_PROFILE: candidate
+[1780315477.942] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315477.942] VP_STREAM: on
+[1780315477.942] AP_STREAM: on
+[1780315477.943] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315477.944] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315477.946] VP_CHROMA: seq=14914 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315477.947] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315477.947] VP_RENDER_US: last=3439 avg=2305 max=3651
+[1780315477.947] }}
+[1780315478.246] ### CLIP_END id=kick-drop-heavy ffplay_rc=0 video_rc=None
+[1780315478.246] ### CLIP_START id=sparse-breakdown-build track=Carte-Blanche-Mixed.mp3 start=20 duration=25
+[1780315478.347] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315478.350] [VP] profile=candidate fix=111011 chroma_seq=14983 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2391 render_avg=2247 render_max=3651
+[1780315478.354] >>> :smart_status
+[1780315478.364] sbr{{
+[1780315478.364] SMART_ASSIST: on
+[1780315478.364] SMART_SWITCHING: on
+[1780315478.364] SMART_DIRECTOR_AUTONOMY: on
+[1780315478.364] SMART_HOOKS: on
+[1780315478.364] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315478.364] SMART_APPLIED_MODE: 3
+[1780315478.364] SMART_LAST_REQUESTED_MODE: 3
+[1780315478.364] SMART_SWITCHES_IN_WINDOW: 0
+[1780315478.365] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315478.365] SMART_LAST_REASON: 0
+[1780315478.365] SMART_STATE: 2
+[1780315478.365] SMART_INTENT_MODE: 11
+[1780315478.365] SMART_INTENT_CONFIDENCE: 0.040
+[1780315478.365] SMART_INTENT_WANTS_SWITCH: 0
+[1780315478.365] SMART_SCALAR_PHOTONS: 1.000
+[1780315478.366] SMART_SCALAR_CHROMA: 1.000
+[1780315478.366] SMART_SCALAR_MOOD: 1.000
+[1780315478.366] SMART_SCALAR_SATURATION: 1.000
+[1780315478.366] SMART_PALETTE_OVERLAY: 1
+[1780315478.366] SMART_PALETTE_INDEX: 11
+[1780315478.366] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315478.366] SMART_MIN_DWELL_MS: 12000
+[1780315478.366] SMART_COOLDOWN_MS: 12000
+[1780315478.366] SMART_SWITCH_WINDOW_MS: 90000
+[1780315478.367] SMART_MAX_SWITCHES: 3
+[1780315478.367] SMART_AUDIO_NOVELTY: 0.0000
+[1780315478.367] SMART_AUDIO_ENERGY: 0.1157
+[1780315478.367] SMART_EVENT_ID: 0
+[1780315478.367] SMART_EVENT_AGE_MS: 4294967295
+[1780315478.367] SMART_ONSET: 0
+[1780315478.367] SMART_BASS_ONSET: 0
+[1780315478.367] SMART_BEAT_CONFIDENCE: 0.000
+[1780315478.367] }}
+[1780315478.406] >>> :vp_status
+[1780315478.416] sbr{{
+[1780315478.416] VP_PROFILE: candidate
+[1780315478.416] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315478.417] VP_STREAM: on
+[1780315478.417] AP_STREAM: on
+[1780315478.418] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315478.420] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315478.422] VP_CHROMA: seq=14995 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315478.423] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315478.424] VP_RENDER_US: last=2589 avg=2297 max=3651
+[1780315478.424] }}
+[1780315479.311] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315479.356] [VP] profile=candidate fix=111011 chroma_seq=15156 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2471 render_avg=2206 render_max=3651
+[1780315480.317] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315480.362] [VP] profile=candidate fix=111011 chroma_seq=15329 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2379 render_avg=2263 render_max=3651
+[1780315481.324] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315481.369] [VP] profile=candidate fix=111011 chroma_seq=15503 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2395 render_avg=2254 render_max=3651
+[1780315482.334] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315482.377] [VP] profile=candidate fix=111011 chroma_seq=15676 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2579 render_avg=2269 render_max=3651
+[1780315483.341] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315483.383] [VP] profile=candidate fix=111011 chroma_seq=15849 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2591 render_avg=2253 render_max=3651
+[1780315483.389] >>> :smart_status
+[1780315483.406] sbr{{
+[1780315483.406] SMART_ASSIST: on
+[1780315483.406] SMART_SWITCHING: on
+[1780315483.406] SMART_DIRECTOR_AUTONOMY: on
+[1780315483.406] SMART_HOOKS: on
+[1780315483.406] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315483.406] SMART_APPLIED_MODE: 3
+[1780315483.406] SMART_LAST_REQUESTED_MODE: 3
+[1780315483.406] SMART_SWITCHES_IN_WINDOW: 0
+[1780315483.406] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315483.406] SMART_LAST_REASON: 0
+[1780315483.406] SMART_STATE: 2
+[1780315483.406] SMART_INTENT_MODE: 11
+[1780315483.407] SMART_INTENT_CONFIDENCE: 0.040
+[1780315483.407] SMART_INTENT_WANTS_SWITCH: 0
+[1780315483.407] SMART_SCALAR_PHOTONS: 1.000
+[1780315483.408] SMART_SCALAR_CHROMA: 1.000
+[1780315483.408] SMART_SCALAR_MOOD: 1.000
+[1780315483.408] SMART_SCALAR_SATURATION: 1.000
+[1780315483.408] SMART_PALETTE_OVERLAY: 1
+[1780315483.408] SMART_PALETTE_INDEX: 11
+[1780315483.408] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315483.408] SMART_MIN_DWELL_MS: 12000
+[1780315483.408] SMART_COOLDOWN_MS: 12000
+[1780315483.408] SMART_SWITCH_WINDOW_MS: 90000
+[1780315483.408] SMART_MAX_SWITCHES: 3
+[1780315483.408] SMART_AUDIO_NOVELTY: 0.0000
+[1780315483.408] SMART_AUDIO_ENERGY: 0.1157
+[1780315483.408] SMART_EVENT_ID: 0
+[1780315483.408] SMART_EVENT_AGE_MS: 4294967295
+[1780315483.408] SMART_ONSET: 0
+[1780315483.409] SMART_BASS_ONSET: 0
+[1780315483.409] SMART_BEAT_CONFIDENCE: 0.000
+[1780315483.409] }}
+[1780315483.441] >>> :vp_status
+[1780315483.448] sbr{{
+[1780315483.448] VP_PROFILE: candidate
+[1780315483.448] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315483.449] VP_STREAM: on
+[1780315483.449] AP_STREAM: on
+[1780315483.450] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315483.452] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315483.455] VP_CHROMA: seq=15861 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315483.456] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315483.457] VP_RENDER_US: last=3614 avg=2395 max=3651
+[1780315483.457] }}
+[1780315484.347] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315484.389] [VP] profile=candidate fix=111011 chroma_seq=16021 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2582 render_avg=2236 render_max=3651
+[1780315485.356] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315485.396] [VP] profile=candidate fix=111011 chroma_seq=16195 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2425 render_avg=2216 render_max=3651
+[1780315486.361] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315486.405] [VP] profile=candidate fix=111011 chroma_seq=16369 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2371 render_avg=2234 render_max=3651
+[1780315487.368] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315487.411] [VP] profile=candidate fix=111011 chroma_seq=16543 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2372 render_avg=2313 render_max=3651
+[1780315488.365] >>> :smart_status
+[1780315488.366] sbr{{
+[1780315488.366] SMART_ASSIST: on
+[1780315488.366] SMART_SWITCHING: on
+[1780315488.366] SMART_DIRECTOR_AUTONOMY: on
+[1780315488.366] SMART_HOOKS: on
+[1780315488.366] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315488.367] SMART_APPLIED_MODE: 3
+[1780315488.367] SMART_LAST_REQUESTED_MODE: 3
+[1780315488.367] SMART_SWITCHES_IN_WINDOW: 0
+[1780315488.367] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315488.367] SMART_LAST_REASON: 0
+[1780315488.367] SMART_STATE: 2
+[1780315488.367] SMART_INTENT_MODE: 11
+[1780315488.368] SMART_INTENT_CONFIDENCE: 0.040
+[1780315488.368] SMART_INTENT_WANTS_SWITCH: 0
+[1780315488.369] SMART_SCALAR_PHOTONS: 1.000
+[1780315488.369] SMART_SCALAR_CHROMA: 1.000
+[1780315488.369] SMART_SCALAR_MOOD: 1.000
+[1780315488.369] SMART_SCALAR_SATURATION: 1.000
+[1780315488.370] SMART_PALETTE_OVERLAY: 1
+[1780315488.370] SMART_PALETTE_INDEX: 11
+[1780315488.370] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315488.371] SMART_MIN_DWELL_MS: 12000
+[1780315488.371] SMART_COOLDOWN_MS: 12000
+[1780315488.371] SMART_SWITCH_WINDOW_MS: 90000
+[1780315488.371] SMART_MAX_SWITCHES: 3
+[1780315488.371] SMART_AUDIO_NOVELTY: 0.0000
+[1780315488.371] SMART_AUDIO_ENERGY: 0.1157
+[1780315488.371] SMART_EVENT_ID: 0
+[1780315488.371] SMART_EVENT_AGE_MS: 4294967295
+[1780315488.371] SMART_ONSET: 0
+[1780315488.371] SMART_BASS_ONSET: 0
+[1780315488.371] SMART_BEAT_CONFIDENCE: 0.000
+[1780315488.371] }}
+[1780315488.415] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315488.418] >>> :vp_status
+[1780315488.419] [VP] profile=candidate fix=111011 chroma_seq=16717 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2457 render_avg=2323 render_max=3651
+[1780315488.420] sbr{{
+[1780315488.420] VP_PROFILE: candidate
+[1780315488.420] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315488.420] VP_STREAM: on
+[1780315488.420] AP_STREAM: on
+[1780315488.421] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315488.422] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315488.424] VP_CHROMA: seq=16718 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315488.426] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315488.426] VP_RENDER_US: last=3335 avg=2386 max=3651
+[1780315488.426] }}
+[1780315489.381] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315489.425] [VP] profile=candidate fix=111011 chroma_seq=16890 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2378 render_avg=2300 render_max=3651
+[1780315490.387] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315490.429] [VP] profile=candidate fix=111011 chroma_seq=17064 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2344 render_avg=2126 render_max=3651
+[1780315491.393] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315491.436] [VP] profile=candidate fix=111011 chroma_seq=17243 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2376 render_avg=1971 render_max=3651
+[1780315492.402] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315492.444] [VP] profile=candidate fix=111011 chroma_seq=17421 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2302 render_avg=2032 render_max=3651
+[1780315493.396] >>> :smart_status
+[1780315493.406] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315493.411] sbr{{
+[1780315493.411] SMART_ASSIST: on
+[1780315493.411] SMART_SWITCHING: on
+[1780315493.411] SMART_DIRECTOR_AUTONOMY: on
+[1780315493.411] SMART_HOOKS: on
+[1780315493.411] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315493.411] SMART_APPLIED_MODE: 3
+[1780315493.411] SMART_LAST_REQUESTED_MODE: 3
+[1780315493.411] SMART_SWITCHES_IN_WINDOW: 0
+[1780315493.411] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315493.411] SMART_LAST_REASON: 0
+[1780315493.411] SMART_STATE: 2
+[1780315493.411] SMART_INTENT_MODE: 10
+[1780315493.412] SMART_INTENT_CONFIDENCE: 0.040
+[1780315493.412] SMART_INTENT_WANTS_SWITCH: 0
+[1780315493.412] SMART_SCALAR_PHOTONS: 1.000
+[1780315493.413] SMART_SCALAR_CHROMA: 1.000
+[1780315493.413] SMART_SCALAR_MOOD: 1.000
+[1780315493.413] SMART_SCALAR_SATURATION: 1.000
+[1780315493.413] SMART_PALETTE_OVERLAY: 1
+[1780315493.413] SMART_PALETTE_INDEX: 22
+[1780315493.413] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315493.413] SMART_MIN_DWELL_MS: 12000
+[1780315493.413] SMART_COOLDOWN_MS: 12000
+[1780315493.413] SMART_SWITCH_WINDOW_MS: 90000
+[1780315493.413] SMART_MAX_SWITCHES: 3
+[1780315493.414] SMART_AUDIO_NOVELTY: 0.0000
+[1780315493.414] SMART_AUDIO_ENERGY: 0.1157
+[1780315493.414] SMART_EVENT_ID: 0
+[1780315493.414] SMART_EVENT_AGE_MS: 4294967295
+[1780315493.414] SMART_ONSET: 0
+[1780315493.414] SMART_BASS_ONSET: 0
+[1780315493.414] SMART_BEAT_CONFIDENCE: 0.000
+[1780315493.414] }}
+[1780315493.449] [VP] profile=candidate fix=111011 chroma_seq=17598 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2278 render_avg=2161 render_max=3651
+[1780315493.451] >>> :vp_status
+[1780315493.457] sbr{{
+[1780315493.457] VP_PROFILE: candidate
+[1780315493.457] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315493.457] VP_STREAM: on
+[1780315493.457] AP_STREAM: on
+[1780315493.459] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315493.460] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315493.462] VP_CHROMA: seq=17601 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315493.464] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315493.464] VP_RENDER_US: last=2482 avg=2142 max=3651
+[1780315493.464] }}
+[1780315494.415] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315494.459] [VP] profile=candidate fix=111011 chroma_seq=17777 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2459 render_avg=1960 render_max=3651
+[1780315495.420] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315495.462] [VP] profile=candidate fix=111011 chroma_seq=17955 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2416 render_avg=2012 render_max=3651
+[1780315496.426] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315496.468] [VP] profile=candidate fix=111011 chroma_seq=18133 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2412 render_avg=2092 render_max=3651
+[1780315497.432] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315497.473] [VP] profile=candidate fix=111011 chroma_seq=18311 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2482 render_avg=2086 render_max=3651
+[1780315498.379] >>> :smart_status
+[1780315498.381] sbr{{
+[1780315498.381] SMART_ASSIST: on
+[1780315498.381] SMART_SWITCHING: on
+[1780315498.381] SMART_DIRECTOR_AUTONOMY: on
+[1780315498.381] SMART_HOOKS: on
+[1780315498.381] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315498.381] SMART_APPLIED_MODE: 3
+[1780315498.381] SMART_LAST_REQUESTED_MODE: 3
+[1780315498.381] SMART_SWITCHES_IN_WINDOW: 0
+[1780315498.381] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315498.382] SMART_LAST_REASON: 0
+[1780315498.382] SMART_STATE: 2
+[1780315498.382] SMART_INTENT_MODE: 10
+[1780315498.382] SMART_INTENT_CONFIDENCE: 0.040
+[1780315498.383] SMART_INTENT_WANTS_SWITCH: 0
+[1780315498.383] SMART_SCALAR_PHOTONS: 1.000
+[1780315498.383] SMART_SCALAR_CHROMA: 1.000
+[1780315498.383] SMART_SCALAR_MOOD: 1.000
+[1780315498.383] SMART_SCALAR_SATURATION: 1.000
+[1780315498.383] SMART_PALETTE_OVERLAY: 1
+[1780315498.384] SMART_PALETTE_INDEX: 22
+[1780315498.384] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315498.384] SMART_MIN_DWELL_MS: 12000
+[1780315498.384] SMART_COOLDOWN_MS: 12000
+[1780315498.384] SMART_SWITCH_WINDOW_MS: 90000
+[1780315498.384] SMART_MAX_SWITCHES: 3
+[1780315498.384] SMART_AUDIO_NOVELTY: 0.0000
+[1780315498.384] SMART_AUDIO_ENERGY: 0.1157
+[1780315498.384] SMART_EVENT_ID: 0
+[1780315498.384] SMART_EVENT_AGE_MS: 4294967295
+[1780315498.384] SMART_ONSET: 0
+[1780315498.385] SMART_BASS_ONSET: 0
+[1780315498.386] SMART_BEAT_CONFIDENCE: 0.000
+[1780315498.386] }}
+[1780315498.429] >>> :vp_status
+[1780315498.436] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315498.442] sbr{{
+[1780315498.442] VP_PROFILE: candidate
+[1780315498.442] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315498.442] VP_STREAM: on
+[1780315498.442] AP_STREAM: on
+[1780315498.443] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315498.445] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315498.447] VP_CHROMA: seq=18483 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315498.447] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315498.448] VP_RENDER_US: last=2492 avg=2099 max=3651
+[1780315498.448] }}
+[1780315498.480] [VP] profile=candidate fix=111011 chroma_seq=18488 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2354 render_avg=2192 render_max=3651
+[1780315499.442] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315499.484] [VP] profile=candidate fix=111011 chroma_seq=18666 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2528 render_avg=2034 render_max=3651
+[1780315500.450] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315500.495] [VP] profile=candidate fix=111011 chroma_seq=18845 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2313 render_avg=1935 render_max=3651
+[1780315501.455] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315501.498] [VP] profile=candidate fix=111011 chroma_seq=19023 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2405 render_avg=2016 render_max=3651
+[1780315502.461] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315502.503] [VP] profile=candidate fix=111011 chroma_seq=19201 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2414 render_avg=2001 render_max=3651
+[1780315503.356] >>> :smart_status
+[1780315503.364] sbr{{
+[1780315503.364] SMART_ASSIST: on
+[1780315503.365] SMART_SWITCHING: on
+[1780315503.365] SMART_DIRECTOR_AUTONOMY: on
+[1780315503.365] SMART_HOOKS: on
+[1780315503.365] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315503.365] SMART_APPLIED_MODE: 3
+[1780315503.365] SMART_LAST_REQUESTED_MODE: 3
+[1780315503.365] SMART_SWITCHES_IN_WINDOW: 0
+[1780315503.365] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315503.365] SMART_LAST_REASON: 0
+[1780315503.365] SMART_STATE: 2
+[1780315503.365] SMART_INTENT_MODE: 10
+[1780315503.366] SMART_INTENT_CONFIDENCE: 0.040
+[1780315503.366] SMART_INTENT_WANTS_SWITCH: 0
+[1780315503.366] SMART_SCALAR_PHOTONS: 1.000
+[1780315503.366] SMART_SCALAR_CHROMA: 1.000
+[1780315503.366] SMART_SCALAR_MOOD: 1.000
+[1780315503.366] SMART_SCALAR_SATURATION: 1.000
+[1780315503.367] SMART_PALETTE_OVERLAY: 1
+[1780315503.367] SMART_PALETTE_INDEX: 22
+[1780315503.367] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315503.368] SMART_MIN_DWELL_MS: 12000
+[1780315503.368] SMART_COOLDOWN_MS: 12000
+[1780315503.368] SMART_SWITCH_WINDOW_MS: 90000
+[1780315503.368] SMART_MAX_SWITCHES: 3
+[1780315503.368] SMART_AUDIO_NOVELTY: 0.0000
+[1780315503.368] SMART_AUDIO_ENERGY: 0.1157
+[1780315503.368] SMART_EVENT_ID: 0
+[1780315503.368] SMART_EVENT_AGE_MS: 4294967295
+[1780315503.368] SMART_ONSET: 0
+[1780315503.369] SMART_BASS_ONSET: 0
+[1780315503.369] SMART_BEAT_CONFIDENCE: 0.000
+[1780315503.369] }}
+[1780315503.409] >>> :vp_status
+[1780315503.416] sbr{{
+[1780315503.416] VP_PROFILE: candidate
+[1780315503.416] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315503.416] VP_STREAM: on
+[1780315503.416] AP_STREAM: on
+[1780315503.416] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315503.418] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315503.419] VP_CHROMA: seq=19363 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315503.420] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315503.420] VP_RENDER_US: last=3262 avg=2148 max=3651
+[1780315503.420] }}
+[1780315503.464] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315503.507] [VP] profile=candidate fix=111011 chroma_seq=19377 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2306 render_avg=2084 render_max=3651
+[1780315503.776] ### CLIP_END id=sparse-breakdown-build ffplay_rc=0 video_rc=None
+[1780315504.473] [AP] SSL=280 DC=-4774 max_raw=30234 follower=29954 peak_scaled=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1
+[1780315504.517] [VP] profile=candidate fix=111011 chroma_seq=19557 chroma_flatness=0.2745 chroma_norm_max=1.0172 chroma_norm_mean=0.7427 chroma_final_max=0.8922 chroma_final_mean=0.6468 agc_gain=0.1000 bloom_alpha=0.9900 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=2311 render_avg=1934 render_max=3651
+[1780315505.035] >>> :ap_stream=off
+[1780315505.045] sbr{{
+[1780315505.045] AP_STREAM: off
+[1780315505.045] }}
+[1780315505.237] >>> :vp_stream=off
+[1780315505.240] sbr{{
+[1780315505.240] VP_STREAM: off
+[1780315505.240] }}
+[1780315505.443] >>> :vp_perf=stop
+[1780315505.450] sbr{{
+[1780315505.450] VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+[1780315505.450] }}
+[1780315505.647] >>> :smart_status
+[1780315505.662] sbr{{
+[1780315505.662] SMART_ASSIST: on
+[1780315505.662] SMART_SWITCHING: on
+[1780315505.662] SMART_DIRECTOR_AUTONOMY: on
+[1780315505.662] SMART_HOOKS: on
+[1780315505.662] SMART_CONFIDENCE_FLOOR: 0.070
+[1780315505.662] SMART_APPLIED_MODE: 3
+[1780315505.663] SMART_LAST_REQUESTED_MODE: 3
+[1780315505.663] SMART_SWITCHES_IN_WINDOW: 0
+[1780315505.664] SMART_MANUAL_OWNER_ACTIVE: 0
+[1780315505.664] SMART_LAST_REASON: 0
+[1780315505.664] SMART_STATE: 2
+[1780315505.664] SMART_INTENT_MODE: 10
+[1780315505.664] SMART_INTENT_CONFIDENCE: 0.040
+[1780315505.664] SMART_INTENT_WANTS_SWITCH: 0
+[1780315505.664] SMART_SCALAR_PHOTONS: 1.000
+[1780315505.664] SMART_SCALAR_CHROMA: 1.000
+[1780315505.664] SMART_SCALAR_MOOD: 1.000
+[1780315505.665] SMART_SCALAR_SATURATION: 1.000
+[1780315505.665] SMART_PALETTE_OVERLAY: 1
+[1780315505.665] SMART_PALETTE_INDEX: 22
+[1780315505.665] SMART_AUTO_COLOUR_SHIFT: 0
+[1780315505.665] SMART_MIN_DWELL_MS: 12000
+[1780315505.666] SMART_COOLDOWN_MS: 12000
+[1780315505.666] SMART_SWITCH_WINDOW_MS: 90000
+[1780315505.666] SMART_MAX_SWITCHES: 3
+[1780315505.666] SMART_AUDIO_NOVELTY: 0.0000
+[1780315505.666] SMART_AUDIO_ENERGY: 0.1157
+[1780315505.666] SMART_EVENT_ID: 0
+[1780315505.666] SMART_EVENT_AGE_MS: 4294967295
+[1780315505.666] SMART_ONSET: 0
+[1780315505.666] SMART_BASS_ONSET: 0
+[1780315505.666] SMART_BEAT_CONFIDENCE: 0.000
+[1780315505.666] }}
+[1780315505.849] >>> :edge_status
+[1780315505.859] sbr{{
+[1780315505.859] EDGE_ENABLED: on
+[1780315505.859] EDGE_MODE: complementary
+[1780315505.859] EDGE_STRENGTH: 0.650
+[1780315505.859] }}
+[1780315506.055] >>> :vp_status
+[1780315506.065] sbr{{
+[1780315506.065] VP_PROFILE: candidate
+[1780315506.066] VP_FIXES: agc_soft=on chroma_gate=on prism_off=on bloom_decay=off hsv_source_sat=on secondary_clean=on
+[1780315506.066] VP_STREAM: off
+[1780315506.066] AP_STREAM: off
+[1780315506.067] VP_BLOOM: alpha=0.9900 shift=1.0000 force_sat=on
+[1780315506.069] VP_WAVEFORM: idle_fade=0.9850 raw_margin=1.1000 peak_floor=0.0800 active_fade=0.0400 blend_gain=2.0000 fallback=1.0000 vu_floor=0.0200 shift_rate=120.0000
+[1780315506.070] VP_CHROMA: seq=19832 range=60 profile=0 gate_gain=0.9727 pre_max=0.2087 pre_mean=0.1524 norm_max=1.0172 norm_mean=0.7427 flatness=0.2745 final_max=0.8922 final_mean=0.6468
+[1780315506.072] VP_AGC: gain=0.1000 envelope=11.3448 floor=0.0010 gated=false
+[1780315506.072] VP_RENDER_US: last=2458 avg=2020 max=3651
+[1780315506.072] }}

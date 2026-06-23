@@ -1,0 +1,30 @@
+[
+  {
+    "label": "bench_k1",
+    "port": "/dev/cu.usbmodem12401",
+    "expected_chip": "B489A500",
+    "observed_chip": "B489A500",
+    "chip_match": true,
+    "expected_env": "k1_bench_reference",
+    "ap_lines": 86,
+    "first_ap": "[AP] SSL=354 DC=-1124 max_raw=3709 follower=839 peak_scaled=2.600 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00",
+    "last_ap": "[AP] SSL=354 DC=-1124 max_raw=533 follower=418 peak_scaled=0.410 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=74.0 conf=0.33 lock=0 phase=0.30 beat=0 bstr=0.02 | onset=0 bass=1 ostr=0.12",
+    "crash_markers": [],
+    "log_path": "docs/forensics/runtime-evidence/20260615T011430-bench_k1-cu.usbmodem12401-post-spectral-bypass-75s-soak.log",
+    "error": null
+  },
+  {
+    "label": "main_k1",
+    "port": "/dev/cu.usbmodem12201",
+    "expected_chip": "F887A500",
+    "observed_chip": "F887A500",
+    "chip_match": true,
+    "expected_env": "k1_hardware",
+    "ap_lines": 86,
+    "first_ap": "[AP] SSL=319 DC=-5075 max_raw=3592 follower=818 peak_scaled=2.600 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00",
+    "last_ap": "[AP] SSL=319 DC=-5075 max_raw=487 follower=375 peak_scaled=0.645 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=74.0 conf=0.32 lock=0 phase=0.63 beat=0 bstr=0.02 | onset=0 bass=1 ostr=0.11",
+    "crash_markers": [],
+    "log_path": "docs/forensics/runtime-evidence/20260615T011430-main_k1-cu.usbmodem12201-post-spectral-bypass-75s-soak.log",
+    "error": null
+  }
+]

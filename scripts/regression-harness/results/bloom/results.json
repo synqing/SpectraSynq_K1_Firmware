@@ -1,0 +1,430 @@
+{
+  "effect": "bloom",
+  "run": {
+    "seed": 42,
+    "max_iterations": 64,
+    "strategy": "grid+fallback",
+    "shortlist_cap": 5,
+    "corpus": [
+      "beat-pulse",
+      "broadband-swell",
+      "chord-major"
+    ],
+    "rendered": 27,
+    "wall_seconds": 2.89,
+    "aggregation": "0.5*mean+0.5*min",
+    "weights_version": "ve-eval-w0-mvp0",
+    "tier": "host",
+    "epistemic": "[MECHANISM] \u2014 ranks only; not [MEASURED]; not a ship decision"
+  },
+  "champion": {
+    "hash": "d890716251e8",
+    "version": 0,
+    "params": {
+      "mood": 0.5,
+      "saturation": 0.9,
+      "square_iter": 1.0,
+      "chroma": 1.0,
+      "palette_mode": false,
+      "palette_index": 0,
+      "auto_color_shift": false,
+      "hue_position": 0.0,
+      "chroma_val": 0.0,
+      "chromatic_mode": true
+    },
+    "rank_score": 0.579375
+  },
+  "shortlist": [
+    {
+      "rank": 1,
+      "hash": "ed464d9b2fc1",
+      "rank_score": 0.576607,
+      "delta_vs_champion": -0.002768,
+      "param_diff": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "chroma": 0.5
+      },
+      "params": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "square_iter": 1.0,
+        "chroma": 0.5,
+        "palette_mode": false,
+        "palette_index": 0,
+        "auto_color_shift": false,
+        "hue_position": 0.0,
+        "chroma_val": 0.0,
+        "chromatic_mode": true
+      },
+      "agg": {
+        "motion_presence": 0.033019,
+        "am_velocity_score": 0.974359,
+        "am_coherence": 1.0,
+        "colour_clarity": 0.515877,
+        "spatial_shape": 0.753122,
+        "persistence": 0.28655,
+        "white_bias_mean": 0.001491,
+        "half_life": 14.0,
+        "liveness_fail": false,
+        "rank_score": 0.576607
+      },
+      "per_fixture": {
+        "beat-pulse": {
+          "frames": 96,
+          "motion_presence": 0.046696,
+          "colour_clarity": 0.50466,
+          "spatial_shape": 0.772288,
+          "persistence": 0.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 76.0,
+          "mean_changed": 0.078026,
+          "liveness_fail": false
+        },
+        "broadband-swell": {
+          "frames": 96,
+          "motion_presence": 0.105689,
+          "colour_clarity": 0.558705,
+          "spatial_shape": 0.751005,
+          "persistence": 1.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.001491,
+          "half_life": 14.0,
+          "mean_changed": 0.105789,
+          "liveness_fail": false
+        },
+        "chord-major": {
+          "frames": 60,
+          "motion_presence": 0.011432,
+          "colour_clarity": 0.517918,
+          "spatial_shape": 0.74886,
+          "persistence": 0.719298,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 38.0,
+          "mean_changed": 0.010593,
+          "liveness_fail": false
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "hash": "f534300d1ef6",
+      "rank_score": 0.576607,
+      "delta_vs_champion": -0.002768,
+      "param_diff": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "chroma": 0.75
+      },
+      "params": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "square_iter": 1.0,
+        "chroma": 0.75,
+        "palette_mode": false,
+        "palette_index": 0,
+        "auto_color_shift": false,
+        "hue_position": 0.0,
+        "chroma_val": 0.0,
+        "chromatic_mode": true
+      },
+      "agg": {
+        "motion_presence": 0.033019,
+        "am_velocity_score": 0.974359,
+        "am_coherence": 1.0,
+        "colour_clarity": 0.515877,
+        "spatial_shape": 0.753122,
+        "persistence": 0.28655,
+        "white_bias_mean": 0.001491,
+        "half_life": 14.0,
+        "liveness_fail": false,
+        "rank_score": 0.576607
+      },
+      "per_fixture": {
+        "beat-pulse": {
+          "frames": 96,
+          "motion_presence": 0.046696,
+          "colour_clarity": 0.50466,
+          "spatial_shape": 0.772288,
+          "persistence": 0.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 76.0,
+          "mean_changed": 0.078026,
+          "liveness_fail": false
+        },
+        "broadband-swell": {
+          "frames": 96,
+          "motion_presence": 0.105689,
+          "colour_clarity": 0.558705,
+          "spatial_shape": 0.751005,
+          "persistence": 1.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.001491,
+          "half_life": 14.0,
+          "mean_changed": 0.105789,
+          "liveness_fail": false
+        },
+        "chord-major": {
+          "frames": 60,
+          "motion_presence": 0.011432,
+          "colour_clarity": 0.517918,
+          "spatial_shape": 0.74886,
+          "persistence": 0.719298,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 38.0,
+          "mean_changed": 0.010593,
+          "liveness_fail": false
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "hash": "81715aa1631b",
+      "rank_score": 0.576607,
+      "delta_vs_champion": -0.002768,
+      "param_diff": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "chroma": 1.0
+      },
+      "params": {
+        "mood": 0.6,
+        "saturation": 0.9,
+        "square_iter": 1.0,
+        "chroma": 1.0,
+        "palette_mode": false,
+        "palette_index": 0,
+        "auto_color_shift": false,
+        "hue_position": 0.0,
+        "chroma_val": 0.0,
+        "chromatic_mode": true
+      },
+      "agg": {
+        "motion_presence": 0.033019,
+        "am_velocity_score": 0.974359,
+        "am_coherence": 1.0,
+        "colour_clarity": 0.515877,
+        "spatial_shape": 0.753122,
+        "persistence": 0.28655,
+        "white_bias_mean": 0.001491,
+        "half_life": 14.0,
+        "liveness_fail": false,
+        "rank_score": 0.576607
+      },
+      "per_fixture": {
+        "beat-pulse": {
+          "frames": 96,
+          "motion_presence": 0.046696,
+          "colour_clarity": 0.50466,
+          "spatial_shape": 0.772288,
+          "persistence": 0.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 76.0,
+          "mean_changed": 0.078026,
+          "liveness_fail": false
+        },
+        "broadband-swell": {
+          "frames": 96,
+          "motion_presence": 0.105689,
+          "colour_clarity": 0.558705,
+          "spatial_shape": 0.751005,
+          "persistence": 1.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.001491,
+          "half_life": 14.0,
+          "mean_changed": 0.105789,
+          "liveness_fail": false
+        },
+        "chord-major": {
+          "frames": 60,
+          "motion_presence": 0.011432,
+          "colour_clarity": 0.517918,
+          "spatial_shape": 0.74886,
+          "persistence": 0.719298,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 38.0,
+          "mean_changed": 0.010593,
+          "liveness_fail": false
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "hash": "efc1717c7717",
+      "rank_score": 0.576293,
+      "delta_vs_champion": -0.003082,
+      "param_diff": {
+        "mood": 0.6,
+        "saturation": 1.0,
+        "chroma": 0.5
+      },
+      "params": {
+        "mood": 0.6,
+        "saturation": 1.0,
+        "square_iter": 1.0,
+        "chroma": 0.5,
+        "palette_mode": false,
+        "palette_index": 0,
+        "auto_color_shift": false,
+        "hue_position": 0.0,
+        "chroma_val": 0.0,
+        "chromatic_mode": true
+      },
+      "agg": {
+        "motion_presence": 0.031594,
+        "am_velocity_score": 0.974359,
+        "am_coherence": 1.0,
+        "colour_clarity": 0.515839,
+        "spatial_shape": 0.752968,
+        "persistence": 0.28655,
+        "white_bias_mean": 0.0,
+        "half_life": 14.0,
+        "liveness_fail": false,
+        "rank_score": 0.576293
+      },
+      "per_fixture": {
+        "beat-pulse": {
+          "frames": 96,
+          "motion_presence": 0.046696,
+          "colour_clarity": 0.50466,
+          "spatial_shape": 0.772288,
+          "persistence": 0.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 76.0,
+          "mean_changed": 0.078026,
+          "liveness_fail": false
+        },
+        "broadband-swell": {
+          "frames": 96,
+          "motion_presence": 0.097139,
+          "colour_clarity": 0.558476,
+          "spatial_shape": 0.750081,
+          "persistence": 1.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 14.0,
+          "mean_changed": 0.093158,
+          "liveness_fail": false
+        },
+        "chord-major": {
+          "frames": 60,
+          "motion_presence": 0.011432,
+          "colour_clarity": 0.517918,
+          "spatial_shape": 0.74886,
+          "persistence": 0.719298,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 38.0,
+          "mean_changed": 0.010593,
+          "liveness_fail": false
+        }
+      }
+    },
+    {
+      "rank": 5,
+      "hash": "eba0f27417af",
+      "rank_score": 0.576293,
+      "delta_vs_champion": -0.003082,
+      "param_diff": {
+        "mood": 0.6,
+        "saturation": 1.0,
+        "chroma": 0.75
+      },
+      "params": {
+        "mood": 0.6,
+        "saturation": 1.0,
+        "square_iter": 1.0,
+        "chroma": 0.75,
+        "palette_mode": false,
+        "palette_index": 0,
+        "auto_color_shift": false,
+        "hue_position": 0.0,
+        "chroma_val": 0.0,
+        "chromatic_mode": true
+      },
+      "agg": {
+        "motion_presence": 0.031594,
+        "am_velocity_score": 0.974359,
+        "am_coherence": 1.0,
+        "colour_clarity": 0.515839,
+        "spatial_shape": 0.752968,
+        "persistence": 0.28655,
+        "white_bias_mean": 0.0,
+        "half_life": 14.0,
+        "liveness_fail": false,
+        "rank_score": 0.576293
+      },
+      "per_fixture": {
+        "beat-pulse": {
+          "frames": 96,
+          "motion_presence": 0.046696,
+          "colour_clarity": 0.50466,
+          "spatial_shape": 0.772288,
+          "persistence": 0.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 76.0,
+          "mean_changed": 0.078026,
+          "liveness_fail": false
+        },
+        "broadband-swell": {
+          "frames": 96,
+          "motion_presence": 0.097139,
+          "colour_clarity": 0.558476,
+          "spatial_shape": 0.750081,
+          "persistence": 1.0,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 14.0,
+          "mean_changed": 0.093158,
+          "liveness_fail": false
+        },
+        "chord-major": {
+          "frames": 60,
+          "motion_presence": 0.011432,
+          "colour_clarity": 0.517918,
+          "spatial_shape": 0.74886,
+          "persistence": 0.719298,
+          "am_velocity_score": 0.974359,
+          "am_coherence": 1.0,
+          "white_bias_mean": 0.0,
+          "half_life": 38.0,
+          "mean_changed": 0.010593,
+          "liveness_fail": false
+        }
+      }
+    }
+  ],
+  "rejection_histogram": {
+    "colour_clarity": 9,
+    "motion_memory": 6
+  },
+  "changelog": [
+    {
+      "date": "2026-06-03",
+      "by": "loop.py",
+      "note": "ran 27 candidates; 12 survivor(s); shortlist 5; champion v0 unchanged"
+    }
+  ]
+}

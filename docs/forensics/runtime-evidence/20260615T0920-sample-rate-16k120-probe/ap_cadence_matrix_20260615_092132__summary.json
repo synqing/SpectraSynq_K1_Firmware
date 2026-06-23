@@ -1,0 +1,70 @@
+{
+  "duration_ms": 15000,
+  "non_actions": [
+    "no calibration command",
+    "no production DSP tuning",
+    "no Loreen run"
+  ],
+  "port": "/dev/cu.usbmodem12201",
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem12201",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2",
+    "location": "0-1.2.2",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:87:F8",
+    "vid": 12346
+  },
+  "started_at": "2026-06-15T09:20:36+0800",
+  "variants": [
+    {
+      "apcad_log": "docs/forensics/runtime-evidence/20260615T0920-sample-rate-16k120-probe/c_16000_120_d3_ap0_vp1_20260615_092106__apcad.log",
+      "capture_summary": "docs/forensics/runtime-evidence/20260615T0920-sample-rate-16k120-probe/c_16000_120_d3_ap0_vp1_20260615_092106__summary.json",
+      "decimation": 3,
+      "declared_rate_replay": "docs/forensics/runtime-evidence/20260615T0920-sample-rate-16k120-probe/c_16000_120_d3_ap0_vp1__declared_rate_replay.json",
+      "dma_desc": 3,
+      "env": "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
+      "expected_ap_core": 0,
+      "expected_vp_core": 1,
+      "gate": {
+        "cadence_replay_contract_passed": false,
+        "dominant_replay_bpm": null,
+        "expected_ap_rate_hz": 133.33333333333334,
+        "expected_nov_rate_hz": 44.44444444444445,
+        "gates": {
+          "ap_core_matches_expected": false,
+          "ap_rate_within_2pct": false,
+          "click_replay_near_127": false,
+          "i2s_status_clean": false,
+          "max_total_le_dma_cushion": false,
+          "nov_rate_within_2pct": false,
+          "p95_total_lt_T": false,
+          "vp_core_matches_expected": false
+        },
+        "measured_ap_rate_hz": null,
+        "measured_nov_rate_hz": null,
+        "observed_ap_core_id": [],
+        "observed_vp_core_id": [],
+        "passed": false,
+        "period_ms": 7.499999999999999,
+        "timing_budget_passed": false,
+        "total_loop_ms": {
+          "max": null,
+          "median": null,
+          "p95": null
+        },
+        "warm_high_or_locked_near_127_rows": 0,
+        "warm_high_or_locked_rows": 0
+      },
+      "label": "c_16000_120_d3_ap0_vp1",
+      "nov_from_apcad": "docs/forensics/runtime-evidence/20260615T0920-sample-rate-16k120-probe/c_16000_120_d3_ap0_vp1__nov_from_apcad.log",
+      "nov_rows": 0,
+      "purpose": "BCLK-safe cadence-preserving timing map",
+      "sample_rate": 16000,
+      "samples_per_chunk": 120,
+      "upload_tail": "Writing at 0x00078391... (58 %)\nWriting at 0x0007db45... (62 %)\nWriting at 0x00083794... (66 %)\nWriting at 0x000889eb... (70 %)\nWriting at 0x0008e2ed... (75 %)\nWriting at 0x00093f07... (79 %)\nWriting at 0x0009ac18... (83 %)\nWriting at 0x000a51c2... (87 %)\nWriting at 0x000ab10d... (91 %)\nWriting at 0x000b0b80... (95 %)\nWriting at 0x000b6969... (100 %)\nWrote 698160 bytes (387232 compressed) at 0x00010000 in 5.0 seconds (effective 1108.0 kbit/s)...\nHash of data verified.\nHard resetting via RTS pin...\n========================= [SUCCESS] Took 12.84 seconds =========================\n\nEnvironment                                       Status    Duration\n------------------------------------------------  --------  ------------\nk1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1  SUCCESS   00:00:12.840\n========================= 1 succeeded in 00:00:12.840 ========================="
+    }
+  ]
+}

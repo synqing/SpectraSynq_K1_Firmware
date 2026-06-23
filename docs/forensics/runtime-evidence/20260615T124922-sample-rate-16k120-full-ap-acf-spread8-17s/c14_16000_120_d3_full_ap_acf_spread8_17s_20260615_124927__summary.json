@@ -1,0 +1,225 @@
+{
+  "acf_lag_cursor": {
+    "max": 181.0,
+    "median": 96.0,
+    "min": 8.0,
+    "p5": 16.0,
+    "p95": 176.0
+  },
+  "acf_publish_count_max": 74.0,
+  "acf_spread_active_rows": 2168,
+  "acf_valid_rows": 2267,
+  "actions": [
+    "stop",
+    "version",
+    "apcad_clear=1",
+    "apdbg=off",
+    "tempo_stream=off",
+    "ap_stream=off",
+    "apcad_capture=17000",
+    "afplay playback",
+    "apcad_dump=1"
+  ],
+  "active_ap_work_over_7500_count": 0,
+  "active_sample_rate_mode": 16000,
+  "active_samples_per_chunk_mode": 120,
+  "active_tempo_decimation_mode": 3,
+  "apcad_log": "docs/forensics/runtime-evidence/20260615T124922-sample-rate-16k120-full-ap-acf-spread8-17s/c14_16000_120_d3_full_ap_acf_spread8_17s_20260615_124927__apcad.log",
+  "baud": 115200,
+  "bytes_mismatch_count": 0,
+  "capture_metadata": {
+    "begin": {
+      "capacity": 2304,
+      "count": 2267,
+      "dropped": 0,
+      "end_ms": 39808,
+      "start_ms": 22808
+    },
+    "done": {
+      "count": 2267,
+      "dropped": 0
+    }
+  },
+  "capture_start": "2026-06-15T12:50:04+0800",
+  "classification": "D_legacy_nov_capture_not_comparable",
+  "classification_reason": "APCAD measured accepted-NOV cadence matches the source contract; older NOV-only capture is stale/non-isolated evidence until recaptured under the same AP/VP core map",
+  "declared_accepted_novelty_rate_hz_from_binary": 44.44531,
+  "declared_ap_frame_hz_from_binary": 133.33203,
+  "duration_ms": 16994,
+  "duration_ms_requested": 17000,
+  "emitted_active_ap_work_over_7500_count": 0,
+  "expected_accepted_novelty_dt_ms_from_active_config": 22.499999999999996,
+  "expected_accepted_novelty_rate_hz_from_active_config": 44.44444444444445,
+  "expected_ap_frame_dt_ms_from_active_config": 7.499999999999999,
+  "expected_ap_frame_rate_hz_from_active_config": 133.33333333333334,
+  "first_frame": 2881,
+  "first_t_ms": 22808,
+  "frame_gap_count": 0,
+  "frame_gaps_first10": [],
+  "i2s_not_ok_count": 0,
+  "i2s_status_counts": {
+    "0": 2267
+  },
+  "last_frame": 5147,
+  "last_t_ms": 39802,
+  "measured_ap_frame_dt_ms": {
+    "max": 11.0,
+    "median": 7.0,
+    "min": 5.0,
+    "p5": 6.0,
+    "p95": 10.0
+  },
+  "measured_ap_frame_rate_hz": 133.34117923973167,
+  "measured_emitted_novelty_count": 755,
+  "measured_emitted_novelty_dt_ms": {
+    "max": 25.0,
+    "median": 23.0,
+    "min": 20.0,
+    "p5": 20.0,
+    "p95": 25.0
+  },
+  "measured_emitted_novelty_rate_hz": 44.44444444444444,
+  "non_actions": [
+    "no calibration command",
+    "no tempo tuning",
+    "no production DSP change"
+  ],
+  "playback_gain_db": 0.0,
+  "player": "afplay",
+  "port": "/dev/cu.usbmodem12201",
+  "raw_log": "docs/forensics/runtime-evidence/20260615T124922-sample-rate-16k120-full-ap-acf-spread8-17s/c14_16000_120_d3_full_ap_acf_spread8_17s_20260615_124927__raw.log",
+  "row_count": 2267,
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem12201",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2",
+    "location": "0-1.2.2",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:87:F8",
+    "vid": 12346
+  },
+  "silence_rows": 227,
+  "source_contract_novelty_decimation": 3,
+  "source_contract_sample_rate": 16000,
+  "source_contract_samples_per_chunk": 120,
+  "start_ms": 0,
+  "timestamp_regression_count": 0,
+  "timestamp_regressions_first10": [],
+  "timing_us": {
+    "active_ap_work_elapsed_us": {
+      "max": 7474.0,
+      "median": 5680.0,
+      "min": 5150.0,
+      "p5": 5262.3,
+      "p95": 6932.7
+    },
+    "calculate_novelty_elapsed_us": {
+      "max": 75.0,
+      "median": 31.0,
+      "min": 16.0,
+      "p5": 20.0,
+      "p95": 51.0
+    },
+    "emitted_active_ap_work_elapsed_us": {
+      "max": 7474.0,
+      "median": 6491.0,
+      "min": 5907.0,
+      "p5": 6115.0,
+      "p95": 7121.2
+    },
+    "i2s_read_elapsed_us": {
+      "max": 4016.0,
+      "median": 54.0,
+      "min": 15.0,
+      "p5": 21.0,
+      "p95": 3444.7
+    },
+    "process_GDFT_elapsed_us": {
+      "max": 4315.0,
+      "median": 3760.0,
+      "min": 3492.0,
+      "p5": 3569.0,
+      "p95": 4147.4
+    },
+    "tempo_acf_elapsed_us": {
+      "max": 803.0,
+      "median": 342.0,
+      "min": 162.0,
+      "p5": 231.3,
+      "p95": 549.7999999999993
+    },
+    "tempo_emit_elapsed_us": {
+      "max": 1593.0,
+      "median": 943.0,
+      "min": 681.0,
+      "p5": 735.5999999999999,
+      "p95": 1285.3999999999996
+    },
+    "tempo_phase_elapsed_us": {
+      "max": 129.0,
+      "median": 56.0,
+      "min": 33.0,
+      "p5": 35.0,
+      "p95": 91.0
+    },
+    "tempo_publish_elapsed_us": {
+      "max": 42.0,
+      "median": 14.0,
+      "min": 8.0,
+      "p5": 8.0,
+      "p95": 25.0
+    },
+    "tempo_silence_elapsed_us": {
+      "max": 193.0,
+      "median": 115.0,
+      "min": 64.0,
+      "p5": 73.0,
+      "p95": 156.0
+    },
+    "tempo_update_elapsed_us": {
+      "max": 715.0,
+      "median": 413.0,
+      "min": 235.0,
+      "p5": 268.0,
+      "p95": 645.6999999999998
+    },
+    "total_ap_loop_elapsed_us": {
+      "max": 10625.0,
+      "median": 7100.0,
+      "min": 5236.0,
+      "p5": 5430.0,
+      "p95": 9845.4
+    }
+  },
+  "track_file": "/Users/spectrasynq/SensoryBridge-main 9/build/audio-semantic-metrics/control-fixtures/control_127bpm_click_44k1.wav",
+  "track_sha256": "2b75e2993a838a5344ff21b3fbe48628b8f92e065eec79fbe949379494eb5ee4",
+  "unique_ap_core_id": [
+    0
+  ],
+  "unique_dma_desc_num": [
+    3
+  ],
+  "unique_dma_frame_num": [
+    120
+  ],
+  "unique_sample_rate": [
+    16000
+  ],
+  "unique_samples_per_chunk": [
+    120
+  ],
+  "unique_slot_bit_width": [
+    32
+  ],
+  "unique_slot_mode": [
+    2
+  ],
+  "unique_stage": [
+    0
+  ],
+  "unique_vp_core_id": [
+    1
+  ]
+}

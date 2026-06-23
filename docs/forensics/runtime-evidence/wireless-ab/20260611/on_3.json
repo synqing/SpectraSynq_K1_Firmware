@@ -1,0 +1,89 @@
+{
+  "afplay_rc": -15,
+  "condition": "on",
+  "doctrine_note": "Scalar symptom capture; not causal attribution (MabuTrace lane for causality).",
+  "duration_s": 90.0,
+  "failure": null,
+  "identity": {
+    "chip_id": "F887A500",
+    "version": "40103"
+  },
+  "index": 3,
+  "metrics": {
+    "ap_cadence": {
+      "max_gap_s": 2.553,
+      "mean_gap_s": 0.875899,
+      "median_gap_s": 1.006,
+      "p95_jitter_ms": 1006.0,
+      "samples": 110
+    },
+    "apcap": {
+      "peak_scaled_window_max": null,
+      "windows": 17
+    },
+    "beat": {
+      "active_samples": 110,
+      "bpm_abs_err_vs_120": 18.760417,
+      "bpm_mean_locked": 101.239583,
+      "bpm_std_locked": 28.217481,
+      "conf_mean_active": 0.727818,
+      "conf_mean_all": 0.727818,
+      "lock_ratio_active": 0.872727,
+      "locked_samples": 96
+    },
+    "crash_markers": 0,
+    "garbage_lines": 0,
+    "lines_total": 505,
+    "onset": {
+      "bass_sampled_count": 22,
+      "bstr_mean": 0.424364,
+      "onset_sampled_count": 16,
+      "ostr_mean": 0.105364
+    },
+    "peak_scaled": {
+      "hist_counts": [
+        9,
+        25,
+        12,
+        15,
+        12,
+        7,
+        9,
+        8,
+        3,
+        10
+      ],
+      "hist_edges": [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.6,
+        0.7,
+        0.8,
+        0.9,
+        1.0
+      ],
+      "mean": 0.416182,
+      "p95": 0.96815
+    },
+    "render": {
+      "max_us": 5688.0,
+      "mean_us": 3950.450549,
+      "p95_us": 3961.5,
+      "resolution": "full-frame-rate avg/max aggregated per 1 s VPF report; p95 over per-second avgs",
+      "surface": "vpf_frame_us"
+    },
+    "vpf": {
+      "reports": 91,
+      "seq_gaps": 0
+    }
+  },
+  "port": "/dev/cu.usbmodem1401",
+  "raw_log": "docs/forensics/runtime-evidence/wireless-ab/20260611/on_3.log",
+  "started_at": "2026-06-11T12:08:33.546869",
+  "stimulus": "/Users/spectrasynq/SensoryBridge-main 9/scripts/regression-harness/fixtures/wireless_ab_stimulus.wav",
+  "tool": "wireless_ab_bench"
+}

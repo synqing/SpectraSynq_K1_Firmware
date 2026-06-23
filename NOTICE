@@ -1,0 +1,29 @@
+SpectraSynq K1 Firmware
+Copyright 2025-2026 SpectraSynq
+
+This product includes software developed at SpectraSynq.
+
+────────────────────────────────────────────────────────────────────────────
+Upstream heritage (GPL-3.0)
+────────────────────────────────────────────────────────────────────────────
+This firmware is a derivative work of "Sensory Bridge" by Connor Nishijima
+(Lixie Labs), licensed under the GNU General Public License v3.0.
+Original work: https://github.com/connornishijima/SensoryBridge
+
+In accordance with the GPL-3.0, this firmware remains licensed under the
+GPL-3.0 (see LICENSE) and the original author's copyright and attribution are
+preserved. The Goertzel-based DFT audio engine, noise calibration, and the
+core audio-to-LED pipeline originate from that work. Modules carrying the
+inherited heritage retain the "sb_" source prefix to mark their provenance.
+
+────────────────────────────────────────────────────────────────────────────
+Bundled third-party libraries
+────────────────────────────────────────────────────────────────────────────
+FixedPoints v1.1.2 — fixed-point arithmetic by Pharap, Apache License 2.0.
+  https://github.com/Pharap/FixedPointsArduino
+
+M5ROTATE8 — rotary encoder driver by Rob Tillaart, MIT License.
+  https://github.com/RobTillaart/M5ROTATE8
+
+FastLED v3.10.3 — addressable-LED driver, MIT License (resolved via PlatformIO
+  lib_deps).

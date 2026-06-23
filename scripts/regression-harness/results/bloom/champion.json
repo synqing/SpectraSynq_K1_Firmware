@@ -1,0 +1,98 @@
+{
+  "champion_version": 0,
+  "promoted_utc": "2026-06-03T20:25:32Z",
+  "promoted_by": "host-bootstrap",
+  "effect": "bloom",
+  "effect_id": null,
+  "effect_source_ref": "git:SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_bloom.cpp@397bb61",
+  "params": {
+    "mood": 0.6,
+    "saturation": 0.9,
+    "square_iter": 1.0,
+    "chroma": 1.0,
+    "palette_mode": true,
+    "palette_index": 0,
+    "auto_color_shift": false,
+    "hue_position": 0.0,
+    "chroma_val": 0.0,
+    "chromatic_mode": true
+  },
+  "params_hash": "7b46e0dc4e160078910cb74fae9c0ddfad13d9f0a2bc7ee4c513b63acbc2f286",
+  "weights_version": "ve-eval-w0-mvp0",
+  "weights": {
+    "motion": 0.2,
+    "am_velocity": 0.2,
+    "am_coherence": 0.133333,
+    "colour": 0.2,
+    "spatial": 0.133333,
+    "persistence": 0.133333
+  },
+  "fixture_corpus": [
+    "beat-pulse",
+    "broadband-swell",
+    "chord-major"
+  ],
+  "fixture_corpus_hash": "6231590781b3f05032a81369a95697c9a0419c0ae0f83306027b0edda97d2e24",
+  "tier_of_record": "host",
+  "panel": {
+    "beat-pulse": {
+      "frames": 96,
+      "motion_presence": 0.128604,
+      "colour_clarity": 0.521407,
+      "spatial_shape": 0.757883,
+      "persistence": 0.0,
+      "am_velocity_score": 0.974359,
+      "am_coherence": 1.0,
+      "white_bias_mean": 0.092365,
+      "half_life": 60.0,
+      "mean_changed": 0.161316,
+      "liveness_fail": false
+    },
+    "broadband-swell": {
+      "frames": 96,
+      "motion_presence": 0.310085,
+      "colour_clarity": 0.663592,
+      "spatial_shape": 0.761365,
+      "persistence": 0.789474,
+      "am_velocity_score": 0.974359,
+      "am_coherence": 1.0,
+      "white_bias_mean": 0.008752,
+      "half_life": 36.0,
+      "mean_changed": 0.494342,
+      "liveness_fail": false
+    },
+    "chord-major": {
+      "frames": 60,
+      "motion_presence": 0.052532,
+      "colour_clarity": 0.646758,
+      "spatial_shape": 0.750437,
+      "persistence": 0.789474,
+      "am_velocity_score": 0.974359,
+      "am_coherence": 1.0,
+      "white_bias_mean": 0.095579,
+      "half_life": 36.0,
+      "mean_changed": 0.023941,
+      "liveness_fail": false
+    }
+  },
+  "rank_score": 0.598585,
+  "doctrine_floors": {
+    "white_bias_max": 0.095579,
+    "energy_half_life_min": 36.0
+  },
+  "evidence_ref": "scripts/regression-harness/results/bloom/results.json",
+  "supersedes": null,
+  "frame_hashes": {
+    "beat-pulse": "813dda347e5ce433f12344be9e18e4e2b25e88712d8e8fabc4d6d873926094e4",
+    "broadband-swell": "f68b081d8332ec01e20ea06c078c9d256cb46ee8d3403321aa5b91b1fc0394a1",
+    "chord-major": "234a9024fbc0b40321c9201cadb3aff55bfa34993eff575f0e1d7ea80b4153c5"
+  },
+  "changelog": [
+    {
+      "version": 0,
+      "utc": "2026-06-03T20:25:32Z",
+      "by": "host-bootstrap",
+      "note": "host-bootstrap [MECHANISM] floor; weights=ve-eval-w0-mvp0; corpus=['beat-pulse', 'broadband-swell', 'chord-major']"
+    }
+  ]
+}

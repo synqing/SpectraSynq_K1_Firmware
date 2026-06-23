@@ -1,0 +1,107 @@
+1781080680.537538 >>> :version
+1781080680.592178 sbr{{
+1781080680.592189 VERSION: 40103
+1781080680.592191 }}
+1781080680.989700 >>> :chip_id
+1781080681.012212 sbr{{
+1781080681.012219 B489A500
+1781080681.012221 }}
+1781080681.440646 >>> :snappy_status
+1781080681.448691 sbr{{
+1781080681.501873 SNAP,ver=1,event=status,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2724051,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1582.0,follower=3242.2,peak_scaled=0.4181,silent_scale=1.0000,silence=0,vu_avg=0.0232,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1192,vp_render_us=1549,vp_render_avg=1821,vp_render_max=3337,system_fps=137.15,led_fps=180.24,ap_stream=0,vp_stream=0,snappy_stream=0
+1781080681.501886 }}
+1781080683.701198 >>> :stop
+1781080683.722998 SBOK
+1781080684.152812 >>> :set_mode=22
+1781080684.196098 sbr{{
+1781080684.196105 CONFIG.LIGHTSHOW_MODE: 18
+1781080684.196106 }}
+1781080684.603884 >>> :smart_scene=l1
+1781080684.616569 sbr{{
+1781080684.616575 SMART_ASSIST: on
+1781080684.616577 SMART_SWITCHING: on
+1781080684.616578 SMART_DIRECTOR_AUTONOMY: off
+1781080684.616579 SMART_HOOKS: on
+1781080684.616580 SMART_CONFIDENCE_FLOOR: 0.080
+1781080684.616581 SMART_APPLIED_MODE: 18
+1781080684.616582 SMART_LAST_REQUESTED_MODE: 18
+1781080684.616583 SMART_SWITCHES_IN_WINDOW: 0
+1781080684.616583 SMART_MANUAL_OWNER_ACTIVE: 0
+1781080684.616584 SMART_LAST_REASON: 0
+1781080684.616585 SMART_STATE: 0
+1781080684.616586 SMART_INTENT_MODE: 3
+1781080684.616586 SMART_INTENT_CONFIDENCE: 0.000
+1781080684.616587 SMART_INTENT_WANTS_SWITCH: 0
+1781080684.616588 SMART_SCALAR_PHOTONS: 1.000
+1781080684.616588 SMART_SCALAR_CHROMA: 1.000
+1781080684.671620 SMART_SCALAR_MOOD: 1.000
+1781080684.671627 SMART_SCALAR_SATURATION: 1.000
+1781080684.671628 SMART_PALETTE_OVERLAY: 0
+1781080684.671629 SMART_PALETTE_INDEX: 0
+1781080684.671630 SMART_AUTO_COLOUR_SHIFT: 0
+1781080684.671631 SMART_MIN_DWELL_MS: 8000
+1781080684.671632 SMART_COOLDOWN_MS: 20000
+1781080684.671633 SMART_SWITCH_WINDOW_MS: 60000
+1781080684.671634 SMART_MAX_SWITCHES: 2
+1781080684.671635 SMART_AUDIO_NOVELTY: 0.0428
+1781080684.671636 SMART_AUDIO_ENERGY: 0.1585
+1781080684.671636 SMART_EVENT_ID: 3666
+1781080684.671637 SMART_EVENT_AGE_MS: 468
+1781080684.671638 SMART_ONSET: 0
+1781080684.671639 SMART_BASS_ONSET: 0
+1781080684.671640 SMART_BEAT_CONFIDENCE: 0.000
+1781080684.671641 }}
+1781080684.671642 sbr{{
+1781080684.671643 EDGE_ENABLED: on
+1781080684.671644 EDGE_MODE: complementary
+1781080684.671645 EDGE_STRENGTH: 0.350
+1781080684.671646 }}
+1781080685.058595 >>> :vp_stream=off
+1781080685.093561 sbr{{
+1781080685.093568 VP_STREAM: off
+1781080685.093569 }}
+1781080685.513692 >>> :ap_stream=off
+1781080685.576216 sbr{{
+1781080685.576223 AP_STREAM: off
+1781080685.576226 }}
+1781080685.965747 >>> :snappy_status
+1781080685.973568 sbr{{
+1781080686.027254 SNAP,ver=1,event=status,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2728575,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=2353.0,follower=2169.3,peak_scaled=0.7833,silent_scale=1.0000,silence=0,vu_avg=0.0283,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2097,vp_render_us=2491,vp_render_avg=2412,vp_render_max=3527,system_fps=144.58,led_fps=169.13,ap_stream=0,vp_stream=0,snappy_stream=0
+1781080686.027262 }}
+1781080689.584615 >>> :snappy_stream=on
+1781080689.605569 sbr{{
+1781080689.605576 SNAPPY_STREAM: on
+1781080689.605577 }}
+1781080689.656337 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2732207,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=4872.0,follower=6852.8,peak_scaled=0.6681,silent_scale=1.0000,silence=0,vu_avg=0.0977,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=2483,vp_render_avg=2353,vp_render_max=4391,system_fps=145.39,led_fps=166.18,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080690.656966 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2733205,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=3427.0,follower=5826.0,peak_scaled=0.6533,silent_scale=1.0000,silence=0,vu_avg=0.0785,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=3310,vp_render_avg=2435,vp_render_max=4391,system_fps=143.94,led_fps=167.11,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080691.661102 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2734210,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1101.0,follower=4272.4,peak_scaled=0.2940,silent_scale=1.0000,silence=0,vu_avg=0.0206,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1459,vp_render_us=2290,vp_render_avg=2340,vp_render_max=4391,system_fps=146.09,led_fps=170.06,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080692.668903 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2735217,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1164.0,follower=2779.9,peak_scaled=0.3637,silent_scale=1.0000,silence=0,vu_avg=0.0206,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2180,vp_render_us=2556,vp_render_avg=2378,vp_render_max=4391,system_fps=139.94,led_fps=166.94,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080693.673099 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2736221,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1606.0,follower=2080.1,peak_scaled=0.5922,silent_scale=1.0000,silence=0,vu_avg=0.0280,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2234,vp_render_us=2383,vp_render_avg=2343,vp_render_max=4391,system_fps=137.29,led_fps=166.11,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080694.674185 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2737225,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1519.0,follower=2292.4,peak_scaled=0.6785,silent_scale=1.0000,silence=0,vu_avg=0.0208,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1866,vp_render_us=2432,vp_render_avg=2238,vp_render_max=4391,system_fps=139.03,led_fps=167.00,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080695.679333 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2738229,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1752.0,follower=2956.4,peak_scaled=0.5388,silent_scale=1.0000,silence=0,vu_avg=0.0309,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1636,vp_render_us=2388,vp_render_avg=2336,vp_render_max=4391,system_fps=136.67,led_fps=167.01,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080696.676192 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2739228,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=2597.0,follower=2957.3,peak_scaled=0.7080,silent_scale=1.0000,silence=0,vu_avg=0.0448,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1540,vp_render_us=2483,vp_render_avg=2376,vp_render_max=4391,system_fps=143.37,led_fps=168.05,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080697.686071 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2740233,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=711.0,follower=2444.8,peak_scaled=0.4341,silent_scale=1.0000,silence=0,vu_avg=0.0181,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1578,vp_render_us=2477,vp_render_avg=2338,vp_render_max=4391,system_fps=134.99,led_fps=168.24,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080698.689660 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2741237,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=2279.0,follower=2362.8,peak_scaled=0.7972,silent_scale=1.0000,silence=0,vu_avg=0.0283,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1803,vp_render_us=2448,vp_render_avg=2466,vp_render_max=4391,system_fps=147.56,led_fps=167.94,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080699.695058 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2742243,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=2771.0,follower=2467.1,peak_scaled=0.6640,silent_scale=1.0000,silence=0,vu_avg=0.0237,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1983,vp_render_us=2529,vp_render_avg=2454,vp_render_max=4391,system_fps=137.80,led_fps=171.77,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080700.699097 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2743249,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1091.0,follower=1951.4,peak_scaled=0.5562,silent_scale=1.0000,silence=0,vu_avg=0.0192,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2081,vp_render_us=2458,vp_render_avg=2400,vp_render_max=4391,system_fps=138.82,led_fps=168.71,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080701.705199 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2744254,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1042.0,follower=1753.4,peak_scaled=0.6185,silent_scale=1.0000,silence=0,vu_avg=0.0231,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2372,vp_render_us=2584,vp_render_avg=2408,vp_render_max=4391,system_fps=137.01,led_fps=164.34,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080702.706919 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2745258,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=2175.0,follower=2045.9,peak_scaled=0.7036,silent_scale=1.0000,silence=0,vu_avg=0.0301,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1660,vp_render_us=2550,vp_render_avg=2179,vp_render_max=4391,system_fps=140.40,led_fps=169.05,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080703.715764 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2746265,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=3757.0,follower=3698.5,peak_scaled=0.8683,silent_scale=1.0000,silence=0,vu_avg=0.0630,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1626,vp_render_us=2376,vp_render_avg=2306,vp_render_max=4391,system_fps=139.91,led_fps=169.35,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080704.722423 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2747270,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=3583.0,follower=4368.7,peak_scaled=0.7635,silent_scale=1.0000,silence=0,vu_avg=0.0790,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1187,vp_render_us=2538,vp_render_avg=2593,vp_render_max=4391,system_fps=138.96,led_fps=167.66,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080705.720985 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2748271,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=3294.0,follower=3662.8,peak_scaled=0.7973,silent_scale=1.0000,silence=0,vu_avg=0.0680,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1768,vp_render_us=1583,vp_render_avg=2542,vp_render_max=4391,system_fps=143.60,led_fps=162.03,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080706.724110 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2749272,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=4459.0,follower=3989.2,peak_scaled=0.9787,silent_scale=1.0000,silence=0,vu_avg=0.0696,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1402,vp_render_us=2341,vp_render_avg=2430,vp_render_max=4391,system_fps=143.86,led_fps=170.17,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080707.724309 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2750276,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1132.0,follower=3501.1,peak_scaled=0.2967,silent_scale=1.0000,silence=0,vu_avg=0.0223,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1455,vp_render_us=2436,vp_render_avg=2443,vp_render_max=4391,system_fps=139.37,led_fps=163.76,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080708.727164 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2751275,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1518.0,follower=2275.1,peak_scaled=0.5691,silent_scale=1.0000,silence=0,vu_avg=0.0202,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2904,vp_render_us=2381,vp_render_avg=2356,vp_render_max=4391,system_fps=139.56,led_fps=169.19,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080709.731972 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2752279,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1302.0,follower=3572.6,peak_scaled=0.2504,silent_scale=1.0000,silence=0,vu_avg=0.0145,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2010,vp_render_us=2352,vp_render_avg=2356,vp_render_max=4391,system_fps=134.35,led_fps=167.20,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080710.732427 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2753283,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=1890.0,follower=2826.1,peak_scaled=0.4724,silent_scale=1.0000,silence=0,vu_avg=0.0233,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.2257,vp_render_us=2330,vp_render_avg=2336,vp_render_max=4391,system_fps=139.82,led_fps=166.55,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080711.740126 SNAP,ver=1,event=stream,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2754288,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=9629.0,follower=9373.3,peak_scaled=1.0220,silent_scale=1.0000,silence=0,vu_avg=0.1939,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1161,vp_render_us=2433,vp_render_avg=2514,vp_render_max=4391,system_fps=143.74,led_fps=162.63,ap_stream=0,vp_stream=0,snappy_stream=1
+1781080712.649556 >>> :snappy_stream=off
+1781080712.683886 sbr{{
+1781080712.683896 SNAPPY_STREAM: off
+1781080712.683897 }}
+1781080713.104168 >>> :stop
+1781080713.158926 SBOK
+1781080713.554292 >>> :snappy_status
+1781080713.561580 sbr{{
+1781080713.615777 SNAP,ver=1,event=status,base=9eb3cee,env=k1_bench_reference_snappy_telem,wireless=0,pinmap=bench,fw=40103,uptime_ms=2756164,mode=18,secondary_mode=3,sample_rate=12800,samples_per_chunk=96,photons=1.0000,chroma=0.1000,mood=0.5500,ssl=216,dc=-909,cal_source=config,cal_valid=1,cal_profile_loaded=0,max_raw=4992.0,follower=7922.7,peak_scaled=0.6154,silent_scale=1.0000,silence=0,vu_avg=0.1044,vp_profile=candidate,wave_shift=120.0000,bloom_alpha=0.9900,agc_gain=0.1000,vp_render_us=2341,vp_render_avg=2382,vp_render_max=4391,system_fps=138.02,led_fps=163.25,ap_stream=0,vp_stream=0,snappy_stream=0
+1781080713.615784 }}

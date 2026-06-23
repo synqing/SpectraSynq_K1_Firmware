@@ -1,0 +1,132 @@
+{
+  "acf_valid_rows": 0,
+  "active_sample_rate_mode": 16000,
+  "active_samples_per_chunk_mode": 120,
+  "active_tempo_decimation_mode": 3,
+  "apcad_log": "docs/forensics/runtime-evidence/20260615T0950-sample-rate-16k120-stage-probes/c2_16000_120_d3_stage_gdft_reparsed_20260615_095947__apcad.log",
+  "bytes_mismatch_count": 0,
+  "capture_metadata": {
+    "begin": {
+      "capacity": 2304,
+      "count": 2000,
+      "dropped": 0,
+      "end_ms": 29779,
+      "start_ms": 14779
+    },
+    "done": {
+      "count": 2000,
+      "dropped": 0
+    }
+  },
+  "capture_start": "2026-06-15T09:59:47+0800",
+  "classification": "E_other",
+  "classification_reason": "active config and I2S health look nominal, but cadence still does not match an already-classified source",
+  "declared_accepted_novelty_rate_hz_from_binary": 44.44531,
+  "declared_ap_frame_hz_from_binary": 133.33203,
+  "duration_ms": 14990,
+  "expected_accepted_novelty_dt_ms_from_active_config": 22.499999999999996,
+  "expected_accepted_novelty_rate_hz_from_active_config": 44.44444444444445,
+  "expected_ap_frame_dt_ms_from_active_config": 7.499999999999999,
+  "expected_ap_frame_rate_hz_from_active_config": 133.33333333333334,
+  "first_frame": 1813,
+  "first_t_ms": 14779,
+  "frame_gap_count": 0,
+  "frame_gaps_first10": [],
+  "i2s_not_ok_count": 0,
+  "i2s_status_counts": {
+    "0": 2000
+  },
+  "last_frame": 3812,
+  "last_t_ms": 29769,
+  "measured_ap_frame_dt_ms": {
+    "max": 11.0,
+    "median": 6.0,
+    "min": 5.0,
+    "p5": 5.0,
+    "p95": 10.0
+  },
+  "measured_ap_frame_rate_hz": 133.3555703802535,
+  "measured_emitted_novelty_count": 0,
+  "measured_emitted_novelty_dt_ms": {
+    "max": null,
+    "median": null,
+    "min": null,
+    "p5": null,
+    "p95": null
+  },
+  "measured_emitted_novelty_rate_hz": null,
+  "non_actions": [
+    "offline reclassification only",
+    "no serial open",
+    "no playback",
+    "no calibration command"
+  ],
+  "raw_log": "docs/forensics/runtime-evidence/20260615T0950-sample-rate-16k120-stage-probes/c2_16000_120_d3_stage_gdft_reparsed_20260615_095947__raw.log",
+  "row_count": 2000,
+  "silence_rows": 0,
+  "source_contract_novelty_decimation": 3,
+  "source_contract_sample_rate": 16000,
+  "source_contract_samples_per_chunk": 120,
+  "source_raw_log": "docs/forensics/runtime-evidence/20260615T0950-sample-rate-16k120-stage-probes/c2_16000_120_d3_stage_gdft_20260615_095433__raw.log",
+  "timestamp_regression_count": 0,
+  "timestamp_regressions_first10": [],
+  "timing_us": {
+    "calculate_novelty_elapsed_us": {
+      "max": 0.0,
+      "median": 0.0,
+      "min": 0.0,
+      "p5": 0.0,
+      "p95": 0.0
+    },
+    "i2s_read_elapsed_us": {
+      "max": 5025.0,
+      "median": 1462.0,
+      "min": 20.0,
+      "p5": 31.0,
+      "p95": 5010.0
+    },
+    "process_GDFT_elapsed_us": {
+      "max": 4237.0,
+      "median": 3745.0,
+      "min": 3464.0,
+      "p5": 3555.8,
+      "p95": 3949.0499999999997
+    },
+    "total_ap_loop_elapsed_us": {
+      "max": 9851.0,
+      "median": 6461.0,
+      "min": 4263.0,
+      "p5": 4483.0,
+      "p95": 9705.0
+    }
+  },
+  "track_file": "/Users/spectrasynq/SensoryBridge-main 9/build/audio-semantic-metrics/control-fixtures/control_127bpm_click_44k1.wav",
+  "track_sha256": "2b75e2993a838a5344ff21b3fbe48628b8f92e065eec79fbe949379494eb5ee4",
+  "unique_ap_core_id": [
+    0
+  ],
+  "unique_dma_desc_num": [
+    3
+  ],
+  "unique_dma_frame_num": [
+    120
+  ],
+  "unique_sample_rate": [
+    16000
+  ],
+  "unique_samples_per_chunk": [
+    120
+  ],
+  "unique_slot_bit_width": [
+    32
+  ],
+  "unique_slot_mode": [
+    2
+  ],
+  "unique_stage": [
+    2
+  ],
+  "unique_vp_core_id": [
+    1
+  ]
+}

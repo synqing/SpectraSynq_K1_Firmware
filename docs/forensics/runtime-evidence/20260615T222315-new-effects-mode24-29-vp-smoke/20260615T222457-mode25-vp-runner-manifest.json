@@ -1,0 +1,40 @@
+{
+  "capture_out_dir": "/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T222315-new-effects-mode24-29-vp-smoke",
+  "capture_returncode": 0,
+  "capture_stderr": "",
+  "capture_stdout": "wrote /Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T222315-new-effects-mode24-29-vp-smoke/20260615T222458-snappiness-manifest.json\n",
+  "commands": [
+    [
+      "/Users/spectrasynq/.platformio/penv/bin/python",
+      "scripts/regression-harness/k1_paired_snappiness_capture.py",
+      "--main-port",
+      "/dev/cu.usbmodem12201",
+      "--bench-port",
+      "/dev/cu.usbmodem12401",
+      "--main-chip-id",
+      "F887A500",
+      "--bench-chip-id",
+      "B489A500",
+      "--duration-s",
+      "60",
+      "--status-period-s",
+      "0",
+      "--mode",
+      "25",
+      "--smart-scene",
+      "",
+      "--stream-surface",
+      "vp",
+      "--out-dir",
+      "/Users/spectrasynq/SensoryBridge-main 9/docs/forensics/runtime-evidence/20260615T222315-new-effects-mode24-29-vp-smoke"
+    ]
+  ],
+  "created_at": "2026-06-15T22:24:57+0800",
+  "duration_s": 60,
+  "failure": null,
+  "mode": 25,
+  "music_path": "/Users/spectrasynq/SensoryBridge-main 9/build/k1-real-music-rendered/20260615T-bench-corrected-targeted-subset-k1-real-music-corpus/subfocus-solarsystem-174bpm/subfocus-solarsystem-174bpm.chorus-body-120s.steady_phase.all_musical.k1-real-music.48k-mono-s16.wav",
+  "music_player_pid": 18970,
+  "music_player_returncode": -15,
+  "music_volume": 0.75
+}

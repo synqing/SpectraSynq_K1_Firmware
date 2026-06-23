@@ -1,0 +1,181 @@
+# capture_start=2026-06-15T09:21:06+0800
+# port=/dev/cu.usbmodem12201 baud=115200 duration_ms=15000
+# track=/Users/spectrasynq/SensoryBridge-main 9/build/audio-semantic-metrics/control-fixtures/control_127bpm_click_44k1.wav
+# track_sha256=2b75e2993a838a5344ff21b3fbe48628b8f92e065eec79fbe949379494eb5ee4
+# player=afplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem12201", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:F8 LOCATION=0-1.2.2", "location": "0-1.2.2", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:F8", "vid": 12346}
+E (12564) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+E (12564) task_wdt:  - IDLE0 (CPU 0)
+E (12564) task_wdt: Tasks currently running:
+E (12564) task_wdt: CPU 0: loopTask
+E (12564) task_wdt: CPU 1: IDLE1
+E (12564) task_wdt: Aborting.
+E (12564) task_wdt: Print CPU 0 (current core) backtrace
+Backtrace: 0x42018e83:0x3fcdf020 0x42016912:0x3fcdf090 0x4202ff14:0x3fcdf3f0 0x4037dd96:0x3fcdf410
+ELF file SHA256: 5a9599c8e
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40377751
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+SENSORY BRIDGE | VER: 40103
+---------------------------
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S STD INIT: PASS
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.551 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 21.683 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.072 MS
+SYSTEM INIT COMPLETE!
+WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=16000 samples_per_chunk=120 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=3.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+SBOK
+sbr{{
+VERSION: 40103
+}}
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+sbr{{
+TEMPO_STREAM: off
+}}
+sbr{{
+AP_STREAM: off
+}}
+E (12530) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+E (12530) task_wdt:  - IDLE0 (CPU 0)
+E (12530) task_wdt: Tasks currently running:
+E (12530) task_wdt: CPU 0: loopTask
+E (12530) task_wdt: CPU 1: IDLE1
+E (12530) task_wdt: Aborting.
+E (12530) task_wdt: Print CPU 0 (current core) backtrace
+Backtrace: 0x4037554a:0x3fcdf050 0x42016880:0x3fcdf090 0x4202ff14:0x3fcdf3f0 0x4037dd96:0x3fcdf410
+ELF file SHA
+256: 5a9599c8e
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40377751
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+SENSORY BRIDGE | VER: 40103
+---------------------------
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S STD INIT: PASS
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.550 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 21.687 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.070 MS
+SYSTEM INIT COMPLETE!
+WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+INIT_SECONDARY_LEDS: PASS
+# playback_cmd=/usr/bin/afplay /Users/spectrasynq/SensoryBridge-main 9/build/audio-semantic-metrics/control-fixtures/control_127bpm_click_44k1.wav
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=16000 samples_per_chunk=120 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=3.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+sbr{{
+APCAD_CAPTURE: armed 15000 ms capacity=2304
+}}
+E (12530) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+E (12530) task_wdt:  - IDLE0 (CPU 0)
+E (12530) task_wdt: Tasks currently running:
+E (12530) task_wdt: CPU 0: loopTask
+E (12530) task_wdt: CPU 1: IDLE1
+E (12530) task_wdt: Aborting.
+E (12530) task_wdt: Print CPU 0 (current core) backtrace
+Backtrace: 0x4204df16:0x3fcdeee0 0x4204c9ba:0x3fcdef10 0x42017dfd:0x3fcdef40 0x42017ef0:0x3fcdef70 0x420184a6:0x3fcdeff0 0x420168ff:0x3fcdf090 0x4202ff14:0x3fcdf3f0 0x4037dd96:0x3fcdf410
+ELF file SHA256: 5a9599c8e
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40377751
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+SENSORY BRIDGE | VER: 40103
+---------------------------
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S STD INIT: PASS
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.551 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 21.745 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.071 MS
+SYSTEM INIT COMPLETE!
+WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=16000 samples_per_chunk=120 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=3.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+E (12530) task_wdt: Task watchdog got triggered. The following tasks/users did not reset the watchdog in time:
+E (12530) task_wdt:  - IDLE0 (CPU 0)
+E (12530) task_wdt: Tasks currently running:
+E (12530) task_wdt: CPU 0: loopTask
+E (12530) task_wdt: CPU 1: IDLE1
+E (12530) task_wdt: Aborting.
+E (12530) task_wdt: Print CPU 0 (current core) backtrace
+Backtrace: 0x40054e88:0x3fcdf040 0x4037582b:0x3fcdf050 0x42016880:0x3fcdf090 0x4202ff14:0x3fcdf3f0 0x4037dd96:0x3fcdf410
+ELF file SHA256: 5a9599c8e
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x40377751
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+SENSORY BRIDGE | VER: 40103
+---------------------------
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S STD INIT: PASS
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.559 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 21.919 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.069 MS
+SYSTEM INIT COMPLETE!
+WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=16000 samples_per_chunk=120 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=3.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+APCAD_CAPTURE_BEGIN,count=0,capacity=2304,dropped=0,start_ms=0,end_ms=0
+APCAD_HEALTH,ver=1,health_ok=0,sample_rate=0,samples_per_chunk=0,tempo_decim=0,decl_ap_hz=0.000,decl_nov_hz=0.000,meas_ap_hz=0.000,meas_nov_hz=0.000,ap_rate_ok=0,nov_rate_ok=0,core_ok=0,i2s_ok=0,bytes_ok=0,dma_desc=0,ap_core=-1,vp_core=-1
+APCAD_CAPTURE_DONE,count=0,dropped=0
+# apcad_dump_done=True
+SBOK

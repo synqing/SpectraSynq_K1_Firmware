@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SB Forensic Archaeological Reconstruction - Waveform/Bloom + S2-S3/K1 hardware</title>
+  <style>
+    :root {
+      --bg: #111315;
+      --panel: #171b1f;
+      --panel-2: #1e2429;
+      --ink: #ece8df;
+      --muted: #a9b0b5;
+      --line: #343c43;
+      --gold: #d8b35f;
+      --amber: #f0a35a;
+      --blue: #6da7d8;
+      --green: #74b77a;
+      --red: #d66c6c;
+      --violet: #a98adf;
+      --code: #0d0f11;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(216, 179, 95, 0.09), rgba(17, 19, 21, 0) 360px),
+        var(--bg);
+      font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1220px, calc(100vw - 40px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    header {
+      border: 1px solid var(--line);
+      background: rgba(23, 27, 31, 0.95);
+      padding: 28px;
+    }
+
+    h1, h2, h3 {
+      line-height: 1.12;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: clamp(30px, 4vw, 54px);
+      max-width: 980px;
+    }
+
+    h2 {
+      margin-top: 34px;
+      padding-top: 26px;
+      border-top: 1px solid var(--line);
+      font-size: 26px;
+      color: var(--gold);
+    }
+
+    h3 {
+      margin-top: 22px;
+      font-size: 18px;
+      color: var(--blue);
+    }
+
+    p {
+      margin: 10px 0 0;
+    }
+
+    a {
+      color: var(--blue);
+    }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: 1px 5px;
+      border: 1px solid rgba(255,255,255,0.09);
+      background: var(--code);
+      border-radius: 4px;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      background: var(--code);
+      color: #d8dee9;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      background: rgba(23, 27, 31, 0.85);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      color: var(--gold);
+      background: rgba(216, 179, 95, 0.08);
+      font-weight: 700;
+    }
+
+    .subtitle {
+      max-width: 980px;
+      color: var(--muted);
+      margin-top: 14px;
+      font-size: 17px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .meta {
+      border: 1px solid var(--line);
+      background: var(--panel-2);
+      padding: 12px;
+      min-height: 82px;
+    }
+
+    .meta strong {
+      display: block;
+      color: var(--gold);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .meta span {
+      display: block;
+      margin-top: 6px;
+      color: var(--ink);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.04);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tag.source { color: var(--blue); }
+    .tag.committed { color: var(--green); }
+    .tag.memory { color: var(--violet); }
+    .tag.runtime { color: var(--amber); }
+    .tag.risk { color: var(--red); }
+    .tag.ssa { color: var(--gold); }
+
+    .callout {
+      margin-top: 16px;
+      padding: 16px;
+      border-left: 4px solid var(--gold);
+      background: rgba(216, 179, 95, 0.09);
+    }
+
+    .callout.risk {
+      border-left-color: var(--red);
+      background: rgba(214, 108, 108, 0.10);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 16px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .timeline {
+      margin-top: 18px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .event {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      gap: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .event time {
+      color: var(--gold);
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+    }
+
+    .event .body > strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .evidence-list {
+      margin-top: 10px;
+      padding-left: 18px;
+    }
+
+    .evidence-list li {
+      margin-top: 6px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .status-strip {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .verdict {
+      font-size: 19px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+
+    .mono-list {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 920px) {
+      main {
+        width: min(100vw - 24px, 1220px);
+      }
+
+      .meta-grid, .cards, .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .event {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Forensic Archaeological Reconstruction: SB Waveform/Bloom Recovery + S2-S3/K1 hardware Migration</h1>
+    <p class="subtitle">A consolidated reconstruction of what was attempted, what landed in source, what was only proved by compile/upload/runtime evidence, and what remains unproven. This report is intentionally source-cited and separates committed facts from memory-derived session chronology.</p>
+    <div class="meta-grid">
+      <div class="meta">
+        <strong>Repository</strong>
+        <span><code>/Users/spectrasynq/SensoryBridge-main 9</code></span>
+      </div>
+      <div class="meta">
+        <strong>Generated</strong>
+        <span>2026-05-23 AWST</span>
+      </div>
+      <div class="meta">
+        <strong>HEAD</strong>
+        <span><code>8b35022</code> - docs: record sb k1v2 upload evidence</span>
+      </div>
+      <div class="meta">
+        <strong>Report Mode</strong>
+        <span>Read-only firmware archaeology. No firmware source changes made for this report.</span>
+      </div>
+    </div>
+    <div class="status-strip">
+      <span class="tag source">current source proof</span>
+      <span class="tag committed">committed docs</span>
+      <span class="tag memory">claude-mem chronology</span>
+      <span class="tag ssa">SSA cross-checks</span>
+      <span class="tag risk">unresolved runtime gaps</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Executive Reconstruction</h2>
+    <div class="callout">
+      <p class="verdict">Short version: the Bloom and Waveform visual fixes are present in current source, but their fine-grained repair history predates the local git commit stack and must be reconstructed from memory/session records plus current source proof. The S2-S3 work evolved into a K1 hardware bring-up profile using firmware-v3 GPIOs, with compile/upload evidence recorded, followed by uncommitted hardening for absent Rotate8, USB serial strategy, LEDC guard failures, and K1 hardware compile flags.</p>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <h3>Bloom</h3>
+        <p>The key transport-history bug was fixed: Bloom now snapshots <code>leds_prev_buffer</code> immediately after centre insert and before display-only edge fade and mirror. This prevents faded/mirrored display output from recursively poisoning the transport history.</p>
+      </div>
+      <div class="card">
+        <h3>Palette</h3>
+        <p>The palette white/grey crush path was removed from palette-owned branches. Palette colour is now sampled once through <code>palette_chroma_colour()</code>; palette branches no longer raw-add twelve <code>ColorFromPalette()</code> RGB samples into <code>current_sum_color</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Modes 7/8</h3>
+        <p>The broken-right-side mirror behaviour was fixed by making mirrored WAVEFORM-FAST and WAVEFORM render an upper-half authoritative trace and mirror from there. Non-mirrored mode preserves the old full-strip oscilloscope trace.</p>
+      </div>
+      <div class="card">
+        <h3>Hybrid</h3>
+        <p>WAVEFORM-HYBRID remains a separate centre-origin outward-trail mode using <code>waveform_shift_outward()</code> and optional <code>waveform_history</code>. The visual probe now seeds <code>waveform_history</code> deterministically when present.</p>
+      </div>
+      <div class="card">
+        <h3>K1 hardware</h3>
+        <p>The migration moved from generic S3 compile prep to an explicit K1 hardware profile: LED GPIO 6/7, I2S 13/11/14, I2C 17/18, physical controls disabled, with compile/upload evidence recorded against ESP32-S3 MAC <code>b4:3a:45:a5:87:f8</code>.</p>
+      </div>
+      <div class="card">
+        <h3>Not Proven</h3>
+        <p>The latest dirty K1 hardware hardening has compile/upload history nearby, but current runtime proof remains incomplete: no confirmed serial smoke after the latest LEDC guard patch, unresolved PSRAM ID error, no I2S/LED/timing proof for the latest binary.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Evidence Ledger</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Evidence Class</th>
+          <th>Used For</th>
+          <th>Reliability Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="tag source">source</span> Current files</td>
+          <td>Current implementation proof in <code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h</code>, K1 hardware guards, USB serial, LEDC guards, compile script.</td>
+          <td>Highest confidence for current code shape. Does not prove runtime behaviour.</td>
+        </tr>
+        <tr>
+          <td><span class="tag committed">git</span> Local commit stack</td>
+          <td>Secondary renderer containment, P2P removal, roadmap docs, perfect snapshot, S3 compile prep, K1.Lightwave reference, K1 hardware GPIO profile, K1 hardware upload evidence.</td>
+          <td>Good for repository chronology since <code>de4fc48</code>. Poor for fine-grained Bloom/Waveform repair because those changes enter as root checkpoint.</td>
+        </tr>
+        <tr>
+          <td><span class="tag memory">memory</span> claude-mem observations</td>
+          <td>Reconstructing pre-commit repair sequence: Bloom history, palette helper, dominant palette removal, Waveform palette repair, probe seeding, mirror repair, K1 hardware USB/Rotate8/LEDC incidents.</td>
+          <td>Necessary because local git lacks those individual commits. Marked as memory-derived where used.</td>
+        </tr>
+        <tr>
+          <td><span class="tag ssa">SSA</span> Reused specialist threads</td>
+          <td>Independent chronology passes over Bloom/Waveform source, S2-S3/K1 hardware migration, committed docs, and dirty build/upload evidence.</td>
+          <td>Fresh SSA spawning hit thread limit, so existing completed SSA threads were reused with read-only tasks.</td>
+        </tr>
+        <tr>
+          <td><span class="tag runtime">runtime</span> Live/recorded serial evidence</td>
+          <td>Perfect dual-channel snapshot, earlier K1 hardware upload and serial sanity, reported LEDC/WDT crash, reported device port changes.</td>
+          <td>Strong when tied to exact port/binary. Some current runtime claims are not yet rechecked after latest dirty hardening.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Global Timeline</h2>
+    <div class="timeline">
+      <article class="event">
+        <time>2026-05-20 prehistory</time>
+        <div class="body">
+          <strong>Waveform was already known-broken before the later Bloom/palette/mirror recovery.</strong>
+          <p>The older audit lane documented WAVEFORM dying after noise calibration. That failure was traced away from the spectrogram/AGC path and toward the raw waveform peak pipeline, <code>noise_cal.h</code>, and post-cal <code>GDFT.h</code> side-effects. This is a separate waveform-death lane from the later palette and mirror bugs.</p>
+          <ul class="evidence-list">
+            <li><code>audit/understanding/01_waveform_kill_investigation.md:9-14</code> records the user-visible symptom: pre-cal alive, post-cal black.</li>
+            <li><code>audit/understanding/01_waveform_kill_investigation.md:67-97</code> identifies the leading kill surface: <code>i2s_audio.h</code> waveform peak pipeline plus calibration side-effects.</li>
+            <li><code>audit/understanding/01_waveform_kill_investigation.md:126-138</code> leaves telemetry confirmation open.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-20 phase work</time>
+        <div class="body">
+          <strong>Waveform colour was identified as dead code / hardcoded override.</strong>
+          <p>Audit docs and current comments agree that Waveform computed chromagram-derived colour but then effectively discarded it. A gated fix restored chromagram-driven trail colour by blending computed colour with a fallback rather than letting silence collapse to black.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1259-1283</code> now contains the guarded chromagram-colour restoration for WAVEFORM-FAST.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1417-1420</code> clamps the final WAVEFORM colour after applying <code>CONFIG.PHOTONS</code>.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:317</code> documents <code>ENABLE_WAVEFORM_CHROMAGRAM_COLOR</code> as a restoration switch.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>pre-local-git repair</time>
+        <div class="body">
+          <strong>Scoped Bloom/palette repair was performed in <code>lightshow_modes.h</code>.</strong>
+          <p>Memory observation <code>#54002</code> describes the exact intended patch: move Bloom history snapshot before edge fade/mirror; add one shared chroma-derived palette helper; use it in Bloom and Waveform palette branches; seed or exclude Hybrid probe history. Current source matches the behavioural intent, with one important note: the current helper uses a circular chroma vector (<code>atan2f</code>) rather than the earlier simple linear weighted-index helper.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:121-166</code> defines <code>palette_chroma_colour()</code>.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:919</code> uses the helper in Bloom palette mode.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1253-1255</code>, <code>1406-1408</code>, and <code>1528-1530</code> use the helper in Waveform-family palette branches.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>local root checkpoint</time>
+        <div class="body">
+          <strong>Fine-grained Bloom/Waveform repair commits are not present in local git.</strong>
+          <p>Local history only shows <code>de4fc48 chore: checkpoint sensory bridge firmware state</code> as the first commit touching <code>lightshow_modes.h</code>. That means the surgical Bloom/Waveform repairs were either already present when the repository was checkpointed or were collapsed into that root commit. The archaeology therefore relies on current source proof plus memory observations for sequence.</p>
+          <ul class="evidence-list">
+            <li><code>git log --oneline -n 9</code> starts at <code>de4fc48</code> then later docs/refactor commits.</li>
+            <li><code>git log --all -- SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h</code> resolves the relevant source state to root checkpoint only.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-22</time>
+        <div class="body">
+          <strong>Secondary render dispatch was contained, not fully re-architected.</strong>
+          <p>Commit <code>039c78a</code> refactored secondary channel mode dispatch through channel-owned state and previous buffers. This improved containment for Bloom/Waveform/VU state without starting the broader secondary-render-isolation architecture that was later deferred.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:230-276</code> contains shared <code>render_lightshow_for_channel()</code>.</li>
+            <li><code>docs/superpowers/plans/2026-05-22-secondary-channel-renderer.md:114</code> records clean S2 compile for that containment pass.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-22</time>
+        <div class="body">
+          <strong>P2P was removed as dead weight.</strong>
+          <p>Commit <code>9f10f0b chore: remove p2p control surface</code> removed the obsolete peer-to-peer surface. SSA doc review found this recorded as superseding older audit state that still referenced <code>init_p2p</code>, <code>run_p2p</code>, and main-unit setters.</p>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-22 19:56</time>
+        <div class="body">
+          <strong>The perfect dual-channel runtime state was captured.</strong>
+          <p>Commit <code>e78b6f6</code> documents Captain's live serial snapshot from firmware <code>40102</code>: primary Bloom mode 3 with mirror, secondary WAVEFORM-FAST mode 7 with palette index 10, VP candidate profile, and render timings. The snapshot explicitly says the running firmware was older than current repo head because <code>dump</code> still printed <code>CONFIG.IS_MAIN_UNIT</code>.</p>
+          <ul class="evidence-list">
+            <li><code>docs/config-snapshots/2026-05-22-perfect-dual-channel-v40102.md:19-55</code> captures primary settings.</li>
+            <li><code>docs/config-snapshots/2026-05-22-perfect-dual-channel-v40102.md:57-76</code> captures secondary settings.</li>
+            <li><code>docs/config-snapshots/2026-05-22-perfect-dual-channel-v40102.md:78-120</code> captures VP profile/timing.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-22 late</time>
+        <div class="body">
+          <strong>S3 migration started as compile prep, then became K1 hardware-specific.</strong>
+          <p>Commit <code>32cbadf</code> added generic ESP32-S3 compile prep. Commit <code>f9f7278</code> documented the existing K1.Lightwave S3 port as a reference. Captain then corrected the target: not S3-Zero, use firmware-v3 K1 hardware GPIOs. Commit <code>5a2d050</code> added <code>SB_K1_HARDWARE</code>.</p>
+          <ul class="evidence-list">
+            <li><code>docs/s3-migration-prep.md:7-15</code> records the original compile target.</li>
+            <li><code>docs/s3-migration-prep.md:31-61</code> records firmware-v3 K1 hardware GPIO source and mapping.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:165-187</code> contains the current K1 hardware profile.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>2026-05-22 / 23</time>
+        <div class="body">
+          <strong>K1 hardware compile/upload evidence landed, but it did not close runtime readiness.</strong>
+          <p>Commit <code>8b35022</code> records a K1 hardware upload to explicit ESP32-S3 target identity, hash verification, and serial sanity. The same doc also states what the result does not prove: I2S capture, FastLED timing, dual-strip signal integrity, controls, or 120 FPS headroom.</p>
+          <ul class="evidence-list">
+            <li><code>docs/s3-migration-prep.md:63-69</code> compile result.</li>
+            <li><code>docs/s3-migration-prep.md:71-90</code> upload evidence.</li>
+            <li><code>docs/s3-migration-prep.md:118-124</code> runtime proof gaps.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>current dirty tree</time>
+        <div class="body">
+          <strong>Uncommitted K1 hardware hardening now addresses absent Rotate8, USB naming/serial, and LEDC crash paths.</strong>
+          <p>The current dirty tree has six tracked modified files. These changes were present before this report task and are not part of the HTML work. They gate absent Rotate8, disable custom USB descriptors/MSC on K1 hardware, map <code>USBSerial</code> to <code>Serial</code> for K1 hardware, guard sweet-spot LEDC writes, and update the K1 hardware compile wrapper.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino</code></li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/constants.h</code></li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/globals.h</code></li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/led_utilities.h</code></li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/system.h</code></li>
+            <li><code>tools/compile-k1-arduino.sh</code></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Waveform/Bloom Repair Strata</h2>
+
+    <h3>Stratum A - Waveform Dies After Noise Calibration</h3>
+    <p>This was the earliest waveform failure lane. It is not the same as the palette/mirror bugs, but it matters because several later repairs happened on top of a source base already shaped by that investigation.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Finding</th>
+          <th>Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>What did Captain see?</td>
+          <td>WAVEFORM visually died immediately after <code>start_noise_cal()</code> completed: no moving dot, no trail, black until reset.</td>
+          <td><code>audit/understanding/01_waveform_kill_investigation.md:9-14</code></td>
+        </tr>
+        <tr>
+          <td>What was ruled out?</td>
+          <td>AGC/spectrogram as the direct kill surface, because <code>light_mode_waveform()</code> did not consume those outputs directly.</td>
+          <td><code>audit/understanding/01_waveform_kill_investigation.md:30-38</code></td>
+        </tr>
+        <tr>
+          <td>Leading mechanism?</td>
+          <td>Calibration changed DC and sweet-spot level in incoherent domains, then follower clamping could jam the waveform peak path.</td>
+          <td><code>audit/understanding/01_waveform_kill_investigation.md:73-97</code></td>
+        </tr>
+        <tr>
+          <td>Status?</td>
+          <td>Still marked as requiring empirical telemetry confirmation. Later visual fixes do not automatically prove this audio-side failure closed.</td>
+          <td><code>audit/understanding/01_waveform_kill_investigation.md:126-138</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Stratum B - Bloom Transport History Corruption</h3>
+    <p>The specific Bloom bug was that the mode inserted centre colour, applied edge fade, mirrored, and only then copied the frame into <code>leds_prev_buffer</code>. That meant display-only attenuation became recursive transport history. The result was Bloom dying before it reached the edges.</p>
+    <pre><code>Current source proof:
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:944-951
+  leds_16[center_idx1] = final_insert_color;
+  leds_16[center_idx2] = final_insert_color;
+
+  // Snapshot transport history before display-only edge fade and mirror.
+  memcpy(leds_prev_buffer, leds_16, sizeof(CRGB16) * NATIVE_RESOLUTION);
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:955-974
+  uint16_t fade_width = NATIVE_RESOLUTION / 4;
+  ...
+  mirror_image_downwards(leds_16);</code></pre>
+    <p>This proves the required ordering: transport history is captured before the display fade and mirror.</p>
+
+    <h3>Stratum C - Palette White/Grey Crush</h3>
+    <p>The palette bug was that palette mode sampled multiple note anchors and accumulated RGB values, which compresses gradients toward grey/white and loses palette structure. The correction was to compute palette position separately from brightness and sample the palette once.</p>
+    <pre><code>Current source proof:
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:121-166
+  CRGB16 palette_chroma_colour(const CRGBPalette16&amp; pal, SQ15x16 fallback_brightness)
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:919
+  sum_color = palette_chroma_colour(pal_bl, SQ15x16(0.0));
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1253-1255
+  current_sum_color = palette_chroma_colour(pal, SQ15x16(brightness_sum));
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1406-1408
+  current_sum_color = palette_chroma_colour(pal, clamp01_fixed(total_magnitude));
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1528-1530
+  current_sum_color = palette_chroma_colour(pal, SQ15x16(brightness_sum));</code></pre>
+    <div class="callout risk">
+      <p><strong>Important nuance:</strong> memory observation <code>#54002</code> specified a simple weighted index using <code>sum(raw_bin * c/12 * 255) / total_weight</code>. Current source instead uses a circular chroma vector via <code>cosf</code>, <code>sinf</code>, and <code>atan2f</code>. That may be creatively better for pitch-class wraparound, but it is not the literal suggested helper implementation. The report records current truth rather than retrofitting the story.</p>
+    </div>
+
+    <h3>Stratum D - WAVEFORM-FAST and WAVEFORM Broken Mirror</h3>
+    <p>The broken right side came from a mismatch between a full-strip dot trace and a directional mirror helper. <code>mirror_image_downwards()</code> copies the second half into the first half. If the meaningful dot/state is on the wrong half, mirror can erase or ignore the intended source.</p>
+    <p>The architecture decision that survived review was narrow: do not convert modes 7/8 into WAVEFORM-HYBRID clones. Preserve OG oscilloscope identity for non-mirrored operation, but in mirrored operation make one half authoritative before mirroring.</p>
+    <pre><code>Current source proof:
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1155-1172
+  waveform_full_strip_position()
+  waveform_upper_half_source_position()
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1174-1184
+  waveform_shift_upper_half_up()
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1310-1327
+  WAVEFORM-FAST: if mirror enabled, shift upper half, constrain dot to upper half, mirror downwards.
+
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1440-1453
+  WAVEFORM: same mirrored branch shape.</code></pre>
+    <p>This is not the symmetric-paired-dot version proposed during discussion. The current source uses upper-half source trace plus conditional mirror.</p>
+
+    <h3>Stratum E - WAVEFORM-HYBRID Probe Validity</h3>
+    <p>The probe originally included WAVEFORM-HYBRID while <code>waveform_history</code> could be null/zero. Current source seeds deterministic waveform history inside the probe if the allocation exists.</p>
+    <pre><code>Current source proof:
+SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1710-1731
+  vp_probe_seed_inputs()
+  waveform_peak_scaled = 0.45f;
+  audio_vu_level_average = SQ15x16(0.35f);
+  if (waveform_history != nullptr) { ... waveform_history[frame][i] = ...; }</code></pre>
+  </section>
+
+  <section>
+    <h2>Secondary Channel, P2P, Preset, and Roadmap Context</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Area</th>
+          <th>What Happened</th>
+          <th>Current Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Secondary render dispatch</td>
+          <td>Commit <code>039c78a</code> isolated channel state enough for Bloom/Waveform/VU dispatch through <code>render_lightshow_for_channel()</code>.</td>
+          <td>Useful containment, but not the full independent-channel architecture that was later discussed and deferred.</td>
+        </tr>
+        <tr>
+          <td>P2P</td>
+          <td>Commit <code>9f10f0b</code> removed the P2P control surface.</td>
+          <td>Matches Captain's instruction that P2P was dead weight.</td>
+        </tr>
+        <tr>
+          <td>Release feature recovery roadmap</td>
+          <td>Commit <code>1dca4cb</code> created an evidence-gated roadmap for bass/GDFT/waveform/Bloom/Kaleidoscope/S3 work.</td>
+          <td>Roadmap work was then frozen/deferred during source stabilisation and K1 hardware bring-up.</td>
+        </tr>
+        <tr>
+          <td>Perfect dual config</td>
+          <td>Commit <code>e78b6f6</code> preserved live primary/secondary/VP settings from firmware <code>40102</code>.</td>
+          <td>Critical runtime snapshot. It is not a guaranteed restore mechanism because some primary knobs are encoder-owned and not serial-settable.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>S2-S3/K1 hardware Migration and Refactor Timeline</h2>
+    <div class="timeline">
+      <article class="event">
+        <time>baseline</time>
+        <div class="body">
+          <strong>S2 was identified as the protected content-capture device.</strong>
+          <p>The S2 capture unit was kept separate on <code>/dev/cu.usbmodem02</code>. After Captain said the S2 was being used to record content, the operating rule became: no S2 upload unless explicitly lifted.</p>
+          <ul class="evidence-list">
+            <li><code>docs/s3-migration-prep.md:92-96</code> records the S2 unit as separate.</li>
+            <li><code>docs/s3-migration-prep.md:135-140</code> says flash only the dedicated S3/K1 hardware device and pass explicit upload port.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>generic S3</time>
+        <div class="body">
+          <strong>First pass created compile-only S3 prep.</strong>
+          <p>The early S3 prep added compile wrappers and guarded the obvious S2-only assumptions. It was compile-only and explicitly not a hardware proof.</p>
+          <ul class="evidence-list">
+            <li><code>tools/compile-s3-arduino.sh</code> targets a generic ESP32-S3 profile.</li>
+            <li><code>docs/s3-migration-prep.md:110-124</code> lists what compile did and did not prove.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>K1.Lightwave detour</time>
+        <div class="body">
+          <strong>The existing <code>K1.Lightwave</code> S3 port was inspected but not treated as drop-in truth.</strong>
+          <p>The repo had a working S3-era reference, but Captain rejected the wrong-target drift and specifically called for firmware-v3 K1 hardware GPIOs, not S3-Zero assumptions.</p>
+          <ul class="evidence-list">
+            <li>Memory observation <code>#54122</code> records the K1.Lightwave reference step.</li>
+            <li>Memory observation <code>#54124</code> records the correction to firmware-v3 K1 hardware GPIOs.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>K1 hardware GPIO profile</time>
+        <div class="body">
+          <strong><code>SB_K1_HARDWARE</code> was added.</strong>
+          <p>K1 hardware maps the SB firmware onto firmware-v3 production pins: LED data 6/7, I2S BCLK/LRCLK/DIN 13/11/14, I2C 17/18. Physical knobs/buttons/sweet-spot LEDs are disabled as invalid pins.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:165-187</code> source mapping.</li>
+            <li><code>docs/s3-migration-prep.md:39-61</code> documented mapping.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>first K1 hardware upload</time>
+        <div class="body">
+          <strong>The first K1 hardware upload was recorded against explicit ESP32-S3 identity.</strong>
+          <p>Recorded device: <code>/dev/cu.usbmodem1301</code>, VID:PID <code>303A:1001</code>, serial <code>B4:3A:45:A5:87:F8</code>, MAC <code>b4:3a:45:a5:87:f8</code>. Hash verified. New port became <code>/dev/cu.usbmodemB43A45A587F82</code>, which triggered later USB naming objections.</p>
+          <ul class="evidence-list">
+            <li><code>docs/s3-migration-prep.md:71-90</code> upload proof.</li>
+            <li>Memory observation <code>#54132</code> records compile/upload and S2 untouched.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>runtime failure</time>
+        <div class="body">
+          <strong>K1 hardware boot exposed missing-hardware paths and serial/PSRAM issues.</strong>
+          <p>Captain reported <code>ledc_set_duty</code> / <code>ledc_update_duty</code> errors because LEDC was not initialised, then a watchdog reset, plus <code>PSRAM ID read error: 0x00ffffff</code>. The likely immediate bug was sweet-spot LED code still running after K1 hardware disabled those pins.</p>
+          <ul class="evidence-list">
+            <li>Memory observation <code>#54168</code> records LEDC/WDT/PSRAM failure.</li>
+            <li>Current dirty tree adds <code>SB_HAS_SWEET_SPOT_LEDS</code> and guards LEDC paths.</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="event">
+        <time>current hardening</time>
+        <div class="body">
+          <strong>Rotate8 and LEDC paths are now guarded in uncommitted source.</strong>
+          <p>K1 hardware has no Rotate8 present, so encoder init/poll/update is now compiled out. Sweet-spot LEDC writes are guarded behind <code>SB_HAS_SWEET_SPOT_LEDS</code>. USB custom descriptors and MSC update mode are disabled for K1 hardware.</p>
+          <ul class="evidence-list">
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:284-362</code> Rotate8/encoder gating.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:33-55</code> capability macros.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/led_utilities.h:153</code> sweet-spot LEDC helper.</li>
+            <li><code>SPECTRASYNQ_K1_FIRMWARE/system.h:101-185</code> MSC/USB/sweet-spot guards.</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>Current Dirty State</h2>
+    <p>The report task itself added this HTML file and planning notes. The following tracked firmware/tool changes were already present before report generation and represent the current K1 hardware hardening state.</p>
+    <pre><code>git diff --name-only
+SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino
+SPECTRASYNQ_K1_FIRMWARE/constants.h
+SPECTRASYNQ_K1_FIRMWARE/globals.h
+SPECTRASYNQ_K1_FIRMWARE/led_utilities.h
+SPECTRASYNQ_K1_FIRMWARE/system.h
+tools/compile-k1-arduino.sh</code></pre>
+    <table>
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Current Purpose</th>
+          <th>Risk / Verification Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE.ino</code></td>
+          <td>Gates Rotate8 init, encoder init, encoder polling, and encoder LED updates behind <code>SB_HAS_ROTATE8</code>. Allocates <code>waveform_history</code> in PSRAM with heap fallback.</td>
+          <td>Runtime serial proof after latest patch is missing. PSRAM allocation must be verified on actual module.</td>
+        </tr>
+        <tr>
+          <td><code>constants.h</code></td>
+          <td>Adds K1 hardware capability flags and source-truth GPIO map.</td>
+          <td>Flash size/profile mismatch remains possible: current wrapper says 8 MB flash, firmware-v3 reference describes N16R8 lineage.</td>
+        </tr>
+        <tr>
+          <td><code>globals.h</code></td>
+          <td>Wraps <code>FirmwareMSC</code> and aliases <code>USBSerial</code> to <code>Serial</code> for K1 hardware.</td>
+          <td>Serial strategy oscillated; current double-begin path with <code>serial_menu.h</code> needs hardware proof.</td>
+        </tr>
+        <tr>
+          <td><code>led_utilities.h</code></td>
+          <td>Centralises sweet-spot LEDC writes and turns them into no-ops if sweet-spot pins do not exist.</td>
+          <td>Likely fixes the reported LEDC crash, but not yet runtime-proven in this report.</td>
+        </tr>
+        <tr>
+          <td><code>system.h</code></td>
+          <td>Compiles out MSC update mode for K1 hardware, changes USB init branch, guards sweet-spot init, and starts K1 hardware USB earlier.</td>
+          <td>Need boot log proof that serial enumerates cleanly and no LEDC/WDT recursion remains.</td>
+        </tr>
+        <tr>
+          <td><code>tools/compile-k1-arduino.sh</code></td>
+          <td>Builds K1 hardware with <code>USBMode=hwcdc</code>, <code>CDCOnBoot=cdc</code>, <code>LoopCore=0</code>, <code>EventsCore=0</code>, FastLED RMT flags, PSRAM, <code>-O3</code>, and <code>-ffast-math</code>.</td>
+          <td>Current docs still show old <code>LoopCore=1</code>/<code>EventsCore=1</code> target. Script and docs are out of sync.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Contradictions and Unresolved Questions</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>History Compression</h3>
+        <p>The most surgical Bloom/Waveform fixes are not represented as individual local git commits. They are reconstructed from memory observations and current source.</p>
+      </div>
+      <div class="card">
+        <h3>Helper Drift</h3>
+        <p>The final <code>palette_chroma_colour()</code> implementation uses circular hue vector logic, not the originally suggested linear weighted-index formula. That may be desirable but should be treated as a real implementation difference.</p>
+      </div>
+      <div class="card">
+        <h3>Mirror Semantics</h3>
+        <p>Modes 7/8 currently use upper-half source trace plus mirror when <code>CONFIG.MIRROR_ENABLED</code> is true. This is not the exact symmetric-paired-dot suggestion from the discussion, but it does solve the directional mirror source problem.</p>
+      </div>
+      <div class="card">
+        <h3>Bloom Mirror Toggle</h3>
+        <p>Bloom still calls <code>mirror_image_downwards(leds_16)</code> unconditionally after fade. Whether Bloom should obey <code>CONFIG.MIRROR_ENABLED</code> remains a product/behaviour question.</p>
+      </div>
+      <div class="card">
+        <h3>USB Serial</h3>
+        <p>K1 hardware USB strategy changed through several iterations: custom descriptors, USBCDC, hardware CDC, and <code>USBSerial</code> aliasing. Current source must be treated as unproven until serial smoke is captured after the latest hardening.</p>
+      </div>
+      <div class="card">
+        <h3>PSRAM</h3>
+        <p>PSRAM compile flags exist and <code>waveform_history</code> has fallback allocation. Runtime log still included <code>PSRAM ID read error: 0x00ffffff</code>; that is not closed.</p>
+      </div>
+      <div class="card">
+        <h3>Performance</h3>
+        <p>K1 hardware upload and compile evidence do not prove 120 FPS or a 2 ms render ceiling. Recorded perfect S2 VP render average was 1911 microseconds with max 8207 microseconds, already showing spikes.</p>
+      </div>
+      <div class="card">
+        <h3>Docs Drift</h3>
+        <p><code>docs/s3-migration-prep.md</code> records <code>LoopCore=1</code>/<code>EventsCore=1</code>, while current <code>tools/compile-k1-arduino.sh</code> uses <code>0/0</code>. That must be reconciled before treating docs as current build truth.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Source Proof Appendix</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Claim</th>
+          <th>Current Proof</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Palette phase respects secondary channel auto-shift.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:98-104</code></td>
+        </tr>
+        <tr>
+          <td>Palette helper samples one bounded colour.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:121-166</code></td>
+        </tr>
+        <tr>
+          <td>Bloom palette branch uses helper.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:918-920</code></td>
+        </tr>
+        <tr>
+          <td>Bloom history snapshot is before fade/mirror.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:944-956</code> and <code>:972-974</code></td>
+        </tr>
+        <tr>
+          <td>Mode 7 palette branch uses helper and does not raw-add palette RGB.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1217-1255</code></td>
+        </tr>
+        <tr>
+          <td>Mode 8 palette branch uses helper and does not raw-add palette RGB.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1361-1408</code></td>
+        </tr>
+        <tr>
+          <td>Hybrid palette branch uses helper.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1494-1530</code></td>
+        </tr>
+        <tr>
+          <td>Modes 7/8 use upper-half source trace when mirrored.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1155-1184</code>, <code>:1310-1327</code>, <code>:1440-1453</code></td>
+        </tr>
+        <tr>
+          <td>Hybrid uses centre-outward shift.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1576-1582</code></td>
+        </tr>
+        <tr>
+          <td>Probe seeds waveform history if present.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/lightshow_modes.h:1710-1731</code></td>
+        </tr>
+        <tr>
+          <td>K1 hardware GPIO map is present.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:165-187</code></td>
+        </tr>
+        <tr>
+          <td>K1 hardware Rotate8 is disabled.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:33-39</code>, <code>SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:284-362</code>, <code>:503-506</code></td>
+        </tr>
+        <tr>
+          <td>K1 hardware sweet-spot LEDC paths are guarded.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/constants.h:424-427</code>, <code>SPECTRASYNQ_K1_FIRMWARE/led_utilities.h:153</code>, <code>SPECTRASYNQ_K1_FIRMWARE/system.h:178-185</code></td>
+        </tr>
+        <tr>
+          <td>K1 hardware serial currently aliases <code>USBSerial</code> to <code>Serial</code>.</td>
+          <td><code>SPECTRASYNQ_K1_FIRMWARE/globals.h:581-588</code>, <code>SPECTRASYNQ_K1_FIRMWARE/system.h:160-176</code></td>
+        </tr>
+        <tr>
+          <td>K1 hardware compile wrapper has current flags.</td>
+          <td><code>tools/compile-k1-arduino.sh:8-21</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>SSA Contribution Ledger</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>SSA</th>
+          <th>Assigned Lane</th>
+          <th>Useful Finding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Averroes</code></td>
+          <td>Bloom/Waveform repair timeline</td>
+          <td>Confirmed current <code>lightshow_modes.h</code> contains palette helper, Bloom pre-fade history snapshot, upper-half mirror source logic, Hybrid centre-outward path, and that fine-grained repair history is not in local git.</td>
+        </tr>
+        <tr>
+          <td><code>Carver</code></td>
+          <td>S2-S3/K1 hardware migration timeline</td>
+          <td>Reconstructed compile prep, K1.Lightwave reference detour, firmware-v3 K1 hardware GPIO correction, upload evidence, and current dirty hardening state.</td>
+        </tr>
+        <tr>
+          <td><code>Volta</code></td>
+          <td>Committed docs/plans/artefact chronology</td>
+          <td>Separated committed facts from deferred roadmap work and highlighted that secondary containment is not full independent render architecture.</td>
+        </tr>
+        <tr>
+          <td><code>Faraday</code></td>
+          <td>Dirty tree/build/upload evidence</td>
+          <td>Confirmed dirty files, current compile wrapper flags, stale docs mismatch, cached build evidence, and runtime proof gaps.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Final Forensic Position</h2>
+    <div class="callout">
+      <p><strong>Bloom/Waveform:</strong> The code now contains the intended transport-history, palette-bounding, and bilateral mirror-source repairs. The report cannot honestly claim those repairs were visually proven in the current binary unless tied to a specific post-fix upload/video/serial capture. Source shape is solid; runtime evidence is incomplete.</p>
+      <p><strong>S2-S3/K1 hardware:</strong> The codebase is in migration bring-up, not production-ready S3 parity. The K1 hardware target is correctly identified and partially hardened. The next truth gate is not more archaeology; it is a clean commit boundary, compile, explicit K1 hardware upload, serial boot capture, PSRAM check, I2S check, LED output check, and timing capture on the same binary.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

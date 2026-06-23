@@ -1,0 +1,10 @@
+{
+  "effect": "bloom",
+  "description": "VE-Auto-Loop host-certification sweep for light_mode_bloom (2026-06-03). Keys MUST be a subset of render_replay's wired 'P'-line surface. square_iter is OMITTED (stays at champion 1.0): square_iter is a CONTRAST control that NON-LINEARLY DARKENS the final render (Captain, 2026-06-03), so high values crush toward black and are correctly rejected as dead on host [MECHANISM]; the visually-acceptable contrast threshold is a device-[MEASURED] judgement (gamma/incandescent/dither), not host-derivable — so contrast is explored on-device, not in this host sweep. Swept axes are bloom's live, discriminating ones: mood (drives persistence/motion-memory — 0.9 scores far above 0.5), saturation (colour vividness/clarity), chroma (colour spread). Grid = 3*3*3 = 27 (<= 64 cap). champion default (mood=0.5/sat=0.9/chroma=1.0) is reachable by being near-grid; palette-mode diversity is the next sweep increment.",
+  "epistemic": "[MECHANISM] — relative-to-champion ranking only; not [MEASURED]; not pitch/colour-accurate. Final aesthetic judgement is Captain's eye (Tier-2/device).",
+  "params": {
+    "mood": [0.3, 0.6, 0.9],
+    "saturation": [0.7, 0.9, 1.0],
+    "chroma": [0.5, 0.75, 1.0]
+  }
+}

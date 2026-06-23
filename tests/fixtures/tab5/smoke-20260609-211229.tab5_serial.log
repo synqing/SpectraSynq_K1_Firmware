@@ -1,0 +1,40 @@
+002057 tx PING
+002082 rx OK PING device=tab5 app=k1-touch-dashboard harness=1
+003308 tx VERSION
+003332 rx OK VERSION app=k1-touch-dashboard harness=1 protocol=1 screen=1280x720
+004562 tx UI_STATUS
+004583 rx [STATUS] WiFi:OK WS:OK heap:232452 psram:31538496
+004583 rx OK UI_STATUS ws=OK wifi=OK heap=232452 psram=31538496 selected=PRIMARY scene=assist k1_seen=1 last_control=scene.smart last_ok=1 pending_count=0 k1_age_ms=1064 k1_tx_dropped=0 last_request_id=19 last_result_id=10 last_result_seq=5 last_error=none ws_status=CONNECTED ws_last_error=none ws_reconnects=0 ws_delay_ms=1000 ws_loop_last_ms=0 ws_loop_max_ms=12 lvgl_handler_last_ms=0 lvgl_handler_max_ms=234 lvgl_flush_last_ms=0 lvgl_flush_max_ms=12 battery=100 charging=0 usb=1 charge_state=0 battery_current_ma=0 rssi_dbm=-40.0 fps=201 bpm=88.0 locked=0 antenna=selector_low antenna_selector=LOW antenna_selected_selector=LOW antenna_documented_label=internal antenna_assumed=internal antenna_mapping=suspect antenna_latch=0 antenna_level=0 antenna_verified=1 antenna_probe=done antenna_high_rssi=-71 antenna_low_rssi=-39 antenna_selected_rssi=-39 antenna_mapping_suspect=1 primary_mode=18 primary_palette=22 primary_brightness=59 primary_colour=61 primary_speed=54 secondary_mode=18 secondary_palette=28 secondary_brightness=100 secondary_colour=0 secondary_speed=5
+005810 tx ANTENNA_STATUS
+005833 rx OK ANTENNA_STATUS ws=OK wifi=OK heap=232452 psram=31538496 selected=PRIMARY scene=assist k1_seen=1 last_control=scene.smart last_ok=1 pending_count=0 k1_age_ms=2311 k1_tx_dropped=0 last_request_id=19 last_result_id=10 last_result_seq=5 last_error=none ws_status=CONNECTED ws_last_error=none ws_reconnects=0 ws_delay_ms=1000 ws_loop_last_ms=0 ws_loop_max_ms=12 lvgl_handler_last_ms=0 lvgl_handler_max_ms=234 lvgl_flush_last_ms=1 lvgl_flush_max_ms=12 battery=100 charging=0 usb=1 charge_state=0 battery_current_ma=0 rssi_dbm=-44.0 fps=201 bpm=88.0 locked=0 antenna=selector_low antenna_selector=LOW antenna_selected_selector=LOW antenna_documented_label=internal antenna_assumed=internal antenna_mapping=suspect antenna_latch=0 antenna_level=0 antenna_verified=1 antenna_probe=done antenna_high_rssi=-71 antenna_low_rssi=-39 antenna_selected_rssi=-39 antenna_mapping_suspect=1 primary_mode=18 primary_palette=22 primary_brightness=59 primary_colour=61 primary_speed=54 secondary_mode=18 secondary_palette=28 secondary_brightness=100 secondary_colour=0 secondary_speed=5
+007060 tx UI_SURFACE PRIMARY
+007083 rx OK UI_SURFACE surface=PRIMARY
+008312 tx UI_SLIDER BRIGHTNESS 70
+008332 rx [UI] Sending K1 control id=20 control=primary.photons value=0.7000
+008332 rx OK UI_SLIDER name=BRIGHTNESS value=70
+008623 rx [UI] K1 result ok=1 id=20 seq=6 control=primary.photons value=0.7000
+009852 tx UI_SLIDER COLOUR 61
+009876 rx [UI] Sending K1 control id=22 control=primary.chroma value=0.6100
+009876 rx OK UI_SLIDER name=COLOUR value=61
+010102 rx [UI] K1 result ok=1 id=22 seq=7 control=primary.chroma value=0.6100
+011984 tx UI_SLIDER SPEED 54
+012006 rx [UI] Sending K1 control id=23 control=primary.mood value=0.5400
+012006 rx OK UI_SLIDER name=SPEED value=54
+012242 rx [UI] K1 result ok=1 id=23 seq=8 control=primary.mood value=0.5400
+013470 tx UI_PALETTE NEXT
+013494 rx [UI] Sending K1 control id=24 control=primary.palette value=23.0000
+013494 rx OK UI_PALETTE delta=1
+013726 rx [UI] K1 result ok=1 id=24 seq=9 control=primary.palette value=23.0000
+014950 tx UI_MODE 18
+014971 rx [UI] Sending K1 control id=26 control=primary.mode value=18.0000
+014971 rx OK UI_MODE mode=18
+015203 rx [UI] K1 result ok=1 id=26 seq=10 control=primary.mode value=18.0000
+016426 tx UI_SCENE ASSIST
+016450 rx [UI] Sending K1 control id=27 control=scene.smart value=assist
+016450 rx OK UI_SCENE scene=ASSIST
+016673 rx [UI] K1 result ok=1 id=27 seq=11 control=scene.smart value=assist
+017900 tx AUDIO_STATUS
+017924 rx OK AUDIO_STATUS enabled=1 muted=0 volume=42 playing=0 last=APPLIED
+019152 tx UI_STATUS
+019229 rx OK UI_STATUS ws=OK wifi=OK heap=232452 psram=31538496 selected=PRIMARY scene=assist k1_seen=1 last_control=scene.smart last_ok=1 pending_count=0 k1_age_ms=236 k1_tx_dropped=0 last_request_id=28 last_result_id=27 last_result_seq=11 last_error=none ws_status=CONNECTED ws_last_error=none ws_reconnects=0 ws_delay_ms=1000 ws_loop_last_ms=1 ws_loop_max_ms=12 lvgl_handler_last_ms=216 lvgl_handler_max_ms=234 lvgl_flush_last_ms=2 lvgl_flush_max_ms=12 battery=0 charging=1 usb=1 charge_state=1 battery_current_ma=0 rssi_dbm=-40.0 fps=202 bpm=88.0 locked=0 antenna=selector_low antenna_selector=LOW antenna_selected_selector=LOW antenna_documented_label=internal antenna_assumed=internal antenna_mapping=suspect antenna_latch=0 antenna_level=0 antenna_verified=1 antenna_probe=done antenna_high_rssi=-71 antenna_low_rssi=-39 antenna_selected_rssi=-39 antenna_mapping_suspect=1 primary_mode=18 primary_palette=23 primary_brightness=70 primary_colour=61 primary_speed=54 secondary_mode=18 secondary_palette=28 secondary_brightness=100 secondary_colour=0 secondary_speed=5
+020481 rx [STATUS] WiFi:OK WS:OK heap:232452 psram:31538496

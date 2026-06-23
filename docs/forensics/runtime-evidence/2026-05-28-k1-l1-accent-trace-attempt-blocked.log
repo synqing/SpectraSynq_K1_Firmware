@@ -1,0 +1,52 @@
+# Visual Event Bus L1 Accent trace attempt — blocked
+
+Date: 2026-05-28
+Ports requested by Captain:
+- /dev/tty.usbmodem1101
+- /dev/tty.usbmodem1401
+
+Resolved USB/JTAG identities:
+- /dev/cu.usbmodem1101 / /dev/tty.usbmodem1101 -> serial B4:3A:45:A5:87:F8
+- /dev/cu.usbmodem1401 / /dev/tty.usbmodem1401 -> serial B4:3A:45:A5:89:B4
+- extra attached ESP32-S3 debug unit /dev/cu.usbmodem12401 -> serial 30:ED:A0:E0:C1:A0
+
+Serial-ROM upload attempts:
+- pio run -e k1_hardware_trace_dev -t upload --upload-port /dev/cu.usbmodem1101
+  Result: FAIL, esptool "Failed to connect to ESP32-S3: No serial data received."
+- pio run -e k1_bench_reference -t upload --upload-port /dev/cu.usbmodem1401
+  Result: FAIL, esptool "Failed to connect to ESP32-S3: No serial data received."
+- pio run -e k1_hardware_trace_dev -t upload --upload-port /dev/tty.usbmodem1101
+  Result: FAIL, esptool "Failed to connect to ESP32-S3: No serial data received."
+
+USB-JTAG identity proof:
+- OpenOCD with `adapter serial B4:3A:45:A5:87:F8` examined ESP32-S3 successfully.
+- OpenOCD with `adapter serial B4:3A:45:A5:89:B4` examined ESP32-S3 successfully.
+
+USB-JTAG flash actions:
+- 1101 was flashed with k1_hardware_trace_dev through OpenOCD `program_esp` at
+  0x0 bootloader, 0x8000 partitions, 0xe000 boot_app0, 0x10000 firmware.
+  Result: all verify OK.
+- 1101 trace capture then failed because USB CDC writes timed out while enabling
+  L1 Accent state.
+- 1101 was restored with k1_hardware through OpenOCD `program_esp`.
+  Result: all verify OK.
+- 1401 was flashed with k1_bench_reference through OpenOCD `program_esp`.
+  Result: all verify OK.
+
+USB CDC command surface:
+- After production/reference restore, `:version` writes to both /dev/cu.usbmodem1101
+  and /dev/cu.usbmodem1401 returned zero response lines.
+- The failure is therefore not "trace JSON failed only"; the current command
+  surface is unavailable on both named devices in this session.
+
+Calibration:
+- No calibration command was issued.
+- No `start_noise_cal`, `N`, or `Y` hotkey was sent.
+
+Current device end state:
+- 1101: production k1_hardware image flashed and verified by USB-JTAG.
+- 1401: production k1_bench_reference image flashed and verified by USB-JTAG.
+
+Status:
+- Runtime trace evidence: BLOCKED.
+- Source/build/symbol evidence from the earlier L1 pass remains valid.

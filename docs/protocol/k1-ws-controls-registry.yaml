@@ -1,0 +1,84 @@
+registry: k1.ws-controls-registry
+version: 2026-06-09
+protocol: k1.ws
+facade: sb_k1_control_facade.cpp
+tiers:
+  p1: product controls (persist where serial persists)
+  p2: VP runtime lab (RAM only)
+  c1: calibration two-step
+  d1: destructive (CONFIRM required)
+controls:
+  - primary.mode
+  - primary.palette
+  - primary.palette_mode
+  - primary.photons
+  - primary.chroma
+  - primary.mood
+  - primary.saturation
+  - primary.square_iter
+  - primary.mirror
+  - primary.auto_color_shift
+  - primary.reverse_order
+  - primary.incandescent_mode
+  - primary.incandescent_filter
+  - primary.bulb_opacity
+  - primary.base_coat
+  - primary.base_coat_intensity
+  - primary.temporal_dithering
+  - primary.prism_count
+  - primary.preset
+  - secondary.mode
+  - secondary.palette
+  - secondary.palette_mode
+  - secondary.enabled
+  - secondary.photons
+  - secondary.chroma
+  - secondary.mood
+  - secondary.saturation
+  - secondary.mirror
+  - secondary.incandescent_mode
+  - secondary.incandescent_filter
+  - secondary.base_coat
+  - secondary.base_coat_intensity
+  - secondary.auto_color_shift
+  - secondary.reverse_order
+  - global.sensitivity
+  - global.standby_dimming
+  - global.chroma_profile
+  - global.chromagram_range
+  - global.max_current_ma
+  - global.master_brightness
+  - director.enabled
+  - director.assist
+  - director.autonomy
+  - director.confidence_floor
+  - hooks.enabled
+  - edge.enabled
+  - edge.mode
+  - edge.strength
+  - scene.smart
+  - vp.profile
+  - vp.fix.agc_soft_knee
+  - vp.fix.chroma_gate
+  - vp.fix.prism_off
+  - vp.fix.bloom_decay
+  - vp.fix.hsv_source_sat
+  - vp.fix.secondary_clean
+  - vp.bloom.alpha
+  - vp.bloom.shift_scale
+  - vp.bloom.force_saturation
+  - vp.waveform.shift_rate
+  - vp.waveform.idle_fade
+  - vp.waveform.raw_margin
+  - vp.waveform.peak_floor
+  - vp.waveform.active_fade
+  - vp.waveform.chroma_blend_gain
+  - vp.waveform.fallback_brightness
+  - vp.waveform.vu_floor
+  - calibration.noise.arm
+  - calibration.noise.confirm
+  - calibration.noise.status
+  - calibration.noise.clear
+rejected:
+  - calibration.noise.start
+  - start_noise_cal

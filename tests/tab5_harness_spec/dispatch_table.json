@@ -1,0 +1,8 @@
+{
+  "UI_SURFACE PRIMARY": {"handler": "select_surface", "ok": "OK UI_SURFACE surface=PRIMARY"},
+  "UI_SURFACE SECONDARY": {"handler": "select_surface", "ok": "OK UI_SURFACE surface=SECONDARY"},
+  "UI_SLIDER BRIGHTNESS": {"handler": "set_slider", "control_suffix": "photons"},
+  "UI_SLIDER COLOUR": {"handler": "set_slider", "control_suffix": "chroma"},
+  "UI_SLIDER SPEED": {"handler": "set_slider", "control_suffix": "mood"},
+  "UI_STATUS": {"handler": "status", "fields": ["selected", "ack_pending", "pending_count"]}
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "label": "bench_k1",
+    "port": "/dev/cu.usbmodem12401",
+    "expected_chip": "B489A500",
+    "observed_chip": "B489A500",
+    "chip_match": true,
+    "expected_env": "k1_bench_reference",
+    "cal_source": "config",
+    "cal_valid": "1",
+    "cal_profile_loaded": "0",
+    "noise_cal_reason": "none",
+    "noise_cal_dc_samples": "0",
+    "noise_cal_ssl_p50": "0.0",
+    "noise_cal_ssl_p90": "0.0",
+    "ap_lines": 36,
+    "last_ap": "[AP] SSL=354 DC=-1124 max_raw=283 follower=461 peak_scaled=0.315 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=123.0 conf=0.97 lock=1 phase=0.42 beat=0 bstr=0.32 | onset=0 bass=0 ostr=0.00",
+    "log_path": "docs/forensics/runtime-evidence/20260615T010437-bench_k1-cu.usbmodem12401-post-cal-reboot-readback.log",
+    "error": null
+  },
+  {
+    "label": "main_k1",
+    "port": "/dev/cu.usbmodem12201",
+    "expected_chip": "F887A500",
+    "observed_chip": "F887A500",
+    "chip_match": true,
+    "expected_env": "k1_hardware",
+    "cal_source": "config",
+    "cal_valid": "1",
+    "cal_profile_loaded": "0",
+    "noise_cal_reason": "none",
+    "noise_cal_dc_samples": "0",
+    "noise_cal_ssl_p50": "0.0",
+    "noise_cal_ssl_p90": "0.0",
+    "ap_lines": 36,
+    "last_ap": "[AP] SSL=319 DC=-5075 max_raw=381 follower=600 peak_scaled=0.266 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=99.0 conf=0.34 lock=0 phase=0.73 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00",
+    "log_path": "docs/forensics/runtime-evidence/20260615T010437-main_k1-cu.usbmodem12201-post-cal-reboot-readback.log",
+    "error": null
+  }
+]

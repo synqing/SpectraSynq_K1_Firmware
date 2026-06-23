@@ -1,0 +1,33 @@
+{
+  "accepted_novelty_rate_hz_used": 44.444444444,
+  "ap_frame_hz_used_for_reconstruction": 133.333333333,
+  "ap_frame_ms_used_for_reconstruction": 7.5000000000187494,
+  "capture_log": "docs/forensics/runtime-evidence/20260615T0920-sample-rate-16k120-probe/c_16000_120_d3_ap0_vp1__nov_from_apcad.log",
+  "classification": "invalid_no_nov",
+  "decimation_used_for_reconstruction": 3,
+  "defines": [
+    "SB_TEMPO_CONF_V2",
+    "SB_TEMPO_FLYWHEEL_V2",
+    "SB_TEMPO_AP_FRAME_HZ=133.333333f",
+    "SB_TEMPO_NOVELTY_DECIMATION=3U"
+  ],
+  "nov_audit": {
+    "emit_gap_count": 0,
+    "ignored_non_buffer_rows": 0,
+    "large_dt_count": 0,
+    "row_count": 0,
+    "source_mode": "live_or_legacy",
+    "timestamp_regression_count": 0,
+    "warnings": [
+      "no NOV rows parsed"
+    ]
+  },
+  "novelty_field": "nov",
+  "ok": true,
+  "replay_injection_mode": "B_AP_FRAME_RECONSTRUCTION",
+  "replay_summary": {
+    "frame_count": 0
+  },
+  "run_returncode": 0,
+  "stderr": ""
+}

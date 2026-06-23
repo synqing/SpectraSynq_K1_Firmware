@@ -1,0 +1,6175 @@
+{
+  "counts": {
+    "diag_summaries": 9,
+    "failures": 38,
+    "ignored_lines": 164,
+    "issues": 224,
+    "passed_records": 0,
+    "vpab_records": 56,
+    "warnings": 0
+  },
+  "diag_summaries": [
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 18,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 50,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 70,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 38,
+        "dropped": 0,
+        "high_water": 38,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 88,
+      "raw": "VPAB_RECORDS: captured=38 dropped=0 high_water=38 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "corrupt": 0,
+        "dropped": 0,
+        "overflowed": 0,
+        "records": 38,
+        "rows": 38
+      },
+      "issues": [],
+      "line": 140,
+      "raw": "VPAB_DUMP: rows=38 records=38 dropped=0 corrupt=0 overflowed=0",
+      "tag": "VPAB_DUMP"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 149,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 0,
+        "dropped": 0,
+        "high_water": 0,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 169,
+      "raw": "VPAB_RECORDS: captured=0 dropped=0 high_water=0 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "captured": 18,
+        "dropped": 0,
+        "high_water": 18,
+        "overflowed": 0
+      },
+      "issues": [],
+      "line": 187,
+      "raw": "VPAB_RECORDS: captured=18 dropped=0 high_water=18 overflowed=0",
+      "tag": "VPAB_RECORDS"
+    },
+    {
+      "fields": {
+        "corrupt": 0,
+        "dropped": 0,
+        "overflowed": 0,
+        "records": 18,
+        "rows": 18
+      },
+      "issues": [],
+      "line": 219,
+      "raw": "VPAB_DUMP: rows=18 records=18 dropped=0 corrupt=0 overflowed=0",
+      "tag": "VPAB_DUMP"
+    }
+  ],
+  "failures": [
+    {
+      "channel": "primary",
+      "frame": 240,
+      "line": 107,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2307,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 240,
+      "line": 108,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2307,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 300,
+      "line": 109,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2449,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 300,
+      "line": 110,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2449,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 360,
+      "line": 111,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2397,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 360,
+      "line": 112,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2397,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 540,
+      "line": 117,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2289,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 540,
+      "line": 118,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2289,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 600,
+      "line": 119,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 600,
+      "line": 120,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 660,
+      "line": 121,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2225,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 660,
+      "line": 122,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2225,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 720,
+      "line": 123,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2250,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 720,
+      "line": 124,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2250,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 780,
+      "line": 125,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2209,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 780,
+      "line": 126,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2209,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 900,
+      "line": 129,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2221,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 900,
+      "line": 130,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2221,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 960,
+      "line": 131,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 960,
+      "line": 132,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3310,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1020,
+      "line": 133,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2176,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1020,
+      "line": 134,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2176,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1080,
+      "line": 135,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3296,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1080,
+      "line": 136,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3296,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1140,
+      "line": 137,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2214,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1140,
+      "line": 138,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2214,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 240,
+      "line": 202,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3302,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 240,
+      "line": 203,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 3302,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 480,
+      "line": 206,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2353,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 480,
+      "line": 207,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2353,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 600,
+      "line": 208,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2295,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 600,
+      "line": 209,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2295,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 840,
+      "line": 212,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2130,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 840,
+      "line": 213,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2130,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 960,
+      "line": 214,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2393,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 960,
+      "line": 215,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2393,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "primary",
+      "frame": 1080,
+      "line": 216,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2366,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    },
+    {
+      "channel": "secondary",
+      "frame": 1080,
+      "line": 217,
+      "message": "render_us exceeds K1 runtime ceiling",
+      "metric": "render_us",
+      "mode": 0,
+      "observed": 2366,
+      "scenario": "self_shadow",
+      "threshold": "<= 2000.0"
+    }
+  ],
+  "issues": [
+    {
+      "field": "memory_metrics",
+      "line": 101,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 101,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 101,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 101,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 102,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 102,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 102,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 102,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 103,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 103,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 103,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 103,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 104,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 104,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 104,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 104,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 105,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 105,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 105,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 105,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 106,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 106,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 106,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 106,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 107,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 107,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 107,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 107,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 108,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 108,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 108,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 108,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 109,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 109,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 109,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 109,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 110,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 110,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 110,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 110,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 111,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 111,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 111,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 111,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 112,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 112,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 112,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 112,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 113,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 113,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 113,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 113,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 114,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 114,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 114,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 114,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 115,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 115,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 115,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 115,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 116,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 116,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 116,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 116,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 117,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 117,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 117,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 117,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 118,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 118,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 118,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 118,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 119,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 119,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 119,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 119,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 120,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 120,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 120,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 120,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 121,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 121,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 121,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 121,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 122,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 122,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 122,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 122,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 123,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 123,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 123,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 123,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 124,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 124,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 124,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 124,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 125,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 125,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 125,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 125,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 126,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 126,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 126,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 126,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 127,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 127,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 127,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 127,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 128,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 128,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 128,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 128,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 129,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 129,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 129,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 129,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 130,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 130,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 130,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 130,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 131,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 131,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 131,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 131,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 132,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 132,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 132,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 132,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 133,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 133,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 133,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 133,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 134,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 134,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 134,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 134,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 135,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 135,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 135,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 135,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 136,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 136,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 136,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 136,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 137,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 137,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 137,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 137,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 138,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 138,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 138,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 138,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 200,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 200,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 200,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 200,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 201,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 201,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 201,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 201,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 202,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 202,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 202,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 202,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 203,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 203,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 203,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 203,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 204,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 204,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 204,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 204,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 205,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 205,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 205,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 205,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 206,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 206,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 206,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 206,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 207,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 207,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 207,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 207,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 208,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 208,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 208,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 208,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 209,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 209,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 209,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 209,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 210,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 210,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 210,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 210,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 211,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 211,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 211,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 211,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 212,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 212,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 212,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 212,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 213,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 213,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 213,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 213,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 214,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 214,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 214,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 214,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 215,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 215,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 215,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 215,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 216,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 216,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 216,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 216,
+      "message": "strict memory gate requires tail integral delta"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 217,
+      "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+      "value": "absent"
+    },
+    {
+      "field": "memory_metrics",
+      "line": 217,
+      "message": "strict memory gate rejects absent/placeholder memory metrics",
+      "value": "absent"
+    },
+    {
+      "field": "trail_half_life_delta_frames",
+      "line": 217,
+      "message": "strict memory gate requires trail delta"
+    },
+    {
+      "field": "tail_integral_delta_pct",
+      "line": 217,
+      "message": "strict memory gate requires tail integral delta"
+    }
+  ],
+  "passed": false,
+  "records": [
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.56,
+        "com_b": 79.56,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 6795,
+        "energy_b": 6795,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 3883,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 104,
+        "render_us": 1172,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1390,
+        "t_ms": 19158,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 101,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 101,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 101,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 101,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 101,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 1437,
+        "energy_b": 1437,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 60,
+        "frame_us": 3883,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 97,
+        "render_us": 1172,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1390,
+        "t_ms": 19158,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 102,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 102,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 102,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 102,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 102,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.16,
+        "energy_a": 5959,
+        "energy_b": 5959,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3907,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 109,
+        "render_us": 1326,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1415,
+        "t_ms": 19487,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 103,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 103,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 103,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 103,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 103,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.62,
+        "com_b": 79.62,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 329.16,
+        "energy_a": 1462,
+        "energy_b": 1462,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3907,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 98,
+        "render_us": 1326,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1415,
+        "t_ms": 19487,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 104,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 104,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 104,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 104,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 104,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.92,
+        "energy_a": 7070,
+        "energy_b": 7070,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 3920,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 105,
+        "render_us": 1250,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1431,
+        "t_ms": 19815,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 105,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 105,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 105,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 105,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 105,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.92,
+        "energy_a": 4546,
+        "energy_b": 4546,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 180,
+        "frame_us": 3920,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 92,
+        "render_us": 1250,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1431,
+        "t_ms": 19815,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 106,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 106,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 106,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 106,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 106,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 240,
+          "line": 107,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2307,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.37,
+        "energy_a": 7363,
+        "energy_b": 7363,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3928,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 1082,
+        "render_us": 2307,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1445,
+        "t_ms": 20143,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 107,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 107,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 107,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 107,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 107,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 240,
+          "line": 108,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2307,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.37,
+        "energy_a": 5164,
+        "energy_b": 5164,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3928,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 95,
+        "render_us": 2307,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1445,
+        "t_ms": 20143,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 108,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 108,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 108,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 108,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 108,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 300,
+          "line": 109,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2449,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.81,
+        "energy_a": 6811,
+        "energy_b": 6811,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 3930,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 75,
+        "render_us": 2449,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1441,
+        "t_ms": 20471,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 109,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 109,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 109,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 109,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 109,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 300,
+          "line": 110,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2449,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.81,
+        "energy_a": 4753,
+        "energy_b": 4753,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 300,
+        "frame_us": 3930,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 103,
+        "render_us": 2449,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1441,
+        "t_ms": 20471,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 110,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 110,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 110,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 110,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 110,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 360,
+          "line": 111,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2397,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.96,
+        "energy_a": 6920,
+        "energy_b": 6920,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3909,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 96,
+        "render_us": 2397,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1407,
+        "t_ms": 20798,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 111,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 111,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 111,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 111,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 111,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 360,
+          "line": 112,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2397,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.96,
+        "energy_a": 5136,
+        "energy_b": 5136,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3909,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 92,
+        "render_us": 2397,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1407,
+        "t_ms": 20798,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 112,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 112,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 112,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 112,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 112,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.88,
+        "energy_a": 6466,
+        "energy_b": 6466,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 3891,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 88,
+        "render_us": 1329,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1373,
+        "t_ms": 21125,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 113,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 113,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 113,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 113,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 113,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.88,
+        "energy_a": 3739,
+        "energy_b": 3739,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 420,
+        "frame_us": 3891,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 99,
+        "render_us": 1329,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1373,
+        "t_ms": 21125,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 114,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 114,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 114,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 114,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 114,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.48,
+        "com_b": 79.48,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.04,
+        "energy_a": 7819,
+        "energy_b": 7819,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3878,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 92,
+        "render_us": 1359,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1366,
+        "t_ms": 21451,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 115,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 115,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 115,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 115,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 115,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.04,
+        "energy_a": 3806,
+        "energy_b": 3806,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3878,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 86,
+        "render_us": 1359,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1366,
+        "t_ms": 21451,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 116,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 116,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 116,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 116,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 116,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 540,
+          "line": 117,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2289,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.37,
+        "energy_a": 7295,
+        "energy_b": 7295,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 67,
+        "render_us": 2289,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1367,
+        "t_ms": 21778,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 117,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 117,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 117,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 117,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 117,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 540,
+          "line": 118,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2289,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.37,
+        "energy_a": 4501,
+        "energy_b": 4501,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 540,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 1087,
+        "render_us": 2289,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1367,
+        "t_ms": 21778,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 118,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 118,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 118,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 118,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 118,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 600,
+          "line": 119,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.27,
+        "energy_a": 7285,
+        "energy_b": 7285,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 60,
+        "render_us": 3310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 19,
+        "shadow": "self",
+        "show_us": 1369,
+        "t_ms": 22105,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 119,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 119,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 119,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 119,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 119,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 600,
+          "line": 120,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.27,
+        "energy_a": 4146,
+        "energy_b": 4146,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 57,
+        "render_us": 3310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 20,
+        "shadow": "self",
+        "show_us": 1369,
+        "t_ms": 22105,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 120,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 120,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 120,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 120,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 120,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 660,
+          "line": 121,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2225,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.09,
+        "energy_a": 6841,
+        "energy_b": 6841,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 3874,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 65,
+        "render_us": 2225,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 21,
+        "shadow": "self",
+        "show_us": 1373,
+        "t_ms": 22433,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 121,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 121,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 121,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 121,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 121,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 660,
+          "line": 122,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2225,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.09,
+        "energy_a": 2510,
+        "energy_b": 2510,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 660,
+        "frame_us": 3874,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 63,
+        "render_us": 2225,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 22,
+        "shadow": "self",
+        "show_us": 1373,
+        "t_ms": 22433,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 122,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 122,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 122,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 122,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 122,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 720,
+          "line": 123,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2250,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.2,
+        "energy_a": 6503,
+        "energy_b": 6503,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3877,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 108,
+        "render_us": 2250,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 23,
+        "shadow": "self",
+        "show_us": 1384,
+        "t_ms": 22763,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 123,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 123,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 123,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 123,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 123,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 720,
+          "line": 124,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2250,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.81,
+        "com_b": 79.81,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 328.2,
+        "energy_a": 1184,
+        "energy_b": 1184,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3877,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 107,
+        "render_us": 2250,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 24,
+        "shadow": "self",
+        "show_us": 1384,
+        "t_ms": 22763,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 124,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 124,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 124,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 124,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 124,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 780,
+          "line": 125,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2209,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 331.78,
+        "energy_a": 6413,
+        "energy_b": 6413,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 2209,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 25,
+        "shadow": "self",
+        "show_us": 1391,
+        "t_ms": 23093,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 125,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 125,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 125,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 125,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 125,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 780,
+          "line": 126,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2209,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.98,
+        "com_b": 79.98,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 331.78,
+        "energy_a": 628,
+        "energy_b": 628,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 780,
+        "frame_us": 3881,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 57,
+        "render_us": 2209,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 26,
+        "shadow": "self",
+        "show_us": 1391,
+        "t_ms": 23093,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 126,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 126,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 126,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 126,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 126,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.7,
+        "energy_a": 6904,
+        "energy_b": 6904,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 102,
+        "render_us": 1238,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 27,
+        "shadow": "self",
+        "show_us": 1383,
+        "t_ms": 23417,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 127,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 127,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 127,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 127,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 127,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 323.7,
+        "energy_a": 3056,
+        "energy_b": 3056,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3875,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 92,
+        "render_us": 1238,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 28,
+        "shadow": "self",
+        "show_us": 1383,
+        "t_ms": 23417,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 128,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 128,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 128,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 128,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 128,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 900,
+          "line": 129,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2221,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.52,
+        "com_b": 79.52,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.32,
+        "energy_a": 7478,
+        "energy_b": 7478,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 2221,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 29,
+        "shadow": "self",
+        "show_us": 1379,
+        "t_ms": 23744,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 129,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 129,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 129,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 129,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 129,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 900,
+          "line": 130,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2221,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.32,
+        "energy_a": 2558,
+        "energy_b": 2558,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 900,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 2221,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 30,
+        "shadow": "self",
+        "show_us": 1379,
+        "t_ms": 23744,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 130,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 130,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 130,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 130,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 130,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 960,
+          "line": 131,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.88,
+        "energy_a": 6954,
+        "energy_b": 6954,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 3310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 31,
+        "shadow": "self",
+        "show_us": 1381,
+        "t_ms": 24072,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 131,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 131,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 131,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 131,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 131,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 960,
+          "line": 132,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3310,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 327.88,
+        "energy_a": 1216,
+        "energy_b": 1216,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3868,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 57,
+        "render_us": 3310,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 32,
+        "shadow": "self",
+        "show_us": 1381,
+        "t_ms": 24072,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 132,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 132,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 132,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 132,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 132,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1020,
+          "line": 133,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2176,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.06,
+        "energy_a": 7319,
+        "energy_b": 7319,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 2176,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 33,
+        "shadow": "self",
+        "show_us": 1386,
+        "t_ms": 24398,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 133,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 133,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 133,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 133,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 133,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1020,
+          "line": 134,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2176,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.63,
+        "com_b": 79.63,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 326.06,
+        "energy_a": 327,
+        "energy_b": 327,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1020,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 2176,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 34,
+        "shadow": "self",
+        "show_us": 1386,
+        "t_ms": 24398,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 134,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 134,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 134,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 134,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 134,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1080,
+          "line": 135,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3296,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 331.9,
+        "energy_a": 6160,
+        "energy_b": 6160,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3878,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 59,
+        "render_us": 3296,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 35,
+        "shadow": "self",
+        "show_us": 1391,
+        "t_ms": 24730,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 135,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 135,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 135,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 135,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 135,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1080,
+          "line": 136,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3296,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.59,
+        "com_b": 79.59,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 331.9,
+        "energy_a": 1040,
+        "energy_b": 1040,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3878,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 3296,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 36,
+        "shadow": "self",
+        "show_us": 1391,
+        "t_ms": 24730,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 136,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 136,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 136,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 136,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 136,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1140,
+          "line": 137,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2214,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.56,
+        "com_b": 79.56,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.29,
+        "energy_a": 6698,
+        "energy_b": 6698,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1140,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 106,
+        "render_us": 2214,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 37,
+        "shadow": "self",
+        "show_us": 1392,
+        "t_ms": 25056,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 137,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 137,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 137,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 137,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 137,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1140,
+          "line": 138,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2214,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.55,
+        "com_b": 79.55,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 1,
+        "dropped": 0,
+        "dt_ms": 325.29,
+        "energy_a": 1774,
+        "energy_b": 1774,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1140,
+        "frame_us": 3879,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 95,
+        "render_us": 2214,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 38,
+        "shadow": "self",
+        "show_us": 1392,
+        "t_ms": 25057,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 138,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 138,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 138,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 138,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 138,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 6222,
+        "energy_b": 6222,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 109,
+        "render_us": 1511,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 1,
+        "shadow": "self",
+        "show_us": 1410,
+        "t_ms": 29551,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 200,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 200,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 200,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 200,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 200,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.5,
+        "com_b": 79.5,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 0.0,
+        "energy_a": 3150,
+        "energy_b": 3150,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 120,
+        "frame_us": 3872,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 92,
+        "render_us": 1511,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 2,
+        "shadow": "self",
+        "show_us": 1410,
+        "t_ms": 29551,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 201,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 201,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 201,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 201,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 201,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 240,
+          "line": 202,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3302,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.44,
+        "com_b": 79.44,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 654.1,
+        "energy_a": 5974,
+        "energy_b": 5974,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3844,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 60,
+        "render_us": 3302,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 3,
+        "shadow": "self",
+        "show_us": 1340,
+        "t_ms": 30205,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 202,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 202,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 202,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 202,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 202,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 240,
+          "line": 203,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 3302,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.56,
+        "com_b": 79.56,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 654.1,
+        "energy_a": 3215,
+        "energy_b": 3215,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 240,
+        "frame_us": 3844,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 58,
+        "render_us": 3302,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 4,
+        "shadow": "self",
+        "show_us": 1340,
+        "t_ms": 30205,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 203,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 203,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 203,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 203,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 203,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 650.9,
+        "energy_a": 5904,
+        "energy_b": 5904,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3831,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 64,
+        "render_us": 1943,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 5,
+        "shadow": "self",
+        "show_us": 1316,
+        "t_ms": 30856,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 204,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 204,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 204,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 204,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 204,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.47,
+        "com_b": 79.47,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 650.9,
+        "energy_a": 3261,
+        "energy_b": 3261,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 360,
+        "frame_us": 3831,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 53,
+        "render_us": 1943,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 6,
+        "shadow": "self",
+        "show_us": 1316,
+        "t_ms": 30856,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 205,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 205,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 205,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 205,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 205,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 480,
+          "line": 206,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2353,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.45,
+        "energy_a": 6276,
+        "energy_b": 6276,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3824,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 91,
+        "render_us": 2353,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 7,
+        "shadow": "self",
+        "show_us": 1306,
+        "t_ms": 31509,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 206,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 206,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 206,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 206,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 206,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 480,
+          "line": 207,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2353,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.45,
+        "energy_a": 3425,
+        "energy_b": 3425,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 480,
+        "frame_us": 3824,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 98,
+        "render_us": 2353,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 8,
+        "shadow": "self",
+        "show_us": 1306,
+        "t_ms": 31509,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 207,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 207,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 207,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 207,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 207,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 600,
+          "line": 208,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2295,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.46,
+        "com_b": 79.46,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 655.92,
+        "energy_a": 6343,
+        "energy_b": 6343,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3835,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 98,
+        "render_us": 2295,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 9,
+        "shadow": "self",
+        "show_us": 1326,
+        "t_ms": 32165,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 208,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 208,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 208,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 208,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 208,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 600,
+          "line": 209,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2295,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.37,
+        "com_b": 79.37,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 655.92,
+        "energy_a": 2707,
+        "energy_b": 2707,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 600,
+        "frame_us": 3835,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 84,
+        "render_us": 2295,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 10,
+        "shadow": "self",
+        "show_us": 1326,
+        "t_ms": 32165,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 209,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 209,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 209,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 209,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 209,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 654.01,
+        "energy_a": 6804,
+        "energy_b": 6804,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3835,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 90,
+        "render_us": 1277,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 11,
+        "shadow": "self",
+        "show_us": 1343,
+        "t_ms": 32819,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 210,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 210,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 210,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 210,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 210,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.53,
+        "com_b": 79.53,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 654.01,
+        "energy_a": 2516,
+        "energy_b": 2516,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 720,
+        "frame_us": 3835,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 87,
+        "render_us": 1277,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 12,
+        "shadow": "self",
+        "show_us": 1343,
+        "t_ms": 32819,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 211,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 211,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 211,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 211,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 211,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 840,
+          "line": 212,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2130,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.51,
+        "com_b": 79.51,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.74,
+        "energy_a": 6853,
+        "energy_b": 6853,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3834,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 67,
+        "render_us": 2130,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 13,
+        "shadow": "self",
+        "show_us": 1342,
+        "t_ms": 33473,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 212,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 212,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 212,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 212,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 212,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 840,
+          "line": 213,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2130,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.43,
+        "com_b": 79.43,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.74,
+        "energy_a": 2861,
+        "energy_b": 2861,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 840,
+        "frame_us": 3834,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 65,
+        "render_us": 2130,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 14,
+        "shadow": "self",
+        "show_us": 1342,
+        "t_ms": 33473,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 213,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 213,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 213,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 213,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 213,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 960,
+          "line": 214,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2393,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.54,
+        "com_b": 79.54,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 649.83,
+        "energy_a": 6099,
+        "energy_b": 6099,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3825,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 60,
+        "render_us": 2393,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 15,
+        "shadow": "self",
+        "show_us": 1339,
+        "t_ms": 34123,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 214,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 214,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 214,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 214,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 214,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 960,
+          "line": 215,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2393,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 649.83,
+        "energy_a": 3166,
+        "energy_b": 3166,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 960,
+        "frame_us": 3825,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 66,
+        "render_us": 2393,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 16,
+        "shadow": "self",
+        "show_us": 1339,
+        "t_ms": 34123,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 215,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 215,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 215,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 215,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 215,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "primary",
+          "frame": 1080,
+          "line": 216,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2366,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "primary",
+        "com_a": 79.49,
+        "com_b": 79.49,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.56,
+        "energy_a": 6390,
+        "energy_b": 6390,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3818,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 96,
+        "render_us": 2366,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 17,
+        "shadow": "self",
+        "show_us": 1327,
+        "t_ms": 34776,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 216,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 216,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 216,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 216,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 216,
+      "status": "FAIL",
+      "warnings": []
+    },
+    {
+      "derived": {},
+      "failures": [
+        {
+          "channel": "secondary",
+          "frame": 1080,
+          "line": 217,
+          "message": "render_us exceeds K1 runtime ceiling",
+          "metric": "render_us",
+          "mode": 0,
+          "observed": 2366,
+          "scenario": "self_shadow",
+          "threshold": "<= 2000.0"
+        }
+      ],
+      "fields": {
+        "changed_channel_pct": 0.0,
+        "changed_led_pct": 0.0,
+        "channel": "secondary",
+        "com_a": 79.6,
+        "com_b": 79.6,
+        "com_delta_leds": 0.0,
+        "com_slope_delta_pct": 0.0,
+        "dither_step": 2,
+        "dropped": 0,
+        "dt_ms": 653.56,
+        "energy_a": 3094,
+        "energy_b": 3094,
+        "energy_delta_pct": 0.0,
+        "fastled_dither": 0,
+        "flicker_score": 0.0,
+        "frame": 1080,
+        "frame_us": 3818,
+        "heap": 0,
+        "hue_delta_p95": 0,
+        "leds": 160,
+        "mae8": 0.0,
+        "max_abs8": 0,
+        "memory_metrics": "absent",
+        "mode": 0,
+        "over": 0,
+        "p95_abs8": 0,
+        "quant_us": 91,
+        "render_us": 2366,
+        "sat_delta_p95": 0,
+        "scenario": "self_shadow",
+        "seq": 18,
+        "shadow": "self",
+        "show_us": 1327,
+        "t_ms": 34776,
+        "truncated": 0,
+        "ver": 1,
+        "white_bias_score": 0.0
+      },
+      "issues": [
+        {
+          "field": "memory_metrics",
+          "line": 217,
+          "message": "self-shadow or absent memory metrics are instrumentation smoke, not visual-memory proof",
+          "value": "absent"
+        },
+        {
+          "field": "memory_metrics",
+          "line": 217,
+          "message": "strict memory gate rejects absent/placeholder memory metrics",
+          "value": "absent"
+        },
+        {
+          "field": "trail_half_life_delta_frames",
+          "line": 217,
+          "message": "strict memory gate requires trail delta"
+        },
+        {
+          "field": "tail_integral_delta_pct",
+          "line": 217,
+          "message": "strict memory gate requires tail integral delta"
+        }
+      ],
+      "line": 217,
+      "status": "FAIL",
+      "warnings": []
+    }
+  ],
+  "result": "FAIL",
+  "schema": "vpab_gate.v1",
+  "summary": "VPAB gate FAIL: 0/56 records passed; 224 issue(s); 38 failure(s); 0 warning(s)",
+  "thresholds": {
+    "changed_channel_pct": 2.0,
+    "changed_led_pct": 2.0,
+    "com_delta_leds": 1.0,
+    "dropped": 0,
+    "frame_us": 8333.33,
+    "mae8": 0.5,
+    "max_abs8": 8.0,
+    "over": 0,
+    "p95_abs8": 1.0,
+    "render_us": 2000.0,
+    "tail_integral_delta_pct_abs": 10.0,
+    "trail_delta_frames": 2.0
+  },
+  "valid": false,
+  "warnings": []
+}

@@ -1,0 +1,473 @@
+{
+  "evidence_dir": "docs/forensics/runtime-evidence",
+  "evidence_schema": "vpml_evidence_page.v1",
+  "global_constraints": [
+    "fixed built-ins only",
+    "no firmware changes",
+    "no AP/REST/WebSocket control",
+    "no raw receive",
+    "no host compiler",
+    "no visual acceptance without Captain review source"
+  ],
+  "pages": [
+    {
+      "acceptance_evidence": [
+        "local JSON surface renders",
+        "live runner command paths are exposed",
+        "latest capture remains eyes_on_pending"
+      ],
+      "controls": [
+        {
+          "data_source": "evidence_dir",
+          "enabled": true,
+          "id": "evidence.refresh",
+          "label": "Refresh Evidence",
+          "requires": "local_files"
+        },
+        {
+          "data_source": "host_device_adapter",
+          "enabled": true,
+          "id": "device.scan",
+          "label": "Scan Device",
+          "requires": "vpml_live_runner scan"
+        },
+        {
+          "data_source": "typed_usb_cdc",
+          "enabled": true,
+          "id": "device.identify",
+          "label": "Identify Device",
+          "requires": "port_and_chip_guard"
+        },
+        {
+          "data_source": "typed_usb_cdc",
+          "enabled": true,
+          "id": "vpml.status",
+          "label": "Read VPML Status",
+          "requires": "port_and_chip_guard"
+        },
+        {
+          "data_source": "programme_registry",
+          "enabled": true,
+          "id": "programme.open_picker",
+          "label": "Open Programme Picker",
+          "requires": "programme_registry"
+        },
+        {
+          "data_source": "vpml_live_runner play",
+          "enabled": true,
+          "id": "programme.play_builtin",
+          "label": "Play Built-In",
+          "requires": "port_and_chip_guard"
+        },
+        {
+          "data_source": "vpml_live_runner stop",
+          "enabled": true,
+          "id": "programme.stop",
+          "label": "Stop VPML",
+          "requires": "port_and_chip_guard"
+        },
+        {
+          "data_source": "vpml_live_runner capture",
+          "enabled": true,
+          "id": "capture.start",
+          "label": "Start Capture",
+          "requires": "port_and_chip_guard"
+        }
+      ],
+      "data_sources": {
+        "capture_count": "vpml_evidence_page.build_page().capture_count",
+        "controls": "vpml_live_runner.py command boundary plus static authoring locks",
+        "device_identity": "capture.device from VPML runtime summary",
+        "latest_byte_clean_capture": "latest capture with page_state=byte_clean",
+        "latest_visual_status": "capture.visual_status"
+      },
+      "failure_states": [
+        "no_evidence_loaded",
+        "missing_files",
+        "malformed_evidence",
+        "transport_failed",
+        "identity_failed"
+      ],
+      "id": "vpml_run_console",
+      "implementation_prerequisites": [
+        "K1 connected over USB CDC",
+        "matching chip identity",
+        "non-shippable VPML firmware already flashed"
+      ],
+      "must_not_claim": [
+        "visual_quality",
+        "product_fitness",
+        "native_effect_parity",
+        "audio_responsiveness",
+        "captain_acceptance_from_bytes",
+        "beat_tempo_onset_causality",
+        "host_preview_equals_k1_output",
+        "production_ready",
+        "uploaded_programme",
+        "compiled_programme",
+        "saved_on_k1",
+        "tab5_live",
+        "ap_connected",
+        "rest_websocket_control",
+        "byte_clean_equals_captain_acceptance"
+      ],
+      "primary_workflow": [
+        "Load local runtime evidence.",
+        "Inspect latest byte-clean capture and pending visual status.",
+        "Open the picker or evidence gate.",
+        "Keep live K1 controls disabled until a separate live host runner verifies device identity."
+      ],
+      "readbacks": {
+        "capture_count": 5,
+        "evidence_dir": "docs/forensics/runtime-evidence",
+        "expected_chip_id": "F887A500",
+        "latest_byte_clean_capture": "20260609T213624-vpml-live-intro-bounce-loop-em1401",
+        "latest_byte_status": "byte_clean",
+        "latest_capture": "20260609T213624-vpml-live-intro-bounce-loop-em1401",
+        "latest_visual_status": "eyes_on_pending",
+        "observed_chip_id": "F887A500",
+        "port": "/dev/cu.usbmodem1401",
+        "programme": "intro_bounce_loop",
+        "runner_commands": {
+          "capture_loop": "python3 scripts/regression-harness/vpml_live_runner.py capture --port <port> --programme intro_bounce_loop --expect-chip-id F887A500",
+          "identify": "python3 scripts/regression-harness/vpml_live_runner.py identify --port <port> --expect-chip-id F887A500",
+          "play_loop": "python3 scripts/regression-harness/vpml_live_runner.py play --port <port> --programme intro_bounce_loop --expect-chip-id F887A500",
+          "scan": "python3 scripts/regression-harness/vpml_live_runner.py scan",
+          "status": "python3 scripts/regression-harness/vpml_live_runner.py status --port <port> --expect-chip-id F887A500",
+          "stop": "python3 scripts/regression-harness/vpml_live_runner.py stop --port <port> --expect-chip-id F887A500"
+        }
+      },
+      "state": "offline_evidence_loaded",
+      "tests_harnesses": [
+        "tests/test_vpml_host_surface.py",
+        "tests/test_vpml_live_runner.py",
+        "tests/test_vpml_evidence_page.py"
+      ],
+      "title": "VPML Run Console",
+      "user_job": "Run the existing VPML built-ins on a verified K1 and generate evidence from the live serial capture loop."
+    },
+    {
+      "acceptance_evidence": [
+        "only intro_bounce_loop and intro_bounce appear",
+        "no compile/upload/raw controls are present"
+      ],
+      "controls": [
+        {
+          "data_source": "programme_registry",
+          "enabled": true,
+          "id": "programme.select",
+          "label": "Select Programme",
+          "requires": "programme_registry",
+          "values": [
+            "intro_bounce_loop",
+            "intro_bounce"
+          ]
+        },
+        {
+          "data_source": "host_surface",
+          "enabled": true,
+          "id": "picker.close",
+          "label": "Close Picker",
+          "requires": "browser_state"
+        }
+      ],
+      "data_sources": {
+        "parameter_model": "current MVP boundary",
+        "programmes": "vpml_evidence_page.PROGRAMME_METADATA",
+        "supported_commands": "fixed built-in command metadata"
+      },
+      "failure_states": [
+        "unknown_programme",
+        "live_play_locked",
+        "unsupported_parameter"
+      ],
+      "id": "programme_parameter_picker",
+      "implementation_prerequisites": [
+        "firmware command support for any new built-in",
+        "updated programme registry test"
+      ],
+      "must_not_claim": [
+        "custom_authoring",
+        "runtime_upload",
+        "compiled_programme",
+        "saved_on_k1"
+      ],
+      "primary_workflow": [
+        "Open layer.",
+        "Select fixed built-in.",
+        "Return selection to Run Console.",
+        "Live play remains locked in this static surface."
+      ],
+      "readbacks": {
+        "default_programme": "intro_bounce_loop",
+        "parameter_model": "none_current_mvp",
+        "programmes": [
+          {
+            "default": true,
+            "frames": 96,
+            "label": "Intro Bounce Loop",
+            "notes": "Loop-safe built-in preview; byte-clean evidence exists, eyes-on pending.",
+            "play_command": ":vpml=play_builtin,intro_bounce_loop",
+            "programme": "intro_bounce_loop"
+          },
+          {
+            "default": false,
+            "frames": 112,
+            "label": "Intro Bounce",
+            "notes": "Boot-shaped reference; may include fade-trough dark samples when looped.",
+            "play_command": ":vpml=play_builtin,intro_bounce",
+            "programme": "intro_bounce"
+          }
+        ],
+        "supported_commands": [
+          ":vpml=play_builtin,intro_bounce_loop",
+          ":vpml=play_builtin,intro_bounce"
+        ]
+      },
+      "state": "fixed_builtins_only",
+      "tests_harnesses": [
+        "tests/test_vpml_host_surface.py::VPMLHostSurfaceTest::test_picker_exposes_fixed_builtins_only"
+      ],
+      "title": "Programme + Parameter Picker",
+      "user_job": "Choose one of the current VPML built-ins without implying authoring support."
+    },
+    {
+      "acceptance_evidence": [
+        "strict transport clean",
+        "primary and secondary present",
+        "mode 250 on records",
+        "Captain eyes-on or equivalent review source"
+      ],
+      "controls": [
+        {
+          "data_source": "vpml_evidence_page",
+          "enabled": true,
+          "id": "evidence.open_json",
+          "label": "Open Evidence JSON",
+          "requires": "local_files"
+        },
+        {
+          "data_source": "vpml_evidence_page",
+          "enabled": true,
+          "id": "evidence.open_html",
+          "label": "Open Evidence HTML",
+          "requires": "local_files"
+        },
+        {
+          "data_source": "annotation_sidecar",
+          "enabled": false,
+          "id": "capture.annotate",
+          "label": "Record Visual Review",
+          "requires": "captain_review_source"
+        }
+      ],
+      "data_sources": {
+        "capture_rollup": "vpml_evidence_page.build_page().captures",
+        "motion_readability": "*.frames.log VPAB byte payloads when present",
+        "visual_status": "*.vpml-annotation.json sidecar or eyes_on_pending"
+      },
+      "failure_states": [
+        "transport_failed",
+        "coverage_failed",
+        "mode_failed",
+        "dark_sample_warning",
+        "blocked_stale_annotation"
+      ],
+      "id": "evidence_gate_motion_readability",
+      "implementation_prerequisites": [
+        "annotation writer after review workflow is approved"
+      ],
+      "must_not_claim": [
+        "visual_quality",
+        "product_fitness",
+        "native_effect_parity",
+        "audio_responsiveness",
+        "captain_acceptance_from_bytes",
+        "beat_tempo_onset_causality",
+        "host_preview_equals_k1_output",
+        "production_ready",
+        "uploaded_programme",
+        "compiled_programme",
+        "saved_on_k1",
+        "tab5_live",
+        "ap_connected",
+        "rest_websocket_control",
+        "byte_clean_equals_captain_acceptance"
+      ],
+      "primary_workflow": [
+        "Review strict gate state.",
+        "Inspect centre-origin motion profiles.",
+        "Compare rejected and accepted captures.",
+        "Record visual status only through explicit annotation."
+      ],
+      "readbacks": {
+        "byte_clean_captures": [
+          "20260609T193511-vpml-intro-bounce-loop-1401",
+          "20260609T213624-vpml-live-intro-bounce-loop-em1401"
+        ],
+        "capture_count": 5,
+        "captures": [
+          {
+            "byte_status": "byte_clean_with_observations",
+            "capture_id": "20260609T190853-vpml-intro-bounce-1401",
+            "motion_source": "frames_log",
+            "page_state": "dark_sample_warning",
+            "profile_count": 48,
+            "programme": "intro_bounce",
+            "visual_status": "eyes_on_pending"
+          },
+          {
+            "byte_status": "transport_failed",
+            "capture_id": "20260609T193419-vpml-intro-bounce-loop-1401",
+            "motion_source": "frames_log",
+            "page_state": "transport_failed",
+            "profile_count": 64,
+            "programme": "intro_bounce_loop",
+            "visual_status": "eyes_on_pending"
+          },
+          {
+            "byte_status": "byte_clean",
+            "capture_id": "20260609T193511-vpml-intro-bounce-loop-1401",
+            "motion_source": "frames_log",
+            "page_state": "byte_clean",
+            "profile_count": 30,
+            "programme": "intro_bounce_loop",
+            "visual_status": "eyes_on_pending"
+          },
+          {
+            "byte_status": "transport_failed",
+            "capture_id": "20260609T212727-vpml-intro-bounce-loop-1401",
+            "motion_source": "summary_aggregate",
+            "page_state": "transport_failed",
+            "profile_count": 0,
+            "programme": "intro_bounce_loop",
+            "visual_status": "eyes_on_pending"
+          },
+          {
+            "byte_status": "byte_clean",
+            "capture_id": "20260609T213624-vpml-live-intro-bounce-loop-em1401",
+            "motion_source": "frames_log",
+            "page_state": "byte_clean",
+            "profile_count": 32,
+            "programme": "intro_bounce_loop",
+            "visual_status": "eyes_on_pending"
+          }
+        ],
+        "dark_sample_captures": [
+          "20260609T190853-vpml-intro-bounce-1401"
+        ],
+        "transport_failed_captures": [
+          "20260609T193419-vpml-intro-bounce-loop-1401",
+          "20260609T212727-vpml-intro-bounce-loop-1401"
+        ]
+      },
+      "state": "byte_clean_pending_visual",
+      "tests_harnesses": [
+        "tests/test_vpml_evidence_page.py",
+        "tests/test_vpml_host_surface.py"
+      ],
+      "title": "Evidence Gate / Motion Readability",
+      "user_job": "Separate transport proof, final-byte readability, and visual acceptance status."
+    },
+    {
+      "acceptance_evidence": [
+        "hidden controls remain hidden",
+        "missing readiness list is visible"
+      ],
+      "controls": [],
+      "data_sources": {
+        "protocol_lock": "vpml_evidence_page.build_page().protocol_lock"
+      },
+      "failure_states": [
+        "locked_no_adr",
+        "blocked_no_protocol_fixtures",
+        "blocked_no_captain_approval"
+      ],
+      "id": "protocol_readiness_authoring_lock",
+      "implementation_prerequisites": [
+        "transport ADR",
+        "host protocol fixtures",
+        "firmware validator tests",
+        "live transport proof",
+        "Captain approval"
+      ],
+      "must_not_claim": [
+        "authoring_ready",
+        "upload_ready",
+        "raw_receive_available",
+        "runtime_code_allowed"
+      ],
+      "primary_workflow": [
+        "Read missing readiness evidence.",
+        "Leave authoring controls hidden.",
+        "Return to evidence gate until protocol prerequisites exist."
+      ],
+      "readbacks": {
+        "available_controls": [
+          "protocol.readiness.view"
+        ],
+        "hidden_controls": [
+          "programme.compile",
+          "programme.upload",
+          "raw_receive"
+        ],
+        "missing": [
+          "transport_adr",
+          "host_protocol_fixtures",
+          "firmware_validator_tests",
+          "live_transport_proof",
+          "captain_approval"
+        ],
+        "reason": "Protocol readiness is not proven; fixed built-ins only."
+      },
+      "state": "locked_no_adr",
+      "tests_harnesses": [
+        "tests/test_vpml_host_surface.py::VPMLHostSurfaceTest::test_evidence_gate_and_protocol_lock_share_evidence_page_contract"
+      ],
+      "title": "Protocol Readiness / Authoring Lock",
+      "user_job": "Show why authoring, upload, and raw receive remain unavailable."
+    },
+    {
+      "acceptance_evidence": [
+        "no promotion controls exposed"
+      ],
+      "controls": [],
+      "data_sources": {
+        "candidate_count": "not implemented; deferred ledger is empty by design"
+      },
+      "failure_states": [
+        "deferred_no_candidates",
+        "blocked_no_visual_acceptance"
+      ],
+      "id": "promotion_regression_ledger",
+      "implementation_prerequisites": [
+        "Captain eyes-on acceptance",
+        "native implementation design",
+        "regression baseline capture",
+        "promotion review checklist"
+      ],
+      "must_not_claim": [
+        "native_promotion_ready",
+        "regression_baseline_ready",
+        "shipping_effect_candidate"
+      ],
+      "primary_workflow": [
+        "Do nothing in the current MVP.",
+        "Create a candidate only after visual acceptance and native promotion design exist."
+      ],
+      "readbacks": {
+        "candidate_count": 0,
+        "candidate_ids": [],
+        "deferred_reason": "No VPML capture has Captain eyes-on acceptance."
+      },
+      "state": "deferred_no_candidates",
+      "tests_harnesses": [
+        "tests/test_vpml_host_surface.py::VPMLHostSurfaceTest::test_deferred_ledger_has_no_promotion_controls"
+      ],
+      "title": "Promotion + Regression Ledger",
+      "user_job": "Keep promotion out of the MVP until there is accepted visual evidence."
+    }
+  ],
+  "proof_boundary": "host_file_review_only",
+  "schema": "vpml_host_surface.v1"
+}

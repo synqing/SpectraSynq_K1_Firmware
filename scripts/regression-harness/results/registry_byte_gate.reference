@@ -1,0 +1,10 @@
+# registry_byte_gate.sh reference — loadable-section SHA-256 of k1_hardware ELF
+# Regenerate ONLY when the production binary is INTENTIONALLY changed.
+bin_bytes=649888
+fingerprint=3073aec99eb757f8001b4402ad0e18993ee21af01d065182a497869cd5ba2dad
+# per-section manifest the fingerprint hashes:
+#   .flash.text:918d27c573d236923bc69835bcb19ec36c19b113a3a1ce204f894ea884b60006
+#   .flash.rodata:b09eb7b7f0614c5c4e89ddd55e09cd4b3f099a55c3fb5fd7da1876be0fd19ffb
+#   .dram0.data:75e2bcae2a0fd96c59c2814e31575f5ef73fc65667937ad4b63acd9c5ea87c8a
+#   .iram0.text:f2f4066553528c29544c8c0481c2e2431462795c530a0d7a95c5cae65b2a3ade
+#   .iram0.vectors:1646046e3d4102889e68a30c27b6c5178e52228177dbfbe510fde0e173dcb742

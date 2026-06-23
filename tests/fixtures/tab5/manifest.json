@@ -1,0 +1,21 @@
+{
+  "fixture": "smoke-20260609-211229.tab5_serial.log",
+  "source_run": "evidence/tab5-k1-dashboard-harness/20260609-211229",
+  "description": "Golden smoke transcript with full K1 id correlation (protocol v1 capture)",
+  "commands": [
+    {"tx": "PING", "expect_ok": "OK PING"},
+    {"tx": "VERSION", "expect_ok": "OK VERSION", "fields": ["protocol", "screen"]},
+    {"tx": "UI_STATUS", "expect_ok": "OK UI_STATUS", "fields": ["ws", "wifi", "selected", "pending_count", "k1_seen"]},
+    {"tx": "ANTENNA_STATUS", "expect_ok": "OK ANTENNA_STATUS", "fields": ["antenna_probe"]},
+    {"tx": "UI_SURFACE PRIMARY", "expect_ok": "OK UI_SURFACE"},
+    {"tx": "UI_SLIDER BRIGHTNESS 70", "expect_ok": "OK UI_SLIDER", "k1_control": "primary.photons"},
+    {"tx": "UI_SLIDER COLOUR 61", "expect_ok": "OK UI_SLIDER", "k1_control": "primary.chroma"},
+    {"tx": "UI_SLIDER SPEED 54", "expect_ok": "OK UI_SLIDER", "k1_control": "primary.mood"},
+    {"tx": "UI_PALETTE NEXT", "expect_ok": "OK UI_PALETTE", "k1_control": "primary.palette"},
+    {"tx": "UI_MODE 18", "expect_ok": "OK UI_MODE", "k1_control": "primary.mode"},
+    {"tx": "UI_SCENE ASSIST", "expect_ok": "OK UI_SCENE", "k1_control": "scene.smart"},
+    {"tx": "AUDIO_STATUS", "expect_ok": "OK AUDIO_STATUS"},
+    {"tx": "UI_STATUS", "expect_ok": "OK UI_STATUS", "fields": ["primary_brightness", "primary_palette"]}
+  ],
+  "v2_optional_fields": ["ui_page", "health", "link", "ack_pending", "overlay", "protocol"]
+}

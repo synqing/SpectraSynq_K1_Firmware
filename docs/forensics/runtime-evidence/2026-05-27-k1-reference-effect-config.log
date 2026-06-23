@@ -1,0 +1,236 @@
+# IDLE
+d=0.900 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5042 follower=5110 peak_scaled=0.882 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4970 follower=4807 peak_scaled=0.879 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4872 follower=4650 peak_scaled=0.881 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4965 follower=4662 peak_scaled=0.920 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4920 follower=4769 peak_scaled=0.893 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5016 follower=4729 peak_scaled=0.890 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4855 follower=5039 peak_scaled=0.822 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4946 follower=4625 peak_scaled=0.916 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4845 follower=4393 peak_scaled=0.929 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4872 follower=4265 peak_scaled=0.970 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4860 follower=4194 peak_scaled=0.980 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4881 follower=4405 peak_scaled=0.935 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4977 follower=4259 peak_scaled=0.987 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4891 follower=4210 peak_scaled=0.979 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4864 follower=5232 peak_scaled=0.786 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5299 follower=7059 peak_scaled=0.731 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4836 follower=8181 peak_scaled=0.496 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=5138 follower=9214 peak_scaled=0.499 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4881 follower=6724 peak_scaled=0.614 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4891 follower=5799 peak_scaled=0.712 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4977 follower=5223 peak_scaled=0.814 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4845 follower=5246 peak_scaled=0.779 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4900 follower=4949 peak_scaled=0.827 silent_scale=1.000 silence=0
+[AP] SSL=750 DC=0 max_raw=4800 follower=4881 peak_scaled=0.838 silent_scale=1.000 silence=0
+# SEND :stop
+SBOK
+# SEND :secondary_control=false
+sbr{{
+SECONDARY_CONTROL: DISABLED (encoders control primary channel)
+}}
+# SEND :set_mode=3
+sbr{{
+CONFIG.LIGHTSHOW_MODE: 3
+}}
+# HOTKEY 'P'
+HOTKEY primary mood: 0.100
+# HOTKEY 'P'
+HOTKEY primary mood: 0.050
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'P'
+HOTKEY primary mood: 0.000
+# HOTKEY 'p'
+HOTKEY primary mood: 0.050
+# HOTKEY 'p'
+HOTKEY primary mood: 0.100
+# HOTKEY 'p'
+HOTKEY primary mood: 0.150
+# HOTKEY 'p'
+HOTKEY primary mood: 0.200
+# HOTKEY 'p'
+HOTKEY primary mood: 0.250
+# HOTKEY '.'
+PALETTE: 1 (es_rivendell_15_gp)
+# HOTKEY '.'
+PALETTE: 2 (es_ocean_breeze_036_gp)
+# HOTKEY '.'
+PALETTE: 3 (rgi_15_gp)
+# HOTKEY '.'
+PALETTE: 4 (retro2_16_gp)
+# HOTKEY '.'
+PALETTE: 5 (Analogous_1_gp)
+# HOTKEY '.'
+PALETTE: 6 (es_pinksplash_08_gp)
+# HOTKEY '.'
+PALETTE: 7 (Coral_reef_gp)
+# HOTKEY '.'
+PALETTE: 8 (es_ocean_breeze_068_gp)
+# HOTKEY '.'
+PALETTE: 9 (es_pinksplash_07_gp)
+# HOTKEY '.'
+PALETTE: 10 (es_vintage_01_gp)
+# HOTKEY '.'
+PALETTE: 11 (departure_gp)
+# HOTKEY '.'
+PALETTE: 12 (es_landscape_64_gp)
+# HOTKEY '.'
+PALETTE: 13 (es_landscape_33_gp)
+# HOTKEY '.'
+PALETTE: 14 (rainbowsherbet_gp)
+# HOTKEY '.'
+PALETTE: 15 (gr65_hult_gp)
+# HOTKEY '.'
+PALETTE: 16 (gr64_hult_gp)
+# HOTKEY '.'
+PALETTE: 17 (GMT_drywet_gp)
+# HOTKEY '.'
+PALETTE: 18 (ib_jul01_gp)
+# HOTKEY '.'
+PALETTE: 19 (es_vintage_57_gp)
+# HOTKEY '.'
+PALETTE: 20 (ib15_gp)
+# HOTKEY '.'
+PALETTE: 21 (Fuschia_7_gp)
+# HOTKEY '.'
+PALETTE: 22 (es_emerald_dragon_08_gp)
+# HOTKEY '.'
+PALETTE: 23 (lava_gp)
+# HOTKEY '.'
+PALETTE: 24 (fire_gp)
+# HOTKEY '.'
+PALETTE: 25 (Colorfull_gp)
+# HOTKEY '.'
+PALETTE: 26 (Magenta_Evening_gp)
+# HOTKEY '.'
+PALETTE: 27 (Pink_Purple_gp)
+# HOTKEY '.'
+PALETTE: 28 (es_autumn_19_gp)
+# HOTKEY '.'
+PALETTE: 29 (BlacK_Blue_Magenta_White_gp)
+# PRIMARY_PALETTE_HIT True
+# SEND :secondary_enabled=true
+sbr{{
+SECONDARY_ENABLED: 1
+}}
+# SEND :secondary_mode=7
+sbr{{
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+}}
+# SEND :secondary_palette_mode=true
+sbr{{
+SECONDARY_PALETTE_MODE_ENABLED: true
+}}
+# SEND :secondary_palette_index=24
+sbr{{
+SECONDARY_PALETTE_INDEX: 24 (fire_gp)
+}}
+# SEND :diag=clear
+sbr{{
+DIAG: stopped
+DIAG_RECORDS: count=0 capacity=64 high_water=0
+DIAG_COUNTERS: captured=0 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+}}
+# HOTKEY ';'
+sbr{{
+K1 HOTKEY STATUS
+target channel: primary
+MODE: 3 (BLOOM)
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+PRIMARY pcm: photons=1.000 chroma=0.050 mood=0.250 saturation=1.000 prism=1.00 base=0.000
+SECONDARY pcm: photons=1.000 chroma=0.000 mood=0.050 saturation=1.000 prism=1.00 base=0.000
+CONFIG: square_iter=1.00 sensitivity=2.400 dithering=on
+VP: wave_shift=120.00 bloom_shift=1.000 bloom_alpha=0.9900
+STREAMS: ap=off vp=off agc=off
+}}
+# SEND :get_mode
+sbr{{
+MODE: 3
+}}
+# SEND :get_mode_name=3
+sbr{{
+MODE_NAME: BLOOM
+}}
+# SEND :get_mode_name=7
+sbr{{
+MODE_NAME: WAVEFORM-FAST
+}}
+# SEND :secondary_status
+sbr{{
+SECONDARY_ENABLED: true
+SECONDARY_CONTROL: false (encoders control primary channel)
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+SECONDARY_PHOTONS: 1.000000
+SECONDARY_CHROMA: 0.000000
+SECONDARY_MOOD: 0.050000
+SECONDARY_SATURATION: 1.000000
+SECONDARY_PRISM_COUNT: 1.00
+SECONDARY_MIRROR_ENABLED: true
+SECONDARY_REVERSE_ORDER: false
+SECONDARY_BASE_COAT: false
+SECONDARY_PALETTE_MODE_ENABLED: true
+SECONDARY_PALETTE_INDEX: 24 (fire_gp)
+NOTE: This command is deprecated, please use secondary_status instead
+}}
+# SEND :diag=status
+sbr{{
+DIAG: stopped
+DIAG_RECORDS: count=0 capacity=64 high_water=0
+DIAG_COUNTERS: captured=0 dropped=0 corrupt=0 overflowed=0
+DIAG_BYTES: payload_max=512 storage=34048
+}}

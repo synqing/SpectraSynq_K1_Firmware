@@ -1,0 +1,36 @@
+In file included from /private/tmp/sb-a5ce32e-build/SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:91:
+SPECTRASYNQ_K1_FIRMWARE/system/system.h: In function 'void check_current_function()':
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:48:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+   48 |   function_hits[function_id]++;
+      |   ~~~~~~~~~~~~~~~~~~~~~~~~~^
+Processing k1_hardware (platform: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip; board: esp32-s3-devkitc1-n16r8; framework: arduino)
+--------------------------------------------------------------------------------
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+PLATFORM: Espressif 32 (54.3.20) > Espressif ESP32-S3-DevKitC-1-N16R8V (16 MB Flash Quad, 8 MB PSRAM Octal)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.2.0 
+ - framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a 
+ - tool-esptoolpy @ 4.8.9 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 
+ - tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 
+ - toolchain-riscv32-esp @ 14.2.0+20241119 
+ - toolchain-xtensa-esp-elf @ 14.2.0+20241119
+Converting SPECTRASYNQ_K1_FIRMWARE.ino
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- FastLED @ 3.10.3
+|-- FixedPoints @ 1.1.2
+|-- M5ROTATE8 @ 0.4.1
+|-- FS @ 3.2.0
+|-- LittleFS @ 3.2.0
+|-- Ticker @ 3.2.0
+|-- Wire @ 3.2.0
+Generating partitions .pio/build/k1_hardware/partitions.bin
+esptool.py v4.8.9
+Creating esp32s3 image...
+... (33 lines truncated)

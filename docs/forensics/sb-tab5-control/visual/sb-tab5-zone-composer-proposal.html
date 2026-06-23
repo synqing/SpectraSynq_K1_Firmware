@@ -1,0 +1,1451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SensoryBridge Tab5 Touch Controller - Zone Composer Adaptation</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%230a0a0b'/%3E%3Cpath d='M2 8h12M8 2v12' stroke='%23ffc700' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0a0a0b;
+      --bg-site: #050506;
+      --surface: #121214;
+      --surface-elevated: #1a1a1c;
+      --surface-soft: #0f0f12;
+      --border: #2a2a2e;
+      --border-subtle: #1e1e24;
+      --fg: #ffffff;
+      --fg-secondary: #9ca3af;
+      --fg-dim: #4b5563;
+      --brand: #ffc700;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --primary: #00ffff;
+      --secondary: #00ff99;
+      --director: #9900ff;
+      --mix: #3b82f6;
+      --magenta: #d946ef;
+      --radius: 14px;
+      --gap: 14px;
+      --shadow-primary: rgba(0, 255, 255, 0.18);
+      --shadow-secondary: rgba(0, 255, 153, 0.18);
+      --shadow-director: rgba(153, 0, 255, 0.22);
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255, 199, 0, 0.08), transparent 30%),
+        linear-gradient(180deg, #070709 0%, var(--bg-site) 100%);
+      color: var(--fg);
+      font-family: "Rajdhani", system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .proposal {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .proposal-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 44px;
+      line-height: 0.95;
+      font-weight: 400;
+    }
+
+    .summary {
+      margin: 8px 0 0;
+      max-width: 1040px;
+      color: var(--fg-secondary);
+      font-size: 18px;
+    }
+
+    .source-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--fg-secondary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .workbench {
+      display: grid;
+      grid-template-columns: minmax(0, 1280px) 300px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .device-shell {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      border: 1px solid #303038;
+      border-radius: 18px;
+      background: #040405;
+      padding: 10px;
+      box-shadow:
+        0 24px 80px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+      overflow: hidden;
+    }
+
+    .tab5 {
+      position: relative;
+      width: 1280px;
+      height: 720px;
+      overflow: hidden;
+      border-radius: 10px;
+      background: var(--bg-page);
+      transform: scale(var(--device-scale, 1));
+      transform-origin: top left;
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+      background: var(--bg-page);
+    }
+
+    .screen.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .header {
+      position: absolute;
+      left: 20px;
+      top: 10px;
+      width: 1240px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .back,
+    .status-card,
+    .tiny-card,
+    .nav-button,
+    .surface-button,
+    .param-card,
+    .overview-card,
+    .action-tile,
+    .health-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--fg);
+    }
+
+    .back {
+      width: 100px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      color: var(--brand);
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .screen-title {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -48%);
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 40px;
+      line-height: 1;
+      font-weight: 400;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .status-card {
+      height: 44px;
+      min-width: 112px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+    }
+
+    .status-card.live {
+      color: var(--success);
+      border-color: rgba(34, 197, 94, 0.55);
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .mode-row {
+      position: absolute;
+      left: 20px;
+      top: 64px;
+      width: 1240px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .surface-button {
+      height: 36px;
+      min-width: 170px;
+      padding: 0 16px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--fg-secondary);
+      background: var(--surface);
+    }
+
+    .surface-button.primary {
+      color: var(--primary);
+      border-color: rgba(0, 255, 255, 0.70);
+      box-shadow: 0 0 20px var(--shadow-primary);
+    }
+
+    .surface-button.secondary {
+      color: var(--secondary);
+      border-color: rgba(0, 255, 153, 0.70);
+      box-shadow: 0 0 20px var(--shadow-secondary);
+    }
+
+    .surface-button.director {
+      color: var(--director);
+      border-color: rgba(153, 0, 255, 0.70);
+      box-shadow: 0 0 20px var(--shadow-director);
+    }
+
+    .hero-strip {
+      position: absolute;
+      left: 40px;
+      top: 108px;
+      width: 1200px;
+      height: 130px;
+    }
+
+    .strip-labels,
+    .strip-ticks {
+      position: absolute;
+      left: 20px;
+      width: 1160px;
+      height: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .strip-labels { top: 0; }
+    .strip-labels span:nth-child(1) { color: var(--primary); text-align: left; }
+    .strip-labels span:nth-child(2) { color: var(--secondary); text-align: center; }
+    .strip-labels span:nth-child(3) { color: var(--director); text-align: right; }
+
+    .lgp-field {
+      position: absolute;
+      left: 20px;
+      top: 28px;
+      width: 1160px;
+      height: 64px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background:
+        linear-gradient(90deg, rgba(153, 0, 255, 0.18), rgba(0, 255, 153, 0.12), rgba(0, 255, 255, 0.28), rgba(0, 255, 153, 0.12), rgba(153, 0, 255, 0.18)),
+        var(--surface);
+      overflow: hidden;
+    }
+
+    .plate-glow {
+      position: absolute;
+      inset: 7px 10px;
+      border-radius: 7px;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.42), rgba(0, 255, 255, 0.20) 22%, transparent 44%),
+        linear-gradient(90deg, rgba(153, 0, 255, 0.34), rgba(0, 255, 153, 0.22), rgba(0, 255, 255, 0.52), rgba(0, 255, 153, 0.22), rgba(153, 0, 255, 0.34));
+      filter: saturate(1.2);
+      opacity: 0.85;
+    }
+
+    .edge-line {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      height: 7px;
+      border-radius: 999px;
+      background: repeating-linear-gradient(90deg, rgba(255,255,255,0.95) 0 4px, rgba(0,255,255,0.35) 4px 12px);
+      opacity: 0.78;
+    }
+
+    .edge-line.top { top: 14px; }
+    .edge-line.bottom {
+      bottom: 14px;
+      background: repeating-linear-gradient(90deg, rgba(0,255,153,0.35) 0 8px, rgba(255,255,255,0.92) 8px 12px);
+    }
+
+    .centre-marker {
+      position: absolute;
+      top: 0;
+      left: 574px;
+      width: 4px;
+      height: 64px;
+      border-radius: 2px;
+      background: var(--brand);
+      box-shadow: 0 0 18px rgba(255, 199, 0, 0.8);
+    }
+
+    .pulse-marker {
+      position: absolute;
+      left: 574px;
+      top: 50%;
+      width: 118px;
+      height: 118px;
+      border: 1px solid rgba(255, 199, 0, 0.28);
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      opacity: 0.9;
+    }
+
+    .strip-ticks {
+      top: 96px;
+      grid-template-columns: 1fr 1fr 1fr;
+      color: var(--fg-dim);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 24px;
+      font-weight: 400;
+    }
+
+    .strip-ticks span:nth-child(2) {
+      color: var(--brand);
+      text-align: center;
+    }
+
+    .strip-ticks span:nth-child(3) { text-align: right; }
+
+    .selected-row {
+      position: absolute;
+      left: 20px;
+      top: 244px;
+      width: 1240px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .selected-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--primary);
+      box-shadow: 0 0 14px var(--primary);
+    }
+
+    .selected-title {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 400;
+      color: var(--primary);
+    }
+
+    .param-grid {
+      position: absolute;
+      left: 20px;
+      top: 284px;
+      width: 1240px;
+      height: 160px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .param-card {
+      position: relative;
+      padding: 10px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .param-card.active {
+      border-color: rgba(0, 255, 255, 0.70);
+      box-shadow: 0 0 22px var(--shadow-primary);
+    }
+
+    .param-label {
+      display: block;
+      color: var(--fg-secondary);
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .param-value {
+      display: block;
+      margin-top: 4px;
+      text-align: center;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 32px;
+      line-height: 1;
+      font-weight: 400;
+      color: var(--fg);
+    }
+
+    .param-name {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      text-align: center;
+      color: var(--fg-secondary);
+      font-size: 24px;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 16px;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      border-radius: 4px;
+      background: var(--primary);
+      box-shadow: 0 0 12px currentColor;
+    }
+
+    .overview-grid {
+      position: absolute;
+      left: 20px;
+      top: 458px;
+      width: 1240px;
+      height: 170px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .overview-card {
+      position: relative;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .overview-card.selected {
+      border-width: 2px;
+      border-color: var(--primary);
+    }
+
+    .ov-header {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .ov-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-size: 22px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ov-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      flex: 0 0 auto;
+    }
+
+    .ov-range {
+      color: var(--fg-dim);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .ov-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1;
+      color: var(--fg-secondary);
+    }
+
+    .ov-line strong {
+      color: var(--fg);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 245px;
+      text-align: right;
+    }
+
+    .ov-meta {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      color: var(--fg-dim);
+      font-size: 18px;
+    }
+
+    .footer {
+      position: absolute;
+      left: 20px;
+      top: 638px;
+      width: 1240px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      background: var(--surface-elevated);
+      padding: 0 16px;
+      color: var(--fg-dim);
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .nav-panel {
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: rgba(18, 18, 20, 0.92);
+      padding: 12px;
+    }
+
+    .nav-title {
+      margin: 0 0 10px;
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .nav-button {
+      width: 100%;
+      height: 44px;
+      margin-bottom: 8px;
+      text-align: left;
+      padding: 0 12px;
+      color: var(--fg-secondary);
+      font-size: 22px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .nav-button.active {
+      color: var(--brand);
+      border-color: rgba(255, 199, 0, 0.7);
+      box-shadow: 0 0 18px rgba(255, 199, 0, 0.16);
+    }
+
+    .notes {
+      margin-top: 12px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: rgba(18, 18, 20, 0.92);
+      padding: 12px;
+      color: var(--fg-secondary);
+      font-size: 17px;
+    }
+
+    .notes h2 {
+      margin: 0 0 8px;
+      color: var(--fg);
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .notes ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .notes li + li { margin-top: 6px; }
+
+    .mix-layout,
+    .health-layout,
+    .protocol-layout {
+      position: absolute;
+      left: 20px;
+      top: 108px;
+      width: 1240px;
+      height: 520px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .mix-layout {
+      grid-template-columns: 1.15fr 1fr;
+      grid-template-rows: 235px 1fr;
+    }
+
+    .hero-current {
+      grid-row: span 2;
+      border: 1px solid rgba(255, 199, 0, 0.42);
+      border-radius: var(--radius);
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(255, 199, 0, 0.16), transparent 42%),
+        var(--surface);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .big-mode {
+      margin: 0;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 64px;
+      line-height: 0.95;
+      font-weight: 400;
+    }
+
+    .big-sub {
+      margin: 10px 0 18px;
+      color: var(--fg-secondary);
+      font-size: 24px;
+    }
+
+    .preset-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .preset {
+      height: 92px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      background: var(--surface-soft);
+      padding: 9px;
+    }
+
+    .preset strong {
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .preset span {
+      display: block;
+      margin-top: 8px;
+      color: var(--fg-secondary);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .control-block {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .action-tile {
+      position: relative;
+      padding: 12px;
+      min-height: 108px;
+      overflow: hidden;
+    }
+
+    .action-tile b {
+      display: block;
+      color: var(--fg-secondary);
+      font-size: 22px;
+    }
+
+    .action-tile strong {
+      display: block;
+      margin-top: 6px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .action-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .health-layout {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: 132px 132px 1fr;
+    }
+
+    .health-card {
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .health-card.wide { grid-column: span 2; }
+
+    .health-card h3 {
+      margin: 0;
+      color: var(--fg-secondary);
+      font-size: 22px;
+    }
+
+    .health-card strong {
+      display: block;
+      margin-top: 8px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .health-card p {
+      margin: 8px 0 0;
+      color: var(--fg-dim);
+      font-size: 20px;
+    }
+
+    .confirm-zone {
+      grid-column: span 4;
+      display: grid;
+      grid-template-columns: 1.4fr repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .confirm-zone .health-card.wide {
+      grid-column: span 1;
+    }
+
+    .protocol-layout {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+
+    .flow-panel,
+    .contract-panel {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .flow-panel h3,
+    .contract-panel h3 {
+      margin: 0 0 14px;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 34px;
+      font-weight: 400;
+    }
+
+    .flow-stack {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .flow-node {
+      min-height: 106px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--surface-soft);
+      padding: 10px;
+      position: relative;
+    }
+
+    .flow-node::after {
+      content: ">";
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--fg-dim);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 18px;
+    }
+
+    .flow-node:nth-child(4)::after,
+    .flow-node:nth-child(8)::after { display: none; }
+
+    .flow-node b {
+      display: block;
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+    }
+
+    .flow-node span {
+      display: block;
+      margin-top: 8px;
+      color: var(--fg);
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .flow-node small {
+      display: block;
+      margin-top: 7px;
+      color: var(--fg-secondary);
+      font-size: 17px;
+      line-height: 1.1;
+    }
+
+    .contract-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .contract-row {
+      display: grid;
+      grid-template-columns: 128px 1fr;
+      gap: 10px;
+      align-items: start;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 10px;
+      color: var(--fg-secondary);
+      font-size: 20px;
+      line-height: 1.15;
+    }
+
+    .contract-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .contract-row b {
+      color: var(--fg);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 15px;
+    }
+
+    .source-block {
+      margin-top: 16px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      background: rgba(18, 18, 20, 0.92);
+      padding: 14px;
+    }
+
+    .source-block h2 {
+      margin: 0 0 8px;
+      font-family: "Bebas Neue", Impact, sans-serif;
+      font-size: 30px;
+      font-weight: 400;
+    }
+
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .source-card {
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: var(--surface-soft);
+      padding: 12px;
+      color: var(--fg-secondary);
+      font-size: 17px;
+    }
+
+    .source-card strong {
+      display: block;
+      color: var(--fg);
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .source-card code {
+      color: var(--brand);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+    }
+
+    @media (max-width: 1420px) {
+      .workbench {
+        grid-template-columns: 1fr;
+      }
+
+      .nav-panel,
+      .notes {
+        max-width: 1280px;
+      }
+
+      .source-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .proposal {
+        padding: 12px;
+      }
+
+      .proposal-header {
+        grid-template-columns: 1fr;
+      }
+
+      .source-pills {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="proposal">
+    <header class="proposal-header">
+      <div>
+        <p class="eyebrow">Visual proposal | SB firmware Tab5 controller</p>
+        <h1>Zone Composer Grammar, Rebuilt For SensoryBridge</h1>
+        <p class="summary">A touch-only controller concept that keeps the strongest Zone Composer hierarchy: the light field is the hero, controls serve the selected surface, and all operational state remains visible without encoder hardware.</p>
+      </div>
+      <div class="source-pills" aria-label="Source basis">
+        <span class="pill">1280 x 720 Tab5</span>
+        <span class="pill">Bebas / Rajdhani / JetBrains</span>
+        <span class="pill">AP-only K1</span>
+        <span class="pill">touch-first MVP</span>
+      </div>
+    </header>
+
+    <section class="workbench" aria-label="Visual workbench">
+      <div class="device-shell" aria-label="Tab5 device mockup">
+        <div class="tab5">
+          <section id="composer" class="screen active" aria-label="Light Composer screen">
+            <div class="header">
+              <div class="back">&lt; BACK</div>
+              <h2 class="screen-title">LIGHT COMPOSER</h2>
+              <div class="header-right">
+                <div class="status-card">K1 AP</div>
+                <div class="status-card live"><span class="dot"></span> WS LIVE</div>
+                <div class="status-card">100 FPS</div>
+              </div>
+            </div>
+
+            <div class="mode-row" aria-label="Surface selector">
+              <button class="surface-button primary" data-surface="primary">PRIMARY EDGE</button>
+              <button class="surface-button" data-surface="secondary">SECONDARY EDGE</button>
+              <button class="surface-button" data-surface="director">SMART DIRECTOR</button>
+            </div>
+
+            <div class="hero-strip" aria-label="Centre-origin LGP field">
+              <div class="strip-labels">
+                <span>PRIMARY EDGE</span>
+                <span>SECONDARY EDGE</span>
+                <span>SMART STATE</span>
+              </div>
+              <div class="lgp-field">
+                <div class="plate-glow"></div>
+                <div class="edge-line top"></div>
+                <div class="edge-line bottom"></div>
+                <div class="pulse-marker"></div>
+                <div class="centre-marker"></div>
+              </div>
+              <div class="strip-ticks">
+                <span>0</span>
+                <span>79|80</span>
+                <span>159</span>
+              </div>
+            </div>
+
+            <div class="selected-row">
+              <span class="selected-dot"></span>
+              <h3 class="selected-title">PRIMARY EDGE PARAMETERS</h3>
+            </div>
+
+            <div class="param-grid" aria-label="Selected surface parameters">
+              <article class="param-card active">
+                <span class="param-label">MODE</span>
+                <span class="param-value">018</span>
+                <span class="param-name">Waveform Tempo</span>
+                <span class="bar"><span style="width: 68%"></span></span>
+              </article>
+              <article class="param-card">
+                <span class="param-label">PALETTE</span>
+                <span class="param-value">009</span>
+                <span class="param-name">K1 Cyan Violet</span>
+                <span class="bar"><span style="width: 44%"></span></span>
+              </article>
+              <article class="param-card">
+                <span class="param-label">PHOTONS</span>
+                <span class="param-value">0.76</span>
+                <span class="param-name">Brightness</span>
+                <span class="bar"><span style="width: 76%"></span></span>
+              </article>
+              <article class="param-card">
+                <span class="param-label">CHROMA</span>
+                <span class="param-value">0.64</span>
+                <span class="param-name">Colour Energy</span>
+                <span class="bar"><span style="width: 64%"></span></span>
+              </article>
+              <article class="param-card">
+                <span class="param-label">MOOD</span>
+                <span class="param-value">0.58</span>
+                <span class="param-name">Musical Bias</span>
+                <span class="bar"><span style="width: 58%"></span></span>
+              </article>
+            </div>
+
+            <div class="overview-grid" aria-label="Surface overview">
+              <article class="overview-card selected">
+                <div class="ov-header">
+                  <div class="ov-title" style="color: var(--primary)"><span class="ov-dot"></span>PRIMARY EDGE</div>
+                  <div class="ov-range">CONFIG</div>
+                </div>
+                <div class="ov-line"><span>MODE</span><strong>018 Tempo</strong></div>
+                <div class="ov-line"><span>PAL</span><strong>009 Cyan Violet</strong></div>
+                <div class="ov-line"><span>ENERGY</span><strong>PH 0.76 CH 0.64</strong></div>
+                <div class="ov-meta"><span>persisted</span><span>main strip</span></div>
+              </article>
+
+              <article class="overview-card">
+                <div class="ov-header">
+                  <div class="ov-title" style="color: var(--secondary)"><span class="ov-dot"></span>SECONDARY EDGE</div>
+                  <div class="ov-range">RUNTIME</div>
+                </div>
+                <div class="ov-line"><span>MODE</span><strong>Mirror Assist</strong></div>
+                <div class="ov-line"><span>PAL</span><strong>Follow Primary</strong></div>
+                <div class="ov-line"><span>ENERGY</span><strong>PH 0.52 CH 0.48</strong></div>
+                <div class="ov-meta"><span>enabled</span><span>channel B</span></div>
+              </article>
+
+              <article class="overview-card">
+                <div class="ov-header">
+                  <div class="ov-title" style="color: var(--director)"><span class="ov-dot"></span>SMART DIRECTOR</div>
+                  <div class="ov-range">ASSIST</div>
+                </div>
+                <div class="ov-line"><span>SCENE</span><strong>assist</strong></div>
+                <div class="ov-line"><span>TEMPO</span><strong>127 BPM 0.72</strong></div>
+                <div class="ov-line"><span>OWNER</span><strong>manual clear</strong></div>
+                <div class="ov-meta"><span>edge mixer ready</span><span>no auto switch</span></div>
+              </article>
+            </div>
+
+            <div class="footer">
+              <span>SELECTED: PRIMARY EDGE</span>
+              <span>QUEUE EMPTY</span>
+              <span>SAVE DELAYED</span>
+              <span>AUDIO SEMANTIC LIVE</span>
+            </div>
+          </section>
+
+          <section id="mix" class="screen" aria-label="Show Mix screen">
+            <div class="header">
+              <div class="back">&lt; BACK</div>
+              <h2 class="screen-title">SHOW MIX</h2>
+              <div class="header-right">
+                <div class="status-card live"><span class="dot"></span> AUDIO</div>
+                <div class="status-card">127 BPM</div>
+                <div class="status-card">LOCK 0.72</div>
+              </div>
+            </div>
+
+            <div class="mode-row">
+              <button class="surface-button primary">SHOW</button>
+              <button class="surface-button secondary">PRESETS</button>
+              <button class="surface-button director">SAFE ACTIONS</button>
+            </div>
+
+            <div class="mix-layout">
+              <article class="hero-current">
+                <h2 class="big-mode">Waveform Tempo</h2>
+                <p class="big-sub">Current SB mode, palette, audio confidence and performer-safe actions in one stage view.</p>
+                <div class="lgp-field" style="position: relative; left: 0; top: 0; width: 100%; height: 160px;">
+                  <div class="plate-glow"></div>
+                  <div class="edge-line top"></div>
+                  <div class="edge-line bottom"></div>
+                  <div class="pulse-marker" style="width: 170px; height: 170px;"></div>
+                  <div class="centre-marker" style="left: calc(50% - 2px); height: 160px;"></div>
+                </div>
+                <div class="preset-strip">
+                  <div class="preset"><strong>A1</strong><span>Tempo Bloom</span></div>
+                  <div class="preset"><strong>A2</strong><span>Dense Forge</span></div>
+                  <div class="preset"><strong>A3</strong><span>Chromagram</span></div>
+                  <div class="preset"><strong>A4</strong><span>Pulse Gate</span></div>
+                </div>
+              </article>
+
+              <div class="control-block">
+                <div class="action-tile"><b>LIGHT ENERGY</b><strong>76%</strong><span class="bar"><span style="width:76%; background:var(--brand)"></span></span></div>
+                <div class="action-tile"><b>COLOUR</b><strong>64%</strong><span class="bar"><span style="width:64%; background:var(--primary)"></span></span></div>
+                <div class="action-tile"><b>MOTION</b><strong>58%</strong><span class="bar"><span style="width:58%; background:var(--secondary)"></span></span></div>
+                <div class="action-tile"><b>SMART</b><strong>ASSIST</strong><span class="bar"><span style="width:52%; background:var(--director)"></span></span></div>
+              </div>
+
+              <div class="action-row">
+                <div class="action-tile"><b>MODE</b><strong>NEXT</strong></div>
+                <div class="action-tile"><b>SECONDARY</b><strong>ON</strong></div>
+                <div class="action-tile"><b>BLACKOUT</b><strong>HOLD</strong></div>
+                <div class="action-tile"><b>SAVE</b><strong>DELAY</strong></div>
+              </div>
+            </div>
+
+            <div class="footer">
+              <span>PERFORMANCE PARAMETERS ONLY</span>
+              <span>NO CALIBRATION WITHOUT CONFIRM</span>
+              <span>MANUAL OWNER ACTIVE</span>
+            </div>
+          </section>
+
+          <section id="health" class="screen" aria-label="Smart and Health screen">
+            <div class="header">
+              <div class="back">&lt; BACK</div>
+              <h2 class="screen-title">SMART + HEALTH</h2>
+              <div class="header-right">
+                <div class="status-card live"><span class="dot"></span> AP ONLY</div>
+                <div class="status-card">192.168.4.1</div>
+                <div class="status-card">USB ID OK</div>
+              </div>
+            </div>
+
+            <div class="mode-row">
+              <button class="surface-button primary">SMART</button>
+              <button class="surface-button secondary">AUDIO</button>
+              <button class="surface-button director">SYSTEM</button>
+            </div>
+
+            <div class="health-layout">
+              <article class="health-card">
+                <h3>WS LINK</h3>
+                <strong style="color: var(--success)">LIVE</strong>
+                <p>AP-only controller session</p>
+              </article>
+              <article class="health-card">
+                <h3>RENDER</h3>
+                <strong>100 FPS</strong>
+                <p>frame budget visible</p>
+              </article>
+              <article class="health-card">
+                <h3>AUDIO</h3>
+                <strong>0.72</strong>
+                <p>tempo confidence</p>
+              </article>
+              <article class="health-card">
+                <h3>QUEUE</h3>
+                <strong>00</strong>
+                <p>bounded command queue</p>
+              </article>
+              <article class="health-card wide">
+                <h3>SMART SCENE</h3>
+                <strong style="color: var(--director)">ASSIST</strong>
+                <p>Director can suggest and shape, but manual control remains visible.</p>
+              </article>
+              <article class="health-card wide">
+                <h3>SAFETY STATE</h3>
+                <strong style="color: var(--warning)">CONFIRM GATED</strong>
+                <p>Calibration, persistence and reset require confirmation.</p>
+              </article>
+              <div class="confirm-zone">
+                <article class="health-card wide">
+                  <h3>CONFIRMATION OVERLAY PATTERN</h3>
+                  <strong>ONE MODAL MAX</strong>
+                  <p>Lift the PipDeck confirmation idea for actions that can alter calibration, persistence or show output.</p>
+                </article>
+                <article class="health-card">
+                  <h3>NOISE CAL</h3>
+                  <strong style="color: var(--warning)">ARM</strong>
+                </article>
+                <article class="health-card">
+                  <h3>SAVE NOW</h3>
+                  <strong>OK</strong>
+                </article>
+                <article class="health-card">
+                  <h3>RESET</h3>
+                  <strong style="color: var(--error)">LOCKED</strong>
+                </article>
+              </div>
+            </div>
+
+            <div class="footer">
+              <span>STATUS FIRST</span>
+              <span>DESTRUCTIVE ACTIONS GATED</span>
+              <span>HOST PROOF STILL REQUIRED</span>
+            </div>
+          </section>
+
+          <section id="protocol" class="screen" aria-label="Protocol architecture screen">
+            <div class="header">
+              <div class="back">&lt; BACK</div>
+              <h2 class="screen-title">CONTROL ARCHITECTURE</h2>
+              <div class="header-right">
+                <div class="status-card">MVP</div>
+                <div class="status-card live"><span class="dot"></span> AP ONLY</div>
+                <div class="status-card">NO STA</div>
+              </div>
+            </div>
+
+            <div class="mode-row">
+              <button class="surface-button primary">TAB5 UI</button>
+              <button class="surface-button secondary">SB FACADE</button>
+              <button class="surface-button director">CONTROL PLANE</button>
+            </div>
+
+            <div class="protocol-layout">
+              <div class="flow-panel">
+                <h3>Minimal Wireless Control Path</h3>
+                <div class="flow-stack">
+                  <div class="flow-node"><b>01</b><span>Touch Surface</span><small>LVGL screen, no encoders required</small></div>
+                  <div class="flow-node"><b>02</b><span>WS Message</span><small>coalesced, typed command intent</small></div>
+                  <div class="flow-node"><b>03</b><span>AP-only K1</span><small>Tab5 joins K1 AP, never reverses K1 into STA</small></div>
+                  <div class="flow-node"><b>04</b><span>Fixed Queue</span><small>bounded records, latest slider value wins</small></div>
+                  <div class="flow-node"><b>05</b><span>Control Plane</span><small>adjacent to serial command handling</small></div>
+                  <div class="flow-node"><b>06</b><span>Existing Setters</span><small>CONFIG, secondary globals, Smart scene</small></div>
+                  <div class="flow-node"><b>07</b><span>RenderParams</span><small>read-only snapshot into effects</small></div>
+                  <div class="flow-node"><b>08</b><span>K1 Light Field</span><small>centre-origin visual output</small></div>
+                </div>
+              </div>
+
+              <div class="contract-panel">
+                <h3>Prototype Contract</h3>
+                <div class="contract-list">
+                  <div class="contract-row"><b>Keep</b><span>Zone Composer visual grammar, centre-origin hero, semantic colour, selected-surface controls.</span></div>
+                  <div class="contract-row"><b>Avoid</b><span>Firmware-v3 zone backend unless SB actually gains zones or layers.</span></div>
+                  <div class="contract-row"><b>Bridge</b><span>Translate touch actions into SB command intents first; do not write from network callbacks into render.</span></div>
+                  <div class="contract-row"><b>Persist</b><span>Reuse delayed save and existing safety gates rather than creating a parallel storage path.</span></div>
+                  <div class="contract-row"><b>Validate</b><span>HTML is visual proposal only. On-device Tab5 screenshot and SB runtime proof remain separate gates.</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="footer">
+              <span>AP STREAMS OPTIONAL</span>
+              <span>REST OPTIONAL</span>
+              <span>WS FIRST</span>
+              <span>NO HEAP IN RENDER IMPACT</span>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <aside>
+        <nav class="nav-panel" aria-label="Prototype pages">
+          <p class="nav-title">Prototype pages</p>
+          <button class="nav-button active" data-screen="composer">01 Light Composer</button>
+          <button class="nav-button" data-screen="mix">02 Show Mix</button>
+          <button class="nav-button" data-screen="health">03 Smart + Health</button>
+          <button class="nav-button" data-screen="protocol">04 Architecture</button>
+        </nav>
+
+        <section class="notes" aria-label="Design notes">
+          <h2>Visual Hierarchy</h2>
+          <ul>
+            <li>Level 1: title, AP/WS status, centre-origin light field.</li>
+            <li>Level 2: selected surface and five active parameters.</li>
+            <li>Level 3: overview cards, safety state and queue state.</li>
+            <li>Colour is semantic: cyan primary, green secondary, purple director, gold centre/status.</li>
+          </ul>
+        </section>
+
+        <section class="notes" aria-label="Font notes">
+          <h2>Type System</h2>
+          <ul>
+            <li>Bebas Neue: page titles and selected-surface headings.</li>
+            <li>Rajdhani: labels, action names and compact UI copy.</li>
+            <li>JetBrains Mono: numeric values, IDs, BPM, queue and IP readouts.</li>
+          </ul>
+        </section>
+
+        <section class="notes" aria-label="Implementation notes">
+          <h2>SB Boundary</h2>
+          <ul>
+            <li>Everything shown is a proposed touch surface.</li>
+            <li>Controls map to existing SB concepts where possible: mode, palette, photons, chroma, mood, secondary, Smart scene.</li>
+            <li>Wireless backend remains API-needed in SB firmware.</li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+
+    <section class="source-block" aria-label="Source-backed rationale">
+      <h2>Source-Backed Design Rationale</h2>
+      <div class="source-grid">
+        <article class="source-card">
+          <strong>Zone Composer Source</strong>
+          The donor screen is `ZoneComposerUI v2`: hero LED strip, 5-column param grid, 3-column overview and centre-origin marker.
+          <br><code>tab5-encoder/src/ui/ZoneComposerUI.cpp:4-8</code>
+        </article>
+        <article class="source-card">
+          <strong>Prior UI Research</strong>
+          The Tab5 design history explicitly says structure must be rendered visually, not evaluated as ASCII or prose.
+          <br><code>tab5-encoder/docs/DESIGN_DECISION_PROCESS.md:35-41</code>
+        </article>
+        <article class="source-card">
+          <strong>SB Control Boundary</strong>
+          Current SB has serial/manual control seams and no active AP/WS backend; this prototype therefore separates UI grammar from backend implementation.
+          <br><code>docs/forensics/sb-tab5-control/agents/sb-control-map.md</code>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function fitDevice() {
+      const shell = document.querySelector(".device-shell");
+      const tab5 = document.querySelector(".tab5");
+      if (!shell || !tab5) return;
+      const availableWidth = Math.max(0, shell.clientWidth - 20);
+      const availableHeight = Math.max(0, shell.clientHeight - 20);
+      const scale = Math.min(availableWidth / 1280, availableHeight / 720, 1);
+      tab5.style.setProperty("--device-scale", scale.toFixed(4));
+    }
+
+    const screenButtons = document.querySelectorAll("[data-screen]");
+    const screens = document.querySelectorAll(".screen");
+
+    function activateScreen(target) {
+      const hasScreen = Array.from(screens).some((screen) => screen.id === target);
+      const safeTarget = hasScreen ? target : "composer";
+      screenButtons.forEach((item) => {
+        item.classList.toggle("active", item.getAttribute("data-screen") === safeTarget);
+      });
+      screens.forEach((screen) => screen.classList.toggle("active", screen.id === safeTarget));
+    }
+
+    screenButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        activateScreen(button.getAttribute("data-screen"));
+      });
+    });
+
+    const surfaceButtons = document.querySelectorAll("[data-surface]");
+    const selectedTitle = document.querySelector(".selected-title");
+    const selectedDot = document.querySelector(".selected-dot");
+    const overviewCards = document.querySelectorAll(".overview-card");
+    const paramCards = document.querySelectorAll("#composer .param-card");
+    const surfaceState = {
+      primary: {
+        label: "PRIMARY EDGE PARAMETERS",
+        colour: "var(--primary)",
+        className: "primary",
+        card: 0
+      },
+      secondary: {
+        label: "SECONDARY EDGE PARAMETERS",
+        colour: "var(--secondary)",
+        className: "secondary",
+        card: 1
+      },
+      director: {
+        label: "SMART DIRECTOR PARAMETERS",
+        colour: "var(--director)",
+        className: "director",
+        card: 2
+      }
+    };
+
+    surfaceButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const key = button.getAttribute("data-surface");
+        const state = surfaceState[key];
+        surfaceButtons.forEach((item) => {
+          item.classList.remove("primary", "secondary", "director");
+        });
+        button.classList.add(state.className);
+        selectedTitle.textContent = state.label;
+        selectedTitle.style.color = state.colour;
+        selectedDot.style.background = state.colour;
+        selectedDot.style.boxShadow = `0 0 14px ${state.colour}`;
+        overviewCards.forEach((card, index) => {
+          card.classList.toggle("selected", index === state.card);
+          card.style.borderColor = index === state.card ? state.colour : "var(--border-subtle)";
+        });
+        paramCards.forEach((card, index) => {
+          card.classList.toggle("active", index === 0);
+          const bar = card.querySelector(".bar span");
+          if (bar) bar.style.background = state.colour;
+        });
+      });
+    });
+
+    window.addEventListener("resize", fitDevice);
+    window.addEventListener("load", fitDevice);
+    activateScreen(new URLSearchParams(window.location.search).get("screen") || "composer");
+    fitDevice();
+  </script>
+</body>
+</html>

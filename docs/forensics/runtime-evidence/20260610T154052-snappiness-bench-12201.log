@@ -1,0 +1,25 @@
+[1781077257.769] #DEVICE role=bench-reference name=bench-12201 port=/dev/tty.usbmodem12201 expected_chip_id=B489A500 env=k1_bench_reference
+[1781077257.769] >>> :version
+[1781077257.781] VERSION: 40103
+[1781077257.781] }}
+[1781077258.570] >>> :chip_id
+[1781077258.578] B489A500
+[1781077258.578] }}
+[1781077259.827] >>> :stop
+[1781077260.731] >>> :vp_stream=off
+[1781077261.637] >>> :ap_stream=off
+[1781077262.544] >>> :dump
+[1781077263.448] >>> :smart_status
+[1781077264.357] >>> :vp_status
+[1781077265.265] >>> :vp_perf=status
+[1781077266.021] >>> :ap_stream=on
+[1781077266.628] >>> :vp_stream=on
+[1781077267.234] >>> :smart_status
+[1781077272.919] >>> :smart_status
+[1781077273.628] >>> :dump
+[1781077274.333] >>> :ap_stream=off
+[1781077275.040] >>> :vp_stream=off
+[1781077276.019] >>> :ap_stream=off
+[1781077276.172] >>> :vp_stream=off
+[1781077276.326] >>> :vp_perf=stop
+[1781077276.481] >>> :stop

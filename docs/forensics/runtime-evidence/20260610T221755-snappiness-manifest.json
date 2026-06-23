@@ -1,0 +1,1082 @@
+{
+  "comparison": {
+    "frame_us_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "gdft_us_mean": {
+      "bench-12201": null,
+      "main-1401": null
+    },
+    "max_raw_last": {
+      "bench-12201": 181,
+      "main-1401": 557
+    },
+    "max_raw_mean": {
+      "bench-12201": 244.333333,
+      "main-1401": 479.027027
+    },
+    "peak_scaled_last": {
+      "bench-12201": -0.382,
+      "main-1401": 0.611
+    },
+    "peak_scaled_mean": {
+      "bench-12201": -0.286778,
+      "main-1401": 0.354027
+    },
+    "render_max_last": {
+      "bench-12201": 5122,
+      "main-1401": 1413
+    },
+    "render_us_last": {
+      "bench-12201": 2326,
+      "main-1401": 1009
+    },
+    "render_us_mean": {
+      "bench-12201": 2359.555556,
+      "main-1401": 927.5
+    },
+    "sample_rate": {
+      "bench-12201": 12800,
+      "main-1401": 12800
+    },
+    "samples_per_chunk": {
+      "bench-12201": 96,
+      "main-1401": 96
+    },
+    "smart_applied_mode_last": {
+      "bench-12201": 18,
+      "main-1401": 3
+    },
+    "smart_beat_confidence_mean": {
+      "bench-12201": 0.0,
+      "main-1401": 0.0
+    },
+    "timing_parity": true
+  },
+  "configure": true,
+  "created_at": "2026-06-10T22:18:30.286654",
+  "devices": [
+    {
+      "chip_id": "F887A500",
+      "env": "k1_hardware",
+      "expected_chip_id": "F887A500",
+      "log": "docs/forensics/runtime-evidence/20260610T221755-snappiness-main-1401.log",
+      "name": "main-1401",
+      "port": "/dev/tty.usbmodem1401",
+      "role": "main-k1",
+      "summary": {
+        "ap": {
+          "DC": {
+            "count": 37,
+            "last": -4994,
+            "max": -4994,
+            "mean": -4994,
+            "min": -4994
+          },
+          "SSL": {
+            "count": 37,
+            "last": 259,
+            "max": 259,
+            "mean": 259,
+            "min": 259
+          },
+          "bass": {
+            "count": 37,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "beat": {
+            "count": 37,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "bpm": {
+            "count": 37,
+            "last": 108.0,
+            "max": 108.0,
+            "mean": 93.972973,
+            "min": 0.0
+          },
+          "bstr": {
+            "count": 37,
+            "last": 0.0,
+            "max": 0.99,
+            "mean": 0.259459,
+            "min": 0.0
+          },
+          "cal_valid": {
+            "count": 37,
+            "last": 1,
+            "max": 1,
+            "mean": 1,
+            "min": 1
+          },
+          "conf": {
+            "count": 37,
+            "last": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "min": 0.0
+          },
+          "follower": {
+            "count": 37,
+            "last": 479,
+            "max": 7170,
+            "mean": 875.864865,
+            "min": 259
+          },
+          "lock": {
+            "count": 37,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "max_raw": {
+            "count": 37,
+            "last": 557,
+            "max": 2021,
+            "mean": 479.027027,
+            "min": 139
+          },
+          "onset": {
+            "count": 37,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "ostr": {
+            "count": 37,
+            "last": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "min": 0.0
+          },
+          "peak_scaled": {
+            "count": 37,
+            "last": 0.611,
+            "max": 1.0,
+            "mean": 0.354027,
+            "min": 0.016
+          },
+          "phase": {
+            "count": 37,
+            "last": 0.07,
+            "max": 0.94,
+            "mean": 0.451622,
+            "min": 0.0
+          },
+          "silence": {
+            "count": 37,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "silent_scale": {
+            "count": 37,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          }
+        },
+        "counts": {
+          "ap": 37,
+          "vp": 4,
+          "vpf": 0
+        },
+        "dump": {
+          "CAL_PROFILE_LOADED": 0,
+          "CAL_SOURCE": "config",
+          "CAL_VALID": 1,
+          "CONFIG.AUTO_COLOR_SHIFT": 0,
+          "CONFIG.BASE_COAT": 1,
+          "CONFIG.BASE_COAT_INTENSITY": 0.1,
+          "CONFIG.BOOT_ANIMATION": 1,
+          "CONFIG.BULB_OPACITY": 0.0,
+          "CONFIG.CHROMA": 0.61,
+          "CONFIG.CHROMAGRAM_RANGE": 60,
+          "CONFIG.DC_OFFSET": -4994,
+          "CONFIG.INCANDESCENT_FILTER": 0.0,
+          "CONFIG.INCANDESCENT_MODE": 0,
+          "CONFIG.LED_COLOR_ORDER": 66,
+          "CONFIG.LED_COUNT": 160,
+          "CONFIG.LED_TYPE": 0,
+          "CONFIG.LIGHTSHOW_MODE": 22,
+          "CONFIG.MAX_CURRENT_MA": 1500,
+          "CONFIG.MIRROR_ENABLED": 1,
+          "CONFIG.MOOD": 0.64,
+          "CONFIG.NOTE_OFFSET": 12,
+          "CONFIG.PHOTONS": 0.96,
+          "CONFIG.PRISM_COUNT": 1.0,
+          "CONFIG.REVERSE_ORDER": 0,
+          "CONFIG.SAMPLES_PER_CHUNK": 96,
+          "CONFIG.SAMPLE_RATE": 12800,
+          "CONFIG.SATURATION": 1.0,
+          "CONFIG.SENSITIVITY": 2.4,
+          "CONFIG.SQUARE_ITER": 1.0,
+          "CONFIG.STANDBY_DIMMING": 0,
+          "CONFIG.SWEET_SPOT_MAX_LEVEL": 30000,
+          "CONFIG.SWEET_SPOT_MIN_LEVEL": 259,
+          "CONFIG.TEMPORAL_DITHERING": 1
+        },
+        "identity": {
+          "chip_id": "F887A500",
+          "version": "40103"
+        },
+        "smart": {
+          "SMART_APPLIED_MODE": 3,
+          "SMART_ASSIST": "off",
+          "SMART_AUDIO_ENERGY": 0.0331,
+          "SMART_AUDIO_NOVELTY": 0.0523,
+          "SMART_AUTO_COLOUR_SHIFT": 0,
+          "SMART_BASS_ONSET": 0,
+          "SMART_BEAT_CONFIDENCE": 0.0,
+          "SMART_CONFIDENCE_FLOOR": 0.08,
+          "SMART_COOLDOWN_MS": 20000,
+          "SMART_DIRECTOR_AUTONOMY": "off",
+          "SMART_EVENT_AGE_MS": 4294967295,
+          "SMART_EVENT_ID": 0,
+          "SMART_HOOKS": "off",
+          "SMART_INTENT_CONFIDENCE": 0.0,
+          "SMART_INTENT_MODE": 3,
+          "SMART_INTENT_WANTS_SWITCH": 0,
+          "SMART_LAST_REASON": 0,
+          "SMART_LAST_REQUESTED_MODE": 3,
+          "SMART_MANUAL_OWNER_ACTIVE": 0,
+          "SMART_MAX_SWITCHES": 2,
+          "SMART_MIN_DWELL_MS": 8000,
+          "SMART_ONSET": 0,
+          "SMART_PALETTE_INDEX": 0,
+          "SMART_PALETTE_OVERLAY": 0,
+          "SMART_SCALAR_CHROMA": 1.0,
+          "SMART_SCALAR_MOOD": 1.0,
+          "SMART_SCALAR_PHOTONS": 1.0,
+          "SMART_SCALAR_SATURATION": 1.0,
+          "SMART_STATE": 0,
+          "SMART_SWITCHES_IN_WINDOW": 0,
+          "SMART_SWITCHING": "off",
+          "SMART_SWITCH_WINDOW_MS": 60000
+        },
+        "smart_metrics": {
+          "SMART_APPLIED_MODE": {
+            "count": 7,
+            "last": 3,
+            "max": 22,
+            "mean": 11.142857,
+            "min": 3
+          },
+          "SMART_AUDIO_ENERGY": {
+            "count": 7,
+            "last": 0.0331,
+            "max": 0.0393,
+            "mean": 0.024386,
+            "min": 0.0
+          },
+          "SMART_AUDIO_NOVELTY": {
+            "count": 7,
+            "last": 0.0523,
+            "max": 0.0523,
+            "mean": 0.022414,
+            "min": 0.0
+          },
+          "SMART_AUTO_COLOUR_SHIFT": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_BASS_ONSET": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_BEAT_CONFIDENCE": {
+            "count": 7,
+            "last": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "min": 0.0
+          },
+          "SMART_CONFIDENCE_FLOOR": {
+            "count": 7,
+            "last": 0.08,
+            "max": 0.08,
+            "mean": 0.08,
+            "min": 0.08
+          },
+          "SMART_COOLDOWN_MS": {
+            "count": 7,
+            "last": 20000,
+            "max": 20000,
+            "mean": 20000,
+            "min": 20000
+          },
+          "SMART_EVENT_AGE_MS": {
+            "count": 7,
+            "last": 4294967295,
+            "max": 4294967295,
+            "mean": 1840701890,
+            "min": 0
+          },
+          "SMART_EVENT_ID": {
+            "count": 7,
+            "last": 0,
+            "max": 4,
+            "mean": 1.714286,
+            "min": 0
+          },
+          "SMART_INTENT_CONFIDENCE": {
+            "count": 7,
+            "last": 0.0,
+            "max": 0.031,
+            "mean": 0.008429,
+            "min": 0.0
+          },
+          "SMART_INTENT_MODE": {
+            "count": 7,
+            "last": 3,
+            "max": 3,
+            "mean": 3,
+            "min": 3
+          },
+          "SMART_INTENT_WANTS_SWITCH": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_LAST_REASON": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_LAST_REQUESTED_MODE": {
+            "count": 7,
+            "last": 3,
+            "max": 22,
+            "mean": 11.142857,
+            "min": 3
+          },
+          "SMART_MANUAL_OWNER_ACTIVE": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_MAX_SWITCHES": {
+            "count": 7,
+            "last": 2,
+            "max": 2,
+            "mean": 2,
+            "min": 2
+          },
+          "SMART_MIN_DWELL_MS": {
+            "count": 7,
+            "last": 8000,
+            "max": 8000,
+            "mean": 8000,
+            "min": 8000
+          },
+          "SMART_ONSET": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_PALETTE_INDEX": {
+            "count": 7,
+            "last": 0,
+            "max": 11,
+            "mean": 3.142857,
+            "min": 0
+          },
+          "SMART_PALETTE_OVERLAY": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_SCALAR_CHROMA": {
+            "count": 7,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 0.977143,
+            "min": 0.92
+          },
+          "SMART_SCALAR_MOOD": {
+            "count": 7,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          },
+          "SMART_SCALAR_PHOTONS": {
+            "count": 7,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 0.96,
+            "min": 0.86
+          },
+          "SMART_SCALAR_SATURATION": {
+            "count": 7,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 0.971429,
+            "min": 0.9
+          },
+          "SMART_STATE": {
+            "count": 7,
+            "last": 0,
+            "max": 1,
+            "mean": 0.285714,
+            "min": 0
+          },
+          "SMART_SWITCHES_IN_WINDOW": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_SWITCH_WINDOW_MS": {
+            "count": 7,
+            "last": 60000,
+            "max": 60000,
+            "mean": 60000,
+            "min": 60000
+          }
+        },
+        "vp": {
+          "agc_gain": {
+            "count": 4,
+            "last": 9.9997,
+            "max": 9.9997,
+            "mean": 9.9997,
+            "min": 9.9997
+          },
+          "bloom_alpha": {
+            "count": 4,
+            "last": 0.99,
+            "max": 0.99,
+            "mean": 0.99,
+            "min": 0.99
+          },
+          "bloom_shift": {
+            "count": 4,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          },
+          "chroma_final_max": {
+            "count": 4,
+            "last": 0.1316,
+            "max": 0.1316,
+            "mean": 0.0329,
+            "min": 0.0
+          },
+          "chroma_final_mean": {
+            "count": 4,
+            "last": 0.011,
+            "max": 0.011,
+            "mean": 0.00275,
+            "min": 0.0
+          },
+          "chroma_flatness": {
+            "count": 4,
+            "last": 0.2403,
+            "max": 0.2403,
+            "mean": 0.112625,
+            "min": 0.0562
+          },
+          "chroma_norm_max": {
+            "count": 4,
+            "last": 0.2642,
+            "max": 0.2642,
+            "mean": 0.125725,
+            "min": 0.0661
+          },
+          "chroma_norm_mean": {
+            "count": 4,
+            "last": 0.0239,
+            "max": 0.0239,
+            "mean": 0.01315,
+            "min": 0.0082
+          },
+          "chroma_seq": {
+            "count": 4,
+            "last": 11984,
+            "max": 11984,
+            "mean": 11681.75,
+            "min": 11379
+          },
+          "fix": {
+            "count": 4,
+            "last": 111011,
+            "max": 111011,
+            "mean": 111011,
+            "min": 111011
+          },
+          "render_avg": {
+            "count": 4,
+            "last": 1033,
+            "max": 1033,
+            "mean": 990,
+            "min": 961
+          },
+          "render_max": {
+            "count": 4,
+            "last": 1413,
+            "max": 1413,
+            "mean": 1371.75,
+            "min": 1319
+          },
+          "render_us": {
+            "count": 4,
+            "last": 1009,
+            "max": 1009,
+            "mean": 927.5,
+            "min": 865
+          },
+          "wave_idle": {
+            "count": 4,
+            "last": 0.985,
+            "max": 0.985,
+            "mean": 0.985,
+            "min": 0.985
+          },
+          "wave_peak_floor": {
+            "count": 4,
+            "last": 0.08,
+            "max": 0.08,
+            "mean": 0.08,
+            "min": 0.08
+          },
+          "wave_raw_margin": {
+            "count": 4,
+            "last": 1.1,
+            "max": 1.1,
+            "mean": 1.1,
+            "min": 1.1
+          },
+          "wave_shift": {
+            "count": 4,
+            "last": 120.0,
+            "max": 120.0,
+            "mean": 120.0,
+            "min": 120.0
+          },
+          "wave_vu_floor": {
+            "count": 4,
+            "last": 0.02,
+            "max": 0.02,
+            "mean": 0.02,
+            "min": 0.02
+          }
+        },
+        "vpf": {}
+      },
+      "version": "40103"
+    },
+    {
+      "chip_id": "B489A500",
+      "env": "k1_bench_reference",
+      "expected_chip_id": "B489A500",
+      "log": "docs/forensics/runtime-evidence/20260610T221755-snappiness-bench-12201.log",
+      "name": "bench-12201",
+      "port": "/dev/tty.usbmodem12201",
+      "role": "bench-reference",
+      "summary": {
+        "ap": {
+          "DC": {
+            "count": 18,
+            "last": -999,
+            "max": -999,
+            "mean": -999,
+            "min": -999
+          },
+          "SSL": {
+            "count": 18,
+            "last": 355,
+            "max": 355,
+            "mean": 355,
+            "min": 355
+          },
+          "cal_valid": {
+            "count": 18,
+            "last": 1,
+            "max": 1,
+            "mean": 1,
+            "min": 1
+          },
+          "follower": {
+            "count": 18,
+            "last": 355,
+            "max": 355,
+            "mean": 355,
+            "min": 355
+          },
+          "max_raw": {
+            "count": 18,
+            "last": 181,
+            "max": 361,
+            "mean": 244.333333,
+            "min": 126
+          },
+          "peak_scaled": {
+            "count": 18,
+            "last": -0.382,
+            "max": -0.08,
+            "mean": -0.286778,
+            "min": -0.504
+          },
+          "silence": {
+            "count": 18,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "silent_scale": {
+            "count": 18,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          }
+        },
+        "counts": {
+          "ap": 18,
+          "vp": 18,
+          "vpf": 0
+        },
+        "dump": {
+          "CAL_PROFILE_LOADED": 1,
+          "CAL_SOURCE": "measured",
+          "CAL_VALID": 1,
+          "CONFIG.AUTO_COLOR_SHIFT": 1,
+          "CONFIG.BASE_COAT": 0,
+          "CONFIG.BASE_COAT_INTENSITY": 0.0,
+          "CONFIG.BOOT_ANIMATION": 1,
+          "CONFIG.BULB_OPACITY": 0.0,
+          "CONFIG.CHROMA": 0.1,
+          "CONFIG.CHROMAGRAM_RANGE": 60,
+          "CONFIG.DC_OFFSET": -999,
+          "CONFIG.INCANDESCENT_FILTER": 0.0,
+          "CONFIG.INCANDESCENT_MODE": 0,
+          "CONFIG.LED_COLOR_ORDER": 66,
+          "CONFIG.LED_COUNT": 160,
+          "CONFIG.LED_TYPE": 0,
+          "CONFIG.LIGHTSHOW_MODE": 18,
+          "CONFIG.MAX_CURRENT_MA": 1500,
+          "CONFIG.MIRROR_ENABLED": 1,
+          "CONFIG.MOOD": 0.55,
+          "CONFIG.NOTE_OFFSET": 12,
+          "CONFIG.PHOTONS": 1.0,
+          "CONFIG.PRISM_COUNT": 1.0,
+          "CONFIG.REVERSE_ORDER": 0,
+          "CONFIG.SAMPLES_PER_CHUNK": 96,
+          "CONFIG.SAMPLE_RATE": 12800,
+          "CONFIG.SATURATION": 1.0,
+          "CONFIG.SENSITIVITY": 2.4,
+          "CONFIG.SQUARE_ITER": 0.75,
+          "CONFIG.STANDBY_DIMMING": 0,
+          "CONFIG.SWEET_SPOT_MAX_LEVEL": 30000,
+          "CONFIG.SWEET_SPOT_MIN_LEVEL": 355,
+          "CONFIG.TEMPORAL_DITHERING": 1
+        },
+        "identity": {
+          "chip_id": "B489A500",
+          "version": "40103"
+        },
+        "smart": {
+          "SMART_APPLIED_MODE": 18,
+          "SMART_ASSIST": "on",
+          "SMART_AUDIO_ENERGY": 0.0442,
+          "SMART_AUDIO_NOVELTY": 0.0096,
+          "SMART_AUTO_COLOUR_SHIFT": 0,
+          "SMART_BASS_ONSET": 0,
+          "SMART_BEAT_CONFIDENCE": 0.0,
+          "SMART_CONFIDENCE_FLOOR": 0.08,
+          "SMART_COOLDOWN_MS": 20000,
+          "SMART_DIRECTOR_AUTONOMY": "off",
+          "SMART_EVENT_AGE_MS": 18713,
+          "SMART_EVENT_ID": 3042,
+          "SMART_HOOKS": "on",
+          "SMART_INTENT_CONFIDENCE": 0.031,
+          "SMART_INTENT_MODE": 3,
+          "SMART_INTENT_WANTS_SWITCH": 0,
+          "SMART_LAST_REASON": 0,
+          "SMART_LAST_REQUESTED_MODE": 18,
+          "SMART_MANUAL_OWNER_ACTIVE": 0,
+          "SMART_MAX_SWITCHES": 2,
+          "SMART_MIN_DWELL_MS": 8000,
+          "SMART_ONSET": 0,
+          "SMART_PALETTE_INDEX": 11,
+          "SMART_PALETTE_OVERLAY": 0,
+          "SMART_SCALAR_CHROMA": 0.92,
+          "SMART_SCALAR_MOOD": 1.0,
+          "SMART_SCALAR_PHOTONS": 0.86,
+          "SMART_SCALAR_SATURATION": 0.9,
+          "SMART_STATE": 1,
+          "SMART_SWITCHES_IN_WINDOW": 0,
+          "SMART_SWITCHING": "on",
+          "SMART_SWITCH_WINDOW_MS": 60000
+        },
+        "smart_metrics": {
+          "SMART_APPLIED_MODE": {
+            "count": 7,
+            "last": 18,
+            "max": 18,
+            "mean": 18,
+            "min": 18
+          },
+          "SMART_AUDIO_ENERGY": {
+            "count": 7,
+            "last": 0.0442,
+            "max": 0.048,
+            "mean": 0.039329,
+            "min": 0.0042
+          },
+          "SMART_AUDIO_NOVELTY": {
+            "count": 7,
+            "last": 0.0096,
+            "max": 0.0352,
+            "mean": 0.021014,
+            "min": 0.0096
+          },
+          "SMART_AUTO_COLOUR_SHIFT": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_BASS_ONSET": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_BEAT_CONFIDENCE": {
+            "count": 7,
+            "last": 0.0,
+            "max": 0.0,
+            "mean": 0.0,
+            "min": 0.0
+          },
+          "SMART_CONFIDENCE_FLOOR": {
+            "count": 7,
+            "last": 0.08,
+            "max": 0.08,
+            "mean": 0.08,
+            "min": 0.08
+          },
+          "SMART_COOLDOWN_MS": {
+            "count": 7,
+            "last": 20000,
+            "max": 20000,
+            "mean": 20000,
+            "min": 20000
+          },
+          "SMART_EVENT_AGE_MS": {
+            "count": 7,
+            "last": 18713,
+            "max": 18713,
+            "mean": 9189,
+            "min": 1013
+          },
+          "SMART_EVENT_ID": {
+            "count": 7,
+            "last": 3042,
+            "max": 3042,
+            "mean": 3041.857143,
+            "min": 3041
+          },
+          "SMART_INTENT_CONFIDENCE": {
+            "count": 7,
+            "last": 0.031,
+            "max": 0.035,
+            "mean": 0.028,
+            "min": 0.0
+          },
+          "SMART_INTENT_MODE": {
+            "count": 7,
+            "last": 3,
+            "max": 3,
+            "mean": 3,
+            "min": 3
+          },
+          "SMART_INTENT_WANTS_SWITCH": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_LAST_REASON": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_LAST_REQUESTED_MODE": {
+            "count": 7,
+            "last": 18,
+            "max": 18,
+            "mean": 18,
+            "min": 18
+          },
+          "SMART_MANUAL_OWNER_ACTIVE": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_MAX_SWITCHES": {
+            "count": 7,
+            "last": 2,
+            "max": 2,
+            "mean": 2,
+            "min": 2
+          },
+          "SMART_MIN_DWELL_MS": {
+            "count": 7,
+            "last": 8000,
+            "max": 8000,
+            "mean": 8000,
+            "min": 8000
+          },
+          "SMART_ONSET": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_PALETTE_INDEX": {
+            "count": 7,
+            "last": 11,
+            "max": 11,
+            "mean": 9.428571,
+            "min": 0
+          },
+          "SMART_PALETTE_OVERLAY": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_SCALAR_CHROMA": {
+            "count": 7,
+            "last": 0.92,
+            "max": 1.0,
+            "mean": 0.931429,
+            "min": 0.92
+          },
+          "SMART_SCALAR_MOOD": {
+            "count": 7,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          },
+          "SMART_SCALAR_PHOTONS": {
+            "count": 7,
+            "last": 0.86,
+            "max": 1.0,
+            "mean": 0.88,
+            "min": 0.86
+          },
+          "SMART_SCALAR_SATURATION": {
+            "count": 7,
+            "last": 0.9,
+            "max": 1.0,
+            "mean": 0.914286,
+            "min": 0.9
+          },
+          "SMART_STATE": {
+            "count": 7,
+            "last": 1,
+            "max": 1,
+            "mean": 0.857143,
+            "min": 0
+          },
+          "SMART_SWITCHES_IN_WINDOW": {
+            "count": 7,
+            "last": 0,
+            "max": 0,
+            "mean": 0,
+            "min": 0
+          },
+          "SMART_SWITCH_WINDOW_MS": {
+            "count": 7,
+            "last": 60000,
+            "max": 60000,
+            "mean": 60000,
+            "min": 60000
+          }
+        },
+        "vp": {
+          "agc_gain": {
+            "count": 18,
+            "last": 9.9997,
+            "max": 9.9997,
+            "mean": 9.9997,
+            "min": 9.9997
+          },
+          "bloom_alpha": {
+            "count": 18,
+            "last": 1.0,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0
+          },
+          "bloom_shift": {
+            "count": 18,
+            "last": 1.25,
+            "max": 1.25,
+            "mean": 1.25,
+            "min": 1.25
+          },
+          "chroma_final_max": {
+            "count": 18,
+            "last": 0.9032,
+            "max": 0.9378,
+            "mean": 0.857217,
+            "min": 0.5005
+          },
+          "chroma_final_mean": {
+            "count": 18,
+            "last": 0.1556,
+            "max": 0.1559,
+            "mean": 0.142417,
+            "min": 0.0829
+          },
+          "chroma_flatness": {
+            "count": 18,
+            "last": 0.8163,
+            "max": 0.8628,
+            "mean": 0.787689,
+            "min": 0.4973
+          },
+          "chroma_norm_max": {
+            "count": 18,
+            "last": 1.0032,
+            "max": 1.0378,
+            "mean": 0.957217,
+            "min": 0.6005
+          },
+          "chroma_norm_mean": {
+            "count": 18,
+            "last": 0.1869,
+            "max": 0.1953,
+            "mean": 0.169528,
+            "min": 0.1032
+          },
+          "chroma_seq": {
+            "count": 18,
+            "last": 618967,
+            "max": 618967,
+            "mean": 617514.5,
+            "min": 616065
+          },
+          "fix": {
+            "count": 18,
+            "last": 111011,
+            "max": 111011,
+            "mean": 111011,
+            "min": 111011
+          },
+          "render_avg": {
+            "count": 18,
+            "last": 2185,
+            "max": 2382,
+            "mean": 2298.333333,
+            "min": 2185
+          },
+          "render_max": {
+            "count": 18,
+            "last": 5122,
+            "max": 5122,
+            "mean": 5122,
+            "min": 5122
+          },
+          "render_us": {
+            "count": 18,
+            "last": 2326,
+            "max": 2481,
+            "mean": 2359.555556,
+            "min": 2220
+          },
+          "wave_idle": {
+            "count": 18,
+            "last": 0.985,
+            "max": 0.985,
+            "mean": 0.985,
+            "min": 0.985
+          },
+          "wave_peak_floor": {
+            "count": 18,
+            "last": 0.08,
+            "max": 0.08,
+            "mean": 0.08,
+            "min": 0.08
+          },
+          "wave_raw_margin": {
+            "count": 18,
+            "last": 1.1,
+            "max": 1.1,
+            "mean": 1.1,
+            "min": 1.1
+          },
+          "wave_shift": {
+            "count": 18,
+            "last": 150.0,
+            "max": 150.0,
+            "mean": 150.0,
+            "min": 150.0
+          },
+          "wave_vu_floor": {
+            "count": 18,
+            "last": 0.02,
+            "max": 0.02,
+            "mean": 0.02,
+            "min": 0.02
+          }
+        },
+        "vpf": {}
+      },
+      "version": "40103"
+    }
+  ],
+  "duration_s": 12.0,
+  "failure": null,
+  "mode": 22,
+  "notes": "No calibration, erase, upload, flash, reset, restore, or factory commands. Default configure path sends :set_mode, which persists through the firmware delayed-save path.",
+  "repo": "/Users/spectrasynq/SensoryBridge-main 9",
+  "smart_scene": "l1",
+  "status_period_s": 3.0,
+  "vp_perf_requested": true
+}

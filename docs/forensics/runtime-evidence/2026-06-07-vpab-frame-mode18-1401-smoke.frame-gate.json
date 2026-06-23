@@ -1,0 +1,654 @@
+{
+  "counts": {
+    "assembled_records": 64,
+    "chunks": 256,
+    "failures": 4,
+    "issues": 0,
+    "records": 64
+  },
+  "coverage": {
+    "channels": [
+      "primary",
+      "secondary"
+    ],
+    "kinds": [
+      "vpab_bytes",
+      "vpab_metrics"
+    ],
+    "modes": [
+      18
+    ],
+    "records": [
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 180,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 1
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 180,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 2
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 180,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 3
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 180,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 4
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 360,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 5
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 360,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 6
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 360,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 7
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 360,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 8
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 540,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 9
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 540,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 10
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 540,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 11
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 540,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 12
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 720,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 13
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 720,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 14
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 720,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 15
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 720,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 16
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 900,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 17
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 900,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 18
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 900,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 19
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 900,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 20
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1080,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 21
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1080,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 22
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1080,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 23
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1080,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 24
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1260,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 25
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1260,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 26
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1260,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 27
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1260,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 28
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1440,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 29
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1440,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 30
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1440,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 31
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1440,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 32
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1620,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 33
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1620,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 34
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1620,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 35
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1620,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 36
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1800,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 37
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1800,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 38
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1800,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 39
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1800,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 40
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1980,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 41
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 1980,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 42
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1980,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 43
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 1980,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 44
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2160,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 45
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2160,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 46
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2160,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 47
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2160,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 48
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2340,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 49
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2340,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 50
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2340,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 51
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2340,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 52
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2520,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 53
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2520,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 54
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2520,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 55
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2520,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 56
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2700,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 57
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2700,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 58
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2700,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 59
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2700,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 60
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2880,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 61
+      },
+      {
+        "channel": "primary",
+        "channel_id": 0,
+        "frame": 2880,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 62
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2880,
+        "kind": "vpab_metrics",
+        "kind_id": 1,
+        "mode": 18,
+        "seq": 63
+      },
+      {
+        "channel": "secondary",
+        "channel_id": 1,
+        "frame": 2880,
+        "kind": "vpab_bytes",
+        "kind_id": 2,
+        "mode": 18,
+        "seq": 64
+      }
+    ]
+  },
+  "failures": [
+    {
+      "message": "diagnostic transport counter must be zero",
+      "metric": "dropped",
+      "observed": 24,
+      "source": "begin",
+      "threshold": "== 0"
+    },
+    {
+      "message": "diagnostic transport counter must be zero",
+      "metric": "overflowed",
+      "observed": 1,
+      "source": "begin",
+      "threshold": "== 0"
+    },
+    {
+      "message": "diagnostic transport counter must be zero",
+      "metric": "dropped",
+      "observed": 24,
+      "source": "end",
+      "threshold": "== 0"
+    },
+    {
+      "message": "diagnostic transport counter must be zero",
+      "metric": "overflowed",
+      "observed": 1,
+      "source": "end",
+      "threshold": "== 0"
+    }
+  ],
+  "issues": [],
+  "passed": false,
+  "result": "FAIL",
+  "schema": "vpab_frame_gate.v1",
+  "stream": {
+    "begin": {
+      "captured": 64,
+      "chunk_bytes": 96,
+      "corrupt": 0,
+      "dropped": 24,
+      "overflowed": 1,
+      "payload_max": 512,
+      "records": 64,
+      "ver": 1
+    },
+    "end": {
+      "chunks": 256,
+      "corrupt": 0,
+      "dropped": 24,
+      "overflowed": 1,
+      "records": 64,
+      "ver": 1
+    }
+  }
+}
