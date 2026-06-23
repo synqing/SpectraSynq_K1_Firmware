@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Harness self-test — the Gate Fα proof (Phase F / L1), multi-oracle.
+"""Harness self-test — the Gate Fα proof (Phase F / L1), multi-oracle & generic.
 
 Mutation testing OF THE HARNESS ITSELF. For every registered oracle, each
 behaviour-changing edit in its MUTATIONS list (planted in a *copy* of the
-firmware) MUST make the oracle output diverge from the frozen golden. A mutation
-that slips through means the oracle is blind to a real regression — NOT
-fail-proof — and the self-test fails.
+firmware) MUST make the oracle output diverge from a freshly-captured baseline.
+A mutation that slips through means the oracle is blind to a real regression —
+NOT fail-proof — and the self-test fails.
 
-This is the objective evidence that autonomous behaviour-preserving lanes can be
-trusted to ride these oracles: they provably reject injected regressions.
-
-Each oracle module is self-describing — it exports NAME, MODULE_CPPS, DEFINES,
-DRIVER, capture(), and MUTATIONS. Registering a new tap is one line below.
+Generic by design: it depends only on each oracle exposing NAME, capture(), and
+MUTATIONS. The mutated re-capture is driven either via capture(firmware_root=...)
+or, for oracles whose capture() uses a module-level FIRMWARE global, by
+temporarily repointing that global at the mutated copy. This tolerates the
+interface variations across independently-authored oracles.
 
 Run:  python harness_selftest.py
 """
@@ -27,13 +27,22 @@ from pathlib import Path
 HARNESS = Path(__file__).resolve().parent
 sys.path.insert(0, str(HARNESS))
 
-from oracle_hostcompile import host_compile_run, FIRMWARE, ROOT  # noqa: E402
+from oracle_hostcompile import FIRMWARE, ROOT  # noqa: E402
 
 GOLDEN_DIR = ROOT / "tests" / "golden"
 
-# The registry — one entry per tap. Extended as oracles land + pass Gate Fα.
+# The registry — one entry per tap. Single source of truth (the golden gate
+# imports this list too).
 ORACLE_MODULES = [
     "oracle_onset_beat",
+    "oracle_tempo",
+    "oracle_chord",
+    "oracle_smart_director",
+    "oracle_render",
+    # oracle_semantic_state — built; re-verify pending (import-time MODULE_CPPS
+    #   binding bypasses the central mutation redirect). Re-enable once fixed.
+    # oracle_spectrum_novelty — built; re-verify pending (mutations target the
+    #   driver string, not firmware files). Re-enable once fixed.
 ]
 
 
@@ -44,16 +53,13 @@ def _load(module_name):
     return mod
 
 
-def _capture(mod, firmware_root):
-    rc, out, err = host_compile_run(
-        mod.MODULE_CPPS, mod.DRIVER, defines=mod.DEFINES, firmware_root=firmware_root)
-    if rc != 0:
-        raise RuntimeError(f"[{mod.NAME}] oracle compile/run failed (rc={rc}):\n{err}")
-    return out
+def _norm(text):
+    return "\n".join(line for line in text.splitlines() if line.strip())
 
 
 def _mutated_capture(mod, pattern, replacement):
-    """Apply a mutation to whichever source file in a firmware COPY matches it."""
+    """Apply a mutation to whichever source file in a firmware COPY matches it,
+    then re-run the oracle against that copy. Returns None if the anchor is absent."""
     with tempfile.TemporaryDirectory() as td:
         dst = Path(td) / "SPECTRASYNQ_K1_FIRMWARE"
         shutil.copytree(FIRMWARE, dst)
@@ -66,8 +72,23 @@ def _mutated_capture(mod, pattern, replacement):
                     target = f
                     break
         if target is None:
-            raise RuntimeError(f"[{mod.NAME}] mutation anchor not found anywhere: {pattern}")
-        return _capture(mod, dst)
+            return None
+        try:
+            return mod.capture(firmware_root=dst)
+        except TypeError:
+            # Oracle uses a module-level FIRMWARE global and/or import-time-bound
+            # absolute MODULE_CPPS paths. Repoint both at the mutated copy.
+            saved_fw = getattr(mod, "FIRMWARE", None)
+            saved_cpps = getattr(mod, "MODULE_CPPS", None)
+            mod.FIRMWARE = dst
+            if saved_cpps and saved_fw is not None:
+                mod.MODULE_CPPS = [str(p).replace(str(saved_fw), str(dst)) for p in saved_cpps]
+            try:
+                return mod.capture()
+            finally:
+                mod.FIRMWARE = saved_fw
+                if saved_cpps is not None:
+                    mod.MODULE_CPPS = saved_cpps
 
 
 def run_selftest():
@@ -75,15 +96,22 @@ def run_selftest():
     results = []
     for module_name in ORACLE_MODULES:
         mod = _load(module_name)
-        golden = (GOLDEN_DIR / f"{mod.NAME}.golden.jsonl").read_text(encoding="utf-8")
-        results.append((f"[{mod.NAME}] baseline (unmutated copy) reproduces golden",
-                        _capture(mod, FIRMWARE) == golden))
-        if not getattr(mod, "MUTATIONS", None):
-            results.append((f"[{mod.NAME}] declares >=1 proven mutation", False))
+        name = getattr(mod, "NAME", module_name)
+        try:
+            b1 = mod.capture()
+            b2 = mod.capture()
+        except Exception as exc:  # noqa: BLE001
+            results.append((f"[{name}] capture() runs ({type(exc).__name__}: {str(exc)[:120]})", False))
             continue
-        for pattern, replacement, desc in mod.MUTATIONS:
-            diverged = _mutated_capture(mod, pattern, replacement) != golden
-            results.append((f"[{mod.NAME}] regression CAUGHT: {desc}", diverged))
+        results.append((f"[{name}] capture() is deterministic", _norm(b1) == _norm(b2)))
+        muts = getattr(mod, "MUTATIONS", [])
+        if not muts:
+            results.append((f"[{name}] declares >=1 mutation", False))
+            continue
+        for pattern, replacement, desc in muts:
+            mutated = _mutated_capture(mod, pattern, replacement)
+            caught = (mutated is not None) and (_norm(mutated) != _norm(b1))
+            results.append((f"[{name}] regression CAUGHT: {desc}", caught))
     return results
 
 
@@ -93,7 +121,7 @@ def main():
         print(f"[{'PASS' if passed else 'FAIL'}] {label}")
         ok = ok and passed
     print("\nGATE_F-alpha:", "PROVEN — every oracle rejects its injected regressions" if ok
-          else "FAILED — an oracle is BLIND to a regression, do not trust it")
+          else "FAILED — an oracle is BLIND or broken, do not trust it")
     return 0 if ok else 1
 
 

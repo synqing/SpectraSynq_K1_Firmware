@@ -104,8 +104,8 @@ int main() {
 """
 
 
-def capture() -> str:
-    rc, out, err = host_compile_run(MODULE_CPPS, DRIVER, defines=DEFINES)
+def capture(firmware_root=None) -> str:
+    rc, out, err = host_compile_run(MODULE_CPPS, DRIVER, defines=DEFINES, firmware_root=firmware_root)
     if rc != 0:
         raise RuntimeError(f"oracle '{NAME}' failed (rc={rc}):\n{err}")
     return out
