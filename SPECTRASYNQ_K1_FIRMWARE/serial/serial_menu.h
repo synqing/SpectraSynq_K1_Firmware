@@ -3035,72 +3035,14 @@ void parse_command(char* command_buf) {
     }
 #endif
 
-    else if (strcmp(command_type, "vp_agc_soft") == 0 || strcmp(command_type, "vp_fix1") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_AGC_SOFT_KNEE);
-    }
-
-    else if (strcmp(command_type, "vp_chroma_gate") == 0 || strcmp(command_type, "vp_fix2") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_CHROMAGRAM_SPARSENESS);
-    }
-
-    else if (strcmp(command_type, "vp_prism_off") == 0 || strcmp(command_type, "vp_fix3") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_PRISM_DEFAULT_OFF);
-    }
-
-    else if (strcmp(command_type, "vp_bloom_decay") == 0 || strcmp(command_type, "vp_fix4") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_BLOOM_DECAY);
-    }
-
-    else if (strcmp(command_type, "vp_hsv_source_sat") == 0 || strcmp(command_type, "vp_fix5") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_HSV_SOURCE_SAT);
-    }
-
-    else if (strcmp(command_type, "vp_secondary_clean") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_FIX_SECONDARY_CLEAN);
-    }
-
-    else if (strcmp(command_type, "vp_bloom_alpha") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_BLOOM_ALPHA, 0.80f, 1.00f);
-    }
-
-    else if (strcmp(command_type, "vp_bloom_shift") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_BLOOM_SHIFT_SCALE, 0.25f, 2.00f);
-    }
-
-    else if (strcmp(command_type, "vp_bloom_force_sat") == 0) {
-      vp_set_flag_command(command_type, command_data, &VP_BLOOM_FORCE_SATURATION);
-    }
-
-    else if (strcmp(command_type, "vp_wave_idle_fade") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_IDLE_FADE, 0.50f, 0.999f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_raw_margin") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_REACTIVE_RAW_MARGIN, 1.00f, 3.00f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_peak_floor") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_REACTIVE_PEAK_FLOOR, 0.00f, 1.00f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_active_fade") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_ACTIVE_FADE_REDUCTION, 0.00f, 0.50f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_blend_gain") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_CHROMA_BLEND_GAIN, 0.00f, 4.00f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_fallback") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_FALLBACK_BRIGHTNESS, 0.00f, 1.00f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_vu_floor") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_VU_FLOOR, 0.00f, 1.00f);
-    }
-
-    else if (strcmp(command_type, "vp_wave_shift") == 0) {
-      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_SHIFT_RATE, 0.00f, 240.00f);
+    // The 17 VP-tuning handlers (vp_fix1/vp_agc_soft … vp_wave_shift) were lifted
+    // VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2, S4.2 / VP-tuning slice).
+    // Each writes a VP inline global via vp_set_flag/float_command — no save_config,
+    // no reboot. Dispatched here once: serial_cmd_dispatch_vp_tuning() returns true
+    // iff command_type named one of them (the body ran), false to fall through.
+    // Proven byte-for-byte by the Fα serial_replay golden extension.
+    else if (serial_cmd_dispatch_vp_tuning(command_type, command_data)) {
+      // handled by an extracted VP-tuning handler
     }
 
     // Toggle Debug Mode --------------------------------------
