@@ -19,8 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install C++ toolchain (host-compiled DSP oracle)
-        run: sudo apt-get update && sudo apt-get install -y clang
+      - name: Install host tools (clang = DSP oracle, ffmpeg = AV loudness fixtures)
+        run: sudo apt-get update && sudo apt-get install -y clang ffmpeg
       - name: Install Python deps
         run: pip install -r requirements-dev.txt
       - name: Golden-master behaviour gate + harness self-test (Gate Fα)
