@@ -2586,6 +2586,11 @@ void parse_command(char* command_buf) {
       }
     }
 
+// tempo_stream stays INLINE here (ENABLE_TEMPO_STREAM-only gate — a different
+// gate level than the AP block, so keeping it inline avoids straddling two
+// gates in the dispatcher). The 11 AP-frontend-debug handlers (combined gate)
+// are lifted to serial/k1_ap_capture_telemetry.{cpp,h}; bodies statement-
+// identical, gates identical, production preprocesses to nothing.
 #if ENABLE_TEMPO_STREAM
     else if (strcmp(command_type, "tempo_stream") == 0) {
       bool value = false;
@@ -2602,137 +2607,7 @@ void parse_command(char* command_buf) {
 #endif
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    else if (strcmp(command_type, "ap_frontend_debug") == 0 || strcmp(command_type, "apdbg") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value)) {
-        AP_FRONTEND_DEBUG_ENABLED = value;
-        tx_begin();
-        USBSerial.print("AP_FRONTEND_DEBUG: ");
-        USBSerial.println(vp_bool_text(AP_FRONTEND_DEBUG_ENABLED));
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_capture") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_NOV_CAPTURE_MAX_MS && ap_nov_capture_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("NOV_CAPTURE: armed ");
-        USBSerial.print(ms);
-        USBSerial.print(" ms capacity=");
-        USBSerial.println(AP_NOV_CAPTURE_CAPACITY);
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_dump") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_dump();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_clear") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_clear();
-        ap_nov_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "nov_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_nov_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_capture") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_CAD_CAPTURE_MAX_MS && ap_cad_capture_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("APCAD_CAPTURE: armed ");
-        USBSerial.print(ms);
-        USBSerial.print(" ms capacity=");
-        USBSerial.println(AP_CAD_CAPTURE_CAPACITY);
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_dump") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_dump();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_clear") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_clear();
-        ap_cad_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_capture_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_soak") == 0) {
-      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
-      if (ms > 0 && (uint32_t)ms <= AP_CAD_SOAK_MAX_MS && ap_cad_soak_arm((uint32_t)ms)) {
-        tx_begin();
-        USBSerial.print("APCAD_SOAK: armed ");
-        USBSerial.print(ms);
-        USBSerial.println(" ms compact=1");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_soak_status") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        ap_cad_soak_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "apcad_abort") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value) && value) {
-        AP_CAD_CAPTURE_ACTIVE = false;
-        AP_CAD_SOAK_ACTIVE = false;
-        tx_begin();
-        USBSerial.println("APCAD_ABORT: stopped");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
+    else if (serial_diag_ap_dispatch(command_type, command_data)) { }
 #endif
 
 #ifdef ENABLE_AP_STREAM
@@ -3251,27 +3126,6 @@ void parse_command(char* command_buf) {
       }
     }
 
-    // Set Sample Rate ----------------------------------------
-    else if (strcmp(command_type, "sample_rate") == 0) {
-      bool good = false;
-      if (strcmp(command_data, "default") == 0) {
-        good = true;
-        CONFIG.SAMPLE_RATE = CONFIG_DEFAULTS.SAMPLE_RATE;
-      } else {
-        good = true;
-        CONFIG.SAMPLE_RATE = constrain(atol(command_data), 6400, 44100);
-      }
-
-      if (good) {
-        save_config();
-        tx_begin();
-        USBSerial.print("CONFIG.SAMPLE_RATE: ");
-        USBSerial.println(CONFIG.SAMPLE_RATE);
-        tx_end();
-        reboot();
-      }
-    }
-
     // Set Mode Number ----------------------------------------
     else if (strcmp(command_type, "set_mode") == 0) {
       mode_transition_queued = true;
@@ -3371,110 +3225,20 @@ void parse_command(char* command_buf) {
       // handled by an extracted pure setter
     }
 
-    // Set Note Offset ----------------------------------------
-    else if (strcmp(command_type, "note_offset") == 0) {
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.NOTE_OFFSET = CONFIG_DEFAULTS.NOTE_OFFSET;
-      } else {
-        CONFIG.NOTE_OFFSET = constrain(atol(command_data), 0, 32);
-      }
-      save_config();
-      tx_begin();
-      USBSerial.print("CONFIG.NOTE_OFFSET: ");
-      USBSerial.println(CONFIG.NOTE_OFFSET);
-      tx_end();
-      reboot();
-    }
-
-    // Set LED Type ---------------------------------------
-    else if (strcmp(command_type, "led_type") == 0) {
-      bool good = false;
-      if (strcmp(command_data, "neopixel") == 0) {
-        CONFIG.LED_TYPE = LED_NEOPIXEL;
-        CONFIG.LED_COLOR_ORDER = GRB;
-        good = true;
-      } 
-      else if (strcmp(command_data, "neopixel_x2") == 0) {
-        CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
-        CONFIG.LED_COLOR_ORDER = GRB;
-        good = true;
-      } else if (strcmp(command_data, "dotstar") == 0) {
-        CONFIG.LED_TYPE = LED_DOTSTAR;
-        CONFIG.LED_COLOR_ORDER = BGR;
-        good = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-
-      if (good) {
-        save_config();
-        tx_begin();
-        USBSerial.print("CONFIG.LED_TYPE: ");
-        USBSerial.println(CONFIG.LED_TYPE);
-        tx_end();
-        reboot();
-      }
-    }
-
-    // Set LED Count ------------------------------------
-    else if (strcmp(command_type, "led_count") == 0) {
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.LED_COUNT = CONFIG_DEFAULTS.LED_COUNT;
-      } else {
-        CONFIG.LED_COUNT = constrain(atol(command_data), 1, 10000);
-      }
-
-      save_config();
-      tx_begin();
-      USBSerial.print("CONFIG.LED_COUNT: ");
-      USBSerial.println(CONFIG.LED_COUNT);
-      tx_end();
-      reboot();
-    }
-
-    // Set LED Color Order ----------------------------
-    else if (strcmp(command_type, "led_color_order") == 0) {
-      bool good = false;
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.LED_COLOR_ORDER = CONFIG_DEFAULTS.LED_COLOR_ORDER;
-        good = true;
-      } else if (strcmp(command_data, "GRB") == 0) {
-        CONFIG.LED_COLOR_ORDER = GRB;
-        good = true;
-      } else if (strcmp(command_data, "RGB") == 0) {
-        CONFIG.LED_COLOR_ORDER = RGB;
-        good = true;
-      } else if (strcmp(command_data, "BGR") == 0) {
-        CONFIG.LED_COLOR_ORDER = BGR;
-        good = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-
-      if (good) {
-        save_config();
-        tx_begin();
-        USBSerial.print("CONFIG.LED_COLOR_ORDER: ");
-        USBSerial.println(CONFIG.LED_COLOR_ORDER);
-        tx_end();
-        reboot();
-      }
-    }
-
-    // Set Samples Per Chunk ---------------------------
-    else if (strcmp(command_type, "samples_per_chunk") == 0) {
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.SAMPLES_PER_CHUNK = CONFIG_DEFAULTS.SAMPLES_PER_CHUNK;
-      } else {
-        CONFIG.SAMPLES_PER_CHUNK = constrain(atol(command_data), 0, SAMPLE_HISTORY_LENGTH);
-      }
-
-      save_config();
-      tx_begin();
-      USBSerial.print("CONFIG.SAMPLES_PER_CHUNK: ");
-      USBSerial.println(CONFIG.SAMPLES_PER_CHUNK);
-      tx_end();
-      reboot();
+    // The 7 CLEAN reboot-bearing CONFIG setters (parse -> CONFIG write ->
+    // save_config() [IMMEDIATE] -> echo -> reboot(); no conditional/subsystem
+    // coupling) were lifted VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2,
+    // S4.1 / Unit H second slice): sample_rate, note_offset, led_type, led_count,
+    // led_color_order, samples_per_chunk, boot_animation. Dispatched here once:
+    // serial_cmd_dispatch_reboot_setter() returns true iff command_type named one
+    // of them (the body ran, including its reboot()), false to fall through to the
+    // remaining ladder branches below. Branch order within Stage B is immaterial
+    // (each tests a unique command_type string), so hoisting the 7 into one call
+    // preserves behaviour — proven byte-for-byte by the S3.1 serial_replay golden.
+    // set_chroma_profile + bass_mode (conditional reboot via apply_chroma_profile,
+    // uncompilable on host) and set_mode (async) stay in this ladder, below.
+    else if (serial_cmd_dispatch_reboot_setter(command_type, command_data)) {
+      // handled by an extracted reboot-bearing setter
     }
 
     // Set runtime post-DC audio response gain ----------------
@@ -3532,31 +3296,9 @@ void parse_command(char* command_buf) {
     }
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
-    // Toggle Boot Animation --------------------------
-    else if (strcmp(command_type, "boot_animation") == 0) {
-      bool good = false;
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.BOOT_ANIMATION = CONFIG_DEFAULTS.BOOT_ANIMATION;
-        good = true;
-      } else if (strcmp(command_data, "true") == 0) {
-        CONFIG.BOOT_ANIMATION = true;
-        good = true;
-      } else if (strcmp(command_data, "false") == 0) {
-        CONFIG.BOOT_ANIMATION = false;
-        good = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-
-      if (good) {
-        save_config();
-        tx_begin();
-        USBSerial.print("CONFIG.BOOT_ANIMATION: ");
-        USBSerial.println(CONFIG.BOOT_ANIMATION);
-        tx_end();
-        reboot();
-      }
-    }
+    // boot_animation (reboot-bearing CONFIG setter) was lifted into
+    // serial/serial_cmd_handlers.cpp (S4.1) and is dispatched above via
+    // serial_cmd_dispatch_reboot_setter().
 
     // Set Chroma Profile -----------------
     // Clean front-end for the NOTE_OFFSET + CHROMAGRAM_RANGE pair (Stage 2 items 18-20).

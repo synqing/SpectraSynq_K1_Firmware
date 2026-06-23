@@ -28,6 +28,13 @@
 extern void save_config();
 extern void save_config_delayed();
 
+// reboot() is the device restart entry point (defined in the driver / .ino TU;
+// declared extern at serial_menu.h:47). The 7 reboot-bearing setters (S4.1) end
+// with reboot() after persisting + echoing — forward-declare it here so the moved
+// bodies link against that single definition (host-stubbed in the serial_replay
+// oracle, which records the fire instead of restarting).
+extern void reboot();
+
 // serial_print_palette_line() is an external-linkage free function defined in
 // serial_menu.h:962 (palette name echo). The palette_index setter calls it; forward
 // declare so this TU links against that single definition.
@@ -484,6 +491,179 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
 
     else {
       return false;  // not a pure setter — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_reboot_setter — the 7 CLEAN reboot-bearing CONFIG setters,
+// lifted verbatim from parse_command()'s else-if ladder (S4.1). Same `if (false) {}`
+// opener + per-branch `else if (strcmp(...) == 0)` structure as the pure dispatcher,
+// so each body is statement-identical to serial_menu.h@HEAD. Each ends with reboot()
+// after save_config() (IMMEDIATE) + echo. Returns true iff a branch matched; false
+// routes parse_command back to its remaining ladder + bad_command. Gated by the S3.1
+// serial_replay golden (reboot:true + save_config:true on all 7) — it must reproduce
+// byte-for-byte after this move.
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_data) {
+    if (false) {}
+
+    // Set Sample Rate ----------------------------------------
+    else if (strcmp(command_type, "sample_rate") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "default") == 0) {
+        good = true;
+        CONFIG.SAMPLE_RATE = CONFIG_DEFAULTS.SAMPLE_RATE;
+      } else {
+        good = true;
+        CONFIG.SAMPLE_RATE = constrain(atol(command_data), 6400, 44100);
+      }
+
+      if (good) {
+        save_config();
+        tx_begin();
+        USBSerial.print("CONFIG.SAMPLE_RATE: ");
+        USBSerial.println(CONFIG.SAMPLE_RATE);
+        tx_end();
+        reboot();
+      }
+    }
+
+    // Set Note Offset ----------------------------------------
+    else if (strcmp(command_type, "note_offset") == 0) {
+      if (strcmp(command_data, "default") == 0) {
+        CONFIG.NOTE_OFFSET = CONFIG_DEFAULTS.NOTE_OFFSET;
+      } else {
+        CONFIG.NOTE_OFFSET = constrain(atol(command_data), 0, 32);
+      }
+      save_config();
+      tx_begin();
+      USBSerial.print("CONFIG.NOTE_OFFSET: ");
+      USBSerial.println(CONFIG.NOTE_OFFSET);
+      tx_end();
+      reboot();
+    }
+
+    // Set LED Type ---------------------------------------
+    else if (strcmp(command_type, "led_type") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "neopixel") == 0) {
+        CONFIG.LED_TYPE = LED_NEOPIXEL;
+        CONFIG.LED_COLOR_ORDER = GRB;
+        good = true;
+      }
+      else if (strcmp(command_data, "neopixel_x2") == 0) {
+        CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
+        CONFIG.LED_COLOR_ORDER = GRB;
+        good = true;
+      } else if (strcmp(command_data, "dotstar") == 0) {
+        CONFIG.LED_TYPE = LED_DOTSTAR;
+        CONFIG.LED_COLOR_ORDER = BGR;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        save_config();
+        tx_begin();
+        USBSerial.print("CONFIG.LED_TYPE: ");
+        USBSerial.println(CONFIG.LED_TYPE);
+        tx_end();
+        reboot();
+      }
+    }
+
+    // Set LED Count ------------------------------------
+    else if (strcmp(command_type, "led_count") == 0) {
+      if (strcmp(command_data, "default") == 0) {
+        CONFIG.LED_COUNT = CONFIG_DEFAULTS.LED_COUNT;
+      } else {
+        CONFIG.LED_COUNT = constrain(atol(command_data), 1, 10000);
+      }
+
+      save_config();
+      tx_begin();
+      USBSerial.print("CONFIG.LED_COUNT: ");
+      USBSerial.println(CONFIG.LED_COUNT);
+      tx_end();
+      reboot();
+    }
+
+    // Set LED Color Order ----------------------------
+    else if (strcmp(command_type, "led_color_order") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "default") == 0) {
+        CONFIG.LED_COLOR_ORDER = CONFIG_DEFAULTS.LED_COLOR_ORDER;
+        good = true;
+      } else if (strcmp(command_data, "GRB") == 0) {
+        CONFIG.LED_COLOR_ORDER = GRB;
+        good = true;
+      } else if (strcmp(command_data, "RGB") == 0) {
+        CONFIG.LED_COLOR_ORDER = RGB;
+        good = true;
+      } else if (strcmp(command_data, "BGR") == 0) {
+        CONFIG.LED_COLOR_ORDER = BGR;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        save_config();
+        tx_begin();
+        USBSerial.print("CONFIG.LED_COLOR_ORDER: ");
+        USBSerial.println(CONFIG.LED_COLOR_ORDER);
+        tx_end();
+        reboot();
+      }
+    }
+
+    // Set Samples Per Chunk ---------------------------
+    else if (strcmp(command_type, "samples_per_chunk") == 0) {
+      if (strcmp(command_data, "default") == 0) {
+        CONFIG.SAMPLES_PER_CHUNK = CONFIG_DEFAULTS.SAMPLES_PER_CHUNK;
+      } else {
+        CONFIG.SAMPLES_PER_CHUNK = constrain(atol(command_data), 0, SAMPLE_HISTORY_LENGTH);
+      }
+
+      save_config();
+      tx_begin();
+      USBSerial.print("CONFIG.SAMPLES_PER_CHUNK: ");
+      USBSerial.println(CONFIG.SAMPLES_PER_CHUNK);
+      tx_end();
+      reboot();
+    }
+
+    // Toggle Boot Animation --------------------------
+    else if (strcmp(command_type, "boot_animation") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "default") == 0) {
+        CONFIG.BOOT_ANIMATION = CONFIG_DEFAULTS.BOOT_ANIMATION;
+        good = true;
+      } else if (strcmp(command_data, "true") == 0) {
+        CONFIG.BOOT_ANIMATION = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        CONFIG.BOOT_ANIMATION = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        save_config();
+        tx_begin();
+        USBSerial.print("CONFIG.BOOT_ANIMATION: ");
+        USBSerial.println(CONFIG.BOOT_ANIMATION);
+        tx_end();
+        reboot();
+      }
+    }
+
+    else {
+      return false;  // not a reboot setter — let parse_command's ladder continue
     }
 
     return true;

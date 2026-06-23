@@ -213,6 +213,15 @@ bool ap_cad_rate_within_2pct(float measured_hz, float declared_hz);
 void ap_cad_capture_print_health();
 void ap_cad_capture_dump();
 
+// ---- Command dispatcher (bodies in k1_ap_capture_telemetry.cpp) -------------
+// Handles the tempo_stream / ap_frontend_debug / nov_* / apcad_* else-if
+// branches lifted from parse_command()'s Stage-B ladder. Returns true iff
+// command_type matched one of the gated handlers (and the body ran); false
+// routes parse_command back to its remaining ladder + bad_command.
+// Gate mirrors the inline blocks this replaces: ENABLE_TEMPO_STREAM covers
+// tempo_stream; ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG covers the rest.
+bool serial_diag_ap_dispatch(const char* command_type, char* command_data);
+
 #endif  // ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 
 #endif  // K1_AP_CAPTURE_TELEMETRY_H
