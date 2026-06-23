@@ -93,6 +93,12 @@ Attacked S1+S1.5 with red-team + inversion; target = a GREEN-but-broken failure 
 
 **Verdict:** the lock is SOUND for its purpose (refactor-equivalence + the int64 overflow delta) and now hardened (+2 mutations). Coverage-broadening + precompute-lock are tracked follow-ups.
 
+## 9 · S2 host pre-characterization (2026-06-23 — int64 ON vs OFF via the oracle)
+Measured the int64-BOTH-ON delta vs the int32 golden on host (same 16000 tone). Sharpens the device gates:
+- **Primary effect = STABILITY, not brightness.** `mag_i32[24]` (440 Hz): OFF oscillates **38201↔0** (the resonant bin is ZEROED every other frame ⇒ a visible flicker/strobe on sustained resonant notes; the non-zero frames are themselves recurrence-corrupted). ON is **steady ~23.5k every frame.** ⇒ the int64 build should look **more stable** on sustained resonant tones — a perceptual *improvement*. Recast the eyes-on expectation: look for *stability*, not a brightness change.
+- **Broadband-dimming (the §systems AGC-absorption concern): CONFIRMED but NEGLIGIBLE** — non-resonance bins dim ~**0.02–0.1%** (AGC lowers gain to absorb the higher resonant magnitude). The "louder→dimmer" risk is essentially **not** from int64; the bundled "no-win" verdict was likely dominated by true-center.
+- **Caveat:** measured at amp 16000 where most bins saturate at 1.0 — relative dimming may be larger at **mid amplitudes** (untested, §8 trace gap). ⇒ **the AGC-scale device gate must SWEEP amplitudes**, not just loud.
+
 ---
 **Document Changelog**
 
@@ -101,3 +107,4 @@ Attacked S1+S1.5 with red-team + inversion; target = a GREEN-but-broken failure 
 | 2026-06-23 | agent:claude-code | Created — GDFT decomposition extraction contract. Synthesis of 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-int64-forensics) + first-hand GDFT.h read. Locks boundary, oracle design (16000-tone + mag_i32), int64 promote-pair / hold-true-center, S1→S3 golden-gated sequence, blast-radius proof (4 existing goldens bypass process_GDFT). |
 | 2026-06-23 | agent:claude-code | Boundary correction from surface inventory: S1 lifts `process_GDFT` **whole & verbatim** (cal FSM inert via `noise_complete=true` + stubbed I/O), NOT a source-split — the cal-completion AGC-reset (249-257) is an ordering coupling. Clean cal/transform split deferred to S3. Linked `gdft-surface-inventory.md` (17-array extern list). |
 | 2026-06-23 | agent:claude-code | Red-team backtest (§8): exact-diff confirms statement-identity; golden reproducible; **recurrence-fix visibility confirmed + locked** (+`int64_recurrence_ON` +`int64_both_ON` → 6 gdft Gate-Fα mutations); coverage census 80/80 bins. Residual limits documented (single-point trace, precompute not locked, host≠device float). Lock SOUND for S2. |
+| 2026-06-23 | agent:claude-code | S2 host pre-characterization (§9): int64 ON stabilizes the 440 Hz bin (OFF flickers 38201↔0; ON steady ~23.5k) — primary effect is STABILITY not brightness; broadband dimming CONFIRMED but negligible (~0.02–0.1%); AGC-scale device gate must sweep amplitudes (saturation masks the delta at 16000). |
