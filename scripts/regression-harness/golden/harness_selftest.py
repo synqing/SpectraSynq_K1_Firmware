@@ -40,6 +40,11 @@ ORACLE_MODULES = [
     "oracle_render",
     "oracle_gdft",   # GDFT spectrum tap (Phase A Lane 1) — int32 baseline; the
                      # int64-magnitude mutation proves the overflow is visible.
+    "oracle_serial_replay",  # serial command->output replay (Phase A Lane 2 S3.0) —
+                     # the 23-pure-CONFIG-setter behaviour-lock that gates the
+                     # serial_menu.h handler extractions (S4+). Captures the triple
+                     # (emitted text + CONFIG deltas + side-effect flags); 5 mutations
+                     # each diverge a different channel (Gate-Fα teeth, not blind).
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform

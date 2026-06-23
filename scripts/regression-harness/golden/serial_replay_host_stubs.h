@@ -1,0 +1,105 @@
+// ============================================================================
+// serial_replay_host_stubs.h — HOST-ONLY symbol stubs for oracle_serial_replay
+// ============================================================================
+// The serial-command->output replay oracle (oracle_serial_replay.py, Phase A
+// Lane 2 S3.0) drives the REAL parse_command() by #including serial_menu.h. That
+// compiles the WHOLE 188 KB header — not just parse_command — so every symbol the
+// header's OTHER functions reference (init_serial, dump_info, cmd_reset_reason,
+// the serial_cmd_table.def destructive handlers, the I2S_PORT echo) must resolve.
+//
+// NONE of those functions are in the S3.0 corpus (24->23 pure CONFIG setters); they
+// only need to COMPILE + LINK. This header supplies them as no-op / macro stubs,
+// included by the driver BEFORE globals.h/serial_menu.h. Design §2/§7 hazard #1
+// explicitly anticipates stubbing this set (FIRMWARE_VERSION/.ino coupling, the
+// pgmspace shims, the device handlers).
+//
+// Two hard rules this header obeys:
+//   1. It is included ONLY by the serial_replay driver (gated -DSB_SERIAL_REPLAY_HOST
+//      and a manual include in the driver). It never enters any other oracle's TU,
+//      so the other 6 goldens stay byte-identical.
+//   2. It must NOT clash with a real definition. serial_menu.h does NOT
+//      transitively include bridge_fs.h / system.h / presets.h / i2s_audio.h
+//      (recon §4), so these are the SOLE definitions of the device handlers.
+//      save_config / save_config_delayed / reboot / set_preset /
+//      check_current_function are defined in the DRIVER (not here) because the
+//      driver also records their fired-flags.
+//
+// NON-SHIPPING. Host-only. Absent from every PlatformIO env.
+// ============================================================================
+#ifndef SERIAL_REPLAY_HOST_STUBS_H
+#define SERIAL_REPLAY_HOST_STUBS_H
+
+#include <cstdint>
+#include <cstring>
+
+// --- FIRMWARE_VERSION (.ino #define; serial_menu.h init_serial/dump_info echo it)
+// Value mirrors the .ino's current 40103 so the banner text, IF it were ever
+// captured, matches device. init_serial/dump_info are NOT in the corpus, so this
+// only needs to make the header compile.
+#ifndef FIRMWARE_VERSION
+#define FIRMWARE_VERSION 40103
+#endif
+
+// --- AVR pgmspace shims (serial_print_palette_line: pgm_read_ptr + strcpy_P) ---
+// On host, PROGMEM is plain memory (stubs/Arduino.h #defines PROGMEM empty), so a
+// flash read is a normal dereference and strcpy_P is strcpy.
+#ifndef pgm_read_ptr
+#define pgm_read_ptr(addr) (*(const void* const*)(addr))
+#endif
+#ifndef strcpy_P
+#define strcpy_P(dst, src) strcpy((dst), (const char*)(src))
+#endif
+
+// --- ESP-IDF I2S port id (constants.h: #define I2S_PORT I2S_NUM_0; the bare
+//     `dump_info` body echoes I2S_PORT). Provide the enum value the macro names.
+#ifndef I2S_NUM_0
+#define I2S_NUM_0 0
+#endif
+
+// --- ESP reset-reason API (cmd_reset_reason switch in serial_menu.h:2098) -------
+// Not in the corpus; only needs to compile/link.
+#ifndef ESP_RST_UNKNOWN
+enum esp_reset_reason_t {
+  ESP_RST_UNKNOWN = 0, ESP_RST_POWERON, ESP_RST_EXT, ESP_RST_SW, ESP_RST_PANIC,
+  ESP_RST_INT_WDT, ESP_RST_TASK_WDT, ESP_RST_WDT, ESP_RST_DEEPSLEEP,
+  ESP_RST_BROWNOUT, ESP_RST_SDIO
+};
+static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
+#endif
+
+// --- device-handler forward symbols referenced by serial_menu.h's whole body ---
+// (init_serial / dump_info / the serial_cmd_table.def destructive handlers /
+//  set_chroma_profile). None reachable from the S3.0 corpus; no-op for link.
+// raw_dump_request is an int flag (i2s_audio.h on device); a writable global here.
+static inline void print_chip_id() {}
+static inline void factory_reset() {}
+static inline void restore_defaults() {}
+static inline void clear_noise_cal() {}
+// blocking_flash takes a CRGB16 colour (real inline def at led_utilities.h:1129,
+// which serial_menu.h does NOT pull in). cmd_identify() calls it with a CRGB16
+// literal. Stub by template to match without naming the FastLED-host colour type.
+template <typename T> static inline void blocking_flash(const T& /*colour*/) {}
+inline int raw_dump_request = 0;
+// apply_chroma_profile is CONFIG-only on device (set_chroma_profile setter, which
+// IS excluded from the corpus as reboot-bearing). Stub returns "no note-offset
+// change" so the excluded branch links without rebooting. Signature must match the
+// serial_menu.h call: bool apply_chroma_profile(<profile>). The profile arg type
+// is an enum from config_types.h (already included via globals.h before this is
+// USED); we take it by a templated param to avoid naming the enum here.
+template <typename T> static inline bool apply_chroma_profile(T /*profile*/) { return false; }
+
+// --- sb_effect_queue.* config symbols ------------------------------------------
+// parse_command's queue/dip/xfade setters (LIVE branches, NOT in the corpus) call
+// these. Rather than compile control/sb_effect_queue.cpp (which drags <FS.h> /
+// <LittleFS.h> / EffectRegistry — heavy, irrelevant to pure setters), stub the
+// handful of config entry points. Signatures mirror sb_effect_queue.h:134-140.
+static inline uint16_t sb_queue_dip_ms()                 { return 0; }
+static inline bool     sb_queue_set_dip_ms(uint32_t)     { return true; }
+static inline uint16_t sb_queue_xfade_ms()               { return 0; }
+static inline bool     sb_queue_set_xfade_ms(uint32_t)   { return true; }
+static inline uint8_t  sb_queue_commit_quantise()        { return 0; }
+static inline void     sb_queue_set_commit_quantise(uint8_t) {}
+static inline void     sb_queue_set_transition_style(uint8_t) {}
+static inline void     sb_queue_set_mode_enabled(bool)   {}
+
+#endif  // SERIAL_REPLAY_HOST_STUBS_H
