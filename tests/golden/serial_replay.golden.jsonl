@@ -44,3 +44,26 @@
 {"cmd":"base_coat=default","emitted":"sberr[[\nBad command: base_coat=default\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"unknown_cmd=1","emitted":"sberr[[\nBad command: unknown_cmd=1\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"palette_index=9999","emitted":"sberr[[\nBad command: palette_index=9999\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"sample_rate=16000","emitted":"sbr{{\nCONFIG.SAMPLE_RATE: 16000\n}}\n","config_delta":{"SAMPLE_RATE":16000.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"note_offset=6","emitted":"sbr{{\nCONFIG.NOTE_OFFSET: 6\n}}\n","config_delta":{"NOTE_OFFSET":6.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_type=neopixel","emitted":"sbr{{\nCONFIG.LED_TYPE: 0\n}}\n","config_delta":{"LED_COLOR_ORDER":66.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_type=dotstar","emitted":"sbr{{\nCONFIG.LED_TYPE: 2\n}}\n","config_delta":{"LED_TYPE":2.000000,"LED_COLOR_ORDER":136.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_count=300","emitted":"sbr{{\nCONFIG.LED_COUNT: 300\n}}\n","config_delta":{"LED_COUNT":300.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_color_order=RGB","emitted":"sbr{{\nCONFIG.LED_COLOR_ORDER: 10\n}}\n","config_delta":{"LED_COLOR_ORDER":10.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"samples_per_chunk=128","emitted":"sbr{{\nCONFIG.SAMPLES_PER_CHUNK: 128\n}}\n","config_delta":{"SAMPLES_PER_CHUNK":128.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"boot_animation=false","emitted":"sbr{{\nCONFIG.BOOT_ANIMATION: 0\n}}\n","config_delta":{},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"sample_rate=100","emitted":"sbr{{\nCONFIG.SAMPLE_RATE: 6400\n}}\n","config_delta":{"SAMPLE_RATE":6400.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"sample_rate=99999","emitted":"sbr{{\nCONFIG.SAMPLE_RATE: 44100\n}}\n","config_delta":{"SAMPLE_RATE":44100.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"sample_rate=default","emitted":"sbr{{\nCONFIG.SAMPLE_RATE: 12800\n}}\n","config_delta":{"SAMPLE_RATE":12800.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"note_offset=99","emitted":"sbr{{\nCONFIG.NOTE_OFFSET: 32\n}}\n","config_delta":{"NOTE_OFFSET":32.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"note_offset=default","emitted":"sbr{{\nCONFIG.NOTE_OFFSET: 12\n}}\n","config_delta":{"NOTE_OFFSET":12.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_count=0","emitted":"sbr{{\nCONFIG.LED_COUNT: 1\n}}\n","config_delta":{"LED_COUNT":1.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_count=default","emitted":"sbr{{\nCONFIG.LED_COUNT: 160\n}}\n","config_delta":{"LED_COUNT":160.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_color_order=default","emitted":"sbr{{\nCONFIG.LED_COLOR_ORDER: 66\n}}\n","config_delta":{"LED_COLOR_ORDER":66.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"samples_per_chunk=99999","emitted":"sbr{{\nCONFIG.SAMPLES_PER_CHUNK: 4096\n}}\n","config_delta":{"SAMPLES_PER_CHUNK":4096.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"samples_per_chunk=default","emitted":"sbr{{\nCONFIG.SAMPLES_PER_CHUNK: 96\n}}\n","config_delta":{"SAMPLES_PER_CHUNK":96.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"boot_animation=default","emitted":"sbr{{\nCONFIG.BOOT_ANIMATION: 1\n}}\n","config_delta":{"BOOT_ANIMATION":1.000000},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"boot_animation=true","emitted":"sbr{{\nCONFIG.BOOT_ANIMATION: 1\n}}\n","config_delta":{},"save_config":true,"save_config_delayed":false,"reboot":true,"bad_command":false}
+{"cmd":"led_type=foo","emitted":"sberr[[\nBad command: led_type=foo\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"led_color_order=XYZ","emitted":"sberr[[\nBad command: led_color_order=XYZ\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"boot_animation=maybe","emitted":"sberr[[\nBad command: boot_animation=maybe\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}

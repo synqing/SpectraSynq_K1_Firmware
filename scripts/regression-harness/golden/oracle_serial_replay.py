@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """Golden-master oracle for the serial command -> output replay behaviour-lock.
 
-Phase A · Lane 2 · S3.0 — the 24-pure-setter (actually 23, see below) replay lock
-that gates ALL remaining serial_menu.h handler extractions (S4+). It compiles the
-REAL `parse_command()` from SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h on the
-host, drives it with a fixed deterministic corpus of pure-CONFIG-setter commands,
-and captures a JSON-lines golden record that any refactor (S4 handler extraction)
-must reproduce byte-for-byte.
+Phase A · Lane 2 · S3.0 + S3.1 — the pure-setter + reboot-setter replay lock that
+gates ALL remaining serial_menu.h handler extractions (S4+). It compiles the REAL
+`parse_command()` from SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h on the host,
+drives it with a fixed deterministic corpus, and captures a JSON-lines golden
+record that any refactor (S4 / S4.1 handler extraction) must reproduce byte-for-byte.
+
+COVERAGE (corpus): 23 PURE CONFIG setters (S3.0) + 7 CLEAN reboot-bearing setters
+(S3.1: sample_rate, note_offset, led_type, led_count, led_color_order,
+samples_per_chunk, boot_animation). The design §4 named 9 reboot-bearing setters;
+set_chroma_profile + bass_mode are EXCLUDED (see "S3.1 EXCLUSIONS" below) — their
+reboot is CONDITIONAL on apply_chroma_profile()'s return, which lives in the
+NOT-host-compiled led_utilities.h (stubbed to a no-op), so capturing them would
+freeze WRONG behaviour. They are deferred like set_mode was in S3.0.
 
 THE CAPTURE IS A TRIPLE PER COMMAND (design §1):
   (a) emitted serial text  — every char USBSerial/Serial.print(...)'d, in order
@@ -53,6 +60,22 @@ CORPUS = 23 PURE SETTERS, NOT 24 (load-bearing deviation, see CORPUS below):
       so the parse->CONFIG->save->echo round-trip is still pure and capturable.
     - prism_count calls save_config() (IMMEDIATE), not save_config_delayed(); the
       triple's separate flags capture exactly that distinction.
+
+S3.1 EXCLUSIONS — set_chroma_profile + bass_mode (2 of the design's 9 reboot setters):
+  Both call apply_chroma_profile(profile) to mutate CONFIG.NOTE_OFFSET /
+  CHROMAGRAM_RANGE / CHROMA_PROFILE, then reboot() ONLY IF note_offset changed
+  (conditional reboot). apply_chroma_profile is an inline in visual/led_utilities.h
+  (line ~1835) which the host build does NOT compile (it drags FastLED +
+  sb_audio_snapshot.h + vpab_capture.h, and ODR-clashes the existing host stubs).
+  serial_replay_host_stubs.h therefore stubs apply_chroma_profile to a no-op that
+  returns false ("no note-offset change"). Under that stub these two setters would
+  capture an EMPTY CONFIG delta and reboot:false ALWAYS — i.e. the exact opposite of
+  their production behaviour. Locking that would freeze a BLIND, WRONG golden. They
+  are EXCLUDED here (same precedent as set_mode) and deferred to a slice that either
+  compiles the real apply_chroma_profile or mirrors it under a drift-pin. The 7 CLEAN
+  reboot setters (no subsystem coupling, unconditional reboot) ARE captured: each is
+  parse -> CONFIG write -> save_config() (IMMEDIATE) -> echo -> reboot(), and the
+  triple locks (a) echo, (b) the CONFIG delta, (c) save_config:true + reboot:true.
 
 NON-SHIPPING. Host-only. Run from the repo root or from within this directory.
 Mirrors oracle_gdft.py / oracle_render.py PUBLIC INTERFACE: NAME / capture(firmware_root=None)
@@ -203,6 +226,50 @@ CORPUS = [
     "base_coat=default",   # base_coat has NO default token -> bad_command
     "unknown_cmd=1",       # unknown command_type -> bad_command
     "palette_index=9999",  # out of [0, gGradientPaletteCount) -> bad_command
+
+    # ===================================================================
+    # S3.1 EXTENSION — the 7 CLEAN reboot-bearing setters (design §4 named 9;
+    # set_chroma_profile + bass_mode are EXCLUDED — see header docstring + report:
+    # their reboot is CONDITIONAL on apply_chroma_profile()'s return, and that
+    # function lives in led_utilities.h which the host build does NOT compile in
+    # (it is stubbed to a no-op). Capturing them here would freeze the WRONG
+    # behaviour — empty CONFIG delta + reboot:false always — exactly the blind-lock
+    # trap. They are deferred like set_mode was in S3.0.).
+    #
+    # The 7 clean setters are each parse -> CONFIG write -> save_config() (IMMEDIATE)
+    # -> echo -> reboot(). The triple captures: (a) echo text, (b) the CONFIG field
+    # delta, (c) save_config:true + reboot:true. This is the load-bearing new
+    # coverage: a botched extraction (S4.1) that drops the reboot, or mis-routes the
+    # CONFIG write, or swaps save_config for save_config_delayed, diverges the golden.
+    # ===================================================================
+    # ---- (4) valid reboot sets: one representative per clean reboot setter -----
+    "sample_rate=16000",        # CONFIG.SAMPLE_RATE write + save_config + reboot
+    "note_offset=6",            # CONFIG.NOTE_OFFSET write + save_config + reboot
+    "led_type=neopixel",        # CONFIG.LED_TYPE + LED_COLOR_ORDER(GRB) + reboot
+    "led_type=dotstar",         # CONFIG.LED_TYPE + LED_COLOR_ORDER(BGR) + reboot
+    "led_count=300",            # CONFIG.LED_COUNT write + save_config + reboot
+    "led_color_order=RGB",      # CONFIG.LED_COLOR_ORDER write + save_config + reboot
+    "samples_per_chunk=128",    # CONFIG.SAMPLES_PER_CHUNK write + save_config + reboot
+    "boot_animation=false",     # CONFIG.BOOT_ANIMATION write + save_config + reboot
+
+    # ---- (5) reboot-setter clamp / boundary + =default branches ---------------
+    "sample_rate=100",          # -> constrain low bound 6400 + reboot
+    "sample_rate=99999",        # -> constrain high bound 44100 + reboot
+    "sample_rate=default",      # reads CONFIG_DEFAULTS.SAMPLE_RATE + reboot
+    "note_offset=99",           # -> constrain high bound 32 + reboot
+    "note_offset=default",      # reads CONFIG_DEFAULTS.NOTE_OFFSET + reboot
+    "led_count=0",              # -> constrain low bound 1 + reboot
+    "led_count=default",        # reads CONFIG_DEFAULTS.LED_COUNT + reboot
+    "led_color_order=default",  # reads CONFIG_DEFAULTS.LED_COLOR_ORDER + reboot
+    "samples_per_chunk=99999",  # -> constrain high bound SAMPLE_HISTORY_LENGTH + reboot
+    "samples_per_chunk=default",# reads CONFIG_DEFAULTS.SAMPLES_PER_CHUNK + reboot
+    "boot_animation=default",   # reads CONFIG_DEFAULTS.BOOT_ANIMATION + reboot
+    "boot_animation=true",      # -> true branch + reboot
+
+    # ---- (6) reboot-setter bad_command paths (no reboot fires) ----------------
+    "led_type=foo",             # not a led-type token -> bad_command, NO reboot
+    "led_color_order=XYZ",      # not a colour-order token -> bad_command, NO reboot
+    "boot_animation=maybe",     # not a bool/default token -> bad_command, NO reboot
 ]
 
 # ---------------------------------------------------------------------------
@@ -353,6 +420,16 @@ static int snapshot(FieldSnap* out) {
   out[n++] = {"BULB_OPACITY",         (double)CONFIG.BULB_OPACITY};
   out[n++] = {"SATURATION",           (double)CONFIG.SATURATION};
   out[n++] = {"PRISM_COUNT",          (double)CONFIG.PRISM_COUNT};
+  // S3.1: the 7 clean reboot-bearing setters' CONFIG fields. Without these in the
+  // snapshot the config_delta channel would be BLIND to a mis-routed reboot-setter
+  // write (the whole point of the new coverage).
+  out[n++] = {"SAMPLE_RATE",          (double)CONFIG.SAMPLE_RATE};
+  out[n++] = {"NOTE_OFFSET",          (double)CONFIG.NOTE_OFFSET};
+  out[n++] = {"LED_TYPE",             (double)CONFIG.LED_TYPE};
+  out[n++] = {"LED_COLOR_ORDER",      (double)CONFIG.LED_COLOR_ORDER};
+  out[n++] = {"LED_COUNT",            (double)CONFIG.LED_COUNT};
+  out[n++] = {"SAMPLES_PER_CHUNK",    (double)CONFIG.SAMPLES_PER_CHUNK};
+  out[n++] = {"BOOT_ANIMATION",       (double)CONFIG.BOOT_ANIMATION};
   return n;
 }
 
@@ -392,6 +469,17 @@ int main() {
   CONFIG_DEFAULTS.SENSITIVITY   = 1.0f;
   CONFIG_DEFAULTS.SQUARE_ITER   = 1.0f;
   CONFIG_DEFAULTS.MIRROR_ENABLED = false;
+
+  // S3.1: fixed, documented defaults for the reboot-setter "=default" branches so
+  // they are reproducible cross-machine (hazard §2). Values mirror the device
+  // firmware defaults (DEFAULT_SAMPLE_RATE=12800, NOTE_OFFSET=12 per v40102,
+  // LED_COUNT_VALUE=160, GRB colour order, DEFAULT_SAMPLES_PER_CHUNK=96).
+  CONFIG_DEFAULTS.SAMPLE_RATE       = 12800;
+  CONFIG_DEFAULTS.NOTE_OFFSET       = 12;
+  CONFIG_DEFAULTS.LED_COUNT         = 160;
+  CONFIG_DEFAULTS.LED_COLOR_ORDER   = GRB;
+  CONFIG_DEFAULTS.SAMPLES_PER_CHUNK = 96;
+  CONFIG_DEFAULTS.BOOT_ANIMATION    = true;
 
   FieldSnap before[64], after[64];
 
@@ -495,6 +583,44 @@ MUTATIONS = [
         r"(else if \(strcmp\(command_type, \"chroma\"\) == 0\) \{(?:.|\n)*?)\} else \{\n\s*bad_command\(command_type, command_data\);\n\s*\}",
         r"\1} else {\n        /* bad_command removed by mutation */\n      }",
         "chroma_bad_command_path_removed (failure-path divergence)",
+    ),
+    # ===================================================================
+    # S3.1 REBOOT-SETTER MUTATIONS — each MUST diverge the golden on the NEW
+    # reboot-setter corpus, proving the extended coverage is not blind. Each
+    # targets a DIFFERENT channel of the triple on a reboot-bearing setter.
+    # ===================================================================
+    # 6. SUPPRESS the reboot on note_offset: drop its trailing reboot() call. The
+    #    echo + CONFIG delta + save_config are identical; ONLY the reboot side-effect
+    #    flag flips true->false. This is the load-bearing reboot-setter regression:
+    #    a botched extraction (S4.1) that drops the reboot leaves the device NOT
+    #    re-seeding the GDFT freq table — silent, and text/CONFIG alone miss it.
+    #    Channel (c) reboot flag. Anchored on the NOTE_OFFSET echo that uniquely
+    #    precedes ONLY this reboot (NOT cmd_reset's bare reboot() at ~2029, NOT the
+    #    other 8 setter reboots) so the mutation lands on the corpus-exercised branch.
+    (
+        r'(USBSerial\.println\(CONFIG\.NOTE_OFFSET\);\s*\n\s*tx_end\(\);\s*\n\s*)reboot\(\);',
+        r'\1/* reboot suppressed by mutation */',
+        "note_offset_reboot_suppressed (reboot side-effect-flag divergence)",
+    ),
+    # 7. MIS-ROUTE the sample_rate CONFIG write to CONFIG.LED_COUNT. "sample_rate=16000"
+    #    now writes the WRONG field — the echo still says SAMPLE_RATE but the CONFIG
+    #    delta lands on LED_COUNT (and SAMPLE_RATE no longer changes). Exactly the
+    #    field-routing regression the echo-text channel cannot see. Channel (b).
+    #    Anchored on the constrain bounds (6400, 44100) unique to sample_rate.
+    (
+        r"CONFIG\.SAMPLE_RATE = constrain\(atol\(command_data\), 6400, 44100\);",
+        r"CONFIG.LED_COUNT = constrain(atol(command_data), 6400, 44100);",
+        "sample_rate_write_misrouted_to_LED_COUNT (field-routing divergence text hides)",
+    ),
+    # 8. SWAP led_count's IMMEDIATE save_config() for save_config_delayed(). Echo +
+    #    CONFIG + reboot identical; only the save-class FLAG changes (save_config
+    #    true->false, save_config_delayed false->true). Proves the lock catches the
+    #    persist-class behaviour on a reboot setter. Channel (c). Anchored inside the
+    #    led_count branch so it does not collide with the 9 other save_config() sites.
+    (
+        r"(else if \(strcmp\(command_type, \"led_count\"\) == 0\) \{(?:.|\n)*?)save_config\(\);",
+        r"\1save_config_delayed();",
+        "led_count_save_class_swap_immediate_to_delayed (side-effect-flag divergence)",
     ),
 ]
 
