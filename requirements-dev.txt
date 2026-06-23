@@ -1,0 +1,10 @@
+# Host regression-harness dependencies (reproducible dev/CI installs).
+# The golden-master oracle itself needs only the stdlib + a C++ compiler;
+# these cover the wider pytest suite (DSP metrics, diagnostics, parsers).
+pytest>=7.4
+numpy>=1.24
+scipy>=1.10
+matplotlib>=3.7
+pillow>=10.0
+pyyaml>=6.0
+pyserial>=3.5

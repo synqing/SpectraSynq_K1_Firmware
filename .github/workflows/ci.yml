@@ -1,0 +1,49 @@
+name: CI
+
+# Phase F / L0 — machine-verifiable gate. Makes "green" reproducible off any
+# single machine (audit Critical: the host gate was previously local-only).
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  host-regression:
+    name: Host regression + golden gate + Gate Fα
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install C++ toolchain (host-compiled DSP oracle)
+        run: sudo apt-get update && sudo apt-get install -y clang
+      - name: Install Python deps
+        run: pip install -r requirements-dev.txt
+      - name: Golden-master behaviour gate + harness self-test (Gate Fα)
+        run: python -m pytest tests/test_golden_master.py tests/test_harness_selftest.py -q
+      - name: Full host regression suite
+        run: python -m pytest tests/ -q
+
+  firmware-build:
+    name: Firmware build (k1_hardware)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+      - name: Install PlatformIO
+        run: pip install platformio
+      - name: Build production firmware
+        run: pio run -e k1_hardware
