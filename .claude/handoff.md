@@ -21,6 +21,12 @@ Synthesised from 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-in
 
 Blast radius: the 4 existing host goldens drive detectors with synthetic snapshots — they never call `process_GDFT`, so S1/S2 cannot move them on host (only the new `gdft` golden moves). Reference replica (correctness target, NOT a valid oracle): old repo `scripts/regression-harness/golden/oracle_spectrum_novelty.py`.
 
+### ✅ GDFT lane S1+S1.5 DONE + red-teamed + S2-pre-characterized (5 commits: `8467d9c`→`03d74f3`)
+Extraction statement-identical; oracle golden-locked + Gate-Fα PROVEN (6 mutations incl. BOTH int64 halves); contract §8 red-team (lock SOUND, residual limits documented), §9 S2 host pre-char (int64 = STABILITY not brightness; dimming negligible; AGC-scale device gate must sweep amplitudes). **S2 owes 4 device gates** (MabuTrace margin · AGC-scale amplitude-sweep · detector-retuning · eyes-on-for-stability) — bench-bound (12201).
+
+### ⏩ LANE 2 (autonomous, ACTIVE) — serial_menu god-header decomposition
+ToC subordinate step toward the `.ino`/build-system constraint. Scope (re-verified): `serial-menu-decomposition-scope.md`. serial_menu.h = **6191 lines, SINGLE includer (`.ino:39`)** (my earlier "6 includers" red-flag was FALSE — substring match on a comment). Verification = structural+behavioral (NOT numeric golden): extend `row1_dispatch_table_test.cpp` + `test_serial_hotkeys_static.py` + a new command-replay. **`serial/` absent from `build_src_filter` (line 44, single point)** → S0 adds `+<serial/*.cpp>`. Sequence S0→S7; **S1 first cut = telemetry/AP-capture (~644-1410), production-OFF** (gated `ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG`, only in probe envs) ⇒ cannot touch production. Keystone (extract LAST) = the 2220-line config-setter ladder (3445-5664: 42 `save_config`, 5 `reboot()`).
+
 ---
 
 ## ✅ DONE this session — Phase F (the fail-proof harness)
