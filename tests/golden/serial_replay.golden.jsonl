@@ -67,3 +67,23 @@
 {"cmd":"led_type=foo","emitted":"sberr[[\nBad command: led_type=foo\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"led_color_order=XYZ","emitted":"sberr[[\nBad command: led_color_order=XYZ\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"boot_animation=maybe","emitted":"sberr[[\nBad command: boot_animation=maybe\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"vp_fix1=false","emitted":"sbr{{\nvp_fix1: off\n}}\n","config_delta":{"VP_FIX_AGC_SOFT_KNEE":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_agc_soft=true","emitted":"sbr{{\nvp_agc_soft: on\n}}\n","config_delta":{"VP_FIX_AGC_SOFT_KNEE":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_fix2=false","emitted":"sbr{{\nvp_fix2: off\n}}\n","config_delta":{"VP_FIX_CHROMAGRAM_SPARSENESS":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_fix3=false","emitted":"sbr{{\nvp_fix3: off\n}}\n","config_delta":{"VP_FIX_PRISM_DEFAULT_OFF":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_fix4=true","emitted":"sbr{{\nvp_fix4: on\n}}\n","config_delta":{"VP_FIX_BLOOM_DECAY":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_fix5=false","emitted":"sbr{{\nvp_fix5: off\n}}\n","config_delta":{"VP_FIX_HSV_SOURCE_SAT":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_secondary_clean=false","emitted":"sbr{{\nvp_secondary_clean: off\n}}\n","config_delta":{"VP_FIX_SECONDARY_CLEAN":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_bloom_force_sat=false","emitted":"sbr{{\nvp_bloom_force_sat: off\n}}\n","config_delta":{"VP_BLOOM_FORCE_SATURATION":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_bloom_alpha=0.90","emitted":"sbr{{\nvp_bloom_alpha: 0.9000\n}}\n","config_delta":{"VP_BLOOM_ALPHA":0.900000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_bloom_shift=1.5","emitted":"sbr{{\nvp_bloom_shift: 1.5000\n}}\n","config_delta":{"VP_BLOOM_SHIFT_SCALE":1.500000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_idle_fade=0.90","emitted":"sbr{{\nvp_wave_idle_fade: 0.9000\n}}\n","config_delta":{"VP_WAVEFORM_IDLE_FADE":0.900000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_raw_margin=2.0","emitted":"sbr{{\nvp_wave_raw_margin: 2.0000\n}}\n","config_delta":{"VP_WAVEFORM_REACTIVE_RAW_MARGIN":2.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_peak_floor=0.10","emitted":"sbr{{\nvp_wave_peak_floor: 0.1000\n}}\n","config_delta":{"VP_WAVEFORM_REACTIVE_PEAK_FLOOR":0.100000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_active_fade=0.10","emitted":"sbr{{\nvp_wave_active_fade: 0.1000\n}}\n","config_delta":{"VP_WAVEFORM_ACTIVE_FADE_REDUCTION":0.100000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_blend_gain=3.0","emitted":"sbr{{\nvp_wave_blend_gain: 3.0000\n}}\n","config_delta":{"VP_WAVEFORM_CHROMA_BLEND_GAIN":3.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_fallback=0.5","emitted":"sbr{{\nvp_wave_fallback: 0.5000\n}}\n","config_delta":{"VP_WAVEFORM_FALLBACK_BRIGHTNESS":0.500000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_vu_floor=0.05","emitted":"sbr{{\nvp_wave_vu_floor: 0.0500\n}}\n","config_delta":{"VP_WAVEFORM_VU_FLOOR":0.050000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_wave_shift=120","emitted":"sbr{{\nvp_wave_shift: 120.0000\n}}\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_bloom_alpha=0.79","emitted":"sbr{{\nvp_bloom_alpha: 0.8000\n}}\n","config_delta":{"VP_BLOOM_ALPHA":0.800000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"vp_bloom_alpha=1.01","emitted":"sbr{{\nvp_bloom_alpha: 1.0000\n}}\n","config_delta":{"VP_BLOOM_ALPHA":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}

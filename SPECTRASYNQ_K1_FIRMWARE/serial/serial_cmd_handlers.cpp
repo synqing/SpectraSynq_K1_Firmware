@@ -40,6 +40,13 @@ extern void reboot();
 // declare so this TU links against that single definition.
 void serial_print_palette_line(const char* label, uint8_t index);
 
+// vp_set_flag_command / vp_set_float_command are external-linkage free functions
+// defined in serial_menu.h:876/893 (the VP tuning helpers). The VP-tuning dispatcher
+// calls them; forward-declare here so this TU links against that single definition
+// (same pattern as serial_print_palette_line above).
+bool vp_set_flag_command(const char* command_type, const char* command_data, bool* flag);
+bool vp_set_float_command(const char* command_type, const char* command_data, float* value, float min_value, float max_value);
+
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_pure_setter — the 23 pure CONFIG setters, lifted verbatim
 // from parse_command()'s else-if ladder. The `if (false) {}` opener lets every
@@ -664,6 +671,93 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
 
     else {
       return false;  // not a reboot setter — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_vp_tuning — the 17 production-live VP-tuning handlers,
+// lifted VERBATIM from parse_command()'s else-if ladder (lines 3038–3104).
+// The `if (false) {}` opener keeps every real branch as a statement-identical
+// `else if (strcmp(command_type, "<name>") == 0)`. No save_config, no reboot.
+// Returns true iff a branch matched; false routes parse_command to its remaining
+// ladder + bad_command. Gated by the Fα serial_replay golden — it must reproduce
+// byte-for-byte after this move (tests/test_golden_master.py + harness_selftest.py).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "vp_agc_soft") == 0 || strcmp(command_type, "vp_fix1") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_AGC_SOFT_KNEE);
+    }
+
+    else if (strcmp(command_type, "vp_chroma_gate") == 0 || strcmp(command_type, "vp_fix2") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_CHROMAGRAM_SPARSENESS);
+    }
+
+    else if (strcmp(command_type, "vp_prism_off") == 0 || strcmp(command_type, "vp_fix3") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_PRISM_DEFAULT_OFF);
+    }
+
+    else if (strcmp(command_type, "vp_bloom_decay") == 0 || strcmp(command_type, "vp_fix4") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_BLOOM_DECAY);
+    }
+
+    else if (strcmp(command_type, "vp_hsv_source_sat") == 0 || strcmp(command_type, "vp_fix5") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_HSV_SOURCE_SAT);
+    }
+
+    else if (strcmp(command_type, "vp_secondary_clean") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_FIX_SECONDARY_CLEAN);
+    }
+
+    else if (strcmp(command_type, "vp_bloom_alpha") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_BLOOM_ALPHA, 0.80f, 1.00f);
+    }
+
+    else if (strcmp(command_type, "vp_bloom_shift") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_BLOOM_SHIFT_SCALE, 0.25f, 2.00f);
+    }
+
+    else if (strcmp(command_type, "vp_bloom_force_sat") == 0) {
+      vp_set_flag_command(command_type, command_data, &VP_BLOOM_FORCE_SATURATION);
+    }
+
+    else if (strcmp(command_type, "vp_wave_idle_fade") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_IDLE_FADE, 0.50f, 0.999f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_raw_margin") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_REACTIVE_RAW_MARGIN, 1.00f, 3.00f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_peak_floor") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_REACTIVE_PEAK_FLOOR, 0.00f, 1.00f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_active_fade") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_ACTIVE_FADE_REDUCTION, 0.00f, 0.50f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_blend_gain") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_CHROMA_BLEND_GAIN, 0.00f, 4.00f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_fallback") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_FALLBACK_BRIGHTNESS, 0.00f, 1.00f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_vu_floor") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_VU_FLOOR, 0.00f, 1.00f);
+    }
+
+    else if (strcmp(command_type, "vp_wave_shift") == 0) {
+      vp_set_float_command(command_type, command_data, &VP_WAVEFORM_SHIFT_RATE, 0.00f, 240.00f);
+    }
+
+    else {
+      return false;  // not a VP-tuning handler — let parse_command's ladder continue
     }
 
     return true;

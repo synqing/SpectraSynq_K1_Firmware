@@ -49,4 +49,14 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
 // false to let parse_command's ladder continue. Same contract as the pure dispatcher.
 bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_data);
 
+// Dispatch the 17 production-live VP-tuning handlers (vp_fix1/vp_agc_soft,
+// vp_fix2/vp_chroma_gate, vp_fix3/vp_prism_off, vp_fix4/vp_bloom_decay,
+// vp_fix5/vp_hsv_source_sat, vp_secondary_clean, vp_bloom_alpha, vp_bloom_shift,
+// vp_bloom_force_sat, vp_wave_idle_fade, vp_wave_raw_margin, vp_wave_peak_floor,
+// vp_wave_active_fade, vp_wave_blend_gain, vp_wave_fallback, vp_wave_vu_floor,
+// vp_wave_shift). Each writes a VP inline global via vp_set_flag/float_command —
+// no save_config, no reboot. Returns true iff command_type named one of them;
+// false to let parse_command's ladder continue. Gated by the Fα serial_replay golden.
+bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data);
+
 #endif // SERIAL_CMD_HANDLERS_H
