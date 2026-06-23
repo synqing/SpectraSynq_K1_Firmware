@@ -22,15 +22,24 @@ typedef void (*TaskFunction_t)(void*);
 #define tskNO_AFFINITY 0x7fffffff
 
 // --- critical sections (no-op on a single-threaded host) -------------------
+// Sentinel-guarded (SB_HOST_PORTMUX_DEFINED) so this is emitted at most once even
+// when stubs/Arduino.h also supplies the portMUX family (director/control TUs pull
+// portMUX via <Arduino.h>, not this header). Whichever header is seen first wins;
+// the other is suppressed. Symbols + no-op behaviour are identical either way.
+#ifndef SB_HOST_PORTMUX_DEFINED
+#define SB_HOST_PORTMUX_DEFINED 1
 #ifndef portMUX_TYPE
 typedef struct { int dummy; } portMUX_TYPE;
+#endif
+#ifndef portMUX_INITIALIZER_UNLOCKED
 #define portMUX_INITIALIZER_UNLOCKED { 0 }
+#endif
 static inline void portENTER_CRITICAL(portMUX_TYPE*) {}
 static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 static inline void portENTER_CRITICAL_ISR(portMUX_TYPE*) {}
 static inline void portEXIT_CRITICAL_ISR(portMUX_TYPE*) {}
 static inline void vPortCPUInitializeMutex(portMUX_TYPE*) {}
-#endif
+#endif  // SB_HOST_PORTMUX_DEFINED
 
 // --- task API (never spun up on host) --------------------------------------
 static inline BaseType_t xTaskCreatePinnedToCore(TaskFunction_t, const char*, uint32_t,

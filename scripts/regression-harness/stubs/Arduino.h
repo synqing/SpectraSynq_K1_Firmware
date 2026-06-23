@@ -24,6 +24,11 @@
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
+#ifdef SB_SERIAL_REPLAY_HOST
+// Pulled BEFORE the Arduino min/max macros below so libstdc++ <string>'s member
+// functions (compare/rfind/...) do not collide with the function-like macros.
+#include <string>
+#endif
 
 // --- Arduino scalar aliases ------------------------------------------------
 typedef uint8_t  byte;
@@ -93,6 +98,30 @@ static inline void yield() {}
 static inline int64_t esp_timer_get_time() { return (int64_t)g_sb_host_millis * 1000; }
 static inline int  xPortGetCoreID() { return 0; }
 
+// --- FreeRTOS critical-section primitives (portMUX) -> no-op on host --------
+// Director/control TUs (sb_edgemixer_lite, sb_visual_hooks, sb_mode_selection,
+// sb_smart_director, sb_effect_queue) guard their config state with portMUX
+// critical sections but include only <Arduino.h>, not freertos/task.h. Provide
+// the family here, self-guarded by SB_HOST_PORTMUX_DEFINED so it is emitted at
+// most once even though freertos/task.h declares the same names (that stub uses
+// an ineffective `#ifndef portMUX_TYPE` typedef guard). The sentinel below also
+// suppresses the freertos stub's copy. Purely additive no-ops: cannot change any
+// existing oracle's output (no previously-compiling TU references these).
+#ifndef SB_HOST_PORTMUX_DEFINED
+#define SB_HOST_PORTMUX_DEFINED 1
+#ifndef portMUX_TYPE
+typedef struct { int dummy; } portMUX_TYPE;
+#endif
+#ifndef portMUX_INITIALIZER_UNLOCKED
+#define portMUX_INITIALIZER_UNLOCKED { 0 }
+#endif
+static inline void portENTER_CRITICAL(portMUX_TYPE*) {}
+static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
+static inline void portENTER_CRITICAL_ISR(portMUX_TYPE*) {}
+static inline void portEXIT_CRITICAL_ISR(portMUX_TYPE*) {}
+static inline void vPortCPUInitializeMutex(portMUX_TYPE*) {}
+#endif  // SB_HOST_PORTMUX_DEFINED
+
 // --- random (deterministic host PRNG; seeded by the harness) ---------------
 inline uint32_t g_sb_host_rng = 0x12345678u;
 static inline long random(long howbig) {
@@ -154,9 +183,20 @@ struct EspClass {
 };
 extern EspClass ESP;
 
-// --- HardwareSerial / USB CDC printing -> swallowed ------------------------
-// led_utilities.h debug dumps print via USBSerial; on host these are no-ops so
-// the harness stdout stays clean for the NDJSON frame stream.
+// --- HardwareSerial / USB CDC printing -------------------------------------
+// led_utilities.h debug dumps print via USBSerial. By DEFAULT (every oracle
+// except serial_replay) these are no-ops so the harness stdout stays clean for
+// the NDJSON frame stream — that path is byte-identical to its long-standing form.
+//
+// Under -DSB_SERIAL_REPLAY_HOST (oracle_serial_replay ONLY) the SAME object
+// becomes a RECORDING sink: every print()/println() appends to the shared inline
+// accumulator g_sb_replay_out, formatted to match Arduino Print's contract (the
+// emitted text IS that oracle's golden). It MUST be a single shared definition so
+// every compiled TU (driver, serial_tx.cpp's tx_begin/bad_command, ...) records
+// into the same buffer. g_sb_replay_out is `inline` => one definition across TUs;
+// HostSerial Serial's storage stays in render_host_globals.cpp (one TU).
+#ifndef SB_SERIAL_REPLAY_HOST
+// ---- default: swallow (unchanged) ----
 struct HostSerial {
   void begin(unsigned long = 0) {}
   void end() {}
@@ -169,4 +209,65 @@ struct HostSerial {
   template <typename... A> size_t printf(A...) { return 0; }
   template <typename... A> size_t write(A...) { return 0; }
 };
+#else
+// ---- serial_replay: RECORD (text == golden) ----
+// <string> is included at the top of this header (before the min/max macros).
+inline std::string g_sb_replay_out;   // shared across all TUs (one definition)
+
+// Arduino Print::printFloat algorithm (matches Arduino core): round half away from
+// zero at the printed precision (+0.5/10^digits), integer part, '.', fractional.
+inline void sb_replay_emit_float(double number, int digits) {
+  if (std::isnan(number)) { g_sb_replay_out += "nan"; return; }
+  if (std::isinf(number)) { g_sb_replay_out += "inf"; return; }
+  if (number > 4294967040.0 || number < -4294967040.0) { g_sb_replay_out += "ovf"; return; }
+  char b[64];
+  double rounding = 0.5;
+  for (int i = 0; i < digits; ++i) rounding /= 10.0;
+  if (number < 0.0) { number = -number; g_sb_replay_out += "-"; }
+  number += rounding;
+  unsigned long int_part = (unsigned long)number;
+  double remainder = number - (double)int_part;
+  std::snprintf(b, sizeof(b), "%lu", int_part);
+  g_sb_replay_out += b;
+  if (digits > 0) {
+    g_sb_replay_out += ".";
+    for (int i = 0; i < digits; ++i) {
+      remainder *= 10.0;
+      int digit = (int)remainder;
+      g_sb_replay_out += (char)('0' + digit);
+      remainder -= digit;
+    }
+  }
+}
+
+struct HostSerial {
+  void begin(unsigned long = 0) {}
+  void end() {}
+  operator bool() const { return true; }
+  size_t available() { return 0; }
+  int read() { return -1; }
+  void flush() {}
+  size_t print(const char* s)   { g_sb_replay_out += (s ? s : ""); return 0; }
+  size_t print(char c)          { g_sb_replay_out += c; return 0; }
+  size_t print(unsigned char n) { return print((unsigned long)n); }
+  size_t print(int n)           { char b[24]; std::snprintf(b,sizeof(b),"%d",n);  g_sb_replay_out+=b; return 0; }
+  size_t print(unsigned int n)  { char b[24]; std::snprintf(b,sizeof(b),"%u",n);  g_sb_replay_out+=b; return 0; }
+  size_t print(long n)          { char b[24]; std::snprintf(b,sizeof(b),"%ld",n); g_sb_replay_out+=b; return 0; }
+  size_t print(unsigned long n) { char b[24]; std::snprintf(b,sizeof(b),"%lu",n); g_sb_replay_out+=b; return 0; }
+  size_t print(double n, int digits = 2) { sb_replay_emit_float(n, digits); return 0; }
+  size_t print(float n, int digits = 2)  { sb_replay_emit_float((double)n, digits); return 0; }
+  size_t println()              { g_sb_replay_out += "\n"; return 0; }
+  size_t println(const char* s) { print(s); return println(); }
+  size_t println(char c)        { print(c); return println(); }
+  size_t println(unsigned char n){ print(n); return println(); }
+  size_t println(int n)         { print(n); return println(); }
+  size_t println(unsigned int n){ print(n); return println(); }
+  size_t println(long n)        { print(n); return println(); }
+  size_t println(unsigned long n){ print(n); return println(); }
+  size_t println(double n, int digits = 2) { print(n, digits); return println(); }
+  size_t println(float n, int digits = 2)  { print(n, digits); return println(); }
+  template <typename... A> size_t printf(A...) { return 0; }
+  template <typename... A> size_t write(A...)  { return 0; }
+};
+#endif  // SB_SERIAL_REPLAY_HOST
 extern HostSerial Serial;

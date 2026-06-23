@@ -415,7 +415,12 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             self.assertNotIn(forbidden, body)
 
     def test_primary_visual_typed_commands_are_colon_settable(self):
-        serial_source = read(FIRMWARE / "serial_menu.h")
+        # Phase A Lane 2, S4: the 23 pure CONFIG setters (incl. these primary
+        # visual ones) were lifted VERBATIM out of parse_command's ladder into
+        # serial/serial_cmd_handlers.cpp. Repointed (not weakened) — same command
+        # strings and same CONFIG-write/clamp tokens, sourced from where the bodies
+        # now live. The S3.0 serial_replay golden gates the behaviour-preservation.
+        serial_source = read(FIRMWARE / "serial_cmd_handlers.cpp")
         for command in (
             '"photons"',
             '"chroma"',

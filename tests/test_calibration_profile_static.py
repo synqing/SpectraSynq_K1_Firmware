@@ -7,7 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 BRIDGE_FS = FW / "bridge_fs.h"
 CONSTANTS = FW / "constants.h"
-GDFT = FW / "GDFT.h"
+GDFT = FW / "k1_gdft_core.cpp"  # cal FSM lifted here from GDFT.h (2026-06-23 Phase A Lane 1)
 GLOBALS = FW / "globals.h"
 I2S_AUDIO = FW / "i2s_audio.h"
 NOISE_CAL = FW / "noise_cal.h"
@@ -55,6 +55,10 @@ class CalibrationProfileStaticTest(unittest.TestCase):
 
     def test_noise_cal_completion_saves_measured_profile(self):
         gdft = GDFT.read_text()
+        # Scope to the process_GDFT body: exclude the preamble comment and the
+        # extern fwd-decls k1_gdft_core.cpp needs (2026-06-23 lift), which would
+        # otherwise satisfy the ordering .index() before the real body calls.
+        gdft = gdft[gdft.index("void IRAM_ATTR process_GDFT()"):]
         self.assertIn("save_ambient_noise_calibration();", gdft)
         self.assertIn("save_calibration_profile(CAL_SOURCE_MEASURED);", gdft)
         self.assertIn("NOISE CAL ACCEPTED", gdft)
@@ -151,6 +155,8 @@ class CalibrationProfileStaticTest(unittest.TestCase):
 
     def test_calibration_rejects_do_not_persist_or_destroy_previous_good_profile(self):
         gdft = GDFT.read_text()
+        # Scope to the process_GDFT body (see note in test_noise_cal_completion).
+        gdft = gdft[gdft.index("void IRAM_ATTR process_GDFT()"):]
         noise_cal = NOISE_CAL.read_text()
         globals_text = GLOBALS.read_text()
 
