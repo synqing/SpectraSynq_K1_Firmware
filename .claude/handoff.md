@@ -9,15 +9,15 @@ Read order: this file → `docs/architecture/firmware-modernization-program.md` 
 
 Captain-ratified re-sequencing (2026-06-23): Phase A leads with **GDFT**, NOT `.ino`/serial_menu. GDFT is the keystone — root of the audio pipeline, the **only gap in the behavior-lock net**, and it carries the open **Critical int32-overflow bug**. Do it first; it needs a fresh context window (hardest, highest-stakes lane).
 
-### The lane (one move, triple win)
-1. **Decompose** `SPECTRASYNQ_K1_FIRMWARE/audio/GDFT.h` (458 lines, single-includer header-soup) → a clean `gdft.cpp/.h` TU with explicit I/O: in = sample buffer + config; out = the ~12 spectral arrays it owns (`magnitudes*`, `novelty*`, `noise_samples`, `notes`, `frequencies`). Only **2 `CONFIG.*` refs**, **~30 Arduino/HAL touchpoints** behind a thin shim. **Behavior-preserving.**
-2. **Golden-lock it** — the REAL spectrum oracle (the one the fan-out could only *replicate*). Fills the safety-net gap. Register in `ORACLE_MODULES`.
-3. **Promote the overflow fix** — `K1_GDFT_INT64_*` flags (device-validated, NOT in `[env:k1_hardware]`). Now host-deterministic + golden-verifiable. Closes audit **Critical #1**.
+### ⚑ SCOPED — full extraction contract: [`docs/architecture/gdft-decomposition-lane.md`](../docs/architecture/gdft-decomposition-lane.md) (authority for this lane; read it first)
+Synthesised from 3 load-bearing agents (gdft-surface, gdft-replica-spec, gdft-int64-forensics) + first-hand `GDFT.h` read, doctrine-gated 2026-06-23.
 
-### Reference spec (gift from the fan-out)
-The spectrum agent's **replica** (a self-contained C++ driver reproducing the GDFT arithmetic verbatim with firmware line refs) is in the OLD repo:
-`/Users/spectrasynq/SensoryBridge-main 9/scripts/regression-harness/golden/oracle_spectrum_novelty.py`.
-Use it as the extraction's **correctness target**. It is NOT a valid oracle (locks a replica, not firmware) — the lane's job is to make the **real** `GDFT.h` host-compilable so the oracle locks firmware.
+### The lane (one move, triple win)
+1. **Decompose** `SPECTRASYNQ_K1_FIRMWARE/audio/GDFT.h` → `audio/k1_gdft_core.cpp/.h` (K1 naming, matches `K1_GDFT_*` flags). **Behavior-preserving** (verbatim arithmetic, extern-globals; explicit-I/O is deferred S3 polish). KEY: the **device noise-cal FSM (GDFT.h:196-266) is EXCLUDED** from the core TU — it has zero spectral coupling in `k1_hardware` (`SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED=0`), stays in a thin `GDFT.h` wrapper. Keep `int32_t magnitudes[]` (storage is part of the overflow surface).
+2. **Golden-lock** `oracle_gdft.py` (mirror `oracle_chord.py`): driver = replica trace **+ sustained 440 Hz @ amp 16000 ≥10 frames** (else blind to the int64 fix); emit `mag_i32[0..79]` + `spec` + `nov`; DEFINES pin the **buggy int32 baseline**. Register in `ORACLE_MODULES`.
+3. **Promote the int64 PAIR** — `K1_GDFT_INT64_MAGNITUDE_V1` **+** `K1_GDFT_INT64_RECURRENCE_V1` together (coupled; magnitude alone proven insufficient on device). **HOLD** `K1_GDFT_TRUE_CENTER_V1` (eyes-on FAIL) and `K1_SPECTRAL_WINDOW_V1` OFF. S2 production-flip owes 3 device gates: MabuTrace Core-0 margin, prod-env AGC-scale, eyes-on. Closes audit **Critical #1**.
+
+Blast radius: the 4 existing host goldens drive detectors with synthetic snapshots — they never call `process_GDFT`, so S1/S2 cannot move them on host (only the new `gdft` golden moves). Reference replica (correctness target, NOT a valid oracle): old repo `scripts/regression-harness/golden/oracle_spectrum_novelty.py`.
 
 ---
 
