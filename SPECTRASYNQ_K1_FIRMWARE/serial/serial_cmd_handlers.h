@@ -59,4 +59,15 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
 // false to let parse_command's ladder continue. Gated by the Fα serial_replay golden.
 bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data);
 
+// Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
+// vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
+// Returns true iff command_type named one of them; false to let parse_command's
+// ladder continue. Gated by the Fα serial_replay golden — it must reproduce
+// byte-for-byte after the bodies relocate from serial_menu.h's SB_VIVID_PRECOMP_V1
+// block (lines 2521-2574). Definition is guarded by the same flag: the dispatcher
+// decl, def, and call-site all use #ifdef SB_VIVID_PRECOMP_V1 — single gate.
+#ifdef SB_VIVID_PRECOMP_V1
+bool serial_cmd_dispatch_vivid(const char* command_type, char* command_data);
+#endif // SB_VIVID_PRECOMP_V1
+
 #endif // SERIAL_CMD_HANDLERS_H

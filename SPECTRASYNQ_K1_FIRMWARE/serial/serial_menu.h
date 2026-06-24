@@ -2518,60 +2518,17 @@ void parse_command(char* command_buf) {
       }
     }
 
+    // The 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma, vivid_black)
+    // were lifted VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2, S4.3 /
+    // vivid slice). Each writes a VP_VIVID_* inline global — no save_config, no
+    // reboot. Dispatched here once: serial_cmd_dispatch_vivid() returns true iff
+    // command_type named one of them (the body ran), false to fall through.
+    // Proven byte-for-byte by the Fα serial_replay golden extension.
 #ifdef SB_VIVID_PRECOMP_V1
-	    else if (strcmp(command_type, "vivid") == 0) {
-	      bool value = false;
-	      if (vp_parse_bool(command_data, &value)) {
-	        VP_VIVID_PRECOMP = value;
-	        if (VP_VIVID_PRECOMP) {
-	          serial_ensure_vivid_defaults();
-	        }
-	        tx_begin();
-	        serial_print_vivid_precomp_status();
-	        tx_end();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-	    else if (strcmp(command_type, "vivid_level") == 0) {
-	      float value = 0.0f;
-	      if (vp_parse_float(command_data, &value)) {
-	        serial_set_vivid_level(value);
-	        tx_begin();
-	        serial_print_vivid_precomp_status();
-	        tx_end();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-	    else if (strcmp(command_type, "vivid_chroma") == 0) {
-	      float value = 0.0f;
-	      if (vp_parse_float(command_data, &value)) {
-	        VP_VIVID_CHROMA_LEVEL = constrain(value, 0.0f, 1.0f);
-	        serial_update_vivid_enabled_from_levels();
-	        tx_begin();
-	        serial_print_vivid_precomp_status();
-	        tx_end();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-	    else if (strcmp(command_type, "vivid_black") == 0) {
-	      float value = 0.0f;
-	      if (vp_parse_float(command_data, &value)) {
-	        VP_VIVID_BLACK_LEVEL = constrain(value, 0.0f, 1.0f);
-	        serial_update_vivid_enabled_from_levels();
-	        tx_begin();
-	        serial_print_vivid_precomp_status();
-	        tx_end();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-#endif
+    else if (serial_cmd_dispatch_vivid(command_type, command_data)) {
+      // handled by an extracted vivid handler
+    }
+#endif // SB_VIVID_PRECOMP_V1
 
     else if (strcmp(command_type, "ap_stream") == 0) {
       bool value = false;
