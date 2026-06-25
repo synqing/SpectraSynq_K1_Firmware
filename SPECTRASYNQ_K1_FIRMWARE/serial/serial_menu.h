@@ -2847,106 +2847,25 @@ void parse_command(char* command_buf) {
 	      vp_perf_command(command_type, command_data);
 	    }
 
-	    else if (strcmp(command_type, "smart_assist") == 0) {
-	      bool value = false;
-	      if (vp_parse_bool(command_data, &value)) {
-	        SBSmartDirectorConfig config = sb_smart_director_config();
-	        config.enabled = value;
-	        if (!value) {
-	          config.assist_switching_enabled = false;
-	          config.director_autonomy_enabled = false;
-	        }
-	        sb_smart_director_set_config(config);
-	        sb_print_smart_status();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
+	    // Extracted VERBATIM to serial_cmd_dispatch_smart_director() in
+	    // serial_cmd_handlers.cpp (smart_assist / smart_switching /
+	    // smart_confidence_floor / smart_scene). UNGATED. Behaviour-preserving —
+	    // proven byte-for-byte by the serial_struct structural-contract gate.
+	    else if (serial_cmd_dispatch_smart_director(command_type, command_data)) {
+	      // handled by the extracted smart-director dispatcher
 	    }
 
-	    else if (strcmp(command_type, "smart_switching") == 0) {
-	      bool value = false;
-	      if (vp_parse_bool(command_data, &value)) {
-	        SBSmartDirectorConfig config = sb_smart_director_config();
-	        config.enabled = config.enabled || value;
-	        config.assist_switching_enabled = value;
-	        sb_smart_director_set_config(config);
-	        sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
-	        sb_print_smart_status();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
+	    // Extracted VERBATIM to serial_cmd_dispatch_smart_visual() in
+	    // serial_cmd_handlers.cpp (smart_hooks). UNGATED. Proven by serial_struct.
+	    else if (serial_cmd_dispatch_smart_visual(command_type, command_data)) {
+	      // handled by the extracted smart-visual dispatcher
 	    }
 
-	    else if (strcmp(command_type, "smart_confidence_floor") == 0) {
-	      float value = 0.0f;
-	      if (vp_parse_float(command_data, &value)) {
-	        SBSmartDirectorConfig config = sb_smart_director_config();
-	        config.confidence_floor = constrain(value, 0.0f, 1.0f);
-	        sb_smart_director_set_config(config);
-	        sb_print_smart_status();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-	    else if (strcmp(command_type, "smart_scene") == 0) {
-	      if (sb_apply_smart_scene(command_data)) {
-	        sb_print_smart_status();
-	        sb_print_edge_status();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-	    else if (strcmp(command_type, "smart_hooks") == 0) {
-	      bool value = false;
-	      if (vp_parse_bool(command_data, &value)) {
-	        SBVisualHookConfig config = sb_visual_hooks_config();
-	        config.enabled = value;
-	        sb_visual_hooks_set_config(config);
-	        sb_print_smart_status();
-	      } else {
-	        bad_command(command_type, command_data);
-	      }
-	    }
-
-		    else if (strcmp(command_type, "edge_enabled") == 0) {
-		      bool value = false;
-		      if (vp_parse_bool(command_data, &value)) {
-		        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
-		        config.enabled = value;
-		        sb_edgemixer_lite_set_config(config);
-		        sb_print_edge_status();
-		      } else {
-		        bad_command(command_type, command_data);
-		      }
-	    }
-
-	    else if (strcmp(command_type, "edge_mode") == 0) {
-		      SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
-		      if (sb_parse_edge_mode(command_data, &mode)) {
-		        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
-		        config.mode = mode;
-		        if (mode == SB_EDGE_MIXER_OFF) {
-		          config.enabled = false;
-		        }
-		        sb_edgemixer_lite_set_config(config);
-		        sb_print_edge_status();
-		      } else {
-		        bad_command(command_type, command_data);
-		      }
-	    }
-
-	    else if (strcmp(command_type, "edge_strength") == 0) {
-	      float value = 0.0f;
-		      if (vp_parse_float(command_data, &value)) {
-		        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
-		        config.strength = constrain(value, 0.0f, 1.0f);
-		        sb_edgemixer_lite_set_config(config);
-		        sb_print_edge_status();
-		      } else {
-	        bad_command(command_type, command_data);
-	      }
+	    // Extracted VERBATIM to serial_cmd_dispatch_edge_mixer() in
+	    // serial_cmd_handlers.cpp (edge_enabled / edge_mode / edge_strength). UNGATED.
+	    // Behaviour-preserving — proven byte-for-byte by the serial_struct gate.
+	    else if (serial_cmd_dispatch_edge_mixer(command_type, command_data)) {
+	      // handled by the extracted edge-mixer dispatcher
 	    }
 
 #if ENABLE_DIAG_CAPTURE

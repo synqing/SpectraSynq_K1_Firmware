@@ -317,6 +317,24 @@ MUTATIONS = [
         r'strcmp(command_type, "edge_mode_MUT")',
         "edge_mode_command_type_renamed (routing/identity divergence)",
     ),
+    # ---- routing-sever teeth (added with the EXTRACT; call-sites now exist) ----
+    # 10-12. sever each dispatcher call in parse_command -> that family's commands flip
+    #        reachable:true->false. Bare-arg form matches ONLY the call-site.
+    (
+        r"serial_cmd_dispatch_smart_director\(command_type, command_data\)",
+        r"serial_cmd_dispatch_smart_director_SEVERED(command_type, command_data)",
+        "smart_director_call_site_severed (routing/reachable divergence)",
+    ),
+    (
+        r"serial_cmd_dispatch_smart_visual\(command_type, command_data\)",
+        r"serial_cmd_dispatch_smart_visual_SEVERED(command_type, command_data)",
+        "smart_visual_call_site_severed (routing/reachable divergence)",
+    ),
+    (
+        r"serial_cmd_dispatch_edge_mixer\(command_type, command_data\)",
+        r"serial_cmd_dispatch_edge_mixer_SEVERED(command_type, command_data)",
+        "edge_mixer_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 

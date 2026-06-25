@@ -191,7 +191,10 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn("Preserve luminance", text)
 
     def test_edge_serial_controls_do_not_auto_enable_mixer(self):
-        text = read(FIRMWARE / "serial_menu.h")
+        # The edge handlers were lifted VERBATIM into serial_cmd_dispatch_edge_mixer()
+        # in serial_cmd_handlers.cpp (structural-contract gate, oracle_serial_struct.py);
+        # the no-auto-enable invariant is asserted against their new home.
+        text = read(FIRMWARE / "serial_cmd_handlers.cpp")
         edge_enabled_body = re.search(
             r'else if \(strcmp\(command_type, "edge_enabled"\) == 0\).*?'
             r'else if \(strcmp\(command_type, "edge_mode"\) == 0\)',
@@ -206,7 +209,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         )
         edge_strength_body = re.search(
             r'else if \(strcmp\(command_type, "edge_strength"\) == 0\).*?'
-            r'#if ENABLE_DIAG_CAPTURE',
+            r'return true;',  # edge_mixer dispatcher terminal (was #if ENABLE_DIAG_CAPTURE inline)
             text,
             re.S,
         )
@@ -366,7 +369,11 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         serial_source = read(FIRMWARE / "serial_menu.h")
         self.assertIn("smart_scene=[off/assist/l1/auto]", serial_source)
         self.assertIn("sb_apply_smart_scene", serial_source)
-        self.assertIn('strcmp(command_type, "smart_scene") == 0', serial_source)
+        # The smart_scene HANDLER branch moved to serial_cmd_dispatch_smart_director()
+        # in serial_cmd_handlers.cpp; sb_apply_smart_scene() (the scene recipe asserted
+        # below) stays in serial_menu.h. Assert the handler branch against its new home.
+        self.assertIn('strcmp(command_type, "smart_scene") == 0',
+                      read(FIRMWARE / "serial_cmd_handlers.cpp"))
         self.assertIn('strcmp(scene, "assist") == 0', serial_source)
         self.assertIn('strcmp(scene, "control") == 0', serial_source)
         self.assertIn('strcmp(scene, "l1") == 0', serial_source)
