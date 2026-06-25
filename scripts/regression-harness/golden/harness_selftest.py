@@ -45,6 +45,12 @@ ORACLE_MODULES = [
                      # serial_menu.h handler extractions (S4+). Captures the triple
                      # (emitted text + CONFIG deltas + side-effect flags); 5 mutations
                      # each diverge a different channel (Gate-Fα teeth, not blind).
+    "oracle_serial_struct",  # structural-contract gate (Phase A Lane 2 keystone) —
+                     # the FUNCTION-CALL families the replay oracle is blind to
+                     # (sb_queue_*/smart_*/edge_* call host-stubbed subsystems). Pure
+                     # source parse: pins normalized handler body + dispatch-routing,
+                     # invariant across a verbatim lift (TRIZ #13/#22). Mutations plant
+                     # altered-statement / mis-routed-command / changed-echo regressions.
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform
