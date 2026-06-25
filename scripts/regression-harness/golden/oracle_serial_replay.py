@@ -321,6 +321,21 @@ CORPUS = [
 
     # ---- (12) vivid failure path: bad_command -------------------------
     "vivid=maybe",              # not a bool token -> bad_command
+
+    # ===================================================================
+    # response_gain EXTENSION — 1 ungated production-live handler. Writes the
+    # audio_response_gain inline global (globals.h:48) via serial_clamp_float
+    # (MIN 0.25, MAX 4.0, DEFAULT 1.0). NO save_config, NO reboot, and — unlike the
+    # pure setters — NO bad_command path (atof() fallback: garbage -> 0.0 -> clamp
+    # MIN). config_delta tracks AUDIO_RESPONSE_GAIN (snapshot extended above); echo
+    # reads audio_response_gain_clamped() at 6 dp.
+    # ===================================================================
+    # ---- (13) response_gain: nominal + clamp boundaries + default + atof-fallback
+    "response_gain=2.0",        # audio_response_gain = 2.0 (in [0.25, 4.0])
+    "response_gain=0.1",        # below 0.25 -> clamped to MIN 0.25
+    "response_gain=9.9",        # above 4.0  -> clamped to MAX 4.0
+    "response_gain=default",    # -> DEFAULT_AUDIO_RESPONSE_GAIN = 1.0
+    "response_gain=abc",        # atof("abc")=0.0 -> clamp MIN 0.25, NO bad_command
 ]
 
 # ---------------------------------------------------------------------------
@@ -508,6 +523,12 @@ static int snapshot(FieldSnap* out) {
   out[n++] = {"VP_VIVID_PRECOMP",      (double)VP_VIVID_PRECOMP};
   out[n++] = {"VP_VIVID_CHROMA_LEVEL", (double)VP_VIVID_CHROMA_LEVEL};
   out[n++] = {"VP_VIVID_BLACK_LEVEL",  (double)VP_VIVID_BLACK_LEVEL};
+  // response_gain extension: audio_response_gain inline global (globals.h:48,
+  // UNGATED) written by the response_gain handler via serial_clamp_float (MIN 0.25,
+  // MAX 4.0, DEFAULT 1.0). NOT a CONFIG field — read directly like the VP/vivid
+  // globals. Without it the config_delta channel is BLIND to a mis-routed or
+  // wrong-clamp response_gain write (the whole point of the new coverage).
+  out[n++] = {"AUDIO_RESPONSE_GAIN",   (double)audio_response_gain};
   return n;
 }
 
@@ -747,6 +768,32 @@ MUTATIONS = [
         r"VP_VIVID_CHROMA_LEVEL = constrain\(value, 0\.0f, 1\.0f\);",
         r"\1VP_VIVID_CHROMA_LEVEL = constrain(value, 0.0f, 0.5f);",
         "vivid_chroma_clamp_upper_1.0_to_0.5 (CONFIG-delta divergence on boundary entry)",
+    ),
+    # ===================================================================
+    # response_gain MUTATIONS — 2 edits that MUST diverge the golden on the
+    # response_gain corpus, proving the new coverage is not blind. Both anchor on
+    # the SINGLE unique clamp-write line (serial_menu.h@HEAD ~3148; after extraction
+    # it lives only in serial_cmd_handlers.cpp — the anchor stays unique either way).
+    # ===================================================================
+    # R1. CHANGE the response_gain upper clamp from AUDIO_RESPONSE_GAIN_MAX (4.0f) to
+    #     2.0f. "response_gain=9.9" now records AUDIO_RESPONSE_GAIN=2.0 instead of the
+    #     correct clamped 4.0 — diverges config_delta AND the echoed value on the
+    #     boundary corpus entry. Channel (b).
+    (
+        r"audio_response_gain = serial_clamp_float\(atof\(command_data\), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX\);",
+        r"audio_response_gain = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, 2.0f);",
+        "response_gain_clamp_upper_4.0_to_2.0 (CONFIG-delta + echo divergence on boundary entry)",
+    ),
+    # R2. MIS-ROUTE the response_gain write to VP_VIVID_BLACK_LEVEL. "response_gain=2.0"
+    #     now writes the WRONG global — audio_response_gain keeps its prior value, so
+    #     the echo (audio_response_gain_clamped()) AND config_delta both diverge
+    #     (AUDIO_RESPONSE_GAIN absent + VP_VIVID_BLACK_LEVEL spuriously changed). This
+    #     is exactly the field-routing regression echo text alone would miss were the
+    #     echo not derived from the global. Channel (b).
+    (
+        r"audio_response_gain = serial_clamp_float\(atof\(command_data\), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX\);",
+        r"VP_VIVID_BLACK_LEVEL = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);",
+        "response_gain_write_misrouted_to_VP_VIVID_BLACK_LEVEL (field-routing divergence)",
     ),
 ]
 

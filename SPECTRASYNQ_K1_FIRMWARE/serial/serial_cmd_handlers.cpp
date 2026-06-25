@@ -763,6 +763,47 @@ bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data)
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_response_gain — the single response_gain handler, lifted
+// VERBATIM from parse_command()'s ungated Stage-B branch (serial_menu.h, just
+// after serial_cmd_dispatch_reboot_setter). Writes the audio_response_gain inline
+// global (globals.h:48) via serial_clamp_float (MIN 0.25, MAX 4.0, DEFAULT 1.0) —
+// no save_config, no reboot, and (unlike the pure setters) NO bad_command path
+// (atof() fallback: garbage -> 0.0 -> clamp MIN). The `if (false) {}` opener keeps
+// the single branch statement-identical. Returns true iff command_type ==
+// "response_gain" (the body ran); false routes parse_command to its remaining
+// ladder. UNGATED — declared, defined, and called with no #ifdef.
+//
+// All symbols used are already available in this TU: audio_response_gain /
+// DEFAULT_AUDIO_RESPONSE_GAIN / audio_response_gain_clamped() /
+// AUDIO_RESPONSE_GAIN_MIN/MAX via globals.h (+ config_types.h), serial_clamp_float
+// via serial_parse_helpers.h, tx_begin/tx_end + USBSerial via serial_tx.h/globals.h,
+// atof via <stdlib.h>. Gated by the Fα serial_replay golden — it must reproduce
+// byte-for-byte after this move (tests/test_golden_master.py + harness_selftest.py).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "response_gain") == 0) {
+      if (strcmp(command_data, "default") == 0) {
+        audio_response_gain = DEFAULT_AUDIO_RESPONSE_GAIN;
+      } else {
+        audio_response_gain = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);
+      }
+
+      tx_begin();
+      USBSerial.print("AUDIO_RESPONSE_GAIN: ");
+      USBSerial.println(audio_response_gain_clamped(), 6);
+      tx_end();
+    }
+
+    else {
+      return false;  // not the response_gain handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
 #ifdef SB_VIVID_PRECOMP_V1
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_vivid — the 4 vivid pre-comp handlers, lifted VERBATIM

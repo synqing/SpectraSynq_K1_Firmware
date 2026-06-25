@@ -3141,17 +3141,12 @@ void parse_command(char* command_buf) {
     }
 
     // Set runtime post-DC audio response gain ----------------
-    else if (strcmp(command_type, "response_gain") == 0) {
-      if (strcmp(command_data, "default") == 0) {
-        audio_response_gain = DEFAULT_AUDIO_RESPONSE_GAIN;
-      } else {
-        audio_response_gain = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);
-      }
-
-      tx_begin();
-      USBSerial.print("AUDIO_RESPONSE_GAIN: ");
-      USBSerial.println(audio_response_gain_clamped(), 6);
-      tx_end();
+    // Extracted VERBATIM to serial_cmd_dispatch_response_gain() in
+    // serial_cmd_handlers.cpp. Returns true iff command_type == "response_gain"
+    // (the body ran); false to fall through to the remaining ladder branches below.
+    // UNGATED. Behaviour-preserving — proven byte-for-byte by the serial_replay golden.
+    else if (serial_cmd_dispatch_response_gain(command_type, command_data)) {
+      // handled by the extracted response_gain dispatcher
     }
 
 #ifdef K1_LOUD_GUARD_V1
