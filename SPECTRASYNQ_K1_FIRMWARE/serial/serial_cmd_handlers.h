@@ -94,6 +94,16 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
 // verbatim lift is proven by oracle_serial_struct.py (the serial_struct golden).
 bool serial_cmd_dispatch_preset(const char* command_type, char* command_data);
 
+// Dispatch the 14 pure secondary-channel setters (secondary_auto_color_shift /
+// _incandescent_mode / _enabled / _photons / _chroma / _mood / _saturation /
+// _prism_count / _mirror_enabled / _reverse_order / _control / _palette_mode /
+// _palette_index / _base_coat) — each writes a SECONDARY_*/ENABLE_SECONDARY_LEDS/
+// secondaryMode inline global (no save_config/reboot/subsystem calls). UNGATED,
+// facade-free. Behaviour-preservation across the verbatim lift is proven by the
+// serial_replay behaviour-lock (oracle_serial_replay.py). secondary_mode (gated,
+// function-call) and secondary_status (read-only) are NOT here — they stay inline.
+bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

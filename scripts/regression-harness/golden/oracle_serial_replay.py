@@ -336,6 +336,48 @@ CORPUS = [
     "response_gain=9.9",        # above 4.0  -> clamped to MAX 4.0
     "response_gain=default",    # -> DEFAULT_AUDIO_RESPONSE_GAIN = 1.0
     "response_gain=abc",        # atof("abc")=0.0 -> clamp MIN 0.25, NO bad_command
+
+    # ===================================================================
+    # secondary_* EXTENSION — the 14 pure inline-global secondary-channel setters
+    # (globals.h:796-823, UNGATED; NO save_config/reboot/subsystem calls). Bool handlers
+    # accept ONLY "true"/"false" (NOT on/off) -> bad_command otherwise; float handlers use
+    # constrain(atof(...)) with NO bad_command path (garbage -> 0.0 -> clamp low);
+    # palette_index validates [0, gGradientPaletteCount). secondary_mode + secondary_status
+    # are NOT extracted (see snapshot note). config_delta tracks the 14 globals.
+    # ===================================================================
+    # ---- (14) valid secondary sets: one representative per handler -------------
+    "secondary_auto_color_shift=true",   # SECONDARY_AUTO_COLOR_SHIFT = true
+    "secondary_incandescent_mode=true",  # SECONDARY_INCANDESCENT_MODE = true
+    "secondary_enabled=true",            # ENABLE_SECONDARY_LEDS = true
+    "secondary_photons=0.8",             # SECONDARY_PHOTONS = 0.8
+    "secondary_chroma=0.5",              # SECONDARY_CHROMA = 0.5
+    "secondary_mood=0.6",                # SECONDARY_MOOD = 0.6
+    "secondary_saturation=0.25",         # SECONDARY_SATURATION = 0.25
+    "secondary_prism_count=3",           # SECONDARY_PRISM_COUNT = 3.0
+    "secondary_mirror_enabled=true",     # SECONDARY_MIRROR_ENABLED = true
+    "secondary_reverse_order=true",      # SECONDARY_REVERSE_ORDER = true
+    "secondary_control=true",            # secondaryMode = true
+    "secondary_control=toggle",          # secondaryMode = !secondaryMode (toggle branch)
+    "secondary_palette_mode=true",       # SECONDARY_PALETTE_MODE_ENABLED = true
+    "secondary_palette_index=2",         # SECONDARY_PALETTE_INDEX = 2 (+ paletteNames echo)
+    "secondary_base_coat=true",          # SECONDARY_BASE_COAT = true
+
+    # ---- (15) secondary float clamp boundaries: constrain(atof(...), lo, hi) ----
+    "secondary_photons=2.0",             # -> clamp 1.0
+    "secondary_photons=-1",              # -> clamp 0.0
+    "secondary_chroma=9.9",              # -> clamp 1.0
+    "secondary_mood=-1",                 # -> clamp 0.0
+    "secondary_saturation=9.9",          # -> clamp 1.0
+    "secondary_prism_count=99",          # -> clamp 10.0
+    "secondary_prism_count=-1",          # -> clamp 0.0
+    "secondary_photons=abc",             # atof("abc")=0.0 -> clamp 0.0, NO bad_command
+
+    # ---- (16) secondary bad_command paths (bool handlers accept ONLY true/false) -
+    "secondary_auto_color_shift=on",     # "on" NOT accepted -> bad_command
+    "secondary_enabled=maybe",           # -> bad_command
+    "secondary_control=maybe",           # not true/false/toggle -> bad_command
+    "secondary_palette_index=9999",      # out of [0, count) -> bad_command
+    "secondary_palette_index=-1",        # index < 0 -> bad_command
 ]
 
 # ---------------------------------------------------------------------------
@@ -541,6 +583,26 @@ static int snapshot(FieldSnap* out) {
   // globals. Without it the config_delta channel is BLIND to a mis-routed or
   // wrong-clamp response_gain write (the whole point of the new coverage).
   out[n++] = {"AUDIO_RESPONSE_GAIN",   (double)audio_response_gain};
+  // secondary_* extension: the 14 inline globals (globals.h:796-823, UNGATED) written
+  // by the 14 pure secondary-channel setters. NOT CONFIG fields — read directly like
+  // the VP/vivid/response_gain globals. Without these the config_delta channel is BLIND
+  // to a mis-routed or wrong-clamp secondary write (the whole point of the coverage).
+  // SECONDARY_LIGHTSHOW_MODE is DELIBERATELY omitted — the secondary_mode handler is NOT
+  // extracted (function-call + #ifdef K1_EFFECT_REGISTRY_V1; deferred with set_mode).
+  out[n++] = {"SECONDARY_AUTO_COLOR_SHIFT",    (double)SECONDARY_AUTO_COLOR_SHIFT};
+  out[n++] = {"SECONDARY_INCANDESCENT_MODE",   (double)SECONDARY_INCANDESCENT_MODE};
+  out[n++] = {"ENABLE_SECONDARY_LEDS",         (double)ENABLE_SECONDARY_LEDS};
+  out[n++] = {"SECONDARY_PHOTONS",             (double)SECONDARY_PHOTONS};
+  out[n++] = {"SECONDARY_CHROMA",              (double)SECONDARY_CHROMA};
+  out[n++] = {"SECONDARY_MOOD",                (double)SECONDARY_MOOD};
+  out[n++] = {"SECONDARY_SATURATION",          (double)SECONDARY_SATURATION};
+  out[n++] = {"SECONDARY_PRISM_COUNT",         (double)SECONDARY_PRISM_COUNT};
+  out[n++] = {"SECONDARY_MIRROR_ENABLED",      (double)SECONDARY_MIRROR_ENABLED};
+  out[n++] = {"SECONDARY_REVERSE_ORDER",       (double)SECONDARY_REVERSE_ORDER};
+  out[n++] = {"secondaryMode",                 (double)secondaryMode};
+  out[n++] = {"SECONDARY_PALETTE_MODE_ENABLED",(double)SECONDARY_PALETTE_MODE_ENABLED};
+  out[n++] = {"SECONDARY_PALETTE_INDEX",       (double)SECONDARY_PALETTE_INDEX};
+  out[n++] = {"SECONDARY_BASE_COAT",           (double)SECONDARY_BASE_COAT};
   return n;
 }
 
@@ -592,7 +654,7 @@ int main() {
   CONFIG_DEFAULTS.SAMPLES_PER_CHUNK = 96;
   CONFIG_DEFAULTS.BOOT_ANIMATION    = true;
 
-  FieldSnap before[64], after[64];
+  FieldSnap before[96], after[96];   // 65 fields after the secondary_* extension (was 51); headroom for future families
 
   for (int i = 0; i < CORPUS_LEN; ++i) {
     // parse_command mutates its buffer in place -> use a writable copy.
@@ -806,6 +868,57 @@ MUTATIONS = [
         r"audio_response_gain = serial_clamp_float\(atof\(command_data\), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX\);",
         r"VP_VIVID_BLACK_LEVEL = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);",
         "response_gain_write_misrouted_to_VP_VIVID_BLACK_LEVEL (field-routing divergence)",
+    ),
+    # ===================================================================
+    # secondary_* MUTATIONS — 3 LOCK teeth that MUST diverge the golden on the secondary
+    # corpus, proving the new coverage is not blind. Each targets a DIFFERENT channel.
+    # Anchored uniquely (count=1, enforced by test_mutation_anchor_uniqueness_static.py)
+    # on the setter BODY: at LOCK these live inline in serial_menu.h; after EXTRACT they
+    # move to serial_cmd_dispatch_secondary() in serial_cmd_handlers.cpp. The canonical
+    # Gate Fα (harness_selftest.py) rglobs and finds them either home; the standalone
+    # verify_mutations hardcodes serial_menu.h (known footgun) — trust harness_selftest.
+    # The call-site-sever tooth is added with the EXTRACT (the call-site exists only then).
+    # ===================================================================
+    # S1. CHANGE the secondary_photons upper clamp 1.0 -> 0.5. "secondary_photons=2.0" now
+    #     records SECONDARY_PHOTONS=0.5 instead of the correct clamped 1.0 — diverges
+    #     config_delta AND the echoed value on the boundary entry. Channel (b).
+    (
+        r"SECONDARY_PHOTONS = constrain\(atof\(command_data\), 0\.0, 1\.0\);",
+        r"SECONDARY_PHOTONS = constrain(atof(command_data), 0.0, 0.5);",
+        "secondary_photons_clamp_upper_1.0_to_0.5 (CONFIG-delta + echo divergence)",
+    ),
+    # S2. MIS-ROUTE the secondary_chroma write to SECONDARY_MOOD. "secondary_chroma=0.5"
+    #     now writes the WRONG global — echo still says SECONDARY_CHROMA but the delta
+    #     lands on SECONDARY_MOOD (SECONDARY_CHROMA unchanged). Field-routing regression
+    #     the echo channel cannot see. Channel (b).
+    (
+        r"SECONDARY_CHROMA = constrain\(atof\(command_data\), 0\.0, 1\.0\);",
+        r"SECONDARY_MOOD = constrain(atof(command_data), 0.0, 1.0);",
+        "secondary_chroma_write_misrouted_to_SECONDARY_MOOD (field-routing divergence)",
+    ),
+    # S3. BREAK the secondary_control echo label (the ENABLED arm — unique to the setter;
+    #     secondary_status echoes "true (encoders control secondary channel)", different).
+    #     "secondary_control=true" now emits the wrong text; the global write is unchanged.
+    #     Pure emitted-text regression. Channel (a).
+    (
+        r'"ENABLED \(encoders control secondary channel\)"',
+        r'"ENABLED (encoders control SECONDARY channel)"',
+        "secondary_control_echo_label_broken (emitted-text divergence)",
+    ),
+    # S4. SEVER THE ROUTING (EXTRACT tooth — the call-site exists only after the lift).
+    #     Disable the dispatcher call with a short-circuit `false &&` so parse_command
+    #     never routes the 14 secondary commands to it; they fall through to bad_command.
+    #     Every secondary record's config_delta empties + bad_command flips true -> massive
+    #     divergence, proving the call-site is load-bearing. COMPILE-SAFE by design: the
+    #     symbol stays referenced. A `_SEVERED` rename (the struct oracle's pure-parse
+    #     trick) would FAIL the host compile, and harness_selftest._mutated_capture only
+    #     catches TypeError — a RuntimeError from a broken build propagates and crashes the
+    #     selftest instead of registering a clean catch. Bare-arg form `(command_type,
+    #     command_data)` matches ONLY the call-site (the def/decl carry typed params).
+    (
+        r"serial_cmd_dispatch_secondary\(command_type, command_data\)",
+        r"false && serial_cmd_dispatch_secondary(command_type, command_data)",
+        "secondary_dispatcher_call_site_severed (routing/reachable divergence)",
     ),
 ]
 

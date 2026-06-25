@@ -1118,6 +1118,258 @@ bool serial_cmd_dispatch_preset(const char* command_type, char* command_data) {
     return true;
 }
 
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_secondary — the 14 pure secondary-channel setters, lifted
+// VERBATIM from parse_command()'s ladder (serial_menu.h secondary_* block). Each
+// writes a SECONDARY_*/ENABLE_SECONDARY_LEDS/secondaryMode inline global (globals.h:
+// 796-823) + echoes; NO save_config, NO reboot, NO subsystem calls. The `if (false) {}`
+// opener keeps every branch a statement-identical `else if (strcmp(command_type,
+// "<name>") == 0)`. Returns true iff matched; false routes parse_command to its
+// remaining ladder. UNGATED, facade-free. Behaviour-preservation across the verbatim
+// lift is proven by the serial_replay behaviour-lock (golden reproduces byte-for-byte).
+// secondary_mode (function-call + #ifdef K1_EFFECT_REGISTRY_V1) and secondary_status
+// (read-only) are NOT extracted — they stay inline in parse_command. paletteNames /
+// strcpy_P / pgm_read_ptr (the secondary_palette_index echo) + gGradientPaletteCount are
+// reachable via globals.h -> Palettes.h (already included by this TU).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "secondary_auto_color_shift") == 0) {
+      // Former '2' hotkey covered the SECONDARY channel via the space target;
+      // the typed auto_color_shift= only reaches PRIMARY, so this twin keeps
+      // the secondary reachable.
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_AUTO_COLOR_SHIFT = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_AUTO_COLOR_SHIFT = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_AUTO_COLOR_SHIFT: ");
+        USBSerial.println(SECONDARY_AUTO_COLOR_SHIFT ? "true" : "false");
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_incandescent_mode") == 0) {
+      // Former '4' hotkey covered the SECONDARY channel via the space target.
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_INCANDESCENT_MODE = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_INCANDESCENT_MODE = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_INCANDESCENT_MODE: ");
+        USBSerial.println(SECONDARY_INCANDESCENT_MODE ? "true" : "false");
+        tx_end();
+      }
+    }
+
+    // Secondary LED Controls ----------------------------
+    else if (strcmp(command_type, "secondary_enabled") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        ENABLE_SECONDARY_LEDS = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        ENABLE_SECONDARY_LEDS = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_ENABLED: ");
+        USBSerial.println(ENABLE_SECONDARY_LEDS);
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_photons") == 0) {
+      SECONDARY_PHOTONS = constrain(atof(command_data), 0.0, 1.0);
+
+      tx_begin();
+      USBSerial.print("SECONDARY_PHOTONS: ");
+      USBSerial.println(SECONDARY_PHOTONS, 6);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_chroma") == 0) {
+      SECONDARY_CHROMA = constrain(atof(command_data), 0.0, 1.0);
+
+      tx_begin();
+      USBSerial.print("SECONDARY_CHROMA: ");
+      USBSerial.println(SECONDARY_CHROMA, 6);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_mood") == 0) {
+      SECONDARY_MOOD = constrain(atof(command_data), 0.0, 1.0);
+
+      tx_begin();
+      USBSerial.print("SECONDARY_MOOD: ");
+      USBSerial.println(SECONDARY_MOOD, 6);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_saturation") == 0) {
+      SECONDARY_SATURATION = constrain(atof(command_data), 0.0, 1.0);
+
+      tx_begin();
+      USBSerial.print("SECONDARY_SATURATION: ");
+      USBSerial.println(SECONDARY_SATURATION, 6);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_prism_count") == 0) {
+      SECONDARY_PRISM_COUNT = constrain(atof(command_data), 0.0, 10.0);
+
+      tx_begin();
+      USBSerial.print("SECONDARY_PRISM_COUNT: ");
+      USBSerial.println(SECONDARY_PRISM_COUNT, 2);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_mirror_enabled") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_MIRROR_ENABLED = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_MIRROR_ENABLED = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_MIRROR_ENABLED: ");
+        USBSerial.println(SECONDARY_MIRROR_ENABLED);
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_reverse_order") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_REVERSE_ORDER = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_REVERSE_ORDER = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_REVERSE_ORDER: ");
+        USBSerial.println(SECONDARY_REVERSE_ORDER);
+        tx_end();
+      }
+    }
+
+    // Add command to toggle secondaryMode (which channel encoders control)
+    else if (strcmp(command_type, "secondary_control") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        secondaryMode = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        secondaryMode = false;
+        good = true;
+      } else if (strcmp(command_data, "toggle") == 0) {
+        secondaryMode = !secondaryMode;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_CONTROL: ");
+        USBSerial.println(secondaryMode ? "ENABLED (encoders control secondary channel)" : "DISABLED (encoders control primary channel)");
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_palette_mode") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_PALETTE_MODE_ENABLED = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_PALETTE_MODE_ENABLED = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_PALETTE_MODE_ENABLED: ");
+        USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "true" : "false");
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_palette_index") == 0) {
+      int index = atoi(command_data);
+      if (index >= 0 && index < gGradientPaletteCount) {
+        SECONDARY_PALETTE_INDEX = index;
+        tx_begin();
+        USBSerial.print("SECONDARY_PALETTE_INDEX: ");
+        USBSerial.print(SECONDARY_PALETTE_INDEX);
+        char buffer[32];
+        strcpy_P(buffer, (const char *)pgm_read_ptr(&(paletteNames[SECONDARY_PALETTE_INDEX])));
+        USBSerial.print(" ("); USBSerial.print(buffer); USBSerial.println(")");
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "secondary_base_coat") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        SECONDARY_BASE_COAT = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        SECONDARY_BASE_COAT = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("SECONDARY_BASE_COAT: ");
+        USBSerial.println(SECONDARY_BASE_COAT);
+        tx_end();
+      }
+    }
+
+    else {
+      return false;  // not a secondary-channel setter — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
 #ifdef SB_VIVID_PRECOMP_V1
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_vivid — the 4 vivid pre-comp handlers, lifted VERBATIM
