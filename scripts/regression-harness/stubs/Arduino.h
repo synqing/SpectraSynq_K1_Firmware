@@ -63,6 +63,20 @@ typedef bool     boolean;
 #endif
 typedef const char* __FlashStringHelper;
 
+// flash-read + PROGMEM string copy (host = plain memory; mirrors the device pgmspace.h
+// API). Promoted here from the replay driver's serial_replay_host_stubs.h so EVERY host
+// TU that includes Arduino.h sees them — serial_cmd_handlers.cpp (compiled standalone by
+// the replay oracle) uses strcpy_P/pgm_read_ptr in the secondary_palette_index echo and
+// does NOT include the driver's host-stub header. #ifndef-guarded; Arduino.h is included
+// first (via globals.h) so the driver's own guarded copy no-ops -> no double-definition.
+// strcpy is resolved at each macro USE-site (where <string.h>/<cstring> is in scope).
+#ifndef pgm_read_ptr
+#define pgm_read_ptr(addr) (*(const void* const*)(addr))
+#endif
+#ifndef strcpy_P
+#define strcpy_P(dst, src) strcpy((dst), (const char*)(src))
+#endif
+
 // --- digital/analog pin API (no-op) ----------------------------------------
 #define HIGH 1
 #define LOW 0

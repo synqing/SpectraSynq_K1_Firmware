@@ -905,6 +905,21 @@ MUTATIONS = [
         r'"ENABLED (encoders control SECONDARY channel)"',
         "secondary_control_echo_label_broken (emitted-text divergence)",
     ),
+    # S4. SEVER THE ROUTING (EXTRACT tooth — the call-site exists only after the lift).
+    #     Disable the dispatcher call with a short-circuit `false &&` so parse_command
+    #     never routes the 14 secondary commands to it; they fall through to bad_command.
+    #     Every secondary record's config_delta empties + bad_command flips true -> massive
+    #     divergence, proving the call-site is load-bearing. COMPILE-SAFE by design: the
+    #     symbol stays referenced. A `_SEVERED` rename (the struct oracle's pure-parse
+    #     trick) would FAIL the host compile, and harness_selftest._mutated_capture only
+    #     catches TypeError — a RuntimeError from a broken build propagates and crashes the
+    #     selftest instead of registering a clean catch. Bare-arg form `(command_type,
+    #     command_data)` matches ONLY the call-site (the def/decl carry typed params).
+    (
+        r"serial_cmd_dispatch_secondary\(command_type, command_data\)",
+        r"false && serial_cmd_dispatch_secondary(command_type, command_data)",
+        "secondary_dispatcher_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
