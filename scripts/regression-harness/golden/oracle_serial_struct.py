@@ -87,6 +87,39 @@ FAMILIES = [
             "commit_quantise",
         ],
     },
+    {
+        "name": "smart_director",
+        "dispatcher": "serial_cmd_dispatch_smart_director",
+        # Smart-director control (sb_smart_director_* config getters/setters +
+        # sb_apply_smart_scene + sb_mode_selection_init); ungated, facade-free. The
+        # config fns live in director/sb_smart_director.cpp (replay-oracle MODULE_CPPS);
+        # the print/apply helpers are external-linkage in serial_menu.h.
+        "commands": [
+            "smart_assist",
+            "smart_switching",
+            "smart_confidence_floor",
+            "smart_scene",
+        ],
+    },
+    {
+        "name": "smart_visual",
+        "dispatcher": "serial_cmd_dispatch_smart_visual",
+        # Visual-hooks toggle (sb_visual_hooks_* config); ungated, facade-free.
+        "commands": [
+            "smart_hooks",
+        ],
+    },
+    {
+        "name": "edge_mixer",
+        "dispatcher": "serial_cmd_dispatch_edge_mixer",
+        # Edge-mixer control (sb_edgemixer_lite_* config + sb_parse_edge_mode);
+        # ungated, facade-free.
+        "commands": [
+            "edge_enabled",
+            "edge_mode",
+            "edge_strength",
+        ],
+    },
 ]
 
 # Files a function-call handler body can live in: inline in parse_command
@@ -249,6 +282,58 @@ MUTATIONS = [
         r"serial_cmd_dispatch_queue\(command_type, command_data\)",
         r"serial_cmd_dispatch_queue_SEVERED(command_type, command_data)",
         "queue_dispatcher_call_site_severed (routing/reachable divergence)",
+    ),
+    # ---- smart_director / smart_visual / edge_mixer body + routing-by-name teeth ----
+    # 5. smart_confidence_floor clamp 1.0->0.5: alters the smart_director body. (a)
+    (
+        r"config\.confidence_floor = constrain\(value, 0\.0f, 1\.0f\);",
+        r"config.confidence_floor = constrain(value, 0.0f, 0.5f);",
+        "smart_confidence_floor_clamp_1.0_to_0.5 (statement-identity divergence)",
+    ),
+    # 6. smart_assist command_type rename: capture can't find "smart_assist" -> body
+    #    null. Routing/identity (b)/(c).
+    (
+        r'strcmp\(command_type, "smart_assist"\)',
+        r'strcmp(command_type, "smart_assist_MUT")',
+        "smart_assist_command_type_renamed (routing/identity divergence)",
+    ),
+    # 7. smart_hooks enabled flip value->false: alters the smart_visual body. Anchored
+    #    on the unique SBVisualHookConfig fetch. (a)
+    (
+        r"(SBVisualHookConfig config = sb_visual_hooks_config\(\);\s*)config\.enabled = value;",
+        r"\1config.enabled = false;",
+        "smart_hooks_enabled_value_to_false (statement-identity divergence)",
+    ),
+    # 8. edge_strength clamp 1.0->0.5: alters the edge_mixer body. (a)
+    (
+        r"config\.strength = constrain\(value, 0\.0f, 1\.0f\);",
+        r"config.strength = constrain(value, 0.0f, 0.5f);",
+        "edge_strength_clamp_1.0_to_0.5 (statement-identity divergence)",
+    ),
+    # 9. edge_mode command_type rename: capture can't find "edge_mode" -> body null.
+    #    Routing/identity (b)/(c).
+    (
+        r'strcmp\(command_type, "edge_mode"\)',
+        r'strcmp(command_type, "edge_mode_MUT")',
+        "edge_mode_command_type_renamed (routing/identity divergence)",
+    ),
+    # ---- routing-sever teeth (added with the EXTRACT; call-sites now exist) ----
+    # 10-12. sever each dispatcher call in parse_command -> that family's commands flip
+    #        reachable:true->false. Bare-arg form matches ONLY the call-site.
+    (
+        r"serial_cmd_dispatch_smart_director\(command_type, command_data\)",
+        r"serial_cmd_dispatch_smart_director_SEVERED(command_type, command_data)",
+        "smart_director_call_site_severed (routing/reachable divergence)",
+    ),
+    (
+        r"serial_cmd_dispatch_smart_visual\(command_type, command_data\)",
+        r"serial_cmd_dispatch_smart_visual_SEVERED(command_type, command_data)",
+        "smart_visual_call_site_severed (routing/reachable divergence)",
+    ),
+    (
+        r"serial_cmd_dispatch_edge_mixer\(command_type, command_data\)",
+        r"serial_cmd_dispatch_edge_mixer_SEVERED(command_type, command_data)",
+        "edge_mixer_call_site_severed (routing/reachable divergence)",
     ),
 ]
 

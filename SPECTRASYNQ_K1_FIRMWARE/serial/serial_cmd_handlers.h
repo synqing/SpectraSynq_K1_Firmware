@@ -76,6 +76,19 @@ bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_d
 // ladder continue. UNGATED.
 bool serial_cmd_dispatch_queue(const char* command_type, char* command_data);
 
+// Dispatch the smart-director family (smart_assist, smart_switching,
+// smart_confidence_floor, smart_scene). Calls sb_smart_director_* (director TU) +
+// serial_menu.h-local helpers. Returns true iff matched; false to continue. UNGATED.
+// Behaviour-preservation across the verbatim lift is proven by oracle_serial_struct.py.
+bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_data);
+
+// Dispatch the smart-visual family (smart_hooks → sb_visual_hooks_*). UNGATED.
+bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_data);
+
+// Dispatch the edge-mixer family (edge_enabled, edge_mode, edge_strength →
+// sb_edgemixer_lite_* + sb_parse_edge_mode). UNGATED.
+bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

@@ -16,6 +16,10 @@
 #include "serial_tx.h"             // tx_begin / tx_end / bad_command
 #include "serial_parse_helpers.h"  // vp_parse_bool / vp_parse_float
 #include "sb_effect_queue.h"        // sb_queue_* setters/getters + SB_QUEUE_* enums (queue family)
+#include "sb_smart_director.h"      // SBSmartDirectorConfig + sb_smart_director_config/set_config (smart_director)
+#include "sb_mode_selection.h"      // sb_mode_selection_init (smart_switching)
+#include "sb_visual_hooks.h"        // SBVisualHookConfig + sb_visual_hooks_config/set_config (smart_visual)
+#include "sb_edgemixer_lite.h"      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
 
 #include <stdint.h>
 #include <stdlib.h>                // atol / atoi / atof
@@ -898,6 +902,166 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 
     else {
       return false;  // not a queue/transition handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_menu.h-local helpers (EXTERNAL linkage; defined in serial_menu.h, included
+// only by the .ino TU in firmware and the driver TU in the replay oracle) that the
+// smart/edge dispatchers call. Forward-declared here (same pattern as the vivid
+// helpers); resolved cross-TU at link. SBEdgeMixerMode comes from sb_edgemixer_lite.h
+// (included above), so sb_parse_edge_mode's prototype is valid here.
+// ---------------------------------------------------------------------------
+void sb_print_smart_status();
+void sb_print_edge_status();
+bool sb_apply_smart_scene(const char* scene);
+bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode);
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
+// smart_switching / smart_confidence_floor / smart_scene), lifted VERBATIM from
+// parse_command()'s ungated ladder. Calls sb_smart_director_* (director TU) +
+// sb_mode_selection_init + the external serial_menu.h helpers. Behaviour-preservation
+// proven by the serial_struct structural-contract golden (reproduces after this move).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "smart_assist") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        SBSmartDirectorConfig config = sb_smart_director_config();
+        config.enabled = value;
+        if (!value) {
+          config.assist_switching_enabled = false;
+          config.director_autonomy_enabled = false;
+        }
+        sb_smart_director_set_config(config);
+        sb_print_smart_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "smart_switching") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        SBSmartDirectorConfig config = sb_smart_director_config();
+        config.enabled = config.enabled || value;
+        config.assist_switching_enabled = value;
+        sb_smart_director_set_config(config);
+        sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
+        sb_print_smart_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "smart_confidence_floor") == 0) {
+      float value = 0.0f;
+      if (vp_parse_float(command_data, &value)) {
+        SBSmartDirectorConfig config = sb_smart_director_config();
+        config.confidence_floor = constrain(value, 0.0f, 1.0f);
+        sb_smart_director_set_config(config);
+        sb_print_smart_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "smart_scene") == 0) {
+      if (sb_apply_smart_scene(command_data)) {
+        sb_print_smart_status();
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else {
+      return false;  // not a smart-director handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_smart_visual — visual-hooks toggle (smart_hooks), lifted
+// VERBATIM. Calls sb_visual_hooks_* (director TU) + sb_print_smart_status. Ungated.
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "smart_hooks") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        SBVisualHookConfig config = sb_visual_hooks_config();
+        config.enabled = value;
+        sb_visual_hooks_set_config(config);
+        sb_print_smart_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else {
+      return false;  // not the smart-visual handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_edge_mixer — edge-mixer control (edge_enabled / edge_mode /
+// edge_strength), lifted VERBATIM. Calls sb_edgemixer_lite_* (director TU) +
+// sb_parse_edge_mode + sb_print_edge_status. Ungated.
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "edge_enabled") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.enabled = value;
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_mode") == 0) {
+      SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
+      if (sb_parse_edge_mode(command_data, &mode)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.mode = mode;
+        if (mode == SB_EDGE_MIXER_OFF) {
+          config.enabled = false;
+        }
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_strength") == 0) {
+      float value = 0.0f;
+      if (vp_parse_float(command_data, &value)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.strength = constrain(value, 0.0f, 1.0f);
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else {
+      return false;  // not an edge-mixer handler — let parse_command's ladder continue
     }
 
     return true;
