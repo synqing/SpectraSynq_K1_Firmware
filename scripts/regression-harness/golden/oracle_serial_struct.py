@@ -369,6 +369,16 @@ MUTATIONS = [
         r'strcmp(command_type, "preset_MUT")',
         "preset_command_type_renamed (routing/identity divergence)",
     ),
+    # 15. SEVER THE ROUTING (added with the EXTRACT, once the call-site exists): rename
+    #     the parse_command call so capture()'s `_routed` check no longer finds it. The
+    #     "preset" body still lives in the dispatcher, but reachable flips true->false ->
+    #     divergence. Bare-arg form `(command_type, command_data)` matches ONLY the
+    #     call-site (the def/decl carry typed params), so the rglob lands there.
+    (
+        r"serial_cmd_dispatch_preset\(command_type, command_data\)",
+        r"serial_cmd_dispatch_preset_SEVERED(command_type, command_data)",
+        "preset_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 
