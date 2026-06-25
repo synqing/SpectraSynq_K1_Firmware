@@ -3210,28 +3210,14 @@ void parse_command(char* command_buf) {
     }
 
     // Set CONFIG preset ----------------------------
-    else if (strcmp(command_type, "preset") == 0) {
-      bool good = false;
-
-      if      (strcmp(command_data, "default")      == 0) { good = true; }
-      else if (strcmp(command_data, "tinted_bulbs") == 0) { good = true; }
-      else if (strcmp(command_data, "incandescent") == 0) { good = true; }
-      else if (strcmp(command_data, "white")        == 0) { good = true; }
-      else if (strcmp(command_data, "classic")      == 0) { good = true; }
-
-      else { // Bad preset name
-        bad_command(command_type, command_data);
-      }
-
-      if (good) {
-        set_preset(command_data); // presets.h
-
-        save_config_delayed();
-        tx_begin();
-        USBSerial.print("ENABLED PRESET: ");
-        USBSerial.println(command_data);
-        tx_end();
-      }
+    // Extracted VERBATIM to serial_cmd_dispatch_preset() in serial_cmd_handlers.cpp:
+    // the single "preset" command (5 theme names -> set_preset() + save_config_delayed()).
+    // Returns true iff command_type == "preset" (the body ran); false to fall through to
+    // the remaining ladder. UNGATED. Behaviour-preserving — proven byte-for-byte by the
+    // serial_struct structural-contract gate (the function-call families the replay
+    // oracle cannot observe).
+    else if (serial_cmd_dispatch_preset(command_type, command_data)) {
+      // handled by the extracted preset dispatcher
     }
 
     // Effects queue + preset slots (spec §4, 2026-06-11) ----------------------

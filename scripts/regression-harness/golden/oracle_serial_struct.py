@@ -120,6 +120,22 @@ FAMILIES = [
             "edge_strength",
         ],
     },
+    {
+        "name": "preset",
+        "dispatcher": "serial_cmd_dispatch_preset",
+        # "Set CONFIG preset" (serial_menu.h): the single "preset" command validates
+        # command_data against 5 theme names, then calls set_preset() + save_config_delayed()
+        # and echoes "ENABLED PRESET: <name>". Ungated, facade-free. set_preset() is an
+        # external-linkage header-body fn in system/presets.h (included only by the .ino TU,
+        # so the firmware links one definition; the handlers TU forward-declares it extern).
+        # In the replay oracle it is a GUARANTEED-EXTERNAL driver stub (oracle_serial_replay
+        # driver `void set_preset(char*) {}`), NOT a static-inline host stub — so the handlers
+        # TU links free (no sb_queue_*-style -O0 link trap). save_config_delayed() is likewise
+        # already a driver stub + already used by the extracted setter dispatchers.
+        "commands": [
+            "preset",
+        ],
+    },
 ]
 
 # Files a function-call handler body can live in: inline in parse_command
@@ -334,6 +350,34 @@ MUTATIONS = [
         r"serial_cmd_dispatch_edge_mixer\(command_type, command_data\)",
         r"serial_cmd_dispatch_edge_mixer_SEVERED(command_type, command_data)",
         "edge_mixer_call_site_severed (routing/reachable divergence)",
+    ),
+    # ---- preset body + routing-by-name teeth (family added 2026-06-25) ----
+    # 13. ALTER THE ECHO: "ENABLED PRESET: " -> "ENABLED PRESET! ". The normalized body
+    #     of "preset" diverges on the string literal's CONTENT (proves normalization is
+    #     not blind to the echo). Channel (a) statement-identity. Anchor is unique and
+    #     home-agnostic (inline serial_menu.h pre-extract, dispatcher post-extract).
+    (
+        r'USBSerial\.print\("ENABLED PRESET: "\);',
+        r'USBSerial.print("ENABLED PRESET! ");',
+        "preset_echo_text_changed (statement/echo divergence)",
+    ),
+    # 14. MIS-ROUTE THE COMMAND_TYPE: rename the "preset" strcmp -> "preset_MUT".
+    #     capture() can no longer find the branch -> body null + reachable false.
+    #     Channel (b)/(c) routing/identity. Exact closing `"` => matches only "preset".
+    (
+        r'strcmp\(command_type, "preset"\)',
+        r'strcmp(command_type, "preset_MUT")',
+        "preset_command_type_renamed (routing/identity divergence)",
+    ),
+    # 15. SEVER THE ROUTING (added with the EXTRACT, once the call-site exists): rename
+    #     the parse_command call so capture()'s `_routed` check no longer finds it. The
+    #     "preset" body still lives in the dispatcher, but reachable flips true->false ->
+    #     divergence. Bare-arg form `(command_type, command_data)` matches ONLY the
+    #     call-site (the def/decl carry typed params), so the rglob lands there.
+    (
+        r"serial_cmd_dispatch_preset\(command_type, command_data\)",
+        r"serial_cmd_dispatch_preset_SEVERED(command_type, command_data)",
+        "preset_call_site_severed (routing/reachable divergence)",
     ),
 ]
 

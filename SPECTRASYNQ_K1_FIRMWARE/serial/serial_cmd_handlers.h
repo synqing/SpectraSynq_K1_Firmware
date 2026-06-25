@@ -89,6 +89,11 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
 // sb_edgemixer_lite_* + sb_parse_edge_mode). UNGATED.
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data);
 
+// Dispatch the "Set CONFIG preset" handler (single "preset" command → set_preset()
+// + save_config_delayed()). UNGATED, facade-free. Behaviour-preservation across the
+// verbatim lift is proven by oracle_serial_struct.py (the serial_struct golden).
+bool serial_cmd_dispatch_preset(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

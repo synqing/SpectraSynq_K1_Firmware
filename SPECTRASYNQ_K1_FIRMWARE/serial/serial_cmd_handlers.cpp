@@ -33,6 +33,12 @@
 extern void save_config();
 extern void save_config_delayed();
 
+// set_preset() is an external-linkage header-body fn in system/presets.h (included
+// ONLY by the .ino TU, so the firmware links that single definition). Forward-declare
+// here — same cross-TU pattern as save_config_delayed above — so the moved preset body
+// links against it. (Host: the serial_replay oracle driver provides void set_preset(char*){}.)
+extern void set_preset(char* preset_name);
+
 // reboot() is the device restart entry point (defined in the driver / .ino TU;
 // declared extern at serial_menu.h:47). The 7 reboot-bearing setters (S4.1) end
 // with reboot() after persisting + echoing — forward-declare it here so the moved
@@ -1062,6 +1068,51 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
 
     else {
       return false;  // not an edge-mixer handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_preset — the "Set CONFIG preset" handler, lifted VERBATIM
+// from parse_command()'s ungated ladder (serial_menu.h "Set CONFIG preset"). The
+// single "preset" command validates command_data against 5 theme names, then calls
+// set_preset() (presets.h, forward-declared extern above) + save_config_delayed().
+// The `if (false) {}` opener keeps the branch a statement-identical
+// `else if (strcmp(command_type, "<name>") == 0)`. Returns true iff matched; false
+// routes parse_command to its remaining ladder. UNGATED, facade-free.
+// Behaviour-preservation across the verbatim lift is proven by the serial_struct
+// structural-contract golden (reproduces byte-for-byte after this move).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_preset(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "preset") == 0) {
+      bool good = false;
+
+      if      (strcmp(command_data, "default")      == 0) { good = true; }
+      else if (strcmp(command_data, "tinted_bulbs") == 0) { good = true; }
+      else if (strcmp(command_data, "incandescent") == 0) { good = true; }
+      else if (strcmp(command_data, "white")        == 0) { good = true; }
+      else if (strcmp(command_data, "classic")      == 0) { good = true; }
+
+      else { // Bad preset name
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        set_preset(command_data); // presets.h
+
+        save_config_delayed();
+        tx_begin();
+        USBSerial.print("ENABLED PRESET: ");
+        USBSerial.println(command_data);
+        tx_end();
+      }
+    }
+
+    else {
+      return false;  // not the preset handler — let parse_command's ladder continue
     }
 
     return true;
