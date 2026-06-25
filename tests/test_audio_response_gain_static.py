@@ -8,6 +8,7 @@ CONFIG_TYPES = (FW / "system" / "config_types.h").read_text(encoding="utf-8")
 GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
 I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
 SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+HANDLERS = (FW / "serial" / "serial_cmd_handlers.cpp").read_text(encoding="utf-8")
 PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 
 
@@ -18,6 +19,20 @@ def typed_command_block(command_type):
     next_block = SERIAL.find("else if (strcmp(command_type,", start + len(marker))
     assert next_block > start, f"missing next typed command block after {command_type}"
     return SERIAL[start:next_block]
+
+
+def dispatcher_function(fn_name):
+    """Return the body of an extracted serial_cmd_dispatch_* function from
+    serial_cmd_handlers.cpp (the strangler-fig home for relocated handlers).
+    Sliced to the column-0 closing brace so it contains ONLY that function — the
+    runtime-only invariants are asserted against the handler's new location after a
+    verbatim lift out of serial_menu.h's parse_command() ladder."""
+    marker = f"bool {fn_name}("
+    start = HANDLERS.find(marker)
+    assert start >= 0, f"missing dispatcher {fn_name}"
+    end = HANDLERS.find("\n}\n", start)
+    assert end > start, f"unterminated dispatcher {fn_name}"
+    return HANDLERS[start:end + 3]
 
 
 def platformio_env_block(env_name):
@@ -59,9 +74,21 @@ class AudioResponseGainStaticTest(unittest.TestCase):
         self.assertGreater(fixed_index, dc_index)
 
     def test_serial_command_is_runtime_only_and_visible_in_dump(self):
+        # The dump-info status echo and the menu help text stay in serial_menu.h.
         self.assertIn("AUDIO_RESPONSE_GAIN: ", SERIAL)
         self.assertIn("response_gain=[float or 'default']", SERIAL)
-        block = typed_command_block("response_gain")
+        # The handler body was extracted VERBATIM (strangler-fig) into
+        # serial_cmd_dispatch_response_gain() in serial_cmd_handlers.cpp;
+        # parse_command() now routes to it via a single UNGATED else-if. No
+        # behaviour change — proven byte-for-byte by the serial_replay golden.
+        self.assertIn(
+            "else if (serial_cmd_dispatch_response_gain(command_type, command_data))",
+            SERIAL,
+            "parse_command must route response_gain to the extracted dispatcher",
+        )
+        # Assert the runtime-only invariants against the handler's NEW home.
+        block = dispatcher_function("serial_cmd_dispatch_response_gain")
+        self.assertIn('strcmp(command_type, "response_gain")', block)
         self.assertIn("audio_response_gain =", block)
         self.assertIn("audio_response_gain_clamped()", block)
         self.assertNotIn("save_config", block)

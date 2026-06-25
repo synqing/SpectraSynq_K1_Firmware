@@ -59,6 +59,14 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
 // false to let parse_command's ladder continue. Gated by the Fα serial_replay golden.
 bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data);
 
+// Dispatch the response_gain handler — writes the audio_response_gain inline global
+// (globals.h:48, UNGATED) via serial_clamp_float (MIN 0.25, MAX 4.0, DEFAULT 1.0).
+// No save_config, no reboot, no bad_command (atof() fallback clamps garbage to MIN).
+// Returns true iff command_type == "response_gain"; false to let parse_command's
+// ladder continue. Gated by the Fα serial_replay golden — it must reproduce
+// byte-for-byte after the body relocates from serial_menu.h's ungated ladder branch.
+bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's
