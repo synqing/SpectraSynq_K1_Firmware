@@ -437,6 +437,18 @@ void sb_queue_arm_preset(bool /*secondary*/, const SBChannelPreset& /*preset*/) 
 void sb_queue_request_commit(bool /*cued*/, uint32_t /*now_ms*/) {}
 bool sb_queue_mode_enabled() { return false; }
 uint8_t sb_queue_transition_style() { return 0; }
+// sb_effect_queue.h config setters/getters (sb_effect_queue.h:134-140). EXTERNAL defs
+// here (moved out of serial_replay_host_stubs.h) so the EXTRACTED
+// serial_cmd_dispatch_queue() in serial_cmd_handlers.cpp — a separate TU that only
+// sees the declaration — links them too. Values irrelevant (queue not in the corpus).
+uint16_t sb_queue_dip_ms() { return 0; }
+bool     sb_queue_set_dip_ms(uint32_t) { return true; }
+uint16_t sb_queue_xfade_ms() { return 0; }
+bool     sb_queue_set_xfade_ms(uint32_t) { return true; }
+uint8_t  sb_queue_commit_quantise() { return 0; }
+void     sb_queue_set_commit_quantise(uint8_t) {}
+void     sb_queue_set_transition_style(uint8_t) {}
+void     sb_queue_set_mode_enabled(bool) {}
 bool sb_preset_slot_save(uint8_t /*slot*/, bool /*from_secondary*/) { return false; }
 bool sb_preset_slot_get(uint8_t /*slot*/, SBChannelPreset* /*out*/) { return false; }
 

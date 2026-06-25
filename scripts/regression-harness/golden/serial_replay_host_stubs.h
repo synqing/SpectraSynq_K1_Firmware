@@ -89,17 +89,15 @@ inline int raw_dump_request = 0;
 template <typename T> static inline bool apply_chroma_profile(T /*profile*/) { return false; }
 
 // --- sb_effect_queue.* config symbols ------------------------------------------
-// parse_command's queue/dip/xfade setters (LIVE branches, NOT in the corpus) call
-// these. Rather than compile control/sb_effect_queue.cpp (which drags <FS.h> /
-// <LittleFS.h> / EffectRegistry — heavy, irrelevant to pure setters), stub the
-// handful of config entry points. Signatures mirror sb_effect_queue.h:134-140.
-static inline uint16_t sb_queue_dip_ms()                 { return 0; }
-static inline bool     sb_queue_set_dip_ms(uint32_t)     { return true; }
-static inline uint16_t sb_queue_xfade_ms()               { return 0; }
-static inline bool     sb_queue_set_xfade_ms(uint32_t)   { return true; }
-static inline uint8_t  sb_queue_commit_quantise()        { return 0; }
-static inline void     sb_queue_set_commit_quantise(uint8_t) {}
-static inline void     sb_queue_set_transition_style(uint8_t) {}
-static inline void     sb_queue_set_mode_enabled(bool)   {}
+// The sb_queue_* config setters/getters (sb_effect_queue.h:134-140) are stubbed as
+// EXTERNAL (non-inline) definitions in the driver (oracle_serial_replay.py), next to
+// the other sb_queue_* externals (sb_queue_any_armed etc.) — NOT here. Reason: the
+// queue command handlers were lifted out of serial_menu.h (driver TU) into
+// serial_cmd_handlers.cpp (a SEPARATE oracle TU). A `static inline` stub here has
+// internal linkage (invisible to the handlers TU); a plain `inline` is only emitted
+// by a TU that odr-uses it, so the setters used ONLY by the handlers TU (which sees
+// just the declaration via sb_effect_queue.h) are emitted by nobody -> link error.
+// A single guaranteed-emitted external definition in the driver binds BOTH TUs. The
+// queue family is not in the replay corpus, so the stub values never affect the golden.
 
 #endif  // SERIAL_REPLAY_HOST_STUBS_H

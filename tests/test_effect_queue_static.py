@@ -118,10 +118,16 @@ class EffectQueueKeyMapTest(unittest.TestCase):
                           f"typed equivalent {token} must exist in the parse_command dispatch surface")
 
     def test_queue_commands_exist(self):
+        # The queue/transition family (queue_mode/transition_style/transition_dip_ms/
+        # transition_xfade_ms/commit_quantise) was lifted VERBATIM into
+        # serial_cmd_dispatch_queue() in serial_cmd_handlers.cpp (structural-contract
+        # gate: oracle_serial_struct.py); the slot_* commands stay inline. Assert the
+        # branch exists across the whole dispatch surface (menu + handlers), as the
+        # sibling test_removed_bindings_have_typed_equivalents already does.
         for token in ["queue_mode", "transition_style", "transition_dip_ms",
                       "transition_xfade_ms", "commit_quantise", "slot_save",
                       "slot_load", "slot_arm"]:
-            self.assertIn(f'strcmp(command_type, "{token}")', self.menu)
+            self.assertIn(f'strcmp(command_type, "{token}")', self.dispatch)
         table = CMD_TABLE.read_text()
         self.assertIn('SERIAL_CMD("commit",', table)
         self.assertIn('SERIAL_CMD("slot_list",', table)

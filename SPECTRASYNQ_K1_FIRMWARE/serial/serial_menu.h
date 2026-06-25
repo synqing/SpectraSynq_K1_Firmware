@@ -3316,74 +3316,14 @@ void parse_command(char* command_buf) {
     }
 
     // Effects queue + preset slots (spec §4, 2026-06-11) ----------------------
-    else if (strcmp(command_type, "queue_mode") == 0) {
-      if (strcmp(command_data, "on") == 0) {
-        sb_queue_set_mode_enabled(true);
-        tx_begin();
-        USBSerial.println("QUEUE_MODE: on");
-        tx_end();
-      } else if (strcmp(command_data, "off") == 0) {
-        sb_queue_set_mode_enabled(false);
-        tx_begin();
-        USBSerial.println("QUEUE_MODE: off");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "transition_style") == 0) {
-      if (strcmp(command_data, "dip") == 0) {
-        sb_queue_set_transition_style(SB_QUEUE_TRANSITION_DIP);
-        tx_begin();
-        USBSerial.println("TRANSITION_STYLE: dip");
-        tx_end();
-      } else if (strcmp(command_data, "xfade") == 0) {
-        sb_queue_set_transition_style(SB_QUEUE_TRANSITION_XFADE);
-        tx_begin();
-        USBSerial.println("TRANSITION_STYLE: xfade");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-
-    else if (strcmp(command_type, "transition_dip_ms") == 0) {
-      if (sb_queue_set_dip_ms((uint32_t)atoi(command_data))) {
-        tx_begin();
-        USBSerial.print("TRANSITION_DIP_MS: ");
-        USBSerial.println(sb_queue_dip_ms());
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);  // valid range 60..1000
-      }
-    }
-
-    else if (strcmp(command_type, "transition_xfade_ms") == 0) {
-      if (sb_queue_set_xfade_ms((uint32_t)atoi(command_data))) {
-        tx_begin();
-        USBSerial.print("TRANSITION_XFADE_MS: ");
-        USBSerial.println(sb_queue_xfade_ms());
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);  // valid range 100..3000
-      }
-    }
-
-    else if (strcmp(command_type, "commit_quantise") == 0) {
-      if (strcmp(command_data, "off") == 0) {
-        sb_queue_set_commit_quantise(SB_QUEUE_QUANTISE_OFF);
-        tx_begin();
-        USBSerial.println("COMMIT_QUANTISE: off");
-        tx_end();
-      } else if (strcmp(command_data, "beat") == 0) {
-        sb_queue_set_commit_quantise(SB_QUEUE_QUANTISE_BEAT);
-        tx_begin();
-        USBSerial.println("COMMIT_QUANTISE: beat");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
+    // Extracted VERBATIM to serial_cmd_dispatch_queue() in serial_cmd_handlers.cpp:
+    // queue_mode / transition_style / transition_dip_ms / transition_xfade_ms /
+    // commit_quantise. Returns true iff command_type named one of the five (the body
+    // ran); false to fall through to the remaining ladder. UNGATED. Behaviour-
+    // preserving — proven byte-for-byte by the serial_struct structural-contract gate
+    // (the function-call families the replay oracle cannot observe).
+    else if (serial_cmd_dispatch_queue(command_type, command_data)) {
+      // handled by the extracted effects-queue / transition dispatcher
     }
 
     else if (strcmp(command_type, "slot_save") == 0) {
