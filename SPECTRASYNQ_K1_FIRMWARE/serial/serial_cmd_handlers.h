@@ -67,6 +67,15 @@ bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data)
 // byte-for-byte after the body relocates from serial_menu.h's ungated ladder branch.
 bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_data);
 
+// Dispatch the effects-queue / transition family (queue_mode, transition_style,
+// transition_dip_ms, transition_xfade_ms, commit_quantise). Each calls the
+// host-stubbed sb_queue_* subsystem (sb_effect_queue.h) — a FUNCTION-CALL family the
+// replay oracle is blind to; behaviour-preservation across this verbatim lift is
+// proven by the structural-contract gate (oracle_serial_struct.py), not replay.
+// Returns true iff command_type named one of the five; false to let parse_command's
+// ladder continue. UNGATED.
+bool serial_cmd_dispatch_queue(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

@@ -239,14 +239,18 @@ MUTATIONS = [
         r'USBSerial.println("TRANSITION_STYLE: DIP");',
         "transition_style_echo_text_changed (statement/echo divergence)",
     ),
+    # 4. SEVER THE ROUTING (added in the EXTRACT commit, once the dispatcher call-site
+    #    exists): rename the parse_command call so capture()'s `_routed` check no longer
+    #    finds it. The queue bodies still live in the dispatcher, but every queue
+    #    command flips reachable:true->false -> divergence. Proves the `reachable`
+    #    field is not blind. The bare-arg form `(command_type, command_data)` matches
+    #    ONLY the call-site (the def/decl carry typed params), so the rglob lands there.
+    (
+        r"serial_cmd_dispatch_queue\(command_type, command_data\)",
+        r"serial_cmd_dispatch_queue_SEVERED(command_type, command_data)",
+        "queue_dispatcher_call_site_severed (routing/reachable divergence)",
+    ),
 ]
-
-# Routing fault-evidence (the `reachable` field) is proven by an ADDITIONAL mutation
-# added in the EXTRACT commit, once the dispatcher call-site exists to sever:
-#   sever `serial_cmd_dispatch_queue(command_type, command_data)` in parse_command
-#   -> every queue command flips reachable:true->false -> divergence.
-# It is intentionally absent pre-extraction (no call-site to match would make
-# harness_selftest report it as "not caught"); see the LOCK/EXTRACT two-commit split.
 
 
 # ---------------------------------------------------------------------------
