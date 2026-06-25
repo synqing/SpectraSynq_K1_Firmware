@@ -4,6 +4,8 @@ abstract: "CURRENT handover (2026-06-25, supersedes handover-2026-06-25-serial-d
 
 # Handover — K1 serial_menu.h decomposition: structural gate shipped + device-smoked (2026-06-25)
 
+> **⛔ SUPERSEDED (2026-06-26) → read [`handover-2026-06-26-secondary-shipped-gated-next.md`](./handover-2026-06-26-secondary-shipped-gated-next.md) instead.** Since this doc: preset (PR#8) + secondary_* 14 setters (PR#9) + the mutation-anchor guard shipped; main is now `bf27cbe`. This file stays as the canonical reference for the two recipes (replay-lock + structural gate) and the device/flash reality, but the current state, lessons, and NEXT work live in the 2026-06-26 handover.
+
 > **You are the SpectraSynq CTO-agent continuing a de-Arduino modernization.** Repo: `/Users/spectrasynq/SpectraSynq_K1_Firmware` (origin `github.com/synqing/SpectraSynq_K1_Firmware`). DECOY repo to NEVER touch: `/Users/spectrasynq/SensoryBridge-main 9`. Goal: decompose the `serial_menu.h` god-header into clean TUs **without regressing the musical light-show** (perceptual product = sacred; behaviour-preservation = the floor). Method = **strangler-fig: verbatim-lift handler families out of `parse_command()` into `serial_cmd_dispatch_*()` behind golden behaviour-locks.** THE VERIFICATION HARNESS IS THE PRODUCT.
 
 ## 0 · TL;DR — where we are
