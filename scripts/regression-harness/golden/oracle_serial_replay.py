@@ -301,6 +301,26 @@ CORPUS = [
     # ---- (9) VP float clamp boundary: prove the manual clamp bounds ----------
     "vp_bloom_alpha=0.79",      # below 0.80 -> clamped to 0.80 (VP_BLOOM_ALPHA)
     "vp_bloom_alpha=1.01",      # above 1.00 -> clamped to 1.00 (VP_BLOOM_ALPHA)
+
+    # ===================================================================
+    # Fα VIVID EXTENSION — 4 vivid handlers (SB_VIVID_PRECOMP_V1, gated in
+    # parse_command by #ifdef). Each writes a VP_VIVID_* inline global.
+    # config_delta now tracks the VP_VIVID_* globals (snapshot extended above).
+    # ===================================================================
+    # ---- (10) valid vivid sets: one representative per handler ----------
+    "vivid=on",                 # VP_VIVID_PRECOMP = true + serial_ensure_vivid_defaults()
+    "vivid=off",                # VP_VIVID_PRECOMP = false
+    "vivid_level=0.7",          # serial_set_vivid_level(0.7) -> CHROMA=0.7, BLACK=scaled
+    "vivid_chroma=0.5",         # VP_VIVID_CHROMA_LEVEL = constrain(0.5, 0.0, 1.0) = 0.5
+    "vivid_black=0.3",          # VP_VIVID_BLACK_LEVEL = constrain(0.3, 0.0, 1.0) = 0.3
+
+    # ---- (11) vivid clamp/boundary: prove the constrain() bounds ----------
+    "vivid_chroma=1.5",         # above 1.0 -> clamped to 1.0 (VP_VIVID_CHROMA_LEVEL)
+    "vivid_chroma=-0.1",        # below 0.0 -> clamped to 0.0 (VP_VIVID_CHROMA_LEVEL)
+    "vivid_black=1.5",          # above 1.0 -> clamped to 1.0 (VP_VIVID_BLACK_LEVEL)
+
+    # ---- (12) vivid failure path: bad_command -------------------------
+    "vivid=maybe",              # not a bool token -> bad_command
 ]
 
 # ---------------------------------------------------------------------------
@@ -481,6 +501,13 @@ static int snapshot(FieldSnap* out) {
   out[n++] = {"VP_WAVEFORM_FALLBACK_BRIGHTNESS",   (double)VP_WAVEFORM_FALLBACK_BRIGHTNESS};
   out[n++] = {"VP_WAVEFORM_VU_FLOOR",              (double)VP_WAVEFORM_VU_FLOOR};
   out[n++] = {"VP_WAVEFORM_SHIFT_RATE",            (double)VP_WAVEFORM_SHIFT_RATE};
+  // Fα vivid extension: 3 vivid inline globals written by the vivid handlers.
+  // UNCONDITIONAL — VP_VIVID_PRECOMP/CHROMA_LEVEL/BLACK_LEVEL exist in globals.h
+  // outside any #ifdef (lines 465-467). Without these the config_delta is BLIND
+  // to mis-routed or wrong-clamp vivid writes (the whole point of the new coverage).
+  out[n++] = {"VP_VIVID_PRECOMP",      (double)VP_VIVID_PRECOMP};
+  out[n++] = {"VP_VIVID_CHROMA_LEVEL", (double)VP_VIVID_CHROMA_LEVEL};
+  out[n++] = {"VP_VIVID_BLACK_LEVEL",  (double)VP_VIVID_BLACK_LEVEL};
   return n;
 }
 
@@ -696,6 +723,30 @@ MUTATIONS = [
         r"vp_set_float_command\(command_type, command_data, &VP_BLOOM_ALPHA, 0\.80f, 1\.00f\);",
         r"\1vp_set_float_command(command_type, command_data, &VP_BLOOM_ALPHA, 0.70f, 1.00f);",
         "vp_bloom_alpha_clamp_low_0.80_to_0.70 (CONFIG-delta divergence on boundary entry)",
+    ),
+    # ===================================================================
+    # Fα VIVID MUTATIONS — 2 edits that MUST diverge the golden on the
+    # vivid corpus entries. Each targets a DIFFERENT channel.
+    # ===================================================================
+    # M1. MIS-ROUTE the vivid_chroma write: change VP_VIVID_CHROMA_LEVEL ->
+    #     VP_VIVID_BLACK_LEVEL. "vivid_chroma=0.5" now writes the WRONG global —
+    #     config_delta shows VP_VIVID_CHROMA_LEVEL absent (unchanged) +
+    #     VP_VIVID_BLACK_LEVEL spuriously changed. Field-routing regression that
+    #     echo text alone misses. Channel (b).
+    (
+        r"(else if \(strcmp\(command_type, \"vivid_chroma\"\) == 0\) \{[^}]*)"
+        r"VP_VIVID_CHROMA_LEVEL = constrain\(value, 0\.0f, 1\.0f\);",
+        r"\1VP_VIVID_BLACK_LEVEL = constrain(value, 0.0f, 1.0f);",
+        "vivid_chroma_write_misrouted_to_VP_VIVID_BLACK_LEVEL (field-routing divergence)",
+    ),
+    # M2. CHANGE the vivid_chroma upper clamp from 1.0f to 0.5f. "vivid_chroma=1.5"
+    #     now records VP_VIVID_CHROMA_LEVEL=0.5 instead of the correct clamped value
+    #     of 1.0. Diverges channel (b) config_delta on the boundary corpus entry.
+    (
+        r"(else if \(strcmp\(command_type, \"vivid_chroma\"\) == 0\) \{[^}]*)"
+        r"VP_VIVID_CHROMA_LEVEL = constrain\(value, 0\.0f, 1\.0f\);",
+        r"\1VP_VIVID_CHROMA_LEVEL = constrain(value, 0.0f, 0.5f);",
+        "vivid_chroma_clamp_upper_1.0_to_0.5 (CONFIG-delta divergence on boundary entry)",
     ),
 ]
 

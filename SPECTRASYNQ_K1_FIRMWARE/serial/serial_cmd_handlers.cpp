@@ -762,3 +762,94 @@ bool serial_cmd_dispatch_vp_tuning(const char* command_type, char* command_data)
 
     return true;
 }
+
+#ifdef SB_VIVID_PRECOMP_V1
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_vivid — the 4 vivid pre-comp handlers, lifted VERBATIM
+// from parse_command()'s #ifdef SB_VIVID_PRECOMP_V1 block (serial_menu.h
+// lines 2521-2574). The `if (false) {}` opener keeps every real branch as a
+// statement-identical `else if (strcmp(command_type, "<name>") == 0)`. Each
+// writes VP_VIVID_* inline globals — no save_config, no reboot.
+// Returns true iff a branch matched; false routes parse_command to its remaining
+// ladder + bad_command. Gated by the Fα serial_replay golden — it must reproduce
+// byte-for-byte after this move (tests/test_golden_master.py + harness_selftest.py).
+//
+// Vivid helpers called here are external-linkage free functions defined in
+// serial_menu.h (within #ifdef SB_VIVID_PRECOMP_V1):
+//   serial_ensure_vivid_defaults()           serial_menu.h:420
+//   serial_set_vivid_level(float)            serial_menu.h:427
+//   serial_update_vivid_enabled_from_levels() serial_menu.h:416
+//   serial_print_vivid_precomp_status()      serial_menu.h:434
+// Forward-declared below (same pattern as serial_print_palette_line and
+// vp_set_flag/float_command above). vp_parse_bool / vp_parse_float are already
+// available via serial_parse_helpers.h (included at top of this TU).
+// constrain is an Arduino macro pulled in transitively through globals.h.
+// ---------------------------------------------------------------------------
+void serial_ensure_vivid_defaults();
+void serial_set_vivid_level(float value);
+void serial_update_vivid_enabled_from_levels();
+void serial_print_vivid_precomp_status();
+
+bool serial_cmd_dispatch_vivid(const char* command_type, char* command_data) {
+    if (false) {}
+
+	    else if (strcmp(command_type, "vivid") == 0) {
+	      bool value = false;
+	      if (vp_parse_bool(command_data, &value)) {
+	        VP_VIVID_PRECOMP = value;
+	        if (VP_VIVID_PRECOMP) {
+	          serial_ensure_vivid_defaults();
+	        }
+	        tx_begin();
+	        serial_print_vivid_precomp_status();
+	        tx_end();
+	      } else {
+	        bad_command(command_type, command_data);
+	      }
+	    }
+
+	    else if (strcmp(command_type, "vivid_level") == 0) {
+	      float value = 0.0f;
+	      if (vp_parse_float(command_data, &value)) {
+	        serial_set_vivid_level(value);
+	        tx_begin();
+	        serial_print_vivid_precomp_status();
+	        tx_end();
+	      } else {
+	        bad_command(command_type, command_data);
+	      }
+	    }
+
+	    else if (strcmp(command_type, "vivid_chroma") == 0) {
+	      float value = 0.0f;
+	      if (vp_parse_float(command_data, &value)) {
+	        VP_VIVID_CHROMA_LEVEL = constrain(value, 0.0f, 1.0f);
+	        serial_update_vivid_enabled_from_levels();
+	        tx_begin();
+	        serial_print_vivid_precomp_status();
+	        tx_end();
+	      } else {
+	        bad_command(command_type, command_data);
+	      }
+	    }
+
+	    else if (strcmp(command_type, "vivid_black") == 0) {
+	      float value = 0.0f;
+	      if (vp_parse_float(command_data, &value)) {
+	        VP_VIVID_BLACK_LEVEL = constrain(value, 0.0f, 1.0f);
+	        serial_update_vivid_enabled_from_levels();
+	        tx_begin();
+	        serial_print_vivid_precomp_status();
+	        tx_end();
+	      } else {
+	        bad_command(command_type, command_data);
+	      }
+	    }
+
+    else {
+      return false;  // not a vivid handler — let parse_command's ladder continue
+    }
+
+    return true;
+}
+#endif // SB_VIVID_PRECOMP_V1
