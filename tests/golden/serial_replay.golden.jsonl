@@ -96,3 +96,8 @@
 {"cmd":"vivid_chroma=-0.1","emitted":"sbr{{\nVIVID_PRECOMP: on\nVIVID_CHROMA_LEVEL: 0.000\nVIVID_BLACK_LEVEL: 0.300\n}}\n","config_delta":{"VP_VIVID_CHROMA_LEVEL":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"vivid_black=1.5","emitted":"sbr{{\nVIVID_PRECOMP: on\nVIVID_CHROMA_LEVEL: 0.000\nVIVID_BLACK_LEVEL: 1.000\n}}\n","config_delta":{"VP_VIVID_BLACK_LEVEL":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"vivid=maybe","emitted":"sberr[[\nBad command: vivid=maybe\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"response_gain=2.0","emitted":"sbr{{\nAUDIO_RESPONSE_GAIN: 2.000000\n}}\n","config_delta":{"AUDIO_RESPONSE_GAIN":2.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"response_gain=0.1","emitted":"sbr{{\nAUDIO_RESPONSE_GAIN: 0.250000\n}}\n","config_delta":{"AUDIO_RESPONSE_GAIN":0.250000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"response_gain=9.9","emitted":"sbr{{\nAUDIO_RESPONSE_GAIN: 4.000000\n}}\n","config_delta":{"AUDIO_RESPONSE_GAIN":4.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"response_gain=default","emitted":"sbr{{\nAUDIO_RESPONSE_GAIN: 1.000000\n}}\n","config_delta":{"AUDIO_RESPONSE_GAIN":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"response_gain=abc","emitted":"sbr{{\nAUDIO_RESPONSE_GAIN: 0.250000\n}}\n","config_delta":{"AUDIO_RESPONSE_GAIN":0.250000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
