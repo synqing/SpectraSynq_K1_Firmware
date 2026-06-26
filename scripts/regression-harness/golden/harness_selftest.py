@@ -51,6 +51,14 @@ ORACLE_MODULES = [
                      # source parse: pins normalized handler body + dispatch-routing,
                      # invariant across a verbatim lift (TRIZ #13/#22). Mutations plant
                      # altered-statement / mis-routed-command / changed-echo regressions.
+    "oracle_bridge_fs_config",  # persisted-config decision-logic LOCK (production-readiness
+                     # Lane N1) — the load/validate/migrate sites in persistence/bridge_fs.h
+                     # (load_config / load_configuration / update_config_filename) that drag
+                     # LittleFS/FreeRTOS and never host-compile, so the replay/struct serial
+                     # oracles never reach them. Pure source parse: pins each function's
+                     # normalized body + load-path reachability (load_configuration's dead-code
+                     # state is pinned too). 5 mutations, one per decision class (valid/load,
+                     # fallback, version/migrate, truncated, error-accept) — Gate-Fα teeth.
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform
