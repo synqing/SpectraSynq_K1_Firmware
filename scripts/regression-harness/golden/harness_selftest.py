@@ -59,6 +59,14 @@ ORACLE_MODULES = [
                      # normalized body + load-path reachability (load_configuration's dead-code
                      # state is pinned too). 5 mutations, one per decision class (valid/load,
                      # fallback, version/migrate, truncated, error-accept) — Gate-Fα teeth.
+    "oracle_bridge_fs_codec",  # BEHAVIOURAL proof for the N1 blob codec (the real N1
+                     # gate) — host-COMPILES persistence/bridge_fs_config_codec.h
+                     # (bridge_fs_classify_config) and RUNS it over the 5 field blob
+                     # classes (valid/bad_crc/version_skew/truncated/headerless_legacy),
+                     # freezing each LOAD/MIGRATE/FALLBACK decision. The codec was
+                     # extracted FS-free precisely so this decision executes off-device.
+                     # 5 mutations flip one classify branch each (magic/crc/version/migrate
+                     # threshold/fallback return), each diverging a recorded decision.
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform

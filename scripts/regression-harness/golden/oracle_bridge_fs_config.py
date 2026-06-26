@@ -34,10 +34,13 @@ IS the alarm — the gate goes RED until the golden is re-pinned ON PURPOSE.
 
 THE PINNED SITES (per the lane brief, all in persistence/bridge_fs.h):
   1. load_config() open-failure fallback     — `if (!file) { ...; return; }`
-  2. load_config() raw-load + sanitise       — memcpy(&CONFIG,...) + light_mode/
-                                                registry_sanitize_persisted block
-  3. load_config() DEAD factory-reset branch — `bool queue_factory_reset=false;`
-                                                + `if (queue_factory_reset==true)`
+  2. load_config() validated-load copy        — CFG_LOAD memcpy(&CONFIG, buf +
+                                                sizeof(ConfigBlobHeader), ...) + the
+                                                light_mode/registry_sanitize block
+  3. load_config() classify-driven recovery  — bridge_fs_classify_config()
+                                                CFG_MIGRATE / CFG_FALLBACK branches
+                                                (CFG_FALLBACK copies CONFIG_DEFAULTS;
+                                                NO factory_reset()/reboot — anti-brick)
   4. load_configuration() validation accrual — `config_error=true;` sites +
                                                 PALETTE_INDEX>=gGradientPaletteCount
                                                 reset + the -1/-2 returns
@@ -52,9 +55,10 @@ stream + reachability, so a faithful refactor survives.
 
 FAULT-EVIDENCE (the Gate-Fα teeth, proven by harness_selftest.py): the MUTATIONS
 list plants one real regression for EACH of the lane's five decision classes —
-(valid/load) memcpy size, (fallback) the queue_factory_reset recovery test,
-(version/migrate) the migration filename format, (truncated) the first read()-size
-guard, (error-accept) a config_error flag flip — each MUST diverge the capture.
+(valid/load) the CFG_LOAD payload-copy offset, (fallback) the CFG_FALLBACK
+CONFIG_DEFAULTS recovery source, (version/migrate) the migration filename format,
+(truncated) the first read()-size guard, (error-accept) a config_error flag flip —
+each MUST diverge the capture.
 Each anchor matches EXACTLY ONCE across the firmware tree
 (tests/test_mutation_anchor_uniqueness_static.py rglob count==1).
 
@@ -90,10 +94,12 @@ _BRIDGE_FS_REL = ("persistence", "bridge_fs.h")
 # ---------------------------------------------------------------------------
 FUNCTIONS = [
     {
-        # SITE 1 (open-failure fallback `if (!file){...return;}`), SITE 2 (raw-load
-        # memcpy + per-field light_mode/registry_sanitize_persisted block) and SITE 3
-        # (the DEAD `bool queue_factory_reset=false;` + `if (queue_factory_reset==true)
-        # { factory_reset(); }` recovery branch) all live in load_config()'s body.
+        # SITE 1 (open-failure fallback `if (!file){...return;}`), SITE 2 (CFG_LOAD
+        # memcpy of the post-header payload + per-field light_mode/registry_sanitize
+        # block) and SITE 3 (the bridge_fs_classify_config()-driven CFG_MIGRATE /
+        # CFG_FALLBACK recovery, with FALLBACK copying CONFIG_DEFAULTS in RAM — no
+        # factory_reset()/reboot, the anti-brick N1 choice) all live in load_config()'s
+        # body.
         "name": "load_config",
         "callers": ["init_fs"],
     },
@@ -242,23 +248,27 @@ def capture(firmware_root=None) -> str:
 # (tests/test_mutation_anchor_uniqueness_static.py).
 # ---------------------------------------------------------------------------
 MUTATIONS = [
-    # 1. (valid/load) ALTER THE RAW-LOAD SIZE: load_config() copies one byte fewer
-    #    from the persisted buffer into CONFIG. SITE 2. The normalized body of
-    #    load_config diverges on the memcpy size argument — proving the gate pins the
-    #    raw-load decision. Anchor is count==1 (only this memcpy reads into &CONFIG).
+    # 1. (valid/load) ALTER THE VALIDATED-LOAD COPY: load_config()'s CFG_LOAD branch
+    #    copies the post-header payload from the persisted buffer into CONFIG. Shift
+    #    the source offset by one byte. SITE 2 (post-N1 classify-driven load). The
+    #    normalized body of load_config diverges on the memcpy source expression —
+    #    proving the gate pins the validated-load decision. Anchor is count==1 (only
+    #    the CFG_LOAD branch copies from `config_buffer + sizeof(ConfigBlobHeader)`).
     (
-        r'memcpy\(&CONFIG, config_buffer, sizeof\(CONFIG\)\);',
-        r'memcpy(&CONFIG, config_buffer, sizeof(CONFIG) - 1);',
-        "load_config_raw_load_size_short_by_one (valid/load decision divergence)",
+        r'memcpy\(&CONFIG, config_buffer \+ sizeof\(ConfigBlobHeader\), sizeof\(CONFIG\)\);',
+        r'memcpy(&CONFIG, config_buffer + sizeof(ConfigBlobHeader) + 1, sizeof(CONFIG));',
+        "load_config_valid_load_payload_offset_shift (valid/load decision divergence)",
     ),
-    # 2. (fallback) INVERT THE RECOVERY TEST: flip the DEAD factory-reset guard
-    #    `if (queue_factory_reset == true)` -> `!= true`, which would fire
-    #    factory_reset() on the (currently-false) flag. SITE 3. The normalized body of
-    #    load_config diverges on the recovery branch condition. count==1.
+    # 2. (fallback) REDIRECT THE RECOVERY COPY: load_config()'s CFG_FALLBACK branch
+    #    recovers by copying the in-RAM compiled defaults (CONFIG_DEFAULTS) into CONFIG
+    #    — the anti-brick recovery N1 added in place of the dead factory_reset() branch.
+    #    Point it at CONFIG itself, so a corrupt/truncated blob would NOT be recovered.
+    #    SITE 3. The normalized body of load_config diverges on the recovery source.
+    #    count==1 (only the fallback branch copies from `&CONFIG_DEFAULTS`).
     (
-        r'if \(queue_factory_reset == true\) \{',
-        r'if (queue_factory_reset != true) {',
-        "load_config_factory_reset_recovery_test_inverted (fallback decision divergence)",
+        r'memcpy\(&CONFIG, &CONFIG_DEFAULTS, sizeof\(CONFIG\)\);',
+        r'memcpy(&CONFIG, &CONFIG, sizeof(CONFIG));',
+        "load_config_fallback_recovery_source_redirected (fallback decision divergence)",
     ),
     # 3. (version/migrate) CHANGE THE MIGRATION FILENAME: update_config_filename()
     #    stamps a DIFFERENT persisted file path, so load_config() would open the wrong
