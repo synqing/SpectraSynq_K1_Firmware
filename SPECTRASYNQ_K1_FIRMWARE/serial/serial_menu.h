@@ -2628,63 +2628,14 @@ void parse_command(char* command_buf) {
 #endif
 
 #ifdef ENABLE_GDFT_HARNESS
-    // gdft_probe=<freq_hz> — inject a pure synthetic sine into the GDFT
-    // integration buffer and emit one GDFTP line with the argmax bin / chroma
-    // bin / peak magnitude. Deterministic; no mic, no audio, no calibration.
-    // process_GDFT() is run UNMODIFIED. State is halted/snapshotted/restored
-    // (see gdft_harness.h). Item 22.
-    else if (strcmp(command_type, "gdft_probe") == 0) {
-      if (command_data && command_data[0] != '\0') {
-        float f = strtof(command_data, nullptr);
-        if (isfinite(f) && f > 0.0f) {
-          gdft_run_single(f);
-        } else {
-          bad_command(command_type, command_data);
-        }
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-    // gdft_sweep=<f0>,<f1>,<steps> — run gdft_probe across a frequency range,
-    // one GDFTP line per step, wrapped in GDFTP,event=start/end. A rising sweep
-    // must move the argmax bin monotonically upward (the correctness invariant
-    // gdft_check.py asserts). Item 22.
-    else if (strcmp(command_type, "gdft_sweep") == 0) {
-      if (command_data && command_data[0] != '\0') {
-        char buf[64];
-        strncpy(buf, command_data, sizeof(buf) - 1);
-        buf[sizeof(buf) - 1] = '\0';
-        char* tok_f0 = strtok(buf, ",");
-        char* tok_f1 = strtok(nullptr, ",");
-        char* tok_st = strtok(nullptr, ",");
-        if (tok_f0 && tok_f1 && tok_st) {
-          float f0 = strtof(tok_f0, nullptr);
-          float f1 = strtof(tok_f1, nullptr);
-          int   st = atoi(tok_st);
-          if (isfinite(f0) && isfinite(f1) && f0 > 0.0f && f1 > 0.0f && st >= 1) {
-            gdft_run_sweep(f0, f1, st);
-          } else {
-            bad_command(command_type, command_data);
-          }
-        } else {
-          bad_command(command_type, command_data);
-        }
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
-    // gdft_agc_probe[=<amp_scale>] — inject a 3-tone synthetic at known relative
-    // amplitudes (strong/mid/weak), converge the broadband AGC to steady state,
-    // and emit one GDFTAGC line comparing pre-AGC vs post-AGC inter-note level
-    // ratios. Quantifies AGC contrast compression (the milky-colour mechanism).
-    // Optional arg = amplitude scale (default 1.0). Item 22.
-    else if (strcmp(command_type, "gdft_agc_probe") == 0) {
-      float amp = 1.0f;
-      if (command_data && command_data[0] != '\0') {
-        float v = strtof(command_data, nullptr);
-        if (isfinite(v) && v > 0.0f) amp = v;
-      }
-      gdft_run_agc_probe(amp);
+    // gdft_probe / gdft_sweep / gdft_agc_probe lifted VERBATIM into
+    // serial_cmd_dispatch_gdft_harness() in serial_cmd_handlers.cpp (gated-out probe lane).
+    // GATE-MATCHED: decl/def/include/call-site all behind #ifdef ENABLE_GDFT_HARNESS
+    // (production-OFF). Returns true iff command_type was one of the three. Behaviour-
+    // preserving — proven by oracle_serial_struct.py; the GDFTP/GDFTP5/GDFTAGC schema by
+    // tests/test_gdft_harness_schema_static.py.
+    else if (serial_cmd_dispatch_gdft_harness(command_type, command_data)) {
+      // handled by the extracted gdft_harness dispatcher
     }
 #endif
 

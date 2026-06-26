@@ -126,6 +126,19 @@ bool serial_cmd_dispatch_mode(const char* command_type, char* command_data);
 bool serial_cmd_dispatch_beat_director(const char* command_type, char* command_data);
 #endif // K1_EFFECT_FRAMEWORK_V1
 
+// Dispatch the GDFT synthetic-probe family (gdft_probe / gdft_sweep / gdft_agc_probe). The
+// WHOLE family is production-OFF — wrapped in #ifdef ENABLE_GDFT_HARNESS (k1_hardware defines
+// the flag nowhere; only the non-shippable k1_bench_reference_harness / k1_hardware_harness
+// envs set it). GATE-MATCHED: this decl, the def, the guarded #include "gdft_harness.h", and
+// the call-site are ALL behind the SAME flag (never a combined gate — the tempo_stream straddle
+// scar). Each command calls its inline backing fn (gdft_run_single / gdft_run_sweep /
+// gdft_run_agc_probe) in diag/gdft_harness.h. Behaviour-preservation across the verbatim lift is
+// proven by oracle_serial_struct.py; the GDFTP/GDFTP5/GDFTAGC output schema by
+// tests/test_gdft_harness_schema_static.py (the diagnostic-is-product schema lock).
+#ifdef ENABLE_GDFT_HARNESS
+bool serial_cmd_dispatch_gdft_harness(const char* command_type, char* command_data);
+#endif // ENABLE_GDFT_HARNESS
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

@@ -178,6 +178,35 @@ FAMILIES = [
             "beat_director",
         ],
     },
+    {
+        "name": "gdft_harness",
+        "dispatcher": "serial_cmd_dispatch_gdft_harness",
+        # GDFT synthetic-probe diagnostic family (gated-out probe lane, 2026-06-26). THREE
+        # commands under ONE contiguous #ifdef ENABLE_GDFT_HARNESS (serial_menu.h ~2630-2689) —
+        # production-OFF (k1_hardware defines the flag nowhere; only the NON-SHIPPABLE
+        # k1_bench_reference_harness / k1_hardware_harness envs set -DENABLE_GDFT_HARNESS=1).
+        # Pure function-call: gdft_probe->gdft_run_single, gdft_sweep->gdft_run_sweep,
+        # gdft_agc_probe->gdft_run_agc_probe — all `inline` in diag/gdft_harness.h (#pragma once,
+        # ODR-safe, NOT self-flag-guarded; the gate is caller-only, exactly the beat_director
+        # model). Read-only diagnostic: the backing fns snapshot/halt/restore GDFT state and run
+        # process_GDFT() UNMODIFIED (the handler adds no CONFIG/global write). GATE-MATCHED
+        # extraction: the dispatcher decl, def, the guarded #include "gdft_harness.h", AND the
+        # call-site are ALL behind #ifdef ENABLE_GDFT_HARNESS (the tempo_stream straddle scar — a
+        # single-flag handler must never land under a different/combined gate). The oracle is pure
+        # parse (no preprocessing), so it captures + locks the body regardless of the gate; the
+        # BUILD enforces the gate-match (k1_hardware code/data byte-identical; the harness envs
+        # compile the dispatcher with the flag ON). The host replay oracle compiles handlers.cpp
+        # WITHOUT the flag, so the gated dispatcher + its include preprocess out there — no
+        # host-link surgery. The OUTPUT SCHEMA row-prefixes (GDFTP / GDFTP5 / GDFTAGC) live in the
+        # UNTOUCHED gdft_harness.h; this structural golden pins the handler BODY + routing, and the
+        # row-prefix tokens are pinned separately by tests/test_gdft_harness_schema_static.py (the
+        # diagnostic-is-product schema lock — byte-identity is necessary but NOT sufficient).
+        "commands": [
+            "gdft_probe",
+            "gdft_sweep",
+            "gdft_agc_probe",
+        ],
+    },
 ]
 
 # Files a function-call handler body can live in: inline in parse_command
@@ -503,6 +532,54 @@ MUTATIONS = [
         r"serial_cmd_dispatch_beat_director\(command_type, command_data\)",
         r"serial_cmd_dispatch_beat_director_SEVERED(command_type, command_data)",
         "beat_director_call_site_severed (routing/reachable divergence)",
+    ),
+    # ---- gdft_harness family teeth (gated-out probe lane, LOCK 2026-06-26) ----
+    # The call-site-sever tooth (#27) is added in the EXTRACT commit (count==0 until the
+    # gate-matched dispatcher call-site exists; the mutation-anchor guard would fail at LOCK
+    # otherwise). The four below anchor on text that is count==1 whether the three commands are
+    # still inline in serial_menu.h (LOCK) or already in serial_cmd_handlers.cpp (EXTRACT) — the
+    # oracle + anchor guard read RAW text, so the #ifdef ENABLE_GDFT_HARNESS wrapper is
+    # transparent to both.
+    # 23. ALTER gdft_agc_probe's body: gdft_run_agc_probe(amp) -> (1.0f). The normalized body of
+    #     "gdft_agc_probe" diverges on the backing-call argument, proving the gate pins the
+    #     gated statements too. Channel (a) statement-identity. (`gdft_run_agc_probe(amp)` is
+    #     count==1 — the inline def in gdft_harness.h is `(float amp_scale)`, not `(amp)`.)
+    (
+        r'gdft_run_agc_probe\(amp\);',
+        r'gdft_run_agc_probe(1.0f);',
+        "gdft_agc_probe_arg_amp_to_1.0f (statement-identity divergence)",
+    ),
+    # 24. MIS-ROUTE gdft_probe: rename its strcmp -> "gdft_probe_MUT". capture() can no longer
+    #     find the branch -> body null + reachable false. Channel (b)/(c). The exact closing `"`
+    #     => matches only "gdft_probe", never the "gdft_agc_probe" literal.
+    (
+        r'strcmp\(command_type, "gdft_probe"\)',
+        r'strcmp(command_type, "gdft_probe_MUT")',
+        "gdft_probe_command_type_renamed (routing/identity divergence)",
+    ),
+    # 25. MIS-ROUTE gdft_sweep: rename its strcmp -> "gdft_sweep_MUT". Channel (b)/(c).
+    (
+        r'strcmp\(command_type, "gdft_sweep"\)',
+        r'strcmp(command_type, "gdft_sweep_MUT")',
+        "gdft_sweep_command_type_renamed (routing/identity divergence)",
+    ),
+    # 26. MIS-ROUTE gdft_agc_probe: rename its strcmp -> "gdft_agc_probe_MUT". Channel (b)/(c).
+    (
+        r'strcmp\(command_type, "gdft_agc_probe"\)',
+        r'strcmp(command_type, "gdft_agc_probe_MUT")',
+        "gdft_agc_probe_command_type_renamed (routing/identity divergence)",
+    ),
+    # 27. SEVER THE ROUTING (added with the EXTRACT, once the gate-matched call-site exists):
+    #     rename the parse_command call so capture()'s `_routed` check no longer finds it — all
+    #     three gdft bodies still live in the dispatcher, but reachable flips true->false for
+    #     each -> divergence. Proves the `reachable` field is not blind. Bare-arg form
+    #     `(command_type, command_data)` matches ONLY the call-site (the def/decl carry typed
+    #     params), so the rglob lands there. count==1 (the call-site is inside serial_menu.h's
+    #     #ifdef ENABLE_GDFT_HARNESS, but the oracle/guard read raw text — gate-transparent).
+    (
+        r"serial_cmd_dispatch_gdft_harness\(command_type, command_data\)",
+        r"serial_cmd_dispatch_gdft_harness_SEVERED(command_type, command_data)",
+        "gdft_harness_call_site_severed (routing/reachable divergence)",
     ),
 ]
 

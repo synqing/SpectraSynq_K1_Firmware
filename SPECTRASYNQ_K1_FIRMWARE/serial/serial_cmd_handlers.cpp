@@ -26,6 +26,13 @@
 #ifdef K1_EFFECT_FRAMEWORK_V1
 #include "beat_aware_director.h"     // bad_director_set_enabled (beat_director family; same guard as serial_menu.h:24)
 #endif
+#ifdef ENABLE_GDFT_HARNESS
+#include "gdft_harness.h"            // gdft_run_single/sweep/agc_probe (inline, #pragma once, ODR-safe;
+                                     // self-declares IRAM_ATTR process_GDFT, defined in audio/k1_gdft_core.cpp).
+                                     // Same single gate as serial_menu.h:2630. The host replay oracle compiles
+                                     // this TU with the flag OFF, so this include + the gated dispatcher
+                                     // preprocess out there — no host-link surgery (gdft_harness family).
+#endif
 
 #include <stdint.h>
 #include <stdlib.h>                // atol / atoi / atof
@@ -1563,6 +1570,91 @@ bool serial_cmd_dispatch_beat_director(const char* command_type, char* command_d
     return true;
 }
 #endif  // K1_EFFECT_FRAMEWORK_V1
+
+#ifdef ENABLE_GDFT_HARNESS
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_gdft_harness — the 3 GDFT synthetic-probe commands, lifted VERBATIM
+// from parse_command()'s #ifdef ENABLE_GDFT_HARNESS block (serial_menu.h ~2630-2689). The
+// `if (false) {}` opener keeps each real branch's original
+// `else if (strcmp(command_type, "<name>") == 0)` text (statement-identical to
+// serial_menu.h@HEAD). GATE-MATCHED: the decl (handlers.h), this def, the guarded
+// #include "gdft_harness.h" (top of file), and the call-site (serial_menu.h) are ALL behind
+// #ifdef ENABLE_GDFT_HARNESS — production-OFF, never folded under a different/combined gate
+// (the tempo_stream straddle scar). Read-only diagnostic: each command calls its inline backing
+// fn (gdft_run_single/sweep/agc_probe), which snapshot/halt/restore GDFT state and run
+// process_GDFT() UNMODIFIED. Returns true iff a branch matched; false routes parse_command back
+// to its remaining ladder + bad_command. Behaviour-preservation proven by oracle_serial_struct.py;
+// the GDFTP/GDFTP5/GDFTAGC output schema by tests/test_gdft_harness_schema_static.py.
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_gdft_harness(const char* command_type, char* command_data) {
+    if (false) {}
+
+    // gdft_probe=<freq_hz> — inject a pure synthetic sine into the GDFT
+    // integration buffer and emit one GDFTP line with the argmax bin / chroma
+    // bin / peak magnitude. Deterministic; no mic, no audio, no calibration.
+    // process_GDFT() is run UNMODIFIED. State is halted/snapshotted/restored
+    // (see gdft_harness.h). Item 22.
+    else if (strcmp(command_type, "gdft_probe") == 0) {
+      if (command_data && command_data[0] != '\0') {
+        float f = strtof(command_data, nullptr);
+        if (isfinite(f) && f > 0.0f) {
+          gdft_run_single(f);
+        } else {
+          bad_command(command_type, command_data);
+        }
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    // gdft_sweep=<f0>,<f1>,<steps> — run gdft_probe across a frequency range,
+    // one GDFTP line per step, wrapped in GDFTP,event=start/end. A rising sweep
+    // must move the argmax bin monotonically upward (the correctness invariant
+    // gdft_check.py asserts). Item 22.
+    else if (strcmp(command_type, "gdft_sweep") == 0) {
+      if (command_data && command_data[0] != '\0') {
+        char buf[64];
+        strncpy(buf, command_data, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = '\0';
+        char* tok_f0 = strtok(buf, ",");
+        char* tok_f1 = strtok(nullptr, ",");
+        char* tok_st = strtok(nullptr, ",");
+        if (tok_f0 && tok_f1 && tok_st) {
+          float f0 = strtof(tok_f0, nullptr);
+          float f1 = strtof(tok_f1, nullptr);
+          int   st = atoi(tok_st);
+          if (isfinite(f0) && isfinite(f1) && f0 > 0.0f && f1 > 0.0f && st >= 1) {
+            gdft_run_sweep(f0, f1, st);
+          } else {
+            bad_command(command_type, command_data);
+          }
+        } else {
+          bad_command(command_type, command_data);
+        }
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    // gdft_agc_probe[=<amp_scale>] — inject a 3-tone synthetic at known relative
+    // amplitudes (strong/mid/weak), converge the broadband AGC to steady state,
+    // and emit one GDFTAGC line comparing pre-AGC vs post-AGC inter-note level
+    // ratios. Quantifies AGC contrast compression (the milky-colour mechanism).
+    // Optional arg = amplitude scale (default 1.0). Item 22.
+    else if (strcmp(command_type, "gdft_agc_probe") == 0) {
+      float amp = 1.0f;
+      if (command_data && command_data[0] != '\0') {
+        float v = strtof(command_data, nullptr);
+        if (isfinite(v) && v > 0.0f) amp = v;
+      }
+      gdft_run_agc_probe(amp);
+    }
+
+    else {
+      return false;  // not a gdft_* probe — let parse_command's ladder continue
+    }
+
+    return true;
+}
+#endif  // ENABLE_GDFT_HARNESS
 
 #ifdef SB_VIVID_PRECOMP_V1
 // ---------------------------------------------------------------------------
