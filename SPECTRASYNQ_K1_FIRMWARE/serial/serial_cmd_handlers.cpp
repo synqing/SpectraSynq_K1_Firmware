@@ -23,6 +23,9 @@
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
 #endif
+#ifdef K1_EFFECT_FRAMEWORK_V1
+#include "beat_aware_director.h"     // bad_director_set_enabled (beat_director family; same guard as serial_menu.h:24)
+#endif
 
 #include <stdint.h>
 #include <stdlib.h>                // atol / atoi / atof
@@ -70,6 +73,14 @@ bool vp_set_float_command(const char* command_type, const char* command_data, fl
 // set_mode/secondary_mode call serial_print_mode_line under K1_EFFECT_REGISTRY_V1.
 const char* serial_mode_name(uint8_t mode);
 void serial_print_mode_line(const char* label, uint8_t mode);
+
+// serial_print_beat_director_status() is an external-linkage free function defined in
+// serial_menu.h:395 — itself inside #ifdef K1_EFFECT_FRAMEWORK_V1, so it exists ONLY under
+// the flag. The beat_director dispatcher calls it; forward-declare under the SAME flag so
+// this TU links it only where it exists (gate-matched).
+#ifdef K1_EFFECT_FRAMEWORK_V1
+void serial_print_beat_director_status();
+#endif
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_pure_setter — the 23 pure CONFIG setters, lifted verbatim
@@ -1511,6 +1522,47 @@ bool serial_cmd_dispatch_mode(const char* command_type, char* command_data) {
 
     return true;
 }
+
+#ifdef K1_EFFECT_FRAMEWORK_V1
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_beat_director — the beat_director toggle, lifted VERBATIM from
+// parse_command()'s #ifdef K1_EFFECT_FRAMEWORK_V1 block (serial_menu.h ~3076-3095). The
+// `if (false) {}` opener keeps the real branch's original
+// `else if (strcmp(command_type, "<name>") == 0)` text (statement-identical to
+// serial_menu.h@HEAD). GATE-MATCHED: the decl (handlers.h), this def, and the call-site
+// (serial_menu.h) are ALL behind #ifdef K1_EFFECT_FRAMEWORK_V1 — production-OFF, never
+// folded under a different/combined gate (the tempo_stream straddle scar). Calls the
+// framework-env subsystem bad_director_set_enabled() + the framework-gated free fn
+// serial_print_beat_director_status(). Behaviour-preservation proven by oracle_serial_struct.
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_beat_director(const char* command_type, char* command_data) {
+    if (false) {}
+
+    else if (strcmp(command_type, "beat_director") == 0) {
+      if (strcmp(command_data, "status") == 0) {
+        tx_begin();
+        serial_print_beat_director_status();
+        tx_end();
+      } else {
+        bool value = false;
+        if (vp_parse_bool(command_data, &value)) {
+          bad_director_set_enabled(value);
+          tx_begin();
+          serial_print_beat_director_status();
+          tx_end();
+        } else {
+          bad_command(command_type, command_data);
+        }
+      }
+    }
+
+    else {
+      return false;  // not beat_director — let parse_command's ladder continue
+    }
+
+    return true;
+}
+#endif  // K1_EFFECT_FRAMEWORK_V1
 
 #ifdef SB_VIVID_PRECOMP_V1
 // ---------------------------------------------------------------------------

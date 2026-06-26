@@ -158,6 +158,26 @@ FAMILIES = [
             "secondary_mode",
         ],
     },
+    {
+        "name": "beat_director",
+        "dispatcher": "serial_cmd_dispatch_beat_director",
+        # beat_director toggle (gated-families lane, Increment B 2026-06-26). The WHOLE
+        # else-if is wrapped in #ifdef K1_EFFECT_FRAMEWORK_V1 (serial_menu.h ~3076-3095) —
+        # production-OFF (k1_hardware defines neither the framework nor registry flag). Pure
+        # function-call: bad_director_set_enabled() (director/beat_aware_director.cpp, a
+        # framework-env TU) + serial_print_beat_director_status() (external-linkage free fn
+        # at serial_menu.h:395, itself inside #ifdef K1_EFFECT_FRAMEWORK_V1) + vp_parse_bool.
+        # GATE-MATCHED extraction: the dispatcher decl, def, AND call-site are ALL behind
+        # #ifdef K1_EFFECT_FRAMEWORK_V1 (the tempo_stream straddle scar — a single-flag
+        # handler must never land under a different/combined gate). The oracle is pure parse
+        # (no preprocessing), so it captures + locks the body regardless of the gate; the
+        # BUILD enforces the gate-match (k1_hardware byte-identical; framework/registry envs
+        # compile the dispatcher). The host replay oracle compiles handlers.cpp WITHOUT the
+        # flag, so the gated dispatcher is preprocessed out there — no host-link surgery.
+        "commands": [
+            "beat_director",
+        ],
+    },
 ]
 
 # Files a function-call handler body can live in: inline in parse_command
@@ -450,6 +470,39 @@ MUTATIONS = [
         r"serial_cmd_dispatch_mode\(command_type, command_data\)",
         r"serial_cmd_dispatch_mode_SEVERED(command_type, command_data)",
         "mode_call_site_severed (routing/reachable divergence)",
+    ),
+    # ---- beat_director family teeth (Increment B, LOCK 2026-06-26) ----
+    # The call-site-sever tooth (#22) is added in the EXTRACT commit (count==0 until the
+    # dispatcher call-site exists; the mutation-anchor guard would fail at LOCK otherwise).
+    # Both below anchor on text that is count==1 whether beat_director is still inline in
+    # serial_menu.h (LOCK) or already in serial_cmd_handlers.cpp (EXTRACT) — the oracle and
+    # the anchor guard read RAW text, so the #ifdef K1_EFFECT_FRAMEWORK_V1 wrapper is
+    # transparent to both.
+    # 20. ALTER beat_director's body: bad_director_set_enabled(value) -> (false). The
+    #     normalized body of "beat_director" diverges on the subsystem-call argument,
+    #     proving the gate pins the framework-gated statements too. Channel (a).
+    (
+        r'bad_director_set_enabled\(value\);',
+        r'bad_director_set_enabled(false);',
+        "beat_director_subsystem_arg_value_to_false (statement-identity divergence)",
+    ),
+    # 21. MIS-ROUTE beat_director: rename its strcmp -> "beat_director_MUT". capture() can
+    #     no longer find the branch -> body null + reachable false. Channel (b)/(c).
+    (
+        r'strcmp\(command_type, "beat_director"\)',
+        r'strcmp(command_type, "beat_director_MUT")',
+        "beat_director_command_type_renamed (routing/identity divergence)",
+    ),
+    # 22. SEVER THE ROUTING (added with the EXTRACT, once the gate-matched call-site exists):
+    #     rename the parse_command call so capture()'s `_routed` check no longer finds it —
+    #     beat_director's body still lives in the dispatcher, but reachable flips
+    #     true->false -> divergence. Bare-arg form matches ONLY the call-site (the def/decl
+    #     carry typed params). count==1 (the call-site is inside serial_menu.h's
+    #     #ifdef K1_EFFECT_FRAMEWORK_V1, but the oracle/guard read raw text — gate-transparent).
+    (
+        r"serial_cmd_dispatch_beat_director\(command_type, command_data\)",
+        r"serial_cmd_dispatch_beat_director_SEVERED(command_type, command_data)",
+        "beat_director_call_site_severed (routing/reachable divergence)",
     ),
 ]
 
