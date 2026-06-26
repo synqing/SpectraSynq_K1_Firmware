@@ -569,6 +569,18 @@ MUTATIONS = [
         r'strcmp(command_type, "gdft_agc_probe_MUT")',
         "gdft_agc_probe_command_type_renamed (routing/identity divergence)",
     ),
+    # 27. SEVER THE ROUTING (added with the EXTRACT, once the gate-matched call-site exists):
+    #     rename the parse_command call so capture()'s `_routed` check no longer finds it — all
+    #     three gdft bodies still live in the dispatcher, but reachable flips true->false for
+    #     each -> divergence. Proves the `reachable` field is not blind. Bare-arg form
+    #     `(command_type, command_data)` matches ONLY the call-site (the def/decl carry typed
+    #     params), so the rglob lands there. count==1 (the call-site is inside serial_menu.h's
+    #     #ifdef ENABLE_GDFT_HARNESS, but the oracle/guard read raw text — gate-transparent).
+    (
+        r"serial_cmd_dispatch_gdft_harness\(command_type, command_data\)",
+        r"serial_cmd_dispatch_gdft_harness_SEVERED(command_type, command_data)",
+        "gdft_harness_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 

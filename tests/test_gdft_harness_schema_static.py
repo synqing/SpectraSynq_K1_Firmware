@@ -50,23 +50,39 @@ GDFT_ROW_PREFIXES = ('"GDFTP,', '"GDFTP5,', '"GDFTAGC,')
 def _balanced_block(text, start):
     """Return text[start:close+1] brace-balanced from the first `{` at/after start.
 
-    String/char literals are skipped so a brace inside a literal cannot unbalance the
-    scan (same discipline as the proven typed_command_block helper)."""
+    String/char literals AND // and /* */ comments are skipped so neither a brace nor an
+    apostrophe inside a literal or comment can unbalance the scan — e.g. the dispatcher's
+    `// ...let parse_command's ladder continue` comment, whose apostrophe would otherwise be
+    read as a char-literal opener. This mirrors the oracle's _extract_block discipline; the
+    over-capture class-bug fixed in test_k1_loud_guard_static (2026-06-26) is the precedent."""
     i = text.find("{", start)
     assert i != -1, "no opening brace after dispatcher signature"
     depth = 0
-    while i < len(text):
+    n = len(text)
+    while i < n:
         c = text[i]
-        if c in "\"'":
+        if c == '"' or c == "'":            # string / char literal
             quote = c
             i += 1
-            while i < len(text) and text[i] != quote:
+            while i < n and text[i] != quote:
                 if text[i] == "\\":
                     i += 1
                 i += 1
-        elif c == "{":
+            i += 1
+            continue
+        if c == '/' and i + 1 < n and text[i + 1] == '/':   # line comment
+            while i < n and text[i] != '\n':
+                i += 1
+            continue
+        if c == '/' and i + 1 < n and text[i + 1] == '*':   # block comment
+            i += 2
+            while i + 1 < n and not (text[i] == '*' and text[i + 1] == '/'):
+                i += 1
+            i += 2
+            continue
+        if c == '{':
             depth += 1
-        elif c == "}":
+        elif c == '}':
             depth -= 1
             if depth == 0:
                 return text[start:i + 1]
