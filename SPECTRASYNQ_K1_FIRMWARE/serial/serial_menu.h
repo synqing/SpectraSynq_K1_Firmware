@@ -935,7 +935,11 @@ void serial_confirm_noise_cal() {
 // truth, native ordinals included); when no row owns it (or the registry is
 // unhealthy) it falls back to the legacy `mode_names + (mode * 32)` table.
 // Without the flag this is exactly the legacy table lookup.
-static inline const char* serial_mode_name(uint8_t mode) {
+// External linkage (widened from `static inline` 2026-06-26): serial_cmd_dispatch_mode()
+// in serial_cmd_handlers.cpp forward-declares + links against this single definition
+// (serial_menu.h has one includer, the .ino TU) — same cross-TU pattern as
+// serial_print_mode_line / serial_print_palette_line below. Statement-identical body.
+const char* serial_mode_name(uint8_t mode) {
 #ifdef K1_EFFECT_REGISTRY_V1
   if (k1::effects::framework::registry_is_healthy()) {
     const char* name = k1::effects::framework::registry_display_name(mode);
@@ -2944,34 +2948,15 @@ void parse_command(char* command_buf) {
       }
     }
 
-    // Set Mode Number ----------------------------------------
-    else if (strcmp(command_type, "set_mode") == 0) {
-      mode_transition_queued = true;
-#ifdef K1_EFFECT_REGISTRY_V1
-      // Input is the gap-free DENSE menu index (0..registry_dense_count()-1),
-      // which also reaches the native effects. Map it to the real persisted
-      // ordinal here; storage still holds the ordinal (presets unaffected).
-      if (k1::effects::framework::registry_is_healthy()) {
-        const long dense_max = (long)k1::effects::framework::registry_dense_count() - 1;
-        const uint16_t dense = (uint16_t)constrain(atol(command_data), 0, dense_max);
-        mode_destination = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(dense);
-      } else {
-        mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
-      }
-#else
-      mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
-#endif
-
-      save_config_delayed();
-      tx_begin();
-      // CONFIG.LIGHTSHOW_MODE is the raw persisted ordinal (storage truth /
-      // tooling-stable); the MODE line shows the dense menu index + name.
-      USBSerial.print("CONFIG.LIGHTSHOW_MODE: ");
-      USBSerial.println(mode_destination);
-#ifdef K1_EFFECT_REGISTRY_V1
-      serial_print_mode_line("MODE", mode_destination);
-#endif
-      tx_end();
+    // Set Mode Number + Secondary Mode -----------------------
+    // set_mode + secondary_mode lifted VERBATIM into serial_cmd_dispatch_mode() in
+    // serial_cmd_handlers.cpp (gated-families lane, Increment A). One call-site routes
+    // both (UNGATED); returns true iff command_type was one of them. secondary_mode's
+    // dispatch hoists here from its old position below — else-if order is immaterial
+    // (unique command_type strings, no fallthrough). Behaviour-preserving — proven by
+    // the structural-contract golden (oracle_serial_struct).
+    else if (serial_cmd_dispatch_mode(command_type, command_data)) {
+      // handled by the extracted set_mode / secondary_mode dispatcher
     }
 
     // Get Mode Name By ID ------------------------------------
@@ -3326,82 +3311,6 @@ void parse_command(char* command_buf) {
       // handled by the extracted secondary-channel setter dispatcher
     }
 
-    else if (strcmp(command_type, "secondary_mode") == 0) {
-#ifdef K1_EFFECT_REGISTRY_V1
-      // Input is the gap-free DENSE menu index (same numbering as set_mode);
-      // map it to the real persisted ordinal. Storage stays the ordinal.
-      const long sec_requested = atoi(command_data);
-      bool sec_good = false;
-      uint8_t sec_target = SECONDARY_LIGHTSHOW_MODE;
-      if (k1::effects::framework::registry_is_healthy()) {
-        if (sec_requested >= 0 &&
-            sec_requested < (long)k1::effects::framework::registry_dense_count()) {
-          sec_target = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(
-              (uint16_t)sec_requested);
-          sec_good = true;
-        }
-      } else if (sec_requested >= 0 && sec_requested < NUM_MODES) {
-        sec_target = light_mode_next_enabled((uint8_t)sec_requested, 1);
-        sec_good = true;
-      }
-      if (sec_good) {
-        uint8_t previous_mode = SECONDARY_LIGHTSHOW_MODE;
-        SECONDARY_LIGHTSHOW_MODE = sec_target;
-
-        tx_begin();
-        serial_print_mode_line("SECONDARY_MODE", SECONDARY_LIGHTSHOW_MODE);
-        tx_end();
-
-        if (debug_mode) {
-          USBSerial.print("SECONDARY MODE CHANGED: from ");
-          USBSerial.print(previous_mode);
-          USBSerial.print(" (");
-          USBSerial.print(serial_mode_name(previous_mode));
-          USBSerial.print(") to ");
-          USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
-          USBSerial.print(" (");
-          USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
-          USBSerial.println(")");
-        }
-
-        ENABLE_SECONDARY_LEDS = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-#else
-      uint8_t mode = atoi(command_data);
-      if (mode < NUM_MODES) {
-        uint8_t previous_mode = SECONDARY_LIGHTSHOW_MODE; // Store previous mode
-        SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(mode, 1);
-
-        tx_begin();
-        USBSerial.print("SECONDARY_MODE: ");
-        USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
-        USBSerial.print(" (");
-        USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
-        USBSerial.println(")");
-        tx_end();
-
-        if (debug_mode) {
-          USBSerial.print("SECONDARY MODE CHANGED: from ");
-          USBSerial.print(previous_mode);
-          USBSerial.print(" (");
-          USBSerial.print(serial_mode_name(previous_mode));
-          USBSerial.print(") to ");
-          USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
-          USBSerial.print(" (");
-          USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
-          USBSerial.println(")");
-        }
-
-        // Enable secondary LEDs if they aren't already
-        ENABLE_SECONDARY_LEDS = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-#endif
-    }
-    
     else if (strcmp(command_type, "secondary_status") == 0) {
       tx_begin();
       USBSerial.print("SECONDARY_ENABLED: ");

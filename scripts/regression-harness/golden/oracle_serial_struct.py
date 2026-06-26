@@ -136,6 +136,28 @@ FAMILIES = [
             "preset",
         ],
     },
+    {
+        "name": "mode",
+        "dispatcher": "serial_cmd_dispatch_mode",
+        # set_mode + secondary_mode (gated-families lane, Increment A 2026-06-26). Both
+        # are UNGATED else-if branches (always present) whose BODIES carry an INTERNAL
+        # #ifdef K1_EFFECT_REGISTRY_V1 / #else (registry dense-index vs legacy
+        # light_mode_next_enabled). Function-call + global-write (mode_destination /
+        # SECONDARY_LIGHTSHOW_MODE / mode_transition_queued / ENABLE_SECONDARY_LEDS;
+        # set_mode also save_config_delayed()). The real CONFIG.LIGHTSHOW_MODE write is
+        # DEFERRED to led_utilities.h's transition FSM (this lane does not touch it), so a
+        # verbatim lift is behaviour-preserving BY CONSTRUCTION — the structural gate pins
+        # it without modelling the async write (replay-locking it would be a blind-lock
+        # trap; the replay oracle EXCLUDES set_mode for exactly this reason). The internal
+        # #ifdef rides verbatim inside the captured body (the oracle does NOT preprocess),
+        # so the registry-gated statements are pinned too. beat_director (fully
+        # #ifdef K1_EFFECT_FRAMEWORK_V1, production-OFF, gate-MATCHED dispatcher) is a
+        # SEPARATE increment (B) — different gate, do not fold it in here.
+        "commands": [
+            "set_mode",
+            "secondary_mode",
+        ],
+    },
 ]
 
 # Files a function-call handler body can live in: inline in parse_command
@@ -378,6 +400,56 @@ MUTATIONS = [
         r"serial_cmd_dispatch_preset\(command_type, command_data\)",
         r"serial_cmd_dispatch_preset_SEVERED(command_type, command_data)",
         "preset_call_site_severed (routing/reachable divergence)",
+    ),
+    # ---- mode family (set_mode + secondary_mode) teeth (Increment A, LOCK 2026-06-26) --
+    # The call-site-sever tooth (#20) is added in the EXTRACT commit, once
+    # serial_cmd_dispatch_mode's parse_command call-site exists — at LOCK its anchor would
+    # be count==0 and the mutation-anchor guard (test_mutation_anchor_uniqueness_static.py)
+    # would fail. The four below anchor on text that is count==1 whether the bodies are
+    # still inline in serial_menu.h (LOCK) or already in serial_cmd_handlers.cpp (EXTRACT).
+    # 16. DROP set_mode's DEFERRED save: the async/deferred-save sever the Captain required.
+    #     Anchored on set_mode's unique "// CONFIG.LIGHTSHOW_MODE" comment so the rglob is
+    #     count==1; dropping the call removes a statement -> the normalized body of
+    #     "set_mode" diverges (the comment itself is stripped by _normalize, so what
+    #     diverges is the MISSING save_config_delayed(), not the anchor text). Channel (a).
+    (
+        r'save_config_delayed\(\);(\s+tx_begin\(\);\s+// CONFIG\.LIGHTSHOW_MODE)',
+        r'\1',
+        "set_mode_deferred_save_dropped (async/deferred-save sever divergence)",
+    ),
+    # 17. MIS-ROUTE set_mode: rename its strcmp -> "set_mode_MUT". capture() can no longer
+    #     find the branch -> body null + reachable false. Channel (b)/(c) routing/identity.
+    (
+        r'strcmp\(command_type, "set_mode"\)',
+        r'strcmp(command_type, "set_mode_MUT")',
+        "set_mode_command_type_renamed (routing/identity divergence)",
+    ),
+    # secondary_mode gets a routing tooth (below) but NO separate body tooth: every
+    # statement-anchored candidate (e.g. serial_print_mode_line("SECONDARY_MODE", ...))
+    # ALSO appears at serial_menu.h:1272, so a count=1 rglob is ambiguous — the
+    # mutation-anchor guard (test_mutation_anchor_uniqueness_static.py) correctly rejects
+    # it. One family-level BODY tooth (#16 set_mode_deferred_save) already proves the gate
+    # is not blind to a body change, and the golden REPRODUCE test pins secondary_mode's
+    # full normalized body regardless. Matches the 1-body-tooth-per-family shape of
+    # preset / smart_director.
+    # 18. MIS-ROUTE secondary_mode: rename its strcmp -> "secondary_mode_MUT". Exact
+    #     closing `"` => matches only "secondary_mode", not the strncmp("secondary_",10)
+    #     prefix-router or the 14 already-extracted secondary_* setters. Channel (b)/(c).
+    (
+        r'strcmp\(command_type, "secondary_mode"\)',
+        r'strcmp(command_type, "secondary_mode_MUT")',
+        "secondary_mode_command_type_renamed (routing/identity divergence)",
+    ),
+    # 19. SEVER THE ROUTING (added with the EXTRACT, once the call-site exists): rename
+    #     the parse_command call so capture()'s `_routed` check no longer finds it. BOTH
+    #     set_mode + secondary_mode bodies still live in the dispatcher, but reachable
+    #     flips true->false for both -> divergence. Proves the `reachable` field is not
+    #     blind. Bare-arg form `(command_type, command_data)` matches ONLY the call-site
+    #     (the def/decl carry typed params), so the rglob lands there. count==1.
+    (
+        r"serial_cmd_dispatch_mode\(command_type, command_data\)",
+        r"serial_cmd_dispatch_mode_SEVERED(command_type, command_data)",
+        "mode_call_site_severed (routing/reachable divergence)",
     ),
 ]
 

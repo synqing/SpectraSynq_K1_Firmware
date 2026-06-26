@@ -20,6 +20,9 @@
 #include "sb_mode_selection.h"      // sb_mode_selection_init (smart_switching)
 #include "sb_visual_hooks.h"        // SBVisualHookConfig + sb_visual_hooks_config/set_config (smart_visual)
 #include "sb_edgemixer_lite.h"      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
+#ifdef K1_EFFECT_REGISTRY_V1
+#include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
+#endif
 
 #include <stdint.h>
 #include <stdlib.h>                // atol / atoi / atof
@@ -57,6 +60,16 @@ void serial_print_palette_line(const char* label, uint8_t index);
 // (same pattern as serial_print_palette_line above).
 bool vp_set_flag_command(const char* command_type, const char* command_data, bool* flag);
 bool vp_set_float_command(const char* command_type, const char* command_data, float* value, float min_value, float max_value);
+
+// serial_mode_name() + serial_print_mode_line() are external-linkage free functions in
+// serial_menu.h (the single .ino includer). serial_mode_name was widened from
+// `static inline` to external linkage for this lift (statement-identical body);
+// serial_print_mode_line was already external (serial_menu.h:950, like
+// serial_print_palette_line above). Forward-declare both so this TU links against those
+// single definitions — secondary_mode calls serial_mode_name in both branches, and both
+// set_mode/secondary_mode call serial_print_mode_line under K1_EFFECT_REGISTRY_V1.
+const char* serial_mode_name(uint8_t mode);
+void serial_print_mode_line(const char* label, uint8_t mode);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_pure_setter — the 23 pure CONFIG setters, lifted verbatim
@@ -1365,6 +1378,135 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
 
     else {
       return false;  // not a secondary-channel setter — let parse_command's ladder continue
+    }
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_mode — set_mode + secondary_mode, lifted VERBATIM from
+// parse_command()'s else-if ladder (gated-families lane, Increment A). The
+// `if (false) {}` opener keeps each real branch's original
+// `else if (strcmp(command_type, "<name>") == 0)` text (statement-identical to
+// serial_menu.h@HEAD). Both are UNGATED; their bodies carry an INTERNAL
+// #ifdef K1_EFFECT_REGISTRY_V1 (registry dense-index path vs legacy
+// light_mode_next_enabled) that rides verbatim with the lifted body. set_mode's real
+// CONFIG.LIGHTSHOW_MODE write is DEFERRED to led_utilities.h's transition FSM (untouched).
+// Returns true iff command_type matched (the body ran); false routes parse_command back
+// to its remaining ladder + bad_command. Behaviour-preservation proven by the
+// structural-contract golden (oracle_serial_struct.py).
+// ---------------------------------------------------------------------------
+bool serial_cmd_dispatch_mode(const char* command_type, char* command_data) {
+    if (false) {}
+
+    // Set Mode Number ----------------------------------------
+    else if (strcmp(command_type, "set_mode") == 0) {
+      mode_transition_queued = true;
+#ifdef K1_EFFECT_REGISTRY_V1
+      // Input is the gap-free DENSE menu index (0..registry_dense_count()-1),
+      // which also reaches the native effects. Map it to the real persisted
+      // ordinal here; storage still holds the ordinal (presets unaffected).
+      if (k1::effects::framework::registry_is_healthy()) {
+        const long dense_max = (long)k1::effects::framework::registry_dense_count() - 1;
+        const uint16_t dense = (uint16_t)constrain(atol(command_data), 0, dense_max);
+        mode_destination = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(dense);
+      } else {
+        mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
+      }
+#else
+      mode_destination = light_mode_next_enabled(constrain(atol(command_data), 0, NUM_MODES - 1), 1);
+#endif
+
+      save_config_delayed();
+      tx_begin();
+      // CONFIG.LIGHTSHOW_MODE is the raw persisted ordinal (storage truth /
+      // tooling-stable); the MODE line shows the dense menu index + name.
+      USBSerial.print("CONFIG.LIGHTSHOW_MODE: ");
+      USBSerial.println(mode_destination);
+#ifdef K1_EFFECT_REGISTRY_V1
+      serial_print_mode_line("MODE", mode_destination);
+#endif
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "secondary_mode") == 0) {
+#ifdef K1_EFFECT_REGISTRY_V1
+      // Input is the gap-free DENSE menu index (same numbering as set_mode);
+      // map it to the real persisted ordinal. Storage stays the ordinal.
+      const long sec_requested = atoi(command_data);
+      bool sec_good = false;
+      uint8_t sec_target = SECONDARY_LIGHTSHOW_MODE;
+      if (k1::effects::framework::registry_is_healthy()) {
+        if (sec_requested >= 0 &&
+            sec_requested < (long)k1::effects::framework::registry_dense_count()) {
+          sec_target = (uint8_t)k1::effects::framework::registry_dense_to_ordinal(
+              (uint16_t)sec_requested);
+          sec_good = true;
+        }
+      } else if (sec_requested >= 0 && sec_requested < NUM_MODES) {
+        sec_target = light_mode_next_enabled((uint8_t)sec_requested, 1);
+        sec_good = true;
+      }
+      if (sec_good) {
+        uint8_t previous_mode = SECONDARY_LIGHTSHOW_MODE;
+        SECONDARY_LIGHTSHOW_MODE = sec_target;
+
+        tx_begin();
+        serial_print_mode_line("SECONDARY_MODE", SECONDARY_LIGHTSHOW_MODE);
+        tx_end();
+
+        if (debug_mode) {
+          USBSerial.print("SECONDARY MODE CHANGED: from ");
+          USBSerial.print(previous_mode);
+          USBSerial.print(" (");
+          USBSerial.print(serial_mode_name(previous_mode));
+          USBSerial.print(") to ");
+          USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+          USBSerial.print(" (");
+          USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
+          USBSerial.println(")");
+        }
+
+        ENABLE_SECONDARY_LEDS = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+#else
+      uint8_t mode = atoi(command_data);
+      if (mode < NUM_MODES) {
+        uint8_t previous_mode = SECONDARY_LIGHTSHOW_MODE; // Store previous mode
+        SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(mode, 1);
+
+        tx_begin();
+        USBSerial.print("SECONDARY_MODE: ");
+        USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+        USBSerial.print(" (");
+        USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
+        USBSerial.println(")");
+        tx_end();
+
+        if (debug_mode) {
+          USBSerial.print("SECONDARY MODE CHANGED: from ");
+          USBSerial.print(previous_mode);
+          USBSerial.print(" (");
+          USBSerial.print(serial_mode_name(previous_mode));
+          USBSerial.print(") to ");
+          USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+          USBSerial.print(" (");
+          USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
+          USBSerial.println(")");
+        }
+
+        // Enable secondary LEDs if they aren't already
+        ENABLE_SECONDARY_LEDS = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+#endif
+    }
+
+    else {
+      return false;  // not set_mode / secondary_mode — let parse_command's ladder continue
     }
 
     return true;
