@@ -1,6 +1,10 @@
 # Active Session Handoff — SpectraSynq K1 Firmware
 
-**Updated:** 2026-06-26 · **Repo:** `/Users/spectrasynq/SpectraSynq_K1_Firmware` (origin `github.com/synqing/SpectraSynq_K1_Firmware`, branch `main`) · **CI:** green. **main = `3317fa1`** (serial_replay golden 131; serial_struct 14; pytest 565/1-skip). **Merge model (CORRECTED 2026-06-26):** there is NO auto-merge automation (only `ci.yml`; PR auto-merge unconfigured) — PRs are merged **manually by the Captain (`synqing`)** on CI-green. The next family is side-effect-bearing → open its PR as a **DRAFT** so it cannot be merged before review (see the gated-families lane doc).
+**Updated:** 2026-06-26 · **Repo:** `/Users/spectrasynq/SpectraSynq_K1_Firmware` (origin `github.com/synqing/SpectraSynq_K1_Firmware`, branch `main`) · **CI:** green. **main = `3c13147`** (firmware tip `0743d4a`; serial_replay golden 131; serial_struct 14; pytest 565/1-skip).
+
+**▶ Increment A IN FLIGHT — PR #10 (DRAFT):** `set_mode` + `secondary_mode` → `serial_cmd_dispatch_mode()` via the **structural gate** (LOCK `4a9edf3` + EXTRACT `15a3f73` on `feat/serial-decomposition`). All local gates green: golden reproduces byte-for-byte UNTOUCHED, Gate Fα 19/19, anchor guard green, `pio -e k1_hardware` (registry OFF) **and** `pio -e k1_effect_registry` (registry ON, the registry branch — NOT in CI) both SUCCESS, statement-identity `diff -w -B` empty, full pytest 565/1-skip. serial_struct golden 14→16. **Held as a DRAFT** (side-effect-bearing) → awaiting Captain review → mark-ready → manual merge; on merge, `main` advances + serial_struct golden becomes 16. **Next: Increment B = `beat_director`** (gate-matched, production-OFF).
+
+**Merge model (CORRECTED 2026-06-26):** there is NO auto-merge automation (only `ci.yml`; PR auto-merge unconfigured) — PRs are merged **manually by the Captain (`synqing`)** on CI-green. The side-effect-bearing gated families open their PRs as a **DRAFT** so they cannot be merged before review (see the gated-families lane doc).
 Read order: this file → `docs/architecture/firmware-modernization-program.md` (blueprint) → `docs/audit/2026-06-23-repo-audit.md` (audit). Old repo `SensoryBridge-main 9` = untouched archival backstop.
 
 ---
