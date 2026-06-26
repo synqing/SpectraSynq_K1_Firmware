@@ -493,6 +493,17 @@ MUTATIONS = [
         r'strcmp(command_type, "beat_director_MUT")',
         "beat_director_command_type_renamed (routing/identity divergence)",
     ),
+    # 22. SEVER THE ROUTING (added with the EXTRACT, once the gate-matched call-site exists):
+    #     rename the parse_command call so capture()'s `_routed` check no longer finds it —
+    #     beat_director's body still lives in the dispatcher, but reachable flips
+    #     true->false -> divergence. Bare-arg form matches ONLY the call-site (the def/decl
+    #     carry typed params). count==1 (the call-site is inside serial_menu.h's
+    #     #ifdef K1_EFFECT_FRAMEWORK_V1, but the oracle/guard read raw text — gate-transparent).
+    (
+        r"serial_cmd_dispatch_beat_director\(command_type, command_data\)",
+        r"serial_cmd_dispatch_beat_director_SEVERED(command_type, command_data)",
+        "beat_director_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 

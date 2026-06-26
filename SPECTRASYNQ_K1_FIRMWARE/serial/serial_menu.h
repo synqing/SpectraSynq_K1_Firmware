@@ -3074,23 +3074,12 @@ void parse_command(char* command_buf) {
 #endif
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
-    // beat_director toggle (P6 eyes-on A/B — isolated, separable block) ------
-    else if (strcmp(command_type, "beat_director") == 0) {
-      if (strcmp(command_data, "status") == 0) {
-        tx_begin();
-        serial_print_beat_director_status();
-        tx_end();
-      } else {
-        bool value = false;
-        if (vp_parse_bool(command_data, &value)) {
-          bad_director_set_enabled(value);
-          tx_begin();
-          serial_print_beat_director_status();
-          tx_end();
-        } else {
-          bad_command(command_type, command_data);
-        }
-      }
+    // beat_director toggle lifted VERBATIM into serial_cmd_dispatch_beat_director() in
+    // serial_cmd_handlers.cpp (gated-families lane, Increment B). GATE-MATCHED: decl/def/
+    // call-site all behind #ifdef K1_EFFECT_FRAMEWORK_V1 (production-OFF). Returns true iff
+    // command_type == "beat_director". Behaviour-preserving — proven by oracle_serial_struct.
+    else if (serial_cmd_dispatch_beat_director(command_type, command_data)) {
+      // handled by the extracted beat_director dispatcher
     }
 #endif  // K1_EFFECT_FRAMEWORK_V1
 

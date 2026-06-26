@@ -116,6 +116,16 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
 // #ifdef K1_EFFECT_FRAMEWORK_V1, production-OFF) is a SEPARATE gated increment, not here.
 bool serial_cmd_dispatch_mode(const char* command_type, char* command_data);
 
+// Dispatch the beat_director toggle (:beat_director on|off|status). The WHOLE handler is
+// production-OFF — wrapped in #ifdef K1_EFFECT_FRAMEWORK_V1 (k1_hardware defines neither the
+// framework nor registry flag). GATE-MATCHED: this decl, the def, and the call-site are all
+// behind the SAME flag (never a combined gate — the tempo_stream straddle scar). Calls
+// bad_director_set_enabled() + serial_print_beat_director_status() (framework-env symbols).
+// Behaviour-preservation across the verbatim lift is proven by oracle_serial_struct.py.
+#ifdef K1_EFFECT_FRAMEWORK_V1
+bool serial_cmd_dispatch_beat_director(const char* command_type, char* command_data);
+#endif // K1_EFFECT_FRAMEWORK_V1
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's
