@@ -59,6 +59,15 @@ ORACLE_MODULES = [
                      # normalized body + load-path reachability (load_configuration's dead-code
                      # state is pinned too). 5 mutations, one per decision class (valid/load,
                      # fallback, version/migrate, truncated, error-accept) — Gate-Fα teeth.
+    "oracle_ble_midi_map",  # Remoted Phase F keystone — the registry->BLE-MIDI map
+                     # (knob CC/NRPN/PC -> K1 control facade). capture() is the
+                     # source-derived map (71 paths, types from the apply() helper,
+                     # ranges from needs_number_range). 3 mutations plant facade
+                     # regressions (float range widened / a control path dropped /
+                     # mode index range changed) — each must diverge the map.
+                     # Registry-SET drift (the 68-vs-71 class) is caught separately
+                     # by `oracle_ble_midi_map.py --gate` (registry md5 binding),
+                     # since the registry lives outside the mutated FIRMWARE tree.
     "oracle_bridge_fs_codec",  # BEHAVIOURAL proof for the N1 blob codec (the real N1
                      # gate) — host-COMPILES persistence/bridge_fs_config_codec.h
                      # (bridge_fs_classify_config) and RUNS it over the 5 field blob

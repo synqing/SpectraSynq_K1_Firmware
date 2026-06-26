@@ -1,0 +1,688 @@
+{
+  "schema": "k1.ble-midi-map/1",
+  "generated_by": "scripts/regression-harness/golden/oracle_ble_midi_map.py",
+  "registry_version": "2026-06-09",
+  "registry_md5": "78fb9af986da36922fae33cb09de3b4b",
+  "control_count": 71,
+  "channel_map": {
+    "primary": 0,
+    "secondary": 1,
+    "global": 2,
+    "director": 3,
+    "hooks": 3,
+    "edge": 4,
+    "scene": 4,
+    "vp": 5,
+    "calibration": 6
+  },
+  "entries": [
+    {
+      "path": "primary.mode",
+      "channel": 0,
+      "type": "mode",
+      "midi": "pc",
+      "max_expr": "NUM_MODES - 1",
+      "encode": "program = mode_index"
+    },
+    {
+      "path": "primary.palette",
+      "channel": 0,
+      "type": "enum",
+      "midi": "cc7",
+      "cc": 96,
+      "max_expr": "gGradientPaletteCount - 1",
+      "encode": "value = index (clamped 0..127)"
+    },
+    {
+      "path": "primary.palette_mode",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.photons",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.05,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.chroma",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 2,
+      "cc_lsb": 34,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.mood",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 3,
+      "cc_lsb": 35,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.saturation",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 4,
+      "cc_lsb": 36,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.square_iter",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 5,
+      "cc_lsb": 37,
+      "min": 0.0,
+      "max": 8.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.mirror",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 65,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.auto_color_shift",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 66,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.reverse_order",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 67,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.incandescent_mode",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 68,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.incandescent_filter",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 6,
+      "cc_lsb": 38,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.bulb_opacity",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 7,
+      "cc_lsb": 39,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.base_coat",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 69,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.base_coat_intensity",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 8,
+      "cc_lsb": 40,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.temporal_dithering",
+      "channel": 0,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 70,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "primary.prism_count",
+      "channel": 0,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 9,
+      "cc_lsb": 41,
+      "min": 0.0,
+      "max": 8.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "primary.preset",
+      "channel": 0,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 0,
+      "encode": "enumerated string / command long-tail"
+    },
+    {
+      "path": "secondary.mode",
+      "channel": 1,
+      "type": "mode",
+      "midi": "pc",
+      "max_expr": "NUM_MODES - 1",
+      "encode": "program = mode_index"
+    },
+    {
+      "path": "secondary.palette",
+      "channel": 1,
+      "type": "enum",
+      "midi": "cc7",
+      "cc": 96,
+      "max_expr": "gGradientPaletteCount - 1",
+      "encode": "value = index (clamped 0..127)"
+    },
+    {
+      "path": "secondary.palette_mode",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.enabled",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 65,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.photons",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.05,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.chroma",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 2,
+      "cc_lsb": 34,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.mood",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 3,
+      "cc_lsb": 35,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.saturation",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 4,
+      "cc_lsb": 36,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.mirror",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 66,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.incandescent_mode",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 67,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.incandescent_filter",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 5,
+      "cc_lsb": 37,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.base_coat",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 68,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.base_coat_intensity",
+      "channel": 1,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 6,
+      "cc_lsb": 38,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "secondary.auto_color_shift",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 69,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "secondary.reverse_order",
+      "channel": 1,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 70,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "global.sensitivity",
+      "channel": 2,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "global.standby_dimming",
+      "channel": 2,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "global.chroma_profile",
+      "channel": 2,
+      "type": "enum",
+      "midi": "cc7",
+      "cc": 96,
+      "max_expr": "2",
+      "encode": "value = index (clamped 0..127)"
+    },
+    {
+      "path": "global.chromagram_range",
+      "channel": 2,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 2,
+      "cc_lsb": 34,
+      "min": 1.0,
+      "max": "float(NUM_FREQS)",
+      "encode": "v14 = round((value-min)/(max-min)*16383)",
+      "range_symbolic": true
+    },
+    {
+      "path": "global.max_current_ma",
+      "channel": 2,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 3,
+      "cc_lsb": 35,
+      "min": 100.0,
+      "max": 5000.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "global.master_brightness",
+      "channel": 2,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 4,
+      "cc_lsb": 36,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "director.enabled",
+      "channel": 3,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "director.assist",
+      "channel": 3,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 65,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "director.autonomy",
+      "channel": 3,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 66,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "director.confidence_floor",
+      "channel": 3,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "hooks.enabled",
+      "channel": 3,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 67,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "edge.enabled",
+      "channel": 4,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "edge.mode",
+      "channel": 4,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 0,
+      "encode": "enumerated string / command long-tail"
+    },
+    {
+      "path": "edge.strength",
+      "channel": 4,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "scene.smart",
+      "channel": 4,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 1,
+      "encode": "enumerated string / command long-tail"
+    },
+    {
+      "path": "vp.profile",
+      "channel": 5,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 0,
+      "encode": "enumerated string / command long-tail"
+    },
+    {
+      "path": "vp.fix.agc_soft_knee",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 64,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.fix.chroma_gate",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 65,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.fix.prism_off",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 66,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.fix.bloom_decay",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 67,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.fix.hsv_source_sat",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 68,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.fix.secondary_clean",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 69,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.bloom.alpha",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 1,
+      "cc_lsb": 33,
+      "min": 0.8,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.bloom.shift_scale",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 2,
+      "cc_lsb": 34,
+      "min": 0.25,
+      "max": 2.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.bloom.force_saturation",
+      "channel": 5,
+      "type": "bool",
+      "midi": "cc7",
+      "cc": 70,
+      "encode": "0=off,127=on"
+    },
+    {
+      "path": "vp.waveform.shift_rate",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 3,
+      "cc_lsb": 35,
+      "min": 0.0,
+      "max": 240.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.idle_fade",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 4,
+      "cc_lsb": 36,
+      "min": 0.5,
+      "max": 0.999,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.raw_margin",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 5,
+      "cc_lsb": 37,
+      "min": 1.0,
+      "max": 3.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.peak_floor",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 6,
+      "cc_lsb": 38,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.active_fade",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 7,
+      "cc_lsb": 39,
+      "min": 0.0,
+      "max": 0.5,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.chroma_blend_gain",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 8,
+      "cc_lsb": 40,
+      "min": 0.0,
+      "max": 4.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.fallback_brightness",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 9,
+      "cc_lsb": 41,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "vp.waveform.vu_floor",
+      "channel": 5,
+      "type": "float",
+      "midi": "cc14",
+      "cc_msb": 10,
+      "cc_lsb": 42,
+      "min": 0.0,
+      "max": 1.0,
+      "encode": "v14 = round((value-min)/(max-min)*16383)"
+    },
+    {
+      "path": "calibration.noise.arm",
+      "channel": 6,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 0,
+      "encode": "enumerated string / command long-tail",
+      "command": true
+    },
+    {
+      "path": "calibration.noise.confirm",
+      "channel": 6,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 1,
+      "encode": "enumerated string / command long-tail",
+      "command": true
+    },
+    {
+      "path": "calibration.noise.status",
+      "channel": 6,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 2,
+      "encode": "enumerated string / command long-tail",
+      "command": true
+    },
+    {
+      "path": "calibration.noise.clear",
+      "channel": 6,
+      "type": "text",
+      "midi": "nrpn",
+      "nrpn_param": 3,
+      "encode": "enumerated string / command long-tail"
+    }
+  ]
+}
