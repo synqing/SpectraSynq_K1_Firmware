@@ -78,10 +78,18 @@ NAMESPACE_CHANNEL = {
                        # completeness; NOT knob-bound by default (destructive setup).
 }
 
-# Band layout per channel.
-CC14_MSB_RANGE = range(1, 32)     # 31 floats max/channel; lsb = msb+32 (-> 33..63)
-CC7_BOOL_RANGE = range(64, 96)    # 32 toggles max/channel
-CC7_ENUM_RANGE = range(96, 120)   # 24 enums max/channel
+# Controllers RESERVED by the MIDI spec — never assign to ordinary controls:
+# 0/32 bank-select, 6/38 data-entry, 96/97 data inc/dec, 98/99 NRPN, 100/101 RPN,
+# 120-127 channel-mode. Our NRPN long tail uses 6/38/98/99, so a 14-bit CC landing
+# on 6 (+lsb 38) would be ambiguous with NRPN data — the differential oracle caught
+# exactly that (primary.incandescent_filter @ cc6/38 mis-decoded as primary.preset).
+RESERVED_CC = {0, 32, 6, 38, 96, 97, 98, 99, 100, 101,
+               120, 121, 122, 123, 124, 125, 126, 127}
+# Band layout per channel (reserved controllers excluded from every band).
+CC14_MSB_RANGE = [n for n in range(1, 32)
+                  if n not in RESERVED_CC and (n + 32) not in RESERVED_CC]  # 30 floats max
+CC7_BOOL_RANGE = [n for n in range(64, 96) if n not in RESERVED_CC]        # 32 toggles max
+CC7_ENUM_RANGE = [n for n in range(102, 120) if n not in RESERVED_CC]      # 18 enums max
 
 
 def md5_of(path: Path) -> str:

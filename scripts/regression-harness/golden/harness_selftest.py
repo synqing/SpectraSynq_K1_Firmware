@@ -68,6 +68,13 @@ ORACLE_MODULES = [
                      # Registry-SET drift (the 68-vs-71 class) is caught separately
                      # by `oracle_ble_midi_map.py --gate` (registry md5 binding),
                      # since the registry lives outside the mutated FIRMWARE tree.
+    "oracle_ble_midi_diff",  # Remoted Phase F primary oracle — BLE-MIDI ingress vs WS
+                     # ingress at the record boundary (decode(encode())==WS record;
+                     # exact for discrete, 14-bit tolerance for floats). capture() is
+                     # the enabled-mode roster re-derived from config_types.h; the 2
+                     # mutations re-enable EMBER_V2 / swap a disable, diverging the
+                     # roster. The decoder fault-evidence is `--selftest` (5 decoder
+                     # faults each caught); the cross-ingress contract is `--gate`.
     "oracle_bridge_fs_codec",  # BEHAVIOURAL proof for the N1 blob codec (the real N1
                      # gate) — host-COMPILES persistence/bridge_fs_config_codec.h
                      # (bridge_fs_classify_config) and RUNS it over the 5 field blob
