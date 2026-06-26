@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "Palettes.h" // Include for gGradientPaletteCount
 #include "sb_effect_queue.h" // SB_PRESET_SLOTS_FILE (factory_reset enumeration)
+#include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
@@ -89,8 +90,16 @@ void save_config() {
     return;
   } else {
     file.seek(0);
+    // N1: write [ConfigBlobHeader][raw CONFIG bytes] zero-padded to 512. The
+    // header (magic+version+length+crc32) lets load_config() detect a truncated
+    // or corrupt file instead of memcpy'ing garbage into the live CONFIG. File
+    // size stays 512 for compatibility with the existing fixed-size read.
     uint8_t config_buffer[512];
-    memcpy(config_buffer, &CONFIG, sizeof(CONFIG));
+    memset(config_buffer, 0, sizeof(config_buffer));
+    ConfigBlobHeader header;
+    bridge_fs_fill_header(&header, reinterpret_cast<const uint8_t*>(&CONFIG), sizeof(CONFIG));
+    memcpy(config_buffer, &header, sizeof(header));
+    memcpy(config_buffer + sizeof(header), &CONFIG, sizeof(CONFIG));
 
     for (uint16_t i = 0; i < 512; i++) {
       file.write(config_buffer[i]);
@@ -122,7 +131,6 @@ void load_config() {
     USBSerial.print("LITTLEFS: ");
   }
 
-  bool queue_factory_reset = false;
   File file = LittleFS.open(config_filename, FILE_READ);
   if (!file) {
     if (debug_mode) {
@@ -131,32 +139,65 @@ void load_config() {
       USBSerial.println(" for reading!");
     }
     return;
-  } else {
-    file.seek(0);
-    uint8_t config_buffer[512];
-    for (uint16_t i = 0; i < sizeof(CONFIG); i++) {
-      config_buffer[i] = file.read();
-    }
+  }
 
-    memcpy(&CONFIG, config_buffer, sizeof(CONFIG));
-#ifdef K1_EFFECT_REGISTRY_V1
-    CONFIG.LIGHTSHOW_MODE = k1::effects::framework::registry_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
-    SECONDARY_LIGHTSHOW_MODE = k1::effects::framework::registry_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
-#else
-    CONFIG.LIGHTSHOW_MODE = light_mode_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
-    SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
-#endif
-
-    if (debug_mode) {
-      USBSerial.println("READ CONFIG SUCCESSFULLY");
-    }
+  // N1: read the whole 512-byte record and classify it BEFORE trusting any of it.
+  // file.size() tells us how many real bytes exist so a truncated file is detected
+  // (CFG_FALLBACK) instead of memcpy'ing read()=-1 padding into CONFIG.
+  file.seek(0);
+  uint8_t config_buffer[512];
+  size_t file_len = (size_t)file.size();
+  size_t bytes_read = file_len < 512 ? file_len : 512;
+  for (size_t i = 0; i < bytes_read; i++) {
+    config_buffer[i] = file.read();
   }
   file.close();
 
-  if (queue_factory_reset == true) {
-    factory_reset();
+  // Decide LOAD / MIGRATE / FALLBACK from header magic+version+length+crc32.
+  // Recovery is RAM-ONLY (copy in-RAM defaults) — we deliberately do NOT call
+  // factory_reset()/restore_defaults()/reboot() on a bad blob, because those
+  // delete files and reboot and a persistently-corrupt file would boot-loop the
+  // device. Anti-brick recovery is the whole point of N1.
+  bool need_resave = false;
+  ConfigLoadDecision decision = bridge_fs_classify_config(config_buffer, bytes_read, sizeof(CONFIG));
+  if (decision == CFG_LOAD) {
+    // Headered + validated: payload sits AFTER the header.
+    memcpy(&CONFIG, config_buffer + sizeof(ConfigBlobHeader), sizeof(CONFIG));
+    if (debug_mode) {
+      USBSerial.println("READ CONFIG SUCCESSFULLY");
+    }
+  } else if (decision == CFG_MIGRATE) {
+    // Headerless legacy image at offset 0: adopt it, then re-save with a header.
+    memcpy(&CONFIG, config_buffer, sizeof(CONFIG));
+    need_resave = true;
+    if (debug_mode) {
+      USBSerial.println("MIGRATED LEGACY CONFIG");
+    }
+  } else { // CFG_FALLBACK
+    // Corrupt/truncated/wrong-version blob: recover to compiled defaults in RAM
+    // (NO file delete, NO reboot), then re-save a valid headered blob.
+    memcpy(&CONFIG, &CONFIG_DEFAULTS, sizeof(CONFIG));
+    need_resave = true;
+    if (debug_mode) {
+      USBSerial.println("CONFIG INVALID -> DEFAULTS (no reboot)");
+    }
   }
+
+#ifdef K1_EFFECT_REGISTRY_V1
+  CONFIG.LIGHTSHOW_MODE = k1::effects::framework::registry_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
+  SECONDARY_LIGHTSHOW_MODE = k1::effects::framework::registry_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
+#else
+  CONFIG.LIGHTSHOW_MODE = light_mode_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
+  SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
+#endif
+
   unlock_leds();
+  // save_config() takes its own lock_leds()/unlock_leds(); lock_leds() is a
+  // flag-set (not a recursive counter), so call it only AFTER unlocking to avoid
+  // unlock_leds() inside save_config() clearing the lock while we still hold it.
+  if (need_resave) {
+    save_config();
+  }
 }
 
 // Save noise calibration to LittleFS

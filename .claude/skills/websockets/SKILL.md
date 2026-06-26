@@ -1,0 +1,131 @@
+---
+name: websockets
+description: |
+  Implements real-time bidirectional communication for the Tab5 wireless controller ↔ K1 firmware link.
+  Use when: adding WebSocket message types, modifying the handshake sequence, implementing reconnect logic, routing new control messages, or debugging the Tab5 ↔ K1 protocol.
+allowed-tools: Read, Edit, Write, Glob, Grep, Bash
+---
+
+# WebSockets Skill
+
+Tab5 wireless controller connects to K1 firmware over WebSocket (`K1WebSocketClient`). The protocol uses JSON messages with a versioned handshake (v2, fallback to v1): Hello → Capabilities → State → Ready. All WebSocket interaction flows through `g_wsClient` (global, `main.cpp`) and is routed by `WsMessageRouter`.
+
+## Before You Code (REQUIRED)
+
+This skill's content was captured at generation time and MAY be stale. For ANY non-trivial change involving websockets, verify against current docs FIRST:
+
+
+
+Then:
+
+1. **Match the installed version.** Cross-reference against the version installed in this repo. APIs change across minor versions; do not assume.
+2. **Discover provider best practices.** If the task touches a production-sensitive capability, inspect the provider service catalog, official docs, and project docs before choosing an implementation.
+3. **Respect explicit direction.** If the user explicitly asks for a specific mechanism, follow it. If project docs clearly mandate a mechanism, follow the project. In both cases, mention the provider-recommended alternative and make the chosen path safe.
+4. **Prefer provider-native primitives by default.** If no explicit user/project override exists and the change involves caching, rate limiting, background work, scheduled jobs, shared state, queues, or secrets, use the provider-recommended binding/API. Do not hand-roll an in-memory or polyfill solution that "works" locally but breaks under the provider's execution model — derive the need→native-primitive mapping yourself from this provider's docs.
+
+## Skill Advantage Protocol
+
+Using this skill should produce a meaningfully better result than an unskilled baseline. Apply this loop before and during implementation:
+
+1. **Clarify only when it changes the outcome.** Ask the smallest useful set of questions when the request is ambiguous, preference-heavy, or could change architecture, user-visible behavior, data shape, security posture, analytics, or external side effects. If the safe assumption is obvious, state it and proceed. When asked to surface data that no existing code path captures, state up front the assumption that capture starts now (no backfill) or ask if a backfill source exists — do not silently build net-new storage without surfacing this.
+2. **Inspect the nearest real patterns.** Read adjacent files, routes, components, tests, schema, infra, copy, and analytics surfaces before inventing structure. Treat local conventions as the starting point.
+3. **Optimize the task's highest-leverage axis.** Identify what would make the result win a review: user-visible correctness, integration quality, accessibility, security, reliability, maintainability, operability, or speed of future change.
+4. **Reuse before reimplementing.** Prefer existing components, hooks, helpers, formatting/utility functions, data registries, metadata builders, analytics, pricing, checkout, auth, routing utilities, and API procedures/endpoints/data sources over local one-off clones. Before adding a new API procedure, query, or data fetch, search for one that already returns this data and extend it in place — a surface that fetches data and only logs or partially uses it is a reuse target, not an absent one; never author a parallel endpoint or leave the original orphaned. Before importing for a data fetch, grep the screen for the call it already makes and reuse that exact client/singleton import path and endpoint/procedure name; never create a second client, transport, or parallel endpoint for data an existing call returns, and confirm every imported path and symbol actually exists in the repo before writing it.
+5. **Use semantic structures.** Tables, lists, forms, buttons, links, headings, and disclosure controls should use native/project accessible primitives instead of div-only lookalikes.
+6. **Prevent drift by construction.** Centralize repeated facts, labels, claims, product defaults, and shared table cells in registries or helpers when multiple surfaces need the same answer.
+7. **Synthesize, do not merely comply.** Combine this skill's guidance with repo evidence and the user's goal. When two good approaches exist, borrow the strongest parts of each instead of blindly choosing one.
+8. **Check claims against code.** Product copy, docs, and comments must not imply automation, integrations, performance, security, refresh cadence, counts, or data flow that the implementation does not actually provide. Any claim that one component writes, records, updates, calls, or is the source of truth for another is allowed only if the edit performing it is in this same change; before finishing, check each such cross-component claim against the actual edits and downgrade unbacked ones to an explicit TODO or implement them now.
+9. **Ship the complete slice.** Include every adjacent artifact needed for the change to be usable and maintainable: wiring, state handling, validation, analytics, tests, docs, migrations, or infra when those surfaces are part of the behavior. When the task shows, displays, or lists user data, deliver the full vertical slice and do not stop at an internal/API/CLI layer: the data-model/schema change AND its migration (a schema change without a migration is incomplete), the path that writes or populates the data, an authenticated endpoint scoped to the current user, and the primary user-facing surface wired through the project's typed data client. Before declaring done, trace one record end-to-end (triggering event → write → read → render); if any hop exists only in a comment or docstring rather than edited code, the slice is NOT done. Shipping only the persistence layer (a schema/migration with no writer, reader, or surface) is an incomplete slice, not a milestone.
+
+## Capability Contract
+
+Use this section when the user prompt touches production risk, even if the prompt does not name this technology explicitly.
+
+
+
+
+Required wiring surfaces:
+- provider/runtime configuration discovered during implementation
+- nearest typed request/context boundary
+- handler/procedure boundary before external side effects
+
+Side-effect barrier:
+- Place guards before external APIs, auth mutations, email sends, analytics events, storage writes, and database mutations.
+
+
+Fallback policy:
+- Prefer provider-native/platform-managed primitives by default when no explicit override exists.
+- Follow clear user/project overrides, but mention the native alternative and tradeoff.
+- Fallbacks must be durable, multi-instance safe, and atomic under concurrency.
+
+Verification rules:
+- [error] native-or-explicit-override: Use the provider-native primitive first unless the user/project explicitly overrides it.
+- [error] atomic-fallback: Fallback counters must be atomic under concurrency.
+
+## Quick Start
+
+### Send a control value to K1
+
+```cpp
+// Existing API — K1WebSocketClient.h
+K1SendResult result = g_wsClient.sendK1NumberControl("brightness", 0.75f);
+if (result.success) { /* ack received */ }
+```
+
+### Add a new message handler
+
+```cpp
+// new code to add — in WsMessageRouter.cpp
+router.on("my_event", [](const JsonObject& msg) {
+    float val = msg["value"] | 0.0f;
+    // handle val
+});
+```
+
+### Poll connection in the update loop
+
+```cpp
+// Existing pattern — call once per loop iteration on the network task
+g_wsClient.update();  // drives _ws.loop() + reconnect backoff
+```
+
+## Key Concepts
+
+| Concept | Usage | Notes |
+|---------|-------|-------|
+| `K1WebSocketStatus` | `isConnected()` → compare enum | DISCONNECTED / CONNECTING / CONNECTED / ERROR |
+| Handshake phases | Hello → Capabilities → State → Ready | Don't send controls before CONNECTED+Ready |
+| Exponential backoff | Built into `update()` | 1 s initial, 30 s max — don't add extra sleep |
+| Protocol version | v2 preferred, v1 fallback | Server advertises; client adapts in event handler |
+| `K1SendResult` | Returned by all `sendK1*` methods | Check `.success` before acting on `.response` |
+
+## Common Patterns
+
+### Gate sends on connection state
+
+```cpp
+// GOOD — check before send
+if (g_wsClient.isConnected()) {
+    g_wsClient.sendK1NumberControl("mode", static_cast<float>(modeIndex));
+}
+```
+
+### Request K1 state after reconnect
+
+```cpp
+// Called automatically in handshake, but can be re-requested:
+g_wsClient.requestK1State();
+g_wsClient.requestK1Capabilities();
+```
+
+## See Also
+
+- [patterns](references/patterns.md) — protocol message structure, JSON schema, anti-patterns
+- [workflows](references/workflows.md) — adding message types, debugging reconnects, testing offline
+
+## Related Skills
+
+- See the **pytest** skill for host-side harness tests that replay WebSocket transcripts
+- See the **python** skill for the `tools/tab5_k1_dashboard_harness.py` test bridge
+- See the **aiofiles** skill for async file I/O in Python-side harness tooling
+- See the **click** skill for CLI tooling around the harness
