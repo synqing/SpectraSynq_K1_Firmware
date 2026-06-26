@@ -104,6 +104,18 @@ bool serial_cmd_dispatch_preset(const char* command_type, char* command_data);
 // function-call) and secondary_status (read-only) are NOT here — they stay inline.
 bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data);
 
+// Dispatch the mode family (set_mode + secondary_mode), lifted VERBATIM from
+// parse_command()'s ladder. Both are UNGATED else-if branches whose bodies carry an
+// INTERNAL #ifdef K1_EFFECT_REGISTRY_V1 (registry dense-index vs legacy
+// light_mode_next_enabled); set_mode also save_config_delayed(), and the real
+// CONFIG.LIGHTSHOW_MODE write is DEFERRED to led_utilities.h's transition FSM (untouched
+// by this lane). Returns true iff command_type was one of the two; false to let
+// parse_command's ladder continue. Behaviour-preservation across the verbatim lift is
+// proven by the structural-contract gate (oracle_serial_struct.py), NOT replay — the
+// deferred async write is sidestepped by construction, not modelled. beat_director (fully
+// #ifdef K1_EFFECT_FRAMEWORK_V1, production-OFF) is a SEPARATE gated increment, not here.
+bool serial_cmd_dispatch_mode(const char* command_type, char* command_data);
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

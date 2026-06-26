@@ -440,6 +440,17 @@ MUTATIONS = [
         r'strcmp(command_type, "secondary_mode_MUT")',
         "secondary_mode_command_type_renamed (routing/identity divergence)",
     ),
+    # 19. SEVER THE ROUTING (added with the EXTRACT, once the call-site exists): rename
+    #     the parse_command call so capture()'s `_routed` check no longer finds it. BOTH
+    #     set_mode + secondary_mode bodies still live in the dispatcher, but reachable
+    #     flips true->false for both -> divergence. Proves the `reachable` field is not
+    #     blind. Bare-arg form `(command_type, command_data)` matches ONLY the call-site
+    #     (the def/decl carry typed params), so the rglob lands there. count==1.
+    (
+        r"serial_cmd_dispatch_mode\(command_type, command_data\)",
+        r"serial_cmd_dispatch_mode_SEVERED(command_type, command_data)",
+        "mode_call_site_severed (routing/reachable divergence)",
+    ),
 ]
 
 
