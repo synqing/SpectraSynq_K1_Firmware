@@ -27,8 +27,11 @@
 // follower tracking, LEDs visibly responsive.
 //
 // DMA sizing is now the production-candidate AP0/VP1 cadence cushion
-// (dma_desc_num=3, dma_frame_num=96). portMAX_DELAY blocking and read size
-// (SAMPLES_PER_CHUNK*sizeof(int32_t)=384 B) are preserved. Init keeps void return + PASS/FAIL print contract; NO
+// (dma_desc_num=3, dma_frame_num=96). Read size
+// (SAMPLES_PER_CHUNK*sizeof(int32_t)=384 B) is preserved. The blocking read is
+// BOUNDED under K1_AUDIO_FREEZE_GUARD_V1 (N2: pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS)
+// in acquire_sample_chunk, degrade-to-silence on timeout/short read); undefining
+// the flag restores the original portMAX_DELAY blocking read. Init keeps void return + PASS/FAIL print contract; NO
 // ESP_ERROR_CHECK (init failure must not panic-reboot). Lines below
 // (acquire_sample_chunk extraction, DC calibration, sweet-spot, AGC,
 // calculate_vu) byte-identical to pre-migration except the single
@@ -39,6 +42,10 @@
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
 #include <esp_timer.h>
+
+#ifndef K1_I2S_READ_TIMEOUT_MS
+#define K1_I2S_READ_TIMEOUT_MS 100  // N2: bounded audio read (>> 7.5ms/chunk DMA; bounds a mic/DMA stall)
+#endif
 
 static i2s_chan_handle_t rx_chan = NULL;
 
@@ -273,8 +280,24 @@ void acquire_sample_chunk(uint32_t t_now) {
   const int64_t i2s_read_start_us = esp_timer_get_time();
 #endif
   // PIO-MIGRATION-STAGE-3 (2026-05-24): i2s_read → i2s_channel_read (rx_chan handle).
-  // Read size unchanged (96 * 4 = 384 B). portMAX_DELAY blocking unchanged.
+  // Read size unchanged (96 * 4 = 384 B). N2 (K1_AUDIO_FREEZE_GUARD_V1): the
+  // read is now BOUNDED (pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS)) so the audio
+  // loopTask can never block forever on a mic/DMA stall; the #else revert path
+  // keeps the original portMAX_DELAY blocking read byte-for-byte.
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+  // N2: bounded read so the audio loopTask can never block forever on a mic/DMA
+  // stall. On timeout/short read, degrade to a SILENCE frame (zero-fill the
+  // unfilled tail) instead of re-processing stale DMA bytes.
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int32_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      i2s_samples_raw[z] = 0;
+    }
+  }
+#else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   sb_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
   sb_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;

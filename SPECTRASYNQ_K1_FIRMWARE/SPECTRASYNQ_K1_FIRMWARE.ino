@@ -21,7 +21,12 @@
 #include <FixedPoints.h>
 #include <FixedPointsCommon.h>
 #include <Wire.h>
+#include "esp_task_wdt.h"  // N2: raw Task-WDT API (esp_task_wdt_reconfigure/_add/_reset/_status) + esp_task_wdt_config_t
 #include "m5rotate8.h"
+
+#ifndef K1_TASK_WDT_TIMEOUT_MS
+#define K1_TASK_WDT_TIMEOUT_MS 5000  // N2: task-watchdog timeout (>> worst-case legit block: render flash window <1s, DMA 7.5ms)
+#endif
 
 // Include Sensory Bridge firmware files, sorted high to low, by boringness ;) -------
 #include "user_config.h"      // Nothing for now
@@ -689,6 +694,18 @@ void setup() {
   USBSerial.print(coreOk ? 1 : 0);
   USBSerial.print(" vp_task_created=");
   USBSerial.println(ledTaskCreated ? 1 : 0);
+
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+  // N2: pin the task-watchdog timeout (IDF auto-inits TWDT at boot; reconfigure
+  // makes our 5s contract explicit + independent of the arduino default, keeping
+  // the stock core-0 idle check), then subscribe the audio loopTask. led_thread
+  // subscribes itself at entry.
+  {
+    esp_task_wdt_config_t k1_wdt_cfg = { K1_TASK_WDT_TIMEOUT_MS, 0x1u, true }; // {timeout_ms, idle_core_mask, trigger_panic}
+    esp_task_wdt_reconfigure(&k1_wdt_cfg);
+  }
+  enableLoopWDT();  // subscribe loopTask (core 0, audio) to the TWDT
+#endif
 }
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
@@ -717,6 +734,9 @@ static void sb_ap_cadence_capture_frame(uint32_t t_now,
 
 // Loop, runs forever after setup() --------------------------------------------------
 void loop() {
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+  feedLoopWDT();  // N2: feed the audio-loop watchdog every iteration (~133 Hz << 5s)
+#endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
   uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
@@ -1004,7 +1024,15 @@ void led_thread(void* arg) {
   }
 #endif
 #endif
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+  if (esp_task_wdt_status(NULL) != ESP_OK) {
+    esp_task_wdt_add(NULL);  // N2: subscribe led_task (core 1) to the TWDT
+  }
+#endif
   while (true) {
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+    esp_task_wdt_reset();  // N2: feed the render-task watchdog each frame
+#endif
 #ifdef K1_EFFECT_FRAMEWORK_V1
     // CL-1 ack-barrier: when the flash/preset path requests a halt, park here at
     // frame-top and publish the acknowledgement BEFORE touching any PSRAM. The
