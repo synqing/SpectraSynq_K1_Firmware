@@ -25,8 +25,10 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -112,6 +114,9 @@ def fault_injection_cases() -> list[tuple]:
                   "hist_counts": [0] * 10, "hist_edges": [round(i * 0.1, 1) for i in range(11)]}}),
                   None, False, ["COMPLETENESS"]))
     cases.append(("SYNTH post_run_dead (U7)", valid_payload(post_run_alive=False), None, False, ["LIVENESS"]))
+    # corrupt capture that decodes to a non-dict (truncated/garbage file) — must
+    # be rejected as malformed, never crash the admission.
+    cases.append(("SYNTH non_dict_payload", [], None, False, ["MALFORMED"]))
 
     # --- log-gated cases (U3 app-ready / U6 download-marker) ---
     cases.append(("SYNTH app_ready_ok (U3)", valid_payload(), LOG_APP_READY, True, []))
@@ -165,6 +170,22 @@ def run_compare_integration() -> list[str]:
     print(f"  compare(all-admitted set)         -> exit {rc_good} (expect 0/1, NOT 2)")
     if rc_good == 2:
         failures.append("compare on an all-admitted set wrongly returned INVALID (exit 2)")
+
+    # Corrupt capture FILES must reject cleanly (exit 2), never crash (a traceback
+    # would be exit 1 + stderr). This is the cb1/cb2 fault class at the file layer.
+    with tempfile.TemporaryDirectory() as td:
+        bad_files = {
+            "malformed-json": "{ not valid json",
+            "non-dict-json": "[]",
+            "empty-file": "",
+        }
+        for label, content in bad_files.items():
+            path = os.path.join(td, label + ".json")
+            Path(path).write_text(content, encoding="utf-8")
+            rc = compare_exit([good, path], [good])
+            print(f"  compare({label:14s})    -> exit {rc} (expect 2=INVALID, no crash)")
+            if rc != 2:
+                failures.append(f"compare with {label} returned {rc}, expected 2 (clean INVALID, no crash)")
     return failures
 
 

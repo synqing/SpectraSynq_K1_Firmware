@@ -317,6 +317,11 @@ def admit_capture(
     U3 app-ready and U6 DOWNLOAD-marker checks; omit it for JSON-only admission
     (the metric-derived gates still reject every real bad capture).
     """
+    # A corrupt capture is not always a dict (a truncated/garbage file may decode
+    # to a list/str/None). Reject it as malformed rather than crash — a crashing
+    # oracle is worse than a silent-admitting one.
+    if not isinstance(payload, dict):
+        return {"admitted": False, "reasons": ["MALFORMED: capture is not a JSON object (got %s)" % type(payload).__name__]}
     reasons: list[str] = []
     metrics = payload.get("metrics") or {}
 
@@ -382,7 +387,17 @@ def load_admitted_runs(
     admitted: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     for raw in paths:
-        payload = json.loads(Path(raw).read_text(encoding="utf-8"))
+        # The capture FILE itself must be readable + well-formed. A truncated /
+        # non-JSON / non-object file is a corrupt capture (the cb1/cb2 fault class
+        # produces exactly these) — reject it, never crash the whole comparison.
+        try:
+            payload = json.loads(Path(raw).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            rejected.append({"file": raw, "reasons": ["UNREADABLE: missing or not valid JSON: %s" % exc]})
+            continue
+        if not isinstance(payload, dict):
+            rejected.append({"file": raw, "reasons": ["MALFORMED: capture is not a JSON object (got %s)" % type(payload).__name__]})
+            continue
         log_text: str | None = None
         log_path = payload.get("raw_log")
         if log_path and Path(log_path).exists():
