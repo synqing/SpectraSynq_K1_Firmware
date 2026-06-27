@@ -37,6 +37,25 @@ in [`../spec-index.md`](../spec-index.md).
   > phase only*, no per-action approval needed. Identity-by-chip-ID still
   > mandatory before every write. Does not extend to other devices.
 
+### Identity manifest (canonical, machine-readable — N4a)
+
+The upload guard's device identities are single-sourced in
+[`scripts/platformio/k1_device_identities.json`](../../scripts/platformio/k1_device_identities.json);
+`k1_upload_guard.py` consumes it. **Identity-by-USB-serial governs** — the
+`advisory_port` is convenience only and never overrides the serial check. The
+guard **fails closed** for protected (mapped) K1 envs: a wrong serial, a
+`KNOWN_QUARANTINED` unit, or an unknown ESP32-S3 at the requested port are all
+rejected. Run `python3 scripts/platformio/k1_upload_guard.py --list-identities`
+(no device I/O) to print the table. Edit the manifest, not the code; the gate
+`tests/test_k1_upload_guard_identity_static.py` keeps doc/guard from diverging.
+
+- **Authorized:** `F887A500` (main K1, `k1_hardware`*) · `B489A500` (bench,
+  `k1_bench_reference`*). *(plus the per-role probe/harness envs in the manifest.)*
+- **Quarantined:** `FC:01:2C:DA:2B:38` — the unregistered 4th ESP32-S3, classified
+  **`KNOWN_QUARANTINED` / unassigned / upload-blocked** ("unknown bench device, not
+  authorized for K1 env upload"). Role is **unassigned** pending Captain ID — do
+  not infer it. The guard refuses it on every K1 env with an explicit message.
+
 ### 2026-06-19 live identity verification (esptool `flash_id`, all 4 enumerated ports)
 
 Ports are badly scrambled vs the typical map; verified by chip type + MAC:
