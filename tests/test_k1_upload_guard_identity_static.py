@@ -138,3 +138,27 @@ def test_blocked_env_overrides_authorized_mapping():
     # even with the CORRECT main-K1 identity at its port, blocked WINS -> reject
     ok, msg = GUARD.validate_upload_target(env, MAIN[0], _ports(MAIN))
     assert not ok and "upload blocked" in msg, msg
+
+
+# 10 — guard loads as a PlatformIO build PRE-SCRIPT (no __file__ in SCons exec)
+def test_guard_loads_without_dunder_file():
+    """Regression: PlatformIO execs this file as a build pre-script WITHOUT
+    `__file__`; a module-scope `Path(__file__)` NameError crashes every
+    `pio run` before compilation (broke the production build once). Faithfully
+    simulate: module registered in sys.modules (so @dataclass resolves), no
+    `__file__`, cwd == project root (as PlatformIO runs it)."""
+    import os
+    import types
+
+    src = GUARD_PATH.read_text(encoding="utf-8")
+    mod = types.ModuleType("k1_upload_guard_nofile")  # ModuleType sets no __file__
+    sys.modules["k1_upload_guard_nofile"] = mod
+    cwd = os.getcwd()
+    try:
+        os.chdir(ROOT)  # PlatformIO runs the pre-script with cwd == project root
+        exec(compile(src, str(GUARD_PATH), "exec"), mod.__dict__)  # must NOT NameError
+    finally:
+        os.chdir(cwd)
+        sys.modules.pop("k1_upload_guard_nofile", None)
+    assert mod.__dict__.get("K1_TARGETS"), "K1_TARGETS empty when loaded without __file__"
+    assert "FC:01:2C:DA:2B:38" in mod.__dict__.get("QUARANTINED", {})
