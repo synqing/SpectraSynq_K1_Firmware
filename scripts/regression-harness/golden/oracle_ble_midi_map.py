@@ -129,6 +129,111 @@ def _branch_bodies(facade_src: str):
     return bodies
 
 
+def _function_body(src: str, name: str) -> str:
+    marker = re.search(rf"(?:bool|const char\*)\s+{re.escape(name)}\s*\([^)]*\)\s*\{{", src)
+    if not marker:
+        raise ValueError(f"cannot find facade helper {name}()")
+    start = marker.end()
+    depth = 1
+    i = start
+    while i < len(src) and depth:
+        if src[i] == "{":
+            depth += 1
+        elif src[i] == "}":
+            depth -= 1
+        i += 1
+    if depth:
+        raise ValueError(f"unterminated facade helper {name}()")
+    return src[start:i - 1]
+
+
+def _strcmp_values(body: str, arg_name: str) -> list[str]:
+    values: list[str] = []
+    for value in re.findall(rf'strcmp\({re.escape(arg_name)},\s*"([^"]+)"\)', body):
+        if value not in values:
+            values.append(value)
+    return values
+
+
+def _edge_mode_text_values(body: str) -> tuple[list[str], list[str]]:
+    canonical: list[str] = []
+    accepted: list[str] = []
+    for cond in re.findall(r"if\s*\((.*?)\)\s*\{", body, re.S):
+        values = re.findall(r'"([^"]+)"', cond)
+        if not values:
+            continue
+        canonical.append(values[0])
+        for value in values:
+            if value not in accepted:
+                accepted.append(value)
+    return canonical, accepted
+
+
+def _scene_text_values(body: str) -> tuple[list[str], list[str]]:
+    canonical: list[str] = []
+    accepted: list[str] = []
+    for cond, ret in re.findall(r'if\s*\((.*?)\)\s*\{\s*return\s+"([^"]+)";\s*\}', body, re.S):
+        if ret not in canonical:
+            canonical.append(ret)
+        for value in re.findall(r'"([^"]+)"', cond):
+            if value not in accepted:
+                accepted.append(value)
+    return canonical, accepted
+
+
+def _text_value_tables(facade_src: str) -> dict[str, dict[str, list[str]]]:
+    """Derive exact NRPN text tables from the facade helpers.
+
+    The knob and K1 decoder both consume these canonical values. Aliases remain
+    visible as accepted_text_values for audit, but emission uses only the exact
+    canonical text the facade accepts without normalisation drift.
+    """
+    preset_body = _function_body(facade_src, "apply_primary_preset")
+    edge_body = _function_body(facade_src, "parse_edge_mode")
+    scene_body = _function_body(facade_src, "normalise_scene_smart")
+    vp_body = _function_body(facade_src, "parse_vp_profile")
+
+    edge_values, edge_accepted = _edge_mode_text_values(edge_body)
+    scene_values, scene_accepted = _scene_text_values(scene_body)
+    preset_values = _strcmp_values(preset_body, "preset_name")
+    vp_values = _strcmp_values(vp_body, "text")
+
+    return {
+        "primary.preset": {
+            "text_values": preset_values,
+            "accepted_text_values": preset_values,
+        },
+        "edge.mode": {
+            "text_values": edge_values,
+            "accepted_text_values": edge_accepted,
+        },
+        "scene.smart": {
+            "text_values": scene_values,
+            "accepted_text_values": scene_accepted,
+        },
+        "vp.profile": {
+            "text_values": vp_values,
+            "accepted_text_values": vp_values,
+        },
+        "calibration.noise.arm": {
+            "text_values": [],
+            "accepted_text_values": [],
+        },
+        "calibration.noise.confirm": {
+            "text_values": [],
+            "accepted_text_values": [],
+        },
+        "calibration.noise.status": {
+            "text_values": [],
+            "accepted_text_values": [],
+        },
+        "calibration.noise.clear": {
+            "text_values": ["CONFIRM"],
+            "accepted_text_values": ["CONFIRM"],
+        },
+    }
+
+
 def _num_or_expr(token: str):
     """Numeric literal -> float; otherwise the source expression verbatim
     (e.g. ``float(NUM_FREQS)`` -> resolved on-device at runtime)."""
@@ -179,6 +284,7 @@ def build_map(firmware_root: Path | None = None) -> dict:
     facade_src = (firmware / FACADE_REL).read_text(encoding="utf-8")
     controls = load_registry_controls()
     bodies = _branch_bodies(facade_src)
+    text_tables = _text_value_tables(facade_src)
 
     # Parity check 1: bijection registry<->apply() branches.
     branch_paths = set(bodies) - KNOWN_NON_REGISTRY_BRANCHES
@@ -227,8 +333,13 @@ def build_map(firmware_root: Path | None = None) -> dict:
         elif info["type"] == "text":
             e.update({"midi": "nrpn", "nrpn_param": alloc[ch]["nrpn"],
                       "encode": "enumerated string / command long-tail"})
+            table = text_tables.get(path)
+            if table is not None:
+                e.update(table)
             if info.get("command"):
                 e["command"] = True
+            if path.startswith("calibration.noise."):
+                e["protected_apply"] = True
             alloc[ch]["nrpn"] += 1
         entries.append(e)
 
@@ -267,7 +378,7 @@ def render_json(m: dict) -> str:
 # --- Gate-F-alpha oracle interface (harness_selftest.py) ---------------------
 
 def capture(firmware_root: Path | None = None) -> str:
-    """Deterministic normalized representation of the map (the oracle output).
+    """Deterministic JSONL representation of the map (the oracle output).
     A facade edit that changes any control's type/range/path-set changes this.
 
     A facade that no longer parses cleanly (e.g. a control path dropped from
@@ -276,14 +387,37 @@ def capture(firmware_root: Path | None = None) -> str:
     try:
         m = build_map(firmware_root=firmware_root)
     except Exception as exc:  # noqa: BLE001 -- the error IS the divergent observation
-        return f"MAP_BUILD_ERROR: {type(exc).__name__}: {exc}"
-    lines = [f"count={m['control_count']}"]
+        return json.dumps({
+            "error": "MAP_BUILD_ERROR",
+            "error_type": type(exc).__name__,
+            "message": str(exc),
+        }, sort_keys=True)
+    text_value_count = sum(len(e.get("text_values", [])) for e in m["entries"])
+    protected_count = sum(1 for e in m["entries"] if e.get("protected_apply"))
+    lines = [json.dumps({
+        "control_count": m["control_count"],
+        "registry_md5": m["registry_md5"],
+        "text_value_count": text_value_count,
+        "protected_apply_count": protected_count,
+    }, sort_keys=True)]
     for e in m["entries"]:
-        parts = [e["path"], e["type"], f"ch{e['channel']}", e["midi"]]
+        rec = {
+            "path": e["path"],
+            "type": e["type"],
+            "channel": e["channel"],
+            "midi": e["midi"],
+        }
         for k in ("cc_msb", "cc_lsb", "cc", "nrpn_param", "min", "max", "max_expr"):
             if k in e:
-                parts.append(f"{k}={e[k]}")
-        lines.append(" ".join(str(p) for p in parts))
+                rec[k] = e[k]
+        if e.get("text_values") is not None:
+            rec["text_values"] = e.get("text_values", [])
+            rec["accepted_text_values"] = e.get("accepted_text_values", [])
+        if e.get("command"):
+            rec["command"] = True
+        if e.get("protected_apply"):
+            rec["protected_apply"] = True
+        lines.append(json.dumps(rec, sort_keys=True))
     return "\n".join(lines)
 
 
@@ -301,6 +435,9 @@ MUTATIONS = [
     (r'parse_index\(record\.number_value, NUM_MODES - 1',
      r'parse_index(record.number_value, NUM_MODES - 2',
      "mode index range changed (NUM_MODES-1 -> NUM_MODES-2)"),
+    (r'(if \(strcmp\(preset_name, )"classic"(\) == 0\) \{\n    CONFIG\.SQUARE_ITER = 1;\n    CONFIG\.INCANDESCENT_FILTER = 0\.0f;)',
+     r'\1"classic_DROPPED"\2',
+     "text value table changed (primary.preset classic removed)"),
 ]
 
 

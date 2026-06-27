@@ -173,11 +173,12 @@ class ReferenceDecoder:
                     param = (nrpn["param_msb"] << 7) | nrpn["param_lsb"]
                     e = self.by_nrpn.get((ch, param))
                     if e is not None:
+                        value = (nrpn['data_msb'] << 7) | d2
                         if e.get("command"):
                             rec = {"control": e["path"], "value_kind": "NONE"}
-                        else:   # text-enum: string table deferred to Phase K
+                        elif e.get("text_values") and value < len(e["text_values"]):
                             rec = {"control": e["path"], "value_kind": "TEXT",
-                                   "text_value": f"idx:{(nrpn['data_msb'] << 7) | d2}",
+                                   "text_value": e["text_values"][value],
                                    "_nrpn_param": param}
                 # 14-bit CC pair
                 elif (ch, cc) in self.by_cc and self.by_cc[(ch, cc)]["midi"] == "cc14":
@@ -221,7 +222,10 @@ def ws_record(entry: dict, value) -> dict:
     # text/command long-tail
     if entry.get("command"):
         return {"control": entry["path"], "value_kind": "NONE"}
-    return {"control": entry["path"], "value_kind": "TEXT", "text_value": f"idx:{int(value)}", "_nrpn_param": entry["nrpn_param"]}
+    values = entry.get("text_values", [])
+    idx = int(value)
+    text = values[idx] if 0 <= idx < len(values) else f"idx:{idx}"
+    return {"control": entry["path"], "value_kind": "TEXT", "text_value": text, "_nrpn_param": entry["nrpn_param"]}
 
 
 # --- the differential ---------------------------------------------------------
@@ -243,7 +247,10 @@ def _samples(entry):
         grid = [lo, hi, lo + 4096 * step, lo + 8192 * step]      # exactly on the 14-bit grid
         off = [lo + (hi - lo) * f for f in (0.137, 0.501, 0.913)]  # off-grid -> tolerance
         return [("grid", v) for v in grid] + [("off", v) for v in off]
-    return ["__structural__"]                # text / command
+    if entry.get("command"):
+        return ["__structural__"]
+    values = entry.get("text_values", [])
+    return list(range(len(values))) if values else ["__structural__"]
 
 
 def run_differential(m: dict, decoder: ReferenceDecoder | None = None):
@@ -265,6 +272,12 @@ def run_differential(m: dict, decoder: ReferenceDecoder | None = None):
             ws = ws_record(e, value)
             if rec is None:
                 results.append((e["path"], value, False, "exact", "decoder returned None"))
+                continue
+            if e["type"] == "text":
+                same_id = rec["control"] == ws["control"] and rec["value_kind"] == ws["value_kind"]
+                ok = same_id and rec.get("text_value") == ws.get("text_value")
+                results.append((e["path"], value, ok, "exact-text",
+                                "" if ok else f"{rec} != {ws}"))
                 continue
             if rec.get("value_kind") != "NUMBER" or "number_value" not in rec:
                 results.append((e["path"], value, False, "exact",
@@ -356,10 +369,18 @@ def capture(firmware_root: Path | None = None) -> str:
     try:
         em = enabled_modes(firmware_root)
     except Exception as exc:  # noqa: BLE001
-        return f"MODE_ROSTER_ERROR: {type(exc).__name__}: {exc}"
-    return (f"num_modes={em['num_modes']} enabled={em['enabled_count']} "
-            f"mode29={em['mode29_name']}:{em['mode29_enabled']} "
-            f"disabled={','.join(em['disabled'])}")
+        return json.dumps({
+            "error": "MODE_ROSTER_ERROR",
+            "error_type": type(exc).__name__,
+            "message": str(exc),
+        }, sort_keys=True)
+    return json.dumps({
+        "num_modes": em["num_modes"],
+        "enabled_count": em["enabled_count"],
+        "mode29_name": em["mode29_name"],
+        "mode29_enabled": em["mode29_enabled"],
+        "disabled": em["disabled"],
+    }, sort_keys=True)
 
 
 MUTATIONS = [

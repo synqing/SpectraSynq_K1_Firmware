@@ -194,7 +194,21 @@
       "type": "text",
       "midi": "nrpn",
       "nrpn_param": 0,
-      "encode": "enumerated string / command long-tail"
+      "encode": "enumerated string / command long-tail",
+      "text_values": [
+        "default",
+        "tinted_bulbs",
+        "incandescent",
+        "white",
+        "classic"
+      ],
+      "accepted_text_values": [
+        "default",
+        "tinted_bulbs",
+        "incandescent",
+        "white",
+        "classic"
+      ]
     },
     {
       "path": "secondary.mode",
@@ -454,7 +468,27 @@
       "type": "text",
       "midi": "nrpn",
       "nrpn_param": 0,
-      "encode": "enumerated string / command long-tail"
+      "encode": "enumerated string / command long-tail",
+      "text_values": [
+        "off",
+        "analogous",
+        "complementary",
+        "split",
+        "veil",
+        "triadic",
+        "tetradic"
+      ],
+      "accepted_text_values": [
+        "off",
+        "analogous",
+        "complementary",
+        "split",
+        "split_complementary",
+        "veil",
+        "saturation_veil",
+        "triadic",
+        "tetradic"
+      ]
     },
     {
       "path": "edge.strength",
@@ -473,7 +507,24 @@
       "type": "text",
       "midi": "nrpn",
       "nrpn_param": 1,
-      "encode": "enumerated string / command long-tail"
+      "encode": "enumerated string / command long-tail",
+      "text_values": [
+        "off",
+        "assist",
+        "l1",
+        "auto"
+      ],
+      "accepted_text_values": [
+        "off",
+        "none",
+        "assist",
+        "control",
+        "l1",
+        "accent",
+        "auto",
+        "autonomy",
+        "demo"
+      ]
     },
     {
       "path": "vp.profile",
@@ -481,7 +532,19 @@
       "type": "text",
       "midi": "nrpn",
       "nrpn_param": 0,
-      "encode": "enumerated string / command long-tail"
+      "encode": "enumerated string / command long-tail",
+      "text_values": [
+        "original",
+        "clean",
+        "candidate",
+        "custom"
+      ],
+      "accepted_text_values": [
+        "original",
+        "clean",
+        "candidate",
+        "custom"
+      ]
     },
     {
       "path": "vp.fix.agc_soft_knee",
@@ -656,7 +719,10 @@
       "midi": "nrpn",
       "nrpn_param": 0,
       "encode": "enumerated string / command long-tail",
-      "command": true
+      "text_values": [],
+      "accepted_text_values": [],
+      "command": true,
+      "protected_apply": true
     },
     {
       "path": "calibration.noise.confirm",
@@ -665,7 +731,10 @@
       "midi": "nrpn",
       "nrpn_param": 1,
       "encode": "enumerated string / command long-tail",
-      "command": true
+      "text_values": [],
+      "accepted_text_values": [],
+      "command": true,
+      "protected_apply": true
     },
     {
       "path": "calibration.noise.status",
@@ -674,7 +743,10 @@
       "midi": "nrpn",
       "nrpn_param": 2,
       "encode": "enumerated string / command long-tail",
-      "command": true
+      "text_values": [],
+      "accepted_text_values": [],
+      "command": true,
+      "protected_apply": true
     },
     {
       "path": "calibration.noise.clear",
@@ -682,7 +754,14 @@
       "type": "text",
       "midi": "nrpn",
       "nrpn_param": 3,
-      "encode": "enumerated string / command long-tail"
+      "encode": "enumerated string / command long-tail",
+      "text_values": [
+        "CONFIRM"
+      ],
+      "accepted_text_values": [
+        "CONFIRM"
+      ],
+      "protected_apply": true
     }
   ]
 }
