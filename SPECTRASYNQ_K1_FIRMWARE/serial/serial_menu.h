@@ -1053,6 +1053,15 @@ void serial_adjust_target_mode(int8_t delta) {
   }
 }
 
+#ifdef SB_K1_BLE_REMOTED
+// Confirmed committed light-show mode ordinal per channel — read by the gated BLE
+// Remoted central (network/ble_remoted_central.cpp) to feed the knob's on-screen
+// CONFIRMED mode display. Gated: exists only in the k1_ble_remoted_probe build.
+uint8_t sb_k1_confirmed_mode(bool secondary) {
+  return secondary ? SECONDARY_LIGHTSHOW_MODE : CONFIG.LIGHTSHOW_MODE;
+}
+#endif
+
 void serial_adjust_target_float(const char* name, float* primary_value, float* secondary_value, float primary_min, float secondary_min, float max_value, float step, uint8_t precision) {
   bool target_secondary = secondaryMode;
   float* value = target_secondary ? secondary_value : primary_value;

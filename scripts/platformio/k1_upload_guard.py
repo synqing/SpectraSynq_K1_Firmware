@@ -56,6 +56,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_ap_frontend_probe_matrix_16000_160_d2",
             "k1_ap_frontend_probe_matrix_16000_160_d2_ap0_vp1",
             "k1_sample_rate_32k_spike",
+            "k1_ble_remoted_probe",
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",
