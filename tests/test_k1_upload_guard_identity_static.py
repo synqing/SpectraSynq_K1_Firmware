@@ -123,3 +123,18 @@ def test_list_identities_dump_has_no_device_io():
     assert "main K1" in text
     assert "KNOWN_QUARANTINED" in text and QUARANTINED_SERIAL in text
     assert "k1_sample_rate_32k_spike" in text
+
+
+# 9 — blocked_envs OVERRIDES the authorized env mapping (precedence)
+def test_blocked_env_overrides_authorized_mapping():
+    """A blocked env that is ALSO authorized-mapped is rejected even on the
+    correct device identity — `blocked` is checked before the target lookup."""
+    data = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    env = "k1_sample_rate_32k_spike"
+    # precondition: this env IS mapped to an authorized unit AND is blocked
+    assert any(env in a["envs"] for a in data["authorized"]), "env must be authorized-mapped"
+    assert env in data["blocked_envs"], "env must be blocked"
+    assert GUARD.expected_target_for_env(env) is not None, "env would otherwise resolve to a target"
+    # even with the CORRECT main-K1 identity at its port, blocked WINS -> reject
+    ok, msg = GUARD.validate_upload_target(env, MAIN[0], _ports(MAIN))
+    assert not ok and "upload blocked" in msg, msg
