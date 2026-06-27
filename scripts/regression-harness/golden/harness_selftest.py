@@ -67,6 +67,13 @@ ORACLE_MODULES = [
                      # extracted FS-free precisely so this decision executes off-device.
                      # 5 mutations flip one classify branch each (magic/crc/version/migrate
                      # threshold/fallback return), each diverging a recorded decision.
+    "oracle_k1_bootloop",  # BEHAVIOURAL proof for the N2b boot-loop guard decision core
+                     # — host-COMPILES system/k1_bootloop_guard.h (k1_bootloop_eval /
+                     # k1_bootloop_mark_stable) and RUNS the 8 boot scenarios, freezing
+                     # each (decision, count): re-seed on garbage magic / stale version /
+                     # power-on, trip SAFE_MODE exactly at the 4-crash threshold,
+                     # mark_stable clear, benign-reset no-op. 3 mutations flip the version
+                     # validity / trip threshold / crash-increment gate (Gate-Fα teeth).
     # oracle_tempo — built + Gate-Fα-proven on mac (4/4 caught), but its 6400-rec
     #   golden has one discrete field that flips cross-platform on the CI runner
     #   (clang vs gcc boundary rounding). Re-enable after cross-platform
