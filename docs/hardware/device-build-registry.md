@@ -20,6 +20,16 @@ in [`../spec-index.md`](../spec-index.md).
 | **1401** | Main K1 (Captain's primary) | `F887A500` | `/dev/cu.usbmodem1401` / currently `/dev/cu.usbmodem1101` | `k1_hardware` |
 | **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently `/dev/cu.usbmodem12401` | `k1_bench_reference` |
 
+> **Scope of this table:** the **ONLY permitted env** column is the *shippable /
+> default* env per device (`k1_hardware` / `k1_bench_reference`) — a human
+> at-a-glance summary. The full set of probe / harness / dev envs each identity
+> may receive, plus quarantined units and build-only blocked envs, is **governed
+> by the identity manifest**
+> ([`scripts/platformio/k1_device_identities.json`](../../scripts/platformio/k1_device_identities.json);
+> see [§ Identity manifest](#identity-manifest-canonical-machine-readable--n4a)),
+> which `k1_upload_guard.py` enforces. This table does not enumerate or gate
+> probe/harness permissions — the manifest does.
+
 - The two envs differ by **GPIO map**, not just flags. `k1_hardware` on 12201
   (or vice versa) produces dead/garbled output. There is no "same binary on
   both" — a build deployed "to both devices" means the SAME COMMIT built twice,

@@ -22,7 +22,22 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
-_MANIFEST_PATH = Path(__file__).resolve().parent / "k1_device_identities.json"
+def _default_manifest_path() -> Path:
+    """Locate k1_device_identities.json next to this script.
+
+    PlatformIO/SCons exec this file as a build PRE-SCRIPT *without* setting
+    `__file__` (a NameError otherwise crashes every `pio run`). In that context
+    the build cwd is the project root, so fall back to the known in-repo path.
+    Normal import (tests / CLI) has `__file__` and uses the script's own dir.
+    """
+    try:
+        base = Path(__file__).resolve().parent
+    except NameError:
+        base = Path.cwd() / "scripts" / "platformio"
+    return base / "k1_device_identities.json"
+
+
+_MANIFEST_PATH = _default_manifest_path()
 
 
 @dataclass(frozen=True)
