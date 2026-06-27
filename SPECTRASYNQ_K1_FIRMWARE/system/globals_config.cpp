@@ -96,6 +96,11 @@ __attribute__((constructor)) static void set_led_count_from_define() {
 
 conf CONFIG_DEFAULTS; // Used for resetting to default values at runtime
 
+#ifdef K1_BOOTLOOP_GUARD_V1
+// N2b: boot-loop safe-mode flag (declared extern in globals.h). False = normal boot.
+bool k1_boot_safe_mode = false;
+#endif
+
 // ----------------------------------------------------------------------------
 // A-weighting lookup table (parsed/mutated in system.h) -----------------------
 float a_weight_table[13][2] = {

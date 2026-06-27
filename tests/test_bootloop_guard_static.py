@@ -32,7 +32,7 @@ PLATFORMIO = REPO / "platformio.ini"
 GUARD_HEADER_REL = "SPECTRASYNQ_K1_FIRMWARE/system/k1_bootloop_guard.h"
 
 # FIX flips this to True (in the same commit that wires the guard).
-GUARD_WIRED = False
+GUARD_WIRED = True
 
 
 def _read(p: Path) -> str:
