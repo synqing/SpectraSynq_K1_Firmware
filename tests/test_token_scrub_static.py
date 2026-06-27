@@ -60,3 +60,59 @@ def test_token_present_in_wireless_env():
         "the scrub it no longer reaches this env via k1_hardware inheritance, so it "
         "must be set on this env directly."
     )
+
+
+# ── N3 hardening (2026-06-27): pin the invariant that actually keeps the token
+# out of prod — the wireless CONSUMER is not compiled into [env:k1_hardware].
+# The token-location checks above are a proxy; this is the binary-truth
+# precondition. Even with the -D scrubbed, if network/ is added to the prod
+# build_src_filter the in-source #ifndef fallback ("k1-tab5",
+# network/sb_k1_wireless.cpp:37) would link into production and ship.
+
+
+def _src_filter(env: str) -> str:
+    """Return the `build_src_filter` block of `[env:<env>]` (inline value after
+    `=` plus indented continuation lines), inline `;` comments stripped."""
+    in_section = False
+    in_filter = False
+    out = []
+    for ln in PLATFORMIO_INI.read_text(encoding="utf-8").splitlines():
+        if ln.startswith("["):
+            in_section = ln.strip() == f"[env:{env}]"
+            in_filter = False
+            continue
+        if not in_section:
+            continue
+        if re.match(r"^build_src_filter\s*=", ln):
+            in_filter = True
+            out.append(ln.split("=", 1)[1].split(";", 1)[0])  # inline remainder
+            continue
+        if in_filter:
+            if ln and not ln[0].isspace():  # next top-level key ends the block
+                in_filter = False
+            else:
+                out.append(ln.split(";", 1)[0])
+    return "\n".join(out)
+
+
+def test_production_build_filter_excludes_wireless_consumer():
+    """Production must NOT compile the wireless control source. This is the real
+    'token never ships' guarantee — stronger than the -D location check."""
+    prod = _src_filter("k1_hardware")
+    assert "network/sb_" not in prod and "<network/" not in prod, (
+        "[env:k1_hardware] build_src_filter now compiles network/ sources — the "
+        "wireless control consumer (network/sb_k1_wireless.cpp) would link into "
+        "production and its hardcoded 'k1-tab5' #ifndef fallback would ship even "
+        "with the -D scrubbed. Keep network/ out of the production filter; it "
+        "belongs only in env:k1_wireless_ab_probe."
+    )
+
+
+def test_wireless_env_compiles_the_consumer():
+    """Counterpart: the only wireless env MUST compile the consumer, else the
+    token is configured into a build that never links its sole user."""
+    wl = _src_filter("k1_wireless_ab_probe")
+    assert "network/sb_" in wl or "<network/" in wl, (
+        "[env:k1_wireless_ab_probe] must compile network/sb_*.cpp — it is the only "
+        "env that links the wireless control consumer the token authenticates."
+    )
