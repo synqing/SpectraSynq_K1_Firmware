@@ -51,6 +51,8 @@ docs/**/runtime-evidence/*.mp4
 /build/audio-semantic-metrics/*
 !/build/audio-semantic-metrics/control-fixtures/
 scripts/regression-harness/results/**/run-*/
+# Regenerable A/B stimulus WAV (8.6MB; rebuild via `wireless_ab_bench.py make-stimulus`)
+scripts/regression-harness/fixtures/*.wav
 
 # Test-generated cross-repo artefact: the ws-registry codegen test writes into
 # the Tab5 controller path, which is a SEPARATE repo (not vendored here).
