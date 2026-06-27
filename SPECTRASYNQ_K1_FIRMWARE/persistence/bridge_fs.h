@@ -127,6 +127,19 @@ void save_config_delayed() {
 // Load configuration from LittleFS
 void load_config() {
   lock_leds();
+#ifdef K1_BOOTLOOP_GUARD_V1
+  // N2b boot-loop safe mode: skip the persisted blob entirely and boot compiled
+  // defaults IN RAM ONLY. The config file is NEVER deleted and defaults are NEVER
+  // written back to flash — safe mode protects a boot-looping device without erasing
+  // user config. The led lock is held across the CONFIG write (as on the normal path)
+  // and released before the early return.
+  if (k1_boot_safe_mode) {
+    memcpy(&CONFIG, &CONFIG_DEFAULTS, sizeof(CONFIG));
+    USBSerial.println("BOOT_LOOP_GUARD: safe_mode_config=DEFAULTS (RAM only, file intact)");
+    unlock_leds();
+    return;
+  }
+#endif
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
   }

@@ -45,6 +45,12 @@ extern conf CONFIG_DEFAULTS; // Used for resetting to default values at runtime
 extern const char SB_PASS[];
 extern const char SB_FAIL[];
 
+#ifdef K1_BOOTLOOP_GUARD_V1
+// N2b: set true at the top of setup() when the boot-loop guard trips; read by
+// load_config() to boot compiled defaults in RAM only (non-destructive safe mode).
+extern bool k1_boot_safe_mode;
+#endif
+
 inline float audio_response_gain = DEFAULT_AUDIO_RESPONSE_GAIN;
 
 inline float audio_response_gain_clamped() {

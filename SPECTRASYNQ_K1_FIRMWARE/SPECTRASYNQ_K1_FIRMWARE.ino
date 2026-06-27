@@ -81,6 +81,14 @@
 #endif
 #include "encoders.h"         // M5Stack Rotate8 encoder handling
 
+#ifdef K1_BOOTLOOP_GUARD_V1
+#include "k1_bootloop_guard.h"  // N2b: boot-loop crash-streak guard (pure core host-proven)
+// The crash counter lives in RTC_NOINIT memory: it survives a crash/panic/WDT/brownout
+// reset and is re-seeded on a clean power-on. Defined here in exactly ONE translation
+// unit — never in the header, which would multiply the global across TUs.
+RTC_NOINIT_ATTR K1BootloopState k1_bootloop_rtc;
+#endif
+
 // Define benchmark state variables (declared extern in serial_menu.h)
 bool benchmark_running = false;
 uint32_t benchmark_start_time = 0;
@@ -599,6 +607,20 @@ void attempt_rotate8_init(bool verbose) {
 
 // Setup, runs only one time ---------------------------------------------------------
 void setup() {
+#ifdef K1_BOOTLOOP_GUARD_V1
+  // N2b boot-loop guard: evaluate the crash streak BEFORE the first heap alloc below
+  // (which can itself crash) and BEFORE init_system()/load_config() consume safe mode.
+  // USBSerial is not up yet here (init_serial runs inside init_system); the visible
+  // BOOT_LOOP_GUARD line is emitted just after init_system() returns.
+  {
+    const esp_reset_reason_t k1_rr = esp_reset_reason();
+    const int k1_is_poweron = (k1_rr == ESP_RST_POWERON || k1_rr == ESP_RST_UNKNOWN);
+    const int k1_is_crash = k1_bootloop_reason_is_crash(k1_rr);
+    k1_boot_safe_mode =
+        (k1_bootloop_eval(&k1_bootloop_rtc, k1_is_poweron, k1_is_crash,
+                          K1_BOOTLOOP_THRESHOLD) == K1_BOOT_SAFE_MODE);
+  }
+#endif
   const size_t wh_bytes = sizeof(short) * 4 * 1024;
   waveform_history = (short(*)[1024])heap_caps_malloc(wh_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
   if (!waveform_history) {
@@ -609,6 +631,17 @@ void setup() {
   }
 
   init_system();  // (system.h) Initialize all hardware and arrays
+#ifdef K1_BOOTLOOP_GUARD_V1
+  // N2b: report the boot-loop decision now that init_serial() (inside init_system)
+  // has brought USBSerial up. The eval ran at the top of setup(); load_config() has
+  // already honoured safe mode during init_fs().
+  USBSerial.print("BOOT_LOOP_GUARD: reset_reason=");
+  USBSerial.print((int)esp_reset_reason());
+  USBSerial.print(" fail_count=");
+  USBSerial.print(k1_bootloop_rtc.fail_count);
+  USBSerial.print(" safe_mode=");
+  USBSerial.println(k1_boot_safe_mode ? 1 : 0);
+#endif
   sb_tempo_init(); // (sb_tempo.h) compute tempo Goertzel coeffs once — REQUIRED or tempo never locks
 
   // Snap any saved-but-disabled light mode to the nearest enabled one (2026-06-02:
@@ -733,6 +766,17 @@ void loop() {
 #endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
   uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
+#ifdef K1_BOOTLOOP_GUARD_V1
+  // N2b: once the device has run K1_BOOTLOOP_STABLE_MS without crashing, this boot is
+  // "good" — clear the crash streak so the next reboot starts clean. Fires once, and
+  // never on the first tick (clearing too early would defeat the guard).
+  static bool k1_bootloop_marked_stable = false;
+  if (!k1_bootloop_marked_stable && t_now > K1_BOOTLOOP_STABLE_MS) {
+    k1_bootloop_mark_stable(&k1_bootloop_rtc);
+    k1_bootloop_marked_stable = true;
+    USBSerial.println("BOOT_LOOP_GUARD: stable_clear=1");
+  }
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   static uint32_t ap_cadence_frame_index = 0;
   const uint32_t ap_cadence_frame_index_now = ap_cadence_frame_index++;
