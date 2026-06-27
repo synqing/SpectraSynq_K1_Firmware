@@ -1,8 +1,12 @@
 ---
-abstract: "Gate-0 fault-injection battery for wireless_ab_bench.py validity-admission gates. Frozen real captures (cb1 DOWNLOAD-reset, cb2 USB-wedge) that INVALIDated both BLE-coexistence counterbalanced retests, plus the gate0_selftest synthetic isolators. The hardened bench must mark every bad capture INVALID and admit every valid one. Read before changing the admission gates."
+abstract: "Gate-0 fault-injection suite for wireless_ab_bench.py validity-admission gates (the HARNESS fault-evidence gate — NOT the K718 battery SoC gate). Frozen real captures (cb1 DOWNLOAD-reset, cb2 USB-wedge) that INVALIDated both BLE-coexistence counterbalanced retests, plus the gate0_selftest synthetic isolators. The hardened bench must mark every bad capture INVALID and admit every valid one. Read before changing the admission gates."
 ---
 
-# Gate-0 bad-capture battery
+# Gate-0 bad-capture fixture set (harness fault-injection)
+
+> **Naming:** "Gate 0" / "GREEN" here = the **harness** fault-evidence selftest.
+> This is NOT the **K718/Remoted battery state-of-charge** gate — a separate
+> physical lane that stays unresolved unless explicitly closed elsewhere.
 
 Purpose: prove the `wireless_ab_bench.py` validity-admission gates are
 **fault-evident** — they reject corrupted captures instead of laundering a
@@ -40,7 +44,7 @@ failure too.
 ## The rule
 
 An **uncaught** bad capture is not a pass — it is a located oracle blind spot.
-Widen the gate (add the missed signal) until the battery is green again. Never
+Widen the gate (add the missed signal) until the suite is GREEN again. Never
 relax a gate or delete a check to make a capture pass: that re-opens the
 silent-admit hole (the cb1/cb2 failure mode).
 
@@ -49,4 +53,5 @@ silent-admit hole (the cb1/cb2 failure mode).
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-06-27 | agent:claude-code | Created with the harness-hardening pass: vendored the real cb1/cb2 bad captures + good control as the Gate-0 battery; documented expected rejections and the no-relax rule. |
+| 2026-06-27 | agent:claude-code | Created with the harness-hardening pass: vendored the real cb1/cb2 bad captures + good control as the Gate-0 fixture set; documented expected rejections and the no-relax rule. |
+| 2026-06-27 | agent:claude-code | Renamed "Gate-0 battery" → "fault-injection suite / fixture set" + added the naming callout, per Captain: disambiguate from the K718/Remoted battery SoC gate (different lane, not closed here). |

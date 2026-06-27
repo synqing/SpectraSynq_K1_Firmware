@@ -312,8 +312,8 @@ def admit_capture(
     """Validity admission for ONE capture payload.
 
     Returns {'admitted': bool, 'reasons': [str]}. Pure/deterministic; the Gate-0
-    battery in fixtures/bad-captures/ pins this against the real cb1/cb2 bad
-    captures + synthetic edge cases. log_text (the run's serial log) enables the
+    fault-injection suite in fixtures/bad-captures/ pins this against the real
+    cb1/cb2 bad captures + synthetic edge cases. log_text (the run's serial log) enables the
     U3 app-ready and U6 DOWNLOAD-marker checks; omit it for JSON-only admission
     (the metric-derived gates still reject every real bad capture).
     """

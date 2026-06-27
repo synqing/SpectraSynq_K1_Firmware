@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 """Gate-0 fault-injection self-test for wireless_ab_bench.py admission gates.
 
+NAMING (avoid confusion): "Gate 0" here is the HARNESS fault-evidence selftest.
+It is NOT the K718/Remoted battery state-of-charge gate — that is a separate
+physical lane and is NOT closed by this file. "GREEN" below means the harness
+selftest passed, never that the device battery SoC gate passed.
+
 doctrine: autonomous-agentic-build § "Gate 0 — prove the harness is FAULT-EVIDENT
-before any retest". This battery feeds the hardened bench the KNOWN-BAD captures
+before any retest". This fault-injection suite feeds the hardened bench the KNOWN-BAD captures
 (the real cb1 DOWNLOAD-reset + cb2 USB-wedge that invalidated both counterbalanced
 retests) plus synthetic edge cases that isolate each gate, and REQUIRES the bench
 to mark every one INVALID — while still admitting every valid capture. An uncaught
@@ -12,7 +17,7 @@ These are VALIDITY-ADMISSION checks only. They do NOT touch the pre-registered
 A/B pass/fail thresholds. Run before any counterbalanced retest; a human signs
 Gate 0 off the green result.
 
-    python3 scripts/regression-harness/gate0_selftest.py    # exit 0 = battery green
+    python3 scripts/regression-harness/gate0_selftest.py    # exit 0 = harness suite GREEN
 
 No device, no network, no afplay — pure static fixtures.
 """
@@ -84,9 +89,9 @@ LOG_DOWNLOAD = ("[1.0] [AP] SSL=421 peak_scaled=0.18 silence=0 | bpm=120 conf=0.
 
 
 # ---------------------------------------------------------------------------
-# Battery: (label, payload, log_text, expect_admitted, expect_reason_substrings)
+# Suite: (label, payload, log_text, expect_admitted, expect_reason_substrings)
 # ---------------------------------------------------------------------------
-def battery() -> list[tuple]:
+def fault_injection_cases() -> list[tuple]:
     cases: list[tuple] = []
 
     # --- real frozen evidence (the captures that broke both retests) ---
@@ -116,10 +121,10 @@ def battery() -> list[tuple]:
     return cases
 
 
-def run_admission_battery() -> list[str]:
+def run_admission_suite() -> list[str]:
     failures: list[str] = []
-    print("=== Gate-0 admission battery ===")
-    for label, payload, log_text, expect_admitted, expect_reasons in battery():
+    print("=== Harness Gate-0 admission suite (fault-injection) ===")
+    for label, payload, log_text, expect_admitted, expect_reasons in fault_injection_cases():
         verdict = wab.admit_capture(payload, log_text=log_text)
         got = verdict["admitted"]
         reasons = "; ".join(verdict["reasons"])
@@ -164,15 +169,16 @@ def run_compare_integration() -> list[str]:
 
 
 def main() -> int:
-    failures = run_admission_battery() + run_compare_integration()
+    failures = run_admission_suite() + run_compare_integration()
     print("-" * 60)
     if failures:
-        print("GATE 0: RED — %d blind spot(s) located:" % len(failures))
+        print("Harness Gate 0 selftest: RED — %d blind spot(s) located:" % len(failures))
         for f in failures:
             print("  - " + f)
         return 1
-    print("GATE 0: GREEN — every known-bad capture rejected, every valid capture admitted,")
-    print("        compare refuses PASS/FAIL on any set containing a rejected capture.")
+    print("Harness Gate 0 selftest: GREEN — every known-bad capture rejected, every valid")
+    print("capture admitted, compare refuses PASS/FAIL on any set with a rejected capture.")
+    print("(HARNESS gate only — NOT the K718/Remoted battery SoC gate, which stays separate.)")
     return 0
 
 
