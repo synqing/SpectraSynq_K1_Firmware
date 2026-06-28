@@ -56,12 +56,19 @@ portMUX_TYPE s_target_mux = portMUX_INITIALIZER_UNLOCKED;
 K1BleMidiDecoderState s_decoder;
 uint32_t s_decode_errors = 0;
 uint32_t s_queue_drops = 0;
+uint32_t s_notify_packets = 0;
+uint32_t s_decoded_records = 0;
+uint32_t s_enqueued_records = 0;
+uint32_t s_apply_ok = 0;
+uint32_t s_apply_fail = 0;
+uint32_t s_last_counter_ms = 0;
 
 void decode_and_enqueue(const uint8_t* p, size_t len) {
   if (!s_cmd_queue || p == nullptr) {
     return;
   }
 
+  ++s_notify_packets;
   K1WirelessControlRecord records[K1_BLE_MIDI_MAX_RECORDS_PER_PACKET];
   size_t count = 0;
   const K1BleMidiDecodeStatus status =
@@ -74,10 +81,13 @@ void decode_and_enqueue(const uint8_t* p, size_t len) {
   if (status == K1_BLE_MIDI_DECODE_OUTPUT_OVERFLOW) {
     ++s_decode_errors;
   }
+  s_decoded_records += static_cast<uint32_t>(count);
 
   for (size_t i = 0; i < count; ++i) {
     if (xQueueSend(s_cmd_queue, &records[i], 0) != pdTRUE) {
       ++s_queue_drops;
+    } else {
+      ++s_enqueued_records;
     }
   }
 }
@@ -229,14 +239,31 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   while (xQueueReceive(s_cmd_queue, &record, 0) == pdTRUE) {
     const K1WirelessControlResult result = sb_k1_control_apply(record);
     if (!result.ok) {
+      ++s_apply_fail;
       Serial.printf("[ble_remoted] apply failed control=%s code=%s\n",
                     record.control, result.error_code);
+    } else {
+      ++s_apply_ok;
     }
   }
 
   const bool force = s_force_confirm;
   s_force_confirm = false;
   send_confirmed_modes(force);
+
+  const uint32_t now_ms = millis();
+  if (now_ms - s_last_counter_ms >= 1000U) {
+    s_last_counter_ms = now_ms;
+    Serial.printf("[ble_remoted] counters linked=%u notify=%lu decoded=%lu enqueued=%lu queue_drops=%lu decode_errors=%lu apply_ok=%lu apply_fail=%lu\n",
+                  s_linked ? 1U : 0U,
+                  (unsigned long)s_notify_packets,
+                  (unsigned long)s_decoded_records,
+                  (unsigned long)s_enqueued_records,
+                  (unsigned long)s_queue_drops,
+                  (unsigned long)s_decode_errors,
+                  (unsigned long)s_apply_ok,
+                  (unsigned long)s_apply_fail);
+  }
 }
 
 bool sb_k1_ble_remoted_is_linked() {

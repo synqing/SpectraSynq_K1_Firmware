@@ -766,10 +766,7 @@ K1WirelessControlResult sb_k1_control_apply(const K1WirelessControlRecord& recor
       result_error(&result, "range", "Chroma profile out of range");
       return result;
     }
-    if (!apply_chroma_profile(uint8_t(profile))) {
-      result_error(&result, "range", "Chroma profile out of range");
-      return result;
-    }
+    (void)apply_chroma_profile(uint8_t(profile));
     save_config_delayed();
     return ok_number(float(CONFIG.CHROMA_PROFILE));
   }
