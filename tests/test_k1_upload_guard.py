@@ -135,6 +135,50 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("sdkconfig.h", text)
         self.assertIn("env.Append(CPPPATH=[_SDKCONFIG_DIR])", text)
 
+    def test_all_k1_chip_bound_envs_are_registered_in_guard(self):
+        # DRIFT-CATCHER (2026-06-30): any env whose `extends` chain roots at
+        # k1_hardware or k1_bench_reference is GPIO-pin-bound to a specific chip;
+        # if it is not in the guard's K1_TARGETS map the guard fail-OPENS ("no K1
+        # upload mapping enforced") and a cross-flash to the wrong unit (or the
+        # K718 on the shared bus) is NOT blocked. This asserts full coverage so a
+        # future probe env added without registration fails the gate, not the chip.
+        import re
+
+        text = PLATFORMIO.read_text()
+        parent: dict[str, str] = {}
+        envs: list[str] = []
+        for chunk in re.split(r"(?m)^\[", text):
+            m = re.match(r"env:([A-Za-z0-9_.]+)\]", chunk)
+            if not m:
+                continue
+            name = m.group(1)
+            envs.append(name)
+            pm = re.search(r"(?m)^\s*extends\s*=\s*env:([A-Za-z0-9_.]+)", chunk)
+            if pm:
+                parent[name] = pm.group(1)
+
+        def root_of(env: str) -> str:
+            seen: set[str] = set()
+            while env in parent and env not in seen:
+                seen.add(env)
+                env = parent[env]
+            return env
+
+        mapped: set[str] = set()
+        for target in self.guard.K1_TARGETS:
+            mapped.update(target.envs)
+
+        K1_ROOTS = {"k1_hardware", "k1_bench_reference"}
+        missing = sorted(
+            e for e in envs if root_of(e) in K1_ROOTS and e not in mapped
+        )
+        self.assertEqual(
+            missing,
+            [],
+            "K1 chip-bound envs missing from upload-guard K1_TARGETS "
+            f"(cross-flash brick risk — register them): {missing}",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
