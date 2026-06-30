@@ -60,6 +60,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_acf_probe",
             "k1_agc_probe",
             "k1_bootloop_probe",
+            "k1_bootloop_inject_probe",
             "k1_effect_framework",
             "k1_effect_registry",
             "k1_vp_motion_lab",

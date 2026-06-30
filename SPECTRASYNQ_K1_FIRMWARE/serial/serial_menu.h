@@ -2103,6 +2103,21 @@ void cmd_chip_id() {
   tx_end();
 }
 
+#if defined(K1_BOOTLOOP_GUARD_V1) && defined(K1_BOOTLOOP_INJECT)
+// N2b crash-streak DEVICE-PROOF ONLY. Deliberately triggers ESP_RST_PANIC via abort()
+// so the boot-loop guard counts a real crash (benign/USB/SW resets are not counted).
+// Gated to env:k1_bootloop_inject_probe — no shippable env defines K1_BOOTLOOP_INJECT,
+// so this command cannot exist in production. Typed-only, single-byte-forbidden.
+void cmd_bootloop_inject() {
+  tx_begin();
+  USBSerial.println("BOOTLOOP_INJECT: forcing ESP_RST_PANIC via abort() in 150ms (N2b proof)");
+  tx_end();
+  USBSerial.flush();
+  delay(150);
+  abort();  // -> panic handler -> ESP_RST_PANIC -> k1_bootloop_reason_is_crash()==1
+}
+#endif
+
 void cmd_identify() {
   ack();
   CRGB16 col = {1.00, 0.25, 0.00};
