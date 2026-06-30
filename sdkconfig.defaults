@@ -1,0 +1,26 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# N7 OTA rollback prerequisite (lane feat/n7-rollback-prereq) — DRAFT, not enabled.
+#
+# Purpose: make the bootloader anti-brick rollback an EXPLICIT, version-controlled
+# pin rather than relying on an arduino-esp32 framework default that could drift
+# on a future toolchain bump. The K1 OTA receiver (system/k1_ota.cpp, flag-OFF)
+# calls esp_ota_mark_app_valid_cancel_rollback(); that cancel is only meaningful
+# if the bootloader armed a pending rollback at boot, which requires the two keys
+# below.
+#
+# IMPORTANT (verified 2026-06-30 on pioarduino 54.03.20 / arduino-esp32 3.2.0 /
+# ESP-IDF 5.4.1): BOTH keys are ALREADY =y in the prebuilt arduino-esp32-libs
+# esp32s3 sdkconfig (lines 444 and 3750). The arduino framework ships a PRECOMPILED
+# bootloader and IDF libs; this repo build does NOT recompile the bootloader from
+# source, so these lines are an INTENT PIN / drift sentinel, not a behaviour change.
+# The A/B OTA partition layout (ota_0 / ota_1 / otadata) is already provided by
+# board_build.partitions = default_16MB.csv in platformio.ini — no custom
+# partitions.csv is required.
+#
+# Blast radius: proven byte-NEUTRAL to the k1_hardware product binary in this lane
+# (see docs/architecture/n7-ota-bench-proof-runbook.md). Do NOT add IDF-source
+# sdkconfig keys here that would force an arduino-as-component rebuild — that WOULD
+# alter the product binary and must stay OTA-branch-only.
+# ─────────────────────────────────────────────────────────────────────────────
+CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE=y
+CONFIG_APP_ROLLBACK_ENABLE=y

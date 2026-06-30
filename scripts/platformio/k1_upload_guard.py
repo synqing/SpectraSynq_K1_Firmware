@@ -82,6 +82,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
             "k1_bench_acf_probe",
             "k1_bench_agc_probe",
+            "k1_bench_ota_probe",
         ),
         role="2nd bench K1",
         upload_port="/dev/tty.usbmodem12201",
