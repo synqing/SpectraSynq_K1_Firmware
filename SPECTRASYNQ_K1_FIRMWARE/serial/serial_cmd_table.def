@@ -32,6 +32,7 @@
 SERIAL_CMD("v",               0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("V",               0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("version",         0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("build",           0, cmd_build,                   SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("h",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("H",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("help",            0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )

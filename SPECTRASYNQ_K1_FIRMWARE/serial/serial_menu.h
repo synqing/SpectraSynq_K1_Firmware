@@ -1863,11 +1863,47 @@ void cmd_version() {
   tx_end();
 }
 
+// Lane N5: serial-readable build provenance. One line that ties a running unit
+// back to the exact source it was built from — FIRMWARE_VERSION (coarse, shared
+// across commits) plus the git short hash, build epoch, and PlatformIO env that
+// scripts/platformio/k1_build_provenance.py stamps in at compile time. Each
+// define is guarded with an #ifdef + sane default so a build WITHOUT the
+// provenance pre-script (e.g. a bare host/IDE compile) still builds and answers.
+// Kept separate from cmd_version() on purpose: the `version` output is locked by
+// host goldens, so provenance gets its own `build` command rather than changing
+// the VERSION line.
+void cmd_build() {
+  tx_begin();
+  USBSerial.print("BUILD: version=");
+  USBSerial.print(FIRMWARE_VERSION);
+  USBSerial.print(" git=");
+#ifdef K1_BUILD_GIT_HASH
+  USBSerial.print(K1_BUILD_GIT_HASH);
+#else
+  USBSerial.print("unknown");
+#endif
+  USBSerial.print(" epoch=");
+#ifdef K1_BUILD_EPOCH
+  USBSerial.print((uint32_t)K1_BUILD_EPOCH);
+#else
+  USBSerial.print(0);
+#endif
+  USBSerial.print(" env=");
+#ifdef K1_BUILD_ENV
+  USBSerial.print(K1_BUILD_ENV);
+#else
+  USBSerial.print("unknown");
+#endif
+  USBSerial.println();
+  tx_end();
+}
+
 void cmd_help() {
   tx_begin();
   USBSerial.println("SENSORY BRIDGE - Serial Menu ------------------------------------------------------------------------------------");
   USBSerial.println();
   USBSerial.println("                                            v | Print firmware version number");
+  USBSerial.println("                                        build | Print build provenance (version + git hash + epoch + env)");
   USBSerial.println("                                        reset | Reboot Sensory Bridge");
   USBSerial.println("                          factory_reset CONFIRM | Delete configuration, including noise cal, reboot (CONFIRM required)");
   USBSerial.println("                       restore_defaults CONFIRM | Delete configuration, reboot (CONFIRM required)");

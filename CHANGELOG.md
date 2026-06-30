@@ -7,6 +7,19 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ## [Unreleased]
 
 ### Added
+- **Lane N5 (release engineering): build provenance + release manifest** —
+  new PlatformIO pre-script `scripts/platformio/k1_build_provenance.py` stamps
+  `K1_BUILD_GIT_HASH` / `K1_BUILD_EPOCH` / `K1_BUILD_ENV` into every translation
+  unit (fail-soft: degrades to `unknown` when git is unavailable, never fails a
+  build), registered under `[env:k1_hardware]` `extra_scripts` so all derived
+  envs inherit it. A new serial `build` command prints the provenance (version +
+  git hash + epoch + env) — a running unit can now name its own source, closing
+  the device-build-registry gap where `FIRMWARE_VERSION` 40103 does not
+  discriminate commits. Read-only `scripts/release/make_release.py` prints a
+  release manifest and the exact `git tag -a` command for the Captain to run
+  (it never tags or pushes — tag-cut is Captain-gated). Host gate
+  `tests/test_build_provenance_static.py`. `cmd_version` output left
+  byte-identical (host goldens unchanged).
 - **Lane N6 (prepare-only): per-band AGC candidate `SB_AGC_PERBAND_V1`** —
   flag-gated, **DEFAULT OFF** fix for the "louder -> dimmer" broadband single-scalar
   AGC defect (`audio/k1_gdft_core.cpp`). Reuses the existing `agc_bands[]` /
