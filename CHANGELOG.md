@@ -7,6 +7,22 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ## [Unreleased]
 
 ### Added
+- **Lane N4 (factory provisioning tooling): factory image + per-unit NVS** —
+  new read-only, non-flashing `scripts/release/make_factory_image.py` assembles
+  a single flashable factory image (`esptool merge_bin`: bootloader @ `0x0`,
+  partitions @ `0x8000`, optional NVS @ `0x9000`, `boot_app0` @ `0xe000`,
+  firmware @ `0x10000`) and prints the exact `esptool write_flash 0x0 <image>`
+  command for a human to run — it never flashes. New
+  `scripts/release/make_unit_nvs.py` generates a per-unit NVS partition
+  (`0x5000`) from the placeholder template `scripts/release/unit_nvs_template.csv`
+  via ESP-IDF `nvs_partition_gen.py` (run under the PlatformIO penv interpreter);
+  it never flashes, never pushes, and never mints NVS keys. The per-unit
+  serial/SKU scheme is Captain decision **D4 — UNDECIDED**, so the template and
+  defaults are clearly-marked placeholders. New runbook
+  `docs/hardware/factory-flash-runbook.md` (build → assemble → provision →
+  verify-by-chip-ID → flash → confirm `Hash of data verified` + `Hard resetting`).
+  Host gate `tests/test_factory_tooling_static.py` (read-only/non-flashing/
+  no-push/no-keygen invariants + D4 placeholder discipline).
 - **Lane N5 (release engineering): build provenance + release manifest** —
   new PlatformIO pre-script `scripts/platformio/k1_build_provenance.py` stamps
   `K1_BUILD_GIT_HASH` / `K1_BUILD_EPOCH` / `K1_BUILD_ENV` into every translation
