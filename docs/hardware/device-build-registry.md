@@ -19,6 +19,7 @@ in [`../spec-index.md`](../spec-index.md).
 |---|---|---|---|---|
 | **1401** | Main K1 (Captain's primary) | `F887A500` | `/dev/cu.usbmodem1401` / currently `/dev/cu.usbmodem1101` | `k1_hardware` |
 | **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently `/dev/cu.usbmodem12401` | `k1_bench_reference` |
+| **K718** | Remoted BLE-MIDI dial (Guition JC3636K718_P, **separate product**, not a K1) | MAC `ac:a7:04:ee:57:7c` (ESP32-S3R8, 8MB PSRAM, 16MB flash) | `/dev/cu.usbmodem101` (2026-06-30; drifts) | arduino-cli `JC3636_K718_REMOTED_BLE_V1` (knob repo) — **never a K1 pio env** |
 
 - The two envs differ by **GPIO map**, not just flags. `k1_hardware` on 12201
   (or vice versa) produces dead/garbled output. There is no "same binary on
@@ -29,6 +30,13 @@ in [`../spec-index.md`](../spec-index.md).
   (`ls /dev/cu.usbmodem*`, `:chip_id` over serial if ambiguous).
 - Port numbers can drift across USB re-enumeration. Identity = chip ID, never
   the port name.
+- **K718 (`ac:a7:04:ee:57:7c`) is a SEPARATE PRODUCT** (BLE-MIDI remote dial,
+  Guition JC3636K718_P), not a K1. It shares the USB bus — **never** flash a K1
+  `pio` env to it or its arduino-cli build to a K1; both bricks output. Its
+  firmware lives in the knob repo
+  (`~/Workspace_Management/Software/JC3636K518CN_knob_EN-bleremote/custom/JC3636_K718_REMOTED_BLE_V1`),
+  identity captured + bench-PASS in that repo's `HARDWARE_VERIFY.md`. Verified
+  on bus 2026-06-30 (esptool `flash_id`: ESP32-S3, 8MB PSRAM, 16MB flash).
 - **Never flash any device without Captain's per-device instruction**
   (standing rule, 2026-06-11; origin: unauthorized 1401 rollback).
   > **Standing authorization (2026-06-19, Captain):** full ownership of the
