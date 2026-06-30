@@ -124,6 +124,16 @@
 #endif
 #endif
 
+// N7 on-device OTA receiver (DRAFT, Captain decision D3). Default-OFF on EVERY
+// target — stricter than the SB_ENABLE_USB_MSC_UPDATE gate above, which is 0 only
+// on K1 hardware. OTA is a field-update attack/brick surface, so it stays 0
+// until v1-scope sign-off, image-signing key custody, and a distribution server
+// are all resolved (see system/k1_ota.h). Flip ON for build/link proof ONLY via
+// the k1_ota_probe env (-DSB_ENABLE_OTA=1); never in a shipping build.
+#ifndef SB_ENABLE_OTA
+#define SB_ENABLE_OTA 0
+#endif
+
 // Cochlear-Inspired AGC Definitions
 // These define frequency bands that roughly correspond to human auditory perception
 #define NUM_AGC_BANDS 4  // Using 4 bands: bass, low-mid, high-mid, treble

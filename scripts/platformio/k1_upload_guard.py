@@ -63,6 +63,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_effect_registry",
             "k1_vp_motion_lab",
             "k1_wireless_ab_probe",
+            "k1_ota_probe",
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",

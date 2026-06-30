@@ -42,6 +42,7 @@
 #include "buttons.h"          // Watch the status of buttons
 #include "knobs.h"            // Watch the status of knobs...
 #include "serial_menu.h"      // Watch the Serial port... *sigh*
+#include "k1_ota.h"           // N7 OTA receiver (DRAFT, D3) — inert unless SB_ENABLE_OTA=1
 #include "system.h"           // Watch how fast I can check if settings were updated... yada yada..
 #include "GDFT.h"             // Conversion to (and post-processing of) frequency data! (hey, something cool!)
 #include "sb_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
@@ -705,6 +706,16 @@ void setup() {
     esp_task_wdt_reconfigure(&k1_wdt_cfg);
   }
   enableLoopWDT();  // subscribe loopTask (core 0, audio) to the TWDT
+#endif
+
+#if SB_ENABLE_OTA
+  // N7 anti-brick (DRAFT, Captain decision D3): we reached the end of setup()
+  // without a boot-time panic, so this slot has proven a healthy boot — cancel
+  // any pending OTA rollback and mark the running image valid. No-op unless the
+  // bootloader armed rollback (CONFIG_BOOTLOADER_APP_ROLLBACK_ENABLE, an
+  // N7-enable prerequisite) on a freshly-OTA'd image. If a richer N2b boot-health
+  // window lands on this line, move this call behind that window's success edge.
+  k1_ota_mark_app_valid_after_boot();
 #endif
 }
 

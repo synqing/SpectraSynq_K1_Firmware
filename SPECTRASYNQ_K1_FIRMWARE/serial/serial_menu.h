@@ -111,6 +111,11 @@ bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
 // parse_command() dispatches them via serial_cmd_dispatch_pure_setter(); the S3.0
 // serial_replay golden gates the move (must reproduce byte-for-byte).
 #include "serial_cmd_handlers.h"
+// N7 OTA receiver (DRAFT, Captain decision D3): declares serial_cmd_dispatch_ota()
+// under #if SB_ENABLE_OTA. The include is harmless when the flag is OFF (the
+// header body compiles to nothing); the call site below is also gated, so the
+// shipping serial parser is byte-unchanged.
+#include "k1_ota.h"
 
 // init_serial() is NOT extracted to serial_tx.cpp: its body references the
 // FIRMWARE_VERSION macro, which is #define'd in the .ino TU (not a header), so
@@ -2645,6 +2650,17 @@ void parse_command(char* command_buf) {
     // tests/test_gdft_harness_schema_static.py.
     else if (serial_cmd_dispatch_gdft_harness(command_type, command_data)) {
       // handled by the extracted gdft_harness dispatcher
+    }
+#endif
+
+#if SB_ENABLE_OTA
+    // N7 OTA receiver (DRAFT, Captain decision D3): ota_begin / ota_status /
+    // ota_abort / ota_end routed to serial_cmd_dispatch_ota() in system/k1_ota.cpp.
+    // GATE-MATCHED: decl/def/include/call-site all behind #if SB_ENABLE_OTA
+    // (default-OFF, never shipped) — exactly the gdft_harness gated-lane pattern.
+    // Returns true iff command_type was an ota_* verb.
+    else if (serial_cmd_dispatch_ota(command_type, command_data)) {
+      // handled by the OTA receiver dispatcher
     }
 #endif
 
