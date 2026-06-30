@@ -7,6 +7,15 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ## [Unreleased]
 
 ### Added
+- **Lane N6 (prepare-only): per-band AGC candidate `SB_AGC_PERBAND_V1`** —
+  flag-gated, **DEFAULT OFF** fix for the "louder -> dimmer" broadband single-scalar
+  AGC defect (`audio/k1_gdft_core.cpp`). Reuses the existing `agc_bands[]` /
+  `freq_to_band_map[]` scaffold to run the proven AGC pipeline per perceptual band.
+  Host harness `oracle_agc_perband.py` + RED->GREEN property gate
+  `test_agc_perband_independence.py`; production byte-identical with the flag off
+  (gdft golden reproduces). Decision package + device A/B protocol:
+  [`docs/architecture/n6-agc-perband-prepare-package.md`](./docs/architecture/n6-agc-perband-prepare-package.md).
+  Class C — prepares only; the perceptual default is unchanged (Captain decides).
 - **Initial SpectraSynq K1 fork** — clean-slate firmware repository forked from
   the `SensoryBridge-main 9` working tree (2026-06-23). See
   [`docs/spectrasynq-fork-2026-06-23.md`](./docs/spectrasynq-fork-2026-06-23.md).
