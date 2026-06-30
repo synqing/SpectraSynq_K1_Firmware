@@ -8,7 +8,8 @@
 #   docs / md / instructions / skills .... no build, no test  (instant)
 #   tests/**.py  scripts/regression-harness/**.py .... pytest only
 #   sb-tab5-wireless-controller/** + Tab5 harness .... pytest + tab5 build
-#   SPECTRASYNQ_K1_FIRMWARE/** source  +  platformio.ini .... pytest + k1 build
+#   SPECTRASYNQ_K1_FIRMWARE/** source  +  platformio.ini
+#     +  scripts/platformio/*.py (build pre-scripts) .... pytest + k1 build
 #   any tier ............................. binary / oversize guard (staged blobs)
 #   on a  wip/*  branch .................. build+test SKIPPED (checkpoint freely)
 #
@@ -18,6 +19,37 @@
 # Detail: docs/git/commit-gate.md
 # ============================================================================
 set -uo pipefail
+
+# --- change-class classifier (pure; testable seam) --------------------------
+# Maps the staged path list -> tier. Side-effect-free so it can be unit tested
+# via `scripts/hooks/pre-commit --classify <paths...>` (no git, no build).
+# Build PRE-SCRIPTS (scripts/platformio/*.py + the identity manifest the upload
+# guard consumes) are firmware-tier: a change there can break `pio run` while
+# pytest stays green — the N4a regression that escaped to main on 2026-06-27.
+classify_tier() {
+  local tier="docs" firmware=0 tab5=0 pyharness=0 f
+  for f in "$@"; do
+    case "$f" in
+      SPECTRASYNQ_K1_FIRMWARE/*.cpp|SPECTRASYNQ_K1_FIRMWARE/*.h|SPECTRASYNQ_K1_FIRMWARE/*.hpp|SPECTRASYNQ_K1_FIRMWARE/*.c|SPECTRASYNQ_K1_FIRMWARE/*.ino|platformio.ini)
+        firmware=1 ;;
+      scripts/platformio/*.py|scripts/platformio/k1_device_identities.json)
+        firmware=1 ;;
+      sb-tab5-wireless-controller/*|tools/tab5_k1_dashboard_harness.py|docs/protocol/k1-ws-contract.yaml|docs/protocol/k1-rest-contract.yaml)
+        tab5=1 ;;
+      tests/*.py|scripts/regression-harness/*.py)
+        pyharness=1 ;;
+    esac
+  done
+  if   [ "$firmware" -eq 1 ] && [ "$tab5" -eq 1 ]; then tier="firmware+tab5"
+  elif [ "$firmware" -eq 1 ]; then tier="firmware"
+  elif [ "$tab5" -eq 1 ]; then tier="tab5"
+  elif [ "$pyharness" -eq 1 ]; then tier="pyharness"
+  fi
+  printf '%s\n' "$tier"
+}
+
+# Testable seam: print the tier for the given paths and exit (no git/build).
+if [ "${1:-}" = "--classify" ]; then shift; classify_tier "$@"; exit 0; fi
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT" || exit 1
@@ -64,36 +96,14 @@ case "$BRANCH" in
     exit 0 ;;
 esac
 
-# --- 3. classify the change-class ------------------------------------------
-tier="docs"            # default: no build, no test
-firmware=0
-tab5=0
-pyharness=0
+# --- 3. classify the change-class (shared classifier; defined at top) -------
+tier="$(classify_tier "${STAGED[@]}")"
 visual=0
 for f in "${STAGED[@]}"; do
-  case "$f" in
-    SPECTRASYNQ_K1_FIRMWARE/*.cpp|SPECTRASYNQ_K1_FIRMWARE/*.h|SPECTRASYNQ_K1_FIRMWARE/*.hpp|\
-    SPECTRASYNQ_K1_FIRMWARE/*.c|SPECTRASYNQ_K1_FIRMWARE/*.ino|platformio.ini)
-      firmware=1 ;;
-    sb-tab5-wireless-controller/*|sb-tab5-wireless-controller/**|\
-    tools/tab5_k1_dashboard_harness.py|docs/protocol/k1-ws-contract.yaml|docs/protocol/k1-rest-contract.yaml)
-      tab5=1 ;;
-    tests/*.py|scripts/regression-harness/*.py)
-      pyharness=1 ;;
-  esac
   case "$f" in
     *light_mode_*|*leds.*|*lightshow*|*palette*|*render_params*|*chroma*) visual=1 ;;
   esac
 done
-if [ "$firmware" -eq 1 ] && [ "$tab5" -eq 1 ]; then
-  tier="firmware+tab5"
-elif [ "$firmware" -eq 1 ]; then
-  tier="firmware"
-elif [ "$tab5" -eq 1 ]; then
-  tier="tab5"
-elif [ "$pyharness" -eq 1 ]; then
-  tier="pyharness"
-fi
 say "  tier: ${tier}"
 
 # --- helpers: tool discovery ------------------------------------------------

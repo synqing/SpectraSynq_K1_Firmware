@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "_comment": "Single structured source of K1 device identity for k1_upload_guard.py. Identity-by-USB-serial GOVERNS; advisory_port is operator convenience only and never overrides the serial check. Quarantined units are refused on every K1 env. See docs/hardware/device-build-registry.md. Edit here, not in code.",
+  "authorized": [
+    {
+      "chip_id": "F887A500",
+      "usb_serial": "B4:3A:45:A5:87:F8",
+      "role": "main K1",
+      "pinmap": "default K1 hardware GPIO assignment",
+      "advisory_port": "/dev/tty.usbmodem1401",
+      "envs": [
+        "k1_hardware",
+        "k1_hardware_harness",
+        "k1_hardware_trace_dev",
+        "k1_motion_probe",
+        "k1_tempo_probe",
+        "k1_ap_frontend_probe",
+        "k1_ap_frontend_probe_matrix_12800_96_d3",
+        "k1_ap_frontend_probe_matrix_12800_96_d3_ap0_vp1",
+        "k1_ap_frontend_probe_matrix_12800_128_d2",
+        "k1_ap_frontend_probe_matrix_12800_128_d2_ap0_vp1",
+        "k1_ap_frontend_probe_matrix_16000_120_d3",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acq_probe",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread8",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_gdft",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_novelty",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_snapshot",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_onset",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_saliency",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_d8",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread16",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread12",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread8",
+        "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread4",
+        "k1_ap_frontend_probe_matrix_16000_160_d2",
+        "k1_ap_frontend_probe_matrix_16000_160_d2_ap0_vp1",
+        "k1_sample_rate_32k_spike"
+      ]
+    },
+    {
+      "chip_id": "B489A500",
+      "usb_serial": "B4:3A:45:A5:89:B4",
+      "role": "2nd bench K1",
+      "pinmap": "bench-reference GPIO assignment",
+      "advisory_port": "/dev/tty.usbmodem12201",
+      "envs": [
+        "k1_bench_reference",
+        "k1_bench_reference_harness",
+        "k1_bench_tempo_probe",
+        "k1_bench_ap_frontend_probe",
+        "k1_bench_ap_frontend_probe_matrix_16000_120_d3",
+        "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
+        "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4"
+      ]
+    }
+  ],
+  "quarantined": [
+    {
+      "chip_id": null,
+      "usb_serial": "FC:01:2C:DA:2B:38",
+      "role": "unassigned",
+      "state": "KNOWN_QUARANTINED",
+      "reason": "unknown bench device, not authorized for K1 env upload"
+    }
+  ],
+  "blocked_envs": {
+    "k1_sample_rate_32k_spike": "32 kHz spike is build-only until acquisition-only, AP/VP, calibration, and watchdog gates are explicitly re-opened"
+  }
+}
