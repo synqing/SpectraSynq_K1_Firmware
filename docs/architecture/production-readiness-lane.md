@@ -165,9 +165,24 @@ Recommended start: **N1** (clean Class-A win, proves the autonomous rhythm), the
 - Not verified closed: offline DSP-fixture reproducibility (audit M0.3), the LED-index OOB clamps (audit M1.3, `led_utilities.h:277/868/1202`), exact arduino-esp32 3.2.0 brownout/coredump defaults (no `sdkconfig` in repo).
 - The audit (`2026-06-23`) predates recent work — cross-check each item's status against live source before acting.
 
+## 10 · Status reality update — 2026-06-30 (live; supersedes stale §3 statuses)
+
+Work shipped this session on the product line `lane/remoted-ble-midi-phase-f` (device-proven on main K1 `F887A500`; none merged to `main` — that stays Captain-gated):
+
+- **N1** — device-proofed (`479701d`, MIGRATE path). Effectively done.
+- **N2** — **SHIPPED** (freeze-fix `827d73a`→`e2beac5`) **+ ACF work-spreading root-fix** (`6880095`): active-AP p95 `9088→6784 µs`, over-budget frames `889/2667→0`, 127 BPM lock preserved 100%. The freeze cause is removed, not just caught.
+- **N6** — the **"louder→dimmer" AGC defect is SHIPPED FIXED** (per-band AGC `SB_AGC_PERBAND_V1`, `2e2800d`): cross-band gain spread `0.000→0.145` (treble ~2.6× brighter than bass on loud). Doc §3 only expected "prepare A/B" — we went further with objective device data. **D2 (effect-framework-v3 vs current look) remains open.**
+- **N4-adjacent** — upload guard **hardened** (`980c8a3`): all 6 K1-chip-bound envs registered + a drift-catcher test (closed a real cross-flash brick-risk the probe envs had opened; found 4 pre-existing gaps).
+- **N7** — flag-OFF OTA receiver: DRAFT in progress (branch `feat/n7-ota-receiver`).
+- **N8 / N9** — memos written: [`n8-field-recovery-blocked-memo.md`](./n8-field-recovery-blocked-memo.md) (BLOCKED on D6 GPIO), [`n9-gdft-int64-held-memo.md`](./n9-gdft-int64-held-memo.md) (HELD; #72837 weakened its case).
+
+**STRUCTURAL FINDING (new Captain decision — D7):** the `feat/*` integration stack (tip `feat/gate-class-pio-prescripts`, carrying N3 + N2b + N4a + build-config + commit-gate) is **NOT merged into the product line**, and the two lines **diverged at N2** (the stack's `827d73a` vs the product line's cherry-picked `e2beac5`). A merge will conflict on `platformio.ini`, the upload guard (both lines edited it), and possibly the golden manifest (trust-root).
+- **D7 — How to reconcile the two divergent firmware lines?** Why Captain-relevant: it sets which line is canonical for v1 and risks the device-validated shipping line. Options: (a) merge the stack into the product line (resolve conflicts in a sandbox, host-gate, land only if clean); (b) cherry-pick the un-integrated lane artifacts (N3 token-scrub, N2b bootloop guard) onto the product line individually; (c) rebase the product line's BLE/ACF/AGC work onto the stack tip. **Recommended:** (b) — cherry-pick the discrete lane artifacts (lower blast radius than a full divergent-line merge); the product line stays canonical. **Default if no override:** product line is canonical for v1; the stack's unique lanes (N3/N2b) are cherry-picked, gated, and landed; the rest of the stack is archived.
+
 ---
 **Document Changelog**
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-06-30 | agent:claude-opus-4-8 (CTO) | Added §10 live status update: N1 done, N2 + ACF + per-band-AGC (N6 defect) SHIPPED + device-proven on the product line, upload-guard hardened, N7 OTA DRAFT in progress, N8/N9 memos written. Surfaced D7 — the feat/* stack is unmerged and diverged from the product line at N2; recommended cherry-picking discrete lane artifacts over a full divergent-line merge. |
 | 2026-06-26 | agent:claude-code (CTO) | Created from the 2026-06-26 Reality-Checker production-readiness assessment (5 evidence reads). Encodes the autonomy taxonomy (A/B/C/D), the lane plan N1-N9, inherited gate discipline, the hard do-not list, the Captain-decision register, and the evidence index. Designed for ingestion by the autonomous build lane: complete Class-A end-to-end, PR+proof-plan Class-B, package-and-stop Class-C/D. |
