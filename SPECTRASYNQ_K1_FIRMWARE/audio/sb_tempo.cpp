@@ -52,7 +52,15 @@ static const uint16_t SB_HISTORY_LENGTH = 512;
 #error "SB_TEMPO_ACF_REFRESH_DECIMATION must be >= 1"
 #endif
 #ifndef SB_TEMPO_ACF_SPREAD_PROBE
+// Production alias: SB_TEMPO_ACF_SPREAD_V1 enables the same work-spreading
+// mechanism under a clean (non-probe) name for shipping builds. Absent any flag
+// the source still defaults the spread OFF; probe envs that set
+// SB_TEMPO_ACF_SPREAD_PROBE=1 directly are unaffected.
+#if defined(SB_TEMPO_ACF_SPREAD_V1) && SB_TEMPO_ACF_SPREAD_V1
+#define SB_TEMPO_ACF_SPREAD_PROBE 1
+#else
 #define SB_TEMPO_ACF_SPREAD_PROBE 0
+#endif
 #endif
 #ifndef SB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT
 #define SB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT 16U
