@@ -76,6 +76,9 @@ void restore_defaults() {
 
 // Save configuration to LittleFS
 void save_config() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  return;  // NVS FROZEN for the IM73D PDM eval — SPH0645 config/profile on disk untouchable
+#endif
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
@@ -117,6 +120,11 @@ void save_config() {
 
 // Save configuration to LittleFS 10 seconds from now
 void save_config_delayed() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  settings_updated = false;   // NVS FROZEN for PDM eval — cancel any queued write
+  next_save_time = 0;
+  return;
+#endif
   if(debug_mode == true){
     USBSerial.println("CONFIG SAVE QUEUED");
   }
@@ -215,6 +223,9 @@ void load_config() {
 
 // Save noise calibration to LittleFS
 void save_ambient_noise_calibration() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  return;  // NVS FROZEN for PDM eval — noise_cal.bin untouchable; PDM cal is RAM-only
+#endif
   lock_leds();
   if (debug_mode) {
     USBSerial.print("SAVING AMBIENT_NOISE PROFILE... ");
@@ -292,6 +303,15 @@ static bool read_cal_profile_bytes(File& file, void* data, size_t len) {
 }
 
 bool save_calibration_profile(uint8_t source) {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // NVS FROZEN for PDM eval: no cal_profile.bin write. BUT this is the ONLY function on the
+  // accept path (k1_gdft_core.cpp) that refreshes runtime cal status — a bare `return false`
+  // would leave cal_valid=0 forever. RAM-only SEMANTIC SUCCESS: refresh status (so the
+  // [AP]/acceptance gate sees cal_valid), do NOT imply a persisted profile, return actual validity.
+  calibration_profile_loaded = false;
+  calibration_refresh_status(source);
+  return calibration_valid;
+#endif
   lock_leds();
   if (!calibration_profile_valid()) {
     calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
@@ -416,6 +436,11 @@ bool load_calibration_profile_if_config_invalid() {
 }
 
 bool clear_calibration_profile() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  return false;  // NVS FROZEN for PDM eval — do NOT remove cal_profile.bin. Every PDM caller
+                 // (boot force-invalidate / clear_noise_cal) sets RAM cal status explicitly;
+                 // the return is caller-ignored.
+#endif
   lock_leds();
   bool removed = LittleFS.remove(CAL_PROFILE_FILE);
   calibration_profile_loaded = false;

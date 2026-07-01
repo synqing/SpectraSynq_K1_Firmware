@@ -420,6 +420,26 @@ void init_system() {
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
   enforce_compiled_audio_timing_config();
 
+#ifdef K1_MIC_IM73D_PDM_V1
+  // IM73D PDM boot force-invalidate (bench eval, 2026-07-02). A stale SPH0645 profile
+  // (DC≈-4714, SSL≈350) is IN-range and would otherwise be applied to the PDM signal
+  // (wrong DC bias + wrong domain). Force RAM cal invalid on EVERY PDM boot, BEFORE the
+  // two sanity blocks below — seeding a PDM-domain SSL (never 0) and a non-zero follower
+  // so the peak-scaled division can never be 0/0. NVS is frozen under the flag
+  // (bridge_fs.h), so nothing here persists; each boot needs a fresh silence-go recal.
+  CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
+  CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
+  CONFIG.VU_LEVEL_FLOOR = 0.0f;
+  CONFIG.STANDBY_DIMMING = false;                               // else silent_scale*0 blanks the plate
+  for (uint8_t i = 0; i < NUM_FREQS; i++) noise_samples[i] = 0;
+  calibration_profile_loaded = false;
+  calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
+  max_waveform_val = 0.0f;
+  max_waveform_val_raw = 0.0f;
+  waveform_peak_scaled = 0.0f;
+  max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
+#endif
+
   // Fix-D Layer 1 (2026-05-24) — DC_OFFSET sanity clamp at boot.
   //
   // Two failure modes covered by one guard:
@@ -435,7 +455,14 @@ void init_system() {
   // Either case: invalidate the runtime profile and prevent the value being
   // reported as a trusted calibration. The next successful noise_cal will save
   // a measured profile; until then cal_valid remains false.
+#ifndef K1_MIC_IM73D_PDM_V1
   if (CONFIG.DC_OFFSET == 0 || calibration_abs_i32(CONFIG.DC_OFFSET) > NOISE_CAL_DC_MAX_VALID_ABS) {
+#else
+  // PDM: DC==0 is legal (HPF), so it must NOT re-trigger this wipe (which would zero SSL).
+  // Only a truly out-of-band |DC| is an artefact here. The force-invalidate above already
+  // set DC=0, so this stays inert on a clean PDM boot.
+  if (calibration_abs_i32(CONFIG.DC_OFFSET) > NOISE_CAL_DC_MAX_VALID_ABS) {
+#endif
     USBSerial.print("DC_OFFSET sanity clamp: stored value ");
     USBSerial.print(CONFIG.DC_OFFSET);
     USBSerial.println(" rejected -> calibration invalidated; run `start_noise_cal` under confirmed silence to learn the true bias.");

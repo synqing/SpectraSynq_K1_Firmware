@@ -37,6 +37,24 @@
 // Must match sizeof(ssl_cal_buf) in system/globals.h (static_assert in i2s_audio.h).
 #define NOISE_CAL_SSL_PHASE_B_FRAMES 112U
 
+#ifdef K1_MIC_IM73D_PDM_V1
+// IM73D122 PDM domain (bench eval, 2026-07-02). The PDM silence floor (~±20-40 raw,
+// then scaled by SENSITIVITY×gain) sits far below the SPH0645 default (350). Re-seed the
+// boot SSL fallback into the PDM band so a PDM boot never sits at an SPH-domain SSL.
+// SEED — retune from the measured PDM silence p90 on the bench (never 0 at runtime).
+#undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
+#define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
+
+// Pre-sensitivity input gain. Extraction = im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN,
+// then the SHARED path multiplies by k1_effective_sensitivity (SENSITIVITY 2.4 × trim), so
+// effective gain = G × 2.4. Seed 3.0 (→ 7.2 effective) targets the SPH0645 4k-10k max_raw
+// band. RETUNE on bench: G_next = G_current × target_peak / observed_peak (discard clipped/
+// trimmed runs). NOT a guess — locked from the Stage-0 SPH0645 baseline.
+#ifndef K1_MIC_IM73D_INPUT_GAIN
+#define K1_MIC_IM73D_INPUT_GAIN 3.0f
+#endif
+#endif
+
 #ifdef K1_LOUD_GUARD_V1
 // K1 loud-room guard: runtime-only headroom management for loud playback tests.
 // These thresholds are internal signal-health thresholds, not room dB/A targets.
@@ -271,6 +289,16 @@ static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
     #define LED_DATA_PIN 4
     #define LED_CLOCK_PIN 5
+
+    #ifdef K1_MIC_IM73D_PDM_V1
+      // IM73D122 PDM mic (bench eval, 2026-07-02) — physically replaces the SPH0645
+      // on these pads. Dedicated PDM macros consumed by init_i2s()'s PDM branch; the
+      // i2s_std I2S_*_PIN above stay defined but UNUSED under the flag. Proven config:
+      // clk 819.2 kHz (DSR_8S) / LR LOW = LEFT slot / falling edge.
+      #define K1_PDM_CLK_PIN 13   // PDM clock out
+      #define K1_PDM_DIN_PIN 12   // PDM data in
+      #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+    #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
     // env: esp32dev_audio_esv11_k1v2.

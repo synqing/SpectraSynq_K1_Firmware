@@ -54,6 +54,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
+            "k1_bench_im73d",  # IM73D122 PDM mic eval — bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
                 ok, message = self.guard.validate_upload_target(
@@ -110,6 +111,7 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_bench_ap_frontend_probe", "/dev/tty.usbmodem1401"),
             ("k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4", "/dev/tty.usbmodem1401"),
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
+            ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):

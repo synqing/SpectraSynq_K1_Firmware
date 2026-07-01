@@ -138,6 +138,12 @@ inline uint16_t k1_loud_frame_sample_count = 0;
 // sees coherent memory without explicit cache-flush. Likely already in DRAM by
 // default; zero-cost belt-and-braces.
 inline DRAM_ATTR int32_t i2s_samples_raw[1024]      = { 0 };
+#ifdef K1_MIC_IM73D_PDM_V1
+// IM73D122 PDM RX landing buffer (bench eval). Dedicated typed int16 buffer — never
+// reinterpret-cast i2s_samples_raw (would be UB + wrong zero-fill stride). File-scope
+// DRAM (no heap, no stack) per esp32-render-path-safety; sized like i2s_samples_raw.
+inline DRAM_ATTR int16_t im73d_samples_i16[1024]    = { 0 };
+#endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };
 inline SQ15x16 waveform_fixed_point[1024]           = { 0 };
@@ -213,7 +219,12 @@ inline int32_t calibration_abs_i32(int32_t value) {
 
 inline bool calibration_profile_valid() {
   return noise_complete == true &&
+#ifndef K1_MIC_IM73D_PDM_V1
+         // SPH0645: DC_OFFSET==0 is the "never calibrated" poison sentinel.
          CONFIG.DC_OFFSET != 0 &&
+#endif
+         // IM73D PDM is AC-coupled (HPF) -> a legitimate cal learns DC≈0, so the
+         // DC!=0 term is dropped under the flag. |DC| bound + SSL range still apply.
          calibration_abs_i32(CONFIG.DC_OFFSET) <= NOISE_CAL_DC_MAX_VALID_ABS &&
          CONFIG.SWEET_SPOT_MIN_LEVEL >= NOISE_CAL_SSL_MIN_VALID_RAW &&
          CONFIG.SWEET_SPOT_MIN_LEVEL <= NOISE_CAL_SSL_MAX_VALID_RAW;
