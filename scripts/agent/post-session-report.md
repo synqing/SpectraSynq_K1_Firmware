@@ -18,6 +18,7 @@ evidence_captured:       <paths to logs / manifests / captures, or "none">
 blockers:                <unresolved issues, or "none">
 generated_files_ignored: <confirm last-bootstrap.json / repo-truth-report.json stayed ignored>
 safety_constraints:      <confirm: no upload, no flash, no erase, no serial-write, no unscoped edits>
+thinking_skill_used:     <skill name + one-line rationale, or "none — mechanical task">
 next_recommended_action: <exact next step, or "await Captain decision: <decision>">
 ```
 

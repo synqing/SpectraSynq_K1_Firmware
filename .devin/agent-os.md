@@ -188,4 +188,46 @@ project policy) without explicit approval.
 
 ---
 
+## 14. Thinking gate
+
+Before acting on any task that involves a **decision between approaches**,
+**ambiguity**, **architecture**, **root-cause debugging under uncertainty**, or
+**estimation under unknowns**, invoke `/thinking-model-router` first and
+consume its output before proceeding.
+
+Do NOT invoke a thinking skill for mechanical execution against a clear spec.
+Forcing a thinking-model step on "write a pytest function" is process sludge.
+
+The router is the single entry point. It maps the task to one of five buckets
+and returns 1-2 named skills. Do not invoke all thinking skills; do not build a
+parallel router. If the router returns two skills that conflict, resolve the
+conflict explicitly — do not average their recommendations.
+
+### Compact taxonomy (the router's reference)
+
+| Bucket | Trigger shape | Representative skills |
+|--------|---------------|----------------------|
+| Decision under options | "should we X or Y", "which approach" | `thinking-reversibility`, `thinking-opportunity-cost`, `thinking-steel-manning` |
+| Root cause / debugging | "why did this break", "symptom vs cause" | `systematic-debugging`, `thinking-five-whys-plus`, `thinking-scientific-method` |
+| Estimation under unknowns | "how long", "how much", "is it feasible" | `thinking-fermi-estimation`, `thinking-probabilistic`, `thinking-margin-of-safety` |
+| Systems / second-order | "what happens downstream", "feedback loops", "unintended consequences" | `thinking-systems`, `thinking-second-order`, `thinking-archetypes`, `thinking-feedback-loops` |
+| First-principles / reframing | "conventional approach fails", "challenge assumptions" | `thinking-first-principles`, `thinking-inversion`, `thinking-triz` |
+
+### Failure modes to avoid
+
+- **Shifting the burden:** invoking a thinking skill is not certification of the
+  answer. The post-session report still needs proof.
+- **Fixes that fail:** keep the gate narrow (decision/ambiguity/architecture
+  only). If you wire thinking into every task, agents will skip it to hit
+  deadlines and the wiring gets removed.
+- **Accidental adversaries:** if two skills conflict, resolve explicitly; do
+  not average.
+- **Tragedy of the commons:** do not invoke the router "to be safe." It exists
+  for decision-class tasks, not as a ritual.
+
+The post-session report includes a `thinking_skill_used` field so skipped-thinking
+on a decision task is a visible process bug, not a silent one.
+
+---
+
 Last updated: 2026-07-02
