@@ -44,7 +44,15 @@ bool k1_ota_write(const uint8_t* data, size_t len);
 // len must equal the RSA modulus size (384 bytes for RSA-3072). Returns false if
 // no session is open or the length is out of range. Without a signature that
 // verifies against the embedded PUBLIC key, k1_ota_end() REFUSES the image.
+// This REPLACES any accumulated signature (natural for a whole-body HTTP transport).
 bool k1_ota_set_signature(const uint8_t* sig, size_t len);
+
+// Append a fragment of the detached signature to the active session. Provided
+// because a line-based serial transport cannot carry a 384-byte signature in one
+// frame (the command buffer is short); the operator streams the signature across
+// several fragments which are concatenated in order. Returns false if no session
+// is open or the running total would exceed the signature buffer.
+bool k1_ota_append_signature(const uint8_t* part, size_t len);
 
 // Finalise: validate the written image AND verify its detached signature against
 // the embedded operator PUBLIC key. The boot partition is switched ONLY if the

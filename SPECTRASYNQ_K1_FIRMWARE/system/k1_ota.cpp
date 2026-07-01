@@ -129,6 +129,19 @@ bool k1_ota_set_signature(const uint8_t* sig, size_t len) {
   return true;
 }
 
+bool k1_ota_append_signature(const uint8_t* part, size_t len) {
+  if (!g_ota_open || part == nullptr || len == 0) {
+    return false;
+  }
+  if (g_ota_sig_len + len > K1_OTA_SIG_MAX) {
+    return false;  // would overflow the signature buffer
+  }
+  memcpy(g_ota_sig + g_ota_sig_len, part, len);
+  g_ota_sig_len += len;
+  g_ota_sig_present = true;
+  return true;
+}
+
 bool k1_ota_end() {
   if (!g_ota_open) {
     return false;
@@ -225,22 +238,25 @@ bool serial_cmd_dispatch_ota(const char* command_type, char* command_data) {
                      ok ? "ok" : "fail", (unsigned)olen, (unsigned)g_ota_written);
     return true;
   } else if (strcmp(command_type, "ota_sigb64") == 0) {
-    // Supply the detached RSA-3072 signature (base64) for the active session.
+    // Append a fragment of the detached RSA-3072 signature (base64). The serial
+    // command buffer is too short to carry all 512 base64 chars in one frame, so
+    // the operator streams the signature across several ota_sigb64 lines; they are
+    // concatenated in order and verified at ota_end.
     if (command_data == nullptr || command_data[0] == '\0') {
       USBSerial.println("[ota] sigb64 fail — empty");
       return true;
     }
-    static uint8_t sigbuf[K1_OTA_SIG_MAX];
+    static uint8_t sigpart[128];
     size_t olen = 0;
     const int rc = mbedtls_base64_decode(
-        sigbuf, sizeof(sigbuf), &olen,
+        sigpart, sizeof(sigpart), &olen,
         reinterpret_cast<const unsigned char*>(command_data), strlen(command_data));
     if (rc != 0) {
       USBSerial.printf("[ota] sigb64 fail — decode rc=%d\n", rc);
       return true;
     }
-    const bool ok = k1_ota_set_signature(sigbuf, olen);
-    USBSerial.printf("[ota] sigb64 %s (%u bytes)\n", ok ? "ok" : "fail",
+    const bool ok = k1_ota_append_signature(sigpart, olen);
+    USBSerial.printf("[ota] sigb64 %s (+%u bytes)\n", ok ? "ok" : "fail",
                      (unsigned)olen);
     return true;
   } else if (strcmp(command_type, "ota_end") == 0) {
