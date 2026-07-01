@@ -1,5 +1,26 @@
 # Active Session Handoff — SpectraSynq K1 Firmware
 
+## ▶ CURRENT LANE — IM73D122 PDM mic graft (bench-only, flag-gated)
+
+- **Branch:** `lane/im73d-pdm-eval` · **HEAD:** `fd5390e` (2026-07-02) · **Off:** `26eebb1`
+- **Flag:** `K1_MIC_IM73D_PDM_V1` — defined in EXACTLY ONE env: `[env:k1_bench_im73d]` (extends `k1_bench_reference`). SPH0645 (`i2s_std`) stays the byte-identical product default when the flag is OFF.
+- **Status:** Graft DONE, committed (`545d331` + `c3584fa`), host-gated GREEN (pytest 619, clean compile, flag-OFF byte-identity PROVEN for `k1_hardware` AND `k1_bench_reference`), and DEVICE-PROVEN end-to-end on bench `B489A500` (boot → PDM read on live AP+VP → silence-go recal `cal_valid=1` → no NaN). Gain `g=16` characterized (loud `max_raw` ~4339, SPH 4k–10k band, non-railed).
+- **Remaining acceptance (both need Captain):** (1) per-band AGC `:stream_agc` all 4 gains <10; (2) eyes-on A/B vs SPH0645.
+- **Authority docs:** `docs/hardware/im73d122-ap-vp-migration-plan.md` (canonical design) · `docs/hardware/im73d122-graft-handover-2026-07-02.md` (session handover + 7 gotchas) · `docs/hardware/device-build-registry.md` (deployed-state table).
+- **Hardware safety:** No upload/flash/erase/serial-write without explicit Captain approval AND identity verification via `scripts/platformio/k1_upload_guard.py`. Bench `B489A500` = `k1_bench_im73d` only; main `F887A500` = `k1_hardware` only. `start_noise_cal` never auto-fired.
+
+### Source-of-truth hierarchy (current)
+1. Git branch + HEAD + working tree
+2. `platformio.ini` + `scripts/platformio/k1_upload_guard.py`
+3. `docs/hardware/im73d122-ap-vp-migration-plan.md` + `docs/hardware/device-build-registry.md`
+4. `.claude/CLAUDE.md` + `AGENTS.md` (process rules)
+5. `claude-mem` (prior-session context only, never current-lane truth)
+6. `.devin/agent-os.md` (agent operating manual + bootstrap/repo-truth harness)
+
+> The GDFT/serial-decomposition content below this block is HISTORICAL (2026-06-26, lane `feat/serial-decomposition` off `main` @ `a9b93ef`). It is preserved for context but is NOT the current active lane. Verify any claim in it against current git before acting.
+
+---
+
 **Updated:** 2026-06-26 · **Repo:** `/Users/spectrasynq/SpectraSynq_K1_Firmware` (origin `github.com/synqing/SpectraSynq_K1_Firmware`, branch `main`) · **CI:** green. **main = `a9b93ef`** (serial_replay golden 131; serial_struct **20**; pytest 569/1-skip; `oracle_serial_struct` locks **8 families**). **✅ MERGED — PR #12 (`a9b93ef`, 2026-06-26):** `gdft_harness` probe family (`gdft_probe`/`gdft_sweep`/`gdft_agc_probe`) extracted → `serial_cmd_dispatch_gdft_harness()` (gate-matched `#ifdef ENABLE_GDFT_HARNESS`, production-OFF). Proved: serial_struct golden 17→20 reproduces UNTOUCHED + new schema-lock `test_gdft_harness_schema_static` (GDFTP/GDFTP5/GDFTAGC); Gate Fα 27/27; `k1_hardware` code/data **byte-identical** (0 code/data bytes differ — only `__TIME__`+self-hashes) + `k1_bench_reference_harness` flag-ON links clean. **▶ NEXT (fresh context): re-cut `feat/serial-decomposition` even off `main`, then `ENABLE_MOTION_PROBE`** (origin/feat still at the merged `798e44c` — first push of the next lane force-resets it).
 
 **✅ GATED SERIAL-FAMILIES LANE COMPLETE (2026-06-26)** — both increments merged to `main`:

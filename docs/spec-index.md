@@ -4,7 +4,7 @@ abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, h
 
 # SensoryBridge K1 — Spec Index
 
-**Last verified:** 2026-06-10 (git `wip/audio-saliency-recovery` = `main` = `f0c6808`; verify current HEAD live). **Merged to main 2026-06-10** (fast-forward; wip + main pushed to origin); tree clean; host gate GREEN (`.venv` pytest **310 passed**) + K1 build + Tab5 build SUCCESS. **Device eyes-on remains the open gate** — main is a host-green + compiles baseline, NOT an eyes-on-validated release. Unfinished dirty lanes still quarantined at `wip/2026-06-07-unfinished-lanes-quarantine` @ `a40bdb8`; VME hardware capture frozen by transport incident. **The `13ffe00` firmware-source baseline is SUPERSEDED** — legitimate feature commits have since landed firmware (boot-intro rewrite `cd832fa`, AP WebSocket `k1.*` protocol, WS control facade `e6a6fbb`, VPML `88a1bc3`); do not use `13ffe00` as an empty-diff containment reference. Full closeout audit: [docs/forensics/2026-06-10-weekly-closeout-audit.md](forensics/2026-06-10-weekly-closeout-audit.md).
+**Last verified:** 2026-07-02 (git `lane/im73d-pdm-eval` = `fd5390e`; active lane = IM73D122 PDM mic graft, bench-only). The IM73D lane is the current live workstream — see the Active Lanes table below and `docs/hardware/im73d122-graft-handover-2026-07-02.md`. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim in it against current git before acting.
 
 > 2026-06-15 live supersession: newer K1 production and effects-lane status lives
 > in [progress.md](../progress.md) and
@@ -12,6 +12,12 @@ abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, h
 > Production is accepted at `12800/96/d3`; the 2026-06-11 effects repair
 > blockers are closed in current source; modes 24-27 have partial VP smoke
 > evidence only; modes 28-29 are still unproven by that smoke.
+
+> 2026-07-02 IM73D lane: the current active lane is the IM73D122 PDM mic graft
+> (flag `K1_MIC_IM73D_PDM_V1`, bench `B489A500` only). Authority docs:
+> [docs/hardware/im73d122-ap-vp-migration-plan.md](hardware/im73d122-ap-vp-migration-plan.md),
+> [docs/hardware/im73d122-graft-handover-2026-07-02.md](hardware/im73d122-graft-handover-2026-07-02.md),
+> [docs/hardware/device-build-registry.md](hardware/device-build-registry.md).
 
 ## Agent read order (load-bearing)
 
@@ -25,12 +31,11 @@ On-disk handover **beats** claude-mem for **current lane status**. Memory is for
 
 ---
 
-## Active lanes (updated 2026-06-10)
-
-> Lanes below the divider were added 2026-06-09 (WS/Tab5/VPML feature commits) and were not in the original 2026-06-07 table. They are committed on `wip/audio-saliency-recovery`, host-side only — device bring-up / eyes-on open. See the closeout audit for the full punch-list.
+## Active lanes (updated 2026-07-02)
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
+| **IM73D122 PDM mic graft (CURRENT)** | [docs/hardware/im73d122-ap-vp-migration-plan.md](hardware/im73d122-ap-vp-migration-plan.md) · [docs/hardware/im73d122-graft-handover-2026-07-02.md](hardware/im73d122-graft-handover-2026-07-02.md) | **DONE, committed, host-gated GREEN, device-proven end-to-end on bench `B489A500`** (flag `K1_MIC_IM73D_PDM_V1`, bench-only). SPH0645 stays byte-identical product default. **Remaining:** per-band AGC `:stream_agc` + Captain eyes-on A/B. | `docs/hardware/device-build-registry.md` (bench row, `c3584fa`); commits `545d331` + `c3584fa` + `49b0393` on `lane/im73d-pdm-eval` |
 | VMEWT transport incident | [docs/forensics/vme_l1/2026-06-07-vmewt-transport-incident.md](forensics/vme_l1/2026-06-07-vmewt-transport-incident.md) | Hardware VMEWT capture frozen; failed sandbox survivor rows are not runtime proof | Reported failed VMEWT summaries: nonzero rejected records, ignored fragments, parser issues, secondary-only coverage, weak-confidence-only scenarios |
 | VME L1 Waveform sandbox | [docs/handover/2026-06-07-vme-l1-waveform-sandbox-handover.md](handover/2026-06-07-vme-l1-waveform-sandbox-handover.md) | Sandbox/shadow only; target Waveform Fast, Waveform, and Waveform Tempo; next valid step is fail-closed transport proof before hardware | [docs/forensics/vme_l1/2026-06-07-vmewt-transport-incident.md](forensics/vme_l1/2026-06-07-vmewt-transport-incident.md), [docs/forensics/2026-05-26-level1-visual-memory-engine-sandbox-plan.md](forensics/2026-05-26-level1-visual-memory-engine-sandbox-plan.md), [docs/architecture/visual-event-bus-stage-2-proposal-v0.1.md](architecture/visual-event-bus-stage-2-proposal-v0.1.md) |
 | Dense Forge closeout | [docs/handover/2026-06-07-dense-forge-closeout.md](handover/2026-06-07-dense-forge-closeout.md) | Source committed + exact `a5ce32e` flashed to 1401 and locked to mode 21; Captain eyes-on PASS was on repair build before exact-source reflash | [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-build.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-build.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-upload.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-upload.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-post-upload.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-post-upload.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-mode21-setup.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-mode21-setup.log) |

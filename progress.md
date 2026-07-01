@@ -1,7 +1,17 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** 2026-06-15 K1 production baseline accepted at `12800/96/d3` after measured calibration, paired AP/VP evidence, and Captain eyes-on; 16 kHz remains research-only. Effects-lane repair blockers from the 2026-06-11 Claude-memory recovery are closed in current source, and modes 24-27 have partial VP smoke evidence. Modes 28-29 are not covered by that smoke because playback was stopped by Captain instruction.
+**Current focus:** 2026-07-02 IM73D122 PDM mic graft (flag-gated, bench-only) is DONE, committed, host-gated GREEN, and device-proven end-to-end on bench `B489A500`; SPH0645 stays the byte-identical product default. Remaining acceptance: per-band AGC `:stream_agc` + Captain eyes-on A/B. See `.claude/handoff.md` and `docs/hardware/im73d122-graft-handover-2026-07-02.md`.
+
+## 2026-07-02 IM73D122 PDM Mic Graft (bench-only, flag-gated)
+
+- **Branch:** `lane/im73d-pdm-eval` (off `26eebb1`). **Flag:** `K1_MIC_IM73D_PDM_V1` — defined in EXACTLY ONE env: `[env:k1_bench_im73d]` (extends `k1_bench_reference`). SPH0645 (`i2s_std`) stays the byte-identical product default when the flag is OFF.
+- **Commits:** `545d331` (the graft, 11-point spec) + `c3584fa` (gain `K1_MIC_IM73D_INPUT_GAIN` 3.0→16.0) + `49b0393` (registry/device-proof). All flag-gated `#ifdef K1_MIC_IM73D_PDM_V1 … #else <verbatim SPH0645> … #endif` across 6 firmware files (i2s_audio.h, constants.h, globals.h, system.h, noise_cal.h, bridge_fs.h).
+- **Host gate GREEN:** pytest 619 pass / 1 skip; `pio run -e k1_bench_im73d` clean (RAM 32.8% / Flash 9.8%); flag-OFF byte-identity PROVEN for `k1_hardware` AND `k1_bench_reference` (identical section sizes + `.dram0`/`.iram0` SHAs; `.text`/`.rodata` churn is only `K1_BUILD_EPOCH`).
+- **Device-proven on bench `B489A500`:** boots; PDM RX reads the mic on the LIVE AP+VP (`onset`/`bass`/`bpm` firing, `lock=1`); boot force-invalidate `SSL=120 DC=0`, no NaN; gain `g=16` in-band (loud `max_raw` ~4339, non-railed); silence-go recal PASSED (`cal_valid=1 SSL=710 DC=-13`); failed-cal path restored `SSL=120` (fallback, not 0). NVS frozen under the flag → cal is RAM-only, re-cal each power-up.
+- **Remaining acceptance (both need Captain):** (1) per-band AGC `:stream_agc` all 4 gains <10; (2) eyes-on A/B vs SPH0645 across genres incl. VU modes.
+- **Do NOT bump `g=16`** (silence cals to `SSL=710`, top of valid `[50,720]`). Rollback = delete `[env:k1_bench_im73d]` + guard tuple line; `#ifdef` blocks are inert with the flag undefined.
+- **Authority docs:** `docs/hardware/im73d122-ap-vp-migration-plan.md` (canonical design) · `docs/hardware/im73d122-graft-handover-2026-07-02.md` (session handover + 7 gotchas) · `docs/hardware/device-build-registry.md` (deployed-state table, bench row).
 
 ## 2026-06-21 AP Measurement-Honesty Lane (Chapter-6 DFT/STFT)
 
