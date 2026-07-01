@@ -117,3 +117,26 @@ def test_on_determinism():
     a = agc.capture(perband=True)
     b = agc.capture(perband=True)
     assert a == b, "ON capture is non-deterministic across runs"
+
+
+def test_on_im73d_domain_gains_in_operating_range():
+    """Per-band AGC stays in a healthy operating range under the IM73D post-extraction
+    amplitude domain (g=16, loud max_raw ~4339). This is the host-side portion of
+    acceptance item #1: `:stream_agc` all 4 gains must be < 10 and not starving at
+    the 0.1 floor. The treble peak is scaled proportionally from the SPH stimulus
+    (1000 ~= 1200 * 4339/5000)."""
+    im73d = agc.frames(perband=True, stimulus=agc.STIMULUS_IM73D)
+    loud = im73d[-1]
+    assert loud["load"] >= 0.99, "driver contract: last frame is loudest"
+
+    for b, g in enumerate(loud["g"]):
+        assert 0.1 <= g <= 9.5, (
+            f"IM73D-domain band {b} gain outside healthy operating range [0.1, 9.5]: "
+            f"{g:.5f} at loud frame (gains={loud['g']})"
+        )
+
+    spread = max(loud["g"]) - min(loud["g"])
+    assert spread > 0.3, (
+        f"per-band AGC not engaged in IM73D domain: gains ~uniform at loud frame "
+        f"(gains={loud['g']} spread={spread:.5f})"
+    )

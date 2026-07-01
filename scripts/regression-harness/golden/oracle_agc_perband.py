@@ -49,6 +49,18 @@ NAME = "agc_perband"
 BASE_DEFINES = list(_g.DEFINES)
 PERBAND_DEFINE = "SB_AGC_PERBAND_V1"
 
+# Stimulus amplitude domains. SPH (default, unchanged) is the original N6
+# two-tone stimulus: broadband BASS+LOW_MID+HIGH_MID ramps to 5000, constant
+# quiet TREBLE tonal peak at 1200. IM73D matches the bench-proven post-extraction
+# amplitude for g=16 (loud max_raw ~4339, non-railed) and scales the treble
+# peak proportionally.
+STIMULUS_SPH = "sph"
+STIMULUS_IM73D = "im73d"
+STIMULUS_PARAMS = {
+    STIMULUS_SPH: (5000.0, 1200.0),   # (BROAD_MAX, TONAL_AMP)
+    STIMULUS_IM73D: (4339.0, 1000.0),  # device-proven loud max, scaled quiet treble
+}
+
 # ---------------------------------------------------------------------------
 # C++ driver. Self-contained: the 5 cross-TU cal/flash no-op stubs, a VERBATIM
 # lift of precompute_goertzel_constants() (int32 path) + the spectral-tilt LUT
@@ -153,8 +165,8 @@ int main() {
   const double wb2       = 2.0 * M_PI *  420.0 / 12800.0;  // BAND_LOW_MID
   const double wb3       = 2.0 * M_PI * 1500.0 / 12800.0;  // BAND_HIGH_MID
   const double wt        = 2.0 * M_PI * 5000.0 / 12800.0;  // BAND_TREBLE (tonal peak)
-  const double BROAD_MAX = 5000.0;  // per broadband tone at full loudness
-  const double TONAL_AMP = 1200.0;  // constant quiet treble peak
+  const double BROAD_MAX = __BROAD_MAX__;  // per broadband tone at full loudness
+  const double TONAL_AMP = __TONAL_AMP__;  // constant quiet treble peak
 
   for (int f = 0; f < TOTAL; f++) {
     const double load = (f < WARMUP) ? 0.0
@@ -200,10 +212,17 @@ int main() {
 """
 
 
-def _compile(workdir: Path, perband: bool) -> Path:
+def _compile(workdir: Path, perband: bool, stimulus: str = STIMULUS_SPH) -> Path:
+    if stimulus not in STIMULUS_PARAMS:
+        raise ValueError(f"unknown stimulus {stimulus!r}; expected one of {list(STIMULUS_PARAMS)}")
+    broad_max, tonal_amp = STIMULUS_PARAMS[stimulus]
+
     fw = _g.FIRMWARE
     main_cpp = workdir / "oracle_agc_perband_driver.cpp"
-    main_cpp.write_text(DRIVER, encoding="utf-8")
+    main_cpp.write_text(
+        DRIVER.replace("__BROAD_MAX__", str(broad_max)).replace("__TONAL_AMP__", str(tonal_amp)),
+        encoding="utf-8",
+    )
     binary = workdir / "oracle_agc_perband_bin"
 
     cc = _g._detect_compiler()
@@ -241,17 +260,17 @@ def _run(binary: Path) -> str:
     return r.stdout
 
 
-def capture(perband: bool = False, firmware_root=None) -> str:
+def capture(perband: bool = False, firmware_root=None, stimulus: str = STIMULUS_SPH) -> str:
     """Compile + run the AGC characterisation driver. perband toggles the flag."""
     with tempfile.TemporaryDirectory(prefix="oracle_agc_perband_") as td:
-        binary = _compile(Path(td), perband=perband)
+        binary = _compile(Path(td), perband=perband, stimulus=stimulus)
         return _run(binary)
 
 
-def frames(perband: bool = False) -> list:
+def frames(perband: bool = False, stimulus: str = STIMULUS_SPH) -> list:
     """Parsed per-frame records. Floats kept as strings in JSON -> cast here."""
     out = []
-    for line in capture(perband=perband).splitlines():
+    for line in capture(perband=perband, stimulus=stimulus).splitlines():
         line = line.strip()
         if not line:
             continue
