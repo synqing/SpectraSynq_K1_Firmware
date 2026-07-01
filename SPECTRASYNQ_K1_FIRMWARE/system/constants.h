@@ -51,7 +51,9 @@
 // band. RETUNE on bench: G_next = G_current × target_peak / observed_peak (discard clipped/
 // trimmed runs). NOT a guess — locked from the Stage-0 SPH0645 baseline.
 #ifndef K1_MIC_IM73D_INPUT_GAIN
-#define K1_MIC_IM73D_INPUT_GAIN 3.0f
+// Bench-characterized 2026-07-02: G_next = 3.0 * (SPH target ~7000 / IM73D obs 1317) ~= 16.
+// 1317 was a clean run (input_trim=1.0, non-railed); 16 lands ~7000 << 28000 near-rail.
+#define K1_MIC_IM73D_INPUT_GAIN 16.0f
 #endif
 #endif
 
