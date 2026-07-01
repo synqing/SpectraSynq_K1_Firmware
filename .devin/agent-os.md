@@ -230,4 +230,58 @@ on a decision task is a visible process bug, not a silent one.
 
 ---
 
+## 15. Skill, tool & specialist awareness
+
+There is a large inventory of skills, tools, MCP servers, and specialist agents
+available. The problem is not "agents don't know they exist" — the inventories
+are already visible in the session. The problem is scanning them at the right
+moment without over-invoking. This is a narrow gate, not a ritual.
+
+### Task-intake ritual
+
+Before acting on any task, run this scan in order:
+
+1. **Keyword scan `available_skills`** (cheap, always do this). Match task
+   keywords against skill titles. If a skill title clearly fits the task
+   domain, invoke it.
+2. **If the task is complex or multi-domain** → invoke `/discover-specialists`
+   and check `.claude/agents/*.md` for a specialist whose scope matches. A
+   specialist subagent often beats a general agent on its domain.
+3. **If no installed skill covers the task** → invoke `/find-skills`
+   (`npx skills find <query>`) to search the open skills ecosystem. Do NOT
+   invoke this for tasks covered by installed skills — it is for gaps.
+4. **If the task needs an external service** (GitHub, Linear, Slack, browser,
+   database, etc.) → scan the MCP server list in the system prompt and call
+   `mcp_list_tools` on the matching server before using its tools.
+
+Mechanical execution against a clear spec: do step 1 only, then proceed. Do
+not invoke specialists, find-skills, or MCP tools "to be safe."
+
+### Inventory cost table
+
+| Inventory | Already visible? | Cost to check | When to check |
+|-----------|------------------|---------------|---------------|
+| Installed skills (`available_skills`) | Yes (system prompt) | ~0 (scan titles) | Every task — keyword scan |
+| Installed specialists (`.claude/agents/*.md`) | No | One `/discover-specialists` call | Complex / multi-domain tasks |
+| Discoverable skills (skills.sh) | No | One `npx skills find` call | Only when installed skills don't cover the task |
+| MCP servers | Yes (system prompt) | ~0 (scan list) + `mcp_list_tools` | When the task needs an external service |
+
+### Failure modes to avoid
+
+- **Tragedy of the commons:** do not invoke every inventory "to be safe."
+  Over-invocation burns tokens and produces ritual noise. The gate is narrow.
+- **Shifting the burden:** invoking a skill does not certify the answer. The
+  post-session report still needs proof.
+- **Map-territory:** skill descriptions are the map; the agent's judgment is
+  the territory. A skill that sounds like a fit may not be — read its actual
+  scope before leaning on it.
+- **Skipping the scan on complex tasks:** if a complex task reports
+  `skills_used: none` and an obvious skill fit existed, that is a visible
+  process bug caught by the post-session report.
+
+The post-session report includes `skills_used` and `specialists_used` fields so
+skipped-scans on tasks that needed them are visible, not silent.
+
+---
+
 Last updated: 2026-07-02
