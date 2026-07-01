@@ -3,7 +3,7 @@ name: test-engineer
 description: |
   Regression harness and diagnostics — expands pytest host validation, VPAB replay fixtures, onset/beat/chord metrics, and offline effect validation without device.
   Use when: writing new pytest tests, debugging failing harness gates, adding VPAB replay fixtures, validating DSP metric regressions, expanding onset/beat/chord/tempo coverage, auditing instrumentation boundary compliance.
-tools: Read, Edit, Write, Glob, Grep, Bash, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_search, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__timeline
+tools: Read, Edit, Write, Glob, Grep, Bash, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__timeline
 model: sonnet
 skills: k1-firmware-change-gate, ssa-management, python, pytest, numpy, scipy, pandas, plotly, matplotlib, jupyter, cpp
 ---
@@ -55,7 +55,7 @@ notebooks/
   audio_semantic_diagnostics.ipynb # DSP analysis and diagnostics
   diag_helpers.py                  # Shared notebook helpers
 
-SENSORY_BRIDGE_FIRMWARE/audio/
+SPECTRASYNQ_K1_FIRMWARE/audio/
   sb_tempo.cpp/.h                  # Beat tracking, PLL flywheel, periodicity
   sb_onset_beat.cpp/.h             # Per-band onset, log-flux
   sb_audio_snapshot.cpp/.h         # AudioSemanticState publish

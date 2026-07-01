@@ -37,6 +37,12 @@ venv/
 graphify-out/
 .graphifyignore
 
+# Devin agent state — local config + generated run outputs only.
+# .devin/agent-os.md and scripts/agent/*.sh ARE tracked.
+.devin/config.local.json
+.devin/last-bootstrap.json
+.devin/repo-truth-report.json
+
 # Scratch / working space — ephemeral, clean up when done
 _scratch/
 __probe.txt
