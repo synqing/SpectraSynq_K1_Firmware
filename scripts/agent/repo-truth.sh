@@ -23,12 +23,13 @@ OVERALL="PASS"
 REASONS=""
 
 warn() {
-  OVERALL="WARN"
+  # WARN must never downgrade an existing FAIL (FAIL is the higher severity).
+  if [ "$OVERALL" = "PASS" ]; then OVERALL="WARN"; fi
   REASONS="${REASONS}WARN: $1\n"
 }
 
 fail() {
-  if [ "$OVERALL" != "FAIL" ]; then OVERALL="FAIL"; fi
+  OVERALL="FAIL"
   REASONS="${REASONS}FAIL: $1\n"
 }
 

@@ -12,6 +12,12 @@ At the start of every session, run:
 bash scripts/agent/session-bootstrap.sh
 ```
 
+The bootstrap runs `scripts/agent/repo-truth.sh` as a pre-session gate:
+
+- **FAIL** (lane-integrity problem: missing IM73D env/guard/plan) → bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
+- **WARN** (stale docs that do not misroute the lane) → bootstrap continues and prints the warnings.
+- **PASS** → bootstrap continues normally.
+
 Then read this file and the files it flags as current. Do not proceed until you know:
 
 - current branch
@@ -126,30 +132,10 @@ For visual-only changes, host-green is sufficient; device eyes-on is a tracked n
 
 ## 10. Handoff / report template
 
-End every session with:
-
-```text
-## Session Handoff
-
-### Files changed
-- file1: reason
-
-### Commands run
-- command: result
-
-### Validation
-- pytest: pass/fail
-- build: pass/fail
-
-### Evidence
-- paths to logs / manifests / captures
-
-### Blockers
-- none, or specific unresolved issue
-
-### Next step
-- exact recommended action
-```
+End every session with `scripts/agent/post-session-report.md`. Fill the fields:
+session objective, branch/HEAD at start and end, files changed, commands run,
+validation results, evidence captured, blockers, generated files intentionally
+ignored, safety constraints respected, next recommended action.
 
 ---
 
@@ -178,6 +164,27 @@ If a gate or build fails, capture:
 ### Next action
 - narrow investigation or fix
 ```
+
+---
+
+## 12. Subagent dispatch
+
+Before dispatching any subagent, fill `scripts/agent/subagent-dispatch-template.md`.
+Every delegated task is classified `load-bearing` or `optional` before launch.
+Load-bearing tasks cannot be downgraded after launch. Stuck-agent recovery is
+mandatory: one bounded retry, then fallback. No indefinite polling. Any final
+answer that used delegated evidence must include a synthesis ledger.
+
+---
+
+## 13. Devin environment setup
+
+The future Devin git-backed blueprint lives at `.devin/blueprint.yaml`. It is a
+knowledge-only draft: it documents the repo's safe-command surface and does not
+install speculative packages, call sync/build APIs, or configure hardware
+access. Sync + build are triggered separately via Devin API/UI after the file
+is committed to the default branch. Do not create `.devin/config.json` (shared
+project policy) without explicit approval.
 
 ---
 

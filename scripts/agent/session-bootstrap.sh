@@ -62,6 +62,24 @@ HANDOFF_MTIME="$(file_mtime "$REPO_ROOT/.claude/handoff.md")"
 PROGRESS_MTIME="$(file_mtime "$REPO_ROOT/progress.md")"
 SPEC_MTIME="$(file_mtime "$REPO_ROOT/docs/spec-index.md")"
 
+# Pre-session gate: run repo-truth.sh and apply its classification.
+# repo-truth.sh OWNS classification (PASS/WARN/FAIL); bootstrap OWNS exit policy.
+# FAIL = lane-integrity problem (missing env/guard/plan) -> exit nonzero.
+# WARN = stale docs that do not misroute the lane -> continue, print warnings.
+# PASS = clean -> continue.
+TRUTH_OUTPUT=""
+REPO_TRUTH_OVERALL="unknown"
+REPO_TRUTH_WARNINGS=""
+TRUTH_SCRIPT="$REPO_ROOT/scripts/agent/repo-truth.sh"
+if [ -x "$TRUTH_SCRIPT" ]; then
+  TRUTH_OUTPUT="$(bash "$TRUTH_SCRIPT" 2>/dev/null || true)"
+  REPO_TRUTH_OVERALL="$(printf '%s\n' "$TRUTH_OUTPUT" | sed -n 's/^[[:space:]]*OVERALL[[:space:]]*:[[:space:]]*//p' | tail -1 | tr -d '[:space:]')"
+  REPO_TRUTH_WARNINGS="$(printf '%s\n' "$TRUTH_OUTPUT" | sed -n 's/^WARN: //p')"
+  [ -z "$REPO_TRUTH_OVERALL" ] && REPO_TRUTH_OVERALL="unknown"
+else
+  REPO_TRUTH_OVERALL="missing-script"
+fi
+
 # Human-readable summary.
 echo ""
 echo "══════════════════════════════════════════════════════════════════"
@@ -80,6 +98,12 @@ echo "  claude-mem   : $MEM_STATUS"
 echo "  handoff.md   : $HANDOFF_MTIME"
 echo "  progress.md  : $PROGRESS_MTIME"
 echo "  spec-index   : $SPEC_MTIME"
+echo "  repo-truth   : $REPO_TRUTH_OVERALL"
+if [ "$REPO_TRUTH_OVERALL" = "WARN" ] && [ -n "$REPO_TRUTH_WARNINGS" ]; then
+  printf '%s\n' "$REPO_TRUTH_WARNINGS" | while IFS= read -r line; do
+    [ -n "$line" ] && echo "    WARN: $line"
+  done
+fi
 echo "══════════════════════════════════════════════════════════════════"
 echo ""
 
@@ -101,8 +125,17 @@ mkdir -p "$REPO_ROOT/.devin"
   echo "  \"claude_mem_status\": \"$MEM_STATUS\","
   echo "  \"handoff_mtime\": \"$HANDOFF_MTIME\","
   echo "  \"progress_mtime\": \"$PROGRESS_MTIME\","
-  echo "  \"spec_index_mtime\": \"$SPEC_MTIME\""
+  echo "  \"spec_index_mtime\": \"$SPEC_MTIME\","
+  echo "  \"repo_truth_overall\": \"$REPO_TRUTH_OVERALL\""
   echo "}"
 } > "$REPO_ROOT/.devin/last-bootstrap.json"
+
+# Exit policy: FAIL is fatal. WARN and PASS continue. claude-mem unavailability
+# is never fatal (it is supporting context only, never source of truth).
+if [ "$REPO_TRUTH_OVERALL" = "FAIL" ]; then
+  echo "FATAL: repo-truth.sh reports FAIL — lane-integrity problem detected." >&2
+  echo "       Resolve before proceeding. Run: bash scripts/agent/repo-truth.sh" >&2
+  exit 1
+fi
 
 exit 0
