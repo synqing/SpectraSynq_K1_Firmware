@@ -59,6 +59,17 @@ SUBCOMMANDS
   compare        N OFF-runs vs N ON-runs -> verdict table + JSON
   protocol       print the interleaved ABAB runbook (flashing stays manual)
 
+VALIDITY ADMISSION (harness-hardening, see admit_capture + gate0_selftest.py)
+  A capture must PASS admission before it can be compared. Gates (validity only,
+  NOT pass/fail thresholds): U1 non-resetting serial open (DTR/RTS low before
+  open — never pulse the S3 USB-JTAG reset); U3 app-ready ([AP] stream before
+  afplay, else abort INVALID pre-playback); U4 AP-sample floor; U5 metric
+  completeness; U6 DOWNLOAD-mode / identity-probe / reset reject; U7 post-run
+  liveness re-probe. `run` stamps an `admission` verdict into each JSON; `compare`
+  returns INVALID (exit 2) — never PASS/FAIL — if ANY input capture failed
+  admission. These close the cb1 (DOWNLOAD-reset) / cb2 (USB-wedge) silent-admit
+  holes. Prove fault-evidence: `python3 gate0_selftest.py` (Gate 0).
+
 STIMULUS (deterministic, numpy-generated)
   48000 Hz mono 16-bit WAV, 90 s, peak amplitude 0.7 FS (~-3.1 dBFS):
     - 120 BPM kick (60 Hz decaying burst) + click (2 kHz, 6 ms) every 0.5 s
@@ -249,6 +260,157 @@ def is_crash_marker(payload: str) -> bool:
 
 def is_garbage(payload: str) -> bool:
     return "�" in payload
+
+
+# ---------------------------------------------------------------------------
+# VALIDITY ADMISSION GATES  (harness-hardening pass — pinned by
+# fixtures/bad-captures/ + gate0_selftest.py)
+#
+# These decide whether a capture is even ELIGIBLE to be compared. They are NOT
+# the pre-registered pass/fail thresholds above (those are unchanged) — a
+# capture that fails admission NEVER enters compare(). Root cause they close:
+# the bench's serial open / reflash cycling drove the ESP32-S3 native USB-JTAG
+# into DOWNLOAD-mode resets (cb1 off_2: 36 AP samples + ROM-reset markers) and a
+# full USB wedge (cb2: identity probe failed, 0 samples, peak_scaled=None). The
+# un-hardened compare() emitted FAIL / INCOMPLETE verdicts from those corrupted
+# captures — laundering a host/USB fault into a pipeline-health verdict.
+#
+# No single gate catches everything (cb1 has crash markers but cb2 does not;
+# cb2 is caught by failure/identity/floor/completeness) — the gates are
+# deliberately orthogonal and only widen, never relax.
+# ---------------------------------------------------------------------------
+MIN_AP_SAMPLES = 80          # U4: ~90 s @ ~1 Hz -> 94-102 valid; floor rejects truncated/reset-shortened
+MAX_GARBAGE_FRAC = 0.05      # serial-corruption ceiling (fraction of total lines)
+DOWNLOAD_MARKERS = ("DOWNLOAD(USB/UART0)", "waiting for download")  # S3 native-USB-JTAG reset signature
+
+
+def _app_ready_before_afplay(log_text: str) -> bool:
+    """U3 (post-hoc): a live app streams an [AP] line BEFORE the stimulus starts.
+
+    NB: the handover's assumed 'RUNTIME_TIMING_GUARD' ready-marker is NOT emitted
+    by this firmware (verified absent in the real captures); the [AP] stream IS
+    the observed readiness signal. Returns False if afplay was reached with no
+    prior [AP], or if the capture never reached playback at all.
+    """
+    ap_seen = False
+    for raw_line in log_text.splitlines():
+        _, payload = split_host_line(raw_line)
+        if "#AFPLAY_START" in payload:
+            return ap_seen
+        if "[AP]" in payload and not payload.startswith(">>>"):
+            ap_seen = True
+    return False
+
+
+def admit_capture(
+    payload: dict[str, Any],
+    *,
+    min_ap_samples: int = MIN_AP_SAMPLES,
+    expected_chip_id: str = DEFAULT_CHIP_ID,
+    log_text: str | None = None,
+) -> dict[str, Any]:
+    """Validity admission for ONE capture payload.
+
+    Returns {'admitted': bool, 'reasons': [str]}. Pure/deterministic; the Gate-0
+    fault-injection suite in fixtures/bad-captures/ pins this against the real
+    cb1/cb2 bad captures + synthetic edge cases. log_text (the run's serial log) enables the
+    U3 app-ready and U6 DOWNLOAD-marker checks; omit it for JSON-only admission
+    (the metric-derived gates still reject every real bad capture).
+    """
+    # A corrupt capture is not always a dict (a truncated/garbage file may decode
+    # to a list/str/None). Reject it as malformed rather than crash — a crashing
+    # oracle is worse than a silent-admitting one.
+    if not isinstance(payload, dict):
+        return {"admitted": False, "reasons": ["MALFORMED: capture is not a JSON object (got %s)" % type(payload).__name__]}
+    reasons: list[str] = []
+    metrics = payload.get("metrics") or {}
+
+    # U6 — capture raised (identity probe / serial / afplay setup failure)
+    if payload.get("failure"):
+        reasons.append("FAILURE: capture raised: %s" % payload["failure"])
+
+    # U6 — identity / wrong-device / probe failure
+    chip = ((payload.get("identity") or {}).get("chip_id") or "").upper()
+    if not chip:
+        reasons.append("IDENTITY: no chip_id (identity probe failed / device off-bus)")
+    elif expected_chip_id and chip != expected_chip_id.upper():
+        reasons.append("IDENTITY: wrong device chip_id=%s expected=%s" % (chip, expected_chip_id.upper()))
+
+    # U4 — AP sample-count floor (truncated / reset-shortened capture)
+    samples = (metrics.get("ap_cadence") or {}).get("samples")
+    if not isinstance(samples, int) or samples < min_ap_samples:
+        reasons.append("AP_FLOOR: ap_cadence.samples=%s < %d" % (samples, min_ap_samples))
+
+    # U6 — reboot / DOWNLOAD-mode reset DURING capture
+    crashes = metrics.get("crash_markers")
+    if isinstance(crashes, int) and crashes > 0:
+        reasons.append("RESET: crash_markers=%d (device reset / ROM log mid-capture)" % crashes)
+    if log_text:
+        for marker in DOWNLOAD_MARKERS:
+            if marker in log_text:
+                reasons.append("DOWNLOAD: '%s' in capture log (USB-JTAG reset to download mode)" % marker)
+                break
+
+    # U5 — metric completeness (a real run yields ALL core metrics)
+    if (metrics.get("peak_scaled") or {}).get("mean") is None:
+        reasons.append("COMPLETENESS: peak_scaled.mean is None")
+    render = metrics.get("render") or {}
+    if render.get("p95_us") is None or render.get("surface") is None:
+        reasons.append("COMPLETENESS: no render surface (VPF/[VP]) parsed")
+    if (metrics.get("beat") or {}).get("lock_ratio_active") is None:
+        reasons.append("COMPLETENESS: beat.lock_ratio_active is None")
+    if (metrics.get("ap_cadence") or {}).get("p95_jitter_ms") is None:
+        reasons.append("COMPLETENESS: ap_cadence.p95_jitter_ms is None")
+
+    # serial-corruption ceiling
+    total_lines = metrics.get("lines_total") or 0
+    garbage = metrics.get("garbage_lines") or 0
+    if total_lines and (garbage / total_lines) > MAX_GARBAGE_FRAC:
+        reasons.append("GARBAGE: %d/%d lines corrupt > %.0f%%" % (garbage, total_lines, MAX_GARBAGE_FRAC * 100))
+
+    # U3 — app-ready-before-afplay (requires the serial log)
+    if log_text is not None and not _app_ready_before_afplay(log_text):
+        reasons.append("APP_READY: no [AP] stream observed before afplay start")
+
+    # U7 — post-run liveness (run path stamps post_run_alive; legacy captures omit it)
+    if payload.get("post_run_alive") is False:
+        reasons.append("LIVENESS: device unreachable after run")
+
+    return {"admitted": not reasons, "reasons": reasons}
+
+
+def load_admitted_runs(
+    paths: list[str], *, expected_chip_id: str
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Load capture JSONs, admit each, return (admitted_metrics, rejected). A
+    capture's raw_log is read for the U3/U6 log gates when it still exists."""
+    admitted: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for raw in paths:
+        # The capture FILE itself must be readable + well-formed. A truncated /
+        # non-JSON / non-object file is a corrupt capture (the cb1/cb2 fault class
+        # produces exactly these) — reject it, never crash the whole comparison.
+        try:
+            payload = json.loads(Path(raw).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            rejected.append({"file": raw, "reasons": ["UNREADABLE: missing or not valid JSON: %s" % exc]})
+            continue
+        if not isinstance(payload, dict):
+            rejected.append({"file": raw, "reasons": ["MALFORMED: capture is not a JSON object (got %s)" % type(payload).__name__]})
+            continue
+        log_text: str | None = None
+        log_path = payload.get("raw_log")
+        if log_path and Path(log_path).exists():
+            try:
+                log_text = Path(log_path).read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                log_text = None
+        verdict = admit_capture(payload, expected_chip_id=expected_chip_id, log_text=log_text)
+        if verdict["admitted"]:
+            admitted.append(payload.get("metrics", payload))
+        else:
+            rejected.append({"file": raw, "reasons": verdict["reasons"]})
+    return admitted, rejected
 
 
 # ---------------------------------------------------------------------------
@@ -684,14 +846,44 @@ class CaptureSession:
         self.ser = None
 
     def open(self) -> None:
-        self.ser = serial.Serial(
-            self.port, self.baud, timeout=0.05, write_timeout=0.5,
-            dsrdtr=False, rtscts=False, xonxoff=False,
-        )
+        # U1 — NON-RESETTING open. Build the port unopened and force DTR/RTS LOW
+        # *before* open() so the native USB-JTAG auto-reset line is never pulsed.
+        # Opening with pyserial's default (DTR/RTS asserted) is what dropped the
+        # ESP32-S3 into DOWNLOAD mode mid-capture (cb1 off_2). dsrdtr=False alone
+        # only disables HW flow control; it does NOT hold the lines low. Mirrors
+        # scripts mon.py, the known-good non-resetting monitor.
+        ser = serial.Serial()
+        ser.port = self.port
+        ser.baudrate = self.baud
+        ser.timeout = 0.05
+        ser.write_timeout = 0.5
+        ser.dsrdtr = False
+        ser.rtscts = False
+        ser.xonxoff = False
+        ser.dtr = False
+        ser.rts = False
+        ser.open()
+        self.ser = ser
         time.sleep(2.0)
-        self.ser.reset_input_buffer()
+        try:
+            self.ser.reset_input_buffer()
+        except OSError:  # pragma: no cover - hardware path
+            pass
         self._thread = threading.Thread(target=self._read_loop, daemon=True)
         self._thread.start()
+
+    def wait_for_ap(self, timeout: float = 8.0) -> bool:
+        """U3 — block until a parseable [AP] line is seen (app is streaming) or
+        timeout. Used to gate afplay: no [AP] within the window => abort the run
+        as INVALID BEFORE audio playback (never measure a dead/booting device)."""
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            for raw_line in self.snapshot_lines():
+                _, payload = split_host_line(raw_line)
+                if "[AP]" in payload and not payload.startswith(">>>"):
+                    return True
+            time.sleep(0.1)
+        return False
 
     def _read_loop(self) -> None:
         while not self._stop.is_set():
@@ -775,6 +967,8 @@ def run_condition_capture(args: argparse.Namespace) -> Path:
     afplay: subprocess.Popen | None = None
     failure: str | None = None
     identity: dict[str, str | None] = {}
+    post_run_alive: bool | None = None      # U7 — set by the post-run liveness probe
+    capture_lines: list[str] | None = None  # metrics window (snapshot before liveness probe)
     started_at = datetime.now().isoformat()
     try:
         session.open()
@@ -793,6 +987,15 @@ def run_condition_capture(args: argparse.Namespace) -> Path:
         assert_command_plan_is_safe(start_commands)
         for command in start_commands:
             session.send(command, settle=0.30)
+
+        # U3 — APP_READY gate: require the [AP] stream to be live before we play
+        # the stimulus. If the device is dead/booting/wedged, abort INVALID
+        # BEFORE audio playback rather than measure a corpse.
+        if not session.wait_for_ap(args.app_ready_timeout):
+            raise RuntimeError(
+                "APP_READY gate: no [AP] stream within %.1fs after :ap_stream=on — "
+                "aborting INVALID before audio playback" % args.app_ready_timeout
+            )
 
         afplay = subprocess.Popen(
             ["afplay", str(stimulus)],
@@ -829,6 +1032,20 @@ def run_condition_capture(args: argparse.Namespace) -> Path:
         assert_command_plan_is_safe(stop_commands)
         for command in stop_commands:
             session.send(command, settle=0.35)
+
+        # Freeze the metrics window here, BEFORE the liveness probe appends its
+        # own :version/:chip_id echoes to the log.
+        capture_lines = session.snapshot_lines()
+
+        # U7 — post-run liveness: re-probe identity. If the device wedged/rebooted
+        # during the run it is unreachable now; mark the run (and any sequence it
+        # belongs to) INVALID.
+        try:
+            session.verify_identity(args.chip_id)
+            post_run_alive = True
+        except Exception as live_exc:  # noqa: BLE001 - any failure means not-alive
+            post_run_alive = False
+            session.mark("#POST_RUN_LIVENESS_FAIL %s" % live_exc)
     except Exception as exc:
         failure = "%s: %s" % (type(exc).__name__, exc)
     finally:
@@ -837,11 +1054,12 @@ def run_condition_capture(args: argparse.Namespace) -> Path:
         session.close()
 
     lines = session.snapshot_lines()
+    metric_lines = capture_lines if capture_lines is not None else lines
     stem = "%s_%d" % (args.condition, args.index)
     log_path = out_dir / ("%s.log" % stem)
     log_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    metrics = compute_run_metrics(lines)
+    metrics = compute_run_metrics(metric_lines)
     payload = {
         "tool": "wireless_ab_bench",
         "condition": args.condition,
@@ -853,15 +1071,25 @@ def run_condition_capture(args: argparse.Namespace) -> Path:
         "started_at": started_at,
         "afplay_rc": afplay.returncode if afplay is not None else None,
         "failure": failure,
+        "post_run_alive": post_run_alive,
         "raw_log": str(log_path),
         "metrics": metrics,
         "doctrine_note": "Scalar symptom capture; not causal attribution (MabuTrace lane for causality).",
     }
+    # Stamp the validity-admission verdict INTO the capture so compare() (and any
+    # human) can see, per-run, whether this capture is eligible to be compared.
+    admission = admit_capture(
+        payload, expected_chip_id=args.chip_id, log_text="\n".join(lines)
+    )
+    payload["admission"] = admission
     json_path = out_dir / ("%s.json" % stem)
     json_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    if failure:
-        raise SystemExit("capture failed (artifacts kept at %s): %s" % (json_path, failure))
-    print("wrote %s" % json_path)
+    if not admission["admitted"]:
+        raise SystemExit(
+            "capture INVALID — failed validity admission (artifacts kept at %s):\n  - %s"
+            % (json_path, "\n  - ".join(admission["reasons"]))
+        )
+    print("wrote %s (ADMITTED)" % json_path)
     return json_path
 
 
@@ -938,11 +1166,16 @@ def main(argv: list[str] | None = None) -> int:
     p_run.add_argument("--no-configure", action="store_true", help="observational: no set_mode/smart_scene")
     p_run.add_argument("--no-vp-perf", action="store_true", help="skip :vp_perf commands")
     p_run.add_argument("--apcap-window-s", type=float, default=5.0, help="0 disables :ap_capture windows")
+    p_run.add_argument(
+        "--app-ready-timeout", type=float, default=8.0,
+        help="U3: seconds to wait for the [AP] stream before afplay; abort INVALID if exceeded",
+    )
 
     p_cmp = sub.add_parser("compare", help="N OFF runs vs N ON runs -> verdict")
     p_cmp.add_argument("--off", nargs="+", required=True, help="OFF-condition run JSON files")
     p_cmp.add_argument("--on", nargs="+", required=True, help="ON-condition run JSON files")
     p_cmp.add_argument("--json-out", default=None, help="optional path for the verdict JSON")
+    p_cmp.add_argument("--chip-id", default=DEFAULT_CHIP_ID, help="expected device chip_id for the identity admission gate")
 
     sub.add_parser("protocol", help="print the ABAB runbook")
 
@@ -958,14 +1191,41 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.cmd == "compare":
-        def load_metrics(paths: list[str]) -> list[dict[str, Any]]:
-            runs = []
-            for raw in paths:
-                payload = json.loads(Path(raw).read_text(encoding="utf-8"))
-                runs.append(payload.get("metrics", payload))
-            return runs
+        # VALIDITY ADMISSION FIRST. If ANY input capture fails admission, refuse
+        # to emit a PASS/FAIL — a verdict from corrupted data is the exact failure
+        # (cb1/cb2) this hardening exists to prevent. INVALID is distinct from
+        # FAIL: it means "infer nothing, fix the capture", not "the radio is bad".
+        off_runs, off_rejected = load_admitted_runs(args.off, expected_chip_id=args.chip_id)
+        on_runs, on_rejected = load_admitted_runs(args.on, expected_chip_id=args.chip_id)
+        rejected = off_rejected + on_rejected
+        if rejected:
+            report = {
+                "verdict": "INVALID",
+                "reason": (
+                    "%d capture(s) failed validity admission; refusing to emit a "
+                    "PASS/FAIL from corrupted data" % len(rejected)
+                ),
+                "rejected": rejected,
+                "n_off_admitted": len(off_runs),
+                "n_on_admitted": len(on_runs),
+                "doctrine_note": (
+                    "Validity-admission gate (harness-hardening). A capture that did "
+                    "not pass admission never enters the pre-registered threshold "
+                    "compare. INVALID => infer nothing, recapture; NOT a BLE/WiFi FAIL."
+                ),
+            }
+            print("OVERALL VERDICT: INVALID  — %d capture(s) failed validity admission:" % len(rejected))
+            for item in rejected:
+                print("  REJECT %s" % item["file"])
+                for reason in item["reasons"]:
+                    print("     - %s" % reason)
+            print(json.dumps(report, indent=2, sort_keys=True))
+            if args.json_out:
+                Path(args.json_out).parent.mkdir(parents=True, exist_ok=True)
+                Path(args.json_out).write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+            return 2  # INVALID (distinct from PASS=0 / FAIL=1)
 
-        result = compare_runs(load_metrics(args.off), load_metrics(args.on))
+        result = compare_runs(off_runs, on_runs)
         print(format_comparison_table(result))
         print(json.dumps(result, indent=2, sort_keys=True))
         if args.json_out:

@@ -99,6 +99,16 @@ class K1WirelessControlStaticTest(unittest.TestCase):
         self.assertIn('"start_noise_cal"', body)
         self.assertIn("calibration.noise.arm then calibration.noise.confirm", body)
 
+    def test_chroma_profile_apply_return_is_not_treated_as_failure(self):
+        body = self._function_body(self.facade, "sb_k1_control_apply")
+        start = body.index('strcmp(record.control, "global.chroma_profile")')
+        end = body.index('strcmp(record.control, "global.chromagram_range")', start)
+        branch = body[start:end]
+        self.assertIn("parse_index(record.number_value, 2, &profile)", branch)
+        self.assertIn("apply_chroma_profile(uint8_t(profile))", branch)
+        self.assertNotIn("!apply_chroma_profile", branch)
+        self.assertEqual(branch.count("Chroma profile out of range"), 1)
+
     def test_wireless_callbacks_only_enqueue_commands(self):
         handler = re.search(
             r"void\s+handle_ws_event\s*\([^)]*\)\s*\{(?P<body>.*?)\n\}",

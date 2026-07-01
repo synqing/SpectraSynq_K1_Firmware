@@ -55,6 +55,9 @@
 #ifdef SB_K1_WIRELESS_ENABLED
 #include "sb_k1_wireless.h"   // K1 AP-only WebSocket command ingress
 #endif
+#ifdef SB_K1_BLE_REMOTED
+#include "ble_remoted_central.h"  // Remoted dial BLE-MIDI central (gated; interference A/B)
+#endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"     // Harness-only final-byte evidence context
 #endif
@@ -669,6 +672,9 @@ void setup() {
 #ifdef SB_K1_WIRELESS_ENABLED
   sb_k1_wireless_begin();
 #endif
+#ifdef SB_K1_BLE_REMOTED
+  sb_k1_ble_remoted_begin();
+#endif
 
 #if ENABLE_FASTLED_COLOR_CORRECTION
   // Phase 1 Change 2: apply WS2812 channel correction globally (both strips)
@@ -802,6 +808,9 @@ void loop() {
   // Check if UART commands are available
 #ifdef SB_K1_WIRELESS_ENABLED
   sb_k1_wireless_poll(t_now);
+#endif
+#ifdef SB_K1_BLE_REMOTED
+  sb_k1_ble_remoted_poll(t_now);
 #endif
 
   function_id = 5;

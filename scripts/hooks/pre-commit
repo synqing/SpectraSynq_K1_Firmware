@@ -124,6 +124,15 @@ run_pytest() {
   say "  → python3 -m pytest tests/ -q"
   local out; out="$(python3 -m pytest tests/ -q 2>&1)"; local rc=$?
   printf '%s\n' "$out" | tail -4 >&2
+  # Fail-closed against a VACUOUS pass: trust rc=0 only if pytest actually
+  # reported >=1 passing test. Guards the observed class where a run exits 0
+  # while collecting nothing (e.g. "no tests collected" / "Pytest: No tests
+  # collected" under resource contention or an interpreter/-q quirk) — which
+  # would otherwise let the gate rubber-stamp a commit without running a test.
+  if [ "$rc" -eq 0 ] && ! printf '%s' "$out" | grep -Eq '[1-9][0-9]* passed'; then
+    say "  ✗ pytest exited 0 but reported no passing tests — refusing vacuous PASS (fail-closed)."
+    return 1
+  fi
   return $rc
 }
 

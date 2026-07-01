@@ -1,0 +1,17 @@
+# K1 per-unit NVS provisioning template — PLACEHOLDER (Captain decision D4 pending)
+#
+# The per-unit serial / SKU SCHEME IS UNDECIDED (decision D4). Every token and
+# value below is a PLACEHOLDER only. Do NOT treat the namespace name, the key
+# names, or any value format here as the final factory provisioning scheme — it
+# will change once D4 is decided. Until then this template exists so the tooling
+# (make_unit_nvs.py) can be exercised end-to-end without baking a real SKU format.
+#
+# Format is ESP-IDF nvs_partition_gen.py CSV: key,type,encoding,value
+# make_unit_nvs.py strips these comment lines, substitutes the __TOKEN__ fields
+# from its command-line arguments, and drops any optional row whose token is left
+# unset before handing a clean CSV to nvs_partition_gen.py.
+key,type,encoding,value
+k1factory,namespace,,
+device_serial,data,string,__DEVICE_SERIAL__
+sku,data,string,__SKU__
+calibration,data,string,__CALIBRATION__

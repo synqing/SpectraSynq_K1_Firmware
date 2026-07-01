@@ -153,3 +153,69 @@ pio run -e k1_hardware --target upload --upload-port /dev/cu.usbmodem12201
   --status-period-s 0 \
   --no-configure
 ```
+
+---
+
+## Update — 2026-06-30: device-proven at PRODUCTION 12.8k/96 (silent A/B) + promotion decision
+
+Timing gate run on the main K1 (`F887A500`, `/dev/cu.usbmodem2101`), `apcad_soak`
+20 s, 2667 frames each, **silent room — no audio stimulus** (the unconditional ACF
+is signal-independent, and silence is the exact regime the N2 freeze lived in):
+
+| ACF work-spreading | active p95 | active max | frames > 7500 µs |
+|---|---|---|---|
+| **OFF** — `k1_ap_frontend_probe` | **9088 µs** | 9504 µs | **889 / 2667 (33%)** |
+| **ON** — `k1_acf_probe` (16 lags/emit) | **6784 µs** | 7236 µs | **0 / 2667** |
+
+Spread-OFF confirms the over-budget loop in the freeze regime: one in three AP frames
+exceeds the 7.5 ms / 133 Hz budget (p95 9088 µs). Spread-ON moves the whole
+distribution under budget — zero overruns, p95 down 25 %. This is the root-cause cure
+for the pressure the N2 watchdog (`827d73a`) only catches. `SB_TEMPO_ACF_REFRESH_DECIMATION`
+kept at `1` per the tripwires above; p95 used for promotion proof, not mean.
+
+**Probe envs (lane `lane/acf-on-n2`, commit `b98509b`):** `k1_acf_probe` /
+`k1_bench_acf_probe` extend `k1_ap_frontend_probe` (the apcad surface is gated behind
+`ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG`, which only that family sets; it
+keeps the production 12.8k/96 regime via `k1_hardware_harness → k1_hardware`). The
+spread-OFF A/B baseline is `k1_ap_frontend_probe` itself.
+
+**Decision (project lead):** ACF work-spreading is **timing-validated and approved for
+production**. The default flip into `k1_hardware` is gated on the one check this plan
+already mandates — a fixed-stimulus tempo-quality probe (127 BPM click) — which needs
+Captain audio-source approval, since silence cannot validate beat tracking. Until that
+is green, shipping firmware stays product (no spread); the device is freeze-safe via the
+N2 watchdog net regardless. Promote behind a clean production flag, not the `_PROBE` flag.
+
+**Owed follow-up (Work Block):** `k1_upload_guard.py` has no chip-mapping for
+`k1_acf_probe` / `k1_agc_probe` — the guard logged `no K1 upload mapping enforced` on
+those flashes (the flash was still correct, port + MAC verified manually). Add the probe
+envs to the guard map so chip re-verification covers them too.
+
+---
+
+## Update — 2026-06-30 (SHIPPED): tempo-quality probe PASSED → promoted to production
+
+The gating tempo-quality probe ran on the main K1 (`F887A500`) under the
+Captain-approved 127 BPM click (`control_127bpm_click_44k1.wav`):
+
+| ACF spread | steady bpm lock | locked | conf |
+|---|---|---|---|
+| ON (`k1_acf_probe`) | **127.00** (median = min = max) | **100 %** | 0.987 |
+| OFF (`k1_ap_frontend_probe`) | 126 by t≈2 s, stream starved under load (~5 s) | — | ~0.96 |
+
+No beat-tracking degradation: the spread locks to the exact stimulus tempo and stays
+alive under load (the un-spread, over-budget leg actually starved its own tempo stream).
+**PROMOTED to `k1_hardware` production** via the clean `SB_TEMPO_ACF_SPREAD_V1` alias
+(product line `6880095`). Host-gated: `pio -e k1_hardware` build + golden master +
+Gate-0 self-test + full suite (580 passed / 1 skipped). Device-confirmed: flashed to the
+main K1 (MAC `b4:3a:45:a5:87:f8`), 25 s soak — **0 reboots, 0 crash markers**, config
+preserved. REVERT = delete one `-D` line. The "gated on tempo probe" status above is
+SUPERSEDED — the probe passed.
+
+---
+**Document Changelog**
+
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-06-30 | agent:claude-opus-4-8 | Appended device-proven silent A/B at production 12.8k/96 (OFF p95 9088 µs/889-over vs ON p95 6784 µs/0-over), promotion decision (timing-approved, default-flip gated on audio tempo-quality probe), env-base fix note, and upload-guard Work Block. |
+| 2026-06-30 | agent:claude-opus-4-8 | SHIPPED: tempo probe PASSED (127.00 lock, 100 %, conf 0.987); ACF spread promoted to k1_hardware production via SB_TEMPO_ACF_SPREAD_V1 (`6880095`); host-gated (580 pass) + device soak clean (0 reboots). |

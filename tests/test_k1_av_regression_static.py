@@ -221,7 +221,15 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn("if (sb_acf_refresh_now)", tempo)
         self.assertIn("production leaves the", tempo)
 
-    def test_16k_acf_spread_probe_is_non_shippable_env_only(self):
+    def test_acf_spread_promoted_to_production_device_proven(self):
+        # 2026-06-30: ACF work-spreading PROMOTED to production. The prior
+        # "non-shippable, probe-only" status was conditional on a fixed-stimulus
+        # tempo-quality probe (docs/forensics/2026-06-15-16k120-acf-work-spreading-
+        # plan.md). That probe PASSED on the main K1 (F887A500): silent A/B active
+        # p95 9088us->6784us, 889/2667 over-budget frames -> 0; 127 BPM click lock
+        # preserved 100% (conf 0.987). k1_hardware now opts in via the clean
+        # SB_TEMPO_ACF_SPREAD_V1 alias; source still defaults OFF absent the flag and
+        # the 16k probe-matrix envs are unchanged.
         tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp").read_text(encoding="utf-8")
         tempo_h = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.h").read_text(encoding="utf-8")
         serial = serial_command_surface()  # acf_spread= print moved to the extracted TU (S1)
@@ -256,6 +264,10 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn("-DSB_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH=1", platformio)
         self.assertIn("#define SB_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH 0", tempo)
         self.assertIn("#define SB_TEMPO_ACF_SPREAD_PROBE 0", tempo)
+        # Production promotion (2026-06-30, device-proven): k1_hardware opts in via
+        # the clean alias; the source default above stays OFF absent the flag.
+        self.assertIn("-DSB_TEMPO_ACF_SPREAD_V1=1", platformio)
+        self.assertIn("SB_TEMPO_ACF_SPREAD_V1", tempo)
         self.assertIn("sb_compute_acf_salience_spread", tempo)
         self.assertIn("sb_acf_spread_publish_pending", tempo)
         self.assertIn("if (!sb_acf_published_now)", tempo)

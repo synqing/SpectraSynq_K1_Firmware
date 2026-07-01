@@ -1053,6 +1053,15 @@ void serial_adjust_target_mode(int8_t delta) {
   }
 }
 
+#ifdef SB_K1_BLE_REMOTED
+// Confirmed committed light-show mode ordinal per channel — read by the gated BLE
+// Remoted central (network/ble_remoted_central.cpp) to feed the knob's on-screen
+// CONFIRMED mode display. Gated: exists only in the k1_ble_remoted_probe build.
+uint8_t sb_k1_confirmed_mode(bool secondary) {
+  return secondary ? SECONDARY_LIGHTSHOW_MODE : CONFIG.LIGHTSHOW_MODE;
+}
+#endif
+
 void serial_adjust_target_float(const char* name, float* primary_value, float* secondary_value, float primary_min, float secondary_min, float max_value, float step, uint8_t precision) {
   bool target_secondary = secondaryMode;
   float* value = target_secondary ? secondary_value : primary_value;
@@ -1854,11 +1863,47 @@ void cmd_version() {
   tx_end();
 }
 
+// Lane N5: serial-readable build provenance. One line that ties a running unit
+// back to the exact source it was built from — FIRMWARE_VERSION (coarse, shared
+// across commits) plus the git short hash, build epoch, and PlatformIO env that
+// scripts/platformio/k1_build_provenance.py stamps in at compile time. Each
+// define is guarded with an #ifdef + sane default so a build WITHOUT the
+// provenance pre-script (e.g. a bare host/IDE compile) still builds and answers.
+// Kept separate from cmd_version() on purpose: the `version` output is locked by
+// host goldens, so provenance gets its own `build` command rather than changing
+// the VERSION line.
+void cmd_build() {
+  tx_begin();
+  USBSerial.print("BUILD: version=");
+  USBSerial.print(FIRMWARE_VERSION);
+  USBSerial.print(" git=");
+#ifdef K1_BUILD_GIT_HASH
+  USBSerial.print(K1_BUILD_GIT_HASH);
+#else
+  USBSerial.print("unknown");
+#endif
+  USBSerial.print(" epoch=");
+#ifdef K1_BUILD_EPOCH
+  USBSerial.print((uint32_t)K1_BUILD_EPOCH);
+#else
+  USBSerial.print(0);
+#endif
+  USBSerial.print(" env=");
+#ifdef K1_BUILD_ENV
+  USBSerial.print(K1_BUILD_ENV);
+#else
+  USBSerial.print("unknown");
+#endif
+  USBSerial.println();
+  tx_end();
+}
+
 void cmd_help() {
   tx_begin();
   USBSerial.println("SENSORY BRIDGE - Serial Menu ------------------------------------------------------------------------------------");
   USBSerial.println();
   USBSerial.println("                                            v | Print firmware version number");
+  USBSerial.println("                                        build | Print build provenance (version + git hash + epoch + env)");
   USBSerial.println("                                        reset | Reboot Sensory Bridge");
   USBSerial.println("                          factory_reset CONFIRM | Delete configuration, including noise cal, reboot (CONFIRM required)");
   USBSerial.println("                       restore_defaults CONFIRM | Delete configuration, reboot (CONFIRM required)");
@@ -2057,6 +2102,21 @@ void cmd_chip_id() {
   print_chip_id();
   tx_end();
 }
+
+#if defined(K1_BOOTLOOP_GUARD_V1) && defined(K1_BOOTLOOP_INJECT)
+// N2b crash-streak DEVICE-PROOF ONLY. Deliberately triggers ESP_RST_PANIC via abort()
+// so the boot-loop guard counts a real crash (benign/USB/SW resets are not counted).
+// Gated to env:k1_bootloop_inject_probe — no shippable env defines K1_BOOTLOOP_INJECT,
+// so this command cannot exist in production. Typed-only, single-byte-forbidden.
+void cmd_bootloop_inject() {
+  tx_begin();
+  USBSerial.println("BOOTLOOP_INJECT: forcing ESP_RST_PANIC via abort() in 150ms (N2b proof)");
+  tx_end();
+  USBSerial.flush();
+  delay(150);
+  abort();  // -> panic handler -> ESP_RST_PANIC -> k1_bootloop_reason_is_crash()==1
+}
+#endif
 
 void cmd_identify() {
   ack();
