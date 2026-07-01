@@ -33,11 +33,24 @@
 bool k1_ota_begin(size_t total_size);
 
 // Stream a chunk into the active session. Returns true on success; on failure
-// the session is aborted.
+// the session is aborted. Every byte streamed here is also folded into a running
+// SHA-256 used for signature verification at k1_ota_end().
 bool k1_ota_write(const uint8_t* data, size_t len);
 
-// Finalise: validate the written image and set it as the boot partition.
-// Returns true on success — the caller is expected to reboot to run it.
+// Supply the detached image signature for the active session. This is an
+// RSA-3072 / PKCS#1 v1.5 signature over the SHA-256 of the exact image bytes
+// streamed via k1_ota_write(), produced offline by the operator's PRIVATE key
+// (e.g. `openssl dgst -sha256 -sign k1_ota_signing_PRIVATE.pem image.bin`).
+// len must equal the RSA modulus size (384 bytes for RSA-3072). Returns false if
+// no session is open or the length is out of range. Without a signature that
+// verifies against the embedded PUBLIC key, k1_ota_end() REFUSES the image.
+bool k1_ota_set_signature(const uint8_t* sig, size_t len);
+
+// Finalise: validate the written image AND verify its detached signature against
+// the embedded operator PUBLIC key. The boot partition is switched ONLY if the
+// signature verifies. Returns true on success — the caller is expected to reboot
+// to run it. Any unsigned, mis-signed, or tampered image is rejected here and the
+// session is aborted; the running image is untouched.
 bool k1_ota_end();
 
 // Abort the active session and release the handle.
