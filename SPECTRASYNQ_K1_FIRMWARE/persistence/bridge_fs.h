@@ -23,6 +23,13 @@ void update_config_filename(uint32_t input) {
 
 // Restore all defaults defined in globals.h by removing saved data and rebooting
 void factory_reset() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // NVS FROZEN for the IM73D PDM eval — this function DELETES the SPH0645
+  // config/noise_cal/cal_profile files, and with every save path frozen a
+  // deletion is unrecoverable. Not performed; no reboot.
+  USBSerial.println("[PDM eval] factory_reset ignored: SPH config/noise/cal profile frozen on disk");
+  return;
+#endif
   lock_leds();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);
@@ -60,6 +67,12 @@ void factory_reset() {
 
 // Restore only configuration defaults
 void restore_defaults() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // NVS FROZEN for the IM73D PDM eval — deleting the SPH0645 config file is
+  // unrecoverable while saves are frozen. Not performed; no reboot.
+  USBSerial.println("[PDM eval] restore_defaults ignored: SPH config frozen on disk");
+  return;
+#endif
   lock_leds();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);

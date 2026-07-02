@@ -417,6 +417,10 @@ void init_system() {
   init_sweet_spot();
   
   init_fs();
+  // PDM adjacency (load-bearing): init_fs() can transiently mark the STALE SPH cal
+  // valid (load_calibration_profile_if_config_invalid refreshes with CONFIG/PERSISTED
+  // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
+  // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
   enforce_compiled_audio_timing_config();
 
