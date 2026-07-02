@@ -21,7 +21,12 @@ safety_constraints:      <confirm: no upload, no flash, no erase, no serial-writ
 thinking_skill_used:     <skill name + one-line rationale, or "none — mechanical task">
 skills_used:             <skill names invoked, or "none — covered by default tools">
 specialists_used:        <specialist agent names dispatched, or "none">
-claude_mem_observations: <count + one-line summary of each, or "none — explain why">
+claude_mem_observations: <see policy below — do not claim a write you cannot retrieve>
+  # Claude Code / Codex / Cursor: recorded: <count> + one-line summary of each
+  # Devin (retrieval-only in worker mode):
+  #   retrieved: <summary of what was looked up>, OR "none — not relevant"
+  #   write_status: unavailable_in_worker_mode_for_devin
+  #   durable_handoff_written: yes/no + path (post-session-report / handoff.md / progress.md / spec-index.md / commit)
 next_recommended_action: <exact next step, or "await Captain decision: <decision>">
 ```
 

@@ -80,7 +80,7 @@ the next session understanding of what was previously done. A session that
 records nothing is a session the next agent cannot learn from. **Skipping
 observation recording is a process failure, not a shortcut.**
 
-### Retrieval (when starting a task)
+### Retrieval (all tools, when starting a task)
 
 - Always `search` → `timeline` → `get_observations` for prior work on the lane
   or task type before acting. Run multiple single-term queries (compound
@@ -90,7 +90,14 @@ observation recording is a process failure, not a shortcut.**
 - Never treat claude-mem as current lane truth — git + on-disk docs win for
   current state. Memory is for prior-session context and recurrence.
 
-### Recording (mandatory, not optional)
+### Recording — tool-split policy (load-bearing)
+
+`claude-mem` runs in **worker mode** (13.6.0). The write path is the
+**hook pipeline** (`PostToolUse` / `Stop` hooks in `~/.claude/hooks/`), which
+fires for **Claude Code, Codex, and Cursor** — NOT for Devin. This is an
+architectural fact of worker mode, not a wiring bug.
+
+**Claude Code / Codex / Cursor (write-capable):**
 
 Record a `claude-mem` observation at each of these moments:
 
@@ -104,11 +111,48 @@ If `claude_mem_observations` in the post-session report is `none`, you must
 explain why. "Forgot" / "ran out of time" / "it was a small task" are not valid
 explanations — small tasks still produce a start + end observation.
 
+**Devin (retrieval-only — cannot write in worker mode):**
+
+Devin does not participate in the claude-mem hook pipeline, so it cannot
+directly record observations. `observation_add` / `memory_add` MCP tools error
+in worker mode (server-beta only). Do NOT attempt workarounds, do NOT write
+directly to the SQLite DB, do NOT call undocumented worker routes to force a
+write. Devin must instead write durable continuity to **on-disk repo artifacts**:
+
+- `scripts/agent/post-session-report.md` — every session end
+- `.claude/handoff.md` — when lane state changes
+- `progress.md` — when project state changes
+- `docs/spec-index.md` — when the source-of-truth index changes
+- `docs/hardware/device-build-registry.md` — when deployed state changes (with explicit approval; never auto-commit)
+- commit messages — for accepted changes
+
+These on-disk artifacts ARE the cross-tool continuity layer. They are read by
+every tool's bootstrap and survive session resets. `claude-mem` is supporting
+context, not the canonical record — git + on-disk docs are source of truth.
+
+### No false claims (load-bearing)
+
+No agent may claim it recorded a `claude-mem` observation unless it can
+**retrieve or otherwise prove** the observation exists. A queued write that
+did not produce an observation row is not a recorded observation. If you
+cannot retrieve it, write `write_status: unavailable_in_worker_mode_for_devin`
+(or the equivalent for your tool) in the report and fall back to on-disk docs.
+
 ### Health check
 
 If `claude-mem` is unreachable, that is a fatal session condition for retrieval
-but NOT for recording — note the outage in the report and proceed with on-disk
-evidence only. Do not silently drop the memory layer.
+but NOT for recording (Claude Code/Codex/Cursor queue writes for later; Devin
+falls back to on-disk docs). Note the outage in the report and proceed with
+on-disk evidence only. Do not silently drop the memory layer.
+
+### Backlog (do not implement now)
+
+Evaluate a Devin → claude-mem observation bridge **only if** all three are true:
+Devin becomes a primary daily executor, AND memory loss causes repeated
+duplicated work or bad decisions, AND on-disk handoff/report docs are proven
+insufficient. Non-goals: no server-beta migration by default, no direct SQLite
+writes without a stable supported route, no memory bridge that bypasses
+repo-truth or commit evidence.
 
 ---
 
