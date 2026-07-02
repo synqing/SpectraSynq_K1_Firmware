@@ -33,6 +33,9 @@ extern bool SECONDARY_PALETTE_MODE_ENABLED;  // defined in globals.h object sea
 // Spectrograms (read by light_mode_gdft / chromagram modes) -------------------
 SQ15x16 spectrogram_smooth[NUM_FREQS] = { 0.0 };
 SQ15x16 chromagram_smooth[12] = { 0.0 };
+#ifdef K1_PALETTE_VIBRANCY_V1
+SQ15x16 chromagram_pregate[12] = { 0.0 };  // K1 PALETTE VIBRANCY: pre-gate chroma for palette coordinates
+#endif
 float   note_chromagram[12] = { 0 };
 
 SQ15x16 chroma_val = 1.0;
