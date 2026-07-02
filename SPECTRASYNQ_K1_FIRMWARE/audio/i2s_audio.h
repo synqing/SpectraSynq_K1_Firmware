@@ -363,7 +363,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     uint16_t dump_n = CONFIG.SAMPLES_PER_CHUNK < 32 ? CONFIG.SAMPLES_PER_CHUNK : 32;
     for (uint16_t i = 0; i < dump_n; i++) {
 #ifdef K1_MIC_IM73D_PDM_V1
-      USBSerial.printf("  %d\n", (int)im73d_samples_i16[i]);   // PDM: int16 decimal (silence ±20-40)
+      USBSerial.printf("  %d\n", (int)im73d_samples_i16[i]);   // PDM: int16 decimal (silence ±4-18 measured 2026-07-02 @G=16; ±20-40 was pre-characterization pessimism)
 #else
       USBSerial.printf("  %08lx\n", (unsigned long)(uint32_t)i2s_samples_raw[i]);
 #endif
