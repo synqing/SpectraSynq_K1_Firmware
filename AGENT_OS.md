@@ -73,12 +73,42 @@ The dirty `docs/hardware/device-build-registry.md` entries are current evidence.
 
 ---
 
-## 5. claude-mem usage rule
+## 5. claude-mem usage rule (HIGHEST-LEVERAGE — do not skip)
 
-- Use `claude-mem` only for historical context, prior bugs, failed attempts, and recurrence patterns.
-- Use `search` → `timeline` → `get_observations` workflow.
-- Never treat claude-mem as current lane truth.
-- Record milestones at session start, green checkpoints, and blockers.
+`claude-mem` is the single highest-leverage agentic tool in this repo: it gives
+the next session understanding of what was previously done. A session that
+records nothing is a session the next agent cannot learn from. **Skipping
+observation recording is a process failure, not a shortcut.**
+
+### Retrieval (when starting a task)
+
+- Always `search` → `timeline` → `get_observations` for prior work on the lane
+  or task type before acting. Run multiple single-term queries (compound
+  AND/OR/NOT queries silently return zero in worker-mode FTS).
+- Use `claude-mem` for historical context, prior bugs, failed attempts, and
+  recurrence patterns.
+- Never treat claude-mem as current lane truth — git + on-disk docs win for
+  current state. Memory is for prior-session context and recurrence.
+
+### Recording (mandatory, not optional)
+
+Record a `claude-mem` observation at each of these moments:
+
+1. **Session start** — what lane, what branch/HEAD, what you're about to do
+2. **Green checkpoint** — what was proven, the commit SHA, the gate result
+3. **Blocker / failure** — what failed, the hypothesis, the next action
+4. **Captain decision** — any decision that constrains future work
+5. **Session end** — what's done, what's open, the next recommended action
+
+If `claude_mem_observations` in the post-session report is `none`, you must
+explain why. "Forgot" / "ran out of time" / "it was a small task" are not valid
+explanations — small tasks still produce a start + end observation.
+
+### Health check
+
+If `claude-mem` is unreachable, that is a fatal session condition for retrieval
+but NOT for recording — note the outage in the report and proceed with on-disk
+evidence only. Do not silently drop the memory layer.
 
 ---
 

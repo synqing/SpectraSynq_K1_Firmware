@@ -21,6 +21,7 @@ safety_constraints:      <confirm: no upload, no flash, no erase, no serial-writ
 thinking_skill_used:     <skill name + one-line rationale, or "none — mechanical task">
 skills_used:             <skill names invoked, or "none — covered by default tools">
 specialists_used:        <specialist agent names dispatched, or "none">
+claude_mem_observations: <count + one-line summary of each, or "none — explain why">
 next_recommended_action: <exact next step, or "await Captain decision: <decision>">
 ```
 
