@@ -1,13 +1,12 @@
 # Active Session Handoff — SpectraSynq K1 Firmware
 
-## ▶ CURRENT LANE — IM73D122 PDM mic graft (bench-only, flag-gated)
+## ▶ CURRENT LANE — IM73D122 PRODUCTIONIZATION (mic RATIFIED for production 2026-07-03)
 
-- **Branch:** `lane/im73d-pdm-eval` · **HEAD:** `fd5390e` (2026-07-02) · **Off:** `26eebb1`
-- **Flag:** `K1_MIC_IM73D_PDM_V1` — defined in EXACTLY ONE env: `[env:k1_bench_im73d]` (extends `k1_bench_reference`). SPH0645 (`i2s_std`) stays the byte-identical product default when the flag is OFF.
-- **Status:** Graft DONE, committed (`545d331` + `c3584fa`), host-gated GREEN (pytest 619, clean compile, flag-OFF byte-identity PROVEN for `k1_hardware` AND `k1_bench_reference`), and DEVICE-PROVEN end-to-end on bench `B489A500` (boot → PDM read on live AP+VP → silence-go recal `cal_valid=1` → no NaN). Gain `g=16` characterized (loud `max_raw` ~4339, SPH 4k–10k band, non-railed).
-- **Remaining acceptance (both need Captain):** (1) per-band AGC `:stream_agc` all 4 gains <10; (2) eyes-on A/B vs SPH0645.
-- **Authority docs:** `docs/hardware/im73d122-ap-vp-migration-plan.md` (canonical design) · `docs/hardware/im73d122-graft-handover-2026-07-02.md` (session handover + 7 gotchas) · `docs/hardware/device-build-registry.md` (deployed-state table).
-- **Hardware safety:** No upload/flash/erase/serial-write without explicit Captain approval AND identity verification via `scripts/platformio/k1_upload_guard.py`. Bench `B489A500` = `k1_bench_im73d` only; main `F887A500` = `k1_hardware` only. `start_noise_cal` never auto-fired.
+- **Authority:** [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](../docs/hardware/im73d122-productionization-handover-2026-07-03.md) — READ FIRST (deployed state, proven-facts ledger, freeze inventory, scars, phase roadmap).
+- **Decision (CLOSED — do not reopen):** IM73D122 = the K1 production mic, Captain-ratified 2026-07-03. All prior acceptance gates passed: silence-go cal ACCEPTED (SSL=979, persists across cold boot AND reflash), per-band AGC gains ≤0.9 vs ceiling 10, eyes-on/sweep validated (agent-run 3-volume sweep + Captain), snappiness delta attributed (honest floor + 2× front-end dynamics; latency unchanged).
+- **Branch:** `lane/im73d-pdm-eval` · **HEAD:** `47dce5c` · bench `B489A500` deployed `3e06f9d` (`k1_bench_im73d`); main K1 `F887A500` on `2e2800d` SPH with its FIRST measured cal (`SSL=360 DC=−5722 measured`, NVS-persisted).
+- **NEXT TASK (Phase 1.1):** un-freeze config persistence under `K1_MIC_IM73D_PDM_V1` via PDM-namespaced files (knobs currently DON'T persist on IM73D builds — unshippable). Then MicFrontend abstraction → test/byte-gate migration → DSR_16S eval → production-flip red-team. Phase 2 (Captain-gated): hardware switch timing, BOM, factory-cal UX.
+- **Hardware safety (unchanged):** identity = USB MAC never port names (ports drift constantly); upload guard on every flash; serial commands `:`-prefixed (bare bytes are hotkeys); N/Y cal ONLY on Captain's verbal silence-go — absolute, never inferred from any grant.
 
 ### Source-of-truth hierarchy (current)
 1. Git branch + HEAD + working tree
