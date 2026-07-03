@@ -88,6 +88,32 @@ Fine for the eval; unshippable. First task = extend the namespacing pattern:
 - Static tests pin base defines by text (`test_calibration_profile_static.py`
   147-152) — `#undef` overrides keep them green; follow that pattern.
 
+### Update — 2026-07-04: Phase 1.1 firmware LANDED (`e2b62b5`), device-proof pending
+
+Config persistence is un-frozen under the flag via the PDM namespace:
+`update_config_filename()` is the single choke point → `/CONFIG_PDM_%05lu.BIN`
+(every config reader/writer routes through `config_filename`). Un-frozen:
+`save_config`, `save_config_delayed`, `factory_reset`, `restore_defaults`
+(resets delete ONLY PDM files; `/noise_cal.bin`, SPH config/profile and preset
+slots preserved + logged). Decisions closed: **no separate PDM noise file**
+(`save_ambient_noise_calibration` stays frozen — PDM noise_samples persist
+inside `/cal_profile_pdm.bin`), and `load_ambient_noise_calibration` is now
+SKIPPED under the flag (never read SPH-domain noise floors). `system.h`
+force-invalidate ordering untouched; its stale "NVS is frozen" comment fixed.
+Golden `bridge_fs_config` re-frozen (intentional change; rec2/update_config_filename
+only; MANIFEST recomputed; Gate Fα green). Gate: pytest 620 pass + `k1_hardware`
++ `k1_bench_im73d` builds green. Two initial pytest failures were mine and
+textual: a comment mentioning the cal-save function moved a static test's
+region anchor (reworded), and the golden pinned the intended body change.
+
+**Remaining for Phase 1.1 (bench was disconnected from USB at the time):**
+flash `e2b62b5` (guard-verified) → `:build` proof → cal regression check
+(`persisted_profile SSL=979` must survive the reflash) → knob persistence proof
+(set knob via `:` command → ≥5 s → `:reset` → `:dump` knob survived) → registry
+deployed-state row. First boot on `e2b62b5` has no `/CONFIG_PDM_*.BIN` →
+compiled defaults (expected, not a regression); the file appears after the
+first knob save.
+
 ## 5 · Phase roadmap (Captain-acknowledged 2026-07-03)
 
 - **Phase 1 (now, no hardware dependency):** (1) config persistence un-freeze
@@ -178,3 +204,4 @@ Fine for the eval; unshippable. First task = extend the namespacing pattern:
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-03 | agent:claude-code (Fable) | Created — productionization handover after ratification, cal-gate fix, persistence, margin tune, and snappiness attribution. |
+| 2026-07-04 | agent:claude-code (Fable) | Phase 1.1 firmware landed (`e2b62b5`): PDM-namespaced config persistence un-freeze; §4 update section added with device-proof protocol (bench off USB, proof pending). |
