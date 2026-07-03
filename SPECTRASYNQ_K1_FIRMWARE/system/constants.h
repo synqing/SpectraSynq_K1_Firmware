@@ -45,6 +45,20 @@
 #undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
+// PDM cal-gate window (Outcome B, 2026-07-03, bench-measured). The base 650/720
+// limits are SPH0645-domain; at G=16 the IM73D measures the SAME room as:
+//   true silence (Captain-confirmed): ssl_p90 = 807  (accepted-cal day: 645)
+//   quiet-ish ambient:                ssl_p90 = 880-922
+//   audible music playing:            ssl_p90 = 1040-1219
+// 8 device runs, 2026-07-02/03 logs: _scratch/im73d_bringup/{watch_and_cal*,silence_cal_ny}.log.
+// TRUSTED_P90 1000 sits between the silence band (<=922) and the music band
+// (>=1040) — still rejects music-contaminated cals. MAX_VALID 1150 admits
+// learned = p90*1.1 up to 1100. Flag-off SPH builds keep 650/720 untouched.
+#undef  NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW
+#define NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW 1000.0f
+#undef  NOISE_CAL_SSL_MAX_VALID_RAW
+#define NOISE_CAL_SSL_MAX_VALID_RAW 1150U
+
 // Pre-sensitivity input gain. Extraction = im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN,
 // then the SHARED path multiplies by k1_effective_sensitivity (SENSITIVITY 2.4 × trim), so
 // effective gain = G × 2.4. Seed 3.0 (→ 7.2 effective) targets the SPH0645 4k-10k max_raw
