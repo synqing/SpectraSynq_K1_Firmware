@@ -442,6 +442,20 @@ void init_system() {
   max_waveform_val_raw = 0.0f;
   waveform_peak_scaled = 0.0f;
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
+
+  // PDM cal persistence (2026-07-03): the scrub above removed every trace of the
+  // SPH-file-derived state; now restore the LAST ACCEPTED PDM cal from
+  // /cal_profile_pdm.bin (CAL_PROFILE_FILE under this flag — never an SPH file).
+  // The loader only reads when the RAM config is invalid, so drop SSL to the
+  // invalid sentinel first; on any miss/corruption restore the fallback seed.
+  CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
+  if (load_calibration_profile_if_config_invalid()) {
+    max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // persisted SSL (cal_valid=1, source=persisted_profile)
+  } else {
+    CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;   // no/invalid profile -> fallback, NEVER 0
+    max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+    calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
+  }
 #endif
 
   // Fix-D Layer 1 (2026-05-24) — DC_OFFSET sanity clamp at boot.

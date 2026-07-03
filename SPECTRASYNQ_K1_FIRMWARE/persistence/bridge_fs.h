@@ -13,7 +13,14 @@
 
 extern void reboot(); // system.h
 
+#ifdef K1_MIC_IM73D_PDM_V1
+// PDM cal persistence (2026-07-03): the PDM cal lives in its OWN file so the
+// SPH0645 baseline (/cal_profile.bin, config.bin, noise_cal.bin) stays frozen
+// and untouchable. Same record format; different namespace.
+#define CAL_PROFILE_FILE "/cal_profile_pdm.bin"
+#else
 #define CAL_PROFILE_FILE "/cal_profile.bin"
+#endif
 #define CAL_PROFILE_MAGIC 0x314C4143UL
 #define CAL_PROFILE_VERSION 1U
 
@@ -316,15 +323,9 @@ static bool read_cal_profile_bytes(File& file, void* data, size_t len) {
 }
 
 bool save_calibration_profile(uint8_t source) {
-#ifdef K1_MIC_IM73D_PDM_V1
-  // NVS FROZEN for PDM eval: no cal_profile.bin write. BUT this is the ONLY function on the
-  // accept path (k1_gdft_core.cpp) that refreshes runtime cal status — a bare `return false`
-  // would leave cal_valid=0 forever. RAM-only SEMANTIC SUCCESS: refresh status (so the
-  // [AP]/acceptance gate sees cal_valid), do NOT imply a persisted profile, return actual validity.
-  calibration_profile_loaded = false;
-  calibration_refresh_status(source);
-  return calibration_valid;
-#endif
+  // Under K1_MIC_IM73D_PDM_V1 this writes CAL_PROFILE_FILE = /cal_profile_pdm.bin
+  // (PDM-namespaced; the SPH profile is untouchable). Un-stubbed 2026-07-03 after
+  // the graft + cal-gate window were device-proven (NOISE CAL ACCEPTED, SSL=887).
   lock_leds();
   if (!calibration_profile_valid()) {
     calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
@@ -371,6 +372,14 @@ bool save_calibration_profile(uint8_t source) {
     calibration_profile_loaded = true;
     calibration_refresh_status(source);
   }
+#ifdef K1_MIC_IM73D_PDM_V1
+  else {
+    // A failed PDM file write must never cost an accepted cal: keep the RAM-only
+    // semantic success (cal_valid reflects the in-RAM learned values).
+    calibration_profile_loaded = false;
+    calibration_refresh_status(source);
+  }
+#endif
   unlock_leds();
   return ok;
 }
@@ -379,9 +388,13 @@ bool load_calibration_profile_if_config_invalid() {
   if (calibration_profile_valid()) {
     calibration_profile_loaded = false;
     calibration_refresh_status(CAL_SOURCE_CONFIG);
+#ifndef K1_MIC_IM73D_PDM_V1
+    // PDM: NEVER seed the PDM profile from CONFIG here — at this point CONFIG
+    // holds SPH-domain values loaded from the frozen SPH config.bin.
     if (!LittleFS.exists(CAL_PROFILE_FILE)) {
       save_calibration_profile(CAL_SOURCE_CONFIG);
     }
+#endif
     return false;
   }
 
@@ -449,11 +462,8 @@ bool load_calibration_profile_if_config_invalid() {
 }
 
 bool clear_calibration_profile() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  return false;  // NVS FROZEN for PDM eval — do NOT remove cal_profile.bin. Every PDM caller
-                 // (boot force-invalidate / clear_noise_cal) sets RAM cal status explicitly;
-                 // the return is caller-ignored.
-#endif
+  // Under K1_MIC_IM73D_PDM_V1, CAL_PROFILE_FILE is /cal_profile_pdm.bin — this
+  // clears only the PDM cal; the SPH profile is unreachable under the flag.
   lock_leds();
   bool removed = LittleFS.remove(CAL_PROFILE_FILE);
   calibration_profile_loaded = false;
