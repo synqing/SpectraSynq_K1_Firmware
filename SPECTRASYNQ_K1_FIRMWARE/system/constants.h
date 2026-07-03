@@ -487,6 +487,17 @@ static inline uint8_t apply_gamma8(uint8_t v) {
 // chromagram silent, to prevent black-out per observation 53369).
 #define ENABLE_WAVEFORM_CHROMAGRAM_COLOR 1
 #define WAVEFORM_REACTIVE_RAW_MARGIN 1.10f
+#ifdef K1_MIC_IM73D_PDM_V1
+// PDM quiet-music duty trim (2026-07-03, Captain-approved). With the measured
+// IM73D floor (SSL=979) the 1.10 margin gates 30% of quiet-background frames;
+// 0.95 (gate≈930, still 1.04x above the room silence p90≈890) trims the measured
+// duty to 22%. Deeper relief is impossible by thresholding — quiet music overlaps
+// the silence band (sweep: _scratch/im73d_bringup/eyes-on-runbook.md). NOTE: the
+// runtime knob VP_WAVEFORM_REACTIVE_RAW_MARGIN serves only waveform_hybrid and
+// clamps >=1.00, so this compile-time override is the only path for fast.
+#undef  WAVEFORM_REACTIVE_RAW_MARGIN
+#define WAVEFORM_REACTIVE_RAW_MARGIN 0.95f
+#endif
 #define WAVEFORM_REACTIVE_PEAK_FLOOR 0.08f
 #define WAVEFORM_IDLE_FADE 0.85f
 
