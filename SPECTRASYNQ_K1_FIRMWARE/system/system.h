@@ -429,8 +429,10 @@ void init_system() {
   // (DC≈-4714, SSL≈350) is IN-range and would otherwise be applied to the PDM signal
   // (wrong DC bias + wrong domain). Force RAM cal invalid on EVERY PDM boot, BEFORE the
   // two sanity blocks below — seeding a PDM-domain SSL (never 0) and a non-zero follower
-  // so the peak-scaled division can never be 0/0. NVS is frozen under the flag
-  // (bridge_fs.h), so nothing here persists; each boot needs a fresh silence-go recal.
+  // so the peak-scaled division can never be 0/0. Persistence under the flag is
+  // PDM-namespaced (bridge_fs.h): /CONFIG_PDM_*.BIN + /cal_profile_pdm.bin; the SPH
+  // files stay frozen. Config cal fields loaded by init_fs() are scrubbed here
+  // regardless — the PDM cal profile below is the sole cal authority.
   CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
   CONFIG.VU_LEVEL_FLOOR = 0.0f;

@@ -14,9 +14,12 @@
 extern void reboot(); // system.h
 
 #ifdef K1_MIC_IM73D_PDM_V1
-// PDM cal persistence (2026-07-03): the PDM cal lives in its OWN file so the
-// SPH0645 baseline (/cal_profile.bin, config.bin, noise_cal.bin) stays frozen
-// and untouchable. Same record format; different namespace.
+// PDM persistence namespace (cal 2026-07-03, config 2026-07-04): everything the
+// PDM build persists lives in its OWN files (/CONFIG_PDM_*.BIN, /cal_profile_pdm.bin)
+// so the SPH0645 baseline (/CONFIG_*.BIN, /cal_profile.bin, /noise_cal.bin) stays
+// frozen and untouchable on disk. Same record formats; different namespace.
+// PDM noise_samples persist INSIDE the cal profile (the cal-profile save path) —
+// there is deliberately no /noise_cal_pdm.bin.
 #define CAL_PROFILE_FILE "/cal_profile_pdm.bin"
 #else
 #define CAL_PROFILE_FILE "/cal_profile.bin"
@@ -25,18 +28,25 @@ extern void reboot(); // system.h
 #define CAL_PROFILE_VERSION 1U
 
 void update_config_filename(uint32_t input) {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Single choke point for the PDM config namespace: every config reader/writer
+  // (load_config, save_config, factory_reset, restore_defaults) goes through
+  // config_filename, so this one branch keeps the SPH /CONFIG_*.BIN unreachable
+  // under the flag. Missing PDM file at boot -> compiled defaults (load_config
+  // open-fail path), NEVER the SPH config.
+  snprintf(config_filename, 24, "/CONFIG_PDM_%05lu.BIN", input);
+#else
   snprintf(config_filename, 24, "/CONFIG_%05lu.BIN", input);
+#endif
 }
 
-// Restore all defaults defined in globals.h by removing saved data and rebooting
+// Restore all defaults defined in globals.h by removing saved data and rebooting.
+// Under K1_MIC_IM73D_PDM_V1 (un-frozen 2026-07-04): config_filename and
+// CAL_PROFILE_FILE are PDM-namespaced, so this clears ONLY the PDM state.
+// The SPH-domain files (/noise_cal.bin, /CONFIG_*.BIN, /cal_profile.bin) and the
+// shared preset slots stay untouched until the SPH path is retired — with SPH
+// saves frozen under the flag, a deletion there would be unrecoverable.
 void factory_reset() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  // NVS FROZEN for the IM73D PDM eval — this function DELETES the SPH0645
-  // config/noise_cal/cal_profile files, and with every save path frozen a
-  // deletion is unrecoverable. Not performed; no reboot.
-  USBSerial.println("[PDM eval] factory_reset ignored: SPH config/noise/cal profile frozen on disk");
-  return;
-#endif
   lock_leds();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);
@@ -48,38 +58,40 @@ void factory_reset() {
     USBSerial.println("delete failed");
   }
 
+#ifndef K1_MIC_IM73D_PDM_V1
   USBSerial.print("Deleting noise_cal.bin: ");
   if (LittleFS.remove("/noise_cal.bin")) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
+#endif
 
-  USBSerial.print("Deleting cal_profile.bin: ");
+  USBSerial.print("Deleting " CAL_PROFILE_FILE ": ");
   if (LittleFS.remove(CAL_PROFILE_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
 
+#ifndef K1_MIC_IM73D_PDM_V1
   USBSerial.print("Deleting " SB_PRESET_SLOTS_FILE ": ");
   if (LittleFS.remove(SB_PRESET_SLOTS_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
+#else
+  USBSerial.println("[PDM] preserved: /noise_cal.bin, SPH config/profile, preset slots (non-PDM files)");
+#endif
 
   reboot();
 }
 
-// Restore only configuration defaults
+// Restore only configuration defaults. Safe under K1_MIC_IM73D_PDM_V1
+// (un-frozen 2026-07-04): config_filename is the PDM-namespaced file, so the
+// SPH config is unreachable here.
 void restore_defaults() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  // NVS FROZEN for the IM73D PDM eval — deleting the SPH0645 config file is
-  // unrecoverable while saves are frozen. Not performed; no reboot.
-  USBSerial.println("[PDM eval] restore_defaults ignored: SPH config frozen on disk");
-  return;
-#endif
   lock_leds();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);
@@ -94,11 +106,12 @@ void restore_defaults() {
   reboot();
 }
 
-// Save configuration to LittleFS
+// Save configuration to LittleFS. Under K1_MIC_IM73D_PDM_V1 this writes the
+// PDM-namespaced config_filename (un-frozen 2026-07-04); the SPH config stays
+// untouchable. The whole CONFIG struct is saved, including live PDM cal fields —
+// those on-disk cal fields are informational only: the boot force-invalidate in
+// system.h scrubs them and the cal profile file is the cal authority.
 void save_config() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  return;  // NVS FROZEN for the IM73D PDM eval — SPH0645 config/profile on disk untouchable
-#endif
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
@@ -138,13 +151,8 @@ void save_config() {
   unlock_leds();
 }
 
-// Save configuration to LittleFS 10 seconds from now
+// Save configuration to LittleFS a few seconds from now
 void save_config_delayed() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  settings_updated = false;   // NVS FROZEN for PDM eval — cancel any queued write
-  next_save_time = 0;
-  return;
-#endif
   if(debug_mode == true){
     USBSerial.println("CONFIG SAVE QUEUED");
   }
@@ -244,7 +252,11 @@ void load_config() {
 // Save noise calibration to LittleFS
 void save_ambient_noise_calibration() {
 #ifdef K1_MIC_IM73D_PDM_V1
-  return;  // NVS FROZEN for PDM eval — noise_cal.bin untouchable; PDM cal is RAM-only
+  // STAYS frozen under the flag (decision 2026-07-04): /noise_cal.bin is
+  // SPH-domain, and the PDM noise_samples[] already persist inside
+  // /cal_profile_pdm.bin via save_calibration_profile(). A separate PDM noise
+  // file would be redundant state with its own corruption/skew surface.
+  return;
 #endif
   lock_leds();
   if (debug_mode) {
@@ -282,6 +294,13 @@ void save_ambient_noise_calibration() {
 
 // Load noise calibration from LittleFS
 void load_ambient_noise_calibration() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Never read the SPH-domain /noise_cal.bin under the flag: with no PDM profile
+  // on disk it would leave SPH noise floors live in noise_samples[] (wrong domain
+  // for GDFT subtraction). PDM noise comes from /cal_profile_pdm.bin (or stays at
+  // compiled-default zeros until the first accepted cal).
+  return;
+#endif
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LOADING AMBIENT_NOISE PROFILE... ");
