@@ -84,6 +84,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_acf_probe",
             "k1_bench_agc_probe",
             "k1_bench_im73d",  # IM73D122 PDM mic evaluation — bench B489A500 ONLY (2026-07-02)
+            "k1_bench_im73d_ble",  # IM73D PDM + NimBLE BLE-MIDI demo — bench B489A500 ONLY (2026-07-04)
         ),
         role="2nd bench K1",
         upload_port="/dev/tty.usbmodem12201",
