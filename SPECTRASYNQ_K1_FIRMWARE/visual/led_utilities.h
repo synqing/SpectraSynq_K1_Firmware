@@ -856,6 +856,16 @@ inline void init_lerp_params() {
             
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
+#ifdef K1_CUSTOM_LED_V1
+            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
+            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
+            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+            // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
+            // flag-gated to keep those builds byte-identical.
+            if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
+                led_lerp_params[i].index_right = NATIVE_RESOLUTION - 1;
+            }
+#endif
             SQ15x16 index_fract = index - SQ15x16(led_lerp_params[i].index_left);
             led_lerp_params[i].mix_left = SQ15x16(1.0) - index_fract;
             led_lerp_params[i].mix_right = index_fract;
