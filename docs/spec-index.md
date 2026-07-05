@@ -4,7 +4,7 @@ abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, h
 
 # SensoryBridge K1 — Spec Index
 
-**Last verified:** 2026-07-02 (git `lane/im73d-pdm-eval` = `fd5390e`; active lane = IM73D122 PDM mic graft, bench-only). The IM73D lane is the current live workstream — see the Active Lanes table below and `docs/hardware/im73d122-graft-handover-2026-07-02.md`. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim in it against current git before acting.
+**Last verified:** 2026-07-05 (git `lane/im73d-pdm-eval` = `d32770d`; active lanes = IM73D122 productionization + the `k1_bench_im73d_ble` IM73D+BLE-MIDI investor-demo build). The IM73D122 productionization lane (mic Captain-ratified 2026-07-03) and the demo build are the current live workstreams — see the Active Lanes table below, `docs/hardware/im73d122-productionization-handover-2026-07-03.md`, and `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim in it against current git before acting.
 
 > 2026-06-15 live supersession: newer K1 production and effects-lane status lives
 > in [progress.md](../progress.md) and
@@ -31,11 +31,13 @@ On-disk handover **beats** claude-mem for **current lane status**. Memory is for
 
 ---
 
-## Active lanes (updated 2026-07-02)
+## Active lanes (updated 2026-07-05)
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
-| **IM73D122 PDM mic graft (CURRENT)** | [docs/hardware/im73d122-ap-vp-migration-plan.md](hardware/im73d122-ap-vp-migration-plan.md) · [docs/hardware/im73d122-graft-handover-2026-07-02.md](hardware/im73d122-graft-handover-2026-07-02.md) | **DONE, committed, host-gated GREEN, device-proven end-to-end on bench `B489A500`** (flag `K1_MIC_IM73D_PDM_V1`, bench-only). SPH0645 stays byte-identical product default. **Remaining:** per-band AGC `:stream_agc` + Captain eyes-on A/B. | `docs/hardware/device-build-registry.md` (bench row, `c3584fa`); commits `545d331` + `c3584fa` + `49b0393` on `lane/im73d-pdm-eval` |
+| **IM73D + BLE-MIDI demo build (`k1_bench_im73d_ble`) — NEWEST** | [docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md](hardware/im73d-ble-midi-demo-build-2026-07-04.md) | **Bench K1 on `d32770d` (2026-07-05)** — IM73D122 PDM + NimBLE BLE-MIDI central for K718 Remoted investor demos. Cal-abort fix deployed + device-proven (K718 unlinked); `:ble_stream` heap telemetry default-off. **Outstanding:** dial-turn control-proof; K718-linked+streaming cal repro. SEPARATE from mic eval — no SNR on this radio build. | `docs/hardware/device-build-registry.md` (bench top row); `platformio.ini` `[env:k1_bench_im73d_ble]` + `k1_upload_guard.py` |
+| **IM73D122 productionization** | [docs/hardware/im73d122-productionization-handover-2026-07-03.md](hardware/im73d122-productionization-handover-2026-07-03.md) | **Mic Captain-ratified as the K1 production mic 2026-07-03.** Phase 1.1 config-persistence landed `e2b62b5` (host gate green). **Next:** Phase 1.1 DEVICE-PROOF — needs a radio-free `k1_bench_im73d` reflash (bench currently runs the demo build above). | `docs/hardware/device-build-registry.md`; `lane/im73d-pdm-eval` HEAD `d32770d` |
+| **IM73D122 PDM mic graft (superseded by productionization)** | [docs/hardware/im73d122-ap-vp-migration-plan.md](hardware/im73d122-ap-vp-migration-plan.md) · [docs/hardware/im73d122-graft-handover-2026-07-02.md](hardware/im73d122-graft-handover-2026-07-02.md) | **DONE, committed, host-gated GREEN, device-proven end-to-end on bench `B489A500`** (flag `K1_MIC_IM73D_PDM_V1`, bench-only). SPH0645 stays byte-identical product default. Continued in the productionization lane above. | `docs/hardware/device-build-registry.md` (bench row, `c3584fa`); commits `545d331` + `c3584fa` + `49b0393` on `lane/im73d-pdm-eval` |
 | VMEWT transport incident | [docs/forensics/vme_l1/2026-06-07-vmewt-transport-incident.md](forensics/vme_l1/2026-06-07-vmewt-transport-incident.md) | Hardware VMEWT capture frozen; failed sandbox survivor rows are not runtime proof | Reported failed VMEWT summaries: nonzero rejected records, ignored fragments, parser issues, secondary-only coverage, weak-confidence-only scenarios |
 | VME L1 Waveform sandbox | [docs/handover/2026-06-07-vme-l1-waveform-sandbox-handover.md](handover/2026-06-07-vme-l1-waveform-sandbox-handover.md) | Sandbox/shadow only; target Waveform Fast, Waveform, and Waveform Tempo; next valid step is fail-closed transport proof before hardware | [docs/forensics/vme_l1/2026-06-07-vmewt-transport-incident.md](forensics/vme_l1/2026-06-07-vmewt-transport-incident.md), [docs/forensics/2026-05-26-level1-visual-memory-engine-sandbox-plan.md](forensics/2026-05-26-level1-visual-memory-engine-sandbox-plan.md), [docs/architecture/visual-event-bus-stage-2-proposal-v0.1.md](architecture/visual-event-bus-stage-2-proposal-v0.1.md) |
 | Dense Forge closeout | [docs/handover/2026-06-07-dense-forge-closeout.md](handover/2026-06-07-dense-forge-closeout.md) | Source committed + exact `a5ce32e` flashed to 1401 and locked to mode 21; Captain eyes-on PASS was on repair build before exact-source reflash | [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-build.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-build.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-upload.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-upload.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-post-upload.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-post-upload.log), [docs/forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-mode21-setup.log](forensics/runtime-evidence/2026-06-07-dense-forge-a5ce32e-mode21-setup.log) |
@@ -72,7 +74,9 @@ On-disk handover **beats** claude-mem for **current lane status**. Memory is for
 | Device | Chip ID | **ONLY permitted env** |
 |--------|---------|------------------------|
 | 1401 (main K1) | `F887A500` | `k1_hardware` |
-| 12201 (bench K1v2) | `B489A500` | `k1_bench_reference` |
+| 12201 (bench K1v2) | `B489A500` | `k1_bench_reference` (+ non-shippable variants `k1_bench_im73d`, `k1_bench_im73d_ble`) |
+
+> **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of **2026-07-04**: bench `B489A500` = `usbmodem1101`, main `F887A500` = `usbmodem2101`, K718 (BLE-MIDI dial) = `usbmodem101`. Registry §2 deployed-state table is authoritative.
 
 The two envs differ by GPIO map — never cross-flash. Identity = chip ID, never the port name. The earlier VMEWT-incident caveat is superseded by the registry's deployed-state table.
 

@@ -1,7 +1,18 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** 2026-07-02 IM73D122 PDM mic graft (flag-gated, bench-only) is DONE, committed, host-gated GREEN, and device-proven end-to-end on bench `B489A500`; SPH0645 stays the byte-identical product default. Remaining acceptance: per-band AGC `:stream_agc` + Captain eyes-on A/B. See `.claude/handoff.md` and `docs/hardware/im73d122-graft-handover-2026-07-02.md`.
+**Current focus:** (2026-07-05) `k1_bench_im73d_ble` **IM73D + BLE-MIDI investor-demo build** — bench K1 (`B489A500`) on `d32770d`; cal-abort fix deployed + device-proven (K718 unlinked); dial-turn control-proof + K718-linked cal repro still owed. **Separate** from IM73D122 productionization (mic Captain-ratified 2026-07-03; Phase 1.1 persistence landed `e2b62b5`). See `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`, `.claude/handoff.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md`.
+
+## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
+
+- **Goal (Captain):** a bench K1 running the IM73D122 mic PLUS BLE-MIDI so the **K718 Remoted dial controls it live** for investor demos. **Separate workstream** from IM73D eval/tuning — do NOT measure mic SNR on this radio build (Core-0 BLE task; interference A/B open).
+- **Composition:** new `[env:k1_bench_im73d_ble]` = `extends k1_bench_im73d` + 3 BLE deltas (`network/ble_remoted_central.cpp` + `k1_ble_midi_decoder.cpp`, `-DSB_K1_BLE_REMOTED`, `NimBLE-Arduino@^2.5.0`); does NOT extend the harness → zero instrumentation, production byte-identical. Guard tuple line added. **Revert** = delete env block + guard line.
+- **4-SSA injection-point investigation** (ssa-management launch/return contracts; orchestrator re-ran the decisive claims): **linkage VERIFIED** (`sb_k1_control_apply()` at `sb_k1_control_facade.cpp:468` unconditional; `.ino:675/812` calls under `#ifdef SB_K1_BLE_REMOTED`); **RT/RF VERIFIED** (BLE app task `central.cpp:229` **and** NimBLE host both default Core-0 → confound real for *measurement*, moot for *demo*); **K718 protocol byte-exact match**; **device/gate VERIFIED**.
+- **Host gate GREEN:** `pio run -e k1_bench_im73d_ble` `[SUCCESS]` (RAM 38.0% / Flash 13.9%); `test_dev_instrumentation_boundary` + `test_token_scrub_static` = **13/13**.
+- **Flashed bench `B489A500` (2026-07-04):** guard-verified on `/dev/cu.usbmodem1101` (ports re-scrambled — `2101`=main, `101`=K718; identity by USB serial, not port); hash-verified. Runtime (passive read-only serial): boots clean, 0 crash markers, BLE central **`linked=1`** to the live K718 "SpectraSynq Remoted" peripheral (`JC3636_K718_REMOTED_BLE_V1`), `notify=0` → **control-proof (dial-turn) pending**. `linked=1` overrides SSA-3's provisional "K718 never flashed" (runtime > static audit).
+- **Outstanding:** (1) turn the K718 dial → confirm `notify/decoded/apply_ok` climb + `CONFIG.*` change; (2) K718-linked+streaming cal repro (crash condition); (3) Core-0 demo-robustness if glitching; (4) **this flash replaced the bench's `3e06f9d k1_bench_im73d` state → IM73D Phase 1.1 device-proof needs a radio-free reflash.**
+- **2026-07-05 update:** bench reflashed to `d32770d` (`1ac840a` cal-abort guard + `:ble_stream` telemetry). Captain silence-go cal **ACCEPTED** with 0 abort (K718 unlinked) — fix device-proven for light load; K718-linked repro still owed.
+- **Detail:** `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`.
 
 ## 2026-07-02 IM73D122 PDM Mic Graft (bench-only, flag-gated)
 
