@@ -605,8 +605,11 @@ void check_settings(uint32_t t_now) {
       if(debug_mode == true){
         USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
       }
-      save_config();
+      // Clear BEFORE the save: if save_config() defers on low internal RAM it
+      // re-arms settings_updated + next_save_time, and that re-arm must survive
+      // this cycle so the write retries. Clearing after would cancel the retry.
       settings_updated = false;
+      save_config();
     }
   }
 }

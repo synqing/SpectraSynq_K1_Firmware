@@ -10,6 +10,7 @@
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
+#include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
 
 extern void reboot(); // system.h
 
@@ -26,6 +27,42 @@ extern void reboot(); // system.h
 #endif
 #define CAL_PROFILE_MAGIC 0x314C4143UL
 #define CAL_PROFILE_VERSION 1U
+
+// --- Internal-RAM precondition for LittleFS writes (crash-safety, 2026-07-05) ---
+// A LittleFS.open() allocates a stdio FILE plus its recursive mutex (a FreeRTOS
+// queue — INTERNAL RAM only) plus the lfs file cache. If the internal 8-bit heap
+// cannot satisfy the mutex allocation, newlib calls abort() from INSIDE fopen()
+// (newlib locks.c: lock_init_generic) — this fires BEFORE open() returns, so the
+// `if (!file)` guards below can never catch it; the device hard-reboots.
+// Root incident: bench K1 (k1_bench_im73d_ble) aborted on core 0 during the first
+// accepted noise-cal after config persistence was un-frozen (e2b62b5). BLE is
+// pinned to core 0 and leaves internal DRAM tight, so save_config()'s open aborted.
+// This precondition turns that fatal path into a graceful, logged, retryable
+// deferral. It is inert on a healthy device (tens of KB largest free block).
+#ifndef SB_FS_MIN_INTERNAL_BLOCK
+#define SB_FS_MIN_INTERNAL_BLOCK 8192  // bytes: conservative headroom for one open
+#endif
+
+static inline bool bridge_fs_internal_heap_ok(const char* who) {
+  const size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL);
+  const size_t freeb   = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+  if (largest >= SB_FS_MIN_INTERNAL_BLOCK) {
+    return true;
+  }
+  // LOUD on every trip (never silent): surfaces the exact headroom so the true
+  // internal-RAM budget can be closed. free vs largest separates exhaustion from
+  // fragmentation, and repeated lines across cals expose any leak.
+  USBSerial.print("[fs] SKIP ");
+  USBSerial.print(who);
+  USBSerial.print(": internal heap too low for LittleFS open (free=");
+  USBSerial.print((uint32_t)freeb);
+  USBSerial.print("B largest=");
+  USBSerial.print((uint32_t)largest);
+  USBSerial.print("B need>=");
+  USBSerial.print((uint32_t)SB_FS_MIN_INTERNAL_BLOCK);
+  USBSerial.println("B) - deferring to avoid fopen abort");
+  return false;
+}
 
 void update_config_filename(uint32_t input) {
 #ifdef K1_MIC_IM73D_PDM_V1
@@ -112,6 +149,14 @@ void restore_defaults() {
 // those on-disk cal fields are informational only: the boot force-invalidate in
 // system.h scrubs them and the cal profile file is the cal authority.
 void save_config() {
+  // Crash-safety: never open the config file when internal RAM can't afford it
+  // (would abort() inside fopen, before the `if (!file)` guard). Re-arm the
+  // check_settings() deferred-save so it retries once heap recovers.
+  if (!bridge_fs_internal_heap_ok("save_config")) {
+    next_save_time = millis() + 5000;
+    settings_updated = true;
+    return;
+  }
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
@@ -258,6 +303,11 @@ void save_ambient_noise_calibration() {
   // file would be redundant state with its own corruption/skew surface.
   return;
 #endif
+  // Crash-safety: skip the open under internal-RAM pressure (non-PDM builds).
+  // noise_samples[] stay live in RAM; a later accepted cal re-attempts the save.
+  if (!bridge_fs_internal_heap_ok("save_ambient_noise_calibration")) {
+    return;
+  }
   lock_leds();
   if (debug_mode) {
     USBSerial.print("SAVING AMBIENT_NOISE PROFILE... ");
@@ -345,6 +395,12 @@ bool save_calibration_profile(uint8_t source) {
   // Under K1_MIC_IM73D_PDM_V1 this writes CAL_PROFILE_FILE = /cal_profile_pdm.bin
   // (PDM-namespaced; the SPH profile is untouchable). Un-stubbed 2026-07-03 after
   // the graft + cal-gate window were device-proven (NOISE CAL ACCEPTED, SSL=887).
+  // Crash-safety: under internal-RAM pressure this open would abort() inside fopen
+  // one line after save_config() in the cal-complete burst. Return false instead;
+  // the accepted cal stays live in RAM for the session (log surfaces the shortfall).
+  if (!bridge_fs_internal_heap_ok("save_calibration_profile")) {
+    return false;
+  }
   lock_leds();
   if (!calibration_profile_valid()) {
     calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
