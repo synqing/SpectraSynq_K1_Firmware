@@ -17,6 +17,7 @@
 
 #include <Arduino.h>
 #include <NimBLEDevice.h>
+#include <esp_heap_caps.h> // internal-RAM budget telemetry (bench-only, non-shippable)
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
@@ -24,6 +25,11 @@
 
 #include "k1_ble_midi_decoder.h"
 #include "sb_k1_control_facade.h"
+
+// Runtime gate for the 1 Hz [ble_remoted] counters + heap telemetry below
+// (defined in globals.h, default false). Toggle live via serial :ble_stream=on/off
+// so the monitor isn't spammed unless a session is actively watching.
+extern bool BLE_STREAM_ENABLED;
 
 extern uint8_t sb_k1_confirmed_mode(bool);       // feedback-only committed mode per channel
 
@@ -252,7 +258,7 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   send_confirmed_modes(force);
 
   const uint32_t now_ms = millis();
-  if (now_ms - s_last_counter_ms >= 1000U) {
+  if (BLE_STREAM_ENABLED && now_ms - s_last_counter_ms >= 1000U) {
     s_last_counter_ms = now_ms;
     Serial.printf("[ble_remoted] counters linked=%u notify=%lu decoded=%lu enqueued=%lu queue_drops=%lu decode_errors=%lu apply_ok=%lu apply_fail=%lu\n",
                   s_linked ? 1U : 0U,
@@ -263,6 +269,20 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
                   (unsigned long)s_decode_errors,
                   (unsigned long)s_apply_ok,
                   (unsigned long)s_apply_fail);
+    // Internal-RAM budget telemetry (bench-only). largest = the exact quantity
+    // bridge_fs_internal_heap_ok() gates on (< SB_FS_MIN_INTERNAL_BLOCK = 8192
+    // -> LittleFS write defers instead of aborting inside fopen). free vs largest
+    // separates exhaustion from fragmentation; watching it across time exposes leak.
+    // internal_min_ever = lowest internal free EVER since boot (heap watermark).
+    // This is the one that catches a TRANSIENT dip between 1Hz samples — e.g. the
+    // load-conditional spike (BLE link + notify stream + WiFi-AP client + cal-complete
+    // fopen) that drove the original abort while idle headroom stays ~76KB.
+    Serial.printf("[ble_remoted] heap internal_free=%u internal_largest=%u internal_min_ever=%u total_free=%u psram_free=%u\n",
+                  (unsigned)heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+                  (unsigned)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL),
+                  (unsigned)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL),
+                  (unsigned)ESP.getFreeHeap(),
+                  (unsigned)ESP.getFreePsram());
   }
 }
 

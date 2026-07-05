@@ -468,6 +468,7 @@ enum VPProfileMode : uint8_t {
 
 inline uint8_t VP_PROFILE = VP_PROFILE_CANDIDATE;
 inline bool VP_STREAM_ENABLED = false;
+inline bool BLE_STREAM_ENABLED = false; // gate for 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build); toggle via :ble_stream=on/off
 
 inline bool VP_FIX_AGC_SOFT_KNEE = true;
 inline bool VP_FIX_CHROMAGRAM_SPARSENESS = true;

@@ -1923,6 +1923,7 @@ void cmd_help() {
   USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
   USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
   USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+  USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
@@ -2852,6 +2853,19 @@ void parse_command(char* command_buf) {
         tx_begin();
         USBSerial.print("VP_STREAM: ");
         USBSerial.println(vp_bool_text(VP_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "ble_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        BLE_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("BLE_STREAM: ");
+        USBSerial.println(vp_bool_text(BLE_STREAM_ENABLED));
         tx_end();
       } else {
         bad_command(command_type, command_data);
