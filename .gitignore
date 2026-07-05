@@ -11,6 +11,8 @@
 # PlatformIO build output + generated compile DB
 .pio/
 compile_commands.json
+# PIO preprocesses the sketch to <Sketch>.ino.cpp inside src_dir on every build
+*.ino.cpp
 
 # Python
 __pycache__/
