@@ -6,13 +6,14 @@ abstract: "Codex end-to-end resume brief (2026-07-06) for the IM73D productioniz
 
 **You are Codex, resuming the SpectraSynq K1 firmware.** Everything that can be done autonomously in firmware is DONE and gated. What is left is mostly **hardware/perceptual checkpoints that only Captain can clear** plus **one owed autonomous device capture**. Your job: execute the remaining ordered queue, escalate the hardware checkpoints as decision-grade asks (do not perform them yourself — they need Captain's hands / eyes / verbal silence-go), and do NOT re-litigate anything in the "closed — do not reopen" list.
 
-> **2026-07-06 supersession:** R1 is closed. R4 controlled-audio DSR testing has
+> **2026-07-07 supersession:** R1 is closed. R4 controlled-audio DSR testing has
 > now been performed on the bench IM73D using radio-free firmware and speaker
 > playback. **DSR_16S is rejected; keep `DSR_8S`.** Bench uploaded back to
-> `k1_bench_im73d @ 9d14463` after the test but is not runtime-proven because it
-> went app-serial/ROM-sync silent; Captain later reported both K1s temporarily
-> offline. Authority:
-> `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`.
+> `k1_bench_im73d @ 9d14463` after the test and is now runtime-proven by
+> 2026-07-07 read-only `:build`/`:dump` recovery (`CAL_SOURCE: persisted_profile`,
+> `CAL_VALID: 1`, `CONFIG.CHROMA: 0.100000`). Authority:
+> `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md` and
+> `artifacts/im73d_recovery_2026-07-07/readonly_build_dump_20260707.json`.
 
 ---
 

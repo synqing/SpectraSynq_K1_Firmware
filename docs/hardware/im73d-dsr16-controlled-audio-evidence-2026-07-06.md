@@ -116,8 +116,9 @@ Decision:
 ## Bench Recovery State
 
 After the DSR16 run, the bench was successfully uploaded back to
-`k1_bench_im73d @ 9d14463`, but it did not produce a valid post-restore
-runtime proof.
+`k1_bench_im73d @ 9d14463`. It initially did not produce a valid post-restore
+runtime proof, but Captain power recovery on 2026-07-07 cleared the fault and
+the restored DSR8 build is now runtime-proven.
 
 Observed recovery attempts:
 
@@ -132,9 +133,13 @@ Observed recovery attempts:
 
 Current handling:
 
-- Treat the bench as physically present but not runtime-proven until Captain
-  reset/replug recovery is performed.
-- After recovery, first action is read-only identity/build/dump proof; do not
-  run noise calibration.
-- This recovery fault does not promote DSR16 and does not invalidate the usable
+- Recovery proof: `artifacts/im73d_recovery_2026-07-07/readonly_build_dump_20260707.json`
+- Bench port at recovery: `/dev/cu.usbmodem1401`
+- Read-only `:build`: `BUILD: version=40103 git=9d14463 epoch=1783332624 env=k1_bench_im73d`
+- Read-only `:dump`: chip `B489A500`, `CONFIG.CHROMA: 0.100000`,
+  `CONFIG.SENSITIVITY: 0.870005`, `CAL_SOURCE: persisted_profile`,
+  `CAL_VALID: 1`, `CAL_PROFILE_LOADED: 1`
+- No `start_noise_cal`, `N`, `Y`, flash, erase, or non-read-only serial command
+  was run during recovery proof.
+- The recovery fault does not promote DSR16 and does not invalidate the usable
   controlled-audio captures above.
