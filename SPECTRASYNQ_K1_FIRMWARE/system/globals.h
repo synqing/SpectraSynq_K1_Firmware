@@ -96,6 +96,9 @@ extern float a_weight_table[13][2];
 inline SQ15x16 spectrogram[NUM_FREQS] = { 0.0 };
 extern SQ15x16 spectrogram_smooth[NUM_FREQS];   // Row 3 → globals.cpp
 extern SQ15x16 chromagram_smooth[12];           // Row 3 → globals.cpp
+#ifdef K1_PALETTE_VIBRANCY_V1
+extern SQ15x16 chromagram_pregate[12];          // Row 3 → globals.cpp — post-normalize, PRE-sparseness-gate chroma for the palette-coordinate engine (K1 PALETTE VIBRANCY, 2026-07-02)
+#endif
 
 inline SQ15x16 spectral_history[SPECTRAL_HISTORY_LENGTH][NUM_FREQS];
 inline SQ15x16 novelty_curve[SPECTRAL_HISTORY_LENGTH] = { 0.0 };
