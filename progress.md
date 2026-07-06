@@ -1,7 +1,15 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-06) **IM73D productionization Phase 1 executed autonomously** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until the main-K1 mic swap). Lanes consolidated (vibrancy `55c536b`). Remaining is Captain-gated hardware (mic swap, DSR_16S SNR, eyes-on, default flip). See `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md` + `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+**Current focus:** (2026-07-06) **IM73D productionization Phase 1 executed autonomously; R1 device proof mostly closed, bench power-cycle required** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until the main-K1 mic swap). Bench was flashed to radio-free `k1_bench_im73d @ 6f2f1ec`; `:chroma=0.150` persisted across `:reset`; restore to `:chroma=0.100` echoed but final post-restore read is blocked by a CDC/bootloader no-serial condition requiring Captain power-cycle/replug. Remaining is Captain-gated hardware (bench recovery, main-K1 mic swap, DSR_16S SNR, eyes-on, default flip). See `docs/hardware/device-build-registry.md`, `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+
+## 2026-07-06 R1 Knob-Persistence Device Capture (radio-free bench)
+
+- **Live truth:** branch `lane/im73d-pdm-eval`, HEAD `6f2f1ec`; bench `B489A500` = `/dev/cu.usbmodem101` (`B4:3A:45:A5:89:B4`), main `F887A500` = `/dev/cu.usbmodem1101` (`B4:3A:45:A5:87:F8`). Existing unrelated untracked skill/config artefacts were left untouched.
+- **Host/identity gates:** `session-bootstrap` PASS; upload guard PASS for `k1_bench_im73d` on bench MAC; `bash scripts/agent/pio-build.sh k1_bench_im73d` PASS; `bash scripts/regression-harness/mic_stable_byte_gate.sh k1_bench_im73d` PASS.
+- **Device proof:** flashed radio-free `k1_bench_im73d @ 6f2f1ec` to bench. Read-only `:build` proved `git=6f2f1ec env=k1_bench_im73d`; `:dump` proved `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`. `:chroma=0.150` echoed, waited >6 s, `:reset`, then `:dump` proved `CONFIG.CHROMA: 0.150000` survived reboot with `CAL_SOURCE: persisted_profile` still intact. No `start_noise_cal` was run.
+- **Restore boundary:** `:chroma=0.100` echoed and waited >6 s, then `:reset` was issued to prove restoration. After that reset the unit remained USB-enumerated by MAC but stopped answering serial; a same-env recovery upload failed with `Failed to connect to ESP32-S3: No serial data received`. This is a physical recovery blocker: Captain must power-cycle/replug the bench, then run read-only `:build` + `:dump` to confirm final `CONFIG.CHROMA: 0.100000`.
+- **Evidence:** `_scratch/im73d_r1_knob_persistence_20260706/r1_knob_persistence_serial.log` and `_scratch/im73d_r1_knob_persistence_20260706/r1_restore_followup_serial.log` (ignored scratch artefacts). Registry top row updated to the current deployed state.
 
 ## 2026-07-06 IM73D Productionization Phase 1 (autonomous execution)
 
