@@ -19,10 +19,12 @@ def test_im73d_dump_raw_is_before_front_end_conditioning():
     text = I2S_AUDIO.read_text()
 
     raw_dump = _index(text, 'USBSerial.printf("  %d\\n", (int)im73d_samples_i16[i])')
+    raw_metric = _index(text, "im73d_raw_i16_abs_peak = im73d_raw_peak")
     im73d_gain = _index(text, "im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN")
     sensitivity = _index(text, "sample * k1_effective_sensitivity")
 
     assert raw_dump < im73d_gain < sensitivity
+    assert raw_metric < im73d_gain < sensitivity
 
 
 def test_ap_max_raw_is_post_gain_sensitivity_clip_and_dc():
@@ -36,6 +38,18 @@ def test_ap_max_raw_is_post_gain_sensitivity_clip_and_dc():
     ap_emit = _index(text, "max_raw=%.0f")
 
     assert im73d_gain < sensitivity < clip < dc_remove < max_raw_update < ap_emit
+
+
+def test_im73d_raw_telemetry_is_pre_conditioning_and_reported_on_ap_stream():
+    text = I2S_AUDIO.read_text()
+
+    read_complete = _index(text, "(void)bytes_read;")
+    raw_metric = _index(text, "im73d_raw_i16_abs_peak = im73d_raw_peak")
+    im73d_gain = _index(text, "im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN")
+    ap_emit = _index(text, "raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f")
+
+    assert read_complete < raw_metric < im73d_gain < ap_emit
+    assert "K1_MIC_IM73D_RAW_I16_NEAR_RAIL" in text
 
 
 def test_current_sensitivity_surfaces_are_explicitly_mapped():

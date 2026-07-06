@@ -234,6 +234,9 @@ void init_i2s() {
       .invert_flags = { .clk_inv = 0 },
     },
   };
+#ifdef K1_MIC_IM73D_DSR_16S_V1
+  pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // DSR eval only: +2 dB SNR lever, bench-radio-free measurement gate.
+#endif
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg); // assign existing result; NO redeclare
   USBSerial.print("I2S PDM RX INIT: ");
   USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
@@ -351,6 +354,26 @@ void acquire_sample_chunk(uint32_t t_now) {
 #else
   (void)i2s_read_status;
   (void)bytes_read;
+#endif
+
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Raw pre-conditioning telemetry for mic-purity and DSR comparisons.
+  // This is before K1_MIC_IM73D_INPUT_GAIN, CONFIG.SENSITIVITY, clamp, DC removal,
+  // response_gain, GDFT, and AGC. Keep it O(n), heap-free, and silent except
+  // through the existing 1 Hz AP stream.
+  uint16_t im73d_raw_peak = 0;
+  uint32_t im73d_raw_near_count = 0;
+  uint64_t im73d_raw_sum_sq = 0;
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    const int32_t raw_sample = (int32_t)im73d_samples_i16[i];
+    const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
+    if (raw_mag > im73d_raw_peak) im73d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
+    if (raw_mag >= K1_MIC_IM73D_RAW_I16_NEAR_RAIL) im73d_raw_near_count++;
+    im73d_raw_sum_sq += (uint64_t)raw_mag * (uint64_t)raw_mag;
+  }
+  im73d_raw_i16_abs_peak = im73d_raw_peak;
+  im73d_raw_i16_rms = sqrtf((float)im73d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  im73d_raw_i16_near_pct = (float)im73d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
 #endif
 
   // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
@@ -781,6 +804,12 @@ void acquire_sample_chunk(uint32_t t_now) {
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,
       oev.onset ? 1 : 0, oev.bass_onset ? 1 : 0, (float)oev.bass_onset_strength);
+#ifdef K1_MIC_IM73D_PDM_V1
+    USBSerial.printf(" | raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f",
+      im73d_raw_i16_abs_peak,
+      im73d_raw_i16_rms,
+      im73d_raw_i16_near_pct);
+#endif
 #ifdef K1_LOUD_GUARD_V1
     USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",
       k1_loud_guard_enabled ? 1 : 0,

@@ -146,6 +146,9 @@ inline DRAM_ATTR int32_t i2s_samples_raw[1024]      = { 0 };
 // reinterpret-cast i2s_samples_raw (would be UB + wrong zero-fill stride). File-scope
 // DRAM (no heap, no stack) per esp32-render-path-safety; sized like i2s_samples_raw.
 inline DRAM_ATTR int16_t im73d_samples_i16[1024]    = { 0 };
+inline uint16_t im73d_raw_i16_abs_peak = 0;
+inline float    im73d_raw_i16_rms = 0.0f;
+inline float    im73d_raw_i16_near_pct = 0.0f;
 #endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };

@@ -69,6 +69,10 @@
 // 1317 was a clean run (input_trim=1.0, non-railed); 16 lands ~7000 << 28000 near-rail.
 #define K1_MIC_IM73D_INPUT_GAIN 16.0f
 #endif
+
+// Raw int16 telemetry guardrail before K1_MIC_IM73D_INPUT_GAIN / sensitivity.
+// This is a measurement-purity surface, not a production gain control.
+#define K1_MIC_IM73D_RAW_I16_NEAR_RAIL 30000
 #endif
 
 #ifdef K1_LOUD_GUARD_V1

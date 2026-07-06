@@ -19,9 +19,9 @@ ENV="$1"
 
 # Primary gate: exact-match allowlist. grep -w matches whole words only,
 # so any argument with appended flags/spaces is rejected here.
-ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d"
+ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_dsr16"
 case "$ENV" in
-  k1_hardware|k1_bench_reference|k1_bench_im73d)
+  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_dsr16)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2

@@ -20,6 +20,7 @@ def test_ap_parser_captures_core_quality_fields():
     harness = load_harness()
     row = harness.parse_ap_line(
         "[AP] SSL=162 DC=0 max_raw=1224 follower=1240 peak_scaled=0.686 "
+        "raw_i16_abs_peak=88 raw_i16_rms=21.5 raw_i16_near_pct=0.000 "
         "response_gain=1.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.998 "
         "agc_gain=0.442 agc_env=0.000 clip_pct=0.000 near_pct=0.000 "
         "peak_pin=0.000 spec_sat=0.000 cal_source=persisted_profile cal_valid=1"
@@ -30,6 +31,8 @@ def test_ap_parser_captures_core_quality_fields():
     assert row["DC"] == 0
     assert row["max_raw"] == 1224
     assert row["peak_scaled"] == 0.686
+    assert row["raw_i16_abs_peak"] == 88
+    assert row["raw_i16_rms"] == 21.5
     assert row["input_trim"] == 1.0
     assert row["cal_source"] == "persisted_profile"
 
@@ -53,6 +56,25 @@ def test_quality_gate_rejects_missing_rows_and_clipping():
     quality = harness.assess_quality(harness.summarise_numeric([clipped]), min_rows=1)
     assert quality["usable"] is False
     assert "clip_pct_nonzero" in quality["reasons"]
+
+
+def test_quality_gate_rejects_raw_i16_rail_evidence_when_present():
+    harness = load_harness()
+    raw_railed = {
+        "max_raw": 1200,
+        "peak_scaled": 0.5,
+        "input_trim": 1.0,
+        "clip_pct": 0.0,
+        "near_pct": 0.0,
+        "peak_pin": 0.0,
+        "raw_i16_abs_peak": 30100,
+        "raw_i16_near_pct": 0.02,
+    }
+
+    quality = harness.assess_quality(harness.summarise_numeric([raw_railed]), min_rows=1)
+
+    assert quality["usable"] is False
+    assert "raw_i16_near_rail" in quality["reasons"]
 
 
 def test_quality_gate_warns_on_conditioned_peak_pin_without_rejecting_raw_capture():

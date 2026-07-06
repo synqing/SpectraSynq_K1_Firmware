@@ -143,6 +143,10 @@ def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
         reasons.append("input_trim_reduced")
     if max_for("max_raw") >= 30000.0:
         reasons.append("raw_near_clip")
+    if max_for("raw_i16_abs_peak") >= 32760.0:
+        reasons.append("raw_i16_near_clip")
+    if max_for("raw_i16_near_pct") > 0.0:
+        reasons.append("raw_i16_near_rail")
 
     return {
         "usable": not reasons,
@@ -484,7 +488,8 @@ def run_self_test() -> None:
         "[AP] SSL=162 DC=0 max_raw=1224 follower=1240 peak_scaled=0.686 "
         "response_gain=1.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.998 "
         "agc_gain=0.442 agc_env=0.000 clip_pct=0.000 near_pct=0.000 "
-        "peak_pin=0.000 spec_sat=0.000 cal_source=persisted_profile cal_valid=1"
+        "peak_pin=0.000 spec_sat=0.000 cal_source=persisted_profile cal_valid=1 "
+        "| raw_i16_abs_peak=88 raw_i16_rms=21.5 raw_i16_near_pct=0.000"
     )
     row = parse_ap_line(good)
     assert row is not None
@@ -493,6 +498,8 @@ def run_self_test() -> None:
     assert row["max_raw"] == 1224
     assert row["peak_scaled"] == 0.686
     assert row["cal_source"] == "persisted_profile"
+    assert row["raw_i16_abs_peak"] == 88
+    assert row["raw_i16_rms"] == 21.5
 
     summary = summarise_numeric([row, row])
     quality = assess_quality(summary, min_rows=2)
@@ -504,6 +511,12 @@ def run_self_test() -> None:
     clipped_quality = assess_quality(clipped_summary, min_rows=1)
     assert clipped_quality["usable"] is False
     assert "clip_pct_nonzero" in clipped_quality["reasons"]
+
+    raw_railed = dict(row)
+    raw_railed["raw_i16_near_pct"] = 0.01
+    raw_railed_quality = assess_quality(summarise_numeric([raw_railed]), min_rows=1)
+    assert raw_railed_quality["usable"] is False
+    assert "raw_i16_near_rail" in raw_railed_quality["reasons"]
 
     thin_quality = assess_quality(summarise_numeric([]), min_rows=1)
     assert thin_quality["usable"] is False
