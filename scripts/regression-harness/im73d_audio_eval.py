@@ -173,6 +173,18 @@ def open_serial(port: str) -> serial.Serial:
     return stream
 
 
+def open_streams(ports: dict[str, str]) -> dict[str, serial.Serial]:
+    streams: dict[str, serial.Serial] = {}
+    try:
+        for spec in DEVICES:
+            streams[spec.role] = open_serial(ports[spec.role])
+    except Exception:
+        for stream in streams.values():
+            stream.close()
+        raise
+    return streams
+
+
 def assert_command_allowed(command: str) -> None:
     stripped = command.strip()
     if stripped.startswith(":"):
@@ -193,33 +205,54 @@ def read_for(stream: serial.Serial, seconds: float) -> list[SerialLine]:
     return lines
 
 
-def serial_preflight(ports: dict[str, str], out_dir: Path) -> dict[str, Any]:
+def read_until_runtime_ready(stream: serial.Serial, timeout: float = 12.0) -> tuple[list[SerialLine], bool]:
+    lines: list[SerialLine] = []
+    end = time.time() + timeout
+    ready = False
+    while time.time() < end:
+        raw = stream.readline()
+        if not raw:
+            continue
+        line = SerialLine(time.time(), raw.decode("utf-8", "replace").rstrip("\n"))
+        lines.append(line)
+        if "[AP]" in line.line or "RUNTIME_TIMING_GUARD:" in line.line:
+            ready = True
+            # Consume a small amount of trailing boot output so the next phase
+            # starts from a live runtime stream rather than the boot boundary.
+            lines.extend(read_for(stream, 0.5))
+            break
+    return lines, ready
+
+
+def serial_preflight(streams: dict[str, serial.Serial], ports: dict[str, str], out_dir: Path) -> dict[str, Any]:
     report: dict[str, Any] = {}
     for spec in DEVICES:
         port = ports[spec.role]
         lines: list[SerialLine] = []
-        try:
-            stream = open_serial(port)
-        except serial.SerialException as exc:
-            raise SystemExit(f"OPEN FAILED: {spec.role} {port}: {exc}") from exc
-        try:
-            lines.extend(read_for(stream, 1.0))
-            for command in ("build", "dump"):
-                assert_command_allowed(command)
-                payload = f":{command}\n".encode()
-                stream.write(payload)
-                stream.flush()
-                lines.append(SerialLine(time.time(), f">>> :{command}"))
-                lines.extend(read_for(stream, 2.5 if command == "build" else 4.0))
-        finally:
-            stream.close()
-
+        stream = streams[spec.role]
+        ready_lines, ready = read_until_runtime_ready(stream)
+        lines.extend(ready_lines)
         log_path = out_dir / f"preflight_{spec.role}.log"
+        write_serial_log(log_path, lines)
+        if not ready:
+            raise SystemExit(
+                f"RUNTIME GATE: {spec.role} {port} produced no [AP]/runtime line after open; "
+                f"see {log_path}"
+            )
+        for command in ("build", "dump"):
+            assert_command_allowed(command)
+            payload = f":{command}\n".encode()
+            stream.write(payload)
+            stream.flush()
+            lines.append(SerialLine(time.time(), f">>> :{command}"))
+            lines.extend(read_for(stream, 2.5 if command == "build" else 4.0))
+
         write_serial_log(log_path, lines)
         report[spec.role] = {
             "port": port,
             "usb_serial": spec.usb_serial,
             "log": str(log_path),
+            "runtime_ready": ready,
             "build_lines": [line.line for line in lines if "BUILD:" in line.line],
             "chip_lines": [line.line for line in lines if "CHIP ID:" in line.line],
             "cal_lines": [line.line for line in lines if "CAL_SOURCE:" in line.line or "CAL_VALID:" in line.line],
@@ -284,22 +317,23 @@ def prepare_stimulus(track: Path, out_dir: Path, duration: float, start_offset: 
     return output
 
 
-def capture_device(role: str, port: str, stop_at: float, start_event: threading.Event, results: dict[str, Any]) -> None:
+def capture_device(
+    role: str,
+    stream: serial.Serial,
+    stop_at: float,
+    start_event: threading.Event,
+    results: dict[str, Any],
+) -> None:
     lines: list[SerialLine] = []
-    try:
-        stream = open_serial(port)
-    except serial.SerialException as exc:
-        results[role] = {"error": str(exc), "lines": []}
-        return
     try:
         start_event.wait()
         while time.time() < stop_at:
             raw = stream.readline()
             if raw:
                 lines.append(SerialLine(time.time(), raw.decode("utf-8", "replace").rstrip("\n")))
-    finally:
-        stream.close()
-    results[role] = {"error": None, "lines": lines}
+        results[role] = {"error": None, "lines": lines}
+    except serial.SerialException as exc:
+        results[role] = {"error": str(exc), "lines": lines}
 
 
 def play_track(stimulus: Path, duration: float) -> None:
@@ -329,6 +363,7 @@ def run_capture(
     settle: float,
     stimulus: Path | None,
     ports: dict[str, str],
+    streams: dict[str, serial.Serial],
     out_dir: Path,
 ) -> dict[str, Any]:
     set_output_volume(volume)
@@ -340,7 +375,7 @@ def run_capture(
     threads = [
         threading.Thread(
             target=capture_device,
-            args=(spec.role, ports[spec.role], stop_at, start_event, results),
+            args=(spec.role, streams[spec.role], stop_at, start_event, results),
             daemon=True,
         )
         for spec in DEVICES
@@ -555,8 +590,18 @@ def main(argv: list[str]) -> int:
     try:
         ports = discover_ports()
         report["ports"] = ports
+        streams = open_streams(ports)
         if not args.skip_preflight:
-            report["preflight"] = serial_preflight(ports, out_dir)
+            report["preflight"] = serial_preflight(streams, ports, out_dir)
+        else:
+            report["runtime_ready"] = {}
+            for spec in DEVICES:
+                ready_lines, ready = read_until_runtime_ready(streams[spec.role])
+                log_path = out_dir / f"runtime_ready_{spec.role}.log"
+                write_serial_log(log_path, ready_lines)
+                report["runtime_ready"][spec.role] = {"ready": ready, "log": str(log_path)}
+                if not ready:
+                    raise SystemExit(f"RUNTIME GATE: {spec.role} produced no [AP]/runtime line after open")
 
         stimulus = None
         if args.track is not None:
@@ -577,6 +622,7 @@ def main(argv: list[str]) -> int:
                     settle=args.settle,
                     stimulus=None,
                     ports=ports,
+                    streams=streams,
                     out_dir=out_dir,
                 )
             )
@@ -593,10 +639,13 @@ def main(argv: list[str]) -> int:
                         settle=args.settle,
                         stimulus=stimulus,
                         ports=ports,
+                        streams=streams,
                         out_dir=out_dir,
                     )
                 )
     finally:
+        for stream in locals().get("streams", {}).values():
+            stream.close()
         if original_volume is not None:
             set_output_volume(original_volume)
 
@@ -617,6 +666,7 @@ def main(argv: list[str]) -> int:
             print(
                 f"{label} vol={volume:03d} r={repeat} {role}: "
                 f"ap_rows={device['ap_rows']} "
+                f"error={device['error'] or 'none'} "
                 f"max_raw_p90={max_raw.get('p90') if isinstance(max_raw, dict) else None} "
                 f"peak_scaled_p90={peak_scaled.get('p90') if isinstance(peak_scaled, dict) else None} "
                 f"usable={quality['usable']} reasons={','.join(quality['reasons']) or 'none'}"
