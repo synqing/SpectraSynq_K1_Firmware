@@ -127,7 +127,7 @@ first knob save.
 - **Phase 3 (post-launch polish):** presence-hysteresis for quiet music;
   PDM-domain sweep of other SSL consumers (waveform_hybrid runtime margin
   clamps ≥1.00; `lightshow_modes.h:789` SSL×2; VU floors); real-speaker loud
-  characterization.
+  characterisation.
 
 ## 6 · Key numbers
 
@@ -169,7 +169,7 @@ first knob save.
 8. **Cursor's serial-monitor tab** holds the port (Resource busy) AND turns
    stray typing into hotkeys — have Captain close it before serial work.
 9. **The rtk tee wrapper truncates long tool output** — redirect to a file
-   and analyze the file; `RC` from a pipeline is the LAST command's.
+   and analyse the file; `RC` from a pipeline is the LAST command's.
 10. **"Waves" = Anchor Point.** The requested track doesn't exist on disk;
     Anchor Point is the project's canonical analysis track and was the
     Captain-accepted substitute.
@@ -183,7 +183,7 @@ first knob save.
 - `docs/hardware/device-build-registry.md` — deployed-state rows (canonical).
 - `_scratch/im73d_bringup/eyes-on-runbook.md` — sweep results + tuning verdict.
 - `_scratch/im73d_bringup/snappiness/` — SYNTHESIS.md, SSA evidence, dual logs,
-  sweep timeline, analyzers (`sweep_analyze.py`, `dual_ap_capture.py`).
+  sweep timeline, analysers (`sweep_analyze.py`, `dual_ap_capture.py`).
 - `_scratch/im73d_bringup/` — capture/cal tooling (`silence_cal_ny.py`,
   `watch_and_cal_v2.py`, `post_flash_proof.py`, `main_k1_cal_ny.py`,
   `read_serial.py`), incident logs.
@@ -212,7 +212,7 @@ verified against the code on `lane/im73d-pdm-eval` at lane consolidation
 | Config-persistence un-freeze | **Firmware DONE (`e2b62b5`, 07-04) AND deployed** — verified `79d7fda ⊇ e2b62b5`, so the un-freeze code ships on the current bench build. | `bridge_fs.h:81` "un-frozen 2026-07-04"; `update_config_filename()` → `/CONFIG_PDM_%05lu.BIN` |
 | Knob-persistence DEVICE-proof | **OWED** — the code ships, but "set knob via `:` → `:reset` → `:dump` survived" was never captured. Autonomous bench task (a config test, NOT an SNR test → any IM73D bench build is fine; radio-free `k1_bench_im73d` is cleanest). | no proof row in registry/`_scratch` |
 | PDM pins | Code today: `K1_PDM_CLK/DIN/LR_PIN` (`clk13/din12/LR14`) exist ONLY in the bench pinmap branch; the production `#else` branch has **no PDM block**. **RESOLVED (D1, 2026-07-06):** production uses the *identical* bench-proven pins `clk13/din12/LR14` — all current K1s are the same ESP32-S3 devboard. Verified collision-free on the production map (GPIO 12 unassigned; 13/14 freed when SPH drops; LEDs stay 6/7; old SPH LRCLK 11 unused). Firmware just needs the block added to the `#else` branch. | `constants.h:297-345` |
-| Input gain 16.0f | As documented; bench-characterized on an OPEN bench (SPH target ~7000 / IM73D obs 1317 → ×16). Enclosure re-characterization = Phase 2 (needs production hardware). | `constants.h:67-70` |
+| Input gain 16.0f | As documented; bench-characterised on an OPEN bench (SPH target ~7000 / IM73D obs 1317 → ×16). Enclosure re-characterisation = Phase 2 (needs production hardware). | `constants.h:67-70` |
 | SSL cal window | **"widen not bump" lever already pulled** — 650/720 → 1000/1150; silence p90 ~807 of 1150 = healthy headroom now. The "710-of-720" tightness predates the widen and is resolved. | `constants.h:40-60` |
 | ifdef sprawl | **34** `K1_MIC_IM73D_PDM_V1` sites across 7 files (`bridge_fs.h` 13, `i2s_audio.h` 10, `system.h` 3, `constants.h` 3, `noise_cal.h` 3, `globals.h` 2, `platformio.ini` 2). This is the `MicFrontend` retirement target. | `git grep` |
 | flag-OFF byte-identity | SPH `i2s_std` path untouched when flag OFF; `k1_hardware` byte-identical. Invariant to preserve through all production-flag work. | — |
@@ -279,6 +279,69 @@ confirmed `13/12/14`, `MicFrontend` abstraction, DSR_16S eval, flip red-team) is
 now fully autonomous. Mic selection unchanged (ratified 2026-07-03); SPH
 `k1_hardware` stays byte-identical (default-OFF flag).
 
+## 11 · Update — 2026-07-06: autonomous execution (UA shipped) + decisions + flip red-team
+
+Executed against `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md` (harness-first gated DAG). Status of every unit below.
+
+### 11.1 · Shipped
+- **UA — `k1_prod_im73d` production build path (commit `4b95e60`).** Production pinmap + `K1_MIC_IM73D_PDM_V1` at the Captain-confirmed identical pins `clk13/din12/LR14`. `[env:k1_prod_im73d]` extends `k1_hardware`; `BLOCKED_UPLOAD_ENVS` hard-blocks it from flashing onto the SPH-equipped main K1 until the mic swap; drift-catcher + blocked-env + production-pin static tests added. **Byte-identical-OFF proven** (see 11.3). Gate: pytest 629, `k1_prod_im73d` + `k1_hardware` build clean.
+
+### 11.2 · MicFrontend abstraction (Phase 1.2) — DECISION: compile-time selection RETAINED (do not build runtime dispatch)
+Evaluated the "retire the 34-site ifdef sprawl via a runtime `MicFrontend`" idea and **reject it**, with evidence:
+1. **It cannot be behaviour-verified in this build.** The ESP-IDF/Arduino image is **not bit-reproducible** in `.flash.text`/`.flash.rodata` even across clean builds of identical source (11.3). A runtime dispatch rewrite of the Core-0 read path could therefore only be certified by device A/B on hardware that does not yet exist — it is not autonomously certifiable.
+2. **It taxes Core 0.** The mic read is on the hard-real-time audio core; adding runtime branching / vtable indirection per chunk violates `sensorybridge-doctrine` (architecture subordinate to perceptual impact) and `esp32-render-path-safety`.
+3. **The sprawl is inherent to compile-time selection and is the correct trade.** The 34 sites are genuinely-different code per mic (init driver mode, read buffer type, extraction domain, cal domain, persistence namespace, boot invalidation). Collapsing them means runtime dispatch — the thing (1)+(2) forbid.
+
+**Delivered instead — the seam map** (the reusable machinery the flip actually needs): the mic front-end is 6 interfaces; each is one compile-time `#ifdef K1_MIC_IM73D_PDM_V1` site set. To flip or audit the mic, these are the only places to touch:
+
+| # | Interface | Site(s) |
+|---|---|---|
+| 1 | I2S init driver-mode (PDM vs std) | `audio/i2s_audio.h` :44 (include), :220-239 (PDM init) / :240+ (std) |
+| 2 | Chunk read (buffer + timeout, freeze-guard + portMAX paths) | `audio/i2s_audio.h` :305-341 |
+| 3 | Sample extraction / domain gain | `audio/i2s_audio.h` :395-399 (`* K1_MIC_IM73D_INPUT_GAIN`) |
+| 4 | Calibration domain (SSL window, DC term, boot fallback, gain, NaN guard) | `system/constants.h` :40-70; `system/globals.h` :225; `system/system.h` :427,:478; `calibration/noise_cal.h` :36,:47,:83; `audio/i2s_audio.h` :585,:598 |
+| 5 | Persistence namespace (PDM files, config filename, freeze/reset) | `persistence/bridge_fs.h` (13 sites) |
+| 6 | Pins + sample buffer | `system/constants.h` :313-316 (bench) / :328-339 (prod, UA); `system/globals.h` :144-148 |
+
+### 11.3 · Byte-identity oracle — DETERMINISM FINDING (harness correction)
+Establishing the determinism contract (before trusting any byte comparison) revealed: **`k1_hardware` is NOT bit-reproducible in `.flash.text` / `.flash.rodata`** — two clean builds of identical source produced two different hashes for those sections (link-order / embedded timestamp). The other three loadable sections — **`.dram0.data`, `.iram0.text`, `.iram0.vectors` — ARE reproducible** (byte-identical across every build this session).
+- **Consequence:** `scripts/regression-harness/registry_byte_gate.sh` hashes all five sections, so it is **inherently flaky** (two of five drift benignly). It is not in the pre-commit hook, which is why the flakiness has been latent.
+- **The trustworthy oracle (use this for all mic-path behaviour-preservation):** compare only the **3 reproducible sections** + full pytest + a source-level review. UA passed it (3 stable sections byte-identical baseline→UA; the source is 100% OFF-gated). Tool provided in UC (`mic_stable_byte_gate.sh`, additive — the existing gate is left untouched as a trust root).
+
+### 11.4 · DSR_16S evaluation (Phase 1.4) — enable recipe + protocol (no dead code added)
+The PDM clock is DSR_8S via `I2S_PDM_RX_CLK_DEFAULT_CONFIG` (`i2s_audio.h:229`). DSR_16S is the reserved +2 dB lever ([[im73d-pdm-snr-modes]]).
+- **Enable recipe (one line, behind a future flag):** after line 229, `pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;` (raises the PDM clock to ~1.6384 MHz; re-verify the SPH0645 BCLK-min risk noted in the registry §2.1 does not apply to the IM73D at DSR_16S).
+- **Absolute-blocker checkpoint (NOT a stop):** the +2 dB verdict is a **device SNR measurement** — radio-free `k1_bench_im73d` ONLY (never a BLE build — Core-0 radio perturbs audio), Captain-context capture. The lever lands with the measurement that justifies it, not before.
+
+### 11.5 · Production-flip readiness red-team (Phase 1.5)
+**Goal:** flip `k1_hardware`'s default mic SPH0645 → IM73D. **Approach: strangler-fig, never big-bang** — `k1_prod_im73d` is the dual-run env; only after a production-unit device-proof does the default flip.
+
+Pre-mortem (failure → guard):
+
+| Failure mode | Guard |
+|---|---|
+| PDM firmware flashed onto an SPH-equipped unit → bitstream misread as PCM, "works" numerically but is garbage | `BLOCKED_UPLOAD_ENVS` (UA) hard-blocks `k1_prod_im73d` until the mic swap; the AP/VP acceptance gates are ratio-based and blind to absolute amplitude (obs #73496), so a dead/garbage front-end can green the numeric tests — **device eyes-on + `dump_raw` non-zero is mandatory**, not optional |
+| Stale SPH0645 NVS (`DC_OFFSET≈-4714/-5722`) survives boot and biases IM73D samples | boot force-invalidate scrubs cal fields under the flag (`system.h:427`); confirm `cal_source` resets, then Captain silence-go recal on the production unit |
+| Enclosure changes acoustics → g=16 rails or under-drives | re-characterise gain on the SEALED production unit (not the open bench); SSL window already widened 1000/1150 with ~807 silence headroom |
+| Default flip before a production unit exists | flip is Captain-gated and depends on the mic swap (11.6) — `k1_prod_im73d` stays a separate env until then |
+| Behaviour regression on the SPH path from mic work | 3-stable-section byte gate (11.3) + pytest; UA proven OFF-identical |
+| Quiet-music partial gating read as a bug | it is acoustically intrinsic (§1); Phase-3 presence-hysteresis, not threshold surgery |
+
+**Flip checklist (all required, in order):** (1) main-K1 mic swap done + `dump_raw` int16 sane; (2) gain re-characterised on the production unit; (3) Captain silence-go recal → `cal_valid=1 reason=none`; (4) `stream_agc` all four gains < 10 after 10 s; (5) eyes-on A/B vs the SPH baseline across genres incl. VU modes; (6) move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the F887A500 allow-list; (7) only then consider flipping the `k1_hardware` default (Captain).
+
+### 11.6 · Absolute-blocker checkpoints (handed to Captain — the run did NOT stop on these)
+1. **Physical main-K1 SPH0645 → IM73D swap** — the only gate to device-proving `k1_prod_im73d`.
+2. **DSR_16S +2 dB SNR measurement** — radio-free bench, Captain-context.
+3. **Perceptual eyes-on / audio A/B** for any default flip.
+4. **`k1_hardware` default-env flip** — Captain call after 1-3.
+
+### 11.7 · Knob-persistence device-proof (Phase 1.1 tail) — status: OWED, deliberately deferred
+Un-freeze code (`e2b62b5`) ships on the bench (`79d7fda ⊇ e2b62b5`). The isolated "set knob → `:reset` → survived" capture is **still owed**. This session confirmed both units are MAC-reachable (bench `B489A500` on usbmodem101, main `F887A500` on usbmodem1101) but **deliberately did NOT run the cycle**, because:
+- the bench runs the **BLE demo build**, where `save_config_delayed`'s LittleFS write can **defer** under BLE heap pressure (the `1ac840a` fail-safe) → a non-persist result would be **inconclusive** (heap-defer vs a real bug), not a clean proof;
+- the cycle requires a `:reset`, disrupting the Captain-directed investor-demo state, with the main K1 co-connected on the bus.
+
+Existing evidence is already strong: persistence is **host-proven** (`bridge_fs_config` golden + `test_calibration_profile_static`) and **device-proven-adjacent** (`cal_source=persisted_profile` uses the identical `/CONFIG_PDM_*.BIN`-family mechanism, proven across cold boot + reflash). **Recommendation:** run the isolated knob cycle on the next **radio-free `k1_bench_im73d`** bench session (no heap-defer confound), not the BLE demo build. Environmental/checkpoint item, not a Captain decision.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
@@ -287,3 +350,4 @@ now fully autonomous. Mic selection unchanged (ratified 2026-07-03); SPH
 | 2026-07-04 | agent:claude-code (Fable) | Phase 1.1 firmware landed (`e2b62b5`): PDM-namespaced config persistence un-freeze; §4 update section added with device-proof protocol (bench off USB, proof pending). |
 | 2026-07-06 | agent:claude-code (Fable) | §10 added: Item-3 productionization audit (code-verified live state — persistence un-freeze DONE+deployed, pins bench-only, SSL window already widened, knob device-proof owed), production-flag plan (`K1_MIC_IM73D_PROD_V1` + `MicFrontend` Phase 1.2), and the Captain hardware-fork decision in accept-reject form. |
 | 2026-07-06 | agent:claude-code (Fable) | §10.3 RESOLVED: Captain D1 = identical bench-proven pin map `clk13/din12/LR14` (all K1s same ESP32-S3 devboard); D2 framing withdrawn (no PCB rev — IM73D already wired on the bench K1 since bringup). Corrected §10.1/§10.2 provisional-pin guess to the confirmed pins; verified collision-free on the production map. No open Captain decision blocks Phase-1 firmware. |
+| 2026-07-06 | agent:claude-code (Fable) | §11 added: autonomous execution — UA `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED); MicFrontend runtime-dispatch REJECTED with evidence (compile-time selection retained + seam map delivered); byte-oracle determinism finding (registry_byte_gate flaky — 2 of 5 sections non-reproducible; use the 3 stable sections); DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist); absolute-blocker checkpoints. |

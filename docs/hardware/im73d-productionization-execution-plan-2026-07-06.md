@@ -79,6 +79,20 @@ U0 (oracle baseline) ──┬─▶ UA (prod build path) ──▶ UB (mic-conf
 3. **Perceptual eyes-on / audio A/B** for any eventual default flip.
 4. **Default-env flip** (`k1_hardware` → IM73D) — Captain call after 1-3.
 
+## Execution status (2026-07-06)
+
+| Unit | Status | Evidence |
+|---|---|---|
+| U0 oracle baseline | ✅ done | 3-stable-section baselines captured; **determinism finding**: `.flash.text`/`.flash.rodata` non-reproducible even clean → oracle = 3 stable sections |
+| UA production build path | ✅ **shipped** `4b95e60` | `k1_prod_im73d` (pins 13/12/14), guard-BLOCKED, byte-identical-OFF (3 stable sections), pytest 629 |
+| UB MicFrontend | ✅ **resolved (decision)** | runtime dispatch REJECTED (un-byte-verifiable + Core-0 + doctrine); seam map delivered — handover §11.2 |
+| UC IM73D byte-gate | ✅ **shipped** `d1ecc10` | `mic_stable_byte_gate.sh` + committed references (k1_hardware/k1_bench_reference/k1_bench_im73d) + static contract test; non-flaky check confirmed |
+| UD DSR_16S recipe | ✅ done (doc) | enable recipe + SNR protocol — handover §11.4 (device SNR = Captain-context checkpoint) |
+| UE flip red-team | ✅ done (doc) | pre-mortem + 7-step flip checklist — handover §11.5 |
+| UF knob device-proof | ⏸ deferred (owed) | bench MAC-reachable but on the BLE demo build → inconclusive (heap-defer); host+adjacent-proven; run on radio-free bench — handover §11.7 |
+
+**Absolute-blocker checkpoints (handed to Captain, run did not stop):** main-K1 mic swap · DSR_16S SNR measurement · eyes-on/audio A/B · `k1_hardware` default flip.
+
 ## Governance (fleet-of-one)
 Retry budget 3 per unit (3-strike → escalate the decomposition, not the code). Byte-identity oracle is the trust root — never edited by a production unit. Every unit = one revertible commit through the pre-commit gate. Burndown tracked in `progress.md` + the working `task_plan.md`.
 
