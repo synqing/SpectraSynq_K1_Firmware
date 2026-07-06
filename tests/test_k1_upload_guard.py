@@ -104,6 +104,31 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
+    def test_prod_im73d_is_blocked_until_mic_swap(self):
+        # k1_prod_im73d = production pinmap + IM73D PDM. The main K1 still carries
+        # an SPH0645, so this env must HARD-BLOCK on every port (a PDM read of an
+        # SPH i2s bitstream is garbage) until Captain does the physical mic swap.
+        for port in ("/dev/tty.usbmodem1401", "/dev/tty.usbmodem12201"):
+            with self.subTest(port=port):
+                ok, message = self.guard.validate_upload_target(
+                    "k1_prod_im73d", port, self.ports
+                )
+                self.assertFalse(ok)
+                self.assertIn("upload blocked", message)
+                self.assertIn("mic swap", message)
+
+    def test_production_pinmap_defines_im73d_pdm_pins(self):
+        # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
+        # bench-proven pins. Assert the production (#else) pinmap defines the PDM
+        # pins clk=13 / din=12 / LR=14 under K1_MIC_IM73D_PDM_V1, so k1_prod_im73d
+        # compiles and wires the mic to the proven GPIOs.
+        constants = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h").read_text()
+        prod = constants.split("#else", 1)[1]  # production GPIO branch onward
+        prod = prod.split("#define I2C_SDA_PIN", 1)[0]  # bound to the pinmap block
+        self.assertIn("#define K1_PDM_CLK_PIN 13", prod)
+        self.assertIn("#define K1_PDM_DIN_PIN 12", prod)
+        self.assertIn("#define K1_PDM_LR_PIN  14", prod)
+
     def test_cross_flash_attempts_are_rejected(self):
         cases = (
             ("k1_hardware", "/dev/tty.usbmodem12201"),
@@ -169,6 +194,10 @@ class K1UploadGuardTest(unittest.TestCase):
         mapped: set[str] = set()
         for target in self.guard.K1_TARGETS:
             mapped.update(target.envs)
+        # A BLOCKED env is also covered: validate_upload_target() hard-blocks it
+        # (returns False) BEFORE the fail-open path, so it can never cross-flash.
+        # k1_prod_im73d lives here until the main-K1 SPH0645 -> IM73D swap.
+        mapped.update(self.guard.BLOCKED_UPLOAD_ENVS)
 
         K1_ROOTS = {"k1_hardware", "k1_bench_reference"}
         missing = sorted(

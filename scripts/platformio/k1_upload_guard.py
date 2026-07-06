@@ -100,6 +100,13 @@ BLOCKED_UPLOAD_ENVS: dict[str, str] = {
         "32 kHz spike is build-only until acquisition-only, AP/VP, "
         "calibration, and watchdog gates are explicitly re-opened"
     ),
+    "k1_prod_im73d": (
+        "IM73D production build path (production pinmap + PDM). The main K1 "
+        "(F887A500) still carries an SPH0645 — flashing PDM firmware onto it would "
+        "misread the i2s bitstream as PCM. BLOCKED until the physical SPH0645 -> "
+        "IM73D mic swap (Captain hardware step); at swap time, move this env from "
+        "BLOCKED_UPLOAD_ENVS to the F887A500 target's envs tuple."
+    ),
 }
 
 

@@ -324,6 +324,18 @@ static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
     #define LED_DATA_PIN 6
     #define LED_CLOCK_PIN 7
+
+    #ifdef K1_MIC_IM73D_PDM_V1
+      // IM73D122 PDM mic on the PRODUCTION pinmap (Captain D1, 2026-07-06): the
+      // production IM73D uses the IDENTICAL bench-proven pins — all current K1s are
+      // the same ESP32-S3 devboard. clk 819.2 kHz (DSR_8S) / LR LOW = LEFT / falling
+      // edge. The i2s_std I2S_*_PIN above stay defined but UNUSED under the flag.
+      // Collision-free on this map: GPIO 12 is unassigned, 13/14 free when SPH drops,
+      // LEDs 6/7 unaffected, old SPH LRCLK 11 goes unused.
+      #define K1_PDM_CLK_PIN 13   // PDM clock out (= production SPH BCLK pad, freed)
+      #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
+      #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
+    #endif
   #endif
 
   #define I2C_SDA_PIN 17
