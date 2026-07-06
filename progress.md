@@ -1,13 +1,20 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; bench recovery proved; main-swap blocker superseded** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until deliberate IM73D proof-unit allow-list update). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 is identical K1 hardware with IM73D on the ratified production pin map and is recovered/runtime-proven on radio-free `k1_bench_im73d @ 9d14463`; main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. The old R2 main-K1 swap wording is superseded: main conversion is optional product-unit work, not a firmware proof blocker. See `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; bench recovery proved; R2/R3 corrected after LED-pinmap incident** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 proves the IM73D mic/PDM path on the ratified `13/12/14` pins, but it must not be used for `k1_prod_im73d` LED-output proof because that env inherits the `k1_hardware` LED GPIO map; a live bench flash made both LED channels dark and the upload guard was restored to hard-block it. Main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. See `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+
+## 2026-07-07 Bench LED-Pinmap Incident
+
+- **Cause:** `k1_prod_im73d` extends `k1_hardware`, so it drives the production LED GPIO map. Treating the bench IM73D unit as a full `k1_prod_im73d` proof unit conflated mic-pin equivalence with LED-harness equivalence.
+- **Observed effect:** flashing `k1_prod_im73d @ f2f7c45` to bench K1 `B489A500` made both LED channels dark while serial/audio proof still appeared alive.
+- **Immediate recovery:** bench was MAC-verified (`B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem1401`) and uploaded back to `k1_bench_im73d @ f2f7c45`; read-only `:build`/`:dump` proved `env=k1_bench_im73d`, chip `B489A500`, `CONFIG.CHROMA: 0.100000`, `CONFIG.SENSITIVITY: 0.870005`, `AUDIO_RESPONSE_GAIN: 1.000000`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`, and `CAL_PROFILE_LOADED: 1`.
+- **Guard correction:** `k1_prod_im73d` is back in `BLOCKED_UPLOAD_ENVS`. Future proof must use a production LED-harness IM73D unit or an explicitly named bench-LED proof env.
 
 ## 2026-07-07 R2 Main-Swap Blocker Superseded
 
-- **Correction:** bench K1 uses identical K1 hardware to the main K1 and already carries IM73D on the ratified production pin map (`clk13/din12/LR14`). It is therefore a valid production-shape IM73D proof unit.
-- **Superseded blocker:** main-K1 SPH0645->IM73D physical swap is not required to prove `k1_prod_im73d`; it is optional product-unit conversion work.
-- **Next mechanical step:** update `scripts/platformio/k1_upload_guard.py` and tests so `k1_prod_im73d` can flash only to the MAC-verified bench IM73D proof unit, then run the R3 proof checklist on bench.
+- **Correction:** bench K1 carries IM73D on the ratified mic pin map (`clk13/din12/LR14`). It is therefore a valid IM73D mic/PDM proof unit.
+- **Superseded blocker:** main-K1 SPH0645->IM73D physical swap is not required to prove the mic path; it is optional product-unit conversion work unless the production LED GPIO map is the proof target.
+- **Next mechanical step:** keep `k1_prod_im73d` blocked and choose the corrected R3 path: production LED-harness IM73D unit, or separate bench-LED proof env.
 - **Doc updated:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` is retained for link stability but now explicitly marks the old swap handoff as superseded.
 
 ## 2026-07-07 Bench Recovery Proof

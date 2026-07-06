@@ -1,5 +1,5 @@
 ---
-abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2026-07-07) for the IM73D productionization lane. Phase-1 productionization firmware shipped (k1_prod_im73d production build path — byte-identical-OFF, upload-guard BLOCKED until deliberate IM73D proof-unit allow-list update). R1 knob persistence is closed. R4 DSR_16S controlled-audio eval is closed and rejected; keep DSR_8S. The original main-K1 physical-swap blocker is superseded: bench K1 is identical K1 hardware with IM73D on the ratified production pin map, so it is the valid production-shape proof unit. What remains is R3 production-env proof on the bench IM73D unit, Captain eyes-on, and final default-env flip. This brief carries read-order, device-identity table (MAC-only), done-ledger, task queue, byte-identity discipline, and hard rules."
+abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2026-07-07) for the IM73D productionization lane. Phase-1 productionization firmware shipped (k1_prod_im73d production build path — byte-identical-OFF, upload-guard BLOCKED). R1 knob persistence is closed. R4 DSR_16S controlled-audio eval is closed and rejected; keep DSR_8S. The original main-K1 physical-swap blocker is superseded only for IM73D mic/PDM proof: bench K1 carries IM73D on the ratified mic pin map, but it is not valid for k1_prod_im73d LED-output proof because that env inherits the k1_hardware LED GPIO map. What remains is a corrected R3 proof path, Captain eyes-on, and final default-env flip. This brief carries read-order, device-identity table (MAC-only), done-ledger, task queue, byte-identity discipline, and hard rules."
 ---
 
 # IM73D productionization — Codex end-to-end resume brief (2026-07-06)
@@ -15,11 +15,13 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 > `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md` and
 > `artifacts/im73d_recovery_2026-07-07/readonly_build_dump_20260707.json`.
 >
-> **2026-07-07 R2 correction:** the original main-K1 physical-swap blocker is
-> superseded. The bench K1 uses identical K1 hardware to the main K1 and already
-> carries IM73D on the ratified production pin map (`clk13/din12/LR14`), so it
-> is a valid production-shape IM73D proof unit. Main-K1 conversion is optional
-> product-unit work, not a firmware proof blocker.
+> **2026-07-07 R2/R3 correction:** the original main-K1 physical-swap blocker is
+> superseded for **mic/PDM** proof. The bench K1 already carries IM73D on the
+> ratified PDM pin map (`clk13/din12/LR14`). However, `k1_prod_im73d` inherits
+> the `k1_hardware` LED GPIO map, and a 2026-07-07 bench flash made both LED
+> channels dark. Therefore the bench IM73D unit is **not** valid for
+> `k1_prod_im73d` LED-output proof unless a dedicated bench-LED proof env is
+> created. Keep `k1_prod_im73d` upload-blocked.
 
 ---
 
@@ -41,7 +43,7 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 
 - **Branch / HEAD:** `lane/im73d-pdm-eval @ 855c4a2`. Tree clean.
 - **Both lanes consolidated:** `lane/palette-vibrancy-v1` is merged in (`55c536b`); vibrancy shipped + eyes-on PASSED on the main K1.
-- **Host gate GREEN:** pytest **629 passed / 1 skipped**; `k1_hardware` + `k1_prod_im73d` build clean.
+- **Host gate GREEN:** pytest **629 passed / 1 skipped**; `k1_hardware` + `k1_prod_im73d` build clean. Later corrective guard tests restored `k1_prod_im73d` to upload-blocked after the bench LED-dark incident.
 - **The pre-commit hook is authoritative** (firmware tier = pytest + `pio run -e k1_hardware`); it runs on every commit. Docs-only commits skip the build.
 
 ### Device identity — MAC ONLY (ports scramble daily; at handover: main=`usbmodem1101`, bench=`usbmodem101`)
@@ -70,7 +72,7 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 | `855c4a2` | Test-precision fix (production-pin test now mutation-proven) | adversarial-review finding |
 
 **Key state you inherit:**
-- `[env:k1_prod_im73d]` = `k1_hardware` GPIO map + `-DK1_MIC_IM73D_PDM_V1` at pins **clk13/din12/LR14** (Captain D1: all K1s the same ESP32-S3 devboard). It is in **`BLOCKED_UPLOAD_ENVS`** in `scripts/platformio/k1_upload_guard.py` — it hard-blocks on every port until the mic swap.
+- `[env:k1_prod_im73d]` = `k1_hardware` LED GPIO map + `-DK1_MIC_IM73D_PDM_V1` at mic pins **clk13/din12/LR14**. It is in **`BLOCKED_UPLOAD_ENVS`** in `scripts/platformio/k1_upload_guard.py` because the bench IM73D unit does not prove this env's LED-output map.
 - Byte-identity oracle = `scripts/regression-harness/mic_stable_byte_gate.sh` (hashes only the 3 reproducible sections `.dram0.data`/`.iram0.text`/`.iram0.vectors`). The old `registry_byte_gate.sh` (5 sections) is **flaky** — see memory `k1-byte-identity-oracle`.
 
 ---
@@ -103,18 +105,24 @@ Two tracks. **Track A** is autonomous (do it). **Track B** is Captain-gated hard
 **No cal firing** — no Captain silence-go needed for this. If the bench is unreachable, document as still-owed and move on.
 
 ### R2 (SUPERSEDED 2026-07-07) — main-K1 SPH0645 → IM73D physical swap
-This is no longer a production proof blocker. Bench K1 is identical K1 hardware
-with IM73D on the ratified production pin map, so it is the valid
-production-shape IM73D proof unit. Main-K1 conversion is optional product-unit
-work only.
+This is no longer a mic/PDM proof blocker. Bench K1 carries IM73D on the
+ratified `clk13/din12/LR14` PDM pin map. Main-K1 conversion is optional
+product-unit work unless the proof specifically requires the production LED
+harness.
 
-### R3 (Track A) — device-prove `k1_prod_im73d` on the bench IM73D proof unit
-Move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the bench IM73D target's
-allow-list in `k1_upload_guard.py` (+ test update), guard-verify by MAC, flash
-bench only, then run the **flip checklist** (handover §11.5): `dump_raw` int16
-sane → gain re-characterise on the sealed unit → **Captain silence-go recal only
-if explicitly authorised** → `stream_agc` all 4 gains < 10 after 10 s →
-Captain eyes-on. Byte-gate stays green for the flag-OFF SPH path throughout.
+### R3 (BLOCKED / corrected 2026-07-07) — device-prove `k1_prod_im73d`
+Do **not** move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the bench allow-list.
+That env extends `k1_hardware`, so it drives the production LED GPIO map. A live
+bench flash on 2026-07-07 made both LED channels dark. Correct proof options:
+
+1. prove `k1_prod_im73d` on a production LED-harness IM73D unit, or
+2. create an explicitly named bench-LED IM73D proof env that preserves the bench
+   LED GPIO map while exercising the production mic path.
+
+Then run the **flip checklist** (handover §11.5): `dump_raw` int16 sane → gain
+re-characterise on the sealed unit → **Captain silence-go recal only if
+explicitly authorised** → `stream_agc` all 4 gains < 10 after 10 s → Captain
+eyes-on. Byte-gate stays green for the flag-OFF SPH path throughout.
 
 ### R4 (CLOSED 2026-07-06) — DSR_16S +2 dB evaluation
 Controlled speaker playback was made available and the DSR16 measurement was
@@ -136,10 +144,10 @@ Phase 2: BOM/supply diligence (IM73D122 / Infineon), per-unit factory-cal UX, SP
 
 ## 5 · Corrected R2/R3 gate
 
-> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-blocked until the upload guard is deliberately updated.
-> **Corrected proof target:** bench K1 `B489A500` / USB MAC `B4:3A:45:A5:89:B4`, because it is identical K1 hardware with IM73D on the ratified production pin map.
-> **Decision no longer required:** main-K1 SPH0645→IM73D swap. That swap is optional product-unit conversion work, not the proof gate.
-> **Next mechanical step:** update upload guard/tests to allow `k1_prod_im73d` only on the bench IM73D proof unit, flash after MAC verification, and run the R3 proof checklist.
+> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-blocked.
+> **Corrected proof target:** bench K1 `B489A500` / USB MAC `B4:3A:45:A5:89:B4` proves the IM73D PDM mic path on pins `13/12/14`, but not the `k1_hardware` LED GPIO map used by `k1_prod_im73d`.
+> **Decision no longer required:** main-K1 SPH0645→IM73D swap is optional for mic proof, but a production LED-harness IM73D unit or dedicated bench-LED proof env is required before `k1_prod_im73d` visual proof.
+> **Next mechanical step:** choose the corrected R3 path: production LED-harness IM73D unit, or a separate bench-LED proof env. Keep `k1_prod_im73d` blocked until then.
 
 ---
 
