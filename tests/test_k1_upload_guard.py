@@ -56,6 +56,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
             "k1_bench_im73d",  # IM73D122 PDM mic eval — bench B489A500 only
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
+            "k1_prod_im73d",  # Production IM73D proof env - bench B489A500 proof unit only
         ):
             with self.subTest(env_name=env_name):
                 ok, message = self.guard.validate_upload_target(
@@ -105,18 +106,27 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
-    def test_prod_im73d_is_blocked_until_mic_swap(self):
-        # k1_prod_im73d = production pinmap + IM73D PDM. The main K1 still carries
-        # an SPH0645, so this env must HARD-BLOCK on every port (a PDM read of an
-        # SPH i2s bitstream is garbage) until Captain does the physical mic swap.
-        for port in ("/dev/tty.usbmodem1401", "/dev/tty.usbmodem12201"):
-            with self.subTest(port=port):
-                ok, message = self.guard.validate_upload_target(
-                    "k1_prod_im73d", port, self.ports
-                )
-                self.assertFalse(ok)
-                self.assertIn("upload blocked", message)
-                self.assertIn("mic swap", message)
+    def test_prod_im73d_is_bound_to_bench_im73d_proof_unit(self):
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d",
+            "/dev/tty.usbmodem12201",
+            self.ports,
+        )
+        self.assertTrue(ok, message)
+        self.assertIn("B489A500", message)
+
+    def test_prod_im73d_rejects_main_sph_unit(self):
+        # k1_prod_im73d = production pinmap + IM73D PDM. Main F887A500 still
+        # carries SPH0645 and remains the SPH reference/control, so the guard
+        # must reject that MAC even though the hardware family is otherwise K1.
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d",
+            "/dev/tty.usbmodem1401",
+            self.ports,
+        )
+        self.assertFalse(ok)
+        self.assertIn("has USB serial", message)
+        self.assertIn("expected", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
         # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
@@ -146,6 +156,7 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
             ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
+            ("k1_prod_im73d", "/dev/tty.usbmodem1401"),  # prod IM73D proof must reject main SPH
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):
@@ -207,7 +218,6 @@ class K1UploadGuardTest(unittest.TestCase):
             mapped.update(target.envs)
         # A BLOCKED env is also covered: validate_upload_target() hard-blocks it
         # (returns False) BEFORE the fail-open path, so it can never cross-flash.
-        # k1_prod_im73d lives here until the main-K1 SPH0645 -> IM73D swap.
         mapped.update(self.guard.BLOCKED_UPLOAD_ENVS)
 
         K1_ROOTS = {"k1_hardware", "k1_bench_reference"}

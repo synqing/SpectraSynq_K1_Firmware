@@ -86,6 +86,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_im73d",  # IM73D122 PDM mic evaluation — bench B489A500 ONLY (2026-07-02)
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S SNR eval - radio-free bench B489A500 ONLY (2026-07-06)
             "k1_bench_im73d_ble",  # IM73D PDM + NimBLE BLE-MIDI demo — bench B489A500 ONLY (2026-07-04)
+            "k1_prod_im73d",  # Production IM73D proof env — bench B489A500 proof unit ONLY (2026-07-07)
             "k1_custom",  # 224-LED single-channel wall-bounce build — bench B489A500 ONLY (2026-07-06)
         ),
         role="2nd bench K1",
@@ -100,13 +101,6 @@ BLOCKED_UPLOAD_ENVS: dict[str, str] = {
     "k1_sample_rate_32k_spike": (
         "32 kHz spike is build-only until acquisition-only, AP/VP, "
         "calibration, and watchdog gates are explicitly re-opened"
-    ),
-    "k1_prod_im73d": (
-        "IM73D production build path (production pinmap + PDM). The main K1 "
-        "(F887A500) still carries an SPH0645 — flashing PDM firmware onto it would "
-        "misread the i2s bitstream as PCM. BLOCKED until the physical SPH0645 -> "
-        "IM73D mic swap (Captain hardware step); at swap time, move this env from "
-        "BLOCKED_UPLOAD_ENVS to the F887A500 target's envs tuple."
     ),
 }
 
