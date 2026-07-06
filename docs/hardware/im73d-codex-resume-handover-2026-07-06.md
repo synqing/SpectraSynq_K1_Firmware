@@ -1,5 +1,5 @@
 ---
-abstract: "Codex end-to-end resume brief (2026-07-06) for the IM73D productionization lane. Everything autonomously-completable is DONE and committed on lane/im73d-pdm-eval @ 855c4a2: two lanes consolidated (vibrancy + IM73D mic-eval), and Phase-1 productionization firmware shipped (k1_prod_im73d production build path — byte-identical-OFF, upload-guard BLOCKED until the physical mic swap). What REMAINS is (A) Captain-gated hardware checkpoints (main-K1 SPH0645->IM73D swap, DSR_16S SNR, eyes-on A/B, default-env flip) and (B) one owed autonomous item (knob-persistence device capture on a radio-free bench). This brief carries: read-order, device-identity table (MAC-only), the done-ledger with commit SHAs, the exact ordered task queue with copy-paste serial/guard/gate payloads, the byte-identity oracle discipline, and every hard rule/gotcha that cost a prior session. Read this FIRST when resuming as Codex."
+abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2026-07-07) for the IM73D productionization lane. Phase-1 productionization firmware shipped (k1_prod_im73d production build path — byte-identical-OFF, upload-guard BLOCKED until deliberate IM73D proof-unit allow-list update). R1 knob persistence is closed. R4 DSR_16S controlled-audio eval is closed and rejected; keep DSR_8S. The original main-K1 physical-swap blocker is superseded: bench K1 is identical K1 hardware with IM73D on the ratified production pin map, so it is the valid production-shape proof unit. What remains is R3 production-env proof on the bench IM73D unit, Captain eyes-on, and final default-env flip. This brief carries read-order, device-identity table (MAC-only), done-ledger, task queue, byte-identity discipline, and hard rules."
 ---
 
 # IM73D productionization — Codex end-to-end resume brief (2026-07-06)
@@ -14,6 +14,12 @@ abstract: "Codex end-to-end resume brief (2026-07-06) for the IM73D productioniz
 > `CAL_VALID: 1`, `CONFIG.CHROMA: 0.100000`). Authority:
 > `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md` and
 > `artifacts/im73d_recovery_2026-07-07/readonly_build_dump_20260707.json`.
+>
+> **2026-07-07 R2 correction:** the original main-K1 physical-swap blocker is
+> superseded. The bench K1 uses identical K1 hardware to the main K1 and already
+> carries IM73D on the ratified production pin map (`clk13/din12/LR14`), so it
+> is a valid production-shape IM73D proof unit. Main-K1 conversion is optional
+> product-unit work, not a firmware proof blocker.
 
 ---
 
@@ -96,11 +102,19 @@ Two tracks. **Track A** is autonomous (do it). **Track B** is Captain-gated hard
 5. Restore the knob (`:chroma=0.100`), update `device-build-registry.md` deployed-state row.
 **No cal firing** — no Captain silence-go needed for this. If the bench is unreachable, document as still-owed and move on.
 
-### R2 (Track B → escalate) — main-K1 SPH0645 → IM73D physical swap
-The only gate to device-proving `k1_prod_im73d`. Captain's hands. Escalate as accept/reject with blast radius (below). Firmware is READY (`k1_prod_im73d` builds clean).
+### R2 (SUPERSEDED 2026-07-07) — main-K1 SPH0645 → IM73D physical swap
+This is no longer a production proof blocker. Bench K1 is identical K1 hardware
+with IM73D on the ratified production pin map, so it is the valid
+production-shape IM73D proof unit. Main-K1 conversion is optional product-unit
+work only.
 
-### R3 (Track A after R2) — device-prove `k1_prod_im73d` on the swapped main K1
-After Captain confirms the swap: move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the `F887A500` target's `envs` tuple in `k1_upload_guard.py` (+ test update), guard-verify, flash, then run the **flip checklist** (handover §11.5): `dump_raw` int16 sane → gain re-characterise on the sealed unit → **Captain silence-go recal** → `stream_agc` all 4 gains < 10 after 10 s → eyes-on A/B vs SPH. Byte-gate stays green for the flag-OFF SPH path throughout.
+### R3 (Track A) — device-prove `k1_prod_im73d` on the bench IM73D proof unit
+Move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the bench IM73D target's
+allow-list in `k1_upload_guard.py` (+ test update), guard-verify by MAC, flash
+bench only, then run the **flip checklist** (handover §11.5): `dump_raw` int16
+sane → gain re-characterise on the sealed unit → **Captain silence-go recal only
+if explicitly authorised** → `stream_agc` all 4 gains < 10 after 10 s →
+Captain eyes-on. Byte-gate stays green for the flag-OFF SPH path throughout.
 
 ### R4 (CLOSED 2026-07-06) — DSR_16S +2 dB evaluation
 Controlled speaker playback was made available and the DSR16 measurement was
@@ -113,20 +127,19 @@ raw rail risk. Authority:
 `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`.
 
 ### R5 (Track B, final) — `k1_hardware` default-env flip
-Only after R2–R4 + eyes-on. Captain call. Strangler-fig: `k1_prod_im73d` is the dual-run env; the default flips last. Full 7-step checklist in handover §11.5.
+Only after R3 + R4 + eyes-on. Captain call. Strangler-fig: `k1_prod_im73d` is the dual-run env; the default flips last. Full 7-step checklist in handover §11.5.
 
 ### Phase 2/3 (later, Captain-sequenced)
 Phase 2: BOM/supply diligence (IM73D122 / Infineon), per-unit factory-cal UX, SPH0645 autopsy on the main K1 (DC ≈ −5722). Phase 3: presence-hysteresis for quiet-music partial gating (acoustically intrinsic — NOT threshold surgery), PDM-domain sweep of other SSL consumers. Details in handover §5.
 
 ---
 
-## 5 · Escalation template for R2 (the one real Captain decision left)
+## 5 · Corrected R2/R3 gate
 
-> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-blocked from the SPH-equipped main K1.
-> **Decision required:** physically swap the main K1's SPH0645 for an IM73D on pins 13/12/14 (identical to the bench), OR keep the main K1 on SPH and device-prove the production build on a dedicated IM73D unit.
-> **Blast radius:** the swap makes the main K1 an IM73D unit (reversible — SPH files preserved on NVS; revert = reflash SPH `k1_hardware`). Until the swap, `k1_prod_im73d` cannot be device-proven and the default flip stays blocked.
-> **Recommended:** swap when convenient; firmware waits at zero cost (flag-OFF SPH is byte-identical, default unchanged).
-> **Default if Captain does not act:** the run holds R2–R5; all autonomous work (R1) proceeds.
+> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-blocked until the upload guard is deliberately updated.
+> **Corrected proof target:** bench K1 `B489A500` / USB MAC `B4:3A:45:A5:89:B4`, because it is identical K1 hardware with IM73D on the ratified production pin map.
+> **Decision no longer required:** main-K1 SPH0645→IM73D swap. That swap is optional product-unit conversion work, not the proof gate.
+> **Next mechanical step:** update upload guard/tests to allow `k1_prod_im73d` only on the bench IM73D proof unit, flash after MAC verification, and run the R3 proof checklist.
 
 ---
 

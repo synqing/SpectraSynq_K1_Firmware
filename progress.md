@@ -1,7 +1,14 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; bench recovery proved** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until production-IM73D hardware proof). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 is recovered and runtime-proven on radio-free `k1_bench_im73d @ 9d14463`; main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. See `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; bench recovery proved; main-swap blocker superseded** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until deliberate IM73D proof-unit allow-list update). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 is identical K1 hardware with IM73D on the ratified production pin map and is recovered/runtime-proven on radio-free `k1_bench_im73d @ 9d14463`; main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. The old R2 main-K1 swap wording is superseded: main conversion is optional product-unit work, not a firmware proof blocker. See `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+
+## 2026-07-07 R2 Main-Swap Blocker Superseded
+
+- **Correction:** bench K1 uses identical K1 hardware to the main K1 and already carries IM73D on the ratified production pin map (`clk13/din12/LR14`). It is therefore a valid production-shape IM73D proof unit.
+- **Superseded blocker:** main-K1 SPH0645->IM73D physical swap is not required to prove `k1_prod_im73d`; it is optional product-unit conversion work.
+- **Next mechanical step:** update `scripts/platformio/k1_upload_guard.py` and tests so `k1_prod_im73d` can flash only to the MAC-verified bench IM73D proof unit, then run the R3 proof checklist on bench.
+- **Doc updated:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` is retained for link stability but now explicitly marks the old swap handoff as superseded.
 
 ## 2026-07-07 Bench Recovery Proof
 
@@ -29,7 +36,7 @@
 - **Device proof:** bench MAC `B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem101` was guard-verified, flashed to `k1_bench_im73d_dsr16 @ bc53ceb`, captured quiet-only 3x, then restored to `k1_bench_im73d @ bc53ceb` and captured matching quiet-only 3x. Main K1 was present but not flashed.
 - **Evidence:** DSR16 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162130_dsr16_quiet_only/summary.json`; restored DSR8 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162406_dsr8_quiet_only_restored/summary.json`; compare report `artifacts/im73d_dsr_eval_2026-07-06/dsr8_vs_dsr16_quiet_compare.json`; write-up `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`.
 - **Result:** no raw near-rail evidence (`raw_i16_near_pct=0` for both), `input_trim=1.000`, `clip_pct=0.000`, `near_pct=0.000`, all bench runs usable. Quiet DSR16 raw RMS was lower than quiet DSR8 (`raw_i16_rms` p90 mean ratio 0.788), but no signal stimulus was present, so **DSR_16S remains unpromoted**.
-- **R2 handoff:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` captures the main-K1 SPH0645 to IM73D accept/reject decision, blast radius, and post-swap proof checklist.
+- **R2 handoff superseded:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` now records that the bench IM73D unit is the production-shape proof target and the main-K1 swap is optional, not a blocker.
 
 ## 2026-07-06 Audio Pipeline Purity Audit
 
@@ -74,7 +81,7 @@
 - **UC — `mic_stable_byte_gate.sh` SHIPPED (`d1ecc10`).** Formalises the stable-section oracle the graft used manually: hashes ONLY the 3 reproducible sections (`.dram0.data`/`.iram0.text`/`.iram0.vectors`), committed references for k1_hardware/k1_bench_reference/k1_bench_im73d, static contract test. Additive — `registry_byte_gate.sh` (flaky, 5 sections) left as trust root.
 - **UD/UE — docs (`6bfc702`):** DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist).
 - **UF — knob-persistence device-proof CLOSED (`d9f53d6` → `67227da`).** Radio-free bench proved `:chroma=0.150` persistence across reset, then final restored `CONFIG.CHROMA: 0.100000` after Captain BOOT/RESET recovery; cal profile stayed `persisted_profile`. No `start_noise_cal` was run.
-- **Absolute-blocker checkpoints (handed to Captain, run did not stop):** main-K1 mic swap · DSR_16S SNR measurement · eyes-on A/B · `k1_hardware` default flip.
+- **Superseded blocker note:** this older absolute-blocker list is superseded for main-K1 mic swap and DSR_16S. DSR_16S was rejected by controlled-audio evidence; main-K1 swap is optional because the bench IM73D unit is identical production-shape K1 hardware. Remaining gates are production-env proof on the bench IM73D unit, eyes-on, and `k1_hardware` default flip.
 
 ## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
 
