@@ -18,7 +18,7 @@
 ### Source-of-truth hierarchy (current)
 1. Git branch + HEAD + working tree
 2. `platformio.ini` + `scripts/platformio/k1_upload_guard.py`
-3. `docs/hardware/im73d122-ap-vp-migration-plan.md` + `docs/hardware/device-build-registry.md`
+3. `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md` + `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` + `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md` + `docs/hardware/device-build-registry.md`
 4. `.claude/CLAUDE.md` + `AGENTS.md` (process rules)
 5. `claude-mem` (prior-session context only, never current-lane truth)
 6. `.devin/agent-os.md` (agent operating manual + bootstrap/repo-truth harness)

@@ -54,7 +54,10 @@ The current live lane is:
 
 - **Branch:** `lane/im73d-pdm-eval`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** IM73D122 PDM microphone evaluation on bench K1 `B489A500`
+- **Focus:** IM73D122 productionisation. Phase-1 firmware is done;
+  bench IM73D R1/no-speaker DSR proof is closed; current blocker is R2
+  production-shape hardware proof (main K1 SPH0645 -> IM73D on GPIO13/12/14,
+  or a dedicated production-shape IM73D unit).
 
 Before any work, verify the lane has not shifted. If `git status` shows a different branch, or if the lane doc says something different, stop and report the conflict.
 
