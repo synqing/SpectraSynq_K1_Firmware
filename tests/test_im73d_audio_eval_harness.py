@@ -2,6 +2,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS_PATH = ROOT / "scripts" / "regression-harness" / "im73d_audio_eval.py"
@@ -114,6 +116,125 @@ def test_repeatability_gate_uses_characterised_variance():
         max_cv=0.15,
     )
     assert drifting["repeatable"] is False
+
+
+def test_quiet_only_mode_disables_speaker_volumes():
+    harness = load_harness()
+    parser = harness.build_parser()
+
+    args = parser.parse_args(["--quiet-only"])
+    volumes, no_speaker_playback = harness.resolve_capture_mode(args)
+
+    assert volumes == []
+    assert no_speaker_playback is True
+
+
+def test_quiet_only_mode_refuses_nonzero_speaker_volume():
+    harness = load_harness()
+    parser = harness.build_parser()
+    args = parser.parse_args(["--no-speaker-playback", "--volumes", "20"])
+
+    with pytest.raises(SystemExit, match="refuses nonzero"):
+        harness.resolve_capture_mode(args)
+
+
+def test_dsr_compare_uses_raw_i16_metrics_for_required_verdict_inputs():
+    harness = load_harness()
+    left_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 10.0},
+                            "raw_i16_abs_peak": {"p90": 50.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 100.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 12.0},
+                            "raw_i16_abs_peak": {"p90": 60.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 300.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+
+    report = harness.compare_summaries(
+        left_doc,
+        right_doc,
+        left_label="dsr8",
+        right_label="dsr16",
+        role="bench_im73d",
+    )
+
+    assert report["required_raw_metrics"] == [
+        "raw_i16_rms",
+        "raw_i16_abs_peak",
+        "raw_i16_near_pct",
+    ]
+    assert report["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 1.2
+    assert report["verdict"] == "no_promotion_without_speaker_stimulus"
+
+
+def test_dsr_compare_rejects_missing_raw_i16_metrics_even_when_max_raw_exists():
+    harness = load_harness()
+    left_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {"max_raw": {"p90": 100.0}},
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {"max_raw": {"p90": 120.0}},
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+
+    report = harness.compare_summaries(
+        left_doc,
+        right_doc,
+        left_label="dsr8",
+        right_label="dsr16",
+        role="bench_im73d",
+    )
+
+    assert report["verdict"] == "invalid_missing_raw_i16_metrics"
+    assert report["missing_required_metrics"] == [
+        "raw_i16_rms",
+        "raw_i16_abs_peak",
+        "raw_i16_near_pct",
+    ]
 
 
 def test_harness_self_test_runs():

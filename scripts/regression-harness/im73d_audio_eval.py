@@ -58,6 +58,15 @@ DEVICES = (
 KEY_VALUE_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)=([^\s|,]+)")
 READ_ONLY_COMMANDS = {"build", "dump"}
 FORBIDDEN_SERIAL_TOKENS = {"start_noise_cal", "N", "Y"}
+DEFAULT_MUSIC_VOLUMES = "45,60,75"
+DSR_COMPARE_REQUIRED_METRICS = ("raw_i16_rms", "raw_i16_abs_peak", "raw_i16_near_pct")
+DSR_COMPARE_CONTEXT_METRICS = (
+    "max_raw",
+    "clip_pct",
+    "near_pct",
+    "input_trim",
+    "peak_pin",
+)
 
 
 def parse_number(value: str) -> int | float | str:
@@ -109,6 +118,19 @@ def summarise_numeric(rows: list[dict[str, Any]]) -> dict[str, Any]:
             "mean": sum(values) / len(values),
         }
     return summary
+
+
+def summarise_values(values: list[float]) -> dict[str, Any]:
+    if not values:
+        return {"count": 0}
+    return {
+        "count": len(values),
+        "min": min(values),
+        "p50": percentile(values, 0.50),
+        "p90": percentile(values, 0.90),
+        "max": max(values),
+        "mean": sum(values) / len(values),
+    }
 
 
 def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
@@ -483,6 +505,166 @@ def repeatability_report(runs: list[dict[str, Any]], max_cv: float) -> dict[str,
     return report
 
 
+def resolve_capture_mode(args: argparse.Namespace) -> tuple[list[int], bool]:
+    no_speaker_playback = bool(args.quiet_only or args.no_speaker_playback)
+    raw_volumes = args.volumes
+    if raw_volumes is None:
+        raw_volumes = "" if no_speaker_playback else DEFAULT_MUSIC_VOLUMES
+    volumes = parse_volumes(raw_volumes)
+    if no_speaker_playback and volumes:
+        raise SystemExit("--quiet-only/--no-speaker-playback refuses nonzero --volumes")
+    if no_speaker_playback and args.quiet_repeats < 1:
+        raise SystemExit("--quiet-only/--no-speaker-playback requires --quiet-repeats >= 1")
+    return volumes, no_speaker_playback
+
+
+def metric_value(summary: dict[str, Any], metric: str, stat: str) -> float | None:
+    value = summary.get(metric)
+    if isinstance(value, dict) and isinstance(value.get(stat), (int, float)):
+        return float(value[stat])
+    return None
+
+
+def collect_role_metric(summary_doc: dict[str, Any], role: str, metric: str, stat: str) -> list[float]:
+    values: list[float] = []
+    for run in summary_doc.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        device = run.get("devices", {}).get(role)
+        if not isinstance(device, dict):
+            continue
+        summary = device.get("summary", {})
+        if not isinstance(summary, dict):
+            continue
+        value = metric_value(summary, metric, stat)
+        if value is not None:
+            values.append(value)
+    return values
+
+
+def count_role_quality_failures(summary_doc: dict[str, Any], role: str) -> dict[str, Any]:
+    total = 0
+    usable = 0
+    reasons: dict[str, int] = {}
+    warnings: dict[str, int] = {}
+    for run in summary_doc.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        device = run.get("devices", {}).get(role)
+        if not isinstance(device, dict):
+            continue
+        quality = device.get("quality", {})
+        if not isinstance(quality, dict):
+            continue
+        total += 1
+        if quality.get("usable") is True:
+            usable += 1
+        for reason in quality.get("reasons", []):
+            reasons[str(reason)] = reasons.get(str(reason), 0) + 1
+        for warning in quality.get("warnings", []):
+            warnings[str(warning)] = warnings.get(str(warning), 0) + 1
+    return {
+        "runs": total,
+        "usable_runs": usable,
+        "reason_counts": reasons,
+        "warning_counts": warnings,
+    }
+
+
+def compare_metric(
+    left_doc: dict[str, Any],
+    right_doc: dict[str, Any],
+    role: str,
+    metric: str,
+    stat: str,
+) -> dict[str, Any]:
+    left_values = collect_role_metric(left_doc, role, metric, stat)
+    right_values = collect_role_metric(right_doc, role, metric, stat)
+    left_summary = summarise_values(left_values)
+    right_summary = summarise_values(right_values)
+    ratio: float | None = None
+    left_mean = left_summary.get("mean")
+    right_mean = right_summary.get("mean")
+    if isinstance(left_mean, (int, float)) and isinstance(right_mean, (int, float)) and left_mean != 0:
+        ratio = float(right_mean) / float(left_mean)
+    return {
+        "stat": stat,
+        "left": left_summary,
+        "right": right_summary,
+        "right_over_left_mean": ratio,
+    }
+
+
+def compare_summaries(
+    left_doc: dict[str, Any],
+    right_doc: dict[str, Any],
+    *,
+    left_label: str,
+    right_label: str,
+    role: str,
+) -> dict[str, Any]:
+    metrics: dict[str, Any] = {}
+    for metric in DSR_COMPARE_REQUIRED_METRICS:
+        stat = "max" if metric == "raw_i16_near_pct" else "p90"
+        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+    for metric in DSR_COMPARE_CONTEXT_METRICS:
+        stat = "min" if metric == "input_trim" else "p90"
+        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+
+    left_quality = count_role_quality_failures(left_doc, role)
+    right_quality = count_role_quality_failures(right_doc, role)
+    missing_required = [
+        metric
+        for metric in DSR_COMPARE_REQUIRED_METRICS
+        if metrics[metric]["left"]["count"] == 0 or metrics[metric]["right"]["count"] == 0
+    ]
+
+    right_near_pct = metrics["raw_i16_near_pct"]["right"].get("max")
+    left_near_pct = metrics["raw_i16_near_pct"]["left"].get("max")
+    rail_risk = (
+        isinstance(left_near_pct, (int, float)) and left_near_pct > 0.0
+    ) or (
+        isinstance(right_near_pct, (int, float)) and right_near_pct > 0.0
+    )
+    quality_failures = bool(left_quality["reason_counts"] or right_quality["reason_counts"])
+
+    verdict = "no_promotion_without_speaker_stimulus"
+    if missing_required:
+        verdict = "invalid_missing_raw_i16_metrics"
+    elif rail_risk:
+        verdict = "reject_raw_i16_near_rail"
+    elif quality_failures:
+        verdict = "reject_quality_failures"
+
+    return {
+        "left_label": left_label,
+        "right_label": right_label,
+        "role": role,
+        "required_raw_metrics": list(DSR_COMPARE_REQUIRED_METRICS),
+        "context_metrics": list(DSR_COMPARE_CONTEXT_METRICS),
+        "metrics": metrics,
+        "quality": {
+            "left": left_quality,
+            "right": right_quality,
+        },
+        "missing_required_metrics": missing_required,
+        "verdict": verdict,
+        "acceptance_note": (
+            "Quiet/ambient comparison can prove raw telemetry presence and rail safety, "
+            "but it cannot promote DSR_16S without speaker or controlled acoustic stimulus."
+        ),
+    }
+
+
+def load_summary(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text())
+
+
+def write_compare_report(report: dict[str, Any], output: Path) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+
+
 def run_self_test() -> None:
     good = (
         "[AP] SSL=162 DC=0 max_raw=1224 follower=1240 peak_scaled=0.686 "
@@ -540,6 +722,57 @@ def run_self_test() -> None:
     )
     assert drifting["repeatable"] is False
 
+    args = build_parser().parse_args(["--quiet-only"])
+    volumes, no_speaker_playback = resolve_capture_mode(args)
+    assert volumes == []
+    assert no_speaker_playback is True
+
+    left_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 10.0},
+                            "raw_i16_abs_peak": {"p90": 40.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 100.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 12.0},
+                            "raw_i16_abs_peak": {"p90": 44.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 120.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    compare = compare_summaries(
+        left_doc,
+        right_doc,
+        left_label="dsr8",
+        right_label="dsr16",
+        role="bench_im73d",
+    )
+    assert compare["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 1.2
+    assert compare["verdict"] == "no_promotion_without_speaker_stimulus"
+
 
 def parse_volumes(raw: str) -> list[int]:
     values: list[int] = []
@@ -559,15 +792,20 @@ def parse_volumes(raw: str) -> list[int]:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true", help="run parser/gate self-test and exit")
+    parser.add_argument("--compare", nargs=2, metavar=("LEFT_SUMMARY", "RIGHT_SUMMARY"), type=Path)
+    parser.add_argument("--compare-output", type=Path, help="write DSR comparison JSON report")
+    parser.add_argument("--compare-role", default="bench_im73d")
     parser.add_argument("--track", type=Path, help="local audio track to play")
     parser.add_argument("--output-dir", type=Path, default=Path("_scratch/im73d_audio_eval"))
     parser.add_argument("--label", default="dsr8")
     parser.add_argument("--duration", type=float, default=30.0)
     parser.add_argument("--settle", type=float, default=2.0)
     parser.add_argument("--start-offset", type=float, default=0.0)
-    parser.add_argument("--volumes", default="45,60,75", help="comma-separated music volumes")
+    parser.add_argument("--volumes", default=None, help="comma-separated music volumes")
     parser.add_argument("--repeats", type=int, default=2)
     parser.add_argument("--quiet-repeats", type=int, default=2)
+    parser.add_argument("--quiet-only", action="store_true", help="capture ambient/quiet AP rows only")
+    parser.add_argument("--no-speaker-playback", action="store_true", help="alias for --quiet-only")
     parser.add_argument("--repeatability-cv", type=float, default=0.25)
     parser.add_argument("--require-repeatability", action="store_true")
     parser.add_argument("--skip-preflight", action="store_true")
@@ -580,16 +818,31 @@ def main(argv: list[str]) -> int:
         run_self_test()
         print("im73d_audio_eval self-test: PASS")
         return 0
+    if args.compare:
+        left_path, right_path = args.compare
+        report = compare_summaries(
+            load_summary(left_path),
+            load_summary(right_path),
+            left_label=left_path.stem,
+            right_label=right_path.stem,
+            role=args.compare_role,
+        )
+        if args.compare_output is not None:
+            write_compare_report(report, args.compare_output)
+            print(f"compare: {args.compare_output}")
+        else:
+            print(json.dumps(report, indent=2, sort_keys=True))
+        return 0
 
     if args.duration <= 0:
         raise SystemExit("--duration must be positive")
     if args.repeats < 0 or args.quiet_repeats < 0:
         raise SystemExit("--repeats and --quiet-repeats must be non-negative")
 
-    volumes = parse_volumes(args.volumes)
+    volumes, no_speaker_playback = resolve_capture_mode(args)
     if volumes and args.track is None:
         raise SystemExit("--track is required when --volumes is non-empty")
-    if args.track is not None and not args.track.exists():
+    if not no_speaker_playback and args.track is not None and not args.track.exists():
         raise SystemExit(f"track does not exist: {args.track}")
 
     timestamp = time.strftime("%Y%m%dT%H%M%S")
@@ -606,6 +859,7 @@ def main(argv: list[str]) -> int:
         "duration_sec": args.duration,
         "start_offset_sec": args.start_offset,
         "volumes": volumes,
+        "no_speaker_playback": no_speaker_playback,
         "repeats": args.repeats,
         "quiet_repeats": args.quiet_repeats,
         "devices": {spec.role: spec.usb_serial for spec in DEVICES},
@@ -629,9 +883,11 @@ def main(argv: list[str]) -> int:
                     raise SystemExit(f"RUNTIME GATE: {spec.role} produced no [AP]/runtime line after open")
 
         stimulus = None
-        if args.track is not None:
+        if args.track is not None and not no_speaker_playback:
             stimulus = prepare_stimulus(args.track, out_dir, args.duration, args.start_offset)
             report["stimulus"] = str(stimulus)
+        elif no_speaker_playback:
+            report["stimulus"] = None
 
         original_volume = get_output_volume()
         report["original_volume"] = original_volume

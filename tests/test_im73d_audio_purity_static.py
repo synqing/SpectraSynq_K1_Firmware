@@ -7,6 +7,7 @@ GLOBALS_CONFIG = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "globals_config.c
 SERIAL_CMD_HANDLERS = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_cmd_handlers.cpp"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
 CONTROL_FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "sb_k1_control_facade.cpp"
+IM73D_HARNESS = ROOT / "scripts" / "regression-harness" / "im73d_audio_eval.py"
 
 
 def _index(text: str, needle: str) -> int:
@@ -62,3 +63,13 @@ def test_current_sensitivity_surfaces_are_explicitly_mapped():
     assert "CONFIG.SENSITIVITY = atof(command_data);" in serial_handlers
     assert "clamp_float(CONFIG.SENSITIVITY + 0.10f, 0.10f, 20.0f)" in serial_menu
     assert 'needs_number_range(record, &result, 0.0f, 1.0f, "Global sensitivity out of range")' in control_facade
+
+
+def test_im73d_harness_preflight_records_front_end_gain_state():
+    harness = IM73D_HARNESS.read_text()
+
+    assert '"CONFIG.SENSITIVITY:" in line.line' in harness
+    assert '"AUDIO_RESPONSE_GAIN:" in line.line' in harness
+    assert '"CONFIG.SWEET_SPOT_MIN_LEVEL:" in line.line' in harness
+    assert '"CONFIG.DC_OFFSET:" in line.line' in harness
+    assert '"front_end_lines": [' in harness
