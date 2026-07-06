@@ -26,10 +26,16 @@ are already affected by firmware sensitivity, IM73D input gain, DC correction,
 clip guards, response gain, followers, GDFT normalisation, AGC, spectral tilt,
 soft knees, and clamps.
 
-The only existing pre-conditioning sample surface is `:dump_raw`, which prints
-the first 32 DMA samples before `K1_MIC_IM73D_INPUT_GAIN`, `CONFIG.SENSITIVITY`,
-clip limiting, and `CONFIG.DC_OFFSET` are applied
-(`SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:356-372`).
+The original pre-conditioning sample surface was `:dump_raw`, which prints the
+first 32 DMA samples before `K1_MIC_IM73D_INPUT_GAIN`, `CONFIG.SENSITIVITY`,
+clip limiting, and `CONFIG.DC_OFFSET` are applied.
+
+Follow-up commit `67ae693` added continuous read-only AP telemetry before the
+same conditioning boundary:
+
+- `raw_i16_abs_peak`
+- `raw_i16_rms`
+- `raw_i16_near_pct`
 
 Therefore:
 
@@ -128,9 +134,10 @@ Required evidence:
 - Raw samples non-zero under stimulus and not stuck at a rail.
 - No `i2s_channel_read` fault/short-read evidence.
 
-Current gap: the real-audio harness does not yet sample `:dump_raw`, because the
-original hard read-only command set only authorised `:build` and `:dump`.
-Without raw dump or new pre-conditioning telemetry, Tier 0 remains unclosed.
+Current status: the real-audio harness still does not send `:dump_raw`, but
+continuous `raw_i16_*` pre-conditioning telemetry is now present in AP rows and
+is parsed by the harness. That closes the "no raw read-only field" gap for
+DSR/headroom comparisons that do not need full waveform samples.
 
 ### Tier 1 - front-end linearity and headroom
 
@@ -224,15 +231,12 @@ can mislead future purity claims.
 
 ## Open Gaps
 
-1. Add an authorised raw sample capture path to the real-audio harness, or add a
-   read-only continuous pre-conditioning field such as `raw_i16_abs_peak` and
-   `raw_i16_rms`.
-2. Add AP/APCAP/AGC schema-lock tests so parser assumptions cannot drift.
-3. Reconcile `global.sensitivity` range with factory default and serial controls,
+1. Add AP/APCAP/AGC schema-lock tests so parser assumptions cannot drift.
+2. Reconcile `global.sensitivity` range with factory default and serial controls,
    or explicitly document that the facade operates in a different user-facing
    scale.
-4. For DSR_16S, perform the one-line firmware flip only after Tier 0 evidence is
-   available for the current DSR_8S baseline.
+3. For DSR_16S, perform controlled-stimulus measurement before any promotion.
+   Quiet-only evidence is rail/headroom evidence, not a signal/SNR verdict.
 
 ## Stop Rule
 

@@ -1,7 +1,18 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-06) **IM73D audio-pipeline purity audit complete; DSR measurement must not use AP `max_raw` as raw mic truth** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until production-IM73D hardware proof). R1 knob persistence is CLOSED. Main K1 remains the live SPH reference/control (`k1_hardware @ 67227da`, last proved). Bench is the radio-free IM73D test article (`k1_bench_im73d @ 6f2f1ec`); after Captain reset, both K1s enumerate and stream again. The current DSR blocker is not bench recovery: it is the purity boundary. Existing `[AP]`/`[APCAP]` metrics are post-IM73D-gain, post-sensitivity, post-clamp/DC, and downstream-conditioned. DSR_8S/DSR_16S acceptance now requires raw/pre-conditioning evidence (`:dump_raw` or an equivalent read-only telemetry field) plus the recorded front-end state. See `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, `docs/hardware/device-build-registry.md`, `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+**Current focus:** (2026-07-06) **IM73D raw-telemetry and no-speaker DSR lane complete; DSR_16S not promoted** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until production-IM73D hardware proof). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the no-speaker DSR harness/compare mode landed (`bc53ceb`). Bench is restored to radio-free `k1_bench_im73d @ bc53ceb`; main K1 remains the SPH reference/control (`k1_hardware @ 67227da`, last proved). Quiet-only DSR16 vs DSR8 comparison showed no raw rail risk and all captures usable/repeatable, but cannot prove the +2 dB signal/SNR benefit without controlled acoustic stimulus. Production default remains `DSR_8S`. See `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+
+## 2026-07-06 No-Speaker DSR_16S Evidence + Harness Hardening
+
+- **Commit:** `bc53ceb test(im73d): add no-speaker dsr harness` on `lane/im73d-pdm-eval`.
+- **Harness:** `scripts/regression-harness/im73d_audio_eval.py` now supports `--quiet-only` / `--no-speaker-playback`, refuses nonzero volumes in that mode, and adds `--compare` / `--compare-output` for DSR reports built from `summary.json` files.
+- **Comparison truth:** DSR comparison now treats `raw_i16_rms`, `raw_i16_abs_peak`, and `raw_i16_near_pct` as required inputs. Conditioned `max_raw` is retained as context only.
+- **Validation:** focused harness/static tests PASS (`15 passed`); harness self-test PASS; full host suite PASS (`647 passed, 1 skipped`). The earlier interrupted pytest PTY is not the verification result; the clean rerun is.
+- **Device proof:** bench MAC `B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem101` was guard-verified, flashed to `k1_bench_im73d_dsr16 @ bc53ceb`, captured quiet-only 3x, then restored to `k1_bench_im73d @ bc53ceb` and captured matching quiet-only 3x. Main K1 was present but not flashed.
+- **Evidence:** DSR16 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162130_dsr16_quiet_only/summary.json`; restored DSR8 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162406_dsr8_quiet_only_restored/summary.json`; compare report `artifacts/im73d_dsr_eval_2026-07-06/dsr8_vs_dsr16_quiet_compare.json`; write-up `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`.
+- **Result:** no raw near-rail evidence (`raw_i16_near_pct=0` for both), `input_trim=1.000`, `clip_pct=0.000`, `near_pct=0.000`, all bench runs usable. Quiet DSR16 raw RMS was lower than quiet DSR8 (`raw_i16_rms` p90 mean ratio 0.788), but no signal stimulus was present, so **DSR_16S remains unpromoted**.
+- **R2 handoff:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` captures the main-K1 SPH0645 to IM73D accept/reject decision, blast radius, and post-swap proof checklist.
 
 ## 2026-07-06 Audio Pipeline Purity Audit
 
@@ -11,7 +22,7 @@
 - **Machine gate:** `tests/test_im73d_audio_purity_static.py` locks the current source truth: `dump_raw` is before conditioning; AP `max_raw` is after IM73D gain, sensitivity, clamp, and DC correction; sensitivity control surfaces are inconsistent and must stay visible until intentionally reconciled.
 - **Validation:** focused pytest `tests/test_im73d_audio_eval_harness.py tests/test_im73d_audio_purity_static.py -q` PASS (8/8); full host suite PASS (`640 passed, 1 skipped`); `im73d_audio_eval.py --self-test` PASS.
 - **Live read-only sanity:** `_scratch/im73d_audio_eval/20260706T144515_purity_conditioned_readiness/summary.json` captured both MAC-verified K1s with no hard front-end failures at quiet + Mac volume 20. This is explicitly conditioned readiness evidence, not raw mic purity evidence. No `start_noise_cal`, `N`, `Y`, erase, flash, or DSR flip was run.
-- **Next mechanical step:** either authorise/use a raw `:dump_raw` capture path in the harness, or add a read-only continuous pre-conditioning metric (`raw_i16_abs_peak`/`raw_i16_rms`) before the DSR_16S one-line firmware flip. Then repeat the DSR_8S baseline and DSR_16S eval on radio-free `k1_bench_im73d`.
+- **Supersession:** raw continuous telemetry landed after this audit as `raw_i16_abs_peak`, `raw_i16_rms`, and `raw_i16_near_pct`. The no-speaker DSR run used those fields and kept DSR_16S unpromoted pending controlled acoustic stimulus.
 
 ## 2026-07-06 R4 Real-Audio Harness + Bench CDC Blocker
 
