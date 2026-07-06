@@ -1,7 +1,14 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-06) **IM73D productionization Phase 1 executed autonomously; R1 device proof CLOSED** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until the main-K1 mic swap). Bench was flashed to radio-free `k1_bench_im73d @ 6f2f1ec`; `:chroma=0.150` persisted across `:reset`; restore to `:chroma=0.100` is now proved by final read-only `:build`/`:dump` after Captain BOOT/RESET recovery. Remaining is Captain-gated hardware (main-K1 mic swap or dedicated IM73D production unit, DSR_16S SNR, eyes-on, default flip). See `docs/hardware/device-build-registry.md`, `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+**Current focus:** (2026-07-06) **IM73D productionization Phase 1 executed autonomously; both K1s live-used** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until production-IM73D hardware proof). Bench is radio-free `k1_bench_im73d @ 6f2f1ec`; R1 knob persistence is CLOSED. Main K1 was refreshed to current `k1_hardware @ 67227da` and is the live SPH reference/control. Paired passive AP capture under the same room stimulus is recorded for main SPH vs bench IM73D. Remaining is hardware/perceptual: production-IM73D proof target, DSR_16S SNR, eyes-on, default flip. See `docs/hardware/device-build-registry.md`, `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+
+## 2026-07-06 Two-K1 Live Refresh
+
+- **Main K1 used:** guard-verified `F887A500` on `/dev/cu.usbmodem1101`, built and uploaded `k1_hardware @ 67227da`; post-upload read-only `:build`/`:dump` proved `env=k1_hardware`, `I2S STD INIT: PASS`, `CAL_SOURCE: config`, `CAL_VALID: 1`.
+- **Bench K1 used:** guard-verified `B489A500` on `/dev/cu.usbmodem101`; left on radio-free `k1_bench_im73d @ 6f2f1ec`, `I2S PDM RX INIT: PASS`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`.
+- **Paired passive AP capture:** `_scratch/im73d_bringup/snappiness/dual_ap_capture.py 30` with zero command bytes. Current envelope: bench IM73D `max_raw p50=1224 p90=1851 max=2282`; main SPH `p50=1906 p90=3063 max=3600`; both cal-valid, input_trim 1.000, no clamp risk.
+- **Evidence:** `_scratch/im73d_r1_knob_persistence_20260706/two_k1_readonly_build_dump_20260706.log`, `_scratch/im73d_r1_knob_persistence_20260706/two_k1_post_main_flash_readback_20260706.log`, `_scratch/im73d_bringup/snappiness/dual_main_sph.log`, `_scratch/im73d_bringup/snappiness/dual_bench_im73d.log`.
 
 ## 2026-07-06 R1 Knob-Persistence Device Capture (radio-free bench)
 
@@ -19,7 +26,7 @@
 - **UB — MicFrontend runtime dispatch REJECTED (decision).** Un-byte-verifiable (build not bit-reproducible in `.flash.text`/`.flash.rodata` — the known `K1_BUILD_EPOCH` timestamp) + Core-0 cost + `sensorybridge-doctrine`. Compile-time selection retained; 6-interface seam map delivered instead (handover §11.2). This is the correct trade, not skipped work.
 - **UC — `mic_stable_byte_gate.sh` SHIPPED (`d1ecc10`).** Formalises the stable-section oracle the graft used manually: hashes ONLY the 3 reproducible sections (`.dram0.data`/`.iram0.text`/`.iram0.vectors`), committed references for k1_hardware/k1_bench_reference/k1_bench_im73d, static contract test. Additive — `registry_byte_gate.sh` (flaky, 5 sections) left as trust root.
 - **UD/UE — docs (`6bfc702`):** DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist).
-- **UF — knob-persistence device-proof DEFERRED (owed).** Bench MAC-reachable but on the BLE demo build → config-save heap-defer makes a non-persist result inconclusive; host + adjacent-proven; run on radio-free `k1_bench_im73d`.
+- **UF — knob-persistence device-proof CLOSED (`d9f53d6` → `67227da`).** Radio-free bench proved `:chroma=0.150` persistence across reset, then final restored `CONFIG.CHROMA: 0.100000` after Captain BOOT/RESET recovery; cal profile stayed `persisted_profile`. No `start_noise_cal` was run.
 - **Absolute-blocker checkpoints (handed to Captain, run did not stop):** main-K1 mic swap · DSR_16S SNR measurement · eyes-on A/B · `k1_hardware` default flip.
 
 ## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
