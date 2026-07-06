@@ -123,8 +123,15 @@ class K1UploadGuardTest(unittest.TestCase):
         # pins clk=13 / din=12 / LR=14 under K1_MIC_IM73D_PDM_V1, so k1_prod_im73d
         # compiles and wires the mic to the proven GPIOs.
         constants = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h").read_text()
-        prod = constants.split("#else", 1)[1]  # production GPIO branch onward
-        prod = prod.split("#define I2C_SDA_PIN", 1)[0]  # bound to the pinmap block
+        # Isolate ONLY the production pinmap branch (the #else of
+        # SB_K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
+        # the shared I2C pins that close the GPIO block. This must NOT alias onto
+        # the bench PDM block above (which defines identical pins) — else deleting
+        # the production block would still pass (adversarial-review defect, fixed).
+        marker = "K1 hardware production GPIO map"
+        self.assertIn(marker, constants)
+        prod = constants.split(marker, 1)[1].split("#define I2C_SDA_PIN", 1)[0]
+        self.assertNotIn("bench-reference GPIO map", prod)  # proves branch isolation
         self.assertIn("#define K1_PDM_CLK_PIN 13", prod)
         self.assertIn("#define K1_PDM_DIN_PIN 12", prod)
         self.assertIn("#define K1_PDM_LR_PIN  14", prod)
