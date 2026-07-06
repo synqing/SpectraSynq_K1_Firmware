@@ -6,6 +6,14 @@ abstract: "Codex end-to-end resume brief (2026-07-06) for the IM73D productioniz
 
 **You are Codex, resuming the SpectraSynq K1 firmware.** Everything that can be done autonomously in firmware is DONE and gated. What is left is mostly **hardware/perceptual checkpoints that only Captain can clear** plus **one owed autonomous device capture**. Your job: execute the remaining ordered queue, escalate the hardware checkpoints as decision-grade asks (do not perform them yourself — they need Captain's hands / eyes / verbal silence-go), and do NOT re-litigate anything in the "closed — do not reopen" list.
 
+> **2026-07-06 supersession:** R1 is closed. R4 controlled-audio DSR testing has
+> now been performed on the bench IM73D using radio-free firmware and speaker
+> playback. **DSR_16S is rejected; keep `DSR_8S`.** Bench uploaded back to
+> `k1_bench_im73d @ 9d14463` after the test but is not runtime-proven because it
+> went app-serial/ROM-sync silent; Captain later reported both K1s temporarily
+> offline. Authority:
+> `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`.
+
 ---
 
 ## 0 · Read order (Codex-native)
@@ -93,8 +101,15 @@ The only gate to device-proving `k1_prod_im73d`. Captain's hands. Escalate as ac
 ### R3 (Track A after R2) — device-prove `k1_prod_im73d` on the swapped main K1
 After Captain confirms the swap: move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the `F887A500` target's `envs` tuple in `k1_upload_guard.py` (+ test update), guard-verify, flash, then run the **flip checklist** (handover §11.5): `dump_raw` int16 sane → gain re-characterise on the sealed unit → **Captain silence-go recal** → `stream_agc` all 4 gains < 10 after 10 s → eyes-on A/B vs SPH. Byte-gate stays green for the flag-OFF SPH path throughout.
 
-### R4 (Track A prep → Track B measure) — DSR_16S +2 dB evaluation
-Enable recipe (one line, behind a future flag), from handover §11.4: after `i2s_audio.h:229`, `pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;`. **The +2 dB verdict is a device SNR measurement on radio-free `k1_bench_im73d` ONLY** (never a BLE build) — Captain-context capture. Do not add the flag speculatively; it lands with the measurement.
+### R4 (CLOSED 2026-07-06) — DSR_16S +2 dB evaluation
+Controlled speaker playback was made available and the DSR16 measurement was
+run on radio-free `k1_bench_im73d` / `k1_bench_im73d_dsr16`, not on the BLE
+build. Verdict: **reject DSR16 and keep `DSR_8S`**. DSR16 raised the quiet raw
+RMS floor and reduced music raw-RMS-over-quiet response at volumes 45/60/75.
+Do not add a DSR16 flag or default flip from the current evidence. Reopen only
+if a later sealed-unit measurement shows repeatable signal/noise benefit without
+raw rail risk. Authority:
+`docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`.
 
 ### R5 (Track B, final) — `k1_hardware` default-env flip
 Only after R2–R4 + eyes-on. Captain call. Strangler-fig: `k1_prod_im73d` is the dual-run env; the default flips last. Full 7-step checklist in handover §11.5.
