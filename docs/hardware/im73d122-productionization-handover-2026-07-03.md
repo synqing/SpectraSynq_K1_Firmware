@@ -199,9 +199,88 @@ first knob save.
   BOM call, factory-cal UX direction, default-env flip, main-K1 flashes,
   anything perceptual (eyes-on).
 
+## 10 · Update — 2026-07-06: Item-3 productionization audit + production-flag plan + Captain hardware-fork decision
+
+Ran the productionization audit the triple-lane handover queued. Findings are
+verified against the code on `lane/im73d-pdm-eval` at lane consolidation
+(`55c536b` = merge of the vibrancy fix into this lane), not carried from prose.
+
+### 10.1 · Live state of every bench-specific surface (audited 2026-07-06)
+
+| Surface | Status | Anchor |
+|---|---|---|
+| Config-persistence un-freeze | **Firmware DONE (`e2b62b5`, 07-04) AND deployed** — verified `79d7fda ⊇ e2b62b5`, so the un-freeze code ships on the current bench build. | `bridge_fs.h:81` "un-frozen 2026-07-04"; `update_config_filename()` → `/CONFIG_PDM_%05lu.BIN` |
+| Knob-persistence DEVICE-proof | **OWED** — the code ships, but "set knob via `:` → `:reset` → `:dump` survived" was never captured. Autonomous bench task (a config test, NOT an SNR test → any IM73D bench build is fine; radio-free `k1_bench_im73d` is cleanest). | no proof row in registry/`_scratch` |
+| PDM pins | **BENCH-ONLY BY CONSTRUCTION.** `K1_PDM_CLK/DIN/LR_PIN` (13/12/14) exist ONLY inside `#if SB_K1_BENCH_REFERENCE_PINMAP → #ifdef K1_MIC_IM73D_PDM_V1`, overlaying the SPH bench pads (BCLK14/DIN13/LRCL12). The production `#else` branch (SPH BCLK=13 / LRCLK=11 / DIN=14, LEDs 6/7) has **no PDM pin block** → the graft cannot compile into `k1_hardware` today. This is the hardware-fork blocker. | `constants.h:297-345` |
+| Input gain 16.0f | As documented; bench-characterized on an OPEN bench (SPH target ~7000 / IM73D obs 1317 → ×16). Enclosure re-characterization = Phase 2 (needs production hardware). | `constants.h:67-70` |
+| SSL cal window | **"widen not bump" lever already pulled** — 650/720 → 1000/1150; silence p90 ~807 of 1150 = healthy headroom now. The "710-of-720" tightness predates the widen and is resolved. | `constants.h:40-60` |
+| ifdef sprawl | **34** `K1_MIC_IM73D_PDM_V1` sites across 7 files (`bridge_fs.h` 13, `i2s_audio.h` 10, `system.h` 3, `constants.h` 3, `noise_cal.h` 3, `globals.h` 2, `platformio.ini` 2). This is the `MicFrontend` retirement target. | `git grep` |
+| flag-OFF byte-identity | SPH `i2s_std` path untouched when flag OFF; `k1_hardware` byte-identical. Invariant to preserve through all production-flag work. | — |
+
+**Net:** the handover's framing of "replace eval-era freeze with Phase 1.1
+persistence" as pending is now stale — at the firmware level it is DONE and
+deployed. The genuinely-open Phase 1 items are (a) the knob-persistence device
+capture (owed, small), (b) the `MicFrontend` abstraction (Phase 1.2, the main
+autonomous firmware), (c) DSR_16S eval, (d) production-flip red-team. None of
+(a)-(d) needs new hardware. The ONE hard blocker that does need hardware truth
+is the production PDM pin map — see §10.3.
+
+### 10.2 · Production-flag plan (`K1_MIC_IM73D_PROD_V1`) — autonomous, steps 1-3 need no hardware
+
+1. **Production PDM pin block.** Add `K1_PDM_CLK/DIN/LR_PIN` to the production
+   `#else` branch (`constants.h`) guarded by `K1_MIC_IM73D_PROD_V1`. Until Captain
+   confirms the PCB (§10.3), stamp a **PROVISIONAL** mapping = the production SPH
+   pad trio (`BCLK 13 / DIN 14 / LRCLK 11`) as the most-likely same-footprint swap,
+   clearly marked provisional. This lets Phase 1 firmware compile + host-gate
+   without waiting on hardware.
+2. **Promote the flag path, keep it revertible.** `K1_MIC_IM73D_PROD_V1` selects
+   PDM in `init_i2s()`, the PDM read path, cal invariants, and the PDM-namespaced
+   persistence — reusing the existing `K1_MIC_IM73D_PDM_V1` machinery, not a fork.
+   SPH stays the default (flag OFF = byte-identical) until the production unit is
+   device-proven.
+3. **`MicFrontend` abstraction (Phase 1.2).** Collapse the 34-site ifdef sprawl
+   behind one seam (init / read / gain / cal-domain / persistence-namespace).
+   SPH byte-identical until the flip; bench IM73D unchanged. This is the largest
+   remaining autonomous firmware lane — scope it as its own branch.
+4. **Gates:** host (pytest + `k1_hardware` byte-identity flag-OFF) → bench proof
+   (the bench IS the IM73D reference) → **production-unit** device proof (needs
+   §10.3) → Captain silence-go recal on the production unit → eyes-on.
+
+### 10.3 · Captain hardware-fork decision (ACCEPT / REJECT — recorded, not executed)
+
+**Current state:** IM73D is the ratified production mic; all Phase-1 firmware can
+be prepared behind `K1_MIC_IM73D_PROD_V1` with a PROVISIONAL pin map. The one
+thing firmware cannot invent is the **production PDM pin map** (which GPIOs the
+production PCB routes the IM73D CLK/DATA/SELECT to) and the **switch timing**.
+
+**Decision required (two coupled sub-decisions):**
+- **D1 — production PDM pin map.** (A) Same-footprint swap on the SPH0645 pads
+  → PDM on the production trio `{13, 11, 14}` (firmware provisional assumes this);
+  (B) dedicated PDM pins on a PCB rev → Captain supplies the trio.
+- **D2 — switch timing.** (A) Hand-rewire the existing main-K1 unit now (like the
+  bench) for early production-unit device-proof; (B) wait for a production PCB rev
+  with the IM73D placed.
+
+**Recommended path:** Firmware proceeds autonomously through §10.2 steps 1-3 with
+the PROVISIONAL `{13,11,14}` map NOW (no hardware needed, fully revertible, SPH
+default). Captain confirms **D1** when the PCB layout is fixed and **D2** when the
+main-K1/PCB timeline is set — at which point firmware swaps the provisional map
+for the confirmed trio (a one-line change) and the production-unit device-proof
+runs. This unblocks all no-hardware firmware immediately and reserves for Captain
+only the two decisions that genuinely require product/PCB truth.
+
+**Blast radius:** none until a production unit is flashed — everything is behind a
+default-OFF flag; SPH `k1_hardware` stays byte-identical. Mic selection is NOT
+reopened (ratified 2026-07-03).
+
+**Default if Captain does not respond:** firmware stops after §10.2 step 3
+(host+bench-proven, provisional map) and does NOT flash any production unit or
+flip any default — the SPH main K1 is untouched.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-03 | agent:claude-code (Fable) | Created — productionization handover after ratification, cal-gate fix, persistence, margin tune, and snappiness attribution. |
 | 2026-07-04 | agent:claude-code (Fable) | Phase 1.1 firmware landed (`e2b62b5`): PDM-namespaced config persistence un-freeze; §4 update section added with device-proof protocol (bench off USB, proof pending). |
+| 2026-07-06 | agent:claude-code (Fable) | §10 added: Item-3 productionization audit (code-verified live state — persistence un-freeze DONE+deployed, pins bench-only, SSL window already widened, knob device-proof owed), production-flag plan (`K1_MIC_IM73D_PROD_V1` + provisional pin map + `MicFrontend` Phase 1.2), and the Captain hardware-fork decision (D1 pin map / D2 switch timing) in accept-reject form. |
