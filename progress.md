@@ -1,7 +1,20 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-05) `k1_bench_im73d_ble` **IM73D + BLE-MIDI investor-demo build** — bench K1 (`B489A500`) on `d32770d`; cal-abort fix deployed + device-proven (K718 unlinked); dial-turn control-proof + K718-linked cal repro still owed. **Separate** from IM73D122 productionization (mic Captain-ratified 2026-07-03; Phase 1.1 persistence landed `e2b62b5`). See `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`, `.claude/handoff.md`, and `docs/hardware/im73d122-productionization-handover-2026-07-03.md`.
+**Current focus:** (2026-07-06) **IM73D productionization Phase 1 executed autonomously** — `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED until the main-K1 mic swap). Lanes consolidated (vibrancy `55c536b`). Remaining is Captain-gated hardware (mic swap, DSR_16S SNR, eyes-on, default flip). See `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md` + `docs/hardware/im73d122-productionization-handover-2026-07-03.md` §§10-11.
+
+## 2026-07-06 IM73D Productionization Phase 1 (autonomous execution)
+
+- **Context:** Captain ratified D1 (production IM73D pin map = identical bench-proven `clk13/din12/LR14`, all K1s same ESP32-S3 devboard) and withdrew the D2 "PCB rev" framing (IM73D already on the bench since bringup). Then authorised autonomous completion of all outstanding Phase-1 phases. Planned harness-first (`/autonomous-agentic-build`, `/planning-with-files`): `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`.
+- **Lane consolidation first:** merged `lane/palette-vibrancy-v1` into `lane/im73d-pdm-eval` (`55c536b`; registry + platformio conflicts resolved, vibrancy row → eyes-on PASSED); forensic doc `32bc384`; §10 audit `741a40f`; §10.3 decision `a82c1d9`.
+- **UA — `k1_prod_im73d` production build path SHIPPED (`4b95e60`).** `constants.h` production `#else` pinmap now defines `K1_PDM_CLK/DIN/LR = 13/12/14` under the flag; `[env:k1_prod_im73d]` extends `k1_hardware`; guard `BLOCKED_UPLOAD_ENVS` hard-blocks it until the main-K1 SPH→IM73D swap (would misread PDM-on-SPH); drift-catcher + blocked-env + production-pin static tests. **Byte-identical-OFF proven** (3 stable sections) + source-level OFF-gated. pytest 629.
+- **UB — MicFrontend runtime dispatch REJECTED (decision).** Un-byte-verifiable (build not bit-reproducible in `.flash.text`/`.flash.rodata` — the known `K1_BUILD_EPOCH` timestamp) + Core-0 cost + `sensorybridge-doctrine`. Compile-time selection retained; 6-interface seam map delivered instead (handover §11.2). This is the correct trade, not skipped work.
+- **UC — `mic_stable_byte_gate.sh` SHIPPED (`d1ecc10`).** Formalises the stable-section oracle the graft used manually: hashes ONLY the 3 reproducible sections (`.dram0.data`/`.iram0.text`/`.iram0.vectors`), committed references for k1_hardware/k1_bench_reference/k1_bench_im73d, static contract test. Additive — `registry_byte_gate.sh` (flaky, 5 sections) left as trust root.
+- **UD/UE — docs (`6bfc702`):** DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist).
+- **UF — knob-persistence device-proof DEFERRED (owed).** Bench MAC-reachable but on the BLE demo build → config-save heap-defer makes a non-persist result inconclusive; host + adjacent-proven; run on radio-free `k1_bench_im73d`.
+- **Absolute-blocker checkpoints (handed to Captain, run did not stop):** main-K1 mic swap · DSR_16S SNR measurement · eyes-on A/B · `k1_hardware` default flip.
+
+## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
 
 ## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
 
