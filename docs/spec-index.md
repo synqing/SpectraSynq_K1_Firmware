@@ -4,7 +4,7 @@ abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, h
 
 # SensoryBridge K1 — Spec Index
 
-**Last verified:** 2026-07-05 (git `lane/im73d-pdm-eval` = `d32770d`; active lanes = IM73D122 productionization + the `k1_bench_im73d_ble` IM73D+BLE-MIDI investor-demo build). The IM73D122 productionization lane (mic Captain-ratified 2026-07-03) and the demo build are the current live workstreams — see the Active Lanes table below, `docs/hardware/im73d122-productionization-handover-2026-07-03.md`, and `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim in it against current git before acting.
+**Last verified:** 2026-07-06 (git `lane/im73d-pdm-eval` = `855c4a2`; active lane = IM73D122 productionization — **Phase-1 firmware DONE**, hardware checkpoints remain). Vibrancy + IM73D mic-eval lanes are consolidated; `k1_prod_im73d` production build path shipped (byte-identical-OFF, upload-guard BLOCKED until the physical mic swap). **Resume authority: [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](hardware/im73d-codex-resume-handover-2026-07-06.md)** (end-to-end work order) → [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](hardware/im73d122-productionization-handover-2026-07-03.md) §§10-11 (deep context). The `k1_bench_im73d_ble` IM73D+BLE-MIDI demo build remains a parallel deliverable. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim against current git before acting.
 
 > 2026-06-15 live supersession: newer K1 production and effects-lane status lives
 > in [progress.md](../progress.md) and
