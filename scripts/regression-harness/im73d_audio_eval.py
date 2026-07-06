@@ -113,6 +113,7 @@ def summarise_numeric(rows: list[dict[str, Any]]) -> dict[str, Any]:
 
 def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
     reasons: list[str] = []
+    warnings: list[str] = []
     rows = int(summary.get("rows") or 0)
     if rows < min_rows:
         reasons.append(f"too_few_ap_rows:{rows}<{min_rows}")
@@ -134,7 +135,10 @@ def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
     if max_for("near_pct") > 0.0:
         reasons.append("near_pct_nonzero")
     if max_for("peak_pin") > 0.20:
-        reasons.append("peak_pin_high")
+        # peak_pin is derived from the conditioned follower path. It is useful
+        # evidence for downstream drive saturation, but it is not raw mic rail
+        # clipping and must not reject an otherwise clean front-end capture.
+        warnings.append("conditioned_peak_pin_high")
     if min_for("input_trim") < 0.999:
         reasons.append("input_trim_reduced")
     if max_for("max_raw") >= 30000.0:
@@ -143,6 +147,7 @@ def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
     return {
         "usable": not reasons,
         "reasons": reasons,
+        "warnings": warnings,
     }
 
 
@@ -256,6 +261,13 @@ def serial_preflight(streams: dict[str, serial.Serial], ports: dict[str, str], o
             "build_lines": [line.line for line in lines if "BUILD:" in line.line],
             "chip_lines": [line.line for line in lines if "CHIP ID:" in line.line],
             "cal_lines": [line.line for line in lines if "CAL_SOURCE:" in line.line or "CAL_VALID:" in line.line],
+            "front_end_lines": [
+                line.line for line in lines
+                if "CONFIG.SENSITIVITY:" in line.line
+                or "AUDIO_RESPONSE_GAIN:" in line.line
+                or "CONFIG.SWEET_SPOT_MIN_LEVEL:" in line.line
+                or "CONFIG.DC_OFFSET:" in line.line
+            ],
         }
     return report
 
@@ -663,13 +675,15 @@ def main(argv: list[str]) -> int:
             max_raw = summary.get("max_raw", {})
             peak_scaled = summary.get("peak_scaled", {})
             quality = device["quality"]
+            warnings = ",".join(quality.get("warnings", [])) or "none"
             print(
                 f"{label} vol={volume:03d} r={repeat} {role}: "
                 f"ap_rows={device['ap_rows']} "
                 f"error={device['error'] or 'none'} "
                 f"max_raw_p90={max_raw.get('p90') if isinstance(max_raw, dict) else None} "
                 f"peak_scaled_p90={peak_scaled.get('p90') if isinstance(peak_scaled, dict) else None} "
-                f"usable={quality['usable']} reasons={','.join(quality['reasons']) or 'none'}"
+                f"usable={quality['usable']} reasons={','.join(quality['reasons']) or 'none'} "
+                f"warnings={warnings}"
             )
 
     repeatability = report["repeatability"]

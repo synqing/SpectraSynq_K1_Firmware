@@ -39,6 +39,7 @@ def test_quality_gate_rejects_missing_rows_and_clipping():
     assert harness.assess_quality(harness.summarise_numeric([]), min_rows=1) == {
         "usable": False,
         "reasons": ["too_few_ap_rows:0<1"],
+        "warnings": [],
     }
 
     clipped = {
@@ -52,6 +53,24 @@ def test_quality_gate_rejects_missing_rows_and_clipping():
     quality = harness.assess_quality(harness.summarise_numeric([clipped]), min_rows=1)
     assert quality["usable"] is False
     assert "clip_pct_nonzero" in quality["reasons"]
+
+
+def test_quality_gate_warns_on_conditioned_peak_pin_without_rejecting_raw_capture():
+    harness = load_harness()
+    downstream_pinned = {
+        "max_raw": 1200,
+        "peak_scaled": 1.0,
+        "input_trim": 1.0,
+        "clip_pct": 0.0,
+        "near_pct": 0.0,
+        "peak_pin": 0.75,
+    }
+
+    quality = harness.assess_quality(harness.summarise_numeric([downstream_pinned]), min_rows=1)
+
+    assert quality["usable"] is True
+    assert quality["reasons"] == []
+    assert quality["warnings"] == ["conditioned_peak_pin_high"]
 
 
 def test_repeatability_gate_uses_characterised_variance():
