@@ -1,0 +1,59 @@
+# K1 BLE OTA — GATT contract (contract-first, like k1-ws-contract.yaml)
+# Status: DRAFT (2026-07-07). Transport for firmware OTA over BLE. The signature
+# is verified ON-DEVICE on the image bytes (k1_ota_end / RSA-3072), so this
+# transport is untrusted-safe: a tampered image fails on-device regardless of BLE.
+# Clients: (1) Lightwave iOS app (CoreBluetooth); (2) Web Bluetooth portal
+# (Chrome/Edge desktop + Android — NOT iOS). Same service for both.
+#
+# CONTRACT RULE: update this file BEFORE implementing. If a characteristic or
+# opcode is not here, it does not exist.
+
+meta:
+  gate_flag: SB_ENABLE_OTA          # whole service compiled only when =1 (never shipped until D3)
+  role: peripheral                   # K1 advertises; NimBLE central (K718 Remoted) may coexist
+  device_name_adv: "Lightwave-Update"
+  mtu_target: 517                    # negotiate max; enable Data Length Extension + 2M PHY
+  security: app_signature_only       # RSA-3072 verify at k1_ota_end; no BLE bonding required for v1
+
+service:
+  uuid: b4d8bc3c-f0cf-4f2b-b4e1-b4c3c570e606
+  name: K1-OTA
+
+characteristics:
+  control:
+    uuid: 3a058b4a-3adc-46e4-85f2-2c57f3d157bd
+    properties: [write, notify]      # client writes opcodes; device notifies status
+    write_opcodes:                   # byte 0 = opcode, followed by args (little-endian)
+      0x01 BEGIN:   { args: "u32 image_size", action: "k1_ota_begin(size)" }
+      0x02 SIG:     { args: "u16 offset, bytes frag", action: "k1_ota_append_signature(frag) at offset (384-byte RSA-3072 sig, fragmented)" }
+      0x03 END:     { args: none, action: "k1_ota_end() -> verify-or-reject; reboot on accept" }
+      0x04 ABORT:   { args: none, action: "k1_ota_abort()" }
+    notify_status:                   # device -> client, byte 0 = status code
+      0x10 PROGRESS: { args: "u8 percent", note: "emitted as bytes land; drives app/portal bar" }
+      0x11 VERIFYING: {}
+      0x12 INSTALLING: {}
+      0x13 ACCEPT:   { note: "signature verified; device will reboot into new slot" }
+      0x14 REJECT:   { args: "u8 reason", reasons: { 1: no_signature, 2: bad_signature, 3: integrity_fail, 4: no_slot, 5: size_mismatch } }
+
+  data:
+    uuid: 6cc82419-4149-4601-a6c1-a255b05b921d
+    properties: [write_without_response]   # image chunks, streamed for throughput
+    payload: "raw image bytes, in order -> k1_ota_write(bytes). Chunk size = MTU-3."
+    note: "No per-chunk ack (throughput). Ordering guaranteed by BLE link. Total is
+           reconciled at END; a short/over count -> REJECT size_mismatch."
+
+flow:
+  1: "central connects, negotiates MTU/DLE/2M PHY"
+  2: "client -> BEGIN(size); device enters OTA mode (visualiser halts, Reactor animation starts)"
+  3: "client -> stream image via data char; device -> PROGRESS notifies (Reactor colour red->amber->green)"
+  4: "client -> SIG fragments (control) until 384 bytes accumulated"
+  5: "client -> END; device VERIFYING notify; k1_ota_end() runs RSA verify"
+  6: "accept -> ACCEPT notify + reboot (bootloader rollback armed; new image self-validates); reject -> REJECT(reason), running image untouched"
+
+ota_mode_ui:
+  renderer: Reactor (status-coloured field red->amber->green + white-hot core; centre-origin 79/80)
+  states: { waiting: advertising, downloading: PROGRESS%, verifying: held shimmer, installing: outward discharge, success: green settle, fail: recede red-ward }
+  constraint: "no audio in OTA mode; procedural; <=2ms/frame; no heap in render"
+
+# Document Changelog
+# | 2026-07-07 | agent:claude-opus-4-8 (CTO) | Created. BLE OTA GATT contract: custom K1-OTA service, control(write+notify) + data(write-no-response); opcodes BEGIN/SIG/END/ABORT; status PROGRESS/VERIFYING/INSTALLING/ACCEPT/REJECT. Reactor status-colour renderer bound to OTA states. Transport-agnostic security (RSA verify on-device). Reflects Captain lock of Reactor + red->amber->green (2026-07-07). |

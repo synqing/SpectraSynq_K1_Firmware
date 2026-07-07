@@ -9,6 +9,7 @@
 #include "globals.h"  // USBSerial
 #include "k1_ota_signing_public_key.h"  // K1_OTA_SIGNING_PUBLIC_KEY_PEM (verify-only)
 #include "k1_ota_selftest_vector.h"  // K1_OTA_SELFTEST_DIGEST / _SIG (residual #1)
+#include "k1_ota_mode.h"  // k1_ota_ble_service_start()
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
 #include "mbedtls/pk.h"
@@ -318,6 +319,13 @@ bool serial_cmd_dispatch_ota(const char* command_type, char* command_data) {
                      st.good_pass ? "PASS" : "FAIL",
                      st.tamper_reject ? "REJECT" : "ACCEPT",
                      pass ? "PASS" : "FAIL");
+    return true;
+  } else if (strcmp(command_type, "ota_ble") == 0) {
+    // Bench-only trigger: bring up the K1-OTA BLE peripheral (advertise
+    // 'Lightwave-Update', switch renderer to Reactor on BEGIN). Production uses
+    // BLE ingress directly; this verb is for the device-proof matrix.
+    const bool up = k1_ota_ble_service_start();
+    USBSerial.printf("[ota_ble] %s\n", up ? "advertising K1-OTA service" : "start FAILED");
     return true;
   }
   // NOTE: the AP/HTTP body chunk ingress remains enablement-time wiring; the

@@ -32,6 +32,8 @@
 #include "user_config.h"      // Nothing for now
 #include "constants.h"        // Global constants
 #include "globals.h"          // Global variables
+#include "system/k1_ota.h"       // OTA receiver API (k1_ota_mark_app_valid_after_boot; self-gated)
+#include "system/k1_ota_mode.h"  // OTA-mode coordinator render-hook + NimBLE seam (self-gated #if SB_ENABLE_OTA)
 #include "sb_trace.h"         // Developer-only MabuTrace wrapper (no-op outside trace_dev)
 #include "presets.h"          // Configuration presets by name
 #include "bridge_fs.h"        // Filesystem access (save/load configuration)
@@ -645,6 +647,11 @@ void setup() {
   USBSerial.print(" safe_mode=");
   USBSerial.println(k1_boot_safe_mode ? 1 : 0);
 #endif
+#if SB_ENABLE_OTA
+  // Cancel any bootloader rollback armed by a prior OTA once this boot is proven
+  // healthy. No-op unless the running slot is PENDING_VERIFY.
+  k1_ota_mark_app_valid_after_boot();
+#endif
   sb_tempo_init(); // (sb_tempo.h) compute tempo Goertzel coeffs once — REQUIRED or tempo never locks
 
   // Snap any saved-but-disabled light mode to the nearest enabled one (2026-06-02:
@@ -1113,6 +1120,21 @@ void led_thread(void* arg) {
     if (led_thread_halt == false) {
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
+#if SB_ENABLE_OTA
+      {
+        // Real per-frame delta for Reactor pacing (seconds).
+        const float ota_dt_s = (last_frame_us > 0)
+            ? (float)(vp_frame_start_us - (int64_t)last_frame_us) / 1000000.0f
+            : 0.008f;
+        if (k1_ota_mode_render_hook(ota_dt_s)) {
+          show_leds();
+          LED_FPS = 0.95f * LED_FPS + 0.05f * (1000000.0f / (float)(esp_timer_get_time() - last_frame_us));
+          last_frame_us = esp_timer_get_time();
+          vTaskDelay(1);
+          continue;   // OTA owns this frame; skip the entire music visualiser
+        }
+      }
+#endif
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running) {
         vp_perf_note_frame_start(uint32_t(vp_frame_start_us));
