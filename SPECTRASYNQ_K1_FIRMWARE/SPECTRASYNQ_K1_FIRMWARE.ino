@@ -1205,6 +1205,13 @@ void led_thread(void* arg) {
 		      SBSmartDirectorConfig smart_director_config = sb_smart_director_config();
 		      SBVisualHookConfig visual_hook_config = sb_visual_hooks_config();
 		      uint8_t vpab_primary_render_mode = CONFIG.LIGHTSHOW_MODE;
+#ifdef SB_EDGEMIXER_AB_DEMO
+		      // BENCH-ONLY: force + cycle the EdgeMixer mode BEFORE the config read
+		      // below, so vpab_edge_base_config picks up the forced config. The only
+		      // later mutation (sb_visual_hooks_apply_edge_config) scales strength
+		      // only, so the forced mode/spread reach sb_edgemixer_lite_apply intact.
+		      sb_edgemixer_ab_demo_tick();
+#endif
 		      SBEdgeMixerConfig vpab_edge_base_config = sb_edgemixer_lite_config();
 		      SBEdgeMixerConfig vpab_edge_effective_config = vpab_edge_base_config;
 #ifdef K1_EFFECT_FRAMEWORK_V1
