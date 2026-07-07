@@ -8,6 +8,7 @@
 
 #include "globals.h"  // USBSerial
 #include "k1_ota_signing_public_key.h"  // K1_OTA_SIGNING_PUBLIC_KEY_PEM (verify-only)
+#include "k1_ota_selftest_vector.h"  // K1_OTA_SELFTEST_DIGEST / _SIG (residual #1)
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
 #include "mbedtls/pk.h"
@@ -67,6 +68,45 @@ bool k1_ota_verify_signature(const uint8_t* digest, size_t digest_len) {
                          g_ota_sig_len);
   mbedtls_pk_free(&pk);
   return rc == 0;
+}
+
+// On-silicon self-test (residual #1). Exercises the EXACT production verify path
+// (k1_ota_verify_signature + the embedded PUBLIC key) against a compiled-in,
+// operator-signed vector — proving mbedtls verify behaves identically on ESP32-S3
+// silicon as on the host. Brick-safe: NO image is written and the boot partition
+// is never touched. Refuses to run if a real OTA session is open, and leaves no
+// signature residue behind.
+struct K1OtaSelftestResult {
+  bool good_pass;      // correct digest -> signature verifies
+  bool tamper_reject;  // one-byte-mutated digest -> signature rejected (fail-closed)
+};
+
+K1OtaSelftestResult k1_ota_run_selftest() {
+  K1OtaSelftestResult r{false, false};
+  if (g_ota_open) {
+    return r;  // a real OTA session is active — do not disturb its crypto state
+  }
+  // Load the known-good detached signature into the same buffer production uses.
+  memset(g_ota_sig, 0, sizeof(g_ota_sig));
+  memcpy(g_ota_sig, K1_OTA_SELFTEST_SIG, sizeof(K1_OTA_SELFTEST_SIG));
+  g_ota_sig_len = sizeof(K1_OTA_SELFTEST_SIG);
+  g_ota_sig_present = true;
+
+  // (1) GOOD: the correct digest must verify against the embedded PUBLIC key.
+  r.good_pass =
+      k1_ota_verify_signature(K1_OTA_SELFTEST_DIGEST, sizeof(K1_OTA_SELFTEST_DIGEST));
+
+  // (2) TAMPER: a one-byte-mutated digest must be rejected (fail-closed).
+  uint8_t tampered[sizeof(K1_OTA_SELFTEST_DIGEST)];
+  memcpy(tampered, K1_OTA_SELFTEST_DIGEST, sizeof(tampered));
+  tampered[0] ^= 0xFF;
+  r.tamper_reject = !k1_ota_verify_signature(tampered, sizeof(tampered));
+
+  // Clear the signature residue (do NOT touch g_ota_sha — no session was opened).
+  memset(g_ota_sig, 0, sizeof(g_ota_sig));
+  g_ota_sig_len = 0;
+  g_ota_sig_present = false;
+  return r;
 }
 }  // namespace
 
@@ -264,6 +304,20 @@ bool serial_cmd_dispatch_ota(const char* command_type, char* command_data) {
     USBSerial.printf("[ota] end %s — %s\n", ok ? "ok" : "REJECT",
                      ok ? "signature verified, reboot to run the new image"
                         : "image refused (unsigned/mis-signed/tampered or no slot)");
+    return true;
+  } else if (strcmp(command_type, "ota_selftest") == 0) {
+    // On-silicon proof of the verify path (residual #1). Brick-safe: no image
+    // write, no boot-partition change. DoD line for the device-build registry.
+    if (g_ota_open) {
+      USBSerial.println("OTA_SELFTEST: skipped — OTA session active");
+      return true;
+    }
+    const K1OtaSelftestResult st = k1_ota_run_selftest();
+    const bool pass = st.good_pass && st.tamper_reject;
+    USBSerial.printf("OTA_SELFTEST: good=%s tamper=%s verify=%s\n",
+                     st.good_pass ? "PASS" : "FAIL",
+                     st.tamper_reject ? "REJECT" : "ACCEPT",
+                     pass ? "PASS" : "FAIL");
     return true;
   }
   // NOTE: the AP/HTTP body chunk ingress remains enablement-time wiring; the
