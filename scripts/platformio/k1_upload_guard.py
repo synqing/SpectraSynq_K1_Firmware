@@ -102,10 +102,11 @@ BLOCKED_UPLOAD_ENVS: dict[str, str] = {
         "calibration, and watchdog gates are explicitly re-opened"
     ),
     "k1_prod_im73d": (
-        "production IM73D env inherits the k1_hardware LED GPIO map; the bench "
-        "IM73D unit proves the PDM mic pins but its LED harness is not compatible "
-        "with this env. Keep blocked until a production LED-harness IM73D unit or "
-        "a dedicated bench-LED proof env exists"
+        "production IM73D env inherits the unresolved k1_hardware LED GPIO map "
+        "(currently 6/7) while the restored live bench proof uses the "
+        "bench-reference map (4/5). Captain confirms the K1 hardware is "
+        "identical; keep blocked until the firmware pin-map conflict is "
+        "reconciled and device-proven"
     ),
 }
 

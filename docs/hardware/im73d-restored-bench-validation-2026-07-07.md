@@ -2,12 +2,15 @@
 
 ## Verdict
 
-The bench K1 is restored and validated on the **bench LED pin map** with the
-IM73D PDM mic path active.
+The bench K1 is restored and validated on the **bench-reference firmware LED
+map** with the IM73D PDM mic path active.
 
 This closes the post-incident bench recovery validation for `k1_bench_im73d`.
 It does **not** prove `k1_prod_im73d`, because `k1_prod_im73d` still inherits
-the `k1_hardware` LED GPIO map and remains upload-blocked.
+the unresolved `k1_hardware` LED GPIO map and remains upload-blocked. Captain
+confirms both K1s are identical hardware; the blocker is the repo's firmware
+LED pin-map conflict (`k1_hardware` GPIO `6/7` versus restored bench-reference
+GPIO `4/5`), not a physical hardware split.
 
 ## Scope
 
@@ -18,7 +21,7 @@ Bench target:
 - Port during run: `/dev/cu.usbmodem1401`
 - Build proved before validation: `BUILD: version=40103 git=f2f7c45 env=k1_bench_im73d`
 - Mic path: IM73D PDM on `clk13/din12/LR14`
-- LED path: bench-reference GPIO map (`GPIO4/5`)
+- LED path: bench-reference firmware GPIO map (`GPIO4/5`)
 
 Main K1 was present only as SPH reference/control:
 
@@ -92,8 +95,8 @@ well below the `<10` starvation ceiling.
 
 What this proves:
 
-- The bench LED pin map is restored and visually confirmed by Captain after the
-  accidental `k1_prod_im73d` flash.
+- The bench-reference firmware LED map is restored and visually confirmed by
+  Captain after the accidental `k1_prod_im73d` flash.
 - The restored `k1_bench_im73d @ f2f7c45` runtime is alive.
 - The IM73D PDM path is active and responds to controlled music.
 - Raw pre-conditioning telemetry is non-railed at accepted playback levels.
@@ -101,13 +104,13 @@ What this proves:
 
 What this does not prove:
 
-- It does not prove `k1_prod_im73d` on the production LED GPIO map.
+- It does not prove `k1_prod_im73d` on the unresolved `k1_hardware` LED GPIO
+  map (`GPIO6/7`).
 - It does not authorise unblocking `k1_prod_im73d` for the bench unit.
 - It does not authorise the `k1_hardware` default flip.
 
-Remaining options for production-env proof:
+Remaining requirement for production-env proof:
 
-1. Use a production LED-harness IM73D unit for `k1_prod_im73d`, or
-2. create an explicitly named bench-LED IM73D proof env that keeps the bench LED
-   GPIO map while exercising the production mic path.
-
+1. Reconcile the canonical K1 LED GPIO map in firmware (`GPIO6/7` versus
+   `GPIO4/5`) against the live identical K1 hardware.
+2. Device-prove the selected map before unblocking `k1_prod_im73d`.

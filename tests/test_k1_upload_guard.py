@@ -105,7 +105,7 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
-    def test_prod_im73d_upload_is_blocked_even_on_bench_im73d_unit(self):
+    def test_prod_im73d_upload_is_blocked_until_led_pinmap_conflict_is_resolved(self):
         ok, message = self.guard.validate_upload_target(
             "k1_prod_im73d",
             "/dev/tty.usbmodem12201",
@@ -114,12 +114,12 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("upload blocked", message)
         self.assertIn("LED GPIO map", message)
-        self.assertIn("bench", message)
+        self.assertIn("firmware pin-map conflict", message)
 
     def test_prod_im73d_upload_is_blocked_on_main_too(self):
-        # k1_prod_im73d = production LED pinmap + IM73D PDM. It is build-only
-        # until a production LED-harness IM73D unit, or an explicit bench-LED
-        # proof env, exists. The hard block must fire before MAC-specific logic.
+        # k1_prod_im73d = k1_hardware LED pinmap + IM73D PDM. It is build-only
+        # until the conflicting firmware LED maps are reconciled against live,
+        # identical K1 hardware. The hard block must fire before MAC logic.
         ok, message = self.guard.validate_upload_target(
             "k1_prod_im73d",
             "/dev/tty.usbmodem1401",
@@ -128,6 +128,7 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertFalse(ok)
         self.assertIn("upload blocked", message)
         self.assertIn("LED GPIO map", message)
+        self.assertIn("firmware pin-map conflict", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
         # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL

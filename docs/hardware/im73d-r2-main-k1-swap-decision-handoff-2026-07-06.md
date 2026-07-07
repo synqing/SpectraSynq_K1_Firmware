@@ -2,8 +2,7 @@
 
 ## Verdict
 
-This handoff's original "main-K1 physical swap" blocker is superseded for
-mic/PDM proof, but not for `k1_prod_im73d` LED-output proof.
+This handoff's original "main-K1 physical swap" blocker is superseded.
 
 The bench K1 and main K1 use identical ESP32-S3 K1 hardware. Captain already
 ratified the production IM73D pin map as the bench-proven `clk13/din12/LR14`
@@ -11,9 +10,11 @@ mic map. Therefore, the bench K1 with IM73D on pins `13/12/14` is a valid
 IM73D PDM proof unit.
 
 Do not treat "swap the main K1's SPH0645 to IM73D" as a mic-path firmware proof
-blocker. Do treat the production LED-output map as a separate proof surface:
-`k1_prod_im73d` extends `k1_hardware`, and a 2026-07-07 bench flash made both LED
-channels dark because the bench LED harness is not compatible with that env.
+blocker. Do treat the LED GPIO map as a separate proof surface:
+`k1_prod_im73d` extends `k1_hardware` and drives GPIO `6/7`, while the restored
+bench-reference proof uses GPIO `4/5`. A 2026-07-07 bench flash made both LED
+channels dark. That is a firmware pin-map conflict until reconciled and
+device-proven, not evidence of different K1 hardware.
 
 ## Current State
 
@@ -29,14 +30,13 @@ channels dark because the bench LED harness is not compatible with that env.
 
 ## Corrected Gate
 
-The remaining production proof gate is not merely a main-unit mic swap. It is:
+The remaining production proof gate is not a main-unit mic swap. It is:
 
 1. Keep `k1_prod_im73d` upload-blocked because it drives the `k1_hardware` LED
-   GPIO map.
-2. Prove that env only on a production LED-harness IM73D unit, or create a
-   separate bench-LED proof env that preserves the bench LED GPIO map while
-   exercising the production mic path.
-3. Keep the main K1 as the SPH reference/control unless a product-unit swap is
+   GPIO map (`6/7`) while the restored bench-reference proof uses GPIO `4/5`.
+2. Reconcile the canonical K1 LED GPIO map in firmware and guard policy.
+3. Device-prove the selected map before unblocking `k1_prod_im73d`.
+4. Keep the main K1 as the SPH reference/control unless a product-unit swap is
    explicitly requested.
 
 ## What Still Needs Care
@@ -47,8 +47,7 @@ equivalence.
 
 Expected follow-up for a production-IM73D proof:
 
-- Either prepare a production LED-harness IM73D unit for `k1_prod_im73d`, or add
-  a separate bench-LED proof env with an explicit name and guard mapping.
+- Decide the canonical firmware LED GPIO map for identical K1 hardware.
 - Add/update guard tests for that policy.
 - Build the selected proof env.
 - Flash only after live USB MAC verification.
@@ -61,9 +60,7 @@ Expected follow-up for a production-IM73D proof:
 ## Optional Main-K1 Swap
 
 Converting the main K1 from SPH0645 to IM73D is optional product-unit validation
-or product configuration work for the mic path. It may become the cleanest way
-to prove `k1_prod_im73d` with the production LED GPIO map if no separate
-production LED-harness IM73D unit exists.
+or product configuration work for the mic path. It is not the current blocker.
 
 If Captain later chooses to convert the main K1, the old swap checklist can be
 reused as a hardware-work checklist only. It must not be treated as the gate
