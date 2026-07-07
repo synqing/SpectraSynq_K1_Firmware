@@ -7,6 +7,7 @@ GLOBALS_CONFIG = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "globals_config.c
 SERIAL_CMD_HANDLERS = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_cmd_handlers.cpp"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
 CONTROL_FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "sb_k1_control_facade.cpp"
+CONFIG_TYPES = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "config_types.h"
 IM73D_HARNESS = ROOT / "scripts" / "regression-harness" / "im73d_audio_eval.py"
 
 
@@ -54,15 +55,19 @@ def test_im73d_raw_telemetry_is_pre_conditioning_and_reported_on_ap_stream():
 
 
 def test_current_sensitivity_surfaces_are_explicitly_mapped():
+    config_types = CONFIG_TYPES.read_text()
     defaults = GLOBALS_CONFIG.read_text()
     serial_handlers = SERIAL_CMD_HANDLERS.read_text()
     serial_menu = SERIAL_MENU.read_text()
     control_facade = CONTROL_FACADE.read_text()
 
+    assert "#define K1_SENSITIVITY_MIN 0.10f" in config_types
+    assert "#define K1_SENSITIVITY_MAX 20.0f" in config_types
     assert "2.4,                 // SENSITIVITY" in defaults
-    assert "CONFIG.SENSITIVITY = atof(command_data);" in serial_handlers
-    assert "clamp_float(CONFIG.SENSITIVITY + 0.10f, 0.10f, 20.0f)" in serial_menu
-    assert 'needs_number_range(record, &result, 0.0f, 1.0f, "Global sensitivity out of range")' in control_facade
+    assert "CONFIG.SENSITIVITY = atof(command_data);" not in serial_handlers
+    assert "constrain(value, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX)" in serial_handlers
+    assert "clamp_float(CONFIG.SENSITIVITY + 0.10f, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX)" in serial_menu
+    assert 'needs_number_range(record, &result, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX, "Global sensitivity out of range")' in control_facade
 
 
 def test_im73d_harness_preflight_records_front_end_gain_state():

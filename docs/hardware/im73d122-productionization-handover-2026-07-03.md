@@ -210,20 +210,19 @@ verified against the code on `lane/im73d-pdm-eval` at lane consolidation
 | Surface | Status | Anchor |
 |---|---|---|
 | Config-persistence un-freeze | **Firmware DONE (`e2b62b5`, 07-04) AND deployed** — verified `79d7fda ⊇ e2b62b5`, so the un-freeze code ships on the current bench build. | `bridge_fs.h:81` "un-frozen 2026-07-04"; `update_config_filename()` → `/CONFIG_PDM_%05lu.BIN` |
-| Knob-persistence DEVICE-proof | **OWED** — the code ships, but "set knob via `:` → `:reset` → `:dump` survived" was never captured. Autonomous bench task (a config test, NOT an SNR test → any IM73D bench build is fine; radio-free `k1_bench_im73d` is cleanest). | no proof row in registry/`_scratch` |
+| Knob-persistence DEVICE-proof | **CLOSED 2026-07-06** — radio-free proof: `:chroma=0.150` survived `:reset`, final restore/readback proved `CONFIG.CHROMA: 0.100000`, and `CAL_SOURCE: persisted_profile` remained intact. | `docs/hardware/device-build-registry.md`; `_scratch/im73d_r1_knob_persistence_20260706/` |
 | PDM pins | Code today: `K1_PDM_CLK/DIN/LR_PIN` (`clk13/din12/LR14`) exist ONLY in the bench pinmap branch; the production `#else` branch has **no PDM block**. **RESOLVED (D1, 2026-07-06):** production uses the *identical* bench-proven pins `clk13/din12/LR14` — all current K1s are the same ESP32-S3 devboard. Verified collision-free on the production map (GPIO 12 unassigned; 13/14 freed when SPH drops; LEDs stay 6/7; old SPH LRCLK 11 unused). Firmware just needs the block added to the `#else` branch. | `constants.h:297-345` |
 | Input gain 16.0f | As documented; bench-characterised on an OPEN bench (SPH target ~7000 / IM73D obs 1317 → ×16). Enclosure re-characterisation = Phase 2 (needs production hardware). | `constants.h:67-70` |
 | SSL cal window | **"widen not bump" lever already pulled** — 650/720 → 1000/1150; silence p90 ~807 of 1150 = healthy headroom now. The "710-of-720" tightness predates the widen and is resolved. | `constants.h:40-60` |
 | ifdef sprawl | **34** `K1_MIC_IM73D_PDM_V1` sites across 7 files (`bridge_fs.h` 13, `i2s_audio.h` 10, `system.h` 3, `constants.h` 3, `noise_cal.h` 3, `globals.h` 2, `platformio.ini` 2). This is the `MicFrontend` retirement target. | `git grep` |
 | flag-OFF byte-identity | SPH `i2s_std` path untouched when flag OFF; `k1_hardware` byte-identical. Invariant to preserve through all production-flag work. | — |
 
-**Net:** the handover's framing of "replace eval-era freeze with Phase 1.1
-persistence" as pending is now stale — at the firmware level it is DONE and
-deployed. The genuinely-open Phase 1 items are (a) the knob-persistence device
-capture (owed, small), (b) the `MicFrontend` abstraction (Phase 1.2, the main
-autonomous firmware), (c) DSR_16S eval, (d) production-flip red-team. None of
-(a)-(d) needs new hardware. The ONE hard blocker that does need hardware truth
-is the production PDM pin map — see §10.3.
+**Net (superseded 2026-07-08):** the firmware-level persistence work and the
+device knob proof are both closed. Runtime MicFrontend dispatch was rejected in
+§11.2, DSR16 was rejected by controlled-audio evidence, and the original
+physical-swap blocker is superseded by Captain's identical-hardware
+confirmation. Current live routing is the selected existing env plus device
+proof/eyes-on before any default flip.
 
 ### 10.2 · Production-flag plan (`K1_MIC_IM73D_PROD_V1`) — autonomous, steps 1-3 need no hardware
 
@@ -335,18 +334,21 @@ Pre-mortem (failure → guard):
 
 **Flip checklist (all required, in order):** (1) selected-env device proof with `dump_raw` int16 sane; (2) gain re-characterised on the target configured unit; (3) Captain silence-go recal only if explicitly authorised → `cal_valid=1 reason=none`; (4) `stream_agc` all four gains < 10 after 10 s; (5) eyes-on A/B vs the SPH baseline across genres incl. VU modes; (6) confirm upload guard still binds `k1_prod_im73d` to the main K1 MAC and rejects bench cross-flash; (7) only then consider flipping the `k1_hardware` default (Captain).
 
-### 11.6 · Absolute-blocker checkpoints (handed to Captain — the run did NOT stop on these)
-1. **Physical main-K1 SPH0645 → IM73D swap** — the only gate to device-proving `k1_prod_im73d`.
-2. **DSR_16S +2 dB SNR measurement** — radio-free bench, Captain-context.
-3. **Perceptual eyes-on / audio A/B** for any default flip.
-4. **`k1_hardware` default-env flip** — Captain call after 1-3.
+### 11.6 · Captain-gated checkpoints after supersession
+1. **Selected-env device proof** — MAC-verify the intended unit/env tuple, prove raw IM73D input sane, confirm AGC gains, and get Captain eyes-on before any default flip.
+2. **Perceptual eyes-on / audio A/B** for any default flip.
+3. **`k1_hardware` default-env flip** — Captain call after selected-env proof and eyes-on.
 
-### 11.7 · Knob-persistence device-proof (Phase 1.1 tail) — status: OWED, deliberately deferred
-Un-freeze code (`e2b62b5`) ships on the bench (`79d7fda ⊇ e2b62b5`). The isolated "set knob → `:reset` → survived" capture is **still owed**. This session confirmed both units are MAC-reachable (bench `B489A500` on usbmodem101, main `F887A500` on usbmodem1101) but **deliberately did NOT run the cycle**, because:
-- the bench runs the **BLE demo build**, where `save_config_delayed`'s LittleFS write can **defer** under BLE heap pressure (the `1ac840a` fail-safe) → a non-persist result would be **inconclusive** (heap-defer vs a real bug), not a clean proof;
-- the cycle requires a `:reset`, disrupting the Captain-directed investor-demo state, with the main K1 co-connected on the bus.
+Closed/superseded: the physical SPH0645 -> IM73D swap is optional product-unit
+work, not the current proof blocker; DSR16 is rejected; the knob-persistence
+device proof is closed.
 
-Existing evidence is already strong: persistence is **host-proven** (`bridge_fs_config` golden + `test_calibration_profile_static`) and **device-proven-adjacent** (`cal_source=persisted_profile` uses the identical `/CONFIG_PDM_*.BIN`-family mechanism, proven across cold boot + reflash). **Recommendation:** run the isolated knob cycle on the next **radio-free `k1_bench_im73d`** bench session (no heap-defer confound), not the BLE demo build. Environmental/checkpoint item, not a Captain decision.
+### 11.7 · Knob-persistence device-proof (Phase 1.1 tail) — CLOSED 2026-07-06
+Un-freeze code (`e2b62b5`) ships on the bench and now has isolated radio-free
+device proof. The test set `:chroma=0.150`, waited for delayed persistence,
+issued `:reset`, then `:dump` proved `CONFIG.CHROMA: 0.150000` survived reboot.
+The knob was restored to `CONFIG.CHROMA: 0.100000`, and readback proved
+`CAL_SOURCE: persisted_profile` stayed intact. No `start_noise_cal` was run.
 
 ---
 **Document Changelog**

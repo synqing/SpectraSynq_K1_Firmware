@@ -4,7 +4,7 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 
 # IM73D productionization — Codex end-to-end resume brief (2026-07-06)
 
-**You are Codex, resuming the SpectraSynq K1 firmware.** Everything that can be done autonomously in firmware is DONE and gated. What is left is mostly **hardware/perceptual checkpoints that only Captain can clear** plus **one owed autonomous device capture**. Your job: execute the remaining ordered queue, escalate the hardware checkpoints as decision-grade asks (do not perform them yourself — they need Captain's hands / eyes / verbal silence-go), and do NOT re-litigate anything in the "closed — do not reopen" list.
+**You are Codex, resuming the SpectraSynq K1 firmware.** Everything that can be done autonomously in Phase-1 firmware is DONE and gated. R1 knob persistence is closed, and DSR16 controlled-audio evaluation is closed/rejected. What remains is selected-env device proof, Captain eyes-on, and any default flip Captain explicitly chooses. Escalate hardware/perceptual checkpoints as decision-grade asks (do not perform them yourself — they need Captain's hands / eyes / verbal silence-go), and do NOT re-litigate anything in the "closed — do not reopen" list.
 
 > **2026-07-07 supersession:** R1 is closed. R4 controlled-audio DSR testing has
 > now been performed on the bench IM73D using radio-free firmware and speaker
@@ -91,18 +91,13 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 
 Two tracks. **Track A** is autonomous (do it). **Track B** is Captain-gated hardware/perceptual (prepare + escalate decision-grade; do NOT perform yourself).
 
-### R1 (Track A, autonomous, small) — knob-persistence device capture
-**Why:** the un-freeze code (`e2b62b5`) ships on the bench (`79d7fda ⊇ e2b62b5`) but the isolated "set knob → `:reset` → survived" proof was never recorded (handover §11.7). Host + adjacent-proven; this closes the last Phase-1.1 device gap.
-**Do NOT run it on the current BLE demo build** — `save_config_delayed`'s LittleFS write can defer under BLE heap pressure → a non-persist result would be inconclusive. Run on **radio-free `k1_bench_im73d`**.
-**Procedure (bench `B489A500` only; identity by MAC; DTR/RTS LOW before pyserial open):**
-1. Guard-verify + flash the bench to radio-free `k1_bench_im73d`:
-   `pio run -e k1_bench_im73d -t upload --upload-port <verified B489A500 port>`
-   (this replaces the BLE demo state — note it in the registry; the demo can be reflashed later).
-2. Passive read `:build` → confirm `env=k1_bench_im73d`. Confirm `cal_source=persisted_profile` survived (regression check).
-3. Set a knob via a **colon-prefixed** command, e.g. `:chroma=0.150` (echo-verify `PRIMARY pcm: chroma=0.150`). Wait ≥5 s (`save_config_delayed`).
-4. `:reset` → after reboot, `:dump` (or `;`) → confirm `chroma=0.150` survived (the `/CONFIG_PDM_*.BIN` persisted).
-5. Restore the knob (`:chroma=0.100`), update `device-build-registry.md` deployed-state row.
-**No cal firing** — no Captain silence-go needed for this. If the bench is unreachable, document as still-owed and move on.
+### R1 (CLOSED 2026-07-06) — knob-persistence device capture
+The un-freeze code (`e2b62b5`) ships and the isolated radio-free device proof is
+recorded. The proof set `:chroma=0.150`, waited for delayed persistence,
+issued `:reset`, then `:dump` proved `CONFIG.CHROMA: 0.150000` survived reboot.
+The knob was restored to `CONFIG.CHROMA: 0.100000`, and readback proved
+`CAL_SOURCE: persisted_profile` stayed intact. No `start_noise_cal` was run.
+Do not rerun this unless a future persistence change invalidates the proof.
 
 ### R2 (SUPERSEDED 2026-07-07) — main-K1 SPH0645 → IM73D physical swap
 This is no longer a mic/PDM proof blocker. Bench K1 carries IM73D on the

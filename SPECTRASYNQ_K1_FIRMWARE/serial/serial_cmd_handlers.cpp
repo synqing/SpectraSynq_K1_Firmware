@@ -258,17 +258,27 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
 
     // Set Audio Sensitivity ----------------------------
     else if (strcmp(command_type, "sensitivity") == 0) {
+      bool good = false;
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SENSITIVITY = CONFIG_DEFAULTS.SENSITIVITY;
+        good = true;
       } else {
-        CONFIG.SENSITIVITY = atof(command_data);
+        float value = 0.0f;
+        if (vp_parse_float(command_data, &value)) {
+          CONFIG.SENSITIVITY = constrain(value, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
+          good = true;
+        } else {
+          bad_command(command_type, command_data);
+        }
       }
 
-      save_config_delayed();
-      tx_begin();
-      USBSerial.print("CONFIG.SENSITIVITY: ");
-      USBSerial.println(CONFIG.SENSITIVITY);
-      tx_end();
+      if (good) {
+        save_config_delayed();
+        tx_begin();
+        USBSerial.print("CONFIG.SENSITIVITY: ");
+        USBSerial.println(CONFIG.SENSITIVITY);
+        tx_end();
+      }
     }
 
     // Toggle Lightshow Mirroring ---------------------

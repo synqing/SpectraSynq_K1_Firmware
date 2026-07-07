@@ -13,7 +13,12 @@ ROOT = next(p for p in Path(__file__).resolve().parents if (p / "SPECTRASYNQ_K1_
 DEFAULT_JSON = ROOT / "docs" / "protocol" / "k1-ble-midi-map.json"
 DEFAULT_OUT = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "network" / "k1_ble_midi_map.h"
 
-K1_SYMBOLS = {"float(NUM_FREQS)": 80.0, "NUM_FREQS": 80.0}
+K1_SYMBOLS = {
+    "float(NUM_FREQS)": 80.0,
+    "NUM_FREQS": 80.0,
+    "K1_SENSITIVITY_MIN": 0.10,
+    "K1_SENSITIVITY_MAX": 20.0,
+}
 
 TYPE_ENUM = {
     ("pc", "mode"): "K1MIDI_PC",

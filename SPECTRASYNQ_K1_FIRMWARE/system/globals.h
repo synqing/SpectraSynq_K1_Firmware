@@ -457,6 +457,9 @@ inline bool stream_magnitudes = false;
 inline bool stream_spectrogram = false;
 inline bool stream_chromagram = false;
 inline bool stream_agc_debug = false;  // Flag for streaming Multi-band AGC debug data
+inline SQ15x16 agc_active_floor_debug[NUM_AGC_BANDS] = {
+  SQ15x16(0.001), SQ15x16(0.001), SQ15x16(0.001), SQ15x16(0.001)
+};
 #ifndef AP_STREAM_DEFAULT_ON
 #define AP_STREAM_DEFAULT_ON 1
 #endif

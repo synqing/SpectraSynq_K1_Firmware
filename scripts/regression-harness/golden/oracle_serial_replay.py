@@ -214,6 +214,7 @@ CORPUS = [
     "saturation=-1",       # -> manual clamp 0.0
     "bulb_opacity=2.0",    # -> manual clamp 1.0
     "incandescent_filter=2.0",  # -> manual clamp 1.0
+    "sensitivity=99",     # -> clamp K1_SENSITIVITY_MAX
 
     # ---- (3) =default + malformed/bad_command: lock the failure path ----------
     "chroma=default",      # reads CONFIG_DEFAULTS.CHROMA
@@ -222,6 +223,7 @@ CORPUS = [
     "mirror_enabled=default",  # enum default branch
     "chroma=",             # empty -> vp_parse_float fails -> bad_command
     "photons=abc",         # non-numeric -> vp_parse_float fails -> bad_command
+    "sensitivity=abc",     # non-numeric -> vp_parse_float fails -> bad_command
     "palette_mode=maybe",  # not a bool token -> bad_command
     "base_coat=default",   # base_coat has NO default token -> bad_command
     "unknown_cmd=1",       # unknown command_type -> bad_command

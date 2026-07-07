@@ -10,6 +10,13 @@ abstract: "End-to-end autonomous execution plan (2026-07-06) to complete every o
 > `k1_prod_im73d` drives GPIO `6/7` and is guard-mapped to the main K1 MAC.
 > Do not re-add `k1_prod_im73d` to `BLOCKED_UPLOAD_ENVS` unless Captain creates
 > a new explicit blocker.
+>
+> **2026-07-08 status note:** this file is now historical execution context, not
+> the live task queue. UF knob persistence is closed by the radio-free
+> `:chroma=0.150` -> `:reset` -> `:dump` proof, DSR16 is rejected by controlled
+> audio evidence, and the physical swap blocker is superseded by Captain's
+> identical-hardware confirmation. Use the resume brief, spec index, and
+> device-build registry for live routing.
 
 Companion to `im73d122-productionization-handover-2026-07-03.md` (§10 = the audit + the Captain decision). This file is the **executable DAG**: units, oracle, per-unit gate, risk/derisk, and the checkpoints autonomy cannot self-certify. Authored under `/autonomous-agentic-build` (harness-first) + `/planning-with-files`.
 
@@ -79,12 +86,18 @@ U0 (oracle baseline) ──┬─▶ UA (prod build path) ──▶ UB (mic-conf
 ### UF — Knob-persistence device capture (device; OPPORTUNISTIC)
 - The un-freeze code (`e2b62b5`) ships on the bench (`79d7fda ⊇ e2b62b5`) but the "set knob → `:reset` → survived" proof was never recorded. If the bench is reachable + guard-verified: set a knob via `:`-prefixed command → `:reset` → `:dump` → confirm survived. **No cal firing** (no Captain silence-go needed). If unreachable → documented owed (environmental, not a Captain decision) and the run continues.
 
-## Checkpoints autonomy CANNOT self-certify (handed to Captain; NOT stops)
+## Checkpoints autonomy CANNOT self-certify (superseded live state)
 
-1. **Physical main-K1 mic swap** (SPH0645 → IM73D on 13/12/14) — the only gate to device-proving `k1_prod_im73d`.
-2. **DSR_16S +2 dB SNR measurement** — radio-free bench, Captain-context.
-3. **Perceptual eyes-on / audio A/B** for any eventual default flip.
-4. **Default-env flip** (`k1_hardware` → IM73D) — Captain call after 1-3.
+Closed/superseded since this plan was written:
+
+1. Physical mic swap is no longer the mic-proof blocker; Captain confirmed both
+   K1s are identical hardware, and env choice encodes the LED route/configuration.
+2. DSR16 controlled-audio measurement is complete and rejected; keep `DSR_8S`.
+
+Still Captain-gated:
+
+1. Selected-env device proof and perceptual eyes-on for any default flip.
+2. Default-env flip (`k1_hardware` -> IM73D) if Captain chooses it after proof.
 
 ## Execution status (2026-07-06)
 
@@ -96,9 +109,9 @@ U0 (oracle baseline) ──┬─▶ UA (prod build path) ──▶ UB (mic-conf
 | UC IM73D byte-gate | ✅ **shipped** `d1ecc10` | `mic_stable_byte_gate.sh` + committed references (k1_hardware/k1_bench_reference/k1_bench_im73d) + static contract test; non-flaky check confirmed |
 | UD DSR_16S recipe | ✅ done (doc) | enable recipe + SNR protocol — handover §11.4 (device SNR = Captain-context checkpoint) |
 | UE flip red-team | ✅ done (doc) | pre-mortem + 7-step flip checklist — handover §11.5 |
-| UF knob device-proof | ⏸ deferred (owed) | bench MAC-reachable but on the BLE demo build → inconclusive (heap-defer); host+adjacent-proven; run on radio-free bench — handover §11.7 |
+| UF knob device-proof | ✅ **closed** | radio-free proof: `:chroma=0.150` survived `:reset`; final restore/readback `CONFIG.CHROMA: 0.100000`; `CAL_SOURCE: persisted_profile`; no `start_noise_cal` |
 
-**Absolute-blocker checkpoints (handed to Captain, run did not stop):** main-K1 mic swap · DSR_16S SNR measurement · eyes-on/audio A/B · `k1_hardware` default flip.
+**Remaining Captain-gated checkpoints:** selected-env device proof + eyes-on for any default flip, and the default flip itself. DSR16 is closed/rejected; physical conversion of `F887A500` is optional product-unit work, not the current mic-proof blocker.
 
 ## Governance (fleet-of-one)
 Retry budget 3 per unit (3-strike → escalate the decomposition, not the code). Byte-identity oracle is the trust root — never edited by a production unit. Every unit = one revertible commit through the pre-commit gate. Burndown tracked in `progress.md` + the working `task_plan.md`.

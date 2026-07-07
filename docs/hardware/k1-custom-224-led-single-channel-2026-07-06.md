@@ -50,7 +50,7 @@ Evidence files: `scratchpad/custom-led-225/ssa{A..G}-*.md`. Verdicts (orchestrat
 
 ## Outstanding
 
-1. **BLE variant on-device confirm (pending device replug):** the BLE-enabled `k1_custom` (extends `k1_bench_im73d_ble`) is built + byte-identity-clean but the bench K1 dropped off USB during the flash-race churn. On replug (and after freeing Cursor's serial-monitor port hold): flash `k1_custom` → confirm boots clean + `[ble_remoted] linked=1` (BLE-MIDI up) + the wall. BLE itself is already device-proven via the demo build; this is the composed-build confirmation.
+1. **BLE variant link/control confirm:** the BLE-enabled `k1_custom` was later flashed and silicon-proven per `docs/hardware/device-build-registry.md`. The remaining confirm is live `[ble_remoted] linked=1` plus wall output under the composed build when that parallel lane resumes. BLE itself is already device-proven via the demo build; this is the composed-build confirmation.
 2. **Cursor port contention:** Cursor's PlatformIO extension auto-connects the serial port and its ext-host respawn auto-cleans the build dir when killed — flash reliably needs the serial monitor closed in Cursor first.
 
 ---

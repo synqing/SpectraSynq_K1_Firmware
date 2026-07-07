@@ -1673,13 +1673,13 @@ bool serial_hotkey_is_immediate(char key) {
       USBSerial.println(CONFIG.SQUARE_ITER, 2);
       break;
     case 'w':
-      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY + 0.10f, 0.10f, 20.0f);
+      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY + 0.10f, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
       save_config_delayed();
       USBSerial.print("CONFIG.SENSITIVITY: ");
       USBSerial.println(CONFIG.SENSITIVITY, 3);
       break;
     case 'W':
-      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY - 0.10f, 0.10f, 20.0f);
+      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY - 0.10f, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
       save_config_delayed();
       USBSerial.print("CONFIG.SENSITIVITY: ");
       USBSerial.println(CONFIG.SENSITIVITY, 3);
@@ -3564,10 +3564,20 @@ void stream_agc_data(uint32_t t_now) {
     }
   }
   
-  // Send noise floor values
+  // Send the legacy silence tracker and the active AGC floor separately. The
+  // per-band AGC path owns its floor in k1_gdft_core.cpp, not in the legacy
+  // silence tracker.
   USBSerial.print(";floor:");
   for (uint8_t band = 0; band < NUM_AGC_BANDS; band++) {
     USBSerial.print(float(min_silent_level_tracker_band[band]));
+    if (band < NUM_AGC_BANDS - 1) {
+      USBSerial.print(',');
+    }
+  }
+
+  USBSerial.print(";active_floor:");
+  for (uint8_t band = 0; band < NUM_AGC_BANDS; band++) {
+    USBSerial.print(float(agc_active_floor_debug[band]));
     if (band < NUM_AGC_BANDS - 1) {
       USBSerial.print(',');
     }

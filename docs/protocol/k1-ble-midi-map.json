@@ -356,9 +356,10 @@
       "midi": "cc14",
       "cc_msb": 1,
       "cc_lsb": 33,
-      "min": 0.0,
-      "max": 1.0,
-      "encode": "v14 = round((value-min)/(max-min)*16383)"
+      "min": "K1_SENSITIVITY_MIN",
+      "max": "K1_SENSITIVITY_MAX",
+      "encode": "v14 = round((value-min)/(max-min)*16383)",
+      "range_symbolic": true
     },
     {
       "path": "global.standby_dimming",

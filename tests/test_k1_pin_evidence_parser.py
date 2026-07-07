@@ -40,13 +40,13 @@ def make_pin_payload(
             "?HHBB"
             "HHHHHHHHHB"
             "HHHHHHHH",
-        1,  # version
+        2,  # version
         0,  # channel
         21,  # mode
         42,  # ap_ms
         7,  # chroma_seq
         3,  # state bits: loud + vivid enabled
-        1000,  # raw_peak_q
+        1000,  # conditioned_peak_q
         2000,  # post_sensitivity_peak_q
         0,  # clip_count
         1,  # near_rail_count

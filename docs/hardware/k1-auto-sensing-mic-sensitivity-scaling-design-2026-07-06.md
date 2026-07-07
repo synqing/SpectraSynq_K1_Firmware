@@ -47,8 +47,8 @@ The relevant gain and conditioning surfaces are already layered:
 | Noise calibration | `SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:459-550`; `SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:195-267` | Learns DC/SSL floors, validates, then persists accepted calibration/config/profile. | Auto-sensing must observe calibration validity but must not start or overwrite calibration. |
 | Response gain | `SPECTRASYNQ_K1_FIRMWARE/system/globals.h:54-60`; `SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:826-839` | Runtime-only `audio_response_gain` clamps to `0.25..4.0`, default `1.0`. | Do not overload this for mic auto-scale; it is a downstream response knob. |
 | GDFT AGC | `SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:304-519` | Broadband/per-band AGC normalises spectral output, gates silence, clamps spectrogram bins to `[0,1]`. | Auto-sensing should feed AGC a healthier input range; it should not be another spectral AGC. |
-| Serial sensitivity | `SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:259-270` | `:sensitivity=<float>` writes `CONFIG.SENSITIVITY` and schedules save, with no clamp. | Existing serial surface is broad and persistent; auto-sense must not spam it. |
-| Wireless sensitivity | `SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp:414-450`; `:747-751` | `global.sensitivity` accepts only `0.0..1.0`, then saves config. | There is a scale mismatch with the 2.4 factory default. Reconcile or explicitly layer before exposing auto-sense to UI. |
+| Serial sensitivity | `SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:259-280` | `:sensitivity=<float>` writes `CONFIG.SENSITIVITY`, clamps to `0.10..20.0`, rejects malformed input, and schedules save. | Existing serial surface is broad and persistent; auto-sense must not spam it. |
+| Wireless sensitivity | `SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp:414-450`; sensitivity apply branch | `global.sensitivity` now uses the same `0.10..20.0` range as serial/hotkeys, then saves config. | The user-facing scale mismatch is closed; auto-sense still needs a persistence-churn guard. |
 | Protocol contract | `docs/protocol/k1-ws-controls-registry.yaml:35-50`; `docs/protocol/k1-rest-contract.yaml:1-8` | WebSocket controls include `global.sensitivity`; the REST contract is explicitly empty/not implemented for this control slice. | Do not add a parallel REST control for auto-sense. If exposed, use the existing WebSocket control pattern. |
 | Persistence | `SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h:17-27`; `:31-64`; `:146-159` | PDM config/calibration files are namespaced away from SPH files; `save_config()` writes the whole `CONFIG` blob and is guarded against low internal RAM before LittleFS open. | Runtime auto-scale must avoid persistence churn and avoid LittleFS work from the controller path. |
 | Raw sample surface | `SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:356-372`; `SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h:2784-2847` | `:dump_raw` prints the first 32 DMA samples before IM73D gain, sensitivity, clamp, and DC offset. | Existing raw proof is manual/one-shot. Auto-sense should add read-only raw health telemetry before relying on conditioned AP data. |
@@ -530,8 +530,8 @@ production enablement:
    runtime-only forever?
 3. What is the perceptual priority when the controller sees a trade-off:
    stronger visuals in quiet rooms, or absolute resistance to false gain-up?
-4. Should `global.sensitivity` be reconciled with the factory `2.4` scale before
-   any UI exposure?
+4. What explicit UI language should distinguish manual sensitivity from any
+   future runtime-only auto-sense offset?
 
 ## One-Paragraph Handoff Prompt
 

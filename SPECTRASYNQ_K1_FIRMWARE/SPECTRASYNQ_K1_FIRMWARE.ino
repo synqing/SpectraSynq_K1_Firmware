@@ -1048,7 +1048,9 @@ void loop() {
     debug_function_timing(t_now);
   }
 
-  yield();  // Otherwise the ESP32 will collapse into a black hole or something
+  // N2c: give CPU0's IDLE task a real FreeRTOS slot. yield() can immediately
+  // reschedule loopTask and does not reliably feed the watched IDLE0 task.
+  vTaskDelay(1);
 }
 
 // Run the lights in their own thread! -------------------------------------------------------------

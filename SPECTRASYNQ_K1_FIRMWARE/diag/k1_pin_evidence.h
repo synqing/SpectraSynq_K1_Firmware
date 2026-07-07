@@ -29,7 +29,7 @@ struct K1PinEvidencePayload {
   uint32_t ap_ms;
   uint32_t chroma_seq;
   uint32_t state_bits;
-  uint16_t raw_peak_q;
+  uint16_t conditioned_peak_q;
   uint16_t post_sensitivity_peak_q;
   uint16_t clip_count;
   uint16_t near_rail_count;

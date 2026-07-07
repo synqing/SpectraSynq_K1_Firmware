@@ -10,7 +10,7 @@
 
 struct K1PinEvidenceApMetrics {
   uint32_t ap_ms;
-  uint16_t raw_peak_q;
+  uint16_t conditioned_peak_q;
   uint16_t post_sensitivity_peak_q;
   uint16_t clip_count;
   uint16_t near_rail_count;
@@ -190,7 +190,7 @@ void k1_pin_evidence_set_ap_metrics(uint32_t t_now) {
   }
 
   k1_pin_ap_metrics.ap_ms = t_now;
-  k1_pin_ap_metrics.raw_peak_q = k1_pin_q16(waveform_peak_scaled);
+  k1_pin_ap_metrics.conditioned_peak_q = k1_pin_q16(waveform_peak_scaled);
   k1_pin_ap_metrics.post_sensitivity_peak_q = k1_pin_q16(waveform_peak_scaled);
 #ifdef K1_LOUD_GUARD_V1
   k1_pin_ap_metrics.clip_count = k1_loud_frame_clip_count;
@@ -233,7 +233,7 @@ static void k1_pin_fill_common(uint8_t channel, uint16_t mode, K1PinEvidencePayl
     out.state_bits |= K1_PIN_STATE_SECONDARY_ENABLED;
   }
 
-  out.raw_peak_q = k1_pin_ap_metrics.raw_peak_q;
+  out.conditioned_peak_q = k1_pin_ap_metrics.conditioned_peak_q;
   out.post_sensitivity_peak_q = k1_pin_ap_metrics.post_sensitivity_peak_q;
   out.clip_count = k1_pin_ap_metrics.clip_count;
   out.near_rail_count = k1_pin_ap_metrics.near_rail_count;

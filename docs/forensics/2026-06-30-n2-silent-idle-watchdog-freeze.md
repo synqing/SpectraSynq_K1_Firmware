@@ -60,12 +60,15 @@ Commit **`827d73a`** (flag **`K1_AUDIO_FREEZE_GUARD_V1`**) on branch `feat/n2-i2
 
 - Adds **explicit `enableLoopWDT()` / `feedLoopWDT()`** on the audio `loopTask`, so IDLE0 no longer carries the sole responsibility for feeding the watchdog on CPU0.
 - Replaces the unguarded `portMAX_DELAY` read at `i2s_audio.h:277` with a **bounded / zero-fill I2S read**, so the loop neither parks forever nor spins on an always-ready buffer.
+- **2026-07-08 correction (N2c):** live IM73D recovery on `B489A500` reproduced the same class with `IDLE0` named after the bounded-read/watchdog guard was present. Feeding `loopTask` is not sufficient while the TWDT still watches IDLE0; the full audio loop tail must call `vTaskDelay(1)` so CPU0's idle task gets a real FreeRTOS scheduling slot. A bare `yield()` can immediately reschedule `loopTask` and preserve the starvation failure.
 
 **Validation:** `827d73a` was flashed to the main K1 (chip **F887A500**) and ran clean — **0 reboots, board alive, `bpm=126` streaming**.
 
+**N2c validation:** on 2026-07-08, the `vTaskDelay(1)` tail-slot patch was flashed to `B489A500` / USB `B4:3A:45:A5:89:B4`; readback crossed the prior ~13 s reboot point and completed a 28 s AP soak with no `task_wdt`, backtrace, or reboot markers.
+
 ### Panic vs. Pressure — the load-bearing distinction
 
-- **`827d73a` stops the PANIC.** It guarantees the watchdog is fed regardless of whether the I2S read blocks, so the over-budget condition can no longer cascade into a reboot loop. This is the safety floor.
+- **`827d73a` is necessary but not sufficient on its own.** It bounds the I2S read and feeds `loopTask`; N2c adds the required idle-task slot so the watched IDLE0 task is actually scheduled.
 - **`827d73a` does NOT cure the PRESSURE.** The AP loop is still over budget under silence (ACF ~1–1.5 ms/emit, decimation pinned to 1). The DMA backlog is still being drained; the system is merely no longer fatal when it empties. The durable cure is **ACF work-spreading** (decimation / amortising the autocorrelation cost across emits) so the loop returns within budget and the I2S backlog is no longer exhausted.
 
 Treating `827d73a` as a complete fix would be a category error: it is the panic guard, not the budget cure.

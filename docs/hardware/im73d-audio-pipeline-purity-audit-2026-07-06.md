@@ -102,16 +102,20 @@ front-end state, not the factory-default gain state.
 
 ## Sensitivity Surfaces
 
-The sensitivity model is currently inconsistent across control surfaces:
+2026-07-08 update: the sensitivity model has been reconciled in source.
+`K1_SENSITIVITY_MIN/MAX` now define the canonical `0.10..20.0` range used by
+serial typed commands, hotkeys, and `global.sensitivity`; the BLE-MIDI map is
+regenerated from that facade range.
 
 1. Factory default: `2.4`
    (`SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp:65`).
-2. Typed serial setter: `:sensitivity=<value>` accepts `atof()` with no clamp
-   (`SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp:259-270`).
+2. Typed serial setter: `:sensitivity=<value>` parses with `vp_parse_float`,
+   clamps to `K1_SENSITIVITY_MIN..K1_SENSITIVITY_MAX`, and rejects malformed
+   input.
 3. Legacy hotkeys clamp to `0.10..20.0`
    (`SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h` hotkey sensitivity path).
-4. Control facade `global.sensitivity` only accepts `0.0..1.0`
-   (`SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp:747-751`).
+4. Control facade `global.sensitivity` accepts the same `0.10..20.0` range
+   (`SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp`).
 
 This is not just cosmetic. A production measurement that says "same mic, same
 track, same volume" is not comparable unless it also pins or records
@@ -212,17 +216,14 @@ future summaries preserve the gain/calibration state used during capture.
 These are not immediate DSR blockers, but they are audit findings because they
 can mislead future purity claims.
 
-1. `stream_agc_data()` emits `threshold` from `agc_bands[band].threshold` and
-   `floor` from `min_silent_level_tracker_band[band]`
-   (`SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h:3558-3574`). In the active
-   `SB_AGC_PERBAND_V1` path, the actual per-band AGC noise floor is the
-   function-static `pb_noise_floor[]`
-   (`SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:370-402`). Therefore
-   `agc_debug floor` is not an authoritative active per-band AGC floor.
-2. `k1_pin_evidence` labels `raw_peak_q` and `post_sensitivity_peak_q`, but both
-   are assigned from `waveform_peak_scaled`
-   (`SPECTRASYNQ_K1_FIRMWARE/diag/k1_pin_evidence.cpp:192-194`). Those fields
-   are not raw and are not a valid source for mic-purity comparison.
+1. `stream_agc_data()` now emits legacy `floor` from
+   `min_silent_level_tracker_band[]` and active `active_floor` from the actual
+   AGC floor (`pb_noise_floor[]` under `SB_AGC_PERBAND_V1`, broadband
+   `agc_noise_floor` otherwise). Use `active_floor` for active AGC floor
+   reasoning.
+2. `k1_pin_evidence` payload version 2 replaces the misleading `raw_peak_q`
+   label with `conditioned_peak_q`. It remains conditioned output-side evidence,
+   not raw mic-purity evidence.
 3. The APCAP comment says `spectrogram_smooth` and `chromagram_smooth` are fresh
    after `process_GDFT` (`SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h:802-806`),
    but smoothing/chromagram generation happens in the render loop
@@ -231,12 +232,12 @@ can mislead future purity claims.
 
 ## Open Gaps
 
-1. Add AP/APCAP/AGC schema-lock tests so parser assumptions cannot drift.
-2. Reconcile `global.sensitivity` range with factory default and serial controls,
-   or explicitly document that the facade operates in a different user-facing
-   scale.
-3. For DSR_16S, perform controlled-stimulus measurement before any promotion.
-   Quiet-only evidence is rail/headroom evidence, not a signal/SNR verdict.
+1. AP/APCAP/AGC schema-lock tests are now present in
+   `tests/test_audio_telemetry_schema_static.py`.
+2. `global.sensitivity` range is reconciled with factory default and serial
+   controls.
+3. DSR16 controlled-stimulus measurement is complete and rejected; do not promote
+   DSR16 from the current evidence.
 
 ## Stop Rule
 

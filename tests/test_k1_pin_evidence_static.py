@@ -37,7 +37,7 @@ class K1PinEvidenceStaticTest(unittest.TestCase):
     def test_payload_kind_and_schema_are_registered(self):
         self.assertIn("DIAG_KIND_K1_PIN_EVIDENCE = 4", DIAG_H)
         self.assertIn('case DIAG_KIND_K1_PIN_EVIDENCE: return "k1_pin_evidence";', DIAG_CPP)
-        self.assertIn("#define K1_PIN_EVIDENCE_PAYLOAD_VERSION 1", CONSTANTS)
+        self.assertIn("#define K1_PIN_EVIDENCE_PAYLOAD_VERSION 2", CONSTANTS)
 
     def test_header_declares_fixed_payload_without_legacy_prefix(self):
         text = PIN_H.read_text(encoding="utf-8")
@@ -45,6 +45,8 @@ class K1PinEvidenceStaticTest(unittest.TestCase):
         self.assertIn("static_assert(sizeof(K1PinEvidencePayload) <= DIAG_CAPTURE_MAX_PAYLOAD_BYTES", text)
         self.assertIn("void k1_pin_evidence_set_ap_metrics", text)
         self.assertIn("void k1_pin_evidence_push_frame", text)
+        self.assertIn("conditioned_peak_q", text)
+        self.assertNotIn("raw_peak_q", text)
         self.assertNotIn("SB_PIN", text)
         self.assertNotIn("SB_LOUD", text)
 

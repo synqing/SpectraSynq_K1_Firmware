@@ -745,7 +745,7 @@ K1WirelessControlResult sb_k1_control_apply(const K1WirelessControlRecord& recor
   }
 
   if (strcmp(record.control, "global.sensitivity") == 0) {
-    if (!needs_number_range(record, &result, 0.0f, 1.0f, "Global sensitivity out of range")) return result;
+    if (!needs_number_range(record, &result, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX, "Global sensitivity out of range")) return result;
     CONFIG.SENSITIVITY = record.number_value;
     save_config_delayed();
     return ok_number(CONFIG.SENSITIVITY);
