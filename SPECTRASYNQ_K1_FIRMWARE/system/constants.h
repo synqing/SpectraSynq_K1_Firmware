@@ -162,6 +162,13 @@
 #endif
 #endif
 
+// N7 OTA receiver (Captain decision D3): default-OFF, flag-gated DRAFT. Flip ON for
+// build/link + bench device-proof ONLY via an OTA env (-DSB_ENABLE_OTA=1); never in
+// a shipping build. The #ifndef lets the env -D flag win.
+#ifndef SB_ENABLE_OTA
+#define SB_ENABLE_OTA 0
+#endif
+
 // Cochlear-Inspired AGC Definitions
 // These define frequency bands that roughly correspond to human auditory perception
 #define NUM_AGC_BANDS 4  // Using 4 bands: bass, low-mid, high-mid, treble
