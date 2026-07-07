@@ -1,5 +1,5 @@
 ---
-abstract: "Bench device-proof runbook for the N7 on-device OTA receiver anti-brick rollback. Executes on the 2nd bench K1 (B489A500), NEVER the main K1 (F887A500). Proves: flag-ON OTA boots, marks its slot valid, accepts a known-good image into the inactive slot and self-validates after reboot, and — the load-bearing test — that the bootloader ROLLS BACK to the last-good slot when a deliberately-truncated bad image is pushed and rebooted. Read before any OTA-enablement hardware session. NO hardware is connected at authoring time; this is a plan to run when a bench unit is attached. Does NOT enable OTA in any shipping build and creates NO signing key."
+abstract: "Bench device-proof runbook for the N7 on-device OTA receiver: anti-brick rollback AND (added on feat/n7-ota-signing) app-level RSA-3072 signature verification. Executes on the 2nd bench K1 (B489A500), NEVER the main K1 (F887A500) — except the brick-safe signature self-test (Stage 0), which may run on any unit. Proves: on-silicon signature verify (:ota_selftest); flag-ON OTA boots and marks its slot valid; a known-good SIGNED image accepted + self-validates after reboot; an unsigned/tampered image REJECTED at k1_ota_end (running image untouched); and — the load-bearing test — bootloader ROLLBACK to last-good slot on a signed-but-broken image. Image ingress is the EXISTING serial base64 transport (ota_datab64 + ota_sigb64) — no HTTP-over-AP build is required for the security proof (that is separate enablement-time wiring, gated on re-admitting the sb_* stack). NO hardware connected at authoring; run when a bench unit is attached. Enables OTA in NO shipping build; creates NO signing key."
 ---
 
 # N7 OTA Bench Proof Runbook — anti-brick rollback verification
@@ -67,10 +67,58 @@ All uploads use the bench port `/dev/tty.usbmodem12201`. Reboots are power-cycle
 4. Confirm via serial that the device is once again running the **last-good** image, not the bad one — the unit is NOT bricked.
 5. **Pass criterion (anti-brick):** after pushing and booting a bad image, the device autonomously recovers to the last-good slot. If the device bricks (no recovery, requires a wired re-flash to revive), the rollback guarantee is **NOT** proven and OTA must not be enabled.
 
+## Signature dimension (added on `feat/n7-ota-signing`, 2026-07-07)
+
+The child branch `feat/n7-ota-signing` adds an **application-level signature check** as
+the security boundary: `k1_ota_end()` finalises the whole-image SHA-256 and calls
+`k1_ota_verify_signature()` (RSA-3072 / PKCS#1 v1.5, `mbedtls_pk_verify` against the
+embedded `certs/k1_ota_signing_PUBLIC.pem`). The boot partition flips ONLY if the
+detached signature verifies. This is verify-only — **no eFuse, no Secure Boot** — so it
+is reversible. Host proof (2026-07-07, Captain's real key): a signed blob → `Verified OK`;
+a one-byte tamper → `bad signature`.
+
+**Ingress already exists — do NOT build a transport first.** `serial_cmd_dispatch_ota()`
+implements `ota_datab64` (base64 image chunks) and `ota_sigb64` (fragmented base64
+signature; the 384-byte sig is streamed across several ≤94-byte frames and concatenated).
+This serial transport is sufficient for the full accept/reject/rollback proof below.
+HTTP-over-AP ingress is a *nicety for field OTA*, not a prerequisite for this proof, and
+is gated on re-admitting the held-out `network/sb_*.cpp` stack (a D3 / wireless-A/B
+decision) — it is NOT in scope here.
+
+### Stage 0 — on-silicon signature self-test (`:ota_selftest`) — BRICK-SAFE, any unit
+Residual #1. Proves the exact production verify path runs identically on ESP32-S3 silicon.
+No image is written and the boot partition is never touched, so this may run on the main
+K1 as well as the bench.
+1. Build + flash the flag-ON probe: `pio run -e k1_ota_probe -t upload --upload-port <port>`
+   (or `k1_bench_ota_probe` on the bench). Confirm the guard prints the matching chip-ID.
+2. On the serial console, issue `ota_selftest`.
+3. **Pass criterion:** `OTA_SELFTEST: good=PASS tamper=REJECT verify=PASS`.
+4. Restore the device's production build afterwards. Log the line in
+   `docs/hardware/device-build-registry.md`.
+
+### Signed-image proof — supersedes Stage 2's ingress note
+Stage 2 (known-good OTA) MUST now also stream the detached signature, or `k1_ota_end()`
+will correctly REJECT the image. Sequence: `ota_begin` → repeated `ota_datab64` (image) →
+repeated `ota_sigb64` (signature fragments, in order) → `ota_end`. The signature is
+produced offline by the operator (Captain action — the private key never leaves
+`~/.k1_secrets/`): `openssl dgst -sha256 -sign ~/.k1_secrets/k1_ota_signing_PRIVATE.pem
+-out image.sig <firmware.bin>`.
+
+### Stage 2b — unsigned / tampered image REJECTED — BRICK-SAFE, any unit
+The signature security boundary. Push a **complete, valid** image via `ota_datab64` but
+supply NO signature (or a tampered `ota_sigb64` fragment), then `ota_end`.
+**Pass criterion:** `[ota] end REJECT — image refused …`; the running image is untouched.
+Because the running slot never changes, this leg cannot brick and may run on any unit.
+
+The rollback leg (Stage 3) remains the only brick-risk test and stays **bench-only**.
+
 ## What this runbook does NOT do
 
 - Does NOT enable OTA in any shipping build (`SB_ENABLE_OTA` stays `0` everywhere except the two probe envs).
-- Does NOT create, hold, or commit any signing key, certificate, or secret. Image-signing / secure-boot is out of scope here and is one of the three human STOPs below.
+- Does NOT create, hold, or commit any signing key, certificate, or secret. App-level
+  signature *verification* (verify-only, no eFuse) IS now covered — see the Signature
+  dimension above — but the PRIVATE key is Captain-custodied (`~/.k1_secrets/`, never in
+  repo) and eFuse **Secure Boot** stays out of scope (irreversible; a human STOP below).
 - Does NOT stand up a distribution/update server. The ingress proven here is the serial DRAFT transport, not a field OTA channel.
 - Does NOT run on the main K1.
 
@@ -89,3 +137,4 @@ Until all three are resolved by the Captain, OTA remains flag-OFF and this runbo
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-06-30 | agent:build-ssa | Created. Bench anti-brick rollback proof procedure on B489A500; documents that rollback config + A/B partitions are already framework-provided; records the sdkconfig.defaults byte-neutrality finding; adds k1_bench_ota_probe env + guard registration; enumerates the three human key-custody/scope STOPs. |
+| 2026-07-07 | agent:claude-opus-4-8 (CTO) | Added the Signature dimension (feat/n7-ota-signing): Stage 0 on-silicon :ota_selftest (brick-safe), signed-image ingress via the EXISTING serial base64 transport (ota_datab64 + ota_sigb64 — corrects the "no transport" premise), Stage 2b unsigned/tampered REJECT (brick-safe). Clarified HTTP-over-AP is enablement-time only, not a proof prerequisite. Reframed the signing scope bullet (verify-only in scope; eFuse Secure Boot out). |
