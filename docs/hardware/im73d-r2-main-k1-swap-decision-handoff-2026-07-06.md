@@ -10,11 +10,11 @@ mic map. Therefore, the bench K1 with IM73D on pins `13/12/14` is a valid
 IM73D PDM proof unit.
 
 Do not treat "swap the main K1's SPH0645 to IM73D" as a mic-path firmware proof
-blocker. Do treat the LED GPIO map as a separate proof surface:
-`k1_prod_im73d` extends `k1_hardware` and drives GPIO `6/7`, while the restored
-bench-reference proof uses GPIO `4/5`. A 2026-07-07 bench flash made both LED
-channels dark. That is a firmware pin-map conflict until reconciled and
-device-proven, not evidence of different K1 hardware.
+blocker. Do treat env choice as explicit configuration:
+`k1_bench_im73d` drives GPIO `4/5`, while `k1_prod_im73d` drives GPIO `6/7`.
+A 2026-07-07 bench flash of `k1_prod_im73d` made both LED channels dark because
+that was the wrong env for the restored bench configuration, not evidence of
+different K1 hardware.
 
 ## Current State
 
@@ -32,22 +32,21 @@ device-proven, not evidence of different K1 hardware.
 
 The remaining production proof gate is not a main-unit mic swap. It is:
 
-1. Keep `k1_prod_im73d` upload-blocked because it drives the `k1_hardware` LED
-   GPIO map (`6/7`) while the restored bench-reference proof uses GPIO `4/5`.
-2. Reconcile the canonical K1 LED GPIO map in firmware and guard policy.
-3. Device-prove the selected map before unblocking `k1_prod_im73d`.
+1. Use `k1_bench_im73d` for the bench/reference LED map (`4/5`).
+2. Use `k1_prod_im73d` for the main/prod LED map (`6/7`).
+3. Device-prove the selected env before any default-env flip.
 4. Keep the main K1 as the SPH reference/control unless a product-unit swap is
    explicitly requested.
 
 ## What Still Needs Care
 
-`k1_prod_im73d` remains upload-guard blocked. The correction is not "flash it
-anywhere"; the correction is that mic-pin equivalence is not LED-pinmap
-equivalence.
+`k1_prod_im73d` is upload-guard mapped to the main K1 MAC. The correction is
+not "flash it anywhere"; the correction is that mic-pin equivalence is not
+env/LED-map equivalence.
 
 Expected follow-up for a production-IM73D proof:
 
-- Decide the canonical firmware LED GPIO map for identical K1 hardware.
+- Choose the existing env that matches the intended LED configuration.
 - Add/update guard tests for that policy.
 - Build the selected proof env.
 - Flash only after live USB MAC verification.

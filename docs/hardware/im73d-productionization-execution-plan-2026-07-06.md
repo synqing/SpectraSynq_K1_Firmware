@@ -1,8 +1,15 @@
 ---
-abstract: "End-to-end autonomous execution plan (2026-07-06) to complete every outstanding IM73D122 productionization phase. Harness-first (byte-identity oracle = registry_byte_gate.sh + pytest 627 + framework-safety-gate). Gated DAG: U0 oracle baseline → UA production IM73D build path (k1_prod_im73d, byte-identical-OFF, guard-BLOCKED until main-K1 mic swap) → UB mic-config-authority header (byte-identical; compile-time selection RETAINED — runtime dispatch rejected as Core-0-unsafe + device-cert-gated) → UC byte-identity coverage for the IM73D env → UD DSR_16S enable-recipe + SNR protocol (no dead code) → UE production-flip red-team → UF knob-persistence device capture (opportunistic). Records the Captain hardware decision (D1 identical pins clk13/din12/LR14; D2 no PCB rev). Absolute blockers (main-K1 mic swap, device SNR A/B, eyes-on) are checkpoints, not stops. Read before executing or auditing the IM73D productionization lane."
+abstract: "End-to-end autonomous execution plan (2026-07-06) to complete every outstanding IM73D122 productionization phase. Harness-first (byte-identity oracle = registry_byte_gate.sh + pytest 627 + framework-safety-gate). Gated DAG: U0 oracle baseline → UA production IM73D build path (k1_prod_im73d, byte-identical-OFF, guard-mapped to the main K1 MAC after 2026-07-07 correction) → UB mic-config-authority header (byte-identical; compile-time selection RETAINED — runtime dispatch rejected as Core-0-unsafe + device-cert-gated) → UC byte-identity coverage for the IM73D env → UD DSR_16S enable-recipe + SNR protocol (no dead code) → UE production-flip red-team → UF knob-persistence device capture (opportunistic). Records the Captain hardware decision (D1 identical pins clk13/din12/LR14; D2 no PCB rev). Absolute blockers (device proof, device SNR A/B, eyes-on) are checkpoints, not stops. Read before executing or auditing the IM73D productionization lane."
 ---
 
 # IM73D productionization — end-to-end autonomous execution plan (2026-07-06)
+
+> **2026-07-07 correction:** the original hard-block plan for `k1_prod_im73d`
+> is superseded. Captain confirmed both K1s are identical hardware; existing
+> envs encode LED-map/configuration choice. `k1_bench_im73d` drives GPIO `4/5`;
+> `k1_prod_im73d` drives GPIO `6/7` and is guard-mapped to the main K1 MAC.
+> Do not re-add `k1_prod_im73d` to `BLOCKED_UPLOAD_ENVS` unless Captain creates
+> a new explicit blocker.
 
 Companion to `im73d122-productionization-handover-2026-07-03.md` (§10 = the audit + the Captain decision). This file is the **executable DAG**: units, oracle, per-unit gate, risk/derisk, and the checkpoints autonomy cannot self-certify. Authored under `/autonomous-agentic-build` (harness-first) + `/planning-with-files`.
 
@@ -47,10 +54,10 @@ U0 (oracle baseline) ──┬─▶ UA (prod build path) ──▶ UB (mic-conf
 ### UA — Production IM73D build path (behaviour-CHANGING, small, byte-identical-OFF)
 - `constants.h`: add `K1_PDM_CLK/DIN/LR_PIN` = `13/12/14` to the production `#else` branch under `#ifdef K1_MIC_IM73D_PDM_V1` (mirrors the bench branch; D1).
 - `platformio.ini`: `[env:k1_prod_im73d]` extends `env:k1_hardware` + `-DK1_MIC_IM73D_PDM_V1`.
-- `scripts/platformio/k1_upload_guard.py`: add `k1_prod_im73d` to **`BLOCKED_UPLOAD_ENVS`** — reason: *IM73D firmware; the main K1 still carries an SPH0645. Blocked from flashing until the physical mic swap (Captain). Moves to the F887A500 allow-list at swap time.* (Registered → not fail-open; blocked → cannot misread PDM-on-SPH.)
+- `scripts/platformio/k1_upload_guard.py`: originally added `k1_prod_im73d` to **`BLOCKED_UPLOAD_ENVS`** while the main K1 still carried SPH0645. **Superseded 2026-07-07:** Captain confirmed the proof constraint is env/configuration choice, not hardware divergence; `k1_prod_im73d` now belongs in the main K1 allow-list and rejects bench cross-flash by USB MAC.
 - `tests/`: static test asserting production PDM pins `13/12/14`, the env's flag inheritance, and the guard block (drift-catcher).
 - **Gate:** `registry_byte_gate.sh` GREEN (k1_hardware byte-identical, flag OFF) · `pio run -e k1_prod_im73d` clean · `pio run -e k1_hardware` clean · pytest green.
-- **Risk/derisk:** (a) pin block leaks into k1_hardware → guarded by the flag + byte gate proves OFF-identity. (b) production-pinmap PDM won't compile (a bench-only assumption in the PDM init) → caught by the `k1_prod_im73d` build. (c) fail-open on a wrong-device flash → BLOCKED_UPLOAD_ENVS + drift-catcher test.
+- **Risk/derisk:** (a) pin block leaks into k1_hardware → guarded by the flag + byte gate proves OFF-identity. (b) production-pinmap PDM won't compile (a bench-only assumption in the PDM init) → caught by the `k1_prod_im73d` build. (c) fail-open on a wrong-device flash → upload-guard MAC binding + drift-catcher test.
 
 ### UB — Mic-config authority header (behaviour-PRESERVING, byte-identical)
 - Create `SPECTRASYNQ_K1_FIRMWARE/audio/k1_mic_frontend.h`: the single documented source of truth for the mic-domain seam — the **6 interfaces** (init driver-mode, read buffer+timeout, sample extraction/domain, calibration domain: SSL window/DC/gain, persistence namespace, boot invalidation) — centralizing the config **data** (pins for both pinmaps, gain, DSR mode, buffer size, SSL window, boot fallback, PDM file names) with a map of where each compile-time `#ifdef` lives.
@@ -84,7 +91,7 @@ U0 (oracle baseline) ──┬─▶ UA (prod build path) ──▶ UB (mic-conf
 | Unit | Status | Evidence |
 |---|---|---|
 | U0 oracle baseline | ✅ done | 3-stable-section baselines captured; **determinism finding**: `.flash.text`/`.flash.rodata` non-reproducible even clean → oracle = 3 stable sections |
-| UA production build path | ✅ **shipped** `4b95e60` | `k1_prod_im73d` (pins 13/12/14), guard-BLOCKED, byte-identical-OFF (3 stable sections), pytest 629 |
+| UA production build path | ✅ **shipped** `4b95e60` | `k1_prod_im73d` (pins 13/12/14), guard-mapped to main K1 after 2026-07-07 correction, byte-identical-OFF (3 stable sections), pytest 629 |
 | UB MicFrontend | ✅ **resolved (decision)** | runtime dispatch REJECTED (un-byte-verifiable + Core-0 + doctrine); seam map delivered — handover §11.2 |
 | UC IM73D byte-gate | ✅ **shipped** `d1ecc10` | `mic_stable_byte_gate.sh` + committed references (k1_hardware/k1_bench_reference/k1_bench_im73d) + static contract test; non-flaky check confirmed |
 | UD DSR_16S recipe | ✅ done (doc) | enable recipe + SNR protocol — handover §11.4 (device SNR = Captain-context checkpoint) |

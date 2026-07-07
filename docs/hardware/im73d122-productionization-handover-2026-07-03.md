@@ -281,10 +281,16 @@ now fully autonomous. Mic selection unchanged (ratified 2026-07-03); SPH
 
 ## 11 · Update — 2026-07-06: autonomous execution (UA shipped) + decisions + flip red-team
 
+> **2026-07-07 correction:** the `BLOCKED_UPLOAD_ENVS` framing below is
+> superseded. Captain confirms both K1s are identical hardware, and the existing
+> envs encode configuration choice: `k1_bench_im73d` drives LED GPIO `4/5`;
+> `k1_prod_im73d` drives LED GPIO `6/7` and is guard-mapped to the main K1 MAC.
+> Do not treat the 2026-07-07 bench dark-output incident as hardware divergence.
+
 Executed against `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md` (harness-first gated DAG). Status of every unit below.
 
 ### 11.1 · Shipped
-- **UA — `k1_prod_im73d` production build path (commit `4b95e60`).** Production pinmap + `K1_MIC_IM73D_PDM_V1` at the Captain-confirmed identical pins `clk13/din12/LR14`. `[env:k1_prod_im73d]` extends `k1_hardware`; `BLOCKED_UPLOAD_ENVS` hard-blocks it from flashing onto the SPH-equipped main K1 until the mic swap; drift-catcher + blocked-env + production-pin static tests added. **Byte-identical-OFF proven** (see 11.3). Gate: pytest 629, `k1_prod_im73d` + `k1_hardware` build clean.
+- **UA — `k1_prod_im73d` production build path (commit `4b95e60`).** Production pinmap + `K1_MIC_IM73D_PDM_V1` at the Captain-confirmed identical pins `clk13/din12/LR14`. `[env:k1_prod_im73d]` extends `k1_hardware` and drives the main/prod LED map (`6/7`); current guard binds it to the main K1 MAC and rejects bench cross-flash by USB MAC. Drift-catcher + guard + production-pin static tests added. **Byte-identical-OFF proven** (see 11.3). Gate: pytest 629, `k1_prod_im73d` + `k1_hardware` build clean.
 
 ### 11.2 · MicFrontend abstraction (Phase 1.2) — DECISION: compile-time selection RETAINED (do not build runtime dispatch)
 Evaluated the "retire the 34-site ifdef sprawl via a runtime `MicFrontend`" idea and **reject it**, with evidence:
@@ -320,14 +326,14 @@ Pre-mortem (failure → guard):
 
 | Failure mode | Guard |
 |---|---|
-| PDM firmware flashed onto an SPH-equipped unit → bitstream misread as PCM, "works" numerically but is garbage | `BLOCKED_UPLOAD_ENVS` (UA) hard-blocks `k1_prod_im73d` until the mic swap; the AP/VP acceptance gates are ratio-based and blind to absolute amplitude (obs #73496), so a dead/garbage front-end can green the numeric tests — **device eyes-on + `dump_raw` non-zero is mandatory**, not optional |
+| PDM firmware flashed onto the wrong configured unit → bitstream or LED output appears alive numerically but is wrong | Upload guard binds `k1_prod_im73d` to the main K1 MAC and rejects bench cross-flash; the AP/VP acceptance gates are ratio-based and blind to absolute amplitude (obs #73496), so a dead/garbage front-end can green the numeric tests — **device eyes-on + `dump_raw` non-zero is mandatory**, not optional |
 | Stale SPH0645 NVS (`DC_OFFSET≈-4714/-5722`) survives boot and biases IM73D samples | boot force-invalidate scrubs cal fields under the flag (`system.h:427`); confirm `cal_source` resets, then Captain silence-go recal on the production unit |
 | Enclosure changes acoustics → g=16 rails or under-drives | re-characterise gain on the SEALED production unit (not the open bench); SSL window already widened 1000/1150 with ~807 silence headroom |
 | Default flip before a production unit exists | flip is Captain-gated and depends on the mic swap (11.6) — `k1_prod_im73d` stays a separate env until then |
 | Behaviour regression on the SPH path from mic work | 3-stable-section byte gate (11.3) + pytest; UA proven OFF-identical |
 | Quiet-music partial gating read as a bug | it is acoustically intrinsic (§1); Phase-3 presence-hysteresis, not threshold surgery |
 
-**Flip checklist (all required, in order):** (1) main-K1 mic swap done + `dump_raw` int16 sane; (2) gain re-characterised on the production unit; (3) Captain silence-go recal → `cal_valid=1 reason=none`; (4) `stream_agc` all four gains < 10 after 10 s; (5) eyes-on A/B vs the SPH baseline across genres incl. VU modes; (6) move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the F887A500 allow-list; (7) only then consider flipping the `k1_hardware` default (Captain).
+**Flip checklist (all required, in order):** (1) selected-env device proof with `dump_raw` int16 sane; (2) gain re-characterised on the target configured unit; (3) Captain silence-go recal only if explicitly authorised → `cal_valid=1 reason=none`; (4) `stream_agc` all four gains < 10 after 10 s; (5) eyes-on A/B vs the SPH baseline across genres incl. VU modes; (6) confirm upload guard still binds `k1_prod_im73d` to the main K1 MAC and rejects bench cross-flash; (7) only then consider flipping the `k1_hardware` default (Captain).
 
 ### 11.6 · Absolute-blocker checkpoints (handed to Captain — the run did NOT stop on these)
 1. **Physical main-K1 SPH0645 → IM73D swap** — the only gate to device-proving `k1_prod_im73d`.
@@ -350,4 +356,4 @@ Existing evidence is already strong: persistence is **host-proven** (`bridge_fs_
 | 2026-07-04 | agent:claude-code (Fable) | Phase 1.1 firmware landed (`e2b62b5`): PDM-namespaced config persistence un-freeze; §4 update section added with device-proof protocol (bench off USB, proof pending). |
 | 2026-07-06 | agent:claude-code (Fable) | §10 added: Item-3 productionization audit (code-verified live state — persistence un-freeze DONE+deployed, pins bench-only, SSL window already widened, knob device-proof owed), production-flag plan (`K1_MIC_IM73D_PROD_V1` + `MicFrontend` Phase 1.2), and the Captain hardware-fork decision in accept-reject form. |
 | 2026-07-06 | agent:claude-code (Fable) | §10.3 RESOLVED: Captain D1 = identical bench-proven pin map `clk13/din12/LR14` (all K1s same ESP32-S3 devboard); D2 framing withdrawn (no PCB rev — IM73D already wired on the bench K1 since bringup). Corrected §10.1/§10.2 provisional-pin guess to the confirmed pins; verified collision-free on the production map. No open Captain decision blocks Phase-1 firmware. |
-| 2026-07-06 | agent:claude-code (Fable) | §11 added: autonomous execution — UA `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF, guard-BLOCKED); MicFrontend runtime-dispatch REJECTED with evidence (compile-time selection retained + seam map delivered); byte-oracle determinism finding (registry_byte_gate flaky — 2 of 5 sections non-reproducible; use the 3 stable sections); DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist); absolute-blocker checkpoints. |
+| 2026-07-06 | agent:claude-code (Fable) | §11 added: autonomous execution — UA `k1_prod_im73d` production build path shipped (`4b95e60`, byte-identical-OFF; original guard block later superseded by 2026-07-07 main-K1 MAC mapping); MicFrontend runtime-dispatch REJECTED with evidence (compile-time selection retained + seam map delivered); byte-oracle determinism finding (registry_byte_gate flaky — 2 of 5 sections non-reproducible; use the 3 stable sections); DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist); absolute-blocker checkpoints. |

@@ -105,30 +105,26 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
-    def test_prod_im73d_upload_is_blocked_until_led_pinmap_conflict_is_resolved(self):
+    def test_prod_im73d_env_is_bound_to_main_k1(self):
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d",
+            "/dev/tty.usbmodem1401",
+            self.ports,
+        )
+        self.assertTrue(ok, message)
+        self.assertIn("F887A500", message)
+
+    def test_prod_im73d_rejects_bench_target(self):
+        # k1_prod_im73d = main/prod LED map + IM73D PDM. Bench IM73D remains
+        # k1_bench_im73d. Cross-flash attempts must fail by USB MAC.
         ok, message = self.guard.validate_upload_target(
             "k1_prod_im73d",
             "/dev/tty.usbmodem12201",
             self.ports,
         )
         self.assertFalse(ok)
-        self.assertIn("upload blocked", message)
-        self.assertIn("LED GPIO map", message)
-        self.assertIn("firmware pin-map conflict", message)
-
-    def test_prod_im73d_upload_is_blocked_on_main_too(self):
-        # k1_prod_im73d = k1_hardware LED pinmap + IM73D PDM. It is build-only
-        # until the conflicting firmware LED maps are reconciled against live,
-        # identical K1 hardware. The hard block must fire before MAC logic.
-        ok, message = self.guard.validate_upload_target(
-            "k1_prod_im73d",
-            "/dev/tty.usbmodem1401",
-            self.ports,
-        )
-        self.assertFalse(ok)
-        self.assertIn("upload blocked", message)
-        self.assertIn("LED GPIO map", message)
-        self.assertIn("firmware pin-map conflict", message)
+        self.assertIn("has USB serial", message)
+        self.assertIn("expected", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
         # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
@@ -158,6 +154,7 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
             ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
+            ("k1_prod_im73d", "/dev/tty.usbmodem12201"),  # prod IM73D must reject the bench K1 port
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):

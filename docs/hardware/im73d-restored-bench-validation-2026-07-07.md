@@ -6,11 +6,10 @@ The bench K1 is restored and validated on the **bench-reference firmware LED
 map** with the IM73D PDM mic path active.
 
 This closes the post-incident bench recovery validation for `k1_bench_im73d`.
-It does **not** prove `k1_prod_im73d`, because `k1_prod_im73d` still inherits
-the unresolved `k1_hardware` LED GPIO map and remains upload-blocked. Captain
-confirms both K1s are identical hardware; the blocker is the repo's firmware
-LED pin-map conflict (`k1_hardware` GPIO `6/7` versus restored bench-reference
-GPIO `4/5`), not a physical hardware split.
+It does **not** prove `k1_prod_im73d`, because `k1_prod_im73d` is the main/prod
+LED-map env (`6/7`) while this restored bench validation is the bench-reference
+LED-map env (`4/5`). Captain confirms both K1s are identical hardware; env
+choice is configuration, not a physical hardware split.
 
 ## Scope
 
@@ -104,13 +103,12 @@ What this proves:
 
 What this does not prove:
 
-- It does not prove `k1_prod_im73d` on the unresolved `k1_hardware` LED GPIO
-  map (`GPIO6/7`).
-- It does not authorise unblocking `k1_prod_im73d` for the bench unit.
+- It does not prove `k1_prod_im73d` on the main/prod LED map (`GPIO6/7`).
+- It does not authorise flashing `k1_prod_im73d` onto the bench/reference `4/5`
+  configuration.
 - It does not authorise the `k1_hardware` default flip.
 
 Remaining requirement for production-env proof:
 
-1. Reconcile the canonical K1 LED GPIO map in firmware (`GPIO6/7` versus
-   `GPIO4/5`) against the live identical K1 hardware.
-2. Device-prove the selected map before unblocking `k1_prod_im73d`.
+1. Use the existing env that matches the intended LED configuration.
+2. Device-prove that selected env before any default flip.

@@ -1,5 +1,5 @@
 ---
-abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2026-07-07) for the IM73D productionization lane. Phase-1 productionization firmware shipped (k1_prod_im73d production build path — byte-identical-OFF, upload-guard BLOCKED). R1 knob persistence is closed. R4 DSR_16S controlled-audio eval is closed and rejected; keep DSR_8S. The original main-K1 physical-swap blocker is superseded: bench K1 carries IM73D on the ratified mic pin map and Captain confirms both K1s are identical hardware. The remaining blocker is the repo's conflicting firmware LED GPIO maps (k1_hardware GPIO 6/7 versus restored bench-reference GPIO 4/5), not a physical hardware split. What remains is corrected R3 pin-map reconciliation, Captain eyes-on, and final default-env flip. This brief carries read-order, device-identity table (MAC-only), done-ledger, task queue, byte-identity discipline, and hard rules."
+abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2026-07-07) for the IM73D productionization lane. Phase-1 productionization firmware shipped (k1_prod_im73d main/prod build path — byte-identical-OFF, upload-guard mapped to main K1). R1 knob persistence is closed. R4 DSR_16S controlled-audio eval is closed and rejected; keep DSR_8S. The original main-K1 physical-swap blocker is superseded: bench K1 carries IM73D on the ratified mic pin map and Captain confirms both K1s are identical hardware. Existing envs encode the intended LED map: k1_bench_im73d = 4/5, k1_prod_im73d = 6/7. What remains is selected-env device proof, Captain eyes-on, and final default-env flip. This brief carries read-order, device-identity table (MAC-only), done-ledger, task queue, byte-identity discipline, and hard rules."
 ---
 
 # IM73D productionization — Codex end-to-end resume brief (2026-07-06)
@@ -18,11 +18,10 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 > **2026-07-07 R2/R3 correction:** the original main-K1 physical-swap blocker is
 > superseded. The bench K1 already carries IM73D on the ratified PDM pin map
 > (`clk13/din12/LR14`), and Captain confirms both K1s are identical hardware.
-> However, `k1_prod_im73d` inherits the unresolved `k1_hardware` LED GPIO map
-> (`6/7`), while the restored bench-reference proof uses GPIO `4/5`; a
-> 2026-07-07 bench flash made both LED channels dark. Therefore the open R3 gate
-> is firmware pin-map reconciliation plus device proof. Keep `k1_prod_im73d`
-> upload-blocked until then.
+> Existing envs encode LED-map choice: `k1_bench_im73d` = GPIO `4/5`,
+> `k1_prod_im73d` = GPIO `6/7`. A 2026-07-07 bench flash of `k1_prod_im73d`
+> made both LED channels dark because that was the wrong env for the restored
+> bench configuration, not because the hardware differs.
 
 ---
 
@@ -44,14 +43,14 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 
 - **Branch / HEAD:** `lane/im73d-pdm-eval @ 855c4a2`. Tree clean.
 - **Both lanes consolidated:** `lane/palette-vibrancy-v1` is merged in (`55c536b`); vibrancy shipped + eyes-on PASSED on the main K1.
-- **Host gate GREEN:** pytest **629 passed / 1 skipped**; `k1_hardware` + `k1_prod_im73d` build clean. Later corrective guard tests restored `k1_prod_im73d` to upload-blocked after the bench LED-dark incident.
+- **Host gate GREEN:** pytest **629 passed / 1 skipped**; `k1_hardware` + `k1_prod_im73d` build clean. Later corrective guard tests restored `k1_prod_im73d` as the main/prod IM73D env, guard-mapped to the main K1 MAC, after the bench wrong-env LED-dark incident.
 - **The pre-commit hook is authoritative** (firmware tier = pytest + `pio run -e k1_hardware`); it runs on every commit. Docs-only commits skip the build.
 
 ### Device identity — MAC ONLY (ports scramble daily; at handover: main=`usbmodem1101`, bench=`usbmodem101`)
 
 | Unit | Chip | USB serial (MAC) | Runs (proven) | Never do |
 |---|---|---|---|---|
-| **Main K1** (production) | `F887A500` | `B4:3A:45:A5:87:F8` | `k1_hardware @ ae5d90a` (SPH0645; vibrancy, eyes-on PASSED) | Do NOT flash `k1_prod_im73d` here (guard blocks it) until the firmware LED pin-map conflict is resolved |
+| **Main K1** (production) | `F887A500` | `B4:3A:45:A5:87:F8` | `k1_hardware @ ae5d90a` (SPH0645; vibrancy, eyes-on PASSED) | `k1_prod_im73d` is the main/prod IM73D env; flash only if Captain wants this unit configured for IM73D |
 | **Bench K1** | `B489A500` | `B4:3A:45:A5:89:B4` | `k1_bench_im73d_ble @ 79d7fda` (BLE demo; IM73D on GPIO 13/12/14; `cal_source=persisted_profile`) | Do NOT measure mic SNR on a BLE build |
 
 `pio device list` → match `SER=` before ANY open/flash. The upload guard is the last line of defence, not the first.
@@ -66,14 +65,14 @@ abstract: "Codex end-to-end resume brief (2026-07-06, superseded notes through 2
 | `32bc384` | Vibrancy forensic doc (`docs/forensics/2026-07-02-palette-vibrancy-colour-collapse.md`) | numbers preserved |
 | `741a40f`,`a82c1d9` | Productionization §10 audit + Captain D1/D2 decision | code-verified |
 | `5628df5` | Execution plan (harness-first DAG U0–UF) | — |
-| **`4b95e60`** | **UA — `k1_prod_im73d` production build path** | pytest 629; byte-identical-OFF; guard-BLOCKED |
+| **`4b95e60`** | **UA — `k1_prod_im73d` production build path** | pytest 629; byte-identical-OFF; guard-mapped to main K1 |
 | **`d1ecc10`** | **UC — `mic_stable_byte_gate.sh`** (trustworthy 3-section oracle + references + static test) | non-flaky check confirmed |
 | `6bfc702` | §11 outcomes: MicFrontend decision, DSR recipe, flip red-team | — |
 | `58928a1` | `progress.md` session entry | — |
 | `855c4a2` | Test-precision fix (production-pin test now mutation-proven) | adversarial-review finding |
 
 **Key state you inherit:**
-- `[env:k1_prod_im73d]` = unresolved `k1_hardware` LED GPIO map (currently GPIO `6/7`) + `-DK1_MIC_IM73D_PDM_V1` at mic pins **clk13/din12/LR14**. It is in **`BLOCKED_UPLOAD_ENVS`** in `scripts/platformio/k1_upload_guard.py` because the restored bench-reference proof uses GPIO `4/5`; Captain confirms both K1s are identical hardware, so this is a firmware pin-map conflict until reconciled.
+- `[env:k1_prod_im73d]` = main/prod LED GPIO map (`6/7`) + `-DK1_MIC_IM73D_PDM_V1` at mic pins **clk13/din12/LR14**. It is guard-mapped to the main K1 MAC. The bench IM73D counterpart remains `[env:k1_bench_im73d]` (`4/5`).
 - Byte-identity oracle = `scripts/regression-harness/mic_stable_byte_gate.sh` (hashes only the 3 reproducible sections `.dram0.data`/`.iram0.text`/`.iram0.vectors`). The old `registry_byte_gate.sh` (5 sections) is **flaky** — see memory `k1-byte-identity-oracle`.
 
 ---
@@ -111,14 +110,16 @@ ratified `clk13/din12/LR14` PDM pin map, and Captain confirms both K1s are
 identical hardware. Main-K1 conversion is optional product-unit work, not the
 current proof blocker.
 
-### R3 (BLOCKED / corrected 2026-07-07) — reconcile and device-prove `k1_prod_im73d`
-Do **not** move `k1_prod_im73d` from `BLOCKED_UPLOAD_ENVS` to the bench allow-list.
-That env extends `k1_hardware`, so it drives GPIO `6/7`; restored bench-reference
-firmware drives GPIO `4/5`. A live bench flash on 2026-07-07 made both LED
-channels dark. Correct proof path:
+### R3 (corrected 2026-07-07) — device-prove the selected existing env
+Do **not** invent new env names or a canonical-map proof. Use the existing env
+that matches the configured unit:
 
-1. reconcile the canonical K1 LED GPIO map in source and guard policy, and
-2. device-prove the selected map before unblocking `k1_prod_im73d`.
+1. `k1_bench_im73d` = IM73D PDM `13/12/14`, bench-reference LED GPIO `4/5`.
+2. `k1_prod_im73d` = IM73D PDM `13/12/14`, main/prod LED GPIO `6/7`.
+
+Correct proof path: Captain chooses the intended env for the unit, the upload
+guard verifies the matching K1 MAC, then device proof + Captain eyes-on decide
+whether it can progress toward a default flip.
 
 Then run the **flip checklist** (handover §11.5): `dump_raw` int16 sane → gain
 re-characterise on the sealed unit → **Captain silence-go recal only if
@@ -145,10 +146,10 @@ Phase 2: BOM/supply diligence (IM73D122 / Infineon), per-unit factory-cal UX, SP
 
 ## 5 · Corrected R2/R3 gate
 
-> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-blocked.
+> **State:** IM73D productionization firmware is complete and gated; `k1_prod_im73d` builds clean and is guard-mapped to the main K1 MAC.
 > **Corrected proof target:** bench K1 `B489A500` / USB MAC `B4:3A:45:A5:89:B4` proves the IM73D PDM mic path on pins `13/12/14`. Captain confirms both K1s are identical hardware.
-> **Decision no longer required:** main-K1 SPH0645→IM73D swap is optional for mic proof. The remaining blocker is the conflicting firmware LED GPIO map used by `k1_prod_im73d` (`6/7`) versus the restored bench-reference proof (`4/5`).
-> **Next mechanical step:** reconcile the canonical K1 LED GPIO map in firmware, then device-prove the selected `k1_prod_im73d` path. Keep `k1_prod_im73d` blocked until then.
+> **Decision no longer required:** main-K1 SPH0645→IM73D swap is optional for mic proof.
+> **Next mechanical step:** use the existing env that matches the intended unit configuration (`k1_bench_im73d` for `4/5`, `k1_prod_im73d` for `6/7`), then device-prove + eyes-on.
 
 ---
 
@@ -179,7 +180,7 @@ bash scripts/regression-harness/mic_stable_byte_gate.sh            # check all
 bash scripts/regression-harness/mic_stable_byte_gate.sh k1_hardware # one env
 bash scripts/regression-harness/mic_stable_byte_gate.sh --update   # re-record on intentional change
 
-# production build path (builds; guard-BLOCKED until LED pin-map reconciliation)
+# main/prod IM73D build path (LED 6/7; guard-mapped to main K1)
 pio run -e k1_prod_im73d
 
 # upload guard CLI re-check (identity by MAC)

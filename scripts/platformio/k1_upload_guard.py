@@ -65,6 +65,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_effect_registry",
             "k1_vp_motion_lab",
             "k1_wireless_ab_probe",
+            "k1_prod_im73d",  # IM73D PDM on the main/prod K1 LED map (6/7)
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",
@@ -100,13 +101,6 @@ BLOCKED_UPLOAD_ENVS: dict[str, str] = {
     "k1_sample_rate_32k_spike": (
         "32 kHz spike is build-only until acquisition-only, AP/VP, "
         "calibration, and watchdog gates are explicitly re-opened"
-    ),
-    "k1_prod_im73d": (
-        "production IM73D env inherits the unresolved k1_hardware LED GPIO map "
-        "(currently 6/7) while the restored live bench proof uses the "
-        "bench-reference map (4/5). Captain confirms the K1 hardware is "
-        "identical; keep blocked until the firmware pin-map conflict is "
-        "reconciled and device-proven"
     ),
 }
 
