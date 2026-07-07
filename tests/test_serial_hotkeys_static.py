@@ -44,9 +44,10 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                     "j", "J", "k", "K", "l", "L",
                     "q", "Q", "w", "W", "e", "E", "r", "R", "t", "T",
                     ",", ".", "/", "1", "2", "3", "4", "5", "6",
-                    "a", "s", "d", "f"]:
+                    "a", "s", "d", "f",
+                    "g", "G", "u", "-", "=", "_", "+"]:
             self.assertIn(f"'{key}'", body)
-        for removed_key in ["'+", "'=", "'-", "'~", "'c", "'C", "'m", "'M", "'n", "'b", "'B", "'g", "'x"]:
+        for removed_key in ["'~", "'c", "'C", "'m", "'M", "'n", "'b", "'B", "'x"]:
             self.assertNotIn(removed_key, body)
 
     def test_dispatcher_has_no_destructive_or_single_byte_calibration_hotkeys(self):

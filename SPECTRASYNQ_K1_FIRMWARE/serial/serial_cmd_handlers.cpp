@@ -965,6 +965,7 @@ void sb_print_smart_status();
 void sb_print_edge_status();
 bool sb_apply_smart_scene(const char* scene);
 bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode);
+bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
@@ -1100,6 +1101,30 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       if (vp_parse_float(command_data, &value)) {
         SBEdgeMixerConfig config = sb_edgemixer_lite_config();
         config.strength = constrain(value, 0.0f, 1.0f);
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_spread") == 0) {
+      float value = 0.0f;
+      if (vp_parse_float(command_data, &value)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.spreadDegrees = (uint8_t)constrain(value, 0.0f, 60.0f);
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_rotation") == 0) {
+      SBEdgeMixerRotationSpace space = SB_EDGE_ROTATION_SUM_PRESERVING;
+      if (sb_parse_edge_rotation(command_data, &space)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.rotationSpace = space;
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
       } else {

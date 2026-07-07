@@ -191,11 +191,13 @@ static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees
 }
 
 // On-device colour transform: a direct SQ15x16 3x3 matrix multiply with a clamp
-// to [0, 1] per channel. The channels are already SQ15x16 normalised 0..1, so
-// there is NO uint8<->Q16 (/255, *255) conversion here — that conversion existed
-// only in the host golden reference whose input was 8-bit CRGB. FixedPoints
-// SQ15x16 operator* accumulates through a 64-bit intermediate (SFixed<30,32>),
-// so this matrix multiply cannot overflow at these coefficient/channel ranges.
+// to [0, 1] per channel. Preserve luminance by transforming existing light only:
+// near-black pixels are passed through unchanged, never inverted into light.
+// The channels are already SQ15x16 normalised 0..1, so there is NO uint8<->Q16
+// (/255, *255) conversion here — that conversion existed only in the host golden
+// reference whose input was 8-bit CRGB. FixedPoints SQ15x16 operator* accumulates
+// through a 64-bit intermediate (SFixed<30,32>), so this matrix multiply cannot
+// overflow at these coefficient/channel ranges.
 static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix) {
   // Near-black passthrough (mirror the source's maxC < 2 skip).
   SQ15x16 maxc = color.r;

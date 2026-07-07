@@ -590,6 +590,23 @@ bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode) {
   return true;
 }
 
+const char* sb_edge_rotation_name(SBEdgeMixerRotationSpace space) {
+  return (space == SB_EDGE_ROTATION_LUMA_PRESERVING) ? "luma" : "faithful";
+}
+
+// faithful -> SUM_PRESERVING (proven); luma -> LUMA_PRESERVING (Tier-1b stub that
+// falls back to faithful in the maths, but the choice is still accepted + stored).
+bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space) {
+  if (strcmp(text, "faithful") == 0 || strcmp(text, "sum") == 0) {
+    *out_space = SB_EDGE_ROTATION_SUM_PRESERVING;
+  } else if (strcmp(text, "luma") == 0) {
+    *out_space = SB_EDGE_ROTATION_LUMA_PRESERVING;
+  } else {
+    return false;
+  }
+  return true;
+}
+
 void sb_print_smart_status() {
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
@@ -697,6 +714,73 @@ void sb_print_edge_status() {
   USBSerial.println(sb_edge_mode_name(edge.mode));
   USBSerial.print("EDGE_STRENGTH: ");
   USBSerial.println(edge.strength, 3);
+  USBSerial.print("EDGE_SPREAD: ");
+  USBSerial.println((int)edge.spreadDegrees);
+  USBSerial.print("EDGE_ROTATION: ");
+  USBSerial.println(sb_edge_rotation_name(edge.rotationSpace));
+  tx_end();
+}
+
+// --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
+// sb_edgemixer_lite_config()/set_config() and prints only its own new state) ---
+void serial_edge_toggle_enabled() {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  e.enabled = !e.enabled;
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_ENABLED: ");
+  USBSerial.println(vp_bool_text(e.enabled));
+  tx_end();
+}
+
+void serial_edge_cycle_mode() {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  // off -> analogous -> complementary -> split -> veil -> triadic -> tetradic -> off
+  uint8_t next = (uint8_t)e.mode + 1;
+  if (next > (uint8_t)SB_EDGE_MIXER_TETRADIC) {
+    next = (uint8_t)SB_EDGE_MIXER_OFF;
+  }
+  e.mode = (SBEdgeMixerMode)next;
+  e.enabled = (e.mode != SB_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_MODE: ");
+  USBSerial.println(sb_edge_mode_name(e.mode));
+  tx_end();
+}
+
+void serial_edge_adjust_spread(int delta) {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  int s = (int)e.spreadDegrees + delta;
+  if (s < 0) { s = 0; }
+  if (s > 60) { s = 60; }
+  e.spreadDegrees = (uint8_t)s;
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_SPREAD: ");
+  USBSerial.println((int)e.spreadDegrees);
+  tx_end();
+}
+
+void serial_edge_adjust_strength(float delta) {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  e.strength = constrain(e.strength + delta, 0.0f, 1.0f);
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_STRENGTH: ");
+  USBSerial.println(e.strength, 3);
+  tx_end();
+}
+
+void serial_edge_toggle_rotation() {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  e.rotationSpace = (e.rotationSpace == SB_EDGE_ROTATION_LUMA_PRESERVING)
+                        ? SB_EDGE_ROTATION_SUM_PRESERVING
+                        : SB_EDGE_ROTATION_LUMA_PRESERVING;
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_ROTATION: ");
+  USBSerial.println(sb_edge_rotation_name(e.rotationSpace));
   tx_end();
 }
 
@@ -1336,6 +1420,15 @@ void serial_print_hotkey_status() {
 
 bool serial_hotkey_is_immediate(char key) {
   switch (key) {
+    // EdgeMixer live-control keys (actions in serial_handle_hotkey). All SC_SAFE:
+    // they mutate only the EdgeMixer secondary-colour config, never destructive.
+    case 'g':  // toggle EdgeMixer on/off
+    case 'G':  // cycle edge_mode
+    case 'u':  // toggle rotation faithful<->luma
+    case '-':  // spread -5
+    case '=':  // spread +5
+    case '_':  // strength -0.1
+    case '+':  // strength +0.1
     case ' ':
     case 'h':
     case ';':
@@ -1563,6 +1656,28 @@ bool serial_hotkey_is_immediate(char key) {
       break;
     case ']':
       serial_adjust_target_mode(1);
+      break;
+    // --- EdgeMixer live control (secondary-strip colour differentiation) ---
+    case 'g':
+      serial_edge_toggle_enabled();
+      break;
+    case 'G':
+      serial_edge_cycle_mode();
+      break;
+    case '=':
+      serial_edge_adjust_spread(5);
+      break;
+    case '-':
+      serial_edge_adjust_spread(-5);
+      break;
+    case '+':
+      serial_edge_adjust_strength(0.1f);
+      break;
+    case '_':
+      serial_edge_adjust_strength(-0.1f);
+      break;
+    case 'u':
+      serial_edge_toggle_rotation();
       break;
     // Effects-queue key map (spec §4, 2026-06-11): digits 1-9,0 load/arm slot
     // 1-10 onto the ACTIVE channel; shift+digit saves the ACTIVE channel into
@@ -1949,6 +2064,9 @@ void cmd_help() {
 	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer-lite");
 	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
 	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
+	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
+	  USBSerial.println("                  edge_rotation=[faithful/luma] | EdgeMixer rotation space (luma=Tier-1b stub, falls back to faithful)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful<->luma");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif
