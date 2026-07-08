@@ -1180,6 +1180,53 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       tx_end();
     }
 
+    else if (strcmp(command_type, "edge_xform") == 0) {
+      // Dev-only colour-transform ORACLE. Transforms ONE input colour through the
+      // REAL on-device fixed-point EdgeMixer rotation for a given rotation space +
+      // harmony mode (full strength, uniform amount) and prints the output. In/out
+      // are 0..65535 (= SQ15x16 * 65535). space: 0=faithful 1=luma 2=oklab.
+      // mode: 1=analogous 2=complementary 3=split 4=veil 5=triadic 6=tetradic.
+      // The host sweeps inputs + does the CIELAB analysis. Restores prior config.
+      int space = 0, modei = 2, ri = 0, gi = 0, bi = 0;
+      if (sscanf(command_data, "%d,%d,%d,%d,%d", &space, &modei, &ri, &gi, &bi) == 5) {
+        const SBEdgeMixerConfig saved = sb_edgemixer_lite_config();
+        SBEdgeMixerRotationSpace rs =
+            (space == 2) ? SB_EDGE_ROTATION_OKLAB :
+            (space == 1) ? SB_EDGE_ROTATION_LUMA_PRESERVING :
+                           SB_EDGE_ROTATION_SUM_PRESERVING;
+        SBEdgeMixerConfig cfg;
+        cfg.enabled = true;
+        cfg.mode = (SBEdgeMixerMode)modei;   // set_config sanitises out-of-range
+        cfg.strength = 1.0f;
+        cfg.spreadDegrees = 30;
+        cfg.rotationSpace = rs;
+        cfg.spatialUniform = true;           // amount = 1 on the single pixel
+        sb_edgemixer_lite_set_config(cfg);
+        static CRGB16 one[1];
+        one[0].r = SQ15x16((float)ri / 65535.0f);
+        one[0].g = SQ15x16((float)gi / 65535.0f);
+        one[0].b = SQ15x16((float)bi / 65535.0f);
+        sb_edgemixer_lite_apply(one, 1, cfg);
+        auto q16 = [](SQ15x16 v) -> int {
+          float f = (float)v.getInternal() / 65536.0f;
+          if (f < 0.0f) f = 0.0f;
+          if (f > 1.0f) f = 1.0f;
+          return (int)(f * 65535.0f + 0.5f);
+        };
+        tx_begin();
+        USBSerial.print("XFORM,");
+        USBSerial.print(space);           USBSerial.print(',');
+        USBSerial.print(modei);           USBSerial.print(',');
+        USBSerial.print(q16(one[0].r));   USBSerial.print(',');
+        USBSerial.print(q16(one[0].g));   USBSerial.print(',');
+        USBSerial.println(q16(one[0].b));
+        tx_end();
+        sb_edgemixer_lite_set_config(saved);
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
     else {
       return false;  // not an edge-mixer handler — let parse_command's ladder continue
     }
