@@ -1504,6 +1504,7 @@ bool serial_hotkey_is_immediate(char key) {
     case 'g':  // toggle EdgeMixer on/off
     case 'G':  // cycle edge_mode
     case 'u':  // toggle rotation faithful<->luma
+    case 'y':  // cycle dual-edge one_sided->split->mirror (A lane)
     case '-':  // spread -5
     case '=':  // spread +5
     case '_':  // strength -0.1

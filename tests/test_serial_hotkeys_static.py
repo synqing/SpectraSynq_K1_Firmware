@@ -45,7 +45,7 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                     "q", "Q", "w", "W", "e", "E", "r", "R", "t", "T",
                     ",", ".", "/", "1", "2", "3", "4", "5", "6",
                     "a", "s", "d", "f",
-                    "g", "G", "u", "-", "=", "_", "+"]:
+                    "g", "G", "u", "y", "-", "=", "_", "+"]:
             self.assertIn(f"'{key}'", body)
         for removed_key in ["'~", "'c", "'C", "'m", "'M", "'n", "'b", "'B", "'x"]:
             self.assertNotIn(removed_key, body)
@@ -94,6 +94,31 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
         self.assertIn("parse_command(command_buf)", body)
         self.assertNotIn("USBSerial.available() == 0", body)
         self.assertIn("serial_handle_hotkey(char(byte))", body)
+
+    def test_edge_hotkeys_are_all_sc_safe_allowlisted(self):
+        # Gate<->handler consistency (the 'y' dual-edge dead-hotkey bug,
+        # 2026-07-09): every EdgeMixer hotkey wired in serial_handle_hotkey
+        # (case 'X' -> a serial_edge_* action) MUST also appear in the
+        # serial_hotkey_is_immediate SC_SAFE allowlist, or the gate silently drops
+        # the key BEFORE dispatch (it never reaches the handler). Handled edge keys
+        # must be a SUBSET of allowlisted keys. This routes the key class through
+        # the gate in CI so a future un-allowlisted hotkey fails here, not on-device.
+        handler = self._function_body("serial_handle_hotkey")
+        allowlist = self._function_body("serial_hotkey_is_immediate")
+        edge_keys = set()
+        for match in re.finditer(
+                r"case '(?P<k>(?:\\.|[^'])+)':(?P<body>.*?)(?=\bcase '|\bdefault\s*:)",
+                handler, re.S):
+            if "serial_edge_" in match.group("body"):
+                edge_keys.add(match.group("k"))
+        self.assertTrue(
+            edge_keys, "no EdgeMixer hotkeys found in serial_handle_hotkey")
+        missing = sorted(k for k in edge_keys if f"'{k}'" not in allowlist)
+        self.assertEqual(
+            missing, [],
+            "EdgeMixer hotkeys handled but NOT SC_SAFE-allowlisted (the gate drops "
+            f"them before dispatch): {missing}",
+        )
 
     def test_help_documents_targeted_controls_and_vp_shortcuts(self):
         self.assertIn("K1 HOTKEYS", self.source)
