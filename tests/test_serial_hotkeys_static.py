@@ -47,7 +47,10 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                     "a", "s", "d", "f",
                     "g", "G", "u", "y", "-", "=", "_", "+"]:
             self.assertIn(f"'{key}'", body)
-        for removed_key in ["'~", "'c", "'C", "'m", "'M", "'n", "'b", "'B", "'x"]:
+        # 'm' is NO LONGER removed: it is the SHIPPING ref-E spatial toggle
+        # (#ifndef ENABLE_MOTION_PROBE), reclaimed from the motion-probe "B knob +"
+        # binding — the two are mutually exclusive by build.
+        for removed_key in ["'~", "'c", "'C", "'M", "'n", "'b", "'B", "'x"]:
             self.assertNotIn(removed_key, body)
 
     def test_dispatcher_has_no_destructive_or_single_byte_calibration_hotkeys(self):

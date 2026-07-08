@@ -638,6 +638,20 @@ bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual) {
   return true;
 }
 
+// uniform -> spatialUniform true (shift applied evenly across the strip);
+// masked  -> false (centre-masked: fades from 0 at the 79/80 centre to full at the
+// ends). Ref E. Scriptable counterpart to the 'm' hotkey.
+bool sb_parse_edge_uniform(const char* text, bool* out_uniform) {
+  if (strcmp(text, "uniform") == 0) {
+    *out_uniform = true;
+  } else if (strcmp(text, "masked") == 0) {
+    *out_uniform = false;
+  } else {
+    return false;
+  }
+  return true;
+}
+
 void sb_print_smart_status() {
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
@@ -756,6 +770,18 @@ void sb_print_edge_status() {
   tx_end();
 }
 
+// A-lane UX guard: MIRROR + COMPLEMENTARY makes both edges rotate +/-180deg to the
+// SAME hue (2*180 = 360 = 0 separation), collapsing the two edges into one. Honest
+// maths, but a UX trap — so warn (informative, NOT a hard block) whenever a change
+// makes that combo active. Called from the mode + dual-edge change handlers.
+void sb_edge_warn_if_collapsed(const SBEdgeMixerConfig& e) {
+  if (e.dualEdge == SB_EDGE_DUAL_MIRROR && e.mode == SB_EDGE_MIXER_COMPLEMENTARY) {
+    tx_begin();
+    USBSerial.println("EDGE_WARN: mirror+complementary collapses both edges to the same hue (2x180=0 separation) - use split at complementary, or mirror at analogous/triadic.");
+    tx_end();
+  }
+}
+
 // --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
 // sb_edgemixer_lite_config()/set_config() and prints only its own new state) ---
 void serial_edge_toggle_enabled() {
@@ -782,6 +808,7 @@ void serial_edge_cycle_mode() {
   USBSerial.print("EDGE_MODE: ");
   USBSerial.println(sb_edge_mode_name(e.mode));
   tx_end();
+  sb_edge_warn_if_collapsed(e);
 }
 
 void serial_edge_adjust_spread(int delta) {
@@ -851,6 +878,7 @@ void serial_edge_toggle_dual_edge() {
   USBSerial.print("EDGE_DUAL: ");
   USBSerial.println(sb_edge_dual_name(e.dualEdge));
   tx_end();
+  sb_edge_warn_if_collapsed(e);
 }
 
 void serial_edge_toggle_uniform() {
@@ -1505,6 +1533,12 @@ bool serial_hotkey_is_immediate(char key) {
     case 'G':  // cycle edge_mode
     case 'u':  // toggle rotation faithful<->luma
     case 'y':  // cycle dual-edge one_sided->split->mirror (A lane)
+#ifndef ENABLE_MOTION_PROBE
+    // ref E spatial toggle (SHIPPING). 'm' doubles as the motion-probe "B knob +"
+    // key under ENABLE_MOTION_PROBE (see the guarded block below); the two are
+    // mutually exclusive by build, so neither duplicates the other.
+    case 'm':  // toggle spatial uniform<->masked (ref E)
+#endif
     case '-':  // spread -5
     case '=':  // spread +5
     case '_':  // strength -0.1
@@ -1762,6 +1796,11 @@ bool serial_hotkey_is_immediate(char key) {
     case 'y':
       serial_edge_toggle_dual_edge();
       break;
+#ifndef ENABLE_MOTION_PROBE
+    case 'm':  // ref E spatial toggle (SHIPPING); motion-probe reuses 'm' (B knob +)
+      serial_edge_toggle_uniform();
+      break;
+#endif
     // Effects-queue key map (spec §4, 2026-06-11): digits 1-9,0 load/arm slot
     // 1-10 onto the ACTIVE channel; shift+digit saves the ACTIVE channel into
     // the slot. The former digit toggle bindings were REMOVED (Captain:
@@ -2150,7 +2189,8 @@ void cmd_help() {
 	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
 	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
 	  USBSerial.println("                  edge_dual=[one_sided/split/mirror] | EdgeMixer symmetric dual-edge (one_sided=secondary only; split=both +/-theta/2; mirror=both +/-theta)");
-	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror");
+	  USBSerial.println("                  edge_uniform=[uniform/masked] | EdgeMixer spatial weighting (uniform=even; masked=fades from the 79/80 centre to the ends) (ref E)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror | m spatial uniform<->masked");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif
