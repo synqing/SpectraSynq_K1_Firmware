@@ -37,9 +37,9 @@ FIXEDPOINTS_SRC = ROOT / "libraries" / "FixedPoints" / "src"
 # fixed-point path, which is bit-deterministic and representative of the device
 # render path) sit far inside every band, proving margin, and the fault-evidence
 # case gives the metric its teeth:
-# Measured actuals on the reference build after the LUT (Task 1) + constant-L
-# gamut clip (Task 2): OK_MAX_DL_M 0 | OK_MAX_DC_M 0 | OK_MAX_HUE_MDEG 94 (0.09 deg)
-# RT_MAX_DIFF_M 1 (0.001) | NONTRIV 179238 (179.2 deg) | FAULT_PERTURBED 12294 (12.3 deg)
+# Measured actuals after LUT (Task 1) + gamut clip (Task 2) + invM2.R.M2 fusion:
+# OK_MAX_DL_M 0 | OK_MAX_DC_M 0 | OK_MAX_HUE_MDEG 105 (0.11 deg)
+# RT_MAX_DIFF_M 1 (0.001) | NONTRIV 179257 (179.3 deg) | FAULT_PERTURBED 12282 (12.3 deg)
 # GAMUT: OOG 29 | DL_NEW 4 (0.004) | DL_CLAMP 36 (0.036) -> chroma clip holds L ~9x
 # better than the old hard clamp.
 BAND_MAX_DL_M = 15        # |dL|        <= 0.015 perceptual-lightness units
@@ -56,8 +56,8 @@ GAMUT_IMPROVE_FACTOR = 2  # ...and at least 2x better than the old per-channel c
 # Task 1 LUT DESIGN TOLERANCE — the certified perceptual cost the LUT + fixed-point
 # path is designed to introduce vs EXACT double-precision OKLab. These are the gate
 # thresholds; the LUT resolution (257-entry interpolated mantissa) was chosen to sit
-# an order of magnitude inside them. Measured actuals: OKLab dE 419e-6 (0.00042),
-# CIELAB dE*ab 105e-3 (0.105) — ~1/10 of the classic 1.0 JND, comfortably no-lite.
+# an order of magnitude inside them. Measured actuals (post-fusion): OKLab dE
+# 411e-6 (0.00041), CIELAB dE*ab 96e-3 (0.096) — ~1/10 of the 1.0 JND, no-lite.
 BAND_MAX_DE_OKLAB_E6 = 5000   # OKLab delta-E <= 0.005 (M5 currency; design target)
 BAND_MAX_DE_LAB_E3 = 500      # CIELAB delta-E*ab <= 0.5 == half the 1.0 JND
 
