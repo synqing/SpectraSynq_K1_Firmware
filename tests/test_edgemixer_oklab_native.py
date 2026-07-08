@@ -37,14 +37,21 @@ FIXEDPOINTS_SRC = ROOT / "libraries" / "FixedPoints" / "src"
 # fixed-point path, which is bit-deterministic and representative of the device
 # render path) sit far inside every band, proving margin, and the fault-evidence
 # case gives the metric its teeth:
-#   OK_MAX_DL_M 0 (<0.0005) | OK_MAX_DC_M 0 (<0.0005) | OK_MAX_HUE_MDEG 162 (0.16 deg)
-#   RT_MAX_DIFF_M 2 (0.002) | NONTRIV 170548 (170.5 deg) | FAULT_PERTURBED 15536 (15.5 deg)
+# Measured actuals on the reference build after the LUT (Task 1) + constant-L
+# gamut clip (Task 2): OK_MAX_DL_M 0 | OK_MAX_DC_M 0 | OK_MAX_HUE_MDEG 94 (0.09 deg)
+# RT_MAX_DIFF_M 1 (0.001) | NONTRIV 179238 (179.2 deg) | FAULT_PERTURBED 12294 (12.3 deg)
+# GAMUT: OOG 29 | DL_NEW 4 (0.004) | DL_CLAMP 36 (0.036) -> chroma clip holds L ~9x
+# better than the old hard clamp.
 BAND_MAX_DL_M = 15        # |dL|        <= 0.015 perceptual-lightness units
 BAND_MAX_DC_M = 15        # |dChroma|   <= 0.015
 BAND_MAX_HUE_MDEG = 2500  # hue error   <= 2.5 degrees
 BAND_RT_DIFF_M = 10       # round-trip  <= 0.010 per channel at theta = 0
 MIN_NONTRIV_HUE_MDEG = 150000   # complementary must swing >= 150 degrees
 MIN_FAULT_HUE_MDEG = 8000       # an injected M2 fault must exceed 8.0 degrees
+# Task 2 gamut-clip quality bands.
+MIN_GAMUT_OOG = 8         # enough out-of-gamut samples for the metric to mean anything
+BAND_GAMUT_DL_NEW_M = 12  # chroma-reduction clip holds output L within 0.012 of ideal
+GAMUT_IMPROVE_FACTOR = 2  # ...and at least 2x better than the old per-channel clamp
 
 EXPECTED_OK_SAMPLES = 6 * 4 * 4 * 4   # 6 modes x 4^3 colour grid
 EXPECTED_RT_SAMPLES = 4 * 4 * 4
@@ -147,6 +154,27 @@ class EdgeMixerOklabNativeTest(unittest.TestCase):
         self.assertGreaterEqual(
             self.v["FAULT_PERTURBED_HUE_MDEG"], MIN_FAULT_HUE_MDEG,
             "injected M2 coefficient fault MUST break the hue metric",
+        )
+
+    def test_gamut_clip_holds_lightness_better_than_hard_clamp(self):
+        # Task 2: enough out-of-gamut COMPLEMENTARY pixels to be meaningful...
+        self.assertGreaterEqual(
+            self.v["GAMUT_OOG_COUNT"], MIN_GAMUT_OOG,
+            "too few out-of-gamut samples to validate the gamut clip",
+        )
+        # ...the constant-L chroma-reduction clip holds output lightness tight...
+        self.assertLessEqual(
+            self.v["GAMUT_DL_NEW_M"], BAND_GAMUT_DL_NEW_M,
+            f"chroma-clip |dL| {self.v['GAMUT_DL_NEW_M']} m-units exceeds band "
+            f"{BAND_GAMUT_DL_NEW_M}",
+        )
+        # ...and is materially better than the OLD per-channel hard clamp, which
+        # is the whole point of Task 2 (hard clamp shifts lightness AND hue).
+        self.assertLessEqual(
+            self.v["GAMUT_DL_NEW_M"] * GAMUT_IMPROVE_FACTOR,
+            self.v["GAMUT_DL_CLAMP_M"],
+            f"chroma clip (dL {self.v['GAMUT_DL_NEW_M']}) must beat hard clamp "
+            f"(dL {self.v['GAMUT_DL_CLAMP_M']}) by >= {GAMUT_IMPROVE_FACTOR}x",
         )
 
 

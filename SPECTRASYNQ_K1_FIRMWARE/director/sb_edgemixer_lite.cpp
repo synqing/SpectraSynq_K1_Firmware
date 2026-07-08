@@ -496,6 +496,62 @@ static SQ15x16 sb_edge_gamma_encode(SQ15x16 x) {
   return sb_edge_pow_lut(x, kSbOkMantEncode, kSbOkExpEncode);
 }
 
+// OKLab (L, a, b) -> linear RGB: inverse M2 (L column == 1), signed cube, inverse
+// M1. Factored out so the gamut-clip pass can re-evaluate it with reduced chroma.
+static void sb_edge_oklab_to_linear(SQ15x16 L, SQ15x16 a, SQ15x16 b,
+                                    SQ15x16* rlin, SQ15x16* glin, SQ15x16* blin) {
+  SQ15x16 lq = L + SB_OK_IM2_A1 * a + SB_OK_IM2_B1 * b;
+  SQ15x16 mq = L + SB_OK_IM2_A2 * a + SB_OK_IM2_B2 * b;
+  SQ15x16 sq = L + SB_OK_IM2_A3 * a + SB_OK_IM2_B3 * b;
+  SQ15x16 lL = sb_edge_cube(lq);
+  SQ15x16 mL = sb_edge_cube(mq);
+  SQ15x16 sL = sb_edge_cube(sq);
+  *rlin = SB_OK_IM1_00 * lL + SB_OK_IM1_01 * mL + SB_OK_IM1_02 * sL;
+  *glin = SB_OK_IM1_10 * lL + SB_OK_IM1_11 * mL + SB_OK_IM1_12 * sL;
+  *blin = SB_OK_IM1_20 * lL + SB_OK_IM1_21 * mL + SB_OK_IM1_22 * sL;
+}
+
+// Constant-L, constant-hue gamut clip (Task 2). When a full-chroma rotated pixel
+// leaves [0,1] linear, do NOT hard-clamp each channel (that shifts hue AND
+// lightness). Instead scale the OKLab chroma (a,b) by a single factor t toward the
+// grey axis until the pixel re-enters gamut, holding L and hue.
+//
+// t comes from a linear-in-t model of each channel: the linear value moves
+// (approximately) along the chord from the grey anchor v(0) = L^3 (the inverse-M1
+// rows sum to 1, so zero chroma maps to grey L^3 on every channel) to the
+// full-chroma value v(1). For each out-of-range channel we solve
+// v(0) + t*(v(1) - v(0)) = boundary and take the smallest t. The chord slightly
+// overshoots (the true channel curve is a cube that bulges past the chord), so the
+// caller re-evaluates at t and the small residual is absorbed by the final clamp —
+// still holding L far better than a per-channel clamp. Returns t in [0,1]; 1.0 in
+// gamut. Divides run ONLY on out-of-gamut pixels (1-3 per pixel), never on the
+// in-gamut majority.
+static SQ15x16 sb_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin, SQ15x16 glin,
+                                   SQ15x16 blin) {
+  const SQ15x16 kZero = SQ15x16(0.0f);
+  const SQ15x16 kOne = SQ15x16(1.0f);
+  const SQ15x16 g = sb_edge_cube(L);  // grey anchor v(0) = L^3
+  const SQ15x16 v[3] = {rlin, glin, blin};
+  SQ15x16 t = kOne;
+  for (int i = 0; i < 3; ++i) {
+    if (v[i] > kOne) {
+      SQ15x16 tc = (kOne - g) / (v[i] - g);
+      if (tc < t) {
+        t = tc;
+      }
+    } else if (v[i] < kZero) {
+      SQ15x16 tc = (kZero - g) / (v[i] - g);
+      if (tc < t) {
+        t = tc;
+      }
+    }
+  }
+  if (t < kZero) {
+    t = kZero;  // degenerate guard (L rounding just over 1) -> full desaturation
+  }
+  return t;
+}
+
 // Per-pixel OKLab perceptual hue rotation. The caller (sb_edge_transform) has
 // already applied the near-black passthrough, so every channel here is a real,
 // non-black colour. c = satRetain*cos(theta), k = satRetain*sin(theta).
@@ -525,22 +581,26 @@ static CRGB16 sb_edge_transform_oklab(CRGB16 color, SQ15x16 c, SQ15x16 k) {
   SQ15x16 A2 = A * c - B * k;
   SQ15x16 B2 = A * k + B * c;
 
-  // OKLab -> LMS' (inverse M2; L column == 1).
-  SQ15x16 lq = L + SB_OK_IM2_A1 * A2 + SB_OK_IM2_B1 * B2;
-  SQ15x16 mq = L + SB_OK_IM2_A2 * A2 + SB_OK_IM2_B2 * B2;
-  SQ15x16 sq = L + SB_OK_IM2_A3 * A2 + SB_OK_IM2_B3 * B2;
+  // OKLab -> linear RGB.
+  SQ15x16 rlin;
+  SQ15x16 glin;
+  SQ15x16 blin;
+  sb_edge_oklab_to_linear(L, A2, B2, &rlin, &glin, &blin);
 
-  // cube -> LMS.
-  SQ15x16 lL = sb_edge_cube(lq);
-  SQ15x16 mL = sb_edge_cube(mq);
-  SQ15x16 sL = sb_edge_cube(sq);
+  // Gamut clip: if the rotated colour left the sRGB gamut, reduce OKLab chroma
+  // toward grey (holding L and hue) until it re-enters, then re-evaluate. This
+  // replaces the old per-channel hard clamp, which shifted both hue and lightness
+  // on the ~majority of saturated COMPLEMENTARY pixels. The final clamp below
+  // absorbs the small cube-curvature residual.
+  const SQ15x16 kZero = SQ15x16(0.0f);
+  const SQ15x16 kOne = SQ15x16(1.0f);
+  if (rlin < kZero || rlin > kOne || glin < kZero || glin > kOne ||
+      blin < kZero || blin > kOne) {
+    SQ15x16 t = sb_edge_gamut_scale(L, rlin, glin, blin);
+    sb_edge_oklab_to_linear(L, A2 * t, B2 * t, &rlin, &glin, &blin);
+  }
 
-  // LMS -> linear RGB (inverse M1).
-  SQ15x16 rlin = SB_OK_IM1_00 * lL + SB_OK_IM1_01 * mL + SB_OK_IM1_02 * sL;
-  SQ15x16 glin = SB_OK_IM1_10 * lL + SB_OK_IM1_11 * mL + SB_OK_IM1_12 * sL;
-  SQ15x16 blin = SB_OK_IM1_20 * lL + SB_OK_IM1_21 * mL + SB_OK_IM1_22 * sL;
-
-  // clamp to gamut, gamma encode, clamp to [0,1].
+  // gamma encode, clamp to [0,1].
   CRGB16 out;
   out.r = sb_edge_clamp01(sb_edge_gamma_encode(sb_edge_clamp01(rlin)));
   out.g = sb_edge_clamp01(sb_edge_gamma_encode(sb_edge_clamp01(glin)));

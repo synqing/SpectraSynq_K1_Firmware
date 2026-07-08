@@ -30,6 +30,9 @@
 //   NONTRIV_HUE_MDEG  complementary hue swing * 1000 (proves the rotation runs)
 //   FAULT_PERTURBED_HUE_MDEG  engine vs a reference with one M2 coefficient
 //                     perturbed -> must blow past the nominal band (fault-evident)
+//   GAMUT_OOG_COUNT   COMPLEMENTARY grid pixels that leave the sRGB gamut
+//   GAMUT_DL_NEW_M    max output-L drift from the constant-L ideal (chroma clip)
+//   GAMUT_DL_CLAMP_M  same, for the OLD per-channel hard clamp (before/after)
 //
 // British English throughout. Emits "KEY value" lines for the pytest driver.
 // ============================================================================
@@ -67,15 +70,62 @@ Lab displayToOklab(double r, double g, double b) {
   return o;
 }
 
+// OKLab (L, a, b) -> linear RGB (double), mirroring sb_edge_oklab_to_linear.
+void refOklabToLinear(double L, double a, double b, double* rl, double* gl,
+                      double* bl) {
+  const double lp = L + 0.3963377774 * a + 0.2158037573 * b;
+  const double mp = L - 0.1055613458 * a - 0.0638541728 * b;
+  const double sp = L - 0.0894841775 * a - 1.2914855480 * b;
+  const double ll = lp * lp * lp, ml = mp * mp * mp, sl = sp * sp * sp;
+  *rl = 4.0767416621 * ll - 3.3077115913 * ml + 0.2309699292 * sl;
+  *gl = -1.2684380046 * ll + 2.6097574011 * ml - 0.3413193965 * sl;
+  *bl = -0.0041960863 * ll - 0.7034186147 * ml + 1.7076147010 * sl;
+}
+
+// Constant-L chroma-reduction gamut scale (double), mirroring sb_edge_gamut_scale.
+double refGamutScale(double L, double rl, double gl, double bl) {
+  const double g = L * L * L;
+  const double v[3] = {rl, gl, bl};
+  double t = 1.0;
+  for (int i = 0; i < 3; ++i) {
+    if (v[i] > 1.0) {
+      double tc = (1.0 - g) / (v[i] - g);
+      if (tc < t) t = tc;
+    } else if (v[i] < 0.0) {
+      double tc = (0.0 - g) / (v[i] - g);
+      if (tc < t) t = tc;
+    }
+  }
+  return (t < 0.0) ? 0.0 : t;
+}
+
+// Forward: display RGB -> (L, A2, B2) after rotation. Used to detect which pixels
+// leave the gamut at full chroma (the constant-L target L equals this L).
+void refForward(double r, double g, double b, double c, double k, double* L,
+                double* A2, double* B2) {
+  const double lr = gammaDecode(r), lg = gammaDecode(g), lb = gammaDecode(b);
+  const double l = 0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb;
+  const double m = 0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb;
+  const double s = 0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb;
+  const double lc = std::cbrt(l), mc = std::cbrt(m), sc = std::cbrt(s);
+  *L = 0.2104542553 * lc + 0.7936177850 * mc - 0.0040720468 * sc;
+  const double A = 1.9779984951 * lc - 2.4285922050 * mc + 0.4505937099 * sc;
+  const double Bv = 0.0259040371 * lc + 0.7827717662 * mc - 0.8086757660 * sc;
+  *A2 = A * c - Bv * k;
+  *B2 = A * k + Bv * c;
+}
+
 // Double-precision reference: the FULL structural mirror of the engine's OKLab
-// path, INCLUDING the identical gamut clamp + gamma encode, returning display
-// RGB. Comparing the engine against this (not against an unclamped ideal OKLab)
-// is the correct cross-validation: both clamp out-of-gamut rotated colours the
-// same way, so the residual is pure fixed-point error, not gamut disagreement.
-// m2aPerturb nudges the M2 'a' first coefficient for the fault-evidence case
-// (0 = correct constants).
+// path, returning display RGB. Comparing the engine against this (not against an
+// unclamped ideal OKLab) is the correct cross-validation: both handle out-of-gamut
+// rotated colours the SAME way, so the residual is pure fixed-point error.
+// gamutMap == true reproduces the Task-2 constant-L chroma-reduction clip (the
+// shipping engine); gamutMap == false is the OLD per-channel hard clamp, retained
+// only to measure the before/after lightness improvement. m2aPerturb nudges the M2
+// 'a' first coefficient for the fault-evidence case (0 = correct constants).
 void refTransform(double r, double g, double b, double c, double k,
-                  double m2aPerturb, double* outR, double* outG, double* outB) {
+                  double m2aPerturb, bool gamutMap, double* outR, double* outG,
+                  double* outB) {
   const double lr = gammaDecode(r), lg = gammaDecode(g), lb = gammaDecode(b);
   const double l = 0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb;
   const double m = 0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb;
@@ -87,13 +137,13 @@ void refTransform(double r, double g, double b, double c, double k,
   const double B = 0.0259040371 * lc + 0.7827717662 * mc - 0.8086757660 * sc;
   const double A2 = A * c - B * k;  // rotate + desaturate, exactly as the engine
   const double B2 = A * k + B * c;
-  const double lp = L + 0.3963377774 * A2 + 0.2158037573 * B2;
-  const double mp = L - 0.1055613458 * A2 - 0.0638541728 * B2;
-  const double sp = L - 0.0894841775 * A2 - 1.2914855480 * B2;
-  const double ll = lp * lp * lp, ml = mp * mp * mp, sl = sp * sp * sp;
-  const double rl = 4.0767416621 * ll - 3.3077115913 * ml + 0.2309699292 * sl;
-  const double gl = -1.2684380046 * ll + 2.6097574011 * ml - 0.3413193965 * sl;
-  const double bl = -0.0041960863 * ll - 0.7034186147 * ml + 1.7076147010 * sl;
+  double rl, gl, bl;
+  refOklabToLinear(L, A2, B2, &rl, &gl, &bl);
+  if (gamutMap && (rl < 0.0 || rl > 1.0 || gl < 0.0 || gl > 1.0 || bl < 0.0 ||
+                   bl > 1.0)) {
+    const double t = refGamutScale(L, rl, gl, bl);
+    refOklabToLinear(L, A2 * t, B2 * t, &rl, &gl, &bl);
+  }
   *outR = clamp01(gammaEncode(clamp01(rl)));
   *outG = clamp01(gammaEncode(clamp01(gl)));
   *outB = clamp01(gammaEncode(clamp01(bl)));
@@ -208,7 +258,7 @@ int main() {
           const double eg = static_cast<float>(out.g);
           const double eb = static_cast<float>(out.b);
           double rr, rg, rb;
-          refTransform(r, g, b, c, k, 0.0, &rr, &rg, &rb);
+          refTransform(r, g, b, c, k, 0.0, true, &rr, &rg, &rb);
           const Lab eng = displayToOklab(er, eg, eb);
           const Lab tgt = displayToOklab(rr, rg, rb);
 
@@ -269,13 +319,52 @@ int main() {
                                    static_cast<float>(out.g),
                                    static_cast<float>(out.b));
     double nr, ng, nb, pr, pg, pb;
-    refTransform(r, g, b, c, k, 0.0, &nr, &ng, &nb);   // correct constants
-    refTransform(r, g, b, c, k, 0.05, &pr, &pg, &pb);  // +0.05 on M2[a0]
+    refTransform(r, g, b, c, k, 0.0, true, &nr, &ng, &nb);   // correct constants
+    refTransform(r, g, b, c, k, 0.05, true, &pr, &pg, &pb);  // +0.05 on M2[a0]
     const Lab nominal = displayToOklab(nr, ng, nb);
     const Lab perturbed = displayToOklab(pr, pg, pb);
     std::printf("FAULT_NOMINAL_HUE_MDEG %d\n", milli(hueErrorDeg(eng, nominal)));
     std::printf("FAULT_PERTURBED_HUE_MDEG %d\n",
                 milli(hueErrorDeg(eng, perturbed)));
+  }
+
+  // Gamut-clip quality (Task 2): over COMPLEMENTARY (the most out-of-gamut mode),
+  // measure how far the OUTPUT lightness drifts from the constant-L ideal (the
+  // input L, which a constant-L rotation must preserve) for the shipping engine
+  // (chroma-reduction clip) versus the OLD per-channel hard clamp. Only pixels
+  // whose full-chroma rotation actually leaves the sRGB gamut are counted.
+  {
+    double c, k;
+    modeCK(2, 0, &c, &k);  // COMPLEMENTARY
+    double maxDlNew = 0.0, maxDlClamp = 0.0;
+    int oog = 0;
+    for (double r : levels) {
+      for (double g : levels) {
+        for (double b : levels) {
+          double L, A2, B2, rl, gl, bl;
+          refForward(r, g, b, c, k, &L, &A2, &B2);
+          refOklabToLinear(L, A2, B2, &rl, &gl, &bl);
+          const bool isOog = (rl < 0.0 || rl > 1.0 || gl < 0.0 || gl > 1.0 ||
+                              bl < 0.0 || bl > 1.0);
+          if (!isOog) continue;
+          ++oog;
+          // Shipping engine (chroma-reduction gamut clip).
+          CRGB16 out = engineApply(2, 0, r, g, b);
+          const double lNew = displayToOklab(static_cast<float>(out.r),
+                                             static_cast<float>(out.g),
+                                             static_cast<float>(out.b)).L;
+          // OLD per-channel hard clamp (reference, gamutMap == false).
+          double cr, cg, cb;
+          refTransform(r, g, b, c, k, 0.0, false, &cr, &cg, &cb);
+          const double lClamp = displayToOklab(cr, cg, cb).L;
+          maxDlNew = std::fmax(maxDlNew, std::fabs(lNew - L));
+          maxDlClamp = std::fmax(maxDlClamp, std::fabs(lClamp - L));
+        }
+      }
+    }
+    std::printf("GAMUT_OOG_COUNT %d\n", oog);
+    std::printf("GAMUT_DL_NEW_M %d\n", milli(maxDlNew));
+    std::printf("GAMUT_DL_CLAMP_M %d\n", milli(maxDlClamp));
   }
 
   std::printf("OK_SAMPLES %d\n", okSamples);
