@@ -1361,6 +1361,22 @@ void led_thread(void* arg) {
           restore_render_runtime(render_snapshot);
         }
 
+        // Symmetric dual-edge (A lane): the primary frame is now restored into
+        // leds_16, so apply the PRIMARY-edge transform to it — making BOTH edges
+        // shift about the 79/80 centre instead of only the secondary. Gated on the
+        // dual-edge mode (ONE_SIDED = primary untouched = byte-inert default) and on
+        // the edge being enabled. NEVER touches leds_16_secondary; uses the SAME
+        // frozen colour transform baked at the mirrored primary angle, with the same
+        // strength scaling the secondary got (vpab_edge_effective_config). Its cost
+        // lands in the vp_perf.secondary_render bucket (both edge transforms) and the
+        // total vp_render_us frame time.
+        if (vpab_edge_effective_config.enabled &&
+            vpab_edge_effective_config.dualEdge != SB_EDGE_DUAL_ONE_SIDED) {
+          SB_TRACE_SCOPE("vp_primary_edge");
+          sb_edgemixer_lite_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
+          clip_led_values(leds_16);
+        }
+
 #if ENABLE_VP_PERF_AUDIT
         if (vp_perf.running) {
           vp_perf_record(vp_perf.secondary_render, uint32_t(esp_timer_get_time() - vp_perf_secondary_start_us));
@@ -1383,6 +1399,9 @@ void led_thread(void* arg) {
 	        sb_smart_director_manual_owner_active(uint32_t(vp_frame_start_us / 1000)) ? uint8_t(1) : uint8_t(0),
 	        uint16_t(constrain(vpab_edge_base_config.strength, 0.0f, 1.0f) * 1000.0f),
 	        uint16_t(constrain(vpab_edge_effective_config.strength, 0.0f, 1.0f) * 1000.0f),
+		        uint8_t(vpab_edge_effective_config.dualEdge),
+		        (vpab_edge_effective_config.enabled &&
+		         vpab_edge_effective_config.dualEdge != SB_EDGE_DUAL_ONE_SIDED) ? uint8_t(1) : uint8_t(0),
 	      };
 	      vpab_capture_set_render_context(vpab_context);
 #endif
