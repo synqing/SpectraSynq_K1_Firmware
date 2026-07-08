@@ -15,13 +15,28 @@ enum SBEdgeMixerMode : uint8_t {
 
 // Colour rotation space for the harmony transform.
 //   SUM_PRESERVING  — the proven hue-rotation-around-grey-axis matrix (EdgeMixer
-//                     golden-master lineage; parity-validated to +/-1 LSB).
-//   LUMA_PRESERVING — Tier-1b: reserved. NOT yet implemented; it needs its own
-//                     design and a luma-band oracle before it may ship, so it
-//                     currently falls back to SUM_PRESERVING (see the .cpp TODO).
+//                     golden-master lineage; parity-validated to +/-1 LSB). This
+//                     is the DEFAULT and is byte-identical to the frozen path.
+//   LUMA_PRESERVING — the grey-axis rotation followed by a per-pixel BT.601 luma
+//                     rescale at render time (see sb_edge_transform); preserves
+//                     hue + saturation while re-pinning brightness to the input.
+//   OKLAB           — a PERCEPTUAL hue rotation performed in the OKLab a/b plane
+//                     (Ottosson 2020). Structurally different from the two grey-
+//                     axis paths: it is a per-pixel, non-linear round trip
+//                     (sRGB-gamma decode -> linear -> LMS -> cube-root -> OKLab
+//                     -> 2D a/b rotation by the mode's theta -> inverse -> gamma
+//                     encode), NOT a 3x3 matrix bake. It rotates hue while
+//                     holding perceptual lightness (L) constant, so — unlike the
+//                     sum-preserving path — it does not lurch brightness across a
+//                     rotation. A mode's desaturation (satRetain) is applied as a
+//                     direct OKLab chroma scale. Validated against a float OKLab
+//                     oracle within a documented perceptual band (NOT +/-1 LSB;
+//                     OKLab is a different transform). See sb_edgemixer_lite.cpp
+//                     and scripts/regression-harness/edgemixer_oklab_probe.cpp.
 enum SBEdgeMixerRotationSpace : uint8_t {
   SB_EDGE_ROTATION_SUM_PRESERVING = 0,
-  SB_EDGE_ROTATION_LUMA_PRESERVING = 1
+  SB_EDGE_ROTATION_LUMA_PRESERVING = 1,
+  SB_EDGE_ROTATION_OKLAB = 2
 };
 
 struct SBEdgeMixerConfig {
@@ -34,7 +49,10 @@ struct SBEdgeMixerConfig {
   uint8_t spreadDegrees;
   // Rotation space (default SUM_PRESERVING). LUMA_PRESERVING (ref C) rescales each
   // rotated pixel to the input's BT.601 luma at render time (see sb_edge_transform);
-  // the 'u' hotkey selects it.
+  // the 'u' hotkey selects it. OKLAB performs a perceptual hue rotation in the
+  // OKLab a/b plane at render time (see sb_edge_transform_oklab), holding
+  // perceptual lightness constant; it is a structural per-pixel round trip, not a
+  // matrix bake. Any value outside the enum is sanitised to SUM_PRESERVING on set.
   SBEdgeMixerRotationSpace rotationSpace;
   // Spatial weighting (ref E). false (default) = centre-mask: the colour shift
   // fades from 0 at the strip centre (LED 79/80) to full at the strip ends. true =
