@@ -303,38 +303,178 @@ static inline int sb_edge_msb32(uint32_t v) {
   return 31 - __builtin_clz(v);
 }
 
-// Fixed-point cube-root for x in (0, ~1.1]; x <= 0 returns 0. Seeded from the
-// binary exponent via a 3-entry 2^(r/3) table (seed within a factor 2^(1/3) of
-// the root), then polished with three division-form Newton steps
-// c <- (2c + x/c^2)/3, which converges quadratically from the seed. All SQ15x16.
-static SQ15x16 sb_edge_cbrt(SQ15x16 x) {
+// ---- Range-reduced power LUTs (Task 1: kill the per-pixel transcendentals) ---
+// The OKLab round trip is dominated by three per-pixel power functions: cube-root
+// x^(1/3) (M1 -> LMS'), gamma decode x^2.2 (display -> linear) and gamma encode
+// x^(1/2.2) (linear -> display). Each is evaluated as x^p = 2^(e*p) * m^p over the
+// binary decomposition x = 2^e * m, m in [1,2): the mantissa m^p is read (linearly
+// interpolated) from a smooth 257-entry LUT with NO steep near-zero toe, and
+// 2^(e*p) is a 17-entry per-exponent table. This removes the division-Newton cbrt
+// and the log2/exp2 series entirely (no per-pixel divides, no Horner). All tables
+// are static const (flash .rodata; no heap, no RAM churn) — 3288 bytes total.
+// Accuracy is validated against the double-precision OKLab oracle
+// (edgemixer_oklab_probe.cpp) and holds the documented perceptual band.
+
+// cbrt(m), m in [1,2] (Q16). Smooth, no toe -> LUT-accurate.
+static const int32_t kSbOkMantCbrt[257] = {
+  65536, 65621, 65706, 65791, 65876, 65960, 66044, 66128,
+  66212, 66295, 66378, 66462, 66544, 66627, 66710, 66792,
+  66874, 66956, 67037, 67119, 67200, 67281, 67362, 67443,
+  67523, 67603, 67684, 67763, 67843, 67923, 68002, 68081,
+  68160, 68239, 68318, 68396, 68474, 68552, 68630, 68708,
+  68786, 68863, 68940, 69017, 69094, 69171, 69247, 69324,
+  69400, 69476, 69552, 69627, 69703, 69778, 69853, 69928,
+  70003, 70078, 70153, 70227, 70301, 70375, 70449, 70523,
+  70597, 70670, 70743, 70816, 70889, 70962, 71035, 71108,
+  71180, 71252, 71324, 71396, 71468, 71540, 71611, 71683,
+  71754, 71825, 71896, 71967, 72038, 72108, 72179, 72249,
+  72319, 72389, 72459, 72529, 72598, 72668, 72737, 72806,
+  72875, 72944, 73013, 73082, 73150, 73219, 73287, 73355,
+  73423, 73491, 73559, 73627, 73694, 73762, 73829, 73896,
+  73963, 74030, 74097, 74164, 74230, 74297, 74363, 74429,
+  74495, 74561, 74627, 74693, 74759, 74824, 74890, 74955,
+  75020, 75085, 75150, 75215, 75280, 75344, 75409, 75473,
+  75537, 75602, 75666, 75730, 75793, 75857, 75921, 75984,
+  76048, 76111, 76174, 76237, 76300, 76363, 76426, 76489,
+  76551, 76614, 76676, 76739, 76801, 76863, 76925, 76987,
+  77049, 77110, 77172, 77233, 77295, 77356, 77417, 77478,
+  77539, 77600, 77661, 77722, 77782, 77843, 77903, 77964,
+  78024, 78084, 78144, 78204, 78264, 78324, 78383, 78443,
+  78503, 78562, 78621, 78681, 78740, 78799, 78858, 78917,
+  78976, 79034, 79093, 79151, 79210, 79268, 79327, 79385,
+  79443, 79501, 79559, 79617, 79674, 79732, 79790, 79847,
+  79905, 79962, 80019, 80077, 80134, 80191, 80248, 80305,
+  80361, 80418, 80475, 80531, 80588, 80644, 80700, 80757,
+  80813, 80869, 80925, 80981, 81037, 81092, 81148, 81204,
+  81259, 81315, 81370, 81426, 81481, 81536, 81591, 81646,
+  81701, 81756, 81811, 81865, 81920, 81975, 82029, 82084,
+  82138, 82192, 82246, 82301, 82355, 82409, 82463, 82516,
+  82570
+};
+
+// m^2.2, m in [1,2] (Q16). Gamma-decode mantissa.
+static const int32_t kSbOkMantDecode[257] = {
+  65536, 66101, 66668, 67237, 67810, 68385, 68963, 69543,
+  70126, 70712, 71300, 71891, 72485, 73081, 73680, 74282,
+  74887, 75494, 76103, 76716, 77331, 77948, 78569, 79192,
+  79818, 80446, 81077, 81711, 82348, 82987, 83629, 84274,
+  84921, 85571, 86224, 86879, 87538, 88198, 88862, 89528,
+  90197, 90869, 91544, 92221, 92901, 93583, 94269, 94957,
+  95648, 96341, 97037, 97736, 98438, 99143, 99850, 100560,
+  101273, 101988, 102706, 103427, 104151, 104878, 105607, 106339,
+  107073, 107811, 108551, 109294, 110040, 110789, 111540, 112294,
+  113051, 113811, 114573, 115338, 116106, 116877, 117651, 118427,
+  119206, 119988, 120773, 121560, 122350, 123144, 123939, 124738,
+  125540, 126344, 127151, 127961, 128773, 129589, 130407, 131228,
+  132052, 132879, 133709, 134541, 135376, 136214, 137055, 137899,
+  138745, 139594, 140446, 141301, 142159, 143020, 143883, 144750,
+  145619, 146491, 147365, 148243, 149124, 150007, 150893, 151782,
+  152674, 153569, 154466, 155367, 156270, 157176, 158085, 158997,
+  159912, 160829, 161750, 162673, 163599, 164528, 165460, 166395,
+  167333, 168273, 169217, 170163, 171112, 172064, 173019, 173977,
+  174938, 175902, 176868, 177837, 178810, 179785, 180763, 181744,
+  182728, 183714, 184704, 185697, 186692, 187690, 188692, 189696,
+  190703, 191713, 192726, 193742, 194760, 195782, 196806, 197834,
+  198864, 199898, 200934, 201973, 203015, 204060, 205108, 206159,
+  207213, 208269, 209329, 210392, 211457, 212526, 213597, 214671,
+  215749, 216829, 217912, 218998, 220087, 221179, 222274, 223372,
+  224473, 225577, 226683, 227793, 228906, 230021, 231140, 232261,
+  233386, 234513, 235644, 236777, 237914, 239053, 240195, 241340,
+  242489, 243640, 244794, 245951, 247111, 248275, 249441, 250610,
+  251782, 252957, 254135, 255316, 256500, 257687, 258877, 260070,
+  261266, 262465, 263667, 264872, 266080, 267291, 268505, 269722,
+  270942, 272165, 273390, 274619, 275851, 277086, 278324, 279565,
+  280809, 282056, 283307, 284560, 285816, 287075, 288337, 289602,
+  290870, 292141, 293416, 294693, 295973, 297256, 298543, 299832,
+  301124
+};
+
+// m^(1/2.2), m in [1,2] (Q16). Gamma-encode mantissa.
+static const int32_t kSbOkMantEncode[257] = {
+  65536, 65652, 65768, 65884, 65999, 66115, 66230, 66345,
+  66459, 66573, 66687, 66801, 66915, 67028, 67141, 67254,
+  67367, 67480, 67592, 67704, 67816, 67927, 68039, 68150,
+  68261, 68371, 68482, 68592, 68702, 68812, 68922, 69031,
+  69140, 69249, 69358, 69467, 69575, 69683, 69791, 69899,
+  70007, 70114, 70221, 70328, 70435, 70542, 70648, 70754,
+  70861, 70966, 71072, 71178, 71283, 71388, 71493, 71598,
+  71702, 71806, 71911, 72015, 72119, 72222, 72326, 72429,
+  72532, 72635, 72738, 72840, 72943, 73045, 73147, 73249,
+  73351, 73452, 73554, 73655, 73756, 73857, 73958, 74058,
+  74159, 74259, 74359, 74459, 74559, 74658, 74758, 74857,
+  74956, 75055, 75154, 75252, 75351, 75449, 75547, 75646,
+  75743, 75841, 75939, 76036, 76133, 76231, 76328, 76424,
+  76521, 76618, 76714, 76810, 76906, 77002, 77098, 77194,
+  77289, 77385, 77480, 77575, 77670, 77765, 77860, 77954,
+  78049, 78143, 78237, 78331, 78425, 78519, 78612, 78706,
+  78799, 78892, 78985, 79078, 79171, 79264, 79356, 79449,
+  79541, 79633, 79725, 79817, 79909, 80001, 80092, 80184,
+  80275, 80366, 80457, 80548, 80639, 80729, 80820, 80910,
+  81001, 81091, 81181, 81271, 81361, 81450, 81540, 81630,
+  81719, 81808, 81897, 81986, 82075, 82164, 82253, 82341,
+  82429, 82518, 82606, 82694, 82782, 82870, 82958, 83045,
+  83133, 83220, 83308, 83395, 83482, 83569, 83656, 83742,
+  83829, 83916, 84002, 84088, 84175, 84261, 84347, 84433,
+  84518, 84604, 84690, 84775, 84861, 84946, 85031, 85116,
+  85201, 85286, 85371, 85456, 85540, 85625, 85709, 85793,
+  85877, 85962, 86045, 86129, 86213, 86297, 86380, 86464,
+  86547, 86631, 86714, 86797, 86880, 86963, 87046, 87128,
+  87211, 87294, 87376, 87458, 87541, 87623, 87705, 87787,
+  87869, 87951, 88032, 88114, 88195, 88277, 88358, 88439,
+  88521, 88602, 88683, 88764, 88844, 88925, 89006, 89086,
+  89167, 89247, 89327, 89408, 89488, 89568, 89648, 89728,
+  89807
+};
+
+// 2^(e/3) for e = -16..0 (Q16), index e + 16.
+static const int32_t kSbOkExpCbrt[17] = {
+  1625, 2048, 2580, 3251, 4096, 5161, 6502, 8192, 10321, 13004, 16384, 20643, 26008, 32768, 41285, 52016, 65536
+};
+
+// 2^(2.2*e) for e = -16..0 (Q16), index e + 16. Underflows to 0 for very dark
+// inputs (x^2.2 is sub-Q16 there), which is the correct near-zero linear value.
+static const int32_t kSbOkExpDecode[17] = {
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7, 32, 147, 676, 3104, 14263, 65536
+};
+
+// 2^(e/2.2) for e = -16..0 (Q16), index e + 16.
+static const int32_t kSbOkExpEncode[17] = {
+  424, 581, 796, 1091, 1495, 2048, 2806, 3846, 5270, 7222, 9897, 13562, 18585, 25467, 34899, 47824, 65536
+};
+
+// Generic x^p via range reduction + mantissa LUT. x in (0, ~1.06]; x <= 0 -> 0.
+// mantLut257 is f(m) over m in [1,2] at 1/256 spacing (Q16); expTab17 is 2^(e*p)
+// for e = -16..0 indexed by (e + 16) (Q16). Linear interpolation on the mantissa;
+// one Q16 multiply folds in the exponent power. Heap-free; no divides.
+static SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
+                               const int32_t* expTab17) {
   int32_t X = x.getInternal();
   if (X <= 0) {
     return SQ15x16(0.0f);
   }
-  // 2^(r/3) * 2^16 for r in {0,1,2}, used to build the seed.
-  static const int32_t kCbrtPow2[3] = {65536, 82570, 104032};
-  const int p = sb_edge_msb32((uint32_t)X);  // 0..16 for x in (0, ~1.1]
-  int e = p - 16;                            // binary exponent of x (<= 0)
-  int eq = e / 3;
-  int er = e - eq * 3;
-  if (er < 0) {  // normalise to er in {0,1,2}, eq = floor(e/3)
-    er += 3;
-    eq -= 1;
+  const int p = sb_edge_msb32((uint32_t)X);  // 0..16 for x in (0, ~1.06]
+  int idxE = (p - 16) + 16;                   // e + 16, e = p - 16 (<= 0)
+  if (idxE < 0) {
+    idxE = 0;
   }
-  int32_t seedInternal = kCbrtPow2[er] >> (-eq);  // eq <= 0 -> shift right by 0..6
-  if (seedInternal <= 0) {
-    seedInternal = 1;
+  if (idxE > 16) {
+    idxE = 16;
   }
-  SQ15x16 c = SQ15x16::fromInternal(seedInternal);
-  const SQ15x16 kThird = SQ15x16(1.0f / 3.0f);
-  const SQ15x16 kTwo = SQ15x16(2.0f);
-  for (int it = 0; it < 3; ++it) {
-    SQ15x16 c2 = c * c;
-    SQ15x16 corr = x / c2;
-    c = (kTwo * c + corr) * kThird;
-  }
-  return c;
+  // mantissa m in [1,2): Q16 in [65536, 131072); fractional part in [0, 65536).
+  int32_t mant = (int32_t)(((uint64_t)(uint32_t)X << 16) >> p);
+  uint32_t frac = (uint32_t)(mant - 65536);   // [0, 65536)
+  uint32_t idx = frac >> 8;                    // 0..255
+  uint32_t sub = frac & 0xFF;                  // interpolation weight 0..255
+  int32_t m0 = mantLut257[idx];
+  int32_t m1 = mantLut257[idx + 1];
+  int32_t mp = m0 + (int32_t)(((int64_t)(m1 - m0) * (int32_t)sub) >> 8);  // Q16
+  int64_t r = ((int64_t)mp * expTab17[idxE]) >> 16;  // fold in 2^(e*p)
+  return SQ15x16::fromInternal((int32_t)r);
+}
+
+// Fixed-point cube-root x^(1/3) for x in (0, ~1.06]; x <= 0 returns 0.
+static SQ15x16 sb_edge_cbrt(SQ15x16 x) {
+  return sb_edge_pow_lut(x, kSbOkMantCbrt, kSbOkExpCbrt);
 }
 
 // Signed cube v^3 (the inverse of the forward cube-root; sign preserved so an
@@ -346,80 +486,14 @@ static SQ15x16 sb_edge_cube(SQ15x16 v) {
   return neg ? -cubed : cubed;
 }
 
-// Fixed-point log2(x) for x in (0, ~1.1]. Range-reduces x = 2^expo * m with the
-// mantissa centred on 1 (m in [1/sqrt2, sqrt2)) so ln(1+f) converges fast, then
-// uses a degree-6 series and rescales by 1/ln2. Callers pre-guard x > 0.
-static SQ15x16 sb_edge_log2(SQ15x16 x) {
-  int32_t X = x.getInternal();
-  if (X <= 0) {
-    return SQ15x16(-31.0f);  // -inf sentinel; never reached via the gamma guards
-  }
-  const int p = sb_edge_msb32((uint32_t)X);
-  int32_t mant = (int32_t)(((uint64_t)(uint32_t)X << 16) >> p);  // m in [1,2) Q16
-  int expo = p - 16;
-  if (mant >= 92682) {  // sqrt(2)*65536 ~= 92681.9 -> centre mantissa on 1.0
-    mant >>= 1;
-    ++expo;
-  }
-  SQ15x16 f = SQ15x16::fromInternal(mant - 65536);  // f in [-0.293, 0.414)
-  // ln(1+f) = f*(1 + f*(-1/2 + f*(1/3 + f*(-1/4 + f*(1/5 + f*(-1/6))))))
-  static const SQ15x16 kC2 = SQ15x16(-1.0f / 2.0f);
-  static const SQ15x16 kC3 = SQ15x16(1.0f / 3.0f);
-  static const SQ15x16 kC4 = SQ15x16(-1.0f / 4.0f);
-  static const SQ15x16 kC5 = SQ15x16(1.0f / 5.0f);
-  static const SQ15x16 kC6 = SQ15x16(-1.0f / 6.0f);
-  static const SQ15x16 kOne = SQ15x16(1.0f);
-  static const SQ15x16 kInvLn2 = SQ15x16(1.4426950409f);
-  SQ15x16 poly = kC5 + f * kC6;
-  poly = kC4 + f * poly;
-  poly = kC3 + f * poly;
-  poly = kC2 + f * poly;
-  poly = kOne + f * poly;
-  SQ15x16 ln = f * poly;
-  return SQ15x16(expo) + ln * kInvLn2;
-}
-
-// Fixed-point 2^y. Splits y = n + f (n = floor(y), f in [0,1)), evaluates 2^f
-// with a degree-5 series (coefficients (ln2)^k/k!), then applies the integer
-// power of two by shifting. n * 65536 (not n << 16) keeps the floor well-defined
-// for negative n without a negative left shift.
-static SQ15x16 sb_edge_exp2(SQ15x16 y) {
-  int32_t Y = y.getInternal();
-  const int n = (int)(Y >> 16);            // arithmetic shift = floor(y)
-  int32_t ff = Y - (n * 65536);            // f in [0,1) Q16, >= 0
-  SQ15x16 f = SQ15x16::fromInternal(ff);
-  static const SQ15x16 kA1 = SQ15x16(0.6931471806f);
-  static const SQ15x16 kA2 = SQ15x16(0.2402265070f);
-  static const SQ15x16 kA3 = SQ15x16(0.0555041087f);
-  static const SQ15x16 kA4 = SQ15x16(0.0096181291f);
-  static const SQ15x16 kA5 = SQ15x16(0.0013333559f);
-  static const SQ15x16 kOne = SQ15x16(1.0f);
-  SQ15x16 poly = kA4 + f * kA5;
-  poly = kA3 + f * poly;
-  poly = kA2 + f * poly;
-  poly = kA1 + f * poly;
-  poly = kOne + f * poly;                  // 2^f
-  int32_t pInternal = poly.getInternal();
-  int32_t rInternal = (n >= 0) ? (pInternal << n) : (pInternal >> (-n));
-  return SQ15x16::fromInternal(rInternal);
-}
-
 // Gamma decode (display, ~sRGB 2.2) -> linear light. x in [0,1]; 0 -> 0.
 static SQ15x16 sb_edge_gamma_decode(SQ15x16 x) {
-  if (x.getInternal() <= 0) {
-    return SQ15x16(0.0f);
-  }
-  static const SQ15x16 kGamma = SQ15x16(2.2f);
-  return sb_edge_exp2(sb_edge_log2(x) * kGamma);
+  return sb_edge_pow_lut(x, kSbOkMantDecode, kSbOkExpDecode);
 }
 
 // Gamma encode: linear light -> display (~sRGB 2.2). x in [0,1]; 0 -> 0.
 static SQ15x16 sb_edge_gamma_encode(SQ15x16 x) {
-  if (x.getInternal() <= 0) {
-    return SQ15x16(0.0f);
-  }
-  static const SQ15x16 kInvGamma = SQ15x16(1.0f / 2.2f);
-  return sb_edge_exp2(sb_edge_log2(x) * kInvGamma);
+  return sb_edge_pow_lut(x, kSbOkMantEncode, kSbOkExpEncode);
 }
 
 // Per-pixel OKLab perceptual hue rotation. The caller (sb_edge_transform) has
