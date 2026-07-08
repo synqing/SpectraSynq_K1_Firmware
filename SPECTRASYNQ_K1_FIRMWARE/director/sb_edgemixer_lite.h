@@ -39,6 +39,28 @@ enum SBEdgeMixerRotationSpace : uint8_t {
   SB_EDGE_ROTATION_OKLAB = 2
 };
 
+// Symmetric dual-edge split (A lane). The EdgeMixer transform normally shifts only
+// the SECONDARY strip; ONE_SIDED keeps that (the certified single-edge default).
+// SPLIT and MIRROR make BOTH edges participate symmetrically about the 79/80
+// centre so neither strip is the untouched one, by baking a SECOND coefficient set
+// for the PRIMARY strip at a mirrored angle — the SAME frozen colour transform,
+// only a different baked angle. The primary set is applied to the primary buffer
+// OUTSIDE the secondary render scope (see sb_edgemixer_lite_apply_primary). The
+// mode's desaturation (satRetain) is shared by both strips; only the rotation
+// angle splits.
+//   ONE_SIDED — secondary theta, primary untouched (DEFAULT; byte-inert: no
+//               primary application, secondary baked at the unchanged angle).
+//   SPLIT     — secondary +theta/2, primary -theta/2 (centred; same edge-to-edge
+//               separation theta, both edges shift equally).
+//   MIRROR    — secondary +theta, primary -theta (wide; full opposite rotations).
+// Rotation modes split meaningfully; SATURATION_VEIL (theta 0) desaturates both
+// strips identically with no hue split.
+enum SBEdgeMixerDualEdge : uint8_t {
+  SB_EDGE_DUAL_ONE_SIDED = 0,
+  SB_EDGE_DUAL_SPLIT = 1,
+  SB_EDGE_DUAL_MIRROR = 2
+};
+
 struct SBEdgeMixerConfig {
   bool enabled;
   SBEdgeMixerMode mode;
@@ -60,11 +82,24 @@ struct SBEdgeMixerConfig {
   // differentiation comes from the per-strip colour difference by physics; the mask
   // only adds along-strip end-emphasis. A bench A/B decides the default.
   bool spatialUniform;
+  // Symmetric dual-edge split (A lane). DEFAULT ONE_SIDED = byte-inert: the primary
+  // strip is untouched and the secondary is baked at the unchanged angle, so the
+  // certified single-edge behaviour is preserved bit-for-bit. SPLIT / MIRROR bake a
+  // second primary-angle coefficient set applied via sb_edgemixer_lite_apply_primary().
+  // The default member initialiser guarantees every construction path defaults to
+  // ONE_SIDED even where fields are set individually; sanitised again on set.
+  SBEdgeMixerDualEdge dualEdge = SB_EDGE_DUAL_ONE_SIDED;
 };
 
 SBEdgeMixerConfig sb_edgemixer_lite_config();
 void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config);
 void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixerConfig& config);
+// Apply the PRIMARY-edge transform (dual-edge SPLIT / MIRROR only) to the primary
+// strip buffer, using the second config-time-baked coefficient set at the mirrored
+// angle. No-op when config.dualEdge == ONE_SIDED. MUST be called OUTSIDE the
+// secondary render scope, on the primary strip's own buffer. Same frozen per-pixel
+// transform as sb_edgemixer_lite_apply — only the baked angle differs.
+void sb_edgemixer_lite_apply_primary(CRGB16* primary, uint16_t count, const SBEdgeMixerConfig& config);
 
 #ifdef SB_EDGEMIXER_HOST_TEST
 // Host-only parity-test hooks (compiled out of every production/device build;

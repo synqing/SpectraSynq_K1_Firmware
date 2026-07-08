@@ -82,6 +82,23 @@ static SQ15x16 sb_edge_oklab_fmat[9] = {
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
 };
 
+// PRIMARY-edge coefficient sets (dual-edge SPLIT / MIRROR, A lane). A SECOND bake
+// of the SAME colour transform at the mirrored primary angle, applied to the
+// primary strip by sb_edgemixer_lite_apply_primary(). Baked by set_config() only
+// when a dual-edge mode is active; sb_edge_dual_active gates whether the primary
+// transform runs at all. Initialised to identity so any pre-bake read is a no-op.
+static SQ15x16 sb_edge_matrix_primary[9] = {
+  SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
+  SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
+  SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
+};
+static SQ15x16 sb_edge_oklab_fmat_primary[9] = {
+  SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
+  SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
+  SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
+};
+static bool sb_edge_dual_active = false;  // true when dualEdge != ONE_SIDED
+
 static SBEdgeMixerMode sb_edge_mode_or_off(SBEdgeMixerMode mode) {
   switch (mode) {
     case SB_EDGE_MIXER_OFF:
@@ -126,7 +143,7 @@ static uint8_t sb_edge_sat_scale(uint8_t spreadDegrees) {
 // config time only, never in the render path.
 static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees,
                                      SBEdgeMixerRotationSpace rotationSpace,
-                                     SQ15x16* outMatrix) {
+                                     float angleFactor, SQ15x16* outMatrix) {
   // LUMA_PRESERVING is NOT a different matrix — the config-time rotation matrix is
   // identical for both rotation spaces. It is implemented as a per-pixel luma
   // rescale in sb_edge_transform() at render time (see the lumaPreserve branch),
@@ -164,6 +181,13 @@ static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees
     default:
       break;  // Identity retained.
   }
+
+  // Dual-edge angle split (A lane): scale the rotation angle by angleFactor
+  // (secondary vs primary get +/- fractions of theta). angleFactor == 1.0f leaves
+  // theta bit-for-bit unchanged (x1.0f is exact), so the single-edge default bakes
+  // the identical golden matrix. satRetain (below) is NOT scaled — desaturation is
+  // shared by both strips; only the rotation angle splits.
+  theta *= angleFactor;
 
   if (theta != 0.0f) {
     const float cosT = cosf(theta);
@@ -620,7 +644,7 @@ static CRGB16 sb_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
 // here at config time only, never in the render path. At theta 0 / satRetain 1,
 // R = I and F = invM2 . M2 = I (the round-trip identity).
 static void sb_edge_recompute_oklab(SBEdgeMixerMode mode, uint8_t spreadDegrees,
-                                    SQ15x16* outF) {
+                                    float angleFactor, SQ15x16* outF) {
   float theta = 0.0f;
   float satRetain = 1.0f;
 
@@ -651,6 +675,13 @@ static void sb_edge_recompute_oklab(SBEdgeMixerMode mode, uint8_t spreadDegrees,
     default:
       break;  // identity (F = I)
   }
+
+  // Dual-edge angle split (A lane): scale the rotation angle by angleFactor before
+  // baking the fused map. angleFactor == 1.0f leaves theta bit-for-bit unchanged
+  // (x1.0f is exact), so the single-edge default bakes the identical certified F
+  // (no colour re-cert). satRetain is NOT scaled — the mode's desaturation is
+  // shared by both strips; only the rotation angle (and its sign) splits.
+  theta *= angleFactor;
 
   const float c = satRetain * cosf(theta);
   const float k = satRetain * sinf(theta);
@@ -806,25 +837,78 @@ void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config) {
       break;
   }
   next.spatialUniform = config.spatialUniform;
+  switch (config.dualEdge) {
+    case SB_EDGE_DUAL_SPLIT:
+      next.dualEdge = SB_EDGE_DUAL_SPLIT;
+      break;
+    case SB_EDGE_DUAL_MIRROR:
+      next.dualEdge = SB_EDGE_DUAL_MIRROR;
+      break;
+    case SB_EDGE_DUAL_ONE_SIDED:
+    default:
+      next.dualEdge = SB_EDGE_DUAL_ONE_SIDED;
+      break;
+  }
 
-  // Recompute the colour matrix (SUM/LUMA paths) AND the OKLab fused LMS' map
-  // (OKLAB path) from the validated mode + spread OUTSIDE the critical section
-  // (float maths must not run under portMUX), then publish the config, matrix and
-  // fused map together atomically. The matrix is the same for every rotation
-  // space; OKLAB reads its own fused F instead.
+  // Per-strip rotation-angle factors for the dual-edge split (A lane):
+  //   ONE_SIDED — secondary x1.0 (unchanged / certified), primary not applied.
+  //   SPLIT     — secondary x+0.5, primary x-0.5 (centred; edge-to-edge span theta).
+  //   MIRROR    — secondary x+1.0, primary x-1.0 (full opposite rotations).
+  // ONE_SIDED and MIRROR keep the secondary factor at 1.0, so the certified
+  // secondary bake stays bit-for-bit; SPLIT deliberately halves the secondary too.
+  float sec_factor = 1.0f;
+  float pri_factor = -1.0f;
+  const bool primary_active = (next.dualEdge != SB_EDGE_DUAL_ONE_SIDED);
+  if (next.dualEdge == SB_EDGE_DUAL_SPLIT) {
+    sec_factor = 0.5f;
+    pri_factor = -0.5f;
+  }
+
+  // Recompute the SECONDARY colour matrix + OKLab fused map (as before) and — when a
+  // dual-edge mode is active — a SECOND PRIMARY set at the mirrored angle. Float
+  // maths runs OUTSIDE the critical section, then all publish atomically. The matrix
+  // is the same for every rotation space; OKLAB reads its own fused F. angleFactor
+  // 1.0f leaves the secondary bake byte-identical to the certified single-edge path.
   SQ15x16 next_matrix[9];
   sb_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
-                           next_matrix);
+                           sec_factor, next_matrix);
   SQ15x16 next_oklab_f[9];
-  sb_edge_recompute_oklab(next.mode, next.spreadDegrees, next_oklab_f);
+  sb_edge_recompute_oklab(next.mode, next.spreadDegrees, sec_factor, next_oklab_f);
+
+  SQ15x16 next_matrix_primary[9];
+  SQ15x16 next_oklab_f_primary[9];
+  if (primary_active) {
+    sb_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
+                             pri_factor, next_matrix_primary);
+    sb_edge_recompute_oklab(next.mode, next.spreadDegrees, pri_factor,
+                            next_oklab_f_primary);
+  }
 
   portENTER_CRITICAL(&sb_edge_config_mux);
   sb_edge_config = next;
   for (int i = 0; i < 9; ++i) {
     sb_edge_matrix[i] = next_matrix[i];
     sb_edge_oklab_fmat[i] = next_oklab_f[i];
+    if (primary_active) {
+      sb_edge_matrix_primary[i] = next_matrix_primary[i];
+      sb_edge_oklab_fmat_primary[i] = next_oklab_f_primary[i];
+    }
   }
+  sb_edge_dual_active = primary_active;
   portEXIT_CRITICAL(&sb_edge_config_mux);
+}
+
+// Shared per-pixel application loop over a snapshotted coefficient set (matrix for
+// SUM/LUMA, fmat for OKLAB). Centre-mask (79/80 outward) unless spatialUniform.
+static void sb_edge_apply_run(CRGB16* buf, uint16_t count,
+                              const SBEdgeMixerConfig& config, float strength,
+                              const SQ15x16* matrix, const SQ15x16* fmat) {
+  const SBEdgeMixerRotationSpace space = config.rotationSpace;
+  for (uint16_t i = 0; i < count; i++) {
+    float amount = config.spatialUniform ? strength
+                                         : strength * sb_edge_mask(i, count);
+    buf[i] = sb_edge_mix(buf[i], matrix, amount, space, fmat);
+  }
 }
 
 void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixerConfig& config) {
@@ -838,9 +922,9 @@ void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixe
     return;
   }
 
-  // Snapshot the config-time matrix atomically. It is keyed on the stored
-  // mode + spread; the only per-frame delta from the stored config is strength
-  // (see sb_visual_hooks_apply_edge_config), which does not affect the matrix.
+  // Snapshot the config-time SECONDARY matrix + fused map atomically. Keyed on the
+  // stored mode + spread; the only per-frame delta is strength (see
+  // sb_visual_hooks_apply_edge_config), which does not affect the coefficients.
   SQ15x16 matrix[9];
   SQ15x16 oklabF[9];
   portENTER_CRITICAL(&sb_edge_config_mux);
@@ -850,12 +934,39 @@ void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixe
   }
   portEXIT_CRITICAL(&sb_edge_config_mux);
 
-  const SBEdgeMixerRotationSpace space = config.rotationSpace;
-  for (uint16_t i = 0; i < count; i++) {
-    float amount = config.spatialUniform ? strength
-                                         : strength * sb_edge_mask(i, count);
-    secondary[i] = sb_edge_mix(secondary[i], matrix, amount, space, oklabF);
+  sb_edge_apply_run(secondary, count, config, strength, matrix, oklabF);
+}
+
+void sb_edgemixer_lite_apply_primary(CRGB16* primary, uint16_t count, const SBEdgeMixerConfig& config) {
+  SBEdgeMixerMode mode = sb_edge_mode_or_off(config.mode);
+  if (primary == nullptr || !config.enabled || mode == SB_EDGE_MIXER_OFF ||
+      config.dualEdge == SB_EDGE_DUAL_ONE_SIDED) {
+    return;  // ONE_SIDED (or disabled) leaves the primary strip untouched.
   }
+
+  float strength = sb_edge_clamp_float01(config.strength);
+  if (strength <= 0.0f) {
+    return;
+  }
+
+  // Snapshot the PRIMARY coefficient set + the dual-active flag atomically. If no
+  // dual bake has been published yet (config says dual but set_config has not run),
+  // fail closed and leave the primary untouched.
+  SQ15x16 matrix[9];
+  SQ15x16 oklabF[9];
+  bool active;
+  portENTER_CRITICAL(&sb_edge_config_mux);
+  active = sb_edge_dual_active;
+  for (int i = 0; i < 9; ++i) {
+    matrix[i] = sb_edge_matrix_primary[i];
+    oklabF[i] = sb_edge_oklab_fmat_primary[i];
+  }
+  portEXIT_CRITICAL(&sb_edge_config_mux);
+  if (!active) {
+    return;
+  }
+
+  sb_edge_apply_run(primary, count, config, strength, matrix, oklabF);
 }
 
 #ifdef SB_EDGEMIXER_HOST_TEST
