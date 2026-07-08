@@ -65,7 +65,6 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_effect_registry",
             "k1_vp_motion_lab",
             "k1_wireless_ab_probe",
-            "k1_prod_im73d",  # IM73D PDM on the main/prod K1 LED map (6/7)
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",
@@ -101,6 +100,14 @@ BLOCKED_UPLOAD_ENVS: dict[str, str] = {
     "k1_sample_rate_32k_spike": (
         "32 kHz spike is build-only until acquisition-only, AP/VP, "
         "calibration, and watchdog gates are explicitly re-opened"
+    ),
+    "k1_prod_im73d": (
+        "production IM73D env inherits the k1_hardware production LED GPIO map "
+        "(6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A "
+        "2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. "
+        "Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed "
+        "un-block) after the forensic root-cause of the bench audio+LED corruption. "
+        "Unblock only when a correctly-wired production IM73D unit exists."
     ),
 }
 
