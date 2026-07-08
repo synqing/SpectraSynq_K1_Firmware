@@ -32,9 +32,16 @@ struct SBEdgeMixerConfig {
   // and SATURATION_VEIL / TRIADIC / TETRADIC desaturation retention, mirroring
   // the LightwaveOS EdgeMixer source. Clamped to [0, 60] on set.
   uint8_t spreadDegrees;
-  // Rotation space (default SUM_PRESERVING). LUMA_PRESERVING is Tier-1b and
-  // falls back to SUM_PRESERVING until its own oracle exists.
+  // Rotation space (default SUM_PRESERVING). LUMA_PRESERVING (ref C) rescales each
+  // rotated pixel to the input's BT.601 luma at render time (see sb_edge_transform);
+  // the 'u' hotkey selects it.
   SBEdgeMixerRotationSpace rotationSpace;
+  // Spatial weighting (ref E). false (default) = centre-mask: the colour shift
+  // fades from 0 at the strip centre (LED 79/80) to full at the strip ends. true =
+  // uniform: the shift is applied evenly across the strip. Edge-to-edge LGP
+  // differentiation comes from the per-strip colour difference by physics; the mask
+  // only adds along-strip end-emphasis. A bench A/B decides the default.
+  bool spatialUniform;
 };
 
 SBEdgeMixerConfig sb_edgemixer_lite_config();

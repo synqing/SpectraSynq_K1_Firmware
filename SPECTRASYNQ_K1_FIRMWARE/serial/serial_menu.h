@@ -718,6 +718,8 @@ void sb_print_edge_status() {
   USBSerial.println((int)edge.spreadDegrees);
   USBSerial.print("EDGE_ROTATION: ");
   USBSerial.println(sb_edge_rotation_name(edge.rotationSpace));
+  USBSerial.print("EDGE_SPATIAL: ");
+  USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
   tx_end();
 }
 
@@ -781,6 +783,16 @@ void serial_edge_toggle_rotation() {
   tx_begin();
   USBSerial.print("EDGE_ROTATION: ");
   USBSerial.println(sb_edge_rotation_name(e.rotationSpace));
+  tx_end();
+}
+
+void serial_edge_toggle_uniform() {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  e.spatialUniform = !e.spatialUniform;  // ref E: centre-masked <-> uniform
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_SPATIAL: ");
+  USBSerial.println(e.spatialUniform ? "uniform" : "masked");
   tx_end();
 }
 

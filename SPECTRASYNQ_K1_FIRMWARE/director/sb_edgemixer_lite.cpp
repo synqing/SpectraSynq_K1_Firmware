@@ -44,7 +44,8 @@ static SBEdgeMixerConfig sb_edge_config = {
   SB_EDGE_MIXER_OFF,
   0.0f,
   0,
-  SB_EDGE_ROTATION_SUM_PRESERVING
+  SB_EDGE_ROTATION_SUM_PRESERVING,
+  false  // spatialUniform: default = centre-masked (ref E)
 };
 static portMUX_TYPE sb_edge_config_mux = portMUX_INITIALIZER_UNLOCKED;
 
@@ -290,6 +291,7 @@ void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config) {
       (config.rotationSpace == SB_EDGE_ROTATION_LUMA_PRESERVING)
           ? SB_EDGE_ROTATION_LUMA_PRESERVING
           : SB_EDGE_ROTATION_SUM_PRESERVING;
+  next.spatialUniform = config.spatialUniform;
 
   // Recompute the colour matrix from the validated mode + spread OUTSIDE the
   // critical section (float trig must not run under portMUX), then publish the
@@ -330,7 +332,8 @@ void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixe
   const bool lumaPreserve =
       (config.rotationSpace == SB_EDGE_ROTATION_LUMA_PRESERVING);
   for (uint16_t i = 0; i < count; i++) {
-    float amount = strength * sb_edge_mask(i, count);
+    float amount = config.spatialUniform ? strength
+                                         : strength * sb_edge_mask(i, count);
     secondary[i] = sb_edge_mix(secondary[i], matrix, amount, lumaPreserve);
   }
 }
@@ -382,6 +385,7 @@ void sb_edgemixer_ab_demo_tick() {
   cfg.strength = 1.0f;
   cfg.spreadDegrees = 30;
   cfg.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+  cfg.spatialUniform = false;
   sb_edgemixer_lite_set_config(cfg);
 }
 #endif
