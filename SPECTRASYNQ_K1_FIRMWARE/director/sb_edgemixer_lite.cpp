@@ -102,9 +102,10 @@ static uint8_t sb_edge_sat_scale(uint8_t spreadDegrees) {
 static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees,
                                      SBEdgeMixerRotationSpace rotationSpace,
                                      SQ15x16* outMatrix) {
-  // TODO Tier-1b: LUMA_PRESERVING is not implemented. It requires its own design
-  // plus a luma-band oracle before it may ship, so it currently falls back to the
-  // proven SUM_PRESERVING rotation. Do NOT add unproven luma maths here.
+  // LUMA_PRESERVING is NOT a different matrix — the config-time rotation matrix is
+  // identical for both rotation spaces. It is implemented as a per-pixel luma
+  // rescale in sb_edge_transform() at render time (see the lumaPreserve branch),
+  // so this config-time compute deliberately ignores rotationSpace.
   (void)rotationSpace;
 
   float mat[9] = {1, 0, 0,  0, 1, 0,  0, 0, 1};
@@ -198,7 +199,7 @@ static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees
 // reference whose input was 8-bit CRGB. FixedPoints SQ15x16 operator* accumulates
 // through a 64-bit intermediate (SFixed<30,32>), so this matrix multiply cannot
 // overflow at these coefficient/channel ranges.
-static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix) {
+static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix, bool lumaPreserve) {
   // Near-black passthrough (mirror the source's maxC < 2 skip).
   SQ15x16 maxc = color.r;
   if (color.g > maxc) {
@@ -219,6 +220,31 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix) {
   out.r = sb_edge_clamp01((matrix[0] * r) + (matrix[1] * g) + (matrix[2] * b));
   out.g = sb_edge_clamp01((matrix[3] * r) + (matrix[4] * g) + (matrix[5] * b));
   out.b = sb_edge_clamp01((matrix[6] * r) + (matrix[7] * g) + (matrix[8] * b));
+
+  // Tier-1b LUMA_PRESERVING (SB_EDGE_ROTATION_LUMA_PRESERVING): the grey-axis
+  // rotation conserves the naive R+G+B sum, NOT perceptual luma, so a hue rotation
+  // lurches brightness (e.g. pure red Y'601=0.299 -> pure green 0.587, ~doubling).
+  // Rescale the rotated pixel so its BT.601 luma matches the INPUT's. Uniform
+  // scaling preserves hue + saturation exactly; only brightness moves. Cost:
+  // 2 dot products + 1 divide + 3 muls per pixel, OFF by default. Caveats (per the
+  // edgemixer port plan ref C, verified by adversarial DSP review): (a) the
+  // near-black divide guard below is mandatory; (b) a scale-UP toward a
+  // higher-luma hue can push a channel past 1.0 and clip — the clamp accepts that
+  // graceful desaturation rather than a full OKLCH colour-space round trip, which
+  // would cost ~20-47% of the 2.0 ms frame budget on Core 1.
+  if (lumaPreserve) {
+    const SQ15x16 Lr = SQ15x16(0.299f);
+    const SQ15x16 Lg = SQ15x16(0.587f);
+    const SQ15x16 Lb = SQ15x16(0.114f);
+    SQ15x16 yIn = (Lr * r) + (Lg * g) + (Lb * b);
+    SQ15x16 yOut = (Lr * out.r) + (Lg * out.g) + (Lb * out.b);
+    if (yOut > SB_EDGE_NEAR_BLACK) {  // guard: never divide by a ~zero rotated luma
+      SQ15x16 scale = yIn / yOut;
+      out.r = sb_edge_clamp01(out.r * scale);
+      out.g = sb_edge_clamp01(out.g * scale);
+      out.b = sb_edge_clamp01(out.b * scale);
+    }
+  }
   return out;
 }
 
@@ -227,9 +253,9 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix) {
 // this returns the pure transform (the golden-validated endpoint) exactly; at
 // amount = 0 it returns the original untouched. Near-black pixels are preserved
 // at every amount because their transform is a passthrough.
-static CRGB16 sb_edge_mix(CRGB16 color, const SQ15x16* matrix, float amount) {
+static CRGB16 sb_edge_mix(CRGB16 color, const SQ15x16* matrix, float amount, bool lumaPreserve) {
   SQ15x16 a = SQ15x16(sb_edge_clamp_float01(amount));
-  CRGB16 transformed = sb_edge_transform(color, matrix);
+  CRGB16 transformed = sb_edge_transform(color, matrix, lumaPreserve);
 
   if (a >= SQ15x16(1.0f)) {
     return transformed;  // Exact endpoint — no blend rounding.
@@ -301,9 +327,11 @@ void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixe
   }
   portEXIT_CRITICAL(&sb_edge_config_mux);
 
+  const bool lumaPreserve =
+      (config.rotationSpace == SB_EDGE_ROTATION_LUMA_PRESERVING);
   for (uint16_t i = 0; i < count; i++) {
     float amount = strength * sb_edge_mask(i, count);
-    secondary[i] = sb_edge_mix(secondary[i], matrix, amount);
+    secondary[i] = sb_edge_mix(secondary[i], matrix, amount, lumaPreserve);
   }
 }
 
