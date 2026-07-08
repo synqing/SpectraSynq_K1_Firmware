@@ -38,11 +38,11 @@ compared states). Captain eyes-on verdict:
 
 | Decision | Verdict | Locked default |
 |---|---|---|
-| Topology (one_sided / split / mirror @ triadic) | **split** | `dualEdge = SB_EDGE_DUAL_SPLIT` |
-| Lightness (faithful vs oklab, saturated complementary) | **oklab** (desaturation trade judged acceptable) | `rotationSpace = SB_EDGE_ROTATION_OKLAB` |
+| Topology (one_sided / split / mirror @ triadic) | **split** | `dualEdge = K1_EDGE_DUAL_SPLIT` |
+| Lightness (faithful vs oklab, saturated complementary) | **oklab** (desaturation trade judged acceptable) | `rotationSpace = K1_EDGE_ROTATION_OKLAB` |
 | E spatial (uniform vs masked) | **masked** (provisional; runtime-switchable) | `spatialUniform = false` (already the default) |
 
-Defaults locked in `director/sb_edgemixer_lite.cpp` (`sb_edge_config`); `enabled=false` stays byte-inert
+Defaults locked in `director/k1_edgemixer.cpp` (`k1_edge_config`); `enabled=false` stays byte-inert
 until turned on, so the device still boots with EdgeMixer off. Hardware-attested on reflash: boot
 `:edge_status` = ROTATION oklab / DUAL split / SPATIAL masked; `VERIFY_RESULT=PASS`. Anti-circularity
 honoured — the plate, not the CIELAB metric, was the arbiter; the metric (drift 48/21/0.6) set the
@@ -56,4 +56,4 @@ Also closed the `edge_mode=` collapse-warning gap: setting mode=complementary wh
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-09 | agent:opus-4-8 | Created. Gate-1 on-device timing evidence (was in the handover/session, now committed to the branch per Captain's evidence-hygiene note). |
-| 2026-07-09 | agent:opus-4-8 | Gate-2 plate A/B SATISFIED — Captain verdict split/oklab/masked; defaults locked in sb_edge_config (hardware-attested B489A500); edge_mode= collapse-warning gap closed. |
+| 2026-07-09 | agent:opus-4-8 | Gate-2 plate A/B SATISFIED — Captain verdict split/oklab/masked; defaults locked in k1_edge_config (hardware-attested B489A500); edge_mode= collapse-warning gap closed. |

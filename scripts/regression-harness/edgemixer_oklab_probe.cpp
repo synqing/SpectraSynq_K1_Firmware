@@ -1,8 +1,8 @@
 // ============================================================================
-// EdgeMixer SB_EDGE_ROTATION_OKLAB perceptual-rotation acceptance oracle.
+// EdgeMixer K1_EDGE_ROTATION_OKLAB perceptual-rotation acceptance oracle.
 //
 // Drives the REAL firmware colour maths
-// (SPECTRASYNQ_K1_FIRMWARE/director/sb_edgemixer_lite.cpp) on a desktop host in
+// (SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.cpp) on a desktop host in
 // the OKLAB rotation space and proves the fixed-point (SQ15x16) OKLab hue
 // rotation reproduces an INDEPENDENT double-precision, textbook-OKLab oracle
 // within a documented PERCEPTUAL band. This is deliberately NOT the +/-1 LSB
@@ -39,7 +39,7 @@
 // British English throughout. Emits "KEY value" lines for the pytest driver.
 // ============================================================================
 
-#include "sb_edgemixer_lite.h"  // real module header (pulls the host shim constants.h)
+#include "k1_edgemixer.h"  // real module header (pulls the host shim constants.h)
 
 #include <cmath>
 #include <cstdint>
@@ -98,7 +98,7 @@ Lab displayToCielab(double r, double g, double b) {
   return o;
 }
 
-// OKLab (L, a, b) -> linear RGB (double), mirroring sb_edge_oklab_to_linear.
+// OKLab (L, a, b) -> linear RGB (double), mirroring k1_edge_oklab_to_linear.
 void refOklabToLinear(double L, double a, double b, double* rl, double* gl,
                       double* bl) {
   const double lp = L + 0.3963377774 * a + 0.2158037573 * b;
@@ -110,7 +110,7 @@ void refOklabToLinear(double L, double a, double b, double* rl, double* gl,
   *bl = -0.0041960863 * ll - 0.7034186147 * ml + 1.7076147010 * sl;
 }
 
-// Constant-L chroma-reduction gamut scale (double), mirroring sb_edge_gamut_scale.
+// Constant-L chroma-reduction gamut scale (double), mirroring k1_edge_gamut_scale.
 double refGamutScale(double L, double rl, double gl, double bl) {
   const double g = L * L * L;
   const double v[3] = {rl, gl, bl};
@@ -178,7 +178,7 @@ void refTransform(double r, double g, double b, double c, double k,
 }
 
 // Per-mode (c, k) = (satRetain*cos(theta), satRetain*sin(theta)). Mirrors
-// sb_edge_recompute_oklab, including the integer veil sat-scale.
+// k1_edge_recompute_oklab, including the integer veil sat-scale.
 void modeCK(int mode, int spread, double* c, double* k) {
   double theta = 0.0, sat = 1.0;
   switch (mode) {
@@ -218,14 +218,14 @@ void modeCK(int mode, int spread, double* c, double* k) {
 // Index 0 of a NATIVE_RESOLUTION buffer has centre-mask == |0 - 79.5|/79.5 == 1.0,
 // so this exercises the pure transform through the shipping apply() path.
 CRGB16 engineApply(int mode, int spread, double r, double g, double b) {
-  SBEdgeMixerConfig cfg;
+  K1EdgeMixerConfig cfg;
   cfg.enabled = true;
-  cfg.mode = static_cast<SBEdgeMixerMode>(mode);
+  cfg.mode = static_cast<K1EdgeMixerMode>(mode);
   cfg.strength = 1.0f;
   cfg.spreadDegrees = static_cast<uint8_t>(spread);
-  cfg.rotationSpace = SB_EDGE_ROTATION_OKLAB;
+  cfg.rotationSpace = K1_EDGE_ROTATION_OKLAB;
   cfg.spatialUniform = false;
-  sb_edgemixer_lite_set_config(cfg);
+  k1_edgemixer_set_config(cfg);
 
   static CRGB16 buf[NATIVE_RESOLUTION];
   for (int i = 0; i < NATIVE_RESOLUTION; ++i) {
@@ -236,7 +236,7 @@ CRGB16 engineApply(int mode, int spread, double r, double g, double b) {
   buf[0].r = SQ15x16(static_cast<float>(r));
   buf[0].g = SQ15x16(static_cast<float>(g));
   buf[0].b = SQ15x16(static_cast<float>(b));
-  sb_edgemixer_lite_apply(buf, NATIVE_RESOLUTION, sb_edgemixer_lite_config());
+  k1_edgemixer_apply(buf, NATIVE_RESOLUTION, k1_edgemixer_config());
   return buf[0];
 }
 

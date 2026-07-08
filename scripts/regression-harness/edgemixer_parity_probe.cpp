@@ -2,15 +2,15 @@
 // EdgeMixer -> K1 colour-port parity probe (Step 1 acceptance oracle).
 //
 // Compiles and drives the REAL firmware colour maths
-// (SPECTRASYNQ_K1_FIRMWARE/director/sb_edgemixer_lite.cpp) on a desktop host and
+// (SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.cpp) on a desktop host and
 // proves it reproduces the frozen LightwaveOS EdgeMixer golden vectors within
 // +/-1 LSB per channel. There is NO Python (or probe-side) re-implementation of
-// the transform — the probe calls sb_edgemixer_lite_apply() itself, so the test
+// the transform — the probe calls k1_edgemixer_apply() itself, so the test
 // cannot drift from the firmware.
 //
 // Faithful mirror of the golden reference pipeline (refApply):
 //   golden uint8 input --(/255, round)--> SQ15x16 0..1
-//     -> REAL sb_edgemixer_lite_apply() at full strength, analytic mask == 1.0,
+//     -> REAL k1_edgemixer_apply() at full strength, analytic mask == 1.0,
 //        no audio (mode/spread from the golden row)
 //     -> SQ15x16 0..1 --(*255, round)--> uint8, compared to golden output.
 //
@@ -21,9 +21,9 @@
 // British English throughout. Emits "key value" lines for the pytest driver.
 // ============================================================================
 
-#define SB_EDGEMIXER_HOST_TEST 1  // expose the get/set matrix parity hooks
+#define K1_EDGEMIXER_HOST_TEST 1  // expose the get/set matrix parity hooks
 
-#include "sb_edgemixer_lite.h"  // real module header (pulls shim constants.h)
+#include "k1_edgemixer.h"  // real module header (pulls shim constants.h)
 
 #include <cstdint>
 #include <cstdio>
@@ -67,22 +67,22 @@ int maxOf3(int a, int b, int c) {
 }
 
 // Drive the REAL apply() for a single probe colour at amount == 1.0.
-CRGB16 applyOne(const SBEdgeMixerConfig& cfg, uint8_t r, uint8_t g, uint8_t b) {
+CRGB16 applyOne(const K1EdgeMixerConfig& cfg, uint8_t r, uint8_t g, uint8_t b) {
   static CRGB16 buf[NATIVE_RESOLUTION];  // all-zero (near-black) except index 0
   buf[0].r = SQ15x16::fromInternal(toQ16(r));
   buf[0].g = SQ15x16::fromInternal(toQ16(g));
   buf[0].b = SQ15x16::fromInternal(toQ16(b));
-  sb_edgemixer_lite_apply(buf, NATIVE_RESOLUTION, cfg);
+  k1_edgemixer_apply(buf, NATIVE_RESOLUTION, cfg);
   return buf[0];
 }
 
-SBEdgeMixerConfig makeConfig(int mode, int spread) {
-  SBEdgeMixerConfig cfg;
+K1EdgeMixerConfig makeConfig(int mode, int spread) {
+  K1EdgeMixerConfig cfg;
   cfg.enabled = true;
-  cfg.mode = static_cast<SBEdgeMixerMode>(mode);
+  cfg.mode = static_cast<K1EdgeMixerMode>(mode);
   cfg.strength = 1.0f;
   cfg.spreadDegrees = static_cast<uint8_t>(spread);
-  cfg.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+  cfg.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
   return cfg;
 }
 
@@ -132,9 +132,9 @@ int main(int argc, char** argv) {
   int worst = 0, worstMode = 0, worstSpread = 0;
   int nearChecked = 0, nearFail = 0;
   for (const GoldenRow& row : rows) {
-    SBEdgeMixerConfig cfg = makeConfig(row.mode, row.spread);
-    sb_edgemixer_lite_set_config(cfg);
-    CRGB16 out = applyOne(sb_edgemixer_lite_config(), row.in_r, row.in_g, row.in_b);
+    K1EdgeMixerConfig cfg = makeConfig(row.mode, row.spread);
+    k1_edgemixer_set_config(cfg);
+    CRGB16 out = applyOne(k1_edgemixer_config(), row.in_r, row.in_g, row.in_b);
 
     int dr = absDelta(toU8(out.r), row.out_r);
     int dg = absDelta(toU8(out.g), row.out_g);
@@ -159,18 +159,18 @@ int main(int argc, char** argv) {
   // TRIADIC / spread 0 is a clean RGB permutation; perturbing M[0] (out_r from
   // in_r) shifts the red probe's output by ~4 LSB. A harness that cannot fail on
   // an injected fault is worthless, so we exercise that failure directly.
-  const int faultMode = static_cast<int>(SB_EDGE_MIXER_TRIADIC);
+  const int faultMode = static_cast<int>(K1_EDGE_MIXER_TRIADIC);
   const int faultSpread = 0;
-  SBEdgeMixerConfig faultCfg = makeConfig(faultMode, faultSpread);
+  K1EdgeMixerConfig faultCfg = makeConfig(faultMode, faultSpread);
 
-  sb_edgemixer_lite_set_config(faultCfg);  // clean matrix in the module
+  k1_edgemixer_set_config(faultCfg);  // clean matrix in the module
   SQ15x16 clean[9];
-  sb_edgemixer_lite_test_get_matrix(clean);
+  k1_edgemixer_test_get_matrix(clean);
 
   int restoredWorst = 0;
   for (const GoldenRow& row : rows) {
     if (row.mode != faultMode || row.spread != faultSpread) continue;
-    CRGB16 out = applyOne(sb_edgemixer_lite_config(), row.in_r, row.in_g, row.in_b);
+    CRGB16 out = applyOne(k1_edgemixer_config(), row.in_r, row.in_g, row.in_b);
     int d = maxOf3(absDelta(toU8(out.r), row.out_r),
                    absDelta(toU8(out.g), row.out_g),
                    absDelta(toU8(out.b), row.out_b));
@@ -180,19 +180,19 @@ int main(int argc, char** argv) {
   SQ15x16 broken[9];
   for (int i = 0; i < 9; ++i) broken[i] = clean[i];
   broken[0] = SQ15x16::fromInternal(clean[0].getInternal() + 4 * 256);  // +4 Q8.8 LSB
-  sb_edgemixer_lite_test_set_matrix(broken);
+  k1_edgemixer_test_set_matrix(broken);
 
   int perturbedWorst = 0;
   for (const GoldenRow& row : rows) {
     if (row.mode != faultMode || row.spread != faultSpread) continue;
-    CRGB16 out = applyOne(sb_edgemixer_lite_config(), row.in_r, row.in_g, row.in_b);
+    CRGB16 out = applyOne(k1_edgemixer_config(), row.in_r, row.in_g, row.in_b);
     int d = maxOf3(absDelta(toU8(out.r), row.out_r),
                    absDelta(toU8(out.g), row.out_g),
                    absDelta(toU8(out.b), row.out_b));
     if (d > perturbedWorst) perturbedWorst = d;
   }
 
-  sb_edgemixer_lite_set_config(faultCfg);  // restore clean state
+  k1_edgemixer_set_config(faultCfg);  // restore clean state
 
   std::printf("PARITY_COUNT %d\n", static_cast<int>(rows.size()));
   std::printf("PARITY_WORST_LSB %d\n", worst);

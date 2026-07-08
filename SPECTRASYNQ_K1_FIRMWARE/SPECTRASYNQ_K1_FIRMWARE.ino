@@ -49,7 +49,7 @@
 #include "sb_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "sb_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
 #include "sb_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
-#include "sb_edgemixer_lite.h" // Smart Visual Engine secondary colour differentiation
+#include "k1_edgemixer.h" // Smart Visual Engine secondary colour differentiation
 #include "sb_visual_hooks.h"  // Smart Visual Engine event-gated visual hooks
 #include "sb_effect_queue.h"  // Effects queuing + preset slots (frame-boundary commit engine)
 #ifdef SB_K1_WIRELESS_ENABLED
@@ -1205,15 +1205,15 @@ void led_thread(void* arg) {
 		      SBSmartDirectorConfig smart_director_config = sb_smart_director_config();
 		      SBVisualHookConfig visual_hook_config = sb_visual_hooks_config();
 		      uint8_t vpab_primary_render_mode = CONFIG.LIGHTSHOW_MODE;
-#ifdef SB_EDGEMIXER_AB_DEMO
+#ifdef K1_EDGEMIXER_AB_DEMO
 		      // BENCH-ONLY: force + cycle the EdgeMixer mode BEFORE the config read
 		      // below, so vpab_edge_base_config picks up the forced config. The only
 		      // later mutation (sb_visual_hooks_apply_edge_config) scales strength
-		      // only, so the forced mode/spread reach sb_edgemixer_lite_apply intact.
-		      sb_edgemixer_ab_demo_tick();
+		      // only, so the forced mode/spread reach k1_edgemixer_apply intact.
+		      k1_edgemixer_ab_demo_tick();
 #endif
-		      SBEdgeMixerConfig vpab_edge_base_config = sb_edgemixer_lite_config();
-		      SBEdgeMixerConfig vpab_edge_effective_config = vpab_edge_base_config;
+		      K1EdgeMixerConfig vpab_edge_base_config = k1_edgemixer_config();
+		      K1EdgeMixerConfig vpab_edge_effective_config = vpab_edge_base_config;
 #ifdef K1_EFFECT_FRAMEWORK_V1
 		      // P6: when the K1-native beat-aware director is enabled (flag-ON,
 		      // opt-in) it OWNS primary mode selection. It un-whitelists across the
@@ -1345,11 +1345,11 @@ void led_thread(void* arg) {
         {
 	          SB_TRACE_SCOPE("vp_secondary_store_clip");
 	          store_render_channel_output(secondary_channel);
-	          SBEdgeMixerConfig edge_config = vpab_edge_base_config;
+	          K1EdgeMixerConfig edge_config = vpab_edge_base_config;
 	          if (edge_config.enabled) {
 	            edge_config = sb_visual_hooks_apply_edge_config(visual_hook_output, edge_config);
 	            vpab_edge_effective_config = edge_config;
-	            sb_edgemixer_lite_apply(leds_16_secondary, NATIVE_RESOLUTION, edge_config);
+	            k1_edgemixer_apply(leds_16_secondary, NATIVE_RESOLUTION, edge_config);
 	          }
           clip_led_values(leds_16_secondary); // Clip the secondary buffer values
         }
@@ -1371,9 +1371,9 @@ void led_thread(void* arg) {
         // lands in the vp_perf.secondary_render bucket (both edge transforms) and the
         // total vp_render_us frame time.
         if (vpab_edge_effective_config.enabled &&
-            vpab_edge_effective_config.dualEdge != SB_EDGE_DUAL_ONE_SIDED) {
+            vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) {
           SB_TRACE_SCOPE("vp_primary_edge");
-          sb_edgemixer_lite_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
+          k1_edgemixer_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
           clip_led_values(leds_16);
         }
 
@@ -1401,7 +1401,7 @@ void led_thread(void* arg) {
 	        uint16_t(constrain(vpab_edge_effective_config.strength, 0.0f, 1.0f) * 1000.0f),
 		        uint8_t(vpab_edge_effective_config.dualEdge),
 		        (vpab_edge_effective_config.enabled &&
-		         vpab_edge_effective_config.dualEdge != SB_EDGE_DUAL_ONE_SIDED) ? uint8_t(1) : uint8_t(0),
+		         vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) ? uint8_t(1) : uint8_t(0),
 	      };
 	      vpab_capture_set_render_context(vpab_context);
 #endif

@@ -36,7 +36,7 @@ WHY THIS HOST-COMPILES (design §2, confirmed by first-hand recon):
       serial/serial_tx.cpp            (tx_begin/tx_end/bad_command/stop_streams)
       serial/serial_parse_helpers.cpp (vp_parse_bool/float, serial_clamp_float)
       director/sb_smart_director.cpp  (sb_smart_director_* config getters/setters)
-      director/sb_edgemixer_lite.cpp  (sb_edgemixer_lite_* config)
+      director/k1_edgemixer.cpp  (k1_edgemixer_* config)
       director/sb_visual_hooks.cpp    (sb_visual_hooks_* config)
       director/sb_mode_selection.cpp  (sb_mode_selection_init)
       control/sb_effect_queue.cpp     (sb_queue_* config)
@@ -127,7 +127,7 @@ MODULE_CPPS = [
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
     "director/sb_smart_director.cpp",
-    "director/sb_edgemixer_lite.cpp",
+    "director/k1_edgemixer.cpp",
     "director/sb_visual_hooks.cpp",
     "director/sb_mode_selection.cpp",
 ]

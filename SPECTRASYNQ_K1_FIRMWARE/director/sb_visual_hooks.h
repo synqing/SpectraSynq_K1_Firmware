@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "render_params.h"
 #include "sb_audio_snapshot.h"
-#include "sb_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 
 struct SBVisualHookConfig {
   bool enabled;
@@ -28,4 +28,4 @@ SBVisualHookConfig sb_visual_hooks_config();
 void sb_visual_hooks_set_config(const SBVisualHookConfig& config);
 SBVisualHookOutput sb_visual_hooks_tick(const SBOnsetBeatEvent& event, uint32_t now_ms);
 void sb_visual_hooks_apply_render_params(const SBVisualHookOutput& output, RenderParams* params);
-SBEdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, SBEdgeMixerConfig config);
+K1EdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, K1EdgeMixerConfig config);

@@ -28,7 +28,7 @@
 #include "EffectRegistry.h" // registry_display_name() (R2b serial name source of truth)
 #endif
 #include "sb_audio_snapshot.h"
-#include "sb_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 #include "sb_mode_selection.h"
 #include "sb_onset_beat.h"
 #include "sb_tempo.h"
@@ -556,52 +556,52 @@ void vp_print_status() {
   tx_end();
 }
 
-const char* sb_edge_mode_name(SBEdgeMixerMode mode) {
+const char* k1_edge_mode_name(K1EdgeMixerMode mode) {
   switch (mode) {
-    case SB_EDGE_MIXER_ANALOGOUS: return "analogous";
-    case SB_EDGE_MIXER_COMPLEMENTARY: return "complementary";
-    case SB_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split";
-    case SB_EDGE_MIXER_SATURATION_VEIL: return "veil";
-    case SB_EDGE_MIXER_TRIADIC: return "triadic";
-    case SB_EDGE_MIXER_TETRADIC: return "tetradic";
-    case SB_EDGE_MIXER_OFF:
+    case K1_EDGE_MIXER_ANALOGOUS: return "analogous";
+    case K1_EDGE_MIXER_COMPLEMENTARY: return "complementary";
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split";
+    case K1_EDGE_MIXER_SATURATION_VEIL: return "veil";
+    case K1_EDGE_MIXER_TRIADIC: return "triadic";
+    case K1_EDGE_MIXER_TETRADIC: return "tetradic";
+    case K1_EDGE_MIXER_OFF:
     default: return "off";
   }
 }
 
-bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode) {
+bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
   if (strcmp(text, "off") == 0) {
-    *out_mode = SB_EDGE_MIXER_OFF;
+    *out_mode = K1_EDGE_MIXER_OFF;
   } else if (strcmp(text, "analogous") == 0) {
-    *out_mode = SB_EDGE_MIXER_ANALOGOUS;
+    *out_mode = K1_EDGE_MIXER_ANALOGOUS;
   } else if (strcmp(text, "complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_COMPLEMENTARY;
   } else if (strcmp(text, "split") == 0 || strcmp(text, "split_complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_SPLIT_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_SPLIT_COMPLEMENTARY;
   } else if (strcmp(text, "veil") == 0 || strcmp(text, "saturation_veil") == 0) {
-    *out_mode = SB_EDGE_MIXER_SATURATION_VEIL;
+    *out_mode = K1_EDGE_MIXER_SATURATION_VEIL;
   } else if (strcmp(text, "triadic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TRIADIC;
+    *out_mode = K1_EDGE_MIXER_TRIADIC;
   } else if (strcmp(text, "tetradic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TETRADIC;
+    *out_mode = K1_EDGE_MIXER_TETRADIC;
   } else {
     return false;
   }
   return true;
 }
 
-const char* sb_edge_rotation_name(SBEdgeMixerRotationSpace space) {
+const char* k1_edge_rotation_name(K1EdgeMixerRotationSpace space) {
   switch (space) {
-    case SB_EDGE_ROTATION_LUMA_PRESERVING: return "luma";
-    case SB_EDGE_ROTATION_OKLAB:           return "oklab";
+    case K1_EDGE_ROTATION_LUMA_PRESERVING: return "luma";
+    case K1_EDGE_ROTATION_OKLAB:           return "oklab";
     default:                               return "faithful";
   }
 }
 
-const char* sb_edge_dual_name(SBEdgeMixerDualEdge dual) {
+const char* k1_edge_dual_name(K1EdgeMixerDualEdge dual) {
   switch (dual) {
-    case SB_EDGE_DUAL_SPLIT:  return "split";
-    case SB_EDGE_DUAL_MIRROR: return "mirror";
+    case K1_EDGE_DUAL_SPLIT:  return "split";
+    case K1_EDGE_DUAL_MIRROR: return "mirror";
     default:                  return "one_sided";
   }
 }
@@ -609,13 +609,13 @@ const char* sb_edge_dual_name(SBEdgeMixerDualEdge dual) {
 // faithful -> SUM_PRESERVING (grey-axis rotation, +/-1 LSB golden parity);
 // luma     -> LUMA_PRESERVING (grey-axis rotation + per-pixel BT.601 luma rescale);
 // oklab    -> OKLAB (perceptual hue rotation in the OKLab a/b plane, holds L constant).
-bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space) {
+bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space) {
   if (strcmp(text, "faithful") == 0 || strcmp(text, "sum") == 0) {
-    *out_space = SB_EDGE_ROTATION_SUM_PRESERVING;
+    *out_space = K1_EDGE_ROTATION_SUM_PRESERVING;
   } else if (strcmp(text, "luma") == 0) {
-    *out_space = SB_EDGE_ROTATION_LUMA_PRESERVING;
+    *out_space = K1_EDGE_ROTATION_LUMA_PRESERVING;
   } else if (strcmp(text, "oklab") == 0) {
-    *out_space = SB_EDGE_ROTATION_OKLAB;
+    *out_space = K1_EDGE_ROTATION_OKLAB;
   } else {
     return false;
   }
@@ -625,13 +625,13 @@ bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_spac
 // one_sided (or one) -> ONE_SIDED (secondary only; certified default);
 // split               -> SPLIT (both edges +/- theta/2 about the 79/80 centre);
 // mirror              -> MIRROR (both edges +/- theta, full opposite rotations).
-bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual) {
+bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual) {
   if (strcmp(text, "one_sided") == 0 || strcmp(text, "one") == 0) {
-    *out_dual = SB_EDGE_DUAL_ONE_SIDED;
+    *out_dual = K1_EDGE_DUAL_ONE_SIDED;
   } else if (strcmp(text, "split") == 0) {
-    *out_dual = SB_EDGE_DUAL_SPLIT;
+    *out_dual = K1_EDGE_DUAL_SPLIT;
   } else if (strcmp(text, "mirror") == 0) {
-    *out_dual = SB_EDGE_DUAL_MIRROR;
+    *out_dual = K1_EDGE_DUAL_MIRROR;
   } else {
     return false;
   }
@@ -641,7 +641,7 @@ bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual) {
 // uniform -> spatialUniform true (shift applied evenly across the strip);
 // masked  -> false (centre-masked: fades from 0 at the 79/80 centre to full at the
 // ends). Ref E. Scriptable counterpart to the 'm' hotkey.
-bool sb_parse_edge_uniform(const char* text, bool* out_uniform) {
+bool k1_parse_edge_uniform(const char* text, bool* out_uniform) {
   if (strcmp(text, "uniform") == 0) {
     *out_uniform = true;
   } else if (strcmp(text, "masked") == 0) {
@@ -750,23 +750,23 @@ void sb_print_smart_status() {
   tx_end();
 }
 
-void sb_print_edge_status() {
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+void k1_print_edge_status() {
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
   tx_begin();
   USBSerial.print("EDGE_ENABLED: ");
   USBSerial.println(vp_bool_text(edge.enabled));
   USBSerial.print("EDGE_MODE: ");
-  USBSerial.println(sb_edge_mode_name(edge.mode));
+  USBSerial.println(k1_edge_mode_name(edge.mode));
   USBSerial.print("EDGE_STRENGTH: ");
   USBSerial.println(edge.strength, 3);
   USBSerial.print("EDGE_SPREAD: ");
   USBSerial.println((int)edge.spreadDegrees);
   USBSerial.print("EDGE_ROTATION: ");
-  USBSerial.println(sb_edge_rotation_name(edge.rotationSpace));
+  USBSerial.println(k1_edge_rotation_name(edge.rotationSpace));
   USBSerial.print("EDGE_SPATIAL: ");
   USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
   USBSerial.print("EDGE_DUAL: ");
-  USBSerial.println(sb_edge_dual_name(edge.dualEdge));
+  USBSerial.println(k1_edge_dual_name(edge.dualEdge));
   tx_end();
 }
 
@@ -774,8 +774,8 @@ void sb_print_edge_status() {
 // SAME hue (2*180 = 360 = 0 separation), collapsing the two edges into one. Honest
 // maths, but a UX trap — so warn (informative, NOT a hard block) whenever a change
 // makes that combo active. Called from the mode + dual-edge change handlers.
-void sb_edge_warn_if_collapsed(const SBEdgeMixerConfig& e) {
-  if (e.dualEdge == SB_EDGE_DUAL_MIRROR && e.mode == SB_EDGE_MIXER_COMPLEMENTARY) {
+void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e) {
+  if (e.dualEdge == K1_EDGE_DUAL_MIRROR && e.mode == K1_EDGE_MIXER_COMPLEMENTARY) {
     tx_begin();
     USBSerial.println("EDGE_WARN: mirror+complementary collapses both edges to the same hue (2x180=0 separation) - use split at complementary, or mirror at analogous/triadic.");
     tx_end();
@@ -783,11 +783,11 @@ void sb_edge_warn_if_collapsed(const SBEdgeMixerConfig& e) {
 }
 
 // --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
-// sb_edgemixer_lite_config()/set_config() and prints only its own new state) ---
+// k1_edgemixer_config()/set_config() and prints only its own new state) ---
 void serial_edge_toggle_enabled() {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   e.enabled = !e.enabled;
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_ENABLED: ");
   USBSerial.println(vp_bool_text(e.enabled));
@@ -795,29 +795,29 @@ void serial_edge_toggle_enabled() {
 }
 
 void serial_edge_cycle_mode() {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   // off -> analogous -> complementary -> split -> veil -> triadic -> tetradic -> off
   uint8_t next = (uint8_t)e.mode + 1;
-  if (next > (uint8_t)SB_EDGE_MIXER_TETRADIC) {
-    next = (uint8_t)SB_EDGE_MIXER_OFF;
+  if (next > (uint8_t)K1_EDGE_MIXER_TETRADIC) {
+    next = (uint8_t)K1_EDGE_MIXER_OFF;
   }
-  e.mode = (SBEdgeMixerMode)next;
-  e.enabled = (e.mode != SB_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
-  sb_edgemixer_lite_set_config(e);
+  e.mode = (K1EdgeMixerMode)next;
+  e.enabled = (e.mode != K1_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_MODE: ");
-  USBSerial.println(sb_edge_mode_name(e.mode));
+  USBSerial.println(k1_edge_mode_name(e.mode));
   tx_end();
-  sb_edge_warn_if_collapsed(e);
+  k1_edge_warn_if_collapsed(e);
 }
 
 void serial_edge_adjust_spread(int delta) {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   int s = (int)e.spreadDegrees + delta;
   if (s < 0) { s = 0; }
   if (s > 60) { s = 60; }
   e.spreadDegrees = (uint8_t)s;
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_SPREAD: ");
   USBSerial.println((int)e.spreadDegrees);
@@ -825,9 +825,9 @@ void serial_edge_adjust_spread(int delta) {
 }
 
 void serial_edge_adjust_strength(float delta) {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   e.strength = constrain(e.strength + delta, 0.0f, 1.0f);
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_STRENGTH: ");
   USBSerial.println(e.strength, 3);
@@ -835,56 +835,56 @@ void serial_edge_adjust_strength(float delta) {
 }
 
 void serial_edge_toggle_rotation() {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   // 3-way cycle: faithful (SUM) -> luma -> oklab -> faithful. This is the bench
   // A/B control for the OKLab-vs-luma-rescale perceptual comparison on the plate.
   switch (e.rotationSpace) {
-    case SB_EDGE_ROTATION_SUM_PRESERVING:
-      e.rotationSpace = SB_EDGE_ROTATION_LUMA_PRESERVING;
+    case K1_EDGE_ROTATION_SUM_PRESERVING:
+      e.rotationSpace = K1_EDGE_ROTATION_LUMA_PRESERVING;
       break;
-    case SB_EDGE_ROTATION_LUMA_PRESERVING:
-      e.rotationSpace = SB_EDGE_ROTATION_OKLAB;
+    case K1_EDGE_ROTATION_LUMA_PRESERVING:
+      e.rotationSpace = K1_EDGE_ROTATION_OKLAB;
       break;
     default:
-      e.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+      e.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
       break;
   }
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_ROTATION: ");
-  USBSerial.println(sb_edge_rotation_name(e.rotationSpace));
+  USBSerial.println(k1_edge_rotation_name(e.rotationSpace));
   tx_end();
 }
 
 void serial_edge_toggle_dual_edge() {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   // 3-way cycle: one_sided -> split -> mirror -> one_sided. Symmetric dual-edge
   // (A lane) — the plate A/B for "make BOTH edges participate about the 79/80
   // centre". one_sided = only the secondary strip shifts (certified default);
   // split = both edges +/- theta/2; mirror = both edges +/- theta.
   switch (e.dualEdge) {
-    case SB_EDGE_DUAL_ONE_SIDED:
-      e.dualEdge = SB_EDGE_DUAL_SPLIT;
+    case K1_EDGE_DUAL_ONE_SIDED:
+      e.dualEdge = K1_EDGE_DUAL_SPLIT;
       break;
-    case SB_EDGE_DUAL_SPLIT:
-      e.dualEdge = SB_EDGE_DUAL_MIRROR;
+    case K1_EDGE_DUAL_SPLIT:
+      e.dualEdge = K1_EDGE_DUAL_MIRROR;
       break;
     default:
-      e.dualEdge = SB_EDGE_DUAL_ONE_SIDED;
+      e.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
       break;
   }
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_DUAL: ");
-  USBSerial.println(sb_edge_dual_name(e.dualEdge));
+  USBSerial.println(k1_edge_dual_name(e.dualEdge));
   tx_end();
-  sb_edge_warn_if_collapsed(e);
+  k1_edge_warn_if_collapsed(e);
 }
 
 void serial_edge_toggle_uniform() {
-  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig e = k1_edgemixer_config();
   e.spatialUniform = !e.spatialUniform;  // ref E: centre-masked <-> uniform
-  sb_edgemixer_lite_set_config(e);
+  k1_edgemixer_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_SPATIAL: ");
   USBSerial.println(e.spatialUniform ? "uniform" : "masked");
@@ -898,7 +898,7 @@ bool sb_apply_smart_scene(const char* scene) {
 
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (strcmp(scene, "off") == 0 || strcmp(scene, "none") == 0) {
     smart.enabled = false;
@@ -911,7 +911,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(scene, "assist") == 0 || strcmp(scene, "control") == 0) {
     smart.enabled = true;
@@ -924,7 +924,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(scene, "l1") == 0 || strcmp(scene, "accent") == 0) {
     smart.enabled = true;
@@ -937,7 +937,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.350f;
   } else if (strcmp(scene, "auto") == 0 || strcmp(scene, "autonomy") == 0 || strcmp(scene, "demo") == 0) {
     smart.enabled = true;
@@ -950,7 +950,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 3;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.650f;
   } else {
     return false;
@@ -958,7 +958,7 @@ bool sb_apply_smart_scene(const char* scene) {
 
   sb_smart_director_set_config(smart);
   sb_visual_hooks_set_config(hooks);
-  sb_edgemixer_lite_set_config(edge);
+  k1_edgemixer_set_config(edge);
   sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
   sb_smart_director_clear_manual_control();
   return true;
@@ -2182,8 +2182,8 @@ void cmd_help() {
 	  USBSerial.println("                  smart_scene=[off/assist/l1/auto] | Apply runtime Smart A/B scene preset");
 	  USBSerial.println("                  smart_hooks=[on/off] | Runtime-enable onset/beat visual hooks");
 	  USBSerial.println("                  event_status | Print current onset/kick/snare/hihat event state");
-	  USBSerial.println("                  edge_status | Runtime EdgeMixer-lite status");
-	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer-lite");
+	  USBSerial.println("                  edge_status | Runtime EdgeMixer status");
+	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer");
 	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
 	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
 	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
@@ -2468,7 +2468,7 @@ void cmd_smart_status() {
 }
 
 void cmd_edge_status() {
-  sb_print_edge_status();
+  k1_print_edge_status();
 }
 
 void cmd_event_status() {

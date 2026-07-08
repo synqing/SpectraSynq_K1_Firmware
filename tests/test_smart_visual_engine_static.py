@@ -14,7 +14,7 @@ SMART_MODULE_PREFIXES = (
     "sb_audio_snapshot",
     "sb_mode_selection",
     "sb_smart_director",
-    "sb_edgemixer_lite",
+    "k1_edgemixer",
     "sb_onset_beat",
     "sb_visual_hooks",
 )
@@ -164,19 +164,19 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertLess(ino.index("calculate_novelty(t_now);"), ino.index("sb_audio_snapshot_update(t_now);"))
 
     def test_edgemixer_future_contract_keeps_centre_79_80_when_present(self):
-        edge_path = FIRMWARE / "sb_edgemixer_lite.cpp"
+        edge_path = FIRMWARE / "k1_edgemixer.cpp"
         if not edge_path.exists():
-            self.skipTest("EdgeMixer-lite not implemented yet")
+            self.skipTest("EdgeMixer not implemented yet")
         text = read(edge_path)
         self.assertTrue("79.5f" in text or ("79" in text and "80" in text))
-        self.assertRegex(text, r"static\s+SBEdgeMixerConfig\s+sb_edge_config\s*=\s*\{\s*false,")
-        self.assertIn("sb_edgemixer_lite_set_config", text)
-        self.assertIn("sb_edgemixer_lite_apply", text)
+        self.assertRegex(text, r"static\s+K1EdgeMixerConfig\s+k1_edge_config\s*=\s*\{\s*false,")
+        self.assertIn("k1_edgemixer_set_config", text)
+        self.assertIn("k1_edgemixer_apply", text)
 
     def test_edgemixer_does_not_create_light_from_dark_pixels(self):
-        edge_path = FIRMWARE / "sb_edgemixer_lite.cpp"
+        edge_path = FIRMWARE / "k1_edgemixer.cpp"
         if not edge_path.exists():
-            self.skipTest("EdgeMixer-lite not implemented yet")
+            self.skipTest("EdgeMixer not implemented yet")
         text = read(edge_path)
         forbidden = (
             "SQ15x16(1.0f) - r",
@@ -216,9 +216,9 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIsNotNone(edge_enabled_body)
         self.assertIsNotNone(edge_mode_body)
         self.assertIsNotNone(edge_strength_body)
-        self.assertNotIn("config.mode = SB_EDGE_MIXER_ANALOGOUS", edge_enabled_body.group(0))
-        self.assertNotIn("config.enabled = mode != SB_EDGE_MIXER_OFF", edge_mode_body.group(0))
-        self.assertNotIn("config.mode = SB_EDGE_MIXER_ANALOGOUS", edge_strength_body.group(0))
+        self.assertNotIn("config.mode = K1_EDGE_MIXER_ANALOGOUS", edge_enabled_body.group(0))
+        self.assertNotIn("config.enabled = mode != K1_EDGE_MIXER_OFF", edge_mode_body.group(0))
+        self.assertNotIn("config.mode = K1_EDGE_MIXER_ANALOGOUS", edge_strength_body.group(0))
         self.assertIn("config.enabled = false", edge_mode_body.group(0))
 
     def test_runtime_capture_scripts_restore_safe_state(self):
@@ -282,7 +282,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         smart_header = read(FIRMWARE / "sb_smart_director.h")
         smart_source = read(FIRMWARE / "sb_smart_director.cpp")
         hooks_source = read(FIRMWARE / "sb_visual_hooks.cpp")
-        edge_source = read(FIRMWARE / "sb_edgemixer_lite.cpp")
+        edge_source = read(FIRMWARE / "k1_edgemixer.cpp")
         mode_source = read(FIRMWARE / "sb_mode_selection.cpp")
         serial_source = read(FIRMWARE / "serial_menu.h")
 
@@ -292,7 +292,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         for text, mux in (
             (smart_source, "sb_director_config_mux"),
             (hooks_source, "sb_hook_config_mux"),
-            (edge_source, "sb_edge_config_mux"),
+            (edge_source, "k1_edge_config_mux"),
             (mode_source, "sb_mode_state_mux"),
         ):
             self.assertIn("portMUX_TYPE", text)
@@ -397,14 +397,14 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "smart.max_switches_per_window = 3",
             "hooks.enabled = true",
             "edge.enabled = true",
-            "edge.mode = SB_EDGE_MIXER_COMPLEMENTARY",
+            "edge.mode = K1_EDGE_MIXER_COMPLEMENTARY",
             "edge.strength = 0.350f",
             "edge.strength = 0.650f",
-            "edge.mode = SB_EDGE_MIXER_OFF",
+            "edge.mode = K1_EDGE_MIXER_OFF",
             "edge.strength = 0.0f",
             "sb_smart_director_set_config(smart)",
             "sb_visual_hooks_set_config(hooks)",
-            "sb_edgemixer_lite_set_config(edge)",
+            "k1_edgemixer_set_config(edge)",
             "sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis())",
             "sb_smart_director_clear_manual_control()",
         ):
@@ -745,7 +745,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn("sb_smart_director_mode_selection_config(smart_now_ms)", ino)
         self.assertRegex(
             ino,
-            r"if\s*\(\s*edge_config\.enabled\s*\)\s*\{[^}]*sb_edgemixer_lite_apply",
+            r"if\s*\(\s*edge_config\.enabled\s*\)\s*\{[^}]*k1_edgemixer_apply",
             "Disabled EdgeMixer must not add an unconditional secondary render-path call.",
         )
 

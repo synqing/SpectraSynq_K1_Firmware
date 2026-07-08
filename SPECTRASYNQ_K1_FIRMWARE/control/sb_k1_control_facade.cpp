@@ -7,7 +7,7 @@
 #include "config_types.h"
 #include "globals.h"
 #include "Palettes.h"
-#include "sb_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 #include "sb_mode_selection.h"
 #include "sb_noise_cal_arm.h"
 #include "sb_smart_director.h"
@@ -167,7 +167,7 @@ bool apply_scene_smart(const char* scene) {
 
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (strcmp(canonical, "off") == 0) {
     smart.enabled = false;
@@ -180,7 +180,7 @@ bool apply_scene_smart(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(canonical, "assist") == 0) {
     smart.enabled = true;
@@ -193,7 +193,7 @@ bool apply_scene_smart(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(canonical, "l1") == 0) {
     smart.enabled = true;
@@ -206,7 +206,7 @@ bool apply_scene_smart(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.350f;
   } else if (strcmp(canonical, "auto") == 0) {
     smart.enabled = true;
@@ -219,7 +219,7 @@ bool apply_scene_smart(const char* scene) {
     smart.max_switches_per_window = 3;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.650f;
   } else {
     return false;
@@ -227,7 +227,7 @@ bool apply_scene_smart(const char* scene) {
 
   sb_smart_director_set_config(smart);
   sb_visual_hooks_set_config(hooks);
-  sb_edgemixer_lite_set_config(edge);
+  k1_edgemixer_set_config(edge);
   sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
   sb_smart_director_clear_manual_control();
   strlcpy(g_scene_smart, canonical, sizeof(g_scene_smart));
@@ -237,7 +237,7 @@ bool apply_scene_smart(const char* scene) {
 const char* infer_scene_smart() {
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (!smart.enabled && !hooks.enabled && !edge.enabled) {
     return "off";
@@ -284,33 +284,33 @@ bool parse_vp_profile(const char* text, uint8_t* out) {
   return false;
 }
 
-bool parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode) {
+bool parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
   if (strcmp(text, "off") == 0) {
-    *out_mode = SB_EDGE_MIXER_OFF;
+    *out_mode = K1_EDGE_MIXER_OFF;
     return true;
   }
   if (strcmp(text, "analogous") == 0) {
-    *out_mode = SB_EDGE_MIXER_ANALOGOUS;
+    *out_mode = K1_EDGE_MIXER_ANALOGOUS;
     return true;
   }
   if (strcmp(text, "complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_COMPLEMENTARY;
     return true;
   }
   if (strcmp(text, "split") == 0 || strcmp(text, "split_complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_SPLIT_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_SPLIT_COMPLEMENTARY;
     return true;
   }
   if (strcmp(text, "veil") == 0 || strcmp(text, "saturation_veil") == 0) {
-    *out_mode = SB_EDGE_MIXER_SATURATION_VEIL;
+    *out_mode = K1_EDGE_MIXER_SATURATION_VEIL;
     return true;
   }
   if (strcmp(text, "triadic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TRIADIC;
+    *out_mode = K1_EDGE_MIXER_TRIADIC;
     return true;
   }
   if (strcmp(text, "tetradic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TETRADIC;
+    *out_mode = K1_EDGE_MIXER_TETRADIC;
     return true;
   }
   return false;
@@ -838,30 +838,30 @@ K1WirelessControlResult sb_k1_control_apply(const K1WirelessControlRecord& recor
   if (strcmp(record.control, "edge.enabled") == 0) {
     bool enabled = false;
     if (!parse_bool_value(record, &enabled, &result)) return result;
-    SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.enabled = enabled;
-    sb_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_number(edge.enabled ? 1.0f : 0.0f);
   }
 
   if (strcmp(record.control, "edge.mode") == 0) {
     if (!needs_text(record, &result)) return result;
-    SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
+    K1EdgeMixerMode mode = K1_EDGE_MIXER_OFF;
     if (!parse_edge_mode(record.text_value, &mode)) {
       result_error(&result, "range", "Edge mode out of range");
       return result;
     }
-    SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.mode = mode;
-    sb_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_text(record.text_value);
   }
 
   if (strcmp(record.control, "edge.strength") == 0) {
     if (!needs_number_range(record, &result, 0.0f, 1.0f, "Edge strength out of range")) return result;
-    SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.strength = record.number_value;
-    sb_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_number(edge.strength);
   }
 

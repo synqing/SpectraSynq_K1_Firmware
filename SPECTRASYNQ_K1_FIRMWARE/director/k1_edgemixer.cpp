@@ -1,4 +1,4 @@
-#include "sb_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 
 #include <Arduino.h>
 #include <math.h>
@@ -10,9 +10,9 @@
 // change). Output stays BYTE-IDENTICAL; only the call/return overhead is removed.
 // Verified by diffing the golden (+/-1 LSB) and OKLab oracle outputs before and
 // after this change — every metric unchanged.
-#define SB_EDGE_HOT inline __attribute__((always_inline))
+#define K1_EDGE_HOT inline __attribute__((always_inline))
 
-static SB_EDGE_HOT SQ15x16 sb_edge_clamp01(SQ15x16 value) {
+static K1_EDGE_HOT SQ15x16 k1_edge_clamp01(SQ15x16 value) {
   if (value < SQ15x16(0.0f)) {
     return SQ15x16(0.0f);
   }
@@ -22,7 +22,7 @@ static SB_EDGE_HOT SQ15x16 sb_edge_clamp01(SQ15x16 value) {
   return value;
 }
 
-static float sb_edge_clamp_float01(float value) {
+static float k1_edge_clamp_float01(float value) {
   if (!isfinite(value) || value < 0.0f) {
     return 0.0f;
   }
@@ -32,7 +32,7 @@ static float sb_edge_clamp_float01(float value) {
   return value;
 }
 
-static float sb_edge_mask(uint16_t index, uint16_t count) {
+static float k1_edge_mask(uint16_t index, uint16_t count) {
   if (count <= 1) {
     return 0.0f;
   }
@@ -45,30 +45,30 @@ static float sb_edge_mask(uint16_t index, uint16_t count) {
   if (edge_distance <= 0.0f) {
     return 0.0f;
   }
-  return sb_edge_clamp_float01(centre_distance / edge_distance);
+  return k1_edge_clamp_float01(centre_distance / edge_distance);
 }
 
-static SBEdgeMixerConfig sb_edge_config = {
+static K1EdgeMixerConfig k1_edge_config = {
   false,                     // enabled: byte-inert at boot (EdgeMixer off until turned on)
-  SB_EDGE_MIXER_OFF,         // mode: supplied on activation (preset / user)
+  K1_EDGE_MIXER_OFF,         // mode: supplied on activation (preset / user)
   0.0f,                      // strength
   0,                         // spreadDegrees
-  SB_EDGE_ROTATION_OKLAB,    // rotationSpace: SHIPPING DEFAULT — gate-2 plate verdict 2026-07-09
+  K1_EDGE_ROTATION_OKLAB,    // rotationSpace: SHIPPING DEFAULT — gate-2 plate verdict 2026-07-09
   false,                     // spatialUniform: centre-masked (ref E; gate-2 confirmed)
-  SB_EDGE_DUAL_SPLIT         // dualEdge: SHIPPING DEFAULT split — gate-2 plate verdict 2026-07-09
+  K1_EDGE_DUAL_SPLIT         // dualEdge: SHIPPING DEFAULT split — gate-2 plate verdict 2026-07-09
 };
-static portMUX_TYPE sb_edge_config_mux = portMUX_INITIALIZER_UNLOCKED;
+static portMUX_TYPE k1_edge_config_mux = portMUX_INITIALIZER_UNLOCKED;
 
 // Config-time colour-harmony matrix (row-major, SQ15x16). Recomputed by
 // set_config() from mode + spread; read (snapshotted) by apply(). Initialised
 // to identity so a pre-config apply() (enabled == false by default) is a no-op.
-static SQ15x16 sb_edge_matrix[9] = {
+static SQ15x16 k1_edge_matrix[9] = {
   SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
 };
 
-// Config-time OKLab fused LMS' map (SB_EDGE_ROTATION_OKLAB only), row-major 3x3.
+// Config-time OKLab fused LMS' map (K1_EDGE_ROTATION_OKLAB only), row-major 3x3.
 // F = invM2 . R . M2 collapses the per-pixel M2 -> rotate(+desaturate) -> invM2
 // chain (three linear maps, L passing through) into ONE 3x3 applied to LMS' —
 // 9 muls/pixel instead of 19. R = [1 0 0; 0 c -k; 0 k c] with c = satRetain*
@@ -76,8 +76,8 @@ static SQ15x16 sb_edge_matrix[9] = {
 // mode's chroma desaturation. Recomputed by set_config(); snapshotted by apply().
 // Initialised to the identity (F = invM2 . M2 = I at theta 0 / satRetain 1) so a
 // pre-config apply() is a no-op. Does NOT affect the SUM/LUMA paths (they read
-// only sb_edge_matrix).
-static SQ15x16 sb_edge_oklab_fmat[9] = {
+// only k1_edge_matrix).
+static SQ15x16 k1_edge_oklab_fmat[9] = {
   SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
@@ -85,49 +85,49 @@ static SQ15x16 sb_edge_oklab_fmat[9] = {
 
 // PRIMARY-edge coefficient sets (dual-edge SPLIT / MIRROR, A lane). A SECOND bake
 // of the SAME colour transform at the mirrored primary angle, applied to the
-// primary strip by sb_edgemixer_lite_apply_primary(). Baked by set_config() only
-// when a dual-edge mode is active; sb_edge_dual_active gates whether the primary
+// primary strip by k1_edgemixer_apply_primary(). Baked by set_config() only
+// when a dual-edge mode is active; k1_edge_dual_active gates whether the primary
 // transform runs at all. Initialised to identity so any pre-bake read is a no-op.
-static SQ15x16 sb_edge_matrix_primary[9] = {
+static SQ15x16 k1_edge_matrix_primary[9] = {
   SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
 };
-static SQ15x16 sb_edge_oklab_fmat_primary[9] = {
+static SQ15x16 k1_edge_oklab_fmat_primary[9] = {
   SQ15x16(1.0f), SQ15x16(0.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(1.0f), SQ15x16(0.0f),
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
 };
-static bool sb_edge_dual_active = false;  // true when dualEdge != ONE_SIDED
+static bool k1_edge_dual_active = false;  // true when dualEdge != ONE_SIDED
 
-static SBEdgeMixerMode sb_edge_mode_or_off(SBEdgeMixerMode mode) {
+static K1EdgeMixerMode k1_edge_mode_or_off(K1EdgeMixerMode mode) {
   switch (mode) {
-    case SB_EDGE_MIXER_OFF:
-    case SB_EDGE_MIXER_ANALOGOUS:
-    case SB_EDGE_MIXER_COMPLEMENTARY:
-    case SB_EDGE_MIXER_SPLIT_COMPLEMENTARY:
-    case SB_EDGE_MIXER_SATURATION_VEIL:
-    case SB_EDGE_MIXER_TRIADIC:
-    case SB_EDGE_MIXER_TETRADIC:
+    case K1_EDGE_MIXER_OFF:
+    case K1_EDGE_MIXER_ANALOGOUS:
+    case K1_EDGE_MIXER_COMPLEMENTARY:
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
+    case K1_EDGE_MIXER_SATURATION_VEIL:
+    case K1_EDGE_MIXER_TRIADIC:
+    case K1_EDGE_MIXER_TETRADIC:
       return mode;
     default:
-      return SB_EDGE_MIXER_OFF;
+      return K1_EDGE_MIXER_OFF;
   }
 }
 
 // Pi as a float literal — matches (float)M_PI bit-for-bit but avoids the
 // __STRICT_ANSI__ M_PI gating that some hosts apply under -std=c++17.
-static constexpr float SB_EDGE_PI = 3.14159265358979323846f;
+static constexpr float K1_EDGE_PI = 3.14159265358979323846f;
 
 // Near-black passthrough threshold. Mirrors the LightwaveOS EdgeMixer source
 // skipping pixels whose max 8-bit channel is < 2 (i.e. < 2/255 of full scale).
 // On K1 the CRGB16 channels are already SQ15x16 normalised 0..1, so the guard
 // is expressed directly in that domain.
-static const SQ15x16 SB_EDGE_NEAR_BLACK = SQ15x16(2.0f / 255.0f);
+static const SQ15x16 K1_EDGE_NEAR_BLACK = SQ15x16(2.0f / 255.0f);
 
 // Mirror EdgeMixer::setSpread's integer m_satScale derivation exactly:
 // 255 - spreadDegrees * 230 / 60 (integer division), clamped to 60 degrees.
-static uint8_t sb_edge_sat_scale(uint8_t spreadDegrees) {
+static uint8_t k1_edge_sat_scale(uint8_t spreadDegrees) {
   if (spreadDegrees > 60) {
     spreadDegrees = 60;
   }
@@ -142,12 +142,12 @@ static uint8_t sb_edge_sat_scale(uint8_t spreadDegrees) {
 // to FULL SQ15x16 (Q15.16) precision via round-to-nearest — identical to the
 // golden-master parity reference (refRecomputeMatrix). Float trig runs here at
 // config time only, never in the render path.
-static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees,
-                                     SBEdgeMixerRotationSpace rotationSpace,
+static void k1_edge_recompute_matrix(K1EdgeMixerMode mode, uint8_t spreadDegrees,
+                                     K1EdgeMixerRotationSpace rotationSpace,
                                      float angleFactor, SQ15x16* outMatrix) {
   // LUMA_PRESERVING is NOT a different matrix — the config-time rotation matrix is
   // identical for both rotation spaces. It is implemented as a per-pixel luma
-  // rescale in sb_edge_transform() at render time (see the lumaPreserve branch),
+  // rescale in k1_edge_transform() at render time (see the lumaPreserve branch),
   // so this config-time compute deliberately ignores rotationSpace.
   (void)rotationSpace;
 
@@ -156,29 +156,29 @@ static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees
   float satRetain = 1.0f;
 
   switch (mode) {
-    case SB_EDGE_MIXER_ANALOGOUS:
-      theta = (float)spreadDegrees * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_ANALOGOUS:
+      theta = (float)spreadDegrees * (K1_EDGE_PI / 180.0f);
       break;
-    case SB_EDGE_MIXER_COMPLEMENTARY:
-      theta = SB_EDGE_PI;
+    case K1_EDGE_MIXER_COMPLEMENTARY:
+      theta = K1_EDGE_PI;
       satRetain = 217.0f / 255.0f;
       break;
-    case SB_EDGE_MIXER_SPLIT_COMPLEMENTARY:
-      theta = 150.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
+      theta = 150.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 230.0f / 255.0f;
       break;
-    case SB_EDGE_MIXER_SATURATION_VEIL:
-      satRetain = (float)sb_edge_sat_scale(spreadDegrees) / 255.0f;
+    case K1_EDGE_MIXER_SATURATION_VEIL:
+      satRetain = (float)k1_edge_sat_scale(spreadDegrees) / 255.0f;
       break;
-    case SB_EDGE_MIXER_TRIADIC:
-      theta = 120.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_TRIADIC:
+      theta = 120.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
       break;
-    case SB_EDGE_MIXER_TETRADIC:
-      theta = 90.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_TETRADIC:
+      theta = 90.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
       break;
-    case SB_EDGE_MIXER_OFF:
+    case K1_EDGE_MIXER_OFF:
     default:
       break;  // Identity retained.
   }
@@ -242,7 +242,7 @@ static void sb_edge_recompute_matrix(SBEdgeMixerMode mode, uint8_t spreadDegrees
 }
 
 // ============================================================================
-// SB_EDGE_ROTATION_OKLAB — perceptual hue rotation in OKLab (Ottosson 2020).
+// K1_EDGE_ROTATION_OKLAB — perceptual hue rotation in OKLab (Ottosson 2020).
 //
 // This is a STRUCTURAL per-pixel transform, NOT a 3x3 matrix bake: an OKLab hue
 // rotation is non-linear (cube-root / cube either side of the a/b rotation) and
@@ -310,7 +310,7 @@ static const SQ15x16 SB_OK_M1_22 = SQ15x16(0.6299787005f);
 // M2: LMS' -> OKLab. Only the L (row 0) coefficients survive as render-time
 // constants — they recover perceptual lightness for the gamut-clip grey anchor.
 // The a/b rows of M2, the rotate, and the whole inverse M2 are folded at config
-// time into the fused 3x3 sb_edge_oklab_fmat (see sb_edge_recompute_oklab), so
+// time into the fused 3x3 k1_edge_oklab_fmat (see k1_edge_recompute_oklab), so
 // they are NOT needed per-pixel.
 static const SQ15x16 SB_OK_M2_00 = SQ15x16(0.2104542553f);
 static const SQ15x16 SB_OK_M2_01 = SQ15x16(0.7936177850f);
@@ -328,7 +328,7 @@ static const SQ15x16 SB_OK_IM1_22 = SQ15x16(1.7076147010f);
 
 // Index of the most-significant set bit of v (v > 0), 0..31. __builtin_clz is
 // available on both the host GCC and the device xtensa-gcc toolchain.
-static SB_EDGE_HOT int sb_edge_msb32(uint32_t v) {
+static K1_EDGE_HOT int k1_edge_msb32(uint32_t v) {
   return 31 - __builtin_clz(v);
 }
 
@@ -345,7 +345,7 @@ static SB_EDGE_HOT int sb_edge_msb32(uint32_t v) {
 // (edgemixer_oklab_probe.cpp) and holds the documented perceptual band.
 
 // cbrt(m), m in [1,2] (Q16). Smooth, no toe -> LUT-accurate.
-static const int32_t kSbOkMantCbrt[257] = {
+static const int32_t kK1OkMantCbrt[257] = {
   65536, 65621, 65706, 65791, 65876, 65960, 66044, 66128,
   66212, 66295, 66378, 66462, 66544, 66627, 66710, 66792,
   66874, 66956, 67037, 67119, 67200, 67281, 67362, 67443,
@@ -382,7 +382,7 @@ static const int32_t kSbOkMantCbrt[257] = {
 };
 
 // m^2.2, m in [1,2] (Q16). Gamma-decode mantissa.
-static const int32_t kSbOkMantDecode[257] = {
+static const int32_t kK1OkMantDecode[257] = {
   65536, 66101, 66668, 67237, 67810, 68385, 68963, 69543,
   70126, 70712, 71300, 71891, 72485, 73081, 73680, 74282,
   74887, 75494, 76103, 76716, 77331, 77948, 78569, 79192,
@@ -419,7 +419,7 @@ static const int32_t kSbOkMantDecode[257] = {
 };
 
 // m^(1/2.2), m in [1,2] (Q16). Gamma-encode mantissa.
-static const int32_t kSbOkMantEncode[257] = {
+static const int32_t kK1OkMantEncode[257] = {
   65536, 65652, 65768, 65884, 65999, 66115, 66230, 66345,
   66459, 66573, 66687, 66801, 66915, 67028, 67141, 67254,
   67367, 67480, 67592, 67704, 67816, 67927, 68039, 68150,
@@ -456,18 +456,18 @@ static const int32_t kSbOkMantEncode[257] = {
 };
 
 // 2^(e/3) for e = -16..0 (Q16), index e + 16.
-static const int32_t kSbOkExpCbrt[17] = {
+static const int32_t kK1OkExpCbrt[17] = {
   1625, 2048, 2580, 3251, 4096, 5161, 6502, 8192, 10321, 13004, 16384, 20643, 26008, 32768, 41285, 52016, 65536
 };
 
 // 2^(2.2*e) for e = -16..0 (Q16), index e + 16. Underflows to 0 for very dark
 // inputs (x^2.2 is sub-Q16 there), which is the correct near-zero linear value.
-static const int32_t kSbOkExpDecode[17] = {
+static const int32_t kK1OkExpDecode[17] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7, 32, 147, 676, 3104, 14263, 65536
 };
 
 // 2^(e/2.2) for e = -16..0 (Q16), index e + 16.
-static const int32_t kSbOkExpEncode[17] = {
+static const int32_t kK1OkExpEncode[17] = {
   424, 581, 796, 1091, 1495, 2048, 2806, 3846, 5270, 7222, 9897, 13562, 18585, 25467, 34899, 47824, 65536
 };
 
@@ -475,13 +475,13 @@ static const int32_t kSbOkExpEncode[17] = {
 // mantLut257 is f(m) over m in [1,2] at 1/256 spacing (Q16); expTab17 is 2^(e*p)
 // for e = -16..0 indexed by (e + 16) (Q16). Linear interpolation on the mantissa;
 // one Q16 multiply folds in the exponent power. Heap-free; no divides.
-static SB_EDGE_HOT SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
+static K1_EDGE_HOT SQ15x16 k1_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
                                           const int32_t* expTab17) {
   int32_t X = x.getInternal();
   if (X <= 0) {
     return SQ15x16(0.0f);
   }
-  const int p = sb_edge_msb32((uint32_t)X);  // 0..16 for x in (0, ~1.06]
+  const int p = k1_edge_msb32((uint32_t)X);  // 0..16 for x in (0, ~1.06]
   int idxE = (p - 16) + 16;                   // e + 16, e = p - 16 (<= 0)
   if (idxE < 0) {
     idxE = 0;
@@ -502,13 +502,13 @@ static SB_EDGE_HOT SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
 }
 
 // Fixed-point cube-root x^(1/3) for x in (0, ~1.06]; x <= 0 returns 0.
-static SB_EDGE_HOT SQ15x16 sb_edge_cbrt(SQ15x16 x) {
-  return sb_edge_pow_lut(x, kSbOkMantCbrt, kSbOkExpCbrt);
+static K1_EDGE_HOT SQ15x16 k1_edge_cbrt(SQ15x16 x) {
+  return k1_edge_pow_lut(x, kK1OkMantCbrt, kK1OkExpCbrt);
 }
 
 // Signed cube v^3 (the inverse of the forward cube-root; sign preserved so an
 // out-of-original-gamut rotated LMS' with a negative component cubes correctly).
-static SB_EDGE_HOT SQ15x16 sb_edge_cube(SQ15x16 v) {
+static K1_EDGE_HOT SQ15x16 k1_edge_cube(SQ15x16 v) {
   const bool neg = (v < SQ15x16(0.0f));
   SQ15x16 a = neg ? -v : v;
   SQ15x16 cubed = a * a * a;
@@ -516,24 +516,24 @@ static SB_EDGE_HOT SQ15x16 sb_edge_cube(SQ15x16 v) {
 }
 
 // Gamma decode (display, ~sRGB 2.2) -> linear light. x in [0,1]; 0 -> 0.
-static SB_EDGE_HOT SQ15x16 sb_edge_gamma_decode(SQ15x16 x) {
-  return sb_edge_pow_lut(x, kSbOkMantDecode, kSbOkExpDecode);
+static K1_EDGE_HOT SQ15x16 k1_edge_gamma_decode(SQ15x16 x) {
+  return k1_edge_pow_lut(x, kK1OkMantDecode, kK1OkExpDecode);
 }
 
 // Gamma encode: linear light -> display (~sRGB 2.2). x in [0,1]; 0 -> 0.
-static SB_EDGE_HOT SQ15x16 sb_edge_gamma_encode(SQ15x16 x) {
-  return sb_edge_pow_lut(x, kSbOkMantEncode, kSbOkExpEncode);
+static K1_EDGE_HOT SQ15x16 k1_edge_gamma_encode(SQ15x16 x) {
+  return k1_edge_pow_lut(x, kK1OkMantEncode, kK1OkExpEncode);
 }
 
 // LMS' -> linear RGB: signed cube (LMS' -> LMS), then inverse M1. The inverse M2
 // that used to precede this is now folded into the config-time fused map, so the
 // per-pixel path feeds rotated LMS' straight in. Re-used by the gamut-clip pass.
-static SB_EDGE_HOT void sb_edge_lmsprime_to_linear(SQ15x16 lq, SQ15x16 mq,
+static K1_EDGE_HOT void k1_edge_lmsprime_to_linear(SQ15x16 lq, SQ15x16 mq,
                                                   SQ15x16 sq, SQ15x16* rlin,
                                                   SQ15x16* glin, SQ15x16* blin) {
-  SQ15x16 lL = sb_edge_cube(lq);
-  SQ15x16 mL = sb_edge_cube(mq);
-  SQ15x16 sL = sb_edge_cube(sq);
+  SQ15x16 lL = k1_edge_cube(lq);
+  SQ15x16 mL = k1_edge_cube(mq);
+  SQ15x16 sL = k1_edge_cube(sq);
   *rlin = SB_OK_IM1_00 * lL + SB_OK_IM1_01 * mL + SB_OK_IM1_02 * sL;
   *glin = SB_OK_IM1_10 * lL + SB_OK_IM1_11 * mL + SB_OK_IM1_12 * sL;
   *blin = SB_OK_IM1_20 * lL + SB_OK_IM1_21 * mL + SB_OK_IM1_22 * sL;
@@ -554,11 +554,11 @@ static SB_EDGE_HOT void sb_edge_lmsprime_to_linear(SQ15x16 lq, SQ15x16 mq,
 // still holding L far better than a per-channel clamp. Returns t in [0,1]; 1.0 in
 // gamut. Divides run ONLY on out-of-gamut pixels (1-3 per pixel), never on the
 // in-gamut majority.
-static SB_EDGE_HOT SQ15x16 sb_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin,
+static K1_EDGE_HOT SQ15x16 k1_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin,
                                               SQ15x16 glin, SQ15x16 blin) {
   const SQ15x16 kZero = SQ15x16(0.0f);
   const SQ15x16 kOne = SQ15x16(1.0f);
-  const SQ15x16 g = sb_edge_cube(L);  // grey anchor v(0) = L^3
+  const SQ15x16 g = k1_edge_cube(L);  // grey anchor v(0) = L^3
   const SQ15x16 v[3] = {rlin, glin, blin};
   SQ15x16 t = kOne;
   for (int i = 0; i < 3; ++i) {
@@ -580,15 +580,15 @@ static SB_EDGE_HOT SQ15x16 sb_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin,
   return t;
 }
 
-// Per-pixel OKLab perceptual hue rotation. The caller (sb_edge_transform) has
+// Per-pixel OKLab perceptual hue rotation. The caller (k1_edge_transform) has
 // already applied the near-black passthrough, so every channel here is real light.
 // fmat is the config-time fused invM2 . R . M2 (hue rotation + chroma desaturation)
 // applied in LMS'; the M2 -> rotate -> invM2 middle chain collapses to 9 muls.
-static CRGB16 sb_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
+static CRGB16 k1_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   // display -> linear.
-  SQ15x16 lr = sb_edge_gamma_decode(color.r);
-  SQ15x16 lg = sb_edge_gamma_decode(color.g);
-  SQ15x16 lb = sb_edge_gamma_decode(color.b);
+  SQ15x16 lr = k1_edge_gamma_decode(color.r);
+  SQ15x16 lg = k1_edge_gamma_decode(color.g);
+  SQ15x16 lb = k1_edge_gamma_decode(color.b);
 
   // linear -> LMS (M1).
   SQ15x16 lC = SB_OK_M1_00 * lr + SB_OK_M1_01 * lg + SB_OK_M1_02 * lb;
@@ -596,9 +596,9 @@ static CRGB16 sb_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   SQ15x16 sC = SB_OK_M1_20 * lr + SB_OK_M1_21 * lg + SB_OK_M1_22 * lb;
 
   // cube-root -> LMS'.
-  SQ15x16 lp = sb_edge_cbrt(lC);
-  SQ15x16 mp = sb_edge_cbrt(mC);
-  SQ15x16 sp = sb_edge_cbrt(sC);
+  SQ15x16 lp = k1_edge_cbrt(lC);
+  SQ15x16 mp = k1_edge_cbrt(mC);
+  SQ15x16 sp = k1_edge_cbrt(sC);
 
   // Fused invM2 . R . M2 in LMS': hue-rotated + desaturated LMS' in one 3x3.
   SQ15x16 lq = fmat[0] * lp + fmat[1] * mp + fmat[2] * sp;
@@ -609,7 +609,7 @@ static CRGB16 sb_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   SQ15x16 rlin;
   SQ15x16 glin;
   SQ15x16 blin;
-  sb_edge_lmsprime_to_linear(lq, mq, sq, &rlin, &glin, &blin);
+  k1_edge_lmsprime_to_linear(lq, mq, sq, &rlin, &glin, &blin);
 
   // Gamut clip: if the rotated colour left the sRGB gamut, reduce OKLab chroma
   // toward grey (holding L and hue) and re-evaluate. Scaling chroma by t is an
@@ -622,57 +622,57 @@ static CRGB16 sb_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   if (rlin < kZero || rlin > kOne || glin < kZero || glin > kOne ||
       blin < kZero || blin > kOne) {
     const SQ15x16 L = SB_OK_M2_00 * lp + SB_OK_M2_01 * mp + SB_OK_M2_02 * sp;
-    const SQ15x16 t = sb_edge_gamut_scale(L, rlin, glin, blin);
+    const SQ15x16 t = k1_edge_gamut_scale(L, rlin, glin, blin);
     const SQ15x16 lqt = L + t * (lq - L);
     const SQ15x16 mqt = L + t * (mq - L);
     const SQ15x16 sqt = L + t * (sq - L);
-    sb_edge_lmsprime_to_linear(lqt, mqt, sqt, &rlin, &glin, &blin);
+    k1_edge_lmsprime_to_linear(lqt, mqt, sqt, &rlin, &glin, &blin);
   }
 
   // gamma encode, clamp to [0,1].
   CRGB16 out;
-  out.r = sb_edge_clamp01(sb_edge_gamma_encode(sb_edge_clamp01(rlin)));
-  out.g = sb_edge_clamp01(sb_edge_gamma_encode(sb_edge_clamp01(glin)));
-  out.b = sb_edge_clamp01(sb_edge_gamma_encode(sb_edge_clamp01(blin)));
+  out.r = k1_edge_clamp01(k1_edge_gamma_encode(k1_edge_clamp01(rlin)));
+  out.g = k1_edge_clamp01(k1_edge_gamma_encode(k1_edge_clamp01(glin)));
+  out.b = k1_edge_clamp01(k1_edge_gamma_encode(k1_edge_clamp01(blin)));
   return out;
 }
 
 // Config-time OKLab fused-map derivation. Reuses the SAME per-mode harmony angle
-// and satRetain as sb_edge_recompute_matrix (analogous = spread deg, complementary
+// and satRetain as k1_edge_recompute_matrix (analogous = spread deg, complementary
 // = 180, split = 150, triadic = 120, tetradic = 90, veil = 0), builds the rotate +
 // desaturate R = [1 0 0; 0 c -k; 0 k c] (c = satRetain*cos, k = satRetain*sin),
 // then bakes F = invM2 . R . M2 (row-major 3x3) into outF. Float matrix maths runs
 // here at config time only, never in the render path. At theta 0 / satRetain 1,
 // R = I and F = invM2 . M2 = I (the round-trip identity).
-static void sb_edge_recompute_oklab(SBEdgeMixerMode mode, uint8_t spreadDegrees,
+static void k1_edge_recompute_oklab(K1EdgeMixerMode mode, uint8_t spreadDegrees,
                                     float angleFactor, SQ15x16* outF) {
   float theta = 0.0f;
   float satRetain = 1.0f;
 
   switch (mode) {
-    case SB_EDGE_MIXER_ANALOGOUS:
-      theta = (float)spreadDegrees * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_ANALOGOUS:
+      theta = (float)spreadDegrees * (K1_EDGE_PI / 180.0f);
       break;
-    case SB_EDGE_MIXER_COMPLEMENTARY:
-      theta = SB_EDGE_PI;
+    case K1_EDGE_MIXER_COMPLEMENTARY:
+      theta = K1_EDGE_PI;
       satRetain = 217.0f / 255.0f;
       break;
-    case SB_EDGE_MIXER_SPLIT_COMPLEMENTARY:
-      theta = 150.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
+      theta = 150.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 230.0f / 255.0f;
       break;
-    case SB_EDGE_MIXER_SATURATION_VEIL:
-      satRetain = (float)sb_edge_sat_scale(spreadDegrees) / 255.0f;
+    case K1_EDGE_MIXER_SATURATION_VEIL:
+      satRetain = (float)k1_edge_sat_scale(spreadDegrees) / 255.0f;
       break;
-    case SB_EDGE_MIXER_TRIADIC:
-      theta = 120.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_TRIADIC:
+      theta = 120.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
       break;
-    case SB_EDGE_MIXER_TETRADIC:
-      theta = 90.0f * (SB_EDGE_PI / 180.0f);
+    case K1_EDGE_MIXER_TETRADIC:
+      theta = 90.0f * (K1_EDGE_PI / 180.0f);
       satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
       break;
-    case SB_EDGE_MIXER_OFF:
+    case K1_EDGE_MIXER_OFF:
     default:
       break;  // identity (F = I)
   }
@@ -726,8 +726,8 @@ static void sb_edge_recompute_oklab(SBEdgeMixerMode mode, uint8_t spreadDegrees,
 // reference whose input was 8-bit CRGB. FixedPoints SQ15x16 operator* accumulates
 // through a 64-bit intermediate (SFixed<30,32>), so this matrix multiply cannot
 // overflow at these coefficient/channel ranges.
-static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix,
-                                SBEdgeMixerRotationSpace space,
+static CRGB16 k1_edge_transform(CRGB16 color, const SQ15x16* matrix,
+                                K1EdgeMixerRotationSpace space,
                                 const SQ15x16* oklabF) {
   // Near-black passthrough (mirror the source's maxC < 2 skip).
   SQ15x16 maxc = color.r;
@@ -737,15 +737,15 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix,
   if (color.b > maxc) {
     maxc = color.b;
   }
-  if (maxc < SB_EDGE_NEAR_BLACK) {
+  if (maxc < K1_EDGE_NEAR_BLACK) {
     return color;
   }
 
   // OKLAB is a structural per-pixel round trip (not a matrix multiply), so it
   // branches out here BEFORE the 3x3 path. SUM_PRESERVING / LUMA_PRESERVING fall
   // through to the byte-identical matrix path below.
-  if (space == SB_EDGE_ROTATION_OKLAB) {
-    return sb_edge_transform_oklab(color, oklabF);
+  if (space == K1_EDGE_ROTATION_OKLAB) {
+    return k1_edge_transform_oklab(color, oklabF);
   }
 
   SQ15x16 r = color.r;
@@ -753,11 +753,11 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix,
   SQ15x16 b = color.b;
 
   CRGB16 out;
-  out.r = sb_edge_clamp01((matrix[0] * r) + (matrix[1] * g) + (matrix[2] * b));
-  out.g = sb_edge_clamp01((matrix[3] * r) + (matrix[4] * g) + (matrix[5] * b));
-  out.b = sb_edge_clamp01((matrix[6] * r) + (matrix[7] * g) + (matrix[8] * b));
+  out.r = k1_edge_clamp01((matrix[0] * r) + (matrix[1] * g) + (matrix[2] * b));
+  out.g = k1_edge_clamp01((matrix[3] * r) + (matrix[4] * g) + (matrix[5] * b));
+  out.b = k1_edge_clamp01((matrix[6] * r) + (matrix[7] * g) + (matrix[8] * b));
 
-  // Tier-1b LUMA_PRESERVING (SB_EDGE_ROTATION_LUMA_PRESERVING): the grey-axis
+  // Tier-1b LUMA_PRESERVING (K1_EDGE_ROTATION_LUMA_PRESERVING): the grey-axis
   // rotation conserves the naive R+G+B sum, NOT perceptual luma, so a hue rotation
   // lurches brightness (e.g. pure red Y'601=0.299 -> pure green 0.587, ~doubling).
   // Rescale the rotated pixel so its BT.601 luma matches the INPUT's. Uniform
@@ -768,19 +768,19 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix,
   // higher-luma hue can push a channel past 1.0 and clip — the clamp accepts that
   // graceful desaturation rather than a full OKLCH colour-space round trip, which
   // would cost ~20-47% of the 2.0 ms frame budget on Core 1. (That OKLab round
-  // trip is now available as SB_EDGE_ROTATION_OKLAB above; this branch remains
+  // trip is now available as K1_EDGE_ROTATION_OKLAB above; this branch remains
   // the cheaper luma-only rescale.)
-  if (space == SB_EDGE_ROTATION_LUMA_PRESERVING) {
+  if (space == K1_EDGE_ROTATION_LUMA_PRESERVING) {
     const SQ15x16 Lr = SQ15x16(0.299f);
     const SQ15x16 Lg = SQ15x16(0.587f);
     const SQ15x16 Lb = SQ15x16(0.114f);
     SQ15x16 yIn = (Lr * r) + (Lg * g) + (Lb * b);
     SQ15x16 yOut = (Lr * out.r) + (Lg * out.g) + (Lb * out.b);
-    if (yOut > SB_EDGE_NEAR_BLACK) {  // guard: never divide by a ~zero rotated luma
+    if (yOut > K1_EDGE_NEAR_BLACK) {  // guard: never divide by a ~zero rotated luma
       SQ15x16 scale = yIn / yOut;
-      out.r = sb_edge_clamp01(out.r * scale);
-      out.g = sb_edge_clamp01(out.g * scale);
-      out.b = sb_edge_clamp01(out.b * scale);
+      out.r = k1_edge_clamp01(out.r * scale);
+      out.g = k1_edge_clamp01(out.g * scale);
+      out.b = k1_edge_clamp01(out.b * scale);
     }
   }
   return out;
@@ -791,10 +791,10 @@ static CRGB16 sb_edge_transform(CRGB16 color, const SQ15x16* matrix,
 // this returns the pure transform (the golden-validated endpoint) exactly; at
 // amount = 0 it returns the original untouched. Near-black pixels are preserved
 // at every amount because their transform is a passthrough.
-static CRGB16 sb_edge_mix(CRGB16 color, const SQ15x16* matrix, float amount,
-                          SBEdgeMixerRotationSpace space, const SQ15x16* oklabF) {
-  SQ15x16 a = SQ15x16(sb_edge_clamp_float01(amount));
-  CRGB16 transformed = sb_edge_transform(color, matrix, space, oklabF);
+static CRGB16 k1_edge_mix(CRGB16 color, const SQ15x16* matrix, float amount,
+                          K1EdgeMixerRotationSpace space, const SQ15x16* oklabF) {
+  SQ15x16 a = SQ15x16(k1_edge_clamp_float01(amount));
+  CRGB16 transformed = k1_edge_transform(color, matrix, space, oklabF);
 
   if (a >= SQ15x16(1.0f)) {
     return transformed;  // Exact endpoint — no blend rounding.
@@ -805,49 +805,49 @@ static CRGB16 sb_edge_mix(CRGB16 color, const SQ15x16* matrix, float amount,
 
   SQ15x16 keep = SQ15x16(1.0f) - a;
   CRGB16 out;
-  out.r = sb_edge_clamp01((color.r * keep) + (transformed.r * a));
-  out.g = sb_edge_clamp01((color.g * keep) + (transformed.g * a));
-  out.b = sb_edge_clamp01((color.b * keep) + (transformed.b * a));
+  out.r = k1_edge_clamp01((color.r * keep) + (transformed.r * a));
+  out.g = k1_edge_clamp01((color.g * keep) + (transformed.g * a));
+  out.b = k1_edge_clamp01((color.b * keep) + (transformed.b * a));
   return out;
 }
 
-SBEdgeMixerConfig sb_edgemixer_lite_config() {
-  SBEdgeMixerConfig config;
-  portENTER_CRITICAL(&sb_edge_config_mux);
-  config = sb_edge_config;
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+K1EdgeMixerConfig k1_edgemixer_config() {
+  K1EdgeMixerConfig config;
+  portENTER_CRITICAL(&k1_edge_config_mux);
+  config = k1_edge_config;
+  portEXIT_CRITICAL(&k1_edge_config_mux);
   return config;
 }
 
-void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config) {
-  SBEdgeMixerConfig next;
+void k1_edgemixer_set_config(const K1EdgeMixerConfig& config) {
+  K1EdgeMixerConfig next;
   next.enabled = config.enabled;
-  next.mode = sb_edge_mode_or_off(config.mode);
-  next.strength = sb_edge_clamp_float01(config.strength);
+  next.mode = k1_edge_mode_or_off(config.mode);
+  next.strength = k1_edge_clamp_float01(config.strength);
   next.spreadDegrees = (config.spreadDegrees > 60) ? 60 : config.spreadDegrees;
   switch (config.rotationSpace) {
-    case SB_EDGE_ROTATION_LUMA_PRESERVING:
-      next.rotationSpace = SB_EDGE_ROTATION_LUMA_PRESERVING;
+    case K1_EDGE_ROTATION_LUMA_PRESERVING:
+      next.rotationSpace = K1_EDGE_ROTATION_LUMA_PRESERVING;
       break;
-    case SB_EDGE_ROTATION_OKLAB:
-      next.rotationSpace = SB_EDGE_ROTATION_OKLAB;
+    case K1_EDGE_ROTATION_OKLAB:
+      next.rotationSpace = K1_EDGE_ROTATION_OKLAB;
       break;
-    case SB_EDGE_ROTATION_SUM_PRESERVING:
+    case K1_EDGE_ROTATION_SUM_PRESERVING:
     default:
-      next.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+      next.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
       break;
   }
   next.spatialUniform = config.spatialUniform;
   switch (config.dualEdge) {
-    case SB_EDGE_DUAL_SPLIT:
-      next.dualEdge = SB_EDGE_DUAL_SPLIT;
+    case K1_EDGE_DUAL_SPLIT:
+      next.dualEdge = K1_EDGE_DUAL_SPLIT;
       break;
-    case SB_EDGE_DUAL_MIRROR:
-      next.dualEdge = SB_EDGE_DUAL_MIRROR;
+    case K1_EDGE_DUAL_MIRROR:
+      next.dualEdge = K1_EDGE_DUAL_MIRROR;
       break;
-    case SB_EDGE_DUAL_ONE_SIDED:
+    case K1_EDGE_DUAL_ONE_SIDED:
     default:
-      next.dualEdge = SB_EDGE_DUAL_ONE_SIDED;
+      next.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
       break;
   }
 
@@ -859,8 +859,8 @@ void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config) {
   // secondary bake stays bit-for-bit; SPLIT deliberately halves the secondary too.
   float sec_factor = 1.0f;
   float pri_factor = -1.0f;
-  const bool primary_active = (next.dualEdge != SB_EDGE_DUAL_ONE_SIDED);
-  if (next.dualEdge == SB_EDGE_DUAL_SPLIT) {
+  const bool primary_active = (next.dualEdge != K1_EDGE_DUAL_ONE_SIDED);
+  if (next.dualEdge == K1_EDGE_DUAL_SPLIT) {
     sec_factor = 0.5f;
     pri_factor = -0.5f;
   }
@@ -871,54 +871,54 @@ void sb_edgemixer_lite_set_config(const SBEdgeMixerConfig& config) {
   // is the same for every rotation space; OKLAB reads its own fused F. angleFactor
   // 1.0f leaves the secondary bake byte-identical to the certified single-edge path.
   SQ15x16 next_matrix[9];
-  sb_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
+  k1_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
                            sec_factor, next_matrix);
   SQ15x16 next_oklab_f[9];
-  sb_edge_recompute_oklab(next.mode, next.spreadDegrees, sec_factor, next_oklab_f);
+  k1_edge_recompute_oklab(next.mode, next.spreadDegrees, sec_factor, next_oklab_f);
 
   SQ15x16 next_matrix_primary[9];
   SQ15x16 next_oklab_f_primary[9];
   if (primary_active) {
-    sb_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
+    k1_edge_recompute_matrix(next.mode, next.spreadDegrees, next.rotationSpace,
                              pri_factor, next_matrix_primary);
-    sb_edge_recompute_oklab(next.mode, next.spreadDegrees, pri_factor,
+    k1_edge_recompute_oklab(next.mode, next.spreadDegrees, pri_factor,
                             next_oklab_f_primary);
   }
 
-  portENTER_CRITICAL(&sb_edge_config_mux);
-  sb_edge_config = next;
+  portENTER_CRITICAL(&k1_edge_config_mux);
+  k1_edge_config = next;
   for (int i = 0; i < 9; ++i) {
-    sb_edge_matrix[i] = next_matrix[i];
-    sb_edge_oklab_fmat[i] = next_oklab_f[i];
+    k1_edge_matrix[i] = next_matrix[i];
+    k1_edge_oklab_fmat[i] = next_oklab_f[i];
     if (primary_active) {
-      sb_edge_matrix_primary[i] = next_matrix_primary[i];
-      sb_edge_oklab_fmat_primary[i] = next_oklab_f_primary[i];
+      k1_edge_matrix_primary[i] = next_matrix_primary[i];
+      k1_edge_oklab_fmat_primary[i] = next_oklab_f_primary[i];
     }
   }
-  sb_edge_dual_active = primary_active;
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+  k1_edge_dual_active = primary_active;
+  portEXIT_CRITICAL(&k1_edge_config_mux);
 }
 
 // Shared per-pixel application loop over a snapshotted coefficient set (matrix for
 // SUM/LUMA, fmat for OKLAB). Centre-mask (79/80 outward) unless spatialUniform.
-static void sb_edge_apply_run(CRGB16* buf, uint16_t count,
-                              const SBEdgeMixerConfig& config, float strength,
+static void k1_edge_apply_run(CRGB16* buf, uint16_t count,
+                              const K1EdgeMixerConfig& config, float strength,
                               const SQ15x16* matrix, const SQ15x16* fmat) {
-  const SBEdgeMixerRotationSpace space = config.rotationSpace;
+  const K1EdgeMixerRotationSpace space = config.rotationSpace;
   for (uint16_t i = 0; i < count; i++) {
     float amount = config.spatialUniform ? strength
-                                         : strength * sb_edge_mask(i, count);
-    buf[i] = sb_edge_mix(buf[i], matrix, amount, space, fmat);
+                                         : strength * k1_edge_mask(i, count);
+    buf[i] = k1_edge_mix(buf[i], matrix, amount, space, fmat);
   }
 }
 
-void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixerConfig& config) {
-  SBEdgeMixerMode mode = sb_edge_mode_or_off(config.mode);
-  if (secondary == nullptr || !config.enabled || mode == SB_EDGE_MIXER_OFF) {
+void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConfig& config) {
+  K1EdgeMixerMode mode = k1_edge_mode_or_off(config.mode);
+  if (secondary == nullptr || !config.enabled || mode == K1_EDGE_MIXER_OFF) {
     return;
   }
 
-  float strength = sb_edge_clamp_float01(config.strength);
+  float strength = k1_edge_clamp_float01(config.strength);
   if (strength <= 0.0f) {
     return;
   }
@@ -928,24 +928,24 @@ void sb_edgemixer_lite_apply(CRGB16* secondary, uint16_t count, const SBEdgeMixe
   // sb_visual_hooks_apply_edge_config), which does not affect the coefficients.
   SQ15x16 matrix[9];
   SQ15x16 oklabF[9];
-  portENTER_CRITICAL(&sb_edge_config_mux);
+  portENTER_CRITICAL(&k1_edge_config_mux);
   for (int i = 0; i < 9; ++i) {
-    matrix[i] = sb_edge_matrix[i];
-    oklabF[i] = sb_edge_oklab_fmat[i];
+    matrix[i] = k1_edge_matrix[i];
+    oklabF[i] = k1_edge_oklab_fmat[i];
   }
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+  portEXIT_CRITICAL(&k1_edge_config_mux);
 
-  sb_edge_apply_run(secondary, count, config, strength, matrix, oklabF);
+  k1_edge_apply_run(secondary, count, config, strength, matrix, oklabF);
 }
 
-void sb_edgemixer_lite_apply_primary(CRGB16* primary, uint16_t count, const SBEdgeMixerConfig& config) {
-  SBEdgeMixerMode mode = sb_edge_mode_or_off(config.mode);
-  if (primary == nullptr || !config.enabled || mode == SB_EDGE_MIXER_OFF ||
-      config.dualEdge == SB_EDGE_DUAL_ONE_SIDED) {
+void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMixerConfig& config) {
+  K1EdgeMixerMode mode = k1_edge_mode_or_off(config.mode);
+  if (primary == nullptr || !config.enabled || mode == K1_EDGE_MIXER_OFF ||
+      config.dualEdge == K1_EDGE_DUAL_ONE_SIDED) {
     return;  // ONE_SIDED (or disabled) leaves the primary strip untouched.
   }
 
-  float strength = sb_edge_clamp_float01(config.strength);
+  float strength = k1_edge_clamp_float01(config.strength);
   if (strength <= 0.0f) {
     return;
   }
@@ -956,40 +956,40 @@ void sb_edgemixer_lite_apply_primary(CRGB16* primary, uint16_t count, const SBEd
   SQ15x16 matrix[9];
   SQ15x16 oklabF[9];
   bool active;
-  portENTER_CRITICAL(&sb_edge_config_mux);
-  active = sb_edge_dual_active;
+  portENTER_CRITICAL(&k1_edge_config_mux);
+  active = k1_edge_dual_active;
   for (int i = 0; i < 9; ++i) {
-    matrix[i] = sb_edge_matrix_primary[i];
-    oklabF[i] = sb_edge_oklab_fmat_primary[i];
+    matrix[i] = k1_edge_matrix_primary[i];
+    oklabF[i] = k1_edge_oklab_fmat_primary[i];
   }
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+  portEXIT_CRITICAL(&k1_edge_config_mux);
   if (!active) {
     return;
   }
 
-  sb_edge_apply_run(primary, count, config, strength, matrix, oklabF);
+  k1_edge_apply_run(primary, count, config, strength, matrix, oklabF);
 }
 
-#ifdef SB_EDGEMIXER_HOST_TEST
+#ifdef K1_EDGEMIXER_HOST_TEST
 // Host-only parity-test hooks. Compiled out of every production/device build.
-void sb_edgemixer_lite_test_get_matrix(SQ15x16* out9) {
-  portENTER_CRITICAL(&sb_edge_config_mux);
+void k1_edgemixer_test_get_matrix(SQ15x16* out9) {
+  portENTER_CRITICAL(&k1_edge_config_mux);
   for (int i = 0; i < 9; ++i) {
-    out9[i] = sb_edge_matrix[i];
+    out9[i] = k1_edge_matrix[i];
   }
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+  portEXIT_CRITICAL(&k1_edge_config_mux);
 }
 
-void sb_edgemixer_lite_test_set_matrix(const SQ15x16* in9) {
-  portENTER_CRITICAL(&sb_edge_config_mux);
+void k1_edgemixer_test_set_matrix(const SQ15x16* in9) {
+  portENTER_CRITICAL(&k1_edge_config_mux);
   for (int i = 0; i < 9; ++i) {
-    sb_edge_matrix[i] = in9[i];
+    k1_edge_matrix[i] = in9[i];
   }
-  portEXIT_CRITICAL(&sb_edge_config_mux);
+  portEXIT_CRITICAL(&k1_edge_config_mux);
 }
 #endif
 
-#ifdef SB_EDGEMIXER_AB_DEMO
+#ifdef K1_EDGEMIXER_AB_DEMO
 // BENCH-ONLY A/B demo (TEMPORARY; compiled out of production). Forces the
 // EdgeMixer on and cycles ANALOGOUS -> COMPLEMENTARY -> TRIADIC every ~4 s at full
 // strength / spread 30 / SUM_PRESERVING. Reconfigures (and so recomputes the
@@ -997,11 +997,11 @@ void sb_edgemixer_lite_test_set_matrix(const SQ15x16* in9) {
 // module, because nothing else writes it during the demo. Strength is 1.0f: the
 // LightwaveOS source's "255" is full scale, which on K1 is the float 1.0 (the
 // config clamps to [0, 1] regardless).
-void sb_edgemixer_ab_demo_tick() {
-  static const SBEdgeMixerMode kDemoModes[3] = {
-    SB_EDGE_MIXER_ANALOGOUS,
-    SB_EDGE_MIXER_COMPLEMENTARY,
-    SB_EDGE_MIXER_TRIADIC
+void k1_edgemixer_ab_demo_tick() {
+  static const K1EdgeMixerMode kDemoModes[3] = {
+    K1_EDGE_MIXER_ANALOGOUS,
+    K1_EDGE_MIXER_COMPLEMENTARY,
+    K1_EDGE_MIXER_TRIADIC
   };
   static uint8_t last_idx = 0xFF;
 
@@ -1011,13 +1011,13 @@ void sb_edgemixer_ab_demo_tick() {
   }
   last_idx = idx;
 
-  SBEdgeMixerConfig cfg;
+  K1EdgeMixerConfig cfg;
   cfg.enabled = true;
   cfg.mode = kDemoModes[idx];
   cfg.strength = 1.0f;
   cfg.spreadDegrees = 30;
-  cfg.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+  cfg.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
   cfg.spatialUniform = false;
-  sb_edgemixer_lite_set_config(cfg);
+  k1_edgemixer_set_config(cfg);
 }
 #endif

@@ -47,14 +47,14 @@ struct SBOnsetBeatEvent {
   bool beat;
 };
 
-enum SBEdgeMixerMode : uint8_t {
-  SB_EDGE_MIXER_OFF = 0,
-  SB_EDGE_MIXER_ANALOGOUS,
+enum K1EdgeMixerMode : uint8_t {
+  K1_EDGE_MIXER_OFF = 0,
+  K1_EDGE_MIXER_ANALOGOUS,
 };
 
-struct SBEdgeMixerConfig {
+struct K1EdgeMixerConfig {
   bool enabled;
-  SBEdgeMixerMode mode;
+  K1EdgeMixerMode mode;
   float strength;
 };
 
@@ -81,7 +81,7 @@ SBVisualHookConfig sb_visual_hooks_config();
 void sb_visual_hooks_set_config(const SBVisualHookConfig& config);
 SBVisualHookOutput sb_visual_hooks_tick(const SBOnsetBeatEvent& event, uint32_t now_ms);
 void sb_visual_hooks_apply_render_params(const SBVisualHookOutput& output, RenderParams* params);
-SBEdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, SBEdgeMixerConfig config);
+K1EdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, K1EdgeMixerConfig config);
 """
 
 

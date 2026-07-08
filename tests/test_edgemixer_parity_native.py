@@ -1,9 +1,9 @@
 """EdgeMixer -> K1 colour-port parity (Step 1 acceptance gate).
 
 Compiles the REAL firmware colour module
-SPECTRASYNQ_K1_FIRMWARE/director/sb_edgemixer_lite.cpp on the host (via the probe
+SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.cpp on the host (via the probe
 scripts/regression-harness/edgemixer_parity_probe.cpp) and drives its actual
-sb_edgemixer_lite_apply() against the frozen LightwaveOS EdgeMixer golden vectors
+k1_edgemixer_apply() against the frozen LightwaveOS EdgeMixer golden vectors
 (tests/golden/edgemixer_golden.csv, 810 rows). No Python re-implementation of the
 transform, so the test cannot drift from the firmware.
 
@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
-MODULE_CPP = FW / "director" / "sb_edgemixer_lite.cpp"
+MODULE_CPP = FW / "director" / "k1_edgemixer.cpp"
 PROBE = ROOT / "scripts" / "regression-harness" / "edgemixer_parity_probe.cpp"
 SHIM_DIR = ROOT / "scripts" / "regression-harness" / "edgemixer_host_shim"
 FIXEDPOINTS_SRC = ROOT / "libraries" / "FixedPoints" / "src"
@@ -67,7 +67,7 @@ def _build_and_run():
         exe = Path(td) / "edgemixer_parity_probe"
         compile_cmd = [
             cc, "-std=c++17", "-O2",
-            "-DSB_EDGEMIXER_HOST_TEST=1",
+            "-DK1_EDGEMIXER_HOST_TEST=1",
             f"-I{SHIM_DIR}",
             f"-I{FIXEDPOINTS_SRC}",
             f"-I{FW / 'director'}",

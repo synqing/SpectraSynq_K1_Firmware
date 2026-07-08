@@ -19,7 +19,7 @@
 #include "sb_smart_director.h"      // SBSmartDirectorConfig + sb_smart_director_config/set_config (smart_director)
 #include "sb_mode_selection.h"      // sb_mode_selection_init (smart_switching)
 #include "sb_visual_hooks.h"        // SBVisualHookConfig + sb_visual_hooks_config/set_config (smart_visual)
-#include "sb_edgemixer_lite.h"      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
+#include "k1_edgemixer.h"      // K1EdgeMixerConfig/K1EdgeMixerMode + k1_edgemixer_config/set_config (edge_mixer)
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
 #endif
@@ -958,17 +958,17 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 // serial_menu.h-local helpers (EXTERNAL linkage; defined in serial_menu.h, included
 // only by the .ino TU in firmware and the driver TU in the replay oracle) that the
 // smart/edge dispatchers call. Forward-declared here (same pattern as the vivid
-// helpers); resolved cross-TU at link. SBEdgeMixerMode comes from sb_edgemixer_lite.h
-// (included above), so sb_parse_edge_mode's prototype is valid here.
+// helpers); resolved cross-TU at link. K1EdgeMixerMode comes from k1_edgemixer.h
+// (included above), so k1_parse_edge_mode's prototype is valid here.
 // ---------------------------------------------------------------------------
 void sb_print_smart_status();
-void sb_print_edge_status();
+void k1_print_edge_status();
 bool sb_apply_smart_scene(const char* scene);
-bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode);
-bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space);
-bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual);
-bool sb_parse_edge_uniform(const char* text, bool* out_uniform);
-void sb_edge_warn_if_collapsed(const SBEdgeMixerConfig& e);
+bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode);
+bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space);
+bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual);
+bool k1_parse_edge_uniform(const char* text, bool* out_uniform);
+void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
@@ -1025,7 +1025,7 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
     else if (strcmp(command_type, "smart_scene") == 0) {
       if (sb_apply_smart_scene(command_data)) {
         sb_print_smart_status();
-        sb_print_edge_status();
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1066,8 +1066,8 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_edge_mixer — edge-mixer control (edge_enabled / edge_mode /
-// edge_strength), lifted VERBATIM. Calls sb_edgemixer_lite_* (director TU) +
-// sb_parse_edge_mode + sb_print_edge_status. Ungated.
+// edge_strength), lifted VERBATIM. Calls k1_edgemixer_* (director TU) +
+// k1_parse_edge_mode + k1_print_edge_status. Ungated.
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data) {
     if (false) {}
@@ -1075,26 +1075,26 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_enabled") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.enabled = value;
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else if (strcmp(command_type, "edge_mode") == 0) {
-      SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
-      if (sb_parse_edge_mode(command_data, &mode)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+      K1EdgeMixerMode mode = K1_EDGE_MIXER_OFF;
+      if (k1_parse_edge_mode(command_data, &mode)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.mode = mode;
-        if (mode == SB_EDGE_MIXER_OFF) {
+        if (mode == K1_EDGE_MIXER_OFF) {
           config.enabled = false;
         }
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
-        sb_edge_warn_if_collapsed(config);  // close the edge_mode= warn gap (mirror+complementary via mode)
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+        k1_edge_warn_if_collapsed(config);  // close the edge_mode= warn gap (mirror+complementary via mode)
       } else {
         bad_command(command_type, command_data);
       }
@@ -1103,10 +1103,10 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_strength") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.strength = constrain(value, 0.0f, 1.0f);
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1115,23 +1115,22 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_spread") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.spreadDegrees = (uint8_t)constrain(value, 0.0f, 60.0f);
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else if (strcmp(command_type, "edge_rotation") == 0) {
-      SBEdgeMixerRotationSpace space = SB_EDGE_ROTATION_SUM_PRESERVING;
-      if (sb_parse_edge_rotation(command_data, &space)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+      K1EdgeMixerRotationSpace space = K1_EDGE_ROTATION_SUM_PRESERVING;
+      if (k1_parse_edge_rotation(command_data, &space)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.rotationSpace = space;
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
-        sb_edge_warn_if_collapsed(config);
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1141,13 +1140,13 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       // Symmetric dual-edge (A lane): one_sided | split | mirror. Scriptable
       // counterpart to the 'y' hotkey — set the dual mode non-interactively for
       // reproducible VP_PERF / capture sweeps.
-      SBEdgeMixerDualEdge dual = SB_EDGE_DUAL_ONE_SIDED;
-      if (sb_parse_edge_dual(command_data, &dual)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+      K1EdgeMixerDualEdge dual = K1_EDGE_DUAL_ONE_SIDED;
+      if (k1_parse_edge_dual(command_data, &dual)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.dualEdge = dual;
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
-        sb_edge_warn_if_collapsed(config);
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+        k1_edge_warn_if_collapsed(config);
       } else {
         bad_command(command_type, command_data);
       }
@@ -1157,11 +1156,11 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       // Spatial weighting (ref E): uniform | masked. Scriptable counterpart to the
       // 'm' hotkey — set non-interactively for reproducible demo / capture.
       bool uniform = false;
-      if (sb_parse_edge_uniform(command_data, &uniform)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+      if (k1_parse_edge_uniform(command_data, &uniform)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.spatialUniform = uniform;
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1169,17 +1168,17 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
 
     else if (strcmp(command_type, "edge_bench") == 0) {
       // Dev-only worst-case micro-benchmark (OKLab perf gate). Times
-      // sb_edgemixer_lite_apply on a synthetic FULLY-LIT 160-px strip so the
+      // k1_edgemixer_apply on a synthetic FULLY-LIT 160-px strip so the
       // near-black passthrough never fires — the true per-strip worst case,
       // measured on-device (not extrapolated). spatialUniform=true forces
       // amount=1 on every pixel. Restores the prior config afterwards.
       static CRGB16 bench_buf[NATIVE_RESOLUTION];
-      const SBEdgeMixerConfig saved = sb_edgemixer_lite_config();
+      const K1EdgeMixerConfig saved = k1_edgemixer_config();
       const int R = 100;
-      const SBEdgeMixerRotationSpace spaces[3] = {
-        SB_EDGE_ROTATION_SUM_PRESERVING,
-        SB_EDGE_ROTATION_LUMA_PRESERVING,
-        SB_EDGE_ROTATION_OKLAB
+      const K1EdgeMixerRotationSpace spaces[3] = {
+        K1_EDGE_ROTATION_SUM_PRESERVING,
+        K1_EDGE_ROTATION_LUMA_PRESERVING,
+        K1_EDGE_ROTATION_OKLAB
       };
       const char* names[3] = {"faithful", "luma", "oklab"};
       tx_begin();
@@ -1188,14 +1187,14 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       USBSerial.print(" iters=");
       USBSerial.println(R);
       for (int s = 0; s < 3; ++s) {
-        SBEdgeMixerConfig cfg;
+        K1EdgeMixerConfig cfg;
         cfg.enabled = true;
-        cfg.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+        cfg.mode = K1_EDGE_MIXER_COMPLEMENTARY;
         cfg.strength = 1.0f;
         cfg.spreadDegrees = 30;
         cfg.rotationSpace = spaces[s];
         cfg.spatialUniform = true;  // amount = 1 on every pixel (worst case)
-        sb_edgemixer_lite_set_config(cfg);
+        k1_edgemixer_set_config(cfg);
         for (uint16_t i = 0; i < NATIVE_RESOLUTION; ++i) {
           bench_buf[i].r = SQ15x16(0.75f);
           bench_buf[i].g = SQ15x16(0.20f);
@@ -1203,7 +1202,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         }
         const unsigned long t0 = micros();
         for (int r = 0; r < R; ++r) {
-          sb_edgemixer_lite_apply(bench_buf, NATIVE_RESOLUTION, cfg);
+          k1_edgemixer_apply(bench_buf, NATIVE_RESOLUTION, cfg);
         }
         const unsigned long dt = micros() - t0;
         USBSerial.print("EDGE_BENCH ");
@@ -1211,7 +1210,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         USBSerial.print(": us_per_call=");
         USBSerial.println((double)dt / (double)R, 1);
       }
-      sb_edgemixer_lite_set_config(saved);
+      k1_edgemixer_set_config(saved);
       tx_end();
     }
 
@@ -1224,24 +1223,24 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       // The host sweeps inputs + does the CIELAB analysis. Restores prior config.
       int space = 0, modei = 2, ri = 0, gi = 0, bi = 0;
       if (sscanf(command_data, "%d,%d,%d,%d,%d", &space, &modei, &ri, &gi, &bi) == 5) {
-        const SBEdgeMixerConfig saved = sb_edgemixer_lite_config();
-        SBEdgeMixerRotationSpace rs =
-            (space == 2) ? SB_EDGE_ROTATION_OKLAB :
-            (space == 1) ? SB_EDGE_ROTATION_LUMA_PRESERVING :
-                           SB_EDGE_ROTATION_SUM_PRESERVING;
-        SBEdgeMixerConfig cfg;
+        const K1EdgeMixerConfig saved = k1_edgemixer_config();
+        K1EdgeMixerRotationSpace rs =
+            (space == 2) ? K1_EDGE_ROTATION_OKLAB :
+            (space == 1) ? K1_EDGE_ROTATION_LUMA_PRESERVING :
+                           K1_EDGE_ROTATION_SUM_PRESERVING;
+        K1EdgeMixerConfig cfg;
         cfg.enabled = true;
-        cfg.mode = (SBEdgeMixerMode)modei;   // set_config sanitises out-of-range
+        cfg.mode = (K1EdgeMixerMode)modei;   // set_config sanitises out-of-range
         cfg.strength = 1.0f;
         cfg.spreadDegrees = 30;
         cfg.rotationSpace = rs;
         cfg.spatialUniform = true;           // amount = 1 on the single pixel
-        sb_edgemixer_lite_set_config(cfg);
+        k1_edgemixer_set_config(cfg);
         static CRGB16 one[1];
         one[0].r = SQ15x16((float)ri / 65535.0f);
         one[0].g = SQ15x16((float)gi / 65535.0f);
         one[0].b = SQ15x16((float)bi / 65535.0f);
-        sb_edgemixer_lite_apply(one, 1, cfg);
+        k1_edgemixer_apply(one, 1, cfg);
         auto q16 = [](SQ15x16 v) -> int {
           float f = (float)v.getInternal() / 65536.0f;
           if (f < 0.0f) f = 0.0f;
@@ -1256,7 +1255,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         USBSerial.print(q16(one[0].g));   USBSerial.print(',');
         USBSerial.println(q16(one[0].b));
         tx_end();
-        sb_edgemixer_lite_set_config(saved);
+        k1_edgemixer_set_config(saved);
       } else {
         bad_command(command_type, command_data);
       }

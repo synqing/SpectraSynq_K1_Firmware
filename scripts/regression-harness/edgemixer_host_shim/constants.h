@@ -1,5 +1,5 @@
 // Minimal host shim for SPECTRASYNQ_K1_FIRMWARE/system/constants.h, used ONLY by
-// the EdgeMixer parity probe. director/sb_edgemixer_lite.h includes "constants.h"
+// the EdgeMixer parity probe. director/k1_edgemixer.h includes "constants.h"
 // purely for the SQ15x16 type, the CRGB16 struct and NATIVE_RESOLUTION. This shim
 // provides EXACTLY those three, sourced identically to the real header:
 //   - SQ15x16  : the genuine FixedPoints SFixed<15,16> alias (FixedPointsCommon)

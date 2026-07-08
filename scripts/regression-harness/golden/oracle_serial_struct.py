@@ -6,7 +6,7 @@ locks BEHAVIOUR by compiling + running parse_command() on the host. That works f
 GLOBAL-WRITE handlers (they mutate inline globals the host can observe). It is BLIND
 to the FUNCTION-CALL families — queue/transition, smart_*, edge_*, set_mode, ... —
 because those call host-STUBBED subsystems (sb_queue_*, sb_smart_director_*,
-sb_edgemixer_*, ...) whose real bodies drag FS/LittleFS/FreeRTOS and cannot host
+k1_edgemixer_*, ...) whose real bodies drag FS/LittleFS/FreeRTOS and cannot host
 compile. Locking them via replay would freeze only the echo shell, not the real
 behaviour = the blind-lock the discipline forbids.
 
@@ -112,7 +112,7 @@ FAMILIES = [
     {
         "name": "edge_mixer",
         "dispatcher": "serial_cmd_dispatch_edge_mixer",
-        # Edge-mixer control (sb_edgemixer_lite_* config + sb_parse_edge_mode);
+        # Edge-mixer control (k1_edgemixer_* config + k1_parse_edge_mode);
         # ungated, facade-free.
         "commands": [
             "edge_enabled",

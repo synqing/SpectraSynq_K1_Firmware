@@ -134,7 +134,7 @@ void sb_visual_hooks_apply_render_params(const SBVisualHookOutput& output, Rende
   params->CHROMA = sb_hook_clamp(params->CHROMA * output.chroma_scalar, 0.0f, 2.0f);
 }
 
-SBEdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, SBEdgeMixerConfig config) {
+K1EdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, K1EdgeMixerConfig config) {
   SBVisualHookConfig hook_config = sb_visual_hooks_config();
   if (!hook_config.enabled) {
     return config;

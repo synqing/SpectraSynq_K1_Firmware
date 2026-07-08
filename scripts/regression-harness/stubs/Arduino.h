@@ -113,7 +113,7 @@ static inline int64_t esp_timer_get_time() { return (int64_t)g_sb_host_millis * 
 static inline int  xPortGetCoreID() { return 0; }
 
 // --- FreeRTOS critical-section primitives (portMUX) -> no-op on host --------
-// Director/control TUs (sb_edgemixer_lite, sb_visual_hooks, sb_mode_selection,
+// Director/control TUs (k1_edgemixer, sb_visual_hooks, sb_mode_selection,
 // sb_smart_director, sb_effect_queue) guard their config state with portMUX
 // critical sections but include only <Arduino.h>, not freertos/task.h. Provide
 // the family here, self-guarded by SB_HOST_PORTMUX_DEFINED so it is emitted at

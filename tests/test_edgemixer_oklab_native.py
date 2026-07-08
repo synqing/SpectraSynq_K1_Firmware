@@ -1,9 +1,9 @@
-"""EdgeMixer SB_EDGE_ROTATION_OKLAB perceptual-rotation acceptance gate.
+"""EdgeMixer K1_EDGE_ROTATION_OKLAB perceptual-rotation acceptance gate.
 
 Compiles the REAL firmware colour module
-SPECTRASYNQ_K1_FIRMWARE/director/sb_edgemixer_lite.cpp on the host (via the probe
+SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.cpp on the host (via the probe
 scripts/regression-harness/edgemixer_oklab_probe.cpp) and drives its actual
-sb_edgemixer_lite_apply() in the OKLAB rotation space against an INDEPENDENT
+k1_edgemixer_apply() in the OKLAB rotation space against an INDEPENDENT
 double-precision, textbook-OKLab oracle (Ottosson 2020) re-implemented in the
 probe. The engine and the oracle share no code, so agreement is real
 cross-validation.
@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
-MODULE_CPP = FW / "director" / "sb_edgemixer_lite.cpp"
+MODULE_CPP = FW / "director" / "k1_edgemixer.cpp"
 PROBE = ROOT / "scripts" / "regression-harness" / "edgemixer_oklab_probe.cpp"
 SHIM_DIR = ROOT / "scripts" / "regression-harness" / "edgemixer_host_shim"
 FIXEDPOINTS_SRC = ROOT / "libraries" / "FixedPoints" / "src"
