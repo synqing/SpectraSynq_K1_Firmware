@@ -1923,7 +1923,11 @@ void cmd_help() {
   USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
   USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
   USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+#ifdef SB_K1_BLE_REMOTED
+  // Radio-isolation guard: this help text must never ship in production —
+  // the literal "[ble_remoted]" token trips guard_k1_radio_isolation.py.
   USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
@@ -2859,6 +2863,8 @@ void parse_command(char* command_buf) {
       }
     }
 
+#ifdef SB_K1_BLE_REMOTED
+    // Compile-gated with the BLE surface it toggles (radio-isolation guard).
     else if (strcmp(command_type, "ble_stream") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
@@ -2871,6 +2877,7 @@ void parse_command(char* command_buf) {
         bad_command(command_type, command_data);
       }
     }
+#endif
 
 	    else if (strcmp(command_type, "vp_perf") == 0) {
 	      vp_perf_command(command_type, command_data);
