@@ -1132,6 +1132,54 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       }
     }
 
+    else if (strcmp(command_type, "edge_bench") == 0) {
+      // Dev-only worst-case micro-benchmark (OKLab perf gate). Times
+      // sb_edgemixer_lite_apply on a synthetic FULLY-LIT 160-px strip so the
+      // near-black passthrough never fires — the true per-strip worst case,
+      // measured on-device (not extrapolated). spatialUniform=true forces
+      // amount=1 on every pixel. Restores the prior config afterwards.
+      static CRGB16 bench_buf[NATIVE_RESOLUTION];
+      const SBEdgeMixerConfig saved = sb_edgemixer_lite_config();
+      const int R = 100;
+      const SBEdgeMixerRotationSpace spaces[3] = {
+        SB_EDGE_ROTATION_SUM_PRESERVING,
+        SB_EDGE_ROTATION_LUMA_PRESERVING,
+        SB_EDGE_ROTATION_OKLAB
+      };
+      const char* names[3] = {"faithful", "luma", "oklab"};
+      tx_begin();
+      USBSerial.print("EDGE_BENCH: px=");
+      USBSerial.print((int)NATIVE_RESOLUTION);
+      USBSerial.print(" iters=");
+      USBSerial.println(R);
+      for (int s = 0; s < 3; ++s) {
+        SBEdgeMixerConfig cfg;
+        cfg.enabled = true;
+        cfg.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+        cfg.strength = 1.0f;
+        cfg.spreadDegrees = 30;
+        cfg.rotationSpace = spaces[s];
+        cfg.spatialUniform = true;  // amount = 1 on every pixel (worst case)
+        sb_edgemixer_lite_set_config(cfg);
+        for (uint16_t i = 0; i < NATIVE_RESOLUTION; ++i) {
+          bench_buf[i].r = SQ15x16(0.75f);
+          bench_buf[i].g = SQ15x16(0.20f);
+          bench_buf[i].b = SQ15x16(0.05f);
+        }
+        const unsigned long t0 = micros();
+        for (int r = 0; r < R; ++r) {
+          sb_edgemixer_lite_apply(bench_buf, NATIVE_RESOLUTION, cfg);
+        }
+        const unsigned long dt = micros() - t0;
+        USBSerial.print("EDGE_BENCH ");
+        USBSerial.print(names[s]);
+        USBSerial.print(": us_per_call=");
+        USBSerial.println((double)dt / (double)R, 1);
+      }
+      sb_edgemixer_lite_set_config(saved);
+      tx_end();
+    }
+
     else {
       return false;  // not an edge-mixer handler — let parse_command's ladder continue
     }

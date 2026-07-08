@@ -591,16 +591,23 @@ bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode) {
 }
 
 const char* sb_edge_rotation_name(SBEdgeMixerRotationSpace space) {
-  return (space == SB_EDGE_ROTATION_LUMA_PRESERVING) ? "luma" : "faithful";
+  switch (space) {
+    case SB_EDGE_ROTATION_LUMA_PRESERVING: return "luma";
+    case SB_EDGE_ROTATION_OKLAB:           return "oklab";
+    default:                               return "faithful";
+  }
 }
 
-// faithful -> SUM_PRESERVING (proven); luma -> LUMA_PRESERVING (Tier-1b stub that
-// falls back to faithful in the maths, but the choice is still accepted + stored).
+// faithful -> SUM_PRESERVING (grey-axis rotation, +/-1 LSB golden parity);
+// luma     -> LUMA_PRESERVING (grey-axis rotation + per-pixel BT.601 luma rescale);
+// oklab    -> OKLAB (perceptual hue rotation in the OKLab a/b plane, holds L constant).
 bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space) {
   if (strcmp(text, "faithful") == 0 || strcmp(text, "sum") == 0) {
     *out_space = SB_EDGE_ROTATION_SUM_PRESERVING;
   } else if (strcmp(text, "luma") == 0) {
     *out_space = SB_EDGE_ROTATION_LUMA_PRESERVING;
+  } else if (strcmp(text, "oklab") == 0) {
+    *out_space = SB_EDGE_ROTATION_OKLAB;
   } else {
     return false;
   }
@@ -776,9 +783,19 @@ void serial_edge_adjust_strength(float delta) {
 
 void serial_edge_toggle_rotation() {
   SBEdgeMixerConfig e = sb_edgemixer_lite_config();
-  e.rotationSpace = (e.rotationSpace == SB_EDGE_ROTATION_LUMA_PRESERVING)
-                        ? SB_EDGE_ROTATION_SUM_PRESERVING
-                        : SB_EDGE_ROTATION_LUMA_PRESERVING;
+  // 3-way cycle: faithful (SUM) -> luma -> oklab -> faithful. This is the bench
+  // A/B control for the OKLab-vs-luma-rescale perceptual comparison on the plate.
+  switch (e.rotationSpace) {
+    case SB_EDGE_ROTATION_SUM_PRESERVING:
+      e.rotationSpace = SB_EDGE_ROTATION_LUMA_PRESERVING;
+      break;
+    case SB_EDGE_ROTATION_LUMA_PRESERVING:
+      e.rotationSpace = SB_EDGE_ROTATION_OKLAB;
+      break;
+    default:
+      e.rotationSpace = SB_EDGE_ROTATION_SUM_PRESERVING;
+      break;
+  }
   sb_edgemixer_lite_set_config(e);
   tx_begin();
   USBSerial.print("EDGE_ROTATION: ");
@@ -2077,8 +2094,8 @@ void cmd_help() {
 	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
 	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
 	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
-	  USBSerial.println("                  edge_rotation=[faithful/luma] | EdgeMixer rotation space (luma=Tier-1b stub, falls back to faithful)");
-	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful<->luma");
+	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif
