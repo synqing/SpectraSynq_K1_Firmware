@@ -53,6 +53,14 @@ MIN_GAMUT_OOG = 8         # enough out-of-gamut samples for the metric to mean a
 BAND_GAMUT_DL_NEW_M = 12  # chroma-reduction clip holds output L within 0.012 of ideal
 GAMUT_IMPROVE_FACTOR = 2  # ...and at least 2x better than the old per-channel clamp
 
+# Task 1 LUT DESIGN TOLERANCE — the certified perceptual cost the LUT + fixed-point
+# path is designed to introduce vs EXACT double-precision OKLab. These are the gate
+# thresholds; the LUT resolution (257-entry interpolated mantissa) was chosen to sit
+# an order of magnitude inside them. Measured actuals: OKLab dE 419e-6 (0.00042),
+# CIELAB dE*ab 105e-3 (0.105) — ~1/10 of the classic 1.0 JND, comfortably no-lite.
+BAND_MAX_DE_OKLAB_E6 = 5000   # OKLab delta-E <= 0.005 (M5 currency; design target)
+BAND_MAX_DE_LAB_E3 = 500      # CIELAB delta-E*ab <= 0.5 == half the 1.0 JND
+
 EXPECTED_OK_SAMPLES = 6 * 4 * 4 * 4   # 6 modes x 4^3 colour grid
 EXPECTED_RT_SAMPLES = 4 * 4 * 4
 
@@ -154,6 +162,21 @@ class EdgeMixerOklabNativeTest(unittest.TestCase):
         self.assertGreaterEqual(
             self.v["FAULT_PERTURBED_HUE_MDEG"], MIN_FAULT_HUE_MDEG,
             "injected M2 coefficient fault MUST break the hue metric",
+        )
+
+    def test_lut_perceptual_cost_within_design_tolerance(self):
+        # Task 1: certify the LUT + fixed-point path's perceptual cost vs EXACT
+        # OKLab sits inside the design tolerance (comfortably sub-JND) in both the
+        # OKLab delta-E (M5) currency and the classic CIELAB delta-E*ab.
+        self.assertLessEqual(
+            self.v["OK_MAX_DE_OKLAB_E6"], BAND_MAX_DE_OKLAB_E6,
+            f"LUT OKLab dE {self.v['OK_MAX_DE_OKLAB_E6']}e-6 exceeds design "
+            f"tolerance {BAND_MAX_DE_OKLAB_E6}e-6",
+        )
+        self.assertLessEqual(
+            self.v["OK_MAX_DE_LAB_E3"], BAND_MAX_DE_LAB_E3,
+            f"LUT CIELAB dE*ab {self.v['OK_MAX_DE_LAB_E3']}e-3 exceeds design "
+            f"tolerance {BAND_MAX_DE_LAB_E3}e-3 (JND == 1000e-3)",
         )
 
     def test_gamut_clip_holds_lightness_better_than_hard_clamp(self):

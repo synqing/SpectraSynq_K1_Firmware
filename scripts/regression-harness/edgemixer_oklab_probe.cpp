@@ -33,6 +33,8 @@
 //   GAMUT_OOG_COUNT   COMPLEMENTARY grid pixels that leave the sRGB gamut
 //   GAMUT_DL_NEW_M    max output-L drift from the constant-L ideal (chroma clip)
 //   GAMUT_DL_CLAMP_M  same, for the OLD per-channel hard clamp (before/after)
+//   OK_MAX_DE_OKLAB_E6  max OKLab delta-E vs exact OKLab * 1e6 (LUT perceptual cost)
+//   OK_MAX_DE_LAB_E3    max CIELAB delta-E*ab vs exact * 1e3 (1000 == 1.0 JND)
 //
 // British English throughout. Emits "KEY value" lines for the pytest driver.
 // ============================================================================
@@ -67,6 +69,32 @@ Lab displayToOklab(double r, double g, double b) {
   o.L = 0.2104542553 * lc + 0.7936177850 * mc - 0.0040720468 * sc;
   o.a = 1.9779984951 * lc - 2.4285922050 * mc + 0.4505937099 * sc;
   o.b = 0.0259040371 * lc + 0.7827717662 * mc - 0.8086757660 * sc;
+  return o;
+}
+
+// Euclidean OKLab delta-E between two OKLab points (the M5 currency).
+double deltaEOklab(const Lab& x, const Lab& y) {
+  const double dl = x.L - y.L, da = x.a - y.a, db = x.b - y.b;
+  return std::sqrt(dl * dl + da * da + db * db);
+}
+
+// CIE L*a*b* companion, so the LUT's perceptual cost can also be read in the
+// classic CIELAB delta-E*ab currency where 1.0 is the JND. Decodes display with
+// the SAME gamma 2.2 as the OKLab domain, then linear sRGB -> XYZ (D65) -> Lab.
+double labF(double t) {
+  const double d = 6.0 / 29.0;
+  return (t > d * d * d) ? std::cbrt(t) : (t / (3.0 * d * d) + 4.0 / 29.0);
+}
+Lab displayToCielab(double r, double g, double b) {
+  const double lr = gammaDecode(r), lg = gammaDecode(g), lb = gammaDecode(b);
+  const double X = 0.4124564 * lr + 0.3575761 * lg + 0.1804375 * lb;
+  const double Y = 0.2126729 * lr + 0.7151522 * lg + 0.0721750 * lb;
+  const double Z = 0.0193339 * lr + 0.1191920 * lg + 0.9503041 * lb;
+  const double fx = labF(X / 0.95047), fy = labF(Y / 1.0), fz = labF(Z / 1.08883);
+  Lab o;
+  o.L = 116.0 * fy - 16.0;
+  o.a = 500.0 * (fx - fy);
+  o.b = 200.0 * (fy - fz);
   return o;
 }
 
@@ -246,6 +274,7 @@ int main() {
   const double kHueChromaGate = 0.02;  // hue undefined for near-neutral results
 
   double maxDL = 0.0, maxDC = 0.0, maxHue = 0.0;
+  double maxDeOklab = 0.0, maxDeLab = 0.0;  // LUT + fixed-point perceptual cost
   int okSamples = 0;
   for (const ModeSpread& cs : cases) {
     double c, k;
@@ -266,6 +295,12 @@ int main() {
           const double dC = std::fabs(chroma(eng) - chroma(tgt));
           if (dL > maxDL) maxDL = dL;
           if (dC > maxDC) maxDC = dC;
+          // Combined perceptual cost (engine vs exact-double reference).
+          const double deOk = deltaEOklab(eng, tgt);
+          if (deOk > maxDeOklab) maxDeOklab = deOk;
+          const double deLab =
+              deltaEOklab(displayToCielab(er, eg, eb), displayToCielab(rr, rg, rb));
+          if (deLab > maxDeLab) maxDeLab = deLab;
           if (chroma(tgt) > kHueChromaGate && chroma(eng) > kHueChromaGate) {
             const double h = hueErrorDeg(eng, tgt);
             if (h > maxHue) maxHue = h;
@@ -371,6 +406,13 @@ int main() {
   std::printf("OK_MAX_DL_M %d\n", milli(maxDL));
   std::printf("OK_MAX_DC_M %d\n", milli(maxDC));
   std::printf("OK_MAX_HUE_MDEG %d\n", milli(maxHue));
+  // Combined perceptual cost of the LUT + fixed-point path vs exact OKLab.
+  // OKLab delta-E in micro-units (x1e6); CIELAB delta-E*ab in milli-units (x1000,
+  // so 1000 == the classic JND of 1.0).
+  std::printf("OK_MAX_DE_OKLAB_E6 %d\n",
+              static_cast<int>(std::lround(maxDeOklab * 1000000.0)));
+  std::printf("OK_MAX_DE_LAB_E3 %d\n",
+              static_cast<int>(std::lround(maxDeLab * 1000.0)));
   std::printf("RT_SAMPLES %d\n", rtSamples);
   std::printf("RT_MAX_DIFF_M %d\n", milli(maxRt));
   std::fflush(stdout);
