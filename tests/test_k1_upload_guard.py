@@ -105,26 +105,33 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
-    def test_prod_im73d_env_is_bound_to_main_k1(self):
+    def test_prod_im73d_upload_is_blocked_on_every_port(self):
+        # 628f69b (2026-07-08) re-blocked k1_prod_im73d outright: no
+        # production-LED-wired (6/7) IM73D unit exists, and the 2026-07-07
+        # misflash onto the 4/5-wired bench darkened both LED channels. The
+        # block fires before any port/identity matching, on any target.
+        for port in ("/dev/tty.usbmodem1401", "/dev/tty.usbmodem12201"):
+            with self.subTest(port=port):
+                ok, message = self.guard.validate_upload_target(
+                    "k1_prod_im73d", port, self.ports
+                )
+                self.assertFalse(ok)
+                self.assertIn("upload blocked", message)
+                self.assertIn("production-LED-wired", message)
+
+    def test_sync_probe_envs_are_bound_to_their_devices(self):
+        # Phase-0 dual-K1 sync probes (F5 grant 2026-07-08): LEADER env only on
+        # the main K1 (F887A500), FOLLOWER env only on the bench K1 (B489A500).
         ok, message = self.guard.validate_upload_target(
-            "k1_prod_im73d",
-            "/dev/tty.usbmodem1401",
-            self.ports,
+            "k1_sync_probe_main", "/dev/tty.usbmodem1401", self.ports
         )
         self.assertTrue(ok, message)
         self.assertIn("F887A500", message)
-
-    def test_prod_im73d_rejects_bench_target(self):
-        # k1_prod_im73d = main/prod LED map + IM73D PDM. Bench IM73D remains
-        # k1_bench_im73d. Cross-flash attempts must fail by USB MAC.
         ok, message = self.guard.validate_upload_target(
-            "k1_prod_im73d",
-            "/dev/tty.usbmodem12201",
-            self.ports,
+            "k1_sync_probe_bench", "/dev/tty.usbmodem12201", self.ports
         )
-        self.assertFalse(ok)
-        self.assertIn("has USB serial", message)
-        self.assertIn("expected", message)
+        self.assertTrue(ok, message)
+        self.assertIn("B489A500", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
         # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
@@ -154,7 +161,10 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
             ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
-            ("k1_prod_im73d", "/dev/tty.usbmodem12201"),  # prod IM73D must reject the bench K1 port
+            # k1_prod_im73d is now upload-blocked outright (628f69b) — covered by
+            # test_prod_im73d_upload_is_blocked_on_every_port, not identity matching.
+            ("k1_sync_probe_main", "/dev/tty.usbmodem12201"),  # sync LEADER must reject the bench port
+            ("k1_sync_probe_bench", "/dev/tty.usbmodem1401"),  # sync FOLLOWER must reject the main port
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):

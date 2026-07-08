@@ -17,8 +17,8 @@ in [`../spec-index.md`](../spec-index.md).
 
 | Device | Role | Chip ID | Port (typical) | Permitted envs by configured route |
 |---|---|---|---|---|
-| **1401** | Main K1 (Captain's primary) | `F887A500` | `/dev/cu.usbmodem1401` / currently (2026-07-04) `/dev/cu.usbmodem2101` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route |
-| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently (2026-07-04) `/dev/cu.usbmodem1101` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
+| **1401** | Main K1 (Captain's primary) | `F887A500` | `/dev/cu.usbmodem1401` / currently (2026-07-04) `/dev/cu.usbmodem2101` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route; `k1_sync_probe_main` (dual-K1 sync Phase-0 LEADER, non-shippable, F5 grant 2026-07-08) |
+| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently (2026-07-04) `/dev/cu.usbmodem1101` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected; `k1_sync_probe_bench` (dual-K1 sync Phase-0 FOLLOWER, non-shippable, F5 grant 2026-07-08) |
 | **K718** | Remoted BLE-MIDI dial (Guition JC3636K718_P, **separate product**, not a K1) | MAC `ac:a7:04:ee:57:7c` (ESP32-S3R8, 8MB PSRAM, 16MB flash) | `/dev/cu.usbmodem101` (2026-06-30; drifts) | arduino-cli `JC3636_K718_REMOTED_BLE_V1` (knob repo) — **never a K1 pio env** |
 
 - Captain confirms the two K1s are **identical hardware**. Env choice encodes

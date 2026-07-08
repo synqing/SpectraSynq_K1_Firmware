@@ -65,6 +65,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_effect_registry",
             "k1_vp_motion_lab",
             "k1_wireless_ab_probe",
+            "k1_sync_probe_main",  # dual-K1 sync Phase-0 LEADER — main F887A500 ONLY (2026-07-08, F5 grant)
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",
@@ -87,6 +88,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S SNR eval - radio-free bench B489A500 ONLY (2026-07-06)
             "k1_bench_im73d_ble",  # IM73D PDM + NimBLE BLE-MIDI demo — bench B489A500 ONLY (2026-07-04)
             "k1_custom",  # 224-LED single-channel wall-bounce build — bench B489A500 ONLY (2026-07-06)
+            "k1_sync_probe_bench",  # dual-K1 sync Phase-0 FOLLOWER — bench B489A500 ONLY (2026-07-08, F5 grant)
         ),
         role="2nd bench K1",
         upload_port="/dev/tty.usbmodem12201",
