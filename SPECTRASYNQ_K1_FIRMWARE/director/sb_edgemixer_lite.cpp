@@ -49,12 +49,13 @@ static float sb_edge_mask(uint16_t index, uint16_t count) {
 }
 
 static SBEdgeMixerConfig sb_edge_config = {
-  false,
-  SB_EDGE_MIXER_OFF,
-  0.0f,
-  0,
-  SB_EDGE_ROTATION_SUM_PRESERVING,
-  false  // spatialUniform: default = centre-masked (ref E)
+  false,                     // enabled: byte-inert at boot (EdgeMixer off until turned on)
+  SB_EDGE_MIXER_OFF,         // mode: supplied on activation (preset / user)
+  0.0f,                      // strength
+  0,                         // spreadDegrees
+  SB_EDGE_ROTATION_OKLAB,    // rotationSpace: SHIPPING DEFAULT — gate-2 plate verdict 2026-07-09
+  false,                     // spatialUniform: centre-masked (ref E; gate-2 confirmed)
+  SB_EDGE_DUAL_SPLIT         // dualEdge: SHIPPING DEFAULT split — gate-2 plate verdict 2026-07-09
 };
 static portMUX_TYPE sb_edge_config_mux = portMUX_INITIALIZER_UNLOCKED;
 

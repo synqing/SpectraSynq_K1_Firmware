@@ -1094,6 +1094,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         }
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
+        sb_edge_warn_if_collapsed(config);  // close the edge_mode= warn gap (mirror+complementary via mode)
       } else {
         bad_command(command_type, command_data);
       }
