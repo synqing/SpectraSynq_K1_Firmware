@@ -39,6 +39,9 @@
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 #include <esp_heap_caps.h>
 #endif
+#ifdef SB_K1_SYNC_PROBE
+#include "k1_sync_link.h"  // k1_sync::set_fault for the gated sync_fault command (non-shippable)
+#endif
 
 // These functions watch the Serial port for incoming commands,
 // and perform actions based on whatis recieved.
@@ -1928,6 +1931,10 @@ void cmd_help() {
   // the literal "[ble_remoted]" token trips guard_k1_radio_isolation.py.
   USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
 #endif
+#ifdef SB_K1_SYNC_PROBE
+  // Radio-isolation guard: gated with the sync probe surface it drives.
+  USBSerial.println("                sync_fault=[delay5/delay20/drop10/off] | Inject a Gate-0 fault on the follower apply path (sync probe build)");
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
@@ -2872,6 +2879,21 @@ void parse_command(char* command_buf) {
         tx_begin();
         USBSerial.print("BLE_STREAM: ");
         USBSerial.println(vp_bool_text(BLE_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#ifdef SB_K1_SYNC_PROBE
+    // Compile-gated with the sync probe surface it drives (radio-isolation guard).
+    // k1_sync::set_fault is declared via the gated include of k1_sync_link.h.
+    else if (strcmp(command_type, "sync_fault") == 0) {
+      if (k1_sync::set_fault(command_data)) {
+        tx_begin();
+        USBSerial.print("SYNC_FAULT: ");
+        USBSerial.println(command_data);
         tx_end();
       } else {
         bad_command(command_type, command_data);

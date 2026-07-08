@@ -58,6 +58,9 @@
 #ifdef SB_K1_BLE_REMOTED
 #include "ble_remoted_central.h"  // Remoted dial BLE-MIDI central (gated; interference A/B)
 #endif
+#ifdef SB_K1_SYNC_PROBE
+#include "network/k1_sync_link.h"  // Dual-K1 sync transport probe (Phase 0, gated; non-shippable)
+#endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"     // Harness-only final-byte evidence context
 #endif
@@ -677,6 +680,9 @@ void setup() {
 #ifdef SB_K1_BLE_REMOTED
   sb_k1_ble_remoted_begin();
 #endif
+#ifdef SB_K1_SYNC_PROBE
+  k1_sync::begin();
+#endif
 
 #if ENABLE_FASTLED_COLOR_CORRECTION
   // Phase 1 Change 2: apply WS2812 channel correction globally (both strips)
@@ -817,6 +823,9 @@ void loop() {
 #endif
 #ifdef SB_K1_BLE_REMOTED
   sb_k1_ble_remoted_poll(t_now);
+#endif
+#ifdef SB_K1_SYNC_PROBE
+  k1_sync::poll();
 #endif
 
   function_id = 5;
