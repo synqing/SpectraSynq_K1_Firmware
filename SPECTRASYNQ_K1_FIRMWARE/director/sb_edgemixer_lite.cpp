@@ -3,7 +3,16 @@
 #include <Arduino.h>
 #include <math.h>
 
-static SQ15x16 sb_edge_clamp01(SQ15x16 value) {
+// Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
+// loop. This is a PURE code-gen change — every operation in these helpers is
+// integer / SQ15x16 (int32/int64), so inlining cannot alter a single result
+// (there is no float contraction and no reassociation of integer results to
+// change). Output stays BYTE-IDENTICAL; only the call/return overhead is removed.
+// Verified by diffing the golden (+/-1 LSB) and OKLab oracle outputs before and
+// after this change — every metric unchanged.
+#define SB_EDGE_HOT inline __attribute__((always_inline))
+
+static SB_EDGE_HOT SQ15x16 sb_edge_clamp01(SQ15x16 value) {
   if (value < SQ15x16(0.0f)) {
     return SQ15x16(0.0f);
   }
@@ -299,7 +308,7 @@ static const SQ15x16 SB_OK_IM1_22 = SQ15x16(1.7076147010f);
 
 // Index of the most-significant set bit of v (v > 0), 0..31. __builtin_clz is
 // available on both the host GCC and the device xtensa-gcc toolchain.
-static inline int sb_edge_msb32(uint32_t v) {
+static SB_EDGE_HOT int sb_edge_msb32(uint32_t v) {
   return 31 - __builtin_clz(v);
 }
 
@@ -446,8 +455,8 @@ static const int32_t kSbOkExpEncode[17] = {
 // mantLut257 is f(m) over m in [1,2] at 1/256 spacing (Q16); expTab17 is 2^(e*p)
 // for e = -16..0 indexed by (e + 16) (Q16). Linear interpolation on the mantissa;
 // one Q16 multiply folds in the exponent power. Heap-free; no divides.
-static SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
-                               const int32_t* expTab17) {
+static SB_EDGE_HOT SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
+                                          const int32_t* expTab17) {
   int32_t X = x.getInternal();
   if (X <= 0) {
     return SQ15x16(0.0f);
@@ -473,13 +482,13 @@ static SQ15x16 sb_edge_pow_lut(SQ15x16 x, const int32_t* mantLut257,
 }
 
 // Fixed-point cube-root x^(1/3) for x in (0, ~1.06]; x <= 0 returns 0.
-static SQ15x16 sb_edge_cbrt(SQ15x16 x) {
+static SB_EDGE_HOT SQ15x16 sb_edge_cbrt(SQ15x16 x) {
   return sb_edge_pow_lut(x, kSbOkMantCbrt, kSbOkExpCbrt);
 }
 
 // Signed cube v^3 (the inverse of the forward cube-root; sign preserved so an
 // out-of-original-gamut rotated LMS' with a negative component cubes correctly).
-static SQ15x16 sb_edge_cube(SQ15x16 v) {
+static SB_EDGE_HOT SQ15x16 sb_edge_cube(SQ15x16 v) {
   const bool neg = (v < SQ15x16(0.0f));
   SQ15x16 a = neg ? -v : v;
   SQ15x16 cubed = a * a * a;
@@ -487,19 +496,20 @@ static SQ15x16 sb_edge_cube(SQ15x16 v) {
 }
 
 // Gamma decode (display, ~sRGB 2.2) -> linear light. x in [0,1]; 0 -> 0.
-static SQ15x16 sb_edge_gamma_decode(SQ15x16 x) {
+static SB_EDGE_HOT SQ15x16 sb_edge_gamma_decode(SQ15x16 x) {
   return sb_edge_pow_lut(x, kSbOkMantDecode, kSbOkExpDecode);
 }
 
 // Gamma encode: linear light -> display (~sRGB 2.2). x in [0,1]; 0 -> 0.
-static SQ15x16 sb_edge_gamma_encode(SQ15x16 x) {
+static SB_EDGE_HOT SQ15x16 sb_edge_gamma_encode(SQ15x16 x) {
   return sb_edge_pow_lut(x, kSbOkMantEncode, kSbOkExpEncode);
 }
 
 // OKLab (L, a, b) -> linear RGB: inverse M2 (L column == 1), signed cube, inverse
 // M1. Factored out so the gamut-clip pass can re-evaluate it with reduced chroma.
-static void sb_edge_oklab_to_linear(SQ15x16 L, SQ15x16 a, SQ15x16 b,
-                                    SQ15x16* rlin, SQ15x16* glin, SQ15x16* blin) {
+static SB_EDGE_HOT void sb_edge_oklab_to_linear(SQ15x16 L, SQ15x16 a, SQ15x16 b,
+                                               SQ15x16* rlin, SQ15x16* glin,
+                                               SQ15x16* blin) {
   SQ15x16 lq = L + SB_OK_IM2_A1 * a + SB_OK_IM2_B1 * b;
   SQ15x16 mq = L + SB_OK_IM2_A2 * a + SB_OK_IM2_B2 * b;
   SQ15x16 sq = L + SB_OK_IM2_A3 * a + SB_OK_IM2_B3 * b;
@@ -526,8 +536,8 @@ static void sb_edge_oklab_to_linear(SQ15x16 L, SQ15x16 a, SQ15x16 b,
 // still holding L far better than a per-channel clamp. Returns t in [0,1]; 1.0 in
 // gamut. Divides run ONLY on out-of-gamut pixels (1-3 per pixel), never on the
 // in-gamut majority.
-static SQ15x16 sb_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin, SQ15x16 glin,
-                                   SQ15x16 blin) {
+static SB_EDGE_HOT SQ15x16 sb_edge_gamut_scale(SQ15x16 L, SQ15x16 rlin,
+                                              SQ15x16 glin, SQ15x16 blin) {
   const SQ15x16 kZero = SQ15x16(0.0f);
   const SQ15x16 kOne = SQ15x16(1.0f);
   const SQ15x16 g = sb_edge_cube(L);  // grey anchor v(0) = L^3
