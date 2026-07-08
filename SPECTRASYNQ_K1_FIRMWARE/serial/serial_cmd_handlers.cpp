@@ -966,6 +966,7 @@ void sb_print_edge_status();
 bool sb_apply_smart_scene(const char* scene);
 bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode);
 bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_space);
+bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
@@ -1125,6 +1126,21 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
       if (sb_parse_edge_rotation(command_data, &space)) {
         SBEdgeMixerConfig config = sb_edgemixer_lite_config();
         config.rotationSpace = space;
+        sb_edgemixer_lite_set_config(config);
+        sb_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_dual") == 0) {
+      // Symmetric dual-edge (A lane): one_sided | split | mirror. Scriptable
+      // counterpart to the 'y' hotkey — set the dual mode non-interactively for
+      // reproducible VP_PERF / capture sweeps.
+      SBEdgeMixerDualEdge dual = SB_EDGE_DUAL_ONE_SIDED;
+      if (sb_parse_edge_dual(command_data, &dual)) {
+        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        config.dualEdge = dual;
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
       } else {

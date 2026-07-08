@@ -622,6 +622,22 @@ bool sb_parse_edge_rotation(const char* text, SBEdgeMixerRotationSpace* out_spac
   return true;
 }
 
+// one_sided (or one) -> ONE_SIDED (secondary only; certified default);
+// split               -> SPLIT (both edges +/- theta/2 about the 79/80 centre);
+// mirror              -> MIRROR (both edges +/- theta, full opposite rotations).
+bool sb_parse_edge_dual(const char* text, SBEdgeMixerDualEdge* out_dual) {
+  if (strcmp(text, "one_sided") == 0 || strcmp(text, "one") == 0) {
+    *out_dual = SB_EDGE_DUAL_ONE_SIDED;
+  } else if (strcmp(text, "split") == 0) {
+    *out_dual = SB_EDGE_DUAL_SPLIT;
+  } else if (strcmp(text, "mirror") == 0) {
+    *out_dual = SB_EDGE_DUAL_MIRROR;
+  } else {
+    return false;
+  }
+  return true;
+}
+
 void sb_print_smart_status() {
   SBSmartDirectorConfig smart = sb_smart_director_config();
   SBVisualHookConfig hooks = sb_visual_hooks_config();
@@ -2132,7 +2148,8 @@ void cmd_help() {
 	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
 	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
 	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
-	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab");
+	  USBSerial.println("                  edge_dual=[one_sided/split/mirror] | EdgeMixer symmetric dual-edge (one_sided=secondary only; split=both +/-theta/2; mirror=both +/-theta)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif
