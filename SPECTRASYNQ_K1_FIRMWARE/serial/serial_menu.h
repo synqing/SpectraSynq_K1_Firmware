@@ -598,6 +598,14 @@ const char* sb_edge_rotation_name(SBEdgeMixerRotationSpace space) {
   }
 }
 
+const char* sb_edge_dual_name(SBEdgeMixerDualEdge dual) {
+  switch (dual) {
+    case SB_EDGE_DUAL_SPLIT:  return "split";
+    case SB_EDGE_DUAL_MIRROR: return "mirror";
+    default:                  return "one_sided";
+  }
+}
+
 // faithful -> SUM_PRESERVING (grey-axis rotation, +/-1 LSB golden parity);
 // luma     -> LUMA_PRESERVING (grey-axis rotation + per-pixel BT.601 luma rescale);
 // oklab    -> OKLAB (perceptual hue rotation in the OKLab a/b plane, holds L constant).
@@ -727,6 +735,8 @@ void sb_print_edge_status() {
   USBSerial.println(sb_edge_rotation_name(edge.rotationSpace));
   USBSerial.print("EDGE_SPATIAL: ");
   USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
+  USBSerial.print("EDGE_DUAL: ");
+  USBSerial.println(sb_edge_dual_name(edge.dualEdge));
   tx_end();
 }
 
@@ -800,6 +810,30 @@ void serial_edge_toggle_rotation() {
   tx_begin();
   USBSerial.print("EDGE_ROTATION: ");
   USBSerial.println(sb_edge_rotation_name(e.rotationSpace));
+  tx_end();
+}
+
+void serial_edge_toggle_dual_edge() {
+  SBEdgeMixerConfig e = sb_edgemixer_lite_config();
+  // 3-way cycle: one_sided -> split -> mirror -> one_sided. Symmetric dual-edge
+  // (A lane) — the plate A/B for "make BOTH edges participate about the 79/80
+  // centre". one_sided = only the secondary strip shifts (certified default);
+  // split = both edges +/- theta/2; mirror = both edges +/- theta.
+  switch (e.dualEdge) {
+    case SB_EDGE_DUAL_ONE_SIDED:
+      e.dualEdge = SB_EDGE_DUAL_SPLIT;
+      break;
+    case SB_EDGE_DUAL_SPLIT:
+      e.dualEdge = SB_EDGE_DUAL_MIRROR;
+      break;
+    default:
+      e.dualEdge = SB_EDGE_DUAL_ONE_SIDED;
+      break;
+  }
+  sb_edgemixer_lite_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_DUAL: ");
+  USBSerial.println(sb_edge_dual_name(e.dualEdge));
   tx_end();
 }
 
@@ -1707,6 +1741,9 @@ bool serial_hotkey_is_immediate(char key) {
       break;
     case 'u':
       serial_edge_toggle_rotation();
+      break;
+    case 'y':
+      serial_edge_toggle_dual_edge();
       break;
     // Effects-queue key map (spec §4, 2026-06-11): digits 1-9,0 load/arm slot
     // 1-10 onto the ACTIVE channel; shift+digit saves the ACTIVE channel into
