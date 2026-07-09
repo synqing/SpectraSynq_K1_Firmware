@@ -169,7 +169,10 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             self.skipTest("EdgeMixer not implemented yet")
         text = read(edge_path)
         self.assertTrue("79.5f" in text or ("79" in text and "80" in text))
-        self.assertRegex(text, r"static\s+K1EdgeMixerConfig\s+k1_edge_config\s*=\s*\{\s*false,")
+        # Gate-3 (Captain 2026-07-09): EdgeMixer now ships ENABLED by default at the
+        # BALANCED intensity, so the shipping default is `{ true, ...` (was `{ false,`
+        # byte-inert). The centre-79/80 contract asserted above still holds (masked spatial).
+        self.assertRegex(text, r"static\s+K1EdgeMixerConfig\s+k1_edge_config\s*=\s*\{\s*true,")
         self.assertIn("k1_edgemixer_set_config", text)
         self.assertIn("k1_edgemixer_apply", text)
 

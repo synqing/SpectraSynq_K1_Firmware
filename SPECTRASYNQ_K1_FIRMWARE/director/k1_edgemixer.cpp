@@ -49,13 +49,13 @@ static float k1_edge_mask(uint16_t index, uint16_t count) {
 }
 
 static K1EdgeMixerConfig k1_edge_config = {
-  false,                     // enabled: byte-inert at boot (EdgeMixer off until turned on)
-  K1_EDGE_MIXER_OFF,         // mode: supplied on activation (preset / user)
-  0.0f,                      // strength
-  0,                         // spreadDegrees
-  K1_EDGE_ROTATION_OKLAB,    // rotationSpace: SHIPPING DEFAULT — gate-2 plate verdict 2026-07-09
-  false,                     // spatialUniform: centre-masked (ref E; gate-2 confirmed)
-  K1_EDGE_DUAL_SPLIT         // dualEdge: SHIPPING DEFAULT split — gate-2 plate verdict 2026-07-09
+  true,                              // enabled: SHIPPING ON by default — gate-3 Captain decision 2026-07-09
+  K1_EDGE_MIXER_SPLIT_COMPLEMENTARY, // mode: BALANCED shipping intensity (gate-3 plate A/B)
+  0.65f,                             // strength: BALANCED shipping intensity
+  33,                                // spreadDegrees: BALANCED shipping intensity
+  K1_EDGE_ROTATION_OKLAB,            // rotationSpace: SHIPPING DEFAULT — gate-2 plate verdict 2026-07-09
+  false,                             // spatialUniform: centre-masked (ref E; gate-2 confirmed)
+  K1_EDGE_DUAL_SPLIT                 // dualEdge: SHIPPING DEFAULT split — gate-2 plate verdict 2026-07-09
 };
 static portMUX_TYPE k1_edge_config_mux = portMUX_INITIALIZER_UNLOCKED;
 

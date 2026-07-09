@@ -653,6 +653,13 @@ void setup() {
   SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(SECONDARY_LIGHTSHOW_MODE, 1);
   SB_TRACE_INIT(64);
 
+  // Compute the EdgeMixer colour maps for the shipping default at boot. The static
+  // k1_edge_config bypasses k1_edgemixer_set_config() — which builds the OKLab fused
+  // map + harmony matrix — so enable-by-default would otherwise render the first frames
+  // through identity/uncomputed maps. This one call makes the boot render correct from
+  // frame 1 (gate-3 enable-by-default, Captain 2026-07-09).
+  k1_edgemixer_set_config(k1_edgemixer_config());
+
   USBSerial.print("WAVEFORM_HISTORY: ");
   if (waveform_history) {
     USBSerial.print("OK @ 0x");
