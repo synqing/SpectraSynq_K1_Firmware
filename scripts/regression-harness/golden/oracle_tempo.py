@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Golden-master oracle for sb_tempo.cpp — Phase F firmware modernization.
+"""Golden-master oracle for k1_tempo.cpp — Phase F firmware modernization.
 
 Mirrors the pattern established by oracle_onset_beat.py.  Compiles the REAL
-sb_tempo.cpp against a minimal Arduino stub, drives a FIXED deterministic input
+k1_tempo.cpp against a minimal Arduino stub, drives a FIXED deterministic input
 trace through the production code-path, and emits one JSON record per step.
 capture() must be byte-identical across two runs (determinism gate) and each
 MUTATION must diverge the output (sensitivity gate).
@@ -37,26 +37,26 @@ FIRMWARE = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 NAME = "tempo"
 
 MODULE_CPPS = [
-    str(FIRMWARE / "audio" / "sb_tempo.cpp"),
+    str(FIRMWARE / "audio" / "k1_tempo.cpp"),
 ]
 
 # Production-matching defines (grep [env:k1_hardware] build_flags).
-# SB_TEMPO_CONF_V2 + SB_TEMPO_FLYWHEEL_V2 are the two V2 flags that gate the
+# K1_TEMPO_CONF_V2 + K1_TEMPO_FLYWHEEL_V2 are the two V2 flags that gate the
 # confidence/lock FSM and the soft PLL beat emitter.  Without them the oracle
 # covers only the baseline incumbent path; with them it covers the production
 # default that shipped in the audio-semantic forward-graft (2026-06-05).
 DEFINES = [
-    "SB_TEMPO_CONF_V2",
-    "SB_TEMPO_FLYWHEEL_V2",
-    "SB_TEMPO_HOST_TEST",
+    "K1_TEMPO_CONF_V2",
+    "K1_TEMPO_FLYWHEEL_V2",
+    "K1_TEMPO_HOST_TEST",
     "DEFAULT_SAMPLE_RATE=12800",
     "DEFAULT_SAMPLES_PER_CHUNK=96",
-    "SB_TEMPO_NOVELTY_DECIMATION=3U",
+    "K1_TEMPO_NOVELTY_DECIMATION=3U",
 ]
 
 # ---------------------------------------------------------------------------
 # Arduino shim — mirrors tempo_replay.py ARDUINO_STUB exactly.
-# sb_tempo.cpp pulls in Arduino.h and config_types.h; config_types.h is on the
+# k1_tempo.cpp pulls in Arduino.h and config_types.h; config_types.h is on the
 # include path from FIRMWARE/system/.  Arduino.h needs only portMUX and expf
 # (math.h already present via the compile command).
 # ---------------------------------------------------------------------------
@@ -80,8 +80,8 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 #   - Then run a 5-second silence flush so the silence-decay and confidence
 #     collapse paths are exercised.
 #   - Then run a 90 BPM re-lock sequence (10 s) to stress winner hysteresis.
-#   - Emit one JSON record per AP frame covering EVERY public SBTempoEvent field
-#     plus the internal bin-bank winner and confidence (via sb_tempo_debug_dump).
+#   - Emit one JSON record per AP frame covering EVERY public K1TempoEvent field
+#     plus the internal bin-bank winner and confidence (via k1_tempo_debug_dump).
 #   - Counters and phase accumulate continuously → mutations that shift a
 #     threshold or refractory constant will diverge beat_tick firing timing,
 #     winner_bin, or confidence, all of which appear in the record stream.
@@ -99,18 +99,18 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 #   conf_internal float internal confidence from debug_dump (%.5f)
 # ---------------------------------------------------------------------------
 DRIVER = r"""
-#include "sb_tempo.h"
+#include "k1_tempo.h"
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
-// host-test introspection hook compiled into sb_tempo.cpp under SB_TEMPO_HOST_TEST
-void sb_tempo_debug_dump(float*, int, int*, float*, float*);
+// host-test introspection hook compiled into k1_tempo.cpp under K1_TEMPO_HOST_TEST
+void k1_tempo_debug_dump(float*, int, int*, float*, float*);
 
 static const float AP_HZ = 12800.0f / 96.0f;  // 133.333 Hz
 
-static SBAudioSnapshot mk(uint32_t ms, float novelty, bool silence) {
-    SBAudioSnapshot a = {};
+static K1AudioSnapshot mk(uint32_t ms, float novelty, bool silence) {
+    K1AudioSnapshot a = {};
     a.frame_ms   = ms;
     a.novelty    = novelty;
     a.silence    = silence;
@@ -124,12 +124,12 @@ static float frand() {
     return (float)((g_rng >> 8) & 0xFFFFFF) / (float)0x1000000;
 }
 
-static void emit_record(int step, uint32_t ms, const SBTempoEvent& e) {
+static void emit_record(int step, uint32_t ms, const K1TempoEvent& e) {
     int   winner_bin    = 0;
     float power_sum     = 0.0f;
     float conf_internal = 0.0f;
     float sm[96];
-    sb_tempo_debug_dump(sm, 96, &winner_bin, &power_sum, &conf_internal);
+    k1_tempo_debug_dump(sm, 96, &winner_bin, &power_sum, &conf_internal);
 
     std::printf(
         "{\"step\":%d,\"ms\":%u,"
@@ -145,13 +145,13 @@ static void emit_record(int step, uint32_t ms, const SBTempoEvent& e) {
 }
 
 int main() {
-    sb_tempo_init();
+    k1_tempo_init();
 
     // ----------------------------------------------------------------
     // Phase A: 120 BPM clean train, 25 seconds.
     // Dense sustained input fills the history ring and locks the V2 FSM.
     // ----------------------------------------------------------------
-    sb_tempo_reset();
+    k1_tempo_reset();
     {
         const float bpm      = 120.0f;
         const float beat_ms  = 60000.0f / bpm;
@@ -161,8 +161,8 @@ int main() {
             uint32_t ms = (uint32_t)((float)f * 1000.0f / AP_HZ + 0.5f);
             float nov   = 0.0f;
             if ((float)ms >= next_beat) { nov = 1.0f; next_beat += beat_ms; }
-            sb_tempo_update(mk(ms, nov, false));
-            SBTempoEvent e = sb_tempo_read();
+            k1_tempo_update(mk(ms, nov, false));
+            K1TempoEvent e = k1_tempo_read();
             emit_record((int)f, ms, e);
         }
     }
@@ -175,8 +175,8 @@ int main() {
         const uint32_t n     = (uint32_t)(5.0f * AP_HZ + 0.5f);
         for (uint32_t f = 0; f < n; f++) {
             uint32_t ms = (uint32_t)((float)(base + f) * 1000.0f / AP_HZ + 0.5f);
-            sb_tempo_update(mk(ms, 0.0f, true));
-            SBTempoEvent e = sb_tempo_read();
+            k1_tempo_update(mk(ms, 0.0f, true));
+            K1TempoEvent e = k1_tempo_read();
             emit_record((int)(base + f), ms, e);
         }
     }
@@ -195,8 +195,8 @@ int main() {
             uint32_t ms = (uint32_t)((float)(base + f) * 1000.0f / AP_HZ + 0.5f);
             float nov   = 0.0f;
             if ((float)ms >= next_beat) { nov = 1.0f; next_beat += beat_ms; }
-            sb_tempo_update(mk(ms, nov, false));
-            SBTempoEvent e = sb_tempo_read();
+            k1_tempo_update(mk(ms, nov, false));
+            K1TempoEvent e = k1_tempo_read();
             emit_record((int)(base + f), ms, e);
         }
     }
@@ -220,8 +220,8 @@ int main() {
                 next_beat += beat_ms;
                 if (frand() > 0.12f) nov = 0.55f + 0.45f * frand();  // ~88% hit rate
             }
-            sb_tempo_update(mk(ms, nov, false));
-            SBTempoEvent e = sb_tempo_read();
+            k1_tempo_update(mk(ms, nov, false));
+            K1TempoEvent e = k1_tempo_read();
             emit_record((int)(base + f), ms, e);
         }
     }
@@ -308,23 +308,23 @@ MUTATIONS = [
     (
         # 1. Raise the lock-acquisition threshold above what a clean 120 BPM train
         #    reaches → fewer (or zero) frames with locked=1, beat_tick=1.
-        #    SB_LOCK_CONFIDENCE is a static const float (not a #define) — match that form.
-        r"(static\s+const\s+float\s+SB_LOCK_CONFIDENCE\s*=\s*)0\.60f",
+        #    K1_LOCK_CONFIDENCE is a static const float (not a #define) — match that form.
+        r"(static\s+const\s+float\s+K1_LOCK_CONFIDENCE\s*=\s*)0\.60f",
         r"\g<1>0.98f",
-        "SB_LOCK_CONFIDENCE 0.60→0.98: lock never acquired on 120 BPM train",
+        "K1_LOCK_CONFIDENCE 0.60→0.98: lock never acquired on 120 BPM train",
     ),
     (
         # 2. Lower the V2 release threshold to match the acquire → hysteresis
         #    collapses; FSM oscillates in/out of lock on every EMA wobble.
-        r"(#define\s+SB_CONF_V2_REL\s+)0\.42f",
+        r"(#define\s+K1_CONF_V2_REL\s+)0\.42f",
         r"\g<1>0.59f",
-        "SB_CONF_V2_REL 0.42→0.59: release hysteresis eliminated, FSM flickers",
+        "K1_CONF_V2_REL 0.42→0.59: release hysteresis eliminated, FSM flickers",
     ),
     (
         # 3. Double the winner-hysteresis candidate-frames gate (5→10).
         #    The 90 BPM re-lock phase takes twice as long to displace the 120 BPM
         #    winner → winner_bin stays pinned longer, confidence trajectory differs.
-        r"(sb_candidate_frames\s*>=\s*)5\b",
+        r"(k1_candidate_frames\s*>=\s*)5\b",
         r"\g<1>10",
         "winner hysteresis candidate_frames 5→10: 90 BPM re-lock delayed",
     ),
@@ -333,9 +333,9 @@ MUTATIONS = [
         #    loses 10% of its energy instead of 0.1%.  The Goertzel bank drains
         #    ~100x faster → the entire confidence/winner/phase trajectory shifts
         #    from the very first emit.  Verified: 6379/6400 lines diverge.
-        r"(static\s+const\s+float\s+SB_NOVELTY_DECAY\s*=\s*)0\.999f",
+        r"(static\s+const\s+float\s+K1_NOVELTY_DECAY\s*=\s*)0\.999f",
         r"\g<1>0.90f",
-        "SB_NOVELTY_DECAY 0.999→0.90: history ring drains 100x faster, full trajectory diverges",
+        "K1_NOVELTY_DECAY 0.999→0.90: history ring drains 100x faster, full trajectory diverges",
     ),
 ]
 
@@ -370,7 +370,7 @@ def _verify_sensitivity():
     all_ok = True
     # --- mutation sensitivity ---
     for pattern, replacement, desc in MUTATIONS:
-        src_path = FIRMWARE / "audio" / "sb_tempo.cpp"
+        src_path = FIRMWARE / "audio" / "k1_tempo.cpp"
         original = src_path.read_text(encoding="utf-8")
         mutated  = re.sub(pattern, replacement, original)
         if mutated == original:
@@ -380,10 +380,10 @@ def _verify_sensitivity():
             continue
 
         with tempfile.TemporaryDirectory(prefix="oracle_tempo_mut_") as td:
-            # Copy firmware tree, overwrite sb_tempo.cpp with mutation
+            # Copy firmware tree, overwrite k1_tempo.cpp with mutation
             mut_root = Path(td) / "SPECTRASYNQ_K1_FIRMWARE"
             shutil.copytree(str(FIRMWARE), str(mut_root))
-            (mut_root / "audio" / "sb_tempo.cpp").write_text(mutated, encoding="utf-8")
+            (mut_root / "audio" / "k1_tempo.cpp").write_text(mutated, encoding="utf-8")
 
             try:
                 mut_output = capture(firmware_root=mut_root)

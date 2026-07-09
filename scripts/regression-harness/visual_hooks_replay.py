@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile and run host-side replay tests for sb_visual_hooks.cpp."""
+"""Compile and run host-side replay tests for k1_visual_hooks.cpp."""
 
 import argparse
 import json
@@ -34,7 +34,7 @@ struct RenderParams {
   float CHROMA;
 };
 
-struct SBOnsetBeatEvent {
+struct K1OnsetBeatEvent {
   uint32_t event_id;
   uint32_t event_ms;
   uint32_t event_age_ms;
@@ -47,18 +47,18 @@ struct SBOnsetBeatEvent {
   bool beat;
 };
 
-enum SBEdgeMixerMode : uint8_t {
-  SB_EDGE_MIXER_OFF = 0,
-  SB_EDGE_MIXER_ANALOGOUS,
+enum K1EdgeMixerMode : uint8_t {
+  K1_EDGE_MIXER_OFF = 0,
+  K1_EDGE_MIXER_ANALOGOUS,
 };
 
-struct SBEdgeMixerConfig {
+struct K1EdgeMixerConfig {
   bool enabled;
-  SBEdgeMixerMode mode;
+  K1EdgeMixerMode mode;
   float strength;
 };
 
-struct SBVisualHookConfig {
+struct K1VisualHookConfig {
   bool enabled;
   uint32_t event_window_ms;
   uint32_t onset_tau_ms;
@@ -70,23 +70,23 @@ struct SBVisualHookConfig {
   float scalar_ceiling;
 };
 
-struct SBVisualHookOutput {
+struct K1VisualHookOutput {
   float photon_scalar;
   float chroma_scalar;
   float edge_scalar;
   bool confirm_switch_boundary;
 };
 
-SBVisualHookConfig sb_visual_hooks_config();
-void sb_visual_hooks_set_config(const SBVisualHookConfig& config);
-SBVisualHookOutput sb_visual_hooks_tick(const SBOnsetBeatEvent& event, uint32_t now_ms);
-void sb_visual_hooks_apply_render_params(const SBVisualHookOutput& output, RenderParams* params);
-SBEdgeMixerConfig sb_visual_hooks_apply_edge_config(const SBVisualHookOutput& output, SBEdgeMixerConfig config);
+K1VisualHookConfig k1_visual_hooks_config();
+void k1_visual_hooks_set_config(const K1VisualHookConfig& config);
+K1VisualHookOutput k1_visual_hooks_tick(const K1OnsetBeatEvent& event, uint32_t now_ms);
+void k1_visual_hooks_apply_render_params(const K1VisualHookOutput& output, RenderParams* params);
+K1EdgeMixerConfig k1_visual_hooks_apply_edge_config(const K1VisualHookOutput& output, K1EdgeMixerConfig config);
 """
 
 
 CPP_REPLAY = r"""
-#include "sb_visual_hooks.h"
+#include "k1_visual_hooks.h"
 
 #include <cmath>
 #include <cstdio>
@@ -107,8 +107,8 @@ static void check_close(float actual, float expected, float tolerance, const cha
   }
 }
 
-static SBVisualHookConfig enabled_config() {
-  SBVisualHookConfig config = {};
+static K1VisualHookConfig enabled_config() {
+  K1VisualHookConfig config = {};
   config.enabled = true;
   config.event_window_ms = 80;
   config.onset_tau_ms = 100;
@@ -121,8 +121,8 @@ static SBVisualHookConfig enabled_config() {
   return config;
 }
 
-static SBOnsetBeatEvent event_base(uint32_t id) {
-  SBOnsetBeatEvent event = {};
+static K1OnsetBeatEvent event_base(uint32_t id) {
+  K1OnsetBeatEvent event = {};
   event.event_id = id;
   event.event_ms = 100;
   event.event_age_ms = 0;
@@ -130,35 +130,35 @@ static SBOnsetBeatEvent event_base(uint32_t id) {
 }
 
 static void drain(uint32_t now_ms) {
-  SBOnsetBeatEvent empty = {};
+  K1OnsetBeatEvent empty = {};
   empty.event_age_ms = 1000;
-  sb_visual_hooks_tick(empty, now_ms);
+  k1_visual_hooks_tick(empty, now_ms);
 }
 
 static void test_onset_routes_to_photons_only() {
-  sb_visual_hooks_set_config(enabled_config());
+  k1_visual_hooks_set_config(enabled_config());
   drain(1000);
 
-  SBOnsetBeatEvent event = event_base(1);
+  K1OnsetBeatEvent event = event_base(1);
   event.onset = true;
   event.onset_strength = 0.5f;
-  SBVisualHookOutput first = sb_visual_hooks_tick(event, 1010);
+  K1VisualHookOutput first = k1_visual_hooks_tick(event, 1010);
   check(first.photon_scalar > 1.0f, "onset increases photon scalar");
   check_close(first.chroma_scalar, 1.0f, 0.0001f, "onset does not increase chroma scalar");
   check_close(first.edge_scalar, 1.0f, 0.0001f, "onset does not increase edge scalar");
   check(!first.confirm_switch_boundary, "onset does not confirm switch boundary");
 
-  SBVisualHookOutput repeated = sb_visual_hooks_tick(event, 1020);
+  K1VisualHookOutput repeated = k1_visual_hooks_tick(event, 1020);
   check(repeated.photon_scalar < first.photon_scalar, "same onset event id decays instead of reinjecting");
 }
 
 static void test_bass_routes_to_edge_only() {
   drain(1400);
 
-  SBOnsetBeatEvent event = event_base(2);
+  K1OnsetBeatEvent event = event_base(2);
   event.bass_onset = true;
   event.bass_onset_strength = 0.75f;
-  SBVisualHookOutput output = sb_visual_hooks_tick(event, 1410);
+  K1VisualHookOutput output = k1_visual_hooks_tick(event, 1410);
   check_close(output.photon_scalar, 1.0f, 0.0001f, "bass does not increase photon scalar");
   check_close(output.chroma_scalar, 1.0f, 0.0001f, "bass does not increase chroma scalar");
   check(output.edge_scalar > 1.0f, "bass increases edge scalar");
@@ -168,16 +168,16 @@ static void test_bass_routes_to_edge_only() {
 static void test_beat_routes_to_chroma_and_boundary_only() {
   drain(1900);
 
-  SBOnsetBeatEvent event = event_base(3);
+  K1OnsetBeatEvent event = event_base(3);
   event.beat = true;
   event.beat_confidence = 0.8f;
-  SBVisualHookOutput first = sb_visual_hooks_tick(event, 1910);
+  K1VisualHookOutput first = k1_visual_hooks_tick(event, 1910);
   check_close(first.photon_scalar, 1.0f, 0.0001f, "beat does not increase photon scalar");
   check(first.chroma_scalar > 1.0f, "beat increases chroma scalar");
   check_close(first.edge_scalar, 1.0f, 0.0001f, "beat does not increase edge scalar");
   check(first.confirm_switch_boundary, "fresh beat confirms switch boundary");
 
-  SBVisualHookOutput repeated = sb_visual_hooks_tick(event, 1920);
+  K1VisualHookOutput repeated = k1_visual_hooks_tick(event, 1920);
   check(!repeated.confirm_switch_boundary, "same beat event id does not reconfirm boundary");
   check(repeated.chroma_scalar < first.chroma_scalar, "same beat event id decays instead of reinjecting");
 }
@@ -185,43 +185,43 @@ static void test_beat_routes_to_chroma_and_boundary_only() {
 static void test_weaker_fresh_event_does_not_lower_live_pulse() {
   drain(2400);
 
-  SBOnsetBeatEvent strong = event_base(4);
+  K1OnsetBeatEvent strong = event_base(4);
   strong.onset = true;
   strong.onset_strength = 0.9f;
-  SBVisualHookOutput first = sb_visual_hooks_tick(strong, 2410);
+  K1VisualHookOutput first = k1_visual_hooks_tick(strong, 2410);
 
-  SBOnsetBeatEvent weak = event_base(5);
+  K1OnsetBeatEvent weak = event_base(5);
   weak.onset = true;
   weak.onset_strength = 0.1f;
-  SBVisualHookOutput second = sb_visual_hooks_tick(weak, 2420);
+  K1VisualHookOutput second = k1_visual_hooks_tick(weak, 2420);
 
   check(second.photon_scalar > 1.0f + (0.1f * 0.16f), "weaker fresh onset does not overwrite stronger live pulse");
   check(second.photon_scalar < first.photon_scalar, "stronger pulse still decays after weaker fresh event");
 }
 
 static void test_disabled_tick_outputs_baseline_but_decays_state() {
-  SBVisualHookConfig config = enabled_config();
+  K1VisualHookConfig config = enabled_config();
   config.enabled = false;
-  sb_visual_hooks_set_config(config);
+  k1_visual_hooks_set_config(config);
 
-  SBOnsetBeatEvent event = event_base(6);
+  K1OnsetBeatEvent event = event_base(6);
   event.onset = true;
   event.onset_strength = 1.0f;
-  SBVisualHookOutput disabled = sb_visual_hooks_tick(event, 2430);
+  K1VisualHookOutput disabled = k1_visual_hooks_tick(event, 2430);
   check_close(disabled.photon_scalar, 1.0f, 0.0001f, "disabled hook returns baseline photon scalar");
   check_close(disabled.chroma_scalar, 1.0f, 0.0001f, "disabled hook returns baseline chroma scalar");
   check_close(disabled.edge_scalar, 1.0f, 0.0001f, "disabled hook returns baseline edge scalar");
   check(!disabled.confirm_switch_boundary, "disabled hook does not confirm boundary");
 
-  sb_visual_hooks_set_config(enabled_config());
-  SBOnsetBeatEvent empty = {};
+  k1_visual_hooks_set_config(enabled_config());
+  K1OnsetBeatEvent empty = {};
   empty.event_age_ms = 1000;
-  SBVisualHookOutput after = sb_visual_hooks_tick(empty, 3000);
+  K1VisualHookOutput after = k1_visual_hooks_tick(empty, 3000);
   check_close(after.photon_scalar, 1.0f, 0.0001f, "disabled interval does not preserve stale onset pulse");
 }
 
 static void test_config_clamps() {
-  SBVisualHookConfig config = {};
+  K1VisualHookConfig config = {};
   config.enabled = true;
   config.event_window_ms = 80;
   config.onset_tau_ms = 0;
@@ -231,8 +231,8 @@ static void test_config_clamps() {
   config.bass_to_edge = -1.0f;
   config.beat_to_chroma = 2.0f;
   config.scalar_ceiling = 10.0f;
-  sb_visual_hooks_set_config(config);
-  SBVisualHookConfig stored = sb_visual_hooks_config();
+  k1_visual_hooks_set_config(config);
+  K1VisualHookConfig stored = k1_visual_hooks_config();
   check(stored.onset_tau_ms == 1, "onset tau zero clamps to one");
   check(stored.bass_tau_ms == 1, "bass tau zero clamps to one");
   check(stored.beat_tau_ms == 1, "beat tau zero clamps to one");
@@ -269,10 +269,10 @@ def run_replay(compiler="clang++", keep_dir=None):
         workdir = Path(temp_owner.name)
 
     try:
-        source_copy = workdir / "sb_visual_hooks.cpp"
-        shutil.copy2(next(FIRMWARE.rglob("sb_visual_hooks.cpp")), source_copy)
+        source_copy = workdir / "k1_visual_hooks.cpp"
+        shutil.copy2(next(FIRMWARE.rglob("k1_visual_hooks.cpp")), source_copy)
         (workdir / "Arduino.h").write_text(ARDUINO_STUB, encoding="utf-8")
-        (workdir / "sb_visual_hooks.h").write_text(HOOKS_HEADER_STUB, encoding="utf-8")
+        (workdir / "k1_visual_hooks.h").write_text(HOOKS_HEADER_STUB, encoding="utf-8")
         main_cpp = workdir / "visual_hooks_replay_main.cpp"
         binary = workdir / "visual_hooks_replay"
         main_cpp.write_text(CPP_REPLAY, encoding="utf-8")

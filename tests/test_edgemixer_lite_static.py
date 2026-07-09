@@ -5,8 +5,8 @@ from _fwpath import FwDir
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EDGE_CPP = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "sb_edgemixer_lite.cpp"
-EDGE_H = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "sb_edgemixer_lite.h"
+EDGE_CPP = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer_lite.cpp"
+EDGE_H = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer_lite.h"
 
 
 def read(path):
@@ -16,21 +16,21 @@ def read(path):
 class EdgeMixerLiteStaticTest(unittest.TestCase):
     def test_invalid_modes_are_sanitised_to_off(self):
         source = read(EDGE_CPP)
-        self.assertIn("sb_edge_mode_or_off", source)
+        self.assertIn("k1_edge_mode_or_off", source)
         self.assertRegex(
             source,
-            r"default:\s*return\s+SB_EDGE_MIXER_OFF;",
+            r"default:\s*return\s+K1_EDGE_MIXER_OFF;",
             "Unexpected EdgeMixer mode values must fail closed to OFF.",
         )
         self.assertRegex(
             source,
-            r"next\.mode\s*=\s*sb_edge_mode_or_off\(config\.mode\);",
+            r"next\.mode\s*=\s*k1_edge_mode_or_off\(config\.mode\);",
             "Stored EdgeMixer config staging must not retain invalid enum values.",
         )
-        self.assertIn("sb_edge_config = next;", source)
+        self.assertIn("k1_edge_config = next;", source)
         self.assertRegex(
             source,
-            r"SBEdgeMixerMode\s+mode\s*=\s*sb_edge_mode_or_off\(config\.mode\);",
+            r"K1EdgeMixerMode\s+mode\s*=\s*k1_edge_mode_or_off\(config\.mode\);",
             "Render-callable apply path must also fail closed for caller-provided config.",
         )
 
@@ -43,8 +43,8 @@ class EdgeMixerLiteStaticTest(unittest.TestCase):
     def test_all_declared_modes_are_handled(self):
         header = read(EDGE_H)
         source = read(EDGE_CPP)
-        modes = re.findall(r"\b(SB_EDGE_MIXER_[A-Z0-9_]+)\b", header)
-        modes = [mode for mode in modes if mode != "SB_EDGE_MIXER_OFF"]
+        modes = re.findall(r"\b(K1_EDGE_MIXER_[A-Z0-9_]+)\b", header)
+        modes = [mode for mode in modes if mode != "K1_EDGE_MIXER_OFF"]
         missing = [mode for mode in modes if f"case {mode}:" not in source]
         self.assertEqual(missing, [])
 

@@ -1,7 +1,7 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_onset_beat.h"
-#include "sb_tempo.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
 
 // ============================================================================
 // light_mode_dense_forge_chord — "Dense Forge Chord": Dense Forge variant with
@@ -13,7 +13,7 @@
 // toward the held chord root (same A-origin hue wheel as
 // chromagram_centroid_hue) instead of using the raw centroid alone.
 // Hue-only — brightness/motion identical to Dense Forge (Strobe-Law-clean).
-// With SB_CHORD_HUE_V1 undefined this renders identically to Dense Forge.
+// With K1_CHORD_HUE_V1 undefined this renders identically to Dense Forge.
 // Recon + liveness evidence: _scratch/fix-investigation/window-audit/
 // 08-tier1-chord-recon.md (conf 98.4% ≥0.70 real material; raw root flicker
 // 5.25/s → 250 ms hold → 0.83/s).
@@ -48,7 +48,7 @@ static float dforge_clamp01(float v) {
   return v;
 }
 
-static bool dforge_presence_ok(const SBAudioSnapshot& snap) {
+static bool dforge_presence_ok(const K1AudioSnapshot& snap) {
   return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
 }
 
@@ -98,9 +98,9 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
-  SBOnsetBeatEvent ev = sb_onset_beat_read();
-  SBTempoEvent tempo = sb_tempo_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_onset_beat_read();
+  K1TempoEvent tempo = k1_tempo_read();
 
   const float novelty = dforge_clamp01(snap.novelty);
   const float energy = dforge_clamp01(snap.spectral_energy);
@@ -111,7 +111,7 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   const float inject_scale =
       (presence_ok && !hard_gate) ? 1.0f : 0.0f;
 
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   const float transient = dforge_clamp01(ev.transient_level);
 #else
   const float transient = ev.onset ? dforge_clamp01(ev.onset_strength) : 0.0f;
@@ -189,14 +189,14 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   }
 
   const float centroid = chromagram_centroid_hue();
-#ifdef SB_CHORD_HUE_V1
+#ifdef K1_CHORD_HUE_V1
   // CHORD→HUE ANCHOR: pull the chromagram centroid toward the held chord root
   // on the same A-origin hue wheel (rootNote/12 and chromagram_centroid_hue
   // share origin and direction). Hue-only — brightness and motion untouched.
   float hue_base;
   {
     const uint8_t root = snap.chord.rootNote;
-    const bool chord_ok = (snap.chord.type != SBChordType::NONE);
+    const bool chord_ok = (snap.chord.type != K1ChordType::NONE);
     // 250 ms hold: a new root must persist before it takes the anchor (raw root
     // changes ~5.25/s on real material; held root measured ~0.83/s).
     if (chord_ok && root != fx.dforge_chord_held_root) {

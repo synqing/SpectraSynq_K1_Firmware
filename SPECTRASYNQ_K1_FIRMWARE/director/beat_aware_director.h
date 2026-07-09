@@ -63,7 +63,7 @@ struct BeatAwareAudioView {
   float    tempo_confidence;   // [0,1] dominance of the winning tempo
   bool     tempo_locked;       // tempo confidence above lock and not silent
   bool     beat_tick;          // true for one tick at the beat instant
-  uint8_t  music_state;        // SBMusicState cast to uint8_t
+  uint8_t  music_state;        // K1MusicState cast to uint8_t
 };
 
 // Persistent decision state (one instance; lives in the .cpp). Exposed so the

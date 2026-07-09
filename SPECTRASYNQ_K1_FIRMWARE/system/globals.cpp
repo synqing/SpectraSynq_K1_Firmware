@@ -22,8 +22,8 @@
 
 // Serial/status response tokens. Keep bytes identical: external parsers and
 // boot logs rely on these exact strings.
-extern const char SB_PASS[] = "PASS";
-extern const char SB_FAIL[] = "FAIL ###################";
+extern const char K1_PASS[] = "PASS";
+extern const char K1_FAIL[] = "FAIL ###################";
 
 // Externs this TU references but does not own --------------------------------
 extern conf CONFIG;                          // defined in globals_config.cpp

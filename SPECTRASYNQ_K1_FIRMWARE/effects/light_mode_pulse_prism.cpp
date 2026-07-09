@@ -1,7 +1,7 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_onset_beat.h"
-#include "sb_tempo.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
 #include <math.h>
 
 // ============================================================================
@@ -64,9 +64,9 @@ void light_mode_pulse_prism(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt > 0.05f)  dt = 0.05f;
   const float frame = dt * 120.0f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
-  SBOnsetBeatEvent ev = sb_onset_beat_read();
-  SBTempoEvent tempo = sb_tempo_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_onset_beat_read();
+  K1TempoEvent tempo = k1_tempo_read();
 
   const float beat_strength = prism_clamp01(tempo.beat_strength);
   const float beat_mod = 0.40f + 0.60f * beat_strength;
@@ -94,7 +94,7 @@ void light_mode_pulse_prism(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   bool spawn = false;
   float spawn_strength = 0.0f;
   uint32_t kick_id = 0;
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   kick_id = ev.kick_event_id;
   if (ev.kick && kick_id != fx.prism_last_kick_id) {
     spawn = true;

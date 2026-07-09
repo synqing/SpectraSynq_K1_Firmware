@@ -218,13 +218,13 @@ class VPMotionLabStaticTest(unittest.TestCase):
     def test_vpml_code_excludes_wireless_audio_persistence_and_smart_director(self):
         code = strip_cpp_comments(read(VPML_H))
         forbidden = (
-            "sb_k1_wireless",
+            "k1_wireless",
             "WebSockets",
             "WiFi",
             "K1_CONTROL_TOKEN",
-            "sb_smart_director",
-            "sb_audio_snapshot_read",
-            "SBOnsetBeatEvent",
+            "k1_smart_director",
+            "k1_audio_snapshot_read",
+            "K1OnsetBeatEvent",
             "GDFT",
             "noise_cal",
             "save_config",

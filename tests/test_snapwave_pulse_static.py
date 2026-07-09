@@ -77,7 +77,7 @@ def test_snapwave_pulse_modes_are_dispatched():
 
 
 def test_snapwave_pulse_modes_are_smart_auto_allowed():
-    mode_selection = read(FW / "director" / "sb_mode_selection.cpp")
+    mode_selection = read(FW / "director" / "k1_mode_selection.cpp")
 
     assert "case LIGHT_MODE_SNAPWAVE:" in mode_selection
     assert "case LIGHT_MODE_PULSE_PRISM:" in mode_selection

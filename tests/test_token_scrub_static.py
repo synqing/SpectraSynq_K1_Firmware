@@ -1,8 +1,8 @@
 """N3 token-scrub — static invariant gate.
 
 The Tab5 wireless control-token macro `K1_CONTROL_TOKEN` must be defined ONLY in the
-env that consumes it — `env:k1_wireless_ab_probe`, the sole `SB_K1_WIRELESS_ENABLED`
-build and the only one whose `build_src_filter` compiles `network/sb_k1_wireless.cpp`.
+env that consumes it — `env:k1_wireless_ab_probe`, the sole `K1_WIRELESS_ENABLED`
+build and the only one whose `build_src_filter` compiles `network/k1_wireless.cpp`.
 It must NOT be defined in the production `env:k1_hardware` (nor, by inheritance, the
 ~50 probe/harness/bench envs that chain off it), where it has no consumer and was
 already dead-stripped from the binary.
@@ -47,7 +47,7 @@ def test_token_absent_from_production_env():
     """The production env must NOT define the wireless control token."""
     assert "-DK1_CONTROL_TOKEN" not in _build_flags("k1_hardware"), (
         "K1_CONTROL_TOKEN must NOT be defined in [env:k1_hardware] (production): it "
-        "has no consumer there (network/sb_k1_wireless.cpp is not compiled into prod) "
+        "has no consumer there (network/k1_wireless.cpp is not compiled into prod) "
         "and was dead-stripped. N3 scoped the credential macro to the wireless env."
     )
 
@@ -56,7 +56,7 @@ def test_token_present_in_wireless_env():
     """The wireless env (the only consumer) must define the token directly."""
     assert "-DK1_CONTROL_TOKEN" in _build_flags("k1_wireless_ab_probe"), (
         "K1_CONTROL_TOKEN must be defined in [env:k1_wireless_ab_probe] — the only "
-        "SB_K1_WIRELESS_ENABLED build that compiles network/sb_k1_wireless.cpp. After "
+        "K1_WIRELESS_ENABLED build that compiles network/k1_wireless.cpp. After "
         "the scrub it no longer reaches this env via k1_hardware inheritance, so it "
         "must be set on this env directly."
     )
@@ -67,7 +67,7 @@ def test_token_present_in_wireless_env():
 # The token-location checks above are a proxy; this is the binary-truth
 # precondition. Even with the -D scrubbed, if network/ is added to the prod
 # build_src_filter the in-source #ifndef fallback ("k1-tab5",
-# network/sb_k1_wireless.cpp:37) would link into production and ship.
+# network/k1_wireless.cpp:37) would link into production and ship.
 
 
 def _src_filter(env: str) -> str:
@@ -99,9 +99,9 @@ def test_production_build_filter_excludes_wireless_consumer():
     """Production must NOT compile the wireless control source. This is the real
     'token never ships' guarantee — stronger than the -D location check."""
     prod = _src_filter("k1_hardware")
-    assert "network/sb_" not in prod and "<network/" not in prod, (
+    assert "network/k1_" not in prod and "<network/" not in prod, (
         "[env:k1_hardware] build_src_filter now compiles network/ sources — the "
-        "wireless control consumer (network/sb_k1_wireless.cpp) would link into "
+        "wireless control consumer (network/k1_wireless.cpp) would link into "
         "production and its hardcoded 'k1-tab5' #ifndef fallback would ship even "
         "with the -D scrubbed. Keep network/ out of the production filter; it "
         "belongs only in env:k1_wireless_ab_probe."
@@ -112,7 +112,7 @@ def test_wireless_env_compiles_the_consumer():
     """Counterpart: the only wireless env MUST compile the consumer, else the
     token is configured into a build that never links its sole user."""
     wl = _src_filter("k1_wireless_ab_probe")
-    assert "network/sb_" in wl or "<network/" in wl, (
-        "[env:k1_wireless_ab_probe] must compile network/sb_*.cpp — it is the only "
+    assert "network/k1_" in wl or "<network/" in wl, (
+        "[env:k1_wireless_ab_probe] must compile network/k1_*.cpp — it is the only "
         "env that links the wireless control consumer the token authenticates."
     )

@@ -36,7 +36,7 @@ def test_hook_present_and_executable_classifier():
     "scripts/platformio/k1_src_includes.py",            # the other build pre-script
     "scripts/platformio/k1_device_identities.json",     # consumed by the guard
     "platformio.ini",                                   # pre-existing
-    "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp",       # pre-existing firmware
+    "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",       # pre-existing firmware
     "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino",
 ])
 def test_build_critical_paths_require_firmware_tier(path):
@@ -62,7 +62,7 @@ def test_host_harness_stays_pytest_only():
 def test_prescript_alongside_firmware_is_firmware():
     assert classify(
         "scripts/platformio/k1_upload_guard.py",
-        "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp",
+        "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
     ) == "firmware"
 
 

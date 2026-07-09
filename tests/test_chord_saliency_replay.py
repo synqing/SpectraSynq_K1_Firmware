@@ -10,12 +10,12 @@ SCRIPT = ROOT / "scripts" / "regression-harness" / "chord_saliency_replay.py"
 
 class ChordSaliencyReplayTest(unittest.TestCase):
     def test_chord_detection_and_harmonic_axis_revival(self):
-        # SB_CHORD_V2 path, host-compiled REAL firmware TUs:
-        #   - sb_chord_detect.cpp: triad detection on labelled synthetic chroma
+        # K1_CHORD_V2 path, host-compiled REAL firmware TUs:
+        #   - k1_chord_detect.cpp: triad detection on labelled synthetic chroma
         #     (major/minor/dim/aug root+type correct, monotone with triad purity,
         #     documented donor limits on flat/unison input).
-        #   - sb_musical_saliency.cpp: harmonic axis A/B — incumbent dead proxy
-        #     (no flag) vs revived chord root/type-change axis (SB_CHORD_V2).
+        #   - k1_musical_saliency.cpp: harmonic axis A/B — incumbent dead proxy
+        #     (no flag) vs revived chord root/type-change axis (K1_CHORD_V2).
         #   - byte-identity guard: the no-flag harmonic axis still computes the
         #     legacy chroma-delta proxy exactly (production path unchanged).
         result = subprocess.run(

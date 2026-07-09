@@ -1,5 +1,5 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 
 // ============================================================================
 // light_mode_river_surge — "River Surge" (mode 28): Spectrum River v2 that
@@ -94,7 +94,7 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
 
   // Tide envelope: slow EMA of bass energy -> breathing drift (byte-faithful
   // SRv2 maths; own rsurge_ field so the variant never bleeds into SRv2 state).

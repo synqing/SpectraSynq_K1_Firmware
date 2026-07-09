@@ -3,15 +3,15 @@
 //
 // ble_remoted_central.cpp - K1 BLE-MIDI CENTRAL receiver for the Remoted dial.
 //
-// GATED / NON-SHIPPABLE. Compiled only under -DSB_K1_BLE_REMOTED
+// GATED / NON-SHIPPABLE. Compiled only under -DK1_BLE_REMOTED
 // (env k1_ble_remoted_probe). Production (k1_hardware) never sees this TU nor
 // the .ino hooks, so the shipping firmware stays radio-free.
 //
 // The Remoted knob is a standard Apple BLE-MIDI peripheral ("SpectraSynq
 // Remoted"). This central scans, connects, subscribes to notifications, decodes
 // the generated 71-control map into K1WirelessControlRecord values, and applies
-// them from the main-loop poll via sb_k1_control_apply().
-#ifdef SB_K1_BLE_REMOTED
+// them from the main-loop poll via k1_control_apply().
+#ifdef K1_BLE_REMOTED
 
 #include "ble_remoted_central.h"
 
@@ -23,9 +23,9 @@
 #include "freertos/task.h"
 
 #include "k1_ble_midi_decoder.h"
-#include "sb_k1_control_facade.h"
+#include "k1_control_facade.h"
 
-extern uint8_t sb_k1_confirmed_mode(bool);       // feedback-only committed mode per channel
+extern uint8_t k1_confirmed_mode(bool);       // feedback-only committed mode per channel
 
 namespace {
 
@@ -178,8 +178,8 @@ void send_confirmed_modes(bool force) {
   if (!s_rx_char) {
     return;
   }
-  const uint8_t pm = sb_k1_confirmed_mode(false);
-  const uint8_t sm = sb_k1_confirmed_mode(true);
+  const uint8_t pm = k1_confirmed_mode(false);
+  const uint8_t sm = k1_confirmed_mode(true);
   if (!force && pm == s_last_pm && sm == s_last_sm) {
     return;
   }
@@ -219,7 +219,7 @@ void ble_task(void*) {
 
 } // namespace
 
-void sb_k1_ble_remoted_begin() {
+void k1_ble_remoted_begin() {
   k1_ble_midi_decoder_reset(&s_decoder);
   s_cmd_queue = xQueueCreateStatic(CMD_QUEUE_CAPACITY,
                                    sizeof(K1WirelessControlRecord),
@@ -230,14 +230,14 @@ void sb_k1_ble_remoted_begin() {
   Serial.printf("[ble_remoted] begin (gated A/B build) - free heap=%u\n", ESP.getFreeHeap());
 }
 
-void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
+void k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   if (!s_cmd_queue) {
     return;
   }
 
   K1WirelessControlRecord record;
   while (xQueueReceive(s_cmd_queue, &record, 0) == pdTRUE) {
-    const K1WirelessControlResult result = sb_k1_control_apply(record);
+    const K1WirelessControlResult result = k1_control_apply(record);
     if (!result.ok) {
       ++s_apply_fail;
       Serial.printf("[ble_remoted] apply failed control=%s code=%s\n",
@@ -266,8 +266,8 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   }
 }
 
-bool sb_k1_ble_remoted_is_linked() {
+bool k1_ble_remoted_is_linked() {
   return s_linked;
 }
 
-#endif // SB_K1_BLE_REMOTED
+#endif // K1_BLE_REMOTED

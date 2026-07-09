@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
-"""SB_CHORD_V2 host harness — REAL firmware C++ on labelled synthetic chroma.
+"""K1_CHORD_V2 host harness — REAL firmware C++ on labelled synthetic chroma.
 
 Two real, flag-gated firmware TUs are compiled on host clang against a minimal
 Arduino stub (portMUX no-ops, math) — no globals/FixedPoints/FastLED surface:
 
-  1. audio/sb_chord_detect.cpp     -> sb_detect_chord(chroma_pc[12], ChordState)
+  1. audio/k1_chord_detect.cpp     -> k1_detect_chord(chroma_pc[12], ChordState)
        Pitch-class triad detector ported from donor ControlBus::detectChord.
        Driven with labelled synthetic 12-bin chroma vectors (known chords).
 
-  2. audio/sb_musical_saliency.cpp -> sb_musical_saliency_update(snapshot, onset)
-       The 4-axis saliency engine. We drive it with a scripted SBAudioSnapshot
+  2. audio/k1_musical_saliency.cpp -> k1_musical_saliency_update(snapshot, onset)
+       The 4-axis saliency engine. We drive it with a scripted K1AudioSnapshot
        stream (frame_ms / silence / chroma_strength / chord{root,type,conf}) and
        read back harmonicNoveltySmooth, A/B-ing the harmonic axis:
          incumbent  (no flag)   : dead chroma_strength-delta proxy  -> ~0
-         SB_CHORD_V2 (flagged)  : chord root/type-change axis        -> ALIVE
+         K1_CHORD_V2 (flagged)  : chord root/type-change axis        -> ALIVE
 
 Production (no-flag) byte-identity of the saliency engine is asserted by the
 incumbent-vs-flag comparison: the no-flag harmonic axis matches the historical
@@ -23,7 +23,7 @@ A-origin convention: the fork notes[] table starts at A (55 Hz), so chroma bin 0
 is pitch class A. detectChord rootNote is therefore reported in A-origin units
 (0 = A). Synthetic fixtures below are built in A-origin pitch classes.
 
-NON-SHIPPING. Host-only. SB_CHORD_V2 / SB_RENDER_HOST_TEST never enter a
+NON-SHIPPING. Host-only. K1_CHORD_V2 / K1_RENDER_HOST_TEST never enter a
 PlatformIO env. Run: python3 scripts/regression-harness/chord_saliency_replay.py
 """
 
@@ -49,17 +49,17 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 
 # ---- detector harness ------------------------------------------------------
 # Reads "C r0 r1 .. r11" lines (12 floats) on stdin, runs the REAL
-# sb_detect_chord, prints "D root type conf".
+# k1_detect_chord, prints "D root type conf".
 CHORD_MAIN = r"""
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 #include <cstdio>
 int main(){
   char tag; float c[12];
   while (std::scanf(" %c", &tag) == 1) {
     if (tag != 'C') { int ch; while((ch=getchar())!='\n'&&ch!=EOF){} continue; }
     for (int i=0;i<12;i++){ if (std::scanf("%f",&c[i])!=1) c[i]=0.0f; }
-    SBChordState cs;
-    sb_detect_chord(c, cs);
+    K1ChordState cs;
+    k1_detect_chord(c, cs);
     std::printf("D %u %u %.4f %.4f %.4f %.4f\n",
       cs.rootNote, (unsigned)cs.type, cs.confidence,
       cs.rootStrength, cs.thirdStrength, cs.fifthStrength);
@@ -70,38 +70,38 @@ int main(){
 """
 
 # ---- saliency harness ------------------------------------------------------
-# Reads scripted frames on stdin and runs the REAL sb_musical_saliency_update,
+# Reads scripted frames on stdin and runs the REAL k1_musical_saliency_update,
 # printing harmonicNoveltySmooth per frame.
 #   Frame line (no-flag build) : "S ms silence chroma_strength"
-#   Frame line (SB_CHORD_V2)   : "S ms silence chroma_strength root type conf"
+#   Frame line (K1_CHORD_V2)   : "S ms silence chroma_strength root type conf"
 # Output: "H ms harmonicSmooth harmonicRaw overall"
 SAL_MAIN = r"""
-#include "sb_musical_saliency.h"
+#include "k1_musical_saliency.h"
 #include <cstdio>
 int main(){
   char tag; long ms; int sil; float cs;
   while (std::scanf(" %c", &tag) == 1) {
     if (tag != 'S') { int ch; while((ch=getchar())!='\n'&&ch!=EOF){} continue; }
     if (std::scanf("%ld %d %f", &ms, &sil, &cs) != 3) break;
-    SBAudioSnapshot a = {};
+    K1AudioSnapshot a = {};
     a.frame_ms = (uint32_t)ms;
     a.silence = sil != 0;
     a.chroma_strength = cs;
     a.novelty = 0.2f;          // static non-silent novelty so timbral/dynamic stay quiet
     a.spectral_energy = 0.5f;  // static energy -> dynamic axis ~0
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
     int root, type; float conf;
     if (std::scanf("%d %d %f", &root, &type, &conf) != 3) { root=0; type=0; conf=0.0f; }
     a.chord.rootNote = (uint8_t)root;
-    a.chord.type = (SBChordType)type;
+    a.chord.type = (K1ChordType)type;
     a.chord.confidence = conf;
 #else
     // No-flag build still consumes the 3 trailing tokens to keep stdin aligned.
     int root, type; float conf;
     (void)std::scanf("%d %d %f", &root, &type, &conf);
 #endif
-    sb_musical_saliency_update(a, nullptr);
-    SBSaliencyAxisFrame f = sb_musical_saliency_read();
+    k1_musical_saliency_update(a, nullptr);
+    K1SaliencyAxisFrame f = k1_musical_saliency_read();
     std::printf("H %ld %.4f %.4f %.4f\n",
       ms, f.harmonicNoveltySmooth, f.harmonicNovelty, f.overallSaliency);
   }
@@ -291,7 +291,7 @@ def test_saliency_axis(bin_inc, bin_v2):
     # Incumbent (no-flag) harmonic axis is DEAD: chroma_strength constant -> ~0.
     if inc_peak > 0.02:
         failures.append(f"incumbent harmonic axis not dead: peak {inc_peak:.4f} > 0.02")
-    # SB_CHORD_V2 RAW axis is the change detector: fires hard (1.0) on root change,
+    # K1_CHORD_V2 RAW axis is the change detector: fires hard (1.0) on root change,
     # 0.6 on type change. This is the load-bearing "axis is ALIVE" proof.
     if v2_root_raw < 0.95:
         failures.append(f"v2 root-change raw spike {v2_root_raw:.4f} < 0.95")
@@ -321,7 +321,7 @@ def test_incumbent_proxy_intact(bin_inc):
     # proxy fires only when |Δchroma_strength| crosses harmonicChangeThreshold
     # (0.5). Drive a stream that DOES cross it and confirm the no-flag build still
     # computes the legacy proxy (i.e. the #else branch is the untouched original).
-    # If SB_CHORD_V2 had leaked into the no-flag path, this raw value would be
+    # If K1_CHORD_V2 had leaked into the no-flag path, this raw value would be
     # chord-derived (~0, no chord fields set) instead of the chroma-delta proxy.
     DT = 7
     frames = [(0, 0, 0.10), (DT, 0, 0.10), (2 * DT, 0, 0.90)]  # warmup, static, +0.80 jump
@@ -342,9 +342,9 @@ def main():
     tmp = tempfile.TemporaryDirectory()
     base = Path(tmp.name)
 
-    bin_chord_v2 = build("audio/sb_chord_detect.cpp", CHORD_MAIN, ["SB_CHORD_V2"], base / "chord_v2", compiler)
-    bin_sal_inc = build("audio/sb_musical_saliency.cpp", SAL_MAIN, [], base / "sal_inc", compiler)
-    bin_sal_v2 = build("audio/sb_musical_saliency.cpp", SAL_MAIN, ["SB_CHORD_V2"], base / "sal_v2", compiler)
+    bin_chord_v2 = build("audio/k1_chord_detect.cpp", CHORD_MAIN, ["K1_CHORD_V2"], base / "chord_v2", compiler)
+    bin_sal_inc = build("audio/k1_musical_saliency.cpp", SAL_MAIN, [], base / "sal_inc", compiler)
+    bin_sal_v2 = build("audio/k1_musical_saliency.cpp", SAL_MAIN, ["K1_CHORD_V2"], base / "sal_v2", compiler)
 
     all_fail = []
 
@@ -362,7 +362,7 @@ def main():
         print(f"{name:18} {confs[name]:6.3f}")
     print(f"monotonicity (triad purity, floor sweep {sweep}): conf {[round(c,3) for c in sconf]}")
     print()
-    print("=== HARMONIC SALIENCY AXIS A/B (incumbent dead-proxy vs SB_CHORD_V2) ===")
+    print("=== HARMONIC SALIENCY AXIS A/B (incumbent dead-proxy vs K1_CHORD_V2) ===")
     print(f"incumbent peak (dead)    : {sm['inc_peak']:.4f}")
     print(f"v2 raw root-change spike : {sm['v2_root_raw']:.4f}")
     print(f"v2 raw type-change spike : {sm['v2_type_raw']:.4f}")

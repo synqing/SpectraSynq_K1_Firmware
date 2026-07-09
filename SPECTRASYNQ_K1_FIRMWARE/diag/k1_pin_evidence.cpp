@@ -221,7 +221,7 @@ static void k1_pin_fill_common(uint8_t channel, uint16_t mode, K1PinEvidencePayl
     out.state_bits |= K1_PIN_STATE_LOUD_GUARD_ENABLED;
   }
 #endif
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
   if (VP_VIVID_PRECOMP) {
     out.state_bits |= K1_PIN_STATE_VIVID_ENABLED;
   }
@@ -263,7 +263,7 @@ static void k1_pin_fill_common(uint8_t channel, uint16_t mode, K1PinEvidencePayl
   out.loud_input_trim_q = 65535U;
   out.loud_gdft_trim_q = 65535U;
 #endif
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
   out.vivid_chroma_q = k1_pin_q16(VP_VIVID_CHROMA_LEVEL);
   out.vivid_black_q = k1_pin_q16(VP_VIVID_BLACK_LEVEL);
 #endif

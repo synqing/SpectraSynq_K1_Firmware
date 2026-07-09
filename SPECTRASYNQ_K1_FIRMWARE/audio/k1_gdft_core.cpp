@@ -26,7 +26,7 @@
 
 #include "constants.h"           // NUM_FREQS, NUM_ZONES, NUM_AGC_BANDS, SYSTEM_FPS, ...
 #include "globals.h"             // CONFIG, frequencies[], sample_window[], magnitudes*, agc_*, ...
-#include "utilities.h"           // low_pass_array() — all-inline, ODR-safe (also incl. by sb_chord_detect.cpp)
+#include "utilities.h"           // low_pass_array() — all-inline, ODR-safe (also incl. by k1_chord_detect.cpp)
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 
@@ -197,7 +197,7 @@ void IRAM_ATTR process_GDFT() {
   // whole 256-iteration calibration window, which mixed Phase-A DC bootstrap and
   // any stale/pre-cal sample_window state into the spectral noise model.
   if (noise_complete == false) {
-#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
+#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
     if (noise_cal_dc_valid &&
         noise_cal_reject_reason == NOISE_CAL_REJECT_NONE &&
         noise_iterations >= 129 &&
@@ -269,10 +269,10 @@ void IRAM_ATTR process_GDFT() {
   }
 
   // Apply noise reduction data
-#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
+#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
   for (uint8_t i = 0; i < NUM_FREQS; i += 1) {
     if (noise_complete == true) {
-      magnitudes_normalized_avg[i] -= float(noise_samples[i] * SQ15x16(SB_GDFT_STATIC_NOISE_SUBTRACTION_GAIN));
+      magnitudes_normalized_avg[i] -= float(noise_samples[i] * SQ15x16(K1_GDFT_STATIC_NOISE_SUBTRACTION_GAIN));
       if (magnitudes_normalized_avg[i] < 0.0) {
         magnitudes_normalized_avg[i] = 0.0;
       }
@@ -342,9 +342,9 @@ void IRAM_ATTR process_GDFT() {
   }
 #endif
 
-#ifdef SB_AGC_PERBAND_V1
+#ifdef K1_AGC_PERBAND_V1
   // ===========================================================================
-  // PER-BAND AGC v1 (SB_AGC_PERBAND_V1 — DEFAULT OFF, prepare-only candidate).
+  // PER-BAND AGC v1 (K1_AGC_PERBAND_V1 — DEFAULT OFF, prepare-only candidate).
   //
   // Lane N6 fix for the "louder -> dimmer" inverse (eyes-on-verdict 2026-06-21;
   // DSP root-cause spike #72837): the broadband stage below computes ONE global
@@ -516,8 +516,8 @@ void IRAM_ATTR process_GDFT() {
     agc_bands[b].target_gain = agc_gain;
     agc_bands[b].energy      = sig_q;
   }
-#endif  // SB_AGC_PERBAND_V1
-  // --- END AGC (broadband v2 default / per-band v1 under SB_AGC_PERBAND_V1) ---
+#endif  // K1_AGC_PERBAND_V1
+  // --- END AGC (broadband v2 default / per-band v1 under K1_AGC_PERBAND_V1) ---
 }
 
 void calculate_novelty(uint32_t t_now) {

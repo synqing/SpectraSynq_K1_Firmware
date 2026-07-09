@@ -3,21 +3,21 @@
 
 Adversarial validation of CLAIM C3a: "the firmware ACF (in-range Acc2 40.6%)
 underperforms the clean host sweep (53.1%) BECAUSE of the live log-Gaussian prior,
-the decayed-512 window (SB_NOVELTY_DECAY=0.999/emit), and the winner hysteresis."
+the decayed-512 window (K1_NOVELTY_DECAY=0.999/emit), and the winner hysteresis."
 
 This script does NOT touch firmware, flash, or commit. It builds a pure-Python
-replica of the EXACT firmware ACF-winner pipeline in sb_tempo.cpp:
+replica of the EXACT firmware ACF-winner pipeline in k1_tempo.cpp:
   - peak-hold /3 decimation to the firmware-native 44.44 Hz emit rate
-    (sb_tempo.cpp:506-544, identical schedule to acf_ceiling_sweep.decimate_peak_hold)
-  - a 512-sample ring decayed by SB_NOVELTY_DECAY=0.999 on EVERY emit, the new
-    sample written undecayed (sb_tempo.cpp:542-544)
-  - per-emit EMA novelty autoranger (sb_update_scale, tau=0.3 every 3 emits)
+    (k1_tempo.cpp:506-544, identical schedule to acf_ceiling_sweep.decimate_peak_hold)
+  - a 512-sample ring decayed by K1_NOVELTY_DECAY=0.999 on EVERY emit, the new
+    sample written undecayed (k1_tempo.cpp:542-544)
+  - per-emit EMA novelty autoranger (k1_update_scale, tau=0.3 every 3 emits)
   - per-emit ACF salience: mean-subtract the ring, biased ACF over the firmware
     lag band, per-bin value at the bin's REAL lag with 3-point parabolic interp,
-    normalise to max=1 (sb_compute_acf_salience, cpp:230-279)
-  - selection score = salience * log-Gaussian tactus prior (sb_sel_score, cpp:285-292)
+    normalise to max=1 (k1_compute_acf_salience, cpp:230-279)
+  - selection score = salience * log-Gaussian tactus prior (k1_sel_score, cpp:285-292)
   - winner = argmax over 96 integer BPM bins (60..155), with simulated +10%/5-tick
-    hysteresis (sb_update_winner, cpp:295-333)
+    hysteresis (k1_update_winner, cpp:295-333)
   - settled detection = MODE of integer winner BPM over the last 50% of emits
     (tempo_accuracy.detected_bpm, by construction the winner is already integer here)
 
@@ -27,7 +27,7 @@ are directly comparable to the 40.6% firmware anchor and the 53.1% sweep.
 ABLATIONS (one factor removed at a time, from the faithful replica):
   base    : full firmware-faithful replica            -> reproduce ~40.6%?
   -prior  : drop the log-Gaussian tactus prior (salience only)
-  -decay  : undecayed ring (SB_NOVELTY_DECAY = 1.0)
+  -decay  : undecayed ring (K1_NOVELTY_DECAY = 1.0)
   -hyst   : no hysteresis (winner = instantaneous argmax every emit)
   argmax  : sweep-style GLOBAL argmax over the ACF + ONE parabolic at that peak,
             continuous BPM (NOT per-bin, NOT bin-quantised) -> isolates METHOD
@@ -54,28 +54,28 @@ import tempo_accuracy as ta         # noqa: E402
 
 ROOT = _HERE.parents[1]
 
-# --- firmware constants (sb_tempo.cpp) ---------------------------------------
-SB_NUM_TEMPI = 96
-SB_TEMPO_LOW = 60.0
-SB_HISTORY_LENGTH = 512
-SB_NOVELTY_DECAY = 0.999
-SB_NOVELTY_DECIMATION = 3
-SB_AP_FRAME_HZ = 12800.0 / 96.0           # 133.333
-SB_NOVELTY_RATE_HZ = SB_AP_FRAME_HZ / SB_NOVELTY_DECIMATION  # 44.444
-SB_TACTUS_BPM = 120.0
-SB_TACTUS_SIGMA = 0.9
+# --- firmware constants (k1_tempo.cpp) ---------------------------------------
+K1_NUM_TEMPI = 96
+K1_TEMPO_LOW = 60.0
+K1_HISTORY_LENGTH = 512
+K1_NOVELTY_DECAY = 0.999
+K1_NOVELTY_DECIMATION = 3
+K1_AP_FRAME_HZ = 12800.0 / 96.0           # 133.333
+K1_NOVELTY_RATE_HZ = K1_AP_FRAME_HZ / K1_NOVELTY_DECIMATION  # 44.444
+K1_TACTUS_BPM = 120.0
+K1_TACTUS_SIGMA = 0.9
 HYST_RATIO = 1.1
 HYST_FRAMES = 5
 
-BIN_BPM = SB_TEMPO_LOW + np.arange(SB_NUM_TEMPI, dtype=np.float64)   # 60..155
+BIN_BPM = K1_TEMPO_LOW + np.arange(K1_NUM_TEMPI, dtype=np.float64)   # 60..155
 
-# log-Gaussian tactus prior, computed exactly as sb_tempo_init (cpp:451-452)
-_L2 = np.log2(BIN_BPM / SB_TACTUS_BPM) / SB_TACTUS_SIGMA
+# log-Gaussian tactus prior, computed exactly as k1_tempo_init (cpp:451-452)
+_L2 = np.log2(BIN_BPM / K1_TACTUS_BPM) / K1_TACTUS_SIGMA
 TEMPO_PRIOR = np.exp(-0.5 * _L2 * _L2)
 
 
 def decimate_peak_hold(nov):
-    """sb_tempo.cpp /3 peak-hold (identical to acf_ceiling_sweep.decimate_peak_hold)."""
+    """k1_tempo.cpp /3 peak-hold (identical to acf_ceiling_sweep.decimate_peak_hold)."""
     out = []
     primed = False
     accum = 0.0
@@ -89,7 +89,7 @@ def decimate_peak_hold(nov):
         if v > accum:
             accum = float(v)
         ctr += 1
-        if ctr < SB_NOVELTY_DECIMATION:
+        if ctr < K1_NOVELTY_DECIMATION:
             continue
         ctr = 0
         out.append(accum)
@@ -98,10 +98,10 @@ def decimate_peak_hold(nov):
 
 
 def acf_salience(curve_lin, scale, fps, decay_used):
-    """Replicate sb_compute_acf_salience EXACTLY over a linearised oldest->newest ring.
+    """Replicate k1_compute_acf_salience EXACTLY over a linearised oldest->newest ring.
 
     `curve_lin` is the 512-length ring already linearised oldest->newest (so the firmware's
-    (sb_spectral_index + k) % LEN rotation is done by the caller). `scale` is the current
+    (k1_spectral_index + k) % LEN rotation is done by the caller). `scale` is the current
     novelty autoranger. Returns (salience[96], valid_bool).
     """
     x = curve_lin * scale
@@ -120,9 +120,9 @@ def acf_salience(curve_lin, scale, fps, decay_used):
         if lag < n:
             ac[li] = float(np.dot(x[lag:], x[:n - lag]))   # biased ACF (no /N), cpp:250
     # per-bin salience at real lag with 3-point parabolic interp (cpp:256-275)
-    sal = np.zeros(SB_NUM_TEMPI, dtype=np.float64)
+    sal = np.zeros(K1_NUM_TEMPI, dtype=np.float64)
     smax = 1e-12
-    for i in range(SB_NUM_TEMPI):
+    for i in range(K1_NUM_TEMPI):
         bpm = BIN_BPM[i]
         lag_real = fps * 60.0 / bpm
         L0 = int(np.floor(lag_real))
@@ -145,7 +145,7 @@ def acf_salience(curve_lin, scale, fps, decay_used):
 
 
 def update_scale(ring, prev_scale, tau=0.3):
-    """sb_update_scale (cpp:157-165): EMA of 1/(max*0.5)."""
+    """k1_update_scale (cpp:157-165): EMA of 1/(max*0.5)."""
     mx = ring.max()
     if mx < 1e-10:
         mx = 1e-10
@@ -168,12 +168,12 @@ def run_track(nov, fps, decay, use_prior, use_hyst, method, decim=True):
     if emit.size < 8:
         return None
 
-    ring = np.zeros(SB_HISTORY_LENGTH, dtype=np.float64)
+    ring = np.zeros(K1_HISTORY_LENGTH, dtype=np.float64)
     idx = 0
     scale = 1.0
     scale_ctr = 0
 
-    winner = SB_NUM_TEMPI // 2
+    winner = K1_NUM_TEMPI // 2
     cand = winner
     cand_frames = 0
 
@@ -182,7 +182,7 @@ def run_track(nov, fps, decay, use_prior, use_hyst, method, decim=True):
         # decay ring then write new sample undecayed (cpp:542-544)
         ring *= decay
         ring[idx] = s
-        idx = (idx + 1) % SB_HISTORY_LENGTH
+        idx = (idx + 1) % K1_HISTORY_LENGTH
         scale_ctr += 1
         if scale_ctr >= 3:
             scale = update_scale(ring, scale, 0.3)
@@ -217,7 +217,7 @@ def run_track(nov, fps, decay, use_prior, use_hyst, method, decim=True):
         if method == "perbin_cont":
             b = int(np.argmax(score))
             bpm = BIN_BPM[b]
-            if 0 < b < SB_NUM_TEMPI - 1:
+            if 0 < b < K1_NUM_TEMPI - 1:
                 ym, y0, yp = score[b - 1], score[b], score[b + 1]
                 den = (ym - 2.0 * y0 + yp)
                 if den != 0.0:
@@ -259,14 +259,14 @@ def run_track(nov, fps, decay, use_prior, use_hyst, method, decim=True):
 
 CONFIGS = [
     # label,            fps,                use_prior, use_hyst, method,        decim
-    ("base",            SB_NOVELTY_RATE_HZ, True,  True,  "perbin",       True),
-    ("-prior",          SB_NOVELTY_RATE_HZ, False, True,  "perbin",       True),
-    ("-decay",          SB_NOVELTY_RATE_HZ, True,  True,  "perbin",       True),  # decay overridden below
-    ("-hyst",           SB_NOVELTY_RATE_HZ, True,  False, "perbin",       True),
-    ("argmax(method)",  SB_NOVELTY_RATE_HZ, False, False, "argmax",       True),
-    ("-bins(cont)",     SB_NOVELTY_RATE_HZ, True,  False, "perbin_cont",  True),
-    ("+133hz(rate)",    SB_AP_FRAME_HZ,     True,  True,  "perbin",       False),
-    ("all-off",         SB_NOVELTY_RATE_HZ, False, False, "perbin",       True),  # decay overridden below
+    ("base",            K1_NOVELTY_RATE_HZ, True,  True,  "perbin",       True),
+    ("-prior",          K1_NOVELTY_RATE_HZ, False, True,  "perbin",       True),
+    ("-decay",          K1_NOVELTY_RATE_HZ, True,  True,  "perbin",       True),  # decay overridden below
+    ("-hyst",           K1_NOVELTY_RATE_HZ, True,  False, "perbin",       True),
+    ("argmax(method)",  K1_NOVELTY_RATE_HZ, False, False, "argmax",       True),
+    ("-bins(cont)",     K1_NOVELTY_RATE_HZ, True,  False, "perbin_cont",  True),
+    ("+133hz(rate)",    K1_AP_FRAME_HZ,     True,  True,  "perbin",       False),
+    ("all-off",         K1_NOVELTY_RATE_HZ, False, False, "perbin",       True),  # decay overridden below
 ]
 DECAY_OVERRIDE = {"-decay": 1.0, "all-off": 1.0}
 
@@ -290,7 +290,7 @@ def main():
         frame_ms, nov, sil = nfw.wav_to_novelty(wav)
         nov = np.where(sil.astype(bool), 0.0, nov)
         for (label, fps, up, uh, method, decim) in CONFIGS:
-            decay = DECAY_OVERRIDE.get(label, SB_NOVELTY_DECAY)
+            decay = DECAY_OVERRIDE.get(label, K1_NOVELTY_DECAY)
             det = run_track(nov, fps, decay, up, uh, method, decim)
             if det is None:
                 continue

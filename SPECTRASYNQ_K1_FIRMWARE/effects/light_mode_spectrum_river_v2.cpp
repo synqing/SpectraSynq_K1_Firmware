@@ -1,5 +1,5 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 
 // ============================================================================
 // light_mode_spectrum_river_v2 — "Spectrum River 2": the 10/10 Spectrum River,
@@ -44,7 +44,7 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
   const uint16_t HALF = NATIVE_RESOLUTION / 2;
 
   // Tide envelope: slow EMA of bass energy -> breathing drift (no twitch).
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
   float low = snap.low_energy;
   if (!isfinite(low) || low < 0.0f) low = 0.0f;
   if (low > 1.0f) low = 1.0f;

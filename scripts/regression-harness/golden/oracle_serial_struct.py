@@ -5,8 +5,8 @@ THE KEYSTONE GATE (Phase A · Lane 2). The replay oracle (oracle_serial_replay.p
 locks BEHAVIOUR by compiling + running parse_command() on the host. That works for
 GLOBAL-WRITE handlers (they mutate inline globals the host can observe). It is BLIND
 to the FUNCTION-CALL families — queue/transition, smart_*, edge_*, set_mode, ... —
-because those call host-STUBBED subsystems (sb_queue_*, sb_smart_director_*,
-sb_edgemixer_*, ...) whose real bodies drag FS/LittleFS/FreeRTOS and cannot host
+because those call host-STUBBED subsystems (k1_queue_*, k1_smart_director_*,
+k1_edgemixer_*, ...) whose real bodies drag FS/LittleFS/FreeRTOS and cannot host
 compile. Locking them via replay would freeze only the echo shell, not the real
 behaviour = the blind-lock the discipline forbids.
 
@@ -46,7 +46,7 @@ oracle PUBLIC INTERFACE (NAME / capture(firmware_root=None) / MUTATIONS), regist
 in harness_selftest.ORACLE_MODULES, gated by test_golden_master.py.
 
 SCOPE LOCK (Captain, 2026-06-25): function-call families ONLY. vp_profile / vp_all and
-the control-facade (sb_k1_control_facade.cpp) profile logic are a SEPARATE architectural
+the control-facade (k1_control_facade.cpp) profile logic are a SEPARATE architectural
 lane and are explicitly OUT OF SCOPE here — no family below may reference them.
 """
 
@@ -78,7 +78,7 @@ FAMILIES = [
         "name": "queue",
         "dispatcher": "serial_cmd_dispatch_queue",
         # The effects-queue / transition family (serial_menu.h spec §4): all ungated,
-        # all calling only the host-stubbed sb_queue_* subsystem, zero facade coupling.
+        # all calling only the host-stubbed k1_queue_* subsystem, zero facade coupling.
         "commands": [
             "queue_mode",
             "transition_style",
@@ -90,9 +90,9 @@ FAMILIES = [
     {
         "name": "smart_director",
         "dispatcher": "serial_cmd_dispatch_smart_director",
-        # Smart-director control (sb_smart_director_* config getters/setters +
-        # sb_apply_smart_scene + sb_mode_selection_init); ungated, facade-free. The
-        # config fns live in director/sb_smart_director.cpp (replay-oracle MODULE_CPPS);
+        # Smart-director control (k1_smart_director_* config getters/setters +
+        # k1_apply_smart_scene + k1_mode_selection_init); ungated, facade-free. The
+        # config fns live in director/k1_smart_director.cpp (replay-oracle MODULE_CPPS);
         # the print/apply helpers are external-linkage in serial_menu.h.
         "commands": [
             "smart_assist",
@@ -104,7 +104,7 @@ FAMILIES = [
     {
         "name": "smart_visual",
         "dispatcher": "serial_cmd_dispatch_smart_visual",
-        # Visual-hooks toggle (sb_visual_hooks_* config); ungated, facade-free.
+        # Visual-hooks toggle (k1_visual_hooks_* config); ungated, facade-free.
         "commands": [
             "smart_hooks",
         ],
@@ -112,7 +112,7 @@ FAMILIES = [
     {
         "name": "edge_mixer",
         "dispatcher": "serial_cmd_dispatch_edge_mixer",
-        # Edge-mixer control (sb_edgemixer_lite_* config + sb_parse_edge_mode);
+        # Edge-mixer control (k1_edgemixer_lite_* config + k1_parse_edge_mode);
         # ungated, facade-free.
         "commands": [
             "edge_enabled",
@@ -130,7 +130,7 @@ FAMILIES = [
         # so the firmware links one definition; the handlers TU forward-declares it extern).
         # In the replay oracle it is a GUARANTEED-EXTERNAL driver stub (oracle_serial_replay
         # driver `void set_preset(char*) {}`), NOT a static-inline host stub — so the handlers
-        # TU links free (no sb_queue_*-style -O0 link trap). save_config_delayed() is likewise
+        # TU links free (no k1_queue_*-style -O0 link trap). save_config_delayed() is likewise
         # already a driver stub + already used by the extracted setter dispatchers.
         "commands": [
             "preset",
@@ -339,7 +339,7 @@ MUTATIONS = [
     # 1. ALTER A STATEMENT: flip the queue_mode subsystem call argument true->false.
     #    The normalized body of "queue_mode" diverges. Channel (a) statement-identity.
     (
-        r'(else if \(strcmp\(command_type, "queue_mode"\) == 0\) \{\s*if \(strcmp\(command_data, "on"\) == 0\) \{\s*)sb_queue_set_mode_enabled\(true\);',
+        r'(else if \(strcmp\(command_type, "queue_mode"\) == 0\) \{\s*if \(strcmp\(command_data, "on"\) == 0\) \{\s*)k1_queue_set_mode_enabled\(true\);',
         r'\1sb_queue_set_mode_enabled(false);',
         "queue_mode_arg_true_to_false (statement-identity divergence)",
     ),
@@ -385,9 +385,9 @@ MUTATIONS = [
         "smart_assist_command_type_renamed (routing/identity divergence)",
     ),
     # 7. smart_hooks enabled flip value->false: alters the smart_visual body. Anchored
-    #    on the unique SBVisualHookConfig fetch. (a)
+    #    on the unique K1VisualHookConfig fetch. (a)
     (
-        r"(SBVisualHookConfig config = sb_visual_hooks_config\(\);\s*)config\.enabled = value;",
+        r"(K1VisualHookConfig config = k1_visual_hooks_config\(\);\s*)config\.enabled = value;",
         r"\1config.enabled = false;",
         "smart_hooks_enabled_value_to_false (statement-identity divergence)",
     ),

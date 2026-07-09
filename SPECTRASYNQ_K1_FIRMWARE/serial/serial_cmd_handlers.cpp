@@ -15,11 +15,11 @@
 #include "constants.h"             // NUM_FREQS, CHROMA_PROFILE_*, SAMPLE_HISTORY_LENGTH
 #include "serial_tx.h"             // tx_begin / tx_end / bad_command
 #include "serial_parse_helpers.h"  // vp_parse_bool / vp_parse_float
-#include "sb_effect_queue.h"        // sb_queue_* setters/getters + SB_QUEUE_* enums (queue family)
-#include "sb_smart_director.h"      // SBSmartDirectorConfig + sb_smart_director_config/set_config (smart_director)
-#include "sb_mode_selection.h"      // sb_mode_selection_init (smart_switching)
-#include "sb_visual_hooks.h"        // SBVisualHookConfig + sb_visual_hooks_config/set_config (smart_visual)
-#include "sb_edgemixer_lite.h"      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
+#include "k1_effect_queue.h"        // k1_queue_* setters/getters + K1_QUEUE_* enums (queue family)
+#include "k1_smart_director.h"      // K1SmartDirectorConfig + k1_smart_director_config/set_config (smart_director)
+#include "k1_mode_selection.h"      // k1_mode_selection_init (smart_switching)
+#include "k1_visual_hooks.h"        // K1VisualHookConfig + k1_visual_hooks_config/set_config (smart_visual)
+#include "k1_edgemixer_lite.h"      // K1EdgeMixerConfig/K1EdgeMixerMode + k1_edgemixer_lite_config/set_config (edge_mixer)
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
 #endif
@@ -42,7 +42,7 @@
 // header-body functions in persistence/bridge_fs.h (save_config:77,
 // save_config_delayed:110), visible in the .ino include context. Forward-declare
 // them here — same pattern as audio/k1_gdft_core.cpp:48 and
-// control/sb_effect_queue.cpp:34 — so the moved bodies link against that storage.
+// control/k1_effect_queue.cpp:34 — so the moved bodies link against that storage.
 extern void save_config();
 extern void save_config_delayed();
 
@@ -850,8 +850,8 @@ bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_d
 // serial_cmd_dispatch_queue — the effects-queue / transition family (5 handlers),
 // lifted VERBATIM from parse_command()'s ungated Stage-B ladder (serial_menu.h
 // spec §4 block): queue_mode, transition_style, transition_dip_ms,
-// transition_xfade_ms, commit_quantise. Each calls the sb_queue_* subsystem
-// (sb_effect_queue.h) — a host-stubbed FUNCTION-CALL family the replay oracle is
+// transition_xfade_ms, commit_quantise. Each calls the k1_queue_* subsystem
+// (k1_effect_queue.h) — a host-stubbed FUNCTION-CALL family the replay oracle is
 // blind to. The `if (false) {}` opener keeps every branch statement-identical.
 // Returns true iff command_type matched one of the five; false routes parse_command
 // to its remaining ladder. UNGATED — decl/def/call-site carry no #ifdef.
@@ -859,9 +859,9 @@ bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_d
 // Behaviour-preservation is proven by the STRUCTURAL-CONTRACT gate (oracle_serial_
 // struct.py): the normalized body + dispatch-routing are pinned in serial_struct.
 // golden and must reproduce byte-for-byte after this verbatim lift (TRIZ #13/#22 —
-// the stubbed sb_queue_* sees a byte-identical call, so its behaviour is irrelevant
-// to the proof). All symbols are available in this TU: sb_queue_* + SB_QUEUE_* enums
-// via sb_effect_queue.h, tx_begin/tx_end/bad_command via serial_tx.h, USBSerial via
+// the stubbed k1_queue_* sees a byte-identical call, so its behaviour is irrelevant
+// to the proof). All symbols are available in this TU: k1_queue_* + K1_QUEUE_* enums
+// via k1_effect_queue.h, tx_begin/tx_end/bad_command via serial_tx.h, USBSerial via
 // globals.h, atoi via <stdlib.h>.
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
@@ -869,12 +869,12 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 
     else if (strcmp(command_type, "queue_mode") == 0) {
       if (strcmp(command_data, "on") == 0) {
-        sb_queue_set_mode_enabled(true);
+        k1_queue_set_mode_enabled(true);
         tx_begin();
         USBSerial.println("QUEUE_MODE: on");
         tx_end();
       } else if (strcmp(command_data, "off") == 0) {
-        sb_queue_set_mode_enabled(false);
+        k1_queue_set_mode_enabled(false);
         tx_begin();
         USBSerial.println("QUEUE_MODE: off");
         tx_end();
@@ -885,12 +885,12 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 
     else if (strcmp(command_type, "transition_style") == 0) {
       if (strcmp(command_data, "dip") == 0) {
-        sb_queue_set_transition_style(SB_QUEUE_TRANSITION_DIP);
+        k1_queue_set_transition_style(K1_QUEUE_TRANSITION_DIP);
         tx_begin();
         USBSerial.println("TRANSITION_STYLE: dip");
         tx_end();
       } else if (strcmp(command_data, "xfade") == 0) {
-        sb_queue_set_transition_style(SB_QUEUE_TRANSITION_XFADE);
+        k1_queue_set_transition_style(K1_QUEUE_TRANSITION_XFADE);
         tx_begin();
         USBSerial.println("TRANSITION_STYLE: xfade");
         tx_end();
@@ -900,10 +900,10 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
     }
 
     else if (strcmp(command_type, "transition_dip_ms") == 0) {
-      if (sb_queue_set_dip_ms((uint32_t)atoi(command_data))) {
+      if (k1_queue_set_dip_ms((uint32_t)atoi(command_data))) {
         tx_begin();
         USBSerial.print("TRANSITION_DIP_MS: ");
-        USBSerial.println(sb_queue_dip_ms());
+        USBSerial.println(k1_queue_dip_ms());
         tx_end();
       } else {
         bad_command(command_type, command_data);  // valid range 60..1000
@@ -911,10 +911,10 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
     }
 
     else if (strcmp(command_type, "transition_xfade_ms") == 0) {
-      if (sb_queue_set_xfade_ms((uint32_t)atoi(command_data))) {
+      if (k1_queue_set_xfade_ms((uint32_t)atoi(command_data))) {
         tx_begin();
         USBSerial.print("TRANSITION_XFADE_MS: ");
-        USBSerial.println(sb_queue_xfade_ms());
+        USBSerial.println(k1_queue_xfade_ms());
         tx_end();
       } else {
         bad_command(command_type, command_data);  // valid range 100..3000
@@ -923,12 +923,12 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 
     else if (strcmp(command_type, "commit_quantise") == 0) {
       if (strcmp(command_data, "off") == 0) {
-        sb_queue_set_commit_quantise(SB_QUEUE_QUANTISE_OFF);
+        k1_queue_set_commit_quantise(K1_QUEUE_QUANTISE_OFF);
         tx_begin();
         USBSerial.println("COMMIT_QUANTISE: off");
         tx_end();
       } else if (strcmp(command_data, "beat") == 0) {
-        sb_queue_set_commit_quantise(SB_QUEUE_QUANTISE_BEAT);
+        k1_queue_set_commit_quantise(K1_QUEUE_QUANTISE_BEAT);
         tx_begin();
         USBSerial.println("COMMIT_QUANTISE: beat");
         tx_end();
@@ -948,19 +948,19 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 // serial_menu.h-local helpers (EXTERNAL linkage; defined in serial_menu.h, included
 // only by the .ino TU in firmware and the driver TU in the replay oracle) that the
 // smart/edge dispatchers call. Forward-declared here (same pattern as the vivid
-// helpers); resolved cross-TU at link. SBEdgeMixerMode comes from sb_edgemixer_lite.h
-// (included above), so sb_parse_edge_mode's prototype is valid here.
+// helpers); resolved cross-TU at link. K1EdgeMixerMode comes from k1_edgemixer_lite.h
+// (included above), so k1_parse_edge_mode's prototype is valid here.
 // ---------------------------------------------------------------------------
-void sb_print_smart_status();
-void sb_print_edge_status();
-bool sb_apply_smart_scene(const char* scene);
-bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode);
+void k1_print_smart_status();
+void k1_print_edge_status();
+bool k1_apply_smart_scene(const char* scene);
+bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
 // smart_switching / smart_confidence_floor / smart_scene), lifted VERBATIM from
-// parse_command()'s ungated ladder. Calls sb_smart_director_* (director TU) +
-// sb_mode_selection_init + the external serial_menu.h helpers. Behaviour-preservation
+// parse_command()'s ungated ladder. Calls k1_smart_director_* (director TU) +
+// k1_mode_selection_init + the external serial_menu.h helpers. Behaviour-preservation
 // proven by the serial_struct structural-contract golden (reproduces after this move).
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_data) {
@@ -969,14 +969,14 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
     else if (strcmp(command_type, "smart_assist") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        SBSmartDirectorConfig config = sb_smart_director_config();
+        K1SmartDirectorConfig config = k1_smart_director_config();
         config.enabled = value;
         if (!value) {
           config.assist_switching_enabled = false;
           config.director_autonomy_enabled = false;
         }
-        sb_smart_director_set_config(config);
-        sb_print_smart_status();
+        k1_smart_director_set_config(config);
+        k1_print_smart_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -985,12 +985,12 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
     else if (strcmp(command_type, "smart_switching") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        SBSmartDirectorConfig config = sb_smart_director_config();
+        K1SmartDirectorConfig config = k1_smart_director_config();
         config.enabled = config.enabled || value;
         config.assist_switching_enabled = value;
-        sb_smart_director_set_config(config);
-        sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
-        sb_print_smart_status();
+        k1_smart_director_set_config(config);
+        k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
+        k1_print_smart_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -999,19 +999,19 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
     else if (strcmp(command_type, "smart_confidence_floor") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
-        SBSmartDirectorConfig config = sb_smart_director_config();
+        K1SmartDirectorConfig config = k1_smart_director_config();
         config.confidence_floor = constrain(value, 0.0f, 1.0f);
-        sb_smart_director_set_config(config);
-        sb_print_smart_status();
+        k1_smart_director_set_config(config);
+        k1_print_smart_status();
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else if (strcmp(command_type, "smart_scene") == 0) {
-      if (sb_apply_smart_scene(command_data)) {
-        sb_print_smart_status();
-        sb_print_edge_status();
+      if (k1_apply_smart_scene(command_data)) {
+        k1_print_smart_status();
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1026,7 +1026,7 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_visual — visual-hooks toggle (smart_hooks), lifted
-// VERBATIM. Calls sb_visual_hooks_* (director TU) + sb_print_smart_status. Ungated.
+// VERBATIM. Calls k1_visual_hooks_* (director TU) + k1_print_smart_status. Ungated.
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_data) {
     if (false) {}
@@ -1034,10 +1034,10 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
     else if (strcmp(command_type, "smart_hooks") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        SBVisualHookConfig config = sb_visual_hooks_config();
+        K1VisualHookConfig config = k1_visual_hooks_config();
         config.enabled = value;
-        sb_visual_hooks_set_config(config);
-        sb_print_smart_status();
+        k1_visual_hooks_set_config(config);
+        k1_print_smart_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1052,8 +1052,8 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_edge_mixer — edge-mixer control (edge_enabled / edge_mode /
-// edge_strength), lifted VERBATIM. Calls sb_edgemixer_lite_* (director TU) +
-// sb_parse_edge_mode + sb_print_edge_status. Ungated.
+// edge_strength), lifted VERBATIM. Calls k1_edgemixer_lite_* (director TU) +
+// k1_parse_edge_mode + k1_print_edge_status. Ungated.
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data) {
     if (false) {}
@@ -1061,25 +1061,25 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_enabled") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
         config.enabled = value;
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_lite_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else if (strcmp(command_type, "edge_mode") == 0) {
-      SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
-      if (sb_parse_edge_mode(command_data, &mode)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+      K1EdgeMixerMode mode = K1_EDGE_MIXER_OFF;
+      if (k1_parse_edge_mode(command_data, &mode)) {
+        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
         config.mode = mode;
-        if (mode == SB_EDGE_MIXER_OFF) {
+        if (mode == K1_EDGE_MIXER_OFF) {
           config.enabled = false;
         }
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_lite_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1088,10 +1088,10 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_strength") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
-        SBEdgeMixerConfig config = sb_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
         config.strength = constrain(value, 0.0f, 1.0f);
-        sb_edgemixer_lite_set_config(config);
-        sb_print_edge_status();
+        k1_edgemixer_lite_set_config(config);
+        k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
       }
@@ -1656,10 +1656,10 @@ bool serial_cmd_dispatch_gdft_harness(const char* command_type, char* command_da
 }
 #endif  // ENABLE_GDFT_HARNESS
 
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_vivid — the 4 vivid pre-comp handlers, lifted VERBATIM
-// from parse_command()'s #ifdef SB_VIVID_PRECOMP_V1 block (serial_menu.h
+// from parse_command()'s #ifdef K1_VIVID_PRECOMP_V1 block (serial_menu.h
 // lines 2521-2574). The `if (false) {}` opener keeps every real branch as a
 // statement-identical `else if (strcmp(command_type, "<name>") == 0)`. Each
 // writes VP_VIVID_* inline globals — no save_config, no reboot.
@@ -1668,7 +1668,7 @@ bool serial_cmd_dispatch_gdft_harness(const char* command_type, char* command_da
 // byte-for-byte after this move (tests/test_golden_master.py + harness_selftest.py).
 //
 // Vivid helpers called here are external-linkage free functions defined in
-// serial_menu.h (within #ifdef SB_VIVID_PRECOMP_V1):
+// serial_menu.h (within #ifdef K1_VIVID_PRECOMP_V1):
 //   serial_ensure_vivid_defaults()           serial_menu.h:420
 //   serial_set_vivid_level(float)            serial_menu.h:427
 //   serial_update_vivid_enabled_from_levels() serial_menu.h:416
@@ -1745,4 +1745,4 @@ bool serial_cmd_dispatch_vivid(const char* command_type, char* command_data) {
 
     return true;
 }
-#endif // SB_VIVID_PRECOMP_V1
+#endif // K1_VIVID_PRECOMP_V1

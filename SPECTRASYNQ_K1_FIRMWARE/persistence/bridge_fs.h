@@ -1,11 +1,11 @@
 /*----------------------------------------
-  Sensory Bridge FILESYSTEM ACCESS
+  K1 FILESYSTEM ACCESS
   ----------------------------------------*/
 
 #include "globals.h"
 #include "constants.h"
 #include "Palettes.h" // Include for gGradientPaletteCount
-#include "sb_effect_queue.h" // SB_PRESET_SLOTS_FILE (factory_reset enumeration)
+#include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
@@ -48,8 +48,8 @@ void factory_reset() {
     USBSerial.println("delete failed");
   }
 
-  USBSerial.print("Deleting " SB_PRESET_SLOTS_FILE ": ");
-  if (LittleFS.remove(SB_PRESET_SLOTS_FILE)) {
+  USBSerial.print("Deleting " K1_PRESET_SLOTS_FILE ": ");
+  if (LittleFS.remove(K1_PRESET_SLOTS_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
@@ -428,7 +428,7 @@ bool clear_calibration_profile() {
 void init_fs() {
   lock_leds();
   USBSerial.print("INIT FILESYSTEM: ");
-  USBSerial.println(LittleFS.begin(true) == true ? SB_PASS : SB_FAIL);
+  USBSerial.println(LittleFS.begin(true) == true ? K1_PASS : K1_FAIL);
 
   update_config_filename(FIRMWARE_VERSION);
 

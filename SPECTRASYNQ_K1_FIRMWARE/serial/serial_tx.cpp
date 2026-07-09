@@ -41,7 +41,7 @@ void tx_end(bool error) {
 }
 
 void ack() {
-  USBSerial.println("SBOK");
+  USBSerial.println("K1OK");
 }
 
 void bad_command(const char* command_type, const char* command_data) {

@@ -14,7 +14,7 @@
 // pgmspace shims, the device handlers).
 //
 // Two hard rules this header obeys:
-//   1. It is included ONLY by the serial_replay driver (gated -DSB_SERIAL_REPLAY_HOST
+//   1. It is included ONLY by the serial_replay driver (gated -DK1_SERIAL_REPLAY_HOST
 //      and a manual include in the driver). It never enters any other oracle's TU,
 //      so the other 6 goldens stay byte-identical.
 //   2. It must NOT clash with a real definition. serial_menu.h does NOT
@@ -88,15 +88,15 @@ inline int raw_dump_request = 0;
 // USED); we take it by a templated param to avoid naming the enum here.
 template <typename T> static inline bool apply_chroma_profile(T /*profile*/) { return false; }
 
-// --- sb_effect_queue.* config symbols ------------------------------------------
-// The sb_queue_* config setters/getters (sb_effect_queue.h:134-140) are stubbed as
+// --- k1_effect_queue.* config symbols ------------------------------------------
+// The k1_queue_* config setters/getters (k1_effect_queue.h:134-140) are stubbed as
 // EXTERNAL (non-inline) definitions in the driver (oracle_serial_replay.py), next to
-// the other sb_queue_* externals (sb_queue_any_armed etc.) — NOT here. Reason: the
+// the other k1_queue_* externals (k1_queue_any_armed etc.) — NOT here. Reason: the
 // queue command handlers were lifted out of serial_menu.h (driver TU) into
 // serial_cmd_handlers.cpp (a SEPARATE oracle TU). A `static inline` stub here has
 // internal linkage (invisible to the handlers TU); a plain `inline` is only emitted
 // by a TU that odr-uses it, so the setters used ONLY by the handlers TU (which sees
-// just the declaration via sb_effect_queue.h) are emitted by nobody -> link error.
+// just the declaration via k1_effect_queue.h) are emitted by nobody -> link error.
 // A single guaranteed-emitted external definition in the driver binds BOTH TUs. The
 // queue family is not in the replay corpus, so the stub values never affect the golden.
 

@@ -47,7 +47,7 @@ ORACLE_MODULES = [
                      # each diverge a different channel (Gate-Fα teeth, not blind).
     "oracle_serial_struct",  # structural-contract gate (Phase A Lane 2 keystone) —
                      # the FUNCTION-CALL families the replay oracle is blind to
-                     # (sb_queue_*/smart_*/edge_* call host-stubbed subsystems). Pure
+                     # (k1_queue_*/smart_*/edge_* call host-stubbed subsystems). Pure
                      # source parse: pins normalized handler body + dispatch-routing,
                      # invariant across a verbatim lift (TRIZ #13/#22). Mutations plant
                      # altered-statement / mis-routed-command / changed-echo regressions.

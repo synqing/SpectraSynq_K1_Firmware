@@ -1,5 +1,5 @@
 #include "lightshow_modes.h"
-#include "sb_tempo.h"
+#include "k1_tempo.h"
 #include <math.h>
 
 // ============================================================================
@@ -18,7 +18,7 @@
 //   around the palette once per counted bar (4 beats).
 // PASS 2 (verbs): Count beats -> Step target per bar -> Slew offset -> Flow ->
 //   Clear centre -> Inject (palette position + offset) -> Clamp -> Mirror.
-// PASS 3 (layers): L1 adds the tempo beat edge (phase01 wrap from sb_tempo_read(),
+// PASS 3 (layers): L1 adds the tempo beat edge (phase01 wrap from k1_tempo_read(),
 //   the same event source Tempo River reads); L2 adds five fx.trwalk_* fields;
 //   L4 (colour) is the ONLY layer altered — sample position = original + offset,
 //   wrapped [0,1); L3/L5/L6 are identical to Tempo River.
@@ -62,7 +62,7 @@ static const float   TR_IDLE_DRIFT  = 0.55f;  // px/frame fallback == plain Spec
 static const float   TR_DRIFT_FLOOR = 0.30f;  // px/frame absolute floor — the river NEVER stops (Organic Law)
 static const float   TR_DRIFT_MAX   = 3.00f;  // px/frame cap (draw_sprite sanity)
 static const float   TR_CONF_LO     = 0.30f;
-static const float   TR_CONF_HI     = 0.60f;  // == SB_LOCK_CONFIDENCE
+static const float   TR_CONF_HI     = 0.60f;  // == K1_LOCK_CONFIDENCE
 static const float   TR_TRAIL_ALPHA = 0.90f;  // == River persistence (do NOT raise: "mechanical hold")
 static const float   TR_FLOOR       = 0.015f; // skip near-silent bins
 static const float   TR_INJECT_GAIN = 0.90f;  // additive white-out guard
@@ -100,12 +100,12 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
     if (dt < 0.001f) dt = 0.001f; else if (dt > 0.050f) dt = 0.050f;
   }
 
-  SBTempoEvent t;
+  K1TempoEvent t;
   if (probe) {
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
     t.beat_tick = false; t.locked = true; t.beat_strength = 1.0f;
   } else {
-    t = sb_tempo_read();
+    t = k1_tempo_read();
   }
 
   // ── Tempo-locked outward drift VELOCITY (px THIS frame) ──────────────────────

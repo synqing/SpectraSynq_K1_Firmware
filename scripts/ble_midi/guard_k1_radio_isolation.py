@@ -15,15 +15,15 @@ ROOT = next(p for p in Path(__file__).resolve().parents if (p / "platformio.ini"
 DEFAULT_ENV = "k1_hardware"
 
 FORBIDDEN_CONFIG_TOKENS = (
-    "-DSB_K1_BLE_REMOTED",
-    "SB_K1_BLE_REMOTED",
+    "-DK1_BLE_REMOTED",
+    "K1_BLE_REMOTED",
     "ble_remoted_central.cpp",
     "k1_ble_midi_decoder.cpp",
     "NimBLE-Arduino",
 )
 
 FORBIDDEN_ARTIFACT_TOKENS = (
-    b"SB_K1_BLE_REMOTED",
+    b"K1_BLE_REMOTED",
     b"ble_remoted",
     b"k1_ble_midi_decoder",
     b"k1_ble_midi_decode_packet",
@@ -108,7 +108,7 @@ def main() -> int:
         print("K1_RADIO_ISOLATION: FAILED")
         return 1
 
-    print(f"[PASS] env:{args.env} does not enable SB_K1_BLE_REMOTED or compile BLE Remoted sources")
+    print(f"[PASS] env:{args.env} does not enable K1_BLE_REMOTED or compile BLE Remoted sources")
     print("[PASS] production map/ELF/bin contain no BLE Remoted, NimBLE, or generated decoder symbols")
     print("K1_RADIO_ISOLATION: PROVEN")
     return 0

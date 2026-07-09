@@ -33,7 +33,7 @@
 // snapshot/onset frames and drive K1AudioContext through them — this is the TU
 // that forces K1AudioContext + K1BufferView to genuinely codegen (nothing on the
 // shipping render path includes them yet).
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 
 namespace k1 {
 namespace effects {
@@ -154,8 +154,8 @@ uint32_t k1_framework_compile_probe() {
     // Build a snapshot + onset event on the stack; bind the context to them and
     // exercise energy / band / chroma / chord / beat / percussive accessors so
     // the adapter is fully instantiated and codegen'd.
-    static SBAudioSnapshot snap{};
-    static SBOnsetBeatEvent beat{};
+    static K1AudioSnapshot snap{};
+    static K1OnsetBeatEvent beat{};
     snap.vu_level = 0.42f;
     snap.peak_scaled = 0.31f;
     snap.novelty = 0.20f;
@@ -165,17 +165,17 @@ uint32_t k1_framework_compile_probe() {
     snap.high_energy = 0.2f;
     snap.chroma_strength = 0.5f;
     snap.silence = false;
-#ifdef SB_ONSET_V2
-    for (uint8_t b = 0; b < SB_ONSET_SPECTRUM_BINS; ++b) {
-        snap.spectrum[b] = static_cast<float>(b) / SB_ONSET_SPECTRUM_BINS;
+#ifdef K1_ONSET_V2
+    for (uint8_t b = 0; b < K1_ONSET_SPECTRUM_BINS; ++b) {
+        snap.spectrum[b] = static_cast<float>(b) / K1_ONSET_SPECTRUM_BINS;
     }
 #endif
-#ifdef SB_CHORD_V2
-    for (uint8_t c = 0; c < SB_CHROMA_PC_BINS; ++c) {
+#ifdef K1_CHORD_V2
+    for (uint8_t c = 0; c < K1_CHROMA_PC_BINS; ++c) {
         snap.chroma_pc[c] = (c == 0) ? 0.9f : 0.1f;  // A-origin index 0 = A
     }
     snap.chord.rootNote = 0;                 // A-origin root
-    snap.chord.type = SBChordType::MAJOR;
+    snap.chord.type = K1ChordType::MAJOR;
     snap.chord.confidence = 0.8f;
 #endif
     beat.beat_phase = 0.25f;

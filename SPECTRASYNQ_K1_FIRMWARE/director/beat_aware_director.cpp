@@ -11,7 +11,7 @@
 
 #include <math.h>
 
-#include "sb_semantic_state.h"  // SBMusicState
+#include "k1_semantic_state.h"  // K1MusicState
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "../effects/framework/EffectRegistry.h"  // R2-core: registry-aware enabled scan (natives reachable)
 #endif
@@ -87,7 +87,7 @@ BeatAwareDirectorConfig bad_director_default_config() {
   c.min_dwell_ms       = 6000UL;  // wall-clock floor (slow tempi / unlocked)
   c.fallback_switch_ms = 20000UL; // gentle time-based switch when unlocked
   c.xfade_beats        = 2;       // two-beat crossfade rides the groove
-  c.xfade_ms_min       = 200;     // within SB_QUEUE_XFADE_MS range [100,3000]
+  c.xfade_ms_min       = 200;     // within K1_QUEUE_XFADE_MS range [100,3000]
   c.xfade_ms_max       = 1600;
   return c;
 }
@@ -214,8 +214,8 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
 #include <Arduino.h>
 
 #include "globals.h"  // CONFIG, portMUX
-#include "sb_audio_snapshot.h"
-#include "sb_effect_queue.h"
+#include "k1_audio_snapshot.h"
+#include "k1_effect_queue.h"
 #include "TransitionOverlay.h"
 #include "TransitionTypes.h"
 
@@ -272,7 +272,7 @@ uint8_t bad_director_current_mode() {
 
 bool bad_director_tempo_locked() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.tempo_locked;
@@ -280,7 +280,7 @@ bool bad_director_tempo_locked() {
 
 float bad_director_bpm() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.bpm;
@@ -288,7 +288,7 @@ float bad_director_bpm() {
 
 float bad_director_tempo_confidence() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.tempo_confidence;
@@ -305,7 +305,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   }
 
   // Read K1's OWN audio surface directly — no firmware-v3 thresholds.
-  SBAudioSnapshot audio = sb_audio_snapshot_read();
+  K1AudioSnapshot audio = k1_audio_snapshot_read();
 
   // Smooth spectral energy for the phrase/energy gate (frame-rate-independent
   // first-order EMA, ~180 ms tau — mirrors SmartDirector's energy smoothing).
@@ -318,7 +318,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   g_bad_energy_smooth += (audio.spectral_energy - g_bad_energy_smooth) * alpha;
 
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
 
@@ -329,7 +329,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   view.tempo_confidence = sem.tempo_confidence;
   view.tempo_locked     = sem.tempo_locked;
   view.beat_tick        = sem.beat_tick;
-  view.music_state      = (uint8_t)SB_MUSIC_STEADY;  // reserved for future bias
+  view.music_state      = (uint8_t)K1_MUSIC_STEADY;  // reserved for future bias
 
   BeatAwareDecision decision =
       bad_director_decide(&g_bad_state, view, config, now_ms);
@@ -346,16 +346,16 @@ uint8_t bad_director_tick(uint32_t now_ms) {
 
     // MUSICAL DURATION + XFADE style: tempo-derived crossfade through the queue,
     // which routes render_queue_xfade_overlay() into the TransitionEngine.
-    sb_queue_set_xfade_ms((uint32_t)decision.xfade_ms);
-    sb_queue_set_transition_style(SB_QUEUE_TRANSITION_XFADE);
+    k1_queue_set_xfade_ms((uint32_t)decision.xfade_ms);
+    k1_queue_set_transition_style(K1_QUEUE_TRANSITION_XFADE);
 
     // Arm the primary channel's pending preset with the new mode and commit.
     // RAM-only arm/flag writes (no flash); Core 1 frame tick lands the swap and
     // starts the crossfade at the next frame boundary.
-    SBChannelPreset* pending = sb_queue_arm_begin(false);
+    K1ChannelPreset* pending = k1_queue_arm_begin(false);
     if (pending != nullptr) {
       pending->lightshow_mode = decision.next_mode;
-      sb_queue_request_commit(true, now_ms);
+      k1_queue_request_commit(true, now_ms);
     }
   }
 

@@ -1,6 +1,6 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_onset_beat.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
 #include <math.h>
 
 // ============================================================================
@@ -17,7 +17,7 @@
 //     (kick > snare > hihat, free-slots only, never evict live) → Spawn →
 //     Integrate(pos += vel·dt; life -= dt) → Draw(streak prev→curr pos) →
 //     Clamp → History → Mirror.
-//  P3 LAYERS: L1 = SBOnsetBeatEvent kick/snare/hihat ids + strengths (V2);
+//  P3 LAYERS: L1 = K1OnsetBeatEvent kick/snare/hihat ids + strengths (V2);
 //     L2 = fx.pburst_* pool (N=8, struct-of-arrays, no heap, no statics);
 //     L3 = class territory: kick centre→edge, snare mid-field split pair,
 //     hihat outer-20% alternating sparkle; L4 = fixed class palette positions
@@ -65,7 +65,7 @@ static inline float pburst_clamp01(float v) {
   return v;
 }
 
-static inline bool pburst_presence_ok(const SBAudioSnapshot& snap) {
+static inline bool pburst_presence_ok(const K1AudioSnapshot& snap) {
   // dense_forge presence gate: genuinely empty programme renders nothing new.
   return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
 }
@@ -125,8 +125,8 @@ void light_mode_percussion_burst(CRGB16* leds_prev_buffer, ChannelEffectState& f
   if (dt > 0.05f)  dt = 0.05f;
   const float frame = dt * 120.0f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
-  SBOnsetBeatEvent ev = sb_onset_beat_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_onset_beat_read();
 
   const bool hard_gate = snap.silence;
   const bool presence_ok = pburst_presence_ok(snap);
@@ -156,7 +156,7 @@ void light_mode_percussion_burst(CRGB16* leds_prev_buffer, ChannelEffectState& f
   // ── MAPPING: event-id edge detection (consume CHANGES, never levels) ──────
   bool kick_fresh = false, snare_fresh = false, hat_fresh = false;
   float kick_s = 0.0f, snare_s = 0.0f, hat_s = 0.0f;
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   if (ev.kick && ev.kick_event_id != fx.pburst_kick_id) {
     kick_fresh = true;
     kick_s = pburst_clamp01(ev.kick_strength);

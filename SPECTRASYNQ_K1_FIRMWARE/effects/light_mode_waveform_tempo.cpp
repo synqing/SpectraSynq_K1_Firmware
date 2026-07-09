@@ -15,14 +15,14 @@
 //   the lock from the per-beat velocity SURGE, never from a position jump.
 //
 // FACTS from source [FACT]:
-//   - sb_tempo IS wired into the Core-0 audio loop at this base (the .wip era it
-//     was not): SPECTRASYNQ_K1_FIRMWARE.ino calls sb_tempo_init() in setup and
-//     sb_tempo_update(sb_audio_snapshot_read()) per AP frame (~133 Hz; self-clocks
-//     a 44.4 Hz novelty feed). So SBTempoEvent is live; this effect is a read-only
-//     consumer (sb_tempo_read() — value-copy under a portMUX, safe from Core-1).
-//   - SBTempoEvent (sb_tempo.h): bpm (60..156); phase01∈[0,1), 0==beat;
+//   - k1_tempo IS wired into the Core-0 audio loop at this base (the .wip era it
+//     was not): SPECTRASYNQ_K1_FIRMWARE.ino calls k1_tempo_init() in setup and
+//     k1_tempo_update(k1_audio_snapshot_read()) per AP frame (~133 Hz; self-clocks
+//     a 44.4 Hz novelty feed). So K1TempoEvent is live; this effect is a read-only
+//     consumer (k1_tempo_read() — value-copy under a portMUX, safe from Core-1).
+//   - K1TempoEvent (k1_tempo.h): bpm (60..156); phase01∈[0,1), 0==beat;
 //     confidence∈[0,1] (already silence-scaled); locked; beat_tick; beat_strength.
-//   - SBAudioSnapshot.silence gates the idle fallback so the strip halts in true
+//   - K1AudioSnapshot.silence gates the idle fallback so the strip halts in true
 //     silence (graceful behaviour, not a frozen frame).
 //
 // VP-PROBE DETERMINISM (change-gate: freeze tempo / deterministic clock during the
@@ -34,9 +34,9 @@
 //   - BELT AND BRACES: should it ever be added to a probe, the effect itself is
 //     made reproducible — when led_thread is halted (vp_run_output_probe sets
 //     led_thread_halt=true before rendering) the effect uses a FIXED dt and a
-//     FROZEN synthetic tempo event instead of millis()/sb_tempo_read(), so two
+//     FROZEN synthetic tempo event instead of millis()/k1_tempo_read(), so two
 //     probe runs produce an identical frame. (cf. the Quantum Collapse lesson:
-//     the probe halts led_thread but NOT Core-0/sb_tempo, so live reads diverge.)
+//     the probe halts led_thread but NOT Core-0/k1_tempo, so live reads diverge.)
 //
 // COLOUR (gate-compliant): uses effect_palette_or_chroma_colour() — the PROVEN
 // BLOOM-lineage colour authority (lightshow_modes.h §213) — so palette mode,
@@ -55,21 +55,21 @@
 // ============================================================================
 
 #include "lightshow_modes.h"
-#include "sb_tempo.h"
-#include "sb_audio_snapshot.h"
+#include "k1_tempo.h"
+#include "k1_audio_snapshot.h"
 #include <math.h>
 
 // ── Feel knobs (in-file constants; deliberately NOT RenderParams fields) ──────
 // These are tuning constants, not runtime-tunable CONFIG, and need no SECONDARY_*
 // override, so keeping them here avoids touching build_primary/secondary_render_
 // params() and the CONFIG struct (lower blast radius for a quarantined branch).
-static const float SB_TWO_PI_F      = 6.28318530718f;
+static const float K1_TWO_PI_F      = 6.28318530718f;
 static const float TEMPO_PX_PER_BEAT = 24.0f;  // px travelled per beat (base scroll distance)
 static const float TEMPO_DEPTH       = 0.5f;   // intra-beat velocity surge depth (0..1) — the "feel" knob
 static const float TEMPO_IDLE_RATE   = 30.0f;  // px/s fallback scroll when unlocked (and not silent)
 static const float TEMPO_LEAD        = 0.0f;   // beat anticipation (0..~0.15); 0 = surge ON the beat
 static const float TEMPO_CONF_LO     = 0.30f;  // confidence gate lower edge
-static const float TEMPO_CONF_HI     = 0.60f;  // confidence gate upper edge (== SB_LOCK_CONFIDENCE)
+static const float TEMPO_CONF_HI     = 0.60f;  // confidence gate upper edge (== K1_LOCK_CONFIDENCE)
 static const int   TEMPO_STEP_CEIL   = 30;     // [MEASURED] correspondence ceiling (~28–32 px), px/frame cap
 
 static inline float t_smoothstep(float lo, float hi, float x) {
@@ -99,8 +99,8 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
     if (dt < 0.001f) dt = 0.001f; else if (dt > 0.050f) dt = 0.050f;
   }
 
-  SBTempoEvent t;
-  SBAudioSnapshot a;
+  K1TempoEvent t;
+  K1AudioSnapshot a;
   if (probe) {
     // Frozen, deterministic stand-ins (no millis(), no live AP state).
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
@@ -109,15 +109,15 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
     a.spectral_energy = 0.5f; a.low_energy = 0.5f; a.mid_energy = 0.5f;
     a.high_energy = 0.5f; a.chroma_strength = 0.5f; a.silence = false;
   } else {
-    t = sb_tempo_read();
-    a = sb_audio_snapshot_read();
+    t = k1_tempo_read();
+    a = k1_audio_snapshot_read();
   }
 
   float base_px_s = TEMPO_PX_PER_BEAT * (t.bpm / 60.0f);     // [FACT bpm ∈ 60..156]
 
   // Mean-preserving intra-beat velocity envelope — surge at the beat (phase01==0).
   float ph  = t.phase01 - TEMPO_LEAD;
-  float env = 1.0f + TEMPO_DEPTH * cosf(SB_TWO_PI_F * ph);
+  float env = 1.0f + TEMPO_DEPTH * cosf(K1_TWO_PI_F * ph);
   if (env < 0.0f) env = 0.0f;                                // never scroll backward
   float tempo_px_s = base_px_s * env;
 

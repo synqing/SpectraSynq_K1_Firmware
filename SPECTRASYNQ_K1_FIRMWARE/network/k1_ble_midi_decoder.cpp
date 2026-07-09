@@ -101,7 +101,7 @@ uint32_t next_record_id(K1BleMidiDecoderState* state) {
 
 K1BleMidiDecodeStatus emit_record(K1BleMidiDecoderState* state,
                                   const K1BleMidiEntry& entry,
-                                  SBWirelessValueKind kind,
+                                  K1WirelessValueKind kind,
                                   float number_value,
                                   const char* text_value,
                                   K1WirelessControlRecord* out_records,
@@ -114,8 +114,8 @@ K1BleMidiDecodeStatus emit_record(K1BleMidiDecoderState* state,
   rec.id = next_record_id(state);
   copy_cstr(rec.control, sizeof(rec.control), entry.path);
   rec.value_kind = kind;
-  rec.number_value = (kind == SB_WIRELESS_VALUE_NUMBER) ? number_value : 0.0f;
-  if (kind == SB_WIRELESS_VALUE_TEXT) {
+  rec.number_value = (kind == K1_WIRELESS_VALUE_NUMBER) ? number_value : 0.0f;
+  if (kind == K1_WIRELESS_VALUE_TEXT) {
     copy_cstr(rec.text_value, sizeof(rec.text_value), text_value);
   } else {
     rec.text_value[0] = '\0';
@@ -146,7 +146,7 @@ K1BleMidiDecodeStatus decode_pc(K1BleMidiDecoderState* state,
 #ifdef K1_BLE_MIDI_DECODER_FAULT_MODE_OFF_BY_ONE
   program = static_cast<uint8_t>((program + 1U) & 0x7FU);
 #endif
-  return emit_record(state, *entry, SB_WIRELESS_VALUE_NUMBER, static_cast<float>(program),
+  return emit_record(state, *entry, K1_WIRELESS_VALUE_NUMBER, static_cast<float>(program),
                      nullptr, out_records, out_capacity, out_count);
 }
 
@@ -193,12 +193,12 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
       return K1_BLE_MIDI_DECODE_OK;
     }
     if (entry->flags & K1MIDI_FLAG_COMMAND) {
-      return emit_record(state, *entry, SB_WIRELESS_VALUE_NONE, 0.0f, nullptr,
+      return emit_record(state, *entry, K1_WIRELESS_VALUE_NONE, 0.0f, nullptr,
                          out_records, out_capacity, out_count);
     }
     if (entry->text_count > 0 && data < entry->text_count) {
       const char* text = kK1BleMidiTextValues[entry->text_index + data];
-      return emit_record(state, *entry, SB_WIRELESS_VALUE_TEXT, 0.0f, text,
+      return emit_record(state, *entry, K1_WIRELESS_VALUE_TEXT, 0.0f, text,
                          out_records, out_capacity, out_count);
     }
     return K1_BLE_MIDI_DECODE_OK;
@@ -228,7 +228,7 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
     const float decoded = cc14_lsb->vmin + (static_cast<float>(n14) / 16383.0f) *
                                              (cc14_lsb->vmax - cc14_lsb->vmin);
     state->cc14_msb_valid[ch][cc14_lsb->cc_msb] = 0;
-    return emit_record(state, *cc14_lsb, SB_WIRELESS_VALUE_NUMBER, decoded, nullptr,
+    return emit_record(state, *cc14_lsb, K1_WIRELESS_VALUE_NUMBER, decoded, nullptr,
                        out_records, out_capacity, out_count);
   }
 
@@ -239,10 +239,10 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
   if (cc7->type == K1MIDI_CC7_BOOL) {
     const float decoded =
         (value >= static_cast<uint8_t>(K1_BLE_MIDI_DECODER_BOOL_THRESHOLD)) ? 1.0f : 0.0f;
-    return emit_record(state, *cc7, SB_WIRELESS_VALUE_NUMBER, decoded, nullptr,
+    return emit_record(state, *cc7, K1_WIRELESS_VALUE_NUMBER, decoded, nullptr,
                        out_records, out_capacity, out_count);
   }
-  return emit_record(state, *cc7, SB_WIRELESS_VALUE_NUMBER, static_cast<float>(value),
+  return emit_record(state, *cc7, K1_WIRELESS_VALUE_NUMBER, static_cast<float>(value),
                      nullptr, out_records, out_capacity, out_count);
 }
 

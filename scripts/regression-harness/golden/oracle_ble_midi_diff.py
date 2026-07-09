@@ -6,7 +6,7 @@
 WHAT IT PROVES
 --------------
 The Remoted knob will reach the K1 over BLE-MIDI; the K1 decodes MIDI back into a
-``K1WirelessControlRecord`` and runs the SAME ``sb_k1_control_apply()`` the existing
+``K1WirelessControlRecord`` and runs the SAME ``k1_control_apply()`` the existing
 WebSocket ingress already uses. The two ingress paths *converge* on that shared
 facade, so:
 

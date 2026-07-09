@@ -1,8 +1,8 @@
 /*----------------------------------------
-  Sensory Bridge I2S FUNCTIONS
+  K1 I2S FUNCTIONS
   ----------------------------------------*/
-#include "sb_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
-#include "sb_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
+#include "k1_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
+#include "k1_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -49,17 +49,17 @@
 
 static i2s_chan_handle_t rx_chan = NULL;
 
-// SB_I2S_* slot constants + SBAudioI2SReadDebug moved to a tiny guarded header
+// K1_I2S_* slot constants + K1AudioI2SReadDebug moved to a tiny guarded header
 // (Phase A Lane 2, S1) so the AP-capture telemetry TU can share the type/
 // constants without including this monolithic impl header. Definitions are
 // unchanged — exactly one definition each, here via the include.
-#include "sb_i2s_capture_types.h"
+#include "k1_i2s_capture_types.h"
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-static SBAudioI2SReadDebug sb_audio_i2s_read_debug = {};
+static K1AudioI2SReadDebug k1_audio_i2s_read_debug = {};
 
-SBAudioI2SReadDebug sb_audio_i2s_read_debug_read() {
-  return sb_audio_i2s_read_debug;
+K1AudioI2SReadDebug k1_audio_i2s_read_debug_read() {
+  return k1_audio_i2s_read_debug;
 }
 #endif
 
@@ -205,12 +205,12 @@ void init_i2s() {
 
   // RX channel — mirror legacy dma_buf_count=2, dma_buf_len=SAMPLES_PER_CHUNK.
   i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT, I2S_ROLE_MASTER);
-  chan_cfg.dma_desc_num  = SB_I2S_DMA_DESC_NUM;
+  chan_cfg.dma_desc_num  = K1_I2S_DMA_DESC_NUM;
   chan_cfg.dma_frame_num = CONFIG.SAMPLES_PER_CHUNK;   // 96
   chan_cfg.auto_clear    = false;
   result = i2s_new_channel(&chan_cfg, NULL, &rx_chan); // tx=NULL → RX-only
   USBSerial.print("INIT I2S (channel): ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
@@ -258,11 +258,11 @@ void init_i2s() {
 
   result = i2s_channel_init_std_mode(rx_chan, &std_cfg);
   USBSerial.print("I2S STD INIT: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start
   USBSerial.print("I2S ENABLE: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 }
 
 void acquire_sample_chunk(uint32_t t_now) {
@@ -299,10 +299,10 @@ void acquire_sample_chunk(uint32_t t_now) {
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
-  sb_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
-  sb_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
-  sb_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
+  k1_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
+  k1_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
+  k1_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
+  k1_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
 #else
   (void)i2s_read_status;
   (void)bytes_read;
@@ -530,7 +530,7 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     if (waveform_peak_scaled_raw > waveform_peak_scaled) {
       float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
-#ifdef SB_PEAK_ASYM_ENV
+#ifdef K1_PEAK_ASYM_ENV
       // ATTACK SNAP (2026-06-11, Captain-directed item 5): asymmetric envelope —
       // fast attack so transients reach the LEDs in ~1-2 AP frames (~8-15 ms vs
       // ~80 ms at the old symmetric 0.25), slow release below so trails keep
@@ -542,7 +542,7 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
     } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
       float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
-#ifdef SB_PEAK_ASYM_ENV
+#ifdef K1_PEAK_ASYM_ENV
       waveform_peak_scaled -= delta * 0.15;
 #else
       waveform_peak_scaled -= delta * 0.25;
@@ -701,8 +701,8 @@ void acquire_sample_chunk(uint32_t t_now) {
   //   CAL_SOURCE/CAL_VALID — calibration provenance for harness captures
   static uint32_t last_ap_dbg = 0;
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > 1000) {
-    SBTempoEvent     tev = sb_tempo_read();
-    SBOnsetBeatEvent oev = sb_onset_beat_read();
+    K1TempoEvent     tev = k1_tempo_read();
+    K1OnsetBeatEvent oev = k1_onset_beat_read();
     USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,

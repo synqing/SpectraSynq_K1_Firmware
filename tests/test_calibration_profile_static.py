@@ -197,9 +197,9 @@ class CalibrationProfileStaticTest(unittest.TestCase):
         noise_cal = NOISE_CAL.read_text()
         led_utilities = (FW / "led_utilities.h").read_text()
 
-        self.assertIn("#define SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0", constants)
-        self.assertIn("#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED", gdft)
-        self.assertIn("SB_GDFT_STATIC_NOISE_SUBTRACTION_GAIN", gdft)
+        self.assertIn("#define K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0", constants)
+        self.assertIn("#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED", gdft)
+        self.assertIn("K1_GDFT_STATIC_NOISE_SUBTRACTION_GAIN", gdft)
         self.assertNotIn("noise_samples[i] * SQ15x16(1.5)", gdft)
         self.assertIn("clear_spectral_noise_samples();", gdft)
         self.assertIn("void clear_spectral_noise_samples()", noise_cal)

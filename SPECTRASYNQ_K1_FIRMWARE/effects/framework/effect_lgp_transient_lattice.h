@@ -29,9 +29,9 @@
  *       documented below as PROXY — 1-frame delay vs v3 hop-level fastFlux)
  *   v3 `ctx.audio.isOnBeat()`    → `ctx.audio.isOnBeat()`        (exact)
  *   v3 `ctx.audio.isSnareHit()`  → `ctx.audio.isSnareHit()`      (exact,
- *       SB_ONSET_V2 gate; falls back to false when flag absent)
+ *       K1_ONSET_V2 gate; falls back to false when flag absent)
  *   v3 `ctx.audio.isHihatHit()`  → `ctx.audio.isHihatHit()`      (exact,
- *       SB_ONSET_V2 gate; falls back to false when flag absent)
+ *       K1_ONSET_V2 gate; falls back to false when flag absent)
  *   v3 `ctx.audio.chroma[i]`     → `ctx.audio.getChroma(i)`      (C-origin
  *       label; rotation applied internally in K1AudioContext)
  *

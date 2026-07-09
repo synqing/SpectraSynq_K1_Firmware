@@ -52,8 +52,8 @@
 #define AUDIO_RESPONSE_GAIN_MIN 0.25f
 #define AUDIO_RESPONSE_GAIN_MAX 4.0f
 
-#ifndef SB_TEMPO_NOVELTY_DECIMATION
-#define SB_TEMPO_NOVELTY_DECIMATION 3U
+#ifndef K1_TEMPO_NOVELTY_DECIMATION
+#define K1_TEMPO_NOVELTY_DECIMATION 3U
 #endif
 
 // Spectral analysis window (Hann) for the GDFT magnitude path. DEFAULT OFF:

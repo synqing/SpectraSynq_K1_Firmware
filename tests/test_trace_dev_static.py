@@ -10,7 +10,7 @@ FIRMWARE = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 INO = FIRMWARE / "SPECTRASYNQ_K1_FIRMWARE.ino"
 SERIAL_MENU = FIRMWARE / "serial_menu.h"
 SERIAL_TABLE = FIRMWARE / "serial_cmd_table.def"
-SB_TRACE = FIRMWARE / "sb_trace.h"
+K1_TRACE = FIRMWARE / "k1_trace.h"
 
 
 def read(path):
@@ -49,38 +49,38 @@ class TraceDevStaticTest(unittest.TestCase):
         self.assertRegex(trace_dev, r"mabuware/mabutrace@[\^~]?\d+\.\d+\.\d+")
 
     def test_sb_trace_wrapper_owns_mabutrace_and_noop_macros(self):
-        text = read(SB_TRACE)
+        text = read(K1_TRACE)
         self.assertIn("#pragma once", text)
         self.assertRegex(text, r"#ifndef\s+FEATURE_MABUTRACE")
         self.assertRegex(text, r"#define\s+FEATURE_MABUTRACE\s+0")
         self.assertIn("#if FEATURE_MABUTRACE", text)
         self.assertIn("#include <mabutrace.h>", text)
         for name in (
-            "SB_TRACE_SCOPE",
-            "SB_TRACE_COUNTER",
-            "SB_TRACE_INSTANT",
-            "SB_TRACE_INIT",
-            "SB_TRACE_DUMP_JSON",
+            "K1_TRACE_SCOPE",
+            "K1_TRACE_COUNTER",
+            "K1_TRACE_INSTANT",
+            "K1_TRACE_INIT",
+            "K1_TRACE_DUMP_JSON",
         ):
             self.assertIn(name, text)
-        self.assertRegex(text, r"#define\s+SB_TRACE_SCOPE\(name\)\s+do\s+\{\s*\}\s+while\(0\)")
-        self.assertRegex(text, r"#define\s+SB_TRACE_COUNTER\(name,\s*value\).*?\(void\)\(value\)", re.DOTALL)
+        self.assertRegex(text, r"#define\s+K1_TRACE_SCOPE\(name\)\s+do\s+\{\s*\}\s+while\(0\)")
+        self.assertRegex(text, r"#define\s+K1_TRACE_COUNTER\(name,\s*value\).*?\(void\)\(value\)", re.DOTALL)
 
     def test_trace_dev_initialises_and_marks_secondary_render_spans(self):
         ino = read(INO)
-        self.assertIn('#include "sb_trace.h"', ino)
-        self.assertIn("SB_TRACE_INIT(64);", ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_secondary_snapshot")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_secondary_effect")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_secondary_store_clip")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_secondary_restore")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_channel_seed_history")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_waveform_fast_body")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_waveform_fast_history_store")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_bus_read")', ino)
-        self.assertIn('SB_TRACE_SCOPE("vp_visual_hooks_tick")', ino)
-        self.assertIn('SB_TRACE_COUNTER("vp_primary_render_us"', ino)
-        self.assertIn('SB_TRACE_COUNTER("vp_secondary_render_us"', ino)
+        self.assertIn('#include "k1_trace.h"', ino)
+        self.assertIn("K1_TRACE_INIT(64);", ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_secondary_snapshot")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_secondary_effect")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_secondary_store_clip")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_secondary_restore")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_channel_seed_history")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_waveform_fast_body")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_waveform_fast_history_store")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_bus_read")', ino)
+        self.assertIn('K1_TRACE_SCOPE("vp_visual_hooks_tick")', ino)
+        self.assertIn('K1_TRACE_COUNTER("vp_primary_render_us"', ino)
+        self.assertIn('K1_TRACE_COUNTER("vp_secondary_render_us"', ino)
 
     def test_trace_command_is_trace_dev_only_and_typed_only(self):
         menu = read(SERIAL_MENU)
@@ -91,7 +91,7 @@ class TraceDevStaticTest(unittest.TestCase):
         )
         self.assertRegex(
             menu,
-            r'(?s)#if\s+FEATURE_MABUTRACE\s*\nvoid cmd_trace_dump\(\).*?SB_TRACE_DUMP_JSON\(USBSerial\).*?#endif',
+            r'(?s)#if\s+FEATURE_MABUTRACE\s*\nvoid cmd_trace_dump\(\).*?K1_TRACE_DUMP_JSON\(USBSerial\).*?#endif',
         )
         self.assertRegex(
             menu,

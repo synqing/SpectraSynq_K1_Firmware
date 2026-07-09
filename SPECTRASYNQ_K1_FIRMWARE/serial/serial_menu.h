@@ -1,5 +1,5 @@
 /*----------------------------------------
-  Sensory Bridge UART COMMAND LINE
+  K1 UART COMMAND LINE
   ----------------------------------------*/
 
 #ifndef SERIAL_MENU_H
@@ -7,7 +7,7 @@
 
 #include "globals.h"  // For USBSerial and global variables
 #include "constants.h" // For NUM_AGC_BANDS
-#include "sb_trace.h"
+#include "k1_trace.h"
 #include <stdint.h>   // For uint32_t
 #include <stdlib.h>   // For strtof, atoi
 #include <string.h>   // For strtok, strncpy (gdft_sweep parse — item 22)
@@ -27,15 +27,15 @@
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_display_name() (R2b serial name source of truth)
 #endif
-#include "sb_audio_snapshot.h"
-#include "sb_edgemixer_lite.h"
-#include "sb_mode_selection.h"
-#include "sb_onset_beat.h"
-#include "sb_tempo.h"
-#include "sb_smart_director.h"
-#include "sb_visual_hooks.h"
-#include "sb_noise_cal_arm.h"
-#include "sb_effect_queue.h"
+#include "k1_audio_snapshot.h"
+#include "k1_edgemixer_lite.h"
+#include "k1_mode_selection.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
+#include "k1_smart_director.h"
+#include "k1_visual_hooks.h"
+#include "k1_noise_cal_arm.h"
+#include "k1_effect_queue.h"
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 #include <esp_heap_caps.h>
 #endif
@@ -133,12 +133,12 @@ void init_serial(uint32_t baud_rate) {
 
   // Print welcome message
   USBSerial.println("---------------------------");
-  USBSerial.print("SENSORY BRIDGE | VER: ");
+  USBSerial.print("K1 | VER: ");
   USBSerial.println(FIRMWARE_VERSION);
   USBSerial.println("---------------------------");
   USBSerial.println();
   USBSerial.print("INIT_SERIAL: ");
-  USBSerial.println(serial_started == true ? SB_PASS : SB_FAIL);
+  USBSerial.println(serial_started == true ? K1_PASS : K1_FAIL);
 }
 
 // This is for development purposes, and allows the user to dump
@@ -412,7 +412,7 @@ void serial_print_beat_director_status() {
 }
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
 void serial_update_vivid_enabled_from_levels() {
   VP_VIVID_PRECOMP = (VP_VIVID_CHROMA_LEVEL > 0.0f) || (VP_VIVID_BLACK_LEVEL > 0.0f);
 }
@@ -556,47 +556,47 @@ void vp_print_status() {
   tx_end();
 }
 
-const char* sb_edge_mode_name(SBEdgeMixerMode mode) {
+const char* k1_edge_mode_name(K1EdgeMixerMode mode) {
   switch (mode) {
-    case SB_EDGE_MIXER_ANALOGOUS: return "analogous";
-    case SB_EDGE_MIXER_COMPLEMENTARY: return "complementary";
-    case SB_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split";
-    case SB_EDGE_MIXER_SATURATION_VEIL: return "veil";
-    case SB_EDGE_MIXER_TRIADIC: return "triadic";
-    case SB_EDGE_MIXER_TETRADIC: return "tetradic";
-    case SB_EDGE_MIXER_OFF:
+    case K1_EDGE_MIXER_ANALOGOUS: return "analogous";
+    case K1_EDGE_MIXER_COMPLEMENTARY: return "complementary";
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split";
+    case K1_EDGE_MIXER_SATURATION_VEIL: return "veil";
+    case K1_EDGE_MIXER_TRIADIC: return "triadic";
+    case K1_EDGE_MIXER_TETRADIC: return "tetradic";
+    case K1_EDGE_MIXER_OFF:
     default: return "off";
   }
 }
 
-bool sb_parse_edge_mode(const char* text, SBEdgeMixerMode* out_mode) {
+bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
   if (strcmp(text, "off") == 0) {
-    *out_mode = SB_EDGE_MIXER_OFF;
+    *out_mode = K1_EDGE_MIXER_OFF;
   } else if (strcmp(text, "analogous") == 0) {
-    *out_mode = SB_EDGE_MIXER_ANALOGOUS;
+    *out_mode = K1_EDGE_MIXER_ANALOGOUS;
   } else if (strcmp(text, "complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_COMPLEMENTARY;
   } else if (strcmp(text, "split") == 0 || strcmp(text, "split_complementary") == 0) {
-    *out_mode = SB_EDGE_MIXER_SPLIT_COMPLEMENTARY;
+    *out_mode = K1_EDGE_MIXER_SPLIT_COMPLEMENTARY;
   } else if (strcmp(text, "veil") == 0 || strcmp(text, "saturation_veil") == 0) {
-    *out_mode = SB_EDGE_MIXER_SATURATION_VEIL;
+    *out_mode = K1_EDGE_MIXER_SATURATION_VEIL;
   } else if (strcmp(text, "triadic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TRIADIC;
+    *out_mode = K1_EDGE_MIXER_TRIADIC;
   } else if (strcmp(text, "tetradic") == 0) {
-    *out_mode = SB_EDGE_MIXER_TETRADIC;
+    *out_mode = K1_EDGE_MIXER_TETRADIC;
   } else {
     return false;
   }
   return true;
 }
 
-void sb_print_smart_status() {
-  SBSmartDirectorConfig smart = sb_smart_director_config();
-  SBVisualHookConfig hooks = sb_visual_hooks_config();
-  SBModeSelectionState mode_state = sb_mode_selection_read_state();
-  SBSmartDirectorOutput director = sb_smart_director_read_output();
-  SBOnsetBeatEvent event = sb_onset_beat_read();
-  SBAudioSnapshot audio = sb_audio_snapshot_read();
+void k1_print_smart_status() {
+  K1SmartDirectorConfig smart = k1_smart_director_config();
+  K1VisualHookConfig hooks = k1_visual_hooks_config();
+  K1ModeSelectionState mode_state = k1_mode_selection_read_state();
+  K1SmartDirectorOutput director = k1_smart_director_read_output();
+  K1OnsetBeatEvent event = k1_onset_beat_read();
+  K1AudioSnapshot audio = k1_audio_snapshot_read();
 
   tx_begin();
   USBSerial.print("SMART_ASSIST: ");
@@ -616,7 +616,7 @@ void sb_print_smart_status() {
   USBSerial.print("SMART_SWITCHES_IN_WINDOW: ");
   USBSerial.println(mode_state.switches_in_window);
   USBSerial.print("SMART_MANUAL_OWNER_ACTIVE: ");
-  USBSerial.println(sb_smart_director_manual_owner_active(millis()) ? 1 : 0);
+  USBSerial.println(k1_smart_director_manual_owner_active(millis()) ? 1 : 0);
   USBSerial.print("SMART_LAST_REASON: ");
   USBSerial.println(uint8_t(mode_state.last_reason));
   USBSerial.print("SMART_STATE: ");
@@ -663,7 +663,7 @@ void sb_print_smart_status() {
   USBSerial.println(event.bass_onset ? 1 : 0);
   USBSerial.print("SMART_BEAT_CONFIDENCE: ");
   USBSerial.println(event.beat_confidence, 3);
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   USBSerial.print("SMART_TRANSIENT: ");
   USBSerial.println(event.transient ? 1 : 0);
   USBSerial.print("SMART_KICK: ");
@@ -688,26 +688,26 @@ void sb_print_smart_status() {
   tx_end();
 }
 
-void sb_print_edge_status() {
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+void k1_print_edge_status() {
+  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
   tx_begin();
   USBSerial.print("EDGE_ENABLED: ");
   USBSerial.println(vp_bool_text(edge.enabled));
   USBSerial.print("EDGE_MODE: ");
-  USBSerial.println(sb_edge_mode_name(edge.mode));
+  USBSerial.println(k1_edge_mode_name(edge.mode));
   USBSerial.print("EDGE_STRENGTH: ");
   USBSerial.println(edge.strength, 3);
   tx_end();
 }
 
-bool sb_apply_smart_scene(const char* scene) {
+bool k1_apply_smart_scene(const char* scene) {
   if (scene == nullptr || scene[0] == 0) {
     return false;
   }
 
-  SBSmartDirectorConfig smart = sb_smart_director_config();
-  SBVisualHookConfig hooks = sb_visual_hooks_config();
-  SBEdgeMixerConfig edge = sb_edgemixer_lite_config();
+  K1SmartDirectorConfig smart = k1_smart_director_config();
+  K1VisualHookConfig hooks = k1_visual_hooks_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
 
   if (strcmp(scene, "off") == 0 || strcmp(scene, "none") == 0) {
     smart.enabled = false;
@@ -720,7 +720,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(scene, "assist") == 0 || strcmp(scene, "control") == 0) {
     smart.enabled = true;
@@ -733,7 +733,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = false;
     edge.enabled = false;
-    edge.mode = SB_EDGE_MIXER_OFF;
+    edge.mode = K1_EDGE_MIXER_OFF;
     edge.strength = 0.0f;
   } else if (strcmp(scene, "l1") == 0 || strcmp(scene, "accent") == 0) {
     smart.enabled = true;
@@ -746,7 +746,7 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 2;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.350f;
   } else if (strcmp(scene, "auto") == 0 || strcmp(scene, "autonomy") == 0 || strcmp(scene, "demo") == 0) {
     smart.enabled = true;
@@ -759,17 +759,17 @@ bool sb_apply_smart_scene(const char* scene) {
     smart.max_switches_per_window = 3;
     hooks.enabled = true;
     edge.enabled = true;
-    edge.mode = SB_EDGE_MIXER_COMPLEMENTARY;
+    edge.mode = K1_EDGE_MIXER_COMPLEMENTARY;
     edge.strength = 0.650f;
   } else {
     return false;
   }
 
-  sb_smart_director_set_config(smart);
-  sb_visual_hooks_set_config(hooks);
-  sb_edgemixer_lite_set_config(edge);
-  sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
-  sb_smart_director_clear_manual_control();
+  k1_smart_director_set_config(smart);
+  k1_visual_hooks_set_config(hooks);
+  k1_edgemixer_lite_set_config(edge);
+  k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
+  k1_smart_director_clear_manual_control();
   return true;
 }
 
@@ -919,15 +919,15 @@ const char* serial_target_name() {
 }
 
 void serial_disarm_noise_cal() {
-  sb_noise_cal_disarm();
+  k1_noise_cal_disarm();
 }
 
 void serial_arm_noise_cal() {
-  sb_noise_cal_arm();
+  k1_noise_cal_arm();
 }
 
 void serial_confirm_noise_cal() {
-  (void)sb_noise_cal_confirm(millis());
+  (void)k1_noise_cal_confirm(millis());
 }
 
 // Display name for a lightshow ordinal. Under the registry flag the name is
@@ -1009,7 +1009,7 @@ void serial_print_target_bool(const char* name, bool value) {
 // the ARMED value (multi-step staging).
 void serial_adjust_target_mode(int8_t delta) {
   const bool target_secondary = secondaryMode;
-  SBChannelPreset* pending = sb_queue_arm_begin(target_secondary);
+  K1ChannelPreset* pending = k1_queue_arm_begin(target_secondary);
 #ifdef K1_EFFECT_REGISTRY_V1
   // Step across the FULL dense menu (0..registry_dense_count()-1) so cycling
   // reaches the native effects too — not just the legacy ordinal span (which
@@ -1030,7 +1030,7 @@ void serial_adjust_target_mode(int8_t delta) {
   pending->lightshow_mode = light_mode_next_enabled(
       serial_wrap_index(pending->lightshow_mode, delta, NUM_MODES), delta);
 #endif
-  if (sb_queue_mode_enabled()) {
+  if (k1_queue_mode_enabled()) {
     USBSerial.print("QUEUE: ARMED ");
     USBSerial.print(target_secondary ? "SECONDARY_MODE" : "MODE");
     USBSerial.print(" ");
@@ -1047,17 +1047,17 @@ void serial_adjust_target_mode(int8_t delta) {
     USBSerial.print(serial_mode_name(pending->lightshow_mode));
     USBSerial.println(") - press \\ to commit");
   } else {
-    sb_queue_request_commit(false, millis());
+    k1_queue_request_commit(false, millis());
     serial_print_mode_line(target_secondary ? "SECONDARY_MODE" : "MODE",
                            pending->lightshow_mode);
   }
 }
 
-#ifdef SB_K1_BLE_REMOTED
+#ifdef K1_BLE_REMOTED
 // Confirmed committed light-show mode ordinal per channel — read by the gated BLE
 // Remoted central (network/ble_remoted_central.cpp) to feed the knob's on-screen
 // CONFIRMED mode display. Gated: exists only in the k1_ble_remoted_probe build.
-uint8_t sb_k1_confirmed_mode(bool secondary) {
+uint8_t k1_confirmed_mode(bool secondary) {
   return secondary ? SECONDARY_LIGHTSHOW_MODE : CONFIG.LIGHTSHOW_MODE;
 }
 #endif
@@ -1092,16 +1092,16 @@ void serial_adjust_target_palette(int8_t delta) {
   }
 
   const bool target_secondary = secondaryMode;
-  SBChannelPreset* pending = sb_queue_arm_begin(target_secondary);
+  K1ChannelPreset* pending = k1_queue_arm_begin(target_secondary);
   pending->palette_index = serial_wrap_index(pending->palette_index, delta, gGradientPaletteCount);
   pending->palette_mode_enabled = true;
-  if (sb_queue_mode_enabled()) {
+  if (k1_queue_mode_enabled()) {
     USBSerial.print("QUEUE: ARMED ");
     USBSerial.print(target_secondary ? "SECONDARY_PALETTE " : "PALETTE ");
     USBSerial.print(pending->palette_index);
     USBSerial.println(" - press \\ to commit");
   } else {
-    sb_queue_request_commit(false, millis());
+    k1_queue_request_commit(false, millis());
     serial_print_palette_line(target_secondary ? "SECONDARY_PALETTE" : "PALETTE",
                               pending->palette_index);
   }
@@ -1129,14 +1129,14 @@ const char* serial_queue_channel_name(bool secondary) {
 // Arm slot N (0-based) onto a channel WITHOUT committing (used by :slot_arm and
 // the queue-mode-ON load path). Returns false if the slot is empty/invalid.
 bool serial_queue_slot_arm(uint8_t slot_index, bool target_secondary) {
-  SBChannelPreset preset;
-  if (!sb_preset_slot_get(slot_index, &preset)) {
+  K1ChannelPreset preset;
+  if (!k1_preset_slot_get(slot_index, &preset)) {
     USBSerial.print("SLOT ");
     USBSerial.print(slot_index + 1);
     USBSerial.println(" EMPTY - nothing loaded");
     return false;
   }
-  sb_queue_arm_preset(target_secondary, preset);
+  k1_queue_arm_preset(target_secondary, preset);
   USBSerial.print("QUEUE: ARMED SLOT ");
   USBSerial.print(slot_index + 1);
   USBSerial.print(" -> ");
@@ -1147,19 +1147,19 @@ bool serial_queue_slot_arm(uint8_t slot_index, bool target_secondary) {
 
 // Load slot N (0-based): queue mode ON = arm; OFF = apply through the dip.
 void serial_queue_slot_load(uint8_t slot_index, bool target_secondary) {
-  if (sb_queue_mode_enabled()) {
+  if (k1_queue_mode_enabled()) {
     serial_queue_slot_arm(slot_index, target_secondary);
     return;
   }
-  SBChannelPreset preset;
-  if (!sb_preset_slot_get(slot_index, &preset)) {
+  K1ChannelPreset preset;
+  if (!k1_preset_slot_get(slot_index, &preset)) {
     USBSerial.print("SLOT ");
     USBSerial.print(slot_index + 1);
     USBSerial.println(" EMPTY - nothing loaded");
     return;
   }
-  sb_queue_arm_preset(target_secondary, preset);
-  sb_queue_request_commit(false, millis());
+  k1_queue_arm_preset(target_secondary, preset);
+  k1_queue_request_commit(false, millis());
   USBSerial.print("SLOT ");
   USBSerial.print(slot_index + 1);
   USBSerial.print(" -> ");
@@ -1170,7 +1170,7 @@ void serial_queue_slot_load(uint8_t slot_index, bool target_secondary) {
 // Save the ACTIVE channel's live 15 fields into slot N (0-based). File written
 // immediately (rare op; loop core only — never the render task).
 void serial_queue_slot_save(uint8_t slot_index, bool from_secondary) {
-  if (sb_preset_slot_save(slot_index, from_secondary)) {
+  if (k1_preset_slot_save(slot_index, from_secondary)) {
     USBSerial.print("SLOT ");
     USBSerial.print(slot_index + 1);
     USBSerial.print(" SAVED (from ");
@@ -1185,12 +1185,12 @@ void serial_queue_slot_save(uint8_t slot_index, bool from_secondary) {
 
 // '\' / :commit — commit ALL armed channels in the same frame.
 void serial_queue_commit() {
-  if (!sb_queue_any_armed()) {
+  if (!k1_queue_any_armed()) {
     USBSerial.println("QUEUE: nothing armed");
     return;
   }
-  sb_queue_request_commit(true, millis());
-  if (sb_queue_commit_quantise() == SB_QUEUE_QUANTISE_BEAT) {
+  k1_queue_request_commit(true, millis());
+  if (k1_queue_commit_quantise() == K1_QUEUE_QUANTISE_BEAT) {
     USBSerial.println("COMMIT (waiting for beat)");
   } else {
     USBSerial.println("COMMIT");
@@ -1198,9 +1198,9 @@ void serial_queue_commit() {
 }
 
 void serial_queue_toggle_mode() {
-  const bool enable = !sb_queue_mode_enabled();
-  const bool had_armed = sb_queue_any_armed();
-  sb_queue_set_mode_enabled(enable);  // disabling discards armed state
+  const bool enable = !k1_queue_mode_enabled();
+  const bool had_armed = k1_queue_any_armed();
+  k1_queue_set_mode_enabled(enable);  // disabling discards armed state
   if (enable) {
     USBSerial.println("QUEUE MODE ON");
   } else if (had_armed) {
@@ -1237,7 +1237,7 @@ void serial_print_hotkey_help() {
   USBSerial.println("  e/E waveform shift");
   USBSerial.println("  r/R bloom shift");
   USBSerial.println("  t/T bloom alpha");
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
   USBSerial.println("  v vivid pre-comp");
 #endif
   USBSerial.println();
@@ -1319,7 +1319,7 @@ void serial_print_hotkey_status() {
   USBSerial.print(VP_BLOOM_SHIFT_SCALE, 3);
   USBSerial.print(" bloom_alpha=");
   USBSerial.println(VP_BLOOM_ALPHA, 4);
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
   serial_print_vivid_precomp_status();
 #endif
 #ifdef K1_LOUD_GUARD_V1
@@ -1394,7 +1394,7 @@ bool serial_hotkey_is_immediate(char key) {
     case 's':
     case 'd':
     case 'f':
-#if defined(SB_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
+#if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
     case 'v':
 #endif
 #ifdef ENABLE_MOTION_PROBE
@@ -1454,7 +1454,7 @@ bool serial_hotkey_is_immediate(char key) {
 	    case ',':
 	    case '.':
 	    case '/':
-#if defined(SB_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
+#if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
 	    case 'v':
 #endif
 	      return true;
@@ -1538,7 +1538,7 @@ bool serial_hotkey_is_immediate(char key) {
 	
 	void serial_handle_hotkey(char key) {
 	  if (serial_hotkey_marks_manual_visual_control(key)) {
-	    sb_smart_director_mark_manual_control(millis(), SB_MANUAL_REASON_SERIAL_HOTKEY);
+	    k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_HOTKEY);
 	  }
 	  switch (key) {
     case ' ':
@@ -1748,7 +1748,7 @@ bool serial_hotkey_is_immediate(char key) {
       stop_streams();
       USBSerial.println("STREAMS: off");
       break;
-#if defined(SB_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
+#if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
     case 'v':
       serial_toggle_vivid_precomp();
       break;
@@ -1900,11 +1900,11 @@ void cmd_build() {
 
 void cmd_help() {
   tx_begin();
-  USBSerial.println("SENSORY BRIDGE - Serial Menu ------------------------------------------------------------------------------------");
+  USBSerial.println("K1 - Serial Menu ------------------------------------------------------------------------------------");
   USBSerial.println();
   USBSerial.println("                                            v | Print firmware version number");
   USBSerial.println("                                        build | Print build provenance (version + git hash + epoch + env)");
-  USBSerial.println("                                        reset | Reboot Sensory Bridge");
+  USBSerial.println("                                        reset | Reboot K1");
   USBSerial.println("                          factory_reset CONFIRM | Delete configuration, including noise cal, reboot (CONFIRM required)");
   USBSerial.println("                       restore_defaults CONFIRM | Delete configuration, reboot (CONFIRM required)");
   USBSerial.println("                                         dump | Print tons of useful variables in realtime");
@@ -1955,7 +1955,7 @@ void cmd_help() {
 	  USBSerial.println("        k1_pin_evidence=[status/dba,<bucket>] | Harness-only loud-pinning evidence label");
 #endif
   USBSerial.println("                           vp_all=[on/off] | Enable candidate or original VP branches");
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
 	  USBSerial.println("                             vivid=[on/off] | Runtime output-stage chroma pre-comp");
 	  USBSerial.println("                      vivid_level=[0.00-1.00] | Runtime vivid shortcut strength");
 	  USBSerial.println("                     vivid_chroma=[0.00-1.00] | Runtime vivid chroma strength");
@@ -2196,7 +2196,7 @@ void cmd_stop() {
 #if FEATURE_MABUTRACE
 void cmd_trace_dump() {
   USBSerial.println("[TRACE] Flushing trace buffer...");
-  SB_TRACE_DUMP_JSON(USBSerial);
+  K1_TRACE_DUMP_JSON(USBSerial);
   USBSerial.println();
   USBSerial.println("[TRACE] Done.");
 }
@@ -2221,17 +2221,17 @@ void cmd_vp_status() {
 }
 
 void cmd_smart_status() {
-  sb_print_smart_status();
+  k1_print_smart_status();
 }
 
 void cmd_edge_status() {
-  sb_print_edge_status();
+  k1_print_edge_status();
 }
 
 void cmd_event_status() {
   tx_begin();
-  const SBAudioSnapshot audio = sb_audio_snapshot_read();
-  const SBOnsetBeatEvent ev = sb_onset_beat_read();
+  const K1AudioSnapshot audio = k1_audio_snapshot_read();
+  const K1OnsetBeatEvent ev = k1_onset_beat_read();
 
   USBSerial.print("EVENT_STATUS,t=");
   USBSerial.print(millis());
@@ -2253,7 +2253,7 @@ void cmd_event_status() {
   USBSerial.print(ev.beat_phase, 3);
   USBSerial.print(",conf=");
   USBSerial.print(ev.beat_confidence, 3);
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   USBSerial.print(",kick=");
   USBSerial.print(ev.kick ? 1 : 0);
   USBSerial.print(",snare=");
@@ -2337,12 +2337,12 @@ void cmd_queue_commit() {
 void cmd_slot_list() {
   tx_begin();
   USBSerial.println("PRESET SLOTS (/PRESETS_V1.BIN)");
-  for (uint8_t i = 0; i < SB_PRESET_SLOT_COUNT; i++) {
+  for (uint8_t i = 0; i < K1_PRESET_SLOT_COUNT; i++) {
     USBSerial.print("SLOT ");
     USBSerial.print(i + 1);
     USBSerial.print(": ");
-    SBChannelPreset preset;
-    if (!sb_preset_slot_get(i, &preset)) {
+    K1ChannelPreset preset;
+    if (!k1_preset_slot_get(i, &preset)) {
       USBSerial.println("EMPTY");
       continue;
     }
@@ -2356,15 +2356,15 @@ void cmd_slot_list() {
     USBSerial.println(preset.palette_mode_enabled ? "on" : "off");
   }
   USBSerial.print("queue_mode=");
-  USBSerial.print(sb_queue_mode_enabled() ? "on" : "off");
+  USBSerial.print(k1_queue_mode_enabled() ? "on" : "off");
   USBSerial.print(" transition_style=");
-  USBSerial.print(sb_queue_transition_style() == SB_QUEUE_TRANSITION_XFADE ? "xfade" : "dip");
+  USBSerial.print(k1_queue_transition_style() == K1_QUEUE_TRANSITION_XFADE ? "xfade" : "dip");
   USBSerial.print(" dip_ms=");
-  USBSerial.print(sb_queue_dip_ms());
+  USBSerial.print(k1_queue_dip_ms());
   USBSerial.print(" xfade_ms=");
-  USBSerial.print(sb_queue_xfade_ms());
+  USBSerial.print(k1_queue_xfade_ms());
   USBSerial.print(" commit_quantise=");
-  USBSerial.println(sb_queue_commit_quantise() == SB_QUEUE_QUANTISE_BEAT ? "beat" : "off");
+  USBSerial.println(k1_queue_commit_quantise() == K1_QUEUE_QUANTISE_BEAT ? "beat" : "off");
   tx_end();
 }
 
@@ -2551,12 +2551,12 @@ void parse_command(char* command_buf) {
 	    // PARSER #############################
 
 	    if (serial_command_marks_manual_visual_control(command_type)) {
-	      sb_smart_director_mark_manual_control(millis(), SB_MANUAL_REASON_SERIAL_COMMAND);
+	      k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_COMMAND);
 	    }
 
 	    // Now react accordingly:
 
-    // Set if this Sensory Bridge is a MAIN Unit --------------
+    // Set if this K1 is a MAIN Unit --------------
     if (strcmp(command_type, "vp_profile") == 0) {
       if (strcmp(command_data, "original") == 0) {
         vp_apply_profile(VP_PROFILE_ORIGINAL);
@@ -2588,11 +2588,11 @@ void parse_command(char* command_buf) {
     // reboot. Dispatched here once: serial_cmd_dispatch_vivid() returns true iff
     // command_type named one of them (the body ran), false to fall through.
     // Proven byte-for-byte by the Fα serial_replay golden extension.
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
     else if (serial_cmd_dispatch_vivid(command_type, command_data)) {
       // handled by an extracted vivid handler
     }
-#endif // SB_VIVID_PRECOMP_V1
+#endif // K1_VIVID_PRECOMP_V1
 
     else if (strcmp(command_type, "ap_stream") == 0) {
       bool value = false;
@@ -3236,7 +3236,7 @@ void parse_command(char* command_buf) {
         }
       }
       int slot_number = atoi(command_data);
-      if (!channel_ok || slot_number < 1 || slot_number > SB_PRESET_SLOT_COUNT) {
+      if (!channel_ok || slot_number < 1 || slot_number > K1_PRESET_SLOT_COUNT) {
         bad_command(command_type, command_data);
       } else {
         tx_begin();
@@ -3264,7 +3264,7 @@ void parse_command(char* command_buf) {
         }
       }
       int slot_number = atoi(command_data);
-      if (!channel_ok || slot_number < 1 || slot_number > SB_PRESET_SLOT_COUNT) {
+      if (!channel_ok || slot_number < 1 || slot_number > K1_PRESET_SLOT_COUNT) {
         bad_command(command_type, command_data);
       } else {
         tx_begin();
@@ -3619,10 +3619,10 @@ void stream_vp_data(uint32_t t_now) {
 
 #if ENABLE_TEMPO_STREAM
 // NON-SHIPPABLE INSTRUMENTATION (compile-gated; -DENABLE_TEMPO_STREAM=1 → k1_tempo_probe
-// env only). Per-frame CSV of the sb_tempo event so a click-track lock can be proven by
+// env only). Per-frame CSV of the k1_tempo event so a click-track lock can be proven by
 // eye: bpm should match the click; conf should sustain >=0.30 (lock); phase should sweep
 // 0->1 each beat with beat=1 at the instant. Throttled so phase stays observable. Useless
-// until sb_tempo_update() is wired into the Core-0 audio loop.
+// until k1_tempo_update() is wired into the Core-0 audio loop.
 #ifndef TEMPO_STREAM_INTERVAL_MS
 #define TEMPO_STREAM_INTERVAL_MS 50   // ~20 Hz
 #endif
@@ -3636,7 +3636,7 @@ void stream_tempo_data(uint32_t t_now) {
   }
   last_tempo_stream = t_now;
 
-  SBTempoEvent te = sb_tempo_read();
+  K1TempoEvent te = k1_tempo_read();
   USBSerial.print("TEMPO,t=");
   USBSerial.print(t_now);
   USBSerial.print(",bpm=");
@@ -3652,7 +3652,7 @@ void stream_tempo_data(uint32_t t_now) {
   USBSerial.print(",str=");
   USBSerial.println(te.beat_strength, 3);
 
-  SBTempoDebugSnapshot td = sb_tempo_debug_read();
+  K1TempoDebugSnapshot td = k1_tempo_debug_read();
   USBSerial.print("TEMPO_DBG,t=");
   USBSerial.print(t_now);
   USBSerial.print(",emit_ms=");
@@ -3762,10 +3762,10 @@ void stream_tempo_data(uint32_t t_now) {
 }
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-// NON-SHIPPABLE AP front-end truth stream. NOV emits exactly once per sb_tempo
-// accepted novelty sample by keying off sb_tempo's emit_count, and this function is
-// called only AFTER calculate_novelty() + sb_audio_snapshot_update() +
-// sb_tempo_update() in the AP loop. APDBG is deliberately throttled; the compact
+// NON-SHIPPABLE AP front-end truth stream. NOV emits exactly once per k1_tempo
+// accepted novelty sample by keying off k1_tempo's emit_count, and this function is
+// called only AFTER calculate_novelty() + k1_audio_snapshot_update() +
+// k1_tempo_update() in the AP loop. APDBG is deliberately throttled; the compact
 // NOV stream is the replayable "territory" surface.
 #ifndef APDBG_STREAM_INTERVAL_MS
 #define APDBG_STREAM_INTERVAL_MS 1000
@@ -3773,7 +3773,7 @@ void stream_tempo_data(uint32_t t_now) {
 void stream_ap_frontend_debug(uint32_t t_now) {
   static uint32_t last_emit_count = 0;
   static uint32_t last_apdbg_stream = 0;
-  SBTempoDebugSnapshot td = sb_tempo_debug_read();
+  K1TempoDebugSnapshot td = k1_tempo_debug_read();
   ap_nov_capture_tick(t_now, td);
   if (!AP_FRONTEND_DEBUG_ENABLED) {
     return;
@@ -3805,8 +3805,8 @@ void stream_ap_frontend_debug(uint32_t t_now) {
   }
   last_apdbg_stream = t_now;
 
-  SBAudioSnapshot audio = sb_audio_snapshot_read();
-  SBTempoEvent te = sb_tempo_read();
+  K1AudioSnapshot audio = k1_audio_snapshot_read();
+  K1TempoEvent te = k1_tempo_read();
 
   USBSerial.print("APDBG,t=");
   USBSerial.print(t_now);

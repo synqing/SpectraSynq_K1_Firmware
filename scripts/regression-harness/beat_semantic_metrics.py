@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Beat-SEMANTIC metrics for the UNMODIFIED sb_tempo detector — the layer above raw
+"""Beat-SEMANTIC metrics for the UNMODIFIED k1_tempo detector — the layer above raw
 BPM accuracy (tempo_accuracy.py). Where tempo_accuracy asks "is the winning BPM right?",
 this asks "are the emitted BEATS right, does the lock ever fire on real music, and does
 it false-lock on silence/noise?" — the questions a faithful music-to-visual translator
@@ -8,7 +8,7 @@ actually lives or dies on.
 PIPELINE (100% offline, no bench, no K1; reuses the existing harness, builds NO second one):
   HarmonixSet 12.8 kHz WAV
     -> novelty_from_wav.wav_to_novelty        (spectral-flux onset @ 133.33 Hz)
-    -> tempo_replay --replay-stdin (REAL sb_tempo.cpp, host-compiled)
+    -> tempo_replay --replay-stdin (REAL k1_tempo.cpp, host-compiled)
     -> extended "T <ms> <bpm> <conf> <locked> <phase01> <beat_tick>" trajectory
     -> beat-F / continuity / confidence-reachability / false-lock metrics
        vs the corpus's GOLD beat-time annotations (beats_and_downbeats/<file_key>.txt).
@@ -21,7 +21,7 @@ Silence / noise are SYNTHETIC diagnostics (no labels), used only to measure fals
 ================================ METRIC DEFINITIONS ================================
 
 PREDICTED BEAT TIMES
-  ms timestamps where the firmware emitted beat_tick==1 (sb_tempo's own internal beat
+  ms timestamps where the firmware emitted beat_tick==1 (k1_tempo's own internal beat
   instant, refractory-gated at 0.6*period inside the firmware — we do NOT re-gate).
 
 beat-F  (±70 ms tolerance window, MIREX F-measure greedy 1:1 match)
@@ -73,7 +73,7 @@ ONSET DENSITY / REFRACTORY SANITY (best-effort)
   predicted beat-event density (beats/sec) over the scored window vs the plausible tactus
   band [PLAUSIBLE_LO_HZ, PLAUSIBLE_HI_HZ] (~0.5–4 Hz ≈ 30–240 BPM). Reported per track and
   as a corpus frac-in-band. A RIGOROUS onset precision/recall needs the separate
-  sb_onset_beat binary (onset_beat_replay.py) and a distinct onset GT, so FULL onset-P/R
+  k1_onset_beat binary (onset_beat_replay.py) and a distinct onset GT, so FULL onset-P/R
   is marked STAGED here rather than invented.
 
 ================================ OUTPUTS ================================
@@ -107,7 +107,7 @@ OUT_DIR = ROOT / "build" / "audio-semantic-metrics"
 BEAT_TOL_MS = 70.0          # standard beat-F tolerance window (±70 ms, Davies/MIREX)
 WARMUP_MS = 11500.0         # Goertzel ring fill (~512 @ 44.44 Hz ≈ 11.5 s) — exclude cold start
 IBI_REL_TOL = 0.15          # ±15% of GT median IBI for ibi_phase_continuity
-CONF_GATE = 0.60            # SB_LOCK_CONFIDENCE — the lock threshold we measure reachability to
+CONF_GATE = 0.60            # K1_LOCK_CONFIDENCE — the lock threshold we measure reachability to
 AP_FRAME_HZ = nfw.SAMPLE_RATE / nfw.HOP     # 133.333 Hz, the same rate the firmware drives at
 PLAUSIBLE_LO_HZ, PLAUSIBLE_HI_HZ = 0.5, 4.0  # ~30–240 BPM tactus band for density sanity
 
@@ -413,7 +413,7 @@ def aggregate(result):
         # false-lock (synthetic)
         "false_lock": result["false_lock"],
         # staged
-        "onset_precision_recall": "STAGED — requires sb_onset_beat binary + onset GT (onset_beat_replay.py); not invented here",
+        "onset_precision_recall": "STAGED — requires k1_onset_beat binary + onset GT (onset_beat_replay.py); not invented here",
         "n_missing_gt": len(result["missing_gt"]),
         "half_suspect_tracks": [r["file_key"] for r in rows if r.get("half_suspect")],
     }
@@ -441,14 +441,14 @@ def write_outputs(result, agg, corpus, gt_dir, label):
 
     fl = agg["false_lock"]
     md = f"""---
-abstract: "Beat-SEMANTIC baseline of the UNMODIFIED sb_tempo on {agg['n_with_gt']}/{result['n_wavs']} HarmonixSet tracks (gold beat-time GT, ±70ms beat-F, octave-fair). The layer above tempo_accuracy: measures whether emitted BEATS land, whether the lock ever fires on real music, and false-lock on synthetic silence/noise. HEADLINE: beat-F(x1) mean={agg['beat_F_x1_mean']:.3f}, octave-fair best={agg['beat_F_metrical_best_mean']:.3f}; CMLt-like={agg['cmlt_like_mean']:.3f} AMLt-like={agg['amlt_like_mean']:.3f}; tracks ever-locked={agg['frac_tracks_ever_locked']*100:.0f}%, ever-reach-0.60={agg['frac_tracks_ever_reach_060']*100:.0f}%, median settled conf={agg['median_settled_conf']:.3f}; false-lock silence={fl['silence']['lock_frac']:.3f} noise={fl['noise']['lock_frac']:.3f}. Re-run: python3 scripts/regression-harness/beat_semantic_metrics.py. Compare: --compare baseline <candidate>. Read before/after any sb_tempo confidence/phase/beat_tick change."
+abstract: "Beat-SEMANTIC baseline of the UNMODIFIED k1_tempo on {agg['n_with_gt']}/{result['n_wavs']} HarmonixSet tracks (gold beat-time GT, ±70ms beat-F, octave-fair). The layer above tempo_accuracy: measures whether emitted BEATS land, whether the lock ever fires on real music, and false-lock on synthetic silence/noise. HEADLINE: beat-F(x1) mean={agg['beat_F_x1_mean']:.3f}, octave-fair best={agg['beat_F_metrical_best_mean']:.3f}; CMLt-like={agg['cmlt_like_mean']:.3f} AMLt-like={agg['amlt_like_mean']:.3f}; tracks ever-locked={agg['frac_tracks_ever_locked']*100:.0f}%, ever-reach-0.60={agg['frac_tracks_ever_reach_060']*100:.0f}%, median settled conf={agg['median_settled_conf']:.3f}; false-lock silence={fl['silence']['lock_frac']:.3f} noise={fl['noise']['lock_frac']:.3f}. Re-run: python3 scripts/regression-harness/beat_semantic_metrics.py. Compare: --compare baseline <candidate>. Read before/after any k1_tempo confidence/phase/beat_tick change."
 ---
 
 # Beat-Semantic Metrics — {label}
 
 **[MEASURED] {result['n_wavs']} corpus WAVs · {agg['n_with_gt']} scored against gold beat-time GT · digital host pipe, no bench.**
 
-Detector = UNMODIFIED `SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp`, host-compiled by
+Detector = UNMODIFIED `SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp`, host-compiled by
 `tempo_replay.py --replay-stdin` (extended trajectory). GT = HarmonixSet gold beat times
 (`beats_and_downbeats/<file_key>.txt`). Metric definitions in the module docstring.
 
@@ -491,7 +491,7 @@ a faithful translator must avoid.
 | frac tracks predicted-beat density in [{PLAUSIBLE_LO_HZ}, {PLAUSIBLE_HI_HZ}] Hz | {agg['frac_tracks_density_in_band']*100:.0f}% |
 | median predicted-beat density | {agg['median_pred_density_hz']:.2f} Hz |
 
-> **STAGED:** full onset precision/recall needs the separate `sb_onset_beat` binary
+> **STAGED:** full onset precision/recall needs the separate `k1_onset_beat` binary
 > (`onset_beat_replay.py`) and a distinct onset GT — not invented here.
 
 ## GT / scope notes
@@ -507,7 +507,7 @@ a faithful translator must avoid.
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-06-05 | agent:claude-opus | Created — incumbent beat-semantic baseline (beat-F / continuity / confidence-reachability / false-lock) of the committed sb_tempo. |
+| 2026-06-05 | agent:claude-opus | Created — incumbent beat-semantic baseline (beat-F / continuity / confidence-reachability / false-lock) of the committed k1_tempo. |
 """
     md_name = "baseline.md" if label in ("baseline", None) else f"{label}.md"
     (OUT_DIR / md_name).write_text(md, encoding="utf-8")
@@ -555,7 +555,7 @@ def main(argv=None):
     p.add_argument("--define", action="append", default=[],
                    help="extra -D preprocessor define (repeatable) for the candidate build")
     p.add_argument("--candidate-confv2", action="store_true",
-                   help="build the V2 confidence/lock path (-DSB_TEMPO_CONF_V2). Pair with --label conf_v2.")
+                   help="build the V2 confidence/lock path (-DK1_TEMPO_CONF_V2). Pair with --label conf_v2.")
     p.add_argument("--verbose", action="store_true")
     args = p.parse_args(argv)
 
@@ -568,8 +568,8 @@ def main(argv=None):
         print(f"gt dataset not found: {args.gt_dataset}", file=sys.stderr); return 2
 
     defines = list(args.define)
-    if args.candidate_confv2 and "SB_TEMPO_CONF_V2" not in defines:
-        defines.append("SB_TEMPO_CONF_V2")
+    if args.candidate_confv2 and "K1_TEMPO_CONF_V2" not in defines:
+        defines.append("K1_TEMPO_CONF_V2")
     result = run(args.corpus, args.gt_dataset, limit=args.limit, verbose=args.verbose, defines=defines)
     agg = aggregate(result)
     jp, mp = write_outputs(result, agg, args.corpus, args.gt_dataset, args.label)

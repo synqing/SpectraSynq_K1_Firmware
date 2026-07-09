@@ -9,7 +9,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 YAML = ROOT / "docs/protocol/k1-ws-controls-registry.yaml"
 OUT = ROOT / "sb-tab5-wireless-controller/src/network/K1ControlRegistry.h"
 CODEGEN = ROOT / "scripts/regression-harness/k1_ws_registry_codegen.py"
-FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp"
+FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE/control/k1_control_facade.cpp"
 
 
 class K1WsRegistryCodegenTest(unittest.TestCase):
