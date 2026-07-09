@@ -36,8 +36,8 @@ PRODUCTION_FORBIDDEN_TOKENS = (
     "enable_vp_motion_lab",
     "enable_tempo_stream",
     "enable_ap_frontend_debug",
-    "sb_acquisition_only_probe",
-    "sb_ap_stage_probe_stop_stage",
+    "k1_acquisition_only_probe",
+    "k1_ap_stage_probe_stop_stage",
     "diagnostic_capture.cpp",
     "vpab_capture.cpp",
 )
@@ -52,8 +52,8 @@ INSTRUMENTATION_ENV_TOKENS = (
     "enable_vp_motion_lab",
     "enable_tempo_stream",
     "enable_ap_frontend_debug",
-    "sb_acquisition_only_probe",
-    "sb_ap_stage_probe_stop_stage",
+    "k1_acquisition_only_probe",
+    "k1_ap_stage_probe_stop_stage",
     "diagnostic_capture.cpp",
     "vpab_capture.cpp",
     "mabutrace",
@@ -149,11 +149,11 @@ class DevInstrumentationBoundaryTest(unittest.TestCase):
         resolved = strip_ini_comments(resolved_section("env:k1_hardware", sections)).lower()
         required = (
             "-darduino_running_core=0",
-            "-dsb_led_task_core=1",
-            "-dsb_i2s_dma_desc_num_value=3",
+            "-dk1_led_task_core=1",
+            "-dk1_i2s_dma_desc_num_value=3",
             "-ddefault_sample_rate=12800",
             "-ddefault_samples_per_chunk=96",
-            "-dsb_tempo_novelty_decimation=3u",
+            "-dk1_tempo_novelty_decimation=3u",
         )
         missing = [token for token in required if token not in resolved]
         self.assertEqual(missing, [])
@@ -210,7 +210,7 @@ class DevInstrumentationBoundaryTest(unittest.TestCase):
             if path.suffix not in {".h", ".hpp", ".c", ".cpp", ".ino"}:
                 continue
             text = path.read_text(encoding="utf-8", errors="replace")
-            if path.name == "sb_trace.h":
+            if path.name == "k1_trace.h":
                 continue
             if MABUTRACE_INCLUDE_RE.search(text):
                 offenders.append(str(path.relative_to(ROOT)) + ": include")

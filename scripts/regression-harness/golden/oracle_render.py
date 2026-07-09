@@ -16,7 +16,7 @@ Public interface (consumed by test_golden_master.py / harness_selftest.py):
 
 Design notes:
   - Reuses render_replay.py's proven compile machinery verbatim (same STUBS,
-    FW_SUBDIRS, COMMON_SOURCES, HOST_GLOBALS, sb_render_host_dump, parse_frame,
+    FW_SUBDIRS, COMMON_SOURCES, HOST_GLOBALS, k1_render_host_dump, parse_frame,
     and RenderParams param-header protocol).  This oracle adds a self-contained
     capture() that does NOT import render_replay.py — it re-implements the
     narrow compile+run slice so the oracle is dependency-free.
@@ -86,13 +86,13 @@ MODULE_CPPS = [str(FIRMWARE / s) for s in _MODE_SOURCES]
 
 # Production-matching defines ([env:k1_hardware] build_flags, 2026-06-11).
 # Only the flags that affect the render / LED path are included; audio-DSP
-# flags (SB_TEMPO_*, SB_ONSET_*) have no effect on host-compiled render TUs.
+# flags (K1_TEMPO_*, K1_ONSET_*) have no effect on host-compiled render TUs.
 DEFINES = [
-    "SB_RENDER_HOST_TEST",     # enables sb_render_host_dump; non-shippable
-    "SB_CHORD_HUE_V1",         # Tier-1 chord consumer (Dense Forge hue anchor)
-    "SB_DROP_CUT_V1",          # musical silence -> dark; affects brightness
-    "SB_SEMANTIC_STATE",       # AudioSemanticState spine (inert on host render)
-    "SB_CHORD_V2",             # ChordState (inert on host render)
+    "K1_RENDER_HOST_TEST",     # enables k1_render_host_dump; non-shippable
+    "K1_CHORD_HUE_V1",         # Tier-1 chord consumer (Dense Forge hue anchor)
+    "K1_DROP_CUT_V1",          # musical silence -> dark; affects brightness
+    "K1_SEMANTIC_STATE",       # AudioSemanticState spine (inert on host render)
+    "K1_CHORD_V2",             # ChordState (inert on host render)
     "K1_LOUD_GUARD_V1",        # loud-guard brightness limiter
 ]
 
@@ -117,7 +117,7 @@ DEFINES = [
 # consume the oracle output directly.
 # ---------------------------------------------------------------------------
 DRIVER = r"""
-// oracle_render_driver.cpp  (HOST-ONLY, -DSB_RENDER_HOST_TEST)
+// oracle_render_driver.cpp  (HOST-ONLY, -DK1_RENDER_HOST_TEST)
 // Drives light_mode_bloom and light_mode_spectrum_river with a fixed
 // deterministic audio-state sequence and dumps leds_16 per frame.
 // Compiled by oracle_render.py capture() — NOT shipped in firmware.
@@ -149,8 +149,8 @@ static void reset_all() {
   std::memset(leds_16,      0, sizeof(CRGB16) * NATIVE_RESOLUTION);
 }
 
-// ---- pre-gamma linear dump (mirrors render_replay.py sb_render_host_dump) --
-static void sb_render_host_dump(unsigned char* out_bytes) {
+// ---- pre-gamma linear dump (mirrors render_replay.py k1_render_host_dump) --
+static void k1_render_host_dump(unsigned char* out_bytes) {
   for (int i = 0; i < NATIVE_RESOLUTION; i++) {
     float ch[3] = { float(leds_16[i].r), float(leds_16[i].g), float(leds_16[i].b) };
     for (int c = 0; c < 3; c++) {
@@ -265,7 +265,7 @@ int main(int /*argc*/, char** /*argv*/) {
       light_mode_spectrum_river(g_river_prev);
     }
 
-    sb_render_host_dump(bytes);
+    k1_render_host_dump(bytes);
     std::printf("R ");
     for (int i = 0; i < NATIVE_RESOLUTION * 3; i++) std::printf("%02x", bytes[i]);
     std::printf("\n");

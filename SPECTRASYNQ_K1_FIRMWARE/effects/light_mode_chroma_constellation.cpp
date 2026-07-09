@@ -1,7 +1,7 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_onset_beat.h"
-#include "sb_tempo.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
 
 // ============================================================================
 // light_mode_chroma_constellation — "Chroma Constellation" (mode 25): the
@@ -54,7 +54,7 @@
 // Laws honoured: Strobe Law — no global full-field brightness modulation;
 // every brightness is a per-star chroma energy. Organic Law — no autonomous
 // wall-clock oscillator; the only motion is the transport, and its speed is
-// audio-mapped (spectral energy). Audio reads ONLY via sb_audio_snapshot_read().
+// audio-mapped (spectral energy). Audio reads ONLY via k1_audio_snapshot_read().
 // Persistent state ONLY in ChannelEffectState (cc_* fields) — no heap, no
 // file-scope mutable statics.
 // ============================================================================
@@ -72,7 +72,7 @@ static float cc_clamp01(float v) {
   return v;
 }
 
-static bool cc_presence_ok(const SBAudioSnapshot& snap) {
+static bool cc_presence_ok(const K1AudioSnapshot& snap) {
   return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
 }
 
@@ -91,7 +91,7 @@ void light_mode_chroma_constellation(CRGB16* leds_prev_buffer, ChannelEffectStat
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
 
   const float energy = cc_clamp01(snap.spectral_energy);
   const bool hard_gate = snap.silence;
@@ -99,13 +99,13 @@ void light_mode_chroma_constellation(CRGB16* leds_prev_buffer, ChannelEffectStat
   const float inject_scale = (presence_ok && !hard_gate) ? 1.0f : 0.0f;
 
   // MAPPING source: 12-bin pitch-class chroma (A-origin, [0,1]).
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
   float chroma[12];
   for (uint8_t pc = 0; pc < 12; pc++) {
     chroma[pc] = cc_clamp01(snap.chroma_pc[pc]);
   }
 #else
-  // Fallback without SB_CHORD_V2: chromagram_smooth[12] is the SAME A-origin
+  // Fallback without K1_CHORD_V2: chromagram_smooth[12] is the SAME A-origin
   // pitch-class fold (globals.h, fed by make_smooth_chromagram), so the mode
   // renders identically-shaped output — only the smoothing lineage differs.
   float chroma[12];

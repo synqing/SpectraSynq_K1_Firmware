@@ -11,12 +11,12 @@ PLAN = ROOT / "docs" / "superpowers" / "plans" / "2026-05-27-smart-visual-engine
 STRATEGY = ROOT / "docs" / "forensics" / "2026-05-27-smart-director-edgemixer-onset-import-strategy.md"
 
 SMART_MODULE_PREFIXES = (
-    "sb_audio_snapshot",
-    "sb_mode_selection",
-    "sb_smart_director",
+    "k1_audio_snapshot",
+    "k1_mode_selection",
+    "k1_smart_director",
     "k1_edgemixer",
-    "sb_onset_beat",
-    "sb_visual_hooks",
+    "k1_onset_beat",
+    "k1_visual_hooks",
 )
 
 FORBIDDEN_SMART_SOURCE_PATTERNS = (
@@ -123,8 +123,8 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
     def test_production_build_filter_includes_smart_modules(self):
         sections = platformio_sections()
         production = strip_ini_comments(sections["env:k1_hardware"]).lower()
-        self.assertIn("+<audio/sb_*.cpp>", production)
-        self.assertIn("+<director/sb_*.cpp>", production)
+        self.assertIn("+<audio/k1_*.cpp>", production)
+        self.assertIn("+<director/k1_*.cpp>", production)
 
     def test_production_env_excludes_dev_and_trace_flags(self):
         sections = platformio_sections()
@@ -145,23 +145,23 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertEqual(offenders, [])
 
     def test_audio_snapshot_contract_exists_and_is_post_novelty(self):
-        header = read(FIRMWARE / "sb_audio_snapshot.h")
-        source = read(FIRMWARE / "sb_audio_snapshot.cpp")
+        header = read(FIRMWARE / "k1_audio_snapshot.h")
+        source = read(FIRMWARE / "k1_audio_snapshot.cpp")
         ino = read(FIRMWARE / "SPECTRASYNQ_K1_FIRMWARE.ino")
 
         for token in (
-            "enum SBMusicState",
-            "struct SBAudioSnapshot",
-            "struct SBOnsetBeatEvent",
-            "void sb_audio_snapshot_update(uint32_t frame_ms)",
-            "SBAudioSnapshot sb_audio_snapshot_read()",
+            "enum K1MusicState",
+            "struct K1AudioSnapshot",
+            "struct K1OnsetBeatEvent",
+            "void k1_audio_snapshot_update(uint32_t frame_ms)",
+            "K1AudioSnapshot k1_audio_snapshot_read()",
         ):
             self.assertIn(token, header)
 
         self.assertIn("portENTER_CRITICAL", source)
         self.assertIn("portEXIT_CRITICAL", source)
         self.assertNotIn("chromagram_smooth", source)
-        self.assertLess(ino.index("calculate_novelty(t_now);"), ino.index("sb_audio_snapshot_update(t_now);"))
+        self.assertLess(ino.index("calculate_novelty(t_now);"), ino.index("k1_audio_snapshot_update(t_now);"))
 
     def test_edgemixer_future_contract_keeps_centre_79_80_when_present(self):
         edge_path = FIRMWARE / "k1_edgemixer.cpp"
@@ -277,26 +277,26 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertNotIn('":smart_confidence_floor=0.180"', capture)
 
     def test_smart_director_default_floor_matches_runtime_evidence(self):
-        smart_source = read(FIRMWARE / "sb_smart_director.cpp")
+        smart_source = read(FIRMWARE / "k1_smart_director.cpp")
         self.assertIn("0.08f", smart_source)
         self.assertNotIn("0.62f", smart_source)
 
     def test_smart_runtime_configs_are_critical_section_snapshots(self):
-        smart_header = read(FIRMWARE / "sb_smart_director.h")
-        smart_source = read(FIRMWARE / "sb_smart_director.cpp")
-        hooks_source = read(FIRMWARE / "sb_visual_hooks.cpp")
+        smart_header = read(FIRMWARE / "k1_smart_director.h")
+        smart_source = read(FIRMWARE / "k1_smart_director.cpp")
+        hooks_source = read(FIRMWARE / "k1_visual_hooks.cpp")
         edge_source = read(FIRMWARE / "k1_edgemixer.cpp")
-        mode_source = read(FIRMWARE / "sb_mode_selection.cpp")
+        mode_source = read(FIRMWARE / "k1_mode_selection.cpp")
         serial_source = read(FIRMWARE / "serial_menu.h")
 
-        self.assertIn("SBSmartDirectorConfig sb_smart_director_config();", smart_header)
-        self.assertNotIn("const SBSmartDirectorConfig& sb_smart_director_config()", smart_header)
-        self.assertNotIn("const SBSmartDirectorConfig& smart", serial_source)
+        self.assertIn("K1SmartDirectorConfig k1_smart_director_config();", smart_header)
+        self.assertNotIn("const K1SmartDirectorConfig& k1_smart_director_config()", smart_header)
+        self.assertNotIn("const K1SmartDirectorConfig& smart", serial_source)
         for text, mux in (
-            (smart_source, "sb_director_config_mux"),
-            (hooks_source, "sb_hook_config_mux"),
+            (smart_source, "k1_director_config_mux"),
+            (hooks_source, "k1_hook_config_mux"),
             (edge_source, "k1_edge_config_mux"),
-            (mode_source, "sb_mode_state_mux"),
+            (mode_source, "k1_mode_state_mux"),
         ):
             self.assertIn("portMUX_TYPE", text)
             self.assertIn(mux, text)
@@ -304,18 +304,18 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             self.assertIn("portEXIT_CRITICAL", text)
 
     def test_serial_visual_mutations_mark_manual_owner(self):
-        smart_header = read(FIRMWARE / "sb_smart_director.h")
-        smart_source = read(FIRMWARE / "sb_smart_director.cpp")
+        smart_header = read(FIRMWARE / "k1_smart_director.h")
+        smart_source = read(FIRMWARE / "k1_smart_director.cpp")
         serial_source = read(FIRMWARE / "serial_menu.h")
 
-        self.assertIn("sb_smart_director_mark_manual_control", smart_header)
-        self.assertIn("sb_smart_director_clear_manual_control", smart_header)
-        self.assertIn("sb_smart_director_manual_owner_active", smart_header)
-        self.assertIn("sb_manual_control_last_ms", smart_source)
+        self.assertIn("k1_smart_director_mark_manual_control", smart_header)
+        self.assertIn("k1_smart_director_clear_manual_control", smart_header)
+        self.assertIn("k1_smart_director_manual_owner_active", smart_header)
+        self.assertIn("k1_manual_control_last_ms", smart_source)
         self.assertIn("serial_hotkey_marks_manual_visual_control", serial_source)
         self.assertIn("serial_command_marks_manual_visual_control", serial_source)
-        self.assertIn("SB_MANUAL_REASON_SERIAL_HOTKEY", serial_source)
-        self.assertIn("SB_MANUAL_REASON_SERIAL_COMMAND", serial_source)
+        self.assertIn("K1_MANUAL_REASON_SERIAL_HOTKEY", serial_source)
+        self.assertIn("K1_MANUAL_REASON_SERIAL_COMMAND", serial_source)
         self.assertIn('"set_mode"', serial_source)
         self.assertIn('"secondary_"', serial_source)
         self.assertIn('"edge_"', serial_source)
@@ -371,9 +371,9 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
     def test_smart_scene_preset_reproduces_l1_ab_runtime_recipe(self):
         serial_source = read(FIRMWARE / "serial_menu.h")
         self.assertIn("smart_scene=[off/assist/l1/auto]", serial_source)
-        self.assertIn("sb_apply_smart_scene", serial_source)
+        self.assertIn("k1_apply_smart_scene", serial_source)
         # The smart_scene HANDLER branch moved to serial_cmd_dispatch_smart_director()
-        # in serial_cmd_handlers.cpp; sb_apply_smart_scene() (the scene recipe asserted
+        # in serial_cmd_handlers.cpp; k1_apply_smart_scene() (the scene recipe asserted
         # below) stays in serial_menu.h. Assert the handler branch against its new home.
         self.assertIn('strcmp(command_type, "smart_scene") == 0',
                       read(FIRMWARE / "serial_cmd_handlers.cpp"))
@@ -385,7 +385,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn('strcmp(scene, "autonomy") == 0', serial_source)
         self.assertIn('strcmp(scene, "demo") == 0', serial_source)
 
-        body = function_body(serial_source, "sb_apply_smart_scene")
+        body = function_body(serial_source, "k1_apply_smart_scene")
         self.assertIsNotNone(body)
         for token in (
             "smart.enabled = true",
@@ -405,14 +405,14 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "edge.strength = 0.650f",
             "edge.mode = K1_EDGE_MIXER_OFF",
             "edge.strength = 0.0f",
-            "sb_smart_director_set_config(smart)",
-            "sb_visual_hooks_set_config(hooks)",
+            "k1_smart_director_set_config(smart)",
+            "k1_visual_hooks_set_config(hooks)",
             "k1_edgemixer_set_config(edge)",
-            "sb_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis())",
-            "sb_smart_director_clear_manual_control()",
+            "k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis())",
+            "k1_smart_director_clear_manual_control()",
         ):
             self.assertIn(token, body)
-        self.assertNotIn("sb_smart_director_mark_manual_control", body)
+        self.assertNotIn("k1_smart_director_mark_manual_control", body)
         for forbidden in (
             "noise_transition_queued",
             "start_noise_cal",
@@ -450,29 +450,29 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             self.assertIn(token, serial_source)
 
     def test_smart_director_future_contract_avoids_parameter_only_assist_when_present(self):
-        director_path = FIRMWARE / "sb_smart_director.cpp"
-        mode_path = FIRMWARE / "sb_mode_selection.cpp"
+        director_path = FIRMWARE / "k1_smart_director.cpp"
+        mode_path = FIRMWARE / "k1_mode_selection.cpp"
         if not director_path.exists():
             self.skipTest("Smart Director Assist not implemented yet")
         text = read(director_path) + "\n" + read(mode_path)
         for token in (
-            "SBModeIntent",
-            "sb_mode_selection_resolve",
+            "K1ModeIntent",
+            "k1_mode_selection_resolve",
             "assist_switching_enabled",
             "director_autonomy_enabled",
             "palette_overlay_enabled",
-            "sb_palette_for_state",
-            "sb_autonomy_palette_for_state",
-            "sb_autonomy_mode_for_state",
-            "sb_auto_colour_for_state",
+            "k1_palette_for_state",
+            "k1_autonomy_palette_for_state",
+            "k1_autonomy_mode_for_state",
+            "k1_auto_colour_for_state",
             "PALETTE_MODE_ENABLED",
             "PALETTE_INDEX",
             "AUTO_COLOR_SHIFT",
-            "sb_smart_director_read_output",
-            "sb_smart_director_manual_owner_active",
+            "k1_smart_director_read_output",
+            "k1_smart_director_manual_owner_active",
             "g_last_encoder_activity_time",
             "mode_transition_queued",
-            "fallback_mode != sb_mode_state.fallback_mode",
+            "fallback_mode != k1_mode_state.fallback_mode",
             "LIGHT_MODE_BLOOM",
             "LIGHT_MODE_BLOOM_FAST",
             "LIGHT_MODE_WAVEFORM",
@@ -501,13 +501,13 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn("!smart_director_config.director_autonomy_enabled", ino_text)
         self.assertRegex(
             text,
-            r"if\s*\(\s*!intent\.wants_switch\s*\)\s*\{[^}]*resolved_mode\s*=\s*sb_mode_state\.applied_mode;[^}]*return\s+resolved_mode;",
+            r"if\s*\(\s*!intent\.wants_switch\s*\)\s*\{[^}]*resolved_mode\s*=\s*k1_mode_state\.applied_mode;[^}]*return\s+resolved_mode;",
             "Enabled-but-no-switch frames must hold the last smart-applied mode.",
         )
 
     def test_smart_autonomy_palette_overlay_is_renderparams_local(self):
-        smart_header = read(FIRMWARE / "sb_smart_director.h")
-        smart_source = read(FIRMWARE / "sb_smart_director.cpp")
+        smart_header = read(FIRMWARE / "k1_smart_director.h")
+        smart_source = read(FIRMWARE / "k1_smart_director.cpp")
         serial_source = read(FIRMWARE / "serial_menu.h")
         combined = smart_header + "\n" + smart_source
 
@@ -526,7 +526,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             self.assertIn(token, combined + "\n" + serial_source)
 
         apply_body = re.search(
-            r"void\s+sb_smart_director_apply_render_params\s*\([^)]*\)\s*\{(?P<body>.*?)\n\}",
+            r"void\s+k1_smart_director_apply_render_params\s*\([^)]*\)\s*\{(?P<body>.*?)\n\}",
             smart_source,
             re.S,
         )
@@ -556,14 +556,14 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
 
     @staticmethod
     def _strip_onset_v2_blocks(text):
-        """Remove #ifdef SB_ONSET_V2 ... [#else ...] #endif regions, keeping only
-        the PRODUCTION (no-flag) path. The donor-shaped SB_ONSET_V2 detector is an
+        """Remove #ifdef K1_ONSET_V2 ... [#else ...] #endif regions, keeping only
+        the PRODUCTION (no-flag) path. The donor-shaped K1_ONSET_V2 detector is an
         intentional, flag-gated addition; this guard test asserts the PRODUCTION
         onset path stays decoupled from donor internals, so it must scope its
         checks to the non-V2 code (mirrors the byte-identical-production contract).
         """
         out = []
-        # depth>0 means inside an SB_ONSET_V2 #ifdef; in_else means the #else
+        # depth>0 means inside an K1_ONSET_V2 #ifdef; in_else means the #else
         # (production) arm of such a block, which we KEEP.
         skip_depth = 0
         keep_else = []
@@ -573,7 +573,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         while i < len(lines):
             ln = lines[i]
             stripped = ln.strip()
-            if skip_depth == 0 and re.match(r"#ifdef\s+SB_ONSET_V2\b", stripped):
+            if skip_depth == 0 and re.match(r"#ifdef\s+K1_ONSET_V2\b", stripped):
                 skip_depth = 1
                 nest = 0
                 i += 1
@@ -587,7 +587,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
                     else:
                         nest -= 1
                 elif re.match(r"#else\b", stripped) and nest == 0:
-                    # production arm of the SB_ONSET_V2 block -> keep what follows
+                    # production arm of the K1_ONSET_V2 block -> keep what follows
                     skip_depth = 0
                     i += 1
                     # keep lines until the matching #endif
@@ -611,12 +611,12 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         return "\n".join(out)
 
     def test_onset_future_contract_is_novelty_first_when_present(self):
-        onset_path = FIRMWARE / "sb_onset_beat.cpp"
-        audio_header = FIRMWARE / "sb_audio_snapshot.h"
+        onset_path = FIRMWARE / "k1_onset_beat.cpp"
+        audio_header = FIRMWARE / "k1_audio_snapshot.h"
         if not onset_path.exists():
             self.skipTest("Onset/beat lane not implemented yet")
         full_text = read(onset_path)
-        # Decoupling checks apply to the PRODUCTION path only; the SB_ONSET_V2
+        # Decoupling checks apply to the PRODUCTION path only; the K1_ONSET_V2
         # donor-shaped detector is flag-gated and legitimately references the
         # per-note spectrum + donor algorithm by name in its comments.
         text = self._strip_onset_v2_blocks(full_text)
@@ -629,15 +629,15 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "80UL",
             "event_age_ms",
             "beat_confidence",
-            "sb_novelty_fast",
-            "sb_novelty_slow",
-            "sb_low_fast",
-            "sb_low_slow",
-            "sb_peak_fast",
-            "sb_peak_slow",
-            "sb_interval_estimate_ms",
-            "sb_interval_close",
-            "sb_note_accepted_interval",
+            "k1_novelty_fast",
+            "k1_novelty_slow",
+            "k1_low_fast",
+            "k1_low_slow",
+            "k1_peak_fast",
+            "k1_peak_slow",
+            "k1_interval_estimate_ms",
+            "k1_interval_close",
+            "k1_note_accepted_interval",
             "portENTER_CRITICAL",
             "portEXIT_CRITICAL",
         ):
@@ -675,17 +675,17 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertNotIn("else {\n    event.event_ms = now_ms;", text)
 
     def test_visual_hooks_l1_accent_contract_is_three_lane_and_default_off(self):
-        hooks_path = FIRMWARE / "sb_visual_hooks.cpp"
+        hooks_path = FIRMWARE / "k1_visual_hooks.cpp"
         if not hooks_path.exists():
             self.skipTest("Visual hooks not implemented yet")
-        hooks_header = read(FIRMWARE / "sb_visual_hooks.h")
+        hooks_header = read(FIRMWARE / "k1_visual_hooks.h")
         text = read(hooks_path)
-        self.assertRegex(text, r"static\s+SBVisualHookConfig\s+sb_hook_config\s*=\s*\{\s*false,")
-        self.assertIn("sb_visual_hooks_set_config", text)
+        self.assertRegex(text, r"static\s+K1VisualHookConfig\s+k1_hook_config\s*=\s*\{\s*false,")
+        self.assertIn("k1_visual_hooks_set_config", text)
         self.assertIn("80UL", text)
         self.assertIn("event.event_age_ms", text)
-        self.assertIn("sb_visual_hooks_apply_render_params", text)
-        self.assertIn("sb_visual_hooks_apply_edge_config", text)
+        self.assertIn("k1_visual_hooks_apply_render_params", text)
+        self.assertIn("k1_visual_hooks_apply_edge_config", text)
         combined = hooks_header + "\n" + text
         for token in (
             "onset_tau_ms",
@@ -698,16 +698,16 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "photon_scalar",
             "chroma_scalar",
             "edge_scalar",
-            "sb_accent_onset_pulse",
-            "sb_accent_bass_pulse",
-            "sb_accent_beat_pulse",
-            "sb_accent_last_onset_event_id",
-            "sb_accent_last_bass_event_id",
-            "sb_accent_last_beat_event_id",
+            "k1_accent_onset_pulse",
+            "k1_accent_bass_pulse",
+            "k1_accent_beat_pulse",
+            "k1_accent_last_onset_event_id",
+            "k1_accent_last_bass_event_id",
+            "k1_accent_last_beat_event_id",
         ):
             self.assertIn(token, combined)
         for legacy_token in (
-            "sb_hook_pulse",
+            "k1_hook_pulse",
             "primary_pulse_strength",
             "secondary_edge_strength",
             "primary_pulse_scalar",
@@ -722,7 +722,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         boundary_write = text.index("output.confirm_switch_boundary = true")
         self.assertLess(beat_branch, boundary_write)
         ino = read(FIRMWARE / "SPECTRASYNQ_K1_FIRMWARE.ino")
-        self.assertIn("SBVisualHookOutput visual_hook_output = { 1.0f, 1.0f, 1.0f, false }", ino)
+        self.assertIn("K1VisualHookOutput visual_hook_output = { 1.0f, 1.0f, 1.0f, false }", ino)
 
     def test_serial_smart_status_exposes_v2_percussive_channels(self):
         text = read(FIRMWARE / "serial_menu.h")
@@ -739,13 +739,13 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "SMART_HIHAT_EVENT_ID:",
         ):
             self.assertIn(token, text)
-        self.assertIn("#ifdef SB_ONSET_V2", text)
+        self.assertIn("#ifdef K1_ONSET_V2", text)
 
     def test_render_integration_gates_switches_and_disabled_edgemixer(self):
         ino = read(FIRMWARE / "SPECTRASYNQ_K1_FIRMWARE.ino")
         self.assertIn("visual_hook_output.confirm_switch_boundary", ino)
         self.assertIn("smart_output.mode_intent.wants_switch = false", ino)
-        self.assertIn("sb_smart_director_mode_selection_config(smart_now_ms)", ino)
+        self.assertIn("k1_smart_director_mode_selection_config(smart_now_ms)", ino)
         self.assertRegex(
             ino,
             r"if\s*\(\s*edge_config\.enabled\s*\)\s*\{[^}]*k1_edgemixer_apply",

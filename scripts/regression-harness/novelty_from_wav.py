@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-"""Convert a 12.8 kHz mono WAV into a SensoryBridge-rate novelty curve.
+"""Convert a 12.8 kHz mono WAV into a K1-rate novelty curve.
 
 This is the front half of the DIGITAL real-music tempo validation pipe (Lane A,
 docs/architecture/tempo-lock-hardening-plan.md). It is 100% offline: no mic, no
 speaker, no sound played, no K1/bench. The WAV's *samples* are processed on the
-dev machine into a spectral-flux onset-strength curve at the SensoryBridge AP
-frame rate, which is then replayed through the UNMODIFIED sb_tempo.cpp by
+dev machine into a spectral-flux onset-strength curve at the K1 AP
+frame rate, which is then replayed through the UNMODIFIED k1_tempo.cpp by
 tempo_replay.py / tempo_accuracy.py.
 
-Why this is valid (per the algo-design swarm, SW5): sb_tempo consumes only the
+Why this is valid (per the algo-design swarm, SW5): k1_tempo consumes only the
 *temporal shape* of novelty (it normalises and [0,1]-clamps internally), so the
 host novelty just needs to be REPRESENTATIVE, not a bit-exact GDFT replica.
 Octave aliasing — the thing the octave fix targets — lives in onset periodicity,
 which spectral flux preserves.
 
-Frame rate: SensoryBridge runs the audio pipeline at
+Frame rate: K1 runs the audio pipeline at
     CONFIG.SAMPLE_RATE / CONFIG.SAMPLES_PER_CHUNK = 12800 / 96 = 133.333 Hz.
-sb_tempo_update() is called once per AP frame; the detector does its OWN /3
+k1_tempo_update() is called once per AP frame; the detector does its OWN /3
 decimation internally (to ~44.4 Hz). So we emit ONE novelty value per 96-sample
 hop = the native 133.333 Hz AP frame rate, and we DO NOT pre-decimate.
 
 Output CSV columns: frame_ms,novelty,silence
   frame_ms : int, monotonic, ~7.5 ms apart (one AP frame).
-  novelty  : float in [0,1] (sb_tempo clamps to [0,1] anyway — pre-scaling here
+  novelty  : float in [0,1] (k1_tempo clamps to [0,1] anyway — pre-scaling here
              mirrors the device's own clamp, so the baseline is faithful to the
              CURRENT system; log-domain pre-clamp novelty is the SW3 Step-4 fix,
              out of scope for the baseline).
@@ -40,7 +40,7 @@ import numpy as np
 import scipy.io.wavfile as wavfile
 from scipy.ndimage import uniform_filter1d
 
-# SensoryBridge audio config (config_types.h DEFAULT_SAMPLE_RATE, i2s_audio.h SAMPLES_PER_CHUNK).
+# K1 audio config (config_types.h DEFAULT_SAMPLE_RATE, i2s_audio.h SAMPLES_PER_CHUNK).
 SAMPLE_RATE = 12800
 HOP = 96            # SAMPLES_PER_CHUNK -> one AP frame per hop -> 133.333 Hz
 NFFT = 512          # ~40 ms analysis window
@@ -68,7 +68,7 @@ def wav_to_novelty(path):
     x, sr = _to_mono_float(sr, data)
     if sr != SAMPLE_RATE:
         # We expect the corpus to already be 12.8 kHz; resampling would change the
-        # hop->frame-rate relationship sb_tempo assumes. Refuse rather than lie.
+        # hop->frame-rate relationship k1_tempo assumes. Refuse rather than lie.
         raise ValueError(f"{path}: sample rate {sr} != {SAMPLE_RATE}; decode to 12.8 kHz first")
 
     n = x.shape[0]
@@ -92,7 +92,7 @@ def wav_to_novelty(path):
 
     # Remove slow song-dynamics drift (verse/chorus swells) that otherwise piles a DC
     # pedestal onto the curve. Left in, that drift dominates the lowest tempo Goertzel
-    # bins and — with sb_tempo's quartic winner exaggeration — pins the winner to its
+    # bins and — with k1_tempo's quartic winner exaggeration — pins the winner to its
     # bottom bin (60 BPM). Subtract a LONG (~3 s) moving mean: high-pass cutoff ~0.3 Hz,
     # well below the 60 BPM (1 Hz) tempo floor, so 60–200 BPM periodicity is fully
     # preserved while only sub-tempo drift is removed; then half-wave rectify to an

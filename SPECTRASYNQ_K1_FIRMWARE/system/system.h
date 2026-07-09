@@ -70,7 +70,7 @@ static void usb_event_callback(void* arg, esp_event_base_t event_base, int32_t e
         break;
     }
   }
-#if SB_ENABLE_USB_MSC_UPDATE
+#if K1_ENABLE_USB_MSC_UPDATE
   else if (event_base == ARDUINO_FIRMWARE_MSC_EVENTS) {
     //arduino_firmware_msc_event_data_t * data = (arduino_firmware_msc_event_data_t*)event_data;
     switch (event_id) {
@@ -99,7 +99,7 @@ static void usb_event_callback(void* arg, esp_event_base_t event_base, int32_t e
 #endif
 }
 
-#if SB_ENABLE_USB_MSC_UPDATE
+#if K1_ENABLE_USB_MSC_UPDATE
 void enable_usb_update_mode() {
   USB.onEvent(usb_event_callback);
 
@@ -124,7 +124,7 @@ void enable_usb_update_mode() {
 
     if (msc_update_started == false) {
       leds_16[led_index] = {0, 0, 0.25};
-#if SB_HAS_SWEET_SPOT_LEDS
+#if K1_HAS_SWEET_SPOT_LEDS
       ledcWrite(SWEET_SPOT_LEFT_CHANNEL,   sweet_order[sweet_index][0] * 512);
       ledcWrite(SWEET_SPOT_CENTER_CHANNEL, sweet_order[sweet_index][1] * 512);
       ledcWrite(SWEET_SPOT_RIGHT_CHANNEL,  sweet_order[sweet_index][2] * 512);
@@ -132,7 +132,7 @@ void enable_usb_update_mode() {
     }
     else {
       leds_16[NATIVE_RESOLUTION-1-led_index] = {0, 0.25, 0};
-#if SB_HAS_SWEET_SPOT_LEDS
+#if K1_HAS_SWEET_SPOT_LEDS
       ledcWrite(SWEET_SPOT_LEFT_CHANNEL,   sweet_order[sweet_index][2] * 4095);
       ledcWrite(SWEET_SPOT_CENTER_CHANNEL, sweet_order[sweet_index][1] * 4095);
       ledcWrite(SWEET_SPOT_RIGHT_CHANNEL,  sweet_order[sweet_index][0] * 4095);
@@ -159,14 +159,14 @@ void enable_usb_update_mode() {
 #endif
 
 void init_usb() {
-#if SB_USB_CUSTOM_DESCRIPTORS
+#if K1_USB_CUSTOM_DESCRIPTORS
   USB.productName("SpectraSynq SB");
   USB.manufacturerName("SpectraSynq");
   USB.VID(0x1209); // This works though, god damn I hate USB
   USB.PID(0xABED); // Cool, cool cool cool https://pid.codes/1209/ABED/
 #endif
 
-#if defined(SB_K1_HARDWARE)
+#if defined(K1_HARDWARE)
   USBSerial.setTxBufferSize(4096);
   USBSerial.setTxTimeoutMs(20);
   USBSerial.begin(SERIAL_BAUD);
@@ -177,7 +177,7 @@ void init_usb() {
 }
 
 void init_sweet_spot() {
-#if SB_HAS_SWEET_SPOT_LEDS
+#if K1_HAS_SWEET_SPOT_LEDS
   ledcSetup(SWEET_SPOT_LEFT_CHANNEL, 500, 12);
   ledcAttachPin(SWEET_SPOT_LEFT_PIN, SWEET_SPOT_LEFT_CHANNEL);
 
@@ -360,7 +360,7 @@ void enforce_compiled_audio_timing_config() {
     USBSerial.print(" samples_per_chunk=");
     USBSerial.print(DEFAULT_SAMPLES_PER_CHUNK);
     USBSerial.print(" tempo_decimation=");
-    USBSerial.println((uint16_t)SB_TEMPO_NOVELTY_DECIMATION);
+    USBSerial.println((uint16_t)K1_TEMPO_NOVELTY_DECIMATION);
     save_config();
   }
 }
@@ -369,7 +369,7 @@ void init_system() {
   noise_button.pin = NOISE_CAL_PIN;
   mode_button.pin = MODE_PIN;
 
-#if defined(SB_K1_HARDWARE)
+#if defined(K1_HARDWARE)
   init_usb();
 #endif
 
@@ -540,12 +540,12 @@ void init_system() {
 #endif
 
   init_leds();
-#if !defined(SB_K1_HARDWARE)
+#if !defined(K1_HARDWARE)
   init_usb();
 #endif
 
   // MODE held down on boot
-#if SB_ENABLE_USB_MSC_UPDATE && MODE_PIN >= 0
+#if K1_ENABLE_USB_MSC_UPDATE && MODE_PIN >= 0
   if (digitalRead(mode_button.pin) == LOW) {
     enable_usb_update_mode();
   }

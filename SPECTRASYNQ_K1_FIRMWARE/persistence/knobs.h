@@ -1,5 +1,5 @@
 /*----------------------------------------
-  Sensory Bridge KNOB FUNCTIONS - PHYSICAL KNOBS DISABLED
+  K1 KNOB FUNCTIONS - PHYSICAL KNOBS DISABLED
 ----------------------------------------*/
 
 uint16_t avg_read(uint8_t pin) {

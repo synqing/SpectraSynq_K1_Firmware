@@ -1,11 +1,11 @@
 /*----------------------------------------
-  Sensory Bridge FILESYSTEM ACCESS
+  K1 FILESYSTEM ACCESS
   ----------------------------------------*/
 
 #include "globals.h"
 #include "constants.h"
 #include "Palettes.h" // Include for gGradientPaletteCount
-#include "sb_effect_queue.h" // SB_PRESET_SLOTS_FILE (factory_reset enumeration)
+#include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
@@ -39,14 +39,14 @@ extern void reboot(); // system.h
 // pinned to core 0 and leaves internal DRAM tight, so save_config()'s open aborted.
 // This precondition turns that fatal path into a graceful, logged, retryable
 // deferral. It is inert on a healthy device (tens of KB largest free block).
-#ifndef SB_FS_MIN_INTERNAL_BLOCK
-#define SB_FS_MIN_INTERNAL_BLOCK 8192  // bytes: conservative headroom for one open
+#ifndef K1_FS_MIN_INTERNAL_BLOCK
+#define K1_FS_MIN_INTERNAL_BLOCK 8192  // bytes: conservative headroom for one open
 #endif
 
 static inline bool bridge_fs_internal_heap_ok(const char* who) {
   const size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL);
   const size_t freeb   = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
-  if (largest >= SB_FS_MIN_INTERNAL_BLOCK) {
+  if (largest >= K1_FS_MIN_INTERNAL_BLOCK) {
     return true;
   }
   // LOUD on every trip (never silent): surfaces the exact headroom so the true
@@ -59,7 +59,7 @@ static inline bool bridge_fs_internal_heap_ok(const char* who) {
   USBSerial.print("B largest=");
   USBSerial.print((uint32_t)largest);
   USBSerial.print("B need>=");
-  USBSerial.print((uint32_t)SB_FS_MIN_INTERNAL_BLOCK);
+  USBSerial.print((uint32_t)K1_FS_MIN_INTERNAL_BLOCK);
   USBSerial.println("B) - deferring to avoid fopen abort");
   return false;
 }
@@ -112,8 +112,8 @@ void factory_reset() {
   }
 
 #ifndef K1_MIC_IM73D_PDM_V1
-  USBSerial.print("Deleting " SB_PRESET_SLOTS_FILE ": ");
-  if (LittleFS.remove(SB_PRESET_SLOTS_FILE)) {
+  USBSerial.print("Deleting " K1_PRESET_SLOTS_FILE ": ");
+  if (LittleFS.remove(K1_PRESET_SLOTS_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
@@ -551,7 +551,7 @@ bool clear_calibration_profile() {
 void init_fs() {
   lock_leds();
   USBSerial.print("INIT FILESYSTEM: ");
-  USBSerial.println(LittleFS.begin(true) == true ? SB_PASS : SB_FAIL);
+  USBSerial.println(LittleFS.begin(true) == true ? K1_PASS : K1_FAIL);
 
   update_config_filename(FIRMWARE_VERSION);
 

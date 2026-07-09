@@ -35,7 +35,7 @@
  *      secondary independently (dual-channel doctrine).
  *   4. Trail buffer allocated from PSRAM (ps_malloc) in init(); freed in
  *      cleanup().  render() is zero-heap.
- *   5. isSnareHit() / isHihatHit() gate on SB_ONSET_V2 internally; safe
+ *   5. isSnareHit() / isHihatHit() gate on K1_ONSET_V2 internally; safe
  *      false-return when flag absent.
  */
 
@@ -285,7 +285,7 @@ void LgpTransientLattice::render(EffectContext& ctx) {
     else          m_beatRing = decayBy(m_beatRing, dtSignal, kBeatRingTau);
 
     // ── Snare accent ring ─────────────────────────────────────────────────────
-    // isSnareHit() returns false safely without SB_ONSET_V2.
+    // isSnareHit() returns false safely without K1_ONSET_V2.
     const bool snareNow = audioAvail && ctx.audio.isSnareHit();
     if (snareNow && m_snareArmed) {
         m_snareRing  = 1.0f;

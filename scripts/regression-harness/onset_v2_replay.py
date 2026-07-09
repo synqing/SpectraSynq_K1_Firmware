@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""WAV -> 80-bin spectrogram -> REAL sb_onset_beat.cpp -> per-frame onset/band events.
+"""WAV -> 80-bin spectrogram -> REAL k1_onset_beat.cpp -> per-frame onset/band events.
 
 This is the onset analogue of tempo_accuracy.py. It drives the UNMODIFIED
-(compiled) `sb_onset_beat.cpp` -- either the incumbent dual-EMA path (no flag) or
-the donor-shaped V2 path (`-DSB_ONSET_V2`) -- with a real-music per-note
+(compiled) `k1_onset_beat.cpp` -- either the incumbent dual-EMA path (no flag) or
+the donor-shaped V2 path (`-DK1_ONSET_V2`) -- with a real-music per-note
 spectrogram synthesised from the 12.8 kHz corpus, and scores:
 
   * onset precision/recall vs GT *beats* (PROXY -- GT is beats, not onsets; we
@@ -24,9 +24,9 @@ Spectrogram synthesis (mirrors the fork's per-note GDFT + broadband AGC):
     1.0 (the loud/clamped regime).
 
 The spectrogram is fed to the firmware as one `S <ms> <silence> <b0..b79>` line
-per frame; the generated replay main parses it, fills SBAudioSnapshot.spectrum[]
-(+ the legacy scalar band means, identically to sb_audio_snapshot.cpp), calls the
-real sb_onset_beat_update, and prints one event line per frame.
+per frame; the generated replay main parses it, fills K1AudioSnapshot.spectrum[]
+(+ the legacy scalar band means, identically to k1_audio_snapshot.cpp), calls the
+real k1_onset_beat_update, and prints one event line per frame.
 """
 
 import argparse
@@ -142,18 +142,18 @@ static inline void portENTER_CRITICAL(portMUX_TYPE*) {}
 static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 """
 
-# Reads 'S <ms> <silence> b0..b79' lines on stdin, fills SBAudioSnapshot
-# (spectrum[] + legacy scalar band means EXACTLY as sb_audio_snapshot.cpp does),
-# runs the real sb_onset_beat_update, prints per-frame events.
+# Reads 'S <ms> <silence> b0..b79' lines on stdin, fills K1AudioSnapshot
+# (spectrum[] + legacy scalar band means EXACTLY as k1_audio_snapshot.cpp does),
+# runs the real k1_onset_beat_update, prints per-frame events.
 CPP_REPLAY = r"""
-#include "sb_onset_beat.h"
+#include "k1_onset_beat.h"
 #include <cstdio>
 #include <cmath>
 
 static float clampnn(float v){ return (!std::isfinite(v)||v<0.0f)?0.0f:v; }
 
 int main(){
-  sb_onset_beat_reset();
+  k1_onset_beat_reset();
   char tag; long ms; int sil;
   static float spec[80];
   while (std::scanf(" %c", &tag) == 1) {
@@ -161,13 +161,13 @@ int main(){
     if (std::scanf("%ld %d", &ms, &sil) != 2) break;
     for (int i=0;i<80;i++){ if (std::scanf("%f",&spec[i])!=1){ spec[i]=0.0f; } }
 
-    SBAudioSnapshot a = {};
+    K1AudioSnapshot a = {};
     a.frame_ms = (uint32_t)ms;
     a.silence = sil != 0;
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
     for (int i=0;i<80;i++) a.spectrum[i] = clampnn(spec[i]);
 #endif
-    // Legacy scalar band means -- identical thirds split to sb_audio_snapshot.cpp.
+    // Legacy scalar band means -- identical thirds split to k1_audio_snapshot.cpp.
     float low=0,mid=0,hi=0;
     for (int i=0;i<80;i++){ float v=clampnn(spec[i]);
       if (i<80/3) low+=v; else if (i<(80*2)/3) mid+=v; else hi+=v; }
@@ -180,11 +180,11 @@ int main(){
     a.novelty = a.spectral_energy;
     a.peak_scaled = a.spectral_energy;
 
-    sb_onset_beat_update(a);
-    SBOnsetBeatEvent e = sb_onset_beat_read();
+    k1_onset_beat_update(a);
+    K1OnsetBeatEvent e = k1_onset_beat_read();
 
     int onset = (e.event_age_ms == 0 && (e.onset || e.bass_onset)) ? 1 : 0;
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
     std::printf("E %ld %d %d %d %d %d %.4f %.4f %.4f %.4f\n",
       ms, onset, e.kick?1:0, e.snare?1:0, e.hihat?1:0, e.transient?1:0,
       e.onset_strength, e.kick_strength, e.snare_strength, e.hihat_strength);
@@ -212,7 +212,7 @@ def build_replay(defines, workdir, compiler="clang++"):
         cmd += ["-I", str(FIRMWARE / d)]
     for d in defines:
         cmd += [f"-D{d}"]
-    cmd += [str(next(FIRMWARE.rglob("sb_onset_beat.cpp"))), str(main_cpp), "-o", str(binary)]
+    cmd += [str(next(FIRMWARE.rglob("k1_onset_beat.cpp"))), str(main_cpp), "-o", str(binary)]
     r = subprocess.run(cmd, text=True, capture_output=True)
     if r.returncode != 0:
         raise RuntimeError(f"compile failed:\n{r.stderr}")
@@ -334,7 +334,7 @@ def main(argv=None):
 
     tmp = tempfile.TemporaryDirectory()
     bin_incumbent = build_replay([], tmp.name + "/inc", args.compiler)
-    bin_v2 = build_replay(["SB_ONSET_V2"], tmp.name + "/v2", args.compiler)
+    bin_v2 = build_replay(["K1_ONSET_V2"], tmp.name + "/v2", args.compiler)
 
     results = {"tracks": [], "agc_clamp": {}}
     agg = {"inc": [], "v2": []}

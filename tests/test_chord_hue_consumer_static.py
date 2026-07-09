@@ -1,4 +1,4 @@
-"""Static gates for SB_CHORD_HUE_V1 — the first chord-state consumer (Tier 1 item 1).
+"""Static gates for K1_CHORD_HUE_V1 — the first chord-state consumer (Tier 1 item 1).
 
 Guards the hardened-rules contract from
 _scratch/fix-investigation/window-audit/07-resolution-plan-postmortem.md plus the
@@ -25,7 +25,7 @@ PIO = (ROOT / "platformio.ini").read_text()
 class ChordHueConsumerStaticTest(unittest.TestCase):
     def test_original_dense_forge_is_untouched_by_the_chord_lane(self):
         # Variant contract: no chord tokens may appear in the original effect.
-        for token in ("SB_CHORD_HUE_V1", "chord.rootNote", "dforge_chord_"):
+        for token in ("K1_CHORD_HUE_V1", "chord.rootNote", "dforge_chord_"):
             self.assertNotIn(token, ORIGINAL)
 
     def test_variant_is_registered_append_only(self):
@@ -40,10 +40,10 @@ class ChordHueConsumerStaticTest(unittest.TestCase):
         self.assertIn('set_mode_name(24, "DENSE FORGE CHORD");', SYSTEM)
 
     def test_consumer_is_flag_gated_and_uses_snapshot_read_idiom(self):
-        self.assertIn("#ifdef SB_CHORD_HUE_V1", VARIANT)
-        self.assertIn("sb_audio_snapshot_read()", VARIANT)
+        self.assertIn("#ifdef K1_CHORD_HUE_V1", VARIANT)
+        self.assertIn("k1_audio_snapshot_read()", VARIANT)
         self.assertIn("chord.rootNote", VARIANT)
-        self.assertIn("SBChordType::NONE", VARIANT)
+        self.assertIn("K1ChordType::NONE", VARIANT)
         # Off-flag fallback keeps the original centroid colour path.
         self.assertIn("const float hue_base = centroid;", VARIANT)
 
@@ -59,26 +59,26 @@ class ChordHueConsumerStaticTest(unittest.TestCase):
     def test_consumer_is_hue_only_no_new_brightness_or_motion_writes(self):
         # The chord block must not introduce brightness/amplitude writes —
         # Strobe Law: harmony maps to colour, never to full-field intensity.
-        block = VARIANT.split("#ifdef SB_CHORD_HUE_V1")[1].split("#else")[0]
+        block = VARIANT.split("#ifdef K1_CHORD_HUE_V1")[1].split("#else")[0]
         for banned in ("MASTER_BRIGHTNESS", "silent_scale", "inject_scale =",
                        "draw_sprite", "leds_16["):
             self.assertNotIn(banned, block)
 
     def test_state_fields_are_flag_gated_in_channel_state(self):
-        self.assertIn("#ifdef SB_CHORD_HUE_V1", STATE)
+        self.assertIn("#ifdef K1_CHORD_HUE_V1", STATE)
         self.assertIn("dforge_chord_held_root", STATE)
         self.assertIn("dforge_chord_hue", STATE)
 
     def test_ap_stream_carries_no_chord_telemetry_in_production(self):
-        # STROBE INCIDENT 2026-06-11: a ~428B SBAudioSnapshot stack copy in the
+        # STROBE INCIDENT 2026-06-11: a ~428B K1AudioSnapshot stack copy in the
         # 1 Hz [AP] block (loopTask, 8KB stack) is the leading suspect for a
         # crash/reboot strobe across ALL modes. The audio path is a frozen
         # surface for effect lanes — chord telemetry belongs in harness envs.
         self.assertNotIn("ch_root", I2S)
-        self.assertNotIn("sb_audio_snapshot_read", I2S)
+        self.assertNotIn("k1_audio_snapshot_read", I2S)
 
     def test_flag_is_on_in_production_with_revert_lever_documented(self):
-        self.assertIn("-DSB_CHORD_HUE_V1", PIO)
+        self.assertIn("-DK1_CHORD_HUE_V1", PIO)
         self.assertIn("REVERT = delete the -D line below", PIO)
 
 

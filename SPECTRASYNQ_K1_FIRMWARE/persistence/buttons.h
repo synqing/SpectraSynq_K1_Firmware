@@ -1,5 +1,5 @@
 /*----------------------------------------
-  Sensory Bridge BUTTON FUNCTIONS
+  K1 BUTTON FUNCTIONS
   ----------------------------------------*/
 
 // Every frame, we check both buttons for two types of input:

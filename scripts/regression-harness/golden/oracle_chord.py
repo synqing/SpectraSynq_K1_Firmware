@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Golden-master oracle for the SB_CHORD_V2 chord detector.
+"""Golden-master oracle for the K1_CHORD_V2 chord detector.
 
-Compiles the REAL firmware sb_chord_detect.cpp on the host (clang++) against a
+Compiles the REAL firmware k1_chord_detect.cpp on the host (clang++) against a
 minimal Arduino stub, drives it with a fixed deterministic chroma trace, and
 captures a JSON-lines golden record that any refactor must reproduce byte-for-byte.
 
@@ -42,23 +42,23 @@ FW   = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 NAME = "chord"
 
 MODULE_CPPS = [
-    "audio/sb_chord_detect.cpp",
+    "audio/k1_chord_detect.cpp",
 ]
 
 # Production-matching defines (from platformio.ini [env:k1_hardware]).
-# SB_CHORD_V2 is mandatory (the TU is a no-op without it).
-# SB_ONSET_V2 is included so SBAudioSnapshot carries the spectrum[] field
+# K1_CHORD_V2 is mandatory (the TU is a no-op without it).
+# K1_ONSET_V2 is included so K1AudioSnapshot carries the spectrum[] field
 # that sits between the base struct and the chord fields — this keeps the
 # struct layout matching production exactly (additive fields are ordered:
 # onset_spectrum → chroma_pc → chord).
 DEFINES = [
-    "SB_CHORD_V2",
-    "SB_ONSET_V2",
+    "K1_CHORD_V2",
+    "K1_ONSET_V2",
 ]
 
 # ---------------------------------------------------------------------------
 # Minimal Arduino stub
-# sb_chord_detect.cpp only touches portMUX (none), stdint, and math.h.
+# k1_chord_detect.cpp only touches portMUX (none), stdint, and math.h.
 # It does NOT pull globals.h, fixed-point, or FastLED — by design.
 # The stub matches the one used by chord_saliency_replay.py exactly.
 # ---------------------------------------------------------------------------
@@ -86,12 +86,12 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 # ints are exact (no fp variance).
 # ---------------------------------------------------------------------------
 DRIVER = r"""
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 #include <cstdio>
 #include <cstring>
 
-// Forward declaration — defined in sb_chord_detect.cpp (compiled alongside).
-void sb_detect_chord(const float* chroma, SBChordState& cs);
+// Forward declaration — defined in k1_chord_detect.cpp (compiled alongside).
+void k1_detect_chord(const float* chroma, K1ChordState& cs);
 
 int main() {
     char tag;
@@ -107,10 +107,10 @@ int main() {
         for (int i = 0; i < 12; ++i) {
             if (std::scanf("%f", &c[i]) != 1) c[i] = 0.0f;
         }
-        SBChordState cs{};
-        sb_detect_chord(c, cs);
+        K1ChordState cs{};
+        k1_detect_chord(c, cs);
         // Emit one JSON record per step.
-        // type cast: SBChordType is uint8_t enum — cast to int for printf.
+        // type cast: K1ChordType is uint8_t enum — cast to int for printf.
         std::printf(
             "{\"step\":%d,\"root\":%d,\"type\":%d,"
             "\"confidence\":\"%.5f\",\"rootStrength\":\"%.5f\","
@@ -308,7 +308,7 @@ def capture(firmware_root=None) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Mutations — 4 real constants from sb_chord_detect.cpp, SUPPRESSING direction
+# Mutations — 4 real constants from k1_chord_detect.cpp, SUPPRESSING direction
 #
 # Each must cause capture() on the mutated firmware to diverge from baseline.
 # All are in the suppressing direction (weaker detection / collapsed output)
@@ -318,7 +318,7 @@ def capture(firmware_root=None) -> str:
 MUTATIONS = [
     # 1. Confidence threshold: raise from 0.3 → 0.6
     #    Cases near the gate (entries 3,4,8) will collapse to NONE.
-    #    Line in sb_chord_detect.cpp: "if (cs.confidence < 0.3f)"
+    #    Line in k1_chord_detect.cpp: "if (cs.confidence < 0.3f)"
     (
         r"if \(cs\.confidence < 0\.3f\)",
         r"if (cs.confidence < 0.6f)",
@@ -327,7 +327,7 @@ MUTATIONS = [
 
     # 2. Triad-energy ratio denominator: raise from 0.4 → 0.8
     #    Halves the confidence for every case → more cases collapse to NONE.
-    #    Line: "cs.confidence = sb_chord_clamp01((triadEnergy / totalEnergy) / 0.4f);"
+    #    Line: "cs.confidence = k1_chord_clamp01((triadEnergy / totalEnergy) / 0.4f);"
     (
         r"/ 0\.4f\)",
         r"/ 0.8f)",
@@ -363,7 +363,7 @@ MUTATIONS = [
 def verify_mutations(baseline: str, firmware_root=None) -> list[dict]:
     """
     For each mutation in MUTATIONS, copy the firmware tree to a temp dir,
-    apply the regex substitution to sb_chord_detect.cpp, recompile, run,
+    apply the regex substitution to k1_chord_detect.cpp, recompile, run,
     and count diverged lines vs baseline.  Returns a list of dicts:
       {"desc": str, "diverged_lines": int, "caught": bool}
     """
@@ -377,7 +377,7 @@ def verify_mutations(baseline: str, firmware_root=None) -> list[dict]:
             fw_copy = td_path / "fw"
             shutil.copytree(fw_src, fw_copy, dirs_exist_ok=True)
 
-            target = fw_copy / "audio" / "sb_chord_detect.cpp"
+            target = fw_copy / "audio" / "k1_chord_detect.cpp"
             original = target.read_text(encoding="utf-8")
             mutated = re.sub(pattern, replacement, original)
             if mutated == original:

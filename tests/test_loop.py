@@ -161,7 +161,7 @@ def test_render_replay_keeps_parked_modes_opt_in():
     assert sorted(rr.MODES.keys()) == ["bloom"]
 
     env = os.environ.copy()
-    env["SB_RENDER_REPLAY_ALL_MODES"] = "1"
+    env["K1_RENDER_REPLAY_ALL_MODES"] = "1"
     result = subprocess.run(
         [sys.executable, str(HARNESS / "render_replay.py"), "--help"],
         cwd=pathlib.Path(__file__).resolve().parents[1],

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Data-driven calibration of the SB_TEMPO_CONF_V2 confidence/lock metric.
+"""Data-driven calibration of the K1_TEMPO_CONF_V2 confidence/lock metric.
 
-Builds the V2 path WITH -DSB_TEMPO_CONF_DUMP (so tempo_replay's T-line carries the raw
+Builds the V2 path WITH -DK1_TEMPO_CONF_DUMP (so tempo_replay's T-line carries the raw
 quality components histShareNorm/prominence/periodicity/peakShare/quality), replays the
 HarmonixSet music corpus + synthetic silence/white-noise + a couple of clean metronome
 trains, and dumps the component distributions so LO/HI/W1-3/REL/FLOOR can be chosen to
@@ -39,7 +39,7 @@ ROOT = _HERE.parents[1]
 OUT_DIR = ROOT / "build" / "audio-semantic-metrics"
 
 AP_FRAME_HZ = nfw.SAMPLE_RATE / nfw.HOP          # 133.333 Hz
-NOVELTY_RATE_HZ = AP_FRAME_HZ / 3.0              # 44.444 Hz (SB_NOVELTY_DECIMATION=3)
+NOVELTY_RATE_HZ = AP_FRAME_HZ / 3.0              # 44.444 Hz (K1_NOVELTY_DECIMATION=3)
 TAU_S = 0.150
 ALPHA = 1.0 - math.exp(-(1.0 / NOVELTY_RATE_HZ) / TAU_S)   # ≈0.1393
 WARMUP_MS = 11500.0
@@ -139,7 +139,7 @@ def quality_series(comp, lo, hi, w1, w2, w3, source="comb"):
         prom = comp["prominence"]
     hsn = np.clip((ps - lo) / (hi - lo), 0.0, 1.0)
     q = np.clip(w1 * hsn + w2 * prom + w3 * comp["periodicity"], 0.0, 1.0)
-    # EMA the quality at the firmware alpha (same recurrence as sb_update_confidence_v2)
+    # EMA the quality at the firmware alpha (same recurrence as k1_update_confidence_v2)
     ema = np.empty_like(q)
     acc = 0.0
     for i, v in enumerate(q):
@@ -156,7 +156,7 @@ def run(corpus, gt_dir, limit=None):
 
     tmp = tempfile.TemporaryDirectory()
     ok, binary, comp = trp.build_binary(
-        tmp.name, defines=["SB_TEMPO_CONF_V2", "SB_TEMPO_CONF_DUMP"])
+        tmp.name, defines=["K1_TEMPO_CONF_V2", "K1_TEMPO_CONF_DUMP"])
     if not ok:
         tmp.cleanup()
         raise RuntimeError("compile failed:\n" + comp["stderr"])

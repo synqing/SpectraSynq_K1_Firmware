@@ -298,33 +298,33 @@ static void k1_edge_recompute_matrix(K1EdgeMixerMode mode, uint8_t spreadDegrees
 
 // Textbook OKLab constants (Bjorn Ottosson, 2020), all within SQ15x16 range.
 // M1: linear sRGB -> LMS.
-static const SQ15x16 SB_OK_M1_00 = SQ15x16(0.4122214708f);
-static const SQ15x16 SB_OK_M1_01 = SQ15x16(0.5363325363f);
-static const SQ15x16 SB_OK_M1_02 = SQ15x16(0.0514459929f);
-static const SQ15x16 SB_OK_M1_10 = SQ15x16(0.2119034982f);
-static const SQ15x16 SB_OK_M1_11 = SQ15x16(0.6806995451f);
-static const SQ15x16 SB_OK_M1_12 = SQ15x16(0.1073969566f);
-static const SQ15x16 SB_OK_M1_20 = SQ15x16(0.0883024619f);
-static const SQ15x16 SB_OK_M1_21 = SQ15x16(0.2817188376f);
-static const SQ15x16 SB_OK_M1_22 = SQ15x16(0.6299787005f);
+static const SQ15x16 K1_OK_M1_00 = SQ15x16(0.4122214708f);
+static const SQ15x16 K1_OK_M1_01 = SQ15x16(0.5363325363f);
+static const SQ15x16 K1_OK_M1_02 = SQ15x16(0.0514459929f);
+static const SQ15x16 K1_OK_M1_10 = SQ15x16(0.2119034982f);
+static const SQ15x16 K1_OK_M1_11 = SQ15x16(0.6806995451f);
+static const SQ15x16 K1_OK_M1_12 = SQ15x16(0.1073969566f);
+static const SQ15x16 K1_OK_M1_20 = SQ15x16(0.0883024619f);
+static const SQ15x16 K1_OK_M1_21 = SQ15x16(0.2817188376f);
+static const SQ15x16 K1_OK_M1_22 = SQ15x16(0.6299787005f);
 // M2: LMS' -> OKLab. Only the L (row 0) coefficients survive as render-time
 // constants — they recover perceptual lightness for the gamut-clip grey anchor.
 // The a/b rows of M2, the rotate, and the whole inverse M2 are folded at config
 // time into the fused 3x3 k1_edge_oklab_fmat (see k1_edge_recompute_oklab), so
 // they are NOT needed per-pixel.
-static const SQ15x16 SB_OK_M2_00 = SQ15x16(0.2104542553f);
-static const SQ15x16 SB_OK_M2_01 = SQ15x16(0.7936177850f);
-static const SQ15x16 SB_OK_M2_02 = SQ15x16(-0.0040720468f);
+static const SQ15x16 K1_OK_M2_00 = SQ15x16(0.2104542553f);
+static const SQ15x16 K1_OK_M2_01 = SQ15x16(0.7936177850f);
+static const SQ15x16 K1_OK_M2_02 = SQ15x16(-0.0040720468f);
 // inverse M1: LMS -> linear sRGB.
-static const SQ15x16 SB_OK_IM1_00 = SQ15x16(4.0767416621f);
-static const SQ15x16 SB_OK_IM1_01 = SQ15x16(-3.3077115913f);
-static const SQ15x16 SB_OK_IM1_02 = SQ15x16(0.2309699292f);
-static const SQ15x16 SB_OK_IM1_10 = SQ15x16(-1.2684380046f);
-static const SQ15x16 SB_OK_IM1_11 = SQ15x16(2.6097574011f);
-static const SQ15x16 SB_OK_IM1_12 = SQ15x16(-0.3413193965f);
-static const SQ15x16 SB_OK_IM1_20 = SQ15x16(-0.0041960863f);
-static const SQ15x16 SB_OK_IM1_21 = SQ15x16(-0.7034186147f);
-static const SQ15x16 SB_OK_IM1_22 = SQ15x16(1.7076147010f);
+static const SQ15x16 K1_OK_IM1_00 = SQ15x16(4.0767416621f);
+static const SQ15x16 K1_OK_IM1_01 = SQ15x16(-3.3077115913f);
+static const SQ15x16 K1_OK_IM1_02 = SQ15x16(0.2309699292f);
+static const SQ15x16 K1_OK_IM1_10 = SQ15x16(-1.2684380046f);
+static const SQ15x16 K1_OK_IM1_11 = SQ15x16(2.6097574011f);
+static const SQ15x16 K1_OK_IM1_12 = SQ15x16(-0.3413193965f);
+static const SQ15x16 K1_OK_IM1_20 = SQ15x16(-0.0041960863f);
+static const SQ15x16 K1_OK_IM1_21 = SQ15x16(-0.7034186147f);
+static const SQ15x16 K1_OK_IM1_22 = SQ15x16(1.7076147010f);
 
 // Index of the most-significant set bit of v (v > 0), 0..31. __builtin_clz is
 // available on both the host GCC and the device xtensa-gcc toolchain.
@@ -534,9 +534,9 @@ static K1_EDGE_HOT void k1_edge_lmsprime_to_linear(SQ15x16 lq, SQ15x16 mq,
   SQ15x16 lL = k1_edge_cube(lq);
   SQ15x16 mL = k1_edge_cube(mq);
   SQ15x16 sL = k1_edge_cube(sq);
-  *rlin = SB_OK_IM1_00 * lL + SB_OK_IM1_01 * mL + SB_OK_IM1_02 * sL;
-  *glin = SB_OK_IM1_10 * lL + SB_OK_IM1_11 * mL + SB_OK_IM1_12 * sL;
-  *blin = SB_OK_IM1_20 * lL + SB_OK_IM1_21 * mL + SB_OK_IM1_22 * sL;
+  *rlin = K1_OK_IM1_00 * lL + K1_OK_IM1_01 * mL + K1_OK_IM1_02 * sL;
+  *glin = K1_OK_IM1_10 * lL + K1_OK_IM1_11 * mL + K1_OK_IM1_12 * sL;
+  *blin = K1_OK_IM1_20 * lL + K1_OK_IM1_21 * mL + K1_OK_IM1_22 * sL;
 }
 
 // Constant-L, constant-hue gamut clip (Task 2). When a full-chroma rotated pixel
@@ -591,9 +591,9 @@ static CRGB16 k1_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   SQ15x16 lb = k1_edge_gamma_decode(color.b);
 
   // linear -> LMS (M1).
-  SQ15x16 lC = SB_OK_M1_00 * lr + SB_OK_M1_01 * lg + SB_OK_M1_02 * lb;
-  SQ15x16 mC = SB_OK_M1_10 * lr + SB_OK_M1_11 * lg + SB_OK_M1_12 * lb;
-  SQ15x16 sC = SB_OK_M1_20 * lr + SB_OK_M1_21 * lg + SB_OK_M1_22 * lb;
+  SQ15x16 lC = K1_OK_M1_00 * lr + K1_OK_M1_01 * lg + K1_OK_M1_02 * lb;
+  SQ15x16 mC = K1_OK_M1_10 * lr + K1_OK_M1_11 * lg + K1_OK_M1_12 * lb;
+  SQ15x16 sC = K1_OK_M1_20 * lr + K1_OK_M1_21 * lg + K1_OK_M1_22 * lb;
 
   // cube-root -> LMS'.
   SQ15x16 lp = k1_edge_cbrt(lC);
@@ -621,7 +621,7 @@ static CRGB16 k1_edge_transform_oklab(CRGB16 color, const SQ15x16* fmat) {
   const SQ15x16 kOne = SQ15x16(1.0f);
   if (rlin < kZero || rlin > kOne || glin < kZero || glin > kOne ||
       blin < kZero || blin > kOne) {
-    const SQ15x16 L = SB_OK_M2_00 * lp + SB_OK_M2_01 * mp + SB_OK_M2_02 * sp;
+    const SQ15x16 L = K1_OK_M2_00 * lp + K1_OK_M2_01 * mp + K1_OK_M2_02 * sp;
     const SQ15x16 t = k1_edge_gamut_scale(L, rlin, glin, blin);
     const SQ15x16 lqt = L + t * (lq - L);
     const SQ15x16 mqt = L + t * (mq - L);
@@ -925,7 +925,7 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
 
   // Snapshot the config-time SECONDARY matrix + fused map atomically. Keyed on the
   // stored mode + spread; the only per-frame delta is strength (see
-  // sb_visual_hooks_apply_edge_config), which does not affect the coefficients.
+  // k1_visual_hooks_apply_edge_config), which does not affect the coefficients.
   SQ15x16 matrix[9];
   SQ15x16 oklabF[9];
   portENTER_CRITICAL(&k1_edge_config_mux);

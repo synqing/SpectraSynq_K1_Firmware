@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Compile and run host-side replay tests for sb_tempo.cpp.
+"""Compile and run host-side replay tests for k1_tempo.cpp.
 
 Feeds synthetic novelty impulse trains (clean metronome-equivalent) through the REAL
-sb_tempo Goertzel-over-novelty detector on host, and asserts it (a) detects the right
+k1_tempo Goertzel-over-novelty detector on host, and asserts it (a) detects the right
 BPM, (b) reports confidence that clears the lock threshold, (c) locks, (d) releases on
 silence, and (e) does NOT false-lock on flat/no-beat input. Prints, per case, both the
 old peak/sum confidence and the new peak^2/sum_sq concentration confidence so the metric
@@ -33,20 +33,20 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 
 
 CPP_REPLAY = r"""
-#include "sb_tempo.h"
+#include "k1_tempo.h"
 
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 
-// host-test introspection hooks compiled into sb_tempo.cpp under SB_TEMPO_HOST_TEST
-void sb_tempo_debug_dump(float*, int, int*, float*, float*);
-void sb_tempo_debug_dump_raw(float*, int);
-#if defined(SB_TEMPO_CONF_V2) && defined(SB_TEMPO_CONF_DUMP)
+// host-test introspection hooks compiled into k1_tempo.cpp under K1_TEMPO_HOST_TEST
+void k1_tempo_debug_dump(float*, int, int*, float*, float*);
+void k1_tempo_debug_dump_raw(float*, int);
+#if defined(K1_TEMPO_CONF_V2) && defined(K1_TEMPO_CONF_DUMP)
 // V2 calibration introspection — last-computed raw quality components (compiled only when BOTH
-// SB_TEMPO_CONF_V2 and SB_TEMPO_CONF_DUMP are set). Lets the corpus sweep dump component
+// K1_TEMPO_CONF_V2 and K1_TEMPO_CONF_DUMP are set). Lets the corpus sweep dump component
 // distributions to pick LO/HI/weights/REL/FLOOR.
-void sb_tempo_debug_dump_v2(float*, float*, float*, float*, float*, float*, int*, int*, float*, float*, float*);
+void k1_tempo_debug_dump_v2(float*, float*, float*, float*, float*, float*, int*, int*, float*, float*, float*);
 #endif
 
 static int failures = 0;
@@ -54,20 +54,20 @@ static void check(bool condition, const char* message) {
   if (!condition) { std::printf("FAIL: %s\n", message); failures++; }
 }
 
-// SensoryBridge AP frame rate = SAMPLE_RATE / SAMPLES_PER_CHUNK = 12800/96 = 133.333 Hz.
+// K1 AP frame rate = SAMPLE_RATE / SAMPLES_PER_CHUNK = 12800/96 = 133.333 Hz.
 static const float FPS = 12800.0f / 96.0f;
 
-static SBAudioSnapshot mk(uint32_t ms, float novelty, bool silence) {
-  SBAudioSnapshot a = {};
+static K1AudioSnapshot mk(uint32_t ms, float novelty, bool silence) {
+  K1AudioSnapshot a = {};
   a.frame_ms = ms;
   a.novelty = novelty;
   a.silence = silence;
   return a;
 }
 
-static void dump(const char* label, const SBTempoEvent& e) {
+static void dump(const char* label, const K1TempoEvent& e) {
   float sm[96]; int win = 0; float ps_live = 0.0f, cf_live = 0.0f;
-  sb_tempo_debug_dump(sm, 96, &win, &ps_live, &cf_live);
+  k1_tempo_debug_dump(sm, 96, &win, &ps_live, &cf_live);
   float mx = 0.0f, ssq = 1e-12f, lin = 0.0f; int mi = 0;
   for (int i = 0; i < 96; i++) { float v = sm[i]; lin += v; ssq += v * v; if (v > mx) { mx = v; mi = i; } }
   // outside-the-main-lobe stats (|i - winner| > 6): a real tempo is an ISOLATED peak, so
@@ -83,8 +83,8 @@ static void dump(const char* label, const SBTempoEvent& e) {
               mi, 60.0f + (float)mi, mx, out_max, lin);
 }
 
-static SBTempoEvent run_train(float bpm, float secs, float silence_secs) {
-  sb_tempo_reset();
+static K1TempoEvent run_train(float bpm, float secs, float silence_secs) {
+  k1_tempo_reset();
   const float beat_ms = 60000.0f / bpm;
   float next_beat = 0.0f;
   uint32_t n = (uint32_t)(secs * FPS);
@@ -92,28 +92,28 @@ static SBTempoEvent run_train(float bpm, float secs, float silence_secs) {
     uint32_t ms = (uint32_t)((float)f * 1000.0f / FPS + 0.5f);
     float nov = 0.0f;
     if ((float)ms >= next_beat) { nov = 1.0f; next_beat += beat_ms; }
-    sb_tempo_update(mk(ms, nov, false));
+    k1_tempo_update(mk(ms, nov, false));
   }
-  SBTempoEvent e = sb_tempo_read();
+  K1TempoEvent e = k1_tempo_read();
   if (silence_secs > 0.0f) {
     uint32_t s = (uint32_t)(silence_secs * FPS);
     for (uint32_t f = 0; f < s; f++) {
       uint32_t ms = (uint32_t)((float)(n + f) * 1000.0f / FPS + 0.5f);
-      sb_tempo_update(mk(ms, 0.0f, true));
+      k1_tempo_update(mk(ms, 0.0f, true));
     }
-    e = sb_tempo_read();
+    e = k1_tempo_read();
   }
   return e;
 }
 
-static SBTempoEvent run_flat(float level, float secs) {
-  sb_tempo_reset();
+static K1TempoEvent run_flat(float level, float secs) {
+  k1_tempo_reset();
   uint32_t n = (uint32_t)(secs * FPS);
   for (uint32_t f = 0; f < n; f++) {
     uint32_t ms = (uint32_t)((float)f * 1000.0f / FPS + 0.5f);
-    sb_tempo_update(mk(ms, level, false));
+    k1_tempo_update(mk(ms, level, false));
   }
-  return sb_tempo_read();
+  return k1_tempo_read();
 }
 
 // deterministic PRNG (fixed seed) so the noisy case is reproducible
@@ -123,8 +123,8 @@ static float frand() { g_rng = g_rng * 1664525u + 1013904223u; return (float)((g
 // Real-music-like: ~88% of beats land with jittered amplitude (0.55..1.0) on a per-frame
 // broadband noise floor — stresses the detector far harder than a clean metronome. This is
 // the "will it survive real music, not just a click" test Captain's instinct points at.
-static SBTempoEvent run_noisy(float bpm, float secs) {
-  sb_tempo_reset();
+static K1TempoEvent run_noisy(float bpm, float secs) {
+  k1_tempo_reset();
   const float beat_ms = 60000.0f / bpm;
   float next_beat = 0.0f;
   uint32_t n = (uint32_t)(secs * FPS);
@@ -135,21 +135,21 @@ static SBTempoEvent run_noisy(float bpm, float secs) {
       next_beat += beat_ms;
       if (frand() > 0.12f) nov = 0.55f + 0.45f * frand(); // most beats hit, amplitude jitter
     }
-    sb_tempo_update(mk(ms, nov, false));
+    k1_tempo_update(mk(ms, nov, false));
   }
-  return sb_tempo_read();
+  return k1_tempo_read();
 }
 
 // Tempo change mid-stream: bpm1 for each_secs, then bpm2 — must re-lock to bpm2.
-static SBTempoEvent run_change(float bpm1, float bpm2, float each_secs) {
-  sb_tempo_reset();
+static K1TempoEvent run_change(float bpm1, float bpm2, float each_secs) {
+  k1_tempo_reset();
   uint32_t n = (uint32_t)(each_secs * FPS);
   float beat = 60000.0f / bpm1, next = 0.0f;
   for (uint32_t f = 0; f < n; f++) {
     uint32_t ms = (uint32_t)((float)f * 1000.0f / FPS + 0.5f);
     float nov = 0.0f;
     if ((float)ms >= next) { nov = 1.0f; next += beat; }
-    sb_tempo_update(mk(ms, nov, false));
+    k1_tempo_update(mk(ms, nov, false));
   }
   beat = 60000.0f / bpm2;
   next = (float)((uint32_t)((float)n * 1000.0f / FPS + 0.5f));
@@ -157,9 +157,9 @@ static SBTempoEvent run_change(float bpm1, float bpm2, float each_secs) {
     uint32_t ms = (uint32_t)((float)(n + f) * 1000.0f / FPS + 0.5f);
     float nov = 0.0f;
     if ((float)ms >= next) { nov = 1.0f; next += beat; }
-    sb_tempo_update(mk(ms, nov, false));
+    k1_tempo_update(mk(ms, nov, false));
   }
-  return sb_tempo_read();
+  return k1_tempo_read();
 }
 
 // ---- FLYWHEEL V2 synthetic tick-collection harness (only meaningful under the flag) ----
@@ -171,7 +171,7 @@ struct FwResult { int n_ticks; double density_hz; int matched_70ms; int n_true; 
 
 static FwResult fw_train(float bpm, float secs, float gap_each, float gap_len) {
   // gap_each>0 -> drop the impulse for gap_len s every gap_each s (missing-onset gaps test).
-  sb_tempo_reset();
+  k1_tempo_reset();
   const float beat_ms = 60000.0f / bpm;
   float next_beat = 0.0f;
   uint32_t n = (uint32_t)(secs * FPS);
@@ -189,8 +189,8 @@ static FwResult fw_train(float bpm, float secs, float gap_each, float gap_len) {
       if ((float)ms >= warm_ms && ntr < 8000) truebeats[ntr++] = ms;
       next_beat += beat_ms;
     }
-    sb_tempo_update(mk(ms, nov, false));
-    SBTempoEvent e = sb_tempo_read();
+    k1_tempo_update(mk(ms, nov, false));
+    K1TempoEvent e = k1_tempo_read();
     if (e.locked) ever_locked = true;
     int t = e.beat_tick ? 1 : 0;
     if (t && !prev_tick && (float)ms >= warm_ms && nt < 8000) ticks[nt++] = ms;  // dedup republish
@@ -212,7 +212,7 @@ static FwResult fw_train(float bpm, float secs, float gap_each, float gap_len) {
 
 static FwResult fw_drift(float bpm0, float bpm1, float secs) {
   // Linear tempo ramp bpm0->bpm1 — the PLL must track the drifting beat grid.
-  sb_tempo_reset();
+  k1_tempo_reset();
   uint32_t n = (uint32_t)(secs * FPS);
   const float warm_ms = 13000.0f;
   float next_beat = 0.0f;
@@ -225,8 +225,8 @@ static FwResult fw_drift(float bpm0, float bpm1, float secs) {
     float beat_ms = 60000.0f / bpm;
     float nov = 0.0f;
     if ((float)ms >= next_beat) { nov = 1.0f; if ((float)ms >= warm_ms && ntr < 8000) truebeats[ntr++] = ms; next_beat += beat_ms; }
-    sb_tempo_update(mk(ms, nov, false));
-    SBTempoEvent e = sb_tempo_read();
+    k1_tempo_update(mk(ms, nov, false));
+    K1TempoEvent e = k1_tempo_read();
     if (e.locked) ever_locked = true;
     int t = e.beat_tick ? 1 : 0;
     if (t && !prev_tick && (float)ms >= warm_ms && nt < 8000) ticks[nt++] = ms;
@@ -246,32 +246,32 @@ static FwResult fw_drift(float bpm0, float bpm1, float secs) {
 }
 
 static int fw_silence_ticks(float secs) {   // pure silence: must emit ZERO ticks
-  sb_tempo_reset();
+  k1_tempo_reset();
   uint32_t n = (uint32_t)(secs * FPS); int t = 0; int prev = 0;
   for (uint32_t f = 0; f < n; f++) {
     uint32_t ms = (uint32_t)((float)f * 1000.0f / FPS + 0.5f);
-    sb_tempo_update(mk(ms, 0.0f, true));
-    SBTempoEvent e = sb_tempo_read();
+    k1_tempo_update(mk(ms, 0.0f, true));
+    K1TempoEvent e = k1_tempo_read();
     int tk = e.beat_tick ? 1 : 0; if (tk && !prev) t++; prev = tk;
   }
   return t;
 }
 
 static int fw_noise_ticks(float secs) {   // white noise: must not beat-storm
-  sb_tempo_reset();
+  k1_tempo_reset();
   g_rng = 999u;
   uint32_t n = (uint32_t)(secs * FPS); int t = 0; int prev = 0;
   for (uint32_t f = 0; f < n; f++) {
     uint32_t ms = (uint32_t)((float)f * 1000.0f / FPS + 0.5f);
-    sb_tempo_update(mk(ms, frand(), false));
-    SBTempoEvent e = sb_tempo_read();
+    k1_tempo_update(mk(ms, frand(), false));
+    K1TempoEvent e = k1_tempo_read();
     int tk = e.beat_tick ? 1 : 0; if (tk && !prev) t++; prev = tk;
   }
   return t;
 }
 
 // File-replay mode: read whitespace lines "ms novelty silence" from stdin, drive the
-// UNMODIFIED sb_tempo through them, and print one trajectory line per update:
+// UNMODIFIED k1_tempo through them, and print one trajectory line per update:
 //   T <ms> <bpm> <conf> <locked> <phase01> <beat_tick>
 // followed by a final "FILE_DONE frames=N". Lets a real-music novelty curve
 // (novelty_from_wav.py) be scored for tempo/octave accuracy on host — the digital,
@@ -280,20 +280,20 @@ static int fw_noise_ticks(float secs) {   // white noise: must not beat-storm
 // p[1..4] still work; beat_semantic_metrics.py consumes the beat_tick column to
 // score beat-F / continuity against the corpus's GT beat-time annotations.
 static int run_stdin_replay() {
-  sb_tempo_reset();
+  k1_tempo_reset();
   char line[160];
   unsigned long n = 0;
   while (std::fgets(line, sizeof(line), stdin)) {
     unsigned int ms = 0; float nov = 0.0f; int sil = 0;
     if (std::sscanf(line, "%u %f %d", &ms, &nov, &sil) < 2) continue;
-    sb_tempo_update(mk(ms, nov, sil != 0));
-    SBTempoEvent e = sb_tempo_read();
-#if defined(SB_TEMPO_CONF_V2) && defined(SB_TEMPO_CONF_DUMP)
+    k1_tempo_update(mk(ms, nov, sil != 0));
+    K1TempoEvent e = k1_tempo_read();
+#if defined(K1_TEMPO_CONF_V2) && defined(K1_TEMPO_CONF_DUMP)
     // Append the raw V2 quality components as TRAILING columns (p[7..]) — backward-compatible:
     //   T <ms> <bpm> <conf> <locked> <phase01> <beat_tick> <histShareNorm> <prominence>
     //     <periodicity> <peakShare> <quality> <point_peakShare> <point_prominence>
     float hs=0,pr=0,pe=0,psh=0,ql=0,ce=0,pps=0,ppr=0,bgp=0; int lk2=0,bs=0;
-    sb_tempo_debug_dump_v2(&hs,&pr,&pe,&psh,&ql,&ce,&lk2,&bs,&pps,&ppr,&bgp);
+    k1_tempo_debug_dump_v2(&hs,&pr,&pe,&psh,&ql,&ce,&lk2,&bs,&pps,&ppr,&bgp);
     std::printf("T %u %.1f %.4f %d %.4f %d %.4f %.4f %.4f %.4f %.4f %.4f %.4f %.4f\n", ms, e.bpm, e.confidence,
                 e.locked ? 1 : 0, e.phase01, e.beat_tick ? 1 : 0, hs, pr, pe, psh, ql, pps, ppr, bgp);
 #else
@@ -302,7 +302,7 @@ static int run_stdin_replay() {
 #endif
     n++;
   }
-  float raw[96]; sb_tempo_debug_dump_raw(raw, 96);   // final raw Goertzel spectrum (diagnostic)
+  float raw[96]; k1_tempo_debug_dump_raw(raw, 96);   // final raw Goertzel spectrum (diagnostic)
   std::printf("RAWSPEC");
   for (int i = 0; i < 96; i++) std::printf(" %.4f", raw[i]);
   std::printf("\n");
@@ -311,48 +311,48 @@ static int run_stdin_replay() {
 }
 
 int main(int argc, char** argv) {
-  sb_tempo_init();
+  k1_tempo_init();
   if (argc >= 2 && std::strcmp(argv[1], "--replay-stdin") == 0) {
     return run_stdin_replay();
   }
 
-  SBTempoEvent e120 = run_train(120.0f, 16.0f, 0.0f);
+  K1TempoEvent e120 = run_train(120.0f, 16.0f, 0.0f);
   dump("120bpm", e120);
   check(std::fabs(e120.bpm - 120.0f) <= 1.5f, "120 BPM clean train detected as ~120");
   check(e120.confidence > 0.80f, "120 BPM clean train reads HIGH confidence (near-maximal — the metronome bar)");
   check(e120.locked, "120 BPM clean train LOCKS (the metronome case)");
 
-  SBTempoEvent e90 = run_train(90.0f, 16.0f, 0.0f);
+  K1TempoEvent e90 = run_train(90.0f, 16.0f, 0.0f);
   dump("90bpm", e90);
   check(std::fabs(e90.bpm - 90.0f) <= 1.5f, "90 BPM clean train detected as ~90 (not hardcoded to 120)");
   check(e90.locked, "90 BPM clean train LOCKS");
 
-  SBTempoEvent e144 = run_train(144.0f, 16.0f, 0.0f);
+  K1TempoEvent e144 = run_train(144.0f, 16.0f, 0.0f);
   dump("144bpm", e144);
   check(std::fabs(e144.bpm - 144.0f) <= 2.0f, "144 BPM clean train detected as ~144 (upper range)");
   check(e144.locked, "144 BPM clean train LOCKS");
 
-  SBTempoEvent eSil = run_train(120.0f, 16.0f, 3.0f);
+  K1TempoEvent eSil = run_train(120.0f, 16.0f, 3.0f);
   dump("120+silence", eSil);
   check(!eSil.locked, "silence releases the lock");
 
-  SBTempoEvent eFlat = run_flat(0.05f, 16.0f);
+  K1TempoEvent eFlat = run_flat(0.05f, 16.0f);
   dump("flat", eFlat);
   check(!eFlat.locked, "flat / no-beat input does NOT false-lock");
 
-  SBTempoEvent eNoisy = run_noisy(120.0f, 18.0f);
+  K1TempoEvent eNoisy = run_noisy(120.0f, 18.0f);
   dump("noisy120", eNoisy);
   check(std::fabs(eNoisy.bpm - 120.0f) <= 2.0f, "real-music-like noisy 120 (88% hit, amp jitter, noise floor) detects ~120");
   check(eNoisy.locked, "real-music-like noisy 120 LOCKS (does it survive non-clean input)");
 
-  SBTempoEvent eChg = run_change(120.0f, 90.0f, 12.0f);
+  K1TempoEvent eChg = run_change(120.0f, 90.0f, 12.0f);
   dump("120->90", eChg);
   check(std::fabs(eChg.bpm - 90.0f) <= 2.0f, "tempo change 120->90 re-locks to 90");
   check(eChg.locked, "tempo change re-locks");
 
   int cases = 7;
-#ifdef SB_TEMPO_FLYWHEEL_V2
-  // ===== FLYWHEEL V2 beat-emission tests (only compiled with -DSB_TEMPO_FLYWHEEL_V2) =====
+#ifdef K1_TEMPO_FLYWHEEL_V2
+  // ===== FLYWHEEL V2 beat-emission tests (only compiled with -DK1_TEMPO_FLYWHEEL_V2) =====
   // (1) Steady beat: ONE tick per tactus period (density ~= bpm/60), and near-perfect phase
   //     lock on a clean train (the 3x stale-republish over-emission must be GONE).
   FwResult fs120 = fw_train(120.0f, 22.0f, 0.0f, 0.0f);
@@ -416,16 +416,16 @@ int main(int argc, char** argv) {
 
 def build_binary(workdir, compiler="clang++", defines=None, extra_flags=None, tempo_source=None):
     """Write the Arduino stub + harness main into workdir and compile against the REAL
-    sb_tempo.cpp. Returns (ok, binary_path, result_dict). The caller owns workdir's
+    k1_tempo.cpp. Returns (ok, binary_path, result_dict). The caller owns workdir's
     lifetime, so the binary can be reused across many --replay-stdin runs (compile once,
     replay N files) — used by tempo_accuracy.py for the corpus sweep.
 
     `defines`: optional iterable of preprocessor defines (each "NAME" or "NAME=VALUE"),
     compiled in as -D flags. This is how a CANDIDATE build is produced — e.g.
-    defines=["SB_TEMPO_CONF_V2"] builds the V2 confidence/lock path; with no defines the
+    defines=["K1_TEMPO_CONF_V2"] builds the V2 confidence/lock path; with no defines the
     incumbent (production) path is compiled byte-for-byte unchanged. `extra_flags`: optional
     iterable of raw extra compiler flags. `tempo_source` is a harness-only escape hatch for
-    compiling a temporary copy of sb_tempo.cpp; production callers leave it unset."""
+    compiling a temporary copy of k1_tempo.cpp; production callers leave it unset."""
     workdir = Path(workdir)
     stub_dir = workdir / "stub"
     stub_dir.mkdir(parents=True, exist_ok=True)
@@ -439,7 +439,7 @@ def build_binary(workdir, compiler="clang++", defines=None, extra_flags=None, te
         "-std=c++17",
         "-Wall",
         "-Wextra",
-        "-DSB_TEMPO_HOST_TEST",
+        "-DK1_TEMPO_HOST_TEST",
     ]
     for d in (defines or []):
         compile_cmd.append("-D" + str(d))
@@ -450,10 +450,10 @@ def build_binary(workdir, compiler="clang++", defines=None, extra_flags=None, te
         "-I",
         str(FIRMWARE),
         "-I",
-        str(FIRMWARE / "audio"),  # Phase 1 restructure: sb_tempo.{cpp,h} moved to audio/
+        str(FIRMWARE / "audio"),  # Phase 1 restructure: k1_tempo.{cpp,h} moved to audio/
         "-I",
         str(FIRMWARE / "system"),
-        str(tempo_source or (FIRMWARE / "audio" / "sb_tempo.cpp")),
+        str(tempo_source or (FIRMWARE / "audio" / "k1_tempo.cpp")),
         str(main_cpp),
         "-o",
         str(binary),
@@ -517,14 +517,14 @@ def main(argv=None):
     parser.add_argument("--keep-dir")
     parser.add_argument("--json", action="store_true", help="Emit JSON instead of replay stdout")
     parser.add_argument("--define", action="append", default=[],
-                        help="extra -D preprocessor define (repeatable); e.g. --define SB_TEMPO_CONF_V2")
+                        help="extra -D preprocessor define (repeatable); e.g. --define K1_TEMPO_CONF_V2")
     parser.add_argument("--candidate-confv2", action="store_true",
-                        help="shorthand for --define SB_TEMPO_CONF_V2 (build the V2 confidence/lock path)")
+                        help="shorthand for --define K1_TEMPO_CONF_V2 (build the V2 confidence/lock path)")
     args = parser.parse_args(argv)
 
     defines = list(args.define)
-    if args.candidate_confv2 and "SB_TEMPO_CONF_V2" not in defines:
-        defines.append("SB_TEMPO_CONF_V2")
+    if args.candidate_confv2 and "K1_TEMPO_CONF_V2" not in defines:
+        defines.append("K1_TEMPO_CONF_V2")
     result = run_replay(compiler=args.compiler, keep_dir=args.keep_dir, defines=defines)
     if args.json:
         print(json.dumps(result, indent=2, sort_keys=True))

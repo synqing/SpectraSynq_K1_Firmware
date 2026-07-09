@@ -1,4 +1,4 @@
-"""Static gates for SB_VIVID_PRECOMP_V1.
+"""Static gates for K1_VIVID_PRECOMP_V1.
 
 The vivid pre-comp slice is an output-stage A/B control. It must stay
 render-only, default-on for the accepted K1 posture, split chroma from black-depth, and reversible without
@@ -51,7 +51,7 @@ def _function_body(source: str, name: str) -> str:
 
 class VividPrecompStaticTest(unittest.TestCase):
     def test_production_flag_and_default_on_runtime_state_exist(self):
-        self.assertIn("-DSB_VIVID_PRECOMP_V1", PIO)
+        self.assertIn("-DK1_VIVID_PRECOMP_V1", PIO)
         self.assertRegex(GLOBALS, r"inline\s+bool\s+VP_VIVID_PRECOMP\s*=\s*true;")
         self.assertRegex(GLOBALS, r"inline\s+float\s+VP_VIVID_CHROMA_LEVEL\s*=\s*1\.0f;")
         self.assertRegex(GLOBALS, r"inline\s+float\s+VP_VIVID_BLACK_LEVEL\s*=\s*VIVID_BLACK_LEVEL_DEFAULT;")
@@ -66,14 +66,14 @@ class VividPrecompStaticTest(unittest.TestCase):
         self.assertRegex(CONSTANTS, r"#define\s+ENABLE_OUTPUT_GAMMA\s+0\b")
         gamma_body = _function_body(CONSTANTS, "apply_gamma8")
         self.assertNotIn("VIVID", gamma_body)
-        self.assertNotIn("SB_VIVID_PRECOMP_V1", PALETTES)
+        self.assertNotIn("K1_VIVID_PRECOMP_V1", PALETTES)
         self.assertNotIn("VIVID_CHROMA_GAIN_MAX", PALETTES)
         self.assertNotIn("VIVID_LUMA_CUT_MAX", PALETTES)
         self.assertNotIn("VIVID_BLACK_LEVEL_DEFAULT", PALETTES)
         self.assertNotIn("VP_VIVID_PRECOMP", PALETTES)
 
     def test_render_helper_is_flag_gated_split_levelled_and_hot_path_safe(self):
-        self.assertIn("#ifdef SB_VIVID_PRECOMP_V1", LED_UTILS)
+        self.assertIn("#ifdef K1_VIVID_PRECOMP_V1", LED_UTILS)
         body = _function_body(LED_UTILS, "apply_vivid_precomp_count")
         self.assertIn("if (!VP_VIVID_PRECOMP) return;", body)
         self.assertIn("VP_VIVID_CHROMA_LEVEL", body)
@@ -129,7 +129,7 @@ class VividPrecompStaticTest(unittest.TestCase):
         # Handler bodies were extracted to serial_cmd_handlers.cpp (Lane 2, S4.3).
         # The call-site in serial_menu.h now invokes serial_cmd_dispatch_vivid().
         self.assertIn('serial_cmd_dispatch_vivid(command_type, command_data)', SERIAL)
-        self.assertIn('#ifdef SB_VIVID_PRECOMP_V1', SERIAL)
+        self.assertIn('#ifdef K1_VIVID_PRECOMP_V1', SERIAL)
 
         # Verify handler bodies are in serial_cmd_handlers.cpp
         self.assertIn('strcmp(command_type, "vivid") == 0', SERIAL_CMD_HANDLERS)
@@ -163,11 +163,11 @@ class VividPrecompStaticTest(unittest.TestCase):
         self.assertIn("serial_update_vivid_enabled_from_levels();", black_branch)
 
         hotkeys = _function_body(SERIAL, "serial_hotkey_is_immediate")
-        self.assertIn("#if defined(SB_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)", hotkeys)
+        self.assertIn("#if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)", hotkeys)
         self.assertIn("case 'v':", hotkeys)
 
         dispatcher = _function_body(SERIAL, "serial_handle_hotkey")
-        shipping_v = dispatcher.split("#if defined(SB_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)", 1)[1]
+        shipping_v = dispatcher.split("#if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)", 1)[1]
         shipping_v = shipping_v.split("#endif", 1)[0]
         self.assertIn("case 'v':", shipping_v)
         self.assertIn("serial_toggle_vivid_precomp();", shipping_v)

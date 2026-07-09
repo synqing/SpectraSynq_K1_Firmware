@@ -42,8 +42,8 @@
 // `extern` declarations with byte-identical emitted initialiser data.
 extern conf CONFIG;
 extern conf CONFIG_DEFAULTS; // Used for resetting to default values at runtime
-extern const char SB_PASS[];
-extern const char SB_FAIL[];
+extern const char K1_PASS[];
+extern const char K1_FAIL[];
 
 #ifdef K1_BOOTLOOP_GUARD_V1
 // N2b: set true at the top of setup() when the boot-loop guard trips; read by
@@ -737,10 +737,10 @@ inline uint8_t brightness_levels[NUM_FREQS] = { 0 };
 // ------------------------------------------------------------
 // Used for USB updates (system.h) ----------------------------
 
-#if SB_ENABLE_USB_MSC_UPDATE
+#if K1_ENABLE_USB_MSC_UPDATE
 inline FirmwareMSC MSC_Update;
 #endif
-#if defined(SB_K1_HARDWARE)
+#if defined(K1_HARDWARE)
 #define USBSerial Serial
 #else
 inline USBCDC USBSerial;

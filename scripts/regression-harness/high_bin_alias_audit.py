@@ -32,7 +32,7 @@ HOP = 96
 NFFT = 512
 NOTE_OFFSET = 12
 NUM_FREQS = 80
-HIHAT_LO, HIHAT_HI = 70, 80  # sb_onset_beat.cpp SBV2_HIHAT_LO/HI
+HIHAT_LO, HIHAT_HI = 70, 80  # k1_onset_beat.cpp K1V2_HIHAT_LO/HI
 NYQUIST = SAMPLE_RATE / 2.0
 
 # constants.h notes[] (A1 = 55 Hz, semitone-spaced)

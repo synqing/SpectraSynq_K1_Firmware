@@ -133,7 +133,7 @@ class K1UploadGuardTest(unittest.TestCase):
         # compiles and wires the mic to the proven GPIOs.
         constants = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h").read_text()
         # Isolate ONLY the production pinmap branch (the #else of
-        # SB_K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
+        # K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
         # the shared I2C pins that close the GPIO block. This must NOT alias onto
         # the bench PDM block above (which defines identical pins) — else deleting
         # the production block would still pass (adversarial-review defect, fixed).

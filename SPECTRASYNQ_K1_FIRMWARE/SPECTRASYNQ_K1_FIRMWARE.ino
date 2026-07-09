@@ -28,11 +28,11 @@
 #define K1_TASK_WDT_TIMEOUT_MS 5000  // N2: task-watchdog timeout (>> worst-case legit block: render flash window <1s, DMA 7.5ms)
 #endif
 
-// Include Sensory Bridge firmware files, sorted high to low, by boringness ;) -------
+// Include K1 firmware files, sorted high to low, by boringness ;) -------
 #include "user_config.h"      // Nothing for now
 #include "constants.h"        // Global constants
 #include "globals.h"          // Global variables
-#include "sb_trace.h"         // Developer-only MabuTrace wrapper (no-op outside trace_dev)
+#include "k1_trace.h"         // Developer-only MabuTrace wrapper (no-op outside trace_dev)
 #include "presets.h"          // Configuration presets by name
 #include "bridge_fs.h"        // Filesystem access (save/load configuration)
 #include "utilities.h"        // Misc. math and other functions
@@ -44,18 +44,18 @@
 #include "serial_menu.h"      // Watch the Serial port... *sigh*
 #include "system.h"           // Watch how fast I can check if settings were updated... yada yada..
 #include "GDFT.h"             // Conversion to (and post-processing of) frequency data! (hey, something cool!)
-#include "sb_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
-#include "sb_onset_beat.h"    // Smart Visual Engine AP onset/beat event lane
-#include "sb_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
-#include "sb_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
-#include "sb_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
+#include "k1_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
+#include "k1_onset_beat.h"    // Smart Visual Engine AP onset/beat event lane
+#include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
+#include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
+#include "k1_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
 #include "k1_edgemixer.h" // Smart Visual Engine secondary colour differentiation
-#include "sb_visual_hooks.h"  // Smart Visual Engine event-gated visual hooks
-#include "sb_effect_queue.h"  // Effects queuing + preset slots (frame-boundary commit engine)
-#ifdef SB_K1_WIRELESS_ENABLED
-#include "sb_k1_wireless.h"   // K1 AP-only WebSocket command ingress
+#include "k1_visual_hooks.h"  // Smart Visual Engine event-gated visual hooks
+#include "k1_effect_queue.h"  // Effects queuing + preset slots (frame-boundary commit engine)
+#ifdef K1_WIRELESS_ENABLED
+#include "k1_wireless.h"   // K1 AP-only WebSocket command ingress
 #endif
-#ifdef SB_K1_BLE_REMOTED
+#ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h"  // Remoted dial BLE-MIDI central (gated; interference A/B)
 #endif
 #if ENABLE_VPAB_PROBE
@@ -103,49 +103,49 @@ uint32_t benchmark_sample_count = 0;
 uint32_t last_frame_us = 0;
 M5ROTATE8 rotate8; // Global M5Rotate8 object - Defined here, declared extern in encoders.h
 
-#ifndef SB_LED_TASK_CORE
-#define SB_LED_TASK_CORE 1
+#ifndef K1_LED_TASK_CORE
+#define K1_LED_TASK_CORE 1
 #endif
 
-#ifndef SB_ACQUISITION_ONLY_PROBE
-#define SB_ACQUISITION_ONLY_PROBE 0
+#ifndef K1_ACQUISITION_ONLY_PROBE
+#define K1_ACQUISITION_ONLY_PROBE 0
 #endif
 
-#define SB_AP_STAGE_FULL 0
-#define SB_AP_STAGE_ACQUISITION 1
-#define SB_AP_STAGE_GDFT 2
-#define SB_AP_STAGE_NOVELTY 3
-#define SB_AP_STAGE_SNAPSHOT 4
-#define SB_AP_STAGE_ONSET 5
-#define SB_AP_STAGE_SALIENCY 6
-#define SB_AP_STAGE_TEMPO 7
+#define K1_AP_STAGE_FULL 0
+#define K1_AP_STAGE_ACQUISITION 1
+#define K1_AP_STAGE_GDFT 2
+#define K1_AP_STAGE_NOVELTY 3
+#define K1_AP_STAGE_SNAPSHOT 4
+#define K1_AP_STAGE_ONSET 5
+#define K1_AP_STAGE_SALIENCY 6
+#define K1_AP_STAGE_TEMPO 7
 
-#ifndef SB_AP_STAGE_PROBE_STOP_STAGE
-#define SB_AP_STAGE_PROBE_STOP_STAGE SB_AP_STAGE_FULL
+#ifndef K1_AP_STAGE_PROBE_STOP_STAGE
+#define K1_AP_STAGE_PROBE_STOP_STAGE K1_AP_STAGE_FULL
 #endif
 
-#if defined(SB_K1_HARDWARE) && defined(ARDUINO_RUNNING_CORE) && (ARDUINO_RUNNING_CORE == SB_LED_TASK_CORE) && !defined(SB_ALLOW_AP_VP_SAME_CORE_FOR_PROBE)
+#if defined(K1_HARDWARE) && defined(ARDUINO_RUNNING_CORE) && (ARDUINO_RUNNING_CORE == K1_LED_TASK_CORE) && !defined(K1_ALLOW_AP_VP_SAME_CORE_FOR_PROBE)
 #error "K1 timing invariant violation: AP loop and VP/render task must not share a core"
 #endif
 
-#if SB_ACQUISITION_ONLY_PROBE && !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
-#error "SB_ACQUISITION_ONLY_PROBE requires ENABLE_TEMPO_STREAM and ENABLE_AP_FRONTEND_DEBUG"
+#if K1_ACQUISITION_ONLY_PROBE && !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
+#error "K1_ACQUISITION_ONLY_PROBE requires ENABLE_TEMPO_STREAM and ENABLE_AP_FRONTEND_DEBUG"
 #endif
 
-#if SB_AP_STAGE_PROBE_STOP_STAGE && !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
-#error "SB_AP_STAGE_PROBE_STOP_STAGE requires ENABLE_TEMPO_STREAM and ENABLE_AP_FRONTEND_DEBUG"
+#if K1_AP_STAGE_PROBE_STOP_STAGE && !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
+#error "K1_AP_STAGE_PROBE_STOP_STAGE requires ENABLE_TEMPO_STREAM and ENABLE_AP_FRONTEND_DEBUG"
 #endif
 
-#if SB_ACQUISITION_ONLY_PROBE && SB_AP_STAGE_PROBE_STOP_STAGE
-#error "SB_ACQUISITION_ONLY_PROBE and SB_AP_STAGE_PROBE_STOP_STAGE are mutually exclusive"
+#if K1_ACQUISITION_ONLY_PROBE && K1_AP_STAGE_PROBE_STOP_STAGE
+#error "K1_ACQUISITION_ONLY_PROBE and K1_AP_STAGE_PROBE_STOP_STAGE are mutually exclusive"
 #endif
 
-#if SB_AP_STAGE_PROBE_STOP_STAGE > SB_AP_STAGE_TEMPO
-#error "Unsupported SB_AP_STAGE_PROBE_STOP_STAGE"
+#if K1_AP_STAGE_PROBE_STOP_STAGE > K1_AP_STAGE_TEMPO
+#error "Unsupported K1_AP_STAGE_PROBE_STOP_STAGE"
 #endif
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-static volatile int8_t sb_ap_cadence_vp_core_id = -1;
+static volatile int8_t k1_ap_cadence_vp_core_id = -1;
 #endif
 
 // Encoder state globals (must be defined exactly once)
@@ -288,17 +288,17 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
   } else if (mode == LIGHT_MODE_WAVEFORM_FAST) {
     if (!history_seeded) {
       {
-        SB_TRACE_SCOPE("vp_channel_seed_history");
+        K1_TRACE_SCOPE("vp_channel_seed_history");
         memcpy(leds_16, channel.history, sizeof(CRGB16) * NATIVE_RESOLUTION);
       }
     }
     {
-      SB_TRACE_SCOPE("vp_waveform_fast_body");
+      K1_TRACE_SCOPE("vp_waveform_fast_body");
       light_mode_waveform_fast(channel.history, *channel.waveform_fast_last_color, *channel.waveform_fast_peak_scaled_last,
                                *channel.waveform_fast_shift_accum, *channel.waveform_fast_last_frame_ms);
     }
     {
-      SB_TRACE_SCOPE("vp_waveform_fast_history_store");
+      K1_TRACE_SCOPE("vp_waveform_fast_history_store");
       memcpy(channel.history, leds_16, sizeof(CRGB16) * NATIVE_RESOLUTION);
     }
   } else if (mode == LIGHT_MODE_WAVEFORM) {
@@ -386,7 +386,7 @@ void render_lightshow_for_channel(uint8_t mode, RenderChannelState& channel) {
   bool history_seeded = false;
   if (channel.seed_history_before_render) {
     {
-      SB_TRACE_SCOPE("vp_channel_seed_history");
+      K1_TRACE_SCOPE("vp_channel_seed_history");
       memcpy(leds_16, channel.history, sizeof(CRGB16) * NATIVE_RESOLUTION);
     }
     history_seeded = true;
@@ -412,17 +412,17 @@ void render_channel_via_framework(uint8_t mode, RenderChannelState& channel) {
   bool history_seeded = false;
   if (channel.seed_history_before_render) {
     {
-      SB_TRACE_SCOPE("vp_channel_seed_history");
+      K1_TRACE_SCOPE("vp_channel_seed_history");
       memcpy(leds_16, channel.history, sizeof(CRGB16) * NATIVE_RESOLUTION);
     }
     history_seeded = true;
   }
 
   // Live audio surface (read-only adapter over K1's own snapshot + onset event).
-  static SBAudioSnapshot fw_audio_snapshot;
-  static SBOnsetBeatEvent fw_beat_event;
-  fw_audio_snapshot = sb_audio_snapshot_read();
-  fw_beat_event = sb_onset_beat_read();
+  static K1AudioSnapshot fw_audio_snapshot;
+  static K1OnsetBeatEvent fw_beat_event;
+  fw_audio_snapshot = k1_audio_snapshot_read();
+  fw_beat_event = k1_onset_beat_read();
 
   // Real frame delta (P2 NEXT item): measured µs since the last VP frame.
   const int64_t now_us = esp_timer_get_time();
@@ -482,7 +482,7 @@ void store_render_channel_output(RenderChannelState& channel) {
 // render the INCOMING state a second time on the dedicated TRANSITION SCRATCH
 // block (never the live block) and blend it equal-power into leds_16 over the
 // outgoing frame. Runs inside the channel's own render pass, so the shared
-// sb_queue_xfade_out_buf snapshot is never contended between channels. The
+// k1_queue_xfade_out_buf snapshot is never contended between channels. The
 // params stack is depth-2: primary overlay pushes at depth 0; secondary
 // overlay pushes above the already-pushed secondary params.
 void render_queue_xfade_overlay(bool secondary) {
@@ -491,15 +491,15 @@ void render_queue_xfade_overlay(bool secondary) {
   uint8_t incoming_mode = 0;
   float incoming_prism = 0.0f;
   const uint32_t now_ms = uint32_t(esp_timer_get_time() / 1000);
-  if (!sb_queue_xfade_overlay_begin(secondary, now_ms, &gain_out, &gain_in,
+  if (!k1_queue_xfade_overlay_begin(secondary, now_ms, &gain_out, &gain_in,
                                     &incoming_mode, &incoming_prism)) {
     return;
   }
 
   // Snapshot the outgoing frame, then render the incoming state into leds_16.
-  memcpy(sb_queue_xfade_out_buf, leds_16, sizeof(CRGB16) * NATIVE_RESOLUTION);
+  memcpy(k1_queue_xfade_out_buf, leds_16, sizeof(CRGB16) * NATIVE_RESOLUTION);
 
-  SBQueueXfadeScratch* scratch = sb_queue_xfade_scratch(secondary);
+  K1QueueXfadeScratch* scratch = k1_queue_xfade_scratch(secondary);
   RenderChannelState channel;
   channel.history = scratch->history;
   channel.output = leds_16;  // blended in place; the live pass stores afterwards
@@ -530,7 +530,7 @@ void render_queue_xfade_overlay(bool secondary) {
     apply_prism_effect(incoming_prism, 0.25);
   }
   pop_render_params();
-  sb_queue_xfade_overlay_end(secondary);  // restore the outgoing live fields
+  k1_queue_xfade_overlay_end(secondary);  // restore the outgoing live fields
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
   // P4: centre-origin TransitionEngine drives the crossfade. Source = outgoing
@@ -539,8 +539,8 @@ void render_queue_xfade_overlay(bool secondary) {
   // equal-power gains are no longer used on this path. If the engine is not ready
   // (PSRAM alloc failed at boot) we fall through to the legacy equal-power blend.
   if (k1::effects::framework::transitionBlendChannel(
-          secondary, sb_queue_xfade_out_buf, leds_16, leds_16,
-          sb_queue_xfade_ms())) {
+          secondary, k1_queue_xfade_out_buf, leds_16, leds_16,
+          k1_queue_xfade_ms())) {
     return;
   }
 #endif
@@ -549,14 +549,14 @@ void render_queue_xfade_overlay(bool secondary) {
   const SQ15x16 g_out = SQ15x16(gain_out);
   const SQ15x16 g_in = SQ15x16(gain_in);
   for (uint16_t i = 0; i < NATIVE_RESOLUTION; i++) {
-    leds_16[i].r = sb_queue_xfade_out_buf[i].r * g_out + leds_16[i].r * g_in;
-    leds_16[i].g = sb_queue_xfade_out_buf[i].g * g_out + leds_16[i].g * g_in;
-    leds_16[i].b = sb_queue_xfade_out_buf[i].b * g_out + leds_16[i].b * g_in;
+    leds_16[i].r = k1_queue_xfade_out_buf[i].r * g_out + leds_16[i].r * g_in;
+    leds_16[i].g = k1_queue_xfade_out_buf[i].g * g_out + leds_16[i].g * g_in;
+    leds_16[i].b = k1_queue_xfade_out_buf[i].b * g_out + leds_16[i].b * g_in;
   }
 }
 
 void attempt_rotate8_init(bool verbose) {
-#if SB_HAS_ROTATE8
+#if K1_HAS_ROTATE8
   bool rotate8_initialized = false;
   const int max_attempts = verbose ? 3 : 1;
   for (int attempt = 0; attempt < max_attempts && !rotate8_initialized; attempt++) {
@@ -645,13 +645,13 @@ void setup() {
   USBSerial.print(" safe_mode=");
   USBSerial.println(k1_boot_safe_mode ? 1 : 0);
 #endif
-  sb_tempo_init(); // (sb_tempo.h) compute tempo Goertzel coeffs once — REQUIRED or tempo never locks
+  k1_tempo_init(); // (k1_tempo.h) compute tempo Goertzel coeffs once — REQUIRED or tempo never locks
 
   // Snap any saved-but-disabled light mode to the nearest enabled one (2026-06-02:
   // GDFT/VU_DOT/KALEIDOSCOPE/QUANTUM_COLLAPSE/VU removed as unfit for purpose).
   CONFIG.LIGHTSHOW_MODE = light_mode_next_enabled(CONFIG.LIGHTSHOW_MODE, 1);
   SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(SECONDARY_LIGHTSHOW_MODE, 1);
-  SB_TRACE_INIT(64);
+  K1_TRACE_INIT(64);
 
   // Compute the EdgeMixer colour maps for the shipping default at boot. The static
   // k1_edge_config bypasses k1_edgemixer_set_config() — which builds the OKLab fused
@@ -668,7 +668,7 @@ void setup() {
     USBSerial.println("FAIL (alloc returned NULL — feature disabled)");
   }
 
-#if SB_HAS_ROTATE8
+#if K1_HAS_ROTATE8
   init_encoders();
 #else
   g_rotate8_available = false;
@@ -678,11 +678,11 @@ void setup() {
   init_secondary_leds();
   ENABLE_SECONDARY_LEDS = true;   // Custom single-channel build (K1_CUSTOM_LED_V1) drops the 2nd strip
 #endif
-#ifdef SB_K1_WIRELESS_ENABLED
-  sb_k1_wireless_begin();
+#ifdef K1_WIRELESS_ENABLED
+  k1_wireless_begin();
 #endif
-#ifdef SB_K1_BLE_REMOTED
-  sb_k1_ble_remoted_begin();
+#ifdef K1_BLE_REMOTED
+  k1_ble_remoted_begin();
 #endif
 
 #if ENABLE_FASTLED_COLOR_CORRECTION
@@ -710,12 +710,12 @@ void setup() {
 
   // Create thread specifically for LED updates
   BaseType_t led_task_create_result = xTaskCreatePinnedToCore(
-    led_thread, "led_task", 8192, NULL, tskIDLE_PRIORITY + 1, &led_task, SB_LED_TASK_CORE);
+    led_thread, "led_task", 8192, NULL, tskIDLE_PRIORITY + 1, &led_task, K1_LED_TASK_CORE);
   const int ap_core = xPortGetCoreID();
   const bool ledTaskCreated = (led_task_create_result == pdPASS);
   const bool timingOk = (CONFIG.SAMPLE_RATE == DEFAULT_SAMPLE_RATE)
     && (CONFIG.SAMPLES_PER_CHUNK == DEFAULT_SAMPLES_PER_CHUNK);
-  const bool coreOk = ledTaskCreated && (ap_core != SB_LED_TASK_CORE);
+  const bool coreOk = ledTaskCreated && (ap_core != K1_LED_TASK_CORE);
   USBSerial.print("RUNTIME_TIMING_GUARD: timing_ok=");
   USBSerial.print(timingOk ? 1 : 0);
   USBSerial.print(" sample_rate=");
@@ -723,19 +723,19 @@ void setup() {
   USBSerial.print(" samples_per_chunk=");
   USBSerial.print(CONFIG.SAMPLES_PER_CHUNK);
   USBSerial.print(" tempo_decim=");
-  USBSerial.print((uint16_t)SB_TEMPO_NOVELTY_DECIMATION);
+  USBSerial.print((uint16_t)K1_TEMPO_NOVELTY_DECIMATION);
   USBSerial.print(" declared_ap_hz=");
   USBSerial.print((float)CONFIG.SAMPLE_RATE / (float)CONFIG.SAMPLES_PER_CHUNK, 3);
   USBSerial.print(" declared_nov_hz=");
-  USBSerial.print(((float)CONFIG.SAMPLE_RATE / (float)CONFIG.SAMPLES_PER_CHUNK) / (float)SB_TEMPO_NOVELTY_DECIMATION, 3);
+  USBSerial.print(((float)CONFIG.SAMPLE_RATE / (float)CONFIG.SAMPLES_PER_CHUNK) / (float)K1_TEMPO_NOVELTY_DECIMATION, 3);
   USBSerial.print(" response_gain=");
   USBSerial.print(audio_response_gain_clamped(), 3);
   USBSerial.print(" dma_desc=");
-  USBSerial.print(SB_I2S_DMA_DESC_NUM);
+  USBSerial.print(K1_I2S_DMA_DESC_NUM);
   USBSerial.print(" ap_core=");
   USBSerial.print(ap_core);
   USBSerial.print(" vp_core=");
-  USBSerial.print(SB_LED_TASK_CORE);
+  USBSerial.print(K1_LED_TASK_CORE);
   USBSerial.print(" core_ok=");
   USBSerial.print(coreOk ? 1 : 0);
   USBSerial.print(" vp_task_created=");
@@ -755,7 +755,7 @@ void setup() {
 }
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-static void sb_ap_cadence_capture_frame(uint32_t t_now,
+static void k1_ap_cadence_capture_frame(uint32_t t_now,
                                         uint32_t frame_index,
                                         int64_t loop_start_us,
                                         uint32_t gdft_elapsed_us,
@@ -770,9 +770,9 @@ static void sb_ap_cadence_capture_frame(uint32_t t_now,
   ap_cadence_frame.total_ap_loop_elapsed_us = (uint32_t)(esp_timer_get_time() - loop_start_us);
   ap_cadence_frame.stage = stage;
   ap_cadence_frame.ap_core_id = (int8_t)xPortGetCoreID();
-  ap_cadence_frame.vp_core_id = sb_ap_cadence_vp_core_id;
-  ap_cadence_frame.i2s = sb_audio_i2s_read_debug_read();
-  ap_cadence_frame.tempo = sb_tempo_debug_read();
+  ap_cadence_frame.vp_core_id = k1_ap_cadence_vp_core_id;
+  ap_cadence_frame.i2s = k1_audio_i2s_read_debug_read();
+  ap_cadence_frame.tempo = k1_tempo_debug_read();
   ap_cad_capture_tick(ap_cadence_frame);
   ap_cad_soak_tick(ap_cadence_frame);
 }
@@ -819,11 +819,11 @@ void loop() {
   function_id = 3;
   check_serial(t_now);  // (serial_menu.h)
   // Check if UART commands are available
-#ifdef SB_K1_WIRELESS_ENABLED
-  sb_k1_wireless_poll(t_now);
+#ifdef K1_WIRELESS_ENABLED
+  k1_wireless_poll(t_now);
 #endif
-#ifdef SB_K1_BLE_REMOTED
-  sb_k1_ble_remoted_poll(t_now);
+#ifdef K1_BLE_REMOTED
+  k1_ble_remoted_poll(t_now);
 #endif
 
   function_id = 5;
@@ -853,13 +853,13 @@ void loop() {
   }
 #endif
 
-#if SB_ACQUISITION_ONLY_PROBE && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_ap_cadence_capture_frame(t_now,
+#if K1_ACQUISITION_ONLY_PROBE && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
                               ap_cadence_loop_start_us,
                               0,
                               0,
-                              SB_AP_STAGE_ACQUISITION);
+                              K1_AP_STAGE_ACQUISITION);
   vTaskDelay(1);
   return;
 #endif
@@ -886,13 +886,13 @@ void loop() {
     vp_perf_record(vp_perf.gdft, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
   }
 #endif
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_GDFT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_ap_cadence_capture_frame(t_now,
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_GDFT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
                               ap_cadence_loop_start_us,
                               ap_cadence_gdft_us,
                               0,
-                              SB_AP_STAGE_GDFT);
+                              K1_AP_STAGE_GDFT);
   vTaskDelay(1);
   return;
 #endif
@@ -915,78 +915,78 @@ void loop() {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   ap_cadence_novelty_us = (uint32_t)(esp_timer_get_time() - ap_cadence_stage_start_us);
 #endif
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_NOVELTY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_ap_cadence_capture_frame(t_now,
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_NOVELTY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
                               ap_cadence_loop_start_us,
                               ap_cadence_gdft_us,
                               ap_cadence_novelty_us,
-                              SB_AP_STAGE_NOVELTY);
+                              K1_AP_STAGE_NOVELTY);
   vTaskDelay(1);
   return;
 #endif
-  SBSmartDirectorConfig ap_smart_config = sb_smart_director_config();
-  SBVisualHookConfig ap_hook_config = sb_visual_hooks_config();
+  K1SmartDirectorConfig ap_smart_config = k1_smart_director_config();
+  K1VisualHookConfig ap_hook_config = k1_visual_hooks_config();
   // Always refresh the AP snapshot + onset/beat stream so onset-driven effects
   // (e.g. Comet) work even when the Smart-Director/hooks are disabled. Cost is
   // negligible; the director still only READS this stream when enabled.
   (void)ap_smart_config;
   (void)ap_hook_config;
   {
-    sb_audio_snapshot_update(t_now);
-    const SBAudioSnapshot sb_audio_snapshot = sb_audio_snapshot_read();
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_SNAPSHOT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    sb_ap_cadence_capture_frame(t_now,
+    k1_audio_snapshot_update(t_now);
+    const K1AudioSnapshot k1_audio_snapshot = k1_audio_snapshot_read();
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_SNAPSHOT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
                                 ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                SB_AP_STAGE_SNAPSHOT);
+                                K1_AP_STAGE_SNAPSHOT);
     vTaskDelay(1);
     return;
 #endif
-    sb_onset_beat_update(sb_audio_snapshot);
-    const SBOnsetBeatEvent sb_onset_beat_event = sb_onset_beat_read();
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_ONSET && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    sb_ap_cadence_capture_frame(t_now,
+    k1_onset_beat_update(k1_audio_snapshot);
+    const K1OnsetBeatEvent k1_onset_beat_event = k1_onset_beat_read();
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_ONSET && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
                                 ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                SB_AP_STAGE_ONSET);
+                                K1_AP_STAGE_ONSET);
     vTaskDelay(1);
     return;
 #endif
-    sb_musical_saliency_update(sb_audio_snapshot, &sb_onset_beat_event);
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_SALIENCY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    sb_ap_cadence_capture_frame(t_now,
+    k1_musical_saliency_update(k1_audio_snapshot, &k1_onset_beat_event);
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_SALIENCY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
                                 ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                SB_AP_STAGE_SALIENCY);
+                                K1_AP_STAGE_SALIENCY);
     vTaskDelay(1);
     return;
 #endif
-    sb_tempo_update(sb_audio_snapshot);  // beat/tempo-phase tracker (Core-0; self-clocks to 50 Hz, read-only consumer of novelty)
-#if SB_AP_STAGE_PROBE_STOP_STAGE == SB_AP_STAGE_TEMPO && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    sb_ap_cadence_capture_frame(t_now,
+    k1_tempo_update(k1_audio_snapshot);  // beat/tempo-phase tracker (Core-0; self-clocks to 50 Hz, read-only consumer of novelty)
+#if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_TEMPO && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
                                 ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                SB_AP_STAGE_TEMPO);
+                                K1_AP_STAGE_TEMPO);
     vTaskDelay(1);
     return;
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     {
-      sb_ap_cadence_capture_frame(t_now,
+      k1_ap_cadence_capture_frame(t_now,
                                   ap_cadence_frame_index_now,
                                   ap_cadence_loop_start_us,
                                   ap_cadence_gdft_us,
                                   ap_cadence_novelty_us,
-                                  SB_AP_STAGE_FULL);
+                                  K1_AP_STAGE_FULL);
     }
 #endif
 #if ENABLE_TEMPO_STREAM
@@ -1045,7 +1045,7 @@ void loop() {
   }
   // --- END BENCHMARK LOGIC ---
 
-#if SB_HAS_ROTATE8
+#if K1_HAS_ROTATE8
   check_encoders(t_now); // Check wired encoders
   update_encoder_leds(); // Update wired encoder LEDs
 #endif
@@ -1063,7 +1063,7 @@ void loop() {
 // Run the lights in their own thread! -------------------------------------------------------------
 void led_thread(void* arg) {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_ap_cadence_vp_core_id = (int8_t)xPortGetCoreID();
+  k1_ap_cadence_vp_core_id = (int8_t)xPortGetCoreID();
 #endif
 #ifdef K1_EFFECT_FRAMEWORK_V1
   // P4: allocate the two per-channel TransitionEngine instances + CRGB scratch
@@ -1179,7 +1179,7 @@ void led_thread(void* arg) {
       // the serial side, advances dip/crossfade transitions, and lands all
       // committed per-channel field swaps BEFORE channel construction — never
       // mid-frame (mode_transition_queued precedent).
-      sb_effect_queue_frame_tick(uint32_t(vp_frame_start_us / 1000));
+      k1_effect_queue_frame_tick(uint32_t(vp_frame_start_us / 1000));
 
 #if ENABLE_VP_PERF_AUDIT || FEATURE_TRACE_RENDER
       int64_t vp_perf_stage_start_us = 0;
@@ -1208,14 +1208,14 @@ void led_thread(void* arg) {
 #endif
 #endif
 		      RenderChannelState primary_channel = make_primary_channel();
-		      SBVisualHookOutput visual_hook_output = { 1.0f, 1.0f, 1.0f, false };
-		      SBSmartDirectorConfig smart_director_config = sb_smart_director_config();
-		      SBVisualHookConfig visual_hook_config = sb_visual_hooks_config();
+		      K1VisualHookOutput visual_hook_output = { 1.0f, 1.0f, 1.0f, false };
+		      K1SmartDirectorConfig smart_director_config = k1_smart_director_config();
+		      K1VisualHookConfig visual_hook_config = k1_visual_hooks_config();
 		      uint8_t vpab_primary_render_mode = CONFIG.LIGHTSHOW_MODE;
 #ifdef K1_EDGEMIXER_AB_DEMO
 		      // BENCH-ONLY: force + cycle the EdgeMixer mode BEFORE the config read
 		      // below, so vpab_edge_base_config picks up the forced config. The only
-		      // later mutation (sb_visual_hooks_apply_edge_config) scales strength
+		      // later mutation (k1_visual_hooks_apply_edge_config) scales strength
 		      // only, so the forced mode/spread reach k1_edgemixer_apply intact.
 		      k1_edgemixer_ab_demo_tick();
 #endif
@@ -1241,34 +1241,34 @@ void led_thread(void* arg) {
 		      } else
 #endif
 		      if (smart_director_config.enabled || visual_hook_config.enabled) {
-	        SBAudioSnapshot smart_audio = {};
-	        SBOnsetBeatEvent smart_event = {};
+	        K1AudioSnapshot smart_audio = {};
+	        K1OnsetBeatEvent smart_event = {};
 	        {
-	          SB_TRACE_SCOPE("vp_bus_read");
-	          smart_audio = sb_audio_snapshot_read();
-	          smart_event = sb_onset_beat_read();
+	          K1_TRACE_SCOPE("vp_bus_read");
+	          smart_audio = k1_audio_snapshot_read();
+	          smart_event = k1_onset_beat_read();
 	        }
 	        uint32_t smart_now_ms = uint32_t(vp_frame_start_us / 1000);
-	        SBSmartDirectorOutput smart_output = sb_smart_director_tick(smart_audio, smart_now_ms, &smart_event);
+	        K1SmartDirectorOutput smart_output = k1_smart_director_tick(smart_audio, smart_now_ms, &smart_event);
 	        {
-	          SB_TRACE_SCOPE("vp_visual_hooks_tick");
-	          visual_hook_output = sb_visual_hooks_tick(smart_event, smart_now_ms);
+	          K1_TRACE_SCOPE("vp_visual_hooks_tick");
+	          visual_hook_output = k1_visual_hooks_tick(smart_event, smart_now_ms);
 	        }
         bool smart_boundary_gate_required = visual_hook_config.enabled &&
                                             !smart_director_config.director_autonomy_enabled;
         if (smart_boundary_gate_required && !visual_hook_output.confirm_switch_boundary) {
           smart_output.mode_intent.wants_switch = false;
         }
-	        uint8_t smart_primary_mode = sb_mode_selection_resolve(
+	        uint8_t smart_primary_mode = k1_mode_selection_resolve(
 	          smart_output.mode_intent,
-	          sb_smart_director_mode_selection_config(smart_now_ms),
+	          k1_smart_director_mode_selection_config(smart_now_ms),
 	          CONFIG.LIGHTSHOW_MODE,
 	          smart_now_ms
 	        );
 	        vpab_primary_render_mode = smart_primary_mode;
 	        RenderParams pp = build_primary_render_params();
-        sb_smart_director_apply_render_params(smart_output, &pp);
-        sb_visual_hooks_apply_render_params(visual_hook_output, &pp);
+        k1_smart_director_apply_render_params(smart_output, &pp);
+        k1_visual_hooks_apply_render_params(visual_hook_output, &pp);
         push_render_params(&pp);
 #ifdef K1_EFFECT_FRAMEWORK_V1
         render_channel_via_framework(smart_primary_mode, primary_channel);
@@ -1301,7 +1301,7 @@ void led_thread(void* arg) {
       }
 #endif
 #if FEATURE_TRACE_RENDER
-      SB_TRACE_COUNTER("vp_primary_render_us", uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
+      K1_TRACE_COUNTER("vp_primary_render_us", uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
 #endif
       
       // Render secondary channel with its own state and restore primary runtime afterwards.
@@ -1319,13 +1319,13 @@ void led_thread(void* arg) {
         RenderParams sp;
 
         {
-          SB_TRACE_SCOPE("vp_secondary_snapshot");
+          K1_TRACE_SCOPE("vp_secondary_snapshot");
           render_snapshot = capture_render_runtime();
           memcpy(leds_16_primary_snapshot, leds_16, sizeof(CRGB16) * NATIVE_RESOLUTION);
         }
 
         {
-          SB_TRACE_SCOPE("vp_secondary_effect");
+          K1_TRACE_SCOPE("vp_secondary_effect");
           secondary_channel = make_secondary_channel();
           // RenderParams core: secondary render reads its params through the
           // params stack instead of mutating global CONFIG. The modes pull the
@@ -1350,11 +1350,11 @@ void led_thread(void* arg) {
         }
 
         {
-	          SB_TRACE_SCOPE("vp_secondary_store_clip");
+	          K1_TRACE_SCOPE("vp_secondary_store_clip");
 	          store_render_channel_output(secondary_channel);
 	          K1EdgeMixerConfig edge_config = vpab_edge_base_config;
 	          if (edge_config.enabled) {
-	            edge_config = sb_visual_hooks_apply_edge_config(visual_hook_output, edge_config);
+	            edge_config = k1_visual_hooks_apply_edge_config(visual_hook_output, edge_config);
 	            vpab_edge_effective_config = edge_config;
 	            k1_edgemixer_apply(leds_16_secondary, NATIVE_RESOLUTION, edge_config);
 	          }
@@ -1362,7 +1362,7 @@ void led_thread(void* arg) {
         }
 
         {
-          SB_TRACE_SCOPE("vp_secondary_restore");
+          K1_TRACE_SCOPE("vp_secondary_restore");
           pop_render_params();
           memcpy(leds_16, leds_16_primary_snapshot, sizeof(CRGB16) * NATIVE_RESOLUTION);
           restore_render_runtime(render_snapshot);
@@ -1379,7 +1379,7 @@ void led_thread(void* arg) {
         // total vp_render_us frame time.
         if (vpab_edge_effective_config.enabled &&
             vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) {
-          SB_TRACE_SCOPE("vp_primary_edge");
+          K1_TRACE_SCOPE("vp_primary_edge");
           k1_edgemixer_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
           clip_led_values(leds_16);
         }
@@ -1390,7 +1390,7 @@ void led_thread(void* arg) {
         }
 #endif
 #if FEATURE_TRACE_RENDER
-	        SB_TRACE_COUNTER("vp_secondary_render_us", uint32_t(esp_timer_get_time() - vp_perf_secondary_start_us));
+	        K1_TRACE_COUNTER("vp_secondary_render_us", uint32_t(esp_timer_get_time() - vp_perf_secondary_start_us));
 #endif
 	      }
 
@@ -1403,7 +1403,7 @@ void led_thread(void* arg) {
 	        visual_hook_config.enabled ? uint8_t(1) : uint8_t(0),
 	        vpab_edge_effective_config.enabled ? uint8_t(1) : uint8_t(0),
 	        uint8_t(vpab_edge_effective_config.mode),
-	        sb_smart_director_manual_owner_active(uint32_t(vp_frame_start_us / 1000)) ? uint8_t(1) : uint8_t(0),
+	        k1_smart_director_manual_owner_active(uint32_t(vp_frame_start_us / 1000)) ? uint8_t(1) : uint8_t(0),
 	        uint16_t(constrain(vpab_edge_base_config.strength, 0.0f, 1.0f) * 1000.0f),
 	        uint16_t(constrain(vpab_edge_effective_config.strength, 0.0f, 1.0f) * 1000.0f),
 		        uint8_t(vpab_edge_effective_config.dualEdge),

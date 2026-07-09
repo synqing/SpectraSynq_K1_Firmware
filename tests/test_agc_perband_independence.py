@@ -2,7 +2,7 @@
 
 RED-before-fix property test for the "louder -> dimmer" broadband-AGC defect and
 its per-band fix. It host-compiles the REAL audio/k1_gdft_core.cpp twice — flag
-OFF (production broadband AGC) and flag ON (-DSB_AGC_PERBAND_V1 candidate) — via
+OFF (production broadband AGC) and flag ON (-DK1_AGC_PERBAND_V1 candidate) — via
 the oracle_agc_perband harness, and asserts:
 
   OFF  (documents the defect — passes against current production code):
@@ -10,7 +10,7 @@ the oracle_agc_perband harness, and asserts:
     * collapse:      the one global gain falls hard as broadband loudness rises
                      (the "louder -> dimmer" inverse)
 
-  ON   (the fix — FAILS until SB_AGC_PERBAND_V1 is implemented, then passes):
+  ON   (the fix — FAILS until K1_AGC_PERBAND_V1 is implemented, then passes):
     * independence:  under loud bass + a quiet treble tone, the per-band gains
                      diverge and the treble (tonal) band keeps far more gain than
                      the loud bass band
@@ -81,7 +81,7 @@ def test_off_gain_collapses_under_load(off):
 
 
 # ---------------------------------------------------------------------------
-# ON — the per-band fix. RED until SB_AGC_PERBAND_V1 is implemented.
+# ON — the per-band fix. RED until K1_AGC_PERBAND_V1 is implemented.
 # ---------------------------------------------------------------------------
 
 def test_on_gains_are_per_band_independent(on):
@@ -92,7 +92,7 @@ def test_on_gains_are_per_band_independent(on):
     assert spread > 0.3, (
         f"per-band AGC not engaged: gains still ~uniform at loud frame "
         f"(gains={loud['g']} spread={spread:.5f}). "
-        f"Is SB_AGC_PERBAND_V1 implemented?"
+        f"Is K1_AGC_PERBAND_V1 implemented?"
     )
 
 

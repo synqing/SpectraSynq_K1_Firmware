@@ -7,7 +7,7 @@
  * EffectRoleFlags portion). Direct-copy per the architecture probe — pure
  * data structs with no audio/render infrastructure dependency.
  *
- * Namespace: `k1::effects::framework`. Clean names only (no legacy SB_/sb_
+ * Namespace: `k1::effects::framework`. Clean names only (no legacy K1_/k1_
  * prefixes, no brand words) per the 2026-06-18 naming rule.
  *
  * Compiled ONLY under the `k1_effect_framework` PlatformIO env (flag

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile and run host-side replay tests for sb_smart_director.cpp."""
+"""Compile and run host-side replay tests for k1_smart_director.cpp."""
 
 import argparse
 import json
@@ -63,17 +63,17 @@ AUDIO_SNAPSHOT_STUB = r"""
 #pragma once
 #include <stdint.h>
 
-enum SBMusicState : uint8_t {
-  SB_MUSIC_SILENCE = 0,
-  SB_MUSIC_AMBIENT,
-  SB_MUSIC_STEADY,
-  SB_MUSIC_BUILD,
-  SB_MUSIC_DROP,
-  SB_MUSIC_BREAKDOWN,
-  SB_MUSIC_DENSE
+enum K1MusicState : uint8_t {
+  K1_MUSIC_SILENCE = 0,
+  K1_MUSIC_AMBIENT,
+  K1_MUSIC_STEADY,
+  K1_MUSIC_BUILD,
+  K1_MUSIC_DROP,
+  K1_MUSIC_BREAKDOWN,
+  K1_MUSIC_DENSE
 };
 
-struct SBAudioSnapshot {
+struct K1AudioSnapshot {
   uint32_t frame_ms;
   float peak_scaled;
   float vu_level;
@@ -86,7 +86,7 @@ struct SBAudioSnapshot {
   bool silence;
 };
 
-struct SBOnsetBeatEvent {
+struct K1OnsetBeatEvent {
   uint32_t event_id;
   uint32_t event_ms;
   uint32_t event_age_ms;
@@ -106,28 +106,28 @@ MODE_SELECTION_STUB = r"""
 #include <stdint.h>
 #include "config_types.h"
 
-enum SBModeIntentReason : uint8_t {
-  SB_MODE_REASON_HOLD = 0,
-  SB_MODE_REASON_SILENCE,
-  SB_MODE_REASON_AMBIENT,
-  SB_MODE_REASON_STEADY,
-  SB_MODE_REASON_BUILD,
-  SB_MODE_REASON_DROP,
-  SB_MODE_REASON_BREAKDOWN,
-  SB_MODE_REASON_DENSE,
-  SB_MODE_REASON_MANUAL_OWNERSHIP,
-  SB_MODE_REASON_COOLDOWN,
-  SB_MODE_REASON_DENIED
+enum K1ModeIntentReason : uint8_t {
+  K1_MODE_REASON_HOLD = 0,
+  K1_MODE_REASON_SILENCE,
+  K1_MODE_REASON_AMBIENT,
+  K1_MODE_REASON_STEADY,
+  K1_MODE_REASON_BUILD,
+  K1_MODE_REASON_DROP,
+  K1_MODE_REASON_BREAKDOWN,
+  K1_MODE_REASON_DENSE,
+  K1_MODE_REASON_MANUAL_OWNERSHIP,
+  K1_MODE_REASON_COOLDOWN,
+  K1_MODE_REASON_DENIED
 };
 
-struct SBModeIntent {
+struct K1ModeIntent {
   uint8_t requested_mode;
-  SBModeIntentReason reason;
+  K1ModeIntentReason reason;
   float confidence;
   bool wants_switch;
 };
 
-struct SBModeSelectionConfig {
+struct K1ModeSelectionConfig {
   bool enabled;
   bool manual_owner_active;
   uint32_t min_dwell_ms;
@@ -158,10 +158,10 @@ SMART_DIRECTOR_HEADER_STUB = r"""
 #pragma once
 
 #include "render_params.h"
-#include "sb_audio_snapshot.h"
-#include "sb_mode_selection.h"
+#include "k1_audio_snapshot.h"
+#include "k1_mode_selection.h"
 
-struct SBSmartDirectorConfig {
+struct K1SmartDirectorConfig {
   bool enabled;
   bool assist_switching_enabled;
   bool director_autonomy_enabled;
@@ -172,9 +172,9 @@ struct SBSmartDirectorConfig {
   uint8_t max_switches_per_window;
 };
 
-struct SBSmartDirectorOutput {
-  SBMusicState state;
-  SBModeIntent mode_intent;
+struct K1SmartDirectorOutput {
+  K1MusicState state;
+  K1ModeIntent mode_intent;
   float speed_scalar;
   float photons_scalar;
   float chroma_scalar;
@@ -184,27 +184,27 @@ struct SBSmartDirectorOutput {
   bool auto_colour_shift;
 };
 
-enum SBSmartManualControlReason : uint8_t {
-  SB_MANUAL_REASON_NONE = 0,
-  SB_MANUAL_REASON_SERIAL_HOTKEY,
-  SB_MANUAL_REASON_SERIAL_COMMAND,
-  SB_MANUAL_REASON_ENCODER
+enum K1SmartManualControlReason : uint8_t {
+  K1_MANUAL_REASON_NONE = 0,
+  K1_MANUAL_REASON_SERIAL_HOTKEY,
+  K1_MANUAL_REASON_SERIAL_COMMAND,
+  K1_MANUAL_REASON_ENCODER
 };
 
-void sb_smart_director_init();
-SBSmartDirectorOutput sb_smart_director_tick(
-  const SBAudioSnapshot& audio,
+void k1_smart_director_init();
+K1SmartDirectorOutput k1_smart_director_tick(
+  const K1AudioSnapshot& audio,
   uint32_t now_ms,
-  const SBOnsetBeatEvent* event = nullptr
+  const K1OnsetBeatEvent* event = nullptr
 );
-SBSmartDirectorOutput sb_smart_director_read_output();
-void sb_smart_director_apply_render_params(const SBSmartDirectorOutput& output, RenderParams* params);
-SBSmartDirectorConfig sb_smart_director_config();
-void sb_smart_director_set_config(const SBSmartDirectorConfig& config);
-SBModeSelectionConfig sb_smart_director_mode_selection_config(uint32_t now_ms);
-void sb_smart_director_mark_manual_control(uint32_t now_ms, SBSmartManualControlReason reason);
-void sb_smart_director_clear_manual_control();
-bool sb_smart_director_manual_owner_active(uint32_t now_ms);
+K1SmartDirectorOutput k1_smart_director_read_output();
+void k1_smart_director_apply_render_params(const K1SmartDirectorOutput& output, RenderParams* params);
+K1SmartDirectorConfig k1_smart_director_config();
+void k1_smart_director_set_config(const K1SmartDirectorConfig& config);
+K1ModeSelectionConfig k1_smart_director_mode_selection_config(uint32_t now_ms);
+void k1_smart_director_mark_manual_control(uint32_t now_ms, K1SmartManualControlReason reason);
+void k1_smart_director_clear_manual_control();
+bool k1_smart_director_manual_owner_active(uint32_t now_ms);
 """
 
 
@@ -218,7 +218,7 @@ extern uint32_t g_last_encoder_activity_time;
 
 
 CPP_REPLAY = r"""
-#include "sb_smart_director.h"
+#include "k1_smart_director.h"
 
 #include <cmath>
 #include <cstdio>
@@ -243,9 +243,9 @@ static void check_close(float actual, float expected, float tolerance, const cha
   }
 }
 
-static SBAudioSnapshot audio(uint32_t ms, float spectral, float novelty, float peak,
+static K1AudioSnapshot audio(uint32_t ms, float spectral, float novelty, float peak,
                              float low, float mid, float high, bool silence = false) {
-  SBAudioSnapshot snapshot = {};
+  K1AudioSnapshot snapshot = {};
   snapshot.frame_ms = ms;
   snapshot.spectral_energy = spectral;
   snapshot.novelty = novelty;
@@ -257,10 +257,10 @@ static SBAudioSnapshot audio(uint32_t ms, float spectral, float novelty, float p
   return snapshot;
 }
 
-static SBOnsetBeatEvent music_event(uint32_t ms, bool onset, bool bass_onset, bool beat,
+static K1OnsetBeatEvent music_event(uint32_t ms, bool onset, bool bass_onset, bool beat,
                                     float onset_strength, float bass_strength,
                                     float beat_confidence) {
-  SBOnsetBeatEvent event = {};
+  K1OnsetBeatEvent event = {};
   event.event_id = ms;
   event.event_ms = ms;
   event.onset = onset;
@@ -272,8 +272,8 @@ static SBOnsetBeatEvent music_event(uint32_t ms, bool onset, bool bass_onset, bo
   return event;
 }
 
-static SBSmartDirectorConfig config(bool enabled, bool switching, bool autonomy, float floor = 0.08f) {
-  SBSmartDirectorConfig c = {};
+static K1SmartDirectorConfig config(bool enabled, bool switching, bool autonomy, float floor = 0.08f) {
+  K1SmartDirectorConfig c = {};
   c.enabled = enabled;
   c.assist_switching_enabled = switching;
   c.director_autonomy_enabled = autonomy;
@@ -289,13 +289,13 @@ static void reset(bool enabled, bool switching, bool autonomy, float floor = 0.0
   mode_transition_queued = false;
   mode_destination = -1;
   g_last_encoder_activity_time = 0;
-  sb_smart_director_init();
-  sb_smart_director_set_config(config(enabled, switching, autonomy, floor));
+  k1_smart_director_init();
+  k1_smart_director_set_config(config(enabled, switching, autonomy, floor));
 }
 
 static void test_disabled_is_materially_inert() {
   reset(false, false, false);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(1000, 0.80f, 0.85f, 0.90f, 0.6f, 0.5f, 0.4f), 1000);
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(1000, 0.80f, 0.85f, 0.90f, 0.6f, 0.5f, 0.4f), 1000);
   check(!output.mode_intent.wants_switch, "disabled Smart does not request a switch");
   check_close(output.speed_scalar, 1.0f, 0.0001f, "disabled Smart keeps speed scalar neutral");
   check_close(output.photons_scalar, 1.0f, 0.0001f, "disabled Smart keeps photons scalar neutral");
@@ -306,9 +306,9 @@ static void test_disabled_is_materially_inert() {
 
 static void test_assist_drop_switches_without_palette_overlay() {
   reset(true, true, false);
-  sb_smart_director_tick(audio(1000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 1000);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(1250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 1250);
-  check(output.state == SB_MUSIC_DROP, "drop snapshot classifies as drop");
+  k1_smart_director_tick(audio(1000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 1000);
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(1250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 1250);
+  check(output.state == K1_MUSIC_DROP, "drop snapshot classifies as drop");
   check(output.mode_intent.requested_mode == LIGHT_MODE_COMET, "drop maps to Comet (kick tracker)");
   check(output.mode_intent.wants_switch, "drop wants bounded mode switch when confidence clears floor");
   check(output.speed_scalar > 1.0f, "drop increases speed/mood scalar");
@@ -320,8 +320,8 @@ static void test_assist_drop_switches_without_palette_overlay() {
 
 static void test_autonomy_drop_adds_frame_local_palette_overlay() {
   reset(true, true, true);
-  sb_smart_director_tick(audio(2000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 2000);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(2250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 2250);
+  k1_smart_director_tick(audio(2000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 2000);
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(2250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 2250);
   check(output.palette_overlay_enabled, "director autonomy enables palette overlay");
   check(output.palette_index == 24, "drop maps to fire palette");
   check(output.auto_colour_shift, "drop enables transient auto-colour phase");
@@ -334,7 +334,7 @@ static void test_autonomy_drop_adds_frame_local_palette_overlay() {
   params.PALETTE_MODE_ENABLED = false;
   params.PALETTE_INDEX = 29;
   params.AUTO_COLOR_SHIFT = false;
-  sb_smart_director_apply_render_params(output, &params);
+  k1_smart_director_apply_render_params(output, &params);
   check(params.PHOTONS > 0.50f, "render params photons are modulated");
   check(params.CHROMA > 0.50f, "render params chroma are modulated");
   check(params.MOOD > 0.25f, "render params mood/speed are modulated");
@@ -346,17 +346,17 @@ static void test_autonomy_drop_adds_frame_local_palette_overlay() {
 
 static void test_autonomy_steady_uses_deliberate_demo_policy() {
   reset(true, true, false);
-  SBSmartDirectorOutput reference = sb_smart_director_tick(audio(8000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 8000);
+  K1SmartDirectorOutput reference = k1_smart_director_tick(audio(8000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 8000);
   check(reference.mode_intent.requested_mode == LIGHT_MODE_SPECTRUM_RIVER, "reference steady maps to Spectrum River");
   check(reference.palette_index == 29, "reference steady maps to palette 29");
 
   reset(true, true, true);
-  SBSmartDirectorOutput first = sb_smart_director_tick(audio(10000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 10000);
-  SBSmartDirectorOutput second = sb_smart_director_tick(audio(19000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 19000);
-  SBSmartDirectorOutput third = sb_smart_director_tick(audio(35000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 35000);
-  check(first.state == SB_MUSIC_STEADY, "steady snapshot classifies as steady");
-  check(second.state == SB_MUSIC_STEADY, "steady follow-up remains steady");
-  check(third.state == SB_MUSIC_STEADY, "third steady sample remains steady");
+  K1SmartDirectorOutput first = k1_smart_director_tick(audio(10000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 10000);
+  K1SmartDirectorOutput second = k1_smart_director_tick(audio(19000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 19000);
+  K1SmartDirectorOutput third = k1_smart_director_tick(audio(35000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f), 35000);
+  check(first.state == K1_MUSIC_STEADY, "steady snapshot classifies as steady");
+  check(second.state == K1_MUSIC_STEADY, "steady follow-up remains steady");
+  check(third.state == K1_MUSIC_STEADY, "third steady sample remains steady");
   check(first.mode_intent.requested_mode != LIGHT_MODE_SPECTRUM_RIVER &&
         second.mode_intent.requested_mode != LIGHT_MODE_SPECTRUM_RIVER &&
         third.mode_intent.requested_mode != LIGHT_MODE_SPECTRUM_RIVER,
@@ -377,11 +377,11 @@ static void test_autonomy_steady_uses_deliberate_demo_policy() {
 
 static void test_autonomy_drop_gets_intentional_high_energy_trajectory() {
   reset(true, true, true, 0.07f);
-  sb_smart_director_tick(audio(2000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 2000);
-  SBSmartDirectorOutput early = sb_smart_director_tick(audio(2250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 2250);
-  SBSmartDirectorOutput late = sb_smart_director_tick(audio(26500, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 26500);
-  check(early.state == SB_MUSIC_DROP, "drop snapshot classifies as drop");
-  check(late.state == SB_MUSIC_DROP, "late drop snapshot remains drop");
+  k1_smart_director_tick(audio(2000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 2000);
+  K1SmartDirectorOutput early = k1_smart_director_tick(audio(2250, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 2250);
+  K1SmartDirectorOutput late = k1_smart_director_tick(audio(26500, 0.80f, 0.82f, 0.90f, 0.55f, 0.45f, 0.35f), 26500);
+  check(early.state == K1_MUSIC_DROP, "drop snapshot classifies as drop");
+  check(late.state == K1_MUSIC_DROP, "late drop snapshot remains drop");
   check(early.mode_intent.requested_mode == LIGHT_MODE_COMET, "early drop maps to Comet kick impact");
   check(late.mode_intent.requested_mode == LIGHT_MODE_BLOOM_FAST, "late drop maps to Bloom Fast trajectory");
   check(early.palette_index == 24, "early drop uses fire palette");
@@ -392,9 +392,9 @@ static void test_autonomy_drop_gets_intentional_high_energy_trajectory() {
 
 static void test_autonomy_sparse_build_lifts_without_colour_washout() {
   reset(true, true, true, 0.07f);
-  sb_smart_director_tick(audio(5000, 0.10f, 0.05f, 0.12f, 0.04f, 0.04f, 0.02f), 5000);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(5500, 0.42f, 0.36f, 0.46f, 0.20f, 0.18f, 0.10f), 5500);
-  check(output.state == SB_MUSIC_BUILD, "sparse/build snapshot classifies as build");
+  k1_smart_director_tick(audio(5000, 0.10f, 0.05f, 0.12f, 0.04f, 0.04f, 0.02f), 5000);
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(5500, 0.42f, 0.36f, 0.46f, 0.20f, 0.18f, 0.10f), 5500);
+  check(output.state == K1_MUSIC_BUILD, "sparse/build snapshot classifies as build");
   check(output.mode_intent.requested_mode == LIGHT_MODE_WAVEFORM_HYBRID, "build maps to controlled Waveform Hybrid");
   check(output.palette_index == 29, "build starts from visible lift palette");
   check(output.photons_scalar > 1.0f, "build increases photons");
@@ -405,8 +405,8 @@ static void test_autonomy_sparse_build_lifts_without_colour_washout() {
 
 static void test_confidence_floor_blocks_switch_but_not_scalar_policy() {
   reset(true, true, true, 1.0f);
-  sb_smart_director_tick(audio(3000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 3000);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(3250, 0.60f, 0.30f, 0.45f, 0.30f, 0.30f, 0.20f), 3250);
+  k1_smart_director_tick(audio(3000, 0.08f, 0.04f, 0.04f, 0.02f, 0.02f, 0.02f), 3000);
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(3250, 0.60f, 0.30f, 0.45f, 0.30f, 0.30f, 0.20f), 3250);
   check(!output.mode_intent.wants_switch, "confidence floor blocks switching");
   check(output.speed_scalar != 1.0f || output.photons_scalar != 1.0f || output.chroma_scalar != 1.0f,
         "scalar modulation remains explicit when switch is blocked");
@@ -414,14 +414,14 @@ static void test_confidence_floor_blocks_switch_but_not_scalar_policy() {
 
 static void test_scene_boundary_requires_music_event_when_event_stream_is_present() {
   reset(true, true, true, 0.07f);
-  SBOnsetBeatEvent confirmed = music_event(10000, true, false, true, 0.34f, 0.05f, 0.28f);
-  SBOnsetBeatEvent quiet = music_event(35000, false, false, false, 0.0f, 0.0f, 0.0f);
-  SBSmartDirectorOutput first = sb_smart_director_tick(
+  K1OnsetBeatEvent confirmed = music_event(10000, true, false, true, 0.34f, 0.05f, 0.28f);
+  K1OnsetBeatEvent quiet = music_event(35000, false, false, false, 0.0f, 0.0f, 0.0f);
+  K1SmartDirectorOutput first = k1_smart_director_tick(
     audio(10000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f),
     10000,
     &confirmed
   );
-  SBSmartDirectorOutput held = sb_smart_director_tick(
+  K1SmartDirectorOutput held = k1_smart_director_tick(
     audio(35000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f),
     35000,
     &quiet
@@ -433,14 +433,14 @@ static void test_scene_boundary_requires_music_event_when_event_stream_is_presen
 
 static void test_scene_boundary_advances_on_confirmed_music_event() {
   reset(true, true, true, 0.07f);
-  SBOnsetBeatEvent first_event = music_event(10000, true, false, true, 0.30f, 0.05f, 0.24f);
-  SBOnsetBeatEvent next_event = music_event(35000, false, true, true, 0.05f, 0.32f, 0.30f);
-  SBSmartDirectorOutput first = sb_smart_director_tick(
+  K1OnsetBeatEvent first_event = music_event(10000, true, false, true, 0.30f, 0.05f, 0.24f);
+  K1OnsetBeatEvent next_event = music_event(35000, false, true, true, 0.05f, 0.32f, 0.30f);
+  K1SmartDirectorOutput first = k1_smart_director_tick(
     audio(10000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f),
     10000,
     &first_event
   );
-  SBSmartDirectorOutput advanced = sb_smart_director_tick(
+  K1SmartDirectorOutput advanced = k1_smart_director_tick(
     audio(35000, 0.18f, 0.05f, 0.24f, 0.10f, 0.10f, 0.05f),
     35000,
     &next_event
@@ -453,13 +453,13 @@ static void test_scene_boundary_advances_on_confirmed_music_event() {
 
 static void test_low_energy_false_onset_stays_idle_in_autonomy() {
   reset(true, true, true, 0.07f);
-  SBOnsetBeatEvent false_onset = music_event(90000, true, true, true, 0.60f, 0.45f, 0.40f);
-  SBSmartDirectorOutput output = sb_smart_director_tick(
+  K1OnsetBeatEvent false_onset = music_event(90000, true, true, true, 0.60f, 0.45f, 0.40f);
+  K1SmartDirectorOutput output = k1_smart_director_tick(
     audio(90000, 0.02f, 0.10f, 0.05f, 0.01f, 0.01f, 0.01f),
     90000,
     &false_onset
   );
-  check(output.state == SB_MUSIC_SILENCE, "low-energy false onset is treated as idle scene input");
+  check(output.state == K1_MUSIC_SILENCE, "low-energy false onset is treated as idle scene input");
   check(output.mode_intent.requested_mode == LIGHT_MODE_BLOOM, "low-energy false onset stays on Bloom");
   check(!output.palette_overlay_enabled, "low-energy false onset does not own palette overlay");
   check(!output.mode_intent.wants_switch, "low-energy false onset does not request a scene switch");
@@ -467,23 +467,23 @@ static void test_low_energy_false_onset_stays_idle_in_autonomy() {
 
 static void test_manual_owner_surfaces_in_mode_selection_config() {
   reset(true, true, true);
-  sb_smart_director_mark_manual_control(4000, SB_MANUAL_REASON_SERIAL_COMMAND);
-  check(sb_smart_director_manual_owner_active(4500), "recent serial command marks manual owner active");
-  SBModeSelectionConfig selection = sb_smart_director_mode_selection_config(4500);
+  k1_smart_director_mark_manual_control(4000, K1_MANUAL_REASON_SERIAL_COMMAND);
+  check(k1_smart_director_manual_owner_active(4500), "recent serial command marks manual owner active");
+  K1ModeSelectionConfig selection = k1_smart_director_mode_selection_config(4500);
   check(selection.enabled, "selection remains enabled for downstream resolver");
   check(selection.manual_owner_active, "selection config exposes manual owner gate");
   check(selection.min_dwell_ms == 12000, "selection config carries dwell");
   check(selection.cooldown_ms == 12000, "selection config carries cooldown");
   check(selection.switch_window_ms == 90000, "selection config carries switch window");
   check(selection.max_switches_per_window == 3, "selection config carries rate limit");
-  sb_smart_director_clear_manual_control();
-  check(!sb_smart_director_manual_owner_active(4500), "smart scene can explicitly hand ownership back to Smart");
+  k1_smart_director_clear_manual_control();
+  check(!k1_smart_director_manual_owner_active(4500), "smart scene can explicitly hand ownership back to Smart");
 }
 
 static void test_silence_never_owns_palette_overlay() {
   reset(true, true, true);
-  SBSmartDirectorOutput output = sb_smart_director_tick(audio(14000, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, true), 14000);
-  check(output.state == SB_MUSIC_SILENCE, "silence classifies as silence");
+  K1SmartDirectorOutput output = k1_smart_director_tick(audio(14000, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, true), 14000);
+  check(output.state == K1_MUSIC_SILENCE, "silence classifies as silence");
   check(!output.palette_overlay_enabled, "silence does not emit palette overlay");
   check(!output.mode_intent.wants_switch || output.mode_intent.requested_mode == LIGHT_MODE_BLOOM,
         "silence does not request a non-idle smart mode");
@@ -522,14 +522,14 @@ def run_replay(compiler="clang++", keep_dir=None):
         workdir = Path(temp_owner.name)
 
     try:
-        source_copy = workdir / "sb_smart_director.cpp"
-        shutil.copy2(next(FIRMWARE.rglob("sb_smart_director.cpp")), source_copy)
+        source_copy = workdir / "k1_smart_director.cpp"
+        shutil.copy2(next(FIRMWARE.rglob("k1_smart_director.cpp")), source_copy)
         (workdir / "Arduino.h").write_text(ARDUINO_STUB, encoding="utf-8")
         (workdir / "config_types.h").write_text(CONFIG_TYPES_STUB, encoding="utf-8")
-        (workdir / "sb_audio_snapshot.h").write_text(AUDIO_SNAPSHOT_STUB, encoding="utf-8")
-        (workdir / "sb_mode_selection.h").write_text(MODE_SELECTION_STUB, encoding="utf-8")
+        (workdir / "k1_audio_snapshot.h").write_text(AUDIO_SNAPSHOT_STUB, encoding="utf-8")
+        (workdir / "k1_mode_selection.h").write_text(MODE_SELECTION_STUB, encoding="utf-8")
         (workdir / "render_params.h").write_text(RENDER_PARAMS_STUB, encoding="utf-8")
-        (workdir / "sb_smart_director.h").write_text(SMART_DIRECTOR_HEADER_STUB, encoding="utf-8")
+        (workdir / "k1_smart_director.h").write_text(SMART_DIRECTOR_HEADER_STUB, encoding="utf-8")
         (workdir / "globals.h").write_text(GLOBALS_STUB, encoding="utf-8")
         main_cpp = workdir / "smart_director_replay_main.cpp"
         binary = workdir / "smart_director_replay"

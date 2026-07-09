@@ -53,7 +53,7 @@ constexpr EffectId legacy_id(uint8_t ordinal) {
 // `metadata` and `effect` are nullptr here and bound in registry_ensure().
 // audio_deps / enabled / director_ok mirror the current K1 behaviour:
 //   enabled     == light_mode_is_enabled(ordinal)  (8 modes disabled today)
-//   director_ok == sb_mode_allowed(ordinal)        (9-mode director allow-list)
+//   director_ok == k1_mode_allowed(ordinal)        (9-mode director allow-list)
 //   audio_deps  == best-effort per mode character.
 EffectEntry g_registry[] = {
     // ── Legacy family 0x00: low byte == lightshow_modes ordinal ──

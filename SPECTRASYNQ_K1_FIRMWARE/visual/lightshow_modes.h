@@ -421,7 +421,7 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   if (energy_fixed > brightness) brightness = energy_fixed;
   brightness = clamp01_fixed(brightness);
 
-#ifdef SB_PALETTE_ENERGY_EXCURSION_V1
+#ifdef K1_PALETTE_ENERGY_EXCURSION_V1
   // PALETTE-RESOLUTION lane item 2 ("value-ramp lite", 2026-06-11): chroma
   // energy sweeps the sampling coordinate UP-gradient from the harmonic anchor
   // (one-sided, 0..+0.20) — dynamics traverse the palette's authored arc during

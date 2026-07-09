@@ -55,8 +55,8 @@
 #define K1_SENSITIVITY_MIN 0.10f
 #define K1_SENSITIVITY_MAX 20.0f
 
-#ifndef SB_TEMPO_NOVELTY_DECIMATION
-#define SB_TEMPO_NOVELTY_DECIMATION 3U
+#ifndef K1_TEMPO_NOVELTY_DECIMATION
+#define K1_TEMPO_NOVELTY_DECIMATION 3U
 #endif
 
 // Spectral analysis window (Hann) for the GDFT magnitude path. DEFAULT OFF:

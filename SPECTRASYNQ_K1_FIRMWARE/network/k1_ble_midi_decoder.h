@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "sb_wireless_control.h"
+#include "k1_wireless_control.h"
 
 #define K1_BLE_MIDI_MAX_PACKET 247
 #define K1_BLE_MIDI_MAX_RECORDS_PER_PACKET 16

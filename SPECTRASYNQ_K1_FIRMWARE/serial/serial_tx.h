@@ -18,7 +18,7 @@
 #define SERIAL_TX_H
 
 #include "globals.h"    // USBSerial, Serial, stream_* flags, AP/VP_STREAM_ENABLED, FIRMWARE_VERSION
-#include "constants.h"  // SB_PASS / SB_FAIL
+#include "constants.h"  // K1_PASS / K1_FAIL
 #include <stdint.h>
 
 // ---- Serial protocol envelope (verbatim from serial_menu.h Unit B) ----------

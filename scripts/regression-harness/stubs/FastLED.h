@@ -21,7 +21,7 @@
 //   (Tier-2 vpab_capture), so ±1 LSB host-vs-device colour drift is by design.
 //   Host-vs-host determinism (acceptance A2) holds regardless of LSB exactness.
 //
-// NON-SHIPPING. Reachable only under -DSB_RENDER_HOST_TEST via -I stubs.
+// NON-SHIPPING. Reachable only under -DK1_RENDER_HOST_TEST via -I stubs.
 // ============================================================================
 #pragma once
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Evaluate sb_musical_saliency on HarmonixSet using host-side replay.
+"""Evaluate k1_musical_saliency on HarmonixSet using host-side replay.
 
-The benchmark compiles a small harness that runs the real `sb_musical_saliency.cpp`
+The benchmark compiles a small harness that runs the real `k1_musical_saliency.cpp`
 with host-provided `frame_ms novelty silence` novelty from `novelty_from_wav`.
 It emits salient-event times as `S` rows and derives precision / recall / rate
 metrics against HarmonixSet beat annotations.
@@ -37,14 +37,14 @@ static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 
 
 CPP_REPLAY = r"""
-#include "sb_musical_saliency.h"
-#include "sb_onset_beat.h"
+#include "k1_musical_saliency.h"
+#include "k1_onset_beat.h"
 
 #include <cmath>
 #include <cstdio>
 
 int main() {
-  sb_onset_beat_reset();
+  k1_onset_beat_reset();
   char line[160];
   unsigned int last_ms = 0;
   unsigned long frames = 0;
@@ -56,7 +56,7 @@ int main() {
     if (got < 2) continue;
     if (got < 5) { spectral_energy = novelty; chroma_strength = novelty; }  // back-compat broadcast
 
-    SBAudioSnapshot audio = {};
+    K1AudioSnapshot audio = {};
     audio.frame_ms = ms;
     audio.peak_scaled = novelty;
     audio.vu_level = novelty;
@@ -68,17 +68,17 @@ int main() {
     audio.chroma_strength = chroma_strength;
     audio.silence = silence != 0;
 
-    sb_onset_beat_update(audio);
-    SBOnsetBeatEvent onset = sb_onset_beat_read();
-    sb_musical_saliency_update(audio, &onset);
+    k1_onset_beat_update(audio);
+    K1OnsetBeatEvent onset = k1_onset_beat_read();
+    k1_musical_saliency_update(audio, &onset);
 
-    SBSaliencyEvent ev = {};
-    if (sb_musical_saliency_read_event(&ev, true)) {
+    K1SaliencyEvent ev = {};
+    if (k1_musical_saliency_read_event(&ev, true)) {
       if (ev.salient) {
         std::printf("S %u %.6f %.6f %u\n", ms, ev.overallSaliency, ev.adaptiveThreshold, (unsigned)ev.ageMs);
       }
     }
-    SBSaliencyAxisFrame ax = sb_musical_saliency_read();
+    K1SaliencyAxisFrame ax = k1_musical_saliency_read();
     std::printf("O %u %.6f %d\n", ms, ax.overallSaliency, silence);
     last_ms = ms;
     frames++;
@@ -95,7 +95,7 @@ def build_binary(compiler="clang++", keep_dir=None):
         workdir = Path(keep_dir)
         workdir.mkdir(parents=True, exist_ok=True)
     else:
-        workdir = Path(tempfile.mkdtemp(prefix="sb_saliency_bench_"))
+        workdir = Path(tempfile.mkdtemp(prefix="k1_saliency_bench_"))
 
     stub_dir = workdir / "stub"
     stub_dir.mkdir(parents=True, exist_ok=True)
@@ -116,8 +116,8 @@ def build_binary(compiler="clang++", keep_dir=None):
         str(FIRMWARE),
         "-I",
         str(FIRMWARE / "audio"),
-        str(FIRMWARE / "audio" / "sb_musical_saliency.cpp"),
-        str(FIRMWARE / "audio" / "sb_onset_beat.cpp"),
+        str(FIRMWARE / "audio" / "k1_musical_saliency.cpp"),
+        str(FIRMWARE / "audio" / "k1_onset_beat.cpp"),
         str(main_cpp),
         "-o",
         str(binary),

@@ -35,11 +35,11 @@ WHY THIS HOST-COMPILES (design §2, confirmed by first-hand recon):
   pure-logic TUs (none drag audio/I2S/FreeRTOS/RMT):
       serial/serial_tx.cpp            (tx_begin/tx_end/bad_command/stop_streams)
       serial/serial_parse_helpers.cpp (vp_parse_bool/float, serial_clamp_float)
-      director/sb_smart_director.cpp  (sb_smart_director_* config getters/setters)
+      director/k1_smart_director.cpp  (k1_smart_director_* config getters/setters)
       director/k1_edgemixer.cpp  (k1_edgemixer_* config)
-      director/sb_visual_hooks.cpp    (sb_visual_hooks_* config)
-      director/sb_mode_selection.cpp  (sb_mode_selection_init)
-      control/sb_effect_queue.cpp     (sb_queue_* config)
+      director/k1_visual_hooks.cpp    (k1_visual_hooks_* config)
+      director/k1_mode_selection.cpp  (k1_mode_selection_init)
+      control/k1_effect_queue.cpp     (k1_queue_* config)
   + the host-stubbed device side-effects: save_config / save_config_delayed /
     reboot / set_preset / check_current_function (defined in the driver — serial_menu.h
     does NOT transitively include bridge_fs.h / system.h / presets.h, so there is
@@ -66,7 +66,7 @@ S3.1 EXCLUSIONS — set_chroma_profile + bass_mode (2 of the design's 9 reboot s
   CHROMAGRAM_RANGE / CHROMA_PROFILE, then reboot() ONLY IF note_offset changed
   (conditional reboot). apply_chroma_profile is an inline in visual/led_utilities.h
   (line ~1835) which the host build does NOT compile (it drags FastLED +
-  sb_audio_snapshot.h + vpab_capture.h, and ODR-clashes the existing host stubs).
+  k1_audio_snapshot.h + vpab_capture.h, and ODR-clashes the existing host stubs).
   serial_replay_host_stubs.h therefore stubs apply_chroma_profile to a no-op that
   returns false ("no note-offset change"). Under that stub these two setters would
   capture an EMPTY CONFIG delta and reboot:false ALWAYS — i.e. the exact opposite of
@@ -112,7 +112,7 @@ COMMON_SOURCES = [
 ]
 
 # The real pure-logic firmware TUs parse_command's full body link-references
-# (recon §2). None drag audio/I2S/FreeRTOS/RMT. NOTE: control/sb_effect_queue.cpp
+# (recon §2). None drag audio/I2S/FreeRTOS/RMT. NOTE: control/k1_effect_queue.cpp
 # is deliberately NOT compiled — it drags <FS.h>/<LittleFS.h>/EffectRegistry, and
 # its only parse_command surface is the queue/dip/xfade config setters (LIVE but
 # NOT in the S3.0 corpus). Those ~8 symbols are host-stubbed in
@@ -126,10 +126,10 @@ MODULE_CPPS = [
                                        # calls serial_cmd_dispatch_pure_setter() here;
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
-    "director/sb_smart_director.cpp",
+    "director/k1_smart_director.cpp",
     "director/k1_edgemixer.cpp",
-    "director/sb_visual_hooks.cpp",
-    "director/sb_mode_selection.cpp",
+    "director/k1_visual_hooks.cpp",
+    "director/k1_mode_selection.cpp",
 ]
 
 # Compiler preference: GCC (FixedPoints SQ15x16 compound-literal compat; mirrors
@@ -143,26 +143,26 @@ NAME = "serial_replay"
 
 # Production-matching defines: the [env:k1_hardware] flag set (so the golden pins
 # PRODUCTION branch structure — every probe/harness/registry #ifdef compiles out
-# exactly as it does in the shipped TU). SB_RENDER_HOST_TEST activates
-# render_host_globals.cpp's host singletons. SB_SERIAL_REPLAY_HOST flips the
+# exactly as it does in the shipped TU). K1_RENDER_HOST_TEST activates
+# render_host_globals.cpp's host singletons. K1_SERIAL_REPLAY_HOST flips the
 # Serial/USBSerial host sink from no-op to RECORDING (driver-local; does not touch
 # the shared stubs, so the other 6 oracles stay byte-identical).
 DEFINES = [
-    "SB_K1_HARDWARE",          # production: USBSerial #define'd to Serial; pin map
-    "SB_RENDER_HOST_TEST",     # render_host_globals host singletons
-    "SB_SERIAL_REPLAY_HOST",   # driver-local: make Serial recording (text = golden)
-    "SB_TEMPO_CONF_V2",
-    "SB_TEMPO_FLYWHEEL_V2",
-    "SB_ONSET_V2",
-    "SB_CHORD_V2",
-    "SB_SEMANTIC_STATE",
-    "SB_CHORD_HUE_V1",
-    "SB_DROP_CUT_V1",
-    "SB_VIVID_PRECOMP_V1",
+    "K1_HARDWARE",          # production: USBSerial #define'd to Serial; pin map
+    "K1_RENDER_HOST_TEST",     # render_host_globals host singletons
+    "K1_SERIAL_REPLAY_HOST",   # driver-local: make Serial recording (text = golden)
+    "K1_TEMPO_CONF_V2",
+    "K1_TEMPO_FLYWHEEL_V2",
+    "K1_ONSET_V2",
+    "K1_CHORD_V2",
+    "K1_SEMANTIC_STATE",
+    "K1_CHORD_HUE_V1",
+    "K1_DROP_CUT_V1",
+    "K1_VIVID_PRECOMP_V1",
     "K1_LOUD_GUARD_V1",
     "DEFAULT_SAMPLE_RATE=12800",
     "DEFAULT_SAMPLES_PER_CHUNK=96",
-    "SB_TEMPO_NOVELTY_DECIMATION=3U",
+    "K1_TEMPO_NOVELTY_DECIMATION=3U",
 ]
 
 # ---------------------------------------------------------------------------
@@ -305,7 +305,7 @@ CORPUS = [
     "vp_bloom_alpha=1.01",      # above 1.00 -> clamped to 1.00 (VP_BLOOM_ALPHA)
 
     # ===================================================================
-    # Fα VIVID EXTENSION — 4 vivid handlers (SB_VIVID_PRECOMP_V1, gated in
+    # Fα VIVID EXTENSION — 4 vivid handlers (K1_VIVID_PRECOMP_V1, gated in
     # parse_command by #ifdef). Each writes a VP_VIVID_* inline global.
     # config_delta now tracks the VP_VIVID_* globals (snapshot extended above).
     # ===================================================================
@@ -387,7 +387,7 @@ CORPUS = [
 #
 # Drives the REAL parse_command (included from serial_menu.h) over the corpus,
 # capturing the TRIPLE per command. Provides:
-#   * a RECORDING serial sink (SB_SERIAL_REPLAY_HOST): a g_sb_replay_out string
+#   * a RECORDING serial sink (K1_SERIAL_REPLAY_HOST): a g_sb_replay_out string
 #     accumulates every print()/println() exactly as Arduino's Print would format
 #     it (int as int, float with N digits default 2 / explicit 6, "on"/"off"
 #     literals as passed, Arduino half-away-from-zero float rounding). The text IS
@@ -402,7 +402,7 @@ CORPUS = [
 # save_config, save_config_delayed, reboot, bad_command}.
 # ---------------------------------------------------------------------------
 DRIVER = r"""
-// oracle_serial_replay_driver.cpp  (HOST-ONLY, -DSB_SERIAL_REPLAY_HOST)
+// oracle_serial_replay_driver.cpp  (HOST-ONLY, -DK1_SERIAL_REPLAY_HOST)
 // Drives the REAL parse_command() over the S3.0 pure-setter corpus and dumps the
 // capture triple per command. Compiled by oracle_serial_replay.py — NOT shipped.
 
@@ -413,18 +413,18 @@ DRIVER = r"""
 #include <cmath>
 
 // The RECORDING serial sink lives in stubs/Arduino.h, gated by
-// SB_SERIAL_REPLAY_HOST: under that flag HostSerial's print/println append to the
+// K1_SERIAL_REPLAY_HOST: under that flag HostSerial's print/println append to the
 // shared inline accumulator g_sb_replay_out (declared there), formatted to match
 // Arduino Print's contract. It must be ONE shared definition so every compiled TU
 // records into the same buffer — the driver TU, AND serial_tx.cpp (tx_begin /
 // tx_end / bad_command echo through USBSerial too). globals.h (under
-// SB_K1_HARDWARE) does `#define USBSerial Serial`, and `HostSerial Serial`'s
+// K1_HARDWARE) does `#define USBSerial Serial`, and `HostSerial Serial`'s
 // storage is defined once in render_host_globals.cpp.
 #include "globals.h"   // brings parse_command's whole world (USBSerial #def -> Serial)
 // g_sb_replay_out is declared inline in stubs/Arduino.h (via globals.h -> Arduino.h).
 
 // Host stubs for the symbols serial_menu.h's WHOLE body references (FIRMWARE_VERSION,
-// pgmspace shims, I2S_NUM_0, esp_reset_reason, the device handlers, the sb_queue_*
+// pgmspace shims, I2S_NUM_0, esp_reset_reason, the device handlers, the k1_queue_*
 // config entry points). Included AFTER globals.h (so config_types.h's enums exist
 // for apply_chroma_profile) and BEFORE serial_menu.h. None are in the corpus; they
 // only need to compile + link. See serial_replay_host_stubs.h header comment.
@@ -461,45 +461,45 @@ static bool emitted_bad_command(const std::string& before, const std::string& af
 
 // ---------------------------------------------------------------------------
 // LINK stubs for serial_menu.h whole-body symbols that need the firmware TYPES
-// (SBChannelPreset / SBAudioSnapshot), so they are DEFINED here, AFTER the header.
+// (K1ChannelPreset / K1AudioSnapshot), so they are DEFINED here, AFTER the header.
 // All belong to handlers OUTSIDE the S3.0 corpus (noise-cal arm/disarm/confirm,
 // preset slot save/get, queue arm/commit, the output probe, the audio snapshot
 // read, the benchmark/FPS-stream globals). They only need to LINK; behaviour is
 // irrelevant to the pure-setter golden. serial_menu.h forward-declares each, so
 // these are the SOLE definitions (no ODR clash — the real TUs are not compiled).
 // ---------------------------------------------------------------------------
-// noise-cal arm FSM (control/sb_noise_cal_arm.cpp — not compiled)
-void sb_noise_cal_arm() {}
-void sb_noise_cal_disarm() {}
-bool sb_noise_cal_confirm(uint32_t /*now_ms*/) { return false; }
+// noise-cal arm FSM (control/k1_noise_cal_arm.cpp — not compiled)
+void k1_noise_cal_arm() {}
+void k1_noise_cal_disarm() {}
+bool k1_noise_cal_confirm(uint32_t /*now_ms*/) { return false; }
 
 // effect-queue surface beyond the config setters stubbed in the host-stub header
-// (control/sb_effect_queue.cpp — not compiled; drags FS/LittleFS)
-bool sb_queue_any_armed() { return false; }
-SBChannelPreset* sb_queue_arm_begin(bool /*secondary*/) { return nullptr; }
-void sb_queue_arm_preset(bool /*secondary*/, const SBChannelPreset& /*preset*/) {}
-void sb_queue_request_commit(bool /*cued*/, uint32_t /*now_ms*/) {}
-bool sb_queue_mode_enabled() { return false; }
-uint8_t sb_queue_transition_style() { return 0; }
-// sb_effect_queue.h config setters/getters (sb_effect_queue.h:134-140). EXTERNAL defs
+// (control/k1_effect_queue.cpp — not compiled; drags FS/LittleFS)
+bool k1_queue_any_armed() { return false; }
+K1ChannelPreset* k1_queue_arm_begin(bool /*secondary*/) { return nullptr; }
+void k1_queue_arm_preset(bool /*secondary*/, const K1ChannelPreset& /*preset*/) {}
+void k1_queue_request_commit(bool /*cued*/, uint32_t /*now_ms*/) {}
+bool k1_queue_mode_enabled() { return false; }
+uint8_t k1_queue_transition_style() { return 0; }
+// k1_effect_queue.h config setters/getters (k1_effect_queue.h:134-140). EXTERNAL defs
 // here (moved out of serial_replay_host_stubs.h) so the EXTRACTED
 // serial_cmd_dispatch_queue() in serial_cmd_handlers.cpp — a separate TU that only
 // sees the declaration — links them too. Values irrelevant (queue not in the corpus).
-uint16_t sb_queue_dip_ms() { return 0; }
-bool     sb_queue_set_dip_ms(uint32_t) { return true; }
-uint16_t sb_queue_xfade_ms() { return 0; }
-bool     sb_queue_set_xfade_ms(uint32_t) { return true; }
-uint8_t  sb_queue_commit_quantise() { return 0; }
-void     sb_queue_set_commit_quantise(uint8_t) {}
-void     sb_queue_set_transition_style(uint8_t) {}
-void     sb_queue_set_mode_enabled(bool) {}
-bool sb_preset_slot_save(uint8_t /*slot*/, bool /*from_secondary*/) { return false; }
-bool sb_preset_slot_get(uint8_t /*slot*/, SBChannelPreset* /*out*/) { return false; }
+uint16_t k1_queue_dip_ms() { return 0; }
+bool     k1_queue_set_dip_ms(uint32_t) { return true; }
+uint16_t k1_queue_xfade_ms() { return 0; }
+bool     k1_queue_set_xfade_ms(uint32_t) { return true; }
+uint8_t  k1_queue_commit_quantise() { return 0; }
+void     k1_queue_set_commit_quantise(uint8_t) {}
+void     k1_queue_set_transition_style(uint8_t) {}
+void     k1_queue_set_mode_enabled(bool) {}
+bool k1_preset_slot_save(uint8_t /*slot*/, bool /*from_secondary*/) { return false; }
+bool k1_preset_slot_get(uint8_t /*slot*/, K1ChannelPreset* /*out*/) { return false; }
 
 // vp output probe (visual/lightshow_modes.h inline — header not pulled) + audio
-// snapshot read (audio/sb_audio_snapshot.cpp — not compiled)
+// snapshot read (audio/k1_audio_snapshot.cpp — not compiled)
 void vp_run_output_probe() {}
-SBAudioSnapshot sb_audio_snapshot_read() { SBAudioSnapshot s = {}; return s; }
+K1AudioSnapshot k1_audio_snapshot_read() { K1AudioSnapshot s = {}; return s; }
 
 // benchmark / FPS-stream globals: serial_menu.h declares these extern (real
 // storage is in the .ino TU). Provide host storage so the FPS-stream branches link.

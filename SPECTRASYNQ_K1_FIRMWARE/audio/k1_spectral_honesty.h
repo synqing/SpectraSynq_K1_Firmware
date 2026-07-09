@@ -29,8 +29,8 @@
 // Everything here is pure, host-clean (no Arduino), and read-only metadata —
 // it never suppresses visuals. It is shared by the firmware windowing path,
 // the boot-time honest self-report, and the host regression tests so there is
-// a single source of truth. K1-specific code uses the k1_ prefix (sb_ is
-// reserved for inherited Sensory Bridge heritage modules).
+// a single source of truth. K1-specific code uses the k1_ prefix (k1_ is
+// reserved for inherited K1 heritage modules).
 // ============================================================================
 
 #include <cstdint>

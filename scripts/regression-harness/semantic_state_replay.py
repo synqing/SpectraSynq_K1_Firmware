@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 """AudioSemanticState spine host harness — REAL firmware C++ on scripted events.
 
-Proves `audio_semantic_read()` (audio/sb_semantic_state.cpp, behind
-SB_SEMANTIC_STATE) packs the produced fields correctly by driving the REAL
+Proves `audio_semantic_read()` (audio/k1_semantic_state.cpp, behind
+K1_SEMANTIC_STATE) packs the produced fields correctly by driving the REAL
 underlying producers and reading the aggregate back:
 
-  - tempo  : the REAL sb_tempo.cpp is fed a clean synthetic beat train; the
+  - tempo  : the REAL k1_tempo.cpp is fed a clean synthetic beat train; the
              packed bpm / tempo_confidence / tempo_locked / beat_phase01 /
-             beat_strength MUST equal sb_tempo_read() field-for-field.
-  - onset  : the REAL sb_onset_beat.cpp (-DSB_ONSET_V2) is driven with band-
+             beat_strength MUST equal k1_tempo_read() field-for-field.
+  - onset  : the REAL k1_onset_beat.cpp (-DK1_ONSET_V2) is driven with band-
              localised hits; the packed onset / *_level channels MUST equal
-             sb_onset_beat_read() field-for-field.
-  - chord  : a host snapshot stub runs the REAL sb_chord_detect.cpp on a labelled
+             k1_onset_beat_read() field-for-field.
+  - chord  : a host snapshot stub runs the REAL k1_chord_detect.cpp on a labelled
              chroma; the packed chord_root / chord_type / chord_confidence MUST
              equal the detected chord.
   - rate   : the self-described diagnostics MUST equal the firmware derivation
              (12800/96 = 133.33 Hz AP, /3 = 44.44 Hz novelty, 7.5 ms frame).
 
-The snapshot PRODUCER (sb_audio_snapshot.cpp) is replaced by a tiny host stub
+The snapshot PRODUCER (k1_audio_snapshot.cpp) is replaced by a tiny host stub
 because the real producer needs firmware globals (FastLED/FixedPoints). The
-spine only ever calls sb_audio_snapshot_READ(), so the stub faithfully models
+spine only ever calls k1_audio_snapshot_READ(), so the stub faithfully models
 the read surface (and runs the REAL chord detector on the chroma we inject).
 tempo + onset use the REAL producers — those are what the spine forwards.
 
-NON-SHIPPING. Host-only. SB_SEMANTIC_STATE / SB_SEMANTIC_HOST_TEST never enter a
+NON-SHIPPING. Host-only. K1_SEMANTIC_STATE / K1_SEMANTIC_HOST_TEST never enter a
 PlatformIO env. Run: python3 scripts/regression-harness/semantic_state_replay.py
 """
 
@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parents[2]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 
 # Minimal Arduino stub: only the portMUX critical-section surface the producer
-# TUs touch. sb_tempo.cpp / sb_onset_beat.cpp are otherwise stdint/math-only and
+# TUs touch. k1_tempo.cpp / k1_onset_beat.cpp are otherwise stdint/math-only and
 # self-clock from audio.frame_ms (no millis()).
 ARDUINO_STUB = r"""
 #pragma once
@@ -50,32 +50,32 @@ static inline void portENTER_CRITICAL(portMUX_TYPE*) {}
 static inline void portEXIT_CRITICAL(portMUX_TYPE*) {}
 """
 
-# Host snapshot stub: stands in for sb_audio_snapshot.cpp (whose real producer
-# needs firmware globals). Stores a settable snapshot and, under SB_CHORD_V2,
-# runs the REAL sb_detect_chord on the injected chroma so the chord the spine
+# Host snapshot stub: stands in for k1_audio_snapshot.cpp (whose real producer
+# needs firmware globals). Stores a settable snapshot and, under K1_CHORD_V2,
+# runs the REAL k1_detect_chord on the injected chroma so the chord the spine
 # forwards is genuinely produced, not hand-set.
 SNAPSHOT_STUB = r"""
-#include "sb_audio_snapshot.h"
-static SBAudioSnapshot g_snap = {};
-void sb_audio_snapshot_update(uint32_t frame_ms) { g_snap.frame_ms = frame_ms; }
-SBAudioSnapshot sb_audio_snapshot_read() { return g_snap; }
+#include "k1_audio_snapshot.h"
+static K1AudioSnapshot g_snap = {};
+void k1_audio_snapshot_update(uint32_t frame_ms) { g_snap.frame_ms = frame_ms; }
+K1AudioSnapshot k1_audio_snapshot_read() { return g_snap; }
 // host-test entry points used by the driver to inject a snapshot
 extern "C" void host_set_snapshot_frame_ms(uint32_t ms) { g_snap.frame_ms = ms; }
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
 extern "C" void host_set_snapshot_chroma(const float* chroma_pc) {
-  for (int i = 0; i < SB_CHROMA_PC_BINS; i++) g_snap.chroma_pc[i] = chroma_pc[i];
-  sb_detect_chord(g_snap.chroma_pc, g_snap.chord);
+  for (int i = 0; i < K1_CHROMA_PC_BINS; i++) g_snap.chroma_pc[i] = chroma_pc[i];
+  k1_detect_chord(g_snap.chroma_pc, g_snap.chord);
 }
 #endif
 """
 
 DRIVER_MAIN = r"""
-#include "sb_semantic_state.h"
+#include "k1_semantic_state.h"
 #include <cmath>
 #include <cstdio>
 
 extern "C" void host_set_snapshot_frame_ms(uint32_t ms);
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
 extern "C" void host_set_snapshot_chroma(const float* chroma_pc);
 #endif
 
@@ -87,27 +87,27 @@ static void feq(float a, float b, const char* m){
 
 // Drive the real tempo producer with one AP frame.
 static void tempo_frame(uint32_t ms, float novelty) {
-  SBAudioSnapshot a = {};
+  K1AudioSnapshot a = {};
   a.frame_ms = ms; a.novelty = novelty; a.peak_scaled = novelty;
   a.spectral_energy = novelty > 0.0f ? 0.5f : 0.0f;
   a.vu_level = novelty > 0.0f ? 0.3f : 0.0f;
-  sb_tempo_update(a);
+  k1_tempo_update(a);
 }
 
 // Drive the real onset producer (V2) with a band-localised hit / quiet frame.
 static void onset_drive(uint32_t ms, bool hit, int lo, int hi) {
-  SBAudioSnapshot a = {};
+  K1AudioSnapshot a = {};
   a.frame_ms = ms; a.silence = false; a.spectral_energy = 0.3f;
   a.vu_level = 0.3f;
-  for (int i=0;i<SB_ONSET_SPECTRUM_BINS;i++) a.spectrum[i] = 0.02f;
+  for (int i=0;i<K1_ONSET_SPECTRUM_BINS;i++) a.spectrum[i] = 0.02f;
   if (hit) for (int i=lo;i<hi;i++) a.spectrum[i] = 0.85f;
-  sb_onset_beat_update(a);
+  k1_onset_beat_update(a);
 }
 
 int main() {
-  sb_tempo_init();
-  sb_tempo_reset();
-  sb_onset_beat_reset();
+  k1_tempo_init();
+  k1_tempo_reset();
+  k1_onset_beat_reset();
 
   // --- 1) RATE DIAGNOSTICS (no producer state needed) -----------------------
   AudioSemanticState s = {};
@@ -134,9 +134,9 @@ int main() {
     tempo_frame(ms_acc, nov);
     ms_acc += (uint32_t)(dt_ms + 0.5f);
   }
-  SBTempoEvent te = sb_tempo_read();
+  K1TempoEvent te = k1_tempo_read();
   audio_semantic_read(&s);
-  feq(s.bpm, te.bpm, "spine.bpm == sb_tempo_read().bpm");
+  feq(s.bpm, te.bpm, "spine.bpm == k1_tempo_read().bpm");
   feq(s.tempo_confidence, te.confidence, "spine.tempo_confidence == tempo.confidence");
   feq(s.beat_phase01, te.phase01, "spine.beat_phase01 == tempo.phase01");
   feq(s.beat_strength, te.beat_strength, "spine.beat_strength == tempo.beat_strength");
@@ -145,13 +145,13 @@ int main() {
   // The clean train must actually drive a non-zero BPM (producer is alive).
   check(s.bpm > 0.0f, "tempo producer reported a non-zero BPM on a clean train");
 
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   // --- 3) ONSET PACKING: real producer -> spine must match field-for-field --
   uint32_t t = 0;
   for (int i=0;i<40;i++){ onset_drive(t, false, 0, 0); t += 8; }   // warm past warmup
   onset_drive(t, true, 1, 25); t += 8;                              // bass-only attack -> kick
   onset_drive(t, false, 0, 0); t += 8;                             // band trigger fires (delayed)
-  SBOnsetBeatEvent oe = sb_onset_beat_read();
+  K1OnsetBeatEvent oe = k1_onset_beat_read();
   audio_semantic_read(&s);
   check(s.onset == oe.onset, "spine.onset == onset.onset");
   feq(s.onset_strength, oe.onset_strength, "spine.onset_strength == onset.onset_strength");
@@ -166,7 +166,7 @@ int main() {
   check(oe.kick_event_id > 0, "onset producer actually fired a kick (sanity)");
 #endif
 
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
   // --- 4) CHORD PACKING: real detector via snapshot stub -> spine ------------
   // A-origin A-major triad: A(0)=1.0, C#(4)=0.8, E(7)=0.7, floor 0.05.
   float chroma[12]; for (int i=0;i<12;i++) chroma[i]=0.05f;
@@ -180,13 +180,13 @@ int main() {
 
   if (failures != 0) { std::printf("SEMANTIC_STATE_REPLAY_FAIL failures=%d\n", failures); return 1; }
   std::printf("SEMANTIC_STATE_REPLAY_OK rate=1 tempo=1 onset=%d chord=%d\n",
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
               1
 #else
               0
 #endif
               ,
-#ifdef SB_CHORD_V2
+#ifdef K1_CHORD_V2
               1
 #else
               0
@@ -198,8 +198,8 @@ int main() {
 
 
 def run_replay(compiler="clang++", keep_dir=None, defines=None):
-    defines = defines if defines is not None else ["SB_SEMANTIC_STATE", "SB_SEMANTIC_HOST_TEST",
-                                                   "SB_ONSET_V2", "SB_CHORD_V2"]
+    defines = defines if defines is not None else ["K1_SEMANTIC_STATE", "K1_SEMANTIC_HOST_TEST",
+                                                   "K1_ONSET_V2", "K1_CHORD_V2"]
     temp_owner = None
     if keep_dir:
         workdir = Path(keep_dir)
@@ -225,10 +225,10 @@ def run_replay(compiler="clang++", keep_dir=None, defines=None):
             *[a for d in ("audio", "visual", "effects", "director", "serial",
                           "system", "persistence", "calibration", "diag")
               for a in ("-I", str(FW / d))],
-            str(FW / "audio" / "sb_semantic_state.cpp"),
-            str(FW / "audio" / "sb_tempo.cpp"),
-            str(FW / "audio" / "sb_onset_beat.cpp"),
-            str(FW / "audio" / "sb_chord_detect.cpp"),
+            str(FW / "audio" / "k1_semantic_state.cpp"),
+            str(FW / "audio" / "k1_tempo.cpp"),
+            str(FW / "audio" / "k1_onset_beat.cpp"),
+            str(FW / "audio" / "k1_chord_detect.cpp"),
             str(snap_cpp),
             str(main_cpp),
             "-o", str(binary),

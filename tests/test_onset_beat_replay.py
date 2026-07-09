@@ -22,7 +22,7 @@ class OnsetBeatReplayTest(unittest.TestCase):
         self.assertIn("ONSET_BEAT_REPLAY_OK cases=7", result.stdout)
 
     def test_onset_v2_synthetic_asserts(self):
-        # SB_ONSET_V2 path: per-band refractory, channel separation, and the
+        # K1_ONSET_V2 path: per-band refractory, channel separation, and the
         # gate-permission-only baseline invariant. Production (no-flag) build is
         # asserted byte-identical by the case above.
         result = subprocess.run(

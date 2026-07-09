@@ -7,7 +7,7 @@ from _fwpath import FwDir
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 SERIAL_MENU = FW / "serial_menu.h"
-NOISE_CAL_ARM = FW / "control" / "sb_noise_cal_arm.cpp"
+NOISE_CAL_ARM = FW / "control" / "k1_noise_cal_arm.cpp"
 
 
 class SerialHotkeyStaticContractTest(unittest.TestCase):
@@ -69,11 +69,11 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
 
     def test_noise_cal_confirmation_is_guarded(self):
         serial_body = self._function_body("serial_confirm_noise_cal")
-        self.assertIn("sb_noise_cal_confirm", serial_body)
+        self.assertIn("k1_noise_cal_confirm", serial_body)
 
         arm_source = NOISE_CAL_ARM.read_text()
-        match = re.search(r"bool\s+sb_noise_cal_confirm\s*\([^)]*\)\s*\{", arm_source)
-        self.assertIsNotNone(match, "sb_noise_cal_confirm() must exist")
+        match = re.search(r"bool\s+k1_noise_cal_confirm\s*\([^)]*\)\s*\{", arm_source)
+        self.assertIsNotNone(match, "k1_noise_cal_confirm() must exist")
         start = match.end()
         depth = 1
         index = start
@@ -85,7 +85,7 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                 depth -= 1
             index += 1
         body = arm_source[start:index - 1]
-        self.assertIn("sb_noise_cal_arm_active", body)
+        self.assertIn("k1_noise_cal_arm_active", body)
         self.assertIn("noise_transition_queued = true", body)
         self.assertIn("NOISE_CAL: not armed", body)
 
