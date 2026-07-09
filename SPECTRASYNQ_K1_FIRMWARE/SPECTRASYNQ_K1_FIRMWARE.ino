@@ -49,7 +49,7 @@
 #include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
 #include "k1_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
-#include "k1_edgemixer_lite.h" // Smart Visual Engine secondary colour differentiation
+#include "k1_edgemixer.h" // Smart Visual Engine secondary colour differentiation
 #include "k1_visual_hooks.h"  // Smart Visual Engine event-gated visual hooks
 #include "k1_effect_queue.h"  // Effects queuing + preset slots (frame-boundary commit engine)
 #ifdef K1_WIRELESS_ENABLED
@@ -653,6 +653,13 @@ void setup() {
   SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(SECONDARY_LIGHTSHOW_MODE, 1);
   K1_TRACE_INIT(64);
 
+  // Compute the EdgeMixer colour maps for the shipping default at boot. The static
+  // k1_edge_config bypasses k1_edgemixer_set_config() — which builds the OKLab fused
+  // map + harmony matrix — so enable-by-default would otherwise render the first frames
+  // through identity/uncomputed maps. This one call makes the boot render correct from
+  // frame 1 (gate-3 enable-by-default, Captain 2026-07-09).
+  k1_edgemixer_set_config(k1_edgemixer_config());
+
   USBSerial.print("WAVEFORM_HISTORY: ");
   if (waveform_history) {
     USBSerial.print("OK @ 0x");
@@ -667,8 +674,10 @@ void setup() {
   g_rotate8_available = false;
 #endif
 
+#ifndef K1_CUSTOM_LED_V1
   init_secondary_leds();
-  ENABLE_SECONDARY_LEDS = true;
+  ENABLE_SECONDARY_LEDS = true;   // Custom single-channel build (K1_CUSTOM_LED_V1) drops the 2nd strip
+#endif
 #ifdef K1_WIRELESS_ENABLED
   k1_wireless_begin();
 #endif
@@ -690,9 +699,13 @@ void setup() {
   for (uint16_t x = 0; x < CONFIG.LED_COUNT; x++) {
     leds_out[x] = CRGB(0, 0, 0);
   }
+#ifndef K1_CUSTOM_LED_V1
+  // Custom single-channel build skips init_secondary_leds() -> leds_out_secondary is
+  // NULL; this boot-clear must be gated or it NULL-derefs on boot.
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
+#endif
   FastLED.show();
 
   // Create thread specifically for LED updates
@@ -1042,7 +1055,9 @@ void loop() {
     debug_function_timing(t_now);
   }
 
-  yield();  // Otherwise the ESP32 will collapse into a black hole or something
+  // N2c: give CPU0's IDLE task a real FreeRTOS slot. yield() can immediately
+  // reschedule loopTask and does not reliably feed the watched IDLE0 task.
+  vTaskDelay(1);
 }
 
 // Run the lights in their own thread! -------------------------------------------------------------
@@ -1197,7 +1212,14 @@ void led_thread(void* arg) {
 		      K1SmartDirectorConfig smart_director_config = k1_smart_director_config();
 		      K1VisualHookConfig visual_hook_config = k1_visual_hooks_config();
 		      uint8_t vpab_primary_render_mode = CONFIG.LIGHTSHOW_MODE;
-		      K1EdgeMixerConfig vpab_edge_base_config = k1_edgemixer_lite_config();
+#ifdef K1_EDGEMIXER_AB_DEMO
+		      // BENCH-ONLY: force + cycle the EdgeMixer mode BEFORE the config read
+		      // below, so vpab_edge_base_config picks up the forced config. The only
+		      // later mutation (k1_visual_hooks_apply_edge_config) scales strength
+		      // only, so the forced mode/spread reach k1_edgemixer_apply intact.
+		      k1_edgemixer_ab_demo_tick();
+#endif
+		      K1EdgeMixerConfig vpab_edge_base_config = k1_edgemixer_config();
 		      K1EdgeMixerConfig vpab_edge_effective_config = vpab_edge_base_config;
 #ifdef K1_EFFECT_FRAMEWORK_V1
 		      // P6: when the K1-native beat-aware director is enabled (flag-ON,
@@ -1334,7 +1356,7 @@ void led_thread(void* arg) {
 	          if (edge_config.enabled) {
 	            edge_config = k1_visual_hooks_apply_edge_config(visual_hook_output, edge_config);
 	            vpab_edge_effective_config = edge_config;
-	            k1_edgemixer_lite_apply(leds_16_secondary, NATIVE_RESOLUTION, edge_config);
+	            k1_edgemixer_apply(leds_16_secondary, NATIVE_RESOLUTION, edge_config);
 	          }
           clip_led_values(leds_16_secondary); // Clip the secondary buffer values
         }
@@ -1344,6 +1366,22 @@ void led_thread(void* arg) {
           pop_render_params();
           memcpy(leds_16, leds_16_primary_snapshot, sizeof(CRGB16) * NATIVE_RESOLUTION);
           restore_render_runtime(render_snapshot);
+        }
+
+        // Symmetric dual-edge (A lane): the primary frame is now restored into
+        // leds_16, so apply the PRIMARY-edge transform to it — making BOTH edges
+        // shift about the 79/80 centre instead of only the secondary. Gated on the
+        // dual-edge mode (ONE_SIDED = primary untouched = byte-inert default) and on
+        // the edge being enabled. NEVER touches leds_16_secondary; uses the SAME
+        // frozen colour transform baked at the mirrored primary angle, with the same
+        // strength scaling the secondary got (vpab_edge_effective_config). Its cost
+        // lands in the vp_perf.secondary_render bucket (both edge transforms) and the
+        // total vp_render_us frame time.
+        if (vpab_edge_effective_config.enabled &&
+            vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) {
+          K1_TRACE_SCOPE("vp_primary_edge");
+          k1_edgemixer_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
+          clip_led_values(leds_16);
         }
 
 #if ENABLE_VP_PERF_AUDIT
@@ -1368,6 +1406,9 @@ void led_thread(void* arg) {
 	        k1_smart_director_manual_owner_active(uint32_t(vp_frame_start_us / 1000)) ? uint8_t(1) : uint8_t(0),
 	        uint16_t(constrain(vpab_edge_base_config.strength, 0.0f, 1.0f) * 1000.0f),
 	        uint16_t(constrain(vpab_edge_effective_config.strength, 0.0f, 1.0f) * 1000.0f),
+		        uint8_t(vpab_edge_effective_config.dualEdge),
+		        (vpab_edge_effective_config.enabled &&
+		         vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) ? uint8_t(1) : uint8_t(0),
 	      };
 	      vpab_capture_set_render_context(vpab_context);
 #endif

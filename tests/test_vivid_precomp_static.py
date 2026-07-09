@@ -66,7 +66,7 @@ class VividPrecompStaticTest(unittest.TestCase):
         self.assertRegex(CONSTANTS, r"#define\s+ENABLE_OUTPUT_GAMMA\s+0\b")
         gamma_body = _function_body(CONSTANTS, "apply_gamma8")
         self.assertNotIn("VIVID", gamma_body)
-        self.assertNotIn("SB_VIVID_PRECOMP_V1", PALETTES)
+        self.assertNotIn("K1_VIVID_PRECOMP_V1", PALETTES)
         self.assertNotIn("VIVID_CHROMA_GAIN_MAX", PALETTES)
         self.assertNotIn("VIVID_LUMA_CUT_MAX", PALETTES)
         self.assertNotIn("VIVID_BLACK_LEVEL_DEFAULT", PALETTES)

@@ -255,6 +255,29 @@ inline CRGB16 palette_manual_colour(const CRGBPalette16& pal, SQ15x16 hue, SQ15x
   return clamp_crgb16(color);
 }
 
+#ifdef K1_PALETTE_VIBRANCY_V1
+// K1 PALETTE VIBRANCY (2026-07-02): weak-centroid hue blend. Instead of hard-
+// freezing the palette coordinate at centroid_strength < 0.08 (which pinned
+// every palette to ONE slowly-auto-shifted colour on dense/loud material —
+// device-proven collapse chain, see docs/forensics 2026-07-02 lane), blend the
+// held anchor toward the LIVE centroid proportionally to strength. Continuous
+// at the threshold (w→1 reduces to the live hue, w→0 to the old hold). The
+// blend target is the live centroid, NEVER dominant-bin 0 — the dark-start
+// palette crush (2026-06-11 bisect) cannot re-enter through this path.
+inline float k1_vibrancy_blend_hue(float live_hue, float anchor_hue, float strength) {
+  float w = strength / 0.08f;
+  if (!isfinite(w) || w < 0.0f) w = 0.0f;
+  if (w > 1.0f) w = 1.0f;
+  float delta = live_hue - anchor_hue;
+  if (delta > 0.5f) delta -= 1.0f;
+  if (delta < -0.5f) delta += 1.0f;
+  float out = anchor_hue + delta * w;
+  out -= floorf(out);
+  if (out < 0.0f) out += 1.0f;
+  return out;
+}
+#endif
+
 inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x16 fallback_brightness,
                                                 float chroma, float hue_offset) {
   // Palette colour must be sampled once per rendered colour. Summing multiple
@@ -268,7 +291,14 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   static const float TWO_PI_F = 6.2831853071795864769f;
 
   for (uint8_t c = 0; c < 12; c++) {
+#ifdef K1_PALETTE_VIBRANCY_V1
+    // K1 PALETTE VIBRANCY: coordinate selection reads the PRE-gate chromagram
+    // (full relative shape survives dense/flat material; the sparseness gate
+    // stays in force for chromatic-mode brightness/summing consumers).
+    float raw_bin = float(chromagram_pregate[c]);
+#else
     float raw_bin = float(chromagram_smooth[c]);
+#endif
     if (!isfinite(raw_bin) || raw_bin < 0.0f) raw_bin = 0.0f;
     if (raw_bin > 1.0f) raw_bin = 1.0f;
 
@@ -348,10 +378,18 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
       held_centroid_hue = hue;
       held_hue_valid = true;
     } else {
+#ifdef K1_PALETTE_VIBRANCY_V1
+      hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
+#else
       hue = held_hue_valid ? held_centroid_hue : dominant_hue;
+#endif
     }
 #else
+#ifdef K1_PALETTE_VIBRANCY_V1
+    hue = held_hue_valid ? k1_vibrancy_blend_hue(hue, held_centroid_hue, centroid_strength) : dominant_hue;
+#else
     hue = held_hue_valid ? held_centroid_hue : dominant_hue;
+#endif
 #endif
   } else {
     held_centroid_hue = hue;
@@ -476,7 +514,11 @@ inline float chromagram_centroid_hue() {
   static const float TWO_PI_F = 6.2831853071795864769f;
   float x = 0.0f, y = 0.0f;
   for (uint8_t c = 0; c < 12; c++) {
+#ifdef K1_PALETTE_VIBRANCY_V1
+    float b = float(chromagram_pregate[c]);  // K1 PALETTE VIBRANCY: particle palette coords read pre-gate chroma (consistent with palette_chroma_colour_with_offset)
+#else
     float b = float(chromagram_smooth[c]);
+#endif
     if (!isfinite(b) || b < 0.0f) b = 0.0f;
     if (b > 1.0f) b = 1.0f;
     float a = (float(c) / 12.0f) * TWO_PI_F;

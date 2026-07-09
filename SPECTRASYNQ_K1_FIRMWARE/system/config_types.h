@@ -52,6 +52,9 @@
 #define AUDIO_RESPONSE_GAIN_MIN 0.25f
 #define AUDIO_RESPONSE_GAIN_MAX 4.0f
 
+#define K1_SENSITIVITY_MIN 0.10f
+#define K1_SENSITIVITY_MAX 20.0f
+
 #ifndef K1_TEMPO_NOVELTY_DECIMATION
 #define K1_TEMPO_NOVELTY_DECIMATION 3U
 #endif
@@ -119,7 +122,15 @@
 
 // LED strip mode selection: 1=61 LEDs, 2=91 LEDs, 3=160 LEDs (default).
 #define LED_STRIP_MODE 3
-#if   LED_STRIP_MODE == 1
+#ifdef K1_CUSTOM_LED_V1
+  // Custom single-channel wall-bounce build (2026-07-06): 224 LEDs on the primary
+  // GPIO only, secondary channel dropped (see the .ino:670/693 guards). The 160-px
+  // render canvas (NATIVE_RESOLUTION) is UNCHANGED — scale_to_strip() resamples it
+  // onto 224 physical LEDs, exactly as strip-modes 61/91/160 already do. Output
+  // buffers are heap-allocated to CONFIG.LED_COUNT so 224 is memory-safe. Flag-gated:
+  // when K1_CUSTOM_LED_V1 is unset every env resolves 160 -> byte-identical.
+  #define LED_COUNT_VALUE 224
+#elif LED_STRIP_MODE == 1
   #define LED_COUNT_VALUE 61
 #elif LED_STRIP_MODE == 2
   #define LED_COUNT_VALUE 91

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "render_params.h"
 #include "k1_audio_snapshot.h"
-#include "k1_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 
 struct K1VisualHookConfig {
   bool enabled;

@@ -3,7 +3,7 @@ name: debugger
 description: |
   Embedded firmware debugging — investigates audio pipeline anomalies, timing issues, race conditions, I2S buffer underruns, PLL lockup, and VPAB diagnostic replay failures.
   Use when: pytest regression failures, beat-tracking divergence between host and device, AGC/onset anomalies, tempo PLL instability, FastLED render artifacts, I2S DMA stalls, serial command failures, VPAB packet structure violations, or any symptom where root cause is unknown.
-tools: Read, Edit, Bash, Grep, Glob, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_search, mcp__plugin_context-mode_context-mode__ctx_index, mcp__plugin_context-mode_context-mode__ctx_insight, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search, mcp__plugin_claude-mem_mcp-search__timeline
+tools: Read, Edit, Bash, Grep, Glob, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search, mcp__plugin_claude-mem_mcp-search__timeline
 model: sonnet
 skills: k1-firmware-change-gate, sensorybridge-doctrine, ssa-management, cpp, platformio, esp32, esp-idf, arduino, fastled, python, pytest, numpy, scipy
 ---
@@ -49,7 +49,7 @@ Use this quality bar for every task, regardless of domain:
 ## Firmware Layout (Key Paths)
 
 ```
-SENSORY_BRIDGE_FIRMWARE/
+SPECTRASYNQ_K1_FIRMWARE/
 ├── audio/sb_tempo.cpp/.h          # Beat tracking, PLL flywheel, periodicity V2
 ├── audio/sb_onset_beat.cpp/.h     # Per-band onset detection, log-flux threshold
 ├── audio/sb_audio_snapshot.cpp/.h # AudioSemanticState publish
@@ -86,7 +86,7 @@ scripts/regression-harness/
 
    Avoid forensic shorthand (`1401 dark gate`) — often returns zero results. Legacy history may be under project `Lightwave-Ledstrip`.
 3. **Locate the failure layer** — is it DSP (Goertzel frame), semantic state (AudioSemanticState), routing (Smart Director), rendering (FastLED), or host harness (pytest/VPAB)?
-4. **Isolate with the narrowest tool** — `pytest tests/test_onset_beat_replay.py -v` before full suite; `grep -r "SYMPTOM" SENSORY_BRIDGE_FIRMWARE/` before reading whole files.
+4. **Isolate with the narrowest tool** — `pytest tests/test_onset_beat_replay.py -v` before full suite; `grep -r "SYMPTOM" SPECTRASYNQ_K1_FIRMWARE/` before reading whole files.
 5. **Form a falsifiable hypothesis** — state what you expect to see if the hypothesis is correct, then verify.
 6. **Fix minimally** — change the smallest scope that fixes the class of bug. Do not refactor adjacent code.
 7. **Verify fix with the gate** — `pytest tests/ && pio run -e k1_hardware` must both pass before declaring resolved.
@@ -96,8 +96,8 @@ scripts/regression-harness/
 | Symptom | Likely Layer | First Check |
 |---------|-------------|-------------|
 | Beat confidence flat / never locks | Periodicity V2 in `sb_tempo.cpp` | Check `prominence_score`, `periodicity_score`, lock threshold 0.60 |
-| 3× beat events per actual beat | Beat republish bug (known, fixed in forward-graft) | `grep -n "republish\|beat_count" SENSORY_BRIDGE_FIRMWARE/audio/sb_tempo.cpp` |
-| AGC stays at 1.0, never adapts | Calibration mutex / silence gate | `grep -n "noise_cal\|agc_gain\|calibrating" SENSORY_BRIDGE_FIRMWARE/` |
+| 3× beat events per actual beat | Beat republish bug (known, fixed in forward-graft) | `grep -n "republish\|beat_count" SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp` |
+| AGC stays at 1.0, never adapts | Calibration mutex / silence gate | `grep -n "noise_cal\|agc_gain\|calibrating" SPECTRASYNQ_K1_FIRMWARE/` |
 | Onset density low (< 50%) | AGC scalar suppression or onset threshold | Check `sb_onset_beat.cpp` log-flux threshold vs. AGC-normalized magnitude |
 | Effect never beat-reactive | Smart Director confidence gate | Check `sb_smart_director.cpp` confidence score requirements |
 | VPAB gate failure in pytest | Packet structure or field range violation | `pytest tests/test_vpab_gate.py -v` then read `diag/vpab_capture.cpp` |
@@ -114,7 +114,7 @@ scripts/regression-harness/
 - **Beat confidence baseline after graft:** settled ~0.620. A flat 0.041 means pre-graft state or misconfiguration.
 - **Onset density-in-band baseline:** 97.2% post-graft (was 5.6%). Below 50% = regression.
 - **AGC is broadband scalar** — one gain applied to all bands. Colour damage from AGC = saturation clamp issue, not differential gain.
-- **MabuTrace (`MABU_TRACE`, `SB_TRACE`) must never appear in `k1_hardware` builds.** If it leaks: `grep -r "MABU_TRACE\|SB_TRACE" SENSORY_BRIDGE_FIRMWARE/` → fix includes or `#ifdef`.
+- **MabuTrace (`MABU_TRACE`, `SB_TRACE`) must never appear in `k1_hardware` builds.** If it leaks: `grep -r "MABU_TRACE\|SB_TRACE" SPECTRASYNQ_K1_FIRMWARE/` → fix includes or `#ifdef`.
 - **`#ifndef SB_*_V2` guards wrap legacy code** — the forward-graft promotes new code under `SB_AUDIO_SEMANTIC_V2` etc. Check which path is active in the build environment.
 - **Dual-channel LGP:** K1 has primary (bottom edge) + secondary (top edge) channels. Single-channel visual assertions are wrong — use K1Optics_v1 dual-channel model for faithful host-side visual judgement.
 - **Strobe Law (LOAD-BEARING):** Beat-reactive effects must be spatial/transport (motion through plate), NEVER global full-field amplitude changes on every beat. Mode 19 `pulse_bloom` was killed for this reason. Any new beat-reactive mode violating this is rejected.
@@ -150,7 +150,7 @@ python scripts/regression-harness/apstream_ingest.py <capture_file>
 pio run -e k1_hardware
 
 # Verify no instrumentation leaks
-grep -r "MABU_TRACE\|trace_dev" SENSORY_BRIDGE_FIRMWARE/ || echo "Clean"
+grep -r "MABU_TRACE\|trace_dev" SPECTRASYNQ_K1_FIRMWARE/ || echo "Clean"
 ```
 
 ## Diagnostic Artifacts

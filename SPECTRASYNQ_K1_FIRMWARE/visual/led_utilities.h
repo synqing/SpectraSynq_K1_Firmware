@@ -856,6 +856,16 @@ inline void init_lerp_params() {
             
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
+#ifdef K1_CUSTOM_LED_V1
+            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
+            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
+            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+            // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
+            // flag-gated to keep those builds byte-identical.
+            if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
+                led_lerp_params[i].index_right = NATIVE_RESOLUTION - 1;
+            }
+#endif
             SQ15x16 index_fract = index - SQ15x16(led_lerp_params[i].index_left);
             led_lerp_params[i].mix_left = SQ15x16(1.0) - index_fract;
             led_lerp_params[i].mix_right = index_fract;
@@ -1919,6 +1929,24 @@ inline void make_smooth_chromagram() {
   }
   norm_mean /= SQ15x16(12.0);
   SQ15x16 flatness = norm_max - norm_mean;
+
+#ifdef K1_PALETTE_VIBRANCY_V1
+  // K1 PALETTE VIBRANCY (2026-07-02): export the POST-normalize, PRE-gate
+  // chromagram for the palette-coordinate engine. The sparseness gate below
+  // exists to stop grey-summing in CHROMATIC modes (summed hsv()); the PALETTE
+  // path only uses chroma as a coordinate selector, where the gate's zeroing
+  // (flatness<=0.08 fires on live dense music — device-proven 2026-07-02) and
+  // the -0.1 floor destroy the relative shape and freeze the palette
+  // coordinate ("every palette renders a handful of colours"). Quiet guard:
+  // below quiet_max the export zeroes so true silence still engages the
+  // held-hue hold (the 2026-06-11 palette-crush protection is preserved).
+  {
+    const SQ15x16 vib_quiet_max = SQ15x16(0.08);
+    for (uint8_t i = 0; i < 12; i++) {
+      chromagram_pregate[i] = (norm_max > vib_quiet_max) ? chromagram_smooth[i] : SQ15x16(0.0);
+    }
+  }
+#endif
 
   if (VP_FIX_CHROMAGRAM_SPARSENESS) {
     SQ15x16 gate_gain = SQ15x16(0.0);

@@ -417,8 +417,48 @@ void init_system() {
   init_sweet_spot();
   
   init_fs();
+  // PDM adjacency (load-bearing): init_fs() can transiently mark the STALE SPH cal
+  // valid (load_calibration_profile_if_config_invalid refreshes with CONFIG/PERSISTED
+  // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
+  // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
   enforce_compiled_audio_timing_config();
+
+#ifdef K1_MIC_IM73D_PDM_V1
+  // IM73D PDM boot force-invalidate (bench eval, 2026-07-02). A stale SPH0645 profile
+  // (DC≈-4714, SSL≈350) is IN-range and would otherwise be applied to the PDM signal
+  // (wrong DC bias + wrong domain). Force RAM cal invalid on EVERY PDM boot, BEFORE the
+  // two sanity blocks below — seeding a PDM-domain SSL (never 0) and a non-zero follower
+  // so the peak-scaled division can never be 0/0. Persistence under the flag is
+  // PDM-namespaced (bridge_fs.h): /CONFIG_PDM_*.BIN + /cal_profile_pdm.bin; the SPH
+  // files stay frozen. Config cal fields loaded by init_fs() are scrubbed here
+  // regardless — the PDM cal profile below is the sole cal authority.
+  CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
+  CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
+  CONFIG.VU_LEVEL_FLOOR = 0.0f;
+  CONFIG.STANDBY_DIMMING = false;                               // else silent_scale*0 blanks the plate
+  for (uint8_t i = 0; i < NUM_FREQS; i++) noise_samples[i] = 0;
+  calibration_profile_loaded = false;
+  calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
+  max_waveform_val = 0.0f;
+  max_waveform_val_raw = 0.0f;
+  waveform_peak_scaled = 0.0f;
+  max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
+
+  // PDM cal persistence (2026-07-03): the scrub above removed every trace of the
+  // SPH-file-derived state; now restore the LAST ACCEPTED PDM cal from
+  // /cal_profile_pdm.bin (CAL_PROFILE_FILE under this flag — never an SPH file).
+  // The loader only reads when the RAM config is invalid, so drop SSL to the
+  // invalid sentinel first; on any miss/corruption restore the fallback seed.
+  CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
+  if (load_calibration_profile_if_config_invalid()) {
+    max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // persisted SSL (cal_valid=1, source=persisted_profile)
+  } else {
+    CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;   // no/invalid profile -> fallback, NEVER 0
+    max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+    calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
+  }
+#endif
 
   // Fix-D Layer 1 (2026-05-24) — DC_OFFSET sanity clamp at boot.
   //
@@ -435,7 +475,14 @@ void init_system() {
   // Either case: invalidate the runtime profile and prevent the value being
   // reported as a trusted calibration. The next successful noise_cal will save
   // a measured profile; until then cal_valid remains false.
+#ifndef K1_MIC_IM73D_PDM_V1
   if (CONFIG.DC_OFFSET == 0 || calibration_abs_i32(CONFIG.DC_OFFSET) > NOISE_CAL_DC_MAX_VALID_ABS) {
+#else
+  // PDM: DC==0 is legal (HPF), so it must NOT re-trigger this wipe (which would zero SSL).
+  // Only a truly out-of-band |DC| is an artefact here. The force-invalidate above already
+  // set DC=0, so this stays inert on a clean PDM boot.
+  if (calibration_abs_i32(CONFIG.DC_OFFSET) > NOISE_CAL_DC_MAX_VALID_ABS) {
+#endif
     USBSerial.print("DC_OFFSET sanity clamp: stored value ");
     USBSerial.print(CONFIG.DC_OFFSET);
     USBSerial.println(" rejected -> calibration invalidated; run `start_noise_cal` under confirmed silence to learn the true bias.");
@@ -558,8 +605,11 @@ void check_settings(uint32_t t_now) {
       if(debug_mode == true){
         USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
       }
-      save_config();
+      // Clear BEFORE the save: if save_config() defers on low internal RAM it
+      // re-arms settings_updated + next_save_time, and that re-arm must survive
+      // this cycle so the write retries. Clearing after would cancel the retry.
       settings_updated = false;
+      save_config();
     }
   }
 }

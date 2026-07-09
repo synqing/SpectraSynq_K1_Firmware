@@ -3,7 +3,7 @@ name: refactor-agent
 description: |
   Code organization and architectural cleanup — consolidates DSP abstractions, effect library composition, diagnostic instrumentation boundaries, and reduces duplication across mode implementations.
   Use when: extracting shared effect helpers, enforcing SB_*_V2 ifdef boundaries, deduplicating beat-reactive mode patterns, separating AudioSemanticState consumers from producers, or tightening the developer instrumentation boundary (MabuTrace never in production builds).
-tools: Read, Edit, Write, Glob, Grep, Bash, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_execute_file, mcp__plugin_context-mode_context-mode__ctx_search, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search, mcp__plugin_claude-mem_mcp-search__smart_outline, mcp__plugin_claude-mem_mcp-search__smart_unfold, mcp__plugin_claude-mem_mcp-search__timeline
+tools: Read, Edit, Write, Glob, Grep, Bash, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search, mcp__plugin_claude-mem_mcp-search__smart_outline, mcp__plugin_claude-mem_mcp-search__smart_unfold, mcp__plugin_claude-mem_mcp-search__timeline
 model: sonnet
 skills: k1-firmware-change-gate, sensorybridge-doctrine, cpp, platformio, esp32, arduino, fastled, pytest, python
 ---
@@ -60,7 +60,7 @@ pio run -e k1_hardware 2>&1 | tail -20
 ### 4. Instrumentation Boundary is Load-Bearing
 - `MABU_TRACE`, `MabuTrace`, `trace_dev`, `SB_TRACE_*` macros must NEVER appear in `k1_hardware` build
 - They are guarded by `#ifdef SB_ENABLE_TRACE` / `-e k1_hardware_trace_dev` only
-- Verify after any file touching `diag/sb_trace.h`: `grep -r "MABU_TRACE" SENSORY_BRIDGE_FIRMWARE/ | grep -v "ifdef\|SB_ENABLE_TRACE"` must return empty
+- Verify after any file touching `diag/sb_trace.h`: `grep -r "MABU_TRACE" SPECTRASYNQ_K1_FIRMWARE/ | grep -v "ifdef\|SB_ENABLE_TRACE"` must return empty
 
 ### 5. SB_*_V2 Ifdef Discipline
 The audio-semantic forward-graft (landed 2026-06-05, commit range 5808e3b→4e96e30) gates new DSP code under `#ifdef SB_TEMPO_V2`, `#ifdef SB_ONSET_V2`, `#ifdef SB_CHORD_V2`, `#ifdef SB_AUDIO_SEMANTIC_V2`. Legacy paths live under `#ifndef SB_*_V2`. When refactoring across these boundaries:
@@ -88,7 +88,7 @@ pytest tests/ -v
 pytest tests/test_onset_beat_replay.py -v
 
 # Verify no instrumentation leaks
-grep -r "MABU_TRACE\|trace_dev" SENSORY_BRIDGE_FIRMWARE/ | grep -v "ifdef\|SB_ENABLE_TRACE"
+grep -r "MABU_TRACE\|trace_dev" SPECTRASYNQ_K1_FIRMWARE/ | grep -v "ifdef\|SB_ENABLE_TRACE"
 ```
 
 **C++ standard:** C++17 (`-std=gnu++17`). RAII, `constexpr`, `static_assert`, and structured bindings are available.
@@ -96,7 +96,7 @@ grep -r "MABU_TRACE\|trace_dev" SENSORY_BRIDGE_FIRMWARE/ | grep -v "ifdef\|SB_EN
 ## Codebase Layout (Refactor Targets)
 
 ```
-SENSORY_BRIDGE_FIRMWARE/
+SPECTRASYNQ_K1_FIRMWARE/
 ├── audio/                  # DSP pipeline — tempo, onset, chord, AGC
 │   ├── sb_tempo.cpp/.h     # Beat PLL flywheel, periodicity V2 (SB_TEMPO_V2)
 │   ├── sb_onset_beat.cpp/.h
@@ -139,7 +139,7 @@ AGC is broadband (one scalar gain). Colour damage from saturation clamping is do
 ### Diagnostic Capture Decoupling
 `vpab_capture.cpp` and `diagnostic_capture.cpp` should have zero callers in `k1_hardware` build. They are compiled in `k1_hardware_harness` only. Verify with:
 ```bash
-grep -r "vpab_capture\|diagnostic_capture" SENSORY_BRIDGE_FIRMWARE/ --include="*.cpp" --include="*.h" | grep -v "diag/"
+grep -r "vpab_capture\|diagnostic_capture" SPECTRASYNQ_K1_FIRMWARE/ --include="*.cpp" --include="*.h" | grep -v "diag/"
 ```
 If callers exist outside `diag/`, they must be guarded by `#ifdef SB_ENABLE_DIAGNOSTIC_CAPTURE`.
 
@@ -189,7 +189,7 @@ If callers exist outside `diag/`, they must be guarded by `#ifdef SB_ENABLE_DIAG
 For each refactoring applied:
 
 **Smell:** [description]
-**Location:** `SENSORY_BRIDGE_FIRMWARE/<path>:<line>`
+**Location:** `SPECTRASYNQ_K1_FIRMWARE/<path>:<line>`
 **Technique:** [Extract Function / Introduce Const / Replace Magic Number / etc.]
 **Files modified:** [list]
 **Build result:** PASS / FAIL + error excerpt

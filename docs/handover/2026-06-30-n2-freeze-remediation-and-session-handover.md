@@ -45,6 +45,8 @@ Cross-pollination analysis → CTO strategy (fork = canonical) → prepared a pe
 
 **Fix — `827d73a` / flag `K1_AUDIO_FREEZE_GUARD_V1` (default ON in `[env:k1_hardware]`):** bounds the I2S read to `pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS=100)` + zero-fills on timeout; adds `enableLoopWDT()` (`.ino`) + `feedLoopWDT()` every loop iteration; `esp_task_wdt_add/_reset` on the LED task; `esp_task_wdt_reconfigure` 5 s. Single `-D` revert. **Host-proven (580/579 pass + golden + Gate-0).** Hardware-validated on the main K1 and on the BLE line (0 reboots vs the old 12.5 s loop).
 
+**2026-07-08 correction (N2c):** a live IM73D recovery on `B489A500` reproduced an `IDLE0` task-WDT around the old failure window even with the bounded-read/watchdog guard present. The missing condition was a real idle-task slot: `yield()` is not sufficient because it can immediately reschedule `loopTask`. The full audio loop tail now uses `vTaskDelay(1)`, and a 28 s readback on `B489A500` / USB `B4:3A:45:A5:89:B4` crossed the prior failure point with no `task_wdt`, backtrace, or reboot markers.
+
 **Important nuance the fix only half-solves:** `827d73a` removes the **panic** (symptom). The **over-budget loop is the underlying pressure** and remains — that is what the ACF lane in §5 cures. Treat the N2 fix as "no longer bricks," not "loop is healthy."
 
 ## 5. Staged-but-incomplete forward work (each gated, awaiting a human/device checkpoint)
@@ -70,7 +72,7 @@ This repo's founding law is **"the harness IS the product"** (`docs/architecture
 
 - Repo: `/Users/spectrasynq/SpectraSynq_K1_Firmware`; firmware src under `SPECTRASYNQ_K1_FIRMWARE/`; prod env `k1_hardware`; bench env `k1_bench_reference`.
 - Main K1 chip `F887A500` / MAC `b4:3a:45:a5:87:f8`; bench `B489A500`. Ports vary — verify via the upload guard, not the string.
-- WDT: 5 s, panic, watches IDLE0 (CPU0); `ARDUINO_RUNNING_CORE=0` → audio loopTask on CPU0, render on CPU1.
+- WDT: 5 s, panic, watches IDLE0 (CPU0); `ARDUINO_RUNNING_CORE=0` -> audio loopTask on CPU0, render on CPU1. If IDLE0 remains watched, the audio loop must provide a real `vTaskDelay(1)` slot; `yield()` is not enough under a hot AP loop.
 - Audio: GDFT @ 133 Hz, 12.8 kHz, 96-sample; ACF unconditional (`SB_TEMPO_ACF_REFRESH_DECIMATION=1`).
 - Telemetry: `[AP]` line at ~1 Hz; `silence=0` even in a quiet room; `max_raw≈1` only when truly dead-still.
 

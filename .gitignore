@@ -11,6 +11,8 @@
 # PlatformIO build output + generated compile DB
 .pio/
 compile_commands.json
+# PIO preprocesses the sketch to <Sketch>.ino.cpp inside src_dir on every build
+*.ino.cpp
 
 # Python
 __pycache__/
@@ -29,6 +31,8 @@ venv/
 .cursor/*
 !.cursor/skills/
 !.cursor/skills/**
+!.cursor/rules/
+!.cursor/rules/**
 .superpowers/
 .planning/
 .cache/
@@ -36,6 +40,12 @@ venv/
 .playwright-mcp/
 graphify-out/
 .graphifyignore
+
+# Devin agent state — local config + generated run outputs only.
+# .devin/agent-os.md and scripts/agent/*.sh ARE tracked.
+.devin/config.local.json
+.devin/last-bootstrap.json
+.devin/repo-truth-report.json
 
 # Scratch / working space — ephemeral, clean up when done
 _scratch/

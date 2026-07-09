@@ -72,7 +72,7 @@ static const K1BleMidiEntry kK1BleMidiMap[K1_BLE_MIDI_CONTROL_COUNT] = {
   { "secondary.base_coat_intensity", 1, K1MIDI_CC14, 7, 39, 0, 0.0f, 1.0f, 5, 0, 0 },
   { "secondary.auto_color_shift", 1, K1MIDI_CC7_BOOL, 69, 0, 0, 0.0f, 0.0f, 5, 0, 0 },
   { "secondary.reverse_order", 1, K1MIDI_CC7_BOOL, 70, 0, 0, 0.0f, 0.0f, 5, 0, 0 },
-  { "global.sensitivity", 2, K1MIDI_CC14, 1, 33, 0, 0.0f, 1.0f, 5, 0, 0 },
+  { "global.sensitivity", 2, K1MIDI_CC14, 1, 33, 0, 0.1f, 20.0f, 5, 0, 0 },
   { "global.standby_dimming", 2, K1MIDI_CC7_BOOL, 64, 0, 0, 0.0f, 0.0f, 5, 0, 0 },
   { "global.chroma_profile", 2, K1MIDI_CC7_ENUM, 102, 0, 0, 0.0f, 0.0f, 5, 0, 0 },
   { "global.chromagram_range", 2, K1MIDI_CC14, 2, 34, 0, 1.0f, 80.0f, 5, 0, 0 },

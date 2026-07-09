@@ -22,6 +22,7 @@ Full doctrine is not loaded by default. Invoke `/sensorybridge-doctrine` when ac
 
 Before firmware, forensic, or device-validation work:
 
+0. [`AGENT_OS.md`](../AGENT_OS.md) — canonical agent manual (all tools): session bootstrap, source-of-truth hierarchy, safety gates, thinking gate, skill awareness
 1. [`progress.md`](../progress.md) — rolling status
 2. [`.claude/handoff.md`](./handoff.md) — active session pointer
 3. [`docs/spec-index.md`](../docs/spec-index.md) — lane authority, devices, recall conventions

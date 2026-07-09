@@ -36,7 +36,7 @@ WHY THIS HOST-COMPILES (design §2, confirmed by first-hand recon):
       serial/serial_tx.cpp            (tx_begin/tx_end/bad_command/stop_streams)
       serial/serial_parse_helpers.cpp (vp_parse_bool/float, serial_clamp_float)
       director/k1_smart_director.cpp  (k1_smart_director_* config getters/setters)
-      director/k1_edgemixer_lite.cpp  (k1_edgemixer_lite_* config)
+      director/k1_edgemixer.cpp  (k1_edgemixer_* config)
       director/k1_visual_hooks.cpp    (k1_visual_hooks_* config)
       director/k1_mode_selection.cpp  (k1_mode_selection_init)
       control/k1_effect_queue.cpp     (k1_queue_* config)
@@ -127,7 +127,7 @@ MODULE_CPPS = [
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
     "director/k1_smart_director.cpp",
-    "director/k1_edgemixer_lite.cpp",
+    "director/k1_edgemixer.cpp",
     "director/k1_visual_hooks.cpp",
     "director/k1_mode_selection.cpp",
 ]
@@ -214,6 +214,7 @@ CORPUS = [
     "saturation=-1",       # -> manual clamp 0.0
     "bulb_opacity=2.0",    # -> manual clamp 1.0
     "incandescent_filter=2.0",  # -> manual clamp 1.0
+    "sensitivity=99",     # -> clamp K1_SENSITIVITY_MAX
 
     # ---- (3) =default + malformed/bad_command: lock the failure path ----------
     "chroma=default",      # reads CONFIG_DEFAULTS.CHROMA
@@ -222,6 +223,7 @@ CORPUS = [
     "mirror_enabled=default",  # enum default branch
     "chroma=",             # empty -> vp_parse_float fails -> bad_command
     "photons=abc",         # non-numeric -> vp_parse_float fails -> bad_command
+    "sensitivity=abc",     # non-numeric -> vp_parse_float fails -> bad_command
     "palette_mode=maybe",  # not a bool token -> bad_command
     "base_coat=default",   # base_coat has NO default token -> bad_command
     "unknown_cmd=1",       # unknown command_type -> bad_command

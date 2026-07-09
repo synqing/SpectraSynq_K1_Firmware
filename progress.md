@@ -1,7 +1,124 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** 2026-06-15 K1 production baseline accepted at `12800/96/d3` after measured calibration, paired AP/VP evidence, and Captain eyes-on; 16 kHz remains research-only. Effects-lane repair blockers from the 2026-06-11 Claude-memory recovery are closed in current source, and modes 24-27 have partial VP smoke evidence. Modes 28-29 are not covered by that smoke because playback was stopped by Captain instruction.
+**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; restored bench validation green at usable levels; R2/R3 corrected after LED-map incident** — `k1_prod_im73d` main/prod build path shipped (`4b95e60`, byte-identical-OFF, guard-mapped to main K1). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 proves the IM73D mic/PDM path on the ratified `13/12/14` pins and is now validated on restored `k1_bench_im73d @ f2f7c45`: quiet/volume 45/volume 60 AP/raw captures are usable and AGC gains stay below 2.0 on all four bands. Volume 75 is a front-end stress/fail condition (`clip_pct`, `near_pct`, input trim), not acceptance evidence. Captain confirms both K1s are identical hardware; existing envs encode configuration choice (`k1_bench_im73d` = LED `4/5`, `k1_prod_im73d` = LED `6/7`). Main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. See `docs/hardware/im73d-restored-bench-validation-2026-07-07.md`, `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+
+## 2026-07-07 Restored Bench Validation
+
+- **Verdict:** restored `k1_bench_im73d @ f2f7c45` is green for IM73D validation at usable playback levels on the bench-reference firmware LED map (`4/5`). This is not a `k1_prod_im73d` proof because `k1_prod_im73d` is the main/prod LED map (`6/7`).
+- **AP/raw:** quiet, volume 45, and volume 60 bench runs were usable with `raw_i16_near_pct=0.000`. Volume 75 failed quality via `clip_pct_nonzero`, `near_pct_nonzero`, and `input_trim_reduced`.
+- **AGC:** `:stream_agc` at volumes 45 and 60 stayed far below the `<10` gate; bench max gains were `[1.49, 1.72, 1.99, 1.57]` and `[1.47, 1.62, 1.84, 1.55]`.
+- **Evidence:** `docs/hardware/im73d-restored-bench-validation-2026-07-07.md`; `artifacts/im73d_bench_ledproof_2026-07-07/20260707T170922_restored_bench_full_music/summary.json`; `artifacts/im73d_bench_ledproof_2026-07-07/20260707T171507_stream_agc_vol45/summary.json`; `artifacts/im73d_bench_ledproof_2026-07-07/20260707T171632_stream_agc_vol60/summary.json`.
+
+## 2026-07-07 Bench LED-Pinmap Incident
+
+- **Cause:** `k1_prod_im73d` extends `k1_hardware`, so it drives GPIO `6/7`; restored bench-reference firmware drives GPIO `4/5`. Treating the restored bench IM73D unit as a `k1_prod_im73d` proof unit conflated mic-pin equivalence with env/LED-map choice. Captain confirms both K1s are identical hardware.
+- **Observed effect:** flashing `k1_prod_im73d @ f2f7c45` to bench K1 `B489A500` made both LED channels dark while serial/audio proof still appeared alive.
+- **Immediate recovery:** bench was MAC-verified (`B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem1401`) and uploaded back to `k1_bench_im73d @ f2f7c45`; read-only `:build`/`:dump` proved `env=k1_bench_im73d`, chip `B489A500`, `CONFIG.CHROMA: 0.100000`, `CONFIG.SENSITIVITY: 0.870005`, `AUDIO_RESPONSE_GAIN: 1.000000`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`, and `CAL_PROFILE_LOADED: 1`.
+- **Guard correction:** `k1_prod_im73d` is restored as the main/prod IM73D env and guard-mapped to the main K1 MAC. Bench proof remains `k1_bench_im73d`.
+
+## 2026-07-07 R2 Main-Swap Blocker Superseded
+
+- **Correction:** bench K1 carries IM73D on the ratified mic pin map (`clk13/din12/LR14`). It is therefore a valid IM73D mic/PDM proof unit.
+- **Superseded blocker:** main-K1 SPH0645->IM73D physical swap is not required to prove the mic path; it is optional product-unit conversion work, not the current proof blocker.
+- **Next mechanical step:** use the existing env that matches the intended configured unit: `k1_bench_im73d` for LED `4/5`, or `k1_prod_im73d` for LED `6/7`.
+- **Doc updated:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` is retained for link stability but now explicitly marks the old swap handoff as superseded.
+
+## 2026-07-07 Bench Recovery Proof
+
+- **Bench identity:** MAC `B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem1401`; read-only `:build` proved `git=9d14463 env=k1_bench_im73d`; `:dump` proved chip `B489A500`, `CONFIG.CHROMA: 0.100000`, `CONFIG.SENSITIVITY: 0.870005`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`, `CAL_PROFILE_LOADED: 1`, `raw_i16_near_pct=0.000`, `input_trim=1.000`, `clip_pct=0.000`, `near_pct=0.000`.
+- **Main identity:** MAC `B4:3A:45:A5:87:F8` on `/dev/cu.usbmodem12401`; read-only `:build` proved `git=67227da env=k1_hardware`; `:dump` proved chip `F887A500`, `CONFIG.SENSITIVITY: 2.400000`, `CAL_SOURCE: config`, `CAL_VALID: 1`.
+- **Evidence:** `artifacts/im73d_recovery_2026-07-07/readonly_build_dump_20260707.json`.
+- **Safety:** no `start_noise_cal`, no `N`/`Y`, no flash, no erase, no non-read-only serial command. Pyserial opened with DTR/RTS low; native USB still emitted benign `rst:0x15` reset banners on open.
+
+## 2026-07-06 Controlled-Audio DSR_16S Evidence
+
+- **Verdict:** `DSR_16S` is rejected; keep `DSR_8S`.
+- **Controlled stimulus:** `/Users/spectrasynq/Downloads/Tiësto-TheBusiness.mp3`, offset `35 s`, duration `30 s`, volumes `45,60,75`, 2 repeats per music condition plus 2 quiet repeats. No `start_noise_cal`, `N`, or `Y`.
+- **Bench DSR8 baseline:** `artifacts/im73d_dsr_audio_eval_2026-07-06/20260706T175119_dsr8_controlled_audio/summary.json`, build line `git=bc53ceb env=k1_bench_im73d`, bench repeatability PASS.
+- **Bench DSR16 candidate:** `artifacts/im73d_dsr_audio_eval_2026-07-06/20260706T180529_dsr16_controlled_audio/summary.json`, build line `git=9d14463 env=k1_bench_im73d_dsr16`, bench repeatability PASS for all bench groups. Overall repeatability was false only because main-SPH volume 45/60 groups exceeded the CV threshold; main is not the DSR promotion target.
+- **Comparison:** `artifacts/im73d_dsr_audio_eval_2026-07-06/dsr8_vs_dsr16_controlled_audio_compare.json`; write-up `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`.
+- **Result:** quiet raw RMS p90 mean rose from `25.45` to `34.00` under DSR16. Music raw-RMS-over-quiet fell at every tested playback volume: volume 45 `2.153 -> 1.422`, volume 60 `4.161 -> 2.771`, volume 75 `6.692 -> 4.729`. Raw near-rail remained zero, `input_trim=1.000`, `clip_pct=0.000`, and `near_pct=0.000`; the rejection is not a rail-safety failure, it is an SNR/response-value failure.
+- **Bench recovery caveat:** same-HEAD restored DSR8 proof failed after post-upload CDC/app serial failure. The bench still enumerates as MAC `B4:3A:45:A5:89:B4`, but low-DTR/RTS serial probes and esptool `chip_id` under `usb_reset`, `default_reset`, and `no_reset` all returned no serial data. Treat the bench as requiring physical reset/replug before further runtime proof.
+
+## 2026-07-06 No-Speaker DSR_16S Evidence + Harness Hardening
+
+- **Commit:** `bc53ceb test(im73d): add no-speaker dsr harness` on `lane/im73d-pdm-eval`.
+- **Harness:** `scripts/regression-harness/im73d_audio_eval.py` now supports `--quiet-only` / `--no-speaker-playback`, refuses nonzero volumes in that mode, and adds `--compare` / `--compare-output` for DSR reports built from `summary.json` files.
+- **Comparison truth:** DSR comparison now treats `raw_i16_rms`, `raw_i16_abs_peak`, and `raw_i16_near_pct` as required inputs. Conditioned `max_raw` is retained as context only.
+- **Validation:** focused harness/static tests PASS (`15 passed`); harness self-test PASS; full host suite PASS (`647 passed, 1 skipped`). The earlier interrupted pytest PTY is not the verification result; the clean rerun is.
+- **Device proof:** bench MAC `B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem101` was guard-verified, flashed to `k1_bench_im73d_dsr16 @ bc53ceb`, captured quiet-only 3x, then restored to `k1_bench_im73d @ bc53ceb` and captured matching quiet-only 3x. Main K1 was present but not flashed.
+- **Evidence:** DSR16 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162130_dsr16_quiet_only/summary.json`; restored DSR8 `artifacts/im73d_dsr_eval_2026-07-06/20260706T162406_dsr8_quiet_only_restored/summary.json`; compare report `artifacts/im73d_dsr_eval_2026-07-06/dsr8_vs_dsr16_quiet_compare.json`; write-up `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`.
+- **Result:** no raw near-rail evidence (`raw_i16_near_pct=0` for both), `input_trim=1.000`, `clip_pct=0.000`, `near_pct=0.000`, all bench runs usable. Quiet DSR16 raw RMS was lower than quiet DSR8 (`raw_i16_rms` p90 mean ratio 0.788), but no signal stimulus was present, so **DSR_16S remains unpromoted**.
+- **R2 handoff superseded:** `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md` now records that the bench IM73D unit proves the mic/PDM path, Captain confirms both K1s are identical hardware, and the remaining blocker is firmware LED pin-map reconciliation rather than a main-K1 swap.
+
+## 2026-07-06 Audio Pipeline Purity Audit
+
+- **Verdict:** normal `[AP]`, `[APCAP]`, `agc_debug`, onset/tempo/chord, and `AudioSemanticState` surfaces are conditioned production-behaviour signals, not raw microphone-purity signals. The one existing pre-conditioning sample surface is `:dump_raw`, which prints DMA samples before IM73D gain, sensitivity, clip limiting, and DC correction. Authority: `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`.
+- **Sensitivity finding:** factory default is `CONFIG.SENSITIVITY=2.4`, but live bench IM73D preflight after reset proved `CONFIG.SENSITIVITY: 0.870005`, `AUDIO_RESPONSE_GAIN: 1.000000`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`; main SPH proved `CONFIG.SENSITIVITY: 2.400000`, `AUDIO_RESPONSE_GAIN: 1.000000`, `CAL_SOURCE: config`, `CAL_VALID: 1`. Ratio claims between devices are invalid unless this state is pinned/recorded.
+- **Harness hardening:** `scripts/regression-harness/im73d_audio_eval.py` now records `front_end_lines` from `:dump` and treats downstream `peak_pin` as `conditioned_peak_pin_high` warning, not raw clipping. Hard rejects remain too-few rows, `clip_pct`, `near_pct`, reduced `input_trim`, and raw-domain near-rail `max_raw >= 30000`.
+- **Machine gate:** `tests/test_im73d_audio_purity_static.py` locks the current source truth: `dump_raw` is before conditioning; AP `max_raw` is after IM73D gain, sensitivity, clamp, and DC correction; sensitivity control surfaces are inconsistent and must stay visible until intentionally reconciled.
+- **Validation:** focused pytest `tests/test_im73d_audio_eval_harness.py tests/test_im73d_audio_purity_static.py -q` PASS (8/8); full host suite PASS (`640 passed, 1 skipped`); `im73d_audio_eval.py --self-test` PASS.
+- **Live read-only sanity:** `_scratch/im73d_audio_eval/20260706T144515_purity_conditioned_readiness/summary.json` captured both MAC-verified K1s with no hard front-end failures at quiet + Mac volume 20. This is explicitly conditioned readiness evidence, not raw mic purity evidence. No `start_noise_cal`, `N`, `Y`, erase, flash, or DSR flip was run.
+- **Supersession:** raw continuous telemetry landed after this audit as `raw_i16_abs_peak`, `raw_i16_rms`, and `raw_i16_near_pct`. The no-speaker DSR run used those fields and kept DSR_16S unpromoted pending controlled acoustic stimulus.
+
+## 2026-07-06 R4 Real-Audio Harness + Bench CDC Blocker
+
+- **Superseded by Captain reset + purity audit:** the bench-silent blocker below was real at the time of `c6c40d4`, but after Captain reset both K1s, live `pio device list` and the 2026-07-06 `purity_conditioned_readiness` capture proved bench `B489A500` and main `F887A500` both enumerate and stream again. The current blocker is raw/pre-conditioning purity evidence, not USB recovery.
+- **Harness shipped:** `c5d2399` added `scripts/regression-harness/im73d_audio_eval.py` + `tests/test_im73d_audio_eval_harness.py`; `c6c40d4` hardened it to keep one serial session open per device, wait for runtime `[AP]` readiness before commands/capture, restore Mac output volume on exit, and fail closed on missing rows, clipping/near-rail, peak pinning, input trim, and repeatability drift.
+- **Validation:** harness self-test PASS; focused pytest `tests/test_im73d_audio_eval_harness.py` PASS; both commits passed the pre-commit pyharness tier (`python3 -m pytest tests/ -q`); compile-only `bash scripts/agent/pio-build.sh k1_bench_im73d` PASS; compile-only `bash scripts/agent/pio-build.sh k1_hardware` PASS.
+- **Dry-run result:** first real-audio dry run proved Mac volume/playback control and main-SPH capture but exposed a bench failure. Final committed harness repro: `_scratch/im73d_audio_eval/20260706T141749_bench_blocker_final/preflight_bench_im73d.log` (0 runtime lines, fail-closed before measurement).
+- **Bench blocker:** bench `B489A500` still enumerates as `B4:3A:45:A5:89:B4` on `/dev/cu.usbmodem101`, but passive CDC reads produce 0 lines; guarded uploads to both `/dev/cu.usbmodem101` and `/dev/tty.usbmodem101` fail at esptool connect with `Failed to connect to ESP32-S3: No serial data received`; direct esptool `chip_id` also fails the same way; `lsof` shows no port owner.
+- **Next mechanical step:** Captain physically presses RESET on the bench K1; if still silent, hold BOOT, tap RESET, release BOOT. Then rerun upload guard + radio-free `k1_bench_im73d` upload, run the DSR_8S baseline with the harness, add the temporary DSR_16S eval flag, flash bench only, and repeat the same volume/track windows. No `start_noise_cal` was run.
+
+## 2026-07-06 Two-K1 Live Refresh
+
+- **Main K1 used:** guard-verified `F887A500` on `/dev/cu.usbmodem1101`, built and uploaded `k1_hardware @ 67227da`; post-upload read-only `:build`/`:dump` proved `env=k1_hardware`, `I2S STD INIT: PASS`, `CAL_SOURCE: config`, `CAL_VALID: 1`.
+- **Bench K1 used:** guard-verified `B489A500` on `/dev/cu.usbmodem101`; left on radio-free `k1_bench_im73d @ 6f2f1ec`, `I2S PDM RX INIT: PASS`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`.
+- **Paired passive AP capture:** `_scratch/im73d_bringup/snappiness/dual_ap_capture.py 30` with zero command bytes. Current envelope: bench IM73D `max_raw p50=1224 p90=1851 max=2282`; main SPH `p50=1906 p90=3063 max=3600`; both cal-valid, input_trim 1.000, no clamp risk.
+- **Evidence:** `_scratch/im73d_r1_knob_persistence_20260706/two_k1_readonly_build_dump_20260706.log`, `_scratch/im73d_r1_knob_persistence_20260706/two_k1_post_main_flash_readback_20260706.log`, `_scratch/im73d_bringup/snappiness/dual_main_sph.log`, `_scratch/im73d_bringup/snappiness/dual_bench_im73d.log`.
+
+## 2026-07-06 R1 Knob-Persistence Device Capture (radio-free bench)
+
+- **Live truth:** branch `lane/im73d-pdm-eval`, HEAD `6f2f1ec`; bench `B489A500` = `/dev/cu.usbmodem101` (`B4:3A:45:A5:89:B4`), main `F887A500` = `/dev/cu.usbmodem1101` (`B4:3A:45:A5:87:F8`). Existing unrelated untracked skill/config artefacts were left untouched.
+- **Host/identity gates:** `session-bootstrap` PASS; upload guard PASS for `k1_bench_im73d` on bench MAC; `bash scripts/agent/pio-build.sh k1_bench_im73d` PASS; `bash scripts/regression-harness/mic_stable_byte_gate.sh k1_bench_im73d` PASS.
+- **Device proof:** flashed radio-free `k1_bench_im73d @ 6f2f1ec` to bench. Read-only `:build` proved `git=6f2f1ec env=k1_bench_im73d`; `:dump` proved `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`. `:chroma=0.150` echoed, waited >6 s, `:reset`, then `:dump` proved `CONFIG.CHROMA: 0.150000` survived reboot with `CAL_SOURCE: persisted_profile` still intact. No `start_noise_cal` was run.
+- **Restore proof:** `:chroma=0.100` echoed and waited >6 s, then `:reset` was issued to prove restoration. After Captain BOOT/RESET recovery, final read-only `:build` + `:dump` on the bench MAC proved `git=6f2f1ec env=k1_bench_im73d`, `CONFIG.CHROMA: 0.100000`, and `CAL_SOURCE: persisted_profile`.
+- **Evidence:** `_scratch/im73d_r1_knob_persistence_20260706/r1_knob_persistence_serial.log` and `_scratch/im73d_r1_knob_persistence_20260706/r1_restore_after_bootreset_read_serial.log` (ignored scratch artefacts). Prior blocked read/upload attempts are retained in the same scratch directory. Registry top row updated to the current deployed state.
+
+## 2026-07-06 IM73D Productionization Phase 1 (autonomous execution)
+
+- **Context:** Captain ratified D1 (production IM73D pin map = identical bench-proven `clk13/din12/LR14`, all K1s same ESP32-S3 devboard) and withdrew the D2 "PCB rev" framing (IM73D already on the bench since bringup). Then authorised autonomous completion of all outstanding Phase-1 phases. Planned harness-first (`/autonomous-agentic-build`, `/planning-with-files`): `docs/hardware/im73d-productionization-execution-plan-2026-07-06.md`.
+- **Lane consolidation first:** merged `lane/palette-vibrancy-v1` into `lane/im73d-pdm-eval` (`55c536b`; registry + platformio conflicts resolved, vibrancy row → eyes-on PASSED); forensic doc `32bc384`; §10 audit `741a40f`; §10.3 decision `a82c1d9`.
+- **UA — `k1_prod_im73d` main/prod build path SHIPPED (`4b95e60`).** `constants.h` production `#else` pinmap now defines `K1_PDM_CLK/DIN/LR = 13/12/14` under the flag; `[env:k1_prod_im73d]` extends `k1_hardware` and uses the main/prod LED map `6/7`; drift-catcher + guard + production-pin static tests. **Byte-identical-OFF proven** (3 stable sections) + source-level OFF-gated. pytest 629.
+- **UB — MicFrontend runtime dispatch REJECTED (decision).** Un-byte-verifiable (build not bit-reproducible in `.flash.text`/`.flash.rodata` — the known `K1_BUILD_EPOCH` timestamp) + Core-0 cost + `sensorybridge-doctrine`. Compile-time selection retained; 6-interface seam map delivered instead (handover §11.2). This is the correct trade, not skipped work.
+- **UC — `mic_stable_byte_gate.sh` SHIPPED (`d1ecc10`).** Formalises the stable-section oracle the graft used manually: hashes ONLY the 3 reproducible sections (`.dram0.data`/`.iram0.text`/`.iram0.vectors`), committed references for k1_hardware/k1_bench_reference/k1_bench_im73d, static contract test. Additive — `registry_byte_gate.sh` (flaky, 5 sections) left as trust root.
+- **UD/UE — docs (`6bfc702`):** DSR_16S enable recipe + SNR protocol; production-flip red-team (pre-mortem + 7-step checklist).
+- **UF — knob-persistence device-proof CLOSED (`d9f53d6` → `67227da`).** Radio-free bench proved `:chroma=0.150` persistence across reset, then final restored `CONFIG.CHROMA: 0.100000` after Captain BOOT/RESET recovery; cal profile stayed `persisted_profile`. No `start_noise_cal` was run.
+- **Superseded blocker note:** this older absolute-blocker list is superseded for main-K1 mic swap and DSR_16S. DSR_16S was rejected by controlled-audio evidence; main-K1 swap is optional because the bench IM73D unit is identical production-shape K1 hardware. Remaining gates are selected-env device proof, eyes-on, and `k1_hardware` default flip.
+
+## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
+
+## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
+
+- **Goal (Captain):** a bench K1 running the IM73D122 mic PLUS BLE-MIDI so the **K718 Remoted dial controls it live** for investor demos. **Separate workstream** from IM73D eval/tuning — do NOT measure mic SNR on this radio build (Core-0 BLE task; interference A/B open).
+- **Composition:** new `[env:k1_bench_im73d_ble]` = `extends k1_bench_im73d` + 3 BLE deltas (`network/ble_remoted_central.cpp` + `k1_ble_midi_decoder.cpp`, `-DSB_K1_BLE_REMOTED`, `NimBLE-Arduino@^2.5.0`); does NOT extend the harness → zero instrumentation, production byte-identical. Guard tuple line added. **Revert** = delete env block + guard line.
+- **4-SSA injection-point investigation** (ssa-management launch/return contracts; orchestrator re-ran the decisive claims): **linkage VERIFIED** (`sb_k1_control_apply()` at `sb_k1_control_facade.cpp:468` unconditional; `.ino:675/812` calls under `#ifdef SB_K1_BLE_REMOTED`); **RT/RF VERIFIED** (BLE app task `central.cpp:229` **and** NimBLE host both default Core-0 → confound real for *measurement*, moot for *demo*); **K718 protocol byte-exact match**; **device/gate VERIFIED**.
+- **Host gate GREEN:** `pio run -e k1_bench_im73d_ble` `[SUCCESS]` (RAM 38.0% / Flash 13.9%); `test_dev_instrumentation_boundary` + `test_token_scrub_static` = **13/13**.
+- **Flashed bench `B489A500` (2026-07-04):** guard-verified on `/dev/cu.usbmodem1101` (ports re-scrambled — `2101`=main, `101`=K718; identity by USB serial, not port); hash-verified. Runtime (passive read-only serial): boots clean, 0 crash markers, BLE central **`linked=1`** to the live K718 "SpectraSynq Remoted" peripheral (`JC3636_K718_REMOTED_BLE_V1`), `notify=0` → **control-proof (dial-turn) pending**. `linked=1` overrides SSA-3's provisional "K718 never flashed" (runtime > static audit).
+- **Outstanding:** (1) turn the K718 dial → confirm `notify/decoded/apply_ok` climb + `CONFIG.*` change; (2) K718-linked+streaming cal repro (crash condition); (3) Core-0 demo-robustness if glitching; (4) **this flash replaced the bench's `3e06f9d k1_bench_im73d` state → IM73D Phase 1.1 device-proof needs a radio-free reflash.**
+- **2026-07-05 update:** bench reflashed to `d32770d` (`1ac840a` cal-abort guard + `:ble_stream` telemetry). Captain silence-go cal **ACCEPTED** with 0 abort (K718 unlinked) — fix device-proven for light load; K718-linked repro still owed.
+- **Detail:** `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`.
+
+## 2026-07-02 IM73D122 PDM Mic Graft (bench-only, flag-gated)
+
+- **Branch:** `lane/im73d-pdm-eval` (off `26eebb1`). **Flag:** `K1_MIC_IM73D_PDM_V1` — defined in EXACTLY ONE env: `[env:k1_bench_im73d]` (extends `k1_bench_reference`). SPH0645 (`i2s_std`) stays the byte-identical product default when the flag is OFF.
+- **Commits:** `545d331` (the graft, 11-point spec) + `c3584fa` (gain `K1_MIC_IM73D_INPUT_GAIN` 3.0→16.0) + `49b0393` (registry/device-proof). All flag-gated `#ifdef K1_MIC_IM73D_PDM_V1 … #else <verbatim SPH0645> … #endif` across 6 firmware files (i2s_audio.h, constants.h, globals.h, system.h, noise_cal.h, bridge_fs.h).
+- **Host gate GREEN:** pytest 619 pass / 1 skip; `pio run -e k1_bench_im73d` clean (RAM 32.8% / Flash 9.8%); flag-OFF byte-identity PROVEN for `k1_hardware` AND `k1_bench_reference` (identical section sizes + `.dram0`/`.iram0` SHAs; `.text`/`.rodata` churn is only `K1_BUILD_EPOCH`).
+- **Device-proven on bench `B489A500`:** boots; PDM RX reads the mic on the LIVE AP+VP (`onset`/`bass`/`bpm` firing, `lock=1`); boot force-invalidate `SSL=120 DC=0`, no NaN; gain `g=16` in-band (loud `max_raw` ~4339, non-railed); silence-go recal PASSED (`cal_valid=1 SSL=710 DC=-13`); failed-cal path restored `SSL=120` (fallback, not 0). NVS frozen under the flag → cal is RAM-only, re-cal each power-up.
+- **Remaining acceptance (both need Captain):** (1) per-band AGC `:stream_agc` all 4 gains <10; (2) eyes-on A/B vs SPH0645 across genres incl. VU modes.
+- **Do NOT bump `g=16`** (silence cals to `SSL=710`, top of valid `[50,720]`). Rollback = delete `[env:k1_bench_im73d]` + guard tuple line; `#ifdef` blocks are inert with the flag undefined.
+- **Authority docs:** `docs/hardware/im73d122-ap-vp-migration-plan.md` (canonical design) · `docs/hardware/im73d122-graft-handover-2026-07-02.md` (session handover + 7 gotchas) · `docs/hardware/device-build-registry.md` (deployed-state table, bench row).
 
 ## 2026-06-21 AP Measurement-Honesty Lane (Chapter-6 DFT/STFT)
 

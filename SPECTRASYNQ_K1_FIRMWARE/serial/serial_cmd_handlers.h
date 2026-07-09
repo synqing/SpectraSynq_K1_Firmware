@@ -86,7 +86,7 @@ bool serial_cmd_dispatch_smart_director(const char* command_type, char* command_
 bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_data);
 
 // Dispatch the edge-mixer family (edge_enabled, edge_mode, edge_strength →
-// k1_edgemixer_lite_* + k1_parse_edge_mode). UNGATED.
+// k1_edgemixer_* + k1_parse_edge_mode). UNGATED.
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data);
 
 // Dispatch the "Set CONFIG preset" handler (single "preset" command → set_preset()

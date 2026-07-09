@@ -88,6 +88,33 @@ def test_loop_watchdog_subscribed_and_fed():
         assert sym in code, f"expected {sym} in {INO.name}"
 
 
+def test_audio_loop_grants_idle_task_slot():
+    """FIXED: the full audio loop must give FreeRTOS a real idle-task slot.
+
+    Feeding loopTask is not enough when TWDT also watches IDLE0; a bare yield()
+    can immediately reschedule loopTask and preserve the starvation failure.
+    """
+    code = _strip_line_comments(INO.read_text(encoding="utf-8"))
+    m = re.search(r"void\s+loop\s*\(\)\s*\{", code)
+    assert m, "expected a loop() definition in the .ino"
+    end = re.search(r"\n}\s*\n\s*void\s+led_thread\s*\(", code[m.start():])
+    assert end, "expected to isolate the full loop() body"
+    loop_body = code[m.start(): m.start() + end.end()]
+
+    tail_start = loop_body.rfind("debug_function_timing(t_now);")
+    assert tail_start >= 0, "expected loop tail after debug_function_timing(t_now)"
+    loop_tail = loop_body[tail_start:]
+
+    assert "vTaskDelay(1)" in loop_tail, (
+        "expected loop() tail to call vTaskDelay(1), giving IDLE0 a real "
+        "FreeRTOS scheduling slot under K1_AUDIO_FREEZE_GUARD_V1."
+    )
+    assert "yield()" not in loop_tail, (
+        "yield() is not a sufficient IDLE0 watchdog feed for the hot AP loop; "
+        "use vTaskDelay(1)."
+    )
+
+
 def test_led_task_watchdog():
     """FIXED: led_thread subscribes itself (esp_task_wdt_add(NULL)) and feeds the
     render-task watchdog (esp_task_wdt_reset())."""

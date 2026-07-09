@@ -28,7 +28,7 @@
 #include "EffectRegistry.h" // registry_display_name() (R2b serial name source of truth)
 #endif
 #include "k1_audio_snapshot.h"
-#include "k1_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 #include "k1_mode_selection.h"
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
@@ -590,6 +590,68 @@ bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
   return true;
 }
 
+const char* k1_edge_rotation_name(K1EdgeMixerRotationSpace space) {
+  switch (space) {
+    case K1_EDGE_ROTATION_LUMA_PRESERVING: return "luma";
+    case K1_EDGE_ROTATION_OKLAB:           return "oklab";
+    default:                               return "faithful";
+  }
+}
+
+const char* k1_edge_dual_name(K1EdgeMixerDualEdge dual) {
+  switch (dual) {
+    case K1_EDGE_DUAL_SPLIT:  return "split";
+    case K1_EDGE_DUAL_MIRROR: return "mirror";
+    default:                  return "one_sided";
+  }
+}
+
+// faithful -> SUM_PRESERVING (grey-axis rotation, +/-1 LSB golden parity);
+// luma     -> LUMA_PRESERVING (grey-axis rotation + per-pixel BT.601 luma rescale);
+// oklab    -> OKLAB (perceptual hue rotation in the OKLab a/b plane, holds L constant).
+bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space) {
+  if (strcmp(text, "faithful") == 0 || strcmp(text, "sum") == 0) {
+    *out_space = K1_EDGE_ROTATION_SUM_PRESERVING;
+  } else if (strcmp(text, "luma") == 0) {
+    *out_space = K1_EDGE_ROTATION_LUMA_PRESERVING;
+  } else if (strcmp(text, "oklab") == 0) {
+    *out_space = K1_EDGE_ROTATION_OKLAB;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+// one_sided (or one) -> ONE_SIDED (secondary only; certified default);
+// split               -> SPLIT (both edges +/- theta/2 about the 79/80 centre);
+// mirror              -> MIRROR (both edges +/- theta, full opposite rotations).
+bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual) {
+  if (strcmp(text, "one_sided") == 0 || strcmp(text, "one") == 0) {
+    *out_dual = K1_EDGE_DUAL_ONE_SIDED;
+  } else if (strcmp(text, "split") == 0) {
+    *out_dual = K1_EDGE_DUAL_SPLIT;
+  } else if (strcmp(text, "mirror") == 0) {
+    *out_dual = K1_EDGE_DUAL_MIRROR;
+  } else {
+    return false;
+  }
+  return true;
+}
+
+// uniform -> spatialUniform true (shift applied evenly across the strip);
+// masked  -> false (centre-masked: fades from 0 at the 79/80 centre to full at the
+// ends). Ref E. Scriptable counterpart to the 'm' hotkey.
+bool k1_parse_edge_uniform(const char* text, bool* out_uniform) {
+  if (strcmp(text, "uniform") == 0) {
+    *out_uniform = true;
+  } else if (strcmp(text, "masked") == 0) {
+    *out_uniform = false;
+  } else {
+    return false;
+  }
+  return true;
+}
+
 void k1_print_smart_status() {
   K1SmartDirectorConfig smart = k1_smart_director_config();
   K1VisualHookConfig hooks = k1_visual_hooks_config();
@@ -689,7 +751,7 @@ void k1_print_smart_status() {
 }
 
 void k1_print_edge_status() {
-  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
   tx_begin();
   USBSerial.print("EDGE_ENABLED: ");
   USBSerial.println(vp_bool_text(edge.enabled));
@@ -697,6 +759,135 @@ void k1_print_edge_status() {
   USBSerial.println(k1_edge_mode_name(edge.mode));
   USBSerial.print("EDGE_STRENGTH: ");
   USBSerial.println(edge.strength, 3);
+  USBSerial.print("EDGE_SPREAD: ");
+  USBSerial.println((int)edge.spreadDegrees);
+  USBSerial.print("EDGE_ROTATION: ");
+  USBSerial.println(k1_edge_rotation_name(edge.rotationSpace));
+  USBSerial.print("EDGE_SPATIAL: ");
+  USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
+  USBSerial.print("EDGE_DUAL: ");
+  USBSerial.println(k1_edge_dual_name(edge.dualEdge));
+  tx_end();
+}
+
+// A-lane UX guard: MIRROR + COMPLEMENTARY makes both edges rotate +/-180deg to the
+// SAME hue (2*180 = 360 = 0 separation), collapsing the two edges into one. Honest
+// maths, but a UX trap — so warn (informative, NOT a hard block) whenever a change
+// makes that combo active. Called from the mode + dual-edge change handlers.
+void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e) {
+  if (e.dualEdge == K1_EDGE_DUAL_MIRROR && e.mode == K1_EDGE_MIXER_COMPLEMENTARY) {
+    tx_begin();
+    USBSerial.println("EDGE_WARN: mirror+complementary collapses both edges to the same hue (2x180=0 separation) - use split at complementary, or mirror at analogous/triadic.");
+    tx_end();
+  }
+}
+
+// --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
+// k1_edgemixer_config()/set_config() and prints only its own new state) ---
+void serial_edge_toggle_enabled() {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  e.enabled = !e.enabled;
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_ENABLED: ");
+  USBSerial.println(vp_bool_text(e.enabled));
+  tx_end();
+}
+
+void serial_edge_cycle_mode() {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  // off -> analogous -> complementary -> split -> veil -> triadic -> tetradic -> off
+  uint8_t next = (uint8_t)e.mode + 1;
+  if (next > (uint8_t)K1_EDGE_MIXER_TETRADIC) {
+    next = (uint8_t)K1_EDGE_MIXER_OFF;
+  }
+  e.mode = (K1EdgeMixerMode)next;
+  e.enabled = (e.mode != K1_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_MODE: ");
+  USBSerial.println(k1_edge_mode_name(e.mode));
+  tx_end();
+  k1_edge_warn_if_collapsed(e);
+}
+
+void serial_edge_adjust_spread(int delta) {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  int s = (int)e.spreadDegrees + delta;
+  if (s < 0) { s = 0; }
+  if (s > 60) { s = 60; }
+  e.spreadDegrees = (uint8_t)s;
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_SPREAD: ");
+  USBSerial.println((int)e.spreadDegrees);
+  tx_end();
+}
+
+void serial_edge_adjust_strength(float delta) {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  e.strength = constrain(e.strength + delta, 0.0f, 1.0f);
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_STRENGTH: ");
+  USBSerial.println(e.strength, 3);
+  tx_end();
+}
+
+void serial_edge_toggle_rotation() {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  // 3-way cycle: faithful (SUM) -> luma -> oklab -> faithful. This is the bench
+  // A/B control for the OKLab-vs-luma-rescale perceptual comparison on the plate.
+  switch (e.rotationSpace) {
+    case K1_EDGE_ROTATION_SUM_PRESERVING:
+      e.rotationSpace = K1_EDGE_ROTATION_LUMA_PRESERVING;
+      break;
+    case K1_EDGE_ROTATION_LUMA_PRESERVING:
+      e.rotationSpace = K1_EDGE_ROTATION_OKLAB;
+      break;
+    default:
+      e.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
+      break;
+  }
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_ROTATION: ");
+  USBSerial.println(k1_edge_rotation_name(e.rotationSpace));
+  tx_end();
+}
+
+void serial_edge_toggle_dual_edge() {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  // 3-way cycle: one_sided -> split -> mirror -> one_sided. Symmetric dual-edge
+  // (A lane) — the plate A/B for "make BOTH edges participate about the 79/80
+  // centre". one_sided = only the secondary strip shifts (certified default);
+  // split = both edges +/- theta/2; mirror = both edges +/- theta.
+  switch (e.dualEdge) {
+    case K1_EDGE_DUAL_ONE_SIDED:
+      e.dualEdge = K1_EDGE_DUAL_SPLIT;
+      break;
+    case K1_EDGE_DUAL_SPLIT:
+      e.dualEdge = K1_EDGE_DUAL_MIRROR;
+      break;
+    default:
+      e.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
+      break;
+  }
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_DUAL: ");
+  USBSerial.println(k1_edge_dual_name(e.dualEdge));
+  tx_end();
+  k1_edge_warn_if_collapsed(e);
+}
+
+void serial_edge_toggle_uniform() {
+  K1EdgeMixerConfig e = k1_edgemixer_config();
+  e.spatialUniform = !e.spatialUniform;  // ref E: centre-masked <-> uniform
+  k1_edgemixer_set_config(e);
+  tx_begin();
+  USBSerial.print("EDGE_SPATIAL: ");
+  USBSerial.println(e.spatialUniform ? "uniform" : "masked");
   tx_end();
 }
 
@@ -707,7 +898,7 @@ bool k1_apply_smart_scene(const char* scene) {
 
   K1SmartDirectorConfig smart = k1_smart_director_config();
   K1VisualHookConfig hooks = k1_visual_hooks_config();
-  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (strcmp(scene, "off") == 0 || strcmp(scene, "none") == 0) {
     smart.enabled = false;
@@ -767,7 +958,7 @@ bool k1_apply_smart_scene(const char* scene) {
 
   k1_smart_director_set_config(smart);
   k1_visual_hooks_set_config(hooks);
-  k1_edgemixer_lite_set_config(edge);
+  k1_edgemixer_set_config(edge);
   k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
   k1_smart_director_clear_manual_control();
   return true;
@@ -1336,6 +1527,22 @@ void serial_print_hotkey_status() {
 
 bool serial_hotkey_is_immediate(char key) {
   switch (key) {
+    // EdgeMixer live-control keys (actions in serial_handle_hotkey). All SC_SAFE:
+    // they mutate only the EdgeMixer secondary-colour config, never destructive.
+    case 'g':  // toggle EdgeMixer on/off
+    case 'G':  // cycle edge_mode
+    case 'u':  // toggle rotation faithful<->luma
+    case 'y':  // cycle dual-edge one_sided->split->mirror (A lane)
+#ifndef ENABLE_MOTION_PROBE
+    // ref E spatial toggle (SHIPPING). 'm' doubles as the motion-probe "B knob +"
+    // key under ENABLE_MOTION_PROBE (see the guarded block below); the two are
+    // mutually exclusive by build, so neither duplicates the other.
+    case 'm':  // toggle spatial uniform<->masked (ref E)
+#endif
+    case '-':  // spread -5
+    case '=':  // spread +5
+    case '_':  // strength -0.1
+    case '+':  // strength +0.1
     case ' ':
     case 'h':
     case ';':
@@ -1564,6 +1771,36 @@ bool serial_hotkey_is_immediate(char key) {
     case ']':
       serial_adjust_target_mode(1);
       break;
+    // --- EdgeMixer live control (secondary-strip colour differentiation) ---
+    case 'g':
+      serial_edge_toggle_enabled();
+      break;
+    case 'G':
+      serial_edge_cycle_mode();
+      break;
+    case '=':
+      serial_edge_adjust_spread(5);
+      break;
+    case '-':
+      serial_edge_adjust_spread(-5);
+      break;
+    case '+':
+      serial_edge_adjust_strength(0.1f);
+      break;
+    case '_':
+      serial_edge_adjust_strength(-0.1f);
+      break;
+    case 'u':
+      serial_edge_toggle_rotation();
+      break;
+    case 'y':
+      serial_edge_toggle_dual_edge();
+      break;
+#ifndef ENABLE_MOTION_PROBE
+    case 'm':  // ref E spatial toggle (SHIPPING); motion-probe reuses 'm' (B knob +)
+      serial_edge_toggle_uniform();
+      break;
+#endif
     // Effects-queue key map (spec §4, 2026-06-11): digits 1-9,0 load/arm slot
     // 1-10 onto the ACTIVE channel; shift+digit saves the ACTIVE channel into
     // the slot. The former digit toggle bindings were REMOVED (Captain:
@@ -1673,13 +1910,13 @@ bool serial_hotkey_is_immediate(char key) {
       USBSerial.println(CONFIG.SQUARE_ITER, 2);
       break;
     case 'w':
-      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY + 0.10f, 0.10f, 20.0f);
+      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY + 0.10f, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
       save_config_delayed();
       USBSerial.print("CONFIG.SENSITIVITY: ");
       USBSerial.println(CONFIG.SENSITIVITY, 3);
       break;
     case 'W':
-      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY - 0.10f, 0.10f, 20.0f);
+      CONFIG.SENSITIVITY = serial_clamp_float(CONFIG.SENSITIVITY - 0.10f, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
       save_config_delayed();
       USBSerial.print("CONFIG.SENSITIVITY: ");
       USBSerial.println(CONFIG.SENSITIVITY, 3);
@@ -1923,6 +2160,7 @@ void cmd_help() {
   USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
   USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
   USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+  USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
@@ -1944,10 +2182,15 @@ void cmd_help() {
 	  USBSerial.println("                  smart_scene=[off/assist/l1/auto] | Apply runtime Smart A/B scene preset");
 	  USBSerial.println("                  smart_hooks=[on/off] | Runtime-enable onset/beat visual hooks");
 	  USBSerial.println("                  event_status | Print current onset/kick/snare/hihat event state");
-	  USBSerial.println("                  edge_status | Runtime EdgeMixer-lite status");
-	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer-lite");
+	  USBSerial.println("                  edge_status | Runtime EdgeMixer status");
+	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer");
 	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
 	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
+	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
+	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
+	  USBSerial.println("                  edge_dual=[one_sided/split/mirror] | EdgeMixer symmetric dual-edge (one_sided=secondary only; split=both +/-theta/2; mirror=both +/-theta)");
+	  USBSerial.println("                  edge_uniform=[uniform/masked] | EdgeMixer spatial weighting (uniform=even; masked=fades from the 79/80 centre to the ends) (ref E)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror | m spatial uniform<->masked");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif
@@ -2858,6 +3101,19 @@ void parse_command(char* command_buf) {
       }
     }
 
+    else if (strcmp(command_type, "ble_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        BLE_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("BLE_STREAM: ");
+        USBSerial.println(vp_bool_text(BLE_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
 	    else if (strcmp(command_type, "vp_perf") == 0) {
 	      vp_perf_command(command_type, command_data);
 	    }
@@ -3550,10 +3806,20 @@ void stream_agc_data(uint32_t t_now) {
     }
   }
   
-  // Send noise floor values
+  // Send the legacy silence tracker and the active AGC floor separately. The
+  // per-band AGC path owns its floor in k1_gdft_core.cpp, not in the legacy
+  // silence tracker.
   USBSerial.print(";floor:");
   for (uint8_t band = 0; band < NUM_AGC_BANDS; band++) {
     USBSerial.print(float(min_silent_level_tracker_band[band]));
+    if (band < NUM_AGC_BANDS - 1) {
+      USBSerial.print(',');
+    }
+  }
+
+  USBSerial.print(";active_floor:");
+  for (uint8_t band = 0; band < NUM_AGC_BANDS; band++) {
+    USBSerial.print(float(agc_active_floor_debug[band]));
     if (band < NUM_AGC_BANDS - 1) {
       USBSerial.print(',');
     }

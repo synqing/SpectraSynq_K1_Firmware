@@ -444,6 +444,7 @@ void IRAM_ATTR process_GDFT() {
     agc_bands[b].gain        = pb_gain[b];
     agc_bands[b].target_gain = pb_gain[b];
     agc_bands[b].energy      = pb_envelope[b];
+    agc_active_floor_debug[b] = pb_noise_floor[b];
   }
 #else
   // 1. Broadband signal level (average magnitude across bins)
@@ -467,6 +468,9 @@ void IRAM_ATTR process_GDFT() {
     agc_noise_floor += (agc_envelope - agc_noise_floor) * NOISE_ALPHA;
   }
   if (agc_noise_floor < AGC_EPS) agc_noise_floor = AGC_EPS;  // floor at 0.001
+  for (uint8_t b = 0; b < NUM_AGC_BANDS; b++) {
+    agc_active_floor_debug[b] = agc_noise_floor;
+  }
 
   // 4. Hysteretic silence gate
   SQ15x16 gate_open_th  = agc_noise_floor * SQ15x16(4.0);

@@ -112,7 +112,7 @@ FAMILIES = [
     {
         "name": "edge_mixer",
         "dispatcher": "serial_cmd_dispatch_edge_mixer",
-        # Edge-mixer control (k1_edgemixer_lite_* config + k1_parse_edge_mode);
+        # Edge-mixer control (k1_edgemixer_* config + k1_parse_edge_mode);
         # ungated, facade-free.
         "commands": [
             "edge_enabled",

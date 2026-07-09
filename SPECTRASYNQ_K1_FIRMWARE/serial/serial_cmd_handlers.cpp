@@ -19,7 +19,7 @@
 #include "k1_smart_director.h"      // K1SmartDirectorConfig + k1_smart_director_config/set_config (smart_director)
 #include "k1_mode_selection.h"      // k1_mode_selection_init (smart_switching)
 #include "k1_visual_hooks.h"        // K1VisualHookConfig + k1_visual_hooks_config/set_config (smart_visual)
-#include "k1_edgemixer_lite.h"      // K1EdgeMixerConfig/K1EdgeMixerMode + k1_edgemixer_lite_config/set_config (edge_mixer)
+#include "k1_edgemixer.h"      // K1EdgeMixerConfig/K1EdgeMixerMode + k1_edgemixer_config/set_config (edge_mixer)
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
 #endif
@@ -258,17 +258,27 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
 
     // Set Audio Sensitivity ----------------------------
     else if (strcmp(command_type, "sensitivity") == 0) {
+      bool good = false;
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SENSITIVITY = CONFIG_DEFAULTS.SENSITIVITY;
+        good = true;
       } else {
-        CONFIG.SENSITIVITY = atof(command_data);
+        float value = 0.0f;
+        if (vp_parse_float(command_data, &value)) {
+          CONFIG.SENSITIVITY = constrain(value, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX);
+          good = true;
+        } else {
+          bad_command(command_type, command_data);
+        }
       }
 
-      save_config_delayed();
-      tx_begin();
-      USBSerial.print("CONFIG.SENSITIVITY: ");
-      USBSerial.println(CONFIG.SENSITIVITY);
-      tx_end();
+      if (good) {
+        save_config_delayed();
+        tx_begin();
+        USBSerial.print("CONFIG.SENSITIVITY: ");
+        USBSerial.println(CONFIG.SENSITIVITY);
+        tx_end();
+      }
     }
 
     // Toggle Lightshow Mirroring ---------------------
@@ -948,13 +958,17 @@ bool serial_cmd_dispatch_queue(const char* command_type, char* command_data) {
 // serial_menu.h-local helpers (EXTERNAL linkage; defined in serial_menu.h, included
 // only by the .ino TU in firmware and the driver TU in the replay oracle) that the
 // smart/edge dispatchers call. Forward-declared here (same pattern as the vivid
-// helpers); resolved cross-TU at link. K1EdgeMixerMode comes from k1_edgemixer_lite.h
+// helpers); resolved cross-TU at link. K1EdgeMixerMode comes from k1_edgemixer.h
 // (included above), so k1_parse_edge_mode's prototype is valid here.
 // ---------------------------------------------------------------------------
 void k1_print_smart_status();
 void k1_print_edge_status();
 bool k1_apply_smart_scene(const char* scene);
 bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode);
+bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space);
+bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual);
+bool k1_parse_edge_uniform(const char* text, bool* out_uniform);
+void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
@@ -1052,7 +1066,7 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_edge_mixer — edge-mixer control (edge_enabled / edge_mode /
-// edge_strength), lifted VERBATIM. Calls k1_edgemixer_lite_* (director TU) +
+// edge_strength), lifted VERBATIM. Calls k1_edgemixer_* (director TU) +
 // k1_parse_edge_mode + k1_print_edge_status. Ungated.
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data) {
@@ -1061,9 +1075,9 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_enabled") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.enabled = value;
-        k1_edgemixer_lite_set_config(config);
+        k1_edgemixer_set_config(config);
         k1_print_edge_status();
       } else {
         bad_command(command_type, command_data);
@@ -1073,13 +1087,14 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_mode") == 0) {
       K1EdgeMixerMode mode = K1_EDGE_MIXER_OFF;
       if (k1_parse_edge_mode(command_data, &mode)) {
-        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.mode = mode;
         if (mode == K1_EDGE_MIXER_OFF) {
           config.enabled = false;
         }
-        k1_edgemixer_lite_set_config(config);
+        k1_edgemixer_set_config(config);
         k1_print_edge_status();
+        k1_edge_warn_if_collapsed(config);  // close the edge_mode= warn gap (mirror+complementary via mode)
       } else {
         bad_command(command_type, command_data);
       }
@@ -1088,10 +1103,159 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
     else if (strcmp(command_type, "edge_strength") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
-        K1EdgeMixerConfig config = k1_edgemixer_lite_config();
+        K1EdgeMixerConfig config = k1_edgemixer_config();
         config.strength = constrain(value, 0.0f, 1.0f);
-        k1_edgemixer_lite_set_config(config);
+        k1_edgemixer_set_config(config);
         k1_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_spread") == 0) {
+      float value = 0.0f;
+      if (vp_parse_float(command_data, &value)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.spreadDegrees = (uint8_t)constrain(value, 0.0f, 60.0f);
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_rotation") == 0) {
+      K1EdgeMixerRotationSpace space = K1_EDGE_ROTATION_SUM_PRESERVING;
+      if (k1_parse_edge_rotation(command_data, &space)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.rotationSpace = space;
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_dual") == 0) {
+      // Symmetric dual-edge (A lane): one_sided | split | mirror. Scriptable
+      // counterpart to the 'y' hotkey — set the dual mode non-interactively for
+      // reproducible VP_PERF / capture sweeps.
+      K1EdgeMixerDualEdge dual = K1_EDGE_DUAL_ONE_SIDED;
+      if (k1_parse_edge_dual(command_data, &dual)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.dualEdge = dual;
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+        k1_edge_warn_if_collapsed(config);
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_uniform") == 0) {
+      // Spatial weighting (ref E): uniform | masked. Scriptable counterpart to the
+      // 'm' hotkey — set non-interactively for reproducible demo / capture.
+      bool uniform = false;
+      if (k1_parse_edge_uniform(command_data, &uniform)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.spatialUniform = uniform;
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "edge_bench") == 0) {
+      // Dev-only worst-case micro-benchmark (OKLab perf gate). Times
+      // k1_edgemixer_apply on a synthetic FULLY-LIT 160-px strip so the
+      // near-black passthrough never fires — the true per-strip worst case,
+      // measured on-device (not extrapolated). spatialUniform=true forces
+      // amount=1 on every pixel. Restores the prior config afterwards.
+      static CRGB16 bench_buf[NATIVE_RESOLUTION];
+      const K1EdgeMixerConfig saved = k1_edgemixer_config();
+      const int R = 100;
+      const K1EdgeMixerRotationSpace spaces[3] = {
+        K1_EDGE_ROTATION_SUM_PRESERVING,
+        K1_EDGE_ROTATION_LUMA_PRESERVING,
+        K1_EDGE_ROTATION_OKLAB
+      };
+      const char* names[3] = {"faithful", "luma", "oklab"};
+      tx_begin();
+      USBSerial.print("EDGE_BENCH: px=");
+      USBSerial.print((int)NATIVE_RESOLUTION);
+      USBSerial.print(" iters=");
+      USBSerial.println(R);
+      for (int s = 0; s < 3; ++s) {
+        K1EdgeMixerConfig cfg;
+        cfg.enabled = true;
+        cfg.mode = K1_EDGE_MIXER_COMPLEMENTARY;
+        cfg.strength = 1.0f;
+        cfg.spreadDegrees = 30;
+        cfg.rotationSpace = spaces[s];
+        cfg.spatialUniform = true;  // amount = 1 on every pixel (worst case)
+        k1_edgemixer_set_config(cfg);
+        for (uint16_t i = 0; i < NATIVE_RESOLUTION; ++i) {
+          bench_buf[i].r = SQ15x16(0.75f);
+          bench_buf[i].g = SQ15x16(0.20f);
+          bench_buf[i].b = SQ15x16(0.05f);
+        }
+        const unsigned long t0 = micros();
+        for (int r = 0; r < R; ++r) {
+          k1_edgemixer_apply(bench_buf, NATIVE_RESOLUTION, cfg);
+        }
+        const unsigned long dt = micros() - t0;
+        USBSerial.print("EDGE_BENCH ");
+        USBSerial.print(names[s]);
+        USBSerial.print(": us_per_call=");
+        USBSerial.println((double)dt / (double)R, 1);
+      }
+      k1_edgemixer_set_config(saved);
+      tx_end();
+    }
+
+    else if (strcmp(command_type, "edge_xform") == 0) {
+      // Dev-only colour-transform ORACLE. Transforms ONE input colour through the
+      // REAL on-device fixed-point EdgeMixer rotation for a given rotation space +
+      // harmony mode (full strength, uniform amount) and prints the output. In/out
+      // are 0..65535 (= SQ15x16 * 65535). space: 0=faithful 1=luma 2=oklab.
+      // mode: 1=analogous 2=complementary 3=split 4=veil 5=triadic 6=tetradic.
+      // The host sweeps inputs + does the CIELAB analysis. Restores prior config.
+      int space = 0, modei = 2, ri = 0, gi = 0, bi = 0;
+      if (sscanf(command_data, "%d,%d,%d,%d,%d", &space, &modei, &ri, &gi, &bi) == 5) {
+        const K1EdgeMixerConfig saved = k1_edgemixer_config();
+        K1EdgeMixerRotationSpace rs =
+            (space == 2) ? K1_EDGE_ROTATION_OKLAB :
+            (space == 1) ? K1_EDGE_ROTATION_LUMA_PRESERVING :
+                           K1_EDGE_ROTATION_SUM_PRESERVING;
+        K1EdgeMixerConfig cfg;
+        cfg.enabled = true;
+        cfg.mode = (K1EdgeMixerMode)modei;   // set_config sanitises out-of-range
+        cfg.strength = 1.0f;
+        cfg.spreadDegrees = 30;
+        cfg.rotationSpace = rs;
+        cfg.spatialUniform = true;           // amount = 1 on the single pixel
+        k1_edgemixer_set_config(cfg);
+        static CRGB16 one[1];
+        one[0].r = SQ15x16((float)ri / 65535.0f);
+        one[0].g = SQ15x16((float)gi / 65535.0f);
+        one[0].b = SQ15x16((float)bi / 65535.0f);
+        k1_edgemixer_apply(one, 1, cfg);
+        auto q16 = [](SQ15x16 v) -> int {
+          float f = (float)v.getInternal() / 65536.0f;
+          if (f < 0.0f) f = 0.0f;
+          if (f > 1.0f) f = 1.0f;
+          return (int)(f * 65535.0f + 0.5f);
+        };
+        tx_begin();
+        USBSerial.print("XFORM,");
+        USBSerial.print(space);           USBSerial.print(',');
+        USBSerial.print(modei);           USBSerial.print(',');
+        USBSerial.print(q16(one[0].r));   USBSerial.print(',');
+        USBSerial.print(q16(one[0].g));   USBSerial.print(',');
+        USBSerial.println(q16(one[0].b));
+        tx_end();
+        k1_edgemixer_set_config(saved);
       } else {
         bad_command(command_type, command_data);
       }

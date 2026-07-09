@@ -54,6 +54,8 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
+            "k1_bench_im73d",  # IM73D122 PDM mic eval — bench B489A500 only
+            "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
                 ok, message = self.guard.validate_upload_target(
@@ -103,6 +105,46 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
+    def test_prod_im73d_env_is_bound_to_main_k1(self):
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d",
+            "/dev/tty.usbmodem1401",
+            self.ports,
+        )
+        self.assertTrue(ok, message)
+        self.assertIn("F887A500", message)
+
+    def test_prod_im73d_rejects_bench_target(self):
+        # k1_prod_im73d = main/prod LED map + IM73D PDM. Bench IM73D remains
+        # k1_bench_im73d. Cross-flash attempts must fail by USB MAC.
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d",
+            "/dev/tty.usbmodem12201",
+            self.ports,
+        )
+        self.assertFalse(ok)
+        self.assertIn("has USB serial", message)
+        self.assertIn("expected", message)
+
+    def test_production_pinmap_defines_im73d_pdm_pins(self):
+        # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
+        # bench-proven pins. Assert the production (#else) pinmap defines the PDM
+        # pins clk=13 / din=12 / LR=14 under K1_MIC_IM73D_PDM_V1, so k1_prod_im73d
+        # compiles and wires the mic to the proven GPIOs.
+        constants = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h").read_text()
+        # Isolate ONLY the production pinmap branch (the #else of
+        # K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
+        # the shared I2C pins that close the GPIO block. This must NOT alias onto
+        # the bench PDM block above (which defines identical pins) — else deleting
+        # the production block would still pass (adversarial-review defect, fixed).
+        marker = "K1 hardware production GPIO map"
+        self.assertIn(marker, constants)
+        prod = constants.split(marker, 1)[1].split("#define I2C_SDA_PIN", 1)[0]
+        self.assertNotIn("bench-reference GPIO map", prod)  # proves branch isolation
+        self.assertIn("#define K1_PDM_CLK_PIN 13", prod)
+        self.assertIn("#define K1_PDM_DIN_PIN 12", prod)
+        self.assertIn("#define K1_PDM_LR_PIN  14", prod)
+
     def test_cross_flash_attempts_are_rejected(self):
         cases = (
             ("k1_hardware", "/dev/tty.usbmodem12201"),
@@ -110,6 +152,9 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_bench_ap_frontend_probe", "/dev/tty.usbmodem1401"),
             ("k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4", "/dev/tty.usbmodem1401"),
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
+            ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
+            ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
+            ("k1_prod_im73d", "/dev/tty.usbmodem12201"),  # prod IM73D must reject the bench K1 port
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):
@@ -127,6 +172,8 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("monitor_port  = /dev/tty.usbmodem12201", text)
         self.assertIn("B4:3A:45:A5:87:F8", text)
         self.assertIn("B4:3A:45:A5:89:B4", text)
+        self.assertIn("[env:k1_bench_im73d_dsr16]", text)
+        self.assertIn("-DK1_MIC_IM73D_DSR_16S_V1", text)
 
     def test_k1_pio_pre_includes_s3_sdkconfig_root(self):
         text = K1_SRC_INCLUDES.read_text()
@@ -167,6 +214,9 @@ class K1UploadGuardTest(unittest.TestCase):
         mapped: set[str] = set()
         for target in self.guard.K1_TARGETS:
             mapped.update(target.envs)
+        # A BLOCKED env is also covered: validate_upload_target() hard-blocks it
+        # (returns False) BEFORE the fail-open path, so it can never cross-flash.
+        mapped.update(self.guard.BLOCKED_UPLOAD_ENVS)
 
         K1_ROOTS = {"k1_hardware", "k1_bench_reference"}
         missing = sorted(

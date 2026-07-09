@@ -1,0 +1,41 @@
+---
+description: Agent Operating System — read AGENT_OS.md before any task. Bootstrap ritual, source-of-truth hierarchy, safety gates, thinking gate, skill awareness.
+globs:
+alwaysApply: true
+---
+
+# Agent OS — SpectraSynq K1 Firmware
+
+Read [`AGENT_OS.md`](../../AGENT_OS.md) before any task in this repo. It is the
+canonical, tool-agnostic manual for all agents (Devin, Claude Code, Codex,
+Cursor).
+
+## Minimum before acting
+
+1. Run `bash scripts/agent/session-bootstrap.sh` — must exit 0. If it exits
+   nonzero, `repo-truth.sh` reported FAIL; resolve before proceeding.
+2. Read `AGENT_OS.md` — source-of-truth hierarchy, current lane, safety rules,
+   thinking gate, skill awareness gate.
+3. Keyword-scan `available_skills` for a skill that fits the task domain.
+4. For decisions/architecture/debugging-under-uncertainty, invoke
+   `/thinking-model-router` before acting.
+
+## Hard rules (from AGENT_OS.md)
+
+- No firmware source edits unless explicitly scoped.
+- No `platformio.ini` env behavior changes unless explicitly scoped.
+- No flash / upload / erase / serial monitor without explicit approval.
+- No `start_noise_cal` without confirmed silence.
+- Build via `bash scripts/agent/pio-build.sh <env>` only (wrapper rejects
+  upload/monitor tokens). Allowed envs: `k1_hardware`, `k1_bench_reference`,
+  `k1_bench_im73d`.
+- Commit only after the pre-commit gate passes (pytest + pio build for the
+  changed class).
+- End session with `scripts/agent/post-session-report.md` filled (including
+  `thinking_skill_used`, `skills_used`, `specialists_used`).
+
+## Cursor-specific
+
+Cursor skills live in `.cursor/skills/`. The same specialist agents and
+claude-mem MCP available to Claude Code are available here. Tool-specific
+overlays for other tools are listed in `AGENT_OS.md` → "Tool-specific overlays".

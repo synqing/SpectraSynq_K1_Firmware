@@ -7,7 +7,7 @@
 #include "config_types.h"
 #include "globals.h"
 #include "Palettes.h"
-#include "k1_edgemixer_lite.h"
+#include "k1_edgemixer.h"
 #include "k1_mode_selection.h"
 #include "k1_noise_cal_arm.h"
 #include "k1_smart_director.h"
@@ -167,7 +167,7 @@ bool apply_scene_smart(const char* scene) {
 
   K1SmartDirectorConfig smart = k1_smart_director_config();
   K1VisualHookConfig hooks = k1_visual_hooks_config();
-  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (strcmp(canonical, "off") == 0) {
     smart.enabled = false;
@@ -227,7 +227,7 @@ bool apply_scene_smart(const char* scene) {
 
   k1_smart_director_set_config(smart);
   k1_visual_hooks_set_config(hooks);
-  k1_edgemixer_lite_set_config(edge);
+  k1_edgemixer_set_config(edge);
   k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis());
   k1_smart_director_clear_manual_control();
   strlcpy(g_scene_smart, canonical, sizeof(g_scene_smart));
@@ -237,7 +237,7 @@ bool apply_scene_smart(const char* scene) {
 const char* infer_scene_smart() {
   K1SmartDirectorConfig smart = k1_smart_director_config();
   K1VisualHookConfig hooks = k1_visual_hooks_config();
-  K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
 
   if (!smart.enabled && !hooks.enabled && !edge.enabled) {
     return "off";
@@ -745,7 +745,7 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
   }
 
   if (strcmp(record.control, "global.sensitivity") == 0) {
-    if (!needs_number_range(record, &result, 0.0f, 1.0f, "Global sensitivity out of range")) return result;
+    if (!needs_number_range(record, &result, K1_SENSITIVITY_MIN, K1_SENSITIVITY_MAX, "Global sensitivity out of range")) return result;
     CONFIG.SENSITIVITY = record.number_value;
     save_config_delayed();
     return ok_number(CONFIG.SENSITIVITY);
@@ -838,9 +838,9 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
   if (strcmp(record.control, "edge.enabled") == 0) {
     bool enabled = false;
     if (!parse_bool_value(record, &enabled, &result)) return result;
-    K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.enabled = enabled;
-    k1_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_number(edge.enabled ? 1.0f : 0.0f);
   }
 
@@ -851,17 +851,17 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
       result_error(&result, "range", "Edge mode out of range");
       return result;
     }
-    K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.mode = mode;
-    k1_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_text(record.text_value);
   }
 
   if (strcmp(record.control, "edge.strength") == 0) {
     if (!needs_number_range(record, &result, 0.0f, 1.0f, "Edge strength out of range")) return result;
-    K1EdgeMixerConfig edge = k1_edgemixer_lite_config();
+    K1EdgeMixerConfig edge = k1_edgemixer_config();
     edge.strength = record.number_value;
-    k1_edgemixer_lite_set_config(edge);
+    k1_edgemixer_set_config(edge);
     return ok_number(edge.strength);
   }
 

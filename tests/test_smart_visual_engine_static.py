@@ -14,7 +14,7 @@ SMART_MODULE_PREFIXES = (
     "k1_audio_snapshot",
     "k1_mode_selection",
     "k1_smart_director",
-    "k1_edgemixer_lite",
+    "k1_edgemixer",
     "k1_onset_beat",
     "k1_visual_hooks",
 )
@@ -164,19 +164,22 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertLess(ino.index("calculate_novelty(t_now);"), ino.index("k1_audio_snapshot_update(t_now);"))
 
     def test_edgemixer_future_contract_keeps_centre_79_80_when_present(self):
-        edge_path = FIRMWARE / "k1_edgemixer_lite.cpp"
+        edge_path = FIRMWARE / "k1_edgemixer.cpp"
         if not edge_path.exists():
-            self.skipTest("EdgeMixer-lite not implemented yet")
+            self.skipTest("EdgeMixer not implemented yet")
         text = read(edge_path)
         self.assertTrue("79.5f" in text or ("79" in text and "80" in text))
-        self.assertRegex(text, r"static\s+K1EdgeMixerConfig\s+k1_edge_config\s*=\s*\{\s*false,")
-        self.assertIn("k1_edgemixer_lite_set_config", text)
-        self.assertIn("k1_edgemixer_lite_apply", text)
+        # Gate-3 (Captain 2026-07-09): EdgeMixer now ships ENABLED by default at the
+        # BALANCED intensity, so the shipping default is `{ true, ...` (was `{ false,`
+        # byte-inert). The centre-79/80 contract asserted above still holds (masked spatial).
+        self.assertRegex(text, r"static\s+K1EdgeMixerConfig\s+k1_edge_config\s*=\s*\{\s*true,")
+        self.assertIn("k1_edgemixer_set_config", text)
+        self.assertIn("k1_edgemixer_apply", text)
 
     def test_edgemixer_does_not_create_light_from_dark_pixels(self):
-        edge_path = FIRMWARE / "k1_edgemixer_lite.cpp"
+        edge_path = FIRMWARE / "k1_edgemixer.cpp"
         if not edge_path.exists():
-            self.skipTest("EdgeMixer-lite not implemented yet")
+            self.skipTest("EdgeMixer not implemented yet")
         text = read(edge_path)
         forbidden = (
             "SQ15x16(1.0f) - r",
@@ -282,7 +285,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         smart_header = read(FIRMWARE / "k1_smart_director.h")
         smart_source = read(FIRMWARE / "k1_smart_director.cpp")
         hooks_source = read(FIRMWARE / "k1_visual_hooks.cpp")
-        edge_source = read(FIRMWARE / "k1_edgemixer_lite.cpp")
+        edge_source = read(FIRMWARE / "k1_edgemixer.cpp")
         mode_source = read(FIRMWARE / "k1_mode_selection.cpp")
         serial_source = read(FIRMWARE / "serial_menu.h")
 
@@ -404,7 +407,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "edge.strength = 0.0f",
             "k1_smart_director_set_config(smart)",
             "k1_visual_hooks_set_config(hooks)",
-            "k1_edgemixer_lite_set_config(edge)",
+            "k1_edgemixer_set_config(edge)",
             "k1_mode_selection_init(CONFIG.LIGHTSHOW_MODE, millis())",
             "k1_smart_director_clear_manual_control()",
         ):
@@ -745,7 +748,7 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn("k1_smart_director_mode_selection_config(smart_now_ms)", ino)
         self.assertRegex(
             ino,
-            r"if\s*\(\s*edge_config\.enabled\s*\)\s*\{[^}]*k1_edgemixer_lite_apply",
+            r"if\s*\(\s*edge_config\.enabled\s*\)\s*\{[^}]*k1_edgemixer_apply",
             "Disabled EdgeMixer must not add an unconditional secondary render-path call.",
         )
 

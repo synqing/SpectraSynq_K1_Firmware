@@ -3,7 +3,7 @@ name: code-reviewer
 description: |
   Firmware code quality and load-bearing discipline enforcement — reviews DSP patterns, architectural constraints, gate compliance, and C++ idioms for real-time audio/visual systems
   Use when: reviewing C++ firmware changes in audio pipeline, visual effects, or core system modules; checking for instrumentation boundary violations; validating gate compliance before merge; auditing new light effects for Strobe Law violations
-tools: Read, Grep, Glob, Bash, mcp__plugin_context-mode_context-mode__ctx_batch_execute, mcp__plugin_context-mode_context-mode__ctx_execute, mcp__plugin_context-mode_context-mode__ctx_search, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search
+tools: Read, Grep, Glob, Bash, mcp__plugin_claude-mem_mcp-search__search, mcp__plugin_claude-mem_mcp-search__get_observations, mcp__plugin_claude-mem_mcp-search__smart_search
 model: inherit
 skills: k1-firmware-change-gate, sensorybridge-doctrine, ssa-management, cpp, platformio, esp32, esp-idf, arduino, fastled, python, pytest
 ---
@@ -57,11 +57,11 @@ I2S DMA (48 kHz) → Goertzel GDFT (133 Hz, 24 octave bands)
 ```
 
 **Key source directories:**
-- `SENSORY_BRIDGE_FIRMWARE/audio/` — DSP core (sb_tempo, sb_onset_beat, sb_audio_snapshot)
-- `SENSORY_BRIDGE_FIRMWARE/effects/` — Light show modes (22+ effects)
-- `SENSORY_BRIDGE_FIRMWARE/director/` — Smart Director, edge mixer
-- `SENSORY_BRIDGE_FIRMWARE/system/` — Globals, config, utilities
-- `SENSORY_BRIDGE_FIRMWARE/diag/` — MabuTrace, VPAB capture (dev-only)
+- `SPECTRASYNQ_K1_FIRMWARE/audio/` — DSP core (sb_tempo, sb_onset_beat, sb_audio_snapshot)
+- `SPECTRASYNQ_K1_FIRMWARE/effects/` — Light show modes (22+ effects)
+- `SPECTRASYNQ_K1_FIRMWARE/director/` — Smart Director, edge mixer
+- `SPECTRASYNQ_K1_FIRMWARE/system/` — Globals, config, utilities
+- `SPECTRASYNQ_K1_FIRMWARE/diag/` — MabuTrace, VPAB capture (dev-only)
 - `tests/` — pytest host regression harness
 
 ## Load-Bearing Rules (Non-Negotiable)
@@ -69,7 +69,7 @@ I2S DMA (48 kHz) → Goertzel GDFT (133 Hz, 24 octave bands)
 ### 1. Developer Instrumentation Boundary
 `MABU_TRACE`, `trace_dev`, `ENABLE_TEMPO_STREAM`, `TEMPO_DBG`, and any diagnostic capture that serialises data to the USB CDC stream **must never appear outside a compile guard** that is absent from `k1_hardware`. Check:
 ```bash
-grep -r "MABU_TRACE\|trace_dev\|ENABLE_TEMPO_STREAM\|TEMPO_DBG" SENSORY_BRIDGE_FIRMWARE/
+grep -r "MABU_TRACE\|trace_dev\|ENABLE_TEMPO_STREAM\|TEMPO_DBG" SPECTRASYNQ_K1_FIRMWARE/
 ```
 Any unguarded occurrence is a **Critical** blocker.
 

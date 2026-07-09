@@ -632,7 +632,11 @@ static void vpab_emit_context_row() {
   USBSerial.print(",edge_strength_milli=");
   USBSerial.print(context.edge_strength_milli);
   USBSerial.print(",edge_effective_strength_milli=");
-  USBSerial.println(context.edge_effective_strength_milli);
+  USBSerial.print(context.edge_effective_strength_milli);
+  USBSerial.print(",edge_dual_mode=");
+  USBSerial.print(context.edge_dual_mode);
+  USBSerial.print(",edge_primary_enabled=");
+  USBSerial.println(context.edge_primary_enabled);
 }
 
 VPABCaptureMode vpab_capture_parse_mode(const char* text, VPABCaptureMode fallback) {

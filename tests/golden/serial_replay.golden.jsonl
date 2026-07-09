@@ -34,12 +34,14 @@
 {"cmd":"saturation=-1","emitted":"sbr{{\nCONFIG.SATURATION: 0.00\n}}\n","config_delta":{"SATURATION":0.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"bulb_opacity=2.0","emitted":"sbr{{\nCONFIG.BULB_OPACITY: 1.00\n}}\n","config_delta":{"BULB_OPACITY":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"incandescent_filter=2.0","emitted":"sbr{{\nCONFIG.INCANDESCENT_FILTER: 1.00\n}}\n","config_delta":{"INCANDESCENT_FILTER":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
+{"cmd":"sensitivity=99","emitted":"sbr{{\nCONFIG.SENSITIVITY: 20.00\n}}\n","config_delta":{"SENSITIVITY":20.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"chroma=default","emitted":"sberr[[\nBad command: chroma=default\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"sensitivity=default","emitted":"sbr{{\nCONFIG.SENSITIVITY: 1.00\n}}\n","config_delta":{"SENSITIVITY":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"square_iter=default","emitted":"sbr{{\nCONFIG.SQUARE_ITER: 1.00\n}}\n","config_delta":{"SQUARE_ITER":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"mirror_enabled=default","emitted":"sbr{{\nCONFIG.MIRROR_ENABLED: 0\n}}\n","config_delta":{"MIRROR_ENABLED":0.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"chroma=","emitted":"sberr[[\nBad command: chroma\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"photons=abc","emitted":"sberr[[\nBad command: photons=abc\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
+{"cmd":"sensitivity=abc","emitted":"sberr[[\nBad command: sensitivity=abc\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"palette_mode=maybe","emitted":"sberr[[\nBad command: palette_mode=maybe\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"base_coat=default","emitted":"sberr[[\nBad command: base_coat=default\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}
 {"cmd":"unknown_cmd=1","emitted":"sberr[[\nBad command: unknown_cmd=1\n]]\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":true}

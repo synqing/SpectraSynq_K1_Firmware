@@ -5,15 +5,15 @@ from _fwpath import FwDir
 
 
 ROOT = Path(__file__).resolve().parents[1]
-EDGE_CPP = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer_lite.cpp"
-EDGE_H = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer_lite.h"
+EDGE_CPP = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer.cpp"
+EDGE_H = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "k1_edgemixer.h"
 
 
 def read(path):
     return path.read_text(encoding="utf-8")
 
 
-class EdgeMixerLiteStaticTest(unittest.TestCase):
+class EdgeMixerStaticTest(unittest.TestCase):
     def test_invalid_modes_are_sanitised_to_off(self):
         source = read(EDGE_CPP)
         self.assertIn("k1_edge_mode_or_off", source)

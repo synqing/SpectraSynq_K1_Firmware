@@ -8,6 +8,7 @@ Real-time audio-responsive lighting system that translates music into visual eff
 
 ## Quick Navigation
 
+- **Agent OS (all tools):** Read **[`AGENT_OS.md`](./AGENT_OS.md)** first — session bootstrap, source-of-truth hierarchy, safety gates, thinking gate, skill awareness. Tool-agnostic; this is the canonical agent manual.
 - **Build & Test:** See [Quick Start](#quick-start)
 - **Load-Bearing Rules:** Read **[`.claude/CLAUDE.md`](./.claude/CLAUDE.md)** first (doctrine, discipline, gates)
 - **Active Spec Index:** Read **[`docs/spec-index.md`](./docs/spec-index.md)** before firmware or forensic work (lane authority, handovers, recall)

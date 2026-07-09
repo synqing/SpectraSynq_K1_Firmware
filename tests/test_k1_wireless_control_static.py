@@ -309,11 +309,11 @@ class K1WirelessControlStaticTest(unittest.TestCase):
         # The wireless define exists nowhere except the bench env.
         before_bench, _, after = self.platformio.partition("[env:k1_wireless_ab_probe]")
         after_bench = after.split("[env:")[0] if after else ""
-        self.assertNotIn("SB_K1_WIRELESS_ENABLED", before_bench)
+        self.assertNotIn("K1_WIRELESS_ENABLED", before_bench)
         self.assertIn("-DK1_WIRELESS_ENABLED", after_bench)
         self.assertIn("NON-SHIPPABLE", after_bench)
         remainder = after[len(after_bench):] if after else ""
-        self.assertNotIn("SB_K1_WIRELESS_ENABLED", remainder)
+        self.assertNotIn("K1_WIRELESS_ENABLED", remainder)
 
     def test_scalar_controls_reject_out_of_range_instead_of_clamping(self):
         self.assertIn("needs_number_range", self.facade)

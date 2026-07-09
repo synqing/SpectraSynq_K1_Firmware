@@ -1,0 +1,89 @@
+# Devin git-backed blueprint — SpectraSynq K1 Firmware
+#
+# Status: KNOWLEDGE-ONLY DRAFT (Phase 2). This blueprint helps Devin understand
+# the repo and its safe-command surface. It deliberately does NOT:
+#   - install speculative packages (the repo already requires PlatformIO + pytest
+#     + python3 + git + bash, all assumed present on the snapshot)
+#   - call sync/build APIs (sync + build are triggered separately via Devin UI/CI)
+#   - configure upload/flash/serial behavior (hardware writes are forbidden from
+#     agent sessions; see .devin/agent-os.md)
+#   - include secrets or API tokens
+#
+# Sync: commit to default branch, then POST /v3/.../snapshot-setup/sync + build
+# via Devin API/UI. Not synced automatically by file presence.
+#
+# Reference: https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints
+
+initialize: |
+  # No-op for this phase. Host tools (pio, pytest, python3, git, bash) are
+  # assumed present. Do not add speculative installs until the repo proves
+  # a missing dependency blocks a Phase 3+ workflow.
+
+maintenance: |
+  # No-op for this phase. The repo does not require recurring dependency refresh
+  # for agent work. Revisit when a documented drift problem appears.
+
+knowledge:
+  - name: session-bootstrap
+    contents: |
+      bash scripts/agent/session-bootstrap.sh
+      # Read-only. Prints branch, HEAD, dirty state, hook status, K1/IM73D envs,
+      # claude-mem reachability, and stale-doc mtimes. Exits nonzero if
+      # repo-truth.sh reports OVERALL: FAIL. Writes .devin/last-bootstrap.json
+      # (gitignored). Run this FIRST in every session.
+
+  - name: repo-truth-check
+    contents: |
+      bash scripts/agent/repo-truth.sh
+      # Read-only. Classifies IM73D env/guard/plan presence (FAIL if missing),
+      # stale-doc mentions of IM73D/PDM lane (WARN), and device-build-registry
+      # dirty state (WARN, never auto-commit). Writes .devin/repo-truth-report.json
+      # (gitignored). Source-of-truth hierarchy lives in .devin/agent-os.md.
+
+  - name: guarded-platformio-build
+    contents: |
+      bash scripts/agent/pio-build.sh k1_hardware
+      bash scripts/agent/pio-build.sh k1_bench_reference
+      bash scripts/agent/pio-build.sh k1_bench_im73d
+      # Tight wrapper. Allowlist-exact env match + dangerous-token rejection
+      # (upload, --target, -t, erase, monitor, device, shell metacharacters).
+      # Direct `pio run -e ...` is intentionally NOT permitted from agent
+      # sessions because Devin Exec() permissions are prefix-based.
+
+  - name: pytest-guard-tests
+    contents: |
+      python3 -m pytest tests/test_k1_upload_guard.py tests/test_bootloop_guard_static.py tests/test_k1_loud_guard_static.py -q
+      # Fast host-only guard tests. Full suite: pytest tests/
+      # Pre-commit hook (scripts/hooks/pre-commit) runs pytest + pio build
+      # automatically on commit, tiered by change class.
+
+  - name: hardware-upload-prohibition
+    contents: |
+      # FORBIDDEN from agent sessions without explicit Captain approval:
+      #   pio run --target upload / pio run -t upload
+      #   pio device monitor
+      #   esptool.py erase_flash / pio run -t erase
+      #   any serial-write command
+      # Upload guard: scripts/platformio/k1_upload_guard.py matches env to USB
+      # serial / chip ID before any upload. Even if the guard passes, agent must
+      # get explicit approval. Bench K1 (B489A500) = k1_bench_im73d only.
+      # Main K1 (F887A500) = k1_hardware only. Different GPIO maps.
+
+  - name: agent-operating-manual
+    contents: |
+      # Read .devin/agent-os.md for: source-of-truth hierarchy, current-lane
+      # verification, stale-doc handling, claude-mem usage, allowed/forbidden
+      # actions, validation gates, handoff + failure report templates.
+
+  - name: subagent-dispatch-contract
+    contents: |
+      # Before dispatching any subagent, fill scripts/agent/subagent-dispatch-template.md.
+      # Every delegated task is classified load-bearing or optional before launch.
+      # Load-bearing tasks cannot be downgraded after launch. Stuck-agent recovery
+      # is mandatory: one bounded retry, then fallback. No indefinite polling.
+
+  - name: post-session-report
+    contents: |
+      # At session end or blocker, fill scripts/agent/post-session-report.md.
+      # Decision-grade: files changed, commands run, validation, evidence,
+      # blockers, safety constraints respected, next recommended action.

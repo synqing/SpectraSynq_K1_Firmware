@@ -211,12 +211,11 @@ class K1AvRegressionStaticTest(unittest.TestCase):
     def test_16k_acf_amortisation_probe_is_non_shippable_env_only(self):
         tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        # N4a: probe-env identity lives in the single source (manifest), not guard source text.
-        identities = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_d8"
         self.assertIn(env_name, platformio)
-        self.assertIn(env_name, identities)
+        self.assertIn(env_name, guard)
         self.assertIn("-DK1_TEMPO_ACF_REFRESH_DECIMATION=8U", platformio)
         self.assertIn("if (k1_acf_refresh_now)", tempo)
         self.assertIn("production leaves the", tempo)
@@ -235,8 +234,7 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         serial = serial_command_surface()  # acf_spread= print moved to the extracted TU (S1)
         capture = (HARNESS / "device_ap_cadence_capture.py").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        # N4a: probe-env identity lives in the single source (manifest), not guard source text.
-        identities = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread16"
         spread12_env = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread12"
@@ -250,12 +248,12 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn(spread4_env, platformio)
         self.assertIn(full_ap_spread8_env, platformio)
         self.assertIn(full_ap_spread4_env, platformio)
-        self.assertIn(env_name, identities)
-        self.assertIn(spread12_env, identities)
-        self.assertIn(spread8_env, identities)
-        self.assertIn(spread4_env, identities)
-        self.assertIn(full_ap_spread8_env, identities)
-        self.assertIn(full_ap_spread4_env, identities)
+        self.assertIn(env_name, guard)
+        self.assertIn(spread12_env, guard)
+        self.assertIn(spread8_env, guard)
+        self.assertIn(spread4_env, guard)
+        self.assertIn(full_ap_spread8_env, guard)
+        self.assertIn(full_ap_spread4_env, guard)
         self.assertIn("-DK1_TEMPO_ACF_SPREAD_PROBE=1", platformio)
         self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=16U", platformio)
         self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=12U", platformio)

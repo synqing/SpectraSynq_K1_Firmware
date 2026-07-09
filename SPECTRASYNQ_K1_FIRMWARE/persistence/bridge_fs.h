@@ -10,18 +10,79 @@
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
+#include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
 
 extern void reboot(); // system.h
 
+#ifdef K1_MIC_IM73D_PDM_V1
+// PDM persistence namespace (cal 2026-07-03, config 2026-07-04): everything the
+// PDM build persists lives in its OWN files (/CONFIG_PDM_*.BIN, /cal_profile_pdm.bin)
+// so the SPH0645 baseline (/CONFIG_*.BIN, /cal_profile.bin, /noise_cal.bin) stays
+// frozen and untouchable on disk. Same record formats; different namespace.
+// PDM noise_samples persist INSIDE the cal profile (the cal-profile save path) —
+// there is deliberately no /noise_cal_pdm.bin.
+#define CAL_PROFILE_FILE "/cal_profile_pdm.bin"
+#else
 #define CAL_PROFILE_FILE "/cal_profile.bin"
+#endif
 #define CAL_PROFILE_MAGIC 0x314C4143UL
 #define CAL_PROFILE_VERSION 1U
 
-void update_config_filename(uint32_t input) {
-  snprintf(config_filename, 24, "/CONFIG_%05lu.BIN", input);
+// --- Internal-RAM precondition for LittleFS writes (crash-safety, 2026-07-05) ---
+// A LittleFS.open() allocates a stdio FILE plus its recursive mutex (a FreeRTOS
+// queue — INTERNAL RAM only) plus the lfs file cache. If the internal 8-bit heap
+// cannot satisfy the mutex allocation, newlib calls abort() from INSIDE fopen()
+// (newlib locks.c: lock_init_generic) — this fires BEFORE open() returns, so the
+// `if (!file)` guards below can never catch it; the device hard-reboots.
+// Root incident: bench K1 (k1_bench_im73d_ble) aborted on core 0 during the first
+// accepted noise-cal after config persistence was un-frozen (e2b62b5). BLE is
+// pinned to core 0 and leaves internal DRAM tight, so save_config()'s open aborted.
+// This precondition turns that fatal path into a graceful, logged, retryable
+// deferral. It is inert on a healthy device (tens of KB largest free block).
+#ifndef K1_FS_MIN_INTERNAL_BLOCK
+#define K1_FS_MIN_INTERNAL_BLOCK 8192  // bytes: conservative headroom for one open
+#endif
+
+static inline bool bridge_fs_internal_heap_ok(const char* who) {
+  const size_t largest = heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL);
+  const size_t freeb   = heap_caps_get_free_size(MALLOC_CAP_INTERNAL);
+  if (largest >= K1_FS_MIN_INTERNAL_BLOCK) {
+    return true;
+  }
+  // LOUD on every trip (never silent): surfaces the exact headroom so the true
+  // internal-RAM budget can be closed. free vs largest separates exhaustion from
+  // fragmentation, and repeated lines across cals expose any leak.
+  USBSerial.print("[fs] SKIP ");
+  USBSerial.print(who);
+  USBSerial.print(": internal heap too low for LittleFS open (free=");
+  USBSerial.print((uint32_t)freeb);
+  USBSerial.print("B largest=");
+  USBSerial.print((uint32_t)largest);
+  USBSerial.print("B need>=");
+  USBSerial.print((uint32_t)K1_FS_MIN_INTERNAL_BLOCK);
+  USBSerial.println("B) - deferring to avoid fopen abort");
+  return false;
 }
 
-// Restore all defaults defined in globals.h by removing saved data and rebooting
+void update_config_filename(uint32_t input) {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Single choke point for the PDM config namespace: every config reader/writer
+  // (load_config, save_config, factory_reset, restore_defaults) goes through
+  // config_filename, so this one branch keeps the SPH /CONFIG_*.BIN unreachable
+  // under the flag. Missing PDM file at boot -> compiled defaults (load_config
+  // open-fail path), NEVER the SPH config.
+  snprintf(config_filename, 24, "/CONFIG_PDM_%05lu.BIN", input);
+#else
+  snprintf(config_filename, 24, "/CONFIG_%05lu.BIN", input);
+#endif
+}
+
+// Restore all defaults defined in globals.h by removing saved data and rebooting.
+// Under K1_MIC_IM73D_PDM_V1 (un-frozen 2026-07-04): config_filename and
+// CAL_PROFILE_FILE are PDM-namespaced, so this clears ONLY the PDM state.
+// The SPH-domain files (/noise_cal.bin, /CONFIG_*.BIN, /cal_profile.bin) and the
+// shared preset slots stay untouched until the SPH path is retired — with SPH
+// saves frozen under the flag, a deletion there would be unrecoverable.
 void factory_reset() {
   lock_leds();
   USBSerial.print("Deleting ");
@@ -34,31 +95,39 @@ void factory_reset() {
     USBSerial.println("delete failed");
   }
 
+#ifndef K1_MIC_IM73D_PDM_V1
   USBSerial.print("Deleting noise_cal.bin: ");
   if (LittleFS.remove("/noise_cal.bin")) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
+#endif
 
-  USBSerial.print("Deleting cal_profile.bin: ");
+  USBSerial.print("Deleting " CAL_PROFILE_FILE ": ");
   if (LittleFS.remove(CAL_PROFILE_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
 
+#ifndef K1_MIC_IM73D_PDM_V1
   USBSerial.print("Deleting " K1_PRESET_SLOTS_FILE ": ");
   if (LittleFS.remove(K1_PRESET_SLOTS_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
   }
+#else
+  USBSerial.println("[PDM] preserved: /noise_cal.bin, SPH config/profile, preset slots (non-PDM files)");
+#endif
 
   reboot();
 }
 
-// Restore only configuration defaults
+// Restore only configuration defaults. Safe under K1_MIC_IM73D_PDM_V1
+// (un-frozen 2026-07-04): config_filename is the PDM-namespaced file, so the
+// SPH config is unreachable here.
 void restore_defaults() {
   lock_leds();
   USBSerial.print("Deleting ");
@@ -74,8 +143,20 @@ void restore_defaults() {
   reboot();
 }
 
-// Save configuration to LittleFS
+// Save configuration to LittleFS. Under K1_MIC_IM73D_PDM_V1 this writes the
+// PDM-namespaced config_filename (un-frozen 2026-07-04); the SPH config stays
+// untouchable. The whole CONFIG struct is saved, including live PDM cal fields —
+// those on-disk cal fields are informational only: the boot force-invalidate in
+// system.h scrubs them and the cal profile file is the cal authority.
 void save_config() {
+  // Crash-safety: never open the config file when internal RAM can't afford it
+  // (would abort() inside fopen, before the `if (!file)` guard). Re-arm the
+  // check_settings() deferred-save so it retries once heap recovers.
+  if (!bridge_fs_internal_heap_ok("save_config")) {
+    next_save_time = millis() + 5000;
+    settings_updated = true;
+    return;
+  }
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
@@ -115,7 +196,7 @@ void save_config() {
   unlock_leds();
 }
 
-// Save configuration to LittleFS 10 seconds from now
+// Save configuration to LittleFS a few seconds from now
 void save_config_delayed() {
   if(debug_mode == true){
     USBSerial.println("CONFIG SAVE QUEUED");
@@ -215,6 +296,18 @@ void load_config() {
 
 // Save noise calibration to LittleFS
 void save_ambient_noise_calibration() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // STAYS frozen under the flag (decision 2026-07-04): /noise_cal.bin is
+  // SPH-domain, and the PDM noise_samples[] already persist inside
+  // /cal_profile_pdm.bin via save_calibration_profile(). A separate PDM noise
+  // file would be redundant state with its own corruption/skew surface.
+  return;
+#endif
+  // Crash-safety: skip the open under internal-RAM pressure (non-PDM builds).
+  // noise_samples[] stay live in RAM; a later accepted cal re-attempts the save.
+  if (!bridge_fs_internal_heap_ok("save_ambient_noise_calibration")) {
+    return;
+  }
   lock_leds();
   if (debug_mode) {
     USBSerial.print("SAVING AMBIENT_NOISE PROFILE... ");
@@ -251,6 +344,13 @@ void save_ambient_noise_calibration() {
 
 // Load noise calibration from LittleFS
 void load_ambient_noise_calibration() {
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Never read the SPH-domain /noise_cal.bin under the flag: with no PDM profile
+  // on disk it would leave SPH noise floors live in noise_samples[] (wrong domain
+  // for GDFT subtraction). PDM noise comes from /cal_profile_pdm.bin (or stays at
+  // compiled-default zeros until the first accepted cal).
+  return;
+#endif
   lock_leds();
   if (debug_mode) {
     USBSerial.print("LOADING AMBIENT_NOISE PROFILE... ");
@@ -292,6 +392,15 @@ static bool read_cal_profile_bytes(File& file, void* data, size_t len) {
 }
 
 bool save_calibration_profile(uint8_t source) {
+  // Under K1_MIC_IM73D_PDM_V1 this writes CAL_PROFILE_FILE = /cal_profile_pdm.bin
+  // (PDM-namespaced; the SPH profile is untouchable). Un-stubbed 2026-07-03 after
+  // the graft + cal-gate window were device-proven (NOISE CAL ACCEPTED, SSL=887).
+  // Crash-safety: under internal-RAM pressure this open would abort() inside fopen
+  // one line after save_config() in the cal-complete burst. Return false instead;
+  // the accepted cal stays live in RAM for the session (log surfaces the shortfall).
+  if (!bridge_fs_internal_heap_ok("save_calibration_profile")) {
+    return false;
+  }
   lock_leds();
   if (!calibration_profile_valid()) {
     calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
@@ -338,6 +447,14 @@ bool save_calibration_profile(uint8_t source) {
     calibration_profile_loaded = true;
     calibration_refresh_status(source);
   }
+#ifdef K1_MIC_IM73D_PDM_V1
+  else {
+    // A failed PDM file write must never cost an accepted cal: keep the RAM-only
+    // semantic success (cal_valid reflects the in-RAM learned values).
+    calibration_profile_loaded = false;
+    calibration_refresh_status(source);
+  }
+#endif
   unlock_leds();
   return ok;
 }
@@ -346,9 +463,13 @@ bool load_calibration_profile_if_config_invalid() {
   if (calibration_profile_valid()) {
     calibration_profile_loaded = false;
     calibration_refresh_status(CAL_SOURCE_CONFIG);
+#ifndef K1_MIC_IM73D_PDM_V1
+    // PDM: NEVER seed the PDM profile from CONFIG here — at this point CONFIG
+    // holds SPH-domain values loaded from the frozen SPH config.bin.
     if (!LittleFS.exists(CAL_PROFILE_FILE)) {
       save_calibration_profile(CAL_SOURCE_CONFIG);
     }
+#endif
     return false;
   }
 
@@ -416,6 +537,8 @@ bool load_calibration_profile_if_config_invalid() {
 }
 
 bool clear_calibration_profile() {
+  // Under K1_MIC_IM73D_PDM_V1, CAL_PROFILE_FILE is /cal_profile_pdm.bin — this
+  // clears only the PDM cal; the SPH profile is unreachable under the flag.
   lock_leds();
   bool removed = LittleFS.remove(CAL_PROFILE_FILE);
   calibration_profile_loaded = false;

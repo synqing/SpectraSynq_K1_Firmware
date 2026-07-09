@@ -37,6 +37,44 @@
 // Must match sizeof(ssl_cal_buf) in system/globals.h (static_assert in i2s_audio.h).
 #define NOISE_CAL_SSL_PHASE_B_FRAMES 112U
 
+#ifdef K1_MIC_IM73D_PDM_V1
+// IM73D122 PDM domain (bench eval, 2026-07-02). The PDM silence floor (~±20-40 raw,
+// then scaled by SENSITIVITY×gain) sits far below the SPH0645 default (350). Re-seed the
+// boot SSL fallback into the PDM band so a PDM boot never sits at an SPH-domain SSL.
+// SEED — retune from the measured PDM silence p90 on the bench (never 0 at runtime).
+#undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
+#define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
+
+// PDM cal-gate window (Outcome B, 2026-07-03, bench-measured). The base 650/720
+// limits are SPH0645-domain; at G=16 the IM73D measures the SAME room as:
+//   true silence (Captain-confirmed): ssl_p90 = 807  (accepted-cal day: 645)
+//   quiet-ish ambient:                ssl_p90 = 880-922
+//   audible music playing:            ssl_p90 = 1040-1219
+// 8 device runs, 2026-07-02/03 logs: _scratch/im73d_bringup/{watch_and_cal*,silence_cal_ny}.log.
+// TRUSTED_P90 1000 sits between the silence band (<=922) and the music band
+// (>=1040) — still rejects music-contaminated cals. MAX_VALID 1150 admits
+// learned = p90*1.1 up to 1100. Flag-off SPH builds keep 650/720 untouched.
+#undef  NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW
+#define NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW 1000.0f
+#undef  NOISE_CAL_SSL_MAX_VALID_RAW
+#define NOISE_CAL_SSL_MAX_VALID_RAW 1150U
+
+// Pre-sensitivity input gain. Extraction = im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN,
+// then the SHARED path multiplies by k1_effective_sensitivity (SENSITIVITY 2.4 × trim), so
+// effective gain = G × 2.4. Seed 3.0 (→ 7.2 effective) targets the SPH0645 4k-10k max_raw
+// band. RETUNE on bench: G_next = G_current × target_peak / observed_peak (discard clipped/
+// trimmed runs). NOT a guess — locked from the Stage-0 SPH0645 baseline.
+#ifndef K1_MIC_IM73D_INPUT_GAIN
+// Bench-characterized 2026-07-02: G_next = 3.0 * (SPH target ~7000 / IM73D obs 1317) ~= 16.
+// 1317 was a clean run (input_trim=1.0, non-railed); 16 lands ~7000 << 28000 near-rail.
+#define K1_MIC_IM73D_INPUT_GAIN 16.0f
+#endif
+
+// Raw int16 telemetry guardrail before K1_MIC_IM73D_INPUT_GAIN / sensitivity.
+// This is a measurement-purity surface, not a production gain control.
+#define K1_MIC_IM73D_RAW_I16_NEAR_RAIL 30000
+#endif
+
 #ifdef K1_LOUD_GUARD_V1
 // K1 loud-room guard: runtime-only headroom management for loud playback tests.
 // These thresholds are internal signal-health thresholds, not room dB/A targets.
@@ -88,7 +126,7 @@
 #define DIAG_CAPTURE_MAX_PAYLOAD_BYTES 512
 #endif
 #ifdef K1_PIN_EVIDENCE_V1
-#define K1_PIN_EVIDENCE_PAYLOAD_VERSION 1
+#define K1_PIN_EVIDENCE_PAYLOAD_VERSION 2
 #endif
 #define DIAG_CAPTURE_MAGIC 0x4B31U
 #define DIAG_CAPTURE_VERSION 1
@@ -271,6 +309,16 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
     #define LED_DATA_PIN 4
     #define LED_CLOCK_PIN 5
+
+    #ifdef K1_MIC_IM73D_PDM_V1
+      // IM73D122 PDM mic (bench eval, 2026-07-02) — physically replaces the SPH0645
+      // on these pads. Dedicated PDM macros consumed by init_i2s()'s PDM branch; the
+      // i2s_std I2S_*_PIN above stay defined but UNUSED under the flag. Proven config:
+      // clk 819.2 kHz (DSR_8S) / LR LOW = LEFT slot / falling edge.
+      #define K1_PDM_CLK_PIN 13   // PDM clock out
+      #define K1_PDM_DIN_PIN 12   // PDM data in
+      #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+    #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
     // env: esp32dev_audio_esv11_k1v2.
@@ -280,6 +328,18 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
     #define LED_DATA_PIN 6
     #define LED_CLOCK_PIN 7
+
+    #ifdef K1_MIC_IM73D_PDM_V1
+      // IM73D122 PDM mic on the PRODUCTION pinmap (Captain D1, 2026-07-06): the
+      // production IM73D uses the IDENTICAL bench-proven pins — all current K1s are
+      // the same ESP32-S3 devboard. clk 819.2 kHz (DSR_8S) / LR LOW = LEFT / falling
+      // edge. The i2s_std I2S_*_PIN above stay defined but UNUSED under the flag.
+      // Collision-free on this map: GPIO 12 is unassigned, 13/14 free when SPH drops,
+      // LEDs 6/7 unaffected, old SPH LRCLK 11 goes unused.
+      #define K1_PDM_CLK_PIN 13   // PDM clock out (= production SPH BCLK pad, freed)
+      #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
+      #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
+    #endif
   #endif
 
   #define I2C_SDA_PIN 17
@@ -443,6 +503,17 @@ static inline uint8_t apply_gamma8(uint8_t v) {
 // chromagram silent, to prevent black-out per observation 53369).
 #define ENABLE_WAVEFORM_CHROMAGRAM_COLOR 1
 #define WAVEFORM_REACTIVE_RAW_MARGIN 1.10f
+#ifdef K1_MIC_IM73D_PDM_V1
+// PDM quiet-music duty trim (2026-07-03, Captain-approved). With the measured
+// IM73D floor (SSL=979) the 1.10 margin gates 30% of quiet-background frames;
+// 0.95 (gate≈930, still 1.04x above the room silence p90≈890) trims the measured
+// duty to 22%. Deeper relief is impossible by thresholding — quiet music overlaps
+// the silence band (sweep: _scratch/im73d_bringup/eyes-on-runbook.md). NOTE: the
+// runtime knob VP_WAVEFORM_REACTIVE_RAW_MARGIN serves only waveform_hybrid and
+// clamps >=1.00, so this compile-time override is the only path for fast.
+#undef  WAVEFORM_REACTIVE_RAW_MARGIN
+#define WAVEFORM_REACTIVE_RAW_MARGIN 0.95f
+#endif
 #define WAVEFORM_REACTIVE_PEAK_FLOOR 0.08f
 #define WAVEFORM_IDLE_FADE 0.85f
 
