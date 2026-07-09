@@ -211,7 +211,7 @@ class K1AvRegressionStaticTest(unittest.TestCase):
     def test_16k_acf_amortisation_probe_is_non_shippable_env_only(self):
         tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")  # N4a: env registration lives in the manifest, not the guard source
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_d8"
         self.assertIn(env_name, platformio)
@@ -234,7 +234,7 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         serial = serial_command_surface()  # acf_spread= print moved to the extracted TU (S1)
         capture = (HARNESS / "device_ap_cadence_capture.py").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")  # N4a: env registration lives in the manifest, not the guard source
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread16"
         spread12_env = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread12"
