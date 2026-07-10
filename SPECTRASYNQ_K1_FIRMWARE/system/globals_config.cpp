@@ -69,7 +69,7 @@ conf CONFIG = {
   0,                   // DC_OFFSET
   60,                  // CHROMAGRAM_RANGE
   CHROMA_PROFILE_DEFAULT, // CHROMA_PROFILE (= v40102: NOTE_OFFSET=12 / CHROMAGRAM_RANGE=60)
-  false,               // STANDBY_DIMMING (off by default — turn back on via `standby_dimming=true` if you want auto-dim in silence)
+  true,                // STANDBY_DIMMING (default-flip 2026-07-10, Captain-signed: go-dark in silence. Detection is raw-RMS + dwell, cal-independent; hardware-validated latch->true-black->wake on B4:3A:45:A5:89:B4)
   false,               // REVERSE_ORDER
   false,               // RESERVED_CONFIG_BYTE, kept to preserve saved-config layout
   1500,                // MAX_CURRENT_MA

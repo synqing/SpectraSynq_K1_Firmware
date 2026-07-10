@@ -436,7 +436,10 @@ void init_system() {
   CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
   CONFIG.VU_LEVEL_FLOOR = 0.0f;
-  CONFIG.STANDBY_DIMMING = false;                               // else silent_scale*0 blanks the plate
+  // STANDBY_DIMMING boot force-off REMOVED at the 2026-07-10 default-flip. Its rationale
+  // (an early-boot bad cal causing false silence -> blanked plate) no longer applies: go-dark
+  // detection is now raw-RMS + dwell (k1_silence_rms_raw), independent of SSL/cal. The
+  // broken-cal guard at ~:519 remains as belt-and-braces if cal is genuinely corrupt.
   for (uint8_t i = 0; i < NUM_FREQS; i++) noise_samples[i] = 0;
   calibration_profile_loaded = false;
   calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
@@ -514,10 +517,12 @@ void init_system() {
     USBSerial.println(CONFIG.SWEET_SPOT_MIN_LEVEL);
     CONFIG.DC_OFFSET = 0;
     CONFIG.VU_LEVEL_FLOOR = 0.0f;
-    // Same broken cal sequence that inflates SSL also leaves STANDBY_DIMMING=true persisted —
-    // force OFF so silent_scale stays at 1.0 (otherwise apply_brightness multiplies every pixel by 0).
-    CONFIG.STANDBY_DIMMING = false;
-    USBSerial.println("STANDBY_DIMMING force-disabled (broken-cal corruption detected)");
+    // STANDBY_DIMMING force-off REMOVED at the 2026-07-10 default-flip. This guard tied
+    // go-dark to SSL-cal validity, but SSL fallback is the NORMAL state of a fresh unit until
+    // noise-cal settles — so it wrongly disabled go-dark on every fresh boot. Go-dark
+    // detection is now raw-RMS + dwell (k1_silence_rms_raw), independent of SSL/cal, so a
+    // fallback/broken cal cannot cause false silence. silent_scale only reaches 0 on genuine
+    // raw-RMS silence, which is correct regardless of cal state.
     // Also wipe persisted noise floor — if cal was bad, the 1.5x oversubtraction in GDFT.h
     // would kill the spectrogram and zero out chromagram → no audio reactivity in any mode.
     for (uint8_t i = 0; i < NUM_FREQS; i++) {

@@ -68,11 +68,18 @@ class TelemetryAndSerial(unittest.TestCase):
         self.assertIn('strcmp(command_type, "silence_rms_exit")', SERIAL)
 
 
-class ShipsDormant(unittest.TestCase):
-    def test_standby_dimming_factory_default_false(self):
-        # Feature must ship OFF (dormant) until Captain hardware sign-off flips the default.
-        self.assertRegex(
-            GLOBALS_CFG, r"false,\s*//\s*STANDBY_DIMMING")
+class ShipsLive(unittest.TestCase):
+    def test_standby_dimming_factory_default_true(self):
+        # Default-flipped 2026-07-10 (Captain-signed): go-dark ships ON. Detection is raw-RMS
+        # + dwell, cal-independent; hardware-validated latch->true-black->wake.
+        self.assertRegex(GLOBALS_CFG, r"true,\s*//\s*STANDBY_DIMMING")
+
+    def test_no_boot_force_off(self):
+        # Both boot force-offs (unconditional IM73D-boot + SSL-cal-validity guard) are removed:
+        # go-dark detection is raw-RMS/cal-independent, so neither guard's rationale holds and
+        # both wrongly disabled go-dark on fresh units. No system.h boot path may force it false.
+        SYSTEM = (FW / "system" / "system.h").read_text(encoding="utf-8")
+        self.assertEqual(SYSTEM.count("CONFIG.STANDBY_DIMMING = false;"), 0)
 
 
 if __name__ == "__main__":
