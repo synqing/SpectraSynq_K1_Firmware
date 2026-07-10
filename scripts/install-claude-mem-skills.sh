@@ -104,10 +104,42 @@ count_named() {
   echo "$n"
 }
 
+# Global availability for /claude-mem-router (Claude Code + Cursor + Codex).
+# Canonical body stays in the project; home skill dirs get symlinks.
+link_router_global() {
+  local src="$PROJECT/.claude/skills/claude-mem-router"
+  [ -f "$src/SKILL.md" ] || {
+    echo "  SKIP global claude-mem-router (project copy missing)"
+    return 0
+  }
+  local dest target
+  for dest in \
+    "$HOME/.claude/skills" \
+    "$HOME/.cursor/skills" \
+    "$HOME/.codex/skills" \
+    "$HOME/.agents/skills"
+  do
+    mkdir -p "$dest"
+    target="$dest/claude-mem-router"
+    if [ -L "$target" ] || [ ! -e "$target" ]; then
+      rm -f "$target"
+      ln -s "$src" "$target"
+      echo "  GLOBAL $target -> $src"
+    elif [ -d "$target" ]; then
+      rm -rf "$target"
+      ln -s "$src" "$target"
+      echo "  GLOBAL (replaced dir) $target -> $src"
+    else
+      echo "  SKIP global $target (unexpected non-dir entry)"
+    fi
+  done
+}
+
 echo "  skills processed: $installed"
 echo "  .claude/skills present: $(count_named "$PROJECT/.claude/skills")/$((${#PLUGIN_SKILLS[@]} + ${#PROJECT_SKILLS[@]}))"
 echo "  .cursor/skills present: $(count_named "$PROJECT/.cursor/skills")/$((${#PLUGIN_SKILLS[@]} + ${#PROJECT_SKILLS[@]}))"
 echo "  .codex/skills present:  $(count_named "$PROJECT/.codex/skills")/$((${#PLUGIN_SKILLS[@]} + ${#PROJECT_SKILLS[@]}))"
-echo "  invoke: /claude-mem-router  (scenario → one skill)"
+link_router_global
+echo "  invoke: /claude-mem-router  (scenario → one skill; project + GLOBAL)"
 echo "          /mem-search /knowledge-agent /timeline-report /how-it-works /spec-recall"
 echo "          /smart-explore /learn-codebase /weekly-digests /memory-authority-gate"
