@@ -3,6 +3,13 @@
 #include <Arduino.h>
 #include <math.h>
 
+#ifdef K1_STM
+// STM (audio-reactive) modes read the Core-0 STM producer via k1_stm_read(). The
+// snapshot header pulls in k1_stm.h (K1StmResult / K1_STM_SPECTRAL_BINS) under the
+// same flag, so one guarded include covers both the type and the accessor.
+#include "k1_audio_snapshot.h"
+#endif
+
 // Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
 // loop. This is a PURE code-gen change — every operation in these helpers is
 // integer / SQ15x16 (int32/int64), so inlining cannot alter a single result
@@ -109,6 +116,10 @@ static K1EdgeMixerMode k1_edge_mode_or_off(K1EdgeMixerMode mode) {
     case K1_EDGE_MIXER_SATURATION_VEIL:
     case K1_EDGE_MIXER_TRIADIC:
     case K1_EDGE_MIXER_TETRADIC:
+#ifdef K1_STM
+    case K1_EDGE_MIXER_STM_DUAL:
+    case K1_EDGE_MIXER_STM_SPECTRAL_MAP:
+#endif
       return mode;
     default:
       return K1_EDGE_MIXER_OFF;
@@ -912,6 +923,69 @@ static void k1_edge_apply_run(CRGB16* buf, uint16_t count,
   }
 }
 
+#ifdef K1_STM
+// LED -> STM spectral-ripple bin map, regenerated for the 40-bin K1 producer (the
+// donor mapped 42). Centre LED 79/80 -> bin 0 (coarsest ripple), strip ends -> bin
+// K1_STM_SPECTRAL_BINS-1 (finest), symmetric about the 79/80 centre so the map is
+// centre-origin. Mirrors the donor's floor(N*(|i-centre|/centre)^0.7) curve.
+static uint8_t k1_edge_stm_bin[NATIVE_RESOLUTION];
+static bool k1_edge_stm_bin_ready = false;
+
+static void k1_edge_stm_build_lut() {
+  if (k1_edge_stm_bin_ready) {
+    return;
+  }
+  const float centre = (NATIVE_RESOLUTION - 1) * 0.5f;   // 79.5 for 160 LEDs
+  const float maxBin = float(K1_STM_SPECTRAL_BINS - 1);  // 39 for 40 bins
+  for (uint16_t i = 0; i < NATIVE_RESOLUTION; ++i) {
+    const float norm = fabsf(float(i) - centre) / centre;  // 0 at centre .. 1 at ends
+    float b = floorf(maxBin * powf(norm, 0.7f));
+    if (b < 0.0f) b = 0.0f;
+    if (b > maxBin) b = maxBin;
+    k1_edge_stm_bin[i] = uint8_t(b);
+  }
+  k1_edge_stm_bin_ready = true;
+}
+
+// Apply an STM (audio-reactive) VALUE-only brightness modulation over a strip
+// buffer. No hue transform, no matrix — the base effect's colour is preserved and
+// only its brightness is scaled, so the two STM axes read as motion (temporal) and
+// texture (spectral) rather than as colour. When the producer is not ready (the
+// 17-frame warm-up or silence) the buffer is left UNTOUCHED (pass-through) — never
+// zero-filled, which would blacken the strip ("named, reasoned, absent" doctrine).
+// strength blends depth: 0 -> scale 1 (no modulation), 1 -> scale = f(energy).
+static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
+                              float strength, bool isPrimary) {
+  const K1StmResult stm = k1_stm_read();
+  if (!stm.ready) {
+    return;  // absent, not zero: leave the strip as the base effect rendered it.
+  }
+  const bool dual = (mode == K1_EDGE_MIXER_STM_DUAL);
+  float uniformScale = 1.0f;
+  if (dual) {
+    float energy = isPrimary ? stm.temporal_energy : stm.spectral_energy;
+    energy = k1_edge_clamp_float01(energy);
+    uniformScale = 1.0f - strength * (1.0f - energy);   // lerp(1, energy, strength)
+  } else {
+    k1_edge_stm_build_lut();
+  }
+  const uint16_t n = (count < NATIVE_RESOLUTION) ? count : NATIVE_RESOLUTION;
+  for (uint16_t i = 0; i < n; ++i) {
+    float scale;
+    if (dual) {
+      scale = uniformScale;
+    } else {
+      const float v = k1_edge_clamp_float01(stm.spectral[k1_edge_stm_bin[i]]);
+      scale = 1.0f - strength * (1.0f - v);
+    }
+    const SQ15x16 s = SQ15x16(scale);
+    buf[i].r = buf[i].r * s;
+    buf[i].g = buf[i].g * s;
+    buf[i].b = buf[i].b * s;
+  }
+}
+#endif  // K1_STM
+
 void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConfig& config) {
   K1EdgeMixerMode mode = k1_edge_mode_or_off(config.mode);
   if (secondary == nullptr || !config.enabled || mode == K1_EDGE_MIXER_OFF) {
@@ -922,6 +996,15 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
   if (strength <= 0.0f) {
     return;
   }
+
+#ifdef K1_STM
+  if (mode == K1_EDGE_MIXER_STM_DUAL || mode == K1_EDGE_MIXER_STM_SPECTRAL_MAP) {
+    // STM modes bypass the colour-matrix path entirely: value-only modulation of
+    // the secondary strip (strip 2 <- spectral energy / the per-LED ripple map).
+    k1_edge_apply_stm(secondary, count, mode, strength, /*isPrimary=*/false);
+    return;
+  }
+#endif
 
   // Snapshot the config-time SECONDARY matrix + fused map atomically. Keyed on the
   // stored mode + spread; the only per-frame delta is strength (see
@@ -940,6 +1023,24 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
 
 void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMixerConfig& config) {
   K1EdgeMixerMode mode = k1_edge_mode_or_off(config.mode);
+#ifdef K1_STM
+  if (mode == K1_EDGE_MIXER_STM_DUAL || mode == K1_EDGE_MIXER_STM_SPECTRAL_MAP) {
+    // STM modes modulate BOTH strips regardless of dualEdge: the primary strip is
+    // strip 1 (<- temporal energy for STM_DUAL, or the same per-LED ripple map for
+    // STM_SPECTRAL_MAP). This must run even under ONE_SIDED, so the caller invokes
+    // apply_primary for STM modes independently of the dual-edge gate (see the .ino
+    // primary-edge guard). Handled BEFORE the ONE_SIDED early-return below.
+    if (primary == nullptr || !config.enabled) {
+      return;
+    }
+    const float stm_strength = k1_edge_clamp_float01(config.strength);
+    if (stm_strength <= 0.0f) {
+      return;
+    }
+    k1_edge_apply_stm(primary, count, mode, stm_strength, /*isPrimary=*/true);
+    return;
+  }
+#endif
   if (primary == nullptr || !config.enabled || mode == K1_EDGE_MIXER_OFF ||
       config.dualEdge == K1_EDGE_DUAL_ONE_SIDED) {
     return;  // ONE_SIDED (or disabled) leaves the primary strip untouched.

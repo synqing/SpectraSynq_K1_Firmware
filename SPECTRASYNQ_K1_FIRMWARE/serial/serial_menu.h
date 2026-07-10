@@ -564,6 +564,10 @@ const char* k1_edge_mode_name(K1EdgeMixerMode mode) {
     case K1_EDGE_MIXER_SATURATION_VEIL: return "veil";
     case K1_EDGE_MIXER_TRIADIC: return "triadic";
     case K1_EDGE_MIXER_TETRADIC: return "tetradic";
+#ifdef K1_STM
+    case K1_EDGE_MIXER_STM_DUAL: return "stm_dual";
+    case K1_EDGE_MIXER_STM_SPECTRAL_MAP: return "stm_spectral_map";
+#endif
     case K1_EDGE_MIXER_OFF:
     default: return "off";
   }
@@ -584,6 +588,12 @@ bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
     *out_mode = K1_EDGE_MIXER_TRIADIC;
   } else if (strcmp(text, "tetradic") == 0) {
     *out_mode = K1_EDGE_MIXER_TETRADIC;
+#ifdef K1_STM
+  } else if (strcmp(text, "stm_dual") == 0) {
+    *out_mode = K1_EDGE_MIXER_STM_DUAL;
+  } else if (strcmp(text, "stm_spectral_map") == 0 || strcmp(text, "stm_spectral") == 0) {
+    *out_mode = K1_EDGE_MIXER_STM_SPECTRAL_MAP;
+#endif
   } else {
     return false;
   }
@@ -797,10 +807,17 @@ void serial_edge_toggle_enabled() {
 void serial_edge_cycle_mode() {
   K1EdgeMixerConfig e = k1_edgemixer_config();
   // off -> analogous -> complementary -> split -> veil -> triadic -> tetradic -> off
+  // (under K1_STM the cycle continues: tetradic -> stm_dual -> stm_spectral_map -> off)
   uint8_t next = (uint8_t)e.mode + 1;
+#ifdef K1_STM
+  if (next > (uint8_t)K1_EDGE_MIXER_STM_SPECTRAL_MAP) {
+    next = (uint8_t)K1_EDGE_MIXER_OFF;
+  }
+#else
   if (next > (uint8_t)K1_EDGE_MIXER_TETRADIC) {
     next = (uint8_t)K1_EDGE_MIXER_OFF;
   }
+#endif
   e.mode = (K1EdgeMixerMode)next;
   e.enabled = (e.mode != K1_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
   k1_edgemixer_set_config(e);

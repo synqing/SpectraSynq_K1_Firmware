@@ -823,6 +823,19 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_spec_sat_duty,
       k1_loud_spec_sat_fraction);
 #endif
+#ifdef K1_STM
+    {
+      // STM producer readout on the [AP] line (bench K1_STM builds only): proves the
+      // live spectrogram[] -> k1_stm_process -> snapshot wiring emits real spectral-
+      // temporal modulation from the mic (ready + non-zero energies under audio;
+      // ready=0 / zeros in silence). k1_stm_read() is visible via k1_tempo.h ->
+      // k1_audio_snapshot.h. Runs on the AP (Core 0) path, gated to AP telemetry.
+      K1StmResult stm_ap = k1_stm_read();
+      USBSerial.printf(" | stm_ready=%d stm_tE=%.4f stm_sE=%.4f stm_sp[0/20/39]=%.3f/%.3f/%.3f",
+        stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy,
+        stm_ap.spectral[0], stm_ap.spectral[20], stm_ap.spectral[39]);
+    }
+#endif
     USBSerial.println();
     last_ap_dbg = millis();
   }

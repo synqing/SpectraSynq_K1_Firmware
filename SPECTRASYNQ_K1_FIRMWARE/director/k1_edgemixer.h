@@ -11,6 +11,17 @@ enum K1EdgeMixerMode : uint8_t {
   K1_EDGE_MIXER_SATURATION_VEIL,
   K1_EDGE_MIXER_TRIADIC,
   K1_EDGE_MIXER_TETRADIC
+#ifdef K1_STM
+  ,
+  // Audio-reactive spectral-temporal-modulation (STM) modes. Unlike the colour-
+  // harmony modes above, these are VALUE-only brightness modulators layered on
+  // the base effect's colour — no hue rotation, no matrix bake. They consume the
+  // Core-0 STM producer via k1_stm_read(); when the producer is not ready (warm-up
+  // or silence) the strip is left untouched (never zero-filled). Gated behind
+  // K1_STM so the production build's mode set stays 0-6.
+  K1_EDGE_MIXER_STM_DUAL = 7,          // primary <- temporal energy, secondary <- spectral energy
+  K1_EDGE_MIXER_STM_SPECTRAL_MAP = 8   // per-LED spectral-ripple map (centre coarse -> edge fine)
+#endif
 };
 
 // Colour rotation space for the harmony transform.

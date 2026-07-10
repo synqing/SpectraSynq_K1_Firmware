@@ -102,6 +102,20 @@ void k1_audio_snapshot_update(uint32_t frame_ms) {
   k1_detect_chord(next.chroma_pc, next.chord);
 #endif
 
+#ifdef K1_STM
+  // Re-derived STM over the same post-AGC per-note spectrogram the band scalars
+  // above are built from. One consistent read of spectrogram[] into a float
+  // working buffer, then a single hot-path call that fills next.stm. Production
+  // build (no K1_STM) omits this entirely so the struct + link are unchanged.
+  static_assert(NUM_FREQS <= K1_STM_MAX_BINS,
+                "NUM_FREQS must fit the STM producer bin bound");
+  float k1_stm_spectrum[NUM_FREQS];
+  for (uint8_t i = 0; i < NUM_FREQS; i++) {
+    k1_stm_spectrum[i] = k1_clamp_nonnegative(float(spectrogram[i]));
+  }
+  k1_stm_process(k1_stm_spectrum, (uint8_t)NUM_FREQS, silence, &next.stm);
+#endif
+
   portENTER_CRITICAL(&k1_audio_snapshot_mux);
   k1_audio_snapshot_current = next;
   portEXIT_CRITICAL(&k1_audio_snapshot_mux);
@@ -114,3 +128,13 @@ K1AudioSnapshot k1_audio_snapshot_read() {
   portEXIT_CRITICAL(&k1_audio_snapshot_mux);
   return snapshot;
 }
+
+#ifdef K1_STM
+K1StmResult k1_stm_read() {
+  K1StmResult result;
+  portENTER_CRITICAL(&k1_audio_snapshot_mux);
+  result = k1_audio_snapshot_current.stm;
+  portEXIT_CRITICAL(&k1_audio_snapshot_mux);
+  return result;
+}
+#endif

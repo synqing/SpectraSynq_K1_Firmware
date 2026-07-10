@@ -11,6 +11,10 @@
 
 #include "serial_cmd_handlers.h"
 
+#ifdef K1_STM
+#include "k1_audio_snapshot.h"  // K1StmResult + k1_stm_read() for the `stm` readout (bench K1_STM only)
+#endif
+
 #include "globals.h"               // CONFIG, CONFIG_DEFAULTS, USBSerial, FastLED, gGradientPaletteCount
 #include "constants.h"             // NUM_FREQS, CHROMA_PROFILE_*, SAMPLE_HISTORY_LENGTH
 #include "serial_tx.h"             // tx_begin / tx_end / bad_command
@@ -1099,6 +1103,34 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         bad_command(command_type, command_data);
       }
     }
+
+#ifdef K1_STM
+    else if (strcmp(command_type, "edge_stm") == 0) {
+      // Named `edge_stm` (not `stm`) so it passes the serial_menu edge-command
+      // prefix gate (strncmp(command_type, "edge_", 5)) that routes here.
+      // Artefact-boundary readout of the live STM producer (bench K1_STM builds
+      // only). Confirms the Core-0 producer emits real spectral-temporal modulation
+      // from the mic: ready + non-zero energies under audio, ready=0 / zeros in
+      // silence. The native replay test exercises the algorithm on SYNTHETIC
+      // spectra; this proves the live spectrogram[] -> k1_stm_process -> snapshot
+      // wiring on the real IM73D input.
+      K1StmResult stm = k1_stm_read();
+      tx_begin();
+      USBSerial.print("[STM] ready=");
+      USBSerial.print(stm.ready ? 1 : 0);
+      USBSerial.print(" tE=");
+      USBSerial.print(stm.temporal_energy, 4);
+      USBSerial.print(" sE=");
+      USBSerial.print(stm.spectral_energy, 4);
+      USBSerial.print(" sp[0/10/20/30/39]=");
+      USBSerial.print(stm.spectral[0], 3);  USBSerial.print('/');
+      USBSerial.print(stm.spectral[10], 3); USBSerial.print('/');
+      USBSerial.print(stm.spectral[20], 3); USBSerial.print('/');
+      USBSerial.print(stm.spectral[30], 3); USBSerial.print('/');
+      USBSerial.println(stm.spectral[39], 3);
+      tx_end();
+    }
+#endif
 
     else if (strcmp(command_type, "edge_strength") == 0) {
       float value = 0.0f;

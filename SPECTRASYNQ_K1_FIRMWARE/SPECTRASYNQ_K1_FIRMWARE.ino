@@ -1377,8 +1377,18 @@ void led_thread(void* arg) {
         // strength scaling the secondary got (vpab_edge_effective_config). Its cost
         // lands in the vp_perf.secondary_render bucket (both edge transforms) and the
         // total vp_render_us frame time.
+        bool k1_stm_needs_primary = false;
+#ifdef K1_STM
+        // STM modes modulate BOTH strips (STM_DUAL: primary <- temporal energy);
+        // they run even under ONE_SIDED, so the primary transform must fire for
+        // them independently of the dual-edge gate.
+        k1_stm_needs_primary =
+            (vpab_edge_effective_config.mode == K1_EDGE_MIXER_STM_DUAL ||
+             vpab_edge_effective_config.mode == K1_EDGE_MIXER_STM_SPECTRAL_MAP);
+#endif
         if (vpab_edge_effective_config.enabled &&
-            vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED) {
+            (vpab_edge_effective_config.dualEdge != K1_EDGE_DUAL_ONE_SIDED ||
+             k1_stm_needs_primary)) {
           K1_TRACE_SCOPE("vp_primary_edge");
           k1_edgemixer_apply_primary(leds_16, NATIVE_RESOLUTION, vpab_edge_effective_config);
           clip_led_values(leds_16);

@@ -2,6 +2,13 @@
 
 #include <stdint.h>
 
+#ifdef K1_STM
+// STM producer publishes K1StmResult; the type must be visible for the snapshot
+// member below. Additive: pulled in only under K1_STM so the no-flag header
+// surface is unchanged.
+#include "k1_stm.h"
+#endif
+
 enum K1MusicState : uint8_t {
   K1_MUSIC_SILENCE = 0,
   K1_MUSIC_AMBIENT,
@@ -81,6 +88,12 @@ struct K1AudioSnapshot {
   float chroma_pc[K1_CHROMA_PC_BINS];
   K1ChordState chord;
 #endif
+#ifdef K1_STM
+  // Spectral-temporal modulation producer output (two energy scalars + the
+  // 40-bin ripple vector). Additive: present only under K1_STM so the no-flag
+  // production struct is byte-identical.
+  K1StmResult stm;
+#endif
 };
 
 struct K1OnsetBeatEvent {
@@ -120,6 +133,12 @@ struct K1OnsetBeatEvent {
 
 void k1_audio_snapshot_update(uint32_t frame_ms);
 K1AudioSnapshot k1_audio_snapshot_read();
+
+#ifdef K1_STM
+// Value-copy of the latest STM result under the snapshot spinlock. Mirrors
+// k1_audio_snapshot_read; additive, present only under K1_STM.
+K1StmResult k1_stm_read();
+#endif
 
 #ifdef K1_CHORD_V2
 // Triad detection ported from donor ControlBus::detectChord (ControlBus.cpp:796).
