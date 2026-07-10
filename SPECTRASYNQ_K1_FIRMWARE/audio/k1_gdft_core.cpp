@@ -477,6 +477,9 @@ void IRAM_ATTR process_GDFT() {
   SQ15x16 gate_close_th = agc_noise_floor * SQ15x16(2.5);
   if (agc_gated && agc_envelope > gate_open_th)  agc_gated = false;
   if (!agc_gated && agc_envelope < gate_close_th) agc_gated = true;
+  // NOTE: agc_envelope/agc_gated here are effectively inert on hardware (measured
+  // stuck at 0 / permanently gated). agc_loudness_norm for STM is therefore sourced
+  // from the LIVE pre-AGC mic RMS in i2s_audio.h, NOT from this envelope.
 
   // 5+6. Target gain (only adapts when ungated; frozen during silence)
   static SQ15x16 agc_gain = SQ15x16(1.0);

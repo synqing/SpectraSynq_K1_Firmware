@@ -4,10 +4,12 @@
 #include <math.h>
 
 #ifdef K1_STM
-// STM (audio-reactive) modes read the Core-0 STM producer via k1_stm_read(). The
-// snapshot header pulls in k1_stm.h (K1StmResult / K1_STM_SPECTRAL_BINS) under the
-// same flag, so one guarded include covers both the type and the accessor.
+// STM (audio-reactive) modes read the Core-0 STM producer via k1_stm_read() and the
+// AGC's normalised loudness tap (agc_loudness_norm, globals.h) to gate modulation
+// depth by volume. The snapshot header pulls in k1_stm.h (K1StmResult) under the
+// same flag.
 #include "k1_audio_snapshot.h"
+#include "globals.h"  // agc_loudness_norm — the correct loudness gate for STM
 #endif
 
 // Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
@@ -960,12 +962,20 @@ static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
   if (!stm.ready) {
     return;  // absent, not zero: leave the strip as the base effect rendered it.
   }
+  // Loudness-gated modulation depth. agc_loudness_norm (globals.h) is the pre-
+  // normalisation broadband loudness — the ONLY signal that tracks volume, because
+  // spectrogram[] / peak_scaled are AGC-flattened (measured near-constant across
+  // silence vs loud EDM: peak_scaled 0.58 vs 0.67). Silence-gated -> depth 0 (strips
+  // untouched); louder -> deeper STM modulation, so the strips pulse with the
+  // actual dynamics rather than dimming by a constant amount.
+  const float k1_stm_loud = k1_edge_clamp_float01(float(agc_loudness_norm));
+  const float depth = strength * k1_stm_loud;
   const bool dual = (mode == K1_EDGE_MIXER_STM_DUAL);
   float uniformScale = 1.0f;
   if (dual) {
     float energy = isPrimary ? stm.temporal_energy : stm.spectral_energy;
     energy = k1_edge_clamp_float01(energy);
-    uniformScale = 1.0f - strength * (1.0f - energy);   // lerp(1, energy, strength)
+    uniformScale = 1.0f - depth * (1.0f - energy);   // lerp(1, energy, strength*loud)
   } else {
     k1_edge_stm_build_lut();
   }
@@ -976,7 +986,7 @@ static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
       scale = uniformScale;
     } else {
       const float v = k1_edge_clamp_float01(stm.spectral[k1_edge_stm_bin[i]]);
-      scale = 1.0f - strength * (1.0f - v);
+      scale = 1.0f - depth * (1.0f - v);
     }
     const SQ15x16 s = SQ15x16(scale);
     buf[i].r = buf[i].r * s;

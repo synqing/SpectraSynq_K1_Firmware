@@ -704,13 +704,25 @@ inline agc_channel agc_bands[NUM_AGC_BANDS];
 inline SQ15x16 agc_envelope = SQ15x16(0.0);     // tracked broadband signal envelope
 inline SQ15x16 agc_noise_floor = SQ15x16(0.001);// slowly-tracked noise floor estimate
 inline bool    agc_gated = true;                // hysteretic silence-gate state
+#ifdef K1_STM
+// Normalised broadband loudness [0,1] for audio-reactive consumers (STM modes).
+// Derived from agc_envelope (the raw signal envelope) BEFORE agc_gain normalises
+// level away, so — unlike spectrogram[] / peak_scaled, which are AGC-flattened and
+// measured near-constant across silence vs loud — this actually tracks volume.
+// 0 while silence-gated. This is the correct signal any loudness/reactivity
+// consumer must read (never sum spectrogram[]).
+inline SQ15x16 agc_loudness_norm = SQ15x16(0.0);
+#endif
 inline SQ15x16 spectral_tilt_lut[NUM_FREQS];    // precomputed per-bin freq weighting
 
 // Mapping of Goertzel bins to AGC bands
 inline uint8_t freq_to_band_map[NUM_FREQS];
 
-// Per-band AGC dynamic ceiling tracker
-inline SQ15x16 goertzel_max_value_band[NUM_AGC_BANDS] = { 0.0001, 0.0001, 0.0001, 0.0001 };
+// Removed 2026-07-10: goertzel_max_value_band[] — orphaned per-band dynamic-ceiling
+// tracker inherited from SensoryBridge's pre-fork cochlear AGC, disconnected by
+// Broadband AGC v2 (2026-05-20). Git-forensic archaeology confirmed zero readers/
+// writers and no hook on the N6 per-band revival path (which uses agc_bands[] +
+// freq_to_band_map[]). Deleted to stop every AGC audit re-discovering the orphan.
 
 // ------------------------------------------------------------
 // Look-ahead smoothing (GDFT.h) ------------------------------

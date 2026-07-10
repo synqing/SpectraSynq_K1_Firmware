@@ -374,6 +374,19 @@ void acquire_sample_chunk(uint32_t t_now) {
   im73d_raw_i16_abs_peak = im73d_raw_peak;
   im73d_raw_i16_rms = sqrtf((float)im73d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im73d_raw_i16_near_pct = (float)im73d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#ifdef K1_STM
+  // STM reactivity gate from the LIVE pre-AGC mic RMS. The broadband AGC envelope
+  // (agc_envelope) is dead code on hardware — measured stuck at 0, gate always
+  // closed. This RMS is live and discriminating: ~8 in silence, ~32-60 under EDM,
+  // ~144 on peaks (bench-measured). Normalise to [0,1]; it spikes on beats, so the
+  // STM modulation pulses with the music.
+  {
+    float k1_stm_ln = (im73d_raw_i16_rms - 12.0f) / 50.0f;
+    if (k1_stm_ln < 0.0f) k1_stm_ln = 0.0f;
+    if (k1_stm_ln > 1.0f) k1_stm_ln = 1.0f;
+    agc_loudness_norm = SQ15x16(k1_stm_ln);
+  }
+#endif
 #endif
 
   // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
@@ -831,9 +844,9 @@ void acquire_sample_chunk(uint32_t t_now) {
       // ready=0 / zeros in silence). k1_stm_read() is visible via k1_tempo.h ->
       // k1_audio_snapshot.h. Runs on the AP (Core 0) path, gated to AP telemetry.
       K1StmResult stm_ap = k1_stm_read();
-      USBSerial.printf(" | stm_ready=%d stm_tE=%.4f stm_sE=%.4f stm_sp[0/20/39]=%.3f/%.3f/%.3f",
-        stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy,
-        stm_ap.spectral[0], stm_ap.spectral[20], stm_ap.spectral[39]);
+      USBSerial.printf(" | stm_loud=%.3f agc_env=%.4f agc_nf=%.4f agc_gated=%d stm_ready=%d stm_tE=%.4f stm_sE=%.4f",
+        float(agc_loudness_norm), float(agc_envelope), float(agc_noise_floor), agc_gated ? 1 : 0,
+        stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy);
     }
 #endif
     USBSerial.println();
