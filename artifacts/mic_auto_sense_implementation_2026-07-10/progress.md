@@ -1,0 +1,74 @@
+# Mic Auto-Sense Progress
+
+## 2026-07-10
+
+- Loaded user-named skills: `ssa-management`, `knowledge-agent`, `find-skills`, `planning-with-files`, and thinking skills for model routing/selection/combination/systems/map-territory/cynefin/OODA/steel-manning/TRIZ/archetypes.
+- Ran `bash scripts/agent/session-bootstrap.sh`: PASS on `lane/dual-sync-phase0 @ cc97081`.
+- Read governing docs: `AGENT_OS.md`, `.claude/CLAUDE.md`, `progress.md`, `.claude/handoff.md`, `docs/spec-index.md`.
+- Created scoped planning files under `artifacts/mic_auto_sense_implementation_2026-07-10/` to avoid clobbering root `progress.md`.
+- Attempted two focused knowledge-agent corpora; both returned zero observations, so knowledge-agent support is degraded for this lane.
+- Spawned four load-bearing SSAs with 6-minute checkpoint contracts: MAS-CODE-01, MAS-TEST-01, MAS-RISK-01, MAS-DESIGN-01.
+- Timed SSA waits completed without timeout:
+  - MAS-CODE-01 returned first wait: telemetry/AP seam verified.
+  - MAS-TEST-01 returned second wait: focused host/static/build gates verified.
+  - MAS-DESIGN-01 returned third wait: default-off telemetry-only shadow scaffold verified.
+  - MAS-RISK-01 returned fourth wait: blocker and stop-condition register written.
+- Orchestrator synthesis: telemetry-only Phase 1 is the only implementation path with sufficient research confidence. Applied controller work remains out of scope.
+- Implementation was initially blocked because live checkout is `lane/dual-sync-phase0 @ cc97081` while `AGENT_OS.md` still declares `lane/im73d-pdm-eval` and says to stop/report if git shows a different branch.
+- Captain selected current branch plus telemetry-only Phase 1.
+- Wrote failing tests first; red gate failed on missing env/module/AP fields/update call as expected.
+- Implemented default-off mic auto-sense telemetry:
+  - `audio/k1_mic_auto_sense.{h,cpp}`
+  - `k1_bench_im73d_mic_auto_telemetry` env and guarded build-wrapper allowlist
+  - AP `mas_*` fields behind `K1_MIC_AUTO_SENSE_V1`
+  - upload-guard mapping for the bench-only telemetry env
+- Red-team/backtest pass found real defects in the first implementation:
+  - I2S timeout/short-read zero-fill was not connected to `K1_MIC_AUTO_REASON_STALE_I2S`.
+  - `mas_shadow_scale` was a fake recommendation-shaped placeholder.
+  - Pre-first-update telemetry could expose an unseeded scale.
+  - The MAS non-finite guard relied on `isfinite()` under the fast-math build posture.
+  - AP parser coverage did not mirror real firmware ordering.
+- Corrected those defects by wiring the I2S result hook, removing `shadow_scale`, renaming the env to telemetry-only, forcing all MAS scale writes to `1.0f`, replacing MAS `isfinite()` use with a bit-level exponent check, and strengthening AP/schema/static tests.
+- Verification:
+  - `python3 -m py_compile scripts/regression-harness/im73d_audio_eval.py scripts/platformio/k1_upload_guard.py tests/test_mic_auto_sense_static.py tests/test_audio_telemetry_schema_static.py tests/test_im73d_audio_eval_harness.py tests/test_k1_upload_guard.py`: pass.
+  - `git diff --check`: pass.
+  - Focused pytest matrix: 49 passed.
+  - Re-run focused MAS/parser/upload tests after builds: 35 passed.
+  - `python3 -m pytest tests/ -q`: 688 passed, 1 skipped.
+  - `bash scripts/agent/pio-build.sh k1_hardware`: pass.
+  - `bash scripts/agent/pio-build.sh k1_bench_im73d`: pass.
+  - `bash scripts/agent/pio-build.sh k1_bench_im73d_mic_auto_telemetry`: pass.
+  - Object containment: `k1_mic_auto_sense.cpp.o/.d` appears only under `.pio/build/k1_bench_im73d_mic_auto_telemetry`.
+  - `bash scripts/regression-harness/mic_stable_byte_gate.sh`: fail, but detached clean HEAD reproduces the same drift hashes; classify as pre-existing stale-reference blocker.
+- Bench hardware validation after Captain authorised unrestricted bench use:
+  - Live ports: `/dev/cu.usbmodem1401` = bench `B489A500`; `/dev/cu.usbmodem12401` = main `F887A500`.
+  - Upload guard accepted `k1_bench_im73d_mic_auto_telemetry` on `/dev/tty.usbmodem1401` and rejected the main port.
+  - Uploaded `k1_bench_im73d_mic_auto_telemetry` to bench.
+  - Serial readback: `BUILD: version=40103 git=cc97081 epoch=1783683889 env=k1_bench_im73d_mic_auto_telemetry`; `:chip_id` returned `B489A500`.
+  - Hardware capture summary: 40 AP rows, 40 MAS rows, `mas_state=[1]`, `mas_reason=[1]`, `mas_applied_scale` min/max `1.0`, zero crash markers.
+  - Evidence: `artifacts/mic_auto_sense_implementation_2026-07-10/hardware/bench_mas_capture_20260710.log` and `.summary.json`.
+  - Updated `docs/hardware/device-build-registry.md` current bench deployed-state row.
+- Bench calibration/eval suite after Captain escalation:
+  - Sent `N` then `Y` on bench only.
+  - Firmware accepted calibration: `reason=none`, `dc_samples=12288`, `ssl_samples=112`, `ssl_p50=147.0`, `ssl_p90=247.0`.
+  - Post-cal dump: `SSL=272`, `DC=-6`, `CAL_SOURCE=measured`, `CAL_VALID=1`.
+  - Post-reset readback after final telemetry reflash: `git=cc97081 env=k1_bench_im73d_mic_auto_telemetry`, chip `B489A500`, `CAL_SOURCE=persisted_profile`, `SSL=272`, `DC=-6`, `CAL_VALID=1`, `CAL_PROFILE_LOADED=1`.
+  - Post-cal settle: 71 AP rows, 70 MAS rows, MAS OK 69/70 rows, one transient headroom-guard row, applied scale fixed `1.0`, raw near-rail/clip/near all zero, fatal markers zero.
+  - AGC stream: toggled on/off, 15 AGC debug rows, no fatal markers.
+  - Discrepancy: one post-cal dump reported `e1a88a2 env=k1_bench_im73d`; exact cause not proven. Final state was corrected by reflashing telemetry and proving post-reset readback.
+  - Consolidated report: `artifacts/mic_auto_sense_implementation_2026-07-10/hardware/bench_calibration_eval_20260710.md`.
+- Mac-audio bench music eval after Captain pointed out local playback stimulus:
+  - Patched `scripts/regression-harness/im73d_audio_eval.py` with `--roles bench_im73d` and `--require-build-env`, so the main K1 is not opened and playback aborts before stimulus if the bench is not running the telemetry env.
+  - Captain reported current playback at `88 dB-A`; this suite caps bench/Mac-speaker stress at `88-90 dB-A`.
+  - `deadmau5-Ghosts'n'Stuff).mp3`: complete capture legs at volumes 45/65/75 were front-end clean; one volume-75 repeat is capture-invalid due serial read fault after 20 AP rows.
+  - `MartinGarrix-Animals.mp3`: first full matrix invalid due serial stream loss; compact rerun was clean at volume 45, failed at volume 65/75 with clipping/near/input-trim reduction, and hit `raw_near_clip` at 75.
+  - Wrong-env recurrence (`e1a88a2 env=k1_bench_im73d`) was caught by `--require-build-env`; bench was reflashed to `k1_bench_im73d_mic_auto_telemetry`.
+  - Final post-music readback: `git=cc97081 epoch=1783685392 env=k1_bench_im73d_mic_auto_telemetry`, chip `B489A500`, persisted cal `SSL=272`, `DC=-6`, `CAL_VALID=1`.
+  - Evidence: `hardware/music_eval_20260710/README.md` and `hardware/music_eval_20260710/aggregate_summary.json`.
+- Final pre-commit gate:
+  - `git diff --cached --check`: pass.
+  - `python3 -m pytest tests/ -q`: `693 passed, 1 skipped`.
+  - `bash scripts/agent/pio-build.sh k1_hardware`: pass.
+  - `bash scripts/agent/pio-build.sh k1_bench_im73d`: pass.
+  - `bash scripts/agent/pio-build.sh k1_bench_im73d_mic_auto_telemetry`: pass.
+  - Generated WAV stimulus snippets from the MP3s were removed before staging; only logs/summaries are committed.

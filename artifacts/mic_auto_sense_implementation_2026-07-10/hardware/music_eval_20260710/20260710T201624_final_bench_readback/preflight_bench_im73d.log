@@ -1,0 +1,120 @@
+1783685784.730 1 cal_reason=none | bpm=127.0 conf=0.39 lock=0 phase=0.56 beat=0 bstr=0.25 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=20 raw_i16_rms=14.1 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=0.990 gdft_trim=0.983 agc_gain=0.226 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.071 spec_pin=0.000 spec_sat=0.000 | mas_state=2 mas_reason=5 mas_window_age_sec=85.4 mas_applied_scale=1.000
+1783685784.731 [AP] SSL=272 DC=-6 max_raw=158 follower=1422 peak_scaled=0.314 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=115.0 conf=0.44 lock=0 phase=0.60 beat=0 bstr=0.03 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=7 raw_i16_rms=3.5 raw_i16_neESP-ROM:esp32s3-20210327
+1783685784.731 Build:Mar 27 2021
+1783685784.732 rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+1783685784.732 Saved PC:0x420268bf
+1783685784.734 SPIWP:0xee
+1783685784.734 mode:DIO, clock div:1
+1783685784.736 load:0x3fce2820,len:0x118c
+1783685784.739 load:0x403c8700,len:0x4
+1783685784.741 load:0x403c8704,len:0xc20
+1783685784.743 load:0x403cb700,len:0x30e0
+1783685784.751 entry 0x403c88b8
+1783685784.894 ---------------------------
+1783685784.894 SENSORY BRIDGE | VER: 40103
+1783685784.894 ---------------------------
+1783685784.894 
+1783685784.895 INIT_SERIAL: PASS
+1783685784.898 INIT FILESYSTEM: PASS
+1783685784.925 INIT_LEDS: PASS
+1783685784.926 INIT I2S (channel): PASS
+1783685784.926 I2S PDM RX INIT: PASS
+1783685784.926 I2S ENABLE: PASS
+1783685784.927 GENERATING A-WEIGHTS: DONE IN 0.556 MS
+1783685784.933 GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 4.933 MS
+1783685784.934 INITIALIZING COCHLEAR AGC: DONE IN 0.076 MS
+1783685784.934 SYSTEM INIT COMPLETE!
+1783685784.934 BOOT_LOOP_GUARD: reset_reason=11 fail_count=0 safe_mode=0
+1783685784.935 WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+1783685784.935 INIT_SECONDARY_LEDS: PASS
+1783685785.446 >>> :build
+1783685786.041 RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+1783685786.042 sbr{{
+1783685786.042 BUILD: version=40103 git=cc97081 epoch=1783685392 env=k1_bench_im73d_mic_auto_telemetry
+1783685786.042 }}
+1783685786.044 [AP] SSL=272 DC=-6 max_raw=422 follower=272 peak_scaled=0.358 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=19 raw_i16_rms=11.9 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.000 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=0.0 mas_applied_scale=1.000
+1783685787.053 [AP] SSL=272 DC=-6 max_raw=213 follower=525 peak_scaled=0.010 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=147.0 conf=0.28 lock=0 phase=0.46 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=10 raw_i16_rms=5.1 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.627 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.029 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=1.0 mas_applied_scale=1.000
+1783685788.058 [AP] SSL=272 DC=-6 max_raw=312 follower=547 peak_scaled=0.611 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=147.0 conf=0.45 lock=0 phase=0.87 beat=0 bstr=0.31 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=14 raw_i16_rms=9.5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.345 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.058 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=2.0 mas_applied_scale=1.000
+1783685788.058 >>> :chip_id
+1783685788.064 sbr{{
+1783685788.064 B489A500
+1783685788.064 }}
+1783685789.063 [AP] SSL=272 DC=-6 max_raw=344 follower=326 peak_scaled=0.357 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.28 lock=0 phase=0.82 beat=0 bstr=0.23 | onset=0 bass=1 ostr=0.02 | raw_i16_abs_peak=16 raw_i16_rms=12.1 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.756 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.014 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=3.0 mas_applied_scale=1.000
+1783685790.067 [AP] SSL=272 DC=-6 max_raw=235 follower=272 peak_scaled=0.064 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.27 lock=0 phase=0.68 beat=0 bstr=0.33 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=11 raw_i16_rms=6.2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.647 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.002 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=4.0 mas_applied_scale=1.000
+1783685791.073 [AP] SSL=272 DC=-6 max_raw=125 follower=272 peak_scaled=0.014 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.28 lock=0 phase=0.49 beat=0 bstr=0.18 | onset=0 bass=1 ostr=0.03 | raw_i16_abs_peak=6 raw_i16_rms=2.7 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.021 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=5.0 mas_applied_scale=1.000
+1783685792.077 [AP] SSL=272 DC=-6 max_raw=312 follower=272 peak_scaled=0.291 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.26 lock=0 phase=0.35 beat=0 bstr=0.09 | onset=1 bass=1 ostr=0.02 | raw_i16_abs_peak=14 raw_i16_rms=8.2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.165 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=6.0 mas_applied_scale=1.000
+1783685792.077 >>> :dump
+1783685792.082 sbr{{
+1783685792.082 FIRMWARE_VERSION: 40103
+1783685792.083 CHIP ID: B489A500
+1783685792.083 noise_button.pressed: 0
+1783685792.083 noise_button.last_down: 0
+1783685792.083 noise_button.last_up: 0
+1783685792.083 noise_button.pin: 255
+1783685792.083 mode_button.pressed: 0
+1783685792.083 mode_button.last_down: 0
+1783685792.083 mode_button.last_up: 0
+1783685792.083 mode_button.pin: 255
+1783685792.084 CONFIG.PHOTONS: 1.000000
+1783685792.084 CONFIG.CHROMA: 1.000000
+1783685792.084 CONFIG.MOOD: 0.150000
+1783685792.084 CONFIG.LIGHTSHOW_MODE: 20
+1783685792.084 CONFIG.MIRROR_ENABLED: 1
+1783685792.084 CONFIG.CHROMAGRAM_RANGE: 60
+1783685792.084 CONFIG.SAMPLE_RATE: 12800
+1783685792.084 CONFIG.NOTE_OFFSET: 12
+1783685792.085 CONFIG.SQUARE_ITER: 1.00
+1783685792.085 CONFIG.LED_TYPE: 0
+1783685792.085 CONFIG.LED_COUNT: 160
+1783685792.085 CONFIG.LED_COLOR_ORDER: 66
+1783685792.085 CONFIG.SAMPLES_PER_CHUNK: 96
+1783685792.085 CONFIG.SENSITIVITY: 1.370006
+1783685792.085 AUDIO_RESPONSE_GAIN: 1.000000
+1783685792.085 CONFIG.BOOT_ANIMATION: 1
+1783685792.085 CONFIG.SWEET_SPOT_MIN_LEVEL: 272
+1783685792.085 CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+1783685792.085 CONFIG.DC_OFFSET: -6
+1783685792.085 CAL_SOURCE: persisted_profile
+1783685792.086 CAL_VALID: 1
+1783685792.086 CAL_PROFILE_LOADED: 1
+1783685792.086 NOISE_CAL_REASON: none
+1783685792.086 NOISE_CAL_DC_SAMPLES: 0
+1783685792.086 NOISE_CAL_SSL_P50: 0.0
+1783685792.086 NOISE_CAL_SSL_P90: 0.0
+1783685792.086 CONFIG.STANDBY_DIMMING: 0
+1783685792.086 CONFIG.REVERSE_ORDER: 0
+1783685792.086 CONFIG.MAX_CURRENT_MA: 1500
+1783685792.086 CONFIG.TEMPORAL_DITHERING: 1
+1783685792.086 CONFIG.AUTO_COLOR_SHIFT: 1
+1783685792.086 CONFIG.INCANDESCENT_FILTER: 0.80
+1783685792.086 CONFIG.INCANDESCENT_MODE: 0
+1783685792.087 CONFIG.BULB_OPACITY: 0.00
+1783685792.087 CONFIG.SATURATION: 1.00
+1783685792.087 CONFIG.PRISM_COUNT: 0.75
+1783685792.087 CONFIG.BASE_COAT: 1
+1783685792.087 CONFIG.BASE_COAT_INTENSITY: 0.400
+1783685792.087 MASTER_BRIGHTNESS: 1.00
+1783685792.088 stream_audio: 0
+1783685792.088 stream_fps: 0
+1783685792.088 stream_max_mags: 0
+1783685792.088 stream_max_mags_followers: 0
+1783685792.088 stream_magnitudes: 0
+1783685792.088 stream_spectrogram: 0
+1783685792.088 stream_chromagram: 0
+1783685792.088 debug_mode: 0
+1783685792.088 noise_complete: 1
+1783685792.088 noise_iterations: 0
+1783685792.088 next_save_time: 0
+1783685792.088 settings_updated: 0
+1783685792.088 I2S_PORT: 0
+1783685792.088 SAMPLE_HISTORY_LENGTH: 4096
+1783685792.089 silence: 0
+1783685792.089 mode_destination: -1
+1783685792.089 SYSTEM_FPS: 140.22
+1783685792.089 LED_FPS: 202.58
+1783685792.089 }}
+1783685793.082 [AP] SSL=272 DC=-6 max_raw=344 follower=375 peak_scaled=0.166 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.26 lock=0 phase=0.21 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=16 raw_i16_rms=10.2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.892 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.019 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=7.0 mas_applied_scale=1.000
+1783685794.087 [AP] SSL=272 DC=-6 max_raw=81 follower=272 peak_scaled=0.035 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.26 lock=0 phase=0.02 beat=0 bstr=0.12 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=4 raw_i16_rms=1.6 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.104 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.003 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=8.0 mas_applied_scale=1.000
+1783685794.878 BOOT_LOOP_GUARD: stable_clear=1
+1783685795.092 [AP] SSL=272 DC=-6 max_raw=147 follower=272 peak_scaled=0.226 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.27 lock=0 phase=0.88 beat=0 bstr=0.18 | onset=0 bass=1 ostr=0.03 | raw_i16_abs_peak=7 raw_i16_rms=2.8 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.164 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=9.0 mas_applied_scale=1.000
+1783685796.097 [AP] SSL=272 DC=-6 max_raw=125 follower=272 peak_scaled=0.095 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=110.0 conf=0.26 lock=0 phase=0.73 beat=0 bstr=0.38 | onset=0 bass=1 ostr=0.03 | raw_i16_abs_peak=6 raw_i16_rms=2.6 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.972 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=10.0 mas_applied_scale=1.000

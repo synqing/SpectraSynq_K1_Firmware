@@ -3,6 +3,9 @@
   ----------------------------------------*/
 #include "sb_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
 #include "sb_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -346,14 +349,23 @@ void acquire_sample_chunk(uint32_t t_now) {
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
   #endif
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+  k1_mic_auto_sense_note_i2s_result(
+    i2s_read_status == ESP_OK && bytes_read >= bytes_requested,
+    (uint32_t)bytes_read,
+    (uint32_t)bytes_requested,
+    t_now);
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   sb_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
   sb_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
   sb_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
   sb_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
 #else
+#ifndef K1_MIC_AUTO_SENSE_V1
   (void)i2s_read_status;
   (void)bytes_read;
+#endif
 #endif
 
 #ifdef K1_MIC_IM73D_PDM_V1
@@ -797,6 +809,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > 1000) {
     SBTempoEvent     tev = sb_tempo_read();
     SBOnsetBeatEvent oev = sb_onset_beat_read();
+#ifdef K1_MIC_AUTO_SENSE_V1
+    K1MicAutoSenseTelemetry mas = k1_mic_auto_sense_read();
+#endif
     USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
@@ -822,6 +837,13 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_peak_pin_duty,
       k1_loud_spec_sat_duty,
       k1_loud_spec_sat_fraction);
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    USBSerial.printf(" | mas_state=%u mas_reason=%u mas_window_age_sec=%.1f mas_applied_scale=%.3f",
+      (unsigned)mas.state,
+      (unsigned)mas.reason,
+      mas.window_age_sec,
+      mas.applied_scale);
 #endif
     USBSerial.println();
     last_ap_dbg = millis();

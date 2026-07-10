@@ -1,0 +1,321 @@
+{
+  "created_at": "20260710T201624",
+  "cwd": "/Users/spectrasynq/SpectraSynq_K1_Firmware",
+  "devices": {
+    "bench_im73d": "B4:3A:45:A5:89:B4"
+  },
+  "duration_sec": 3.0,
+  "label": "final_bench_readback",
+  "no_speaker_playback": true,
+  "original_volume": 65,
+  "ports": {
+    "bench_im73d": "/dev/cu.usbmodem1401"
+  },
+  "preflight": {
+    "bench_im73d": {
+      "build_lines": [
+        "BUILD: version=40103 git=cc97081 epoch=1783685392 env=k1_bench_im73d_mic_auto_telemetry\r"
+      ],
+      "cal_lines": [
+        "CAL_SOURCE: persisted_profile\r",
+        "CAL_VALID: 1\r"
+      ],
+      "chip_lines": [
+        "CHIP ID: B489A500\r"
+      ],
+      "front_end_lines": [
+        "CONFIG.SENSITIVITY: 1.370006\r",
+        "AUDIO_RESPONSE_GAIN: 1.000000\r",
+        "CONFIG.SWEET_SPOT_MIN_LEVEL: 272\r",
+        "CONFIG.DC_OFFSET: -6\r"
+      ],
+      "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201624_final_bench_readback/preflight_bench_im73d.log",
+      "port": "/dev/cu.usbmodem1401",
+      "runtime_ready": true,
+      "usb_serial": "B4:3A:45:A5:89:B4"
+    }
+  },
+  "quiet_repeats": 1,
+  "repeatability": {
+    "groups": [],
+    "max_cv": 0.25,
+    "repeatable": true
+  },
+  "repeats": 2,
+  "runs": [
+    {
+      "devices": {
+        "bench_im73d": {
+          "ap_rows": 5,
+          "error": null,
+          "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201624_final_bench_readback/quiet_vol000_r1_bench_im73d.log",
+          "port": "/dev/cu.usbmodem1401",
+          "quality": {
+            "reasons": [],
+            "usable": true,
+            "warnings": []
+          },
+          "summary": {
+            "DC": {
+              "max": -6.0,
+              "mean": -6.0,
+              "min": -6.0,
+              "p50": -6.0,
+              "p90": -6.0
+            },
+            "SSL": {
+              "max": 272.0,
+              "mean": 272.0,
+              "min": 272.0,
+              "p50": 272.0,
+              "p90": 272.0
+            },
+            "agc_env": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "agc_gain": {
+              "max": 1.386,
+              "mean": 1.026,
+              "min": 0.595,
+              "p50": 1.083,
+              "p90": 1.115
+            },
+            "bass": {
+              "max": 1.0,
+              "mean": 0.4,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "beat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "bpm": {
+              "max": 114.0,
+              "mean": 95.8,
+              "min": 85.0,
+              "p50": 85.0,
+              "p90": 110.0
+            },
+            "bstr": {
+              "max": 0.93,
+              "mean": 0.302,
+              "min": 0.03,
+              "p50": 0.07,
+              "p90": 0.44
+            },
+            "cal_valid": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "clip_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "conf": {
+              "max": 0.56,
+              "mean": 0.348,
+              "min": 0.21,
+              "p50": 0.25,
+              "p90": 0.49
+            },
+            "follower": {
+              "max": 436.0,
+              "mean": 321.0,
+              "min": 272.0,
+              "p50": 272.0,
+              "p90": 353.0
+            },
+            "gdft_trim": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "input_trim": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "k1_loud": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "lock": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "mas_applied_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_reason": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_state": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_window_age_sec": {
+              "max": 15.1,
+              "mean": 13.080000000000002,
+              "min": 11.0,
+              "p50": 13.1,
+              "p90": 14.1
+            },
+            "max_raw": {
+              "max": 444.0,
+              "mean": 250.8,
+              "min": 169.0,
+              "p50": 213.0,
+              "p90": 247.0
+            },
+            "near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "onset": {
+              "max": 1.0,
+              "mean": 0.4,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "ostr": {
+              "max": 0.04,
+              "mean": 0.012,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.02
+            },
+            "peak_pin": {
+              "max": 0.054,
+              "mean": 0.0198,
+              "min": 0.001,
+              "p50": 0.009,
+              "p90": 0.03
+            },
+            "peak_scaled": {
+              "max": 0.915,
+              "mean": 0.2494,
+              "min": 0.023,
+              "p50": 0.099,
+              "p90": 0.129
+            },
+            "phase": {
+              "max": 0.79,
+              "mean": 0.45200000000000007,
+              "min": 0.05,
+              "p50": 0.55,
+              "p90": 0.65
+            },
+            "raw_i16_abs_peak": {
+              "max": 20.0,
+              "mean": 11.4,
+              "min": 8.0,
+              "p50": 10.0,
+              "p90": 11.0
+            },
+            "raw_i16_near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "raw_i16_rms": {
+              "max": 7.8,
+              "mean": 6.3,
+              "min": 4.3,
+              "p50": 7.1,
+              "p90": 7.6
+            },
+            "response_gain": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "rows": 5,
+            "silence": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silent_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "spec_pin": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "spec_sat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "total_lines": 5,
+          "usb_serial": "B4:3A:45:A5:89:B4"
+        }
+      },
+      "duration_sec": 3.0,
+      "label": "quiet",
+      "repeat": 1,
+      "stimulus": null,
+      "volume": 0
+    }
+  ],
+  "start_offset_sec": 0.0,
+  "stimulus": null,
+  "track": null,
+  "volumes": []
+}

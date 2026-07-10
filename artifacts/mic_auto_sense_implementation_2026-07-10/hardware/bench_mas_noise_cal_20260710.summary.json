@@ -1,0 +1,78 @@
+{
+  "ap_lines": 52,
+  "build_lines": [
+    "BUILD: version=40103 git=cc97081 epoch=1783683889 env=k1_bench_im73d_mic_auto_telemetry"
+  ],
+  "chip_lines": [
+    "B489A500"
+  ],
+  "clip_pct": {
+    "count": 52,
+    "max": 0.0,
+    "min": 0.0
+  },
+  "crash_marker_count": 1,
+  "dump_cal_lines": [
+    "CONFIG.SENSITIVITY: 1.370006",
+    "CONFIG.SWEET_SPOT_MIN_LEVEL: 179",
+    "CONFIG.DC_OFFSET: -2",
+    "CAL_SOURCE: persisted_profile",
+    "CAL_VALID: 1",
+    "CONFIG.SENSITIVITY: 1.370006",
+    "CONFIG.SWEET_SPOT_MIN_LEVEL: 272",
+    "CONFIG.DC_OFFSET: -6",
+    "CAL_SOURCE: measured",
+    "CAL_VALID: 1"
+  ],
+  "input_trim": {
+    "count": 52,
+    "max": 1.0,
+    "min": 0.922
+  },
+  "line_count": 237,
+  "log_path": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/bench_mas_noise_cal_20260710.log",
+  "mas_ap_lines": 51,
+  "mas_applied_scale": {
+    "count": 51,
+    "max": 1.0,
+    "min": 1.0
+  },
+  "mas_reason_values": [
+    1,
+    3,
+    5
+  ],
+  "mas_state_values": [
+    1,
+    2
+  ],
+  "near_pct": {
+    "count": 52,
+    "max": 0.001,
+    "min": 0.0
+  },
+  "noise_cal_accepted": [
+    "NOISE CAL ACCEPTED"
+  ],
+  "noise_cal_failed": [],
+  "noise_cal_quality": [
+    "NOISE CAL QUALITY: reason=none dc_valid=1 dc_samples=12288 dc_rejected=0 ssl_valid=1 ssl_samples=112 ssl_rejected=0 ssl_p50=147.0 ssl_p90=247.0"
+  ],
+  "noise_cal_restored": [],
+  "port": "/dev/cu.usbmodem1401",
+  "raw_i16_abs_peak": {
+    "count": 52,
+    "max": 71.0,
+    "min": 4.0
+  },
+  "raw_i16_near_pct": {
+    "count": 52,
+    "max": 0.0,
+    "min": 0.0
+  },
+  "raw_i16_rms": {
+    "count": 52,
+    "max": 30.5,
+    "min": 1.6
+  }
+}

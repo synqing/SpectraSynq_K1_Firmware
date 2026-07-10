@@ -880,6 +880,9 @@ void loop() {
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_update(t_now);
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+  k1_mic_auto_sense_update_frame(t_now);
+#endif
 #ifdef K1_PIN_EVIDENCE_V1
   k1_pin_evidence_set_ap_metrics(t_now);
 #endif

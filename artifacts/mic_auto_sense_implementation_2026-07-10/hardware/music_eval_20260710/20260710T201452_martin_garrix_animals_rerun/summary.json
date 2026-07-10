@@ -1,0 +1,880 @@
+{
+  "created_at": "20260710T201452",
+  "cwd": "/Users/spectrasynq/SpectraSynq_K1_Firmware",
+  "devices": {
+    "bench_im73d": "B4:3A:45:A5:89:B4"
+  },
+  "duration_sec": 20.0,
+  "label": "martin_garrix_animals_rerun",
+  "no_speaker_playback": false,
+  "original_volume": 65,
+  "ports": {
+    "bench_im73d": "/dev/cu.usbmodem1401"
+  },
+  "preflight": {
+    "bench_im73d": {
+      "build_lines": [
+        "BUILD: version=40103 git=cc97081 epoch=1783685392 env=k1_bench_im73d_mic_auto_telemetry\r"
+      ],
+      "cal_lines": [
+        "CAL_SOURCE: persisted_profile\r",
+        "CAL_VALID: 1\r"
+      ],
+      "chip_lines": [
+        "CHIP ID: B489A500\r"
+      ],
+      "front_end_lines": [
+        "CONFIG.SENSITIVITY: 1.370006\r",
+        "AUDIO_RESPONSE_GAIN: 1.000000\r",
+        "CONFIG.SWEET_SPOT_MIN_LEVEL: 272\r",
+        "CONFIG.DC_OFFSET: -6\r"
+      ],
+      "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/preflight_bench_im73d.log",
+      "port": "/dev/cu.usbmodem1401",
+      "runtime_ready": true,
+      "usb_serial": "B4:3A:45:A5:89:B4"
+    }
+  },
+  "quiet_repeats": 0,
+  "repeatability": {
+    "groups": [],
+    "max_cv": 0.35,
+    "repeatable": true
+  },
+  "repeats": 1,
+  "runs": [
+    {
+      "devices": {
+        "bench_im73d": {
+          "ap_rows": 22,
+          "error": null,
+          "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/music_vol045_r1_bench_im73d.log",
+          "port": "/dev/cu.usbmodem1401",
+          "quality": {
+            "reasons": [],
+            "usable": true,
+            "warnings": [
+              "conditioned_peak_pin_high"
+            ]
+          },
+          "summary": {
+            "DC": {
+              "max": -6.0,
+              "mean": -6.0,
+              "min": -6.0,
+              "p50": -6.0,
+              "p90": -6.0
+            },
+            "SSL": {
+              "max": 272.0,
+              "mean": 272.0,
+              "min": 272.0,
+              "p50": 272.0,
+              "p90": 272.0
+            },
+            "agc_env": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "agc_gain": {
+              "max": 0.161,
+              "mean": 0.078,
+              "min": 0.065,
+              "p50": 0.071,
+              "p90": 0.082
+            },
+            "bass": {
+              "max": 1.0,
+              "mean": 0.2727272727272727,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "beat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "bpm": {
+              "max": 129.0,
+              "mean": 118.77272727272727,
+              "min": 107.0,
+              "p50": 113.0,
+              "p90": 127.0
+            },
+            "bstr": {
+              "max": 0.84,
+              "mean": 0.4104545454545454,
+              "min": 0.02,
+              "p50": 0.41,
+              "p90": 0.72
+            },
+            "cal_valid": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "clip_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "conf": {
+              "max": 0.96,
+              "mean": 0.45954545454545453,
+              "min": 0.12,
+              "p50": 0.45,
+              "p90": 0.73
+            },
+            "follower": {
+              "max": 14786.0,
+              "mean": 10937.045454545454,
+              "min": 3239.0,
+              "p50": 10196.0,
+              "p90": 14409.0
+            },
+            "gdft_trim": {
+              "max": 0.868,
+              "mean": 0.7775454545454544,
+              "min": 0.701,
+              "p50": 0.756,
+              "p90": 0.85
+            },
+            "input_trim": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "k1_loud": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "lock": {
+              "max": 1.0,
+              "mean": 0.3181818181818182,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "mas_applied_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_reason": {
+              "max": 5.0,
+              "mean": 3.1818181818181817,
+              "min": 1.0,
+              "p50": 5.0,
+              "p90": 5.0
+            },
+            "mas_state": {
+              "max": 2.0,
+              "mean": 1.5454545454545454,
+              "min": 1.0,
+              "p50": 2.0,
+              "p90": 2.0
+            },
+            "mas_window_age_sec": {
+              "max": 32.2,
+              "mean": 21.6,
+              "min": 11.0,
+              "p50": 21.1,
+              "p90": 29.1
+            },
+            "max_raw": {
+              "max": 15184.0,
+              "mean": 8183.681818181818,
+              "min": 1133.0,
+              "p50": 8094.0,
+              "p90": 13399.0
+            },
+            "near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "onset": {
+              "max": 1.0,
+              "mean": 0.22727272727272727,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "ostr": {
+              "max": 0.05,
+              "mean": 0.009090909090909092,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.03
+            },
+            "peak_pin": {
+              "max": 0.421,
+              "mean": 0.25045454545454543,
+              "min": 0.088,
+              "p50": 0.251,
+              "p90": 0.374
+            },
+            "peak_scaled": {
+              "max": 1.134,
+              "mean": 0.7903636363636365,
+              "min": 0.22,
+              "p50": 0.774,
+              "p90": 1.012
+            },
+            "phase": {
+              "max": 0.96,
+              "mean": 0.5499999999999999,
+              "min": 0.1,
+              "p50": 0.49,
+              "p90": 0.86
+            },
+            "raw_i16_abs_peak": {
+              "max": 693.0,
+              "mean": 373.3636363636364,
+              "min": 52.0,
+              "p50": 369.0,
+              "p90": 611.0
+            },
+            "raw_i16_near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "raw_i16_rms": {
+              "max": 419.0,
+              "mean": 193.6090909090909,
+              "min": 22.9,
+              "p50": 158.5,
+              "p90": 339.5
+            },
+            "response_gain": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "rows": 22,
+            "silence": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silent_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "spec_pin": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "spec_sat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "total_lines": 22,
+          "usb_serial": "B4:3A:45:A5:89:B4"
+        }
+      },
+      "duration_sec": 20.0,
+      "label": "music",
+      "repeat": 1,
+      "stimulus": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/stimulus_60s_20s.wav",
+      "volume": 45
+    },
+    {
+      "devices": {
+        "bench_im73d": {
+          "ap_rows": 23,
+          "error": null,
+          "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/music_vol065_r1_bench_im73d.log",
+          "port": "/dev/cu.usbmodem1401",
+          "quality": {
+            "reasons": [
+              "clip_pct_nonzero",
+              "near_pct_nonzero",
+              "input_trim_reduced"
+            ],
+            "usable": false,
+            "warnings": [
+              "conditioned_peak_pin_high"
+            ]
+          },
+          "summary": {
+            "DC": {
+              "max": -6.0,
+              "mean": -6.0,
+              "min": -6.0,
+              "p50": -6.0,
+              "p90": -6.0
+            },
+            "SSL": {
+              "max": 272.0,
+              "mean": 272.0,
+              "min": 272.0,
+              "p50": 272.0,
+              "p90": 272.0
+            },
+            "agc_env": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "agc_gain": {
+              "max": 0.306,
+              "mean": 0.08452173913043479,
+              "min": 0.065,
+              "p50": 0.072,
+              "p90": 0.079
+            },
+            "bass": {
+              "max": 1.0,
+              "mean": 0.17391304347826086,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "beat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "bpm": {
+              "max": 127.0,
+              "mean": 92.6086956521739,
+              "min": 64.0,
+              "p50": 85.0,
+              "p90": 127.0
+            },
+            "bstr": {
+              "max": 0.99,
+              "mean": 0.5034782608695653,
+              "min": 0.01,
+              "p50": 0.57,
+              "p90": 0.94
+            },
+            "cal_valid": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "clip_pct": {
+              "max": 0.002,
+              "mean": 0.00030434782608695655,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.001
+            },
+            "conf": {
+              "max": 0.97,
+              "mean": 0.7056521739130435,
+              "min": 0.3,
+              "p50": 0.8,
+              "p90": 0.96
+            },
+            "follower": {
+              "max": 29545.0,
+              "mean": 24096.17391304348,
+              "min": 2091.0,
+              "p50": 26425.0,
+              "p90": 29510.0
+            },
+            "gdft_trim": {
+              "max": 0.946,
+              "mean": 0.7751739130434783,
+              "min": 0.7,
+              "p50": 0.77,
+              "p90": 0.833
+            },
+            "input_trim": {
+              "max": 1.0,
+              "mean": 0.7897826086956521,
+              "min": 0.631,
+              "p50": 0.802,
+              "p90": 0.884
+            },
+            "k1_loud": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "lock": {
+              "max": 1.0,
+              "mean": 0.6086956521739131,
+              "min": 0.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_applied_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_reason": {
+              "max": 5.0,
+              "mean": 4.478260869565218,
+              "min": 1.0,
+              "p50": 5.0,
+              "p90": 5.0
+            },
+            "mas_state": {
+              "max": 2.0,
+              "mean": 1.8695652173913044,
+              "min": 1.0,
+              "p50": 2.0,
+              "p90": 2.0
+            },
+            "mas_window_age_sec": {
+              "max": 55.3,
+              "mean": 44.21739130434783,
+              "min": 33.2,
+              "p50": 44.2,
+              "p90": 52.3
+            },
+            "max_raw": {
+              "max": 27693.0,
+              "mean": 17933.391304347828,
+              "min": 203.0,
+              "p50": 20286.0,
+              "p90": 24065.0
+            },
+            "near_pct": {
+              "max": 0.009,
+              "mean": 0.002956521739130435,
+              "min": 0.0,
+              "p50": 0.001,
+              "p90": 0.008
+            },
+            "onset": {
+              "max": 1.0,
+              "mean": 0.34782608695652173,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "ostr": {
+              "max": 0.01,
+              "mean": 0.0004347826086956522,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "peak_pin": {
+              "max": 0.463,
+              "mean": 0.2313478260869565,
+              "min": 0.001,
+              "p50": 0.237,
+              "p90": 0.338
+            },
+            "peak_scaled": {
+              "max": 1.063,
+              "mean": 0.7447391304347827,
+              "min": 0.006,
+              "p50": 0.818,
+              "p90": 0.981
+            },
+            "phase": {
+              "max": 0.98,
+              "mean": 0.4556521739130435,
+              "min": 0.08,
+              "p50": 0.34,
+              "p90": 0.83
+            },
+            "raw_i16_abs_peak": {
+              "max": 1908.0,
+              "mean": 1105.2173913043478,
+              "min": 9.0,
+              "p50": 1173.0,
+              "p90": 1613.0
+            },
+            "raw_i16_near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "raw_i16_rms": {
+              "max": 1034.1,
+              "mean": 570.2347826086956,
+              "min": 5.3,
+              "p50": 635.4,
+              "p90": 879.2
+            },
+            "response_gain": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "rows": 23,
+            "silence": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silent_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "spec_pin": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "spec_sat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "total_lines": 23,
+          "usb_serial": "B4:3A:45:A5:89:B4"
+        }
+      },
+      "duration_sec": 20.0,
+      "label": "music",
+      "repeat": 1,
+      "stimulus": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/stimulus_60s_20s.wav",
+      "volume": 65
+    },
+    {
+      "devices": {
+        "bench_im73d": {
+          "ap_rows": 23,
+          "error": null,
+          "log": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/music_vol075_r1_bench_im73d.log",
+          "port": "/dev/cu.usbmodem1401",
+          "quality": {
+            "reasons": [
+              "clip_pct_nonzero",
+              "near_pct_nonzero",
+              "input_trim_reduced",
+              "raw_near_clip"
+            ],
+            "usable": false,
+            "warnings": [
+              "conditioned_peak_pin_high"
+            ]
+          },
+          "summary": {
+            "DC": {
+              "max": -6.0,
+              "mean": -6.0,
+              "min": -6.0,
+              "p50": -6.0,
+              "p90": -6.0
+            },
+            "SSL": {
+              "max": 272.0,
+              "mean": 272.0,
+              "min": 272.0,
+              "p50": 272.0,
+              "p90": 272.0
+            },
+            "agc_env": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "agc_gain": {
+              "max": 0.781,
+              "mean": 0.10591304347826087,
+              "min": 0.058,
+              "p50": 0.069,
+              "p90": 0.085
+            },
+            "bass": {
+              "max": 1.0,
+              "mean": 0.30434782608695654,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "beat": {
+              "max": 1.0,
+              "mean": 0.043478260869565216,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "bpm": {
+              "max": 127.0,
+              "mean": 114.91304347826087,
+              "min": 85.0,
+              "p50": 116.0,
+              "p90": 127.0
+            },
+            "bstr": {
+              "max": 0.93,
+              "mean": 0.411304347826087,
+              "min": 0.01,
+              "p50": 0.43,
+              "p90": 0.8
+            },
+            "cal_valid": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "clip_pct": {
+              "max": 0.004,
+              "mean": 0.001391304347826087,
+              "min": 0.0,
+              "p50": 0.001,
+              "p90": 0.003
+            },
+            "conf": {
+              "max": 0.93,
+              "mean": 0.5530434782608696,
+              "min": 0.27,
+              "p50": 0.56,
+              "p90": 0.67
+            },
+            "follower": {
+              "max": 31438.0,
+              "mean": 27321.869565217392,
+              "min": 3974.0,
+              "p50": 30034.0,
+              "p90": 31042.0
+            },
+            "gdft_trim": {
+              "max": 0.956,
+              "mean": 0.7566086956521739,
+              "min": 0.649,
+              "p50": 0.742,
+              "p90": 0.791
+            },
+            "input_trim": {
+              "max": 0.961,
+              "mean": 0.6423478260869565,
+              "min": 0.514,
+              "p50": 0.611,
+              "p90": 0.722
+            },
+            "k1_loud": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "lock": {
+              "max": 1.0,
+              "mean": 0.43478260869565216,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 1.0
+            },
+            "mas_applied_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "mas_reason": {
+              "max": 5.0,
+              "mean": 5.0,
+              "min": 5.0,
+              "p50": 5.0,
+              "p90": 5.0
+            },
+            "mas_state": {
+              "max": 2.0,
+              "mean": 2.0,
+              "min": 2.0,
+              "p50": 2.0,
+              "p90": 2.0
+            },
+            "mas_window_age_sec": {
+              "max": 78.4,
+              "mean": 67.33043478260869,
+              "min": 56.3,
+              "p50": 67.3,
+              "p90": 75.4
+            },
+            "max_raw": {
+              "max": 32763.0,
+              "mean": 20440.869565217392,
+              "min": 90.0,
+              "p50": 22006.0,
+              "p90": 27011.0
+            },
+            "near_pct": {
+              "max": 0.026,
+              "mean": 0.008434782608695653,
+              "min": 0.0,
+              "p50": 0.01,
+              "p90": 0.012
+            },
+            "onset": {
+              "max": 1.0,
+              "mean": 0.13043478260869565,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "ostr": {
+              "max": 0.11,
+              "mean": 0.004782608695652174,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "peak_pin": {
+              "max": 0.443,
+              "mean": 0.2491304347826087,
+              "min": 0.001,
+              "p50": 0.265,
+              "p90": 0.349
+            },
+            "peak_scaled": {
+              "max": 1.066,
+              "mean": 0.7525217391304347,
+              "min": 0.0,
+              "p50": 0.834,
+              "p90": 1.015
+            },
+            "phase": {
+              "max": 0.88,
+              "mean": 0.5573913043478261,
+              "min": 0.03,
+              "p50": 0.64,
+              "p90": 0.84
+            },
+            "raw_i16_abs_peak": {
+              "max": 2890.0,
+              "mean": 1581.2608695652175,
+              "min": 4.0,
+              "p50": 1651.0,
+              "p90": 2055.0
+            },
+            "raw_i16_near_pct": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "raw_i16_rms": {
+              "max": 1460.8,
+              "mean": 776.8913043478261,
+              "min": 1.7,
+              "p50": 862.8,
+              "p90": 1023.6
+            },
+            "response_gain": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "rows": 23,
+            "silence": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "silent_scale": {
+              "max": 1.0,
+              "mean": 1.0,
+              "min": 1.0,
+              "p50": 1.0,
+              "p90": 1.0
+            },
+            "spec_pin": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            },
+            "spec_sat": {
+              "max": 0.0,
+              "mean": 0.0,
+              "min": 0.0,
+              "p50": 0.0,
+              "p90": 0.0
+            }
+          },
+          "total_lines": 23,
+          "usb_serial": "B4:3A:45:A5:89:B4"
+        }
+      },
+      "duration_sec": 20.0,
+      "label": "music",
+      "repeat": 1,
+      "stimulus": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/stimulus_60s_20s.wav",
+      "volume": 75
+    }
+  ],
+  "start_offset_sec": 60.0,
+  "stimulus": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/music_eval_20260710/20260710T201452_martin_garrix_animals_rerun/stimulus_60s_20s.wav",
+  "track": "/Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3",
+  "volumes": [
+    45,
+    65,
+    75
+  ]
+}
