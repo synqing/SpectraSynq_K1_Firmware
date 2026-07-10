@@ -761,17 +761,29 @@ void acquire_sample_chunk(uint32_t t_now) {
         // --- END REMOVED --- 
     }
 
-    // *** Use RAW value for loud sound detection ***
-    bool loud_sound_detected = (max_waveform_val_raw > threshold_loud_break); // Use pre-calculated threshold
+    // Go-dark quiet detection: RAW per-frame RMS vs an ABSOLUTE threshold with hysteresis
+    // (firmware-v3 pre-gate port — pure RMS, cf. ControlBus.cpp Stage 7). Replaces the
+    // SSL/sweet_spot_state==-1 gate (smoothed-peak floor sits above SSL in a normal room)
+    // AND deliberately does NOT re-use the peak-based loud_sound_detected veto
+    // (threshold_loud_break = SSL*1.2 ≈ 326 trips on quiet-room peaks 150-870, which would
+    // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
+    // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
+    // is what keeps genuinely quiet *music* from darkening the plate.
+    static bool k1_rms_silent_state = false;
+    if (k1_rms_silent_state) {
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
+    } else {
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
+    }
 
-    if (loud_sound_detected) {
+    if (!k1_rms_silent_state) {
         if (silence && debug_mode) {
-             USBSerial.println("DEBUG: Silence broken by loud sound");
+             USBSerial.println("DEBUG: Silence broken (audio detected)");
         }
         silence = false;
         silence_temp = false;
         silence_switched = t_now;
-    } else if (sweet_spot_state == -1) {
+    } else {
          silence_temp = true;
          if (t_now - silence_switched >= SILENCE_DWELL_MS) {
             if (!silence && debug_mode) {
@@ -779,9 +791,6 @@ void acquire_sample_chunk(uint32_t t_now) {
             }
             silence = true;
          }
-    } else {
-        silence = false;
-        silence_temp = false;
     }
 
     if (debug_mode && (t_now % 10000 == 0)) {
@@ -848,10 +857,10 @@ void acquire_sample_chunk(uint32_t t_now) {
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
     K1TempoEvent     tev = k1_tempo_read();
     K1OnsetBeatEvent oev = k1_onset_beat_read();
-    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
-      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, CONFIG.STANDBY_DIMMING ? 1 : 0,
       calibration_source_name(), calibration_valid ? 1 : 0,
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,
@@ -985,6 +994,7 @@ void calculate_vu() {
 
   SQ15x16 rms = SQ15x16(sqrtf((float)(sum / CONFIG.SAMPLES_PER_CHUNK))); // Phase 1 2026-05-20: sqrt→sqrtf for S2 soft-float
   audio_vu_level = rms;
+  k1_silence_rms_raw = (float)rms;   // raw pre-floor RMS for go-dark silence detection (firmware-v3 pre-gate port)
 
   if (!noise_complete) {
     if (!noise_cal_dc_valid ||

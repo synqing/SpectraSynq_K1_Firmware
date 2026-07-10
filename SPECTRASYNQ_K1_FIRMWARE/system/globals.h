@@ -687,6 +687,16 @@ inline uint32_t SILENCE_DWELL_MS       = 5000;    // continuous quiet (ms) befor
 inline float    SILENT_FADE_DOWN_ALPHA = 0.03f;   // slow fade to black (~1-2 s)
 inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first sound
 
+// Go-dark silence detection — RAW per-frame RMS vs an ABSOLUTE threshold (firmware-v3
+// pre-gate port; cf. ControlBus.cpp Stage 7 `rmsUngated < m_silence_threshold`). Decoupled
+// from SSL/sweet_spot_state, whose smoothed-peak floor sits ABOVE SSL in a normal room and
+// so never latched silence. Seeds are DEGRADED-MODE first-guesses placed above the expected
+// mic self-noise floor; calibrate on the bench from [AP] rms_raw in a quiet room, then set
+// with margin. Runtime-tunable via :silence_rms_enter / :silence_rms_exit (no recompile).
+inline float    K1_SILENCE_RMS_ENTER = 0.04f;     // raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-room floor <0.02, ~8x margin.
+inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not silent (Schmitt exit; > enter)
+inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
+
 // ------------------------------------------------------------
 // Cochlear-Inspired Multi-Band AGC (GDFT.h) ------------------
 

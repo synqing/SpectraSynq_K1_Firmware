@@ -3409,6 +3409,16 @@ void parse_command(char* command_buf) {
       SILENCE_DWELL_MS = (uint32_t)atol(command_data);
       tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
     }
+    // Raw-RMS absolute go-dark thresholds (firmware-v3 pre-gate port). Calibrate live from
+    // [AP] rms_raw in a quiet room, then set enter above the floor with margin (exit > enter).
+    else if (strcmp(command_type, "silence_rms_enter") == 0) {
+      K1_SILENCE_RMS_ENTER = (float)atof(command_data);
+      tx_begin(); USBSerial.print("K1_SILENCE_RMS_ENTER: "); USBSerial.println(K1_SILENCE_RMS_ENTER, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_rms_exit") == 0) {
+      K1_SILENCE_RMS_EXIT = (float)atof(command_data);
+      tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
+    }
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
     // beat_director toggle lifted VERBATIM into serial_cmd_dispatch_beat_director() in
