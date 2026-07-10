@@ -121,6 +121,13 @@ inline bool chromatic_mode = true;
 
 #ifdef K1_LOUD_GUARD_V1
 inline bool     k1_loud_guard_enabled = true;
+// Loud-guard release/floor-cut retune. 0 = legacy baseline (2.20 s release + flat cut),
+// 1 = conservative (1.30 s + hybrid), 2 = AGGRESSIVE (0.80 s release + hybrid affine cut).
+// DEFAULT 2 — hardware-validated winner (bench B489A500, IM73D, 2026-07-10): recovery tail
+// 5.54->1.94 s, no limit cycle (spec-sat self-suppressed by the ceiling knee), no onset/
+// tempo regression (bpm lock + onset rate flat). Captain hardware sign-off 2026-07-10. Modes
+// 0/1 remain runtime-selectable (:k1_loud_guard=mode0|1). See constants.h + the AP audit run-book.
+inline uint8_t  k1_loud_guard_mode = 2;
 inline float    k1_loud_input_trim = 1.0f;
 inline float    k1_loud_gdft_trim = 1.0f;
 inline float    k1_loud_clip_duty = 0.0f;

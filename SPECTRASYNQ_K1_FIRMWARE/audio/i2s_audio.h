@@ -112,6 +112,16 @@ static inline float k1_loud_guard_approach(float current, float target, float dt
   return current + (target - current) * k1_loud_guard_alpha(dt, tau);
 }
 
+// A/B retune: GDFT release select by k1_loud_guard_mode. Attack is never mode-switched
+// (engage must stay fast; the invariant attack < release must hold). Mode 0 = baseline.
+static inline float k1_loud_guard_gdft_release_sec() {
+  switch (k1_loud_guard_mode) {
+    case 1:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS;
+    case 2:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR;
+    default: return K1_LOUD_GUARD_GDFT_RELEASE_SEC;
+  }
+}
+
 static inline float k1_loud_guard_effective_sensitivity() {
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
   return CONFIG.SENSITIVITY * k1_loud_input_trim;
@@ -190,7 +200,7 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
   }
 
   k1_loud_input_trim = k1_loud_guard_approach(k1_loud_input_trim, input_target, dt, K1_LOUD_GUARD_INPUT_ATTACK_SEC, K1_LOUD_GUARD_INPUT_RELEASE_SEC);
-  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, K1_LOUD_GUARD_GDFT_RELEASE_SEC);
+  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, k1_loud_guard_gdft_release_sec());
 }
 #else
 static inline float k1_audio_response_gain_effective() {
@@ -807,7 +817,13 @@ void acquire_sample_chunk(uint32_t t_now) {
   //   silence      — extended-silence flag (10 s timeout)
   //   CAL_SOURCE/CAL_VALID — calibration provenance for harness captures
   static uint32_t last_ap_dbg = 0;
-  if (AP_STREAM_ENABLED && millis() - last_ap_dbg > 1000) {
+  // [AP] stream cadence. Default 1 Hz (production). Override via -DK1_AP_STREAM_INTERVAL_MS
+  // for higher-rate diagnostics (e.g. loud-guard limit-cycle A/B needs ~10 Hz to resolve a
+  // ~1.5 s oscillation without aliasing). Production builds leave the default untouched.
+#ifndef K1_AP_STREAM_INTERVAL_MS
+#define K1_AP_STREAM_INTERVAL_MS 1000
+#endif
+  if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
     K1TempoEvent     tev = k1_tempo_read();
     K1OnsetBeatEvent oev = k1_onset_beat_read();
     USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
@@ -824,7 +840,7 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_raw_i16_near_pct);
 #endif
 #ifdef K1_LOUD_GUARD_V1
-    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f mode=%d",
       k1_loud_guard_enabled ? 1 : 0,
       k1_loud_input_trim,
       k1_loud_gdft_trim,
@@ -834,7 +850,8 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_near_rail_duty,
       k1_loud_peak_pin_duty,
       k1_loud_spec_sat_duty,
-      k1_loud_spec_sat_fraction);
+      k1_loud_spec_sat_fraction,
+      k1_loud_guard_mode);
 #endif
 #ifdef K1_STM
     {

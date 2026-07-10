@@ -94,6 +94,17 @@
 #define K1_LOUD_GUARD_GDFT_ATTACK_SEC 0.30f
 #define K1_LOUD_GUARD_GDFT_RELEASE_SEC 2.20f
 #define K1_LOUD_GUARD_DUTY_TAU_SEC 0.55f
+// ── A/B retune matrix (DEGRADED-MODE — loud-room hardware A/B + Captain sign-off pending) ─
+//   Selected at runtime by k1_loud_guard_mode (globals.h). Mode 0 uses the baseline
+//   RELEASE_SEC 2.20 + flat SPECTRAL_FLOOR_CUT above. Modes 1/2 shorten the GDFT release
+//   tail and switch the floor-cut to a hybrid affine form (pedestal + proportional) that
+//   preserves noise-floor/mud suppression while sparing quiet musical bins.
+//   Provenance: AP signal-robbery audit + 3-way red-team (2026-07-10). Values are A/B
+//   starting points, NOT proven on hardware — do not treat as final constants.
+#define K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS 1.30f   // mode 1: >= ~2x DUTY_TAU, over-damped
+#define K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR 0.80f   // mode 2: red-team upper safe bound
+#define K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL 0.03f      // absolute mud-suppression floor (modes 1/2)
+#define K1_LOUD_GUARD_FLOOR_CUT_PROP_K 0.12f        // magnitude-proportional cut coeff (modes 1/2)
 #endif
 
 // Legacy per-bin spectral noise subtraction is disabled in production. Runtime

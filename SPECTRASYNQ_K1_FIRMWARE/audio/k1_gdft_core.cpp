@@ -61,6 +61,20 @@ static inline float k1_loud_guard_clamp_float(float value, float min_value, floa
   if (value > max_value) return max_value;
   return value;
 }
+
+// A/B floor-cut applied at BOTH AGC paths (per-band + broadband) so the retune is valid
+// regardless of which AGC path a build selects. Mode 0 = flat cut (byte-identical shipping).
+// Modes 1/2 = hybrid affine cut: a small absolute pedestal (retains noise-floor/mud
+// suppression via the zero-clamp) plus a magnitude-proportional term (spares quiet musical
+// bins). The ceiling soft-knee (the actual saturation-tamer) is left untouched at the sites.
+static inline void k1_loud_guard_apply_floor_cut(SQ15x16 &out, SQ15x16 loud_depth) {
+  if (k1_loud_guard_mode == 0) {
+    out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
+  } else {
+    out -= loud_depth * (SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL) + out * SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PROP_K));
+  }
+  if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+}
 #endif
 
 // Obscure audio magic happens here
@@ -422,8 +436,7 @@ void IRAM_ATTR process_GDFT() {
 #ifdef K1_LOUD_GUARD_V1
     if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
       const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      k1_loud_guard_apply_floor_cut(out, loud_depth);
 
       const SQ15x16 knee = SQ15x16(0.45);
       const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
@@ -500,8 +513,7 @@ void IRAM_ATTR process_GDFT() {
 #ifdef K1_LOUD_GUARD_V1
     if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
       const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      k1_loud_guard_apply_floor_cut(out, loud_depth);
 
       const SQ15x16 knee = SQ15x16(0.45);
       const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));

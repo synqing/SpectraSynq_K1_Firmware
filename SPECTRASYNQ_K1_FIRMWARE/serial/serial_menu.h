@@ -372,6 +372,8 @@ void serial_print_k1_loud_guard_status() {
   USBSerial.println(k1_loud_peak_pin_duty, 4);
   USBSerial.print("K1_LOUD_SPEC_SAT_DUTY: ");
   USBSerial.println(k1_loud_spec_sat_duty, 4);
+  USBSerial.print("K1_LOUD_GUARD_MODE: ");
+  USBSerial.println(k1_loud_guard_mode);   // 0=baseline 1=conservative 2=aggressive
 }
 
 void serial_set_k1_loud_guard(bool enabled) {
@@ -385,6 +387,19 @@ void serial_set_k1_loud_guard(bool enabled) {
     k1_loud_spec_sat_duty = 0.0f;
     k1_loud_spec_sat_fraction = 0.0f;
   }
+}
+
+// A/B retune matrix cycle: 0 BASELINE -> 1 CONSERVATIVE -> 2 AGGRESSIVE -> 0.
+// Ships dormant at 0 (byte-identical shipping behaviour); DEGRADED-MODE until
+// the loud-room hardware A/B + Captain sign-off.
+void serial_cycle_k1_loud_guard_mode() {
+  k1_loud_guard_mode = (k1_loud_guard_mode + 1) % 3;
+  USBSerial.print("K1_LOUD_GUARD_MODE -> ");
+  USBSerial.print(k1_loud_guard_mode);
+  const char* label = (k1_loud_guard_mode == 0) ? " BASELINE (2.20s/flat)"
+                    : (k1_loud_guard_mode == 1) ? " CONSERVATIVE (1.30s/hybrid)"
+                    :                             " AGGRESSIVE (0.80s/hybrid)";
+  USBSerial.println(label);
 }
 #endif
 
@@ -2255,7 +2270,7 @@ void cmd_help() {
   USBSerial.println("             sensitivity=[float or 'default'] | Sets the scaling of audio data (>1.0 is more sensitive, <1.0 is less sensitive)");
   USBSerial.println("           response_gain=[float or 'default'] | Runtime-only post-DC audio response gain for paired K1 response probes");
 #ifdef K1_LOUD_GUARD_V1
-  USBSerial.println("              k1_loud_guard=[on/off/status] | Runtime loud-room headroom guard");
+  USBSerial.println("              k1_loud_guard=[on/off/status/mode0/mode1/mode2/cycle] | Loud-room guard + A/B retune matrix");
 #endif
   USBSerial.println("          boot_animation=[true/false/default] | Enable or disable the boot animation");
   USBSerial.println("            sweet_spot_min=[int or 'default'] | Sets the minimum amplitude to be inside the 'Sweet Spot'");
@@ -3340,6 +3355,17 @@ void parse_command(char* command_buf) {
 #ifdef K1_LOUD_GUARD_V1
     else if (strcmp(command_type, "k1_loud_guard") == 0) {
       if (strcmp(command_data, "status") == 0) {
+        tx_begin();
+        serial_print_k1_loud_guard_status();
+        tx_end();
+      } else if (strcmp(command_data, "cycle") == 0) {
+        tx_begin();
+        serial_cycle_k1_loud_guard_mode();
+        serial_print_k1_loud_guard_status();
+        tx_end();
+      } else if (strncmp(command_data, "mode", 4) == 0 &&
+                 command_data[4] >= '0' && command_data[4] <= '2' && command_data[5] == '\0') {
+        k1_loud_guard_mode = (uint8_t)(command_data[4] - '0');   // A/B retune matrix select
         tx_begin();
         serial_print_k1_loud_guard_status();
         tx_end();
