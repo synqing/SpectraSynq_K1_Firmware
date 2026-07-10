@@ -26,7 +26,9 @@ venv/
 # Agent / tooling state (never commit)
 .claude/worktrees/
 .claude/hooks/.summonaikit-task-contract.txt
-.codex/
+.codex/*
+!.codex/skills/
+!.codex/skills/**
 .codex-subagent/
 .cursor/*
 !.cursor/skills/

@@ -83,6 +83,30 @@ the next session understanding of what was previously done. A session that
 records nothing is a session the next agent cannot learn from. **Skipping
 observation recording is a process failure, not a shortcut.**
 
+### Memory skill router (scenario → skill)
+
+When the task involves **resume / prior work / "did we already" / memory /
+history narrative / unfamiliar codebase**, invoke **`/claude-mem-router`**
+(or apply its table below) and pick **one** skill. Do not invoke the whole set.
+
+| Scenario | Skill |
+|----------|-------|
+| Current lane / device / branch status; before flash/forensics | `/spec-recall` |
+| Prior bug / "did we already fix X?" / recurrence | `/mem-search` |
+| Code structure without full-file reads | `/smart-explore` |
+| Cold-start / prime unfamiliar tree | `/learn-codebase` |
+| Theme corpus Q&A | `/knowledge-agent` |
+| One sweeping journey report | `/timeline-report` |
+| Week-by-week serial chapters | `/weekly-digests` |
+| How the memory tool works | `/how-it-works` |
+| Memory empty/stale/offline/contradicts Tier 0 | `/memory-authority-gate` |
+
+**Default K1 ladder:** bootstrap → `/spec-recall` → `/mem-search` (2–4 single-term
+queries) → act from git + on-disk + filtered observations → record observations.
+
+Full playbook: `.claude/skills/claude-mem-router/SKILL.md` (mirrored in
+`.cursor/skills/` and `.codex/skills/`).
+
 ### Retrieval (all tools, when starting a task)
 
 - Always `search` → `timeline` → `get_observations` for prior work on the lane
@@ -308,9 +332,10 @@ moment without over-invoking. This is a narrow gate, not a ritual.
 Before acting on any task, run this scan in order:
 
 1. **Keyword scan `available_skills`** (cheap, always do this). Match task keywords against skill titles. If a skill title clearly fits the task domain, invoke it.
-2. **If the task is complex or multi-domain** → invoke `/discover-specialists` and check `.claude/agents/*.md` for a specialist whose scope matches. A specialist subagent often beats a general agent on its domain.
-3. **If no installed skill covers the task** → invoke `/find-skills` (`npx skills find <query>`) to search the open skills ecosystem. Do NOT invoke this for tasks covered by installed skills — it is for gaps.
-4. **If the task needs an external service** (GitHub, Linear, Slack, browser, database, etc.) → scan the MCP server list in the system prompt and call `mcp_list_tools` on the matching server before using its tools.
+2. **If the task involves resume / prior work / memory / "did we already" / history narrative** → apply §5 scenario table or invoke `/claude-mem-router` (pick one skill; do not fan out the whole set).
+3. **If the task is complex or multi-domain** → invoke `/discover-specialists` and check `.claude/agents/*.md` for a specialist whose scope matches. A specialist subagent often beats a general agent on its domain.
+4. **If no installed skill covers the task** → invoke `/find-skills` (`npx skills find <query>`) to search the open skills ecosystem. Do NOT invoke this for tasks covered by installed skills — it is for gaps.
+5. **If the task needs an external service** (GitHub, Linear, Slack, browser, database, etc.) → scan the MCP server list in the system prompt and call `mcp_list_tools` on the matching server before using its tools.
 
 Mechanical execution against a clear spec: do step 1 only, then proceed. Do not invoke specialists, find-skills, or MCP tools "to be safe."
 
@@ -343,8 +368,33 @@ pointer to this file plus tool-specific settings:
 |------|-------|----------------------|
 | **Devin** | `.devin/agent-os.md` | `.devin/config.local.json` (permissions), `.devin/blueprint.yaml` (knowledge), `scripts/agent/pio-build.sh` (guarded build wrapper) |
 | **Claude Code** | `CLAUDE.md` (root) + `.claude/CLAUDE.md` | `.claude/agents/*.md` (specialists), `.claude/skills/` (skills), `claude-mem` MCP |
-| **Codex** | `AGENTS.md` (root) | same specialist/skill inventory as Claude Code |
-| **Cursor** | `.cursor/rules/agent-os.mdc` | `.cursor/skills/` (skills) |
+| **Codex** | `AGENTS.md` (root) | `.codex/skills/` (skills; same inventory as Claude Code / Cursor), `claude-mem` MCP |
+| **Cursor** | `.cursor/rules/agent-os.mdc` | `.cursor/skills/` (skills), `claude-mem` MCP |
+
+### claude-mem skills (all three tools)
+
+**Router (start here when unsure):** `/claude-mem-router` — scenario → one skill.
+Canonical table also lives in §5.
+
+Project-local copies live in `.claude/skills/`, `.cursor/skills/`, and
+`.codex/skills/`. Reinstall / refresh with:
+
+```bash
+bash scripts/install-claude-mem-skills.sh
+```
+
+| Skill | Invoke when |
+|-------|-------------|
+| `/claude-mem-router` | Unsure which memory/recall skill fits — scenario table |
+| `/mem-search` | Prior-session recall (`search` → `timeline` → `get_observations`) |
+| `/knowledge-agent` | Build/query observation corpora |
+| `/timeline-report` | Full-project journey narrative from memory timeline |
+| `/how-it-works` | Explain claude-mem capture / injection / storage |
+| `/spec-recall` | On-disk-first lane resume (handoff beats memory for current status) |
+| `/smart-explore` | Token-cheap AST structural code search (`smart_search` / outline / unfold) |
+| `/learn-codebase` | Prime an unfamiliar codebase by reading sources |
+| `/weekly-digests` | Week-by-week serial timeline chapters |
+| `/memory-authority-gate` | Memory empty/stale/offline — DAF + Tier 0 docs |
 
 If your tool's overlay conflicts with this file, this file wins for
 tool-agnostic rules (safety, gates, source-of-truth). The overlay wins only for
@@ -352,4 +402,4 @@ tool-specific mechanics (how to invoke a build, where permissions live).
 
 ---
 
-Last updated: 2026-07-02
+Last updated: 2026-07-10

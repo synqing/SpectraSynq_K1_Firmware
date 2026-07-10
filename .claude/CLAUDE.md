@@ -29,7 +29,10 @@ Before firmware, forensic, or device-validation work:
 4. Lane handover linked from spec-index Active Lanes table
 5. claude-mem `search` → `timeline` → `get_observations` for prior sessions only
 
-On-disk handover beats claude-mem for **current lane status**. Invoke `/spec-recall` when resuming work or checking "did we already solve this?"
+On-disk handover beats claude-mem for **current lane status**. Invoke
+`/claude-mem-router` (or `/spec-recall`) when resuming work or checking "did we
+already solve this?" — pick one memory skill from the scenario table; do not
+fan out the whole set.
 
 ## Developer Instrumentation Boundary (load-bearing — added 2026-05-27)
 
