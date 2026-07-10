@@ -3383,6 +3383,33 @@ void parse_command(char* command_buf) {
     }
 #endif
 
+    // ── Silence go-dark A/B (2026-07-10) — runtime enable + tuning, no recompile. ──
+    // K1 has NO indicator LEDs; the plate is the only output. STANDBY_DIMMING ships OFF
+    // (dormant); enable it here to A/B the go-dark on hardware before the default flip.
+    else if (strcmp(command_type, "standby_dimming") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        CONFIG.STANDBY_DIMMING = value;
+        tx_begin();
+        USBSerial.print("STANDBY_DIMMING: "); USBSerial.println(value ? "on" : "off");
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    else if (strcmp(command_type, "silence_enter") == 0) {
+      SILENCE_ENTER_SSL_FRAC = (float)atof(command_data);
+      tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_exit") == 0) {
+      SILENCE_EXIT_SSL_FRAC = (float)atof(command_data);
+      tx_begin(); USBSerial.print("SILENCE_EXIT_SSL_FRAC: "); USBSerial.println(SILENCE_EXIT_SSL_FRAC, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_dwell") == 0) {
+      SILENCE_DWELL_MS = (uint32_t)atol(command_data);
+      tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
+    }
+
 #ifdef K1_EFFECT_FRAMEWORK_V1
     // beat_director toggle lifted VERBATIM into serial_cmd_dispatch_beat_director() in
     // serial_cmd_handlers.cpp (gated-families lane, Increment B). GATE-MATCHED: decl/def/

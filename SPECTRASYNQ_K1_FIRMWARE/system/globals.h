@@ -675,6 +675,18 @@ inline SQ15x16 min_silent_level_tracker = 65535.0; // Initialize high, tracks mi
 #define AGC_FLOOR_MAX_CLAMP_SCALED (100.0) // Final maximum AGC floor after scaling
 #define AGC_FLOOR_RECOVERY_RATE (50.0) // *** EXPERIMENTAL *** Rate at which tracker recovers upwards per frame during silence-
 
+// --> Silence go-dark (2026-07-10) <--
+// SSL-derived Schmitt silence detection + dwell + asymmetric fade. Replaces the dead
+// static threshold (the min_silent_level_tracker decay above was commented out, pinning
+// threshold_silence at 100 decoupled from the learned SSL, so a quiet room NEVER latched
+// silence and the plate never went dark). These are DEGRADED-MODE first-guesses, tunable
+// at runtime for the hardware A/B via the :standby_dimming / :silence_* serial commands.
+inline float    SILENCE_ENTER_SSL_FRAC = 0.35f;   // enter silence below this * SSL (smoothed peak)
+inline float    SILENCE_EXIT_SSL_FRAC  = 0.55f;   // leave silence above this * SSL (Schmitt gap: exit > enter)
+inline uint32_t SILENCE_DWELL_MS       = 5000;    // continuous quiet (ms) before the plate darkens
+inline float    SILENT_FADE_DOWN_ALPHA = 0.03f;   // slow fade to black (~1-2 s)
+inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first sound
+
 // ------------------------------------------------------------
 // Cochlear-Inspired Multi-Band AGC (GDFT.h) ------------------
 

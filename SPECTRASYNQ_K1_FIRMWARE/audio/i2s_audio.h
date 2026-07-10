@@ -605,7 +605,14 @@ void acquire_sample_chunk(uint32_t t_now) {
     float dynamic_agc_floor_scaled = dynamic_agc_floor_raw * AGC_FLOOR_SCALING_FACTOR;
     if (dynamic_agc_floor_scaled < AGC_FLOOR_MIN_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MIN_CLAMP_SCALED;
     if (dynamic_agc_floor_scaled > AGC_FLOOR_MAX_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MAX_CLAMP_SCALED;
-    float threshold_silence = dynamic_agc_floor_scaled;
+    // Silence detection: SSL-derived Schmitt (2026-07-10). dynamic_agc_floor_scaled above
+    // is DEAD (the min-tracker decay was commented out, pinning it at a static 100 that is
+    // decoupled from the learned floor — a quiet room never fell below it, so silence never
+    // latched and the plate never darkened). Derive the thresholds from the calibrated SSL
+    // so they track the real ambient, with a Schmitt gap (enter < exit) to kill chatter.
+    const float ssl_f = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+    float threshold_silence = SILENCE_ENTER_SSL_FRAC * ssl_f;        // enter-silence line (low)
+    float threshold_silence_exit = SILENCE_EXIT_SSL_FRAC * ssl_f;    // exit-silence line (high)
 
     max_waveform_val = (max_waveform_val_raw - (CONFIG.SWEET_SPOT_MIN_LEVEL));
 
@@ -674,13 +681,24 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     int8_t potential_next_state = sweet_spot_state; // Assume current state initially
 
-    // *** Use the SMOOTHED value for state decision ***
-    if (max_waveform_val_raw_smooth <= threshold_silence) { // Use pre-calculated threshold
-        potential_next_state = -1;
-    } else if (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) {
-        potential_next_state = 1;
+    // *** Use the SMOOTHED value for state decision, with Schmitt hysteresis on the ***
+    // *** silence boundary: enter -1 below threshold_silence; once silent, only leave ***
+    // *** -1 when the smoothed peak rises above the higher threshold_silence_exit. ***
+    const bool was_silent_state = (sweet_spot_state == -1);
+    if (was_silent_state) {
+        if (max_waveform_val_raw_smooth >= threshold_silence_exit) {
+            potential_next_state = (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) ? 1 : 0;
+        } else {
+            potential_next_state = -1;   // stay silent until we clear the exit line
+        }
     } else {
-        potential_next_state = 0;
+        if (max_waveform_val_raw_smooth <= threshold_silence) {
+            potential_next_state = -1;
+        } else if (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) {
+            potential_next_state = 1;
+        } else {
+            potential_next_state = 0;
+        }
     }
 
     if (potential_next_state != sweet_spot_state) {
@@ -755,9 +773,9 @@ void acquire_sample_chunk(uint32_t t_now) {
         silence_switched = t_now;
     } else if (sweet_spot_state == -1) {
          silence_temp = true;
-         if (t_now - silence_switched >= 10000) {
+         if (t_now - silence_switched >= SILENCE_DWELL_MS) {
             if (!silence && debug_mode) {
-                USBSerial.println("DEBUG: Extended silence detected (10s)");
+                USBSerial.println("DEBUG: Extended silence detected (dwell met)");
             }
             silence = true;
          }
@@ -776,8 +794,12 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
 
     if (CONFIG.STANDBY_DIMMING) {
-      float silent_scale_raw = silence ? 0.0 : 1.0;
-      silent_scale = silent_scale_raw * 0.1 + silent_scale_last * 0.9;
+      // Asymmetric fade: slow to true black on sustained silence, near-instant wake on
+      // the first sound. silent_scale multiplies MASTER_BRIGHTNESS on the plate
+      // (led_utilities.h:399) → reaches 0 = fully dark. K1 has no indicator LEDs.
+      const float fade_target = silence ? 0.0f : 1.0f;
+      const float fade_a = (fade_target < silent_scale) ? SILENT_FADE_DOWN_ALPHA : SILENT_FADE_UP_ALPHA;
+      silent_scale = fade_target * fade_a + silent_scale_last * (1.0f - fade_a);
       silent_scale_last = silent_scale;
     } else {
       silent_scale = 1.0;
@@ -826,10 +848,11 @@ void acquire_sample_chunk(uint32_t t_now) {
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
     K1TempoEvent     tev = k1_tempo_read();
     K1OnsetBeatEvent oev = k1_onset_beat_read();
-    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
-      silence ? 1 : 0, calibration_source_name(), calibration_valid ? 1 : 0,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      calibration_source_name(), calibration_valid ? 1 : 0,
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,
       oev.onset ? 1 : 0, oev.bass_onset ? 1 : 0, (float)oev.bass_onset_strength);
