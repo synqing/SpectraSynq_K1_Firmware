@@ -38,9 +38,8 @@ in [`../spec-index.md`](../spec-index.md).
   firmware lives in the knob repo
   (`~/Workspace_Management/Software/JC3636K518CN_knob_EN-bleremote/custom/JC3636_K718_REMOTED_BLE_V1`),
   identity captured + bench-PASS in that repo's `HARDWARE_VERIFY.md`. Verified
-  on bus 2026-07-12 as `/dev/cu.usbmodem2101`; reflashed 2026-07-12 with the
-  Remoted `halo_phase1` target patched for SpectraSynq.LED `sqled.ble-midi-map/1`
-  and PC 0–8 SQLED modes, then used to prove SpectraSynq.LED
+  on bus 2026-07-12 as `/dev/cu.usbmodem2101`; flashed with the Remoted
+  `halo_phase1` diagnostic harness and used to prove SpectraSynq.LED
   `primary.photons` BLE-MIDI apply (`notify=10 decoded=10 apply_ok=10`).
 - **Never flash any device without Captain's per-device instruction**
   (standing rule, 2026-06-11; origin: unauthorized 1401 rollback).
