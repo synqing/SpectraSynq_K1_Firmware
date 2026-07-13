@@ -43,7 +43,7 @@ Firmware lanes remain governed by [`AGENT_OS.md`](../../AGENT_OS.md) and active 
 
 | Field | Value |
 |-------|-------|
-| `final_commit_sha` | `7f6f1ba44ed749c73d1bf45286b4e0fc19833aff` |
+| `final_commit_sha` | `d5639cd55a2373cdc9162ed2a34998627aafae9a` |
 
 ## Post-commit verification (2026-07-13)
 
