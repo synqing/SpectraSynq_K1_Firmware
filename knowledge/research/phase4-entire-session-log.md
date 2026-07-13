@@ -1,6 +1,6 @@
 ---
 title: Phase 4 — Entire session capture log (P4-E03)
-status: active
+status: complete
 parent: phase4-entire-lineage-proof.md
 operator: cursor-subagent (shell)
 branch: lane/gem-port-beat-pulse
@@ -28,3 +28,10 @@ Dual-path note: `core.hooksPath=scripts/hooks` → Entire `.git/hooks/*` dormant
 
 <!-- cycle 5 @ 2026-07-13 11:11:12 +0800 -->
 | 5 | 2026-07-13 11:11:12 +0800 | `Enabled: true;Strategy: manual-commit;Branch: lane/gem-port-beat-pulse;Checkpoints branch: not created;Git hooks: installed;Agents: claude-code;` | `9f484dc` | `exit:0` | `exit:0` | `Commit: 9f484dcd;Message: docs: P4-E03 Entire lineage capture cycle 5;` | `No rewind points found. Work with your agent and commit changes.;` |
+
+## Post-cycle summary
+
+- Commits: `5df16e6` (bootstrap) … `cd60262` (HEAD); five capture SHAs `7143f51`–`9f484dc`.
+- `entire rewind`: no points; `entire/checkpoints/v1` not created.
+- `git show-ref | rg entire`: empty; no session push.
+- Follow-up: Claude Code session after Entire CLI ships `hooks claude-code` (or upgrade); optional chain Entire git hooks into `scripts/hooks/`.
