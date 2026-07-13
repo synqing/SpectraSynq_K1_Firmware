@@ -1523,6 +1523,10 @@ inline void run_transition_fade() {
         if (CONFIG.LIGHTSHOW_MODE >= NUM_MODES) {
           CONFIG.LIGHTSHOW_MODE = 0;
         }
+        // Skip tombstoned/disabled modes so the physical MODE button honours the
+        // "unreachable in every selection path" contract (config_types.h). The
+        // serial + secondary paths already route through light_mode_next_enabled().
+        CONFIG.LIGHTSHOW_MODE = light_mode_next_enabled(CONFIG.LIGHTSHOW_MODE, 1);
       } else {  // Triggered via Serial
         CONFIG.LIGHTSHOW_MODE = mode_destination;
         mode_destination = -1;

@@ -16,7 +16,7 @@
 // British English. Centre origin: r in px, 0 = centre (LED 79/80), 80 = edge.
 // ============================================================================
 
-#include "iris_math.h"
+#include "effects/iris_math.h"
 
 #include <cmath>
 #include <cstdint>

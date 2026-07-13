@@ -7,6 +7,8 @@ description: "Use when creating, modifying, or reviewing any LED visual effect f
 
 LED effect authoring rules for K1-family Light Guide Plate (LGP) hardware. These constraints are non-negotiable -- violating them produces visually broken or unsafe firmware.
 
+> **Unsure which effect skills a task needs?** Start at `/k1-effects-router` — it routes any effect task (author / port / fix stutter / optimise / crash / wire / debug) to the minimal relevant skills. For the full craft law read `docs/effect-craft/PORTING_CRAFT_CANON.md`.
+
 ## Hardware Topology
 
 - **160 LEDs total**: two WS2812B strips of 80, driven as a single logical strip (index 0-159)
@@ -112,9 +114,30 @@ Use instead:
 
 Before writing any audio-reactive effect:
 
-1. Read `AUDIO_VISUAL_SEMANTIC_MAPPING.md` in the project root
+1. Read `docs/effect-craft/PORTING_CRAFT_CANON.md` — the load-bearing craft standard (mandatory easing, per-LED perf, fork idiom + workflow). Skipping the standard is exactly what produced a run of amateur-looking effects on 2026-07-11.
 2. Never bind raw FFT bins directly to visual parameters -- always pass through musical saliency filtering
 3. Use the `/spectrasynq-audio-pipeline` skill for integration patterns
+
+## MANDATORY Temporal Easing — the professional "decay" layer (NON-NEGOTIABLE)
+
+The #1 cause of amateur-looking effects: writing **raw/instantaneous audio to brightness**, so the effect lights the instant the drive rises and goes **dark the instant it falls** ("stuttering / on-off"). Every native effect eases; a new effect MUST too.
+
+- **Never brightness = raw audio.** Pass every audio drive (rms, onset, chroma, band energy, beat_strength) through an **asymmetric follower first: fast attack, slow release** (release ≥ 5× attack). Use `k1ease::follow(cur, target, dt, attack_tau, release_tau)` from `visual/easing.h` — do NOT roll your own (there were 8+ duplicates before easing.h).
+- Native taus: beat 0.02–0.05 / 0.15–0.30 s · bass 0.05–0.10 / 0.30–0.50 s · colour 0.10–0.25 / 0.50–1.50 s (prism 0.035/0.32, snapwave 0.05/0.28, wfhyb 0.02/0.50, moire 0.05/0.35).
+- **Trail persistence / life decay** so a trigger leaves a *fading* object, never a pixel that vanishes next frame.
+- **Silence gate SMOOTHED** — `k1ease::follow(sil, snap.silence?0:1, dt, 0.05f, 0.30f)` × output; never a hard `if(silence) 0` (allowed only for strictly event-gated effects).
+- **Brightness floor** — `0.4f + 0.6f*env`; never approach zero on the off-phase, never pump the whole field by a raw 0→1 beat value.
+- **STROBE LAW** (`/sensorybridge-doctrine`): prefer spatial/transport reactivity (position, phase, palette-shift). Global brightness modulation on audio is a rejectable strobe.
+- **Don't double-smooth** already-smoothed inputs (`peak_scaled`, band energies, `*_level`, `beat_strength`). DO smooth instantaneous ones (`vu_level`, `novelty`, `chroma_strength`, `*_strength`, raw `chromagram_smooth[]`).
+
+## Per-Frame Perf Discipline — the 2.0 ms ceiling
+
+Two ports blew the ceiling (3.9 ms, 2.2 ms) by calling heavy helpers per-LED.
+
+- **Colour that depends on field/ring POSITION (not per-LED brightness) is frame-constant — sample it ONCE per frame, scale per-LED.**
+- **NEVER per-LED:** `effect_particle_colour()` (recomputes `chromagram_centroid_hue()` 12-trig every call), `palette_manual_colour()` (~48-stop scan), `effect_palette_or_chroma_colour()` (~35 µs — the chromatic hot path). Hoist once; for genuine per-LED hue variation use a ≤16-stop hue LUT + lerp.
+- **`powf` per-LED → multiply; `sinf` per-LED → incremental angle-addition recurrence.**
+- `render_us` is **data-dependent** (lit-pixel count, palette vs chromatic) — measure at full illumination via `:vp_stream=on`.
 
 ## Anti-Patterns (Will Be Rejected in Review)
 
@@ -127,6 +150,10 @@ Before writing any audio-reactive effect:
 | Frame-count timing (`counter++`) | Speed varies with frame rate; use `ctx.dt` |
 | Rigid frequency-to-visual bindings | Musical context changes meaning of frequency bands |
 | Effect-internal speed/intensity knobs | Conflicts with modifier system; use modifiers |
+| **Raw audio → brightness (no easing)** | **Stuttering on/off, amateur. Assert an asymmetric follower (fast attack, slow release) on every audio drive. THE #1 rejection cause.** |
+| **Hard silence gate (`snap.silence ? 0`)** | Snaps to black. Ease the gate through a follower (~0.3 s release). |
+| **Heavy colour helper called per-LED** | Blows the 2.0 ms ceiling. Sample frame-constant colour once/frame; LUT per-LED hue. |
+| **Pure beat-gated brightness, no bed** | Robotic strobe on sparse beats. Favour continuous-audio drives with a floor. |
 
 ---
 
@@ -134,6 +161,7 @@ Before writing any audio-reactive effect:
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-03-18 | agent:embedded-firmware-engineer | Created -- codified K1 LGP effect development patterns from 7 SpectraSynq projects |
+| 2026-07-11 | agent:claude-opus-4-8 | Added MANDATORY temporal-easing + per-frame perf-discipline sections + 4 anti-patterns (from the gem-port session's amateur-look rejections); corrected stale fork-API note (SPECTRASYNQ names, probe coverage, easing.h); pointed to docs/effect-craft/PORTING_CRAFT_CANON.md. |
 
 ---
 ## ⚠ CURRENT FORK API CORRECTION (2026-06-04) — load-bearing
@@ -141,8 +169,9 @@ The `RenderContext` / `ctx.controlBus` / `Effect[]`-in-`main.cpp` / zone-buffer 
 
 Current fork contract (verify against source before quoting):
 - effect signatures are heterogeneous; the BLOOM/Ember lineage is `void light_mode_<name>(CRGB16* leds_prev_buffer, ChannelEffectState& fx)`
-- dispatched in `SENSORY_BRIDGE_FIRMWARE/SENSORY_BRIDGE_FIRMWARE.ino` `render_lightshow_for_channel(...)`; registered via append-only enum in `system/config_types.h`, prototype in `visual/lightshow_modes.h`, mode name in `system/system.h`
-- pixels are `leds_16` (CRGB16); colour via `effect_palette_or_chroma_colour(...)` / `chromagram_centroid_hue()`; centre-origin via `mirror_image_downwards`
+- dispatched in `SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino` `dispatch_legacy_lightshow(...)`; registered via append-only enum in `system/config_types.h`, prototype in `visual/lightshow_modes.h`, mode name in `system/system.h`; **probe coverage** (a dispatch arm + `vp_probe_print_mode` line in `visual/lightshow_modes.h`) is mandatory and enforced by `tests/test_vp_probe_mode_coverage_static.py`
+- pixels are `leds_16` (CRGB16); colour via `effect_particle_colour(...)` / `effect_palette_or_chroma_colour(...)` / `chromagram_centroid_hue()`; centre-origin via `mirror_image_downwards` (author upper half `[80,160)`, zero lower, then `finalize_additive_frame` + mirror)
+- easing/decay primitives: `visual/easing.h` (`k1ease::follow/ema/decay/safe_dt/peak_follow`)
 - there is NO RenderContext / ControlBus / modifier-slot system in this fork
 
-Apply the LAWS above (centre-origin, no rainbow, no flash, no heap in render, dt-timing, musical-saliency filtering) — but build to the fork's REAL signature. Fork-specific method: `docs/architecture/effect-decomposition/` + the `k1-motion-canon` skill. (Logged per `load-bearing-edges`: a canonised wrong-node API.)
+Apply the LAWS above (centre-origin, no rainbow, no flash, no heap in render, dt-timing, musical-saliency filtering, **mandatory temporal easing**, **per-frame perf discipline**) — but build to the fork's REAL signature. **Full fork method: `docs/effect-craft/PORTING_CRAFT_CANON.md`** + `docs/architecture/effect-decomposition/` + the `k1-motion-canon` skill. (Logged per `load-bearing-edges`: a canonised wrong-node API.)

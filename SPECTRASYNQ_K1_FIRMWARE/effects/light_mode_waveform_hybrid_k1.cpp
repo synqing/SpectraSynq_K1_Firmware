@@ -218,7 +218,13 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   float amp = fx.wfhyb_peak_last * (WFHYB_DOT_GAIN / WFHYB_SENSITIVITY);
   if (amp > 1.0f) amp = 1.0f;
   if (amp < 0.0f) amp = 0.0f;  // peak envelope is non-negative -> dot in upper half
-  const float pos_f = float(HALF) + amp * float(HALF);
+  float pos_f = float(HALF) + amp * float(HALF);
+  // At amp==1 the verbatim port yields pos_f==NATIVE_RESOLUTION, whose pos_i and
+  // pos_i+1 both fail the `< NATIVE_RESOLUTION` guards below, making the dot
+  // vanish at peak amplitude. Clamp onto the last physical pixel so the peak dot
+  // is always drawn.
+  const float pos_max = float(NATIVE_RESOLUTION - 1);
+  if (pos_f > pos_max) pos_f = pos_max;
   const int pos_i = int(pos_f);
   const float frac = pos_f - float(pos_i);
   if (pos_i >= int(HALF) && pos_i < int(NATIVE_RESOLUTION)) {

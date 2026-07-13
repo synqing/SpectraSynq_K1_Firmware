@@ -154,9 +154,15 @@ void light_mode_iris(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     if (w <= 0.004f) continue;
     const SQ15x16 weight = SQ15x16(w);
     const uint16_t idx = HALF + k;
-    leds_16[idx].r += disc_col.r * weight;
-    leds_16[idx].g += disc_col.g * weight;
-    leds_16[idx].b += disc_col.b * weight;
+    // OVERWRITE (not +=): the disc interior is re-authored every frame from the
+    // envelope-scaled disc_col. Adding on top of the faded history (memcpy + fade
+    // above) double-counts the filled region and accumulates geometrically
+    // (~1/(1-fade) ≈ 10x), clamping the whole disc to full and defeating the
+    // global_gain brightness envelope. History is retained only for pixels the
+    // membrane no longer covers (w<=threshold above) — i.e. the moving edge/trail.
+    leds_16[idx].r = disc_col.r * weight;
+    leds_16[idx].g = disc_col.g * weight;
+    leds_16[idx].b = disc_col.b * weight;
   }
 
   // ==========================================================================

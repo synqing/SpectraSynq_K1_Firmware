@@ -502,6 +502,9 @@ void check_encoders(uint32_t t_now) {
             if (!secondaryMode) {
                 // Primary channel is active, cycle primary mode
                 CONFIG.LIGHTSHOW_MODE = (CONFIG.LIGHTSHOW_MODE + 1) % NUM_MODES;
+                // Skip tombstoned/disabled modes so the physical encoder honours the
+                // "unreachable in every selection path" contract (config_types.h).
+                CONFIG.LIGHTSHOW_MODE = light_mode_next_enabled(CONFIG.LIGHTSHOW_MODE, 1);
                 if (true){
                     USBSerial.print("[DBG E3] Single Press Timeout | New Light Mode [Ch1]: ");
                     USBSerial.print(mode_names + (CONFIG.LIGHTSHOW_MODE * 32)); 
@@ -510,6 +513,8 @@ void check_encoders(uint32_t t_now) {
             } else {
                 // Secondary channel is active, cycle secondary mode
                 SECONDARY_LIGHTSHOW_MODE = (SECONDARY_LIGHTSHOW_MODE + 1) % NUM_MODES;
+                // Skip tombstoned/disabled modes (see primary path above).
+                SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(SECONDARY_LIGHTSHOW_MODE, 1);
                  if (true){
                     USBSerial.print("[DBG E3] Single Press Timeout | New Light Mode [Ch2]: ");
                     USBSerial.print(mode_names + (SECONDARY_LIGHTSHOW_MODE * 32)); 

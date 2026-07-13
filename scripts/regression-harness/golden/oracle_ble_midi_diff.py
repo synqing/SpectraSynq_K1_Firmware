@@ -308,14 +308,21 @@ def run_property(m: dict, firmware_root: Path | None = None):
         out.append((label, bool(cond)))
 
     em = enabled_modes(firmware_root)
-    check(f"enabled modes re-derived from config_types.h == 22 (got {em['enabled_count']})",
-          em["enabled_count"] == 22)
-    check(f"NUM_MODES roster == 30 (got {em['num_modes']})", em["num_modes"] == 30)
+    # Roster locked to the captivation-families release (37 modes, 26 enabled):
+    # NUM_MODES grew 30->37 (Shockwave 35 + Iris 36 + the 2026-07 gem ports) and the
+    # enabled count is 26 after tombstoning 30/33/34. These are hard-locked so an
+    # accidental future roster change trips the gate.
+    check(f"enabled modes re-derived from config_types.h == 26 (got {em['enabled_count']})",
+          em["enabled_count"] == 26)
+    check(f"NUM_MODES roster == 37 (got {em['num_modes']})", em["num_modes"] == 37)
     check(f"mode 29 ({em['mode29_name']}) is enabled", em["mode29_enabled"])
 
     modes = [e for e in m["entries"] if e["type"] == "mode"]
     check(f"mode controls present ({len(modes)}: primary+secondary)", len(modes) == 2)
-    check("every ordinal 0..29 is PC-addressable (value<=127)", all(o <= 127 for o in range(30)))
+    # Cover the WHOLE roster (0..NUM_MODES-1) so the new modes 30..36 — including
+    # Shockwave (35) and Iris (36) — are verified PC-addressable, not just 0..29.
+    check(f"every ordinal 0..{em['num_modes'] - 1} is PC-addressable (value<=127)",
+          all(o <= 127 for o in range(em["num_modes"])))
 
     # 14-bit float monotonicity + resolution
     mono_ok = res_ok = True
@@ -409,7 +416,7 @@ def assert_gate() -> int:
         ok = ok and passed
     print("\nBLE_MIDI_DIFF_GATE:",
           "PROVEN -- MIDI ingress reconstructs the WS record (exact for discrete, "
-          "14-bit-resolution for floats); 22 modes addressable" if ok
+          "14-bit-resolution for floats); 26 enabled modes, full 37-mode roster PC-addressable" if ok
           else "FAILED -- decoder/map diverges from the WS record contract")
     return 0 if ok else 1
 
