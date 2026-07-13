@@ -56,7 +56,18 @@ audit remains an immutable record of what was known when it ran.
 - [FACT] The batch runner requires the corrected IM73D probe, exactly 120000 ms
   per track, explicit port/chip/environment, concurrent AP cadence capture,
   PASS-only capture reuse, checkpointed manifests, and exact command logging.
-- [FACT] Host verification is `731 passed, 1 skipped`; production V2, corrected
+- [FACT] The session target pin now fingerprints build-relevant working-tree
+  bytes as well as HEAD and rejects any source drift after pinning.
+- [FACT] Corpus execution rejects a stale preflight, a changed manifest, or a
+  changed local audio file before playback begins.
+- [FACT] Each 120-second capture emits a progress heartbeat every ten seconds,
+  and the batch runner streams child output rather than appearing stalled.
+- [FACT] The generated measurement Markdown embeds the exact batch rerun
+  command and names the literal per-track command ledger.
+- [FACT] A synthetic end-to-end integration test proves PASS-capture resume,
+  real C++ novelty replay, scoring, command-ledger completion, and Markdown
+  reproduction output.
+- [FACT] Host verification is `738 passed, 1 skipped`; production V2, corrected
   bench V2 probe, and bench V1-off control all build successfully.
 
 ## Exact Verification Commands
@@ -76,6 +87,7 @@ python3 scripts/regression-harness/device_novelty_corpus_preflight.py \
 ```bash
 cd /Users/spectrasynq/SpectraSynq_K1_Firmware
 python3 -m pytest tests/ -q
+python3 -m pytest tests/test_device_novelty_corpus_end_to_end.py -q
 pio run -e k1_hardware
 pio run -e k1_bench_ap_frontend_probe
 pio run -e k1_bench_ap_frontend_probe_v1_off

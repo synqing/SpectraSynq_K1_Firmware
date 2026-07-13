@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import time
@@ -12,6 +13,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_STATE = ROOT / ".devin" / "k1-session-target.json"
 MANIFEST = Path(__file__).resolve().with_name("k1_device_identities.json")
+SOURCE_ROOTS = (
+    Path("platformio.ini"),
+    Path("SPECTRASYNQ_K1_FIRMWARE"),
+    Path("libraries"),
+    Path("scripts/platformio"),
+)
+SOURCE_IGNORES = {".DS_Store", "__pycache__"}
 
 
 def normalise_port(value: str) -> str:
@@ -27,6 +35,37 @@ def current_head() -> str:
     return subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
     ).strip()
+
+
+def current_source_fingerprint(root: Path = ROOT) -> str:
+    """Hash the bytes that can affect a PlatformIO K1 build.
+
+    This deliberately fingerprints the working tree, not only tracked git
+    state. A dirty edit or untracked source file therefore invalidates a pin
+    rather than silently sharing the same embedded HEAD provenance.
+    """
+    digest = hashlib.sha256()
+    files: list[Path] = []
+    for relative in SOURCE_ROOTS:
+        candidate = root / relative
+        if candidate.is_file():
+            files.append(candidate)
+        elif candidate.is_dir():
+            files.extend(
+                path
+                for path in candidate.rglob("*")
+                if path.is_file()
+                and not any(part in SOURCE_IGNORES for part in path.relative_to(root).parts)
+                and path.suffix != ".pyc"
+            )
+    for path in sorted(files, key=lambda item: item.relative_to(root).as_posix()):
+        relative = path.relative_to(root).as_posix().encode("utf-8")
+        digest.update(len(relative).to_bytes(4, "big"))
+        digest.update(relative)
+        with path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+    return digest.hexdigest()
 
 
 def load_manifest(path: Path = MANIFEST) -> dict:
@@ -70,6 +109,7 @@ def create_pin(
     now: int | None = None,
     ttl_seconds: int = 14400,
     head: str | None = None,
+    source_fingerprint: str | None = None,
 ) -> dict:
     if not envs:
         raise RuntimeError("at least one --env is required")
@@ -107,6 +147,7 @@ def create_pin(
         "allowed_envs": sorted(set(envs)),
         "purpose": purpose,
         "git_head": head or current_head(),
+        "source_fingerprint": source_fingerprint or current_source_fingerprint(),
         "created_epoch": created,
         "expires_epoch": created + ttl_seconds,
     }
@@ -125,6 +166,7 @@ def validate_session_pin(
     ports: list[dict[str, object]] | None = None,
     now: int | None = None,
     head: str | None = None,
+    source_fingerprint: str | None = None,
 ) -> tuple[bool, str]:
     if not state_path.is_file():
         return False, f"session target pin missing: {state_path}"
@@ -138,6 +180,9 @@ def validate_session_pin(
     live_head = head or current_head()
     if pin.get("git_head") != live_head:
         return False, f"session target pin HEAD drift: pinned {pin.get('git_head')}, live {live_head}"
+    live_source = source_fingerprint or current_source_fingerprint()
+    if pin.get("source_fingerprint") != live_source:
+        return False, "session target pin source drift: build-relevant working-tree bytes changed"
     if env not in pin.get("allowed_envs", []):
         return False, f"environment {env} is not in the session target pin"
     if normalise_port(port) not in {
@@ -154,7 +199,10 @@ def validate_session_pin(
     actual = normalise_id(live.get("serial_number"))
     if actual != normalise_id(pin.get("usb_serial")):
         return False, f"pinned port USB identity mismatch: expected {pin.get('usb_serial')}, observed {actual or 'NONE'}"
-    return True, f"session target verified: {pin['role']} chip {pin['chip_id']} env {env} HEAD {live_head[:8]}"
+    return True, (
+        f"session target verified: {pin['role']} chip {pin['chip_id']} env {env} "
+        f"HEAD {live_head[:8]} source {live_source[:12]}"
+    )
 
 
 def main() -> int:

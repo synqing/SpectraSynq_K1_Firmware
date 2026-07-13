@@ -100,3 +100,15 @@ def test_runtime_identity_rejects_plausible_wrong_board_output():
     )
     assert any("build env mismatch" in error for error in errors)
     assert any("runtime chip mismatch" in error for error in errors)
+
+
+def test_corpus_scorer_renders_exact_rerun_command(tmp_path):
+    ledger = tmp_path / "commands.json"
+    ledger.write_text(
+        '{"entry_command":"python3 scripts/regression-harness/device_novelty_corpus_run.py corpus.json --port /dev/cu.usbmodem1401"}'
+    )
+    lines, command = scorer.reproduction_section(ledger)
+    assert command is not None
+    assert "/dev/cu.usbmodem1401" in command
+    assert "```bash" in lines
+    assert any(str(ledger) in line for line in lines)

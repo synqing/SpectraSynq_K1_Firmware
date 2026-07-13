@@ -257,15 +257,15 @@ def _percentile(values: list[int], pct: float):
     return float(ordered[lo] * (1.0 - frac) + ordered[hi] * frac)
 
 
-def _near_bpm(value: float, expected_bpm: int, tolerance_bpm: int) -> bool:
-    return abs(int(round(value)) - int(expected_bpm)) <= int(tolerance_bpm)
+def _near_bpm(value: float, expected_bpm: float, tolerance_bpm: int) -> bool:
+    return abs(float(value) - float(expected_bpm)) <= float(tolerance_bpm)
 
 
 def summarise_frames(
     frames: list[dict],
     warm_ms: int,
     high_conf: float,
-    expected_bpm: int,
+    expected_bpm: float,
     near_bpm_tolerance: int,
 ) -> dict:
     if not frames:
@@ -304,7 +304,7 @@ def summarise_frames(
     }
 
 
-def classify(audit: dict, replay: dict, expected_bpm: int, near_bpm_tolerance: int) -> str:
+def classify(audit: dict, replay: dict, expected_bpm: float, near_bpm_tolerance: int) -> str:
     if audit.get("row_count", 0) == 0:
         return "invalid_no_nov"
     if audit.get("emit_gap_count", 0) or audit.get("timestamp_regression_count", 0):
@@ -349,7 +349,7 @@ def main(argv=None) -> int:
     )
     parser.add_argument("--warm-ms", type=int, default=15000)
     parser.add_argument("--high-conf", type=float, default=0.60)
-    parser.add_argument("--expected-bpm", type=int, default=127)
+    parser.add_argument("--expected-bpm", type=float, default=127.0)
     parser.add_argument("--near-bpm-tolerance", type=int, default=3)
     args = parser.parse_args(argv)
 

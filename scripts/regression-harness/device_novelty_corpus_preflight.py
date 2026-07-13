@@ -182,6 +182,7 @@ def main() -> int:
     report = {
         "verdict": "PASS" if not errors else "INVALID",
         "manifest": str(args.manifest.resolve()),
+        "manifest_sha256": sha256(args.manifest),
         "method": {
             "gt_authority": "cited catalogue BPM in the manifest",
             "audio_check": "decoded local file novelty has an ACF local maximum within 4% of cited BPM",

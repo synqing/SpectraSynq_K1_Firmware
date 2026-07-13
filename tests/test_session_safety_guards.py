@@ -37,6 +37,7 @@ def make_pin(tmp_path, **overrides):
         now=100,
         ttl_seconds=300,
         head="abc123",
+        source_fingerprint="source123",
     )
     args.update(overrides)
     return target.create_pin(**args), args["state_path"]
@@ -46,26 +47,42 @@ def test_session_pin_accepts_exact_live_target(tmp_path):
     _, path = make_pin(tmp_path)
     ok, message = target.validate_session_pin(
         "k1_bench_ap_frontend_probe", "/dev/cu.usbmodem1401",
-        state_path=path, ports=BENCH_PORTS, now=200, head="abc123",
+        state_path=path, ports=BENCH_PORTS, now=200, head="abc123", source_fingerprint="source123",
     )
     assert ok, message
 
 
 @pytest.mark.parametrize(
-    "env,port,ports,now,head,fragment",
+    "env,port,ports,now,head,source_fingerprint,fragment",
     [
-        ("k1_hardware", "/dev/cu.usbmodem1401", BENCH_PORTS, 200, "abc123", "not in"),
-        ("k1_bench_im73d", "/dev/cu.usbmodem12401", BENCH_PORTS, 200, "abc123", "not in"),
-        ("k1_bench_im73d", "/dev/cu.usbmodem1401", BENCH_PORTS, 401, "abc123", "expired"),
-        ("k1_bench_im73d", "/dev/cu.usbmodem1401", BENCH_PORTS, 200, "def456", "HEAD drift"),
-        ("k1_bench_im73d", "/dev/cu.usbmodem1401", [{"device": "/dev/cu.usbmodem1401", "serial_number": "B4:3A:45:A5:87:F8"}], 200, "abc123", "identity mismatch"),
+        ("k1_hardware", "/dev/cu.usbmodem1401", BENCH_PORTS, 200, "abc123", "source123", "not in"),
+        ("k1_bench_im73d", "/dev/cu.usbmodem12401", BENCH_PORTS, 200, "abc123", "source123", "not in"),
+        ("k1_bench_im73d", "/dev/cu.usbmodem1401", BENCH_PORTS, 401, "abc123", "source123", "expired"),
+        ("k1_bench_im73d", "/dev/cu.usbmodem1401", BENCH_PORTS, 200, "def456", "source123", "HEAD drift"),
+        ("k1_bench_im73d", "/dev/cu.usbmodem1401", BENCH_PORTS, 200, "abc123", "changed", "source drift"),
+        ("k1_bench_im73d", "/dev/cu.usbmodem1401", [{"device": "/dev/cu.usbmodem1401", "serial_number": "B4:3A:45:A5:87:F8"}], 200, "abc123", "source123", "identity mismatch"),
     ],
 )
-def test_session_pin_fault_battery_rejects_drift(tmp_path, env, port, ports, now, head, fragment):
+def test_session_pin_fault_battery_rejects_drift(
+    tmp_path, env, port, ports, now, head, source_fingerprint, fragment
+):
     _, path = make_pin(tmp_path)
-    ok, message = target.validate_session_pin(env, port, state_path=path, ports=ports, now=now, head=head)
+    ok, message = target.validate_session_pin(
+        env, port, state_path=path, ports=ports, now=now, head=head,
+        source_fingerprint=source_fingerprint,
+    )
     assert not ok
     assert fragment in message
+
+
+def test_source_fingerprint_changes_when_build_source_changes(tmp_path):
+    (tmp_path / "SPECTRASYNQ_K1_FIRMWARE").mkdir()
+    source = tmp_path / "SPECTRASYNQ_K1_FIRMWARE" / "probe.cpp"
+    source.write_text("int value = 1;\n")
+    before = target.current_source_fingerprint(tmp_path)
+    source.write_text("int value = 2;\n")
+    after = target.current_source_fingerprint(tmp_path)
+    assert before != after
 
 
 def test_delegation_guard_caps_active_launches_and_releases_on_close():

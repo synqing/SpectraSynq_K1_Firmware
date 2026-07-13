@@ -10,6 +10,7 @@ run can resume without repeating valid 120-second captures.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import shlex
 import subprocess
@@ -45,9 +46,33 @@ def display_command(argv: list[str]) -> str:
     return shlex.join(rendered)
 
 
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def run_command(argv: list[str]) -> subprocess.CompletedProcess[str]:
     print(f"+ {display_command(argv)}", flush=True)
-    return subprocess.run(argv, check=True, text=True, capture_output=True)
+    process = subprocess.Popen(
+        argv,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        bufsize=1,
+    )
+    lines: list[str] = []
+    assert process.stdout is not None
+    for line in process.stdout:
+        lines.append(line)
+        print(line, end="", flush=True)
+    return_code = process.wait()
+    stdout = "".join(lines)
+    if return_code:
+        raise subprocess.CalledProcessError(return_code, argv, output=stdout)
+    return subprocess.CompletedProcess(argv, return_code, stdout, "")
 
 
 def parse_written_path(stdout: str, key: str) -> Path:
@@ -150,8 +175,20 @@ def validate_inputs(args: argparse.Namespace, manifest: dict[str, object], prefl
         raise RuntimeError("corpus preflight verdict is not PASS")
     if Path(str(preflight.get("manifest", ""))).resolve() != args.manifest.resolve():
         raise RuntimeError("preflight report does not name this source manifest")
+    if preflight.get("manifest_sha256") != sha256(args.manifest):
+        raise RuntimeError("preflight report is stale: source manifest SHA-256 changed")
     if not manifest.get("tracks"):
         raise RuntimeError("source manifest has no tracks")
+    preflight_rows = {str(row.get("id")): row for row in preflight.get("tracks", [])}
+    for track in manifest["tracks"]:
+        path = Path(str(track["track_file"])).expanduser()
+        row = preflight_rows.get(str(track["id"]))
+        if row is None or row.get("verdict") != "PASS":
+            raise RuntimeError(f"{track['id']}: no matching PASS preflight row")
+        if not path.is_file() or sha256(path) != track.get("track_sha256"):
+            raise RuntimeError(f"{track['id']}: local track SHA-256 changed after preflight")
+        if row.get("track_sha256") != track.get("track_sha256"):
+            raise RuntimeError(f"{track['id']}: preflight track SHA-256 does not match manifest")
 
 
 def main() -> int:
@@ -171,7 +208,6 @@ def main() -> int:
             commands.append({"track": str(track["id"]), "stage": "capture", "command": display_command(capture_argv)})
             write_checkpoints(args, manifest, rows, commands)
             result = run_command(capture_argv)
-            print(result.stdout, end="")
             summary_path = parse_written_path(result.stdout, "summary")
         else:
             commands.append({"track": str(track["id"]), "stage": "capture", "command": "REUSED PASS capture: " + str(summary_path)})
@@ -182,8 +218,7 @@ def main() -> int:
         replay_argv = replay_command(track, capture)
         commands.append({"track": str(track["id"]), "stage": "replay", "command": display_command(replay_argv)})
         write_checkpoints(args, manifest, rows, commands)
-        replay = run_command(replay_argv)
-        print(replay.stdout, end="")
+        run_command(replay_argv)
         rows.append(
             {
                 "id": track["id"],
@@ -204,6 +239,8 @@ def main() -> int:
         str(args.score_manifest),
         "--baseline-csv",
         str(args.baseline_csv),
+        "--commands-json",
+        str(args.commands_out),
         "--out-json",
         str(args.out_json),
         "--out-md",
@@ -211,8 +248,7 @@ def main() -> int:
     ]
     commands.append({"track": "ALL", "stage": "score", "command": display_command(score_argv)})
     write_checkpoints(args, manifest, rows, commands)
-    scored = run_command(score_argv)
-    print(scored.stdout, end="")
+    run_command(score_argv)
     command_report = json.loads(args.commands_out.read_text(encoding="utf-8"))
     command_report["verdict"] = "COMPLETE"
     args.commands_out.write_text(json.dumps(command_report, indent=2, sort_keys=True) + "\n", encoding="utf-8")

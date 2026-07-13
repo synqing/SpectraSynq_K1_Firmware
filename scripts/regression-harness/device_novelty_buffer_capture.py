@@ -354,8 +354,17 @@ def main():
         afplay = subprocess.Popen(["/usr/bin/afplay", str(track)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         capture_start = time.monotonic()
         capture_deadline = time.time() + (args.duration_ms / 1000.0)
+        next_progress_ms = 10000
         capture_carry = ""
         while time.time() < capture_deadline:
+            elapsed_ms = int(round((time.monotonic() - capture_start) * 1000.0))
+            if elapsed_ms >= next_progress_ms:
+                print(
+                    f"CAPTURE_PROGRESS elapsed_ms={elapsed_ms} target_ms={args.duration_ms} "
+                    f"track={args.label}",
+                    flush=True,
+                )
+                next_progress_ms += 10000
             chunk = ser.read(ser.in_waiting or 1)
             if not chunk:
                 if afplay.poll() is not None:

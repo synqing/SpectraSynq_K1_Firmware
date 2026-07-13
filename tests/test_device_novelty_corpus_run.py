@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 import sys
 from argparse import Namespace
@@ -45,6 +46,24 @@ def track() -> dict[str, object]:
     }
 
 
+def valid_inputs(tmp_path: Path):
+    values = args(tmp_path)
+    audio = tmp_path / "track.mp3"
+    audio.write_bytes(b"fixed audio fixture")
+    row = track()
+    row["track_file"] = str(audio)
+    row["track_sha256"] = hashlib.sha256(audio.read_bytes()).hexdigest()
+    manifest = {"tracks": [row]}
+    values.manifest.write_text(json.dumps(manifest))
+    preflight = {
+        "verdict": "PASS",
+        "manifest": str(values.manifest.resolve()),
+        "manifest_sha256": runner.sha256(values.manifest),
+        "tracks": [{"id": row["id"], "verdict": "PASS", "track_sha256": row["track_sha256"]}],
+    }
+    return values, manifest, preflight, audio
+
+
 def test_capture_command_pins_port_chip_env_duration_and_cadence(tmp_path):
     command = runner.capture_command(args(tmp_path), track())
     rendered = runner.display_command(command)
@@ -55,16 +74,43 @@ def test_capture_command_pins_port_chip_env_duration_and_cadence(tmp_path):
     assert "--capture-apcad-soak" in rendered
 
 
+def test_run_command_streams_and_returns_child_output(capsys):
+    result = runner.run_command([sys.executable, "-c", "print('live-child-output', flush=True)"])
+    assert result.stdout == "live-child-output\n"
+    assert "live-child-output" in capsys.readouterr().out
+
+
 def test_validate_inputs_rejects_wrong_microphone_environment(tmp_path):
-    values = args(tmp_path)
+    values, manifest, preflight, _ = valid_inputs(tmp_path)
     values.expected_build_env = "k1_bench_reference"
-    preflight = {"verdict": "PASS", "manifest": str(values.manifest.resolve())}
     try:
-        runner.validate_inputs(values, {"tracks": [track()]}, preflight)
+        runner.validate_inputs(values, manifest, preflight)
     except RuntimeError as error:
         assert "k1_bench_ap_frontend_probe" in str(error)
     else:
         raise AssertionError("wrong environment was accepted")
+
+
+def test_validate_inputs_rejects_stale_preflight_manifest(tmp_path):
+    values, manifest, preflight, _ = valid_inputs(tmp_path)
+    values.manifest.write_text(json.dumps({"tracks": [], "changed": True}))
+    try:
+        runner.validate_inputs(values, manifest, preflight)
+    except RuntimeError as error:
+        assert "stale" in str(error)
+    else:
+        raise AssertionError("stale preflight was accepted")
+
+
+def test_validate_inputs_rejects_track_changed_after_preflight(tmp_path):
+    values, manifest, preflight, audio = valid_inputs(tmp_path)
+    audio.write_bytes(b"changed audio fixture")
+    try:
+        runner.validate_inputs(values, manifest, preflight)
+    except RuntimeError as error:
+        assert "changed after preflight" in str(error)
+    else:
+        raise AssertionError("changed track was accepted")
 
 
 def test_reusable_capture_requires_all_identity_and_integrity_fields(tmp_path):

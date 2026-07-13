@@ -25,6 +25,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", type=Path, help="JSON manifest containing a tracks array")
     parser.add_argument("--baseline-csv", type=Path, default=DEFAULT_BASELINE)
+    parser.add_argument("--commands-json", type=Path, help="Exact command ledger written by the corpus runner")
     parser.add_argument("--out-json", type=Path, required=True)
     parser.add_argument("--out-md", type=Path, required=True)
     return parser.parse_args()
@@ -113,6 +114,30 @@ def table_row(label: str, device: dict[str, object], baseline: dict[str, object]
     )
 
 
+def reproduction_section(commands_path: Path | None) -> tuple[list[str], str | None]:
+    if commands_path is None:
+        return [], None
+    commands = json.loads(commands_path.read_text(encoding="utf-8"))
+    entry = str(commands.get("entry_command", "")).strip()
+    if not entry:
+        raise RuntimeError(f"command ledger has no entry_command: {commands_path}")
+    return (
+        [
+            "",
+            "## Exact Re-run",
+            "",
+            "[FACT] The following command regenerates every device row and aggregate in this document:",
+            "",
+            "```bash",
+            entry,
+            "```",
+            "",
+            f"[FACT] The literal per-track capture, replay, and score child commands are preserved in `{commands_path}`.",
+        ],
+        entry,
+    )
+
+
 def main() -> int:
     args = parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
@@ -153,6 +178,7 @@ def main() -> int:
     baseline_rows = load_baseline(args.baseline_csv)
     device = aggregate_set(device_rows)
     baseline = aggregate_set(baseline_rows)
+    reproduction, rerun_command = reproduction_section(args.commands_json)
     result = {
         "verdict": "MEASURED",
         "metric_contract": {
@@ -164,6 +190,8 @@ def main() -> int:
         },
         "manifest": str(args.manifest),
         "baseline_csv": str(args.baseline_csv),
+        "commands_json": str(args.commands_json) if args.commands_json else None,
+        "rerun_command": rerun_command,
         "device": device,
         "baseline": baseline,
         "tracks": device_rows,
@@ -207,6 +235,7 @@ def main() -> int:
             f"{'PASS' if row['acc1'] else 'FAIL'} | {'PASS' if row['acc2'] else 'FAIL'} | "
             f"{row['octave']} | {percent(row['locked_frac'])} | {row['gt_source']} |"
         )
+    lines.extend(reproduction)
     args.out_md.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print(json.dumps({"verdict": "MEASURED", "tracks": len(device_rows), "out_json": str(args.out_json), "out_md": str(args.out_md)}, indent=2))
     return 0
