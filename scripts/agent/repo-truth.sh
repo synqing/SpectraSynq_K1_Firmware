@@ -42,10 +42,26 @@ else
 fi
 
 IM73D_GUARD="FAIL"
-if [ -f "$REPO_ROOT/scripts/platformio/k1_upload_guard.py" ] && grep -q 'k1_bench_im73d' "$REPO_ROOT/scripts/platformio/k1_upload_guard.py"; then
-  IM73D_GUARD="PASS"
+MANIFEST="$REPO_ROOT/scripts/platformio/k1_device_identities.json"
+GUARD_PY="$REPO_ROOT/scripts/platformio/k1_upload_guard.py"
+if [ -f "$GUARD_PY" ] && [ -f "$MANIFEST" ] && grep -q 'k1_device_identities\.json' "$GUARD_PY"; then
+  if python3 - "$MANIFEST" <<'PYEOF' >/dev/null 2>&1
+import json
+import sys
+from pathlib import Path
+
+manifest = Path(sys.argv[1])
+data = json.loads(manifest.read_text(encoding="utf-8"))
+envs = {env for row in data.get("authorized", []) for env in row.get("envs", [])}
+sys.exit(0 if "k1_bench_im73d" in envs else 1)
+PYEOF
+  then
+    IM73D_GUARD="PASS"
+  else
+    fail "k1_device_identities.json does not authorize k1_bench_im73d"
+  fi
 else
-  fail "k1_upload_guard.py does not reference k1_bench_im73d"
+  fail "upload guard must load k1_device_identities.json (manifest missing or guard not wired)"
 fi
 
 IM73D_PLAN="FAIL"
