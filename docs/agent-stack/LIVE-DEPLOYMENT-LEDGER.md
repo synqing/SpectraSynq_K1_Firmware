@@ -18,15 +18,15 @@
 
 ## Repo deployment status (sibling pointers)
 
-Deployed **2026-07-13** by agent:cursor (sibling pointer rollout).
+Deployed **2026-07-13** by agent:cursor (sibling pointer rollout). Pointer commits recorded after sibling `docs: link canonical agent-stack v1` landings.
 
-| Repo | Path | Herdr `workspace_id` | Pointer file | README / AGENTS line | Notes |
-|------|------|----------------------|--------------|----------------------|-------|
-| **K1.esp32s3** | `/Users/spectrasynq/Workspace_Management/Software/K1.esp32s3` | `w2` | `docs/agent-stack-link.md` | `AGENTS.md` (1 line) | ESP32-S3 renderer / OSC firmware |
-| **K1.juce** | `/Users/spectrasynq/Workspace_Management/Software/K1.juce` | `w3` | `docs/agent-stack-link.md` | `AGENTS.md` (1 line) | JUCE desktop host |
-| **K1.tab5** | `/Users/spectrasynq/Workspace_Management/Software/T-Keyboard-S3-Pro/K1.tab5` | `w4` | `docs/agent-stack-link.md` | `README.md` (1 line) | Tab5 deck controller; no `AGENTS.md` |
-| **SpectraSynq.LandingPage** | `/Users/spectrasynq/SpectraSynq.LandingPage` | `w5` | `docs/agent-stack-link.md` | `README.md` (1 line) | Active K1 FE landing; symlink to archive dir |
-| **SpectraSynq_K1_Firmware** | `/Users/spectrasynq/SpectraSynq_K1_Firmware` | `w1` | *(canonical)* | `AGENT_OS.md` §2 | Full stack + `knowledge/` authority |
+| Repo | Path | Herdr `workspace_id` | Pointer file | Pointer commit | README / AGENTS line | Notes |
+|------|------|----------------------|--------------|----------------|----------------------|-------|
+| **K1.esp32s3** | `/Users/spectrasynq/Workspace_Management/Software/K1.esp32s3` | `w2` | `docs/agent-stack-link.md` | `1b676a9` | `AGENTS.md` (1 line) | ESP32-S3 renderer / OSC firmware |
+| **K1.juce** | `/Users/spectrasynq/Workspace_Management/Software/K1.juce` | `w3` | `docs/agent-stack-link.md` | `d1620dd` | `AGENTS.md` (1 line) | JUCE desktop host |
+| **K1.tab5** | `/Users/spectrasynq/Workspace_Management/Software/T-Keyboard-S3-Pro/K1.tab5` | `w4` | `docs/agent-stack-link.md` | `c4837d8` | `README.md` (1 line) | Tab5 deck controller; no `AGENTS.md` |
+| **SpectraSynq.LandingPage** | `/Users/spectrasynq/SpectraSynq.LandingPage` | `w5` | `docs/agent-stack-link.md` | `f23c30f` | `README.md` (1 line) | Active K1 FE landing; symlink to archive dir |
+| **SpectraSynq_K1_Firmware** | `/Users/spectrasynq/SpectraSynq_K1_Firmware` | `w1` | *(canonical)* | — | `AGENT_OS.md` §2 | Full stack + `knowledge/` authority |
 
 ### Not deployed (surveyed, out of scope)
 
@@ -72,3 +72,4 @@ Qualification pilots run **autonomously on real work** when the campaign executo
 | 2026-07-13 | agent:cursor | Session run table + row #1 (live deployment Session 1) |
 | 2026-07-13 | agent:cursor | Qualification queue restored; w5 live path; Headroom/Ruflo READY (through 26442be7) |
 | 2026-07-13 | agent:cursor | Initial sibling pointer deployment (4 repos + ledger) |
+| 2026-07-13 | agent:cursor | Repo deployment status: sibling pointer commit SHAs (`1b676a9`, `d1620dd`, `c4837d8`, `f23c30f`) |
