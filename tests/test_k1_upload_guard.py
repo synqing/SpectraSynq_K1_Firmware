@@ -51,6 +51,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_reference",
             "k1_bench_tempo_probe",
             "k1_bench_ap_frontend_probe",
+            "k1_bench_ap_frontend_probe_v1_off",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
@@ -179,6 +180,29 @@ class K1UploadGuardTest(unittest.TestCase):
         text = GUARD_PATH.read_text()
         self.assertIn("pin_ok, pin_message = _validate_session_pin", text)
         self.assertIn("k1_session_target.py", text)
+
+    def test_bench_ap_frontend_probe_inherits_physical_im73d_backend(self):
+        text = PLATFORMIO.read_text()
+        section = text.split("[env:k1_bench_ap_frontend_probe]", 1)[1].split("[env:", 1)[0]
+        self.assertIn("extends = env:k1_bench_im73d", section)
+        self.assertIn("${env:k1_bench_im73d.build_flags}", section)
+        self.assertNotIn("extends = env:k1_bench_reference", section)
+
+    def test_bench_v1_off_probe_removes_promoted_flags_and_dependent_consumer(self):
+        text = PLATFORMIO.read_text()
+        section = text.split("[env:k1_bench_ap_frontend_probe_v1_off]", 1)[1].split("[env:", 1)[0]
+        self.assertIn("extends = env:k1_bench_ap_frontend_probe", section)
+        for flag in (
+            "K1_TEMPO_CONF_V2",
+            "K1_TEMPO_FLYWHEEL_V2",
+            "K1_ONSET_V2",
+            "K1_CHORD_V2",
+            "K1_SEMANTIC_STATE",
+        ):
+            self.assertEqual(section.count(f"-D{flag}"), 1)
+        self.assertEqual(section.count("-DK1_CHORD_HUE_V1"), 1)
+        self.assertNotIn("-DK1_DROP_CUT_V1", section)
+        self.assertNotIn("K1_MIC_IM73D_PDM_V1", section)
 
     def test_k1_pio_pre_includes_s3_sdkconfig_root(self):
         text = K1_SRC_INCLUDES.read_text()

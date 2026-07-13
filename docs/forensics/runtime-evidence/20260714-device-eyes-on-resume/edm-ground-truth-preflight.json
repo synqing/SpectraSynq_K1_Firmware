@@ -1,0 +1,457 @@
+{
+  "errors": [],
+  "manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-corpus.json",
+  "method": {
+    "analysis_seconds": 120.0,
+    "audio_check": "decoded local file novelty has an ACF local maximum within 4% of cited BPM",
+    "audio_check_role": "identity sanity check only; not replacement ground truth",
+    "gt_authority": "cited catalogue BPM in the manifest"
+  },
+  "required_band": {
+    "bpm_max": 135.0,
+    "bpm_min": 120.0,
+    "genre": "house/techno/EDM"
+  },
+  "tracks": [
+    {
+      "duration_s": 201.247347,
+      "errors": [],
+      "genre": "Mainstage / Big Room",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/animals-original-mix/4459187",
+      "id": "martin-garrix-animals-128",
+      "matching_acf_peak": {
+        "acf": 263.1295166044729,
+        "bpm": 126.984126984127,
+        "lag": 63
+      },
+      "title": "Animals",
+      "top_acf_peaks": [
+        {
+          "acf": 351.320179313151,
+          "bpm": 64.00000000000001,
+          "lag": 125
+        },
+        {
+          "acf": 263.1295166044729,
+          "bpm": 126.984126984127,
+          "lag": 63
+        },
+        {
+          "acf": 244.88371411842164,
+          "bpm": 85.10638297872342,
+          "lag": 94
+        },
+        {
+          "acf": 125.65752253091958,
+          "bpm": 73.39449541284405,
+          "lag": 109
+        },
+        {
+          "acf": 114.13831499579852,
+          "bpm": 102.56410256410257,
+          "lag": 78
+        },
+        {
+          "acf": -36.61079229428941,
+          "bpm": 70.17543859649123,
+          "lag": 114
+        },
+        {
+          "acf": -43.68640397135577,
+          "bpm": 117.64705882352942,
+          "lag": 68
+        },
+        {
+          "acf": -46.86861202780342,
+          "bpm": 89.88764044943821,
+          "lag": 89
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3",
+      "track_sha256": "174025b5ff4d326675cfb3b31b820e8448242d1b51d1a3b00e236e66373cc61a",
+      "verdict": "PASS"
+    },
+    {
+      "duration_s": 207.261315,
+      "errors": [],
+      "genre": "Dance / Pop EDM",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/dreams-feat-lanie-gardner/14632865",
+      "id": "david-guetta-morten-dreams-128",
+      "matching_acf_peak": {
+        "acf": 389.3960441700624,
+        "bpm": 126.984126984127,
+        "lag": 63
+      },
+      "title": "Dreams (feat. Lanie Gardner)",
+      "top_acf_peaks": [
+        {
+          "acf": 421.87322795976536,
+          "bpm": 64.00000000000001,
+          "lag": 125
+        },
+        {
+          "acf": 389.3960441700624,
+          "bpm": 126.984126984127,
+          "lag": 63
+        },
+        {
+          "acf": 382.41520537016544,
+          "bpm": 85.10638297872342,
+          "lag": 94
+        },
+        {
+          "acf": 377.43096862020127,
+          "bpm": 102.56410256410257,
+          "lag": 78
+        },
+        {
+          "acf": 343.4109666486652,
+          "bpm": 73.39449541284405,
+          "lag": 109
+        },
+        {
+          "acf": -44.41291934215897,
+          "bpm": 114.28571428571429,
+          "lag": 70
+        },
+        {
+          "acf": -46.13584920173945,
+          "bpm": 68.37606837606839,
+          "lag": 117
+        },
+        {
+          "acf": -46.20277126009163,
+          "bpm": 145.45454545454547,
+          "lag": 55
+        },
+        {
+          "acf": -60.652598330568665,
+          "bpm": 93.0232558139535,
+          "lag": 86
+        },
+        {
+          "acf": -61.937253709563564,
+          "bpm": 78.43137254901961,
+          "lag": 102
+        },
+        {
+          "acf": -87.38148691725618,
+          "bpm": 70.17543859649123,
+          "lag": 114
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/DavidGuettaMORTEN-Dreams.mp3",
+      "track_sha256": "51ed8bc5cf34055cc9c5fdde2378eca2f0dcb36d8168a39a6f7cbf464420e4f6",
+      "verdict": "PASS"
+    },
+    {
+      "duration_s": 187.988753,
+      "errors": [],
+      "genre": "Mainstage / Electro House",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/ghosts-n-stuff/23606643",
+      "id": "deadmau5-ghosts-n-stuff-128",
+      "matching_acf_peak": {
+        "acf": 226.58432921450495,
+        "bpm": 129.03225806451616,
+        "lag": 62
+      },
+      "title": "Ghosts 'n' Stuff (feat. Rob Swire)",
+      "top_acf_peaks": [
+        {
+          "acf": 226.58432921450495,
+          "bpm": 129.03225806451616,
+          "lag": 62
+        },
+        {
+          "acf": 219.40148718300827,
+          "bpm": 64.51612903225808,
+          "lag": 124
+        },
+        {
+          "acf": 111.63473599041092,
+          "bpm": 86.0215053763441,
+          "lag": 93
+        },
+        {
+          "acf": 18.42985233557625,
+          "bpm": 115.94202898550726,
+          "lag": 69
+        },
+        {
+          "acf": 1.7286616275040574,
+          "bpm": 145.45454545454547,
+          "lag": 55
+        },
+        {
+          "acf": -0.0423286602796481,
+          "bpm": 60.606060606060616,
+          "lag": 132
+        },
+        {
+          "acf": -5.168310180126032,
+          "bpm": 72.07207207207207,
+          "lag": 111
+        },
+        {
+          "acf": -6.530741151076219,
+          "bpm": 105.26315789473685,
+          "lag": 76
+        },
+        {
+          "acf": -8.978142467374035,
+          "bpm": 68.96551724137932,
+          "lag": 116
+        },
+        {
+          "acf": -12.001683306127923,
+          "bpm": 80.00000000000001,
+          "lag": 100
+        },
+        {
+          "acf": -13.035991943231982,
+          "bpm": 109.58904109589042,
+          "lag": 73
+        },
+        {
+          "acf": -14.580100182456174,
+          "bpm": 96.3855421686747,
+          "lag": 83
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/deadmau5-Ghosts'n'Stuff).mp3",
+      "track_sha256": "bad1b49e1b3bcbf1fd8a83b4880738be8295cc5773ff420454f4e64ce319ce4d",
+      "verdict": "PASS"
+    },
+    {
+      "duration_s": 202.060045,
+      "errors": [],
+      "genre": "Dance / Pop EDM",
+      "gt_bpm": 126.0,
+      "gt_source": "https://www.beatport.com/track/levels/15757104",
+      "id": "avicii-levels-126",
+      "matching_acf_peak": {
+        "acf": 354.57113737644164,
+        "bpm": 125.00000000000001,
+        "lag": 64
+      },
+      "title": "Levels (Radio Edit)",
+      "top_acf_peaks": [
+        {
+          "acf": 388.5033237861969,
+          "bpm": 62.99212598425198,
+          "lag": 127
+        },
+        {
+          "acf": 354.57113737644164,
+          "bpm": 125.00000000000001,
+          "lag": 64
+        },
+        {
+          "acf": 263.11107612843114,
+          "bpm": 84.21052631578948,
+          "lag": 95
+        },
+        {
+          "acf": 24.251321376711832,
+          "bpm": 101.26582278481014,
+          "lag": 79
+        },
+        {
+          "acf": 24.098669664791608,
+          "bpm": 72.07207207207207,
+          "lag": 111
+        },
+        {
+          "acf": -33.97017977663156,
+          "bpm": 148.14814814814815,
+          "lag": 54
+        },
+        {
+          "acf": -34.529933321100614,
+          "bpm": 89.88764044943821,
+          "lag": 89
+        },
+        {
+          "acf": -35.120875499190184,
+          "bpm": 111.11111111111113,
+          "lag": 72
+        },
+        {
+          "acf": -35.81904060634266,
+          "bpm": 78.43137254901961,
+          "lag": 102
+        },
+        {
+          "acf": -36.49389022762525,
+          "bpm": 140.35087719298247,
+          "lag": 57
+        },
+        {
+          "acf": -37.00302458154334,
+          "bpm": 108.10810810810813,
+          "lag": 74
+        },
+        {
+          "acf": -37.430457971198074,
+          "bpm": 93.0232558139535,
+          "lag": 86
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/Avicii-Levels.mp3",
+      "track_sha256": "27157153244a9cd223102a8c5c800f6f7594d6db50745fd21bb1204d5ceb0143",
+      "verdict": "PASS"
+    },
+    {
+      "duration_s": 266.518639,
+      "errors": [],
+      "genre": "Mainstage / Electro House",
+      "gt_bpm": 127.0,
+      "gt_source": "https://www.beatport.com/track/poseidon/12577047",
+      "id": "hi-lo-poseidon-127",
+      "matching_acf_peak": {
+        "acf": 413.9359281289252,
+        "bpm": 126.984126984127,
+        "lag": 63
+      },
+      "title": "Poseidon",
+      "top_acf_peaks": [
+        {
+          "acf": 413.9359281289252,
+          "bpm": 126.984126984127,
+          "lag": 63
+        },
+        {
+          "acf": 410.74114183494373,
+          "bpm": 63.4920634920635,
+          "lag": 126
+        },
+        {
+          "acf": 319.2269151165638,
+          "bpm": 85.10638297872342,
+          "lag": 94
+        },
+        {
+          "acf": 5.112860380277427,
+          "bpm": 101.26582278481014,
+          "lag": 79
+        },
+        {
+          "acf": 1.7399237275784127,
+          "bpm": 72.72727272727273,
+          "lag": 110
+        },
+        {
+          "acf": -38.565890856520106,
+          "bpm": 112.67605633802818,
+          "lag": 71
+        },
+        {
+          "acf": -39.179720664500664,
+          "bpm": 145.45454545454547,
+          "lag": 55
+        },
+        {
+          "acf": -39.29505060819941,
+          "bpm": 117.64705882352942,
+          "lag": 68
+        },
+        {
+          "acf": -39.50358783987623,
+          "bpm": 137.93103448275863,
+          "lag": 58
+        },
+        {
+          "acf": -39.68276444148627,
+          "bpm": 67.79661016949153,
+          "lag": 118
+        },
+        {
+          "acf": -43.511795349927844,
+          "bpm": 88.8888888888889,
+          "lag": 90
+        },
+        {
+          "acf": -44.49940077615255,
+          "bpm": 80.80808080808082,
+          "lag": 99
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/HI-LO-Poseidon).mp3",
+      "track_sha256": "0b6bd15625dad36344cb8aa654a83229148321f13c2393f4f10ed193c1475aaf",
+      "verdict": "PASS"
+    },
+    {
+      "duration_s": 299.514195,
+      "errors": [],
+      "genre": "Techno (Peak Time / Driving)",
+      "gt_bpm": 135.0,
+      "gt_source": "https://www.beatport.com/track/sgadi-li-mi/13636228",
+      "id": "charlotte-de-witte-sgadi-li-mi-135",
+      "matching_acf_peak": {
+        "acf": 656.7430523504969,
+        "bpm": 135.59322033898306,
+        "lag": 59
+      },
+      "title": "Sgadi Li Mi",
+      "top_acf_peaks": [
+        {
+          "acf": 656.7430523504969,
+          "bpm": 135.59322033898306,
+          "lag": 59
+        },
+        {
+          "acf": 601.7443584490533,
+          "bpm": 108.10810810810813,
+          "lag": 74
+        },
+        {
+          "acf": 595.2870296683226,
+          "bpm": 89.88764044943821,
+          "lag": 89
+        },
+        {
+          "acf": 594.7582396936962,
+          "bpm": 67.22689075630252,
+          "lag": 119
+        },
+        {
+          "acf": 566.6485105223717,
+          "bpm": 76.92307692307693,
+          "lag": 104
+        },
+        {
+          "acf": -118.6932701720399,
+          "bpm": 97.56097560975611,
+          "lag": 82
+        },
+        {
+          "acf": -119.35430036118863,
+          "bpm": 119.40298507462688,
+          "lag": 67
+        },
+        {
+          "acf": -119.78143018869012,
+          "bpm": 83.33333333333334,
+          "lag": 96
+        },
+        {
+          "acf": -123.02133061780059,
+          "bpm": 72.07207207207207,
+          "lag": 111
+        },
+        {
+          "acf": -123.03734177306924,
+          "bpm": 63.4920634920635,
+          "lag": 126
+        }
+      ],
+      "track_file": "/Users/spectrasynq/Downloads/CharlotteDeWitte-SgadiLiMi.mp3",
+      "track_sha256": "ade668d82ba590e53acbbae10c8c1db22e39701dc1fd8a033cc231491a27acd6",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": "PASS"
+}
