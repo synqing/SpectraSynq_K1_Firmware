@@ -16,6 +16,16 @@
 - **Hardware safety (unchanged):** identity = USB MAC never port names; upload guard on every flash; serial commands `:`-prefixed (bare bytes are hotkeys); N/Y cal ONLY on Captain's verbal silence-go — absolute, never inferred from any grant.
 - **▶ PARALLEL DELIVERABLE (2026-07-04) — IM73D + BLE-MIDI investor-demo build (`k1_bench_im73d_ble`):** SEPARATE from productionization and not currently flashed after R1. Reflash it only when BLE demo work resumes. The build runs the IM73D mic + a NimBLE BLE-MIDI central so the **K718 Remoted dial controls it live**; last demo proof was on earlier bench firmware — cal-abort guard device-proven (K718 unlinked); **outstanding** = dial-turn control-proof + K718-linked+streaming cal repro. Do NOT measure mic SNR on this radio build. Authority: [`docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`](../docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md).
 
+### Agent stack rollout COMPLETE (v1)
+
+- **Status:** Phases 0–6 **DONE** (standard stack v1 promoted 2026-07-13) — closure [`knowledge/research/agent-stack-rollout-complete-2026-07-13.md`](../knowledge/research/agent-stack-rollout-complete-2026-07-13.md)
+- **Manifest:** [`docs/agent-stack/STANDARD-STACK.md`](../docs/agent-stack/STANDARD-STACK.md) (canonical adopted tools, pins, forbidden paths)
+- **Authority:** [`docs/agent-stack/AUTHORITY-CONTRACT.md`](../docs/agent-stack/AUTHORITY-CONTRACT.md) (ratified)
+- **Knowledge:** [`knowledge/`](../knowledge/) — decisions, runbooks; OpenKnowledge MCP optional (`@inkeep/open-knowledge@0.29.1`); Markdown authoritative
+- **Onboarding:** [`knowledge/runbooks/agent-onboarding.md`](../knowledge/runbooks/agent-onboarding.md)
+- **Routing skill:** `knowledge-memory-routing` (`.cursor/skills/` + `.claude/skills/`)
+- Lane-orthogonal to firmware; does **not** override IM73D lane unless explicitly scoped.
+
 ### Source-of-truth hierarchy (current)
 1. Git branch + HEAD + working tree
 2. `platformio.ini` + `scripts/platformio/k1_upload_guard.py`

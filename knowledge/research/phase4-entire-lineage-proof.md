@@ -132,7 +132,7 @@ Evidence table: [`phase4-entire-session-log.md`](./phase4-entire-session-log.md)
 **Root cause (two defects):**
 
 1. **Dormant git hooks:** `core.hooksPath=scripts/hooks` — K1 pre-commit gate wins; Entire `.git/hooks/*` never run on normal commits (manual CLI invocation still no-op without session).
-2. **Claude Code hook CLI gap (`entire-cli@0.0.3`):** `.claude/settings.json` dispatches `entire hooks claude-code <event>`, but `entire` only implements `entire hooks git …` → `Unknown hooks subcommand: claude-code`. No `SessionStart` → no `sessionStore` entries → `manual-commit` cannot inject `Entire-Checkpoint` trailers.
+2. **npm `entire-cli@0.0.3` hook surface gap:** `entire --help` lists no `hooks` command; `entire hooks claude-code <event>` → `Unknown hooks subcommand: claude-code` (captured 2026-07-13). Pilot **did** run `entire enable --agent claude-code` per runbook; `.claude/settings.json` hook dispatchers remain non-functional on this npm build. No session store population → `entire rewind` empty.
 
 **Deferred:** Live checkpoint lineage requires Entire CLI fix (or upstream version) **and** a Claude Code session on this repo **and/or** chained Entire git hooks into `scripts/hooks/` after sessions exist.
 
@@ -145,7 +145,7 @@ Evidence table: [`phase4-entire-session-log.md`](./phase4-entire-session-log.md)
 | Five capture cycles (docs commits + hook probes) | **PASS** | §3.3; [`phase4-entire-session-log.md`](./phase4-entire-session-log.md) |
 | Checkpoints retrievable (`entire rewind` ≥1 point) | **DEFERRED** | Still empty after 10 manual git-hook invocations; blocked §3.3 |
 | No remote session push | **PASS** | `skipPushSessions: true`; no `git push`; no `refs/heads/entire/*` |
-| Five Claude Code sessions with session ids | **DEFERRED** | CLI `hooks claude-code` missing in 0.0.3 |
+| Five Claude Code sessions with session ids | **UNPROMOTED (retest on CLI upgrade)** | npm `0.0.3` lacks hook CLI; enable path documented |
 
 **P4-E03 verdict:** **DONE (methodology + CLI map + shell evidence)** — exit gate for Phase 4 task tracker; **live checkpoint retrieval** remains a follow-up when Claude Code runs on a fixed Entire CLI (or git hooks chained) and produces session store + `entire/checkpoints/v1`.
 
@@ -214,6 +214,7 @@ Operators running P4-E03 must record whether each session produced rewind points
 - Enable / hook audit: [`phase4-entire-pilot-proof.md`](./phase4-entire-pilot-proof.md)
 - Operator runbook: [`entire-local-pilot.md`](../runbooks/entire-local-pilot.md)
 - Dual-path ADR: [`agent-stack-entire-hooks-dual-path.md`](../decisions/agent-stack-entire-hooks-dual-path.md)
+- CLI limitation (P4-E03 deferred): [`agent-stack-entire-cli-limitation-2026-07-13.md`](../decisions/agent-stack-entire-cli-limitation-2026-07-13.md)
 - Task tracker: [`ACTIONABLE-TASKS.md`](../../docs/agent-stack/ACTIONABLE-TASKS.md) P4-E03
 
 ---

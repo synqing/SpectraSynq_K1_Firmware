@@ -1,6 +1,6 @@
 # Agent Stack — Actionable Task Backlog
 
-**Status:** Active backlog — Phase 0 complete, **Phase 1 exit criteria DONE** (2026-07-13; P1-08 contract debt remediated same day)  
+**Status:** Active backlog — Phase 0 complete, **Phase 1 DONE**, **Phase 2 DONE**, **Phase 3 DONE**, **Phase 4 DONE** (exit gate PASS with documented debt 2026-07-13; Captain go P4-08), **Phase 5 DONE** (compression benchmark PASS 2026-07-13; P5-05 promotion DEFERRED), **Phase 6 DONE** (standard stack v1 2026-07-13; Captain go P6-06)  
 **Parent:** [`PHASED-ROLLOUT.md`](./PHASED-ROLLOUT.md), [`AUTHORITY-CONTRACT.md`](./AUTHORITY-CONTRACT.md)  
 **Phase ledger:** [`knowledge/current-priorities.md`](../../knowledge/current-priorities.md)  
 **Legend:** Owner = role responsible; Dep = task IDs; Risk = H/M/L
@@ -12,10 +12,10 @@
 | ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
 |----|------|-------|-----|---------------------|------|--------|
 | P0-01 | Ratify `AUTHORITY-CONTRACT.md` with Captain | Captain | — | Captain sign-off recorded in `knowledge/decisions/` or PR comment | L | **DONE** |
-| P0-02 | Add `docs/agent-stack/` index link from `AGENT_OS.md` (governance section) | Knowledge curator | P0-01 | PR merged; `AGENT_OS.md` references agent-stack docs | L | Open — **non-blocking** for Phase 1 exit |
+| P0-02 | Add `docs/agent-stack/` index link from `AGENT_OS.md` (governance section) | Knowledge curator | P0-01 | PR merged; `AGENT_OS.md` references agent-stack docs | L | **DONE** — `AGENT_OS.md` §2 + [`STANDARD-STACK.md`](./STANDARD-STACK.md) pointer (P6-03) |
 | P0-03 | Document OpenKnowledge v0.29.1 pre-1.0 maturity risk in `knowledge/decisions/` | Knowledge curator | P0-01 | Decision doc with `status: verified`, rollback trigger defined | M | **DONE** |
 | P0-04 | Define promotion workflow spec (Claude-mem → OpenKnowledge) | Knowledge curator | P0-01 | Workflow in `SWARM-ORCHESTRATION.md` § Promotion; no auto-sync path | M | **DONE** |
-| P0-05 | Inventory existing verification assets (pytest, PIO, repo-truth) for agent-stack gates | Provenance auditor | — | Inventory table in Phase 6 eval doc; maps to gate types | L | Open — **non-blocking** for Phase 1 exit |
+| P0-05 | Inventory existing verification assets (pytest, PIO, repo-truth) for agent-stack gates | Provenance auditor | — | Inventory table in Phase 6 eval doc; maps to gate types | L | **DONE** — [`phase6-scorecard.md`](../../knowledge/research/phase6-scorecard.md) § Verification asset inventory |
 | P0-06 | Confirm AGPL implications for Herdr org deploy | Captain | — | Written note: deploy scope or defer org-wide | M | Open — **non-blocking** for Phase 1 exit |
 
 ---
@@ -31,7 +31,7 @@
 | P1-05 | Verify Codex plugin has **no** auto stop-gate enabled | Provenance auditor | P1-03 | Config audit log; explicit `DO NOT` in contract | H | **DONE** — `reviewGateEnabled: false` in audit |
 | P1-06 | Install sqlite-utils in operator environment | Agent | P0-01 | `sqlite-utils --version` succeeds on operator machine | L | **DONE** — [`phase1-sqlite-utils-proof.md`](../../knowledge/research/phase1-sqlite-utils-proof.md) |
 | P1-07 | Document read-only sqlite snapshot recipes (claude-mem DB, local stores) | Knowledge curator | P1-06 | Runbook in `knowledge/runbooks/sqlite-snapshots.md` | L | **DONE** — runbook + proof snapshot |
-| P1-08 | Run first manual Codex adversarial review on a docs-only PR | Reviewer | P1-04 | Handoff artifact archived; Captain rates usefulness 1–5 | M | **DONE** — [`phase1-p1-08-codex-adversarial-result.md`](../../knowledge/research/phase1-p1-08-codex-adversarial-result.md) (scoped `codex exec`, ~99KB); verdict **FAIL** on contract coherence (12 findings); Captain usefulness **pending**; agent-self-rated: **4** |
+| P1-08 | Run first manual Codex adversarial review on a docs-only PR | Reviewer | P1-04 | Handoff artifact archived; Captain rates usefulness 1–5 | M | **DONE** — [`phase1-p1-08-codex-adversarial-result.md`](../../knowledge/research/phase1-p1-08-codex-adversarial-result.md) (scoped `codex exec`, ~99KB); verdict **FAIL** on contract coherence (12 findings); Captain usefulness **not assessed**; agent-self-rated: **4** |
 | P1-09 | Add agent-stack bootstrap check to session ritual (read authority contract) | Knowledge curator | P0-02 | `AGENT_OS.md` or bootstrap script prints agent-stack reminder | L | **DONE** — `session-bootstrap.sh` + AGENT_OS pointer |
 
 ---
@@ -41,7 +41,7 @@
 | ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
 |----|------|-------|-----|---------------------|------|--------|
 | P2-01 | Scaffold `knowledge/` directory per authority contract layout | Knowledge curator | P0-04 | Dirs exist: index, product, architecture, decisions, runbooks, research | L | **DONE** — layout per contract |
-| P2-02 | Install/configure OpenKnowledge MCP v0.29.1 (project scope) | Implementer | P2-01 | MCP reachable; scoped to this repo only | M | **DONE** — `@inkeep/open-knowledge@0.29.1`; project `.mcp.json` only; `content.dir: knowledge` — [`phase2-openknowledge-mcp-proof.md`](../../knowledge/research/phase2-openknowledge-mcp-proof.md) |
+| P2-02 | Install/configure OpenKnowledge MCP v0.29.1 (project scope) | Implementer | P2-01 | MCP reachable; scoped to this repo only | M | **DONE** — `@inkeep/open-knowledge@0.29.1`; `.mcp.json` (Claude Code) + `.cursor/mcp.json` (Cursor, OK-only); no user-global; `content.dir: knowledge` — [`phase2-openknowledge-mcp-proof.md`](../../knowledge/research/phase2-openknowledge-mcp-proof.md) |
 | P2-03 | Write `knowledge/index.md` with navigation and maturity disclaimer | Knowledge curator | P2-01 | Links all subdirs; notes pre-1.0 risk | L | **DONE** — updated 2026-07-13 |
 | P2-04 | Migrate 3 high-value decisions from handoff/spec-index into `knowledge/decisions/` | Knowledge curator | P2-01 | Each has frontmatter: status, last_verified, sources | M | **DONE** — 4 decisions `status: verified` |
 | P2-05 | Configure manual git commits for knowledge (no auto GitHub sync) | Captain | P2-02 | Documented policy; no bot auto-push | L | **DONE** — [`openknowledge-manual-git-policy.md`](../../knowledge/runbooks/openknowledge-manual-git-policy.md) |
@@ -56,13 +56,13 @@
 | ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
 |----|------|-------|-----|---------------------|------|--------|
 | P3-01 | Author routing skill (`.cursor/skills/` + `.claude/skills/`) | Knowledge curator | P2-08 | Skill matches minimal routing content in authority contract | L | **DONE** — `.cursor/skills/knowledge-memory-routing/SKILL.md` + `.claude/skills/` mirror; verified 2026-07-13 via [`phase3-test1-fresh-handoff.md`](../../knowledge/research/phase3-test1-fresh-handoff.md) |
-| P3-02 | Author promote-learning workflow skill | Knowledge curator | P0-04 | Step list: identify → draft → review → frontmatter → commit | M | **DONE** — [`knowledge/runbooks/promote-learning.md`](../../knowledge/runbooks/promote-learning.md); end-to-end demo: [`repo-truth-im73d-manifest-check-2026-07-13.md`](../../knowledge/decisions/repo-truth-im73d-manifest-check-2026-07-13.md) § Promotion workflow trace |
+| P3-02 | Author promote-learning workflow skill | Knowledge curator | P0-04 | Step list: identify → draft → review → frontmatter → commit | M | **DONE** — runbook [`promote-learning.md`](../../knowledge/runbooks/promote-learning.md); skills `.cursor/skills/promote-learning/SKILL.md` + `.claude/skills/` mirror; demo [`repo-truth-im73d-manifest-check-2026-07-13.md`](../../knowledge/decisions/repo-truth-im73d-manifest-check-2026-07-13.md) § Promotion workflow trace |
 | P3-03 | Add promote-learning checklist to post-session report template | Knowledge curator | P3-02 | Template field: `openknowledge_promoted: <path\|none>` | L | **DONE** — [`knowledge/runbooks/promote-learning.md`](../../knowledge/runbooks/promote-learning.md); pointer + field in [`scripts/agent/post-session-report.md`](../../scripts/agent/post-session-report.md) |
 | P3-04 | **Test 1:** Fresh-agent handoff — new agent completes scoped task using only promoted knowledge + code | Tester | P3-01 | Task completed without Captain re-brief; evidence log | M | **DONE** — [`phase3-test1-retest.md`](../../knowledge/research/phase3-test1-retest.md) (PASS vs original FAIL in [`phase3-test1-fresh-handoff.md`](../../knowledge/research/phase3-test1-fresh-handoff.md); G1–G3 closed; G4/G5 residual non-blocking) |
 | P3-05 | **Test 2:** Old bug resurrection — agent finds prior fix via Claude-mem, confirms against code | Tester | P3-01 | Correct root cause cited; no doc/code conflict | M | **DONE** — [`phase3-test2-bug-resurrection.md`](../../knowledge/research/phase3-test2-bug-resurrection.md) (PASS; G1 `repo-truth.sh` manifest guard check fixed 2026-07-13) |
 | P3-06 | **Test 3:** Architectural decision retrieval — agent cites `knowledge/decisions/` not stale handoff | Tester | P3-01 | Decision doc cited with `last_verified`; git lane verified | M | **DONE** — [`phase3-test3-arch-decision.md`](../../knowledge/research/phase3-test3-arch-decision.md) (PASS; MEDIUM friction on promotion-not-sync grep gap closed by [`agent-stack-promotion-not-sync.md`](../../knowledge/decisions/agent-stack-promotion-not-sync.md)) |
-| P3-07 | Audit: confirm zero auto-sync pipelines Claude-mem → OpenKnowledge | Provenance auditor | P3-02 | Grep/config audit PASS; documented in audit log | H | **DONE** — audit log in [`repo-truth-im73d-manifest-check-2026-07-13.md`](../../knowledge/decisions/repo-truth-im73d-manifest-check-2026-07-13.md) § P3-07 auto-sync audit (2026-07-13; zero pipelines) |
-| P3-08 | Phase 3 exit gate: all 3 tests PASS + auditor sign-off | Captain | P3-04..07 | Written gate record in `knowledge/decisions/` | M | Open |
+| P3-07 | Audit: confirm zero auto-sync pipelines Claude-mem → OpenKnowledge | Provenance auditor | P3-02 | Grep/config audit PASS; documented in audit log | H | **DONE** — [`phase3-p3-07-auto-sync-audit.md`](../../knowledge/research/phase3-p3-07-auto-sync-audit.md) (2026-07-13; zero pipelines); prior inline log [`repo-truth-im73d-manifest-check-2026-07-13.md`](../../knowledge/decisions/repo-truth-im73d-manifest-check-2026-07-13.md) § P3-07 |
+| P3-08 | Phase 3 exit gate: all 3 tests PASS + auditor sign-off | Captain | P3-04..07 | Written gate record in `knowledge/decisions/` | M | **DONE** — Captain ratified autonomous go 2026-07-13; [`agent-stack-phase3-exit-gate-2026-07-13.md`](../../knowledge/decisions/agent-stack-phase3-exit-gate-2026-07-13.md); summary [`phase3-exit-gate-summary.md`](../../knowledge/research/phase3-exit-gate-summary.md) |
 
 ---
 
@@ -89,32 +89,40 @@
 | P4-R05 | **Eval 2:** Cross-cutting defect — competing hypotheses investigation | Orchestrator | P4-R03 | Hypothesis log; winner evidence-based; no authority collision | M | **DONE** — repo-truth dual-track (P1-08-04); proof §8 |
 | P4-R06 | **Eval 3:** Release prep (review, tests, docs, risk, readiness) | Orchestrator | P4-R03 | Readiness checklist complete; human checkpoint in Herdr | M | **DONE** — readiness §9; Herdr bundle §9.2 |
 | P4-R07 | Ruflo pilot scorecard vs manual orchestration | Captain | P4-R04..06 | Written score: time, quality, failure modes | M | **DONE** — proof §10 |
-| P4-R08 | Tear down or quarantine Ruflo worktree if pilot fails | Implementer | P4-R07 | No residual daemon/global config | M | Open — pilot PASS; teardown optional: `git worktree remove /tmp/ruflo-pilot-k1` |
+| P4-R08 | Tear down or quarantine Ruflo worktree if pilot fails | Implementer | P4-R07 | No residual daemon/global config | M | **DONE** — worktree removed 2026-07-13; main repo has no `.claude-flow` / no `ruflo init`; proof §11 |
+
+### Composite exit gate
+
+| ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
+|----|------|-------|-----|---------------------|------|--------|
+| P4-08 | Phase 4 exit gate: Entire + Ruflo composite assessment | Captain | P4-E05, P4-R08 | Written gate record; debt documented; Phase 5 entry unblocked | M | **DONE** — Captain ratified autonomous go 2026-07-13; [`agent-stack-phase4-exit-gate-2026-07-13.md`](../../knowledge/decisions/agent-stack-phase4-exit-gate-2026-07-13.md); summary [`phase4-exit-gate-summary.md`](../../knowledge/research/phase4-exit-gate-summary.md) |
 
 ---
 
 ## Phase 5 — Headroom compression benchmark
 
-| ID | Task | Owner | Dep | Acceptance criteria | Risk |
-|----|------|-------|-----|---------------------|------|
-| P5-01 | Define Headroom A/B protocol (compression-only) | Orchestrator | P4-R07 or P3-08 | Protocol excludes: memory, learn, instruction writes, output shaping | M |
-| P5-02 | Establish baseline token/headroom metrics on representative tasks | Tester | P5-01 | 3 task types measured: debug, implement, review | M |
-| P5-03 | Run Headroom compression variant; capture metrics | Tester | P5-02 | A/B table with task ID, tokens, outcome quality | M |
-| P5-04 | Human quality review of Headroom outputs | Captain | P5-03 | No unacceptable information loss on 3/3 tasks | H |
-| P5-05 | Headroom go/no-go for standard stack | Captain | P5-04 | Decision doc; default remains no Headroom in prod | M |
+**Policy:** Compression-only scope is **pre-approved** and **agent-autonomous** — no Captain spend or install gate. See [`knowledge/decisions/agent-stack-autonomous-execution.md`](../../knowledge/decisions/agent-stack-autonomous-execution.md) and `AUTHORITY-CONTRACT.md` § Benchmark later.
+
+| ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
+|----|------|-------|-----|---------------------|------|--------|
+| P5-01 | Define Headroom A/B protocol (compression-only) | Orchestrator | P4-08 | Protocol excludes: memory, learn, instruction writes, output shaping | M | **DONE** — [`phase5-headroom-benchmark-plan.md`](../../knowledge/research/phase5-headroom-benchmark-plan.md) |
+| P5-02 | Establish baseline token/headroom metrics on representative tasks | Tester | P5-01 | 3 task types measured: debug, implement, review | M | **DONE** — [`phase5-ab-metrics.json`](../../knowledge/research/phase5-ab-metrics.json) + [`scripts/agent/phase5-headroom-ab.py`](../../scripts/agent/phase5-headroom-ab.py) |
+| P5-03 | Run Headroom compression variant; capture metrics | Tester | P5-02 | A/B table with task ID, tokens, outcome quality | M | **DONE** — ~81–83% harness `compress()` (isolated `/tmp/headroom-bench-venv`) — [`phase5-exit-gate-summary.md`](../../knowledge/research/phase5-exit-gate-summary.md), runbook [`headroom-compression-benchmark.md`](../../knowledge/runbooks/headroom-compression-benchmark.md), [`phase5-headroom-kompress-retest.md`](../../knowledge/research/phase5-headroom-kompress-retest.md) |
+| P5-04 | Quality review of Headroom outputs | Reviewer agent | P5-03 | No unacceptable information loss on 3/3 tasks | H | **PASS (automated)** — 18/18 canaries + `git_head` 3/3; **DEFERRED** — human task replay — [`phase5-headroom-benchmark-results.md`](../../knowledge/research/phase5-headroom-benchmark-results.md) |
+| P5-05 | Headroom go/no-go for standard stack | Knowledge curator | P5-04 | Decision doc; default remains no Headroom in prod | M | **CLOSED** — **no promote**; compression benchmark PASS; operational qualification pending — [`agent-stack-headroom-partial-2026-07-13.md`](../../knowledge/decisions/agent-stack-headroom-partial-2026-07-13.md) |
 
 ---
 
 ## Phase 6 — Evaluation gates & promotion to standard stack
 
-| ID | Task | Owner | Dep | Acceptance criteria | Risk |
-|----|------|-------|-----|---------------------|------|
-| P6-01 | Compile phase scorecards (Phases 1–5) | Provenance auditor | P5-05 | Single matrix: tool, status, evidence links | L |
-| P6-02 | Define standard stack manifest (`docs/agent-stack/STANDARD-STACK.md`) | Captain | P6-01 | Lists adopted tools, configs, forbidden tools | M |
-| P6-03 | Update `AGENT_OS.md` with standard stack pointer | Knowledge curator | P6-02 | Agents see stack on bootstrap | L |
-| P6-04 | Roll out OpenKnowledge to second SpectraSynq repo (if Phase 3 PASS) | Implementer | P6-02 | Second repo `knowledge/` seeded | M |
-| P6-05 | Training runbook for new agents (routing + promote + Herdr) | Knowledge curator | P6-02 | Runbook in `knowledge/runbooks/agent-onboarding.md` | L |
-| P6-06 | Final Captain sign-off: agent stack v1 | Captain | P6-01..05 | Promotion recorded; rejected tools remain rejected | L |
+| ID | Task | Owner | Dep | Acceptance criteria | Risk | Status |
+|----|------|-------|-----|---------------------|------|--------|
+| P6-01 | Compile phase scorecards (Phases 1–5) | Provenance auditor | P5-05 | Single matrix: tool, status, evidence links | L | **DONE** — [`phase6-scorecard.md`](../../knowledge/research/phase6-scorecard.md) |
+| P6-02 | Define standard stack manifest (`docs/agent-stack/STANDARD-STACK.md`) | Captain | P6-01 | Lists adopted tools, configs, forbidden tools | M | **DONE** — [`STANDARD-STACK.md`](./STANDARD-STACK.md) v1 |
+| P6-03 | Update `AGENT_OS.md` with standard stack pointer | Knowledge curator | P6-02 | Agents see stack on bootstrap | L | **DONE** |
+| P6-04 | Roll out OpenKnowledge to second SpectraSynq repo (if Phase 3 PASS) | Implementer | P6-02 | Second repo `knowledge/` seeded | M | **Future expansion** — optional; not v1 rollout debt |
+| P6-05 | Training runbook for new agents (routing + promote + Herdr) | Knowledge curator | P6-02 | Runbook in `knowledge/runbooks/agent-onboarding.md` | L | **DONE** — [`agent-onboarding.md`](../../knowledge/runbooks/agent-onboarding.md) |
+| P6-06 | Final Captain sign-off: agent stack v1 | Captain | P6-01..05 | Promotion recorded; rejected tools remain rejected | L | **DONE** — [`agent-stack-standard-stack-2026-07-13.md`](../../knowledge/decisions/agent-stack-standard-stack-2026-07-13.md) |
 
 ---
 
@@ -157,8 +165,9 @@ P0 ──► P1 ──► P2 ──► P3 ──► P4 (E + R parallel) ──�
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-07-13 | agent:cursor | Reconcile pass — Phase 3/4 exit gates aligned across `PHASED-ROLLOUT.md`, `current-priorities.md`, `knowledge/index.md`; P4-E03 closed (shell evidence); live `entire rewind` deferred per CLI 0.0.3 limitation |
 | 2026-07-13 | agent:cursor | P2-08 DONE — Captain ratified stack; live MCP search/config PASS; Phase 2 exit gate PASS — [`phase2-openknowledge-mcp-proof.md`](../../knowledge/research/phase2-openknowledge-mcp-proof.md) |
-| 2026-07-13 | agent:cursor | **Phase 2 DONE** — P2-08 Captain ratified go; exit gate PASS; canonical proof [`phase2-openknowledge-mcp-proof.md`](../../knowledge/research/phase2-openknowledge-mcp-proof.md); `.mcp.json` only (duplicate `.cursor/mcp.json` removed) |
+| 2026-07-13 | agent:cursor | **Phase 2 DONE** — P2-08 Captain ratified go; exit gate PASS; canonical proof [`phase2-openknowledge-mcp-proof.md`](../../knowledge/research/phase2-openknowledge-mcp-proof.md); editor split — `.mcp.json` (Claude Code) + `.cursor/mcp.json` (Cursor, OK-only); no user-global |
 | 2026-07-13 | agent:search-specialist | P2-02 UNBLOCKED: correct package `@inkeep/open-knowledge` (v0.29.1) identified and installed; `.mcp.json` + `.cursor/mcp.json` registered; MCP server callable; Phase 2 exit criteria on track for P2-08 Captain review |
 | 2026-07-13 | agent:orchestrator | Initial task backlog from architecture review |
 | 2026-07-13 | agent:cursor | Phase 1 executed autonomously; P1-01–07, P1-09 DONE; P1-08 partial |
@@ -171,5 +180,12 @@ P0 ──► P1 ──► P2 ──► P3 ──► P4 (E + R parallel) ──�
 | 2026-07-13 | agent:cursor | Phase 4 Entire partial: P4-E01–E02, E04 DONE; P4-E03/E05 open — [`phase4-entire-pilot-proof.md`](../../knowledge/research/phase4-entire-pilot-proof.md); `core.hooksPath` vs Entire git hooks |
 | 2026-07-13 | agent:cursor | P4-E03 lineage audit — [`phase4-entire-lineage-proof.md`](../../knowledge/research/phase4-entire-lineage-proof.md); status IN PROGRESS (live 5-session retrieval open) |
 | 2026-07-13 | agent:cursor | P4-E03 **DONE** (methodology + shell evidence) — [`phase4-entire-session-log.md`](../../knowledge/research/phase4-entire-session-log.md); checkpoint `rewind` deferred pending Claude Code + Entire CLI hook fix |
-| 2026-07-13 | agent:cursor | P4-E05 **DONE** — Captain ratified autonomous go; hooks dual-path ADR [`agent-stack-entire-hooks-dual-path.md`](../../knowledge/decisions/agent-stack-entire-hooks-dual-path.md); P4-E03 remains open (5-session lineage) |
+| 2026-07-13 | agent:cursor | **Phase 3 DONE** — P3-02 skills authored; P3-07 standalone audit PASS; P3-08 exit gate PASS — [`agent-stack-phase3-exit-gate-2026-07-13.md`](../../knowledge/decisions/agent-stack-phase3-exit-gate-2026-07-13.md); summary [`phase3-exit-gate-summary.md`](../../knowledge/research/phase3-exit-gate-summary.md) |
+| 2026-07-13 | agent:cursor | P4-E05 **DONE** — Captain ratified autonomous go; hooks dual-path ADR [`agent-stack-entire-hooks-dual-path.md`](../../knowledge/decisions/agent-stack-entire-hooks-dual-path.md) |
 | 2026-07-13 | agent:cursor | Phase 4 Ruflo Eval 2–3 + P4-R05–R07 DONE — proof §8–§10; worktree orchestration-only |
+| 2026-07-13 | agent:cursor | **Phase 5 IN PROGRESS** — remove Captain spend gate; P5-01..03 autonomous; P5-04 reviewer agent; allowlist extended in [`agent-stack-autonomous-execution.md`](../../knowledge/decisions/agent-stack-autonomous-execution.md) |
+| 2026-07-13 | agent:cursor | **Phase 4 DONE** — P4-08 composite exit gate PASS with documented debt — [`phase4-exit-gate-summary.md`](../../knowledge/research/phase4-exit-gate-summary.md); [`agent-stack-phase4-exit-gate-2026-07-13.md`](../../knowledge/decisions/agent-stack-phase4-exit-gate-2026-07-13.md) |
+| 2026-07-13 | agent:cursor | **Phase 5 PARTIAL PASS** — exit gate closed; [`phase5-exit-gate-summary.md`](../../knowledge/research/phase5-exit-gate-summary.md); [`agent-stack-headroom-partial-2026-07-13.md`](../../knowledge/decisions/agent-stack-headroom-partial-2026-07-13.md); P5-04 IN PROGRESS; P5-05 no promote; superseded `phase5-headroom-benchmark-results.md` |
+| 2026-07-13 | agent:cursor | **Phase 5 reconciliation** — tiebreaker harness PASS; unified PASS exit (promotion DEFERRED); dc9e23a7 archived as first attempt — [`phase5-exit-gate-summary.md`](../../knowledge/research/phase5-exit-gate-summary.md) |
+| 2026-07-13 | agent:cursor | **Phase 6 DONE** — P6-01..03, P6-05..06 DONE; P6-04 DEFERRED; [`STANDARD-STACK.md`](./STANDARD-STACK.md); [`phase6-scorecard.md`](../../knowledge/research/phase6-scorecard.md) |
+| 2026-07-13 | agent:cursor | **Phase 5 doc supersession** — Kompress UNBLOCKED (`bd2c1225` / `/tmp/headroom-bench-venv`); supersede PARTIAL + miniforge-blocked narratives; composite PASS, P5-05 DEFERRED — [`phase5-exit-gate-summary.md`](../../knowledge/research/phase5-exit-gate-summary.md) |

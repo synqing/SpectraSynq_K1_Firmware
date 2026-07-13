@@ -9,7 +9,7 @@ entire_cli: entire-cli@0.0.3
 
 # P4-E03 capture cycles (Cursor shell)
 
-Dual-path note: `core.hooksPath=scripts/hooks` → Entire `.git/hooks/*` dormant. Post-commit invoked manually via `entire hooks git post-commit` after each docs commit. Claude Code path: `entire hooks claude-code` **not implemented** in CLI 0.0.3 (exit 1).
+Dual-path note: `core.hooksPath=scripts/hooks` → Entire `.git/hooks/*` dormant. Post-commit invoked manually via `entire hooks git post-commit` after each docs commit. Claude Code hook path: `entire hooks claude-code` **not on npm 0.0.3 surface** (`Unknown hooks subcommand: claude-code`); enable used `entire enable --agent claude-code`.
 
 | Cycle | Wall (UTC+8) | `entire status` (pre) | Commit SHA | `prepare-commit-msg` | `post-commit` (manual) | `entire explain` | `entire rewind` |
 |-------|--------------|----------------------|------------|----------------------|------------------------|------------------|-----------------|
@@ -34,4 +34,4 @@ Dual-path note: `core.hooksPath=scripts/hooks` → Entire `.git/hooks/*` dormant
 - Commits: `5df16e6` (bootstrap) … `cd60262` (HEAD); five capture SHAs `7143f51`–`9f484dc`.
 - `entire rewind`: no points; `entire/checkpoints/v1` not created.
 - `git show-ref | rg entire`: empty; no session push.
-- Follow-up: Claude Code session after Entire CLI ships `hooks claude-code` (or upgrade); optional chain Entire git hooks into `scripts/hooks/`.
+- Follow-up: Retest live lineage after Entire CLI > npm `0.0.3` (upstream `entire enable --agent claude-code`); optional git-hook chain into `scripts/hooks/` per dual-path ADR.

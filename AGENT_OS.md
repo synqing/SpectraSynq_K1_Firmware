@@ -19,9 +19,13 @@ bash scripts/agent/session-bootstrap.sh
 
 The bootstrap runs `scripts/agent/repo-truth.sh` as a pre-session gate:
 
-- **FAIL** (lane-integrity problem: missing IM73D env/guard/plan) → bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
-- **WARN** (stale docs that do not misroute the lane) → bootstrap continues and prints the warnings.
-- **PASS** → bootstrap continues normally.
+- **FAIL** (lane-integrity problem: missing IM73D env/guard/plan) → bootstrap exits nonzero; dual-track applies per [`knowledge/decisions/agent-stack-repo-truth-dual-track.md`](knowledge/decisions/agent-stack-repo-truth-dual-track.md).
+  - **Firmware work:** do not proceed — no firmware source edits, `pio-build.sh`, or firmware commits until FAIL is resolved.
+  - **Docs-only agent-stack work:** may proceed only when explicitly scoped (governance/knowledge/runbooks) and FAIL is acknowledged in the artifact.
+- **WARN** (non-fatal hygiene, e.g. dirty `docs/hardware/device-build-registry.md`) → bootstrap exits **0**; firmware work is not blocked (dual-track does not apply).
+- **PASS** → bootstrap exits 0 normally.
+
+IM73D upload-guard false-FAIL fix (2026-07-13): [`knowledge/research/repo-truth-fix-evidence.md`](knowledge/research/repo-truth-fix-evidence.md).
 
 Then read this file and the files it flags as current. Do not proceed until you know:
 
@@ -42,24 +46,68 @@ Trust sources in this order:
 3. **Lane-specific docs** — e.g. `docs/hardware/im73d122-ap-vp-migration-plan.md`
 4. **`docs/hardware/device-build-registry.md`** — physically-deployed state (including dirty entries)
 5. **`.claude/CLAUDE.md` + `AGENTS.md`** — load-bearing process rules
-6. **`claude-mem`** — prior-session context and recurrence patterns only
+6. **`knowledge/`** — Captain-ratified durable knowledge (OpenKnowledge pilot scaffold); `status: verified` frontmatter required for agent consumption
+7. **`claude-mem`** — prior-session context and recurrence patterns only; never promoted without verification into `knowledge/`
 
 `progress.md`, `.claude/handoff.md`, and `docs/spec-index.md` are authoritative only when confirmed fresh. If `scripts/agent/repo-truth.sh` flags them stale, treat them as historical, not current.
+
+### Agent stack rollout (standard stack v1 — ratified 2026-07-13)
+
+Cross-tool agent infrastructure rollout (Herdr, Codex plugin, OpenKnowledge,
+Claude-mem coexistence) is documented under [`docs/agent-stack/`](docs/agent-stack/README.md).
+**Phases 0–6 closed** (Captain ratification 2026-07-13). **Canonical manifest:**
+[`docs/agent-stack/STANDARD-STACK.md`](docs/agent-stack/STANDARD-STACK.md).
+Durable knowledge lives in [`knowledge/`](knowledge/index.md); routing skill:
+`.cursor/skills/knowledge-memory-routing/` (mirror in `.claude/skills/`).
+
+| Doc | Use for |
+|-----|---------|
+| [`docs/agent-stack/STANDARD-STACK.md`](docs/agent-stack/STANDARD-STACK.md) | **Adopted tools, version pins, forbidden paths** (start here after bootstrap) |
+| [`docs/agent-stack/AUTHORITY-CONTRACT.md`](docs/agent-stack/AUTHORITY-CONTRACT.md) | Ratified ownership boundaries (code vs rules vs durable knowledge vs episodic memory) |
+| [`docs/agent-stack/PHASED-ROLLOUT.md`](docs/agent-stack/PHASED-ROLLOUT.md) | Phased adoption history, gates, rollback |
+| [`docs/agent-stack/ACTIONABLE-TASKS.md`](docs/agent-stack/ACTIONABLE-TASKS.md) | Numbered task backlog with acceptance criteria |
+| [`docs/agent-stack/SWARM-ORCHESTRATION.md`](docs/agent-stack/SWARM-ORCHESTRATION.md) | Multi-agent roles, Herdr/Ruflo/Codex handoffs, promotion workflow |
+| [`knowledge/runbooks/agent-onboarding.md`](knowledge/runbooks/agent-onboarding.md) | New-agent cold start (routing + promote + operator tools) |
+
+**Core rule (when rollout is active):** promote verified learnings to OpenKnowledge;
+never auto-sync Claude-mem observations into curated knowledge.
+
+**Hierarchy deferral:** Firmware safety and session rules in this file prevail.
+For agent-stack **tool ownership** and promotion boundaries, defer to
+[`AUTHORITY-CONTRACT.md`](docs/agent-stack/AUTHORITY-CONTRACT.md) when not in conflict
+with firmware gates.
 
 ---
 
 ## 3. Current-lane verification rule
 
-The current live lane is:
+### Firmware lane (verify from git every session)
 
-- **Branch:** `lane/im73d-pdm-eval`
+At session start, **git branch + HEAD + working tree** are authoritative for the
+active firmware lane. Do not assume a branch named in docs without verifying:
+
+```bash
+git branch --show-current && git rev-parse --short HEAD
+```
+
+**IM73D productionization reference** (when on that lane):
+
+- **Typical branch:** `lane/im73d-pdm-eval`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
 - **Focus:** IM73D122 productionisation. Phase-1 firmware is done;
   bench IM73D R1/no-speaker DSR proof is closed; current blocker is R2
   production-shape hardware proof (main K1 SPH0645 -> IM73D on GPIO13/12/14,
   or a dedicated production-shape IM73D unit).
 
-Before any work, verify the lane has not shifted. If `git status` shows a different branch, or if the lane doc says something different, stop and report the conflict.
+If scoped **firmware** work and `git status` shows a different branch than lane
+docs imply, stop and report the conflict before editing source.
+
+### Agent-stack rollout (lane-orthogonal)
+
+Agent-stack phases (`docs/agent-stack/`) are **lane-orthogonal**: docs, operator
+tooling, and `knowledge/` curation may proceed on any branch when explicitly
+scoped docs-only. Agent-stack docs **do not** override firmware lane verification
+in this section. Parallel priorities: [`knowledge/current-priorities.md`](knowledge/current-priorities.md).
 
 ---
 
@@ -169,6 +217,7 @@ repo-truth or commit evidence.
 - Use `scripts/hooks/wip-checkpoint.sh` for broken-work checkpoints
 - Delegate to subagents with a written consumption contract
 - Add `claude-mem` observations
+- Install/verify **enumerated** agent-stack operator tools only (see §7 install allowlist) — document evidence in `knowledge/research/`
 
 ## 7. Forbidden actions
 
@@ -178,7 +227,20 @@ repo-truth or commit evidence.
 - Run `start_noise_cal` without the user confirming a silence window
 - Auto-commit dirty `device-build-registry.md` or other governance docs
 - Edit files outside the approved scope
-- Install new MCPs, plugins, packages, or global tools
+- Install new MCPs, plugins, packages, or global tools **except** the enumerated Phase 1–2 allowlist below (no blanket “operator tooling”; no tools not on the list)
+
+### Install allowlist (standard stack v1)
+
+Agents may install/verify **only** these tools per [`STANDARD-STACK.md`](docs/agent-stack/STANDARD-STACK.md):
+
+| Tool | Install path | Forbidden |
+|------|--------------|-----------|
+| **Herdr** | `brew install herdr` | Routing agent execution through Herdr |
+| **sqlite-utils** | `brew install sqlite-utils` or pip equivalent | Writes to production SQLite stores |
+| **Codex plugin** | `claude plugin marketplace add` + `install codex@openai-codex` | `reviewGateEnabled: true` (auto stop-gate) |
+| **OpenKnowledge MCP** | Project-scoped `@inkeep/open-knowledge@0.29.1` per runbook | Auto-sync Claude-mem → OK; global install |
+
+**Not on allowlist (always forbidden):** pxpipe, OmniRoute as primary, Ruflo full init, Entire on main firmware lane (pilot closed), Headroom in agent path (promotion deferred), Claude-mem → OK auto-sync, any other MCP/plugin/package. Authority: [`knowledge/decisions/agent-stack-autonomous-execution.md`](knowledge/decisions/agent-stack-autonomous-execution.md), [`docs/agent-stack/STANDARD-STACK.md`](docs/agent-stack/STANDARD-STACK.md).
 - Create large frameworks or task bureaucracy
 - Treat stale handoff docs as current truth
 - Run `pio run --target upload` without verifying the target via `k1_upload_guard.py`
@@ -352,4 +414,4 @@ tool-specific mechanics (how to invoke a build, where permissions live).
 
 ---
 
-Last updated: 2026-07-02
+Last updated: 2026-07-13

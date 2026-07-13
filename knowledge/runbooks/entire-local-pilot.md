@@ -103,7 +103,7 @@ The K1 **pre-commit gate** lives at `scripts/hooks/pre-commit`. Entire installs 
 **Verified ADR:** [`agent-stack-entire-cli-limitation-2026-07-13.md`](../decisions/agent-stack-entire-cli-limitation-2026-07-13.md).
 
 `entire-cli@0.0.3` enables `--agent claude-code` and writes `.claude/settings.json` dispatchers, but the CLI
-**does not implement** `entire hooks claude-code`:
+**npm `entire-cli@0.0.3` does not expose** a working `entire hooks claude-code` CLI (upstream may differ):
 
 ```bash
 entire hooks claude-code --help   # no hooks tree; prints top-level help

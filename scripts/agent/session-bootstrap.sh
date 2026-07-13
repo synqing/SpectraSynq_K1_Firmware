@@ -80,6 +80,25 @@ else
   REPO_TRUTH_OVERALL="missing-script"
 fi
 
+
+# Advisory: OpenKnowledge user-global scope (only when .ok/ exists).
+OK_SCOPE_STATUS="skipped"
+OK_SCOPE_WARNINGS=""
+OK_SCOPE_SCRIPT="$REPO_ROOT/scripts/agent/ok-scope-check.sh"
+if [ -d "$REPO_ROOT/.ok" ] && [ -f "$OK_SCOPE_SCRIPT" ]; then
+  OK_SCOPE_RC=0
+  OK_SCOPE_OUTPUT="$(bash "$OK_SCOPE_SCRIPT" 2>&1)" || OK_SCOPE_RC=$?
+  if [ "$OK_SCOPE_RC" -eq 0 ]; then
+    OK_SCOPE_STATUS="PASS"
+  elif [ "$OK_SCOPE_RC" -eq 1 ]; then
+    OK_SCOPE_STATUS="WARN"
+    OK_SCOPE_WARNINGS="$OK_SCOPE_OUTPUT"
+  else
+    OK_SCOPE_STATUS="ERROR"
+    OK_SCOPE_WARNINGS="$OK_SCOPE_OUTPUT"
+  fi
+fi
+
 # Human-readable summary.
 echo ""
 echo "══════════════════════════════════════════════════════════════════"
@@ -98,9 +117,24 @@ echo "  claude-mem   : $MEM_STATUS"
 echo "  handoff.md   : $HANDOFF_MTIME"
 echo "  progress.md  : $PROGRESS_MTIME"
 echo "  spec-index   : $SPEC_MTIME"
+echo "  agent-stack  : read docs/agent-stack/STANDARD-STACK.md (v1 manifest); AUTHORITY-CONTRACT.md for domains; install per knowledge/decisions/agent-stack-autonomous-execution.md"
 echo "  repo-truth   : $REPO_TRUTH_OVERALL"
 if [ "$REPO_TRUTH_OVERALL" = "WARN" ] && [ -n "$REPO_TRUTH_WARNINGS" ]; then
   printf '%s\n' "$REPO_TRUTH_WARNINGS" | while IFS= read -r line; do
+    [ -n "$line" ] && echo "    WARN: $line"
+  done
+fi
+
+echo "  ok-scope     : $OK_SCOPE_STATUS"
+if [ "$OK_SCOPE_STATUS" = "WARN" ]; then
+  echo "    WARN: user-global OpenKnowledge scope creep — see knowledge/runbooks/openknowledge-manual-git-policy.md (Post-init guardrails)"
+  if [ -n "$OK_SCOPE_WARNINGS" ]; then
+    printf '%s\n' "$OK_SCOPE_WARNINGS" | while IFS= read -r line; do
+      [ -n "$line" ] && echo "    WARN: $line"
+    done
+  fi
+elif [ "$OK_SCOPE_STATUS" = "ERROR" ] && [ -n "$OK_SCOPE_WARNINGS" ]; then
+  printf '%s\n' "$OK_SCOPE_WARNINGS" | while IFS= read -r line; do
     [ -n "$line" ] && echo "    WARN: $line"
   done
 fi
@@ -126,6 +160,7 @@ mkdir -p "$REPO_ROOT/.devin"
   echo "  \"handoff_mtime\": \"$HANDOFF_MTIME\","
   echo "  \"progress_mtime\": \"$PROGRESS_MTIME\","
   echo "  \"spec_index_mtime\": \"$SPEC_MTIME\","
+  echo "  \"ok_scope_status\": \"$OK_SCOPE_STATUS\","
   echo "  \"repo_truth_overall\": \"$REPO_TRUTH_OVERALL\""
   echo "}"
 } > "$REPO_ROOT/.devin/last-bootstrap.json"

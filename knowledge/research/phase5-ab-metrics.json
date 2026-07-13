@@ -1,0 +1,89 @@
+{
+  "headroom_version": "0.31.0",
+  "package": "headroom-ai (PyPI)",
+  "env": {
+    "mode": "library compress() only",
+    "forbidden": "memory,learn,wrap,proxy,output-shaping"
+  },
+  "git_head_at_run": "e67da587c78c31a3c056a8dfab74fe8e5a5708f2",
+  "results": [
+    {
+      "task_id": "T-DEBUG",
+      "task_type": "debug",
+      "tokens_baseline": 41769,
+      "tokens_compressed": 7104,
+      "tokens_saved": 34665,
+      "pct_reduction": 82.99,
+      "compression_ratio": 0.8299217122746535,
+      "chars_baseline": 126345,
+      "chars_compressed": 17270,
+      "transforms": [
+        "router:protected:user_message",
+        "router:mixed:0.00"
+      ],
+      "canaries_checked": [
+        "light_mode_beat_pulse",
+        "k1_hardware",
+        "F887A500",
+        "session-bootstrap.sh",
+        "e67da58",
+        "scripts/agent/session-bootstrap.sh"
+      ],
+      "canaries_lost": [],
+      "git_head_full_present": true,
+      "identifier_ok": true
+    },
+    {
+      "task_id": "T-IMPLEMENT",
+      "task_type": "implement",
+      "tokens_baseline": 37846,
+      "tokens_compressed": 7098,
+      "tokens_saved": 30748,
+      "pct_reduction": 81.25,
+      "compression_ratio": 0.8124504571156793,
+      "chars_baseline": 120203,
+      "chars_compressed": 17242,
+      "transforms": [
+        "router:protected:user_message",
+        "router:mixed:0.00"
+      ],
+      "canaries_checked": [
+        "AudioSemanticState",
+        "session-bootstrap.sh",
+        "SB_ONSET_V2",
+        "Goertzel",
+        "e67da58",
+        "k1_hardware"
+      ],
+      "canaries_lost": [],
+      "git_head_full_present": true,
+      "identifier_ok": true
+    },
+    {
+      "task_id": "T-REVIEW",
+      "task_type": "review",
+      "tokens_baseline": 37807,
+      "tokens_compressed": 7102,
+      "tokens_saved": 30705,
+      "pct_reduction": 81.22,
+      "compression_ratio": 0.8121511889332663,
+      "chars_baseline": 119721,
+      "chars_compressed": 17260,
+      "transforms": [
+        "router:protected:user_message",
+        "router:mixed:0.00"
+      ],
+      "canaries_checked": [
+        "k1_hardware",
+        "session-bootstrap.sh",
+        "P4-R07",
+        "AUTHORITY-CONTRACT",
+        "e67da58",
+        "docs/agent-stack/AUTHORITY-CONTRACT.md"
+      ],
+      "canaries_lost": [],
+      "git_head_full_present": true,
+      "identifier_ok": true
+    }
+  ]
+}
