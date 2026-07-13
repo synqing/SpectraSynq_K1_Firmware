@@ -21,3 +21,4 @@ Dual-path note: `core.hooksPath=scripts/hooks` → Entire `.git/hooks/*` dormant
 | 2 | 2026-07-13 11:11:10 +0800 | `Enabled: true;Strategy: manual-commit;Branch: lane/gem-port-beat-pulse;Checkpoints branch: not created;Git hooks: installed;Agents: claude-code;` | `1b556a5` | `exit:0` | `exit:0` | `Commit: 1b556a59;Message: docs: P4-E03 Entire lineage capture cycle 2;` | `No rewind points found. Work with your agent and commit changes.;` |
 
 <!-- cycle 3 @ 2026-07-13 11:11:11 +0800 -->
+| 3 | 2026-07-13 11:11:11 +0800 | `Enabled: true;Strategy: manual-commit;Branch: lane/gem-port-beat-pulse;Checkpoints branch: not created;Git hooks: installed;Agents: claude-code;` | `96c19ae` | `exit:0` | `exit:0` | `Commit: 96c19ae8;Message: docs: P4-E03 Entire lineage capture cycle 3;` | `No rewind points found. Work with your agent and commit changes.;` |
