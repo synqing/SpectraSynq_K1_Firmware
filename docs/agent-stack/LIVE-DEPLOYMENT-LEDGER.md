@@ -25,7 +25,7 @@ Deployed **2026-07-13** by agent:cursor (sibling pointer rollout).
 | **K1.esp32s3** | `/Users/spectrasynq/Workspace_Management/Software/K1.esp32s3` | `w2` | `docs/agent-stack-link.md` | `AGENTS.md` (1 line) | ESP32-S3 renderer / OSC firmware |
 | **K1.juce** | `/Users/spectrasynq/Workspace_Management/Software/K1.juce` | `w3` | `docs/agent-stack-link.md` | `AGENTS.md` (1 line) | JUCE desktop host |
 | **K1.tab5** | `/Users/spectrasynq/Workspace_Management/Software/T-Keyboard-S3-Pro/K1.tab5` | `w4` | `docs/agent-stack-link.md` | `README.md` (1 line) | Tab5 deck controller; no `AGENTS.md` |
-| **SpectraSynq.LandingPage** | `/Users/spectrasynq/SpectraSynq.LandingPage` → archive path | `w5` | `docs/agent-stack-link.md` | `README.md` (1 line) | Active K1 FE landing; symlink to archive dir |
+| **SpectraSynq.LandingPage** | `/Users/spectrasynq/SpectraSynq.LandingPage` | `w5` | `docs/agent-stack-link.md` | `README.md` (1 line) | Active K1 FE landing; symlink to archive dir |
 | **SpectraSynq_K1_Firmware** | `/Users/spectrasynq/SpectraSynq_K1_Firmware` | `w1` | *(canonical)* | `AGENT_OS.md` §2 | Full stack + `knowledge/` authority |
 
 ### Not deployed (surveyed, out of scope)
@@ -44,7 +44,24 @@ Deployed **2026-07-13** by agent:cursor (sibling pointer rollout).
 | `w2` | `K1.esp32s3` | `/Users/spectrasynq/Workspace_Management/Software/K1.esp32s3` |
 | `w3` | `K1.juce` | `/Users/spectrasynq/Workspace_Management/Software/K1.juce` |
 | `w4` | `K1.tab5` | `/Users/spectrasynq/Workspace_Management/Software/T-Keyboard-S3-Pro/K1.tab5` |
-| `w5` | `SpectraSynq.LandingPage` | `/Users/spectrasynq/SpectraSynq/archive/SpectraSynq.LandingPage.archived_2026-05-14` |
+| `w5` | `SpectraSynq.LandingPage` | `/Users/spectrasynq/SpectraSynq.LandingPage` |
+
+**Archive fallback (not Herdr `cwd`):** `/Users/spectrasynq/SpectraSynq/archive/SpectraSynq.LandingPage.archived_2026-05-14` — symlink target for `w5`; use live path above for workspaces and pilots.
+
+---
+
+## Qualification queue
+
+Qualification pilots run **autonomously on real work** when the campaign executor schedules them. Captain interventions are **measured**, not required for gate. Status labels per `STANDARD-STACK.md`.
+
+**Scheduling note:** **Not scheduled yet** applies only while Session 1+ standard lane is in progress — executor queue state, not a Captain approval block.
+
+| Tool | Repo | Objective | Constraints | Gate |
+|------|------|-----------|-------------|------|
+| **Headroom** | `/Users/spectrasynq/SpectraSynq.LandingPage` | One real **implementation audit** session (multi-file FE + optics/launch-lock alignment) with compression on tool-heavy context | **Compression only** — no memory/learn/proxy/wrap/instruction writes/output shaping/routing; `headroom-ai==0.31.0`; isolated venv. Label: **compression benchmark PASS; operational qualification pending** | **Repo path PASS** (2026-07-13). **Execution READY** — repo path cleared; runs when campaign executor schedules |
+| **Ruflo** | `/Users/spectrasynq/SpectraSynq.LandingPage` | One disposable worktree delivery: landing↔firmware visual-system evidence index (single merged handover) | `RUFLO_DAEMON_AUTOSTART=0`; `init --minimal --no-global`; isolated worktree; no daemon/memory/RAG/federation/routing; no canonical `knowledge/` writes on main | **Repo path PASS**; `git worktree add` viable. **Execution READY** — repo path cleared; runs when campaign executor schedules |
+| **Entire** | `/Users/spectrasynq/SpectraSynq_K1_Firmware` (canonical) | Real-commit provenance during live deployment sessions | Local-only; `--skip-push-sessions`; `--telemetry=false`; dual-path hooks; unpromoted | Active — run on verified commits in Session 1+ (`2a4be6b` spot-check: `explain` OK, rewind empty on 0.0.3) |
+
 
 ---
 
@@ -53,4 +70,5 @@ Deployed **2026-07-13** by agent:cursor (sibling pointer rollout).
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-13 | agent:cursor | Session run table + row #1 (live deployment Session 1) |
+| 2026-07-13 | agent:cursor | Qualification queue restored; w5 live path; Headroom/Ruflo READY (through 26442be7) |
 | 2026-07-13 | agent:cursor | Initial sibling pointer deployment (4 repos + ledger) |
