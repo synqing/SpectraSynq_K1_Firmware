@@ -80,6 +80,20 @@ else
   REPO_TRUTH_OVERALL="missing-script"
 fi
 
+# Fail closed when a prior delegation missed launch acknowledgement or its
+# checkpoint. The stateful guard is the executable counterpart to the written
+# dispatch contract; a missing ledger is a clean initial state.
+DELEGATION_STATUS="PASS"
+DELEGATION_OUTPUT=""
+DELEGATION_GUARD="$REPO_ROOT/scripts/agent/delegation_guard.py"
+if [ -f "$DELEGATION_GUARD" ]; then
+  DELEGATION_RC=0
+  DELEGATION_OUTPUT="$(python3 "$DELEGATION_GUARD" check 2>&1)" || DELEGATION_RC=$?
+  if [ "$DELEGATION_RC" -ne 0 ]; then
+    DELEGATION_STATUS="FAIL"
+  fi
+fi
+
 
 # Advisory: OpenKnowledge user-global scope (only when .ok/ exists).
 OK_SCOPE_STATUS="skipped"
@@ -119,6 +133,12 @@ echo "  progress.md  : $PROGRESS_MTIME"
 echo "  spec-index   : $SPEC_MTIME"
 echo "  agent-stack  : read docs/agent-stack/STANDARD-STACK.md (v1 manifest); AUTHORITY-CONTRACT.md for domains; install per knowledge/decisions/agent-stack-autonomous-execution.md"
 echo "  repo-truth   : $REPO_TRUTH_OVERALL"
+echo "  delegations  : $DELEGATION_STATUS"
+if [ "$DELEGATION_STATUS" = "FAIL" ]; then
+  printf '%s\n' "$DELEGATION_OUTPUT" | while IFS= read -r line; do
+    [ -n "$line" ] && echo "    FAIL: $line"
+  done
+fi
 if [ "$REPO_TRUTH_OVERALL" = "WARN" ] && [ -n "$REPO_TRUTH_WARNINGS" ]; then
   printf '%s\n' "$REPO_TRUTH_WARNINGS" | while IFS= read -r line; do
     [ -n "$line" ] && echo "    WARN: $line"
@@ -161,6 +181,7 @@ mkdir -p "$REPO_ROOT/.devin"
   echo "  \"progress_mtime\": \"$PROGRESS_MTIME\","
   echo "  \"spec_index_mtime\": \"$SPEC_MTIME\","
   echo "  \"ok_scope_status\": \"$OK_SCOPE_STATUS\","
+  echo "  \"delegation_status\": \"$DELEGATION_STATUS\","
   echo "  \"repo_truth_overall\": \"$REPO_TRUTH_OVERALL\""
   echo "}"
 } > "$REPO_ROOT/.devin/last-bootstrap.json"
@@ -170,6 +191,12 @@ mkdir -p "$REPO_ROOT/.devin"
 if [ "$REPO_TRUTH_OVERALL" = "FAIL" ]; then
   echo "FATAL: repo-truth.sh reports FAIL — lane-integrity problem detected." >&2
   echo "       Resolve before proceeding. Run: bash scripts/agent/repo-truth.sh" >&2
+  exit 1
+fi
+
+if [ "$DELEGATION_STATUS" = "FAIL" ]; then
+  echo "FATAL: unresolved delegation acknowledgement/checkpoint failure." >&2
+  echo "       Close or replace it before further fan-out." >&2
   exit 1
 fi
 

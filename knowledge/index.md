@@ -1,7 +1,7 @@
 ---
 title: SpectraSynq K1 — Knowledge Index
 status: verified
-last_verified: 2026-07-13
+last_verified: 2026-07-14
 sources:
   - docs/agent-stack/AUTHORITY-CONTRACT.md
 owner: knowledge-curator
@@ -40,6 +40,7 @@ OpenKnowledge tooling is **pre-1.0** (v0.29.1 pilot). See
 | [`runbooks/agent-onboarding.md`](./runbooks/agent-onboarding.md) | Standard stack v1 — new-agent cold start (P6-05) |
 | [`runbooks/fresh-agent-handoff.md`](./runbooks/fresh-agent-handoff.md) | Phase 3 Test 1 — cold-start read order for agents without Captain re-brief |
 | [`runbooks/promote-learning.md`](./runbooks/promote-learning.md) | Post-session promotion checklist (P3-03); Claude-mem read-only → `knowledge/` write path |
+| [`runbooks/k1-device-session-and-delegation-gates.md`](./runbooks/k1-device-session-and-delegation-gates.md) | Fail-closed device target, runtime identity, erase aftermath, and bounded delegation workflow |
 | [`runbooks/headroom-compression-benchmark.md`](./runbooks/headroom-compression-benchmark.md) | Phase 5 headroom compression benchmark — isolated venv, Kompress A/B metrics (P5-03) |
 | [`research/`](./research/) | Verified research notes (promote when durable) |
 | [`research/agent-stack-rollout-complete-2026-07-13.md`](./research/agent-stack-rollout-complete-2026-07-13.md) | Phase 6 closure — rollout COMPLETE (v1) |
@@ -61,6 +62,7 @@ OpenKnowledge tooling is **pre-1.0** (v0.29.1 pilot). See
 | [`agent-stack-entire-hooks-dual-path.md`](./decisions/agent-stack-entire-hooks-dual-path.md) | Entire hooks dual-path; P4-E05 pilot go | 2026-07-13 |
 | [`agent-stack-entire-cli-limitation-2026-07-13.md`](./decisions/agent-stack-entire-cli-limitation-2026-07-13.md) | npm `entire-cli@0.0.3` unpromoted; enable path vs hook CLI gap | 2026-07-13 |
 | [`repo-truth-im73d-manifest-check-2026-07-13.md`](./decisions/repo-truth-im73d-manifest-check-2026-07-13.md) | Repo-truth IM73D guard — manifest-aware check (post grep fix) | 2026-07-13 |
+| [`k1-runtime-target-and-agent-launch-gates-2026-07-14.md`](./decisions/k1-runtime-target-and-agent-launch-gates-2026-07-14.md) | Session-specific device intent and subagent launch circuit breakers | 2026-07-14 |
 
 ## Authority
 

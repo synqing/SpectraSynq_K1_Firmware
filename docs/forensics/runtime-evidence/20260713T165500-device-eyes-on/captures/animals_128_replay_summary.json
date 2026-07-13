@@ -1,0 +1,76 @@
+{
+  "accepted_novelty_rate_hz_used": 44.44444444444445,
+  "ap_frame_hz_used_for_reconstruction": 133.33333333333334,
+  "ap_frame_ms_used_for_reconstruction": 7.499999999999999,
+  "capture_log": "docs/forensics/runtime-evidence/20260713T165500-device-eyes-on/captures/animals_128_nov_buffered_20260713_171026__nov_dump.log",
+  "classification": "host_replay_of_device_nov_reproduces_wrong_lane_frontend_novelty_suspect",
+  "decimation_used_for_reconstruction": 3,
+  "defines": [
+    "K1_TEMPO_CONF_V2",
+    "K1_TEMPO_FLYWHEEL_V2",
+    "K1_TEMPO_AP_FRAME_HZ=133.333333f",
+    "K1_TEMPO_NOVELTY_DECIMATION=3U"
+  ],
+  "nov_audit": {
+    "accepted_nov_rate_hz_measured": 44.44425924845616,
+    "cadence_ms_max": 25,
+    "cadence_ms_median": 23,
+    "cadence_ms_min": 20,
+    "cadence_ms_p5": 21.0,
+    "cadence_ms_p95": 24.0,
+    "duration_ms": 119993,
+    "emit_gap_count": 0,
+    "emit_gaps_first10": [],
+    "first_emit": 21872,
+    "first_t_ms": 493280,
+    "ignored_non_buffer_rows": 0,
+    "large_dt_count": 0,
+    "large_dt_first10": [],
+    "last_emit": 27205,
+    "last_t_ms": 613273,
+    "row_count": 5334,
+    "source_mode": "buffer",
+    "timestamp_regression_count": 0,
+    "timestamp_regressions_first10": []
+  },
+  "novelty_field": "nov",
+  "ok": true,
+  "replay_injection_mode": "B_AP_FRAME_RECONSTRUCTION",
+  "replay_summary": {
+    "bpm_min_median_max": [
+      0.0,
+      108.0,
+      155.0
+    ],
+    "expected_bpm": 128,
+    "frame_count": 16003,
+    "near_bpm_tolerance": 3,
+    "warm_beat_ticks": 0,
+    "warm_bpm_counts": {
+      "108": 11106,
+      "112": 1162,
+      "127": 1629,
+      "155": 36,
+      "77": 69
+    },
+    "warm_bpm_min_median_max": [
+      77.0,
+      108.0,
+      155.0
+    ],
+    "warm_frame_count": 14002,
+    "warm_high_conf_count": 0,
+    "warm_high_conf_near_127_rows": 0,
+    "warm_high_conf_near_target_rows": 0,
+    "warm_high_or_locked_count": 0,
+    "warm_high_or_locked_near_127_rows": 0,
+    "warm_high_or_locked_near_target_rows": 0,
+    "warm_locked_count": 0,
+    "warm_locked_near_127_rows": 0,
+    "warm_locked_near_target_rows": 0,
+    "warm_near_127_rows": 1629,
+    "warm_near_target_rows": 1629
+  },
+  "run_returncode": 0,
+  "stderr": ""
+}

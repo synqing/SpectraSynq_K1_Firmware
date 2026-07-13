@@ -62,8 +62,19 @@ verified identity in the evidence.
 Canonical device↔env↔build pairing and deployed-state table:
 [`docs/hardware/device-build-registry.md`](../docs/hardware/device-build-registry.md)
 (added 2026-06-11). Read it before any flash/erase/serial-write; update its
-deployed-state table after every flash. 1401 (`F887A500`) = `k1_hardware` only;
-12201 (`B489A500`) = `k1_bench_reference` only — different GPIO maps.
+deployed-state table after every flash. Chip `F887A500` is the main-K1 family;
+chip `B489A500` is the bench-K1 family. They have different GPIO and microphone
+maps; current port numbers never override these identities.
+
+Port numbers are advisory and may change. Before every upload or measurement,
+create the expiring session-intent record with
+`scripts/platformio/k1_session_target.py pin`. PlatformIO uploads require this
+pin in addition to the persistent identity manifest. The pin must bind the
+current HEAD, explicit upload/capture ports, chip ID, and every allowed
+environment. Device measurements must also read back runtime `BUILD` environment
+and `CHIP_ID` before playback. After full erase, calibration and all persisted
+state are invalid until deliberately re-established. See
+`knowledge/runbooks/k1-device-session-and-delegation-gates.md`.
 
 ## Git discipline (load-bearing — added 2026-05-28)
 
@@ -87,6 +98,13 @@ classification, classification rationale, expected output or minimum useful
 partial, source scope, write scope, checkpoint timeout, bounded retry window,
 fallback owner and action, final-answer dependency, escalation condition, and
 consumption rule.
+
+Register every launch with `scripts/agent/delegation_guard.py` before dispatch.
+Launch one at a time, record the returned agent ID within 30 seconds, cap active
+interactive delegations at two, and cap checkpoints at five minutes. A launch
+without acknowledgement is closed as `aborted` with no spawn retry; execute the
+declared fallback locally. The ledger cannot interrupt a collaboration API call
+that is already blocked, so platform interruption remains the hard stop.
 
 Every delegated task is classified before launch as `load-bearing` or
 `optional`. `optional` means the task could be deleted before launch without

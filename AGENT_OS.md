@@ -320,6 +320,13 @@ Load-bearing tasks cannot be downgraded after launch. Stuck-agent recovery is
 mandatory: one bounded retry, then fallback. No indefinite polling. Any final
 answer that used delegated evidence must include a synthesis ledger.
 
+Run `scripts/agent/delegation_guard.py register` before each launch and `ack`
+immediately after the collaboration tool returns an agent ID. Launch sequentially,
+keep at most two active, and use checkpoints of at most 300 seconds. If a launch
+does not acknowledge within 30 seconds, do not spawn again: close it as `aborted`
+and execute the declared fallback locally. Canonical runbook:
+`knowledge/runbooks/k1-device-session-and-delegation-gates.md`.
+
 ---
 
 ## 13. Thinking gate

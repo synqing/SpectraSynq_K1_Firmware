@@ -16,6 +16,7 @@ consumes it. No SKU/manufacturing/NVS/efuse logic lives here.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 from dataclasses import dataclass
@@ -237,6 +238,21 @@ def _guard_upload_action(source, target, env) -> None:  # pragma: no cover - exe
     if not ok:
         raise SystemExit(prefix + message)
     print(prefix + message)
+    pin_ok, pin_message = _validate_session_pin(pioenv, upload_port)
+    if not pin_ok:
+        raise SystemExit(prefix + pin_message)
+    print(prefix + pin_message)
+
+
+def _validate_session_pin(pioenv: str, upload_port: str) -> tuple[bool, str]:
+    """Load the adjacent session-pin authority without relying on sys.path."""
+    path = _default_manifest_path().with_name("k1_session_target.py")
+    spec = importlib.util.spec_from_file_location("k1_session_target_guard", path)
+    if spec is None or spec.loader is None:
+        return False, f"unable to load session target guard at {path}"
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.validate_session_pin(pioenv, upload_port)
 
 
 def _install_platformio_hook() -> None:
@@ -252,6 +268,11 @@ def _main(argv: list[str]) -> int:
     parser.add_argument("--env", dest="pioenv")
     parser.add_argument("--upload-port")
     parser.add_argument("--ports-json", type=Path)
+    parser.add_argument(
+        "--require-session-pin",
+        action="store_true",
+        help="Also require the live, unexpired session target pin used by PlatformIO uploads.",
+    )
     parser.add_argument(
         "--list-identities",
         action="store_true",
@@ -272,6 +293,11 @@ def _main(argv: list[str]) -> int:
 
     ok, message = validate_upload_target(args.pioenv, args.upload_port, ports)
     print(message)
+    if not ok:
+        return 2
+    if args.require_session_pin:
+        ok, message = _validate_session_pin(args.pioenv, args.upload_port)
+        print(message)
     return 0 if ok else 2
 
 

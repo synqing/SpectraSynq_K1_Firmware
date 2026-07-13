@@ -175,6 +175,11 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("[env:k1_bench_im73d_dsr16]", text)
         self.assertIn("-DK1_MIC_IM73D_DSR_16S_V1", text)
 
+    def test_platformio_upload_action_requires_session_intent_pin(self):
+        text = GUARD_PATH.read_text()
+        self.assertIn("pin_ok, pin_message = _validate_session_pin", text)
+        self.assertIn("k1_session_target.py", text)
+
     def test_k1_pio_pre_includes_s3_sdkconfig_root(self):
         text = K1_SRC_INCLUDES.read_text()
         self.assertIn("framework-arduinoespressif32-libs", text)

@@ -17,6 +17,7 @@ source_scope:            <paths the subagent may read>
 write_scope:             <paths the subagent may write; "none" if read-only>
 forbidden_actions:       <explicit no-list: upload, flash, erase, serial-write, commit, edit outside write_scope, ...>
 checkpoint_timeout:      <wall-clock or tool-call bound, e.g. "5 min" or "20 tool calls">
+launch_ack_timeout:      30 seconds (fixed; no retry after a blocked launch call)
 bounded_retry:           <one bounded retry window if first checkpoint misses, e.g. "3 min, request partial">
 fallback_owner:          <who runs if the subagent stalls: orchestrator-local | replacement agent | captain-escalation>
 final_answer_dependency: <can the final answer ship without this evidence? yes | no | narrow-to-claim>
@@ -42,6 +43,14 @@ PRE_DISPATCH -> RUNNING -> RECEIVED
                                                                           -> MISSING_OR_BLOCKED
                        -> SYNTHESIS_LEDGER
 ```
+
+Before `PRE_DISPATCH`, register the contract with
+`scripts/agent/delegation_guard.py register`. Launch one agent at a time and run
+`ack` immediately with the returned agent ID. The active cap is two and the
+maximum checkpoint is 300 seconds. A launch call without acknowledgement after
+30 seconds is `aborted`; do not issue another spawn attempt, and run the declared
+fallback locally. The repository guard records and detects this condition but
+cannot interrupt a collaboration API call that is already blocked.
 
 - First miss: request a useful partial or narrow the task. One bounded retry.
 - Second miss: stop treating the subagent as a source of truth. Start fallback.
