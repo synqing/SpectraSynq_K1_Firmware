@@ -384,9 +384,9 @@ def capture(firmware_root: Path | None = None) -> str:
 
 
 MUTATIONS = [
-    (r"case LIGHT_MODE_EMBER_V2:\s*//[^\n]*\n\s*return false;",
-     "return false;",
-     "EMBER_V2 re-enabled -> enabled count 22->23"),
+    (r"case LIGHT_MODE_EMBER_V2:\s*//[^\n]*\n",
+     "",
+     "EMBER_V2 re-enabled -> enabled count changes"),
     (r"case LIGHT_MODE_VU:\n", "case LIGHT_MODE_BLOOM:\n",
      "disable BLOOM instead of VU -> roster identity changes"),
 ]

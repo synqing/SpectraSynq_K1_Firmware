@@ -374,6 +374,27 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
     light_mode_river_surge(channel.history, *channel.effect);
   } else if (mode == LIGHT_MODE_TEMPO_RIVER_WALK) {
     light_mode_tempo_river_walk(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_BEAT_PULSE) {
+    // Closed-form inward rings: authors its own leds_16 fresh each frame (no trail).
+    light_mode_beat_pulse(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_BLOOM_BT) {
+    // Bloom BassTreble: greyscale scroll transport self-managed in channel.history.
+    light_mode_bloom_bt(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
+    // Waveform Hybrid: bouncing dot + trail, self-managed history.
+    light_mode_waveform_hybrid_k1(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_MOIRE_CATHEDRAL) {
+    // Moire Cathedral: overwrite-per-frame grating field.
+    light_mode_moire_cathedral(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_CANNONADE) {
+    // Cannonade: ballistic lob + arc-return + centre crack; self-managed wake.
+    light_mode_cannonade(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_SHOCKWAVE) {
+    // Shockwave: pure-age expanding shells; self-managed wake.
+    light_mode_shockwave(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_IRIS) {
+    // Iris: in-place spring dilate-recoil membrane; self-managed after-glow.
+    light_mode_iris(channel.history, *channel.effect);
   }
 }
 
@@ -674,10 +695,8 @@ void setup() {
   g_rotate8_available = false;
 #endif
 
-#ifndef K1_CUSTOM_LED_V1
   init_secondary_leds();
-  ENABLE_SECONDARY_LEDS = true;   // Custom single-channel build (K1_CUSTOM_LED_V1) drops the 2nd strip
-#endif
+  ENABLE_SECONDARY_LEDS = true;   // Dual-channel (incl. K1_CUSTOM_LED_V1 dual-214 wall build)
 #ifdef K1_WIRELESS_ENABLED
   k1_wireless_begin();
 #endif
@@ -699,13 +718,9 @@ void setup() {
   for (uint16_t x = 0; x < CONFIG.LED_COUNT; x++) {
     leds_out[x] = CRGB(0, 0, 0);
   }
-#ifndef K1_CUSTOM_LED_V1
-  // Custom single-channel build skips init_secondary_leds() -> leds_out_secondary is
-  // NULL; this boot-clear must be gated or it NULL-derefs on boot.
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
-#endif
   FastLED.show();
 
   // Create thread specifically for LED updates

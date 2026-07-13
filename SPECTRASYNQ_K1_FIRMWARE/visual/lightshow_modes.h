@@ -681,6 +681,13 @@ void light_mode_percussion_burst(CRGB16* leds_prev_buffer, ChannelEffectState& f
 void light_mode_tempo_comet_anticipate(ChannelEffectState& fx);  // Tempo Comet Anticipate — comets decelerate into the next beat (2026-06-11)
 void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // River Surge — Spectrum River v2 + build/drop macro-dynamics (2026-06-11)
 void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Tempo River Walk — palette walks one step per bar (2026-06-11)
+void light_mode_beat_pulse(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Beat Pulse (Resonant) — twin rings contract edge->centre on each beat; firmware-v3 0x1404 port (2026-07-11)
+void light_mode_bloom_bt(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Bloom BassTreble — bass births rings, treble drives speed, sqrt-warped bloom; firmware-v3 0x1309 port (2026-07-11)
+void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Waveform Hybrid — amplitude-bouncing dot + scroll trail; firmware-v3 0x1313 port (2026-07-11)
+void light_mode_moire_cathedral(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Moire Cathedral — migrating detuned gratings; firmware-v3 0x1C08 port (2026-07-11)
+void light_mode_cannonade(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Cannonade — ballistic lob, arc-and-return, centre crack (LIGHT_MODE_CANNONADE, 2026-07-11)
+void light_mode_shockwave(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Shockwave — pure-age expanding shells (LIGHT_MODE_SHOCKWAVE, 2026-07-11)
+void light_mode_iris(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Iris — in-place spring dilate-recoil membrane (LIGHT_MODE_IRIS, 2026-07-11)
 
 inline uint16_t waveform_full_strip_position(float amp) {
   if (amp > 1.0f) amp = 1.0f;
@@ -976,6 +983,20 @@ inline uint32_t vp_probe_dispatch_and_hash(uint8_t mode, uint32_t& energy) {
     light_mode_river_surge(leds_16_prev, effect_state_primary);
   } else if (mode == LIGHT_MODE_TEMPO_RIVER_WALK) {
     light_mode_tempo_river_walk(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_BEAT_PULSE) {
+    light_mode_beat_pulse(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_BLOOM_BT) {
+    light_mode_bloom_bt(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
+    light_mode_waveform_hybrid_k1(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_MOIRE_CATHEDRAL) {
+    light_mode_moire_cathedral(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_CANNONADE) {
+    light_mode_cannonade(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_SHOCKWAVE) {
+    light_mode_shockwave(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_IRIS) {
+    light_mode_iris(leds_16_prev, effect_state_primary);
   }
 
   energy = vp_probe_energy(leds_16);
@@ -1094,6 +1115,13 @@ inline void vp_run_output_probe() {
   vp_probe_print_mode(LIGHT_MODE_TEMPO_COMET_ANTICIPATE);
   vp_probe_print_mode(LIGHT_MODE_RIVER_SURGE);
   vp_probe_print_mode(LIGHT_MODE_TEMPO_RIVER_WALK);
+  vp_probe_print_mode(LIGHT_MODE_BEAT_PULSE);
+  vp_probe_print_mode(LIGHT_MODE_BLOOM_BT);
+  vp_probe_print_mode(LIGHT_MODE_WAVEFORM_HYBRID_K1);
+  vp_probe_print_mode(LIGHT_MODE_MOIRE_CATHEDRAL);
+  vp_probe_print_mode(LIGHT_MODE_CANNONADE);
+  vp_probe_print_mode(LIGHT_MODE_SHOCKWAVE);
+  vp_probe_print_mode(LIGHT_MODE_IRIS);
   USBSerial.println("VPO,ver=1,event=end");
   tx_end(false);
 

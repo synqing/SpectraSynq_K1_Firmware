@@ -87,6 +87,13 @@ EffectEntry g_registry[] = {
     { legacy_id(LIGHT_MODE_TEMPO_COMET_ANTICIPATE),"tempo_comet_anticipate","TEMPO COMET ANTICIPATE",nullptr,nullptr,true, false, AudioDeps::BEAT | AudioDeps::ONSET,  LIGHT_MODE_TEMPO_COMET_ANTICIPATE },
     { legacy_id(LIGHT_MODE_RIVER_SURGE),          "river_surge",          "RIVER SURGE",           nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_RIVER_SURGE },
     { legacy_id(LIGHT_MODE_TEMPO_RIVER_WALK),     "tempo_river_walk",     "TEMPO RIVER WALK",      nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::CHORD,  LIGHT_MODE_TEMPO_RIVER_WALK },
+    { legacy_id(LIGHT_MODE_BEAT_PULSE),           "beat_pulse",           "BEAT PULSE",            nullptr, nullptr, false, false, AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_BEAT_PULSE },
+    { legacy_id(LIGHT_MODE_BLOOM_BT),             "bloom_bt",             "BLOOM BASSTREBLE",      nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_BLOOM_BT },
+    { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),   "waveform_hybrid_k1",   "WAVEFORM HYBRID K1",    nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_WAVEFORM_HYBRID_K1 },
+    { legacy_id(LIGHT_MODE_MOIRE_CATHEDRAL),      "moire_cathedral",      "MOIRE CATHEDRAL",       nullptr, nullptr, false, false, AudioDeps::LEVEL,                  LIGHT_MODE_MOIRE_CATHEDRAL },
+    { legacy_id(LIGHT_MODE_CANNONADE),            "cannonade",            "CANNONADE",             nullptr, nullptr, false, false, AudioDeps::ONSET | AudioDeps::BEAT,  LIGHT_MODE_CANNONADE },
+    { legacy_id(LIGHT_MODE_SHOCKWAVE),            "shockwave",            "SHOCKWAVE",             nullptr, nullptr, true,  false, AudioDeps::ONSET | AudioDeps::LEVEL, LIGHT_MODE_SHOCKWAVE },
+    { legacy_id(LIGHT_MODE_IRIS),                 "iris",                 "IRIS",                  nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::ONSET,  LIGHT_MODE_IRIS },
 
     // ── Native family 0x10/0x11/0x12: the ported-but-dead IEffects go live here ──
     { 0x1001, "beat_pulse_resonant",   "Beat Pulse (Resonant)",  nullptr, nullptr, true, true, AudioDeps::BEAT | AudioDeps::LEVEL,  kNoLegacy },
@@ -142,6 +149,13 @@ constexpr RegId k_reg_ids[] = {
     { legacy_id(LIGHT_MODE_TEMPO_COMET_ANTICIPATE),LIGHT_MODE_TEMPO_COMET_ANTICIPATE },
     { legacy_id(LIGHT_MODE_RIVER_SURGE),           LIGHT_MODE_RIVER_SURGE },
     { legacy_id(LIGHT_MODE_TEMPO_RIVER_WALK),      LIGHT_MODE_TEMPO_RIVER_WALK },
+    { legacy_id(LIGHT_MODE_BEAT_PULSE),            LIGHT_MODE_BEAT_PULSE },
+    { legacy_id(LIGHT_MODE_BLOOM_BT),              LIGHT_MODE_BLOOM_BT },
+    { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),    LIGHT_MODE_WAVEFORM_HYBRID_K1 },
+    { legacy_id(LIGHT_MODE_MOIRE_CATHEDRAL),       LIGHT_MODE_MOIRE_CATHEDRAL },
+    { legacy_id(LIGHT_MODE_CANNONADE),             LIGHT_MODE_CANNONADE },
+    { legacy_id(LIGHT_MODE_SHOCKWAVE),             LIGHT_MODE_SHOCKWAVE },
+    { legacy_id(LIGHT_MODE_IRIS),                  LIGHT_MODE_IRIS },
     { 0x1001, kNoLegacy },
     { 0x1101, kNoLegacy },
     { 0x1201, kNoLegacy },
@@ -194,7 +208,9 @@ K1_REG_ROW_GUARD(16); K1_REG_ROW_GUARD(17); K1_REG_ROW_GUARD(18); K1_REG_ROW_GUA
 K1_REG_ROW_GUARD(20); K1_REG_ROW_GUARD(21); K1_REG_ROW_GUARD(22); K1_REG_ROW_GUARD(23);
 K1_REG_ROW_GUARD(24); K1_REG_ROW_GUARD(25); K1_REG_ROW_GUARD(26); K1_REG_ROW_GUARD(27);
 K1_REG_ROW_GUARD(28); K1_REG_ROW_GUARD(29); K1_REG_ROW_GUARD(30); K1_REG_ROW_GUARD(31);
-K1_REG_ROW_GUARD(32); K1_REG_ROW_GUARD(33); K1_REG_ROW_GUARD(34);
+K1_REG_ROW_GUARD(32); K1_REG_ROW_GUARD(33); K1_REG_ROW_GUARD(34); K1_REG_ROW_GUARD(35);
+K1_REG_ROW_GUARD(36); K1_REG_ROW_GUARD(37); K1_REG_ROW_GUARD(38); K1_REG_ROW_GUARD(39);
+K1_REG_ROW_GUARD(40); K1_REG_ROW_GUARD(41);
 
 #undef K1_REG_ROW_GUARD
 

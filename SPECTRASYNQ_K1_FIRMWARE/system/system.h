@@ -412,6 +412,13 @@ void init_system() {
   set_mode_name(27, "TEMPO COMET ANTICIPATE");
   set_mode_name(28, "RIVER SURGE");
   set_mode_name(29, "TEMPO RIVER WALK");
+  set_mode_name(30, "BEAT PULSE");
+  set_mode_name(31, "BLOOM BASSTREBLE");
+  set_mode_name(32, "WAVEFORM HYBRID K1");
+  set_mode_name(33, "MOIRE CATHEDRAL");
+  set_mode_name(34, "CANNONADE");
+  set_mode_name(35, "SHOCKWAVE");
+  set_mode_name(36, "IRIS");
 
   init_serial(SERIAL_BAUD);
   init_sweet_spot();
@@ -422,6 +429,12 @@ void init_system() {
   // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
+#ifdef K1_CUSTOM_LED_V1
+  // Dual-214 wall build: Captain-locked 2.5 A total PSU budget. Force over any
+  // persisted CONFIG.MAX_CURRENT_MA so a prior 1500 mA product save cannot leave
+  // FastLED's power limiter undersized (or a stale higher value over-budget).
+  CONFIG.MAX_CURRENT_MA = 2500;
+#endif
   enforce_compiled_audio_timing_config();
 
 #ifdef K1_MIC_IM73D_PDM_V1

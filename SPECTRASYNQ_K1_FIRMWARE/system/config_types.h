@@ -122,14 +122,26 @@
 
 // LED strip mode selection: 1=61 LEDs, 2=91 LEDs, 3=160 LEDs (default).
 #define LED_STRIP_MODE 3
-#ifdef K1_CUSTOM_LED_V1
-  // Custom single-channel wall-bounce build (2026-07-06): 224 LEDs on the primary
-  // GPIO only, secondary channel dropped (see the .ino:670/693 guards). The 160-px
-  // render canvas (NATIVE_RESOLUTION) is UNCHANGED — scale_to_strip() resamples it
-  // onto 224 physical LEDs, exactly as strip-modes 61/91/160 already do. Output
-  // buffers are heap-allocated to CONFIG.LED_COUNT so 224 is memory-safe. Flag-gated:
-  // when K1_CUSTOM_LED_V1 is unset every env resolves 160 -> byte-identical.
-  #define LED_COUNT_VALUE 224
+#ifdef K1_CUSTOM_RGBIC_V1
+  // Custom dual-channel 12V-5050 build (2026-07-12): 138 addressable LEDs PER channel,
+  // driven as WS2812B 800 kbps RGB (matches the Captain's proven Pixelblaze config;
+  // NOT the APA102/clocked path that was tried and rejected — see the k1_custom_rgbic
+  // env block). Both channels stay independent; SECONDARY_LED_COUNT
+  // is set to 138 in globals.h under the same flag. NATIVE_RESOLUTION stays 160 →
+  // scale_to_strip() downsamples 160→138 (the existing 61/91 down-scale path). When
+  // K1_CUSTOM_RGBIC_V1 is unset every env resolves 160 → byte-identical.
+  #define LED_COUNT_VALUE 138
+#elif defined(K1_CUSTOM_LED_V1)
+  // Custom dual-channel wall-bounce build (2026-07-12 overwrite of the 2026-07-06
+  // single-channel test bed): 214 WS2812B LEDs PER channel (primary GPIO4 +
+  // secondary GPIO5), bare bulbs bouncing off a white wall (no LGP). Viewer sees
+  // the wall wash, not the dies. The 160-px render canvas (NATIVE_RESOLUTION) is
+  // UNCHANGED — scale_to_strip() / scale_to_secondary_strip() upsample 160→214 on
+  // both independent channels. SECONDARY_LED_COUNT is set to 214 in globals.h under
+  // the same flag. Output buffers are heap-allocated to CONFIG.LED_COUNT /
+  // SECONDARY_LED_COUNT so 214 is memory-safe. Flag-gated: when unset every env
+  // resolves 160 → byte-identical.
+  #define LED_COUNT_VALUE 214
 #elif LED_STRIP_MODE == 1
   #define LED_COUNT_VALUE 61
 #elif LED_STRIP_MODE == 2
@@ -183,6 +195,13 @@ enum lightshow_modes {
   LIGHT_MODE_TEMPO_COMET_ANTICIPATE,// -- Tempo Comet variant: comets decelerate INTO the next beat (2026-06-11)
   LIGHT_MODE_RIVER_SURGE,           // -- Spectrum River v2 variant: build/drop macro-dynamics axis (2026-06-11)
   LIGHT_MODE_TEMPO_RIVER_WALK,      // -- Tempo River variant: palette walks one step per bar (2026-06-11)
+  LIGHT_MODE_BEAT_PULSE,            // -- Twin rings CONTRACT edge->centre on each beat; faithful firmware-v3 0x1404 port (2026-07-11)
+  LIGHT_MODE_BLOOM_BT,              // -- Bloom BassTreble: bass births rings, treble drives speed, sqrt-warped outward bloom; firmware-v3 0x1309 port (2026-07-11)
+  LIGHT_MODE_WAVEFORM_HYBRID_K1,    // -- Waveform Hybrid: amplitude-bouncing dot + decaying scroll trail, 0.163s colour inertia; firmware-v3 0x1313 port (2026-07-11)
+  LIGHT_MODE_MOIRE_CATHEDRAL,       // -- Moire Cathedral: detuned gratings interfere into migrating ribs; firmware-v3 0x1C08 port (2026-07-11)
+  LIGHT_MODE_CANNONADE,             // -- Cannonade: ballistic lob from centre, arc-and-return under inward gravity, centre CRACK on impact; captivation family (2026-07-11)
+  LIGHT_MODE_SHOCKWAVE,             // -- Shockwave: pure-AGE expanding concentric shells (radius=vel*age, radius perp amplitude), timbre-tilt colour; captivation family (2026-07-11)
+  LIGHT_MODE_IRIS,                  // -- Iris: in-place spring membrane, dilate-and-recoil about 79/80, live beat-phase breathing; captivation family (2026-07-11)
 
   NUM_MODES  // used to know the length of this list if it changes in the future
 };
@@ -202,6 +221,9 @@ inline bool light_mode_is_enabled(uint8_t mode) {
     case LIGHT_MODE_QUANTUM_COLLAPSE:
     case LIGHT_MODE_VU:
     case LIGHT_MODE_EMBER_V2:   // pulled 2026-06-02 (Captain: "fucked, not going anywhere"); code kept, unselectable
+    case LIGHT_MODE_BEAT_PULSE:      // DELETED 2026-07-12 (Captain: A/B fail, "must be deleted"); unselectable
+    case LIGHT_MODE_MOIRE_CATHEDRAL: // DELETED 2026-07-12 (Captain: A/B fail, "delete that filth"); unselectable
+    case LIGHT_MODE_CANNONADE:       // DELETED 2026-07-12 (Captain: A/B fail); unselectable
       return false;
     default:
       return true;

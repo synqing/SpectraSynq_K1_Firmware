@@ -23,6 +23,8 @@
 
 #define COMET_MAX 6  // light_mode_comet() per-channel comet pool size (2026-06-02)
 #define PBURST_MAX 8  // light_mode_percussion_burst() per-channel particle pool size (2026-06-11)
+#define CANNA_MAX 6  // light_mode_cannonade() per-channel ballistic projectile pool (2026-07-11)
+#define SHOCK_MAX 6  // light_mode_shockwave() per-channel pure-age shell pool (2026-07-11)
 
 #define DFORGE_LATTICE_N 8
 #define PRISM_RING_MAX 6
@@ -169,6 +171,81 @@ struct ChannelEffectState {
   uint8_t  trwalk_beats;              // beats counted in current bar (0..3)
   float    trwalk_target;             // palette-walk target offset [0,1)
   float    trwalk_offset;             // slewed live offset [0,1)
+
+  // light_mode_beat_pulse() — Beat Pulse (Resonant) port of firmware-v3 0x1404.
+  // Scalar-only, closed-form on ms-since-last-beat; no buffers. Reset to 0 canonically.
+  uint32_t bpulse_last_beat_ms;       // last beat timestamp (millis); 0 = no beat yet
+  float    bpulse_intensity;          // per-beat punch (0.40..1.0 by beat strength); 0 pre-first-beat
+  float    bpulse_travel;             // per-beat contraction-speed scale (strong beat = faster inward)
+  float    bpulse_hue;                // per-beat warm/cool colour offset (band balance at the beat)
+  float    bpulse_glow;               // eased continuous bass-breathing centre glow (inter-beat life)
+  uint32_t bpulse_last_ms;            // k1ease::safe_dt source for the glow follower
+
+  // light_mode_bloom_bt() — Bloom BassTreble port of firmware-v3 0x1309.
+  // Greyscale scroll transport lives in the per-channel leds_prev_buffer.
+  uint32_t bloombt_iter;              // (legacy) even/odd frame counter — unused since the continuous-scroll fix
+  uint32_t bloombt_last_ms;           // k1ease::safe_dt source (0 = seed 1/120 s)
+  float    bloombt_bass_env;          // eased bass envelope (40 ms attack / 350 ms release)
+  float    bloombt_sil;               // smoothed silence gate 0..1 (50 ms in / 300 ms out)
+  float    bloombt_treble_env;        // eased treble envelope -> continuous scroll speed (kills the 1<->2 px thrash)
+  float    bloombt_scroll_accum;      // fractional-pixel outward-scroll carry (continuous speed)
+
+  // light_mode_waveform_hybrid_k1() — Waveform Hybrid port of firmware-v3 0x1313.
+  // Bouncing amplitude-dot + decaying scroll trail. Reset to 0 canonically.
+  uint32_t wfhyb_last_ms;             // dt source; 0 == first frame
+  float    wfhyb_scroll_accum;        // sub-pixel outward-scroll carry (px)
+  float    wfhyb_peak_ema1;           // wfPeakLast reconstruction, EMA stage 1
+  float    wfhyb_peak_last;           // wfPeakLast reconstruction, EMA stage 2 -> dot position
+  float    wfhyb_dot_r;               // 0.163s temporal RGB EMA (red) — hybrid colour signature
+  float    wfhyb_dot_g;               // 0.163s temporal RGB EMA (green)
+  float    wfhyb_dot_b;               // 0.163s temporal RGB EMA (blue)
+  float    wfhyb_hold_env;            // signal-presence hold envelope (audioConfidence analogue)
+  float    wfhyb_sil_scale;           // silence gate envelope (silentScale analogue)
+
+  // light_mode_moire_cathedral() — Moire Cathedral port of firmware-v3 0x1C08.
+  // Migrating detuned gratings. Reset to 0 canonically (max-followers floored in-loop).
+  uint32_t moire_last_ms;             // dt source (millis of previous frame)
+  float    moire_t;                   // grating migration phase accumulator
+  float    moire_bass;                // low_energy asymmetric envelope (attack 0.05s / release 0.35s)
+  float    moire_mid;                 // mid_energy asymmetric envelope (attack 0.05s / release 0.35s)
+  float    moire_bass_max;            // bass peak max-follower (floored 0.04)
+  float    moire_mid_max;             // mid peak max-follower (floored 0.04)
+  float    moire_impact;              // beat-impact decay envelope
+  float    moire_beat_env;            // smoothed beat-strength envelope feeding beat_mod (0.4 floor)
+  float    moire_sil;                 // smoothed silence gate 0..1 (soft fade-to-dark)
+
+  // light_mode_cannonade() — ballistic-lob projectile pool (arc-and-return + centre crack).
+  float    canna_pos[CANNA_MAX];      // px from centre (0..HALF), outward
+  float    canna_prev[CANNA_MAX];     // frame-start pos — swept-wake tail anchor
+  float    canna_vel[CANNA_MAX];      // px/s (>0 outward, <0 falling back); gravity pulls inward
+  float    canna_hue[CANNA_MAX];      // palette position set at launch by strength
+  float    canna_life[CANNA_MAX];     // remaining-flight countdown (s); <=0 => slot free
+  float    canna_crack;               // eased centre CRACK envelope (impact_flash ∝ |v_impact|)
+  float    canna_sil;                 // eased silence gate (0 = honest dark)
+  float    canna_hold_env;            // presence envelope for the breathe-not-blink floor
+  uint32_t canna_last_ms;             // dt source (0 == first frame)
+  uint32_t canna_last_event_id;       // bass_onset edge-detect
+
+  // light_mode_shockwave() — pure-AGE expanding shell pool (radius = vel*age, radius perp amplitude).
+  float    shock_age[SHOCK_MAX];      // seconds since birth; radius = vel*age (pure age)
+  float    shock_life[SHOCK_MAX];     // fixed lifetime (s); slot dead when <=0, dies at age>=life
+  float    shock_vel[SHOCK_MAX];      // px/s, FIXED at spawn (never amplitude)
+  float    shock_bright[SHOCK_MAX];   // spawn brightness (amplitude-derived); also scales thickness
+  float    shock_hue[SHOCK_MAX];      // timbre-tilt palette coordinate [0,1], captured at spawn
+  float    shock_env;                 // eased breathe envelope (drives 0.4+0.6*env floor)
+  float    shock_sil;                 // eased silence gate (honest dark on silence)
+  uint32_t shock_last_ms;             // dt source (k1ease::safe_dt)
+  uint32_t shock_last_event_id;       // onset edge-detect
+
+  // light_mode_iris() — single in-place spring membrane (dilate-and-recoil about 79/80).
+  float    iris_r;                    // membrane radius (px from centre, 0..HALF)
+  float    iris_v;                    // radial velocity (px/s)
+  float    iris_target;               // spring target radius (px)
+  float    iris_baseline;             // beat-breathing rest radius (px)
+  float    iris_sil;                  // eased silence gate (0=dark .. 1=present)
+  float    iris_env;                  // audio-presence envelope (breathe-not-blink floor)
+  uint32_t iris_last_ms;              // k1ease::safe_dt source (0 == first frame)
+  uint32_t iris_last_event;           // onset event_id dedupe (fresh-impact edge)
 };
 
 // The two per-channel state globals are defined in globals.h (which includes
