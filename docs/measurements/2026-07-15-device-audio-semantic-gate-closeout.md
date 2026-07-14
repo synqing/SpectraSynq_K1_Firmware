@@ -100,6 +100,30 @@ requires `--leave-effect-selected` to opt out.
 maxima were 9.483 ms and 10.121 ms. No frame gaps or I2S faults were recorded.
 This lane reports the known frame-budget pressure and does not modify it.
 
+## Commit-State Validation
+
+[FACT] The gate implementation and evidence were committed as `7b3d6c0`.
+
+[FACT] A detached worktree at exact commit `7b3d6c0` passed all 36 focused
+IM73D/device-gate tests. Both `k1_prod_im73d` and `k1_bench_im73d` built
+successfully from that exact commit.
+
+[FACT] The exact-commit full suite reported **762 passed, 1 skipped, 2 failed**.
+Both failures are legacy `tests/test_custom_led_static.py` assertions for
+uncommitted 224-LED/single-channel code. The parent commit `6170d69` fails the
+same two tests with the same assertions, so they are not regressions from this
+lane. The dirty working tree passes 766 tests because unrelated current custom-
+LED edits satisfy them.
+
+[FACT] Exact reproduction of the commit-state boundary:
+
+```bash
+git worktree add --detach /tmp/k1-im73d-verify 7b3d6c0
+(cd /tmp/k1-im73d-verify && python3 -m pytest tests/ -q)
+git worktree add --detach /tmp/k1-parent-verify 6170d69
+(cd /tmp/k1-parent-verify && python3 -m pytest tests/test_custom_led_static.py::test_led_count_224_is_flag_gated_only tests/test_custom_led_static.py::test_single_channel_secondary_is_flag_guarded -q)
+```
+
 ## Exact Re-runs
 
 [FACT] Re-run the six-track device corpus and regenerate every tempo number:
