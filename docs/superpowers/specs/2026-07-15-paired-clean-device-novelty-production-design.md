@@ -1,5 +1,10 @@
 # Paired Clean vs Device Novelty Production Design
 
+> [FACT] **SUPERSEDED 2026-07-15:** Captain designated IM73D as the
+> production/reference microphone. The proposed SPH recapture transaction is
+> cancelled. The completed same-track IM73D offline replay is specified in
+> [`2026-07-15-paired-clean-im73d-novelty-design.md`](2026-07-15-paired-clean-im73d-novelty-design.md).
+
 ## Status
 
 [FACT] Captain approved this revised design on 2026-07-15 after a red-team

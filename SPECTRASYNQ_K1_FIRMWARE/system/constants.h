@@ -322,8 +322,8 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define LED_CLOCK_PIN 5
 
     #ifdef K1_MIC_IM73D_PDM_V1
-      // IM73D122 PDM mic (bench eval, 2026-07-02) — physically replaces the SPH0645
-      // on these pads. Dedicated PDM macros consumed by init_i2s()'s PDM branch; the
+      // IM73D122 PDM mic (bench/reference hardware) on the production audio path.
+      // Dedicated PDM macros are consumed by init_i2s()'s PDM branch; the
       // i2s_std I2S_*_PIN above stay defined but UNUSED under the flag. Proven config:
       // clk 819.2 kHz (DSR_8S) / LR LOW = LEFT slot / falling edge.
       #define K1_PDM_CLK_PIN 13   // PDM clock out
@@ -331,8 +331,7 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
     #endif
   #else
-    // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
-    // env: esp32dev_audio_esv11_k1v2.
+    // K1 hardware production GPIO map.
     #define I2S_BCLK_PIN 13
     #define I2S_LRCLK_PIN 11
     #define I2S_DIN_PIN 14
@@ -347,9 +346,9 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       // edge. The i2s_std I2S_*_PIN above stay defined but UNUSED under the flag.
       // Collision-free on this map: GPIO 12 is unassigned, 13/14 free when SPH drops,
       // LEDs 6/7 unaffected, old SPH LRCLK 11 goes unused.
-      #define K1_PDM_CLK_PIN 13   // PDM clock out (= production SPH BCLK pad, freed)
+      #define K1_PDM_CLK_PIN 13   // PDM clock out
       #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
-      #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
+      #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge
     #endif
   #endif
 

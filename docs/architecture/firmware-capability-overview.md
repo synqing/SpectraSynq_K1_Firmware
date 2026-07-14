@@ -30,7 +30,7 @@ branches and includes intentionally-disabled and dev-only surfaces:
 
 | Capability | Status | Detail |
 |---|---|---|
-| Mic capture | [LIVE] | SPH0645 MEMS over I2S, 12.8 kHz, 32-bit, **mono** (single tap — no stereo analysis) |
+| Mic capture | [LIVE] | IM73D MEMS over PDM, 12.8 kHz, 16-bit **mono**; `k1_prod_im73d` is the production/reference environment |
 | Pitch analysis ("GDFT") | [LIVE] | **80 parallel Goertzel bins, one per semitone**, from ~110 Hz (A2) up through the musical range; per-bin variable window (long for bass, short for treble). Not an FFT — pitch-resolved by design (`constants.h:23-24`, `GDFT.h`) |
 | Effective update rate | [LIVE] | DMA frames at 133 Hz; low bins interlaced → ~66 Hz lower / ~133 Hz upper spectral refresh (`GDFT.h` `interlace_flip`) |
 | Chromagram | [LIVE] | 80 bins folded into **12 pitch classes** — drives note-coloured effects |

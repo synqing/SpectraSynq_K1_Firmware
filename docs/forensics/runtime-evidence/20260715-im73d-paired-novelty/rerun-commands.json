@@ -1,0 +1,37 @@
+{
+  "commands": [
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i /Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3 -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/martin-garrix-animals-128.wav",
+      "stage": "clean_decode",
+      "track": "martin-garrix-animals-128"
+    },
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i /Users/spectrasynq/Downloads/DavidGuettaMORTEN-Dreams.mp3 -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/david-guetta-morten-dreams-128.wav",
+      "stage": "clean_decode",
+      "track": "david-guetta-morten-dreams-128"
+    },
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i '/Users/spectrasynq/Downloads/deadmau5-Ghosts'\"'\"'n'\"'\"'Stuff).mp3' -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/deadmau5-ghosts-n-stuff-128.wav",
+      "stage": "clean_decode",
+      "track": "deadmau5-ghosts-n-stuff-128"
+    },
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i /Users/spectrasynq/Downloads/Avicii-Levels.mp3 -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/avicii-levels-126.wav",
+      "stage": "clean_decode",
+      "track": "avicii-levels-126"
+    },
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i '/Users/spectrasynq/Downloads/HI-LO-Poseidon).mp3' -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/hi-lo-poseidon-127.wav",
+      "stage": "clean_decode",
+      "track": "hi-lo-poseidon-127"
+    },
+    {
+      "command": "/opt/homebrew/bin/ffmpeg -hide_banner -loglevel error -y -t 120.000 -i /Users/spectrasynq/Downloads/CharlotteDeWitte-SgadiLiMi.mp3 -ac 1 -ar 12800 /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/k1-paired-novelty-79sv7dl_/charlotte-de-witte-sgadi-li-mi-135.wav",
+      "stage": "clean_decode",
+      "track": "charlotte-de-witte-sgadi-li-mi-135"
+    }
+  ],
+  "detector_binary_sha256": "501bff561200270ea0532fe9cf053ac50f819ff545059a9b08a3bd8cd528d7e1",
+  "entry_command": "python3 scripts/regression-harness/paired_novelty_source_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-corpus.json --device-manifest docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/device-corpus-manifest.json --preflight-report docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-preflight.json --duration-ms 120000 --out-dir docs/forensics/runtime-evidence/20260715-im73d-paired-novelty --commands-out docs/forensics/runtime-evidence/20260715-im73d-paired-novelty/rerun-commands.json --out-json docs/measurements/2026-07-15-im73d-paired-novelty.json --out-md docs/measurements/2026-07-15-im73d-paired-novelty.md",
+  "verdict": "COMPLETE"
+}

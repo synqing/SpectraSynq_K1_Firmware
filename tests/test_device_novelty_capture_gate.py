@@ -60,6 +60,21 @@ def test_corpus_scorer_uses_last_half_mode_and_relative_tolerance(tmp_path):
     assert scored["locked_frac"] == 1.0
 
 
+def test_corpus_scorer_last_half_is_relative_to_nonzero_device_uptime(tmp_path):
+    trajectory = tmp_path / "device-uptime-trajectory.log"
+    rows = []
+    for index in range(20):
+        bpm = 90.0 if index < 10 else 128.0
+        locked = 0 if index < 10 else 1
+        rows.append(f"T {300000 + index * 1000} {bpm:.1f} 0.8 {locked} 0.0 0")
+    trajectory.write_text("\n".join(rows) + "\n")
+
+    scored = scorer.score_trajectory(trajectory, 128.0)
+    assert scored["det_bpm"] == 128.0
+    assert scored["acc1"] is True
+    assert scored["locked_frac"] == 1.0
+
+
 def test_aggregate_emits_empty_bucket_as_not_applicable():
     aggregate = scorer.aggregate_set(
         [

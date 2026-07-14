@@ -20,13 +20,19 @@ binary identity.
 
 ## Truthumbers
 
-[FACT] Six device-novelty EDM tracks at 126-135 BPM produced Acc1 **83.3%**,
-Acc2 **83.3%**, octave-error **0.0%**, and mean locked fraction **50.4%**.
+[FACT] Six device-novelty EDM tracks at 126-135 BPM produced Acc1 **100.0%**,
+Acc2 **100.0%**, octave-error **0.0%**, and mean raw locked fraction **47.0%**.
 
 [FACT] All six tracks are in the load-bearing **120-140 BPM** bucket, where the
-device results are Acc1 **83.3%**, Acc2 **83.3%**, octave-error **0.0%**, and
-locked fraction **50.4%**. The cross-corpus host-clean reference for that bucket
+device results are Acc1 **100.0%**, Acc2 **100.0%**, octave-error **0.0%**, and
+raw locked fraction **47.0%**. The cross-corpus host-clean reference for that bucket
 is Acc1/Acc2 **16.7%**.
+
+[FACT] These figures supersede the earlier **83.3% / 50.4%** aggregate and the
+earlier Dreams **73 BPM** result. The scorer incorrectly treated absolute device
+uptime as trajectory-relative time when selecting the final half. The corrected
+cutoff is `first_timestamp + 0.5 * (last_timestamp - first_timestamp)` and is
+regression-tested with a non-zero timestamp origin.
 
 [INFERENCE] The positive delta does not prove that device GDFT novelty is better
 than clean spectral flux because the device and host rows use different corpora.
@@ -34,6 +40,25 @@ It proves the requested device behaviour on this six-track EDM set.
 
 [FACT] The complete all-scope, in-range, per-bucket, and per-track delta table is
 [`2026-07-14-device-novelty-tempo-delta.md`](2026-07-14-device-novelty-tempo-delta.md).
+
+## Paired Novelty-Source Result
+
+[FACT] On the same six tracks through the same compiled detector, host-clean
+spectral flux scored Acc1 **33.3%** and Acc2 **50.0%** while IM73D device novelty
+scored Acc1/Acc2 **100.0%**. Therefore the hypothesis that device novelty reduces
+tempo correctness is **NOT_SUPPORTED** by this corpus.
+
+[FACT] Raw lock occupancy was higher for clean novelty (**94.9%**) than device
+novelty (**47.0%**), but clean wrong-lane lock was **42.7%** versus device
+**1.8%**. Acc1-correct lock occupancy was **44.2%** clean versus **43.8%** device.
+
+[INFERENCE] Raw lock occupancy alone is not a useful success metric here because
+the clean arm frequently locks with confidence to an incorrect tempo. The IM73D
+front-end is more conservative on this set, and Dreams remains weak at only
+**7.5%** Acc1-correct lock occupancy.
+
+[FACT] The paired table, per-track trajectories, limitations, and exact rerun are
+in [`2026-07-15-im73d-paired-novelty.md`](2026-07-15-im73d-paired-novelty.md).
 
 ## Five-Flag Evidence
 

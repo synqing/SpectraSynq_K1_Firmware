@@ -94,10 +94,9 @@ git branch --show-current && git rev-parse --short HEAD
 
 - **Typical branch:** `lane/im73d-pdm-eval`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** IM73D122 productionisation. Phase-1 firmware is done;
-  bench IM73D R1/no-speaker DSR proof is closed; current blocker is R2
-  production-shape hardware proof (main K1 SPH0645 -> IM73D on GPIO13/12/14,
-  or a dedicated production-shape IM73D unit).
+- **Focus:** IM73D122 production/reference hardware. Captain closed the hardware
+  choice on 2026-07-15; `k1_prod_im73d` is shipping/default and
+  `k1_bench_im73d` is the bench reference. Do not reopen an SPH comparison gate.
 
 If scoped **firmware** work and `git status` shows a different branch than lane
 docs imply, stop and report the conflict before editing source.
@@ -257,7 +256,8 @@ Hardware writes are gated. `scripts/platformio/k1_upload_guard.py` matches the b
 - any serial command that writes to a device
 
 Bench K1 (`B489A500`) is the only valid target for `k1_bench_im73d`.
-Main K1 (`F887A500`) is the only valid target for `k1_hardware`.
+Main K1 (`F887A500`) is the only valid target for `k1_prod_im73d`.
+`k1_hardware` is a legacy SPH-compatible base and requires an explicit legacy use.
 
 ---
 
@@ -266,9 +266,9 @@ Main K1 (`F887A500`) is the only valid target for `k1_hardware`.
 Before any non-`wip/*` commit:
 
 1. `pytest tests/` must pass
-2. `bash scripts/agent/pio-build.sh k1_hardware` must be clean for firmware source changes
+2. `bash scripts/agent/pio-build.sh k1_prod_im73d` must be clean for firmware source changes
 3. The pre-commit hook runs automatically
-4. For IM73D changes, `bash scripts/agent/pio-build.sh k1_bench_im73d` must also be clean
+4. For microphone-path changes, `bash scripts/agent/pio-build.sh k1_bench_im73d` must also be clean
 
 For visual-only changes, host-green is sufficient; device eyes-on is a tracked non-blocking follow-up.
 

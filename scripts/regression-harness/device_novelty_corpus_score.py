@@ -184,8 +184,8 @@ def main() -> int:
         "metric_contract": {
             "acc1": "relative error <=4% at exact GT tempo",
             "acc2": "relative error <=4% at GT multiples 1/3, 1/2, 1, 2, 3",
-            "detected_bpm": "mode of rounded BPM over final 50% of trajectory",
-            "locked_fraction": "mean lock state over final 50% of trajectory",
+            "detected_bpm": "mode of rounded BPM over final 50% of trajectory duration, relative to first timestamp",
+            "locked_fraction": "mean lock state over final 50% of trajectory duration, relative to first timestamp",
             "octave_error": "Acc2 minus Acc1",
         },
         "manifest": str(args.manifest),
@@ -202,6 +202,8 @@ def main() -> int:
 
     lines = [
         "# Device-Novelty Tempo Delta",
+        "",
+        "[FACT] **2026-07-15 scoring correction:** the settled-window cutoff is derived from trajectory duration (`first + 0.5 * (last - first)`). The earlier absolute-uptime cutoff overstated the window and produced the superseded 83.3% aggregate and 73 BPM Dreams result.",
         "",
         "[FACT] Device rows use buffered on-device GDFT novelty replayed through the current host tempo detector.",
         "",

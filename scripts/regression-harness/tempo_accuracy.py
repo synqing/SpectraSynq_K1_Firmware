@@ -137,7 +137,9 @@ def detected_bpm(ms, bpm, conf, lock):
     (det_bpm, settled_median, locked_frac, final_conf)."""
     if ms.size == 0:
         return None, None, 0.0, 0.0
-    cutoff = ms.max() * 0.5
+    # Device replays retain absolute firmware-uptime timestamps. Derive the
+    # settled window from trajectory duration, not from an assumed zero origin.
+    cutoff = ms.min() + (ms.max() - ms.min()) * 0.5
     sel = ms >= cutoff
     if sel.sum() < 5:
         sel = np.ones_like(ms, dtype=bool)

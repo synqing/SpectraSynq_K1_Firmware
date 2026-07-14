@@ -100,7 +100,7 @@ esp-idf 5.4.1, arduino-esp32 3.2.0, xtensa-esp32s3-elf
 git clone [repo-url]
 cd "SensoryBridge-main 9"
 
-# Build firmware (default: k1_hardware — production audio-semantic forward-graft)
+# Build firmware (default: k1_prod_im73d — production IM73D hardware)
 pio run
 
 # Upload to device (verifies USB MAC + chip ID via k1_upload_guard.py pre-script)
@@ -117,15 +117,21 @@ pytest tests/ -v
 
 | Environment | Purpose | Status |
 |-------------|---------|--------|
-| `k1_hardware` | **Production** — audio-semantic forward-graft (v2 DSP, 2026-06-05) | Default, device eyes-on gate pending |
-| `k1_bench_reference` | Alternative bench K1v2 GPIO map (same DSP, different pinout) | No instrumentation |
+| `k1_prod_im73d` | **Production/default** — IM73D PDM + production GPIO map | Shipping |
+| `k1_bench_im73d` | **Bench reference** — IM73D PDM + bench GPIO map | Reference hardware |
+| `k1_hardware` | Legacy SPH-compatible production-map base | Non-canonical compatibility |
+| `k1_bench_reference` | Legacy SPH-compatible bench-map base | Non-canonical compatibility |
 | `k1_hardware_trace_dev` | Development + MabuTrace timeline capture (non-shippable) | Dev-only |
 | `k1_hardware_harness` | Diagnostic capture mode (AP/VP evidence surfaces) | Dev-only |
 | `k1_ap_frontend_probe` | AP frontend diagnostics + replayable tempo input (2026-06-06) | Dev-only |
 | `k1_motion_probe` | Apparent-motion perceptual test harness | Non-shippable |
 | `k1_tempo_probe` | Beat/tempo-phase lock proof harness | Non-shippable |
 
-**Current Status (2026-06-15):** Audio-semantic forward-graft (SB_TEMPO_CONF_V2, SB_TEMPO_FLYWHEEL_V2, SB_ONSET_V2, SB_CHORD_V2, SB_SEMANTIC_STATE, SB_CHORD_HUE_V1, SB_DROP_CUT_V1) promoted to k1_hardware default. Host regression gate PASS (427 tests across 54 test files; static, replay, and gates validated in the release-gate run). Tier 1 chord-hue consumer and impact-lane (drop-cut + attack-snap) additions hardened 2026-06-11. Device eyes-on testing is the one remaining gate before production release.
+**Current Status (2026-07-15):** IM73D is the production/reference microphone;
+`k1_prod_im73d` is the default shipping environment and `k1_bench_im73d` is the
+bench reference. The five-flag DEVICE audio-semantic eyes-on gate is closed.
+Paired same-track replay does not support device-novelty accuracy degradation,
+while weak correct-lock occupancy on Dreams remains an explicit limitation.
 
 ### Testing
 
@@ -383,14 +389,14 @@ git commit -m "docs: ..."
 pytest tests/ && git commit -m "test: ..."
 
 # Changes to firmware or platformio.ini → pytest AND build must pass
-pytest tests/ && pio run -e k1_hardware && git commit -m "feat: ..."
+pytest tests/ && pio run -e k1_prod_im73d && git commit -m "feat: ..."
 
 # Unstaged binaries or files >5 MB → automatically rejected
 ```
 
 ### Build Configuration Reference
 
-**platformio.ini (active flags for k1_hardware, 2026-06-11):**
+**platformio.ini (shared production flags inherited by `k1_prod_im73d`):**
 ```ini
 # Audio semantic forward-graft (v2 DSP, fully validated 2026-06-05)
 -DSB_TEMPO_CONF_V2       # Stable prominence/periodicity confidence + lock FSM
@@ -501,7 +507,7 @@ Before implementing production behavior for timing, performance, frame-drop reco
 
 | Command | Description |
 |---------|-------------|
-| `pio run` | Build firmware (default: k1_hardware, production) |
+| `pio run` | Build firmware (default: k1_prod_im73d, production) |
 | `pio run -e <env>` | Build specific environment (k1_hardware, k1_bench_reference, etc.) |
 | `pio run --target upload` | Upload to device (USB MAC verified by k1_upload_guard.py) |
 | `pio run --verbose` | Build with verbose output (check warnings) |
@@ -519,19 +525,19 @@ Before implementing production behavior for timing, performance, frame-drop reco
 
 **Production Build Verification:**
 ```bash
-# Build firmware (k1_hardware is production)
-pio run -e k1_hardware
+# Build firmware (k1_prod_im73d is production)
+pio run -e k1_prod_im73d
 
 # Verify no instrumentation leaks
 grep -r "MABU_TRACE\|trace_dev" SPECTRASYNQ_K1_FIRMWARE/ || true
 # Should return empty
 
 # Check binary size (must fit in 16 MB total)
-ls -lh .pio/build/k1_hardware/firmware.bin
+ls -lh .pio/build/k1_prod_im73d/firmware.bin
 # Expected: ~10–12 MB
 
 # Run full gate before pushing
-pytest tests/ && pio run -e k1_hardware
+pytest tests/ && pio run -e k1_prod_im73d
 ```
 
 **Serial Hotkeys (on running device, 115200 baud):**

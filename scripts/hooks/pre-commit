@@ -143,8 +143,8 @@ run_build() {
     say "    install pio, or checkpoint on a wip/* branch."
     return 1
   fi
-  say "  → ${pio} run -e k1_hardware"
-  local out; out="$($pio run -e k1_hardware 2>&1)"; local rc=$?
+  say "  → ${pio} run -e k1_prod_im73d"
+  local out; out="$($pio run -e k1_prod_im73d 2>&1)"; local rc=$?
   printf '%s\n' "$out" | tail -4 >&2
   return $rc
 }

@@ -1,5 +1,5 @@
 ---
-abstract: "Step-by-step factory provisioning runbook for K1 units: build the k1_hardware target, assemble a single flashable factory image with make_factory_image.py (esptool merge_bin), optionally generate a per-unit NVS partition with make_unit_nvs.py, verify the unit by CHIP-ID (never by port) against device-build-registry.md, then flash and confirm 'Hash of data verified' + 'Hard resetting'. Per-unit serial/SKU scheme is Captain decision D4 — UNDECIDED; the NVS template is a placeholder. The tooling assembles and provisions only — it never flashes; the operator runs the single esptool write_flash command by hand."
+abstract: "Step-by-step factory provisioning runbook for K1 units: build the IM73D production target k1_prod_im73d, assemble a single flashable factory image with make_factory_image.py, verify the unit by chip ID rather than port, then flash and verify."
 ---
 
 # K1 Factory Flash Runbook
@@ -40,11 +40,11 @@ working in a worktree:
 
 ```bash
 export PLATFORMIO_BUILD_DIR=/path/to/.pio_isolated   # optional, for worktrees
-pio run -e k1_hardware
+pio run -e k1_prod_im73d
 ```
 
 This produces `bootloader.bin`, `partitions.bin`, and `firmware.bin` under the
-env build dir (`$PLATFORMIO_BUILD_DIR/k1_hardware`, or `.pio/build/k1_hardware`
+env build dir (`$PLATFORMIO_BUILD_DIR/k1_prod_im73d`, or `.pio/build/k1_prod_im73d`
 by default).
 
 ## Step 2 — (Optional, D4-gated) Generate a per-unit NVS partition

@@ -132,7 +132,7 @@ class DevInstrumentationBoundaryTest(unittest.TestCase):
     def test_production_platformio_env_excludes_dev_instrumentation(self):
         sections = platformio_sections()
         default_env = default_env_name()
-        self.assertEqual(default_env, "env:k1_hardware")
+        self.assertEqual(default_env, "env:k1_prod_im73d")
         production_envs = [name for name in sections if name.startswith("env:") and not is_non_shippable_env(name)]
         self.assertIn(default_env, production_envs)
 

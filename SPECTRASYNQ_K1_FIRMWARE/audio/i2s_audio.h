@@ -42,7 +42,7 @@
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
 #ifdef K1_MIC_IM73D_PDM_V1
-#include <driver/i2s_pdm.h>   // IM73D122 PDM RX (bench eval); flag-OFF token stream unchanged
+#include <driver/i2s_pdm.h>   // IM73D122 production/reference PDM RX
 #include <driver/gpio.h>      // LR-select GPIO drive
 #include <math.h>             // isfinite() for the PDM follower/NaN guard
 #endif
@@ -228,7 +228,7 @@ void init_i2s() {
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 
 #ifdef K1_MIC_IM73D_PDM_V1
-  // IM73D122 PDM RX (bench eval, 2026-07-02) — replaces the SPH0645 i2s_std path below.
+  // IM73D122 production/reference PDM RX — replaces the legacy SPH0645 i2s_std path below.
   // 16-bit mono, DSR_8S (clk 819.2 kHz), slot LEFT; pins clk=13/din=12/LR=14(LOW). Proven
   // on B489A500. Reuses the shared chan_cfg prologue above + the enable epilogue below;
   // assigns the EXISTING `result` (does NOT redeclare it — same function scope).

@@ -46,21 +46,22 @@ This project builds with **PlatformIO** (pioarduino 54.03.20 ≡ arduino-esp32
 
 ```bash
 # Build the production firmware
-pio run -e k1_hardware
+pio run -e k1_prod_im73d
 
 # Flash to the device (a pre-upload guard verifies USB serial + chip ID
 # before writing — it refuses a mismatched target)
-pio run -e k1_hardware -t upload
+pio run -e k1_prod_im73d -t upload --upload-port <verified-F887A500-port>
 
 # Serial monitor (live status + hotkeys)
 pio device monitor -b 115200
 ```
 
 > **Device discipline.** Each physical unit is bound to exactly one build
-> environment by GPIO map — never cross-flash. See
+> environment by GPIO and microphone map — never cross-flash. See
 > [`docs/hardware/device-build-registry.md`](./docs/hardware/device-build-registry.md):
-> the main K1 (`/dev/tty.usbmodem1401`, chip `F887A500`) takes `k1_hardware`;
-> the bench unit (`12201`, chip `B489A500`) takes `k1_bench_reference`.
+> the main K1 (chip `F887A500`) takes `k1_prod_im73d`; the bench reference
+> (chip `B489A500`) takes `k1_bench_im73d`. Ports drift and must be supplied
+> explicitly after identity verification.
 
 ## Test
 
