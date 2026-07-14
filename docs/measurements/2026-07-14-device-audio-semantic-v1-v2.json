@@ -1,0 +1,87 @@
+{
+  "captain_eyes_on": "PASS",
+  "expected_bpm": 128.0,
+  "eyes_on_evidence": "docs/measurements/2026-07-15-device-effect-eyes-on-corrected.json",
+  "eyes_on_evidence_pass": true,
+  "gate_verdict": "PASS",
+  "rerun_command": "python3 scripts/regression-harness/device_semantic_ab_score.py --v1-summary docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v1-off-animals-128_nov_buffered_20260714_225608__summary.json --v2-summary docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v2-animals-128_nov_buffered_20260714_225907__summary.json --expected-bpm 128 --captain-eyes-on PASS --eyes-on-evidence docs/measurements/2026-07-15-device-effect-eyes-on-corrected.json --out-json docs/measurements/2026-07-14-device-audio-semantic-v1-v2.json --out-md docs/measurements/2026-07-14-device-audio-semantic-v1-v2.md",
+  "v1_off": {
+    "ap_sampled": {
+      "bass_onset_positive_rows": 1,
+      "locked_fraction": 0.0,
+      "onset_positive_rows": 11,
+      "rows": 125
+    },
+    "build_env": "k1_bench_ap_frontend_probe_v1_off",
+    "capture_integrity": {
+      "active_max_us": 9483.0,
+      "active_over_7500_count": 48,
+      "active_p95_us": 6016.0,
+      "bytes_mismatch_count": 0,
+      "crash_signature_count": 0,
+      "frame_gap_count": 0,
+      "i2s_not_ok_count": 0,
+      "novelty_dropped": 0,
+      "novelty_rows": 5334,
+      "timestamp_regression_count": 0,
+      "total_max_us": 11293
+    },
+    "capture_validation": "PASS",
+    "chip_id": "B489A500",
+    "mechanical_errors": [],
+    "mechanical_verdict": "PASS",
+    "raw_log": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v1-off-animals-128_nov_buffered_20260714_225608__raw.log",
+    "summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v1-off-animals-128_nov_buffered_20260714_225608__summary.json",
+    "tempo": {
+      "final_half_acc1": true,
+      "final_half_locked_fraction": 0.0,
+      "final_half_median_bpm": 128.0,
+      "final_half_median_confidence": 0.078,
+      "final_half_mode_bpm": 128,
+      "final_half_relative_error": 0.0,
+      "final_half_rows": 1189,
+      "rows": 2377,
+      "sampled_beat_tick_count": 29
+    }
+  },
+  "v2": {
+    "ap_sampled": {
+      "bass_onset_positive_rows": 42,
+      "locked_fraction": 0.688,
+      "onset_positive_rows": 41,
+      "rows": 125
+    },
+    "build_env": "k1_bench_ap_frontend_probe",
+    "capture_integrity": {
+      "active_max_us": 10121.0,
+      "active_over_7500_count": 111,
+      "active_p95_us": 6912.0,
+      "bytes_mismatch_count": 0,
+      "crash_signature_count": 0,
+      "frame_gap_count": 0,
+      "i2s_not_ok_count": 0,
+      "novelty_dropped": 0,
+      "novelty_rows": 5262,
+      "timestamp_regression_count": 0,
+      "total_max_us": 10169
+    },
+    "capture_validation": "PASS",
+    "chip_id": "B489A500",
+    "mechanical_errors": [],
+    "mechanical_verdict": "PASS",
+    "raw_log": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v2-animals-128_nov_buffered_20260714_225907__raw.log",
+    "summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/eyes-on-ab/v2-animals-128_nov_buffered_20260714_225907__summary.json",
+    "tempo": {
+      "final_half_acc1": true,
+      "final_half_locked_fraction": 0.6776929601357082,
+      "final_half_median_bpm": 129.0,
+      "final_half_median_confidence": 0.796,
+      "final_half_mode_bpm": 129,
+      "final_half_relative_error": 0.0078125,
+      "final_half_rows": 1179,
+      "rows": 2358,
+      "sampled_beat_tick_count": 4
+    }
+  },
+  "verdict": "MEASURED"
+}

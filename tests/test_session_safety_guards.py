@@ -85,6 +85,21 @@ def test_source_fingerprint_changes_when_build_source_changes(tmp_path):
     assert before != after
 
 
+def test_source_fingerprint_ignores_platformio_ino_conversion_output(tmp_path):
+    source_dir = tmp_path / "SPECTRASYNQ_K1_FIRMWARE"
+    source_dir.mkdir()
+    sketch = source_dir / "K1.ino"
+    generated = source_dir / "K1.ino.cpp"
+    sketch.write_text("void setup() {}\n")
+    before = target.current_source_fingerprint(tmp_path)
+    generated.write_text("// generated from K1.ino\n")
+    after_generated = target.current_source_fingerprint(tmp_path)
+    sketch.write_text("void setup() { int changed = 1; }\n")
+    after_source = target.current_source_fingerprint(tmp_path)
+    assert before == after_generated
+    assert before != after_source
+
+
 def test_delegation_guard_caps_active_launches_and_releases_on_close():
     state = {"schema_version": 1, "delegations": []}
     for index in (1, 2):

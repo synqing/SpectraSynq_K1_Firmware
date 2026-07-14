@@ -1,0 +1,78 @@
+{
+  "actions": [
+    "session target pin and runtime build/chip identity verified before playback",
+    "set_mode=18",
+    "nov_clear=1",
+    "apdbg=off",
+    "tempo_stream=off",
+    "ap_stream=off",
+    "nov_capture=30000",
+    "event_status polling off",
+    "nov_dump=1",
+    "afplay playback"
+  ],
+  "apcad_soak": null,
+  "apcad_soak_log": null,
+  "baud": 115200,
+  "capture_start": "2026-07-14T23:43:14+0800",
+  "duration_ms_observed": 30040,
+  "duration_ms_requested": 30000,
+  "event_status_period_ms": 0,
+  "expected_build_env": "k1_bench_ap_frontend_probe_v1_off",
+  "expected_chip_id": "B489A500",
+  "non_actions": [
+    "no device firmware constant tuning",
+    "no calibration command"
+  ],
+  "nov_dump_log": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab/v1-percussion-burst_nov_buffered_20260714_234226__nov_dump.log",
+  "nov_rows": 1333,
+  "novelty_integrity": {
+    "begin": {
+      "capacity": 6144,
+      "count": 1333,
+      "dropped": 0,
+      "end_ms": 109567,
+      "start_ms": 79567
+    },
+    "done": {
+      "count": 1333,
+      "dropped": 0
+    },
+    "dropped": 0,
+    "emit_gap_count": 0,
+    "row_count": 1333,
+    "timestamp_regression_count": 0
+  },
+  "out_dir": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab",
+  "port": "/dev/cu.usbmodem112401",
+  "raw_log": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab/v1-percussion-burst_nov_buffered_20260714_234226__raw.log",
+  "replay_input": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab/v1-percussion-burst_nov_buffered_20260714_234226__device_nov_replay_input.txt",
+  "replay_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab/v1-percussion-burst_nov_buffered_20260714_234226__device_nov_replay_summary.json",
+  "runtime_identity": {
+    "build_env": "k1_bench_ap_frontend_probe_v1_off",
+    "build_line": "BUILD: version=40103 git=52a21db epoch=1784043654 env=k1_bench_ap_frontend_probe_v1_off",
+    "chip_id": "B489A500",
+    "chip_line": "B489A500"
+  },
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem112401",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=1-1.2.4",
+    "location": "1-1.2.4",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:89:B4",
+    "vid": 12346
+  },
+  "session_target_pin": "/Users/spectrasynq/SpectraSynq_K1_Firmware/.devin/k1-session-target.json",
+  "session_target_verification": "session target verified: 2nd bench K1 chip B489A500 env k1_bench_ap_frontend_probe_v1_off HEAD 52a21db5 source caacb24bf26a",
+  "set_mode_dense": 18,
+  "track_file": "/Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3",
+  "track_sha256": "174025b5ff4d326675cfb3b31b820e8448242d1b51d1a3b00e236e66373cc61a",
+  "trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/clean-eyes-on-ab/v1-percussion-burst_nov_buffered_20260714_234226__device_nov_replay_trajectory.log",
+  "validation": {
+    "errors": [],
+    "verdict": "PASS"
+  }
+}

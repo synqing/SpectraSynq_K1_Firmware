@@ -1,0 +1,340 @@
+Processing k1_bench_im73d (platform: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip; board: esp32-s3-devkitc1-n16r8; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+[k1-build-provenance] env=k1_bench_im73d git=52a21db epoch=1784039510
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/esp32-s3-devkitc1-n16r8.html
+PLATFORM: Espressif 32 (54.3.20) > Espressif ESP32-S3-DevKitC-1-N16R8V (16 MB Flash Quad, 8 MB PSRAM Octal)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.2.0 
+ - framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a 
+ - tool-esptoolpy @ 4.8.9 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 
+ - tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 
+ - toolchain-riscv32-esp @ 14.2.0+20241119 
+ - toolchain-xtensa-esp-elf @ 14.2.0+20241119
+Converting SPECTRASYNQ_K1_FIRMWARE.ino
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- FastLED @ 3.10.3
+|-- FixedPoints @ 1.1.2
+|-- M5ROTATE8 @ 0.4.1
+|-- FS @ 3.2.0
+|-- LittleFS @ 3.2.0
+|-- Ticker @ 3.2.0
+|-- Wire @ 3.2.0
+Building in release mode
+Compiling .pio/build/k1_bench_im73d/src/SPECTRASYNQ_K1_FIRMWARE.ino.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_audio_snapshot.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_chord_detect.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_gdft_core.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_musical_saliency.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_onset_beat.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_semantic_state.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_stm.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/audio/k1_tempo.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/control/k1_control_facade.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/control/k1_effect_queue.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/control/k1_noise_cal_arm.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/control/k1_wireless_control.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/director/k1_edgemixer.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/director/k1_mode_selection.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/director/k1_smart_director.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/director/k1_visual_hooks.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_aurora.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_beat_pulse.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_bloom.cpp.o
+SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:81:29: warning: ignoring attribute 'section (".iram1.4")' because it conflicts with previous 'section (".iram1.3")' [-Wattributes]
+   81 | void IRAM_ATTR process_GDFT() {
+      |                             ^
+In file included from SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:30:
+SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.h:28:16: note: previous declaration here
+   28 | void IRAM_ATTR process_GDFT();
+      |                ^~~~~~~~~~~~
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_bloom_bt.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_cannonade.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_chroma_constellation.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_chromagram_dots.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_chromagram_gradient.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_comet.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_dense_forge.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_dense_forge_chord.cpp.o
+In file included from /Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:45:
+SPECTRASYNQ_K1_FIRMWARE/system/system.h: In function 'void check_current_function()':
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:49:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+   49 |   function_hits[function_id]++;
+      |   ~~~~~~~~~~~~~~~~~~~~~~~~~^
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_ember.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_ember_v2.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_gdft.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_iris.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_kaleidoscope.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_moire_cathedral.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_percussion_burst.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_pulse_prism.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_quantum_collapse.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_river_surge.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_shockwave.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_snapwave.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_spectrum_river.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_spectrum_river_v2.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_tempo_comet.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_tempo_comet_anticipate.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_tempo_river.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_tempo_river_walk.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_vu.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_vu_dot.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_waveform.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_waveform_fast.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_waveform_hybrid.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_waveform_hybrid_k1.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/effects/light_mode_waveform_tempo.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/serial/k1_ap_capture_telemetry.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/serial/serial_cmd_handlers.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/serial/serial_parse_helpers.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/serial/serial_tx.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/system/globals.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/system/globals_config.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/visual/Palettes.cpp.o
+Compiling .pio/build/k1_bench_im73d/src/visual/render_params.cpp.o
+Building .pio/build/k1_bench_im73d/bootloader.bin
+Generating partitions .pio/build/k1_bench_im73d/partitions.bin
+esptool.py v4.8.9
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Compiling .pio/build/k1_bench_im73d/lib0c0/SPI/SPI.cpp.o
+Compiling .pio/build/k1_bench_im73d/libda8/FS/FS.cpp.o
+Compiling .pio/build/k1_bench_im73d/libda8/FS/vfs_api.cpp.o
+Compiling .pio/build/k1_bench_im73d/libd0c/SD/SD.cpp.o
+Compiling .pio/build/k1_bench_im73d/libd0c/SD/sd_diskio.cpp.o
+Compiling .pio/build/k1_bench_im73d/libd0c/SD/sd_diskio_crc.c.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/FastLED.cpp.o
+Archiving .pio/build/k1_bench_im73d/lib0c0/libSPI.a
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/bitswap.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/cled_controller.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/colorpalettes.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/crgb.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/allocator.cpp.o
+Indexing .pio/build/k1_bench_im73d/lib0c0/libSPI.a
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/async.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/audio.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/audio_input.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/audio_reactive.cpp.o
+Archiving .pio/build/k1_bench_im73d/libda8/libFS.a
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/bitset.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/blur.cpp.o
+Indexing .pio/build/k1_bench_im73d/libda8/libFS.a
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/bytestreammemory.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/colorutils.cpp.o
+Archiving .pio/build/k1_bench_im73d/libd0c/libSD.a
+Indexing .pio/build/k1_bench_im73d/libd0c/libSD.a
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/corkscrew.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/crgb_hsv16.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/downscale.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/ease.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/engine_events.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/fetch.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/fft.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/fft_impl.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/file_system.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/fill.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/gamma.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/gradient.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/hsv16.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/id_tracker.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/io.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/istream.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/json.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/leds.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/line_simplification.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/noise_woryley.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/ostream.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/ptr.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/random.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/raster_sparse.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/rectangular_draw_buffer.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/referent.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/rgbw.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/screenmap.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/sin32.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/splat.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/str.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/str_ui.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/strstream.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/stub_main.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/task.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/tile2x2.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/time.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/time_alpha.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/transform.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/type_traits.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/ui.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/upscale.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/wave_simulation.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/wave_simulation_real.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/xmap.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/xymap.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/xypath.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/xypath_impls.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fl/xypath_renderer.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/2d/blend.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/2d/luminova.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/2d/noisepalette.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/2d/scale_up.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/2d/wave.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/detail/fx_layer.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/frame.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/fx_engine.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/time.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/video.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/video/frame_interpolator.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/video/frame_tracker.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/video/pixel_stream.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/fx/video/video_impl.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/hsv2rgb.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/lib8tion.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/noise.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/adafruit/clockless.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/arm/k20/clockless_objectfled.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/arm/mgm240/fastpin_arm_mgm240.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/compile_test.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/audio/audio.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/audio/sound_util.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/clockless_i2s_esp32s3.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/i2s/i2s_esp32dev.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/rmt_4/idf4_rmt.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/rmt_4/idf4_rmt_impl.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/rmt_5/idf5_rmt.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/rmt_5/strip_rmt.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/esp/32/spi_ws2812/strip_spi.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/stub/Arduino.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/stub/led_sysdefs_stub.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/stub/time_stub.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/active_strip_data.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/engine_listener.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/entry_point.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/fastspi_wasm.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/fs_wasm.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/js.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/js_bindings.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/js_fetch.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/timer.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/platforms/wasm/ui.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/power_mgt.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/sensors/button.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/sensors/digital_pin.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/sensors/pir.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/simplex.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/cq_kernel/cq_kernel.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/cq_kernel/kiss_fft.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/cq_kernel/kiss_fftr.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/espressif/led_strip/src/led_strip_api.c.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/espressif/led_strip/src/led_strip_rmt_dev.c.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/espressif/led_strip/src/led_strip_rmt_encoder.c.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/espressif/led_strip/src/led_strip_spi_dev.c.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/third_party/object_fled/src/OjectFLED.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/transpose8x1_noinline.cpp.o
+Compiling .pio/build/k1_bench_im73d/libf67/FastLED/wiring.cpp.o
+Compiling .pio/build/k1_bench_im73d/lib6b4/Wire/Wire.cpp.o
+Compiling .pio/build/k1_bench_im73d/libad0/M5ROTATE8/m5rotate8.cpp.o
+Compiling .pio/build/k1_bench_im73d/lib69c/LittleFS/LittleFS.cpp.o
+Compiling .pio/build/k1_bench_im73d/libe38/Ticker/Ticker.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/ColorFormat.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/Esp.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/FirmwareMSC.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/FunctionalInterrupt.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/HEXBuilder.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/HWCDC.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/HardwareSerial.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/IPAddress.cpp.o
+Archiving .pio/build/k1_bench_im73d/libe38/libTicker.a
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/MD5Builder.cpp.o
+Indexing .pio/build/k1_bench_im73d/libe38/libTicker.a
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/MacAddress.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/Print.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/SHA1Builder.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/Stream.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/StreamString.cpp.o
+Archiving .pio/build/k1_bench_im73d/libf67/libFastLED.a
+Archiving .pio/build/k1_bench_im73d/lib6b4/libWire.a
+Indexing .pio/build/k1_bench_im73d/lib6b4/libWire.a
+Archiving .pio/build/k1_bench_im73d/libad0/libM5ROTATE8.a
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/Tone.cpp.o
+Indexing .pio/build/k1_bench_im73d/libad0/libM5ROTATE8.a
+Indexing .pio/build/k1_bench_im73d/libf67/libFastLED.a
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/USB.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/USBCDC.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/USBMSC.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/WMath.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/WString.cpp.o
+Archiving .pio/build/k1_bench_im73d/lib69c/libLittleFS.a
+Indexing .pio/build/k1_bench_im73d/lib69c/libLittleFS.a
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/base64.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/cbuf.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/chip-debug-report.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-adc.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-bt.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-cpu.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-dac.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-gpio.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-i2c-ng.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-i2c-slave.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-i2c.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-ledc.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-matrix.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-misc.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-periman.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-psram.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-rgb-led.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-rmt.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-sigmadelta.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-spi.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-time.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-timer.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-tinyusb.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-touch-ng.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-touch.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/esp32-hal-uart.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/firmware_msc_fat.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/freertos_stats.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/libb64/cdecode.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/libb64/cencode.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/main.cpp.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/stdlib_noniso.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/wiring_pulse.c.o
+Compiling .pio/build/k1_bench_im73d/FrameworkArduino/wiring_shift.c.o
+Archiving .pio/build/k1_bench_im73d/libFrameworkArduino.a
+Indexing .pio/build/k1_bench_im73d/libFrameworkArduino.a
+Linking .pio/build/k1_bench_im73d/firmware.elf
+Retrieving maximum program size .pio/build/k1_bench_im73d/firmware.elf
+Checking size .pio/build/k1_bench_im73d/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  34.0% (used 111544 bytes from 327680 bytes)
+Flash: [=         ]  10.6% (used 696502 bytes from 6553600 bytes)
+Building .pio/build/k1_bench_im73d/firmware.bin
+esptool.py v4.8.9
+Creating esp32s3 image...
+Merged 2 ELF sections
+Successfully created esp32s3 image.
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-builtin, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+_guard_upload_action(["upload"], [".pio/build/k1_bench_im73d/firmware.bin"])
+[k1-upload-guard] k1_bench_im73d: /dev/tty.usbmodem112401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+*** [upload] Explicit exit, status [k1-upload-guard] session target pin source drift: build-relevant working-tree bytes changed
+[k1-upload-guard] session target pin source drift: build-relevant working-tree bytes changed
+========================= [FAILED] Took 18.90 seconds =========================
+
+Environment     Status    Duration
+--------------  --------  ------------
+k1_bench_im73d  FAILED    00:00:18.899
+==================== 1 failed, 0 succeeded in 00:00:18.899 ====================

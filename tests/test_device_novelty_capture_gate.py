@@ -89,6 +89,32 @@ def test_runtime_identity_requires_exact_chip_and_build_environment():
     assert observed["chip_id"] == "B489A500"
 
 
+def test_runtime_identity_accepts_firmware_native_bare_chip_line():
+    observed, errors = capture.validate_runtime_identity(
+        [
+            "BUILD: version=40103 git=52a21db epoch=1784039780 env=k1_bench_ap_frontend_probe",
+            "B489A500",
+        ],
+        "B489A500",
+        "k1_bench_ap_frontend_probe",
+    )
+    assert errors == []
+    assert observed["chip_line"] == "B489A500"
+    assert observed["chip_id"] == "B489A500"
+
+
+def test_runtime_identity_rejects_chip_id_embedded_in_unrelated_output():
+    _, errors = capture.validate_runtime_identity(
+        [
+            "BUILD: version=40103 git=52a21db epoch=1784039780 env=k1_bench_ap_frontend_probe",
+            "debug expected_chip=B489A500",
+        ],
+        "B489A500",
+        "k1_bench_ap_frontend_probe",
+    )
+    assert any("runtime chip mismatch" in error for error in errors)
+
+
 def test_runtime_identity_rejects_plausible_wrong_board_output():
     _, errors = capture.validate_runtime_identity(
         [
@@ -100,6 +126,140 @@ def test_runtime_identity_rejects_plausible_wrong_board_output():
     )
     assert any("build env mismatch" in error for error in errors)
     assert any("runtime chip mismatch" in error for error in errors)
+
+
+def test_capture_cli_can_retain_ap_and_tempo_streams(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "device_novelty_buffer_capture.py",
+            "--track",
+            "/tmp/track.mp3",
+            "--port",
+            "/dev/cu.usbmodem112401",
+            "--expected-chip-id",
+            "B489A500",
+            "--expected-build-env",
+            "k1_bench_ap_frontend_probe",
+            "--capture-ap-stream",
+            "--capture-tempo-stream",
+            "--set-mode",
+            "23",
+            "--expected-mode-ordinal",
+            "23",
+            "--event-status-period-ms",
+            "250",
+            "--eyes-on-countdown-ms",
+            "10000",
+        ],
+    )
+    args = capture.parse_args()
+    assert args.capture_ap_stream is True
+    assert args.capture_tempo_stream is True
+    assert args.set_mode == 23
+    assert args.event_status_period_ms == 250
+    assert args.eyes_on_countdown_ms == 10000
+    assert args.leave_effect_selected is False
+
+
+def test_capture_has_explicit_eyes_on_arm_start_stop_markers():
+    source = (HARNESS / "device_novelty_buffer_capture.py").read_text()
+    assert "EYES_ON_ARMED effect=" in source
+    assert "EYES_ON_START effect=" in source
+    assert "EYES_ON_STOP effect=" in source
+
+
+def test_numeric_mode_requires_explicit_ordinal_expectation(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "device_novelty_buffer_capture.py",
+            "--track",
+            "/tmp/track.mp3",
+            "--port",
+            "/dev/cu.usbmodem112401",
+            "--expected-chip-id",
+            "B489A500",
+            "--expected-build-env",
+            "k1_bench_ap_frontend_probe",
+            "--set-mode",
+            "23",
+        ],
+    )
+    try:
+        capture.parse_args()
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("numeric mode selection must fail without an ordinal expectation")
+
+
+def test_effect_catalog_resolves_captain_corrected_ordinals():
+    catalog = capture.load_legacy_effect_catalog(ROOT)
+    assert catalog["ember"]["ordinal"] == 16
+    assert catalog["waveform_tempo"]["ordinal"] == 18
+    assert catalog["dense_forge"]["ordinal"] == 21
+    assert catalog["dense_forge_chord"]["ordinal"] == 24
+    assert catalog["percussion_burst"]["ordinal"] == 26
+    assert catalog["waveform_hybrid_k1"]["ordinal"] == 32
+
+
+def test_mode_readback_uses_raw_config_ordinal_not_mode_echo():
+    observed, errors = capture.validate_mode_readback(
+        ["CONFIG.LIGHTSHOW_MODE: 26", "MODE: 18 (PERCUSSION BURST)"], 26
+    )
+    assert observed == 26
+    assert errors == []
+
+
+def test_mode_readback_rejects_wrong_render_ordinal():
+    _, errors = capture.validate_mode_readback(
+        ["CONFIG.LIGHTSHOW_MODE: 18", "MODE: 18"], 26
+    )
+    assert errors == ["mode ordinal mismatch: expected 26, observed 18"]
+
+
+def test_get_mode_readback_requires_expected_runtime_ordinal():
+    observed, errors = capture.validate_get_mode_readback(["MODE: 18"], 18)
+    assert observed == 18
+    assert errors == []
+
+    _, errors = capture.validate_get_mode_readback(["MODE: 32"], 18)
+    assert errors == ["runtime mode ordinal mismatch: expected 18, observed 32"]
+
+
+def test_effect_selection_restores_previous_mode_by_default():
+    source = (HARNESS / "device_novelty_buffer_capture.py").read_text()
+    assert 'send(ser, "get_mode")' in source
+    assert 'send(ser, f"set_mode={initial_mode_ordinal}")' in source
+    assert "MODE_SNAPSHOT initial_ordinal=" in source
+    assert "MODE_RESTORE verdict=" in source
+    assert "not args.leave_effect_selected" in source
+
+
+def test_leave_effect_selected_requires_explicit_cli_opt_in(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "device_novelty_buffer_capture.py",
+            "--track",
+            "/tmp/track.mp3",
+            "--port",
+            "/dev/cu.usbmodem112401",
+            "--expected-chip-id",
+            "B489A500",
+            "--expected-build-env",
+            "k1_bench_ap_frontend_probe",
+            "--set-effect",
+            "waveform_tempo",
+            "--leave-effect-selected",
+        ],
+    )
+    args = capture.parse_args()
+    assert args.leave_effect_selected is True
 
 
 def test_corpus_scorer_renders_exact_rerun_command(tmp_path):

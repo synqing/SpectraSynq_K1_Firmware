@@ -1,0 +1,71 @@
+{
+  "commands": [
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track /Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3 --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label martin-garrix-animals-128",
+      "stage": "capture",
+      "track": "martin-garrix-animals-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__nov_dump.log --expected-bpm 128.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "martin-garrix-animals-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track /Users/spectrasynq/Downloads/DavidGuettaMORTEN-Dreams.mp3 --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label david-guetta-morten-dreams-128",
+      "stage": "capture",
+      "track": "david-guetta-morten-dreams-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__nov_dump.log --expected-bpm 128.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "david-guetta-morten-dreams-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track '/Users/spectrasynq/Downloads/deadmau5-Ghosts'\"'\"'n'\"'\"'Stuff).mp3' --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label deadmau5-ghosts-n-stuff-128",
+      "stage": "capture",
+      "track": "deadmau5-ghosts-n-stuff-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__nov_dump.log --expected-bpm 128.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "deadmau5-ghosts-n-stuff-128"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track /Users/spectrasynq/Downloads/Avicii-Levels.mp3 --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label avicii-levels-126",
+      "stage": "capture",
+      "track": "avicii-levels-126"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__nov_dump.log --expected-bpm 126.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "avicii-levels-126"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track '/Users/spectrasynq/Downloads/HI-LO-Poseidon).mp3' --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label hi-lo-poseidon-127",
+      "stage": "capture",
+      "track": "hi-lo-poseidon-127"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__nov_dump.log --expected-bpm 127.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "hi-lo-poseidon-127"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_buffer_capture.py --track /Users/spectrasynq/Downloads/CharlotteDeWitte-SgadiLiMi.mp3 --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --capture-apcad-soak --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --label charlotte-de-witte-sgadi-li-mi-135",
+      "stage": "capture",
+      "track": "charlotte-de-witte-sgadi-li-mi-135"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_replay.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__nov_dump.log --expected-bpm 135.0 --out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__device_nov_replay_summary.json --trajectory-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__device_nov_replay_trajectory.log --stdin-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__device_nov_replay_input.txt",
+      "stage": "replay",
+      "track": "charlotte-de-witte-sgadi-li-mi-135"
+    },
+    {
+      "command": "python3 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_novelty_corpus_score.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/device-corpus-manifest.json --baseline-csv /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/measurements/tempo-octave-baseline.tracks.csv --commands-json docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/rerun-commands.json --out-json docs/measurements/2026-07-14-device-novelty-tempo-delta.json --out-md docs/measurements/2026-07-14-device-novelty-tempo-delta.md",
+      "stage": "score",
+      "track": "ALL"
+    }
+  ],
+  "entry_command": "python3 scripts/regression-harness/device_novelty_corpus_run.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-corpus.json --preflight-report docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-preflight.json --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --score-manifest docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/device-corpus-manifest.json --commands-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/rerun-commands.json --out-json docs/measurements/2026-07-14-device-novelty-tempo-delta.json --out-md docs/measurements/2026-07-14-device-novelty-tempo-delta.md --resume",
+  "verdict": "COMPLETE"
+}

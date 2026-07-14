@@ -1,0 +1,507 @@
+SPECTRASYNQ_K1_FIRMWARE/system/constants.h        | 16 +++++-
+ SPECTRASYNQ_K1_FIRMWARE/system/globals.h          | 12 ++++
+ SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp |  4 ++
+ SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h    | 42 +++++++++++++-
+ platformio.ini                                    | 70 ++++++++++++++++++-----
+ scripts/platformio/k1_device_identities.json      |  3 +-
+ scripts/platformio/k1_session_target.py           |  2 +
+ 7 files changed, 130 insertions(+), 19 deletions(-)
+
+diff --git a/SPECTRASYNQ_K1_FIRMWARE/system/constants.h b/SPECTRASYNQ_K1_FIRMWARE/system/constants.h
+index db68d67..f9db894 100644
+--- a/SPECTRASYNQ_K1_FIRMWARE/system/constants.h
++++ b/SPECTRASYNQ_K1_FIRMWARE/system/constants.h
+@@ -365,7 +365,21 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
+   #define SWEET_SPOT_CENTER_PIN (-1)
+   #define SWEET_SPOT_RIGHT_PIN (-1)
+ 
+-  #define RNG_SEED_PIN 8
++  #ifdef K1_CUSTOM_RGBIC_V1
++    // Custom dual-channel 12V-5050 build (2026-07-12): driven as WS2812B 800 kbps
++    // RGB (resolved + eyes-on PASS; the APA102/clocked reading was wrong). DATA pins
++    // are UNCHANGED from the bench K1 (LED_DATA_PIN=primary,
++    // SECONDARY_LED_DATA_PIN=LED_CLOCK_PIN=secondary). These two macros are the
++    // strip's SECOND ("CLK") wire — driven with MIRRORED data in init_leds() /
++    // init_secondary_leds() so the real DIN always gets a valid WS2812 signal. GPIO8
++    // was RNG_SEED_PIN below (dead code, never read), reclaimed here; RNG_SEED_PIN
++    // moved off 8. (Names keep the *_CLOCK_PIN suffix = the strip's labelled CLK pad.)
++    #define K1_RGBIC_PRIMARY_CLOCK_PIN 7
++    #define K1_RGBIC_SECONDARY_CLOCK_PIN 8
++    #define RNG_SEED_PIN 9   // moved off 8 (now the secondary RGBIC clock); RNG seed is unused anyway
++  #else
++    #define RNG_SEED_PIN 8
++  #endif
+ #else
+   #define PHOTONS_PIN 1
+   #define CHROMA_PIN 2
+diff --git a/SPECTRASYNQ_K1_FIRMWARE/system/globals.h b/SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+index c630ab5..e455828 100644
+--- a/SPECTRASYNQ_K1_FIRMWARE/system/globals.h
++++ b/SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+@@ -841,7 +841,19 @@ inline CRGB *leds_out_secondary;              // Final output buffer
+ // Secondary strip configuration
+ inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
+ inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;
++#ifdef K1_CUSTOM_RGBIC_V1
++// Custom dual-channel 12V-5050 build (2026-07-12): 138 LEDs on the secondary channel
++// (matches LED_COUNT_VALUE=138 primary), driven WS2812B 800 kbps RGB. scale_to_strip's
++// secondary lerp branch (led_utilities.h:2203) downsamples the 160 canvas → 138.
++inline const uint16_t SECONDARY_LED_COUNT = 138;
++#elif defined(K1_CUSTOM_LED_V1)
++// Custom dual-channel wall-bounce build (2026-07-12): 214 LEDs on the secondary
++// channel (matches LED_COUNT_VALUE=214 primary). scale_to_secondary_strip() upsamples
++// the 160 canvas → 214 (same resample path as primary; lerp_led_16 is clamp-guarded).
++inline const uint16_t SECONDARY_LED_COUNT = 214;
++#else
+ inline const uint16_t SECONDARY_LED_COUNT = 160;
++#endif
+ inline const uint16_t SECONDARY_LED_COLOR_ORDER = GRB;
+ inline uint8_t SECONDARY_LIGHTSHOW_MODE = LIGHT_MODE_WAVEFORM_TEMPO; // 1401 dual-tempo setup (2026-06-04): secondary boots on mode 18
+ inline bool SECONDARY_MIRROR_ENABLED = true;
+diff --git a/SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp b/SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp
+index cbf3717..bb53aa6 100644
+--- a/SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp
++++ b/SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp
+@@ -72,7 +72,11 @@ conf CONFIG = {
+   false,               // STANDBY_DIMMING (off by default — turn back on via `standby_dimming=true` if you want auto-dim in silence)
+   false,               // REVERSE_ORDER
+   false,               // RESERVED_CONFIG_BYTE, kept to preserve saved-config layout
++#ifdef K1_CUSTOM_LED_V1
++  2500,                // MAX_CURRENT_MA — dual-214 wall build: Captain-locked 2.5 A total @ 5 V
++#else
+   1500,                // MAX_CURRENT_MA
++#endif
+   true,                // TEMPORAL_DITHERING
+   true,                // AUTO_COLOR_SHIFT
+   0.00,                // INCANDESCENT_FILTER
+diff --git a/SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h b/SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
+index bdfa6e5..19ea350 100644
+--- a/SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
++++ b/SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
+@@ -282,6 +282,18 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
+ 
+   int32_t index_left = index_whole + 0;
+   int32_t index_right = index_whole + 1;
++#ifdef K1_CUSTOM_LED_V1
++  // UPSAMPLE guard for scale_to_secondary_strip() (SECONDARY_LED_COUNT=214 >
++  // NATIVE_RESOLUTION=160): the top output pixel resolves index_right ==
++  // NATIVE_RESOLUTION, a 1-element OOB read. Clamp. Down/equal modes (61/91/138/160)
++  // never reach index_left == NR-1 with a positive fraction, so flag-gated.
++  if (index_left >= NATIVE_RESOLUTION) {
++    index_left = NATIVE_RESOLUTION - 1;
++  }
++  if (index_right >= NATIVE_RESOLUTION) {
++    index_right = NATIVE_RESOLUTION - 1;
++  }
++#endif
+ 
+   SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
+   SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
+@@ -857,9 +869,9 @@ inline void init_lerp_params() {
+             led_lerp_params[i].index_left = index.getInteger();
+             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
+ #ifdef K1_CUSTOM_LED_V1
+-            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
+-            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
+-            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
++            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the dual-214
++            // wall build): the top output pixel resolves index_right == NATIVE_RESOLUTION,
++            // a 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+             // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
+             // flag-gated to keep those builds byte-identical.
+             if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
+@@ -1090,6 +1102,20 @@ inline void init_leds() {
+   // Initialize the lerp parameters for scale_to_strip optimization
+   init_lerp_params();
+ 
++#ifdef K1_CUSTOM_RGBIC_V1
++  // Custom dual-channel RGBIC build (2026-07-12): the primary channel is a CLOCKED
++  // SPI RGBIC (reel labelled "WS2815"; actually APA102/DotStar-family, Data+Clock).
++  // Compile-time override of the runtime CONFIG.LED_TYPE branch below so a persisted
++  // CONFIG can't flip it back. Matches the Captain's PROVEN Pixelblaze config
++  // (screenshot 2026-07-12): LED type WS2812/SK6812/NeoPixel, 800 Kbps 250ns/750ns,
++  // Color Order RGB. WS2815 is WS2812-protocol-compatible; FastLED's WS2815 chipset
++  // uses different timing constants than the 250/750 this reel wants (that garbled).
++  // BOTH wires of the channel are driven with the SAME buffer — GPIO4 and GPIO7 —
++  // so whichever is the strip's real DIN gets valid WS2812 data (why the 2nd wire
++  // must be connected). RGB order. Keep in sync with init_secondary_leds().
++  FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
++  FastLED.addLeds<WS2812B, K1_RGBIC_PRIMARY_CLOCK_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
++#else
+   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
+     if (CONFIG.LED_COLOR_ORDER == RGB) {
+       FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
+@@ -1122,6 +1148,7 @@ inline void init_leds() {
+       FastLED.addLeds<DOTSTAR, LED_DATA_PIN, LED_CLOCK_PIN, BGR>(leds_out, CONFIG.LED_COUNT);
+     }
+   }
++#endif  // K1_CUSTOM_RGBIC_V1
+ 
+   FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
+ 
+@@ -2190,7 +2217,16 @@ inline void init_secondary_leds() {
+   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
+ 
+   // Use constants for FastLED template arguments
++#ifdef K1_CUSTOM_RGBIC_V1
++  // Matches the Captain's PROVEN Pixelblaze config (WS2812/SK6812, 800 Kbps
++  // 250ns/750ns, RGB). BOTH wires of the secondary channel driven with the same
++  // buffer — GPIO5 (data) and GPIO8 (2nd wire) — so the real DIN gets valid WS2812
++  // data. RGB order; keep in sync with the primary in init_leds().
++  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
++  FastLED.addLeds<WS2812B, K1_RGBIC_SECONDARY_CLOCK_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
++#else
+   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
++#endif
+   
+   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
+     leds_out_secondary[x] = CRGB(0, 0, 0);
+diff --git a/platformio.ini b/platformio.ini
+index 9255441..5ab64fa 100644
+--- a/platformio.ini
++++ b/platformio.ini
+@@ -261,20 +261,23 @@ build_flags =
+     ${env:k1_hardware.build_flags}
+     -DK1_MIC_IM73D_PDM_V1
+ ; ─────────────────────────────────────────────────────────────────────────────
+-; CUSTOM 224-LED SINGLE-CHANNEL BUILD (2026-07-06) — NON-SHIPPABLE, BENCH K1 ONLY
+-; (B489A500 / port 12201). ONE WS2812B data channel of 224 LEDs on the bench PRIMARY
+-; GPIO (LED_DATA_PIN = GPIO4); the secondary strip is DROPPED. The output bounces off
+-; a white wall (fully diffused), so per-pixel detail is invisible → the 160-px render
+-; canvas is RESAMPLED onto 224 by the existing scale_to_strip() (the same path that
+-; already drives strip-modes 61/91/160). NATIVE_RESOLUTION stays 160 → NO buffer,
+-; effect, mirror, or DSP changes. Extends k1_bench_im73d_ble → the bench's IM73D PDM
+-; mic + the NimBLE BLE-MIDI central so the K718 Remoted dial controls the wall live;
+-; everything else identical.
+-; K1_CUSTOM_LED_V1 gates: config_types.h LED_COUNT_VALUE=224; .ino:670/693 drop+guard
+-; the secondary strip; led_utilities.h init_lerp_params upsample clamp. Flag-OFF →
+-; k1_hardware / k1_bench_reference / k1_bench_im73d byte-identical.
+-; REVERT = delete this env block + the k1_custom line in k1_upload_guard.py + the
+-; K1_CUSTOM_LED_V1 guards (config_types.h, .ino, led_utilities.h).
++; CUSTOM DUAL-214 WALL-BOUNCE BUILD (2026-07-12 overwrite of 2026-07-06 single-channel
++; test bed) — NON-SHIPPABLE, BENCH K1 ONLY (B489A500 / port 12201).
++; TWO independent WS2812B 5V channels of 214 LEDs each (primary GPIO4, secondary
++; GPIO5) — same topology as production, bare bulbs (no LGP). Viewer sees light
++; bounced off a white wall, not the dies → per-pixel detail is invisible, so the
++; 160-px render canvas is RESAMPLED onto 214 by scale_to_strip() /
++; scale_to_secondary_strip() (same path as strip-modes 61/91/160). NATIVE_RESOLUTION
++; stays 160 → NO buffer, effect, mirror, or DSP changes. Power: Captain-locked
++; CONFIG.MAX_CURRENT_MA=2500 (2.5 A total @ 5 V), forced at boot over persisted
++; saves. Extends k1_bench_im73d_ble → IM73D PDM mic + NimBLE BLE-MIDI (K718 Remoted).
++; K1_CUSTOM_LED_V1 gates: config_types.h LED_COUNT_VALUE=214; globals.h
++; SECONDARY_LED_COUNT=214; globals_config.cpp + system.h MAX_CURRENT_MA=2500;
++; led_utilities.h primary lerp-params upsample clamp + lerp_led_16 secondary clamp.
++; Flag-OFF → k1_hardware / k1_bench_reference / k1_bench_im73d byte-identical.
++; REVERT = delete this env block + the k1_custom line in k1_device_identities.json +
++; the K1_CUSTOM_LED_V1 guards (config_types.h, globals.h, globals_config.cpp,
++; system.h, led_utilities.h).
+ ; Flash: pio run -e k1_custom -t upload --upload-port <verified B489A500 port>
+ [env:k1_custom]
+ extends = env:k1_bench_im73d_ble
+@@ -282,6 +285,45 @@ build_flags =
+     ${env:k1_bench_im73d_ble.build_flags}
+     -DK1_CUSTOM_LED_V1
+ ; ─────────────────────────────────────────────────────────────────────────────
++; CUSTOM 12V 5050 DUAL-CHANNEL BUILD (2026-07-12) — NON-SHIPPABLE, BENCH K1 ONLY
++; (B489A500 / port 12201). NOT the K1 product: a custom rig that swaps the two
++; WS2812B channels (2x 160) for TWO 138-LED addressable 12V 5050 strips.
++; CHIP/DRIVER (RESOLVED + EYES-ON PASS 2026-07-12): the strip is driven with
++; FastLED **WS2812B, 800 kbps 250ns/750ns, RGB order** — an EXACT match to the
++; Captain's proven Pixelblaze config (LED type WS2812/SK6812/NeoPixel, 800 Kbps,
++; Color Order RGB; screenshot on file). EARLIER DEAD-ENDS (do not reintroduce):
++; APA102/clocked-SPI (garbled from px0 — wrong protocol) and FastLED's WS2815
++; chipset (wrong 250/750 timing). The reel is labelled "WS2815 / Data+CLK", but the
++; DATA protocol is plain WS2812 800 kbps; the strip's second ("CLK") wire is driven
++; with the SAME data (see led_utilities.h) so the real DIN always gets a valid
++; signal. **ROOT CAUSE of the whole corruption saga = MISSING COMMON GROUND:** the
++; strip runs off an external 12V PSU; its GND MUST be tied to the ESP32-S3 GND or
++; the data has no shared reference and reads as garbage. 3.3V logic may still be
++; marginal into a 12V strip — a 3.3->5V shifter (74AHCT125) on DATA/CLK is the
++; backup if any sparkle remains.
++; WIRING (bench-reference GPIO map, inherited): DATA pins UNCHANGED from the bench
++; K1 — primary GPIO4, secondary GPIO5. Second ("CLK") wire driven with mirrored
++; data: primary GPIO7, secondary GPIO8 (GPIO8 was RNG_SEED_PIN, dead/never-read;
++; reassigned under flag).
++; K1_CUSTOM_RGBIC_V1 gates: config_types.h LED_COUNT_VALUE=138; globals.h
++; SECONDARY_LED_COUNT=138; constants.h clock-pin macros; led_utilities.h the two
++; addLeds<> registrations. NATIVE_RESOLUTION stays 160 → scale_to_strip()
++; downsamples 160→138 on BOTH channels (the existing 61/91 down-scale path; the
++; secondary lerp branch at led_utilities.h:2203 already handles count != 160).
++; Both channels stay INDEPENDENT (primary + secondary), exactly as the bench K1.
++; Extends k1_bench_im73d_ble → inherits the IM73D PDM mic + NimBLE BLE-MIDI central
++; so the K718 "Remoted" dial drives the rig live, same base as k1_custom.
++; Flag-OFF → k1_hardware / k1_bench_reference / k1_bench_im73d / k1_custom all
++; byte-identical. REVERT = delete this env block + the k1_custom_rgbic line in
++; k1_upload_guard.py manifest + the K1_CUSTOM_RGBIC_V1 guards (config_types.h,
++; constants.h, globals.h, led_utilities.h).
++; Flash: pio run -e k1_custom_rgbic -t upload --upload-port <verified B489A500 port>
++[env:k1_custom_rgbic]
++extends = env:k1_bench_im73d_ble
++build_flags =
++    ${env:k1_bench_im73d_ble.build_flags}
++    -DK1_CUSTOM_RGBIC_V1
++; ─────────────────────────────────────────────────────────────────────────────
+ ; IM73D + BLE-MIDI DEMO BUILD (2026-07-04) — NON-SHIPPABLE, BENCH K1 ONLY
+ ; (B489A500 / USB serial B4:3A:45:A5:89:B4 / port 12201). The INVESTOR-DEMO
+ ; amalgamation: bench K1 running the IM73D122 PDM mic on the LIVE production AP+VP,
+diff --git a/scripts/platformio/k1_device_identities.json b/scripts/platformio/k1_device_identities.json
+index bf7a228..680d40f 100644
+--- a/scripts/platformio/k1_device_identities.json
++++ b/scripts/platformio/k1_device_identities.json
+@@ -68,7 +68,8 @@
+         "k1_bench_reference",
+         "k1_bench_reference_harness",
+         "k1_bench_tempo_probe",
+-        "k1_custom"
++        "k1_custom",
++        "k1_custom_rgbic"
+       ]
+     }
+   ],
+diff --git a/scripts/platformio/k1_session_target.py b/scripts/platformio/k1_session_target.py
+index 0106055..e73a081 100644
+--- a/scripts/platformio/k1_session_target.py
++++ b/scripts/platformio/k1_session_target.py
+@@ -20,6 +20,7 @@ SOURCE_ROOTS = (
+     Path("scripts/platformio"),
+ )
+ SOURCE_IGNORES = {".DS_Store", "__pycache__"}
++GENERATED_SOURCE_SUFFIXES = (".ino.cpp",)
+ 
+ 
+ def normalise_port(value: str) -> str:
+@@ -57,6 +58,7 @@ def current_source_fingerprint(root: Path = ROOT) -> str:
+                 if path.is_file()
+                 and not any(part in SOURCE_IGNORES for part in path.relative_to(root).parts)
+                 and path.suffix != ".pyc"
++                and not path.name.endswith(GENERATED_SOURCE_SUFFIXES)
+             )
+     for path in sorted(files, key=lambda item: item.relative_to(root).as_posix()):
+         relative = path.relative_to(root).as_posix().encode("utf-8")
+
+--- Changes ---
+
+SPECTRASYNQ_K1_FIRMWARE/system/constants.h
+  @@ -365,7 +365,21 @@
+  -  #define RNG_SEED_PIN 8
+  +  #ifdef K1_CUSTOM_RGBIC_V1
+  +    // Custom dual-channel 12V-5050 build (2026-07-12): driven as WS2812B 800 kbps
+  +    // RGB (resolved + eyes-on PASS; the APA102/clocked reading was wrong). DATA pins
+  +    // are UNCHANGED from the bench K1 (LED_DATA_PIN=primary,
+  +    // SECONDARY_LED_DATA_PIN=LED_CLOCK_PIN=secondary). These two macros are the
+  +    // strip's SECOND ("CLK") wire — driven with MIRRORED data in init_leds() /
+  +    // init_secondary_leds() so the real DIN always gets a valid WS2812 signal. GPIO8
+  +    // was RNG_SEED_PIN below (dead code, never read), reclaimed here; RNG_SEED_PIN
+  +    // moved off 8. (Names keep the *_CLOCK_PIN suffix = the strip's labelled CLK pad.)
+  +    #define K1_RGBIC_PRIMARY_CLOCK_PIN 7
+  +    #define K1_RGBIC_SECONDARY_CLOCK_PIN 8
+  +    #define RNG_SEED_PIN 9   // moved off 8 (now the secondary RGBIC clock); RNG seed is unused anyway
+  +  #else
+  +    #define RNG_SEED_PIN 8
+  +  #endif
+   #else
+     #define PHOTONS_PIN 1
+     #define CHROMA_PIN 2
+  +15 -1
+
+SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+  @@ -841,7 +841,19 @@
+  +#ifdef K1_CUSTOM_RGBIC_V1
+  +// Custom dual-channel 12V-5050 build (2026-07-12): 138 LEDs on the secondary channel
+  +// (matches LED_COUNT_VALUE=138 primary), driven WS2812B 800 kbps RGB. scale_to_strip's
+  +// secondary lerp branch (led_utilities.h:2203) downsamples the 160 canvas → 138.
+  +inline const uint16_t SECONDARY_LED_COUNT = 138;
+  +#elif defined(K1_CUSTOM_LED_V1)
+  +// Custom dual-channel wall-bounce build (2026-07-12): 214 LEDs on the secondary
+  +// channel (matches LED_COUNT_VALUE=214 primary). scale_to_secondary_strip() upsamples
+  +// the 160 canvas → 214 (same resample path as primary; lerp_led_16 is clamp-guarded).
+  +inline const uint16_t SECONDARY_LED_COUNT = 214;
+  +#else
+   inline const uint16_t SECONDARY_LED_COUNT = 160;
+  +#endif
+   inline const uint16_t SECONDARY_LED_COLOR_ORDER = GRB;
+   inline uint8_t SECONDARY_LIGHTSHOW_MODE = LIGHT_MODE_WAVEFORM_TEMPO; // 1401 dual-tempo setup (2026-06-04): secondary boots on mode 18
+   inline bool SECONDARY_MIRROR_ENABLED = true;
+  +12 -0
+
+SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp
+  @@ -72,7 +72,11 @@
+  +#ifdef K1_CUSTOM_LED_V1
+  +  2500,                // MAX_CURRENT_MA — dual-214 wall build: Captain-locked 2.5 A total @ 5 V
+  +#else
+     1500,                // MAX_CURRENT_MA
+  +#endif
+     true,                // TEMPORAL_DITHERING
+     true,                // AUTO_COLOR_SHIFT
+     0.00,                // INCANDESCENT_FILTER
+  +4 -0
+
+SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
+  @@ -282,6 +282,18 @@
+  +#ifdef K1_CUSTOM_LED_V1
+  +  // UPSAMPLE guard for scale_to_secondary_strip() (SECONDARY_LED_COUNT=214 >
+  +  // NATIVE_RESOLUTION=160): the top output pixel resolves index_right ==
+  +  // NATIVE_RESOLUTION, a 1-element OOB read. Clamp. Down/equal modes (61/91/138/160)
+  +  // never reach index_left == NR-1 with a positive fraction, so flag-gated.
+  +  if (index_left >= NATIVE_RESOLUTION) {
+  +    index_left = NATIVE_RESOLUTION - 1;
+  +  }
+  +  if (index_right >= NATIVE_RESOLUTION) {
+  +    index_right = NATIVE_RESOLUTION - 1;
+  +  }
+  +#endif
+   
+     SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
+     SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
+  @@ -857,9 +869,9 @@
+  -            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
+  -            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
+  -            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+  +            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the dual-214
+  +            // wall build): the top output pixel resolves index_right == NATIVE_RESOLUTION,
+  +            // a 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+               // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
+               // flag-gated to keep those builds byte-identical.
+               if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
+  @@ -1090,6 +1102,20 @@
+  +#ifdef K1_CUSTOM_RGBIC_V1
+  +  // Custom dual-channel RGBIC build (2026-07-12): the primary channel is a CLOCKED
+  +  // SPI RGBIC (reel labelled "WS2815"; actually APA102/DotStar-family, Data+Clock).
+  +  // Compile-time override of the runtime CONFIG.LED_TYPE branch below so a persisted
+  +  // CONFIG can't flip it back. Matches the Captain's PROVEN Pixelblaze config
+  +  // (screenshot 2026-07-12): LED type WS2812/SK6812/NeoPixel, 800 Kbps 250ns/750ns,
+  +  // Color Order RGB. WS2815 is WS2812-protocol-compatible; FastLED's WS2815 chipset
+  +  // uses different timing constants than the 250/750 this reel wants (that garbled).
+  +  // BOTH wires of the channel are driven with the SAME buffer — GPIO4 and GPIO7 —
+  +  // so whichever is the strip's real DIN gets valid WS2812 data (why the 2nd wire
+  +  // must be connected). RGB order. Keep in sync with init_secondary_leds().
+  +  FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
+  +  FastLED.addLeds<WS2812B, K1_RGBIC_PRIMARY_CLOCK_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
+  +#else
+     if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
+       if (CONFIG.LED_COLOR_ORDER == RGB) {
+         FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
+  @@ -1122,6 +1148,7 @@
+  +#endif  // K1_CUSTOM_RGBIC_V1
+   
+     FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
+   
+  @@ -2190,7 +2217,16 @@
+  +#ifdef K1_CUSTOM_RGBIC_V1
+  +  // Matches the Captain's PROVEN Pixelblaze config (WS2812/SK6812, 800 Kbps
+  +  // 250ns/750ns, RGB). BOTH wires of the secondary channel driven with the same
+  +  // buffer — GPIO5 (data) and GPIO8 (2nd wire) — so the real DIN gets valid WS2812
+  +  // data. RGB order; keep in sync with the primary in init_leds().
+  +  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
+  +  FastLED.addLeds<WS2812B, K1_RGBIC_SECONDARY_CLOCK_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
+  +#else
+     FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+  +#endif
+     
+     for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
+       leds_out_secondary[x] = CRGB(0, 0, 0);
+  +39 -3
+
+platformio.ini
+  @@ -261,20 +261,23 @@
+  -; CUSTOM 224-LED SINGLE-CHANNEL BUILD (2026-07-06) — NON-SHIPPABLE, BENCH K1 ONLY
+  -; (B489A500 / port 12201). ONE WS2812B data channel of 224 LEDs on the bench PRIMARY
+  -; GPIO (LED_DATA_PIN = GPIO4); the secondary strip is DROPPED. The output bounces off
+  -; a white wall (fully diffused), so per-pixel detail is invisible → the 160-px render
+  -; canvas is RESAMPLED onto 224 by the existing scale_to_strip() (the same path that
+  -; already drives strip-modes 61/91/160). NATIVE_RESOLUTION stays 160 → NO buffer,
+  -; effect, mirror, or DSP changes. Extends k1_bench_im73d_ble → the bench's IM73D PDM
+  -; mic + the NimBLE BLE-MIDI central so the K718 Remoted dial controls the wall live;
+  -; everything else identical.
+  -; K1_CUSTOM_LED_V1 gates: config_types.h LED_COUNT_VALUE=224; .ino:670/693 drop+guard
+  -; the secondary strip; led_utilities.h init_lerp_params upsample clamp. Flag-OFF →
+  -; k1_hardware / k1_bench_reference / k1_bench_im73d byte-identical.
+  -; REVERT = delete this env block + the k1_custom line in k1_upload_guard.py + the
+  -; K1_CUSTOM_LED_V1 guards (config_types.h, .ino, led_utilities.h).
+  +; CUSTOM DUAL-214 WALL-BOUNCE BUILD (2026-07-12 overwrite of 2026-07-06 single-channel
+  +; test bed) — NON-SHIPPABLE, BENCH K1 ONLY (B489A500 / port 12201).
+  +; TWO independent WS2812B 5V channels of 214 LEDs each (primary GPIO4, secondary
+  +; GPIO5) — same topology as production, bare bulbs (no LGP). Viewer sees light
+  +; bounced off a white wall, not the dies → per-pixel detail is invisible, so the
+  +; 160-px render canvas is RESAMPLED onto 214 by scale_to_strip() /
+  +; scale_to_secondary_strip() (same path as strip-modes 61/91/160). NATIVE_RESOLUTION
+  +; stays 160 → NO buffer, effect, mirror, or DSP changes. Power: Captain-locked
+  +; CONFIG.MAX_CURRENT_MA=2500 (2.5 A total @ 5 V), forced at boot over persisted
+  +; saves. Extends k1_bench_im73d_ble → IM73D PDM mic + NimBLE BLE-MIDI (K718 Remoted).
+  +; K1_CUSTOM_LED_V1 gates: config_types.h LED_COUNT_VALUE=214; globals.h
+  +; SECONDARY_LED_COUNT=214; globals_config.cpp + system.h MAX_CURRENT_MA=2500;
+  +; led_utilities.h primary lerp-params upsample clamp + lerp_led_16 secondary clamp.
+  +; Flag-OFF → k1_hardware / k1_bench_reference / k1_bench_im73d byte-identical.
+  +; REVERT = delete this env block + the k1_custom line in k1_device_identities.json +
+  +; the K1_CUSTOM_LED_V1 guards (config_types.h, globals.h, globals_config.cpp,
+  +; system.h, led_utilities.h).
+   ; Flash: pio run -e k1_custom -t upload --upload-port <verified B489A500 port>
+   [env:k1_custom]
+   extends = env:k1_bench_im73d_ble
+  @@ -282,6 +285,45 @@
+  +; CUSTOM 12V 5050 DUAL-CHANNEL BUILD (2026-07-12) — NON-SHIPPABLE, BENCH K1 ONLY
+  +; (B489A500 / port 12201). NOT the K1 product: a custom rig that swaps the two
+  +; WS2812B channels (2x 160) for TWO 138-LED addressable 12V 5050 strips.
+  +; CHIP/DRIVER (RESOLVED + EYES-ON PASS 2026-07-12): the strip is driven with
+  +; FastLED **WS2812B, 800 kbps 250ns/750ns, RGB order** — an EXACT match to the
+  +; Captain's proven Pixelblaze config (LED type WS2812/SK6812/NeoPixel, 800 Kbps,
+  +; Color Order RGB; screenshot on file). EARLIER DEAD-ENDS (do not reintroduce):
+  +; APA102/clocked-SPI (garbled from px0 — wrong protocol) and FastLED's WS2815
+  +; chipset (wrong 250/750 timing). The reel is labelled "WS2815 / Data+CLK", but the
+  +; DATA protocol is plain WS2812 800 kbps; the strip's second ("CLK") wire is driven
+  +; with the SAME data (see led_utilities.h) so the real DIN always gets a valid
+  +; signal. **ROOT CAUSE of the whole corruption saga = MISSING COMMON GROUND:** the
+  +; strip runs off an external 12V PSU; its GND MUST be tied to the ESP32-S3 GND or
+  +; the data has no shared reference and reads as garbage. 3.3V logic may still be
+  +; marginal into a 12V strip — a 3.3->5V shifter (74AHCT125) on DATA/CLK is the
+  +; backup if any sparkle remains.
+  +; WIRING (bench-reference GPIO map, inherited): DATA pins UNCHANGED from the bench
+  +; K1 — primary GPIO4, secondary GPIO5. Second ("CLK") wire driven with mirrored
+  +; data: primary GPIO7, secondary GPIO8 (GPIO8 was RNG_SEED_PIN, dead/never-read;
+  +; reassigned under flag).
+  +; K1_CUSTOM_RGBIC_V1 gates: config_types.h LED_COUNT_VALUE=138; globals.h
+  +; SECONDARY_LED_COUNT=138; constants.h clock-pin macros; led_utilities.h the two
+  +; addLeds<> registrations. NATIVE_RESOLUTION stays 160 → scale_to_strip()
+  +; downsamples 160→138 on BOTH channels (the existing 61/91 down-scale path; the
+  +; secondary lerp branch at led_utilities.h:2203 already handles count != 160).
+  +; Both channels stay INDEPENDENT (primary + secondary), exactly as the bench K1.
+  +; Extends k1_bench_im73d_ble → inherits the IM73D PDM mic + NimBLE BLE-MIDI central
+  +; so the K718 "Remoted" dial drives the rig live, same base as k1_custom.
+  +; Flag-OFF → k1_hardware / k1_bench_reference / k1_bench_im73d / k1_custom all
+  +; byte-identical. REVERT = delete this env block + the k1_custom_rgbic line in
+  +; k1_upload_guard.py manifest + the K1_CUSTOM_RGBIC_V1 guards (config_types.h,
+  +; constants.h, globals.h, led_utilities.h).
+  +; Flash: pio run -e k1_custom_rgbic -t upload --upload-port <verified B489A500 port>
+  +[env:k1_custom_rgbic]
+  +extends = env:k1_bench_im73d_ble
+  +build_flags =
+  +    ${env:k1_bench_im73d_ble.build_flags}
+  +    -DK1_CUSTOM_RGBIC_V1
+  +; ─────────────────────────────────────────────────────────────────────────────
+   ; IM73D + BLE-MIDI DEMO BUILD (2026-07-04) — NON-SHIPPABLE, BENCH K1 ONLY
+   ; (B489A500 / USB serial B4:3A:45:A5:89:B4 / port 12201). The INVESTOR-DEMO
+   ; amalgamation: bench K1 running the IM73D122 PDM mic on the LIVE production AP+VP,
+  +56 -14
+
+scripts/platformio/k1_device_identities.json
+  @@ -68,7 +68,8 @@
+  -        "k1_custom"
+  +        "k1_custom",
+  +        "k1_custom_rgbic"
+         ]
+       }
+     ],
+  +2 -1
+
+scripts/platformio/k1_session_target.py
+  @@ -20,6 +20,7 @@
+  +GENERATED_SOURCE_SUFFIXES = (".ino.cpp",)
+   
+   
+   def normalise_port(value: str) -> str:
+  @@ -57,6 +58,7 @@
+  +                and not path.name.endswith(GENERATED_SOURCE_SUFFIXES)
+               )
+       for path in sorted(files, key=lambda item: item.relative_to(root).as_posix()):
+           relative = path.relative_to(root).as_posix().encode("utf-8")
+  +2 -0

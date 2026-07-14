@@ -1,0 +1,276 @@
+{
+  "baseline": {
+    "all": {
+      "acc1": 0.5,
+      "acc2": 0.5277777777777778,
+      "locked_fraction": 0.00812479145812479,
+      "n": 36,
+      "octave_error": 0.02777777777777779
+    },
+    "buckets": {
+      "060-080": {
+        "acc1": 0.25,
+        "acc2": 0.25,
+        "locked_fraction": 0.012612612612612612,
+        "n": 4,
+        "octave_error": 0.0
+      },
+      "080-100": {
+        "acc1": 0.6153846153846154,
+        "acc2": 0.6153846153846154,
+        "locked_fraction": 0.012520212520212522,
+        "n": 13,
+        "octave_error": 0.0
+      },
+      "100-120": {
+        "acc1": 0.8888888888888888,
+        "acc2": 0.8888888888888888,
+        "locked_fraction": 0.0,
+        "n": 9,
+        "octave_error": 0.0
+      },
+      "120-140": {
+        "acc1": 0.16666666666666666,
+        "acc2": 0.16666666666666666,
+        "locked_fraction": 0.013213213213213212,
+        "n": 6,
+        "octave_error": 0.0
+      },
+      "140-156": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      "<060": {
+        "acc1": 0.0,
+        "acc2": 0.0,
+        "locked_fraction": 0.0,
+        "n": 1,
+        "octave_error": 0.0
+      },
+      ">156": {
+        "acc1": 0.0,
+        "acc2": 0.3333333333333333,
+        "locked_fraction": 0.0,
+        "n": 3,
+        "octave_error": 0.3333333333333333
+      }
+    },
+    "in_range": {
+      "acc1": 0.5625,
+      "acc2": 0.5625,
+      "locked_fraction": 0.00914039039039039,
+      "n": 32,
+      "octave_error": 0.0
+    }
+  },
+  "baseline_csv": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/measurements/tempo-octave-baseline.tracks.csv",
+  "commands_json": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/rerun-commands.json",
+  "device": {
+    "all": {
+      "acc1": 0.8333333333333334,
+      "acc2": 0.8333333333333334,
+      "locked_fraction": 0.5039391956456081,
+      "n": 6,
+      "octave_error": 0.0
+    },
+    "buckets": {
+      "060-080": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      "080-100": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      "100-120": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      "120-140": {
+        "acc1": 0.8333333333333334,
+        "acc2": 0.8333333333333334,
+        "locked_fraction": 0.5039391956456081,
+        "n": 6,
+        "octave_error": 0.0
+      },
+      "140-156": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      "<060": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      },
+      ">156": {
+        "acc1": null,
+        "acc2": null,
+        "locked_fraction": null,
+        "n": 0,
+        "octave_error": null
+      }
+    },
+    "in_range": {
+      "acc1": 0.8333333333333334,
+      "acc2": 0.8333333333333334,
+      "locked_fraction": 0.5039391956456081,
+      "n": 6,
+      "octave_error": 0.0
+    }
+  },
+  "manifest": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/device-corpus-manifest.json",
+  "metric_contract": {
+    "acc1": "relative error <=4% at exact GT tempo",
+    "acc2": "relative error <=4% at GT multiples 1/3, 1/2, 1, 2, 3",
+    "detected_bpm": "mode of rounded BPM over final 50% of trajectory",
+    "locked_fraction": "mean lock state over final 50% of trajectory",
+    "octave_error": "Acc2 minus Acc1"
+  },
+  "rerun_command": "python3 scripts/regression-harness/device_novelty_corpus_run.py docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-corpus.json --preflight-report docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/edm-ground-truth-preflight.json --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_ap_frontend_probe --duration-ms 120000 --out-dir docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures --score-manifest docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/device-corpus-manifest.json --commands-out docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/rerun-commands.json --out-json docs/measurements/2026-07-14-device-novelty-tempo-delta.json --out-md docs/measurements/2026-07-14-device-novelty-tempo-delta.md --resume",
+  "tracks": [
+    {
+      "acc1": true,
+      "acc2": true,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__summary.json",
+      "det_bpm": 127.0,
+      "final_conf": 0.7095,
+      "genre": "Mainstage / Big Room",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/animals-original-mix/4459187",
+      "id": "martin-garrix-animals-128",
+      "in_range": true,
+      "locked_frac": 0.5504592888833344,
+      "n_frames": 16003,
+      "octave": "x1",
+      "rel_err": 0.0078125,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/martin-garrix-animals-128_nov_buffered_20260714_223905__device_nov_replay_trajectory.log",
+      "settled_median": 127.0,
+      "title": "Animals",
+      "track_sha256": "174025b5ff4d326675cfb3b31b820e8448242d1b51d1a3b00e236e66373cc61a"
+    },
+    {
+      "acc1": false,
+      "acc2": false,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__summary.json",
+      "det_bpm": 73.0,
+      "final_conf": 0.0,
+      "genre": "Dance / Pop EDM",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/dreams-feat-lanie-gardner/14632865",
+      "id": "david-guetta-morten-dreams-128",
+      "in_range": true,
+      "locked_frac": 0.042367056176966816,
+      "n_frames": 16003,
+      "octave": "off",
+      "rel_err": 0.140625,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/david-guetta-morten-dreams-128_nov_buffered_20260714_224127__device_nov_replay_trajectory.log",
+      "settled_median": 76.0,
+      "title": "Dreams (feat. Lanie Gardner)",
+      "track_sha256": "51ed8bc5cf34055cc9c5fdde2378eca2f0dcb36d8168a39a6f7cbf464420e4f6"
+    },
+    {
+      "acc1": true,
+      "acc2": true,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__summary.json",
+      "det_bpm": 129.0,
+      "final_conf": 0.0,
+      "genre": "Mainstage / Electro House",
+      "gt_bpm": 128.0,
+      "gt_source": "https://www.beatport.com/track/ghosts-n-stuff/23606643",
+      "id": "deadmau5-ghosts-n-stuff-128",
+      "in_range": true,
+      "locked_frac": 0.7766668749609448,
+      "n_frames": 16003,
+      "octave": "x1",
+      "rel_err": 0.0078125,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/deadmau5-ghosts-n-stuff-128_nov_buffered_20260714_224347__device_nov_replay_trajectory.log",
+      "settled_median": 129.0,
+      "title": "Ghosts 'n' Stuff (feat. Rob Swire)",
+      "track_sha256": "bad1b49e1b3bcbf1fd8a83b4880738be8295cc5773ff420454f4e64ce319ce4d"
+    },
+    {
+      "acc1": true,
+      "acc2": true,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__summary.json",
+      "det_bpm": 126.0,
+      "final_conf": 0.0,
+      "genre": "Dance / Pop EDM",
+      "gt_bpm": 126.0,
+      "gt_source": "https://www.beatport.com/track/levels/15757104",
+      "id": "avicii-levels-126",
+      "in_range": true,
+      "locked_frac": 0.3700556145722677,
+      "n_frames": 16003,
+      "octave": "x1",
+      "rel_err": 0.0,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__device_nov_replay_trajectory.log",
+      "settled_median": 125.0,
+      "title": "Levels (Radio Edit)",
+      "track_sha256": "27157153244a9cd223102a8c5c800f6f7594d6db50745fd21bb1204d5ceb0143"
+    },
+    {
+      "acc1": true,
+      "acc2": true,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__summary.json",
+      "det_bpm": 126.0,
+      "final_conf": 0.0,
+      "genre": "Mainstage / Electro House",
+      "gt_bpm": 127.0,
+      "gt_source": "https://www.beatport.com/track/poseidon/12577047",
+      "id": "hi-lo-poseidon-127",
+      "in_range": true,
+      "locked_frac": 0.5395238392801349,
+      "n_frames": 16003,
+      "octave": "x1",
+      "rel_err": 0.007874015748031496,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/hi-lo-poseidon-127_nov_buffered_20260714_224828__device_nov_replay_trajectory.log",
+      "settled_median": 126.0,
+      "title": "Poseidon",
+      "track_sha256": "0b6bd15625dad36344cb8aa654a83229148321f13c2393f4f10ed193c1475aaf"
+    },
+    {
+      "acc1": true,
+      "acc2": true,
+      "bucket": "120-140",
+      "capture_summary": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__summary.json",
+      "det_bpm": 135.0,
+      "final_conf": 0.3973,
+      "genre": "Techno (Peak Time / Driving)",
+      "gt_bpm": 135.0,
+      "gt_source": "https://www.beatport.com/track/sgadi-li-mi/13636228",
+      "id": "charlotte-de-witte-sgadi-li-mi-135",
+      "in_range": true,
+      "locked_frac": 0.7445625,
+      "n_frames": 16000,
+      "octave": "x1",
+      "rel_err": 0.0,
+      "replay_trajectory": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/charlotte-de-witte-sgadi-li-mi-135_nov_buffered_20260714_225048__device_nov_replay_trajectory.log",
+      "settled_median": 135.0,
+      "title": "Sgadi Li Mi",
+      "track_sha256": "ade668d82ba590e53acbbae10c8c1db22e39701dc1fd8a033cc231491a27acd6"
+    }
+  ],
+  "verdict": "MEASURED"
+}

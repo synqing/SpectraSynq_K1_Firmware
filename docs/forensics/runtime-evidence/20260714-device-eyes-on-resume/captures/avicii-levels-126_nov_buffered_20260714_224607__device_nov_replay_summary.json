@@ -1,0 +1,79 @@
+{
+  "accepted_novelty_rate_hz_used": 44.44444444444445,
+  "ap_frame_hz_used_for_reconstruction": 133.33333333333334,
+  "ap_frame_ms_used_for_reconstruction": 7.499999999999999,
+  "capture_log": "docs/forensics/runtime-evidence/20260714-device-eyes-on-resume/captures/avicii-levels-126_nov_buffered_20260714_224607__nov_dump.log",
+  "classification": "declared_rate_device_nov_replay_timing_but_weak_lock",
+  "decimation_used_for_reconstruction": 3,
+  "defines": [
+    "K1_TEMPO_CONF_V2",
+    "K1_TEMPO_FLYWHEEL_V2",
+    "K1_TEMPO_AP_FRAME_HZ=133.333333f",
+    "K1_TEMPO_NOVELTY_DECIMATION=3U"
+  ],
+  "nov_audit": {
+    "accepted_nov_rate_hz_measured": 44.44500004166979,
+    "cadence_ms_max": 25,
+    "cadence_ms_median": 23,
+    "cadence_ms_min": 20,
+    "cadence_ms_p5": 21.0,
+    "cadence_ms_p95": 24.0,
+    "duration_ms": 119991,
+    "emit_gap_count": 0,
+    "emit_gaps_first10": [],
+    "first_emit": 24825,
+    "first_t_ms": 572240,
+    "ignored_non_buffer_rows": 0,
+    "large_dt_count": 0,
+    "large_dt_first10": [],
+    "last_emit": 30158,
+    "last_t_ms": 692231,
+    "row_count": 5334,
+    "source_mode": "buffer",
+    "timestamp_regression_count": 0,
+    "timestamp_regressions_first10": []
+  },
+  "novelty_field": "nov",
+  "ok": true,
+  "replay_injection_mode": "B_AP_FRAME_RECONSTRUCTION",
+  "replay_summary": {
+    "bpm_min_median_max": [
+      0.0,
+      125.0,
+      155.0
+    ],
+    "expected_bpm": 126.0,
+    "frame_count": 16003,
+    "near_bpm_tolerance": 3,
+    "warm_beat_ticks": 78,
+    "warm_bpm_counts": {
+      "123": 591,
+      "125": 3192,
+      "126": 4263,
+      "155": 417,
+      "60": 279,
+      "63": 2805,
+      "64": 1567,
+      "98": 888
+    },
+    "warm_bpm_min_median_max": [
+      60.0,
+      125.0,
+      155.0
+    ],
+    "warm_frame_count": 14002,
+    "warm_high_conf_count": 3591,
+    "warm_high_conf_near_127_rows": 2607,
+    "warm_high_conf_near_target_rows": 2607,
+    "warm_high_or_locked_count": 5529,
+    "warm_high_or_locked_near_127_rows": 2616,
+    "warm_high_or_locked_near_target_rows": 2616,
+    "warm_locked_count": 5529,
+    "warm_locked_near_127_rows": 2616,
+    "warm_locked_near_target_rows": 2616,
+    "warm_near_127_rows": 7455,
+    "warm_near_target_rows": 8046
+  },
+  "run_returncode": 0,
+  "stderr": ""
+}

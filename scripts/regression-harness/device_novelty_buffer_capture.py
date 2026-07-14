@@ -60,11 +60,55 @@ def parse_args():
         help="Keep TEMPO stream enabled during NOV capture window.",
     )
     p.add_argument(
+        "--capture-ap-stream",
+        action="store_true",
+        help="Keep the 1 Hz AP tempo/onset stream enabled during the NOV capture window.",
+    )
+    p.add_argument(
         "--capture-apcad-soak",
         action="store_true",
         help="Capture compact AP cadence evidence concurrently with buffered novelty.",
     )
-    return p.parse_args()
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument(
+        "--set-effect",
+        help="Stable legacy effect key from EffectRegistry.cpp; preferred over numeric mode selection.",
+    )
+    mode.add_argument(
+        "--set-mode",
+        type=int,
+        help="Numeric firmware input. Requires --expected-mode-ordinal because numbering is build-dependent.",
+    )
+    p.add_argument(
+        "--expected-mode-ordinal",
+        type=int,
+        help="Required with --set-mode; exact CONFIG.LIGHTSHOW_MODE ordinal expected after selection.",
+    )
+    p.add_argument(
+        "--event-status-period-ms",
+        type=int,
+        default=0,
+        help="Poll the read-only event_status surface at this interval during playback; 0 disables polling.",
+    )
+    p.add_argument(
+        "--eyes-on-countdown-ms",
+        type=int,
+        default=0,
+        help="After all preflight gates pass, emit EYES_ON_ARMED and wait this long before playback.",
+    )
+    p.add_argument(
+        "--leave-effect-selected",
+        action="store_true",
+        help="Do not restore the pre-capture primary mode. Diagnostic opt-in; restoration is the default.",
+    )
+    args = p.parse_args()
+    if args.set_mode is not None and args.expected_mode_ordinal is None:
+        p.error("--set-mode requires --expected-mode-ordinal; never infer dense versus ordinal numbering")
+    if args.set_effect and args.expected_mode_ordinal is not None:
+        p.error("--expected-mode-ordinal is derived from source when --set-effect is used")
+    if args.eyes_on_countdown_ms < 0:
+        p.error("--eyes-on-countdown-ms must be non-negative")
+    return args
 
 
 def now_stamp():
@@ -113,9 +157,15 @@ def normalise_serial(value: str | None) -> str:
 def validate_runtime_identity(lines: list[str], expected_chip_id: str, expected_build_env: str) -> tuple[dict[str, str], list[str]]:
     """Require runtime build and chip readback before playback can begin."""
     build_line = next((line for line in lines if line.startswith("BUILD:")), "")
-    chip_line = next((line for line in lines if line.startswith("CHIP_ID:")), "")
+    chip_line = ""
+    chip_match = None
+    for line in lines:
+        candidate = re.fullmatch(r"(?:CHIP_ID:\s*)?([0-9A-Fa-f]{8})", line.strip())
+        if candidate:
+            chip_line = line
+            chip_match = candidate
+            break
     build_match = re.search(r"\benv=([^\s]+)", build_line)
-    chip_match = re.search(r"CHIP_ID:\s*([0-9A-Fa-f]+)", chip_line)
     observed = {
         "build_line": build_line,
         "chip_line": chip_line,
@@ -127,6 +177,92 @@ def validate_runtime_identity(lines: list[str], expected_chip_id: str, expected_
         errors.append(f"runtime build env mismatch: expected {expected_build_env}, observed {observed['build_env'] or 'NONE'}")
     if normalise_serial(observed["chip_id"]) != normalise_serial(expected_chip_id):
         errors.append(f"runtime chip mismatch: expected {expected_chip_id}, observed {observed['chip_id'] or 'NONE'}")
+    return observed, errors
+
+
+def load_legacy_effect_catalog(root: Path = ROOT) -> dict[str, dict[str, object]]:
+    """Resolve stable effect keys to append-only enum ordinals from current source."""
+    config = (root / "SPECTRASYNQ_K1_FIRMWARE/system/config_types.h").read_text()
+    registry = (root / "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectRegistry.cpp").read_text()
+    enum_match = re.search(r"enum lightshow_modes\s*\{(.*?)\bNUM_MODES\b", config, re.DOTALL)
+    if not enum_match:
+        raise RuntimeError("cannot locate lightshow_modes enum")
+    constants = re.findall(r"^\s*(LIGHT_MODE_[A-Z0-9_]+)\s*,", enum_match.group(1), re.MULTILINE)
+    ordinals = {constant: ordinal for ordinal, constant in enumerate(constants)}
+    row_re = re.compile(
+        r'\{\s*legacy_id\((LIGHT_MODE_[A-Z0-9_]+)\),\s*"([^"]+)",\s*"([^"]+)"'
+    )
+    catalog: dict[str, dict[str, object]] = {}
+    for constant, key, display_name in row_re.findall(registry):
+        if constant not in ordinals:
+            raise RuntimeError(f"registry constant {constant} is absent from lightshow_modes")
+        catalog[key] = {
+            "constant": constant,
+            "display_name": display_name,
+            "ordinal": ordinals[constant],
+        }
+    if not catalog:
+        raise RuntimeError("no legacy effect rows resolved from EffectRegistry.cpp")
+    return catalog
+
+
+def resolve_mode_request(args) -> dict[str, object] | None:
+    if args.set_effect:
+        if args.expected_build_env not in {
+            "k1_bench_ap_frontend_probe",
+            "k1_bench_ap_frontend_probe_v1_off",
+        }:
+            raise RuntimeError("--set-effect is fail-closed to legacy-numbered bench AP probe environments")
+        catalog = load_legacy_effect_catalog()
+        effect = catalog.get(args.set_effect)
+        if effect is None:
+            raise RuntimeError(f"unknown legacy effect key: {args.set_effect}")
+        return {
+            "input": int(effect["ordinal"]),
+            "expected_ordinal": int(effect["ordinal"]),
+            "effect_key": args.set_effect,
+            "effect_name": effect["display_name"],
+            "numbering": "legacy_ordinal",
+        }
+    if args.set_mode is not None:
+        return {
+            "input": args.set_mode,
+            "expected_ordinal": args.expected_mode_ordinal,
+            "effect_key": None,
+            "effect_name": None,
+            "numbering": "explicit_untrusted_numeric",
+        }
+    return None
+
+
+def validate_mode_readback(lines: list[str], expected_ordinal: int) -> tuple[int | None, list[str]]:
+    observed = None
+    for line in lines:
+        match = re.fullmatch(r"CONFIG\.LIGHTSHOW_MODE:\s*(\d+)", line.strip())
+        if match:
+            observed = int(match.group(1))
+            break
+    errors = []
+    if observed is None:
+        errors.append("CONFIG.LIGHTSHOW_MODE ordinal readback missing")
+    elif observed != expected_ordinal:
+        errors.append(f"mode ordinal mismatch: expected {expected_ordinal}, observed {observed}")
+    return observed, errors
+
+
+def validate_get_mode_readback(lines: list[str], expected_ordinal: int | None = None) -> tuple[int | None, list[str]]:
+    """Parse the current legacy runtime ordinal returned by the get_mode command."""
+    observed = None
+    for line in lines:
+        match = re.fullmatch(r"MODE:\s*(\d+)(?:\s+.*)?", line.strip())
+        if match:
+            observed = int(match.group(1))
+            break
+    errors = []
+    if observed is None:
+        errors.append("MODE runtime ordinal readback missing")
+    elif expected_ordinal is not None and observed != expected_ordinal:
+        errors.append(f"runtime mode ordinal mismatch: expected {expected_ordinal}, observed {observed}")
     return observed, errors
 
 
@@ -299,6 +435,13 @@ def main():
     identity = serial_identity(args.port)
 
     ser = serial.Serial(args.port, args.baud, timeout=0.05, write_timeout=1.0)
+    mode_request = resolve_mode_request(args)
+    initial_mode_ordinal = None
+    observed_mode_ordinal = None
+    restored_mode_ordinal = None
+    mode_change_attempted = False
+    mode_restore_attempted = False
+    mode_restore_errors: list[str] = []
     raw_lines: list[str] = []
     afplay: subprocess.Popen[bytes] | None = None
     playback_early_exit = False
@@ -334,11 +477,34 @@ def main():
         if runtime_errors:
             raise RuntimeError("; ".join(runtime_errors))
 
+        mode_lines: list[str] = []
+        if mode_request is not None:
+            send(ser, "get_mode")
+            initial_mode_lines = read_lines(ser, 1.5)
+            raw_lines.extend(initial_mode_lines)
+            initial_mode_ordinal, initial_mode_errors = validate_get_mode_readback(initial_mode_lines)
+            if initial_mode_errors:
+                raise RuntimeError("; ".join(initial_mode_errors))
+            raw_lines.append(f"MODE_SNAPSHOT initial_ordinal={initial_mode_ordinal}")
+
+            send(ser, f"set_mode={mode_request['input']}")
+            mode_change_attempted = True
+            mode_lines.extend(read_lines(ser, 1.5))
+            time.sleep(1.0)
+            send(ser, "get_mode")
+            mode_lines.extend(read_lines(ser, 1.5))
+            raw_lines.extend(mode_lines)
+            observed_mode_ordinal, mode_errors = validate_mode_readback(
+                mode_lines, int(mode_request["expected_ordinal"])
+            )
+            if mode_errors:
+                raise RuntimeError("; ".join(mode_errors))
+
         for cmd in (
             "nov_clear=1",
             f"apdbg={'on' if args.capture_apdbg else 'off'}",
             f"tempo_stream={'on' if args.capture_tempo_stream else 'off'}",
-            "ap_stream=off",
+            f"ap_stream={'on' if args.capture_ap_stream else 'off'}",
         ):
             send(ser, cmd)
             raw_lines.extend(read_lines(ser, 0.5))
@@ -351,10 +517,27 @@ def main():
         send(ser, f"nov_capture={args.duration_ms}")
         raw_lines.extend(read_lines(ser, 0.8))
 
+        if args.eyes_on_countdown_ms > 0:
+            effect_label = mode_request["effect_key"] if mode_request else "mode_unchanged"
+            ordinal_label = mode_request["expected_ordinal"] if mode_request else "unchanged"
+            armed_marker = (
+                f"EYES_ON_ARMED effect={effect_label} ordinal={ordinal_label} "
+                f"playback_in_ms={args.eyes_on_countdown_ms}"
+            )
+            raw_lines.append(armed_marker)
+            print(armed_marker, flush=True)
+            time.sleep(args.eyes_on_countdown_ms / 1000.0)
         afplay = subprocess.Popen(["/usr/bin/afplay", str(track)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        start_marker = (
+            f"EYES_ON_START effect={mode_request['effect_key'] if mode_request else 'mode_unchanged'} "
+            f"ordinal={mode_request['expected_ordinal'] if mode_request else 'unchanged'}"
+        )
+        raw_lines.append(start_marker)
+        print(start_marker, flush=True)
         capture_start = time.monotonic()
         capture_deadline = time.time() + (args.duration_ms / 1000.0)
         next_progress_ms = 10000
+        next_event_status_ms = 0
         capture_carry = ""
         while time.time() < capture_deadline:
             elapsed_ms = int(round((time.monotonic() - capture_start) * 1000.0))
@@ -365,6 +548,10 @@ def main():
                     flush=True,
                 )
                 next_progress_ms += 10000
+            if args.event_status_period_ms > 0 and elapsed_ms >= next_event_status_ms:
+                ser.write(b":event_status\n")
+                ser.flush()
+                next_event_status_ms += args.event_status_period_ms
             chunk = ser.read(ser.in_waiting or 1)
             if not chunk:
                 if afplay.poll() is not None:
@@ -378,6 +565,12 @@ def main():
             if afplay.poll() is not None:
                 playback_early_exit = True
         capture_elapsed_ms = int(round((time.monotonic() - capture_start) * 1000.0))
+        stop_marker = (
+            f"EYES_ON_STOP effect={mode_request['effect_key'] if mode_request else 'mode_unchanged'} "
+            f"elapsed_ms={capture_elapsed_ms}"
+        )
+        raw_lines.append(stop_marker)
+        print(stop_marker, flush=True)
         if capture_carry:
             text = capture_carry.strip()
             if text:
@@ -409,6 +602,26 @@ def main():
     finally:
         if afplay is not None and afplay.poll() is None:
             afplay.terminate()
+        if mode_change_attempted and initial_mode_ordinal is not None and not args.leave_effect_selected:
+            mode_restore_attempted = True
+            try:
+                send(ser, f"set_mode={initial_mode_ordinal}")
+                restore_lines = read_lines(ser, 1.5)
+                time.sleep(1.0)
+                send(ser, "get_mode")
+                restore_lines.extend(read_lines(ser, 1.5))
+                raw_lines.extend(restore_lines)
+                restored_mode_ordinal, restore_errors = validate_get_mode_readback(
+                    restore_lines, initial_mode_ordinal
+                )
+                mode_restore_errors.extend(restore_errors)
+            except Exception as exc:
+                mode_restore_errors.append(f"mode restoration failed: {exc}")
+            restore_verdict = "PASS" if not mode_restore_errors else "FAIL"
+            raw_lines.append(
+                f"MODE_RESTORE verdict={restore_verdict} initial_ordinal={initial_mode_ordinal} "
+                f"observed_ordinal={restored_mode_ordinal if restored_mode_ordinal is not None else 'NONE'}"
+            )
         ser.close()
 
     # Persist outputs.
@@ -432,6 +645,7 @@ def main():
 
     nov_rows = [l for l in nov_dump_path.read_text(errors="replace").splitlines() if l.startswith("NOV,")]
     novelty_integrity, validation_errors = validate_novelty_dump(filtered_nov_lines)
+    validation_errors.extend(mode_restore_errors)
     if not any("NOV_CAPTURE: armed" in line for line in raw_lines):
         validation_errors.append("novelty capture arm acknowledgement missing")
     if not nov_dump_done:
@@ -476,15 +690,54 @@ def main():
         "expected_chip_id": args.expected_chip_id,
         "expected_build_env": args.expected_build_env,
         "runtime_identity": runtime_identity,
+        "set_mode_dense": None,
+        "mode_selection": {
+            "requested_input": mode_request["input"] if mode_request else None,
+            "numbering": mode_request["numbering"] if mode_request else None,
+            "expected_ordinal": mode_request["expected_ordinal"] if mode_request else None,
+            "observed_ordinal": observed_mode_ordinal,
+            "effect_key": mode_request["effect_key"] if mode_request else None,
+            "effect_name": mode_request["effect_name"] if mode_request else None,
+        },
+        "mode_restoration": {
+            "required": mode_request is not None and not args.leave_effect_selected,
+            "attempted": mode_restore_attempted,
+            "initial_ordinal": initial_mode_ordinal,
+            "observed_ordinal": restored_mode_ordinal,
+            "verdict": (
+                "PASS"
+                if mode_restore_attempted and not mode_restore_errors
+                else "NOT_REQUIRED"
+                if mode_request is None or args.leave_effect_selected
+                else "FAIL"
+            ),
+            "errors": mode_restore_errors,
+        },
+        "event_status_period_ms": args.event_status_period_ms,
+        "eyes_on_countdown_ms": args.eyes_on_countdown_ms,
         "actions": [
             "session target pin and runtime build/chip identity verified before playback",
+            (
+                f"set_mode={mode_request['input']} expected_ordinal={mode_request['expected_ordinal']} "
+                f"effect={mode_request['effect_key'] or 'UNTRUSTED_NUMERIC'}"
+                if mode_request is not None
+                else "mode unchanged"
+            ),
             "nov_clear=1",
             f"apdbg={'on' if args.capture_apdbg else 'off'}",
             f"tempo_stream={'on' if args.capture_tempo_stream else 'off'}",
-            "ap_stream=off",
+            f"ap_stream={'on' if args.capture_ap_stream else 'off'}",
             f"nov_capture={args.duration_ms}",
+            f"event_status every {args.event_status_period_ms} ms" if args.event_status_period_ms > 0 else "event_status polling off",
             "nov_dump=1",
             "afplay playback",
+            (
+                f"restore primary mode to ordinal {initial_mode_ordinal} with get_mode readback"
+                if mode_restore_attempted
+                else "primary mode restoration explicitly disabled"
+                if mode_request is not None and args.leave_effect_selected
+                else "mode unchanged"
+            ),
         ],
         "non_actions": [
             "no device firmware constant tuning",

@@ -20,6 +20,7 @@ SOURCE_ROOTS = (
     Path("scripts/platformio"),
 )
 SOURCE_IGNORES = {".DS_Store", "__pycache__"}
+GENERATED_SOURCE_SUFFIXES = (".ino.cpp",)
 
 
 def normalise_port(value: str) -> str:
@@ -57,6 +58,7 @@ def current_source_fingerprint(root: Path = ROOT) -> str:
                 if path.is_file()
                 and not any(part in SOURCE_IGNORES for part in path.relative_to(root).parts)
                 and path.suffix != ".pyc"
+                and not path.name.endswith(GENERATED_SOURCE_SUFFIXES)
             )
     for path in sorted(files, key=lambda item: item.relative_to(root).as_posix()):
         relative = path.relative_to(root).as_posix().encode("utf-8")
