@@ -49,7 +49,7 @@
 #include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
 #include "k1_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
-#include "k1ev_stream.h"       // Mode-A [K1EV] read-only telemetry tap (ENABLE_K1EV_STREAM; bench capture only)
+#include "k1ev_capture.h"      // Mode-A [K1EV] BUFFERED telemetry capture (ENABLE_K1EV_STREAM; bench capture only; supersedes k1ev_stream.h live emit)
 #include "k1_edgemixer.h" // Smart Visual Engine secondary colour differentiation
 #include "k1_visual_hooks.h"  // Smart Visual Engine event-gated visual hooks
 #include "k1_effect_queue.h"  // Effects queuing + preset slots (frame-boundary commit engine)
@@ -986,7 +986,7 @@ void loop() {
 #endif
     k1_tempo_update(k1_audio_snapshot);  // beat/tempo-phase tracker (Core-0; self-clocks to 50 Hz, read-only consumer of novelty)
 #ifdef ENABLE_K1EV_STREAM
-    k1ev_emit(k1_audio_snapshot, k1_onset_beat_event);  // Mode-A read-only telemetry tap (additive; #ifdefs to nothing in release)
+    k1ev_capture_tick(k1_audio_snapshot, k1_onset_beat_event);  // Mode-A buffered telemetry: sub-us struct append (dump off the hot path; #ifdefs to nothing in release)
 #endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_TEMPO && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,

@@ -20,6 +20,7 @@
 
 #include "k1_ap_capture_telemetry.h"
 #include "serial_parse_helpers.h"   // vp_parse_bool
+#include "k1ev_capture.h"           // buffered [K1EV] capture (piggybacked arm/dump; no-op unless ENABLE_K1EV_STREAM)
 #include <stdlib.h>                 // atol
 #include <string.h>                 // strcmp
 
@@ -131,6 +132,12 @@ bool ap_nov_capture_arm(uint32_t duration_ms) {
   AP_NOV_CAPTURE_END_MS = AP_NOV_CAPTURE_START_MS + duration_ms;
   AP_NOV_CAPTURE_LAST_EMIT = k1_tempo_debug_read().emit_count;
   AP_NOV_CAPTURE_ACTIVE = true;
+#ifdef ENABLE_K1EV_STREAM
+  // Piggyback: the same duration arms the buffered [K1EV] capture, so the existing
+  // `nov_capture=<ms>` serial command (device_novelty_buffer_capture.py) drives both
+  // with no new command and no tool edit. Non-fatal if the k1ev PSRAM alloc fails.
+  k1ev_capture_arm(duration_ms);
+#endif
   return true;
 }
 
@@ -162,6 +169,11 @@ void ap_nov_capture_tick(uint32_t t_now, const K1TempoDebugSnapshot& td) {
 }
 
 void ap_nov_capture_dump() {
+  // NOTE: the [K1EV] buffered dump is DELIBERATELY NOT emitted here. Injecting the
+  // large k1ev block into this stream corrupts the capture tool's NOV/APCAD parse
+  // (device_novelty_buffer_capture.py expects a clean NOV dump). The k1ev buffer is
+  // dumped out-of-band by the decoupled `k1ev_dump=1` command (serial_diag_ap_dispatch),
+  // which an orchestrator sends AFTER the tool's capture completes, when serial is quiet.
   AP_NOV_CAPTURE_ACTIVE = false;
   USBSerial.print("NOV_CAPTURE_BEGIN,count=");
   USBSerial.print(AP_NOV_CAPTURE_COUNT);
@@ -869,6 +881,17 @@ bool serial_diag_ap_dispatch(const char* command_type, char* command_data) {
         bad_command(command_type, command_data);
       }
     }
+
+#ifdef ENABLE_K1EV_STREAM
+    else if (strcmp(command_type, "k1ev_dump") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value) && value) {
+        k1ev_capture_dump();   // decoupled [K1EV] dump: orchestrator sends `k1ev_dump=1` AFTER the nov flow
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
 
     else if (strcmp(command_type, "nov_clear") == 0) {
       bool value = false;
