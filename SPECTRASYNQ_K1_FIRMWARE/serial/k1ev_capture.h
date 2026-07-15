@@ -35,8 +35,12 @@
 #endif                           // frame. 3 -> 44.4 Hz at the 133 Hz AP rate. Onset
                                  // frames ALWAYS append (chroma optional to the parser).
 #ifndef K1EV_CAPTURE_CAPACITY
-#define K1EV_CAPTURE_CAPACITY 32768   // 32768 * 64 B = 2 MiB PSRAM. Worst case (append
-#endif                                // every frame @133 Hz) ~= 246 s; typical ~= 10 min.
+#define K1EV_CAPTURE_CAPACITY 65536   // 65536 * 64 B = 4 MiB PSRAM (of 8 MiB N16R8). Sized for
+#endif                                // the longest corpus track (Sgadi Li Mi 300.6 s) at the
+                                      // MEASURED 107 samples/s (48,231 w/ 1.5 safety) AND the
+                                      // absolute every-frame-@133Hz worst case (60,118) -> both
+                                      // < 65,536. 32,768 (2 MiB) overflowed both. Alloc fails
+                                      // safe (arm returns false) if 4 MiB PSRAM is unavailable.
 #ifndef K1EV_CAPTURE_MAX_MS
 #define K1EV_CAPTURE_MAX_MS 180000UL  // mirror AP_NOV_CAPTURE_MAX_MS (the piggyback arm
 #endif                                // duration comes straight from nov_capture=<ms>).
