@@ -43,7 +43,6 @@ required artefact and rerun command exists.
 
 | Error | Attempt | Resolution |
 |---|---:|---|
-| `docs/agent/AGENT_EXECUTION_STANDARD.md` absent | 1 | Locate current canonical equivalent before relying on it |
 | `k1_hardware` rejected on 1401 by identity guard | 1 | Captain selected identity-first main K1 on current 12401 |
 | Production env lacks novelty dump commands | 1 | Captain selected base `k1_ap_frontend_probe` for buffered capture only |
 | Existing replay is single-track and baseline is not directly comparable | 1 | Require paired same-track scoring and explicit GT handling |
