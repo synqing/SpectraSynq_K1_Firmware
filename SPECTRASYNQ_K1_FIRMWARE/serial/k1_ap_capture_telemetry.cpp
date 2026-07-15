@@ -891,6 +891,25 @@ bool serial_diag_ap_dispatch(const char* command_type, char* command_data) {
         bad_command(command_type, command_data);
       }
     }
+
+    else if (strcmp(command_type, "k1ev_arm") == 0) {
+      // Standalone [K1EV] arm, DECOUPLED from the NOV buffer. The nov_capture piggyback
+      // (ap_nov_capture_arm) caps at AP_NOV_CAPTURE_MAX_MS=180s because AP_NOV_CAPTURE_CAPACITY
+      // is only 6144 samples; the K1EV ring, by contrast, is sized for the longest corpus
+      // track (Sgadi 300.6 s). Stage-2 full-track captures therefore arm K1EV directly here,
+      // bypassing NOV, so the two chirp anchors (head + tail) land in one contiguous buffer.
+      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
+      if (ms > 0 && (uint32_t)ms <= K1EV_CAPTURE_MAX_MS && k1ev_capture_arm((uint32_t)ms)) {
+        tx_begin();
+        USBSerial.print("K1EV_ARM: armed ");
+        USBSerial.print(ms);
+        USBSerial.print(" ms capacity=");
+        USBSerial.println((uint32_t)K1EV_CAPTURE_CAPACITY);
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
 #endif
 
     else if (strcmp(command_type, "nov_clear") == 0) {

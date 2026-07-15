@@ -21,6 +21,7 @@
 #include "k1_mode_selection.h"   // k1_mode_selection_read_state()
 #include "k1_smart_director.h"   // k1_smart_director_read_output()
 #include <esp_heap_caps.h>       // heap_caps_malloc / MALLOC_CAP_SPIRAM
+#include <esp_task_wdt.h>        // esp_task_wdt_reset: feed loopTask's WDT during a long dump
 #include <math.h>                // lroundf, isfinite
 
 // One record is exactly 64 B; assert it so the PSRAM budget claim can't silently
@@ -195,15 +196,20 @@ void k1ev_capture_dump() {
       b[p++] = '\n';
     }
     USBSerial.write((const uint8_t*)b, (size_t)p);
-    if ((i & 0x3F) == 0x3F) {   // yield every 64 lines (buffer holds up to 32768)
-      vTaskDelay(1);
+    if ((i & 0x3F) == 0x3F) {   // every 64 lines: yield AND feed loopTask's Task-WDT. The dump
+      vTaskDelay(1);            // runs on loopTask (CPU0); a >~6k-frame buffer blocks loop() past
+      esp_task_wdt_reset();     // the 5 s TWDT and reboots mid-dump without this feed.
     }
   }
 
   USBSerial.print("K1EV_CAPTURE_DONE,count=");
   USBSerial.print(K1EV_CAPTURE_COUNT);
   USBSerial.print(",dropped=");
-  USBSerial.println(K1EV_CAPTURE_DROPPED);
+  USBSerial.print(K1EV_CAPTURE_DROPPED);
+  // Measured internal-DRAM floor at dump time (ring lives in PSRAM, so this should be
+  // untouched by the tap; parse_capture.py reads `largest_free_block=` from this line).
+  USBSerial.print(",largest_free_block=");
+  USBSerial.println((uint32_t)heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 }
 
 #endif  // ENABLE_K1EV_STREAM

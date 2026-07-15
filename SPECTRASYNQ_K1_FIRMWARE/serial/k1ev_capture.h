@@ -42,8 +42,12 @@
                                       // < 65,536. 32,768 (2 MiB) overflowed both. Alloc fails
                                       // safe (arm returns false) if 4 MiB PSRAM is unavailable.
 #ifndef K1EV_CAPTURE_MAX_MS
-#define K1EV_CAPTURE_MAX_MS 180000UL  // mirror AP_NOV_CAPTURE_MAX_MS (the piggyback arm
-#endif                                // duration comes straight from nov_capture=<ms>).
+#define K1EV_CAPTURE_MAX_MS 310000UL  // covers the longest corpus track (Sgadi Li Mi 300.6 s)
+#endif                                // + chirp/margin; ring worst case ~62k < 65,536. K1EV arms
+                                      // either via the nov_capture=<ms> piggyback (<=180s, bounded
+                                      // by the 6144-sample NOV buffer) OR the standalone
+                                      // :k1ev_arm=<ms> command for Stage-2 full-track captures,
+                                      // which is decoupled from the NOV buffer.
 
 // Compact per-frame record (64 B, naturally aligned; sizeof == 64 — static_assert'd
 // in the .cpp). Floats are scaled to int16 with a saturating helper and re-expanded
