@@ -8,6 +8,15 @@
 
 **Codex review policy:** Use normal review for ordinary implementation. Use adversarial review for architecture, concurrency, persistence, security, rollback, hardware-risk, or broad multi-file changes. Skip Codex review for genuinely trivial documentation-only changes unless they alter authoritative instructions.
 
+**Evidence admissibility:** Product evidence and agent-tool qualification are
+separate verdicts. `executed` requires preserved command output or an equivalent
+durable invocation artefact; a commit-message assertion alone is
+`NOT_VERIFIED`. `qualified` additionally requires a predeclared tool gate and
+evidence that the tool affected delivery quality, speed, risk, or recovery.
+Reachability, installation, naming a tool, or storing its only log under `/tmp`
+does not qualify it. Copy load-bearing ephemeral output into the repository
+before closing the session.
+
 ---
 
 ## Session runs
@@ -15,8 +24,40 @@
 | # | date | repo | task | tools | outcome | captain_interventions | verification | tokens/efficiency | defects | promotion_rec |
 |---|------|------|------|-------|---------|----------------------|--------------|-------------------|---------|---------------|
 | 1 | 2026-07-13 | `SpectraSynq_K1_Firmware` (`w1`) | Session 1: ship IM73D `repo-truth` manifest guard (`2a4be6b`) on `lane/gem-port-beat-pulse` | Herdr `w1` (pre-existing); `session-bootstrap.sh`; OK scope; claude-mem reachable; Codex `exec review --commit 2a4be6b`; Entire `status`/`doctor`/`rewind` | **Shipped** `fix(agent): validate IM73D via device identity manifest` — separate from rollout doc commit `d5639cd` | none | **5 signals:** (1) bootstrap exit **0**; (2) `repo-truth` IM73D env/guard/plan **PASS**, OVERALL **WARN** (registry dirty, expected no auto-commit); (3) `ok-scope` **PASS**; (4) Herdr workspace **w1** focused; (5) Entire **enabled**, strategy `manual-commit`, **rewind empty** (npm `entire-cli@0.0.3` — no lineage points). Commit-gate **docs** tier PASS. Targeted pytest upload/guard **24 passed**. Full suite **690 passed / 13 failed** on dirty lane (not staged; not gate for this commit). | Codex review ~173s; scoped single-file commit | Codex **P2:** guard checks env membership only, not bench chip `B489A500` row binding. Lane-wide pytest failures (effect registry, golden master, IM73D harness) — **pre-existing**, not introduced by `2a4be6b`. | **No** `knowledge/` promote — follow-up optional: tighten repo-truth to assert `k1_bench_im73d` ↔ bench identity row |
-| 2 | 2026-07-13 | `SpectraSynq_K1_Firmware` (`w1`) | Ship captivation families Shockwave (35) + Iris (36) for manual A/B vs Waveform; adversarial Codex gate + fix commit | Herdr `w1` (note only); `session-bootstrap.sh`; Codex `exec review --commit 7b3bb99` (~958s, task-mrj8x7xv-1qtov0; log `/tmp/codexrev/7b3bb99_adversarial.log`); fix `49ea369`; native math TDD; pytest; `pio-build.sh k1_hardware` | **Shipped** product slice `7b3bb99` + **fix** `49ea369` on `lane/gem-port-beat-pulse` — modes 35/36 enabled, 30/33/34 tombstoned; **host gate closed**; Captain eyes-on A/B **pending** (no flash without authorization) | none | bootstrap **0**; targeted pytest **22 passed** (easing, vp-probe, snapwave); `oracle_ble_midi_diff --gate` **PROVEN** (26 enabled / 37 roster); native iris+shockwave math **PASS**; `k1_hardware` build **SUCCESS** @ `49ea369` (Flash 700450 B; `firmware.bin` 700848 B, SHA256 `a627476216dbd182bb826a9bca7ba9b2ee220abd39567f22896a323bea50c0b4`) | Codex adversarial **executed** on `7b3bb99` (~958s) | **6 findings** (5×P1, 1×P2): (1) tombstone reachability via MODE button + Rotate8 encoder — **Y** (`light_mode_next_enabled` in `led_utilities.h`, `encoders.h`); (2) Iris membrane saturation — **Y** (interior overwrite in `light_mode_iris.cpp`); (3) BLE-MIDI gate 22/30 hard-lock — **Y** (`oracle_ble_midi_diff.py` 26/37 + full ordinal PC coverage); (4) easing-canon clean-checkout — **Y** (`PORTING_CRAFT_CANON.md` + SKILL committed); (5) k1_custom dual-strip 214/160 topology — **deferred** (inert for `k1_hardware`/`k1_bench_im73d` A/B); (6) Iris native-test include path — **Y** (`test_iris_math.cpp`). **Independent (source):** waveform_hybrid_k1 amp==1 dot clamp — **Y**. Entire/Headroom/Ruflo/sqlite-utils **skipped** | `49ea369` — **no flash** without Captain authorization |
-| 3 | 2026-07-15 | `SpectraSynq_K1_Firmware` | Close physical captivation A/B: 32 Waveform vs 35 Shockwave vs 36 Iris | clean detached `f2257ef`; `k1_session_target.py`; guarded `k1_bench_im73d` build/upload; `device_captivation_leg.py`; Captain eyes-on | **DECISION CLOSED:** mode 32 strongest/RETAIN; mode 35 FAIL/REJECT; mode 36 FAIL/REJECT. Mechanical device legs all PASS; the negative verdict is perceptual, not a crash or routing failure. | Captain authorised bench flash and supplied the sole captivation verdict after the three staged legs | Bench USB serial `B4:3A:45:A5:89:B4`, chip `B489A500`, ports explicitly `112401`; runtime `git=f2257ef env=k1_bench_im73d`; flashed bin 696896 B, SHA256 `ee92b495a0c56bfb80994ec164cb600dee9d8fd9238d6539ff97965d43a5df50`; modes 32/35/36 each 30.0 s, correct name/ordinal, 0 crash signatures, restored to mode 18 | Three device legs plus one Captain verdict; no subagent follow-up | Product defect: both proposed families failed the captivation bar despite mechanically correct execution. Deferred `k1_custom` topology remains outside this A/B. | Close the 35/36 product proposal; retain 32. Evidence: `docs/measurements/2026-07-15-captivation-32-35-36-verdict.md` |
+| 2 | 2026-07-13 | `SpectraSynq_K1_Firmware` (`w1`) | Ship captivation families Shockwave (35) + Iris (36) for manual A/B vs Waveform; review-remediation commit before device A/B | Herdr `w1` (note only); `session-bootstrap.sh`; a Codex CLI review is asserted by commits `49ea369`/`17e8a58`, but its `/tmp` log is absent; native math TDD; pytest; `pio-build.sh k1_hardware` | **Shipped** product slice `7b3bb99` + **fix** `49ea369` on `lane/gem-port-beat-pulse` — modes 35/36 enabled, 30/33/34 tombstoned; **host gate closed**; Captain eyes-on A/B was pending | none | bootstrap **0**; targeted pytest **22 passed** (easing, vp-probe, snapwave); `oracle_ble_midi_diff --gate` **PROVEN** (26 enabled / 37 roster); native iris+shockwave math **PASS**; `k1_hardware` build **SUCCESS** @ `49ea369` (Flash 700450 B; `firmware.bin` 700848 B, SHA256 `a627476216dbd182bb826a9bca7ba9b2ee220abd39567f22896a323bea50c0b4`) | **Codex execution NOT_VERIFIED from durable artefacts.** The commit message records `codex exec review --commit 7b3bb99` and ~958 s; the named raw log no longer exists. No Codex-plugin handoff artefact is preserved. | Six findings and their remediation are recorded in `49ea369`: five fixed, `k1_custom` topology deferred. The code changes are independently inspectable; attribution of the findings to an executed Codex review is **NOT_VERIFIED**. Entire/Headroom/Ruflo/sqlite-utils were skipped. | Product host gate accepted. **No agent-stack tool qualification from this session.** |
+| 3 | 2026-07-15 | `SpectraSynq_K1_Firmware` | Close physical captivation A/B: 32 Waveform vs 35 Shockwave vs 36 Iris | clean detached `f2257ef`; `k1_session_target.py`; guarded `k1_bench_im73d` build/upload; `device_captivation_leg.py`; Captain eyes-on | **DECISION CLOSED:** mode 32 strongest/RETAIN; mode 35 FAIL/REJECT; mode 36 FAIL/REJECT. Mechanical device legs all PASS; the negative verdict is perceptual, not a crash or routing failure. | Captain authorised bench flash and supplied the sole captivation verdict after the three staged legs | Bench USB serial `B4:3A:45:A5:89:B4`, chip `B489A500`, ports explicitly `112401`; runtime `git=f2257ef env=k1_bench_im73d`; flashed bin 696896 B, SHA256 `ee92b495a0c56bfb80994ec164cb600dee9d8fd9238d6539ff97965d43a5df50`; modes 32/35/36 each 30.0 s, correct name/ordinal, 0 crash signatures, restored to mode 18 | Three device legs plus one Captain verdict; no subagent follow-up | Product defect: both proposed families failed the captivation bar despite mechanically correct execution. Deferred `k1_custom` topology remains outside this A/B. | Close the 35/36 product proposal; retain 32. **Agent-stack qualification: none.** Evidence: `docs/measurements/2026-07-15-captivation-32-35-36-verdict.md` |
+
+---
+
+## Live-use evidence interpretation correction (2026-07-15)
+
+[FACT] Sessions 2 and 3 are valid K1 product-delivery records. They are not a
+qualification test for the standard agent stack or its optional tools.
+
+[FACT] The audit distinguishes a tool being named in a ledger, a tool being
+used with preserved output, and a tool being qualified by a measured delivery
+benefit. These are different claims.
+
+| Surface | This live-use arc proves | Qualification verdict |
+|---|---|---|
+| K1 five-flag audio-semantic gate | Scoped device gate closed under the recorded six-track IM73D corpus and limitations | PRODUCT EVIDENCE ACCEPTED |
+| Modes 32/35/36 | 32 retained; 35 and 36 rejected after mechanically valid equal-condition device legs | PRODUCT EVIDENCE ACCEPTED |
+| Herdr | `w1` was recorded as a pre-existing workspace/note | NOT QUALIFIED BY THIS ARC |
+| Bootstrap / repo-truth | Session checks were recorded and the current workflow remains reproducible | WORKFLOW USE ONLY; NOT A TOOL QUALIFICATION |
+| OpenKnowledge / Claude-mem | No preserved retrieval-to-decision trace is attached to Sessions 2 or 3 | NOT VERIFIED FOR THIS ARC |
+| Codex CLI review | `49ea369` and `17e8a58` assert a manual review and record resulting fixes; the named raw log is absent | EXECUTION NOT VERIFIED FROM DURABLE ARTEFACTS |
+| Codex plugin | No preserved plugin invocation or Claude-to-Codex handoff artefact | NOT VERIFIED; NOT QUALIFIED BY THIS ARC |
+| Entire | Not exercised in Sessions 2 or 3; the separate v1 pilot remains unpromoted | NOT QUALIFIED BY THIS ARC |
+| Headroom | Not exercised | NOT QUALIFIED BY THIS ARC |
+| Ruflo | Not exercised | NOT QUALIFIED BY THIS ARC |
+| `sqlite-utils` | Not exercised | NOT QUALIFIED BY THIS ARC |
+
+[FACT] This correction is scoped to the K1 live-use arc. It does not rewrite
+the separate Phase 1-6 pilot evidence or the ratified status recorded in
+[`STANDARD-STACK.md`](./STANDARD-STACK.md).
+
+[FACT] The complete commit-to-evidence chain and exact audit commands are in
+[`2026-07-15-k1-live-use-evidence-audit.md`](./2026-07-15-k1-live-use-evidence-audit.md).
 
 ---
 
@@ -79,3 +120,4 @@ Qualification pilots run **autonomously on real work** when the campaign executo
 | 2026-07-13 | agent:cursor | Initial sibling pointer deployment (4 repos + ledger) |
 | 2026-07-13 | agent:cursor | Repo deployment status: sibling pointer commit SHAs (`1b676a9`, `d1620dd`, `c4837d8`, `f23c30f`) |
 | 2026-07-15 | agent:codex | Session row #3: guarded IM73D bench flash plus Captain 32/35/36 A/B; 32 retained, 35/36 rejected |
+| 2026-07-15 | agent:codex | Corrected Sessions 2-3 evidence interpretation; Codex execution set to `NOT_VERIFIED`; added commit-chain audit and explicit no-qualification verdicts |
