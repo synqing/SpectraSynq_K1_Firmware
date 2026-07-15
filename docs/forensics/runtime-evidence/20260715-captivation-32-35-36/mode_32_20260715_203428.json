@@ -1,0 +1,18 @@
+{
+  "build_line": "BUILD: version=40103 git=f2257ef epoch=1784118604 env=k1_bench_im73d",
+  "chip_id": "B489A500",
+  "crash_signature_count": 0,
+  "duration_s": 30.0,
+  "failure": null,
+  "initial_mode": 18,
+  "mode": 32,
+  "mode_name": "WAVEFORM HYBRID K1",
+  "observed_mode": 32,
+  "playback_returncode": -15,
+  "raw_log": "/private/tmp/k1-captivation-ab/mode_32_20260715_203428.log",
+  "rerun_command": "python3 /private/tmp/k1_captivation_leg.py --repo /private/tmp/k1-captivation-f2257ef --port /dev/cu.usbmodem112401 --expected-chip-id B489A500 --expected-build-env k1_bench_im73d --expected-git f2257ef --track /Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3 --expected-track-sha256 174025b5ff4d326675cfb3b31b820e8448242d1b51d1a3b00e236e66373cc61a --mode 32 --duration-s 30 --countdown-s 5 --out-dir /private/tmp/k1-captivation-ab",
+  "restored_mode": 18,
+  "track": "/Users/spectrasynq/Downloads/MartinGarrix-Animals.mp3",
+  "track_sha256": "174025b5ff4d326675cfb3b31b820e8448242d1b51d1a3b00e236e66373cc61a",
+  "verdict": "PASS"
+}
