@@ -1090,6 +1090,13 @@ inline void init_leds() {
   // Initialize the lerp parameters for scale_to_strip optimization
   init_lerp_params();
 
+#ifdef K1_WS2816_1313_V1
+  // WS2816C-1313 bench evaluation (2026-07-15): same K1 channel geometry as
+  // the bench reference, but FastLED emits the WS2816 48-bit GRB wire payload.
+  // This is compile-time fixed so persisted LED_TYPE / LED_COLOR_ORDER cannot
+  // silently fall back to the WS2812B branch during hardware bring-up.
+  FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, CONFIG.LED_COUNT);
+#else
   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
     if (CONFIG.LED_COLOR_ORDER == RGB) {
       FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
@@ -1122,6 +1129,7 @@ inline void init_leds() {
       FastLED.addLeds<DOTSTAR, LED_DATA_PIN, LED_CLOCK_PIN, BGR>(leds_out, CONFIG.LED_COUNT);
     }
   }
+#endif  // K1_WS2816_1313_V1
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
 
@@ -2190,7 +2198,13 @@ inline void init_secondary_leds() {
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
   // Use constants for FastLED template arguments
+#ifdef K1_WS2816_1313_V1
+  // WS2816C-1313 bench evaluation: secondary channel stays independent on the
+  // bench-reference GPIO5 pin and uses the same 48-bit GRB WS2816 controller.
+  FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+#else
   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+#endif
   
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);

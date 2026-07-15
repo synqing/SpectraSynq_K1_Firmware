@@ -19,9 +19,11 @@ ENV="$1"
 
 # Primary gate: exact-match allowlist. grep -w matches whole words only,
 # so any argument with appended flags/spaces is rejected here.
-ALLOWED_ENVS="k1_prod_im73d k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_dsr16"
+# k1_bench_ws2816_1313 added 2026-07-15: radio-free WS2816C-1313 LED-controller
+# evaluation build. This wrapper still rejects upload/monitor/erase tokens below.
+ALLOWED_ENVS="k1_prod_im73d k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_dsr16 k1_bench_ws2816_1313"
 case "$ENV" in
-  k1_prod_im73d|k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_dsr16)
+  k1_prod_im73d|k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_dsr16|k1_bench_ws2816_1313)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2
