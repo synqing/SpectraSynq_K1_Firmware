@@ -72,7 +72,11 @@ conf CONFIG = {
   false,               // STANDBY_DIMMING (off by default — turn back on via `standby_dimming=true` if you want auto-dim in silence)
   false,               // REVERSE_ORDER
   false,               // RESERVED_CONFIG_BYTE, kept to preserve saved-config layout
+#ifdef K1_CUSTOM_LED_V1
+  2500,                // MAX_CURRENT_MA — dual-214 wall build: Captain-locked 2.5 A total @ 5 V
+#else
   1500,                // MAX_CURRENT_MA
+#endif
   true,                // TEMPORAL_DITHERING
   true,                // AUTO_COLOR_SHIFT
   0.00,                // INCANDESCENT_FILTER

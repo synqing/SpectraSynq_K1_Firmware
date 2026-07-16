@@ -364,7 +364,21 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
   #define SWEET_SPOT_CENTER_PIN (-1)
   #define SWEET_SPOT_RIGHT_PIN (-1)
 
-  #define RNG_SEED_PIN 8
+  #ifdef K1_CUSTOM_RGBIC_V1
+    // Custom dual-channel 12V-5050 build (2026-07-12): driven as WS2812B 800 kbps
+    // RGB (resolved + eyes-on PASS; the APA102/clocked reading was wrong). DATA pins
+    // are UNCHANGED from the bench K1 (LED_DATA_PIN=primary,
+    // SECONDARY_LED_DATA_PIN=LED_CLOCK_PIN=secondary). These two macros are the
+    // strip's SECOND ("CLK") wire — driven with MIRRORED data in init_leds() /
+    // init_secondary_leds() so the real DIN always gets a valid WS2812 signal. GPIO8
+    // was RNG_SEED_PIN below (dead code, never read), reclaimed here; RNG_SEED_PIN
+    // moved off 8. (Names keep the *_CLOCK_PIN suffix = the strip's labelled CLK pad.)
+    #define K1_RGBIC_PRIMARY_CLOCK_PIN 7
+    #define K1_RGBIC_SECONDARY_CLOCK_PIN 8
+    #define RNG_SEED_PIN 9   // moved off 8 (now the secondary RGBIC clock); RNG seed is unused anyway
+  #else
+    #define RNG_SEED_PIN 8
+  #endif
 #else
   #define PHOTONS_PIN 1
   #define CHROMA_PIN 2

@@ -282,6 +282,18 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
 
   int32_t index_left = index_whole + 0;
   int32_t index_right = index_whole + 1;
+#ifdef K1_CUSTOM_LED_V1
+  // UPSAMPLE guard for scale_to_secondary_strip() (SECONDARY_LED_COUNT=214 >
+  // NATIVE_RESOLUTION=160): the top output pixel resolves index_right ==
+  // NATIVE_RESOLUTION, a 1-element OOB read. Clamp. Down/equal modes (61/91/138/160)
+  // never reach index_left == NR-1 with a positive fraction, so flag-gated.
+  if (index_left >= NATIVE_RESOLUTION) {
+    index_left = NATIVE_RESOLUTION - 1;
+  }
+  if (index_right >= NATIVE_RESOLUTION) {
+    index_right = NATIVE_RESOLUTION - 1;
+  }
+#endif
 
   SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
   SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
@@ -857,9 +869,9 @@ inline void init_lerp_params() {
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
 #ifdef K1_CUSTOM_LED_V1
-            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
-            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
-            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
+            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the dual-214
+            // wall build): the top output pixel resolves index_right == NATIVE_RESOLUTION,
+            // a 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
             // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
             // flag-gated to keep those builds byte-identical.
             if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
@@ -1096,6 +1108,19 @@ inline void init_leds() {
   // This is compile-time fixed so persisted LED_TYPE / LED_COLOR_ORDER cannot
   // silently fall back to the WS2812B branch during hardware bring-up.
   FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, CONFIG.LED_COUNT);
+#elif defined(K1_CUSTOM_RGBIC_V1)
+  // Custom dual-channel RGBIC build (2026-07-12): the primary channel is a CLOCKED
+  // SPI RGBIC (reel labelled "WS2815"; actually APA102/DotStar-family, Data+Clock).
+  // Compile-time override of the runtime CONFIG.LED_TYPE branch below so a persisted
+  // CONFIG can't flip it back. Matches the Captain's PROVEN Pixelblaze config
+  // (screenshot 2026-07-12): LED type WS2812/SK6812/NeoPixel, 800 Kbps 250ns/750ns,
+  // Color Order RGB. WS2815 is WS2812-protocol-compatible; FastLED's WS2815 chipset
+  // uses different timing constants than the 250/750 this reel wants (that garbled).
+  // BOTH wires of the channel are driven with the SAME buffer — GPIO4 and GPIO7 —
+  // so whichever is the strip's real DIN gets valid WS2812 data (why the 2nd wire
+  // must be connected). RGB order. Keep in sync with init_secondary_leds().
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
+  FastLED.addLeds<WS2812B, K1_RGBIC_PRIMARY_CLOCK_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
 #else
   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
     if (CONFIG.LED_COLOR_ORDER == RGB) {
@@ -1129,7 +1154,7 @@ inline void init_leds() {
       FastLED.addLeds<DOTSTAR, LED_DATA_PIN, LED_CLOCK_PIN, BGR>(leds_out, CONFIG.LED_COUNT);
     }
   }
-#endif  // K1_WS2816_1313_V1
+#endif  // K1_WS2816_1313_V1 / K1_CUSTOM_RGBIC_V1
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
 
@@ -2202,6 +2227,13 @@ inline void init_secondary_leds() {
   // WS2816C-1313 bench evaluation: secondary channel stays independent on the
   // bench-reference GPIO5 pin and uses the same 48-bit GRB WS2816 controller.
   FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+#elif defined(K1_CUSTOM_RGBIC_V1)
+  // Matches the Captain's PROVEN Pixelblaze config (WS2812/SK6812, 800 Kbps
+  // 250ns/750ns, RGB). BOTH wires of the secondary channel driven with the same
+  // buffer — GPIO5 (data) and GPIO8 (2nd wire) — so the real DIN gets valid WS2812
+  // data. RGB order; keep in sync with the primary in init_leds().
+  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
+  FastLED.addLeds<WS2812B, K1_RGBIC_SECONDARY_CLOCK_PIN, RGB>(leds_out_secondary, SECONDARY_LED_COUNT);
 #else
   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
 #endif

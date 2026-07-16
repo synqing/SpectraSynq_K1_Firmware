@@ -841,7 +841,19 @@ inline CRGB *leds_out_secondary;              // Final output buffer
 // Secondary strip configuration
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;
+#ifdef K1_CUSTOM_RGBIC_V1
+// Custom dual-channel 12V-5050 build (2026-07-12): 138 LEDs on the secondary channel
+// (matches LED_COUNT_VALUE=138 primary), driven WS2812B 800 kbps RGB. scale_to_strip's
+// secondary lerp branch (led_utilities.h:2203) downsamples the 160 canvas → 138.
+inline const uint16_t SECONDARY_LED_COUNT = 138;
+#elif defined(K1_CUSTOM_LED_V1)
+// Custom dual-channel wall-bounce build (2026-07-12): 214 LEDs on the secondary
+// channel (matches LED_COUNT_VALUE=214 primary). scale_to_secondary_strip() upsamples
+// the 160 canvas → 214 (same resample path as primary; lerp_led_16 is clamp-guarded).
+inline const uint16_t SECONDARY_LED_COUNT = 214;
+#else
 inline const uint16_t SECONDARY_LED_COUNT = 160;
+#endif
 inline const uint16_t SECONDARY_LED_COLOR_ORDER = GRB;
 inline uint8_t SECONDARY_LIGHTSHOW_MODE = LIGHT_MODE_WAVEFORM_TEMPO; // 1401 dual-tempo setup (2026-06-04): secondary boots on mode 18
 inline bool SECONDARY_MIRROR_ENABLED = true;

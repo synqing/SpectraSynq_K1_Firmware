@@ -12,6 +12,14 @@
 **Started:** 2026-05-25
 **Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; restored bench validation green at usable levels; R2/R3 corrected after LED-map incident** — `k1_prod_im73d` main/prod build path shipped (`4b95e60`, byte-identical-OFF, guard-mapped to main K1). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 proves the IM73D mic/PDM path on the ratified `13/12/14` pins and is now validated on restored `k1_bench_im73d @ f2f7c45`: quiet/volume 45/volume 60 AP/raw captures are usable and AGC gains stay below 2.0 on all four bands. Volume 75 is a front-end stress/fail condition (`clip_pct`, `near_pct`, input trim), not acceptance evidence. Captain confirms both K1s are identical hardware; existing envs encode configuration choice (`k1_bench_im73d` = LED `4/5`, `k1_prod_im73d` = LED `6/7`). Main K1 `k1_hardware @ 67227da` is a historical SPH deployment; IM73D is current authority. See `docs/hardware/im73d-restored-bench-validation-2026-07-07.md`, `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
 
+## 2026-07-13 SQLED receiver + K718 knob flash (Captain-approved)
+
+- **SpectraSynq.LED receiver:** env `sqled_bench_wch`, MAC `AC:A7:04:FC:55:84` (chip `FC55A500`), port `/dev/cu.wchusbserial5B7A1146691`. `pio run -e sqled_bench_wch -t upload` SUCCESS; firmware **668670** bytes program (653 KiB `firmware.bin`). Post-flash serial: `BUILD: ... env=sqled_bench_wch`, `BLE: scanning for 'SpectraSynq Remoted' (K718)...`, then `[ble_remoted] linked + subscribed to Remoted dial`.
+- **K718 knob:** `JC3636_K718_REMOTED_BLE_V1`, MAC `AC:A7:04:EE:57:7C`, port `/dev/cu.usbmodem2101` (drift from prior `1101`). `arduino-cli compile` + `upload` SUCCESS; **1174990** bytes (37% flash). Upload esptool confirmed MAC before write.
+- **Host gate:** SpectraSynq.LED `pytest tests -q` → 33 passed, 1 doc guardrail fail (`HANDOFF.md` receiver HW-GATE wording); flash proceeded per Captain approval.
+- **Registry:** K1 `device-build-registry.md` not modified (non-K1 bench pair).
+
+
 ## 2026-07-07 Restored Bench Validation
 
 - **Verdict:** restored `k1_bench_im73d @ f2f7c45` is green for IM73D validation at usable playback levels on the bench-reference firmware LED map (`4/5`). This is not a `k1_prod_im73d` proof because `k1_prod_im73d` is the main/prod LED map (`6/7`).
