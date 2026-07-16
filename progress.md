@@ -1,5 +1,18 @@
 # K1 SensoryBridge Rolling Progress
 
+## 2026-07-16 WS2816-1313 split geometry (phase 1, host-green)
+
+- **`k1_bench_ws2816_1313` now matches the physical rig:** 160 WS2816C-1313
+  LEDs = ONE continuous 160-px primary image over TWO 80-LED data feeds
+  (GPIO4 = px 0–79, GPIO5 = px 80–159; Captain-ratified topology + pins,
+  2026-07-16). Wire time per feed 9.88 ms → 5.08 ms (WS2816 is 48-bit/pixel).
+  Secondary channel renders but is physically unregistered this phase; phase 2
+  = GPIO7/8 split behind `K1_WS2816_1313_SECONDARY` after eyes-on PASS.
+- Host gate: 774 passed / 1 skipped; `k1_hardware` + `k1_bench_ws2816_1313`
+  both build clean. Device bring-up owed: `:dump` LED_COUNT=160 check
+  (shared persistence namespace trap), boot-intro seam check at px79/80,
+  GRB sanity, `:led_fps`. Captain eyes-on = tracked non-blocking follow-up.
+
 ## 2026-07-15 IM73D Production/Reference Authority
 
 - [FACT] Captain designated IM73D as the K1 production and reference microphone.

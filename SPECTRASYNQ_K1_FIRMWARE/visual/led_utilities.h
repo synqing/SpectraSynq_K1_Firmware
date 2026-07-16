@@ -1103,11 +1103,23 @@ inline void init_leds() {
   init_lerp_params();
 
 #ifdef K1_WS2816_1313_V1
-  // WS2816C-1313 bench evaluation (2026-07-15): same K1 channel geometry as
-  // the bench reference, but FastLED emits the WS2816 48-bit GRB wire payload.
-  // This is compile-time fixed so persisted LED_TYPE / LED_COLOR_ORDER cannot
-  // silently fall back to the WS2812B branch during hardware bring-up.
-  FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, CONFIG.LED_COUNT);
+  // WS2816C-1313 bench rig (split geometry, 2026-07-16): ONE continuous 160-px
+  // primary image on 160 physical WS2816 LEDs fed by TWO 80-LED data inputs —
+  // GPIO4 (LED_DATA_PIN) drives px 0–79, GPIO5 (SECONDARY_LED_DATA_PIN, the
+  // K1's second channel connector) drives px 80–159. Same offset-registration
+  // shape as the LED_NEOPIXEL_X2 branch below; assumes an even LED_COUNT.
+  // WHY the split: WS2816 is 48-bit/pixel at WS2812 timing (60 µs/LED) — a
+  // single 160-LED run costs 9.88 ms incl. latch (~101 Hz ceiling, the whole
+  // 100 FPS frame budget); two 80-LED halves transmit in parallel on separate
+  // RMT channels at 5.08 ms each. Compile-time fixed so persisted LED_TYPE /
+  // LED_COLOR_ORDER cannot silently fall back to the WS2812B branch during
+  // hardware bring-up. GRB is correct for WS2816 (FastLED 3.10.3 wrapper
+  // applies the user order once in 16-bit space; inner WS2812 is forced RGB).
+  // The logical secondary channel has NO physical output in this phase — see
+  // init_secondary_leds(). Phase 2 (after eyes-on PASS) moves the secondary
+  // to GPIO7/8 with the same split.
+  FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
+  FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2);
 #elif defined(K1_CUSTOM_RGBIC_V1)
   // Custom dual-channel RGBIC build (2026-07-12): the primary channel is a CLOCKED
   // SPI RGBIC (reel labelled "WS2815"; actually APA102/DotStar-family, Data+Clock).
@@ -2224,9 +2236,16 @@ inline void init_secondary_leds() {
 
   // Use constants for FastLED template arguments
 #ifdef K1_WS2816_1313_V1
-  // WS2816C-1313 bench evaluation: secondary channel stays independent on the
-  // bench-reference GPIO5 pin and uses the same 48-bit GRB WS2816 controller.
-  FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+  // WS2816C-1313 split geometry (2026-07-16): NO secondary controller is
+  // registered in this phase — GPIO5 (SECONDARY_LED_DATA_PIN) now carries the
+  // PRIMARY channel's px 80–159 half (see init_leds()). This branch MUST stay
+  // (even empty): deleting it would let the #else register a WS2812B
+  // controller on GPIO5 on top of the WS2816 half — two controllers, one pin.
+  // The buffers above are still allocated so the .ino boot-clear, diag
+  // null-guards, and the secondary VP render stay valid; the secondary canvas
+  // renders into an unregistered buffer (wasted CPU accepted on bench).
+  // Phase 2 (after Captain eyes-on PASS) registers the secondary here on
+  // GPIO7/8 with the same 2×(SECONDARY_LED_COUNT/2) offset split.
 #elif defined(K1_CUSTOM_RGBIC_V1)
   // Matches the Captain's PROVEN Pixelblaze config (WS2812/SK6812, 800 Kbps
   // 250ns/750ns, RGB). BOTH wires of the secondary channel driven with the same

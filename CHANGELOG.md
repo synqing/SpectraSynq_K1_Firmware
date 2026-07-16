@@ -7,6 +7,17 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ## [Unreleased]
 
 ### Changed
+- **`k1_bench_ws2816_1313` geometry corrected to the physical rig: one 160-px
+  primary image split over two 80-LED data feeds.** GPIO4 = px 0–79, GPIO5 =
+  px 80–159, registered as two offset `WS2816` controllers over the same
+  `leds_out` buffer (`LED_NEOPIXEL_X2` shape). WS2816 is 48-bit/pixel — a
+  single 160-LED run costs 9.88 ms (~101 Hz ceiling); the parallel halves cost
+  5.08 ms, restoring the 100 FPS headroom. Counts/canvas unchanged
+  (`LED_COUNT_VALUE`/`NATIVE_RESOLUTION`/`SECONDARY_LED_COUNT` all 160); the
+  logical secondary channel keeps rendering but has no physical controller in
+  this phase (phase 2 moves it to GPIO7/8 behind a `K1_WS2816_1313_SECONDARY`
+  sub-flag after Captain eyes-on PASS). Flag-off envs byte-identical. Static
+  gate rewritten (`tests/test_ws2816_profile_static.py`).
 - **`k1_custom` overwritten: dual-214 wall-bounce (was single-channel 224 test bed).**
   Two independent WS2812B 5V channels of **214 LEDs each** (GPIO4/5), bare bulbs
   (no LGP), white-wall bounce viewing. Still extends `k1_bench_im73d_ble` (IM73D +
