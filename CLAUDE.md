@@ -98,7 +98,7 @@ esp-idf 5.4.1, arduino-esp32 3.2.0, xtensa-esp32s3-elf
 git clone [repo-url]
 cd "SensoryBridge-main 9"
 
-# Build firmware (default: k1_hardware — production audio-semantic forward-graft)
+# Build firmware (default_envs = k1_prod_im73d — production; k1_hardware is the base it extends)
 pio run
 
 # Upload to device (verifies USB MAC + chip ID via k1_upload_guard.py pre-script)
@@ -113,15 +113,19 @@ pytest tests/ -v
 
 ### Build Environments
 
+**`default_envs = k1_prod_im73d`** (platformio.ini) — `pio run` with no `-e` builds ONLY that. The matrix is **52 `[env:]` blocks** (2026-07-17), not one. Representative families:
+
 | Environment | Purpose | Status |
 |-------------|---------|--------|
-| `k1_hardware` | **Production** — audio-semantic forward-graft (v2 DSP, 2026-06-05) | Default, device eyes-on gate pending |
-| `k1_bench_reference` | Alternative bench K1v2 GPIO map (same DSP, different pinout) | No instrumentation |
-| `k1_hardware_trace_dev` | Development + MabuTrace timeline capture (non-shippable) | Dev-only |
-| `k1_hardware_harness` | Diagnostic capture mode (AP/VP evidence surfaces) | Dev-only |
-| `k1_ap_frontend_probe` | AP frontend diagnostics + replayable tempo input (2026-06-06) | Dev-only |
-| `k1_motion_probe` | Apparent-motion perceptual test harness | Non-shippable |
-| `k1_tempo_probe` | Beat/tempo-phase lock proof harness | Non-shippable |
+| `k1_prod_im73d` | **Production DEFAULT** (`default_envs`) — k1_hardware base + IM73D PDM mic | **Default** (`pio run`) |
+| `k1_hardware` | Production BASE (audio-semantic forward-graft v2 DSP); extended by k1_prod_im73d + bench/probe matrix | Base env (not the default build) |
+| `k1_bench_reference` | Bench K1 (chip B489A500) GPIO map — extends k1_hardware | No instrumentation |
+| `k1_bench_reference_harness` / `k1_bench_vp_probe` | Bench GDFT probe / bench VP+VPAB probe (E1) — B489A500 only | Dev-only, non-shippable |
+| `k1_hardware_harness` | Diagnostic AP/VP evidence surfaces — **MAIN K1 (F887A500) only** | Dev-only |
+| `k1_ap_frontend_probe*`, `k1_bench_ap_frontend_probe_matrix_*` | AP-frontend diagnostic matrix (samplerate / decimation / stage variants) | Dev-only (~30 envs) |
+| `k1_custom`, `k1_motion_probe`, `k1_tempo_probe`, `k1_hardware_trace_dev`, … | 214-LED wall build, perceptual/motion harnesses, trace-dev | Non-shippable / variant |
+
+Each env is chip-authorised in `scripts/platformio/k1_device_identities.json` (identity by USB-serial / chip-id; ports advisory).
 
 **Current Status (2026-06-15):** Audio-semantic forward-graft (SB_TEMPO_CONF_V2, SB_TEMPO_FLYWHEEL_V2, SB_ONSET_V2, SB_CHORD_V2, SB_SEMANTIC_STATE, SB_CHORD_HUE_V1, SB_DROP_CUT_V1) promoted to k1_hardware default. Host regression gate PASS (427 tests across 54 test files; static, replay, and gates validated in the release-gate run). Tier 1 chord-hue consumer and impact-lane (drop-cut + attack-snap) additions hardened 2026-06-11. Device eyes-on testing is the one remaining gate before production release.
 
@@ -381,7 +385,7 @@ git commit -m "docs: ..."
 pytest tests/ && git commit -m "test: ..."
 
 # Changes to firmware or platformio.ini → pytest AND build must pass
-pytest tests/ && pio run -e k1_hardware && git commit -m "feat: ..."
+pytest tests/ && pio run -e k1_prod_im73d && git commit -m "feat: ..."
 
 # Unstaged binaries or files >5 MB → automatically rejected
 ```
@@ -499,7 +503,7 @@ Before implementing production behavior for timing, performance, frame-drop reco
 
 | Command | Description |
 |---------|-------------|
-| `pio run` | Build firmware (default: k1_hardware, production) |
+| `pio run` | Build firmware (default_envs = k1_prod_im73d, production) |
 | `pio run -e <env>` | Build specific environment (k1_hardware, k1_bench_reference, etc.) |
 | `pio run --target upload` | Upload to device (USB MAC verified by k1_upload_guard.py) |
 | `pio run --verbose` | Build with verbose output (check warnings) |
