@@ -1,0 +1,28 @@
+{
+  "freeze": "freeze-a6ab2c6",
+  "firmware": "k1_bench_vp_probe@a6ab2c6",
+  "env": "k1_bench_vp_probe",
+  "build_flags": [
+    "-DENABLE_VP_PROBE_CMD=1",
+    "-DENABLE_VPAB_PROBE=1",
+    "-DENABLE_DIAG_CAPTURE=1"
+  ],
+  "captured_at": "2026-07-17T21:28:14.810146+00:00",
+  "tier_a_run_to_run_identical": true,
+  "modes": {
+    "18": {
+      "name": "WAVEFORM TEMPO",
+      "nondet": "0",
+      "fp_tolerant": true,
+      "fp_reason": "float phase/velocity scroll (TEMPO_* consts, t_smoothstep, float dt/accum in tempo_scroll_step) under -O3 -ffast-math; quantised bytes not bit-stable across TU/inline changes. Probe-deterministic via the led_thread_halt frozen-clock path (fixed dt=1/120, frozen synthetic tempo) so run-to-run identical, but FP-reassoc avalanches the hash on any codegen shuffle. GATE POLICY: energy-tolerance gated, hash diff = INFO; motion validated by vpab phase-lock + Captain FEEL, not a strict bit-hash. Band 3%/16abs mirrors mode 11.",
+      "energy_tol_pct": 3.0,
+      "energy_tol_abs": 16.0,
+      "pal_a": "939482BD",
+      "pal_b": "A88AA2CD",
+      "manual_a": "5C593F69",
+      "manual_b": "32CE061",
+      "pal_energy": "48/116",
+      "manual_energy": "118/22"
+    }
+  }
+}
