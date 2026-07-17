@@ -55,6 +55,14 @@
       "role": "2nd bench K1",
       "pinmap": "bench-reference GPIO assignment",
       "advisory_port": "/dev/tty.usbmodem12201",
+      "mic": "IM73D122",
+      "mic_flag": "K1_MIC_IM73D_PDM_V1",
+      "_mic_comment": "Physical mic fitted on this unit is the IM73D122 PDM. Any env FLASHED here must select the IM73D driver (mic_flag) or the wrong-mic driver gives garbage/no audio while the build stays green — the E1 bench session's worst failure (docs/K1_BENCH_HARDWARE_LESSONS.md §1). tests/test_k1_mic_hardware_match_static.py asserts every authorized env resolves mic_flag, EXCEPT mic_exempt_envs. mic_exempt_envs are the legacy SPH-compatible / GDFT reference-base envs retained ONLY as extends bases (NOT IM73D capture/flash targets); they root at k1_bench_reference and NEVER through k1_bench_im73d. The exemption is fault-evident: an env that derives from k1_bench_im73d can never be exempted, so you cannot hide a broken IM73D env by listing it here — the wrong-base bug still REDs the gate.",
+      "mic_exempt_envs": [
+        "k1_bench_reference",
+        "k1_bench_reference_harness",
+        "k1_bench_tempo_probe"
+      ],
       "envs": [
         "k1_bench_ap_frontend_probe",
         "k1_bench_ap_frontend_probe_v1_off",
