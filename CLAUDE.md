@@ -6,6 +6,12 @@ abstract: "SensoryBridge K1 firmware (ESP32-S3): audio-reactive LEDs via Goertze
 
 Real-time audio-responsive lighting system that translates music into visual effects on dual-channel edge-lit LGP hardware. Powered by Goertzel-based spectral analysis, beat detection, and harmonic saliency tracking—delivering synchronized visual shows with <50ms latency.
 
+> ## ⛔ BEFORE FLASHING — verify env↔MIC (not just chip-id)
+> - Verify the build ENV's `-DK1_MIC_*` define matches the target device's PHYSICAL mic — chip-id verification is NOT sufficient.
+> - 2nd bench K1 (chip **B489A500**) physically has the IM73D122 PDM mic → flash a `k1_bench_im73d`-lineage env (defines `K1_MIC_IM73D_PDM_V1`). A reference-mic env (e.g. the as-shipped `k1_bench_vp_probe` before its 2026-07-18 fix) STARVES the mic → dead audio-driven motion + garbage effects.
+> - Trace the mic define through the env's `extends` chain in `platformio.ini`. **RED FLAG:** env absent from that chip's `envs` list in `scripts/platformio/k1_device_identities.json` → STOP.
+> - Full canon: skill `firmware-telemetry-instrumentation` §15 + `k1-analysis-harness/docs/LESSONS.md` Session 6.
+
 ## Quick Navigation
 
 - **Agent OS (all tools):** Read **[`AGENT_OS.md`](./AGENT_OS.md)** first — session bootstrap, source-of-truth hierarchy, safety gates, thinking gate, skill awareness. Tool-agnostic; this is the canonical agent manual.
