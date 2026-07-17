@@ -395,6 +395,9 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
   } else if (mode == LIGHT_MODE_IRIS) {
     // Iris: in-place spring dilate-recoil membrane; self-managed after-glow.
     light_mode_iris(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_MELODIC_BLOOM) {
+    // Melodic Bloom: mid-forward presence bloom; greyscale scroll transport self-managed.
+    light_mode_melodic_bloom(channel.history, *channel.effect);
   }
 }
 

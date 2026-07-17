@@ -688,6 +688,7 @@ void light_mode_moire_cathedral(CRGB16* leds_prev_buffer, ChannelEffectState& fx
 void light_mode_cannonade(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Cannonade — ballistic lob, arc-and-return, centre crack (LIGHT_MODE_CANNONADE, 2026-07-11)
 void light_mode_shockwave(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Shockwave — pure-age expanding shells (LIGHT_MODE_SHOCKWAVE, 2026-07-11)
 void light_mode_iris(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Iris — in-place spring dilate-recoil membrane (LIGHT_MODE_IRIS, 2026-07-11)
+void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Melodic Bloom — mid-forward presence bloom driven by post-AGC mid_energy (LIGHT_MODE_MELODIC_BLOOM, 2026-07-17)
 
 inline uint16_t waveform_full_strip_position(float amp) {
   if (amp > 1.0f) amp = 1.0f;
@@ -997,6 +998,8 @@ inline uint32_t vp_probe_dispatch_and_hash(uint8_t mode, uint32_t& energy) {
     light_mode_shockwave(leds_16_prev, effect_state_primary);
   } else if (mode == LIGHT_MODE_IRIS) {
     light_mode_iris(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_MELODIC_BLOOM) {
+    light_mode_melodic_bloom(leds_16_prev, effect_state_primary);
   }
 
   energy = vp_probe_energy(leds_16);
@@ -1122,6 +1125,7 @@ inline void vp_run_output_probe() {
   vp_probe_print_mode(LIGHT_MODE_CANNONADE);
   vp_probe_print_mode(LIGHT_MODE_SHOCKWAVE);
   vp_probe_print_mode(LIGHT_MODE_IRIS);
+  vp_probe_print_mode(LIGHT_MODE_MELODIC_BLOOM);
   USBSerial.println("VPO,ver=1,event=end");
   tx_end(false);
 

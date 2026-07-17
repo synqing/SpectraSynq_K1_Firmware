@@ -202,6 +202,7 @@ enum lightshow_modes {
   LIGHT_MODE_CANNONADE,             // -- Cannonade: ballistic lob from centre, arc-and-return under inward gravity, centre CRACK on impact; captivation family (2026-07-11)
   LIGHT_MODE_SHOCKWAVE,             // -- Shockwave: pure-AGE expanding concentric shells (radius=vel*age, radius perp amplitude), timbre-tilt colour; captivation family (2026-07-11)
   LIGHT_MODE_IRIS,                  // -- Iris: in-place spring membrane, dilate-and-recoil about 79/80, live beat-phase breathing; captivation family (2026-07-11)
+  LIGHT_MODE_MELODIC_BLOOM,         // -- Melodic Bloom: mid-forward presence bloom (post-AGC mid_energy, V.3a-scored); renamed from "Vocal Bloom", presence-not-identity (Captain 2026-07-17)
 
   NUM_MODES  // used to know the length of this list if it changes in the future
 };

@@ -419,6 +419,7 @@ void init_system() {
   set_mode_name(34, "CANNONADE");
   set_mode_name(35, "SHOCKWAVE");
   set_mode_name(36, "IRIS");
+  set_mode_name(37, "MELODIC BLOOM");
 
   init_serial(SERIAL_BAUD);
   init_sweet_spot();

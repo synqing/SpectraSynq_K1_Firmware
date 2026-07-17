@@ -94,6 +94,7 @@ EffectEntry g_registry[] = {
     { legacy_id(LIGHT_MODE_CANNONADE),            "cannonade",            "CANNONADE",             nullptr, nullptr, false, false, AudioDeps::ONSET | AudioDeps::BEAT,  LIGHT_MODE_CANNONADE },
     { legacy_id(LIGHT_MODE_SHOCKWAVE),            "shockwave",            "SHOCKWAVE",             nullptr, nullptr, true,  false, AudioDeps::ONSET | AudioDeps::LEVEL, LIGHT_MODE_SHOCKWAVE },
     { legacy_id(LIGHT_MODE_IRIS),                 "iris",                 "IRIS",                  nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::ONSET,  LIGHT_MODE_IRIS },
+    { legacy_id(LIGHT_MODE_MELODIC_BLOOM),       "melodic_bloom",        "MELODIC BLOOM",         nullptr, nullptr, true,  false, AudioDeps::LEVEL,                    LIGHT_MODE_MELODIC_BLOOM },
 
     // ── Native family 0x10/0x11/0x12: the ported-but-dead IEffects go live here ──
     { 0x1001, "beat_pulse_resonant",   "Beat Pulse (Resonant)",  nullptr, nullptr, true, true, AudioDeps::BEAT | AudioDeps::LEVEL,  kNoLegacy },
@@ -156,6 +157,7 @@ constexpr RegId k_reg_ids[] = {
     { legacy_id(LIGHT_MODE_CANNONADE),             LIGHT_MODE_CANNONADE },
     { legacy_id(LIGHT_MODE_SHOCKWAVE),             LIGHT_MODE_SHOCKWAVE },
     { legacy_id(LIGHT_MODE_IRIS),                  LIGHT_MODE_IRIS },
+    { legacy_id(LIGHT_MODE_MELODIC_BLOOM),         LIGHT_MODE_MELODIC_BLOOM },
     { 0x1001, kNoLegacy },
     { 0x1101, kNoLegacy },
     { 0x1201, kNoLegacy },
