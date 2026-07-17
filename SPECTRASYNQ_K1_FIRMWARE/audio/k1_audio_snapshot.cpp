@@ -63,7 +63,9 @@ void k1_audio_snapshot_update(uint32_t frame_ms) {
 #ifdef K1_ONSET_V2
   // Carry the per-note spectrum into the V2 onset detector. Same clamped values
   // the band scalars above are derived from — no extra read of the live array
-  // (snapshot consistency). Production build omits this entirely.
+  // (snapshot consistency). The no-flag build omits this; shipping k1_hardware
+  // DEFINES K1_ONSET_V2 (platformio.ini:98) so spectrum[] IS present and populated
+  // in production. (Corrected 2026-07-17: prior "Production build omits" was stale.)
   static_assert(K1_ONSET_SPECTRUM_BINS == NUM_FREQS,
                 "K1_ONSET_SPECTRUM_BINS must equal NUM_FREQS");
   next.nyquist_safe_bin_hi = nyquist_safe_bin_hi;
