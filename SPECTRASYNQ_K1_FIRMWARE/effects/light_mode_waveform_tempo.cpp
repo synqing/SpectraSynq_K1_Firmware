@@ -2,8 +2,10 @@
 // light_mode_waveform_tempo.cpp — Beat/Tempo-Phase-Locked Motion (WIP-1)
 // ----------------------------------------------------------------------------
 // Landed from light_mode_waveform_tempo.cpp.wip (wip/tempo-waveform-checkpoint
-// @ 8767589). QUARANTINED branch wf/wip-tempo — for Captain on-device validation;
-// NOT merged into integration, NOT flashed this run.
+// @ 8767589). NOW INTEGRATED + SHIPPING: dispatched (lightshow_modes.h + .ino),
+// enum LIGHT_MODE_WAVEFORM_TEMPO (config_types.h), and the secondary boot default
+// (globals.h). The "Captain on-device validation" this was landed for IS E1
+// (docs/E1_SCOPE.md in k1-analysis-harness): vpab phase-lock + FEEL verdict.
 //
 // THE DESIGN LAW [MEASURED] (docs/measurements/apparent-motion-on-k1.md §8):
 //   The K1 motion↔blink boundary is an INTER-STEP INTERVAL threshold (~36–60 ms),
@@ -25,18 +27,21 @@
 //   - K1AudioSnapshot.silence gates the idle fallback so the strip halts in true
 //     silence (graceful behaviour, not a frozen frame).
 //
-// VP-PROBE DETERMINISM (change-gate: freeze tempo / deterministic clock during the
-// probe, OR mark nondeterministic-excluded):
-//   - This mode is NOT in the Tier-A vp_run_output_probe roster (lightshow_modes.h)
-//     — like AURORA / COMET / SPECTRUM_RIVER* / EMBER* it is omitted, i.e.
-//     nondeterministic-EXCLUDED from the bit-hash gate by construction. The roster
-//     ends at QUANTUM_COLLAPSE; only the Tier-A core is hashed.
-//   - BELT AND BRACES: should it ever be added to a probe, the effect itself is
-//     made reproducible — when led_thread is halted (vp_run_output_probe sets
-//     led_thread_halt=true before rendering) the effect uses a FIXED dt and a
-//     FROZEN synthetic tempo event instead of millis()/k1_tempo_read(), so two
-//     probe runs produce an identical frame. (cf. the Quantum Collapse lesson:
-//     the probe halts led_thread but NOT Core-0/k1_tempo, so live reads diverge.)
+// VP-PROBE DETERMINISM (change-gate: deterministic under the probe):
+//   - This mode IS in the Tier-A vp_run_output_probe roster (lightshow_modes.h) and
+//     emits nondet=0 — it is HASHED, not excluded. (The earlier "NOT in the roster,
+//     roster ends at QUANTUM_COLLAPSE" note was STALE: the roster was later expanded
+//     to every mode. Trust the live roster in lightshow_modes.h, not this comment.)
+//   - It is reproducible under the probe because when led_thread is halted
+//     (vp_run_output_probe sets led_thread_halt=true before rendering) the effect
+//     uses a FIXED dt and a FROZEN synthetic tempo event instead of millis()/
+//     k1_tempo_read(), so two probe runs produce an identical frame. (cf. the
+//     Quantum Collapse lesson: the probe halts led_thread but NOT Core-0/k1_tempo,
+//     so naive live reads would diverge.)
+//   - It is a float-output WAVEFORM-family mode, so the hash is codegen-sensitive
+//     under -O3 -ffast-math (cf. WAVEFORM_HYBRID). The golden baseline row is
+//     therefore fp_tolerant (energy-tolerant; hash = INFO), with motion validated
+//     visually + by vpab, not by a strict bit-hash.
 //
 // COLOUR (gate-compliant): uses effect_palette_or_chroma_colour() — the PROVEN
 // BLOOM-lineage colour authority (lightshow_modes.h §213) — so palette mode,
