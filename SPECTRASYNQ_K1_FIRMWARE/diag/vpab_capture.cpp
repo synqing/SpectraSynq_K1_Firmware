@@ -5,6 +5,7 @@
 #include <string.h>
 #include "diagnostic_capture.h"
 #include "globals.h"
+#include "esp_task_wdt.h"
 #ifdef K1_PIN_EVIDENCE_V1
 #include "k1_pin_evidence.h"
 #endif
@@ -964,6 +965,12 @@ void vpab_capture_dump_frames() {
       chunks++;
     }
     rows++;
+    if ((i & 0x3F) == 0x3F) {
+      // firmware-telemetry-instrumentation §7: a long buffered dump (~2500 records -> ~5k lines)
+      // must feed the Task-WDT or loopTask trips it mid-dump and the board reboots (corrupt capture).
+      esp_task_wdt_reset();
+      vTaskDelay(1);
+    }
   }
 
   diag_capture_end_drain();

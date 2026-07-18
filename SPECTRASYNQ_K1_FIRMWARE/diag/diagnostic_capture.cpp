@@ -2,10 +2,22 @@
 
 #include <Arduino.h>
 #include <string.h>
+#include "esp_heap_caps.h"
 #include "globals.h"
 
 #if ENABLE_DIAG_CAPTURE
-static DiagRecordSlot diag_slots[DIAG_CAPTURE_MAX_RECORDS];
+// Storage is PSRAM-backed so DIAG_CAPTURE_MAX_RECORDS can be raised (via a build flag on a
+// NON-SHIPPING probe env) to a continuous multi-beat capture window without blowing internal
+// SRAM. Allocated lazily on first start; a failed alloc fails SAFE (start returns false, no
+// crash) per the buffered-capture playbook (firmware-telemetry-instrumentation §1).
+static DiagRecordSlot* diag_slots = nullptr;
+static bool diag_capture_ensure_alloc() {
+  if (diag_slots != nullptr) return true;
+  diag_slots = (DiagRecordSlot*)heap_caps_malloc(
+      (size_t)DIAG_CAPTURE_MAX_RECORDS * sizeof(DiagRecordSlot),
+      MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  return diag_slots != nullptr;
+}
 static portMUX_TYPE diag_capture_mux = portMUX_INITIALIZER_UNLOCKED;
 static DiagCaptureStatus diag_status_state = {
   DIAG_CAPTURE_STOPPED,
@@ -58,6 +70,9 @@ void diag_capture_reset() {
 }
 
 bool diag_capture_start() {
+  if (!diag_capture_ensure_alloc()) {
+    return false;   // PSRAM buffer unavailable -> fail safe, do not capture
+  }
   portENTER_CRITICAL(&diag_capture_mux);
   if (diag_status_state.state == DIAG_CAPTURE_DRAINING) {
     portEXIT_CRITICAL(&diag_capture_mux);
@@ -132,6 +147,7 @@ bool diag_capture_can_push(uint16_t payload_bytes) {
 
 bool diag_capture_try_push(uint8_t kind, uint16_t flags, uint32_t frame, uint32_t t_us,
                            const void* payload, uint16_t payload_bytes) {
+  if (diag_slots == nullptr) return false;
   portENTER_CRITICAL(&diag_capture_mux);
   if (diag_status_state.state != DIAG_CAPTURE_CAPTURING) {
     portEXIT_CRITICAL(&diag_capture_mux);
@@ -181,6 +197,7 @@ uint16_t diag_capture_count() {
 }
 
 const DiagRecordSlot* diag_capture_record_at(uint16_t index) {
+  if (diag_slots == nullptr) return nullptr;
   portENTER_CRITICAL(&diag_capture_mux);
   if (index >= diag_status_state.count) {
     portEXIT_CRITICAL(&diag_capture_mux);
