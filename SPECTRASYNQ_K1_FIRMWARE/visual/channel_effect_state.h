@@ -193,10 +193,13 @@ struct ChannelEffectState {
   // light_mode_melodic_bloom() — "Melodic Bloom" mid-forward presence bloom.
   // Driven by post-AGC snap.mid_energy (V.3a-scored). Reset to 0 canonically.
   uint32_t melodicbloom_last_ms;      // k1ease::safe_dt source (0 = seed 1/120 s)
-  float    melodicbloom_mid_env;      // mid_energy asymmetric envelope (40 ms attack / 350 ms release)
-  float    melodicbloom_mid_max;      // slow running-max of mid_env for auto-range (floored 0.06)
+  float    melodicbloom_mid_env;      // mid_energy asymmetric envelope (50 ms attack / 400 ms release)
+  float    melodicbloom_mid_max;      // SLOW auto-range EMA (tau ~4 s, floored) — must NOT instant-rise (would pump = twitch)
   float    melodicbloom_sil;          // smoothed silence gate 0..1 (50 ms in / 300 ms out)
   float    melodicbloom_scroll_accum; // fractional-pixel outward-scroll carry (continuous speed)
+  float    melodicbloom_bright_env;   // eased presence -> injected core brightness (0.4+0.6 breathing floor)
+  float    melodicbloom_speed_env;    // calm eased presence -> outward surge speed (grow-not-pulse)
+  float    melodicbloom_reach_env;    // slow eased presence -> display reach/extent (the bloom breathes in size)
 
   // light_mode_waveform_hybrid_k1() — Waveform Hybrid port of firmware-v3 0x1313.
   // Bouncing amplitude-dot + decaying scroll trail. Reset to 0 canonically.

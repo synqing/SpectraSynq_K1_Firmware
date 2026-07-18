@@ -16,21 +16,27 @@
 // (bins 26..52 ~= 494..2217 Hz, k1_audio_snapshot.cpp:56). This is the signal
 // host-scored in V.3a (findings/VOCAL_PROXY_V3A_RESULTS.md): the raw mid_energy
 // meter, NOT the ratio+gate proxy (which V.3a killed as redundant). mid_energy
-// is a 27-bin band-mean that rests well below 1.0, so it is auto-ranged against
-// a slow running max before it drives brightness.
+// is a 27-bin band-mean that rests well below 1.0, so it is auto-ranged against a
+// SLOW EMA (tau ~4 s) — NEVER an instant-rise peak, which would re-snap the eased
+// signal and pump (the twitch fixed 2026-07-18; findings/MELODIC_BLOOM_MOTION_DIAGNOSIS.md).
 //
-// STRUCTURE: a peer of light_mode_bloom_bt — the same proven, budget-verified
-// centre-origin OUTWARD greyscale scroll + sqrt radial warp + palette/chroma
-// colour + mirror_image_downwards. Only the audio drive differs (mid presence
-// instead of bass/treble chroma). Centre-origin, no rainbow, no heap in render,
-// dt-timed, silence-gated — all K1 effect laws honoured.
+// MOTION (the-method 4.1 + 00b 2): presence is eased, then routed through three followers —
+// a 0.4+0.6*env breathing floor on CORE brightness (breathe, never blink), plus a calm SURGE
+// speed and a slow REACH envelope that grow the bloom's SPATIAL EXTENT with energy (reactivity
+// on transport, out of the 5-20 Hz global-brightness flicker band), not a brightness strobe.
+//
+// STRUCTURE: a peer of light_mode_bloom_bt — the same proven, budget-verified centre-origin
+// OUTWARD greyscale scroll + sqrt radial warp + palette/chroma colour + mirror_image_downwards.
+// Centre-origin, no rainbow, no heap in render, dt-timed, silence-gated — all K1 laws honoured.
 // =============================================================================
 
-static const float MELODIC_SPEED_MIN     = 35.0f;   // px/s at zero presence (always flowing outward)
-static const float MELODIC_SPEED_SPAN    = 50.0f;   // + presence * this (=> 35..85 px/s)
-static const int   MELODIC_MAX_STEP      = 4;        // per-frame integer-scroll clamp
-static const float MELODIC_MID_MAX_FLOOR = 0.06f;    // auto-range floor (mid_energy rests low)
-static const float MELODIC_MID_MAX_FALL_S = 4.0f;    // running-max decay time constant (s)
+static const float MELODIC_SPEED_MIN    = 35.0f;   // px/s drift floor — always flowing outward, never stalls
+static const float MELODIC_SPEED_SPAN   = 40.0f;   // + calm surge envelope * this (=> 35..75 px/s), grow-not-pulse
+static const int   MELODIC_MAX_STEP     = 4;        // per-frame integer-scroll clamp
+static const float MELODIC_RANGE_TAU_S  = 4.0f;     // SLOW auto-range time constant (s) — must NOT instant-rise (pumps = twitch)
+static const float MELODIC_RANGE_FLOOR  = 0.03f;    // auto-range floor (measured mid_energy p50 ~0.03..0.08 across corpus)
+static const float MELODIC_BRIGHT_FLOOR = 0.40f;    // breathing floor: core = 0.4 + 0.6*env (breathes, never blinks — the-method 4.1)
+static const float MELODIC_REACH_MIN_PX = 22.0f;    // bloom half-extent (px) at rest — a small central core that GROWS with presence
 
 void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   const RenderParams* rp = active_render_params();
@@ -40,20 +46,18 @@ void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx) 
   const K1AudioSnapshot snap = k1_audio_snapshot_read();
   const float dt = k1ease::safe_dt(millis(), fx.melodicbloom_last_ms);
 
-  // Presence = post-AGC mid-band energy, enveloped (40 ms attack / 350 ms release),
-  // then auto-ranged against a slow running max so the bloom is visible regardless
-  // of programme level (the band-mean rests well below full-scale).
+  // Presence = post-AGC mid-band energy, eased (50 ms attack / 400 ms release), then
+  // auto-ranged against a SLOW EMA range (tau ~4 s) so the bloom is visible regardless of
+  // programme level. The old code divided by an INSTANT-RISE running max, which re-snapped the
+  // eased signal on every mid onset — that is the raw-level->intensity strobe (the-method
+  // 4.1(b), the #1 amateur failure) laundered back in AFTER the easing, and it drove BOTH
+  // brightness and speed (the "twitchy / flips on a dime" Captain rejected, 2026-07-18). A slow
+  // range is ~constant over the envelope's timescale, so presence now inherits mid_env's grace.
   float mid = float(snap.mid_energy);
   if (mid < 0.0f) mid = 0.0f;
-  fx.melodicbloom_mid_env = k1ease::follow(fx.melodicbloom_mid_env, mid, dt, 0.04f, 0.35f);
-  if (fx.melodicbloom_mid_env > fx.melodicbloom_mid_max) {
-    fx.melodicbloom_mid_max = fx.melodicbloom_mid_env;             // instant rise to the peak
-  } else {
-    float fall = dt / MELODIC_MID_MAX_FALL_S;
-    if (fall > 1.0f) fall = 1.0f;
-    fx.melodicbloom_mid_max += (fx.melodicbloom_mid_env - fx.melodicbloom_mid_max) * fall;
-  }
-  if (fx.melodicbloom_mid_max < MELODIC_MID_MAX_FLOOR) fx.melodicbloom_mid_max = MELODIC_MID_MAX_FLOOR;
+  fx.melodicbloom_mid_env = k1ease::follow(fx.melodicbloom_mid_env, mid, dt, 0.05f, 0.40f);
+  fx.melodicbloom_mid_max = k1ease::ema(fx.melodicbloom_mid_max, fx.melodicbloom_mid_env, dt, MELODIC_RANGE_TAU_S);
+  if (fx.melodicbloom_mid_max < MELODIC_RANGE_FLOOR) fx.melodicbloom_mid_max = MELODIC_RANGE_FLOOR;
   float presence = fx.melodicbloom_mid_env / fx.melodicbloom_mid_max;
   if (presence > 1.0f) presence = 1.0f;
   if (presence < 0.0f) presence = 0.0f;
@@ -61,8 +65,18 @@ void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx) 
   // Soft silence gate (eases to dark over ~300 ms instead of snapping black).
   fx.melodicbloom_sil = k1ease::follow(fx.melodicbloom_sil, snap.silence ? 0.0f : 1.0f, dt, 0.05f, 0.30f);
 
-  // Continuous sub-pixel OUTWARD scroll; presence drives the flow speed.
-  const float speed_pxs = MELODIC_SPEED_MIN + MELODIC_SPEED_SPAN * presence;
+  // Three eased characters from the one presence (00b 2.5). Brightness carries the breathing
+  // floor (0.4 + 0.6*env -> never blinks); speed and reach carry the "grow, not pulse" energy
+  // read as SPATIAL extent (00b 4.8: reactivity routed to transport, OUT of the 5-20 Hz
+  // global-brightness flicker band). Each is eased, so none can twitch even on hard onsets.
+  fx.melodicbloom_bright_env = k1ease::follow(fx.melodicbloom_bright_env, presence, dt, 0.05f, 0.40f);
+  fx.melodicbloom_speed_env  = k1ease::follow(fx.melodicbloom_speed_env,  presence, dt, 0.08f, 0.60f);
+  fx.melodicbloom_reach_env  = k1ease::follow(fx.melodicbloom_reach_env,  presence, dt, 0.12f, 0.80f);
+  const float bright_core = MELODIC_BRIGHT_FLOOR + (1.0f - MELODIC_BRIGHT_FLOOR) * fx.melodicbloom_bright_env;
+
+  // Continuous sub-pixel OUTWARD scroll; the calm surge envelope drives an energy-linked speed
+  // (the medium accelerates under load, Ember 6.4) with SPEED_MIN as the no-stall drift floor.
+  const float speed_pxs = MELODIC_SPEED_MIN + MELODIC_SPEED_SPAN * fx.melodicbloom_speed_env;
   fx.melodicbloom_scroll_accum += speed_pxs * dt;
   int steps = (int)fx.melodicbloom_scroll_accum;
   fx.melodicbloom_scroll_accum -= (float)steps;
@@ -79,8 +93,9 @@ void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx) 
     }
   }
 
-  // Inject the presence-driven greyscale ring across the freshly-exposed centre.
-  const float inject = presence * fx.melodicbloom_sil;
+  // Inject the eased, FLOORED greyscale core across the freshly-exposed centre. Brightness is
+  // the breathing-floor envelope * silence gate — raw presence never touches brightness.
+  const float inject = bright_core * fx.melodicbloom_sil;
   const CRGB16 grayPix = { SQ15x16(inject), SQ15x16(inject), SQ15x16(inject) };
   const int fill = (steps < 1) ? 1 : steps;
   for (int k = 0; k < fill && (int)(HALF + k) < NATIVE_RESOLUTION; ++k) {
@@ -132,10 +147,17 @@ void light_mode_melodic_bloom(CRGB16* leds_prev_buffer, ChannelEffectState& fx) 
       : effect_palette_or_chroma_colour(rp, render_secondary, SQ15x16(1.0f));
 
   const float sil = fx.melodicbloom_sil;
-  const float presenceHue = presence * 0.10f;   // gentle warm shift as presence rises
+  const float presenceHue = fx.melodicbloom_bright_env * 0.10f;   // eased warm shift (no per-frame twitch)
+  // Reach/extent (Tier 2, grow-not-pulse): the display half-extent breathes with the SLOW reach
+  // envelope — a small central core at rest (REACH_MIN_PX) that grows toward the edge as presence
+  // rises. Display-only (post-snapshot), so it never feeds the transport (bloom 5.8).
+  const float reach_px = MELODIC_REACH_MIN_PX
+      + (float)((uint16_t)HALF - (uint16_t)MELODIC_REACH_MIN_PX) * fx.melodicbloom_reach_env;
 
   for (uint16_t i = 0; i < HALF; ++i) {
-    const float fade   = (float)(HALF - 1 - i) / (float)(HALF - 1);   // linear edge fade
+    float fade = 1.0f - (float)i / reach_px;                          // 1 at centre, 0 at the reach front
+    if (fade < 0.0f) fade = 0.0f;
+    fade *= fade;                                                     // soft quadratic falloff — no hard boundary (Ember 5.2)
     const float bright = float(leds_16[HALF + i].r) * fade * sil;     // greyscale: r == g == b
     if (bright < 0.001f) {
       leds_16[HALF + i] = CRGB16{ SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(0.0f) };
