@@ -75,7 +75,7 @@ EffectEntry g_registry[] = {
     { legacy_id(LIGHT_MODE_SPECTRUM_RIVER_V2),    "spectrum_river_v2",    "SPECTRUM RIVER 2",      nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_SPECTRUM_RIVER_V2 },
     { legacy_id(LIGHT_MODE_EMBER),                "ember",                "EMBER FIELD",           nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_EMBER },
     { legacy_id(LIGHT_MODE_EMBER_V2),             "ember_v2",             "EMBER FIELD 2",         nullptr, nullptr, false, false, AudioDeps::LEVEL,                  LIGHT_MODE_EMBER_V2 },
-    { legacy_id(LIGHT_MODE_WAVEFORM_TEMPO),       "waveform_tempo",       "WAVEFORM TEMPO",        nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_WAVEFORM_TEMPO },
+    { legacy_id(LIGHT_MODE_WAVEFORM_TEMPO),       "waveform_tempo",       "WAVEFORM TEMPO",        nullptr, nullptr, true,  true,  AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_WAVEFORM_TEMPO },
     { legacy_id(LIGHT_MODE_TEMPO_RIVER),          "tempo_river",          "TEMPO RIVER",           nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_TEMPO_RIVER },
     { legacy_id(LIGHT_MODE_TEMPO_COMET),          "tempo_comet",          "TEMPO COMET",           nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::ONSET,  LIGHT_MODE_TEMPO_COMET },
     { legacy_id(LIGHT_MODE_DENSE_FORGE),          "dense_forge",          "DENSE FORGE",           nullptr, nullptr, true,  true,  AudioDeps::ONSET | AudioDeps::LEVEL, LIGHT_MODE_DENSE_FORGE },
