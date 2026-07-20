@@ -19,9 +19,12 @@ firmware repositories are frozen references or archived experiments (see below).
 
 1. **No new firmware features on Lightwave-Ledstrip.** It is frozen. Bug-only fixes
    require an explicit exception.
-2. **Nothing is deleted until parity is proven.** Lightwave stays as reference-of-record
+2. **Nothing is deleted — ever — without the owner's explicit, per-item approval.**
+   Retirement is backup-first and archive-by-default (reversible); deletion is a
+   separate, later, explicitly-approved step. Lightwave stays as reference-of-record
    until the effect/DSP migration passes the parity harness (see
-   `docs/consolidation/FIRMWARE-CONSOLIDATION-PLAN.md`).
+   `docs/consolidation/FIRMWARE-CONSOLIDATION-PLAN.md` and
+   `docs/consolidation/WORKING-COPY-INVENTORY.md`).
 3. **Effects/DSP are re-derived, not copy-pasted**, using the effect-decomposition
    method already established in `SPECTRASYNQ_K1_FIRMWARE/effects/`, gated by the
    parity harness.

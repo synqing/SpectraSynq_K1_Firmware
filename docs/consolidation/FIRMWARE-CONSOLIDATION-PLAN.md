@@ -70,11 +70,17 @@ Re-derive the LGP physics suite through the decomposition method, batch by batch
 - **Exit criteria:** effect parity target met (recommend ≥ the curated
   "keeper" set, not all 194 — prune during migration).
 
-### Phase 4 — Archive & spin-out
+### Phase 4 — Archive & spin-out (backup-first, approval-gated)
 - [ ] Spin dashboard/iOS/composer/zone-mixer/tab5-encoder out of Lightwave monorepo
       into sibling repos under the org.
-- [ ] Archive Lightwave (GitHub archive, not delete) + variants once parity signed off.
-- [ ] Deduplicate working copies per WORKING-COPY-INVENTORY.md.
+- [ ] Archive Lightwave (GitHub archive, **never delete**) + variants once parity signed off.
+- [ ] Deduplicate working copies per WORKING-COPY-INVENTORY.md — **backup-first, and only
+      the items the owner explicitly approves**. Archive is reversible; deletion is a
+      separate, later, explicitly-approved step.
+
+> **Preservation policy:** Nothing is deleted without the owner's explicit per-item
+> approval. Every retirement is preceded by a verified backup (pushed branch/tag on
+> origin and/or a `git bundle` in cold storage). Default retirement = archive, not delete.
 
 ## 5. Risks & gates
 
@@ -83,7 +89,8 @@ Re-derive the LGP physics suite through the decomposition method, batch by batch
 | Loss of tacit DSP/effect tuning | High | Parity harness (Phase 1) mandatory before any port; Lightwave frozen, never deleted until sign-off |
 | Licence/heritage (GPL, prior AGPL/token leak alerts) | Medium | Canon carries NOTICE + `sb_` provenance; secret-scan gate on release builds |
 | Fork keeps widening during migration | Medium | "No new features on Lightwave" freeze enforced from Phase 0 |
-| Working-copy sprawl causes work on wrong copy | Medium | WORKING-COPY-INVENTORY.md; consolidate to canon primary |
+| Working-copy sprawl causes work on wrong copy | Medium | WORKING-COPY-INVENTORY.md; consolidate to canon primary (backup-first, approval-gated) |
+| Accidental loss of unique local state | High | Preservation policy: no delete without approval; verified backup before any retirement; archive-by-default |
 
 ## 6. Non-goals
 
