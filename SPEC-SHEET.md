@@ -1,5 +1,7 @@
 # SpectraSynq K1 — Authoritative Product Spec Sheet
 
+**Status: CANON REALITY — LOCKED by owner 2026-07-22.**
+
 **This document is the single source of truth for K1 marketing and product
 specifications.** Every number below was extracted from the K1 firmware source
 code. Marketing copy, landing pages, and datasheets MUST cite this sheet (and
@@ -61,8 +63,8 @@ Paths are relative to the repository root. Firmware sources live under
 
 | Spec | Value | Source |
 | --- | --- | --- |
-| LED chip | **WS2812B** | `SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h:1095`; `SPECTRASYNQ_K1_FIRMWARE/system/constants.h:315` |
-| LEDs per channel (default) | **160** (`LED_STRIP_MODE 3` / `LED_COUNT_VALUE`; SB v9 K1 hardware) | `SPECTRASYNQ_K1_FIRMWARE/system/config_types.h:123-140` |
+| LED chip | **WS2816** — owner-locked product spec (2026-07-22); firmware origin/main currently WS2812B, WS2816 productisation in-flight | owner lock 2026-07-22; firmware origin/main: `SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h:1095`; `SPECTRASYNQ_K1_FIRMWARE/system/constants.h:315` |
+| LEDs per K1 | **320** — owner-locked product spec (2026-07-22); firmware origin/main currently WS2812B, WS2816 productisation in-flight (origin/main ships 160 per channel × 2 channels) | owner lock 2026-07-22; firmware origin/main: `SPECTRASYNQ_K1_FIRMWARE/system/config_types.h:123-140` |
 | Channels | **2** — primary + secondary (`make_primary_channel` / `make_secondary_channel`; dual `addLeds`) | `SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:192-220`; `SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h:1105-1112` |
 | Geometry | **Centre-origin**, mirror-filled across the second half (mirror anchor at `NATIVE_RESOLUTION/2`) | `SPECTRASYNQ_K1_FIRMWARE/system/constants.h:118-119` |
 
@@ -83,7 +85,7 @@ Paths are relative to the repository root. Firmware sources live under
 | REST/HTTP endpoints | **0** — no HTTP route handlers; control is serial + (gated) WebSocket | verified: no `server.on`/HTTP routes under `SPECTRASYNQ_K1_FIRMWARE/network/` |
 | WebSocket endpoints | **1** endpoint (`/ws`, port 80) with **2** request kinds (`k1.state.get`, `k1.capabilities.get`) — **gated**, not in the production build | `SPECTRASYNQ_K1_FIRMWARE/network/k1_wireless.cpp:24,74,679-693`; gated by `platformio.ini:371-379` (`env:k1_wireless_ab_probe`, `-DK1_WIRELESS_ENABLED`) |
 | BLE | **Present but gated / non-shipping** — BLE-MIDI central for the "SpectraSynq Remoted" dial; only under `-DK1_BLE_REMOTED` | `SPECTRASYNQ_K1_FIRMWARE/network/ble_remoted_central.h:4-6`; `platformio.ini:396-405` (`env:k1_ble_remoted_probe`) |
-| iOS app | **Unverified** — no iOS/CoreBluetooth client code present in this firmware repo | not found under `SPECTRASYNQ_K1_FIRMWARE/` |
+| iOS app | **None** — owner-locked (2026-07-22); no iOS/CoreBluetooth client code present in this firmware repo | owner lock 2026-07-22; not found under `SPECTRASYNQ_K1_FIRMWARE/` |
 
 > Note: the default/production build (`build_src_filter`, `platformio.ini:44`)
 > does **not** compile `network/`. WiFi AP, WebSocket, and BLE-MIDI are
