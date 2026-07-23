@@ -314,9 +314,15 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     // K1 bench-reference GPIO map.
     // Primary/secondary WS2812 channels: GPIO 4/5.
     // SPH0645: BCLK=14, DOUT->DIN=13, LRCL/WS=12. SEL wiring matches default K1.
-    #define I2S_BCLK_PIN 14
-    #define I2S_LRCLK_PIN 12
-    #define I2S_DIN_PIN 13
+    #ifndef I2S_BCLK_PIN
+      #define I2S_BCLK_PIN 14
+    #endif
+    #ifndef I2S_LRCLK_PIN
+      #define I2S_LRCLK_PIN 12
+    #endif
+    #ifndef I2S_DIN_PIN
+      #define I2S_DIN_PIN 13
+    #endif
 
     #define LED_DATA_PIN 4
     #define LED_CLOCK_PIN 5
@@ -326,15 +332,27 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       // Dedicated PDM macros are consumed by init_i2s()'s PDM branch; the
       // i2s_std I2S_*_PIN above stay defined but UNUSED under the flag. Proven config:
       // clk 819.2 kHz (DSR_8S) / LR LOW = LEFT slot / falling edge.
-      #define K1_PDM_CLK_PIN 13   // PDM clock out
-      #define K1_PDM_DIN_PIN 12   // PDM data in
-      #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+      #ifndef K1_PDM_CLK_PIN
+        #define K1_PDM_CLK_PIN 13   // PDM clock out
+      #endif
+      #ifndef K1_PDM_DIN_PIN
+        #define K1_PDM_DIN_PIN 12   // PDM data in
+      #endif
+      #ifndef K1_PDM_LR_PIN
+        #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+      #endif
     #endif
   #else
     // K1 hardware production GPIO map.
-    #define I2S_BCLK_PIN 13
-    #define I2S_LRCLK_PIN 11
-    #define I2S_DIN_PIN 14
+    #ifndef I2S_BCLK_PIN
+      #define I2S_BCLK_PIN 13
+    #endif
+    #ifndef I2S_LRCLK_PIN
+      #define I2S_LRCLK_PIN 11
+    #endif
+    #ifndef I2S_DIN_PIN
+      #define I2S_DIN_PIN 14
+    #endif
 
     #define LED_DATA_PIN 6
     #define LED_CLOCK_PIN 7
@@ -346,9 +364,15 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       // edge. The i2s_std I2S_*_PIN above stay defined but UNUSED under the flag.
       // Collision-free on this map: GPIO 12 is unassigned, 13/14 free when SPH drops,
       // LEDs 6/7 unaffected, old SPH LRCLK 11 goes unused.
-      #define K1_PDM_CLK_PIN 13   // PDM clock out
-      #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
-      #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge
+      #ifndef K1_PDM_CLK_PIN
+        #define K1_PDM_CLK_PIN 13   // PDM clock out
+      #endif
+      #ifndef K1_PDM_DIN_PIN
+        #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
+      #endif
+      #ifndef K1_PDM_LR_PIN
+        #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge
+      #endif
     #endif
   #endif
 
@@ -376,6 +400,18 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define K1_RGBIC_PRIMARY_CLOCK_PIN 7
     #define K1_RGBIC_SECONDARY_CLOCK_PIN 8
     #define RNG_SEED_PIN 9   // moved off 8 (now the secondary RGBIC clock); RNG seed is unused anyway
+  #elif defined(K1_WS2816_1313_SECONDARY)
+    // WS2816C-1313 Phase 2 dual-channel split (2026-07-24): the SECONDARY 160-px
+    // PCB is fed by TWO 80-LED data inputs — GPIO7 = px 0-79, GPIO8 = px 80-159 —
+    // the same wire-time split as the primary (GPIO4/5). This is the K1's real
+    // secondary channel (its own rendered image), now given a physical output.
+    // GPIO8 was RNG_SEED_PIN (dead code, never read); reclaimed here, RNG_SEED_PIN
+    // moved to 9. Requires the bench pin map (env extends k1_bench_im73d → GPIO7
+    // free) + K1_WS2816_1313_V1 (the #error in led_utilities.h enforces the
+    // primary-split co-definition).
+    #define K1_WS2816_SECONDARY_DATA_A_PIN 7   // secondary px 0-79
+    #define K1_WS2816_SECONDARY_DATA_B_PIN 8   // secondary px 80-159
+    #define RNG_SEED_PIN 9   // moved off 8 (now the secondary WS2816 data-B feed)
   #else
     #define RNG_SEED_PIN 8
   #endif
@@ -442,6 +478,23 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 // and remains UN-GAMMED in Phase 1 — Phase 2 work.
 // Bypass: set ENABLE_OUTPUT_GAMMA to 0 to make apply_gamma8() pass-through.
 #define ENABLE_OUTPUT_GAMMA 0   // 2026-05-20 ROLLBACK: SUSPECT #2 for washout. Crushes midtones; firmware color math likely already perceptually-tuned.
+
+// Lever 3 (WS2816 optimisation plan §5, 2026-07-24): the WS2816C applies its OWN
+// internal 4-bit gamma in hardware ("20-bit display effect"). Host output gamma
+// must stay OFF on any WS2816 build or the two gammas double-apply and crush the
+// midtones (the exact washout ENABLE_OUTPUT_GAMMA was rolled back to 0 to avoid).
+// Structural guard, not a tuning knob. See docs/research/ws2816-vs-ws2812/OPTIMIZATION-PLAN.md §5.
+#if ENABLE_OUTPUT_GAMMA && (defined(K1_WS2816_1313_V1) || defined(K1_WS2816_1313_SECONDARY) || defined(K1_WS2816_16BIT))
+#  error "Host output gamma must stay OFF on WS2816 builds (chip applies its own 4-bit gamma; double-gamma crushes midtones). Keep ENABLE_OUTPUT_GAMMA 0."
+#endif
+
+// Lever 2/5 guard (2026-07-24): FastLED's per-controller temporal dither toggles the
+// low bits of every emitted byte — on the 16-bit path those bytes are the hi/lo
+// halves of a 16-bit channel, so dithering them CORRUPTS the value (looks like a
+// wiring fault). The 16-bit packer needs the raw WS2812 controllers un-dithered.
+#if ENABLE_FASTLED_DITHER && defined(K1_WS2816_16BIT)
+#  error "ENABLE_FASTLED_DITHER must be 0 on the K1_WS2816_16BIT path — dither corrupts the packed 16-bit byte-halves."
+#endif
 #define OUTPUT_GAMMA_VALUE 2.2f
 
 // Test-only output-stage vivid pre-comp. Output gamma stays disabled above

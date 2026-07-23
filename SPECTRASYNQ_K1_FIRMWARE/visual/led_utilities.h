@@ -45,6 +45,13 @@ void apply_brightness_secondary();
 void show_secondary_leds();
 void init_secondary_leds();
 void quantize_color_secondary(bool temporal_dither);
+#ifdef K1_WS2816_16BIT
+// Forward decl so the primary show path (pack call precedes the definition below).
+void pack_ws2816_16bit(const CRGB16* src, CRGB* wire, uint16_t count);
+// Feature #3: 8-bit WS2816 packer (byte-identical to the shipped 8-bit dual build);
+// same reason it is forward-declared — the primary pack call precedes its definition.
+void pack_ws2816_8bit(const CRGB16* src, CRGB* wire, uint16_t count);
+#endif
 
 // Forward declarations for internal functions needed before their implementations
 CRGB16 adjust_hue_and_saturation(CRGB16 color, SQ15x16 hue, SQ15x16 saturation);
@@ -496,6 +503,39 @@ inline void quantize_color(bool temporal_dithering) {
     }
   }
 }
+
+#ifdef ENABLE_LED_TESTMODE
+// Deterministic, audio-independent LED test patterns for the WS2816-vs-WS2812 banding
+// eval (docs/research/ws2816-vs-ws2812/EVALUATION-METHODOLOGY.md). Overwrites the final
+// 16-bit buffer (leds_scaled) JUST BEFORE the encoder, so it drives EXACT commanded
+// levels — bypassing audio / brightness / silence scaling — through whichever encoder
+// is active (8-bit quantize_color OR the 16-bit packer). The SAME pattern on the 8-bit
+// and 16-bit builds is the controlled A/B. No-op unless armed via serial ':ledtest <n>'.
+// NON-SHIPPABLE — ENABLE_LED_TESTMODE lives only in bench/harness envs.
+//   1 = temporal global ramp (slow 0->1->0 over 20 s) — the low-light banding test
+//   2 = spatial ramp (static 0->1 across the strip)
+//   3 = mid grey (0.5 all)
+//   4 = R / G / B thirds (colour / white-balance)
+//   5 = LOW temporal ramp (0->0.10->0) — the bottom 10% where 16-bit vs 8-bit differs most
+inline void k1_ledtest_apply(CRGB16* buf, uint16_t count) {
+  const uint8_t pattern = k1_ledtest_pattern;
+  if (pattern == 0 || buf == nullptr || count == 0) return;
+  float t = (millis() % 20000) / 20000.0f;
+  float tri = (t < 0.5f) ? (t * 2.0f) : ((1.0f - t) * 2.0f);
+  for (uint16_t i = 0; i < count; i++) {
+    SQ15x16 r = SQ15x16(0), g = SQ15x16(0), b = SQ15x16(0);
+    switch (pattern) {
+      case 1: r = g = b = SQ15x16(tri); break;
+      case 2: { float v = (count > 1) ? (float(i) / float(count - 1)) : 0.0f; r = g = b = SQ15x16(v); break; }
+      case 3: r = g = b = SQ15x16(0.5f); break;
+      case 4: { uint16_t third = count / 3; if (i < third) r = SQ15x16(1); else if (i < 2 * third) g = SQ15x16(1); else b = SQ15x16(1); break; }
+      case 5: r = g = b = SQ15x16(tri * 0.10f); break;
+      default: break;
+    }
+    buf[i].r = r; buf[i].g = g; buf[i].b = b;
+  }
+}
+#endif  // ENABLE_LED_TESTMODE
 
 inline void apply_incandescent_filter() {
   SQ15x16 mix = CONFIG.INCANDESCENT_FILTER;
@@ -1010,7 +1050,20 @@ inline void show_leds() {
 #if ENABLE_VP_PERF_AUDIT || ENABLE_VPAB_PROBE
   int64_t vp_perf_quant_start_us = esp_timer_get_time();
 #endif
+#ifdef ENABLE_LED_TESTMODE
+  k1_ledtest_apply(leds_scaled, CONFIG.LED_COUNT);   // no-op unless a pattern is armed via :ledtest
+#endif
+#ifdef K1_WS2816_16BIT
+  // Feature #3: runtime per-channel bit-depth. Registration is unchanged; only which
+  // packer fills leds_ws2816_wire changes. 16 → true-16-bit; else → byte-identical 8-bit.
+  if (k1_bitdepth_primary == 16) {
+    pack_ws2816_16bit(leds_scaled, leds_ws2816_wire, CONFIG.LED_COUNT);
+  } else {
+    pack_ws2816_8bit(leds_scaled, leds_ws2816_wire, CONFIG.LED_COUNT);
+  }
+#else
   quantize_color(CONFIG.TEMPORAL_DITHERING);
+#endif
 #if ENABLE_VP_PERF_AUDIT || ENABLE_VPAB_PROBE
   uint32_t vp_perf_primary_quant_us = uint32_t(esp_timer_get_time() - vp_perf_quant_start_us);
 #endif
@@ -1093,12 +1146,110 @@ inline void show_leds() {
   }
 }
 
+// K1_WS2816_1313_SECONDARY (Phase 2) requires the primary split (V1). The
+// secondary WS2816 halves on GPIO7/8 only make sense on top of the primary
+// GPIO4/5 split; without V1 the primary would fall back to a single-controller
+// WS2812B path and the pin / current-cap assumptions here would be wrong.
+#if defined(K1_WS2816_1313_SECONDARY) && !defined(K1_WS2816_1313_V1)
+#  error "K1_WS2816_1313_SECONDARY requires K1_WS2816_1313_V1 (enable the primary split too)"
+#endif
+
+#ifdef K1_WS2816_16BIT
+// K1_WS2816_16BIT (Lever 2 — true 16-bit emit path) builds ON the dual split: it
+// replaces the WS2816 controllers with raw WS2812 controllers over a doubled wire
+// buffer packed from 16-bit data, so it requires the secondary split (and hence V1).
+#  if !defined(K1_WS2816_1313_SECONDARY)
+#    error "K1_WS2816_16BIT requires K1_WS2816_1313_SECONDARY (the dual split it packs over)"
+#  endif
+// Pack the K1's 16-bit render (leds_scaled / leds_scaled_secondary — CRGB16 = SQ15x16
+// in [0,1]) straight to the WS2816 48-bit wire: TWO wire-CRGB per pixel carrying the
+// hi/lo bytes of three 16-bit GRB channels. Byte layout is byte-for-byte what FastLED's
+// WS2816Controller emits (chipsets.h:1193-1194 after loadAndScale_WS2816_HD's GRB
+// reorder, pixel_controller.h:563-569) but SOURCED FROM 16-BIT rather than an 8->16
+// byte-replicated 8-bit value. Scales by 65535 (fixes quantize_color's 254 deficit) and
+// does NO temporal dither (Lever 5 — 16-bit exceeds the JND; the chip owns gamma). The
+// inner controller is registered WS2812B in RGB order, so these bytes emit verbatim.
+static inline uint16_t k1_ws2816_to16(SQ15x16 v) {
+  float f = float(v);
+  if (f <= 0.0f) return 0;
+  if (f >= 1.0f) return 65535;
+  return (uint16_t)(f * 65535.0f + 0.5f);
+}
+inline void pack_ws2816_16bit(const CRGB16* src, CRGB* wire, uint16_t count) {
+  for (uint16_t i = 0; i < count; i++) {
+    uint16_t r16 = k1_ws2816_to16(src[i].r);
+    uint16_t g16 = k1_ws2816_to16(src[i].g);
+    uint16_t b16 = k1_ws2816_to16(src[i].b);
+    // GRB wire order (RGB_ORDER=GRB => loadAndScale_WS2816_HD yields s0=g, s1=r, s2=b):
+    wire[2 * i]     = CRGB((uint8_t)(g16 >> 8), (uint8_t)(g16 & 0xFF), (uint8_t)(r16 >> 8));
+    wire[2 * i + 1] = CRGB((uint8_t)(r16 & 0xFF), (uint8_t)(b16 >> 8), (uint8_t)(b16 & 0xFF));
+  }
+}
+
+// Feature #3 — 8-bit WS2816 packer. Produces BYTE-IDENTICAL wire to the shipped 8-bit dual
+// build (FastLED WS2816Controller over quantize_color / quantize_color_secondary output).
+// Per channel it reproduces quantize_color's EXACT byte v8 = (leds_scaled*254 + 4-frame
+// Bayer temporal dither when CONFIG.TEMPORAL_DITHERING, then apply_gamma8) — replicated
+// verbatim below so this stays behind K1_WS2816_16BIT and every flag-off env is untouched.
+// Then v16 = (v8<<8)|v8  (== FastLED map8_to_16 = v8*0x101), written in the SAME GRB hi/lo
+// layout pack_ws2816_16bit uses ⇒ the wire equals map8_to_16(quantize_color's byte).
+// Temporal-dither phase: quantize_color and quantize_color_secondary each keep their OWN
+// free-running noise_origin (from 0, +1/frame). We mirror that with SEPARATE primary/
+// secondary phase counters keyed off the destination `wire`, advanced once per call (=once
+// per frame, since each role packs once/frame). quantize_color is NOT compiled on this path
+// (show_leds bypasses it under the flag) so the counter is never double-advanced.
+static inline uint8_t k1_quant8_dither(SQ15x16 v, uint8_t noise_origin, uint16_t i) {
+  SQ15x16 decimal = v * SQ15x16(254);
+  SQ15x16 whole = decimal.getInteger();
+  SQ15x16 fract = decimal - whole;
+  if (fract >= dither_table[(noise_origin + i) % 4]) whole += SQ15x16(1);
+  return apply_gamma8(whole.getInteger());
+}
+inline void pack_ws2816_8bit(const CRGB16* src, CRGB* wire, uint16_t count) {
+  const bool dither = CONFIG.TEMPORAL_DITHERING;
+  // Per-role phase (primary vs secondary), matching each quantiser's independent counter.
+  static uint8_t no_r_p = 0, no_g_p = 0, no_b_p = 0;
+  static uint8_t no_r_s = 0, no_g_s = 0, no_b_s = 0;
+  uint8_t nr = 0, ng = 0, nb = 0;
+  if (dither) {
+    if (wire == leds_ws2816_wire) {          // primary role
+      nr = ++no_r_p; ng = ++no_g_p; nb = ++no_b_p;
+    } else {                                  // secondary role (leds_ws2816_wire_secondary)
+      nr = ++no_r_s; ng = ++no_g_s; nb = ++no_b_s;
+    }
+  }
+  for (uint16_t i = 0; i < count; i++) {
+    uint8_t r8, g8, b8;
+    if (dither) {
+      r8 = k1_quant8_dither(src[i].r, nr, i);
+      g8 = k1_quant8_dither(src[i].g, ng, i);
+      b8 = k1_quant8_dither(src[i].b, nb, i);
+    } else {
+      r8 = apply_gamma8(uint8_t(src[i].r * 255));
+      g8 = apply_gamma8(uint8_t(src[i].g * 255));
+      b8 = apply_gamma8(uint8_t(src[i].b * 255));
+    }
+    uint16_t r16 = (uint16_t(r8) << 8) | uint16_t(r8);   // == map8_to_16 (v8 * 0x101)
+    uint16_t g16 = (uint16_t(g8) << 8) | uint16_t(g8);
+    uint16_t b16 = (uint16_t(b8) << 8) | uint16_t(b8);
+    wire[2 * i]     = CRGB((uint8_t)(g16 >> 8), (uint8_t)(g16 & 0xFF), (uint8_t)(r16 >> 8));
+    wire[2 * i + 1] = CRGB((uint8_t)(r16 & 0xFF), (uint8_t)(b16 >> 8), (uint8_t)(b16 & 0xFF));
+  }
+}
+#endif  // K1_WS2816_16BIT
+
 inline void init_leds() {
   bool leds_started = false;
 
   leds_scaled = new CRGB16[CONFIG.LED_COUNT];
   leds_out = new CRGB[CONFIG.LED_COUNT];
-  
+#ifdef K1_WS2816_16BIT
+  // Lever 2: doubled 48-bit wire buffer (2 wire-CRGB per WS2816 pixel), zeroed so the
+  // boot-clear show() emits black before the first pack_ws2816_16bit().
+  leds_ws2816_wire = new CRGB[2 * CONFIG.LED_COUNT];
+  for (uint16_t x = 0; x < 2 * CONFIG.LED_COUNT; x++) leds_ws2816_wire[x] = CRGB(0, 0, 0);
+#endif
+
   // Initialize the lerp parameters for scale_to_strip optimization
   init_lerp_params();
 
@@ -1118,8 +1269,28 @@ inline void init_leds() {
   // The logical secondary channel has NO physical output in this phase — see
   // init_secondary_leds(). Phase 2 (after eyes-on PASS) moves the secondary
   // to GPIO7/8 with the same split.
+#ifdef K1_WS2816_16BIT
+  // Lever 2 (true 16-bit): raw WS2812 controllers over the doubled wire buffer instead
+  // of the WS2816 emulated controller (which would 8->16 byte-replicate an 8-bit source).
+  // Same split — GPIO4 = px0-79 = wire[0,LED_COUNT), GPIO5 = px80-159 =
+  // wire[LED_COUNT,2*LED_COUNT). RGB order (bytes already packed GRB by
+  // pack_ws2816_16bit). Neutralise FastLED scaling+dither so the hi/lo byte-halves pass
+  // through verbatim (mirrors WS2816Controller internals, chipsets.h:1201-1203).
+  {
+    auto& c16a = FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_ws2816_wire, 0, CONFIG.LED_COUNT);
+    c16a.setCorrection(CRGB(255, 255, 255));
+    c16a.setTemperature(CRGB(255, 255, 255));
+    c16a.setDither(DISABLE_DITHER);
+    auto& c16b = FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, RGB>(leds_ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
+    c16b.setCorrection(CRGB(255, 255, 255));
+    c16b.setTemperature(CRGB(255, 255, 255));
+    c16b.setDither(DISABLE_DITHER);
+  }
+  FastLED.setBrightness(255);  // brightness already folded into leds_scaled (apply_brightness)
+#else
   FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
   FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2);
+#endif
 #elif defined(K1_CUSTOM_RGBIC_V1)
   // Custom dual-channel RGBIC build (2026-07-12): the primary channel is a CLOCKED
   // SPI RGBIC (reel labelled "WS2815"; actually APA102/DotStar-family, Data+Clock).
@@ -2233,19 +2404,51 @@ inline CRGB16 adjust_hue_and_saturation(CRGB16 color, SQ15x16 hue, SQ15x16 satur
 inline void init_secondary_leds() {
   leds_scaled_secondary = new CRGB16[SECONDARY_LED_COUNT];
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
+#ifdef K1_WS2816_16BIT
+  leds_ws2816_wire_secondary = new CRGB[2 * SECONDARY_LED_COUNT];
+  for (uint16_t x = 0; x < 2 * SECONDARY_LED_COUNT; x++) leds_ws2816_wire_secondary[x] = CRGB(0, 0, 0);
+#endif
 
   // Use constants for FastLED template arguments
 #ifdef K1_WS2816_1313_V1
-  // WS2816C-1313 split geometry (2026-07-16): NO secondary controller is
-  // registered in this phase — GPIO5 (SECONDARY_LED_DATA_PIN) now carries the
-  // PRIMARY channel's px 80–159 half (see init_leds()). This branch MUST stay
-  // (even empty): deleting it would let the #else register a WS2812B
-  // controller on GPIO5 on top of the WS2816 half — two controllers, one pin.
-  // The buffers above are still allocated so the .ino boot-clear, diag
-  // null-guards, and the secondary VP render stay valid; the secondary canvas
-  // renders into an unregistered buffer (wasted CPU accepted on bench).
-  // Phase 2 (after Captain eyes-on PASS) registers the secondary here on
-  // GPIO7/8 with the same 2×(SECONDARY_LED_COUNT/2) offset split.
+#  ifdef K1_WS2816_1313_SECONDARY
+  // WS2816C-1313 Phase 2 dual-channel split (2026-07-24): the SECONDARY 160-px
+  // PCB is its own continuous image, wire-time-split across TWO 80-LED feeds —
+  // GPIO7 (K1_WS2816_SECONDARY_DATA_A_PIN) = px 0–79, GPIO8
+  // (K1_WS2816_SECONDARY_DATA_B_PIN) = px 80–159 — two offset WS2816 controllers
+  // over the INDEPENDENT leds_out_secondary buffer (mirrors the primary split in
+  // init_leds()). Restores the K1's true dual-channel behaviour — this PCB shows
+  // the secondary channel's OWN rendered image — AND wire-time-splits it. RMT
+  // budget is now EXACTLY the S3's 4 TX channels (GPIO 4/5/7/8); a 5th aborts.
+  // GRB is correct for WS2816 (FastLED 3.10.3 wrapper reorders once in 16-bit
+  // space; inner WS2812 forced RGB). Assumes an even SECONDARY_LED_COUNT (160).
+#    ifdef K1_WS2816_16BIT
+  // Lever 2 (true 16-bit secondary): raw WS2812 over the doubled wire buffer on GPIO7/8,
+  // scaling+dither neutralised. Same split — GPIO7 = px0-79, GPIO8 = px80-159.
+  {
+    auto& s16a = FastLED.addLeds<WS2812B, K1_WS2816_SECONDARY_DATA_A_PIN, RGB>(leds_ws2816_wire_secondary, 0, SECONDARY_LED_COUNT);
+    s16a.setCorrection(CRGB(255, 255, 255));
+    s16a.setTemperature(CRGB(255, 255, 255));
+    s16a.setDither(DISABLE_DITHER);
+    auto& s16b = FastLED.addLeds<WS2812B, K1_WS2816_SECONDARY_DATA_B_PIN, RGB>(leds_ws2816_wire_secondary, SECONDARY_LED_COUNT, SECONDARY_LED_COUNT);
+    s16b.setCorrection(CRGB(255, 255, 255));
+    s16b.setTemperature(CRGB(255, 255, 255));
+    s16b.setDither(DISABLE_DITHER);
+  }
+#    else
+  FastLED.addLeds<WS2816, K1_WS2816_SECONDARY_DATA_A_PIN, GRB>(leds_out_secondary, 0, SECONDARY_LED_COUNT / 2);
+  FastLED.addLeds<WS2816, K1_WS2816_SECONDARY_DATA_B_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2);
+#    endif
+#  else
+  // WS2816C-1313 split geometry Phase 1 (2026-07-16): NO secondary controller is
+  // registered — GPIO5 (SECONDARY_LED_DATA_PIN) carries the PRIMARY channel's
+  // px 80–159 half (see init_leds()). This branch MUST stay (even empty):
+  // deleting it would let the #else register a WS2812B controller on GPIO5 on top
+  // of the WS2816 half — two controllers, one pin. Buffers above are still
+  // allocated so the .ino boot-clear, diag null-guards, and the secondary VP
+  // render stay valid; the secondary canvas renders into an unregistered buffer
+  // (wasted CPU accepted on bench). Phase 2 = -DK1_WS2816_1313_SECONDARY.
+#  endif
 #elif defined(K1_CUSTOM_RGBIC_V1)
   // Matches the Captain's PROVEN Pixelblaze config (WS2812/SK6812, 800 Kbps
   // 250ns/750ns, RGB). BOTH wires of the secondary channel driven with the same
@@ -2330,6 +2533,24 @@ inline void show_secondary_leds() {
   if (SECONDARY_INCANDESCENT_MODE) {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }
+#ifdef K1_WS2816_16BIT
+  // Lever 2 (16-bit secondary): pack the 16-bit secondary render (post brightness +
+  // force_incandescent, both 16-bit) straight to the WS2816 wire and BYPASS the 8-bit
+  // quantise / incandescent-filter / base-coat / reverse block below (leds_out_secondary
+  // is unused on this path). SECONDARY incandescent-FILTER / base-coat / reverse are not
+  // applied on this bench-eval 16-bit path.
+  // Feature #3: runtime per-channel bit-depth + A/B content sync. When k1_ab_sync, source
+  // the secondary from the PRIMARY's final buffer (leds_scaled) so BOTH bars render the
+  // pixel-identical image the same instant — the valid same-instant 8-vs-16 A/B. Both
+  // leds_scaled and leds_scaled_secondary are CRGB16 and SECONDARY_LED_COUNT == CONFIG.LED_COUNT
+  // (160) on this bench rig, so the sizes match. k1_ab_sync == 0 → independent (as before).
+  const CRGB16* sec_src = (k1_ab_sync != 0) ? leds_scaled : leds_scaled_secondary;
+  if (k1_bitdepth_secondary == 16) {
+    pack_ws2816_16bit(sec_src, leds_ws2816_wire_secondary, SECONDARY_LED_COUNT);
+  } else {
+    pack_ws2816_8bit(sec_src, leds_ws2816_wire_secondary, SECONDARY_LED_COUNT);
+  }
+#else
   // Quantization needs to happen *after* filtering if filter uses scaled values
   // quantize_color_secondary(CONFIG.TEMPORAL_DITHERING); // Moved down
 
@@ -2416,6 +2637,7 @@ inline void show_secondary_leds() {
   if (SECONDARY_REVERSE_ORDER) {
     reverse_leds(leds_out_secondary, SECONDARY_LED_COUNT);
   }
+#endif  // K1_WS2816_16BIT (8-bit secondary output block bypassed on the 16-bit path)
 #if ENABLE_VP_PERF_AUDIT
   if (vp_perf.running && vp_perf_secondary_prep_start_us != 0) {
     uint32_t total_us = uint32_t(esp_timer_get_time() - vp_perf_secondary_prep_start_us);

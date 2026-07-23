@@ -422,6 +422,75 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       tx_end();
     }
 
+#ifdef ENABLE_LED_TESTMODE
+    // Deterministic LED test pattern (bench eval only; NON-SHIPPABLE) ----------
+    // :ledtest <0-5> — 0=off, 1=ramp, 2=spatial, 3=grey, 4=RGB thirds, 5=low-ramp.
+    else if (strcmp(command_type, "ledtest") == 0) {
+      k1_ledtest_pattern = (uint8_t)constrain(atoi(command_data), 0, 5);
+      tx_begin();
+      USBSerial.print("LEDTEST_PATTERN: ");
+      USBSerial.println(k1_ledtest_pattern);
+      tx_end();
+    }
+#endif
+
+#ifdef K1_WS2816_16BIT
+    // Runtime per-channel WS2816 driver select (bench eval only; NON-SHIPPABLE) --------
+    // :bitdepth <8|16>            → set BOTH channels
+    // :bitdepth_primary <8|16>    → primary bar only
+    // :bitdepth_secondary <8|16>  → secondary bar only
+    // :ab_sync <0|1>              → 1 = secondary mirrors the primary image (same-instant A/B)
+    else if (strcmp(command_type, "bitdepth") == 0) {
+      uint8_t d = (uint8_t)constrain(atoi(command_data), 8, 16);
+      d = (d >= 16) ? 16 : 8;
+      k1_bitdepth_primary = d;
+      k1_bitdepth_secondary = d;
+      tx_begin();
+      USBSerial.print("BITDEPTH: primary=");
+      USBSerial.print(k1_bitdepth_primary);
+      USBSerial.print(" secondary=");
+      USBSerial.print(k1_bitdepth_secondary);
+      USBSerial.print(" ab_sync=");
+      USBSerial.println(k1_ab_sync);
+      tx_end();
+    }
+    else if (strcmp(command_type, "bitdepth_primary") == 0) {
+      uint8_t d = (uint8_t)constrain(atoi(command_data), 8, 16);
+      k1_bitdepth_primary = (d >= 16) ? 16 : 8;
+      tx_begin();
+      USBSerial.print("BITDEPTH: primary=");
+      USBSerial.print(k1_bitdepth_primary);
+      USBSerial.print(" secondary=");
+      USBSerial.print(k1_bitdepth_secondary);
+      USBSerial.print(" ab_sync=");
+      USBSerial.println(k1_ab_sync);
+      tx_end();
+    }
+    else if (strcmp(command_type, "bitdepth_secondary") == 0) {
+      uint8_t d = (uint8_t)constrain(atoi(command_data), 8, 16);
+      k1_bitdepth_secondary = (d >= 16) ? 16 : 8;
+      tx_begin();
+      USBSerial.print("BITDEPTH: primary=");
+      USBSerial.print(k1_bitdepth_primary);
+      USBSerial.print(" secondary=");
+      USBSerial.print(k1_bitdepth_secondary);
+      USBSerial.print(" ab_sync=");
+      USBSerial.println(k1_ab_sync);
+      tx_end();
+    }
+    else if (strcmp(command_type, "ab_sync") == 0) {
+      k1_ab_sync = (uint8_t)constrain(atoi(command_data), 0, 1);
+      tx_begin();
+      USBSerial.print("BITDEPTH: primary=");
+      USBSerial.print(k1_bitdepth_primary);
+      USBSerial.print(" secondary=");
+      USBSerial.print(k1_bitdepth_secondary);
+      USBSerial.print(" ab_sync=");
+      USBSerial.println(k1_ab_sync);
+      tx_end();
+    }
+#endif
+
     // Toggle Color Shift ---------------------------------
     else if (strcmp(command_type, "auto_color_shift") == 0) {
       bool good = false;

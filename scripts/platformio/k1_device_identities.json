@@ -66,11 +66,24 @@
         "k1_bench_im73d_dsr16",
         "k1_bench_im73d_stm",
         "k1_bench_ws2816_1313",
+        "k1_bench_ws2816_1313_dual",
+        "k1_bench_ws2816_1313_16bit",
+        "k1_bench_ws2816_1313_harness",
         "k1_bench_reference",
         "k1_bench_reference_harness",
         "k1_bench_tempo_probe",
         "k1_custom",
         "k1_custom_rgbic"
+      ]
+    },
+    {
+      "chip_id": "C4A12900",
+      "usb_serial": "30:ED:A0:29:A1:C4",
+      "role": "Waveshare ESP32-S3 Touch AMOLED 1.75 IM69D130 bring-up",
+      "pinmap": "Waveshare devboard; IM69D130 PDM DATA GPIO17 / CLK GPIO18",
+      "advisory_port": "/dev/tty.usbmodem2101",
+      "envs": [
+        "k1_waveshare_im69d_bringup"
       ]
     }
   ],

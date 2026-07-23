@@ -74,6 +74,8 @@ conf CONFIG = {
   false,               // RESERVED_CONFIG_BYTE, kept to preserve saved-config layout
 #ifdef K1_CUSTOM_LED_V1
   2500,                // MAX_CURRENT_MA — dual-214 wall build: Captain-locked 2.5 A total @ 5 V
+#elif defined(K1_WS2816_1313_SECONDARY)
+  2000,                // MAX_CURRENT_MA — WS2816 dual-channel 2×160 rig: Captain-locked 2.0 A @ 5 V (2026-07-24)
 #else
   1500,                // MAX_CURRENT_MA
 #endif

@@ -389,6 +389,24 @@ inline SQ15x16 ui_mask_height = 0.0;
 
 inline CRGB16 *leds_scaled;
 inline CRGB *leds_out;
+#ifdef K1_WS2816_16BIT
+// Lever 2 (WS2816 optimisation plan §4, 2026-07-24): doubled 48-bit wire buffer for
+// the true-16-bit emit path — TWO wire-CRGB per WS2816 pixel (hi/lo bytes of GRB).
+// Packed from leds_scaled (CRGB16) by pack_ws2816_16bit(), emitted by a raw WS2812
+// controller — bypasses quantize_color()'s 8-bit crush AND FastLED's 8->16 map8_to_16.
+inline CRGB *leds_ws2816_wire;
+// Feature #3 (2026-07-24): runtime per-channel 8/16-bit WS2816 driver select on the
+// ONE k1_bench_ws2816_1313_16bit env. Which PACKER fills each wire buffer per frame is
+// chosen at runtime; registration is unchanged. DEFAULT = SPLIT A/B: primary bar 8-bit,
+// secondary bar 16-bit, content-synced (k1_ab_sync) so both bars show the SAME pixels the
+// same instant → an on-boot side-by-side 8-vs-16 comparison. Set via :bitdepth* / :ab_sync.
+inline uint8_t k1_bitdepth_primary = 8;    // {8,16}; 16 → pack_ws2816_16bit, else pack_ws2816_8bit
+inline uint8_t k1_bitdepth_secondary = 16; // {8,16}
+inline uint8_t k1_ab_sync = 1;             // 1 → secondary packs from leds_scaled (primary's buffer); 0 → independent
+#endif
+#ifdef ENABLE_LED_TESTMODE
+inline uint8_t k1_ledtest_pattern = 0;  // 0=off; deterministic LED test patterns armed via serial :ledtest <n> (WS2816-vs-WS2812 banding eval)
+#endif
 
 inline SQ15x16 hue_shift = 0.0; // Used in auto color cycling
 
@@ -837,6 +855,9 @@ inline void unlock_leds(){
 inline CRGB16  leds_16_secondary[160];        // Main buffer for secondary strip
 inline CRGB16 *leds_scaled_secondary;         // For scaling to actual LED count
 inline CRGB *leds_out_secondary;              // Final output buffer
+#ifdef K1_WS2816_16BIT
+inline CRGB *leds_ws2816_wire_secondary;      // Lever 2: 48-bit wire for the secondary channel (2 wire-CRGB/px)
+#endif
 
 // Secondary strip configuration
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip

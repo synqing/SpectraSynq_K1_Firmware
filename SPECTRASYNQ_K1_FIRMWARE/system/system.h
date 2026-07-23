@@ -435,6 +435,12 @@ void init_system() {
   // FastLED's power limiter undersized (or a stale higher value over-budget).
   CONFIG.MAX_CURRENT_MA = 2500;
 #endif
+#ifdef K1_WS2816_1313_SECONDARY
+  // WS2816 dual-channel 2×160 rig (2026-07-24): Captain-locked 2.0 A budget.
+  // Force over any persisted MAX_CURRENT_MA — the WS2816 persistence namespace is
+  // shared with k1_custom/k1_custom_rgbic, so a stale 2500/1500 save must not win.
+  CONFIG.MAX_CURRENT_MA = 2000;
+#endif
   enforce_compiled_audio_timing_config();
 
 #ifdef K1_MIC_IM73D_PDM_V1

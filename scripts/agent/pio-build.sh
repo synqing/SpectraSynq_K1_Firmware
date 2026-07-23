@@ -23,9 +23,9 @@ ENV="$1"
 # k1_bench_ws2816_1313 added 2026-07-15: radio-free WS2816C-1313 LED-controller
 # evaluation build. Both are non-shippable bench B489A500 profiles. This wrapper
 # still rejects upload/monitor/erase tokens below.
-ALLOWED_ENVS="k1_prod_im73d k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_dsr16 k1_custom k1_bench_ws2816_1313"
+ALLOWED_ENVS="k1_prod_im73d k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_dsr16 k1_custom k1_bench_ws2816_1313 k1_bench_ws2816_1313_dual k1_bench_ws2816_1313_16bit k1_bench_ws2816_1313_harness"
 case "$ENV" in
-  k1_prod_im73d|k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_dsr16|k1_custom|k1_bench_ws2816_1313)
+  k1_prod_im73d|k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_dsr16|k1_custom|k1_bench_ws2816_1313|k1_bench_ws2816_1313_dual|k1_bench_ws2816_1313_16bit|k1_bench_ws2816_1313_harness)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2
