@@ -356,16 +356,24 @@ def test_ledtest_serial_clamps_to_12_and_prints_legend():
     assert "LEDTEST legend" in serial
 
 
-def test_ab_sync_hotkey_present_and_flag_gated():
-    """Captain 2026-07-24: a single keystroke ('S' = Sync) toggles primary<->secondary
-    content sync for the live 8/16-bit A/B (`a`/`s` were taken by AP/VP stream). Must be
-    gated under K1_WS2816_16BIT so no flag-off/production env gains a hotkey."""
+def test_ab_sync_hotkey_in_allowlist_and_action():
+    """Captain 2026-07-24: single keystroke 'S' = Sync toggles primary<->secondary content
+    sync for the live 8/16-bit A/B ('a'/'s' were AP/VP stream). Bare bytes dispatch in TWO
+    stages — serial_hotkey_is_immediate() (allow-list GATE) then serial_handle_hotkey()
+    (action). 'S' MUST be in BOTH or the action is unreachable (this was caught on-device:
+    action present, allow-list missing ⇒ no echo). All K1_WS2816_16BIT-gated so no
+    flag-off/production env gains a hotkey."""
     menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h").read_text(encoding="utf-8")
-    assert "case 'S':" in menu, "ab_sync hotkey 'S' missing"
-    idx = menu.index("case 'S':")
-    guard_region = menu[max(0, idx - 500):idx]  # guard sits above a 3-line rationale comment
-    assert "#if defined(K1_WS2816_16BIT)" in guard_region, "'S' hotkey must be K1_WS2816_16BIT-gated"
-    block = menu[idx:idx + 400]
+    # stage 1 — allow-list gate (up to the shared `return true;`): 'S' must be listed
+    imm = menu.index("bool serial_hotkey_is_immediate")
+    allow = menu[imm:menu.index("return true;", imm)]
+    assert "case 'S':" in allow, "'S' missing from serial_hotkey_is_immediate allow-list ⇒ action never runs"
+    assert "#if defined(K1_WS2816_16BIT)" in allow, "'S' allow-list entry must be K1_WS2816_16BIT-gated"
+    # stage 2 — action switch: toggles k1_ab_sync, echoes AB_SYNC, gated
+    action = menu[menu.index("return true;", imm):]
+    idx = action.index("case 'S':")
+    assert "#if defined(K1_WS2816_16BIT)" in action[max(0, idx - 500):idx], "'S' action must be gated"
+    block = action[idx:idx + 400]
     assert "k1_ab_sync" in block and "AB_SYNC" in block, "'S' must toggle k1_ab_sync / echo AB_SYNC"
     # 'a' (AP_STREAM) and 's' (VP_STREAM) remain distinct, unchanged hotkeys
     assert "AP_STREAM_ENABLED = !AP_STREAM_ENABLED;" in menu

@@ -1633,6 +1633,10 @@ bool serial_hotkey_is_immediate(char key) {
     case 's':
     case 'd':
     case 'f':
+#if defined(K1_WS2816_16BIT)
+    case 'S':  // ab_sync toggle (WS2816 bench): allow-list gate — the byte must be here
+               // OR serial_handle_hotkey('S') is never called. Action in that switch.
+#endif
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
     case 'v':
 #endif
