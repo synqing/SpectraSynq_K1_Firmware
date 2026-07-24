@@ -514,47 +514,53 @@ inline void quantize_color(bool temporal_dithering) {
 // independent of ab_sync / bit-depth / show-path order. No-op unless armed via ':ledtest <n>'.
 // NON-SHIPPABLE — ENABLE_LED_TESTMODE lives only in bench/harness envs.
 //
-// PATTERN LEGEND — n : name : PRECISE per-pixel level (all channels 0..1 unless noted):
-//    0  off           normal audio render (returns immediately; no write)
-//    1  white         1.00 all px                    (DOA / uniformity / power draw)
-//    2  solid-50      0.50 all px                    (flat-level banding ref)
-//    3  solid-10      0.10 all px                    (flat-level banding ref)
-//    4  ramp          tri: 0->1->0 over ~20 s        (full-range brightness sweep)
-//    5  low-ramp      tri*0.10: 0->0.10->0 over ~20s (bottom-10% 8-vs-16 banding; DIM by
-//                     design — verified peak 0.10 == 16b 6553/65535, 8b 25/255; NEVER white)
-//    6  spatial-ramp  px i = i/(count-1): static 0->1 across the strip
-//    7  red           (1,0,0) all px                 (per-channel / dead-channel)
-//    8  green         (0,1,0) all px
-//    9  blue          (0,0,1) all px
-//   10  rgb-thirds    [0,1/3) red, [1/3,2/3) green, rest blue   (white-balance / thirds)
-//   11  walk          one 1.00 white px at (millis()/50)%count, rest off  (seam / dead-px /
-//                     ordering — walks the px79/80 split seam)
-//   12  checker       1.00 white where (i&1), else off          (addressing / crosstalk)
+// PATTERN LEGEND — the COLOUR-DEPTH suite. Patterns 2-9 are gradients engineered
+// so the 8-bit packer POSTERIZES into visible plateaus while the 16-bit packer stays
+// smooth — the whole reason WS2816 exists. Full-range ramps do NOT reveal the win
+// (160 px < 256 codes ⇒ 8-bit has "enough" codes; pattern 10 is that control), so the
+// gradients are DARK / NARROW-RANGE (dim peaks 0.08/0.12). Plateau widths host-verified
+// (docs/research/ws2816-vs-ws2812, grad_tune): 6-34 px, robust to LGP diffusion. On the
+// two-bar bench (primary=8-bit / secondary=16-bit, ab_sync) each is a same-instant A/B.
+// NB temporal dither (CONFIG.TEMPORAL_DITHERING) PARTLY HIDES 8-bit banding — use
+// ':temporal_dithering=false' for the raw win, '=true' for the shipped case. f=i/(count-1):
+//    0  off              normal audio render (returns immediately; no write)
+//    1  white            1.00 all px                            (DOA / uniformity / power)
+//    2  grad-grey        r=g=b = 0.08*f       blk->8%  neutral  (canonical banding)
+//    3  grad-blue        b     = 0.08*f       blk->8%  blue     (worst-banding hue, dark)
+//    4  grad-red         r     = 0.12*f       blk->12% red
+//    5  grad-amber       r=0.12*f, g=0.048*f  blk->dim amber    (hue-drift banding)
+//    6  grad-blend       r=0.08*f, g=0.08*(1-f), b=0.08   dim teal<->magenta glide
+//    7  grad-perc-blue   b     = 0.12*f^2.2   dark-detail: 16b resolves the near-black
+//    8  grad-mid         r=g=b = 0.42+0.12*f  mid-tone banding (not just the dark end)
+//    9  grad-warm        r=0.08*f,g=.068*f,b=.048*f   dim warm-white (colour-temp banding)
+//   10  grad-full        r=g=b = f            blk->white CONTROL (should NOT band)
+//   11  walk             one 1.00 px at (millis()/50)%count     (seam px79/80 / dead-px)
+//   12  checker          1.00 where (i&1), else off             (addressing / crosstalk)
 inline void k1_ledtest_apply(CRGB16* buf, uint16_t count) {
   const uint8_t pattern = k1_ledtest_pattern;
   if (pattern == 0 || buf == nullptr || count == 0) return;
   const uint32_t ms = millis();
-  const float t = (ms % 20000) / 20000.0f;                          // 0..1 over 20 s
-  const float tri = (t < 0.5f) ? (t * 2.0f) : ((1.0f - t) * 2.0f);  // 0->1->0
-  const uint16_t walk = (uint16_t)((ms / 50) % count);              // pattern 11 position
+  const uint16_t walk = (uint16_t)((ms / 50) % count);   // pattern 11 position
+  const float LO = 0.08f, MD = 0.12f;                    // dim peaks (host-verified plateaus)
   for (uint16_t i = 0; i < count; i++) {
-    SQ15x16 r = SQ15x16(0), g = SQ15x16(0), b = SQ15x16(0);
+    const float f = (count > 1) ? (float(i) / float(count - 1)) : 0.0f;
+    float r = 0.0f, g = 0.0f, b = 0.0f;
     switch (pattern) {
-      case 1:  r = g = b = SQ15x16(1);             break;  // full white
-      case 2:  r = g = b = SQ15x16(0.5f);          break;  // 50%
-      case 3:  r = g = b = SQ15x16(0.10f);         break;  // 10%
-      case 4:  r = g = b = SQ15x16(tri);           break;  // full temporal ramp 0->1->0
-      case 5:  r = g = b = SQ15x16(tri * 0.10f);   break;  // LOW ramp 0->0.10->0 (DIM; peaks 0.10)
-      case 6:  { float v = (count > 1) ? (float(i) / float(count - 1)) : 0.0f; r = g = b = SQ15x16(v); break; }
-      case 7:  r = SQ15x16(1);                     break;  // red
-      case 8:  g = SQ15x16(1);                     break;  // green
-      case 9:  b = SQ15x16(1);                     break;  // blue
-      case 10: { uint16_t third = count / 3; if (i < third) r = SQ15x16(1); else if (i < 2 * third) g = SQ15x16(1); else b = SQ15x16(1); break; }
-      case 11: if (i == walk) { r = g = b = SQ15x16(1); }  break;  // walking white px
-      case 12: if (i & 1)     { r = g = b = SQ15x16(1); }  break;  // checkerboard
+      case 1:  r = g = b = 1.0f;                                   break;  // white
+      case 2:  r = g = b = LO * f;                                 break;  // grad-grey
+      case 3:  b = LO * f;                                         break;  // grad-blue
+      case 4:  r = MD * f;                                         break;  // grad-red
+      case 5:  r = MD * f; g = 0.40f * MD * f;                     break;  // grad-amber
+      case 6:  r = LO * f; g = LO * (1.0f - f); b = LO;            break;  // grad-blend
+      case 7:  b = MD * powf(f, 2.2f);                             break;  // grad-perc-blue
+      case 8:  r = g = b = 0.42f + 0.12f * f;                      break;  // grad-mid
+      case 9:  r = LO * f; g = 0.85f * LO * f; b = 0.60f * LO * f; break;  // grad-warm
+      case 10: r = g = b = f;                                      break;  // grad-full (control)
+      case 11: if (i == walk) { r = g = b = 1.0f; }                break;  // walk
+      case 12: if (i & 1)     { r = g = b = 1.0f; }                break;  // checker
       default: break;
     }
-    buf[i].r = r; buf[i].g = g; buf[i].b = b;
+    buf[i].r = SQ15x16(r); buf[i].g = SQ15x16(g); buf[i].b = SQ15x16(b);
   }
 }
 #endif  // ENABLE_LED_TESTMODE

@@ -430,8 +430,8 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
     // Legend mirrors k1_ledtest_apply() in visual/led_utilities.h.
     else if (strcmp(command_type, "ledtest") == 0) {
       static const char* const K1_LEDTEST_NAMES[] = {
-        "off", "white", "solid-50", "solid-10", "ramp", "low-ramp", "spatial-ramp",
-        "red", "green", "blue", "rgb-thirds", "walk", "checker"};
+        "off", "white", "grad-grey", "grad-blue", "grad-red", "grad-amber",
+        "grad-blend", "grad-perc-blue", "grad-mid", "grad-warm", "grad-full", "walk", "checker"};
       const uint8_t K1_LEDTEST_MAX = 12;
       if (command_data[0] == '\0' || strcmp(command_data, "list") == 0) {
         tx_begin();

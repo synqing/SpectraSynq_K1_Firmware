@@ -254,54 +254,119 @@ def test_ledtest_applied_to_BOTH_primary_and_secondary_buffers():
     assert "#ifdef ENABLE_LED_TESTMODE" in text
 
 
-def test_ledtest_pattern5_is_dim_not_white():
-    """Defect #2: :ledtest=5 must be a LOW ramp peaking at ~10% — NEVER full white.
-    Extract the case-5 multiplier straight from source and prove the emitted peak."""
+def test_ledtest_gradients_are_dim_never_white():
+    """The colour-depth gradients (2-9) must be DIM by design (peaks <= 12%, never a
+    white-out). Extract the peak constants from source and prove the emitted peak."""
     text = LED_UTILS.read_text(encoding="utf-8")
-    m = re.search(r"case 5:\s*r = g = b = SQ15x16\(tri \* ([0-9.]+)f\);", text)
-    assert m, "pattern 5 must be `SQ15x16(tri * <k>f)` (a scaled-down ramp)"
-    mult = float(m.group(1))
-    assert mult == 0.10, f"pattern 5 multiplier must be 0.10 (bottom-10%), got {mult}"
-    # tri peaks at 1.0 ⇒ peak level == mult. Replicate the SQ15x16→16-bit emit exactly:
-    # internal = int32(0.10*65536)=6553 ⇒ f=6553/65536 ⇒ wire=int(f*65535+0.5).
-    internal = int(mult * 65536.0)
-    f = internal / 65536.0
-    wire16 = int(f * 65535.0 + 0.5)
-    assert wire16 == 6553, f"case-5 peak must emit 6553/65535 (~10%), got {wire16}"
-    assert wire16 < 6554 and (100.0 * wire16 / 65535.0) < 12.0  # provably dim, never white
-    # and case 1 (white) must be the full-scale reference it is NOT
-    assert "case 1:  r = g = b = SQ15x16(1);" in text
+    m = re.search(r"const float LO = ([0-9.]+)f, MD = ([0-9.]+)f;", text)
+    assert m, "gradient dim-peak constants LO/MD must be defined"
+    lo, md = float(m.group(1)), float(m.group(2))
+    assert lo <= 0.10 and md <= 0.12, f"gradient peaks must stay dim (LO={lo}, MD={md})"
+    for peak in (lo, md):
+        internal = int(peak * 65536.0)                 # SQ15x16 truncation
+        wire16 = int(internal / 65536.0 * 65535.0 + 0.5)
+        assert wire16 < 8000, f"peak {peak} emits {wire16}/65535 — must be dim, never white"
+    assert "case 1:  r = g = b = 1.0f;" in text        # white is the full-scale reference
 
 
-def test_ledtest_full_pattern_suite_0_to_12():
-    """The comprehensive deterministic suite: all 13 cases present with the documented
-    levels, incl. the seam-walk and checkerboard addressing patterns."""
+def test_ledtest_gradient_suite_present():
+    """The colour-depth gradient suite (2-9) + full-range control (10) + utilities,
+    with the EXACT per-channel formulas (so the test can't drift from source)."""
     text = LED_UTILS.read_text(encoding="utf-8")
-    assert "case 2:  r = g = b = SQ15x16(0.5f);" in text          # 50%
-    assert "case 3:  r = g = b = SQ15x16(0.10f);" in text         # 10%
-    assert "case 4:  r = g = b = SQ15x16(tri);" in text           # full ramp
-    assert "case 7:  r = SQ15x16(1);" in text                     # red
-    assert "case 8:  g = SQ15x16(1);" in text                     # green
-    assert "case 9:  b = SQ15x16(1);" in text                     # blue
-    assert "float(i) / float(count - 1)" in text                  # spatial ramp (6)
-    # walking single pixel (11) — deterministic position, seam continuity test
-    assert "const uint16_t walk = (uint16_t)((ms / 50) % count);" in text
-    assert "case 11: if (i == walk) { r = g = b = SQ15x16(1); }" in text
-    # checkerboard (12) — addressing / crosstalk
-    assert "case 12: if (i & 1)     { r = g = b = SQ15x16(1); }" in text
+    assert "case 1:  r = g = b = 1.0f;" in text                          # white
+    assert "case 2:  r = g = b = LO * f;" in text                        # grad-grey
+    assert "case 3:  b = LO * f;" in text                                # grad-blue
+    assert "case 4:  r = MD * f;" in text                                # grad-red
+    assert "case 5:  r = MD * f; g = 0.40f * MD * f;" in text            # grad-amber
+    assert "case 6:  r = LO * f; g = LO * (1.0f - f); b = LO;" in text    # grad-blend
+    assert "case 7:  b = MD * powf(f, 2.2f);" in text                    # grad-perc-blue
+    assert "case 8:  r = g = b = 0.42f + 0.12f * f;" in text             # grad-mid
+    assert "case 10: r = g = b = f;" in text                             # grad-full (control)
+    assert "case 11: if (i == walk) { r = g = b = 1.0f; }" in text       # walk
+    assert "case 12: if (i & 1)     { r = g = b = 1.0f; }" in text       # checker
+    assert "const float f = (count > 1) ? (float(i) / float(count - 1)) : 0.0f;" in text
+
+
+def test_ledtest_gradients_posterize_8bit_smooth_16bit():
+    """ARTEFACT-BOUNDARY GATE — the whole reason these patterns exist. Replicate the
+    EXACT device packer math and prove each depth gradient (2-9) POSTERIZES on the 8-bit
+    wire (wide plateaus) while the 16-bit wire stays smooth. A null A/B here (both bars
+    identical) would make the Captain's eyes-on worthless. Control (10) must NOT band."""
+    COUNT = 160
+
+    def sq(x):
+        x = 0.0 if x < 0 else (1.0 if x > 1 else x)
+        return int(x * 65536) / 65536.0            # SQ15x16 truncation
+
+    def w16(v):
+        return int(sq(v) * 65535.0 + 0.5)          # k1_ws2816_to16
+
+    def w8(v):
+        return int(sq(v) * 255.0)                  # uint8_t(src*255); *257 is monotone in v8
+
+    def plateau_distinct(vs):
+        c8 = [w8(v) for v in vs]
+        c16 = [w16(v) for v in vs]
+        run = best = 1
+        for k in range(1, len(c8)):
+            run = run + 1 if c8[k] == c8[k - 1] else 1
+            best = max(best, run)
+        return best, len(set(c8)), len(set(c16))
+
+    LO, MD = 0.08, 0.12
+    fs = [i / (COUNT - 1) for i in range(COUNT)]
+    grad = {                                        # mirrors k1_ledtest_apply cases 2-9
+        2: [lambda f: LO * f, lambda f: LO * f, lambda f: LO * f],
+        3: [lambda f: 0, lambda f: 0, lambda f: LO * f],
+        4: [lambda f: MD * f, lambda f: 0, lambda f: 0],
+        5: [lambda f: MD * f, lambda f: 0.40 * MD * f, lambda f: 0],
+        6: [lambda f: LO * f, lambda f: LO * (1 - f), lambda f: LO],
+        7: [lambda f: 0, lambda f: 0, lambda f: MD * (f ** 2.2)],
+        8: [lambda f: 0.42 + 0.12 * f, lambda f: 0.42 + 0.12 * f, lambda f: 0.42 + 0.12 * f],
+        9: [lambda f: LO * f, lambda f: 0.85 * LO * f, lambda f: 0.60 * LO * f],
+    }
+    for pat, chans in grad.items():
+        banded = False
+        for fn in chans:
+            vs = [fn(f) for f in fs]
+            if max(vs) <= 0 or len(set(w8(v) for v in vs)) <= 1:
+                continue                            # dead or flat channel
+            plateau, d8, d16 = plateau_distinct(vs)
+            if plateau >= 5 and d16 >= 2 * d8:
+                banded = True
+                break
+        assert banded, f"pattern {pat} does NOT posterize 8-bit vs 16-bit — null A/B, worthless"
+
+    plateau, d8, d16 = plateau_distinct(fs)          # control (10): full-range ramp
+    assert plateau <= 2 and d8 >= 150, "control pattern 10 must NOT band (full-range ⇒ no win)"
 
 
 def test_ledtest_serial_clamps_to_12_and_prints_legend():
     """Serial must clamp :ledtest to [0,12], echo the pattern NAME, and print a numbered
-    legend for a bare `:ledtest` or `:ledtest=list`."""
+    legend for a bare `:ledtest` or `:ledtest=list`. Legend names = the gradient suite."""
     serial = SERIAL_CMD.read_text(encoding="utf-8")
     assert "const uint8_t K1_LEDTEST_MAX = 12;" in serial
     assert "constrain(atoi(command_data), 0, K1_LEDTEST_MAX)" in serial
-    # name table drives the echoed name (e.g. "LEDTEST: 5 low-ramp")
     assert "static const char* const K1_LEDTEST_NAMES[]" in serial
-    for name in ("off", "white", "low-ramp", "spatial-ramp", "rgb-thirds", "walk", "checker"):
+    for name in ("off", "white", "grad-grey", "grad-blue", "grad-perc-blue",
+                 "grad-full", "walk", "checker"):
         assert f'"{name}"' in serial, f"legend name {name!r} missing"
     assert 'USBSerial.print("LEDTEST: ");' in serial
-    # bare `:ledtest` (empty data) or `:ledtest=list` prints the legend
     assert "command_data[0] == '\\0' || strcmp(command_data, \"list\") == 0" in serial
     assert "LEDTEST legend" in serial
+
+
+def test_ab_sync_hotkey_present_and_flag_gated():
+    """Captain 2026-07-24: a single keystroke ('S' = Sync) toggles primary<->secondary
+    content sync for the live 8/16-bit A/B (`a`/`s` were taken by AP/VP stream). Must be
+    gated under K1_WS2816_16BIT so no flag-off/production env gains a hotkey."""
+    menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+    assert "case 'S':" in menu, "ab_sync hotkey 'S' missing"
+    idx = menu.index("case 'S':")
+    guard_region = menu[max(0, idx - 500):idx]  # guard sits above a 3-line rationale comment
+    assert "#if defined(K1_WS2816_16BIT)" in guard_region, "'S' hotkey must be K1_WS2816_16BIT-gated"
+    block = menu[idx:idx + 400]
+    assert "k1_ab_sync" in block and "AB_SYNC" in block, "'S' must toggle k1_ab_sync / echo AB_SYNC"
+    # 'a' (AP_STREAM) and 's' (VP_STREAM) remain distinct, unchanged hotkeys
+    assert "AP_STREAM_ENABLED = !AP_STREAM_ENABLED;" in menu
+    assert "VP_STREAM_ENABLED = !VP_STREAM_ENABLED;" in menu

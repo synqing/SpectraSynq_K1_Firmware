@@ -2008,6 +2008,17 @@ bool serial_hotkey_is_immediate(char key) {
       USBSerial.print("VP_STREAM: ");
       USBSerial.println(VP_STREAM_ENABLED ? "on" : "off");
       break;
+#if defined(K1_WS2816_16BIT)
+    // Captain 2026-07-24: single-key toggle for the primary<->secondary content sync
+    // (the live 8-bit-vs-16-bit A/B). 'a'/'s' were taken (AP/VP stream); 'S' = Sync.
+    // Bench-only — gated under K1_WS2816_16BIT so no flag-off/production env gains a hotkey.
+    case 'S':
+      k1_ab_sync = (k1_ab_sync != 0) ? 0 : 1;
+      USBSerial.print("AB_SYNC: ");
+      USBSerial.println(k1_ab_sync ? "on (both bars mirror same content — 8b vs 16b A/B)"
+                                   : "off (secondary renders independently)");
+      break;
+#endif
     case 'd':
       stream_agc_debug = !stream_agc_debug;
       USBSerial.print("STREAM_AGC_DEBUG: ");

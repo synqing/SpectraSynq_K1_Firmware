@@ -183,6 +183,18 @@ The 4-pad WS2816C-1313-4P exposes only DI/DO (1=VDD, 2=DO, 3=GND, 4=DI) — it h
 
 ---
 
+### Update — 2026-07-24: depth arm (H1) implemented as COLOUR-DEPTH GRADIENTS, not solids
+
+The first `:ledtest` suite tested only *liveness* (solid white/50%/10%, solid R/G/B, thirds) — it could not reveal bit-depth at all, because **8-bit posterization is only visible in dark, narrow-range gradients.** Plateau width ≈ `count / 8-bit-code-span`; a full-range 0→1 ramp over 160 px spans ~255 codes at ~1.6 codes/px ⇒ no visible plateaus (160 px < 256 codes — 8-bit has "enough"). The win lives in the **dark, range-compressed** region.
+
+`:ledtest` patterns **2–9 are now colour-depth gradients** (`k1_ledtest_apply`, `led_utilities.h`), dim by design (peaks 0.08/0.12): grad-grey, grad-blue, grad-red, grad-amber, grad-blend (teal↔magenta), grad-perc-blue (f²·², dark-detail), grad-mid (mid-tone), grad-warm; **10 = grad-full is the full-range CONTROL** that proves a full-range ramp does *not* band (so a null there ≠ "16-bit useless"). Built with direct per-channel float ramps (NOT `hsv()`, whose internal CHSV is 8-bit and would confound the A/B). On the runtime split bench (primary bar = 8-bit packer, secondary = 16-bit, `ab_sync`), each pattern is a **same-instant A/B**.
+
+**Artefact-boundary proof (before any eyes-on):** `grad_tune.py` (this dir) + the pytest gate `test_ledtest_gradients_posterize_8bit_smooth_16bit` replicate the EXACT device packer math (`sq→w8/w16`) and assert every gradient posterizes on 8-bit (**plateaus 6–34 px**, robust to LGP diffusion) while 16-bit stays smooth (≈160 distinct); the control does not band. This forecloses a null (both-bars-identical) A/B that would waste the eyes-on.
+
+**The H1 test is a dither toggle.** `grad_tune` shows temporal dither (`CONFIG.TEMPORAL_DITHERING`) recovers 8-bit from 21–31 raw levels to **82–123 effective levels** — so `:temporal_dithering=false` shows the raw 16-bit win, `=true` (the shipped path) shows how much dither already closes it. That B-vs-A-with-dither delta *is* the WS2816-depth adoption question this doc predicted would likely be small. New `S` hotkey toggles `ab_sync` for live A/B on real audio. Firmware: `led_utilities.h` `k1_ledtest_apply`; `serial/serial_cmd_handlers.cpp` (legend); `serial/serial_menu.h` (`S`); `grad_tune.py`; `tests/test_ws2816_16bit_static.py`.
+
+---
+
 ## Sources
 Crux verdicts + digest (this evaluation's inputs) and depth files under `scratchpad/ws2816_eval/`: `measurement-methodology.md`, `k1-rig-feasibility.md`, `k1-bitdepth-audit.md`, `fastled-ws2816-internals.md`, `ws2816-datasheet.md`, `ws2812-baseline.md`, `industry-comparative.md`, plus the datasheet PDFs (`ws2816c-1313-4p_gainer.pdf`, `ws2812b_adafruit.pdf`).
 Firmware: `SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h:440-498,1063-1074,1129-1130`; `system/constants.h:124-128,259-263,480,516-522,580-584`; `diag/vpab_capture.cpp:421-458,751-757`; `platformio.ini:471-479`; `serial/serial_cmd_table.def:58-59`.
@@ -194,3 +206,4 @@ Standards/method: IEEE 1789-2015 (flicker% / flicker-index / risk zones); CIE TN
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-24 | agent:research-swarm (synthesis / evaluation-methodology lens) | Created: falsifiable WS2816-vs-WS2812 K1-bench protocol — five hypotheses with pass/fail thresholds, metrics→method map, minimal camera-as-photometer rig + K1 self-evidence surfaces, the three-arm (16-bit / 8-bit-fed / WS2812) confound, phased desk→camera→instruments plan, and an honest "likely imperceptible" section. Consumes three CONFIRMED crux verdicts + seven-lens digest. |
+| 2026-07-24 | agent:claude-code | Added §Update: H1 depth arm implemented as COLOUR-DEPTH GRADIENTS (`:ledtest` 2–9) replacing the liveness-only solids; committed `grad_tune.py` artefact-boundary proof + pytest posterization gate (plateaus 6–34 px on 8-bit, smooth 16-bit); documented the dither toggle as the actual H1 test and the new `S`=ab_sync hotkey. |
