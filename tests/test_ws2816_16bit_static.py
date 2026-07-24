@@ -233,3 +233,75 @@ def test_new_envs_registered_for_guard_and_compile_wrapper():
     for env in ("k1_bench_ws2816_1313_16bit", "k1_bench_ws2816_1313_harness"):
         assert env in bench["envs"], f"{env} missing from B489A500 guard allowlist"
         assert env in pio, f"{env} missing from pio-build.sh allowlist"
+
+
+# ── LED test-mode: A/B routing fix + comprehensive pattern suite ─────────────
+
+def test_ledtest_applied_to_BOTH_primary_and_secondary_buffers():
+    """Defect #1: the test pattern must drive BOTH final buffers, else one bar shows
+    the pattern and the other shows the (mis-routed) audio frame. Both writes must be
+    ENABLE_LED_TESTMODE-gated so flag-off envs stay byte-identical."""
+    text = LED_UTILS.read_text(encoding="utf-8")
+    # primary final buffer, before the primary packer
+    assert "k1_ledtest_apply(leds_scaled, CONFIG.LED_COUNT);" in text
+    # secondary final buffer, before the secondary packer (the fix)
+    assert "k1_ledtest_apply(leds_scaled_secondary, SECONDARY_LED_COUNT);" in text
+    # while armed, the secondary must bypass ab_sync and pack from its OWN buffer,
+    # so render order / ab_sync can never leak the primary's audio frame onto it.
+    assert "if (k1_ledtest_pattern != 0) sec_src = leds_scaled_secondary;" in text
+    # both writes live behind the dev flag (flag-off = byte-identical)
+    assert text.count("k1_ledtest_apply(") >= 2
+    assert "#ifdef ENABLE_LED_TESTMODE" in text
+
+
+def test_ledtest_pattern5_is_dim_not_white():
+    """Defect #2: :ledtest=5 must be a LOW ramp peaking at ~10% — NEVER full white.
+    Extract the case-5 multiplier straight from source and prove the emitted peak."""
+    text = LED_UTILS.read_text(encoding="utf-8")
+    m = re.search(r"case 5:\s*r = g = b = SQ15x16\(tri \* ([0-9.]+)f\);", text)
+    assert m, "pattern 5 must be `SQ15x16(tri * <k>f)` (a scaled-down ramp)"
+    mult = float(m.group(1))
+    assert mult == 0.10, f"pattern 5 multiplier must be 0.10 (bottom-10%), got {mult}"
+    # tri peaks at 1.0 ⇒ peak level == mult. Replicate the SQ15x16→16-bit emit exactly:
+    # internal = int32(0.10*65536)=6553 ⇒ f=6553/65536 ⇒ wire=int(f*65535+0.5).
+    internal = int(mult * 65536.0)
+    f = internal / 65536.0
+    wire16 = int(f * 65535.0 + 0.5)
+    assert wire16 == 6553, f"case-5 peak must emit 6553/65535 (~10%), got {wire16}"
+    assert wire16 < 6554 and (100.0 * wire16 / 65535.0) < 12.0  # provably dim, never white
+    # and case 1 (white) must be the full-scale reference it is NOT
+    assert "case 1:  r = g = b = SQ15x16(1);" in text
+
+
+def test_ledtest_full_pattern_suite_0_to_12():
+    """The comprehensive deterministic suite: all 13 cases present with the documented
+    levels, incl. the seam-walk and checkerboard addressing patterns."""
+    text = LED_UTILS.read_text(encoding="utf-8")
+    assert "case 2:  r = g = b = SQ15x16(0.5f);" in text          # 50%
+    assert "case 3:  r = g = b = SQ15x16(0.10f);" in text         # 10%
+    assert "case 4:  r = g = b = SQ15x16(tri);" in text           # full ramp
+    assert "case 7:  r = SQ15x16(1);" in text                     # red
+    assert "case 8:  g = SQ15x16(1);" in text                     # green
+    assert "case 9:  b = SQ15x16(1);" in text                     # blue
+    assert "float(i) / float(count - 1)" in text                  # spatial ramp (6)
+    # walking single pixel (11) — deterministic position, seam continuity test
+    assert "const uint16_t walk = (uint16_t)((ms / 50) % count);" in text
+    assert "case 11: if (i == walk) { r = g = b = SQ15x16(1); }" in text
+    # checkerboard (12) — addressing / crosstalk
+    assert "case 12: if (i & 1)     { r = g = b = SQ15x16(1); }" in text
+
+
+def test_ledtest_serial_clamps_to_12_and_prints_legend():
+    """Serial must clamp :ledtest to [0,12], echo the pattern NAME, and print a numbered
+    legend for a bare `:ledtest` or `:ledtest=list`."""
+    serial = SERIAL_CMD.read_text(encoding="utf-8")
+    assert "const uint8_t K1_LEDTEST_MAX = 12;" in serial
+    assert "constrain(atoi(command_data), 0, K1_LEDTEST_MAX)" in serial
+    # name table drives the echoed name (e.g. "LEDTEST: 5 low-ramp")
+    assert "static const char* const K1_LEDTEST_NAMES[]" in serial
+    for name in ("off", "white", "low-ramp", "spatial-ramp", "rgb-thirds", "walk", "checker"):
+        assert f'"{name}"' in serial, f"legend name {name!r} missing"
+    assert 'USBSerial.print("LEDTEST: ");' in serial
+    # bare `:ledtest` (empty data) or `:ledtest=list` prints the legend
+    assert "command_data[0] == '\\0' || strcmp(command_data, \"list\") == 0" in serial
+    assert "LEDTEST legend" in serial

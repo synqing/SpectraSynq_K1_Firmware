@@ -506,30 +506,52 @@ inline void quantize_color(bool temporal_dithering) {
 
 #ifdef ENABLE_LED_TESTMODE
 // Deterministic, audio-independent LED test patterns for the WS2816-vs-WS2812 banding
-// eval (docs/research/ws2816-vs-ws2812/EVALUATION-METHODOLOGY.md). Overwrites the final
-// 16-bit buffer (leds_scaled) JUST BEFORE the encoder, so it drives EXACT commanded
-// levels — bypassing audio / brightness / silence scaling — through whichever encoder
-// is active (8-bit quantize_color OR the 16-bit packer). The SAME pattern on the 8-bit
-// and 16-bit builds is the controlled A/B. No-op unless armed via serial ':ledtest <n>'.
+// eval (docs/research/ws2816-vs-ws2812/EVALUATION-METHODOLOGY.md). Writes EXACT commanded
+// levels into a final CRGB16 buffer JUST BEFORE its encoder — bypassing audio / brightness
+// / silence scaling — through whichever packer is active (8-bit or 16-bit). This is called
+// on BOTH the primary (leds_scaled) AND the secondary (leds_scaled_secondary) final buffers
+// with the SAME formula + SAME count, so both bars render pixel-identically every frame,
+// independent of ab_sync / bit-depth / show-path order. No-op unless armed via ':ledtest <n>'.
 // NON-SHIPPABLE — ENABLE_LED_TESTMODE lives only in bench/harness envs.
-//   1 = temporal global ramp (slow 0->1->0 over 20 s) — the low-light banding test
-//   2 = spatial ramp (static 0->1 across the strip)
-//   3 = mid grey (0.5 all)
-//   4 = R / G / B thirds (colour / white-balance)
-//   5 = LOW temporal ramp (0->0.10->0) — the bottom 10% where 16-bit vs 8-bit differs most
+//
+// PATTERN LEGEND — n : name : PRECISE per-pixel level (all channels 0..1 unless noted):
+//    0  off           normal audio render (returns immediately; no write)
+//    1  white         1.00 all px                    (DOA / uniformity / power draw)
+//    2  solid-50      0.50 all px                    (flat-level banding ref)
+//    3  solid-10      0.10 all px                    (flat-level banding ref)
+//    4  ramp          tri: 0->1->0 over ~20 s        (full-range brightness sweep)
+//    5  low-ramp      tri*0.10: 0->0.10->0 over ~20s (bottom-10% 8-vs-16 banding; DIM by
+//                     design — verified peak 0.10 == 16b 6553/65535, 8b 25/255; NEVER white)
+//    6  spatial-ramp  px i = i/(count-1): static 0->1 across the strip
+//    7  red           (1,0,0) all px                 (per-channel / dead-channel)
+//    8  green         (0,1,0) all px
+//    9  blue          (0,0,1) all px
+//   10  rgb-thirds    [0,1/3) red, [1/3,2/3) green, rest blue   (white-balance / thirds)
+//   11  walk          one 1.00 white px at (millis()/50)%count, rest off  (seam / dead-px /
+//                     ordering — walks the px79/80 split seam)
+//   12  checker       1.00 white where (i&1), else off          (addressing / crosstalk)
 inline void k1_ledtest_apply(CRGB16* buf, uint16_t count) {
   const uint8_t pattern = k1_ledtest_pattern;
   if (pattern == 0 || buf == nullptr || count == 0) return;
-  float t = (millis() % 20000) / 20000.0f;
-  float tri = (t < 0.5f) ? (t * 2.0f) : ((1.0f - t) * 2.0f);
+  const uint32_t ms = millis();
+  const float t = (ms % 20000) / 20000.0f;                          // 0..1 over 20 s
+  const float tri = (t < 0.5f) ? (t * 2.0f) : ((1.0f - t) * 2.0f);  // 0->1->0
+  const uint16_t walk = (uint16_t)((ms / 50) % count);              // pattern 11 position
   for (uint16_t i = 0; i < count; i++) {
     SQ15x16 r = SQ15x16(0), g = SQ15x16(0), b = SQ15x16(0);
     switch (pattern) {
-      case 1: r = g = b = SQ15x16(tri); break;
-      case 2: { float v = (count > 1) ? (float(i) / float(count - 1)) : 0.0f; r = g = b = SQ15x16(v); break; }
-      case 3: r = g = b = SQ15x16(0.5f); break;
-      case 4: { uint16_t third = count / 3; if (i < third) r = SQ15x16(1); else if (i < 2 * third) g = SQ15x16(1); else b = SQ15x16(1); break; }
-      case 5: r = g = b = SQ15x16(tri * 0.10f); break;
+      case 1:  r = g = b = SQ15x16(1);             break;  // full white
+      case 2:  r = g = b = SQ15x16(0.5f);          break;  // 50%
+      case 3:  r = g = b = SQ15x16(0.10f);         break;  // 10%
+      case 4:  r = g = b = SQ15x16(tri);           break;  // full temporal ramp 0->1->0
+      case 5:  r = g = b = SQ15x16(tri * 0.10f);   break;  // LOW ramp 0->0.10->0 (DIM; peaks 0.10)
+      case 6:  { float v = (count > 1) ? (float(i) / float(count - 1)) : 0.0f; r = g = b = SQ15x16(v); break; }
+      case 7:  r = SQ15x16(1);                     break;  // red
+      case 8:  g = SQ15x16(1);                     break;  // green
+      case 9:  b = SQ15x16(1);                     break;  // blue
+      case 10: { uint16_t third = count / 3; if (i < third) r = SQ15x16(1); else if (i < 2 * third) g = SQ15x16(1); else b = SQ15x16(1); break; }
+      case 11: if (i == walk) { r = g = b = SQ15x16(1); }  break;  // walking white px
+      case 12: if (i & 1)     { r = g = b = SQ15x16(1); }  break;  // checkerboard
       default: break;
     }
     buf[i].r = r; buf[i].g = g; buf[i].b = b;
@@ -2545,6 +2567,18 @@ inline void show_secondary_leds() {
   // leds_scaled and leds_scaled_secondary are CRGB16 and SECONDARY_LED_COUNT == CONFIG.LED_COUNT
   // (160) on this bench rig, so the sizes match. k1_ab_sync == 0 → independent (as before).
   const CRGB16* sec_src = (k1_ab_sync != 0) ? leds_scaled : leds_scaled_secondary;
+#ifdef ENABLE_LED_TESTMODE
+  // A/B test patterns must drive BOTH bars pixel-identically — regardless of ab_sync,
+  // bit-depth, or show-path order. show_secondary_leds() packs HERE, but the primary's
+  // ledtest hook writes leds_scaled LATER in show_leds(); with ab_sync=1 (sec_src ==
+  // leds_scaled) this bar would otherwise pack the primary's stale AUDIO frame and only
+  // the primary would show the pattern (the observed "one bar bright, one dim" defect).
+  // Fix: write the SAME deterministic pattern into the secondary's OWN final buffer and
+  // pack from it, bypassing ab_sync while armed. Same formula + same count as the primary
+  // ⇒ byte-identical wire. No-op (and ab_sync untouched) when disarmed (pattern 0).
+  k1_ledtest_apply(leds_scaled_secondary, SECONDARY_LED_COUNT);
+  if (k1_ledtest_pattern != 0) sec_src = leds_scaled_secondary;
+#endif
   if (k1_bitdepth_secondary == 16) {
     pack_ws2816_16bit(sec_src, leds_ws2816_wire_secondary, SECONDARY_LED_COUNT);
   } else {

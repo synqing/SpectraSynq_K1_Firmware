@@ -423,14 +423,39 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
     }
 
 #ifdef ENABLE_LED_TESTMODE
-    // Deterministic LED test pattern (bench eval only; NON-SHIPPABLE) ----------
-    // :ledtest <0-5> — 0=off, 1=ramp, 2=spatial, 3=grey, 4=RGB thirds, 5=low-ramp.
+    // Deterministic LED test patterns (bench eval only; NON-SHIPPABLE) ----------
+    // :ledtest=<0-12>  → arm pattern (echoes the pattern name).
+    // :ledtest         → print the full numbered legend (no change).
+    // :ledtest=list    → print the full numbered legend (no change).
+    // Legend mirrors k1_ledtest_apply() in visual/led_utilities.h.
     else if (strcmp(command_type, "ledtest") == 0) {
-      k1_ledtest_pattern = (uint8_t)constrain(atoi(command_data), 0, 5);
-      tx_begin();
-      USBSerial.print("LEDTEST_PATTERN: ");
-      USBSerial.println(k1_ledtest_pattern);
-      tx_end();
+      static const char* const K1_LEDTEST_NAMES[] = {
+        "off", "white", "solid-50", "solid-10", "ramp", "low-ramp", "spatial-ramp",
+        "red", "green", "blue", "rgb-thirds", "walk", "checker"};
+      const uint8_t K1_LEDTEST_MAX = 12;
+      if (command_data[0] == '\0' || strcmp(command_data, "list") == 0) {
+        tx_begin();
+        USBSerial.println("LEDTEST legend — arm with :ledtest=<n>");
+        for (uint8_t n = 0; n <= K1_LEDTEST_MAX; n++) {
+          USBSerial.print("  ");
+          USBSerial.print(n);
+          USBSerial.print(" = ");
+          USBSerial.println(K1_LEDTEST_NAMES[n]);
+        }
+        USBSerial.print("current: ");
+        USBSerial.print(k1_ledtest_pattern);
+        USBSerial.print(" ");
+        USBSerial.println(K1_LEDTEST_NAMES[k1_ledtest_pattern]);
+        tx_end();
+      } else {
+        k1_ledtest_pattern = (uint8_t)constrain(atoi(command_data), 0, K1_LEDTEST_MAX);
+        tx_begin();
+        USBSerial.print("LEDTEST: ");
+        USBSerial.print(k1_ledtest_pattern);
+        USBSerial.print(" ");
+        USBSerial.println(K1_LEDTEST_NAMES[k1_ledtest_pattern]);
+        tx_end();
+      }
     }
 #endif
 
