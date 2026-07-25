@@ -13,6 +13,8 @@ Branch `feat/prod-shipping-hardening` off `origin/main accc5f0` (NOT the parked 
 
 Verified by a 3-skeptic adversarial pass (Lane A/B/C), each verdict re-run by the orchestrator; the accuracy/completeness corrections (reachability framing, `unmirror` guard, test hardening, default_envs, perf evidence, no-int64-golden) are folded into `4521015`.
 
+**Update (2026-07-25, later — Captain-directed Push+Merge+bench A/B):** all lanes **merged to `main`** (`b26e235`); **CI ran green** on the branch push (host suite + both firmware envs). GDFT int64 (M1.1): on-device the int64-ON build runs **healthy at the shipping 12.8k/96** on bench `B489A500` (clean boot, full AP pipeline, tempo tracking, no WDT/bootloop) — a qualitative no-cadence-catastrophe pass; the QUANTIFIED cadence (`gdft_elapsed_us`) was NOT obtained (the AP stage-profiler is a main-K1-GPIO env, and the bench `apcad_*` dispatch needs the full `ap_frontend_probe` surface). Bench then flashed `k1_bench_im73d_ble` @ `6077f6e` (int64 fix + demo effects) and **Captain eyes-on PASS** ("It's good, looks/feels right") — **M1.1 fully closed.** Residual low-priority items only: the quantified cadence number (needs the main-K1 profiler or a bench profiler env-chain) and freezing an int64 golden.
+
 ## 2026-07-07 Restored Bench Validation
 
 - **Verdict:** restored `k1_bench_im73d @ f2f7c45` is green for IM73D validation at usable playback levels on the bench-reference firmware LED map (`4/5`). This is not a `k1_prod_im73d` proof because `k1_prod_im73d` is the main/prod LED map (`6/7`).
