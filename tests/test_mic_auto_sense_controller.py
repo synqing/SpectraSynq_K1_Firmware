@@ -61,11 +61,13 @@ class Cfg:
     agc_high_gain: float = 2.50
     hot_spec_sat: float = 0.12
     clip_eps: float = 0.0
+    raw_hot_threshold: float = 0.0
     boot_observe_ms: int = 10000
     up_dwell_ms: int = 5000
     down_dwell_ms: int = 3000
     protect_cooldown_ms: int = 8000
     ema_alpha: float = 0.08
+    boot_scale: float = 1.0
 
 
 @dataclass
@@ -172,6 +174,7 @@ def decide(st: State, m: Metrics, cfg: Cfg, now_ms: int) -> tuple[float, int, in
         or m.near_pct > cfg.clip_eps
         or m.raw_near_rail_pct > cfg.clip_eps
         or m.input_trim < 0.999
+        or (cfg.raw_hot_threshold > 0.0 and m.max_waveform_val_raw > cfg.raw_hot_threshold)
     )
     hot = st.ema_peak_scaled > cfg.target_peak_hi or m.spec_sat > cfg.hot_spec_sat
     quiet = (
@@ -430,15 +433,16 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
         self.assertIn("RAM-only", HEADER)
 
     def test_headroom_v2_defaults_in_header_and_env(self):
-        """P2 REWORK vol60: HEADROOM_V2b dual-stage + lower floor behind flag."""
+        """P2 REWORK vol60: HEADROOM_V2c lower floor + anticipatory raw-hot."""
         self.assertIn("K1_MIC_AUTO_HEADROOM_V2", HEADER)
-        self.assertIn("0.65f", HEADER)   # protect_factor under HEADROOM_V2
-        self.assertIn("0.35f", HEADER)   # scale_min under HEADROOM_V2
+        self.assertIn("0.55f", HEADER)   # protect_factor / boot_scale / peak_hi under V2c
+        self.assertIn("0.22f", HEADER)   # scale_min under HEADROOM_V2c
         self.assertIn("1.00f", HEADER)   # scale_max under HEADROOM_V2
-        self.assertIn("0.65f", HEADER)   # target_peak_hi earlier threshold
-        self.assertIn("1500UL", HEADER)  # protect_cooldown under HEADROOM_V2
+        self.assertIn("16000.0f", HEADER)  # raw_hot_threshold
+        self.assertIn("1000UL", HEADER)  # protect_cooldown under HEADROOM_V2c
         self.assertIn("protect_stages", HEADER)
-        self.assertIn("2", HEADER)       # dual-stage
+        self.assertIn("raw_hot_threshold", HEADER)
+        self.assertIn("boot_scale", HEADER)
         mic_auto_idx = PLATFORMIO.index("[env:k1_bench_im73d_mic_auto]")
         # Next env section after mic_auto
         rest = PLATFORMIO[mic_auto_idx + 1 :]
@@ -449,21 +453,23 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
         self.assertIn("-DK1_MIC_AUTO_HEADROOM_V2=1", mic_block)
 
     def test_headroom_v2_protect_reaches_floor_faster(self):
-        """Dual-stage 0.65 drops further/faster than legacy 0.85 single-step."""
+        """Dual-stage 0.55 drops further/faster than legacy 0.85 single-step."""
         legacy = Cfg(protect_factor=0.85, scale_max=1.50, protect_cooldown_ms=8000)
         v2 = Cfg(
-            scale_min=0.35,
-            protect_factor=0.65,
+            scale_min=0.22,
+            protect_factor=0.55,
             protect_stages=2,
             scale_max=1.00,
-            protect_cooldown_ms=1500,
-            target_peak_hi=0.65,
-            down_factor=0.82,
-            down_dwell_ms=1000,
+            protect_cooldown_ms=1000,
+            target_peak_hi=0.55,
+            down_factor=0.70,
+            down_dwell_ms=500,
+            raw_hot_threshold=16000.0,
+            boot_scale=0.55,
         )
 
-        def after_n_protects(cfg, n=1):
-            st = State(boot_start_ms=0, last_adjust_ms=0, scale=1.0)
+        def after_n_protects(cfg, n=1, start=1.0):
+            st = State(boot_start_ms=0, last_adjust_ms=0, scale=start)
             decide(st, Metrics(), cfg, 11000)
             t = 12000
             for _ in range(n):
@@ -476,31 +482,29 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
                 t += 200
             return st.scale
 
-        # One V2 protect frame = two 0.65 stages → 0.4225; legacy one frame → 0.85
+        # One V2 protect frame = two 0.55 stages → 0.3025; legacy one frame → 0.85
         self.assertLess(after_n_protects(v2, 1), after_n_protects(legacy, 1))
-        self.assertAlmostEqual(after_n_protects(v2, 1), 0.65**2, places=5)
-        # Two V2 frames reach floor 0.35
-        self.assertAlmostEqual(after_n_protects(v2, 2), 0.35, places=5)
+        self.assertAlmostEqual(after_n_protects(v2, 1), 0.55**2, places=5)
+        # Two V2 frames reach floor 0.22
+        self.assertAlmostEqual(after_n_protects(v2, 2), 0.22, places=5)
         self.assertEqual(v2.scale_max, 1.00)
-        self.assertEqual(v2.scale_min, 0.35)
-        self.assertEqual(v2.protect_cooldown_ms, 1500)
+        self.assertEqual(v2.scale_min, 0.22)
+        self.assertEqual(v2.protect_cooldown_ms, 1000)
         self.assertEqual(v2.protect_stages, 2)
 
     def test_headroom_v2_anticipatory_hot_trim_earlier(self):
-        """target_peak_hi 0.65 fires hot_drive before legacy 0.78."""
+        """target_peak_hi 0.55 fires hot_drive before legacy 0.78."""
         v2 = Cfg(
-            scale_min=0.35,
+            scale_min=0.22,
             scale_max=1.00,
-            protect_factor=0.65,
+            protect_factor=0.55,
             protect_stages=2,
-            target_peak_hi=0.65,
-            down_factor=0.82,
-            down_dwell_ms=1000,
-            protect_cooldown_ms=1500,
+            target_peak_hi=0.55,
+            down_factor=0.70,
+            down_dwell_ms=500,
+            protect_cooldown_ms=1000,
+            raw_hot_threshold=16000.0,
         )
-        st = State(boot_start_ms=0, last_adjust_ms=0, scale=1.0)
-        decide(st, Metrics(waveform_peak_scaled=0.70), v2, 11000)  # seed EMA via boot exit
-        # Force post-boot with peak above 0.65
         st2 = State(
             boot_start_ms=0,
             last_adjust_ms=0,
@@ -515,7 +519,36 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
         self.assertEqual(state, ADJUST_DOWN)
         self.assertEqual(reason, REASON_HOT)
         self.assertTrue(adjusted)
-        self.assertAlmostEqual(scale, 0.82, places=5)
+        self.assertAlmostEqual(scale, 0.70, places=5)
+
+    def test_headroom_v2_raw_hot_threshold_protects(self):
+        """max_waveform_val_raw above 16k triggers protect without clip flags."""
+        v2 = Cfg(
+            scale_min=0.22,
+            scale_max=1.00,
+            protect_factor=0.55,
+            protect_stages=2,
+            raw_hot_threshold=16000.0,
+            protect_cooldown_ms=1000,
+        )
+        st = State(
+            boot_start_ms=0,
+            last_adjust_ms=0,
+            scale=0.55,
+            ema_seeded=True,
+            ema_peak_scaled=0.40,
+            ema_raw_rms=50.0,
+        )
+        scale, state, reason, adjusted = decide(
+            st,
+            Metrics(max_waveform_val_raw=18000.0, waveform_peak_scaled=0.40, raw_rms=50.0),
+            v2,
+            12000,
+        )
+        self.assertEqual(state, PROTECT)
+        self.assertEqual(reason, REASON_HEADROOM)
+        self.assertTrue(adjusted)
+        self.assertAlmostEqual(scale, max(0.22, 0.55 * 0.55 * 0.55), places=5)
 
 
 if __name__ == "__main__":

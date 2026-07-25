@@ -70,11 +70,13 @@ struct K1MicAutoConfig {
   float    agc_high_gain;          // mean AGC gain above this supports under-drive
   float    hot_spec_sat;           // spectral saturation duty/fraction threshold
   float    clip_eps;               // clip_pct / near_pct / raw_near > this => protect
+  float    raw_hot_threshold;      // max_waveform_val_raw above this => protect (0=off)
   uint32_t boot_observe_ms;        // OBSERVE_BOOT dwell
   uint32_t up_dwell_ms;            // min time between upscales
   uint32_t down_dwell_ms;          // min time between downscales
   uint32_t protect_cooldown_ms;    // block ADJUST_UP after protect/down
   float    ema_alpha;              // O(1) rolling estimate (no sorting / no heap)
+  float    boot_scale;             // scale after reset / observe start
 };
 
 // Per-frame observation snapshot (filled by firmware; fed to pure core).
@@ -123,19 +125,22 @@ struct K1MicAutoDecision {
 inline K1MicAutoConfig k1_mic_auto_default_config() {
   K1MicAutoConfig c;
 #if defined(K1_MIC_AUTO_HEADROOM_V2) && K1_MIC_AUTO_HEADROOM_V2
-  // HEADROOM_V2b (Captain rejects CONDITIONAL): vol60 still railed at scale=0.50.
-  // Lower floor + dual-stage protect + earlier hot peak + no boost above unity.
-  // Keep quiet/vol45 green via slow upscale + lower ceiling. Bench-only. (2026-07-25)
-  c.scale_min           = 0.35f;    // was 0.50 — more headroom once floored
-  c.scale_max           = 1.00f;    // was 1.20 — never boost above unity under V2
-  c.up_factor            = 1.04f;    // +4%
-  c.down_factor          = 0.82f;    // faster anticipatory trim (was 0.90)
-  c.protect_factor       = 0.65f;    // -35% per stage (was 0.75 / legacy 0.85)
+  // HEADROOM_V2c: V2b still clipped vol60 at floor 0.35 (max_raw≈30k, trim↓).
+  // ADC raw_i16 ≪ rail — digital post-SENSITIVITY headroom. Lower floor further,
+  // start below unity, anticipatory raw-hot protect, stronger dual-stage.
+  // Bench mic_auto only; keep quiet/vol45 green. (2026-07-25)
+  c.scale_min           = 0.22f;    // was 0.35 — clear ~30k max_raw spikes
+  c.scale_max           = 1.00f;    // never boost above unity under V2
+  c.up_factor            = 1.03f;    // slower recover
+  c.down_factor          = 0.70f;    // faster anticipatory trim
+  c.protect_factor       = 0.55f;    // -45% per stage
   c.protect_stages      = 2;        // dual-stage same-frame protect
   c.target_peak_lo      = 0.12f;
-  c.target_peak_hi      = 0.65f;    // earlier near-threshold (was 0.78)
-  c.down_dwell_ms       = 1000UL;   // faster hot trim (was 3000)
-  c.protect_cooldown_ms = 1500UL;   // re-protect sooner (was 3000 / legacy 8000)
+  c.target_peak_hi      = 0.55f;    // earlier near-threshold
+  c.down_dwell_ms       = 500UL;
+  c.protect_cooldown_ms = 1000UL;
+  c.raw_hot_threshold   = 16000.0f; // protect before loud-guard rails
+  c.boot_scale          = 0.55f;    // start with headroom after reset
 #else
   c.scale_min           = 0.50f;
   c.scale_max           = 1.50f;
@@ -147,6 +152,8 @@ inline K1MicAutoConfig k1_mic_auto_default_config() {
   c.target_peak_hi      = 0.78f;
   c.down_dwell_ms       = 3000UL;
   c.protect_cooldown_ms = 8000UL;
+  c.raw_hot_threshold   = 0.0f;     // off
+  c.boot_scale          = 1.0f;
 #endif
   c.silence_raw_rms     = 18.0f;
   c.music_raw_rms       = 28.0f;
@@ -159,12 +166,23 @@ inline K1MicAutoConfig k1_mic_auto_default_config() {
   return c;
 }
 
+inline float k1_mic_auto_clamp_scale(float scale, const K1MicAutoConfig& cfg) {
+  if (!isfinite(scale)) return 1.0f;
+  if (scale < cfg.scale_min) return cfg.scale_min;
+  if (scale > cfg.scale_max) return cfg.scale_max;
+  return scale;
+}
+
 inline void k1_mic_auto_reset_state(K1MicAutoState* st, uint32_t now_ms) {
   if (!st) return;
+  const K1MicAutoConfig cfg = k1_mic_auto_default_config();
+  const float boot = (isfinite(cfg.boot_scale) && cfg.boot_scale > 0.0f)
+                         ? k1_mic_auto_clamp_scale(cfg.boot_scale, cfg)
+                         : 1.0f;
   st->runtime_enabled     = true;
   st->shadow_only         = false;
-  st->scale               = 1.0f;
-  st->recommended_scale   = 1.0f;
+  st->scale               = boot;
+  st->recommended_scale   = boot;
   st->state               = K1_MIC_AUTO_OBSERVE_BOOT;
   st->reason              = K1_MIC_AUTO_REASON_BOOT;
   st->boot_start_ms       = now_ms;
@@ -174,13 +192,6 @@ inline void k1_mic_auto_reset_state(K1MicAutoState* st, uint32_t now_ms) {
   st->ema_raw_rms         = 0.0f;
   st->ema_seeded          = false;
   st->window_age_ms       = 0;
-}
-
-inline float k1_mic_auto_clamp_scale(float scale, const K1MicAutoConfig& cfg) {
-  if (!isfinite(scale)) return 1.0f;
-  if (scale < cfg.scale_min) return cfg.scale_min;
-  if (scale > cfg.scale_max) return cfg.scale_max;
-  return scale;
 }
 
 inline float k1_mic_auto_applied_scale_from_state(const K1MicAutoState& st) {
@@ -269,7 +280,9 @@ inline K1MicAutoDecision k1_mic_auto_decide(K1MicAutoState* st,
       (m.clip_pct > cfg.clip_eps) ||
       (m.near_pct > cfg.clip_eps) ||
       (m.raw_near_rail_pct > cfg.clip_eps) ||
-      (m.input_trim < 0.999f);
+      (m.input_trim < 0.999f) ||
+      ((cfg.raw_hot_threshold > 0.0f) &&
+       (m.max_waveform_val_raw > cfg.raw_hot_threshold));
 
   const bool hot_drive =
       (st->ema_peak_scaled > cfg.target_peak_hi) ||
