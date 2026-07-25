@@ -29,9 +29,13 @@ jobs:
         run: python -m pytest tests/ -q
 
   firmware-build:
-    # Build BOTH the base env and the actual shipping env. k1_prod_im73d
-    # (default_envs) is what ships to backers; k1_hardware is its base, inherited
-    # by the other reference/probe envs. CI must guard the binary that ships.
+    # Build BOTH firmware envs. k1_hardware IS default_envs (platformio.ini:15 — the
+    # shipping build); k1_prod_im73d is the IM73D-mic production variant that extends
+    # k1_hardware. CI builds both so it guards the shipping binary and the IM73D
+    # variant. NOTE: CI is the COMMITTED enforcement gate — it runs on every push
+    # regardless of local git hooks. The local pre-commit gate (scripts/hooks) is a
+    # per-clone fast-feedback convenience activated by scripts/hooks/install.sh; git
+    # deliberately will not auto-run hooks on a fresh clone, so CI is the backstop.
     name: Firmware build (${{ matrix.env }})
     runs-on: ubuntu-latest
     strategy:

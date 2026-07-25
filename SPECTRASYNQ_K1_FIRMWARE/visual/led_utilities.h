@@ -284,11 +284,14 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   int32_t index_right = index_whole + 1;
 
   // Bounds guard (audit M1.3): every CRGB16 buffer is NATIVE_RESOLUTION-sized, so
-  // an out-of-range index — e.g. the top pixel of a secondary strip where
-  // SECONDARY_LED_COUNT != NATIVE_RESOLUTION resolves index_right ==
-  // NATIVE_RESOLUTION — must not read one past the buffer. No-op for valid in-range
-  // indices (output unchanged for the shipping 160 config); at the top edge this
-  // clamps to the edge pixel, matching scale_to_strip's existing index_right guard.
+  // an out-of-range index must not read one past the buffer. LATENT in ALL current
+  // configs — SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h) so
+  // the only caller's lerp else-branch is dead, and the custom-224 build drops the
+  // secondary channel. This is defensive hardening that becomes LIVE only if a
+  // secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION, or a new
+  // out-of-range caller, is ever added. No-op for valid in-range indices
+  // (byte-identical for the shipping 160 config); at the top edge it clamps to the
+  // edge pixel, matching scale_to_strip's existing index_right guard.
   if (index_left  < 0) index_left  = 0;
   if (index_right < 0) index_right = 0;
   if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
@@ -1204,6 +1207,15 @@ inline void unmirror() {
 
     int32_t index_left = index_whole + 0;
     int32_t index_right = index_whole + 1;
+
+    // Bounds guard (audit M1.3): same OOB class as lerp_led_16 (index_right could
+    // reach NATIVE_RESOLUTION on a NATIVE_RESOLUTION-sized buffer). unmirror() has
+    // no live callers today, so this is dead-code hardening for class completeness;
+    // no-op for valid in-range indices.
+    if (index_left  < 0) index_left  = 0;
+    if (index_right < 0) index_right = 0;
+    if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
+    if (index_right > NATIVE_RESOLUTION - 1) index_right = NATIVE_RESOLUTION - 1;
 
     SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
     SQ15x16 mix_right = SQ15x16(1.0) - mix_left;

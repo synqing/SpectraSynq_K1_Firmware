@@ -1,22 +1,35 @@
 """Audit M1.3 — LED-index out-of-bounds hardening in the render path.
 
-Three shared render helpers in visual/led_utilities.h indexed / sized 160-element
+Four shared render helpers in visual/led_utilities.h index / size 160-element
 (NATIVE_RESOLUTION) CRGB/CRGB16 buffers with no bounds guard:
 
-  * lerp_led_16()   — index_right = index_whole + 1 could reach NATIVE_RESOLUTION
-                      (1-past-end read) at the top pixel of a secondary strip
-                      where SECONDARY_LED_COUNT != NATIVE_RESOLUTION.
-  * shift_leds_up() / shift_leds_down() — an offset > NATIVE_RESOLUTION makes the
-                      unsigned (NATIVE_RESOLUTION - offset) wrap to a huge size →
-                      catastrophic OOB memcpy.
+  * lerp_led_16()  — index_right = index_whole + 1 could reach NATIVE_RESOLUTION
+                     (1-past-end read) at the top pixel.
+  * unmirror()     — identical index_right = index_whole + 1 OOB pattern.
+  * shift_leds_up() / shift_leds_down() — offset > NATIVE_RESOLUTION makes the
+                     unsigned (NATIVE_RESOLUTION - offset) wrap to a huge size →
+                     catastrophic OOB memcpy.
 
-Under the shipping 160/160 config these are LATENT (index_right stays <=159;
-callers pass offset <= NATIVE_RESOLUTION/2), but they are reachable under the
-custom 61/91/224 strip configs and any future caller. This test proves (a) the
-guards are present in source and (b) the clamp arithmetic keeps every index /
-offset in-bounds while remaining a no-op across the valid range (so the shipping
-config's output is unchanged). Pattern mirrors test_gdft_int64_*: numeric replica
-of the exact firmware expression + regex tying the replica to the source.
+REACHABILITY (honest, verified 2026-07-25 by adversarial review): these are
+LATENT in ALL current build configs, not "reachable under 61/91/224":
+  - lerp_led_16's only caller (scale_to_secondary_strip) sits behind
+    `if (SECONDARY_LED_COUNT == NATIVE_RESOLUTION) {memcpy} else {lerp}`, and
+    SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h), so the lerp
+    branch is dead in every env; the custom-224 build drops the secondary channel.
+  - every shift_leds_up caller passes offset <= NATIVE_RESOLUTION/2; shift_leds_down
+    and unmirror have zero callers.
+This is DEFENSIVE hardening of a real OOB class the audit flagged (M1.3); it
+becomes live only if a secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION
+or a new out-of-range caller is added. The guards are exact no-ops across the
+valid range, so shipping output is byte-identical.
+
+This test proves (a) the guards are present AND uncommented in source and (b) the
+clamp arithmetic keeps every index / offset in-bounds while remaining a no-op
+across the valid range. Pattern mirrors test_gdft_int64_*: numeric replica of the
+exact firmware expression + regex tying the replica to the source. The source
+regexes are statement-anchored (^\\s*if) so a commented-out clamp cannot satisfy
+them (line-comment resistant; a /* */ block comment is not detected — regex, not
+a parser).
 """
 
 import re
@@ -33,7 +46,7 @@ NR = 160  # NATIVE_RESOLUTION; re-asserted against source below.
 
 # --- exact replicas of the firmware clamp expressions -----------------------
 def lerp_clamp(index_whole):
-    """Replica of lerp_led_16's index_left/index_right guard."""
+    """Replica of the lerp_led_16 / unmirror index_left/index_right guard."""
     index_left = index_whole
     index_right = index_whole + 1
     if index_left < 0:
@@ -59,23 +72,27 @@ class LedIndexBoundsTest(unittest.TestCase):
     def test_native_resolution_is_160(self):
         self.assertRegex(CONSTANTS, r"#define\s+NATIVE_RESOLUTION\s+160")
 
-    # --- 1: source carries the lerp_led_16 bounds guard ---------------------
-    def test_lerp_led_16_source_has_bounds_guard(self):
-        self.assertRegex(LED_UTILS, r"if\s*\(index_left\s*<\s*0\)\s*index_left\s*=\s*0;")
-        self.assertRegex(LED_UTILS, r"if\s*\(index_right\s*<\s*0\)\s*index_right\s*=\s*0;")
-        self.assertRegex(
-            LED_UTILS,
-            r"if\s*\(index_left\s*>\s*NATIVE_RESOLUTION\s*-\s*1\)\s*index_left\s*=\s*NATIVE_RESOLUTION\s*-\s*1;")
-        self.assertRegex(
-            LED_UTILS,
-            r"if\s*\(index_right\s*>\s*NATIVE_RESOLUTION\s*-\s*1\)\s*index_right\s*=\s*NATIVE_RESOLUTION\s*-\s*1;")
+    # --- 1: index clamp present + UNCOMMENTED in BOTH interpolators ----------
+    # ^\s*if anchors to a real statement (a leading // breaks the match), and
+    # count >= 2 requires it in both lerp_led_16 AND unmirror.
+    def test_index_clamp_present_in_both_interpolators(self):
+        clamps = [
+            r"^\s*if\s*\(index_left\s+<\s*0\)\s*index_left\s*=\s*0;",
+            r"^\s*if\s*\(index_right\s+<\s*0\)\s*index_right\s*=\s*0;",
+            r"^\s*if\s*\(index_left\s+>\s*NATIVE_RESOLUTION\s*-\s*1\)\s*index_left\s*=\s*NATIVE_RESOLUTION\s*-\s*1;",
+            r"^\s*if\s*\(index_right\s+>\s*NATIVE_RESOLUTION\s*-\s*1\)\s*index_right\s*=\s*NATIVE_RESOLUTION\s*-\s*1;",
+        ]
+        for expr in clamps:
+            n = len(re.findall(expr, LED_UTILS, re.M))
+            self.assertGreaterEqual(
+                n, 2, f"uncommented clamp must appear in BOTH lerp_led_16 and unmirror: {expr!r} (found {n})")
 
-    # --- 2: source carries the shift underflow guard (both helpers) ---------
-    def test_shift_leds_source_has_underflow_guard(self):
-        guard = "if (offset > NATIVE_RESOLUTION) offset = NATIVE_RESOLUTION;"
+    # --- 2: shift underflow guard present + UNCOMMENTED in both helpers ------
+    def test_shift_underflow_guard_present_in_both(self):
+        n = len(re.findall(
+            r"^\s*if\s*\(offset\s*>\s*NATIVE_RESOLUTION\)\s*offset\s*=\s*NATIVE_RESOLUTION;", LED_UTILS, re.M))
         self.assertGreaterEqual(
-            LED_UTILS.count(guard), 2,
-            "both shift_leds_up and shift_leds_down must clamp offset")
+            n, 2, f"uncommented offset clamp must appear in both shift_leds_up and shift_leds_down (found {n})")
 
     # --- 3: clamp keeps every lerp index in [0, NR-1] -----------------------
     def test_lerp_clamp_never_out_of_bounds(self):
