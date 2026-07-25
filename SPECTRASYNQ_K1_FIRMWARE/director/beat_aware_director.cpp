@@ -153,6 +153,13 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
   const bool may_switch     = energy_ok && dwell_ms_ok;
 
   // ── Stage 2: FIRE ────────────────────────────────────────────────────────
+  // Trustworthy = locked AND confidence above floor. Critical product rule
+  // (AUDIO_ON 2026-07-25 autopsy): while tempo_locked, NEVER take the time
+  // fallback — even if confidence dips below the floor. Device soak showed
+  // locked_beat_q_bad=4/5 because fallback switches fired (~20s cadence) then
+  // lock flipped ON before the next status poll, so the scorer attributed a
+  // non-beat-q switch to a locked sample. Hold instead until beat-q can fire
+  // or the lock drops.
   const bool tempo_trustworthy =
       view.tempo_locked && (view.tempo_confidence >= config.confidence_floor);
 
@@ -162,7 +169,12 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
     return decision;
   }
 
-  if (tempo_trustworthy) {
+  if (view.tempo_locked) {
+    // LOCKED path: beat-quantise only. Low confidence => hold (no time fallback).
+    if (!tempo_trustworthy) {
+      state->pending_switch = false;
+      return decision;
+    }
     // BEAT-QUANTISED path. Require the beat dwell too, then latch and wait for
     // the next beat instant so the cut lands exactly on the groove.
     if (!dwell_beats_ok) {
@@ -183,8 +195,9 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
     decision.beat_quantised = true;
     decision.wants_switch   = (decision.next_mode != state->current_mode);
   } else {
-    // FALLBACK: tempo not trustworthy — gentle time-based switch. No beat to
-    // quantise to, so use a long wall-clock interval and a fixed gentle xfade.
+    // FALLBACK: unlocked only — gentle time-based switch. No beat to quantise
+    // to, so use a long wall-clock interval and a fixed gentle xfade.
+    state->pending_switch = false;  // drop any stale locked latch
     if (dwell_ms < config.fallback_switch_ms) {
       return decision;
     }
@@ -231,6 +244,7 @@ static uint32_t g_bad_switch_count           = 0;
 static uint32_t g_bad_last_switch_ms         = 0;
 static uint8_t  g_bad_last_switch_mode       = 0;
 static bool     g_bad_last_switch_beat_q     = false;
+static bool     g_bad_last_switch_locked     = false;  // lock state AT commit
 
 void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_state = {};
@@ -242,10 +256,11 @@ void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_energy_smooth = 0.0f;
   g_bad_last_tick_ms  = now_ms;
   g_bad_safe_cursor   = 0;
-  g_bad_switch_count       = 0;
-  g_bad_last_switch_ms     = 0;
-  g_bad_last_switch_mode   = initial_mode;
-  g_bad_last_switch_beat_q = false;
+  g_bad_switch_count         = 0;
+  g_bad_last_switch_ms       = 0;
+  g_bad_last_switch_mode     = initial_mode;
+  g_bad_last_switch_beat_q   = false;
+  g_bad_last_switch_locked   = false;
 }
 
 BeatAwareDirectorConfig bad_director_config() {
@@ -310,6 +325,9 @@ uint8_t  bad_director_last_switch_mode() { return g_bad_last_switch_mode; }
 bool     bad_director_last_switch_beat_quantised() {
   return g_bad_last_switch_beat_q;
 }
+bool bad_director_last_switch_tempo_locked() {
+  return g_bad_last_switch_locked;
+}
 bool bad_director_compile_opt_in() {
 #ifdef K1_BEAT_AWARE_DIRECTOR_V1
   return true;
@@ -362,10 +380,12 @@ uint8_t bad_director_tick(uint32_t now_ms) {
     using namespace k1::effects::framework;
 
     // Proof telemetry first (RAM-only) so serial status can confirm beat-q.
+    // Sticky lock-at-commit prevents poll-time lock flicker from poisoning score.
     g_bad_switch_count++;
-    g_bad_last_switch_ms     = now_ms;
-    g_bad_last_switch_mode   = decision.next_mode;
-    g_bad_last_switch_beat_q = decision.beat_quantised;
+    g_bad_last_switch_ms       = now_ms;
+    g_bad_last_switch_mode     = decision.next_mode;
+    g_bad_last_switch_beat_q   = decision.beat_quantised;
+    g_bad_last_switch_locked   = view.tempo_locked;
 
     // SAFE transition type only (never NUCLEAR/STARGATE/PHASE_SHIFT). Rotate the
     // P4 SAFE_DEFAULT set so successive switches feel varied but stay spatial.

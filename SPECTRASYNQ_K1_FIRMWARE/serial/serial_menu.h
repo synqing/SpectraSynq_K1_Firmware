@@ -436,6 +436,9 @@ void serial_print_beat_director_status() {
   USBSerial.println(bad_director_last_switch_mode());
   USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: ");
   USBSerial.println(vp_bool_text(bad_director_last_switch_beat_quantised()));
+  // Sticky lock-at-commit (rework 2026-07-25): score against THIS, not poll-time lock.
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_LOCKED: ");
+  USBSerial.println(vp_bool_text(bad_director_last_switch_tempo_locked()));
 }
 #endif  // K1_EFFECT_FRAMEWORK_V1
 

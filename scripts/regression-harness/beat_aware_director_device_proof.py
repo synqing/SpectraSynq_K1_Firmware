@@ -3,9 +3,11 @@
 
 Scores serial status dumps for the beat-boundary contract:
 
-  - When BEAT_DIRECTOR_TEMPO_LOCKED is true and SWITCH_COUNT advances,
+  - Prefer sticky BEAT_DIRECTOR_LAST_SWITCH_LOCKED (lock state AT commit) when
+    present. Fall back to poll-time BEAT_DIRECTOR_TEMPO_LOCKED for older logs.
+  - When that lock attribute is true and SWITCH_COUNT advances,
     BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q must be true.
-  - When unlocked, LAST_SWITCH_BEAT_Q must be false (time fallback).
+  - When unlocked at commit/poll, LAST_SWITCH_BEAT_Q must be false (time fallback).
 
 Modes:
   --fixture <log>   Score a captured/synthetic serial log (no device).
@@ -42,6 +44,7 @@ class StatusSample:
     last_switch_ms: int | None = None
     last_switch_mode: int | None = None
     last_switch_beat_q: bool | None = None
+    last_switch_locked: bool | None = None  # sticky lock AT commit (rework)
 
 
 def _parse_bool(raw: str) -> bool | None:
@@ -102,6 +105,8 @@ def parse_status_block(text: str) -> StatusSample:
                 pass
         elif key == "BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q":
             sample.last_switch_beat_q = _parse_bool(rest)
+        elif key == "BEAT_DIRECTOR_LAST_SWITCH_LOCKED":
+            sample.last_switch_locked = _parse_bool(rest)
     return sample
 
 
@@ -140,7 +145,13 @@ def score_samples(samples: Iterable[StatusSample]) -> dict:
     def _score_switch(s: StatusSample) -> None:
         nonlocal locked_switch_events, locked_beat_q_ok, locked_beat_q_bad
         nonlocal unlocked_switch_events, unlocked_beat_q_ok, unlocked_beat_q_bad
-        if s.tempo_locked:
+        # Prefer sticky lock-at-commit when firmware emits it (rework 2026-07-25).
+        locked_attr = (
+            s.last_switch_locked
+            if s.last_switch_locked is not None
+            else s.tempo_locked
+        )
+        if locked_attr:
             locked_switch_events += 1
             if s.last_switch_beat_q is True:
                 locked_beat_q_ok += 1
@@ -282,6 +293,7 @@ BEAT_DIRECTOR_SWITCH_COUNT: 0
 BEAT_DIRECTOR_LAST_SWITCH_MS: 0
 BEAT_DIRECTOR_LAST_SWITCH_MODE: 7
 BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: false
+BEAT_DIRECTOR_LAST_SWITCH_LOCKED: false
 BEAT_DIRECTOR: true
 BEAT_DIRECTOR_OPT_IN: true
 BEAT_DIRECTOR_MODE: 12
@@ -293,6 +305,7 @@ BEAT_DIRECTOR_SWITCH_COUNT: 1
 BEAT_DIRECTOR_LAST_SWITCH_MS: 16400
 BEAT_DIRECTOR_LAST_SWITCH_MODE: 12
 BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: true
+BEAT_DIRECTOR_LAST_SWITCH_LOCKED: true
 BEAT_DIRECTOR: true
 BEAT_DIRECTOR_OPT_IN: true
 BEAT_DIRECTOR_MODE: 18
@@ -304,6 +317,7 @@ BEAT_DIRECTOR_SWITCH_COUNT: 2
 BEAT_DIRECTOR_LAST_SWITCH_MS: 42000
 BEAT_DIRECTOR_LAST_SWITCH_MODE: 18
 BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: false
+BEAT_DIRECTOR_LAST_SWITCH_LOCKED: false
 """,
         encoding="utf-8",
     )

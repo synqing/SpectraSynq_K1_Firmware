@@ -134,6 +134,7 @@ uint32_t bad_director_switch_count();
 uint32_t bad_director_last_switch_ms();
 uint8_t  bad_director_last_switch_mode();
 bool     bad_director_last_switch_beat_quantised();
+bool     bad_director_last_switch_tempo_locked();  // sticky lock AT switch commit
 bool     bad_director_compile_opt_in();  // true iff K1_BEAT_AWARE_DIRECTOR_V1
 
 // One render-task tick. Reads the live audio accessors, runs the decision core,
