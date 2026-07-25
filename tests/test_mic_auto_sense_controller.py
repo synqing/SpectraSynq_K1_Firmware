@@ -425,6 +425,44 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
         self.assertIn("never persist", HEADER.lower())
         self.assertIn("RAM-only", HEADER)
 
+    def test_headroom_v2_defaults_in_header_and_env(self):
+        """P2 REWORK vol60: stronger protect + lower ceiling behind HEADROOM_V2."""
+        self.assertIn("K1_MIC_AUTO_HEADROOM_V2", HEADER)
+        self.assertIn("0.75f", HEADER)   # protect_factor under HEADROOM_V2
+        self.assertIn("1.20f", HEADER)   # scale_max under HEADROOM_V2
+        self.assertIn("3000UL", HEADER)  # protect_cooldown under HEADROOM_V2
+        mic_auto_idx = PLATFORMIO.index("[env:k1_bench_im73d_mic_auto]")
+        # Next env section after mic_auto
+        rest = PLATFORMIO[mic_auto_idx + 1:]
+        next_env = rest.find("\n[env:")
+        mic_block = PLATFORMIO[mic_auto_idx: mic_auto_idx + 1 + (next_env if next_env >= 0 else len(rest))]
+        self.assertIn("-DK1_MIC_AUTO_HEADROOM_V2=1", mic_block)
+
+    def test_headroom_v2_protect_reaches_floor_faster(self):
+        """0.75 protect drops further than 0.85 in the same number of clip frames."""
+        legacy = Cfg(protect_factor=0.85, scale_max=1.50, protect_cooldown_ms=8000)
+        v2 = Cfg(protect_factor=0.75, scale_max=1.20, protect_cooldown_ms=3000)
+
+        def after_n_protects(cfg, n=3):
+            st = State(boot_start_ms=0, last_adjust_ms=0, scale=1.0)
+            decide(st, Metrics(), cfg, 11000)
+            t = 12000
+            for _ in range(n):
+                decide(
+                    st,
+                    Metrics(clip_pct=0.05, near_pct=0.05, raw_near_rail_pct=0.05),
+                    cfg,
+                    t,
+                )
+                t += 200
+            return st.scale
+
+        self.assertLess(after_n_protects(v2, 2), after_n_protects(legacy, 2))
+        self.assertAlmostEqual(after_n_protects(v2, 2), 0.75 ** 2, places=5)
+        # V2 ceiling blocks upscale above 1.20
+        self.assertEqual(v2.scale_max, 1.20)
+        self.assertEqual(v2.protect_cooldown_ms, 3000)
+
 
 if __name__ == "__main__":
     unittest.main()

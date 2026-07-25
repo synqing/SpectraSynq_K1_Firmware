@@ -122,10 +122,19 @@ struct K1MicAutoDecision {
 inline K1MicAutoConfig k1_mic_auto_default_config() {
   K1MicAutoConfig c;
   c.scale_min           = 0.50f;
+#if defined(K1_MIC_AUTO_HEADROOM_V2) && K1_MIC_AUTO_HEADROOM_V2
+  // P2 REWORK vol60 headroom: stronger/faster protect + lower music scale ceiling.
+  // Host/unit-validated path; bench flash only after unit gate. (2026-07-25)
+  c.scale_max           = 1.20f;
+  c.up_factor            = 1.04f;    // +4%
+  c.down_factor          = 0.90f;    // -10%
+  c.protect_factor       = 0.75f;    // -25% immediate (was 0.85)
+#else
   c.scale_max           = 1.50f;
   c.up_factor            = 1.04f;    // +4%
   c.down_factor          = 0.90f;    // -10%
   c.protect_factor       = 0.85f;    // -15% immediate
+#endif
   c.target_peak_lo      = 0.12f;
   c.target_peak_hi      = 0.78f;
   c.silence_raw_rms     = 18.0f;
@@ -136,7 +145,11 @@ inline K1MicAutoConfig k1_mic_auto_default_config() {
   c.boot_observe_ms     = 10000UL;
   c.up_dwell_ms         = 5000UL;
   c.down_dwell_ms       = 3000UL;
+#if defined(K1_MIC_AUTO_HEADROOM_V2) && K1_MIC_AUTO_HEADROOM_V2
+  c.protect_cooldown_ms = 3000UL;   // was 8000 — re-protect sooner under sustained rail
+#else
   c.protect_cooldown_ms = 8000UL;
+#endif
   c.ema_alpha           = 0.08f;
   return c;
 }
