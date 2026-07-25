@@ -355,76 +355,17 @@ const char* vp_bool_text(bool value) {
 }
 
 #ifdef K1_LOUD_GUARD_V1
-void serial_print_k1_loud_guard_status() {
-  USBSerial.print("K1_LOUD_GUARD: ");
-  USBSerial.println(vp_bool_text(k1_loud_guard_enabled));
-  USBSerial.print("K1_LOUD_INPUT_TRIM: ");
-  USBSerial.println(k1_loud_input_trim, 3);
-  USBSerial.print("K1_LOUD_GDFT_TRIM: ");
-  USBSerial.println(k1_loud_gdft_trim, 3);
-  USBSerial.print("K1_LOUD_AGC_GAIN: ");
-  USBSerial.println(float(agc_bands[0].gain), 4);
-  USBSerial.print("K1_LOUD_CLIP_DUTY: ");
-  USBSerial.println(k1_loud_clip_duty, 4);
-  USBSerial.print("K1_LOUD_NEAR_RAIL_DUTY: ");
-  USBSerial.println(k1_loud_near_rail_duty, 4);
-  USBSerial.print("K1_LOUD_PEAK_PIN_DUTY: ");
-  USBSerial.println(k1_loud_peak_pin_duty, 4);
-  USBSerial.print("K1_LOUD_SPEC_SAT_DUTY: ");
-  USBSerial.println(k1_loud_spec_sat_duty, 4);
-  USBSerial.print("K1_LOUD_GUARD_MODE: ");
-  USBSerial.println(k1_loud_guard_mode);   // 0=baseline 1=conservative 2=aggressive
-}
-
-void serial_set_k1_loud_guard(bool enabled) {
-  k1_loud_guard_enabled = enabled;
-  if (!k1_loud_guard_enabled) {
-    k1_loud_input_trim = 1.0f;
-    k1_loud_gdft_trim = 1.0f;
-    k1_loud_clip_duty = 0.0f;
-    k1_loud_near_rail_duty = 0.0f;
-    k1_loud_peak_pin_duty = 0.0f;
-    k1_loud_spec_sat_duty = 0.0f;
-    k1_loud_spec_sat_fraction = 0.0f;
-  }
-}
-
-// A/B retune matrix cycle: 0 BASELINE -> 1 CONSERVATIVE -> 2 AGGRESSIVE -> 0.
-// Ships dormant at 0 (byte-identical shipping behaviour); DEGRADED-MODE until
-// the loud-room hardware A/B + Captain sign-off.
-void serial_cycle_k1_loud_guard_mode() {
-  k1_loud_guard_mode = (k1_loud_guard_mode + 1) % 3;
-  USBSerial.print("K1_LOUD_GUARD_MODE -> ");
-  USBSerial.print(k1_loud_guard_mode);
-  const char* label = (k1_loud_guard_mode == 0) ? " BASELINE (2.20s/flat)"
-                    : (k1_loud_guard_mode == 1) ? " CONSERVATIVE (1.30s/hybrid)"
-                    :                             " AGGRESSIVE (0.80s/hybrid)";
-  USBSerial.println(label);
-}
+// K1 loud-guard serial helpers — DEFINITIONS moved to serial/serial_menu.cpp
+// (M2.1 R1 batch 4). Gated declarations remain for the in-header command dispatch.
+void serial_print_k1_loud_guard_status();
+void serial_set_k1_loud_guard(bool enabled);
+void serial_cycle_k1_loud_guard_mode();
 #endif
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
-// ---------------------------------------------------------------------------
-// beat_director serial helpers (P6 eyes-on toggle — isolated, separable block)
-// ---------------------------------------------------------------------------
-void serial_print_beat_director_status() {
-  // READ-ONLY: uses pure accessors only — never ticks the director or arms a
-  // transition, so a status query never advances selection/dwell state.
-  const bool enabled = bad_director_enabled();
-  const bool locked  = bad_director_tempo_locked();
-  USBSerial.print("BEAT_DIRECTOR: ");
-  USBSerial.println(vp_bool_text(enabled));
-  USBSerial.print("BEAT_DIRECTOR_MODE: ");
-  USBSerial.println(bad_director_current_mode());
-  USBSerial.print("BEAT_DIRECTOR_TEMPO_LOCKED: ");
-  USBSerial.println(vp_bool_text(locked));
-  USBSerial.print("BEAT_DIRECTOR_BPM: ");
-  USBSerial.println(bad_director_bpm(), 1);
-  USBSerial.print("BEAT_DIRECTOR_TEMPO_CONF: ");
-  USBSerial.println(bad_director_tempo_confidence(), 3);
-  USBSerial.print("BEAT_DIRECTOR_FALLBACK: ");
-  USBSerial.println(vp_bool_text(!locked));  // time-fallback active when unlocked
-}
+// beat_director serial helper — DEFINITION moved to serial/serial_menu.cpp
+// (M2.1 R1 batch 4). serial_cmd_handlers.cpp already forward-declares + calls it.
+void serial_print_beat_director_status();
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
 #ifdef K1_VIVID_PRECOMP_V1
