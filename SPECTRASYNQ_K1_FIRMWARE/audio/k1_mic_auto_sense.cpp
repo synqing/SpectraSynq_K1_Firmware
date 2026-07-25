@@ -14,6 +14,12 @@ static K1MicAutoConfig g_k1_mic_auto_cfg;
 static bool g_k1_mic_auto_inited = false;
 
 void k1_mic_auto_sense_init(uint32_t now_ms) {
+#ifdef K1_MIC_AUTO_DEFAULT_SENSITIVITY
+  // Post-NVS pin: persisted SPH-era SENSITIVITY=2.4 would defeat the mic_auto
+  // gain-chain probe. RAM-only — never save_config from this path.
+  CONFIG.SENSITIVITY = K1_MIC_AUTO_DEFAULT_SENSITIVITY;
+  CONFIG_DEFAULTS.SENSITIVITY = K1_MIC_AUTO_DEFAULT_SENSITIVITY;
+#endif
   g_k1_mic_auto_cfg = k1_mic_auto_default_config();
   k1_mic_auto_reset_state(&g_k1_mic_auto, now_ms);
   g_k1_mic_auto_inited = true;

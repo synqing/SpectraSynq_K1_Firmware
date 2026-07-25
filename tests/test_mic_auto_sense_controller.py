@@ -451,6 +451,18 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
             mic_auto_idx : mic_auto_idx + 1 + (next_env if next_env >= 0 else len(rest))
         ]
         self.assertIn("-DK1_MIC_AUTO_HEADROOM_V2=1", mic_block)
+        self.assertIn("-DK1_MIC_AUTO_DEFAULT_SENSITIVITY=1.8f", mic_block)
+
+    def test_mic_auto_default_sensitivity_pinned(self):
+        """SENS_V1a: mic_auto pins CONFIG.SENSITIVITY after NVS (no save_config)."""
+        self.assertIn("K1_MIC_AUTO_DEFAULT_SENSITIVITY", CPP)
+        self.assertIn("CONFIG.SENSITIVITY = K1_MIC_AUTO_DEFAULT_SENSITIVITY", CPP)
+        self.assertIn("CONFIG_DEFAULTS.SENSITIVITY = K1_MIC_AUTO_DEFAULT_SENSITIVITY", CPP)
+        self.assertNotIn("save_config(", CPP)
+        globals_cfg = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "globals_config.cpp").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("K1_MIC_AUTO_DEFAULT_SENSITIVITY", globals_cfg)
 
     def test_headroom_v2_protect_reaches_floor_faster(self):
         """Dual-stage 0.55 drops further/faster than legacy 0.85 single-step."""
