@@ -53,6 +53,7 @@ class Cfg:
     up_factor: float = 1.04
     down_factor: float = 0.90
     protect_factor: float = 0.85
+    protect_stages: int = 1
     target_peak_lo: float = 0.12
     target_peak_hi: float = 0.78
     silence_raw_rms: float = 18.0
@@ -198,7 +199,10 @@ def decide(st: State, m: Metrics, cfg: Cfg, now_ms: int) -> tuple[float, int, in
     did = False
 
     if hard:
-        next_scale = clamp_scale(st.scale * cfg.protect_factor, cfg)
+        next_scale = st.scale
+        stages = max(1, int(cfg.protect_stages))
+        for _ in range(stages):
+            next_scale = clamp_scale(next_scale * cfg.protect_factor, cfg)
         next_state = PROTECT
         next_reason = REASON_LOUD_TRIM if m.input_trim < 0.999 else REASON_HEADROOM
         st.protect_until_ms = now_ms + cfg.protect_cooldown_ms
@@ -426,24 +430,39 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
         self.assertIn("RAM-only", HEADER)
 
     def test_headroom_v2_defaults_in_header_and_env(self):
-        """P2 REWORK vol60: stronger protect + lower ceiling behind HEADROOM_V2."""
+        """P2 REWORK vol60: HEADROOM_V2b dual-stage + lower floor behind flag."""
         self.assertIn("K1_MIC_AUTO_HEADROOM_V2", HEADER)
-        self.assertIn("0.75f", HEADER)   # protect_factor under HEADROOM_V2
-        self.assertIn("1.20f", HEADER)   # scale_max under HEADROOM_V2
-        self.assertIn("3000UL", HEADER)  # protect_cooldown under HEADROOM_V2
+        self.assertIn("0.65f", HEADER)   # protect_factor under HEADROOM_V2
+        self.assertIn("0.35f", HEADER)   # scale_min under HEADROOM_V2
+        self.assertIn("1.00f", HEADER)   # scale_max under HEADROOM_V2
+        self.assertIn("0.65f", HEADER)   # target_peak_hi earlier threshold
+        self.assertIn("1500UL", HEADER)  # protect_cooldown under HEADROOM_V2
+        self.assertIn("protect_stages", HEADER)
+        self.assertIn("2", HEADER)       # dual-stage
         mic_auto_idx = PLATFORMIO.index("[env:k1_bench_im73d_mic_auto]")
         # Next env section after mic_auto
-        rest = PLATFORMIO[mic_auto_idx + 1:]
+        rest = PLATFORMIO[mic_auto_idx + 1 :]
         next_env = rest.find("\n[env:")
-        mic_block = PLATFORMIO[mic_auto_idx: mic_auto_idx + 1 + (next_env if next_env >= 0 else len(rest))]
+        mic_block = PLATFORMIO[
+            mic_auto_idx : mic_auto_idx + 1 + (next_env if next_env >= 0 else len(rest))
+        ]
         self.assertIn("-DK1_MIC_AUTO_HEADROOM_V2=1", mic_block)
 
     def test_headroom_v2_protect_reaches_floor_faster(self):
-        """0.75 protect drops further than 0.85 in the same number of clip frames."""
+        """Dual-stage 0.65 drops further/faster than legacy 0.85 single-step."""
         legacy = Cfg(protect_factor=0.85, scale_max=1.50, protect_cooldown_ms=8000)
-        v2 = Cfg(protect_factor=0.75, scale_max=1.20, protect_cooldown_ms=3000)
+        v2 = Cfg(
+            scale_min=0.35,
+            protect_factor=0.65,
+            protect_stages=2,
+            scale_max=1.00,
+            protect_cooldown_ms=1500,
+            target_peak_hi=0.65,
+            down_factor=0.82,
+            down_dwell_ms=1000,
+        )
 
-        def after_n_protects(cfg, n=3):
+        def after_n_protects(cfg, n=1):
             st = State(boot_start_ms=0, last_adjust_ms=0, scale=1.0)
             decide(st, Metrics(), cfg, 11000)
             t = 12000
@@ -457,11 +476,46 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
                 t += 200
             return st.scale
 
-        self.assertLess(after_n_protects(v2, 2), after_n_protects(legacy, 2))
-        self.assertAlmostEqual(after_n_protects(v2, 2), 0.75 ** 2, places=5)
-        # V2 ceiling blocks upscale above 1.20
-        self.assertEqual(v2.scale_max, 1.20)
-        self.assertEqual(v2.protect_cooldown_ms, 3000)
+        # One V2 protect frame = two 0.65 stages → 0.4225; legacy one frame → 0.85
+        self.assertLess(after_n_protects(v2, 1), after_n_protects(legacy, 1))
+        self.assertAlmostEqual(after_n_protects(v2, 1), 0.65**2, places=5)
+        # Two V2 frames reach floor 0.35
+        self.assertAlmostEqual(after_n_protects(v2, 2), 0.35, places=5)
+        self.assertEqual(v2.scale_max, 1.00)
+        self.assertEqual(v2.scale_min, 0.35)
+        self.assertEqual(v2.protect_cooldown_ms, 1500)
+        self.assertEqual(v2.protect_stages, 2)
+
+    def test_headroom_v2_anticipatory_hot_trim_earlier(self):
+        """target_peak_hi 0.65 fires hot_drive before legacy 0.78."""
+        v2 = Cfg(
+            scale_min=0.35,
+            scale_max=1.00,
+            protect_factor=0.65,
+            protect_stages=2,
+            target_peak_hi=0.65,
+            down_factor=0.82,
+            down_dwell_ms=1000,
+            protect_cooldown_ms=1500,
+        )
+        st = State(boot_start_ms=0, last_adjust_ms=0, scale=1.0)
+        decide(st, Metrics(waveform_peak_scaled=0.70), v2, 11000)  # seed EMA via boot exit
+        # Force post-boot with peak above 0.65
+        st2 = State(
+            boot_start_ms=0,
+            last_adjust_ms=0,
+            scale=1.0,
+            ema_seeded=True,
+            ema_peak_scaled=0.70,
+            ema_raw_rms=50.0,
+        )
+        scale, state, reason, adjusted = decide(
+            st2, Metrics(waveform_peak_scaled=0.70, raw_rms=50.0), v2, 12000
+        )
+        self.assertEqual(state, ADJUST_DOWN)
+        self.assertEqual(reason, REASON_HOT)
+        self.assertTrue(adjusted)
+        self.assertAlmostEqual(scale, 0.82, places=5)
 
 
 if __name__ == "__main__":

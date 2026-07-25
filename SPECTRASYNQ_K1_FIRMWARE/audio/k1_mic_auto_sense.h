@@ -62,6 +62,7 @@ struct K1MicAutoConfig {
   float    up_factor;               // multiplicative step for ADJUST_UP
   float    down_factor;             // multiplicative step for ADJUST_DOWN
   float    protect_factor;          // multiplicative step for PROTECT
+  uint8_t  protect_stages;         // 1 = single step; 2 = dual-stage same-frame protect
   float    target_peak_lo;         // below => candidate under-drive (peak_scaled EMA)
   float    target_peak_hi;         // above => candidate over-drive
   float    silence_raw_rms;        // raw RMS below this is quiet/silence
@@ -121,22 +122,32 @@ struct K1MicAutoDecision {
 
 inline K1MicAutoConfig k1_mic_auto_default_config() {
   K1MicAutoConfig c;
-  c.scale_min           = 0.50f;
 #if defined(K1_MIC_AUTO_HEADROOM_V2) && K1_MIC_AUTO_HEADROOM_V2
-  // P2 REWORK vol60 headroom: stronger/faster protect + lower music scale ceiling.
-  // Host/unit-validated path; bench flash only after unit gate. (2026-07-25)
-  c.scale_max           = 1.20f;
+  // HEADROOM_V2b (Captain rejects CONDITIONAL): vol60 still railed at scale=0.50.
+  // Lower floor + dual-stage protect + earlier hot peak + no boost above unity.
+  // Keep quiet/vol45 green via slow upscale + lower ceiling. Bench-only. (2026-07-25)
+  c.scale_min           = 0.35f;    // was 0.50 — more headroom once floored
+  c.scale_max           = 1.00f;    // was 1.20 — never boost above unity under V2
   c.up_factor            = 1.04f;    // +4%
-  c.down_factor          = 0.90f;    // -10%
-  c.protect_factor       = 0.75f;    // -25% immediate (was 0.85)
+  c.down_factor          = 0.82f;    // faster anticipatory trim (was 0.90)
+  c.protect_factor       = 0.65f;    // -35% per stage (was 0.75 / legacy 0.85)
+  c.protect_stages      = 2;        // dual-stage same-frame protect
+  c.target_peak_lo      = 0.12f;
+  c.target_peak_hi      = 0.65f;    // earlier near-threshold (was 0.78)
+  c.down_dwell_ms       = 1000UL;   // faster hot trim (was 3000)
+  c.protect_cooldown_ms = 1500UL;   // re-protect sooner (was 3000 / legacy 8000)
 #else
+  c.scale_min           = 0.50f;
   c.scale_max           = 1.50f;
   c.up_factor            = 1.04f;    // +4%
   c.down_factor          = 0.90f;    // -10%
   c.protect_factor       = 0.85f;    // -15% immediate
-#endif
+  c.protect_stages      = 1;
   c.target_peak_lo      = 0.12f;
   c.target_peak_hi      = 0.78f;
+  c.down_dwell_ms       = 3000UL;
+  c.protect_cooldown_ms = 8000UL;
+#endif
   c.silence_raw_rms     = 18.0f;
   c.music_raw_rms       = 28.0f;
   c.agc_high_gain       = 2.50f;
@@ -144,12 +155,6 @@ inline K1MicAutoConfig k1_mic_auto_default_config() {
   c.clip_eps            = 0.0f;
   c.boot_observe_ms     = 10000UL;
   c.up_dwell_ms         = 5000UL;
-  c.down_dwell_ms       = 3000UL;
-#if defined(K1_MIC_AUTO_HEADROOM_V2) && K1_MIC_AUTO_HEADROOM_V2
-  c.protect_cooldown_ms = 3000UL;   // was 8000 — re-protect sooner under sustained rail
-#else
-  c.protect_cooldown_ms = 8000UL;
-#endif
   c.ema_alpha           = 0.08f;
   return c;
 }
@@ -294,7 +299,11 @@ inline K1MicAutoDecision k1_mic_auto_decide(K1MicAutoState* st,
   bool did = false;
 
   if (hard_headroom) {
-    next = k1_mic_auto_clamp_scale(st->scale * cfg.protect_factor, cfg);
+    next = st->scale;
+    const uint8_t stages = (cfg.protect_stages < 1) ? 1 : cfg.protect_stages;
+    for (uint8_t i = 0; i < stages; ++i) {
+      next = k1_mic_auto_clamp_scale(next * cfg.protect_factor, cfg);
+    }
     next_state = K1_MIC_AUTO_PROTECT;
     next_reason = (m.input_trim < 0.999f) ? K1_MIC_AUTO_REASON_LOUD_TRIM
                                           : K1_MIC_AUTO_REASON_HEADROOM;
