@@ -446,3 +446,106 @@ void serial_print_beat_director_status() {
   USBSerial.println(vp_bool_text(!locked));  // time-fallback active when unlocked
 }
 #endif  // K1_EFFECT_FRAMEWORK_V1
+
+// ---------------------------------------------------------------------------
+// Smart-director status printer (moved VERBATIM from serial_menu.h, M2.1 R1
+// batch 5). Reads real accessors from the director/audio TUs (all in the replay
+// oracle MODULE_CPPS) + vp_bool_text + tx_begin/tx_end. K1_ONSET_V2 arm preserved.
+// ---------------------------------------------------------------------------
+void k1_print_smart_status() {
+  K1SmartDirectorConfig smart = k1_smart_director_config();
+  K1VisualHookConfig hooks = k1_visual_hooks_config();
+  K1ModeSelectionState mode_state = k1_mode_selection_read_state();
+  K1SmartDirectorOutput director = k1_smart_director_read_output();
+  K1OnsetBeatEvent event = k1_onset_beat_read();
+  K1AudioSnapshot audio = k1_audio_snapshot_read();
+
+  tx_begin();
+  USBSerial.print("SMART_ASSIST: ");
+  USBSerial.println(vp_bool_text(smart.enabled));
+  USBSerial.print("SMART_SWITCHING: ");
+  USBSerial.println(vp_bool_text(smart.assist_switching_enabled));
+  USBSerial.print("SMART_DIRECTOR_AUTONOMY: ");
+  USBSerial.println(vp_bool_text(smart.director_autonomy_enabled));
+  USBSerial.print("SMART_HOOKS: ");
+  USBSerial.println(vp_bool_text(hooks.enabled));
+  USBSerial.print("SMART_CONFIDENCE_FLOOR: ");
+  USBSerial.println(smart.confidence_floor, 3);
+  USBSerial.print("SMART_APPLIED_MODE: ");
+  USBSerial.println(mode_state.applied_mode);
+  USBSerial.print("SMART_LAST_REQUESTED_MODE: ");
+  USBSerial.println(mode_state.last_requested_mode);
+  USBSerial.print("SMART_SWITCHES_IN_WINDOW: ");
+  USBSerial.println(mode_state.switches_in_window);
+  USBSerial.print("SMART_MANUAL_OWNER_ACTIVE: ");
+  USBSerial.println(k1_smart_director_manual_owner_active(millis()) ? 1 : 0);
+  USBSerial.print("SMART_LAST_REASON: ");
+  USBSerial.println(uint8_t(mode_state.last_reason));
+  USBSerial.print("SMART_STATE: ");
+  USBSerial.println(uint8_t(director.state));
+  USBSerial.print("SMART_INTENT_MODE: ");
+  USBSerial.println(director.mode_intent.requested_mode);
+  USBSerial.print("SMART_INTENT_CONFIDENCE: ");
+  USBSerial.println(director.mode_intent.confidence, 3);
+  USBSerial.print("SMART_INTENT_WANTS_SWITCH: ");
+  USBSerial.println(director.mode_intent.wants_switch ? 1 : 0);
+  USBSerial.print("SMART_SCALAR_PHOTONS: ");
+  USBSerial.println(director.photons_scalar, 3);
+  USBSerial.print("SMART_SCALAR_CHROMA: ");
+  USBSerial.println(director.chroma_scalar, 3);
+  USBSerial.print("SMART_SCALAR_MOOD: ");
+  USBSerial.println(director.speed_scalar, 3);
+  USBSerial.print("SMART_SCALAR_SATURATION: ");
+  USBSerial.println(director.saturation_scalar, 3);
+  USBSerial.print("SMART_PALETTE_OVERLAY: ");
+  USBSerial.println(director.palette_overlay_enabled ? 1 : 0);
+  USBSerial.print("SMART_PALETTE_INDEX: ");
+  USBSerial.println(director.palette_index);
+  USBSerial.print("SMART_AUTO_COLOUR_SHIFT: ");
+  USBSerial.println(director.auto_colour_shift ? 1 : 0);
+  USBSerial.print("SMART_MIN_DWELL_MS: ");
+  USBSerial.println(smart.min_dwell_ms);
+  USBSerial.print("SMART_COOLDOWN_MS: ");
+  USBSerial.println(smart.cooldown_ms);
+  USBSerial.print("SMART_SWITCH_WINDOW_MS: ");
+  USBSerial.println(smart.switch_window_ms);
+  USBSerial.print("SMART_MAX_SWITCHES: ");
+  USBSerial.println(smart.max_switches_per_window);
+  USBSerial.print("SMART_AUDIO_NOVELTY: ");
+  USBSerial.println(audio.novelty, 4);
+  USBSerial.print("SMART_AUDIO_ENERGY: ");
+  USBSerial.println(audio.spectral_energy, 4);
+  USBSerial.print("SMART_EVENT_ID: ");
+  USBSerial.println(event.event_id);
+  USBSerial.print("SMART_EVENT_AGE_MS: ");
+  USBSerial.println(event.event_age_ms);
+  USBSerial.print("SMART_ONSET: ");
+  USBSerial.println(event.onset ? 1 : 0);
+  USBSerial.print("SMART_BASS_ONSET: ");
+  USBSerial.println(event.bass_onset ? 1 : 0);
+  USBSerial.print("SMART_BEAT_CONFIDENCE: ");
+  USBSerial.println(event.beat_confidence, 3);
+#ifdef K1_ONSET_V2
+  USBSerial.print("SMART_TRANSIENT: ");
+  USBSerial.println(event.transient ? 1 : 0);
+  USBSerial.print("SMART_KICK: ");
+  USBSerial.println(event.kick ? 1 : 0);
+  USBSerial.print("SMART_SNARE: ");
+  USBSerial.println(event.snare ? 1 : 0);
+  USBSerial.print("SMART_HIHAT: ");
+  USBSerial.println(event.hihat ? 1 : 0);
+  USBSerial.print("SMART_TRANSIENT_LEVEL: ");
+  USBSerial.println(event.transient_level, 3);
+  USBSerial.print("SMART_KICK_LEVEL: ");
+  USBSerial.println(event.kick_level, 3);
+  USBSerial.print("SMART_SNARE_LEVEL: ");
+  USBSerial.println(event.snare_level, 3);
+  USBSerial.print("SMART_HIHAT_LEVEL: ");
+  USBSerial.println(event.hihat_level, 3);
+  USBSerial.print("SMART_SNARE_EVENT_ID: ");
+  USBSerial.println(event.snare_event_id);
+  USBSerial.print("SMART_HIHAT_EVENT_ID: ");
+  USBSerial.println(event.hihat_event_id);
+#endif
+  tx_end();
+}

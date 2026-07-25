@@ -326,7 +326,10 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             re.S,
         )
         self.assertIsNotNone(smart_guard, "Smart control commands must not self-mark manual ownership")
-        self.assertIn("SMART_MANUAL_OWNER_ACTIVE", serial_source)
+        # SMART_MANUAL_OWNER_ACTIVE prints from k1_print_smart_status, moved to
+        # serial_menu.cpp (M2.1 R1 batch 5); search the whole serial surface.
+        self.assertIn("SMART_MANUAL_OWNER_ACTIVE",
+                      serial_source + "\n" + read(FIRMWARE / "serial_menu.cpp"))
         self.assertNotIn('strcmp(command_type, "smart_scene") != 0', serial_source)
 
     def test_manual_owner_audit_covers_operator_surfaces(self):
@@ -523,7 +526,10 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
             "SMART_PALETTE_INDEX",
             "SMART_AUTO_COLOUR_SHIFT",
         ):
-            self.assertIn(token, combined + "\n" + serial_source)
+            # SMART_PALETTE_* tokens print from k1_print_smart_status, moved to
+            # serial_menu.cpp (M2.1 R1 batch 5); include it in the searched surface.
+            self.assertIn(token, combined + "\n" + serial_source
+                          + "\n" + read(FIRMWARE / "serial_menu.cpp"))
 
         apply_body = re.search(
             r"void\s+k1_smart_director_apply_render_params\s*\([^)]*\)\s*\{(?P<body>.*?)\n\}",
@@ -725,7 +731,9 @@ class SmartVisualEngineStaticTest(unittest.TestCase):
         self.assertIn("K1VisualHookOutput visual_hook_output = { 1.0f, 1.0f, 1.0f, false }", ino)
 
     def test_serial_smart_status_exposes_v2_percussive_channels(self):
-        text = read(FIRMWARE / "serial_menu.h")
+        # k1_print_smart_status moved to serial_menu.cpp (M2.1 R1 batch 5); the
+        # serial command surface now spans both files. Same tokens, both homes.
+        text = read(FIRMWARE / "serial_menu.h") + "\n" + read(FIRMWARE / "serial_menu.cpp")
         for token in (
             "SMART_TRANSIENT:",
             "SMART_KICK:",
