@@ -414,6 +414,8 @@ void serial_print_beat_director_status() {
   const bool locked  = bad_director_tempo_locked();
   USBSerial.print("BEAT_DIRECTOR: ");
   USBSerial.println(vp_bool_text(enabled));
+  USBSerial.print("BEAT_DIRECTOR_OPT_IN: ");
+  USBSerial.println(vp_bool_text(bad_director_compile_opt_in()));
   USBSerial.print("BEAT_DIRECTOR_MODE: ");
   USBSerial.println(bad_director_current_mode());
   USBSerial.print("BEAT_DIRECTOR_TEMPO_LOCKED: ");
@@ -424,6 +426,16 @@ void serial_print_beat_director_status() {
   USBSerial.println(bad_director_tempo_confidence(), 3);
   USBSerial.print("BEAT_DIRECTOR_FALLBACK: ");
   USBSerial.println(vp_bool_text(!locked));  // time-fallback active when unlocked
+  // Device-proof surface (Proposal 3): poll these after a known-BPM locked track
+  // to confirm switches land beat-quantised. RAM-only; no NVS.
+  USBSerial.print("BEAT_DIRECTOR_SWITCH_COUNT: ");
+  USBSerial.println(bad_director_switch_count());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_MS: ");
+  USBSerial.println(bad_director_last_switch_ms());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_MODE: ");
+  USBSerial.println(bad_director_last_switch_mode());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: ");
+  USBSerial.println(vp_bool_text(bad_director_last_switch_beat_quantised()));
 }
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
