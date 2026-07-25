@@ -685,153 +685,22 @@ void k1_print_smart_status() {
   tx_end();
 }
 
-void k1_print_edge_status() {
-  K1EdgeMixerConfig edge = k1_edgemixer_config();
-  tx_begin();
-  USBSerial.print("EDGE_ENABLED: ");
-  USBSerial.println(vp_bool_text(edge.enabled));
-  USBSerial.print("EDGE_MODE: ");
-  USBSerial.println(k1_edge_mode_name(edge.mode));
-  USBSerial.print("EDGE_STRENGTH: ");
-  USBSerial.println(edge.strength, 3);
-  USBSerial.print("EDGE_SPREAD: ");
-  USBSerial.println((int)edge.spreadDegrees);
-  USBSerial.print("EDGE_ROTATION: ");
-  USBSerial.println(k1_edge_rotation_name(edge.rotationSpace));
-  USBSerial.print("EDGE_SPATIAL: ");
-  USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
-  USBSerial.print("EDGE_DUAL: ");
-  USBSerial.println(k1_edge_dual_name(edge.dualEdge));
-  tx_end();
-}
-
-// A-lane UX guard: MIRROR + COMPLEMENTARY makes both edges rotate +/-180deg to the
-// SAME hue (2*180 = 360 = 0 separation), collapsing the two edges into one. Honest
-// maths, but a UX trap — so warn (informative, NOT a hard block) whenever a change
-// makes that combo active. Called from the mode + dual-edge change handlers.
-void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e) {
-  if (e.dualEdge == K1_EDGE_DUAL_MIRROR && e.mode == K1_EDGE_MIXER_COMPLEMENTARY) {
-    tx_begin();
-    USBSerial.println("EDGE_WARN: mirror+complementary collapses both edges to the same hue (2x180=0 separation) - use split at complementary, or mirror at analogous/triadic.");
-    tx_end();
-  }
-}
-
-// --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
-// k1_edgemixer_config()/set_config() and prints only its own new state) ---
-void serial_edge_toggle_enabled() {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  e.enabled = !e.enabled;
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_ENABLED: ");
-  USBSerial.println(vp_bool_text(e.enabled));
-  tx_end();
-}
-
-void serial_edge_cycle_mode() {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  // off -> analogous -> complementary -> split -> veil -> triadic -> tetradic -> off
-  // (under K1_STM the cycle continues: tetradic -> stm_dual -> stm_spectral_map -> off)
-  uint8_t next = (uint8_t)e.mode + 1;
-#ifdef K1_STM
-  if (next > (uint8_t)K1_EDGE_MIXER_STM_SPECTRAL_MAP) {
-    next = (uint8_t)K1_EDGE_MIXER_OFF;
-  }
-#else
-  if (next > (uint8_t)K1_EDGE_MIXER_TETRADIC) {
-    next = (uint8_t)K1_EDGE_MIXER_OFF;
-  }
-#endif
-  e.mode = (K1EdgeMixerMode)next;
-  e.enabled = (e.mode != K1_EDGE_MIXER_OFF);  // colour mode -> visible; off -> disabled
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_MODE: ");
-  USBSerial.println(k1_edge_mode_name(e.mode));
-  tx_end();
-  k1_edge_warn_if_collapsed(e);
-}
-
-void serial_edge_adjust_spread(int delta) {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  int s = (int)e.spreadDegrees + delta;
-  if (s < 0) { s = 0; }
-  if (s > 60) { s = 60; }
-  e.spreadDegrees = (uint8_t)s;
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_SPREAD: ");
-  USBSerial.println((int)e.spreadDegrees);
-  tx_end();
-}
-
-void serial_edge_adjust_strength(float delta) {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  e.strength = constrain(e.strength + delta, 0.0f, 1.0f);
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_STRENGTH: ");
-  USBSerial.println(e.strength, 3);
-  tx_end();
-}
-
-void serial_edge_toggle_rotation() {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  // 3-way cycle: faithful (SUM) -> luma -> oklab -> faithful. This is the bench
-  // A/B control for the OKLab-vs-luma-rescale perceptual comparison on the plate.
-  switch (e.rotationSpace) {
-    case K1_EDGE_ROTATION_SUM_PRESERVING:
-      e.rotationSpace = K1_EDGE_ROTATION_LUMA_PRESERVING;
-      break;
-    case K1_EDGE_ROTATION_LUMA_PRESERVING:
-      e.rotationSpace = K1_EDGE_ROTATION_OKLAB;
-      break;
-    default:
-      e.rotationSpace = K1_EDGE_ROTATION_SUM_PRESERVING;
-      break;
-  }
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_ROTATION: ");
-  USBSerial.println(k1_edge_rotation_name(e.rotationSpace));
-  tx_end();
-}
-
-void serial_edge_toggle_dual_edge() {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  // 3-way cycle: one_sided -> split -> mirror -> one_sided. Symmetric dual-edge
-  // (A lane) — the plate A/B for "make BOTH edges participate about the 79/80
-  // centre". one_sided = only the secondary strip shifts (certified default);
-  // split = both edges +/- theta/2; mirror = both edges +/- theta.
-  switch (e.dualEdge) {
-    case K1_EDGE_DUAL_ONE_SIDED:
-      e.dualEdge = K1_EDGE_DUAL_SPLIT;
-      break;
-    case K1_EDGE_DUAL_SPLIT:
-      e.dualEdge = K1_EDGE_DUAL_MIRROR;
-      break;
-    default:
-      e.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
-      break;
-  }
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_DUAL: ");
-  USBSerial.println(k1_edge_dual_name(e.dualEdge));
-  tx_end();
-  k1_edge_warn_if_collapsed(e);
-}
-
-void serial_edge_toggle_uniform() {
-  K1EdgeMixerConfig e = k1_edgemixer_config();
-  e.spatialUniform = !e.spatialUniform;  // ref E: centre-masked <-> uniform
-  k1_edgemixer_set_config(e);
-  tx_begin();
-  USBSerial.print("EDGE_SPATIAL: ");
-  USBSerial.println(e.spatialUniform ? "uniform" : "masked");
-  tx_end();
-}
+// ---------------------------------------------------------------------------
+// Edge-mixer status + live-hotkey control — DEFINITIONS moved to
+// serial/serial_menu.cpp (M2.1 Phase R1, batch 2). Declarations stay here for the
+// in-header hotkey dispatch and the extracted serial_cmd_dispatch_edge_mixer
+// (serial_cmd_handlers.cpp already forward-declares k1_print_edge_status /
+// k1_edge_warn_if_collapsed). Behaviour-preserving: goldens reproduce byte-for-byte.
+// ---------------------------------------------------------------------------
+void k1_print_edge_status();
+void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e);
+void serial_edge_toggle_enabled();
+void serial_edge_cycle_mode();
+void serial_edge_adjust_spread(int delta);
+void serial_edge_adjust_strength(float delta);
+void serial_edge_toggle_rotation();
+void serial_edge_toggle_dual_edge();
+void serial_edge_toggle_uniform();
 
 bool k1_apply_smart_scene(const char* scene) {
   if (scene == nullptr || scene[0] == 0) {
