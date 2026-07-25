@@ -16,6 +16,7 @@ LED_UTILS_PATH = FW / "visual" / "led_utilities.h"
 CONSTANTS_PATH = FW / "system" / "constants.h"
 GLOBALS_PATH = FW / "system" / "globals.h"
 SERIAL_PATH = FW / "serial" / "serial_menu.h"
+SERIAL_MENU_CPP_PATH = FW / "serial" / "serial_menu.cpp"
 SERIAL_CMD_HANDLERS_PATH = FW / "serial" / "serial_cmd_handlers.cpp"
 PALETTES_PATH = FW / "visual" / "Palettes.cpp"
 PIO_PATH = ROOT / "platformio.ini"
@@ -24,6 +25,7 @@ LED_UTILS = LED_UTILS_PATH.read_text()
 CONSTANTS = CONSTANTS_PATH.read_text()
 GLOBALS = GLOBALS_PATH.read_text()
 SERIAL = SERIAL_PATH.read_text()
+SERIAL_MENU_CPP = SERIAL_MENU_CPP_PATH.read_text()
 SERIAL_CMD_HANDLERS = SERIAL_CMD_HANDLERS_PATH.read_text()
 PALETTES = PALETTES_PATH.read_text()
 PIO = PIO_PATH.read_text()
@@ -139,8 +141,9 @@ class VividPrecompStaticTest(unittest.TestCase):
         self.assertIn("serial_ensure_vivid_defaults();", vivid_branch)
         self.assertIn("serial_print_vivid_precomp_status();", vivid_branch)
 
-        # Helper function bodies remain in serial_menu.h
-        print_body = _function_body(SERIAL, "serial_print_vivid_precomp_status")
+        # Helper function bodies moved to serial_menu.cpp (M2.1 R1 batch 3); the
+        # declarations remain gated in serial_menu.h. Same body teeth, correct file.
+        print_body = _function_body(SERIAL_MENU_CPP, "serial_print_vivid_precomp_status")
         self.assertIn('USBSerial.print("VIVID_PRECOMP: ");', print_body)
         self.assertIn('USBSerial.print("VIVID_CHROMA_LEVEL: ");', print_body)
         self.assertIn('USBSerial.print("VIVID_BLACK_LEVEL: ");', print_body)

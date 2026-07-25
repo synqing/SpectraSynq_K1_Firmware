@@ -319,3 +319,48 @@ void serial_edge_toggle_uniform() {
   USBSerial.println(e.spatialUniform ? "uniform" : "masked");
   tx_end();
 }
+
+// ---------------------------------------------------------------------------
+// Vivid pre-comp helpers (moved VERBATIM from serial_menu.h, M2.1 Phase R1
+// batch 3). Gated by K1_VIVID_PRECOMP_V1, same as the extracted
+// serial_cmd_dispatch_vivid (serial_cmd_handlers.cpp) and the 'v' hotkey. Source
+// order preserved so the sibling helpers are defined before their callers.
+// ---------------------------------------------------------------------------
+#ifdef K1_VIVID_PRECOMP_V1
+void serial_update_vivid_enabled_from_levels() {
+  VP_VIVID_PRECOMP = (VP_VIVID_CHROMA_LEVEL > 0.0f) || (VP_VIVID_BLACK_LEVEL > 0.0f);
+}
+
+void serial_ensure_vivid_defaults() {
+  if (VP_VIVID_CHROMA_LEVEL <= 0.0f && VP_VIVID_BLACK_LEVEL <= 0.0f) {
+    VP_VIVID_CHROMA_LEVEL = 1.0f;
+    VP_VIVID_BLACK_LEVEL = VIVID_BLACK_LEVEL_DEFAULT;
+  }
+}
+
+void serial_set_vivid_level(float value) {
+  float level = constrain(value, 0.0f, 1.0f);
+  VP_VIVID_CHROMA_LEVEL = level;
+  VP_VIVID_BLACK_LEVEL = constrain(level * VIVID_BLACK_LEVEL_DEFAULT, 0.0f, 1.0f);
+  serial_update_vivid_enabled_from_levels();
+}
+
+void serial_print_vivid_precomp_status() {
+  USBSerial.print("VIVID_PRECOMP: ");
+  USBSerial.println(vp_bool_text(VP_VIVID_PRECOMP));
+  USBSerial.print("VIVID_CHROMA_LEVEL: ");
+  USBSerial.println(VP_VIVID_CHROMA_LEVEL, 3);
+  USBSerial.print("VIVID_BLACK_LEVEL: ");
+  USBSerial.println(VP_VIVID_BLACK_LEVEL, 3);
+}
+
+void serial_toggle_vivid_precomp() {
+  VP_VIVID_PRECOMP = !VP_VIVID_PRECOMP;
+  if (VP_VIVID_PRECOMP) {
+    serial_ensure_vivid_defaults();
+  }
+  tx_begin();
+  serial_print_vivid_precomp_status();
+  tx_end();
+}
+#endif

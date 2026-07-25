@@ -428,42 +428,15 @@ void serial_print_beat_director_status() {
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
 #ifdef K1_VIVID_PRECOMP_V1
-void serial_update_vivid_enabled_from_levels() {
-  VP_VIVID_PRECOMP = (VP_VIVID_CHROMA_LEVEL > 0.0f) || (VP_VIVID_BLACK_LEVEL > 0.0f);
-}
-
-void serial_ensure_vivid_defaults() {
-  if (VP_VIVID_CHROMA_LEVEL <= 0.0f && VP_VIVID_BLACK_LEVEL <= 0.0f) {
-    VP_VIVID_CHROMA_LEVEL = 1.0f;
-    VP_VIVID_BLACK_LEVEL = VIVID_BLACK_LEVEL_DEFAULT;
-  }
-}
-
-void serial_set_vivid_level(float value) {
-  float level = constrain(value, 0.0f, 1.0f);
-  VP_VIVID_CHROMA_LEVEL = level;
-  VP_VIVID_BLACK_LEVEL = constrain(level * VIVID_BLACK_LEVEL_DEFAULT, 0.0f, 1.0f);
-  serial_update_vivid_enabled_from_levels();
-}
-
-void serial_print_vivid_precomp_status() {
-  USBSerial.print("VIVID_PRECOMP: ");
-  USBSerial.println(vp_bool_text(VP_VIVID_PRECOMP));
-  USBSerial.print("VIVID_CHROMA_LEVEL: ");
-  USBSerial.println(VP_VIVID_CHROMA_LEVEL, 3);
-  USBSerial.print("VIVID_BLACK_LEVEL: ");
-  USBSerial.println(VP_VIVID_BLACK_LEVEL, 3);
-}
-
-void serial_toggle_vivid_precomp() {
-  VP_VIVID_PRECOMP = !VP_VIVID_PRECOMP;
-  if (VP_VIVID_PRECOMP) {
-    serial_ensure_vivid_defaults();
-  }
-  tx_begin();
-  serial_print_vivid_precomp_status();
-  tx_end();
-}
+// Vivid pre-comp helpers — DEFINITIONS moved to serial/serial_menu.cpp (M2.1 R1
+// batch 3). Declarations stay (gated) so the extracted serial_cmd_dispatch_vivid
+// (serial_cmd_handlers.cpp) and the in-header 'v' hotkey dispatch resolve against
+// the single out-of-line definition. Behaviour-preserving: serial goldens reproduce.
+void serial_update_vivid_enabled_from_levels();
+void serial_ensure_vivid_defaults();
+void serial_set_vivid_level(float value);
+void serial_print_vivid_precomp_status();
+void serial_toggle_vivid_precomp();
 #endif
 
 
