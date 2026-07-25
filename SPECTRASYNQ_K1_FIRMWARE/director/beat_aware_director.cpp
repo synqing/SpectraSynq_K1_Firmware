@@ -226,6 +226,12 @@ static uint32_t                g_bad_last_tick_ms  = 0;
 static uint8_t                 g_bad_safe_cursor   = 0;  // SAFE transition rotation
 static portMUX_TYPE            g_bad_config_mux    = portMUX_INITIALIZER_UNLOCKED;
 
+// Proof telemetry (RAM-only; updated on switch commit; serial-readable).
+static uint32_t g_bad_switch_count           = 0;
+static uint32_t g_bad_last_switch_ms         = 0;
+static uint8_t  g_bad_last_switch_mode       = 0;
+static bool     g_bad_last_switch_beat_q     = false;
+
 void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_state = {};
   g_bad_state.current_mode    = initial_mode;
@@ -236,6 +242,10 @@ void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_energy_smooth = 0.0f;
   g_bad_last_tick_ms  = now_ms;
   g_bad_safe_cursor   = 0;
+  g_bad_switch_count       = 0;
+  g_bad_last_switch_ms     = 0;
+  g_bad_last_switch_mode   = initial_mode;
+  g_bad_last_switch_beat_q = false;
 }
 
 BeatAwareDirectorConfig bad_director_config() {
@@ -294,6 +304,20 @@ float bad_director_tempo_confidence() {
   return sem.tempo_confidence;
 }
 
+uint32_t bad_director_switch_count() { return g_bad_switch_count; }
+uint32_t bad_director_last_switch_ms() { return g_bad_last_switch_ms; }
+uint8_t  bad_director_last_switch_mode() { return g_bad_last_switch_mode; }
+bool     bad_director_last_switch_beat_quantised() {
+  return g_bad_last_switch_beat_q;
+}
+bool bad_director_compile_opt_in() {
+#ifdef K1_BEAT_AWARE_DIRECTOR_V1
+  return true;
+#else
+  return false;
+#endif
+}
+
 uint8_t bad_director_tick(uint32_t now_ms) {
   BeatAwareDirectorConfig config = bad_director_config();
   if (!config.enabled) {
@@ -336,6 +360,12 @@ uint8_t bad_director_tick(uint32_t now_ms) {
 
   if (decision.wants_switch) {
     using namespace k1::effects::framework;
+
+    // Proof telemetry first (RAM-only) so serial status can confirm beat-q.
+    g_bad_switch_count++;
+    g_bad_last_switch_ms     = now_ms;
+    g_bad_last_switch_mode   = decision.next_mode;
+    g_bad_last_switch_beat_q = decision.beat_quantised;
 
     // SAFE transition type only (never NUCLEAR/STARGATE/PHASE_SHIFT). Rotate the
     // P4 SAFE_DEFAULT set so successive switches feel varied but stay spatial.
