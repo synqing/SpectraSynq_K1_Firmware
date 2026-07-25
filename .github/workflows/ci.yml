@@ -29,8 +29,15 @@ jobs:
         run: python -m pytest tests/ -q
 
   firmware-build:
-    name: Firmware build (k1_hardware)
+    # Build BOTH the base env and the actual shipping env. k1_prod_im73d
+    # (default_envs) is what ships to backers; k1_hardware is its base, inherited
+    # by the other reference/probe envs. CI must guard the binary that ships.
+    name: Firmware build (${{ matrix.env }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        env: [k1_hardware, k1_prod_im73d]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -42,8 +49,8 @@ jobs:
           path: |
             ~/.platformio
             ~/.cache/pip
-          key: pio-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+          key: pio-${{ runner.os }}-${{ matrix.env }}-${{ hashFiles('platformio.ini') }}
       - name: Install PlatformIO
         run: pip install platformio
-      - name: Build production firmware
-        run: pio run -e k1_hardware
+      - name: Build ${{ matrix.env }}
+        run: pio run -e ${{ matrix.env }}
