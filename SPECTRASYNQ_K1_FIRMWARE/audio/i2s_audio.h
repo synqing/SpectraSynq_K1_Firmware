@@ -83,6 +83,10 @@ volatile uint8_t raw_dump_request = 0;
 // while still accepting all real loud-audio dynamics.
 #define SAMPLE_RAIL_THRESHOLD 32000
 
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
+
 #ifdef K1_LOUD_GUARD_V1
 static inline float k1_loud_guard_clamp_float(float value, float min_value, float max_value) {
   if (!isfinite(value)) return min_value;
@@ -113,8 +117,16 @@ static inline float k1_loud_guard_approach(float current, float target, float dt
 }
 
 static inline float k1_loud_guard_effective_sensitivity() {
+  // Layering: CONFIG.SENSITIVITY * auto-sense (optional) * loud-guard trim.
+  // Auto-sense is ABOVE loud-guard and must never replace or fight it.
+#ifdef K1_MIC_AUTO_SENSE_V1
+  const float auto_scale = k1_mic_auto_sense_applied_scale();
+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY * auto_scale;
+  return CONFIG.SENSITIVITY * auto_scale * k1_loud_input_trim;
+#else
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
   return CONFIG.SENSITIVITY * k1_loud_input_trim;
+#endif
 }
 
 static inline float k1_audio_response_gain_effective() {
@@ -809,6 +821,18 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_raw_i16_abs_peak,
       im73d_raw_i16_rms,
       im73d_raw_i16_near_pct);
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    {
+      const K1MicAutoState& mas = k1_mic_auto_sense_state();
+      USBSerial.printf(" | auto_scale=%.3f auto_rec=%.3f auto_state=%u auto_reason=%u auto_en=%d auto_shadow=%d",
+        (float)k1_mic_auto_sense_applied_scale(),
+        (float)mas.recommended_scale,
+        (unsigned)mas.state,
+        (unsigned)mas.reason,
+        mas.runtime_enabled ? 1 : 0,
+        mas.shadow_only ? 1 : 0);
+    }
 #endif
 #ifdef K1_LOUD_GUARD_V1
     USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",

@@ -871,6 +871,11 @@ void loop() {
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_update(t_now);
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+  // Slow supervisor: update AFTER loud-guard publishes this frame's duties/trims.
+  // Applied scale is consumed on the NEXT acquire_sample_chunk via effective sensitivity.
+  k1_mic_auto_sense_update(t_now);
+#endif
 #ifdef K1_PIN_EVIDENCE_V1
   k1_pin_evidence_set_ap_metrics(t_now);
 #endif

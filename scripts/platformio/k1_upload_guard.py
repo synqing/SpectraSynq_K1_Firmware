@@ -85,6 +85,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_agc_probe",
             "k1_bench_im73d",  # IM73D122 PDM mic evaluation — bench B489A500 ONLY (2026-07-02)
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S SNR eval - radio-free bench B489A500 ONLY (2026-07-06)
+            "k1_bench_im73d_mic_auto",  # IM73D + K1_MIC_AUTO_SENSE_V1 opt-in — bench B489A500 ONLY
             "k1_bench_im73d_ble",  # IM73D PDM + NimBLE BLE-MIDI demo — bench B489A500 ONLY (2026-07-04)
             "k1_custom",  # 224-LED single-channel wall-bounce build — bench B489A500 ONLY (2026-07-06)
         ),
