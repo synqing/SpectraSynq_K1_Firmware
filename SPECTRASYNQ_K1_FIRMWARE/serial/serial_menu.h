@@ -571,111 +571,21 @@ void vp_print_status() {
   tx_end();
 }
 
-const char* k1_edge_mode_name(K1EdgeMixerMode mode) {
-  switch (mode) {
-    case K1_EDGE_MIXER_ANALOGOUS: return "analogous";
-    case K1_EDGE_MIXER_COMPLEMENTARY: return "complementary";
-    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split";
-    case K1_EDGE_MIXER_SATURATION_VEIL: return "veil";
-    case K1_EDGE_MIXER_TRIADIC: return "triadic";
-    case K1_EDGE_MIXER_TETRADIC: return "tetradic";
-#ifdef K1_STM
-    case K1_EDGE_MIXER_STM_DUAL: return "stm_dual";
-    case K1_EDGE_MIXER_STM_SPECTRAL_MAP: return "stm_spectral_map";
-#endif
-    case K1_EDGE_MIXER_OFF:
-    default: return "off";
-  }
-}
-
-bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode) {
-  if (strcmp(text, "off") == 0) {
-    *out_mode = K1_EDGE_MIXER_OFF;
-  } else if (strcmp(text, "analogous") == 0) {
-    *out_mode = K1_EDGE_MIXER_ANALOGOUS;
-  } else if (strcmp(text, "complementary") == 0) {
-    *out_mode = K1_EDGE_MIXER_COMPLEMENTARY;
-  } else if (strcmp(text, "split") == 0 || strcmp(text, "split_complementary") == 0) {
-    *out_mode = K1_EDGE_MIXER_SPLIT_COMPLEMENTARY;
-  } else if (strcmp(text, "veil") == 0 || strcmp(text, "saturation_veil") == 0) {
-    *out_mode = K1_EDGE_MIXER_SATURATION_VEIL;
-  } else if (strcmp(text, "triadic") == 0) {
-    *out_mode = K1_EDGE_MIXER_TRIADIC;
-  } else if (strcmp(text, "tetradic") == 0) {
-    *out_mode = K1_EDGE_MIXER_TETRADIC;
-#ifdef K1_STM
-  } else if (strcmp(text, "stm_dual") == 0) {
-    *out_mode = K1_EDGE_MIXER_STM_DUAL;
-  } else if (strcmp(text, "stm_spectral_map") == 0 || strcmp(text, "stm_spectral") == 0) {
-    *out_mode = K1_EDGE_MIXER_STM_SPECTRAL_MAP;
-#endif
-  } else {
-    return false;
-  }
-  return true;
-}
-
-const char* k1_edge_rotation_name(K1EdgeMixerRotationSpace space) {
-  switch (space) {
-    case K1_EDGE_ROTATION_LUMA_PRESERVING: return "luma";
-    case K1_EDGE_ROTATION_OKLAB:           return "oklab";
-    default:                               return "faithful";
-  }
-}
-
-const char* k1_edge_dual_name(K1EdgeMixerDualEdge dual) {
-  switch (dual) {
-    case K1_EDGE_DUAL_SPLIT:  return "split";
-    case K1_EDGE_DUAL_MIRROR: return "mirror";
-    default:                  return "one_sided";
-  }
-}
-
-// faithful -> SUM_PRESERVING (grey-axis rotation, +/-1 LSB golden parity);
-// luma     -> LUMA_PRESERVING (grey-axis rotation + per-pixel BT.601 luma rescale);
-// oklab    -> OKLAB (perceptual hue rotation in the OKLab a/b plane, holds L constant).
-bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space) {
-  if (strcmp(text, "faithful") == 0 || strcmp(text, "sum") == 0) {
-    *out_space = K1_EDGE_ROTATION_SUM_PRESERVING;
-  } else if (strcmp(text, "luma") == 0) {
-    *out_space = K1_EDGE_ROTATION_LUMA_PRESERVING;
-  } else if (strcmp(text, "oklab") == 0) {
-    *out_space = K1_EDGE_ROTATION_OKLAB;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-// one_sided (or one) -> ONE_SIDED (secondary only; certified default);
-// split               -> SPLIT (both edges +/- theta/2 about the 79/80 centre);
-// mirror              -> MIRROR (both edges +/- theta, full opposite rotations).
-bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual) {
-  if (strcmp(text, "one_sided") == 0 || strcmp(text, "one") == 0) {
-    *out_dual = K1_EDGE_DUAL_ONE_SIDED;
-  } else if (strcmp(text, "split") == 0) {
-    *out_dual = K1_EDGE_DUAL_SPLIT;
-  } else if (strcmp(text, "mirror") == 0) {
-    *out_dual = K1_EDGE_DUAL_MIRROR;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-// uniform -> spatialUniform true (shift applied evenly across the strip);
-// masked  -> false (centre-masked: fades from 0 at the 79/80 centre to full at the
-// ends). Ref E. Scriptable counterpart to the 'm' hotkey.
-bool k1_parse_edge_uniform(const char* text, bool* out_uniform) {
-  if (strcmp(text, "uniform") == 0) {
-    *out_uniform = true;
-  } else if (strcmp(text, "masked") == 0) {
-    *out_uniform = false;
-  } else {
-    return false;
-  }
-  return true;
-}
+// ---------------------------------------------------------------------------
+// Edge-mixer name/parse helpers — DEFINITIONS moved to serial/serial_menu.cpp
+// (M2.1 Phase R1, batch 1: kill the serial_menu.h ODR bomb). Declarations stay
+// here so the in-header status printers (k1_print_edge_status et al.) and the
+// extracted serial_cmd_dispatch_edge_mixer() in serial_cmd_handlers.cpp resolve
+// against the single out-of-line definition. Behaviour-preserving: the
+// serial_replay + serial_struct goldens reproduce byte-for-byte after the move.
+// ---------------------------------------------------------------------------
+const char* k1_edge_mode_name(K1EdgeMixerMode mode);
+bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode);
+const char* k1_edge_rotation_name(K1EdgeMixerRotationSpace space);
+const char* k1_edge_dual_name(K1EdgeMixerDualEdge dual);
+bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space);
+bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual);
+bool k1_parse_edge_uniform(const char* text, bool* out_uniform);
 
 void k1_print_smart_status() {
   K1SmartDirectorConfig smart = k1_smart_director_config();

@@ -126,6 +126,13 @@ MODULE_CPPS = [
                                        # calls serial_cmd_dispatch_pure_setter() here;
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
+    "serial/serial_menu.cpp",          # M2.1 R1: out-of-line home for serial_menu.h's
+                                       # non-inline defs (ODR-bomb kill). The driver
+                                       # #includes serial_menu.h (now the prototypes for
+                                       # the moved fns); this TU supplies the definitions
+                                       # the driver + serial_cmd_handlers.cpp link against.
+                                       # Golden must reproduce byte-for-byte (behaviour
+                                       # preserved by the verbatim move).
     "director/k1_smart_director.cpp",
     "director/k1_edgemixer.cpp",
     "director/k1_visual_hooks.cpp",
