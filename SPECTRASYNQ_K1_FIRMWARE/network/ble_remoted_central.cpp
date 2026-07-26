@@ -50,14 +50,19 @@ uint8_t s_cmd_queue_storage[CMD_QUEUE_CAPACITY * sizeof(K1WirelessControlRecord)
 TaskHandle_t s_task = nullptr;
 NimBLEClient* s_client = nullptr;
 NimBLERemoteCharacteristic* s_rx_char = nullptr; // subscribed + writable characteristic
+volatile bool s_connected = false;
 volatile bool s_linked = false;
+volatile uint32_t s_connection_generation = 0;
 volatile bool s_force_confirm = false;
 uint8_t s_last_pm = 255;
 uint8_t s_last_sm = 255;
+bool s_confirmation_pending = false;
+uint8_t s_confirmation_pm = 0;
+uint8_t s_confirmation_sm = 0;
 volatile bool s_have_target = false;
-volatile bool s_scanning = false;
 NimBLEAddress s_target_addr;
 portMUX_TYPE s_target_mux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE s_state_mux = portMUX_INITIALIZER_UNLOCKED;
 
 K1BleMidiDecoderState s_decoder;
 uint32_t s_decode_errors = 0;
@@ -104,7 +109,7 @@ void on_notify(NimBLERemoteCharacteristic*, uint8_t* data, size_t len, bool) {
 
 class ScanCB : public NimBLEScanCallbacks {
   void onResult(const NimBLEAdvertisedDevice* dev) override {
-    if (s_have_target || s_linked) {
+    if (s_have_target || s_connected || s_linked) {
       return;
     }
     const bool match = (dev->getName() == KNOB_NAME) ||
@@ -118,33 +123,55 @@ class ScanCB : public NimBLEScanCallbacks {
     s_have_target = true;
     portEXIT_CRITICAL(&s_target_mux);
     NimBLEDevice::getScan()->stop();
-    s_scanning = false;
-  }
-
-  void onScanEnd(const NimBLEScanResults&, int) override {
-    s_scanning = false;
   }
 };
 ScanCB s_scan_cb;
 
 class ClientCB : public NimBLEClientCallbacks {
   void onConnect(NimBLEClient*) override {
-    s_linked = true;
+    // Raw GAP connection is not a usable dial link until subscribe() succeeds.
+    portENTER_CRITICAL(&s_state_mux);
+    ++s_connection_generation;
+    s_connected = true;
+    s_linked = false;
+    portEXIT_CRITICAL(&s_state_mux);
   }
 
   void onDisconnect(NimBLEClient*, int) override {
+    portENTER_CRITICAL(&s_state_mux);
+    ++s_connection_generation;
+    s_connected = false;
     s_linked = false;
-    s_have_target = false;
     s_rx_char = nullptr;
+    s_confirmation_pending = false;
+    portEXIT_CRITICAL(&s_state_mux);
+    portENTER_CRITICAL(&s_target_mux);
+    s_have_target = false;
+    portEXIT_CRITICAL(&s_target_mux);
   }
 
   void onConnectFail(NimBLEClient*, int) override {
+    portENTER_CRITICAL(&s_state_mux);
+    ++s_connection_generation;
+    s_connected = false;
     s_linked = false;
-    s_have_target = false;
     s_rx_char = nullptr;
+    s_confirmation_pending = false;
+    portEXIT_CRITICAL(&s_state_mux);
+    portENTER_CRITICAL(&s_target_mux);
+    s_have_target = false;
+    portEXIT_CRITICAL(&s_target_mux);
   }
 };
 ClientCB s_client_cb;
+
+bool connection_is_current(uint32_t generation) {
+  portENTER_CRITICAL(&s_state_mux);
+  const bool current =
+      s_connected && s_connection_generation == generation;
+  portEXIT_CRITICAL(&s_state_mux);
+  return current && s_client && s_client->isConnected();
+}
 
 bool connect_and_subscribe() {
   NimBLEAddress addr;
@@ -154,9 +181,23 @@ bool connect_and_subscribe() {
 
   if (!s_client) {
     s_client = NimBLEDevice::createClient();
+    if (!s_client) {
+      Serial.println("[ble_remoted_diag] connect_setup_fail step=create_client");
+      return false;
+    }
     s_client->setClientCallbacks(&s_client_cb, false);
   }
-  if (!s_client->connect(addr)) {
+  // Preserve discovered attribute objects across reconnects so the main-loop
+  // writer cannot race deletion of a locally snapshotted characteristic.
+  if (!s_client->connect(addr, false)) {
+    Serial.printf("[ble_remoted_diag] connect_fail last_error=%d\n",
+                  s_client->getLastError());
+    return false;
+  }
+  portENTER_CRITICAL(&s_state_mux);
+  const uint32_t generation = s_connection_generation;
+  portEXIT_CRITICAL(&s_state_mux);
+  if (!connection_is_current(generation)) {
     return false;
   }
 
@@ -170,20 +211,28 @@ bool connect_and_subscribe() {
     s_client->disconnect();
     return false;
   }
-  if (!chr->subscribe(true, on_notify)) {
+  if (!connection_is_current(generation) ||
+      !chr->subscribe(true, on_notify)) {
     s_client->disconnect();
     return false;
   }
-  s_rx_char = chr;
-  s_force_confirm = true;
+  portENTER_CRITICAL(&s_state_mux);
+  const bool publish =
+      s_connected && s_connection_generation == generation;
+  if (publish) {
+    s_rx_char = chr;
+    s_force_confirm = true;
+    s_linked = true;
+  }
+  portEXIT_CRITICAL(&s_state_mux);
+  if (!publish) {
+    return false;
+  }
   Serial.println("[ble_remoted] linked + subscribed to Remoted dial");
   return true;
 }
 
-void send_confirmed_modes(bool force) {
-  if (!s_rx_char) {
-    return;
-  }
+void queue_confirmed_modes(bool force) {
   const uint8_t pm = sb_k1_confirmed_mode(false);
   const uint8_t sm = sb_k1_confirmed_mode(true);
   if (!force && pm == s_last_pm && sm == s_last_sm) {
@@ -191,6 +240,28 @@ void send_confirmed_modes(bool force) {
   }
   s_last_pm = pm;
   s_last_sm = sm;
+  portENTER_CRITICAL(&s_state_mux);
+  s_confirmation_pm = pm;
+  s_confirmation_sm = sm;
+  s_confirmation_pending = true;
+  portEXIT_CRITICAL(&s_state_mux);
+}
+
+void send_pending_confirmation() {
+  portENTER_CRITICAL(&s_state_mux);
+  NimBLERemoteCharacteristic* const rx_char = s_rx_char;
+  const uint32_t generation = s_connection_generation;
+  const bool usable = s_connected && s_linked && rx_char != nullptr;
+  const bool pending = s_confirmation_pending;
+  const uint8_t pm = s_confirmation_pm;
+  const uint8_t sm = s_confirmation_sm;
+  if (usable && pending) {
+    s_confirmation_pending = false;
+  }
+  portEXIT_CRITICAL(&s_state_mux);
+  if (!usable || !pending) {
+    return;
+  }
   const uint16_t ts = static_cast<uint16_t>(millis() & 0x1FFF);
   uint8_t pkt[8] = {
       static_cast<uint8_t>(0x80 | ((ts >> 7) & 0x3F)),
@@ -198,7 +269,15 @@ void send_confirmed_modes(bool force) {
       0xB0, CC_CONFIRM_PRIMARY, pm,
       0xB0, CC_CONFIRM_SECONDARY, sm,
   };
-  s_rx_char->writeValue(pkt, sizeof(pkt), false);
+  if (!rx_char->writeValue(pkt, sizeof(pkt), false)) {
+    Serial.println("[ble_remoted_diag] confirmation_write_fail");
+    portENTER_CRITICAL(&s_state_mux);
+    if (s_connected && s_linked &&
+        s_connection_generation == generation && s_rx_char == rx_char) {
+      s_confirmation_pending = true;
+    }
+    portEXIT_CRITICAL(&s_state_mux);
+  }
 }
 
 void ble_task(void*) {
@@ -206,15 +285,21 @@ void ble_task(void*) {
   scan->setScanCallbacks(&s_scan_cb, false);
   scan->setActiveScan(true);
   for (;;) {
-    if (!s_linked) {
+    // This Core-1 task owns every remote characteristic operation. The audio
+    // loop only publishes the next confirmation payload.
+    send_pending_confirmation();
+    if (!s_linked && !s_connected) {
       if (!s_have_target) {
-        if (!s_scanning) {
-          s_scanning = true;
-          scan->start(0, false);
+        if (!scan->isScanning()) {
+          const bool started = scan->start(0, false);
+          Serial.printf("[ble_remoted_diag] scan_start ok=%u active=%u\n",
+                        started ? 1U : 0U,
+                        scan->isScanning() ? 1U : 0U);
+          if (!started) {
+            vTaskDelay(pdMS_TO_TICKS(500));
+          }
         }
-      } else if (connect_and_subscribe()) {
-        s_linked = true;
-      } else {
+      } else if (!connect_and_subscribe()) {
         s_have_target = false;
         vTaskDelay(pdMS_TO_TICKS(800));
       }
@@ -231,8 +316,17 @@ void sb_k1_ble_remoted_begin() {
                                    sizeof(K1WirelessControlRecord),
                                    s_cmd_queue_storage,
                                    &s_cmd_queue_struct);
-  NimBLEDevice::init("K1-Remoted-RX");
-  xTaskCreatePinnedToCore(ble_task, "ble_remoted", 4096, nullptr, 1, &s_task, 0);
+  const bool init_ok =
+      NimBLEDevice::isInitialized() || NimBLEDevice::init("K1-Remoted-RX");
+  const BaseType_t task_result =
+      init_ok ? xTaskCreatePinnedToCore(ble_task, "ble_remoted", 4096, nullptr,
+                                       1, &s_task, 1)
+              : pdFAIL;
+  Serial.printf("[ble_remoted_diag] init ok=%u task_ok=%u core=1\n",
+                init_ok ? 1U : 0U, task_result == pdPASS ? 1U : 0U);
+  if (!init_ok || task_result != pdPASS) {
+    return;
+  }
   Serial.printf("[ble_remoted] begin (gated A/B build) - free heap=%u\n", ESP.getFreeHeap());
 }
 
@@ -253,9 +347,11 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
     }
   }
 
+  portENTER_CRITICAL(&s_state_mux);
   const bool force = s_force_confirm;
   s_force_confirm = false;
-  send_confirmed_modes(force);
+  portEXIT_CRITICAL(&s_state_mux);
+  queue_confirmed_modes(force);
 
   const uint32_t now_ms = millis();
   if (BLE_STREAM_ENABLED && now_ms - s_last_counter_ms >= 1000U) {

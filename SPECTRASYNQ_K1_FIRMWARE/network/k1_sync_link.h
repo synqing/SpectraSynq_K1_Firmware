@@ -26,13 +26,19 @@ inline constexpr const char* kSyncDeviceName = "K1-SyncLink";
 void begin();  // init NimBLE role(s) per build flag; safe to call once from setup()
 void poll();   // main-loop service hook (non-blocking)
 
-// True while the K1-SyncLink radio link is up (leader: a follower is connected;
-// follower: connected to the leader). Diagnostics only.
+// Replay the current application-ready lifecycle snapshot for a host capture
+// that attached after the one-shot transition logs. Emits a fail-closed
+// SYNC_STATUS line; LinkUp + Negotiated follow only when the snapshot is valid.
+void status();
+
+// True only while SyncLink is application-ready: both stream and clock
+// subscriptions are established. A raw GAP connection is not sufficient.
 bool is_linked();
 
-// On-silicon Gate-0 fault injection (bench only). Recognised modes:
-//   "delay5"  — follower applies each packet +5 ms late
-//   "delay20" — follower applies each packet +20 ms late
+// Host-plumbing fault tokens (bench only). These are NOT Gate-0 delay proof
+// until F3 replaces the timestamp-only delay modes with a real pending queue:
+//   "delay5"  — adds 5 ms to the printed consume stamp only (stamp-fake)
+//   "delay20" — adds 20 ms to the printed consume stamp only (stamp-fake)
 //   "drop10"  — follower drops ~10% of stream packets before apply
 //   "off"     — clear injection
 // Returns true if the mode string was recognised. Never persists, never touches

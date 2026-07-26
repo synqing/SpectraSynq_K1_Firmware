@@ -677,10 +677,13 @@ void setup() {
 #ifdef SB_K1_WIRELESS_ENABLED
   sb_k1_wireless_begin();
 #endif
+#if defined(SB_K1_SYNC_PROBE) && defined(K1_SYNC_ROLE_LEADER)
+  k1_sync::begin();
+#endif
 #ifdef SB_K1_BLE_REMOTED
   sb_k1_ble_remoted_begin();
 #endif
-#ifdef SB_K1_SYNC_PROBE
+#if defined(SB_K1_SYNC_PROBE) && defined(K1_SYNC_ROLE_FOLLOWER)
   k1_sync::begin();
 #endif
 

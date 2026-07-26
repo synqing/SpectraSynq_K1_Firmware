@@ -66,6 +66,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_vp_motion_lab",
             "k1_wireless_ab_probe",
             "k1_sync_probe_main",  # dual-K1 sync Phase-0 LEADER — main F887A500 ONLY (2026-07-08, F5 grant)
+            "k1_sync_probe_main_sync_only",  # F2 Case A SyncLink-only LEADER — main F887A500 ONLY
         ),
         role="main K1",
         upload_port="/dev/tty.usbmodem1401",
@@ -170,6 +171,8 @@ def validate_upload_target(
 
     target = expected_target_for_env(pioenv)
     if target is None:
+        if pioenv.startswith("k1_sync_probe_"):
+            return False, f"{pioenv}: unmapped sync probe environment; upload blocked"
         return True, f"{pioenv}: no K1 upload mapping enforced"
 
     port_list = list(ports) if ports is not None else list_serial_ports()

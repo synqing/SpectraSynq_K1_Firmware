@@ -74,6 +74,29 @@
   docs. The extra lines were removed; no commit was created by that attempt.
 - No firmware, device, serial or hardware action performed.
 
+## 2026-07-27 — F1 link hardening commit gate
+
+- Fixed advertising/scan defects A-E, added the SyncLink-only Case-A leader,
+  registered its exact build/upload identity and retained exact NimBLE 2.5.0.
+- Added strict application-ready lifecycle publication, stable exact
+  negotiated read-back, current-state `:sync_status` replay and checked
+  steady-state failure diagnostics.
+- Closed adversarial generation/concurrency defects: lifecycle transitions are
+  generation-bound; central writes and periodic stream work have Core-1
+  owners; leader advertising restart is deferred; clock responses preserve
+  callback-time `t4` and connection generation.
+- Embedded SSA final concurrency verdict: `APPROVE`.
+- Focused validation: `103 passed, 24 subtests passed`.
+- Full repository validation:
+  `760 passed, 1 skipped, 86 subtests passed`.
+- Wrapper builds SUCCESS:
+  `k1_hardware`, `k1_sync_probe_main`,
+  `k1_sync_probe_main_sync_only`, `k1_sync_probe_bench`.
+- All three probe dependency graphs resolve NimBLE-Arduino `2.5.0`.
+- Build provenance is still pre-commit `a4c2408`; post-commit rebuilds are
+  required before any F2 flash.
+- No firmware, device, serial or hardware action performed.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -83,6 +106,7 @@
 | dual-sync-f1-fw-003 | F1 firmware/API/guard map | load-bearing | received | `recovery/ssa/f1_firmware_contract.md` | source/API checks pending F1 | F1 implementation input |
 | dual-sync-f0-review-004/005/006/007 | Adversarial F0 implementation review | load-bearing | VERIFIED | `recovery/ssa/f0_implementation_review.md` | 63 focused tests plus negative wrapper probes PASS | verified host evidence |
 | dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
+| dual-sync-f1-concurrency-009/010 | Adversarial connection-generation and Core ownership review | load-bearing | APPROVE | current source citations in SSA return | focused tests, four builds and full regression PASS | verified F1 evidence |
 
 ## Test results
 
@@ -100,8 +124,15 @@
 | F0 follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
 | F0b focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_probe_firmware_static.py tests/test_dual_sync_oracle.py tests/test_k1_upload_guard.py` | 103 passed, 24 subtests passed |
 | F0b isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 737 passed, 1 skipped, 83 subtests passed |
+| F1 focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_probe_firmware_static.py tests/test_dual_sync_oracle.py tests/test_k1_upload_guard.py` | 103 passed, 24 subtests passed |
+| F1 full current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 760 passed, 1 skipped, 86 subtests passed |
+| F1 production build | `bash scripts/agent/pio-build.sh k1_hardware` | SUCCESS |
+| F1 dual-role leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main` | SUCCESS; NimBLE 2.5.0 |
+| F1 sync-only leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main_sync_only` | SUCCESS; NimBLE 2.5.0 |
+| F1 follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
 
 ## Next
 
-Review the narrow F0 staged diff, commit, rebuild against the committed SHA,
-then push and verify the remote SHA.
+Review and commit the narrow F1 staged diff, rebuild the three probe binaries
+against the committed SHA, then push and verify the remote SHA. Do not flash
+until F2 identity/wiring preflight.

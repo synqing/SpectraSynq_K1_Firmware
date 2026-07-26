@@ -87,3 +87,28 @@ authority.
   it bisects an in-flight TX/RX/apply set. It cannot manufacture PASS and is
   retained until a firmware nonce or sequence-aware boundary exists; F2 uses
   one `off` segment only.
+
+## F1 link-hardening findings
+
+- `NimBLEService::start()` is a deprecated no-op in pinned NimBLE-Arduino
+  2.5.0; advertising start invokes the server start. Re-adding the service call
+  would add theatre, not readiness proof.
+- A raw GAP connection cannot be Link Ready. Leader publication now requires
+  both CCCDs plus a valid follower clock request; follower publication requires
+  service/characteristic discovery, both subscriptions and a stable exact
+  negotiated snapshot.
+- Accepted transport values are exact: interval units `6`, latency `0`, MTU
+  `247`, TX/RX PHY `2M`. Request acceptance and negotiated read-back remain
+  separate diagnostics; DLE stays explicitly `UNMEASURED`.
+- Central characteristic writes can cross reconnect generations if the audio
+  loop snapshots a pointer while a Core-1 task reconnects. Sync clock writes
+  and Remoted confirmations are now owned by their Core-1 connection tasks.
+- Leader advertising restart is deferred to the same Core-1 owner as periodic
+  stream notify. A generation-bound handle snapshot therefore cannot be
+  delivered into a replacement pre-ready connection.
+- Clock response `t4` must be stamped in the NimBLE callback. Stamping when the
+  Core-1 queue drains can bias the offset by half the scheduling delay and
+  invalidate a 4 ms gate.
+- NimBLE host/controller callback cost on Core 0 is not claimed eliminated.
+  F3 must measure real AP p95, heap and soak effects; F1 only removes
+  application-owned periodic GATT work from the Core-0 audio loop.

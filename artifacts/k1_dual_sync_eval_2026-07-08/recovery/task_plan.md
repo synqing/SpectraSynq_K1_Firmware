@@ -8,7 +8,7 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F0b — lifecycle snapshot repair discovered by adversarial F1 review.
+Phase F1 — observable, generation-safe SyncLink establishment.
 
 ## Phases
 
@@ -42,8 +42,9 @@ Phase F0b — lifecycle snapshot repair discovered by adversarial F1 review.
 - [x] Persist and hash `SYNC_STATUS.json` in F2 evidence.
 - [x] Focused host tests and staged-boundary review.
 - [x] Full pytest (`737 passed, 1 skipped`) in isolated staged-tree worktree.
-- [ ] Green host-only repair commit.
-- **Status:** commit_ready
+- [x] Green host-only repair commit and verified push
+  (`a4c2408696b84ebc4a860f69c8e86cf3adeb7db3`).
+- **Status:** complete
 
 ### F1: Link hardening
 
@@ -53,9 +54,11 @@ Phase F0b — lifecycle snapshot repair discovered by adversarial F1 review.
 - [x] Settled negotiated BLE values recorded.
 - [x] Lifecycle snapshot serializer matches the F0b host contract.
 - [x] Application-owned GATT I/O moved off the Core-0 audio loop.
-- [ ] Focused tests, full pytest, production plus three sync builds.
+- [x] Focused tests (`103 passed, 24 subtests passed`).
+- [x] Full pytest (`760 passed, 1 skipped, 86 subtests passed`).
+- [x] Production plus three sync builds SUCCESS; NimBLE exactly `2.5.0`.
 - [ ] Green F1 commit.
-- **Status:** in_progress
+- **Status:** commit_ready
 
 ### F2: Silicon A/B/C
 
@@ -104,3 +107,4 @@ Phase F0b — lifecycle snapshot repair discovered by adversarial F1 review.
 | Strict capture marker check mistook `t_host_us` for a second `host_us` prefix | 1 | Match a complete `host_us` token instead of a substring; rerun focused suite. |
 | Final F0 wrapper review found locked-argument and A/B/C-order bypasses | 1 | Replaced the forwarding shell with a typed controller that derives case semantics, probes chip/build identity, enforces A→B→C and hashes its manifest evidence. |
 | F1 adversarial review found lifecycle lines were one-shot before F2 attached | 1 | Added a fresh, fail-closed `:sync_status` capture contract and F2 evidence hash before firmware is committed. |
+| F1 concurrency review found cross-generation characteristic writes and lossy clock callback timing | 1 | Moved periodic application GATT I/O to Core 1, made lifecycle publication generation-bound, deferred leader advertising restart, and queued callback-time clock timestamps with generation. |

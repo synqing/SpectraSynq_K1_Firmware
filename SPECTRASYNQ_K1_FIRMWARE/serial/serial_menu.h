@@ -2889,6 +2889,9 @@ void parse_command(char* command_buf) {
 #ifdef SB_K1_SYNC_PROBE
     // Compile-gated with the sync probe surface it drives (radio-isolation guard).
     // k1_sync::set_fault is declared via the gated include of k1_sync_link.h.
+    else if (strcmp(command_type, "sync_status") == 0) {
+      k1_sync::status();
+    }
     else if (strcmp(command_type, "sync_fault") == 0) {
       if (k1_sync::set_fault(command_data)) {
         tx_begin();

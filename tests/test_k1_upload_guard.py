@@ -123,16 +123,26 @@ class K1UploadGuardTest(unittest.TestCase):
     def test_sync_probe_envs_are_bound_to_their_devices(self):
         # Phase-0 dual-K1 sync probes (F5 grant 2026-07-08): LEADER env only on
         # the main K1 (F887A500), FOLLOWER env only on the bench K1 (B489A500).
-        ok, message = self.guard.validate_upload_target(
-            "k1_sync_probe_main", "/dev/tty.usbmodem1401", self.ports
-        )
-        self.assertTrue(ok, message)
-        self.assertIn("F887A500", message)
+        for env_name in ("k1_sync_probe_main", "k1_sync_probe_main_sync_only"):
+            with self.subTest(env_name=env_name):
+                ok, message = self.guard.validate_upload_target(
+                    env_name, "/dev/tty.usbmodem1401", self.ports
+                )
+                self.assertTrue(ok, message)
+                self.assertIn("F887A500", message)
         ok, message = self.guard.validate_upload_target(
             "k1_sync_probe_bench", "/dev/tty.usbmodem12201", self.ports
         )
         self.assertTrue(ok, message)
         self.assertIn("B489A500", message)
+
+    def test_unmapped_sync_probe_environment_fails_closed(self):
+        ok, message = self.guard.validate_upload_target(
+            "k1_sync_probe_typo", "/dev/tty.usbmodem1401", self.ports
+        )
+        self.assertFalse(ok)
+        self.assertIn("unmapped sync probe environment", message)
+        self.assertIn("upload blocked", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
         # Captain D1 (2026-07-06): the production IM73D uses the IDENTICAL
@@ -166,6 +176,7 @@ class K1UploadGuardTest(unittest.TestCase):
             # k1_prod_im73d is now upload-blocked outright (628f69b) — covered by
             # test_prod_im73d_upload_is_blocked_on_every_port, not identity matching.
             ("k1_sync_probe_main", "/dev/tty.usbmodem12201"),  # sync LEADER must reject the bench port
+            ("k1_sync_probe_main_sync_only", "/dev/tty.usbmodem12201"),  # Case A leader must reject bench
             ("k1_sync_probe_bench", "/dev/tty.usbmodem1401"),  # sync FOLLOWER must reject the main port
         )
         for env_name, port in cases:
