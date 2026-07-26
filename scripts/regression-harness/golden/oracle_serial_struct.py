@@ -216,6 +216,8 @@ FAMILIES = [
 _MENU_REL     = ("serial", "serial_menu.h")
 _MENU_CPP_REL = ("serial", "serial_menu.cpp")
 _HANDLERS_REL = ("serial", "serial_cmd_handlers.cpp")
+_TYPED_REL    = ("serial", "serial_typed_dispatch.cpp")
+_TABLE_REL    = ("serial", "serial_typed_cmd_table.def")
 
 
 # ---------------------------------------------------------------------------
@@ -285,13 +287,16 @@ def _normalize(body: str) -> str:
     return body
 
 
-def _routed(menu_src: str, dispatcher: str) -> bool:
-    """True iff parse_command() invokes the dispatcher with the canonical arg names.
+def _routed(menu_src: str, typed_src: str, table_src: str, cmd: str, dispatcher: str) -> bool:
+    """True iff the command is routed from parse_command to its dispatcher.
 
-    `serial_cmd_dispatch_<x>(command_type, command_data)` (bare arg names) appears
-    ONLY at the call-site; the definition/declaration carry typed parameters
-    (`const char*`, `char*`), so this marker is unambiguous."""
-    return f"{dispatcher}(command_type, command_data)" in menu_src
+    Pre-R2: parse_command called serial_cmd_dispatch_<x>(command_type, command_data).
+    Post-R2 (M2.1): SERIAL_TYPED_CMD table -> typed wrapper -> dispatcher."""
+    if f"{dispatcher}(command_type, command_data)" in menu_src:
+        return True
+    if not re.search(rf'SERIAL_TYPED_CMD\("{re.escape(cmd)}"', table_src):
+        return False
+    return f"return {dispatcher}(command_type, command_data)" in typed_src
 
 
 # ---------------------------------------------------------------------------
@@ -312,6 +317,10 @@ def capture(firmware_root=None) -> str:
     menu_src = menu_src + "\n" + menu_cpp
     handlers_src = (fw.joinpath(*_HANDLERS_REL)).read_text(encoding="utf-8") \
                    if (fw.joinpath(*_HANDLERS_REL)).exists() else ""
+    typed_src = (fw.joinpath(*_TYPED_REL)).read_text(encoding="utf-8") \
+                if (fw.joinpath(*_TYPED_REL)).exists() else ""
+    table_src = (fw.joinpath(*_TABLE_REL)).read_text(encoding="utf-8") \
+                if (fw.joinpath(*_TABLE_REL)).exists() else ""
 
     lines = []
     for fam in FAMILIES:
@@ -324,9 +333,9 @@ def capture(firmware_root=None) -> str:
             else:
                 moved = _extract_block(handlers_src, cmd)
                 body = _normalize(moved) if moved is not None else None
-                # routed only if the body now lives in the dispatcher AND
-                # parse_command actually calls that dispatcher.
-                reachable = bool(moved is not None and _routed(menu_src, dispatcher))
+                # routed if the body lives in the dispatcher AND parse_command still
+                # reaches it (direct call-site or R2 typed-table wrapper).
+                reachable = bool(moved is not None and _routed(menu_src, typed_src, table_src, cmd, dispatcher))
             rec = {"family": fam["name"], "cmd": cmd, "body": body, "reachable": reachable}
             lines.append(json.dumps(rec, sort_keys=True, separators=(",", ":")))
     return "\n".join(lines) + "\n"
@@ -363,15 +372,12 @@ MUTATIONS = [
         r'USBSerial.println("TRANSITION_STYLE: DIP");',
         "transition_style_echo_text_changed (statement/echo divergence)",
     ),
-    # 4. SEVER THE ROUTING (added in the EXTRACT commit, once the dispatcher call-site
-    #    exists): rename the parse_command call so capture()'s `_routed` check no longer
-    #    finds it. The queue bodies still live in the dispatcher, but every queue
-    #    command flips reachable:true->false -> divergence. Proves the `reachable`
-    #    field is not blind. The bare-arg form `(command_type, command_data)` matches
-    #    ONLY the call-site (the def/decl carry typed params), so the rglob lands there.
+    # 4. SEVER THE ROUTING (M2.1 R2): rename the typed-wrapper return so capture()'s
+    #    `_routed` check no longer finds it. The queue bodies still live in the
+    #    dispatcher, but every queue command flips reachable:true->false.
     (
-        r"serial_cmd_dispatch_queue\(command_type, command_data\)",
-        r"serial_cmd_dispatch_queue_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_queue\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_queue_SEVERED(command_type, command_data);",
         "queue_dispatcher_call_site_severed (routing/reachable divergence)",
     ),
     # ---- smart_director / smart_visual / edge_mixer body + routing-by-name teeth ----
@@ -412,18 +418,18 @@ MUTATIONS = [
     # 10-12. sever each dispatcher call in parse_command -> that family's commands flip
     #        reachable:true->false. Bare-arg form matches ONLY the call-site.
     (
-        r"serial_cmd_dispatch_smart_director\(command_type, command_data\)",
-        r"serial_cmd_dispatch_smart_director_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_smart_director\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_smart_director_SEVERED(command_type, command_data);",
         "smart_director_call_site_severed (routing/reachable divergence)",
     ),
     (
-        r"serial_cmd_dispatch_smart_visual\(command_type, command_data\)",
-        r"serial_cmd_dispatch_smart_visual_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_smart_visual\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_smart_visual_SEVERED(command_type, command_data);",
         "smart_visual_call_site_severed (routing/reachable divergence)",
     ),
     (
-        r"serial_cmd_dispatch_edge_mixer\(command_type, command_data\)",
-        r"serial_cmd_dispatch_edge_mixer_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_edge_mixer\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_edge_mixer_SEVERED(command_type, command_data);",
         "edge_mixer_call_site_severed (routing/reachable divergence)",
     ),
     # ---- preset body + routing-by-name teeth (family added 2026-06-25) ----
@@ -450,8 +456,8 @@ MUTATIONS = [
     #     divergence. Bare-arg form `(command_type, command_data)` matches ONLY the
     #     call-site (the def/decl carry typed params), so the rglob lands there.
     (
-        r"serial_cmd_dispatch_preset\(command_type, command_data\)",
-        r"serial_cmd_dispatch_preset_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_preset\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_preset_SEVERED(command_type, command_data);",
         "preset_call_site_severed (routing/reachable divergence)",
     ),
     # ---- mode family (set_mode + secondary_mode) teeth (Increment A, LOCK 2026-06-26) --
@@ -500,8 +506,8 @@ MUTATIONS = [
     #     blind. Bare-arg form `(command_type, command_data)` matches ONLY the call-site
     #     (the def/decl carry typed params), so the rglob lands there. count==1.
     (
-        r"serial_cmd_dispatch_mode\(command_type, command_data\)",
-        r"serial_cmd_dispatch_mode_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_mode\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_mode_SEVERED(command_type, command_data);",
         "mode_call_site_severed (routing/reachable divergence)",
     ),
     # ---- beat_director family teeth (Increment B, LOCK 2026-06-26) ----
@@ -533,8 +539,8 @@ MUTATIONS = [
     #     carry typed params). count==1 (the call-site is inside serial_menu.h's
     #     #ifdef K1_EFFECT_FRAMEWORK_V1, but the oracle/guard read raw text — gate-transparent).
     (
-        r"serial_cmd_dispatch_beat_director\(command_type, command_data\)",
-        r"serial_cmd_dispatch_beat_director_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_beat_director\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_beat_director_SEVERED(command_type, command_data);",
         "beat_director_call_site_severed (routing/reachable divergence)",
     ),
     # ---- gdft_harness family teeth (gated-out probe lane, LOCK 2026-06-26) ----
@@ -581,8 +587,8 @@ MUTATIONS = [
     #     params), so the rglob lands there. count==1 (the call-site is inside serial_menu.h's
     #     #ifdef ENABLE_GDFT_HARNESS, but the oracle/guard read raw text — gate-transparent).
     (
-        r"serial_cmd_dispatch_gdft_harness\(command_type, command_data\)",
-        r"serial_cmd_dispatch_gdft_harness_SEVERED(command_type, command_data)",
+        r"return serial_cmd_dispatch_gdft_harness\(command_type, command_data\);",
+        r"return serial_cmd_dispatch_gdft_harness_SEVERED(command_type, command_data);",
         "gdft_harness_call_site_severed (routing/reachable divergence)",
     ),
 ]

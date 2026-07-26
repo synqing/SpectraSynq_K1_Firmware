@@ -133,6 +133,7 @@ MODULE_CPPS = [
                                        # the driver + serial_cmd_handlers.cpp link against.
                                        # Golden must reproduce byte-for-byte (behaviour
                                        # preserved by the verbatim move).
+    "serial/serial_typed_dispatch.cpp",  # M2.1 R2: Stage-B typed table handlers.
     "director/k1_smart_director.cpp",
     "director/k1_edgemixer.cpp",
     "director/k1_visual_hooks.cpp",
@@ -1023,14 +1024,18 @@ def verify_mutations(baseline: str, firmware_root=None) -> list:
         with tempfile.TemporaryDirectory(prefix="oracle_serial_replay_mut_") as td:
             fw_copy = Path(td) / "fw"
             shutil.copytree(fw_src, fw_copy)
-            target = fw_copy / "serial" / "serial_menu.h"
-            original = target.read_text(encoding="utf-8")
-            mutated = re.sub(pattern, replacement, original, count=1)
-            if mutated == original:
+            target = None
+            for f in fw_copy.rglob("*"):
+                if f.suffix in (".cpp", ".h") and f.is_file():
+                    text = f.read_text(encoding="utf-8", errors="ignore")
+                    if re.search(pattern, text):
+                        f.write_text(re.sub(pattern, replacement, text, count=1), encoding="utf-8")
+                        target = f
+                        break
+            if target is None:
                 results.append({"desc": desc, "diverged_lines": 0, "caught": False,
                                 "error": "regex did not match"})
                 continue
-            target.write_text(mutated, encoding="utf-8")
             try:
                 mutant_out = capture(firmware_root=fw_copy)
             except RuntimeError as exc:

@@ -532,6 +532,52 @@ const serial_cmd_row_t* serial_cmd_lookup(const char* name);
 //  - SC_SAFE / SC_TYPED_ONLY: invoke the handler directly.
 void serial_dispatch_typed_row(const serial_cmd_row_t* row, const char* args);
 
+// ---- Stage B typed `type=value` dispatch table (R2) ----
+#include "serial_typed_dispatch.h"
+
+typedef struct {
+  const char*              name;
+  serial_typed_handler_t   handler;
+  safety_class_t           safety_class;
+  uint8_t                  flags;
+} serial_typed_cmd_row_t;
+
+inline constexpr serial_typed_cmd_row_t SERIAL_TYPED_CMD_TABLE[] = {
+#define SERIAL_TYPED_CMD(name, handler, safety_class, flags) \
+  { name, handler, safety_class, flags },
+#include "serial_typed_cmd_table.def"
+#undef SERIAL_TYPED_CMD
+};
+
+#define SERIAL_TYPED_CMD_TABLE_LEN (sizeof(SERIAL_TYPED_CMD_TABLE) / sizeof(SERIAL_TYPED_CMD_TABLE[0]))
+
+constexpr bool serial_typed_table_all_have_handlers() {
+  for (size_t i = 0; i < SERIAL_TYPED_CMD_TABLE_LEN; i++) {
+    if (SERIAL_TYPED_CMD_TABLE[i].handler == nullptr) return false;
+    if (SERIAL_TYPED_CMD_TABLE[i].name == nullptr) return false;
+  }
+  return true;
+}
+
+constexpr bool serial_typed_table_no_duplicate_names() {
+  for (size_t i = 0; i < SERIAL_TYPED_CMD_TABLE_LEN; i++) {
+    for (size_t j = i + 1; j < SERIAL_TYPED_CMD_TABLE_LEN; j++) {
+      if (serial_cstr_eq(SERIAL_TYPED_CMD_TABLE[i].name, SERIAL_TYPED_CMD_TABLE[j].name)) return false;
+    }
+  }
+  return true;
+}
+
+static_assert(serial_typed_table_all_have_handlers(),
+              "Stage B: every serial_typed_cmd_row_t must have a non-null name and handler");
+static_assert(serial_typed_table_no_duplicate_names(),
+              "Stage B: duplicate command names in SERIAL_TYPED_CMD_TABLE");
+
+const serial_typed_cmd_row_t* serial_typed_cmd_lookup(const char* name);
+bool serial_dispatch_typed_setter(const serial_typed_cmd_row_t* row,
+                                  const char* command_type,
+                                  char* command_data);
+
 // This parses a completed command to decide how to handle it
 void parse_command(char* command_buf);
 
