@@ -8,7 +8,7 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F1 — observable, generation-safe SyncLink establishment.
+Phase F2 — identity-checked silicon A/B/C preflight.
 
 ## Phases
 
@@ -57,8 +57,11 @@ Phase F1 — observable, generation-safe SyncLink establishment.
 - [x] Focused tests (`103 passed, 24 subtests passed`).
 - [x] Full pytest (`760 passed, 1 skipped, 86 subtests passed`).
 - [x] Production plus three sync builds SUCCESS; NimBLE exactly `2.5.0`.
-- [ ] Green F1 commit.
-- **Status:** commit_ready
+- [x] Green F1 commit and verified push
+  (`862aea89efc1c0c98035268a1b2ecf1bc1bab6f2`).
+- [x] Three post-commit probe binaries rebuilt with embedded provenance
+  `862aea8`.
+- **Status:** complete
 
 ### F2: Silicon A/B/C
 
@@ -68,7 +71,7 @@ Phase F1 — observable, generation-safe SyncLink establishment.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** pending
+- **Status:** preflight_pending
 
 ### F3: Real Gate-0
 

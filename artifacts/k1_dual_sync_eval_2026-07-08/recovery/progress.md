@@ -97,6 +97,28 @@
   required before any F2 flash.
 - No firmware, device, serial or hardware action performed.
 
+## 2026-07-27 — F1 committed and published
+
+- F1 committed as
+  `862aea89efc1c0c98035268a1b2ecf1bc1bab6f2`
+  (`fix(dual-sync): harden SyncLink adv/scan observability (defects A–E)`).
+- The commit hook passed and the commit membership was rechecked: 14 intended
+  F1 files; the pre-existing dirty device registry and all F0 host files were
+  excluded.
+- Pushed `lane/dual-sync-phase0`; local and remote refs both resolved to the
+  full F1 SHA.
+- Rebuilt all three probe environments after the commit. Each build succeeded,
+  resolved NimBLE-Arduino `2.5.0` and embeds `862aea8`.
+- Firmware SHA-256:
+  - sync-only leader:
+    `e08c2e8629b8bf123489e8b5b6a44eb97ab49c9307ebfed036ff2279dbaaa861`
+  - dual-role leader:
+    `e5b7210b8468c79b96921b3b9e7c78594789c1744a849586ab822b504947452e`
+  - follower:
+    `a83e1b798b9cc1a2c9bbd5860ac1f794dfdb29518e7ca1846d63e2886c6dc11b`
+- F1 is complete at the source/build boundary. No firmware has been flashed
+  and no runtime or silicon claim has been made.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -133,6 +155,6 @@
 
 ## Next
 
-Review and commit the narrow F1 staged diff, rebuild the three probe binaries
-against the committed SHA, then push and verify the remote SHA. Do not flash
-until F2 identity/wiring preflight.
+Start F2 with a fresh task-plan read, session bootstrap, physical GPIO-wiring
+confirmation and read-only port/chip mapping. Do not flash until both chips and
+explicit target ports are proven.

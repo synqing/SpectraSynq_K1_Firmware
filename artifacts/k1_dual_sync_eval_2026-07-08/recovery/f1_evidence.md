@@ -1,6 +1,6 @@
 # F1 link-hardening evidence
 
-Status: `COMMIT_READY`, not silicon verified.
+Status: `COMPLETE`, not silicon verified.
 
 ## Implemented contract
 
@@ -33,6 +33,22 @@ k1_sync_probe_bench            SUCCESS
 
 All probe dependency graphs report `NimBLE-Arduino @ 2.5.0`.
 
+## Committed artefacts
+
+Commit and verified remote branch:
+
+```text
+862aea89efc1c0c98035268a1b2ecf1bc1bab6f2
+```
+
+Post-commit probe binaries:
+
+| Environment | Embedded git | Firmware SHA-256 |
+|---|---|---|
+| `k1_sync_probe_main_sync_only` | `862aea8` | `e08c2e8629b8bf123489e8b5b6a44eb97ab49c9307ebfed036ff2279dbaaa861` |
+| `k1_sync_probe_main` | `862aea8` | `e5b7210b8468c79b96921b3b9e7c78594789c1744a849586ab822b504947452e` |
+| `k1_sync_probe_bench` | `862aea8` | `a83e1b798b9cc1a2c9bbd5860ac1f794dfdb29518e7ca1846d63e2886c6dc11b` |
+
 ## Adversarial disposition
 
 - Host late-attach review: repaired in F0b commit `a4c2408`.
@@ -43,5 +59,5 @@ All probe dependency graphs report `NimBLE-Arduino @ 2.5.0`.
 ## Boundary
 
 These are source, host-test and compile proofs. There has been no flash, serial
-capture or silicon claim. The binaries above embed pre-commit provenance
-`a4c2408` and must be rebuilt after the F1 commit before F2.
+capture or silicon claim. F2 must still verify chip identity, wiring, flashed
+environment and runtime build provenance before evaluating Case A.
