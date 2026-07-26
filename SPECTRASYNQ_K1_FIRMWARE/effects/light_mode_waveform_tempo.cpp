@@ -22,8 +22,9 @@
 //     consumer (k1_tempo_read() — value-copy under a portMUX, safe from Core-1).
 //   - K1TempoEvent (k1_tempo.h): bpm (60..156); phase01∈[0,1), 0==beat;
 //     confidence∈[0,1] (already silence-scaled); locked; beat_tick; beat_strength.
-//   - K1AudioSnapshot.silence gates the idle fallback so the strip halts in true
-//     silence (graceful behaviour, not a frozen frame).
+//   - K1AudioSnapshot.silence halts tempo scroll in true silence; without an active
+//     dark gate (presence loss / silence) the reactive fade also stops
+//     when peak≈0 (fade→1.0), which freezes the last frame — see dark_gate below.
 //
 // VP-PROBE DETERMINISM (change-gate: freeze tempo / deterministic clock during the
 // probe, OR mark nondeterministic-excluded):
@@ -58,6 +59,14 @@
 #include "k1_tempo.h"
 #include "k1_audio_snapshot.h"
 #include <math.h>
+
+static const float TEMPO_QUIET_ALPHA = 0.82f;  // history drain when presence lost (matches Dense Forge)
+
+static bool tempo_presence_ok(const K1AudioSnapshot& snap) {
+  // Mirrors Dense Forge inject contract; vu floor catches low-level room noise jitter.
+  return snap.vu_level >= 0.05f &&
+         !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
+}
 
 // ── Feel knobs (in-file constants; deliberately NOT RenderParams fields) ──────
 // These are tuning constants, not runtime-tunable CONFIG, and need no SECONDARY_*
@@ -142,18 +151,31 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
 void light_mode_waveform_tempo(ChannelEffectState& fx) {
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
+  const K1AudioSnapshot snap = k1_audio_snapshot_read();
+  const bool dark_gate = snap.silence || !tempo_presence_ok(snap);
 
   // MOTION — reactive persistence (canon §4.3): the trail breathes shorter when
   // louder, so a busy passage keeps a tight head while a sparse one leaves a tail.
-  float abs_amp = fabsf(waveform_peak_scaled);
-  if (abs_amp > 1.0f) abs_amp = 1.0f;
-  SQ15x16 fade = SQ15x16(1.0f - 0.10f * abs_amp);
+  // When presence is lost, switch to a fixed drain alpha so scroll halt does not
+  // leave a painted frame frozen (2026-06-07 secondary dark-state verdict).
+  SQ15x16 fade;
+  if (dark_gate) {
+    fade = SQ15x16(TEMPO_QUIET_ALPHA);
+  } else {
+    float abs_amp = fabsf(waveform_peak_scaled);
+    if (abs_amp > 1.0f) abs_amp = 1.0f;
+    fade = SQ15x16(1.0f - 0.10f * abs_amp);
+  }
   for (uint16_t i = 0; i < NATIVE_RESOLUTION; i++) {
     leds_16[i].r *= fade; leds_16[i].g *= fade; leds_16[i].b *= fade;
   }
 
   // MOTION — the tempo-locked continuous scroll velocity (steps every frame).
   tempo_scroll_step(fx.tempo_scroll_accum, fx.tempo_last_ms, rp);
+
+  if (dark_gate) {
+    return;  // drain only — do not repaint stale history from chroma/palette
+  }
 
   // MAPPING — sanctioned palette/chroma authority (palette mode, chromatic
   // note-sum, and auto-colour-shift honoured identically to BLOOM/Aurora/Comet).
