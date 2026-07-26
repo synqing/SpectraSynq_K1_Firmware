@@ -24,6 +24,9 @@
 #ifdef K1_EFFECT_FRAMEWORK_V1
 #include "beat_aware_director.h"
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_display_name() (R2b serial name source of truth)
 #endif
@@ -135,10 +138,65 @@ void serial_set_k1_loud_guard(bool enabled);
 void serial_cycle_k1_loud_guard_mode();
 #endif
 
+#ifdef K1_MIC_AUTO_SENSE_V1
+void serial_print_k1_mic_auto_status() {
+  const K1MicAutoState& st = k1_mic_auto_sense_state();
+  USBSerial.print("K1_MIC_AUTO: ");
+  USBSerial.println(vp_bool_text(st.runtime_enabled));
+  USBSerial.print("K1_MIC_AUTO_SHADOW: ");
+  USBSerial.println(vp_bool_text(st.shadow_only));
+  USBSerial.print("K1_MIC_AUTO_SCALE: ");
+  USBSerial.println(k1_mic_auto_sense_applied_scale(), 6);
+  USBSerial.print("K1_MIC_AUTO_REC: ");
+  USBSerial.println(st.recommended_scale, 6);
+  USBSerial.print("K1_MIC_AUTO_STATE: ");
+  USBSerial.println((unsigned)st.state);
+  USBSerial.print("K1_MIC_AUTO_REASON: ");
+  USBSerial.println((unsigned)st.reason);
+  USBSerial.println("K1_MIC_AUTO_NOTE: runtime-only; never NVS; purity=:mic_auto=off");
+}
+#endif
+
 #ifdef K1_EFFECT_FRAMEWORK_V1
 // beat_director serial helper — DEFINITION moved to serial/serial_menu.cpp
 // (M2.1 R1 batch 4). serial_cmd_handlers.cpp already forward-declares + calls it.
 void serial_print_beat_director_status();
+// ---------------------------------------------------------------------------
+// beat_director serial helpers (P6 eyes-on toggle — isolated, separable block)
+// ---------------------------------------------------------------------------
+void serial_print_beat_director_status() {
+  // READ-ONLY: uses pure accessors only — never ticks the director or arms a
+  // transition, so a status query never advances selection/dwell state.
+  const bool enabled = bad_director_enabled();
+  const bool locked  = bad_director_tempo_locked();
+  USBSerial.print("BEAT_DIRECTOR: ");
+  USBSerial.println(vp_bool_text(enabled));
+  USBSerial.print("BEAT_DIRECTOR_OPT_IN: ");
+  USBSerial.println(vp_bool_text(bad_director_compile_opt_in()));
+  USBSerial.print("BEAT_DIRECTOR_MODE: ");
+  USBSerial.println(bad_director_current_mode());
+  USBSerial.print("BEAT_DIRECTOR_TEMPO_LOCKED: ");
+  USBSerial.println(vp_bool_text(locked));
+  USBSerial.print("BEAT_DIRECTOR_BPM: ");
+  USBSerial.println(bad_director_bpm(), 1);
+  USBSerial.print("BEAT_DIRECTOR_TEMPO_CONF: ");
+  USBSerial.println(bad_director_tempo_confidence(), 3);
+  USBSerial.print("BEAT_DIRECTOR_FALLBACK: ");
+  USBSerial.println(vp_bool_text(!locked));  // time-fallback active when unlocked
+  // Device-proof surface (Proposal 3): poll these after a known-BPM locked track
+  // to confirm switches land beat-quantised. RAM-only; no NVS.
+  USBSerial.print("BEAT_DIRECTOR_SWITCH_COUNT: ");
+  USBSerial.println(bad_director_switch_count());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_MS: ");
+  USBSerial.println(bad_director_last_switch_ms());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_MODE: ");
+  USBSerial.println(bad_director_last_switch_mode());
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_BEAT_Q: ");
+  USBSerial.println(vp_bool_text(bad_director_last_switch_beat_quantised()));
+  // Sticky lock-at-commit (rework 2026-07-25): score against THIS, not poll-time lock.
+  USBSerial.print("BEAT_DIRECTOR_LAST_SWITCH_LOCKED: ");
+  USBSerial.println(vp_bool_text(bad_director_last_switch_tempo_locked()));
+}
 #endif  // K1_EFFECT_FRAMEWORK_V1
 
 #ifdef K1_VIVID_PRECOMP_V1
@@ -384,6 +442,185 @@ void cmd_version();
 void cmd_build();
 
 void cmd_help();
+void cmd_help() {
+  tx_begin();
+  USBSerial.println("K1 - Serial Menu ------------------------------------------------------------------------------------");
+  USBSerial.println();
+  USBSerial.println("                                            v | Print firmware version number");
+  USBSerial.println("                                        build | Print build provenance (version + git hash + epoch + env)");
+  USBSerial.println("                                        reset | Reboot K1");
+  USBSerial.println("                          factory_reset CONFIRM | Delete configuration, including noise cal, reboot (CONFIRM required)");
+  USBSerial.println("                       restore_defaults CONFIRM | Delete configuration, reboot (CONFIRM required)");
+  USBSerial.println("                                         dump | Print tons of useful variables in realtime");
+  USBSerial.println("                                         stop | Stops the output of any enabled streams");
+  USBSerial.println("                                          fps | Return the system FPS");
+  USBSerial.println("                                      led_fps | Return the LED FPS");
+  USBSerial.println("                                      chip_id | Return the chip id (MAC) of the CPU");
+  USBSerial.println("                                     get_mode | Get lightshow mode's ID (index)");
+  USBSerial.println("                                get_num_modes | Return the number of modes available");
+  USBSerial.println("                  noise calibration | press N to arm, then Y within 5s (typed start_noise_cal is disabled)");
+  USBSerial.println("                        clear_noise_cal CONFIRM | Clear the stored noise calibration (CONFIRM required)");
+  USBSerial.println("                             start_benchmark | Start a timed benchmark (calculates avg FPS)");
+  USBSerial.println("                                  stream_agc | Toggle multi-band AGC debug visualization");
+  USBSerial.println("                                    vp_status | Print visual-pipeline diagnostic state");
+  USBSerial.println("                                  vp_out_test | Render controlled VP frames and print output hashes");
+  USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
+  USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
+  USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+  USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
+  USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
+  USBSerial.println("                         nov_clear=1 | Clear buffered NOV rows");
+  USBSerial.println("                         nov_status=1 | Show buffered NOV capture status");
+  USBSerial.println("                         apcad_capture=[ms] | Non-shippable buffered AP cadence/read-health capture");
+  USBSerial.println("                         apcad_dump=1 | Dump buffered APCAD rows after capture");
+  USBSerial.println("                         apcad_clear=1 | Clear buffered APCAD rows");
+  USBSerial.println("                         apcad_status=1 | Show buffered APCAD capture status");
+  USBSerial.println("                         apcad_soak=[ms] | Compact AP cadence/read-health soak without row dump");
+  USBSerial.println("                         apcad_soak_status=1 | Print compact APCAD soak summary + worst rows");
+  USBSerial.println("                         apcad_abort=1 | Stop APCAD capture/soak without dumping buffered rows");
+#endif
+	  USBSerial.println("                  vp_perf=[start/stop/reset/status] | Measure VP frame stages when compiled in");
+	  USBSerial.println("                  smart_status | Runtime Smart Visual Engine status");
+	  USBSerial.println("                  smart_assist=[on/off] | Runtime-enable Smart Assist modulation");
+	  USBSerial.println("                  smart_switching=[on/off] | Runtime-enable bounded Assist mode switching");
+	  USBSerial.println("                  smart_confidence_floor=[0.00-1.00] | Runtime Assist switch confidence floor");
+	  USBSerial.println("                  smart_scene=[off/assist/l1/auto] | Apply runtime Smart A/B scene preset");
+	  USBSerial.println("                  smart_hooks=[on/off] | Runtime-enable onset/beat visual hooks");
+	  USBSerial.println("                  event_status | Print current onset/kick/snare/hihat event state");
+	  USBSerial.println("                  edge_status | Runtime EdgeMixer status");
+	  USBSerial.println("                  edge_enabled=[on/off] | Runtime-enable secondary EdgeMixer");
+	  USBSerial.println("                  edge_mode=[off/analogous/complementary/split/veil/triadic/tetradic] | EdgeMixer mode");
+	  USBSerial.println("                  edge_strength=[0.00-1.00] | EdgeMixer strength");
+	  USBSerial.println("                  edge_spread=[0-60] | EdgeMixer harmony spread (degrees)");
+	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
+	  USBSerial.println("                  edge_dual=[one_sided/split/mirror] | EdgeMixer symmetric dual-edge (one_sided=secondary only; split=both +/-theta/2; mirror=both +/-theta)");
+	  USBSerial.println("                  edge_uniform=[uniform/masked] | EdgeMixer spatial weighting (uniform=even; masked=fades from the 79/80 centre to the ends) (ref E)");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror | m spatial uniform<->masked");
+#if ENABLE_VPAB_PROBE
+	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
+#endif
+#ifdef K1_PIN_EVIDENCE_V1
+	  USBSerial.println("        k1_pin_evidence=[status/dba,<bucket>] | Harness-only loud-pinning evidence label");
+#endif
+  USBSerial.println("                           vp_all=[on/off] | Enable candidate or original VP branches");
+#ifdef K1_VIVID_PRECOMP_V1
+	  USBSerial.println("                             vivid=[on/off] | Runtime output-stage chroma pre-comp");
+	  USBSerial.println("                      vivid_level=[0.00-1.00] | Runtime vivid shortcut strength");
+	  USBSerial.println("                     vivid_chroma=[0.00-1.00] | Runtime vivid chroma strength");
+	  USBSerial.println("                      vivid_black=[0.00-1.00] | Runtime vivid black-depth strength");
+#endif
+  USBSerial.println("        vp_bloom_alpha=[0.80-1.00] | Runtime BLOOM history alpha");
+  USBSerial.println("        vp_bloom_shift=[0.25-2.00] | Runtime BLOOM propagation scale");
+  USBSerial.println("          vp_bloom_force_sat=[on/off] | Runtime BLOOM saturation restore");
+  USBSerial.println("        vp_wave_idle_fade=[0.50-0.999] | Runtime WAVEFORM idle trail retention");
+  USBSerial.println("          vp_wave_raw_margin=[1.00-3.00] | Runtime WAVEFORM raw gate margin");
+  USBSerial.println("          vp_wave_peak_floor=[0.00-1.00] | Runtime WAVEFORM peak gate floor");
+  USBSerial.println("          vp_wave_active_fade=[0.00-0.50] | Runtime WAVEFORM active fade penalty");
+  USBSerial.println("          vp_wave_blend_gain=[0.00-4.00] | Runtime WAVEFORM chroma blend gain");
+  USBSerial.println("          vp_wave_fallback=[0.00-1.00] | Runtime WAVEFORM fallback brightness");
+  USBSerial.println("          vp_wave_vu_floor=[0.00-1.00] | Runtime WAVEFORM RMS/VU gate floor");
+  USBSerial.println("          vp_wave_shift=[0.00-240.00] | Runtime WAVEFORM outward trail speed");
+  USBSerial.println("                               set_mode=[int] | Set the mode number");
+  USBSerial.println("                               photons=[0.00-1.00] | Set primary visual photons");
+  USBSerial.println("                                chroma=[0.00-1.00] | Set primary visual chroma");
+  USBSerial.println("                                  mood=[0.00-1.00] | Set primary visual mood");
+  USBSerial.println("                     palette_mode=[on/off] | Runtime-enable primary palette mode");
+  USBSerial.println("                         palette_index=[int] | Set primary gradient palette");
+  USBSerial.println("          mirror_enabled=[true/false/default] | Remotely toggle lightshow mirroring");
+  USBSerial.println("           reverse_order=[true/false/default] | Toggle whether image is flipped upside down before final rendering");
+  USBSerial.println("                          get_mode_name=[int] | Get a mode's name by ID (index)");
+  USBSerial.println("                                stream=[type] | Stream live data to a Serial Plotter.");
+  USBSerial.println("                                                Options are: audio, fps, magnitudes, spectrogram, chromagram");
+  USBSerial.println("led_type=['neopixel'/'neopixel_x2'/'dotstar'] | Sets which LED protocol to use, 3 wire, 4 wire, or dual-data mode");
+  USBSerial.println("                 led_count=[int or 'default'] | Sets how many LEDs your display will use (native resolution is 160)");
+  USBSerial.println("        led_color_order=[GRB/RGB/BGR/default] | Sets LED color ordering, default GRB");
+  USBSerial.println("       led_interpolation=[true/false/default] | Toggles linear LED interpolation when running in a non-native resolution (slower)");
+  USBSerial.println("                           debug=[true/false] | Enables debug mode, where functions are timed");
+  USBSerial.println("                sample_rate=[hz or 'default'] | Sets the microphone sample rate");
+  USBSerial.println("              note_offset=[0-32 or 'default'] | Sets the lowest note, as a positive offset from A1 (55.0Hz)");
+  USBSerial.println("               square_iter=[int or 'default'] | Sets the number of times the LED output is squared (contrast)");
+  USBSerial.println("         samples_per_chunk=[int or 'default'] | Sets the number of samples collected every frame");
+  USBSerial.println("             sensitivity=[float or 'default'] | Sets the scaling of audio data (>1.0 is more sensitive, <1.0 is less sensitive)");
+  USBSerial.println("           response_gain=[float or 'default'] | Runtime-only post-DC audio response gain for paired K1 response probes");
+#ifdef K1_LOUD_GUARD_V1
+  USBSerial.println("              k1_loud_guard=[on/off/status/mode0/mode1/mode2/cycle] | Loud-room guard + A/B retune matrix");
+#ifdef K1_MIC_AUTO_SENSE_V1
+  USBSerial.println("              mic_auto=[on/off/status/reset/shadow/live] | Slow mic auto-sense (RAM-only; purity=off)");
+#endif
+#endif
+  USBSerial.println("          boot_animation=[true/false/default] | Enable or disable the boot animation");
+  USBSerial.println("            sweet_spot_min=[int or 'default'] | Sets the minimum amplitude to be inside the 'Sweet Spot'");
+  USBSerial.println("            sweet_spot_max=[int or 'default'] | Sets the maximum amplitude to be inside the 'Sweet Spot'");
+  USBSerial.println("         chromagram_range=[1-80 or 'default'] | Range between 1 and 80, how many notes at the bottom of the");
+  USBSerial.println("                                                spectrogram should be considered in chromagram sums");
+  USBSerial.println("         standby_dimming=[true/false/default] | Toggle dimming during detected silence");
+  USBSerial.println("    set_chroma_profile=[default/bass/full] | Chromagram preset (global): default=v40102 (12/60), bass=0/24, full=0/80. Reboots only if note_offset changes");
+  USBSerial.println("                       bass_mode=[true/false] | (alias) Toggle bass-mode; true=bass profile, false=default. Alters note_offset and chromagram_range for bass-y tunes");
+  USBSerial.println("            max_current_ma=[int or 'default'] | Sets the maximum current FastLED will attempt to limit the LED consumption to");
+  USBSerial.println("      temporal_dithering=[true/false/default] | Toggle per-LED temporal dithering that simulates higher bit-depths");
+  USBSerial.println("        auto_color_shift=[true/false/default] | Toggle automated color shifting based on positive spectral changes");
+  USBSerial.println("     incandescent_filter=[float or 'default'] | Set the intensity of the incandescent LUT (reduces harsh blues)");
+  USBSerial.println("       incandescent_mode=[true/false/default] | Force all output into monochrome and tint with 2700K incandescent color");
+  USBSerial.println("               base_coat=[true/false/default] | Enable a dim gray backdrop to the LEDs (approves appearance in most modes)");
+  USBSerial.println("            bulb_opacity=[float or 'default'] | Set opacity of a filter that portrays the output as 32 \"bulbs\" with separation and hot spots");
+  USBSerial.println("              saturation=[float or 'default'] | Sets the saturation of internal hues");
+  USBSerial.println("               prism_count=[int or 'default'] | Sets the number of times the \"prism\" effect is applied");
+  USBSerial.println("                         preset=[preset_name] | Sets multiple configuration options at once to match a preset theme");
+  USBSerial.println("                          chromatic=[on/off] | Toggle global chromatic colour mode (former '1' hotkey)");
+  USBSerial.println();
+  USBSerial.println("                         -- EFFECTS QUEUE + PRESET SLOTS --");
+  USBSerial.println("                          queue_mode=[on/off] | Arm-then-commit mode for [/] ,/. and slot loads ('U' hotkey)");
+  USBSerial.println("                                       commit | Commit ALL armed channels in the same frame ('\\' hotkey)");
+  USBSerial.println("                  transition_style=[dip/xfade] | Transition used by committed changes (default dip)");
+  USBSerial.println("                   transition_dip_ms=[60-1000] | Dip-to-dark duration in ms (default 120)");
+  USBSerial.println("                 transition_xfade_ms=[100-3000] | Crossfade duration in ms (default 400)");
+  USBSerial.println("                    commit_quantise=[off/beat] | Hold '\\' commits for the next beat tick (2s timeout)");
+  USBSerial.println("        slot_save=[1-10][,primary|secondary] | Save channel visual fields to a slot (default ACTIVE target)");
+  USBSerial.println("        slot_load=[1-10][,primary|secondary] | Load slot (queue on=arm, off=apply via dip; digit hotkeys)");
+  USBSerial.println("         slot_arm=[1-10][,primary|secondary] | Arm slot without committing, regardless of queue mode");
+  USBSerial.println("                                    slot_list | Dump slot validity + mode/palette summary");
+  USBSerial.println();
+  USBSerial.println("                         -- SECONDARY LED STRIP CONTROL --");
+  USBSerial.println("         secondary_enabled=[true/false] | Enable or disable the secondary LED strip");
+  USBSerial.println("                 secondary_mode=[0-NUM_MODES-1] | Set mode for secondary LED strip");
+  USBSerial.println("              secondary_photons=[0-1.0] | Set brightness for secondary LED strip");
+  USBSerial.println("               secondary_chroma=[0-1.0] | Set chroma value for secondary LED strip");
+  USBSerial.println("                 secondary_mood=[0-1.0] | Set mood value for secondary LED strip");
+  USBSerial.println("            secondary_saturation=[0-1.0] | Set saturation for secondary LED strip");
+  USBSerial.println("          secondary_prism_count=[0-10] | Set prism count for secondary LED strip");
+  USBSerial.println("   secondary_mirror_enabled=[true/false] | Toggle mirroring on secondary LED strip");
+  USBSerial.println("    secondary_reverse_order=[true/false] | Toggle image flipping on secondary LED strip");
+  USBSerial.println("              secondary_base_coat=[true/false] | Enable dim backdrop on secondary LED strip");
+  USBSerial.println("                  secondary_status | Display current status of secondary LED strip");
+#ifdef ENABLE_GDFT_HARNESS
+  USBSerial.println();
+  USBSerial.println("                         -- GDFT HARNESS (item 22, harness build only) --");
+  USBSerial.println("                  gdft_probe=[freq_hz] | Inject a synthetic sine; print GDFTP argmax bin / chroma / peak (no mic, no cal)");
+  USBSerial.println("       gdft_sweep=[f0],[f1],[steps] | Sweep synthetic sine; one GDFTP line per step (argmax bin must rise monotonically)");
+  USBSerial.println("              gdft_agc_probe[=amp] | 3-tone AGC contrast A/B; GDFTAGC line with pre/post inter-note level ratios");
+#endif
+#if ENABLE_DIAG_CAPTURE
+  USBSerial.println();
+  USBSerial.println("                         -- DIAGNOSTIC CAPTURE (harness build only) --");
+  USBSerial.println("                  diag=status|clear | Show or clear the static diagnostic pool");
+  USBSerial.println("                  vpab=start[,N][,metrics|bytes|both] | Capture final-byte VPAB records without render-path serial");
+  USBSerial.println("                  vpab=stop|dump|frames|reset|status | Freeze, drain, clear, or inspect VPAB capture");
+#endif
+#ifdef ENABLE_VP_MOTION_LAB
+  USBSerial.println();
+  USBSerial.println("                         -- VP MOTION LAB (NON-SHIPPABLE harness only) --");
+  USBSerial.println("                  vpml=play_builtin,intro_bounce | Start built-in dual-channel intro preview");
+  USBSerial.println("                  vpml=play_builtin,intro_bounce_loop | Start loop-safe built-in VPML preview");
+  USBSerial.println("                  vpml=play_params,<programme>,frames=N,... | Start bounded VPML parameter preview");
+  USBSerial.println("                  vpml=status|stop | Inspect or stop the built-in VPML preview");
+#endif
+#if FEATURE_MABUTRACE
+  USBSerial.println("                                        trace | Dump MabuTrace Perfetto JSON (trace_dev only)");
+#endif
+  tx_end();
+}
 
 void cmd_sb_query();
 
@@ -548,6 +785,1054 @@ inline constexpr serial_typed_cmd_row_t SERIAL_TYPED_CMD_TABLE[] = {
 #include "serial_typed_cmd_table.def"
 #undef SERIAL_TYPED_CMD
 };
+  // COMMANDS WITHOUT METADATA ###############################
+  // Row 1: the bare-command vocabulary routes through the dispatch table for the
+  // typed `:cmd` surface. The table enforces the safety class (D5 cal guidance,
+  // D6 CONFIRM trio). Commands carrying `=value` (typed setters) fall through to
+  // the metadata parser below, unchanged.
+  if (strchr(command_buf, '=') == nullptr) {
+    // Exact-match (no trailing token): the common case for every bare command.
+    const serial_cmd_row_t* row = serial_cmd_lookup(command_buf);
+    if (row != nullptr) {
+      serial_dispatch_typed_row(row, "");
+      return;
+    }
+    // Trailing space+token, e.g. `factory_reset CONFIRM`. This branch is scoped
+    // to SC_FORBIDDEN_SINGLE_BYTE rows ONLY — those are the only commands that
+    // take an argument (the CONFIRM token, D6). For any other head row (SAFE /
+    // TYPED_ONLY / ARM_REQUIRED) a trailing token is NOT meaningful: we must NOT
+    // dispatch the head and silently drop the tail (that would turn `reset now`
+    // into a reboot — an unsigned delta on a disruptive command). Instead we
+    // restore the buffer and fall through to the metadata parser, which ends in
+    // bad_command exactly as the pre-Row-1 base did.
+    char* space = strchr(command_buf, ' ');
+    if (space != nullptr) {
+      *space = '\0';
+      const serial_cmd_row_t* head = serial_cmd_lookup(command_buf);
+      if (head != nullptr && head->safety_class == SC_FORBIDDEN_SINGLE_BYTE) {
+        serial_dispatch_typed_row(head, space + 1);
+        *space = ' ';
+        return;
+      }
+      *space = ' ';
+      // head was non-FORBIDDEN (or unknown): fall through to metadata parser.
+    }
+  }
+
+  // The legacy bare-command strcmp chain has been REMOVED — its vocabulary now
+  // lives in SERIAL_CMD_TABLE (serial_cmd_table.def) and dispatches above.
+  // Provenance is the git history (diff 92cfa74..HEAD) + the equivalence matrix
+  // at docs/k1-refactor-2026-05/row1-command-equivalence-matrix.md.
+
+  // COMMANDS WITH METADATA ##################################
+  // Reached for any token NOT consumed by the table above: i.e. `type=value`
+  // typed setters, the deprecated SECONDARY_* aliases / SECONDARY_MODE prefix,
+  // and unknown tokens (which fall through to bad_command).
+  {  // Commands with metadata are parsed here
+
+    // PARSER #############################
+    // Parse command type
+    char command_type[32] = { 0 };
+    uint8_t reading_index = 0;
+    for (uint8_t i = 0; i < 32; i++) {
+      reading_index++;
+      if (command_buf[i] != '=') {
+        command_type[i] = command_buf[i];
+      } else {
+        break;
+      }
+    }
+
+    // Then parse command data
+    char command_data[94] = { 0 };
+    for (uint8_t i = 0; i < 94; i++) {
+      if (command_buf[reading_index + i] != 0) {
+        command_data[i] = command_buf[reading_index + i];
+      } else {
+        break;
+      }
+	    }
+	    // PARSER #############################
+
+	    if (serial_command_marks_manual_visual_control(command_type)) {
+	      k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_COMMAND);
+	    }
+
+	    // Now react accordingly:
+
+    // Set if this K1 is a MAIN Unit --------------
+    if (strcmp(command_type, "vp_profile") == 0) {
+      if (strcmp(command_data, "original") == 0) {
+        vp_apply_profile(VP_PROFILE_ORIGINAL);
+        vp_print_status();
+      } else if (strcmp(command_data, "clean") == 0) {
+        vp_apply_profile(VP_PROFILE_CLEAN);
+        vp_print_status();
+      } else if (strcmp(command_data, "candidate") == 0) {
+        vp_apply_profile(VP_PROFILE_CANDIDATE);
+        vp_print_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "vp_all") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        vp_apply_profile(value ? VP_PROFILE_CANDIDATE : VP_PROFILE_ORIGINAL);
+        vp_print_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    // The 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma, vivid_black)
+    // were lifted VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2, S4.3 /
+    // vivid slice). Each writes a VP_VIVID_* inline global — no save_config, no
+    // reboot. Dispatched here once: serial_cmd_dispatch_vivid() returns true iff
+    // command_type named one of them (the body ran), false to fall through.
+    // Proven byte-for-byte by the Fα serial_replay golden extension.
+#ifdef K1_VIVID_PRECOMP_V1
+    else if (serial_cmd_dispatch_vivid(command_type, command_data)) {
+      // handled by an extracted vivid handler
+    }
+#endif // K1_VIVID_PRECOMP_V1
+
+    else if (strcmp(command_type, "ap_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        AP_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("AP_STREAM: ");
+        USBSerial.println(vp_bool_text(AP_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+// tempo_stream stays INLINE here (ENABLE_TEMPO_STREAM-only gate — a different
+// gate level than the AP block, so keeping it inline avoids straddling two
+// gates in the dispatcher). The 11 AP-frontend-debug handlers (combined gate)
+// are lifted to serial/k1_ap_capture_telemetry.{cpp,h}; bodies statement-
+// identical, gates identical, production preprocesses to nothing.
+#if ENABLE_TEMPO_STREAM
+    else if (strcmp(command_type, "tempo_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        TEMPO_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("TEMPO_STREAM: ");
+        USBSerial.println(vp_bool_text(TEMPO_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    else if (serial_diag_ap_dispatch(command_type, command_data)) { }
+#endif
+
+#ifdef ENABLE_AP_STREAM
+    // ap_capture=<ms> — harness-only windowed structured AP capture (parallel to the
+    // boolean ap_stream toggle above; does NOT change ap_stream's debug semantics).
+    else if (strcmp(command_type, "ap_capture") == 0) {
+      long ms = (command_data && command_data[0]) ? atol(command_data) : 0;
+      if (ms > 0 && ms <= 60000) {
+        ap_capture_arm((uint32_t)ms);
+        tx_begin();
+        USBSerial.print("AP_CAPTURE: armed ");
+        USBSerial.print(ms);
+        USBSerial.println(" ms");
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#ifdef ENABLE_FRAME_DUMP
+    // frame_dump=<metric>,<mode>,<dur_ms>,<every_n> — VP Tier B live per-frame stream
+    // (emits FNV hash + energy + COM + FPS; <metric> is recorded in the start header).
+    else if (strcmp(command_type, "frame_dump") == 0) {
+      char metric[12] = {0};
+      int mode = 0; long dur = 0; int every = 1;
+      int parsed = (command_data && command_data[0])
+                     ? sscanf(command_data, "%11[^,],%d,%ld,%d", metric, &mode, &dur, &every) : 0;
+      if (parsed >= 3 && dur > 0 && dur <= 60000 && mode >= 0 && mode < NUM_MODES) {
+        if (every < 1) every = 1;
+        frame_dump_every_n = (uint16_t)every;
+        frame_dump_frame = 0;
+        frame_dump_end_ms = millis() + (uint32_t)dur;
+        frame_dump_active = true;
+        tx_begin();
+        USBSerial.printf("[FDUMP] start metric=%s mode=%d dur=%ld every=%d\n", metric, mode, dur, every);
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#ifdef ENABLE_VP_PROBE_CMD
+    // vp_probe=all — run the deterministic VP output probe (12-mode roster: 11 Tier A
+    // hashes + the nondet quantum row). Canonical harness command; legacy bare command
+    // `vp_out_test` triggers the same machinery and remains available.
+    else if (strcmp(command_type, "vp_probe") == 0) {
+      if (command_data && strcmp(command_data, "all") == 0) {
+        vp_run_output_probe();
+      } else if (command_data && strcmp(command_data, "secondary") == 0) {
+        vp_run_secondary_bleed_probe();   // item 17 — secondary bleed test (VPB)
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#ifdef ENABLE_GDFT_HARNESS
+    // gdft_probe / gdft_sweep / gdft_agc_probe lifted VERBATIM into
+    // serial_cmd_dispatch_gdft_harness() in serial_cmd_handlers.cpp (gated-out probe lane).
+    // GATE-MATCHED: decl/def/include/call-site all behind #ifdef ENABLE_GDFT_HARNESS
+    // (production-OFF). Returns true iff command_type was one of the three. Behaviour-
+    // preserving — proven by oracle_serial_struct.py; the GDFTP/GDFTP5/GDFTAGC schema by
+    // tests/test_gdft_harness_schema_static.py.
+    else if (serial_cmd_dispatch_gdft_harness(command_type, command_data)) {
+      // handled by the extracted gdft_harness dispatcher
+    }
+#endif
+
+#ifdef ENABLE_MOTION_PROBE
+    // mp_step=<interval_ms>,<size_px>[,<lum_0_255>] — a single point that jumps
+    // size_px pixels every interval_ms (measured by millis, wraps at strip ends).
+    // Live-adjustable: re-issue to change params. The harness reports the ACHIEVED
+    // interval (measured millis delta) and effective px/s, NOT the requested value.
+    // Apparent-motion test harness; non-shipping (motion_probe.h).
+    else if (strcmp(command_type, "mp_step") == 0) {
+      if (command_data && command_data[0] != '\0') {
+        char buf[64];
+        strncpy(buf, command_data, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = '\0';
+        char* tok_iv  = strtok(buf, ",");
+        char* tok_sz  = strtok(nullptr, ",");
+        char* tok_lum = strtok(nullptr, ",");   // optional luminance 0..255
+        if (tok_iv && tok_sz) {
+          float interval_ms = strtof(tok_iv, nullptr);
+          int   size_px     = atoi(tok_sz);
+          float lum         = 1.0f;             // default full brightness
+          if (tok_lum) {
+            int l = atoi(tok_lum);
+            if (l < 0) l = 0; if (l > 255) l = 255;
+            lum = (float)l / 255.0f;
+          }
+          if (isfinite(interval_ms) && interval_ms > 0.0f && size_px >= 1) {
+            motion_probe_arm_step(interval_ms, size_px, lum);
+          } else {
+            bad_command(command_type, command_data);
+          }
+        } else {
+          bad_command(command_type, command_data);
+        }
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    // mp_flash=<a_px>,<b_px>,<gap_ms>,<lum_0_255>,<on_ms> — two-flash apparent-
+    // motion primitive looping until mp_off. Each cycle: A on for on_ms, dark for
+    // gap_ms (ISI), B on for on_ms, dark for gap_ms, repeat. Reports A-B
+    // separation and the ACHIEVED gap_ms + cycle each onset. Non-shipping.
+    else if (strcmp(command_type, "mp_flash") == 0) {
+      if (command_data && command_data[0] != '\0') {
+        char buf[64];
+        strncpy(buf, command_data, sizeof(buf) - 1);
+        buf[sizeof(buf) - 1] = '\0';
+        char* tok_a   = strtok(buf, ",");
+        char* tok_b   = strtok(nullptr, ",");
+        char* tok_gap = strtok(nullptr, ",");
+        char* tok_lum = strtok(nullptr, ",");
+        char* tok_on  = strtok(nullptr, ",");
+        if (tok_a && tok_b && tok_gap && tok_lum && tok_on) {
+          int   a_px   = atoi(tok_a);
+          int   b_px   = atoi(tok_b);
+          float gap_ms = strtof(tok_gap, nullptr);
+          int   lum_i  = atoi(tok_lum);
+          float on_ms  = strtof(tok_on, nullptr);
+          if (lum_i < 0) lum_i = 0; if (lum_i > 255) lum_i = 255;
+          float lum = (float)lum_i / 255.0f;
+          if (isfinite(gap_ms) && isfinite(on_ms) && gap_ms >= 0.0f && on_ms > 0.0f
+              && a_px >= 0 && b_px >= 0) {
+            motion_probe_arm_flash(a_px, b_px, gap_ms, lum, on_ms);
+          } else {
+            bad_command(command_type, command_data);
+          }
+        } else {
+          bad_command(command_type, command_data);
+        }
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    // mp_off — stop the probe, restore the snapshotted CONFIG, resume rendering.
+    else if (strcmp(command_type, "mp_off") == 0) {
+      motion_probe_off();
+    }
+    // mp_status — print active state, params, measured LED_FPS + frame period,
+    // and last achieved timings.
+    else if (strcmp(command_type, "mp_status") == 0) {
+      motion_probe_status();
+    }
+#endif
+
+    // ----------------------------------------------------------------------
+    //  dump_raw — SPH0645 raw I2S frame dump
+    // ----------------------------------------------------------------------
+    //
+    //  Usage:
+    //    dump_raw=silence   → next chunk printed under [DUMP-SILENCE]
+    //    dump_raw=tone      → next chunk printed under [DUMP-TONE-1KHZ]
+    //
+    //  Prints the first 32 raw 32-bit samples from i2s_samples_raw as
+    //  zero-padded hex, framed by [DUMP-*] / [DUMP-END] tags. One-shot —
+    //  the flag (raw_dump_request, declared in i2s_audio.h) auto-clears
+    //  after the next acquire_sample_chunk call fires the dump.
+    //
+    //  Origin — Test A, 2026-05-24 PIO toolchain migration:
+    //    During the arduino-cli → PIO + arduino-esp32 3.2.0 + IDF 5.4.1
+    //    migration, the SPH0645 mic's i2s_std unpacking had to be
+    //    empirically verified against the datasheet's 24-bit MSB-aligned
+    //    frame structure. This command captured the data that closed the
+    //    last forensic gap:
+    //      - silence: 32 samples clustered ~0xf924xxxx, lower 14 bits zero
+    //        (matches SPH0645 18-bit effective resolution per Knowles
+    //         Rev B/C Table 2), post-`>>14` DC = -6951
+    //      - 1 kHz tone (afplay): clean 13-sample periodic structure at
+    //        Fs=12800 = 984.6 Hz, amplitude in 18-bit signal range
+    //    Decode integrity end-to-end PASS — slot_mask=LEFT + ws_pol=true
+    //    correctly places the 24-bit data in bits [31..8] under IDF 5.4.1.
+    //
+    //  Why kept (not stripped post-migration):
+    //    Doctrine Rule 4 (re-test on toolchain bumps) — preserves the
+    //    measurement infrastructure for the next mic / sample-rate /
+    //    driver change so the next forensic capture isn't built under
+    //    fire. Cost: ~400 B flash, 1 byte RAM, zero CPU when idle.
+    //    Hardware-specific (SPH0645 24-bit MSB-aligned frame); will need
+    //    re-tuning if mic is swapped — that's the point.
+    //
+    //  Safety:
+    //    ~0.5ms blocking total (32 USBSerial.printf calls, async USB CDC
+    //    TX), well under the 7.5ms audio chunk window @ 12.8kHz Fs.
+    //    No audio glitch risk. Manual fire only — agent must NOT
+    //    auto-trigger (the dump itself is silence-agnostic, but the
+    //    interpretation depends on Captain's verbal silence / tone
+    //    confirmation per .claude/CLAUDE.md Calibration command policy).
+    //
+    //  Refs:
+    //    docs/forensics/2026-05-24-stage7-handoff.md (Test A captures)
+    //    Lixie-Labs/Emotiscope src/microphone.h (slot_cfg reference)
+    //    ESP-IDF v5.4.1 components/hal/esp32s3/include/hal/i2s_ll.h
+    //      (i2s_ll_tx_set_pdm_chan_mod doxygen — slot semantic table)
+    // ----------------------------------------------------------------------
+    else if (strcmp(command_type, "dump_raw") == 0) {
+      if (strcmp(command_data, "silence") == 0) {
+        raw_dump_request = 1;
+        tx_begin();
+        USBSerial.println("DUMP_RAW: armed (silence)");
+        tx_end();
+      } else if (strcmp(command_data, "tone") == 0) {
+        raw_dump_request = 2;
+        tx_begin();
+        USBSerial.println("DUMP_RAW: armed (tone-1kHz)");
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "vp_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        VP_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("VP_STREAM: ");
+        USBSerial.println(vp_bool_text(VP_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    else if (strcmp(command_type, "ble_stream") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        BLE_STREAM_ENABLED = value;
+        tx_begin();
+        USBSerial.print("BLE_STREAM: ");
+        USBSerial.println(vp_bool_text(BLE_STREAM_ENABLED));
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+	    else if (strcmp(command_type, "vp_perf") == 0) {
+	      vp_perf_command(command_type, command_data);
+	    }
+
+	    // Extracted VERBATIM to serial_cmd_dispatch_smart_director() in
+	    // serial_cmd_handlers.cpp (smart_assist / smart_switching /
+	    // smart_confidence_floor / smart_scene). UNGATED. Behaviour-preserving —
+	    // proven byte-for-byte by the serial_struct structural-contract gate.
+	    else if (serial_cmd_dispatch_smart_director(command_type, command_data)) {
+	      // handled by the extracted smart-director dispatcher
+	    }
+
+	    // Extracted VERBATIM to serial_cmd_dispatch_smart_visual() in
+	    // serial_cmd_handlers.cpp (smart_hooks). UNGATED. Proven by serial_struct.
+	    else if (serial_cmd_dispatch_smart_visual(command_type, command_data)) {
+	      // handled by the extracted smart-visual dispatcher
+	    }
+
+	    // Extracted VERBATIM to serial_cmd_dispatch_edge_mixer() in
+	    // serial_cmd_handlers.cpp (edge_enabled / edge_mode / edge_strength). UNGATED.
+	    // Behaviour-preserving — proven byte-for-byte by the serial_struct gate.
+	    else if (serial_cmd_dispatch_edge_mixer(command_type, command_data)) {
+	      // handled by the extracted edge-mixer dispatcher
+	    }
+
+#if ENABLE_DIAG_CAPTURE
+	    else if (strcmp(command_type, "diag") == 0) {
+      if (strcmp(command_data, "status") == 0 || command_data[0] == 0) {
+        diag_capture_print_status();
+      } else if (strcmp(command_data, "clear") == 0 || strcmp(command_data, "reset") == 0) {
+        diag_capture_reset();
+        diag_capture_print_status();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#if ENABLE_VPAB_PROBE
+    else if (strcmp(command_type, "vpab") == 0) {
+      vpab_command(command_type, command_data);
+    }
+#endif
+
+#ifdef K1_PIN_EVIDENCE_V1
+    else if (strcmp(command_type, "k1_pin_evidence") == 0) {
+      if (command_data == nullptr || command_data[0] == 0 || strcmp(command_data, "status") == 0) {
+        k1_pin_evidence_print_status();
+      } else if (strncmp(command_data, "dba,", 4) == 0) {
+        if (k1_pin_evidence_set_dba_bucket_name(command_data + 4)) {
+          k1_pin_evidence_print_status();
+        } else {
+          bad_command(command_type, command_data);
+        }
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+#ifdef ENABLE_VP_MOTION_LAB
+    else if (strcmp(command_type, "vpml") == 0) {
+      if (!vpml_command(command_type, command_data)) {
+        bad_command(command_type, command_data);
+      }
+    }
+#endif
+
+    // The 17 VP-tuning handlers (vp_fix1/vp_agc_soft … vp_wave_shift) were lifted
+    // VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2, S4.2 / VP-tuning slice).
+    // Each writes a VP inline global via vp_set_flag/float_command — no save_config,
+    // no reboot. Dispatched here once: serial_cmd_dispatch_vp_tuning() returns true
+    // iff command_type named one of them (the body ran), false to fall through.
+    // Proven byte-for-byte by the Fα serial_replay golden extension.
+    else if (serial_cmd_dispatch_vp_tuning(command_type, command_data)) {
+      // handled by an extracted VP-tuning handler
+    }
+
+    // Toggle Debug Mode --------------------------------------
+    else if (strcmp(command_type, "debug") == 0) {
+      bool good = false;
+      if (strcmp(command_data, "true") == 0) {
+        good = true;
+        debug_mode = true;
+        cpu_usage.attach_ms(5, check_current_function);
+      } else if (strcmp(command_data, "false") == 0) {
+        good = true;
+        debug_mode = false;
+        cpu_usage.detach();
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        tx_begin();
+        USBSerial.print("debug_mode: ");
+        USBSerial.println(debug_mode);
+        tx_end();
+      }
+    }
+
+    // Set Mode Number + Secondary Mode -----------------------
+    // set_mode + secondary_mode lifted VERBATIM into serial_cmd_dispatch_mode() in
+    // serial_cmd_handlers.cpp (gated-families lane, Increment A). One call-site routes
+    // both (UNGATED); returns true iff command_type was one of them. secondary_mode's
+    // dispatch hoists here from its old position below — else-if order is immaterial
+    // (unique command_type strings, no fallthrough). Behaviour-preserving — proven by
+    // the structural-contract golden (oracle_serial_struct).
+    else if (serial_cmd_dispatch_mode(command_type, command_data)) {
+      // handled by the extracted set_mode / secondary_mode dispatcher
+    }
+
+    // Get Mode Name By ID ------------------------------------
+    else if (strcmp(command_type, "get_mode_name") == 0) {
+      uint16_t mode_id = atol(command_data);
+
+#ifdef K1_EFFECT_REGISTRY_V1
+      // Under the registry flag the ID argument is the gap-free DENSE menu index
+      // (same numbering as set_mode / the MODE line), which covers the native
+      // effects. Convert it to the real runtime ordinal before the name lookup
+      // (registry row → display name). Falls back to the legacy span when the
+      // registry is unhealthy.
+      const bool registry_ok = k1::effects::framework::registry_is_healthy();
+      const uint16_t mode_id_limit = registry_ok
+                                         ? k1::effects::framework::registry_dense_count()
+                                         : (uint16_t)NUM_MODES;
+      if (mode_id < mode_id_limit) {
+        const uint16_t ordinal =
+            registry_ok ? k1::effects::framework::registry_dense_to_ordinal(mode_id) : mode_id;
+        char buf[32] = { 0 };
+        const char* src = serial_mode_name((uint8_t)ordinal);
+        for (uint8_t i = 0; i < 32; i++) {
+          char c = src[i];
+          if (c != 0) {
+            buf[i] = c;
+          } else {
+            break;
+          }
+        }
+
+        tx_begin();
+        USBSerial.print("MODE_NAME: ");
+        USBSerial.println(buf);
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+#else
+      if (mode_id < NUM_MODES) {
+        char buf[32] = { 0 };
+        for (uint8_t i = 0; i < 32; i++) {
+          char c = mode_names[32 * mode_id + i];
+          if (c != 0) {
+            buf[i] = c;
+          } else {
+            break;
+          }
+        }
+
+        tx_begin();
+        USBSerial.print("MODE_NAME: ");
+        USBSerial.println(buf);
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+#endif
+    }
+
+    // The 23 PURE CONFIG setters (parse -> CONFIG write -> save_config[_delayed]
+    // -> echo; no reboot, no subsystem coupling) were lifted VERBATIM into
+    // serial/serial_cmd_handlers.cpp (Lane 2, S4 / Unit H first slice). Dispatched
+    // here once: serial_cmd_dispatch_pure_setter() returns true iff command_type
+    // named one of them (the body ran), false to fall through to the remaining
+    // ladder branches below. Branch order within Stage B is immaterial (each tests
+    // a unique command_type string), so hoisting the 23 into one call preserves
+    // behaviour — proven byte-for-byte by the S3.0 serial_replay golden.
+    else if (serial_cmd_dispatch_pure_setter(command_type, command_data)) {
+      // handled by an extracted pure setter
+    }
+
+    // The 7 CLEAN reboot-bearing CONFIG setters (parse -> CONFIG write ->
+    // save_config() [IMMEDIATE] -> echo -> reboot(); no conditional/subsystem
+    // coupling) were lifted VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2,
+    // S4.1 / Unit H second slice): sample_rate, note_offset, led_type, led_count,
+    // led_color_order, samples_per_chunk, boot_animation. Dispatched here once:
+    // serial_cmd_dispatch_reboot_setter() returns true iff command_type named one
+    // of them (the body ran, including its reboot()), false to fall through to the
+    // remaining ladder branches below. Branch order within Stage B is immaterial
+    // (each tests a unique command_type string), so hoisting the 7 into one call
+    // preserves behaviour — proven byte-for-byte by the S3.1 serial_replay golden.
+    // set_chroma_profile + bass_mode (conditional reboot via apply_chroma_profile,
+    // uncompilable on host) and set_mode (async) stay in this ladder, below.
+    else if (serial_cmd_dispatch_reboot_setter(command_type, command_data)) {
+      // handled by an extracted reboot-bearing setter
+    }
+
+    // Set runtime post-DC audio response gain ----------------
+    // Extracted VERBATIM to serial_cmd_dispatch_response_gain() in
+    // serial_cmd_handlers.cpp. Returns true iff command_type == "response_gain"
+    // (the body ran); false to fall through to the remaining ladder branches below.
+    // UNGATED. Behaviour-preserving — proven byte-for-byte by the serial_replay golden.
+    else if (serial_cmd_dispatch_response_gain(command_type, command_data)) {
+      // handled by the extracted response_gain dispatcher
+    }
+
+#ifdef K1_LOUD_GUARD_V1
+    else if (strcmp(command_type, "k1_loud_guard") == 0) {
+      if (strcmp(command_data, "status") == 0) {
+        tx_begin();
+        serial_print_k1_loud_guard_status();
+        tx_end();
+      } else if (strcmp(command_data, "cycle") == 0) {
+        tx_begin();
+        serial_cycle_k1_loud_guard_mode();
+        serial_print_k1_loud_guard_status();
+        tx_end();
+      } else if (strncmp(command_data, "mode", 4) == 0 &&
+                 command_data[4] >= '0' && command_data[4] <= '2' && command_data[5] == '\0') {
+        k1_loud_guard_mode = (uint8_t)(command_data[4] - '0');   // A/B retune matrix select
+        tx_begin();
+        serial_print_k1_loud_guard_status();
+        tx_end();
+      } else {
+        bool value = false;
+        if (vp_parse_bool(command_data, &value)) {
+          serial_set_k1_loud_guard(value);
+          tx_begin();
+          serial_print_k1_loud_guard_status();
+          tx_end();
+        } else {
+          bad_command(command_type, command_data);
+        }
+      }
+    }
+#endif
+
+    // ── Silence go-dark A/B (2026-07-10) — runtime enable + tuning, no recompile. ──
+    // K1 has NO indicator LEDs; the plate is the only output. STANDBY_DIMMING ships OFF
+    // (dormant); enable it here to A/B the go-dark on hardware before the default flip.
+    else if (strcmp(command_type, "standby_dimming") == 0) {
+      bool value = false;
+      if (vp_parse_bool(command_data, &value)) {
+        CONFIG.STANDBY_DIMMING = value;
+        tx_begin();
+        USBSerial.print("STANDBY_DIMMING: "); USBSerial.println(value ? "on" : "off");
+        tx_end();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+    else if (strcmp(command_type, "silence_enter") == 0) {
+      SILENCE_ENTER_SSL_FRAC = (float)atof(command_data);
+      tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_exit") == 0) {
+      SILENCE_EXIT_SSL_FRAC = (float)atof(command_data);
+      tx_begin(); USBSerial.print("SILENCE_EXIT_SSL_FRAC: "); USBSerial.println(SILENCE_EXIT_SSL_FRAC, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_dwell") == 0) {
+      SILENCE_DWELL_MS = (uint32_t)atol(command_data);
+      tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
+    }
+    // Raw-RMS absolute go-dark thresholds (firmware-v3 pre-gate port). Calibrate live from
+    // [AP] rms_raw in a quiet room, then set enter above the floor with margin (exit > enter).
+    else if (strcmp(command_type, "silence_rms_enter") == 0) {
+      K1_SILENCE_RMS_ENTER = (float)atof(command_data);
+      tx_begin(); USBSerial.print("K1_SILENCE_RMS_ENTER: "); USBSerial.println(K1_SILENCE_RMS_ENTER, 3); tx_end();
+    }
+    else if (strcmp(command_type, "silence_rms_exit") == 0) {
+      K1_SILENCE_RMS_EXIT = (float)atof(command_data);
+      tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
+    }
+#ifdef K1_MIC_AUTO_SENSE_V1
+    // Runtime-only mic auto-sense supervisor. Never persists; never fires noise cal.
+    else if (strcmp(command_type, "mic_auto") == 0) {
+      if (strcmp(command_data, "status") == 0) {
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "reset") == 0) {
+        k1_mic_auto_sense_reset(millis());
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "shadow") == 0) {
+        k1_mic_auto_sense_set_shadow(true);
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "live") == 0) {
+        k1_mic_auto_sense_set_shadow(false);
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else {
+        bool value = false;
+        if (vp_parse_bool(command_data, &value)) {
+          k1_mic_auto_sense_set_enabled(value);
+          tx_begin();
+          serial_print_k1_mic_auto_status();
+          tx_end();
+        } else {
+          bad_command(command_type, command_data);
+        }
+      }
+    }
+#endif
+
+#ifdef K1_EFFECT_FRAMEWORK_V1
+    // beat_director toggle lifted VERBATIM into serial_cmd_dispatch_beat_director() in
+    // serial_cmd_handlers.cpp (gated-families lane, Increment B). GATE-MATCHED: decl/def/
+    // call-site all behind #ifdef K1_EFFECT_FRAMEWORK_V1 (production-OFF). Returns true iff
+    // command_type == "beat_director". Behaviour-preserving — proven by oracle_serial_struct.
+    else if (serial_cmd_dispatch_beat_director(command_type, command_data)) {
+      // handled by the extracted beat_director dispatcher
+    }
+#endif  // K1_EFFECT_FRAMEWORK_V1
+
+    // boot_animation (reboot-bearing CONFIG setter) was lifted into
+    // serial/serial_cmd_handlers.cpp (S4.1) and is dispatched above via
+    // serial_cmd_dispatch_reboot_setter().
+
+    // Set Chroma Profile -----------------
+    // Clean front-end for the NOTE_OFFSET + CHROMAGRAM_RANGE pair (Stage 2 items 18-20).
+    // Global setting (chromagram is shared audio analysis). DEFAULT == v40102 values.
+    else if (strcmp(command_type, "set_chroma_profile") == 0) {
+      bool good = false;
+      uint8_t profile = CHROMA_PROFILE_DEFAULT;
+      if (strcmp(command_data, "default") == 0) {
+        profile = CHROMA_PROFILE_DEFAULT;
+        good = true;
+      } else if (strcmp(command_data, "bass") == 0) {
+        profile = CHROMA_PROFILE_BASS;
+        good = true;
+      } else if (strcmp(command_data, "full") == 0) {
+        profile = CHROMA_PROFILE_FULL;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        bool note_offset_changed = apply_chroma_profile(profile);
+        save_config();
+        tx_begin();
+        USBSerial.print("CONFIG.CHROMA_PROFILE: ");
+        USBSerial.print(command_data);
+        USBSerial.print(" (NOTE_OFFSET=");
+        USBSerial.print(CONFIG.NOTE_OFFSET);
+        USBSerial.print(" CHROMAGRAM_RANGE=");
+        USBSerial.print(CONFIG.CHROMAGRAM_RANGE);
+        USBSerial.println(")");
+        tx_end();
+        // Reboot ONLY if NOTE_OFFSET changed — it re-seeds the GDFT freq table at
+        // init. A pure CHROMAGRAM_RANGE change is picked up live each frame.
+        if (note_offset_changed) {
+          reboot();
+        }
+      }
+    }
+
+    // Toggle bass mode (back-compat alias for set_chroma_profile) -------------------
+    else if (strcmp(command_type, "bass_mode") == 0) {
+      bool good = false;
+      uint8_t profile = CHROMA_PROFILE_DEFAULT;
+      if (strcmp(command_data, "true") == 0) {
+        profile = CHROMA_PROFILE_BASS;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0) {
+        profile = CHROMA_PROFILE_DEFAULT;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+
+      if (good) {
+        bool note_offset_changed = apply_chroma_profile(profile);
+        save_config();
+        tx_begin();
+        USBSerial.println(profile == CHROMA_PROFILE_BASS ? "BASS MODE ENABLED" : "BASS MODE DISABLED");
+        tx_end();
+        // Reboot ONLY if NOTE_OFFSET changed (matches set_chroma_profile + the
+        // original mechanism: bass<->default always flips NOTE_OFFSET 0<->12).
+        if (note_offset_changed) {
+          reboot();
+        }
+      }
+    }
+
+    // Stream a given value over Serial -----------------
+    else if (strcmp(command_type, "stream") == 0) {
+      stop_streams();  // Stop any current streams
+      if (strcmp(command_data, "audio") == 0) {
+        stream_audio = true;
+        ack();
+      } else if (strcmp(command_data, "fps") == 0) {
+        stream_fps = true;
+        ack();
+      } else if (strcmp(command_data, "max_mags") == 0) {
+        stream_max_mags = true;
+        ack();
+      } else if (strcmp(command_data, "max_mags_followers") == 0) {
+        stream_max_mags_followers = true;
+        ack();
+      } else if (strcmp(command_data, "magnitudes") == 0) {
+        stream_magnitudes = true;
+        ack();
+      } else if (strcmp(command_data, "spectrogram") == 0) {
+        stream_spectrogram = true;
+        ack();
+      } else if (strcmp(command_data, "chromagram") == 0) {
+        stream_chromagram = true;
+        ack();
+      } else {
+        bad_command(command_type, command_data);
+      }
+    }
+
+    // Set CONFIG preset ----------------------------
+    // Extracted VERBATIM to serial_cmd_dispatch_preset() in serial_cmd_handlers.cpp:
+    // the single "preset" command (5 theme names -> set_preset() + save_config_delayed()).
+    // Returns true iff command_type == "preset" (the body ran); false to fall through to
+    // the remaining ladder. UNGATED. Behaviour-preserving — proven byte-for-byte by the
+    // serial_struct structural-contract gate (the function-call families the replay
+    // oracle cannot observe).
+    else if (serial_cmd_dispatch_preset(command_type, command_data)) {
+      // handled by the extracted preset dispatcher
+    }
+
+    // Effects queue + preset slots (spec §4, 2026-06-11) ----------------------
+    // Extracted VERBATIM to serial_cmd_dispatch_queue() in serial_cmd_handlers.cpp:
+    // queue_mode / transition_style / transition_dip_ms / transition_xfade_ms /
+    // commit_quantise. Returns true iff command_type named one of the five (the body
+    // ran); false to fall through to the remaining ladder. UNGATED. Behaviour-
+    // preserving — proven byte-for-byte by the serial_struct structural-contract gate
+    // (the function-call families the replay oracle cannot observe).
+    else if (serial_cmd_dispatch_queue(command_type, command_data)) {
+      // handled by the extracted effects-queue / transition dispatcher
+    }
+
+    else if (strcmp(command_type, "slot_save") == 0) {
+      // :slot_save=N[,primary|secondary]
+      // Default channel = the ACTIVE serial target, matching the shift+digit
+      // hotkeys; explicit suffix exists for automated proof without relying on
+      // mutable target-channel RAM state.
+      bool from_secondary = secondaryMode;
+      bool channel_ok = true;
+      char* comma = strchr(command_data, ',');
+      if (comma != nullptr) {
+        *comma = '\0';
+        const char* channel_name = comma + 1;
+        if (strcmp(channel_name, "primary") == 0) {
+          from_secondary = false;
+        } else if (strcmp(channel_name, "secondary") == 0) {
+          from_secondary = true;
+        } else {
+          channel_ok = false;
+        }
+      }
+      int slot_number = atoi(command_data);
+      if (!channel_ok || slot_number < 1 || slot_number > K1_PRESET_SLOT_COUNT) {
+        bad_command(command_type, command_data);
+      } else {
+        tx_begin();
+        serial_queue_slot_save(uint8_t(slot_number - 1), from_secondary);
+        tx_end();
+      }
+    }
+
+    else if (strcmp(command_type, "slot_load") == 0 ||
+             strcmp(command_type, "slot_arm") == 0) {
+      // :slot_load=N[,primary|secondary] / :slot_arm=N[,primary|secondary]
+      // Default channel = the ACTIVE serial target (space hotkey).
+      bool target_secondary = secondaryMode;
+      bool channel_ok = true;
+      char* comma = strchr(command_data, ',');
+      if (comma != nullptr) {
+        *comma = '\0';
+        const char* channel_name = comma + 1;
+        if (strcmp(channel_name, "primary") == 0) {
+          target_secondary = false;
+        } else if (strcmp(channel_name, "secondary") == 0) {
+          target_secondary = true;
+        } else {
+          channel_ok = false;
+        }
+      }
+      int slot_number = atoi(command_data);
+      if (!channel_ok || slot_number < 1 || slot_number > K1_PRESET_SLOT_COUNT) {
+        bad_command(command_type, command_data);
+      } else {
+        tx_begin();
+        if (strcmp(command_type, "slot_arm") == 0) {
+          serial_queue_slot_arm(uint8_t(slot_number - 1), target_secondary);
+        } else {
+          serial_queue_slot_load(uint8_t(slot_number - 1), target_secondary);
+        }
+        tx_end();
+      }
+    }
+
+    // Typed equivalents for removed digit hotkeys (zero capability loss) -----
+    else if (strcmp(command_type, "chromatic") == 0) {
+      // Former '1' hotkey (global chromatic colour mode toggle); RAM-only
+      // state, exactly like the hotkey it replaces.
+      bool good = false;
+      if (strcmp(command_data, "true") == 0 || strcmp(command_data, "on") == 0) {
+        chromatic_mode = true;
+        good = true;
+      } else if (strcmp(command_data, "false") == 0 || strcmp(command_data, "off") == 0) {
+        chromatic_mode = false;
+        good = true;
+      } else {
+        bad_command(command_type, command_data);
+      }
+      if (good) {
+        tx_begin();
+        USBSerial.print("CHROMATIC_MODE: ");
+        USBSerial.println(chromatic_mode ? "on" : "off");
+        tx_end();
+      }
+    }
+
+    // Secondary-channel setters ----------------------------
+    // Extracted VERBATIM to serial_cmd_dispatch_secondary() in serial_cmd_handlers.cpp:
+    // the 14 pure inline-global setters (auto_color_shift, incandescent_mode, enabled,
+    // photons, chroma, mood, saturation, prism_count, mirror_enabled, reverse_order,
+    // control, palette_mode, palette_index, base_coat). Returns true iff command_type
+    // named one of the 14 (the body ran); false to fall through to the remaining ladder.
+    // UNGATED. Behaviour-preserving — proven byte-for-byte by the serial_replay
+    // behaviour-lock. secondary_mode (below) + secondary_status stay inline.
+    else if (serial_cmd_dispatch_secondary(command_type, command_data)) {
+      // handled by the extracted secondary-channel setter dispatcher
+    }
+
+    else if (strcmp(command_type, "secondary_status") == 0) {
+      tx_begin();
+      USBSerial.print("SECONDARY_ENABLED: ");
+      USBSerial.println(ENABLE_SECONDARY_LEDS ? "true" : "false");
+      USBSerial.print("SECONDARY_CONTROL: ");
+      USBSerial.println(secondaryMode ? "true (encoders control secondary channel)" : "false (encoders control primary channel)");
+      USBSerial.print("SECONDARY_MODE: ");
+      USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+      USBSerial.print(" (");
+      USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
+      USBSerial.println(")");
+      USBSerial.print("SECONDARY_PHOTONS: ");
+      USBSerial.println(SECONDARY_PHOTONS, 6);
+      USBSerial.print("SECONDARY_CHROMA: ");
+      USBSerial.println(SECONDARY_CHROMA, 6);
+      USBSerial.print("SECONDARY_MOOD: ");
+      USBSerial.println(SECONDARY_MOOD, 6);
+      USBSerial.print("SECONDARY_SATURATION: ");
+      USBSerial.println(SECONDARY_SATURATION, 6);
+      USBSerial.print("SECONDARY_PRISM_COUNT: ");
+      USBSerial.println(SECONDARY_PRISM_COUNT, 2);
+      USBSerial.print("SECONDARY_MIRROR_ENABLED: ");
+      USBSerial.println(SECONDARY_MIRROR_ENABLED ? "true" : "false");
+      USBSerial.print("SECONDARY_REVERSE_ORDER: ");
+      USBSerial.println(SECONDARY_REVERSE_ORDER ? "true" : "false");
+      USBSerial.print("SECONDARY_BASE_COAT: ");
+      USBSerial.println(SECONDARY_BASE_COAT ? "true" : "false");
+      USBSerial.print("SECONDARY_PALETTE_MODE_ENABLED: ");
+      USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "true" : "false");
+      USBSerial.print("SECONDARY_PALETTE_INDEX: ");
+      USBSerial.print(SECONDARY_PALETTE_INDEX);
+      if (SECONDARY_PALETTE_MODE_ENABLED) {
+        char buffer[32];
+        strcpy_P(buffer, (const char *)pgm_read_ptr(&(paletteNames[SECONDARY_PALETTE_INDEX])));
+        USBSerial.print(" ("); USBSerial.print(buffer); USBSerial.println(")");
+      } else {
+        USBSerial.println();
+      }
+      USBSerial.println("NOTE: This command is deprecated, please use secondary_status instead");
+      tx_end();
+    }
+    
+    // Add backward compatibility for old commands
+    else if (strcmp(command_buf, "SECONDARY_ON") == 0) {
+      ENABLE_SECONDARY_LEDS = true;
+      USBSerial.println("Secondary LEDs enabled");
+      USBSerial.println("NOTE: This command is deprecated, please use secondary_enabled=true instead");
+    }
+    else if (strcmp(command_buf, "SECONDARY_OFF") == 0) {
+      ENABLE_SECONDARY_LEDS = false;
+      USBSerial.println("Secondary LEDs disabled");
+      USBSerial.println("NOTE: This command is deprecated, please use secondary_enabled=false instead");
+    }
+    else if (strncmp(command_buf, "SECONDARY_MODE", 14) == 0) {
+      uint8_t mode = atoi(command_buf + 15);
+      if (mode < NUM_MODES) {
+        SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(mode, 1);
+        USBSerial.print("Secondary mode set to: ");
+        USBSerial.println(serial_mode_name(mode));
+        ENABLE_SECONDARY_LEDS = true;
+        USBSerial.println("NOTE: This command is deprecated, please use secondary_mode=[int] instead");
+      } else {
+        USBSerial.println("Invalid mode number");
+      }
+    }
+    else if (strcmp(command_buf, "SECONDARY_STATUS") == 0) {
+      USBSerial.print("Secondary LEDs: ");
+      USBSerial.println(ENABLE_SECONDARY_LEDS ? "ENABLED" : "DISABLED");
+      USBSerial.print("  Mode: ");
+      USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+      USBSerial.print(" (");
+      USBSerial.print(serial_mode_name(SECONDARY_LIGHTSHOW_MODE));
+      USBSerial.println(")");
+      USBSerial.print("  Photons: ");
+      USBSerial.println(SECONDARY_PHOTONS);
+      USBSerial.print("  Chroma: ");
+      USBSerial.println(SECONDARY_CHROMA);
+      USBSerial.print("  Mood: ");
+      USBSerial.println(SECONDARY_MOOD);
+      USBSerial.print("  Palette Mode: ");
+      USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "ON" : "OFF");
+      USBSerial.print("  Palette Index: ");
+      USBSerial.print(SECONDARY_PALETTE_INDEX);
+      if (SECONDARY_PALETTE_MODE_ENABLED) {
+        char buffer[32];
+        strcpy_P(buffer, (const char *)pgm_read_ptr(&(paletteNames[SECONDARY_PALETTE_INDEX])));
+        USBSerial.print(" ("); USBSerial.print(buffer); USBSerial.println(")");
+      } else {
+        USBSerial.println();
+      }
+      USBSerial.println("NOTE: This command is deprecated, please use secondary_status instead");
+    }
+
+    // Start system benchmark -----------------------------------
+    else if (strcmp(command_type, "start_benchmark") == 0) {
+
+      if (!benchmark_running) {
+        benchmark_running = true;
+        benchmark_start_time = millis();
+        system_fps_sum = 0;
+        led_fps_sum = 0;
+        benchmark_sample_count = 0;
+        ack();
+        tx_begin();
+        USBSerial.print("Benchmark started (Duration: ");
+        USBSerial.print(benchmark_duration / 1000);
+        USBSerial.println(" seconds)...");
+        tx_end();
+      } else {
+        tx_begin(true);
+        USBSerial.println("Benchmark already running.");
+        tx_end(true);
+      }
+
+    }
+
+    // Toggle streaming spectrogram ---------------------
+    else if (strcmp(command_type, "stream_spectrogram") == 0) {
+      stream_spectrogram = !stream_spectrogram;
+      USBSerial.print("STREAM_SPECTROGRAM: ");
+      USBSerial.println(stream_spectrogram);
+    }
 
 #define SERIAL_TYPED_CMD_TABLE_LEN (sizeof(SERIAL_TYPED_CMD_TABLE) / sizeof(SERIAL_TYPED_CMD_TABLE[0]))
 
