@@ -1,7 +1,11 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-26) **M2.1 `serial_menu.h` decomposition — COMPLETE (R1+R2)** on branch `feat/serial-menu-decomposition-r1`: R1 moved **104/104** non-inline defs to `serial/serial_menu.cpp`; R2 migrated **151** `type=value` setter arms into `SERIAL_TYPED_CMD_TABLE` (`serial_typed_cmd_table.def` + `serial_typed_dispatch.cpp`); `parse_command()` strcmp ladder retired (142 lines, deprecated `SECONDARY_*` tail only). Gates: pytest **718 passed** / 1 skipped; golden reproduce + Gate-Fα PROVEN; `k1_hardware` + `k1_bench_im73d` build SUCCESS. Plan: `docs/refactor/serial-menu-decomposition-plan-2026-07-26.md`. Prior focus (2026-07-25): production-shipping hardening lane.
+**Current focus:** (2026-07-26) **Shift+S save show state** on `feat/save-show-hotkey` (PR #39, stacked on M2.1 PR #38) — Lightwave-parity `'S'` / `:save_show` persists primary+secondary+EdgeMixer to LittleFS `/SHOW_STATE_V1.BIN` and restores after `load_config()` on boot. Host-green (pytest **728** / 1 skip; `k1_hardware` SUCCESS); **not device-proven**. Prior: M2.1 R1+R2 COMPLETE on `feat/serial-menu-decomposition-r1` (PR #38).
+
+## 2026-07-26 Shift+S Save Show State (Lightwave parity)
+
+Branch `feat/save-show-hotkey` off M2.1 tip. Module `control/k1_show_state.{h,cpp}`: capture via `k1_queue_capture_live` ×2 + `k1_edgemixer_config()`; encode CRC blob; `'S'` / `:save_show` write blob then immediate `save_config()`; `init_fs()` calls `k1_show_state_load()` after `load_config()` (soft no-op if missing). Lowercase `'s'` remains VP stream. Secondary hotkey edits stay RAM-only until explicit save. Host proof: `tests/test_show_state_static.py`. **Device smoke Captain-gated.**
 
 ## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R2 COMPLETE
 

@@ -53,6 +53,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_visual_hooks.h"
 #include "k1_noise_cal_arm.h"
 #include "k1_effect_queue.h"
+#include "k1_show_state.h"
 #include "k1_ap_capture_telemetry.h"
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
@@ -1448,6 +1449,7 @@ void serial_print_hotkey_help() {
   USBSerial.println("  f stop streams");
   USBSerial.println();
   USBSerial.println("System");
+  USBSerial.println("  S = save show state (primary+secondary+edge) for next boot");
   USBSerial.println("  h help");
   USBSerial.println("  ; status");
   USBSerial.println("  N arm noise calibration");
@@ -1590,6 +1592,7 @@ bool serial_hotkey_is_immediate(char key) {
     case '/':
     case 'a':
     case 's':
+    case 'S':  // save show state (primary+secondary+edge) for next boot
     case 'd':
     case 'f':
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
@@ -1964,6 +1967,22 @@ bool serial_hotkey_is_immediate(char key) {
       USBSerial.print("VP_STREAM: ");
       USBSerial.println(VP_STREAM_ENABLED ? "on" : "off");
       break;
+    case 'S': {
+      const bool ok = k1_show_state_save();
+      USBSerial.print("SHOW_STATE_SAVED");
+      if (!ok) {
+        USBSerial.print(" FAIL");
+      }
+      USBSerial.print(" primary_mode=");
+      USBSerial.print(CONFIG.LIGHTSHOW_MODE);
+      USBSerial.print(" primary_palette=");
+      USBSerial.print(CONFIG.PALETTE_INDEX);
+      USBSerial.print(" secondary_mode=");
+      USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+      USBSerial.print(" secondary_palette=");
+      USBSerial.println(SECONDARY_PALETTE_INDEX);
+      break;
+    }
     case 'd':
       stream_agc_debug = !stream_agc_debug;
       USBSerial.print("STREAM_AGC_DEBUG: ");
@@ -2176,6 +2195,8 @@ void cmd_help() {
   USBSerial.println("        slot_load=[1-10][,primary|secondary] | Load slot (queue on=arm, off=apply via dip; digit hotkeys)");
   USBSerial.println("         slot_arm=[1-10][,primary|secondary] | Arm slot without committing, regardless of queue mode");
   USBSerial.println("                                    slot_list | Dump slot validity + mode/palette summary");
+  USBSerial.println("                                    save_show | Persist primary+secondary+edge for next boot ('S')");
+  USBSerial.println("                                   show_state | Echo live primary/secondary/edge show fields");
   USBSerial.println();
   USBSerial.println("                         -- SECONDARY LED STRIP CONTROL --");
   USBSerial.println("         secondary_enabled=[true/false] | Enable or disable the secondary LED strip");

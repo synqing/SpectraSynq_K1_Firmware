@@ -10,6 +10,8 @@
 #include "led_utilities.h"
 #include "k1_smart_director.h"
 #include "k1_effect_queue.h"
+#include "k1_show_state.h"
+#include "k1_edgemixer.h"
 #include "k1_ap_capture_telemetry.h"
 #if ENABLE_DIAG_CAPTURE
 #include "diagnostic_capture.h"
@@ -723,6 +725,53 @@ bool serial_typed_slot_load(const char* command_type, char* command_data) {
 
 bool serial_typed_slot_arm(const char* command_type, char* command_data) {
   return serial_typed_slot_load(command_type, command_data);
+}
+
+bool serial_typed_save_show(const char* command_type, char* command_data) {
+  (void)command_data;
+  const bool ok = k1_show_state_save();
+  tx_begin();
+  USBSerial.print("SHOW_STATE_SAVED");
+  if (!ok) {
+    USBSerial.print(" FAIL");
+  }
+  USBSerial.print(" primary_mode=");
+  USBSerial.print(CONFIG.LIGHTSHOW_MODE);
+  USBSerial.print(" primary_palette=");
+  USBSerial.print(CONFIG.PALETTE_INDEX);
+  USBSerial.print(" secondary_mode=");
+  USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+  USBSerial.print(" secondary_palette=");
+  USBSerial.println(SECONDARY_PALETTE_INDEX);
+  tx_end();
+  (void)command_type;
+  return true;
+}
+
+bool serial_typed_show_state(const char* command_type, char* command_data) {
+  (void)command_type;
+  (void)command_data;
+  const K1EdgeMixerConfig edge = k1_edgemixer_config();
+  tx_begin();
+  USBSerial.println("SHOW_STATE");
+  USBSerial.print("  primary_mode=");
+  USBSerial.print(CONFIG.LIGHTSHOW_MODE);
+  USBSerial.print(" palette=");
+  USBSerial.println(CONFIG.PALETTE_INDEX);
+  USBSerial.print("  secondary_mode=");
+  USBSerial.print(SECONDARY_LIGHTSHOW_MODE);
+  USBSerial.print(" palette=");
+  USBSerial.print(SECONDARY_PALETTE_INDEX);
+  USBSerial.print(" enabled=");
+  USBSerial.println(ENABLE_SECONDARY_LEDS ? "on" : "off");
+  USBSerial.print("  edge enabled=");
+  USBSerial.print(edge.enabled ? "on" : "off");
+  USBSerial.print(" mode=");
+  USBSerial.print(static_cast<int>(edge.mode));
+  USBSerial.print(" strength=");
+  USBSerial.println(edge.strength, 3);
+  tx_end();
+  return true;
 }
 
 bool serial_typed_chromatic(const char* command_type, char* command_data) {

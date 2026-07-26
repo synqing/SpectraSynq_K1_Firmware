@@ -37,6 +37,9 @@ void k1_queue_set_transition_style(uint8_t) {}
 void k1_queue_set_mode_enabled(bool) {}
 bool k1_preset_slot_save(uint8_t, bool) { return false; }
 bool k1_preset_slot_get(uint8_t, K1ChannelPreset*) { return false; }
+void k1_queue_apply_fields(bool, const K1ChannelPreset&) {}
+bool k1_show_state_save() { return false; }
+bool k1_show_state_load() { return false; }
 void vp_run_output_probe() {}
 void vp_print_secondary_state() {}
 K1AudioSnapshot k1_audio_snapshot_read() { return {}; }

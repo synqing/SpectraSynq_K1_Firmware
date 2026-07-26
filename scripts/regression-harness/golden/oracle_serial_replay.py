@@ -509,6 +509,12 @@ void     k1_queue_set_transition_style(uint8_t) {}
 void     k1_queue_set_mode_enabled(bool) {}
 bool k1_preset_slot_save(uint8_t /*slot*/, bool /*from_secondary*/) { return false; }
 bool k1_preset_slot_get(uint8_t /*slot*/, K1ChannelPreset* /*out*/) { return false; }
+void k1_queue_apply_fields(bool /*secondary*/, const K1ChannelPreset& /*preset*/) {}
+
+// show-state (control/k1_show_state.cpp — not compiled; LittleFS). Hotkey 'S' /
+// :save_show are not in the S3.0 corpus; stubs only need to link.
+bool k1_show_state_save() { return false; }
+bool k1_show_state_load() { return false; }
 
 // vp output probe (visual/lightshow_modes.h inline — header not pulled) + audio
 // snapshot read (audio/k1_audio_snapshot.cpp — not compiled)

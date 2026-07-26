@@ -109,6 +109,11 @@ void k1_queue_set_mode_enabled(bool on);
 // secondary = SECONDARY_* globals).
 K1ChannelPreset k1_queue_capture_live(bool secondary);
 
+// Write the 15 fields to the live channel WITHOUT persistence side effects
+// (boot restore / show-state apply). Prefer this over apply_preset_live when
+// a delayed CONFIG save must not be queued.
+void k1_queue_apply_fields(bool secondary, const K1ChannelPreset& preset);
+
 // Begin/continue arming a channel: on first arm the pending struct is seeded
 // from the live channel, so relative stepping starts from reality. Returns the
 // mutable pending preset for the caller to step mode/palette/etc.

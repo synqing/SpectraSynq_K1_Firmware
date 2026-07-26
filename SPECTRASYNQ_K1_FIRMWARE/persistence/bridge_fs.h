@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "Palettes.h" // Include for gGradientPaletteCount
 #include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
+#include "k1_show_state.h"   // K1_SHOW_STATE_FILE + boot restore after load_config
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
@@ -114,6 +115,12 @@ void factory_reset() {
 #ifndef K1_MIC_IM73D_PDM_V1
   USBSerial.print("Deleting " K1_PRESET_SLOTS_FILE ": ");
   if (LittleFS.remove(K1_PRESET_SLOTS_FILE)) {
+    USBSerial.println("file deleted");
+  } else {
+    USBSerial.println("delete failed");
+  }
+  USBSerial.print("Deleting " K1_SHOW_STATE_FILE ": ");
+  if (LittleFS.remove(K1_SHOW_STATE_FILE)) {
     USBSerial.println("file deleted");
   } else {
     USBSerial.println("delete failed");
@@ -557,6 +564,9 @@ void init_fs() {
 
   load_ambient_noise_calibration();
   load_config();
+  // Soft restore of secondary/edge/show overlay; missing or corrupt file is a
+  // no-op (primary CONFIG from load_config() remains authoritative alone).
+  (void)k1_show_state_load();
   load_calibration_profile_if_config_invalid();
   unlock_leds();
 }
