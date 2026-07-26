@@ -1,7 +1,11 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-26) **M2.1 `serial_menu.h` decomposition — R1 COMPLETE** on branch `feat/serial-menu-decomposition-r1`: all **104/104** non-inline defs moved to `serial/serial_menu.cpp`; header **573 lines** (declarations + dispatch table only); golden + Gate-Fα green; `k1_hardware` + `k1_bench_im73d` build green; host pytest **702 passed** (5 skipped; 10 pre-existing failures in `test_im73d_audio_eval_harness.py` only). **R2 next** (table-migrate 79 `=value` setter arms). Plan: `docs/refactor/serial-menu-decomposition-plan-2026-07-26.md`. Prior focus (2026-07-25): production-shipping hardening lane on `feat/prod-shipping-hardening`.
+**Current focus:** (2026-07-26) **M2.1 `serial_menu.h` decomposition — COMPLETE (R1+R2)** on branch `feat/serial-menu-decomposition-r1`: R1 moved **104/104** non-inline defs to `serial/serial_menu.cpp`; R2 migrated **151** `type=value` setter arms into `SERIAL_TYPED_CMD_TABLE` (`serial_typed_cmd_table.def` + `serial_typed_dispatch.cpp`); `parse_command()` strcmp ladder retired (142 lines, deprecated `SECONDARY_*` tail only). Gates: pytest **718 passed** / 1 skipped; golden reproduce + Gate-Fα PROVEN; `k1_hardware` + `k1_bench_im73d` build SUCCESS. Plan: `docs/refactor/serial-menu-decomposition-plan-2026-07-26.md`. Prior focus (2026-07-25): production-shipping hardening lane.
+
+## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R2 COMPLETE
+
+Stage-B typed `type=value` dispatch: `serial_typed_cmd_table.def` (151 rows), `serial_typed_dispatch.{h,cpp}`, `serial_typed_cmd_lookup()` + `serial_dispatch_typed_setter()` chokepoint in `serial_menu.cpp`. `parse_command()` no longer fans out through inline strcmp arms or `serial_cmd_dispatch_*()` call-sites — table lookup only (+ deprecated `SECONDARY_*` `command_buf` aliases). Host gates: ODR second-TU smoke (`test_serial_menu_odr_static.py`), typed-table mirror (`test_serial_typed_dispatch_table_static.py`), `oracle_serial_struct.py` R2 routing (`_routed` via typed wrappers), `oracle_serial_replay.py` `verify_mutations` tree-rglob hard-fail. **718 pytest pass**; golden + Gate-Fα PROVEN; builds green.
 
 ## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R1 COMPLETE
 
@@ -11,7 +15,7 @@ Killed the `serial_menu.h` ODR bomb (104 non-inline external-linkage defs at fil
 - **Batch 6+ bulk move** (~78 defs): `init_serial`, `dump_info`, `parse_command`, `check_serial`, all `cmd_*`, hotkey/queue helpers, `stream_*`, target adjusters, noise-cal helpers, `vp_*` status paths, etc. Script: `scripts/refactor/r1_move_serial_menu_defs.py`.
 - **Close-out fixes:** `FIRMWARE_VERSION` → `constants.h`; `vp_apply_profile` deduped vs `k1_control_facade.cpp`; oracle struct reads h+cpp; static tests use `read_serial_menu_surface()`.
 
-**104/104 defs moved; `serial_menu.h` 4329 → 573 lines; `serial_menu.cpp` 4065 lines.** R2 (table-migrate 79 `=value` setter arms) is next. Clamp-gap fixes remain a SEPARATE behaviour-changing ticket.
+**104/104 defs moved; `serial_menu.h` 4329 → 573 lines; `serial_menu.cpp` 4065 lines.** R2 table migration complete (see section above). Clamp-gap fixes remain a SEPARATE behaviour-changing ticket.
 
 ## 2026-07-25 Production-Shipping Hardening Lane
 

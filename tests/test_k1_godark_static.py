@@ -10,7 +10,7 @@ prevents the wiring from silently regressing.
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir, read_serial_menu_surface
+from _fwpath import FwDir, read_serial_menu_surface, typed_command_registered
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
@@ -65,8 +65,8 @@ class TelemetryAndSerial(unittest.TestCase):
         self.assertIn("k1_silence_rms_raw, CONFIG.STANDBY_DIMMING", I2S)
 
     def test_serial_tuners_present(self):
-        self.assertIn('strcmp(command_type, "silence_rms_enter")', SERIAL)
-        self.assertIn('strcmp(command_type, "silence_rms_exit")', SERIAL)
+        self.assertTrue(typed_command_registered(SERIAL, "silence_rms_enter"))
+        self.assertTrue(typed_command_registered(SERIAL, "silence_rms_exit"))
 
 
 class ShipsLive(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from _fwpath import FwDir, read_serial_menu_surface
+from _fwpath import FwDir, read_serial_menu_surface, typed_command_registered, typed_command_handler_body
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -76,25 +76,20 @@ class AudioResponseGainStaticTest(unittest.TestCase):
         self.assertGreater(fixed_index, dc_index)
 
     def test_serial_command_is_runtime_only_and_visible_in_dump(self):
-        # The dump-info status echo and the menu help text stay in serial_menu.h.
+        # The dump-info status echo and the menu help text stay in serial_menu.h/cpp.
         self.assertIn("AUDIO_RESPONSE_GAIN: ", SERIAL)
         self.assertIn("response_gain=[float or 'default']", SERIAL)
-        # The handler body was extracted VERBATIM (strangler-fig) into
-        # serial_cmd_dispatch_response_gain() in serial_cmd_handlers.cpp;
-        # parse_command() now routes to it via a single UNGATED else-if. No
-        # behaviour change — proven byte-for-byte by the serial_replay golden.
-        self.assertIn(
-            "else if (serial_cmd_dispatch_response_gain(command_type, command_data))",
-            SERIAL,
-            "parse_command must route response_gain to the extracted dispatcher",
-        )
-        # Assert the runtime-only invariants against the handler's NEW home.
+        # M2.1 R2: response_gain routes via SERIAL_TYPED_CMD table -> typed wrapper ->
+        # serial_cmd_dispatch_response_gain() in serial_cmd_handlers.cpp.
+        self.assertTrue(typed_command_registered(SERIAL, "response_gain"))
         block = dispatcher_function("serial_cmd_dispatch_response_gain")
         self.assertIn('strcmp(command_type, "response_gain")', block)
         self.assertIn("audio_response_gain =", block)
         self.assertIn("audio_response_gain_clamped()", block)
         self.assertNotIn("save_config", block)
         self.assertNotIn("reboot", block)
+        handler = typed_command_handler_body(SERIAL, "response_gain")
+        self.assertIn("serial_cmd_dispatch_response_gain", handler)
 
 
 if __name__ == "__main__":

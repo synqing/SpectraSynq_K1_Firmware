@@ -1,7 +1,7 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir, read_serial_menu_surface
+from _fwpath import FwDir, read_serial_menu_surface, compile_guarded_typed_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,10 +85,7 @@ class K1PinEvidenceStaticTest(unittest.TestCase):
         )
 
     def test_serial_command_is_harness_guarded(self):
-        self.assertRegex(
-            SERIAL,
-            r'(?s)#ifdef\s+K1_PIN_EVIDENCE_V1\s*\n.*?else if \(strcmp\(command_type, "k1_pin_evidence"\) == 0\).*?#endif',
-        )
+        self.assertTrue(compile_guarded_typed_row(SERIAL, "K1_PIN_EVIDENCE_V1", "k1_pin_evidence"))
 
 
 if __name__ == "__main__":

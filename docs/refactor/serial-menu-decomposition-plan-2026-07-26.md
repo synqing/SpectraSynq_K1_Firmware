@@ -1,8 +1,8 @@
 ---
-abstract: "M2.1 serial_menu.h decomposition — R1 COMPLETE (2026-07-26): all 104 non-inline defs moved to serial/serial_menu.cpp; header ~573 lines (declarations + dispatch table + constexpr guards only); branch feat/serial-menu-decomposition-r1; golden + Gate-Fα green; builds k1_hardware + k1_bench_im73d green. R2 (table-migrate 79 =value setter arms) is next. Clamp-gap fixes ride a SEPARATE behaviour-changing ticket. Read before touching serial/serial_menu.{h,cpp}."
+abstract: "M2.1 serial_menu.h decomposition — R1+R2 COMPLETE (2026-07-26): 104/104 defs in serial_menu.cpp; 151-row SERIAL_TYPED_CMD_TABLE; parse_command strcmp ladder retired; golden + Gate-Fα green. Clamp-gap fixes ride a SEPARATE behaviour-changing ticket."
 ---
 
-# M2.1 — serial_menu.h decomposition (R1 COMPLETE 2026-07-26; R2 next)
+# M2.1 — serial_menu.h decomposition (R1+R2 COMPLETE 2026-07-26)
 
 Scoped 2026-07-26 (2 read-only scouts + orchestrator Gate-0 run). **No product code edited.** Captain approved the *approach*; execution deferred to fresh context. Follows the `autonomous-agentic-build` skill (harness IS the product).
 
@@ -56,7 +56,19 @@ Supporting close-out edits (same branch, behaviour-preserving unless noted):
 - Oracle: `oracle_serial_struct.py` reads `serial_menu.h` + `serial_menu.cpp`; replay driver stubs for host-only symbols.
 - Static tests: `tests/_fwpath.py::read_serial_menu_surface()` — grep h+cpp for moved bodies.
 
-**R2 is next** (table-migrate the 79 `=value` setter arms). Optional follow-up: second-TU `#include serial_menu.h` compile smoke test per plan close-out checklist.
+**R2 is COMPLETE** (2026-07-26 close-out). See `progress.md` §2026-07-26 R2.
+
+### R2 EXECUTION STATUS — COMPLETE (2026-07-26)
+
+| Metric | Value |
+|--------|-------|
+| Typed table rows | **151** (`serial_typed_cmd_table.def`) |
+| Handler TU | `serial_typed_dispatch.cpp` (+ thin wrappers to `serial_cmd_dispatch_*`) |
+| `parse_command()` body | **142 lines** (2530–2671): Row-1 table + typed lookup + deprecated `SECONDARY_*` tail |
+| ODR smoke | `tests/test_serial_menu_odr_static.py` + `serial_menu_odr_driver.cpp` |
+| Host mirror | `tests/test_serial_typed_dispatch_table_static.py` |
+| Oracle updates | `oracle_serial_struct._routed` via typed wrappers; sever mutations target `return serial_cmd_dispatch_*` |
+| Gates | pytest **718** pass; golden reproduce; Gate-Fα PROVEN; `k1_hardware` + `k1_bench_im73d` |
 
 ### Batches 1–5 (leaf-first, committed incrementally)
 
@@ -101,4 +113,5 @@ Moved ~78 remaining defs via `r1_move_serial_menu_defs.py` between `// --- R1 bu
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-26 | agent:claude-code | Created — M2.1 scoped (2 scouts + Gate-0). Oracle exists but mutation battery partly rotted (17/18 inert); R0 repair must precede R1 body-extraction + R2 table-migration. Clamp gaps fenced to a separate behaviour-changing ticket. Not started. |
-| 2026-07-26 | agent:cursor | R1 COMPLETE — batch 6+ bulk move (78 defs); header 573 L / cpp 4065 L; golden + Gate-Fα + k1_hardware + k1_bench_im73d green; static tests re-pointed via read_serial_menu_surface(); FIRMWARE_VERSION→constants.h; vp_apply_profile deduped. R2 next. |
+| 2026-07-26 | agent:cursor | R2 COMPLETE — 151-row typed table; parse_command ladder retired; ODR smoke + host mirror tests; oracle struct/replay R2 routing; pytest 718; builds green. |
+| 2026-07-26 | agent:cursor | R1 COMPLETE — batch 6+ bulk move (78 defs); header 573 L / cpp 4065 L; golden + Gate-Fα + k1_hardware + k1_bench_im73d green; static tests re-pointed via read_serial_menu_surface(); FIRMWARE_VERSION→constants.h; vp_apply_profile deduped. |
