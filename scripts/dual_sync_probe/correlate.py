@@ -1,31 +1,4 @@
-"""Correlate a leader + follower log pair into the raw series the gate
-evaluator scores. Pure and deterministic over captured text — no clocks of its
-own, no randomness, no I/O.
-
-The measurement chain (see probe-log-contract.md §2):
-
-  (a) Wire-truth offset. The wired GPIO cross-trigger is a radio-independent
-      clock bridge. Per round ``seq=n`` BOTH directions fire:
-        dir1 (leader->follower):  leader trig_out @ t_L_out ; follower trig_in @ t_F_in
-        dir2 (follower->leader):  follower trig_out @ t_F_out ; leader trig_in @ t_L_in
-      With wire delay ~ns and per-side ISR latency eps:
-        D1 = t_F_in  - t_L_out = O + eps_follower
-        D2 = t_F_out - t_L_in  = O - eps_leader
-      so  offset  O_hat = (D1 + D2) / 2      (ISR latency cancels if symmetric)
-      and asymmetry bound = (D1 - D2) / 2    (the residual wire+ISR uncertainty)
-      where O is the true (follower_local - leader_local) offset at that instant.
-      Sampling every round tracks drift; the two directions bound the asymmetry.
-
-  (b) Radio clock-estimate error = est_offset_us - O_hat interpolated at the
-      clk line's (reconstructed) time. This is what Gate 1 scores.
-
-  (c) Apply-lateness = (follower apply time mapped to leader clock) - t_leader_us
-      for each stream packet. Gates 2 and 3 score this.
-
-  (d) Loss / dup / reorder from the follower stream seq order.
-
-  (e) Health mins + dial-link uptime from health lines.
-"""
+"""Correlate a dual-sync leader/follower capture into raw proof series."""
 
 from __future__ import annotations
 
@@ -33,275 +6,324 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from . import logfmt
-from .logfmt import (
-    Apply,
-    Clk,
-    Health,
-    ParsedLog,
-    Rx,
-    TrigIn,
-    TrigOut,
-    Tx,
-    interp_xy,
-)
+from .logfmt import Apply, Clk, Health, ParsedLog, Rx, TrigIn, TrigOut, Tx, interp_xy
 
 
 @dataclass
 class RoundSample:
-    """One matched cross-trigger round (both directions present)."""
-
     seq: int
-    leader_mid_us: float  # round time in the leader clock
-    follower_mid_us: float  # round time in the follower clock
-    offset_us: float  # O_hat = follower_local - leader_local
-    asymmetry_us: float  # (D1 - D2)/2 : wire+ISR residual
+    leader_mid_us: float
+    follower_mid_us: float
+    offset_us: float
+    asymmetry_us: float
+
+
+@dataclass
+class HealthAggregate:
+    samples: int = 0
+    fps_min: Optional[float] = None
+    heap_min: Optional[int] = None
+    ap_p95_max: Optional[int] = None
+    dial_uptime: Optional[float] = None
+    loss_max: int = 0
+    dup_max: int = 0
 
 
 @dataclass
 class Correlation:
     rounds: List[RoundSample] = field(default_factory=list)
-    # (follower_time_us, error_us) — est_offset minus wire truth.
     clock_error_series: List[Tuple[float, float]] = field(default_factory=list)
-    # apply-lateness values (leader clock, µs) per applied packet.
     apply_lateness_us: List[float] = field(default_factory=list)
-    # stream integrity
-    stream_expected: int = 0
-    loss: int = 0
-    dup: int = 0
-    reorder: int = 0
-    # health aggregates (None if no health lines)
-    health_samples: int = 0
-    fps_min: Optional[float] = None
-    heap_min: Optional[int] = None
-    ap_p95_max: Optional[int] = None
-    dial_uptime: Optional[float] = None
-    health_loss_max: int = 0
-    health_dup_max: int = 0
-    # diagnostics / provenance
+
+    leader_tx_count: int = 0
+    follower_rx_count: int = 0
+    follower_apply_count: int = 0
+    follower_clk_records: int = 0
+
+    transport_expected: int = 0
+    transport_missing: int = 0
+    transport_dup: int = 0
+    transport_reorder: int = 0
+    apply_expected: int = 0
+    apply_missing: int = 0
+    apply_dup: int = 0
+    apply_reorder: int = 0
+    transport_unexpected: int = 0
+    apply_unexpected: int = 0
+    leader_tx_gap: int = 0
+    leader_tx_dup: int = 0
+    leader_tx_reorder: int = 0
+
+    health_by_role: Dict[str, HealthAggregate] = field(default_factory=dict)
     incomplete_rounds: int = 0
     unmatched_apply: int = 0
 
-    # ----- wire-truth interpolation in either clock domain ----------------- #
+    # Compatibility aliases for archived analysis code. New proof code uses
+    # the explicit transport/apply names above.
+    @property
+    def stream_expected(self) -> int:
+        return self.transport_expected
+
+    @property
+    def loss(self) -> int:
+        return self.transport_missing
+
+    @property
+    def dup(self) -> int:
+        return self.transport_dup
+
+    @property
+    def reorder(self) -> int:
+        return self.transport_reorder
+
     def _offset_by_follower(self) -> List[Tuple[float, float]]:
-        return sorted((r.follower_mid_us, r.offset_us) for r in self.rounds)
+        return sorted((sample.follower_mid_us, sample.offset_us) for sample in self.rounds)
 
     def offset_at_follower(self, t_follower_us: float) -> Optional[float]:
         return interp_xy(self._offset_by_follower(), t_follower_us)
 
 
 def _index_records(records: List[object]):
-    """Bucket records by type and by seq for O(1) round pairing."""
     trig_out: Dict[int, int] = {}
     trig_in: Dict[int, int] = {}
-    tx: Dict[int, int] = {}
+    tx: List[Tx] = []
     rx: List[Rx] = []
     apply: List[Apply] = []
     clk: List[Clk] = []
     health: List[Health] = []
-    for rec in records:
-        if isinstance(rec, TrigOut):
-            trig_out.setdefault(rec.seq, rec.t_us)
-        elif isinstance(rec, TrigIn):
-            trig_in.setdefault(rec.seq, rec.t_us)
-        elif isinstance(rec, Tx):
-            tx.setdefault(rec.seq, rec.t_leader_us)
-        elif isinstance(rec, Rx):
-            rx.append(rec)
-        elif isinstance(rec, Apply):
-            apply.append(rec)
-        elif isinstance(rec, Clk):
-            clk.append(rec)
-        elif isinstance(rec, Health):
-            health.append(rec)
+    for record in records:
+        if isinstance(record, TrigOut):
+            trig_out.setdefault(record.seq, record.t_us)
+        elif isinstance(record, TrigIn):
+            trig_in.setdefault(record.seq, record.t_us)
+        elif isinstance(record, Tx):
+            tx.append(record)
+        elif isinstance(record, Rx):
+            rx.append(record)
+        elif isinstance(record, Apply):
+            apply.append(record)
+        elif isinstance(record, Clk):
+            clk.append(record)
+        elif isinstance(record, Health):
+            health.append(record)
     return trig_out, trig_in, tx, rx, apply, clk, health
 
 
 def correlate(leader: ParsedLog, follower: ParsedLog) -> Correlation:
-    """Fuse a leader + follower :class:`ParsedLog` into a :class:`Correlation`."""
-    c = Correlation()
+    correlation = Correlation()
+    (
+        leader_trig_out,
+        leader_trig_in,
+        leader_tx,
+        _leader_rx,
+        _leader_apply,
+        _leader_clk,
+        leader_health,
+    ) = _index_records(leader.records)
+    (
+        follower_trig_out,
+        follower_trig_in,
+        _follower_tx,
+        follower_rx,
+        follower_apply,
+        follower_clk,
+        follower_health,
+    ) = _index_records(follower.records)
 
-    (l_trig_out, l_trig_in, l_tx, _l_rx, _l_apply, _l_clk, _l_health) = _index_records(
-        leader.records
+    leader_tx_by_seq: Dict[int, int] = {}
+    for record in leader_tx:
+        leader_tx_by_seq.setdefault(record.seq, record.t_leader_us)
+    correlation.leader_tx_count = len(leader_tx_by_seq)
+    correlation.follower_rx_count = len({record.seq for record in follower_rx})
+    correlation.follower_apply_count = len(
+        {record.seq for record in follower_apply}
     )
-    (f_trig_out, f_trig_in, _f_tx, f_rx, f_apply, f_clk, f_health) = _index_records(
-        follower.records
-    )
+    correlation.follower_clk_records = len(follower_clk)
 
-    # (a) wire-truth offset per matched round -------------------------------- #
-    all_seqs = (
-        set(l_trig_out) & set(f_trig_in) & set(f_trig_out) & set(l_trig_in)
+    complete = (
+        set(leader_trig_out)
+        & set(follower_trig_in)
+        & set(follower_trig_out)
+        & set(leader_trig_in)
     )
-    # count rounds that appear in some direction but are not fully paired
-    seen = set(l_trig_out) | set(f_trig_in) | set(f_trig_out) | set(l_trig_in)
-    c.incomplete_rounds = len(seen) - len(all_seqs)
-    for seq in sorted(all_seqs):
-        t_l_out = l_trig_out[seq]
-        t_f_in = f_trig_in[seq]
-        t_f_out = f_trig_out[seq]
-        t_l_in = l_trig_in[seq]
-        d1 = t_f_in - t_l_out  # O + eps_follower
-        d2 = t_f_out - t_l_in  # O - eps_leader
-        offset = (d1 + d2) / 2.0
-        asymmetry = (d1 - d2) / 2.0
-        leader_mid = (t_l_out + t_l_in) / 2.0
-        follower_mid = (t_f_in + t_f_out) / 2.0
-        c.rounds.append(
-            RoundSample(seq, leader_mid, follower_mid, offset, asymmetry)
+    seen = (
+        set(leader_trig_out)
+        | set(follower_trig_in)
+        | set(follower_trig_out)
+        | set(leader_trig_in)
+    )
+    correlation.incomplete_rounds = len(seen) - len(complete)
+    for seq in sorted(complete):
+        leader_out = leader_trig_out[seq]
+        follower_in = follower_trig_in[seq]
+        follower_out = follower_trig_out[seq]
+        leader_in = leader_trig_in[seq]
+        d1 = follower_in - leader_out
+        d2 = follower_out - leader_in
+        correlation.rounds.append(
+            RoundSample(
+                seq=seq,
+                leader_mid_us=(leader_out + leader_in) / 2.0,
+                follower_mid_us=(follower_in + follower_out) / 2.0,
+                offset_us=(d1 + d2) / 2.0,
+                asymmetry_us=(d1 - d2) / 2.0,
+            )
         )
 
-    offset_by_follower = sorted((r.follower_mid_us, r.offset_us) for r in c.rounds)
-
-    # (b) radio clock-estimate error ---------------------------------------- #
-    # clk lines carry no timestamp: reconstruct the follower-local time from the
-    # line's position between timestamped neighbours, then diff est_offset
-    # against wire truth.
-    for rec, t_follower in _reconstruct_times(follower.records, Clk):
-        wire = interp_xy(offset_by_follower, t_follower)
+    offset_by_follower = correlation._offset_by_follower()
+    for entry in follower.entries:
+        record = entry.record
+        if not isinstance(record, Clk):
+            continue
+        local_time = record.t_local_us
+        if local_time is None:
+            local_time = follower.local_time_at(entry.line_index)
+        if local_time is None:
+            continue
+        wire = interp_xy(offset_by_follower, float(local_time))
         if wire is None:
-            continue  # no wire truth to compare against — cannot score this clk
-        c.clock_error_series.append((t_follower, rec.est_offset_us - wire))
+            continue
+        correlation.clock_error_series.append(
+            (float(local_time), record.est_offset_us - wire)
+        )
 
-    # (c) apply-lateness ----------------------------------------------------- #
-    # leader stamp per seq: prefer the leader tx log, fall back to the follower
-    # rx line's echoed t_leader_us.
     rx_leader_stamp: Dict[int, int] = {}
-    for r in f_rx:
-        rx_leader_stamp.setdefault(r.seq, r.t_leader_us)
-    for a in f_apply:
-        t_leader_stamp = l_tx.get(a.seq)
-        if t_leader_stamp is None:
-            t_leader_stamp = rx_leader_stamp.get(a.seq)
-        if t_leader_stamp is None:
-            c.unmatched_apply += 1
+    for record in follower_rx:
+        rx_leader_stamp.setdefault(record.seq, record.t_leader_us)
+    for record in follower_apply:
+        leader_stamp = leader_tx_by_seq.get(
+            record.seq, rx_leader_stamp.get(record.seq)
+        )
+        if leader_stamp is None:
+            correlation.unmatched_apply += 1
             continue
-        wire = interp_xy(offset_by_follower, a.t_render_us)
+        wire = interp_xy(offset_by_follower, record.t_render_us)
         if wire is None:
-            c.unmatched_apply += 1
+            correlation.unmatched_apply += 1
             continue
-        apply_leader = a.t_render_us - wire  # follower clock -> leader clock
-        c.apply_lateness_us.append(apply_leader - t_leader_stamp)
+        apply_leader = record.t_render_us - wire
+        correlation.apply_lateness_us.append(apply_leader - leader_stamp)
 
-    # (d) loss / dup / reorder from the follower rx stream ------------------- #
-    _stream_integrity(l_tx, f_rx, c)
-
-    # (e) health ------------------------------------------------------------- #
-    _health_aggregate(f_health, c)
-
-    return c
-
-
-def _reconstruct_times(records, kind):
-    """Yield ``(record, reconstructed_local_time)`` for every record of type
-    ``kind`` (the untimestamped ``clk`` / ``health`` lines).
-
-    Records are appended in capture (line) order, so a record's ordinal in the
-    list is a faithful stand-in for its line position. We build a map from the
-    ordinals of timestamped records to their device-local times and linearly
-    interpolate the untimestamped targets between their bracketing neighbours.
-    """
-    timed: List[Tuple[int, int]] = []
-    targets: List[Tuple[int, object]] = []
-    for ordinal, rec in enumerate(records):
-        t = logfmt._local_anchor(rec)
-        if t is not None:
-            timed.append((ordinal, t))
-        if isinstance(rec, kind):
-            targets.append((ordinal, rec))
-    out = []
-    for ordinal, rec in targets:
-        t = logfmt._interp_by_index(timed, ordinal)
-        if t is not None:
-            out.append((rec, float(t)))
-    return out
+    _integrity(leader_tx, follower_rx, follower_apply, correlation)
+    correlation.health_by_role["leader"] = _health_aggregate(
+        leader_health, fallback_role="leader"
+    )
+    correlation.health_by_role["follower"] = _health_aggregate(
+        follower_health, fallback_role="follower"
+    )
+    return correlation
 
 
-def _stream_integrity(l_tx: Dict[int, int], f_rx: List[Rx], c: Correlation) -> None:
-    """Loss/dup/reorder from the follower rx seq stream, scoped to the seq range
-    the leader actually transmitted when a tx log is present."""
-    rx_seqs = [r.seq for r in f_rx]
-    if l_tx:
-        lo, hi = min(l_tx), max(l_tx)
-        expected = hi - lo + 1
-    elif rx_seqs:
-        lo, hi = min(rx_seqs), max(rx_seqs)
-        expected = hi - lo + 1
-    else:
-        return
-    c.stream_expected = expected
-
+def _duplicates_and_reorder(sequences: List[int]) -> Tuple[int, int]:
     seen: Dict[int, int] = {}
-    for s in rx_seqs:
-        seen[s] = seen.get(s, 0) + 1
-    received_unique = sum(1 for s in range(lo, hi + 1) if s in seen)
-    c.loss = expected - received_unique
-    c.dup = sum(v - 1 for v in seen.values() if v > 1)
-
+    for seq in sequences:
+        seen[seq] = seen.get(seq, 0) + 1
+    duplicates = sum(count - 1 for count in seen.values() if count > 1)
     reorder = 0
-    peak = None
-    for s in rx_seqs:
-        if peak is not None and s < peak:
+    peak: Optional[int] = None
+    for seq in sequences:
+        if peak is not None and seq < peak:
             reorder += 1
         else:
-            peak = s
-    c.reorder = reorder
+            peak = seq
+    return duplicates, reorder
 
 
-def _health_aggregate(f_health: List[Health], c: Correlation) -> None:
-    if not f_health:
-        return
-    c.health_samples = len(f_health)
-    c.fps_min = min(h.fps for h in f_health)
-    c.heap_min = min(h.heap_min for h in f_health)
-    c.ap_p95_max = max(h.ap_p95_us for h in f_health)
-    c.dial_uptime = sum(1 for h in f_health if h.dial_linked == 1) / len(f_health)
-    c.health_loss_max = max(h.loss for h in f_health)
-    c.health_dup_max = max(h.dup for h in f_health)
+def _integrity(
+    leader_tx: List[Tx],
+    follower_rx: List[Rx],
+    follower_apply: List[Apply],
+    correlation: Correlation,
+) -> None:
+    ordered_tx_sequences = [record.seq for record in leader_tx]
+    tx_sequences = sorted(set(ordered_tx_sequences))
+    rx_sequences = [record.seq for record in follower_rx]
+    apply_sequences = [record.seq for record in follower_apply]
+    correlation.leader_tx_dup, correlation.leader_tx_reorder = (
+        _duplicates_and_reorder(ordered_tx_sequences)
+    )
+    if tx_sequences:
+        low, high = tx_sequences[0], tx_sequences[-1]
+        dense_expected = set(range(low, high + 1))
+        tx_set = set(tx_sequences)
+        correlation.leader_tx_gap = len(dense_expected - tx_set)
+        correlation.transport_expected = len(tx_set)
+        correlation.transport_missing = len(tx_set - set(rx_sequences))
+        correlation.transport_unexpected = len(set(rx_sequences) - tx_set)
+    elif rx_sequences:
+        correlation.transport_unexpected = len(set(rx_sequences))
+    correlation.transport_dup, correlation.transport_reorder = _duplicates_and_reorder(
+        rx_sequences
+    )
+
+    rx_unique = set(rx_sequences)
+    apply_unique = set(apply_sequences)
+    correlation.apply_expected = len(rx_unique)
+    correlation.apply_missing = len(rx_unique - apply_unique)
+    correlation.apply_unexpected = len(apply_unique - rx_unique)
+    correlation.apply_dup, correlation.apply_reorder = _duplicates_and_reorder(
+        apply_sequences
+    )
 
 
-# --------------------------------------------------------------------------- #
-# Deterministic percentile (numpy-free). Linear interpolation between the two  #
-# nearest ranks, matching numpy's default 'linear' method.                    #
-# --------------------------------------------------------------------------- #
+def _health_aggregate(
+    health: List[Health], *, fallback_role: str
+) -> HealthAggregate:
+    selected = [
+        record
+        for record in health
+        if record.role in (None, fallback_role)
+    ]
+    if not selected:
+        return HealthAggregate()
+    return HealthAggregate(
+        samples=len(selected),
+        fps_min=min(record.fps for record in selected),
+        heap_min=min(record.heap_min for record in selected),
+        ap_p95_max=max(record.ap_p95_us for record in selected),
+        dial_uptime=(
+            sum(1 for record in selected if record.dial_linked == 1) / len(selected)
+            if fallback_role == "leader"
+            else None
+        ),
+        loss_max=max(record.loss for record in selected),
+        dup_max=max(record.dup for record in selected),
+    )
 
 
 def percentile(values: List[float], q: float) -> Optional[float]:
-    """The ``q``-th percentile (0..100) of ``values`` by linear interpolation.
-    Returns ``None`` for an empty input. Deterministic and stdlib-only."""
     if not values:
         return None
     if len(values) == 1:
         return float(values[0])
-    s = sorted(values)
+    ordered = sorted(values)
     if q <= 0:
-        return float(s[0])
+        return float(ordered[0])
     if q >= 100:
-        return float(s[-1])
-    rank = (q / 100.0) * (len(s) - 1)
-    lo = int(rank)
-    hi = min(lo + 1, len(s) - 1)
-    frac = rank - lo
-    return float(s[lo] + (s[hi] - s[lo]) * frac)
+        return float(ordered[-1])
+    rank = (q / 100.0) * (len(ordered) - 1)
+    low = int(rank)
+    high = min(low + 1, len(ordered) - 1)
+    fraction = rank - low
+    return float(ordered[low] + (ordered[high] - ordered[low]) * fraction)
 
 
 def mean(values: List[float]) -> Optional[float]:
-    if not values:
-        return None
-    return sum(values) / len(values)
+    return None if not values else sum(values) / len(values)
 
 
-def clock_error_slope_us_per_s(series: List[Tuple[float, float]]) -> Optional[float]:
-    """Least-squares slope of the clock-error series in µs of error per second
-    of (follower-clock) elapsed time. Used to characterise a drift-tracking
-    failure. ``None`` if fewer than two points or zero time span."""
+def clock_error_slope_us_per_s(
+    series: List[Tuple[float, float]]
+) -> Optional[float]:
     if len(series) < 2:
         return None
-    xs = [t / 1_000_000.0 for t, _ in series]  # seconds
-    ys = [e for _, e in series]
-    n = len(xs)
-    mx = sum(xs) / n
-    my = sum(ys) / n
-    sxx = sum((x - mx) ** 2 for x in xs)
-    if sxx == 0:
+    xs = [time_us / 1_000_000.0 for time_us, _ in series]
+    ys = [error for _, error in series]
+    count = len(xs)
+    mean_x = sum(xs) / count
+    mean_y = sum(ys) / count
+    sum_xx = sum((value - mean_x) ** 2 for value in xs)
+    if sum_xx == 0:
         return None
-    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
-    return sxy / sxx
+    sum_xy = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, ys))
+    return sum_xy / sum_xx

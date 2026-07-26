@@ -19,19 +19,19 @@ Phase F0 — host trust root.
 - [x] Reconcile `AGENT_OS.md`, `.claude/handoff.md`, `docs/spec-index.md`,
   root `progress.md` and `repo-truth.sh`.
 - [x] Review and stage only the owned documentation/source-truth files.
-- [ ] Commit the verified P-1 checkpoint.
-- **Status:** complete_pending_commit
+- [x] Commit the verified P-1 checkpoint (`fe634bb`).
+- **Status:** complete
 
 ### F0: Host trust root
 
-- [ ] Exact NimBLE 2.5.0 pin and resolved-version evidence.
-- [ ] Strict role/link/clock grammar and contract update.
-- [ ] Coherent-epoch Link Ready and explicit status/exit schema.
-- [ ] Per-role health and transport/apply loss split.
-- [ ] Capture helper, segmented plumbing runner and A/B/C runner.
-- [ ] Focused tests, full pytest, production and existing sync builds.
+- [x] Exact NimBLE 2.5.0 pin and resolved-version evidence.
+- [x] Strict role/link/clock grammar and contract update.
+- [x] Coherent-epoch Link Ready and explicit status/exit schema.
+- [x] Per-role health and transport/apply loss split.
+- [x] Capture helper, segmented plumbing runner and A/B/C runner.
+- [x] Focused tests, full pytest, production and existing sync builds.
 - [ ] Green F0 commit; push exact committed SHA and verify remote.
-- **Status:** in_progress
+- **Status:** commit_ready
 
 ### F1: Link hardening
 
@@ -84,3 +84,7 @@ Phase F0 — host trust root.
 |---|---:|---|
 | Governing `docs/agent/AGENT_EXECUTION_STANDARD.md` is referenced but absent | 1 | Use `AGENT_OS.md`, `.claude/CLAUDE.md`, AGENTS instructions and record the missing canon; do not invent it. |
 | P-1 staged `git diff --check` found blank lines at EOF in two new recovery docs | 1 | Removed the extra blank lines with `apply_patch`; restage and rerun the same gate. |
+| F0 adversarial SSA review reproduced pre-link and duplicate/reorder false-PASS paths | 1 | Select post-link role-local epochs, require positive overlap and post-link negotiation, preserve ordered TX evidence, and block on duplicate/reorder/unexpected records. Added reproductions to the focused suite. |
+| First post-epoch focused run blocked the clean fixture because sequence zero preceded link-up | 1 | Moved synthetic proof observations behind an explicit settle offset; retained the fail-closed epoch selection. |
+| Strict capture marker check mistook `t_host_us` for a second `host_us` prefix | 1 | Match a complete `host_us` token instead of a substring; rerun focused suite. |
+| Final F0 wrapper review found locked-argument and A/B/C-order bypasses | 1 | Replaced the forwarding shell with a typed controller that derives case semantics, probes chip/build identity, enforces A→B→C and hashes its manifest evidence. |

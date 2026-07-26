@@ -53,3 +53,20 @@ branch authority.
 Historical memory reinforces that Gate-0 needs a fault-evident harness and
 paired controls. Current git, files and live silicon evidence remain higher
 authority.
+
+## F0 host-trust findings
+
+- NimBLE resolves to exactly `2.5.0` in both existing sync environments after
+  replacing the compatible-range specifier with an exact pin.
+- A sole numeric epoch match is not proof: role-local epoch values may differ.
+  Shared host-time overlap, post-link negotiated state and bounded evidence are
+  the proof.
+- `Begin` after `link up` is a session boundary even if the ESP-IDF reset line
+  was missed.
+- Duplicate, reordered, reset and unexpected sequences must remain ordered
+  evidence; dictionary de-duplication can hide a false-PASS path.
+- A firmware counter named `ws2812_glitch` cannot prove a physical glitch.
+  Physical WS2812 evidence remains `UNMEASURED`.
+- Persistent-link segment proofs must inherit only captured connection boundary
+  records. They must not inherit an earlier segment's stream, GPIO, timing or
+  health observations.

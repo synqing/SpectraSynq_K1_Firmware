@@ -4,7 +4,9 @@ abstract: "Phase-0 dual-K1 sync probe: GPIO cross-trigger pin audit + shared ser
 
 # Phase 0 — Probe pin audit + serial log-line contract
 
-Lane authority: [`phase0-plan.md`](./phase0-plan.md) (P0.3). Transport ratified: [`f2-transport-decision.md`](./f2-transport-decision.md).
+Lane authority:
+[`recovery/recovery-plan.md`](./recovery/recovery-plan.md). Transport ratified:
+[`f2-transport-decision.md`](./f2-transport-decision.md).
 This document fixes two things the oracle and the P0.4 firmware must agree on: **which two GPIOs carry the wired cross-trigger**, and **the exact serial log grammar** that turns two captured device logs into the four Phase-0 gate numbers.
 
 British English throughout. `artifacts/` in a path is a literal directory name, not a spelling.
@@ -83,33 +85,117 @@ Two signal jumpers, crossed, plus one common ground. With both units powered ove
 - No series resistor needed for a short bench jumper (both are 3V3 push-pull GPIOs); keep leads short. Do not connect either trigger line to 5 V.
 - These pins are output-low / input at boot for the probe; they are never driven by production firmware (the probe TU is `-DSB_K1_SYNC_PROBE`, non-shippable).
 
-## 2. Serial log-line contract
+## 2. Serial log-line contract — version 2
 
-Both the P0.4 probe firmware and `scripts/dual_sync_probe/` (`logfmt.py`) emit/parse **exactly** these lines. Timestamps are **device-local `micros()`**, 64-bit (no wrap within a probe run). Every field is decimal. Lines may be freely interleaved with unrelated serial noise; the parser skips and counts anything it cannot match, and drops truncated lines.
+Firmware writes device-local records. The capture helper prefixes every
+recognised proof line from both open ports with a timestamp from one shared
+host-monotonic origin:
 
-| Emitter | Line grammar |
+```text
+host_us=<u64> <firmware-record>
+```
+
+Independent per-port origins are forbidden because they cannot prove that the
+leader and follower connection epochs overlap.
+
+The parser has two deliberate modes:
+
+- permissive mode reads archived version-1 captures, including health without
+  `role` and clock lines without a local timestamp;
+- strict proof mode, required for F2/F3, requires a leading `host_us`, consumes
+  the entire versioned record, and rejects duplicate keys, trailing fields,
+  missing/wrong roles and untimestamped follower clock records. Contract/input
+  errors exit `4`.
+
+### 2.1 Version-2 records
+
+All numeric fields are decimal. Device-local timestamps use 64-bit extended
+`micros()` and may not wrap within a proof run.
+
+| Emitter | Exact grammar |
 |---|---|
-| device raised its TRIG_OUT | `[sync_oracle] trig_out seq=<n> t_us=<u64>` |
-| device ISR captured its TRIG_IN edge | `[sync_oracle] trig_in seq=<n> t_us=<u64>` |
-| follower radio RTT clock estimate | `[k1_sync] clk est_offset_us=<i64> rtt_us=<u32> n=<samples>` |
-| leader sent a stream packet | `[k1_sync] tx seq=<n> t_leader_us=<u64>` |
-| follower received a stream packet | `[k1_sync] rx seq=<n> t_leader_us=<u64> t_local_us=<u64>` |
-| follower applied a packet at render | `[k1_sync] apply seq=<n> t_render_us=<u64>` |
-| 1 Hz health telemetry | `[k1_sync] health fps=<f> heap_min=<u32> ap_p95_us=<u32> dial_linked=<0\|1> loss=<u32> dup=<u32>` |
+| role initialisation | `[k1_sync] begin role=<leader\|follower>` |
+| settled usable link | `[k1_sync] link up role=<leader\|follower> epoch=<u32> handle=<u16> mtu=<u16>` |
+| link loss | `[k1_sync] link down role=<leader\|follower> epoch=<u32> reason=<i32>` |
+| settled BLE values | `[k1_sync] negotiated role=<leader\|follower> epoch=<u32> interval_units=<u16> latency=<u16> mtu=<u16> phy_tx=<u8> phy_rx=<u8>` |
+| device raised TRIG_OUT | `[sync_oracle] trig_out seq=<u32> t_us=<u64>` |
+| device ISR captured TRIG_IN | `[sync_oracle] trig_in seq=<u32> t_us=<u64>` |
+| follower clock estimate | `[k1_sync] clk role=follower t_local_us=<u64> est_offset_us=<i64> rtt_us=<u32> n=<u32>` |
+| leader stream send | `[k1_sync] tx seq=<u32> t_leader_us=<u64>` |
+| follower stream receive | `[k1_sync] rx seq=<u32> t_leader_us=<u64> t_local_us=<u64>` |
+| follower scheduled consume | `[k1_sync] apply seq=<u32> t_render_us=<u64>` |
+| 1 Hz health | `[k1_sync] health role=<leader\|follower> fps=<f> heap_min=<u32> ap_p95_us=<u32> dial_linked=<0\|1> loss=<u32> dup=<u32> [honest-extra=<value> ...]` |
+| host segment marker | `[sync_host] segment name=<token> phase=<start\|end> t_host_us=<u64>` |
 
-Contract notes that the firmware MUST honour:
+`t_host_us` in a segment marker must equal its leading `host_us`.
 
-- **`seq` pairing across the wire.** Each cross-trigger round `n` fires in BOTH directions and both devices log the SAME `seq=n`: the leader logs `trig_out seq=n` (its send) and `trig_in seq=n` (its capture of the follower's send); the follower logs `trig_in seq=n` and `trig_out seq=n`. The oracle pairs the four events per `seq` to derive the wire-truth offset and the ISR asymmetry bound (both directions).
-- **`clk` and `health` carry no timestamp field** (matching the grammar above). The oracle reconstructs their device-local time by interpolating between the nearest timestamped lines in the same log, by line position. Firmware should emit `clk`/`health` interleaved with the timestamped stream so this reconstruction stays tight.
-- **Stream `seq` is a dense monotonic counter** on the leader; the oracle derives loss (missing seq), dup (repeated seq) and reorder (out-of-order arrival) from the follower `rx`/`apply` streams.
-- **`est_offset_us` is `follower_local − leader_local`** (signed), i.e. the follower's estimate of how far ahead its own clock is of the leader's. The wire-truth offset uses the identical sign so the clock-error series is `est_offset_us − wire_truth`.
+`link up` means application-usable, not merely a raw GAP connection. Both
+stream and clock subscriptions must be established before either role emits
+it. A request-submission return is not a negotiated-value measurement.
+Connection interval, latency, MTU and PHY are settled values. DLE remains
+`REQUESTED_UNVERIFIED` unless a lower-level proof surface is added.
 
-The four gate numbers the oracle computes from a leader+follower log pair (thresholds are `gate_eval` defaults):
+Role-local epoch counters need not have the same numeric value. The host-time
+overlap and each role's own negotiation epoch establish coherence.
 
-1. **Clock-offset error** p95 of `|est_offset_us − wire_truth|` ≤ **4000 µs**.
-2. **Packet lateness** p99.9 of apply-lateness (follower apply mapped to leader clock, minus `t_leader_us`) ≤ **D = 30000 µs**.
-3. **Leader end-to-end** (follower-visible leader-stamp→apply, the longer twin path) worst-case ≤ **50000 µs**.
-4. **Health under load** — render FPS floor, `heap_min` above the abort line, Core-0 AP p95 ≤ 7500 µs, dial-link uptime 100 %, zero loss/dup beyond tolerance.
+### 2.2 Link Ready and integrity
+
+Only evidence at or after each role's sole `link up` is eligible. Pre-link
+records, records from a disconnected epoch and accumulated reconnect counts
+cannot certify readiness.
+
+Link Ready is `PASS` only when:
+
+1. both roles have one overlapping, positive-duration connection epoch;
+2. neither log contains a reset, link-down or reconnect;
+3. each role records one post-link negotiated record matching its own epoch;
+4. leader unique TX count is at least 300;
+5. follower unique RX and apply counts are each at least 300;
+6. the follower has at least 10 timestamped clock records;
+7. at least 10 complete four-event GPIO rounds exist;
+8. transport expected count is non-zero; and
+9. TX/RX/apply sequences are dense where required, monotonic, non-duplicated
+   and contain no unexpected RX or apply sequence.
+
+Each GPIO round uses the same sequence in both directions. The oracle derives
+the wire-truth offset and ISR asymmetry from the four paired events.
+`est_offset_us` is `follower_local − leader_local`, so clock error is
+`est_offset_us − wire_truth`.
+
+Integrity is split and must not be collapsed:
+
+- transport: leader TX → follower RX;
+- application consume: follower RX → follower apply.
+
+The silicon-shaped `drop10` control preserves RX and omits apply. It is an
+application-loss fault, not transport loss.
+
+### 2.3 Verdict schema
+
+Every gate and the overall verdict uses:
+
+`PASS | FAIL | BLOCKED | UNMEASURED`
+
+- `overall_status` is the enum.
+- `overall_pass` is true only when `overall_status == "PASS"`.
+- CLI exits are `0=PASS`, `1=FAIL`, `2=BLOCKED`, `3=UNMEASURED`,
+  `4=contract/input error`.
+- Zero observations are `BLOCKED`.
+- Missing instrumentation is `UNMEASURED`.
+- Link Ready not-PASS blocks all timing gates.
+
+The measured gates are:
+
+1. clock-offset error p95 ≤ 4000 µs;
+2. leader-stamp→follower-consume lateness p99.9 ≤ 30000 µs;
+3. leader-stamp→follower-consume worst case ≤ 50000 µs; and
+4. per-role health, leader dial uptime, transport/application integrity and
+   honest instrumentation.
+
+Gate 3 is not mic→LED and must not be described that way. A firmware health
+field named `ws2812_glitch` does not prove a physical glitch. Until an explicit
+physical instrument contract exists, `physical_ws2812_glitch` remains
+`UNMEASURED` and prevents overall PASS.
 
 ---
 
@@ -118,3 +204,4 @@ The four gate numbers the oracle computes from a leader+follower log pair (thres
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-08 | agent:claude-code | Created — GPIO cross-trigger pin audit (TRIG_OUT 15 / TRIG_IN 16, both maps) + shared serial log-line contract for P0.3 oracle and P0.4 firmware. |
+| 2026-07-27 | Codex SSA orchestrator | Version 2 — strict shared-host-time grammar, coherent Link Ready epoch, role-specific health, split transport/apply integrity and explicit verdict/exit schema. |
