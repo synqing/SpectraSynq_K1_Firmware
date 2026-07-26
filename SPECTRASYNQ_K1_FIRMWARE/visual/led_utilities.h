@@ -283,6 +283,20 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   int32_t index_left = index_whole + 0;
   int32_t index_right = index_whole + 1;
 
+  // Bounds guard (audit M1.3): every CRGB16 buffer is NATIVE_RESOLUTION-sized, so
+  // an out-of-range index must not read one past the buffer. LATENT in ALL current
+  // configs — SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h) so
+  // the only caller's lerp else-branch is dead, and the custom-224 build drops the
+  // secondary channel. This is defensive hardening that becomes LIVE only if a
+  // secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION, or a new
+  // out-of-range caller, is ever added. No-op for valid in-range indices
+  // (byte-identical for the shipping 160 config); at the top edge it clamps to the
+  // edge pixel, matching scale_to_strip's existing index_right guard.
+  if (index_left  < 0) index_left  = 0;
+  if (index_right < 0) index_right = 0;
+  if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
+  if (index_right > NATIVE_RESOLUTION - 1) index_right = NATIVE_RESOLUTION - 1;
+
   SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
   SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
 
@@ -1194,6 +1208,15 @@ inline void unmirror() {
     int32_t index_left = index_whole + 0;
     int32_t index_right = index_whole + 1;
 
+    // Bounds guard (audit M1.3): same OOB class as lerp_led_16 (index_right could
+    // reach NATIVE_RESOLUTION on a NATIVE_RESOLUTION-sized buffer). unmirror() has
+    // no live callers today, so this is dead-code hardening for class completeness;
+    // no-op for valid in-range indices.
+    if (index_left  < 0) index_left  = 0;
+    if (index_right < 0) index_right = 0;
+    if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
+    if (index_right > NATIVE_RESOLUTION - 1) index_right = NATIVE_RESOLUTION - 1;
+
     SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
     SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
 
@@ -1209,12 +1232,21 @@ inline void unmirror() {
 }
 
 inline void shift_leds_up(CRGB16* led_array, uint16_t offset) {
+  // Underflow guard (audit M1.3): offset > NATIVE_RESOLUTION makes the unsigned
+  // (NATIVE_RESOLUTION - offset) wrap to a huge size -> catastrophic OOB memcpy,
+  // and led_array + offset / memset(offset) overrun the buffer. Clamp to a
+  // full-buffer scroll (everything shifted off -> all black). No-op for today's
+  // bounded callers (offset <= NATIVE_RESOLUTION/2).
+  if (offset > NATIVE_RESOLUTION) offset = NATIVE_RESOLUTION;
   memcpy(leds_16_temp, led_array, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(led_array + offset, leds_16_temp, (NATIVE_RESOLUTION - offset) * sizeof(CRGB16));
   memset(led_array, 0, offset * sizeof(CRGB16));
 }
 
 inline void shift_leds_down(CRGB* led_array, uint16_t offset) {
+  // Underflow guard (audit M1.3): mirror of shift_leds_up — an offset past the
+  // buffer would wrap (NATIVE_RESOLUTION - offset) and OOB-memcpy/memset.
+  if (offset > NATIVE_RESOLUTION) offset = NATIVE_RESOLUTION;
   memcpy(led_array, led_array + offset, (NATIVE_RESOLUTION - offset) * sizeof(CRGB));
   memset(led_array + (NATIVE_RESOLUTION - offset), 0, offset * sizeof(CRGB));
 }

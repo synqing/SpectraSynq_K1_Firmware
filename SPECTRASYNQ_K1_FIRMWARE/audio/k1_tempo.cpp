@@ -118,6 +118,33 @@ static const int      K1_CONF_LOBE = 6;
 #ifndef K1_TACTUS_BPM
 #define K1_TACTUS_BPM   88.0f
 #endif
+
+// ----------------------------------------------------------------------------------------
+// Selection anti-pinning (Proposal 1) — compile-gated, SELECTION path only.
+// ----------------------------------------------------------------------------------------
+// Host KEEP (2026-07-24 candidate6): asymmetric UP-escape dwell only
+//   (challenger BPM > winner*1.15 → ratio 1.08 / 4 frames; else legacy 1.10 / 5).
+//   Acc1 in-range held 56.2%; mean locked-fraction 62.5%→63.3%; 100–120 guardrail held 89%.
+// Explored + ROLLED BACK (Acc1 regressions): IOI sel_score weights, top1/top2 margin,
+// down-jump hardening, aggressive up-escape (1.06/3). Do NOT retune K1_TACTUS_BPM / SIGMA.
+// Flag OFF (default 0): selection identical to pre-P1. Enable with -DK1_TEMPO_ANTI_PIN_V1.
+#ifndef K1_TEMPO_ANTI_PIN_V1
+#define K1_TEMPO_ANTI_PIN_V1 0
+#endif
+#if K1_TEMPO_ANTI_PIN_V1
+#ifndef K1_AP_UP_RATIO
+#define K1_AP_UP_RATIO          1.08f
+#endif
+#ifndef K1_AP_UP_FRAMES
+#define K1_AP_UP_FRAMES         4
+#endif
+#ifndef K1_AP_BASE_RATIO
+#define K1_AP_BASE_RATIO        1.10f
+#endif
+#ifndef K1_AP_BASE_FRAMES
+#define K1_AP_BASE_FRAMES       5
+#endif
+#endif  // K1_TEMPO_ANTI_PIN_V1
 #ifndef K1_TACTUS_SIGMA
 #define K1_TACTUS_SIGMA 0.75f
 #endif
@@ -836,6 +863,7 @@ static void k1_update_confidence_v2(float dt_sec) {
 #endif  // K1_TEMPO_CONF_V2
 
 // Winner selection with hysteresis: challenger needs +10% for 5 consecutive ticks.
+// Under K1_TEMPO_ANTI_PIN_V1: easier UP-escape dwell when challenger BPM >> winner.
 static void k1_update_winner() {
   if (k1_winner_bin >= K1_NUM_TEMPI) {
     k1_winner_bin = K1_NUM_TEMPI / 2;
@@ -855,10 +883,25 @@ static void k1_update_winner() {
 
   if (best_bin != k1_winner_bin) {
     float current_mag = k1_sel_score(k1_winner_bin);
-    if (best_mag > current_mag * 1.1f) {
+#if K1_TEMPO_ANTI_PIN_V1
+    const float win_bpm = k1_tempi[k1_winner_bin].target_bpm;
+    const float ch_bpm  = k1_tempi[best_bin].target_bpm;
+    float need_ratio = K1_AP_BASE_RATIO;
+    uint8_t need_frames = (uint8_t)K1_AP_BASE_FRAMES;
+    // UP-escape only: help leave a low-bin pin. Do NOT harden down-jumps — that
+    // blocked legitimate corrections (cand4/5: 90→120 and 84→111 regressions).
+    if (ch_bpm > win_bpm * 1.15f) {
+      need_ratio = K1_AP_UP_RATIO;
+      need_frames = (uint8_t)K1_AP_UP_FRAMES;
+    }
+#else
+    const float need_ratio = 1.1f;
+    const uint8_t need_frames = 5;
+#endif
+    if (best_mag > current_mag * need_ratio) {
       if (best_bin == k1_candidate_bin) {
         if (k1_candidate_frames < 255) k1_candidate_frames++;
-        if (k1_candidate_frames >= 5) {
+        if (k1_candidate_frames >= need_frames) {
           k1_winner_bin = best_bin;
           k1_candidate_frames = 0;
         }

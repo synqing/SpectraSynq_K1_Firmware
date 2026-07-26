@@ -24,6 +24,9 @@
 #ifdef K1_EFFECT_FRAMEWORK_V1
 #include "beat_aware_director.h"
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_display_name() (R2b serial name source of truth)
 #endif
@@ -400,6 +403,25 @@ void serial_cycle_k1_loud_guard_mode() {
                     : (k1_loud_guard_mode == 1) ? " CONSERVATIVE (1.30s/hybrid)"
                     :                             " AGGRESSIVE (0.80s/hybrid)";
   USBSerial.println(label);
+}
+#endif
+
+#ifdef K1_MIC_AUTO_SENSE_V1
+void serial_print_k1_mic_auto_status() {
+  const K1MicAutoState& st = k1_mic_auto_sense_state();
+  USBSerial.print("K1_MIC_AUTO: ");
+  USBSerial.println(vp_bool_text(st.runtime_enabled));
+  USBSerial.print("K1_MIC_AUTO_SHADOW: ");
+  USBSerial.println(vp_bool_text(st.shadow_only));
+  USBSerial.print("K1_MIC_AUTO_SCALE: ");
+  USBSerial.println(k1_mic_auto_sense_applied_scale(), 6);
+  USBSerial.print("K1_MIC_AUTO_REC: ");
+  USBSerial.println(st.recommended_scale, 6);
+  USBSerial.print("K1_MIC_AUTO_STATE: ");
+  USBSerial.println((unsigned)st.state);
+  USBSerial.print("K1_MIC_AUTO_REASON: ");
+  USBSerial.println((unsigned)st.reason);
+  USBSerial.println("K1_MIC_AUTO_NOTE: runtime-only; never NVS; purity=:mic_auto=off");
 }
 #endif
 
@@ -2286,6 +2308,9 @@ void cmd_help() {
   USBSerial.println("           response_gain=[float or 'default'] | Runtime-only post-DC audio response gain for paired K1 response probes");
 #ifdef K1_LOUD_GUARD_V1
   USBSerial.println("              k1_loud_guard=[on/off/status/mode0/mode1/mode2/cycle] | Loud-room guard + A/B retune matrix");
+#ifdef K1_MIC_AUTO_SENSE_V1
+  USBSerial.println("              mic_auto=[on/off/status/reset/shadow/live] | Slow mic auto-sense (RAM-only; purity=off)");
+#endif
 #endif
   USBSerial.println("          boot_animation=[true/false/default] | Enable or disable the boot animation");
   USBSerial.println("            sweet_spot_min=[int or 'default'] | Sets the minimum amplitude to be inside the 'Sweet Spot'");
@@ -3434,6 +3459,41 @@ void parse_command(char* command_buf) {
       K1_SILENCE_RMS_EXIT = (float)atof(command_data);
       tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
     }
+#ifdef K1_MIC_AUTO_SENSE_V1
+    // Runtime-only mic auto-sense supervisor. Never persists; never fires noise cal.
+    else if (strcmp(command_type, "mic_auto") == 0) {
+      if (strcmp(command_data, "status") == 0) {
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "reset") == 0) {
+        k1_mic_auto_sense_reset(millis());
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "shadow") == 0) {
+        k1_mic_auto_sense_set_shadow(true);
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else if (strcmp(command_data, "live") == 0) {
+        k1_mic_auto_sense_set_shadow(false);
+        tx_begin();
+        serial_print_k1_mic_auto_status();
+        tx_end();
+      } else {
+        bool value = false;
+        if (vp_parse_bool(command_data, &value)) {
+          k1_mic_auto_sense_set_enabled(value);
+          tx_begin();
+          serial_print_k1_mic_auto_status();
+          tx_end();
+        } else {
+          bad_command(command_type, command_data);
+        }
+      }
+    }
+#endif
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
     // beat_director toggle lifted VERBATIM into serial_cmd_dispatch_beat_director() in
