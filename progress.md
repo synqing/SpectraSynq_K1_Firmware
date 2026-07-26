@@ -1,6 +1,28 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
+
+**Current focus (2026-07-27, authoritative):** dual-sync F0-F3 recovery on
+`lane/dual-sync-phase0`. Canonical authority:
+`artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`. Current
+phase P-1 reconciles cross-tool lane routing; F0 then makes the host oracle
+fail closed, and F1 repairs observable BLE establishment. F2 is the first
+silicon phase and stops for Captain after scripted A/B/C. All older
+`Current focus` text below is historical context.
+
+## 2026-07-27 Dual-sync recovery takeover
+
+- Captain authorised Codex to act as SSA orchestrator.
+- Baseline branch/HEAD: `lane/dual-sync-phase0 @ 3a9724e`.
+- July Gate-0 attempt remains BLOCKED because SyncLink produced no link,
+  stream, clock or GPIO evidence; AP/FPS health alone is not link proof.
+- Recovery authority is now the tracked plan under
+  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/`.
+- Existing dirty device-registry and build-wrapper changes are preserved and
+  excluded from the P-1 documentation commit.
+- No device, serial, flash or calibration action was performed during
+  takeover.
+
 **Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; restored bench validation green at usable levels; R2/R3 corrected after LED-map incident** — `k1_prod_im73d` main/prod build path shipped (`4b95e60`, byte-identical-OFF, guard-mapped to main K1). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 proves the IM73D mic/PDM path on the ratified `13/12/14` pins and is now validated on restored `k1_bench_im73d @ f2f7c45`: quiet/volume 45/volume 60 AP/raw captures are usable and AGC gains stay below 2.0 on all four bands. Volume 75 is a front-end stress/fail condition (`clip_pct`, `near_pct`, input trim), not acceptance evidence. Captain confirms both K1s are identical hardware; existing envs encode configuration choice (`k1_bench_im73d` = LED `4/5`, `k1_prod_im73d` = LED `6/7`). Main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. See `docs/hardware/im73d-restored-bench-validation-2026-07-07.md`, `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
 
 ## 2026-07-07 Restored Bench Validation

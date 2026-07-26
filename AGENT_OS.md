@@ -19,7 +19,9 @@ bash scripts/agent/session-bootstrap.sh
 
 The bootstrap runs `scripts/agent/repo-truth.sh` as a pre-session gate:
 
-- **FAIL** (lane-integrity problem: missing IM73D env/guard/plan) → bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
+- **FAIL** (lane-integrity problem: active authority missing, untracked,
+  inactive, or branch-mismatched; required production invariant missing) →
+  bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
 - **WARN** (stale docs that do not misroute the lane) → bootstrap continues and prints the warnings.
 - **PASS** → bootstrap continues normally.
 
@@ -50,16 +52,25 @@ Trust sources in this order:
 
 ## 3. Current-lane verification rule
 
-The current live lane is:
+The current live lane is declared in the machine-readable frontmatter of
+`docs/spec-index.md`:
 
-- **Branch:** `lane/im73d-pdm-eval`
+- `active_branch`
+- `active_lane`
+- `active_authority`
+
+At this revision:
+
+- **Branch:** `lane/dual-sync-phase0`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** IM73D122 productionisation. Phase-1 firmware is done;
-  bench IM73D R1/no-speaker DSR proof is closed; current blocker is R2
-  production-shape hardware proof (main K1 SPH0645 -> IM73D on GPIO13/12/14,
-  or a dedicated production-shape IM73D unit).
+- **Focus:** dual-sync F0-F3 recovery.
+- **Authority:**
+  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`
 
-Before any work, verify the lane has not shifted. If `git status` shows a different branch, or if the lane doc says something different, stop and report the conflict.
+Before any work, verify the checked-out branch matches `active_branch` and the
+authority path exists. `scripts/agent/repo-truth.sh` enforces both. If either
+check fails, stop and report the conflict rather than silently rewriting lane
+authority.
 
 ---
 
@@ -68,7 +79,8 @@ Before any work, verify the lane has not shifted. If `git status` shows a differ
 If `repo-truth.sh` reports `handoff.md`, `progress.md`, or `spec-index.md` as stale:
 
 - Do not rely on them for current lane status.
-- Do not silently update them to match git.
+- Do not silently update them to match git unless Captain has explicitly
+  authorised an orchestration/lane takeover.
 - Report the stale docs in your handoff.
 - Ask for explicit approval before editing governance/docs files.
 

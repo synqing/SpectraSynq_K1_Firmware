@@ -1,6 +1,21 @@
 # Active Session Handoff — SpectraSynq K1 Firmware
 
-## ▶ CURRENT LANE — IM73D122 PRODUCTIONIZATION — Phase 1 firmware DONE; production proof remains
+## ▶ CURRENT LANE — DUAL-SYNC F0-F3 RECOVERY
+
+- **Branch:** `lane/dual-sync-phase0`.
+- **Authority:** [`artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`](../artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md).
+- **Current phase:** P-1 source-truth reconciliation, then F0 fail-closed host
+  oracle. F1 BLE link hardening follows as a separate commit.
+- **Silicon boundary:** no F2 device action until the scripted A/B/C harness,
+  upload mappings and identity tests are ready. F3 requires A+B+C PASS and an
+  explicit Captain GO.
+- **Existing dirty state:** preserve
+  `docs/hardware/device-build-registry.md` and `scripts/agent/pio-build.sh`;
+  neither belongs to the P-1 documentation commit.
+- **Safety:** identity by chip, never port; no cross-flash; never
+  `start_noise_cal`.
+
+## HISTORICAL LANE — IM73D122 PRODUCTIONIZATION
 
 - **RESUME BRIEF (Codex + any agent — READ FIRST):** [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](../docs/hardware/im73d-codex-resume-handover-2026-07-06.md) — the end-to-end work order: done-ledger, device table, ordered remaining queue (R1–R5 + Phase 2/3), escalation template, hard-rule set.
 - **Lane authority (deep context):** [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](../docs/hardware/im73d122-productionization-handover-2026-07-03.md) — §10 = audit + Captain D1/D2 decision; **§11 = the 2026-07-06 autonomous-execution outcomes** (UA shipped, MicFrontend decision, byte-oracle finding, DSR recipe, flip red-team).
