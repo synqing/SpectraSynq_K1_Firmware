@@ -1,9 +1,11 @@
 import re
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 DIAG_H = (FW / "diag" / "diagnostic_capture.h").read_text(encoding="utf-8")
@@ -11,7 +13,7 @@ DIAG_CPP = (FW / "diag" / "diagnostic_capture.cpp").read_text(encoding="utf-8")
 PIN_H = FW / "diag" / "k1_pin_evidence.h"
 PIN_CPP = FW / "diag" / "k1_pin_evidence.cpp"
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW_DIR)
 VPAB = (FW / "diag" / "vpab_capture.cpp").read_text(encoding="utf-8")
 CONSTANTS = (FW / "system" / "constants.h").read_text(encoding="utf-8")
 

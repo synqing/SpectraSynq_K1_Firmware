@@ -10,7 +10,7 @@ down + instant relight, no oscillation), and drop_cut composition preserved.
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,7 +48,7 @@ def function_body(source, name, kinds=r"(?:bool|void|float|uint8_t|uint16_t|K1Ch
 class EffectQueueKeyMapTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.menu = SERIAL_MENU.read_text()
+        cls.menu = read_serial_menu_surface(FW)
         # Typed-command dispatch now spans serial_menu.h (the ladder + dispatcher
         # call) AND serial_cmd_handlers.cpp (the 23 pure-setter strcmp branches,
         # S4). Concatenate for typed-equivalence checks (repoint, not weaken).

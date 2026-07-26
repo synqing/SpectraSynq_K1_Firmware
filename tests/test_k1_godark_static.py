@@ -10,13 +10,14 @@ prevents the wiring from silently regressing.
 import re
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 ROOT = Path(__file__).resolve().parents[1]
-FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
-GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
-GLOBALS_CFG = (FW / "system" / "globals_config.cpp").read_text(encoding="utf-8")
-I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
+GLOBALS = (FW.base / "system" / "globals.h").read_text(encoding="utf-8")
+GLOBALS_CFG = (FW.base / "system" / "globals_config.cpp").read_text(encoding="utf-8")
+I2S = (FW.base / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW)
 
 
 class RawRmsThresholds(unittest.TestCase):

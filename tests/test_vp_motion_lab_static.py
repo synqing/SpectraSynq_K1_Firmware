@@ -2,7 +2,7 @@ import re
 import unittest
 from pathlib import Path
 
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -187,7 +187,7 @@ class VPMotionLabStaticTest(unittest.TestCase):
         self.assertIn("vpab_capture_set_render_context(context)", body)
 
     def test_vpml_serial_surface_is_compile_guarded_and_typed_only(self):
-        serial = read(SERIAL_MENU_H)
+        serial = read_serial_menu_surface(FIRMWARE)
         self.assertRegex(
             serial,
             r'(?s)#ifdef\s+ENABLE_VP_MOTION_LAB\s*\n\s*else if \(strcmp\(command_type, "vpml"\) == 0\).*?#endif',

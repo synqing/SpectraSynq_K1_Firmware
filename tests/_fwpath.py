@@ -42,3 +42,14 @@ class FwDir:
     @property
     def base(self):
         return self._base
+
+
+def read_serial_menu_surface(fw: FwDir) -> str:
+    """serial_menu.h + serial_menu.cpp (M2.1 R1 bulk move). Host/static tests that
+    grep the serial command surface must search both — the header is declarations
+    + dispatch table only after R1 close-out."""
+    parts = [(fw / "serial_menu.h").read_text(encoding="utf-8")]
+    cpp = fw / "serial_menu.cpp"
+    if cpp.exists():
+        parts.append(cpp.read_text(encoding="utf-8"))
+    return "\n".join(parts)

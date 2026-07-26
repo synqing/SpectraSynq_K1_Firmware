@@ -25,12 +25,14 @@ scan (the over-capture class-bug fixed 2026-06-26)."""
 
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 GDFT_HARNESS = (FW / "diag" / "gdft_harness.h").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW_DIR)
 HANDLERS = (FW / "serial" / "serial_cmd_handlers.cpp").read_text(encoding="utf-8")
 
 # command_type -> the inline backing fn (diag/gdft_harness.h) it must route to. The lift

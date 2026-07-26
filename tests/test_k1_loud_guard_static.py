@@ -1,8 +1,10 @@
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
@@ -12,7 +14,7 @@ I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
 # the loud-guard AGC arithmetic asserted here now lives in the .cpp TU.
 GDFT = (FW / "audio" / "k1_gdft_core.cpp").read_text(encoding="utf-8")
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW_DIR)
 LIGHTSHOW = (FW / "visual" / "lightshow_modes.h").read_text(encoding="utf-8")
 
 

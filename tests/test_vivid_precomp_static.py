@@ -8,24 +8,24 @@ touching the K1 palette datasets or re-enabling output gamma.
 import re
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 ROOT = Path(__file__).resolve().parents[1]
-FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
+FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
+FW_BASE = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 
-LED_UTILS_PATH = FW / "visual" / "led_utilities.h"
-CONSTANTS_PATH = FW / "system" / "constants.h"
-GLOBALS_PATH = FW / "system" / "globals.h"
-SERIAL_PATH = FW / "serial" / "serial_menu.h"
-SERIAL_MENU_CPP_PATH = FW / "serial" / "serial_menu.cpp"
-SERIAL_CMD_HANDLERS_PATH = FW / "serial" / "serial_cmd_handlers.cpp"
-PALETTES_PATH = FW / "visual" / "Palettes.cpp"
+LED_UTILS_PATH = FW_BASE / "visual" / "led_utilities.h"
+CONSTANTS_PATH = FW_BASE / "system" / "constants.h"
+GLOBALS_PATH = FW_BASE / "system" / "globals.h"
+SERIAL_CMD_HANDLERS_PATH = FW_BASE / "serial" / "serial_cmd_handlers.cpp"
+PALETTES_PATH = FW_BASE / "visual" / "Palettes.cpp"
 PIO_PATH = ROOT / "platformio.ini"
 
 LED_UTILS = LED_UTILS_PATH.read_text()
 CONSTANTS = CONSTANTS_PATH.read_text()
 GLOBALS = GLOBALS_PATH.read_text()
-SERIAL = SERIAL_PATH.read_text()
-SERIAL_MENU_CPP = SERIAL_MENU_CPP_PATH.read_text()
+SERIAL = read_serial_menu_surface(FW)
+SERIAL_MENU_CPP = (FW / "serial_menu.cpp").read_text()
 SERIAL_CMD_HANDLERS = SERIAL_CMD_HANDLERS_PATH.read_text()
 PALETTES = PALETTES_PATH.read_text()
 PIO = PIO_PATH.read_text()
@@ -122,14 +122,13 @@ class VividPrecompStaticTest(unittest.TestCase):
                         secondary.index("scale_to_secondary_strip();"))
 
     def test_serial_control_is_typed_and_hotkey_is_not_motion_probe_collision(self):
-        # Help-text strings remain in serial_menu.h
+        # Help text and dispatch call-site moved to serial_menu.cpp (M2.1 R1 bulk move).
         self.assertIn('vivid=[on/off] | Runtime output-stage chroma pre-comp', SERIAL)
         self.assertIn('vivid_level=[0.00-1.00] | Runtime vivid shortcut strength', SERIAL)
         self.assertIn('vivid_chroma=[0.00-1.00] | Runtime vivid chroma strength', SERIAL)
         self.assertIn('vivid_black=[0.00-1.00] | Runtime vivid black-depth strength', SERIAL)
 
-        # Handler bodies were extracted to serial_cmd_handlers.cpp (Lane 2, S4.3).
-        # The call-site in serial_menu.h now invokes serial_cmd_dispatch_vivid().
+        # parse_command() dispatches via serial_cmd_dispatch_vivid() in serial_menu.cpp.
         self.assertIn('serial_cmd_dispatch_vivid(command_type, command_data)', SERIAL)
         self.assertIn('#ifdef K1_VIVID_PRECOMP_V1', SERIAL)
 

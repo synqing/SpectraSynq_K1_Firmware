@@ -1,7 +1,7 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,7 +13,7 @@ NOISE_CAL_ARM = FW / "control" / "k1_noise_cal_arm.cpp"
 class SerialHotkeyStaticContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.source = SERIAL_MENU.read_text()
+        cls.source = read_serial_menu_surface(FW)
 
     def _function_body(self, name):
         match = re.search(rf"\b(?:bool|void)\s+{name}\s*\([^)]*\)\s*\{{", self.source)
