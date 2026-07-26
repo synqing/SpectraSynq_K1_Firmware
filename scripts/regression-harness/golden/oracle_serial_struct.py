@@ -214,6 +214,7 @@ FAMILIES = [
 # post-extraction. capture() searches both; the golden records neither (the move is
 # invisible to the contract).
 _MENU_REL     = ("serial", "serial_menu.h")
+_MENU_CPP_REL = ("serial", "serial_menu.cpp")
 _HANDLERS_REL = ("serial", "serial_cmd_handlers.cpp")
 
 
@@ -305,7 +306,10 @@ def capture(firmware_root=None) -> str:
     moved to a dispatcher. Both are invariant across a verbatim lift, so the golden
     reproduces; a botched lift diverges body or reachable."""
     fw = Path(firmware_root) if firmware_root else FIRMWARE
-    menu_src     = (fw.joinpath(*_MENU_REL)).read_text(encoding="utf-8")
+    menu_src = (fw.joinpath(*_MENU_REL)).read_text(encoding="utf-8")
+    menu_cpp = (fw.joinpath(*_MENU_CPP_REL)).read_text(encoding="utf-8") \
+               if (fw.joinpath(*_MENU_CPP_REL)).exists() else ""
+    menu_src = menu_src + "\n" + menu_cpp
     handlers_src = (fw.joinpath(*_HANDLERS_REL)).read_text(encoding="utf-8") \
                    if (fw.joinpath(*_HANDLERS_REL)).exists() else ""
 

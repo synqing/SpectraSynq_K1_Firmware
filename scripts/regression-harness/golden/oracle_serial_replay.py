@@ -455,6 +455,12 @@ void save_config_delayed() { g_save_config_delayed_fired = true; }
 void reboot()              { g_reboot_fired = true; return; }
 void set_preset(char*)     {}
 void check_current_function() {}
+void factory_reset()       {}
+void restore_defaults()    {}
+void clear_noise_cal()     {}
+float k1_queue_transition_scale_primary = 1.0f;
+float k1_queue_transition_scale_secondary = 1.0f;
+int raw_dump_request = 0;
 
 // bad_command() lives in serial_tx.cpp (compiled in) and prints via USBSerial; to
 // detect that the parse-failure path was taken we sniff the recorded text for the
@@ -506,6 +512,7 @@ bool k1_preset_slot_get(uint8_t /*slot*/, K1ChannelPreset* /*out*/) { return fal
 // vp output probe (visual/lightshow_modes.h inline — header not pulled) + audio
 // snapshot read (audio/k1_audio_snapshot.cpp — not compiled)
 void vp_run_output_probe() {}
+void vp_print_secondary_state() {}
 K1AudioSnapshot k1_audio_snapshot_read() { K1AudioSnapshot s = {}; return s; }
 
 // benchmark / FPS-stream globals: serial_menu.h declares these extern (real

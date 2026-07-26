@@ -6,6 +6,11 @@
 #include <stdint.h>      // Include for uint32_t type used within
 #include "config_types.h" // PIO-SPIKE2: ODR-safe enums/macros (LED_STRIP_MODE, LED_COUNT_VALUE, DEFAULT_SAMPLE_RATE, led_types, lightshow_modes) + struct conf, shared with globals_config.cpp
 
+// Coarse firmware version echoed on serial (:version/:build) and in NVS config paths.
+#ifndef FIRMWARE_VERSION
+#define FIRMWARE_VERSION 40103
+#endif
+
 // ================= LED STRIP MODE SELECTION =================
 // PIO-SPIKE2 (2026-05-25): LED_STRIP_MODE / LED_COUNT_VALUE selection block,
 // DEFAULT_SAMPLE_RATE, enum led_types, and enum lightshow_modes moved to
