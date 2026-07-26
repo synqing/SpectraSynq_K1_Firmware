@@ -62,7 +62,11 @@ conf CONFIG = {
   GRB,                 // LED_COLOR_ORDER
   true,                // LED_INTERPOLATION
   DEFAULT_SAMPLES_PER_CHUNK, // SAMPLES_PER_CHUNK
+#ifdef K1_MIC_AUTO_DEFAULT_SENSITIVITY
+  K1_MIC_AUTO_DEFAULT_SENSITIVITY, // SENSITIVITY (mic_auto gain-chain probe)
+#else
   2.4,                 // SENSITIVITY
+#endif
   true,                // BOOT_ANIMATION
   DEFAULT_SWEET_SPOT_MIN_LEVEL, // SWEET_SPOT_MIN_LEVEL (fallback only; measured cal must provide provenance)
   30000,               // SWEET_SPOT_MAX_LEVEL
