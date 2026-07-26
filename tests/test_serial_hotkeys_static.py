@@ -44,7 +44,7 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                     "j", "J", "k", "K", "l", "L",
                     "q", "Q", "w", "W", "e", "E", "r", "R", "t", "T",
                     ",", ".", "/", "1", "2", "3", "4", "5", "6",
-                    "a", "s", "d", "f",
+                    "a", "s", "S", "d", "f",
                     "g", "G", "u", "y", "-", "=", "_", "+"]:
             self.assertIn(f"'{key}'", body)
         # 'm' is NO LONGER removed: it is the SHIPPING ref-E spatial toggle

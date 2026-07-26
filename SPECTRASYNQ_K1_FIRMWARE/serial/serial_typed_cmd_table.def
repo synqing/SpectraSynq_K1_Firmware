@@ -162,6 +162,8 @@ SERIAL_TYPED_CMD("commit_quantise", serial_typed_wrap_queue, SC_TYPED_ONLY, CMD_
 SERIAL_TYPED_CMD("slot_save", serial_typed_slot_save, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("slot_load", serial_typed_slot_load, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("slot_arm", serial_typed_slot_load, SC_TYPED_ONLY, CMD_PERSISTS)
+SERIAL_TYPED_CMD("save_show", serial_typed_save_show, SC_TYPED_ONLY, CMD_PERSISTS)
+SERIAL_TYPED_CMD("show_state", serial_typed_show_state, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("chromatic", serial_typed_chromatic, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("secondary_auto_color_shift", serial_typed_wrap_secondary, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("secondary_incandescent_mode", serial_typed_wrap_secondary, SC_TYPED_ONLY, CMD_PERSISTS)

@@ -91,6 +91,8 @@ bool serial_typed_bass_mode(const char* command_type, char* command_data);
 bool serial_typed_stream(const char* command_type, char* command_data);
 bool serial_typed_slot_save(const char* command_type, char* command_data);
 bool serial_typed_slot_load(const char* command_type, char* command_data);
+bool serial_typed_save_show(const char* command_type, char* command_data);
+bool serial_typed_show_state(const char* command_type, char* command_data);
 bool serial_typed_chromatic(const char* command_type, char* command_data);
 bool serial_typed_secondary_status(const char* command_type, char* command_data);
 bool serial_typed_start_benchmark(const char* command_type, char* command_data);
