@@ -1,8 +1,10 @@
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface, typed_command_handler_body
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
@@ -12,45 +14,12 @@ I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
 # the loud-guard AGC arithmetic asserted here now lives in the .cpp TU.
 GDFT = (FW / "audio" / "k1_gdft_core.cpp").read_text(encoding="utf-8")
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW_DIR)
 LIGHTSHOW = (FW / "visual" / "lightshow_modes.h").read_text(encoding="utf-8")
 
 
 def typed_command_block(command_type):
-    """Return the command's OWN else-if block, brace-balanced.
-
-    Bounds the block by matching the handler's own braces, NOT by scanning to the next
-    `strcmp(command_type, ...)` else-if. The old scan over-captured once an adjacent handler
-    was lifted to a dispatcher call-site: `else if (serial_cmd_dispatch_*(...))` is not a
-    strcmp form, so the scan sailed past it into later commands — e.g. after beat_director's
-    Increment-B call-site it pulled the `boot_animation (reboot-bearing ...)` comment into
-    the k1_loud_guard block and tripped assertNotIn("reboot"). Brace-matching is robust to
-    whatever follows. String literals are skipped so a brace inside a literal cannot
-    unbalance the scan (the loud-guard / response-gain bodies have none, but this keeps the
-    helper correct as a class)."""
-    marker = f'else if (strcmp(command_type, "{command_type}") == 0)'
-    start = SERIAL.find(marker)
-    assert start >= 0, f"missing typed command block for {command_type}"
-    i = SERIAL.find("{", start + len(marker))
-    assert i > start, f"missing opening brace for {command_type}"
-    depth = 0
-    while i < len(SERIAL):
-        c = SERIAL[i]
-        if c in "\"'":
-            quote = c
-            i += 1
-            while i < len(SERIAL) and SERIAL[i] != quote:
-                if SERIAL[i] == "\\":
-                    i += 1
-                i += 1
-        elif c == "{":
-            depth += 1
-        elif c == "}":
-            depth -= 1
-            if depth == 0:
-                return SERIAL[start:i + 1]
-        i += 1
-    raise AssertionError(f"unbalanced braces for {command_type}")
+    return typed_command_handler_body(SERIAL, command_type)
 
 
 class K1LoudGuardStaticTest(unittest.TestCase):

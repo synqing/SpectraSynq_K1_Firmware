@@ -427,6 +427,10 @@ void k1_queue_set_mode_enabled(bool on) {
   }
 }
 
+void k1_queue_apply_fields(bool secondary, const K1ChannelPreset& preset) {
+  apply_preset_fields(secondary, preset);
+}
+
 K1ChannelPreset k1_queue_capture_live(bool secondary) {
   K1ChannelPreset p;
   if (!secondary) {

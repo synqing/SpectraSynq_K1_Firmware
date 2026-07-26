@@ -2,7 +2,7 @@ import re
 import unittest
 from pathlib import Path
 
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface, compile_guarded_typed_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -187,11 +187,8 @@ class VPMotionLabStaticTest(unittest.TestCase):
         self.assertIn("vpab_capture_set_render_context(context)", body)
 
     def test_vpml_serial_surface_is_compile_guarded_and_typed_only(self):
-        serial = read(SERIAL_MENU_H)
-        self.assertRegex(
-            serial,
-            r'(?s)#ifdef\s+ENABLE_VP_MOTION_LAB\s*\n\s*else if \(strcmp\(command_type, "vpml"\) == 0\).*?#endif',
-        )
+        serial = read_serial_menu_surface(FIRMWARE)
+        self.assertTrue(compile_guarded_typed_row(serial, "ENABLE_VP_MOTION_LAB", "vpml"))
         command_body = extract_function_body(read(VPML_H), "vpml_command")
         self.assertIn('"play_builtin,intro_bounce"', command_body)
         self.assertIn('"play_builtin,intro_bounce_loop"', command_body)

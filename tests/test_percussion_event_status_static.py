@@ -1,12 +1,12 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
-SERIAL_MENU = (FW / "serial_menu.h").read_text()
+SERIAL_MENU = read_serial_menu_surface(FW)
 SERIAL_TABLE = (FW / "serial_cmd_table.def").read_text()
 I2S = (FW / "audio" / "i2s_audio.h").read_text()
 SNAPSHOT = (FW / "audio" / "k1_audio_snapshot.h").read_text()

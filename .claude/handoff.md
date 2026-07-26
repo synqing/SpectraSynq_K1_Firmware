@@ -1,5 +1,11 @@
 # Active Session Handoff — SpectraSynq K1 Firmware
 
+## ▶ COMPLETED (2026-07-26) — M2.1 `serial_menu.h` decomposition (R1+R2)
+
+- **Authority:** [`docs/refactor/serial-menu-decomposition-plan-2026-07-26.md`](../docs/refactor/serial-menu-decomposition-plan-2026-07-26.md)
+- **Branch:** `feat/serial-menu-decomposition-r1` (local, unpushed — Captain merges)
+- **Outcome:** ODR bomb defused (104/104 defs in `serial_menu.cpp`); Stage-B typed table (`serial_typed_cmd_table.def`, 151 rows); `parse_command()` strcmp ladder retired; golden + Gate-Fα PROVEN; pytest **718** pass; `k1_hardware` + `k1_bench_im73d` build green.
+
 ## ▶ CURRENT LANE — IM73D122 PRODUCTIONIZATION — Phase 1 firmware DONE; production proof remains
 
 - **RESUME BRIEF (Codex + any agent — READ FIRST):** [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](../docs/hardware/im73d-codex-resume-handover-2026-07-06.md) — the end-to-end work order: done-ledger, device table, ordered remaining queue (R1–R5 + Phase 2/3), escalation template, hard-rule set.

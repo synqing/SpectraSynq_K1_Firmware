@@ -16,6 +16,7 @@
 #include "led_utilities.h"
 
 void save_config_delayed();
+extern void vp_apply_profile(uint8_t profile);
 
 namespace {
 
@@ -254,15 +255,7 @@ const char* infer_scene_smart() {
   return g_scene_smart;
 }
 
-void vp_apply_profile(uint8_t profile) {
-  VP_PROFILE = profile;
-  VP_FIX_AGC_SOFT_KNEE = (profile == VP_PROFILE_CANDIDATE);
-  VP_FIX_CHROMAGRAM_SPARSENESS = (profile == VP_PROFILE_CANDIDATE);
-  VP_FIX_PRISM_DEFAULT_OFF = (profile == VP_PROFILE_CANDIDATE);
-  VP_FIX_BLOOM_DECAY = false;
-  VP_FIX_HSV_SOURCE_SAT = (profile == VP_PROFILE_CANDIDATE);
-  VP_FIX_SECONDARY_CLEAN = (profile == VP_PROFILE_CLEAN || profile == VP_PROFILE_CANDIDATE);
-}
+// vp_apply_profile() — single definition in serial/serial_menu.cpp (M2.1 R1).
 
 bool parse_vp_profile(const char* text, uint8_t* out) {
   if (strcmp(text, "original") == 0) {

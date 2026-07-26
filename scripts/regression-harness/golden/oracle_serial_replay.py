@@ -126,6 +126,14 @@ MODULE_CPPS = [
                                        # calls serial_cmd_dispatch_pure_setter() here;
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
+    "serial/serial_menu.cpp",          # M2.1 R1: out-of-line home for serial_menu.h's
+                                       # non-inline defs (ODR-bomb kill). The driver
+                                       # #includes serial_menu.h (now the prototypes for
+                                       # the moved fns); this TU supplies the definitions
+                                       # the driver + serial_cmd_handlers.cpp link against.
+                                       # Golden must reproduce byte-for-byte (behaviour
+                                       # preserved by the verbatim move).
+    "serial/serial_typed_dispatch.cpp",  # M2.1 R2: Stage-B typed table handlers.
     "director/k1_smart_director.cpp",
     "director/k1_edgemixer.cpp",
     "director/k1_visual_hooks.cpp",
@@ -448,6 +456,12 @@ void save_config_delayed() { g_save_config_delayed_fired = true; }
 void reboot()              { g_reboot_fired = true; return; }
 void set_preset(char*)     {}
 void check_current_function() {}
+void factory_reset()       {}
+void restore_defaults()    {}
+void clear_noise_cal()     {}
+float k1_queue_transition_scale_primary = 1.0f;
+float k1_queue_transition_scale_secondary = 1.0f;
+int raw_dump_request = 0;
 
 // bad_command() lives in serial_tx.cpp (compiled in) and prints via USBSerial; to
 // detect that the parse-failure path was taken we sniff the recorded text for the
@@ -495,10 +509,17 @@ void     k1_queue_set_transition_style(uint8_t) {}
 void     k1_queue_set_mode_enabled(bool) {}
 bool k1_preset_slot_save(uint8_t /*slot*/, bool /*from_secondary*/) { return false; }
 bool k1_preset_slot_get(uint8_t /*slot*/, K1ChannelPreset* /*out*/) { return false; }
+void k1_queue_apply_fields(bool /*secondary*/, const K1ChannelPreset& /*preset*/) {}
+
+// show-state (control/k1_show_state.cpp — not compiled; LittleFS). Hotkey 'S' /
+// :save_show are not in the S3.0 corpus; stubs only need to link.
+bool k1_show_state_save() { return false; }
+bool k1_show_state_load() { return false; }
 
 // vp output probe (visual/lightshow_modes.h inline — header not pulled) + audio
 // snapshot read (audio/k1_audio_snapshot.cpp — not compiled)
 void vp_run_output_probe() {}
+void vp_print_secondary_state() {}
 K1AudioSnapshot k1_audio_snapshot_read() { K1AudioSnapshot s = {}; return s; }
 
 // benchmark / FPS-stream globals: serial_menu.h declares these extern (real
@@ -1009,14 +1030,18 @@ def verify_mutations(baseline: str, firmware_root=None) -> list:
         with tempfile.TemporaryDirectory(prefix="oracle_serial_replay_mut_") as td:
             fw_copy = Path(td) / "fw"
             shutil.copytree(fw_src, fw_copy)
-            target = fw_copy / "serial" / "serial_menu.h"
-            original = target.read_text(encoding="utf-8")
-            mutated = re.sub(pattern, replacement, original, count=1)
-            if mutated == original:
+            target = None
+            for f in fw_copy.rglob("*"):
+                if f.suffix in (".cpp", ".h") and f.is_file():
+                    text = f.read_text(encoding="utf-8", errors="ignore")
+                    if re.search(pattern, text):
+                        f.write_text(re.sub(pattern, replacement, text, count=1), encoding="utf-8")
+                        target = f
+                        break
+            if target is None:
                 results.append({"desc": desc, "diverged_lines": 0, "caught": False,
                                 "error": "regex did not match"})
                 continue
-            target.write_text(mutated, encoding="utf-8")
             try:
                 mutant_out = capture(firmware_root=fw_copy)
             except RuntimeError as exc:

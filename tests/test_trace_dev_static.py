@@ -1,7 +1,7 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,7 +83,7 @@ class TraceDevStaticTest(unittest.TestCase):
         self.assertIn('K1_TRACE_COUNTER("vp_secondary_render_us"', ino)
 
     def test_trace_command_is_trace_dev_only_and_typed_only(self):
-        menu = read(SERIAL_MENU)
+        menu = read_serial_menu_surface(FIRMWARE)
         table = read(SERIAL_TABLE)
         self.assertRegex(
             table,

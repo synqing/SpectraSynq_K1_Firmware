@@ -1,8 +1,8 @@
 ---
-abstract: "M2.1 serial_menu.h decomposition — scoped, harness-first plan (NOT started). The behavioural oracle exists AND its CI gate is SOUND: harness_selftest.py (run by test_golden_master.py) rglobs the tree and CAUGHT all 18 serial_replay mutations on HEAD f23bea3 (orchestrator-confirmed 2026-07-26). The scare — oracle_serial_replay.py --verify-mutations reporting 17/18 inert — was a STALE STANDALONE PROBE (hardcodes serial_menu.h) not a rotted gate; canonical Gate-0 for this repo is harness_selftest.py, not per-oracle --verify-mutations. Small R0 hygiene: fix/retire that standalone path. Then R1 (move 104 non-inline defs -> serial_menu.cpp, kill the ODR bomb) + R2 (table-migrate the 79 =value setter arms). Clamp-gap fixes ride a SEPARATE behaviour-changing ticket. Read before touching serial_menu.h."
+abstract: "M2.1 serial_menu.h decomposition — R1+R2 COMPLETE (2026-07-26): 104/104 defs in serial_menu.cpp; 151-row SERIAL_TYPED_CMD_TABLE; parse_command strcmp ladder retired; golden + Gate-Fα green. Clamp-gap fixes ride a SEPARATE behaviour-changing ticket."
 ---
 
-# M2.1 — serial_menu.h decomposition (harness-first plan, NOT started 2026-07-26)
+# M2.1 — serial_menu.h decomposition (R1+R2 COMPLETE 2026-07-26)
 
 Scoped 2026-07-26 (2 read-only scouts + orchestrator Gate-0 run). **No product code edited.** Captain approved the *approach*; execution deferred to fresh context. Follows the `autonomous-agentic-build` skill (harness IS the product).
 
@@ -37,8 +37,81 @@ Converge serial setters onto the `control/k1_control_facade.cpp` validate→appl
 ## Key files
 `serial/serial_menu.h`, `serial/serial_cmd_handlers.cpp`, `serial/serial_cmd_table.def`, `control/k1_control_facade.cpp`; `scripts/regression-harness/golden/{oracle_serial_replay,oracle_serial_struct,harness_selftest}.py`; `tests/test_golden_master.py`; `tests/golden/{serial_replay,serial_struct}.golden.jsonl`.
 
+## R1 EXECUTION STATUS — COMPLETE (2026-07-26)
+
+Branch `feat/serial-menu-decomposition-r1` off `main` `1c131a9` (local, unpushed — Captain merges). Batches 1–5 moved 26 defs leaf-first; **batch 6+ bulk move** (`scripts/refactor/r1_move_serial_menu_defs.py`) moved the remaining **78 defs** in one gate-green pass (including `init_serial`, `dump_info`, `parse_command`, `check_serial`, all `cmd_*`, hotkey helpers, queue helpers, `stream_*`, etc.). Close-out state:
+
+| Metric | Value |
+|--------|-------|
+| Non-inline defs moved | **104 / 104** |
+| `serial_menu.h` | **573 lines** (declarations + `inline constexpr SERIAL_CMD_TABLE[]` + integrity `static_assert`s only) |
+| `serial_menu.cpp` | **4065 lines** (all moved bodies + substrate) |
+| Golden reproduce | **PASS** (`test_golden_master.py` + `harness_selftest.py` → Gate-Fα PROVEN) |
+| Builds | **PASS** `k1_hardware`, `k1_bench_im73d` |
+| Host pytest (serial surface) | **702 passed** (5 skipped; 10 failures isolated to pre-existing `test_im73d_audio_eval_harness.py`) |
+
+Supporting close-out edits (same branch, behaviour-preserving unless noted):
+- `FIRMWARE_VERSION` → `system/constants.h` (`#ifndef` guard); `.ino` local `#define` removed.
+- `vp_apply_profile` double-def resolved: body stays in `serial_menu.cpp`; duplicate removed from `k1_control_facade.cpp`.
+- Oracle: `oracle_serial_struct.py` reads `serial_menu.h` + `serial_menu.cpp`; replay driver stubs for host-only symbols.
+- Static tests: `tests/_fwpath.py::read_serial_menu_surface()` — grep h+cpp for moved bodies.
+
+**R2 is COMPLETE** (2026-07-26 close-out). See `progress.md` §2026-07-26 R2.
+
+### R2 EXECUTION STATUS — COMPLETE (2026-07-26)
+
+| Metric | Value |
+|--------|-------|
+| Typed table rows | **151** (`serial_typed_cmd_table.def`) |
+| Handler TU | `serial_typed_dispatch.cpp` (+ thin wrappers to `serial_cmd_dispatch_*`) |
+| `parse_command()` body | **142 lines** (2530–2671): Row-1 table + typed lookup + deprecated `SECONDARY_*` tail |
+| ODR smoke | `tests/test_serial_menu_odr_static.py` + `serial_menu_odr_driver.cpp` |
+| Host mirror | `tests/test_serial_typed_dispatch_table_static.py` |
+| Oracle updates | `oracle_serial_struct._routed` via typed wrappers; sever mutations target `return serial_cmd_dispatch_*` |
+| Gates | pytest **718** pass; golden reproduce; Gate-Fα PROVEN; `k1_hardware` + `k1_bench_im73d` |
+
+### Batches 1–5 (leaf-first, committed incrementally)
+
+| Batch | Commit | Moved | Pattern proven |
+|-------|--------|-------|----------------|
+| 1 | `2a0a514` | 7 edge name/parse (`k1_edge_*_name`, `k1_parse_edge_*`) | pure leaves; NEW `serial_menu.cpp` + substrate + oracle `MODULE_CPPS` add |
+| 2 | `bfcc3af` | 9 edge status/control (`k1_print_edge_status`, `serial_edge_*`) | with-deps, moved-sibling linkage, substrate growth (`serial_tx.h` + `vp_bool_text` decl) |
+| 3 | `320fd62` | 5 vivid | static-test-anchored (re-point) + gated (`K1_VIVID_PRECOMP_V1`) |
+| 4 | `23f00af` | 3 loud-guard + 1 beat-director status | multi-gate; needs `pio run -e k1_effect_framework` to validate the `K1_EFFECT_FRAMEWORK_V1` move |
+| 5 | `1b45957` | 1 `k1_print_smart_status` | big status printer; OUTPUT-STRING static anchor (re-point) |
+
+### Batch 6+ (bulk close-out, uncommitted at session start)
+
+Moved ~78 remaining defs via `r1_move_serial_menu_defs.py` between `// --- R1 bulk move ---` / `// --- end R1 bulk move ---` markers in `serial_menu.cpp`. Landmines handled in the same pass:
+
+- **`FIRMWARE_VERSION`**: relocated to `constants.h` so `init_serial` / `cmd_version` / `cmd_build` / `dump_info` / `cmd_help` could move.
+- **`vp_apply_profile`**: duplicate in `k1_control_facade.cpp` removed (extern linkage to `serial_menu.cpp`).
+- **Host oracle link**: replay driver stubs for `factory_reset`, `restore_defaults`, `clear_noise_cal`, queue transition scales, `raw_dump_request`, `vp_print_secondary_state`.
+- **Static tests**: re-pointed to `read_serial_menu_surface()` across ~15 test files + `test_k1_av_regression_static.py` surface concat.
+- **Substrate discipline**: `serial_menu.cpp` includes `serial_menu.h` (for dispatch-table types) but NOT `system.h` / `bridge_fs.h` / `presets.h` / `buttons.h` / `knobs.h` (inline ODR with `.ino`).
+
+### The proven mechanism (per batch)
+1. Move the body/bodies **VERBATIM** into `serial/serial_menu.cpp` (append; preserve source order for internal sibling calls; move `#ifdef` gates arm-for-arm). `serial_menu.cpp` includes the SUBSTRATE (`globals.h` + the `k1_*.h` stack + `serial_tx.h` + gated `beat_aware_director.h`) but **NEVER `serial_menu.h`** (avoids ODR double-def against the `.ino` TU).
+2. Leave a DECLARATION (gated if the family is gated) in `serial_menu.h` at the same position.
+3. `serial_menu.cpp` is in `oracle_serial_replay.py` `MODULE_CPPS` (added batch 1) — **REQUIRED** so the host oracle links the moved defs (the brief omitted this; it is the S4 `serial_cmd_handlers.cpp` precedent).
+4. Still-in-header callee → forward-declare it (external linkage) in `serial_menu.cpp` (e.g. `vp_bool_text`).
+5. Gate: `pio -e k1_prod_im73d` + `k1_hardware` clean AND golden reproduces byte-for-byte AND Gate-Fα intact; framework-gated moves ALSO need `pio -e k1_effect_framework`. Divergence = behaviour changed = revert.
+
+### Landmines for the remaining ~74 (verify BEFORE each move)
+- **Static-test anchors ≠ function-name grep.** Batch 5 broke 3 tests anchored on OUTPUT STRINGS (`SMART_TRANSIENT:` …), not the name. Grep `tests/` for the function name AND its distinctive echo tokens; re-point by searching the whole serial surface (`serial_menu.h` + `serial_menu.cpp`), non-weakening.
+- **Host-stubbed subsystem calls = oracle-link trap.** `serial_queue_*`, `cmd_queue_commit`, `cmd_slot_list` call `sb_queue_*` (stubbed static/inline in the replay driver) → moving to a `MODULE_CPP` breaks the host link unless the stubs are promoted to guaranteed-external. AVOID until handled.
+- **`vp_apply_profile` DOUBLE-DEF** — defined in both `serial_menu.h` AND `control/k1_control_facade.cpp` (both compiled via `build_src_filter +<control/k1_*.cpp>`). Firmware links today → exactly one is live (one must be gated). Resolve which links first. Skipped this session.
+- **`FIRMWARE_VERSION`-blocked** (need a `FIRMWARE_VERSION`→header relocation first): `init_serial`, `cmd_version`, `cmd_build` (± `dump_info`, `cmd_help`).
+- **`constexpr` table guards STAY** (implicitly inline; needed in-header for `static_assert`): `serial_table_all_have_handlers`, `serial_cstr_eq`, `serial_table_no_duplicate_names`, `serial_table_no_dangerous_hotkey`.
+- **`parse_command` (~1040 L) + `check_serial` + `stream_*`: move LAST** (largest symbol/forward-decl surface).
+
+### Recommended next safe batches (no landmine)
+`cmd_*` leaves that only print globals/accessors (`cmd_chip_id/reset/reset_reason/fps/led_fps/stop/dump/get_num_modes/get_mode/identify/trace_dump/event_status/get_knobs/get_buttons/vp_out_test/bootloop_inject`); target print helpers (`serial_target_name/mode_name/print_mode_line/print_palette_line/print_target_float/print_target_bool`, `k1_confirmed_mode`); `vp_profile_name` + `vp_print_status` (skip `vp_apply_profile`); `k1_apply_smart_scene`; the hotkey help/status printers. For each: (a) no host-stubbed subsystem call, (b) grep tests/ for name AND output strings, (c) no facade double-def, (d) gated moves get their gate's build.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-07-26 | agent:claude-code | Created — M2.1 scoped (2 scouts + Gate-0). Oracle exists but mutation battery partly rotted (17/18 inert); R0 repair must precede R1 body-extraction + R2 table-migration. Clamp gaps fenced to a separate behaviour-changing ticket. Not started. |
+| 2026-07-26 | agent:cursor | R2 COMPLETE — 151-row typed table; parse_command ladder retired; ODR smoke + host mirror tests; oracle struct/replay R2 routing; pytest 718; builds green. |
+| 2026-07-26 | agent:cursor | R1 COMPLETE — batch 6+ bulk move (78 defs); header 573 L / cpp 4065 L; golden + Gate-Fα + k1_hardware + k1_bench_im73d green; static tests re-pointed via read_serial_menu_surface(); FIRMWARE_VERSION→constants.h; vp_apply_profile deduped. |

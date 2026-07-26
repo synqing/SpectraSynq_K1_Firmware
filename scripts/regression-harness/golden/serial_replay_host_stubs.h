@@ -72,14 +72,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 //  set_chroma_profile). None reachable from the S3.0 corpus; no-op for link.
 // raw_dump_request is an int flag (i2s_audio.h on device); a writable global here.
 static inline void print_chip_id() {}
-static inline void factory_reset() {}
-static inline void restore_defaults() {}
-static inline void clear_noise_cal() {}
-// blocking_flash takes a CRGB16 colour (real inline def at led_utilities.h:1129,
-// which serial_menu.h does NOT pull in). cmd_identify() calls it with a CRGB16
-// literal. Stub by template to match without naming the FastLED-host colour type.
 template <typename T> static inline void blocking_flash(const T& /*colour*/) {}
-inline int raw_dump_request = 0;
 // apply_chroma_profile is CONFIG-only on device (set_chroma_profile setter, which
 // IS excluded from the corpus as reboot-bearing). Stub returns "no note-offset
 // change" so the excluded branch links without rebooting. Signature must match the

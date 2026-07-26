@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "scripts" / "regression-harness"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
+SERIAL_MENU_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.cpp"
 # Phase A Lane 2: the serial_menu.h god-header is being decomposed into cohesive
 # serial/*.{h,cpp} TUs. Assertions that pin serial-command-surface code must look
 # across the WHOLE surface (serial_menu.h + the extracted TUs), not serial_menu.h
@@ -42,6 +43,7 @@ def serial_command_surface() -> str:
         p.read_text(encoding="utf-8")
         for p in (
             SERIAL_MENU,
+            SERIAL_MENU_CPP,
             AP_CAPTURE_TELEMETRY_H,
             AP_CAPTURE_TELEMETRY_CPP,
             SERIAL_TX_H,

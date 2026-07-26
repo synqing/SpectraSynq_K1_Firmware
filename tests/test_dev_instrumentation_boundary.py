@@ -1,7 +1,7 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface, compile_guarded_typed_row
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -232,15 +232,9 @@ class DevInstrumentationBoundaryTest(unittest.TestCase):
             )
 
     def test_diagnostic_command_surfaces_are_compile_guarded(self):
-        serial_menu = read(FIRMWARE / "serial_menu.h")
-        self.assertRegex(
-            serial_menu,
-            r'(?s)#if\s+ENABLE_DIAG_CAPTURE\s*\n\s*else if \(strcmp\(command_type, "diag"\) == 0\).*?#endif',
-        )
-        self.assertRegex(
-            serial_menu,
-            r'(?s)#if\s+ENABLE_VPAB_PROBE\s*\n\s*else if \(strcmp\(command_type, "vpab"\) == 0\).*?#endif',
-        )
+        serial_menu = read_serial_menu_surface(FIRMWARE)
+        self.assertTrue(compile_guarded_typed_row(serial_menu, "ENABLE_DIAG_CAPTURE", "diag"))
+        self.assertTrue(compile_guarded_typed_row(serial_menu, "ENABLE_VPAB_PROBE", "vpab"))
 
 
 if __name__ == "__main__":

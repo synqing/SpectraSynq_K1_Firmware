@@ -10,7 +10,7 @@ down + instant relight, no oscillation), and drop_cut composition preserved.
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface, read_serial_dispatch_surface, typed_command_registered, typed_command_handler_body
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,11 +48,8 @@ def function_body(source, name, kinds=r"(?:bool|void|float|uint8_t|uint16_t|K1Ch
 class EffectQueueKeyMapTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.menu = SERIAL_MENU.read_text()
-        # Typed-command dispatch now spans serial_menu.h (the ladder + dispatcher
-        # call) AND serial_cmd_handlers.cpp (the 23 pure-setter strcmp branches,
-        # S4). Concatenate for typed-equivalence checks (repoint, not weaken).
-        cls.dispatch = cls.menu + "\n" + SERIAL_CMD_HANDLERS.read_text()
+        cls.menu = read_serial_menu_surface(FW)
+        cls.dispatch = read_serial_dispatch_surface(FW)
         cls.handler = function_body(cls.menu, "serial_handle_hotkey")
         cls.immediate = re.sub(
             r"#ifdef\s+ENABLE_MOTION_PROBE\b.*?#endif", "",
@@ -114,8 +111,8 @@ class EffectQueueKeyMapTest(unittest.TestCase):
             '"temporal_dithering"',           # was '6' (global)
         ]
         for token in equivalents:
-            self.assertIn(f"strcmp(command_type, {token})", self.dispatch,
-                          f"typed equivalent {token} must exist in the parse_command dispatch surface")
+            self.assertTrue(typed_command_registered(self.dispatch, token.strip('"')),
+                          f"typed equivalent {token} must exist in the dispatch surface")
 
     def test_queue_commands_exist(self):
         # The queue/transition family (queue_mode/transition_style/transition_dip_ms/
@@ -127,14 +124,14 @@ class EffectQueueKeyMapTest(unittest.TestCase):
         for token in ["queue_mode", "transition_style", "transition_dip_ms",
                       "transition_xfade_ms", "commit_quantise", "slot_save",
                       "slot_load", "slot_arm"]:
-            self.assertIn(f'strcmp(command_type, "{token}")', self.dispatch)
+            self.assertTrue(typed_command_registered(self.dispatch, token),
+                            f"{token} must be registered in typed dispatch surface")
         table = CMD_TABLE.read_text()
         self.assertIn('SERIAL_CMD("commit",', table)
         self.assertIn('SERIAL_CMD("slot_list",', table)
 
     def test_slot_save_accepts_explicit_channel_like_slot_load(self):
-        branch = self.menu.split('strcmp(command_type, "slot_save") == 0', 1)[1]
-        branch = branch.split('strcmp(command_type, "slot_load") == 0', 1)[0]
+        branch = typed_command_handler_body(self.dispatch, "slot_save")
         self.assertIn("strchr(command_data, ',')", branch)
         self.assertIn('"primary"', branch)
         self.assertIn('"secondary"', branch)

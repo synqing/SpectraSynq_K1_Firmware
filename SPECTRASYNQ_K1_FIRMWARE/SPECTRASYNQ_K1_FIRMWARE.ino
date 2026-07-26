@@ -1,6 +1,6 @@
 
 
-#define FIRMWARE_VERSION 40103  // Try "V" on the Serial port for this!  // 2026-05-26: bumped for CHROMA_PROFILE conf field add (Stage 2 items 18-21) — config byte layout shifted after CHROMAGRAM_RANGE; forces fresh /CONFIG_*.BIN, orphans stale 40102 blob (values re-seed to identical defaults: NOTE_OFFSET=12/CHROMAGRAM_RANGE=60/CHROMA_PROFILE=DEFAULT)  // 2026-05-20: single-domain noise_cal fix
+// FIRMWARE_VERSION lives in constants.h (40103). Try "V" on the Serial port for this!
 
 
 // Lightshow modes by name -----------------------------------------------------------

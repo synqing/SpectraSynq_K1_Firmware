@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,14 +71,14 @@ class CalibrationProfileStaticTest(unittest.TestCase):
         self.assertIn("calibration_source_name", globals_text)
 
         required = {
-            "serial dump": SERIAL_MENU,
+            "serial dump": read_serial_menu_surface(FW),
             "diagnostic status": DIAG_CAPTURE,
             "VPAB status": VPAB_CAPTURE,
             "AP stream/capture": I2S_AUDIO,
         }
         for label, path in required.items():
             with self.subTest(label=label):
-                text = path.read_text()
+                text = path if isinstance(path, str) else path.read_text()
                 self.assertIn("CAL_SOURCE", text)
                 self.assertIn("CAL_VALID", text)
                 if label != "AP stream/capture":

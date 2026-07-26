@@ -25,10 +25,15 @@ ROOT = Path(__file__).resolve().parents[1]
 PROVENANCE = ROOT / "scripts" / "platformio" / "k1_build_provenance.py"
 PLATFORMIO_INI = ROOT / "platformio.ini"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
+SERIAL_MENU_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.cpp"
 CMD_TABLE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_cmd_table.def"
 MAKE_RELEASE = ROOT / "scripts" / "release" / "make_release.py"
 
 PROVENANCE_DEFINES = ("K1_BUILD_GIT_HASH", "K1_BUILD_EPOCH", "K1_BUILD_ENV")
+
+
+def _serial_menu_surface() -> str:
+    return SERIAL_MENU.read_text(encoding="utf-8") + "\n" + SERIAL_MENU_CPP.read_text(encoding="utf-8")
 
 
 def _k1_hardware_section(ini_text: str) -> str:
@@ -81,12 +86,12 @@ def test_provenance_registered_in_k1_hardware_extra_scripts():
 # 3. Serial `build` provenance print exists and is define-guarded.
 # ---------------------------------------------------------------------------
 def test_serial_build_command_prints_provenance():
-    text = SERIAL_MENU.read_text(encoding="utf-8")
-    assert "void cmd_build()" in text, "serial_menu.h has no cmd_build() handler"
+    text = _serial_menu_surface()
+    assert "void cmd_build()" in text, "serial surface has no cmd_build() handler"
     # Build line must surface FIRMWARE_VERSION + all three provenance defines.
     assert "FIRMWARE_VERSION" in text
     for name in PROVENANCE_DEFINES:
-        assert ("#ifdef %s" % name) in text, f"{name} not guarded by #ifdef in serial_menu.h"
+        assert ("#ifdef %s" % name) in text, f"{name} not guarded by #ifdef in serial surface"
 
 
 def test_serial_build_command_registered_in_table():
@@ -98,7 +103,7 @@ def test_serial_build_command_registered_in_table():
 
 def test_version_command_left_untouched():
     # cmd_version output is locked by host goldens; provenance must not change it.
-    text = SERIAL_MENU.read_text(encoding="utf-8")
+    text = _serial_menu_surface()
     assert 'USBSerial.print("VERSION: ")' in text, "cmd_version VERSION line must remain intact"
 
 
