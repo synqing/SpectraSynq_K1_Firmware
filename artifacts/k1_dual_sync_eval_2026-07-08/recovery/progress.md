@@ -35,6 +35,24 @@
 - Hardware remains untouched; these are compile and host proofs only.
 - Hardware remains untouched.
 
+## 2026-07-27 — F0 committed and F0b reopened
+
+- F0 committed and pushed as
+  `4c1d48288fe99182748e67b0732275494210fccd`.
+- Post-commit leader/follower builds resolved NimBLE exactly `2.5.0`; remote
+  branch equality was verified.
+- F1 adversarial capture review reproduced a healthy persistent link becoming
+  `BLOCKED` when F2 attached after link-up and cleared its one-shot lifecycle
+  records.
+- Implemented a host-only F0b repair: fresh exact `:sync_status` snapshots,
+  per-role proof-context boundaries and hashed `SYNC_STATUS.json` evidence.
+- Focused current validation:
+  `103 passed, 24 subtests passed`.
+- Isolated staged-tree full regression:
+  `737 passed, 1 skipped, 83 subtests passed`.
+- Firmware serializer is implemented in the unstaged F1 work; hardware remains
+  untouched.
+
 ## 2026-07-27 — Codex SSA orchestration takeover
 
 - Captain authorised Codex to take over as SSA orchestrator.
@@ -64,6 +82,7 @@
 | dual-sync-f0-host-003 | F0 host implementation map | load-bearing | received | `recovery/ssa/f0_host_contract.md` | focused baseline and implementation tests rerun | implementation contract |
 | dual-sync-f1-fw-003 | F1 firmware/API/guard map | load-bearing | received | `recovery/ssa/f1_firmware_contract.md` | source/API checks pending F1 | F1 implementation input |
 | dual-sync-f0-review-004/005/006/007 | Adversarial F0 implementation review | load-bearing | VERIFIED | `recovery/ssa/f0_implementation_review.md` | 63 focused tests plus negative wrapper probes PASS | verified host evidence |
+| dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
 
 ## Test results
 
@@ -79,6 +98,8 @@
 | F0 production build | `bash scripts/agent/pio-build.sh k1_hardware` | SUCCESS |
 | F0 leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main` | SUCCESS; NimBLE 2.5.0 |
 | F0 follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
+| F0b focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_probe_firmware_static.py tests/test_dual_sync_oracle.py tests/test_k1_upload_guard.py` | 103 passed, 24 subtests passed |
+| F0b isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 737 passed, 1 skipped, 83 subtests passed |
 
 ## Next
 

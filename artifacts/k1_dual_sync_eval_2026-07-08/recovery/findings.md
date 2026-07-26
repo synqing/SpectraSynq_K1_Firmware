@@ -70,3 +70,20 @@ authority.
 - Persistent-link segment proofs must inherit only captured connection boundary
   records. They must not inherit an earlier segment's stream, GPIO, timing or
   health observations.
+
+## F0b late-attach finding
+
+- `verify_devices()` clears pending serial input before querying chip/build
+  identity. On already-running F2 devices that can discard the only boot/link
+  transition records while stream, clock and GPIO continue normally.
+- A reproduced healthy persistent link without those one-shot lifecycle lines
+  returns `BLOCKED` (`leader_up=0`, `follower_up=0`), so F2 requires an explicit
+  current-state replay rather than log archaeology.
+- The host now sends `:sync_status` to both roles after identity verification
+  and accepts only one exact linked ACK, LinkUp and Negotiated record per role
+  with coherent role/epoch/MTU. The raw session and parsed
+  `SYNC_STATUS.json` remain evidence.
+- Per-segment input clearing still presents a conservative false-BLOCK risk if
+  it bisects an in-flight TX/RX/apply set. It cannot manufacture PASS and is
+  retained until a firmware nonce or sequence-aware boundary exists; F2 uses
+  one `off` segment only.

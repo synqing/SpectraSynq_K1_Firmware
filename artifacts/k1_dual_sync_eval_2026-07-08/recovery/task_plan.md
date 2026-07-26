@@ -8,7 +8,7 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F0 — host trust root.
+Phase F0b — lifecycle snapshot repair discovered by adversarial F1 review.
 
 ## Phases
 
@@ -30,18 +30,32 @@ Phase F0 — host trust root.
 - [x] Per-role health and transport/apply loss split.
 - [x] Capture helper, segmented plumbing runner and A/B/C runner.
 - [x] Focused tests, full pytest, production and existing sync builds.
-- [ ] Green F0 commit; push exact committed SHA and verify remote.
+- [x] Green F0 commit; push exact committed SHA and verify remote
+  (`4c1d48288fe99182748e67b0732275494210fccd`).
+- **Status:** complete
+
+### F0b: Late-attaching capture proof
+
+- [x] Reproduce persistent healthy link becoming BLOCKED after serial input clear.
+- [x] Require fresh exact `:sync_status` lifecycle snapshots from both roles.
+- [x] Reject missing, unlinked, malformed, duplicate and incoherent snapshots.
+- [x] Persist and hash `SYNC_STATUS.json` in F2 evidence.
+- [x] Focused host tests and staged-boundary review.
+- [x] Full pytest (`737 passed, 1 skipped`) in isolated staged-tree worktree.
+- [ ] Green host-only repair commit.
 - **Status:** commit_ready
 
 ### F1: Link hardening
 
-- [ ] Advertising/scan defects A-E fixed with fail-closed diagnostics.
-- [ ] Correct Remoted compile guards and sync-only leader.
-- [ ] Mandatory build-wrapper and upload-guard registration/tests.
-- [ ] Settled negotiated BLE values recorded.
+- [x] Advertising/scan defects A-E fixed with fail-closed diagnostics.
+- [x] Correct Remoted compile guards and sync-only leader.
+- [x] Mandatory build-wrapper and upload-guard registration/tests.
+- [x] Settled negotiated BLE values recorded.
+- [x] Lifecycle snapshot serializer matches the F0b host contract.
+- [x] Application-owned GATT I/O moved off the Core-0 audio loop.
 - [ ] Focused tests, full pytest, production plus three sync builds.
 - [ ] Green F1 commit.
-- **Status:** pending
+- **Status:** in_progress
 
 ### F2: Silicon A/B/C
 
@@ -69,6 +83,7 @@ Phase F0 — host trust root.
 | Canonical authority lives in `recovery/recovery-plan.md` | The Cursor plan is outside git and cannot govern other checkouts or agents. |
 | Orchestrator owns edits, gates, commits and device actions | SSA returns are hypotheses until re-run. |
 | Existing dirty registry and wrapper edits are preserved | They pre-date this takeover and must not be silently absorbed. |
+| Reopen F0 with a narrow F0b commit | Late-attaching F2 capture otherwise discards the only lifecycle transition and falsely blocks a healthy persistent link. |
 
 ## Stop conditions
 
@@ -88,3 +103,4 @@ Phase F0 — host trust root.
 | First post-epoch focused run blocked the clean fixture because sequence zero preceded link-up | 1 | Moved synthetic proof observations behind an explicit settle offset; retained the fail-closed epoch selection. |
 | Strict capture marker check mistook `t_host_us` for a second `host_us` prefix | 1 | Match a complete `host_us` token instead of a substring; rerun focused suite. |
 | Final F0 wrapper review found locked-argument and A/B/C-order bypasses | 1 | Replaced the forwarding shell with a typed controller that derives case semantics, probes chip/build identity, enforces A→B→C and hashes its manifest evidence. |
+| F1 adversarial review found lifecycle lines were one-shot before F2 attached | 1 | Added a fresh, fail-closed `:sync_status` capture contract and F2 evidence hash before firmware is committed. |

@@ -150,6 +150,7 @@ def run(args) -> dict:
         "follower_session": case_dir / "follower_session.log",
         "verdict": case_dir / "off" / "verdict_off.json",
         "identity": case_dir / "IDENTITY.json",
+        "sync_status": case_dir / "SYNC_STATUS.json",
     }
     manifest = {
         "schema_version": 1,
@@ -186,6 +187,7 @@ def run(args) -> dict:
         },
         "capture_index": str(case_dir / "INDEX.md"),
         "identity_evidence": str(case_dir / "IDENTITY.json"),
+        "sync_status_evidence": str(case_dir / "SYNC_STATUS.json"),
         "verdict": str(case_dir / "off" / "verdict_off.json"),
     }
     _atomic_manifest(case_dir / "MANIFEST.json", manifest)

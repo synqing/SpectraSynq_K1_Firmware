@@ -508,8 +508,19 @@ def test_determinism_is_byte_identical():
 
 
 class _FakeSerial:
-    def __init__(self, *, acknowledge=True, stale=()):
+    def __init__(
+        self,
+        role,
+        *,
+        acknowledge=True,
+        stale=(),
+        status_mode="linked",
+        status_epoch=7,
+    ):
+        self.role = role
         self.acknowledge = acknowledge
+        self.status_mode = status_mode
+        self.status_epoch = status_epoch
         self.lines = [f"{line}\n".encode() for line in stale]
         self.writes = []
         self.closed = False
@@ -519,9 +530,39 @@ class _FakeSerial:
         return self.lines.pop(0) if self.lines else b""
 
     def write(self, payload):
-        self.writes.append(payload.decode().strip())
+        command = payload.decode().strip()
+        self.writes.append(command)
+        if command == ":sync_status":
+            if self.status_mode == "silent":
+                return len(payload)
+            linked = "0" if self.status_mode == "unlinked" else "1"
+            self.lines.append(
+                f"SYNC_STATUS: role={self.role} linked={linked}\n".encode()
+            )
+            if linked == "1":
+                mtu = 23 if self.status_mode == "incoherent" else 247
+                link_suffix = (
+                    " trailing=garbage"
+                    if self.status_mode == "malformed"
+                    else ""
+                )
+                self.lines.extend(
+                    [
+                        (
+                            f"[k1_sync] link up role={self.role} "
+                            f"epoch={self.status_epoch} handle=1 mtu=247"
+                            f"{link_suffix}\n"
+                        ).encode(),
+                        (
+                            f"[k1_sync] negotiated role={self.role} "
+                            f"epoch={self.status_epoch} interval_units=6 "
+                            f"latency=0 mtu={mtu} phy_tx=2 phy_rx=2\n"
+                        ).encode(),
+                    ]
+                )
+            return len(payload)
         if self.acknowledge:
-            mode = payload.decode().strip().split("=", 1)[1]
+            mode = command.split("=", 1)[1]
             self.lines.extend(
                 [
                     f"SYNC_FAULT: {mode}\n".encode(),
@@ -543,7 +584,8 @@ class _FakeSerial:
 
 class _IdentitySerial(_FakeSerial):
     def __init__(self, chip_id, env, git_hash="abcdef0"):
-        super().__init__()
+        role = "leader" if "main" in env else "follower"
+        super().__init__(role)
         self.chip_id = chip_id
         self.env = env
         self.git_hash = git_hash
@@ -605,8 +647,9 @@ def test_capture_is_non_overwriting(tmp_path):
 
 
 def test_capture_requires_fresh_exact_acks_and_restores_off(tmp_path):
-    leader = _FakeSerial()
+    leader = _FakeSerial("leader")
     follower = _FakeSerial(
+        "follower",
         stale=("SYNC_FAULT: delay5", "[k1_sync] fault=delay5")
     )
     results = capture.run_segments(
@@ -623,8 +666,9 @@ def test_capture_requires_fresh_exact_acks_and_restores_off(tmp_path):
         gate_eval.BLOCKED,
         gate_eval.BLOCKED,
     ]
-    assert follower.reset_count == 2
+    assert follower.reset_count == 3
     assert follower.writes == [
+        ":sync_status",
         ":sync_fault=delay5",
         ":sync_fault=off",
         ":sync_fault=off",
@@ -636,8 +680,8 @@ def test_capture_requires_fresh_exact_acks_and_restores_off(tmp_path):
 
 
 def test_capture_ack_failure_still_attempts_off_restoration(tmp_path):
-    leader = _FakeSerial()
-    follower = _FakeSerial(acknowledge=False)
+    leader = _FakeSerial("leader")
+    follower = _FakeSerial("follower", acknowledge=False)
     with pytest.raises(capture.CaptureContractError, match="ACK missing"):
         capture.run_segments(
             leader_port="leader",
@@ -649,7 +693,11 @@ def test_capture_ack_failure_still_attempts_off_restoration(tmp_path):
             settle_s=0,
             serial_factory=_serial_factory(leader, follower),
         )
-    assert follower.writes == [":sync_fault=delay5", ":sync_fault=off"]
+    assert follower.writes == [
+        ":sync_status",
+        ":sync_fault=delay5",
+        ":sync_fault=off",
+    ]
     index = (tmp_path / "capture" / "INDEX.md").read_text()
     assert "Capture error:" in index
     assert "Restoration error:" in index
@@ -723,6 +771,102 @@ def test_capture_probes_both_chip_and_build_identities():
     )
     assert observed["leader"]["chip_id"] == "F887A500"
     assert observed["follower"]["env"] == "k1_sync_probe_bench"
+
+
+def test_capture_sync_status_discards_stale_lifecycle_and_records_fresh():
+    stale = (
+        "[k1_sync] link up role={role} epoch=99 handle=9 mtu=23",
+        (
+            "[k1_sync] negotiated role={role} epoch=99 interval_units=24 "
+            "latency=4 mtu=23 phy_tx=1 phy_rx=1"
+        ),
+    )
+    leader = _FakeSerial(
+        "leader",
+        stale=tuple(line.format(role="leader") for line in stale),
+        status_epoch=7,
+    )
+    follower = _FakeSerial(
+        "follower",
+        stale=tuple(line.format(role="follower") for line in stale),
+        status_epoch=8,
+    )
+    leader_output = io.StringIO()
+    follower_output = io.StringIO()
+    dual = capture.DualCapture(
+        leader,
+        follower,
+        capture._RoleWriter(leader_output),
+        capture._RoleWriter(follower_output),
+    )
+    status = dual.capture_sync_status(timeout_s=0.05)
+    assert status["leader"]["epoch"] == 7
+    assert status["follower"]["epoch"] == 8
+    assert "epoch=99" not in leader_output.getvalue()
+    assert "epoch=99" not in follower_output.getvalue()
+    assert leader.writes == [":sync_status"]
+    assert follower.writes == [":sync_status"]
+
+
+@pytest.mark.parametrize(
+    ("status_mode", "message"),
+    (
+        ("silent", "response missing"),
+        ("unlinked", "reports linked=0"),
+        ("malformed", "malformed lifecycle"),
+        ("incoherent", "lifecycle is incoherent"),
+    ),
+)
+def test_capture_sync_status_fails_closed(status_mode, message):
+    leader = _FakeSerial("leader", status_mode=status_mode)
+    follower = _FakeSerial("follower")
+    dual = capture.DualCapture(
+        leader,
+        follower,
+        capture._RoleWriter(io.StringIO()),
+        capture._RoleWriter(io.StringIO()),
+    )
+    with pytest.raises(capture.CaptureContractError, match=message):
+        dual.capture_sync_status(timeout_s=0.01)
+
+
+def test_segment_proof_can_select_only_fresh_status_context():
+    old = [
+        "host_us=0 [k1_sync] link up role=leader epoch=1 handle=1 mtu=23",
+        (
+            "host_us=1 [k1_sync] negotiated role=leader epoch=1 "
+            "interval_units=24 latency=4 mtu=23 phy_tx=1 phy_rx=1"
+        ),
+    ]
+    fresh = [
+        "host_us=2 [k1_sync] link up role=leader epoch=2 handle=2 mtu=247",
+        (
+            "host_us=3 [k1_sync] negotiated role=leader epoch=2 "
+            "interval_units=6 latency=0 mtu=247 phy_tx=2 phy_rx=2"
+        ),
+    ]
+    segment = "\n".join(
+        [
+            (
+                "host_us=10 [sync_host] segment name=off phase=start "
+                "t_host_us=10"
+            ),
+            "host_us=11 [k1_sync] tx seq=10 t_leader_us=11",
+            (
+                "host_us=12 [sync_host] segment name=off phase=end "
+                "t_host_us=12"
+            ),
+            "",
+        ]
+    )
+    proof = capture._proof_text(
+        "\n".join(old + fresh) + "\n",
+        segment,
+        context_start_line=len(old),
+    )
+    assert "epoch=1" not in proof
+    assert proof.count("[k1_sync] link up") == 1
+    assert "epoch=2" in proof
 
 
 def test_f2_parser_rejects_locked_capture_overrides():

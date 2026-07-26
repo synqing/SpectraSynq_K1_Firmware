@@ -35,6 +35,9 @@ _BUILD_RE = re.compile(
     r"^BUILD:\s+version=(\S+)\s+git=([0-9A-Za-z]+)\s+"
     r"epoch=(\d+)\s+env=(\S+)$"
 )
+_SYNC_STATUS_RE = re.compile(
+    r"^SYNC_STATUS:\s+role=(leader|follower)\s+linked=(0|1)$"
+)
 
 
 class CaptureContractError(RuntimeError):
@@ -92,10 +95,12 @@ def _atomic_text(path: Path, text: str) -> None:
 class _RoleWriter:
     session_file: object
     segment_file: Optional[object] = None
+    line_count: int = 0
 
     def write(self, line: str) -> None:
         self.session_file.write(line)
         self.session_file.flush()
+        self.line_count += 1
         if self.segment_file is not None:
             self.segment_file.write(line)
             self.segment_file.flush()
@@ -252,6 +257,153 @@ class DualCapture:
             }
         return observed
 
+    @staticmethod
+    def _strict_status_record(role: str, line: str):
+        try:
+            parsed = logfmt.parse_log(
+                f"host_us=0 {line}\n",
+                strict=True,
+                expected_role=role,
+            )
+        except logfmt.LogContractError as error:
+            raise CaptureContractError(
+                f"{role} :sync_status emitted malformed lifecycle: {error}"
+            ) from error
+        if len(parsed.records) != 1:
+            raise CaptureContractError(
+                f"{role} :sync_status emitted unparseable lifecycle: {line}"
+            )
+        return parsed.records[0]
+
+    def capture_sync_status(self, timeout_s: float) -> dict:
+        """Request one fresh, coherent lifecycle snapshot from both roles.
+
+        The firmware response contract is three exact lines per role, in any
+        order:
+
+        ``SYNC_STATUS: role=<role> linked=1``
+        ``[k1_sync] link up ...``
+        ``[k1_sync] negotiated ...``
+
+        Input is cleared immediately before both commands, so lifecycle lines
+        buffered before this request cannot certify the run. Every accepted
+        response is still written to the continuous session log.
+        """
+        self.clear_pending_input()
+        context_start_line = {
+            role: self.writers[role].line_count
+            for role in ("leader", "follower")
+        }
+        command = b":sync_status\n"
+        for role in ("leader", "follower"):
+            self.streams[role].write(command)
+            self.streams[role].flush()
+
+        state = {
+            role: {"ack": False, "link_up": None, "negotiated": None}
+            for role in ("leader", "follower")
+        }
+        deadline = self._monotonic_ns() + int(max(0.0, timeout_s) * 1e9)
+        while self._monotonic_ns() < deadline:
+            received = False
+            for role in ("leader", "follower"):
+                line = self._read_one(role)
+                received = line is not None or received
+                if line is None:
+                    continue
+                if line.startswith("SYNC_STATUS:"):
+                    match = _SYNC_STATUS_RE.fullmatch(line)
+                    if match is None:
+                        raise CaptureContractError(
+                            f"{role} :sync_status malformed ACK: {line}"
+                        )
+                    response_role, linked = match.groups()
+                    if response_role != role:
+                        raise CaptureContractError(
+                            f"{role} :sync_status ACK role={response_role}"
+                        )
+                    if linked != "1":
+                        raise CaptureContractError(
+                            f"{role} :sync_status reports linked={linked}"
+                        )
+                    if state[role]["ack"]:
+                        raise CaptureContractError(
+                            f"{role} :sync_status duplicate ACK"
+                        )
+                    state[role]["ack"] = True
+                    continue
+                if "[k1_sync] link up" in line:
+                    record = self._strict_status_record(role, line)
+                    if not isinstance(record, logfmt.LinkUp):
+                        raise CaptureContractError(
+                            f"{role} :sync_status link-up type mismatch"
+                        )
+                    if state[role]["link_up"] is not None:
+                        raise CaptureContractError(
+                            f"{role} :sync_status duplicate link-up"
+                        )
+                    state[role]["link_up"] = record
+                    continue
+                if "[k1_sync] negotiated" in line:
+                    record = self._strict_status_record(role, line)
+                    if not isinstance(record, logfmt.Negotiated):
+                        raise CaptureContractError(
+                            f"{role} :sync_status negotiated type mismatch"
+                        )
+                    if state[role]["negotiated"] is not None:
+                        raise CaptureContractError(
+                            f"{role} :sync_status duplicate negotiated"
+                        )
+                    state[role]["negotiated"] = record
+
+            complete = all(
+                value["ack"]
+                and value["link_up"] is not None
+                and value["negotiated"] is not None
+                for value in state.values()
+            )
+            if complete:
+                break
+            if not received:
+                self._sleep(0.001)
+
+        missing = {
+            role: [
+                name
+                for name, value in role_state.items()
+                if value is False or value is None
+            ]
+            for role, role_state in state.items()
+        }
+        missing = {role: fields for role, fields in missing.items() if fields}
+        if missing:
+            raise CaptureContractError(
+                f"fresh exact :sync_status response missing: {missing}"
+            )
+
+        output = {"context_start_line": context_start_line}
+        for role, role_state in state.items():
+            link_up = role_state["link_up"]
+            negotiated = role_state["negotiated"]
+            if (
+                negotiated.epoch != link_up.epoch
+                or negotiated.mtu != link_up.mtu
+            ):
+                raise CaptureContractError(
+                    f"{role} :sync_status lifecycle is incoherent"
+                )
+            output[role] = {
+                "linked": True,
+                "epoch": link_up.epoch,
+                "handle": link_up.handle,
+                "mtu": link_up.mtu,
+                "interval_units": negotiated.interval_units,
+                "latency": negotiated.latency,
+                "phy_tx": negotiated.phy_tx,
+                "phy_rx": negotiated.phy_rx,
+            }
+        return output
+
 
 def _evaluate_segment(segment_dir: Path) -> tuple[dict, int]:
     leader_text = (segment_dir / "leader.log").read_text(
@@ -280,7 +432,12 @@ def _evaluate_segment(segment_dir: Path) -> tuple[dict, int]:
     return verdict, exit_code
 
 
-def _proof_text(session_text: str, segment_text: str) -> str:
+def _proof_text(
+    session_text: str,
+    segment_text: str,
+    *,
+    context_start_line: int = 0,
+) -> str:
     """Carry captured connection context into one segment proof.
 
     Only boundary records before the segment are inherited. Prior stream,
@@ -305,7 +462,9 @@ def _proof_text(session_text: str, segment_text: str) -> str:
         logfmt.Reset,
     )
     context: list[str] = []
-    for line in session_text.splitlines():
+    for line_index, line in enumerate(session_text.splitlines()):
+        if line_index < context_start_line:
+            continue
         parsed = logfmt.parse_log(line)
         if len(parsed.entries) != 1:
             continue
@@ -367,6 +526,11 @@ def run_segments(
                     out_dir / "IDENTITY.json",
                     json.dumps(identity, indent=2, sort_keys=True) + "\n",
                 )
+            sync_status = capture.capture_sync_status(ack_timeout_s)
+            _atomic_text(
+                out_dir / "SYNC_STATUS.json",
+                json.dumps(sync_status, indent=2, sort_keys=True) + "\n",
+            )
             capture.pump(settle_s)
             for segment in segments:
                 segment_dir = out_dir / segment
@@ -394,6 +558,9 @@ def run_segments(
                     (segment_dir / "leader_segment.log").read_text(
                         encoding="utf-8", errors="replace"
                     ),
+                    context_start_line=sync_status["context_start_line"][
+                        "leader"
+                    ],
                 )
                 follower_proof = _proof_text(
                     follower_session_path.read_text(
@@ -402,6 +569,9 @@ def run_segments(
                     (segment_dir / "follower_segment.log").read_text(
                         encoding="utf-8", errors="replace"
                     ),
+                    context_start_line=sync_status["context_start_line"][
+                        "follower"
+                    ],
                 )
                 _atomic_text(segment_dir / "leader.log", leader_proof)
                 _atomic_text(segment_dir / "follower.log", follower_proof)
