@@ -45,8 +45,11 @@ TRACKED_F2_REL = Path(
 
 _REMOTED_COUNTER_RE = re.compile(
     r"(?:^|\s)\[ble_remoted\]\s+counters\s+linked=(0|1)"
+    r"\s+scan_active=(0|1)\s+scan_start_ok=(\d+)"
+    r"\s+scan_start_fail=(\d+)"
     r"\s+notify=(\d+)\s+decoded=(\d+)\s+enqueued=(\d+)"
     r"\s+queue_drops=(\d+)\s+decode_errors=(\d+)"
+    r"\s+stale_generation_drops=(\d+)"
     r"\s+apply_ok=(\d+)\s+apply_fail=(\d+)"
     r"\s+link_up=(\d+)\s+link_down=(\d+)\s+connect_fail=(\d+)"
     r"\s+confirm_ok=(\d+)\s+confirm_fail=(\d+)"
@@ -332,11 +335,15 @@ def _analyse_dial(
     confirm_writes: list[dict[str, int | str]] = []
     counter_keys = (
         "linked",
+        "scan_active",
+        "scan_start_ok",
+        "scan_start_fail",
         "notify",
         "decoded",
         "enqueued",
         "queue_drops",
         "decode_errors",
+        "stale_generation_drops",
         "apply_ok",
         "apply_fail",
         "link_up",
@@ -397,6 +404,9 @@ def _analyse_dial(
     status_keys = {
         "linked",
         "generation",
+        "scan_active",
+        "scan_start_ok",
+        "scan_start_fail",
         "notify",
         "decoded",
         "enqueued",
@@ -404,6 +414,7 @@ def _analyse_dial(
         "apply_fail",
         "queue_drops",
         "decode_errors",
+        "stale_generation_drops",
         "dial_mode_apply_ok",
         "confirm_write_ok",
         "confirm_write_fail",
@@ -442,6 +453,8 @@ def _analyse_dial(
         "end": end,
     }
     endpoint_keys = (
+        "scan_start_ok",
+        "scan_start_fail",
         "notify",
         "decoded",
         "enqueued",
@@ -449,6 +462,7 @@ def _analyse_dial(
         "apply_fail",
         "queue_drops",
         "decode_errors",
+        "stale_generation_drops",
         "dial_mode_apply_ok",
         "confirm_write_ok",
         "confirm_write_fail",
@@ -475,11 +489,14 @@ def _analyse_dial(
         and baseline["generation"] == end["generation"]
     )
     monotonic_counter_keys = (
+        "scan_start_ok",
+        "scan_start_fail",
         "notify",
         "decoded",
         "enqueued",
         "queue_drops",
         "decode_errors",
+        "stale_generation_drops",
         "apply_ok",
         "apply_fail",
         "link_up",
@@ -502,11 +519,14 @@ def _analyse_dial(
     )
     checks["counter_deltas"] = counter_deltas
     shared_counter_endpoint = {
+        "scan_start_ok": "scan_start_ok",
+        "scan_start_fail": "scan_start_fail",
         "notify": "notify",
         "decoded": "decoded",
         "enqueued": "enqueued",
         "queue_drops": "queue_drops",
         "decode_errors": "decode_errors",
+        "stale_generation_drops": "stale_generation_drops",
         "apply_ok": "apply_ok",
         "apply_fail": "apply_fail",
         "confirm_ok": "confirm_write_ok",
@@ -538,9 +558,27 @@ def _analyse_dial(
         )
     )
     if case_name == "B":
+        checks["scanner_active_exact"] = (
+            len(counters) >= MIN_DIAL_SAMPLES
+            and all(sample["scan_active"] == 1 for sample in counters)
+            and baseline is not None
+            and end is not None
+            and baseline["scan_active"] == 1
+            and end["scan_active"] == 1
+        )
+        checks["scanner_start_observed"] = (
+            len(counters) >= MIN_DIAL_SAMPLES
+            and all(sample["scan_start_ok"] >= 1 for sample in counters)
+            and baseline is not None
+            and end is not None
+            and baseline["scan_start_ok"] >= 1
+            and end["scan_start_ok"] >= 1
+        )
         zero_delta = bool(endpoint_deltas) and all(
             endpoint_deltas[key] == 0
             for key in (
+                "scan_start_ok",
+                "scan_start_fail",
                 "notify",
                 "decoded",
                 "enqueued",
@@ -548,6 +586,7 @@ def _analyse_dial(
                 "apply_fail",
                 "queue_drops",
                 "decode_errors",
+                "stale_generation_drops",
                 "dial_mode_apply_ok",
                 "confirm_write_ok",
                 "confirm_write_fail",
@@ -572,6 +611,8 @@ def _analyse_dial(
             and checks["counter_monotonic"]
             and checks["counter_lifecycle_stable"]
             and checks["counter_lifecycle_zero"]
+            and checks["scanner_active_exact"]
+            and checks["scanner_start_observed"]
             and checks["endpoint_monotonic"]
             and checks["counter_endpoint_bounded"]
             and zero_delta
@@ -586,6 +627,8 @@ def _analyse_dial(
                 and (
                     not checks["counter_link_exact"]
                     or not checks["counter_lifecycle_zero"]
+                    or not checks["scanner_active_exact"]
+                    or not checks["scanner_start_observed"]
                 )
             )
             or not checks["no_lifecycle_events"]
@@ -600,6 +643,8 @@ def _analyse_dial(
                 and (
                     not checks["endpoint_link_exact"]
                     or not checks["generation_stable"]
+                    or not checks["scanner_active_exact"]
+                    or not checks["scanner_start_observed"]
                     or (
                         checks["endpoint_monotonic"]
                         and not zero_delta
@@ -620,14 +665,16 @@ def _analyse_dial(
             "checks": checks,
         }
 
-    checks["traffic_increased"] = bool(endpoint_deltas) and all(
-        endpoint_deltas[key] >= 3
-        for key in (
-            "notify",
-            "decoded",
-            "enqueued",
-            "apply_ok",
-            "dial_mode_apply_ok",
+    checks["traffic_increased"] = bool(endpoint_deltas) and (
+        endpoint_deltas["notify"] >= 1
+        and all(
+            endpoint_deltas[key] >= 3
+            for key in (
+                "decoded",
+                "enqueued",
+                "apply_ok",
+                "dial_mode_apply_ok",
+            )
         )
     )
     checks["traffic_drained"] = bool(endpoint_deltas) and (
@@ -644,7 +691,9 @@ def _analyse_dial(
         for key in (
             "queue_drops",
             "decode_errors",
+            "stale_generation_drops",
             "apply_fail",
+            "scan_start_fail",
             "confirm_write_fail",
         )
     )

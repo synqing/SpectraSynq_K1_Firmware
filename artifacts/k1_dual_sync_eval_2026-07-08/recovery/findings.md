@@ -178,3 +178,19 @@ authority.
 - This remains evidence of K1 accepting distinct mode changes, not proof that
   K718 displayed the confirmation. Physical display acceptance remains a
   Captain decision at the STOP.
+
+## F2a.3 scanner and packetisation findings
+
+- Case B previously proved only `dial_linked=0` and zero dial traffic. Because
+  capture attaches after a settle delay, the transient boot `scan_start` line
+  can be gone; a stopped Remoted scanner could therefore pass and invalidate
+  the intended scan/advertise coexistence isolation.
+- The host contract now requires both coherent status endpoints and every
+  periodic sample to report `scan_active=1`, at least one successful scanner
+  start, and no in-window restart or start failure.
+- BLE-MIDI decoding supports more than one record per notification. Case C now
+  requires at least one notification while independently requiring at least
+  three decoded, enqueued, applied and meaningful mode records. A one-packet-
+  per-detent requirement would create a false BLOCK on legal batching.
+- A new `stale_generation_drops` error counter is reserved in the host grammar
+  so the firmware can expose and fail closed on pre-disconnect queue residue.

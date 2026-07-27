@@ -42,9 +42,12 @@ _RUNTIME_ID_RE = re.compile(
 )
 _DIAL_STATUS_RE = re.compile(
     r"DIAL_STATUS: linked=(0|1)\s+generation=(\d+)"
+    r"\s+scan_active=(0|1)\s+scan_start_ok=(\d+)"
+    r"\s+scan_start_fail=(\d+)"
     r"\s+notify=(\d+)\s+decoded=(\d+)\s+enqueued=(\d+)"
     r"\s+apply_ok=(\d+)\s+apply_fail=(\d+)"
     r"\s+queue_drops=(\d+)\s+decode_errors=(\d+)"
+    r"\s+stale_generation_drops=(\d+)"
     r"\s+dial_mode_apply_ok=(\d+)"
     r"\s+confirm_write_ok=(\d+)\s+confirm_write_fail=(\d+)"
     r"\s+dial_confirm_write_ok=(\d+)"
@@ -321,6 +324,9 @@ class DualCapture:
         keys = (
             "linked",
             "generation",
+            "scan_active",
+            "scan_start_ok",
+            "scan_start_fail",
             "notify",
             "decoded",
             "enqueued",
@@ -328,6 +334,7 @@ class DualCapture:
             "apply_fail",
             "queue_drops",
             "decode_errors",
+            "stale_generation_drops",
             "dial_mode_apply_ok",
             "confirm_write_ok",
             "confirm_write_fail",

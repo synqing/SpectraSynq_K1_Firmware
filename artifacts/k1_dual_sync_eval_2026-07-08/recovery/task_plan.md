@@ -8,8 +8,8 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2a.2 — reject no-op Case-C dial evidence before committing F2b
-firmware observability.
+Phase F2a.3 — require Case-B scanner evidence and retain BLE-MIDI batching
+semantics before committing F2b firmware observability.
 
 ## Phases
 
@@ -73,6 +73,8 @@ firmware observability.
 - [x] F2a.1 periodic-counter window correction committed
   (`3077b4d5dab10811963b99bafe47729068db3bcf`).
 - [x] F2a.2 meaningful-mode host contract and no-op regression validated.
+- [x] F2a.3 Case-B scanner-active contract and batched-notification regression
+  validated.
 - [ ] F2b application-image/dial-causality firmware observability committed.
 - [x] Read-only USB serial/chip mapping and cross-target guard negatives.
 - [ ] Captain physical GPIO/K718 attestation for the selected run.
@@ -80,7 +82,7 @@ firmware observability.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** f2a2_ready_to_commit_then_firmware
+- **Status:** f2a3_ready_to_commit_then_firmware
 
 ### F3: Real Gate-0
 
@@ -101,6 +103,8 @@ firmware observability.
 | Reopen F0 with a narrow F0b commit | Late-attaching F2 capture otherwise discards the only lifecycle transition and falsely blocks a healthy persistent link. |
 | Split F2 readiness into F2a host and F2b firmware commits | The former runner trusted self-declared binaries/prior PASS JSON and could not prove causal K718 dial traffic or the flashed application image. |
 | Count only meaningful Case-C mode changes | Accepted records that leave the confirmed ordinal unchanged are traffic, not physical detent proof; three no-op records must not satisfy the Captain commitment. |
+| Prove Case-B scanner activity from sampled state | Dial-off alone cannot isolate scan/advertise coexistence if the Remoted scanner silently stopped before capture attached. |
+| Count decoded detents independently of BLE notifications | BLE-MIDI may batch multiple records in one notification; one packet per detent is not a justified transport invariant. |
 
 ## Stop conditions
 
@@ -125,3 +129,4 @@ firmware observability.
 | Initial F2 entry point was named incorrectly during read-only preflight | 1 | Located the committed `run_f2_abc.sh` → `f2_capture.py` path; no serial or device action was attempted. |
 | Independent F2 reviews returned NO-GO on evidence provenance and dial causality | 1 | Added bounded F2a/F2b closure commits before any flash; Case A remains forbidden until both validate. |
 | F2b adversarial review reproduced a Case-C no-op false PASS | 1 | Bind host evidence to three ordinal changes from the coherent baseline and require the firmware meaningful-mode counter delta to match emitted events exactly. |
+| F2b re-review found Case B could pass with no scanner and Case C overconstrained notifications | 1 | Add sampled scanner state/start counters to the host grammar; require active/stable scan in B; require at least one notify but three decoded/applied mode changes in C. |

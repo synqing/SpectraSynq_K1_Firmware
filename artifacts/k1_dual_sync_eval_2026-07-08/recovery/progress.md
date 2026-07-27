@@ -181,6 +181,23 @@
 - This correction remains host-only. Firmware observability is uncommitted and
   no device, serial or hardware action has occurred.
 
+## 2026-07-27 — F2a.3 scanner and BLE-MIDI batching contract
+
+- F2b re-review remained `NO-GO`: Case B could pass without current Remoted
+  scanner evidence, and Case C required three notifications even though one
+  notification may legally carry multiple mode records.
+- Extended the strict status/counter grammar with scanner-active, scanner-start
+  success/failure and stale-generation-drop fields.
+- Case B now requires sampled scanner activity, an observed successful start,
+  and zero in-window restart/failure. Case C requires at least one notification
+  but retains the three-record/three-meaningful-change requirement.
+- Added scanner-inactive, scanner-restart and batched-notification regressions.
+  Current host-focused validation: `78 passed`; firmware-static/upload focused
+  validation: `49 passed, 24 subtests passed`.
+- Full regression from an isolated staged tree:
+  `778 passed, 1 skipped, 86 subtests passed`.
+- No device, serial or hardware action has occurred.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -223,10 +240,14 @@
 | F2a.1 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 776 passed, 1 skipped, 86 subtests passed |
 | F2a.2 focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_oracle.py tests/test_dual_sync_probe_firmware_static.py tests/test_k1_upload_guard.py` | 126 passed, 24 subtests passed |
 | F2a.2 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 777 passed, 1 skipped, 86 subtests passed |
+| F2a.3 host focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_oracle.py` | 78 passed |
+| F2a.3 firmware-static/upload focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_probe_firmware_static.py tests/test_k1_upload_guard.py` | 49 passed, 24 subtests passed |
+| F2a.3 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 778 passed, 1 skipped, 86 subtests passed |
 
 ## Next
 
-Commit and publish the narrow F2a.2 host correction after isolated staged-tree
-regression. Then complete the separate F2b firmware-observability commit,
-independent review and production/probe builds. Do not flash until F2b passes
-and Captain provides the physical GPIO/K718 attestation.
+Commit and publish the narrow F2a.3 host correction after isolated staged-tree
+regression. Then close the remaining F2b heap-free formatting and
+generation-bound queue blockers, obtain independent approval and validate
+production/probe builds. Do not flash until F2b passes and Captain provides
+the physical GPIO/K718 attestation.

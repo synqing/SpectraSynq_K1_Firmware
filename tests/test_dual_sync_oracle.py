@@ -839,9 +839,11 @@ def test_dial_status_parser_requires_exact_complete_snapshot():
     leader = _FakeSerial("leader")
     follower = _FakeSerial("follower")
     status_line = (
-        "DIAL_STATUS: linked=1 generation=4 notify=3 decoded=3 "
+        "DIAL_STATUS: linked=1 generation=4 scan_active=0 "
+        "scan_start_ok=1 scan_start_fail=0 notify=3 decoded=3 "
         "enqueued=3 apply_ok=3 apply_fail=0 queue_drops=0 "
-        "decode_errors=0 dial_mode_apply_ok=3 confirm_write_ok=2 "
+        "decode_errors=0 stale_generation_drops=0 "
+        "dial_mode_apply_ok=3 confirm_write_ok=2 "
         "confirm_write_fail=0 dial_confirm_write_ok=1 "
         "last_confirm_pm=5 last_confirm_sm=2"
     )
@@ -1014,11 +1016,27 @@ def test_f2_order_rejects_minimal_forged_pass_manifest(tmp_path):
         )
 
 
-def _remoted_counter_line(linked, value=0):
+def _remoted_counter_line(
+    linked,
+    value=0,
+    *,
+    notify_value=None,
+    scan_active=None,
+    scan_start_ok=1,
+    scan_start_fail=0,
+    stale_generation_drops=0,
+):
+    if notify_value is None:
+        notify_value = value
+    if scan_active is None:
+        scan_active = 1 - linked
     return (
         "[ble_remoted] counters "
-        f"linked={linked} notify={value} decoded={value} enqueued={value} "
+        f"linked={linked} scan_active={scan_active} "
+        f"scan_start_ok={scan_start_ok} scan_start_fail={scan_start_fail} "
+        f"notify={notify_value} decoded={value} enqueued={value} "
         "queue_drops=0 decode_errors=0 "
+        f"stale_generation_drops={stale_generation_drops} "
         f"apply_ok={value} apply_fail=0 "
         f"link_up={linked} link_down=0 connect_fail=0 "
         f"confirm_ok={linked + (value > 0)} confirm_fail=0 "
@@ -1026,17 +1044,35 @@ def _remoted_counter_line(linked, value=0):
     )
 
 
-def _dial_status(linked, generation, value=0):
+def _dial_status(
+    linked,
+    generation,
+    value=0,
+    *,
+    notify_value=None,
+    scan_active=None,
+    scan_start_ok=1,
+    scan_start_fail=0,
+    stale_generation_drops=0,
+):
+    if notify_value is None:
+        notify_value = value
+    if scan_active is None:
+        scan_active = 1 - linked
     return {
         "linked": linked,
         "generation": generation,
-        "notify": value,
+        "scan_active": scan_active,
+        "scan_start_ok": scan_start_ok,
+        "scan_start_fail": scan_start_fail,
+        "notify": notify_value,
         "decoded": value,
         "enqueued": value,
         "apply_ok": value,
         "apply_fail": 0,
         "queue_drops": 0,
         "decode_errors": 0,
+        "stale_generation_drops": stale_generation_drops,
         "dial_mode_apply_ok": value,
         "confirm_write_ok": linked + (value > 0),
         "confirm_write_fail": 0,
@@ -1064,6 +1100,28 @@ def test_f2_case_b_requires_dial_off_and_zero_counter_delta():
     }
     result = f2_capture._analyse_dial("B", "\n".join(lines), status)
     assert result["status"] == gate_eval.PASS
+
+    scanner_inactive = [
+        line.replace("scan_active=1", "scan_active=0")
+        for line in lines
+    ]
+    inactive_status = {
+        "baseline": _dial_status(0, 0, scan_active=0),
+        "end": _dial_status(0, 0, scan_active=0),
+    }
+    inactive = f2_capture._analyse_dial(
+        "B", "\n".join(scanner_inactive), inactive_status
+    )
+    assert inactive["status"] == gate_eval.FAIL
+
+    restarted_status = {
+        "baseline": _dial_status(0, 0, scan_start_ok=1),
+        "end": _dial_status(0, 0, scan_start_ok=2),
+    }
+    restarted = f2_capture._analyse_dial(
+        "B", "\n".join(lines), restarted_status
+    )
+    assert restarted["status"] == gate_eval.FAIL
 
     traffic = {
         "baseline": _dial_status(0, 0),
@@ -1247,6 +1305,53 @@ def test_f2_case_c_periodic_samples_may_sit_inside_endpoint_window():
     assert result["checks"]["counter_endpoint_bounded"] is True
     assert result["checks"]["counter_deltas"]["notify"] == 1
     assert result["checks"]["endpoint_deltas"]["notify"] == 3
+
+
+def test_f2_case_c_allows_three_records_in_one_notification():
+    lines = []
+    for index in range(10):
+        value = min(index, 3)
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                (
+                    f"host_us={index} "
+                    f"{_remoted_counter_line(1, value, notify_value=min(value, 1))}"
+                ),
+            )
+        )
+    lines.extend(
+        (
+            (
+                "host_us=20 [ble_remoted] mode_apply record_id=5 "
+                "control=primary.mode accepted=5 apply_ok=3"
+            ),
+            (
+                "host_us=21 [ble_remoted] mode_apply record_id=6 "
+                "control=primary.mode accepted=6 apply_ok=4"
+            ),
+            (
+                "host_us=22 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=7 apply_ok=5"
+            ),
+            (
+                "host_us=23 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=7 sm=2"
+            ),
+        )
+    )
+    status = {
+        "baseline": _dial_status(1, 4),
+        "end": _dial_status(1, 4, 3, notify_value=1),
+    }
+    status["end"]["last_confirm_pm"] = 7
+    result = f2_capture._analyse_dial("C", "\n".join(lines), status)
+    assert result["status"] == gate_eval.PASS
+    assert result["checks"]["endpoint_deltas"]["notify"] == 1
+    assert result["checks"]["endpoint_deltas"]["decoded"] == 3
 
 
 def test_f2_case_c_rejects_duplicate_noop_mode_records():
