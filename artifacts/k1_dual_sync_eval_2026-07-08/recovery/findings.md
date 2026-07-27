@@ -163,3 +163,18 @@ authority.
   traffic cannot manufacture PASS.
 - Regressed endpoint snapshots remain `BLOCKED`; a monotonic endpoint window
   contradicted by periodic cumulative values is `FAIL`.
+
+## F2a.2 meaningful-mode finding
+
+- The first F2b implementation labelled every accepted primary/secondary mode
+  record as a dial-mode application, even when the accepted ordinal already
+  matched the committed mode. Three duplicate no-op records plus one
+  confirmation could therefore satisfy the Case-C host contract without three
+  real mode changes.
+- Case-C evidence now derives a per-control ordinal sequence from the coherent
+  baseline `last_confirm_pm`/`last_confirm_sm`, counts only changes, requires at
+  least three meaningful events, and requires the endpoint
+  `dial_mode_apply_ok` delta to equal that event count.
+- This remains evidence of K1 accepting distinct mode changes, not proof that
+  K718 displayed the confirmation. Physical display acceptance remains a
+  Captain decision at the STOP.

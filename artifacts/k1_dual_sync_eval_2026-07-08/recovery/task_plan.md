@@ -8,8 +8,8 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2b — add application identity and causal dial observability before
-silicon.
+Phase F2a.2 — reject no-op Case-C dial evidence before committing F2b
+firmware observability.
 
 ## Phases
 
@@ -70,7 +70,9 @@ silicon.
   rejected as forgeable and insufficient for Case-C dial causality.
 - [x] F2a guarded-upload and recursive evidence contract committed
   (`0a1100bc8525ecc1d3d29f64454b9e8e78f9dd19`).
-- [ ] F2a.1 periodic-counter window correction committed.
+- [x] F2a.1 periodic-counter window correction committed
+  (`3077b4d5dab10811963b99bafe47729068db3bcf`).
+- [x] F2a.2 meaningful-mode host contract and no-op regression validated.
 - [ ] F2b application-image/dial-causality firmware observability committed.
 - [x] Read-only USB serial/chip mapping and cross-target guard negatives.
 - [ ] Captain physical GPIO/K718 attestation for the selected run.
@@ -78,7 +80,7 @@ silicon.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** host_contract_correction_then_firmware
+- **Status:** f2a2_ready_to_commit_then_firmware
 
 ### F3: Real Gate-0
 
@@ -98,6 +100,7 @@ silicon.
 | Existing dirty registry and wrapper edits are preserved | They pre-date this takeover and must not be silently absorbed. |
 | Reopen F0 with a narrow F0b commit | Late-attaching F2 capture otherwise discards the only lifecycle transition and falsely blocks a healthy persistent link. |
 | Split F2 readiness into F2a host and F2b firmware commits | The former runner trusted self-declared binaries/prior PASS JSON and could not prove causal K718 dial traffic or the flashed application image. |
+| Count only meaningful Case-C mode changes | Accepted records that leave the confirmed ordinal unchanged are traffic, not physical detent proof; three no-op records must not satisfy the Captain commitment. |
 
 ## Stop conditions
 
@@ -121,3 +124,4 @@ silicon.
 | F1 concurrency review found cross-generation characteristic writes and lossy clock callback timing | 1 | Moved periodic application GATT I/O to Core 1, made lifecycle publication generation-bound, deferred leader advertising restart, and queued callback-time clock timestamps with generation. |
 | Initial F2 entry point was named incorrectly during read-only preflight | 1 | Located the committed `run_f2_abc.sh` → `f2_capture.py` path; no serial or device action was attempted. |
 | Independent F2 reviews returned NO-GO on evidence provenance and dial causality | 1 | Added bounded F2a/F2b closure commits before any flash; Case A remains forbidden until both validate. |
+| F2b adversarial review reproduced a Case-C no-op false PASS | 1 | Bind host evidence to three ordinal changes from the coherent baseline and require the firmware meaningful-mode counter delta to match emitted events exactly. |

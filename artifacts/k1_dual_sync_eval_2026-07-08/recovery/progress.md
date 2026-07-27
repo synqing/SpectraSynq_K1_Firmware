@@ -161,6 +161,23 @@
 - Focused host regression after the correction: `76 passed`.
 - Full regression from an isolated staged tree:
   `776 passed, 1 skipped, 86 subtests passed`.
+- F2a.1 committed and published as
+  `3077b4d5dab10811963b99bafe47729068db3bcf`
+  (`fix(dual-sync): bound F2 periodic evidence window`).
+- Local and remote branch tips were verified equal at that SHA.
+
+## 2026-07-27 — F2a.2 no-op dial-proof correction
+
+- Independent F2b red-team review reproduced a false-PASS path: three accepted
+  mode records that all retained the already-confirmed ordinal were counted as
+  three physical mode changes.
+- The host analyser now derives meaningful primary/secondary ordinal changes
+  from the coherent baseline, requires at least three, and requires the
+  `dial_mode_apply_ok` endpoint delta to match those events exactly.
+- Added an adversarial duplicate/no-op regression. Current focused F2 gate:
+  `126 passed, 24 subtests passed`.
+- Full regression from an isolated staged tree:
+  `777 passed, 1 skipped, 86 subtests passed`.
 - This correction remains host-only. Firmware observability is uncommitted and
   no device, serial or hardware action has occurred.
 
@@ -174,7 +191,7 @@
 | dual-sync-f0-review-004/005/006/007 | Adversarial F0 implementation review | load-bearing | VERIFIED | `recovery/ssa/f0_implementation_review.md` | 63 focused tests plus negative wrapper probes PASS | verified host evidence |
 | dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
 | dual-sync-f1-concurrency-009/010 | Adversarial connection-generation and Core ownership review | load-bearing | APPROVE | current source citations in SSA return | focused tests, four builds and full regression PASS | verified F1 evidence |
-| dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b pending | current-source SSA returns | read-only USB/guard checks, 75 focused tests and 775-test full regression | verified F2a evidence |
+| dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b NO-GO findings under repair | current-source SSA returns | read-only USB/guard checks; F2a tests; no-op, generation and serial-allocation reproductions | verified F2a evidence and F2b repair input |
 
 ## Test results
 
@@ -204,10 +221,12 @@
 | F2a full current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 775 passed, 1 skipped, 86 subtests passed |
 | F2a.1 focused current | `python3 -m pytest -q tests/test_dual_sync_oracle.py` | 76 passed |
 | F2a.1 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 776 passed, 1 skipped, 86 subtests passed |
+| F2a.2 focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_oracle.py tests/test_dual_sync_probe_firmware_static.py tests/test_k1_upload_guard.py` | 126 passed, 24 subtests passed |
+| F2a.2 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 777 passed, 1 skipped, 86 subtests passed |
 
 ## Next
 
-Commit and publish the narrow F2a.1 host correction. Then implement the
-separate minimal F2b firmware-observability commit and validate production plus
-all probe builds. Do not flash until both commits pass and Captain provides the
-physical GPIO/K718 attestation.
+Commit and publish the narrow F2a.2 host correction after isolated staged-tree
+regression. Then complete the separate F2b firmware-observability commit,
+independent review and production/probe builds. Do not flash until F2b passes
+and Captain provides the physical GPIO/K718 attestation.

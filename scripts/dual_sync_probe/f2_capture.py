@@ -651,10 +651,24 @@ def _analyse_dial(
     checks["dial_confirmation_increased"] = bool(endpoint_deltas) and (
         endpoint_deltas["dial_confirm_write_ok"] >= 1
     )
+    meaningful_modes: list[dict[str, int | str]] = []
+    if baseline is not None:
+        confirmed_mode = {
+            "primary.mode": baseline["last_confirm_pm"],
+            "secondary.mode": baseline["last_confirm_sm"],
+        }
+        for event in mode_applies:
+            control = str(event["control"])
+            accepted = int(event["accepted"])
+            if (
+                int(event["apply_ok"]) > 0
+                and accepted != confirmed_mode[control]
+            ):
+                meaningful_modes.append(event)
+                confirmed_mode[control] = accepted
     successful_modes = {
         int(event["record_id"]): event
-        for event in mode_applies
-        if int(event["apply_ok"]) > 0
+        for event in meaningful_modes
     }
     causal_confirmations = [
         event
@@ -682,6 +696,12 @@ def _analyse_dial(
         )
     ]
     checks["mode_apply_events"] = mode_applies
+    checks["meaningful_mode_changes"] = meaningful_modes
+    checks["meaningful_mode_change_count"] = len(meaningful_modes)
+    checks["mode_apply_counter_matches_events"] = (
+        bool(endpoint_deltas)
+        and endpoint_deltas["dial_mode_apply_ok"] == len(meaningful_modes)
+    )
     checks["confirm_write_events"] = confirm_writes
     checks["causal_confirmations"] = causal_confirmations
     checks["causal_confirmation_present"] = bool(causal_confirmations)
@@ -698,6 +718,8 @@ def _analyse_dial(
         and checks["traffic_increased"]
         and checks["counter_traffic_observed"]
         and checks["traffic_drained"]
+        and checks["meaningful_mode_change_count"] >= 3
+        and checks["mode_apply_counter_matches_events"]
         and checks["error_deltas_zero"]
         and checks["dial_confirmation_increased"]
         and checks["causal_confirmation_present"]

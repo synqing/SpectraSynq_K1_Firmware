@@ -1108,12 +1108,20 @@ def test_f2_case_c_requires_causal_mode_confirmation():
     lines.extend(
         (
             (
-                "host_us=20 [ble_remoted] mode_apply record_id=7 "
+                "host_us=20 [ble_remoted] mode_apply record_id=5 "
                 "control=primary.mode accepted=5 apply_ok=3"
             ),
             (
-                "host_us=21 [ble_remoted] confirm_write ok=1 "
-                "cause=dial_mode record_id=7 generation=4 pm=5 sm=2"
+                "host_us=21 [ble_remoted] mode_apply record_id=6 "
+                "control=primary.mode accepted=6 apply_ok=4"
+            ),
+            (
+                "host_us=22 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=7 apply_ok=5"
+            ),
+            (
+                "host_us=23 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=7 sm=2"
             ),
         )
     )
@@ -1121,6 +1129,7 @@ def test_f2_case_c_requires_causal_mode_confirmation():
         "baseline": _dial_status(1, 4),
         "end": _dial_status(1, 4, 3),
     }
+    status["end"]["last_confirm_pm"] = 7
     result = f2_capture._analyse_dial("C", "\n".join(lines), status)
     assert result["status"] == gate_eval.PASS
 
@@ -1147,7 +1156,7 @@ def test_f2_case_c_requires_causal_mode_confirmation():
                 f"host_us={index} {_remoted_counter_line(1, 0)}",
             )
         )
-    fixed_periodic.extend(lines[-2:])
+    fixed_periodic.extend(lines[-4:])
     split = f2_capture._analyse_dial(
         "C", "\n".join(fixed_periodic), status
     )
@@ -1164,23 +1173,31 @@ def test_f2_case_c_requires_causal_mode_confirmation():
         line.replace("confirm_pm=4", "confirm_pm=5").replace(
             "confirm_pm=5", "confirm_pm=3"
         )
-        for line in lines[:-2]
+        for line in lines[:20]
     ]
     decreasing_gauge_lines.extend(
         (
             (
-                "host_us=20 [ble_remoted] mode_apply record_id=7 "
-                "control=primary.mode accepted=3 apply_ok=3"
+                "host_us=20 [ble_remoted] mode_apply record_id=5 "
+                "control=primary.mode accepted=4 apply_ok=3"
             ),
             (
-                "host_us=21 [ble_remoted] confirm_write ok=1 "
-                "cause=dial_mode record_id=7 generation=4 pm=3 sm=2"
+                "host_us=21 [ble_remoted] mode_apply record_id=6 "
+                "control=primary.mode accepted=3 apply_ok=4"
+            ),
+            (
+                "host_us=22 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=2 apply_ok=5"
+            ),
+            (
+                "host_us=23 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=2 sm=2"
             ),
         )
     )
     decreasing_status = json.loads(json.dumps(status))
     decreasing_status["baseline"]["last_confirm_pm"] = 5
-    decreasing_status["end"]["last_confirm_pm"] = 3
+    decreasing_status["end"]["last_confirm_pm"] = 2
     gauge_result = f2_capture._analyse_dial(
         "C", "\n".join(decreasing_gauge_lines), decreasing_status
     )
@@ -1203,12 +1220,20 @@ def test_f2_case_c_periodic_samples_may_sit_inside_endpoint_window():
     lines.extend(
         (
             (
-                "host_us=20 [ble_remoted] mode_apply record_id=7 "
+                "host_us=20 [ble_remoted] mode_apply record_id=5 "
                 "control=primary.mode accepted=5 apply_ok=3"
             ),
             (
-                "host_us=21 [ble_remoted] confirm_write ok=1 "
-                "cause=dial_mode record_id=7 generation=4 pm=5 sm=2"
+                "host_us=21 [ble_remoted] mode_apply record_id=6 "
+                "control=primary.mode accepted=6 apply_ok=4"
+            ),
+            (
+                "host_us=22 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=7 apply_ok=5"
+            ),
+            (
+                "host_us=23 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=7 sm=2"
             ),
         )
     )
@@ -1216,11 +1241,46 @@ def test_f2_case_c_periodic_samples_may_sit_inside_endpoint_window():
         "baseline": _dial_status(1, 4),
         "end": _dial_status(1, 4, 3),
     }
+    status["end"]["last_confirm_pm"] = 7
     result = f2_capture._analyse_dial("C", "\n".join(lines), status)
     assert result["status"] == gate_eval.PASS
     assert result["checks"]["counter_endpoint_bounded"] is True
     assert result["checks"]["counter_deltas"]["notify"] == 1
     assert result["checks"]["endpoint_deltas"]["notify"] == 3
+
+
+def test_f2_case_c_rejects_duplicate_noop_mode_records():
+    lines = []
+    for index in range(10):
+        value = min(index, 3)
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(1, value)}",
+            )
+        )
+    for record_id in (5, 6, 7):
+        lines.append(
+            f"host_us={20 + record_id} [ble_remoted] mode_apply "
+            f"record_id={record_id} control=primary.mode "
+            f"accepted=5 apply_ok={record_id - 2}"
+        )
+    lines.append(
+        "host_us=30 [ble_remoted] confirm_write ok=1 "
+        "cause=dial_mode record_id=7 generation=4 pm=5 sm=2"
+    )
+    status = {
+        "baseline": _dial_status(1, 4),
+        "end": _dial_status(1, 4, 3),
+    }
+    status["baseline"]["last_confirm_pm"] = 5
+    status["end"]["last_confirm_pm"] = 5
+    result = f2_capture._analyse_dial("C", "\n".join(lines), status)
+    assert result["status"] != gate_eval.PASS
+    assert result["checks"]["meaningful_mode_change_count"] == 0
 
 
 def test_f2_dial_status_is_fail_closed_on_missing_or_regressed_snapshot():
