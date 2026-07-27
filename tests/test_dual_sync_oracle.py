@@ -1038,7 +1038,7 @@ def _dial_status(linked, generation, value=0):
         "queue_drops": 0,
         "decode_errors": 0,
         "dial_mode_apply_ok": value,
-        "confirm_write_ok": 1 + (value > 0),
+        "confirm_write_ok": linked + (value > 0),
         "confirm_write_fail": 0,
         "dial_confirm_write_ok": 1 if value > 0 else 0,
         "last_confirm_pm": 5 if value else 4,
@@ -1185,6 +1185,42 @@ def test_f2_case_c_requires_causal_mode_confirmation():
         "C", "\n".join(decreasing_gauge_lines), decreasing_status
     )
     assert gauge_result["status"] == gate_eval.PASS
+
+
+def test_f2_case_c_periodic_samples_may_sit_inside_endpoint_window():
+    lines = []
+    for index in range(10):
+        value = min(index + 1, 2)
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(1, value)}",
+            )
+        )
+    lines.extend(
+        (
+            (
+                "host_us=20 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=5 apply_ok=3"
+            ),
+            (
+                "host_us=21 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=5 sm=2"
+            ),
+        )
+    )
+    status = {
+        "baseline": _dial_status(1, 4),
+        "end": _dial_status(1, 4, 3),
+    }
+    result = f2_capture._analyse_dial("C", "\n".join(lines), status)
+    assert result["status"] == gate_eval.PASS
+    assert result["checks"]["counter_endpoint_bounded"] is True
+    assert result["checks"]["counter_deltas"]["notify"] == 1
+    assert result["checks"]["endpoint_deltas"]["notify"] == 3
 
 
 def test_f2_dial_status_is_fail_closed_on_missing_or_regressed_snapshot():

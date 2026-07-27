@@ -8,7 +8,8 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2a — harden the evidence/upload contract before silicon.
+Phase F2b — add application identity and causal dial observability before
+silicon.
 
 ## Phases
 
@@ -67,7 +68,9 @@ Phase F2a — harden the evidence/upload contract before silicon.
 
 - [x] Independent host/firmware F2 preflight review completed; existing runner
   rejected as forgeable and insufficient for Case-C dial causality.
-- [ ] F2a guarded-upload and recursive evidence contract committed.
+- [x] F2a guarded-upload and recursive evidence contract committed
+  (`0a1100bc8525ecc1d3d29f64454b9e8e78f9dd19`).
+- [ ] F2a.1 periodic-counter window correction committed.
 - [ ] F2b application-image/dial-causality firmware observability committed.
 - [x] Read-only USB serial/chip mapping and cross-target guard negatives.
 - [ ] Captain physical GPIO/K718 attestation for the selected run.
@@ -75,7 +78,7 @@ Phase F2a — harden the evidence/upload contract before silicon.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** preflight_pending
+- **Status:** host_contract_correction_then_firmware
 
 ### F3: Real Gate-0
 

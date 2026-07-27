@@ -149,3 +149,17 @@ authority.
   detect.
 - No device was flashed and no manual serial command was sent during this
   preflight.
+
+## F2a.1 periodic-window finding
+
+- A baseline `:dial_status` snapshot precedes the segment and the end snapshot
+  follows its capture, while the first and last 1 Hz counter lines necessarily
+  sit inside that interval. Exact equality between their deltas is therefore
+  impossible whenever traffic occurs before the first periodic sample or after
+  the last.
+- The evidence contract now requires each cumulative periodic counter to stay
+  between its coherent baseline and end values. Case C separately requires
+  positive periodic notify/decode/enqueue/apply movement, so endpoint-only
+  traffic cannot manufacture PASS.
+- Regressed endpoint snapshots remain `BLOCKED`; a monotonic endpoint window
+  contradicted by periodic cumulative values is `FAIL`.

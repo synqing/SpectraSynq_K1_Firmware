@@ -512,12 +512,20 @@ def _analyse_dial(
         "confirm_ok": "confirm_write_ok",
         "confirm_fail": "confirm_write_fail",
     }
-    checks["counter_endpoint_agree"] = (
-        bool(counter_deltas)
-        and bool(endpoint_deltas)
+    # The status endpoints bracket the segment, while the first/last 1 Hz
+    # samples necessarily fall inside it. Their deltas therefore cannot be
+    # required to match exactly: that would discard traffic before the first
+    # periodic sample and after the last. Absolute cumulative values must
+    # instead remain bounded by the coherent endpoint snapshots.
+    checks["counter_endpoint_bounded"] = (
+        len(counters) >= MIN_DIAL_SAMPLES
+        and baseline is not None
+        and end is not None
         and all(
-            counter_deltas[counter_key]
-            == endpoint_deltas[endpoint_key]
+            baseline[endpoint_key]
+            <= counters[0][counter_key]
+            <= counters[-1][counter_key]
+            <= end[endpoint_key]
             for counter_key, endpoint_key in shared_counter_endpoint.items()
         )
     )
@@ -565,7 +573,7 @@ def _analyse_dial(
             and checks["counter_lifecycle_stable"]
             and checks["counter_lifecycle_zero"]
             and checks["endpoint_monotonic"]
-            and checks["counter_endpoint_agree"]
+            and checks["counter_endpoint_bounded"]
             and zero_delta
         )
         observed_contradiction = (
@@ -581,6 +589,12 @@ def _analyse_dial(
                 )
             )
             or not checks["no_lifecycle_events"]
+            or (
+                len(counters) >= MIN_DIAL_SAMPLES
+                and status_pair_valid
+                and checks["endpoint_monotonic"]
+                and not checks["counter_endpoint_bounded"]
+            )
             or (
                 status_pair_valid
                 and (
@@ -620,6 +634,10 @@ def _analyse_dial(
         endpoint_deltas["decoded"]
         == endpoint_deltas["enqueued"]
         == endpoint_deltas["apply_ok"]
+    )
+    checks["counter_traffic_observed"] = bool(counter_deltas) and all(
+        counter_deltas[key] >= 1
+        for key in ("notify", "decoded", "enqueued", "apply_ok")
     )
     checks["error_deltas_zero"] = bool(endpoint_deltas) and all(
         endpoint_deltas[key] == 0
@@ -676,8 +694,9 @@ def _analyse_dial(
         and checks["counter_monotonic"]
         and checks["counter_lifecycle_stable"]
         and checks["endpoint_monotonic"]
-        and checks["counter_endpoint_agree"]
+        and checks["counter_endpoint_bounded"]
         and checks["traffic_increased"]
+        and checks["counter_traffic_observed"]
         and checks["traffic_drained"]
         and checks["error_deltas_zero"]
         and checks["dial_confirmation_increased"]
@@ -693,6 +712,12 @@ def _analyse_dial(
             and not checks["counter_link_exact"]
         )
         or not checks["no_lifecycle_events"]
+        or (
+            len(counters) >= MIN_DIAL_SAMPLES
+            and status_pair_valid
+            and checks["endpoint_monotonic"]
+            and not checks["counter_endpoint_bounded"]
+        )
         or (
             status_pair_valid
             and (

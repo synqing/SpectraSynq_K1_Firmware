@@ -148,6 +148,22 @@
 - Hardware remains untouched. F2b firmware observability is still required
   before Case A.
 
+## 2026-07-27 — F2a committed, then periodic-window correction
+
+- F2a committed and published as
+  `0a1100bc8525ecc1d3d29f64454b9e8e78f9dd19`
+  (`fix(dual-sync): harden F2 evidence and upload contract`).
+- Pre-silicon review reproduced a false-BLOCK path: the endpoint snapshots
+  bracket the capture, but the first/last 1 Hz samples sit inside it, so their
+  deltas cannot be exactly equal under live traffic.
+- Replaced equality with cumulative endpoint bounds and retained an independent
+  positive-periodic-traffic requirement for Case C.
+- Focused host regression after the correction: `76 passed`.
+- Full regression from an isolated staged tree:
+  `776 passed, 1 skipped, 86 subtests passed`.
+- This correction remains host-only. Firmware observability is uncommitted and
+  no device, serial or hardware action has occurred.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -186,10 +202,12 @@
 | F2a focused current | `PYTHONPATH=. python3 -m pytest -q tests/test_dual_sync_oracle.py` | 75 passed |
 | F2a syntax | `python3 -m py_compile ...`; `bash -n run_f2_abc.sh run_f2_flash.sh`; `git diff --check` | PASS |
 | F2a full current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 775 passed, 1 skipped, 86 subtests passed |
+| F2a.1 focused current | `python3 -m pytest -q tests/test_dual_sync_oracle.py` | 76 passed |
+| F2a.1 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 776 passed, 1 skipped, 86 subtests passed |
 
 ## Next
 
-Complete adversarial F2a review and commit the host contract. Then implement
-the separate minimal F2b firmware-observability commit and validate all probe
-builds. Do not flash until both commits pass and Captain provides the physical
-GPIO/K718 attestation.
+Commit and publish the narrow F2a.1 host correction. Then implement the
+separate minimal F2b firmware-observability commit and validate production plus
+all probe builds. Do not flash until both commits pass and Captain provides the
+physical GPIO/K718 attestation.
