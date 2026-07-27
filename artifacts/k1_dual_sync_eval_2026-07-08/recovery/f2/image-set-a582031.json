@@ -1,0 +1,65 @@
+{
+  "schema_version": 2,
+  "status": "BLOCKED",
+  "blockers": [
+    "The reviewed k1_sync_probe_main_sync_only BIN and ELF are not present in the raw image pack.",
+    "Three bounded reproductions at a582031 did not match the reviewed BIN and ELF SHA-256 identities."
+  ],
+  "firmware_source_sha": "a58203183208a4db7fcc7a30d060e6db14673ab1",
+  "raw_pack_relative_path": "_scratch/dual_sync_f2_image_set_a582031",
+  "esptool_package": "tool-esptoolpy@4.8.9",
+  "package_provenance": {
+    "platformio": "6.1.19",
+    "python": "3.14.3",
+    "platform": "54.03.20",
+    "framework_arduino": "3.2.0",
+    "framework_espidf_libraries": "5.4.0+sha.2f7dcd862a",
+    "toolchain_xtensa": "14.2.0+20241119",
+    "toolchain_riscv": "14.2.0+20241119",
+    "nimble_arduino": "2.5.0",
+    "fastled": "3.10.3",
+    "fixedpoints": "1.1.2",
+    "m5rotate8": "0.4.1"
+  },
+  "partition_table": {
+    "path": "k1_sync_probe_main/partitions.bin",
+    "sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+    "offset": 32768,
+    "size": 3072,
+    "application_label": "app0",
+    "application_offset": 65536,
+    "application_size": 6553600
+  },
+  "images": {
+    "k1_sync_probe_main_sync_only": {
+      "role": "leader",
+      "required_chip": "F887A500",
+      "available": false,
+      "bin_path": "k1_sync_probe_main_sync_only/firmware.bin",
+      "bin_sha256": "8750774afbd2e2ff233015946a337757259efc1c38895accc64318731dc95c61",
+      "elf_path": "k1_sync_probe_main_sync_only/firmware.elf",
+      "elf_sha256": "f062eab2e3416da94e18d1a2f3b4acb999dfcec8d4c50a458c0e1a6514503b9a",
+      "app_elf_sha256": "f062eab2e3416da94e18d1a2f3b4acb999dfcec8d4c50a458c0e1a6514503b9a"
+    },
+    "k1_sync_probe_main": {
+      "role": "leader",
+      "required_chip": "F887A500",
+      "available": true,
+      "bin_path": "k1_sync_probe_main/firmware.bin",
+      "bin_sha256": "732fb6afbbe84baa1a504b94760d0c65ba6527b1e49714769bc576a1ac7e8874",
+      "elf_path": "k1_sync_probe_main/firmware.elf",
+      "elf_sha256": "03f93e9704e771adb602fbf6c084c7c3d061d38ef00195aa3e8282da0f736a63",
+      "app_elf_sha256": "03f93e9704e771adb602fbf6c084c7c3d061d38ef00195aa3e8282da0f736a63"
+    },
+    "k1_sync_probe_bench": {
+      "role": "follower",
+      "required_chip": "B489A500",
+      "available": true,
+      "bin_path": "k1_sync_probe_bench/firmware.bin",
+      "bin_sha256": "3552db9f108dca29be2b27c156676290a28216c397666805a39cd9ebb5c34c7f",
+      "elf_path": "k1_sync_probe_bench/firmware.elf",
+      "elf_sha256": "3e2ccf6136425c453103023697b53c9995b0f2ffb7e8b80b4a147197b8901740",
+      "app_elf_sha256": "3e2ccf6136425c453103023697b53c9995b0f2ffb7e8b80b4a147197b8901740"
+    }
+  }
+}

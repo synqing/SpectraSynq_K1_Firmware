@@ -2,7 +2,9 @@
 
 **Debrief date:** 2026-07-28
 **Branch:** `lane/dual-sync-phase0`
-**Repository HEAD:** `4d685a859f19f0a141028b739b49a54503ad56ad`
+**Host execution authority:** symbolic `HOST_EXECUTION_SHA`; the concrete
+value is frozen in the first immutable F2 run manifest after the controller
+commit exists
 **Firmware source commit:** `a58203183208a4db7fcc7a30d060e6db14673ab1`
 **Baseline before recovery:** `3a9724e`
 **Canonical authority:** [recovery-plan.md](recovery-plan.md)
@@ -14,13 +16,16 @@
 
 ## 1. Executive verdict
 
-The recovery implementation is **complete through the host, firmware-source,
-build and pre-silicon evidence boundary**.
+The recovery implementation is complete through F0, F1 and the reviewed
+firmware source. The amended F2 host controller is being closed against a
+strict reviewed-image gate.
 
 It is **not complete on silicon**.
 
-The repaired firmware has not been flashed to either K1. Cases A, B and C have
-not been run. There is therefore no valid claim yet that:
+The repaired firmware has not been flashed to either K1. Cases A, B, C1 and C2
+have not been run. The reviewed sync-only Case-A image is missing, and three
+bounded reproductions did not match its reviewed BIN/ELF hashes. There is
+therefore no valid claim yet that:
 
 - SyncLink establishes on the repaired firmware;
 - the dual-role leader can scan for K718 while advertising SyncLink;
@@ -31,7 +36,8 @@ not been run. There is therefore no valid claim yet that:
 
 The correct immediate status is:
 
-> **APPROVED FOR F2 CASE-A EXECUTION AFTER CAPTAIN PHYSICAL ATTESTATION.**
+> **F2 HARDWARE NO-GO: recover the exact reviewed sync-only image or obtain a
+> separate Captain decision for a complete new frozen image set.**
 
 The following are still explicitly forbidden:
 
@@ -52,9 +58,10 @@ The following are still explicitly forbidden:
 | F0 host trust root | **COMPLETE** | Fail-closed oracle, coherent Link Ready, strict grammar and tests | Real-device Link Ready |
 | F0b late-attach recovery | **COMPLETE** | Current lifecycle replay prevents false blocking after capture attaches | Behaviour on the repaired devices |
 | F1 BLE hardening | **COMPLETE at source/build** | Defects A-E repaired; generation and Core-ownership defects closed; four builds green | Real advertisement, discovery and connection on the two K1s |
-| F2a evidence controller | **COMPLETE** | Identity-guarded flash/capture, recursive evidence validation, attestations and causal Case-C contract | Actual A/B/C evidence |
+| F2a/F2b prior controller | **SUPERSEDED FOR EXECUTION** | Earlier identity, capture and observability repairs remain useful | Its build-coupled upload and single Case C are no longer authorised |
+| F2c amended controller | **HOST COMPLETE / IMAGE BLOCKED** | Split host/firmware authority, exact-image writer, chained ports, C1/C2, immutable feedback/status; full regression green | Complete reviewed image set |
 | F2b runtime observability | **COMPLETE at source/build** | Image/runtime identity, scanner/dial counters, generation-bound queue and decoder reset | Live counter behaviour and dial causality |
-| F2 silicon A/B/C | **NOT STARTED** | Read-only USB/chip mapping and negative cross-target guards | Every case verdict |
+| F2 silicon A/B/C1/C2 | **BLOCKED / NOT STARTED** | Read-only USB/chip mapping, negative cross-target guards and two reviewed images | Complete image set and every case verdict |
 | Captain STOP | **PENDING** | Format and fail-closed production path exist | A populated/accepted STOP report |
 | F3 real Gate-0 | **BLOCKED / NOT STARTED** | Scope and causal boundary are defined | Real delays, clock fault, AP p95, LED instrumentation, semantic payload and soak |
 | Phase 0 | **NOT COMPLETE** | Recovery machinery exists | Product-level measuring Gate-0 |
@@ -79,7 +86,7 @@ The starting situation included:
 - no trustworthy way to distinguish current source, built image and running
   application;
 - no causal proof that K718 detents became meaningful K1 mode changes;
-- no A/B/C evidence pack;
+- no A/B/C1/C2 evidence pack;
 - no safe path from F2 into F3.
 
 The recovery deliberately did **not** retry the old Gate-0. It first repaired
@@ -90,12 +97,10 @@ machinery required to touch silicon safely.
 
 ## 3. Scope delivered
 
-From baseline `3a9724e` to current HEAD `4d685a8`, the recovery changed:
-
-- **44 files**
-- **10,754 insertions**
-- **1,151 deletions**
-- **11 narrow commits**
+The recovery spans a sequence of narrow committed checkpoints plus the F2c
+controller tranche. The authority document deliberately does not embed a
+volatile “current HEAD”: the concrete `HOST_EXECUTION_SHA` belongs in the first
+immutable F2 run manifest after the final controller commit exists.
 
 The changes cover:
 
@@ -128,20 +133,23 @@ The changes cover:
 | 10 | `a582031` | Add F2 image and dial-causality firmware evidence | Added runtime identity, counters, generation safety and decoder reset |
 | 11 | `4d685a8` | Record immutable F2b image evidence | Preserved final image hashes and moved the phase to physical attestation |
 
-Local and remote `lane/dual-sync-phase0` refs both resolve to
-`4d685a859f19f0a141028b739b49a54503ad56ad`.
+Before F2c began, local and remote `lane/dual-sync-phase0` refs both resolved
+to `4d685a859f19f0a141028b739b49a54503ad56ad`. That is a historical checkpoint,
+not the F2 host authority.
 
 ### Important provenance split
 
-The repository HEAD and firmware source identity are intentionally different:
+The host-controller and firmware source identities are intentionally different:
 
-- host/controller/docs HEAD: `4d685a8`;
+- host/controller/docs authority: symbolic `HOST_EXECUTION_SHA`, resolved from
+  the clean committed HEAD only when an immutable F2 run is created;
 - firmware source and expected `:build` identity: `a582031`.
 
-`4d685a8` is a documentation-only evidence commit created after the final
-firmware build. F2 must expect the device to report `a582031`, not `4d685a8`.
-Conflating these two identities was one of the evidence flaws found during
-review.
+`4d685a8` is the prior documentation-only evidence checkpoint created after
+the final firmware build. It is neither the future host execution authority nor
+the firmware source. F2 must expect the device to report `a582031`, while the
+controller reports the concrete run-time `HOST_EXECUTION_SHA`. Conflating
+these identities was one of the evidence flaws found during review.
 
 ---
 
@@ -438,6 +446,11 @@ on the actual pair remain unverified.
 
 ## 5.5 F2a — guarded silicon evidence controller
 
+> Historical record: this section describes the earlier F2a controller. Its
+> build-coupled upload and single Case-C execution path are superseded by F2c.
+> The current authority is the provenance-split A→B→C1→C2 contract in
+> [`f2/README.md`](f2/README.md).
+
 ### Problem
 
 The first F2 runner was not trustworthy enough for silicon decisions. It could:
@@ -459,9 +472,9 @@ Independent host and firmware reviews returned `NO-GO`.
 [`f2_flash.py`](../../../scripts/dual_sync_probe/f2_flash.py) is the only F2
 writer.
 
-It:
+The earlier revision:
 
-- builds through the approved wrapper;
+- built through the approved wrapper;
 - applies the existing upload guard;
 - records the attempted write before upload;
 - preserves exact BIN and ELF artefacts;
@@ -469,7 +482,8 @@ It:
 - performs post-flash chip, build, image and runtime read-back;
 - produces a fail-closed upload manifest.
 
-Case C has no flash path.
+The current F2c writer never builds, uses pinned esptool for the application
+partition only, and has no C1/C2 flash path.
 
 #### Identity model
 
@@ -686,22 +700,63 @@ images.
 
 ---
 
+## 5.8 F2c — provenance split and order-complete controller
+
+Captain’s amended execution contract separates controller authority from
+firmware authority and splits Case C into late-join and cold-start experiments.
+
+Implemented host surfaces:
+
+- complete reviewed-image validation with no host SHA in the image manifest;
+- positive and negative cross-target guards followed by pinned esptool
+  application-only writes with no build or PlatformIO upload;
+- partition-table read-back before the first write;
+- USB-serial-first `pre_A→A→B→C1→C2` port manifests;
+- A→B follower boot continuity and B→C1 dual boot continuity;
+- Captain-authorised typed dual reset for C2 with ACK, non-consuming
+  USB-serial rebinding, immutable two-role startup capture,
+  same-image/source/environment checks and new boot nonces;
+- post-write startup capture for A/B, preserving leader advertising,
+  follower scan/UUID discovery and a fresh two-role link snapshot before
+  identity requests consume the boot diagnostics;
+- deterministic raw-run to tracked-runtime routing, with an immutable
+  `RUN_BLOCKED.json` on any C2 controller failure;
+- immutable C1/C2 pre-attestations and separately immutable post-run feedback;
+- separate software, physical, evidence-collection and acceptance statuses;
+- immutable STOP plus sidecar; F3 remains false.
+
+Image recovery did not succeed. The original successful build epoch and
+package graph were recovered, but an exact epoch/path replay still produced
+different BIN and ELF identities. The reproduced files were rejected and
+never entered the reviewed image pack.
+
+Current result:
+
+```text
+IMAGE_SET_STATUS=BLOCKED
+F2_HARDWARE_EXECUTION=NO_GO
+F3_AUTHORISED=false
+```
+
+This is a real provenance blocker, not a controller defect. The only valid
+resume conditions are recovery of the original reviewed sync-only BIN/ELF or a
+new Captain-authorised, fully frozen three-image set.
+
+---
+
 ## 6. Validation and immutable build evidence
 
 ### Latest test evidence
 
 | Gate | Result |
 |---|---|
-| Current focused F2b rerun | `134 passed, 24 subtests passed` |
-| Last full repository run on final code | `786 passed, 1 skipped, 86 subtests passed` |
+| Current focused F2c controller suite | `152 passed` |
+| Current full repository run | `822 passed, 1 skipped, 86 subtests passed` |
+| Python and shell syntax | PASS |
+| Firmware/platform configuration diff | Empty |
 | Session bootstrap | PASS with expected dirty-registry warning |
 | F2b independent firmware review | `APPROVE` |
 | Staged diff checks | PASS |
-| Commit hook | PASS |
-| Local/origin branch parity | PASS |
-
-The full test was run before the documentation-only `4d685a8` commit. The code
-at HEAD is unchanged from the tested firmware commit.
 
 ### Build evidence
 
@@ -819,8 +874,9 @@ The word “works” here means proven at the stated layer, not inferred end to 
 - Sync-only leader excludes Remoted.
 - Upload guard maps the correct chips.
 - Both cross-flash directions are rejected.
-- Final flashable images embed the intended firmware commit.
-- BIN, ELF and application-descriptor identities are available for read-back.
+- The two preserved reviewed images embed the intended firmware commit.
+- Expected BIN, ELF and application-descriptor identities are frozen for all
+  three roles, while the reviewed sync-only files themselves remain missing.
 
 ---
 
@@ -831,16 +887,20 @@ The word “works” here means proven at the stated layer, not inferred end to 
 **Status:** unproven.
 
 No Case-A flash or capture has occurred. The original BLE failure class remains
-unknown until A/B/C isolates it.
+unknown until A/B/C1/C2 isolates it.
 
 Interpretation after future tests:
 
 - A fails: base SyncLink advertisement/scan/connect path still fails;
 - A passes, B fails: dual-role scan/advertise coexistence fails;
-- A and B pass, C fails: K718 link/control coexistence fails;
-- A, B and C pass: bounded link recovery is proven and F3 can be considered.
+- A and B pass, C1 fails: K718 cannot late-join a stable SyncLink session under
+  the tested conditions;
+- C1 passes, C2 fails: late join works but cold coexistence/boot-order
+  robustness is not proven;
+- A, B, C1 and C2 software pass with required physical feedback: bounded link
+  evidence is complete and Captain may decide whether to accept F2.
 
-## 9.2 Case A/B/C evidence
+## 9.2 Case A/B/C1/C2 evidence
 
 **Status:** absent.
 
@@ -981,16 +1041,18 @@ AP p95 and soak behaviour.
 
 | Blocker | Type | Why it still exists | Who can clear it | What clears it |
 |---|---|---|---|---|
-| Physical GPIO/K718 attestation | Human/physical | Software cannot see passive wiring before exercising it | Captain | Explicit confirmation of wiring, ground, 3V3 and Case-A K718 state |
-| Case-A silicon result | Hardware/runtime | Final images have not been flashed | Orchestrator after attestation | Guarded flash plus 60 s evidence capture and Link Ready PASS |
+| Exact sync-only image | Provenance | Original reviewed BIN/ELF is missing; three reproductions mismatched | Artefact recovery or Captain | Recover reviewed hashes or authorise a new complete frozen image set |
+| Controller full gate/commit | Host | F2c integration must be fully regressed and frozen | Orchestrator | Focused/full pytest, shell/static gates, narrow commits and push |
+| Physical GPIO/K718 attestation | Human/physical | Software cannot see passive wiring before exercising it | Captain after image READY | Immutable case pre-attestations |
+| Case-A silicon result | Hardware/runtime | Hardware is locked by the image gate | Orchestrator after all preflight gates | Exact-image app-only flash plus 60 s Link Ready PASS |
 | Case-B silicon result | Hardware/runtime | Forbidden until A passes | Orchestrator after A | Dual-role leader flash with K718 off; scanner and Link Ready PASS |
-| Case-C silicon result | Hardware/human | Forbidden until B passes; needs physical dial action | Orchestrator + Captain | No reflash; K718 on; at least three meaningful detents during capture |
-| Captain STOP | Decision | No A/B/C evidence exists | Orchestrator then Captain | Generated tracked report followed by explicit acceptance/rejection |
-| F3 implementation | Deliberate phase gate | Building faults before transport isolation would mix causes | Captain after Case C | Explicit F3 GO |
+| Case-C1/C2 silicon result | Hardware/human | Forbidden until B/C1 pass; needs physical dial action | Orchestrator + Captain | Late join, controlled cold reboot and four detents in each capture |
+| Captain STOP | Decision | No A/B/C1/C2 evidence exists | Orchestrator then Captain | Immutable STOP plus separate decision |
+| F3 implementation | Deliberate phase gate | Building faults before transport isolation would mix causes | Captain after C2 | Separate explicit F3 GO |
 | AP p95 and LED proof | Instrumentation | Current probe has no real surfaces | F3 firmware/host work | Defined counters/instrument contract plus fault-sensitive tests |
 
-The current blocker is not lack of code. It is the intentionally required
-physical attestation before an irreversible device write.
+The current first blocker is exact reviewed-image provenance. Physical
+attestation does not yet authorise a write.
 
 ---
 
@@ -998,25 +1060,23 @@ physical attestation before an irreversible device write.
 
 ## 12.1 Immediate critical path — F2
 
-### Task 1: Captain physical attestation
+### Task 1: clear the image-set gate
 
-Create `case_A.json` only after Captain confirms the exact physical state.
+Recover the reviewed sync-only BIN/ELF hashes, or obtain a separate Captain
+decision for a complete new frozen three-image set. Do not bless any one-off
+rebuild.
 
-### Task 2: Re-run preflight immediately before flash
+### Task 2: freeze the controller
 
-- Re-read [task_plan.md](task_plan.md).
-- Run `session-bootstrap.sh`.
-- Re-enumerate ports.
-- Resolve USB serial and chip identity.
-- Verify no target-specific serial holder.
-- Run both correct-target guards.
-- Retain cross-target negative behaviour.
+Run all focused/full tests and shell/static checks, commit only owned files,
+push, then freeze concrete `HOST_EXECUTION_SHA`. Any later HEAD change closes
+the run.
 
 ### Task 3: Case A — base SyncLink
 
 - Flash `k1_sync_probe_main_sync_only` to `F887A500`.
 - Flash `k1_sync_probe_bench` to `B489A500`.
-- Preserve upload manifests and immutable images.
+- Preserve exact-image flash manifests and immutable images.
 - Capture at least 60 seconds.
 - Require:
   - exact build/image/runtime identities;
@@ -1029,7 +1089,7 @@ Create `case_A.json` only after Captain confirms the exact physical state.
   - no reset/reconnect loop;
   - Link Ready PASS.
 
-If A does not pass, stop. Do not run B or C.
+If A does not pass, stop. Do not run B, C1 or C2.
 
 ### Task 4: Case B — dual-role leader, K718 off
 
@@ -1040,38 +1100,52 @@ If A does not pass, stop. Do not run B or C.
 - Require continuous Remoted scanner activity with no dial traffic.
 - Require Link Ready PASS.
 
-If B does not pass, stop. Do not run C.
+If B does not pass, stop. Do not run C1 or C2.
 
-### Task 5: Case C — dual-role leader, K718 on
+### Task 5: Case C1 — K718 late join
 
 - Revalidate A and B recursively.
 - Do not reflash either device.
 - Prove the exact Case-B boot continues.
 - Power/link K718.
-- Captain commits to and turns at least three meaningful mode detents during
+- Captain commits to and turns four meaningful mode detents during
   the active capture.
 - Require:
   - 100% post-settle dial-linked health;
   - no dial reconnect/disconnect;
   - positive notify/decode/enqueue/apply movement;
-  - at least three meaningful ordinal changes;
+  - at least four meaningful ordinal changes;
   - causal mode-apply to confirmation-write evidence;
   - Link Ready PASS.
 
-### Task 6: Captain STOP
+### Task 6: Case C2 — cold coexistence
+
+- Keep K718 powered and advertising.
+- Create immutable C2 pre-attestation.
+- Perform the controlled typed dual reset.
+- Require both ACKs, unchanged images/source/environments and two new nonces.
+- Capture leader advertising, follower scan/UUID discovery and fresh linked
+  snapshots from both roles before any post-reset identity request.
+- Capture at least 60 seconds of post-establishment Link Ready evidence and
+  another four causal detents.
+- Store physical feedback separately.
+
+### Task 7: Captain STOP
 
 Generate tracked `CAPTAIN_STOP.md` with:
 
-- A/B/C verdicts;
+- A/B/C1/C2 software verdicts;
 - Link Ready counts;
 - stream counts;
 - GPIO rounds;
 - dial evidence;
 - image/runtime identity;
-- unresolved physical K718 feedback;
-- `decision: PENDING`.
+- both immutable physical-feedback results;
+- `f2_acceptance=PENDING`;
+- `f3_authorised=false`.
 
-Stop and wait for Captain. Do not begin F3.
+Write `CAPTAIN_STOP.sha256`, then stop. Captain’s decision is a new file; the
+STOP is never edited. Do not begin F3.
 
 ---
 
@@ -1079,7 +1153,7 @@ Stop and wait for Captain. Do not begin F3.
 
 Outstanding host work:
 
-- replay A/B/C stored captures and preserve their baseline verdicts;
+- replay A/B/C1/C2 stored captures and preserve their baseline verdicts;
 - define the real approximately 39-byte packet grammar;
 - define delay-queue and overflow/late/reset tokens;
 - define `clockoff` evidence;
@@ -1168,58 +1242,59 @@ remain untouched unless separately scoped.
 
 ## 13. Exact resume boundary
 
-### Required Captain statement
+### Gate 1 — complete the image set
 
-> Main GPIO15 is connected to Bench GPIO16. Bench GPIO15 is connected to Main
-> GPIO16. The K1s share GND. The interconnect is 3V3 logic only and secure.
-> K718 is irrelevant/off for Case A.
+Do not create a run or query a device while
+`image-set-a582031.json` is `BLOCKED`. Resume only after one of:
 
-Only after that statement may the orchestrator create the tracked Case-A
-attestation.
+- the original reviewed sync-only BIN/ELF pair is recovered and the complete
+  three-image ledger validates as `READY`; or
+- Captain separately authorises a new complete frozen image set, with new
+  reviewed identities for all three environments.
 
-### Required variables
+Normal PlatformIO upload remains forbidden.
 
-```bash
-RUN_ID="<immutable-run-id>"
-LEADER_PORT="<identity-resolved-leader-port>"
-FOLLOWER_PORT="<identity-resolved-follower-port>"
-FIRMWARE_SHA="a58203183208a4db7fcc7a30d060e6db14673ab1"
-```
-
-`FIRMWARE_SHA` is the firmware commit, not documentation HEAD.
-
-### Case-A guarded flash
+### Gate 2 — freeze the host authority and create one run
 
 ```bash
-bash scripts/dual_sync_probe/run_f2_flash.sh \
-  --case A \
-  --run-id "$RUN_ID" \
-  --firmware-sha "$FIRMWARE_SHA" \
-  --attestation \
-    "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/$RUN_ID/attestations/case_A.json" \
-  --leader-port "$LEADER_PORT" \
-  --follower-port "$FOLLOWER_PORT"
+HOST_EXECUTION_SHA="$(git rev-parse HEAD)"
+FIRMWARE_SOURCE_SHA="a58203183208a4db7fcc7a30d060e6db14673ab1"
+RUN_ID="<UTC_RUN_ID>"
+RUN_ROOT="_scratch/dual_sync_f2_abc_${RUN_ID}"
+IMAGE_SET="artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/image-set-a582031.json"
+
+bash scripts/dual_sync_probe/run_f2_create.sh \
+  --host-execution-sha "$HOST_EXECUTION_SHA" \
+  --firmware-source-sha "$FIRMWARE_SOURCE_SHA" \
+  --image-set-manifest "$IMAGE_SET" \
+  --run-root "$RUN_ROOT"
 ```
 
-### Case-A capture
+Run creation itself rechecks the clean committed host HEAD, READY image set,
+authority-document hashes, unambiguous USB serials and chip identities. It
+writes `runtime/ports_pre_A.json`; no operator may replace it with manually
+edited port variables.
 
-```bash
-bash scripts/dual_sync_probe/run_f2_abc.sh \
-  --case A \
-  --physical-state sync-only \
-  --out-root "_scratch/dual_sync_f2_abc_$RUN_ID" \
-  --run-id "$RUN_ID" \
-  --leader-port "$LEADER_PORT" \
-  --follower-port "$FOLLOWER_PORT" \
-  --firmware-sha "$FIRMWARE_SHA" \
-  --flash-manifest \
-    "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/$RUN_ID/uploads/flash_A.json" \
-  --attestation \
-    "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/$RUN_ID/attestations/case_A.json"
+### Gate 3 — physical boundary and ordered controller
+
+Before Case A, Captain must confirm Main15→Bench16, Bench15→Main16, shared GND,
+3V3 logic and secure wiring. K718 is irrelevant/off. The orchestrator then uses
+the generated prior port manifest and the wrapper `--help` contracts for:
+
+```text
+run_f2_flash.sh    A only after every A build/hash/guard check
+run_f2_abc.sh      capture A
+run_f2_flash.sh    B leader only after recursive A validation
+run_f2_abc.sh      capture B
+run_f2_abc.sh      capture C1 after immutable C1 pre-attestation
+run_f2_reboot.sh   controlled dual reset after C1 PASS and C2 pre-attestation
+run_f2_abc.sh      capture C2
+run_f2_finalise.sh immutable status and Captain STOP
 ```
 
-These commands are shown for the next execution agent. They are not authority
-to flash before physical attestation and fresh identity checks.
+Every invocation consumes the preceding generated ports manifest. Any
+non-PASS or continuity break closes the run. No command in this section
+authorises F3.
 
 ---
 
@@ -1227,9 +1302,10 @@ to flash before physical attestation and fresh identity checks.
 
 ### Tracked recovery state
 
-- Current HEAD: `4d685a8`.
-- Origin parity: `0 ahead / 0 behind`.
-- Recovery commits are published.
+- Host authority name: `HOST_EXECUTION_SHA`.
+- Its concrete value is intentionally absent from this self-describing
+  document and is written only into the first immutable F2 run manifest.
+- Run creation requires that value to equal the current clean committed HEAD.
 
 ### Pre-existing dirty tracked file
 
@@ -1275,6 +1351,11 @@ long-term audit.
 - [`capture.py`](../../../scripts/dual_sync_probe/capture.py)
 - [`f2_capture.py`](../../../scripts/dual_sync_probe/f2_capture.py)
 - [`f2_flash.py`](../../../scripts/dual_sync_probe/f2_flash.py)
+- [`f2_image_set.py`](../../../scripts/dual_sync_probe/f2_image_set.py)
+- [`f2_ports.py`](../../../scripts/dual_sync_probe/f2_ports.py)
+- [`f2_reboot.py`](../../../scripts/dual_sync_probe/f2_reboot.py)
+- [`f2_run.py`](../../../scripts/dual_sync_probe/f2_run.py)
+- [`f2_status.py`](../../../scripts/dual_sync_probe/f2_status.py)
 - [`run_f2_abc.sh`](../../../scripts/dual_sync_probe/run_f2_abc.sh)
 - [`run_f2_flash.sh`](../../../scripts/dual_sync_probe/run_f2_flash.sh)
 - [`run_gate0_segments.sh`](../../../scripts/dual_sync_probe/run_gate0_segments.sh)
@@ -1294,6 +1375,8 @@ long-term audit.
 
 - [`test_dual_sync_oracle.py`](../../../tests/test_dual_sync_oracle.py)
 - [`test_dual_sync_probe_firmware_static.py`](../../../tests/test_dual_sync_probe_firmware_static.py)
+- [`test_f2_ports_reboot.py`](../../../tests/test_f2_ports_reboot.py)
+- [`test_f2_status.py`](../../../tests/test_f2_status.py)
 - [`test_ble_midi_firmware_decoder.py`](../../../tests/test_ble_midi_firmware_decoder.py)
 - [`test_k1_upload_guard.py`](../../../tests/test_k1_upload_guard.py)
 
@@ -1303,6 +1386,9 @@ long-term audit.
 - [F0 host contract](ssa/f0_host_contract.md)
 - [P-1 authority contract](ssa/p1_authority_contract.md)
 - [F1 firmware contract](ssa/f1_firmware_contract.md)
+- [F2 image/flash contract](ssa/f2_image_flash_contract.md)
+- [F2 port/reboot contract](ssa/f2_ports_reboot_contract.md)
+- [F2 evidence/status contract](ssa/f2_evidence_status_contract.md)
 
 ---
 
@@ -1313,18 +1399,22 @@ The recovery did what it was supposed to do before hardware:
 - it made false PASS materially harder;
 - it repaired the known BLE defects;
 - it found and repaired several deeper lifecycle and evidence defects;
-- it produced immutable, identity-verifiable probe images;
-- it created a bounded A/B/C experiment that can distinguish the remaining
-  failure class;
+- it preserved two immutable reviewed probe images and froze the missing
+  sync-only image’s expected identity without laundering a rebuild;
+- it created a bounded A/B/C1/C2 controller that can distinguish the remaining
+  failure class and connection-order sensitivity;
 - it preserved the hard Captain STOP before product-level fault work.
 
 The honest current statement is:
 
-> **The recovery machinery is ready. The recovery result is not yet known.**
+> **The host recovery machinery is ready. The reviewed image set and silicon
+> result are not.**
 
-The next useful action is not more host refactoring or another speculative BLE
-change. It is Captain's physical wiring attestation followed by one guarded
-Case-A run. Every later action depends on that evidence.
+The next useful action is not more host refactoring, another speculative BLE
+change or a hardware write. It is recovery of the exact reviewed sync-only
+BIN/ELF pair, or a separate Captain decision to freeze an entirely new
+three-image set. Only then may the controller create a run and approach
+Case A.
 
 ---
 
@@ -1335,37 +1425,43 @@ This debrief was reconciled against the live workspace on 2026-07-28 using:
 ```bash
 git status --short
 git branch --show-current
-git rev-parse HEAD
+HOST_EXECUTION_SHA="$(git rev-parse HEAD)"
 git log --oneline --decorate -15
-git diff --shortstat 3a9724e..4d685a8
-git diff --name-only 3a9724e..4d685a8
+git diff --shortstat "3a9724e..$HOST_EXECUTION_SHA"
+git diff --name-only "3a9724e..$HOST_EXECUTION_SHA"
 git rev-list --left-right --count \
   HEAD...origin/lane/dual-sync-phase0
 bash scripts/agent/session-bootstrap.sh
 ```
 
-The current focused proof suite was rerun:
+The current focused F2c proof suite was rerun:
 
 ```bash
-PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q \
-  tests/test_ble_midi_firmware_decoder.py \
+PYTHONPATH="$PWD" /Users/spectrasynq/miniforge3/bin/python -m pytest -q \
+  -p no:cacheprovider \
   tests/test_dual_sync_oracle.py \
-  tests/test_dual_sync_probe_firmware_static.py \
-  tests/test_k1_upload_guard.py
+  tests/test_f2_ports_reboot.py \
+  tests/test_f2_status.py \
+  tests/test_dual_sync_probe_firmware_static.py
 ```
 
 Result:
 
 ```text
-134 passed, 24 subtests passed
+152 passed
 ```
 
-The document itself passed:
+The full repository suite was also rerun:
+
+```text
+822 passed, 1 skipped, 86 subtests passed
+```
+
+The document and controller tranche passed:
 
 - `git diff --check`;
 - local Markdown-link existence validation: 48 links checked, none missing;
 - placeholder scan;
-- branch/local-origin parity check;
 - direct source checks for current fault verbs, stamp-fake delays, dummy
   24-byte payload, AP sentinel zero and Gate-3 naming.
 

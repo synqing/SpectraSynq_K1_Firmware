@@ -256,8 +256,9 @@
     `3e2ccf6136425c453103023697b53c9995b0f2ffb7e8b80b4a147197b8901740`
 - In every environment, the ESP application-descriptor identity extracted from
   the BIN equals the raw ELF SHA-256.
-- F2 host/firmware readiness is complete. Case A remains blocked on Captain's
-  physical GPIO/K718 attestation; no flash or serial command has occurred.
+- At this checkpoint, F2a/F2b source and build readiness was complete. The
+  later F2c provenance amendment supersedes hardware-execution readiness; no
+  flash or serial command occurred.
 
 ## Delegation ledger
 
@@ -270,6 +271,9 @@
 | dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
 | dual-sync-f1-concurrency-009/010 | Adversarial connection-generation and Core ownership review | load-bearing | APPROVE | current source citations in SSA return | focused tests, four builds and full regression PASS | verified F1 evidence |
 | dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b APPROVE after four review/repair cycles | current-source SSA returns | read-only USB/guard checks; full host gate; four builds; reconnect decoder regressions | verified F2a/F2b evidence |
+| dual-sync-f2c-image-flash-014 | Image-set and exact-write controller | load-bearing | received and reconciled | `recovery/ssa/f2_image_flash_contract.md` | focused controller tests, complete image-schema checks and full suite PASS | verified F2c implementation |
+| dual-sync-f2c-ports-reboot-015 | Port chain and controlled C2 reboot | load-bearing | received and reconciled | `recovery/ssa/f2_ports_reboot_contract.md` | continuity, tamper, partial-reset and rebinding tests plus full suite PASS | verified F2c implementation |
+| dual-sync-f2c-evidence-status-016 | Immutable attestation, feedback and STOP status | load-bearing | received and reconciled | `recovery/ssa/f2_evidence_status_contract.md` | status-matrix, non-overwrite and finaliser contract tests plus full suite PASS | verified F2c implementation |
 
 ## Test results
 
@@ -310,9 +314,113 @@
 | F2b dual-role leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main` | SUCCESS; NimBLE 2.5.0 |
 | F2b sync-only leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main_sync_only` | SUCCESS; NimBLE 2.5.0 |
 | F2b follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
+| F2c focused current | `PYTHONPATH="$PWD" /Users/spectrasynq/miniforge3/bin/python -m pytest -q -p no:cacheprovider tests/test_dual_sync_oracle.py tests/test_f2_ports_reboot.py tests/test_f2_status.py tests/test_dual_sync_probe_firmware_static.py` | 152 passed |
+| F2c full current | `PYTHONPATH="$PWD" /Users/spectrasynq/miniforge3/bin/python -m pytest -q -p no:cacheprovider tests/` | 822 passed, 1 skipped, 86 subtests passed |
+| F2c syntax and diff | `python3 -m py_compile scripts/dual_sync_probe/f2_*.py`; `bash -n scripts/dual_sync_probe/*.sh`; `git diff --check` | PASS |
+
+## Superseded next (before F2c implementation)
+
+Implement and verify F2c. Preserve the two still-matching reviewed images,
+recover the exact sync-only image in a detached worktree, freeze the image-set
+manifest, land the provenance/port/C1/C2 controller contract, and keep all
+hardware writes blocked until every host gate passes.
+
+## 2026-07-28 — F2c implementation authorised
+
+- Captain approved the provenance-split, order-complete F2 controller plan.
+- Concrete identities are intentionally separate:
+  - host/controller authority: symbolic `HOST_EXECUTION_SHA`, frozen only
+    after the final controller/authority commit;
+  - firmware source: `a58203183208a4db7fcc7a30d060e6db14673ab1`.
+- Hardware execution remains NO-GO until the reviewed three-image set is
+  complete and the amended controller gates are green.
+- Added C1 late join and C2 controlled cold coexistence to the tracked working
+  plan; F3 remains unauthorised.
+- Loaded and manually invoked the requested PLC graph-loop skill:
+  - mission: `GRAPH-LOOP-SUPERVISED-DUAL-SYNC-F2-001`;
+  - run: `dual-sync-f2-20260728T005500Z`;
+  - result: success, retrieval NONE, no protected merge;
+  - audit:
+    `/Users/spectrasynq/Workspace_Management/Software/probe-loop-audit/graph-loop/runs/dual-sync-f2-20260728T005500Z`.
+- No device action occurred.
+
+## 2026-07-28 — reviewed image preservation and sync-only recovery attempt
+
+- Copied the still-matching dual-role leader and follower BIN, ELF,
+  partition-table and bootloader artefacts into
+  `_scratch/dual_sync_f2_image_set_a582031/`.
+- Rehashed every copied file; the application identities match the reviewed
+  `a582031` ledger exactly.
+- Created a detached clean worktree at exact source `a582031` and built only
+  `k1_sync_probe_main_sync_only` through the guarded build wrapper.
+- Build result: SUCCESS; NimBLE `2.5.0`, platform `54.03.20`, Arduino `3.2.0`,
+  esptool `4.8.9`, both toolchains `14.2.0+20241119`.
+- Byte identities did not reproduce:
+  - rebuilt BIN `f52b65c18aa54ece0ca7d22144355915393f603a3d0c32d2045fec9dc95d1779`;
+  - rebuilt ELF `429a1e250875fd15d432921e0d91425590f40eef7dd9ae6a979943e510387735`.
+- Those outputs were rejected and were not copied into the reviewed image
+  pack. `F2_HARDWARE_EXECUTION=NO_GO`.
+- A bounded path-prefix-mapped reproduction also failed:
+  BIN `14844ce249f0c0fd11e9da005a33a5501b863acd1ea14ac18a1bf2b018307d74`,
+  ELF `f16d3681ad57536def0f9d9f8665d22bd948e58f940f8effb5d58b4a34c417c9`.
+- The build provenance epoch changed between attempts. Search prior durable
+  build logs for the exact original epoch; no brute-force recovery is allowed.
+- No device action occurred.
+
+## 2026-07-28 — bounded sync-only reproduction closed
+
+- Recovered the exact original sync-only build provenance epoch
+  `1785168896` and package log from the durable local session archive.
+- Performed one final detached reproduction with the recovered epoch and
+  original-path prefix mappings.
+- Build completed successfully but did not reproduce either reviewed identity:
+  - BIN `e2ad3da980990b87bc4aa8301853ff5d03b47b6dc6339d3dd7f744ac58872e86`;
+  - ELF `0ec0a64b7362b93f11bbd64925d0eee3efd2ab76e92497e6a10b934d6531c2d2`.
+- Rejected the result. No rebuilt sync-only file entered the reviewed image
+  pack.
+- `IMAGE_SET_STATUS=BLOCKED`;
+  `F2_HARDWARE_EXECUTION=NO_GO`; no device action occurred.
+- Host-controller implementation and tests continue because they reduce
+  uncertainty without weakening the image gate.
+
+## 2026-07-28 — F2c host controller complete
+
+- Implemented the provenance-split run creator, complete image-set validator,
+  exact application writer, chained port resolver, ordered A/B/C1/C2 capture,
+  controlled C2 reboot and immutable final status/STOP controller.
+- Added non-consuming USB-serial rebinding and immutable startup-stream
+  capture. Case A/B flash manifests now prove leader advertising,
+  follower scan/UUID discovery and fresh two-role link state before identity
+  probes; C2 records the full post-reset establishment path before its
+  minimum-60-second steady-state capture.
+- Corrected the production C2 CLI boundary so the raw run root resolves to the
+  tracked runtime directory. Any C2 controller failure now closes that run
+  with immutable `RUN_BLOCKED.json`.
+- Added non-overwriting wrappers for run creation, port resolution, flash,
+  capture, reboot and finalisation.
+- Added host regressions for identity separation, blocked/mismatched images,
+  no-build flashing, port-chain tamper detection, A→B and B→C1 continuity,
+  C1→C2 dual-reboot rules, partial-reset rejection, attestation/feedback
+  immutability and the full status matrix.
+- Focused F2 validation: `152 passed`.
+- Full repository validation:
+  `822 passed, 1 skipped, 86 subtests passed`.
+- Python compilation, shell syntax, CLI `--help` surfaces and
+  `git diff --check` passed.
+- Firmware source and `platformio.ini` are unchanged. The pre-existing dirty
+  device registry remains excluded.
+- Created the authorised two-commit freeze:
+  - controller implementation:
+    `8880412e5924f2160ad7741ce8ffb1c12cf50630`;
+  - test/image/authority freeze: the current committed
+    `HOST_EXECUTION_SHA`, whose concrete value is intentionally reported only
+    after the commit and push exist.
+- No hardware action occurred.
 
 ## Next
 
-Obtain Captain's physical GPIO/K718 attestation, then re-read this task plan and
-enter the scripted identity-guarded Case-A flash/capture path. Do not run Case B
-or C unless the preceding case passes, and stop for Captain after Case C.
+Recover the original reviewed sync-only BIN/ELF pair, or obtain a separate
+Captain decision authorising a new complete frozen three-image set. Only after
+the tracked image ledger validates as `READY` may a clean committed host
+controller create the first immutable run and freeze its concrete
+`HOST_EXECUTION_SHA`. F3 remains unauthorised.

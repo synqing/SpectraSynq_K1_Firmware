@@ -771,3 +771,11 @@ def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
             assert forbidden not in body
     assert "low-priority Core-1 task" in header
     assert "void sb_k1_ble_remoted_status();" in header
+
+
+def test_f2_controlled_reboot_typed_command_remains_acknowledged():
+    serial_menu = _read(_MENU)
+    reset = _function_body(serial_menu, "void cmd_reset()")
+    assert "ack();" in reset
+    assert "reboot();" in reset
+    assert reset.index("ack();") < reset.index("reboot();")

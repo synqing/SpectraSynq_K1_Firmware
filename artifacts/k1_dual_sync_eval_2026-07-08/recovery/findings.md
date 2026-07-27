@@ -227,3 +227,92 @@ authority.
   `a582031`. For every image, the application descriptor identity extracted
   from the BIN equals the raw ELF SHA-256.
 - No firmware was flashed and no serial or hardware action occurred.
+
+## F2c provenance/order amendment findings
+
+- Current host/controller HEAD is a documentation descendant of the reviewed
+  firmware source `a582031`; it must not replace the firmware identity.
+- The dual-role leader and follower cached BIN/ELF pairs still match the
+  recorded reviewed hashes. The sync-only cache no longer matches, and no
+  second local copy was found. Exact sync-only recovery is now a hard
+  pre-hardware gate.
+- The first clean detached worktree build at exact source `a582031` resolved
+  the recorded PlatformIO packages and succeeded, but produced sync-only BIN
+  `f52b65c18aa54ece0ca7d22144355915393f603a3d0c32d2045fec9dc95d1779`
+  and ELF
+  `429a1e250875fd15d432921e0d91425590f40eef7dd9ae6a979943e510387735`,
+  not the reviewed `875077…` / `f062ea…` pair. The output is rejected.
+- Compiler diagnostics include the detached absolute worktree path. Because
+  the ESP application descriptor binds the ELF identity into the application
+  image, path-dependent ELF content is a plausible reproducibility cause, not
+  authority to bless the new binary.
+- A second build mapped the detached source/debug path back to the original
+  repository path but still mismatched (`14844c…` BIN, `f16d36…` ELF).
+  Crucially, the provenance epoch changed from `1785174564` to `1785174728`
+  between the two builds. Build time is therefore another embedded,
+  nondeterministic input and must be recovered from durable original evidence
+  rather than guessed.
+- The original successful build log was recovered from the local Codex session
+  archive. It proves provenance epoch `1785168896`, the original absolute
+  source path, and the complete recorded PlatformIO package versions.
+- A third and final bounded reproduction used that exact epoch and mapped the
+  detached worktree to the original source/debug path. It still mismatched:
+  BIN `e2ad3da980990b87bc4aa8301853ff5d03b47b6dc6339d3dd7f744ac58872e86`,
+  ELF `0ec0a64b7362b93f11bbd64925d0eee3efd2ab76e92497e6a10b934d6531c2d2`.
+  The original and detached builds also assigned different PlatformIO library
+  dependency directory identities, so byte reproduction is not established.
+  Further search would no longer be a bounded recovery. The reviewed
+  sync-only artefact remains missing and the image set remains BLOCKED.
+- Normal PlatformIO upload rebuilds the application and therefore cannot be
+  the F2 exact-image writer. F2 needs guard-first, partition-readback,
+  application-only flashing using the already-pinned esptool package.
+- Case-C late join and cold coexistence exercise different BLE activity
+  establishment orders. C1 proves late join; only C2 may support the broader
+  cold-start coexistence claim.
+- A pre-run attestation cannot contain a mutable post-run feedback placeholder.
+  Each C1/C2 pre-attestation and feedback file must be separately immutable and
+  separately hashed.
+- The requested PLC graph-loop was manually invoked under allowlisted mission
+  `GRAPH-LOOP-SUPERVISED-DUAL-SYNC-F2-001`; it completed successfully with
+  retrieval NONE and no protected merge. Its audit is supporting orchestration
+  evidence, not a substitute for repo or silicon validation.
+
+## F2c controller implementation findings
+
+- The image gate is executable and fail-closed. A `BLOCKED` image-set ledger is
+  rejected before device resolution or run-root creation, so the missing
+  sync-only artefact cannot be bypassed by starting a nominal run.
+- Every F2 entry point now binds the clean committed
+  `HOST_EXECUTION_SHA`, reviewed
+  `FIRMWARE_SOURCE_SHA=a58203183208a4db7fcc7a30d060e6db14673ab1`,
+  image-set manifest, prior ports manifest and immutable run root as distinct
+  inputs.
+- The exact-image writer has no PlatformIO build or upload path. It requires
+  both a positive target guard and an exit-2 negative cross-target control,
+  then verifies BIN/ELF identities and partition-table geometry before
+  invoking pinned esptool for an application-only write.
+- USB serial is the rebinding authority; chip ID is then re-proved. Immutable
+  port manifests form the `pre_A→A→B→C1→C2` SHA chain and encode the expected
+  boot-continuity policy at each transition.
+- C1 and C2 are distinct experiments. C1 forbids flash/reset and proves only
+  late join. C2 requires a Captain-authorised typed dual reset, two
+  acknowledgements, automatic USB-serial rebinding, an immutable two-role boot
+  capture proving leader advertising plus follower scan/UUID discovery,
+  unchanged applications and two new boot nonces.
+- Case A and Case B flashing now preserve and validate the immediate post-write
+  startup path before identity requests can consume it. The flash manifest
+  records leader advertising, follower scan/UUID discovery and a fresh
+  two-role link snapshot, while Case A still writes follower before leader.
+- The CLI boundary now deterministically maps the raw
+  `_scratch/dual_sync_f2_abc_<run-id>` root to the tracked run's `runtime/`
+  directory. A failed controlled C2 operation writes an immutable
+  `RUN_BLOCKED.json`; a partial or ambiguous reset cannot be retried inside
+  the same run.
+- Pre-attestations, physical feedback, software verdicts, collection status,
+  Captain acceptance and F3 authorisation are independent immutable evidence
+  fields. Missing physical observations cannot become PASS.
+- Focused F2 contract validation passed `152` tests. Full repository validation
+  passed `822` tests, with `1` skipped and `86` subtests. Python compilation,
+  all dual-sync shell syntax checks and `git diff --check` also passed.
+- No firmware source or `platformio.ini` changed, and no serial command, reset,
+  flash or other device action occurred.
