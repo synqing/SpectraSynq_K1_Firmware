@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# F2 A/B/C Link Ready capture entry point. This is not a Gate-0 runner.
+# F2 A/B/C1/C2 Link Ready capture entry point. This is not Gate-0.
 # The Python controller locks case semantics, probes identity/build provenance,
-# enforces A -> B -> C and writes the evidence manifest. It never flashes.
+# enforces A -> B -> C1 -> C2 and writes the evidence manifest. It never flashes.
 
 set -euo pipefail
 

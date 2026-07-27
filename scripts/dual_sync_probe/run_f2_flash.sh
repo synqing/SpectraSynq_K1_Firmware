@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Identity-first F2 A/B guarded upload entry point. Case C never flashes.
+# Identity-first exact application writer for F2 A/B.
+# C1/C2 never flash. This path never builds or invokes PlatformIO upload.
 
 set -euo pipefail
 

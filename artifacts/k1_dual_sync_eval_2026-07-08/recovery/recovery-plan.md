@@ -11,7 +11,7 @@ baseline_sha: 3a9724e
 
 Retain the strategic sequence:
 
-`F0 host trust → F1 link hardening → F2 silicon A/B/C → Captain STOP → F3 real Gate-0`
+`F0 host trust → F1 link hardening → F2 silicon A/B/C1/C2 → Captain STOP → F3 real Gate-0`
 
 Locked boundaries:
 
@@ -21,8 +21,9 @@ Locked boundaries:
 - No cross-flash between `F887A500` and `B489A500`.
 - Never run `start_noise_cal`.
 - F0 and F1 remain separate commits.
-- F3 requires A, B and C PASS plus explicit Captain GO.
-- No device action substitutes for the scripted A/B/C evidence matrix.
+- F3 requires A, B, C1 and C2 software PASS, required physical feedback,
+  complete evidence collection and explicit Captain GO.
+- No device action substitutes for the scripted A/B/C1/C2 evidence matrix.
 
 This file is the sole recovery execution authority. The Cursor plan
 `~/.cursor/plans/dual-sync_f0-f3_recovery_ff1ff901.plan.md` is a superseded
@@ -144,7 +145,7 @@ runner and tests must compare statuses explicitly.
 5. Keep both serial sessions open, require exact ACKs, insert segment markers,
    never overwrite, restore `off` in an exit trap, and treat non-PASS CLI codes
    without accidental shell abort.
-6. Add a separate tracked F2 A/B/C runner; do not call it Gate-0.
+6. Add a separate tracked F2 A/B/C1/C2 runner; do not call it Gate-0.
 
 ### F0.6 Required tests
 
@@ -227,40 +228,67 @@ Unknown/unmapped sync environments are an F1 failure.
 - Narrow staged diff reviewed.
 - Green F1 commit.
 
-## Phase F2 — scripted silicon isolation
+## Phase F2 — provenance-split A/B/C1/C2 silicon isolation
 
-Evidence root may contain raw captures under
-`_scratch/dual_sync_f2_abc_<date>/`, but each case also produces a tracked
-compact manifest with:
+F2 retains two independent authorities:
 
-- source commit and environment
-- chip identity and port at action time
-- ELF/bin hashes
-- exact commands
-- raw-log hashes/locations
-- Link Ready JSON
-- negotiated BLE values
-- reset/disconnect/epoch counts
+```text
+HOST_EXECUTION_SHA=<clean committed controller HEAD>
+FIRMWARE_SOURCE_SHA=a58203183208a4db7fcc7a30d060e6db14673ab1
+```
 
-Cases:
+The host SHA may be a documentation/controller descendant. It must never
+replace the firmware SHA. Device `:build` remains `a582031…`; device
+`:image_id` must match the reviewed application identity.
 
-- A: sync-only leader + follower.
-- B: full dual-role leader, K718 powered off.
-- C: exact Case-B firmware with K718 powered on; no B→C reflash.
+### Image gate
 
-Case C additionally requires post-settle:
+The reviewed dual-role leader and follower images are preserved. The reviewed
+sync-only leader image is missing and three bounded reproductions failed its
+BIN/ELF hashes. The tracked image-set ledger is therefore `BLOCKED`.
 
-- 100% leader dial-linked health
-- zero dial disconnect/reconnect events
-- real dial turns with increasing notify/decode/apply counters
-- confirmed mode/control feedback
+No hardware write is allowed until the original reviewed sync-only artefact is
+recovered or Captain separately authorises a complete new frozen image set.
+Normal PlatformIO upload is forbidden because it rebuilds.
 
-F2 exit requires A PASS, B PASS and C PASS. A failure stops B/C. B or C
-failure prevents F3. Write a tracked `CAPTAIN_STOP.md`; F3 requires explicit
-Captain GO recorded there.
+### Controllers
 
-The device registry is updated after actual flashes, but its pre-existing dirty
-content is never auto-committed or absorbed into another commit.
+- `f2_image_set.py`: complete reviewed-image and package provenance.
+- `f2_ports.py`: USB-serial-first binding and immutable
+  `pre_A→A→B→C1→C2` port chain.
+- `f2_flash.py`: positive/negative guards, partition read-back and pinned
+  application-only esptool write for A/B.
+- `f2_capture.py`: recursive A/B/C1/C2 capture and oracle revalidation.
+- `f2_reboot.py`: Captain-authorised typed dual reset for C2, ACK capture,
+  non-consuming USB-serial rebinding, two-role cold-start establishment
+  capture and same-image/new-nonce proof.
+- `f2_status.py`: immutable C1/C2 pre-attestation and feedback validation,
+  separate software/physical/acceptance status and Captain STOP.
+
+Every controller binds `HOST_EXECUTION_SHA`, `FIRMWARE_SOURCE_SHA`, the image
+set, prior port manifest and immutable run root.
+
+### Cases
+
+- A: reviewed sync-only leader plus follower; both flashed.
+- B: reviewed dual-role leader; follower neither flashed nor reset; K718 off.
+- C1: continuing Case-B boots; K718 late joins; no flash or reset.
+- C2: same application images after a controlled reset with K718 already
+  powered/advertising; both boot nonces must be new.
+
+A non-PASS forbids B. B non-PASS forbids C1. C1 non-PASS forbids C2.
+C1 and C2 each require four causal mode changes and separate physical
+feedback. C1 proves late join only; broad cold-start coexistence requires C2.
+
+### F2 exit
+
+Software, physical feedback, evidence collection and Captain acceptance are
+separate fields. Both physical feedback results PASS still leave acceptance
+PENDING until Captain writes a separate immutable decision.
+
+The STOP and its sidecar remain immutable and always state
+`f3_authorised=false`. F3 requires a later explicit Captain decision. The
+pre-existing dirty device registry remains excluded from controller commits.
 
 ## Phase F3 — real Gate-0, only after F2 + Captain GO
 
@@ -268,7 +296,7 @@ F3a and F3b are mandatory separate commits.
 
 ### F3a host contract
 
-- Replay stored F2 A/B/C captures and prove unchanged baseline verdicts.
+- Replay stored F2 A/B/C1/C2 captures and prove unchanged baseline verdicts.
 - Add real fault fixtures and require every fault to flip its intended
   independent gate.
 - Full host gate before commit.

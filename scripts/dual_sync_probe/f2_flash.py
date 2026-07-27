@@ -1,19 +1,18 @@
-"""Guarded, evidence-producing F2 upload controller.
+"""Guarded exact-application writer for F2 A/B.
 
-This is the only F2 writer. It builds and uploads one ordered A/B device pair
-through the existing PlatformIO guard, preserves the exact BIN/ELF artefacts,
-and requires post-flash chip/build/image read-back before publishing a PASS
-upload event. Case C deliberately has no upload path and must reuse Case B.
+This controller never builds and never invokes PlatformIO's upload target. It
+validates one frozen reviewed-image set, proves every target and partition
+table before the first write, then writes only the selected application image
+with the pinned esptool package. C1/C2 have no flash path and reuse Case B.
 """
 
 from __future__ import annotations
 
 import argparse
 import copy
-import hashlib
 import json
+import os
 import re
-import shutil
 import subprocess
 import time
 from pathlib import Path
@@ -21,19 +20,11 @@ from pathlib import Path
 from serial import Serial
 from serial.tools import list_ports
 
-from . import capture, f2_capture, gate_eval
+from . import capture, f2_capture, f2_image_set, f2_ports, gate_eval
 
 
 class F2FlashError(RuntimeError):
-    """Guarded build, upload, identity, or evidence failure."""
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as source:
-        for chunk in iter(lambda: source.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    """Exact-image validation, target guard, flash, or evidence failure."""
 
 
 def _run_logged(command: list[str], log_path: Path, *, append: bool) -> int:
@@ -53,11 +44,14 @@ def _run_logged(command: list[str], log_path: Path, *, append: bool) -> int:
     return completed.returncode
 
 
-def _app_elf_sha256(bin_path: Path) -> str:
-    try:
-        return f2_capture._app_elf_sha256(bin_path)
-    except f2_capture.F2ContractError as error:
-        raise F2FlashError(str(error)) from error
+def _write_manifest_once(path: Path, payload: dict) -> None:
+    """Durably publish evidence without an overwrite-capable rename."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf-8") as output:
+        json.dump(payload, output, indent=2, sort_keys=True)
+        output.write("\n")
+        output.flush()
+        os.fsync(output.fileno())
 
 
 def _port_for_usb_serial(usb_serial: str, timeout_s: float) -> str:
@@ -146,11 +140,11 @@ def _postflash_identity(
         or not expected["firmware_source_sha"].startswith(git_hash)
     ):
         raise F2FlashError(
-            "post-flash build does not match firmware source commit"
+            "post-flash build does not match reviewed firmware source"
         )
     if image_id != expected["app_elf_sha256"]:
         raise F2FlashError(
-            "post-flash app ELF identity does not match built image"
+            "post-flash app ELF identity does not match reviewed image"
         )
     return {
         "port": port,
@@ -209,10 +203,11 @@ def _preflash_chip_identity(
 
 def _target(case_name: str, role: str) -> dict[str, str]:
     expected = f2_capture._expected_device(case_name, role)
-    if role == "leader":
-        usb_serial = f2_capture.LEADER_USB_SERIAL
-    else:
-        usb_serial = f2_capture.FOLLOWER_USB_SERIAL
+    usb_serial = (
+        f2_capture.LEADER_USB_SERIAL
+        if role == "leader"
+        else f2_capture.FOLLOWER_USB_SERIAL
+    )
     return {**expected, "usb_serial": usb_serial}
 
 
@@ -221,7 +216,6 @@ def _require_clean_inputs(repo_root: Path) -> None:
         "platformio.ini",
         "SPECTRASYNQ_K1_FIRMWARE",
         "libraries",
-        "scripts/agent/pio-build.sh",
         "scripts/platformio",
         "scripts/dual_sync_probe",
     ]
@@ -242,8 +236,89 @@ def _require_clean_inputs(repo_root: Path) -> None:
     )
     if completed.returncode != 0 or completed.stdout.strip():
         raise F2FlashError(
-            "tracked firmware/build/upload inputs are dirty; commit or stop"
+            "tracked firmware/image/flash-controller inputs are dirty; "
+            "commit or stop"
         )
+
+
+def _esptool_command(port: str, operation: list[str]) -> list[str]:
+    return [
+        "pio",
+        "pkg",
+        "exec",
+        "--package",
+        f2_image_set.ESPTOOL_PACKAGE,
+        "--",
+        "esptool.py",
+        "--chip",
+        "esp32s3",
+        "--port",
+        port,
+        "--baud",
+        "921600",
+        *operation,
+    ]
+
+
+def _guard_command(env: str, port: str) -> list[str]:
+    return [
+        "python3",
+        "scripts/platformio/k1_upload_guard.py",
+        "--env",
+        env,
+        "--upload-port",
+        port,
+    ]
+
+
+def _cross_target_env(role: str) -> str:
+    """Return an environment that must reject the resolved physical target."""
+    if role == "leader":
+        return "k1_sync_probe_bench"
+    if role == "follower":
+        return "k1_sync_probe_main_sync_only"
+    raise F2FlashError(f"unknown flash role {role!r}")
+
+
+def _postwrite_startup(
+    case_name: str,
+    *,
+    output_dir: Path,
+    repo_root: Path,
+    timeout_s: float,
+) -> tuple[dict[str, dict[str, str]], dict]:
+    """Capture A/B establishment before identity queries consume boot logs."""
+    from . import f2_reboot
+
+    try:
+        bindings = f2_ports.resolve_usb_paths_by_serial(timeout_s=timeout_s)
+    except f2_ports.F2PortsError as error:
+        raise F2FlashError(f"post-write USB rebinding failed: {error}") from error
+    startup = f2_reboot._capture_c2_startup(
+        bindings,
+        output_dir=output_dir,
+        repo_root=repo_root,
+        serial_factory=capture._open_serial,
+        baud=capture.DEFAULT_BAUD,
+        duration_s=max(20.0, timeout_s),
+        status_timeout_s=timeout_s,
+        label=f"case_{case_name}",
+    )
+    return bindings, startup
+
+
+def _image_evidence(image: dict, repo_root: Path) -> dict:
+    return {
+        "bin_path": f2_capture._repo_relative(
+            image["bin_path"], repo_root
+        ),
+        "bin_sha256": image["bin_sha256"],
+        "elf_path": f2_capture._repo_relative(
+            image["elf_path"], repo_root
+        ),
+        "elf_sha256": image["elf_sha256"],
+        "app_elf_sha256": image["app_elf_sha256"],
+    }
 
 
 def run(
@@ -252,6 +327,7 @@ def run(
     command_runner=_run_logged,
     identity_reader=_postflash_identity,
     preflash_reader=_preflash_chip_identity,
+    startup_reader=None,
     repo_root_override: Path | None = None,
 ) -> dict:
     repo_root = (
@@ -260,23 +336,33 @@ def run(
         else Path(__file__).resolve().parents[2]
     )
     host_sha = f2_capture._git_head(repo_root)
-    firmware_sha = f2_capture._resolve_commit(repo_root, args.firmware_sha)
-    if firmware_sha != host_sha:
-        raise F2FlashError(
-            "guarded upload requires firmware SHA to equal current clean HEAD"
+    if host_sha != args.host_execution_sha:
+        f2_capture._close_run_for_host_drift(
+            repo_root,
+            args.run_root,
+            expected_host_sha=args.host_execution_sha,
+            observed_host_sha=host_sha,
         )
-    _require_clean_inputs(repo_root)
+        raise F2FlashError(
+            "host execution SHA does not equal current committed HEAD"
+        )
     if args.case not in ("A", "B"):
-        raise F2FlashError("Case C must reuse the exact Case-B upload event")
+        raise F2FlashError("C1/C2 must reuse the exact Case-B flash event")
+    raw_root = args.run_root.resolve()
+    if (
+        not f2_capture._inside(raw_root, repo_root / "_scratch")
+        or not raw_root.name.startswith("dual_sync_f2_abc_")
+    ):
+        raise F2FlashError(
+            "run root must be _scratch/dual_sync_f2_abc_<run-id>"
+        )
+    run_id = raw_root.name.removeprefix("dual_sync_f2_abc_")
     try:
-        f2_capture._validate_run_id(args.run_id)
+        f2_capture._validate_run_id(run_id)
     except f2_capture.F2ContractError as error:
         raise F2FlashError(str(error)) from error
-    if args.leader_port == args.follower_port:
-        raise F2FlashError("leader and follower ports must be distinct")
 
-    raw_root = repo_root / "_scratch" / f"dual_sync_f2_abc_{args.run_id}"
-    tracked_root = repo_root / f2_capture.TRACKED_F2_REL / args.run_id
+    tracked_root = repo_root / f2_capture.TRACKED_F2_REL / run_id
     if (
         f2_capture._has_symlink_component(raw_root)
         or f2_capture._has_symlink_component(tracked_root)
@@ -286,12 +372,45 @@ def run(
         tracked_root, repo_root / f2_capture.TRACKED_F2_REL
     ):
         raise F2FlashError("F2 tracked root escapes fixed evidence root")
-    upload_raw = raw_root / "uploads" / f"case_{args.case}"
-    upload_manifest = tracked_root / "uploads" / f"flash_{args.case}.json"
-    if upload_raw.exists() or upload_manifest.exists():
-        raise F2FlashError("refusing to overwrite F2 upload evidence")
+    try:
+        f2_capture._require_run_open(repo_root, args.run_root)
+    except f2_capture.F2ContractError as error:
+        raise F2FlashError(str(error)) from error
+    flash_raw = raw_root / "uploads" / f"case_{args.case}"
+    flash_manifest = tracked_root / "uploads" / f"flash_{args.case}.json"
+    if flash_raw.exists() or flash_manifest.exists():
+        raise F2FlashError("refusing to overwrite F2 flash evidence")
 
-    ports = {"leader": args.leader_port, "follower": args.follower_port}
+    image_set = f2_image_set.load(
+        args.image_set_manifest, repo_root=repo_root
+    )
+    firmware_sha = f2_capture._resolve_commit(
+        repo_root, args.firmware_source_sha
+    )
+    if (
+        firmware_sha != args.firmware_source_sha
+        or firmware_sha != image_set["firmware_source_sha"]
+    ):
+        raise F2FlashError(
+            "image-set firmware source must be one exact full commit"
+        )
+    f2_capture._require_ancestor(repo_root, firmware_sha, host_sha)
+    _require_clean_inputs(repo_root)
+
+    expected_ports_stage = "pre_A" if args.case == "A" else "A"
+    try:
+        ports_payload = f2_ports.validate_ports_manifest(
+            args.ports_manifest,
+            expected_stage=expected_ports_stage,
+            expected_host_execution_sha=host_sha,
+            expected_firmware_source_sha=firmware_sha,
+        )
+    except f2_ports.F2PortsError as error:
+        raise F2FlashError(f"ports manifest rejected: {error}") from error
+    ports = {
+        role: str(ports_payload[role]["port"])
+        for role in ("leader", "follower")
+    }
     prior = f2_capture.validate_case_order(
         args.case,
         raw_root,
@@ -306,186 +425,251 @@ def run(
         "physical attestation",
     )
     f2_capture._validate_attestation(attestation, args.case)
-    preflash: dict[str, dict[str, str]] = {}
-    for role in ("leader", "follower"):
-        target = _target(args.case, role)
-        preflash[role] = preflash_reader(
-            ports[role],
-            target["usb_serial"],
-            target["chip_id"],
-            args.readback_timeout_s,
-        )
 
-    upload_raw.mkdir(parents=True, exist_ok=False)
-    upload_manifest.parent.mkdir(parents=True, exist_ok=True)
-
-    roles_to_upload = (
-        ("leader", "follower") if args.case == "A" else ("leader",)
+    flash_raw.mkdir(parents=True, exist_ok=False)
+    flash_manifest.parent.mkdir(parents=True, exist_ok=True)
+    image_set_record = f2_capture._evidence_record(
+        image_set["manifest_path"], repo_root
     )
+    roles_to_flash = (
+        ("follower", "leader") if args.case == "A" else ("leader",)
+    )
+    preflash: dict[str, dict[str, str]] = {}
     prepared: dict[str, dict] = {}
-    uploads: dict[str, dict] = {}
+    flashes: dict[str, dict] = {}
+    operation_logs: dict[str, Path] = {}
     write_actions: list[dict] = []
+    startup_reader = startup_reader or _postwrite_startup
+
     try:
-        # Complete every required build and explicit guard before the first
-        # device write. Case B only changes the leader environment.
-        for role in roles_to_upload:
+        for role in ("leader", "follower"):
+            target = _target(args.case, role)
+            preflash[role] = preflash_reader(
+                ports[role],
+                target["usb_serial"],
+                target["chip_id"],
+                args.readback_timeout_s,
+            )
+
+        # Every target guard and partition-table read-back completes before the
+        # first application write. A partial preflight cannot mutate hardware.
+        for role in roles_to_flash:
             target = _target(args.case, role)
             env = target["env"]
-            role_dir = upload_raw / role
+            image = image_set["images"][env]
+            role_dir = flash_raw / role
             role_dir.mkdir()
-            log_path = role_dir / "upload.log"
-            build_command = ["bash", "scripts/agent/pio-build.sh", env]
-            if command_runner(build_command, log_path, append=False) != 0:
-                raise F2FlashError(f"{role} canonical build failed")
-            build_log = log_path.read_text(
+            log_path = role_dir / "flash.log"
+            operation_logs[role] = log_path
+
+            guard_command = _guard_command(env, ports[role])
+            if command_runner(
+                guard_command, log_path, append=False
+            ) != 0:
+                raise F2FlashError(f"{role} upload guard rejected target")
+            if "verified as" not in log_path.read_text(
                 encoding="utf-8", errors="replace"
-            )
-            provenance = re.search(
-                rf"\[k1-build-provenance\]\s+env={re.escape(env)}\s+"
-                r"git=([0-9a-f]+)\s+epoch=(\d+)",
-                build_log,
-            )
-            if (
-                provenance is None
-                or not f2_capture._valid_git_prefix(
-                    firmware_sha, provenance.group(1)
-                )
             ):
                 raise F2FlashError(
-                    f"{role} build log lacks matching source provenance"
+                    f"{role} guard log lacks target verification"
                 )
 
-            build_dir = repo_root / ".pio" / "build" / env
-            built_bin = build_dir / "firmware.bin"
-            built_elf = build_dir / "firmware.elf"
-            if not built_bin.is_file() or not built_elf.is_file():
-                raise F2FlashError(f"{role} build artefacts are missing")
-            preserved_bin = role_dir / "firmware.bin"
-            preserved_elf = role_dir / "firmware.elf"
-            shutil.copy2(built_bin, preserved_bin)
-            shutil.copy2(built_elf, preserved_elf)
-            bin_sha = _sha256(preserved_bin)
-            elf_sha = _sha256(preserved_elf)
-            app_elf_sha = _app_elf_sha256(preserved_bin)
-            if app_elf_sha != elf_sha:
+            cross_guard_log = role_dir / "cross-target-guard.log"
+            cross_guard_command = _guard_command(
+                _cross_target_env(role), ports[role]
+            )
+            cross_guard_exit = command_runner(
+                cross_guard_command, cross_guard_log, append=False
+            )
+            if cross_guard_exit != 2:
                 raise F2FlashError(
-                    f"{role} BIN app identity does not match ELF hash"
+                    f"{role} cross-target guard did not fail closed "
+                    f"with exit 2 (observed {cross_guard_exit})"
+                )
+            cross_guard_text = cross_guard_log.read_text(
+                encoding="utf-8", errors="replace"
+            )
+            if "verified as" in cross_guard_text or "expected" not in (
+                cross_guard_text
+            ):
+                raise F2FlashError(
+                    f"{role} cross-target guard lacks rejection evidence"
+                )
+            operation_logs[f"{role}_cross_target"] = cross_guard_log
+
+            partition_readback = role_dir / "partition-table-readback.bin"
+            partition = image_set["partition_table"]
+            read_command = _esptool_command(
+                ports[role],
+                [
+                    "read_flash",
+                    hex(partition["offset"]),
+                    hex(partition["size"]),
+                    str(partition_readback),
+                ],
+            )
+            if command_runner(read_command, log_path, append=True) != 0:
+                raise F2FlashError(
+                    f"{role} partition-table read-back failed"
+                )
+            if (
+                partition_readback.is_symlink()
+                or not partition_readback.is_file()
+                or partition_readback.stat().st_size != partition["size"]
+                or f2_capture._sha256(partition_readback)
+                != partition["sha256"]
+            ):
+                raise F2FlashError(
+                    f"{role} partition-table read-back mismatch"
                 )
 
-            guard_command = [
-                "python3",
-                "scripts/platformio/k1_upload_guard.py",
-                "--env",
-                env,
-                "--upload-port",
+            write_command = _esptool_command(
                 ports[role],
-            ]
-            if command_runner(guard_command, log_path, append=True) != 0:
-                raise F2FlashError(f"{role} upload guard rejected target")
+                [
+                    "write_flash",
+                    hex(partition["application_offset"]),
+                    f2_capture._repo_relative(
+                        image["bin_path"], repo_root
+                    ),
+                ],
+            )
             prepared[role] = {
                 "target": target,
                 "env": env,
+                "image": image,
                 "log_path": log_path,
-                "build_command": build_command,
                 "guard_command": guard_command,
-                "built_bin": built_bin,
-                "built_elf": built_elf,
-                "preserved_bin": preserved_bin,
-                "preserved_elf": preserved_elf,
-                "bin_sha256": bin_sha,
-                "elf_sha256": elf_sha,
-                "app_elf_sha256": app_elf_sha,
+                "cross_guard_command": cross_guard_command,
+                "cross_guard_exit_code": cross_guard_exit,
+                "cross_guard_log": cross_guard_log,
+                "partition_read_command": read_command,
+                "partition_readback": partition_readback,
+                "write_command": write_command,
             }
 
-        for role in roles_to_upload:
+        for role in roles_to_flash:
             item = prepared[role]
             target = item["target"]
-            env = item["env"]
-            log_path = item["log_path"]
-            upload_command = [
-                "pio",
-                "run",
-                "-e",
-                env,
-                "-t",
-                "upload",
-                "--upload-port",
-                ports[role],
-            ]
             action = {
                 "role": role,
-                "command": upload_command,
+                "command": item["write_command"],
                 "attempted": True,
                 "outcome": "running",
                 "exit_code": None,
             }
             write_actions.append(action)
             try:
-                upload_exit = command_runner(
-                    upload_command, log_path, append=True
+                write_exit = command_runner(
+                    item["write_command"],
+                    item["log_path"],
+                    append=True,
                 )
             except Exception:
                 action["outcome"] = "error"
                 raise
-            action["exit_code"] = upload_exit
+            action["exit_code"] = write_exit
             action["outcome"] = (
-                "success" if upload_exit == 0 else "failed"
+                "success" if write_exit == 0 else "failed"
             )
-            if upload_exit != 0:
-                raise F2FlashError(f"{role} upload failed")
+            if write_exit != 0:
+                raise F2FlashError(
+                    f"{role} application-image write failed"
+                )
+            image = item["image"]
             if (
-                _sha256(item["built_bin"]) != item["bin_sha256"]
-                or _sha256(item["built_elf"]) != item["elf_sha256"]
+                f2_capture._sha256(image["bin_path"])
+                != image["bin_sha256"]
+                or f2_capture._sha256(image["elf_path"])
+                != image["elf_sha256"]
             ):
                 raise F2FlashError(
-                    f"{role} build artefacts changed during guarded upload"
+                    f"{role} reviewed image changed during flash"
                 )
-            log_text = log_path.read_text(
-                encoding="utf-8", errors="replace"
-            )
-            if "verified as" not in log_text:
+            item["write_exit_code"] = write_exit
+
+        startup_bindings, startup_capture = startup_reader(
+            args.case,
+            output_dir=flash_raw,
+            repo_root=repo_root,
+            timeout_s=args.readback_timeout_s,
+        )
+        for role in ("leader", "follower"):
+            expected_target = _target(args.case, role)
+            binding = startup_bindings.get(role)
+            if (
+                not isinstance(binding, dict)
+                or binding.get("usb_serial")
+                != expected_target["usb_serial"]
+                or binding.get("chip_id") != expected_target["chip_id"]
+                or not isinstance(binding.get("port"), str)
+                or not binding["port"]
+            ):
                 raise F2FlashError(
-                    f"{role} upload log lacks guard verification"
+                    f"{role} post-write USB binding is invalid"
                 )
+        if (
+            not isinstance(startup_capture, dict)
+            or startup_capture.get("status") != gate_eval.PASS
+        ):
+            raise F2FlashError("post-write link establishment did not PASS")
+
+        for role in roles_to_flash:
+            item = prepared[role]
+            target = item["target"]
+            image = item["image"]
             readback = identity_reader(
                 target["usb_serial"],
                 {
                     **target,
                     "firmware_source_sha": firmware_sha,
-                    "app_elf_sha256": item["app_elf_sha256"],
+                    "app_elf_sha256": image["app_elf_sha256"],
                 },
                 args.readback_timeout_s,
             )
-            uploads[role] = {
-                "action": "upload",
+            write_exit = item["write_exit_code"]
+            flashes[role] = {
+                "action": "flash",
                 "source_case": args.case,
-                "env": env,
+                "env": item["env"],
                 "chip_id": target["chip_id"],
                 "usb_serial": target["usb_serial"],
                 "port": ports[role],
                 "preflash_identity": preflash[role],
                 "guard_verified": True,
-                "upload_exit_code": upload_exit,
-                "command": upload_command,
-                "build_command": item["build_command"],
                 "guard_command": item["guard_command"],
-                "bin_path": f2_capture._repo_relative(
-                    item["preserved_bin"], repo_root
+                "cross_target_guard_verified": True,
+                "cross_target_guard_command": item["cross_guard_command"],
+                "cross_target_guard_exit_code": item[
+                    "cross_guard_exit_code"
+                ],
+                "cross_target_guard_log": f2_capture._evidence_record(
+                    item["cross_guard_log"], repo_root
                 ),
-                "bin_sha256": item["bin_sha256"],
-                "elf_path": f2_capture._repo_relative(
-                    item["preserved_elf"], repo_root
-                ),
-                "elf_sha256": item["elf_sha256"],
-                "app_elf_sha256": item["app_elf_sha256"],
+                "partition_read_command": item["partition_read_command"],
+                "partition_table": {
+                    "expected_path": f2_capture._repo_relative(
+                        image_set["partition_table"]["path"], repo_root
+                    ),
+                    "expected_sha256": image_set[
+                        "partition_table"
+                    ]["sha256"],
+                    "readback": f2_capture._evidence_record(
+                        item["partition_readback"], repo_root
+                    ),
+                },
+                "write_command": item["write_command"],
+                "write_exit_code": write_exit,
+                **_image_evidence(image, repo_root),
                 "postflash_readback": readback,
-                "log": f2_capture._evidence_record(log_path, repo_root),
+                "log": f2_capture._evidence_record(
+                    item["log_path"], repo_root
+                ),
             }
 
         if args.case == "B":
             case_a_flash_record = prior[0]["flash_manifest"]
-            case_a_flash_path = (
-                repo_root / str(case_a_flash_record["path"])
+            case_a_flash_path = repo_root / str(
+                case_a_flash_record["path"]
             )
             case_a_flash = f2_capture._read_manifest(case_a_flash_path)
             follower = copy.deepcopy(case_a_flash["uploads"]["follower"])
@@ -493,46 +677,97 @@ def run(
             follower["source_case"] = "A"
             follower["reused_flash_manifest"] = case_a_flash_record
             follower["reuse_preflight_identity"] = preflash["follower"]
-            uploads["follower"] = follower
+            flashes["follower"] = follower
+
+        next_bindings = {}
+        for role in ("leader", "follower"):
+            if flashes[role]["action"] == "flash":
+                next_port = flashes[role]["postflash_readback"]["port"]
+            else:
+                next_port = startup_bindings[role]["port"]
+            next_bindings[role] = {
+                "port": next_port,
+                "usb_serial": flashes[role]["usb_serial"],
+                "chip_id": flashes[role]["chip_id"],
+            }
+        try:
+            next_ports = f2_ports.write_ports_manifest(
+                args.case,
+                tracked_root / "runtime",
+                next_bindings,
+                host_execution_sha=host_sha,
+                firmware_source_sha=firmware_sha,
+                prior_manifest=args.ports_manifest,
+            )
+        except f2_ports.F2PortsError as error:
+            raise F2FlashError(
+                f"cannot persist post-flash ports manifest: {error}"
+            ) from error
+        next_ports_path = (
+            tracked_root / "runtime" / f"ports_{args.case}.json"
+        )
 
         manifest = {
-            "schema_version": 1,
+            "schema_version": 2,
             "status": gate_eval.PASS,
-            "run_id": args.run_id,
+            "run_id": run_id,
             "case": args.case,
-            "upload_controller_sha": host_sha,
+            "host_execution_sha": host_sha,
             "firmware_source_sha": firmware_sha,
-            "uploads": uploads,
+            "image_set": image_set_record,
+            "input_ports_manifest": f2_capture._evidence_record(
+                args.ports_manifest, repo_root
+            ),
+            "output_ports_manifest": f2_capture._evidence_record(
+                next_ports_path, repo_root
+            ),
+            "port_bindings": next_ports,
+            "startup_capture": startup_capture,
+            "uploads": flashes,
         }
-        f2_capture._atomic_manifest(upload_manifest, manifest)
+        _write_manifest_once(flash_manifest, manifest)
         return manifest
-    except (F2FlashError, OSError) as error:
+    except Exception as error:
+        logs = {
+            role: f2_capture._evidence_record(path, repo_root)
+            for role, path in operation_logs.items()
+            if path.is_file()
+        }
         blocked = {
-            "schema_version": 1,
+            "schema_version": 2,
             "status": gate_eval.BLOCKED,
-            "run_id": args.run_id,
+            "run_id": run_id,
             "case": args.case,
-            "upload_controller_sha": host_sha,
+            "host_execution_sha": host_sha,
             "firmware_source_sha": firmware_sha,
+            "image_set": image_set_record,
+            "preflash_identity": preflash,
             "prepared_roles": sorted(prepared),
             "write_actions": write_actions,
-            "completed_uploads": uploads,
+            "completed_flashes": flashes,
+            "operation_logs": logs,
             "error": str(error),
         }
-        f2_capture._atomic_manifest(upload_manifest, blocked)
-        raise
+        _write_manifest_once(flash_manifest, blocked)
+        if isinstance(error, F2FlashError):
+            raise
+        raise F2FlashError(str(error)) from error
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Guard-build, upload and read back one F2 A/B device pair."
+        description=(
+            "Validate and flash exact frozen F2 application images; "
+            "never build and never invoke PlatformIO upload."
+        )
     )
     parser.add_argument("--case", choices=("A", "B"), required=True)
-    parser.add_argument("--run-id", required=True)
-    parser.add_argument("--firmware-sha", required=True)
+    parser.add_argument("--host-execution-sha", required=True)
+    parser.add_argument("--firmware-source-sha", required=True)
+    parser.add_argument("--image-set-manifest", type=Path, required=True)
+    parser.add_argument("--ports-manifest", type=Path, required=True)
+    parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--attestation", type=Path, required=True)
-    parser.add_argument("--leader-port", required=True)
-    parser.add_argument("--follower-port", required=True)
     parser.add_argument("--readback-timeout-s", type=float, default=20.0)
     return parser
 
@@ -545,6 +780,8 @@ def main(argv=None) -> int:
     except (
         F2FlashError,
         f2_capture.F2ContractError,
+        f2_image_set.F2ImageSetError,
+        f2_ports.F2PortsError,
         OSError,
         ValueError,
     ) as error:

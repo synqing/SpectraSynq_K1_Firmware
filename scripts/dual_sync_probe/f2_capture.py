@@ -1,7 +1,7 @@
-"""Identity-checked, ordered F2 A/B/C Link Ready capture controller.
+"""Identity-checked, ordered F2 A/B/C1/C2 Link Ready capture controller.
 
 This controller never flashes. It proves the already-flashed binaries and
-devices before capture, enforces A -> B -> C, and writes a compact manifest.
+devices before capture, enforces A -> B -> C1 -> C2, and writes a manifest.
 It is deliberately separate from Gate-0.
 """
 
@@ -13,9 +13,17 @@ import json
 import os
 import re
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
-from . import capture, gate_eval, logfmt
+from . import (
+    capture,
+    f2_image_set,
+    f2_ports,
+    f2_status,
+    gate_eval,
+    logfmt,
+)
 
 CASE_CONTRACT = {
     "A": {
@@ -26,8 +34,12 @@ CASE_CONTRACT = {
         "physical_state": "dial-off",
         "leader_env": "k1_sync_probe_main",
     },
-    "C": {
-        "physical_state": "dial-on",
+    "C1": {
+        "physical_state": "dial-late-join",
+        "leader_env": "k1_sync_probe_main",
+    },
+    "C2": {
+        "physical_state": "dial-cold-coexistence",
         "leader_env": "k1_sync_probe_main",
     },
 }
@@ -36,7 +48,7 @@ LEADER_CHIP = "F887A500"
 FOLLOWER_CHIP = "B489A500"
 LEADER_USB_SERIAL = "B4:3A:45:A5:87:F8"
 FOLLOWER_USB_SERIAL = "B4:3A:45:A5:89:B4"
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 MIN_CAPTURE_SECONDS = 60.0
 MIN_DIAL_SAMPLES = 10
 TRACKED_F2_REL = Path(
@@ -93,9 +105,7 @@ def _require_clean_host_inputs(repo_root: Path) -> None:
             "git",
             "status",
             "--porcelain",
-            "--untracked-files=all",
-            "--",
-            "scripts/dual_sync_probe",
+            "--untracked-files=no",
         ],
         cwd=repo_root,
         text=True,
@@ -103,9 +113,17 @@ def _require_clean_host_inputs(repo_root: Path) -> None:
         stderr=subprocess.PIPE,
         check=False,
     )
-    if completed.returncode != 0 or completed.stdout.strip():
+    allowed = {"docs/hardware/device-build-registry.md"}
+    dirty = set()
+    for line in completed.stdout.splitlines():
+        if not line.strip():
+            continue
+        dirty.add(line[3:])
+    unexpected = sorted(dirty - allowed)
+    if completed.returncode != 0 or unexpected:
         raise F2ContractError(
-            "F2 capture controller inputs are dirty; commit or stop"
+            "F2 tracked inputs are dirty outside the explicit registry "
+            f"exclusion: {unexpected}"
         )
 
 
@@ -174,6 +192,10 @@ def _app_elf_sha256(bin_path: Path) -> str:
 def _require_ancestor(
     repo_root: Path, firmware_sha: str, host_sha: str
 ) -> None:
+    if firmware_sha == host_sha:
+        raise F2ContractError(
+            "host execution SHA and firmware source SHA must remain distinct"
+        )
     try:
         subprocess.check_call(
             ["git", "merge-base", "--is-ancestor", firmware_sha, host_sha],
@@ -183,8 +205,8 @@ def _require_ancestor(
         )
     except (OSError, subprocess.CalledProcessError) as error:
         raise F2ContractError(
-            "firmware source commit must be the host controller commit or "
-            "an ancestor of it"
+            "firmware source commit must be a strict ancestor of the host "
+            "controller commit"
         ) from error
 
 
@@ -284,8 +306,15 @@ def _require_direct_file(
 
 
 def _validate_attestation(path: Path, case_name: str) -> dict:
+    if case_name in ("C1", "C2"):
+        try:
+            return f2_status.validate_pre_attestation(
+                path, case_name, path.parents[1]
+            )["payload"]
+        except f2_status.F2StatusError as error:
+            raise F2ContractError(str(error)) from error
     payload = _read_manifest(path)
-    expected_k718 = {"A": "irrelevant", "B": "off", "C": "on"}[case_name]
+    expected_k718 = {"A": "irrelevant", "B": "off"}[case_name]
     required = {
         "schema_version": 1,
         "case": case_name,
@@ -299,21 +328,6 @@ def _validate_attestation(path: Path, case_name: str) -> dict:
         if payload.get(key) != expected:
             raise F2ContractError(
                 f"Case {case_name} attestation requires {key}={expected!r}"
-            )
-    if case_name == "C":
-        detents = payload.get("dial_detents_committed")
-        if (
-            not isinstance(detents, int)
-            or isinstance(detents, bool)
-            or detents < 3
-        ):
-            raise F2ContractError(
-                "Case C attestation requires dial_detents_committed>=3"
-            )
-        if payload.get("mode_feedback_acceptance") != "PENDING":
-            raise F2ContractError(
-                "Case C attestation requires "
-                "mode_feedback_acceptance='PENDING'"
             )
     return payload
 
@@ -668,7 +682,7 @@ def _analyse_dial(
     checks["traffic_increased"] = bool(endpoint_deltas) and (
         endpoint_deltas["notify"] >= 1
         and all(
-            endpoint_deltas[key] >= 3
+                endpoint_deltas[key] >= 4
             for key in (
                 "decoded",
                 "enqueued",
@@ -767,7 +781,7 @@ def _analyse_dial(
         and checks["traffic_increased"]
         and checks["counter_traffic_observed"]
         and checks["traffic_drained"]
-        and checks["meaningful_mode_change_count"] >= 3
+        and checks["meaningful_mode_change_count"] >= 4
         and checks["mode_apply_counter_matches_events"]
         and checks["error_deltas_zero"]
         and checks["dial_confirmation_increased"]
@@ -832,6 +846,7 @@ def _validate_flash_manifest(
     *,
     case_name: str,
     firmware_sha: str,
+    host_sha: str,
     out_root: Path,
     tracked_root: Path,
     repo_root: Path,
@@ -841,20 +856,46 @@ def _validate_flash_manifest(
         path, tracked_root / "uploads", "flash manifest"
     )
     payload = _read_manifest(path)
-    expected_flash_case = "B" if case_name == "C" else case_name
+    expected_flash_case = (
+        "B" if case_name in ("C1", "C2") else case_name
+    )
     required = {
-        "schema_version": 1,
+        "schema_version": 2,
         "status": gate_eval.PASS,
         "run_id": tracked_root.name,
         "case": expected_flash_case,
+        "host_execution_sha": host_sha,
         "firmware_source_sha": firmware_sha,
-        "upload_controller_sha": firmware_sha,
     }
     for key, expected in required.items():
         if payload.get(key) != expected:
             raise F2ContractError(
                 f"flash manifest requires {key}={expected!r}"
             )
+    _validate_evidence_record(
+        payload.get("image_set"),
+        repo_root,
+        repo_root,
+        "flash image-set manifest",
+    )
+    _validate_evidence_record(
+        payload.get("input_ports_manifest"),
+        repo_root,
+        tracked_root / "runtime",
+        "flash input ports manifest",
+    )
+    _validate_evidence_record(
+        payload.get("output_ports_manifest"),
+        repo_root,
+        tracked_root / "runtime",
+        "flash output ports manifest",
+    )
+    _validate_startup_capture_payload(
+        payload.get("startup_capture"),
+        repo_root,
+        out_root / "uploads" / f"case_{expected_flash_case}",
+        f"Case {expected_flash_case} post-write startup",
+    )
     uploads = payload.get("uploads")
     if not isinstance(uploads, dict):
         raise F2ContractError("flash manifest uploads are missing")
@@ -869,27 +910,14 @@ def _validate_flash_manifest(
             if expected_flash_case == "B" and role == "follower"
             else expected_flash_case
         )
-        expected_action = "reuse" if source_case != expected_flash_case else "upload"
+        expected_action = (
+            "reuse" if source_case != expected_flash_case else "flash"
+        )
         upload_port = upload.get("port")
         if not isinstance(upload_port, str) or not upload_port:
             raise F2ContractError(
                 f"flash manifest {role} upload port is missing"
             )
-        expected_command = [
-            "pio",
-            "run",
-            "-e",
-            expected["env"],
-            "-t",
-            "upload",
-            "--upload-port",
-            upload_port,
-        ]
-        expected_build = [
-            "bash",
-            "scripts/agent/pio-build.sh",
-            expected["env"],
-        ]
         expected_guard = [
             "python3",
             "scripts/platformio/k1_upload_guard.py",
@@ -908,10 +936,9 @@ def _validate_flash_manifest(
             "chip_id": expected["chip_id"],
             "usb_serial": expected_usb_serial,
             "guard_verified": True,
-            "upload_exit_code": 0,
-            "command": expected_command,
-            "build_command": expected_build,
             "guard_command": expected_guard,
+            "cross_target_guard_verified": True,
+            "cross_target_guard_exit_code": 2,
         }
         for key, expected_value in required_upload.items():
             if upload.get(key) != expected_value:
@@ -919,9 +946,53 @@ def _validate_flash_manifest(
                     f"flash manifest {role} requires "
                     f"{key}={expected_value!r}"
                 )
-        expected_upload_root = (
-            out_root / "uploads" / f"case_{source_case}" / role
-        )
+        if expected_action == "flash":
+            cross_guard = upload.get("cross_target_guard_command")
+            expected_cross_guard = [
+                "python3",
+                "scripts/platformio/k1_upload_guard.py",
+                "--env",
+                (
+                    "k1_sync_probe_bench"
+                    if role == "leader"
+                    else "k1_sync_probe_main_sync_only"
+                ),
+                "--upload-port",
+                upload_port,
+            ]
+            if cross_guard != expected_cross_guard:
+                raise F2ContractError(
+                    f"flash manifest {role} cross-target guard mismatch"
+                )
+            _validate_evidence_record(
+                upload.get("cross_target_guard_log"),
+                repo_root,
+                out_root / "uploads",
+                f"flash {role} cross-target guard log",
+            )
+            write_command = upload.get("write_command")
+            if (
+                not isinstance(write_command, list)
+                or "write_flash" not in write_command
+                or "pio" not in write_command
+                or "pkg" not in write_command
+                or "run" in write_command
+                or upload.get("write_exit_code") != 0
+            ):
+                raise F2ContractError(
+                    f"flash manifest {role} lacks exact app-only write"
+                )
+            partition = upload.get("partition_table")
+            if not isinstance(partition, dict):
+                raise F2ContractError(
+                    f"flash manifest {role} partition proof is missing"
+                )
+            _validate_evidence_record(
+                partition.get("readback"),
+                repo_root,
+                out_root / "uploads",
+                f"flash {role} partition read-back",
+            )
         binaries[role] = {}
         for kind in ("bin", "elf"):
             path_key = f"{kind}_path"
@@ -936,7 +1007,7 @@ def _validate_flash_manifest(
                 )
             artefact_path = _require_direct_file(
                 repo_root / upload[path_key],
-                expected_upload_root,
+                repo_root / "_scratch",
                 f"flash {role} {kind}",
             )
             if _sha256(artefact_path) != upload[hash_key]:
@@ -1019,7 +1090,7 @@ def _validate_flash_manifest(
             readback.get("chip_id") != expected["chip_id"]
             or readback.get("env") != expected["env"]
             or (
-                expected_action == "upload"
+                expected_action == "flash"
                 and readback.get("port") != ports[role]
             )
             or readback.get("app_elf_sha256") != image_id
@@ -1044,7 +1115,7 @@ def _validate_flash_manifest(
             )
         log_record = upload.get("log")
         _validate_evidence_record(
-            log_record, repo_root, out_root,
+            log_record, repo_root, repo_root / "_scratch",
             f"flash {role} log"
         )
     return payload, binaries
@@ -1054,6 +1125,10 @@ def _runtime_continuity(
     identity: dict,
     flash_payload: dict,
     prior_runtime: dict | None = None,
+    *,
+    case_name: str = "C1",
+    firmware_sha: str | None = None,
+    reboot_payload: dict | None = None,
 ) -> tuple[dict, dict]:
     runtime: dict[str, dict[str, int | str]] = {}
     checks: dict[str, dict[str, bool]] = {}
@@ -1062,35 +1137,65 @@ def _runtime_continuity(
         readback = flash_payload["uploads"][role]["postflash_readback"]
         if not isinstance(observed, dict):
             runtime[role] = {}
-            checks[role] = {
-                "matches_postflash_boot": False,
-                "uptime_after_postflash": False,
-                "continues_prior_case": False,
-            }
+            checks[role] = {"identity_present": False}
             continue
         runtime[role] = {
+            "app_elf_sha256": observed.get("app_elf_sha256"),
+            "git": observed.get("git"),
+            "env": observed.get("env"),
             "boot_nonce": observed.get("boot_nonce"),
             "uptime_ms": observed.get("uptime_ms"),
             "reset_reason": observed.get("reset_reason"),
         }
         prior = prior_runtime.get(role) if prior_runtime else None
-        checks[role] = {
-            "matches_postflash_boot": (
+        expected_env = flash_payload["uploads"][role]["env"]
+        expected_image = flash_payload["uploads"][role]["app_elf_sha256"]
+        source_ok = (
+            firmware_sha is None
+            or _valid_git_prefix(firmware_sha, observed.get("git"))
+        )
+        if case_name == "A" or (case_name == "B" and role == "leader"):
+            transition_ok = (
                 observed.get("boot_nonce") == readback.get("boot_nonce")
-            ),
-            "uptime_after_postflash": (
-                isinstance(observed.get("uptime_ms"), int)
+                and isinstance(observed.get("uptime_ms"), int)
                 and observed["uptime_ms"] >= readback.get("uptime_ms", -1)
+            )
+        elif case_name in ("B", "C1"):
+            transition_ok = (
+                isinstance(prior, dict)
+                and observed.get("boot_nonce") == prior.get("boot_nonce")
+                and isinstance(prior.get("uptime_ms"), int)
+                and isinstance(observed.get("uptime_ms"), int)
+                and observed["uptime_ms"] > prior["uptime_ms"]
+            )
+        elif case_name == "C2":
+            reboot_role = (
+                reboot_payload.get("roles", {}).get(role, {})
+                if isinstance(reboot_payload, dict)
+                else {}
+            )
+            expected_after = reboot_role.get("after", {})
+            transition_ok = (
+                isinstance(prior, dict)
+                and isinstance(expected_after, dict)
+                and observed.get("boot_nonce")
+                == expected_after.get("boot_nonce")
+                and observed.get("boot_nonce") != prior.get("boot_nonce")
+                and observed.get("app_elf_sha256")
+                == expected_after.get("app_elf_sha256")
+                and isinstance(observed.get("uptime_ms"), int)
+                and observed["uptime_ms"]
+                >= expected_after.get("uptime_ms", -1)
+            )
+        else:
+            transition_ok = False
+        checks[role] = {
+            "application_identity": (
+                observed.get("app_elf_sha256") == expected_image
             ),
-            "continues_prior_case": (
-                prior is None
-                or (
-                    observed.get("boot_nonce") == prior.get("boot_nonce")
-                    and isinstance(prior.get("uptime_ms"), int)
-                    and isinstance(observed.get("uptime_ms"), int)
-                    and observed["uptime_ms"] > prior["uptime_ms"]
-                )
-            ),
+            "firmware_source": source_ok,
+            "environment": observed.get("env") == expected_env,
+            "transition_continuity": transition_ok,
         }
     result = {
         "status": (
@@ -1117,6 +1222,55 @@ def _case_status(
     return gate_eval.BLOCKED
 
 
+def _validate_c2_startup_capture(
+    reboot_payload: dict, repo_root: Path, tracked_root: Path
+) -> dict:
+    return _validate_startup_capture_payload(
+        reboot_payload.get("cold_start_capture"),
+        repo_root,
+        tracked_root / "runtime",
+        "controlled C2 reboot",
+    )
+
+
+def _validate_startup_capture_payload(
+    startup: object,
+    repo_root: Path,
+    allowed_root: Path,
+    label: str,
+) -> dict:
+    required_checks = {
+        "leader_advertising_ready",
+        "follower_scan_started",
+        "follower_uuid_discovered",
+        "leader_link_ready_snapshot",
+        "follower_link_ready_snapshot",
+    }
+    if (
+        not isinstance(startup, dict)
+        or startup.get("status") != gate_eval.PASS
+        or not isinstance(startup.get("checks"), dict)
+        or not all(
+            startup["checks"].get(check) is True
+            for check in required_checks
+        )
+    ):
+        raise F2ContractError(
+            f"{label} lacks cold-start establishment PASS"
+        )
+    logs = startup.get("logs")
+    if not isinstance(logs, dict) or set(logs) != {"leader", "follower"}:
+        raise F2ContractError(f"{label} startup logs are missing")
+    for role, record in logs.items():
+        _validate_evidence_record(
+            record,
+            repo_root,
+            allowed_root,
+            f"{label} {role} startup log",
+        )
+    return startup
+
+
 def _validate_prior_case(
     path: Path,
     *,
@@ -1127,6 +1281,7 @@ def _validate_prior_case(
     out_root: Path,
     tracked_root: Path,
     previous_digest: str | None,
+    prior_runtime: dict | None,
 ) -> dict:
     path = _require_direct_file(
         path, tracked_root, f"prior Case {case_name} manifest"
@@ -1137,6 +1292,7 @@ def _validate_prior_case(
         "run_id": tracked_root.name,
         "case": case_name,
         "case_status": gate_eval.PASS,
+        "host_execution_sha": host_sha,
         "firmware_source_sha": firmware_sha,
         "prior_manifest_sha256": previous_digest,
     }
@@ -1145,15 +1301,6 @@ def _validate_prior_case(
             raise F2ContractError(
                 f"prior Case {case_name} requires {key}={expected!r}"
             )
-    prior_host_sha = manifest.get("host_source_sha")
-    if (
-        not isinstance(prior_host_sha, str)
-        or re.fullmatch(r"[0-9a-f]{40}", prior_host_sha) is None
-    ):
-        raise F2ContractError(
-            f"prior Case {case_name} host source SHA is malformed"
-        )
-    _require_ancestor(repo_root, prior_host_sha, host_sha)
     link_ready = manifest.get("link_ready")
     if not isinstance(link_ready, dict) or link_ready.get("status") != gate_eval.PASS:
         raise F2ContractError(f"prior Case {case_name} lacks Link Ready PASS")
@@ -1182,6 +1329,28 @@ def _validate_prior_case(
         f"Case {case_name} attestation"
     )
     _validate_attestation(attestation_path, case_name)
+    ports_record = manifest.get(
+        "output_ports_manifest"
+        if case_name == "C1"
+        else "ports_manifest"
+    )
+    ports_path = _validate_evidence_record(
+        ports_record,
+        repo_root,
+        tracked_root / "runtime",
+        f"Case {case_name} ports manifest",
+    )
+    try:
+        f2_ports.validate_ports_manifest(
+            ports_path,
+            expected_stage=case_name,
+            expected_host_execution_sha=host_sha,
+            expected_firmware_source_sha=firmware_sha,
+        )
+    except f2_ports.F2PortsError as error:
+        raise F2ContractError(
+            f"prior Case {case_name} ports chain mismatch: {error}"
+        ) from error
 
     required_evidence = {
         "leader_session",
@@ -1195,7 +1364,7 @@ def _validate_prior_case(
         "sync_status",
         "index",
     }
-    if case_name in ("B", "C"):
+    if case_name in ("B", "C1", "C2"):
         required_evidence.add("dial_status")
     missing = sorted(required_evidence - set(evidence_paths))
     if missing:
@@ -1270,6 +1439,7 @@ def _validate_prior_case(
         flash_path,
         case_name=case_name,
         firmware_sha=firmware_sha,
+        host_sha=host_sha,
         out_root=out_root,
         tracked_root=tracked_root,
         repo_root=repo_root,
@@ -1286,8 +1456,30 @@ def _validate_prior_case(
             raise F2ContractError(
                 f"prior Case {case_name} {role} image identity mismatch"
             )
+    reboot_payload = None
+    if case_name == "C2":
+        reboot_record = manifest.get("reboot_manifest")
+        reboot_path = _validate_evidence_record(
+            reboot_record,
+            repo_root,
+            tracked_root / "runtime",
+            "Case C2 reboot manifest",
+        )
+        reboot_payload = _read_manifest(reboot_path)
+        startup = _validate_c2_startup_capture(
+            reboot_payload, repo_root, tracked_root
+        )
+        if manifest.get("cold_start_establishment") != startup["checks"]:
+            raise F2ContractError(
+                "prior Case C2 cold-start establishment mismatch"
+            )
     runtime_identity, runtime_continuity = _runtime_continuity(
-        identity, flash_payload
+        identity,
+        flash_payload,
+        prior_runtime,
+        case_name=case_name,
+        firmware_sha=firmware_sha,
+        reboot_payload=reboot_payload,
     )
     if (
         runtime_identity != manifest.get("runtime_identity")
@@ -1298,7 +1490,7 @@ def _validate_prior_case(
             f"prior Case {case_name} runtime continuity mismatch"
         )
     status_pair = None
-    if case_name in ("B", "C"):
+    if case_name in ("B", "C1", "C2"):
         status_payload = _read_manifest(evidence_paths["dial_status"])
         status_pair = status_payload.get("off")
     dial = _analyse_dial(
@@ -1323,7 +1515,12 @@ def validate_case_order(
     host_sha: str,
     repo_root: Path,
 ) -> list[dict]:
-    prior_names = {"A": (), "B": ("A",), "C": ("A", "B")}[case_name]
+    prior_names = {
+        "A": (),
+        "B": ("A",),
+        "C1": ("A", "B"),
+        "C2": ("A", "B", "C1"),
+    }[case_name]
     prior: list[dict] = []
     previous_digest: str | None = None
     for prior_name in prior_names:
@@ -1337,6 +1534,9 @@ def validate_case_order(
             out_root=out_root,
             tracked_root=tracked_root,
             previous_digest=previous_digest,
+            prior_runtime=(
+                prior[-1].get("runtime_identity") if prior else None
+            ),
         )
         previous_digest = _sha256(path)
         prior.append(manifest)
@@ -1356,24 +1556,80 @@ def _atomic_manifest(path: Path, payload: dict) -> None:
     os.replace(temporary, path)
 
 
+def _run_tracked_root(repo_root: Path, run_root: Path) -> Path:
+    raw_root = run_root.resolve()
+    scratch_root = repo_root / "_scratch"
+    if not _inside(raw_root, scratch_root) or not raw_root.name.startswith(
+        "dual_sync_f2_abc_"
+    ):
+        raise F2ContractError(
+            "F2 raw root must be _scratch/dual_sync_f2_abc_<stamp>"
+        )
+    run_id = raw_root.name.removeprefix("dual_sync_f2_abc_")
+    _validate_run_id(run_id)
+    tracked_root = repo_root / TRACKED_F2_REL / run_id
+    if _has_symlink_component(tracked_root) or not _inside(
+        tracked_root, repo_root / TRACKED_F2_REL
+    ):
+        raise F2ContractError("F2 tracked root is not a direct evidence path")
+    return tracked_root
+
+
+def _close_run_for_host_drift(
+    repo_root: Path,
+    run_root: Path,
+    *,
+    expected_host_sha: str,
+    observed_host_sha: str,
+) -> Path | None:
+    """Write one immutable global BLOCKED marker for a started run."""
+    tracked_root = _run_tracked_root(repo_root, run_root)
+    if not tracked_root.is_dir():
+        return None
+    marker = tracked_root / "RUN_BLOCKED.json"
+    _atomic_manifest(
+        marker,
+        {
+            "schema_version": 1,
+            "status": gate_eval.BLOCKED,
+            "reason": "host_execution_sha_changed_after_run_creation",
+            "expected_host_execution_sha": expected_host_sha,
+            "observed_host_execution_sha": observed_host_sha,
+            "created_at_utc": datetime.now(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "f3_authorised": False,
+        },
+    )
+    return marker
+
+
+def _require_run_open(repo_root: Path, run_root: Path) -> None:
+    marker = _run_tracked_root(repo_root, run_root) / "RUN_BLOCKED.json"
+    if marker.exists() or marker.is_symlink():
+        raise F2ContractError(
+            f"F2 run is already closed as BLOCKED: {marker}"
+        )
+
+
 def _capture_command(args, firmware_sha: str) -> list[str]:
-    return [
+    command = [
         "bash",
         "scripts/dual_sync_probe/run_f2_abc.sh",
         "--case",
         args.case,
         "--physical-state",
         args.physical_state,
-        "--out-root",
-        str(args.out_root),
-        "--run-id",
-        args.run_id,
-        "--leader-port",
-        args.leader_port,
-        "--follower-port",
-        args.follower_port,
-        "--firmware-sha",
+        "--host-execution-sha",
+        args.host_execution_sha,
+        "--firmware-source-sha",
         firmware_sha,
+        "--image-set-manifest",
+        str(args.image_set_manifest),
+        "--ports-manifest",
+        str(args.ports_manifest),
+        "--run-root",
+        str(args.run_root),
         "--flash-manifest",
         str(args.flash_manifest),
         "--attestation",
@@ -1387,50 +1643,40 @@ def _capture_command(args, firmware_sha: str) -> list[str]:
         "--baud",
         str(args.baud),
     ]
-
-
-def _captain_stop(tracked_root: Path, cases: list[dict]) -> None:
-    lines = [
-        "---",
-        "decision: PENDING",
-        "f3_authorised: false",
-        "---",
-        "",
-        "# Dual-sync F2 — Captain STOP",
-        "",
-        "F3 is forbidden until Captain changes `Decision: PENDING` to an "
-        "explicit acceptance.",
-        "Case-C software proof covers K1 apply and confirmation-write "
-        "submission. K718 display receipt remains Captain-observed.",
-        "",
-        "| Case | Link Ready | Stream TX | GPIO rounds | Dial | Verdict |",
-        "|---|---|---:|---:|---|---|",
-    ]
-    for manifest in cases:
-        checks = manifest["link_ready"]["checks"]
-        lines.append(
-            f"| {manifest['case']} | {manifest['link_ready']['status']} | "
-            f"{checks['leader_tx']['value']} | "
-            f"{checks['gpio_complete_rounds']['value']} | "
-            f"{manifest['dial_evidence']['requirement']} | "
-            f"{manifest['case_status']} |"
+    if args.reboot_manifest is not None:
+        command.extend(
+            ["--reboot-manifest", str(args.reboot_manifest)]
         )
-    lines.extend(("", "## Manifest hashes", ""))
-    for manifest in cases:
-        path = tracked_root / f"case_{manifest['case']}.json"
-        lines.append(f"- Case {manifest['case']}: `{_sha256(path)}`")
-    lines.extend(("", "Decision: PENDING", ""))
-    path = tracked_root / "CAPTAIN_STOP.md"
-    if path.exists():
-        raise F2ContractError(f"refusing to overwrite Captain STOP {path}")
-    path.write_text("\n".join(lines), encoding="utf-8")
+    return command
 
 
 def run(args) -> dict:
     repo_root = Path(__file__).resolve().parents[2]
     _require_clean_host_inputs(repo_root)
     host_sha = _git_head(repo_root)
-    firmware_sha = _resolve_commit(repo_root, args.firmware_sha)
+    if host_sha != args.host_execution_sha:
+        _close_run_for_host_drift(
+            repo_root,
+            args.run_root,
+            expected_host_sha=args.host_execution_sha,
+            observed_host_sha=host_sha,
+        )
+        raise F2ContractError(
+            "host execution SHA does not equal current committed HEAD"
+        )
+    image_set = f2_image_set.load(
+        args.image_set_manifest, repo_root=repo_root
+    )
+    firmware_sha = _resolve_commit(
+        repo_root, args.firmware_source_sha
+    )
+    if (
+        firmware_sha != args.firmware_source_sha
+        or firmware_sha != image_set["firmware_source_sha"]
+    ):
+        raise F2ContractError(
+            "firmware source SHA does not match the reviewed image set"
+        )
     _require_ancestor(repo_root, firmware_sha, host_sha)
     contract = CASE_CONTRACT[args.case]
     if args.physical_state != contract["physical_state"]:
@@ -1442,9 +1688,15 @@ def run(args) -> dict:
         raise F2ContractError(
             f"F2 capture duration must be at least {MIN_CAPTURE_SECONDS:g}s"
         )
-    if _has_symlink_component(args.out_root):
+    if args.case == "C2" and args.reboot_manifest is None:
+        raise F2ContractError("Case C2 requires --reboot-manifest")
+    if args.case != "C2" and args.reboot_manifest is not None:
+        raise F2ContractError(
+            "--reboot-manifest is valid only for Case C2"
+        )
+    if _has_symlink_component(args.run_root):
         raise F2ContractError("F2 raw root may not contain symlinks")
-    out_root = args.out_root.resolve()
+    out_root = args.run_root.resolve()
     scratch_root = repo_root / "_scratch"
     if not _inside(out_root, scratch_root) or not out_root.name.startswith(
         "dual_sync_f2_abc_"
@@ -1452,16 +1704,14 @@ def run(args) -> dict:
         raise F2ContractError(
             "F2 raw root must be _scratch/dual_sync_f2_abc_<stamp>"
         )
-    _validate_run_id(args.run_id)
-    if out_root.name != f"dual_sync_f2_abc_{args.run_id}":
-        raise F2ContractError(
-            "F2 raw root name must exactly match the declared run ID"
-        )
-    tracked_root = repo_root / TRACKED_F2_REL / args.run_id
+    run_id = out_root.name.removeprefix("dual_sync_f2_abc_")
+    _validate_run_id(run_id)
+    tracked_root = repo_root / TRACKED_F2_REL / run_id
     if _has_symlink_component(tracked_root):
         raise F2ContractError("F2 tracked root may not contain symlinks")
     if not _inside(tracked_root, repo_root / TRACKED_F2_REL):
         raise F2ContractError("F2 tracked root escapes fixed evidence root")
+    _require_run_open(repo_root, args.run_root)
     tracked_case = tracked_root / f"case_{args.case}.json"
     if tracked_case.exists():
         raise F2ContractError(
@@ -1484,7 +1734,25 @@ def run(args) -> dict:
         repo_root,
     )
 
-    ports = {"leader": args.leader_port, "follower": args.follower_port}
+    expected_ports_stage = {
+        "A": "A",
+        "B": "B",
+        "C1": "B",
+        "C2": "C2",
+    }[args.case]
+    try:
+        ports_payload = f2_ports.validate_ports_manifest(
+            args.ports_manifest,
+            expected_stage=expected_ports_stage,
+            expected_host_execution_sha=host_sha,
+            expected_firmware_source_sha=firmware_sha,
+        )
+    except f2_ports.F2PortsError as error:
+        raise F2ContractError(f"ports manifest rejected: {error}") from error
+    ports = {
+        role: str(ports_payload[role]["port"])
+        for role in ("leader", "follower")
+    }
     flash_manifest_path = _require_direct_file(
         args.flash_manifest,
         tracked_root / "uploads",
@@ -1494,23 +1762,24 @@ def run(args) -> dict:
         flash_manifest_path,
         case_name=args.case,
         firmware_sha=firmware_sha,
+        host_sha=host_sha,
         out_root=out_root,
         tracked_root=tracked_root,
         repo_root=repo_root,
         ports=ports,
     )
 
-    if args.case == "C":
+    if args.case in ("C1", "C2"):
         case_b = prior[-1]
         if case_b.get("binaries") != binaries:
             raise F2ContractError(
-                "Case C must use the exact Case-B firmware binaries"
+                f"Case {args.case} must use the exact Case-B binaries"
             )
         if case_b.get("flash_manifest", {}).get("sha256") != _sha256(
             flash_manifest_path
         ):
             raise F2ContractError(
-                "Case C must reuse the exact Case-B flash manifest"
+                f"Case {args.case} must reuse the Case-B flash manifest"
             )
 
     expectations = {
@@ -1533,8 +1802,8 @@ def run(args) -> dict:
     }
     case_dir = out_root / f"case_{args.case}"
     results = capture.run_segments(
-        leader_port=args.leader_port,
-        follower_port=args.follower_port,
+        leader_port=ports["leader"],
+        follower_port=ports["follower"],
         out_dir=case_dir,
         segments=("off",),
         duration_s=args.duration_s,
@@ -1542,8 +1811,8 @@ def run(args) -> dict:
         settle_s=args.settle_s,
         baud=args.baud,
         identity_expectations=expectations,
-        leader_ble_stream=args.case in ("B", "C"),
-        leader_dial_status=args.case in ("B", "C"),
+        leader_ble_stream=args.case in ("B", "C1", "C2"),
+        leader_dial_status=args.case in ("B", "C1", "C2"),
     )
     link_ready = results[0]["link_ready"]
     verdict_path = case_dir / "off" / "verdict_off.json"
@@ -1551,17 +1820,42 @@ def run(args) -> dict:
     identity_payload = _read_manifest(case_dir / "IDENTITY.json")
     prior_runtime = (
         prior[-1].get("runtime_identity")
-        if args.case == "C" and prior
+        if args.case in ("B", "C1", "C2") and prior
         else None
     )
+    reboot_payload = None
+    reboot_manifest_path = None
+    if args.case == "C2":
+        reboot_manifest_path = _require_direct_file(
+            args.reboot_manifest,
+            tracked_root / "runtime",
+            "controlled C2 reboot manifest",
+        )
+        reboot_payload = _read_manifest(reboot_manifest_path)
+        if (
+            reboot_payload.get("status") != gate_eval.PASS
+            or reboot_payload.get("host_execution_sha") != host_sha
+            or reboot_payload.get("firmware_source_sha") != firmware_sha
+        ):
+            raise F2ContractError(
+                "controlled C2 reboot manifest is not a bound PASS"
+            )
+        startup = _validate_c2_startup_capture(
+            reboot_payload, repo_root, tracked_root
+        )
     runtime_identity, runtime_continuity = _runtime_continuity(
-        identity_payload, flash_payload, prior_runtime
+        identity_payload,
+        flash_payload,
+        prior_runtime,
+        case_name=args.case,
+        firmware_sha=firmware_sha,
+        reboot_payload=reboot_payload,
     )
     leader_segment_path = case_dir / "off" / "leader_segment.log"
     dial_status_path = case_dir / "DIAL_STATUS.json"
     dial_status = (
         _read_manifest(dial_status_path).get("off")
-        if args.case in ("B", "C")
+        if args.case in ("B", "C1", "C2")
         else None
     )
     dial_evidence = _analyse_dial(
@@ -1581,7 +1875,7 @@ def run(args) -> dict:
         "sync_status": case_dir / "SYNC_STATUS.json",
         "index": case_dir / "INDEX.md",
     }
-    if args.case in ("B", "C"):
+    if args.case in ("B", "C1", "C2"):
         evidence_paths["dial_status"] = dial_status_path
     prior_digest = (
         _sha256(tracked_root / f"case_{prior[-1]['case']}.json")
@@ -1595,7 +1889,7 @@ def run(args) -> dict:
     )
     manifest = {
         "schema_version": SCHEMA_VERSION,
-        "run_id": args.run_id,
+        "run_id": run_id,
         "case": args.case,
         "case_status": status,
         "link_ready": verdict["link_ready"],
@@ -1607,16 +1901,16 @@ def run(args) -> dict:
         "runtime_identity": runtime_identity,
         "runtime_continuity": runtime_continuity,
         "physical_state": args.physical_state,
-        "host_source_sha": host_sha,
+        "host_execution_sha": host_sha,
         "firmware_source_sha": firmware_sha,
         "prior_manifest_sha256": prior_digest,
         "leader": {
-            "port": args.leader_port,
+            "port": ports["leader"],
             "chip_id": LEADER_CHIP,
             "env": contract["leader_env"],
         },
         "follower": {
-            "port": args.follower_port,
+            "port": ports["follower"],
             "chip_id": FOLLOWER_CHIP,
             "env": FOLLOWER_ENV,
         },
@@ -1624,12 +1918,18 @@ def run(args) -> dict:
         "flash_manifest": _evidence_record(
             flash_manifest_path, repo_root
         ),
+        "image_set_manifest": _evidence_record(
+            image_set["manifest_path"], repo_root
+        ),
+        "ports_manifest": _evidence_record(
+            args.ports_manifest, repo_root
+        ),
         "attestation": _evidence_record(attestation_path, repo_root),
         "attestation_summary": attestation_payload,
         "commands": {
             "capture": _capture_command(args, firmware_sha),
-            "uploads": {
-                role: flash_payload["uploads"][role]["command"]
+            "firmware_writes": {
+                role: flash_payload["uploads"][role].get("write_command")
                 for role in ("leader", "follower")
             },
             "serial": (
@@ -1663,26 +1963,52 @@ def run(args) -> dict:
             for name, path in evidence_paths.items()
         },
     }
+    if reboot_manifest_path is not None:
+        manifest["reboot_manifest"] = _evidence_record(
+            reboot_manifest_path, repo_root
+        )
+        manifest["cold_start_establishment"] = startup["checks"]
+    if args.case == "C1":
+        try:
+            f2_ports.write_ports_manifest(
+                "C1",
+                tracked_root / "runtime",
+                {
+                    "leader": ports_payload["leader"],
+                    "follower": ports_payload["follower"],
+                },
+                host_execution_sha=host_sha,
+                firmware_source_sha=firmware_sha,
+                prior_manifest=args.ports_manifest,
+            )
+        except f2_ports.F2PortsError as error:
+            raise F2ContractError(
+                f"cannot persist ports_C1.json: {error}"
+            ) from error
+        manifest["output_ports_manifest"] = _evidence_record(
+            tracked_root / "runtime" / "ports_C1.json", repo_root
+        )
     _atomic_manifest(case_dir / "MANIFEST.json", manifest)
     _atomic_manifest(tracked_case, manifest)
-    if args.case == "C" and status == gate_eval.PASS:
-        _captain_stop(tracked_root, prior + [manifest])
     return manifest
 
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Capture one ordered, identity-checked F2 A/B/C case."
+        description=(
+            "Capture one ordered, identity-checked F2 A/B/C1/C2 case."
+        )
     )
     parser.add_argument("--case", choices=tuple(CASE_CONTRACT), required=True)
     parser.add_argument("--physical-state", required=True)
-    parser.add_argument("--out-root", type=Path, required=True)
-    parser.add_argument("--run-id", required=True)
-    parser.add_argument("--leader-port", required=True)
-    parser.add_argument("--follower-port", required=True)
-    parser.add_argument("--firmware-sha", required=True)
+    parser.add_argument("--host-execution-sha", required=True)
+    parser.add_argument("--firmware-source-sha", required=True)
+    parser.add_argument("--image-set-manifest", type=Path, required=True)
+    parser.add_argument("--ports-manifest", type=Path, required=True)
+    parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--flash-manifest", type=Path, required=True)
     parser.add_argument("--attestation", type=Path, required=True)
+    parser.add_argument("--reboot-manifest", type=Path)
     parser.add_argument("--duration-s", type=float, default=60.0)
     parser.add_argument("--settle-s", type=float, default=10.0)
     parser.add_argument("--ack-timeout-s", type=float, default=3.0)
