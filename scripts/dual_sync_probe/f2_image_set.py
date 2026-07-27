@@ -177,7 +177,7 @@ def _partition_entries(data: bytes) -> dict[str, tuple[int, int]]:
         if len(raw) != 32:
             break
         magic = int.from_bytes(raw[:2], "little")
-        if magic == 0xFFFF:
+        if magic in {0xFFFF, 0xEBEB}:
             break
         if magic != 0x50AA:
             raise F2ImageSetError(
