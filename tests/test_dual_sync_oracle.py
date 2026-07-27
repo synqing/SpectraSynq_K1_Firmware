@@ -6,6 +6,7 @@ import dataclasses
 import io
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -13,6 +14,7 @@ from scripts.dual_sync_probe import (
     capture,
     correlate,
     f2_capture,
+    f2_flash,
     gate_eval,
     logfmt,
     synth,
@@ -561,7 +563,7 @@ class _FakeSerial:
                     ]
                 )
             return len(payload)
-        if self.acknowledge:
+        if self.acknowledge and command.startswith(":sync_fault="):
             mode = command.split("=", 1)[1]
             self.lines.extend(
                 [
@@ -583,12 +585,19 @@ class _FakeSerial:
 
 
 class _IdentitySerial(_FakeSerial):
-    def __init__(self, chip_id, env, git_hash="abcdef0"):
+    def __init__(
+        self,
+        chip_id,
+        env,
+        git_hash="abcdef0",
+        app_elf_sha256="a" * 64,
+    ):
         role = "leader" if "main" in env else "follower"
         super().__init__(role)
         self.chip_id = chip_id
         self.env = env
         self.git_hash = git_hash
+        self.app_elf_sha256 = app_elf_sha256
 
     def write(self, payload):
         command = payload.decode().strip()
@@ -600,6 +609,22 @@ class _IdentitySerial(_FakeSerial):
                 (
                     f"BUILD: version=40103 git={self.git_hash} "
                     f"epoch=123 env={self.env}\n"
+                ).encode()
+            )
+            return len(payload)
+        if command == ":image_id":
+            self.lines.append(
+                (
+                    "IMAGE_ID: app_elf_sha256="
+                    f"{self.app_elf_sha256}\n"
+                ).encode()
+            )
+            return len(payload)
+        if command == ":runtime_id":
+            self.lines.append(
+                (
+                    "RUNTIME_ID: boot_nonce=0123456789abcdef "
+                    "uptime_ms=12345 reset_reason=1\n"
                 ).encode()
             )
             return len(payload)
@@ -760,17 +785,82 @@ def test_capture_probes_both_chip_and_build_identities():
                 "chip_id": "F887A500",
                 "env": "k1_sync_probe_main_sync_only",
                 "source_sha": "abcdef012345",
+                "app_elf_sha256": "a" * 64,
             },
             "follower": {
                 "chip_id": "B489A500",
                 "env": "k1_sync_probe_bench",
                 "source_sha": "abcdef012345",
+                "app_elf_sha256": "a" * 64,
             },
         },
         timeout_s=0.05,
     )
     assert observed["leader"]["chip_id"] == "F887A500"
     assert observed["follower"]["env"] == "k1_sync_probe_bench"
+    assert observed["leader"]["app_elf_sha256"] == "a" * 64
+    assert observed["leader"]["boot_nonce"] == "0123456789abcdef"
+
+
+def test_capture_rejects_postflash_image_identity_mismatch():
+    leader = _IdentitySerial(
+        "F887A500",
+        "k1_sync_probe_main_sync_only",
+        app_elf_sha256="b" * 64,
+    )
+    follower = _IdentitySerial("B489A500", "k1_sync_probe_bench")
+    dual = capture.DualCapture(
+        leader,
+        follower,
+        capture._RoleWriter(io.StringIO()),
+        capture._RoleWriter(io.StringIO()),
+    )
+    with pytest.raises(capture.CaptureContractError, match="image mismatch"):
+        dual.verify_devices(
+            {
+                "leader": {
+                    "chip_id": "F887A500",
+                    "env": "k1_sync_probe_main_sync_only",
+                    "source_sha": "abcdef012345",
+                    "app_elf_sha256": "a" * 64,
+                },
+                "follower": {
+                    "chip_id": "B489A500",
+                    "env": "k1_sync_probe_bench",
+                    "source_sha": "abcdef012345",
+                    "app_elf_sha256": "a" * 64,
+                },
+            },
+            timeout_s=0.05,
+        )
+
+
+def test_dial_status_parser_requires_exact_complete_snapshot():
+    leader = _FakeSerial("leader")
+    follower = _FakeSerial("follower")
+    status_line = (
+        "DIAL_STATUS: linked=1 generation=4 notify=3 decoded=3 "
+        "enqueued=3 apply_ok=3 apply_fail=0 queue_drops=0 "
+        "decode_errors=0 dial_mode_apply_ok=3 confirm_write_ok=2 "
+        "confirm_write_fail=0 dial_confirm_write_ok=1 "
+        "last_confirm_pm=5 last_confirm_sm=2"
+    )
+    leader.lines.append(f"{status_line}\n".encode())
+    dual = capture.DualCapture(
+        leader,
+        follower,
+        capture._RoleWriter(io.StringIO()),
+        capture._RoleWriter(io.StringIO()),
+    )
+    status = dual.query_leader_dial_status(timeout_s=0.05)
+    assert status["generation"] == 4
+    assert status["dial_confirm_write_ok"] == 1
+
+    leader.lines.append(
+        b"DIAL_STATUS: linked=1 generation=4 notify=3\n"
+    )
+    with pytest.raises(capture.CaptureContractError, match="response missing"):
+        dual.query_leader_dial_status(timeout_s=0.01)
 
 
 def test_capture_sync_status_discards_stale_lifecycle_and_records_fresh():
@@ -880,30 +970,752 @@ def test_f2_parser_rejects_locked_capture_overrides():
                 "sync-only",
                 "--out-root",
                 "/tmp/evidence",
+                "--run-id",
+                "run",
                 "--leader-port",
                 "leader",
                 "--follower-port",
                 "follower",
                 "--leader-bin",
                 "leader.bin",
-                "--follower-bin",
-                "follower.bin",
-                "--segments",
-                "delay5",
+                "--firmware-sha",
+                "a" * 40,
+                "--flash-manifest",
+                "flash.json",
+                "--attestation",
+                "attestation.json",
             ]
         )
 
 
-def test_f2_order_blocks_direct_b_or_c(tmp_path):
-    with pytest.raises(f2_capture.F2ContractError, match="invalid prior"):
-        f2_capture.validate_case_order("B", tmp_path, "abc")
-    case_a = tmp_path / "case_A"
-    case_a.mkdir()
-    (case_a / "MANIFEST.json").write_text(
-        json.dumps({"case_status": "BLOCKED", "source_sha": "abc"})
+def test_f2_order_rejects_minimal_forged_pass_manifest(tmp_path):
+    raw_root = tmp_path / "_scratch" / "dual_sync_f2_abc_run"
+    tracked_root = tmp_path / "artifacts" / "f2" / "run"
+    tracked_root.mkdir(parents=True)
+    (tracked_root / "case_A.json").write_text(
+        json.dumps(
+            {
+                "case_status": gate_eval.PASS,
+                "firmware_source_sha": "f" * 40,
+                "host_source_sha": "h" * 40,
+            }
+        )
     )
-    with pytest.raises(f2_capture.F2ContractError, match="Case A PASS"):
-        f2_capture.validate_case_order("B", tmp_path, "abc")
+    with pytest.raises(
+        f2_capture.F2ContractError, match="schema_version"
+    ):
+        f2_capture.validate_case_order(
+            "B",
+            raw_root,
+            tracked_root,
+            "f" * 40,
+            "h" * 40,
+            tmp_path,
+        )
+
+
+def _remoted_counter_line(linked, value=0):
+    return (
+        "[ble_remoted] counters "
+        f"linked={linked} notify={value} decoded={value} enqueued={value} "
+        "queue_drops=0 decode_errors=0 "
+        f"apply_ok={value} apply_fail=0 "
+        f"link_up={linked} link_down=0 connect_fail=0 "
+        f"confirm_ok={linked + (value > 0)} confirm_fail=0 "
+        f"confirm_pm={5 if value else 4} confirm_sm=2"
+    )
+
+
+def _dial_status(linked, generation, value=0):
+    return {
+        "linked": linked,
+        "generation": generation,
+        "notify": value,
+        "decoded": value,
+        "enqueued": value,
+        "apply_ok": value,
+        "apply_fail": 0,
+        "queue_drops": 0,
+        "decode_errors": 0,
+        "dial_mode_apply_ok": value,
+        "confirm_write_ok": 1 + (value > 0),
+        "confirm_write_fail": 0,
+        "dial_confirm_write_ok": 1 if value > 0 else 0,
+        "last_confirm_pm": 5 if value else 4,
+        "last_confirm_sm": 2,
+    }
+
+
+def test_f2_case_b_requires_dial_off_and_zero_counter_delta():
+    lines = []
+    for index in range(10):
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=0 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(0)}",
+            )
+        )
+    status = {
+        "baseline": _dial_status(0, 0),
+        "end": _dial_status(0, 0),
+    }
+    result = f2_capture._analyse_dial("B", "\n".join(lines), status)
+    assert result["status"] == gate_eval.PASS
+
+    traffic = {
+        "baseline": _dial_status(0, 0),
+        "end": _dial_status(0, 0, 1),
+    }
+    failed = f2_capture._analyse_dial("B", "\n".join(lines), traffic)
+    assert failed["status"] == gate_eval.FAIL
+
+    hidden_activity = []
+    for index in range(10):
+        hidden_activity.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=0 loss=0 dup=0"
+                ),
+                (
+                    f"host_us={index} "
+                    f"{_remoted_counter_line(0, min(index, 3))}"
+                ),
+            )
+        )
+    split = f2_capture._analyse_dial(
+        "B", "\n".join(hidden_activity), status
+    )
+    assert split["status"] != gate_eval.PASS
+
+
+def test_f2_case_c_requires_causal_mode_confirmation():
+    lines = []
+    for index in range(10):
+        value = min(index, 3)
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(1, value)}",
+            )
+        )
+    lines.extend(
+        (
+            (
+                "host_us=20 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=5 apply_ok=3"
+            ),
+            (
+                "host_us=21 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=5 sm=2"
+            ),
+        )
+    )
+    status = {
+        "baseline": _dial_status(1, 4),
+        "end": _dial_status(1, 4, 3),
+    }
+    result = f2_capture._analyse_dial("C", "\n".join(lines), status)
+    assert result["status"] == gate_eval.PASS
+
+    without_confirmation = "\n".join(lines[:-1])
+    blocked = f2_capture._analyse_dial(
+        "C", without_confirmation, status
+    )
+    assert blocked["status"] == gate_eval.BLOCKED
+
+    reversed_events = lines[:-2] + [lines[-1], lines[-2]]
+    reversed_result = f2_capture._analyse_dial(
+        "C", "\n".join(reversed_events), status
+    )
+    assert reversed_result["status"] == gate_eval.BLOCKED
+
+    fixed_periodic = []
+    for index in range(10):
+        fixed_periodic.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(1, 0)}",
+            )
+        )
+    fixed_periodic.extend(lines[-2:])
+    split = f2_capture._analyse_dial(
+        "C", "\n".join(fixed_periodic), status
+    )
+    assert split["status"] == gate_eval.BLOCKED
+
+    error_status = json.loads(json.dumps(status))
+    error_status["end"]["decode_errors"] = 1
+    failed = f2_capture._analyse_dial(
+        "C", "\n".join(lines), error_status
+    )
+    assert failed["status"] == gate_eval.FAIL
+
+    decreasing_gauge_lines = [
+        line.replace("confirm_pm=4", "confirm_pm=5").replace(
+            "confirm_pm=5", "confirm_pm=3"
+        )
+        for line in lines[:-2]
+    ]
+    decreasing_gauge_lines.extend(
+        (
+            (
+                "host_us=20 [ble_remoted] mode_apply record_id=7 "
+                "control=primary.mode accepted=3 apply_ok=3"
+            ),
+            (
+                "host_us=21 [ble_remoted] confirm_write ok=1 "
+                "cause=dial_mode record_id=7 generation=4 pm=3 sm=2"
+            ),
+        )
+    )
+    decreasing_status = json.loads(json.dumps(status))
+    decreasing_status["baseline"]["last_confirm_pm"] = 5
+    decreasing_status["end"]["last_confirm_pm"] = 3
+    gauge_result = f2_capture._analyse_dial(
+        "C", "\n".join(decreasing_gauge_lines), decreasing_status
+    )
+    assert gauge_result["status"] == gate_eval.PASS
+
+
+def test_f2_dial_status_is_fail_closed_on_missing_or_regressed_snapshot():
+    lines = []
+    for index in range(10):
+        lines.extend(
+            (
+                (
+                    f"host_us={index} [k1_sync] health role=leader fps=100 "
+                    "heap_min=60000 ap_p95_us=0 dial_linked=1 loss=0 dup=0"
+                ),
+                f"host_us={index} {_remoted_counter_line(1, 3)}",
+            )
+        )
+    missing = f2_capture._analyse_dial("C", "\n".join(lines), None)
+    assert missing["status"] == gate_eval.BLOCKED
+
+    regressed = {
+        "baseline": _dial_status(1, 4, 3),
+        "end": _dial_status(1, 4, 2),
+    }
+    result = f2_capture._analyse_dial(
+        "C", "\n".join(lines), regressed
+    )
+    assert result["status"] == gate_eval.BLOCKED
+
+
+def test_f2_runtime_continuity_blocks_same_image_reflash_between_b_and_c():
+    identity = {
+        role: {
+            "boot_nonce": "0123456789abcdef",
+            "uptime_ms": 3000,
+            "reset_reason": 1,
+        }
+        for role in ("leader", "follower")
+    }
+    flash_payload = {
+        "uploads": {
+            role: {
+                "postflash_readback": {
+                    "boot_nonce": "0123456789abcdef",
+                    "uptime_ms": 1000,
+                    "reset_reason": 1,
+                }
+            }
+            for role in ("leader", "follower")
+        }
+    }
+    prior = {
+        role: {
+            "boot_nonce": "0123456789abcdef",
+            "uptime_ms": 2000,
+            "reset_reason": 1,
+        }
+        for role in ("leader", "follower")
+    }
+    _runtime, result = f2_capture._runtime_continuity(
+        identity, flash_payload, prior
+    )
+    assert result["status"] == gate_eval.PASS
+
+    identity["leader"]["boot_nonce"] = "fedcba9876543210"
+    _runtime, reset = f2_capture._runtime_continuity(
+        identity, flash_payload, prior
+    )
+    assert reset["status"] == gate_eval.BLOCKED
+
+
+def test_f2_case_status_preserves_observed_failures():
+    assert (
+        f2_capture._case_status(
+            gate_eval.PASS, gate_eval.FAIL, gate_eval.PASS
+        )
+        == gate_eval.FAIL
+    )
+    assert (
+        f2_capture._case_status(
+            gate_eval.PASS, gate_eval.BLOCKED, gate_eval.PASS
+        )
+        == gate_eval.BLOCKED
+    )
+
+
+def test_f2_firmware_sha_is_separate_ancestor_of_harness_head():
+    repo_root = Path(__file__).resolve().parents[1]
+    host_sha = f2_capture._git_head(repo_root)
+    parent_sha = f2_capture._resolve_commit(repo_root, f"{host_sha}^")
+    f2_capture._require_ancestor(repo_root, parent_sha, host_sha)
+
+
+def test_f2_flash_parser_has_no_case_c_upload_path():
+    parser = f2_flash._build_parser()
+    with pytest.raises(SystemExit):
+        parser.parse_args(
+            [
+                "--case",
+                "C",
+                "--run-id",
+                "run",
+                "--firmware-sha",
+                "a" * 40,
+                "--leader-port",
+                "leader",
+                "--follower-port",
+                "follower",
+            ]
+        )
+
+
+def _flash_args(tmp_path, case, run_id):
+    return SimpleNamespace(
+        case=case,
+        run_id=run_id,
+        firmware_sha="a" * 40,
+        attestation=tmp_path / "attestation.json",
+        leader_port="leader-port",
+        follower_port="follower-port",
+        readback_timeout_s=0.01,
+    )
+
+
+def test_f2_flash_rejects_unsafe_run_id_before_any_device_action(
+    tmp_path, monkeypatch,
+):
+    args = _flash_args(tmp_path, "A", "..")
+    monkeypatch.setattr(f2_flash, "_require_clean_inputs", lambda _root: None)
+    monkeypatch.setattr(f2_capture, "_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(
+        f2_capture, "_resolve_commit", lambda _root, _value: "a" * 40
+    )
+    actions = []
+    with pytest.raises(f2_flash.F2FlashError, match="unsafe"):
+        f2_flash.run(
+            args,
+            command_runner=lambda *values, **_kwargs: actions.append(values),
+            preflash_reader=lambda *values: actions.append(values),
+            repo_root_override=tmp_path,
+        )
+    assert actions == []
+    for unsafe in (".", "a.", "a-", "_a", "a/b"):
+        with pytest.raises(f2_capture.F2ContractError, match="unsafe"):
+            f2_capture._validate_run_id(unsafe)
+
+
+def test_f2_flash_b_requires_case_a_before_any_device_action(
+    tmp_path, monkeypatch,
+):
+    args = _flash_args(tmp_path, "B", "missing_a")
+    monkeypatch.setattr(f2_flash, "_require_clean_inputs", lambda _root: None)
+    monkeypatch.setattr(f2_capture, "_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(
+        f2_capture, "_resolve_commit", lambda _root, _value: "a" * 40
+    )
+    actions = []
+    with pytest.raises(
+        f2_capture.F2ContractError, match="prior Case A manifest"
+    ):
+        f2_flash.run(
+            args,
+            command_runner=lambda *values, **_kwargs: actions.append(values),
+            preflash_reader=lambda *values: actions.append(values),
+            repo_root_override=tmp_path,
+        )
+    assert actions == []
+
+
+def test_f2_flash_prepares_all_required_roles_before_first_upload(
+    tmp_path, monkeypatch,
+):
+    args = _flash_args(tmp_path, "A", "prepare_first")
+    tracked = (
+        tmp_path / f2_capture.TRACKED_F2_REL
+        / args.run_id / "attestations"
+    )
+    tracked.mkdir(parents=True)
+    args.attestation = tracked / "case_A.json"
+    args.attestation.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "case": "A",
+                "confirmed_by": "Captain",
+                "gpio_wiring_confirmed": True,
+                "common_ground_confirmed": True,
+                "logic_voltage": "3V3",
+                "k718_state": "irrelevant",
+            }
+        )
+    )
+    monkeypatch.setattr(f2_flash, "_require_clean_inputs", lambda _root: None)
+    monkeypatch.setattr(f2_capture, "_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(
+        f2_capture, "_resolve_commit", lambda _root, _value: "a" * 40
+    )
+    monkeypatch.setattr(
+        f2_flash,
+        "_app_elf_sha256",
+        lambda path: f2_capture._sha256(
+            path.with_name("firmware.elf")
+        ),
+    )
+    commands = []
+
+    def runner(command, log_path, *, append):
+        commands.append(command)
+        mode = "a" if append else "w"
+        with log_path.open(mode) as output:
+            if command[:2] == ["bash", "scripts/agent/pio-build.sh"]:
+                env = command[2]
+                output.write(
+                    f"[k1-build-provenance] env={env} "
+                    "git=aaaaaaa epoch=1\n"
+                )
+                if env == "k1_sync_probe_bench":
+                    return 1
+                build_dir = tmp_path / ".pio" / "build" / env
+                build_dir.mkdir(parents=True)
+                (build_dir / "firmware.bin").write_bytes(b"bin")
+                (build_dir / "firmware.elf").write_bytes(b"elf")
+                return 0
+            output.write("verified as target\n")
+        return 0
+
+    with pytest.raises(f2_flash.F2FlashError, match="follower canonical"):
+        f2_flash.run(
+            args,
+            command_runner=runner,
+            preflash_reader=lambda port, usb, chip, _timeout: {
+                "port": port,
+                "usb_serial": usb,
+                "chip_id": chip,
+            },
+            repo_root_override=tmp_path,
+        )
+    assert not any(command and command[0] == "pio" for command in commands)
+    blocked = json.loads(
+        (
+            tmp_path / f2_capture.TRACKED_F2_REL / args.run_id
+            / "uploads" / "flash_A.json"
+        ).read_text()
+    )
+    assert blocked["status"] == gate_eval.BLOCKED
+
+
+def test_f2_flash_records_failed_upload_attempt(
+    tmp_path, monkeypatch,
+):
+    args = _flash_args(tmp_path, "A", "failed_upload")
+    tracked = (
+        tmp_path / f2_capture.TRACKED_F2_REL
+        / args.run_id / "attestations"
+    )
+    tracked.mkdir(parents=True)
+    args.attestation = tracked / "case_A.json"
+    args.attestation.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "case": "A",
+                "confirmed_by": "Captain",
+                "gpio_wiring_confirmed": True,
+                "common_ground_confirmed": True,
+                "logic_voltage": "3V3",
+                "k718_state": "irrelevant",
+            }
+        )
+    )
+    monkeypatch.setattr(f2_flash, "_require_clean_inputs", lambda _root: None)
+    monkeypatch.setattr(f2_capture, "_git_head", lambda _root: "a" * 40)
+    monkeypatch.setattr(
+        f2_capture, "_resolve_commit", lambda _root, _value: "a" * 40
+    )
+    monkeypatch.setattr(
+        f2_flash,
+        "_app_elf_sha256",
+        lambda path: f2_capture._sha256(
+            path.with_name("firmware.elf")
+        ),
+    )
+
+    def runner(command, log_path, *, append):
+        mode = "a" if append else "w"
+        with log_path.open(mode) as output:
+            if command[:2] == ["bash", "scripts/agent/pio-build.sh"]:
+                env = command[2]
+                output.write(
+                    f"[k1-build-provenance] env={env} "
+                    "git=aaaaaaa epoch=1\n"
+                )
+                build_dir = tmp_path / ".pio" / "build" / env
+                build_dir.mkdir(parents=True)
+                (build_dir / "firmware.bin").write_bytes(
+                    f"{env}-bin".encode()
+                )
+                (build_dir / "firmware.elf").write_bytes(
+                    f"{env}-elf".encode()
+                )
+                return 0
+            output.write("verified as target\n")
+            return 9 if command and command[0] == "pio" else 0
+
+    with pytest.raises(f2_flash.F2FlashError, match="leader upload failed"):
+        f2_flash.run(
+            args,
+            command_runner=runner,
+            preflash_reader=lambda port, usb, chip, _timeout: {
+                "port": port,
+                "usb_serial": usb,
+                "chip_id": chip,
+            },
+            repo_root_override=tmp_path,
+        )
+    blocked = json.loads(
+        (
+            tmp_path / f2_capture.TRACKED_F2_REL / args.run_id
+            / "uploads" / "flash_A.json"
+        ).read_text()
+    )
+    assert blocked["status"] == gate_eval.BLOCKED
+    assert blocked["write_actions"] == [
+        {
+            "role": "leader",
+            "command": [
+                "pio", "run", "-e", "k1_sync_probe_main_sync_only",
+                "-t", "upload", "--upload-port", "leader-port",
+            ],
+            "attempted": True,
+            "outcome": "failed",
+            "exit_code": 9,
+        }
+    ]
+
+
+def test_f2_flash_manifest_binds_preserved_images_and_preflash_identity(
+    tmp_path, monkeypatch,
+):
+    repo_root = tmp_path
+    run_id = "run"
+    raw_root = repo_root / "_scratch" / f"dual_sync_f2_abc_{run_id}"
+    tracked_root = repo_root / "artifacts" / "f2" / run_id
+    uploads = {}
+    binaries = {}
+    ports = {"leader": "leader-port", "follower": "follower-port"}
+    firmware_sha = "a" * 40
+    app_identities = {}
+    for role, env, chip, usb_serial in (
+        (
+            "leader",
+            "k1_sync_probe_main_sync_only",
+            f2_capture.LEADER_CHIP,
+            f2_capture.LEADER_USB_SERIAL,
+        ),
+        (
+            "follower",
+            "k1_sync_probe_bench",
+            f2_capture.FOLLOWER_CHIP,
+            f2_capture.FOLLOWER_USB_SERIAL,
+        ),
+    ):
+        role_root = raw_root / "uploads" / "case_A" / role
+        role_root.mkdir(parents=True)
+        bin_path = role_root / "firmware.bin"
+        elf_path = role_root / "firmware.elf"
+        log_path = role_root / "upload.log"
+        bin_path.write_bytes(f"{role}-bin".encode())
+        elf_path.write_bytes(f"{role}-elf".encode())
+        log_path.write_text("verified as target\n")
+        app_elf_sha = f2_capture._sha256(elf_path)
+        app_identities[str(bin_path)] = app_elf_sha
+        binaries[role] = {
+            "bin_path": f2_capture._repo_relative(bin_path, repo_root),
+            "bin_sha256": f2_capture._sha256(bin_path),
+            "elf_path": f2_capture._repo_relative(elf_path, repo_root),
+            "elf_sha256": f2_capture._sha256(elf_path),
+        }
+        uploads[role] = {
+            "action": "upload",
+            "source_case": "A",
+            "env": env,
+            "chip_id": chip,
+            "usb_serial": usb_serial,
+            "port": ports[role],
+            "guard_verified": True,
+            "upload_exit_code": 0,
+            "command": [
+                "pio", "run", "-e", env, "-t", "upload",
+                "--upload-port", ports[role],
+            ],
+            "build_command": [
+                "bash", "scripts/agent/pio-build.sh", env,
+            ],
+            "guard_command": [
+                "python3", "scripts/platformio/k1_upload_guard.py",
+                "--env", env, "--upload-port", ports[role],
+            ],
+            **binaries[role],
+            "app_elf_sha256": app_elf_sha,
+            "preflash_identity": {
+                "port": ports[role],
+                "usb_serial": usb_serial,
+                "chip_id": chip,
+            },
+            "postflash_readback": {
+                "port": ports[role],
+                "chip_id": chip,
+                "env": env,
+                "git": firmware_sha[:7],
+                "app_elf_sha256": app_elf_sha,
+                "boot_nonce": "0123456789abcdef",
+                "uptime_ms": 1000,
+                "reset_reason": 1,
+            },
+            "log": f2_capture._evidence_record(log_path, repo_root),
+        }
+    manifest_path = tracked_root / "uploads" / "flash_A.json"
+    manifest_path.parent.mkdir(parents=True)
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "status": gate_eval.PASS,
+                "run_id": run_id,
+                "case": "A",
+                "firmware_source_sha": firmware_sha,
+                "upload_controller_sha": firmware_sha,
+                "uploads": uploads,
+            }
+        )
+    )
+    monkeypatch.setattr(
+        f2_capture,
+        "_app_elf_sha256",
+        lambda path: app_identities[str(path)],
+    )
+    result, derived_binaries = f2_capture._validate_flash_manifest(
+        manifest_path,
+        case_name="A",
+        firmware_sha=firmware_sha,
+        out_root=raw_root,
+        tracked_root=tracked_root,
+        repo_root=repo_root,
+        ports=ports,
+    )
+    assert result["status"] == gate_eval.PASS
+    assert derived_binaries == binaries
+
+    monkeypatch.setattr(
+        f2_capture, "_app_elf_sha256", lambda _path: "c" * 64
+    )
+    with pytest.raises(
+        f2_capture.F2ContractError, match="app ELF identity mismatch"
+    ):
+        f2_capture._validate_flash_manifest(
+            manifest_path,
+            case_name="A",
+            firmware_sha=firmware_sha,
+            out_root=raw_root,
+            tracked_root=tracked_root,
+            repo_root=repo_root,
+            ports=ports,
+        )
+    monkeypatch.setattr(
+        f2_capture,
+        "_app_elf_sha256",
+        lambda path: app_identities[str(path)],
+    )
+
+    payload = json.loads(manifest_path.read_text())
+    payload["uploads"]["leader"]["postflash_readback"]["git"] = ""
+    manifest_path.write_text(json.dumps(payload))
+    with pytest.raises(
+        f2_capture.F2ContractError, match="post-flash read-back mismatch"
+    ):
+        f2_capture._validate_flash_manifest(
+            manifest_path,
+            case_name="A",
+            firmware_sha=firmware_sha,
+            out_root=raw_root,
+            tracked_root=tracked_root,
+            repo_root=repo_root,
+            ports=ports,
+        )
+    payload["uploads"]["leader"]["postflash_readback"]["git"] = (
+        firmware_sha[:7]
+    )
+    manifest_path.write_text(json.dumps(payload))
+
+    (raw_root / "uploads" / "case_A" / "leader" / "firmware.bin").write_bytes(
+        b"mutated"
+    )
+    with pytest.raises(f2_capture.F2ContractError, match="hash mismatch"):
+        f2_capture._validate_flash_manifest(
+            manifest_path,
+            case_name="A",
+            firmware_sha=firmware_sha,
+            out_root=raw_root,
+            tracked_root=tracked_root,
+            repo_root=repo_root,
+            ports=ports,
+        )
+
+
+def test_f2_evidence_rejects_intermediate_and_prior_manifest_symlinks(
+    tmp_path,
+):
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    evidence = outside / "evidence.json"
+    evidence.write_text("{}")
+    tracked_root = tmp_path / "tracked" / "run"
+    tracked_root.mkdir(parents=True)
+    (tracked_root / "uploads").symlink_to(outside, target_is_directory=True)
+    with pytest.raises(f2_capture.F2ContractError, match="symlink"):
+        f2_capture._require_direct_file(
+            tracked_root / "uploads" / "evidence.json",
+            tracked_root / "uploads",
+            "evidence",
+        )
+
+    prior_target = outside / "case_A.json"
+    prior_target.write_text("{}")
+    (tracked_root / "case_A.json").symlink_to(prior_target)
+    with pytest.raises(f2_capture.F2ContractError, match="symlink"):
+        f2_capture.validate_case_order(
+            "B",
+            tmp_path / "_scratch" / "dual_sync_f2_abc_run",
+            tracked_root,
+            "a" * 40,
+            "a" * 40,
+            tmp_path,
+        )
 
 
 def _persistent_segment_pair(name: str, host_offset: int):

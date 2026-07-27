@@ -112,3 +112,40 @@ authority.
 - NimBLE host/controller callback cost on Core 0 is not claimed eliminated.
   F3 must measure real AP p95, heap and soak effects; F1 only removes
   application-owned periodic GATT work from the Core-0 audio loop.
+
+## F2 preflight findings
+
+- Current USB enumeration maps leader chip `F887A500` to USB serial
+  `B4:3A:45:A5:87:F8` and follower chip `B489A500` to
+  `B4:3A:45:A5:89:B4`. Both correct-target upload-guard probes passed and both
+  cross-target negative controls exited `2`. These are read-only observations,
+  not flash authority.
+- The former F2 runner bound runtime `:build` to current HEAD while the
+  post-F1 binaries embedded the earlier F1 commit. A documentation checkpoint
+  could therefore invalidate sound binaries without changing firmware.
+  Firmware provenance and host-controller provenance must be separate fields.
+- Minimal self-authored prior-case JSON could satisfy A→B→C ordering. Every
+  prior manifest and every referenced raw file must be rehashed, reparsed and
+  re-evaluated before the next case.
+- A BIN file hash alone does not identify the application installed on the
+  ESP32. F2 now requires the ESP application descriptor ELF identity extracted
+  from the preserved image and read back from the running device.
+- K718 power and physical dial turns cannot be inferred from a caller-supplied
+  string. Each case requires a tracked Captain attestation; Case C additionally
+  requires a pre-run commitment to at least three detents and causal
+  mode-apply→confirmation-write evidence. The BLE write proves K1 submission,
+  not K718 receipt, so physical display feedback remains pending in
+  `CAPTAIN_STOP.md`.
+- Missing samples or reset/regressed counters are `BLOCKED`. Observed dial
+  traffic in Case B, reconnect/lifecycle changes, stream loss or error deltas in
+  Case C are `FAIL`; neither may be laundered into a generic absence of proof.
+- Case B reuses the validated Case-A follower upload event and writes only the
+  dual-role leader. Both required Case-A builds/guards complete before its
+  first upload; partial write attempts produce a tracked `BLOCKED` action
+  event. Case C has no upload path.
+- A per-boot runtime nonce and monotonic uptime bind capture to the post-flash
+  process. Case C must continue the exact Case-B boot on both devices, closing
+  the same-image reflash/reset ambiguity that build and image hashes cannot
+  detect.
+- No device was flashed and no manual serial command was sent during this
+  preflight.

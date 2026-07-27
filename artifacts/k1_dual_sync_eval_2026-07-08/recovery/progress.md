@@ -119,6 +119,35 @@
 - F1 is complete at the source/build boundary. No firmware has been flashed
   and no runtime or silicon claim has been made.
 
+## 2026-07-27 — F2 read-only preflight and F2a host hardening
+
+- Re-read the phase task plan and ran session bootstrap before F2.
+- Read-only port inventory identified leader USB serial
+  `B4:3A:45:A5:87:F8` and follower USB serial
+  `B4:3A:45:A5:89:B4`.
+- Upload-guard positive controls passed for the sync-only leader and follower;
+  both cross-target negative controls failed closed with exit `2`.
+- Independent host and embedded reviews returned `NO-GO` on the original F2
+  evidence contract. No flash, manual serial command or hardware action was
+  performed.
+- Implemented the bounded F2a host contract: guarded A/B-only uploader; Case C
+  cannot upload; pre/post chip identity; preserved BIN/ELF and ESP application
+  identity; exact command capture; recursive prior-case revalidation; tracked
+  Captain attestations; causal Case-C dial proof; non-overwriting
+  `CAPTAIN_STOP.md` with `decision: PENDING`.
+- Current F2a focused validation:
+  `75 passed` in `tests/test_dual_sync_oracle.py`; all three Python modules
+  compile, both shell entry points pass `bash -n`, and `git diff --check`
+  passes.
+- Full repository regression:
+  `775 passed, 1 skipped, 86 subtests passed` after the final adversarial
+  closure additions.
+- Final F2a adversarial reviewer verdict: `APPROVE`; all ten reproduced attack
+  paths now fail closed, including a failed upload attempt being retained as a
+  tracked `BLOCKED` write action.
+- Hardware remains untouched. F2b firmware observability is still required
+  before Case A.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -129,6 +158,7 @@
 | dual-sync-f0-review-004/005/006/007 | Adversarial F0 implementation review | load-bearing | VERIFIED | `recovery/ssa/f0_implementation_review.md` | 63 focused tests plus negative wrapper probes PASS | verified host evidence |
 | dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
 | dual-sync-f1-concurrency-009/010 | Adversarial connection-generation and Core ownership review | load-bearing | APPROVE | current source citations in SSA return | focused tests, four builds and full regression PASS | verified F1 evidence |
+| dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b pending | current-source SSA returns | read-only USB/guard checks, 75 focused tests and 775-test full regression | verified F2a evidence |
 
 ## Test results
 
@@ -152,9 +182,14 @@
 | F1 dual-role leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main` | SUCCESS; NimBLE 2.5.0 |
 | F1 sync-only leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main_sync_only` | SUCCESS; NimBLE 2.5.0 |
 | F1 follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
+| F2 read-only guard map | correct leader/follower guard commands plus both cross-target negatives | PASS / negative exit 2 |
+| F2a focused current | `PYTHONPATH=. python3 -m pytest -q tests/test_dual_sync_oracle.py` | 75 passed |
+| F2a syntax | `python3 -m py_compile ...`; `bash -n run_f2_abc.sh run_f2_flash.sh`; `git diff --check` | PASS |
+| F2a full current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 775 passed, 1 skipped, 86 subtests passed |
 
 ## Next
 
-Start F2 with a fresh task-plan read, session bootstrap, physical GPIO-wiring
-confirmation and read-only port/chip mapping. Do not flash until both chips and
-explicit target ports are proven.
+Complete adversarial F2a review and commit the host contract. Then implement
+the separate minimal F2b firmware-observability commit and validate all probe
+builds. Do not flash until both commits pass and Captain provides the physical
+GPIO/K718 attestation.

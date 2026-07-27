@@ -8,7 +8,7 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2 — identity-checked silicon A/B/C preflight.
+Phase F2a — harden the evidence/upload contract before silicon.
 
 ## Phases
 
@@ -65,8 +65,12 @@ Phase F2 — identity-checked silicon A/B/C preflight.
 
 ### F2: Silicon A/B/C
 
-- [ ] Scripted, non-overwriting A/B/C harness and tracked evidence schema ready.
-- [ ] Identity and wiring preflight.
+- [x] Independent host/firmware F2 preflight review completed; existing runner
+  rejected as forgeable and insufficient for Case-C dial causality.
+- [ ] F2a guarded-upload and recursive evidence contract committed.
+- [ ] F2b application-image/dial-causality firmware observability committed.
+- [x] Read-only USB serial/chip mapping and cross-target guard negatives.
+- [ ] Captain physical GPIO/K718 attestation for the selected run.
 - [ ] Case A PASS.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
@@ -90,6 +94,7 @@ Phase F2 — identity-checked silicon A/B/C preflight.
 | Orchestrator owns edits, gates, commits and device actions | SSA returns are hypotheses until re-run. |
 | Existing dirty registry and wrapper edits are preserved | They pre-date this takeover and must not be silently absorbed. |
 | Reopen F0 with a narrow F0b commit | Late-attaching F2 capture otherwise discards the only lifecycle transition and falsely blocks a healthy persistent link. |
+| Split F2 readiness into F2a host and F2b firmware commits | The former runner trusted self-declared binaries/prior PASS JSON and could not prove causal K718 dial traffic or the flashed application image. |
 
 ## Stop conditions
 
@@ -111,3 +116,5 @@ Phase F2 — identity-checked silicon A/B/C preflight.
 | Final F0 wrapper review found locked-argument and A/B/C-order bypasses | 1 | Replaced the forwarding shell with a typed controller that derives case semantics, probes chip/build identity, enforces A→B→C and hashes its manifest evidence. |
 | F1 adversarial review found lifecycle lines were one-shot before F2 attached | 1 | Added a fresh, fail-closed `:sync_status` capture contract and F2 evidence hash before firmware is committed. |
 | F1 concurrency review found cross-generation characteristic writes and lossy clock callback timing | 1 | Moved periodic application GATT I/O to Core 1, made lifecycle publication generation-bound, deferred leader advertising restart, and queued callback-time clock timestamps with generation. |
+| Initial F2 entry point was named incorrectly during read-only preflight | 1 | Located the committed `run_f2_abc.sh` → `f2_capture.py` path; no serial or device action was attempted. |
+| Independent F2 reviews returned NO-GO on evidence provenance and dial causality | 1 | Added bounded F2a/F2b closure commits before any flash; Case A remains forbidden until both validate. |

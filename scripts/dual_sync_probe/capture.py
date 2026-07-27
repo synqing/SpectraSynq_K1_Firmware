@@ -35,6 +35,21 @@ _BUILD_RE = re.compile(
     r"^BUILD:\s+version=(\S+)\s+git=([0-9A-Za-z]+)\s+"
     r"epoch=(\d+)\s+env=(\S+)$"
 )
+_IMAGE_ID_RE = re.compile(r"IMAGE_ID: app_elf_sha256=([0-9a-f]{64})")
+_RUNTIME_ID_RE = re.compile(
+    r"RUNTIME_ID: boot_nonce=([0-9a-f]{16})\s+"
+    r"uptime_ms=(\d+)\s+reset_reason=(-?\d+)"
+)
+_DIAL_STATUS_RE = re.compile(
+    r"DIAL_STATUS: linked=(0|1)\s+generation=(\d+)"
+    r"\s+notify=(\d+)\s+decoded=(\d+)\s+enqueued=(\d+)"
+    r"\s+apply_ok=(\d+)\s+apply_fail=(\d+)"
+    r"\s+queue_drops=(\d+)\s+decode_errors=(\d+)"
+    r"\s+dial_mode_apply_ok=(\d+)"
+    r"\s+confirm_write_ok=(\d+)\s+confirm_write_fail=(\d+)"
+    r"\s+dial_confirm_write_ok=(\d+)"
+    r"\s+last_confirm_pm=(\d+)\s+last_confirm_sm=(\d+)"
+)
 _SYNC_STATUS_RE = re.compile(
     r"^SYNC_STATUS:\s+role=(leader|follower)\s+linked=(0|1)$"
 )
@@ -248,14 +263,91 @@ class DualCapture:
                     f"{role} build env mismatch: observed {env}, "
                     f"expected {expected['env']}"
                 )
+            expected_image = expected.get("app_elf_sha256")
+            observed_image = self._query(
+                role,
+                "image_id",
+                lambda line: (
+                    _IMAGE_ID_RE.fullmatch(line).group(1)
+                    if _IMAGE_ID_RE.fullmatch(line)
+                    else None
+                ),
+                timeout_s,
+            )
+            if (
+                expected_image is not None
+                and observed_image != expected_image.lower()
+            ):
+                raise CaptureContractError(
+                    f"{role} image mismatch: observed {observed_image}, "
+                    f"expected {expected_image.lower()}"
+                )
+            runtime = self._query(
+                role,
+                "runtime_id",
+                lambda line: (
+                    _RUNTIME_ID_RE.fullmatch(line).groups()
+                    if _RUNTIME_ID_RE.fullmatch(line)
+                    else None
+                ),
+                timeout_s,
+            )
+            boot_nonce, uptime_ms, reset_reason = runtime
             observed[role] = {
                 "chip_id": chip,
                 "version": version,
                 "git": git_hash,
                 "epoch": int(epoch),
                 "env": env,
+                "app_elf_sha256": observed_image,
+                "boot_nonce": boot_nonce,
+                "uptime_ms": int(uptime_ms),
+                "reset_reason": int(reset_reason),
             }
         return observed
+
+    def set_leader_ble_stream(self, enabled: bool, timeout_s: float) -> None:
+        """Enable exact Remoted counters on the leader and require its ACK."""
+        value = "on" if enabled else "off"
+        expected = f"BLE_STREAM: {value}"
+        self._query(
+            "leader",
+            f"ble_stream={value}",
+            lambda line: line if line == expected else None,
+            timeout_s,
+        )
+
+    def query_leader_dial_status(self, timeout_s: float) -> dict[str, int]:
+        keys = (
+            "linked",
+            "generation",
+            "notify",
+            "decoded",
+            "enqueued",
+            "apply_ok",
+            "apply_fail",
+            "queue_drops",
+            "decode_errors",
+            "dial_mode_apply_ok",
+            "confirm_write_ok",
+            "confirm_write_fail",
+            "dial_confirm_write_ok",
+            "last_confirm_pm",
+            "last_confirm_sm",
+        )
+
+        def match_status(line: str):
+            match = _DIAL_STATUS_RE.fullmatch(line)
+            if match is None:
+                return None
+            return {
+                key: int(value)
+                for key, value in zip(keys, match.groups())
+            }
+
+        return self._query(
+            "leader", "dial_status", match_status, timeout_s
+        )
 
     @staticmethod
     def _strict_status_record(role: str, line: str):
@@ -492,6 +584,8 @@ def run_segments(
     baud: int = DEFAULT_BAUD,
     serial_factory: Callable[[str, int], object] = _open_serial,
     identity_expectations: Optional[dict[str, dict[str, str]]] = None,
+    leader_ble_stream: bool = False,
+    leader_dial_status: bool = False,
 ) -> list[dict]:
     """Capture F0 plumbing segments without overwriting prior evidence."""
     for segment in segments:
@@ -531,8 +625,16 @@ def run_segments(
                 out_dir / "SYNC_STATUS.json",
                 json.dumps(sync_status, indent=2, sort_keys=True) + "\n",
             )
+            if leader_ble_stream:
+                capture.set_leader_ble_stream(True, ack_timeout_s)
             capture.pump(settle_s)
+            dial_status: dict[str, dict[str, dict[str, int]]] = {}
             for segment in segments:
+                baseline = (
+                    capture.query_leader_dial_status(ack_timeout_s)
+                    if leader_dial_status
+                    else None
+                )
                 segment_dir = out_dir / segment
                 segment_dir.mkdir(exist_ok=False)
                 with (segment_dir / "leader_segment.log").open(
@@ -548,9 +650,19 @@ def run_segments(
                     fault = fault_for_segment(segment)
                     capture.set_fault(fault, ack_timeout_s)
                     capture.pump(duration_s)
+                    end_status = (
+                        capture.query_leader_dial_status(ack_timeout_s)
+                        if leader_dial_status
+                        else None
+                    )
                     capture.marker(segment, "end")
                     writers["leader"].segment_file = None
                     writers["follower"].segment_file = None
+                if baseline is not None and end_status is not None:
+                    dial_status[segment] = {
+                        "baseline": baseline,
+                        "end": end_status,
+                    }
                 leader_proof = _proof_text(
                     leader_session_path.read_text(
                         encoding="utf-8", errors="replace"
@@ -585,6 +697,11 @@ def run_segments(
                         "exit_code": exit_code,
                     }
                 )
+            if leader_dial_status:
+                _atomic_text(
+                    out_dir / "DIAL_STATUS.json",
+                    json.dumps(dial_status, indent=2, sort_keys=True) + "\n",
+                )
         except BaseException as error:
             primary_error = error
         finally:
@@ -599,6 +716,12 @@ def run_segments(
                         capture.marker("cleanup", "end")
                 except Exception as error:  # preserve original failure
                     restoration_error = error
+            if leader_ble_stream and leader is not None and follower is not None:
+                try:
+                    capture.set_leader_ble_stream(False, ack_timeout_s)
+                except Exception as error:
+                    if restoration_error is None:
+                        restoration_error = error
             for stream in (leader, follower):
                 if stream is not None:
                     try:
