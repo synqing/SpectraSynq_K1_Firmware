@@ -8,8 +8,9 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2a.3 — require Case-B scanner evidence and retain BLE-MIDI batching
-semantics before committing F2b firmware observability.
+Phase F2b — commit the independently approved application-image and
+dial-causality firmware observability boundary, then rebuild immutable probe
+images before silicon.
 
 ## Phases
 
@@ -72,9 +73,12 @@ semantics before committing F2b firmware observability.
   (`0a1100bc8525ecc1d3d29f64454b9e8e78f9dd19`).
 - [x] F2a.1 periodic-counter window correction committed
   (`3077b4d5dab10811963b99bafe47729068db3bcf`).
-- [x] F2a.2 meaningful-mode host contract and no-op regression validated.
+- [x] F2a.2 meaningful-mode host contract and no-op regression committed
+  (`7320262d98998f258c9e4f710744faad4ef0dc72`).
 - [x] F2a.3 Case-B scanner-active contract and batched-notification regression
-  validated.
+  committed (`acb9c4002a1da2a4c9371a30187e25d614af0082`).
+- [x] F2b firmware observability independently approved; focused/full tests and
+  production plus all three probe builds green on current source.
 - [ ] F2b application-image/dial-causality firmware observability committed.
 - [x] Read-only USB serial/chip mapping and cross-target guard negatives.
 - [ ] Captain physical GPIO/K718 attestation for the selected run.
@@ -82,7 +86,7 @@ semantics before committing F2b firmware observability.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** f2a3_ready_to_commit_then_firmware
+- **Status:** f2b_ready_to_commit
 
 ### F3: Real Gate-0
 
@@ -130,3 +134,5 @@ semantics before committing F2b firmware observability.
 | Independent F2 reviews returned NO-GO on evidence provenance and dial causality | 1 | Added bounded F2a/F2b closure commits before any flash; Case A remains forbidden until both validate. |
 | F2b adversarial review reproduced a Case-C no-op false PASS | 1 | Bind host evidence to three ordinal changes from the coherent baseline and require the firmware meaningful-mode counter delta to match emitted events exactly. |
 | F2b re-review found Case B could pass with no scanner and Case C overconstrained notifications | 1 | Add sampled scanner state/start counters to the host grammar; require active/stable scan in B; require at least one notify but three decoded/applied mode changes in C. |
+| Final F2b review found partial decoder state survived reconnect | 1 | Reset all CC14/NRPN partial accumulators before advancing connection generation while preserving the monotonic record ID; add old-generation-half/new-generation-remainder regressions. |
+| Unscoped `pytest -q` collected duplicate consult-pack test modules | 1 | Preserve the consult evidence and use the canonical repository boundary `pytest -q tests/`; no source or evidence deletion. |

@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-// Start the BLE-MIDI central: spins a low-priority Core-0 task that scans for the
+// Start the BLE-MIDI central: spins a low-priority Core-1 task that scans for the
 // "SpectraSynq Remoted" knob, connects, and subscribes to its MIDI NOTIFY char.
 // Call once from setup(), under #ifdef SB_K1_BLE_REMOTED.
 void sb_k1_ble_remoted_begin();
@@ -20,3 +20,6 @@ void sb_k1_ble_remoted_poll(uint32_t now_ms);
 
 // True while the knob link is up (status / diagnostics / A/B instrumentation).
 bool sb_k1_ble_remoted_is_linked();
+
+// Print one coherent, fixed-schema snapshot for the F2 dial evidence contract.
+void sb_k1_ble_remoted_status();

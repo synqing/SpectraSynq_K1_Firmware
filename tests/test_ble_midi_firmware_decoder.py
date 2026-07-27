@@ -111,6 +111,102 @@ def _build_driver(tmp_path, *extra_flags):
     return exe
 
 
+def _build_generation_boundary_driver(tmp_path):
+    driver = tmp_path / "decoder_generation_boundary_driver.cpp"
+    exe = tmp_path / "decoder_generation_boundary_driver"
+    driver.write_text(
+        textwrap.dedent(
+            r"""
+            #include <stddef.h>
+            #include <stdint.h>
+
+            #include <iostream>
+
+            #include "k1_ble_midi_decoder.h"
+
+            size_t decode(
+                K1BleMidiDecoderState* state,
+                const uint8_t* packet,
+                size_t packet_len) {
+              K1WirelessControlRecord records[
+                  K1_BLE_MIDI_MAX_RECORDS_PER_PACKET];
+              size_t count = 0;
+              const K1BleMidiDecodeStatus status =
+                  k1_ble_midi_decode_packet(
+                      state, packet, packet_len, records,
+                      K1_BLE_MIDI_MAX_RECORDS_PER_PACKET, &count);
+              if (status != K1_BLE_MIDI_DECODE_OK) {
+                return 99;
+              }
+              return count;
+            }
+
+            int main() {
+              K1BleMidiDecoderState state;
+              k1_ble_midi_decoder_reset(&state);
+
+              const uint8_t cc14_old_msb[] = {
+                  0x80, 0x80, 0xB0, 1, 64};
+              const uint8_t cc14_new_lsb[] = {
+                  0x80, 0x80, 0xB0, 33, 0};
+              const uint8_t cc14_new_pair[] = {
+                  0x80, 0x80, 0xB0, 1, 64, 0xB0, 33, 0};
+              std::cout << decode(
+                  &state, cc14_old_msb, sizeof(cc14_old_msb));
+              k1_ble_midi_decoder_reset_partial(&state);
+              std::cout << "|" << decode(
+                  &state, cc14_new_lsb, sizeof(cc14_new_lsb));
+              std::cout << "|" << decode(
+                  &state, cc14_new_pair, sizeof(cc14_new_pair));
+
+              k1_ble_midi_decoder_reset(&state);
+              const uint8_t nrpn_old_partial[] = {
+                  0x80, 0x80,
+  0xB0, 99, 0, 0xB0, 98, 0, 0xB0, 6, 0};
+              const uint8_t nrpn_new_lsb[] = {
+                  0x80, 0x80, 0xB0, 38, 4};
+              const uint8_t nrpn_new_pair[] = {
+                  0x80, 0x80,
+  0xB0, 99, 0, 0xB0, 98, 0,
+                  0xB0, 6, 0, 0xB0, 38, 4};
+              std::cout << "|" << decode(
+                  &state, nrpn_old_partial, sizeof(nrpn_old_partial));
+              k1_ble_midi_decoder_reset_partial(&state);
+              std::cout << "|" << decode(
+                  &state, nrpn_new_lsb, sizeof(nrpn_new_lsb));
+              std::cout << "|" << decode(
+                  &state, nrpn_new_pair, sizeof(nrpn_new_pair));
+              std::cout << "\n";
+              return 0;
+            }
+            """
+        ),
+        encoding="utf-8",
+    )
+    cmd = [
+        "c++",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-I",
+        str(ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "network"),
+        "-I",
+        str(ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control"),
+        str(driver),
+        str(
+            ROOT
+            / "SPECTRASYNQ_K1_FIRMWARE"
+            / "network"
+            / "k1_ble_midi_decoder.cpp"
+        ),
+        "-o",
+        str(exe),
+    ]
+    subprocess.run(cmd, cwd=ROOT, check=True)
+    return exe
+
+
 def _decode_many(exe, packets, cap=K1_BLE_MIDI_MAX_RECORDS_PER_PACKET):
     lines = []
     for packet in packets:
@@ -248,6 +344,17 @@ def test_decoder_nrpn_incomplete_sequence_resets_then_accepts_valid_nrpn(tmp_pat
     assert output["records"][0]["control"] == "primary.preset"
     assert output["records"][0]["value_kind"] == "TEXT"
     assert output["records"][0]["text_value"] == "classic"
+
+
+def test_decoder_partial_state_cannot_cross_connection_generation(tmp_path):
+    exe = _build_generation_boundary_driver(tmp_path)
+    completed = subprocess.run(
+        [str(exe)],
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    assert completed.stdout.strip() == "0|0|1|0|0|1"
 
 
 def test_injected_decoder_faults_are_caught(tmp_path):

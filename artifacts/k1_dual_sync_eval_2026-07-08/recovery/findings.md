@@ -194,3 +194,35 @@ authority.
   per-detent requirement would create a false BLOCK on legal batching.
 - A new `stale_generation_drops` error counter is reserved in the host grammar
   so the firmware can expose and fail closed on pre-disconnect queue residue.
+
+## F2b firmware observability findings
+
+- Runtime evidence now separates source revision, exact ESP application-image
+  identity and per-boot runtime identity. This closes the prior path where a
+  current host checkout or a BIN filename could stand in for the application
+  actually running on silicon.
+- Remoted evidence exposes scanner activity/start outcomes, notification,
+  decode, enqueue, apply, meaningful-mode, confirmation and stale-generation
+  counters. Accepted no-op modes remain traffic but cannot become dial-detent
+  proof.
+- Queue records and pending confirmation targets carry their connection
+  generation. Both pre-apply and post-apply generation checks reject stale
+  work, and the rejected count is visible to the fail-closed host contract.
+- A generation tag on emitted records is insufficient if the decoder retains
+  a pre-disconnect half-message. The decoder now clears all partial CC14 and
+  NRPN accumulator state before the new generation is published, while
+  preserving its next record ID. Host regression covers both contamination
+  paths and proves a complete new-generation pair still emits one record.
+- Remoted diagnostic lines use checked fixed-size stack formatting followed by
+  `Serial.print`; callback serial output is deferred to the Core-1 owner. This
+  avoids Arduino `Print`'s long-format allocation path in the reviewed
+  observability surface.
+- Independent final firmware review verdict: `APPROVE`. The reviewer found no
+  remaining concrete F2b proof or connection-generation defect.
+- Full current-source regression:
+  `786 passed, 1 skipped, 86 subtests passed`.
+- Wrapper builds succeeded for `k1_hardware`, both leader environments and the
+  follower; every probe dependency graph resolved NimBLE-Arduino `2.5.0`.
+- These builds still embed pre-F2b revision `acb9c40`. Immutable post-commit
+  probe rebuilds remain mandatory before any flash.
+- No firmware was flashed and no serial or hardware action occurred.

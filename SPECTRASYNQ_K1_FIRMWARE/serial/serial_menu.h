@@ -36,8 +36,17 @@
 #include "sb_visual_hooks.h"
 #include "sb_noise_cal_arm.h"
 #include "sb_effect_queue.h"
+#include <stdio.h>
+#ifndef SB_SERIAL_REPLAY_HOST
+#include <esp_app_desc.h>
+#include <esp_random.h>
+#include <esp_system.h>
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 #include <esp_heap_caps.h>
+#endif
+#ifdef SB_K1_BLE_REMOTED
+#include "ble_remoted_central.h"
 #endif
 #ifdef SB_K1_SYNC_PROBE
 #include "k1_sync_link.h"  // k1_sync::set_fault for the gated sync_fault command (non-shippable)
@@ -1901,12 +1910,58 @@ void cmd_build() {
   tx_end();
 }
 
+void cmd_image_id() {
+  tx_begin();
+  USBSerial.print("IMAGE_ID: app_elf_sha256=");
+  const esp_app_desc_t* const description = esp_app_get_description();
+  if (description == nullptr) {
+    USBSerial.println("unavailable");
+  } else {
+    for (size_t index = 0; index < sizeof(description->app_elf_sha256);
+         ++index) {
+      USBSerial.printf(
+          "%02x",
+          static_cast<unsigned>(description->app_elf_sha256[index]));
+    }
+    USBSerial.println();
+  }
+  tx_end();
+}
+
+void cmd_runtime_id() {
+  static const uint32_t boot_nonce_hi = esp_random();
+  static const uint32_t boot_nonce_lo = esp_random();
+  tx_begin();
+  char line[128];
+  const int written = snprintf(
+      line, sizeof(line),
+      "RUNTIME_ID: boot_nonce=%08lx%08lx uptime_ms=%lu reset_reason=%d\n",
+      static_cast<unsigned long>(boot_nonce_hi),
+      static_cast<unsigned long>(boot_nonce_lo),
+      static_cast<unsigned long>(millis()),
+      static_cast<int>(esp_reset_reason()));
+  if (written > 0 && static_cast<size_t>(written) < sizeof(line)) {
+    USBSerial.print(line);
+  } else {
+    USBSerial.println("RUNTIME_ID: ERROR format_overflow");
+  }
+  tx_end();
+}
+
+#ifdef SB_K1_BLE_REMOTED
+void cmd_dial_status() {
+  sb_k1_ble_remoted_status();
+}
+#endif
+
 void cmd_help() {
   tx_begin();
   USBSerial.println("SENSORY BRIDGE - Serial Menu ------------------------------------------------------------------------------------");
   USBSerial.println();
   USBSerial.println("                                            v | Print firmware version number");
   USBSerial.println("                                        build | Print build provenance (version + git hash + epoch + env)");
+  USBSerial.println("                                     image_id | Print the running application ELF identity");
+  USBSerial.println("                                   runtime_id | Print boot nonce, uptime and reset reason");
   USBSerial.println("                                        reset | Reboot Sensory Bridge");
   USBSerial.println("                          factory_reset CONFIRM | Delete configuration, including noise cal, reboot (CONFIRM required)");
   USBSerial.println("                       restore_defaults CONFIRM | Delete configuration, reboot (CONFIRM required)");
@@ -1930,6 +1985,7 @@ void cmd_help() {
   // Radio-isolation guard: this help text must never ship in production —
   // the literal "[ble_remoted]" token trips guard_k1_radio_isolation.py.
   USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
+  USBSerial.println("                                  dial_status | Print coherent Remoted link and causal counters");
 #endif
 #ifdef SB_K1_SYNC_PROBE
   // Radio-isolation guard: gated with the sync probe surface it drives.

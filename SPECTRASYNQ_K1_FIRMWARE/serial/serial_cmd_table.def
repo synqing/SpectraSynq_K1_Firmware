@@ -33,6 +33,11 @@ SERIAL_CMD("v",               0, cmd_version,                 SC_SAFE,          
 SERIAL_CMD("V",               0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("version",         0, cmd_version,                 SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("build",           0, cmd_build,                   SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("image_id",        0, cmd_image_id,                SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("runtime_id",      0, cmd_runtime_id,              SC_SAFE,                  0,                                 IS_BOTH       )
+#ifdef SB_K1_BLE_REMOTED
+SERIAL_CMD("dial_status",     0, cmd_dial_status,             SC_SAFE,                  0,                                 IS_BOTH       )
+#endif
 SERIAL_CMD("h",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("H",               0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("help",            0, cmd_help,                    SC_SAFE,                  0,                                 IS_BOTH       )

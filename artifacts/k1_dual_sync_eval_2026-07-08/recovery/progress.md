@@ -198,6 +198,38 @@
   `778 passed, 1 skipped, 86 subtests passed`.
 - No device, serial or hardware action has occurred.
 
+## 2026-07-27 — F2b firmware observability ready to commit
+
+- F2a.2 was committed and published as
+  `7320262d98998f258c9e4f710744faad4ef0dc72`.
+- F2a.3 was committed and published as
+  `acb9c4002a1da2a4c9371a30187e25d614af0082`; local and remote refs were
+  verified equal.
+- Added exact application-image and per-boot runtime evidence, strict Remoted
+  scanner/traffic/apply/confirmation counters and meaningful dial-mode events.
+- Bound queued records and pending confirmation targets to the live connection
+  generation with visible stale-generation rejection.
+- Final adversarial review found one remaining reconnect path: partial CC14 or
+  NRPN decoder state could survive into a new connection. Added an explicit
+  partial-state reset before generation advancement, preserving the next
+  record ID, plus host regressions for both protocol paths.
+- Independent final firmware review verdict: `APPROVE`; no earlier blocker
+  regressed.
+- Focused validation:
+  `134 passed, 24 subtests passed`.
+- Canonical full repository validation:
+  `786 passed, 1 skipped, 86 subtests passed`.
+- An unscoped `pytest -q` attempt was rejected during collection because
+  `_scratch/dual_sync_external_consult_20260727/04_HOST/tests` preserves
+  duplicate module names. The scoped canonical `tests/` run above is green;
+  consult evidence was not deleted.
+- Wrapper builds SUCCESS:
+  `k1_hardware`, `k1_sync_probe_main`,
+  `k1_sync_probe_main_sync_only`, `k1_sync_probe_bench`.
+- All probe builds resolved NimBLE-Arduino `2.5.0`. They currently embed the
+  pre-F2b revision `acb9c40` and will be rebuilt after the F2b commit.
+- No flash, serial command or hardware action occurred.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -208,7 +240,7 @@
 | dual-sync-f0-review-004/005/006/007 | Adversarial F0 implementation review | load-bearing | VERIFIED | `recovery/ssa/f0_implementation_review.md` | 63 focused tests plus negative wrapper probes PASS | verified host evidence |
 | dual-sync-f0-late-attach-008 | Adversarial F1/capture boundary review | load-bearing | received | persistent-link reproduction + unstaged F0b host patch | 103 focused tests and strict status negatives PASS | F0b repair input |
 | dual-sync-f1-concurrency-009/010 | Adversarial connection-generation and Core ownership review | load-bearing | APPROVE | current source citations in SSA return | focused tests, four builds and full regression PASS | verified F1 evidence |
-| dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b NO-GO findings under repair | current-source SSA returns | read-only USB/guard checks; F2a tests; no-op, generation and serial-allocation reproductions | verified F2a evidence and F2b repair input |
+| dual-sync-f2-preflight-011/012/013 | F2 identity, evidence and dial-causality review | load-bearing | F2a APPROVE; F2b APPROVE after four review/repair cycles | current-source SSA returns | read-only USB/guard checks; full host gate; four builds; reconnect decoder regressions | verified F2a/F2b evidence |
 
 ## Test results
 
@@ -243,11 +275,15 @@
 | F2a.3 host focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_oracle.py` | 78 passed |
 | F2a.3 firmware-static/upload focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_dual_sync_probe_firmware_static.py tests/test_k1_upload_guard.py` | 49 passed, 24 subtests passed |
 | F2a.3 full isolated staged tree | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 778 passed, 1 skipped, 86 subtests passed |
+| F2b focused current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/test_ble_midi_firmware_decoder.py tests/test_dual_sync_oracle.py tests/test_dual_sync_probe_firmware_static.py tests/test_k1_upload_guard.py` | 134 passed, 24 subtests passed |
+| F2b full current | `PYTHONPATH=. /Users/spectrasynq/miniforge3/bin/python -m pytest -q tests/` | 786 passed, 1 skipped, 86 subtests passed |
+| F2b production build | `bash scripts/agent/pio-build.sh k1_hardware` | SUCCESS |
+| F2b dual-role leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main` | SUCCESS; NimBLE 2.5.0 |
+| F2b sync-only leader build | `bash scripts/agent/pio-build.sh k1_sync_probe_main_sync_only` | SUCCESS; NimBLE 2.5.0 |
+| F2b follower build | `bash scripts/agent/pio-build.sh k1_sync_probe_bench` | SUCCESS; NimBLE 2.5.0 |
 
 ## Next
 
-Commit and publish the narrow F2a.3 host correction after isolated staged-tree
-regression. Then close the remaining F2b heap-free formatting and
-generation-bound queue blockers, obtain independent approval and validate
-production/probe builds. Do not flash until F2b passes and Captain provides
-the physical GPIO/K718 attestation.
+Commit and publish the independently approved F2b firmware boundary, rebuild
+all three immutable probe images with the committed revision and record their
+hashes. Do not flash until Captain provides the physical GPIO/K718 attestation.

@@ -21,17 +21,29 @@ import sys
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts"))
 
-from dual_sync_probe import logfmt  # noqa: E402
+from dual_sync_probe import f2_capture, logfmt  # noqa: E402
 
 _FW = os.path.join(_ROOT, "SPECTRASYNQ_K1_FIRMWARE")
 _CPP = os.path.join(_FW, "network", "k1_sync_link.cpp")
 _H = os.path.join(_FW, "network", "k1_sync_link.h")
 _REMOTED = os.path.join(_FW, "network", "ble_remoted_central.cpp")
+_REMOTED_H = os.path.join(_FW, "network", "ble_remoted_central.h")
 _INO = os.path.join(_FW, "SPECTRASYNQ_K1_FIRMWARE.ino")
 _MENU = os.path.join(_FW, "serial", "serial_menu.h")
+_CMD_TABLE = os.path.join(_FW, "serial", "serial_cmd_table.def")
 _PIO = os.path.join(_ROOT, "platformio.ini")
 _GUARD = os.path.join(_ROOT, "scripts", "platformio", "k1_upload_guard.py")
 _WRAPPER = os.path.join(_ROOT, "scripts", "agent", "pio-build.sh")
+_ROW1 = os.path.join(
+    _ROOT, "scripts", "regression-harness", "row1_dispatch_table_test.cpp"
+)
+_SERIAL_HOST_STUBS = os.path.join(
+    _ROOT,
+    "scripts",
+    "regression-harness",
+    "golden",
+    "serial_replay_host_stubs.h",
+)
 
 
 def _read(path):
@@ -542,3 +554,220 @@ def test_header_does_not_claim_timestamp_delays_are_real_gate0_faults():
     assert "NOT Gate-0 delay proof" in header
     assert '"delay5"  — adds 5 ms to the printed consume stamp only' in header
     assert '"delay20" — adds 20 ms to the printed consume stamp only' in header
+
+
+# --------------------------------------------------------------------------- #
+# F2 application identity and causal dial observability                       #
+# --------------------------------------------------------------------------- #
+
+
+def test_f2_identity_commands_are_read_only_shared_table_rows():
+    table = _read(_CMD_TABLE)
+    menu = _read(_MENU)
+    row1 = _read(_ROW1)
+    for command, handler in (
+        ("image_id", "cmd_image_id"),
+        ("runtime_id", "cmd_runtime_id"),
+    ):
+        assert re.search(
+            rf'SERIAL_CMD\("{command}",\s+0,\s+{handler},'
+            r"\s+SC_SAFE,\s+0,\s+IS_BOTH\s+\)",
+            table,
+        )
+        assert f"static void {handler}()" in row1
+    dial_row = re.search(
+        r"#ifdef SB_K1_BLE_REMOTED\s+"
+        r'SERIAL_CMD\("dial_status",\s+0,\s+cmd_dial_status,'
+        r"\s+SC_SAFE,\s+0,\s+IS_BOTH\s+\)\s+#endif",
+        table,
+    )
+    assert dial_row
+    assert _gated_by_sync_probe(menu, "k1_sync_link.h")
+    assert "#ifdef SB_K1_BLE_REMOTED\n#include \"ble_remoted_central.h\"" in menu
+
+
+def test_f2_image_and_runtime_lines_match_host_capture_grammar():
+    menu = _read(_MENU)
+    image = _function_body(menu, "void cmd_image_id()")
+    runtime = _function_body(menu, "void cmd_runtime_id()")
+    assert "esp_app_get_description()" in image
+    assert "sizeof(description->app_elf_sha256)" in image
+    assert '"IMAGE_ID: app_elf_sha256="' in image
+    assert '"%02x"' in image
+    assert "static const uint32_t boot_nonce_hi = esp_random();" in runtime
+    assert "static const uint32_t boot_nonce_lo = esp_random();" in runtime
+    assert "char line[128];" in runtime
+    assert "const int written = snprintf(" in runtime
+    assert (
+        '"RUNTIME_ID: boot_nonce=%08lx%08lx uptime_ms=%lu '
+        'reset_reason=%d\\n"'
+    ) in runtime
+    assert "USBSerial.printf" not in runtime
+    assert "static_cast<size_t>(written) < sizeof(line)" in runtime
+    assert "USBSerial.print(line);" in runtime
+    assert "RUNTIME_ID: ERROR format_overflow" in runtime
+    assert f2_capture.capture._IMAGE_ID_RE.fullmatch(
+        "IMAGE_ID: app_elf_sha256=" + "ab" * 32
+    )
+    assert f2_capture.capture._RUNTIME_ID_RE.fullmatch(
+        "RUNTIME_ID: boot_nonce=0123456789abcdef "
+        "uptime_ms=123 reset_reason=1"
+    )
+    host_stubs = _read(_SERIAL_HOST_STUBS)
+    assert "struct esp_app_desc_t" in host_stubs
+    assert "static inline uint32_t esp_random()" in host_stubs
+
+
+def test_f2_remoted_status_and_periodic_counter_grammars_are_exact():
+    remoted = _read(_REMOTED)
+    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
+    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    for part in (
+        "DIAL_STATUS: linked=%u generation=%lu scan_active=%u ",
+        "scan_start_ok=%lu scan_start_fail=%lu notify=%lu decoded=%lu ",
+        "enqueued=%lu apply_ok=%lu apply_fail=%lu queue_drops=%lu ",
+        "decode_errors=%lu stale_generation_drops=%lu ",
+        "dial_mode_apply_ok=%lu confirm_write_ok=%lu ",
+        "confirm_write_fail=%lu dial_confirm_write_ok=%lu ",
+        "last_confirm_pm=%u last_confirm_sm=%u",
+    ):
+        assert part in status
+    for part in (
+        "[ble_remoted] counters linked=%u scan_active=%u ",
+        "scan_start_ok=%lu scan_start_fail=%lu ",
+        "notify=%lu decoded=%lu ",
+        "enqueued=%lu queue_drops=%lu decode_errors=%lu ",
+        "stale_generation_drops=%lu apply_ok=%lu ",
+        "apply_fail=%lu link_up=%lu link_down=%lu connect_fail=%lu ",
+        "confirm_ok=%lu confirm_fail=%lu confirm_pm=%u confirm_sm=%u",
+    ):
+        assert part in poll
+    assert "const StateSnapshot snapshot = state_snapshot();" in status
+    assert "const StateSnapshot snapshot = state_snapshot();" in poll
+
+
+def test_f2_remoted_lifecycle_and_causal_events_match_host_grammar():
+    remoted = _read(_REMOTED)
+    assert "[ble_remoted] link up generation=%lu" in remoted
+    assert "[ble_remoted] link down generation=%lu reason=%d" in remoted
+    assert (
+        "[ble_remoted] mode_apply record_id=%lu control=%s "
+        in remoted
+    )
+    assert (
+        "[ble_remoted] confirm_write ok=%u cause=%s record_id=%lu "
+        in remoted
+    )
+    assert f2_capture._REMOTED_LINK_RE.search(
+        "[ble_remoted] link up generation=4"
+    )
+    assert f2_capture._MODE_APPLY_RE.search(
+        "[ble_remoted] mode_apply record_id=7 "
+        "control=primary.mode accepted=5 apply_ok=3"
+    )
+    assert f2_capture._CONFIRM_WRITE_RE.search(
+        "[ble_remoted] confirm_write ok=1 cause=dial_mode "
+        "record_id=7 generation=4 pm=5 sm=2"
+    )
+
+
+def test_f2_dial_confirmation_is_causal_and_retry_stable():
+    remoted = _read(_REMOTED)
+    queue = _function_body(remoted, "void queue_confirmed_modes(bool force)")
+    send = _function_body(remoted, "void send_pending_confirmation()")
+    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    assert "if (s_connected && s_linked &&" in queue
+    assert queue.index("if (force)") < queue.index(
+        "s_dial_mode_target.valid"
+    )
+    assert "cause = ConfirmCause::Initial;" in queue
+    assert "cause = ConfirmCause::DialMode;" in queue
+    assert "record_id = s_dial_mode_target.record_id;" in queue
+    assert "s_confirmation_generation = s_connection_generation;" in queue
+    assert "queued_generation == generation" in send
+    assert "s_confirmation_inflight = true;" in send
+    assert "s_confirmation_cause = cause;" in send
+    assert "s_confirmation_record_id = record_id;" in send
+    assert "s_confirmation_generation = queued_generation;" in send
+    assert "++s_dial_confirm_write_ok;" in send
+    assert "s_dial_mode_target.record_id == record_id" in send
+    assert "s_dial_mode_target.generation == generation" in send
+    assert "const uint8_t committed_before =" in poll
+    assert "meaningful_mode_change = accepted != committed_before;" in poll
+    assert poll.index("if (meaningful_mode_change)") < poll.index(
+        "++s_dial_mode_apply_ok;"
+    )
+    assert "s_dial_mode_target.record_id = record.id;" in poll
+    assert "s_dial_mode_target.generation = queued.generation;" in poll
+    assert "++s_dial_mode_apply_ok;" in poll
+
+
+def test_f2_dial_queue_and_scanner_evidence_are_generation_bound():
+    remoted = _read(_REMOTED)
+    decode = _function_body(remoted, "void decode_and_enqueue(")
+    notify = _function_body(remoted, "void on_notify(")
+    connect = _function_body(
+        remoted, "void onConnect(NimBLEClient*) override"
+    )
+    task = _function_body(remoted, "void ble_task(void*)")
+    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
+    assert "struct QueuedControlRecord" in remoted
+    assert "uint32_t generation;" in remoted
+    assert "const QueuedControlRecord queued = {records[i], generation};" in decode
+    assert "xQueueSend(s_cmd_queue, &queued, 0)" in decode
+    assert "s_connected && s_linked && characteristic == s_rx_char" in notify
+    assert "decode_and_enqueue(data, len, generation);" in notify
+    assert "k1_ble_midi_decoder_reset_partial(&s_decoder);" in connect
+    assert connect.index("k1_ble_midi_decoder_reset_partial") < connect.index(
+        "++s_connection_generation"
+    )
+    assert "QueuedControlRecord queued;" in poll
+    assert poll.count("queued.generation == s_connection_generation") >= 2
+    assert poll.index("if (!current_generation)") < poll.index(
+        "sb_k1_control_apply(record)"
+    )
+    assert "++s_stale_generation_drops;" in poll
+    assert "publish_scan_active(scan->isScanning());" in task
+    assert "++s_scan_start_ok;" in task
+    assert "++s_scan_start_fail;" in task
+    assert "scan_active=%u" in status
+    assert "scan_start_ok=%lu scan_start_fail=%lu" in status
+    assert "stale_generation_drops=%lu" in status
+
+
+def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
+    remoted = _read(_REMOTED)
+    header = _read(_REMOTED_H)
+    send = _function_body(remoted, "void send_pending_confirmation()")
+    task = _function_body(remoted, "void ble_task(void*)")
+    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
+    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    disconnect = _function_body(
+        remoted, "void onDisconnect(NimBLEClient*, int reason) override"
+    )
+    deferred_down = _function_body(remoted, "void emit_pending_link_down()")
+    assert remoted.count("writeValue(") == 1
+    assert "Serial.printf" not in remoted
+    assert "rx_char->writeValue" in send
+    assert "send_pending_confirmation();" in task
+    assert "emit_pending_link_down();" in task
+    assert "writeValue" not in status
+    assert "writeValue" not in poll
+    assert "Serial." not in disconnect
+    assert "s_link_down_log_pending = true;" in disconnect
+    assert "snprintf(" in deferred_down
+    assert "serial_print_formatted(line, written);" in deferred_down
+    assert "static_cast<size_t>(written) < N" in remoted
+    assert "[ble_remoted_diag] format_overflow" in remoted
+    for body in (send, status):
+        assert "Serial.printf" not in body
+        assert "snprintf(" in body
+        assert "serial_print_formatted(line, written);" in body
+    assert poll.count("snprintf(") >= 2
+    assert poll.count("serial_print_formatted(line, written);") >= 2
+    for body in (send, status, poll, deferred_down):
+        for forbidden in ("String", "new ", "malloc", "calloc", "realloc"):
+            assert forbidden not in body
+    assert "low-priority Core-1 task" in header
+    assert "void sb_k1_ble_remoted_status();" in header
