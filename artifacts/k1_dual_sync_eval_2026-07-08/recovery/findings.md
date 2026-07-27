@@ -223,6 +223,7 @@ authority.
   `786 passed, 1 skipped, 86 subtests passed`.
 - Wrapper builds succeeded for `k1_hardware`, both leader environments and the
   follower; every probe dependency graph resolved NimBLE-Arduino `2.5.0`.
-- These builds still embed pre-F2b revision `acb9c40`. Immutable post-commit
-  probe rebuilds remain mandatory before any flash.
+- Post-commit immutable probe rebuilds succeeded and embed F2b revision
+  `a582031`. For every image, the application descriptor identity extracted
+  from the BIN equals the raw ELF SHA-256.
 - No firmware was flashed and no serial or hardware action occurred.

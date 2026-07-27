@@ -8,9 +8,8 @@ Captain after Case C.
 
 ## Current phase
 
-Phase F2b — commit the independently approved application-image and
-dial-causality firmware observability boundary, then rebuild immutable probe
-images before silicon.
+Phase F2 silicon preflight — F2a/F2b are committed and immutable probe images
+are ready; wait for Captain's physical GPIO/K718 attestation before Case A.
 
 ## Phases
 
@@ -79,14 +78,17 @@ images before silicon.
   committed (`acb9c4002a1da2a4c9371a30187e25d614af0082`).
 - [x] F2b firmware observability independently approved; focused/full tests and
   production plus all three probe builds green on current source.
-- [ ] F2b application-image/dial-causality firmware observability committed.
+- [x] F2b application-image/dial-causality firmware observability committed
+  and published (`a58203183208a4db7fcc7a30d060e6db14673ab1`).
+- [x] Three post-commit probe images rebuilt with embedded provenance
+  `a582031`.
 - [x] Read-only USB serial/chip mapping and cross-target guard negatives.
 - [ ] Captain physical GPIO/K718 attestation for the selected run.
 - [ ] Case A PASS.
 - [ ] Case B PASS.
 - [ ] Case C PASS with real dial traffic.
 - [ ] Tracked Captain STOP report.
-- **Status:** f2b_ready_to_commit
+- **Status:** ready_for_physical_attestation
 
 ### F3: Real Gate-0
 

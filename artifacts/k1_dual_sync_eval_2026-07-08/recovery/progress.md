@@ -230,6 +230,35 @@
   pre-F2b revision `acb9c40` and will be rebuilt after the F2b commit.
 - No flash, serial command or hardware action occurred.
 
+## 2026-07-27 — F2b committed and immutable images rebuilt
+
+- F2b committed and published as
+  `a58203183208a4db7fcc7a30d060e6db14673ab1`
+  (`fix(dual-sync): add F2 image and dial causality evidence`).
+- The commit hook passed. Commit membership was rechecked at 13 intended files;
+  the pre-existing dirty device registry remained excluded.
+- Local and remote `lane/dual-sync-phase0` refs were verified equal at the full
+  F2b SHA.
+- Rebuilt all three flashable probe environments after the commit. Each
+  succeeded, resolved NimBLE-Arduino `2.5.0` and embeds `a582031`.
+- Immutable image identities:
+  - sync-only leader BIN:
+    `8750774afbd2e2ff233015946a337757259efc1c38895accc64318731dc95c61`
+  - sync-only leader ELF/application:
+    `f062eab2e3416da94e18d1a2f3b4acb999dfcec8d4c50a458c0e1a6514503b9a`
+  - dual-role leader BIN:
+    `732fb6afbbe84baa1a504b94760d0c65ba6527b1e49714769bc576a1ac7e8874`
+  - dual-role leader ELF/application:
+    `03f93e9704e771adb602fbf6c084c7c3d061d38ef00195aa3e8282da0f736a63`
+  - follower BIN:
+    `3552db9f108dca29be2b27c156676290a28216c397666805a39cd9ebb5c34c7f`
+  - follower ELF/application:
+    `3e2ccf6136425c453103023697b53c9995b0f2ffb7e8b80b4a147197b8901740`
+- In every environment, the ESP application-descriptor identity extracted from
+  the BIN equals the raw ELF SHA-256.
+- F2 host/firmware readiness is complete. Case A remains blocked on Captain's
+  physical GPIO/K718 attestation; no flash or serial command has occurred.
+
 ## Delegation ledger
 
 | ID | Task | Class | Status | Evidence | Orchestrator re-run | Consumed as |
@@ -284,6 +313,6 @@
 
 ## Next
 
-Commit and publish the independently approved F2b firmware boundary, rebuild
-all three immutable probe images with the committed revision and record their
-hashes. Do not flash until Captain provides the physical GPIO/K718 attestation.
+Obtain Captain's physical GPIO/K718 attestation, then re-read this task plan and
+enter the scripted identity-guarded Case-A flash/capture path. Do not run Case B
+or C unless the preceding case passes, and stop for Captain after Case C.
