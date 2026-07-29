@@ -33,6 +33,8 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
+**If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
+
 ---
 
 ## 2. Source-of-truth hierarchy
