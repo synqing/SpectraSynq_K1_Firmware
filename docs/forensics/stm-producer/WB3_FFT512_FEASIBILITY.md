@@ -42,6 +42,33 @@
 | Delivers independent 42-bin oracle | **Yes** if built separately from `k1_stm.cpp` |
 | Worth product cost vs native 40-bin | **Captain decision (H5 + Path B)** |
 
+## Bench spike procedure (Track B — documentation step)
+
+Execute only on a **separate** worktree/branch from Track A; flash is mutually exclusive.
+
+1. **Gate 0:** clangd smoke clean on spike branch (`GATE0_CLANGD_BLOCKER.md`).
+2. **Reference:** Satisfy `WB3_REFERENCE_ATTESTATION.md` Track B checklist (or stop — spike stays host-only).
+3. **Branch:** `bench/wb3-track-b-fft512` (or Captain-named) from `origin/main`; bench env with FFT flag **only** (no `K1_STM`).
+4. **Static buffers:** Pre-allocate PCM ring (512 samples), window, FFT workspace in init — **no heap** in audio hot path.
+5. **Microbenchmark:** Log `esp_timer_get_time()` around 512-pt FFT + envelope + 42-bin LUT for N≥1000 frames; export CSV to `artifacts/stm-track-b/<run-id>/fft_microbench.csv`.
+6. **Core-0:** Follow `WB3_CORE0_BENCH_PROCEDURE.md` with treatment = FFT bench image, baseline = `k1_hardware` or Captain-named rollback.
+7. **VP:** When reference valid, `stm_vp_compare.py` reference vs candidate captures → `artifacts/stm-track-b/<run-id>/vp/`.
+8. **Registry:** MAC, rollback commit, env name in `manifest.json`.
+
+**Host-only fallback:** Steps 4–5 can run as native/off-device prototype **without** flash if reference is host Python — still publish under `artifacts/stm-track-b/` with `flash_required: false`.
+
+## Bench spike procedure (Track B)
+
+1. **Worktree:** Branch from `origin/main`; confirm `K1_STM` **undefined** in spike env.
+2. **Flag:** Add bench-only `-DK1_STM_FFT512_BENCH=1` (name as implemented) — **mutually exclusive** with `-DK1_STM`.
+3. **Buffers:** Static PCM ring 512 samples + FFT workspace in PSRAM or DRAM at init — **no heap** in audio hop callback.
+4. **Microbenchmark:** `esp_timer_get_time()` around FFT + envelope + 42-bin LUT; log p50/p95 over ≥1000 hops to `artifacts/stm-track-b/<run-id>/fft_microbench.json`.
+5. **Core-0:** Same treatment/control protocol as Track A (`WB3_CORE0_BENCH_PROCEDURE.md`) with FFT flag on.
+6. **VP:** Only when `WB3_REFERENCE_ATTESTATION.md` TB-1–TB-4 close; run `stm_vp_compare.py` reference vs FFT candidate.
+7. **Rollback:** Record bench MAC + prior image in `flash_manifest.yaml` before any upload.
+
+**Captain blockers:** device allocation, playback fixtures, reference source approval.
+
 ## Explicit non-actions this programme
 
 - No `FEATURE_FFT_STM` in `k1_hardware`.

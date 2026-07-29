@@ -2,8 +2,10 @@
 
 **Status:** VERIFIED (git topology, registry, preflight) + **DEGRADED-MODE** (symbol-level C++ claims — clangd unavailable this session; see `GATE0_CLANGD_BLOCKER.md`).
 
-**Plan:** WB-3 Investigation-to-Convergence (`correct-wb3-state_dee68cf1`).  
+**Plan:** WB-3 Investigation-to-Convergence (`correct-wb3-state_dee68cf1`); **dual-track bench** (`wb3-dual-track-test_d626f070`, Captain 2026-07-29).  
 **Ledger:** `Lightwave-Ledstrip/BACKLOG.md` § WB-3 (corrected 2026-07-29).
+
+**Dual-track policy:** Captain authorised **parallel** bench validation of Track A (native 40-bin, `K1_STM`) and Track B (512-point FFT, separate bench flag) before any A/B product lock-in. Tracks are **mutually exclusive per flash**; evidence lands in `artifacts/stm-track-a/` and `artifacts/stm-track-b/`; comparative choice is recorded only in `WB3_COMPARATIVE_DECISION_RECORD.md` after both packets (or documented abandon). See `WB3_CAPTAIN_DECISION_PENDING.md`.
 
 ## Repository roles
 
@@ -86,11 +88,15 @@ These remain **hypotheses** until Gate 0 clangd verification on `origin/main`:
 
 See `WB3_HYPOTHESES_AND_CLAIMS.md` for falsifiers and result states.
 
+## Dual-track test policy (Captain 2026-07-29)
+
+WB-3 no longer requires a pre-test Path A vs B lock-in. **Track A** (native `K1_STM` on `origin/main`) and **Track B** (512-point FFT bench spike, mutually exclusive flag) run in parallel on bench; comparative Captain sign-off waits on `artifacts/stm-track-a/` and `artifacts/stm-track-b/` packets. See `WB3_CAPTAIN_DECISION_PENDING.md`, `WB3_CONVERGENCE_CONDITIONAL.md`, plan `wb3-dual-track-test_d626f070`.
+
 ## Cross-links
 
 - Claims / thresholds: `WB3_HYPOTHESES_AND_CLAIMS.md`
 - 512 reference: `WB3_REFERENCE_ATTESTATION.md` (**INDETERMINATE**)
 - VP instrument: `../stm-vp/STM_VP_MEASUREMENT_SPEC.md`, `scripts/regression-harness/stm_vp_compare.py`
 - Core-0 bench: `WB3_CORE0_INSTRUMENTATION_SPEC.md`, `WB3_CORE0_BENCH_INDETERMINATE.md`
-- Captain gate: `WB3_CAPTAIN_DECISION_PENDING.md`
+- Captain gate: `WB3_CAPTAIN_DECISION_PENDING.md`, comparative record `WB3_COMPARATIVE_DECISION_RECORD.md`
 - Clangd blocker: `GATE0_CLANGD_BLOCKER.md`
