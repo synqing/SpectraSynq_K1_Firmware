@@ -183,6 +183,12 @@ enum lightshow_modes {
   LIGHT_MODE_TEMPO_COMET_ANTICIPATE,// -- Tempo Comet variant: comets decelerate INTO the next beat (2026-06-11)
   LIGHT_MODE_RIVER_SURGE,           // -- Spectrum River v2 variant: build/drop macro-dynamics axis (2026-06-11)
   LIGHT_MODE_TEMPO_RIVER_WALK,      // -- Tempo River variant: palette walks one step per bar (2026-06-11)
+  // ID-reserve slots 30/31 keep WAVEFORM_HYBRID_K1 at ordinal 32 (append-only
+  // parity with lane/gem-port-beat-pulse). Bodies not shipped here; both are
+  // unselectable via light_mode_is_enabled().
+  LIGHT_MODE_BEAT_PULSE,            // -- ID reserve 30 (tombstone; no body on this branch)
+  LIGHT_MODE_BLOOM_BT,              // -- ID reserve 31 (tombstone; no body on this branch)
+  LIGHT_MODE_WAVEFORM_HYBRID_K1,    // -- Waveform Hybrid K1: amplitude-bouncing dot + decaying scroll trail (2026-08-05 all-builds)
 
   NUM_MODES  // used to know the length of this list if it changes in the future
 };
@@ -202,6 +208,8 @@ inline bool light_mode_is_enabled(uint8_t mode) {
     case LIGHT_MODE_QUANTUM_COLLAPSE:
     case LIGHT_MODE_VU:
     case LIGHT_MODE_EMBER_V2:   // pulled 2026-06-02 (Captain: "fucked, not going anywhere"); code kept, unselectable
+    case LIGHT_MODE_BEAT_PULSE: // ID reserve 30 — unselectable on this branch (no effect body)
+    case LIGHT_MODE_BLOOM_BT:   // ID reserve 31 — unselectable on this branch (no effect body)
       return false;
     default:
       return true;
@@ -283,5 +291,16 @@ struct conf {
   uint8_t PALETTE_INDEX;         // Index of the currently selected palette
   bool    PALETTE_MODE_ENABLED;  // True if palette mode is active
 };
+
+// Boot palette lock (Captain standing order, 2026-08-05): EVERY K1 — bench and
+// main, every env — comes up on K1_Naberius_Gold_gp with palette mode ON for both
+// the primary and secondary channel. Index 40 into gGradientPalettes[] /
+// paletteNames[] in visual/Palettes.h; the two arrays are written in one order and
+// tests/test_boot_palette_lock_static.py fails the build if this index stops
+// naming K1_Naberius_Gold_gp, so a palette reordering cannot silently ship the
+// wrong colour. Runtime palette changes still work — they simply do not survive a
+// reboot, which is what "always start with" requires.
+#define K1_BOOT_PALETTE_NAME  "K1_Naberius_Gold_gp"
+#define K1_BOOT_PALETTE_INDEX 40
 
 #endif // CONFIG_TYPES_H

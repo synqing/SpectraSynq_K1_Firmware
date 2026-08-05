@@ -2985,6 +2985,16 @@ void parse_command(char* command_buf) {
 	      // handled by the extracted edge-mixer dispatcher
 	    }
 
+#ifdef K1_STM
+	    else if (serial_cmd_dispatch_stm_telem(command_type, command_data)) {
+	    }
+#endif
+
+#ifdef K1_STM_FFT512_BENCH
+	    else if (serial_cmd_dispatch_fft512_bench(command_type, command_data)) {
+	    }
+#endif
+
 #if ENABLE_DIAG_CAPTURE
 	    else if (strcmp(command_type, "diag") == 0) {
       if (strcmp(command_data, "status") == 0 || command_data[0] == 0) {

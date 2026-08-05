@@ -19,7 +19,10 @@
 #include "sb_smart_director.h"      // SBSmartDirectorConfig + sb_smart_director_config/set_config (smart_director)
 #include "sb_mode_selection.h"      // sb_mode_selection_init (smart_switching)
 #include "sb_visual_hooks.h"        // SBVisualHookConfig + sb_visual_hooks_config/set_config (smart_visual)
-#include "sb_edgemixer_lite.h"      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
+#include "sb_edgemixer_lite.h"
+#ifdef K1_STM
+#include "k1_edgemixer.h"
+#endif      // SBEdgeMixerConfig/SBEdgeMixerMode + sb_edgemixer_lite_config/set_config (edge_mixer)
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"         // k1::effects::framework::registry_* (mode family registry branch; same guard as serial_menu.h:27)
 #endif
@@ -1065,54 +1068,206 @@ bool serial_cmd_dispatch_smart_visual(const char* command_type, char* command_da
 // edge_strength), lifted VERBATIM. Calls sb_edgemixer_lite_* (director TU) +
 // sb_parse_edge_mode + sb_print_edge_status. Ungated.
 // ---------------------------------------------------------------------------
+#ifdef K1_STM
+static bool k1_parse_edge_mode_text(const char* text, K1EdgeMixerMode* out_mode) {
+  if (strcmp(text, "7") == 0 || strcmp(text, "stm_dual") == 0) {
+    *out_mode = K1_EDGE_MIXER_STM_DUAL;
+    return true;
+  }
+  if (strcmp(text, "8") == 0 || strcmp(text, "stm_spectral_map") == 0 || strcmp(text, "stm_spectral") == 0) {
+    *out_mode = K1_EDGE_MIXER_STM_SPECTRAL_MAP;
+    return true;
+  }
+  SBEdgeMixerMode sb_mode = SB_EDGE_MIXER_OFF;
+  if (!sb_parse_edge_mode(text, &sb_mode)) return false;
+  *out_mode = static_cast<K1EdgeMixerMode>(sb_mode);
+  return true;
+}
+
+static void k1_print_edge_status() {
+  K1EdgeMixerConfig edge = k1_edgemixer_config();
+  tx_begin();
+  USBSerial.print("EDGE_ENABLED: ");
+  USBSerial.println(edge.enabled ? "on" : "off");
+  USBSerial.print("EDGE_MODE: ");
+  if (edge.mode == K1_EDGE_MIXER_STM_DUAL) USBSerial.println("stm_dual");
+  else if (edge.mode == K1_EDGE_MIXER_STM_SPECTRAL_MAP) USBSerial.println("stm_spectral_map");
+  else if (edge.mode == K1_EDGE_MIXER_OFF) USBSerial.println("off");
+  else { USBSerial.print("mode_"); USBSerial.println((int)edge.mode); }
+  USBSerial.print("EDGE_STRENGTH: ");
+  USBSerial.println(edge.strength, 3);
+  tx_end();
+}
+#endif
+
 bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data) {
     if (false) {}
 
     else if (strcmp(command_type, "edge_enabled") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
+#ifdef K1_STM
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.enabled = value;
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+#else
         SBEdgeMixerConfig config = sb_edgemixer_lite_config();
         config.enabled = value;
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
+#endif
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else if (strcmp(command_type, "edge_mode") == 0) {
+#ifdef K1_STM
+      K1EdgeMixerMode mode = K1_EDGE_MIXER_OFF;
+      if (k1_parse_edge_mode_text(command_data, &mode)) {
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.mode = mode;
+        if (mode == K1_EDGE_MIXER_OFF) config.enabled = false;
+        else config.enabled = true;
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+      } else bad_command(command_type, command_data);
+#else
       SBEdgeMixerMode mode = SB_EDGE_MIXER_OFF;
       if (sb_parse_edge_mode(command_data, &mode)) {
         SBEdgeMixerConfig config = sb_edgemixer_lite_config();
         config.mode = mode;
-        if (mode == SB_EDGE_MIXER_OFF) {
-          config.enabled = false;
-        }
+        if (mode == SB_EDGE_MIXER_OFF) config.enabled = false;
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
-      } else {
-        bad_command(command_type, command_data);
-      }
+      } else bad_command(command_type, command_data);
+#endif
     }
 
     else if (strcmp(command_type, "edge_strength") == 0) {
       float value = 0.0f;
       if (vp_parse_float(command_data, &value)) {
+#ifdef K1_STM
+        K1EdgeMixerConfig config = k1_edgemixer_config();
+        config.strength = constrain(value, 0.0f, 1.0f);
+        k1_edgemixer_set_config(config);
+        k1_print_edge_status();
+#else
         SBEdgeMixerConfig config = sb_edgemixer_lite_config();
         config.strength = constrain(value, 0.0f, 1.0f);
         sb_edgemixer_lite_set_config(config);
         sb_print_edge_status();
+#endif
       } else {
         bad_command(command_type, command_data);
       }
     }
 
     else {
-      return false;  // not an edge-mixer handler — let parse_command's ladder continue
+      return false;
     }
 
     return true;
 }
+
+
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_stm_telem — STM producer snapshot (K1_STM only)
+// ---------------------------------------------------------------------------
+#ifdef K1_STM
+#include "k1_audio_snapshot.h"
+#include "k1_stm.h"
+
+static void k1_stm_print_telemetry_report() {
+  K1StmResult stm = k1_stm_read();
+  float spec_max = 0.0f;
+  float spec_sum = 0.0f;
+  for (uint8_t i = 0; i < K1_STM_SPECTRAL_BINS; i++) {
+    float v = stm.spectral[i];
+    spec_sum += v;
+    if (v > spec_max) spec_max = v;
+  }
+  tx_begin();
+  USBSerial.print("STM_TELEM: ready=");
+  USBSerial.print(stm.ready ? 1 : 0);
+  USBSerial.print(" temporal=");
+  USBSerial.print(stm.temporal_energy, 4);
+  USBSerial.print(" spectral=");
+  USBSerial.print(stm.spectral_energy, 4);
+  USBSerial.print(" spec_max=");
+  USBSerial.print(spec_max, 4);
+  USBSerial.print(" spec_mean=");
+  USBSerial.println(spec_sum / float(K1_STM_SPECTRAL_BINS), 4);
+  tx_end();
+}
+
+bool serial_cmd_dispatch_stm_telem(const char* command_type, char* command_data) {
+  if (strcmp(command_type, "stm_telem") != 0) return false;
+  if (command_data == nullptr || command_data[0] == 0 || strcmp(command_data, "report") == 0) {
+    k1_stm_print_telemetry_report();
+    return true;
+  }
+  if (strcmp(command_data, "reset") == 0) {
+    k1_stm_reset();
+    k1_stm_print_telemetry_report();
+    return true;
+  }
+  bad_command(command_type, command_data);
+  return true;
+}
+#endif
+
+// ---------------------------------------------------------------------------
+// serial_cmd_dispatch_fft512_bench — Track B spike (K1_STM_FFT512_BENCH only)
+// ---------------------------------------------------------------------------
+#ifdef K1_STM_FFT512_BENCH
+#include "k1_stm_fft512_bench.h"
+
+static uint32_t k1_parse_u32_or_default(const char* text, uint32_t def) {
+  if (text == nullptr || text[0] == 0) return def;
+  return static_cast<uint32_t>(strtoul(text, nullptr, 10));
+}
+
+bool serial_cmd_dispatch_fft512_bench(const char* command_type, char* command_data) {
+  if (strcmp(command_type, "fft512_bench") != 0) return false;
+  if (command_data == nullptr || command_data[0] == 0 || strcmp(command_data, "report") == 0) {
+    k1_stm_fft512_bench_print_report();
+    return true;
+  }
+  if (strcmp(command_data, "hop") == 0) {
+    (void)k1_stm_fft512_bench_run_one_hop();
+    k1_stm_fft512_bench_print_report();
+    return true;
+  }
+  if (strcmp(command_data, "reset") == 0) {
+    k1_stm_fft512_bench_reset_stats();
+    k1_stm_fft512_bench_print_report();
+    return true;
+  }
+  if (strncmp(command_data, "burst", 5) == 0) {
+    const char* arg = command_data + 5;
+    if (*arg == ',') arg++;
+    while (*arg == ' ') arg++;
+    k1_stm_fft512_bench_run_burst(k1_parse_u32_or_default(arg, 1000));
+    k1_stm_fft512_bench_print_report();
+    return true;
+  }
+  if (strncmp(command_data, "live_hop", 8) == 0) {
+    const char* arg = command_data + 8;
+    if (*arg == ',') arg++;
+    while (*arg == ' ') arg++;
+    if (strcmp(arg, "on") == 0) k1_stm_fft512_bench_set_live_hop(true);
+    else if (strcmp(arg, "off") == 0) k1_stm_fft512_bench_set_live_hop(false);
+    else { bad_command(command_type, command_data); return true; }
+    k1_stm_fft512_bench_print_report();
+    return true;
+  }
+  bad_command(command_type, command_data);
+  return true;
+}
+#endif
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_preset — the "Set CONFIG preset" handler, lifted VERBATIM

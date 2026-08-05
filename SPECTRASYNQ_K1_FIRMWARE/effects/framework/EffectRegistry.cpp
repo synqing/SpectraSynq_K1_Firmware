@@ -87,6 +87,9 @@ EffectEntry g_registry[] = {
     { legacy_id(LIGHT_MODE_TEMPO_COMET_ANTICIPATE),"tempo_comet_anticipate","TEMPO COMET ANTICIPATE",nullptr,nullptr,true, false, AudioDeps::BEAT | AudioDeps::ONSET,  LIGHT_MODE_TEMPO_COMET_ANTICIPATE },
     { legacy_id(LIGHT_MODE_RIVER_SURGE),          "river_surge",          "RIVER SURGE",           nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_RIVER_SURGE },
     { legacy_id(LIGHT_MODE_TEMPO_RIVER_WALK),     "tempo_river_walk",     "TEMPO RIVER WALK",      nullptr, nullptr, true,  false, AudioDeps::BEAT | AudioDeps::CHORD,  LIGHT_MODE_TEMPO_RIVER_WALK },
+    { legacy_id(LIGHT_MODE_BEAT_PULSE),           "beat_pulse",           "BEAT PULSE",            nullptr, nullptr, false, false, AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_BEAT_PULSE },
+    { legacy_id(LIGHT_MODE_BLOOM_BT),             "bloom_bt",             "BLOOM BASSTREBLE",      nullptr, nullptr, false, false, AudioDeps::LEVEL,                  LIGHT_MODE_BLOOM_BT },
+    { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),   "waveform_hybrid_k1",   "WAVEFORM HYBRID K1",    nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_WAVEFORM_HYBRID_K1 },
 
     // ── Native family 0x10/0x11/0x12: the ported-but-dead IEffects go live here ──
     { 0x1001, "beat_pulse_resonant",   "Beat Pulse (Resonant)",  nullptr, nullptr, true, true, AudioDeps::BEAT | AudioDeps::LEVEL,  kNoLegacy },
@@ -142,6 +145,9 @@ constexpr RegId k_reg_ids[] = {
     { legacy_id(LIGHT_MODE_TEMPO_COMET_ANTICIPATE),LIGHT_MODE_TEMPO_COMET_ANTICIPATE },
     { legacy_id(LIGHT_MODE_RIVER_SURGE),           LIGHT_MODE_RIVER_SURGE },
     { legacy_id(LIGHT_MODE_TEMPO_RIVER_WALK),      LIGHT_MODE_TEMPO_RIVER_WALK },
+    { legacy_id(LIGHT_MODE_BEAT_PULSE),            LIGHT_MODE_BEAT_PULSE },
+    { legacy_id(LIGHT_MODE_BLOOM_BT),              LIGHT_MODE_BLOOM_BT },
+    { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),    LIGHT_MODE_WAVEFORM_HYBRID_K1 },
     { 0x1001, kNoLegacy },
     { 0x1101, kNoLegacy },
     { 0x1201, kNoLegacy },

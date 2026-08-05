@@ -412,6 +412,9 @@ void init_system() {
   set_mode_name(27, "TEMPO COMET ANTICIPATE");
   set_mode_name(28, "RIVER SURGE");
   set_mode_name(29, "TEMPO RIVER WALK");
+  set_mode_name(30, "BEAT PULSE");
+  set_mode_name(31, "BLOOM BASSTREBLE");
+  set_mode_name(32, "WAVEFORM HYBRID K1");
 
   init_serial(SERIAL_BAUD);
   init_sweet_spot();

@@ -205,6 +205,26 @@ void save_config_delayed() {
   settings_updated = true;
 }
 
+// Boot palette lock (Captain standing order, 2026-08-05): every K1, bench and main,
+// starts on K1_Naberius_Gold_gp with palette mode ON for both channels.
+//
+// The compiled defaults alone cannot deliver this. CONFIG.PALETTE_INDEX and
+// CONFIG.PALETTE_MODE_ENABLED are inside the persisted blob, so any device that has
+// ever saved a config would restore its old palette over the new default and boot
+// the wrong colour. Forcing after the load — on every exit path, including boot-loop
+// safe mode and a missing/corrupt config file — is what makes "always" true rather
+// than "true on a freshly erased device".
+//
+// The secondary channel's globals are not in the blob (save_configuration() /
+// load_configuration() have no callers), so they already reset each boot; they are
+// set here too so one function states the whole boot contract.
+static inline void k1_apply_boot_palette_lock() {
+  CONFIG.PALETTE_INDEX = K1_BOOT_PALETTE_INDEX;
+  CONFIG.PALETTE_MODE_ENABLED = true;
+  SECONDARY_PALETTE_INDEX = K1_BOOT_PALETTE_INDEX;
+  SECONDARY_PALETTE_MODE_ENABLED = true;
+}
+
 // Load configuration from LittleFS
 void load_config() {
   lock_leds();
@@ -216,6 +236,7 @@ void load_config() {
   // and released before the early return.
   if (k1_boot_safe_mode) {
     memcpy(&CONFIG, &CONFIG_DEFAULTS, sizeof(CONFIG));
+    k1_apply_boot_palette_lock();
     USBSerial.println("BOOT_LOOP_GUARD: safe_mode_config=DEFAULTS (RAM only, file intact)");
     unlock_leds();
     return;
@@ -232,6 +253,7 @@ void load_config() {
       USBSerial.print(config_filename);
       USBSerial.println(" for reading!");
     }
+    k1_apply_boot_palette_lock();
     return;
   }
 
@@ -284,6 +306,9 @@ void load_config() {
   CONFIG.LIGHTSHOW_MODE = light_mode_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
   SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
 #endif
+
+  // Applied AFTER the persisted blob is adopted, so a stored palette cannot win.
+  k1_apply_boot_palette_lock();
 
   unlock_leds();
   // save_config() takes its own lock_leds()/unlock_leds(); lock_leds() is a

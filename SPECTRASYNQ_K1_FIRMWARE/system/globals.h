@@ -837,8 +837,8 @@ inline bool SECONDARY_BASE_COAT = false;
 inline bool SECONDARY_REVERSE_ORDER = false;
 inline bool SECONDARY_AUTO_COLOR_SHIFT = true;
 inline float SECONDARY_BASE_COAT_INTENSITY = 0.0; // NEW: Secondary Base coat intensity control
-inline uint8_t SECONDARY_PALETTE_INDEX = 28; // 1401 dual-tempo setup (2026-06-04): es_autumn_19_gp
-inline bool SECONDARY_PALETTE_MODE_ENABLED = true; // 1401 dual-tempo setup (2026-06-04): palette mode ON
+inline uint8_t SECONDARY_PALETTE_INDEX = K1_BOOT_PALETTE_INDEX; // boot palette lock (2026-08-05)
+inline bool SECONDARY_PALETTE_MODE_ENABLED = true; // boot palette lock — palette mode ON
 
 bool palette_owns_colour_source(bool secondary_channel);   // Row 3 → globals.cpp
 bool palette_owns_render_colour_source();                  // Row 3 → globals.cpp

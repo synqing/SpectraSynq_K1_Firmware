@@ -392,9 +392,13 @@ MUTATIONS = [
         "smart_hooks_enabled_value_to_false (statement-identity divergence)",
     ),
     # 8. edge_strength clamp 1.0->0.5: alters the edge_mixer body. (a)
+    # Anchored on the production sb_edgemixer path — the K1_STM ifdef twin uses the
+    # same constrain statement, so a bare pattern matches twice after the handler
+    # extraction that kept both branches in one TU.
     (
+        r"(SBEdgeMixerConfig config = sb_edgemixer_lite_config\(\);\s*)"
         r"config\.strength = constrain\(value, 0\.0f, 1\.0f\);",
-        r"config.strength = constrain(value, 0.0f, 0.5f);",
+        r"\1config.strength = constrain(value, 0.0f, 0.5f);",
         "edge_strength_clamp_1.0_to_0.5 (statement-identity divergence)",
     ),
     # 9. edge_mode command_type rename: capture can't find "edge_mode" -> body null.

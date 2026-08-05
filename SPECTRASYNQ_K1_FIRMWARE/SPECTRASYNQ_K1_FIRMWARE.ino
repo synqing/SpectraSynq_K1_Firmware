@@ -377,6 +377,13 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
     light_mode_river_surge(channel.history, *channel.effect);
   } else if (mode == LIGHT_MODE_TEMPO_RIVER_WALK) {
     light_mode_tempo_river_walk(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_BEAT_PULSE) {
+    // Tombstone ID reserve 30 — unselectable; no render body on this branch.
+  } else if (mode == LIGHT_MODE_BLOOM_BT) {
+    // Tombstone ID reserve 31 — unselectable; no render body on this branch.
+  } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
+    // Waveform Hybrid K1: bouncing dot + trail, self-managed history.
+    light_mode_waveform_hybrid_k1(channel.history, *channel.effect);
   }
 }
 

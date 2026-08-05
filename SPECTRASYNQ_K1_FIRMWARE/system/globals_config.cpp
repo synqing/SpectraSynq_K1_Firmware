@@ -85,8 +85,8 @@ conf CONFIG = {
   0.00,                // BASE_COAT_INTENSITY (Default 0.0 = base coat off; user enables via encoder 0. Phase 1 2026-05-20: comment corrected from "full intensity"; the value has always been 0.0.)
 
   // --- Palette Defaults ---
-  0,                   // PALETTE_INDEX (Default to the first palette)
-  false,               // PALETTE_MODE_ENABLED (Default to off)
+  K1_BOOT_PALETTE_INDEX,  // PALETTE_INDEX (K1_Naberius_Gold_gp — boot palette lock, 2026-08-05)
+  true,                   // PALETTE_MODE_ENABLED (palette mode ON at boot, both channels)
 };
 
 // Ensure LED count is set from the single #define in constants.h
