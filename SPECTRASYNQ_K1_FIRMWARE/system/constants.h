@@ -305,6 +305,10 @@ const float notes[] = {
   7040.000, 7458.620, 7902.130, 8372.018, 8869.844, 9397.272, 9956.064, 10548.08, 11175.30, 11839.82, 12543.85, 13289.75
 };
 
+// Analysis authority: first GDFT bin index whose target_freq is above fs/2.
+// Canvas/LED width stays NUM_FREQS (NATIVE_RESOLUTION/2); bins [hi, NUM_FREQS)
+// are Nyquist ghosts (aliased labels) — skip Goertzel + do not treat as resolution.
+// Default profile fs=12800 / NOTE_OFFSET=12 → hi=71 (nine ghosts: 71..79).
 static inline uint8_t sb_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t note_offset) {
   const float nyquist_hz = float(sample_rate) * 0.5f;
   const uint8_t note_count = uint8_t(sizeof(notes) / sizeof(notes[0]));

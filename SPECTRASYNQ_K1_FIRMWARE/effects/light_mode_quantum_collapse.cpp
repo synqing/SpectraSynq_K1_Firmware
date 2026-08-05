@@ -48,12 +48,18 @@ void light_mode_quantum_collapse() {
   }
   mid_energy /= 16.0;
   
-  for (int i = NUM_FREQS / 2; i < NUM_FREQS; i++) {
+  // High band: analysis authority only (exclude Nyquist ghosts above safe_hi).
+  const uint8_t analysis_bins =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+  const int high_lo = NUM_FREQS / 2;
+  const int high_hi = (int)analysis_bins;
+  const int high_count = (high_hi > high_lo) ? (high_hi - high_lo) : 1;
+  for (int i = high_lo; i < high_hi; i++) {
     if (isfinite(float(spectrogram_smooth[i]))) {
       high_energy += spectrogram_smooth[i] * spectrogram_smooth[i];
     }
   }
-  high_energy /= SQ15x16(NUM_FREQS / 2);
+  high_energy /= SQ15x16(high_count);
   
   // Scale energy values
   bass_energy = bass_energy * 5.0;

@@ -238,6 +238,29 @@ class NyquistBinHygieneStaticTest(unittest.TestCase):
         self.assertNotIn("for (uint8_t i = 0; i < NUM_FREQS; i++) {\n    chroma_bucket", SNAPSHOT_CPP)
         self.assertIn("Nyquist-clamped by the runtime sample rate and NOTE_OFFSET", SNAPSHOT_H)
 
+    def test_gdft_skips_above_nyquist_goertzel_eval(self):
+        gdft = (FW / "k1_gdft_core.cpp").read_text()
+        self.assertIn("nyquist_safe_bin_hi", gdft)
+        self.assertIn("if (i >= nyquist_safe_bin_hi)", gdft)
+        self.assertIn("magnitudes_normalized_avg[i] = 0.0f", gdft)
+        self.assertIn("continue;", gdft)
+        # Phase 1 must not touch the ×2 block_size formula.
+        system_h = (FW / "system.h").read_text()
+        self.assertIn(
+            "frequencies[i].block_size = CONFIG.SAMPLE_RATE / (max_distance_hz * 2.0);",
+            system_h,
+        )
+
+    def test_vp_spectrum_paint_uses_analysis_authority_not_ghosts(self):
+        river = (FW / "light_mode_spectrum_river.cpp").read_text()
+        gdft_fx = (FW / "light_mode_gdft.cpp").read_text()
+        self.assertIn("sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET)", river)
+        self.assertIn("k < analysis_bins && k < HALF", river)
+        self.assertNotIn("k < NUM_FREQS && k < HALF", river)
+        self.assertIn("analysis_bins", gdft_fx)
+        self.assertIn("freq_prog * (SQ15x16)analysis_hi", gdft_fx)
+        self.assertNotIn("freq_prog * (NUM_FREQS - 1)", gdft_fx)
+
 
 if __name__ == "__main__":
     unittest.main()

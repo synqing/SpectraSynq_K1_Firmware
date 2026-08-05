@@ -46,11 +46,12 @@ static bool dforge_presence_ok(const SBAudioSnapshot& snap) {
   return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
 }
 
-static float dforge_band_target(uint8_t band, uint8_t bands, uint8_t bins_per_band) {
+static float dforge_band_target(uint8_t band, uint8_t bands, uint8_t bins_per_band,
+                                uint8_t analysis_bins) {
   float sum = 0.0f;
   const uint16_t start = uint16_t(band) * bins_per_band;
   const uint16_t end = start + bins_per_band;
-  for (uint16_t k = start; k < end && k < NUM_FREQS; k++) {
+  for (uint16_t k = start; k < end && k < analysis_bins; k++) {
     float e = float(spectrogram_smooth[k]);
     if (!isfinite(e) || e < 0.0f) e = 0.0f;
     if (e > 1.0f) e = 1.0f;
@@ -83,7 +84,9 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       cached_gradient_palette(render_params_palette_index(rp, render_secondary), render_secondary);
   const uint16_t HALF = NATIVE_RESOLUTION / 2;
   const uint8_t bands = DFORGE_LATTICE_N;
-  const uint8_t bins_per_band = (NUM_FREQS + bands - 1) / bands;
+  const uint8_t analysis_bins =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+  const uint8_t bins_per_band = (analysis_bins + bands - 1) / bands;
 
   const uint32_t prev_ms = fx.dense_last_ms;
   const uint32_t now_ms = millis();
@@ -126,7 +129,7 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   float tau[DFORGE_LATTICE_N];
   for (uint8_t i = 0; i < bands; i++) {
-    tau[i] = dforge_band_target(i, bands, bins_per_band);
+    tau[i] = dforge_band_target(i, bands, bins_per_band, analysis_bins);
   }
 
   const float kappa = DFORGE_KAPPA0 * novelty * conf_scale * (0.35f + 0.65f * activity);
@@ -192,7 +195,7 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
         sinf(6.2831853f * (u * 2.17f + fx.dforge_carrier)) *
         sinf(6.2831853f * (u * 3.61f - phase_b));
     const float envelope = (0.35f + 0.65f * activity) * (0.5f + 0.5f * moire);
-    float e = float(spectrogram_smooth[k < NUM_FREQS ? k : NUM_FREQS - 1]);
+    float e = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
     if (!isfinite(e)) e = 0.0f;
     e = dforge_clamp01(e) * envelope * DFORGE_MOIRE_GAIN * inject_scale;
     if (e < DFORGE_FLOOR) continue;

@@ -84,9 +84,21 @@ void IRAM_ATTR process_GDFT() {
     spectrogram_history_index = 0;  // wrap to index zero at end
   }
 
-  // Run GDFT (Goertzel-based Discrete Fourier Transform) with NUM_FREQS frequencies
+  // Run GDFT (Goertzel-based Discrete Fourier Transform) with NUM_FREQS canvas slots.
+  // Analysis authority is nyquist_safe_bin_hi: above-Nyquist indices are ghosts —
+  // skip the resonator (cheap) and force zero magnitudes so VP/AP cannot treat
+  // aliased labels as extra resolution. NUM_FREQS stays 80 for LED canvas width.
   // Fixed-point code adapted from example here: https://sourceforge.net/p/freetel/code/HEAD/tree/misc/goertzal/goertzal.c
+  const uint8_t nyquist_safe_bin_hi =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   for (uint16_t i = 0; i < NUM_FREQS; i++) {  // Run NUM_FREQS times
+    if (i >= nyquist_safe_bin_hi) {
+      magnitudes[i] = 0;
+      magnitudes_normalized[i] = 0.0f;
+      magnitudes_normalized_avg[i] = 0.0f;
+      continue;
+    }
+
     int32_t q0, q1, q2;
     int64_t mult;
 

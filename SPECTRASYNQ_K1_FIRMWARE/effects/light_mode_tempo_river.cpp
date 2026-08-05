@@ -113,13 +113,18 @@ void light_mode_tempo_river(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
   // 2. Inject the live spectrum: bin k -> pixel HALF+k, colour BY FREQUENCY.
+  //    Nyquist ghosts retired — analysis_bins only.
   uint8_t iters = (uint8_t)rp->SQUARE_ITER; if (iters > TR_MAX_ITERS) iters = TR_MAX_ITERS;
-  for (uint16_t k = 0; k < NUM_FREQS && k < HALF; k++) {
+  const uint8_t analysis_bins =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+  const float hue_denom =
+      float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
+  for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
     float e = float(spectrogram_smooth[k]);
     if (!isfinite(e) || e < 0.0f) e = 0.0f; if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;               // contrast (square-iter)
     if (e < TR_FLOOR) continue;
-    const float hue = float(k) / float(NUM_FREQS - 1);        // frequency -> palette position
+    const float hue = float(k) / hue_denom;        // frequency -> palette position
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * TR_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r; leds_16[idx].g += col.g; leds_16[idx].b += col.b;

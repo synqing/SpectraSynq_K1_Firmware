@@ -178,15 +178,20 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   // 2. Inject the live spectrum (identical to SR v2: bin k -> pixel HALF+k,
   //    colour by frequency, brightness by contrast-enhanced energy).
+  //    Nyquist ghosts retired — analysis_bins only.
   uint8_t iters = (uint8_t)rp->SQUARE_ITER;
   if (iters > RSURGE_MAX_ITERS) iters = RSURGE_MAX_ITERS;
-  for (uint16_t k = 0; k < NUM_FREQS && k < HALF; k++) {
+  const uint8_t analysis_bins =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+  const float hue_denom =
+      float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
+  for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
     float e = float(spectrogram_smooth[k]);
     if (!isfinite(e) || e < 0.0f) e = 0.0f;
     if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;
     if (e < RSURGE_FLOOR) continue;
-    const float hue = float(k) / float(NUM_FREQS - 1);
+    const float hue = float(k) / hue_denom;
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * RSURGE_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r;
@@ -207,7 +212,7 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       fx.rsurge_wf_life = 0.0f;
     } else {
       const float inten = fx.rsurge_wf_life;  // 1 -> 0 over ~0.8 s
-      float wf_hue = (fx.rsurge_wf_pos - float(HALF)) / float(NUM_FREQS - 1);
+      float wf_hue = (fx.rsurge_wf_pos - float(HALF)) / hue_denom;
       if (wf_hue < 0.0f) wf_hue = 0.0f;
       if (wf_hue > 1.0f) wf_hue = 1.0f;
       const int centre = int(fx.rsurge_wf_pos + 0.5f);
