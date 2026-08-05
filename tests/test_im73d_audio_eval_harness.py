@@ -215,6 +215,81 @@ def test_harness_refuses_unknown_or_duplicate_device_roles():
         harness.select_device_specs("bench_im73d,bench_im73d")
 
 
+def test_harness_can_select_bench_im69d_role():
+    harness = load_harness()
+
+    selected = harness.select_device_specs("bench_im69d")
+
+    assert [spec.role for spec in selected] == ["bench_im69d"]
+    assert [spec.usb_serial for spec in selected] == [harness.BENCH_MAC]
+
+
+def test_harness_refuses_bench_roles_sharing_one_usb_serial():
+    harness = load_harness()
+
+    with pytest.raises(SystemExit, match="ROLE CONFLICT"):
+        harness.select_device_specs("bench_im73d,bench_im69d")
+
+    # Default --roles=all now contains both bench roles and must fail closed
+    # rather than opening the same serial port under two provenance labels.
+    with pytest.raises(SystemExit, match="ROLE CONFLICT"):
+        harness.select_device_specs(None)
+
+
+def test_dsr_compare_supports_cross_role_mic_ab():
+    harness = load_harness()
+    left_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 10.0},
+                            "raw_i16_abs_peak": {"p90": 50.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 100.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im69d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 30.0},
+                            "raw_i16_abs_peak": {"p90": 90.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 250.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+
+    report = harness.compare_summaries(
+        left_doc,
+        right_doc,
+        left_label="im73d_dsr16",
+        right_label="im69d_dsr16",
+        role="bench_im73d",
+        right_role="bench_im69d",
+    )
+
+    assert report["role"] == "bench_im73d"
+    assert report["right_role"] == "bench_im69d"
+    assert report["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 3.0
+    assert report["verdict"] == "no_promotion_without_speaker_stimulus"
+
+
 def test_chip_id_is_allowed_as_read_only_preflight_command():
     harness = load_harness()
 
@@ -235,6 +310,34 @@ def test_required_build_env_gate_accepts_matching_env_and_rejects_mismatch():
 
     with pytest.raises(SystemExit, match="BUILD ENV GATE"):
         harness.assert_required_build_env(preflight, "k1_bench_im73d")
+
+
+def test_required_build_env_gate_supports_per_role_mapping():
+    harness = load_harness()
+    preflight = {
+        "bench_im69d": {
+            "build_lines": ["BUILD: version=40103 git=3b59794 epoch=1785927357 env=k1_bench_im69d"]
+        },
+        "main_sph": {
+            "build_lines": ["BUILD: version=40103 git=1c131a9 epoch=1785000000 env=k1_hardware"]
+        },
+    }
+
+    harness.assert_required_build_env(
+        preflight, "bench_im69d=k1_bench_im69d,main_sph=k1_hardware"
+    )
+
+    with pytest.raises(SystemExit, match="BUILD ENV GATE"):
+        harness.assert_required_build_env(
+            preflight, "bench_im69d=k1_bench_im69d,main_sph=k1_bench_im69d"
+        )
+
+    # A mapping must name every selected role — an unmapped device fails closed.
+    with pytest.raises(SystemExit, match="missing from --require-build-env"):
+        harness.assert_required_build_env(preflight, "bench_im69d=k1_bench_im69d")
+
+    with pytest.raises(SystemExit, match="invalid --require-build-env entry"):
+        harness.assert_required_build_env(preflight, "bench_im69d=")
 
 
 def test_dsr_compare_uses_raw_i16_metrics_for_required_verdict_inputs():

@@ -52,6 +52,10 @@ class SerialLine:
 
 DEVICES = (
     DeviceSpec("bench_im73d", BENCH_MAC),
+    # IM69D130 dual-mic PCB3 eval (2026-08-05): same bench unit, different fitted
+    # mic + env (k1_bench_im69d). Mutually exclusive with bench_im73d in one run —
+    # both roles resolve to the same USB serial, and only one mic is ever fitted.
+    DeviceSpec("bench_im69d", BENCH_MAC),
     DeviceSpec("main_sph", MAIN_MAC),
 )
 DEVICE_BY_ROLE = {spec.role: spec for spec in DEVICES}
@@ -190,9 +194,28 @@ def assess_capture_integrity(error: str | None, ap_rows: int, min_rows: int) -> 
     }
 
 
+def assert_unique_usb_serials(specs: tuple[DeviceSpec, ...]) -> tuple[DeviceSpec, ...]:
+    by_serial: dict[str, list[str]] = {}
+    for spec in specs:
+        by_serial.setdefault(spec.usb_serial, []).append(spec.role)
+    conflicts = {serial: roles for serial, roles in by_serial.items() if len(roles) > 1}
+    if conflicts:
+        rendered = "; ".join(
+            f"{'+'.join(roles)} share USB serial {serial}" for serial, roles in conflicts.items()
+        )
+        raise SystemExit(
+            "ROLE CONFLICT: "
+            + rendered
+            + " — one physical unit carries one mic at a time; pass --roles with the "
+            "role matching the mic actually fitted (e.g. --roles bench_im69d or "
+            "--roles bench_im69d,main_sph)"
+        )
+    return specs
+
+
 def select_device_specs(raw_roles: str | None) -> tuple[DeviceSpec, ...]:
     if raw_roles is None or raw_roles.strip() == "all":
-        return DEVICES
+        return assert_unique_usb_serials(DEVICES)
 
     selected: list[DeviceSpec] = []
     seen: set[str] = set()
@@ -213,7 +236,7 @@ def select_device_specs(raw_roles: str | None) -> tuple[DeviceSpec, ...]:
 
     if not selected:
         raise SystemExit("--roles selected no devices")
-    return tuple(selected)
+    return assert_unique_usb_serials(tuple(selected))
 
 
 def discover_ports(specs: tuple[DeviceSpec, ...] = DEVICES) -> dict[str, str]:
@@ -346,17 +369,39 @@ def serial_preflight(
 
 
 def assert_required_build_env(preflight: dict[str, Any], required_env: str) -> None:
+    # required_env is either a single env name applied to every selected role, or
+    # a comma-separated role=env mapping for mixed-device sessions
+    # (e.g. "bench_im69d=k1_bench_im69d,main_sph=k1_hardware"). With a mapping,
+    # every selected role must appear in it — fail closed, never skip a device.
+    per_role: dict[str, str] = {}
+    if "=" in required_env:
+        for item in required_env.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            role_key, _, env_name = item.partition("=")
+            if not role_key.strip() or not env_name.strip():
+                raise SystemExit(f"invalid --require-build-env entry: {item!r}")
+            per_role[role_key.strip()] = env_name.strip()
+
     mismatches: list[str] = []
     for role, device in preflight.items():
+        if per_role:
+            expected = per_role.get(role)
+            if expected is None:
+                mismatches.append(f"{role}: missing from --require-build-env mapping")
+                continue
+        else:
+            expected = required_env
         build_lines = device.get("build_lines", [])
         envs = {
             match.group(1)
             for line in build_lines
             for match in re.finditer(r"\benv=([^\s]+)", str(line))
         }
-        if required_env not in envs:
+        if expected not in envs:
             rendered = ",".join(sorted(envs)) or "none"
-            mismatches.append(f"{role}: expected env={required_env}, observed={rendered}")
+            mismatches.append(f"{role}: expected env={expected}, observed={rendered}")
     if mismatches:
         raise SystemExit("BUILD ENV GATE: " + "; ".join(mismatches))
 
@@ -640,12 +685,13 @@ def count_role_quality_failures(summary_doc: dict[str, Any], role: str) -> dict[
 def compare_metric(
     left_doc: dict[str, Any],
     right_doc: dict[str, Any],
-    role: str,
+    left_role: str,
+    right_role: str,
     metric: str,
     stat: str,
 ) -> dict[str, Any]:
-    left_values = collect_role_metric(left_doc, role, metric, stat)
-    right_values = collect_role_metric(right_doc, role, metric, stat)
+    left_values = collect_role_metric(left_doc, left_role, metric, stat)
+    right_values = collect_role_metric(right_doc, right_role, metric, stat)
     left_summary = summarise_values(left_values)
     right_summary = summarise_values(right_values)
     ratio: float | None = None
@@ -668,17 +714,21 @@ def compare_summaries(
     left_label: str,
     right_label: str,
     role: str,
+    right_role: str | None = None,
 ) -> dict[str, Any]:
+    # right_role enables cross-mic A/B (e.g. left bench_im73d vs right
+    # bench_im69d). Default keeps the original same-role DSR comparison.
+    right_role = right_role or role
     metrics: dict[str, Any] = {}
     for metric in DSR_COMPARE_REQUIRED_METRICS:
         stat = "max" if metric == "raw_i16_near_pct" else "p90"
-        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+        metrics[metric] = compare_metric(left_doc, right_doc, role, right_role, metric, stat)
     for metric in DSR_COMPARE_CONTEXT_METRICS:
         stat = "min" if metric == "input_trim" else "p90"
-        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+        metrics[metric] = compare_metric(left_doc, right_doc, role, right_role, metric, stat)
 
     left_quality = count_role_quality_failures(left_doc, role)
-    right_quality = count_role_quality_failures(right_doc, role)
+    right_quality = count_role_quality_failures(right_doc, right_role)
     missing_required = [
         metric
         for metric in DSR_COMPARE_REQUIRED_METRICS
@@ -706,6 +756,7 @@ def compare_summaries(
         "left_label": left_label,
         "right_label": right_label,
         "role": role,
+        "right_role": right_role,
         "required_raw_metrics": list(DSR_COMPARE_REQUIRED_METRICS),
         "context_metrics": list(DSR_COMPARE_CONTEXT_METRICS),
         "metrics": metrics,
@@ -839,6 +890,42 @@ def run_self_test() -> None:
     assert compare["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 1.2
     assert compare["verdict"] == "no_promotion_without_speaker_stimulus"
 
+    cross_right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im69d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 20.0},
+                            "raw_i16_abs_peak": {"p90": 80.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 200.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    cross = compare_summaries(
+        left_doc,
+        cross_right_doc,
+        left_label="im73d",
+        right_label="im69d",
+        role="bench_im73d",
+        right_role="bench_im69d",
+    )
+    assert cross["right_role"] == "bench_im69d"
+    assert cross["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 2.0
+
+    try:
+        select_device_specs("bench_im73d,bench_im69d")
+    except SystemExit as exc:
+        assert "ROLE CONFLICT" in str(exc)
+    else:
+        raise AssertionError("bench role conflict not detected")
+
 
 def parse_volumes(raw: str) -> list[int]:
     values: list[int] = []
@@ -861,6 +948,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--compare", nargs=2, metavar=("LEFT_SUMMARY", "RIGHT_SUMMARY"), type=Path)
     parser.add_argument("--compare-output", type=Path, help="write DSR comparison JSON report")
     parser.add_argument("--compare-role", default="bench_im73d")
+    parser.add_argument(
+        "--compare-role-right",
+        default=None,
+        help="role to read from the RIGHT summary (cross-mic A/B, e.g. bench_im69d); "
+        "defaults to --compare-role",
+    )
     parser.add_argument("--track", type=Path, help="local audio track to play")
     parser.add_argument("--output-dir", type=Path, default=Path("_scratch/im73d_audio_eval"))
     parser.add_argument("--label", default="dsr8")
@@ -875,7 +968,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--roles",
         default="all",
-        help="comma-separated device roles to open; use bench_im73d for bench-only capture",
+        help="comma-separated device roles to open; bench_im73d and bench_im69d are "
+        "mutually exclusive (same physical unit), so 'all' refuses to run — pass the "
+        "role matching the fitted mic (e.g. bench_im69d or bench_im69d,main_sph)",
     )
     parser.add_argument("--repeatability-cv", type=float, default=0.25)
     parser.add_argument("--require-repeatability", action="store_true")
@@ -901,6 +996,7 @@ def main(argv: list[str]) -> int:
             left_label=left_path.stem,
             right_label=right_path.stem,
             role=args.compare_role,
+            right_role=args.compare_role_right,
         )
         if args.compare_output is not None:
             write_compare_report(report, args.compare_output)
