@@ -2,13 +2,13 @@
 
 **Started:** 2026-05-25
 
-**Current focus (2026-07-27, authoritative):** dual-sync F0-F3 recovery on
-`lane/dual-sync-phase0`. Canonical authority:
-`artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`. Current
-phase P-1 reconciles cross-tool lane routing; F0 then makes the host oracle
-fail closed, and F1 repairs observable BLE establishment. F2 is the first
-silicon phase and stops for Captain after scripted A/B/C. All older
-`Current focus` text below is historical context.
+**Current focus (2026-08-05, authoritative):** IM69D130 dual-mic evaluation on
+`lane/dual-sync-phase0` (branch name is historical; dual-sync is shelved).
+Canonical authority:
+`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Open defect: at
+`K1_MIC_IM69D_INPUT_GAIN=16` the bench never reports silence — next step is
+gain 8, re-measure, then Captain silence-go re-cal. Production mic remains
+IM73D122. All older `Current focus` text below is historical context.
 
 ## 2026-07-27 Dual-sync recovery takeover
 

@@ -33,6 +33,11 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
+**Active lane (2026-08-05):** `im69d130-mic-eval` on `lane/dual-sync-phase0`
+(branch name is historical; dual-sync is shelved). Authority:
+`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Session pointer:
+`.claude/handoff.md`. Spec routing: `docs/spec-index.md`.
+
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
 ---
