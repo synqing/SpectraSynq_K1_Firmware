@@ -94,11 +94,13 @@
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
 #ifndef K1_MIC_IM69D_INPUT_GAIN
-// Phase 0 silence-domain close (2026-08-05): G=16 quiet max_raw 307–1190 overflowed
-// the SSL learn window [50,720] (silence never asserted). Halve to G=8 so quiet
-// projects into the learnable band while music still clears SSL (pred. ~½ of G=16
-// music drive). Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune.
-#define K1_MIC_IM69D_INPUT_GAIN 8.0f
+// Phase 0 silence-domain close (2026-08-05): G=16 quiet overflowed SSL learn
+// window; G=8 cal ACCEPTED (SSL=111) but post-cal ambient max_raw mean ~214–296
+// stayed above SSL×1.2 (~133) so silence never latched — self-noise / gain floor,
+// not "quieter room". Music still had headroom (max_raw~1785, near_pct=0).
+// Halve again to G=4 so quiet floor can sit under a learnable SSL+latch.
+// Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune (Captain rage-valid).
+#define K1_MIC_IM69D_INPUT_GAIN 4.0f
 #endif
 
 #define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000

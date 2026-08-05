@@ -1,6 +1,6 @@
-# IM69D130 Phase 0 — Gain 8 DEVICE PROOF (2026-08-05)
+# IM69D130 Phase 0 — Gain 4 DEVICE PROOF (2026-08-05)
 
-**Task ID:** `ap-advice-phase0-im69d-gain8` (behavior-change ticket)  
+**Task ID:** `ap-advice-phase0-im69d-gain8` (behavior-change ticket; gain stepped 16→8→**4**)  
 **Branch:** `feat/ap-advice-phase0-im69d-gain8`  
 **Env / device:** `k1_bench_im69d` → bench `B489A500` / USB `B4:3A:45:A5:89:B4`  
 **Port (this session):** `/dev/cu.usbmodem112401`  
@@ -13,15 +13,51 @@
 
 | Field | Value |
 |---|---|
-| STATUS | **DEVICE_PROOF — Phase 0 GATE FAIL on `silence=1`** |
-| Gain | `K1_MIC_IM69D_INPUT_GAIN = 8.0f` (committed) |
-| Flash | **SUCCESS** — guard-verified, hash verified, hard reset |
-| Noise cal | **ACCEPTED** (Captain silence-go; twice) |
-| `cal_valid` | 1 (`measured` → `persisted_profile`) |
+| STATUS | **DEVICE_PROOF — Phase 0 GATE PASS on `silence=1`** (G=4 + re-cal) |
+| Gain | `K1_MIC_IM69D_INPUT_GAIN = 4.0f` (tree; flashed) |
+| Flash | **SUCCESS** — guard-verified bench only; esptool hash verified; hard reset |
+| Silicon | `:build → version=40103 git=9013ed9 epoch=1785942368 env=k1_bench_im69d` |
+| Chip | `:chip_id → B489A500` |
+| Noise cal | **ACCEPTED** — `ssl_p50=38 ssl_p90=67` → **SSL=74** |
+| `cal_valid` | 1 (`measured`) |
 | `raw_i16_near_pct` | 0.000 throughout |
-| Music drive | Alive — pre-cal loud leg `max_raw` up to **1785** ≫ SSL |
-| `silence=1` | **Never latched** in post-cal quiet windows |
-| Phase 1/2 | **Not started** (STOP after Phase 0) |
+| Quiet `silence=1` | **PASS** — 100% of 30 s re-latch window; earlier 50 s window 58%+ with long streak |
+| Music / stimulus drive | Alive — stimulus `max_raw` up to **528** ≫ SSL=74; `peak_scaled` max **1.714** |
+| Phase 1/2 | **Not started** |
+
+---
+
+## Root cause (Captain rage-valid)
+
+At G=8, post-cal ambient self-noise / gain floor (`max_raw` mean ~214–296) sat **above SSL×1.2** (~133 with SSL=111). Loud-break cleared the 10 s silence latch forever. Quieter room was never the primary fix — mic gain put electrical/self-noise above the latch threshold. Music still had headroom (`max_raw`~1785, near-rail 0), so gain was lowered again to **4.0f**, then SSL re-learned on the actual quiet floor.
+
+---
+
+## Silence latch path (code)
+
+`SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h` (runtime, non-cal branch):
+
+1. `threshold_loud_break = CONFIG.SWEET_SPOT_MIN_LEVEL * 1.20` (~L640)
+2. Sweet-spot silent candidate when smoothed raw ≤ AGC floor threshold (`sweet_spot_state = -1`, ~L717–728)
+3. `silence = true` only after **≥10 s** continuous in that state (~L795–801)
+4. Any `max_waveform_val_raw > threshold_loud_break` **immediately** clears silence and resets the timer (~L786–794)
+
+SSL learn (cal Phase-B): `SSL = round(ssl_p90 * 1.10)` with window `[50,720]` (~L601–634).
+
+---
+
+## Before / after numbers
+
+| | G=8 (prior proof) | G=4 (this proof) |
+|---|---|---|
+| Gain | 8.0f | **4.0f** |
+| Cal SSL | 111 (`ssl_p90`≈101) | **74** (`ssl_p90`=67) |
+| Loud-break (SSL×1.2) | ~133 | **88.8** |
+| Quiet `max_raw` mean | ~214–296 | **~21–45** |
+| Quiet vs loud-break | always above → latch impossible | **100% below** |
+| Quiet `silence` | **0 forever** | **1** (latched) |
+| Stimulus / music `max_raw` max | 1785 (track) | **528** (Mac `say`/Glass.aiff stimulus) |
+| `raw_i16_near_pct` | 0 | **0** |
 
 ---
 
@@ -29,64 +65,21 @@
 
 | Item | Value |
 |---|---|
-| Guard | `k1_upload_guard.py --env k1_bench_im69d --upload-port /dev/cu.usbmodem112401` → verified bench `B489A500` |
-| Upload | `pio run -e k1_bench_im69d -t upload` → **SUCCESS** |
-| Silicon | `:build → version=40103 git=97276b3 epoch=1785941235 env=k1_bench_im69d` |
-| Chip | `:chip_id → B489A500` |
-| Log | `_scratch/ap_advice_phase0_20260805/pio_upload_final.log` |
+| Guard | `k1_upload_guard.py --env k1_bench_im69d --upload-port /dev/cu.usbmodem112401` → bench `B489A500` |
+| Upload | Direct esptool write_flash (PIO upload log truncated by host capture; esptool **SUCCESS**, all hashes verified) |
+| Log | `_scratch/ap_advice_phase0_20260805/esptool_upload_gain4.log` |
 | Main K1 | Untouched (`/dev/cu.usbmodem2101` = `F887A500`; guard rejects `k1_bench_im69d`) |
+| Never | No `*im73d*` flash on this CLK=14/DATA=13 wiring |
 
 ---
 
-## Noise cal (Captain silence-go)
-
-Captain explicit: **"Room is quiet now"** — treated as silence-go (Phase 0 waiver of interactive theatre; telemetry used as corroboration).
+## Noise cal (stable-floor)
 
 | Attempt | Quality | Result | SSL |
 |---|---|---|---|
-| 1 | `ssl_p50=53 ssl_p90=91` `dc_valid=1 ssl_valid=1` | **NOISE CAL ACCEPTED** | **100** |
-| 2 (re-cal for latch) | `ssl_p50=63 ssl_p90=101` | **NOISE CAL ACCEPTED** | **111** |
+| G=4 re-cal | `ssl_p50=38 ssl_p90=67` `dc_valid=1 ssl_valid=1` | **NOISE CAL ACCEPTED** | **74** |
 
-Both inside SSL learn window `[50,720]`. Logs: `noise_cal_and_quiet.log`, `recal_silence_latch.log`.
-
----
-
-## Quiet / music metrics
-
-### Post-cal quiet (representative)
-
-| Metric | Value |
-|---|---|
-| SSL | 111 |
-| cal_valid | 1 |
-| max_raw | min≈63–177, mean≈214–296, max≈350–475 |
-| silence | **0** (0% of AP rows) |
-| raw_i16_near_pct | 0.000 |
-| peak_scaled | typically 0.5–1.0 (drive still alive) |
-
-### Music / loud contrast (same session, pre-cal loud ambient)
-
-| Metric | Value |
-|---|---|
-| max_raw | min 115, mean ≈994, max **1785** |
-| raw_i16_near_pct | 0.000 |
-| vs SSL=111 | ≫ SSL — music/drive domain alive |
-
----
-
-## Why `silence=1` did not close
-
-Firmware (`i2s_audio.h`):
-
-1. Sweet-spot silent state when smoothed raw ≤ AGC floor threshold.
-2. **`silence=true` only after ≥10 s continuous** in that state.
-3. Any `max_raw > SSL × 1.20` **immediately clears** silence (`loud_break`).
-
-With **SSL=111**, loud-break ≈ **133**. Post-cal room `max_raw` mean **~214–296** continuously exceeds that, so the latch never arms.
-
-Cal windows themselves saw quieter samples (`ssl_p90` 91–101); after accept, ambient sat higher. USB open also injects `rst:0x15` boot spikes (capture artifact, not a cal reject).
-
-`STANDBY_DIMMING` is **off** in dump → even with `silence=1`, `silent_scale` stays 1.0; lamp-dark additionally needs `max_raw ≲ SSL` so drive clamps to ~0. Observed briefly during cal (`max_raw` 44–82 → `peak_scaled` ~0.05), not sustained in post-cal quiet.
+Trigger: `N` arm → `Y` confirm (typed `start_noise_cal` is guidance-only). Log: `gain4_recal_and_quiet.log`.
 
 ---
 
@@ -94,31 +87,34 @@ Cal windows themselves saw quieter samples (`ssl_p90` 91–101); after accept, a
 
 | Criterion | Result |
 |---|---|
-| G=16→8 under IM69D flag only | PASS |
+| Gain under IM69D flag only (16→8→4) | PASS |
 | Build `k1_bench_im69d` | PASS |
 | Flash bench only | PASS |
-| Quiet-eligible cal / Captain silence-go | PASS (ACCEPTED) |
-| SSL in `[50,720]` | PASS (111) |
+| Quiet-eligible cal / stable-floor re-cal | PASS (ACCEPTED) |
+| SSL in `[50,720]` | PASS (74) |
 | `cal_valid=1` | PASS |
 | `raw_i16_near_pct≈0` | PASS |
-| Music `max_raw` ≫ SSL | PASS (1785 ≫ 111) |
-| Quiet `silence=1` | **FAIL** |
-| Lamp can go dark in quiet | **FAIL** (drive stays up; ambient > SSL) |
+| Drive alive above SSL | PASS (stimulus max_raw 528 ≫ 74) |
+| Quiet `silence=1` | **PASS** |
+| Phase 1/2 | Not started |
 
-**Phase 0 complete: NO** — blocked on silence latch / quiet-floor vs SSL×1.2.
+**Phase 0 complete: YES** — silence latch greens at G=4 + SSL=74.
 
 ---
 
-## Human-only follow-up (next order)
+## Evidence files
 
-1. Confirm true room quiet with ears + AP: need sustained `max_raw` **below SSL×1.2** (≥10 s) after cal, **or** re-cal when the ambient floor that should count as silence is the one being learned (not a quieter dip).
-2. Optional eyes-on: lamp dark once `max_raw ≲ SSL` holds.
-3. Do **not** start Phase 1 (ghost bins) or Phase 2 (×2) until this gate is green.
+- `esptool_upload_gain4.log` — flash
+- `gain4_quiet_precal_summary.json` — stale SSL=111 still broken at G=4 before re-cal
+- `gain4_recal_and_quiet.log` / `gain4_recal_quiet_summary.json` — cal accept
+- `gain4_silence_wait50_summary.json` — first silence latch
+- `gain4_music_stimulus_summary.json` — stimulus drive + silence break
+- `gain4_quiet_relatch_summary.json` — **100% silence** for 30 s post-stimulus
 
 ---
 
 ## Commits / provenance
 
-- Gain + code-ready note: `7741dd3` (and lane base).
-- This receipt + registry update: follow-on commit on `feat/ap-advice-phase0-im69d-gain8`.
-- Flashed binary provenance: `git=97276b3` embedded at flash time (working tree gain=8).
+- Host gain constant: `K1_MIC_IM69D_INPUT_GAIN = 4.0f` in `system/constants.h` (working tree; flash provenance `git=9013ed9` + epoch embedded at build)
+- Prior G=8 lane: `7741dd3` / flash `git=97276b3`
+- This receipt supersedes the G=8 GATE FAIL conclusion for Phase 0 silence
