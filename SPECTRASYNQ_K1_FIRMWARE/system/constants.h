@@ -94,12 +94,11 @@
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
 #ifndef K1_MIC_IM69D_INPUT_GAIN
-// First measured retune step (2026-08-05): G=1 music max_raw≈67–74 sat below SSL=120.
-// G_next = G_cur × target_max_raw / observed_max_raw; SPH-band ~7000 ⇒ ~80–100 eventual,
-// but conservative first step G=16 clears SSL (pred. music max_raw≈1070–1180) with
-// headroom vs near_rail=30000 and quiet pred. ≈256–416 (learnable SSL window).
-// Not a blind copy of IM73D G=16 — same numeric by coincidence of the SSL-clear step.
-#define K1_MIC_IM69D_INPUT_GAIN 16.0f
+// Phase 0 silence-domain close (2026-08-05): G=16 quiet max_raw 307–1190 overflowed
+// the SSL learn window [50,720] (silence never asserted). Halve to G=8 so quiet
+// projects into the learnable band while music still clears SSL (pred. ~½ of G=16
+// music drive). Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune.
+#define K1_MIC_IM69D_INPUT_GAIN 8.0f
 #endif
 
 #define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000
