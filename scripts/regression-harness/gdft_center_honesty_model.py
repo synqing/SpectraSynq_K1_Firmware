@@ -88,16 +88,19 @@ def fold_to_real_audio_band(f, sample_rate=SAMPLE_RATE):
     return (sample_rate - f_mod) if f_mod > nyquist else f_mod
 
 
-def _block_size(target, nl, nr, sample_rate, cap):
-    """Mirror system.h: block_size = SAMPLE_RATE / (max_distance_hz * 2.0), capped.
-    max_distance is float32 (fabs of float subtraction); the division promotes to
-    double then truncates into uint16_t."""
+def _block_size(target, nl, nr, sample_rate, cap, bin_index=0, x2_crossover=0):
+    """Mirror system.h Rayleigh sizing with ×2 crossover.
+
+    Bins with index < x2_crossover keep legacy ×2; at/above use fs/Δf (1-semitone).
+    CTO default x2_crossover=0 → global drop of ×2.
+    """
     dl = np.float32(abs(np.float32(nl) - np.float32(target)))
     dr = np.float32(abs(np.float32(nr) - np.float32(target)))
     max_distance = np.float32(max(np.float32(0.0), dl, dr))
     if max_distance <= np.float32(0.0):
         return 0
-    bs = int(sample_rate / (float(max_distance) * 2.0))  # int/double -> trunc
+    resolution_div = 2.0 if bin_index < x2_crossover else 1.0
+    bs = int(sample_rate / (float(max_distance) * resolution_div))  # int/double -> trunc
     return min(bs, cap)
 
 
@@ -122,13 +125,15 @@ def _bin_k_true_center(block_size, target, sample_rate):
 
 def compute_bins(sample_rate=SAMPLE_RATE, note_offset=NOTE_OFFSET,
                  num_freqs=NUM_FREQS, notes=NOTES, cap=BLOCK_SIZE_CAP,
-                 mode="rounded_k"):
+                 mode="rounded_k", x2_crossover=0):
     """Per-bin alias-aware honesty table mirroring precompute_goertzel_constants().
 
     mode="rounded_k"  (default) -> legacy K1_GDFT_TRUE_CENTER_V1=0 behaviour.
     mode="true_center"          -> K1_GDFT_TRUE_CENTER_V1=1: representable bins
                                    (target <= Nyquist) resonate at the exact target;
                                    above-Nyquist bins keep rounded-k (folded).
+    x2_crossover                -> mirror K1_GDFT_X2_CROSSOVER_BIN (default 0 =
+                                   global 1-semitone / drop ×2).
     """
     if mode not in ("rounded_k", "true_center"):
         raise ValueError(f"unknown mode {mode!r}")
@@ -144,7 +149,8 @@ def compute_bins(sample_rate=SAMPLE_RATE, note_offset=NOTE_OFFSET,
         else:
             nl, nr = notes[i + note_offset - 1], notes[i + note_offset + 1]
 
-        block_size = _block_size(target, nl, nr, sample_rate, cap)
+        block_size = _block_size(target, nl, nr, sample_rate, cap,
+                                 bin_index=i, x2_crossover=x2_crossover)
         if mode == "true_center" and target <= nyquist:
             # representable bin: exact-frequency coefficient (non-integer k)
             k = _bin_k_true_center(block_size, target, sample_rate)

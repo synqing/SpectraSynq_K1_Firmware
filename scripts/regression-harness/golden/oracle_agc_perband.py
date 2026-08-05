@@ -109,7 +109,7 @@ static void host_precompute_goertzel_constants() {
     float max_distance_hz = 0;
     if (nld > max_distance_hz) max_distance_hz = nld;
     if (nrd > max_distance_hz) max_distance_hz = nrd;
-    frequencies[i].block_size = CONFIG.SAMPLE_RATE / (max_distance_hz * 2.0);
+    frequencies[i].block_size = CONFIG.SAMPLE_RATE / (max_distance_hz * ((i < (uint8_t)K1_GDFT_X2_CROSSOVER_BIN) ? 2.0f : 1.0f));
     if (frequencies[i].block_size > 2000) frequencies[i].block_size = 2000;
     if (frequencies[i].block_size > 0)
       frequencies[i].inv_block_size_half = 2.0 / frequencies[i].block_size;

@@ -880,6 +880,31 @@ void acquire_sample_chunk(uint32_t t_now) {
       im69d_raw_i16_rms,
       im69d_raw_i16_near_pct);
 #endif
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+    // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.
+    {
+      float bass_now = 0.0f;
+      for (uint8_t bi = 0; bi < 12 && bi < NUM_FREQS; bi++) {
+        float m = magnitudes_normalized[bi];
+        if (isfinite(m) && m > bass_now) bass_now = m;
+      }
+      static float bass_prev = 0.0f;
+      static uint32_t rise_t0_ms = 0;
+      static float rise_ms_latched = 0.0f;
+      if (bass_now > 0.15f && bass_prev <= 0.15f) {
+        rise_t0_ms = millis();
+      }
+      if (rise_t0_ms != 0 && bass_now >= bass_prev) {
+        rise_ms_latched = float(millis() - rise_t0_ms);
+      }
+      if (bass_now < 0.08f) {
+        rise_t0_ms = 0;
+      }
+      bass_prev = bass_now;
+      USBSerial.printf(" | x2_cross=%u bass_mag=%.3f rise_ms=%.0f",
+                       (unsigned)k1_gdft_x2_crossover_bin, bass_now, rise_ms_latched);
+    }
+#endif
 #ifdef K1_LOUD_GUARD_V1
     USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",
       k1_loud_guard_enabled ? 1 : 0,

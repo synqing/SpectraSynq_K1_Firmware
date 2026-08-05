@@ -139,6 +139,19 @@
 // mirror-fill across the second half.  Mirror anchor lives at NATIVE_RESOLUTION/2.
 #define NATIVE_RESOLUTION 160
 #define NUM_FREQS 80
+
+// Phase 2 (ap_advice): Goertzel Rayleigh crossover for the legacy ×2 window.
+// Bins with index < crossover keep ×2 sizing; at/above use fs/Δf (1-semitone).
+// CTO 2026-08-05: default 0 = global drop of ×2 (simplest correct formula).
+#ifndef K1_GDFT_X2_CROSSOVER_BIN
+#define K1_GDFT_X2_CROSSOVER_BIN 0u
+#endif
+
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+// Bench-only runtime override (serial `x2_cross=<n>` then recompute). Not on
+// production envs — prefer the compile-time default above.
+inline volatile uint8_t k1_gdft_x2_crossover_bin = (uint8_t)K1_GDFT_X2_CROSSOVER_BIN;
+#endif
 #define NUM_ZONES 2
 
 #ifndef ENABLE_VP_PERF_AUDIT

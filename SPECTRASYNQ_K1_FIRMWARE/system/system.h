@@ -268,7 +268,19 @@ void precompute_goertzel_constants() {
       max_distance_hz = neighbor_right_distance_hz;
     }
 
-    frequencies[i].block_size = CONFIG.SAMPLE_RATE / (max_distance_hz * 2.0);
+    // Phase 2 (ap_advice, 2026-08-05): Rayleigh sizing.
+    // Legacy used ×2 everywhere → ~2-semitone cells by construction.
+    // Crossover bin index: below = keep ×2, at/above = 1-semitone (fs/Δf).
+    // CTO decision: K1_GDFT_X2_CROSSOVER_BIN=0 → global drop of ×2.
+    // Optional bench A/B: define K1_GDFT_X2_AB_V1 and set k1_gdft_x2_crossover_bin
+    // at runtime, then call precompute_goertzel_constants() again.
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+    const uint8_t x2_cross = k1_gdft_x2_crossover_bin;
+#else
+    const uint8_t x2_cross = (uint8_t)K1_GDFT_X2_CROSSOVER_BIN;
+#endif
+    const float resolution_div = (i < x2_cross) ? 2.0f : 1.0f;
+    frequencies[i].block_size = CONFIG.SAMPLE_RATE / (max_distance_hz * resolution_div);
 
     if(frequencies[i].block_size > 2000){
         frequencies[i].block_size = 2000;
