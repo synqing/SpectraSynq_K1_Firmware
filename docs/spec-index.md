@@ -1,6 +1,6 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_branch: lane/dual-sync-phase0
+active_branch: feat/ap-advice-phase0-im69d-gain8
 active_lane: im69d130-mic-eval
 active_authority: docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md
 last_verified: 2026-08-05

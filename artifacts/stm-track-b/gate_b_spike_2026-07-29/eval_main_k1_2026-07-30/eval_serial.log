@@ -1,0 +1,56 @@
+CMD :build
+CMD s
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 1: p50=0 p95=0 max=0
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 2: p50=0 p95=0 max=0
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 3: p50=0 p95=0 max=0
+CMD :fft512_bench=reset
+CMD :fft512_bench=live_hop,on
+CMD :fft512_bench=report
+LIVE 30s: hops=4014 rate=133.8/s p50=1118
+CMD :fft512_bench=reset
+CMD :fft512_bench=live_hop,on
+CMD :fft512_bench=report
+LIVE 60s: hops=8024 rate=133.7/s p50=1125
+CMD :fft512_bench=reset
+CMD :fft512_bench=hop
+
+--- accumulated during run ---
+CMD :build
+CMD s
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 1: p50=0 p95=0 max=0
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 2: p50=0 p95=0 max=0
+CMD :fft512_bench=live_hop,off
+CMD :fft512_bench=reset
+CMD :fft512_bench=burst,1000
+CMD :fft512_bench=report
+BURST 3: p50=0 p95=0 max=0
+CMD :fft512_bench=reset
+CMD :fft512_bench=live_hop,on
+CMD :fft512_bench=report
+LIVE 30s: hops=4014 rate=133.8/s p50=1118
+CMD :fft512_bench=reset
+CMD :fft512_bench=live_hop,on
+CMD :fft512_bench=report
+LIVE 60s: hops=8024 rate=133.7/s p50=1125
+CMD :fft512_bench=reset
+CMD :fft512_bench=hop

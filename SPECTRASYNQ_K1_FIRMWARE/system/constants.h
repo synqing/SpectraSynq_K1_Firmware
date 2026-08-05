@@ -37,6 +37,17 @@
 // Must match sizeof(ssl_cal_buf) in system/globals.h (static_assert in i2s_audio.h).
 #define NOISE_CAL_SSL_PHASE_B_FRAMES 112U
 
+#if defined(K1_MIC_IM73D_PDM_V1) && defined(K1_MIC_IM69D_PDM_V1)
+#error "K1_MIC_IM73D_PDM_V1 and K1_MIC_IM69D_PDM_V1 are mutually exclusive"
+#endif
+
+// Shared "any PDM RX mic path" helper. NOT an alias of either product flag —
+// both mic families remain independently gated; this only collapses shared
+// AC-coupled / int16 PDM plumbing (boot scrub, NaN guards, cal DC==0 legality).
+#if defined(K1_MIC_IM73D_PDM_V1) || defined(K1_MIC_IM69D_PDM_V1)
+#define K1_MIC_PDM_RX_ANY_V1 1
+#endif
+
 #ifdef K1_MIC_IM73D_PDM_V1
 // IM73D122 PDM domain (bench eval, 2026-07-02). The PDM silence floor (~±20-40 raw,
 // then scaled by SENSITIVITY×gain) sits far below the SPH0645 default (350). Re-seed the
@@ -73,6 +84,25 @@
 // Raw int16 telemetry guardrail before K1_MIC_IM73D_INPUT_GAIN / sensitivity.
 // This is a measurement-purity surface, not a production gain control.
 #define K1_MIC_IM73D_RAW_I16_NEAR_RAIL 30000
+#endif
+
+#ifdef K1_MIC_IM69D_PDM_V1
+// IM69D130 PDM domain (bench eval, 2026-08-05). Separate from IM73D — do NOT inherit
+// K1_MIC_IM73D_INPUT_GAIN or the IM73D-widened SSL cal gates until measured.
+// SEED SSL fallback into a PDM-plausible band (never 0 at runtime).
+#undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
+#define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
+
+#ifndef K1_MIC_IM69D_INPUT_GAIN
+// First measured retune step (2026-08-05): G=1 music max_raw≈67–74 sat below SSL=120.
+// G_next = G_cur × target_max_raw / observed_max_raw; SPH-band ~7000 ⇒ ~80–100 eventual,
+// but conservative first step G=16 clears SSL (pred. music max_raw≈1070–1180) with
+// headroom vs near_rail=30000 and quiet pred. ≈256–416 (learnable SSL window).
+// Not a blind copy of IM73D G=16 — same numeric by coincidence of the SSL-clear step.
+#define K1_MIC_IM69D_INPUT_GAIN 16.0f
+#endif
+
+#define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000
 #endif
 
 #ifdef K1_LOUD_GUARD_V1
@@ -319,6 +349,14 @@ static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_DIN_PIN 12   // PDM data in
       #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
     #endif
+    #ifdef K1_MIC_IM69D_PDM_V1
+      // IM69D130 dual-mic PCB3 on SPH pads (bench eval, 2026-08-05).
+      // CLK=GPIO14 / DATA=GPIO13. SELECT is hard-strapped on-board (IM1 HIGH /
+      // IM2 LOW) — firmware does NOT drive GPIO12 as LR. Escape-hatch pin only.
+      #define K1_PDM_CLK_PIN 14          // PDM clock out → board CLK_IN_3V3 (J1.3)
+      #define K1_PDM_DIN_PIN 13          // PDM data in  ← board DATA_OUT_3V3 (J1.5)
+      #define K1_IM69_PDM_SEL_PIN 12     // unused on PCB3; do not drive as LR
+    #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
     // env: esp32dev_audio_esv11_k1v2.
@@ -339,6 +377,9 @@ static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_CLK_PIN 13   // PDM clock out (= production SPH BCLK pad, freed)
       #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
       #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
+    #endif
+    #ifdef K1_MIC_IM69D_PDM_V1
+      #error "K1_MIC_IM69D_PDM_V1 is bench-reference only (SPH pad CLK=14/DATA=13); refuse production pinmap"
     #endif
   #endif
 

@@ -1,0 +1,85 @@
+
+>>> :fft512_bench=live_hop,off
+d=1 input_trim=1.000 gdft_trim=0.922 agc_gain=1.113 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.040 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=980 follower=631 peak_scaled=0.689 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=124.0 conf=0.34 lock=0 phase=0.64 beat=0 bstr=0.18 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.951 agc_gain=1.260 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.022 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=1141 follower=652 peak_scaled=0.809 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=124.0 conf=0.31 lock=0 phase=0.73 beat=0 bstr=0.09 | onset=0 bass=1 ostr=0.02 | k1_loud=1 input_trim=1.000 gdft_trim=0.806 agc_gain=1.052 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.314 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=1004 follower=602 peak_scaled=0.661 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=124.0 conf=0.32 lock=0 phase=0.82 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.811 agc_gain=0.702 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.084 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=994 follower=602 peak_scaled=0.635 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=124.0 conf=0.31 lock=0 phase=0.87 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.880 agc_gain=0.795 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.013 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=884 follower=602 peak_scaled=0.593 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.20 lock=0 phase=0.63 beat=0 bstr=0.34 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.924 agc_gain=0.707 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.002 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=939 follower=602 peak_scaled=0.633 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.21 lock=0 phase=0.22 beat=0 bstr=0.18 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.952 agc_gain=0.487 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=819 follower=602 peak_scaled=0.628 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.20 lock=0 phase=0.77 beat=0 bstr=0.17 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.970 agc_gain=0.742 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+BOOT_LOOP_GUARD: stable_clear=1
+[AP] SSL=602 DC=-4727 max_raw=728 follower=602 peak_scaled=0.378 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.20 lock=0 phase=0.36 beat=0 bstr=0.55 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.981 agc_gain=0.801 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+FFT512_BENCH_REPORT:
+  nfft=512
+  stm_bins=42
+  hop_count=0
+  burst_count=0
+  live_hop=off
+  us_last=0
+  us_min=0
+  us_p50=0
+  us_p95=0
+  us_max=0
+[AP] SSL=602 DC=-4727 max_raw=869 follower=602 peak_scaled=0.403 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.20 lock=0 phase=0.95 beat=0 bstr=0.72 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.988 agc_gain=0.757 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+
+>>> :fft512_bench=burst,1000
+
+>>> :fft512_bench=report
+
+>>> :fft512_bench=live_hop,on
+FFT512_BENCH_REPORT:
+  nfft=512
+  stm_bins=42
+  hop_count=1000
+  burst_count=1000
+  live_hop=off
+  us_last=937
+  us_min=672
+  us_p50=967
+  us_p95=1147
+  us_max=1317
+[AP] SSL=602 DC=-4727 max_raw=632 follower=602 peak_scaled=0.361 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=94.0 conf=0.21 lock=0 phase=0.12 beat=0 bstr=0.68 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.988 agc_gain=0.736 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+FFT512_BENCH_REPORT:
+  nfft=512
+  stm_bins=42
+  hop_count=1000
+  burst_count=1000
+  live_hop=off
+  us_last=937
+  us_min=672
+  us_p50=967
+  us_p95=1147
+  us_max=1317
+FFT512_BENCH_REPORT:
+  nfft=512
+  stm_bins=42
+  hop_count=1000
+  burst_count=1000
+  live_hop=on
+  us_last=937
+  us_min=672
+  us_p50=967
+  us_p95=1147
+  us_max=1317
+[AP] SSL=602 DC=-4727 max_raw=537 follower=3694 peak_scaled=0.007 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=102.0 conf=0.39 lock=0 phase=0.69 beat=0 bstr=0.61 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.988 gdft_trim=0.993 agc_gain=0.625 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.022 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=256 follower=5588 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=68.0 conf=0.95 lock=1 phase=0.19 beat=0 bstr=0.12 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.946 gdft_trim=0.995 agc_gain=0.434 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.018 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=599 follower=3020 peak_scaled=0.150 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=68.0 conf=0.95 lock=1 phase=0.26 beat=0 bstr=0.21 | onset=0 bass=1 ostr=0.18 | k1_loud=1 input_trim=0.969 gdft_trim=0.997 agc_gain=0.108 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.003 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=601 follower=1550 peak_scaled=0.015 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=68.0 conf=0.85 lock=1 phase=0.32 beat=0 bstr=0.10 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.982 gdft_trim=0.998 agc_gain=0.316 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=582 follower=804 peak_scaled=0.027 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=68.0 conf=0.84 lock=1 phase=0.45 beat=0 bstr=0.07 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.990 gdft_trim=0.999 agc_gain=0.427 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=455 follower=602 peak_scaled=0.140 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=69.0 conf=0.86 lock=1 phase=0.62 beat=0 bstr=0.06 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=0.994 gdft_trim=0.999 agc_gain=0.475 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+[AP] SSL=602 DC=-4727 max_raw=564 follower=602 peak_scaled=0.019 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=69.0 conf=0.83 lock=0 phase=0.76 beat=0 bstr=0.05 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.997 gdft_trim=1.000 agc_gain=0.474 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+
+>>> :fft512_bench=report
+FFT512_BENCH_REPORT:
+  nfft=512
+  stm_bins=42
+  hop_count=1000
+  burst_count=1000
+  live_hop=on
+  us_last=937
+  us_min=672
+  us_p50=967
+  us_p95=1147
+  us_max=1317
+[AP] SSL=602 DC=-4727 max_raw=586 follower=965 peak_scaled=0.125 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=69.0 conf=0.85 lock=1 phase=0.92 beat=0 bstr=0.12 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=0.998 gdft_trim=0.954 agc_gain=0.333 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.108 spec_pin=0.032 spec_sat=0.000

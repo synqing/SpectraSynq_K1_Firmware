@@ -57,6 +57,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_im73d",  # IM73D122 PDM mic eval — bench B489A500 only
             "k1_bench_im73d_mic_auto_telemetry",  # IM73D mic auto-sense telemetry - bench B489A500 only
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
+            "k1_bench_im69d",  # IM69D130 dual-mic PCB3 PDM eval — bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
                 ok, message = self.guard.validate_upload_target(

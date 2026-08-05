@@ -1,0 +1,832 @@
+{
+  "basis": "controlled speaker playback captured on the same bench MAC; DSR16 raised the quiet raw RMS floor and did not produce better raw-RMS-over-quiet response at matched playback levels",
+  "bench_builds": {
+    "dsr16": [
+      "BUILD: version=40103 git=9d14463 epoch=1783332287 env=k1_bench_im73d_dsr16\r"
+    ],
+    "dsr8": [
+      "BUILD: version=40103 git=bc53ceb epoch=1783326213 env=k1_bench_im73d\r"
+    ]
+  },
+  "bench_identity": {
+    "chip": "B489A500",
+    "usb_serial": "B4:3A:45:A5:89:B4"
+  },
+  "caveats": [
+    "DSR8 numeric baseline is from git bc53ceb; DSR16 is from git 9d14463. The intervening firmware signal path is unchanged for this DSR comparison, but the stricter same-HEAD baseline could not be completed because the bench went serial-silent after restore.",
+    "The same-HEAD restored DSR8 capture is invalid: bench produced zero usable rows after post-upload CDC failure and then stopped responding to app serial and esptool ROM sync.",
+    "Main SPH repeatability failed in the DSR16 run, but bench IM73D repeatability passed for all groups; main is not the DSR promotion target."
+  ],
+  "created_at": "2026-07-06T18:40:00+08:00",
+  "front_end": {
+    "dsr16": [
+      "CONFIG.SENSITIVITY: 0.870005\r",
+      "AUDIO_RESPONSE_GAIN: 1.000000\r",
+      "CONFIG.SWEET_SPOT_MIN_LEVEL: 162\r",
+      "CONFIG.DC_OFFSET: 0\r"
+    ],
+    "dsr8": [
+      "CONFIG.SENSITIVITY: 0.870005\r",
+      "AUDIO_RESPONSE_GAIN: 1.000000\r",
+      "CONFIG.SWEET_SPOT_MIN_LEVEL: 162\r",
+      "CONFIG.DC_OFFSET: 0\r"
+    ]
+  },
+  "inputs": {
+    "dsr16_summary": "artifacts/im73d_dsr_audio_eval_2026-07-06/20260706T180529_dsr16_controlled_audio/summary.json",
+    "dsr8_summary": "artifacts/im73d_dsr_audio_eval_2026-07-06/20260706T175119_dsr8_controlled_audio/summary.json",
+    "invalid_same_head_dsr8_summary": "artifacts/im73d_dsr_audio_eval_2026-07-06/20260706T181059_dsr8_controlled_audio_restored_head/summary.json"
+  },
+  "invalid_same_head_dsr8": {
+    "bench_total_runs": 8,
+    "bench_usable_runs": 0,
+    "reason": "post-upload CDC/app serial failure; subsequent read probes and esptool chip_id returned no serial data"
+  },
+  "main_identity": {
+    "chip": "F887A500",
+    "usb_serial": "B4:3A:45:A5:87:F8"
+  },
+  "quality_summary": {
+    "clip_pct_max_all_usable": 0.0,
+    "input_trim_min_all_usable": 1.0,
+    "near_pct_max_all_usable": 0.0,
+    "raw_i16_near_pct_max_all_usable": 0.0
+  },
+  "repeatability": {
+    "bench_dsr16_all_groups_repeatable": true,
+    "dsr16": {
+      "groups": [
+        {
+          "cv": 0.1803172547750081,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            1823.0,
+            1266.0
+          ],
+          "volume": 45
+        },
+        {
+          "cv": 0.16941015089163236,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            3410.0,
+            2422.0
+          ],
+          "volume": 60
+        },
+        {
+          "cv": 0.1312462372065021,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            5637.0,
+            4329.0
+          ],
+          "volume": 75
+        },
+        {
+          "cv": 0.08470444850700792,
+          "label": "quiet",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            890.0,
+            751.0
+          ],
+          "volume": 0
+        },
+        {
+          "cv": 0.2501052631578947,
+          "label": "music",
+          "repeatable": false,
+          "role": "main_sph",
+          "values": [
+            2969.0,
+            1781.0
+          ],
+          "volume": 45
+        },
+        {
+          "cv": 0.2900021593608292,
+          "label": "music",
+          "repeatable": false,
+          "role": "main_sph",
+          "values": [
+            5974.0,
+            3288.0
+          ],
+          "volume": 60
+        },
+        {
+          "cv": 0.23007518796992482,
+          "label": "music",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            8998.0,
+            5632.0
+          ],
+          "volume": 75
+        },
+        {
+          "cv": 0.15819613457408732,
+          "label": "quiet",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            1618.0,
+            1176.0
+          ],
+          "volume": 0
+        }
+      ],
+      "max_cv": 0.25,
+      "repeatable": false
+    },
+    "dsr8": {
+      "groups": [
+        {
+          "cv": 0.15545376467220154,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            1475.0,
+            2018.0
+          ],
+          "volume": 45
+        },
+        {
+          "cv": 0.04780400358530027,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            3187.0,
+            3507.0
+          ],
+          "volume": 60
+        },
+        {
+          "cv": 0.08508307467591747,
+          "label": "music",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            5011.0,
+            5943.0
+          ],
+          "volume": 75
+        },
+        {
+          "cv": 0.011844331641285956,
+          "label": "quiet",
+          "repeatable": true,
+          "role": "bench_im73d",
+          "values": [
+            584.0,
+            598.0
+          ],
+          "volume": 0
+        },
+        {
+          "cv": 0.07959144343804202,
+          "label": "music",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            2388.0,
+            2801.0
+          ],
+          "volume": 45
+        },
+        {
+          "cv": 0.13510265398097146,
+          "label": "music",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            4318.0,
+            5667.0
+          ],
+          "volume": 60
+        },
+        {
+          "cv": 0.08715958027536848,
+          "label": "music",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            8962.0,
+            7525.0
+          ],
+          "volume": 75
+        },
+        {
+          "cv": 0.12398921832884097,
+          "label": "quiet",
+          "repeatable": true,
+          "role": "main_sph",
+          "values": [
+            1251.0,
+            975.0
+          ],
+          "volume": 0
+        }
+      ],
+      "max_cv": 0.25,
+      "repeatable": true
+    }
+  },
+  "rows": [
+    {
+      "condition": "quiet_0",
+      "dsr16": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "quiet",
+        "max_raw_p90": {
+          "max": 890.0,
+          "mean": 820.5,
+          "min": 751.0,
+          "values": [
+            890.0,
+            751.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 64.0,
+          "mean": 59.0,
+          "min": 54.0,
+          "values": [
+            64.0,
+            54.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 34.0,
+          "mean": 34.0,
+          "min": 34.0,
+          "values": [
+            34.0,
+            34.0
+          ]
+        },
+        "volume": 0
+      },
+      "dsr8": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "quiet",
+        "max_raw_p90": {
+          "max": 598.0,
+          "mean": 591.0,
+          "min": 584.0,
+          "values": [
+            584.0,
+            598.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 43.0,
+          "mean": 42.5,
+          "min": 42.0,
+          "values": [
+            42.0,
+            43.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 27.3,
+          "mean": 25.450000000000003,
+          "min": 23.6,
+          "values": [
+            27.3,
+            23.6
+          ]
+        },
+        "volume": 0
+      },
+      "ratios": {
+        "max_raw_p90": 1.3883248730964468,
+        "raw_i16_abs_peak_p90": 1.388235294117647,
+        "raw_i16_rms_p90": 1.3359528487229861
+      }
+    },
+    {
+      "condition": "music_45",
+      "dsr16": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 1823.0,
+          "mean": 1544.5,
+          "min": 1266.0,
+          "values": [
+            1823.0,
+            1266.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 131.0,
+          "mean": 111.0,
+          "min": 91.0,
+          "values": [
+            131.0,
+            91.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 59.9,
+          "mean": 48.349999999999994,
+          "min": 36.8,
+          "values": [
+            59.9,
+            36.8
+          ]
+        },
+        "volume": 45
+      },
+      "dsr8": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 2018.0,
+          "mean": 1746.5,
+          "min": 1475.0,
+          "values": [
+            1475.0,
+            2018.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 145.0,
+          "mean": 125.5,
+          "min": 106.0,
+          "values": [
+            106.0,
+            145.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 62.4,
+          "mean": 54.8,
+          "min": 47.2,
+          "values": [
+            47.2,
+            62.4
+          ]
+        },
+        "volume": 45
+      },
+      "ratios": {
+        "max_raw_p90": 0.8843401087890066,
+        "raw_i16_abs_peak_p90": 0.8844621513944223,
+        "raw_i16_rms_p90": 0.8822992700729927
+      },
+      "snr_like_delta_dsr16_minus_dsr8": -0.7311828267652833,
+      "snr_like_raw_rms_over_quiet": {
+        "dsr16": 1.4220588235294116,
+        "dsr8": 2.153241650294695
+      }
+    },
+    {
+      "condition": "music_60",
+      "dsr16": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 3410.0,
+          "mean": 2916.0,
+          "min": 2422.0,
+          "values": [
+            3410.0,
+            2422.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 245.0,
+          "mean": 209.5,
+          "min": 174.0,
+          "values": [
+            245.0,
+            174.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 118.5,
+          "mean": 94.2,
+          "min": 69.9,
+          "values": [
+            118.5,
+            69.9
+          ]
+        },
+        "volume": 60
+      },
+      "dsr8": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 3507.0,
+          "mean": 3347.0,
+          "min": 3187.0,
+          "values": [
+            3187.0,
+            3507.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 252.0,
+          "mean": 240.5,
+          "min": 229.0,
+          "values": [
+            229.0,
+            252.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 106.3,
+          "mean": 105.9,
+          "min": 105.5,
+          "values": [
+            105.5,
+            106.3
+          ]
+        },
+        "volume": 60
+      },
+      "ratios": {
+        "max_raw_p90": 0.8712279653420975,
+        "raw_i16_abs_peak_p90": 0.8711018711018711,
+        "raw_i16_rms_p90": 0.8895184135977336
+      },
+      "snr_like_delta_dsr16_minus_dsr8": -1.390511961169536,
+      "snr_like_raw_rms_over_quiet": {
+        "dsr16": 2.7705882352941176,
+        "dsr8": 4.161100196463654
+      }
+    },
+    {
+      "condition": "music_75",
+      "dsr16": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 5637.0,
+          "mean": 4983.0,
+          "min": 4329.0,
+          "values": [
+            5637.0,
+            4329.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 405.0,
+          "mean": 358.0,
+          "min": 311.0,
+          "values": [
+            405.0,
+            311.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 182.1,
+          "mean": 160.8,
+          "min": 139.5,
+          "values": [
+            182.1,
+            139.5
+          ]
+        },
+        "volume": 75
+      },
+      "dsr8": {
+        "clip_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "input_trim_min": {
+          "max": 1.0,
+          "mean": 1.0,
+          "min": 1.0,
+          "values": [
+            1.0,
+            1.0
+          ]
+        },
+        "label": "music",
+        "max_raw_p90": {
+          "max": 5943.0,
+          "mean": 5477.0,
+          "min": 5011.0,
+          "values": [
+            5011.0,
+            5943.0
+          ]
+        },
+        "near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_abs_peak_p90": {
+          "max": 427.0,
+          "mean": 393.5,
+          "min": 360.0,
+          "values": [
+            360.0,
+            427.0
+          ]
+        },
+        "raw_i16_near_pct_max": {
+          "max": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "values": [
+            0.0,
+            0.0
+          ]
+        },
+        "raw_i16_rms_p90": {
+          "max": 177.3,
+          "mean": 170.3,
+          "min": 163.3,
+          "values": [
+            163.3,
+            177.3
+          ]
+        },
+        "volume": 75
+      },
+      "ratios": {
+        "max_raw_p90": 0.9098046375753149,
+        "raw_i16_abs_peak_p90": 0.9097839898348158,
+        "raw_i16_rms_p90": 0.9442160892542572
+      },
+      "snr_like_delta_dsr16_minus_dsr8": -1.9621402981624865,
+      "snr_like_raw_rms_over_quiet": {
+        "dsr16": 4.729411764705882,
+        "dsr8": 6.691552062868369
+      }
+    }
+  ],
+  "verdict": "reject_dsr16_promotion_keep_dsr8_default"
+}

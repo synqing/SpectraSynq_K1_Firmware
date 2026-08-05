@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>K718 · 10 Centre Visualisations</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060608;color:#7c8597;font-family:'Saira Condensed',system-ui,sans-serif;padding:26px;display:flex;flex-direction:column;align-items:center;gap:16px}
+h1{font-weight:700;letter-spacing:.18em;font-size:16px;color:#9aa3b2;text-transform:uppercase}
+.sub{font:11px ui-monospace,monospace;color:#566;letter-spacing:.06em;margin-top:-8px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:22px 18px;max-width:1040px;margin-top:8px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:7px}
+canvas{display:block;border-radius:50%}
+.lab{font-weight:700;letter-spacing:.12em;font-size:12px;color:#cfd6e2;text-transform:uppercase;text-align:center}
+.lab b{color:#00AECF;font-family:ui-monospace,monospace;margin-right:5px}
+.desc{font:9px/1.35 ui-monospace,monospace;color:#5a6273;letter-spacing:.02em;text-align:center;max-width:170px}
+</style></head>
+<body>
+<h1>K718 · Centre Visualisation — 10 types</h1>
+<div class="sub">all soft-glow / flowing · zero spiky bars · point at the ones you want</div>
+<div class="grid" id="grid"></div>
+<script>
+const TAU=Math.PI*2;
+const COL=["#00AECF","#E0338F","#EFA020","#7C5CFF"]; // cyan magenta amber violet
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
+const rnd=(s=>()=>(s=(s*1103515245+12345)&0x7fffffff)/0x7fffffff)(987654321);
+
+// 01 NEBULA
+function nebula(x,t,C,beat){x.globalCompositeOperation='lighter';
+ [[0,0],[1,2.1],[2,4.2],[3,1],[1,3.3]].forEach(([ci,off],i)=>{const c=COL[ci],ph=t*.5+off,px=C+Math.cos(ph*.8+i)*C*.30,py=C+Math.sin(ph*1.1+i)*C*.30,r=C*(.55+.14*Math.sin(ph*1.3))*(1+beat*.18),g=x.createRadialGradient(px,py,0,px,py,r);
+  g.addColorStop(0,hexA(c,.5+beat*.2));g.addColorStop(.4,hexA(c,.13));g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,TAU);x.fill();});
+ x.globalCompositeOperation='source-over';}
+// 02 AURORA FLOW
+function aurora(x,t,C,beat){x.globalCompositeOperation='lighter';
+ for(let k=0;k<5;k++){const c=COL[k%4];x.strokeStyle=c;x.shadowColor=c;x.shadowBlur=16;x.lineWidth=4+k*1.2;x.globalAlpha=.16+.1*Math.sin(t+k);x.beginPath();
+  for(let i=0;i<=72;i++){const a=(i/72)*TAU,rr=C*.6+Math.sin(a*2+t*1.2+k*1.3)*C*.18*(1+beat*.4)+Math.sin(a*3-t+k)*C*.07,px=C+Math.cos(a)*rr,py=C+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.closePath();x.stroke();}
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 03 LIQUID CORE
+function liquid(x,t,C,beat){x.globalCompositeOperation='lighter';
+ const cg=x.createRadialGradient(C,C,0,C,C,C*.66);cg.addColorStop(0,hexA(COL[0],.42+beat*.2));cg.addColorStop(.45,hexA(COL[1],.18));cg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=cg;x.beginPath();x.arc(C,C,C*.66,0,TAU);x.fill();
+ for(let i=0;i<9;i++){const ph=t*.9+i*.7,px=C+Math.cos(ph)*C*.30,py=C+Math.sin(ph*1.25)*C*.30,r=C*.34*(1+.22*Math.sin(ph*1.7))*(1+beat*.2),c=COL[i%4],g=x.createRadialGradient(px,py,0,px,py,r);
+  g.addColorStop(0,hexA(c,.34));g.addColorStop(.6,hexA(c,.1));g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,TAU);x.fill();}
+ x.globalCompositeOperation='source-over';}
+// 04 CONSTELLATION
+const PTS=[];for(let i=0;i<26;i++)PTS.push({a:rnd()*TAU,r:.2+rnd()*.72,sp:.1+rnd()*.5,ph:rnd()*TAU});
+function constellation(x,t,C,beat){x.globalCompositeOperation='lighter';
+ const p=PTS.map((q,i)=>{const a=q.a+t*q.sp*.2,r=(q.r+Math.sin(t*.7+q.ph)*.05)*C*.95;return{x:C+Math.cos(a)*r,y:C+Math.sin(a)*r,c:COL[i%4]};});
+ for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const d=Math.hypot(p[i].x-p[j].x,p[i].y-p[j].y);if(d<C*.34){x.strokeStyle=p[i].c;x.globalAlpha=(1-d/(C*.34))*.28;x.lineWidth=1;x.beginPath();x.moveTo(p[i].x,p[i].y);x.lineTo(p[j].x,p[j].y);x.stroke();}}
+ x.globalAlpha=1;p.forEach(q=>{x.shadowColor=q.c;x.shadowBlur=10;x.fillStyle=q.c;x.beginPath();x.arc(q.x,q.y,1.8+beat*1.2,0,TAU);x.fill();});x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 05 SOFT SKYLINE (lumpy donut of light, no spikes)
+function skyline(x,t,C,beat){x.globalCompositeOperation='lighter';const base=C*.40,N=180;
+ const g=x.createRadialGradient(C,C,base*.6,C,C,C);g.addColorStop(0,hexA(COL[0],.5));g.addColorStop(.45,hexA(COL[1],.4));g.addColorStop(1,hexA(COL[2],0));x.fillStyle=g;x.shadowColor=COL[1];x.shadowBlur=22;x.beginPath();
+ for(let i=0;i<=N;i++){const a=(i/N)*TAU,m=.62+.14*Math.sin(a*6+t*1.3)+.09*Math.sin(a*11-t*1.8)+.06*Math.sin(a*3+t*.6),rr=base+m*C*.42*(1+beat*.25),px=C+Math.cos(a)*rr,py=C+Math.sin(a)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}
+ x.closePath();x.fill();x.shadowBlur=0;x.globalCompositeOperation='source-over';
+ const h=x.createRadialGradient(C,C,0,C,C,base*.95);h.addColorStop(0,'#060608');h.addColorStop(.7,'#060608');h.addColorStop(1,'rgba(6,6,8,0)');x.fillStyle=h;x.beginPath();x.arc(C,C,base*.95,0,TAU);x.fill();}
+// 06 PULSE SONAR
+function sonar(x,t,C,beat){x.globalCompositeOperation='lighter';
+ const g=x.createRadialGradient(C,C,0,C,C,C*.42);g.addColorStop(0,hexA(COL[0],.22+beat*.25));g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(C,C,C*.42,0,TAU);x.fill();
+ for(let k=0;k<4;k++){const ph=((t*.45+k*.25)%1),rr=C*.16+ph*C*.82,c=COL[k%4];x.strokeStyle=c;x.shadowColor=c;x.shadowBlur=12;x.globalAlpha=(1-ph)*.6;x.lineWidth=3+(1-ph)*4;x.beginPath();x.arc(C,C,rr,0,TAU);x.stroke();}
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 07 PLASMA SWIRL (rotating spiral vortex)
+function swirl(x,t,C,beat){x.globalCompositeOperation='lighter';const arms=5;
+ for(let a=0;a<arms;a++){const c=COL[a%4];x.strokeStyle=c;x.shadowColor=c;x.shadowBlur=14;x.lineWidth=3.5;x.globalAlpha=.5;x.beginPath();
+  for(let i=0;i<=80;i++){const f=i/80,ang=f*TAU*1.6+a/arms*TAU+t*.8*(1+beat*.4),rr=f*C*.92,px=C+Math.cos(ang)*rr,py=C+Math.sin(ang)*rr;i?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();}
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 08 RIPPLE FIELD (standing-wave concentric ripples)
+function ripple(x,t,C,beat){x.globalCompositeOperation='lighter';
+ for(let k=0;k<15;k++){const rr=C*.1+k*C*.058,ph=Math.sin(rr*.12-t*2.2)*.5+.5,c=k%2?COL[0]:COL[1];x.strokeStyle=c;x.shadowColor=c;x.shadowBlur=8;x.globalAlpha=ph*.5*(1+beat*.3);x.lineWidth=2.4;x.beginPath();x.arc(C,C,rr,0,TAU);x.stroke();}
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 09 EMBER DRIFT (rising glowing sparks)
+const EMB=[];for(let i=0;i<36;i++)EMB.push({x:rnd(),sp:.1+rnd()*.4,sz:1+rnd()*2,ph:rnd(),c:Math.floor(rnd()*3)});
+function ember(x,t,C,beat){x.globalCompositeOperation='lighter';
+ EMB.forEach(e=>{const prog=((t*e.sp+e.ph)%1),py=C*1.85-prog*C*1.7,px=C+(e.x*2-1)*C*.7+Math.sin(t*1.5+e.ph*TAU)*C*.08;if(Math.hypot(px-C,py-C)>C*.95)return;
+  const c=[COL[2],COL[1],COL[3]][e.c];x.shadowColor=c;x.shadowBlur=10;x.globalAlpha=(1-prog)*.8;x.fillStyle=c;x.beginPath();x.arc(px,py,e.sz+beat,0,TAU);x.fill();});
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+// 10 ORBIT RINGS (tilted gyroscopic glowing rings)
+function orbits(x,t,C,beat){x.globalCompositeOperation='lighter';
+ [[.30,0,0],[.55,1.1,1],[.42,2.2,2],[.62,.6,3]].forEach(([ry,rot,ci],i)=>{const c=COL[ci%4];x.strokeStyle=c;x.shadowColor=c;x.shadowBlur=14;x.lineWidth=3;x.globalAlpha=.5+beat*.2;
+  x.save();x.translate(C,C);x.rotate(rot+t*.4*(i%2?1:-1));x.beginPath();x.ellipse(0,0,C*.85,C*.85*ry,0,0,TAU);x.stroke();
+  const na=t*1.2*(i%2?1:-1);x.fillStyle=c;x.beginPath();x.arc(Math.cos(na)*C*.85,Math.sin(na)*C*.85*ry,3,0,TAU);x.fill();x.restore();});
+ x.globalAlpha=1;x.shadowBlur=0;x.globalCompositeOperation='source-over';}
+
+const VIZ=[
+ ["01","NEBULA",nebula,"Breathing colour-clouds, pure haze."],
+ ["02","AURORA FLOW",aurora,"Sinuous glowing ribbons orbiting."],
+ ["03","LIQUID CORE",liquid,"Fused wobbling liquid-light mass."],
+ ["04","CONSTELLATION",constellation,"Drifting particles + proximity links."],
+ ["05","SOFT SKYLINE",skyline,"Soft lumpy donut of light."],
+ ["06","PULSE SONAR",sonar,"Beat-expanding rings on a core."],
+ ["07","PLASMA SWIRL",swirl,"Rotating spiral vortex of filaments."],
+ ["08","RIPPLE FIELD",ripple,"Standing-wave concentric ripples."],
+ ["09","EMBER DRIFT",ember,"Rising glowing sparks, warm."],
+ ["10","ORBIT RINGS",orbits,"Tilted gyroscopic glowing rings."],
+];
+const grid=document.getElementById('grid'),SZ=300,C=SZ/2;
+const cells=VIZ.map(v=>{const d=document.createElement('div');d.className='cell';
+ const cv=document.createElement('canvas');cv.width=SZ;cv.height=SZ;cv.style.width='150px';cv.style.height='150px';
+ const lab=document.createElement('div');lab.className='lab';lab.innerHTML='<b>'+v[0]+'</b>'+v[1];
+ const ds=document.createElement('div');ds.className='desc';ds.textContent=v[3];
+ d.append(cv,lab,ds);grid.appendChild(d);return{x:cv.getContext('2d'),fn:v[2]};});
+
+function frame(now){const t=now/1000,period=60/128,beat=Math.max(0,1-((t%period)/period)*4);
+ cells.forEach(c=>{const x=c.x;x.globalCompositeOperation='source-over';x.globalAlpha=1;
+  x.fillStyle='#000';x.beginPath();x.arc(C,C,C,0,TAU);x.fill();
+  x.save();x.beginPath();x.arc(C,C,C-2,0,TAU);x.clip();
+  const bg=x.createRadialGradient(C,C,8,C,C,C);bg.addColorStop(0,'#0a0b10');bg.addColorStop(1,'#040406');x.fillStyle=bg;x.fillRect(0,0,SZ,SZ);
+  c.fn(x,t,C,beat);x.restore();
+  x.strokeStyle='#161b25';x.lineWidth=2;x.beginPath();x.arc(C,C,C-2,0,TAU);x.stroke();});
+ requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+</script></body></html>

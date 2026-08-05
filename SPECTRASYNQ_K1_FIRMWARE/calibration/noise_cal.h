@@ -33,7 +33,7 @@ void noise_cal_restore_previous_or_invalidate() {
   }
 
   CONFIG.DC_OFFSET = 0;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;  // PDM: never 0 at runtime
 #else
   CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
@@ -44,7 +44,7 @@ void noise_cal_restore_previous_or_invalidate() {
   noise_iterations = 0;
   calibration_profile_loaded = false;
   calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed division denominator (NaN guard)
 #endif
   USBSerial.println("NOISE CAL HAS NO PREVIOUS VALID PROFILE");
@@ -80,7 +80,7 @@ void start_noise_cal() {
 void clear_noise_cal() {
   clear_spectral_noise_samples();
   CONFIG.DC_OFFSET = 0;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;  // PDM: never 0 at runtime
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed division denominator (NaN guard)
 #else

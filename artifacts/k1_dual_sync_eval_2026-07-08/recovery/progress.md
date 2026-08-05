@@ -424,3 +424,53 @@ Captain decision authorising a new complete frozen three-image set. Only after
 the tracked image ledger validates as `READY` may a clean committed host
 controller create the first immutable run and freeze its concrete
 `HOST_EXECUTION_SHA`. F3 remains unauthorised.
+
+## 2026-07-28 F2 new frozen image set and Case A stop
+
+Captain authorised stopping historical sync-only image recovery and creating a
+new complete frozen three-image set from firmware source
+`a58203183208a4db7fcc7a30d060e6db14673ab1`.
+
+- Built all three images from detached source worktree
+  `/tmp/dual_sync_f2_newset.qq6WXo/src` at `a582031`.
+- Raw pack:
+  `_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/`.
+- Image-set ledger committed READY in local host commit
+  `1e006a8692a5bd06360adf153cc41969835735e2`.
+- Minimal controller compatibility fix: `f2_image_set.py` now treats the
+  ESP32 partition-table MD5 marker `0xEBEB` as the end of parseable partition
+  entries while preserving the full partition-table hash for readback.
+- Run created:
+  `_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/`.
+- Tracked run root:
+  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/20260728T192348Z-newset-caseA/`.
+- Resolved leader: `/dev/cu.usbmodem112401`, chip `F887A500`,
+  USB serial `B4:3A:45:A5:87:F8`.
+- Resolved follower: `/dev/cu.usbmodem11401`, chip `B489A500`,
+  USB serial `B4:3A:45:A5:89:B4`.
+- Case A flash status: PASS. Follower `k1_sync_probe_bench` and leader
+  `k1_sync_probe_main_sync_only` were written with direct esptool application
+  writes at `0x10000`; partition readback hashes matched
+  `bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce`.
+- Post-flash startup status: PASS. Leader advertising, follower scan start,
+  UUID discovery and both linked snapshots were present.
+- Case A capture status: NON-PASS / stopped. The strict oracle refused the
+  60-second capture because leader serial records were merged/truncated
+  (`Tx has trailing or malformed fields`, malformed health lines such as
+  `heap_min=84=0`). Per Captain instruction, Case B was not attempted.
+- Important raw evidence:
+  - leader log:
+    `_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/case_A/off/leader.log`
+    SHA-256 `6d656a3778bc29a387b70e6002c6a5f731243a330cd4b03456edcb5cc6b92a46`;
+  - follower log:
+    `_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/case_A/off/follower.log`
+    SHA-256 `e749742b3e18a4faf29fec52141e1fa850173e0e5660cc3096627e258f94eb11`;
+  - flash manifest:
+    `artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/20260728T192348Z-newset-caseA/uploads/flash_A.json`
+    SHA-256 `f0b58d7e957e048b8d702de3164f1c6f499f6802d8b3b946cd5102861190280b`.
+
+Observed link evidence before the parse stop was strong but not accepted as
+Case A PASS because the oracle cannot score corrupted serial text: both roles
+reported `link up`, the synchronised status snapshot showed epoch 1, handle 1,
+MTU 247, interval 6, PHY 2/2, and the logs contained thousands of leader TX,
+follower RX and follower apply records.

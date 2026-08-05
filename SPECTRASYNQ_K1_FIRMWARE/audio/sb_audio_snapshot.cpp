@@ -4,6 +4,14 @@
 #include "constants.h"
 #include "globals.h"
 
+#ifdef K1_STM_FFT512_BENCH
+#include "k1_stm_fft512_bench.h"
+#endif
+
+#ifdef K1_STM
+#include "k1_audio_snapshot.h"
+#endif
+
 static portMUX_TYPE sb_audio_snapshot_mux = portMUX_INITIALIZER_UNLOCKED;
 static SBAudioSnapshot sb_audio_snapshot_current = {};
 
@@ -100,6 +108,14 @@ void sb_audio_snapshot_update(uint32_t frame_ms) {
     next.chroma_pc[i] = chroma_bucket[i];
   }
   sb_detect_chord(next.chroma_pc, next.chord);
+#endif
+
+#ifdef K1_STM_FFT512_BENCH
+  k1_stm_fft512_bench_on_ap_frame();
+#endif
+
+#ifdef K1_STM
+  k1_audio_snapshot_update(frame_ms);
 #endif
 
   portENTER_CRITICAL(&sb_audio_snapshot_mux);

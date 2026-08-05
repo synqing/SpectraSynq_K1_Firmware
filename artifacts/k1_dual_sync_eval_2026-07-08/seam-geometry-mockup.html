@@ -1,0 +1,155 @@
+<!-- british-english-guard: ignore -->
+<title>Dual-K1 Seam Geometry — Fork F4</title>
+<style>
+  :root { --bg:#05070a; --panel:#0b0f14; --edge:#1f2937; --txt:#e5e7eb; --dim:#8b94a3; --faint:#5b6472; --accent:#f59e0b; }
+  html,body { background:var(--bg); color:var(--txt); margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:1296px; margin:0 auto; padding:44px 24px 40px; }
+  h1 { font-size:22px; font-weight:650; letter-spacing:.2px; margin:0 0 6px; }
+  .sub { color:var(--dim); font-size:13.5px; line-height:1.5; margin:0 0 30px; max-width:900px; }
+  .sub b { color:var(--txt); font-weight:600; }
+  .row { margin:0 0 30px; }
+  .lbl { display:flex; align-items:baseline; gap:10px; margin:0 0 8px; }
+  .idx { font-size:11px; font-weight:700; letter-spacing:.14em; color:var(--faint); }
+  .name { font-size:15px; font-weight:650; }
+  .badge { font-size:10px; font-weight:700; letter-spacing:.12em; color:#05070a; background:var(--accent);
+    padding:3px 8px; border-radius:4px; transform:translateY(-1px); }
+  .badge.mute { background:transparent; color:var(--dim); border:1px solid #2a3442; }
+  .desc { color:var(--dim); font-size:12.5px; margin:0 0 10px; line-height:1.45; }
+  canvas { display:block; width:1248px; height:130px; }
+  .ref canvas { height:110px; }
+  .ann { color:var(--dim); font-size:12px; margin:8px 0 0; line-height:1.45; }
+  .ann .good { color:#34d399; } .ann .bad { color:#f87171; } .ann .warn { color:var(--accent); }
+  .hr { border:0; border-top:1px solid #131a22; margin:26px 0; }
+  .foot { color:var(--faint); font-size:11.5px; line-height:1.6; max-width:980px; }
+</style>
+<div class="wrap">
+  <h1>Dual-K1 Sync — Seam Geometry <span style="color:var(--faint);font-weight:500">· Fork F4</span></h1>
+  <p class="sub">Two K1 units (160&nbsp;px each) merged into one widened 320&nbsp;px surface. All three options show the <b>same simulated music moment</b> — a 120&nbsp;BPM pulse with a beat comet — so the junction behaviour is directly comparable. <b>The page animates</b>: judge motion continuity live, not from a single frame.</p>
+
+  <div class="row ref">
+    <div class="lbl"><span class="idx">REFERENCE</span><span class="name" style="font-size:13px;color:var(--dim)">Today — single K1, centre-origin mirror (80&nbsp;px unique arm, shown twice)</span></div>
+    <canvas id="c0" width="2496" height="220"></canvas>
+  </div>
+
+  <hr class="hr">
+
+  <div class="row">
+    <div class="lbl"><span class="idx">OPTION 1</span><span class="name">Seam-centred — one origin at the junction</span><span class="badge">RECOMMENDED FOR M2 (WIDENED)</span></div>
+    <p class="desc">Both units render the same arm; the left unit is flipped. Energy is born at the seam and radiates outward across 320&nbsp;px. Per-arm detail depends on the render mechanism (stretch vs native-arm) — decided in the plan, not here.</p>
+    <canvas id="c1" width="2496" height="260"></canvas>
+    <p class="ann"><span class="good">●</span> The comet never crosses the junction — it starts there and dies at the outer edges, so sync error shows as a subtle left/right lag, not a broken hand-over. The junction becomes the display's heart.</p>
+  </div>
+
+  <div class="row">
+    <div class="lbl"><span class="idx">OPTION 2</span><span class="name">Mirrored twins — each unit keeps its own centre</span><span class="badge mute">M1 — SHIPS FIRST REGARDLESS</span></div>
+    <p class="desc">Today's geometry, duplicated. No render change at all — sync only matches state between the two units. This is the full-roster (22-mode) twin-sync milestone; Options&nbsp;1/3 are the contingent widened milestone on top of it.</p>
+    <canvas id="c2" width="2496" height="260"></canvas>
+    <p class="ann"><span class="warn">●</span> Safest to build, but the junction is two dead outer edges meeting: comets never touch it. Reads as <b>two synced lamps</b>, not one wider display.</p>
+  </div>
+
+  <div class="row">
+    <div class="lbl"><span class="idx">OPTION 3</span><span class="name">Linear — one 320&nbsp;px left&nbsp;→&nbsp;right field</span></div>
+    <p class="desc">A single unmirrored field: low frequencies left, highs right; the comet sweeps the full span. Abandons the centre-origin mandate entirely.</p>
+    <canvas id="c3" width="2496" height="260"></canvas>
+    <p class="ann"><span class="bad">●</span> Motion crosses the junction mid-flight at full speed — the geometry most exposed to sync error (any timing offset shows as a visible stutter exactly at the hand-over).</p>
+  </div>
+
+  <hr class="hr">
+  <p class="foot"><b>Fidelity notes.</b> LED pitch 3.9&nbsp;px/LED at row scale; inter-unit gap drawn at ~4 LED pitches (true bezel width unmeasured — Phase&nbsp;0 measures it); LGP diffusion approximated as vertical glow; colours representative of the spectrum hue ramp, not palette-exact. Simulation: synthetic 80-bin spectrum, 120&nbsp;BPM energy pulse, comet travel 4&nbsp;s origin&nbsp;→&nbsp;edge. The physical seam will always include the two device bezels — “seamless” means <i>continuous motion and state</i>, not zero dark gap. <b>Scope:</b> this page decides geometry <i>semantics</i> only; seam <i>quality</i> (true gap, brightness step, LGP edge behaviour) is decided on the day-zero bench photo — no HTML can honestly represent light-guide optics.</p>
+</div>
+
+<script>
+const W = 1248, GAP = 16, PW = (W - GAP) / 2;   // panel width 616
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+
+function binMag(k, t){
+  const beatPh = (t % 500) / 500;
+  const beat = Math.pow(Math.max(0, Math.cos(beatPh * Math.PI * 2 * 0.5)), 3); // decays over the beat
+  const bass = Math.exp(-Math.pow((k-4)/6, 2))  * (0.50 + 0.50*beat);
+  const mid  = Math.exp(-Math.pow((k-30)/11, 2)) * (0.42 + 0.22*Math.sin(t/230 + k*0.35));
+  const high = Math.exp(-Math.pow((k-62)/15, 2)) * (0.30 + 0.18*Math.sin(t/90  + k*1.7));
+  return clamp(0.05 + bass + mid*0.85 + high*0.65, 0, 1);
+}
+function hueOf(k){ return 196 + k * 1.05; }        // cyan -> violet
+function cometBoost(distPx, armPx, t){
+  const p = ((t / 4000) % 1) * armPx;
+  return Math.exp(-Math.pow(distPx - p, 2) / (2 * 5.5 * 5.5));
+}
+
+// Per-mode: virtual pixel i (0..nPix-1) -> {bin, cometDist, armPx}
+function sampleSeam(i){   const d = Math.abs(i - 159.5); return { bin: clamp(d/2, 0, 79), dist: d,            arm: 160 }; }
+function sampleTwins(i){  const p = i % 160; const d = Math.abs(p - 79.5); return { bin: clamp(d, 0, 79), dist: d, arm: 80 }; }
+function sampleLinear(i){ return { bin: clamp((i/319)*79, 0, 79), dist: i, arm: 320 }; }
+function sampleSingle(i){ const d = Math.abs(i - 79.5); return { bin: clamp(d, 0, 79), dist: d, arm: 80 }; }
+
+function drawStrip(ctx, x0, w, nPix, sampler, t, plateH, ledY){
+  const pitch = w / nPix;
+  for (let i = 0; i < nPix; i++){
+    const s = sampler(i);
+    const mag = binMag(s.bin, t);
+    const cb  = cometBoost(s.dist, s.arm, t);
+    const hue = hueOf(s.bin);
+    const l   = clamp(7 + 50*mag + 46*cb, 0, 92);
+    const sat = clamp(88 - cb*70, 15, 92);
+    const x = x0 + i * pitch;
+    // plate glow (edge-lit LGP: light rises from the bottom edge)
+    const a = clamp(0.05 + mag*0.34 + cb*0.5, 0, 0.85);
+    const g = ctx.createLinearGradient(0, ledY, 0, ledY - plateH);
+    g.addColorStop(0, `hsla(${hue},${sat}%,${l}%,${a})`);
+    g.addColorStop(1, `hsla(${hue},${sat}%,${l}%,0)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(x, ledY - plateH, pitch + 0.5, plateH);
+    // LED itself
+    ctx.fillStyle = `hsl(${hue},${sat}%,${clamp(l+10,0,96)}%)`;
+    ctx.fillRect(x + pitch*0.18, ledY - 2.5, pitch*0.64, 5);
+  }
+}
+
+function panel(ctx, x0, w, h){
+  ctx.fillStyle = '#0b0f14'; ctx.strokeStyle = '#1f2937'; ctx.lineWidth = 1;
+  const r = 7; ctx.beginPath();
+  ctx.moveTo(x0+r, 0.5); ctx.arcTo(x0+w-0.5, 0.5, x0+w-0.5, h-0.5, r);
+  ctx.arcTo(x0+w-0.5, h-0.5, x0+r, h-0.5, r); ctx.arcTo(x0+0.5, h-0.5, x0+0.5, 0.5, r);
+  ctx.arcTo(x0+0.5, 0.5, x0+w-0.5, 0.5, r); ctx.closePath(); ctx.fill(); ctx.stroke();
+}
+
+function frame(t){
+  const defs = [
+    { id:'c0', mode:'single' }, { id:'c1', mode:'seam' },
+    { id:'c2', mode:'twins' },  { id:'c3', mode:'linear' },
+  ];
+  for (const d of defs){
+    const cv = document.getElementById(d.id);
+    const ctx = cv.getContext('2d');
+    const cw = cv.width / 2, ch = cv.height / 2;      // CSS px space
+    ctx.setTransform(2, 0, 0, 2, 0, 0);
+    ctx.clearRect(0, 0, cw, ch);
+    const ledY = ch - 10, plateH = ch - 26;
+    if (d.mode === 'single'){
+      const x0 = (cw - PW) / 2;
+      panel(ctx, x0, PW, ch);
+      ctx.save(); ctx.beginPath(); ctx.rect(x0+2, 2, PW-4, ch-4); ctx.clip();
+      drawStrip(ctx, x0, PW, 160, sampleSingle, t, plateH, ledY);
+      ctx.restore();
+    } else {
+      panel(ctx, 0, PW, ch); panel(ctx, PW + GAP, PW, ch);
+      const map = d.mode === 'seam' ? sampleSeam : d.mode === 'twins' ? sampleTwins : sampleLinear;
+      ctx.save(); ctx.beginPath(); ctx.rect(2, 2, PW-4, ch-4); ctx.clip();
+      drawStrip(ctx, 0, PW, 160, i => map(i), t, plateH, ledY);
+      ctx.restore();
+      ctx.save(); ctx.beginPath(); ctx.rect(PW+GAP+2, 2, PW-4, ch-4); ctx.clip();
+      drawStrip(ctx, PW + GAP, PW, 160, i => map(i + 160), t, plateH, ledY);
+      ctx.restore();
+      // seam marker
+      ctx.fillStyle = 'rgba(245,158,11,0.9)'; ctx.font = '700 10px -apple-system,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText('SEAM', PW + GAP/2, 11);
+      ctx.strokeStyle = 'rgba(245,158,11,0.35)'; ctx.setLineDash([3,4]); ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(PW + GAP/2, 16); ctx.lineTo(PW + GAP/2, ch-4); ctx.stroke(); ctx.setLineDash([]);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>

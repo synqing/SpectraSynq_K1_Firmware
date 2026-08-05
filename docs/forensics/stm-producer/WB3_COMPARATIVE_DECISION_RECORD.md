@@ -25,3 +25,10 @@ captain_attestation:
 ## Notes
 
 _(Empty — comparative rationale belongs here after both tracks.)_
+
+
+## Track B spike packet (2026-07-29)
+
+- Gate B waiver recorded; firmware `k1_hardware_fft512_bench` built.
+- On-device µs metrics: **INDETERMINATE** (flash blocked — port busy).
+- Comparative native vs FFT: **pending** Track A commit bundle + device microbench.

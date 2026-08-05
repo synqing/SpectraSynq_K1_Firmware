@@ -99,3 +99,6 @@ sb-tab5-wireless-controller/
 *.key
 secure_boot_signing_key*.pem
 k1_ota_signing_PRIVATE.pem
+
+# Stimulus WAVs >5MB — pre-commit rejects; keep local for eval replay only
+artifacts/**/stimulus_*.wav

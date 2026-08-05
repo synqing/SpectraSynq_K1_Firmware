@@ -1,0 +1,219 @@
+1783415712.838 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.938 agc_gain=0.349 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.014 spec_pin=0.000 spec_sat=0.000
+1783415712.839 [AP] SSL=215 DC=-4545 max_raw=350 follower=425 peak_scaled=0.654 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=103.0 conf=0.00 lock=0 phase=0.88 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.933 agc_gain=0.316 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.111 spec_pin=0.000 spec_sat=0.000
+1783415712.839 [AP] SSL=215 DC=-4545 max_raw=497 follower=384 peak_scaled=0.626 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=103.0 conf=0.00 lock=0 phase=0.62 beat=0 bstr=0.03 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.958 agc_gain=0.290 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.082 spec_pin=0.000 spec_sat=0.000
+1783415712.840 [AP] SSL=215 DC=-4545 max_raw=154 follower=283 peak_scaled=0.643 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=configESP-ROM:esp32s3-20210327
+1783415712.840 Build:Mar 27 2021
+1783415712.840 rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+1783415712.840 Saved PC:0x4202670b
+1783415712.840 SPIWP:0xee
+1783415712.840 mode:DIO, clock div:1
+1783415712.840 load:0x3fce2820,len:0x118c
+1783415712.840 load:0x403c8700,len:0x4
+1783415712.840 load:0x403c8704,len:0xc20
+1783415712.840 load:0x403cb700,len:0x30e0
+1783415712.840 entry 0x403c88b8
+1783415712.840 ---------------------------
+1783415712.840 SENSORY BRIDGE | VER: 40103
+1783415712.840 ---------------------------
+1783415712.840 
+1783415712.840 INIT_SERIAL: PASS
+1783415712.840 INIT FILESYSTEM: PASS
+1783415712.840 INIT_LEDS: PASS
+1783415712.840 INIT I2S (channel): PASS
+1783415712.840 I2S STD INIT: PASS
+1783415712.841 I2S ENABLE: PASS
+1783415712.841 GENERATING A-WEIGHTS: DONE IN 0.549 MS
+1783415712.841 GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 5.011 MS
+1783415712.841 INITIALIZING COCHLEAR AGC: DONE IN 0.069 MS
+1783415712.841 SYSTEM INIT COMPLETE!
+1783415712.841 WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+1783415712.841 INIT_SECONDARY_LEDS: PASS
+1783415712.841 RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+1783415712.842 [AP] SSL=215 DC=-4545 max_raw=3333 follower=780 peak_scaled=2.600 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.000 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000
+1783415712.843 [AP] SSL=215 DC=-4545 max_raw=360 follower=1909 peak_scaled=0.137 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=144.0 conf=0.25 lock=0 phase=0.48 beat=0 bstr=0.07 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.905 agc_gain=0.534 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.050 spec_pin=0.000 spec_sat=0.000
+1783415712.843 [AP] SSL=215 DC=-4545 max_raw=576 follower=1055 peak_scaled=0.481 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=129.0 conf=0.33 lock=0 phase=0.79 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.940 agc_gain=0.665 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.008 spec_pin=0.000 spec_sat=0.000
+1783415712.844 [AP] SSL=215 DC=-4545 max_raw=888 follower=807 peak_scaled=0.799 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=129.0 conf=0.21 lock=0 phase=0.92 beat=0 bstr=0.09 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.962 agc_gain=0.530 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.051 spec_pin=0.000 spec_sat=0.000
+1783415713.022 [AP] SSL=215 DC=-4545 max_raw=1099 follower=878 peak_scaled=0.937 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=129.0 conf=0.21 lock=0 phase=0.10 beat=0 bstr=0.21 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.869 agc_gain=0.539 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.116 spec_pin=0.000 spec_sat=0.000
+1783415714.030 [AP] SSL=215 DC=-4545 max_raw=819 follower=896 peak_scaled=0.663 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.18 lock=0 phase=0.06 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.851 agc_gain=0.491 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.172 spec_pin=0.000 spec_sat=0.000
+1783415714.030 >>> :build
+1783415714.041 sberr[[
+1783415714.041 Bad command: build
+1783415714.041 ]]
+1783415715.033 [AP] SSL=215 DC=-4545 max_raw=975 follower=849 peak_scaled=0.869 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.18 lock=0 phase=0.79 beat=0 bstr=0.02 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.860 agc_gain=0.486 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.092 spec_pin=0.000 spec_sat=0.000
+1783415715.640 >>> :dump
+1783415715.647 sbr{{
+1783415715.647 FIRMWARE_VERSION: 40103
+1783415715.647 CHIP ID: F887A500
+1783415715.647 noise_button.pressed: 0
+1783415715.647 noise_button.last_down: 0
+1783415715.647 noise_button.last_up: 0
+1783415715.647 noise_button.pin: 255
+1783415715.647 mode_button.pressed: 0
+1783415715.648 mode_button.last_down: 0
+1783415715.648 mode_button.last_up: 0
+1783415715.648 mode_button.pin: 255
+1783415715.648 CONFIG.PHOTONS: 1.000000
+1783415715.648 CONFIG.CHROMA: 0.250000
+1783415715.648 CONFIG.MOOD: 0.200000
+1783415715.648 CONFIG.LIGHTSHOW_MODE: 18
+1783415715.649 CONFIG.MIRROR_ENABLED: 1
+1783415715.649 CONFIG.CHROMAGRAM_RANGE: 60
+1783415715.649 CONFIG.SAMPLE_RATE: 12800
+1783415715.649 CONFIG.NOTE_OFFSET: 12
+1783415715.649 CONFIG.SQUARE_ITER: 1.00
+1783415715.649 CONFIG.LED_TYPE: 0
+1783415715.649 CONFIG.LED_COUNT: 160
+1783415715.649 CONFIG.LED_COLOR_ORDER: 66
+1783415715.649 CONFIG.SAMPLES_PER_CHUNK: 96
+1783415715.649 CONFIG.SENSITIVITY: 2.400000
+1783415715.650 AUDIO_RESPONSE_GAIN: 1.000000
+1783415715.650 CONFIG.BOOT_ANIMATION: 1
+1783415715.650 CONFIG.SWEET_SPOT_MIN_LEVEL: 215
+1783415715.650 CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+1783415715.650 CONFIG.DC_OFFSET: -4545
+1783415715.650 CAL_SOURCE: config
+1783415715.650 CAL_VALID: 1
+1783415715.650 CAL_PROFILE_LOADED: 0
+1783415715.650 NOISE_CAL_REASON: none
+1783415715.650 NOISE_CAL_DC_SAMPLES: 0
+1783415715.650 NOISE_CAL_SSL_P50: 0.0
+1783415715.650 NOISE_CAL_SSL_P90: 0.0
+1783415715.650 CONFIG.STANDBY_DIMMING: 0
+1783415715.650 CONFIG.REVERSE_ORDER: 0
+1783415715.650 CONFIG.MAX_CURRENT_MA: 1500
+1783415715.651 CONFIG.TEMPORAL_DITHERING: 1
+1783415715.651 CONFIG.AUTO_COLOR_SHIFT: 1
+1783415715.651 CONFIG.INCANDESCENT_FILTER: 0.00
+1783415715.651 CONFIG.INCANDESCENT_MODE: 0
+1783415715.651 CONFIG.BULB_OPACITY: 0.00
+1783415715.651 CONFIG.SATURATION: 1.00
+1783415715.651 CONFIG.PRISM_COUNT: 1.50
+1783415715.652 CONFIG.BASE_COAT: 0
+1783415715.652 CONFIG.BASE_COAT_INTENSITY: 0.150
+1783415715.652 MASTER_BRIGHTNESS: 1.00
+1783415715.652 stream_audio: 0
+1783415715.652 stream_fps: 0
+1783415715.652 stream_max_mags: 0
+1783415715.652 stream_max_mags_followers: 0
+1783415715.652 stream_magnitudes: 0
+1783415715.652 stream_spectrogram: 0
+1783415715.652 stream_chromagram: 0
+1783415715.652 debug_mode: 0
+1783415715.653 noise_complete: 1
+1783415715.653 noise_iterations: 0
+1783415715.653 next_save_time: 0
+1783415715.653 settings_updated: 0
+1783415715.653 I2S_PORT: 0
+1783415715.653 SAMPLE_HISTORY_LENGTH: 4096
+1783415715.653 silence: 0
+1783415715.653 mode_destination: -1
+1783415715.653 SYSTEM_FPS: 145.65
+1783415715.653 LED_FPS: 201.44
+1783415715.653 }}
+1783415716.039 [AP] SSL=215 DC=-4545 max_raw=965 follower=829 peak_scaled=0.855 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.13 lock=0 phase=0.57 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.881 agc_gain=0.664 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.088 spec_pin=0.000 spec_sat=0.000
+1783415717.045 [AP] SSL=215 DC=-4545 max_raw=538 follower=763 peak_scaled=0.655 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.12 lock=0 phase=0.34 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.857 agc_gain=0.684 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.125 spec_pin=0.000 spec_sat=0.000
+1783415718.049 [AP] SSL=215 DC=-4545 max_raw=699 follower=757 peak_scaled=0.762 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.14 lock=0 phase=0.07 beat=0 bstr=0.01 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.854 agc_gain=0.596 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.116 spec_pin=0.000 spec_sat=0.000
+1783415721.537 >>> :stream_agc
+1783415721.537 [AP] SSL=215 DC=-4545 max_raw=929 follower=778 peak_scaled=0.821 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=105.0 conf=0.14 lock=0 phase=0.84 beat=0 bstr=0.01 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.852 agc_gain=0.360 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.124 spec_pin=0.000 spec_sat=0.000
+1783415721.538 [AP] SSL=215 DC=-4545 max_raw=699 follower=644 peak_scaled=0.711 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=88.0 conf=0.16 lock=0 phase=0.68 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.906 agc_gain=0.476 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.057 spec_pin=0.000 spec_sat=0.000
+1783415721.538 [AP] SSL=215 DC=-4545 max_raw=387 follower=606 peak_scaled=0.676 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=74.0 conf=0.00 lock=0 phase=0.95 beat=0 bstr=0.23 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.896 agc_gain=0.698 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.049 spec_pin=0.000 spec_sat=0.000
+1783415721.542 STREAM_AGC_DEBUG: ON
+1783415721.846 sbs((agc_debug=energy:0.31,0.19,0.17,0.24;gain:0.72,1.29,1.30,1.00;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415722.070 [AP] SSL=215 DC=-4545 max_raw=567 follower=525 peak_scaled=0.878 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=99.0 conf=0.00 lock=0 phase=0.48 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.934 agc_gain=0.755 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.050 spec_pin=0.000 spec_sat=0.000
+1783415722.146 sbs((agc_debug=energy:0.28,0.17,0.17,0.23;gain:0.78,1.30,1.36,1.00;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415722.351 sbs((agc_debug=energy:0.26,0.17,0.17,0.22;gain:0.85,1.36,1.36,1.03;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415722.746 sbs((agc_debug=energy:0.37,0.20,0.18,0.23;gain:0.66,1.19,1.27,0.98;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415723.074 sbs((agc_debug=energy:0.64,0.70,0.29,0.35;gain:0.54,0.88,1.07,0.85;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415723.077 [AP] SSL=215 DC=-4545 max_raw=1387 follower=1160 peak_scaled=1.166 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=99.0 conf=0.00 lock=0 phase=0.15 beat=0 bstr=0.01 | onset=0 bass=1 ostr=0.24 | k1_loud=1 input_trim=1.000 gdft_trim=0.835 agc_gain=0.499 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.339 spec_pin=0.000 spec_sat=0.000
+1783415723.251 sbs((agc_debug=energy:2.44,1.25,0.58,0.47;gain:0.21,0.36,0.56,0.56;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415723.646 sbs((agc_debug=energy:2.85,1.33,1.89,1.62;gain:0.08,0.15,0.26,0.28;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415724.055 sbs((agc_debug=energy:2.30,1.33,1.82,1.21;gain:0.07,0.14,0.11,0.15;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415724.079 [AP] SSL=215 DC=-4545 max_raw=924 follower=3027 peak_scaled=0.383 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=99.0 conf=0.46 lock=0 phase=0.78 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.719 agc_gain=0.077 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.217 spec_pin=0.000 spec_sat=0.000
+1783415724.546 sbs((agc_debug=energy:5.81,2.19,3.25,2.96;gain:0.07,0.08,0.07,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415724.847 sbs((agc_debug=energy:4.06,2.44,6.19,4.19;gain:0.07,0.08,0.07,0.07;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415725.051 sbs((agc_debug=energy:3.25,2.58,5.52,3.89;gain:0.07,0.07,0.07,0.07;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415725.084 [AP] SSL=215 DC=-4545 max_raw=1351 follower=4515 peak_scaled=0.327 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=99.0 conf=0.72 lock=1 phase=0.45 beat=0 bstr=0.25 | onset=0 bass=1 ostr=0.03 | k1_loud=1 input_trim=1.000 gdft_trim=0.766 agc_gain=0.072 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.159 spec_pin=0.000 spec_sat=0.000
+1783415725.461 sbs((agc_debug=energy:3.31,2.07,3.17,2.53;gain:0.07,0.09,0.07,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415725.869 sbs((agc_debug=energy:2.45,2.40,4.70,3.10;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415725.953 sbs((agc_debug=energy:2.33,2.37,4.13,2.56;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415726.090 [AP] SSL=215 DC=-4545 max_raw=3084 follower=4395 peak_scaled=0.648 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.71 lock=1 phase=0.04 beat=0 bstr=0.31 | onset=0 bass=1 ostr=0.05 | k1_loud=1 input_trim=1.000 gdft_trim=0.810 agc_gain=0.088 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.112 spec_pin=0.000 spec_sat=0.000
+1783415726.347 sbs((agc_debug=energy:2.16,2.80,5.72,3.82;gain:0.10,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415726.647 sbs((agc_debug=energy:3.87,2.26,4.73,2.49;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415726.852 sbs((agc_debug=energy:2.97,1.99,5.31,2.19;gain:0.08,0.09,0.08,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415727.238 [AP] SSL=215 DC=-4545 max_raw=3053 follower=4150 peak_scaled=0.791 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.72 lock=1 phase=0.77 beat=0 bstr=0.58 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.839 agc_gain=0.088 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.087 spec_pin=0.000 spec_sat=0.000
+1783415727.247 sbs((agc_debug=energy:1.66,1.68,5.43,2.44;gain:0.11,0.12,0.08,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415727.654 sbs((agc_debug=energy:1.06,1.78,6.57,3.34;gain:0.17,0.12,0.08,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415727.751 sbs((agc_debug=energy:0.85,1.57,8.51,5.31;gain:0.22,0.13,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415728.102 [AP] SSL=215 DC=-4545 max_raw=955 follower=4664 peak_scaled=0.141 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.70 lock=1 phase=0.40 beat=0 bstr=0.73 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.849 agc_gain=0.302 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.137 spec_pin=0.000 spec_sat=0.000
+1783415728.146 sbs((agc_debug=energy:2.33,1.05,3.34,2.22;gain:0.27,0.23,0.08,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415728.553 sbs((agc_debug=energy:13.00,2.41,3.06,2.58;gain:0.11,0.13,0.08,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415728.651 sbs((agc_debug=energy:12.09,2.86,3.00,2.20;gain:0.09,0.09,0.08,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415729.047 sbs((agc_debug=energy:14.55,2.60,6.82,3.94;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415729.106 [AP] SSL=215 DC=-4545 max_raw=2827 follower=4844 peak_scaled=0.737 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.71 lock=1 phase=0.95 beat=0 bstr=0.46 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.850 agc_gain=0.083 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.149 spec_pin=0.000 spec_sat=0.000
+1783415729.346 sbs((agc_debug=energy:16.07,2.72,4.76,2.91;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415729.637 sbs((agc_debug=energy:11.56,2.34,3.79,2.42;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415730.046 sbs((agc_debug=energy:11.31,2.45,3.24,1.86;gain:0.08,0.09,0.08,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415730.109 [AP] SSL=215 DC=-4545 max_raw=4806 follower=4462 peak_scaled=0.952 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=100.0 conf=0.53 lock=1 phase=0.38 beat=0 bstr=0.33 | onset=0 bass=1 ostr=0.19 | k1_loud=1 input_trim=1.000 gdft_trim=0.878 agc_gain=0.085 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.090 spec_pin=0.000 spec_sat=0.000
+1783415730.315 sbs((agc_debug=energy:22.18,2.95,3.13,2.50;gain:0.09,0.09,0.09,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415730.451 sbs((agc_debug=energy:16.40,2.54,2.87,2.18;gain:0.09,0.09,0.09,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415730.945 sbs((agc_debug=energy:16.74,1.95,1.92,1.52;gain:0.09,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415731.117 [AP] SSL=215 DC=-4545 max_raw=6622 follower=4825 peak_scaled=1.043 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.60 lock=1 phase=0.41 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.881 agc_gain=0.086 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.103 spec_pin=0.000 spec_sat=0.000
+1783415731.319 sbs((agc_debug=energy:10.38,2.54,3.03,1.36;gain:0.09,0.09,0.09,0.16;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415731.351 sbs((agc_debug=energy:11.32,2.17,2.76,1.29;gain:0.08,0.09,0.09,0.15;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415731.747 sbs((agc_debug=energy:18.80,2.22,2.48,1.69;gain:0.08,0.11,0.09,0.15;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415732.117 sbs((agc_debug=energy:14.28,2.33,3.12,2.25;gain:0.08,0.10,0.09,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415732.120 [AP] SSL=215 DC=-4545 max_raw=2722 follower=4846 peak_scaled=0.887 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.63 lock=1 phase=0.36 beat=0 bstr=0.04 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.867 agc_gain=0.084 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.103 spec_pin=0.000 spec_sat=0.000
+1783415732.646 sbs((agc_debug=energy:23.11,3.38,5.16,3.47;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415732.947 sbs((agc_debug=energy:17.24,2.92,9.42,5.78;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415733.124 [AP] SSL=215 DC=-4545 max_raw=2712 follower=6581 peak_scaled=0.723 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.62 lock=1 phase=0.31 beat=0 bstr=0.03 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.771 agc_gain=0.076 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.280 spec_pin=0.000 spec_sat=0.000
+1783415733.152 sbs((agc_debug=energy:14.65,2.67,8.00,4.83;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415733.547 sbs((agc_debug=energy:11.56,3.50,6.41,3.90;gain:0.07,0.08,0.07,0.07;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415733.847 sbs((agc_debug=energy:14.25,2.95,5.56,3.57;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415734.127 sbs((agc_debug=energy:9.75,2.58,4.39,2.74;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415734.129 [AP] SSL=215 DC=-4545 max_raw=4347 follower=5226 peak_scaled=0.860 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.62 lock=1 phase=0.18 beat=0 bstr=0.02 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.824 agc_gain=0.078 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.098 spec_pin=0.000 spec_sat=0.000
+1783415734.447 sbs((agc_debug=energy:10.99,3.08,4.73,3.28;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415734.852 sbs((agc_debug=energy:19.20,2.80,3.70,2.66;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415735.135 [AP] SSL=215 DC=-4545 max_raw=5098 follower=5092 peak_scaled=0.989 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.56 lock=1 phase=0.19 beat=0 bstr=0.01 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.861 agc_gain=0.082 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.094 spec_pin=0.000 spec_sat=0.000
+1783415735.541 sbs((agc_debug=energy:12.07,1.98,2.72,1.86;gain:0.08,0.10,0.08,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415735.647 sbs((agc_debug=energy:13.57,2.33,7.14,5.14;gain:0.08,0.09,0.08,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415735.852 sbs((agc_debug=energy:13.17,2.37,6.56,4.72;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415736.139 [AP] SSL=215 DC=-4545 max_raw=4975 follower=5410 peak_scaled=0.853 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=60.0 conf=0.55 lock=1 phase=0.15 beat=0 bstr=0.01 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.851 agc_gain=0.082 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.146 spec_pin=0.000 spec_sat=0.000
+1783415736.248 sbs((agc_debug=energy:10.96,2.97,5.24,3.64;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415736.547 sbs((agc_debug=energy:7.87,3.47,7.85,5.29;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415736.751 sbs((agc_debug=energy:14.59,3.33,7.45,5.68;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415737.147 [AP] SSL=215 DC=-4545 max_raw=5705 follower=6337 peak_scaled=0.835 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=120.0 conf=0.84 lock=1 phase=0.80 beat=0 bstr=0.20 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.814 agc_gain=0.078 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.203 spec_pin=0.000 spec_sat=0.000
+1783415737.149 sbs((agc_debug=energy:9.32,3.10,7.08,4.73;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415737.555 sbs((agc_debug=energy:10.55,2.68,6.15,4.13;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415737.555 sbs((agc_debug=energy:8.75,3.03,5.83,3.92;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415737.652 sbs((agc_debug=energy:6.31,3.54,5.58,3.71;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415738.047 sbs((agc_debug=energy:7.00,2.77,7.51,4.74;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415738.150 [AP] SSL=215 DC=-4545 max_raw=6103 follower=6414 peak_scaled=0.844 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=120.0 conf=0.89 lock=1 phase=0.88 beat=0 bstr=0.21 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.834 agc_gain=0.080 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.159 spec_pin=0.000 spec_sat=0.000
+1783415738.355 sbs((agc_debug=energy:11.08,2.12,4.95,3.33;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415738.552 sbs((agc_debug=energy:10.05,2.59,4.50,2.87;gain:0.08,0.10,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415739.046 sbs((agc_debug=energy:12.30,2.73,4.82,3.36;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415739.154 [AP] SSL=215 DC=-4545 max_raw=4962 follower=5760 peak_scaled=0.790 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=120.0 conf=0.94 lock=1 phase=0.08 beat=0 bstr=0.19 | onset=1 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.848 agc_gain=0.082 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.120 spec_pin=0.000 spec_sat=0.000
+1783415739.358 sbs((agc_debug=energy:15.59,3.60,5.07,3.56;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415739.452 sbs((agc_debug=energy:12.79,2.61,4.20,3.25;gain:0.08,0.08,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415739.847 sbs((agc_debug=energy:17.84,2.05,4.33,3.27;gain:0.08,0.10,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415740.158 sbs((agc_debug=energy:15.03,2.65,3.45,2.89;gain:0.09,0.09,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415740.159 [AP] SSL=215 DC=-4545 max_raw=5755 follower=5522 peak_scaled=0.978 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.70 lock=1 phase=0.68 beat=0 bstr=0.12 | onset=0 bass=1 ostr=0.06 | k1_loud=1 input_trim=1.000 gdft_trim=0.883 agc_gain=0.085 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.085 spec_pin=0.000 spec_sat=0.000
+1783415740.352 sbs((agc_debug=energy:16.43,2.44,2.82,2.40;gain:0.09,0.09,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415740.747 sbs((agc_debug=energy:18.93,2.34,5.44,4.14;gain:0.09,0.09,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415741.151 sbs((agc_debug=energy:16.30,2.75,7.34,4.23;gain:0.08,0.09,0.08,0.08;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415741.167 [AP] SSL=215 DC=-4545 max_raw=2925 follower=6381 peak_scaled=0.821 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.74 lock=1 phase=0.93 beat=0 bstr=0.08 | onset=0 bass=1 ostr=0.12 | k1_loud=1 input_trim=1.000 gdft_trim=0.869 agc_gain=0.084 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.085 spec_pin=0.000 spec_sat=0.000
+1783415741.647 sbs((agc_debug=energy:10.30,2.02,3.48,2.81;gain:0.09,0.10,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415741.947 sbs((agc_debug=energy:11.26,2.50,4.33,3.38;gain:0.09,0.09,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415742.153 sbs((agc_debug=energy:9.64,2.79,3.54,2.65;gain:0.09,0.09,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415742.171 [AP] SSL=215 DC=-4545 max_raw=2511 follower=5268 peak_scaled=0.877 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.84 lock=1 phase=0.05 beat=0 bstr=0.09 | onset=0 bass=1 ostr=0.05 | k1_loud=1 input_trim=1.000 gdft_trim=0.899 agc_gain=0.087 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.069 spec_pin=0.000 spec_sat=0.000
+1783415742.547 sbs((agc_debug=energy:11.36,2.33,3.06,2.03;gain:0.09,0.09,0.09,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.587 >>> :stream_agc
+1783415744.588 sbs((agc_debug=energy:12.43,2.12,5.83,3.73;gain:0.09,0.10,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.589 sbs((agc_debug=energy:9.28,1.80,8.17,3.56;gain:0.09,0.11,0.09,0.09;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.591 [AP] SSL=215 DC=-4545 max_raw=538 follower=6526 peak_scaled=0.153 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.77 lock=1 phase=0.36 beat=0 bstr=0.08 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.880 agc_gain=0.087 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.165 spec_pin=0.000 spec_sat=0.000
+1783415744.592 sbs((agc_debug=energy:4.31,0.90,4.83,1.87;gain:0.09,0.19,0.09,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.592 sbs((agc_debug=energy:2.08,0.48,2.24,0.95;gain:0.09,0.36,0.09,0.18;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.593 sbs((agc_debug=energy:1.31,0.35,1.37,0.64;gain:0.13,0.52,0.13,0.27;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.594 [AP] SSL=215 DC=-4545 max_raw=305 follower=3441 peak_scaled=0.090 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.69 lock=1 phase=0.71 beat=0 bstr=0.06 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.909 agc_gain=0.214 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.026 spec_pin=0.000 spec_sat=0.000
+1783415744.595 sbs((agc_debug=energy:0.59,0.22,0.57,0.36;gain:0.30,0.92,0.31,0.53;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00))
+1783415744.597 STREAM_AGC_DEBUG: OFF
+1783415745.183 [AP] SSL=215 DC=-4545 max_raw=492 follower=1860 peak_scaled=0.144 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=config cal_valid=1 cal_reason=none | bpm=80.0 conf=0.64 lock=1 phase=0.99 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00 | k1_loud=1 input_trim=1.000 gdft_trim=0.943 agc_gain=0.857 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.004 spec_pin=0.000 spec_sat=0.000

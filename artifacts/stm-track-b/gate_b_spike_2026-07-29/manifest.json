@@ -1,0 +1,33 @@
+{
+  "run_id": "gate_b_spike_2026-07-29",
+  "track": "B",
+  "gate_b": "Captain waiver \u2014 spike-only (TB-1..TB-4 deferred; no stm_vp_compare closure)",
+  "git_sha": "3b597942218fe745b2fcadddd8ba0a68fc416bf4",
+  "env": "k1_hardware_fft512_bench",
+  "build_flag": "K1_STM_FFT512_BENCH=1",
+  "k1_stm": false,
+  "flash_required": true,
+  "rollback_env": "k1_hardware_stm",
+  "target_chip_id": "F887A500",
+  "target_usb_serial": "b4:3a:45:a5:87:f8",
+  "elf_sha256": "8f6abb47d2682e6288d1945a229162f3dc70418af48765e319ea74188a33ccb9",
+  "vp_closure": "skipped_per_gate_b_waiver",
+  "flash_completed_at": "2026-07-29T15:31:49Z",
+  "microbench_us_p50_burst": 967,
+  "microbench_us_p95_burst": 1147,
+  "eval_main_k1_2026-07-30": "artifacts/stm-track-b/gate_b_spike_2026-07-29/eval_main_k1_2026-07-30",
+  "eval_summary": {
+    "burst_us_p50_mean": 0.0,
+    "burst_us_p50_spread": 0,
+    "burst_us_p95_mean": 0.0,
+    "live_60s_hops_per_s": 133.7,
+    "ap_rate_expected_hz": 133.33,
+    "feasibility_2ms_budget": true,
+    "note": "feasibility_2ms_budget is render-path ceiling; AP hop budget is separate (~7.5ms class per forensics)",
+    "live_rate_within_ap": true
+  },
+  "eval_finished_at": "2026-07-29T18:38:51Z",
+  "vp_host_packet": "artifacts/stm-track-b/gate_b_spike_2026-07-29/vp/wb3_vp_host_2026-07-30",
+  "tb1_tb5_host": "CLOSED",
+  "h2_verdict": "FAIL_expected"
+}

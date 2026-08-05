@@ -968,7 +968,7 @@ static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
   // silence vs loud EDM: peak_scaled 0.58 vs 0.67). Silence-gated -> depth 0 (strips
   // untouched); louder -> deeper STM modulation, so the strips pulse with the
   // actual dynamics rather than dimming by a constant amount.
-  const float k1_stm_loud = k1_edge_clamp_float01(float(agc_loudness_norm));
+  const float k1_stm_loud = k1_edge_clamp_float01(float(agc_envelope));
   const float depth = strength * k1_stm_loud;
   const bool dual = (mode == K1_EDGE_MIXER_STM_DUAL);
   float uniformScale = 1.0f;

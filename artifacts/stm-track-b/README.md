@@ -3,24 +3,37 @@
 **Track:** WB-3 Track B (bench FFT producer, **mutually exclusive** with `K1_STM`).  
 **Policy:** `docs/forensics/stm-producer/WB3_REFERENCE_ATTESTATION.md`, spike steps in `WB3_FFT512_FEASIBILITY.md`.
 
-## Reference gate
+## Reference gate (Gate B)
 
-**E5 / attestation:** **INDETERMINATE** until Track B checklist (TB-1…TB-6) in `WB3_REFERENCE_ATTESTATION.md` is satisfied or Captain waives in `WB3_COMPARATIVE_DECISION_RECORD.md`.
+**2026-07-29:** Captain **waived** TB-1..TB-4 for **spike-only** execution.  
+Waiver: `reference_waiver_gate_b_2026-07-29.md` and `gate_b_spike_2026-07-29/reference_waiver_gate_b_2026-07-29.md`.
 
-## Branch / worktree
+VP reference-vs-candidate closure is **out of scope** for this packet.
 
-- From `origin/main`: e.g. `bench/wb3-track-b-fft512`
-- Never combine native `K1_STM` and FFT bench producer in one image
+## Firmware
 
-## Evidence checklist (per `<run-id>/`)
+| Env | Flag | `K1_STM` |
+|-----|------|----------|
+| `k1_hardware_fft512_bench` | `K1_STM_FFT512_BENCH=1` | **off** |
 
-- [ ] `manifest.json` — reference hashes, fixture list, `flash_required`, rollback
-- [ ] `reference_attestation.md` — copy of completed TB checklist
-- [ ] `fft_microbench.csv` — optional host or on-device (see feasibility doc)
-- [ ] `core0/` — treatment vs baseline per bench procedure
-- [ ] `vp/` — reference vs candidate when reference valid
-- [ ] `gate0_clangd.txt`
+Build: `pio run -e k1_hardware_fft512_bench`  
+Flash (main K1 F887A500): `pio run -e k1_hardware_fft512_bench -t upload --upload-port /dev/cu.usbmodem112401`
 
-## Hardware
+### Serial (115200, `:` prefix)
 
-**This packet is scaffolding only** until an independent 512-point reference exists. No flash, playback, or FFT firmware integration in the 2026-07-29 doc session.
+- `:fft512_bench=report` — stats (p50/p95/us_max)
+- `:fft512_bench=burst,1000` — synthetic 1 kHz burst microbench
+- `:fft512_bench=live_hop,on|off` — Core-0 AP-frame integration hook
+- `:fft512_bench=reset` — clear counters
+
+## Run `gate_b_spike_2026-07-29`
+
+| Artefact | Status |
+|----------|--------|
+| `manifest.json` | **GROUNDED** |
+| `reference_waiver_gate_b_2026-07-29.md` | **GROUNDED** |
+| `fft_microbench.json` | **CAPTURED** (burst n=1000; live_hop hop_count=0 at idle — AP path not ticking in soak) |
+| `core0/` | **INDETERMINATE** — formal Phase B/C not run |
+| `vp/` | **Skipped** per Gate B waiver |
+
+See `gate_b_spike_2026-07-29/FLASH_AND_CAPTURE.md` for capture steps.

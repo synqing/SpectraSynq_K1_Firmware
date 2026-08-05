@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K718 Element Guide — Every Layer, Isolated</title>
+<meta name="description" content="A self-demonstrating field guide to the K718 dial. Every layer is ripped out and shown alone as a live specimen — you rule KEEP / CHANGE / CUT on each.">
+<style>
+/* ============================================================
+   K1 DESIGN SYSTEM — dogfooded (exact jargon-guide presentation)
+   void #060606 · gold #FFB84D · ink #f5f5f5/#a3a3a3/#737373
+   ============================================================ */
+:root{
+  --void:#060606; --gold:#FFB84D; --gold-b:rgba(255,184,77,.35); --gold-g:rgba(255,184,77,.18);
+  --ink-1:#f5f5f5; --ink-2:#a3a3a3; --ink-3:#737373; --line:rgba(255,255,255,.08);
+  --ease:cubic-bezier(.16,1,.3,1);
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --maxw:1180px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--ink-1);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:rgba(255,184,77,.25);color:#fff}
+/* atmosphere stack */
+.atmo-grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.15;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:60px 60px;-webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 75%);mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 30%,transparent 75%)}
+.atmo-noise{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.atmo-glow{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 600px 420px at 18% 4%,rgba(255,184,77,.07),transparent 70%),radial-gradient(ellipse 700px 480px at 85% 30%,rgba(255,160,60,.05),transparent 70%),radial-gradient(ellipse 800px 500px at 40% 95%,rgba(255,184,77,.04),transparent 70%)}
+main,header.site,footer.fat{position:relative;z-index:2}
+/* primitives */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+.glass{background:linear-gradient(145deg,rgba(30,28,24,.55),rgba(12,11,9,.85));-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:16px;box-shadow:0 12px 28px rgba(0,0,0,.45);position:relative}
+.glass::before{content:"";position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);pointer-events:none}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:500}
+.spec-tag{display:inline-block;font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.04em;white-space:nowrap;opacity:.95}
+.spec-tag::before{content:"";display:inline-block;width:14px;height:1px;background:rgba(255,184,77,.45);vertical-align:middle;margin-right:7px}
+/* reveal */
+@keyframes rise{from{opacity:0;transform:translateY(26px);filter:blur(9px)}to{opacity:1;transform:none;filter:blur(0)}}
+.rv.active{animation:rise .9s var(--ease) both;animation-delay:var(--d,0s)}
+@media (prefers-reduced-motion:reduce){.rv.active{animation:none}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}}
+/* sticky header */
+header.site{position:sticky;top:0;z-index:50;background:rgba(6,6,6,.72);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+header.site .bar{max-width:var(--maxw);margin:0 auto;padding:0 32px;display:flex;align-items:center;gap:28px;height:60px}
+.brand{font-family:var(--mono);font-size:13px;color:var(--ink-1);letter-spacing:.06em;text-decoration:none;white-space:nowrap}
+.brand b{color:var(--gold);font-weight:500}
+nav.chapters{display:flex;gap:4px;margin-left:auto;overflow-x:auto}
+nav.chapters a{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;color:var(--ink-3);text-decoration:none;padding:6px 11px;border-radius:8px;border:1px solid transparent;transition:color .35s var(--ease),border-color .35s var(--ease);white-space:nowrap}
+nav.chapters a:hover{color:var(--ink-1)}
+nav.chapters a.active{color:var(--gold);border-color:rgba(255,184,77,.28)}
+.head-actions{display:flex;align-items:center;gap:10px}
+.part2-link{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-decoration:none;color:var(--ink-1);border:1px solid rgba(255,184,77,.35);border-radius:999px;padding:6px 14px;box-shadow:0 0 16px rgba(255,184,77,.1);white-space:nowrap;transition:box-shadow .35s var(--ease)}
+.part2-link:hover{box-shadow:0 0 22px rgba(255,184,77,.22)}
+.progress-hairline{position:absolute;left:0;bottom:-1px;height:1px;width:100%;background:linear-gradient(90deg,rgba(255,184,77,.45),rgba(255,184,77,.2));transform-origin:0 50%;transform:scaleX(0)}
+/* hero */
+.hero{padding:130px 0 110px;position:relative}
+.hero .eyebrow-row,.hero .h-row,.hero .lede-row{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.badge-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(255,184,77,.3);border-radius:999px;padding:7px 16px;box-shadow:0 0 18px rgba(255,184,77,.1)}
+.badge-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:rgba(255,184,77,.8);box-shadow:0 0 8px rgba(255,184,77,.45)}
+h1.display{font-size:clamp(2.6rem,1.2rem + 4.6vw,4.6rem);font-weight:700;letter-spacing:-.03em;line-height:1.04;margin:26px 0 0}
+h1.display .grad{background:linear-gradient(100deg,#f5f5f5 20%,rgba(255,184,77,.85) 60%,#f5f5f5 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lede{font-size:19px;color:var(--ink-2);max-width:700px;margin-top:22px;font-weight:400}
+.hero .fold-note{margin-top:64px;padding-top:18px;border-top:1px dashed rgba(255,255,255,.12);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.hero .fold-note .spec-tag::before{display:none}
+/* chapter scaffolding */
+section.chapter{padding:110px 0 0}
+section.chapter:last-of-type{padding-bottom:120px}
+.ch-head{margin-bottom:54px;max-width:820px}
+.ch-head .eyebrow{display:block;margin-bottom:18px}
+.ch-head h2{font-size:clamp(1.9rem,1.2rem + 2vw,2.8rem);font-weight:700;letter-spacing:-.02em;line-height:1.12}
+.ch-head .ch-lede{color:var(--ink-2);font-size:17px;margin-top:16px}
+/* entry card */
+.entry{padding:40px 44px 40px;margin-bottom:40px}
+.entry-head{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.entry-head h3{font-size:26px;font-weight:700;letter-spacing:-.015em}
+.aka{font-family:var(--mono);font-size:12px;color:var(--gold);letter-spacing:.03em}
+.builder{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;margin-top:2px}
+.entry-body{color:var(--ink-2);font-size:15.5px;max-width:840px;margin-top:14px}
+.entry-body strong{color:var(--ink-1);font-weight:600}
+/* lw in-the-wild system (verbatim) */
+.lw{--accent:var(--gold);--ink:#f3f3f4;--ink2:#a8a8ae;--ink3:#707078;--green:#10b981;--red:#ef4444;--stage-bg:#060706;margin-top:22px;border-top:1px solid var(--line);padding-top:6px}
+.lw .lw-h{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:8px;margin:18px 0 4px}
+.lw .lw-h::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);flex:none}
+.lw article.spec{display:grid;grid-template-columns:minmax(0,4.6fr) minmax(0,7.4fr);gap:26px;padding:30px 0 6px;border-top:1px solid rgba(255,255,255,.07);align-items:start}
+@media(max-width:860px){.lw article.spec{grid-template-columns:1fr;gap:16px}}
+.lw .s-info h3{font-size:18px;font-weight:620;letter-spacing:-.01em;color:var(--ink)}
+.lw .alias{font:11px var(--mono);color:var(--accent);margin-top:7px;letter-spacing:.03em}
+.lw .where{margin-top:11px;font:11.5px/1.6 var(--mono);color:var(--ink3)}
+.lw .where b{color:var(--ink2);font-weight:600}
+.lw .firm{display:inline-block;margin-top:13px;font:700 9px var(--mono);letter-spacing:.12em;border-radius:5px;padding:3px 8px}
+.firm.backed{color:#8affb1;border:1px solid rgba(16,185,129,.4)}
+.firm.roadmap{color:var(--gold);border:1px dashed rgba(255,184,77,.45)}
+.firm.fake{color:#ff8d80;border:1px solid rgba(239,68,68,.42)}
+.firm.flag{color:#cdb1ff;border:1px solid rgba(166,107,255,.5)}
+.lw .stage{position:relative;min-height:300px;border-radius:16px;overflow:hidden;background:var(--stage-bg);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;padding:20px;isolation:isolate;text-align:center}
+.lw .stage canvas{display:block}
+.lw .stage-label{position:absolute;bottom:9px;left:13px;font:10px var(--mono);letter-spacing:.13em;color:rgba(255,255,255,.42);text-transform:uppercase;z-index:8;pointer-events:none}
+.lw .replay{position:absolute;top:10px;right:10px;z-index:9;width:32px;height:32px;border-radius:9px;border:1px solid color-mix(in srgb,var(--accent) 55%,transparent);background:rgba(6,6,6,.7);color:var(--accent);font-size:16px;line-height:1;cursor:pointer;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.lw .replay:hover{transform:rotate(-45deg);box-shadow:0 0 16px color-mix(in srgb,var(--accent) 35%,transparent)}
+.lw .logic{margin-top:13px;color:var(--ink2);font-size:13.5px;line-height:1.62}
+/* verdict → the Captain's KEEP / CHANGE / CUT ruling (exact verdict styling) */
+.decide{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.decide .lab{font:10px var(--mono);letter-spacing:.16em;color:var(--ink3);text-transform:uppercase;margin-right:2px}
+.decide button{font:700 11px var(--mono);letter-spacing:.14em;border-radius:8px;padding:8px 14px;cursor:pointer;background:transparent;transition:all .25s var(--ease)}
+.decide .keep{border:1px solid rgba(16,185,129,.4);color:#8affb1}
+.decide .change{border:1px solid rgba(255,184,77,.4);color:var(--gold)}
+.decide .cut{border:1px solid rgba(239,68,68,.42);color:#ff8d80}
+.decide .keep.on{background:rgba(16,36,21,.55);box-shadow:0 0 0 1px #10b981 inset}
+.decide .change.on{background:rgba(50,38,16,.5);box-shadow:0 0 0 1px var(--gold) inset}
+.decide .cut.on{background:rgba(60,16,16,.5);box-shadow:0 0 0 1px #ef4444 inset}
+/* footer */
+footer.fat{border-top:1px solid var(--line);padding:64px 0 40px;background:rgba(4,4,4,.6)}
+.foot-base{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+@media(max-width:900px){.entry{padding:30px 26px 34px}nav.chapters{display:none}}
+</style>
+</head>
+<body>
+<div class="atmo-glow" aria-hidden="true"></div>
+<div class="atmo-grid" aria-hidden="true"></div>
+<div class="atmo-noise" aria-hidden="true"></div>
+
+<header class="site" id="top">
+  <div class="bar">
+    <a class="brand" href="#top"><b>K718</b>/ELEMENT GUIDE</a>
+    <nav class="chapters" aria-label="Chapters">
+      <a href="#ch1">01 HARDWARE</a><a href="#ch2">02 GRID</a><a href="#ch3">03 CONTENT</a><a href="#ch4">04 STATUS</a><a href="#ch5">05 COLOUR</a>
+    </nav>
+    <div class="head-actions"><a class="part2-link" href="live.html">Live Dial →</a></div>
+  </div>
+  <div class="progress-hairline" id="progressBar" aria-hidden="true"></div>
+</header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <div class="eyebrow-row rv"><span class="badge-eyebrow"><span class="dot"></span>Field Guide · 20 Layers</span><span class="spec-tag">every layer · ripped out · isolated</span></div>
+  <div class="h-row rv" style="--d:.08s"><h1 class="display">Take the knob<br><span class="grad">apart.</span></h1></div>
+  <div class="lede-row rv" style="--d:.16s"><p class="lede">Every layer of the K718 dial — pulled out and shown <b>alone</b> as a live, moving specimen, named with the real instrument jargon, defined in plain English. Nothing decided for you. On each one you rule: <b style="color:#8affb1">KEEP</b> · <b style="color:var(--gold)">CHANGE</b> · <b style="color:#ff8d80">CUT</b> — saved in this browser. Each carries its honest firmware tag so you decide with facts, not mockup theatre.</p><span class="spec-tag">subhead / lede</span></div>
+  <div class="fold-note rv" style="--d:.24s"><span class="spec-tag">device · Guition JC3636K718 · round IPS · 360×360 · BLE-MIDI only · rotation-only encoder</span><span class="spec-tag">hover a stage · tap ↻ to replay</span></div>
+</div></section>
+
+<!-- ===== CH 01 HARDWARE ===== -->
+<section class="chapter" id="ch1"><div class="wrap">
+  <div class="ch-head rv"><span class="eyebrow">Chapter 01 — Hardware <span class="spec-tag" style="margin-left:14px">the real object, before any pixel</span></span>
+  <h2>What physically exists</h2>
+  <p class="ch-lede">Name the part and you can direct the part. These four aren't design choices — they're the substrate every other layer must respect. Each carries a firmware tag: <span style="font:700 9px var(--mono);letter-spacing:.12em;color:#8affb1;border:1px solid rgba(16,185,129,.4);border-radius:5px;padding:2px 6px">BACKED</span> real today · <span style="font:700 9px var(--mono);letter-spacing:.12em;color:var(--gold);border:1px dashed rgba(255,184,77,.45);border-radius:5px;padding:2px 6px">ROADMAP</span> needs work · <span style="font:700 9px var(--mono);letter-spacing:.12em;color:#ff8d80;border:1px solid rgba(239,68,68,.4);border-radius:5px;padding:2px 6px">FAKE</span> would lie if shipped.</p></div>
+
+  <article class="entry glass rv" id="t-canvas"><div class="entry-head"><h3>Display Canvas</h3><span class="aka">aka: the face · round LCD · the glass</span></div>
+    <p class="builder">builder · the whole circular screen the dial is drawn on</p>
+    <div class="entry-body"><p>The round IPS screen — a circle of pixels with <strong>no corners</strong>. Everything lives by distance-from-centre and clock-angle, never rows and columns. <strong>Conflict to resolve:</strong> the physical part is <strong>360×360</strong>; the boards drew 480×480. Same look, different pixel budget — your call which is law.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The bare round face</h3><div class="alias">aka: bezel + active area · the substrate</div><div class="where"><b>where</b> · hardware (Guition JC3636K718) vs the board drawings.</div><span class="firm roadmap">ROADMAP · 360 vs 480</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="face" data-theme="editorial"></canvas><div class="stage-label">live · the bare round face</div></div>
+          <p class="logic">A circle is the canvas; importance grows toward the middle.</p>
+          <div class="decide" data-id="canvas"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-safe"><div class="entry-head"><h3>Safe Area &amp; Keep-out</h3><span class="aka">aka: inscribed safe rectangle · bezel-safe margin · keep-out zone</span></div>
+    <p class="builder">builder · the outer ~6% ring + the thumb-occlusion arcs</p>
+    <div class="entry-body"><p>The band near the edge where the bezel and viewing angle eat legibility — <strong>no critical content there</strong>, only glow bleed. Plus the two thumb zones (~30% each) and the bottom finger-swipe arc, where a hand covers the screen while you turn.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Safe radius + occlusion arcs</h3><div class="alias">aka: content-safe area · thumb zones</div><div class="where"><b>where</b> · wearable design law (WearOS / watchOS) + board 02.</div><span class="firm backed">HARDWARE LAW</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="safe" data-theme="editorial"></canvas><div class="stage-label">live · dashed = safe radius · arcs = thumb zones</div></div>
+          <p class="logic">Design so the readout survives both thumbs at once.</p>
+          <div class="decide" data-id="safe"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-led"><div class="entry-head"><h3>The 13-LED Ring</h3><span class="aka">aka: bloom ring · physical telltale ring</span></div>
+    <p class="builder">builder · physical LEDs OUTSIDE the glass, around the bezel</p>
+    <div class="entry-body"><p>A ring of 13 real LEDs around the knob — <strong>not on the screen</strong>. Your past verdict: because the K1 can't acknowledge a command back over BLE, <strong>this ring is the real confirm surface</strong> (hue + motion + extent), not any on-screen ring. Eyes-free, survives glance / venue light / colour-blindness.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The physical LED ring</h3><div class="alias">aka: the honest trust surface</div><div class="where"><b>where</b> · hardware + Captain verdict (trust → LED ring).</div><span class="firm backed">HARDWARE · REAL TRUST</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="led" data-theme="editorial"></canvas><div class="stage-label">live · 13 LEDs, green = confirmed</div></div>
+          <p class="logic">The honest place to say "got it" — light, not pixels.</p>
+          <div class="decide" data-id="led"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-encoder"><div class="entry-head"><h3>The Encoder</h3><span class="aka">aka: the knob · rotary · the dial mechanism</span></div>
+    <p class="builder">builder · the physical rotation under your fingers</p>
+    <div class="entry-body"><p>It turns left and right — that's it. The driver exposes <code>KNOB_LEFT</code>/<code>KNOB_RIGHT</code> and <strong>no press event</strong>. So any UI that says "press to confirm" is <strong>describing hardware that isn't there</strong>. Rotation is the only verb you truly have.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Rotation moves the marker</h3><div class="alias">aka: detented rotary · CW/CCW only</div><div class="where"><b>where</b> · firmware driver — no press event exists.</div><span class="firm fake">NO HARDWARE PRESS</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="encoder" data-theme="editorial"></canvas><div class="stage-label">live · turning moves the bright dot</div></div>
+          <p class="logic">Build the interaction around turning, not pressing.</p>
+          <div class="decide" data-id="encoder"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+</div></section>
+
+<!-- ===== CH 02 GRID ===== -->
+<section class="chapter" id="ch2"><div class="wrap">
+  <div class="ch-head rv"><span class="eyebrow">Chapter 02 — The Radial Grid <span class="spec-tag" style="margin-left:14px">the skeleton everything hangs on</span></span>
+  <h2>Placement by ring and clock</h2>
+  <p class="ch-lede">A circle is organised by <b>radius band</b> (how far out) × <b>angular zone</b> (clock position) — the structural bones that decide where every element is allowed to sit.</p></div>
+
+  <article class="entry glass rv" id="t-bezel"><div class="entry-head"><h3>Bezel</h3><span class="aka">aka: surround · rim · chapter ring (when it carries scale)</span></div>
+    <p class="builder">builder · the outermost framing ring of the face</p>
+    <div class="entry-body"><p>The frame that borders the screen and reads as "a made object." On a watch it holds the crystal; here it's drawn, and it's what makes the dial look like instrument-grade hardware, not an app.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The drawn bezel</h3><div class="alias">aka: framing ring · machined surround</div><div class="where"><b>where</b> · horology / the board face.</div><span class="firm backed">STRUCTURE</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="bezel" data-theme="prism"></canvas><div class="stage-label">live · the bezel frame</div></div>
+          <p class="logic">Frame quality is most of the "premium" read.</p>
+          <div class="decide" data-id="bezel"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-bands"><div class="entry-head"><h3>Radius Bands</h3><span class="aka">aka: concentric tracks · ring roles · data rings</span></div>
+    <p class="builder">builder · five nested zones, bezel → centre</p>
+    <div class="entry-body"><p>Five concentric jobs: <strong>nav ring</strong> (mode labels) · <strong>control ring</strong> (the live parameter) · <strong>signal core</strong> (animation) · <strong>readout centre</strong> (the one value), wrapped by the dead <strong>safe margin</strong>. Outer = context, inner = importance.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The five bands</h3><div class="alias">aka: the radial grid</div><div class="where"><b>where</b> · HALO grid (board "ring grammar").</div><span class="firm backed">STRUCTURE</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="bands" data-theme="editorial"></canvas><div class="stage-label">live · the nested bands</div></div>
+          <p class="logic">A place for everything; importance grows inward.</p>
+          <div class="decide" data-id="bands"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-ticks"><div class="entry-head"><h3>Graduation Marks</h3><span class="aka">aka: indices · tick marks · scale marks · minute track</span></div>
+    <p class="builder">builder · evenly-spaced ticks just inside the bezel</p>
+    <div class="entry-body"><p>The little marks around the rim that say "measuring instrument." Static and learned, so they're allowed on the rim. Major/minor ticks give a sense of range and position without numbers.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>60 graduations</h3><div class="alias">aka: tick ring · index marks</div><div class="where"><b>where</b> · metrology / horology.</div><span class="firm backed">RIM-PERMITTED</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="ticks" data-theme="prism"></canvas><div class="stage-label">live · every 5th tick major</div></div>
+          <p class="logic">Instrument credibility, almost for free.</p>
+          <div class="decide" data-id="ticks"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-arctext"><div class="entry-head"><h3>Curved Mode Labels</h3><span class="aka">aka: arc text · text-on-a-path · radial label · circular type</span></div>
+    <p class="builder">builder · mode names curved along the nav ring</p>
+    <div class="entry-body"><p>Text that <strong>follows the ring's curve</strong> instead of sitting straight — the watch-bezel convention you mandated. <strong>Honest flag:</strong> a prior handoff listed "no arc-text" as an LVGL 8.3 limit; on-device it needs per-glyph rotated placement. Your call wins; firmware feasibility is a build task, not a veto. Rim text also needs a keep-out scrim behind the glyphs.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Labels curved to the radius</h3><div class="alias">aka: arc text · radial label</div><div class="where"><b>where</b> · Captain mandate + text-protection principle.</div><span class="firm flag">YOUR MANDATE ⇄ LVGL FLAG</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="arctext" data-theme="editorial"></canvas><div class="stage-label">live · text follows the curve</div></div>
+          <p class="logic">Curved type reads as instrument; straight type reads as app.</p>
+          <div class="decide" data-id="arctext"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+</div></section>
+
+<!-- ===== CH 03 CONTENT ===== -->
+<section class="chapter" id="ch3"><div class="wrap">
+  <div class="ch-head rv"><span class="eyebrow">Chapter 03 — Content <span class="spec-tag" style="margin-left:14px">what the knob actually shows</span></span>
+  <h2>The things that carry information</h2>
+  <p class="ch-lede">Each tagged for whether the firmware can really feed it over BLE today.</p></div>
+
+  <article class="entry glass rv" id="t-readout"><div class="entry-head"><h3>Readout</h3><span class="aka">aka: register · complication · centre value · digital window</span></div>
+    <p class="builder">builder · the one big value, dead centre</p>
+    <div class="entry-body"><p>The single big number/word in the middle — what you're controlling now. <strong>Exactly one per screen.</strong> BPM is computed in the K1 but doesn't cross the BLE link yet — it's live only once the feedback channel carries it.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The centre register</h3><div class="alias">aka: primary readout</div><div class="where"><b>where</b> · board + firmware (tempo computed; readback = roadmap).</div><span class="firm roadmap">BPM computed, not yet over BLE</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="readout" data-theme="editorial"></canvas><div class="stage-label">live · beat-pulsed register</div></div>
+          <p class="logic">One value, instantly readable at a glance.</p>
+          <div class="decide" data-id="readout"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-dotring"><div class="entry-head"><h3>Dot-Ring</h3><span class="aka">aka: pip ring · position ring · mode selector ring</span></div>
+    <p class="builder">builder · a ring of dots; the bright one is the encoder position</p>
+    <div class="entry-body"><p>A ring of small dots; the bright one shows where the encoder is. Doubles as a mode selector — one dot per real K1 mode, rotation moves the highlight.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Rotating dot-ring</h3><div class="alias">aka: pip ring</div><div class="where"><b>where</b> · candidates A–F + HALO (maps to encoder + mode enum).</div><span class="firm backed">BACKED · encoder position</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="dotring" data-theme="editorial"></canvas><div class="stage-label">live · bright dot = current</div></div>
+          <p class="logic">Eyes-free position sense while turning.</p>
+          <div class="decide" data-id="dotring"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-needle"><div class="entry-head"><h3>Needle / Pointer</h3><span class="aka">aka: hand · indicator · sweep hand</span></div>
+    <p class="builder">builder · a line from centre to the selected position</p>
+    <div class="entry-body"><p>A pointer from the middle out to the current value/mode — the gauge/clock metaphor. An alternative (or companion) to the dot-ring for showing position.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Sweeping pointer</h3><div class="alias">aka: needle · hand</div><div class="where"><b>where</b> · candidate D + needle-refinement session.</div><span class="firm backed">OPTIONAL STRUCTURE</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="needle" data-theme="prism"></canvas><div class="stage-label">live · pointer to the value</div></div>
+          <p class="logic">Instant "where am I in the range" read.</p>
+          <div class="decide" data-id="needle"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-spectrum"><div class="entry-head"><h3>Signal Viz</h3><span class="aka">aka: signal core · inner-core animation · spectrum / waveform</span></div>
+    <p class="builder">builder · animated graphics in the inner core</p>
+    <div class="entry-body"><p>The animated spectrum that makes the dial feel alive to the music. <strong>Hard honesty flag:</strong> the K1's audio <strong>does not travel to the K718 over BLE</strong> — only mode numbers do. A live spectrum here today is <strong>faked animation</strong>. Real only if a future BLE audio channel is built.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Animated spectrum</h3><div class="alias">aka: signal core</div><div class="where"><b>where</b> · candidates (decorative) — DLG-01: not wired over BLE.</div><span class="firm fake">audio does NOT cross BLE</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="spectrum" data-theme="zerog"></canvas><div class="stage-label">live · simulated — not data-fed yet</div></div>
+          <p class="logic">Gorgeous — but only honest if the data is real.</p>
+          <div class="decide" data-id="spectrum"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-paramarc"><div class="entry-head"><h3>Parameter Arcs</h3><span class="aka">aka: arc gauge · radial gauge fill · PHOTONS / MOOD arcs</span></div>
+    <p class="builder">builder · partial arcs showing a live parameter's level</p>
+    <div class="entry-body"><p>Filled arcs for a live parameter (<strong>PHOTONS</strong> brightness, <strong>MOOD</strong>). These map directly to the real 71-path BLE control map — turn the knob, the value sends, the arc fills. The most firmware-honest "live" element on the dial.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Live PHOTONS / MOOD arcs</h3><div class="alias">aka: arc gauge</div><div class="where"><b>where</b> · candidates D/F — backed by BLE CC14 map.</div><span class="firm backed">BACKED · real BLE controls</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="paramarc" data-theme="zerog"></canvas><div class="stage-label">live · arcs fill with the value</div></div>
+          <p class="logic">A real control you actually send over BLE.</p>
+          <div class="decide" data-id="paramarc"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-stateedge"><div class="entry-head"><h3>State-Edge Label</h3><span class="aka">aka: keel label · bottom status caption</span></div>
+    <p class="builder">builder · a curved caption along the bottom arc</p>
+    <div class="entry-body"><p>A curved caption at the bottom — currently the mode name. Honest flag from your own rim taxonomy: <strong>live, changing values must NOT live on the rim</strong> (they belong centre, at readout size). Static things (wordmark, min/max) are fine here.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Curved keel caption</h3><div class="alias">aka: state edge</div><div class="where"><b>where</b> · board keel + Captain rim taxonomy.</div><span class="firm flag">rim-rule: live values promote to centre</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="stateedge" data-theme="editorial"></canvas><div class="stage-label">live · curved bottom caption</div></div>
+          <p class="logic">Curve is right; live content placement is the question.</p>
+          <div class="decide" data-id="stateedge"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+</div></section>
+
+<!-- ===== CH 04 STATUS ===== -->
+<section class="chapter" id="ch4"><div class="wrap">
+  <div class="ch-head rv"><span class="eyebrow">Chapter 04 — Status &amp; Trust <span class="spec-tag" style="margin-left:14px">the one light vs. the machinery</span></span>
+  <h2>The one light vs. the elaborate machinery</h2>
+  <p class="ch-lede">You said it plainly: one BLE light, green or red, done. Here it is — and here, isolated, are the elaborate status layers from the boards, each tagged with whether the firmware can back it.</p></div>
+
+  <article class="entry glass rv" id="t-telltale"><div class="entry-head"><h3>BLE Telltale</h3><span class="aka">aka: status light · connection indicator · idiot light (ISO 2575 "telltale")</span></div>
+    <p class="builder">builder · a single Bluetooth glyph near the crown</p>
+    <div class="entry-body"><p>One Bluetooth symbol: <strong style="color:#8affb1">green = connected</strong>, <strong style="color:#ff8d80">red = not</strong>. Formally a <strong>telltale</strong> (the automotive idiot-light, ISO 2575). The single system indicator you asked for — everything below is the stuff you suspected was over-built.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Connected vs lost</h3><div class="alias">aka: telltale · connection dot</div><div class="where"><b>where</b> · Captain directive 2026-06-29.</div><span class="firm backed">THE ONE STATUS · your keeper</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="telltale" data-theme="editorial"></canvas><div class="stage-label">live · green pulse → red on loss</div></div>
+          <p class="logic">The only status that's always true and always matters.</p>
+          <div class="decide" data-id="telltale"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-truthring"><div class="entry-head"><h3>Truth Ring</h3><span class="aka">aka: trust gradient · pending ring</span></div>
+    <p class="builder">builder · a coloured dot-gradient ring</p>
+    <div class="entry-body"><p>A ring whose colours march from "pending" to "ready" to show a command confirming. <strong>Fake over BLE:</strong> the K1 never acknowledges, so the screen can't truthfully show "confirmed." Your verdict already moved trust to the physical LED ring — this is the on-screen version of a job the LEDs do honestly.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The trust gradient</h3><div class="alias">aka: pending ring</div><div class="where"><b>where</b> · board — superseded by the LED-ring verdict.</div><span class="firm fake">no BLE backing · LED ring does this</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="truthring" data-theme="editorial"></canvas><div class="stage-label">live · magenta→cyan gradient (decorative)</div></div>
+          <p class="logic">Pretty, but it asserts a confirm the protocol can't give.</p>
+          <div class="decide" data-id="truthring"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-focus"><div class="entry-head"><h3>Focus / Active / Confirm rings</h3><span class="aka">aka: encoder focus FSM · the 5 state colours</span></div>
+    <p class="builder">builder · coloured rings/arcs per interaction state</p>
+    <div class="entry-body"><p>The cyan "focused" ring, amber "adjusting" arc, green "confirmed" pulse — colour standing in for UI state. This is the <strong>focus / input / active / confirm / alert</strong> system you called over-complication. Shown isolated so you can confirm it goes, or rescue one piece (e.g. just the amber value-changing arc).</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>Focus ring + active arc</h3><div class="alias">aka: colour-as-state</div><div class="where"><b>where</b> · board encoder FSM — Captain flagged.</div><span class="firm flag">the machinery you flagged</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="focus" data-theme="editorial"></canvas><div class="stage-label">live · focus ring + filling arc</div></div>
+          <p class="logic">Colour-as-state — the complexity you questioned.</p>
+          <div class="decide" data-id="focus"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+
+  <article class="entry glass rv" id="t-alert"><div class="entry-head"><h3>Alert Overlay</h3><span class="aka">aka: interrupt · annunciator · warning</span></div>
+    <p class="builder">builder · a full-screen red interrupt</p>
+    <div class="entry-body"><p>A red full-ring + warning mark that preempts everything. Question for you: if the only real failure is "BLE lost," the <strong>red telltale already covers it</strong> — does a separate alert layer earn its place, or is it more machinery to cut?</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>The interrupt overlay</h3><div class="alias">aka: annunciator</div><div class="where"><b>where</b> · board overlay.</div><span class="firm flag">maybe just the red telltale?</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="alert" data-theme="editorial"></canvas><div class="stage-label">live · red interrupt pulse</div></div>
+          <p class="logic">Possibly redundant with the red BLE light.</p>
+          <div class="decide" data-id="alert"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+</div></section>
+
+<!-- ===== CH 05 COLOUR ===== -->
+<section class="chapter" id="ch5"><div class="wrap">
+  <div class="ch-head rv"><span class="eyebrow">Chapter 05 — Colour <span class="spec-tag" style="margin-left:14px">the look, open for you to drive</span></span>
+  <h2>The skin — vibrant, none married</h2>
+  <p class="ch-lede">You said no theme is married and the dial must be <b>vibrant</b>. The same dial, restyled — variation lives only here, never in new layouts.</p></div>
+
+  <article class="entry glass rv" id="t-themes"><div class="entry-head"><h3>Theme Directions</h3><span class="aka">aka: skins · palettes · visual languages</span></div>
+    <p class="builder">builder · the whole dial, restyled — same grammar, different colour</p>
+    <div class="entry-body"><p>The same dial in different colour worlds. Six were explored across the space (austere → vibrant, dark → light). You mandated vibrant, so the loud end leads. None locked until you pick.</p></div>
+    <div class="lw"><div class="lw-h">On the dial · live specimen</div>
+      <article class="spec"><div class="s-info"><h3>One grammar, cycling skins</h3><div class="alias">aka: theme territories</div><div class="where"><b>where</b> · 6-way theme fan-out + 5 board themes.</div><span class="firm flag">none canonical — vibrant mandate</span></div>
+        <div class="s-demo"><div class="stage"><button class="replay" aria-label="Replay">&#8635;</button><canvas data-layer="themecycle" data-theme="editorial"></canvas><div class="stage-label">live · same dial, cycling themes</div></div>
+          <p class="logic">Pick a direction; I lock it as the reference.</p>
+          <div class="decide" data-id="themes"><span class="lab">your call</span><button class="keep">KEEP</button><button class="change">CHANGE</button><button class="cut">CUT</button></div></div></article></div></article>
+</div></section>
+</main>
+
+<footer class="fat"><div class="wrap"><div class="foot-base"><span>K718 · ELEMENT GUIDE · every layer isolated · your KEEP/CHANGE/CUT saves locally</span><span>built on the HALO grammar · <a href="live.html" style="color:var(--gold);text-decoration:none">Live Dial →</a></span></div></div></footer>
+
+<script>
+/* ============ animated isolated-layer specimens (one rAF loop, N canvases) ============ */
+const TH = {
+  editorial:{bg:"#0C0C10",ink:"#EDE9E3",sub:"#8A8784",glow:"#00AECF",c:["#00AECF","#E0338F","#EFA020","#28B76E","#E83A36"]},
+  zerog:{bg:"#0a0708",ink:"#fff4e8",sub:"#9a8a78",glow:"#FF8A1E",c:["#FF8A1E","#FFC74D","#FFE14D","#2D9CF5","#FF5C9C"]},
+  prism:{bg:"#05100e",ink:"#eafff8",sub:"#7a9a92",glow:"#2DE0C4",c:["#2DE0C4","#2DD4F5","#3FD0FF","#B6FF3D","#3FD96A"]},
+};
+const THKEYS=["editorial","zerog","prism"];
+const TAU=Math.PI*2, lerp=(a,b,t)=>a+(b-a)*t;
+const MODES=["TEMPO RIVER WALK","RIVER SURGE","DENSE FORGE","PULSE PRISM","SNAPWAVE","AURORA","COMET","BLOOM","WAVEFORM","EMBER"];
+
+function mk(canvas){
+  const SZ=300, R=150, dpr=2; canvas.width=SZ*dpr; canvas.height=SZ*dpr; canvas.style.width=SZ+"px"; canvas.style.height=SZ+"px";
+  const ctx=canvas.getContext("2d"); ctx.scale(dpr,dpr);
+  return {ctx,R,SZ,layer:canvas.dataset.layer,theme:canvas.dataset.theme||"editorial",
+    spec:new Array(26).fill(0),sv:new Array(26).fill(0),ring:0,vel:0,sel:0,confirm:0,ble:true,tcyc:0,seed:Math.random()*9};
+}
+function face(c,th){const {ctx,R}=c; ctx.clearRect(0,0,c.SZ,c.SZ);
+  const g=ctx.createRadialGradient(R,R,14,R,R,R); g.addColorStop(0,th.bg); g.addColorStop(1,"#020203");
+  ctx.fillStyle="#000"; ctx.beginPath(); ctx.arc(R,R,R,0,TAU); ctx.fill();
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(R,R,R-4,0,TAU); ctx.fill();
+  ctx.strokeStyle="#161b25"; ctx.lineWidth=5; ctx.beginPath(); ctx.arc(R,R,R-6,0,TAU); ctx.stroke();
+  ctx.strokeStyle=th.glow+"33"; ctx.lineWidth=1; ctx.beginPath(); ctx.arc(R,R,R-8,0,TAU); ctx.stroke();}
+function dot(ctx,x,y,r,col,blur){ctx.save();if(blur){ctx.shadowColor=col;ctx.shadowBlur=blur;}ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fillStyle=col;ctx.fill();ctx.restore();}
+function P(R,r,a){return [R+r*Math.cos(a),R+r*Math.sin(a)];}
+function ticks(c){const {ctx,R}=c; for(let i=0;i<60;i++){const a=-Math.PI/2+(TAU/60)*i,maj=i%5===0;const[x0,y0]=P(R,R-9,a),[x1,y1]=P(R,R-(maj?17:12),a);ctx.strokeStyle=maj?"#39414f":"#222936";ctx.lineWidth=maj?1.4:0.7;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();}}
+function dotRing(c,th,rad,N,sel,glow){const {ctx,R}=c; for(let i=0;i<N;i++){const a=-Math.PI/2+(TAU/N)*i+c.ring;const[x,y]=P(R,rad,a);if(i===sel){dot(ctx,x,y,4+(glow||0),th.glow,14);}else{const d=Math.abs(((a+Math.PI/2)+Math.PI)%TAU-Math.PI);const near=Math.max(0,1-d*1.5);ctx.globalAlpha=.4+near*.6;dot(ctx,x,y,2+near*1.4,near>.5?th.c[0]:"#2b3340");ctx.globalAlpha=1;}}}
+function arcText(c,str,r,centerA,size,col,flip){const {ctx,R}=c;ctx.save();ctx.fillStyle=col;ctx.font=`700 ${size}px 'Saira Condensed','Arial Narrow',sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";
+  const w=[...str].map(ch=>ctx.measureText(ch).width+size*0.06),tot=w.reduce((a,b)=>a+b,0),span=tot/r;let a=centerA-(flip?-span/2:span/2),dir=flip?-1:1;
+  for(let i=0;i<str.length;i++){const aw=w[i]/r;a+=dir*aw/2;const[x,y]=P(R,r,a);ctx.save();ctx.translate(x,y);ctx.rotate(a+(flip?-Math.PI/2:Math.PI/2));ctx.fillText(str[i],0,0);ctx.restore();a+=dir*aw/2;}ctx.restore();}
+function spectrum(c,th){const {ctx,R}=c;const n=c.spec.length,baseY=R+76,bw=4.2,gap=1.5,tot=n*(bw+gap)-gap;let sx=R-tot/2;
+  for(let i=0;i<n;i++){const h=5+c.spec[i]*52;ctx.fillStyle=th.c[i%th.c.length];ctx.globalAlpha=.92;rr(ctx,sx,baseY-h,bw,h,2);ctx.globalAlpha=.26;rr(ctx,sx,baseY,bw,h*.4,2);sx+=bw+gap;}ctx.globalAlpha=1;}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.fill();}
+function readout(c,th,val,unit,pulse){const {ctx,R}=c;ctx.save();ctx.translate(R,R-6);ctx.scale(1+pulse*.05,1+pulse*.05);ctx.fillStyle=th.ink;ctx.font="700 42px 'Saira Condensed','Arial Narrow',sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(val,0,0);ctx.restore();if(unit){ctx.fillStyle=th.sub;ctx.font="600 12px 'Inter',sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(unit,R,R+18);}}
+function ble(c,col,a){const {ctx,R}=c;ctx.save();ctx.translate(R,28);ctx.globalAlpha=a;ctx.strokeStyle=col;ctx.lineWidth=2.2;ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowColor=col;ctx.shadowBlur=9;ctx.beginPath();ctx.moveTo(0,-8);ctx.lineTo(5,-4);ctx.lineTo(-5,4);ctx.lineTo(0,8);ctx.lineTo(5,4);ctx.lineTo(-5,-4);ctx.lineTo(0,-8);ctx.lineTo(0,8);ctx.stroke();ctx.restore();}
+function arcGauge(c,r,a0,sweep,col){const {ctx,R}=c;ctx.save();ctx.strokeStyle=col;ctx.lineWidth=4;ctx.lineCap="round";ctx.shadowColor=col;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(R,R,r,a0,a0+sweep,sweep<0);ctx.stroke();ctx.restore();}
+
+const cells=[];
+document.querySelectorAll('canvas[data-layer]').forEach(cv=>cells.push(mk(cv)));
+let last=0;
+function tick(now){const t=now/1000,dt=Math.min(.05,(now-last)/1000||.016);last=now;
+  for(const c of cells){
+    let th=TH[c.theme];
+    if(c.layer==="themecycle"){c.tcyc+=dt; th=TH[THKEYS[Math.floor(c.tcyc/2.6)%THKEYS.length]];}
+    // shared sim
+    for(let i=0;i<c.spec.length;i++){const x=i/(c.spec.length-1),env=Math.pow(1-x*.5,1.4),a=.45+.55*Math.abs(Math.sin(t*3.1+x*9+c.seed)),b=.5+.5*Math.sin(t*8+i*1.7);c.sv[i]=lerp(c.sv[i],env*(.35+.65*a*b),.34);c.spec[i]=c.sv[i];}
+    const period=60/128,beat=Math.max(0,1-((t%period)/period)*4);
+    // auto-advance modes for ring layers
+    if(["encoder","dotring","needle","arctext","stateedge","themecycle","bands","face","ticks","bezel","safe","led","readout","paramarc"].includes(c.layer)){
+      if(c.confirm<.2 && Math.sin(t*0.8+c.seed)>0.9){ c.sel=(c.sel+1)%MODES.length; c.confirm=1; }
+    }
+    const tgt=-(TAU/MODES.length)*c.sel; let diff=tgt-c.ring; while(diff>Math.PI)diff-=TAU; while(diff<-Math.PI)diff+=TAU;
+    c.vel=lerp(c.vel,diff*9,.2); c.ring+=c.vel*dt; c.confirm=Math.max(0,c.confirm-dt*1.5);
+
+    face(c,th); const {ctx,R}=c;
+    const L=c.layer;
+    if(L==="safe"||L==="bands"){ctx.strokeStyle=th.glow;ctx.setLineDash([3,7]);ctx.lineWidth=1.4;ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(R,R,R-16,0,TAU);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+      [R-16,118,86,44].forEach(rr2=>{ctx.strokeStyle="#222936";ctx.lineWidth=1;ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(R,R,rr2,0,TAU);ctx.stroke();ctx.globalAlpha=1;});
+      if(L==="safe"){[[.5,.75,th.c[4]],[.25,.5,th.glow]].forEach(([s,e,col])=>{ctx.strokeStyle=col;ctx.lineWidth=6;ctx.globalAlpha=.16;ctx.beginPath();ctx.arc(R,R,R-22,Math.PI*s,Math.PI*e);ctx.stroke();ctx.globalAlpha=1;});}}
+    if(L==="ticks"||L==="bezel"||L==="needle"||L==="dotring"||L==="encoder"||L==="readout"||L==="paramarc"||L==="bands") ticks(c);
+    if(L==="arctext"||L==="themecycle"){arcText(c,MODES[c.sel],R-12,-Math.PI/2,15,th.ink,false);
+      arcText(c,MODES[(c.sel+1)%MODES.length],R-20,-Math.PI/2+.6,11,th.sub,false);
+      arcText(c,MODES[(c.sel-1+MODES.length)%MODES.length],R-20,-Math.PI/2-.6,11,th.sub,false);}
+    if(["dotring","encoder","themecycle","needle"].includes(L)) dotRing(c,th,R-44,MODES.length,c.sel,c.confirm*2);
+    if(L==="needle"){const a=-Math.PI/2+c.ring*0+(-(TAU/MODES.length)*0);const ang=-Math.PI/2;const[x,y]=P(R,R-58,ang);ctx.save();ctx.strokeStyle=th.glow;ctx.lineWidth=3;ctx.lineCap="round";ctx.shadowColor=th.glow;ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(R,R);ctx.lineTo(x,y);ctx.stroke();ctx.restore();dot(ctx,R,R,5,th.glow,0);}
+    if(L==="paramarc"){arcGauge(c,R-30,-Math.PI/2+.25,(.5+.18*Math.sin(t*.7))*Math.PI*.8,th.c[2]);arcGauge(c,R-30,-Math.PI/2-.25,-(.5+.22*Math.sin(t*.5+2))*Math.PI*.8,th.c[1]);}
+    if(L==="truthring"){const cols=[th.c[1],th.c[2],th.glow];const N=30;for(let i=0;i<N;i++){const a=-Math.PI/2+(TAU/N)*i+c.ring;const[x,y]=P(R,R-44,a);dot(ctx,x,y,3,cols[Math.floor(i/N*3)],10);}}
+    if(L==="focus"){ctx.save();ctx.strokeStyle=th.glow;ctx.lineWidth=2.4;ctx.globalAlpha=.85;ctx.shadowColor=th.glow;ctx.shadowBlur=10;ctx.beginPath();ctx.arc(R,R,R-28,0,TAU);ctx.stroke();ctx.restore();arcGauge(c,R-16,-Math.PI/2,(.4+.4*Math.sin(t*1.4))*TAU*.6,th.c[2]);}
+    if(L==="spectrum"||L==="readout"||L==="bands"||L==="paramarc"||L==="arctext"||L==="dotring"||L==="encoder"||L==="needle"||L==="themecycle"||L==="focus"||L==="truthring"||L==="stateedge"||L==="telltale") if(L!=="bands"&&L!=="safe"&&L!=="ticks"&&L!=="bezel"&&L!=="face"&&L!=="led") {}
+    if(["spectrum","themecycle","paramarc","readout","arctext","dotring","stateedge","telltale","focus","truthring","needle"].includes(L) && L!=="readout") spectrum(c,th);
+    if(["readout","spectrum","themecycle","paramarc","arctext","dotring","needle","stateedge","telltale","focus","truthring","encoder"].includes(L)) readout(c,th,"128","BPM",beat);
+    if(L==="stateedge"||L==="themecycle"){arcText(c,"MODE "+(c.sel+1)+" / "+MODES.length,R-92,Math.PI/2,11,th.sub,true);}
+    if(L==="telltale"){ble(c,c.ble?"#36C46A":"#FF4D4D", c.ble?(.7+.3*Math.sin(t*3)):1); if(Math.sin(t*0.5+c.seed)<-0.6)c.ble=false;else c.ble=true;}
+    else { ble(c,"#36C46A",.7+.3*Math.sin(t*3)); }
+    if(L==="alert"){ctx.save();ctx.globalAlpha=.6+.4*Math.sin(t*4);ctx.strokeStyle="#FF4D4D";ctx.lineWidth=3;ctx.shadowColor="#FF4D4D";ctx.shadowBlur=18;ctx.beginPath();ctx.arc(R,R,R-8,0,TAU);ctx.stroke();ctx.beginPath();ctx.moveTo(R,R+30);ctx.lineTo(R+12,R+50);ctx.lineTo(R-12,R+50);ctx.closePath();ctx.stroke();ctx.restore();ctx.fillStyle="#FF4D4D";ctx.font="700 18px 'Inter'";ctx.textAlign="center";ctx.fillText("!",R,R+48);readout(c,th,"128","BPM",beat);}
+    // LED ring outside (hardware specimens)
+    if(L==="led"){const col=c.confirm>.05?"#36C46A":th.c[0];for(let i=0;i<13;i++){const a=-Math.PI/2+(TAU/13)*i,[x,y]=P(R,R-12,a),fl=.2+.14*Math.sin(t*1.5+i);ctx.save();ctx.globalAlpha=.3+fl;ctx.shadowColor="#36C46A";ctx.shadowBlur=10;dot(ctx,x,y,3,"#36C46A",0);ctx.restore();}ctx.fillStyle=th.sub;ctx.font="600 12px 'Inter'";ctx.textAlign="center";ctx.fillText("LED RING",R,R);}
+    if(L==="encoder"){ctx.fillStyle=th.sub;ctx.font="600 11px 'Inter'";ctx.textAlign="center";ctx.fillText("↻ ROTATE",R,R+56);}
+    // confirm bloom
+    if(c.confirm>0 && !["alert","led","safe","bands","ticks","bezel","face"].includes(L)){ctx.save();ctx.globalAlpha=c.confirm*.5;ctx.strokeStyle=th.glow;ctx.lineWidth=2+c.confirm*3;ctx.shadowColor=th.glow;ctx.shadowBlur=18;ctx.beginPath();ctx.arc(R,R,R-30+(1-c.confirm)*22,0,TAU);ctx.stroke();ctx.restore();}
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* decisions + per-layer CHANGE notes persist */
+function load(k){try{return JSON.parse(localStorage.getItem(k)||'{}')}catch(e){return{}}}
+function save(k,o){localStorage.setItem(k,JSON.stringify(o));}
+const D=load('k718-decisions'), NOTES=load('k718-notes');
+document.querySelectorAll('.decide').forEach(d=>{
+  const id=d.dataset.id;
+  // CHANGE comment box (appears only when CHANGE is selected)
+  const cw=document.createElement('div'); cw.style.cssText="margin-top:10px;display:none";
+  cw.innerHTML='<label style="font:10px var(--mono);letter-spacing:.14em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:5px">↳ What should change?</label><textarea placeholder="Type the change you want for this layer… (saved as you type)" style="width:100%;min-height:62px;background:rgba(4,4,4,.6);border:1px solid var(--gold-b);border-radius:9px;padding:10px 12px;color:var(--ink-1);font:13px/1.5 var(--sans);resize:vertical"></textarea>';
+  d.parentNode.insertBefore(cw, d.nextSibling);
+  const ta=cw.querySelector('textarea');
+  ta.value=NOTES[id]||'';
+  ta.addEventListener('input',()=>{ NOTES[id]=ta.value; save('k718-notes',NOTES); });
+  function setSel(v){ d.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x.classList.contains(v))); cw.style.display = (v==='change') ? 'block' : 'none'; }
+  d.querySelectorAll('button').forEach(b=>{
+    const v=b.classList.contains('keep')?'keep':b.classList.contains('cut')?'cut':'change';
+    b.addEventListener('click',()=>{ D[id]=v; save('k718-decisions',D); setSel(v); if(v==='change')ta.focus(); if(window.refreshBtn)window.refreshBtn(); });
+  });
+  if(D[id]) setSel(D[id]);
+});
+/* reveal + progress + nav active */
+const ioE=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('active');}),{threshold:.12,rootMargin:'0px 0px -4% 0px'});
+const ioX=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)e.target.classList.remove('active');}),{threshold:0,rootMargin:'25% 0px 25% 0px'});
+document.querySelectorAll('.rv').forEach(el=>{ioE.observe(el);ioX.observe(el);});
+const bar=document.getElementById('progressBar'),links=[...document.querySelectorAll('nav.chapters a')];
+addEventListener('scroll',()=>{const h=document.documentElement,max=h.scrollHeight-h.clientHeight;if(bar)bar.style.transform='scaleX('+(max>0?h.scrollTop/max:0)+')';let cur=null;links.forEach(a=>{const s=document.querySelector(a.getAttribute('href'));if(s&&s.getBoundingClientRect().top<innerHeight*.4)cur=a;});links.forEach(a=>a.classList.toggle('active',a===cur));},{passive:true});
+document.querySelectorAll('.replay').forEach(b=>b.addEventListener('click',()=>{const cv=b.closest('.stage').querySelector('canvas');const cell=cells.find(c=>c.ctx.canvas===cv);if(cell){cell.confirm=1;cell.seed=Math.random()*9;}}));
+
+/* ============ EXPORT — get your KEEP/CHANGE/CUT picks out to the Captain ============ */
+const LABELS={canvas:"Display Canvas",safe:"Safe Area & Keep-out",led:"13-LED Ring",encoder:"The Encoder",bezel:"Bezel",bands:"Radius Bands",ticks:"Graduation Marks",arctext:"Curved Mode Labels",readout:"Readout",dotring:"Dot-Ring",needle:"Needle / Pointer",spectrum:"Signal Viz",paramarc:"Parameter Arcs",stateedge:"State-Edge Label",telltale:"BLE Telltale",truthring:"Truth Ring",focus:"Focus / Active / Confirm rings",alert:"Alert Overlay",themes:"Theme Directions"};
+function buildSummary(){
+  const Dx=load('k718-decisions'), Nx=load('k718-notes');
+  const g={keep:[],change:[],cut:[],unset:[]};
+  Object.keys(LABELS).forEach(id=>{
+    const v=Dx[id];
+    if(v==='change'){ g.change.push(LABELS[id]+' — "'+(((Nx[id]||'').trim())||'(no note)')+'"'); }
+    else if(v&&g[v]){ g[v].push(LABELS[id]); }
+    else g.unset.push(LABELS[id]);
+  });
+  const d=new Date().toISOString().slice(0,10);
+  const txt="K718 ELEMENT DECISIONS — "+d+"\n\n"+
+    "KEEP ("+g.keep.length+"): "+(g.keep.join(", ")||"—")+"\n\n"+
+    "CHANGE ("+g.change.length+"):"+(g.change.length?"\n  • "+g.change.join("\n  • "):" —")+"\n\n"+
+    "CUT ("+g.cut.length+"): "+(g.cut.join(", ")||"—")+"\n\n"+
+    "UNSET ("+g.unset.length+"): "+(g.unset.join(", ")||"—")+"\n\n"+
+    "raw: "+JSON.stringify({decisions:Dx,notes:Nx});
+  return {txt,g,payload:{decisions:Dx,notes:Nx}};
+}
+const exBtn=document.createElement('button');
+exBtn.id='exportBtn';
+exBtn.style.cssText="position:fixed;right:22px;bottom:22px;z-index:120;font:700 12px var(--mono);letter-spacing:.08em;color:#060606;background:var(--gold);border:none;border-radius:999px;padding:13px 20px;cursor:pointer;box-shadow:0 0 24px rgba(255,184,77,.35),0 12px 28px rgba(0,0,0,.5)";
+function refreshBtn(){const {g}=buildSummary();const n=g.keep.length+g.change.length+g.cut.length;exBtn.textContent="⬇ EXPORT DECISIONS ("+n+"/"+Object.keys(LABELS).length+")";}
+window.refreshBtn=refreshBtn;
+refreshBtn(); document.addEventListener('click',e=>{if(e.target.closest('.decide'))setTimeout(refreshBtn,0);});
+document.body.appendChild(exBtn);
+
+const ov=document.createElement('div');
+ov.style.cssText="position:fixed;inset:0;z-index:130;background:rgba(2,2,3,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:24px";
+ov.innerHTML='<div class="glass" style="max-width:620px;width:100%;padding:28px 30px"><div style="display:flex;align-items:baseline;gap:14px;margin-bottom:6px"><h3 style="font-size:22px;font-weight:700;color:var(--ink-1)">Your K718 decisions</h3><span class="spec-tag" id="exTally"></span></div><p style="color:var(--ink-2);font-size:14px;margin-bottom:14px">Copy this and paste it to me in chat — or download the file and I’ll read it.</p><textarea id="exText" readonly style="width:100%;height:230px;background:rgba(4,4,4,.7);border:1px solid var(--line);border-radius:10px;padding:14px;color:var(--ink-2);font:12px/1.5 var(--mono);resize:vertical"></textarea><div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap"><button id="exCopy" style="font:700 12px var(--mono);letter-spacing:.08em;color:#060606;background:var(--gold);border:none;border-radius:9px;padding:11px 18px;cursor:pointer">COPY TO CLIPBOARD</button><button id="exDl" style="font:700 12px var(--mono);letter-spacing:.08em;color:var(--gold);background:transparent;border:1px solid var(--gold-b);border-radius:9px;padding:11px 18px;cursor:pointer">DOWNLOAD .JSON</button><button id="exClose" style="font:700 12px var(--mono);letter-spacing:.08em;color:var(--ink-3);background:transparent;border:1px solid var(--line);border-radius:9px;padding:11px 18px;cursor:pointer;margin-left:auto">CLOSE</button></div></div>';
+document.body.appendChild(ov);
+const exText=ov.querySelector('#exText'), exTally=ov.querySelector('#exTally');
+function openOv(){const {txt,g,payload}=buildSummary();exText.value=txt;exTally.textContent=g.keep.length+" keep · "+g.change.length+" change · "+g.cut.length+" cut";ov.style.display='flex';exText.focus();exText.select();window._k718dl=payload;}
+exBtn.addEventListener('click',openOv);
+ov.addEventListener('click',e=>{if(e.target===ov)ov.style.display='none';});
+ov.querySelector('#exClose').addEventListener('click',()=>ov.style.display='none');
+ov.querySelector('#exCopy').addEventListener('click',async()=>{const b=ov.querySelector('#exCopy');try{await navigator.clipboard.writeText(exText.value);}catch(e){exText.select();document.execCommand('copy');}b.textContent='COPIED ✓';setTimeout(()=>b.textContent='COPY TO CLIPBOARD',1600);});
+ov.querySelector('#exDl').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(window._k718dl,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='k718-decisions.json';a.click();});
+</script>
+</body>
+</html>

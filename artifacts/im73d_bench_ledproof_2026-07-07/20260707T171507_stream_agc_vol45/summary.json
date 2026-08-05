@@ -1,0 +1,104 @@
+{
+  "created_at": "20260707T171545",
+  "devices": {
+    "bench_im73d": {
+      "agc_samples": 49,
+      "all_gain_max_lt_10": true,
+      "build_lines": [
+        "BUILD: version=40103 git=f2f7c45 epoch=1783357888 env=k1_bench_im73d"
+      ],
+      "front_end_lines": [
+        "CHIP ID: B489A500",
+        "CONFIG.SENSITIVITY: 0.870005",
+        "AUDIO_RESPONSE_GAIN: 1.000000",
+        "CAL_SOURCE: persisted_profile",
+        "CAL_VALID: 1",
+        "CAL_PROFILE_LOADED: 1"
+      ],
+      "gain_by_band": [
+        {
+          "count": 49,
+          "max": 1.49,
+          "min": 0.07,
+          "p50": 0.08,
+          "p90": 1.07
+        },
+        {
+          "count": 49,
+          "max": 1.72,
+          "min": 0.07,
+          "p50": 0.08,
+          "p90": 1.1
+        },
+        {
+          "count": 49,
+          "max": 1.99,
+          "min": 0.08,
+          "p50": 0.09,
+          "p90": 1.55
+        },
+        {
+          "count": 49,
+          "max": 1.57,
+          "min": 0.08,
+          "p50": 0.09,
+          "p90": 1.37
+        }
+      ],
+      "log": "artifacts/im73d_bench_ledproof_2026-07-07/20260707T171507_stream_agc_vol45/bench_im73d.log",
+      "port": "/dev/cu.usbmodem1401"
+    },
+    "main_sph": {
+      "agc_samples": 73,
+      "all_gain_max_lt_10": true,
+      "build_lines": [],
+      "front_end_lines": [
+        "CHIP ID: F887A500",
+        "CONFIG.SENSITIVITY: 2.400000",
+        "AUDIO_RESPONSE_GAIN: 1.000000",
+        "CAL_SOURCE: config",
+        "CAL_VALID: 1",
+        "CAL_PROFILE_LOADED: 0"
+      ],
+      "gain_by_band": [
+        {
+          "count": 73,
+          "max": 0.85,
+          "min": 0.07,
+          "p50": 0.08,
+          "p90": 0.21
+        },
+        {
+          "count": 73,
+          "max": 1.36,
+          "min": 0.07,
+          "p50": 0.09,
+          "p90": 0.36
+        },
+        {
+          "count": 73,
+          "max": 1.36,
+          "min": 0.07,
+          "p50": 0.08,
+          "p90": 0.13
+        },
+        {
+          "count": 73,
+          "max": 1.03,
+          "min": 0.07,
+          "p50": 0.09,
+          "p90": 0.27
+        }
+      ],
+      "log": "artifacts/im73d_bench_ledproof_2026-07-07/20260707T171507_stream_agc_vol45/main_sph.log",
+      "port": "/dev/cu.usbmodem12401"
+    }
+  },
+  "duration_sec": 20,
+  "ports": {
+    "bench_im73d": "/dev/cu.usbmodem1401",
+    "main_sph": "/dev/cu.usbmodem12401"
+  },
+  "stimulus": "artifacts/im73d_bench_ledproof_2026-07-07/20260707T170922_restored_bench_full_music/stimulus_35s_30s.wav",
+  "volume": 45
+}

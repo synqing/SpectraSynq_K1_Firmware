@@ -1,0 +1,1274 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2025-2026 SpectraSynq
+//
+// K718 Remoted live dashboard — LVGL/ESP32-S3 translation of live.html.
+//
+// Design constraints deliberately preserved:
+//   • 360x360 round ST77916 panel = live.html 480 canvas scaled by 0.75
+//   • function menu: swipe up, encoder moves rows, tap selects
+//   • encoder adjusts the selected function when menu is closed
+//   • six selectable centre visual fields, palette-tinted and beat-reactive
+//   • PRI/SEC per-channel state for MODE/PALETTE/PHOTONS/CHROMA/MOOD/SAT/MIRROR
+//   • BLE-MIDI emission for controls that have a real K1BleMidiMap entry
+//
+// What this is NOT:
+//   It is not a browser-canvas emulator. It is a small RGB565 procedural renderer
+//   with LVGL labels over the top, designed to survive ESP32-S3 bandwidth limits.
+#include "remoted_dashboard.h"
+
+#include <Arduino.h>
+#include <math.h>
+#include <stdio.h>
+#include <string.h>
+#include "esp_heap_caps.h"
+
+#include "K1BleMidiMap.h"
+#include "remoted_control.h"
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Geometry: live.html 480x480 → K718 360x360, scale = 0.75
+// ─────────────────────────────────────────────────────────────────────────────
+static const int   SC = 360;
+static const int   CX = 180;
+static const int   CY = 180;
+static const float RAD_SCREEN = 180.0f;
+static const float R_BORDER   = 175.0f;  // ~233 * .75
+static const float R_SWEEP    = 166.5f;  // 222 * .75
+static const float R_DOTS     = 126.0f;  // 168 * .75
+static const float R_VALUE    = 112.5f;  // 150 * .75
+static const float R_PAL      = 121.5f;  // 162 * .75
+static const float R_KEEL     = 148.5f;  // 198 * .75
+static const float R_LED      = 177.0f;  // 236 * .75
+static const float FR         =  92.0f;  // 122 * .75
+static const float R_SCRIM    =  48.0f;  // 64 * .75
+static const float DEG        = 0.01745329251994329577f;
+static const float TAU        = 6.2831853071795864769f;
+static const int   NOTCH_DEG  = 18;
+static const uint32_t FRAME_MS = 42;     // ~24 FPS; lower to 50/66 if the panel stutters.
+static const int BPM = 128;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// live.html data model
+// ─────────────────────────────────────────────────────────────────────────────
+static const char* const MODES[] = {
+  "TEMPO RIVER WALK", "RIVER SURGE", "DENSE FORGE", "PULSE PRISM", "SNAPWAVE",
+  "CHROMA CONST.", "PERCUSSION", "TEMPO COMET", "TEMPO RIVER", "EMBER",
+  "SPECTRUM RIVER", "COMET", "AURORA", "WAVEFORM", "BLOOM"
+};
+static const int N_MODES = (int)(sizeof(MODES) / sizeof(MODES[0]));
+
+static const char* const VISUALS[] = {
+  "NEBULA", "AURORA FLOW", "LIQUID CORE", "CONSTELLATION", "SOFT SKYLINE", "PULSE SONAR"
+};
+static const int N_VISUALS = (int)(sizeof(VISUALS) / sizeof(VISUALS[0]));
+
+static const char* const PRESETS[] = {
+  "01", "02", "03", "04", "05", "06", "07", "08", "09", "10"
+};
+static const int N_PRESETS = (int)(sizeof(PRESETS) / sizeof(PRESETS[0]));
+
+struct PaletteDef {
+  const char* name;
+  uint8_t count;
+  uint32_t rgb[5];
+};
+
+static const PaletteDef PALS[] = {
+  { "INFERNO",   4, {0x2a0010, 0xff2d55, 0xff8a1e, 0xffe14d, 0x000000} },
+  { "AURORA",    4, {0x00263a, 0x2DE0C4, 0x3FD96A, 0xB6FF3D, 0x000000} },
+  { "SYNTHWAVE", 4, {0x1a0040, 0x7C5CFF, 0xE0338F, 0x00AECF, 0x000000} },
+  { "EMBER",     4, {0x200800, 0xff5c1e, 0xffb020, 0xffe6a0, 0x000000} },
+  { "OCEAN",     4, {0x001a2e, 0x0080ff, 0x2DD4F5, 0xaef0ff, 0x000000} },
+  { "PRISM",     5, {0xff2d55, 0xff8a1e, 0x3FD96A, 0x00AECF, 0x7C5CFF} },
+  { "GOLD",      3, {0x1a1200, 0xFFB84D, 0xfff0c0, 0x000000, 0x000000} },
+  { "ICE",       4, {0x00121f, 0x3FD0FF, 0xbfeaff, 0xffffff, 0x000000} },
+};
+static const int N_PALS = (int)(sizeof(PALS) / sizeof(PALS[0]));
+
+enum FuncIndex : uint8_t {
+  FN_MODE = 0,
+  FN_PALETTE,
+  FN_PHOTONS,
+  FN_CHROMA,
+  FN_MOOD,
+  FN_SATURATION,
+  FN_BRIGHTNESS,
+  FN_SENSITIVITY,
+  FN_EDGE_LIGHTING,
+  FN_MIRROR,
+  FN_VISUAL_FIELD,
+  FN_PRESET,
+  FN_SETTINGS,
+  FN_COUNT
+};
+
+enum FuncType : uint8_t {
+  FT_ENUM = 0,
+  FT_PAL,
+  FT_VAL,
+  FT_TOG,
+  FT_SET
+};
+
+struct FunctionDef {
+  const char* name;
+  FuncType type;
+  bool per_channel;
+  const char* const* enum_values;
+  uint8_t enum_count;
+};
+
+static const FunctionDef FUNCS[FN_COUNT] = {
+  { "MODE",          FT_ENUM, true,  MODES,   (uint8_t)N_MODES   },
+  { "PALETTE",       FT_PAL,  true,  nullptr, 0                  },
+  { "PHOTONS",       FT_VAL,  true,  nullptr, 0                  },
+  { "CHROMA",        FT_VAL,  true,  nullptr, 0                  },
+  { "MOOD",          FT_VAL,  true,  nullptr, 0                  },
+  { "SATURATION",    FT_VAL,  true,  nullptr, 0                  },
+  { "BRIGHTNESS",    FT_VAL,  false, nullptr, 0                  },
+  { "SENSITIVITY",   FT_VAL,  false, nullptr, 0                  },
+  { "EDGE LIGHTING", FT_TOG,  false, nullptr, 0                  },
+  { "MIRROR",        FT_TOG,  true,  nullptr, 0                  },
+  { "VISUAL FIELD",  FT_ENUM, false, VISUALS, (uint8_t)N_VISUALS },
+  { "PRESET",        FT_ENUM, false, PRESETS, (uint8_t)N_PRESETS },
+  { "SETTINGS",      FT_SET,  false, nullptr, 0                  },
+};
+
+struct ChannelState {
+  int mode;
+  int palette;
+  int photons;
+  int chroma;
+  int mood;
+  int saturation;
+  bool mirror;
+};
+
+struct DashState {
+  ChannelState ch[2];
+  int channel;
+  int func;
+  int brightness;
+  int sensitivity;
+  bool edge_lighting;
+  int visual_field;
+  int preset;
+  bool menu;
+  bool ble;
+  bool force_redraw;
+  bool labels_dirty;
+  float confirm;
+  int16_t down_x, down_y;
+  bool touching;
+  uint32_t last_frame_ms;
+  uint32_t last_label_ms;
+  char value_label[40];
+  char status_text[96];
+};
+
+static DashState s = {
+  // Primary defaults copied from live.html
+  { {0, 2, 74, 60, 48, 88, false},
+    {7, 4, 40, 70, 80, 55, true} },
+  0,              // channel: primary
+  FN_MODE,
+  80,             // brightness
+  65,             // sensitivity
+  true,           // edge lighting
+  1,              // AURORA FLOW
+  2,              // preset 03
+  false,          // menu
+  false,          // ble
+  true,           // force_redraw
+  true,           // labels_dirty
+  0.0f,           // confirm bloom
+  0, 0, false,
+  0, 0,
+  "", ""
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LVGL objects + RGB565 buffers
+// ─────────────────────────────────────────────────────────────────────────────
+static lv_color_t* s_canvas_buf = nullptr;   // live frame buffer, PSRAM
+static lv_color_t* s_static_buf = nullptr;   // cached static face, PSRAM
+static lv_obj_t* s_canvas = nullptr;
+
+static lv_obj_t* s_center1 = nullptr;
+static lv_obj_t* s_center2 = nullptr;
+static lv_obj_t* s_unit    = nullptr;
+static lv_obj_t* s_keel    = nullptr;
+static lv_obj_t* s_pri     = nullptr;
+static lv_obj_t* s_sec     = nullptr;
+static lv_obj_t* s_global  = nullptr;
+static lv_obj_t* s_link    = nullptr;
+static lv_obj_t* s_hint    = nullptr;
+
+static lv_obj_t* s_menu_title = nullptr;
+static lv_obj_t* s_menu_rows[9] = {nullptr};
+static lv_obj_t* s_menu_hint = nullptr;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Small utilities
+// ─────────────────────────────────────────────────────────────────────────────
+static inline int clampi(int v, int lo, int hi) {
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
+
+static inline float clampf(float v, float lo, float hi) {
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
+
+static inline int wrapi(int v, int n) {
+  if (n <= 0) return 0;
+  while (v < 0) v += n;
+  while (v >= n) v -= n;
+  return v;
+}
+
+static inline float rad_from_deg(float deg) {
+  return (deg - 90.0f) * DEG;
+}
+
+static inline uint16_t rgb565(uint8_t r, uint8_t g, uint8_t b) {
+  return lv_color_make(r, g, b).full;
+}
+
+static inline uint16_t rgb565_hex(uint32_t x) {
+  return rgb565((uint8_t)((x >> 16) & 0xff), (uint8_t)((x >> 8) & 0xff), (uint8_t)(x & 0xff));
+}
+
+static inline void set_px(uint16_t* b, int x, int y, uint16_t c) {
+  if ((unsigned)x < (unsigned)SC && (unsigned)y < (unsigned)SC) {
+    b[y * SC + x] = c;
+  }
+}
+
+static inline void blend_add_px(uint16_t* b, int x, int y, uint16_t c, uint8_t a) {
+  if ((unsigned)x >= (unsigned)SC || (unsigned)y >= (unsigned)SC || a == 0) return;
+  uint16_t* p = &b[y * SC + x];
+  uint16_t base = *p;
+
+  int br = (base >> 11) & 0x1f;
+  int bg = (base >> 5)  & 0x3f;
+  int bb = base & 0x1f;
+  int cr = (c >> 11) & 0x1f;
+  int cg = (c >> 5)  & 0x3f;
+  int cb = c & 0x1f;
+
+  br += (cr * a) >> 8;
+  bg += (cg * a) >> 8;
+  bb += (cb * a) >> 8;
+  if (br > 31) br = 31;
+  if (bg > 63) bg = 63;
+  if (bb > 31) bb = 31;
+  *p = (uint16_t)((br << 11) | (bg << 5) | bb);
+}
+
+static inline void darken_px(uint16_t* b, int x, int y, uint8_t keep) {
+  if ((unsigned)x >= (unsigned)SC || (unsigned)y >= (unsigned)SC) return;
+  uint16_t* p = &b[y * SC + x];
+  uint16_t base = *p;
+  int br = (base >> 11) & 0x1f;
+  int bg = (base >> 5)  & 0x3f;
+  int bb = base & 0x1f;
+  br = (br * keep) >> 8;
+  bg = (bg * keep) >> 8;
+  bb = (bb * keep) >> 8;
+  *p = (uint16_t)((br << 11) | (bg << 5) | bb);
+}
+
+static void fill_circle(uint16_t* b, float cx, float cy, float r, uint16_t c) {
+  int x0 = (int)floorf(cx - r), x1 = (int)ceilf(cx + r);
+  int y0 = (int)floorf(cy - r), y1 = (int)ceilf(cy + r);
+  float rr = r * r;
+  for (int y = y0; y <= y1; ++y) {
+    for (int x = x0; x <= x1; ++x) {
+      float dx = x - cx, dy = y - cy;
+      if (dx * dx + dy * dy <= rr) set_px(b, x, y, c);
+    }
+  }
+}
+
+static void add_soft_circle(uint16_t* b, float cx, float cy, float r, uint16_t c, uint8_t alpha) {
+  int x0 = (int)floorf(cx - r), x1 = (int)ceilf(cx + r);
+  int y0 = (int)floorf(cy - r), y1 = (int)ceilf(cy + r);
+  float inv = 1.0f / (r * r);
+  for (int y = y0; y <= y1; ++y) {
+    for (int x = x0; x <= x1; ++x) {
+      float dx = x - cx, dy = y - cy;
+      float q = (dx * dx + dy * dy) * inv;
+      if (q < 1.0f) {
+        float f = (1.0f - q);
+        f *= f;
+        blend_add_px(b, x, y, c, (uint8_t)clampi((int)(alpha * f), 0, 255));
+      }
+    }
+  }
+}
+
+static void darken_soft_circle(uint16_t* b, float cx, float cy, float r, uint8_t center_keep, uint8_t edge_keep) {
+  int x0 = (int)floorf(cx - r), x1 = (int)ceilf(cx + r);
+  int y0 = (int)floorf(cy - r), y1 = (int)ceilf(cy + r);
+  float inv = 1.0f / r;
+  for (int y = y0; y <= y1; ++y) {
+    for (int x = x0; x <= x1; ++x) {
+      float dx = x - cx, dy = y - cy;
+      float d = sqrtf(dx * dx + dy * dy);
+      if (d <= r) {
+        float q = clampf(d * inv, 0.0f, 1.0f);
+        uint8_t keep = (uint8_t)(center_keep + (edge_keep - center_keep) * q);
+        darken_px(b, x, y, keep);
+      }
+    }
+  }
+}
+
+static void draw_line(uint16_t* b, float x0, float y0, float x1, float y1, uint16_t c, uint8_t alpha) {
+  float dx = x1 - x0, dy = y1 - y0;
+  int steps = (int)ceilf(fmaxf(fabsf(dx), fabsf(dy)));
+  if (steps <= 0) {
+    blend_add_px(b, (int)x0, (int)y0, c, alpha);
+    return;
+  }
+  for (int i = 0; i <= steps; ++i) {
+    float t = (float)i / (float)steps;
+    int x = (int)(x0 + dx * t + 0.5f);
+    int y = (int)(y0 + dy * t + 0.5f);
+    blend_add_px(b, x, y, c, alpha);
+    if (alpha > 100) {
+      blend_add_px(b, x + 1, y, c, alpha / 3);
+      blend_add_px(b, x - 1, y, c, alpha / 3);
+      blend_add_px(b, x, y + 1, c, alpha / 3);
+      blend_add_px(b, x, y - 1, c, alpha / 3);
+    }
+  }
+}
+
+static void draw_arc_add(uint16_t* b, float r, float deg0, float deg1, float width, uint16_t c, uint8_t alpha) {
+  if (deg1 < deg0) {
+    float tmp = deg0; deg0 = deg1; deg1 = tmp;
+  }
+  float step = fmaxf(0.45f, (0.55f / r) * 57.2958f);
+  for (float a = deg0; a <= deg1; a += step) {
+    float t = rad_from_deg(a);
+    float ca = cosf(t), sa = sinf(t);
+    for (float rr = r - width * 0.5f; rr <= r + width * 0.5f; rr += 1.0f) {
+      blend_add_px(b, (int)(CX + rr * ca + 0.5f), (int)(CY + rr * sa + 0.5f), c, alpha);
+    }
+  }
+}
+
+
+static void draw_circle_outline_add(uint16_t* b, float cx, float cy, float r, float width, uint16_t c, uint8_t alpha) {
+  float step = fmaxf(0.45f, (0.55f / r) * 57.2958f);
+  for (float a = 0.0f; a <= 360.0f; a += step) {
+    float t = a * DEG;
+    float ca = cosf(t), sa = sinf(t);
+    for (float rr = r - width * 0.5f; rr <= r + width * 0.5f; rr += 1.0f) {
+      blend_add_px(b, (int)(cx + rr * ca + 0.5f), (int)(cy + rr * sa + 0.5f), c, alpha);
+    }
+  }
+}
+
+static void draw_arc_set(uint16_t* b, float r, float deg0, float deg1, float width, uint16_t c) {
+  if (deg1 < deg0) {
+    float tmp = deg0; deg0 = deg1; deg1 = tmp;
+  }
+  float step = fmaxf(0.45f, (0.55f / r) * 57.2958f);
+  for (float a = deg0; a <= deg1; a += step) {
+    float t = rad_from_deg(a);
+    float ca = cosf(t), sa = sinf(t);
+    for (float rr = r - width * 0.5f; rr <= r + width * 0.5f; rr += 1.0f) {
+      set_px(b, (int)(CX + rr * ca + 0.5f), (int)(CY + rr * sa + 0.5f), c);
+    }
+  }
+}
+
+static uint16_t pal_color565(const PaletteDef& p, int i) {
+  int idx = i;
+  if (p.count > 1 && idx == 0 && p.count > 3) idx = 1;  // skip dark base for effects
+  if (idx < 0) idx = 0;
+  if (idx >= p.count) idx = p.count - 1;
+  return rgb565_hex(p.rgb[idx]);
+}
+
+static int current_palette_index(void) {
+  return clampi(s.ch[s.channel].palette, 0, N_PALS - 1);
+}
+
+static const PaletteDef& current_palette(void) {
+  return PALS[current_palette_index()];
+}
+
+static bool current_is_per_channel(void) {
+  return FUNCS[s.func].per_channel;
+}
+
+static int enum_count_for_func(int fn) {
+  if (fn < 0 || fn >= FN_COUNT) return 0;
+  if (FUNCS[fn].type == FT_PAL) return N_PALS;
+  return FUNCS[fn].enum_count;
+}
+
+static int get_current_raw_value(void) {
+  ChannelState& ch = s.ch[s.channel];
+  switch (s.func) {
+    case FN_MODE:          return ch.mode;
+    case FN_PALETTE:       return ch.palette;
+    case FN_PHOTONS:       return ch.photons;
+    case FN_CHROMA:        return ch.chroma;
+    case FN_MOOD:          return ch.mood;
+    case FN_SATURATION:    return ch.saturation;
+    case FN_BRIGHTNESS:    return s.brightness;
+    case FN_SENSITIVITY:   return s.sensitivity;
+    case FN_EDGE_LIGHTING: return s.edge_lighting ? 1 : 0;
+    case FN_MIRROR:        return ch.mirror ? 1 : 0;
+    case FN_VISUAL_FIELD:  return s.visual_field;
+    case FN_PRESET:        return s.preset;
+    default:               return 0;
+  }
+}
+
+static void set_current_raw_value(int v) {
+  ChannelState& ch = s.ch[s.channel];
+  switch (s.func) {
+    case FN_MODE:          ch.mode = wrapi(v, N_MODES); break;
+    case FN_PALETTE:       ch.palette = wrapi(v, N_PALS); break;
+    case FN_PHOTONS:       ch.photons = clampi(v, 0, 100); break;
+    case FN_CHROMA:        ch.chroma = clampi(v, 0, 100); break;
+    case FN_MOOD:          ch.mood = clampi(v, 0, 100); break;
+    case FN_SATURATION:    ch.saturation = clampi(v, 0, 100); break;
+    case FN_BRIGHTNESS:    s.brightness = clampi(v, 0, 100); break;
+    case FN_SENSITIVITY:   s.sensitivity = clampi(v, 0, 100); break;
+    case FN_EDGE_LIGHTING: s.edge_lighting = (v != 0); break;
+    case FN_MIRROR:        ch.mirror = (v != 0); break;
+    case FN_VISUAL_FIELD:  s.visual_field = wrapi(v, N_VISUALS); break;
+    case FN_PRESET:        s.preset = wrapi(v, N_PRESETS); break;
+    default: break;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// BLE-MIDI bridge for live.html subset
+// ─────────────────────────────────────────────────────────────────────────────
+static int midi_index_for_current(void) {
+  const int ch = s.channel;
+  switch (s.func) {
+    case FN_MODE:          return ch == 0 ? 0  : 19; // primary.mode / secondary.mode
+    case FN_PALETTE:       return ch == 0 ? 1  : 20; // primary.palette / secondary.palette
+    case FN_PHOTONS:       return ch == 0 ? 3  : 23;
+    case FN_CHROMA:        return ch == 0 ? 4  : 24;
+    case FN_MOOD:          return ch == 0 ? 5  : 25;
+    case FN_SATURATION:    return ch == 0 ? 6  : 26;
+    case FN_BRIGHTNESS:    return 39;              // global.master_brightness
+    case FN_SENSITIVITY:   return 34;              // global.sensitivity
+    case FN_EDGE_LIGHTING: return 45;              // edge.enabled
+    case FN_MIRROR:        return ch == 0 ? 8  : 27;
+    case FN_PRESET:        return 18;              // primary.preset, 5 mapped text values only
+    default:               return -1;              // VISUAL FIELD and SETTINGS are local UI controls
+  }
+}
+
+static float midi_value_for_index(int midi_index, int raw) {
+  if (midi_index < 0 || midi_index >= K1_BLE_MIDI_CONTROL_COUNT) return 0.0f;
+  const K1BleMidiEntry& e = kK1BleMidiMap[midi_index];
+  switch (e.type) {
+    case K1MIDI_CC14:
+      return e.vmin + (e.vmax - e.vmin) * ((float)clampi(raw, 0, 100) / 100.0f);
+    case K1MIDI_CC7_BOOL:
+      return raw ? 1.0f : 0.0f;
+    case K1MIDI_CC7_ENUM:
+    case K1MIDI_PC:
+      return (float)raw;
+    case K1MIDI_NRPN:
+      // The current K1 map exposes 5 primary preset text values. The live.html
+      // mock shows 10 slots. Clamp outgoing MIDI to the committed map.
+      if (e.text_count > 0) return (float)clampi(raw, 0, e.text_count - 1);
+      return (float)raw;
+  }
+  return 0.0f;
+}
+
+static void emit_current(void) {
+  int idx = midi_index_for_current();
+  if (idx < 0) return;
+  int raw = get_current_raw_value();
+  float value = midi_value_for_index(idx, raw);
+  RemotedEmitStatus st = remoted_control_emit_index(idx, value, false);
+  Serial.printf("DASH_EMIT fn=%s raw=%d midi_index=%d path=%s value=%.4f status=%d\n",
+                FUNCS[s.func].name,
+                raw,
+                idx,
+                kK1BleMidiMap[idx].path,
+                (double)value,
+                (int)st);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Labels
+// ─────────────────────────────────────────────────────────────────────────────
+static lv_obj_t* make_label(lv_obj_t* parent, const lv_font_t* font, uint32_t color, int width) {
+  lv_obj_t* l = lv_label_create(parent);
+  lv_obj_set_width(l, width);
+  lv_obj_set_style_text_font(l, font, 0);
+  lv_obj_set_style_text_color(l, lv_color_hex(color), 0);
+  lv_obj_set_style_text_align(l, LV_TEXT_ALIGN_CENTER, 0);
+  lv_obj_set_style_bg_opa(l, LV_OPA_TRANSP, 0);
+  lv_label_set_long_mode(l, LV_LABEL_LONG_CLIP);
+  lv_label_set_text(l, "");
+  return l;
+}
+
+static void obj_show(lv_obj_t* o, bool show) {
+  if (!o) return;
+  if (show) lv_obj_clear_flag(o, LV_OBJ_FLAG_HIDDEN);
+  else      lv_obj_add_flag(o, LV_OBJ_FLAG_HIDDEN);
+}
+
+static void split_first_word(const char* src, char* a, size_t asz, char* b, size_t bsz) {
+  if (!src) src = "";
+  const char* sp = strchr(src, ' ');
+  if (!sp) {
+    snprintf(a, asz, "%s", src);
+    b[0] = 0;
+    return;
+  }
+  size_t n = (size_t)(sp - src);
+  if (n >= asz) n = asz - 1;
+  memcpy(a, src, n);
+  a[n] = 0;
+  snprintf(b, bsz, "%s", sp + 1);
+}
+
+static const char* current_enum_label(void) {
+  int raw = get_current_raw_value();
+  if (s.func == FN_MODE) return MODES[wrapi(raw, N_MODES)];
+  if (s.func == FN_VISUAL_FIELD) return VISUALS[wrapi(raw, N_VISUALS)];
+  if (s.func == FN_PRESET) return PRESETS[wrapi(raw, N_PRESETS)];
+  return "";
+}
+
+const char* remoted_dashboard_value_label(void) {
+  const FunctionDef& f = FUNCS[s.func];
+  switch (f.type) {
+    case FT_VAL:
+      snprintf(s.value_label, sizeof(s.value_label), "%d%%", get_current_raw_value());
+      break;
+    case FT_ENUM:
+      snprintf(s.value_label, sizeof(s.value_label), "%s", current_enum_label());
+      break;
+    case FT_PAL:
+      snprintf(s.value_label, sizeof(s.value_label), "%s", PALS[current_palette_index()].name);
+      break;
+    case FT_TOG:
+      snprintf(s.value_label, sizeof(s.value_label), "%s", get_current_raw_value() ? "ON" : "OFF");
+      break;
+    default:
+      snprintf(s.value_label, sizeof(s.value_label), "");
+      break;
+  }
+  return s.value_label;
+}
+
+const char* remoted_dashboard_function_name(void) {
+  return FUNCS[s.func].name;
+}
+
+static void update_menu_labels(void) {
+  obj_show(s_menu_title, true);
+  obj_show(s_menu_hint, true);
+  lv_label_set_text(s_menu_title, "FUNCTIONS");
+  lv_label_set_text(s_menu_hint, "ENCODER chooses · TAP selects · SWIPE DOWN closes");
+
+  for (int row = 0; row < 9; ++row) {
+    int off = row - 4;
+    int idx = wrapi(s.func + off, FN_COUNT);
+    bool sel = (off == 0);
+    char line[48];
+    if (sel) snprintf(line, sizeof(line), "›  %s  ‹", FUNCS[idx].name);
+    else     snprintf(line, sizeof(line), "%s", FUNCS[idx].name);
+    lv_label_set_text(s_menu_rows[row], line);
+    lv_obj_set_style_text_font(s_menu_rows[row], sel ? &lv_font_montserrat_22 : &lv_font_montserrat_14, 0);
+    lv_obj_set_style_text_color(s_menu_rows[row], lv_color_hex(sel ? 0xEDE9E3 : 0x7c7f88), 0);
+    obj_show(s_menu_rows[row], true);
+  }
+}
+
+static void hide_menu_labels(void) {
+  obj_show(s_menu_title, false);
+  obj_show(s_menu_hint, false);
+  for (int i = 0; i < 9; ++i) obj_show(s_menu_rows[i], false);
+}
+
+static void update_labels(void) {
+  if (s.menu) {
+    obj_show(s_center1, false);
+    obj_show(s_center2, false);
+    obj_show(s_unit, false);
+    obj_show(s_keel, false);
+    obj_show(s_pri, false);
+    obj_show(s_sec, false);
+    obj_show(s_global, false);
+    obj_show(s_link, false);
+    obj_show(s_hint, false);
+    update_menu_labels();
+    s.labels_dirty = false;
+    return;
+  }
+
+  hide_menu_labels();
+  obj_show(s_center1, true);
+  obj_show(s_center2, true);
+  obj_show(s_unit, true);
+  obj_show(s_keel, true);
+  obj_show(s_link, true);
+  obj_show(s_hint, true);
+
+  const FunctionDef& f = FUNCS[s.func];
+  lv_label_set_text(s_keel, f.name);
+
+  if (f.per_channel) {
+    obj_show(s_pri, true);
+    obj_show(s_sec, true);
+    obj_show(s_global, false);
+    lv_obj_set_style_text_color(s_pri, lv_color_hex(s.channel == 0 ? 0x00AECF : 0x586273), 0);
+    lv_obj_set_style_text_color(s_sec, lv_color_hex(s.channel == 1 ? 0x00AECF : 0x586273), 0);
+  } else {
+    obj_show(s_pri, false);
+    obj_show(s_sec, false);
+    obj_show(s_global, true);
+    lv_label_set_text(s_global, "GLOBAL");
+  }
+
+  lv_obj_set_style_text_color(s_link, lv_color_hex(s.ble ? 0x36C46A : 0x586273), 0);
+  lv_label_set_text(s_link, s.ble ? "LINKED" : "ADVERTISING");
+
+  char a[32], b[40];
+  switch (f.type) {
+    case FT_VAL: {
+      lv_obj_set_style_text_font(s_center1, &lv_font_montserrat_32, 0);
+      lv_obj_set_style_text_font(s_center2, &lv_font_montserrat_14, 0);
+      lv_label_set_text_fmt(s_center1, "%d", get_current_raw_value());
+      lv_label_set_text(s_center2, "");
+      lv_label_set_text(s_unit, "%");
+      lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, -13);
+      lv_obj_align(s_center2, LV_ALIGN_CENTER, 0, 18);
+      lv_obj_align(s_unit,    LV_ALIGN_CENTER, 0, 28);
+      break;
+    }
+    case FT_ENUM: {
+      const char* name = current_enum_label();
+      split_first_word(name, a, sizeof(a), b, sizeof(b));
+      lv_obj_set_style_text_font(s_center1, &lv_font_montserrat_22, 0);
+      lv_obj_set_style_text_font(s_center2, &lv_font_montserrat_14, 0);
+      lv_label_set_text(s_center1, a);
+      lv_label_set_text(s_center2, b);
+      lv_label_set_text(s_unit, "");
+      lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, -9);
+      lv_obj_align(s_center2, LV_ALIGN_CENTER, 0, 16);
+      break;
+    }
+    case FT_PAL:
+      lv_obj_set_style_text_font(s_center1, &lv_font_montserrat_22, 0);
+      lv_obj_set_style_text_font(s_center2, &lv_font_montserrat_14, 0);
+      lv_label_set_text(s_center1, PALS[current_palette_index()].name);
+      lv_label_set_text(s_center2, "");
+      lv_label_set_text(s_unit, "");
+      lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, 42);
+      break;
+    case FT_TOG:
+      lv_obj_set_style_text_font(s_center1, &lv_font_montserrat_32, 0);
+      lv_label_set_text(s_center1, get_current_raw_value() ? "ON" : "OFF");
+      lv_label_set_text(s_center2, "");
+      lv_label_set_text(s_unit, "");
+      lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, 0);
+      break;
+    case FT_SET:
+    default:
+      lv_obj_set_style_text_font(s_center1, &lv_font_montserrat_22, 0);
+      lv_obj_set_style_text_font(s_center2, &lv_font_montserrat_14, 0);
+      lv_label_set_text(s_center1, "SETTINGS");
+      lv_label_set_text(s_center2, "themes · sync · about");
+      lv_label_set_text(s_unit, "");
+      lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, -8);
+      lv_obj_align(s_center2, LV_ALIGN_CENTER, 0, 18);
+      break;
+  }
+
+  snprintf(s.status_text, sizeof(s.status_text), "%s · %s · %s",
+           s.ble ? "BLE LINK" : "BLE ADV",
+           f.per_channel ? (s.channel == 0 ? "PRI" : "SEC") : "GLOBAL",
+           remoted_dashboard_value_label());
+  lv_label_set_text(s_hint, s.status_text);
+
+  s.labels_dirty = false;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Static face and procedural field renderers
+// ─────────────────────────────────────────────────────────────────────────────
+static void render_static_face(void) {
+  if (!s_static_buf) return;
+  uint16_t* b = (uint16_t*)s_static_buf;
+  for (int y = 0; y < SC; ++y) {
+    int dy = y - CY;
+    for (int x = 0; x < SC; ++x) {
+      int dx = x - CX;
+      float d = sqrtf((float)(dx * dx + dy * dy));
+      if (d > RAD_SCREEN) {
+        b[y * SC + x] = 0;
+        continue;
+      }
+      float td = d / RAD_SCREEN;
+      uint8_t r = (uint8_t)(0x0C + (0x02 - 0x0C) * td);
+      uint8_t g = (uint8_t)(0x0C + (0x02 - 0x0C) * td);
+      uint8_t bl = (uint8_t)(0x10 + (0x03 - 0x10) * td);
+      b[y * SC + x] = rgb565(r, g, bl);
+    }
+  }
+
+  draw_arc_set(b, R_BORDER, 0, 360, 3.0f, rgb565_hex(0x161b25));
+  draw_arc_set(b, R_SWEEP, NOTCH_DEG, 360 - NOTCH_DEG, 2.0f, rgb565_hex(0x1b212e));
+}
+
+static void render_nebula(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  static const uint8_t cfg[5][2] = {{0,0},{1,21},{2,42},{3,10},{1,33}};
+  for (int i = 0; i < 5; ++i) {
+    int ci = cfg[i][0];
+    float off = cfg[i][1] * 0.1f;
+    float ph = t * 0.50f + off;
+    float x = CX + cosf(ph * 0.8f + i) * FR * 0.30f;
+    float y = CY + sinf(ph * 1.1f + i) * FR * 0.30f;
+    float r = FR * (0.55f + 0.14f * sinf(ph * 1.3f)) * (1.0f + beat * 0.18f);
+    add_soft_circle(b, x, y, r, pal_color565(p, ci + 1), (uint8_t)(105 + beat * 45));
+  }
+}
+
+static void render_aurora(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  int minx = CX - (int)FR, maxx = CX + (int)FR;
+  int miny = CY - (int)FR, maxy = CY + (int)FR;
+  for (int y = miny; y <= maxy; ++y) {
+    for (int x = minx; x <= maxx; ++x) {
+      float dx = x - CX, dy = y - CY;
+      float d = sqrtf(dx * dx + dy * dy);
+      if (d > FR) continue;
+      float a = atan2f(dy, dx);
+      for (int k = 0; k < 5; ++k) {
+        float rr = FR * 0.60f
+                 + sinf(a * 2.0f + t * 1.20f + k * 1.30f) * FR * 0.18f * (1.0f + beat * 0.40f)
+                 + sinf(a * 3.0f - t + k) * FR * 0.07f;
+        float e = 1.0f - fabsf(d - rr) / (4.8f + k * 0.55f);
+        if (e > 0.0f) {
+          uint8_t alpha = (uint8_t)clampi((int)(e * (38 + k * 9)), 0, 120);
+          blend_add_px(b, x, y, pal_color565(p, k + 1), alpha);
+        }
+      }
+    }
+  }
+}
+
+static void render_liquid(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  add_soft_circle(b, CX, CY, FR * 0.66f, pal_color565(p, 1), (uint8_t)(70 + beat * 50));
+  for (int i = 0; i < 9; ++i) {
+    float ph = t * 0.90f + i * 0.70f;
+    float x = CX + cosf(ph) * FR * 0.30f;
+    float y = CY + sinf(ph * 1.25f) * FR * 0.30f;
+    float r = FR * 0.34f * (1.0f + 0.22f * sinf(ph * 1.7f)) * (1.0f + beat * 0.20f);
+    add_soft_circle(b, x, y, r, pal_color565(p, i + 1), 76);
+  }
+}
+
+struct Pt { float x, y; uint16_t c; };
+
+static void render_constellation(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  Pt pts[26];
+  for (int i = 0; i < 26; ++i) {
+    float a = fmodf(i * 2.3999f, TAU) + t * (0.02f + (float)((i * 5) % 9) * 0.010f);
+    float base = 0.20f + ((float)((i * 7) % 11) / 11.0f) * 0.72f;
+    float r = (base + sinf(t * 0.7f + i * 1.7f) * 0.05f) * FR;
+    pts[i].x = CX + cosf(a) * r;
+    pts[i].y = CY + sinf(a) * r;
+    pts[i].c = pal_color565(p, i + 1);
+  }
+  for (int i = 0; i < 26; ++i) {
+    for (int j = i + 1; j < 26; ++j) {
+      float dx = pts[i].x - pts[j].x;
+      float dy = pts[i].y - pts[j].y;
+      float d = sqrtf(dx * dx + dy * dy);
+      float maxd = FR * 0.34f;
+      if (d < maxd) {
+        uint8_t a = (uint8_t)((1.0f - d / maxd) * 70.0f);
+        draw_line(b, pts[i].x, pts[i].y, pts[j].x, pts[j].y, pts[i].c, a);
+      }
+    }
+  }
+  for (int i = 0; i < 26; ++i) {
+    add_soft_circle(b, pts[i].x, pts[i].y, 3.0f + beat * 1.8f, pts[i].c, 155);
+    fill_circle(b, pts[i].x, pts[i].y, 1.25f + beat * 0.7f, pts[i].c);
+  }
+}
+
+static void render_skyline(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  const float base = FR * 0.40f;
+  int minx = CX - (int)FR, maxx = CX + (int)FR;
+  int miny = CY - (int)FR, maxy = CY + (int)FR;
+  for (int y = miny; y <= maxy; ++y) {
+    for (int x = minx; x <= maxx; ++x) {
+      float dx = x - CX, dy = y - CY;
+      float d = sqrtf(dx * dx + dy * dy);
+      if (d > FR || d < base * 0.55f) continue;
+      float a = atan2f(dy, dx);
+      float m = 0.62f + 0.14f * sinf(a * 6.0f + t * 1.3f)
+                      + 0.09f * sinf(a * 11.0f - t * 1.8f)
+                      + 0.06f * sinf(a * 3.0f + t * 0.6f);
+      float rr = base + m * FR * 0.42f * (1.0f + beat * 0.25f);
+      float e = 1.0f - fabsf(d - rr) / 16.0f;
+      if (e > 0.0f) {
+        uint16_t col = (d < rr) ? pal_color565(p, 1) : pal_color565(p, 2);
+        blend_add_px(b, x, y, col, (uint8_t)clampi((int)(e * 130), 0, 160));
+      }
+    }
+  }
+}
+
+static void render_sonar(uint16_t* b, float t, float beat, const PaletteDef& p) {
+  add_soft_circle(b, CX, CY, FR * 0.42f, pal_color565(p, 1), (uint8_t)(55 + beat * 80));
+  for (int k = 0; k < 4; ++k) {
+    float ph = fmodf(t * 0.45f + k * 0.25f, 1.0f);
+    float rr = FR * 0.16f + ph * FR * 0.82f;
+    uint8_t alpha = (uint8_t)((1.0f - ph) * 150.0f);
+    draw_arc_add(b, rr, 0, 360, 2.0f + (1.0f - ph) * 4.0f, pal_color565(p, k + 1), alpha);
+  }
+}
+
+static void render_field(uint16_t* b, float t, float beat) {
+  const PaletteDef& p = current_palette();
+  switch (s.visual_field) {
+    case 0: render_nebula(b, t, beat, p); break;
+    case 1: render_aurora(b, t, beat, p); break;
+    case 2: render_liquid(b, t, beat, p); break;
+    case 3: render_constellation(b, t, beat, p); break;
+    case 4: render_skyline(b, t, beat, p); break;
+    case 5: render_sonar(b, t, beat, p); break;
+    default: render_aurora(b, t, beat, p); break;
+  }
+
+  // Centre scrim: protects text readability exactly like live.html's radial scrim.
+  darken_soft_circle(b, CX, CY, R_SCRIM, 44, 230);
+}
+
+static void render_ble_glyph(uint16_t* b) {
+  uint16_t col = s.ble ? rgb565_hex(0x36C46A) : rgb565_hex(0xFF4D4D);
+  float pulse = s.ble ? (0.70f + 0.30f * sinf(millis() * 0.003f)) : 1.0f;
+  uint8_t a = (uint8_t)(180.0f * pulse);
+  const float x = CX, y = 22.0f;
+  draw_line(b, x, y - 7, x + 5, y - 3, col, a);
+  draw_line(b, x + 5, y - 3, x - 5, y + 3, col, a);
+  draw_line(b, x - 5, y + 3, x, y + 7, col, a);
+  draw_line(b, x, y + 7, x + 5, y + 3, col, a);
+  draw_line(b, x + 5, y + 3, x - 5, y - 3, col, a);
+  draw_line(b, x - 5, y - 3, x, y - 7, col, a);
+  draw_line(b, x, y - 7, x, y + 7, col, a);
+}
+
+static void render_led_ring(uint16_t* b, float t) {
+  const PaletteDef& p = current_palette();
+  uint16_t col = s.confirm > 0.05f ? rgb565_hex(0x36C46A) : (s.ble ? pal_color565(p, 2) : rgb565_hex(0xFF4D4D));
+  for (int i = 0; i < 13; ++i) {
+    float a = rad_from_deg((360.0f / 13.0f) * i);
+    float x = CX + R_LED * cosf(a);
+    float y = CY + R_LED * sinf(a);
+    float fl = s.confirm > 0.0f ? s.confirm : (0.16f + 0.12f * sinf(t * 1.5f + i));
+    add_soft_circle(b, x, y, 4.2f + fl * 2.0f, col, (uint8_t)(80 + fl * 130));
+    fill_circle(b, x, y, 2.0f, col);
+  }
+}
+
+static void render_palette_swatch(uint16_t* b) {
+  const PaletteDef& p = current_palette();
+  const float rr = 28.0f;
+  for (int y = CY - (int)rr - 6; y <= CY + (int)rr - 6; ++y) {
+    for (int x = CX - (int)rr; x <= CX + (int)rr; ++x) {
+      float dx = x - CX;
+      float dy = y - (CY - 6);
+      if (dx * dx + dy * dy > rr * rr) continue;
+      float u = clampf((dx + rr) / (2.0f * rr), 0.0f, 1.0f);
+      int segs = p.count - 1;
+      int seg = clampi((int)(u * segs), 0, segs - 1);
+      float lt = u * segs - seg;
+      uint32_t c0 = p.rgb[seg];
+      uint32_t c1 = p.rgb[seg + 1];
+      uint8_t r = (uint8_t)(((c0 >> 16) & 0xff) + (((int)((c1 >> 16) & 0xff) - (int)((c0 >> 16) & 0xff)) * lt));
+      uint8_t g = (uint8_t)(((c0 >> 8) & 0xff) + (((int)((c1 >> 8) & 0xff) - (int)((c0 >> 8) & 0xff)) * lt));
+      uint8_t bl = (uint8_t)((c0 & 0xff) + (((int)(c1 & 0xff) - (int)(c0 & 0xff)) * lt));
+      set_px(b, x, y, rgb565(r, g, bl));
+    }
+  }
+  draw_circle_outline_add(b, CX, CY - 6.0f, 28.0f, 1.0f, rgb565_hex(0xffffff), 70);
+}
+
+static void render_control(uint16_t* b) {
+  const FunctionDef& f = FUNCS[s.func];
+  const uint16_t glow = rgb565_hex(0x00AECF);
+  const uint16_t dim  = rgb565_hex(0x2b3340);
+  const uint16_t trk  = rgb565_hex(0x1a2230);
+
+  if (f.type == FT_VAL) {
+    int v = get_current_raw_value();
+    draw_arc_set(b, R_VALUE, NOTCH_DEG, 360 - NOTCH_DEG, 6.0f, trk);
+    draw_arc_add(b, R_VALUE, NOTCH_DEG, NOTCH_DEG + (v / 100.0f) * (360 - 2 * NOTCH_DEG), 7.0f, glow, 230);
+    return;
+  }
+
+  if (f.type == FT_ENUM) {
+    int n = enum_count_for_func(s.func);
+    int selected = get_current_raw_value();
+    for (int i = 0; i < n; ++i) {
+      float deg = 180.0f + (i - selected) * (360.0f / n);
+      float a = rad_from_deg(deg);
+      float x = CX + R_DOTS * cosf(a);
+      float y = CY + R_DOTS * sinf(a);
+      if (i == selected) {
+        add_soft_circle(b, x, y, 8.0f + s.confirm * 3.0f, glow, 170);
+        fill_circle(b, x, y, 3.5f + s.confirm * 1.5f, glow);
+      } else {
+        float dd = fabsf(fmodf(fmodf(deg - 180.0f, 360.0f) + 540.0f, 360.0f) - 180.0f);
+        float near = clampf(1.0f - dd / 70.0f, 0.0f, 1.0f);
+        fill_circle(b, x, y, 1.7f + near * 1.4f, near > 0.5f ? glow : dim);
+      }
+    }
+    return;
+  }
+
+  if (f.type == FT_PAL) {
+    const int gap = 10;
+    for (int i = 0; i < N_PALS; ++i) {
+      float seg = (360.0f - gap) / N_PALS;
+      float d0 = i * seg + gap * 0.5f;
+      float d1 = d0 + seg - 3.0f;
+      uint16_t c = rgb565_hex(PALS[i].rgb[PALS[i].count > 2 ? 2 : 1]);
+      bool on = (i == current_palette_index());
+      draw_arc_add(b, R_PAL, d0, d1, on ? 10.0f : 6.0f, c, on ? 230 : 105);
+    }
+    render_palette_swatch(b);
+    return;
+  }
+
+  if (f.type == FT_TOG) {
+    bool on = get_current_raw_value() != 0;
+    draw_arc_add(b, R_VALUE, NOTCH_DEG, 360 - NOTCH_DEG, 7.0f, on ? glow : dim, on ? 230 : 135);
+    return;
+  }
+
+  // Settings placeholder ring.
+  draw_arc_set(b, R_VALUE, NOTCH_DEG, 360 - NOTCH_DEG, 3.0f, dim);
+}
+
+static void render_menu_face(uint16_t* b) {
+  // Darken the cached face under LVGL menu rows.
+  for (int y = 0; y < SC; ++y) {
+    for (int x = 0; x < SC; ++x) {
+      int dx = x - CX, dy = y - CY;
+      if (dx * dx + dy * dy <= (int)(RAD_SCREEN * RAD_SCREEN)) {
+        darken_px(b, x, y, 45);
+      }
+    }
+  }
+  draw_arc_add(b, R_BORDER, 0, 360, 2.0f, rgb565_hex(0x00AECF), 30);
+}
+
+static void render_frame(bool force) {
+  if (!s_canvas_buf || !s_static_buf || !s_canvas) return;
+  uint32_t now = millis();
+  if (!force && !s.force_redraw && now - s.last_frame_ms < FRAME_MS) return;
+
+  float dt = s.last_frame_ms == 0 ? 0.016f : (now - s.last_frame_ms) * 0.001f;
+  if (dt > 0.08f) dt = 0.08f;
+  s.last_frame_ms = now;
+
+  memcpy(s_canvas_buf, s_static_buf, (size_t)SC * SC * sizeof(lv_color_t));
+  uint16_t* b = (uint16_t*)s_canvas_buf;
+
+  float t = now * 0.001f;
+  float period = 60.0f / BPM;
+  float beat_phase = fmodf(t, period) / period;
+  float beat = clampf(1.0f - beat_phase * 4.0f, 0.0f, 1.0f);
+  float sweep = beat_phase;
+
+  if (s.menu) {
+    render_menu_face(b);
+  } else {
+    render_field(b, t, beat);
+
+    // BPM sweep tail.
+    float head = NOTCH_DEG + sweep * (360.0f - 2.0f * NOTCH_DEG);
+    for (int k = 0; k < 46; ++k) {
+      float d = head - k;
+      if (d < NOTCH_DEG || d > 360 - NOTCH_DEG) continue;
+      float a = powf(1.0f - (float)k / 46.0f, 1.6f);
+      draw_arc_add(b, R_SWEEP, d - 1.0f, d, 3.0f, rgb565_hex(0x00AECF), (uint8_t)(a * 210));
+    }
+
+    render_ble_glyph(b);
+    render_control(b);
+
+    if (s.confirm > 0.0f) {
+      float rr = 142.5f - (1.0f - s.confirm) * 10.5f; // 190*.75, bloom shrinks like live.html
+      draw_arc_add(b, rr, 130, 230, 2.0f + s.confirm * 4.0f, rgb565_hex(0x00AECF), (uint8_t)(s.confirm * 150));
+    }
+  }
+
+  render_led_ring(b, t);
+
+  if (s.confirm > 0.0f) {
+    s.confirm -= dt * 1.5f;
+    if (s.confirm < 0.0f) s.confirm = 0.0f;
+  }
+
+  if (s.labels_dirty || now - s.last_label_ms > 250) {
+    update_labels();
+    s.last_label_ms = now;
+  }
+
+  s.force_redraw = false;
+  lv_obj_invalidate(s_canvas);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Public build/tick/input API
+// ─────────────────────────────────────────────────────────────────────────────
+void remoted_dashboard_build(lv_obj_t* parent) {
+  lv_obj_set_style_bg_color(parent, lv_color_hex(0x000000), 0);
+  lv_obj_set_style_bg_opa(parent, LV_OPA_COVER, 0);
+  lv_obj_clear_flag(parent, LV_OBJ_FLAG_SCROLLABLE);
+
+  s_canvas_buf = (lv_color_t*)heap_caps_malloc((size_t)SC * SC * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  s_static_buf = (lv_color_t*)heap_caps_malloc((size_t)SC * SC * sizeof(lv_color_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+
+  if (!s_canvas_buf || !s_static_buf) {
+    Serial.printf("DASH_INIT FAILED canvas=%p static=%p psram_free=%u\n",
+                  (void*)s_canvas_buf, (void*)s_static_buf, ESP.getFreePsram());
+    return;
+  }
+
+  s_canvas = lv_canvas_create(parent);
+  lv_canvas_set_buffer(s_canvas, s_canvas_buf, SC, SC, LV_IMG_CF_TRUE_COLOR);
+  lv_obj_center(s_canvas);
+
+  render_static_face();
+  memcpy(s_canvas_buf, s_static_buf, (size_t)SC * SC * sizeof(lv_color_t));
+
+  s_center1 = make_label(parent, &lv_font_montserrat_32, 0xEDE9E3, 320);
+  s_center2 = make_label(parent, &lv_font_montserrat_14, 0x9aa3b2, 320);
+  s_unit    = make_label(parent, &lv_font_montserrat_14, 0x7c7f88, 80);
+  s_keel    = make_label(parent, &lv_font_montserrat_14, 0x00AECF, 280);
+  s_pri     = make_label(parent, &lv_font_montserrat_14, 0x00AECF, 80);
+  s_sec     = make_label(parent, &lv_font_montserrat_14, 0x586273, 80);
+  s_global  = make_label(parent, &lv_font_montserrat_14, 0x4a5160, 120);
+  s_link    = make_label(parent, &lv_font_montserrat_14, 0x586273, 160);
+  s_hint    = make_label(parent, &lv_font_montserrat_14, 0x586273, 330);
+
+  lv_obj_align(s_center1, LV_ALIGN_CENTER, 0, -8);
+  lv_obj_align(s_center2, LV_ALIGN_CENTER, 0, 16);
+  lv_obj_align(s_unit,    LV_ALIGN_CENTER, 0, 28);
+  lv_obj_align(s_keel,    LV_ALIGN_CENTER, 0, 110);
+  lv_obj_align(s_pri,     LV_ALIGN_TOP_MID, -52, 28);
+  lv_obj_align(s_sec,     LV_ALIGN_TOP_MID,  52, 28);
+  lv_obj_align(s_global,  LV_ALIGN_TOP_MID,   0, 34);
+  lv_obj_align(s_link,    LV_ALIGN_BOTTOM_MID, 0, -28);
+  lv_obj_align(s_hint,    LV_ALIGN_BOTTOM_MID, 0, -8);
+
+  s_menu_title = make_label(parent, &lv_font_montserrat_14, 0x00AECF, 260);
+  lv_obj_align(s_menu_title, LV_ALIGN_TOP_MID, 0, 48);
+  for (int i = 0; i < 9; ++i) {
+    s_menu_rows[i] = make_label(parent, &lv_font_montserrat_14, 0x7c7f88, 320);
+    lv_obj_align(s_menu_rows[i], LV_ALIGN_CENTER, 0, (i - 4) * 26);
+  }
+  s_menu_hint = make_label(parent, &lv_font_montserrat_14, 0x586273, 340);
+  lv_obj_align(s_menu_hint, LV_ALIGN_BOTTOM_MID, 0, -30);
+  hide_menu_labels();
+
+  s.force_redraw = true;
+  s.labels_dirty = true;
+  update_labels();
+  render_frame(true);
+
+  Serial.printf("DASH_INIT live.html LVGL canvas=%dx%d psram=%u\n", SC, SC, ESP.getFreePsram());
+}
+
+void remoted_dashboard_tick(bool ble_connected) {
+  if (s.ble != ble_connected) {
+    s.ble = ble_connected;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+  }
+  render_frame(false);
+}
+
+void remoted_dashboard_update(int selected_index,
+                              const char* path,
+                              const char* value_label,
+                              bool editing,
+                              bool protected_apply,
+                              bool ble_connected) {
+  (void)selected_index;
+  (void)path;
+  (void)value_label;
+  (void)editing;
+  (void)protected_apply;
+  remoted_dashboard_tick(ble_connected);
+}
+
+void remoted_dashboard_on_encoder(int delta) {
+  if (delta == 0) return;
+  if (s.menu) {
+    s.func = wrapi(s.func + delta, FN_COUNT);
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    s.confirm = 1.0f;
+    return;
+  }
+
+  const FunctionDef& f = FUNCS[s.func];
+  int raw = get_current_raw_value();
+  switch (f.type) {
+    case FT_VAL:
+      raw += delta * 2;
+      set_current_raw_value(raw);
+      emit_current();
+      break;
+    case FT_ENUM:
+      set_current_raw_value(raw + delta);
+      emit_current();
+      break;
+    case FT_PAL:
+      set_current_raw_value(raw + delta);
+      emit_current();
+      break;
+    case FT_TOG:
+      set_current_raw_value(raw ? 0 : 1);
+      emit_current();
+      break;
+    case FT_SET:
+      s.menu = true;
+      break;
+  }
+  s.labels_dirty = true;
+  s.force_redraw = true;
+  s.confirm = 1.0f;
+}
+
+void remoted_dashboard_on_touch_down(int16_t x, int16_t y) {
+  s.down_x = x;
+  s.down_y = y;
+  s.touching = true;
+}
+
+void remoted_dashboard_on_touch_move(int16_t x, int16_t y) {
+  (void)x;
+  (void)y;
+}
+
+static void handle_tap(int16_t x, int16_t y) {
+  if (s.menu) {
+    // Menu row selection. Rows are centred around CY at 26px pitch.
+    int off = (int)lroundf(((float)y - CY) / 26.0f);
+    if (off >= -4 && off <= 4) {
+      s.func = wrapi(s.func + off, FN_COUNT);
+    }
+    s.menu = false;
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    return;
+  }
+
+  float dx = x - CX;
+  float dy = y - CY;
+  float d = sqrtf(dx * dx + dy * dy);
+
+  if (current_is_per_channel() && y < CY && d > 139.0f && d < 164.0f) {
+    s.channel = (x < CX) ? 0 : 1;
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    return;
+  }
+
+  if (FUNCS[s.func].type == FT_PAL && d > 96.0f && d < 140.0f) {
+    float ang = atan2f(dy, dx) / DEG + 90.0f;
+    while (ang < 0) ang += 360.0f;
+    while (ang >= 360.0f) ang -= 360.0f;
+    const float gap = 10.0f;
+    float seg = (360.0f - gap) / N_PALS;
+    int idx = clampi((int)((ang - gap * 0.5f) / seg), 0, N_PALS - 1);
+    set_current_raw_value(idx);
+    emit_current();
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    return;
+  }
+
+  if (FUNCS[s.func].type == FT_TOG && d < R_VALUE) {
+    set_current_raw_value(get_current_raw_value() ? 0 : 1);
+    emit_current();
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    return;
+  }
+
+  // Centre tap opens the function menu, preserving live.html's tap-select model.
+  if (d < 80.0f || s.func == FN_SETTINGS) {
+    s.menu = true;
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+  }
+}
+
+void remoted_dashboard_on_touch_up(int16_t x, int16_t y) {
+  if (!s.touching) return;
+  int16_t dx = x - s.down_x;
+  int16_t dy = y - s.down_y;
+  s.touching = false;
+
+  if (abs(dx) < 11 && abs(dy) < 11) {
+    handle_tap(x, y);
+    return;
+  }
+
+  if (abs(dy) > 30 && abs(dy) > abs(dx)) {
+    s.menu = (dy < 0);
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+    return;
+  }
+
+  if (!s.menu && abs(dx) > 38 && abs(dx) > abs(dy)) {
+    s.func = wrapi(s.func + (dx < 0 ? 1 : -1), FN_COUNT);
+    s.confirm = 1.0f;
+    s.labels_dirty = true;
+    s.force_redraw = true;
+  }
+}
+
+void remoted_dashboard_on_long_press(void) {
+  s.menu = !s.menu;
+  s.confirm = 1.0f;
+  s.labels_dirty = true;
+  s.force_redraw = true;
+}
+
+void remoted_dashboard_set_status(const char* text) {
+  // Kept for compatibility with setup()/driver callers. The live dashboard owns
+  // its status line; external text is intentionally not painted over it.
+  (void)text;
+}

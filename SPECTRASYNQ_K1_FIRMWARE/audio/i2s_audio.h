@@ -44,10 +44,12 @@
 //      MIGRATION_PLAN-v2-rebaselined.md §8 Stage 3
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
-#ifdef K1_MIC_IM73D_PDM_V1
-#include <driver/i2s_pdm.h>   // IM73D122 PDM RX (bench eval); flag-OFF token stream unchanged
-#include <driver/gpio.h>      // LR-select GPIO drive
+#ifdef K1_MIC_PDM_RX_ANY_V1
+#include <driver/i2s_pdm.h>   // PDM RX (IM73D / IM69); flag-OFF token stream unchanged
 #include <math.h>             // isfinite() for the PDM follower/NaN guard
+#endif
+#ifdef K1_MIC_IM73D_PDM_V1
+#include <driver/gpio.h>      // LR-select GPIO drive (IM73D only; IM69 SELECT is hard-strapped)
 #endif
 #include <esp_timer.h>
 
@@ -243,6 +245,25 @@ void init_i2s() {
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg); // assign existing result; NO redeclare
   USBSerial.print("I2S PDM RX INIT: ");
   USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
+  // 16-bit mono Stage 1, DSR_16S default (1.6384 MHz @ 12.8k), slot LEFT.
+  // Pins clk=14/din=13. SELECT is hard-strapped on-board — do NOT drive GPIO12.
+  i2s_pdm_rx_config_t pdm_cfg = {
+    .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
+    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+    .gpio_cfg = {
+      .clk = (gpio_num_t)K1_PDM_CLK_PIN,
+      .din = (gpio_num_t)K1_PDM_DIN_PIN,
+      .invert_flags = { .clk_inv = 0 },
+    },
+  };
+#ifdef K1_MIC_IM69D_DSR_16S_V1
+  pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
+#endif
+  result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
+  USBSerial.print("I2S PDM RX INIT: ");
+  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
@@ -291,7 +312,7 @@ void init_i2s() {
   result = i2s_channel_init_std_mode(rx_chan, &std_cfg);
   USBSerial.print("I2S STD INIT: ");
   USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
-#endif  // K1_MIC_IM73D_PDM_V1 (mic driver mode select)
+#endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
 
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
@@ -308,7 +329,7 @@ void acquire_sample_chunk(uint32_t t_now) {
   static float max_waveform_val_raw_smooth = 0.0; // Added for smoothing
 
   size_t bytes_read = 0;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int16_t);  // PDM: 96*2 = 192 B
 #else
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int32_t);  // SPH0645: 96*4 = 384 B
@@ -333,6 +354,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_samples_i16[z] = 0;
     }
   }
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      im69d_samples_i16[z] = 0;
+    }
+  }
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
@@ -345,6 +374,8 @@ void acquire_sample_chunk(uint32_t t_now) {
 #else
   #ifdef K1_MIC_IM73D_PDM_V1
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im73d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
   #endif
@@ -386,6 +417,20 @@ void acquire_sample_chunk(uint32_t t_now) {
   im73d_raw_i16_abs_peak = im73d_raw_peak;
   im73d_raw_i16_rms = sqrtf((float)im73d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im73d_raw_i16_near_pct = (float)im73d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  uint16_t im69d_raw_peak = 0;
+  uint32_t im69d_raw_near_count = 0;
+  uint64_t im69d_raw_sum_sq = 0;
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    const int32_t raw_sample = (int32_t)im69d_samples_i16[i];
+    const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
+    if (raw_mag > im69d_raw_peak) im69d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
+    if (raw_mag >= K1_MIC_IM69D_RAW_I16_NEAR_RAIL) im69d_raw_near_count++;
+    im69d_raw_sum_sq += (uint64_t)raw_mag * (uint64_t)raw_mag;
+  }
+  im69d_raw_i16_abs_peak = im69d_raw_peak;
+  im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
 #endif
 
   // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
@@ -399,6 +444,8 @@ void acquire_sample_chunk(uint32_t t_now) {
     for (uint16_t i = 0; i < dump_n; i++) {
 #ifdef K1_MIC_IM73D_PDM_V1
       USBSerial.printf("  %d\n", (int)im73d_samples_i16[i]);   // PDM: int16 decimal (silence ±4-18 measured 2026-07-02 @G=16; ±20-40 was pre-characterization pessimism)
+#elif defined(K1_MIC_IM69D_PDM_V1)
+      USBSerial.printf("  %d\n", (int)im69d_samples_i16[i]);
 #else
       USBSerial.printf("  %08lx\n", (unsigned long)(uint32_t)i2s_samples_raw[i]);
 #endif
@@ -432,6 +479,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     // NO SPH0645 pedestal math (*0.000512 + 56000 - 5120; >>2). Everything below
     // (k1_effective_sensitivity, clamp, -DC_OFFSET, follower, GDFT) is shared/unchanged.
     int32_t sample = (int32_t)((float)im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    // IM69D130 PDM: own gain seed (never inherit K1_MIC_IM73D_INPUT_GAIN).
+    int32_t sample = (int32_t)((float)im69d_samples_i16[i] * K1_MIC_IM69D_INPUT_GAIN);
 #else
     int32_t sample = (i2s_samples_raw[i] * 0.000512) + 56000 - 5120;
 
@@ -617,7 +667,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         max_waveform_val_follower = CONFIG.SWEET_SPOT_MIN_LEVEL;
       }
     }
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
     // PDM cold-boot / failed-cal guard: the follower inits 0.0 and its floor-clamp only
     // runs in the decay branch, so cold-boot silence divides 0/0 -> NaN. A non-zero SSL
     // alone does NOT guarantee a non-zero follower. Force the denominator into the PDM
@@ -630,7 +680,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (max_waveform_val_follower < 1.0f) max_waveform_val_follower = 1.0f;
 #endif
     float waveform_peak_scaled_raw = max_waveform_val / max_waveform_val_follower;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
     if (!isfinite(waveform_peak_scaled_raw)) waveform_peak_scaled_raw = 0.0f;
 #endif
 
@@ -824,6 +874,11 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_raw_i16_abs_peak,
       im73d_raw_i16_rms,
       im73d_raw_i16_near_pct);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    USBSerial.printf(" | raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f",
+      im69d_raw_i16_abs_peak,
+      im69d_raw_i16_rms,
+      im69d_raw_i16_near_pct);
 #endif
 #ifdef K1_LOUD_GUARD_V1
     USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",

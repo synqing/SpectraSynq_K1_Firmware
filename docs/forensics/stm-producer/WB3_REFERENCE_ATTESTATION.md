@@ -44,6 +44,17 @@ Until attestation closes, H2 must be evaluated as:
 
 Do **not** require Captain to pick native vs FFT **before** both bench tracks are exercised.
 
+
+## Gate B waiver (2026-07-29) — spike-only Track B
+
+Captain authorised execution **without** closing TB-1..TB-4 for this packet.
+
+- Waiver artefact: `artifacts/stm-track-b/reference_waiver_gate_b_2026-07-29.md`
+- Run bundle: `artifacts/stm-track-b/gate_b_spike_2026-07-29/`
+- TB-5 (**bench flag exclusive with `K1_STM`**) → **PASS** (`k1_hardware_fft512_bench` builds with `K1_STM_FFT512_BENCH=1` only)
+- TB-6 manifest → **partial** (manifest + waiver; microbench metrics INDETERMINATE until device capture)
+- H2 VP closure remains **INDETERMINATE** until a future non-waived packet.
+
 ## Track B explicit requirements (bench gate)
 
 Track B bench work (`WB3_CONVERGENCE_CONDITIONAL.md`) **requires** closing this INDETERMINATE row **or** a Captain waiver recorded in `WB3_COMPARATIVE_DECISION_RECORD.md`.

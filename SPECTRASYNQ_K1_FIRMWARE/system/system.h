@@ -427,15 +427,14 @@ void init_system() {
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
   enforce_compiled_audio_timing_config();
 
-#ifdef K1_MIC_IM73D_PDM_V1
-  // IM73D PDM boot force-invalidate (bench eval, 2026-07-02). A stale SPH0645 profile
-  // (DC≈-4714, SSL≈350) is IN-range and would otherwise be applied to the PDM signal
-  // (wrong DC bias + wrong domain). Force RAM cal invalid on EVERY PDM boot, BEFORE the
-  // two sanity blocks below — seeding a PDM-domain SSL (never 0) and a non-zero follower
-  // so the peak-scaled division can never be 0/0. Persistence under the flag is
-  // PDM-namespaced (bridge_fs.h): /CONFIG_PDM_*.BIN + /cal_profile_pdm.bin; the SPH
-  // files stay frozen. Config cal fields loaded by init_fs() are scrubbed here
-  // regardless — the PDM cal profile below is the sole cal authority.
+#ifdef K1_MIC_PDM_RX_ANY_V1
+  // PDM boot force-invalidate (IM73D 2026-07-02 / IM69 2026-08-05). A stale SPH0645
+  // profile (DC≈-4714, SSL≈350) is IN-range and would otherwise be applied to the
+  // PDM signal (wrong DC bias + wrong domain). Force RAM cal invalid on EVERY PDM
+  // boot, BEFORE the two sanity blocks below — seeding a PDM-domain SSL (never 0)
+  // and a non-zero follower so the peak-scaled division can never be 0/0.
+  // Persistence is mic-namespaced via CAL_PROFILE_FILE (IM73D → /cal_profile_pdm.bin,
+  // IM69 → /cal_profile_im69d.bin); SPH files stay frozen.
   CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
   CONFIG.VU_LEVEL_FLOOR = 0.0f;
@@ -448,11 +447,8 @@ void init_system() {
   waveform_peak_scaled = 0.0f;
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed the division denominator
 
-  // PDM cal persistence (2026-07-03): the scrub above removed every trace of the
-  // SPH-file-derived state; now restore the LAST ACCEPTED PDM cal from
-  // /cal_profile_pdm.bin (CAL_PROFILE_FILE under this flag — never an SPH file).
-  // The loader only reads when the RAM config is invalid, so drop SSL to the
-  // invalid sentinel first; on any miss/corruption restore the fallback seed.
+  // PDM cal persistence: scrub removed SPH-file-derived state; restore last
+  // accepted PDM cal from CAL_PROFILE_FILE (never an SPH file).
   CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
   if (load_calibration_profile_if_config_invalid()) {
     max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // persisted SSL (cal_valid=1, source=persisted_profile)
@@ -478,7 +474,7 @@ void init_system() {
   // Either case: invalidate the runtime profile and prevent the value being
   // reported as a trusted calibration. The next successful noise_cal will save
   // a measured profile; until then cal_valid remains false.
-#ifndef K1_MIC_IM73D_PDM_V1
+#ifndef K1_MIC_PDM_RX_ANY_V1
   if (CONFIG.DC_OFFSET == 0 || calibration_abs_i32(CONFIG.DC_OFFSET) > NOISE_CAL_DC_MAX_VALID_ABS) {
 #else
   // PDM: DC==0 is legal (HPF), so it must NOT re-trigger this wipe (which would zero SSL).

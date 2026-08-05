@@ -1,0 +1,59 @@
+/* K718 HALO — candidate THEMES (Captain 2026-06-29: no theme is married; these are
+   exploration candidates spanning the design space, none canonical). Each is a token
+   set applied via [data-theme]; the locked grammar renders unchanged through halo.js.
+   Generated from the 6-way theme fan-out (DLG-T1..T6), each contrast-audited ≥AA. */
+
+/* T1 · Austere scientific instrument — dark mono cool, "oscilloscope at 3am" */
+[data-theme="measurement-grade"] {
+  --bg-base:#0F1118; --bg-raised:#181B28; --bg-ring:#1E2235; --bg-hairline:#2A2F4A;
+  --text-primary:#E2E4EC; --text-secondary:#8A90A4; --text-tertiary:#6B728C;
+  --accent-focus:#3DCFCF; --accent-input:#D455B8; --accent-active:#D4902A; --accent-confirm:#4AB86A; --accent-alert:#E05040;
+  --c1:#3DCFCF; --c2:#D455B8; --c3:#D4902A; --c4:#4AB86A; --c5:#E05040;
+  --trust-settled:#6B728C; --trust-pending:#D455B8; --trust-committing:#D4902A; --trust-committed:#4AB86A;
+  --tz-pending:#D455B8; --tz-near:#D4902A; --tz-ready:#3DCFCF;
+}
+/* T2 · Daylight-legible — light field, deep-pigment accents (solves neon-on-light) */
+[data-theme="daylight-panel"] {
+  --bg-base:#EDEEF2; --bg-raised:#F7F8FB; --bg-ring:#D6D9E3; --bg-hairline:#C0C4D0;
+  --text-primary:#111318; --text-secondary:#454A58; --text-tertiary:#5E6374;
+  --accent-focus:#006B7F; --accent-input:#8B006B; --accent-active:#7A4800; --accent-confirm:#2A6E00; --accent-alert:#A50000;
+  --c1:#006B7F; --c2:#8B006B; --c3:#7A4800; --c4:#2A6E00; --c5:#A50000;
+  --trust-settled:#5E6374; --trust-pending:#8B006B; --trust-committing:#7A4800; --trust-committed:#2A6E00;
+  --tz-pending:#8B006B; --tz-near:#7A4800; --tz-ready:#006B7F;
+}
+/* T3 · Warm analog / precision-meter — warm-neutral dark, instrument faceplate */
+[data-theme="precision-dark"] {
+  --bg-base:#181512; --bg-raised:#221E1A; --bg-ring:#2E2925; --bg-hairline:#3D3830;
+  --text-primary:#E8DFC8; --text-secondary:#9E9280; --text-tertiary:#8A8278;
+  --accent-focus:#28B5A3; --accent-input:#D46A96; --accent-active:#D4921E; --accent-confirm:#5CB87A; --accent-alert:#E85858;
+  --c1:#28B5A3; --c2:#D46A96; --c3:#D4921E; --c4:#5CB87A; --c5:#E85858;
+  --trust-settled:#8A8278; --trust-pending:#D46A96; --trust-committing:#D4921E; --trust-committed:#5CB87A;
+  --tz-pending:#D46A96; --tz-near:#D4921E; --tz-ready:#28B5A3;
+}
+/* T4 · Maximum restraint — grayscale at rest, color only when a state fires */
+[data-theme="neutral-field"] {
+  --bg-base:#0D0D0F; --bg-raised:#1A1A1E; --bg-ring:#252528; --bg-hairline:#2E2E35;
+  --text-primary:#F2F2F4; --text-secondary:#8A8A90; --text-tertiary:#696970;
+  --accent-focus:#00B4CC; --accent-input:#D040A0; --accent-active:#E8A020; --accent-confirm:#3DB060; --accent-alert:#D94040;
+  --c1:#252528; --c2:#8A8A90; --c3:#E8A020; --c4:#00B4CC; --c5:#3DB060;
+  --trust-settled:#696970; --trust-pending:#D040A0; --trust-committing:#E8A020; --trust-committed:#3DB060;
+  --tz-pending:#D040A0; --tz-near:#E8A020; --tz-ready:#00B4CC;
+}
+/* T5 · Vivid-but-disciplined / editorial — pure saturated hues, NYT/Swiss discipline */
+[data-theme="editorial-signal"] {
+  --bg-base:#0C0C10; --bg-raised:#161619; --bg-ring:#252528; --bg-hairline:#1D1D21;
+  --text-primary:#EDE9E3; --text-secondary:#8A8784; --text-tertiary:#524F50;
+  --accent-focus:#00AECF; --accent-input:#E0338F; --accent-active:#EFA020; --accent-confirm:#28B76E; --accent-alert:#E83A36;
+  --c1:#00AECF; --c2:#E0338F; --c3:#EFA020; --c4:#28B76E; --c5:#E83A36;
+  --trust-settled:#524F50; --trust-pending:#E0338F; --trust-committing:#EFA020; --trust-committed:#28B76E;
+  --tz-pending:#E0338F; --tz-near:#EFA020; --tz-ready:#00AECF;
+}
+/* T6 · Refined dark-luminous — deep-blue-black, studio instrument, glow=info-not-spectacle */
+[data-theme="instrument-dark"] {
+  --bg-base:#0C0F14; --bg-raised:#141A22; --bg-ring:#1E2A38; --bg-hairline:#161C26;
+  --text-primary:#E4E8ED; --text-secondary:#8090A0; --text-tertiary:#78849A;
+  --accent-focus:#26B2CC; --accent-input:#BC5CB8; --accent-active:#C98A18; --accent-confirm:#28A060; --accent-alert:#DC5050;
+  --c1:#26B2CC; --c2:#BC5CB8; --c3:#C98A18; --c4:#28A060; --c5:#DC5050;
+  --trust-settled:#78849A; --trust-pending:#BC5CB8; --trust-committing:#C98A18; --trust-committed:#28A060;
+  --tz-pending:#BC5CB8; --tz-near:#C98A18; --tz-ready:#26B2CC;
+}

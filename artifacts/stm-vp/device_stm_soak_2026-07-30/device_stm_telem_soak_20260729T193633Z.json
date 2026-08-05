@@ -1,0 +1,35 @@
+{
+  "completed_at_utc": "2026-07-29T19:37:38.187793+00:00",
+  "device_port": "/dev/cu.usbmodem112401",
+  "wav": "/Users/spectrasynq/Workspace_Management/Software/Lightwave-Ledstrip/firmware-v3/tools/mic_ab_scorer/stimuli/cal_tone_1khz.wav",
+  "edge_mode": "stm_dual",
+  "edge_strength": 0.75,
+  "wall_seconds": 64.9,
+  "stm_samples_total": 121,
+  "stm_samples_ready": 121,
+  "ready_fraction": 1.0,
+  "bad_command_lines": 0,
+  "temporal_energy": {
+    "n": 121,
+    "min": 0.1719,
+    "max": 0.4684,
+    "mean": 0.3238371900826446,
+    "p50": 0.3232
+  },
+  "spectral_energy": {
+    "n": 121,
+    "min": 0.1638,
+    "max": 0.4714,
+    "mean": 0.2930082644628099,
+    "p50": 0.2934
+  },
+  "spec_max": {
+    "n": 121,
+    "min": 0.7902,
+    "max": 1.0,
+    "mean": 0.9913099173553719,
+    "p50": 1.0
+  },
+  "verdict": "PASS",
+  "log_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/artifacts/stm-vp/device_stm_soak_2026-07-30/device_stm_telem_soak_20260729T193633Z.log"
+}

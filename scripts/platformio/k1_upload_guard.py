@@ -28,6 +28,8 @@ K1_TARGETS: tuple[K1Target, ...] = (
     K1Target(
         envs=(
             "k1_hardware",
+            "k1_hardware_stm",
+            "k1_hardware_fft512_bench",
             "k1_hardware_harness",
             "k1_hardware_trace_dev",
             "k1_motion_probe",
@@ -89,6 +91,7 @@ K1_TARGETS: tuple[K1Target, ...] = (
             "k1_bench_im73d_mic_auto_telemetry",  # IM73D mic auto-sense telemetry — bench B489A500 ONLY (2026-07-10)
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S SNR eval - radio-free bench B489A500 ONLY (2026-07-06)
             "k1_bench_im73d_ble",  # IM73D PDM + NimBLE BLE-MIDI demo — bench B489A500 ONLY (2026-07-04)
+            "k1_bench_im69d",  # IM69D130 dual-mic PCB3 PDM eval — bench B489A500 ONLY (2026-08-05)
             "k1_custom",  # 224-LED single-channel wall-bounce build — bench B489A500 ONLY (2026-07-06)
             "k1_sync_probe_bench",  # dual-K1 sync Phase-0 FOLLOWER — bench B489A500 ONLY (2026-07-08, F5 grant)
         ),
