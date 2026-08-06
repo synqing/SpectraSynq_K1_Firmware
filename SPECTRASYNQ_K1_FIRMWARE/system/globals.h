@@ -673,15 +673,15 @@ inline float magnitudes_final[NUM_FREQS] = { 0.000 };
 inline volatile uint32_t k1_gdft_q0_overflow_count = 0;
 #endif
 
-// --> For Dynamic AGC Floor <--
-inline SQ15x16 min_silent_level_tracker = 65535.0; // Initialize high, tracks min max_waveform_val_raw during silence
+// --> Per-band AGC floor seed <--
+// Sole survivor of the retired single-band dynamic AGC floor: it seeds
+// min_silent_level_tracker_band[] below (do NOT confuse the two — the _band array is live and
+// is read by the ':floor' telemetry in serial_menu.cpp). The single-band tracker
+// (min_silent_level_tracker) and its clamp/scale macros had ZERO read sites and were removed
+// 2026-08-06. AGC_FLOOR_RECOVERY_RATE is retained only because the retired updater it belongs
+// to survives as the commented-out block in i2s_audio.h.
 #define AGC_FLOOR_INITIAL_RESET (65535.0)
-#define AGC_FLOOR_SCALING_FACTOR (0.01) // *** EXPERIMENTAL VALUE *** Relates raw amplitude to Goertzel magnitude
-#define AGC_FLOOR_MIN_CLAMP_RAW (10.0) // Min reasonable raw tracker value before scaling
-#define AGC_FLOOR_MAX_CLAMP_RAW (30000.0) // Max reasonable raw tracker value before scaling
-#define AGC_FLOOR_MIN_CLAMP_SCALED (0.1) // Final minimum AGC floor after scaling - ADJUSTED FROM 0.5
-#define AGC_FLOOR_MAX_CLAMP_SCALED (100.0) // Final maximum AGC floor after scaling
-#define AGC_FLOOR_RECOVERY_RATE (50.0) // *** EXPERIMENTAL *** Rate at which tracker recovers upwards per frame during silence-
+#define AGC_FLOOR_RECOVERY_RATE (50.0) // retired updater only; no live reads
 
 // --> Silence go-dark (2026-07-10) <--
 // SSL-derived Schmitt silence detection + dwell + asymmetric fade. Replaces the dead

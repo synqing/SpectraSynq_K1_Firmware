@@ -343,7 +343,6 @@ void init_i2s() {
 
 void acquire_sample_chunk(uint32_t t_now) {
   static int8_t sweet_spot_state_last = 0;
-  static bool silence_temp = false;
   static uint32_t silence_switched = 0;
   static float silent_scale_last = 1.0;
   static uint32_t last_state_change_time = 0;
@@ -682,19 +681,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       }
     }
   } else {
-    // Pre-calculate thresholds used multiple times
-    float threshold_loud_break = CONFIG.SWEET_SPOT_MIN_LEVEL * 1.20;
-    float dynamic_agc_floor_raw = float(min_silent_level_tracker);
-    if (dynamic_agc_floor_raw < AGC_FLOOR_MIN_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MIN_CLAMP_RAW;
-    if (dynamic_agc_floor_raw > AGC_FLOOR_MAX_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MAX_CLAMP_RAW;
-    float dynamic_agc_floor_scaled = dynamic_agc_floor_raw * AGC_FLOOR_SCALING_FACTOR;
-    if (dynamic_agc_floor_scaled < AGC_FLOOR_MIN_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MIN_CLAMP_SCALED;
-    if (dynamic_agc_floor_scaled > AGC_FLOOR_MAX_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MAX_CLAMP_SCALED;
-    // Silence detection: SSL-derived Schmitt (2026-07-10). dynamic_agc_floor_scaled above
-    // is DEAD (the min-tracker decay was commented out, pinning it at a static 100 that is
-    // decoupled from the learned floor — a quiet room never fell below it, so silence never
-    // latched and the plate never darkened). Derive the thresholds from the calibrated SSL
-    // so they track the real ambient, with a Schmitt gap (enter < exit) to kill chatter.
+    // Silence detection: SSL-derived Schmitt (2026-07-10). The predecessor was a static
+    // AGC-floor threshold pinned at 100 and decoupled from the learned floor — a quiet room
+    // never fell below it, so silence never latched and the plate never darkened. Its dead
+    // remains (threshold_loud_break, min_silent_level_tracker, and the AGC_FLOOR_* clamp
+    // chain) had ZERO read sites and were removed 2026-08-06 — they were recomputed every
+    // Core-0 frame and, worse, were cited as live evidence in a Phase 0 proof doc. Derive the
+    // thresholds from the calibrated SSL so they track the real ambient, with a Schmitt gap
+    // (enter < exit) to kill chatter.
     const float ssl_f = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
     float threshold_silence = SILENCE_ENTER_SSL_FRAC * ssl_f;        // enter-silence line (low)
     float threshold_silence_exit = SILENCE_EXIT_SSL_FRAC * ssl_f;    // exit-silence line (high)
@@ -793,23 +787,21 @@ void acquire_sample_chunk(uint32_t t_now) {
             last_state_change_time = t_now;
 
             if (sweet_spot_state == -1) {
-                silence_temp = true;
                 silence_switched = t_now;
 
                 if (previous_state != -1) {
                      // *** Use RAW value for deadband check ***
                      float agc_delta = threshold_silence - max_waveform_val_raw; // Use pre-calculated threshold
                      if (agc_delta > 50.0) {
-                         min_silent_level_tracker = SQ15x16(AGC_FLOOR_INITIAL_RESET);
                          if (debug_mode) {
-                             USBSerial.print("DEBUG: AGC Floor Tracker Reset (deadband met): raw_val=");
+                             USBSerial.print("DEBUG: silence-entry deadband met: raw_val=");
                              USBSerial.print(max_waveform_val_raw);
                              USBSerial.print(" threshold=");
                              USBSerial.println(threshold_silence); // Use pre-calculated threshold
                          }
                      } else {
                          if (debug_mode) {
-                             USBSerial.print("DEBUG: AGC Floor Tracker not reset due to deadband, delta=");
+                             USBSerial.print("DEBUG: silence-entry deadband not met, delta=");
                              USBSerial.println(agc_delta);
                          }
                      }
@@ -850,7 +842,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     // (firmware-v3 pre-gate port — pure RMS, cf. ControlBus.cpp Stage 7). Replaces the
     // SSL/sweet_spot_state==-1 gate (smoothed-peak floor sits above SSL in a normal room)
     // AND deliberately does NOT re-use the peak-based loud_sound_detected veto
-    // (threshold_loud_break = SSL*1.2 ≈ 326 trips on quiet-room peaks 150-870, which would
+    // (the REMOVED threshold_loud_break = SSL*1.2 ≈ 326 trips on quiet-room peaks 150-870, which would
     // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
     // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
     // is what keeps genuinely quiet *music* from darkening the plate.
@@ -866,10 +858,8 @@ void acquire_sample_chunk(uint32_t t_now) {
              USBSerial.println("DEBUG: Silence broken (audio detected)");
         }
         silence = false;
-        silence_temp = false;
         silence_switched = t_now;
     } else {
-         silence_temp = true;
          if (t_now - silence_switched >= SILENCE_DWELL_MS) {
             if (!silence && debug_mode) {
                 USBSerial.println("DEBUG: Extended silence detected (dwell met)");
