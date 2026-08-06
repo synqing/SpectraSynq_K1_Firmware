@@ -990,8 +990,17 @@ inline void show_leds() {
   }
 #endif
   
-  // Only attempt to use secondary LEDs if explicitly enabled
-  if (ENABLE_SECONDARY_LEDS) {
+  // Secondary output requires BOTH the enable flag and allocated buffers.
+  // restore_defaults() (presets.h) and the boot-loop guard's safe-mode DEFAULTS
+  // path set ENABLE_SECONDARY_LEDS=true at system.h:552 -- six lines before
+  // init_leds() at :558 -- but the secondary buffers are not allocated until
+  // init_secondary_leds() at .ino:688. Without the null check
+  // scale_to_secondary_strip() memcpy()s to a null destination and Core 0 dies
+  // with StoreProhibited (EXCVADDR 0x0), bootlooping the device. The try/catch
+  // below cannot save it: a CPU exception is not a C++ exception.
+  // Same guard idiom as k1_pin_evidence.cpp:291 / vpab_capture.cpp:760.
+  if (ENABLE_SECONDARY_LEDS && leds_scaled_secondary != nullptr &&
+      leds_out_secondary != nullptr) {
     // Put in try/catch-style protection
     bool secondary_success = true;
     
