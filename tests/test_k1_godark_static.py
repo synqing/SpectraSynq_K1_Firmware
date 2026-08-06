@@ -62,7 +62,14 @@ class SilenceLatchDrivenByRawRms(unittest.TestCase):
 class TelemetryAndSerial(unittest.TestCase):
     def test_ap_telemetry_exposes_rms_raw(self):
         self.assertIn("rms_raw=%.4f", I2S)
-        self.assertIn("k1_silence_rms_raw, CONFIG.STANDBY_DIMMING", I2S)
+        # 2026-08-06: pky= (peak-to-mean) was inserted between rms_raw and dim. RMS alone
+        # cannot separate music from a narrowband room floor (music p50 rms is LOWER than
+        # ambient's), so the go-dark gate gained a second, gain-invariant discriminator.
+        # Both must reach the [AP] line; assert each rather than their adjacency.
+        self.assertIn("pky=%.2f", I2S)
+        self.assertIn("k1_silence_rms_raw", I2S)
+        self.assertIn("k1_silence_peakiness", I2S)
+        self.assertIn("CONFIG.STANDBY_DIMMING", I2S)
 
     def test_serial_tuners_present(self):
         self.assertTrue(typed_command_registered(SERIAL, "silence_rms_enter"))
