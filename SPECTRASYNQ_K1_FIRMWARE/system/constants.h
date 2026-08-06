@@ -99,13 +99,16 @@
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
 #ifndef K1_MIC_IM69D_INPUT_GAIN
-// Phase 0 silence-domain close (2026-08-05): G=16 quiet overflowed SSL learn
-// window; G=8 cal ACCEPTED (SSL=111) but post-cal ambient max_raw mean ~214–296
-// stayed above SSL×1.2 (~133) so silence never latched — self-noise / gain floor,
-// not "quieter room". Music still had headroom (max_raw~1785, near_pct=0).
-// Halve again to G=4 so quiet floor can sit under a learnable SSL+latch.
-// Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune (Captain rage-valid).
-#define K1_MIC_IM69D_INPUT_GAIN 4.0f
+// Gain history. G=16 overflowed the SSL learn window. G=8 cal ACCEPTED (SSL=111,
+// p90 101 = 2.2x floor margin). G=4 (2026-08-05, commit 1ae9d4a) was then chosen
+// to make "silence latch" work — but that step was justified by ambient sitting
+// above SSL x1.2, i.e. threshold_loud_break, which was assigned once and NEVER
+// READ (removed 2026-08-06). The live latch is the RMS Schmitt, and it latches at
+// any of these gains, so the halving bought nothing and cost 4x of music headroom.
+// REVERTED to 8.0f 2026-08-06 (Captain) on SSL floor margin alone: 2.2x at G=8 vs
+// 1.47x at G=4, against an ambient floor that swings ~3x between sessions.
+// Ticket: ap_advice Phase 0 / IM69D gain retune.
+#define K1_MIC_IM69D_INPUT_GAIN 8.0f
 #endif
 
 #define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000
