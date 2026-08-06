@@ -759,6 +759,10 @@ inline bool    agc_gated = true;                // hysteretic silence-gate state
 // 0 while silence-gated. This is the correct signal any loudness/reactivity
 // consumer must read (never sum spectrogram[]).
 inline SQ15x16 agc_loudness_norm = SQ15x16(0.0);
+// Companion to agc_loudness_norm: true = no raw-RMS source in this mic domain,
+// so the 0 above is ABSENT, not a measured silence. Default true (bypassed until
+// a live arm proves otherwise). Under K1_STM with agc_loudness_norm.
+inline bool    k1_stm_loud_bypassed = true;
 #endif
 inline SQ15x16 spectral_tilt_lut[NUM_FREQS];    // precomputed per-bin freq weighting
 

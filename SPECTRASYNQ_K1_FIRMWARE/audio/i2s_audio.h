@@ -459,17 +459,38 @@ void acquire_sample_chunk(uint32_t t_now) {
   // closed. This RMS is live and discriminating: ~8 in silence, ~32-60 under EDM,
   // ~144 on peaks (bench-measured). Normalise to [0,1]; it spikes on beats, so the
   // STM modulation pulses with the music.
+  // MIC-DOMAIN SPLIT: the 12.0f/50.0f normaliser is bench-derived for the PDM
+  // int16 raw domain and is NOT portable. The SPH0645 path computes no raw
+  // per-chunk RMS at all (the telemetry block above has no #else arm), and its
+  // raw int32 samples sit ~6 decades higher, so feeding any SPH statistic
+  // through this normaliser pins k1_stm_ln at 1.0 permanently. A fabricated
+  // value is worse than none: publish BYPASS and let the consumer skip.
   {
-    float raw_rms_for_stm = 0.0f;
-#if defined(K1_MIC_IM73D_PDM_V1)
-    raw_rms_for_stm = im73d_raw_i16_rms;
-#elif defined(K1_MIC_IM69D_PDM_V1)
-    raw_rms_for_stm = im69d_raw_i16_rms;
-#endif
+#if defined(K1_MIC_IM73D_PDM_V1) || defined(K1_MIC_IM69D_PDM_V1)
+  #if defined(K1_MIC_IM73D_PDM_V1)
+    const float raw_rms_for_stm = im73d_raw_i16_rms;
+  #else
+    const float raw_rms_for_stm = im69d_raw_i16_rms;
+  #endif
     float k1_stm_ln = (raw_rms_for_stm - 12.0f) / 50.0f;
     if (k1_stm_ln < 0.0f) k1_stm_ln = 0.0f;
     if (k1_stm_ln > 1.0f) k1_stm_ln = 1.0f;
     agc_loudness_norm = SQ15x16(k1_stm_ln);
+    k1_stm_loud_bypassed = false;
+#else
+    // No raw-RMS source in this mic domain. Mirror k1_mic_auto_sense.cpp:73-77
+    // + :103-106 — zero the value AND publish the bypass, so a 0 here is never
+    // mistaken for a measured silence.
+    agc_loudness_norm = SQ15x16(0.0);
+    k1_stm_loud_bypassed = true;
+    static bool k1_stm_bypass_announced = false;
+    if (!k1_stm_bypass_announced) {
+      k1_stm_bypass_announced = true;
+      USBSerial.println("[K1_STM] BYPASSED reason=RAW_RMS_UNAVAILABLE mic=SPH0645 "
+                        "(no PDM raw RMS; 12/50 normaliser is PDM-only) "
+                        "-> EdgeMixer modes 7/8 inert");
+    }
+#endif
   }
 #endif
 

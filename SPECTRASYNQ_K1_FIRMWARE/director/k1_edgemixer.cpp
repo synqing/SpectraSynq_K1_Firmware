@@ -962,6 +962,10 @@ static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
   if (!stm.ready) {
     return;  // absent, not zero: leave the strip as the base effect rendered it.
   }
+  if (k1_stm_loud_bypassed) {
+    return;  // no loudness source in this mic domain (see i2s_audio.h K1_STM block):
+             // absent, not zero — do not modulate by a value we never measured.
+  }
   // Loudness-gated modulation depth. agc_loudness_norm (globals.h) is the pre-
   // normalisation broadband loudness — the ONLY signal that tracks volume, because
   // spectrogram[] / peak_scaled are AGC-flattened (measured near-constant across
