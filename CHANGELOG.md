@@ -7,6 +7,8 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ## [Unreleased]
 
 ### Added
+- **docs (forensics):** WB-3 STM investigation pack — authority map, hypotheses/thresholds, reference attestation (INDETERMINATE), Core-0 bench spec + INDETERMINATE bundle, FFT512 feasibility sheet, evidence matrix, Captain decision pending, conditional convergence, red-team closure, STM re-derivation design; VP measurement spec under `docs/forensics/stm-vp/`. Refs: BACKLOG.md § WB-3 (Lightwave-Ledstrip), plan `correct-wb3-state`.
+- **tools (forensics):** Fail-closed STM VP manifest gate `scripts/regression-harness/stm_vp_compare.py` with `tests/test_stm_vp_compare.py` (7 host controls). Refs: BACKLOG.md § WB-3.
 - **Lane N4 (factory provisioning tooling): factory image + per-unit NVS** —
   new read-only, non-flashing `scripts/release/make_factory_image.py` assembles
   a single flashable factory image (`esptool merge_bin`: bootloader @ `0x0`,

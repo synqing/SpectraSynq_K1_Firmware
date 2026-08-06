@@ -113,21 +113,51 @@ def _norm(text):
     return "\n".join(line for line in text.splitlines() if line.strip())
 
 
+def _routing_sever_companions(pattern, replacement):
+    """serial_menu.cpp (else-if ladder) and serial_typed_dispatch.cpp (return
+    wrappers) both route to the same dispatcher. Gate-Fα anchors stay count==1
+    per site, but severing only one path leaves oracle _routed() true."""
+    m = re.search(r"(serial_cmd_dispatch_\w+)", pattern)
+    if not m or "_SEVERED" in m.group(1):
+        return []
+    fn = m.group(1)
+    sm = re.search(r"(serial_cmd_dispatch_\w+_SEVERED)", replacement)
+    if not sm:
+        return []
+    severed_fn = sm.group(1)
+    if "else if" in pattern:
+        return [(
+            rf"return {re.escape(fn)}\(command_type, command_data\);",
+            f"return {severed_fn}(command_type, command_data);",
+        )]
+    if "return" in pattern:
+        return [(
+            rf"else if \({re.escape(fn)}\(command_type, command_data\)\)",
+            f"else if ({severed_fn}(command_type, command_data))",
+        )]
+    return []
+
+
 def _mutated_capture(mod, pattern, replacement):
     """Apply a mutation to whichever source file in a firmware COPY matches it,
     then re-run the oracle against that copy. Returns None if the anchor is absent."""
+    patterns = [(pattern, replacement)] + _routing_sever_companions(pattern, replacement)
     with tempfile.TemporaryDirectory() as td:
         dst = Path(td) / "SPECTRASYNQ_K1_FIRMWARE"
         shutil.copytree(FIRMWARE, dst)
-        target = None
+        targets = []
         for f in dst.rglob("*"):
             if f.suffix in (".cpp", ".h") and f.is_file():
                 text = f.read_text(encoding="utf-8", errors="ignore")
-                if re.search(pattern, text):
-                    f.write_text(re.sub(pattern, replacement, text, count=1), encoding="utf-8")
-                    target = f
-                    break
-        if target is None:
+                changed = False
+                for pat, repl in patterns:
+                    if re.search(pat, text):
+                        text = re.sub(pat, repl, text, count=1)
+                        changed = True
+                if changed:
+                    f.write_text(text, encoding="utf-8")
+                    targets.append(f)
+        if not targets:
             return None
         try:
             return mod.capture(firmware_root=dst)

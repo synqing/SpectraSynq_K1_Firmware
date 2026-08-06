@@ -376,8 +376,8 @@ MUTATIONS = [
     #    `_routed` check no longer finds it. The queue bodies still live in the
     #    dispatcher, but every queue command flips reachable:true->false.
     (
-        r"return serial_cmd_dispatch_queue\(command_type, command_data\);",
-        r"return serial_cmd_dispatch_queue_SEVERED(command_type, command_data);",
+        r"else if \(serial_cmd_dispatch_queue\(command_type, command_data\)\)",
+        r"else if (serial_cmd_dispatch_queue_SEVERED(command_type, command_data))",
         "queue_dispatcher_call_site_severed (routing/reachable divergence)",
     ),
     # ---- smart_director / smart_visual / edge_mixer body + routing-by-name teeth ----

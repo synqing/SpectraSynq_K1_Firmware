@@ -1,0 +1,79 @@
+/* K718 Remoted — HALO design tokens (CSS mirror of tokens.json)
+   Authority: ../spec/K718-DESIGN-LANGUAGE.md · do not edit values here without updating tokens.json */
+
+:root {
+  /* ── Device / geometry ─────────────────────────────── */
+  --device-active-px: 480;
+  --device-r-px: 240;
+  --device-scale: 8;            /* px per mm */
+  --grid-safe-pct: 6%;
+  --grid-safe-px: 14px;
+  --grid-safe-r: 226px;
+
+  /* radius bands (outer→inner) */
+  --band-nav-outer: 226px;   --band-nav-inner: 188px;
+  --band-control-outer: 188px; --band-control-inner: 138px;
+  --band-core-outer: 138px;  --band-core-inner: 70px;
+  --band-readout-r: 70px;
+
+  /* ── Background layers ─────────────────────────────── */
+  --bg-base: #06070A;
+  --bg-raised: #0E1014;
+  --bg-ring: #14171D;
+  --bg-hairline: #222630;
+
+  /* ── Text ──────────────────────────────────────────── */
+  --text-primary: #FFFFFF;
+  --text-secondary: #C4CAD4;
+  --text-tertiary: #8A92A0;
+  --text-disabled: #4A515C;
+
+  /* ── SIMPLIFIED (Captain 2026-06-29): one accent + one status indicator ──
+     The board's 5-semantic-accent system (focus/input/active/confirm/alert) and the
+     whole trust/attention machinery are REMOVED. The K718 has:
+       (1) a single highlight accent — theme-driven, overridden per [data-theme]
+       (2) ONE status indicator — BLE connection: green up / red down (universal) */
+  --accent-focus: #2DD4F5;   /* "the accent" (single highlight); theme overrides this */
+  --status-ok:    #36C46A;   /* BLE connected — green  (theme-independent, never changes) */
+  --status-down:  #FF4D4D;   /* BLE not connected — red (theme-independent, never changes) */
+
+  /* ── Typography — K1 Signal Interface standard (artifacts/.../fonts) ──
+     PRIMARY DISPLAY + numerals: DIN Condensed Bold (tabular figures).
+     SECONDARY / UI: Inter Regular. (Oswald/Saira = web render fallback for DIN.) */
+  --font-display: 'DIN Condensed', 'Saira Condensed', 'Barlow Semi Condensed', sans-serif; /* Oswald BANNED (brand violation) */
+  --font-label: 'Inter', system-ui, sans-serif;
+  --font-numeric: var(--font-display); /* legacy alias — the readout uses the display face */
+  --t1: 30px; --t2: 22px; --t3: 17px; --t4: 14px; --t5: 11px;
+  /* micro floor raised to AA @ 11px min (V1/Rams#8): old T6 9-10px@A retired */
+  --track-t2: 0.05em; --track-t3: 0.07em; --track-t4: 0.09em; --track-t5: 0.12em; /* size-compensated (V3) */
+  --track-label: 0.08em; /* legacy alias */
+
+  /* ── Motion ────────────────────────────────────────── */
+  --motion-focus: 160ms cubic-bezier(0.2,0.8,0.2,1);
+  --motion-adjust: 90ms cubic-bezier(0.4,0,0.2,1);
+  --motion-confirm: 320ms cubic-bezier(0.3,0,0,1);
+}
+
+/* ── Theme Territories — the only sanctioned variation axis ──
+   Apply on a container: <div class="dial" data-territory="zero-g-bazaar">
+   Each sets --c1..--c5 (palette) + --t-motion + --t-density.            */
+[data-territory="signal-observatory"] {
+  --c1:#2D6BF5; --c2:#2D9CF5; --c3:#2DD4F5; --c4:#5CE0E0; --c5:#A66BFF;
+  --t-motion: calm; --t-density: high;
+}
+[data-territory="afterglow-district"] {
+  --c1:#A66BFF; --c2:#FF4FD8; --c3:#FF5C9C; --c4:#FF4D4D; --c5:#FF8A1E;
+  --t-motion: smooth; --t-density: low;
+}
+[data-territory="prism-firewall"] {
+  --c1:#2DE0C4; --c2:#2DD4F5; --c3:#3FD0FF; --c4:#3FD96A; --c5:#B6FF3D;
+  --t-motion: responsive; --t-density: high;
+}
+[data-territory="laser-liturgy"] {
+  --c1:#7A4DFF; --c2:#A66BFF; --c3:#D04FFF; --c4:#FF5CD0; --c5:#FF4FD8;
+  --t-motion: deliberate; --t-density: minimal;
+}
+[data-territory="zero-g-bazaar"] {
+  --c1:#FF8A1E; --c2:#FFA63D; --c3:#FFC74D; --c4:#FFE14D; --c5:#2D9CF5;
+  --t-motion: lively; --t-density: medium;
+}

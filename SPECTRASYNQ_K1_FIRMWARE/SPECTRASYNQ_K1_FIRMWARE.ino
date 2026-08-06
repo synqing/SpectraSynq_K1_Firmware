@@ -58,6 +58,9 @@
 #ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h"  // Remoted dial BLE-MIDI central (gated; interference A/B)
 #endif
+#ifdef SB_K1_SYNC_PROBE
+#include "network/k1_sync_link.h"  // Dual-K1 sync transport probe (Phase 0, gated; non-shippable)
+#endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"     // Harness-only final-byte evidence context
 #endif
@@ -374,6 +377,13 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
     light_mode_river_surge(channel.history, *channel.effect);
   } else if (mode == LIGHT_MODE_TEMPO_RIVER_WALK) {
     light_mode_tempo_river_walk(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_BEAT_PULSE) {
+    // Tombstone ID reserve 30 — unselectable; no render body on this branch.
+  } else if (mode == LIGHT_MODE_BLOOM_BT) {
+    // Tombstone ID reserve 31 — unselectable; no render body on this branch.
+  } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
+    // Waveform Hybrid K1: bouncing dot + trail, self-managed history.
+    light_mode_waveform_hybrid_k1(channel.history, *channel.effect);
   }
 }
 
@@ -681,8 +691,14 @@ void setup() {
 #ifdef K1_WIRELESS_ENABLED
   k1_wireless_begin();
 #endif
+#if defined(SB_K1_SYNC_PROBE) && defined(K1_SYNC_ROLE_LEADER)
+  k1_sync::begin();
+#endif
 #ifdef K1_BLE_REMOTED
   k1_ble_remoted_begin();
+#endif
+#if defined(SB_K1_SYNC_PROBE) && defined(K1_SYNC_ROLE_FOLLOWER)
+  k1_sync::begin();
 #endif
 
 #if ENABLE_FASTLED_COLOR_CORRECTION
@@ -825,6 +841,9 @@ void loop() {
 #ifdef K1_BLE_REMOTED
   k1_ble_remoted_poll(t_now);
 #endif
+#ifdef SB_K1_SYNC_PROBE
+  k1_sync::poll();
+#endif
 
   function_id = 5;
 #if ENABLE_VP_PERF_AUDIT
@@ -881,7 +900,10 @@ void loop() {
 #ifdef K1_MIC_AUTO_SENSE_V1
   // Slow supervisor: update AFTER loud-guard publishes this frame's duties/trims.
   // Applied scale is consumed on the NEXT acquire_sample_chunk via effective sensitivity.
+#ifdef K1_MIC_AUTO_SENSE_V1
+  k1_mic_auto_sense_update_frame(t_now);
   k1_mic_auto_sense_update(t_now);
+#endif
 #endif
 #ifdef K1_PIN_EVIDENCE_V1
   k1_pin_evidence_set_ap_metrics(t_now);

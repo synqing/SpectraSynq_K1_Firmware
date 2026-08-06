@@ -23,6 +23,10 @@ extern void reboot(); // system.h
 // PDM noise_samples persist INSIDE the cal profile (the cal-profile save path) —
 // there is deliberately no /noise_cal_pdm.bin.
 #define CAL_PROFILE_FILE "/cal_profile_pdm.bin"
+#elif defined(K1_MIC_IM69D_PDM_V1)
+// IM69D130 persistence namespace (2026-08-05): MUST stay distinct from IM73D
+// /cal_profile_pdm.bin — shared namespace would poison the IM73D cal profile.
+#define CAL_PROFILE_FILE "/cal_profile_im69d.bin"
 #else
 #define CAL_PROFILE_FILE "/cal_profile.bin"
 #endif
@@ -73,6 +77,9 @@ void update_config_filename(uint32_t input) {
   // under the flag. Missing PDM file at boot -> compiled defaults (load_config
   // open-fail path), NEVER the SPH config.
   snprintf(config_filename, 24, "/CONFIG_PDM_%05lu.BIN", input);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  // IM69 namespace — distinct from both SPH (/CONFIG_*.BIN) and IM73D (/CONFIG_PDM_*).
+  snprintf(config_filename, 24, "/CONFIG_IM69_%05lu.BIN", input);
 #else
   snprintf(config_filename, 24, "/CONFIG_%05lu.BIN", input);
 #endif
@@ -96,7 +103,7 @@ void factory_reset() {
     USBSerial.println("delete failed");
   }
 
-#ifndef K1_MIC_IM73D_PDM_V1
+#ifndef K1_MIC_PDM_RX_ANY_V1
   USBSerial.print("Deleting noise_cal.bin: ");
   if (LittleFS.remove("/noise_cal.bin")) {
     USBSerial.println("file deleted");
@@ -112,7 +119,7 @@ void factory_reset() {
     USBSerial.println("delete failed");
   }
 
-#ifndef K1_MIC_IM73D_PDM_V1
+#ifndef K1_MIC_PDM_RX_ANY_V1
   USBSerial.print("Deleting " K1_PRESET_SLOTS_FILE ": ");
   if (LittleFS.remove(K1_PRESET_SLOTS_FILE)) {
     USBSerial.println("file deleted");
@@ -213,6 +220,26 @@ void save_config_delayed() {
 }
 
 // Load configuration from LittleFS
+// Boot palette lock (Captain standing order, 2026-08-05): every K1, bench and main,
+// starts on K1_Naberius_Gold_gp with palette mode ON for both channels.
+//
+// The compiled defaults alone cannot deliver this. CONFIG.PALETTE_INDEX and
+// CONFIG.PALETTE_MODE_ENABLED are inside the persisted blob, so any device that has
+// ever saved a config would restore its old palette over the new default and boot
+// the wrong colour. Forcing after the load — on every exit path, including boot-loop
+// safe mode and a missing/corrupt config file — is what makes "always" true rather
+// than "true on a freshly erased device".
+//
+// The secondary channel's globals are not in the blob (save_configuration() /
+// load_configuration() have no callers), so they already reset each boot; they are
+// set here too so one function states the whole boot contract.
+static inline void k1_apply_boot_palette_lock() {
+  CONFIG.PALETTE_INDEX = K1_BOOT_PALETTE_INDEX;
+  CONFIG.PALETTE_MODE_ENABLED = true;
+  SECONDARY_PALETTE_INDEX = K1_BOOT_PALETTE_INDEX;
+  SECONDARY_PALETTE_MODE_ENABLED = true;
+}
+
 void load_config() {
   lock_leds();
 #ifdef K1_BOOTLOOP_GUARD_V1
@@ -223,6 +250,7 @@ void load_config() {
   // and released before the early return.
   if (k1_boot_safe_mode) {
     memcpy(&CONFIG, &CONFIG_DEFAULTS, sizeof(CONFIG));
+    k1_apply_boot_palette_lock();
     USBSerial.println("BOOT_LOOP_GUARD: safe_mode_config=DEFAULTS (RAM only, file intact)");
     unlock_leds();
     return;
@@ -239,6 +267,7 @@ void load_config() {
       USBSerial.print(config_filename);
       USBSerial.println(" for reading!");
     }
+    k1_apply_boot_palette_lock();
     return;
   }
 
@@ -292,6 +321,9 @@ void load_config() {
   SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
 #endif
 
+  // Applied AFTER the persisted blob is adopted, so a stored palette cannot win.
+  k1_apply_boot_palette_lock();
+
   unlock_leds();
   // save_config() takes its own lock_leds()/unlock_leds(); lock_leds() is a
   // flag-set (not a recursive counter), so call it only AFTER unlocking to avoid
@@ -303,11 +335,10 @@ void load_config() {
 
 // Save noise calibration to LittleFS
 void save_ambient_noise_calibration() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  // STAYS frozen under the flag (decision 2026-07-04): /noise_cal.bin is
-  // SPH-domain, and the PDM noise_samples[] already persist inside
-  // /cal_profile_pdm.bin via save_calibration_profile(). A separate PDM noise
-  // file would be redundant state with its own corruption/skew surface.
+#ifdef K1_MIC_PDM_RX_ANY_V1
+  // STAYS frozen under PDM flags (decision 2026-07-04 / IM69 2026-08-05):
+  // /noise_cal.bin is SPH-domain; PDM noise_samples[] persist inside
+  // CAL_PROFILE_FILE via save_calibration_profile().
   return;
 #endif
   // Crash-safety: skip the open under internal-RAM pressure (non-PDM builds).
@@ -351,11 +382,10 @@ void save_ambient_noise_calibration() {
 
 // Load noise calibration from LittleFS
 void load_ambient_noise_calibration() {
-#ifdef K1_MIC_IM73D_PDM_V1
-  // Never read the SPH-domain /noise_cal.bin under the flag: with no PDM profile
-  // on disk it would leave SPH noise floors live in noise_samples[] (wrong domain
-  // for GDFT subtraction). PDM noise comes from /cal_profile_pdm.bin (or stays at
-  // compiled-default zeros until the first accepted cal).
+#ifdef K1_MIC_PDM_RX_ANY_V1
+  // Never read the SPH-domain /noise_cal.bin under a PDM flag: with no PDM
+  // profile on disk it would leave SPH noise floors live in noise_samples[]
+  // (wrong domain). PDM noise comes from CAL_PROFILE_FILE (or stays zero).
   return;
 #endif
   lock_leds();
@@ -454,7 +484,7 @@ bool save_calibration_profile(uint8_t source) {
     calibration_profile_loaded = true;
     calibration_refresh_status(source);
   }
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   else {
     // A failed PDM file write must never cost an accepted cal: keep the RAM-only
     // semantic success (cal_valid reflects the in-RAM learned values).
@@ -470,7 +500,7 @@ bool load_calibration_profile_if_config_invalid() {
   if (calibration_profile_valid()) {
     calibration_profile_loaded = false;
     calibration_refresh_status(CAL_SOURCE_CONFIG);
-#ifndef K1_MIC_IM73D_PDM_V1
+#ifndef K1_MIC_PDM_RX_ANY_V1
     // PDM: NEVER seed the PDM profile from CONFIG here — at this point CONFIG
     // holds SPH-domain values loaded from the frozen SPH config.bin.
     if (!LittleFS.exists(CAL_PROFILE_FILE)) {

@@ -1,12 +1,55 @@
+<!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
+     repo, so paths and links must spell it that way. Prose here uses "artefacts". -->
+
 # Active Session Handoff — SpectraSynq K1 Firmware
 
-## ▶ COMPLETED (2026-07-26) — M2.1 `serial_menu.h` decomposition (R1+R2)
+## ⛔ DUAL-SYNC IS DEAD (Captain, 2026-08-05)
+
+Deprecated and shelved — closed by instruction, not by a failed gate. Do not
+resume it and do not propose work that depends on it. Full notice:
+[`artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md`](../artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md).
+**The branch `lane/dual-sync-phase0` no longer describes its contents** — it now
+just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
+
+## ▶ CURRENT LANE — AP ADVICE / IM69D130 DUAL-MIC EVALUATION
+
+- **Branch:** `feat/ap-advice-phase0-im69d-gain8` (PR #40 merge target).
+- **Authority:** [`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`](../docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md)
+  · design [`im69d130-dual-mic-eval-design-2026-08-05.md`](../docs/hardware/im69d130-dual-mic-eval-design-2026-08-05.md).
+- **Phase 0 (device-proven):** `K1_MIC_IM69D_INPUT_GAIN=4` (not G=8) — silence latch
+  PASS after Captain silence-go re-cal (`SSL=74`, quiet `silence=1` 100% / 30 s).
+- **Phases 1–2 (host + flash):** Nyquist ghost-bin retirement; GDFT ×2 globally
+  dropped (`K1_GDFT_X2_CROSSOVER_BIN=0`).
+- **Result so far:** in the raw domain the IM69D130 **beats** the productionised
+  IM73D122 — noise floor `raw_i16_rms` 12.8 vs 34.0, dynamic range 2.3–3.5×
+  better, no near-rail anywhere.
+- **Not tested:** AOP/loudness (needs a loudspeaker without onboard limiting);
+  mic B / RIGHT slot (Stage 1b); stereo (Stage 2).
+- **Deployed:** main `F887A500` = `k1_hardware @ 6f1325e`; bench `B489A500` =
+  `k1_bench_im69d` @ Phase 0 gain-4 proof. See
+  [`docs/hardware/device-build-registry.md`](../docs/hardware/device-build-registry.md).
+- **Safety:** identity by chip ID, never port; no cross-flash; `start_noise_cal`
+  requires Captain's spoken silence-go, always.
+
+### Tooling added 2026-08-05 (reusable)
+
+- `scripts/regression-harness/mic_ab_compare.py` — tiered mic comparison; refuses
+  an absolute comparison when a side lacks `raw_i16_*`, and carries a
+  source-limiter detector so a loudspeaker's compression is never reported as
+  microphone headroom. `--self-test` included.
+- `scripts/regression-harness/recover_eval_summary.py` — rebuilds a run's
+  `summary.json` from its per-leg serial logs when a capture is interrupted.
+- `im73d_audio_eval.py` — gained a `bench_im69d` role, `--compare-role-right`,
+  fail-closed dual-role guard, and cross-role A/B comparison.
+
+## ▶ COMPLETED (2026-07-26) — M2.1 `serial_menu.h` decomposition (R1+R2) + Shift+S save-show
 
 - **Authority:** [`docs/refactor/serial-menu-decomposition-plan-2026-07-26.md`](../docs/refactor/serial-menu-decomposition-plan-2026-07-26.md)
-- **Branch:** `feat/serial-menu-decomposition-r1` (local, unpushed — Captain merges)
-- **Outcome:** ODR bomb defused (104/104 defs in `serial_menu.cpp`); Stage-B typed table (`serial_typed_cmd_table.def`, 151 rows); `parse_command()` strcmp ladder retired; golden + Gate-Fα PROVEN; pytest **718** pass; `k1_hardware` + `k1_bench_im73d` build green.
+- **Outcome:** ODR bomb defused (104/104 defs in `serial_menu.cpp`); Stage-B typed
+  table (`serial_typed_cmd_table.def`, 151 rows); `parse_command()` strcmp ladder
+  retired; golden + Gate-Fα PROVEN; Shift+S / `:save_show` host-green on main.
 
-## ▶ CURRENT LANE — IM73D122 PRODUCTIONIZATION — Phase 1 firmware DONE; production proof remains
+## HISTORICAL LANE — IM73D122 PRODUCTIONIZATION
 
 - **RESUME BRIEF (Codex + any agent — READ FIRST):** [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](../docs/hardware/im73d-codex-resume-handover-2026-07-06.md) — the end-to-end work order: done-ledger, device table, ordered remaining queue (R1–R5 + Phase 2/3), escalation template, hard-rule set.
 - **Lane authority (deep context):** [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](../docs/hardware/im73d122-productionization-handover-2026-07-03.md) — §10 = audit + Captain D1/D2 decision; **§11 = the 2026-07-06 autonomous-execution outcomes** (UA shipped, MicFrontend decision, byte-oracle finding, DSR recipe, flip red-team).

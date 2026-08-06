@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>K718 Remoted · SpectraSynq.LED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<style>
+  :root { --bg:#0b0d10; --ink:#ede9e3; --pri:#00aecf; --sec:#b05aa0; --feel:#efa020; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui,sans-serif; }
+  main { max-width:720px; margin:2rem auto; padding:0 1rem; }
+  h1 { font-weight:600; letter-spacing:0.04em; }
+  .note { opacity:0.75; margin-bottom:1.5rem; }
+  .dial { width:360px; height:360px; margin:1rem auto; border-radius:50%;
+          border:2px solid #1e2430; background:radial-gradient(circle at 50% 45%, #141820, #080a0c);
+          position:relative; }
+  .crown { position:absolute; left:50%; top:8px; transform:translateX(-50%);
+           width:10px; height:10px; border-radius:50%; background:var(--pri); }
+  .arc { position:absolute; inset:28px; border:2px solid #2a3344; border-radius:50%; }
+  .centre { position:absolute; inset:0; display:flex; flex-direction:column;
+            align-items:center; justify-content:center; text-align:center; }
+  .fn { color:#9aa3b2; font-size:12px; letter-spacing:0.08em; }
+  .val { font-size:28px; margin-top:6px; }
+  .preview { margin-top:8px; font-size:11px; opacity:0.6; }
+  ul.controls { columns:2; gap:2rem; }
+  li { margin:0.25rem 0; }
+  .tag { display:inline-block; padding:0 6px; border-radius:4px; font-size:11px; }
+  .look { background:#00384a; color:var(--pri); }
+  .feel { background:#3a2a00; color:var(--feel); }
+  .level { background:#0d2e1c; color:#28b76e; }
+  .stage { background:#1c1640; color:#7c5cff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>K718 × SpectraSynq.LED</h1>
+  <p class="note">Static/ambient control surface mock — <strong>not</strong> K1 audio.
+  mood → <strong>SPEED</strong>. Modes PC 0–8 only. Crown sacred for BLE telltale.</p>
+  <div class="dial" aria-label="360 round dial preview">
+    <div class="crown" title="BLE telltale"></div>
+    <div class="arc"></div>
+    <div class="centre">
+      <div class="fn">SPEED</div>
+      <div class="val">35%</div>
+      <div class="preview">installation preview · non-audio</div>
+    </div>
+  </div>
+  <h2>Picker functions (map-backed)</h2>
+  <ul class="controls">
+    <li><span class="tag look">LOOK</span> MODE · PALETTE · PALETTE MODE</li>
+    <li><span class="tag feel">FEEL</span> PHOTONS · CHROMA · SPEED · SATURATION</li>
+    <li><span class="tag level">LEVEL</span> BRIGHTNESS · AUTO SHIFT · STANDBY · CHROMA PROF · MAX mA</li>
+    <li><span class="tag stage">STAGE</span> EDGE LIGHT · EDGE MODE · EDGE STR · MIRROR · SEC ENABLE · PRESET · USER SLOT</li>
+  </ul>
+  <p class="note">Contract: <code>sqled.ble-midi-map/1</code> (40 controls). H-1 echoes mode, photons, palette, brightness, sec.enable.</p>
+</main>
+</body>
+</html>

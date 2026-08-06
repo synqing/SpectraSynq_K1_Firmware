@@ -1,0 +1,304 @@
+{
+  "case": "A",
+  "firmware_source_sha": "a58203183208a4db7fcc7a30d060e6db14673ab1",
+  "host_execution_sha": "1e006a8692a5bd06360adf153cc41969835735e2",
+  "image_set": {
+    "path": "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/image-set-a582031.json",
+    "sha256": "0310a620ece61b9f79f9085f1d986d4d9d94d1f0ffed4e932c79cb9593a6b6b0",
+    "size": 2493
+  },
+  "input_ports_manifest": {
+    "path": "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/20260728T192348Z-newset-caseA/runtime/ports_pre_A.json",
+    "sha256": "6bdd1c0de570c7a9d777f420e20cc17f3e5055658289b812ec27c00a5a5a016b",
+    "size": 508
+  },
+  "output_ports_manifest": {
+    "path": "artifacts/k1_dual_sync_eval_2026-07-08/recovery/f2/20260728T192348Z-newset-caseA/runtime/ports_A.json",
+    "sha256": "fb5927d6682215e3bc49f468a537af457f8225e82dd6957d7f501b4a245ea5f3",
+    "size": 566
+  },
+  "port_bindings": {
+    "created_at_utc": "2026-07-27T19:25:20Z",
+    "firmware_source_sha": "a58203183208a4db7fcc7a30d060e6db14673ab1",
+    "follower": {
+      "chip_id": "B489A500",
+      "port": "/dev/cu.usbmodem11401",
+      "usb_serial": "B4:3A:45:A5:89:B4"
+    },
+    "host_execution_sha": "1e006a8692a5bd06360adf153cc41969835735e2",
+    "leader": {
+      "chip_id": "F887A500",
+      "port": "/dev/cu.usbmodem112401",
+      "usb_serial": "B4:3A:45:A5:87:F8"
+    },
+    "previous_manifest_sha256": "6bdd1c0de570c7a9d777f420e20cc17f3e5055658289b812ec27c00a5a5a016b",
+    "schema_version": 1,
+    "stage": "A"
+  },
+  "run_id": "20260728T192348Z-newset-caseA",
+  "schema_version": 2,
+  "startup_capture": {
+    "checks": {
+      "follower_link_ready_snapshot": true,
+      "follower_scan_started": true,
+      "follower_uuid_discovered": true,
+      "leader_advertising_ready": true,
+      "leader_link_ready_snapshot": true
+    },
+    "duration_s": 20.0,
+    "logs": {
+      "follower": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/case_A_startup_follower.log",
+        "sha256": "e923f41459190363fbf0bfbf2d6f7c760698aa920e749b7eda1abffc6def1c4b",
+        "size": 176489
+      },
+      "leader": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/case_A_startup_leader.log",
+        "sha256": "852789e6edacc72ce9b2a04f566e0baf8edac3cd1640b65c9f126a05f3f2c858",
+        "size": 80960
+      }
+    },
+    "status": "PASS",
+    "sync_status": {
+      "context_start_line": {
+        "follower": 2359,
+        "leader": 1187
+      },
+      "follower": {
+        "epoch": 1,
+        "handle": 1,
+        "interval_units": 6,
+        "latency": 0,
+        "linked": true,
+        "mtu": 247,
+        "phy_rx": 2,
+        "phy_tx": 2
+      },
+      "leader": {
+        "epoch": 1,
+        "handle": 1,
+        "interval_units": 6,
+        "latency": 0,
+        "linked": true,
+        "mtu": 247,
+        "phy_rx": 2,
+        "phy_tx": 2
+      }
+    }
+  },
+  "status": "PASS",
+  "uploads": {
+    "follower": {
+      "action": "flash",
+      "app_elf_sha256": "71b88377f33a7ef4d353f79a502c68fcf475cc8c7877397f454728ba97c26b36",
+      "bin_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_bench/firmware.bin",
+      "bin_sha256": "51c8924255b7e8542ab0023c03489bda50f747407d7fc09ce8cbf2037fb79701",
+      "chip_id": "B489A500",
+      "cross_target_guard_command": [
+        "python3",
+        "scripts/platformio/k1_upload_guard.py",
+        "--env",
+        "k1_sync_probe_main_sync_only",
+        "--upload-port",
+        "/dev/cu.usbmodem11401"
+      ],
+      "cross_target_guard_exit_code": 2,
+      "cross_target_guard_log": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/follower/cross-target-guard.log",
+        "sha256": "d0494b5aa795abda6bca4cc28a6970f0c6f4ec100c2ea8c4ae8ec611606d0961",
+        "size": 355
+      },
+      "cross_target_guard_verified": true,
+      "elf_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_bench/firmware.elf",
+      "elf_sha256": "71b88377f33a7ef4d353f79a502c68fcf475cc8c7877397f454728ba97c26b36",
+      "env": "k1_sync_probe_bench",
+      "guard_command": [
+        "python3",
+        "scripts/platformio/k1_upload_guard.py",
+        "--env",
+        "k1_sync_probe_bench",
+        "--upload-port",
+        "/dev/cu.usbmodem11401"
+      ],
+      "guard_verified": true,
+      "log": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/follower/flash.log",
+        "sha256": "7124fbc85cc9a9a3c69892245990c35ea66360cf0ae7a942ef34cec78a774de8",
+        "size": 3063
+      },
+      "partition_read_command": [
+        "pio",
+        "pkg",
+        "exec",
+        "--package",
+        "tool-esptoolpy@4.8.9",
+        "--",
+        "esptool.py",
+        "--chip",
+        "esp32s3",
+        "--port",
+        "/dev/cu.usbmodem11401",
+        "--baud",
+        "921600",
+        "read_flash",
+        "0x8000",
+        "0xc00",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/follower/partition-table-readback.bin"
+      ],
+      "partition_table": {
+        "expected_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_main/partitions.bin",
+        "expected_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+        "readback": {
+          "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/follower/partition-table-readback.bin",
+          "sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+          "size": 3072
+        }
+      },
+      "port": "/dev/cu.usbmodem11401",
+      "postflash_readback": {
+        "app_elf_sha256": "71b88377f33a7ef4d353f79a502c68fcf475cc8c7877397f454728ba97c26b36",
+        "boot_nonce": "b99086fdd772e4a0",
+        "chip_id": "B489A500",
+        "env": "k1_sync_probe_bench",
+        "epoch": 1785180046,
+        "git": "a582031",
+        "port": "/dev/cu.usbmodem11401",
+        "reset_reason": 11,
+        "uptime_ms": 1252,
+        "version": "40103"
+      },
+      "preflash_identity": {
+        "chip_id": "B489A500",
+        "port": "/dev/cu.usbmodem11401",
+        "usb_serial": "B4:3A:45:A5:89:B4"
+      },
+      "source_case": "A",
+      "usb_serial": "B4:3A:45:A5:89:B4",
+      "write_command": [
+        "pio",
+        "pkg",
+        "exec",
+        "--package",
+        "tool-esptoolpy@4.8.9",
+        "--",
+        "esptool.py",
+        "--chip",
+        "esp32s3",
+        "--port",
+        "/dev/cu.usbmodem11401",
+        "--baud",
+        "921600",
+        "write_flash",
+        "0x10000",
+        "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_bench/firmware.bin"
+      ],
+      "write_exit_code": 0
+    },
+    "leader": {
+      "action": "flash",
+      "app_elf_sha256": "336840441cb3b03180bb7997f1e3edc16f0ade1fad873b0e75471bbe9693d2c8",
+      "bin_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_main_sync_only/firmware.bin",
+      "bin_sha256": "3bc07534aa0c52e7cf3d5cca082f214a84a046314f127ac88cb0a4be4c945228",
+      "chip_id": "F887A500",
+      "cross_target_guard_command": [
+        "python3",
+        "scripts/platformio/k1_upload_guard.py",
+        "--env",
+        "k1_sync_probe_bench",
+        "--upload-port",
+        "/dev/cu.usbmodem112401"
+      ],
+      "cross_target_guard_exit_code": 2,
+      "cross_target_guard_log": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/leader/cross-target-guard.log",
+        "sha256": "e19981ad425835d33c88841ae262e1de49fd3307ed7fc87fa026228768da8ef7",
+        "size": 341
+      },
+      "cross_target_guard_verified": true,
+      "elf_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_main_sync_only/firmware.elf",
+      "elf_sha256": "336840441cb3b03180bb7997f1e3edc16f0ade1fad873b0e75471bbe9693d2c8",
+      "env": "k1_sync_probe_main_sync_only",
+      "guard_command": [
+        "python3",
+        "scripts/platformio/k1_upload_guard.py",
+        "--env",
+        "k1_sync_probe_main_sync_only",
+        "--upload-port",
+        "/dev/cu.usbmodem112401"
+      ],
+      "guard_verified": true,
+      "log": {
+        "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/leader/flash.log",
+        "sha256": "8480d2f5b40a11cbf6e9c984e1f004363be3d557f65dfbacb4e6dc7479dae6f0",
+        "size": 3159
+      },
+      "partition_read_command": [
+        "pio",
+        "pkg",
+        "exec",
+        "--package",
+        "tool-esptoolpy@4.8.9",
+        "--",
+        "esptool.py",
+        "--chip",
+        "esp32s3",
+        "--port",
+        "/dev/cu.usbmodem112401",
+        "--baud",
+        "921600",
+        "read_flash",
+        "0x8000",
+        "0xc00",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/leader/partition-table-readback.bin"
+      ],
+      "partition_table": {
+        "expected_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_main/partitions.bin",
+        "expected_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+        "readback": {
+          "path": "_scratch/dual_sync_f2_abc_20260728T192348Z-newset-caseA/uploads/case_A/leader/partition-table-readback.bin",
+          "sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+          "size": 3072
+        }
+      },
+      "port": "/dev/cu.usbmodem112401",
+      "postflash_readback": {
+        "app_elf_sha256": "336840441cb3b03180bb7997f1e3edc16f0ade1fad873b0e75471bbe9693d2c8",
+        "boot_nonce": "aaa78c4da88ac03c",
+        "chip_id": "F887A500",
+        "env": "k1_sync_probe_main_sync_only",
+        "epoch": 1785179988,
+        "git": "a582031",
+        "port": "/dev/cu.usbmodem112401",
+        "reset_reason": 11,
+        "uptime_ms": 1242,
+        "version": "40103"
+      },
+      "preflash_identity": {
+        "chip_id": "F887A500",
+        "port": "/dev/cu.usbmodem112401",
+        "usb_serial": "B4:3A:45:A5:87:F8"
+      },
+      "source_case": "A",
+      "usb_serial": "B4:3A:45:A5:87:F8",
+      "write_command": [
+        "pio",
+        "pkg",
+        "exec",
+        "--package",
+        "tool-esptoolpy@4.8.9",
+        "--",
+        "esptool.py",
+        "--chip",
+        "esp32s3",
+        "--port",
+        "/dev/cu.usbmodem112401",
+        "--baud",
+        "921600",
+        "write_flash",
+        "0x10000",
+        "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z/k1_sync_probe_main_sync_only/firmware.bin"
+      ],
+      "write_exit_code": 0
+    }
+  }
+}

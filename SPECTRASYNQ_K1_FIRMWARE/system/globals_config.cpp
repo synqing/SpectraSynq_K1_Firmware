@@ -76,7 +76,7 @@ conf CONFIG = {
   true,                // STANDBY_DIMMING (default-flip 2026-07-10, Captain-signed: go-dark in silence. Detection is raw-RMS + dwell, cal-independent; hardware-validated latch->true-black->wake on B4:3A:45:A5:89:B4)
   false,               // REVERSE_ORDER
   false,               // RESERVED_CONFIG_BYTE, kept to preserve saved-config layout
-  1500,                // MAX_CURRENT_MA
+  2500,                // MAX_CURRENT_MA (was 1500; raised for 5V/~2.5A PSU headroom)
   true,                // TEMPORAL_DITHERING
   true,                // AUTO_COLOR_SHIFT
   0.00,                // INCANDESCENT_FILTER
@@ -89,8 +89,8 @@ conf CONFIG = {
   0.00,                // BASE_COAT_INTENSITY (Default 0.0 = base coat off; user enables via encoder 0. Phase 1 2026-05-20: comment corrected from "full intensity"; the value has always been 0.0.)
 
   // --- Palette Defaults ---
-  0,                   // PALETTE_INDEX (Default to the first palette)
-  false,               // PALETTE_MODE_ENABLED (Default to off)
+  K1_BOOT_PALETTE_INDEX,  // PALETTE_INDEX (K1_Naberius_Gold_gp — boot palette lock, 2026-08-05)
+  true,                   // PALETTE_MODE_ENABLED (palette mode ON at boot, both channels)
 };
 
 // Ensure LED count is set from the single #define in constants.h

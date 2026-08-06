@@ -72,11 +72,16 @@ class SerialLine:
 
 DEVICES = (
     DeviceSpec("bench_im73d", BENCH_MAC),
+    # IM69D130 dual-mic PCB3 eval (2026-08-05): same bench unit, different fitted
+    # mic + env (k1_bench_im69d). Mutually exclusive with bench_im73d in one run —
+    # both roles resolve to the same USB serial, and only one mic is ever fitted.
+    DeviceSpec("bench_im69d", BENCH_MAC),
     DeviceSpec("main_sph", MAIN_MAC),
 )
+DEVICE_BY_ROLE = {spec.role: spec for spec in DEVICES}
 
 KEY_VALUE_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)=([^\s|,]+)")
-READ_ONLY_COMMANDS = {"build", "dump"}
+READ_ONLY_COMMANDS = {"build", "chip_id", "dump"}
 FORBIDDEN_SERIAL_TOKENS = {"start_noise_cal", "N", "Y"}
 DEFAULT_MUSIC_VOLUMES = "45,60,75"
 DSR_COMPARE_REQUIRED_METRICS = ("raw_i16_rms", "raw_i16_abs_peak", "raw_i16_near_pct")
@@ -197,7 +202,64 @@ def assess_quality(summary: dict[str, Any], min_rows: int) -> dict[str, Any]:
     }
 
 
-def discover_ports() -> dict[str, str]:
+def assess_capture_integrity(error: str | None, ap_rows: int, min_rows: int) -> dict[str, Any]:
+    reasons: list[str] = []
+    if error:
+        reasons.append("serial_capture_error")
+    if ap_rows < min_rows:
+        reasons.append(f"too_few_ap_rows:{ap_rows}<{min_rows}")
+    return {
+        "valid": not reasons,
+        "reasons": reasons,
+    }
+
+
+def assert_unique_usb_serials(specs: tuple[DeviceSpec, ...]) -> tuple[DeviceSpec, ...]:
+    by_serial: dict[str, list[str]] = {}
+    for spec in specs:
+        by_serial.setdefault(spec.usb_serial, []).append(spec.role)
+    conflicts = {serial: roles for serial, roles in by_serial.items() if len(roles) > 1}
+    if conflicts:
+        rendered = "; ".join(
+            f"{'+'.join(roles)} share USB serial {serial}" for serial, roles in conflicts.items()
+        )
+        raise SystemExit(
+            "ROLE CONFLICT: "
+            + rendered
+            + " — one physical unit carries one mic at a time; pass --roles with the "
+            "role matching the mic actually fitted (e.g. --roles bench_im69d or "
+            "--roles bench_im69d,main_sph)"
+        )
+    return specs
+
+
+def select_device_specs(raw_roles: str | None) -> tuple[DeviceSpec, ...]:
+    if raw_roles is None or raw_roles.strip() == "all":
+        return assert_unique_usb_serials(DEVICES)
+
+    selected: list[DeviceSpec] = []
+    seen: set[str] = set()
+    for item in raw_roles.split(","):
+        role = item.strip()
+        if not role:
+            continue
+        if role == "all":
+            raise SystemExit("--roles=all cannot be combined with explicit roles")
+        spec = DEVICE_BY_ROLE.get(role)
+        if spec is None:
+            valid = ",".join(sorted(DEVICE_BY_ROLE))
+            raise SystemExit(f"unknown device role {role!r}; valid roles: {valid},all")
+        if role in seen:
+            raise SystemExit(f"duplicate device role {role!r}")
+        seen.add(role)
+        selected.append(spec)
+
+    if not selected:
+        raise SystemExit("--roles selected no devices")
+    return assert_unique_usb_serials(tuple(selected))
+
+
+def discover_ports(specs: tuple[DeviceSpec, ...] = DEVICES) -> dict[str, str]:
     by_serial: dict[str, str] = {}
     for port in list_ports.comports():
         serial_number = (port.serial_number or "").upper()
@@ -205,7 +267,7 @@ def discover_ports() -> dict[str, str]:
             by_serial[serial_number] = port.device
 
     resolved: dict[str, str] = {}
-    for spec in DEVICES:
+    for spec in specs:
         port = by_serial.get(spec.usb_serial)
         if not port:
             raise SystemExit(f"IDENTITY GATE: missing {spec.role} serial {spec.usb_serial}")
@@ -224,10 +286,13 @@ def open_serial(port: str) -> serial.Serial:
     return stream
 
 
-def open_streams(ports: dict[str, str]) -> dict[str, serial.Serial]:
+def open_streams(
+    ports: dict[str, str],
+    specs: tuple[DeviceSpec, ...] = DEVICES,
+) -> dict[str, serial.Serial]:
     streams: dict[str, serial.Serial] = {}
     try:
-        for spec in DEVICES:
+        for spec in specs:
             streams[spec.role] = open_serial(ports[spec.role])
     except Exception:
         for stream in streams.values():
@@ -275,9 +340,14 @@ def read_until_runtime_ready(stream: serial.Serial, timeout: float = 12.0) -> tu
     return lines, ready
 
 
-def serial_preflight(streams: dict[str, serial.Serial], ports: dict[str, str], out_dir: Path) -> dict[str, Any]:
+def serial_preflight(
+    streams: dict[str, serial.Serial],
+    ports: dict[str, str],
+    out_dir: Path,
+    specs: tuple[DeviceSpec, ...] = DEVICES,
+) -> dict[str, Any]:
     report: dict[str, Any] = {}
-    for spec in DEVICES:
+    for spec in specs:
         port = ports[spec.role]
         lines: list[SerialLine] = []
         stream = streams[spec.role]
@@ -290,7 +360,7 @@ def serial_preflight(streams: dict[str, serial.Serial], ports: dict[str, str], o
                 f"RUNTIME GATE: {spec.role} {port} produced no [AP]/runtime line after open; "
                 f"see {log_path}"
             )
-        for command in ("build", "dump"):
+        for command in ("build", "chip_id", "dump"):
             assert_command_allowed(command)
             payload = f":{command}\n".encode()
             stream.write(payload)
@@ -316,6 +386,44 @@ def serial_preflight(streams: dict[str, serial.Serial], ports: dict[str, str], o
             ],
         }
     return report
+
+
+def assert_required_build_env(preflight: dict[str, Any], required_env: str) -> None:
+    # required_env is either a single env name applied to every selected role, or
+    # a comma-separated role=env mapping for mixed-device sessions
+    # (e.g. "bench_im69d=k1_bench_im69d,main_sph=k1_hardware"). With a mapping,
+    # every selected role must appear in it — fail closed, never skip a device.
+    per_role: dict[str, str] = {}
+    if "=" in required_env:
+        for item in required_env.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            role_key, _, env_name = item.partition("=")
+            if not role_key.strip() or not env_name.strip():
+                raise SystemExit(f"invalid --require-build-env entry: {item!r}")
+            per_role[role_key.strip()] = env_name.strip()
+
+    mismatches: list[str] = []
+    for role, device in preflight.items():
+        if per_role:
+            expected = per_role.get(role)
+            if expected is None:
+                mismatches.append(f"{role}: missing from --require-build-env mapping")
+                continue
+        else:
+            expected = required_env
+        build_lines = device.get("build_lines", [])
+        envs = {
+            match.group(1)
+            for line in build_lines
+            for match in re.finditer(r"\benv=([^\s]+)", str(line))
+        }
+        if expected not in envs:
+            rendered = ",".join(sorted(envs)) or "none"
+            mismatches.append(f"{role}: expected env={expected}, observed={rendered}")
+    if mismatches:
+        raise SystemExit("BUILD ENV GATE: " + "; ".join(mismatches))
 
 
 def write_serial_log(path: Path, lines: list[SerialLine]) -> None:
@@ -425,6 +533,7 @@ def run_capture(
     ports: dict[str, str],
     streams: dict[str, serial.Serial],
     out_dir: Path,
+    specs: tuple[DeviceSpec, ...] = DEVICES,
 ) -> dict[str, Any]:
     set_output_volume(volume)
     time.sleep(settle)
@@ -445,7 +554,7 @@ def run_capture(
             args=(spec.role, streams[spec.role], stop_at, start_event, results),
             daemon=True,
         )
-        for spec in DEVICES
+        for spec in specs
     ]
     for thread in threads:
         thread.start()
@@ -469,7 +578,7 @@ def run_capture(
         "devices": {},
     }
     min_rows = max(3, int(duration * 0.50))
-    for spec in DEVICES:
+    for spec in specs:
         device_result = results.get(spec.role, {"error": "thread produced no result", "lines": []})
         lines = list(device_result.get("lines") or [])
         log_path = out_dir / f"{label}_vol{volume:03d}_r{repeat_index}_{spec.role}.log"
@@ -477,6 +586,7 @@ def run_capture(
         ap_rows = [row for row in (parse_ap_line(line.line) for line in lines) if row is not None]
         summary = summarise_numeric(ap_rows)
         quality = assess_quality(summary, min_rows)
+        capture = assess_capture_integrity(device_result.get("error"), len(ap_rows), min_rows)
         run_report["devices"][spec.role] = {
             "port": ports[spec.role],
             "usb_serial": spec.usb_serial,
@@ -486,6 +596,7 @@ def run_capture(
             "ap_rows": len(ap_rows),
             "summary": summary,
             "quality": quality,
+            "capture": capture,
         }
     return run_report
 
@@ -603,12 +714,13 @@ def count_role_quality_failures(summary_doc: dict[str, Any], role: str) -> dict[
 def compare_metric(
     left_doc: dict[str, Any],
     right_doc: dict[str, Any],
-    role: str,
+    left_role: str,
+    right_role: str,
     metric: str,
     stat: str,
 ) -> dict[str, Any]:
-    left_values = collect_role_metric(left_doc, role, metric, stat)
-    right_values = collect_role_metric(right_doc, role, metric, stat)
+    left_values = collect_role_metric(left_doc, left_role, metric, stat)
+    right_values = collect_role_metric(right_doc, right_role, metric, stat)
     left_summary = summarise_values(left_values)
     right_summary = summarise_values(right_values)
     ratio: float | None = None
@@ -631,17 +743,21 @@ def compare_summaries(
     left_label: str,
     right_label: str,
     role: str,
+    right_role: str | None = None,
 ) -> dict[str, Any]:
+    # right_role enables cross-mic A/B (e.g. left bench_im73d vs right
+    # bench_im69d). Default keeps the original same-role DSR comparison.
+    right_role = right_role or role
     metrics: dict[str, Any] = {}
     for metric in DSR_COMPARE_REQUIRED_METRICS:
         stat = "max" if metric == "raw_i16_near_pct" else "p90"
-        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+        metrics[metric] = compare_metric(left_doc, right_doc, role, right_role, metric, stat)
     for metric in DSR_COMPARE_CONTEXT_METRICS:
         stat = "min" if metric == "input_trim" else "p90"
-        metrics[metric] = compare_metric(left_doc, right_doc, role, metric, stat)
+        metrics[metric] = compare_metric(left_doc, right_doc, role, right_role, metric, stat)
 
     left_quality = count_role_quality_failures(left_doc, role)
-    right_quality = count_role_quality_failures(right_doc, role)
+    right_quality = count_role_quality_failures(right_doc, right_role)
     missing_required = [
         metric
         for metric in DSR_COMPARE_REQUIRED_METRICS
@@ -669,6 +785,7 @@ def compare_summaries(
         "left_label": left_label,
         "right_label": right_label,
         "role": role,
+        "right_role": right_role,
         "required_raw_metrics": list(DSR_COMPARE_REQUIRED_METRICS),
         "context_metrics": list(DSR_COMPARE_CONTEXT_METRICS),
         "metrics": metrics,
@@ -802,6 +919,42 @@ def run_self_test() -> None:
     assert compare["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 1.2
     assert compare["verdict"] == "no_promotion_without_speaker_stimulus"
 
+    cross_right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im69d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 20.0},
+                            "raw_i16_abs_peak": {"p90": 80.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 200.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    cross = compare_summaries(
+        left_doc,
+        cross_right_doc,
+        left_label="im73d",
+        right_label="im69d",
+        role="bench_im73d",
+        right_role="bench_im69d",
+    )
+    assert cross["right_role"] == "bench_im69d"
+    assert cross["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 2.0
+
+    try:
+        select_device_specs("bench_im73d,bench_im69d")
+    except SystemExit as exc:
+        assert "ROLE CONFLICT" in str(exc)
+    else:
+        raise AssertionError("bench role conflict not detected")
+
 
 def parse_volumes(raw: str) -> list[int]:
     values: list[int] = []
@@ -825,6 +978,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--compare-output", type=Path, help="write DSR comparison JSON report")
     parser.add_argument("--compare-role", default="bench_im73d")
     parser.add_argument(
+        "--compare-role-right",
+        default=None,
+        help="role to read from the RIGHT summary (cross-mic A/B, e.g. bench_im69d); "
+        "defaults to --compare-role",
+    )
+    parser.add_argument(
         "--track",
         type=Path,
         help="optional first track; for multi-trial music prefer --playlist",
@@ -845,9 +1004,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quiet-repeats", type=int, default=2)
     parser.add_argument("--quiet-only", action="store_true", help="capture ambient/quiet AP rows only")
     parser.add_argument("--no-speaker-playback", action="store_true", help="alias for --quiet-only")
+    parser.add_argument(
+        "--roles",
+        default="all",
+        help="comma-separated device roles to open; bench_im73d and bench_im69d are "
+        "mutually exclusive (same physical unit), so 'all' refuses to run — pass the "
+        "role matching the fitted mic (e.g. bench_im69d or bench_im69d,main_sph)",
+    )
     parser.add_argument("--repeatability-cv", type=float, default=0.25)
     parser.add_argument("--require-repeatability", action="store_true")
     parser.add_argument("--skip-preflight", action="store_true")
+    parser.add_argument(
+        "--require-build-env",
+        help="abort before playback unless every selected device reports this BUILD env",
+    )
     return parser
 
 
@@ -865,6 +1035,7 @@ def main(argv: list[str]) -> int:
             left_label=left_path.stem,
             right_label=right_path.stem,
             role=args.compare_role,
+            right_role=args.compare_role_right,
         )
         if args.compare_output is not None:
             write_compare_report(report, args.compare_output)
@@ -878,6 +1049,7 @@ def main(argv: list[str]) -> int:
     if args.repeats < 0 or args.quiet_repeats < 0:
         raise SystemExit("--repeats and --quiet-repeats must be non-negative")
 
+    selected_specs = select_device_specs(args.roles)
     volumes, no_speaker_playback = resolve_capture_mode(args)
 
     music_trials: list[Any] = []
@@ -934,19 +1106,21 @@ def main(argv: list[str]) -> int:
         "no_speaker_playback": no_speaker_playback,
         "repeats": args.repeats,
         "quiet_repeats": args.quiet_repeats,
-        "devices": {spec.role: spec.usb_serial for spec in DEVICES},
+        "devices": {spec.role: spec.usb_serial for spec in selected_specs},
         "runs": runs,
     }
 
     try:
-        ports = discover_ports()
+        ports = discover_ports(selected_specs)
         report["ports"] = ports
-        streams = open_streams(ports)
+        streams = open_streams(ports, selected_specs)
         if not args.skip_preflight:
-            report["preflight"] = serial_preflight(streams, ports, out_dir)
+            report["preflight"] = serial_preflight(streams, ports, out_dir, selected_specs)
+            if args.require_build_env:
+                assert_required_build_env(report["preflight"], args.require_build_env)
         else:
             report["runtime_ready"] = {}
-            for spec in DEVICES:
+            for spec in selected_specs:
                 ready_lines, ready = read_until_runtime_ready(streams[spec.role])
                 log_path = out_dir / f"runtime_ready_{spec.role}.log"
                 write_serial_log(log_path, ready_lines)
@@ -969,12 +1143,13 @@ def main(argv: list[str]) -> int:
                     repeat_index=repeat,
                     duration=args.duration,
                     settle=args.settle,
-                    stimulus=None,
-                    ports=ports,
-                    streams=streams,
-                    out_dir=out_dir,
+                        stimulus=None,
+                        ports=ports,
+                        streams=streams,
+                        out_dir=out_dir,
+                        specs=selected_specs,
+                    )
                 )
-            )
 
         played_afplay: set[str] = set()
         for trial in music_trials:
@@ -1005,6 +1180,7 @@ def main(argv: list[str]) -> int:
                     ports=ports,
                     streams=streams,
                     out_dir=out_dir,
+                    specs=selected_specs,
                 )
             )
             runs[-1]["source_track"] = str(trial.track)

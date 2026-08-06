@@ -39,6 +39,49 @@ def test_ap_parser_captures_core_quality_fields():
     assert row["cal_source"] == "persisted_profile"
 
 
+def test_ap_parser_accepts_production_rows_without_mic_auto_sense_fields():
+    harness = load_harness()
+    row = harness.parse_ap_line(
+        "[AP] SSL=162 DC=0 max_raw=1224 follower=1240 peak_scaled=0.686 "
+        "response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile "
+        "cal_valid=1 cal_reason=ok | bpm=123.4 conf=0.91 lock=1 phase=0.25 "
+        "beat=0 bstr=0.10 | onset=1 bass=0 ostr=0.42 "
+        "| raw_i16_abs_peak=88 raw_i16_rms=21.5 raw_i16_near_pct=0.000 "
+        "| k1_loud=1 input_trim=1.000 gdft_trim=0.998 agc_gain=0.442 "
+        "agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 "
+        "spec_pin=0.000 spec_sat=0.000"
+    )
+
+    assert row is not None
+    assert row["raw_i16_abs_peak"] == 88
+    assert "mas_state" not in row
+
+
+def test_ap_parser_captures_mic_auto_sense_telemetry_fields_in_firmware_order():
+    harness = load_harness()
+    row = harness.parse_ap_line(
+        "[AP] SSL=162 DC=0 max_raw=1224 follower=1240 peak_scaled=0.686 "
+        "response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile "
+        "cal_valid=1 cal_reason=ok | bpm=123.4 conf=0.91 lock=1 phase=0.25 "
+        "beat=0 bstr=0.10 | onset=1 bass=0 ostr=0.42 "
+        "raw_i16_abs_peak=88 raw_i16_rms=21.5 raw_i16_near_pct=0.000 "
+        "| k1_loud=1 input_trim=1.000 gdft_trim=0.998 agc_gain=0.442 "
+        "agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 "
+        "spec_pin=0.000 spec_sat=0.000 "
+        "| mas_state=2 mas_reason=6 mas_window_age_sec=12.5 mas_applied_scale=1.000"
+    )
+
+    assert row is not None
+    assert row["mas_state"] == 2
+    assert row["mas_reason"] == 6
+    assert row["mas_window_age_sec"] == 12.5
+    assert row["mas_applied_scale"] == 1.0
+
+    summary = harness.summarise_numeric([row])
+    assert summary["mas_reason"]["max"] == 6
+    assert summary["mas_applied_scale"]["max"] == 1.0
+
+
 def test_quality_gate_rejects_missing_rows_and_clipping():
     harness = load_harness()
     assert harness.assess_quality(harness.summarise_numeric([]), min_rows=1) == {
@@ -97,6 +140,21 @@ def test_quality_gate_warns_on_conditioned_peak_pin_without_rejecting_raw_captur
     assert quality["warnings"] == ["conditioned_peak_pin_high"]
 
 
+def test_capture_integrity_rejects_serial_error_even_with_enough_ap_rows():
+    harness = load_harness()
+
+    capture = harness.assess_capture_integrity(
+        "device reports readiness to read but returned no data",
+        ap_rows=20,
+        min_rows=12,
+    )
+
+    assert capture == {
+        "valid": False,
+        "reasons": ["serial_capture_error"],
+    }
+
+
 def test_repeatability_gate_uses_characterised_variance():
     harness = load_harness()
     stable = harness.repeatability_report(
@@ -136,6 +194,150 @@ def test_quiet_only_mode_refuses_nonzero_speaker_volume():
 
     with pytest.raises(SystemExit, match="refuses nonzero"):
         harness.resolve_capture_mode(args)
+
+
+def test_harness_can_select_bench_only_device_role():
+    harness = load_harness()
+
+    selected = harness.select_device_specs("bench_im73d")
+
+    assert [spec.role for spec in selected] == ["bench_im73d"]
+    assert [spec.usb_serial for spec in selected] == [harness.BENCH_MAC]
+
+
+def test_harness_refuses_unknown_or_duplicate_device_roles():
+    harness = load_harness()
+
+    with pytest.raises(SystemExit, match="unknown device role"):
+        harness.select_device_specs("not_a_k1")
+
+    with pytest.raises(SystemExit, match="duplicate device role"):
+        harness.select_device_specs("bench_im73d,bench_im73d")
+
+
+def test_harness_can_select_bench_im69d_role():
+    harness = load_harness()
+
+    selected = harness.select_device_specs("bench_im69d")
+
+    assert [spec.role for spec in selected] == ["bench_im69d"]
+    assert [spec.usb_serial for spec in selected] == [harness.BENCH_MAC]
+
+
+def test_harness_refuses_bench_roles_sharing_one_usb_serial():
+    harness = load_harness()
+
+    with pytest.raises(SystemExit, match="ROLE CONFLICT"):
+        harness.select_device_specs("bench_im73d,bench_im69d")
+
+    # Default --roles=all now contains both bench roles and must fail closed
+    # rather than opening the same serial port under two provenance labels.
+    with pytest.raises(SystemExit, match="ROLE CONFLICT"):
+        harness.select_device_specs(None)
+
+
+def test_dsr_compare_supports_cross_role_mic_ab():
+    harness = load_harness()
+    left_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im73d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 10.0},
+                            "raw_i16_abs_peak": {"p90": 50.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 100.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+    right_doc = {
+        "runs": [
+            {
+                "devices": {
+                    "bench_im69d": {
+                        "summary": {
+                            "raw_i16_rms": {"p90": 30.0},
+                            "raw_i16_abs_peak": {"p90": 90.0},
+                            "raw_i16_near_pct": {"max": 0.0},
+                            "max_raw": {"p90": 250.0},
+                            "input_trim": {"min": 1.0},
+                        },
+                        "quality": {"usable": True, "reasons": [], "warnings": []},
+                    }
+                }
+            }
+        ]
+    }
+
+    report = harness.compare_summaries(
+        left_doc,
+        right_doc,
+        left_label="im73d_dsr16",
+        right_label="im69d_dsr16",
+        role="bench_im73d",
+        right_role="bench_im69d",
+    )
+
+    assert report["role"] == "bench_im73d"
+    assert report["right_role"] == "bench_im69d"
+    assert report["metrics"]["raw_i16_rms"]["right_over_left_mean"] == 3.0
+    assert report["verdict"] == "no_promotion_without_speaker_stimulus"
+
+
+def test_chip_id_is_allowed_as_read_only_preflight_command():
+    harness = load_harness()
+
+    harness.assert_command_allowed(":chip_id")
+
+
+def test_required_build_env_gate_accepts_matching_env_and_rejects_mismatch():
+    harness = load_harness()
+    preflight = {
+        "bench_im73d": {
+            "build_lines": [
+                "BUILD: version=40103 git=cc97081 epoch=1783684663 env=k1_bench_im73d_mic_auto_telemetry"
+            ]
+        }
+    }
+
+    harness.assert_required_build_env(preflight, "k1_bench_im73d_mic_auto_telemetry")
+
+    with pytest.raises(SystemExit, match="BUILD ENV GATE"):
+        harness.assert_required_build_env(preflight, "k1_bench_im73d")
+
+
+def test_required_build_env_gate_supports_per_role_mapping():
+    harness = load_harness()
+    preflight = {
+        "bench_im69d": {
+            "build_lines": ["BUILD: version=40103 git=3b59794 epoch=1785927357 env=k1_bench_im69d"]
+        },
+        "main_sph": {
+            "build_lines": ["BUILD: version=40103 git=1c131a9 epoch=1785000000 env=k1_hardware"]
+        },
+    }
+
+    harness.assert_required_build_env(
+        preflight, "bench_im69d=k1_bench_im69d,main_sph=k1_hardware"
+    )
+
+    with pytest.raises(SystemExit, match="BUILD ENV GATE"):
+        harness.assert_required_build_env(
+            preflight, "bench_im69d=k1_bench_im69d,main_sph=k1_bench_im69d"
+        )
+
+    # A mapping must name every selected role — an unmapped device fails closed.
+    with pytest.raises(SystemExit, match="missing from --require-build-env"):
+        harness.assert_required_build_env(preflight, "bench_im69d=k1_bench_im69d")
+
+    with pytest.raises(SystemExit, match="invalid --require-build-env entry"):
+        harness.assert_required_build_env(preflight, "bench_im69d=")
 
 
 def test_dsr_compare_uses_raw_i16_metrics_for_required_verdict_inputs():

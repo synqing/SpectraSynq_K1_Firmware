@@ -939,8 +939,8 @@ MUTATIONS = [
     #     selftest instead of registering a clean catch. Bare-arg form `(command_type,
     #     command_data)` matches ONLY the call-site (the def/decl carry typed params).
     (
-        r"serial_cmd_dispatch_secondary\(command_type, command_data\)",
-        r"false && serial_cmd_dispatch_secondary(command_type, command_data)",
+        r"else if \(serial_cmd_dispatch_secondary\(command_type, command_data\)\)",
+        r"else if (false && serial_cmd_dispatch_secondary(command_type, command_data))",
         "secondary_dispatcher_call_site_severed (routing/reachable divergence)",
     ),
 ]

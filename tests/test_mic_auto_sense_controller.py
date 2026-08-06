@@ -20,7 +20,9 @@ I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
 HEADER = (FW / "audio" / "k1_mic_auto_sense.h").read_text(encoding="utf-8")
 CPP = (FW / "audio" / "k1_mic_auto_sense.cpp").read_text(encoding="utf-8")
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8") + (
+    FW / "serial" / "serial_menu.cpp"
+).read_text(encoding="utf-8")
 EVAL = (ROOT / "scripts" / "regression-harness" / "im73d_audio_eval.py").read_text(
     encoding="utf-8"
 )
@@ -423,7 +425,7 @@ class MicAutoSenseStaticContracts(unittest.TestCase):
 
     def test_eval_harness_still_refuses_cal_tokens(self):
         self.assertIn('FORBIDDEN_SERIAL_TOKENS = {"start_noise_cal", "N", "Y"}', EVAL)
-        self.assertIn('READ_ONLY_COMMANDS = {"build", "dump"}', EVAL)
+        self.assertIn('READ_ONLY_COMMANDS = {"build", "chip_id", "dump"}', EVAL)
 
     def test_scale_bounds_documented_in_header(self):
         self.assertIn("scale_min", HEADER)

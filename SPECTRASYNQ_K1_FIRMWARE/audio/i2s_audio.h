@@ -3,6 +3,9 @@
   ----------------------------------------*/
 #include "k1_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
 #include "k1_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -41,10 +44,12 @@
 //      MIGRATION_PLAN-v2-rebaselined.md §8 Stage 3
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
-#ifdef K1_MIC_IM73D_PDM_V1
-#include <driver/i2s_pdm.h>   // IM73D122 PDM RX (bench eval); flag-OFF token stream unchanged
-#include <driver/gpio.h>      // LR-select GPIO drive
+#ifdef K1_MIC_PDM_RX_ANY_V1
+#include <driver/i2s_pdm.h>   // PDM RX (IM73D / IM69); flag-OFF token stream unchanged
 #include <math.h>             // isfinite() for the PDM follower/NaN guard
+#endif
+#ifdef K1_MIC_IM73D_PDM_V1
+#include <driver/gpio.h>      // LR-select GPIO drive (IM73D only; IM69 SELECT is hard-strapped)
 #endif
 #include <esp_timer.h>
 
@@ -127,17 +132,17 @@ static inline float k1_loud_guard_gdft_release_sec() {
 }
 
 static inline float k1_loud_guard_effective_sensitivity() {
-  // Layering: CONFIG.SENSITIVITY * auto-sense (optional) * loud-guard trim.
-  // Auto-sense is ABOVE loud-guard and must never replace or fight it.
+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
+  return CONFIG.SENSITIVITY * k1_loud_input_trim;
+}
+
 #ifdef K1_MIC_AUTO_SENSE_V1
+static inline float k1_mic_auto_layered_sensitivity() {
   const float auto_scale = k1_mic_auto_sense_applied_scale();
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY * auto_scale;
   return CONFIG.SENSITIVITY * auto_scale * k1_loud_input_trim;
-#else
-  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
-  return CONFIG.SENSITIVITY * k1_loud_input_trim;
-#endif
 }
+#endif
 
 static inline float k1_audio_response_gain_effective() {
   return audio_response_gain_clamped();
@@ -262,6 +267,25 @@ void init_i2s() {
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg); // assign existing result; NO redeclare
   USBSerial.print("I2S PDM RX INIT: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
+  // 16-bit mono Stage 1, DSR_16S default (1.6384 MHz @ 12.8k), slot LEFT.
+  // Pins clk=14/din=13. SELECT is hard-strapped on-board — do NOT drive GPIO12.
+  i2s_pdm_rx_config_t pdm_cfg = {
+    .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
+    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+    .gpio_cfg = {
+      .clk = (gpio_num_t)K1_PDM_CLK_PIN,
+      .din = (gpio_num_t)K1_PDM_DIN_PIN,
+      .invert_flags = { .clk_inv = 0 },
+    },
+  };
+#ifdef K1_MIC_IM69D_DSR_16S_V1
+  pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
+#endif
+  result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
+  USBSerial.print("I2S PDM RX INIT: ");
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
@@ -310,7 +334,7 @@ void init_i2s() {
   result = i2s_channel_init_std_mode(rx_chan, &std_cfg);
   USBSerial.print("I2S STD INIT: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
-#endif  // K1_MIC_IM73D_PDM_V1 (mic driver mode select)
+#endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
 
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
@@ -327,7 +351,7 @@ void acquire_sample_chunk(uint32_t t_now) {
   static float max_waveform_val_raw_smooth = 0.0; // Added for smoothing
 
   size_t bytes_read = 0;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int16_t);  // PDM: 96*2 = 192 B
 #else
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int32_t);  // SPH0645: 96*4 = 384 B
@@ -352,6 +376,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_samples_i16[z] = 0;
     }
   }
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      im69d_samples_i16[z] = 0;
+    }
+  }
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
@@ -364,9 +396,18 @@ void acquire_sample_chunk(uint32_t t_now) {
 #else
   #ifdef K1_MIC_IM73D_PDM_V1
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im73d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
   #endif
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+  k1_mic_auto_sense_note_i2s_result(
+    i2s_read_status == ESP_OK && bytes_read >= bytes_requested,
+    (uint32_t)bytes_read,
+    (uint32_t)bytes_requested,
+    t_now);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   k1_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
@@ -374,8 +415,10 @@ void acquire_sample_chunk(uint32_t t_now) {
   k1_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
   k1_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
 #else
+#ifndef K1_MIC_AUTO_SENSE_V1
   (void)i2s_read_status;
   (void)bytes_read;
+#endif
 #endif
 
 #ifdef K1_MIC_IM73D_PDM_V1
@@ -396,6 +439,21 @@ void acquire_sample_chunk(uint32_t t_now) {
   im73d_raw_i16_abs_peak = im73d_raw_peak;
   im73d_raw_i16_rms = sqrtf((float)im73d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im73d_raw_i16_near_pct = (float)im73d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  uint16_t im69d_raw_peak = 0;
+  uint32_t im69d_raw_near_count = 0;
+  uint64_t im69d_raw_sum_sq = 0;
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    const int32_t raw_sample = (int32_t)im69d_samples_i16[i];
+    const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
+    if (raw_mag > im69d_raw_peak) im69d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
+    if (raw_mag >= K1_MIC_IM69D_RAW_I16_NEAR_RAIL) im69d_raw_near_count++;
+    im69d_raw_sum_sq += (uint64_t)raw_mag * (uint64_t)raw_mag;
+  }
+  im69d_raw_i16_abs_peak = im69d_raw_peak;
+  im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#endif
 #ifdef K1_STM
   // STM reactivity gate from the LIVE pre-AGC mic RMS. The broadband AGC envelope
   // (agc_envelope) is dead code on hardware — measured stuck at 0, gate always
@@ -403,12 +461,17 @@ void acquire_sample_chunk(uint32_t t_now) {
   // ~144 on peaks (bench-measured). Normalise to [0,1]; it spikes on beats, so the
   // STM modulation pulses with the music.
   {
-    float k1_stm_ln = (im73d_raw_i16_rms - 12.0f) / 50.0f;
+    float raw_rms_for_stm = 0.0f;
+#if defined(K1_MIC_IM73D_PDM_V1)
+    raw_rms_for_stm = im73d_raw_i16_rms;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    raw_rms_for_stm = im69d_raw_i16_rms;
+#endif
+    float k1_stm_ln = (raw_rms_for_stm - 12.0f) / 50.0f;
     if (k1_stm_ln < 0.0f) k1_stm_ln = 0.0f;
     if (k1_stm_ln > 1.0f) k1_stm_ln = 1.0f;
     agc_loudness_norm = SQ15x16(k1_stm_ln);
   }
-#endif
 #endif
 
   // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
@@ -422,6 +485,8 @@ void acquire_sample_chunk(uint32_t t_now) {
     for (uint16_t i = 0; i < dump_n; i++) {
 #ifdef K1_MIC_IM73D_PDM_V1
       USBSerial.printf("  %d\n", (int)im73d_samples_i16[i]);   // PDM: int16 decimal (silence ±4-18 measured 2026-07-02 @G=16; ±20-40 was pre-characterization pessimism)
+#elif defined(K1_MIC_IM69D_PDM_V1)
+      USBSerial.printf("  %d\n", (int)im69d_samples_i16[i]);
 #else
       USBSerial.printf("  %08lx\n", (unsigned long)(uint32_t)i2s_samples_raw[i]);
 #endif
@@ -441,7 +506,12 @@ void acquire_sample_chunk(uint32_t t_now) {
   max_waveform_val_raw = 0.0;
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_begin_frame();
-  const float k1_effective_sensitivity = k1_loud_guard_effective_sensitivity();
+  const float k1_effective_sensitivity =
+#ifdef K1_MIC_AUTO_SENSE_V1
+      k1_mic_auto_layered_sensitivity();
+#else
+      k1_loud_guard_effective_sensitivity();
+#endif
 #endif
   const bool noise_cal_phase_a_active = (!noise_complete && noise_iterations < NOISE_CAL_DC_PHASE_A_FRAMES);
   waveform_history_index++;
@@ -455,6 +525,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     // NO SPH0645 pedestal math (*0.000512 + 56000 - 5120; >>2). Everything below
     // (k1_effective_sensitivity, clamp, -DC_OFFSET, follower, GDFT) is shared/unchanged.
     int32_t sample = (int32_t)((float)im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    // IM69D130 PDM: own gain seed (never inherit K1_MIC_IM73D_INPUT_GAIN).
+    int32_t sample = (int32_t)((float)im69d_samples_i16[i] * K1_MIC_IM69D_INPUT_GAIN);
 #else
     int32_t sample = (i2s_samples_raw[i] * 0.000512) + 56000 - 5120;
 
@@ -647,7 +720,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         max_waveform_val_follower = CONFIG.SWEET_SPOT_MIN_LEVEL;
       }
     }
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
     // PDM cold-boot / failed-cal guard: the follower inits 0.0 and its floor-clamp only
     // runs in the decay branch, so cold-boot silence divides 0/0 -> NaN. A non-zero SSL
     // alone does NOT guarantee a non-zero follower. Force the denominator into the PDM
@@ -660,7 +733,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     if (max_waveform_val_follower < 1.0f) max_waveform_val_follower = 1.0f;
 #endif
     float waveform_peak_scaled_raw = max_waveform_val / max_waveform_val_follower;
-#ifdef K1_MIC_IM73D_PDM_V1
+#ifdef K1_MIC_PDM_RX_ANY_V1
     if (!isfinite(waveform_peak_scaled_raw)) waveform_peak_scaled_raw = 0.0f;
 #endif
 
@@ -882,6 +955,36 @@ void acquire_sample_chunk(uint32_t t_now) {
       im73d_raw_i16_abs_peak,
       im73d_raw_i16_rms,
       im73d_raw_i16_near_pct);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    USBSerial.printf(" | raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f",
+      im69d_raw_i16_abs_peak,
+      im69d_raw_i16_rms,
+      im69d_raw_i16_near_pct);
+#endif
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+    // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.
+    {
+      float bass_now = 0.0f;
+      for (uint8_t bi = 0; bi < 12 && bi < NUM_FREQS; bi++) {
+        float m = magnitudes_normalized[bi];
+        if (isfinite(m) && m > bass_now) bass_now = m;
+      }
+      static float bass_prev = 0.0f;
+      static uint32_t rise_t0_ms = 0;
+      static float rise_ms_latched = 0.0f;
+      if (bass_now > 0.15f && bass_prev <= 0.15f) {
+        rise_t0_ms = millis();
+      }
+      if (rise_t0_ms != 0 && bass_now >= bass_prev) {
+        rise_ms_latched = float(millis() - rise_t0_ms);
+      }
+      if (bass_now < 0.08f) {
+        rise_t0_ms = 0;
+      }
+      bass_prev = bass_now;
+      USBSerial.printf(" | x2_cross=%u bass_mag=%.3f rise_ms=%.0f",
+                       (unsigned)k1_gdft_x2_crossover_bin, bass_now, rise_ms_latched);
+    }
 #endif
 #ifdef K1_MIC_AUTO_SENSE_V1
     {
@@ -921,6 +1024,13 @@ void acquire_sample_chunk(uint32_t t_now) {
         float(agc_loudness_norm), float(agc_envelope), float(agc_noise_floor), agc_gated ? 1 : 0,
         stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy);
     }
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    USBSerial.printf(" | mas_state=%u mas_reason=%u mas_window_age_sec=%.1f mas_applied_scale=%.3f",
+      (unsigned)mas.state,
+      (unsigned)mas.reason,
+      mas.window_age_sec,
+      mas.applied_scale);
 #endif
     USBSerial.println();
     last_ap_dbg = millis();

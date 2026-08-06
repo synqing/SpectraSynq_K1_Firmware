@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "status": "READY",
+  "blockers": [],
+  "firmware_source_sha": "a58203183208a4db7fcc7a30d060e6db14673ab1",
+  "raw_pack_relative_path": "_scratch/dual_sync_f2_image_set_a582031_new_20260728T000000Z",
+  "esptool_package": "tool-esptoolpy@4.8.9",
+  "package_provenance": {
+    "platformio": "6.1.19",
+    "python": "3.14.3",
+    "platform": "54.03.20",
+    "framework_arduino": "3.2.0",
+    "framework_espidf_libraries": "5.4.0+sha.2f7dcd862a",
+    "toolchain_xtensa": "14.2.0+20241119",
+    "toolchain_riscv": "14.2.0+20241119",
+    "nimble_arduino": "2.5.0",
+    "fastled": "3.10.3",
+    "fixedpoints": "1.1.2",
+    "m5rotate8": "0.4.1"
+  },
+  "partition_table": {
+    "path": "k1_sync_probe_main/partitions.bin",
+    "sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce",
+    "offset": 32768,
+    "size": 3072,
+    "application_label": "app0",
+    "application_offset": 65536,
+    "application_size": 6553600
+  },
+  "images": {
+    "k1_sync_probe_main_sync_only": {
+      "role": "leader",
+      "required_chip": "F887A500",
+      "available": true,
+      "bin_path": "k1_sync_probe_main_sync_only/firmware.bin",
+      "bin_sha256": "3bc07534aa0c52e7cf3d5cca082f214a84a046314f127ac88cb0a4be4c945228",
+      "elf_path": "k1_sync_probe_main_sync_only/firmware.elf",
+      "elf_sha256": "336840441cb3b03180bb7997f1e3edc16f0ade1fad873b0e75471bbe9693d2c8",
+      "app_elf_sha256": "336840441cb3b03180bb7997f1e3edc16f0ade1fad873b0e75471bbe9693d2c8"
+    },
+    "k1_sync_probe_main": {
+      "role": "leader",
+      "required_chip": "F887A500",
+      "available": true,
+      "bin_path": "k1_sync_probe_main/firmware.bin",
+      "bin_sha256": "20d1c4fd01ac32da2b161c6b63310470f236bba5e801a7abe6a7ad4b04fd4dca",
+      "elf_path": "k1_sync_probe_main/firmware.elf",
+      "elf_sha256": "332cbc6c1904454f588da27af148dd5e75901f2d66ed13e2903ce607a126e1b7",
+      "app_elf_sha256": "332cbc6c1904454f588da27af148dd5e75901f2d66ed13e2903ce607a126e1b7"
+    },
+    "k1_sync_probe_bench": {
+      "role": "follower",
+      "required_chip": "B489A500",
+      "available": true,
+      "bin_path": "k1_sync_probe_bench/firmware.bin",
+      "bin_sha256": "51c8924255b7e8542ab0023c03489bda50f747407d7fc09ce8cbf2037fb79701",
+      "elf_path": "k1_sync_probe_bench/firmware.elf",
+      "elf_sha256": "71b88377f33a7ef4d353f79a502c68fcf475cc8c7877397f454728ba97c26b36",
+      "app_elf_sha256": "71b88377f33a7ef4d353f79a502c68fcf475cc8c7877397f454728ba97c26b36"
+    }
+  }
+}

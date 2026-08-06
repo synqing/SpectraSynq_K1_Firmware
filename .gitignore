@@ -26,7 +26,16 @@ venv/
 # Agent / tooling state (never commit)
 .claude/worktrees/
 .claude/hooks/.summonaikit-task-contract.txt
-.codex/
+.claude/proven-config.json
+.claude/.proven-config-version
+.claude/launch.json
+.claude/settings.json
+.claude-flow/
+.ok/
+.entire/
+.codex/*
+!.codex/skills/
+!.codex/skills/**
 .codex-subagent/
 .cursor/*
 !.cursor/skills/
@@ -46,10 +55,25 @@ graphify-out/
 .devin/config.local.json
 .devin/last-bootstrap.json
 .devin/repo-truth-report.json
+.devin/delegations.json
+.devin/k1-session-target.json
 
 # Scratch / working space — ephemeral, clean up when done
 _scratch/
 __probe.txt
+evidence/
+findings.md
+*.bak.*
+.mcp.json.bak.*
+
+# Heavy local artefact dumps (binaries / media) — text receipts may be staged
+# pathwise when Captain explicitly authorises a docs(artifacts) wave.
+artifacts/**/knob_build/
+artifacts/**/knob_build_*/
+artifacts/**/*.bin
+artifacts/**/*.elf
+artifacts/**/*.map
+artifacts/ble_midi_71_20260628/
 
 # Heavy media / capture binaries (kept in the archive repo, not here)
 *.mp4
@@ -75,3 +99,6 @@ sb-tab5-wireless-controller/
 *.key
 secure_boot_signing_key*.pem
 k1_ota_signing_PRIVATE.pem
+
+# Stimulus WAVs >5MB — pre-commit rejects; keep local for eval replay only
+artifacts/**/stimulus_*.wav

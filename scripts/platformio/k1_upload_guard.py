@@ -159,6 +159,8 @@ def validate_upload_target(
 
     target = _expected_target_for_env(pioenv, targets)
     if target is None:
+        if pioenv.startswith("k1_sync_probe_"):
+            return False, f"{pioenv}: unmapped sync probe environment; upload blocked"
         return True, f"{pioenv}: no K1 upload mapping enforced"
 
     port_list = list(ports) if ports is not None else list_serial_ports()

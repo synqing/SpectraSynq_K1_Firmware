@@ -15,7 +15,12 @@ jobs:
     name: Host regression + golden gate + Gate Fα
     runs-on: ubuntu-latest
     steps:
+      # fetch-depth >= 2 so dual-sync F2 oracle can resolve HEAD^ (ancestor
+      # contract). Default shallow depth-1 checkout fails
+      # test_f2_firmware_sha_is_separate_ancestor_of_harness_head.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

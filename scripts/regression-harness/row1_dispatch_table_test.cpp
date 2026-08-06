@@ -77,7 +77,7 @@ enum class Effect {
   CLEAR_NOISE_CAL, CHIP_ID, IDENTIFY, CAL_GUIDANCE, CAL_QUEUED, GET_NUM_MODES,
   GET_MODE, RESET_REASON, DUMP, STOP, FPS, LED_FPS, VP_STATUS, SMART_STATUS,
   EDGE_STATUS, EVENT_STATUS, VP_OUT_TEST, GET_KNOBS, GET_BUTTONS, QUEUE_COMMIT,
-  SLOT_LIST, BUILD
+  SLOT_LIST, BUILD, IMAGE_ID, RUNTIME_ID
 };
 static Effect g_last_effect = Effect::NONE;
 static bool   g_calibration_queued = false; // mirrors noise_transition_queued
@@ -87,6 +87,8 @@ static bool   g_calibration_queued = false; // mirrors noise_transition_queued
 // the SAME X-macro rows build the test's table. Each records its effect.
 static void cmd_version()          { g_last_effect = Effect::VERSION; }
 static void cmd_build()            { g_last_effect = Effect::BUILD; }  // N5 build-provenance row
+static void cmd_image_id()         { g_last_effect = Effect::IMAGE_ID; }
+static void cmd_runtime_id()       { g_last_effect = Effect::RUNTIME_ID; }
 static void cmd_help()             { g_last_effect = Effect::HELP; }
 static void cmd_sb_query()         { g_last_effect = Effect::K1_QUERY; }
 static void cmd_reset()            { g_last_effect = Effect::REBOOT; }

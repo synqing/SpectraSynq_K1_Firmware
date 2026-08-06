@@ -32,6 +32,7 @@ typedef struct {
 } K1BleMidiDecoderState;
 
 void k1_ble_midi_decoder_reset(K1BleMidiDecoderState* state);
+void k1_ble_midi_decoder_reset_partial(K1BleMidiDecoderState* state);
 
 K1BleMidiDecodeStatus k1_ble_midi_decode_packet(K1BleMidiDecoderState* state,
                                                 const uint8_t* packet,

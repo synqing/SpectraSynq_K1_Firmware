@@ -55,7 +55,9 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
             "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
             "k1_bench_im73d",  # IM73D122 PDM mic eval — bench B489A500 only
+            "k1_bench_im73d_mic_auto_telemetry",  # IM73D mic auto-sense telemetry - bench B489A500 only
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
+            "k1_bench_im69d",  # IM69D130 dual-mic PCB3 PDM eval — bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
                 ok, message = self.guard.validate_upload_target(
@@ -105,25 +107,51 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertIn("upload blocked", message)
         self.assertIn("acquisition-only", message)
 
-    def test_prod_im73d_env_is_blocked_until_wired_unit_exists(self):
-        # Q1(a) / 628f69b re-block: no 6/7-wired IM73D production unit exists yet.
+    def test_prod_im73d_upload_is_blocked_on_every_port(self):
+        # 628f69b (2026-07-08) re-blocked k1_prod_im73d outright: no
+        # production-LED-wired (6/7) IM73D unit exists, and the 2026-07-07
+        # misflash onto the 4/5-wired bench darkened both LED channels. The
+        # block fires before any port/identity matching, on any target.
+        for port in ("/dev/tty.usbmodem1401", "/dev/tty.usbmodem12201"):
+            with self.subTest(port=port):
+                ok, message = self.guard.validate_upload_target(
+                    "k1_prod_im73d", port, self.ports
+                )
+                self.assertFalse(ok)
+                self.assertIn("upload blocked", message)
+                self.assertIn("production-LED-wired", message)
+
+    def test_sync_probe_envs_are_bound_to_their_devices(self):
+        # Phase-0 dual-K1 sync probes (F5 grant 2026-07-08): LEADER env only on
+        # the main K1 (F887A500), FOLLOWER env only on the bench K1 (B489A500).
+        for env_name in ("k1_sync_probe_main", "k1_sync_probe_main_sync_only"):
+            with self.subTest(env_name=env_name):
+                ok, message = self.guard.validate_upload_target(
+                    env_name, "/dev/tty.usbmodem1401", self.ports
+                )
+                self.assertTrue(ok, message)
+                self.assertIn("F887A500", message)
         ok, message = self.guard.validate_upload_target(
-            "k1_prod_im73d",
-            "/dev/tty.usbmodem1401",
-            self.ports,
+            "k1_sync_probe_bench", "/dev/tty.usbmodem12201", self.ports
+        )
+        self.assertTrue(ok, message)
+        self.assertIn("B489A500", message)
+
+    def test_prod_im73d_blocked_rejects_bench_target(self):
+        # Blocked envs fail closed before MAC matching — bench port also rejected.
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d", "/dev/tty.usbmodem12201", self.ports
         )
         self.assertFalse(ok, message)
         self.assertIn("upload blocked", message)
         self.assertIn("6/7", message)
 
-    def test_prod_im73d_blocked_rejects_bench_target(self):
-        # Blocked envs fail closed before MAC matching — bench port also rejected.
+    def test_unmapped_sync_probe_environment_fails_closed(self):
         ok, message = self.guard.validate_upload_target(
-            "k1_prod_im73d",
-            "/dev/tty.usbmodem12201",
-            self.ports,
+            "k1_sync_probe_typo", "/dev/tty.usbmodem1401", self.ports
         )
         self.assertFalse(ok)
+        self.assertIn("unmapped sync probe environment", message)
         self.assertIn("upload blocked", message)
 
     def test_production_pinmap_defines_im73d_pdm_pins(self):
@@ -153,8 +181,13 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4", "/dev/tty.usbmodem1401"),
             ("k1_hardware_harness", "/dev/tty.usbmodem12201"),
             ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
+            ("k1_bench_im73d_mic_auto_telemetry", "/dev/tty.usbmodem1401"),  # mic auto-sense telemetry must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
-            # k1_prod_im73d covered by blocked-env tests (Q1a re-block) — not MAC cross-flash
+            ("k1_bench_im69d", "/dev/tty.usbmodem1401"),  # IM69D eval must reject the main K1 port
+            # k1_prod_im73d is upload-blocked outright (628f69b) — covered by blocked-env tests.
+            ("k1_sync_probe_main", "/dev/tty.usbmodem12201"),  # sync LEADER must reject the bench port
+            ("k1_sync_probe_main_sync_only", "/dev/tty.usbmodem12201"),  # Case A leader must reject bench
+            ("k1_sync_probe_bench", "/dev/tty.usbmodem1401"),  # sync FOLLOWER must reject the main port
         )
         for env_name, port in cases:
             with self.subTest(env_name=env_name, port=port):

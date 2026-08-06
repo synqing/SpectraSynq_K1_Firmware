@@ -1,0 +1,32 @@
+Processing k1_bench_im73d_mic_auto_telemetry (extends: env:k1_bench_im73d; build_src_filter: +<*.ino> +<*.ino.cpp> +<system/globals_config.cpp> +<system/globals.cpp> +<visual/Palettes.cpp> +<visual/render_params.cpp> +<effects/light_mode_*.cpp> +<audio/sb_*.cpp> +<audio/k1_*.cpp> -<audio/k1_mic_auto_sense.cpp> +<director/sb_*.cpp> +<control/sb_*.cpp> +<serial/*.cpp>, +<audio/k1_mic_auto_sense.cpp>; build_flags: -DARDUINO_USB_MODE=1, -DARDUINO_USB_CDC_ON_BOOT=1, -DARDUINO_RUNNING_CORE=0, -DBOARD_HAS_PSRAM, -DSB_K1_HARDWARE, -DSB_LED_TASK_CORE=1, -DSB_I2S_DMA_DESC_NUM_VALUE=3, -DDEFAULT_SAMPLE_RATE=12800, -DDEFAULT_SAMPLES_PER_CHUNK=96, -DSB_TEMPO_NOVELTY_DECIMATION=3U, -DDEFAULT_AUDIO_RESPONSE_GAIN=1.0f, -DESP32_ARDUINO_NO_RGB_BUILTIN, -O3, -ffast-math, -Wno-deprecated-declarations, -Wno-narrowing, -DSB_TEMPO_CONF_V2, -DSB_TEMPO_FLYWHEEL_V2, -DSB_ONSET_V2, -DSB_CHORD_V2, -DSB_SEMANTIC_STATE, -DSB_CHORD_HUE_V1, -DSB_DROP_CUT_V1, -DSB_PEAK_ASYM_ENV, -DSB_VIVID_PRECOMP_V1, -DK1_LOUD_GUARD_V1, -DK1_AUDIO_FREEZE_GUARD_V1, -DSB_TEMPO_ACF_SPREAD_V1=1, -DSB_AGC_PERBAND_V1=1, -DK1_BOOTLOOP_GUARD_V1, -DK1_PALETTE_VIBRANCY_V1, -DSB_K1_BENCH_REFERENCE_PINMAP=1, -DK1_MIC_IM73D_PDM_V1, -DK1_MIC_AUTO_SENSE_V1=1; upload_port: /dev/tty.usbmodem12201; monitor_port: /dev/tty.usbmodem12201; build_unflags: -DARDUINO_RUNNING_CORE=1; platform: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip; board: esp32-s3-devkitc1-n16r8; framework: arduino; board_build.arduino.memory_type: qio_opi; board_build.psram_type: opi; board_build.flash_mode: qio; board_build.flash_size: 16MB; board_upload.flash_size: 16MB; board_build.partitions: default_16MB.csv; monitor_speed: 115200; upload_speed: 921600; extra_scripts: pre:scripts/platformio/k1_src_includes.py, pre:scripts/platformio/k1_upload_guard.py, pre:scripts/platformio/k1_build_provenance.py; lib_deps: fastled/FastLED@3.10.3, file://libraries/FixedPoints, file://libraries/M5ROTATE8)
+--------------------------------------------------------------------------------
+[k1-build-provenance] env=k1_bench_im73d_mic_auto_telemetry git=cc97081 epoch=1783684628
+PLATFORM: Espressif 32 (54.3.20) (https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip) > Espressif ESP32-S3-DevKitC-1-N16R8V (16 MB Flash Quad, 8 MB PSRAM Octal)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.2.0 (https://github.com/espressif/arduino-esp32/releases/download/3.2.0/esp32-3.2.0.zip) 
+ - framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a (https://github.com/espressif/esp32-arduino-lib-builder/releases/download/idf-release_v5.4/esp32-arduino-libs-idf-release_v5.4-2f7dcd86-v1.zip) 
+ - tool-esptoolpy @ 4.8.9 (https://github.com/pioarduino/esptool/releases/download/v4.8.9/esptool.zip) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 
+ - tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 
+ - toolchain-riscv32-esp @ 14.2.0+20241119 
+ - toolchain-xtensa-esp-elf @ 14.2.0+20241119
+xtensa-esp32s3-elf-g++ -o "/Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino.cpp" -x c++ -fpreprocessed -dD -E "/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/tmp2utnv86z"
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- FastLED @ 3.10.3 (License: MIT, Path: /Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/libdeps/k1_bench_im73d_mic_auto_telemetry/FastLED)
+|   |-- SPI @ 3.2.0 (License: Unknown, Path: /Users/spectrasynq/.platformio/packages/framework-arduinoespressif32@src-6738aaddd9fb901216d5f60e093380b6/libraries/SPI)
+|   |-- SD @ 3.2.0 (License: Unknown, Path: /Users/spectrasynq/.platformio/packages/framework-arduinoespressif32@src-6738aaddd9fb901216d5f60e093380b6/libraries/SD)
+|   |   |-- FS @ 3.2.0 (License: Unknown, Path: /Users/spectrasynq/.platformio/packages/framework-arduinoespressif32@src-6738aaddd9fb901216d5f60e093380b6/libraries/FS)
+|   |   |-- SPI @ 3.2.0 (License: Unknown, Path: /Users/spectrasynq/.platformio/packages/framework-arduinoespressif32@src-6738aaddd9fb901216d5f60e093380b6/libraries/SPI)
+|-- FixedPoints @ 1.1.2 (License: Apache-2.0, URI: file://libraries/FixedPoints, Path: /Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/libdeps/k1_bench_im73d_mic_auto_telemetry/FixedPoints)
+|-- M5ROTATE8 @ 0.4.1 (License: MIT, URI: file://libraries/M5ROTATE8, Path: /Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/libdeps/k1_bench_im73d_mic_auto_telemetry/M5ROTATE8)
+|   |-- Wire @ 3.2.0 (License: Unknown, Path: /Users/spectrasynq/.platformio/packages/framework-arduinoespressif32@src-6738aaddd9fb901216d5f60e093380b6/libraries/Wire)
+... (306 lines truncated)
+[full output: ~/Library/Application Support/rtk/tee/1783684646_pio_run_-e_k1_bench_im73d_mic_auto_telem.log]

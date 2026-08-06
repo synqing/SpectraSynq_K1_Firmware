@@ -1,0 +1,179 @@
+# Task Plan — dual-sync F0-F3 recovery
+
+## Goal
+
+Recover SyncLink through fail-closed host proof, observable BLE establishment,
+scripted A/B/C1/C2 silicon isolation and a real fault-evident Gate-0, stopping
+for Captain after C2.
+
+## Current phase
+
+Phase F2c controller is committed and the amended host gates pass. Hardware
+remains NO-GO until the reviewed `a582031` image set is complete. The concrete
+host SHA belongs only in the first immutable run manifest.
+
+## Phases
+
+### P-1: Canonical authority
+
+- [x] Inspect live branch, HEAD, dirty tree and existing lane artefacts.
+- [x] Capture the amended execution contract in `recovery-plan.md`.
+- [x] Reconcile `AGENT_OS.md`, `.claude/handoff.md`, `docs/spec-index.md`,
+  root `progress.md` and `repo-truth.sh`.
+- [x] Review and stage only the owned documentation/source-truth files.
+- [x] Commit the verified P-1 checkpoint (`fe634bb`).
+- **Status:** complete
+
+### F0: Host trust root
+
+- [x] Exact NimBLE 2.5.0 pin and resolved-version evidence.
+- [x] Strict role/link/clock grammar and contract update.
+- [x] Coherent-epoch Link Ready and explicit status/exit schema.
+- [x] Per-role health and transport/apply loss split.
+- [x] Capture helper, segmented plumbing runner and A/B/C runner.
+- [x] Focused tests, full pytest, production and existing sync builds.
+- [x] Green F0 commit; push exact committed SHA and verify remote
+  (`4c1d48288fe99182748e67b0732275494210fccd`).
+- **Status:** complete
+
+### F0b: Late-attaching capture proof
+
+- [x] Reproduce persistent healthy link becoming BLOCKED after serial input clear.
+- [x] Require fresh exact `:sync_status` lifecycle snapshots from both roles.
+- [x] Reject missing, unlinked, malformed, duplicate and incoherent snapshots.
+- [x] Persist and hash `SYNC_STATUS.json` in F2 evidence.
+- [x] Focused host tests and staged-boundary review.
+- [x] Full pytest (`737 passed, 1 skipped`) in isolated staged-tree worktree.
+- [x] Green host-only repair commit and verified push
+  (`a4c2408696b84ebc4a860f69c8e86cf3adeb7db3`).
+- **Status:** complete
+
+### F1: Link hardening
+
+- [x] Advertising/scan defects A-E fixed with fail-closed diagnostics.
+- [x] Correct Remoted compile guards and sync-only leader.
+- [x] Mandatory build-wrapper and upload-guard registration/tests.
+- [x] Settled negotiated BLE values recorded.
+- [x] Lifecycle snapshot serializer matches the F0b host contract.
+- [x] Application-owned GATT I/O moved off the Core-0 audio loop.
+- [x] Focused tests (`103 passed, 24 subtests passed`).
+- [x] Full pytest (`760 passed, 1 skipped, 86 subtests passed`).
+- [x] Production plus three sync builds SUCCESS; NimBLE exactly `2.5.0`.
+- [x] Green F1 commit and verified push
+  (`862aea89efc1c0c98035268a1b2ecf1bc1bab6f2`).
+- [x] Three post-commit probe binaries rebuilt with embedded provenance
+  `862aea8`.
+- **Status:** complete
+
+### F2: Silicon A/B/C1/C2
+
+- [x] Independent host/firmware F2 preflight review completed; existing runner
+  rejected as forgeable and insufficient for Case-C dial causality.
+- [x] F2a guarded-upload and recursive evidence contract committed
+  (`0a1100bc8525ecc1d3d29f64454b9e8e78f9dd19`).
+- [x] F2a.1 periodic-counter window correction committed
+  (`3077b4d5dab10811963b99bafe47729068db3bcf`).
+- [x] F2a.2 meaningful-mode host contract and no-op regression committed
+  (`7320262d98998f258c9e4f710744faad4ef0dc72`).
+- [x] F2a.3 Case-B scanner-active contract and batched-notification regression
+  committed (`acb9c4002a1da2a4c9371a30187e25d614af0082`).
+- [x] F2b firmware observability independently approved; focused/full tests and
+  production plus all three probe builds green on current source.
+- [x] F2b application-image/dial-causality firmware observability committed
+  and published (`a58203183208a4db7fcc7a30d060e6db14673ab1`).
+- [x] Three post-commit probe images rebuilt with embedded provenance
+  `a582031`.
+- [x] Read-only USB serial/chip mapping and cross-target guard negatives.
+- [x] Preserve matching dual-role leader/follower images outside `.pio`.
+- [ ] Reproduce or recover the exact reviewed sync-only image byte-for-byte
+  (**blocked:** three bounded detached reproductions mismatched both hashes).
+- [x] Freeze a fail-closed image-set ledger that never embeds host-controller
+  HEAD; its current status is `BLOCKED`, not `READY`.
+- [x] Split `HOST_EXECUTION_SHA` from
+  `FIRMWARE_SOURCE_SHA=a58203183208a4db7fcc7a30d060e6db14673ab1`.
+- [x] Replace build-coupled PlatformIO upload with guarded exact application
+  image write and partition-table readback.
+- [x] Add chained controller-owned port manifests and continuity enforcement.
+- [x] Split Case C into C1 late join and C2 controlled cold coexistence.
+- [x] Preserve A/B post-write startup diagnostics and C2 cold-start
+  establishment before identity queries consume the boot streams.
+- [x] Split immutable pre-attestation from post-run physical feedback.
+- [x] Add separate software, physical, collection, acceptance and F3 statuses.
+- [x] Focused and full host gates green (`152` focused; `822` full, `1`
+  skipped, `86` subtests).
+- [x] Create the final two-commit F2 controller/test freeze; concrete push
+  parity is recorded in the orchestrator handoff after the commit exists.
+- [ ] Freeze concrete `HOST_EXECUTION_SHA` in the first run manifest only.
+- [ ] Captain physical GPIO/K718 attestation for the selected run.
+- [ ] Case A PASS.
+- [ ] Case B PASS.
+- [ ] Case C1 software PASS with late-join dial traffic and physical feedback.
+- [ ] Case C2 software PASS after controlled reboot with physical feedback.
+- [ ] Tracked Captain STOP report.
+- **Status:** host_controller_ready_hardware_blocked_on_image_set
+
+### F3: Real Gate-0
+
+- [ ] Explicit Captain GO after A+B+C1+C2 software PASS, required physical
+  feedback, complete evidence collection and signed acceptance.
+- [ ] F3a host fault contract commit.
+- [ ] F3b fixed-capacity firmware implementation commit.
+- [ ] Fault qualification, restored controls, measurement and soak.
+- **Status:** blocked_on_F2_and_Captain
+
+## Decisions
+
+| Decision | Rationale |
+|---|---|
+| Retain F0→F1→F2→Captain→F3 | Correctly separates oracle trust, link repair, silicon isolation and product proof. |
+| Canonical authority lives in `recovery/recovery-plan.md` | The Cursor plan is outside git and cannot govern other checkouts or agents. |
+| Orchestrator owns edits, gates, commits and device actions | SSA returns are hypotheses until re-run. |
+| Existing dirty registry and wrapper edits are preserved | They pre-date this takeover and must not be silently absorbed. |
+| Reopen F0 with a narrow F0b commit | Late-attaching F2 capture otherwise discards the only lifecycle transition and falsely blocks a healthy persistent link. |
+| Split F2 readiness into F2a host and F2b firmware commits | The former runner trusted self-declared binaries/prior PASS JSON and could not prove causal K718 dial traffic or the flashed application image. |
+| Add F2c before hardware | Documentation/controller HEAD and reviewed firmware source are different evidence identities; normal PlatformIO upload would rebuild and relabel the reviewed images. |
+| Preserve `HOST_EXECUTION_SHA` separately from `FIRMWARE_SOURCE_SHA` | Host authority may advance without changing firmware. Devices must continue to report `a582031`. |
+| Split Case C into C1 and C2 | Late join alone does not prove cold-start scan/advertise/connection coexistence. |
+| Keep attestations and feedback immutable and separate | Post-run Captain feedback must not mutate a pre-run file already committed to the evidence hash chain. |
+| PLC graph-loop is supporting control evidence only | The supervised run proves the allowlisted external-process loop is operational; repository gates and silicon evidence remain authoritative. |
+| Count only meaningful Case-C mode changes | Accepted records that leave the confirmed ordinal unchanged are traffic, not physical detent proof; three no-op records must not satisfy the Captain commitment. |
+| Prove Case-B scanner activity from sampled state | Dial-off alone cannot isolate scan/advertise coexistence if the Remoted scanner silently stopped before capture attached. |
+| Count decoded detents independently of BLE notifications | BLE-MIDI may batch multiple records in one notification; one packet per detent is not a justified transport invariant. |
+
+## Stop conditions
+
+- Any empty or missing-instrument capture appears as PASS.
+- Any sync environment lacks upload-guard mapping.
+- Any F0/F1 full commit gate fails.
+- Any A/B/C1/C2 identity mismatch, unexpected reset, reconnect, or incoherent
+  epoch.
+- Any attempt to enter F3 before A+B+C1+C2 software PASS, required physical
+  feedback and explicit Captain GO.
+- Any attempt to flash before the exact reviewed three-image set is complete.
+- Any normal `pio run ... --target upload` path in F2.
+
+## Errors encountered
+
+| Error | Attempt | Resolution |
+|---|---:|---|
+| Governing `docs/agent/AGENT_EXECUTION_STANDARD.md` is referenced but absent | 1 | Use `AGENT_OS.md`, `.claude/CLAUDE.md`, AGENTS instructions and record the missing canon; do not invent it. |
+| P-1 staged `git diff --check` found blank lines at EOF in two new recovery docs | 1 | Removed the extra blank lines with `apply_patch`; restage and rerun the same gate. |
+| F0 adversarial SSA review reproduced pre-link and duplicate/reorder false-PASS paths | 1 | Select post-link role-local epochs, require positive overlap and post-link negotiation, preserve ordered TX evidence, and block on duplicate/reorder/unexpected records. Added reproductions to the focused suite. |
+| First post-epoch focused run blocked the clean fixture because sequence zero preceded link-up | 1 | Moved synthetic proof observations behind an explicit settle offset; retained the fail-closed epoch selection. |
+| Strict capture marker check mistook `t_host_us` for a second `host_us` prefix | 1 | Match a complete `host_us` token instead of a substring; rerun focused suite. |
+| Final F0 wrapper review found locked-argument and A/B/C-order bypasses | 1 | Replaced the forwarding shell with a typed controller that derives case semantics, probes chip/build identity, enforces A→B→C and hashes its manifest evidence. |
+| F1 adversarial review found lifecycle lines were one-shot before F2 attached | 1 | Added a fresh, fail-closed `:sync_status` capture contract and F2 evidence hash before firmware is committed. |
+| F1 concurrency review found cross-generation characteristic writes and lossy clock callback timing | 1 | Moved periodic application GATT I/O to Core 1, made lifecycle publication generation-bound, deferred leader advertising restart, and queued callback-time clock timestamps with generation. |
+| Initial F2 entry point was named incorrectly during read-only preflight | 1 | Located the committed `run_f2_abc.sh` → `f2_capture.py` path; no serial or device action was attempted. |
+| Independent F2 reviews returned NO-GO on evidence provenance and dial causality | 1 | Added bounded F2a/F2b closure commits before any flash; Case A remains forbidden until both validate. |
+| F2b adversarial review reproduced a Case-C no-op false PASS | 1 | Bind host evidence to three ordinal changes from the coherent baseline and require the firmware meaningful-mode counter delta to match emitted events exactly. |
+| F2b re-review found Case B could pass with no scanner and Case C overconstrained notifications | 1 | Add sampled scanner state/start counters to the host grammar; require active/stable scan in B; require at least one notify but three decoded/applied mode changes in C. |
+| Final F2b review found partial decoder state survived reconnect | 1 | Reset all CC14/NRPN partial accumulators before advancing connection generation while preserving the monotonic record ID; add old-generation-half/new-generation-remainder regressions. |
+| Unscoped `pytest -q` collected duplicate consult-pack test modules | 1 | Preserve the consult evidence and use the canonical repository boundary `pytest -q tests/`; no source or evidence deletion. |
+| Governing skill was absent from the advertised inventory | 1 | Captain supplied the exact `invoking-plc-graph-loop` path; read it directly, validated the allowlist and used the supervised manual launcher. |
+| A zsh inspection loop assigned to special variable `path`, which replaced `PATH` inside that shell and made later commands unavailable | 1 | The shell was ephemeral and made no changes. Use task-specific `artifact_path`/`env_name` variables and rerun the read-only hash inspection. |
+| The workstation `find` shim rejected `-exec` after the reviewed dual/follower copies completed | 1 | Do not repeat the copy. Verify the already-created pack with explicit `/usr/bin/find` and a simple hash loop. |
+| First detached-worktree command ran `git worktree add` from `/var/tmp`, outside the repository | 1 | Empty temp directory only; no worktree or source change was created. Reuse it with `git -C <repo> worktree add`, then build from the attached directory. |
+| Clean detached `a582031` sync-only build succeeded but BIN/ELF hashes differed from the reviewed immutable identities | 1 | Reject the fresh output and keep hardware NO-GO. Inspect absolute-build-path influence and allow one prefix-mapped reproduction attempt; otherwise require original artefact recovery or a new Captain-authorised image set. |
+| Prefix-mapping the detached path still produced different sync-only BIN/ELF hashes | 2 | Reject the output. The build-provenance epoch changed between attempts, proving a second nondeterministic input. Search durable prior build logs for the original epoch; do not brute-force or bless another image. |
+| Replaying the recovered original epoch plus original-path prefix maps still produced different sync-only BIN/ELF hashes | 3 | Reject the output and stop bounded reproduction. The remaining build-graph identity difference is not justified authority for further search or for blessing a new image. Keep `IMAGE_SET_STATUS=BLOCKED` and require recovery of the original reviewed artefact or separate Captain authorisation for a new frozen image set. |

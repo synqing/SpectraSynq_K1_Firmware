@@ -11,17 +11,23 @@ void light_mode_gdft() {
   uint8_t palette_to_use = render_secondary ? SECONDARY_PALETTE_INDEX : CONFIG.PALETTE_INDEX;
   const CRGBPalette16& pal = cached_gradient_palette(palette_to_use, render_secondary);
 
+  // Analysis authority: only bins with target_freq <= fs/2. Canvas width stays
+  // NATIVE_RESOLUTION/2 (= NUM_FREQS); ghosts [safe_hi, NUM_FREQS) are not resolution.
+  const uint8_t analysis_bins =
+      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+  const uint8_t analysis_hi = (analysis_bins > 1) ? (uint8_t)(analysis_bins - 1) : 0;
+
   // Calculate frequency data for the first half of the strip
   for (uint16_t i = 0; i < (NATIVE_RESOLUTION / 2); i++) {
-    // Map the NUM_FREQS frequency bins across the first half (NATIVE_RESOLUTION / 2 LEDs)
+    // Map representable bins across the first half (NATIVE_RESOLUTION / 2 LEDs)
     SQ15x16 freq_prog = (SQ15x16)i / (SQ15x16)(NATIVE_RESOLUTION / 2);
-    SQ15x16 freq_index_f = freq_prog * (NUM_FREQS - 1);
+    SQ15x16 freq_index_f = freq_prog * (SQ15x16)analysis_hi;
     uint16_t freq_index_i = freq_index_f.getInteger();
     SQ15x16 freq_fract = freq_index_f - freq_index_i;
 
-    // Ensure we don't index out of bounds
-    if (freq_index_i >= NUM_FREQS - 1) {
-      freq_index_i = NUM_FREQS - 2;
+    // Ensure we don't index out of bounds within analysis authority
+    if (freq_index_i >= analysis_hi) {
+      freq_index_i = (analysis_hi > 0) ? (uint16_t)(analysis_hi - 1) : 0;
       freq_fract = 1.0;
     }
     
@@ -31,8 +37,8 @@ void light_mode_gdft() {
       freq_fract = 0.0;
     }
 
-    // Ensure both indices are within bounds before accessing data
-    if (freq_index_i >= NUM_FREQS || freq_index_i + 1 >= NUM_FREQS) {
+    // Ensure both indices are within analysis authority before accessing data
+    if (freq_index_i >= analysis_bins || freq_index_i + 1 >= analysis_bins) {
       if (debug_mode) { USBSerial.print("!!! WARNING [GDFT]: Out of bounds freq_index_i: "); USBSerial.println(freq_index_i); }
       continue; // Skip this iteration if indices are invalid
     }

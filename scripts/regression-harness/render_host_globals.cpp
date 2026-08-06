@@ -31,10 +31,23 @@ CFastLED   FastLED;
 EspClass   ESP;
 
 // --- conf objects (firmware: globals_config.cpp, which we do NOT compile — it
-//     drags persistence/NVS). The render path only reads RenderParams (pushed via
-//     push_render_params), not CONFIG fields, so zero-init is sufficient here. ---
+//     drags persistence/NVS). Render historically only read RenderParams, but
+//     Phase 1 Nyquist ghost retirement reads CONFIG.SAMPLE_RATE / NOTE_OFFSET
+//     for analysis authority — keep production defaults here. ---
 conf CONFIG          = {};
 conf CONFIG_DEFAULTS = {};
+
+namespace {
+struct ConfigNyquistDefaultsInit {
+  ConfigNyquistDefaultsInit() {
+    CONFIG.SAMPLE_RATE = DEFAULT_SAMPLE_RATE;
+    CONFIG.NOTE_OFFSET = 12;
+    CONFIG_DEFAULTS.SAMPLE_RATE = DEFAULT_SAMPLE_RATE;
+    CONFIG_DEFAULTS.NOTE_OFFSET = 12;
+  }
+};
+static ConfigNyquistDefaultsInit g_config_nyquist_defaults_init;
+}  // namespace
 
 // Force an ODR-use of globals.h's `inline bool SECONDARY_PALETTE_MODE_ENABLED` so
 // this TU emits its definition. globals.cpp's palette_owns_colour_source() declares

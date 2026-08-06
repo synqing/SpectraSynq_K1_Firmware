@@ -64,6 +64,16 @@ def test_ap_stream_schema_keeps_front_end_and_loud_guard_fields():
     for field in loud_guard_fields:
         assert field in text
 
+    mas_guard = text.index("#ifdef K1_MIC_AUTO_SENSE_V1", text.index("USBSerial.printf(\" | k1_loud=%d"))
+    mas_end = text.index("#endif", mas_guard)
+    mas_block = text[mas_guard:mas_end]
+    assert "mas_state=%u" in mas_block
+    assert "mas_reason=%u" in mas_block
+    assert "mas_window_age_sec=%.1f" in mas_block
+    assert "mas_applied_scale=%.3f" in mas_block
+    assert "mas_shadow_scale" not in text
+    assert text.index("USBSerial.printf(\" | k1_loud=%d") < mas_guard
+
 
 def test_ap_capture_schema_keeps_capture_summary_fields():
     text = I2S_AUDIO.read_text(encoding="utf-8")

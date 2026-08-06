@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>K718 · Centre Visualisation Options</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&family=Saira+Condensed:wght@700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050608;color:#9aa3b2;font-family:'Inter',system-ui,sans-serif;padding:34px;min-height:100vh}
+h1{font-family:'Saira Condensed',sans-serif;letter-spacing:.1em;color:#f5f5f5;font-size:22px;text-transform:uppercase}
+.sub{color:#5a6273;font:12px ui-monospace,monospace;letter-spacing:.06em;margin:6px 0 26px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px;max-width:1180px}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+.cell{background:linear-gradient(145deg,rgba(30,28,24,.4),rgba(10,10,12,.85));border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.cell canvas{border-radius:50%;background:#040507}
+.cell .n{font:700 11px 'Saira Condensed',sans-serif;letter-spacing:.14em;color:#FFB84D}
+.cell .t{font:600 12px 'Inter';color:#cdd2da;text-align:center}
+.cell .d{font:10px ui-monospace,monospace;color:#5a6273;text-align:center;line-height:1.4}
+</style></head><body>
+<h1>K718 · Centre Visualisation — 10 Options</h1>
+<div class="sub">all radial · live · vibrant · pick a number and I build it into the dial</div>
+<div class="grid" id="g"></div>
+<script>
+const VIZ=[
+ ["RADIAL BARS","Spectrum bars radiating outward","bars"],
+ ["PULSE RINGS","Concentric rings expanding on the beat","rings"],
+ ["CIRCULAR WAVE","Audio waveform wrapped into a ring","wave"],
+ ["LIQUID BLOB","Organic shape morphing to the audio","blob"],
+ ["PARTICLE BURST","Particles thrown out on transients","burst"],
+ ["OSCILLOSCOPE","Spinning Lissajous trace","scope"],
+ ["DOT MATRIX","Concentric dot rings, size by band","dots"],
+ ["SPIRAL","Rotating spiral that pulses","spiral"],
+ ["LIQUID FILL","Wavy level rising with energy","fill"],
+ ["AURORA","Soft orbiting colour blobs","aurora"],
+ ["AFTERGLOW ★","Dense layered glow-rings — the K1 reference look","afterglow"],
+];
+const COL=["#00AECF","#E0338F","#EFA020","#28B76E","#7C5CFF","#FF8A1E","#2DE0C4"];
+const TAU=Math.PI*2,lerp=(a,b,t)=>a+(b-a)*t;
+const spec=new Array(40).fill(0),sv=new Array(40).fill(0);let wf=new Array(120).fill(0);
+const cells=[];
+const g=document.getElementById('g');
+VIZ.forEach((v,i)=>{const d=document.createElement('div');d.className='cell';
+ d.innerHTML=`<canvas width="380" height="380" style="width:190px;height:190px"></canvas><div class="n">${String(i+1).padStart(2,'0')}</div><div class="t">${v[0]}</div><div class="d">${v[1]}</div>`;
+ g.appendChild(d);const cv=d.querySelector('canvas');const ctx=cv.getContext('2d');ctx.scale(2,2);cells.push({ctx,fn:v[2],seed:i*1.7});});
+const C=95,R=95; // canvas centre 95, radius
+function P(r,a){return[C+r*Math.cos(a),C+r*Math.sin(a)];}
+function glowLine(ctx,x0,y0,x1,y1,col,w,blur){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap="round";if(blur){ctx.shadowColor=col;ctx.shadowBlur=blur;}ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();ctx.restore();}
+
+const FN={
+ bars(ctx,t,beat,seed){const n=44,ri=30;for(let i=0;i<n;i++){const a=i/n*TAU,h=8+spec[i%spec.length]*52*(1+beat*.4);const[x0,y0]=P(ri,a),[x1,y1]=P(ri+h,a);glowLine(ctx,x0,y0,x1,y1,COL[i%5],3,spec[i%spec.length]>.6?8:0);}},
+ rings(ctx,t,beat,seed){for(let k=0;k<5;k++){const ph=((t*0.9+k*0.2)%1);const r=18+ph*70;ctx.save();ctx.globalAlpha=(1-ph)*.8;ctx.strokeStyle=COL[k%5];ctx.lineWidth=2+beat*2;ctx.shadowColor=COL[k%5];ctx.shadowBlur=10;ctx.beginPath();ctx.arc(C,C,r,0,TAU);ctx.stroke();ctx.restore();}ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(C,C,4+beat*4,0,TAU);ctx.fill();},
+ wave(ctx,t,beat,seed){ctx.save();ctx.strokeStyle=COL[0];ctx.lineWidth=2.4;ctx.shadowColor=COL[0];ctx.shadowBlur=10;ctx.beginPath();const n=120;for(let i=0;i<=n;i++){const a=i/n*TAU;const w=Math.sin(a*6+t*4)*.5+Math.sin(a*3-t*3)*.5;const r=52+w*22*(1+beat);const[x,y]=P(r,a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();ctx.stroke();ctx.restore();},
+ blob(ctx,t,beat,seed){const grd=ctx.createRadialGradient(C,C,5,C,C,80);grd.addColorStop(0,COL[4]);grd.addColorStop(.6,COL[1]);grd.addColorStop(1,COL[0]+"00");ctx.save();ctx.shadowColor=COL[1];ctx.shadowBlur=18;ctx.fillStyle=grd;ctx.beginPath();const n=80;for(let i=0;i<=n;i++){const a=i/n*TAU;const r=44+Math.sin(a*3+t*1.6)*9+Math.sin(a*5-t*2.2)*7+beat*10;const[x,y]=P(r,a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();ctx.fill();ctx.restore();},
+ burst(ctx,t,beat,seed){for(let i=0;i<60;i++){const a=(i*2.39996+seed);const ph=((t*0.6+i*0.13)%1);const r=14+ph*78+beat*16;const[x,y]=P(r,a);ctx.save();ctx.globalAlpha=(1-ph)*.9;ctx.fillStyle=COL[i%5];ctx.shadowColor=COL[i%5];ctx.shadowBlur=6;ctx.beginPath();ctx.arc(x,y,1.4+(1-ph)*2,0,TAU);ctx.fill();ctx.restore();}},
+ scope(ctx,t,beat,seed){ctx.save();ctx.translate(C,C);ctx.rotate(t*0.4);ctx.strokeStyle=COL[3];ctx.lineWidth=1.8;ctx.shadowColor=COL[3];ctx.shadowBlur=9;ctx.globalAlpha=.9;ctx.beginPath();const n=200;for(let i=0;i<=n;i++){const u=i/n*TAU;const x=Math.sin(u*3+t)*70*(.6+beat*.4);const y=Math.sin(u*2)*70;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.restore();},
+ dots(ctx,t,beat,seed){for(let ring=0;ring<5;ring++){const rr=22+ring*15;const cnt=8+ring*4;for(let i=0;i<cnt;i++){const a=i/cnt*TAU+t*0.2*(ring%2?1:-1);const s=spec[(ring*4+i)%spec.length];const[x,y]=P(rr,a);ctx.save();ctx.globalAlpha=.4+s*.6;ctx.fillStyle=COL[ring%5];if(s>.5){ctx.shadowColor=COL[ring%5];ctx.shadowBlur=8;}ctx.beginPath();ctx.arc(x,y,1.4+s*3,0,TAU);ctx.fill();ctx.restore();}}},
+ spiral(ctx,t,beat,seed){ctx.save();ctx.translate(C,C);ctx.rotate(t*0.5);ctx.strokeStyle=COL[5];ctx.lineWidth=2.2;ctx.shadowColor=COL[5];ctx.shadowBlur=8;ctx.beginPath();for(let i=0;i<260;i++){const a=i*0.16;const r=i/260*82*(1+beat*.15);const x=r*Math.cos(a),y=r*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.restore();},
+ fill(ctx,t,beat,seed){ctx.save();ctx.beginPath();ctx.arc(C,C,80,0,TAU);ctx.clip();const lvl=C+30-beat*30;const grd=ctx.createLinearGradient(0,lvl,0,C+80);grd.addColorStop(0,COL[0]);grd.addColorStop(1,COL[4]);ctx.fillStyle=grd;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(15,200);for(let x=15;x<=175;x+=4){const y=lvl+Math.sin(x*0.12+t*3)*5;ctx.lineTo(x,y);}ctx.lineTo(175,200);ctx.closePath();ctx.fill();ctx.restore();ctx.strokeStyle="rgba(255,255,255,.12)";ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(C,C,80,0,TAU);ctx.stroke();},
+ aurora(ctx,t,beat,seed){ctx.save();ctx.beginPath();ctx.arc(C,C,84,0,TAU);ctx.clip();for(let k=0;k<3;k++){const a=t*(.5+k*.2)+k*2.1;const cx=C+Math.cos(a)*30,cy=C+Math.sin(a*1.2)*30;const rad=40+beat*16;const grd=ctx.createRadialGradient(cx,cy,2,cx,cy,rad);grd.addColorStop(0,COL[[4,1,0][k]]+"cc");grd.addColorStop(1,COL[[4,1,0][k]]+"00");ctx.fillStyle=grd;ctx.fillRect(0,0,190,190);}ctx.restore();},
+ afterglow(ctx,t,beat,seed){ctx.save();ctx.translate(C,C);
+  for(let i=0;i<72;i++){const a=i/72*TAU,h=5+spec[i%spec.length]*24,c0=Math.cos(a),s0=Math.sin(a);glowLine(ctx,28*c0,28*s0,(28+h)*c0,(28+h)*s0,i%2?COL[1]:COL[0],1.3,spec[i%spec.length]>.5?5:0);}
+  for(let k=0;k<5;k++){const r=40+k*11+Math.sin(t*1.3+k)*2+beat*4;ctx.save();ctx.rotate(t*0.15*(k%2?1:-1));ctx.strokeStyle=k%2?COL[1]:COL[0];ctx.globalAlpha=.45+.3*Math.sin(t*2+k);ctx.lineWidth=1.4;ctx.shadowColor=k%2?COL[1]:COL[0];ctx.shadowBlur=10;ctx.beginPath();ctx.arc(0,0,r,0,TAU);ctx.stroke();ctx.restore();}
+  ctx.globalAlpha=.9;ctx.strokeStyle=COL[1];ctx.lineWidth=2.6;ctx.shadowColor=COL[1];ctx.shadowBlur=12;ctx.beginPath();ctx.arc(0,0,68,t%TAU,t%TAU+1.6);ctx.stroke();
+  ctx.strokeStyle=COL[0];ctx.shadowColor=COL[0];ctx.beginPath();ctx.arc(0,0,80,(-t*0.7)%TAU,(-t*0.7)%TAU+1.2);ctx.stroke();
+  const gr=ctx.createRadialGradient(0,0,1,0,0,32);gr.addColorStop(0,"#fff");gr.addColorStop(.3,COL[1]);gr.addColorStop(1,COL[1]+"00");ctx.globalAlpha=.5+beat*.4;ctx.fillStyle=gr;ctx.beginPath();ctx.arc(0,0,32,0,TAU);ctx.fill();
+  ctx.restore();},
+};
+let lt=0;
+function loop(now){const t=now/1000,dt=Math.min(.05,(now-lt)/1000||.016);lt=now;
+ const beat=Math.max(0,1-((t%(60/128))/(60/128))*4);
+ for(let i=0;i<spec.length;i++){const x=i/(spec.length-1),env=Math.pow(.5+.5*Math.sin(x*Math.PI),.7),a=.45+.55*Math.abs(Math.sin(t*3+x*10)),b=.5+.5*Math.sin(t*7+i*1.6);sv[i]=lerp(sv[i],env*(.3+.7*a*b)*(1+beat*.5),.3);spec[i]=sv[i];}
+ cells.forEach(c=>{c.ctx.clearRect(0,0,190,190);FN[c.fn](c.ctx,t,beat,c.seed);});
+ requestAnimationFrame(loop);}
+requestAnimationFrame(loop);
+</script></body></html>

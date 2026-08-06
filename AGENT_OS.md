@@ -19,7 +19,9 @@ bash scripts/agent/session-bootstrap.sh
 
 The bootstrap runs `scripts/agent/repo-truth.sh` as a pre-session gate:
 
-- **FAIL** (lane-integrity problem: missing IM73D env/guard/plan) → bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
+- **FAIL** (lane-integrity problem: active authority missing, untracked,
+  inactive, or branch-mismatched; required production invariant missing) →
+  bootstrap exits nonzero. Do not proceed. Resolve the FAIL first.
 - **WARN** (stale docs that do not misroute the lane) → bootstrap continues and prints the warnings.
 - **PASS** → bootstrap continues normally.
 
@@ -30,6 +32,13 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - dirty / untracked state
 - active lane
 - whether handoff docs are stale
+
+**Active lane (2026-08-05):** `im69d130-mic-eval` on `lane/dual-sync-phase0`
+(branch name is historical; dual-sync is shelved). Authority:
+`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Session pointer:
+`.claude/handoff.md`. Spec routing: `docs/spec-index.md`.
+
+**If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
 ---
 
@@ -50,16 +59,25 @@ Trust sources in this order:
 
 ## 3. Current-lane verification rule
 
-The current live lane is:
+The current live lane is declared in the machine-readable frontmatter of
+`docs/spec-index.md`:
 
-- **Branch:** `lane/im73d-pdm-eval`
+- `active_branch`
+- `active_lane`
+- `active_authority`
+
+At this revision:
+
+- **Branch:** `lane/dual-sync-phase0`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** IM73D122 productionisation. Phase-1 firmware is done;
-  bench IM73D R1/no-speaker DSR proof is closed; current blocker is R2
-  production-shape hardware proof (main K1 SPH0645 -> IM73D on GPIO13/12/14,
-  or a dedicated production-shape IM73D unit).
+- **Focus:** dual-sync F0-F3 recovery.
+- **Authority:**
+  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`
 
-Before any work, verify the lane has not shifted. If `git status` shows a different branch, or if the lane doc says something different, stop and report the conflict.
+Before any work, verify the checked-out branch matches `active_branch` and the
+authority path exists. `scripts/agent/repo-truth.sh` enforces both. If either
+check fails, stop and report the conflict rather than silently rewriting lane
+authority.
 
 ---
 
@@ -68,7 +86,8 @@ Before any work, verify the lane has not shifted. If `git status` shows a differ
 If `repo-truth.sh` reports `handoff.md`, `progress.md`, or `spec-index.md` as stale:
 
 - Do not rely on them for current lane status.
-- Do not silently update them to match git.
+- Do not silently update them to match git unless Captain has explicitly
+  authorised an orchestration/lane takeover.
 - Report the stale docs in your handoff.
 - Ask for explicit approval before editing governance/docs files.
 
@@ -82,6 +101,30 @@ The dirty `docs/hardware/device-build-registry.md` entries are current evidence.
 the next session understanding of what was previously done. A session that
 records nothing is a session the next agent cannot learn from. **Skipping
 observation recording is a process failure, not a shortcut.**
+
+### Memory skill router (scenario → skill)
+
+When the task involves **resume / prior work / "did we already" / memory /
+history narrative / unfamiliar codebase**, invoke **`/claude-mem-router`**
+(or apply its table below) and pick **one** skill. Do not invoke the whole set.
+
+| Scenario | Skill |
+|----------|-------|
+| Current lane / device / branch status; before flash/forensics | `/spec-recall` |
+| Prior bug / "did we already fix X?" / recurrence | `/mem-search` |
+| Code structure without full-file reads | `/smart-explore` |
+| Cold-start / prime unfamiliar tree | `/learn-codebase` |
+| Theme corpus Q&A | `/knowledge-agent` |
+| One sweeping journey report | `/timeline-report` |
+| Week-by-week serial chapters | `/weekly-digests` |
+| How the memory tool works | `/how-it-works` |
+| Memory empty/stale/offline/contradicts Tier 0 | `/memory-authority-gate` |
+
+**Default K1 ladder:** bootstrap → `/spec-recall` → `/mem-search` (2–4 single-term
+queries) → act from git + on-disk + filtered observations → record observations.
+
+Full playbook: `.claude/skills/claude-mem-router/SKILL.md` (mirrored in
+`.cursor/skills/` and `.codex/skills/`).
 
 ### Retrieval (all tools, when starting a task)
 
@@ -308,9 +351,10 @@ moment without over-invoking. This is a narrow gate, not a ritual.
 Before acting on any task, run this scan in order:
 
 1. **Keyword scan `available_skills`** (cheap, always do this). Match task keywords against skill titles. If a skill title clearly fits the task domain, invoke it.
-2. **If the task is complex or multi-domain** → invoke `/discover-specialists` and check `.claude/agents/*.md` for a specialist whose scope matches. A specialist subagent often beats a general agent on its domain.
-3. **If no installed skill covers the task** → invoke `/find-skills` (`npx skills find <query>`) to search the open skills ecosystem. Do NOT invoke this for tasks covered by installed skills — it is for gaps.
-4. **If the task needs an external service** (GitHub, Linear, Slack, browser, database, etc.) → scan the MCP server list in the system prompt and call `mcp_list_tools` on the matching server before using its tools.
+2. **If the task involves resume / prior work / memory / "did we already" / history narrative** → apply §5 scenario table or invoke `/claude-mem-router` (pick one skill; do not fan out the whole set).
+3. **If the task is complex or multi-domain** → invoke `/discover-specialists` and check `.claude/agents/*.md` for a specialist whose scope matches. A specialist subagent often beats a general agent on its domain.
+4. **If no installed skill covers the task** → invoke `/find-skills` (`npx skills find <query>`) to search the open skills ecosystem. Do NOT invoke this for tasks covered by installed skills — it is for gaps.
+5. **If the task needs an external service** (GitHub, Linear, Slack, browser, database, etc.) → scan the MCP server list in the system prompt and call `mcp_list_tools` on the matching server before using its tools.
 
 Mechanical execution against a clear spec: do step 1 only, then proceed. Do not invoke specialists, find-skills, or MCP tools "to be safe."
 
@@ -343,8 +387,33 @@ pointer to this file plus tool-specific settings:
 |------|-------|----------------------|
 | **Devin** | `.devin/agent-os.md` | `.devin/config.local.json` (permissions), `.devin/blueprint.yaml` (knowledge), `scripts/agent/pio-build.sh` (guarded build wrapper) |
 | **Claude Code** | `CLAUDE.md` (root) + `.claude/CLAUDE.md` | `.claude/agents/*.md` (specialists), `.claude/skills/` (skills), `claude-mem` MCP |
-| **Codex** | `AGENTS.md` (root) | same specialist/skill inventory as Claude Code |
-| **Cursor** | `.cursor/rules/agent-os.mdc` | `.cursor/skills/` (skills) |
+| **Codex** | `AGENTS.md` (root) | `.codex/skills/` (skills; same inventory as Claude Code / Cursor), `claude-mem` MCP |
+| **Cursor** | `.cursor/rules/agent-os.mdc` | `.cursor/skills/` (skills), `claude-mem` MCP |
+
+### claude-mem skills (all three tools)
+
+**Router (start here when unsure):** `/claude-mem-router` — scenario → one skill.
+Canonical table also lives in §5.
+
+Project-local copies live in `.claude/skills/`, `.cursor/skills/`, and
+`.codex/skills/`. Reinstall / refresh with:
+
+```bash
+bash scripts/install-claude-mem-skills.sh
+```
+
+| Skill | Invoke when |
+|-------|-------------|
+| `/claude-mem-router` | Unsure which memory/recall skill fits — scenario table |
+| `/mem-search` | Prior-session recall (`search` → `timeline` → `get_observations`) |
+| `/knowledge-agent` | Build/query observation corpora |
+| `/timeline-report` | Full-project journey narrative from memory timeline |
+| `/how-it-works` | Explain claude-mem capture / injection / storage |
+| `/spec-recall` | On-disk-first lane resume (handoff beats memory for current status) |
+| `/smart-explore` | Token-cheap AST structural code search (`smart_search` / outline / unfold) |
+| `/learn-codebase` | Prime an unfamiliar codebase by reading sources |
+| `/weekly-digests` | Week-by-week serial timeline chapters |
+| `/memory-authority-gate` | Memory empty/stale/offline — DAF + Tier 0 docs |
 
 If your tool's overlay conflicts with this file, this file wins for
 tool-agnostic rules (safety, gates, source-of-truth). The overlay wins only for
@@ -352,4 +421,4 @@ tool-specific mechanics (how to invoke a build, where permissions live).
 
 ---
 
-Last updated: 2026-07-02
+Last updated: 2026-07-10

@@ -1,0 +1,91 @@
+// K1 Palette Bank + Previewer for Pixelblaze
+// 14 palettes lifted verbatim from SPECTRASYNQ_K1_FIRMWARE/visual/Palettes.cpp:
+// all 11 K1-native palettes plus Sunset_Real, lava, GMT_drywet.
+//
+// IMPORTANT: the byte values in Palettes.cpp are already gamma-converted for
+// WS2812B output (FastLED cpt-city conversion, gammas 2.6/2.2/2.5; the K1-native
+// palettes were authored directly in output space). Do NOT re-gamma (do not square)
+// these values in render() -- pass them to rgb() as-is.
+//
+// The K1-native palettes use deliberate dark anchors/separators: they prevent wide
+// hue jumps from blending into low-chroma mush. Keep them when designing patterns
+// that sweep the full palette range.
+//
+// As a pattern, this file is a palette previewer: the strip shows the selected
+// palette; optional slow scroll and auto-cycle.
+// To reuse in your own pattern: copy PAL_COUNT/palOff/palLen/palData + evalPal().
+
+// K1 palette bank — generated verbatim from SPECTRASYNQ_K1_FIRMWARE/visual/Palettes.cpp
+// Values are the FastLED gradient bytes /255 (already gamma-converted for WS2812B output).
+// Order: K1_Iris_Apricot, K1_Tropical_Ultraviolet, K1_Chameleon_Flare, K1_Coral_Sunset, K1_Night_Sea_Amber, K1_Crimson_Gold, K1_Ultraviolet_Ascend, K1_Naberius_Gold, K1_Vepar_Pink, K1_Flourish_Sweep, K1_Ultraviolet_Bright, Sunset_Real, lava, GMT_drywet
+var PAL_COUNT = 14
+var palOff = [0, 9, 20, 30, 39, 49, 59, 68, 78, 86, 95, 101, 108, 121]
+var palLen = [9, 11, 10, 9, 10, 10, 9, 10, 8, 9, 6, 7, 13, 7]
+var palData = [
+  0, 0.0118, 0.0078, 0.0941, 0.1176, 0.1569, 0.0784, 0.5098, 0.2275, 0.3608, 0.1765, 1, 0.3451, 0.7451, 0, 0.7059, 0.4627, 1, 0.1255, 0.2824, 0.6039, 1, 0.3725, 0, 0.7686, 1, 0.5882, 0, 0.8863, 1, 0.2824, 0, 1, 0.0941, 0.0039, 0.0706,  // K1_Iris_Apricot
+  0, 0, 0.0157, 0.0706, 0.1098, 0, 0.1647, 0.2745, 0.2275, 0, 0.5882, 0.6275, 0.3451, 0, 0.8627, 0.8235, 0.4549, 0.3216, 0.8627, 0, 0.5647, 0.1333, 0.5882, 0, 0.6667, 0, 0.2157, 0.0392, 0.7451, 0.0314, 0.0118, 0.0706, 0.8471, 0.6471, 0, 0.5098, 0.9333, 0.9608, 0, 0.6667, 1, 0.0471, 0.0078, 0.1098,  // K1_Tropical_Ultraviolet
+  0, 0, 0.0196, 0.1373, 0.1255, 0, 0.3529, 0.5686, 0.2588, 0, 0.8235, 0.902, 0.3843, 0, 0.5098, 0.6275, 0.4941, 0.4706, 0, 1, 0.6039, 0.7059, 0, 1, 0.7137, 0.9216, 0, 0.6863, 0.8314, 1, 0.5098, 0, 0.9255, 1, 0.3333, 0, 1, 0, 0.0196, 0.1373,  // K1_Chameleon_Flare
+  0, 0.0706, 0, 0.0118, 0.1333, 0.3765, 0.0314, 0.0392, 0.2745, 0.8235, 0.1373, 0.1569, 0.4118, 1, 0.2824, 0.1765, 0.5412, 1, 0.4118, 0.0784, 0.6745, 1, 0.5882, 0, 0.8039, 1, 0.7451, 0.0784, 0.9098, 0.6667, 0, 0.3725, 1, 0.0706, 0, 0.0118,  // K1_Coral_Sunset
+  0, 0, 0.0118, 0.0706, 0.1333, 0, 0.0784, 0.3529, 0.2667, 0, 0.3333, 0.7451, 0.4, 0, 0.7059, 0.8627, 0.5176, 0, 0.4314, 0.5098, 0.6275, 0, 0.0784, 0.1569, 0.7137, 0.0157, 0.0078, 0.0392, 0.8157, 1, 0.5294, 0, 0.9176, 1, 0.2941, 0, 1, 0.1373, 0, 0.0314,  // K1_Night_Sea_Amber
+  0, 0.0471, 0, 0.0392, 0.1255, 0.2549, 0, 0.1765, 0.251, 0.5686, 0, 0.3137, 0.3765, 0.8627, 0, 0.2745, 0.502, 1, 0.1412, 0.0941, 0.6275, 1, 0.3608, 0, 0.7529, 1, 0.5686, 0, 0.8549, 1, 0.7451, 0.1569, 0.9412, 1, 0.2745, 0.4706, 1, 0.0471, 0, 0.0392,  // K1_Crimson_Gold
+  0, 0.0314, 0, 0.0941, 0.1333, 0.1176, 0, 0.5098, 0.2745, 0.2745, 0, 0.9216, 0.4078, 0.5098, 0, 1, 0.5412, 0.7451, 0, 0.8627, 0.6745, 0.9216, 0, 0.6275, 0.8078, 1, 0.0314, 0.3765, 0.9098, 1, 0, 0.2353, 1, 0.0314, 0, 0.0941,  // K1_Ultraviolet_Ascend
+  0, 0.0078, 0, 0.0784, 0.1333, 0.0392, 0, 0.549, 0.2745, 0.1098, 0, 0.8824, 0.4157, 0.2745, 0.0392, 1, 0.549, 0.4706, 0, 1, 0.6667, 0.1569, 0, 0.4706, 0.7451, 0.0235, 0.0078, 0.0549, 0.8314, 1, 0.549, 0, 0.9255, 1, 0.3725, 0, 1, 0.0078, 0, 0.0784,  // K1_Naberius_Gold
+  0, 0.0549, 0, 0.0549, 0.149, 0.251, 0, 0.1882, 0.3059, 0.5882, 0, 0.3137, 0.4549, 0.8627, 0, 0.4706, 0.5961, 1, 0, 0.5882, 0.7373, 1, 0.1176, 0.4706, 0.8627, 1, 0.2745, 0.5882, 1, 0.0549, 0, 0.0549,  // K1_Vepar_Pink
+  0, 0, 0.0627, 0.0235, 0.1333, 0, 0.6667, 0.1569, 0.2588, 0, 0.8627, 0.4706, 0.3843, 0, 0.8235, 0.8235, 0.5098, 0, 0.4706, 1, 0.6353, 0.2353, 0.1176, 1, 0.7608, 0.549, 0, 1, 0.8784, 0.8627, 0, 0.6667, 1, 0.0627, 0, 0.0549,  // K1_Flourish_Sweep
+  0, 1, 0.0314, 0.3765, 0.2039, 0.9216, 0, 0.6275, 0.4078, 0.7451, 0, 0.8627, 0.6118, 0.5098, 0, 1, 0.8157, 0.2745, 0, 0.9216, 1, 0.1176, 0, 0.5098,  // K1_Ultraviolet_Bright
+  0, 0.4706, 0, 0, 0.0863, 0.702, 0.0863, 0, 0.2, 1, 0.4078, 0, 0.3333, 0.6549, 0.0863, 0.0706, 0.5294, 0.3922, 0, 0.4039, 0.7765, 0.0627, 0, 0.5098, 1, 0, 0, 0.6275,  // Sunset_Real
+  0, 0, 0, 0, 0.1804, 0.0706, 0, 0, 0.3765, 0.4431, 0, 0, 0.4235, 0.5569, 0.0118, 0.0039, 0.4667, 0.6863, 0.0667, 0.0039, 0.5725, 0.8353, 0.1725, 0.0078, 0.6824, 1, 0.3216, 0.0157, 0.7373, 1, 0.451, 0.0157, 0.7922, 1, 0.6118, 0.0157, 0.8549, 1, 0.7961, 0.0157, 0.9176, 1, 1, 0.0157, 0.9569, 1, 1, 0.2784, 1, 1, 1, 1,  // lava
+  0, 0.1843, 0.1176, 0.0078, 0.1647, 0.8353, 0.5765, 0.0941, 0.3294, 0.4039, 0.8588, 0.2039, 0.498, 0.0118, 0.8588, 0.8118, 0.6667, 0.0039, 0.1882, 0.8392, 0.8314, 0.0039, 0.0039, 0.4353, 1, 0.0039, 0.0275, 0.1294  // GMT_drywet
+]
+
+// ---------- UI ----------
+var paletteIndex = 0, palManual = 0
+export function sliderPalette(v) { palManual = min(PAL_COUNT - 1, floor(v * PAL_COUNT)); paletteIndex = palManual }
+export function showNumberPaletteIndex() { return paletteIndex }
+var autoCycle = 0
+export function toggleAutoCycle(v) { autoCycle = v }
+var scrollRate = 0.05
+export function sliderScroll(v) { scrollRate = 0.5 * v }
+
+// ---------- palette lookup ----------
+var pr, pg, pb
+function evalPal(t) {
+  var o = palOff[paletteIndex]
+  var n = palLen[paletteIndex]
+  t = mod(t, 1)
+  var base = o * 4
+  var i
+  for (i = 0; i < n - 1; i++) {
+    if (t < palData[base + (i + 1) * 4]) break
+  }
+  if (i >= n - 1) i = n - 2
+  var i0 = base + i * 4
+  var i1 = i0 + 4
+  var p0 = palData[i0], p1 = palData[i1]
+  var f = p1 > p0 ? (t - p0) / (p1 - p0) : 0
+  pr = mix(palData[i0 + 1], palData[i1 + 1], f)
+  pg = mix(palData[i0 + 2], palData[i1 + 2], f)
+  pb = mix(palData[i0 + 3], palData[i1 + 3], f)
+}
+
+// ---------- previewer ----------
+var shift = 0, cycleT = 0
+export function beforeRender(delta) {
+  var dt = delta / 1000
+  shift += scrollRate * dt
+  if (shift > 1) shift -= 1
+  if (autoCycle) {
+    cycleT += dt
+    if (cycleT > 4) {
+      cycleT = 0
+      paletteIndex = (paletteIndex + 1) % PAL_COUNT
+    }
+  } else {
+    paletteIndex = palManual
+  }
+}
+
+export function render(index) {
+  evalPal(index / pixelCount + shift)
+  rgb(pr, pg, pb)
+}

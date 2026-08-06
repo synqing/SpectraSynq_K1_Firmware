@@ -20,6 +20,11 @@ FORBIDDEN_CONFIG_TOKENS = (
     "ble_remoted_central.cpp",
     "k1_ble_midi_decoder.cpp",
     "NimBLE-Arduino",
+    # Dual-K1 sync probe surface (Phase 0, 2026-07-08) — extended BEFORE probe
+    # firmware lands so a sync TU can never silently reach a production env.
+    "-DSB_K1_SYNC_PROBE",
+    "SB_K1_SYNC_PROBE",
+    "k1_sync_link.cpp",
 )
 
 FORBIDDEN_ARTIFACT_TOKENS = (
@@ -34,6 +39,14 @@ FORBIDDEN_ARTIFACT_TOKENS = (
     b"SpectraSynq Remoted",
     b"03B80E5A-EDE8-4B33-A751-6CE34EC4C700",
     b"7772E5DB-3868-4112-A1A9-F2669D106BF3",
+    # Dual-K1 sync probe surface (Phase 0, 2026-07-08)
+    b"SB_K1_SYNC_PROBE",
+    b"k1_sync_link",
+    b"K1-SyncLink",
+    b"53594E43-4B31-4544-9B1A-2026070800A1",
+    # ESP-NOW is a rejected-but-contingency transport (F2): if it is ever
+    # compiled in by accident, production must fail loudly.
+    b"esp_now_init",
 )
 
 

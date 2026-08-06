@@ -139,6 +139,14 @@ bool serial_cmd_dispatch_beat_director(const char* command_type, char* command_d
 bool serial_cmd_dispatch_gdft_harness(const char* command_type, char* command_data);
 #endif // ENABLE_GDFT_HARNESS
 
+#ifdef K1_STM
+bool serial_cmd_dispatch_stm_telem(const char* command_type, char* command_data);
+#endif
+
+#ifdef K1_STM_FFT512_BENCH
+bool serial_cmd_dispatch_fft512_bench(const char* command_type, char* command_data);
+#endif
+
 // Dispatch the 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma,
 // vivid_black). Each writes VP_VIVID_* inline globals — no save_config, no reboot.
 // Returns true iff command_type named one of them; false to let parse_command's

@@ -67,6 +67,18 @@ enum esp_reset_reason_t {
 static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #endif
 
+// --- ESP application/runtime identity APIs (F2 dual-sync read-only commands) --
+// The identity commands are outside this replay corpus. Fixed host values keep
+// the real serial menu compilable without pretending to emulate an ESP image.
+struct esp_app_desc_t {
+  uint8_t app_elf_sha256[32];
+};
+static inline const esp_app_desc_t* esp_app_get_description() {
+  static const esp_app_desc_t description = {};
+  return &description;
+}
+static inline uint32_t esp_random() { return 0x12345678U; }
+
 // --- device-handler forward symbols referenced by serial_menu.h's whole body ---
 // (init_serial / dump_info / the serial_cmd_table.def destructive handlers /
 //  set_chroma_profile). None reachable from the S3.0 corpus; no-op for link.

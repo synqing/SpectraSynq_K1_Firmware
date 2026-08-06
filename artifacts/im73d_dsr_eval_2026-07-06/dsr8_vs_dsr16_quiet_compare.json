@@ -1,0 +1,198 @@
+{
+  "acceptance_note": "Quiet/ambient comparison can prove raw telemetry presence and rail safety, but it cannot promote DSR_16S without speaker or controlled acoustic stimulus.",
+  "context_metrics": [
+    "max_raw",
+    "clip_pct",
+    "near_pct",
+    "input_trim",
+    "peak_pin"
+  ],
+  "left_label": "summary",
+  "metrics": {
+    "clip_pct": {
+      "left": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right_over_left_mean": null,
+      "stat": "p90"
+    },
+    "input_trim": {
+      "left": {
+        "count": 3,
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 1.0
+      },
+      "right": {
+        "count": 3,
+        "max": 1.0,
+        "mean": 1.0,
+        "min": 1.0,
+        "p50": 1.0,
+        "p90": 1.0
+      },
+      "right_over_left_mean": 1.0,
+      "stat": "min"
+    },
+    "max_raw": {
+      "left": {
+        "count": 3,
+        "max": 501.0,
+        "mean": 487.0,
+        "min": 473.0,
+        "p50": 487.0,
+        "p90": 487.0
+      },
+      "right": {
+        "count": 3,
+        "max": 501.0,
+        "mean": 440.6666666666667,
+        "min": 348.0,
+        "p50": 473.0,
+        "p90": 473.0
+      },
+      "right_over_left_mean": 0.9048596851471595,
+      "stat": "p90"
+    },
+    "near_pct": {
+      "left": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right_over_left_mean": null,
+      "stat": "p90"
+    },
+    "peak_pin": {
+      "left": {
+        "count": 3,
+        "max": 0.162,
+        "mean": 0.147,
+        "min": 0.127,
+        "p50": 0.152,
+        "p90": 0.152
+      },
+      "right": {
+        "count": 3,
+        "max": 0.158,
+        "mean": 0.136,
+        "min": 0.12,
+        "p50": 0.13,
+        "p90": 0.13
+      },
+      "right_over_left_mean": 0.925170068027211,
+      "stat": "p90"
+    },
+    "raw_i16_abs_peak": {
+      "left": {
+        "count": 3,
+        "max": 36.0,
+        "mean": 35.0,
+        "min": 34.0,
+        "p50": 35.0,
+        "p90": 35.0
+      },
+      "right": {
+        "count": 3,
+        "max": 36.0,
+        "mean": 31.666666666666668,
+        "min": 25.0,
+        "p50": 34.0,
+        "p90": 34.0
+      },
+      "right_over_left_mean": 0.9047619047619048,
+      "stat": "p90"
+    },
+    "raw_i16_near_pct": {
+      "left": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right": {
+        "count": 3,
+        "max": 0.0,
+        "mean": 0.0,
+        "min": 0.0,
+        "p50": 0.0,
+        "p90": 0.0
+      },
+      "right_over_left_mean": null,
+      "stat": "max"
+    },
+    "raw_i16_rms": {
+      "left": {
+        "count": 3,
+        "max": 24.4,
+        "mean": 23.133333333333336,
+        "min": 21.7,
+        "p50": 23.3,
+        "p90": 23.3
+      },
+      "right": {
+        "count": 3,
+        "max": 21.6,
+        "mean": 18.233333333333334,
+        "min": 14.6,
+        "p50": 18.5,
+        "p90": 18.5
+      },
+      "right_over_left_mean": 0.7881844380403458,
+      "stat": "p90"
+    }
+  },
+  "missing_required_metrics": [],
+  "quality": {
+    "left": {
+      "reason_counts": {},
+      "runs": 3,
+      "usable_runs": 3,
+      "warning_counts": {}
+    },
+    "right": {
+      "reason_counts": {},
+      "runs": 3,
+      "usable_runs": 3,
+      "warning_counts": {
+        "conditioned_peak_pin_high": 1
+      }
+    }
+  },
+  "required_raw_metrics": [
+    "raw_i16_rms",
+    "raw_i16_abs_peak",
+    "raw_i16_near_pct"
+  ],
+  "right_label": "summary",
+  "role": "bench_im73d",
+  "verdict": "no_promotion_without_speaker_stimulus"
+}

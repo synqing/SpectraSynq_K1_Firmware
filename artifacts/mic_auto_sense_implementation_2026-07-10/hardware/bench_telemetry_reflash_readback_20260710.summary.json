@@ -1,0 +1,25 @@
+{
+  "ap_lines": 29,
+  "boot_markers": [
+    "rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)"
+  ],
+  "build_lines": [
+    "BUILD: version=40103 git=cc97081 epoch=1783684663 env=k1_bench_im73d_mic_auto_telemetry"
+  ],
+  "chip_lines": [
+    "B489A500"
+  ],
+  "dump_cal_lines": [
+    "CONFIG.SWEET_SPOT_MIN_LEVEL: 272",
+    "CONFIG.DC_OFFSET: -6",
+    "CAL_SOURCE: persisted_profile",
+    "CAL_VALID: 1",
+    "CAL_PROFILE_LOADED: 1",
+    "NOISE_CAL_REASON: none"
+  ],
+  "fatal_markers": [],
+  "first_mas": "[AP] SSL=272 DC=-6 max_raw=59 follower=272 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=115.0 conf=0.24 lock=0 phase=0.98 beat=0 bstr=0.04 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=3 raw_i16_rms=1.2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=0.801 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=9.0 mas_applied_scale=1.000",
+  "last_mas": "[AP] SSL=272 DC=-6 max_raw=235 follower=272 peak_scaled=0.005 response_gain=1.000 silent_scale=1.000 silence=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=104.0 conf=0.05 lock=0 phase=0.25 beat=0 bstr=0.10 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=11 raw_i16_rms=6.0 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.995 agc_gain=1.432 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 | mas_state=1 mas_reason=1 mas_window_age_sec=26.1 mas_applied_scale=1.000",
+  "log_path": "artifacts/mic_auto_sense_implementation_2026-07-10/hardware/bench_telemetry_reflash_readback_20260710.log",
+  "mas_ap_lines": 28
+}

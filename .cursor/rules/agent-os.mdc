@@ -1,5 +1,5 @@
 ---
-description: Agent Operating System — read AGENT_OS.md before any task. Bootstrap ritual, source-of-truth hierarchy, safety gates, thinking gate, skill awareness.
+description: Agent Operating System — read AGENT_OS.md before any task. Bootstrap ritual, source-of-truth hierarchy, safety gates, thinking gate, skill awareness, claude-mem router.
 globs:
 alwaysApply: true
 ---
@@ -17,7 +17,10 @@ Cursor).
 2. Read `AGENT_OS.md` — source-of-truth hierarchy, current lane, safety rules,
    thinking gate, skill awareness gate.
 3. Keyword-scan `available_skills` for a skill that fits the task domain.
-4. For decisions/architecture/debugging-under-uncertainty, invoke
+4. If the task involves **resume / prior work / memory / "did we already" /
+   history**, apply the **claude-mem scenario table** below (or invoke
+   `/claude-mem-router`) — pick **one** skill, do not fan out the set.
+5. For decisions/architecture/debugging-under-uncertainty, invoke
    `/thinking-model-router` before acting.
 
 ## Hard rules (from AGENT_OS.md)
@@ -33,6 +36,28 @@ Cursor).
   changed class).
 - End session with `scripts/agent/post-session-report.md` filled (including
   `thinking_skill_used`, `skills_used`, `specialists_used`).
+
+## Claude-mem scenario → skill (always-on reference)
+
+| Scenario | Skill |
+|----------|-------|
+| Current lane / device / branch; before flash/forensics | `/spec-recall` |
+| "Did we already fix X?" / prior bug / recurrence | `/mem-search` |
+| Code structure without full-file reads | `/smart-explore` |
+| Cold-start / prime unfamiliar tree | `/learn-codebase` |
+| Theme corpus Q&A | `/knowledge-agent` |
+| One sweeping journey report | `/timeline-report` |
+| Week-by-week serial chapters | `/weekly-digests` |
+| How the memory tool works | `/how-it-works` |
+| Memory empty/stale/offline/contradicts Tier 0 | `/memory-authority-gate` |
+| Unsure which of the above | `/claude-mem-router` |
+
+**Default K1 ladder:** bootstrap → `/spec-recall` → `/mem-search` (2–4 single-term
+queries) → act from git + on-disk + filtered observations → record observations.
+
+On-disk handover beats claude-mem for **current** lane status. Full playbook:
+`.cursor/skills/claude-mem-router/SKILL.md` (also in `.claude/skills/` and
+`.codex/skills/`). Refresh: `bash scripts/install-claude-mem-skills.sh`.
 
 ## Cursor-specific
 

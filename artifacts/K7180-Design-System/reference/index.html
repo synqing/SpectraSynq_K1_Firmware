@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K718 Remoted — HALO Design System</title>
+<link rel="stylesheet" href="gallery.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <h1>K718 REMOTED · <b>HALO</b></h1>
+    <div class="sub">Circular Design Language · Component Gallery · v0.1</div>
+    <p class="lede">The radial operating grammar for the K718 Remoted — a physical encoder with a round 480×480 display that helps a user <b>see, understand, and shape</b> music in real time. Every dial below is produced by one token-driven renderer (<code>halo.js</code>) — not hand-drawn. That is the discipline: variation lives only in Theme Territory, never in new dials.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ── FOUNDATIONS · COLOR ─────────────────────────── -->
+<section>
+  <div class="eyebrow">Foundations</div>
+  <h2>Color — meaning before mood</h2>
+  <p class="note">Semantic accents have <b>fixed meaning across every theme</b> (green is always confirm; red is always alert). Theme Territories restyle the <i>palette</i>, never the meaning. Contrast ratios are the board-documented targets on the dark background.</p>
+
+  <h3>Semantic accents (fixed)</h3>
+  <div class="accent-row" style="border-bottom:1px solid var(--bg-hairline);color:var(--text-tertiary);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em">
+    <span>Hue</span><span>Meaning</span><span>Ratio</span><span>WCAG</span></div>
+  <div class="accent-row"><span class="chip" style="background:var(--accent-focus)"></span><span class="mean"><b style="color:var(--accent-focus)">focus</b> — selected element</span><span class="ratio">9.7:1</span><span class="pass" style="color:var(--accent-confirm)">AAA ✓</span></div>
+  <div class="accent-row"><span class="chip" style="background:var(--accent-input)"></span><span class="mean"><b style="color:var(--accent-input)">input</b> — user input / pending</span><span class="ratio">7.1:1</span><span class="pass" style="color:var(--accent-confirm)">AAA ✓</span></div>
+  <div class="accent-row"><span class="chip" style="background:var(--accent-active)"></span><span class="mean"><b style="color:var(--accent-active)">active</b> — value changing</span><span class="ratio">7.2:1</span><span class="pass" style="color:var(--accent-confirm)">AAA ✓</span></div>
+  <div class="accent-row"><span class="chip" style="background:var(--accent-confirm)"></span><span class="mean"><b style="color:var(--accent-confirm)">confirm</b> — committed / healthy</span><span class="ratio">6.3:1</span><span class="pass" style="color:var(--accent-confirm)">AA ✓</span></div>
+  <div class="accent-row"><span class="chip" style="background:var(--accent-alert)"></span><span class="mean"><b style="color:var(--accent-alert)">alert</b> — warning / critical</span><span class="ratio">6.2:1</span><span class="pass" style="color:var(--accent-confirm)">AA ✓</span></div>
+  <p class="note" style="margin-top:0.6rem;font-size:0.78rem">Exactly <b>five</b> semantic accents — no sixth. Decorative colour lives only inside a theme palette (<code>--c*</code>), never as fixed meaning (Vignelli).</p>
+
+  <h3>Theme palettes — sanctioned variation (open candidates, none married)</h3>
+  <div class="grid g5">
+    <div class="card"><div class="swatches" data-territory="signal-observatory"><span style="background:var(--c1)"></span><span style="background:var(--c2)"></span><span style="background:var(--c3)"></span><span style="background:var(--c4)"></span><span style="background:var(--c5)"></span></div><div class="cap"><b>Signal Observatory</b>Clean · Scientific · Precise</div></div>
+    <div class="card"><div class="swatches" data-territory="afterglow-district"><span style="background:var(--c1)"></span><span style="background:var(--c2)"></span><span style="background:var(--c3)"></span><span style="background:var(--c4)"></span><span style="background:var(--c5)"></span></div><div class="cap"><b>Afterglow District</b>Cinematic · Moody · Electric</div></div>
+    <div class="card"><div class="swatches" data-territory="prism-firewall"><span style="background:var(--c1)"></span><span style="background:var(--c2)"></span><span style="background:var(--c3)"></span><span style="background:var(--c4)"></span><span style="background:var(--c5)"></span></div><div class="cap"><b>Prism Firewall</b>Data-driven · Vivid · Adaptive</div></div>
+    <div class="card"><div class="swatches" data-territory="laser-liturgy"><span style="background:var(--c1)"></span><span style="background:var(--c2)"></span><span style="background:var(--c3)"></span><span style="background:var(--c4)"></span><span style="background:var(--c5)"></span></div><div class="cap"><b>Laser Liturgy</b>Sacred · Focused · Ritual</div></div>
+    <div class="card"><div class="swatches" data-territory="zero-g-bazaar"><span style="background:var(--c1)"></span><span style="background:var(--c2)"></span><span style="background:var(--c3)"></span><span style="background:var(--c4)"></span><span style="background:var(--c5)"></span></div><div class="cap"><b>Zero-G Bazaar</b>Energetic · Holographic · Alive</div></div>
+  </div>
+</section>
+
+<!-- ── FOUNDATIONS · TYPE ──────────────────────────── -->
+<section>
+  <div class="eyebrow">Foundations</div>
+  <h2>Typography — the Legibility Ladder</h2>
+  <p class="note">Type is sized by <b>role</b>, not taste. Every rung carries a minimum contrast grade — non-negotiable on a 60 mm display at arm's length. Two families max: mono for values, humanist for labels.</p>
+  <div class="ladder">
+    <div><span class="readout-val" style="font-size:30px">128</span><span class="spec">T1 · 28–32px · Primary numeric</span><span class="grade">AAA</span></div>
+    <div><span style="font-size:22px;color:var(--text-primary);letter-spacing:0.12em">WAVEFORM</span><span class="spec">T2 · 20–24px · Primary labels</span><span class="grade">AAA</span></div>
+    <div><span style="font-size:17px;color:var(--text-primary);letter-spacing:0.1em">RATE</span><span class="spec">T3 · 16–18px · Secondary labels</span><span class="grade">AAA</span></div>
+    <div><span style="font-size:14px;color:var(--text-secondary);letter-spacing:0.08em">INTENSITY</span><span class="spec">T4 · 13–15px · Tertiary info</span><span class="grade">AA</span></div>
+    <div><span style="font-size:11px;color:var(--text-tertiary);letter-spacing:0.08em">DUSK PAD</span><span class="spec">T5 · 11–12px · Micro labels</span><span class="grade">AA</span></div>
+    <div><span style="font-size:10px;color:var(--text-tertiary);letter-spacing:0.06em">LOCKED</span><span class="spec">T6 · 9–10px · Micro / fine print</span><span class="grade">A</span></div>
+  </div>
+</section>
+
+<!-- ── RADIAL GRID ─────────────────────────────────── -->
+<section>
+  <div class="eyebrow">Structure</div>
+  <h2>The Radial Grid — placement by band × zone</h2>
+  <p class="note">A circular display has no columns. HALO places every element by <b>radius band</b> (distance from center) and <b>angular zone</b> (clock position). Importance is centrality: the sacred Readout sits dead-center; navigation lives at the rim. Dashed cyan = bezel-safe radius (6%); coloured arcs = thumb-occlusion zones. <i>(Encoded in the <code>k718-radial-grid</code> skill.)</i></p>
+  <div class="grid g2">
+    <div class="card"><div data-halo='{"size":360,"territory":"signal-observatory","showGrid":true,"navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"SYNCED"}'></div><div class="cap"><b>Zone anatomy</b>bezel-safe · nav · control · signal-core · readout · occlusion arcs</div></div>
+    <div class="card" style="justify-content:center;align-items:flex-start;text-align:left">
+      <h3 style="margin-top:0">Radius bands (bezel→center)</h3>
+      <p class="note"><b style="color:var(--text-primary)">Nav Ring</b> r188–226 · modes & navigation<br>
+      <b style="color:var(--text-primary)">Control Ring</b> r138–188 · active parameter (thumb)<br>
+      <b style="color:var(--text-primary)">Signal Core</b> r70–138 · live spectrum / waveform<br>
+      <b style="color:var(--text-primary)">Readout Center</b> r0–70 · the one sacred value<br>
+      <b style="color:var(--text-primary)">State Edge</b> · keel (6 o'clock), always visible</p>
+      <h3>Angular zones</h3>
+      <p class="note">Crown (12) status · Right/Left arcs nav · Keel (6) state + promotion lane</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMPONENTS ──────────────────────────────────── -->
+<section>
+  <div class="eyebrow">Components</div>
+  <h2>The closed component set</h2>
+  <p class="note">Building a screen = composing these named parts. Adding a component needs a spec revision; restyling one via a Theme Territory does not.</p>
+  <div class="grid g3">
+    <div class="card"><div data-halo='{"size":230,"territory":"prism-firewall","attention":"glanceable","readout":{"value":"128","unit":"BPM"},"stateEdge":"GLANCEABLE"}'></div><div class="cap"><b>Readout + State Edge</b><span class="desc">Glanceable — one value, persistent status</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"territory":"prism-firewall","attention":"aware","controlDots":{"count":40},"readout":{"value":"128","unit":"BPM"},"core":"spectrum","stateEdge":"AWARE"}'></div><div class="cap"><b>Signal Core + Dot-Ring</b><span class="desc">Aware — live spectrum, monitoring</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"territory":"prism-firewall","attention":"engaged","controlDots":{"count":40,"focus":9},"focusRing":true,"activeArc":0.62,"readout":{"value":"74","unit":"CUTOFF %"},"stateEdge":"ENGAGED"}'></div><div class="cap"><b>Focus Ring + Active Arc</b><span class="desc">Engaged — adjusting a value</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"territory":"afterglow-district","truthRing":true,"status":{"label":"PEND","trust":"pending"},"readout":{"value":"128","unit":"BPM"},"promotionLane":"MODE SELECT"}'></div><div class="cap"><b>Truth Ring + Promotion Lane</b><span class="desc">Pending — trust gradient + commit verbs</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"territory":"signal-observatory","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"E","unit":"MODE"},"stateEdge":"ROTATE TO PREVIEW"}'></div><div class="cap"><b>Mode Compass / Nav</b><span class="desc">Center = mode glyph (non-numeric) · rotate to preview, press to select</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"territory":"zero-g-bazaar","attention":"aware","core":"spectrum","readout":{"value":"128","unit":"BPM"},"alert":true,"status":{"label":"CLIP","trust":"settled"}}'></div><div class="cap"><b>Alert Layer</b><span class="desc">Interrupt overlay — preempts any state</span></div></div>
+  </div>
+</section>
+
+<!-- ── STATE MODEL ─────────────────────────────────── -->
+<section>
+  <div class="eyebrow">Patterns</div>
+  <h2>The state model — rationalized (R1)</h2>
+  <p class="note">The boards tangled three different things. HALO separates them into <b>orthogonal</b> concerns: an <b>Attention ramp</b> (how much is revealed) × a <b>Trust lifecycle</b> (pending→committed) × an <b>Alert overlay</b> (interrupt). Any screen is a point in (Attention × Trust).</p>
+  <h3>Axis A — Attention ramp</h3>
+  <div class="grid g4">
+    <div class="card"><div data-halo='{"size":190,"territory":"afterglow-district","attention":"glanceable","readout":{"value":"128","unit":"BPM"},"stateEdge":"GLANCEABLE"}'></div><div class="cap"><b>Glanceable</b><span class="desc">at rest · minimal</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"afterglow-district","attention":"aware","core":"spectrum","readout":{"value":"128","unit":"BPM"},"stateEdge":"AWARE"}'></div><div class="cap"><b>Aware</b><span class="desc">monitoring · live</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"afterglow-district","attention":"engaged","controlDots":{"count":36,"focus":7},"focusRing":true,"activeArc":0.5,"readout":{"value":"74","unit":"%"},"stateEdge":"ENGAGED"}'></div><div class="cap"><b>Engaged</b><span class="desc">adjusting · focus</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"afterglow-district","attention":"focused","controlDots":{"count":36,"focus":7},"focusRing":true,"core":"waveform","readout":{"value":"24","unit":"dB LPF"},"stateEdge":"FOCUSED"}'></div><div class="cap"><b>Focused</b><span class="desc">exploring · deep</span></div></div>
+  </div>
+  <h3>Axis B — Trust lifecycle</h3>
+  <div class="grid g4">
+    <div class="card"><div data-halo='{"size":190,"territory":"prism-firewall","attention":"aware","core":"spectrum","readout":{"value":"128","unit":"BPM"},"status":{"label":"LIVE","trust":"settled"},"stateEdge":"SETTLED"}'></div><div class="cap"><b>Settled</b><span class="desc">applied · live</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"prism-firewall","truthRing":true,"status":{"label":"PEND","trust":"pending"},"readout":{"value":"128","unit":"BPM"},"promotionLane":"PENDING"}'></div><div class="cap"><b>Pending</b><span class="desc">previewed · Truth Ring</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"prism-firewall","activeArc":1,"status":{"label":"COMMIT","trust":"committing"},"readout":{"value":"128","unit":"BPM"},"stateEdge":"COMMITTING"}'></div><div class="cap"><b>Committing</b><span class="desc">confirm in progress</span></div></div>
+    <div class="card"><div data-halo='{"size":190,"territory":"prism-firewall","confirmRing":true,"status":{"label":"DONE","trust":"committed"},"readout":{"value":"128","unit":"BPM"},"stateEdge":"COMMITTED"}'></div><div class="cap"><b>Committed</b><span class="desc">applied · green confirm ring</span></div></div>
+  </div>
+</section>
+
+<!-- ── THEME EXPLORATION (one grammar, the whole design space) ── -->
+<section>
+  <div class="eyebrow">Variation · everything on the table</div>
+  <h2>One grammar, six theme directions</h2>
+  <p class="note"><b>No theme is married</b> (Captain 2026-06-29). The <i>same</i> locked composition — hero = real enabled mode <code>TEMPO_RIVER_WALK</code>, type = DIN Condensed + Inter — rendered across six directions spanning the design space: austere↔vivid, dark↔light, cool↔warm. This is theme-only variation (swap a token set, never draw a new dial) — the antidote to variant-dial churn. Default reference = the most austere (<i>Measurement Grade</i>), per the craft audit; loud themes are sanctioned variation, not the reference. None canonical until you choose.</p>
+  <div class="grid g3">
+    <div class="card"><div data-halo='{"size":230,"theme":"measurement-grade","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Measurement Grade</b><span class="desc">Austere instrument · dark mono cool · "oscilloscope at 3am"</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"theme":"instrument-dark","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Instrument Dark</b><span class="desc">Refined dark-luminous · deep-blue-black · glow=info</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"theme":"precision-dark","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Precision Dark</b><span class="desc">Warm analog · warm-neutral dark · instrument faceplate</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"theme":"neutral-field","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Neutral Field</b><span class="desc">Max restraint · grayscale at rest · form before colour</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"theme":"editorial-signal","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Editorial Signal</b><span class="desc">Vivid-disciplined · pure hues · "signal over noise"</span></div></div>
+    <div class="card"><div data-halo='{"size":230,"theme":"daylight-panel","attention":"aware","core":"spectrum","navLabels":["SIGNAL","SHAPE","MOTION","SYSTEM","SCENE"],"readout":{"value":"128","unit":"BPM"},"stateEdge":"TEMPO RIVER WALK"}'></div><div class="cap"><b>Daylight Panel</b><span class="desc">Daylight-legible · light field · deep-pigment accents</span></div></div>
+  </div>
+  <p class="note" style="margin-top:1rem;font-size:0.8rem">The board's original five (Signal Observatory · Afterglow District · Prism Firewall · Laser Liturgy · Zero-G Bazaar) remain available as the dark-neon region — one corner of this space, no longer privileged.</p>
+</section>
+
+<!-- ── MODES & BACKING LEDGER (Honesty Rule H-1) ────── -->
+<section>
+  <div class="eyebrow">Application · verified against firmware</div>
+  <h2>Modes &amp; readout — the Honesty Ledger</h2>
+  <p class="note"><b>Honesty Rule H-1:</b> the dashboard must never display a control or value the firmware cannot provide. Every element is tagged from a firmware audit (DLG-01, file-cited). A shippable screen contains only <span class="tag backed">BACKED</span>. <span class="tag aspirational">ASPIRATIONAL ◇</span> is roadmap, never live truth.</p>
+  <table class="ledger">
+    <tr><th>Element</th><th>Firmware reality</th><th>Backing</th></tr>
+    <tr><td><b>SHAPE</b> mode</td><td>34 primary/secondary control paths in the BLE-MIDI map (photons, chroma, mood, palette…)</td><td><span class="tag backed">BACKED</span></td></tr>
+    <tr><td><b>MOTION</b> mode</td><td>5 enabled tempo-locked effects + live beat_phase / bpm</td><td><span class="tag backed">BACKED</span></td></tr>
+    <tr><td><b>SYSTEM</b> mode</td><td>director / global / calibration / edge controls all in the map</td><td><span class="tag backed">BACKED</span></td></tr>
+    <tr><td><b>SIGNAL</b> mode</td><td>audio data computed internally but <b>does not cross the wire</b>; "Spectrum/Chromagram" point at disabled modes</td><td><span class="tag partial">PARTIAL</span></td></tr>
+    <tr><td><b>SCENE</b> mode</td><td>scene.smart + 10 preset slots exist; preset-morph over the wire is not a named control</td><td><span class="tag partial">PARTIAL</span></td></tr>
+    <tr><td><b>BPM</b> readout</td><td>tempo_bpm published in k1.state over WebSocket (WiFi path)</td><td><span class="tag backed">BACKED</span></td></tr>
+    <tr><td><b>INTENSITY</b> readout</td><td>vu_level / spectral_energy exist internally, unnamed, untransmitted</td><td><span class="tag partial">PARTIAL</span></td></tr>
+    <tr><td><b>KEY</b> readout</td><td>no key detection; only chord_root pitch-class + triad type, no note-name lookup</td><td><span class="tag aspirational">ASPIRATIONAL ◇</span></td></tr>
+    <tr><td><b>TIME</b> signature</td><td>not computed anywhere; no beats-per-bar / downbeat</td><td><span class="tag aspirational">ASPIRATIONAL ◇</span></td></tr>
+    <tr><td><b>PEND</b> commit flow</td><td>no protocol counterpart — controller-local UX layer, not a firmware handshake</td><td><span class="tag partial">UX-LOCAL</span></td></tr>
+  </table>
+</section>
+
+<!-- ── GOVERNANCE ──────────────────────────────────── -->
+<section style="border-bottom:none">
+  <div class="eyebrow">Governance</div>
+  <h2>What is locked, open, forbidden</h2>
+  <div class="gov">
+    <div class="locked"><h4 style="color:var(--accent-confirm)">Locked</h4><ul><li>radial grid &amp; ring roles</li><li>gesture &amp; state model</li><li>component set</li><li>legibility ladder</li><li>the six principles</li></ul></div>
+    <div class="open"><h4 style="color:var(--accent-active)">Open (sanctioned)</h4><ul><li><b>Theme Territory only</b></li><li>palette · motion · density</li><li>new Territories may be proposed</li></ul></div>
+    <div class="forbidden"><h4 style="color:var(--accent-alert)">Forbidden</h4><ul><li>new decorative dials</li><li>per-screen collars</li><li>burying key info</li><li>simultaneous-data overload</li><li>legibility traded for style</li></ul></div>
+  </div>
+  <h3>The governance test (apply before any change)</h3>
+  <p class="note" style="font-size:1rem;color:var(--text-secondary)">Does this compose existing named HALO elements within the locked grammar, varying only Theme Territory? <b style="color:var(--accent-confirm)">Yes → in grammar, proceed.</b> Invents a new layout/dial? <b style="color:var(--accent-alert)">No → out of grammar, STOP.</b> <i>(This is the churn the freeze was meant to end.)</i></p>
+  <div class="pills">
+    <span><b>Clarity</b> first</span><span><b>Context</b> always</span><span><b>Feedback</b> real-time</span><span><b>Depth</b> on demand</span><span><b>Consistency</b> everywhere</span><span><b>Performance</b> matters</span>
+  </div>
+</section>
+
+</div>
+
+<footer>K718 REMOTED · HALO v0.1 · authority = ../spec/K718-DESIGN-LANGUAGE.md · rendered by halo.js · DESIGN WITH PURPOSE · BUILD FOR FLOW · VALIDATE FOR REALITY</footer>
+
+<script src="halo.js"></script>
+</body>
+</html>

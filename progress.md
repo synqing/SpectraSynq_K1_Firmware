@@ -1,37 +1,35 @@
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
-**Current focus:** (2026-07-26) **Shift+S save show state** on `feat/save-show-hotkey` (PR #39, stacked on M2.1 PR #38) — Lightwave-parity `'S'` / `:save_show` persists primary+secondary+EdgeMixer to LittleFS `/SHOW_STATE_V1.BIN` and restores after `load_config()` on boot. Host-green (pytest **728** / 1 skip; `k1_hardware` SUCCESS); **not device-proven**. Prior: M2.1 R1+R2 COMPLETE on `feat/serial-menu-decomposition-r1` (PR #38).
+
+**Current focus (2026-08-05, authoritative — AP advice / IM69D):** IM69D130 dual-mic
+evaluation on `feat/ap-advice-phase0-im69d-gain8` (PR #40). Phase 0 **PASS** at
+`K1_MIC_IM69D_INPUT_GAIN=4` (G=8 failed silence latch). Phases 1–2: Nyquist ghost
+retirement + GDFT ×2 global drop. Authority:
+`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Production mic remains
+IM73D122 until IM69 lane closes.
+
+**Also landed on main (2026-07-26):** M2.1 `serial_menu` decomposition (R1+R2) +
+Shift+S save-show (`k1_show_state`) — host-green; device smoke Captain-gated.
 
 ## 2026-07-26 Shift+S Save Show State (Lightwave parity)
 
-Branch `feat/save-show-hotkey` off M2.1 tip. Module `control/k1_show_state.{h,cpp}`: capture via `k1_queue_capture_live` ×2 + `k1_edgemixer_config()`; encode CRC blob; `'S'` / `:save_show` write blob then immediate `save_config()`; `init_fs()` calls `k1_show_state_load()` after `load_config()` (soft no-op if missing). Lowercase `'s'` remains VP stream. Secondary hotkey edits stay RAM-only until explicit save. Host proof: `tests/test_show_state_static.py`. **Device smoke Captain-gated.**
+Branch `feat/save-show-hotkey` off M2.1 tip. Module `control/k1_show_state.{h,cpp}`:
+capture via `k1_queue_capture_live` ×2 + `k1_edgemixer_config()`; encode CRC blob;
+`'S'` / `:save_show` write blob then immediate `save_config()`; `init_fs()` calls
+`k1_show_state_load()` after `load_config()` (soft no-op if missing). Lowercase
+`'s'` remains VP stream. Host proof: `tests/test_show_state_static.py`.
 
 ## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R2 COMPLETE
 
-Stage-B typed `type=value` dispatch: `serial_typed_cmd_table.def` (151 rows), `serial_typed_dispatch.{h,cpp}`, `serial_typed_cmd_lookup()` + `serial_dispatch_typed_setter()` chokepoint in `serial_menu.cpp`. `parse_command()` no longer fans out through inline strcmp arms or `serial_cmd_dispatch_*()` call-sites — table lookup only (+ deprecated `SECONDARY_*` `command_buf` aliases). Host gates: ODR second-TU smoke (`test_serial_menu_odr_static.py`), typed-table mirror (`test_serial_typed_dispatch_table_static.py`), `oracle_serial_struct.py` R2 routing (`_routed` via typed wrappers), `oracle_serial_replay.py` `verify_mutations` tree-rglob hard-fail. **718 pytest pass**; golden + Gate-Fα PROVEN; builds green.
-
-## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R1 COMPLETE
-
-Killed the `serial_menu.h` ODR bomb (104 non-inline external-linkage defs at file scope) by moving all bodies into `serial/serial_menu.cpp`. Branch `feat/serial-menu-decomposition-r1` off `main` `1c131a9` (local, unpushed — Captain merges). Gate-green: `pytest tests/` **702 pass** / 5 skip (excluding 10 pre-existing `test_im73d_audio_eval_harness.py` failures) + `pio run -e k1_hardware` + `pio run -e k1_bench_im73d` + golden reproduce + Gate-Fα PROVEN.
-
-- **Batches 1–5** (26 defs, leaf-first): edge name/parse, edge status/control, vivid, loud-guard + beat-director, `k1_print_smart_status` — see plan doc commit table.
-- **Batch 6+ bulk move** (~78 defs): `init_serial`, `dump_info`, `parse_command`, `check_serial`, all `cmd_*`, hotkey/queue helpers, `stream_*`, target adjusters, noise-cal helpers, `vp_*` status paths, etc. Script: `scripts/refactor/r1_move_serial_menu_defs.py`.
-- **Close-out fixes:** `FIRMWARE_VERSION` → `constants.h`; `vp_apply_profile` deduped vs `k1_control_facade.cpp`; oracle struct reads h+cpp; static tests use `read_serial_menu_surface()`.
-
-**104/104 defs moved; `serial_menu.h` 4329 → 573 lines; `serial_menu.cpp` 4065 lines.** R2 table migration complete (see section above). Clamp-gap fixes remain a SEPARATE behaviour-changing ticket.
+Stage-B typed `type=value` dispatch: `serial_typed_cmd_table.def` (151 rows),
+`serial_typed_dispatch.{h,cpp}`, `serial_typed_cmd_lookup()` +
+`serial_dispatch_typed_setter()` chokepoint in `serial_menu.cpp`.
+`parse_command()` no longer fans out through inline strcmp arms.
 
 ## 2026-07-25 Production-Shipping Hardening Lane
 
-Branch `feat/prod-shipping-hardening` off `origin/main accc5f0` (NOT the parked `bench/ws2816-split`). Captain deferred the wireless-security lane — verified LATENT: wireless is compiled out of every shippable env (`K1_WIRELESS_ENABLED` only in non-shippable `k1_wireless_ab_probe`), the shared control token was scrubbed from production 2026-06-27, and the audit's own tag is "[High — latent until wireless ships]". He then directed all three shipping-binary audit items to completion. All four commits gate-green; full host suite 716 passed / 1 skipped.
-
-- **M1.3 LED-index OOB hardening** (`c877cfd` + corrections `4521015`): unconditional bounds guards in `lerp_led_16`, `unmirror`, `shift_leds_up/down` (`visual/led_utilities.h`). Real OOB class (`index_right → NATIVE_RESOLUTION`; unsigned `offset` underflow) that is LATENT in ALL current configs (SECONDARY_LED_COUNT hardcoded == NATIVE_RESOLUTION so the lerp caller's else-branch is dead; shift callers ≤ NR/2; unmirror has no callers) → defensive hardening, byte-identical at 160/160. Host proof `tests/test_led_index_bounds_static.py` (fuzz + statement-anchored source regex). Fully autonomous.
-- **M1.1 GDFT int64 overflow promotion** (`a7dfe3a` + corrections `4521015`): enabled `K1_GDFT_INT64_MAGNITUDE_V1 + K1_GDFT_INT64_RECURRENCE_V1` in `[env:k1_hardware]` (= `default_envs`/shipping; `k1_prod_im73d` inherits). Fixes the int32 Goertzel overflow that zeroes near-resonance bins on loud audio. Host proof: `oracle_gdft` mutations 4–6 diverge the int32 golden (un-zero) + `test_gdft_int64_*` parity (clean-signal identical); shipping `k1_prod_im73d` compiles. **PRE-MERGE-TO-MAIN GATES (not closed autonomously, per authors' contract `config_types.h:95-96,101-112):** Core-0 perf/cadence pass (int64 in the hottest per-sample loop; the int32 AP loop is already p95-tight at 16k/120 — measure the 12.8k/96 delta) + Captain eyes-on real music. Revert = delete the two `-D` lines. Note: the host suite proves divergence + parity but does NOT golden-lock the int64 output (freeze that only after on-device acceptance).
-- **M0.1/M0.2 CI + gate** (`da78aa0` + corrections `4521015`): `.github/workflows/ci.yml` widened to a matrix building `k1_hardware` + shipping `k1_prod_im73d` + the host golden gate + full suite; the pre-commit gate is proven to BLOCK a bad commit (negative test: a deliberately-failing test → `GATE BLOCKED`, HEAD unchanged) and pass good; classifier + `requirements-dev.txt` verified. CI is the committed enforcement gate (runs on every push regardless of local hooks); the local gate is a per-clone convenience (`scripts/hooks/install.sh`). Green-on-push needs a Captain-authorized push to the public `origin`.
-
-Verified by a 3-skeptic adversarial pass (Lane A/B/C), each verdict re-run by the orchestrator; the accuracy/completeness corrections (reachability framing, `unmirror` guard, test hardening, default_envs, perf evidence, no-int64-golden) are folded into `4521015`.
-
-**Update (2026-07-25, later — Captain-directed Push+Merge+bench A/B):** all lanes **merged to `main`** (`b26e235`); **CI ran green** on the branch push (host suite + both firmware envs). GDFT int64 (M1.1): on-device the int64-ON build runs **healthy at the shipping 12.8k/96** on bench `B489A500` (clean boot, full AP pipeline, tempo tracking, no WDT/bootloop) — a qualitative no-cadence-catastrophe pass; the QUANTIFIED cadence (`gdft_elapsed_us`) was NOT obtained (the AP stage-profiler is a main-K1-GPIO env, and the bench `apcad_*` dispatch needs the full `ap_frontend_probe` surface). Bench then flashed `k1_bench_im73d_ble` @ `6077f6e` (int64 fix + demo effects) and **Captain eyes-on PASS** ("It's good, looks/feels right") — **M1.1 fully closed.** Residual low-priority items only: the quantified cadence number (needs the main-K1 profiler or a bench profiler env-chain) and freezing an int64 golden.
+(See main history below — int64 promotion, LED bounds, CI matrix.)
 
 ## 2026-07-07 Restored Bench Validation
 

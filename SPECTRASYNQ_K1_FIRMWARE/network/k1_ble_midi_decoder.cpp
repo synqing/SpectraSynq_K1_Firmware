@@ -256,6 +256,16 @@ void k1_ble_midi_decoder_reset(K1BleMidiDecoderState* state) {
   state->next_record_id = 1;
 }
 
+void k1_ble_midi_decoder_reset_partial(K1BleMidiDecoderState* state) {
+  if (state == nullptr) {
+    return;
+  }
+  const uint32_t next_record_id =
+      state->next_record_id == 0 ? 1 : state->next_record_id;
+  memset(state, 0, sizeof(*state));
+  state->next_record_id = next_record_id;
+}
+
 K1BleMidiDecodeStatus k1_ble_midi_decode_packet(K1BleMidiDecoderState* state,
                                                 const uint8_t* packet,
                                                 size_t packet_len,

@@ -30,8 +30,9 @@ CONTRACTS (parsed, not trusted-by-prose)
   value_kind=NUMBER, ``needs_text`` requires TEXT, ``parse_bool_value`` accepts NUMBER
   0/1 (threshold >=0.5); modes/enums arrive as NUMBER via ``parse_index``.
 * The enabled-mode roster: re-derived from ``system/config_types.h``
-  (``light_mode_is_enabled`` disables 8 of NUM_MODES=30 -> 22 enabled). This oracle
-  re-confirms the 22 from source; it is NOT hand-typed.
+  (``light_mode_is_enabled`` disables 10 of NUM_MODES=33 -> 23 enabled, after
+  Mode 32 WAVEFORM_HYBRID_K1 + tombstone reserves 30/31). This oracle
+  re-confirms the 23 from source; it is NOT hand-typed.
 
 The reference decoder here IS the executable spec the Phase-K firmware decoder must
 match (the same differential vectors will be replayed against the firmware decoder).
@@ -308,8 +309,8 @@ def run_property(m: dict, firmware_root: Path | None = None):
         out.append((label, bool(cond)))
 
     em = enabled_modes(firmware_root)
-    check(f"enabled modes re-derived from config_types.h == 22 (got {em['enabled_count']})",
-          em["enabled_count"] == 22)
+    check(f"enabled modes re-derived from config_types.h == 23 (got {em['enabled_count']})",
+          em["enabled_count"] == 23)
     check(f"NUM_MODES roster == 30 (got {em['num_modes']})", em["num_modes"] == 30)
     check(f"mode 29 ({em['mode29_name']}) is enabled", em["mode29_enabled"])
 
@@ -384,9 +385,12 @@ def capture(firmware_root: Path | None = None) -> str:
 
 
 MUTATIONS = [
-    (r"case LIGHT_MODE_EMBER_V2:\s*//[^\n]*\n\s*return false;",
-     "return false;",
-     "EMBER_V2 re-enabled -> enabled count 22->23"),
+    # Remove the EMBER_V2 case line so it falls out of the disabled cluster
+    # (tombstones 30/31 sit between EMBER and `return false;` — a pattern that
+    # demanded an immediate return no longer matches).
+    (r"    case LIGHT_MODE_EMBER_V2:[^\n]*\n",
+     "",
+     "EMBER_V2 re-enabled -> enabled count 23->24"),
     (r"case LIGHT_MODE_VU:\n", "case LIGHT_MODE_BLOOM:\n",
      "disable BLOOM instead of VU -> roster identity changes"),
 ]
@@ -409,7 +413,7 @@ def assert_gate() -> int:
         ok = ok and passed
     print("\nBLE_MIDI_DIFF_GATE:",
           "PROVEN -- MIDI ingress reconstructs the WS record (exact for discrete, "
-          "14-bit-resolution for floats); 22 modes addressable" if ok
+          "14-bit-resolution for floats); 23 modes addressable" if ok
           else "FAILED -- decoder/map diverges from the WS record contract")
     return 0 if ok else 1
 

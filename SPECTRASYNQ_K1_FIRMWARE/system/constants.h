@@ -42,6 +42,17 @@
 // Must match sizeof(ssl_cal_buf) in system/globals.h (static_assert in i2s_audio.h).
 #define NOISE_CAL_SSL_PHASE_B_FRAMES 112U
 
+#if defined(K1_MIC_IM73D_PDM_V1) && defined(K1_MIC_IM69D_PDM_V1)
+#error "K1_MIC_IM73D_PDM_V1 and K1_MIC_IM69D_PDM_V1 are mutually exclusive"
+#endif
+
+// Shared "any PDM RX mic path" helper. NOT an alias of either product flag —
+// both mic families remain independently gated; this only collapses shared
+// AC-coupled / int16 PDM plumbing (boot scrub, NaN guards, cal DC==0 legality).
+#if defined(K1_MIC_IM73D_PDM_V1) || defined(K1_MIC_IM69D_PDM_V1)
+#define K1_MIC_PDM_RX_ANY_V1 1
+#endif
+
 #ifdef K1_MIC_IM73D_PDM_V1
 // IM73D122 PDM domain (bench eval, 2026-07-02). The PDM silence floor (~±20-40 raw,
 // then scaled by SENSITIVITY×gain) sits far below the SPH0645 default (350). Re-seed the
@@ -78,6 +89,26 @@
 // Raw int16 telemetry guardrail before K1_MIC_IM73D_INPUT_GAIN / sensitivity.
 // This is a measurement-purity surface, not a production gain control.
 #define K1_MIC_IM73D_RAW_I16_NEAR_RAIL 30000
+#endif
+
+#ifdef K1_MIC_IM69D_PDM_V1
+// IM69D130 PDM domain (bench eval, 2026-08-05). Separate from IM73D — do NOT inherit
+// K1_MIC_IM73D_INPUT_GAIN or the IM73D-widened SSL cal gates until measured.
+// SEED SSL fallback into a PDM-plausible band (never 0 at runtime).
+#undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
+#define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
+
+#ifndef K1_MIC_IM69D_INPUT_GAIN
+// Phase 0 silence-domain close (2026-08-05): G=16 quiet overflowed SSL learn
+// window; G=8 cal ACCEPTED (SSL=111) but post-cal ambient max_raw mean ~214–296
+// stayed above SSL×1.2 (~133) so silence never latched — self-noise / gain floor,
+// not "quieter room". Music still had headroom (max_raw~1785, near_pct=0).
+// Halve again to G=4 so quiet floor can sit under a learnable SSL+latch.
+// Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune (Captain rage-valid).
+#define K1_MIC_IM69D_INPUT_GAIN 4.0f
+#endif
+
+#define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000
 #endif
 
 #ifdef K1_LOUD_GUARD_V1
@@ -124,6 +155,19 @@
 // mirror-fill across the second half.  Mirror anchor lives at NATIVE_RESOLUTION/2.
 #define NATIVE_RESOLUTION 160
 #define NUM_FREQS 80
+
+// Phase 2 (ap_advice): Goertzel Rayleigh crossover for the legacy ×2 window.
+// Bins with index < crossover keep ×2 sizing; at/above use fs/Δf (1-semitone).
+// CTO 2026-08-05: default 0 = global drop of ×2 (simplest correct formula).
+#ifndef K1_GDFT_X2_CROSSOVER_BIN
+#define K1_GDFT_X2_CROSSOVER_BIN 0u
+#endif
+
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+// Bench-only runtime override (serial `x2_cross=<n>` then recompute). Not on
+// production envs — prefer the compile-time default above.
+inline volatile uint8_t k1_gdft_x2_crossover_bin = (uint8_t)K1_GDFT_X2_CROSSOVER_BIN;
+#endif
 #define NUM_ZONES 2
 
 #ifndef ENABLE_VP_PERF_AUDIT
@@ -290,6 +334,10 @@ const float notes[] = {
   7040.000, 7458.620, 7902.130, 8372.018, 8869.844, 9397.272, 9956.064, 10548.08, 11175.30, 11839.82, 12543.85, 13289.75
 };
 
+// Analysis authority: first GDFT bin index whose target_freq is above fs/2.
+// Canvas/LED width stays NUM_FREQS (NATIVE_RESOLUTION/2); bins [hi, NUM_FREQS)
+// are Nyquist ghosts (aliased labels) — skip Goertzel + do not treat as resolution.
+// Default profile fs=12800 / NOTE_OFFSET=12 → hi=71 (nine ghosts: 71..79).
 static inline uint8_t k1_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t note_offset) {
   const float nyquist_hz = float(sample_rate) * 0.5f;
   const uint8_t note_count = uint8_t(sizeof(notes) / sizeof(notes[0]));
@@ -301,6 +349,8 @@ static inline uint8_t k1_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t 
   }
   return NUM_FREQS;
 }
+
+#define sb_gdft_nyquist_safe_bin_hi k1_gdft_nyquist_safe_bin_hi
 
 static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
                                                       uint16_t sample_rate,
@@ -335,6 +385,14 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_DIN_PIN 12   // PDM data in
       #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
     #endif
+    #ifdef K1_MIC_IM69D_PDM_V1
+      // IM69D130 dual-mic PCB3 on SPH pads (bench eval, 2026-08-05).
+      // CLK=GPIO14 / DATA=GPIO13. SELECT is hard-strapped on-board (IM1 HIGH /
+      // IM2 LOW) — firmware does NOT drive GPIO12 as LR. Escape-hatch pin only.
+      #define K1_PDM_CLK_PIN 14          // PDM clock out → board CLK_IN_3V3 (J1.3)
+      #define K1_PDM_DIN_PIN 13          // PDM data in  ← board DATA_OUT_3V3 (J1.5)
+      #define K1_IM69_PDM_SEL_PIN 12     // unused on PCB3; do not drive as LR
+    #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
     // env: esp32dev_audio_esv11_k1v2.
@@ -355,6 +413,9 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_CLK_PIN 13   // PDM clock out (= production SPH BCLK pad, freed)
       #define K1_PDM_DIN_PIN 12   // PDM data in   (unassigned on the production map)
       #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
+    #endif
+    #ifdef K1_MIC_IM69D_PDM_V1
+      #error "K1_MIC_IM69D_PDM_V1 is bench-reference only (SPH pad CLK=14/DATA=13); refuse production pinmap"
     #endif
   #endif
 

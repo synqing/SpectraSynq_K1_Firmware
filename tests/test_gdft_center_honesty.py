@@ -63,9 +63,14 @@ class GdftCenterHonestyTest(unittest.TestCase):
         self.assertAlmostEqual(float(model.NOTES[36]), 440.0, places=2)
 
     def test_formula_text_matches_firmware(self):
+        # Phase 2: crossover Rayleigh (default crossover=0 → global 1-semitone).
+        self.assertIn("K1_GDFT_X2_CROSSOVER_BIN", SYSTEM_H)
         self.assertRegex(
             SYSTEM_H,
-            r"block_size\s*=\s*CONFIG\.SAMPLE_RATE\s*/\s*\(max_distance_hz\s*\*\s*2\.0\)")
+            r"resolution_div\s*=\s*\(i\s*<\s*x2_cross\)\s*\?\s*2\.0f\s*:\s*1\.0f")
+        self.assertRegex(
+            SYSTEM_H,
+            r"block_size\s*=\s*CONFIG\.SAMPLE_RATE\s*/\s*\(max_distance_hz\s*\*\s*resolution_div\)")
         self.assertRegex(
             SYSTEM_H,
             r"\(int\)\(0\.5\s*\+\s*\(\(frequencies\[i\]\.block_size\s*\*\s*"
@@ -127,44 +132,42 @@ class GdftCenterHonestyTest(unittest.TestCase):
                 self.assertLessEqual(b["effective_center_hz"], b["nyquist_hz"] + 1e-6)
 
     # --- regression locks: below-Nyquist vs above-Nyquist (Captain test 4) --
-    def test_a4_below_nyquist_lock(self):  # representable case
+    def test_a4_below_nyquist_lock(self):  # representable case (Phase 2: 1-semitone)
         b = self.bins[24]
         self.assertFalse(b["target_above_nyquist"])
         self.assertAlmostEqual(b["target_hz"], 440.0, places=2)
-        self.assertEqual(b["block_size"], 244)
-        self.assertEqual(b["k"], 8)
-        self.assertAlmostEqual(b["raw_center_hz"], 419.67, delta=0.1)
+        self.assertEqual(b["block_size"], 489)
+        self.assertEqual(b["k"], 17)
+        self.assertAlmostEqual(b["raw_center_hz"], 444.99, delta=0.1)
         # below Nyquist: no fold, so effective == raw, and label_error is real.
         self.assertAlmostEqual(b["effective_center_hz"], b["raw_center_hz"], places=4)
-        self.assertAlmostEqual(b["label_error_hz"], -20.33, delta=0.1)
+        self.assertAlmostEqual(b["label_error_hz"], 4.99, delta=0.1)
 
     def test_high_bin_above_nyquist_folded_lock(self):  # aliased case
         b = self.bins[76]
         self.assertTrue(b["target_above_nyquist"])
         self.assertAlmostEqual(b["target_hz"], 8869.84, delta=0.1)
-        self.assertEqual(b["k"], 8)
-        self.assertEqual(b["block_size"], 12)
-        self.assertAlmostEqual(b["raw_center_hz"], 8533.33, delta=0.1)   # bare Goertzel
-        self.assertAlmostEqual(b["effective_center_hz"], 4266.67, delta=0.1)  # FOLDED real centre
+        self.assertEqual(b["k"], 17)
+        self.assertEqual(b["block_size"], 24)
+        self.assertAlmostEqual(b["raw_center_hz"], 9066.67, delta=0.1)   # bare Goertzel
+        self.assertAlmostEqual(b["effective_center_hz"], 3733.33, delta=0.1)  # FOLDED real centre
         self.assertAlmostEqual(b["target_folded_hz"], 3930.16, delta=0.1)
         self.assertIsNone(b["label_error_hz"])
 
     def test_worst_representable_label_error(self):
-        # Corrected headline: worst error among REPRESENTABLE bins is bin 70
-        # (~6.27 kHz, just under Nyquist) -- not an above-Nyquist raw value.
-        self.assertEqual(self.summary["max_representable_label_error_bin"], 70)
-        self.assertAlmostEqual(self.summary["max_representable_label_error_hz"], 248.4, delta=1.0)
+        # Phase 2 1-semitone: worst representable error lands near bin 67 (~5.3 kHz).
+        self.assertEqual(self.summary["max_representable_label_error_bin"], 67)
+        self.assertAlmostEqual(self.summary["max_representable_label_error_hz"], 154.0, delta=2.0)
 
     def test_representable_error_grows_with_frequency(self):
         self.assertGreater(abs(self.bins[60]["label_error_hz"]),
                            abs(self.bins[0]["label_error_hz"]))
         self.assertGreater(abs(self.bins[70]["label_error_hz"]),
-                           abs(self.bins[60]["label_error_hz"]))
+                           abs(self.bins[24]["label_error_hz"]))
 
     def test_resolution_span(self):
-        self.assertAlmostEqual(self.summary["min_resolution_hz"], 13.09, delta=0.1)
-        self.assertAlmostEqual(self.summary["max_resolution_hz"], 1280.0, delta=0.1)
-
+        self.assertAlmostEqual(self.summary["min_resolution_hz"], 6.54, delta=0.1)
+        self.assertAlmostEqual(self.summary["max_resolution_hz"], 609.52, delta=1.0)
     def test_renderer_smoke(self):
         md = model.render_markdown(self.bins)
         self.assertIn("alias-aware", md)

@@ -169,6 +169,18 @@ struct ChannelEffectState {
   uint8_t  trwalk_beats;              // beats counted in current bar (0..3)
   float    trwalk_target;             // palette-walk target offset [0,1)
   float    trwalk_offset;             // slewed live offset [0,1)
+
+  // light_mode_waveform_hybrid_k1() — Waveform Hybrid port of firmware-v3 0x1313.
+  // Bouncing amplitude-dot + decaying scroll trail. Reset to 0 canonically.
+  uint32_t wfhyb_last_ms;             // dt source; 0 == first frame
+  float    wfhyb_scroll_accum;        // sub-pixel outward-scroll carry (px)
+  float    wfhyb_peak_ema1;           // wfPeakLast reconstruction, EMA stage 1
+  float    wfhyb_peak_last;           // wfPeakLast reconstruction, EMA stage 2 -> dot position
+  float    wfhyb_dot_r;               // temporal RGB EMA (red) — hybrid colour signature
+  float    wfhyb_dot_g;               // temporal RGB EMA (green)
+  float    wfhyb_dot_b;               // temporal RGB EMA (blue)
+  float    wfhyb_hold_env;            // signal-presence hold envelope (audioConfidence analogue)
+  float    wfhyb_sil_scale;           // silence gate envelope (silentScale analogue)
 };
 
 // The two per-channel state globals are defined in globals.h (which includes

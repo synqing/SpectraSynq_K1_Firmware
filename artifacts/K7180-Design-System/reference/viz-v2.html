@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>K718 · Centre Viz — soft/flow set</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#060608;color:#7c8597;font-family:'Saira Condensed',system-ui,sans-serif;padding:26px;display:flex;flex-direction:column;align-items:center;gap:18px}
+h1{font-weight:700;letter-spacing:.18em;font-size:15px;color:#9aa3b2;text-transform:uppercase}
+.sub{font:11px ui-monospace,monospace;color:#566;letter-spacing:.06em;margin-top:-10px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;max-width:980px}
+.cell{display:flex;flex-direction:column;align-items:center;gap:8px}
+canvas{display:block;border-radius:50%}
+.lab{font-weight:700;letter-spacing:.14em;font-size:13px;color:#cfd6e2;text-transform:uppercase}
+.lab b{color:#00AECF;font-family:ui-monospace,monospace;margin-right:6px}
+.desc{font:10px/1.4 ui-monospace,monospace;color:#5a6273;letter-spacing:.03em;text-align:center;max-width:200px}
+</style></head>
+<body>
+<h1>K718 · Centre Visualisation — soft / flowing set</h1>
+<div class="sub">6 genuinely different directions · all soft-glow, no spiky bars · point at one</div>
+<div class="grid" id="grid"></div>
+<script>
+const TAU=Math.PI*2;
+const COL=["#00AECF","#E0338F","#EFA020","#7C5CFF"]; // cyan magenta amber violet
+function hexA(h,a){const n=parseInt(h.slice(1),16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`;}
+
+// ── 1 NEBULA — drifting breathing colour-clouds, zero hard edges ──
+function nebula(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';
+ [[0,0],[1,2.1],[2,4.2],[3,1.0]].forEach(([ci,off],i)=>{const ph=t*.45+off;
+  const x=C+Math.cos(ph*.8+i)*C*.24,y=C+Math.sin(ph*1.1+i)*C*.24,r=C*(.5+.12*Math.sin(ph*1.3))*(1+beat*.18);
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,hexA(COL[ci],.55+beat*.2));g.addColorStop(.4,hexA(COL[ci],.12));g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();});
+ ctx.globalCompositeOperation='source-over';}
+
+// ── 2 AURORA FLOW — sinuous glowing closed ribbons orbiting ──
+function aurora(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';
+ for(let k=0;k<5;k++){const col=COL[k%COL.length];ctx.strokeStyle=col;ctx.shadowColor=col;ctx.shadowBlur=16;
+  ctx.lineWidth=5+k*1.4;ctx.globalAlpha=.16+.10*Math.sin(t+k);ctx.beginPath();
+  for(let i=0;i<=72;i++){const a=(i/72)*TAU,rr=C*.6+Math.sin(a*2+t*1.2+k*1.3)*C*.16*(1+beat*.4)+Math.sin(a*3-t+k)*C*.06;
+   const x=C+Math.cos(a)*rr,y=C+Math.sin(a)*rr;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.closePath();ctx.stroke();}
+ ctx.globalAlpha=1;ctx.shadowBlur=0;ctx.globalCompositeOperation='source-over';}
+
+// ── 3 LIQUID CORE — wobbling fused liquid-light blob ──
+function liquid(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';
+ for(let i=0;i<7;i++){const ph=t*.9+i*.9,x=C+Math.cos(ph)*C*.18,y=C+Math.sin(ph*1.2)*C*.18,r=C*.34*(1+.2*Math.sin(ph*1.7))*(1+beat*.2),col=COL[i%COL.length];
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,hexA(col,.42));g.addColorStop(.6,hexA(col,.12));g.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();}
+ ctx.globalCompositeOperation='source-over';}
+
+// ── 4 CONSTELLATION — drifting energy particles + proximity links ──
+const PTS=[];for(let i=0;i<26;i++)PTS.push({a:Math.random()*TAU,r:.2+Math.random()*.72,sp:.1+Math.random()*.5,ph:Math.random()*TAU});
+function constellation(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';
+ const p=PTS.map((q,i)=>{const a=q.a+t*q.sp*.2,r=(q.r+Math.sin(t*.7+q.ph)*.05)*C*.95;return{x:C+Math.cos(a)*r,y:C+Math.sin(a)*r,c:COL[i%COL.length]};});
+ for(let i=0;i<p.length;i++)for(let j=i+1;j<p.length;j++){const dx=p[i].x-p[j].x,dy=p[i].y-p[j].y,d=Math.hypot(dx,dy);
+  if(d<C*.34){ctx.strokeStyle=p[i].c;ctx.globalAlpha=(1-d/(C*.34))*.28;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(p[i].x,p[i].y);ctx.lineTo(p[j].x,p[j].y);ctx.stroke();}}
+ ctx.globalAlpha=1;p.forEach(q=>{ctx.shadowColor=q.c;ctx.shadowBlur=10;ctx.fillStyle=q.c;ctx.beginPath();ctx.arc(q.x,q.y,1.8+beat*1.2,0,TAU);ctx.fill();});
+ ctx.shadowBlur=0;ctx.globalCompositeOperation='source-over';}
+
+// ── 5 SOFT SKYLINE — smooth FILLED mountains of light (the corrected spectrum) ──
+function skyline(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';const base=C*.30,N=140;
+ const g=ctx.createRadialGradient(C,C,base,C,C,C*.95);g.addColorStop(0,hexA(COL[1],.5));g.addColorStop(.5,hexA(COL[0],.32));g.addColorStop(1,hexA(COL[2],0));
+ ctx.fillStyle=g;ctx.shadowColor=COL[0];ctx.shadowBlur=16;ctx.beginPath();
+ for(let i=0;i<=N;i++){const a=(i/N)*TAU,m=.5+.3*Math.sin(a*5+t*1.4)+.2*Math.sin(a*9-t*2)+.15*Math.sin(a*2+t),rr=base+Math.max(0,m)*C*.5*(1+beat*.3),x=C+Math.cos(a)*rr,y=C+Math.sin(a)*rr;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+ ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.globalCompositeOperation='source-over';
+ const h=ctx.createRadialGradient(C,C,0,C,C,base*1.15);h.addColorStop(0,'#060608');h.addColorStop(.72,'#060608');h.addColorStop(1,'rgba(6,6,8,0)');
+ ctx.fillStyle=h;ctx.beginPath();ctx.arc(C,C,base*1.15,0,TAU);ctx.fill();}
+
+// ── 6 PULSE SONAR — soft beat-expanding rings on a faint field ──
+function sonar(ctx,t,C,beat){ctx.globalCompositeOperation='lighter';
+ const g=ctx.createRadialGradient(C,C,0,C,C,C*.4);g.addColorStop(0,hexA(COL[0],.2+beat*.25));g.addColorStop(1,'rgba(0,0,0,0)');
+ ctx.fillStyle=g;ctx.beginPath();ctx.arc(C,C,C*.4,0,TAU);ctx.fill();
+ for(let k=0;k<4;k++){const ph=((t*.45+k*.25)%1),rr=C*.15+ph*C*.78,col=COL[k%COL.length];
+  ctx.strokeStyle=col;ctx.shadowColor=col;ctx.shadowBlur=12;ctx.globalAlpha=(1-ph)*.6;ctx.lineWidth=3+(1-ph)*4;
+  ctx.beginPath();ctx.arc(C,C,rr,0,TAU);ctx.stroke();}
+ ctx.globalAlpha=1;ctx.shadowBlur=0;ctx.globalCompositeOperation='source-over';}
+
+const VIZ=[
+ ["01","NEBULA",nebula,"Breathing colour-clouds. Pure haze, no edges."],
+ ["02","AURORA FLOW",aurora,"Sinuous glowing ribbons orbiting the core."],
+ ["03","LIQUID CORE",liquid,"Fused wobbling liquid-light blob."],
+ ["04","CONSTELLATION",constellation,"Drifting energy particles + links."],
+ ["05","SOFT SKYLINE",skyline,"Smooth filled mountains of light (fixed spectrum)."],
+ ["06","PULSE SONAR",sonar,"Soft beat-expanding rings on an energy field."],
+];
+const grid=document.getElementById('grid'),SZ=300,C=SZ/2;
+const cells=VIZ.map(v=>{const d=document.createElement('div');d.className='cell';
+ const cv=document.createElement('canvas');cv.width=SZ;cv.height=SZ;cv.style.width='168px';cv.style.height='168px';
+ const lab=document.createElement('div');lab.className='lab';lab.innerHTML='<b>'+v[0]+'</b>'+v[1];
+ const ds=document.createElement('div');ds.className='desc';ds.textContent=v[3];
+ d.appendChild(cv);d.appendChild(lab);d.appendChild(ds);grid.appendChild(d);return{ctx:cv.getContext('2d'),fn:v[2]};});
+
+function frame(now){const t=now/1000,bpm=128,period=60/bpm,beat=Math.max(0,1-((t%period)/period)*4);
+ cells.forEach(c=>{const x=c.ctx;x.globalCompositeOperation='source-over';
+  const bg=x.createRadialGradient(C,C,8,C,C,C);bg.addColorStop(0,'#0a0b10');bg.addColorStop(1,'#040406');
+  x.fillStyle='#000';x.beginPath();x.arc(C,C,C,0,TAU);x.fill();x.save();x.beginPath();x.arc(C,C,C-2,0,TAU);x.clip();
+  x.fillStyle=bg;x.fillRect(0,0,SZ,SZ);c.fn(x,t,C,beat);x.restore();
+  x.strokeStyle='#161b25';x.lineWidth=2;x.beginPath();x.arc(C,C,C-2,0,TAU);x.stroke();});
+ requestAnimationFrame(frame);}
+requestAnimationFrame(frame);
+</script></body></html>

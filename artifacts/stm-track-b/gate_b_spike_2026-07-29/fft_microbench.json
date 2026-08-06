@@ -1,0 +1,23 @@
+{
+  "status": "CAPTURED",
+  "captured_at": "2026-07-29T15:31:49Z",
+  "port": "/dev/cu.usbmodem112401",
+  "synthetic_burst_1000": {
+    "hop_count": 1000,
+    "us_min": 672,
+    "us_p50": 967,
+    "us_p95": 1147,
+    "us_max": 1317,
+    "us_last": 937
+  },
+  "live_hop_ap_frame": {
+    "hop_count": 1277,
+    "us_min": 770,
+    "us_p50": 972,
+    "us_p95": 1243,
+    "us_max": 1289
+  },
+  "serial_log": "fft_microbench_serial.log",
+  "notes": "Burst uses synthetic 1 kHz PCM; live_hop uses waveform[] on AP snapshot path.",
+  "live_hop_fix": "sb_audio_snapshot_update hook (2026-07-29)"
+}
