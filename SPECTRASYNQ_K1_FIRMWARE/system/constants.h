@@ -98,6 +98,29 @@
 #undef  NOISE_CAL_SSL_BOOT_FALLBACK_RAW
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
+// NOISE-CAL ADMISSION CORRIDOR (2026-08-06, Captain-stamped at G=8).
+// Without these the IM69D build silently inherits the SPH0645 BASE gates (650/720):
+// the IM73D widening at :73-76 is UNREACHABLE here because the two mic flags are
+// mutually exclusive (:45-47). Measured at G=4, scaled x2 for G=8:
+//   ambient ceiling 1010 · TRUSTED_P90 1400 · music p90 1866  ->  separation 1.85x
+// Boundary-checked against the truncation edge: the test is `learned_ssl >
+// MAX_VALID` (STRICT), and TRUSTED_P90 x 1.10 = 1540 exactly, so a cal whose p90
+// sits on the ceiling still ACCEPTS.
+//
+// PHASE_B_MAX is deliberately LEFT AT BASE. Music p50 (294 @G4) sits inside
+// ambient's own per-frame range (275-505), so NO per-frame threshold can separate
+// sustained music from silence. PHASE_B guards isolated loud transients only — do
+// not widen it and do not credit it with music rejection.
+//
+// The layer that ACTUALLY rejects sustained music is the ratio gate
+// NOISE_CAL_SSL_MAX_P90_TO_P50_RATIO (base 2.50): measured ambient 1.24 vs music
+// 3.17. It is RATIO-BASED and therefore GAIN-INVARIANT — the one guard here that
+// survives a gain change. IT IS NOT TO BE WIDENED.
+#undef  NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW
+#define NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW 1400.0f
+#undef  NOISE_CAL_SSL_MAX_VALID_RAW
+#define NOISE_CAL_SSL_MAX_VALID_RAW 1540U
+
 #ifndef K1_MIC_IM69D_INPUT_GAIN
 // Gain history. G=16 overflowed the SSL learn window. G=8 cal ACCEPTED (SSL=111,
 // p90 101 = 2.2x floor margin). G=4 (2026-08-05, commit 1ae9d4a) was then chosen
