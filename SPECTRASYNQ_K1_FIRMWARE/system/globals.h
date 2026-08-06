@@ -42,8 +42,8 @@
 // `extern` declarations with byte-identical emitted initialiser data.
 extern conf CONFIG;
 extern conf CONFIG_DEFAULTS; // Used for resetting to default values at runtime
-extern const char SB_PASS[];
-extern const char SB_FAIL[];
+extern const char K1_PASS[];
+extern const char K1_FAIL[];
 
 #ifdef K1_BOOTLOOP_GUARD_V1
 // N2b: set true at the top of setup() when the boot-loop guard trips; read by
@@ -121,6 +121,13 @@ inline bool chromatic_mode = true;
 
 #ifdef K1_LOUD_GUARD_V1
 inline bool     k1_loud_guard_enabled = true;
+// Loud-guard release/floor-cut retune. 0 = legacy baseline (2.20 s release + flat cut),
+// 1 = conservative (1.30 s + hybrid), 2 = AGGRESSIVE (0.80 s release + hybrid affine cut).
+// DEFAULT 2 — hardware-validated winner (bench B489A500, IM73D, 2026-07-10): recovery tail
+// 5.54->1.94 s, no limit cycle (spec-sat self-suppressed by the ceiling knee), no onset/
+// tempo regression (bpm lock + onset rate flat). Captain hardware sign-off 2026-07-10. Modes
+// 0/1 remain runtime-selectable (:k1_loud_guard=mode0|1). See constants.h + the AP audit run-book.
+inline uint8_t  k1_loud_guard_mode = 2;
 inline float    k1_loud_input_trim = 1.0f;
 inline float    k1_loud_gdft_trim = 1.0f;
 inline float    k1_loud_clip_duty = 0.0f;
@@ -676,6 +683,28 @@ inline SQ15x16 min_silent_level_tracker = 65535.0; // Initialize high, tracks mi
 #define AGC_FLOOR_MAX_CLAMP_SCALED (100.0) // Final maximum AGC floor after scaling
 #define AGC_FLOOR_RECOVERY_RATE (50.0) // *** EXPERIMENTAL *** Rate at which tracker recovers upwards per frame during silence-
 
+// --> Silence go-dark (2026-07-10) <--
+// SSL-derived Schmitt silence detection + dwell + asymmetric fade. Replaces the dead
+// static threshold (the min_silent_level_tracker decay above was commented out, pinning
+// threshold_silence at 100 decoupled from the learned SSL, so a quiet room NEVER latched
+// silence and the plate never went dark). These are DEGRADED-MODE first-guesses, tunable
+// at runtime for the hardware A/B via the :standby_dimming / :silence_* serial commands.
+inline float    SILENCE_ENTER_SSL_FRAC = 0.35f;   // enter silence below this * SSL (smoothed peak)
+inline float    SILENCE_EXIT_SSL_FRAC  = 0.55f;   // leave silence above this * SSL (Schmitt gap: exit > enter)
+inline uint32_t SILENCE_DWELL_MS       = 5000;    // continuous quiet (ms) before the plate darkens
+inline float    SILENT_FADE_DOWN_ALPHA = 0.03f;   // slow fade to black (~1-2 s)
+inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first sound
+
+// Go-dark silence detection — RAW per-frame RMS vs an ABSOLUTE threshold (firmware-v3
+// pre-gate port; cf. ControlBus.cpp Stage 7 `rmsUngated < m_silence_threshold`). Decoupled
+// from SSL/sweet_spot_state, whose smoothed-peak floor sits ABOVE SSL in a normal room and
+// so never latched silence. Seeds are DEGRADED-MODE first-guesses placed above the expected
+// mic self-noise floor; calibrate on the bench from [AP] rms_raw in a quiet room, then set
+// with margin. Runtime-tunable via :silence_rms_enter / :silence_rms_exit (no recompile).
+inline float    K1_SILENCE_RMS_ENTER = 0.04f;     // raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-room floor <0.02, ~8x margin.
+inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not silent (Schmitt exit; > enter)
+inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
+
 // ------------------------------------------------------------
 // Cochlear-Inspired Multi-Band AGC (GDFT.h) ------------------
 
@@ -712,13 +741,25 @@ inline agc_channel agc_bands[NUM_AGC_BANDS];
 inline SQ15x16 agc_envelope = SQ15x16(0.0);     // tracked broadband signal envelope
 inline SQ15x16 agc_noise_floor = SQ15x16(0.001);// slowly-tracked noise floor estimate
 inline bool    agc_gated = true;                // hysteretic silence-gate state
+#ifdef K1_STM
+// Normalised broadband loudness [0,1] for audio-reactive consumers (STM modes).
+// Derived from agc_envelope (the raw signal envelope) BEFORE agc_gain normalises
+// level away, so — unlike spectrogram[] / peak_scaled, which are AGC-flattened and
+// measured near-constant across silence vs loud — this actually tracks volume.
+// 0 while silence-gated. This is the correct signal any loudness/reactivity
+// consumer must read (never sum spectrogram[]).
+inline SQ15x16 agc_loudness_norm = SQ15x16(0.0);
+#endif
 inline SQ15x16 spectral_tilt_lut[NUM_FREQS];    // precomputed per-bin freq weighting
 
 // Mapping of Goertzel bins to AGC bands
 inline uint8_t freq_to_band_map[NUM_FREQS];
 
-// Per-band AGC dynamic ceiling tracker
-inline SQ15x16 goertzel_max_value_band[NUM_AGC_BANDS] = { 0.0001, 0.0001, 0.0001, 0.0001 };
+// Removed 2026-07-10: goertzel_max_value_band[] — orphaned per-band dynamic-ceiling
+// tracker inherited from SensoryBridge's pre-fork cochlear AGC, disconnected by
+// Broadband AGC v2 (2026-05-20). Git-forensic archaeology confirmed zero readers/
+// writers and no hook on the N6 per-band revival path (which uses agc_bands[] +
+// freq_to_band_map[]). Deleted to stop every AGC audit re-discovering the orphan.
 
 // ------------------------------------------------------------
 // Look-ahead smoothing (GDFT.h) ------------------------------
@@ -745,10 +786,10 @@ inline uint8_t brightness_levels[NUM_FREQS] = { 0 };
 // ------------------------------------------------------------
 // Used for USB updates (system.h) ----------------------------
 
-#if SB_ENABLE_USB_MSC_UPDATE
+#if K1_ENABLE_USB_MSC_UPDATE
 inline FirmwareMSC MSC_Update;
 #endif
-#if defined(SB_K1_HARDWARE)
+#if defined(K1_HARDWARE)
 #define USBSerial Serial
 #else
 inline USBCDC USBSerial;

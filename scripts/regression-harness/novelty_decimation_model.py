@@ -1,4 +1,4 @@
-"""Host model of the AP novelty -> tempo decimation (sb_tempo.cpp:1280-1326).
+"""Host model of the AP novelty -> tempo decimation (k1_tempo.cpp:1280-1326).
 
 Faithfully mirrors the firmware's peak-hold downsampler so a host test can
 assert the behaviour without compiling the full tempo unit. The decimation
@@ -8,14 +8,14 @@ model cannot silently drift from the contract.
 Firmware logic mirrored:
   - prime on first call (no emit)
   - peak-hold accumulate every AP frame:  if novelty > accum: accum = novelty
-  - emit every SB_NOVELTY_DECIMATION-th frame: sample = accum; accum = 0
+  - emit every K1_NOVELTY_DECIMATION-th frame: sample = accum; accum = 0
 The peak-hold is the firmware's anti-alias mechanism: it aggregates ALL frames
 in the decimation window (preserving onset spikes), it does NOT pick every Nth
 raw sample. A linear pre-decimation low-pass is intentionally ABSENT because it
 would smear onset transients and regress beat detection.
 """
 
-# Default mirrors config_types.h:  #define SB_TEMPO_NOVELTY_DECIMATION 3U
+# Default mirrors config_types.h:  #define K1_TEMPO_NOVELTY_DECIMATION 3U
 DEFAULT_DECIMATION = 3
 
 

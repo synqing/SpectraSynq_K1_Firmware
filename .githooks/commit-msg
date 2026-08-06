@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# SpectraSynq commit-msg hook — trailer presence + truth-in-claims.
+# Doctrine: docs/process/SPECTRASYNQ-GIT-DOCTRINE.md. Do not extend.
+msg_file="$1"
+first_line="$(head -n1 "$msg_file")"
+
+# Exempt merges, reverts, fixups/squashes.
+case "$first_line" in
+  Merge\ *|Revert\ *|fixup!*|squash!*) exit 0 ;;
+esac
+
+if ! grep -qE '^Verify: (none|host|device:[A-Za-z0-9_-]+@[^[:space:]]+)$' "$msg_file"; then
+  echo "commit-msg: missing or malformed 'Verify:' trailer." >&2
+  echo "  Use one of:  Verify: none | Verify: host | Verify: device:<chip>@<receipt>" >&2
+  exit 1
+fi
+
+if grep -qiE 'device-proven|field-?tested|glass[- ]?pass' "$msg_file" \
+   && ! grep -qE '^Verify: device:' "$msg_file"; then
+  echo "commit-msg: device-level claim without 'Verify: device:<chip>@<receipt>'." >&2
+  echo "  Either drop the claim or attach the receipt." >&2
+  exit 1
+fi
+
+exit 0

@@ -1,6 +1,6 @@
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -71,14 +71,14 @@ class CalibrationProfileStaticTest(unittest.TestCase):
         self.assertIn("calibration_source_name", globals_text)
 
         required = {
-            "serial dump": SERIAL_MENU,
+            "serial dump": read_serial_menu_surface(FW),
             "diagnostic status": DIAG_CAPTURE,
             "VPAB status": VPAB_CAPTURE,
             "AP stream/capture": I2S_AUDIO,
         }
         for label, path in required.items():
             with self.subTest(label=label):
-                text = path.read_text()
+                text = path if isinstance(path, str) else path.read_text()
                 self.assertIn("CAL_SOURCE", text)
                 self.assertIn("CAL_VALID", text)
                 if label != "AP stream/capture":
@@ -197,9 +197,9 @@ class CalibrationProfileStaticTest(unittest.TestCase):
         noise_cal = NOISE_CAL.read_text()
         led_utilities = (FW / "led_utilities.h").read_text()
 
-        self.assertIn("#define SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0", constants)
-        self.assertIn("#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED", gdft)
-        self.assertIn("SB_GDFT_STATIC_NOISE_SUBTRACTION_GAIN", gdft)
+        self.assertIn("#define K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0", constants)
+        self.assertIn("#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED", gdft)
+        self.assertIn("K1_GDFT_STATIC_NOISE_SUBTRACTION_GAIN", gdft)
         self.assertNotIn("noise_samples[i] * SQ15x16(1.5)", gdft)
         self.assertIn("clear_spectral_noise_samples();", gdft)
         self.assertIn("void clear_spectral_noise_samples()", noise_cal)

@@ -10,8 +10,8 @@
 // The Remoted knob is a standard Apple BLE-MIDI peripheral ("SpectraSynq
 // Remoted"). This central scans, connects, subscribes to notifications, decodes
 // the generated 71-control map into K1WirelessControlRecord values, and applies
-// them from the main-loop poll via sb_k1_control_apply().
-#ifdef SB_K1_BLE_REMOTED
+// them from the main-loop poll via k1_control_apply().
+#ifdef K1_BLE_REMOTED
 
 #include "ble_remoted_central.h"
 
@@ -25,14 +25,14 @@
 #include "freertos/task.h"
 
 #include "k1_ble_midi_decoder.h"
-#include "sb_k1_control_facade.h"
+#include "k1_control_facade.h"
 
 // Runtime gate for the 1 Hz [ble_remoted] counters + heap telemetry below
 // (defined in globals.h, default false). Toggle live via serial :ble_stream=on/off
 // so the monitor isn't spammed unless a session is actively watching.
 extern bool BLE_STREAM_ENABLED;
 
-extern uint8_t sb_k1_confirmed_mode(bool);       // feedback-only committed mode per channel
+extern uint8_t k1_confirmed_mode(bool);       // feedback-only committed mode per channel
 
 namespace {
 
@@ -430,8 +430,8 @@ bool connect_and_subscribe() {
 }
 
 void queue_confirmed_modes(bool force) {
-  const uint8_t pm = sb_k1_confirmed_mode(false);
-  const uint8_t sm = sb_k1_confirmed_mode(true);
+  const uint8_t pm = k1_confirmed_mode(false);
+  const uint8_t sm = k1_confirmed_mode(true);
 
   portENTER_CRITICAL(&s_state_mux);
   if (s_connected && s_linked &&
@@ -592,7 +592,7 @@ void ble_task(void*) {
 
 } // namespace
 
-void sb_k1_ble_remoted_begin() {
+void k1_ble_remoted_begin() {
   k1_ble_midi_decoder_reset(&s_decoder);
   s_cmd_queue = xQueueCreateStatic(CMD_QUEUE_CAPACITY,
                                    sizeof(QueuedControlRecord),
@@ -620,7 +620,7 @@ void sb_k1_ble_remoted_begin() {
   serial_print_formatted(line, written);
 }
 
-void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
+void k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   if (!s_cmd_queue) {
     return;
   }
@@ -645,9 +645,9 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
         strcmp(record.control, "secondary.mode") == 0;
     const uint8_t committed_before =
         (is_primary_mode || is_secondary_mode)
-            ? sb_k1_confirmed_mode(is_secondary_mode)
+            ? k1_confirmed_mode(is_secondary_mode)
             : 0;
-    const K1WirelessControlResult result = sb_k1_control_apply(record);
+    const K1WirelessControlResult result = k1_control_apply(record);
     uint32_t apply_ok_count = 0;
     uint8_t accepted = 0;
     bool meaningful_mode_change = false;
@@ -766,11 +766,11 @@ void sb_k1_ble_remoted_poll(uint32_t /*now_ms*/) {
   }
 }
 
-bool sb_k1_ble_remoted_is_linked() {
+bool k1_ble_remoted_is_linked() {
   return state_snapshot().linked;
 }
 
-void sb_k1_ble_remoted_status() {
+void k1_ble_remoted_status() {
   const StateSnapshot snapshot = state_snapshot();
   char line[512];
   const int written = snprintf(
@@ -804,4 +804,4 @@ void sb_k1_ble_remoted_status() {
   serial_print_formatted(line, written);
 }
 
-#endif // SB_K1_BLE_REMOTED
+#endif // K1_BLE_REMOTED

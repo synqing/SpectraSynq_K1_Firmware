@@ -1,8 +1,10 @@
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
+FW_DIR = FwDir(FW)
 I2S_AUDIO = FW / "audio" / "i2s_audio.h"
 SERIAL_MENU = FW / "serial" / "serial_menu.h"
 GDFT_CORE = FW / "audio" / "k1_gdft_core.cpp"
@@ -88,7 +90,7 @@ def test_ap_capture_schema_keeps_capture_summary_fields():
 
 
 def test_agc_stream_schema_exposes_legacy_and_active_floor_fields():
-    serial = SERIAL_MENU.read_text(encoding="utf-8")
+    serial = read_serial_menu_surface(FW_DIR)
     gdft = GDFT_CORE.read_text(encoding="utf-8")
     globals_h = GLOBALS.read_text(encoding="utf-8")
 

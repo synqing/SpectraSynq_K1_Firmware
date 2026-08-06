@@ -75,12 +75,12 @@ MODULE_CPPS = [
 ]
 
 # Production-matching defines, with the int32 (int64-OFF) baseline pinned.
-#   - DEFAULT_SAMPLE_RATE / DEFAULT_SAMPLES_PER_CHUNK / SB_TEMPO_NOVELTY_DECIMATION:
+#   - DEFAULT_SAMPLE_RATE / DEFAULT_SAMPLES_PER_CHUNK / K1_TEMPO_NOVELTY_DECIMATION:
 #       the [env:k1_hardware] audio contract.
 #   - K1_LOUD_GUARD_V1: ON in [env:k1_hardware]; k1_loud_guard_enabled defaults
 #       true, so the AGC loud-trim path is LIVE in production — the golden must
 #       lock the production spectrum, so it is included here too.
-#   - SB_RENDER_HOST_TEST: render_host_globals.cpp's host singletons (no functional
+#   - K1_RENDER_HOST_TEST: render_host_globals.cpp's host singletons (no functional
 #       effect on the GDFT transform; matches the render substrate it shares).
 #   - NO K1_GDFT_INT64_MAGNITUDE_V1 / _RECURRENCE_V1 / K1_GDFT_TRUE_CENTER_V1 /
 #       K1_SPECTRAL_WINDOW_V1 ⇒ pins the buggy int32 baseline; the int64 promotion
@@ -88,9 +88,9 @@ MODULE_CPPS = [
 DEFINES = [
     "DEFAULT_SAMPLE_RATE=12800",
     "DEFAULT_SAMPLES_PER_CHUNK=96",
-    "SB_TEMPO_NOVELTY_DECIMATION=3U",
+    "K1_TEMPO_NOVELTY_DECIMATION=3U",
     "K1_LOUD_GUARD_V1",
-    "SB_RENDER_HOST_TEST",
+    "K1_RENDER_HOST_TEST",
 ]
 
 # ---------------------------------------------------------------------------

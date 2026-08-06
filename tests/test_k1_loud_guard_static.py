@@ -1,8 +1,10 @@
 import unittest
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface, typed_command_handler_body
 
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 PLATFORMIO = (ROOT / "platformio.ini").read_text(encoding="utf-8")
 GLOBALS = (FW / "system" / "globals.h").read_text(encoding="utf-8")
@@ -12,45 +14,12 @@ I2S = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
 # the loud-guard AGC arithmetic asserted here now lives in the .cpp TU.
 GDFT = (FW / "audio" / "k1_gdft_core.cpp").read_text(encoding="utf-8")
 INO = (FW / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(encoding="utf-8")
-SERIAL = (FW / "serial" / "serial_menu.h").read_text(encoding="utf-8")
+SERIAL = read_serial_menu_surface(FW_DIR)
 LIGHTSHOW = (FW / "visual" / "lightshow_modes.h").read_text(encoding="utf-8")
 
 
 def typed_command_block(command_type):
-    """Return the command's OWN else-if block, brace-balanced.
-
-    Bounds the block by matching the handler's own braces, NOT by scanning to the next
-    `strcmp(command_type, ...)` else-if. The old scan over-captured once an adjacent handler
-    was lifted to a dispatcher call-site: `else if (serial_cmd_dispatch_*(...))` is not a
-    strcmp form, so the scan sailed past it into later commands — e.g. after beat_director's
-    Increment-B call-site it pulled the `boot_animation (reboot-bearing ...)` comment into
-    the k1_loud_guard block and tripped assertNotIn("reboot"). Brace-matching is robust to
-    whatever follows. String literals are skipped so a brace inside a literal cannot
-    unbalance the scan (the loud-guard / response-gain bodies have none, but this keeps the
-    helper correct as a class)."""
-    marker = f'else if (strcmp(command_type, "{command_type}") == 0)'
-    start = SERIAL.find(marker)
-    assert start >= 0, f"missing typed command block for {command_type}"
-    i = SERIAL.find("{", start + len(marker))
-    assert i > start, f"missing opening brace for {command_type}"
-    depth = 0
-    while i < len(SERIAL):
-        c = SERIAL[i]
-        if c in "\"'":
-            quote = c
-            i += 1
-            while i < len(SERIAL) and SERIAL[i] != quote:
-                if SERIAL[i] == "\\":
-                    i += 1
-                i += 1
-        elif c == "{":
-            depth += 1
-        elif c == "}":
-            depth -= 1
-            if depth == 0:
-                return SERIAL[start:i + 1]
-        i += 1
-    raise AssertionError(f"unbalanced braces for {command_type}")
+    return typed_command_handler_body(SERIAL, command_type)
 
 
 class K1LoudGuardStaticTest(unittest.TestCase):
@@ -93,7 +62,11 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         floor_define_index = CONSTANTS.index("K1_LOUD_GUARD_AGC_GAIN_FLOOR")
         floor_mix_index = GDFT.index("k1_loud_floor_mix")
         floor_calc_index = GDFT.index("const float k1_loud_floor = K1_LOUD_GUARD_AGC_GAIN_FLOOR")
-        depin_floor_index = GDFT.index("K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT")
+        # 2026-07-10: the flat/hybrid floor-cut is applied via the shared helper
+        # k1_loud_guard_apply_floor_cut(); its DEFINITION sits earlier in the TU, but the
+        # invariant is that the loud-guard cut ACTS on the post-AGC output — i.e. the CALL
+        # site is after the gain clamp. Assert the call, not the (relocated) constant token.
+        apply_floor_index = GDFT.index("k1_loud_guard_apply_floor_cut(out")
         depin_ceiling_index = GDFT.index("K1_LOUD_GUARD_SPECTRAL_CEILING_DROP")
         clamp_index = GDFT.index("if (target_gain < agc_gain_floor)")
 
@@ -103,7 +76,7 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         self.assertLess(floor_calc_index, clamp_index)
         self.assertIn("K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT", CONSTANTS)
         self.assertIn("K1_LOUD_GUARD_SPECTRAL_CEILING_DROP", CONSTANTS)
-        self.assertGreater(depin_floor_index, clamp_index)
+        self.assertGreater(apply_floor_index, clamp_index)
         self.assertGreater(depin_ceiling_index, clamp_index)
 
     def test_loud_guard_unpins_weak_palette_chroma_without_palette_edits(self):
@@ -145,12 +118,32 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         self.assertIn("spec_pin=%.3f spec_sat=%.3f", I2S)
 
     def test_serial_command_is_runtime_only(self):
-        self.assertIn("k1_loud_guard=[on/off/status]", SERIAL)
+        self.assertIn("k1_loud_guard=[on/off/status/mode0/mode1/mode2/cycle]", SERIAL)
         block = typed_command_block("k1_loud_guard")
         self.assertIn("serial_set_k1_loud_guard(value)", block)
         self.assertIn("serial_print_k1_loud_guard_status()", block)
         self.assertNotIn("save_config", block)
         self.assertNotIn("reboot", block)
+
+    def test_ab_retune_matrix_defaults_to_validated_mode(self):
+        # Loud-guard release/floor-cut A/B retune (AP audit 2026-07-10). Default = mode 2
+        # (0.80 s release + hybrid affine cut); Captain hardware sign-off 2026-07-10.
+        self.assertIn("inline uint8_t  k1_loud_guard_mode = 2;", GLOBALS)
+        for c in ("K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS", "K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR",
+                  "K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL", "K1_LOUD_GUARD_FLOOR_CUT_PROP_K"):
+            self.assertIn(c, CONSTANTS)
+        # shared floor-cut helper applied at BOTH AGC paths (per-band + broadband)
+        self.assertIn("static inline void k1_loud_guard_apply_floor_cut(", GDFT)
+        self.assertEqual(GDFT.count("k1_loud_guard_apply_floor_cut(out"), 2)
+        # release is mode-switched; attack is not (engage stays fast)
+        self.assertIn("k1_loud_guard_gdft_release_sec()", I2S)
+        self.assertIn("K1_LOUD_GUARD_GDFT_ATTACK_SEC", I2S)
+        # telemetry carries the active mode
+        self.assertIn("spec_sat=%.3f mode=%d", I2S)
+        # runtime mode switching stays runtime-only (no persistence)
+        block = typed_command_block("k1_loud_guard")
+        self.assertIn("serial_cycle_k1_loud_guard_mode()", block)
+        self.assertNotIn("save_config", block)
 
 
 if __name__ == "__main__":

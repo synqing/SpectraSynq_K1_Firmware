@@ -18,7 +18,7 @@ SOURCES OF TRUTH (parsed, not trusted-by-prose)
 1. ``docs/protocol/k1-ws-controls-registry.yaml`` -- the canonical SET and ORDER
    of control paths (the 71). Its md5 is recorded in the generated map; the gate
    regenerates from the live registry, so any registry edit without a regen FAILS.
-2. ``SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.cpp`` -- the per-control
+2. ``SPECTRASYNQ_K1_FIRMWARE/control/k1_control_facade.cpp`` -- the per-control
    TYPE, derived from the helper used inside each path's ``apply()`` branch:
      parse_bool_value(...)            -> bool   (CC 7-bit, 0/127)
      needs_number_range(...,min,max)  -> float  (CC 14-bit, range from source)
@@ -56,7 +56,7 @@ from pathlib import Path
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "SPECTRASYNQ_K1_FIRMWARE").is_dir())
 FIRMWARE = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 REGISTRY_YAML = ROOT / "docs" / "protocol" / "k1-ws-controls-registry.yaml"
-FACADE_REL = "control/sb_k1_control_facade.cpp"
+FACADE_REL = "control/k1_control_facade.cpp"
 MAP_JSON = ROOT / "docs" / "protocol" / "k1-ble-midi-map.json"
 
 NAME = "ble_midi_map"

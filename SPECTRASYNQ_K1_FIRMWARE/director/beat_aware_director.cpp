@@ -11,7 +11,7 @@
 
 #include <math.h>
 
-#include "sb_semantic_state.h"  // SBMusicState
+#include "k1_semantic_state.h"  // K1MusicState
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "../effects/framework/EffectRegistry.h"  // R2-core: registry-aware enabled scan (natives reachable)
 #endif
@@ -87,7 +87,7 @@ BeatAwareDirectorConfig bad_director_default_config() {
   c.min_dwell_ms       = 6000UL;  // wall-clock floor (slow tempi / unlocked)
   c.fallback_switch_ms = 20000UL; // gentle time-based switch when unlocked
   c.xfade_beats        = 2;       // two-beat crossfade rides the groove
-  c.xfade_ms_min       = 200;     // within SB_QUEUE_XFADE_MS range [100,3000]
+  c.xfade_ms_min       = 200;     // within K1_QUEUE_XFADE_MS range [100,3000]
   c.xfade_ms_max       = 1600;
   return c;
 }
@@ -153,6 +153,13 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
   const bool may_switch     = energy_ok && dwell_ms_ok;
 
   // ── Stage 2: FIRE ────────────────────────────────────────────────────────
+  // Trustworthy = locked AND confidence above floor. Critical product rule
+  // (AUDIO_ON 2026-07-25 autopsy): while tempo_locked, NEVER take the time
+  // fallback — even if confidence dips below the floor. Device soak showed
+  // locked_beat_q_bad=4/5 because fallback switches fired (~20s cadence) then
+  // lock flipped ON before the next status poll, so the scorer attributed a
+  // non-beat-q switch to a locked sample. Hold instead until beat-q can fire
+  // or the lock drops.
   const bool tempo_trustworthy =
       view.tempo_locked && (view.tempo_confidence >= config.confidence_floor);
 
@@ -162,7 +169,12 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
     return decision;
   }
 
-  if (tempo_trustworthy) {
+  if (view.tempo_locked) {
+    // LOCKED path: beat-quantise only. Low confidence => hold (no time fallback).
+    if (!tempo_trustworthy) {
+      state->pending_switch = false;
+      return decision;
+    }
     // BEAT-QUANTISED path. Require the beat dwell too, then latch and wait for
     // the next beat instant so the cut lands exactly on the groove.
     if (!dwell_beats_ok) {
@@ -183,8 +195,9 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
     decision.beat_quantised = true;
     decision.wants_switch   = (decision.next_mode != state->current_mode);
   } else {
-    // FALLBACK: tempo not trustworthy — gentle time-based switch. No beat to
-    // quantise to, so use a long wall-clock interval and a fixed gentle xfade.
+    // FALLBACK: unlocked only — gentle time-based switch. No beat to quantise
+    // to, so use a long wall-clock interval and a fixed gentle xfade.
+    state->pending_switch = false;  // drop any stale locked latch
     if (dwell_ms < config.fallback_switch_ms) {
       return decision;
     }
@@ -214,8 +227,8 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
 #include <Arduino.h>
 
 #include "globals.h"  // CONFIG, portMUX
-#include "sb_audio_snapshot.h"
-#include "sb_effect_queue.h"
+#include "k1_audio_snapshot.h"
+#include "k1_effect_queue.h"
 #include "TransitionOverlay.h"
 #include "TransitionTypes.h"
 
@@ -225,6 +238,13 @@ static float                   g_bad_energy_smooth = 0.0f;
 static uint32_t                g_bad_last_tick_ms  = 0;
 static uint8_t                 g_bad_safe_cursor   = 0;  // SAFE transition rotation
 static portMUX_TYPE            g_bad_config_mux    = portMUX_INITIALIZER_UNLOCKED;
+
+// Proof telemetry (RAM-only; updated on switch commit; serial-readable).
+static uint32_t g_bad_switch_count           = 0;
+static uint32_t g_bad_last_switch_ms         = 0;
+static uint8_t  g_bad_last_switch_mode       = 0;
+static bool     g_bad_last_switch_beat_q     = false;
+static bool     g_bad_last_switch_locked     = false;  // lock state AT commit
 
 void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_state = {};
@@ -236,6 +256,11 @@ void bad_director_init(uint8_t initial_mode, uint32_t now_ms) {
   g_bad_energy_smooth = 0.0f;
   g_bad_last_tick_ms  = now_ms;
   g_bad_safe_cursor   = 0;
+  g_bad_switch_count         = 0;
+  g_bad_last_switch_ms       = 0;
+  g_bad_last_switch_mode     = initial_mode;
+  g_bad_last_switch_beat_q   = false;
+  g_bad_last_switch_locked   = false;
 }
 
 BeatAwareDirectorConfig bad_director_config() {
@@ -272,7 +297,7 @@ uint8_t bad_director_current_mode() {
 
 bool bad_director_tempo_locked() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.tempo_locked;
@@ -280,7 +305,7 @@ bool bad_director_tempo_locked() {
 
 float bad_director_bpm() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.bpm;
@@ -288,10 +313,27 @@ float bad_director_bpm() {
 
 float bad_director_tempo_confidence() {
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
   return sem.tempo_confidence;
+}
+
+uint32_t bad_director_switch_count() { return g_bad_switch_count; }
+uint32_t bad_director_last_switch_ms() { return g_bad_last_switch_ms; }
+uint8_t  bad_director_last_switch_mode() { return g_bad_last_switch_mode; }
+bool     bad_director_last_switch_beat_quantised() {
+  return g_bad_last_switch_beat_q;
+}
+bool bad_director_last_switch_tempo_locked() {
+  return g_bad_last_switch_locked;
+}
+bool bad_director_compile_opt_in() {
+#ifdef K1_BEAT_AWARE_DIRECTOR_V1
+  return true;
+#else
+  return false;
+#endif
 }
 
 uint8_t bad_director_tick(uint32_t now_ms) {
@@ -305,7 +347,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   }
 
   // Read K1's OWN audio surface directly — no firmware-v3 thresholds.
-  SBAudioSnapshot audio = sb_audio_snapshot_read();
+  K1AudioSnapshot audio = k1_audio_snapshot_read();
 
   // Smooth spectral energy for the phrase/energy gate (frame-rate-independent
   // first-order EMA, ~180 ms tau — mirrors SmartDirector's energy smoothing).
@@ -318,7 +360,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   g_bad_energy_smooth += (audio.spectral_energy - g_bad_energy_smooth) * alpha;
 
   AudioSemanticState sem = {};
-#ifdef SB_SEMANTIC_STATE
+#ifdef K1_SEMANTIC_STATE
   audio_semantic_read(&sem);
 #endif
 
@@ -329,13 +371,21 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   view.tempo_confidence = sem.tempo_confidence;
   view.tempo_locked     = sem.tempo_locked;
   view.beat_tick        = sem.beat_tick;
-  view.music_state      = (uint8_t)SB_MUSIC_STEADY;  // reserved for future bias
+  view.music_state      = (uint8_t)K1_MUSIC_STEADY;  // reserved for future bias
 
   BeatAwareDecision decision =
       bad_director_decide(&g_bad_state, view, config, now_ms);
 
   if (decision.wants_switch) {
     using namespace k1::effects::framework;
+
+    // Proof telemetry first (RAM-only) so serial status can confirm beat-q.
+    // Sticky lock-at-commit prevents poll-time lock flicker from poisoning score.
+    g_bad_switch_count++;
+    g_bad_last_switch_ms       = now_ms;
+    g_bad_last_switch_mode     = decision.next_mode;
+    g_bad_last_switch_beat_q   = decision.beat_quantised;
+    g_bad_last_switch_locked   = view.tempo_locked;
 
     // SAFE transition type only (never NUCLEAR/STARGATE/PHASE_SHIFT). Rotate the
     // P4 SAFE_DEFAULT set so successive switches feel varied but stay spatial.
@@ -346,16 +396,16 @@ uint8_t bad_director_tick(uint32_t now_ms) {
 
     // MUSICAL DURATION + XFADE style: tempo-derived crossfade through the queue,
     // which routes render_queue_xfade_overlay() into the TransitionEngine.
-    sb_queue_set_xfade_ms((uint32_t)decision.xfade_ms);
-    sb_queue_set_transition_style(SB_QUEUE_TRANSITION_XFADE);
+    k1_queue_set_xfade_ms((uint32_t)decision.xfade_ms);
+    k1_queue_set_transition_style(K1_QUEUE_TRANSITION_XFADE);
 
     // Arm the primary channel's pending preset with the new mode and commit.
     // RAM-only arm/flag writes (no flash); Core 1 frame tick lands the swap and
     // starts the crossfade at the next frame boundary.
-    SBChannelPreset* pending = sb_queue_arm_begin(false);
+    K1ChannelPreset* pending = k1_queue_arm_begin(false);
     if (pending != nullptr) {
       pending->lightshow_mode = decision.next_mode;
-      sb_queue_request_commit(true, now_ms);
+      k1_queue_request_commit(true, now_ms);
     }
   }
 

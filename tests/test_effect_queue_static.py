@@ -10,7 +10,7 @@ down + instant relight, no oscillation), and drop_cut composition preserved.
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface, read_serial_dispatch_surface, typed_command_registered, typed_command_handler_body
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,14 +21,14 @@ SERIAL_MENU = FW / "serial_menu.h"
 # serial_cmd_dispatch_pure_setter). The typed-command dispatch surface now spans
 # BOTH files, so typed-equivalence assertions check the combined source.
 SERIAL_CMD_HANDLERS = FW / "serial_cmd_handlers.cpp"
-QUEUE_HEADER = FW / "control" / "sb_effect_queue.h"
-QUEUE_IMPL = FW / "control" / "sb_effect_queue.cpp"
+QUEUE_HEADER = FW / "control" / "k1_effect_queue.h"
+QUEUE_IMPL = FW / "control" / "k1_effect_queue.cpp"
 LED_UTILS = FW / "led_utilities.h"
 CMD_TABLE = FW / "serial" / "serial_cmd_table.def"
 INO = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "SPECTRASYNQ_K1_FIRMWARE.ino"
 
 
-def function_body(source, name, kinds=r"(?:bool|void|float|uint8_t|uint16_t|SBChannelPreset\*?)"):
+def function_body(source, name, kinds=r"(?:bool|void|float|uint8_t|uint16_t|K1ChannelPreset\*?)"):
     match = re.search(rf"\b{kinds}\s+{name}\s*\([^)]*\)\s*\{{", source)
     assert match is not None, f"{name}() must exist"
     start = match.end()
@@ -48,11 +48,8 @@ def function_body(source, name, kinds=r"(?:bool|void|float|uint8_t|uint16_t|SBCh
 class EffectQueueKeyMapTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.menu = SERIAL_MENU.read_text()
-        # Typed-command dispatch now spans serial_menu.h (the ladder + dispatcher
-        # call) AND serial_cmd_handlers.cpp (the 23 pure-setter strcmp branches,
-        # S4). Concatenate for typed-equivalence checks (repoint, not weaken).
-        cls.dispatch = cls.menu + "\n" + SERIAL_CMD_HANDLERS.read_text()
+        cls.menu = read_serial_menu_surface(FW)
+        cls.dispatch = read_serial_dispatch_surface(FW)
         cls.handler = function_body(cls.menu, "serial_handle_hotkey")
         cls.immediate = re.sub(
             r"#ifdef\s+ENABLE_MOTION_PROBE\b.*?#endif", "",
@@ -95,7 +92,7 @@ class EffectQueueKeyMapTest(unittest.TestCase):
         self.assertNotIn("chromatic_mode = !chromatic_mode", self.handler)
         self.assertNotIn("serial_toggle_target_bool", self.handler)
         self.assertNotIn("TEMPORAL_DITHERING = !CONFIG.TEMPORAL_DITHERING", self.handler)
-        self.assertNotIn("sb_apply_smart_scene", self.handler)
+        self.assertNotIn("k1_apply_smart_scene", self.handler)
 
     def test_removed_bindings_have_typed_equivalents(self):
         # Zero capability loss (spec §4): every removed digit binding keeps (or
@@ -114,8 +111,8 @@ class EffectQueueKeyMapTest(unittest.TestCase):
             '"temporal_dithering"',           # was '6' (global)
         ]
         for token in equivalents:
-            self.assertIn(f"strcmp(command_type, {token})", self.dispatch,
-                          f"typed equivalent {token} must exist in the parse_command dispatch surface")
+            self.assertTrue(typed_command_registered(self.dispatch, token.strip('"')),
+                          f"typed equivalent {token} must exist in the dispatch surface")
 
     def test_queue_commands_exist(self):
         # The queue/transition family (queue_mode/transition_style/transition_dip_ms/
@@ -127,14 +124,14 @@ class EffectQueueKeyMapTest(unittest.TestCase):
         for token in ["queue_mode", "transition_style", "transition_dip_ms",
                       "transition_xfade_ms", "commit_quantise", "slot_save",
                       "slot_load", "slot_arm"]:
-            self.assertIn(f'strcmp(command_type, "{token}")', self.dispatch)
+            self.assertTrue(typed_command_registered(self.dispatch, token),
+                            f"{token} must be registered in typed dispatch surface")
         table = CMD_TABLE.read_text()
         self.assertIn('SERIAL_CMD("commit",', table)
         self.assertIn('SERIAL_CMD("slot_list",', table)
 
     def test_slot_save_accepts_explicit_channel_like_slot_load(self):
-        branch = self.menu.split('strcmp(command_type, "slot_save") == 0', 1)[1]
-        branch = branch.split('strcmp(command_type, "slot_load") == 0', 1)[0]
+        branch = typed_command_handler_body(self.dispatch, "slot_save")
         self.assertIn("strchr(command_data, ',')", branch)
         self.assertIn('"primary"', branch)
         self.assertIn('"secondary"', branch)
@@ -144,11 +141,11 @@ class EffectQueueKeyMapTest(unittest.TestCase):
         # The browse steppers must not hard-cut live fields any more: they go
         # through the pending/arm surface, applied by Core 1 at frame boundary.
         mode_body = function_body(self.menu, "serial_adjust_target_mode")
-        self.assertIn("sb_queue_arm_begin", mode_body)
+        self.assertIn("k1_queue_arm_begin", mode_body)
         self.assertNotIn("CONFIG.LIGHTSHOW_MODE =", mode_body)
         self.assertNotIn("SECONDARY_LIGHTSHOW_MODE =", mode_body)
         palette_body = function_body(self.menu, "serial_adjust_target_palette")
-        self.assertIn("sb_queue_arm_begin", palette_body)
+        self.assertIn("k1_queue_arm_begin", palette_body)
         self.assertNotIn("CONFIG.PALETTE_INDEX =", palette_body)
         self.assertNotIn("SECONDARY_PALETTE_INDEX =", palette_body)
 
@@ -161,21 +158,21 @@ class EffectQueueModuleBoundaryTest(unittest.TestCase):
 
     def test_no_core0_includes_or_calls(self):
         # The queue module must never touch the Core-0 audio pipeline. Its only
-        # audio-adjacent surface is the any-core-safe sb_tempo_read().
+        # audio-adjacent surface is the any-core-safe k1_tempo_read().
         for forbidden in ["i2s_audio.h", "GDFT.h", "noise_cal.h",
-                          "sb_onset_beat.h", "sb_audio_snapshot.h",
-                          "sb_musical_saliency.h"]:
+                          "k1_onset_beat.h", "k1_audio_snapshot.h",
+                          "k1_musical_saliency.h"]:
             self.assertNotIn(forbidden, self.header)
             self.assertNotIn(forbidden, self.impl)
-        for forbidden_call in ["sb_tempo_update", "sb_tempo_reset",
-                               "sb_tempo_init", "acquire_sample_chunk",
+        for forbidden_call in ["k1_tempo_update", "k1_tempo_reset",
+                               "k1_tempo_init", "acquire_sample_chunk",
                                "process_GDFT", "calculate_vu", "start_noise_cal"]:
             self.assertNotIn(forbidden_call, self.impl)
-        self.assertIn("sb_tempo_read()", self.impl)
+        self.assertIn("k1_tempo_read()", self.impl)
 
     def test_no_audio_or_calibration_fields_in_preset(self):
         # Slot payload = the 15 visual fields ONLY (recon §1c poisoning hazard).
-        struct = self.header.split("struct SBChannelPreset {", 1)[1].split("};", 1)[0]
+        struct = self.header.split("struct K1ChannelPreset {", 1)[1].split("};", 1)[0]
         for forbidden in ["SAMPLE_RATE", "SENSITIVITY", "DC_OFFSET",
                           "SWEET_SPOT", "NOTE_OFFSET", "CHROMAGRAM",
                           "CHROMA_PROFILE", "SQUARE_ITER", "LED_COUNT",
@@ -184,10 +181,10 @@ class EffectQueueModuleBoundaryTest(unittest.TestCase):
         self.assertEqual(struct.count(";"), 15, "exactly 15 per-channel fields")
 
     def test_slot_file_format_constants(self):
-        self.assertIn('#define SB_PRESET_SLOTS_FILE "/PRESETS_V1.BIN"', self.header)
-        self.assertIn("#define SB_PRESET_SLOTS_MAGIC 0x53504253UL", self.header)
-        self.assertIn("#define SB_PRESET_SLOTS_VERSION 1U", self.header)
-        self.assertIn("#define SB_PRESET_SLOT_COUNT 10", self.header)
+        self.assertIn('#define K1_PRESET_SLOTS_FILE "/PRESETS_V1.BIN"', self.header)
+        self.assertIn("#define K1_PRESET_SLOTS_MAGIC 0x53504253UL", self.header)
+        self.assertIn("#define K1_PRESET_SLOTS_VERSION 1U", self.header)
+        self.assertIn("#define K1_PRESET_SLOT_COUNT 10", self.header)
         # The orphaned save_configuration()/load_configuration() landmine must
         # stay unwired: the module never calls either.
         self.assertNotIn("save_configuration", self.impl)
@@ -195,11 +192,11 @@ class EffectQueueModuleBoundaryTest(unittest.TestCase):
         # factory_reset() must enumerate the new file (recon §3).
         bridge_fs = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "persistence" / "bridge_fs.h").read_text()
         reset_body = bridge_fs.split("void factory_reset()", 1)[1].split("void restore_defaults", 1)[0]
-        self.assertIn("SB_PRESET_SLOTS_FILE", reset_body)
+        self.assertIn("K1_PRESET_SLOTS_FILE", reset_body)
 
     def test_frame_tick_wired_before_channel_construction(self):
         ino = INO.read_text()
-        tick = ino.index("sb_effect_queue_frame_tick(")
+        tick = ino.index("k1_effect_queue_frame_tick(")
         primary_channel = ino.index("RenderChannelState primary_channel = make_primary_channel();")
         self.assertLess(tick, primary_channel,
                         "frame tick must run before channel construction (frame boundary)")
@@ -214,7 +211,7 @@ class EffectQueueTransitionSafetyTest(unittest.TestCase):
         cls.led_utils = LED_UTILS.read_text()
 
     def test_dip_is_monotonic_down_with_instant_relight(self):
-        dip_case = self.impl.split("case SBQ_DIP_DOWN: {", 1)[1].split("case SBQ_XFADE:", 1)[0]
+        dip_case = self.impl.split("case K1Q_DIP_DOWN: {", 1)[1].split("case K1Q_XFADE:", 1)[0]
         # Monotonic guard: the scalar only ever moves down during the ramp.
         self.assertIn("if (s < scale) scale = s;", dip_case)
         # Instant relight: a single assignment back to 1.0, never a ramp up.
@@ -226,13 +223,13 @@ class EffectQueueTransitionSafetyTest(unittest.TestCase):
 
     def test_dip_retarget_never_oscillates(self):
         start_body = self.impl.split("void start_transition(", 1)[1].split("void advance_transition(", 1)[0]
-        retarget = start_body.split("if (tr.phase == SBQ_DIP_DOWN) {", 1)[1].split("}", 1)[0]
+        retarget = start_body.split("if (tr.phase == K1Q_DIP_DOWN) {", 1)[1].split("}", 1)[0]
         self.assertIn("tr.target = preset;", retarget)
         self.assertIn("return;", retarget)
         self.assertNotIn("scale", retarget)  # a mid-dip commit never touches the scalar
 
     def test_xfade_uses_dedicated_scratch_and_equal_power(self):
-        self.assertIn("struct SBQueueXfadeScratch", QUEUE_HEADER.read_text())
+        self.assertIn("struct K1QueueXfadeScratch", QUEUE_HEADER.read_text())
         self.assertIn("sqrtf(1.0f - t)", self.impl)
         self.assertIn("sqrtf(t)", self.impl)
         # Completion copies scratch -> live at the frame boundary.
@@ -247,20 +244,20 @@ class EffectQueueTransitionSafetyTest(unittest.TestCase):
         # application points; never replace or reorder existing factors.
         self.assertIn("silent_scale * SQ15x16(drop_cut_scale)", self.led_utils)
         self.assertIn("bright_val *= drop_cut_scale;", self.led_utils)
-        self.assertIn("brightness *= SQ15x16(sb_queue_transition_scale_primary);", self.led_utils)
-        self.assertIn("bright_val *= sb_queue_transition_scale_secondary;", self.led_utils)
+        self.assertIn("brightness *= SQ15x16(k1_queue_transition_scale_primary);", self.led_utils)
+        self.assertIn("bright_val *= k1_queue_transition_scale_secondary;", self.led_utils)
         # Composition order: the queue scalar applies AFTER the drop-cut factor
         # at each point (multiplication, not replacement).
         primary_point = self.led_utils.index("silent_scale * SQ15x16(drop_cut_scale)")
         self.assertLess(primary_point,
-                        self.led_utils.index("brightness *= SQ15x16(sb_queue_transition_scale_primary);"))
+                        self.led_utils.index("brightness *= SQ15x16(k1_queue_transition_scale_primary);"))
         secondary_point = self.led_utils.index("bright_val *= drop_cut_scale;")
         self.assertLess(secondary_point,
-                        self.led_utils.index("bright_val *= sb_queue_transition_scale_secondary;"))
+                        self.led_utils.index("bright_val *= k1_queue_transition_scale_secondary;"))
 
     def test_beat_quantise_has_timeout_fallback(self):
-        self.assertIn("SB_QUEUE_QUANTISE_TIMEOUT_MS", self.impl)
-        tick = self.impl.split("void sb_effect_queue_frame_tick(", 1)[1]
+        self.assertIn("K1_QUEUE_QUANTISE_TIMEOUT_MS", self.impl)
+        tick = self.impl.split("void k1_effect_queue_frame_tick(", 1)[1]
         self.assertIn("tempo.beat_tick && tempo.locked", tick)
         self.assertIn("on_beat || timed_out", tick)
 

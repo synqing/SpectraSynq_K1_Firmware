@@ -133,6 +133,21 @@ int main() {
         CHECK(!any_beat_quantised, "fallback switches are NOT beat-quantised");
     }
 
+    // --- (6) LOCKED + LOW CONF: hold — never time-fallback while locked. -----
+    // Autopsy 2026-07-25: locked_beat_q_bad when conf < floor took fallback.
+    {
+        BeatAwareDirectorState st = {}; st.current_mode = 7; st.initialised = false;
+        bool switched = false;
+        for (uint32_t t = 0; t < 60000; t += 100) {
+            bool beat = (t % 500) == 0;
+            // Locked but confidence below floor (0.45).
+            BeatAwareAudioView v = view(false, 0.5f, 127.0f, 0.30f, true, beat);
+            BeatAwareDecision d = bad_director_decide(&st, v, cfg, t);
+            if (d.wants_switch) switched = true;
+        }
+        CHECK(!switched, "locked+low-conf must HOLD (no time fallback)");
+    }
+
     if (failures == 0) {
         printf("BEAT_AWARE_DIRECTOR_OK checks=all\n");
         return 0;

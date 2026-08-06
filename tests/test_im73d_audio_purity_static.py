@@ -1,12 +1,13 @@
 from pathlib import Path
-
+from _fwpath import FwDir, read_serial_menu_surface
 
 ROOT = Path(__file__).resolve().parents[1]
+FW_DIR = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 I2S_AUDIO = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "i2s_audio.h"
 GLOBALS_CONFIG = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "globals_config.cpp"
 SERIAL_CMD_HANDLERS = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_cmd_handlers.cpp"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
-CONTROL_FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "sb_k1_control_facade.cpp"
+CONTROL_FACADE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "k1_control_facade.cpp"
 CONFIG_TYPES = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "config_types.h"
 IM73D_HARNESS = ROOT / "scripts" / "regression-harness" / "im73d_audio_eval.py"
 
@@ -58,7 +59,7 @@ def test_current_sensitivity_surfaces_are_explicitly_mapped():
     config_types = CONFIG_TYPES.read_text()
     defaults = GLOBALS_CONFIG.read_text()
     serial_handlers = SERIAL_CMD_HANDLERS.read_text()
-    serial_menu = SERIAL_MENU.read_text()
+    serial_menu = read_serial_menu_surface(FW_DIR)
     control_facade = CONTROL_FACADE.read_text()
 
     assert "#define K1_SENSITIVITY_MIN 0.10f" in config_types

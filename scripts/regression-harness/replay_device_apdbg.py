@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Replay device-captured APDBG novelty through the host sb_tempo harness.
+"""Replay device-captured APDBG novelty through the host k1_tempo harness.
 
 This bridges the K1 mic/AGC/GDFT territory to the existing host tempo map.
-`[APDBG]` rows are emitted once per sb_tempo accepted novelty sample. The host
+`[APDBG]` rows are emitted once per k1_tempo accepted novelty sample. The host
 harness expects AP-frame input and performs the same /3 peak-hold decimation
 internally, so this script expands each accepted sample into three AP frames
 whose final timestamp is the captured `emit_ms`.
@@ -12,7 +12,7 @@ No DSP is reimplemented. The only transformation is transport reconstruction:
   APDBG accepted novelty sample -> synthetic 3-frame AP packet -> tempo_replay
 
 Use raw `nov` by default. `nov_scaled` is available only for sensitivity checks;
-feeding it into sb_tempo applies the firmware scale logic a second time.
+feeding it into k1_tempo applies the firmware scale logic a second time.
 """
 
 from __future__ import annotations
@@ -31,7 +31,7 @@ import apstream_ingest as api  # noqa: E402
 import tempo_replay as trp  # noqa: E402
 
 
-FINAL_DEFINES = ["SB_TEMPO_CONF_V2", "SB_TEMPO_FLYWHEEL_V2"]
+FINAL_DEFINES = ["K1_TEMPO_CONF_V2", "K1_TEMPO_FLYWHEEL_V2"]
 AP_FRAME_DT_MS = 1000.0 / (12800.0 / 96.0)
 
 
@@ -75,7 +75,7 @@ def _expanded_ap_frames(apdbg_records, value_key):
             continue
         last_emit_ms = emit_ms
 
-        # Recreate the host sb_tempo accepted-frame cadence:
+        # Recreate the host k1_tempo accepted-frame cadence:
         # two leading quiet AP frames then the accepted sample on the third
         # frame (which drives emit cadence).
         t0 = max(0, int(round(emit_ms - 2.0 * AP_FRAME_DT_MS)))
@@ -145,7 +145,7 @@ def main(argv=None):
     parser.add_argument("--define", action="append", default=[],
                         help="extra -D preprocessor define; defaults to final tempo flags")
     parser.add_argument("--baseline", action="store_true",
-                        help="use baseline sb_tempo with no final flags")
+                        help="use baseline k1_tempo with no final flags")
     parser.add_argument("--compiler", default="clang++")
     parser.add_argument("--out", help="optional JSON output path")
     args = parser.parse_args(argv)

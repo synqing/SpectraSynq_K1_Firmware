@@ -73,7 +73,7 @@ typedef struct {
 // noise_transition_queued: it is set true ONLY by a handler that actually
 // queues calibration. The guidance handler must leave it false.
 enum class Effect {
-  NONE, VERSION, HELP, SB_QUERY, REBOOT, FACTORY_RESET, RESTORE_DEFAULTS,
+  NONE, VERSION, HELP, K1_QUERY, REBOOT, FACTORY_RESET, RESTORE_DEFAULTS,
   CLEAR_NOISE_CAL, CHIP_ID, IDENTIFY, CAL_GUIDANCE, CAL_QUEUED, GET_NUM_MODES,
   GET_MODE, RESET_REASON, DUMP, STOP, FPS, LED_FPS, VP_STATUS, SMART_STATUS,
   EDGE_STATUS, EVENT_STATUS, VP_OUT_TEST, GET_KNOBS, GET_BUTTONS, QUEUE_COMMIT,
@@ -90,7 +90,7 @@ static void cmd_build()            { g_last_effect = Effect::BUILD; }  // N5 bui
 static void cmd_image_id()         { g_last_effect = Effect::IMAGE_ID; }
 static void cmd_runtime_id()       { g_last_effect = Effect::RUNTIME_ID; }
 static void cmd_help()             { g_last_effect = Effect::HELP; }
-static void cmd_sb_query()         { g_last_effect = Effect::SB_QUERY; }
+static void cmd_sb_query()         { g_last_effect = Effect::K1_QUERY; }
 static void cmd_reset()            { g_last_effect = Effect::REBOOT; }
 static void cmd_factory_reset()    { g_last_effect = Effect::FACTORY_RESET; }
 static void cmd_restore_defaults() { g_last_effect = Effect::RESTORE_DEFAULTS; }

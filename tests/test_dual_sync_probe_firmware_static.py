@@ -30,6 +30,7 @@ _REMOTED = os.path.join(_FW, "network", "ble_remoted_central.cpp")
 _REMOTED_H = os.path.join(_FW, "network", "ble_remoted_central.h")
 _INO = os.path.join(_FW, "SPECTRASYNQ_K1_FIRMWARE.ino")
 _MENU = os.path.join(_FW, "serial", "serial_menu.h")
+_MENU_CPP = os.path.join(_FW, "serial", "serial_menu.cpp")
 _CMD_TABLE = os.path.join(_FW, "serial", "serial_cmd_table.def")
 _PIO = os.path.join(_ROOT, "platformio.ini")
 _GUARD = os.path.join(_ROOT, "scripts", "platformio", "k1_upload_guard.py")
@@ -149,7 +150,7 @@ def test_ino_wiring_is_gated():
 
 
 def test_serial_menu_wiring_is_gated():
-    menu = _read(_MENU)
+    menu = _read(_MENU) + _read(_MENU_CPP)
     for needle in ('#include "k1_sync_link.h"',
                    'strcmp(command_type, "sync_status")',
                    "k1_sync::status()",
@@ -450,9 +451,9 @@ def test_init_task_and_steady_state_failures_are_observable():
 def test_dual_role_capacity_and_remoted_symbol_guards():
     cpp = _read(_CPP)
     assert "CONFIG_BT_NIMBLE_MAX_CONNECTIONS >= 2" in cpp
-    guard = "#if defined(K1_SYNC_ROLE_LEADER) && defined(SB_K1_BLE_REMOTED)"
+    guard = "#if defined(K1_SYNC_ROLE_LEADER) && defined(K1_BLE_REMOTED)"
     assert cpp.count(guard) >= 3
-    assert "const int dial = sb_k1_ble_remoted_is_linked() ? 1 : 0;" in cpp
+    assert "const int dial = k1_ble_remoted_is_linked() ? 1 : 0;" in cpp
 
 
 def test_leader_initialises_sync_before_optional_remoted():
@@ -463,8 +464,8 @@ def test_leader_initialises_sync_before_optional_remoted():
         "#endif"
     )
     remoted = (
-        "#ifdef SB_K1_BLE_REMOTED\n"
-        "  sb_k1_ble_remoted_begin();\n"
+        "#ifdef K1_BLE_REMOTED\n"
+        "  k1_ble_remoted_begin();\n"
         "#endif"
     )
     follower = (
@@ -486,7 +487,7 @@ def test_case_a_environment_is_sync_only_and_exactly_pinned():
     assert "-DK1_SYNC_ROLE_LEADER" in section
     assert "h2zero/NimBLE-Arduino@2.5.0" in section
     for forbidden in (
-        "SB_K1_BLE_REMOTED",
+        "K1_BLE_REMOTED",
         "ble_remoted_central.cpp",
         "k1_ble_midi_decoder.cpp",
     ):
@@ -494,10 +495,20 @@ def test_case_a_environment_is_sync_only_and_exactly_pinned():
 
 
 def test_case_a_is_registered_in_guard_and_exact_wrapper_allowlist():
-    guard = _read(_GUARD)
+    import json
+
+    manifest = json.loads(
+        open(
+            os.path.join(_ROOT, "scripts", "platformio", "k1_device_identities.json"),
+            encoding="utf-8",
+        ).read()
+    )
     wrapper = _read(_WRAPPER)
     env = "k1_sync_probe_main_sync_only"
-    assert env in guard
+    main_envs = next(
+        e["envs"] for e in manifest["authorized"] if e["chip_id"] == "F887A500"
+    )
+    assert env in main_envs
     assert env in wrapper
     assert f"|{env}|" in wrapper or f"|{env})" in wrapper
     assert 'pio run -e "$ENV"' in wrapper
@@ -522,7 +533,7 @@ def test_build_wrapper_rejects_case_a_suffix_and_argument_injection():
 
 def test_remoted_probe_task_is_off_audio_core():
     remoted = _read(_REMOTED)
-    begin = _function_body(remoted, "void sb_k1_ble_remoted_begin()")
+    begin = _function_body(remoted, "void k1_ble_remoted_begin()")
     assert '&s_task, 1)' in begin
     assert "core=1" in begin
 
@@ -540,7 +551,7 @@ def test_remoted_ready_publish_is_generation_checked_and_not_caller_latched():
     assert "connect_and_subscribe()) {\n        s_linked = true;" not in task
     queue = _function_body(remoted, "void queue_confirmed_modes(bool force)")
     send = _function_body(remoted, "void send_pending_confirmation()")
-    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    poll = _function_body(remoted, "void k1_ble_remoted_poll(")
     assert "s_confirmation_pending = true;" in queue
     assert "NimBLERemoteCharacteristic* const rx_char = s_rx_char;" in send
     assert "rx_char->writeValue" in send
@@ -576,14 +587,14 @@ def test_f2_identity_commands_are_read_only_shared_table_rows():
         )
         assert f"static void {handler}()" in row1
     dial_row = re.search(
-        r"#ifdef SB_K1_BLE_REMOTED\s+"
+        r"#ifdef K1_BLE_REMOTED\s+"
         r'SERIAL_CMD\("dial_status",\s+0,\s+cmd_dial_status,'
         r"\s+SC_SAFE,\s+0,\s+IS_BOTH\s+\)\s+#endif",
         table,
     )
     assert dial_row
     assert _gated_by_sync_probe(menu, "k1_sync_link.h")
-    assert "#ifdef SB_K1_BLE_REMOTED\n#include \"ble_remoted_central.h\"" in menu
+    assert "#ifdef K1_BLE_REMOTED\n#include \"ble_remoted_central.h\"" in menu
 
 
 def test_f2_image_and_runtime_lines_match_host_capture_grammar():
@@ -620,8 +631,8 @@ def test_f2_image_and_runtime_lines_match_host_capture_grammar():
 
 def test_f2_remoted_status_and_periodic_counter_grammars_are_exact():
     remoted = _read(_REMOTED)
-    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
-    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    status = _function_body(remoted, "void k1_ble_remoted_status()")
+    poll = _function_body(remoted, "void k1_ble_remoted_poll(")
     for part in (
         "DIAL_STATUS: linked=%u generation=%lu scan_active=%u ",
         "scan_start_ok=%lu scan_start_fail=%lu notify=%lu decoded=%lu ",
@@ -675,7 +686,7 @@ def test_f2_dial_confirmation_is_causal_and_retry_stable():
     remoted = _read(_REMOTED)
     queue = _function_body(remoted, "void queue_confirmed_modes(bool force)")
     send = _function_body(remoted, "void send_pending_confirmation()")
-    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    poll = _function_body(remoted, "void k1_ble_remoted_poll(")
     assert "if (s_connected && s_linked &&" in queue
     assert queue.index("if (force)") < queue.index(
         "s_dial_mode_target.valid"
@@ -710,8 +721,8 @@ def test_f2_dial_queue_and_scanner_evidence_are_generation_bound():
         remoted, "void onConnect(NimBLEClient*) override"
     )
     task = _function_body(remoted, "void ble_task(void*)")
-    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
-    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
+    poll = _function_body(remoted, "void k1_ble_remoted_poll(")
+    status = _function_body(remoted, "void k1_ble_remoted_status()")
     assert "struct QueuedControlRecord" in remoted
     assert "uint32_t generation;" in remoted
     assert "const QueuedControlRecord queued = {records[i], generation};" in decode
@@ -725,7 +736,7 @@ def test_f2_dial_queue_and_scanner_evidence_are_generation_bound():
     assert "QueuedControlRecord queued;" in poll
     assert poll.count("queued.generation == s_connection_generation") >= 2
     assert poll.index("if (!current_generation)") < poll.index(
-        "sb_k1_control_apply(record)"
+        "k1_control_apply(record)"
     )
     assert "++s_stale_generation_drops;" in poll
     assert "publish_scan_active(scan->isScanning());" in task
@@ -741,8 +752,8 @@ def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
     header = _read(_REMOTED_H)
     send = _function_body(remoted, "void send_pending_confirmation()")
     task = _function_body(remoted, "void ble_task(void*)")
-    status = _function_body(remoted, "void sb_k1_ble_remoted_status()")
-    poll = _function_body(remoted, "void sb_k1_ble_remoted_poll(")
+    status = _function_body(remoted, "void k1_ble_remoted_status()")
+    poll = _function_body(remoted, "void k1_ble_remoted_poll(")
     disconnect = _function_body(
         remoted, "void onDisconnect(NimBLEClient*, int reason) override"
     )
@@ -770,11 +781,11 @@ def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
         for forbidden in ("String", "new ", "malloc", "calloc", "realloc"):
             assert forbidden not in body
     assert "low-priority Core-1 task" in header
-    assert "void sb_k1_ble_remoted_status();" in header
+    assert "void k1_ble_remoted_status();" in header
 
 
 def test_f2_controlled_reboot_typed_command_remains_acknowledged():
-    serial_menu = _read(_MENU)
+    serial_menu = _read(_MENU_CPP)
     reset = _function_body(serial_menu, "void cmd_reset()")
     assert "ack();" in reset
     assert "reboot();" in reset

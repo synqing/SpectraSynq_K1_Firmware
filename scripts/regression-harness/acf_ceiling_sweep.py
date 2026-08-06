@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""ACF-salience CEILING characterisation for K1 sb_tempo (task #7 de-risk).
+"""ACF-salience CEILING characterisation for K1 k1_tempo (task #7 de-risk).
 
 HOST-ONLY experiment. No firmware edit, no flash, no commit. This script measures
 the in-range ACF-ceiling Acc1/Acc2 achievable on the 36-track HarmonixSet corpus as
 a function of THREE knobs, BEFORE any firmware ACF-salience term is written:
 
   (A) frame rate     : 133.33 Hz (host novelty, no decimation)  vs
-                       44.44 Hz  (sb_tempo's TRUE emit rate after its /3 decimation)
+                       44.44 Hz  (k1_tempo's TRUE emit rate after its /3 decimation)
   (B) sub-lag interp : none (integer argmax)  vs  parabolic 3-point peak interpolation
   (C) conditioning   : raw (current fork [0,1]-clamped peak-held domain)  vs
                        log1p-compressed (nov -> log1p(LOG1P_SCALE*nov))
@@ -29,10 +29,10 @@ REUSE CONTRACT (does NOT mutate tempo_accuracy.py):
     OCTAVES + BPM_LO/BPM_HI in-range gate. Numbers are directly comparable to the
     committed baseline (in-range Acc1 25.0% / Acc2 28.1%).
 
-DECIMATION (the load-bearing edge -- matches sb_tempo.cpp:440-468 EXACTLY):
-  sb_tempo does NOT take every 3rd sample and does NOT sum-in-threes. It PEAK-HOLDS:
-  sb_accum = max over a window of SB_NOVELTY_DECIMATION(=3) AP frames, emits that peak,
-  then resets to 0. With first-call priming (sb_accum = nov[0], counter=0), the emit
+DECIMATION (the load-bearing edge -- matches k1_tempo.cpp:440-468 EXACTLY):
+  k1_tempo does NOT take every 3rd sample and does NOT sum-in-threes. It PEAK-HOLDS:
+  k1_accum = max over a window of K1_NOVELTY_DECIMATION(=3) AP frames, emits that peak,
+  then resets to 0. With first-call priming (k1_accum = nov[0], counter=0), the emit
   schedule is: prime on frame 0; thereafter peak-hold and emit when the per-emit frame
   counter reaches 3. decimate_peak_hold() below reproduces that schedule frame-for-frame.
 
@@ -60,9 +60,9 @@ ROOT = _HERE.parents[1]
 OUT_MD = ROOT / "docs/research/2026-06-04-acf-ceiling-characterization.md"
 
 # --- load-bearing constants ---------------------------------------------------
-SB_NOVELTY_DECIMATION = 3          # sb_tempo.cpp:23
+K1_NOVELTY_DECIMATION = 3          # k1_tempo.cpp:23
 FPS_FULL = nfw.SAMPLE_RATE / nfw.HOP            # 133.333 Hz (no decimation)
-FPS_DECIM = FPS_FULL / SB_NOVELTY_DECIMATION    # 44.444 Hz (sb_tempo TRUE emit rate)
+FPS_DECIM = FPS_FULL / K1_NOVELTY_DECIMATION    # 44.444 Hz (k1_tempo TRUE emit rate)
 LOG1P_SCALE = 15.0                 # stated; nov in [0,1] -> log1p(15*nov)
 
 # ACF search window (identical to tempo_accuracy.ac_ceiling_bpm defaults).
@@ -70,7 +70,7 @@ LO_BPM, HI_BPM = 55.0, 210.0
 
 
 def decimate_peak_hold(nov):
-    """Reproduce sb_tempo.cpp's /3 peak-hold decimation EXACTLY (cpp:440-468).
+    """Reproduce k1_tempo.cpp's /3 peak-hold decimation EXACTLY (cpp:440-468).
 
     Priming: first frame sets accum = nov[0], frame_ctr = 0, emits nothing.
     Thereafter: accum = max(accum, nov[i]); on the 3rd accumulated frame emit accum
@@ -89,7 +89,7 @@ def decimate_peak_hold(nov):
         if v > accum:
             accum = float(v)
         ctr += 1
-        if ctr < SB_NOVELTY_DECIMATION:
+        if ctr < K1_NOVELTY_DECIMATION:
             continue
         ctr = 0
         out.append(accum)
@@ -182,7 +182,7 @@ def run(corpus, gt_dir, limit=None):
         except Exception as e:  # noqa: BLE001
             print(f"  ERROR {yt}: {e}", file=sys.stderr)
             continue
-        # zero novelty on silence frames -> matches sb_tempo (novelty=0 if silence)
+        # zero novelty on silence frames -> matches k1_tempo (novelty=0 if silence)
         nov = np.where(sil.astype(bool), 0.0, nov)
         nov_decim = decimate_peak_hold(nov)
         n_scored += 1
@@ -273,7 +273,7 @@ def write_report(res, rows, best, corpus, gt_dir, n_inr):
                     key=lambda r: (r["a2"], r["a1"]))
 
     md = f"""---
-abstract: "HOST de-risk for K1 sb_tempo ACF-salience (task #7). Measures the in-range ACF tempo CEILING on the 36-track HarmonixSet corpus across 8 configs (frame rate 133.33Hz vs firmware-native 44.44Hz x integer-vs-parabolic sub-lag interp x raw-vs-log1p novelty conditioning), reusing novelty_from_wav + tempo_accuracy's exact ACF estimator/GT/scoring (comparable to the committed in-range baseline Acc1 25.0%/Acc2 28.1%). The firmware /3 decimation is reproduced as PEAK-HOLD over groups of 3 (sb_tempo.cpp:440-468), NOT stride-3 or sum-3; log1p scale=15. BEST config: {best['label']} (in-range Acc2={best['a2']:.1f}%). Headline verdict on whether the firmware-native 44.44Hz rate is viable (with parabolic interpolation / log1p) or whether the ACF must run at 133.33Hz. Read before writing any in-firmware ACF-salience term."
+abstract: "HOST de-risk for K1 k1_tempo ACF-salience (task #7). Measures the in-range ACF tempo CEILING on the 36-track HarmonixSet corpus across 8 configs (frame rate 133.33Hz vs firmware-native 44.44Hz x integer-vs-parabolic sub-lag interp x raw-vs-log1p novelty conditioning), reusing novelty_from_wav + tempo_accuracy's exact ACF estimator/GT/scoring (comparable to the committed in-range baseline Acc1 25.0%/Acc2 28.1%). The firmware /3 decimation is reproduced as PEAK-HOLD over groups of 3 (k1_tempo.cpp:440-468), NOT stride-3 or sum-3; log1p scale=15. BEST config: {best['label']} (in-range Acc2={best['a2']:.1f}%). Headline verdict on whether the firmware-native 44.44Hz rate is viable (with parabolic interpolation / log1p) or whether the ACF must run at 133.33Hz. Read before writing any in-firmware ACF-salience term."
 ---
 
 # ACF-salience ceiling characterisation — firmware-rate viability (task #7 de-risk)
@@ -284,7 +284,7 @@ WAVs; ground truth = HarmonixSet gold human BPM annotations. Novelty front-end =
 `novelty_from_wav.wav_to_novelty` (raw [0,1]-clamped onset curve). ACF estimator,
 BPM↔lag mapping, GT join, and Acc1/Acc2 + octave-tolerant scoring are imported /
 copied EXACTLY from `tempo_accuracy.py`, so these numbers are directly comparable to
-the committed in-range baseline (sb_tempo Acc1 25.0% / Acc2 28.1%).
+the committed in-range baseline (k1_tempo Acc1 25.0% / Acc2 28.1%).
 
 Scored: **{res['n_scored']}** tracks (in-range 60–155 BPM: **{n_inr}**);
 missing-GT join: {len(res['missing'])}.
@@ -292,10 +292,10 @@ missing-GT join: {len(res['missing'])}.
 ## The load-bearing edges (how the firmware condition was reproduced)
 
 - **Decimation = PEAK-HOLD over groups of 3, not stride-3 / not sum-3.** Reproduced
-  frame-for-frame from `sb_tempo.cpp:440-468`: first call primes `accum = nov[0]`;
+  frame-for-frame from `k1_tempo.cpp:440-468`: first call primes `accum = nov[0]`;
   thereafter `accum = max(accum, nov[i])` and on the 3rd accumulated frame the peak is
   emitted and `accum` reset to 0. Silence frames force `novelty = 0` before peak-hold
-  (matches `sb_tempo_update`). `decimate_peak_hold()` in the script.
+  (matches `k1_tempo_update`). `decimate_peak_hold()` in the script.
 - **Frame rate / lag mapping.** 133.33 Hz: `fps = 12800/96`. 44.44 Hz: `fps/3`.
   BPM = `60*fps/lag`. At 44.44 Hz the tempo window 55–210 BPM spans only
   `{int(round(FPS_DECIM*60/HI_BPM))}–{int(round(FPS_DECIM*60/LO_BPM))}` integer lags
@@ -348,7 +348,7 @@ consumed artefact.
 - No librosa; numpy only (`np.correlate`, `np.log1p`).
 - Corpus: `{Path(corpus).relative_to(ROOT) if Path(corpus).is_relative_to(ROOT) else corpus}`
 - Gold GT: `{gt_dir}`
-- log1p scale = **{LOG1P_SCALE:.0f}**; decimation = **peak-hold over 3 frames** (sb_tempo.cpp:440-468).
+- log1p scale = **{LOG1P_SCALE:.0f}**; decimation = **peak-hold over 3 frames** (k1_tempo.cpp:440-468).
 
 ---
 **Document Changelog**

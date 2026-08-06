@@ -1,7 +1,7 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_onset_beat.h"
-#include "sb_tempo.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
 
 // ============================================================================
 // light_mode_dense_forge — "Dense Forge": Novelty Shear Lattice motion engine.
@@ -42,7 +42,7 @@ static float dforge_clamp01(float v) {
   return v;
 }
 
-static bool dforge_presence_ok(const SBAudioSnapshot& snap) {
+static bool dforge_presence_ok(const K1AudioSnapshot& snap) {
   return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
 }
 
@@ -95,9 +95,9 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
-  SBOnsetBeatEvent ev = sb_onset_beat_read();
-  SBTempoEvent tempo = sb_tempo_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_onset_beat_read();
+  K1TempoEvent tempo = k1_tempo_read();
 
   const float novelty = dforge_clamp01(snap.novelty);
   const float energy = dforge_clamp01(snap.spectral_energy);
@@ -108,7 +108,7 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   const float inject_scale =
       (presence_ok && !hard_gate) ? 1.0f : 0.0f;
 
-#ifdef SB_ONSET_V2
+#ifdef K1_ONSET_V2
   const float transient = dforge_clamp01(ev.transient_level);
 #else
   const float transient = ev.onset ? dforge_clamp01(ev.onset_strength) : 0.0f;

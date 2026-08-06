@@ -29,12 +29,12 @@ class TestFwStringsRemovedStatic(unittest.TestCase):
         globals_h = (FW / "globals.h").read_text()
         globals_cpp = (FW / "globals.cpp").read_text()
 
-        self.assertIn("extern const char SB_PASS[];", globals_h)
-        self.assertIn("extern const char SB_FAIL[];", globals_h)
-        self.assertRegex(globals_cpp, r'\bconst\s+char\s+SB_PASS\[\]\s*=\s*"PASS"\s*;')
+        self.assertIn("extern const char K1_PASS[];", globals_h)
+        self.assertIn("extern const char K1_FAIL[];", globals_h)
+        self.assertRegex(globals_cpp, r'\bconst\s+char\s+K1_PASS\[\]\s*=\s*"PASS"\s*;')
         self.assertRegex(
             globals_cpp,
-            r'\bconst\s+char\s+SB_FAIL\[\]\s*=\s*"FAIL ###################"\s*;',
+            r'\bconst\s+char\s+K1_FAIL\[\]\s*=\s*"FAIL ###################"\s*;',
         )
 
     def test_dead_note_label_tables_do_not_survive(self):

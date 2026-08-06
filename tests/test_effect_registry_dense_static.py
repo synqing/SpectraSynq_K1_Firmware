@@ -20,13 +20,15 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from _fwpath import FwDir, read_serial_menu_surface
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
+FW_DIR = FwDir(FW)
 CONFIG_TYPES = (FW / "system" / "config_types.h").read_text()
 REGISTRY_CPP = (FW / "effects" / "framework" / "EffectRegistry.cpp").read_text()
 REGISTRY_H = (FW / "effects" / "framework" / "EffectRegistry.h").read_text()
-SERIAL_MENU = (FW / "serial" / "serial_menu.h").read_text()
+SERIAL_MENU = read_serial_menu_surface(FW_DIR)
 
 
 # ─── Source parsing (shared shape with the sanitize gate) ───────────────────

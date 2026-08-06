@@ -18,9 +18,9 @@ WHY ALIAS-AWARE: at fs = 12800, Nyquist = 6400 Hz. A magnitude-only Goertzel on 
 REAL sampled signal cannot distinguish f from fs - f, so a raw_center (or note
 label) above Nyquist does NOT denote a physically distinct real-audio centre --
 it folds. 9 of the 80 bins (71..79) are labelled ABOVE Nyquist. The firmware is
-aware: sb_gdft_nyquist_safe_bin_hi() (constants.h) clamps the downstream onset /
-AudioSemanticState consumers to the safe range (sb_audio_snapshot.cpp,
-sb_onset_beat.cpp). Energy-side counterpart: high_bin_alias_audit.py (same fold
+aware: k1_gdft_nyquist_safe_bin_hi() (constants.h) clamps the downstream onset /
+AudioSemanticState consumers to the safe range (k1_audio_snapshot.cpp,
+k1_onset_beat.cpp). Energy-side counterpart: high_bin_alias_audit.py (same fold
 convention). Firmware is source of truth; this changes nothing in it.
 """
 

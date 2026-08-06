@@ -90,29 +90,23 @@ def test_im69d_cal_namespace_distinct_from_im73d():
 
 
 def test_im69d_registered_in_upload_guard_and_pio_build_allowlist():
-    guard = GUARD.read_text(encoding="utf-8")
+    import json
+
+    manifest = json.loads(
+        (ROOT / "scripts" / "platformio" / "k1_device_identities.json").read_text(
+            encoding="utf-8"
+        )
+    )
     wrapper = PIO_BUILD.read_text(encoding="utf-8")
-    assert '"k1_bench_im69d"' in guard
+    bench_envs = next(
+        e["envs"] for e in manifest["authorized"] if e["chip_id"] == "B489A500"
+    )
+    main_envs = next(
+        e["envs"] for e in manifest["authorized"] if e["chip_id"] == "F887A500"
+    )
+    assert "k1_bench_im69d" in bench_envs
+    assert "k1_bench_im69d" not in main_envs
     assert "k1_bench_im69d" in wrapper
-    bench_target = re.search(
-        r'role="2nd bench K1".*?chip_id="B489A500"',
-        guard,
-        flags=re.S,
-    )
-    assert bench_target, "bench K1Target missing"
-    # The env is declared in the envs=() tuple that precedes role= for that target.
-    bench_envs = re.search(
-        r'envs=\((.*?)\)\s*,\s*role="2nd bench K1"',
-        guard,
-        flags=re.S,
-    )
-    assert bench_envs and '"k1_bench_im69d"' in bench_envs.group(1)
-    main_envs = re.search(
-        r'envs=\((.*?)\)\s*,\s*role="main K1"',
-        guard,
-        flags=re.S,
-    )
-    assert main_envs and '"k1_bench_im69d"' not in main_envs.group(1)
 
 
 def test_im69d_not_alias_of_im73d_flag():

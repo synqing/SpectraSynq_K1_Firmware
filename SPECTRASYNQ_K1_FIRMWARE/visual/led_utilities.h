@@ -9,8 +9,8 @@
 #include "globals.h" // Assuming globals contains necessary definitions
 #include "constants.h" // Assuming constants contains necessary definitions
 #include "utilities.h" // Row 2: led_utilities uses fabs_fixed/fmod_fixed/random_float (after globals/constants so SQ15x16 is visible)
-#ifdef SB_DROP_CUT_V1
-#include "sb_audio_snapshot.h" // drop-cut detector reads the published AP snapshot (Core-1 read idiom)
+#ifdef K1_DROP_CUT_V1
+#include "k1_audio_snapshot.h" // drop-cut detector reads the published AP snapshot (Core-1 read idiom)
 #endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
@@ -18,11 +18,11 @@
 
 extern void start_noise_cal();
 
-// Effects-queue DIP transition scalars (control/sb_effect_queue.cpp). Composed
+// Effects-queue DIP transition scalars (control/k1_effect_queue.cpp). Composed
 // by multiplication into the final brightness of each channel, at the same
 // application points as drop_cut_scale. 1.0 whenever no dip is active.
-extern float sb_queue_transition_scale_primary;
-extern float sb_queue_transition_scale_secondary;
+extern float k1_queue_transition_scale_primary;
+extern float k1_queue_transition_scale_secondary;
 
 #ifdef ENABLE_MOTION_PROBE
 // NON-SHIPPING: apparent-motion probe state (defined inline in motion_probe.h,
@@ -104,7 +104,7 @@ inline SQ15x16 vivid_luminance(CRGB16 input_color) {
   return SQ15x16(0.2126) * input_color.r + SQ15x16(0.7152) * input_color.g + SQ15x16(0.0722) * input_color.b;
 }
 
-#ifdef SB_VIVID_PRECOMP_V1
+#ifdef K1_VIVID_PRECOMP_V1
 inline void apply_vivid_precomp_count(CRGB16* buffer, uint16_t count) {
   if (!VP_VIVID_PRECOMP) return;
   float chroma_level_float = VP_VIVID_CHROMA_LEVEL;
@@ -211,7 +211,7 @@ inline void reverse_leds(CRGB arr[], uint16_t size) {
 }
 
 static inline void write_sweet_spot_pwm(uint8_t channel, uint32_t duty) {
-#if SB_HAS_SWEET_SPOT_LEDS
+#if K1_HAS_SWEET_SPOT_LEDS
   ledcWrite(channel, duty);
 #else
   (void)channel;
@@ -220,7 +220,7 @@ static inline void write_sweet_spot_pwm(uint8_t channel, uint32_t duty) {
 }
 
 inline void run_sweet_spot() {
-#if SB_HAS_SWEET_SPOT_LEDS
+#if K1_HAS_SWEET_SPOT_LEDS
   static float sweet_spot_brightness = 0.0;  // init to zero for first fade in
 
   if (sweet_spot_brightness < 1.0) {
@@ -283,6 +283,20 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   int32_t index_left = index_whole + 0;
   int32_t index_right = index_whole + 1;
 
+  // Bounds guard (audit M1.3): every CRGB16 buffer is NATIVE_RESOLUTION-sized, so
+  // an out-of-range index must not read one past the buffer. LATENT in ALL current
+  // configs — SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h) so
+  // the only caller's lerp else-branch is dead, and the custom-224 build drops the
+  // secondary channel. This is defensive hardening that becomes LIVE only if a
+  // secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION, or a new
+  // out-of-range caller, is ever added. No-op for valid in-range indices
+  // (byte-identical for the shipping 160 config); at the top edge it clamps to the
+  // edge pixel, matching scale_to_strip's existing index_right guard.
+  if (index_left  < 0) index_left  = 0;
+  if (index_right < 0) index_right = 0;
+  if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
+  if (index_right > NATIVE_RESOLUTION - 1) index_right = NATIVE_RESOLUTION - 1;
+
   SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
   SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
 
@@ -294,7 +308,7 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   return out_col;
 }
 
-#ifdef SB_DROP_CUT_V1
+#ifdef K1_DROP_CUT_V1
 // ── DROP-CUT (2026-06-11, Captain-directed) ──────────────────────────────────
 // When a song deliberately cuts to silence (pre-drop gap, breakdown stop), the
 // plate must ACTUALLY go dark — trails included — and relight instantly when
@@ -317,7 +331,7 @@ inline void drop_cut_update() {
   static uint32_t last_ms = 0;
   static bool cutting = false;
 
-  const SBAudioSnapshot snap = sb_audio_snapshot_read();
+  const K1AudioSnapshot snap = k1_audio_snapshot_read();
   const uint32_t now = millis();
   float dt = (last_ms != 0) ? float(now - last_ms) * 0.001f : 0.01f;
   if (dt < 0.001f) dt = 0.001f;
@@ -360,7 +374,7 @@ inline void drop_cut_update() {
     if (drop_cut_scale > 1.0f) drop_cut_scale = 1.0f;
   }
 }
-#endif  // SB_DROP_CUT_V1
+#endif  // K1_DROP_CUT_V1
 
 inline void apply_brightness() {
   // This is only used to fade in when booting!
@@ -394,16 +408,16 @@ inline void apply_brightness() {
   // dimming must not alter the final-byte proof while the lab owns the frame.
   if (vpml_active) silent_scale = 1.0f;
 #endif
-#ifdef SB_DROP_CUT_V1
+#ifdef K1_DROP_CUT_V1
   drop_cut_update();
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale * SQ15x16(drop_cut_scale);
 #else
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale;
 #endif
-  // Effects-queue DIP transition scalar (control/sb_effect_queue.cpp): COMPOSES
+  // Effects-queue DIP transition scalar (control/k1_effect_queue.cpp): COMPOSES
   // with drop_cut_scale by multiplication at the same application point — never
   // replaces or reorders the existing brightness factors. 1.0 when idle.
-  brightness *= SQ15x16(sb_queue_transition_scale_primary);
+  brightness *= SQ15x16(k1_queue_transition_scale_primary);
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Brightness components - MASTER_BRIGHTNESS: ");
@@ -1133,7 +1147,7 @@ inline void init_leds() {
   leds_started = true;
 
   USBSerial.print("INIT_LEDS: ");
-  USBSerial.println(leds_started == true ? SB_PASS : SB_FAIL);
+  USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
 }
 
 inline void blocking_flash(CRGB16 col) {
@@ -1194,6 +1208,15 @@ inline void unmirror() {
     int32_t index_left = index_whole + 0;
     int32_t index_right = index_whole + 1;
 
+    // Bounds guard (audit M1.3): same OOB class as lerp_led_16 (index_right could
+    // reach NATIVE_RESOLUTION on a NATIVE_RESOLUTION-sized buffer). unmirror() has
+    // no live callers today, so this is dead-code hardening for class completeness;
+    // no-op for valid in-range indices.
+    if (index_left  < 0) index_left  = 0;
+    if (index_right < 0) index_right = 0;
+    if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
+    if (index_right > NATIVE_RESOLUTION - 1) index_right = NATIVE_RESOLUTION - 1;
+
     SQ15x16 mix_left = SQ15x16(1.0) - index_fract;
     SQ15x16 mix_right = SQ15x16(1.0) - mix_left;
 
@@ -1209,12 +1232,21 @@ inline void unmirror() {
 }
 
 inline void shift_leds_up(CRGB16* led_array, uint16_t offset) {
+  // Underflow guard (audit M1.3): offset > NATIVE_RESOLUTION makes the unsigned
+  // (NATIVE_RESOLUTION - offset) wrap to a huge size -> catastrophic OOB memcpy,
+  // and led_array + offset / memset(offset) overrun the buffer. Clamp to a
+  // full-buffer scroll (everything shifted off -> all black). No-op for today's
+  // bounded callers (offset <= NATIVE_RESOLUTION/2).
+  if (offset > NATIVE_RESOLUTION) offset = NATIVE_RESOLUTION;
   memcpy(leds_16_temp, led_array, sizeof(CRGB16) * NATIVE_RESOLUTION);
   memcpy(led_array + offset, leds_16_temp, (NATIVE_RESOLUTION - offset) * sizeof(CRGB16));
   memset(led_array, 0, offset * sizeof(CRGB16));
 }
 
 inline void shift_leds_down(CRGB* led_array, uint16_t offset) {
+  // Underflow guard (audit M1.3): mirror of shift_leds_up — an offset past the
+  // buffer would wrap (NATIVE_RESOLUTION - offset) and OOB-memcpy/memset.
+  if (offset > NATIVE_RESOLUTION) offset = NATIVE_RESOLUTION;
   memcpy(led_array, led_array + offset, (NATIVE_RESOLUTION - offset) * sizeof(CRGB));
   memset(led_array + (NATIVE_RESOLUTION - offset), 0, offset * sizeof(CRGB));
 }
@@ -2193,7 +2225,7 @@ inline void init_secondary_leds() {
   }
   
   USBSerial.print("INIT_SECONDARY_LEDS: ");
-  USBSerial.println(SB_PASS);
+  USBSerial.println(K1_PASS);
 }
 
 inline void scale_to_secondary_strip() {
@@ -2218,15 +2250,15 @@ inline void apply_brightness_secondary() {
   float photons_curve_s = sqrtf(SECONDARY_PHOTONS);                // sqrt (perceptual)
 #endif
   float bright_val = photons_curve_s * silent_scale;
-#ifdef SB_DROP_CUT_V1
+#ifdef K1_DROP_CUT_V1
   // Same musical-cut scaler as the primary channel (updated once per frame
   // in apply_brightness; primary always renders first in show_leds()).
   bright_val *= drop_cut_scale;
 #endif
-  // Effects-queue DIP transition scalar (control/sb_effect_queue.cpp): the
+  // Effects-queue DIP transition scalar (control/k1_effect_queue.cpp): the
   // SECONDARY channel's independent dip, composed by multiplication at the
   // same application point as drop_cut_scale. 1.0 when idle.
-  bright_val *= sb_queue_transition_scale_secondary;
+  bright_val *= k1_queue_transition_scale_secondary;
 
   if (debug_mode && (millis() % 5000 == 0)) {
     USBSerial.print("DEBUG: Secondary brightness curve = f(PHOTONS=");

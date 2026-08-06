@@ -117,7 +117,7 @@ static inline uint8_t dominantNoteFromChroma(const K1AudioContext& audio) {
 /// Uses Schmitt-trigger hysteresis on chord confidence to avoid jitter.
 ///
 /// Proxy note: v3 calls `ctx.audio.chordConfidence()` which is mapped directly
-/// to K1AudioContext::chordConfidence() (SBChordState::confidence, SB_CHORD_V2).
+/// to K1AudioContext::chordConfidence() (K1ChordState::confidence, K1_CHORD_V2).
 /// When chord confidence is below the gate, falls back to circular chroma centroid.
 static inline uint8_t selectMusicalHue(const K1AudioContext& audio, bool& chordGateOpen) {
     if (!audio.available()) return 24;  // warm amber fallback on silence

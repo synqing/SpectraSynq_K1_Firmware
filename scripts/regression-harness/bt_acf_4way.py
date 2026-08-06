@@ -13,14 +13,14 @@ It scores FOUR winner-selection signals on the SAME firmware-faithful per-emit p
 firmware lag band; per-bin parabolic ACF salience; 96-bin integer argmax + hysteresis):
 
   (a) step2  = quartic-Goertzel de-sharpened (^0.25) magnitude  * prior   [PRE-ACF Step-2]
-  (b) acf    = ACF-salience                                     * prior   [THE COMMIT — sb_sel_score]
+  (b) acf    = ACF-salience                                     * prior   [THE COMMIT — k1_sel_score]
   (c) acf_only = ACF-salience ALONE (no prior)
   (d) prior_only = prior ALONE (selection signal = the constant tactus prior)
 
 Plus a faithfulness audit: the replica's per-track detected BPM for signal (b) is
 compared to the ACTUAL compiled firmware's per-track BPM (read from
 docs/measurements/tempo-octave-baseline.tracks.csv, produced by tempo_accuracy.py
-running the real sb_tempo.cpp). If they diverge, V-GAP's replica is unfaithful and its
+running the real k1_tempo.cpp). If they diverge, V-GAP's replica is unfaithful and its
 40.6% reproduction is coincidental aggregate agreement, not per-track fidelity.
 
 It ALSO independently measures the ACF-salience std and max/mean spread per track, over
@@ -47,26 +47,26 @@ import tempo_accuracy as ta         # noqa: E402
 ROOT = _HERE.parents[1]
 FW_CSV = ROOT / "docs/measurements/tempo-octave-baseline.tracks.csv"
 
-# --- firmware constants (sb_tempo.cpp, verbatim) -----------------------------
-SB_NUM_TEMPI = 96
-SB_TEMPO_LOW = 60.0
-SB_HISTORY_LENGTH = 512
-SB_NOVELTY_DECAY = 0.999
-SB_NOVELTY_DECIMATION = 3
-SB_AP_FRAME_HZ = 12800.0 / 96.0                          # 133.333
-SB_NOVELTY_RATE_HZ = SB_AP_FRAME_HZ / SB_NOVELTY_DECIMATION  # 44.444
-SB_TACTUS_BPM = 120.0
-SB_TACTUS_SIGMA = 0.9
+# --- firmware constants (k1_tempo.cpp, verbatim) -----------------------------
+K1_NUM_TEMPI = 96
+K1_TEMPO_LOW = 60.0
+K1_HISTORY_LENGTH = 512
+K1_NOVELTY_DECAY = 0.999
+K1_NOVELTY_DECIMATION = 3
+K1_AP_FRAME_HZ = 12800.0 / 96.0                          # 133.333
+K1_NOVELTY_RATE_HZ = K1_AP_FRAME_HZ / K1_NOVELTY_DECIMATION  # 44.444
+K1_TACTUS_BPM = 120.0
+K1_TACTUS_SIGMA = 0.9
 HYST_RATIO = 1.1
 HYST_FRAMES = 5
 
-BIN_BPM = SB_TEMPO_LOW + np.arange(SB_NUM_TEMPI, dtype=np.float64)   # 60..155
-_L2 = np.log2(BIN_BPM / SB_TACTUS_BPM) / SB_TACTUS_SIGMA
-TEMPO_PRIOR = np.exp(-0.5 * _L2 * _L2)                               # sb_tempo_prior[]
+BIN_BPM = K1_TEMPO_LOW + np.arange(K1_NUM_TEMPI, dtype=np.float64)   # 60..155
+_L2 = np.log2(BIN_BPM / K1_TACTUS_BPM) / K1_TACTUS_SIGMA
+TEMPO_PRIOR = np.exp(-0.5 * _L2 * _L2)                               # k1_tempo_prior[]
 
 
 def decimate_peak_hold(nov):
-    """sb_tempo.cpp /3 peak-hold to the firmware-native 44.44 Hz emit rate (cpp:520-530)."""
+    """k1_tempo.cpp /3 peak-hold to the firmware-native 44.44 Hz emit rate (cpp:520-530)."""
     out, primed, accum, ctr = [], False, 0.0, 0
     for v in nov:
         if not primed:
@@ -75,7 +75,7 @@ def decimate_peak_hold(nov):
         if v > accum:
             accum = float(v)
         ctr += 1
-        if ctr < SB_NOVELTY_DECIMATION:
+        if ctr < K1_NOVELTY_DECIMATION:
             continue
         ctr = 0
         out.append(accum)
@@ -84,14 +84,14 @@ def decimate_peak_hold(nov):
 
 
 def update_scale(ring, prev_scale, tau=0.3):
-    """sb_update_scale (cpp:157-165)."""
+    """k1_update_scale (cpp:157-165)."""
     mx = max(ring.max(), 1e-10)
     target = 1.0 / (mx * 0.5)
     return prev_scale * (1.0 - tau) + target * tau
 
 
 def acf_salience(lin, scale, fps):
-    """Replicate sb_compute_acf_salience EXACTLY (cpp:230-279) over an oldest->newest ring.
+    """Replicate k1_compute_acf_salience EXACTLY (cpp:230-279) over an oldest->newest ring.
 
     Returns (sal[96], valid, ac, lag_min, nlag)."""
     x = lin * scale
@@ -105,9 +105,9 @@ def acf_salience(lin, scale, fps):
         lag = lag_min + li
         if lag < n:
             ac[li] = float(np.dot(x[lag:], x[:n - lag]))      # biased ACF, no /N (cpp:250)
-    sal = np.zeros(SB_NUM_TEMPI)
+    sal = np.zeros(K1_NUM_TEMPI)
     smax = 1e-12
-    for i in range(SB_NUM_TEMPI):
+    for i in range(K1_NUM_TEMPI):
         lag_real = fps * 60.0 / BIN_BPM[i]
         L0 = int(np.floor(lag_real))
         frac = lag_real - L0
@@ -128,17 +128,17 @@ def acf_salience(lin, scale, fps):
 
 
 # ---- firmware-faithful Goertzel-over-novelty bank (for signal (a) step2) -----
-# Mirrors sb_tempo_init coefficients + sb_compute_magnitude + the quartic + 0.975 smooth.
+# Mirrors k1_tempo_init coefficients + k1_compute_magnitude + the quartic + 0.975 smooth.
 def _bank_init(fps):
     bank = []
-    for i in range(SB_NUM_TEMPI):
+    for i in range(K1_NUM_TEMPI):
         bpm = BIN_BPM[i]
         hz = bpm / 60.0
-        left_hz = (SB_TEMPO_LOW + (0 if i == 0 else i - 1)) / 60.0
-        right_hz = (SB_TEMPO_LOW + (SB_NUM_TEMPI - 1 if i == SB_NUM_TEMPI - 1 else i + 1)) / 60.0
+        left_hz = (K1_TEMPO_LOW + (0 if i == 0 else i - 1)) / 60.0
+        right_hz = (K1_TEMPO_LOW + (K1_NUM_TEMPI - 1 if i == K1_NUM_TEMPI - 1 else i + 1)) / 60.0
         max_dist = max(abs(left_hz - hz), abs(right_hz - hz), 1e-6)
         block = int(fps / (max_dist * 0.5))
-        block = min(max(block, 32), SB_HISTORY_LENGTH)
+        block = min(max(block, 32), K1_HISTORY_LENGTH)
         w = (2.0 * np.pi * hz) / fps
         bank.append({"coeff": 2.0 * np.cos(w), "sine": np.sin(w),
                      "cosine": np.cos(w), "block": block})
@@ -146,7 +146,7 @@ def _bank_init(fps):
 
 
 def _goertzel_mag(ring_lin_newest_last, scale, b):
-    """sb_compute_magnitude (cpp:191-224) over the last `block` newest samples (4.0 clamp)."""
+    """k1_compute_magnitude (cpp:191-224) over the last `block` newest samples (4.0 clamp)."""
     block = min(b["block"], ring_lin_newest_last.size)
     seg = ring_lin_newest_last[-block:]
     q1 = q2 = 0.0
@@ -161,7 +161,7 @@ def _goertzel_mag(ring_lin_newest_last, scale, b):
     return np.sqrt(mag_sq) / (block * 0.5)
 
 
-def run_track(nov, signal, fps=SB_NOVELTY_RATE_HZ, decay=SB_NOVELTY_DECAY):
+def run_track(nov, signal, fps=K1_NOVELTY_RATE_HZ, decay=K1_NOVELTY_DECAY):
     """Drive the firmware-faithful winner pipeline over one track for a given selection signal.
 
     signal: 'step2'     -> de-sharpened(^0.25) quartic-Goertzel-smooth * prior  (PRE-ACF)
@@ -175,13 +175,13 @@ def run_track(nov, signal, fps=SB_NOVELTY_RATE_HZ, decay=SB_NOVELTY_DECAY):
     if emit.size < 8:
         return None, []
     bank = _bank_init(fps) if signal == "step2" else None
-    smooth = np.zeros(SB_NUM_TEMPI)
+    smooth = np.zeros(K1_NUM_TEMPI)
 
-    ring = np.zeros(SB_HISTORY_LENGTH)
+    ring = np.zeros(K1_HISTORY_LENGTH)
     idx = 0
     scale = 1.0
     scale_ctr = 0
-    winner = SB_NUM_TEMPI // 2
+    winner = K1_NUM_TEMPI // 2
     cand = winner
     cand_frames = 0
     per_emit_bpm = []
@@ -190,7 +190,7 @@ def run_track(nov, signal, fps=SB_NOVELTY_RATE_HZ, decay=SB_NOVELTY_DECAY):
     for s in emit:
         ring *= decay
         ring[idx] = s
-        idx = (idx + 1) % SB_HISTORY_LENGTH
+        idx = (idx + 1) % K1_HISTORY_LENGTH
         scale_ctr += 1
         if scale_ctr >= 3:
             scale = update_scale(ring, scale, 0.3)
@@ -203,13 +203,13 @@ def run_track(nov, signal, fps=SB_NOVELTY_RATE_HZ, decay=SB_NOVELTY_DECAY):
             score = TEMPO_PRIOR.copy()
             valid = True
         elif signal == "step2":
-            raw = np.array([_goertzel_mag(lin, scale, bank[i]) for i in range(SB_NUM_TEMPI)])
+            raw = np.array([_goertzel_mag(lin, scale, bank[i]) for i in range(K1_NUM_TEMPI)])
             mx = max(raw.max(), 0.01)
             mag = (raw / mx) ** 4                          # quartic exaggeration (cpp:352-353)
             upd = mag > 0.005
             smooth[upd] = smooth[upd] * 0.975 + mag[upd] * 0.025
             smooth[~upd] *= 0.995
-            desharp = np.power(np.maximum(smooth, 0.0), 0.25)   # sb_sel_score warm-up branch ^0.25
+            desharp = np.power(np.maximum(smooth, 0.0), 0.25)   # k1_sel_score warm-up branch ^0.25
             score = desharp * TEMPO_PRIOR
             valid = True
         else:  # 'acf' or 'acf_only'
@@ -248,7 +248,7 @@ def run_track(nov, signal, fps=SB_NOVELTY_RATE_HZ, decay=SB_NOVELTY_DECAY):
 
 
 def load_fw_pertrack():
-    """Real-firmware per-track detected BPM from the compiled sb_tempo run (faithfulness oracle)."""
+    """Real-firmware per-track detected BPM from the compiled k1_tempo run (faithfulness oracle)."""
     out = {}
     if not FW_CSV.exists():
         return out

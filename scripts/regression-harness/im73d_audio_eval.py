@@ -33,6 +33,26 @@ from typing import Any
 import serial
 from serial.tools import list_ports
 
+# Distinct-track music planner (Captain SAME_TRACK_RELOOP_BANNED).
+_CONTROL_SCRIPTS = Path(
+    "/Users/spectrasynq/Workspace_Management/Software/probe-loop-control/scripts"
+)
+if str(_CONTROL_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_CONTROL_SCRIPTS))
+try:
+    from im73d_music_trial_plan import (  # type: ignore
+        DEFAULT_PLAYLIST,
+        plan_from_args,
+        track_key,
+    )
+except ImportError as exc:  # pragma: no cover - fail closed at music plan time
+    DEFAULT_PLAYLIST = None  # type: ignore[assignment]
+    plan_from_args = None  # type: ignore[assignment]
+    track_key = None  # type: ignore[assignment]
+    _PLANNER_IMPORT_ERROR = exc
+else:
+    _PLANNER_IMPORT_ERROR = None
+
 
 BENCH_MAC = "B4:3A:45:A5:89:B4"
 MAIN_MAC = "B4:3A:45:A5:87:F8"
@@ -438,7 +458,8 @@ def prepare_stimulus(track: Path, out_dir: Path, duration: float, start_offset: 
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         raise SystemExit("--start-offset requires ffmpeg, but ffmpeg is not installed")
-    output = out_dir / f"stimulus_{int(start_offset)}s_{int(duration)}s.wav"
+    # Include source stem so multi-trial sessions never share one clipped path.
+    output = out_dir / f"stimulus_{track.stem}_{int(start_offset)}s_{int(duration)}s.wav"
     subprocess.run(
         [
             ffmpeg,
@@ -483,6 +504,7 @@ def capture_device(
 
 
 def play_track(stimulus: Path, duration: float) -> None:
+    """Play stimulus once (duration cap). Caller must never re-afplay the same path."""
     proc = subprocess.Popen(
         ["afplay", "-t", f"{duration:.3f}", str(stimulus)],
         stdout=subprocess.DEVNULL,
@@ -515,6 +537,13 @@ def run_capture(
 ) -> dict[str, Any]:
     set_output_volume(volume)
     time.sleep(settle)
+
+    # Drain stale bytes so a wedged peer buffer cannot starve the capture window.
+    for stream in streams.values():
+        try:
+            stream.reset_input_buffer()
+        except Exception:
+            pass
 
     stop_at = time.time() + duration
     start_event = threading.Event()
@@ -954,7 +983,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="role to read from the RIGHT summary (cross-mic A/B, e.g. bench_im69d); "
         "defaults to --compare-role",
     )
-    parser.add_argument("--track", type=Path, help="local audio track to play")
+    parser.add_argument(
+        "--track",
+        type=Path,
+        help="optional first track; for multi-trial music prefer --playlist",
+    )
+    parser.add_argument(
+        "--playlist",
+        type=Path,
+        default=None,
+        help="file of distinct WAV paths (≥ volumes×repeats); required for music multi-trial",
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("_scratch/im73d_audio_eval"))
     parser.add_argument("--label", default="dsr8")
     parser.add_argument("--duration", type=float, default=30.0)
@@ -1012,10 +1051,30 @@ def main(argv: list[str]) -> int:
 
     selected_specs = select_device_specs(args.roles)
     volumes, no_speaker_playback = resolve_capture_mode(args)
-    if volumes and args.track is None:
-        raise SystemExit("--track is required when --volumes is non-empty")
-    if not no_speaker_playback and args.track is not None and not args.track.exists():
-        raise SystemExit(f"track does not exist: {args.track}")
+
+    music_trials: list[Any] = []
+    if volumes and not no_speaker_playback:
+        if plan_from_args is None:
+            raise SystemExit(
+                "ABORT: im73d_music_trial_plan import failed — refuse music eval: "
+                f"{_PLANNER_IMPORT_ERROR}"
+            )
+        playlist = args.playlist
+        if playlist is None and DEFAULT_PLAYLIST is not None and DEFAULT_PLAYLIST.exists():
+            playlist = DEFAULT_PLAYLIST
+        music_trials = plan_from_args(
+            volumes=volumes,
+            repeats=args.repeats,
+            playlist=playlist,
+            track=args.track,
+        )
+        assert track_key is not None
+        played_keys: list[str] = []
+        for trial in music_trials:
+            key = track_key(trial.track)
+            if key in played_keys:
+                raise SystemExit(f"ABORT: refused same-track re-afplay: {trial.track}")
+            played_keys.append(key)
 
     timestamp = time.strftime("%Y%m%dT%H%M%S")
     out_dir = args.output_dir / f"{timestamp}_{args.label}"
@@ -1028,6 +1087,19 @@ def main(argv: list[str]) -> int:
         "label": args.label,
         "cwd": os.getcwd(),
         "track": str(args.track) if args.track is not None else None,
+        "playlist": str(args.playlist) if args.playlist is not None else (
+            str(DEFAULT_PLAYLIST) if volumes and DEFAULT_PLAYLIST is not None else None
+        ),
+        "music_trials": [
+            {
+                "volume": t.volume,
+                "repeat": t.repeat,
+                "track": str(t.track),
+                "name": t.track.name,
+            }
+            for t in music_trials
+        ],
+        "no_same_track_reloop": True,
         "duration_sec": args.duration,
         "start_offset_sec": args.start_offset,
         "volumes": volumes,
@@ -1056,11 +1128,7 @@ def main(argv: list[str]) -> int:
                 if not ready:
                     raise SystemExit(f"RUNTIME GATE: {spec.role} produced no [AP]/runtime line after open")
 
-        stimulus = None
-        if args.track is not None and not no_speaker_playback:
-            stimulus = prepare_stimulus(args.track, out_dir, args.duration, args.start_offset)
-            report["stimulus"] = str(stimulus)
-        elif no_speaker_playback:
+        if no_speaker_playback:
             report["stimulus"] = None
 
         original_volume = get_output_volume()
@@ -1083,23 +1151,46 @@ def main(argv: list[str]) -> int:
                     )
                 )
 
-        for volume in volumes:
-            for repeat in range(1, args.repeats + 1):
-                print(f"capture music repeat {repeat}/{args.repeats} volume={volume}", flush=True)
-                runs.append(
-                    run_capture(
-                        label="music",
-                        volume=volume,
-                        repeat_index=repeat,
-                        duration=args.duration,
-                        settle=args.settle,
-                        stimulus=stimulus,
-                        ports=ports,
-                        streams=streams,
-                        out_dir=out_dir,
-                        specs=selected_specs,
-                    )
+        played_afplay: set[str] = set()
+        for trial in music_trials:
+            assert track_key is not None
+            key = track_key(trial.track)
+            if key in played_afplay:
+                raise SystemExit(f"ABORT: refused same-track re-afplay mid-session: {trial.track}")
+            stimulus = prepare_stimulus(
+                trial.track, out_dir, args.duration, args.start_offset
+            )
+            # If prepare_stimulus returns the same path (offset=0), still mark played.
+            stim_key = track_key(stimulus)
+            if stim_key in played_afplay or key in played_afplay:
+                raise SystemExit(f"ABORT: refused same-track re-afplay: {stimulus}")
+            print(
+                f"capture music vol={trial.volume} r={trial.repeat} "
+                f"track={trial.track.name} (once)",
+                flush=True,
+            )
+            runs.append(
+                run_capture(
+                    label="music",
+                    volume=trial.volume,
+                    repeat_index=trial.repeat,
+                    duration=args.duration,
+                    settle=args.settle,
+                    stimulus=stimulus,
+                    ports=ports,
+                    streams=streams,
+                    out_dir=out_dir,
+                    specs=selected_specs,
                 )
+            )
+            runs[-1]["source_track"] = str(trial.track)
+            runs[-1]["source_track_name"] = trial.track.name
+            played_afplay.add(key)
+            played_afplay.add(stim_key)
+            # Gap so input_trim / mic_auto can recover before next distinct track.
+            time.sleep(8.0)
+            set_output_volume(0)
+            time.sleep(2.0)
     finally:
         for stream in locals().get("streams", {}).values():
             stream.close()

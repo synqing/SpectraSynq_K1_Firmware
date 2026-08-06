@@ -1513,9 +1513,21 @@ def test_f2_case_status_preserves_observed_failures():
 
 
 def test_f2_firmware_sha_is_separate_ancestor_of_harness_head():
+    """Firmware SHA must be a strict ancestor of harness HEAD (distinct).
+
+    CI host-regression uses checkout fetch-depth: 2 so HEAD^ resolves.
+    On a depth-1 shallow clone (or missing parent), skip rather than fail —
+    the invariant still runs whenever history is deep enough.
+    """
     repo_root = Path(__file__).resolve().parents[1]
     host_sha = f2_capture._git_head(repo_root)
-    parent_sha = f2_capture._resolve_commit(repo_root, f"{host_sha}^")
+    try:
+        parent_sha = f2_capture._resolve_commit(repo_root, f"{host_sha}^")
+    except f2_capture.F2ContractError as error:
+        pytest.skip(
+            "parent of HEAD unavailable (shallow clone?): "
+            f"{error}"
+        )
     f2_capture._require_ancestor(repo_root, parent_sha, host_sha)
 
 

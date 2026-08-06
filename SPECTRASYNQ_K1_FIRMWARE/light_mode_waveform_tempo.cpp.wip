@@ -2,7 +2,7 @@
 // light_mode_waveform_tempo.cpp — Beat/Tempo-Phase-Locked Motion (reference impl)
 // ----------------------------------------------------------------------------
 // RENAMED from motion-tempo-scroll.cpp: the hyphenated name matched NEITHER
-// build_src_filter pattern (+<light_mode_*.cpp> +<sb_*.cpp>) and would have been
+// build_src_filter pattern (+<light_mode_*.cpp> +<k1_*.cpp>) and would have been
 // silently not built. This name matches +<light_mode_*.cpp> and the convention
 // the New-Light-Mode gate requires. DELETE motion-tempo-scroll.cpp.
 //
@@ -10,7 +10,7 @@
 // shipping mode (whitelisted, Smart-Auto-selectable) → the full New-Light-Mode
 // change-gate applies: append-only enum, VP-probe determinism, primary/secondary
 // bleed test, secondary-enabled perf check. See AGENT-HANDOFF-tempo-phase-lock.md
-// and invoke /sensorybridge-doctrine before this touches k1_hardware.
+// and invoke /K1-doctrine before this touches k1_hardware.
 //
 // THE DESIGN LAW [MEASURED] (docs/measurements/apparent-motion-on-k1.md):
 //   Lock modulates CONTINUOUS per-frame scroll VELOCITY, stepping every frame.
@@ -19,13 +19,13 @@
 //   velocity SURGE, not from scroll speed.
 //
 // FACTS from source [FACT]:
-//   - SBTempoEvent (sb_tempo.h): bpm; phase01∈[0,1), 0==beat; confidence∈[0,1]
+//   - K1TempoEvent (k1_tempo.h): bpm; phase01∈[0,1), 0==beat; confidence∈[0,1]
 //     (already silence-scaled); locked = conf>0.30 && !silence; beat_tick;
 //     beat_strength.  Lock range 60–156 BPM (out-of-range aliases half/double — ok).
 //   - phase01 publishes at 50 Hz; read per render frame → quantises VELOCITY (fine;
 //     does NOT touch the POSITION fusion floor).
-//   - [FACT] sb_tempo is UNWIRED: the only callers of sb_tempo_update/read in the
-//     tree are in this file. Until sb_tempo_update(sb_audio_snapshot_read()) is
+//   - [FACT] k1_tempo is UNWIRED: the only callers of k1_tempo_update/read in the
+//     tree are in this file. Until k1_tempo_update(k1_audio_snapshot_read()) is
 //     called in the Core-0 audio loop, this mode reads a never-updated event →
 //     confidence≈0 → idle scroll → nothing tempo-locked. WIRING IT IS THE ACTUAL
 //     WORK AND THE ACTUAL RISK (AP-class, cross-core). Do that first (handoff Step 0).
@@ -44,12 +44,12 @@
 // ============================================================================
 
 #include "lightshow_modes.h"
-#include "sb_tempo.h"
-#include "sb_audio_snapshot.h"
+#include "k1_tempo.h"
+#include "k1_audio_snapshot.h"
 #include <math.h>
 
-static const float SB_TWO_PI_F   = 6.28318530718f;
-static const float TEMPO_CONF_LO = 0.30f;   // == SB_LOCK_CONFIDENCE (sb_tempo.cpp)
+static const float K1_TWO_PI_F   = 6.28318530718f;
+static const float TEMPO_CONF_LO = 0.30f;   // == K1_LOCK_CONFIDENCE (k1_tempo.cpp)
 static const float TEMPO_CONF_HI = 0.60f;
 static const float TEMPO_LEAD    = 0.0f;    // beat anticipation (0..~0.15); 0 = surge ON the beat
 
@@ -65,8 +65,8 @@ static inline float t_smoothstep(float lo, float hi, float x) {
 // continuous, tempo-locked, phase-shaped VELOCITY. Feature-agnostic; any MAPPING
 // draws after. This is the new owned engine; the mode below is one demo of it.
 //
-// NOTE on VP-probe determinism: this reads millis() + live sb_tempo state. Under
-// the VP bit-hash probe (which halts led_thread but NOT Core-0/sb_tempo) two runs
+// NOTE on VP-probe determinism: this reads millis() + live k1_tempo state. Under
+// the VP bit-hash probe (which halts led_thread but NOT Core-0/k1_tempo) two runs
 // can differ → non-reproducible hash → gate failure (cf. Quantum Collapse). MUST
 // be resolved before Tier-A: either mark this mode nondeterministic in the probe,
 // or have the probe snapshot/freeze tempo+time. See the handoff.
@@ -76,14 +76,14 @@ void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParams* rp) 
   last_ms = now;
   if (dt < 0.001f) dt = 0.001f; else if (dt > 0.050f) dt = 0.050f;
 
-  SBTempoEvent    t = sb_tempo_read();
-  SBAudioSnapshot a = sb_audio_snapshot_read();
+  K1TempoEvent    t = k1_tempo_read();
+  K1AudioSnapshot a = k1_audio_snapshot_read();
 
   float base_px_s = rp->TEMPO_PX_PER_BEAT * (t.bpm / 60.0f);     // [FACT bpm ∈ 60..156]
 
   // Mean-preserving intra-beat velocity envelope — surge at beat (phase01==0).
   float ph  = t.phase01 - TEMPO_LEAD;
-  float env = 1.0f + rp->TEMPO_DEPTH * cosf(SB_TWO_PI_F * ph);
+  float env = 1.0f + rp->TEMPO_DEPTH * cosf(K1_TWO_PI_F * ph);
   if (env < 0.0f) env = 0.0f;                                    // never scroll backward
   float tempo_px_s = base_px_s * env;
 

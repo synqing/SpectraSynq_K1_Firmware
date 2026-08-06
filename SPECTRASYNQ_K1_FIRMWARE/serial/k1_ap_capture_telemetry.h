@@ -21,8 +21,8 @@
 
 #include "globals.h"                // USBSerial, CONFIG
 #include "constants.h"
-#include "sb_i2s_capture_types.h"   // SBAudioI2SReadDebug + SB_I2S_* (guarded; used by APCadenceFrameInput / ap_cad_make_sample)
-#include "sb_tempo.h"               // SBTempoDebugSnapshot, sb_tempo_debug_read()
+#include "k1_i2s_capture_types.h"   // K1AudioI2SReadDebug + K1_I2S_* (guarded; used by APCadenceFrameInput / ap_cad_make_sample)
+#include "k1_tempo.h"               // K1TempoDebugSnapshot, k1_tempo_debug_read()
 #include <stdint.h>
 #include <math.h>                   // isfinite
 
@@ -87,8 +87,8 @@ struct APCadenceFrameInput {
   uint8_t stage;
   int8_t ap_core_id;
   int8_t vp_core_id;
-  SBAudioI2SReadDebug i2s;
-  SBTempoDebugSnapshot tempo;
+  K1AudioI2SReadDebug i2s;
+  K1TempoDebugSnapshot tempo;
 };
 
 struct APCadenceCaptureSample {
@@ -134,7 +134,7 @@ struct APCadenceCaptureSample {
   uint8_t slot_bit_width;
   uint8_t slot_mode;
   uint8_t dma_desc_num;
-  uint8_t sb_frame_ctr;
+  uint8_t k1_frame_ctr;
   uint8_t tempo_decimation;
   uint8_t flags;
 };
@@ -190,7 +190,7 @@ void ap_nov_capture_print_q8_8(uint16_t value);
 void ap_nov_capture_status();
 void ap_nov_capture_clear();
 bool ap_nov_capture_arm(uint32_t duration_ms);
-void ap_nov_capture_tick(uint32_t t_now, const SBTempoDebugSnapshot& td);
+void ap_nov_capture_tick(uint32_t t_now, const K1TempoDebugSnapshot& td);
 void ap_nov_capture_dump();
 uint16_t ap_capture_u16_sat(uint32_t value);
 int16_t ap_capture_i16_sat(int32_t value);

@@ -58,7 +58,7 @@ void k1_audio_snapshot_update(uint32_t frame_ms) {
   next.spectral_energy = (low_sum + mid_sum + high_sum) / float(NUM_FREQS);
 
   const uint8_t nyquist_safe_bin_hi =
-      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+      k1_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
 
 #ifdef K1_ONSET_V2
   // Carry the per-note spectrum into the V2 onset detector. Same clamped values

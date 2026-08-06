@@ -10,10 +10,10 @@ SCRIPT = ROOT / "scripts" / "regression-harness" / "semantic_state_replay.py"
 
 class SemanticStateReplayTest(unittest.TestCase):
     def test_spine_packs_produced_fields(self):
-        # Compiles the REAL spine (audio/sb_semantic_state.cpp) against the REAL
-        # tempo + onset producers (sb_tempo.cpp, sb_onset_beat.cpp) and the REAL
-        # chord detector (sb_chord_detect.cpp via a snapshot read-stub), with ALL
-        # flags (SB_SEMANTIC_STATE / SB_ONSET_V2 / SB_CHORD_V2). Asserts:
+        # Compiles the REAL spine (audio/k1_semantic_state.cpp) against the REAL
+        # tempo + onset producers (k1_tempo.cpp, k1_onset_beat.cpp) and the REAL
+        # chord detector (k1_chord_detect.cpp via a snapshot read-stub), with ALL
+        # flags (K1_SEMANTIC_STATE / K1_ONSET_V2 / K1_CHORD_V2). Asserts:
         #   - audio_semantic_read() forwards tempo/onset/chord field-for-field,
         #   - the rate diagnostics equal the firmware derivation
         #     (12800/96 = 133.33 Hz AP, /3 = 44.44 Hz novelty, 7.5 ms frame).

@@ -19,10 +19,11 @@ ENV="$1"
 
 # Primary gate: exact-match allowlist. grep -w matches whole words only,
 # so any argument with appended flags/spaces is rejected here.
-# k1_sync_probe_{main,main_sync_only,bench} = dual-K1 sync Phase-0 probes.
-ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench"
+# k1_sync_probe_{main,main_sync_only,bench} = dual-K1 sync Phase-0 probes (historical).
+# k1_bench_im73d_ble = standing Captain "bench K1 firmware" (registry 2026-07-06).
+ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im73d_ble k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench"
 case "$ENV" in
-  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench)
+  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im73d_ble|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2

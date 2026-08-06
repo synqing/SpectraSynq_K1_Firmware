@@ -137,6 +137,15 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertTrue(ok, message)
         self.assertIn("B489A500", message)
 
+    def test_prod_im73d_blocked_rejects_bench_target(self):
+        # Blocked envs fail closed before MAC matching — bench port also rejected.
+        ok, message = self.guard.validate_upload_target(
+            "k1_prod_im73d", "/dev/tty.usbmodem12201", self.ports
+        )
+        self.assertFalse(ok, message)
+        self.assertIn("upload blocked", message)
+        self.assertIn("6/7", message)
+
     def test_unmapped_sync_probe_environment_fails_closed(self):
         ok, message = self.guard.validate_upload_target(
             "k1_sync_probe_typo", "/dev/tty.usbmodem1401", self.ports
@@ -152,7 +161,7 @@ class K1UploadGuardTest(unittest.TestCase):
         # compiles and wires the mic to the proven GPIOs.
         constants = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h").read_text()
         # Isolate ONLY the production pinmap branch (the #else of
-        # SB_K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
+        # K1_BENCH_REFERENCE_PINMAP) by its unique marker comment, bounded by
         # the shared I2C pins that close the GPIO block. This must NOT alias onto
         # the bench PDM block above (which defines identical pins) — else deleting
         # the production block would still pass (adversarial-review defect, fixed).
@@ -174,8 +183,8 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_bench_im73d", "/dev/tty.usbmodem1401"),  # PDM eval must reject the main K1 port
             ("k1_bench_im73d_mic_auto_telemetry", "/dev/tty.usbmodem1401"),  # mic auto-sense telemetry must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
-            # k1_prod_im73d is now upload-blocked outright (628f69b) — covered by
-            # test_prod_im73d_upload_is_blocked_on_every_port, not identity matching.
+            ("k1_bench_im69d", "/dev/tty.usbmodem1401"),  # IM69D eval must reject the main K1 port
+            # k1_prod_im73d is upload-blocked outright (628f69b) — covered by blocked-env tests.
             ("k1_sync_probe_main", "/dev/tty.usbmodem12201"),  # sync LEADER must reject the bench port
             ("k1_sync_probe_main_sync_only", "/dev/tty.usbmodem12201"),  # Case A leader must reject bench
             ("k1_sync_probe_bench", "/dev/tty.usbmodem1401"),  # sync FOLLOWER must reject the main port

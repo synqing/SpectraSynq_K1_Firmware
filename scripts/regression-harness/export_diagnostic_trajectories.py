@@ -5,16 +5,16 @@ DISPLAY-PRODUCING, NOT DSP. This script runs the EXISTING host harness binaries
 (tempo_replay, onset_v2_replay) on the corpus and dumps their per-frame output
 verbatim into a single JSON per (track, run). It reimplements NO tempo / beat /
 onset / saliency / AP DSP — every numeric field is produced by the compiled,
-UNMODIFIED firmware C++ (sb_tempo.cpp / sb_onset_beat.cpp) replayed through the
+UNMODIFIED firmware C++ (k1_tempo.cpp / k1_onset_beat.cpp) replayed through the
 canonical harness modules:
 
   novelty_from_wav.wav_to_novelty   -> 'ms novelty silence' lines      (front-end)
   tempo_replay.build_binary/replay_stdin
-      run=baseline : no defines                 -> incumbent sb_tempo
-      run=final    : SB_TEMPO_CONF_V2 +
-                     SB_TEMPO_FLYWHEEL_V2        -> the graft confidence/lock/beat path
+      run=baseline : no defines                 -> incumbent k1_tempo
+      run=final    : K1_TEMPO_CONF_V2 +
+                     K1_TEMPO_FLYWHEEL_V2        -> the graft confidence/lock/beat path
       -> 'T <ms> <bpm> <conf> <locked> <phase01> <beat_tick>' + final 'RAWSPEC ...'
-  onset_v2_replay (FINAL only, SB_ONSET_V2)
+  onset_v2_replay (FINAL only, K1_ONSET_V2)
       -> per-frame transient/kick/snare/hihat events
 
 The two run flavours mirror exactly how baseline.json / final.json were produced
@@ -56,14 +56,14 @@ FIRMWARE = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 OUT_DIR = ROOT / "build" / "audio-semantic-metrics" / "trajectories"
 
 AP_FRAME_HZ = nfw.SAMPLE_RATE / nfw.HOP          # 133.333 Hz
-NOVELTY_RATE_HZ = AP_FRAME_HZ / 3.0              # sb_tempo internally /3-decimates the novelty
+NOVELTY_RATE_HZ = AP_FRAME_HZ / 3.0              # k1_tempo internally /3-decimates the novelty
 DEFAULT_GT = tac.DEFAULT_GT
 DEFAULT_CORPUS = tac.DEFAULT_CORPUS
 
 # run -> tempo defines (must match how baseline.json / final.json were produced)
 RUN_TEMPO_DEFINES = {
     "baseline": [],
-    "final": ["SB_TEMPO_CONF_V2", "SB_TEMPO_FLYWHEEL_V2"],
+    "final": ["K1_TEMPO_CONF_V2", "K1_TEMPO_FLYWHEEL_V2"],
 }
 # onset per-band channels only come from the V2 onset binary; only the final run gets them
 RUN_HAS_ONSET_CHANNELS = {"baseline": False, "final": True}
@@ -160,12 +160,12 @@ def parse_tempo_trajectory(stdout):
     }
     tempogram = None
     if rawspec is not None:
-        # sb_tempo raw Goertzel spectrum: 96 bins, bin i == (60 + i) BPM (TEMPO_LOW=60,
+        # k1_tempo raw Goertzel spectrum: 96 bins, bin i == (60 + i) BPM (TEMPO_LOW=60,
         # 96 integer bins). This is the device's own tempo periodicity surface (the
         # "ACF/comb" heatmap the notebook shows) — taken verbatim, no recompute.
         bpm_axis = [60.0 + i for i in range(len(rawspec))]
         tempogram = {"bpm_axis": bpm_axis, "magnitude": rawspec,
-                     "source": "sb_tempo RAWSPEC (final raw Goertzel-over-novelty spectrum, bin i = 60+i BPM)"}
+                     "source": "k1_tempo RAWSPEC (final raw Goertzel-over-novelty spectrum, bin i = 60+i BPM)"}
     return frames, tempogram
 
 
@@ -185,12 +185,12 @@ def extract_novelty_aligned(frame_ms_nov, nov, t_ms_traj):
 
 # --------------------------------------------------------------------------- onset channels (final only)
 def onset_channels_for(wav, frame_ms_nov):
-    """Run the REAL sb_onset_beat.cpp V2 binary on the per-note spectrogram of this WAV
+    """Run the REAL k1_onset_beat.cpp V2 binary on the per-note spectrogram of this WAV
     and return {transient_ms, kick_ms, snare_ms, hihat_ms} event-time lists. Uses
     onset_v2_replay's own spectrogram synth + V2 build + run — NO reimplementation."""
     tmp = tempfile.TemporaryDirectory()
     try:
-        binary = ov2.build_replay(["SB_ONSET_V2"], tmp.name)
+        binary = ov2.build_replay(["K1_ONSET_V2"], tmp.name)
         fm, spec, sil = ov2.wav_to_spectrogram(wav)
         events = ov2.run_replay(binary, fm, spec, sil)
     finally:
@@ -217,14 +217,14 @@ def export_one(track_id, run, wav, gt, binary, head, branch):
     onset_note = "baseline run: per-band onset channels are V2-only; left empty by design"
     if RUN_HAS_ONSET_CHANNELS[run]:
         onset_channels = onset_channels_for(wav, frame_ms_nov)
-        onset_note = ("final run: from sb_onset_beat.cpp compiled with SB_ONSET_V2, "
+        onset_note = ("final run: from k1_onset_beat.cpp compiled with K1_ONSET_V2, "
                       "driven by onset_v2_replay per-note spectrogram (real firmware C++)")
 
     g = gt.get(track_id, {})
     harness_cmd = (
         "novelty_from_wav.wav_to_novelty -> tempo_replay.build_binary("
         f"defines={RUN_TEMPO_DEFINES[run]}).replay_stdin"
-        + ("  ||  onset: onset_v2_replay.build_replay(['SB_ONSET_V2']).run_replay" if RUN_HAS_ONSET_CHANNELS[run] else "")
+        + ("  ||  onset: onset_v2_replay.build_replay(['K1_ONSET_V2']).run_replay" if RUN_HAS_ONSET_CHANNELS[run] else "")
     )
     out = {
         "track_id": track_id,
@@ -279,15 +279,15 @@ abstract: "Schema + provenance for build/audio-semantic-metrics/trajectories/<tr
 
 Produced by `scripts/regression-harness/export_diagnostic_trajectories.py`. These are
 DISPLAY artifacts: every numeric value is emitted verbatim by the compiled, UNMODIFIED
-firmware (`sb_tempo.cpp`, `sb_onset_beat.cpp`) replayed through the existing host harness.
+firmware (`k1_tempo.cpp`, `k1_onset_beat.cpp`) replayed through the existing host harness.
 The exporter reimplements no tempo/beat/onset/saliency DSP.
 
 ## Runs
 
 | `run` | tempo defines | onset channels | meaning |
 |---|---|---|---|
-| `baseline` | *(none)* | empty (V2-only) | incumbent sb_tempo (matches baseline.json) |
-| `final` | `SB_TEMPO_CONF_V2`, `SB_TEMPO_FLYWHEEL_V2` | from `SB_ONSET_V2` | the graft confidence/lock/flywheel + V2 onset path (matches final.json) |
+| `baseline` | *(none)* | empty (V2-only) | incumbent k1_tempo (matches baseline.json) |
+| `final` | `K1_TEMPO_CONF_V2`, `K1_TEMPO_FLYWHEEL_V2` | from `K1_ONSET_V2` | the graft confidence/lock/flywheel + V2 onset path (matches final.json) |
 
 ## Top-level fields
 
@@ -300,7 +300,7 @@ The exporter reimplements no tempo/beat/onset/saliency DSP.
 | `provenance.sample_rate_hz` | 12800 (`novelty_from_wav.SAMPLE_RATE`) |
 | `provenance.hop` | 96 (`SAMPLES_PER_CHUNK`) |
 | `provenance.ap_frame_hz` | 12800/96 = 133.333 Hz |
-| `provenance.novelty_rate_hz` | 133.333/3 = 44.44 Hz (sb_tempo's internal /3 decimation) |
+| `provenance.novelty_rate_hz` | 133.333/3 = 44.44 Hz (k1_tempo's internal /3 decimation) |
 | `provenance.corpus_path` | absolute WAV path |
 | `provenance.gt_source` | HarmonixSet dataset dir |
 | `provenance.harness_cmd` | the exact harness call chain |
@@ -311,21 +311,21 @@ The exporter reimplements no tempo/beat/onset/saliency DSP.
 | field | producer / column |
 |---|---|
 | `t_ms` | `tempo_replay --replay-stdin` → `T <ms> ...` col 1 (ms, ~7.5 ms apart) |
-| `novelty` | `novelty_from_wav.wav_to_novelty` (spectral-flux onset @ 133.33 Hz) — the front-end fed to sb_tempo, aligned 1:1 to the trajectory |
-| `bpm` | `T` col 2 — sb_tempo detected BPM |
-| `conf` | `T` col 3 — sb_tempo confidence (incumbent or CONF_V2 metric per run) |
-| `locked` | `T` col 4 — sb_tempo lock state (0/1) |
+| `novelty` | `novelty_from_wav.wav_to_novelty` (spectral-flux onset @ 133.33 Hz) — the front-end fed to k1_tempo, aligned 1:1 to the trajectory |
+| `bpm` | `T` col 2 — k1_tempo detected BPM |
+| `conf` | `T` col 3 — k1_tempo confidence (incumbent or CONF_V2 metric per run) |
+| `locked` | `T` col 4 — k1_tempo lock state (0/1) |
 | `beat_tick_raw` | `T` col 6 — raw emitted beat_tick (carries the known 133 Hz stale-republish) |
 | `beat_tick_dedup` | DISPLAY-derived leading-edge collapse of `beat_tick_raw` (the harness's own dedup view, `tempo_replay.fw_train`); NOT a DSP change |
-| `phase01` | `T` col 5 — sb_tempo beat-phase in [0,1] (carried for completeness) |
+| `phase01` | `T` col 5 — k1_tempo beat-phase in [0,1] (carried for completeness) |
 
 ## `onset_channels.*` — event-time lists (ms), `final` run only
 
 `transient_ms`, `kick_ms`, `snare_ms`, `hihat_ms`: frames where the V2
-`sb_onset_beat.cpp` fired that channel, via `onset_v2_replay.build_replay(['SB_ONSET_V2'])`
+`k1_onset_beat.cpp` fired that channel, via `onset_v2_replay.build_replay(['K1_ONSET_V2'])`
 on the per-note spectrogram of this WAV. Empty `[]` for the `baseline` run (these channels
-do not exist without `SB_ONSET_V2`) — see `onset_channels_note`. Beat / downbeat are
-sb_tempo-owned (see `frames.beat_tick_*`); downbeat is not available from any harness.
+do not exist without `K1_ONSET_V2`) — see `onset_channels_note`. Beat / downbeat are
+k1_tempo-owned (see `frames.beat_tick_*`); downbeat is not available from any harness.
 
 ## `chord_events` — always `[]`
 
@@ -336,7 +336,7 @@ reimplementation (forbidden). Harmonic/chord state for the notebook comes from
 
 ## `tempogram` — `{bpm_axis[], magnitude[], source}` or `null`
 
-From the `RAWSPEC` line of the tempo replay: sb_tempo's final raw Goertzel-over-novelty
+From the `RAWSPEC` line of the tempo replay: k1_tempo's final raw Goertzel-over-novelty
 spectrum, 96 bins, bin *i* = (60 + *i*) BPM. The device's own tempo-periodicity surface
 (the notebook's "ACF/comb heatmap"), verbatim — not recomputed. `null` if the binary
 emitted no RAWSPEC.

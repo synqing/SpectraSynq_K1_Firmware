@@ -1,8 +1,8 @@
 /*----------------------------------------
-  Sensory Bridge I2S FUNCTIONS
+  K1 I2S FUNCTIONS
   ----------------------------------------*/
-#include "sb_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
-#include "sb_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
+#include "k1_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
+#include "k1_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
 #ifdef K1_MIC_AUTO_SENSE_V1
 #include "k1_mic_auto_sense.h"
 #endif
@@ -59,17 +59,17 @@
 
 static i2s_chan_handle_t rx_chan = NULL;
 
-// SB_I2S_* slot constants + SBAudioI2SReadDebug moved to a tiny guarded header
+// K1_I2S_* slot constants + K1AudioI2SReadDebug moved to a tiny guarded header
 // (Phase A Lane 2, S1) so the AP-capture telemetry TU can share the type/
 // constants without including this monolithic impl header. Definitions are
 // unchanged — exactly one definition each, here via the include.
-#include "sb_i2s_capture_types.h"
+#include "k1_i2s_capture_types.h"
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-static SBAudioI2SReadDebug sb_audio_i2s_read_debug = {};
+static K1AudioI2SReadDebug k1_audio_i2s_read_debug = {};
 
-SBAudioI2SReadDebug sb_audio_i2s_read_debug_read() {
-  return sb_audio_i2s_read_debug;
+K1AudioI2SReadDebug k1_audio_i2s_read_debug_read() {
+  return k1_audio_i2s_read_debug;
 }
 #endif
 
@@ -87,6 +87,10 @@ volatile uint8_t raw_dump_request = 0;
 // Threshold sits just below the ±32767 clip so we reject the clipped samples
 // while still accepting all real loud-audio dynamics.
 #define SAMPLE_RAIL_THRESHOLD 32000
+
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
 
 #ifdef K1_LOUD_GUARD_V1
 static inline float k1_loud_guard_clamp_float(float value, float min_value, float max_value) {
@@ -117,10 +121,28 @@ static inline float k1_loud_guard_approach(float current, float target, float dt
   return current + (target - current) * k1_loud_guard_alpha(dt, tau);
 }
 
+// A/B retune: GDFT release select by k1_loud_guard_mode. Attack is never mode-switched
+// (engage must stay fast; the invariant attack < release must hold). Mode 0 = baseline.
+static inline float k1_loud_guard_gdft_release_sec() {
+  switch (k1_loud_guard_mode) {
+    case 1:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS;
+    case 2:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR;
+    default: return K1_LOUD_GUARD_GDFT_RELEASE_SEC;
+  }
+}
+
 static inline float k1_loud_guard_effective_sensitivity() {
   if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
   return CONFIG.SENSITIVITY * k1_loud_input_trim;
 }
+
+#ifdef K1_MIC_AUTO_SENSE_V1
+static inline float k1_mic_auto_layered_sensitivity() {
+  const float auto_scale = k1_mic_auto_sense_applied_scale();
+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY * auto_scale;
+  return CONFIG.SENSITIVITY * auto_scale * k1_loud_input_trim;
+}
+#endif
 
 static inline float k1_audio_response_gain_effective() {
   return audio_response_gain_clamped();
@@ -195,7 +217,7 @@ static inline void k1_loud_guard_update(uint32_t t_now) {
   }
 
   k1_loud_input_trim = k1_loud_guard_approach(k1_loud_input_trim, input_target, dt, K1_LOUD_GUARD_INPUT_ATTACK_SEC, K1_LOUD_GUARD_INPUT_RELEASE_SEC);
-  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, K1_LOUD_GUARD_GDFT_RELEASE_SEC);
+  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, k1_loud_guard_gdft_release_sec());
 }
 #else
 static inline float k1_audio_response_gain_effective() {
@@ -215,12 +237,12 @@ void init_i2s() {
 
   // RX channel — mirror legacy dma_buf_count=2, dma_buf_len=SAMPLES_PER_CHUNK.
   i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT, I2S_ROLE_MASTER);
-  chan_cfg.dma_desc_num  = SB_I2S_DMA_DESC_NUM;
+  chan_cfg.dma_desc_num  = K1_I2S_DMA_DESC_NUM;
   chan_cfg.dma_frame_num = CONFIG.SAMPLES_PER_CHUNK;   // 96
   chan_cfg.auto_clear    = false;
   result = i2s_new_channel(&chan_cfg, NULL, &rx_chan); // tx=NULL → RX-only
   USBSerial.print("INIT I2S (channel): ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 
 #ifdef K1_MIC_IM73D_PDM_V1
   // IM73D122 PDM RX (bench eval, 2026-07-02) — replaces the SPH0645 i2s_std path below.
@@ -244,7 +266,7 @@ void init_i2s() {
 #endif
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg); // assign existing result; NO redeclare
   USBSerial.print("I2S PDM RX INIT: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #elif defined(K1_MIC_IM69D_PDM_V1)
   // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
   // 16-bit mono Stage 1, DSR_16S default (1.6384 MHz @ 12.8k), slot LEFT.
@@ -263,7 +285,7 @@ void init_i2s() {
 #endif
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
   USBSerial.print("I2S PDM RX INIT: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
@@ -311,12 +333,12 @@ void init_i2s() {
 
   result = i2s_channel_init_std_mode(rx_chan, &std_cfg);
   USBSerial.print("I2S STD INIT: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
 
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
-  USBSerial.println(result == ESP_OK ? SB_PASS : SB_FAIL);
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 }
 
 void acquire_sample_chunk(uint32_t t_now) {
@@ -388,10 +410,10 @@ void acquire_sample_chunk(uint32_t t_now) {
     t_now);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  sb_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
-  sb_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
-  sb_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
-  sb_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
+  k1_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
+  k1_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
+  k1_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
+  k1_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
 #else
 #ifndef K1_MIC_AUTO_SENSE_V1
   (void)i2s_read_status;
@@ -432,6 +454,25 @@ void acquire_sample_chunk(uint32_t t_now) {
   im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
 #endif
+#ifdef K1_STM
+  // STM reactivity gate from the LIVE pre-AGC mic RMS. The broadband AGC envelope
+  // (agc_envelope) is dead code on hardware — measured stuck at 0, gate always
+  // closed. This RMS is live and discriminating: ~8 in silence, ~32-60 under EDM,
+  // ~144 on peaks (bench-measured). Normalise to [0,1]; it spikes on beats, so the
+  // STM modulation pulses with the music.
+  {
+    float raw_rms_for_stm = 0.0f;
+#if defined(K1_MIC_IM73D_PDM_V1)
+    raw_rms_for_stm = im73d_raw_i16_rms;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    raw_rms_for_stm = im69d_raw_i16_rms;
+#endif
+    float k1_stm_ln = (raw_rms_for_stm - 12.0f) / 50.0f;
+    if (k1_stm_ln < 0.0f) k1_stm_ln = 0.0f;
+    if (k1_stm_ln > 1.0f) k1_stm_ln = 1.0f;
+    agc_loudness_norm = SQ15x16(k1_stm_ln);
+  }
+#endif
 
   // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
   // first 32 raw int32 samples as zero-padded hex, tagged for analyst parsing.
@@ -465,7 +506,12 @@ void acquire_sample_chunk(uint32_t t_now) {
   max_waveform_val_raw = 0.0;
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_begin_frame();
-  const float k1_effective_sensitivity = k1_loud_guard_effective_sensitivity();
+  const float k1_effective_sensitivity =
+#ifdef K1_MIC_AUTO_SENSE_V1
+      k1_mic_auto_layered_sensitivity();
+#else
+      k1_loud_guard_effective_sensitivity();
+#endif
 #endif
   const bool noise_cal_phase_a_active = (!noise_complete && noise_iterations < NOISE_CAL_DC_PHASE_A_FRAMES);
   waveform_history_index++;
@@ -644,7 +690,14 @@ void acquire_sample_chunk(uint32_t t_now) {
     float dynamic_agc_floor_scaled = dynamic_agc_floor_raw * AGC_FLOOR_SCALING_FACTOR;
     if (dynamic_agc_floor_scaled < AGC_FLOOR_MIN_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MIN_CLAMP_SCALED;
     if (dynamic_agc_floor_scaled > AGC_FLOOR_MAX_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MAX_CLAMP_SCALED;
-    float threshold_silence = dynamic_agc_floor_scaled;
+    // Silence detection: SSL-derived Schmitt (2026-07-10). dynamic_agc_floor_scaled above
+    // is DEAD (the min-tracker decay was commented out, pinning it at a static 100 that is
+    // decoupled from the learned floor — a quiet room never fell below it, so silence never
+    // latched and the plate never darkened). Derive the thresholds from the calibrated SSL
+    // so they track the real ambient, with a Schmitt gap (enter < exit) to kill chatter.
+    const float ssl_f = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+    float threshold_silence = SILENCE_ENTER_SSL_FRAC * ssl_f;        // enter-silence line (low)
+    float threshold_silence_exit = SILENCE_EXIT_SSL_FRAC * ssl_f;    // exit-silence line (high)
 
     max_waveform_val = (max_waveform_val_raw - (CONFIG.SWEET_SPOT_MIN_LEVEL));
 
@@ -686,7 +739,7 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     if (waveform_peak_scaled_raw > waveform_peak_scaled) {
       float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
-#ifdef SB_PEAK_ASYM_ENV
+#ifdef K1_PEAK_ASYM_ENV
       // ATTACK SNAP (2026-06-11, Captain-directed item 5): asymmetric envelope —
       // fast attack so transients reach the LEDs in ~1-2 AP frames (~8-15 ms vs
       // ~80 ms at the old symmetric 0.25), slow release below so trails keep
@@ -698,7 +751,7 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
     } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
       float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
-#ifdef SB_PEAK_ASYM_ENV
+#ifdef K1_PEAK_ASYM_ENV
       waveform_peak_scaled -= delta * 0.15;
 #else
       waveform_peak_scaled -= delta * 0.25;
@@ -713,13 +766,24 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     int8_t potential_next_state = sweet_spot_state; // Assume current state initially
 
-    // *** Use the SMOOTHED value for state decision ***
-    if (max_waveform_val_raw_smooth <= threshold_silence) { // Use pre-calculated threshold
-        potential_next_state = -1;
-    } else if (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) {
-        potential_next_state = 1;
+    // *** Use the SMOOTHED value for state decision, with Schmitt hysteresis on the ***
+    // *** silence boundary: enter -1 below threshold_silence; once silent, only leave ***
+    // *** -1 when the smoothed peak rises above the higher threshold_silence_exit. ***
+    const bool was_silent_state = (sweet_spot_state == -1);
+    if (was_silent_state) {
+        if (max_waveform_val_raw_smooth >= threshold_silence_exit) {
+            potential_next_state = (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) ? 1 : 0;
+        } else {
+            potential_next_state = -1;   // stay silent until we clear the exit line
+        }
     } else {
-        potential_next_state = 0;
+        if (max_waveform_val_raw_smooth <= threshold_silence) {
+            potential_next_state = -1;
+        } else if (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) {
+            potential_next_state = 1;
+        } else {
+            potential_next_state = 0;
+        }
     }
 
     if (potential_next_state != sweet_spot_state) {
@@ -782,27 +846,36 @@ void acquire_sample_chunk(uint32_t t_now) {
         // --- END REMOVED --- 
     }
 
-    // *** Use RAW value for loud sound detection ***
-    bool loud_sound_detected = (max_waveform_val_raw > threshold_loud_break); // Use pre-calculated threshold
+    // Go-dark quiet detection: RAW per-frame RMS vs an ABSOLUTE threshold with hysteresis
+    // (firmware-v3 pre-gate port — pure RMS, cf. ControlBus.cpp Stage 7). Replaces the
+    // SSL/sweet_spot_state==-1 gate (smoothed-peak floor sits above SSL in a normal room)
+    // AND deliberately does NOT re-use the peak-based loud_sound_detected veto
+    // (threshold_loud_break = SSL*1.2 ≈ 326 trips on quiet-room peaks 150-870, which would
+    // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
+    // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
+    // is what keeps genuinely quiet *music* from darkening the plate.
+    static bool k1_rms_silent_state = false;
+    if (k1_rms_silent_state) {
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
+    } else {
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
+    }
 
-    if (loud_sound_detected) {
+    if (!k1_rms_silent_state) {
         if (silence && debug_mode) {
-             USBSerial.println("DEBUG: Silence broken by loud sound");
+             USBSerial.println("DEBUG: Silence broken (audio detected)");
         }
         silence = false;
         silence_temp = false;
         silence_switched = t_now;
-    } else if (sweet_spot_state == -1) {
+    } else {
          silence_temp = true;
-         if (t_now - silence_switched >= 10000) {
+         if (t_now - silence_switched >= SILENCE_DWELL_MS) {
             if (!silence && debug_mode) {
-                USBSerial.println("DEBUG: Extended silence detected (10s)");
+                USBSerial.println("DEBUG: Extended silence detected (dwell met)");
             }
             silence = true;
          }
-    } else {
-        silence = false;
-        silence_temp = false;
     }
 
     if (debug_mode && (t_now % 10000 == 0)) {
@@ -815,8 +888,12 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
 
     if (CONFIG.STANDBY_DIMMING) {
-      float silent_scale_raw = silence ? 0.0 : 1.0;
-      silent_scale = silent_scale_raw * 0.1 + silent_scale_last * 0.9;
+      // Asymmetric fade: slow to true black on sustained silence, near-instant wake on
+      // the first sound. silent_scale multiplies MASTER_BRIGHTNESS on the plate
+      // (led_utilities.h:399) → reaches 0 = fully dark. K1 has no indicator LEDs.
+      const float fade_target = silence ? 0.0f : 1.0f;
+      const float fade_a = (fade_target < silent_scale) ? SILENT_FADE_DOWN_ALPHA : SILENT_FADE_UP_ALPHA;
+      silent_scale = fade_target * fade_a + silent_scale_last * (1.0f - fade_a);
       silent_scale_last = silent_scale;
     } else {
       silent_scale = 1.0;
@@ -856,16 +933,20 @@ void acquire_sample_chunk(uint32_t t_now) {
   //   silence      — extended-silence flag (10 s timeout)
   //   CAL_SOURCE/CAL_VALID — calibration provenance for harness captures
   static uint32_t last_ap_dbg = 0;
-  if (AP_STREAM_ENABLED && millis() - last_ap_dbg > 1000) {
-    SBTempoEvent     tev = sb_tempo_read();
-    SBOnsetBeatEvent oev = sb_onset_beat_read();
-#ifdef K1_MIC_AUTO_SENSE_V1
-    K1MicAutoSenseTelemetry mas = k1_mic_auto_sense_read();
+  // [AP] stream cadence. Default 1 Hz (production). Override via -DK1_AP_STREAM_INTERVAL_MS
+  // for higher-rate diagnostics (e.g. loud-guard limit-cycle A/B needs ~10 Hz to resolve a
+  // ~1.5 s oscillation without aliasing). Production builds leave the default untouched.
+#ifndef K1_AP_STREAM_INTERVAL_MS
+#define K1_AP_STREAM_INTERVAL_MS 1000
 #endif
-    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+  if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
+    K1TempoEvent     tev = k1_tempo_read();
+    K1OnsetBeatEvent oev = k1_onset_beat_read();
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
-      silence ? 1 : 0, calibration_source_name(), calibration_valid ? 1 : 0,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      calibration_source_name(), calibration_valid ? 1 : 0,
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,
       oev.onset ? 1 : 0, oev.bass_onset ? 1 : 0, (float)oev.bass_onset_strength);
@@ -905,8 +986,20 @@ void acquire_sample_chunk(uint32_t t_now) {
                        (unsigned)k1_gdft_x2_crossover_bin, bass_now, rise_ms_latched);
     }
 #endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    {
+      const K1MicAutoState& mas = k1_mic_auto_sense_state();
+      USBSerial.printf(" | auto_scale=%.3f auto_rec=%.3f auto_state=%u auto_reason=%u auto_en=%d auto_shadow=%d",
+        (float)k1_mic_auto_sense_applied_scale(),
+        (float)mas.recommended_scale,
+        (unsigned)mas.state,
+        (unsigned)mas.reason,
+        mas.runtime_enabled ? 1 : 0,
+        mas.shadow_only ? 1 : 0);
+    }
+#endif
 #ifdef K1_LOUD_GUARD_V1
-    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f",
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f mode=%d",
       k1_loud_guard_enabled ? 1 : 0,
       k1_loud_input_trim,
       k1_loud_gdft_trim,
@@ -916,7 +1009,21 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_near_rail_duty,
       k1_loud_peak_pin_duty,
       k1_loud_spec_sat_duty,
-      k1_loud_spec_sat_fraction);
+      k1_loud_spec_sat_fraction,
+      k1_loud_guard_mode);
+#endif
+#ifdef K1_STM
+    {
+      // STM producer readout on the [AP] line (bench K1_STM builds only): proves the
+      // live spectrogram[] -> k1_stm_process -> snapshot wiring emits real spectral-
+      // temporal modulation from the mic (ready + non-zero energies under audio;
+      // ready=0 / zeros in silence). k1_stm_read() is visible via k1_tempo.h ->
+      // k1_audio_snapshot.h. Runs on the AP (Core 0) path, gated to AP telemetry.
+      K1StmResult stm_ap = k1_stm_read();
+      USBSerial.printf(" | stm_loud=%.3f agc_env=%.4f agc_nf=%.4f agc_gated=%d stm_ready=%d stm_tE=%.4f stm_sE=%.4f",
+        float(agc_loudness_norm), float(agc_envelope), float(agc_noise_floor), agc_gated ? 1 : 0,
+        stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy);
+    }
 #endif
 #ifdef K1_MIC_AUTO_SENSE_V1
     USBSerial.printf(" | mas_state=%u mas_reason=%u mas_window_age_sec=%.1f mas_applied_scale=%.3f",
@@ -1021,6 +1128,7 @@ void calculate_vu() {
 
   SQ15x16 rms = SQ15x16(sqrtf((float)(sum / CONFIG.SAMPLES_PER_CHUNK))); // Phase 1 2026-05-20: sqrt→sqrtf for S2 soft-float
   audio_vu_level = rms;
+  k1_silence_rms_raw = (float)rms;   // raw pre-floor RMS for go-dark silence detection (firmware-v3 pre-gate port)
 
   if (!noise_complete) {
     if (!noise_cal_dc_valid ||

@@ -8,11 +8,11 @@
  * for the CRGB16 <-> CRGB conversion the engine requires.
  *
  * SEAM CONTRACT (mirrors the original equal-power blend it replaces):
- *   The .ino overlay snapshots the OUTGOING frame into sb_queue_xfade_out_buf
+ *   The .ino overlay snapshots the OUTGOING frame into k1_queue_xfade_out_buf
  *   (CRGB16) and renders the INCOMING frame into leds_16 (CRGB16). Under the
  *   flag, instead of the per-pixel equal-power blend, the overlay calls
  *   transitionBlendChannel(secondary, outgoing, incoming, leds_16, durationMs):
- *     - source  = outgoing snapshot (sb_queue_xfade_out_buf)
+ *     - source  = outgoing snapshot (k1_queue_xfade_out_buf)
  *     - target  = incoming frame    (leds_16, just rendered)
  *     - output  = leds_16            (blended in place, CRGB16)
  *   The adapter converts source+target into its CRGB scratch, drives the engine,

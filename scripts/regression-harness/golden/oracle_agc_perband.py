@@ -6,7 +6,7 @@ golden-master oracle (it is deliberately absent from harness_selftest.ORACLE_MOD
 so it never touches tests/golden/ or the MANIFEST). It is a *property /
 characterisation* harness: it host-compiles the REAL firmware
 audio/k1_gdft_core.cpp twice — once with the production broadband AGC (flag OFF)
-and once with the candidate per-band AGC (-DSB_AGC_PERBAND_V1, flag ON) — drives
+and once with the candidate per-band AGC (-DK1_AGC_PERBAND_V1, flag ON) — drives
 both with the SAME deterministic two-tone stimulus, and emits per-band AGC gains
 plus per-band post-AGC output so a test can assert the "louder -> dimmer" defect
 (OFF) and its fix (ON).
@@ -47,7 +47,7 @@ NAME = "agc_perband"
 # Production-matching defines (same audio contract as oracle_gdft). The per-band
 # candidate flag is appended per-capture, never baked here.
 BASE_DEFINES = list(_g.DEFINES)
-PERBAND_DEFINE = "SB_AGC_PERBAND_V1"
+PERBAND_DEFINE = "K1_AGC_PERBAND_V1"
 
 # Stimulus amplitude domains. SPH (default, unchanged) is the original N6
 # two-tone stimulus: broadband BASS+LOW_MID+HIGH_MID ramps to 5000, constant

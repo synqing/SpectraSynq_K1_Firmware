@@ -14,7 +14,7 @@
 // pgmspace shims, the device handlers).
 //
 // Two hard rules this header obeys:
-//   1. It is included ONLY by the serial_replay driver (gated -DSB_SERIAL_REPLAY_HOST
+//   1. It is included ONLY by the serial_replay driver (gated -DK1_SERIAL_REPLAY_HOST
 //      and a manual include in the driver). It never enters any other oracle's TU,
 //      so the other 6 goldens stay byte-identical.
 //   2. It must NOT clash with a real definition. serial_menu.h does NOT
@@ -84,14 +84,7 @@ static inline uint32_t esp_random() { return 0x12345678U; }
 //  set_chroma_profile). None reachable from the S3.0 corpus; no-op for link.
 // raw_dump_request is an int flag (i2s_audio.h on device); a writable global here.
 static inline void print_chip_id() {}
-static inline void factory_reset() {}
-static inline void restore_defaults() {}
-static inline void clear_noise_cal() {}
-// blocking_flash takes a CRGB16 colour (real inline def at led_utilities.h:1129,
-// which serial_menu.h does NOT pull in). cmd_identify() calls it with a CRGB16
-// literal. Stub by template to match without naming the FastLED-host colour type.
 template <typename T> static inline void blocking_flash(const T& /*colour*/) {}
-inline int raw_dump_request = 0;
 // apply_chroma_profile is CONFIG-only on device (set_chroma_profile setter, which
 // IS excluded from the corpus as reboot-bearing). Stub returns "no note-offset
 // change" so the excluded branch links without rebooting. Signature must match the
@@ -100,15 +93,15 @@ inline int raw_dump_request = 0;
 // USED); we take it by a templated param to avoid naming the enum here.
 template <typename T> static inline bool apply_chroma_profile(T /*profile*/) { return false; }
 
-// --- sb_effect_queue.* config symbols ------------------------------------------
-// The sb_queue_* config setters/getters (sb_effect_queue.h:134-140) are stubbed as
+// --- k1_effect_queue.* config symbols ------------------------------------------
+// The k1_queue_* config setters/getters (k1_effect_queue.h:134-140) are stubbed as
 // EXTERNAL (non-inline) definitions in the driver (oracle_serial_replay.py), next to
-// the other sb_queue_* externals (sb_queue_any_armed etc.) — NOT here. Reason: the
+// the other k1_queue_* externals (k1_queue_any_armed etc.) — NOT here. Reason: the
 // queue command handlers were lifted out of serial_menu.h (driver TU) into
 // serial_cmd_handlers.cpp (a SEPARATE oracle TU). A `static inline` stub here has
 // internal linkage (invisible to the handlers TU); a plain `inline` is only emitted
 // by a TU that odr-uses it, so the setters used ONLY by the handlers TU (which sees
-// just the declaration via sb_effect_queue.h) are emitted by nobody -> link error.
+// just the declaration via k1_effect_queue.h) are emitted by nobody -> link error.
 // A single guaranteed-emitted external definition in the driver binds BOTH TUs. The
 // queue family is not in the replay corpus, so the stub values never affect the golden.
 

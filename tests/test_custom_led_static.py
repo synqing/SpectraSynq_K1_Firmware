@@ -101,8 +101,9 @@ def test_native_resolution_unchanged():
 
 def test_custom_env_registered_in_upload_guard():
     """An unregistered env fails OPEN in the guard (no identity check before flash)."""
-    assert '"k1_custom"' in GUARD.read_text(encoding="utf-8"), (
-        "k1_custom must be in a K1_TARGETS tuple in k1_upload_guard.py, or it "
+    manifest = (GUARD.parent / "k1_device_identities.json").read_text(encoding="utf-8")
+    assert '"k1_custom"' in manifest, (
+        "k1_custom must be registered in k1_device_identities.json (N4a manifest), or it "
         "fails open (no chip-ID check) and can cross-flash the wrong device."
     )
 

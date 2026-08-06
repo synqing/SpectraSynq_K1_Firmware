@@ -21,7 +21,7 @@ PIO = (ROOT / "platformio.ini").read_text()
 class ImpactLaneStaticTest(unittest.TestCase):
     # ---- #6 drop-cut --------------------------------------------------------
     def test_drop_cut_is_flag_gated_and_applied_to_both_channels(self):
-        self.assertIn("#ifdef SB_DROP_CUT_V1", LED_UTILS)
+        self.assertIn("#ifdef K1_DROP_CUT_V1", LED_UTILS)
         self.assertIn("drop_cut_update();", LED_UTILS)
         # Primary and secondary brightness lines both carry the scaler.
         self.assertIn("silent_scale * SQ15x16(drop_cut_scale)", LED_UTILS)
@@ -46,7 +46,7 @@ class ImpactLaneStaticTest(unittest.TestCase):
 
     # ---- #5 attack snap -----------------------------------------------------
     def test_peak_envelope_is_asymmetric_under_flag_with_legacy_retained(self):
-        self.assertIn("#ifdef SB_PEAK_ASYM_ENV", I2S)
+        self.assertIn("#ifdef K1_PEAK_ASYM_ENV", I2S)
         self.assertIn("waveform_peak_scaled += delta * 0.65;", I2S)
         self.assertIn("waveform_peak_scaled -= delta * 0.15;", I2S)
         # Legacy symmetric path retained for off-flag builds.
@@ -74,8 +74,8 @@ class ImpactLaneStaticTest(unittest.TestCase):
 
     # ---- production flags ---------------------------------------------------
     def test_flags_are_on_in_production_with_revert_levers(self):
-        self.assertIn("-DSB_DROP_CUT_V1", PIO)
-        self.assertIn("-DSB_PEAK_ASYM_ENV", PIO)
+        self.assertIn("-DK1_DROP_CUT_V1", PIO)
+        self.assertIn("-DK1_PEAK_ASYM_ENV", PIO)
 
 
 if __name__ == "__main__":

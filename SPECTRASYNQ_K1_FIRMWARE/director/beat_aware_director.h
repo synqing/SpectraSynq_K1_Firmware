@@ -63,7 +63,7 @@ struct BeatAwareAudioView {
   float    tempo_confidence;   // [0,1] dominance of the winning tempo
   bool     tempo_locked;       // tempo confidence above lock and not silent
   bool     beat_tick;          // true for one tick at the beat instant
-  uint8_t  music_state;        // SBMusicState cast to uint8_t
+  uint8_t  music_state;        // K1MusicState cast to uint8_t
 };
 
 // Persistent decision state (one instance; lives in the .cpp). Exposed so the
@@ -126,6 +126,16 @@ uint8_t bad_director_current_mode();      // stored current/selected mode
 bool    bad_director_tempo_locked();      // live tempo lock (read-only)
 float   bad_director_bpm();               // live tempo (read-only)
 float   bad_director_tempo_confidence();  // live tempo confidence (read-only)
+
+// Device-proof counters (read-only). Updated only when a switch commits.
+// Used by `:beat_director status` + host/device boundary proof scripts.
+// No NVS; RAM-only; never touches brightness.
+uint32_t bad_director_switch_count();
+uint32_t bad_director_last_switch_ms();
+uint8_t  bad_director_last_switch_mode();
+bool     bad_director_last_switch_beat_quantised();
+bool     bad_director_last_switch_tempo_locked();  // sticky lock AT switch commit
+bool     bad_director_compile_opt_in();  // true iff K1_BEAT_AWARE_DIRECTOR_V1
 
 // One render-task tick. Reads the live audio accessors, runs the decision core,
 // and — on a switch — selects a SAFE transition type, sets the tempo-derived

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Replay captured device NOV telemetry through the host sb_tempo.cpp harness.
+"""Replay captured device NOV telemetry through the host k1_tempo.cpp harness.
 
 This is an adapter, not a DSP implementation. It parses non-shippable firmware
 `NOV,` rows, expands each accepted tempo novelty sample back into three AP-frame
@@ -22,9 +22,9 @@ import tempo_replay as trp
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DEFINES = ["SB_TEMPO_CONF_V2", "SB_TEMPO_FLYWHEEL_V2"]
+DEFAULT_DEFINES = ["K1_TEMPO_CONF_V2", "K1_TEMPO_FLYWHEEL_V2"]
 DEFAULT_ACCEPTED_NOVELTY_RATE_HZ = (12800.0 / 96.0) / 3.0
-SB_TEMPO_SOURCE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "sb_tempo.cpp"
+K1_TEMPO_SOURCE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "k1_tempo.cpp"
 
 
 def c_float_literal(value: float) -> str:
@@ -344,7 +344,7 @@ def main(argv=None) -> int:
         help=(
             "accepted NOV rate used by the host tempo coefficients. Default is the "
             "firmware contract, 44.444 Hz. Non-default values compile a temporary "
-            "harness-only copy of sb_tempo.cpp; production source is not modified."
+            "harness-only copy of k1_tempo.cpp; production source is not modified."
         ),
     )
     parser.add_argument("--warm-ms", type=int, default=15000)
@@ -369,8 +369,8 @@ def main(argv=None) -> int:
         if define not in defines:
             defines.append(define)
     rate_defines = [
-        f"SB_TEMPO_AP_FRAME_HZ={c_float_literal(args.ap_frame_hz)}",
-        f"SB_TEMPO_NOVELTY_DECIMATION={args.decimation}U",
+        f"K1_TEMPO_AP_FRAME_HZ={c_float_literal(args.ap_frame_hz)}",
+        f"K1_TEMPO_NOVELTY_DECIMATION={args.decimation}U",
     ]
     for define in rate_defines:
         if define not in defines:

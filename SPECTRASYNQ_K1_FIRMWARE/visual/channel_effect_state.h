@@ -94,7 +94,7 @@ struct ChannelEffectState {
   float    dforge_carrier;                    // audio-driven interference phase
   float    dense_activity_env;
   uint32_t dense_last_ms;
-#ifdef SB_CHORD_HUE_V1
+#ifdef K1_CHORD_HUE_V1
   // Chord→hue anchor state (Tier 1 item 1). Raw chord root flickers ~5/s on real
   // material; the consumer debounces (250 ms hold) and slews the output anchor.
   uint8_t  dforge_chord_held_root;            // debounced root driving the hue anchor (A-origin 0-11)

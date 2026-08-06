@@ -82,11 +82,16 @@ else
   fail "platformio.ini is missing [env:k1_bench_im73d]"
 fi
 
+# N4a: env→device mapping lives in k1_device_identities.json (consumed by
+# k1_upload_guard.py). Accept either the JSON manifest or a legacy hard-coded
+# reference in the Python file.
 IM73D_GUARD="FAIL"
-if [ -f "$REPO_ROOT/scripts/platformio/k1_upload_guard.py" ] && grep -q 'k1_bench_im73d' "$REPO_ROOT/scripts/platformio/k1_upload_guard.py"; then
+if [ -f "$REPO_ROOT/scripts/platformio/k1_device_identities.json" ] && grep -q 'k1_bench_im73d' "$REPO_ROOT/scripts/platformio/k1_device_identities.json"; then
+  IM73D_GUARD="PASS"
+elif [ -f "$REPO_ROOT/scripts/platformio/k1_upload_guard.py" ] && grep -q 'k1_bench_im73d' "$REPO_ROOT/scripts/platformio/k1_upload_guard.py"; then
   IM73D_GUARD="PASS"
 else
-  fail "k1_upload_guard.py does not reference k1_bench_im73d"
+  fail "k1_bench_im73d missing from k1_device_identities.json (and k1_upload_guard.py)"
 fi
 
 IM73D_PLAN="FAIL"

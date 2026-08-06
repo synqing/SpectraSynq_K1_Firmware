@@ -1,5 +1,5 @@
 #include "lightshow_modes.h"
-#include "sb_tempo.h"
+#include "k1_tempo.h"
 #include <math.h>
 
 // ============================================================================
@@ -16,7 +16,7 @@
 // effect maps tempo to flow VELOCITY, so any tracker wobble is an imperceptible
 // nudge; a discrete effect maps tempo to a spawn EVENT, so every imperfect beat
 // decision is a VISIBLE miss or spurious comet (the causality contract). The
-// sb_tempo phase jitter (the 50 Hz re-anchor at sb_tempo.cpp:392-395, plus octave
+// k1_tempo phase jitter (the 50 Hz re-anchor at k1_tempo.cpp:392-395, plus octave
 // flips) is invisible in a flow but fatal in a comet sampled once per beat. v1 fired
 // on a render-loop phase WRAP — maximally exposed -> "lost in the woods".
 //
@@ -76,12 +76,12 @@ void light_mode_tempo_comet(ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f; else if (dt > 0.05f) dt = 0.05f;
   const float frame = dt * 120.0f;
 
-  SBTempoEvent t;
+  K1TempoEvent t;
   if (probe) {
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
     t.beat_tick = false; t.locked = true; t.beat_strength = 1.0f;
   } else {
-    t = sb_tempo_read();
+    t = k1_tempo_read();
   }
 
   // 1. Fade the persisted trail in place.

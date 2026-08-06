@@ -6,6 +6,11 @@
 #include <stdint.h>      // Include for uint32_t type used within
 #include "config_types.h" // PIO-SPIKE2: ODR-safe enums/macros (LED_STRIP_MODE, LED_COUNT_VALUE, DEFAULT_SAMPLE_RATE, led_types, lightshow_modes) + struct conf, shared with globals_config.cpp
 
+// Coarse firmware version echoed on serial (:version/:build) and in NVS config paths.
+#ifndef FIRMWARE_VERSION
+#define FIRMWARE_VERSION 40103
+#endif
+
 // ================= LED STRIP MODE SELECTION =================
 // PIO-SPIKE2 (2026-05-25): LED_STRIP_MODE / LED_COUNT_VALUE selection block,
 // DEFAULT_SAMPLE_RATE, enum led_types, and enum lightshow_modes moved to
@@ -125,14 +130,25 @@
 #define K1_LOUD_GUARD_GDFT_ATTACK_SEC 0.30f
 #define K1_LOUD_GUARD_GDFT_RELEASE_SEC 2.20f
 #define K1_LOUD_GUARD_DUTY_TAU_SEC 0.55f
+// ── A/B retune matrix (DEGRADED-MODE — loud-room hardware A/B + Captain sign-off pending) ─
+//   Selected at runtime by k1_loud_guard_mode (globals.h). Mode 0 uses the baseline
+//   RELEASE_SEC 2.20 + flat SPECTRAL_FLOOR_CUT above. Modes 1/2 shorten the GDFT release
+//   tail and switch the floor-cut to a hybrid affine form (pedestal + proportional) that
+//   preserves noise-floor/mud suppression while sparing quiet musical bins.
+//   Provenance: AP signal-robbery audit + 3-way red-team (2026-07-10). Values are A/B
+//   starting points, NOT proven on hardware — do not treat as final constants.
+#define K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS 1.30f   // mode 1: >= ~2x DUTY_TAU, over-damped
+#define K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR 0.80f   // mode 2: red-team upper safe bound
+#define K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL 0.03f      // absolute mud-suppression floor (modes 1/2)
+#define K1_LOUD_GUARD_FLOOR_CUT_PROP_K 0.12f        // magnitude-proportional cut coeff (modes 1/2)
 #endif
 
 // Legacy per-bin spectral noise subtraction is disabled in production. Runtime
 // evidence on 2026-06-15 showed AP peak drive alive while VP chroma was zeroed
 // after a valid broadband noise calibration, which points at this static spectral
 // floor erasing magnitudes_final[] before chroma/semantic consumers see it.
-#define SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0
-#define SB_GDFT_STATIC_NOISE_SUBTRACTION_GAIN 1.5f
+#define K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED 0
+#define K1_GDFT_STATIC_NOISE_SUBTRACTION_GAIN 1.5f
 
 // Render canvas sized 1:1 with physical strip (160 LEDs per channel on K1/SB v9 hardware).
 // NUM_FREQS = NATIVE_RESOLUTION / 2 because each freq bin maps to one canvas pixel before
@@ -182,27 +198,27 @@ inline volatile uint8_t k1_gdft_x2_crossover_bin = (uint8_t)K1_GDFT_X2_CROSSOVER
 #define VP_PERF_RENDER_BUDGET_US 2000UL
 #define VP_PERF_REPORT_INTERVAL_MS 1000UL
 
-#ifndef SB_HAS_ROTATE8
-#if defined(SB_K1_HARDWARE)
-#define SB_HAS_ROTATE8 0
+#ifndef K1_HAS_ROTATE8
+#if defined(K1_HARDWARE)
+#define K1_HAS_ROTATE8 0
 #else
-#define SB_HAS_ROTATE8 1
+#define K1_HAS_ROTATE8 1
 #endif
 #endif
 
-#ifndef SB_USB_CUSTOM_DESCRIPTORS
-#if defined(SB_K1_HARDWARE)
-#define SB_USB_CUSTOM_DESCRIPTORS 0
+#ifndef K1_USB_CUSTOM_DESCRIPTORS
+#if defined(K1_HARDWARE)
+#define K1_USB_CUSTOM_DESCRIPTORS 0
 #else
-#define SB_USB_CUSTOM_DESCRIPTORS 1
+#define K1_USB_CUSTOM_DESCRIPTORS 1
 #endif
 #endif
 
-#ifndef SB_ENABLE_USB_MSC_UPDATE
-#if defined(SB_K1_HARDWARE)
-#define SB_ENABLE_USB_MSC_UPDATE 0
+#ifndef K1_ENABLE_USB_MSC_UPDATE
+#if defined(K1_HARDWARE)
+#define K1_ENABLE_USB_MSC_UPDATE 0
 #else
-#define SB_ENABLE_USB_MSC_UPDATE 1
+#define K1_ENABLE_USB_MSC_UPDATE 1
 #endif
 #endif
 
@@ -322,7 +338,7 @@ const float notes[] = {
 // Canvas/LED width stays NUM_FREQS (NATIVE_RESOLUTION/2); bins [hi, NUM_FREQS)
 // are Nyquist ghosts (aliased labels) — skip Goertzel + do not treat as resolution.
 // Default profile fs=12800 / NOTE_OFFSET=12 → hi=71 (nine ghosts: 71..79).
-static inline uint8_t sb_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t note_offset) {
+static inline uint8_t k1_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t note_offset) {
   const float nyquist_hz = float(sample_rate) * 0.5f;
   const uint8_t note_count = uint8_t(sizeof(notes) / sizeof(notes[0]));
   for (uint8_t i = 0; i < NUM_FREQS; i++) {
@@ -334,10 +350,12 @@ static inline uint8_t sb_gdft_nyquist_safe_bin_hi(uint16_t sample_rate, uint8_t 
   return NUM_FREQS;
 }
 
-static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
+#define sb_gdft_nyquist_safe_bin_hi k1_gdft_nyquist_safe_bin_hi
+
+static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
                                                       uint16_t sample_rate,
                                                       uint8_t note_offset) {
-  uint8_t safe_hi = sb_gdft_nyquist_safe_bin_hi(sample_rate, note_offset);
+  uint8_t safe_hi = k1_gdft_nyquist_safe_bin_hi(sample_rate, note_offset);
   if (safe_hi < lo) {
     return lo;
   }
@@ -346,8 +364,8 @@ static inline uint8_t sb_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
 // GPIO PINS #######################################################
 
-#if defined(SB_K1_HARDWARE)
-  #if defined(SB_K1_BENCH_REFERENCE_PINMAP)
+#if defined(K1_HARDWARE)
+  #if defined(K1_BENCH_REFERENCE_PINMAP)
     // K1 bench-reference GPIO map.
     // Primary/secondary WS2812 channels: GPIO 4/5.
     // SPH0645: BCLK=14, DOUT->DIN=13, LRCL/WS=12. SEL wiring matches default K1.
@@ -676,7 +694,7 @@ const SQ15x16 hue_lookup[64][3] = {
 #define SWEET_SPOT_LEFT_CHANNEL 0
 #define SWEET_SPOT_CENTER_CHANNEL 1
 #define SWEET_SPOT_RIGHT_CHANNEL 2
-#define SB_HAS_SWEET_SPOT_LEDS (SWEET_SPOT_LEFT_PIN >= 0 && SWEET_SPOT_CENTER_PIN >= 0 && SWEET_SPOT_RIGHT_PIN >= 0)
+#define K1_HAS_SWEET_SPOT_LEDS (SWEET_SPOT_LEFT_PIN >= 0 && SWEET_SPOT_CENTER_PIN >= 0 && SWEET_SPOT_RIGHT_PIN >= 0)
 
 #define TWOPI 6.28318530
 #define FOURPI 12.56637061

@@ -1,12 +1,12 @@
 /*----------------------------------------
-  Sensory Bridge HARDWARE CONFIGURATION
+  K1 HARDWARE CONFIGURATION
 ----------------------------------------*/
 
-// Every notable setting about hardware moved to the settings.sensorybridge.rocks site for now!
+// Every notable setting about hardware moved to the settings.K1.rocks site for now!
 // No more hardcoding values for strip length and such
 
 /*----------------------------------------
-  Sensory Bridge SOFTWARE CONFIGURATION
+  K1 SOFTWARE CONFIGURATION
 ----------------------------------------*/
 
 // TODO: CRGBPalette16/lookups in place of all CHSV usage, which defaults

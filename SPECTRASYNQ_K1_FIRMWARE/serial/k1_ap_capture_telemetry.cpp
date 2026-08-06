@@ -118,7 +118,7 @@ void ap_nov_capture_clear() {
   AP_NOV_CAPTURE_DROPPED = 0;
   AP_NOV_CAPTURE_START_MS = 0;
   AP_NOV_CAPTURE_END_MS = 0;
-  AP_NOV_CAPTURE_LAST_EMIT = sb_tempo_debug_read().emit_count;
+  AP_NOV_CAPTURE_LAST_EMIT = k1_tempo_debug_read().emit_count;
 }
 
 bool ap_nov_capture_arm(uint32_t duration_ms) {
@@ -129,12 +129,12 @@ bool ap_nov_capture_arm(uint32_t duration_ms) {
   AP_NOV_CAPTURE_DROPPED = 0;
   AP_NOV_CAPTURE_START_MS = millis();
   AP_NOV_CAPTURE_END_MS = AP_NOV_CAPTURE_START_MS + duration_ms;
-  AP_NOV_CAPTURE_LAST_EMIT = sb_tempo_debug_read().emit_count;
+  AP_NOV_CAPTURE_LAST_EMIT = k1_tempo_debug_read().emit_count;
   AP_NOV_CAPTURE_ACTIVE = true;
   return true;
 }
 
-void ap_nov_capture_tick(uint32_t t_now, const SBTempoDebugSnapshot& td) {
+void ap_nov_capture_tick(uint32_t t_now, const K1TempoDebugSnapshot& td) {
   if (!AP_NOV_CAPTURE_ACTIVE) {
     return;
   }
@@ -249,7 +249,7 @@ void ap_cad_capture_clear() {
   AP_CAD_CAPTURE_DROPPED = 0;
   AP_CAD_CAPTURE_START_MS = 0;
   AP_CAD_CAPTURE_END_MS = 0;
-  SBTempoDebugSnapshot td = sb_tempo_debug_read();
+  K1TempoDebugSnapshot td = k1_tempo_debug_read();
   AP_CAD_CAPTURE_LAST_EMIT = td.emit_count;
   AP_CAD_CAPTURE_LAST_EMIT_MS = td.last_emit_ms;
 }
@@ -265,7 +265,7 @@ bool ap_cad_capture_arm(uint32_t duration_ms) {
   AP_CAD_CAPTURE_DROPPED = 0;
   AP_CAD_CAPTURE_START_MS = millis();
   AP_CAD_CAPTURE_END_MS = AP_CAD_CAPTURE_START_MS + duration_ms;
-  SBTempoDebugSnapshot td = sb_tempo_debug_read();
+  K1TempoDebugSnapshot td = k1_tempo_debug_read();
   AP_CAD_CAPTURE_LAST_EMIT = td.emit_count;
   AP_CAD_CAPTURE_LAST_EMIT_MS = td.last_emit_ms;
   AP_CAD_CAPTURE_ACTIVE = true;
@@ -313,10 +313,10 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
   sample.i2s_status = ap_capture_i16_sat(frame.i2s.status);
   sample.ap_core_id = frame.ap_core_id;
   sample.vp_core_id = frame.vp_core_id;
-  sample.slot_bit_width = SB_I2S_SLOT_BIT_WIDTH_BITS;
-  sample.slot_mode = SB_I2S_SLOT_MODE_STEREO;
-  sample.dma_desc_num = SB_I2S_DMA_DESC_NUM;
-  sample.sb_frame_ctr = (uint8_t)frame.tempo.frame_ctr;
+  sample.slot_bit_width = K1_I2S_SLOT_BIT_WIDTH_BITS;
+  sample.slot_mode = K1_I2S_SLOT_MODE_STEREO;
+  sample.dma_desc_num = K1_I2S_DMA_DESC_NUM;
+  sample.k1_frame_ctr = (uint8_t)frame.tempo.frame_ctr;
   sample.tempo_decimation = (uint8_t)frame.tempo.novelty_decimation;
   sample.flags = (emitted ? 0x01 : 0x00)
     | (frame.tempo.silence_detected ? 0x02 : 0x00)
@@ -386,7 +386,7 @@ void ap_cad_soak_reset() {
   for (uint16_t i = 0; i < AP_CAD_SOAK_HIST_BUCKETS; i++) {
     AP_CAD_SOAK_ACTIVE_HIST[i] = 0;
   }
-  SBTempoDebugSnapshot td = sb_tempo_debug_read();
+  K1TempoDebugSnapshot td = k1_tempo_debug_read();
   AP_CAD_SOAK_LAST_EMIT = td.emit_count;
   AP_CAD_SOAK_LAST_EMIT_MS = td.last_emit_ms;
 }
@@ -564,7 +564,7 @@ void ap_cad_soak_status() {
   USBSerial.print(",samples_per_chunk=");
   USBSerial.print(CONFIG.SAMPLES_PER_CHUNK);
   USBSerial.print(",tempo_decim=");
-  USBSerial.print(SB_TEMPO_NOVELTY_DECIMATION);
+  USBSerial.print(K1_TEMPO_NOVELTY_DECIMATION);
   USBSerial.print(",meas_ap_hz=");
   USBSerial.print(measured_ap_hz, 3);
   USBSerial.print(",meas_nov_hz=");
@@ -745,8 +745,8 @@ void ap_cad_capture_dump() {
     USBSerial.print(sample.novelty_elapsed_us);
     USBSerial.print(",total_us=");
     USBSerial.print(sample.total_ap_loop_elapsed_us);
-    USBSerial.print(",sb_frame_ctr=");
-    USBSerial.print(sample.sb_frame_ctr);
+    USBSerial.print(",k1_frame_ctr=");
+    USBSerial.print(sample.k1_frame_ctr);
     USBSerial.print(",tempo_decim=");
     USBSerial.print(sample.tempo_decimation);
     USBSerial.print(",decl_ap_hz=");

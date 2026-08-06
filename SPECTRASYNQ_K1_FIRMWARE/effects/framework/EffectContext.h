@@ -17,8 +17,8 @@
  *   - Dual-strip channel pointers (stripLeds[2]) — v3 CRGB geometry view.
  *
  * P2 ADAPTERS (wired here):
- *   - AUDIO: `K1AudioContext audio` maps `audio/sb_audio_snapshot.h`
- *     (SBAudioSnapshot / SBOnsetBeatEvent / SBChordState — 80-bin Goertzel +
+ *   - AUDIO: `K1AudioContext audio` maps `audio/k1_audio_snapshot.h`
+ *     (K1AudioSnapshot / K1OnsetBeatEvent / K1ChordState — 80-bin Goertzel +
  *     12-bin chroma + triad) onto the accessor surface effects expect
  *     (rms/getBand/beatPhase/onset/chord). It is a MAP, not a re-pipe of v3's
  *     ControlBus. P3 binds it from the live snapshot on the render path.
@@ -136,7 +136,7 @@ struct EffectContext {
     K1BufferView k1Buffer{};
 
     // ── Audio (P2 audio adapter) ──
-    // Maps K1's SBAudioSnapshot / SBOnsetBeatEvent onto the v3 accessor surface
+    // Maps K1's K1AudioSnapshot / K1OnsetBeatEvent onto the v3 accessor surface
     // (rms / getBand / beatPhase / onset channels / chroma / chord). P3 binds it
     // from the live snapshot. Default-constructed → audio.available() == false.
     K1AudioContext audio{};

@@ -38,16 +38,16 @@
 // Render-rate EMA maintained by the LED task (system/globals.h); read-only here.
 extern float LED_FPS;
 
-#if defined(K1_SYNC_ROLE_LEADER) && defined(SB_K1_BLE_REMOTED)
+#if defined(K1_SYNC_ROLE_LEADER) && defined(K1_BLE_REMOTED)
 // The leader env also compiles the BLE Remoted central; dial-link state feeds the
 // health line's dial_linked field.
-bool sb_k1_ble_remoted_is_linked();
+bool k1_ble_remoted_is_linked();
 #endif
 
 namespace k1_sync {
 namespace {
 
-#if defined(K1_SYNC_ROLE_LEADER) && defined(SB_K1_BLE_REMOTED)
+#if defined(K1_SYNC_ROLE_LEADER) && defined(K1_BLE_REMOTED)
 static_assert(CONFIG_BT_NIMBLE_MAX_CONNECTIONS >= 2,
               "dual-role sync leader requires at least two BLE connections");
 #endif
@@ -1265,8 +1265,8 @@ void health_service() {
   s_last_health_us = now_us();
   const uint32_t heap_min =
       (uint32_t)heap_caps_get_minimum_free_size(MALLOC_CAP_INTERNAL);
-#if defined(K1_SYNC_ROLE_LEADER) && defined(SB_K1_BLE_REMOTED)
-  const int dial = sb_k1_ble_remoted_is_linked() ? 1 : 0;
+#if defined(K1_SYNC_ROLE_LEADER) && defined(K1_BLE_REMOTED)
+  const int dial = k1_ble_remoted_is_linked() ? 1 : 0;
 #else
   const int dial = 0;
 #endif

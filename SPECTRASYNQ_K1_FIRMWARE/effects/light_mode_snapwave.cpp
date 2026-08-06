@@ -1,6 +1,6 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
-#include "sb_tempo.h"
+#include "k1_audio_snapshot.h"
+#include "k1_tempo.h"
 #include <math.h>
 
 // ============================================================================
@@ -51,8 +51,8 @@ void light_mode_snapwave(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  SBAudioSnapshot snap = sb_audio_snapshot_read();
-  SBTempoEvent tempo = sb_tempo_read();
+  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1TempoEvent tempo = k1_tempo_read();
 
   const float peak = snap_clamp01(snap.peak_scaled);
   const float beat_strength = snap_clamp01(tempo.beat_strength);

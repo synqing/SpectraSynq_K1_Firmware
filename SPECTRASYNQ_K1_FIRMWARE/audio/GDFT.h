@@ -2,7 +2,7 @@
 #define GDFT_H
 
 //
-// Welcome to the GDFT file: this is the core of Sensory Bridge.
+// Welcome to the GDFT file: this is the core of K1.
 // This is where time-domain audio is converted into a
 // frequency-domain representation for your viewing pleasure. This
 // file doesn't actually contain LED code. That's lightshow_modes.h,
@@ -28,7 +28,7 @@
 //    every 12th note is doubled in frequency.
 //
 //    By running Goertzel's algorithm 64 times in parallel I can
-//    choose my own bin spacing, and in this case Sensory Bridge is
+//    choose my own bin spacing, and in this case K1 is
 //    watching the upper 64 keys of an 88-key piano's frequency
 //    range: 110Hz to 4186Hz (by default).
 //
@@ -50,7 +50,7 @@
 // This GDFT method, which operates on a sliding window with 256
 // new samples per frame, (i2s_audio.h) combined with a shitload
 // of interesting post-processing methods I've documented below
-// are what's behind the eye-catching shows on Sensory Bridge!
+// are what's behind the eye-catching shows on K1!
 //
 // If you like that I've shared this code, *please* support my work
 // by purchasing genuine hardware or telling your friends about it!

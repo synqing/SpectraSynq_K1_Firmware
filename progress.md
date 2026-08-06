@@ -2,28 +2,34 @@
 
 **Started:** 2026-05-25
 
-**Current focus (2026-08-05, authoritative):** IM69D130 dual-mic evaluation on
-`lane/dual-sync-phase0` (branch name is historical; dual-sync is shelved).
-Canonical authority:
-`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Open defect: at
-`K1_MIC_IM69D_INPUT_GAIN=16` the bench never reports silence — next step is
-gain 8, re-measure, then Captain silence-go re-cal. Production mic remains
-IM73D122. All older `Current focus` text below is historical context.
+**Current focus (2026-08-05, authoritative — AP advice / IM69D):** IM69D130 dual-mic
+evaluation on `feat/ap-advice-phase0-im69d-gain8` (PR #40). Phase 0 **PASS** at
+`K1_MIC_IM69D_INPUT_GAIN=4` (G=8 failed silence latch). Phases 1–2: Nyquist ghost
+retirement + GDFT ×2 global drop. Authority:
+`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Production mic remains
+IM73D122 until IM69 lane closes.
 
-## 2026-07-27 Dual-sync recovery takeover
+**Also landed on main (2026-07-26):** M2.1 `serial_menu` decomposition (R1+R2) +
+Shift+S save-show (`k1_show_state`) — host-green; device smoke Captain-gated.
 
-- Captain authorised Codex to act as SSA orchestrator.
-- Baseline branch/HEAD: `lane/dual-sync-phase0 @ 3a9724e`.
-- July Gate-0 attempt remains BLOCKED because SyncLink produced no link,
-  stream, clock or GPIO evidence; AP/FPS health alone is not link proof.
-- Recovery authority is now the tracked plan under
-  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/`.
-- Existing dirty device-registry and build-wrapper changes are preserved and
-  excluded from the P-1 documentation commit.
-- No device, serial, flash or calibration action was performed during
-  takeover.
+## 2026-07-26 Shift+S Save Show State (Lightwave parity)
 
-**Current focus:** (2026-07-07) **IM73D controlled-audio DSR lane complete; DSR_16S rejected; restored bench validation green at usable levels; R2/R3 corrected after LED-map incident** — `k1_prod_im73d` main/prod build path shipped (`4b95e60`, byte-identical-OFF, guard-mapped to main K1). R1 knob persistence is CLOSED. Raw pre-conditioning AP telemetry landed (`67ae693`) and the DSR harness/compare path landed (`bc53ceb`). Controlled speaker playback showed DSR16 raises the quiet raw-RMS floor and does not improve raw-RMS-over-quiet response at matched playback levels, so production default remains `DSR_8S`. Bench K1 proves the IM73D mic/PDM path on the ratified `13/12/14` pins and is now validated on restored `k1_bench_im73d @ f2f7c45`: quiet/volume 45/volume 60 AP/raw captures are usable and AGC gains stay below 2.0 on all four bands. Volume 75 is a front-end stress/fail condition (`clip_pct`, `near_pct`, input trim), not acceptance evidence. Captain confirms both K1s are identical hardware; existing envs encode configuration choice (`k1_bench_im73d` = LED `4/5`, `k1_prod_im73d` = LED `6/7`). Main K1 remains the SPH reference/control on `k1_hardware @ 67227da`. See `docs/hardware/im73d-restored-bench-validation-2026-07-07.md`, `docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`, `docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`, `docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`, `docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`, and `docs/hardware/device-build-registry.md`.
+Branch `feat/save-show-hotkey` off M2.1 tip. Module `control/k1_show_state.{h,cpp}`:
+capture via `k1_queue_capture_live` ×2 + `k1_edgemixer_config()`; encode CRC blob;
+`'S'` / `:save_show` write blob then immediate `save_config()`; `init_fs()` calls
+`k1_show_state_load()` after `load_config()` (soft no-op if missing). Lowercase
+`'s'` remains VP stream. Host proof: `tests/test_show_state_static.py`.
+
+## 2026-07-26 M2.1 serial_menu.h Decomposition — Phase R2 COMPLETE
+
+Stage-B typed `type=value` dispatch: `serial_typed_cmd_table.def` (151 rows),
+`serial_typed_dispatch.{h,cpp}`, `serial_typed_cmd_lookup()` +
+`serial_dispatch_typed_setter()` chokepoint in `serial_menu.cpp`.
+`parse_command()` no longer fans out through inline strcmp arms.
+
+## 2026-07-25 Production-Shipping Hardening Lane
+
+(See main history below — int64 promotion, LED bounds, CI matrix.)
 
 ## 2026-07-07 Restored Bench Validation
 

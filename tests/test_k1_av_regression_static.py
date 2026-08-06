@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 HARNESS = ROOT / "scripts" / "regression-harness"
 SERIAL_MENU = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.h"
+SERIAL_MENU_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.cpp"
 # Phase A Lane 2: the serial_menu.h god-header is being decomposed into cohesive
 # serial/*.{h,cpp} TUs. Assertions that pin serial-command-surface code must look
 # across the WHOLE surface (serial_menu.h + the extracted TUs), not serial_menu.h
@@ -42,6 +43,7 @@ def serial_command_surface() -> str:
         p.read_text(encoding="utf-8")
         for p in (
             SERIAL_MENU,
+            SERIAL_MENU_CPP,
             AP_CAPTURE_TELEMETRY_H,
             AP_CAPTURE_TELEMETRY_CPP,
             SERIAL_TX_H,
@@ -185,39 +187,39 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn('USBSerial.print(",stage=");', source)
         self.assertIn('"unique_stage": unique_sorted(rows, "stage")', capture)
         self.assertIn('"tempo_acf_elapsed_us": describe_ms([numeric(row, "tempo_acf_us") for row in rows])', capture)
-        self.assertIn("SB_AP_STAGE_GDFT", ino)
-        self.assertIn("SB_AP_STAGE_NOVELTY", ino)
-        self.assertIn("SB_AP_STAGE_SNAPSHOT", ino)
-        self.assertIn("SB_AP_STAGE_ONSET", ino)
-        self.assertIn("SB_AP_STAGE_SALIENCY", ino)
-        self.assertIn("SB_AP_STAGE_TEMPO", ino)
-        self.assertIn("sb_ap_cadence_capture_frame", ino)
+        self.assertIn("K1_AP_STAGE_GDFT", ino)
+        self.assertIn("K1_AP_STAGE_NOVELTY", ino)
+        self.assertIn("K1_AP_STAGE_SNAPSHOT", ino)
+        self.assertIn("K1_AP_STAGE_ONSET", ino)
+        self.assertIn("K1_AP_STAGE_SALIENCY", ino)
+        self.assertIn("K1_AP_STAGE_TEMPO", ino)
+        self.assertIn("k1_ap_cadence_capture_frame", ino)
 
     def test_tempo_profiler_timer_is_diagnostic_only(self):
-        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp").read_text(encoding="utf-8")
+        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp").read_text(encoding="utf-8")
 
         self.assertIn("#if ENABLE_TEMPO_STREAM\n#if __has_include(<esp_timer.h>)", tempo)
-        self.assertIn("static inline int64_t sb_tempo_diag_time_us()", tempo)
+        self.assertIn("static inline int64_t k1_tempo_diag_time_us()", tempo)
         self.assertEqual(tempo.count("esp_timer_get_time()"), 1)
 
         self.assertIn(
-            "#define SB_TEMPO_AP_FRAME_HZ ((float)DEFAULT_SAMPLE_RATE / (float)DEFAULT_SAMPLES_PER_CHUNK)",
+            "#define K1_TEMPO_AP_FRAME_HZ ((float)DEFAULT_SAMPLE_RATE / (float)DEFAULT_SAMPLES_PER_CHUNK)",
             tempo,
         )
-        self.assertIn("#define SB_TEMPO_ACF_REFRESH_DECIMATION 1U", tempo)
-        self.assertIn("SB_NOVELTY_RATE_HZ    = SB_AP_FRAME_HZ / (float)SB_NOVELTY_DECIMATION", tempo)
-        self.assertIn("if (++sb_frame_ctr < SB_NOVELTY_DECIMATION)", tempo)
+        self.assertIn("#define K1_TEMPO_ACF_REFRESH_DECIMATION 1U", tempo)
+        self.assertIn("K1_NOVELTY_RATE_HZ    = K1_AP_FRAME_HZ / (float)K1_NOVELTY_DECIMATION", tempo)
+        self.assertIn("if (++k1_frame_ctr < K1_NOVELTY_DECIMATION)", tempo)
 
     def test_16k_acf_amortisation_probe_is_non_shippable_env_only(self):
-        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp").read_text(encoding="utf-8")
+        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")  # N4a: env registration lives in the manifest, not the guard source
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_d8"
         self.assertIn(env_name, platformio)
         self.assertIn(env_name, guard)
-        self.assertIn("-DSB_TEMPO_ACF_REFRESH_DECIMATION=8U", platformio)
-        self.assertIn("if (sb_acf_refresh_now)", tempo)
+        self.assertIn("-DK1_TEMPO_ACF_REFRESH_DECIMATION=8U", platformio)
+        self.assertIn("if (k1_acf_refresh_now)", tempo)
         self.assertIn("production leaves the", tempo)
 
     def test_acf_spread_promoted_to_production_device_proven(self):
@@ -227,14 +229,14 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         # plan.md). That probe PASSED on the main K1 (F887A500): silent A/B active
         # p95 9088us->6784us, 889/2667 over-budget frames -> 0; 127 BPM click lock
         # preserved 100% (conf 0.987). k1_hardware now opts in via the clean
-        # SB_TEMPO_ACF_SPREAD_V1 alias; source still defaults OFF absent the flag and
+        # K1_TEMPO_ACF_SPREAD_V1 alias; source still defaults OFF absent the flag and
         # the 16k probe-matrix envs are unchanged.
-        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.cpp").read_text(encoding="utf-8")
-        tempo_h = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_tempo.h").read_text(encoding="utf-8")
+        tempo = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp").read_text(encoding="utf-8")
+        tempo_h = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h").read_text(encoding="utf-8")
         serial = serial_command_surface()  # acf_spread= print moved to the extracted TU (S1)
         capture = (HARNESS / "device_ap_cadence_capture.py").read_text(encoding="utf-8")
         platformio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
-        guard = (ROOT / "scripts/platformio/k1_upload_guard.py").read_text(encoding="utf-8")
+        guard = (ROOT / "scripts/platformio/k1_device_identities.json").read_text(encoding="utf-8")  # N4a: env registration lives in the manifest, not the guard source
 
         env_name = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread16"
         spread12_env = "k1_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_stage_tempo_acf_spread12"
@@ -254,22 +256,22 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertIn(spread4_env, guard)
         self.assertIn(full_ap_spread8_env, guard)
         self.assertIn(full_ap_spread4_env, guard)
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_PROBE=1", platformio)
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=16U", platformio)
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=12U", platformio)
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=8U", platformio)
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=4U", platformio)
-        self.assertIn("-DSB_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH=1", platformio)
-        self.assertIn("#define SB_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH 0", tempo)
-        self.assertIn("#define SB_TEMPO_ACF_SPREAD_PROBE 0", tempo)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_PROBE=1", platformio)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=16U", platformio)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=12U", platformio)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=8U", platformio)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_LAGS_PER_EMIT=4U", platformio)
+        self.assertIn("-DK1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH=1", platformio)
+        self.assertIn("#define K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH 0", tempo)
+        self.assertIn("#define K1_TEMPO_ACF_SPREAD_PROBE 0", tempo)
         # Production promotion (2026-06-30, device-proven): k1_hardware opts in via
         # the clean alias; the source default above stays OFF absent the flag.
-        self.assertIn("-DSB_TEMPO_ACF_SPREAD_V1=1", platformio)
-        self.assertIn("SB_TEMPO_ACF_SPREAD_V1", tempo)
-        self.assertIn("sb_compute_acf_salience_spread", tempo)
-        self.assertIn("sb_acf_spread_publish_pending", tempo)
-        self.assertIn("if (!sb_acf_published_now)", tempo)
-        self.assertIn("if (!sb_acf_spread_active) return false;", tempo)
+        self.assertIn("-DK1_TEMPO_ACF_SPREAD_V1=1", platformio)
+        self.assertIn("K1_TEMPO_ACF_SPREAD_V1", tempo)
+        self.assertIn("k1_compute_acf_salience_spread", tempo)
+        self.assertIn("k1_acf_spread_publish_pending", tempo)
+        self.assertIn("if (!k1_acf_published_now)", tempo)
+        self.assertIn("if (!k1_acf_spread_active) return false;", tempo)
         self.assertIn("d.acf_spread_active", tempo)
         self.assertIn("uint16_t acf_lag_cursor;", tempo_h)
         self.assertIn('USBSerial.print(",acf_spread=");', serial)
@@ -363,11 +365,11 @@ class K1AvRegressionStaticTest(unittest.TestCase):
         self.assertFalse(lc.is_matrix_blocking_failure(entry))
 
     def test_onset_v2_open_quiet_gate_is_output_permission_only(self):
-        source = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/sb_onset_beat.cpp").read_text(encoding="utf-8")
-        self.assertIn("SBV2_QUIET_SPECTRAL_FLOOR = 0.08f", source)
-        self.assertIn("SBV2_QUIET_NOVELTY_FLOOR  = 0.08f", source)
-        self.assertIn("bool open_quiet = audio.spectral_energy < SBV2_QUIET_SPECTRAL_FLOOR", source)
-        self.assertIn("bool inactive = audio.spectral_energy < SBV2_ACT_FLOOR || open_quiet", source)
+        source = (ROOT / "SPECTRASYNQ_K1_FIRMWARE/audio/k1_onset_beat.cpp").read_text(encoding="utf-8")
+        self.assertIn("K1V2_QUIET_SPECTRAL_FLOOR = 0.08f", source)
+        self.assertIn("K1V2_QUIET_NOVELTY_FLOOR  = 0.08f", source)
+        self.assertIn("bool open_quiet = audio.spectral_energy < K1V2_QUIET_SPECTRAL_FLOOR", source)
+        self.assertIn("bool inactive = audio.spectral_energy < K1V2_ACT_FLOOR || open_quiet", source)
         self.assertIn("stats updates below run regardless", source)
 
     def test_tempo_lane_fail_blocks_matrix(self):

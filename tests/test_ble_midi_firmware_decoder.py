@@ -43,11 +43,11 @@ def _driver_source():
 
         #include "k1_ble_midi_decoder.h"
 
-        const char* kind_name(SBWirelessValueKind kind) {
+        const char* kind_name(K1WirelessValueKind kind) {
           switch (kind) {
-            case SB_WIRELESS_VALUE_NONE: return "NONE";
-            case SB_WIRELESS_VALUE_NUMBER: return "NUMBER";
-            case SB_WIRELESS_VALUE_TEXT: return "TEXT";
+            case K1_WIRELESS_VALUE_NONE: return "NONE";
+            case K1_WIRELESS_VALUE_NUMBER: return "NUMBER";
+            case K1_WIRELESS_VALUE_TEXT: return "TEXT";
           }
           return "UNKNOWN";
         }

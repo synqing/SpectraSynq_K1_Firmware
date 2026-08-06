@@ -1,5 +1,5 @@
 #include "lightshow_modes.h"
-#include "sb_audio_snapshot.h"
+#include "k1_audio_snapshot.h"
 #include <math.h>
 
 // ============================================================================
@@ -116,7 +116,7 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   // else in the firmware exhibited the fault. sb_audio_snapshot_update(t_now)
   // runs every AP frame (SPECTRASYNQ_K1_FIRMWARE.ino:958) and carries the same
   // peak_scaled / vu_level / silence fields under the same spinlock discipline.
-  const SBAudioSnapshot snap = sb_audio_snapshot_read();
+  const K1AudioSnapshot snap = k1_audio_snapshot_read();
   const float peak = wfhyb_clamp01(snap.peak_scaled);
   const bool  silence = snap.silence;
 

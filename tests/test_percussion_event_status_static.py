@@ -1,15 +1,15 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
-SERIAL_MENU = (FW / "serial_menu.h").read_text()
+SERIAL_MENU = read_serial_menu_surface(FW)
 SERIAL_TABLE = (FW / "serial_cmd_table.def").read_text()
 I2S = (FW / "audio" / "i2s_audio.h").read_text()
-SNAPSHOT = (FW / "audio" / "sb_audio_snapshot.h").read_text()
+SNAPSHOT = (FW / "audio" / "k1_audio_snapshot.h").read_text()
 
 
 def function_body(source, name):
@@ -39,8 +39,8 @@ class PercussionEventStatusStaticTest(unittest.TestCase):
 
     def test_event_status_prints_all_percussion_channels_without_streaming(self):
         body = function_body(SERIAL_MENU, "cmd_event_status")
-        self.assertIn("sb_audio_snapshot_read()", body)
-        self.assertIn("sb_onset_beat_read()", body)
+        self.assertIn("k1_audio_snapshot_read()", body)
+        self.assertIn("k1_onset_beat_read()", body)
         self.assertIn("EVENT_STATUS,t=", body)
         for token in (
             "onset=",

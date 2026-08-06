@@ -1,19 +1,19 @@
 import re
 import unittest
 from pathlib import Path
-from _fwpath import FwDir
+from _fwpath import FwDir, read_serial_menu_surface
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FW = FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE")
 SERIAL_MENU = FW / "serial_menu.h"
-NOISE_CAL_ARM = FW / "control" / "sb_noise_cal_arm.cpp"
+NOISE_CAL_ARM = FW / "control" / "k1_noise_cal_arm.cpp"
 
 
 class SerialHotkeyStaticContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.source = SERIAL_MENU.read_text()
+        cls.source = read_serial_menu_surface(FW)
 
     def _function_body(self, name):
         match = re.search(rf"\b(?:bool|void)\s+{name}\s*\([^)]*\)\s*\{{", self.source)
@@ -44,9 +44,13 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                     "j", "J", "k", "K", "l", "L",
                     "q", "Q", "w", "W", "e", "E", "r", "R", "t", "T",
                     ",", ".", "/", "1", "2", "3", "4", "5", "6",
-                    "a", "s", "d", "f"]:
+                    "a", "s", "S", "d", "f",
+                    "g", "G", "u", "y", "-", "=", "_", "+"]:
             self.assertIn(f"'{key}'", body)
-        for removed_key in ["'+", "'=", "'-", "'~", "'c", "'C", "'m", "'M", "'n", "'b", "'B", "'g", "'x"]:
+        # 'm' is NO LONGER removed: it is the SHIPPING ref-E spatial toggle
+        # (#ifndef ENABLE_MOTION_PROBE), reclaimed from the motion-probe "B knob +"
+        # binding — the two are mutually exclusive by build.
+        for removed_key in ["'~", "'c", "'C", "'M", "'n", "'b", "'B", "'x"]:
             self.assertNotIn(removed_key, body)
 
     def test_dispatcher_has_no_destructive_or_single_byte_calibration_hotkeys(self):
@@ -65,11 +69,11 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
 
     def test_noise_cal_confirmation_is_guarded(self):
         serial_body = self._function_body("serial_confirm_noise_cal")
-        self.assertIn("sb_noise_cal_confirm", serial_body)
+        self.assertIn("k1_noise_cal_confirm", serial_body)
 
         arm_source = NOISE_CAL_ARM.read_text()
-        match = re.search(r"bool\s+sb_noise_cal_confirm\s*\([^)]*\)\s*\{", arm_source)
-        self.assertIsNotNone(match, "sb_noise_cal_confirm() must exist")
+        match = re.search(r"bool\s+k1_noise_cal_confirm\s*\([^)]*\)\s*\{", arm_source)
+        self.assertIsNotNone(match, "k1_noise_cal_confirm() must exist")
         start = match.end()
         depth = 1
         index = start
@@ -81,7 +85,7 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
                 depth -= 1
             index += 1
         body = arm_source[start:index - 1]
-        self.assertIn("sb_noise_cal_arm_active", body)
+        self.assertIn("k1_noise_cal_arm_active", body)
         self.assertIn("noise_transition_queued = true", body)
         self.assertIn("NOISE_CAL: not armed", body)
 
@@ -93,6 +97,31 @@ class SerialHotkeyStaticContractTest(unittest.TestCase):
         self.assertIn("parse_command(command_buf)", body)
         self.assertNotIn("USBSerial.available() == 0", body)
         self.assertIn("serial_handle_hotkey(char(byte))", body)
+
+    def test_edge_hotkeys_are_all_sc_safe_allowlisted(self):
+        # Gate<->handler consistency (the 'y' dual-edge dead-hotkey bug,
+        # 2026-07-09): every EdgeMixer hotkey wired in serial_handle_hotkey
+        # (case 'X' -> a serial_edge_* action) MUST also appear in the
+        # serial_hotkey_is_immediate SC_SAFE allowlist, or the gate silently drops
+        # the key BEFORE dispatch (it never reaches the handler). Handled edge keys
+        # must be a SUBSET of allowlisted keys. This routes the key class through
+        # the gate in CI so a future un-allowlisted hotkey fails here, not on-device.
+        handler = self._function_body("serial_handle_hotkey")
+        allowlist = self._function_body("serial_hotkey_is_immediate")
+        edge_keys = set()
+        for match in re.finditer(
+                r"case '(?P<k>(?:\\.|[^'])+)':(?P<body>.*?)(?=\bcase '|\bdefault\s*:)",
+                handler, re.S):
+            if "serial_edge_" in match.group("body"):
+                edge_keys.add(match.group("k"))
+        self.assertTrue(
+            edge_keys, "no EdgeMixer hotkeys found in serial_handle_hotkey")
+        missing = sorted(k for k in edge_keys if f"'{k}'" not in allowlist)
+        self.assertEqual(
+            missing, [],
+            "EdgeMixer hotkeys handled but NOT SC_SAFE-allowlisted (the gate drops "
+            f"them before dispatch): {missing}",
+        )
 
     def test_help_documents_targeted_controls_and_vp_shortcuts(self):
         self.assertIn("K1 HOTKEYS", self.source)

@@ -26,7 +26,7 @@
 
 #include "constants.h"           // NUM_FREQS, NUM_ZONES, NUM_AGC_BANDS, SYSTEM_FPS, ...
 #include "globals.h"             // CONFIG, frequencies[], sample_window[], magnitudes*, agc_*, ...
-#include "utilities.h"           // low_pass_array() — all-inline, ODR-safe (also incl. by sb_chord_detect.cpp)
+#include "utilities.h"           // low_pass_array() — all-inline, ODR-safe (also incl. by k1_chord_detect.cpp)
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 
@@ -61,6 +61,20 @@ static inline float k1_loud_guard_clamp_float(float value, float min_value, floa
   if (value > max_value) return max_value;
   return value;
 }
+
+// A/B floor-cut applied at BOTH AGC paths (per-band + broadband) so the retune is valid
+// regardless of which AGC path a build selects. Mode 0 = flat cut (byte-identical shipping).
+// Modes 1/2 = hybrid affine cut: a small absolute pedestal (retains noise-floor/mud
+// suppression via the zero-clamp) plus a magnitude-proportional term (spares quiet musical
+// bins). The ceiling soft-knee (the actual saturation-tamer) is left untouched at the sites.
+static inline void k1_loud_guard_apply_floor_cut(SQ15x16 &out, SQ15x16 loud_depth) {
+  if (k1_loud_guard_mode == 0) {
+    out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
+  } else {
+    out -= loud_depth * (SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PEDESTAL) + out * SQ15x16(K1_LOUD_GUARD_FLOOR_CUT_PROP_K));
+  }
+  if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+}
 #endif
 
 // Obscure audio magic happens here
@@ -90,7 +104,7 @@ void IRAM_ATTR process_GDFT() {
   // aliased labels as extra resolution. NUM_FREQS stays 80 for LED canvas width.
   // Fixed-point code adapted from example here: https://sourceforge.net/p/freetel/code/HEAD/tree/misc/goertzal/goertzal.c
   const uint8_t nyquist_safe_bin_hi =
-      sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+      k1_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   for (uint16_t i = 0; i < NUM_FREQS; i++) {  // Run NUM_FREQS times
     if (i >= nyquist_safe_bin_hi) {
       magnitudes[i] = 0;
@@ -209,7 +223,7 @@ void IRAM_ATTR process_GDFT() {
   // whole 256-iteration calibration window, which mixed Phase-A DC bootstrap and
   // any stale/pre-cal sample_window state into the spectral noise model.
   if (noise_complete == false) {
-#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
+#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
     if (noise_cal_dc_valid &&
         noise_cal_reject_reason == NOISE_CAL_REJECT_NONE &&
         noise_iterations >= 129 &&
@@ -281,10 +295,10 @@ void IRAM_ATTR process_GDFT() {
   }
 
   // Apply noise reduction data
-#if SB_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
+#if K1_GDFT_STATIC_NOISE_SUBTRACTION_ENABLED
   for (uint8_t i = 0; i < NUM_FREQS; i += 1) {
     if (noise_complete == true) {
-      magnitudes_normalized_avg[i] -= float(noise_samples[i] * SQ15x16(SB_GDFT_STATIC_NOISE_SUBTRACTION_GAIN));
+      magnitudes_normalized_avg[i] -= float(noise_samples[i] * SQ15x16(K1_GDFT_STATIC_NOISE_SUBTRACTION_GAIN));
       if (magnitudes_normalized_avg[i] < 0.0) {
         magnitudes_normalized_avg[i] = 0.0;
       }
@@ -354,9 +368,9 @@ void IRAM_ATTR process_GDFT() {
   }
 #endif
 
-#ifdef SB_AGC_PERBAND_V1
+#ifdef K1_AGC_PERBAND_V1
   // ===========================================================================
-  // PER-BAND AGC v1 (SB_AGC_PERBAND_V1 — DEFAULT OFF, prepare-only candidate).
+  // PER-BAND AGC v1 (K1_AGC_PERBAND_V1 — DEFAULT OFF, prepare-only candidate).
   //
   // Lane N6 fix for the "louder -> dimmer" inverse (eyes-on-verdict 2026-06-21;
   // DSP root-cause spike #72837): the broadband stage below computes ONE global
@@ -434,8 +448,7 @@ void IRAM_ATTR process_GDFT() {
 #ifdef K1_LOUD_GUARD_V1
     if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
       const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      k1_loud_guard_apply_floor_cut(out, loud_depth);
 
       const SQ15x16 knee = SQ15x16(0.45);
       const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
@@ -489,6 +502,9 @@ void IRAM_ATTR process_GDFT() {
   SQ15x16 gate_close_th = agc_noise_floor * SQ15x16(2.5);
   if (agc_gated && agc_envelope > gate_open_th)  agc_gated = false;
   if (!agc_gated && agc_envelope < gate_close_th) agc_gated = true;
+  // NOTE: agc_envelope/agc_gated here are effectively inert on hardware (measured
+  // stuck at 0 / permanently gated). agc_loudness_norm for STM is therefore sourced
+  // from the LIVE pre-AGC mic RMS in i2s_audio.h, NOT from this envelope.
 
   // 5+6. Target gain (only adapts when ungated; frozen during silence)
   static SQ15x16 agc_gain = SQ15x16(1.0);
@@ -509,8 +525,7 @@ void IRAM_ATTR process_GDFT() {
 #ifdef K1_LOUD_GUARD_V1
     if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
       const SQ15x16 loud_depth = SQ15x16(1.0f - k1_loud_trim);
-      out -= loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_FLOOR_CUT);
-      if (out < SQ15x16(0.0)) out = SQ15x16(0.0);
+      k1_loud_guard_apply_floor_cut(out, loud_depth);
 
       const SQ15x16 knee = SQ15x16(0.45);
       const SQ15x16 ceiling = SQ15x16(0.92) - (loud_depth * SQ15x16(K1_LOUD_GUARD_SPECTRAL_CEILING_DROP));
@@ -532,8 +547,8 @@ void IRAM_ATTR process_GDFT() {
     agc_bands[b].target_gain = agc_gain;
     agc_bands[b].energy      = sig_q;
   }
-#endif  // SB_AGC_PERBAND_V1
-  // --- END AGC (broadband v2 default / per-band v1 under SB_AGC_PERBAND_V1) ---
+#endif  // K1_AGC_PERBAND_V1
+  // --- END AGC (broadband v2 default / per-band v1 under K1_AGC_PERBAND_V1) ---
 }
 
 void calculate_novelty(uint32_t t_now) {

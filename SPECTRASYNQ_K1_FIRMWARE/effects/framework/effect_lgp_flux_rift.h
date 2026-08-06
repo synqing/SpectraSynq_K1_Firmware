@@ -19,7 +19,7 @@
  * AUDIO PROXY MAP (v3 ControlBus/EffectContext → K1AudioContext):
  *   v3 `ctx.audio.available`           → `ctx.audio.available()`          (method)
  *   v3 `ctx.audio.fastFlux()`          → `ctx.audio.spectralFlux()`       (proxy:
- *       K1 `spectralFlux()` reads `SBAudioSnapshot::spectral_energy`, a 1-frame-EMA
+ *       K1 `spectralFlux()` reads `K1AudioSnapshot::spectral_energy`, a 1-frame-EMA
  *       of spectral novelty — not raw hop-level fastFlux.  Seam responds slightly
  *       slower than v3; acceptable for P7 first port. See p7-prep §4.2.)
  *   v3 `ctx.audio.overallSaliency()`   → `ctx.audio.rms()`                (proxy)

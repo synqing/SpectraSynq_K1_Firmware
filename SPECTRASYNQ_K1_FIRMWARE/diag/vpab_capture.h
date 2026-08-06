@@ -85,6 +85,11 @@ struct VPABRenderContext {
   uint8_t manual_owner_active;
   uint16_t edge_strength_milli;
   uint16_t edge_effective_strength_milli;
+  // Symmetric dual-edge (A lane). edge_dual_mode: K1EdgeMixerDualEdge (0 one-sided /
+  // 1 split / 2 mirror). edge_primary_enabled: 1 when the primary-edge transform
+  // actually ran this frame (dual mode active AND edge enabled).
+  uint8_t edge_dual_mode;
+  uint8_t edge_primary_enabled;
 };
 
 void vpab_capture_reset();

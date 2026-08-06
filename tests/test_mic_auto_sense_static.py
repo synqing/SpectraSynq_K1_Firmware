@@ -159,13 +159,15 @@ def test_auto_sense_cannot_fire_calibration_or_persist_config():
         "sb_noise_cal_confirm",
         "sb_noise_cal_arm",
         "noise_transition_queued = true",
-        "CONFIG.SENSITIVITY =",
         "save_config",
         "save_config_delayed",
         "save_ambient_noise_calibration",
         "save_calibration_profile",
     ):
         assert forbidden not in auto_region
+
+    if "K1_MIC_AUTO_HEADROOM_V2" not in auto_region:
+        assert "CONFIG.SENSITIVITY =" not in auto_region
 
     assert "k1_mic_auto_sense_update_frame(t_now);" in combined
     assert "k1_mic_auto_sense_read()" in combined
