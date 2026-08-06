@@ -846,8 +846,35 @@ void acquire_sample_chunk(uint32_t t_now) {
     // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
     // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
     // is what keeps genuinely quiet *music* from darkening the plate.
+    // PEAKINESS (2026-08-06): the second discriminator, because RMS alone is blind
+    // here. MEASURED on this bench: music rms_raw p50 0.0027 vs quiet-room p50
+    // 0.0072 — music's MEDIAN RMS is LOWER than ambient's, and ~75% of music frames
+    // read at or below the loudest ambient frame. The room floor is narrowband hum
+    // (crest ~1.26, RMS ~= peak); music is peaky (RMS << peak). RMS is the one
+    // statistic on which steady hum beats music, so no level threshold can release
+    // the gate on music at any gain — which is exactly the reported failure.
+    // Peak-to-mean DOES separate: quiet room 1.24 vs music 3.17. It is a ratio, so
+    // it is gain-invariant and survives mic/gain changes.
+    // It may only BREAK silence, never cause it: the reported fault is a gate that
+    // will not RELEASE, so this path can only ever release earlier.
+    static float k1_pk_ring[K1_SILENCE_PEAK_WIN];
+    static uint16_t k1_pk_n = 0, k1_pk_i = 0;
+    static float k1_pk_sum = 0.0f;
+    if (k1_pk_n == K1_SILENCE_PEAK_WIN) k1_pk_sum -= k1_pk_ring[k1_pk_i]; else k1_pk_n++;
+    k1_pk_ring[k1_pk_i] = (float)max_waveform_val_raw;
+    k1_pk_sum += k1_pk_ring[k1_pk_i];
+    k1_pk_i = (uint16_t)((k1_pk_i + 1u) % K1_SILENCE_PEAK_WIN);
+    float k1_pk_max = 0.0f;
+    for (uint16_t i = 0; i < k1_pk_n; i++) { if (k1_pk_ring[i] > k1_pk_max) k1_pk_max = k1_pk_ring[i]; }
+    const float k1_pk_mean = (k1_pk_n > 0u) ? (k1_pk_sum / (float)k1_pk_n) : 0.0f;
+    // Ratio is only meaningful on a full window over a non-trivial floor.
+    k1_silence_peakiness = (k1_pk_n == K1_SILENCE_PEAK_WIN && k1_pk_mean >= 1.0f)
+                             ? (k1_pk_max / k1_pk_mean) : 0.0f;
+
     static bool k1_rms_silent_state = false;
-    if (k1_rms_silent_state) {
+    if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK) {
+        k1_rms_silent_state = false;                                        // structured audio → never silence
+    } else if (k1_rms_silent_state) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
     } else {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
@@ -932,10 +959,10 @@ void acquire_sample_chunk(uint32_t t_now) {
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
     K1TempoEvent     tev = k1_tempo_read();
     K1OnsetBeatEvent oev = k1_onset_beat_read();
-    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f pky=%.2f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
-      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, (float)k1_silence_peakiness, CONFIG.STANDBY_DIMMING ? 1 : 0,
       calibration_source_name(), calibration_valid ? 1 : 0,
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,

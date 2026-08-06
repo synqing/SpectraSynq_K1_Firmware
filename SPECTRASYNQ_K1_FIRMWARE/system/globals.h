@@ -703,6 +703,16 @@ inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first 
 // with margin. Runtime-tunable via :silence_rms_enter / :silence_rms_exit (no recompile).
 inline float    K1_SILENCE_RMS_ENTER = 0.04f;     // raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-room floor <0.02, ~8x margin.
 inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not silent (Schmitt exit; > enter)
+// PEAKINESS discriminator (2026-08-06). RMS alone CANNOT separate music from a
+// narrowband room floor — measured on bench B489A500: music rms_raw p50 0.0027 vs
+// quiet-room p50 0.0072 (music's MEDIAN is LOWER), ~75% of music frames at or below
+// the loudest ambient frame. Peak-to-mean over a short window does separate, and
+// being a RATIO it is gain-invariant — it survives the mic/gain changes that
+// silently desynchronised the absolute thresholds above.
+//   MEASURED: quiet room 1.24   ·   music 3.17
+#define K1_SILENCE_PEAK_WIN 64                    // ~0.48 s at the 133 Hz AP frame rate
+inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured audio, never silence
+inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
 // ------------------------------------------------------------
