@@ -51,11 +51,52 @@ static void style_row(lv_obj_t* row)
   deck_ui_style_solid(row, DECK_COLOR_CRT, DECK_COLOR_BORDER, 6, 1);
 }
 
-/* Selection chrome (fill/outline) deferred — optical T1 BLOCKED (SKIP_LOOK_BLOCKED). */
+/** Selected = filled/high-contrast; idle = outline/empty; pending = thicker amber border. */
+static void style_bool_tile(lv_obj_t* btn, bool selected, bool pending)
+{
+  if (!btn) return;
+  lv_obj_t* lab = lv_obj_get_child_count(btn) > 0 ? lv_obj_get_child(btn, 0) : nullptr;
+  if (selected) {
+    lv_obj_set_style_bg_color(btn, lv_color_hex(DECK_COLOR_BOOL_SEL_FILL), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(
+        btn, lv_color_hex(pending ? DECK_COLOR_BOOL_PENDING_BORDER : DECK_COLOR_BOOL_SEL_BORDER),
+        LV_PART_MAIN);
+    lv_obj_set_style_border_width(btn, pending ? 3 : 2, LV_PART_MAIN);
+    if (lab) {
+      lv_obj_set_style_text_color(lab, lv_color_hex(DECK_COLOR_BOOL_SEL_LABEL), LV_PART_MAIN);
+    }
+  } else {
+    lv_obj_set_style_bg_color(btn, lv_color_hex(DECK_COLOR_BOOL_IDLE_FILL), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(btn, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(btn, lv_color_hex(DECK_COLOR_BOOL_IDLE_BORDER), LV_PART_MAIN);
+    lv_obj_set_style_border_width(btn, 2, LV_PART_MAIN);
+    if (lab) {
+      lv_obj_set_style_text_color(lab, lv_color_hex(DECK_COLOR_AMBER_DIM), LV_PART_MAIN);
+    }
+  }
+}
+
 static void bool_apply_selection_logic(BoolCtx* ctx)
 {
-  (void)ctx;
-  /* Logic-only: pending/confirmed tracked; no theme token / fill edits while blocked. */
+  if (!ctx) return;
+  const bool value = ctx->pending_active ? ctx->pending_value : ctx->confirmed_value;
+  const bool pending = ctx->pending_active;
+  style_bool_tile(ctx->off_btn, !value, pending && !value);
+  style_bool_tile(ctx->on_btn, value, pending && value);
+}
+
+/** Apple: press feedback on pointer-down — optimistic chrome before ACK. */
+static void bool_btn_pressed_cb(lv_event_t* e)
+{
+  if (lv_event_get_code(e) != LV_EVENT_PRESSED) return;
+  BoolCtx* ctx = static_cast<BoolCtx*>(lv_event_get_user_data(e));
+  if (!ctx || !ctx->path) return;
+  const intptr_t on = reinterpret_cast<intptr_t>(
+      lv_obj_get_user_data(static_cast<lv_obj_t*>(lv_event_get_target(e))));
+  ctx->pending_value = (on != 0);
+  ctx->pending_active = true;
+  bool_apply_selection_logic(ctx);
 }
 
 static void bool_btn_cb(lv_event_t* e)
@@ -65,7 +106,7 @@ static void bool_btn_cb(lv_event_t* e)
   if (!ctx || !ctx->path) return;
   const intptr_t on = reinterpret_cast<intptr_t>(
       lv_obj_get_user_data(static_cast<lv_obj_t*>(lv_event_get_target(e))));
-  /* Local pending selection before TX (Task 1.2 logic-only). */
+  /* Ensure pending chrome even if PRESSED was skipped (keyboard/sim). */
   ctx->pending_value = (on != 0);
   ctx->pending_active = true;
   bool_apply_selection_logic(ctx);
@@ -143,13 +184,17 @@ static void add_bool_control(lv_obj_t* sheet, const char* title, const char* pat
 
   lv_obj_t* off = deck_ui_make_sheet_button(row, 720, 12, 200, 64, "OFF", DECK_COLOR_AMBER_DIM);
   lv_obj_set_user_data(off, reinterpret_cast<void*>(static_cast<intptr_t>(0)));
+  lv_obj_add_event_cb(off, bool_btn_pressed_cb, LV_EVENT_PRESSED, ctx);
   lv_obj_add_event_cb(off, bool_btn_cb, LV_EVENT_CLICKED, ctx);
   ctx->off_btn = off;
 
   lv_obj_t* on = deck_ui_make_sheet_button(row, 940, 12, 200, 64, "ON", DECK_COLOR_AMBER_HI);
   lv_obj_set_user_data(on, reinterpret_cast<void*>(static_cast<intptr_t>(1)));
+  lv_obj_add_event_cb(on, bool_btn_pressed_cb, LV_EVENT_PRESSED, ctx);
   lv_obj_add_event_cb(on, bool_btn_cb, LV_EVENT_CLICKED, ctx);
   ctx->on_btn = on;
+
+  bool_apply_selection_logic(ctx); /* confirmed=false → OFF filled, ON outline */
 }
 
 static void add_text_control(lv_obj_t* sheet, const char* title, const char* path,

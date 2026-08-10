@@ -436,11 +436,17 @@ static void set_lamp_visual(lv_obj_t* lamp, bool on)
   if (!lamp) return;
   if (on) {
     lv_obj_set_style_bg_color(lamp, lv_color_hex(DECK_COLOR_LAMP_ON), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lamp, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_width(lamp, 0, LV_PART_MAIN);
     lv_obj_set_style_shadow_width(lamp, 8, LV_PART_MAIN);
     lv_obj_set_style_shadow_color(lamp, lv_color_hex(DECK_COLOR_LAMP_ON), LV_PART_MAIN);
     lv_obj_set_style_shadow_opa(lamp, LV_OPA_40, LV_PART_MAIN);
   } else {
-    lv_obj_set_style_bg_color(lamp, lv_color_hex(DECK_COLOR_LAMP_OFF), LV_PART_MAIN);
+    /* OFF = unlit outline (not dull amber blob) — MERGE CAPTAIN_MERGE_20260811. */
+    lv_obj_set_style_bg_color(lamp, lv_color_hex(DECK_COLOR_LAMP_OFF_FILL), LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(lamp, LV_OPA_COVER, LV_PART_MAIN);
+    lv_obj_set_style_border_color(lamp, lv_color_hex(DECK_COLOR_LAMP_OFF_BORDER), LV_PART_MAIN);
+    lv_obj_set_style_border_width(lamp, 2, LV_PART_MAIN);
     lv_obj_set_style_shadow_width(lamp, 0, LV_PART_MAIN);
   }
 }
@@ -678,6 +684,11 @@ static void hide_scrim_after_close(lv_anim_t* a)
   }
 }
 
+/**
+ * Zero-stagger sheet open (REDRAW_ROOT_CAUSE H1–H3 / plan Task 3.1 Option C):
+ * stay HIDDEN → update_layout → COVER bg → single clear-HIDDEN.
+ * Kill full-screen style_opa scrim anim + translate_y under PARTIAL 64-line FB.
+ */
 static void sheet_animate_open(DeckSheetId id)
 {
   deck_input_open_sheet(id);
@@ -687,39 +698,28 @@ static void sheet_animate_open(DeckSheetId id)
     if (static_cast<DeckSheetId>(i) != id) {
       lv_anim_delete(gSheets[i], nullptr);
       lv_obj_add_flag(gSheets[i], LV_OBJ_FLAG_HIDDEN);
+      lv_obj_set_style_translate_y(gSheets[i], 0, LV_PART_MAIN);
     }
   }
 
   if (gScrim) {
+    lv_anim_delete(gScrim, nullptr);
+    /* Snap scrim — no whole-object style_opa animation under PARTIAL. */
+    lv_obj_set_style_opa(gScrim, LV_OPA_40, LV_PART_MAIN);
     lv_obj_clear_flag(gScrim, LV_OBJ_FLAG_HIDDEN);
     lv_obj_move_foreground(gScrim);
-    lv_obj_set_style_opa(gScrim, LV_OPA_TRANSP, LV_PART_MAIN);
-    lv_anim_t sa;
-    lv_anim_init(&sa);
-    lv_anim_set_var(&sa, gScrim);
-    lv_anim_set_values(&sa, LV_OPA_TRANSP, LV_OPA_40);
-    lv_anim_set_duration(&sa, DECK_MOTION_SCRIM_MS);
-    lv_anim_set_exec_cb(&sa, anim_opa_cb);
-    lv_anim_set_path_cb(&sa, lv_anim_path_ease_out);
-    lv_anim_start(&sa);
   }
 
   lv_obj_t* sheet = gSheets[id];
   if (!sheet) return;
   lv_anim_delete(sheet, nullptr);
+  lv_obj_set_style_bg_opa(sheet, LV_OPA_COVER, LV_PART_MAIN);
+  lv_obj_set_style_opa(sheet, LV_OPA_COVER, LV_PART_MAIN);
+  lv_obj_set_style_translate_y(sheet, 0, LV_PART_MAIN);
+  /* Layout while still HIDDEN — single opaque reveal (no mid-visible create storm). */
+  lv_obj_update_layout(sheet);
   lv_obj_clear_flag(sheet, LV_OBJ_FLAG_HIDDEN);
   lv_obj_move_foreground(sheet);
-  lv_obj_set_style_translate_y(sheet, 40, LV_PART_MAIN);
-  lv_obj_set_style_opa(sheet, LV_OPA_COVER, LV_PART_MAIN);
-
-  lv_anim_t a;
-  lv_anim_init(&a);
-  lv_anim_set_var(&a, sheet);
-  lv_anim_set_values(&a, 40, 0);
-  lv_anim_set_duration(&a, DECK_MOTION_SHEET_MS);
-  lv_anim_set_exec_cb(&a, anim_translate_y_cb);
-  lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
-  lv_anim_start(&a);
 
   if (id == DECK_SHEET_CALIBRATE) {
     // Resume mid-window if still armed after close.
@@ -736,31 +736,18 @@ static void sheet_animate_close(void)
   const DeckSheetId id = deck_state_sheet();
   deck_input_close_sheet();
 
-  if (gScrim && !lv_obj_has_flag(gScrim, LV_OBJ_FLAG_HIDDEN)) {
-    lv_anim_t sa;
-    lv_anim_init(&sa);
-    lv_anim_set_var(&sa, gScrim);
-    lv_anim_set_values(&sa, static_cast<int32_t>(lv_obj_get_style_opa(gScrim, LV_PART_MAIN)),
-                       LV_OPA_TRANSP);
-    lv_anim_set_duration(&sa, DECK_MOTION_SCRIM_MS);
-    lv_anim_set_exec_cb(&sa, anim_opa_cb);
-    lv_anim_set_path_cb(&sa, lv_anim_path_ease_out);
-    lv_anim_set_completed_cb(&sa, hide_scrim_after_close);
-    lv_anim_start(&sa);
+  if (gScrim) {
+    lv_anim_delete(gScrim, nullptr);
+    lv_obj_add_flag(gScrim, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_style_opa(gScrim, LV_OPA_40, LV_PART_MAIN);
   }
 
   if (id > DECK_SHEET_NONE && id < DECK_SHEET_COUNT && gSheets[id]) {
     lv_obj_t* sheet = gSheets[id];
     lv_anim_delete(sheet, nullptr);
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_var(&a, sheet);
-    lv_anim_set_values(&a, 0, 40);
-    lv_anim_set_duration(&a, DECK_MOTION_SHEET_MS);
-    lv_anim_set_exec_cb(&a, anim_translate_y_cb);
-    lv_anim_set_path_cb(&a, lv_anim_path_ease_out);
-    lv_anim_set_completed_cb(&a, hide_sheet_after_close);
-    lv_anim_start(&a);
+    lv_obj_add_flag(sheet, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_set_style_translate_y(sheet, 0, LV_PART_MAIN);
+    lv_obj_set_style_opa(sheet, LV_OPA_COVER, LV_PART_MAIN);
   }
 }
 
@@ -1263,7 +1250,8 @@ static void create_sheet_root(DeckSheetId id)
   lv_obj_set_size(gSheets[id], SCREEN_W, SCREEN_H);
   lv_obj_set_pos(gSheets[id], 0, 0);
   style_solid(gSheets[id], DECK_COLOR_SHEET, DECK_COLOR_BORDER, 0, 0);
-  lv_obj_set_style_bg_opa(gSheets[id], LV_OPA_90, LV_PART_MAIN);
+  /* COVER during open — LV_OPA_90 kept MAIN blended under sheet (H3 amplifier). */
+  lv_obj_set_style_bg_opa(gSheets[id], LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_add_flag(gSheets[id], LV_OBJ_FLAG_HIDDEN);
 }
 
@@ -1275,7 +1263,7 @@ static void create_calibrate_sheet(void)
   lv_obj_set_size(gSheets[id], SCREEN_W, SCREEN_H);
   lv_obj_set_pos(gSheets[id], 0, 0);
   style_solid(gSheets[id], DECK_COLOR_SHEET, DECK_COLOR_BORDER, 0, 0);
-  lv_obj_set_style_bg_opa(gSheets[id], LV_OPA_90, LV_PART_MAIN);
+  lv_obj_set_style_bg_opa(gSheets[id], LV_OPA_COVER, LV_PART_MAIN);
   lv_obj_add_flag(gSheets[id], LV_OBJ_FLAG_HIDDEN);
 
   lv_obj_t* title_lab = make_label(gSheets[id], "NOISE CALIBRATION", DECK_TYPE_MONO_34,
@@ -1504,6 +1492,9 @@ void Deck_UI_Tick(void)
   const bool authority_changed =
       (rev != gLastRxRevision) || (conf != gLastConfirmedCount) || (stale != gLastStale);
 
+  /* Suppress MAIN 10 Hz refresh while sheet open — reduces PARTIAL dirty traffic (H5). */
+  const bool sheet_open = (deck_state_sheet() != DECK_SHEET_NONE);
+
   static uint32_t last = 0;
   const uint32_t now = millis();
   const bool tick_due = (now - last >= 100);
@@ -1515,9 +1506,11 @@ void Deck_UI_Tick(void)
     gLastRxRevision = rev;
     gLastConfirmedCount = conf;
     gLastStale = stale;
-    refresh_all_controls();
+    if (!sheet_open) refresh_all_controls();
     return;
   }
+
+  if (sheet_open) return;
 
 #if DECK_UI_LAYOUT_MAP_DEBUG
   deck_ui_layout_map_refresh();

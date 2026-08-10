@@ -161,12 +161,28 @@ class TestDeckStateV1(unittest.TestCase):
         self.assertIn("never CONFIRMED_REMOTE", manifest)
         self.assertNotIn('"ack_policy": "CONFIRMED_REMOTE"', manifest)
 
-    def test_sheet_bool_pending_logic_without_look_tokens(self):
-        """Task 1.2 — pending/confirm logic present; look chrome deferred."""
+    def test_sheet_bool_fill_outline_chrome_present(self):
+        """Task 2.2 — selected fill vs idle outline + pending chrome (MERGE)."""
         sheets = (ROOT / "tab5_firmware" / "src" / "deck_ui_sheets.cpp").read_text()
+        theme = (ROOT / "tab5_firmware" / "include" / "deck_theme.h").read_text()
+        motion = (ROOT / "tab5_firmware" / "include" / "deck_motion.h").read_text()
+        deck_ui = (ROOT / "tab5_firmware" / "src" / "deck_ui.cpp").read_text()
         self.assertIn("pending_active", sheets)
         self.assertIn("deck_ui_sheets_apply_bool", sheets)
-        self.assertIn("SKIP_LOOK_BLOCKED", sheets)
+        self.assertIn("style_bool_tile", sheets)
+        self.assertIn("LV_EVENT_PRESSED", sheets)
+        self.assertIn("DECK_COLOR_BOOL_SEL_FILL", theme)
+        self.assertIn("DECK_COLOR_BOOL_IDLE_FILL", theme)
+        self.assertNotIn("SKIP_LOOK_BLOCKED", sheets)
+        # Zero-stagger: snap durations + COVER reveal contract markers.
+        self.assertRegex(motion, r"#define\s+DECK_MOTION_SHEET_MS\s+0\b")
+        self.assertRegex(motion, r"#define\s+DECK_MOTION_SCRIM_MS\s+0\b")
+        self.assertIn("lv_obj_update_layout(sheet)", deck_ui)
+        self.assertIn("LV_OPA_COVER", deck_ui)
+        # VIVID stays disabled.
+        self.assertIn("F07_VIVID", sheets)
+        self.assertIn("non-open", sheets.lower())
+
 
 
 if __name__ == "__main__":

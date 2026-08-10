@@ -47,7 +47,7 @@ lv_obj_t* deck_ui_make_sheet_button(lv_obj_t* parent, int x, int y, int w, int h
                                     const char* title, uint32_t label_colour);
 void deck_ui_bind_sheet_close(lv_obj_t* btn);
 void deck_ui_set_key_lamp(DeckSheetId sheet, bool on);
-/** Reconcile sheet bool pending/confirmed from SNAPSHOT/DELTA (logic-only). */
+/** Reconcile sheet bool pending/confirmed from SNAPSHOT/DELTA (fill/outline chrome). */
 void deck_ui_sheets_apply_bool(const char* path, bool value);
 
 /** Link markers — prove modules are in the binary (nm / strings). */
