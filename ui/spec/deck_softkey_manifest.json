@@ -1,0 +1,337 @@
+{
+  "schema": "precision_bay_r1.deck_softkey_manifest/1",
+  "status": "FROZEN_G0_PASS",
+  "frozen_utc": "2026-08-08T02:10:00Z",
+  "captain_freeze": {
+    "F03_RENDER": "A \u2192 vp.profile",
+    "F05_SMART": "A \u2192 scene.smart",
+    "F07_VIVID": "DISABLED_NO_OPEN 2026-08-10 \u2014 soft-key non-open; chroma/sat DEAD ON GLASS (serial-only)",
+    "kept": [
+      "F01 calibration.noise.*",
+      "F02 edge.*",
+      "F04 global.sensitivity",
+      "F06 director.*"
+    ]
+  },
+  "note": "All controls[].path validated against live docs/protocol/k1-ble-midi-map.json. Ack honesty: B2 not landed \u2192 LOCAL_SEND_ONLY or SENT_UNCONFIRMED only. Mirror purged from BLE map 2026-08-09.",
+  "map_sha256": "2d1121bd5d1a54421b4b35ead62ba91bfba3a709c8259d35b166f25a6dc148ff",
+  "registry_md5": "9b5db3fbb17438367adeaceb541db03b",
+  "backend_ack_note": "Until Deck16 B2 lands, ack_policy must be LOCAL_SEND_ONLY or SENT_UNCONFIRMED \u2014 never CONFIRMED_REMOTE / REMOTE_ECHO as if B2 existed. Soft-key lamp paths (edge.enabled, director.enabled, scene.smart, vp.profile) are included in K1 HELLO+SNAPSHOT image so reconnect can light lamps without inventing apply-ACK UX; sheet bool chrome remains SENT_UNCONFIRMED until optical PASS + true ACK surface.",
+  "keys": [
+    {
+      "key_id": "F01_CALIBRATE",
+      "label": "CALIBRATE",
+      "sheet_id": "DECK_SHEET_CALIBRATE",
+      "status": "FROZEN",
+      "captain_resolution": "prior_frozen_candidate",
+      "lamp_policy": "BOOL_LOCAL_ARMED_STATE",
+      "lamp_note": "Derive from honest arm state after TX success; current code arms on click regardless of deck_tx_cal_arm() result \u2014 repair G4/G6",
+      "controls": [
+        {
+          "path": "calibration.noise.arm",
+          "kind": "COMMAND",
+          "wire": "NRPN",
+          "channel": 6,
+          "nrpn_param": 0,
+          "range": "command pulse",
+          "ack_policy": "LOCAL_SEND_ONLY",
+          "disconnect_policy": "BLOCK",
+          "destructive_protection": "PROTECTED_APPLY",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "calibration.noise.confirm",
+          "kind": "COMMAND",
+          "wire": "NRPN",
+          "channel": 6,
+          "nrpn_param": 1,
+          "range": "command pulse",
+          "ack_policy": "LOCAL_SEND_ONLY",
+          "disconnect_policy": "BLOCK",
+          "destructive_protection": "PROTECTED_APPLY",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "calibration.noise.clear",
+          "kind": "COMMAND",
+          "wire": "NRPN",
+          "channel": 6,
+          "nrpn_param": 3,
+          "range": [
+            "CONFIRM"
+          ],
+          "ack_policy": "LOCAL_SEND_ONLY",
+          "disconnect_policy": "BLOCK",
+          "destructive_protection": "PROTECTED_APPLY",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "calibration.noise.status",
+          "kind": "COMMAND",
+          "wire": "NRPN",
+          "channel": 6,
+          "nrpn_param": 2,
+          "range": "command",
+          "ack_policy": "LOCAL_SEND_ONLY",
+          "disconnect_policy": "BLOCK",
+          "destructive_protection": "PROTECTED_APPLY",
+          "k1_apply": "YES",
+          "map_validated": true,
+          "note": "status path exists; Tab5 currently has no RX echo into deck_state"
+        }
+      ]
+    },
+    {
+      "key_id": "F02_EDGE",
+      "label": "EDGE",
+      "sheet_id": "DECK_SHEET_EDGE",
+      "status": "FROZEN",
+      "captain_resolution": "prior_frozen_candidate",
+      "lamp_policy": "BOOL_CONFIRMED_PATH",
+      "lamp_source_path": "edge.enabled",
+      "lamp_note": "Must NOT hard-code active; bind to edge.enabled (SENT_UNCONFIRMED until B2)",
+      "controls": [
+        {
+          "path": "edge.enabled",
+          "kind": "BOOL",
+          "wire": "CC7",
+          "channel": 4,
+          "cc": 64,
+          "range": "0=off,127=on",
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "edge.mode",
+          "kind": "ENUM_TEXT",
+          "wire": "NRPN",
+          "channel": 4,
+          "nrpn_param": 0,
+          "range": [
+            "off",
+            "analogous",
+            "complementary",
+            "split",
+            "veil",
+            "triadic",
+            "tetradic"
+          ],
+          "accepted_text_values": [
+            "off",
+            "analogous",
+            "complementary",
+            "split",
+            "split_complementary",
+            "veil",
+            "saturation_veil",
+            "triadic",
+            "tetradic"
+          ],
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "edge.strength",
+          "kind": "NUMBER",
+          "wire": "CC14",
+          "channel": 4,
+          "cc_msb": 1,
+          "cc_lsb": 33,
+          "range": [
+            0.0,
+            1.0
+          ],
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        }
+      ]
+    },
+    {
+      "key_id": "F03_RENDER",
+      "label": "RENDER",
+      "sheet_id": "DECK_SHEET_RENDER",
+      "status": "FROZEN",
+      "captain_resolution": "A \u2192 vp.profile",
+      "lamp_policy": "ENUM_ACTIVE",
+      "lamp_source_path": "vp.profile",
+      "lamp_note": "Lamp active when vp.profile != original; forbid hard-coded ON",
+      "controls": [
+        {
+          "path": "vp.profile",
+          "kind": "ENUM_TEXT",
+          "wire": "NRPN",
+          "channel": 5,
+          "nrpn_param": 0,
+          "range": [
+            "original",
+            "clean",
+            "candidate",
+            "custom"
+          ],
+          "accepted_text_values": [
+            "original",
+            "clean",
+            "candidate",
+            "custom"
+          ],
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        }
+      ]
+    },
+    {
+      "key_id": "F04_SENSITIVITY",
+      "label": "SENSITIVITY",
+      "sheet_id": "DECK_SHEET_SENSITIVITY",
+      "status": "FROZEN",
+      "captain_resolution": "prior_frozen_candidate",
+      "lamp_policy": "NONE",
+      "controls": [
+        {
+          "path": "global.sensitivity",
+          "kind": "NUMBER",
+          "wire": "CC14",
+          "channel": 2,
+          "cc_msb": 1,
+          "cc_lsb": 33,
+          "range": [
+            0.1,
+            20.0
+          ],
+          "range_source": "K1_SENSITIVITY_MIN/MAX in config_types.h + map vmin/vmax symbolic",
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        }
+      ],
+      "note": "Primary executable binding is global.sensitivity. STANDBY_DIMMING struck 2026-08-09 \u2014 not selectable."
+    },
+    {
+      "key_id": "F05_SMART",
+      "label": "SMART",
+      "sheet_id": "DECK_SHEET_SMART",
+      "status": "FROZEN",
+      "captain_resolution": "A \u2192 scene.smart",
+      "lamp_policy": "ENUM_ACTIVE",
+      "lamp_source_path": "scene.smart",
+      "lamp_note": "Must NOT hard-code active; lamp on when scene.smart not in {off,none}",
+      "controls": [
+        {
+          "path": "scene.smart",
+          "kind": "ENUM_TEXT",
+          "wire": "NRPN",
+          "channel": 4,
+          "nrpn_param": 1,
+          "range": [
+            "off",
+            "assist",
+            "l1",
+            "auto"
+          ],
+          "accepted_text_values": [
+            "off",
+            "none",
+            "assist",
+            "control",
+            "l1",
+            "accent",
+            "auto",
+            "autonomy",
+            "demo"
+          ],
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        }
+      ],
+      "note": "MERGE_SMART_DIRECTOR=NO \u2014 SMART stays scene.smart; DIRECTOR stays director.*"
+    },
+    {
+      "key_id": "F06_DIRECTOR",
+      "label": "DIRECTOR",
+      "sheet_id": "DECK_SHEET_DIRECTOR",
+      "status": "FROZEN",
+      "captain_resolution": "prior_frozen_candidate",
+      "lamp_policy": "BOOL_CONFIRMED_PATH",
+      "lamp_source_path": "director.enabled",
+      "controls": [
+        {
+          "path": "director.enabled",
+          "kind": "BOOL",
+          "wire": "CC7",
+          "channel": 3,
+          "cc": 64,
+          "range": "0=off,127=on",
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "director.assist",
+          "kind": "BOOL",
+          "wire": "CC7",
+          "channel": 3,
+          "cc": 65,
+          "range": "0=off,127=on",
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "director.autonomy",
+          "kind": "BOOL",
+          "wire": "CC7",
+          "channel": 3,
+          "cc": 66,
+          "range": "0=off,127=on",
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        },
+        {
+          "path": "director.confidence_floor",
+          "kind": "NUMBER",
+          "wire": "CC14",
+          "channel": 3,
+          "cc_msb": 1,
+          "cc_lsb": 33,
+          "range": [
+            0.0,
+            1.0
+          ],
+          "ack_policy": "SENT_UNCONFIRMED",
+          "disconnect_policy": "BLOCK",
+          "k1_apply": "YES",
+          "map_validated": true
+        }
+      ],
+      "note": "hooks.enabled adjacent on ch3 but not claimed"
+    },
+    {
+      "key_id": "F07_VIVID",
+      "label": "VIVID",
+      "sheet_id": "DECK_SHEET_VIVID",
+      "status": "DISABLED_NO_OPEN",
+      "captain_resolution": "Dead-on-glass \u2014 chroma/saturation never on Operator glass (AUTHORITY_AUDIT 2026-08-09). 2026-08-10 Phase 1.3: soft-key non-open (no sheet) to kill false affordance; no grey/look chrome while optical T1 BLOCKED.",
+      "lamp_policy": "NONE",
+      "sheet_note": "Soft-key does not open a sheet. Serial-only for chroma/sat. glass_path_forbidden remains.",
+      "controls": []
+    }
+  ]
+}
