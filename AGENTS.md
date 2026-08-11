@@ -1,3 +1,6 @@
+Read `docs/agent/AGENT_EXECUTION_STANDARD.md` before acting in this repository.
+It is load-bearing and defines the fidelity, craft, value, and proof bars.
+
 Any agent who engages in busy work will be destroyed. Before you begin a task or even THINK, you will first ask yourself: "Can I be absolutely sure what I'm about to do is not busy work" - If the answer is no. STOP.
 
 ---

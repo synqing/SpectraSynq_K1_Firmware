@@ -5,7 +5,7 @@ description: >-
   Core-0 silent_scale / STANDBY strike, PRISM haunt, latency map≠RTT, layout16
   false MAIN approval, exclusive-port soak contention, and first-contact
   device-absence stop. Use before Tab5↔bench-K1 BLE work, identity hash claims,
-  deck_state pending TX, full-map / full71 harnesses, C6 soaks, dark-fade,
+  deck_state pending TX, 68/71 map drift, full-map harnesses, C6 soaks, dark-fade,
   MAIN glass authority, Mirror/STANDBY surfaces, or any claim about Deck16
   production readiness.
 ---
@@ -51,7 +51,7 @@ source-integration fact only: the boot-loop guard, the quiet-mic plate fix and
 the dual-206 retarget carry HOST proof only, `PHASE1_GATE=FAIL` stands on
 `B489A500`, and the flash freeze is unchanged. Merged is not proven.
 
-## HARD FAIL checklist (HF-14…HF-28)
+## HARD FAIL checklist (HF-14…HF-31)
 
 Copy and mark each item before acting:
 
@@ -70,6 +70,27 @@ Copy and mark each item before acting:
 - [ ] **HF-26** Not substituting unknown USB serial for Tab5/bench — MAC/chip or STOP
 - [ ] **HF-27** Not flashing C6 / `F887A500` / SoftAP / erase / commit without Captain
 - [ ] **HF-28** Not reopening B1→B2 / optimistic ack_tx / Precision Bay
+- [ ] **HF-29** Ran `tab5_protocol_parity_gate.py` before any coupled protocol build or flash
+- [ ] **HF-30** Not treating the 71-control / `78fb9a...` registry as live authority
+- [ ] **HF-31** Not claiming bidirectional closure from an ARMED snapshot alone
+
+## 68/71 recovery gate
+
+The live sender/receiver bytes are the territory. The current Unit2/Tab5
+contract is exactly **68 controls** with registry MD5
+`9b5db3fbb17438367adeaceb541db03b`. The 71-control / `78fb9a...` registry is
+archaeology and must never be used to "correct" a live 68-control sender.
+
+Before a protocol build, flash, commit, or compatibility claim:
+
+```bash
+python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root .
+```
+
+For live closure, add `--serial-log <capture>`. `ARMED` plus one committed
+snapshot and zero fault counters proves admission and snapshot compatibility.
+Full bidirectional proof additionally requires `LIVE`, `sent>0`, and
+`delta_commit>0` after one harmless physical control change.
 
 ## First-contact machine gate
 
