@@ -33,10 +33,14 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
-**Active lane (2026-08-05):** `im69d130-mic-eval` on `lane/dual-sync-phase0`
-(branch name is historical; dual-sync is shelved). Authority:
-`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`. Session pointer:
-`.claude/handoff.md`. Spec routing: `docs/spec-index.md`.
+**Active lane (2026-08-11):** `K1_DUAL_IM69D130_RESOLUTION_20260810`.
+Lane branch `fix/dual-im69d130-resolution-20260810` is checked out in the
+worktree `.worktrees/unit2_slot_ab`; the Deck16 / Tab5 / STANDBY / MIRROR work
+of 2026-08-07..11 is committed on `fix/tab5-phase1-softkey-wiring`. Authority:
+`docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`.
+Session pointer: `.claude/handoff.md`. Spec routing: `docs/spec-index.md`.
+Pack: `_scratch/im69d_resolution_20260810/`. Pin receipt PENDING — no firmware
+retarget / no flash until `CAPTAIN_PIN_AUTH=GO`.
 
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
@@ -470,4 +474,4 @@ tool-specific mechanics (how to invoke a build, where permissions live).
 
 ---
 
-Last updated: 2026-07-10
+Last updated: 2026-08-09
