@@ -112,7 +112,9 @@ def list_serial_ports() -> list[dict[str, str | None]]:
     ports: list[dict[str, str | None]] = []
     for port in list_ports.comports():
         device = port.device or ""
-        if "usbmodem" not in device:
+        # Native ESP32-S3 CDC enumerates as usbmodem*; CH9102/CH340 UART bridges
+        # (custom dual-206 board) enumerate as wchusbserial*.
+        if "usbmodem" not in device and "wchusbserial" not in device:
             continue
         ports.append(
             {
@@ -161,7 +163,11 @@ def validate_upload_target(
     if target is None:
         if pioenv.startswith("k1_sync_probe_"):
             return False, f"{pioenv}: unmapped sync probe environment; upload blocked"
+        if pioenv.startswith("k1_"):
+            return False, f"{pioenv}: unmapped K1 environment; upload blocked"
         return True, f"{pioenv}: no K1 upload mapping enforced"
+
+    candidates = [t for t in targets if pioenv in t.envs]
 
     port_list = list(ports) if ports is not None else list_serial_ports()
     port = find_port(upload_port, port_list)
@@ -169,14 +175,17 @@ def validate_upload_target(
         return False, f"{pioenv}: {upload_port} is not currently enumerated"
 
     actual = _norm_serial(port.get("serial_number"))
-    expected = _norm_serial(target.usb_serial)
+    matched = next(
+        (t for t in candidates if actual == _norm_serial(t.usb_serial)),
+        None,
+    )
 
-    if actual == expected:
+    if matched is not None:
         return (
             True,
             (
-                f"{pioenv}: {upload_port} verified as {target.role} "
-                f"({target.usb_serial}, chip {target.chip_id}, {target.pinmap})"
+                f"{pioenv}: {upload_port} verified as {matched.role} "
+                f"({matched.usb_serial}, chip {matched.chip_id}, {matched.pinmap})"
             ),
         )
 
@@ -191,11 +200,12 @@ def validate_upload_target(
             ),
         )
 
+    expected_serials = ", ".join(sorted({_norm_serial(t.usb_serial) for t in candidates}))
     return (
         False,
         (
             f"{pioenv}: {upload_port} has USB serial {actual or '<missing>'}; "
-            f"expected {target.usb_serial} for {target.role} ({target.pinmap}); "
+            f"expected one of [{expected_serials}] for {pioenv}; "
             f"configured default is {target.upload_port}"
         ),
     )

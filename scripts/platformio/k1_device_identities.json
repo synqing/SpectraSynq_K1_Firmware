@@ -67,6 +67,7 @@
         "k1_bench_im73d",
         "k1_bench_im73d_bad",
         "k1_bench_im69d",
+        "k1_bench_im69d_ble",
         "k1_bench_im73d_mic_auto",
         "k1_bench_im73d_mic_auto_telemetry",
         "k1_bench_im73d_ble",
@@ -75,8 +76,17 @@
         "k1_bench_reference",
         "k1_bench_reference_harness",
         "k1_bench_tempo_probe",
-        "k1_custom",
         "k1_sync_probe_bench"
+      ]
+    },
+    {
+      "chip_id": "0C54FC00",
+      "usb_serial": "AC:A7:04:FC:54:0C",
+      "role": "K1 Bench Unit 2",
+      "pinmap": "bench LED 4/5 + custom PDM DIN=38/CLK=39; ESP MAC AC:A7:04:FC:54:0C (native USB-JTAG CDC; was CH9102 WCH 5B7A114793)",
+      "advisory_port": "/dev/tty.usbmodem1101",
+      "envs": [
+        "k1_custom"
       ]
     }
   ],
