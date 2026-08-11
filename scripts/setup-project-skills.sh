@@ -44,6 +44,30 @@ copy_all_from_dir() {
   done
 }
 
+
+# Always ship UI router + optical gate into project trees (fail-closed UI law).
+# Prefer symlink to K1 .claude canonical when PROJECT is K1; else copy from K1.
+ensure_ui_router_skills() {
+  local name
+  for name in spectrasynq-ui-router spectrasynq-ui-precode-optical-gate; do
+    if [ ! -d "$K1/.claude/skills/$name" ]; then
+      echo "  SKIP UI skill missing at K1: $name"
+      continue
+    fi
+    if [ "$PROJECT" = "$K1" ]; then
+      # Canonical lives in .claude; twins are relative symlinks (no drift).
+      for base in "$PROJECT/.cursor/skills" "$PROJECT/.codex/skills"; do
+        mkdir -p "$base"
+        rm -rf "$base/$name"
+        ln -s "../../.claude/skills/$name" "$base/$name"
+      done
+      echo "  OK $name (repo twins → .claude symlink)"
+    else
+      copy_skill "$name" "$K1/.claude/skills"
+    fi
+  done
+}
+
 copy_thinking_suite() {
   local src="$1"
   for d in "$src"/thinking-*; do
@@ -67,6 +91,8 @@ echo "== setup $PROFILE -> $PROJECT =="
 case "$PROFILE" in
   k1-firmware)
     # Ensure K1 canonical tree has full thinking-skills + claude-mem skills in all agent dirs.
+    # Note: does NOT wipe ~/.claude|cursor|codex|agents/skills UI router symlinks;
+    # install-claude-mem-skills.sh re-asserts those globals when PROJECT=K1.
     if [ "$PROJECT" = "$K1" ]; then
       bash "$K1/scripts/install-thinking-skills.sh" "$K1"
       bash "$K1/scripts/install-claude-mem-skills.sh" "$K1"
@@ -127,6 +153,7 @@ case "$PROFILE" in
       peripheral-bus-debugging register-map-verification signal-processing-verification
       esp32 esp-idf platformio arduino cpp ziglang embedded-graphics-patterns
       memory-authority-gate parallel-agent-sandboxing
+      spectrasynq-ui-router spectrasynq-ui-precode-optical-gate
       k1-tab5-lvgl-dashboard k1-tab5-ux-feedback k1-tab5-wireless-control
       spectrasynq-build-system
     )
@@ -153,6 +180,8 @@ case "$PROFILE" in
     exit 1
     ;;
 esac
+
+ensure_ui_router_skills
 
 echo "  skills: $(find "$PROJECT/.claude/skills" -name SKILL.md 2>/dev/null | wc -l | tr -d ' ')"
 echo "  agents: $(ls -1 "$PROJECT/.claude/agents" 2>/dev/null | wc -l | tr -d ' ')"

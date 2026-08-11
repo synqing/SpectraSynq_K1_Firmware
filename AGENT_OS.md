@@ -225,6 +225,42 @@ repo-truth or commit evidence.
 - Create large frameworks or task bureaucracy
 - Treat stale handoff docs as current truth
 - Run `pio run --target upload` without verifying the target via `k1_upload_guard.py`
+- Edit SpectraSynq UI look (LVGL/firmware UI, fonts, type/geometry/layout flags,
+  soft-key chrome, product HTML sizes, FE control surfaces) without entering via
+  `/spectrasynq-ui-router` and obtaining a PASS from
+  `/spectrasynq-ui-precode-optical-gate` — see §7a
+
+### 7a. UI pre-code optical gate (load-bearing)
+
+BEFORE any SpectraSynq UI code — including LVGL/firmware UI, font asset
+regen+rebind, type token / geometry / layout-flag edits, soft-key/sheet chrome,
+product HTML that asserts sizes, or FE control surfaces — the agent MUST enter
+via `/spectrasynq-ui-router` (UI skill dispatch) and PASS
+`/spectrasynq-ui-precode-optical-gate` as the router’s mandatory first hop for
+design→code.
+
+FAIL-CLOSED:
+- No PASS receipt with SHA-pinned evidence pack ⇒ UI edits are forbidden.
+- “Small nudge”, “colour only”, “bugfix clip”, “sim only”, “HTML is enough”,
+  “we already audited”, “G0 passed”, and “C++ inspection” are NOT exemptions.
+- Source inspection, CSS hierarchy studies, and functional freezes (G0/bindings)
+  are maps. Territory is measured optical ink on an opened native/sim still.
+- Invented measurements, TBD tables, or skill-name drop-ins without artefacts
+  ⇒ BLOCKED.
+- Captain waiver is the ONLY override; it must use the waiver string in the
+  skill. Verbal paraphrase is insufficient.
+
+Declare gate tier (T0/T1/T2/T3) in writing before touching gated paths.
+Undeclared tier defaults to T0.
+
+**Authority:** router `.claude/skills/spectrasynq-ui-router/` (dispatch);
+gate `.claude/skills/spectrasynq-ui-precode-optical-gate/` (PASS/BLOCKED law)
+— both mirrored under `.cursor/skills/` and `.codex/skills/`;
+canon `docs/canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md`;
+process `docs/process/SPECTRASYNQ-UI-PRECODE-OPTICAL-GATE.md`;
+design `_scratch/precision_bay_r1/UI_ROUTER_DESIGN.md`.
+PASS keys: `OPTICAL_GATE_RECEIPT.md` + SHA-pinned `MEASURED.json` + crops —
+prose alone cannot PASS. `G0_PASS ≠ OPTICAL_PASS`.
 
 ---
 
@@ -392,6 +428,16 @@ pointer to this file plus tool-specific settings:
 | **Claude Code** | `CLAUDE.md` (root) + `.claude/CLAUDE.md` | `.claude/agents/*.md` (specialists), `.claude/skills/` (skills), `claude-mem` MCP |
 | **Codex** | `AGENTS.md` (root) | `.codex/skills/` (skills; same inventory as Claude Code / Cursor), `claude-mem` MCP |
 | **Cursor** | `.cursor/rules/agent-os.mdc` | `.cursor/skills/` (skills), `claude-mem` MCP |
+
+### UI skills (all three tools)
+
+**Router (start here when unsure):** `/spectrasynq-ui-router` — scenario → one
+skill. Design→code always hops to `/spectrasynq-ui-precode-optical-gate` first
+(§7a). Playbook: `.claude/skills/spectrasynq-ui-router/SKILL.md` (`.cursor` / `.codex`
+twins are **symlinks** to `.claude`). Globals under `~/.{claude,cursor,codex,agents}/skills/`
+are re-asserted by `scripts/install-claude-mem-skills.sh` (`link_ui_skills_global`)
+and by `setup-project-skills.sh` (`ensure_ui_router_skills`). Optical gate is the
+mandatory first hop for design→code (§7a).
 
 ### claude-mem skills (all three tools)
 

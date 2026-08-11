@@ -1,0 +1,218 @@
+{
+  "schema": "precision_bay_r1_spec/1",
+  "status": "FROZEN_G1",
+  "frozen_utc": "2026-08-08T02:10:00Z",
+  "authority": {
+    "plan": "_scratch/precision_bay_r1/PRECISION_BAY_R1_FAIL_CLOSED_EXECUTION_PLAN.md \u00a76",
+    "map_sha256": "2bdadaf8e8cb51c09b10e810b5dc068cdb198d7da655bf534ff9e1426e3bc86a",
+    "theme_header": "tab5_firmware/include/deck_theme.h",
+    "type_header": "tab5_firmware/include/deck_type.h",
+    "touch_min_source": "tab5_firmware/src/deck_ui.cpp TOUCH_MIN"
+  },
+  "screen": {
+    "w": 1280,
+    "h": 720
+  },
+  "touch_min_px": 105,
+  "regions": {
+    "header": {
+      "x": 0,
+      "y": 0,
+      "w": 1280,
+      "h": 50
+    },
+    "secondary_channel": {
+      "x": 14,
+      "y": 60,
+      "w": 1252,
+      "h": 244
+    },
+    "primary_channel": {
+      "x": 14,
+      "y": 314,
+      "w": 1252,
+      "h": 244
+    },
+    "soft_key_dock": {
+      "x": 12,
+      "y": 568,
+      "w": 1256,
+      "h": 140
+    }
+  },
+  "channel_grid": {
+    "tracks_px": [
+      122,
+      244,
+      420,
+      466
+    ],
+    "track_roles": [
+      "CHANNEL_RAIL",
+      "MODE",
+      "PALETTE",
+      "MACROS"
+    ],
+    "note": "Cumulative X from outer width+borders is generator responsibility; do not hand-copy arithmetic into C++"
+  },
+  "mode_module": {
+    "title_origin": {
+      "x": 14,
+      "y": 13
+    },
+    "nav_visual": {
+      "w": 44,
+      "h": 126,
+      "top": 49
+    },
+    "nav_touch_min_px": 105,
+    "hero_numeral_top": 58,
+    "mode_name_top": 136
+  },
+  "palette_module": {
+    "index_x": 56,
+    "index_y": 55,
+    "index_w": 90,
+    "name_x": 166,
+    "name_y": 55,
+    "name_h": 67,
+    "name_right_inset": 42,
+    "strip_left": 56,
+    "strip_right": 42,
+    "strip_y": 150,
+    "strip_h": 38,
+    "index_format": "%02u",
+    "name_lines": 2,
+    "laws": [
+      "no pair_w/pair_x content-width centring",
+      "arrows and spectrum strip never move",
+      "real FastLED palette stops only"
+    ]
+  },
+  "macro_controls": {
+    "rows": [
+      "BRIGHTNESS",
+      "SPEED"
+    ],
+    "header_inset": {
+      "left": 14,
+      "right": 14,
+      "top": 12
+    },
+    "track_inset": {
+      "left": 14,
+      "right": 14,
+      "top": 51
+    },
+    "track_visual_h": 36,
+    "thumb_visual": {
+      "w": 24,
+      "h": 52
+    },
+    "value_position": "top_right_inside_macro",
+    "touch": "entire_macro_track_captures_drag"
+  },
+  "soft_key_dock": {
+    "soft_key_count": 7,
+    "labels": [
+      "CALIBRATE",
+      "EDGE",
+      "RENDER",
+      "SENSITIVITY",
+      "SMART",
+      "DIRECTOR",
+      "VIVID"
+    ],
+    "grid_policy": "EQUAL_COLUMNS_PREFERRED",
+    "equal_column_w_px": 179.429,
+    "fallback_policy": "FROZEN_MIRRORED_WIDER_CENTRE_IF_EQUAL_FAILS",
+    "forbidden": [
+      "shrink_only_SENSITIVITY",
+      "per_word_tracking",
+      "clip_released_label"
+    ],
+    "key_content_flex": [
+      "label",
+      "annunciator_slot"
+    ],
+    "annunciator_slot_px": {
+      "w": 16,
+      "h": 16
+    },
+    "lamp_visible_px": {
+      "w": 13,
+      "h": 13
+    },
+    "index_cell": "separate_grid_cell_F01_F07",
+    "key_label_type_target": "MONO_24",
+    "key_label_type_current_live": "MONO_21",
+    "glyph_fit": {
+      "font_file": "tab5_firmware/src/fonts/BerkeleyMono-Regular.ttf",
+      "method": "fontTools_advance_width",
+      "SENSITIVITY": {
+        "advance_px_at_21": 138.6,
+        "advance_px_at_24": 158.4,
+        "advance_px_at_26": 171.6,
+        "equal_col_px": 179.429,
+        "pad_budget_px": 16,
+        "mono_24_fits_equal": true,
+        "mono_26_fits_equal_with_16pad": false
+      },
+      "decision": "Freeze equal seven columns + MONO_24 target. MONO_26 rejected for equal-column layout at 16px pad. LVGL berkeley_mono_24 asset not yet in build \u2014 generate before G3; live code still MONO_21 until then."
+    }
+  },
+  "typography": {
+    "display_face": "Countach Bold Italic \u2014 hero mode/palette numerals only",
+    "mono_face": "Berkeley Mono \u2014 labels, names, values, status, keys",
+    "roles": {
+      "hero_mode_numeral": "DECK_TYPE_DISPLAY_40",
+      "hero_palette_numeral": "DECK_TYPE_DISPLAY_55",
+      "instrument_large": "DECK_TYPE_MONO_55",
+      "names_brand_titles": "DECK_TYPE_MONO_34",
+      "zone_titles_keys_telemetry": "DECK_TYPE_MONO_21",
+      "soft_key_label_target": "MONO_24_PENDING_ASSET"
+    }
+  },
+  "colours": {
+    "source": "tab5_firmware/include/deck_theme.h",
+    "bg": "0x0B0906",
+    "crt": "0x120D04",
+    "sheet": "0x17140D",
+    "key_idle": "0x14110C",
+    "key_press": "0x241E12",
+    "border_recessed_dark": "0x3A2E18",
+    "track": "0x1A140A",
+    "fill_lo": "0x8A5E1C",
+    "fill_hi": "0xFFB84D",
+    "thumb_metal": "0xFFE2B8",
+    "amber_hi": "0xFFE2B8",
+    "amber": "0xFFB84D",
+    "amber_dim": "0x7A5A26",
+    "lamp_off_dead_warm_brown": "0x7A5A26",
+    "lamp_on_connection_green": "0x1AFF66",
+    "error_red": "0xFF4D5E",
+    "scrim": "0x000000",
+    "laws": [
+      "K1 high/white; REMOTE amber",
+      "Green reserved for connection health only",
+      "Amber = selected / confirmed active / live value",
+      "Dim amber = supporting information",
+      "Red = error/destructive only",
+      "Soft-key borders recessed dark, not amber decoration",
+      "Metal reserved for manipulated fader caps"
+    ]
+  },
+  "animation": {
+    "pending_pulse_ms": 120,
+    "sheet_open_ms": 160,
+    "sheet_close_ms": 120,
+    "note": "Durations frozen as initial Bay tokens; tune only via spec"
+  },
+  "state_colours": {
+    "pending": "amber_dim",
+    "sent_unconfirmed": "amber",
+    "confirmed": "amber_hi",
+    "error": "error_red",
+    "disconnected": "amber_dim"
+  }
+}
