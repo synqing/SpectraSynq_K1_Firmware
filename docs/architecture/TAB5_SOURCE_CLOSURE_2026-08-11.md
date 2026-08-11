@@ -10,6 +10,9 @@ the external dependency manifest.
 
 - Active P4 application, Deck protocol, hosted-HCI, LVGL and generated-control
   source under `tab5_firmware/src` and `tab5_firmware/include`.
+- The tracked `docs/protocol/k1-deck-state-v1.md` wire contract and the
+  generator-derived 71-control Tab5 map. The Tab5 map must remain byte-identical
+  to `SPECTRASYNQ_K1_FIRMWARE/network/k1_ble_midi_map.h`.
 - Production/native configuration, partition table, simulator, build scripts,
   source generators, build/run guides and licences already present in the Git
   tree.
@@ -38,7 +41,25 @@ two-line `CONFIG_ESP_WIFI_SOFTAP_SUPPORT` guard. Both are now declared and
 checksum-gated by `scripts/patch_tab5_framework.py`; an unexpected upstream
 file is refused rather than patched heuristically.
 
+The initial G0 receipt was reopened after red-team parity checks found a stale
+68-control Tab5 header and an untracked Deck-state protocol document. The
+header is now regenerated from the tracked 71-control JSON authority and the
+protocol document is tracked. Targeted protocol/decoder tests are part of G0,
+not deferred to a later gate.
+
 The first disposable build correctly failed on the missing hosted HAL. The
 second correctly failed on the missing C6 slave-target shim. Importing those
 inputs made the third build succeed. These failures are retained as G0 evidence,
 not erased from the receipt.
+
+## Deliberate compatibility boundary
+
+The canonical 71-control registry identifies itself as
+`78fb9af986da36922fae33cb09de3b4b`. The existing K1 and Tab5 Deck-identity
+headers both still advertise the older `9b5db3fbb17438367adeaceb541db03b`
+wire digest. Changing the K1 identity or flashing main K1 is outside this
+programme's approved Tab5/P4 scope. Source closure therefore requires both
+identity copies to remain equal and the two generated map headers to remain
+equal, while recording the legacy identity digest as an explicit compatibility
+exception. G2 must not silently relabel this as canonical; G3 must prove the
+actual peer accepts the compatibility identity before any release claim.

@@ -1,7 +1,7 @@
 # G0 source-closure receipt
 
 **Gate:** G0 — Source closure  
-**Result:** PASS  
+**Result:** REOPENED — protocol source parity correction in progress  
 **Recorded:** 2026-08-11 (Australia/Perth)  
 **Frozen baseline:** `21d0e593461af468d38394b140e2477bd58bf7f3`  
 **Reviewed source-closure commit:** `0f3cab432c8b17b7b049f5a7996df8ca7c1a3f86`
@@ -102,3 +102,12 @@ polish but is not source closure or firmware correctness evidence.
 - Undeclared/fragile build input: none found.
 
 G1 may begin. A later gate may not waive this receipt or broaden its claim.
+
+## Reopen notice
+
+After this receipt was first committed, red-team parity checks found that the
+Tab5 generated map contained 68 controls while the tracked JSON/K1 header
+contained 71, and that `docs/protocol/k1-deck-state-v1.md` was required by the
+host gate but absent from Git. The prior PASS is withdrawn. G0 returns to PASS
+only after the regenerated map, restored contract, targeted host tests, and two
+new clean-clone builds all pass from the corrected commit.
