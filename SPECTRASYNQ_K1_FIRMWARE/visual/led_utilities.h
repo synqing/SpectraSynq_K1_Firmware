@@ -2280,6 +2280,12 @@ inline void apply_brightness_secondary() {
 }
 
 inline void show_secondary_leds() {
+  // Safety: init_secondary_leds() allocates both buffers; show_leds() may be
+  // called (e.g. from init_leds()) before that runs, if k1_show_state_load()
+  // has already restored ENABLE_SECONDARY_LEDS=true from persisted flash state.
+  // Return immediately rather than dereferencing a null pointer.
+  if (leds_scaled_secondary == nullptr || leds_out_secondary == nullptr) return;
+
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_secondary_prep_start_us = vp_perf.running ? esp_timer_get_time() : 0;
   uint32_t vp_perf_secondary_quant_us = 0;
