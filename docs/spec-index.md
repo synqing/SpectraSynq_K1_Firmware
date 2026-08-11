@@ -60,11 +60,45 @@ On-disk handover **beats** claude-mem for **current lane status**. Memory is for
 
 ---
 
+## Session canon (immune memory)
+
+**Load before silence-gate / IM69D soak / Tab5 BLE / boot-default work:**
+[`docs/canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md`](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)
+· skill [`k1-vj-session-discipline`](../.claude/skills/k1-vj-session-discipline/SKILL.md).
+
+Encodes HARD FAILs from the peakiness×joint-break×crash-loop×Deck16-HCI×boot-show
+session so agents do not replay crest-only OP hunting, RMS learner admit, K718
+framing, prediction-free soaks, or safe-mode null-LED intro crashes.
+
+**Load BEFORE Deck16 BLE backend / identity digests / deck_state haunt / full71 /
+C6 soak / dark-fade / MAIN glass authority / Mirror·STANDBY claims:**
+[`docs/canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md`](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)
+· skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md)
+· gate `bash scripts/agent/deck16-first-contact-gate.sh`
+· handover [`_scratch/deck16_session_handover_20260809/HANDOVER.md`](../_scratch/deck16_session_handover_20260809/HANDOVER.md).
+Encodes HF-14…HF-28 (stale digests, host-RTT lies, false MAIN approval, Core-0
+pin, haunt clear, exclusive soak, absent-peer STOP). Authority claim block stays
+`PRODUCTION_READY=NO` / `MERGE_OR_PROMOTION=HOLD` until Captain.
+
+**Load BEFORE any SpectraSynq UI design→code (LVGL / fonts / product HTML sizes):**
+[`docs/canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md`](canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md)
+· process [`SPECTRASYNQ-UI-PRECODE-OPTICAL-GATE.md`](process/SPECTRASYNQ-UI-PRECODE-OPTICAL-GATE.md)
+· skill [`spectrasynq-ui-precode-optical-gate`](../.claude/skills/spectrasynq-ui-precode-optical-gate/SKILL.md)
+· red-team [`UI_PRECODE_GATE_REDTEAM.md`](../_scratch/precision_bay_r1/UI_PRECODE_GATE_REDTEAM.md).
+UI look edits without `OPTICAL_GATE_RECEIPT.md` + SHA-pinned `MEASURED.json` = **BLOCKED**
+(AGENT_OS §7a). `G0_PASS ≠ OPTICAL_PASS`.
+
+| Inbound | Authority | When |
+|---------|-----------|------|
+| **Tab5 Deck16 HCI / BLE / operator UI** | [`docs/architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md`](architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md) · **[backend/haunt/latency canon 2026-08-09](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)** · skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md) · skill [`tab5-hosted-ble-debug`](../.claude/skills/tab5-hosted-ble-debug/SKILL.md) · guardrails [`.cursor/rules/tab5-deck16-guardrails.mdc`](../.cursor/rules/tab5-deck16-guardrails.mdc) | Before Tab5 P4 flash, identity-hash claims, deck_state pending TX, full71/C6 soak, dark-fade, MAIN authority, `BLE_HS_ETIMEOUT_HCI` triage, ESP_HCI_IF wire work, `deck_ui_assets.py` / BLE-MIDI TX edits. Proof: `_scratch/deck16_tab5_k1_proof_20260807/` + `_scratch/deck16_session_handover_20260809/`. |
+| **UI optical / typography / layout look** | [session canon 2026-08-09](canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md) · skill [`spectrasynq-ui-precode-optical-gate`](../.claude/skills/spectrasynq-ui-precode-optical-gate/SKILL.md) · rule [`.cursor/rules/spectrasynq-ui-precode-optical-gate.mdc`](../.cursor/rules/spectrasynq-ui-precode-optical-gate.mdc) | Before any `deck_ui*` / font / type-token / geometry / product-HTML-size edit. |
+
 ## Active lanes (updated 2026-08-05)
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
-| **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) | **CURRENT.** Branch `feat/ap-advice-phase0-im69d-gain8`. Phase 0 device PASS at **G=4**; ghost retirement + ×2 drop landed. Bench `B489A500` = `k1_bench_im69d`. | `platformio.ini` `[env:k1_bench_im69d]`; `docs/hardware/device-build-registry.md` |
+| **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) · **[session canon 2026-08-07](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)** | **CURRENT.** Branch `feat/ap-advice-phase0-im69d-gain8`. Phase 0 device PASS at **G=4**; ghost retirement + ×2 drop landed. Bench `B489A500` = `k1_bench_im69d`. Peakiness/joint-break work continues on vj-lane. | `platformio.ini` `[env:k1_bench_im69d]`; `docs/hardware/device-build-registry.md`; vj-lane `docs/forensics/im69d-bringup-2026-08-06/` |
+| **Deck16 Tab5 BLE R1** | [docs/architecture/K1_DECK16_ARCHITECTURE_R1.md](architecture/K1_DECK16_ARCHITECTURE_R1.md) · [radio](architecture/RADIO_FALLBACK_DECISION.md) · **[Tab5 session canon 2026-08-07](architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md)** · **[backend/haunt/latency canon 2026-08-09](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)** · skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md) | **ACTIVE architecture + ACTIVE immune memory.** Product = Tab5 + dual Unit 8Encoder; **K718 Remoted dial retired.** B1/B2 PASS; Mirror purged; STANDBY struck; PRODUCTION_READY=NO. Handover: `_scratch/deck16_session_handover_20260809/`. | `docs/protocol/k1-ble-midi-map.json`; `tab5_firmware/`; `scripts/agent/deck16-first-contact-gate.sh` |
 | **M2.1 serial_menu decomposition + save-show** | [docs/refactor/serial-menu-decomposition-plan-2026-07-26.md](refactor/serial-menu-decomposition-plan-2026-07-26.md) | **COMPLETE 2026-07-26** on main. R1+R2 typed dispatch; Shift+S / `:save_show` host-green. | `serial/serial_typed_cmd_table.def`, `control/k1_show_state.*` |
 | ~~**Dual-sync F0-F3 recovery**~~ | [DEPRECATED notice](../artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md) | **⛔ DEAD — SHELVED by Captain 2026-08-05.** Artefacts retained as historical evidence only. | `artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md` |
 | **IM73D + BLE-MIDI demo build (`k1_bench_im73d_ble`)** | [docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md](hardware/im73d-ble-midi-demo-build-2026-07-04.md) | **Parallel deliverable, not current bench proof target.** The bench was historically reflashed to radio-free `k1_bench_im73d @ 6f2f1ec` for R1 knob-persistence proof; after the controlled-audio DSR lane and the 2026-07-07 LED-pinmap incident, the bench is radio-free `k1_bench_im73d @ f2f7c45` and runtime-proven. Reflash `k1_bench_im73d_ble` only when BLE demo work resumes. SEPARATE from mic eval - no SNR on the radio build. | `docs/hardware/device-build-registry.md`; `platformio.ini` `[env:k1_bench_im73d_ble]` + `k1_upload_guard.py` |
@@ -78,7 +112,7 @@ On-disk handover **beats** claude-mem for **current lane status**. Memory is for
 | AP0/VP1 closeout | [docs/forensics/tempo_tracking_refactor/2026-06-06-ap0-vp1-p0-closeout-handover.md](forensics/tempo_tracking_refactor/2026-06-06-ap0-vp1-p0-closeout-handover.md) | Historical; do not reopen without new evidence | `docs/forensics/tempo_tracking_refactor/` ledger |
 | Tempo primitive | [docs/handover/2026-06-05-cto-session-handover-3.md](handover/2026-06-05-cto-session-handover-3.md) | Octave/confidence SOLVED; modes 18/19/20 host-green; **device eyes-on still open** (tracked non-blocking follow-up, never formally closed) | `docs/research/validation/2026-06-04-RECONCILIATION.md` + handover #3 |
 | K1 wireless control (WS v2) | feat(k1) `e6a6fbb` + AP WebSocket `k1.*` protocol (`b748678`, `59b6023`) | WS control facade + protocol v2 + safe noise-cal arm path landed on wip; host static tests pass; device integration + eyes-on **open** | `SPECTRASYNQ_K1_FIRMWARE/control/sb_k1_control_facade.*`, `network/sb_k1_wireless.*`; [docs/forensics/sb-tab5-control/2026-06-08-tab5-k1-ui-wireless-integration-investigation.md](forensics/sb-tab5-control/2026-06-08-tab5-k1-ui-wireless-integration-investigation.md) |
-| Tab5 wireless controller | [docs/forensics/sb-tab5-control/2026-06-09-tab5-onwards-roadmap.md](forensics/sb-tab5-control/2026-06-09-tab5-onwards-roadmap.md) | Separate PlatformIO project (`sb-tab5-wireless-controller`, ESP32-P4); k1.ws v2 capabilities handshake (`a80e888`); host static tests pass; 5 src files + harness **uncommitted**; device bring-up **open** | [docs/forensics/sb-tab5-control/2026-06-09-tab5-hardening-execution-plan.md](forensics/sb-tab5-control/2026-06-09-tab5-hardening-execution-plan.md) |
+| Tab5 wireless controller | [docs/forensics/sb-tab5-control/2026-06-09-tab5-onwards-roadmap.md](forensics/sb-tab5-control/2026-06-09-tab5-onwards-roadmap.md) | **PORTED IN-REPO 2026-08-06.** Canonical PlatformIO root is now `tab5_firmware/` in this repository. Current direction is BLE MIDI, not STA Wi-Fi/OSC; repo-local `tab5_p4` build and flash to Tab5 `/dev/tty.usbmodem11401` succeeded, with serial proof of inverse landscape, Berkeley Mono, disabled waiting overlay, and BLE-MIDI command output. BLE GATT bearer remains pending on hosted NimBLE availability. | `tab5_firmware/README.md`; `tab5_firmware/src/ble_midi_transport.cpp`; `tab5_firmware/src/net.cpp` |
 | VP Motion Lab (VPML) | [docs/forensics/vp_motion_lab/2026-06-09-vp-motion-lab-mvp-decision.md](forensics/vp_motion_lab/2026-06-09-vp-motion-lab-mvp-decision.md) | **Host-authoring/workbench slice CLOSED 2026-06-10 (Captain)**: compiler, param editor, preset A/B recall, host-only recipe-deck authoring, save/load/compile variants, hard command-length gate vs firmware parser cap (66/93, 85/93 ok), workbench **Device-Disabled by default** (no K1 without `--allow-device`); verified py-clean, home/compile `200`, recipe `host_manual` / `device_sequencing=false`. **Boundary:** does NOT close visual acceptance, VPAB proof, production promotion, or live-K1 recipe-run — bench K1 access Captain-blocked. (Earlier: 2 `intro_bounce_loop` frame-gate FAILs + 1 1401 no-response, 2026-06-09.) | [docs/forensics/vp_motion_lab/2026-06-09-vp-motion-lab-onwards-roadmap.md](forensics/vp_motion_lab/2026-06-09-vp-motion-lab-onwards-roadmap.md); `docs/forensics/runtime-evidence/20260610T*-12201-snappy-*`, `evidence/vpml-recipes/` |
 
 **Parallel lanes:** Secondary dark-state and Scene Policy v2 are independent. Do not conflate Dense Forge (mode 21 primary) with secondary darkness (mode 18).
