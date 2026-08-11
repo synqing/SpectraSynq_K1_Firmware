@@ -57,9 +57,13 @@ def test_pinned_m5gfx_overlay_is_double_buffered_and_checksum_gated():
 def test_palette_preview_is_seamless_dt_correct_transform_motion():
     text = UI.read_text(encoding="utf-8")
     assert "GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)" in text
-    assert "kPaletteAnimationFrameMs = 33" in text
-    assert "kPaletteAnimationCycleMs = 8000" in text
-    assert "gPaletteAnimationPhaseMs + elapsed" in text
+    assert "kPaletteAnimationFrameMs = 16" in text
+    assert "kPaletteAnimationMaxDtMs = 50" in text
+    assert "palette_smootherstep" in text
+    assert "palette_motion_retarget" in text
+    assert "const uint32_t entropy = micros()" in text
+    assert "motion.phase += motion.velocity * dt" in text
+    assert "one in four gently reverses direction" in text
     assert "lv_obj_set_style_translate_x(z.grad, offset" in text
     assert "z->grad_buf[y * ring_w + w + x] = px" in text
     assert "lv_obj_set_size(z->grad, z->grad_w * 2" in text
