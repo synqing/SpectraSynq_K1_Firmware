@@ -72,3 +72,50 @@ correct if both hold simultaneously. This is the check the first iteration of th
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-08-11 | agent:claude-code | Created before the joint-gate soak, per HF-4. Records post-recalibration distributions, the frac=6.0 derivation, the flagged divergence from canon's 1.25 seed, and predictions P1–P5. |
+
+---
+
+## Result — evaluated after the soak, 2026-08-11
+
+Firmware `git 52dedd2`, env `k1_unit2_im69d_right`, identity asserted on the wire.
+Calibration `SSL=136` learned under this firmware. Both legs witnessed by an
+independent microphone: quiet **−60.3 dB**, music **−28.6 dB** (31.7 dB separation,
+acoustic path proven).
+
+| | quiet (45 frames) | music vol70 (30 frames) |
+|---|---|---|
+| `silence` held | **88.9%** | **0.0%** |
+| `silent_scale` mean | 0.12 | **1.00** |
+| `max_raw` p50 / max, ×SSL | 0.64 / **1.49** | **12.64** / 25.90 |
+| `pky` ≥ 2.10 | 21/45 | 27/30 |
+
+| ID | Prediction | Result |
+|---|---|---|
+| **P1** | quiet `silence` ≥ 95% | **FAIL — 88.9%** |
+| **P2** | music breaks silence ≥ 80% | **PASS — 100%** |
+| **P3** | music `max_raw` p50 ≥ 3× threshold (≥1632) | **PASS — 1719** |
+| **P4** | `silent_scale` → 0.00 within 15 s of music stop | PASS |
+| **P5** | quiet `silent_scale` mean = 0.00 | **FAIL — 0.12** |
+
+### What the P1/P5 failure is, and is not
+
+It is **not** the joint gate. The level threshold at frac 4.0 is **544 raw**, and the
+loudest quiet frame in 45 s reached **202** — the level term did not fire once, despite
+peakiness clearing 2.10 on 21 of 45 quiet frames. The AND rejected every one, exactly as
+designed.
+
+The residual 11% therefore comes from the **legacy RMS Schmitt** (`K1_SILENCE_RMS_ENTER
+0.04 / EXIT 0.08`) that sits underneath, plus `SILENCE_DWELL_MS` resetting on each of its
+trips. That path is untouched by this work and is the correct next target — not another
+adjustment to the fraction, which would only degrade P2.
+
+### Method note — a guard bug worth keeping
+
+The derivation harness aborted this run with "ACOUSTIC PATH NOT PROVEN" on a leg whose
+witness showed a 31.7 dB separation. The condition was written `music > quiet - 10` where
+it must be `music > quiet + 10`: louder is *less* negative on the dB scale. A sign error
+in a guard fails in the safe direction here (it refused to derive), but the same error
+inverted would have silently accepted a starved acoustic path. Guards need their own
+negative control.
+
+---
