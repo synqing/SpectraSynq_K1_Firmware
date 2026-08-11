@@ -52,3 +52,14 @@ def test_pinned_m5gfx_overlay_is_double_buffered_and_checksum_gated():
     for name in ("HPP_PATCHED_SHA256", "CPP_PATCHED_SHA256"):
         match = re.search(rf'{name} = "([0-9a-f]{{64}})"', text)
         assert match, name
+
+
+def test_palette_preview_is_seamless_dt_correct_transform_motion():
+    text = UI.read_text(encoding="utf-8")
+    assert "GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)" in text
+    assert "kPaletteAnimationFrameMs = 33" in text
+    assert "kPaletteAnimationCycleMs = 8000" in text
+    assert "gPaletteAnimationPhaseMs + elapsed" in text
+    assert "lv_obj_set_style_translate_x(z.grad, offset" in text
+    assert "z->grad_buf[y * ring_w + w + x] = px" in text
+    assert "lv_obj_set_size(z->grad, z->grad_w * 2" in text

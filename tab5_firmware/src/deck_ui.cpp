@@ -58,6 +58,10 @@
 
 #define GRAD_STRIP_H      22
 #define GRAD_STRIP_MAX_W  420
+#define GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)
+
+static constexpr uint32_t kPaletteAnimationFrameMs = 33;   /* 30 FPS UI motion */
+static constexpr uint32_t kPaletteAnimationCycleMs = 8000; /* calm continuous traverse */
 
 typedef struct {
   lv_obj_t* zone;
@@ -66,6 +70,7 @@ typedef struct {
   lv_obj_t* title;
   lv_obj_t* number;
   lv_obj_t* name;
+  lv_obj_t* grad_view;  /* clipped palette viewport */
   lv_obj_t* grad;       /* palette spectrum image */
   lv_image_dsc_t grad_dsc;
   uint16_t* grad_buf;
@@ -110,8 +115,10 @@ static SelectorZone gSelectors[4];
 static MegaSlider gSliders[4];  // sec_bri, sec_spd, pri_bri, pri_spd
 static SoftKey gKeys[7];
 
-static uint16_t gGradBuf0[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
-static uint16_t gGradBuf1[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint16_t gGradBuf0[GRAD_STRIP_RING_W * GRAD_STRIP_H];
+static uint16_t gGradBuf1[GRAD_STRIP_RING_W * GRAD_STRIP_H];
+static uint32_t gPaletteAnimationLastMs = 0;
+static uint32_t gPaletteAnimationPhaseMs = 0;
 
 static lv_obj_t* gScrim = nullptr;
 static lv_obj_t* gSheets[DECK_SHEET_COUNT] = {nullptr};
@@ -156,6 +163,7 @@ static void refresh_key_lamp(SoftKey* k);
 static void layout_link_cluster(void);
 static void layout_palette_inline(SelectorZone* z);
 static void paint_palette_strip(SelectorZone* z, uint8_t pal_index);
+static void tick_palette_animation(uint32_t now_ms);
 static void refresh_all_controls(void);
 static void refresh_status_strip(void);
 static void apply_armed_gate_visuals(void);
@@ -271,25 +279,53 @@ static void paint_palette_strip(SelectorZone* z, uint8_t pal_index)
 
   const DeckPaletteStrip* strip = deck_palette_strip(pal_index);
   const int w = z->grad_w;
+  const int ring_w = w * 2;
   const int h = GRAD_STRIP_H;
   for (int x = 0; x < w; ++x) {
     const uint8_t t =
         (w <= 1) ? 0 : static_cast<uint8_t>((static_cast<uint32_t>(x) * 255u) / static_cast<uint32_t>(w - 1));
     const uint16_t px = rgb888_to_rgb565(sample_palette_rgb(strip, t));
     for (int y = 0; y < h; ++y) {
-      z->grad_buf[y * w + x] = px;
+      z->grad_buf[y * ring_w + x] = px;
+      z->grad_buf[y * ring_w + w + x] = px;
     }
   }
   z->grad_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
   z->grad_dsc.header.cf = LV_COLOR_FORMAT_RGB565;
-  z->grad_dsc.header.w = static_cast<uint32_t>(w);
+  z->grad_dsc.header.w = static_cast<uint32_t>(ring_w);
   z->grad_dsc.header.h = static_cast<uint32_t>(h);
-  z->grad_dsc.header.stride = static_cast<uint32_t>(w * 2);
+  z->grad_dsc.header.stride = static_cast<uint32_t>(ring_w * 2);
   z->grad_dsc.header.flags = 0;
-  z->grad_dsc.data_size = static_cast<uint32_t>(w * h * 2);
+  z->grad_dsc.data_size = static_cast<uint32_t>(ring_w * h * 2);
   z->grad_dsc.data = reinterpret_cast<const uint8_t*>(z->grad_buf);
   lv_image_set_src(z->grad, &z->grad_dsc);
   lv_obj_invalidate(z->grad);
+}
+
+/** Seamless palette preview: duplicated strip traverses one width then wraps. */
+static void tick_palette_animation(uint32_t now_ms)
+{
+  if (gPaletteAnimationLastMs == 0) {
+    gPaletteAnimationLastMs = now_ms;
+    return;
+  }
+
+  const uint32_t elapsed = now_ms - gPaletteAnimationLastMs;
+  if (elapsed < kPaletteAnimationFrameMs) return;
+  gPaletteAnimationLastMs = now_ms;
+
+  /* Keep covered MAIN controls still; resume from the same phase after close. */
+  if (deck_state_sheet() != DECK_SHEET_NONE) return;
+
+  gPaletteAnimationPhaseMs =
+      (gPaletteAnimationPhaseMs + elapsed) % kPaletteAnimationCycleMs;
+  for (SelectorZone& z : gSelectors) {
+    if (!z.is_palette || !z.grad || z.grad_w <= 0) continue;
+    const int32_t offset = -static_cast<int32_t>(
+        (static_cast<uint64_t>(gPaletteAnimationPhaseMs) * static_cast<uint32_t>(z.grad_w)) /
+        kPaletteAnimationCycleMs);
+    lv_obj_set_style_translate_x(z.grad, offset, LV_PART_MAIN);
+  }
 }
 
 /** Anchored palette: fixed index X + two-line name; strip never recentres. */
@@ -337,13 +373,14 @@ static void layout_palette_inline(SelectorZone* z)
   lv_obj_set_style_text_align(z->name, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
   (void)name_ls;
 
-  if (z->grad) {
+  if (z->grad && z->grad_view) {
     const int gw = content_w - 20;
-    lv_obj_set_pos(z->grad, content_x + 10, strip_y);
+    lv_obj_set_pos(z->grad_view, content_x + 10, strip_y);
     if (gw != z->grad_w && gw > 0 && gw <= GRAD_STRIP_MAX_W) {
       z->grad_w = gw;
       z->grad_last = 0xFFu;  /* force repaint at new width */
-      lv_obj_set_size(z->grad, gw, GRAD_STRIP_H);
+      lv_obj_set_size(z->grad_view, gw, GRAD_STRIP_H);
+      lv_obj_set_size(z->grad, gw * 2, GRAD_STRIP_H);
     }
   }
 }
@@ -1105,16 +1142,27 @@ static void create_selector(SelectorZone* z, lv_obj_t* parent, int x, int y, int
   lv_label_set_long_mode(z->name, LV_LABEL_LONG_CLIP);
   lv_obj_clear_flag(z->name, LV_OBJ_FLAG_HIDDEN);
 
+  z->grad_view = nullptr;
   z->grad = nullptr;
   if (is_palette) {
     /* Anchored %02u|name; spectrum bar below at fixed Y. */
     z->grad_w = (w - 2 * WING_W) - 20;
     if (z->grad_w > GRAD_STRIP_MAX_W) z->grad_w = GRAD_STRIP_MAX_W;
-    z->grad = lv_image_create(z->zone);
-    lv_obj_set_size(z->grad, z->grad_w, GRAD_STRIP_H);
-    lv_obj_set_pos(z->grad, WING_W + 10, 100);
-    lv_obj_set_style_radius(z->grad, 5, LV_PART_MAIN);
-    lv_obj_set_style_clip_corner(z->grad, true, LV_PART_MAIN);
+    z->grad_view = lv_obj_create(z->zone);
+    lv_obj_set_size(z->grad_view, z->grad_w, GRAD_STRIP_H);
+    lv_obj_set_pos(z->grad_view, WING_W + 10, 100);
+    lv_obj_set_style_pad_all(z->grad_view, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(z->grad_view, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(z->grad_view, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_radius(z->grad_view, 5, LV_PART_MAIN);
+    lv_obj_set_style_clip_corner(z->grad_view, true, LV_PART_MAIN);
+    lv_obj_clear_flag(z->grad_view, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(z->grad_view, LV_OBJ_FLAG_SCROLLABLE);
+
+    z->grad = lv_image_create(z->grad_view);
+    lv_obj_set_size(z->grad, z->grad_w * 2, GRAD_STRIP_H);
+    lv_obj_set_pos(z->grad, 0, 0);
+    lv_obj_set_style_translate_x(z->grad, 0, LV_PART_MAIN);
     lv_obj_clear_flag(z->grad, LV_OBJ_FLAG_CLICKABLE);
   } else {
     /* Title Mono21 @ y6. Unified Countach hero @ y36.
@@ -1484,6 +1532,8 @@ void Deck_UI_Init(lv_display_t* disp)
 
 void Deck_UI_Tick(void)
 {
+  const uint32_t now = millis();
+  tick_palette_animation(now);
   refresh_status_strip();
 
   const uint32_t rev = deck_state_rx_revision();
@@ -1496,7 +1546,6 @@ void Deck_UI_Tick(void)
   const bool sheet_open = (deck_state_sheet() != DECK_SHEET_NONE);
 
   static uint32_t last = 0;
-  const uint32_t now = millis();
   const bool tick_due = (now - last >= 100);
 
   if (!authority_changed && !tick_due) return;
