@@ -19,13 +19,16 @@ just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 **Runbook:** `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`  
 **Pack:** [`_scratch/im69d_resolution_20260810/`](../_scratch/im69d_resolution_20260810/)
 
-**Where the code is (2026-08-11):** lane branch
-`fix/dual-im69d130-resolution-20260810` is checked out in the worktree
-`.worktrees/unit2_slot_ab` and is an ANCESTOR of
-`fix/tab5-phase1-softkey-wiring`, which is where the 2026-08-07..11 Deck16 /
-Tab5 / STANDBY / MIRROR / guard / doctrine work is committed. The lane branch
-was deliberately NOT fast-forwarded: moving a ref out from under a live
-worktree corrupts it. Merge order is the Captain's call.
+**Where the code is (2026-08-11, post-merge):** the 2026-08-07..11 Deck16 /
+Tab5 / STANDBY / MIRROR / guard / doctrine work is **merged to `main`**
+(Captain-authorised) and pushed. `main` is the active branch; start new work
+from it. The lane branch `fix/tab5-phase1-softkey-wiring` is retained on origin
+as the pre-merge record.
+
+`fix/dual-im69d130-resolution-20260810` is still checked out in the worktree
+`.worktrees/unit2_slot_ab` and is now BEHIND `main`. It was deliberately never
+fast-forwarded — moving a ref out from under a live worktree corrupts it. If
+that worktree resumes, rebase or merge it onto `main` from inside the worktree.
 
 ```text
 UNIT2_PHYSICAL_MIC=dual_IM69D130
