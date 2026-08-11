@@ -1000,20 +1000,13 @@ inline void show_leds() {
   }
 #endif
   
-  // Only attempt to use secondary LEDs if explicitly enabled
-  if (ENABLE_SECONDARY_LEDS) {
-    // Put in try/catch-style protection
-    bool secondary_success = true;
-    
-    // Try to show secondary LEDs but don't crash if it fails
-    if (secondary_success) {
-      try {
-        show_secondary_leds();
-      } catch(...) {
-        secondary_success = false;
-        // If we had a system for logging errors, we'd do it here
-      }
-    }
+  // Only attempt to use secondary LEDs if explicitly enabled AND buffers exist.
+  // k1_show_state_load() can set ENABLE_SECONDARY_LEDS=true during init_fs(),
+  // before init_secondary_leds() runs (after init_system). C++ try/catch does
+  // not catch null deref on ESP32 — guard the pointer explicitly.
+  if (ENABLE_SECONDARY_LEDS && leds_scaled_secondary != nullptr &&
+      leds_out_secondary != nullptr) {
+    show_secondary_leds();
   }
   
 #if ENABLE_VPAB_PROBE
@@ -2239,6 +2232,9 @@ inline void init_secondary_leds() {
 }
 
 inline void scale_to_secondary_strip() {
+  if (leds_scaled_secondary == nullptr || leds_16_secondary == nullptr) {
+    return;
+  }
   if (SECONDARY_LED_COUNT == NATIVE_RESOLUTION) {
     memcpy(leds_scaled_secondary, leds_16_secondary, sizeof(CRGB16) * NATIVE_RESOLUTION);
   } else {
