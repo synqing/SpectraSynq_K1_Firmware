@@ -702,8 +702,16 @@ inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first 
 // so never latched silence. Seeds are DEGRADED-MODE first-guesses placed above the expected
 // mic self-noise floor; calibrate on the bench from [AP] rms_raw in a quiet room, then set
 // with margin. Runtime-tunable via :silence_rms_enter / :silence_rms_exit (no recompile).
+// IM73D PDM post-DC path (k1_custom / bench IM73D): after measured cal, music floor sits
+// ~0.007–0.012 rms_raw while SPH-scale defaults (0.04/0.08) never clear a latched silence.
+// Tuned live on Bench Unit 2 (0C54FC00) 2026-08-09: exit MUST sit below typical music floor.
+#if defined(K1_MIC_IM73D_PDM_V1)
+inline float    K1_SILENCE_RMS_ENTER = 0.001f;    // enter below true quiet (~0.000–0.002 post-cal)
+inline float    K1_SILENCE_RMS_EXIT  = 0.003f;    // clear once rms exceeds quiet; music ~0.007–0.012
+#else
 inline float    K1_SILENCE_RMS_ENTER = 0.04f;     // raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-room floor <0.02, ~8x margin.
 inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not silent (Schmitt exit; > enter)
+#endif
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
 // ------------------------------------------------------------
