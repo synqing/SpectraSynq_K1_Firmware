@@ -620,7 +620,7 @@ void setup()
   M5.Display.setRotation(3);
   LOG("[display] Rotation=3 (inverse landscape)");
   // Don't set EPD mode for LCD (only for e-ink displays)
-  M5.Display.setSwapBytes(false);  // LVGL presentation bypasses M5GFX pixel pushes; PPA swaps RGB565 bytes
+  M5.Display.setSwapBytes(false);  // Full-frame presenter uses native-endian RGB565 throughout
   ::delay(50);
   LOG("[display] Display width=%d height=%d", M5.Display.width(), M5.Display.height());
 

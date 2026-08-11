@@ -18,7 +18,7 @@
 // DISPLAY SETTINGS
 // ============================================================
 #define LV_COLOR_DEPTH 16  // RGB565 (2 bytes per pixel)
-#define LV_COLOR_16_SWAP 0  // PPA performs the one required RGB565 byte swap during presentation
+#define LV_COLOR_16_SWAP 0  // LVGL, PPA and the DSI framebuffer all use native-endian RGB565
 
 // ============================================================
 // PERFORMANCE

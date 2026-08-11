@@ -35,6 +35,7 @@ def test_presenter_uses_complete_frames_ppa_and_vsync_swap_only():
     assert "LV_DISPLAY_RENDER_MODE_DIRECT" in text
     assert "lv_display_flush_is_last" in text
     assert "ppa_do_scale_rotate_mirror" in text
+    assert "operation.byte_swap = false" in text
     assert "esp_lcd_panel_draw_bitmap" in text
     assert "on_refresh_done" in text
     assert "buffer2" in text

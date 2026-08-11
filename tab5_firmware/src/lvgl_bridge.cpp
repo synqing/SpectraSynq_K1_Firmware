@@ -111,7 +111,9 @@ bool rotate_complete_frame(void* destination)
     operation.rotation_angle = PPA_SRM_ROTATION_ANGLE_90;
     operation.scale_x = 1.0f;
     operation.scale_y = 1.0f;
-    operation.byte_swap = true;
+    // The DSI RGB565 framebuffer is native little-endian.  LVGL's direct
+    // buffer is also native-endian, so a PPA byte swap corrupts every colour.
+    operation.byte_swap = false;
     operation.mode = PPA_TRANS_MODE_BLOCKING;
 
     const esp_err_t result = ppa_do_scale_rotate_mirror(gPpaHandle, &operation);
