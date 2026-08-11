@@ -31,6 +31,7 @@
 #include "deck_latency.h"
 #include "deck_input.h"
 #include "ble_midi_transport.h"
+#include "network/WiFiAntenna.h"
 
 using namespace lgfx;
 
@@ -595,6 +596,9 @@ void setup()
   LOG("[init] Calling M5.begin()...");
   M5.begin(cfg);
   LOG("[init] M5.begin() returned");
+
+  // Drive RF_PTH via Lightwave WiFiAntenna (product path). Boot = INTERNAL.
+  initWiFiAntennaPin();
 
   LOG("[display] Waiting for DSI initialization (200ms)...");
   ::delay(200);
