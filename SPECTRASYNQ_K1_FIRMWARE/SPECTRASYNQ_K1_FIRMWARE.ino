@@ -684,10 +684,8 @@ void setup() {
   g_rotate8_available = false;
 #endif
 
-#ifndef K1_CUSTOM_LED_V1
   init_secondary_leds();
-  ENABLE_SECONDARY_LEDS = true;   // Custom single-channel build (K1_CUSTOM_LED_V1) drops the 2nd strip
-#endif
+  ENABLE_SECONDARY_LEDS = true;   // Dual-channel (incl. K1_CUSTOM_LED_V1 dual-206)
 #ifdef K1_WIRELESS_ENABLED
   k1_wireless_begin();
 #endif
@@ -715,13 +713,9 @@ void setup() {
   for (uint16_t x = 0; x < CONFIG.LED_COUNT; x++) {
     leds_out[x] = CRGB(0, 0, 0);
   }
-#ifndef K1_CUSTOM_LED_V1
-  // Custom single-channel build skips init_secondary_leds() -> leds_out_secondary is
-  // NULL; this boot-clear must be gated or it NULL-derefs on boot.
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
-#endif
   FastLED.show();
 
   // Create thread specifically for LED updates

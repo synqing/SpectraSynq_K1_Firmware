@@ -67,6 +67,7 @@
         "k1_bench_im73d",
         "k1_bench_im73d_bad",
         "k1_bench_im69d",
+        "k1_bench_im69d_ble",
         "k1_bench_im73d_mic_auto",
         "k1_bench_im73d_mic_auto_telemetry",
         "k1_bench_im73d_ble",
@@ -75,7 +76,6 @@
         "k1_bench_reference",
         "k1_bench_reference_harness",
         "k1_bench_tempo_probe",
-        "k1_custom",
         "k1_sync_probe_bench"
       ]
     },
@@ -83,8 +83,9 @@
       "chip_id": "0C54FC00",
       "usb_serial": "AC:A7:04:FC:54:0C",
       "role": "K1 Bench Unit 2",
-      "pinmap": "bench IM69D130 PDM CLK=39/DATA=38, RIGHT slot; dual 206-px WS2812B on LED 4/5",
+      "pinmap": "bench IM69D130 PDM CLK=39/DATA=38, RIGHT slot; dual 206-px WS2812B on LED 4/5; ESP MAC AC:A7:04:FC:54:0C (native USB-JTAG CDC; was CH9102 WCH 5B7A114793)",
       "advisory_port": "/dev/tty.usbmodem1101",
+      "_merge_note_2026_08_12": "main's side allowlisted k1_custom here. k1_custom extends k1_bench_im73d_ble, so admitting it would put an IM73D build on confirmed IM69D wiring - the S7 stop rule, and the exact false-authority path Captain correction 2026-08-10 voided. Unit 2's env is k1_unit2_im69d_right. Main's ESP MAC + USB adapter provenance is retained in pinmap above.",
       "envs": [
         "k1_unit2_im69d_right"
       ]
@@ -101,6 +102,7 @@
   ],
   "blocked_envs": {
     "k1_sample_rate_32k_spike": "32 kHz spike is build-only until acquisition-only, AP/VP, calibration, and watchdog gates are explicitly re-opened",
-    "k1_prod_im73d": "production IM73D env inherits the k1_hardware production LED GPIO map (6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A 2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed un-block) after the forensic root-cause of the bench audio+LED corruption. Unblock only when a correctly-wired production IM73D unit exists."
+    "k1_prod_im73d": "production IM73D env inherits the k1_hardware production LED GPIO map (6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A 2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed un-block) after the forensic root-cause of the bench audio+LED corruption. Unblock only when a correctly-wired production IM73D unit exists.",
+    "k1_custom": "BLOCKED 2026-08-12 at the fix/im69d-rms-gate merge. k1_custom still `extends = env:k1_bench_im73d_ble`, so it compiles K1_MIC_IM73D_PDM_V1 — the false-authority inheritance voided by Captain correction 2026-08-10. It was previously the ONLY env allowlisted to Bench Unit 2 (0C54FC00); Unit 2 physically carries dual IM69D130 and its env is now k1_unit2_im69d_right. Flashing k1_custom to Unit 2 would put an IM73D build on confirmed IM69D wiring (stop rule S7) and is the origin of the 2026-08-09 misflash cascade. Also under the P0.D flash freeze. Unblock only after k1_custom stops extending any *im73d* env (Cursor plan P1.A) AND a device is nominated for it."
   }
 }

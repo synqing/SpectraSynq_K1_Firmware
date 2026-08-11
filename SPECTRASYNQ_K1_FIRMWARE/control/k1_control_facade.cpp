@@ -378,7 +378,6 @@ static const char* const kAllowedControls[] = {
     "primary.mood",
     "primary.saturation",
     "primary.square_iter",
-    "primary.mirror",
     "primary.auto_color_shift",
     "primary.reverse_order",
     "primary.incandescent_mode",
@@ -397,7 +396,6 @@ static const char* const kAllowedControls[] = {
     "secondary.chroma",
     "secondary.mood",
     "secondary.saturation",
-    "secondary.mirror",
     "secondary.incandescent_mode",
     "secondary.incandescent_filter",
     "secondary.base_coat",
@@ -405,7 +403,6 @@ static const char* const kAllowedControls[] = {
     "secondary.auto_color_shift",
     "secondary.reverse_order",
     "global.sensitivity",
-    "global.standby_dimming",
     "global.chroma_profile",
     "global.chromagram_range",
     "global.max_current_ma",
@@ -542,13 +539,7 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     return ok_number(CONFIG.SQUARE_ITER);
   }
 
-  if (strcmp(record.control, "primary.mirror") == 0) {
-    bool enabled = false;
-    if (!parse_bool_value(record, &enabled, &result)) return result;
-    CONFIG.MIRROR_ENABLED = enabled;
-    save_config_delayed();
-    return ok_number(CONFIG.MIRROR_ENABLED ? 1.0f : 0.0f);
-  }
+  /* primary.mirror purged from BLE/Deck 2026-08-09 — serial mirror_enabled= only. */
 
   if (strcmp(record.control, "primary.auto_color_shift") == 0) {
     bool enabled = false;
@@ -690,12 +681,7 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     return ok_number(SECONDARY_SATURATION);
   }
 
-  if (strcmp(record.control, "secondary.mirror") == 0) {
-    bool enabled = false;
-    if (!parse_bool_value(record, &enabled, &result)) return result;
-    SECONDARY_MIRROR_ENABLED = enabled;
-    return ok_number(SECONDARY_MIRROR_ENABLED ? 1.0f : 0.0f);
-  }
+  /* secondary.mirror purged from BLE/Deck 2026-08-09 — serial secondary_mirror_enabled= only. */
 
   if (strcmp(record.control, "secondary.incandescent_mode") == 0) {
     bool enabled = false;
@@ -742,14 +728,6 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     CONFIG.SENSITIVITY = record.number_value;
     save_config_delayed();
     return ok_number(CONFIG.SENSITIVITY);
-  }
-
-  if (strcmp(record.control, "global.standby_dimming") == 0) {
-    bool enabled = false;
-    if (!parse_bool_value(record, &enabled, &result)) return result;
-    CONFIG.STANDBY_DIMMING = enabled;
-    save_config_delayed();
-    return ok_number(CONFIG.STANDBY_DIMMING ? 1.0f : 0.0f);
   }
 
   if (strcmp(record.control, "global.chroma_profile") == 0) {

@@ -1,0 +1,99 @@
+---
+description: Deck16 Tab5 hard guardrails — Mirror/STANDBY purged, haunt clear required, no stale digests, no host-RTT lies, exclusive soak, firmware-truth UI, map-generated BLE TX.
+globs: tab5_firmware/**,docs/protocol/**,SPECTRASYNQ_K1_FIRMWARE/network/**,SPECTRASYNQ_K1_FIRMWARE/control/**,SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h
+alwaysApply: false
+---
+
+# Tab5 Deck16 guardrails
+
+**Canons (load both when applicable):**
+- HCI / K718: [`docs/architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md`](../../docs/architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md)
+- Backend / haunt / latency / authority: [`docs/canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md`](../../docs/canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)
+- Skill: [`k1-deck16-session-discipline`](../skills/k1-deck16-session-discipline/SKILL.md)
+- First-contact gate: `bash scripts/agent/deck16-first-contact-gate.sh`
+
+## Mirror ON/OFF — standing forbid (2026-08-09) — HF-21
+
+**HARD FAIL / NEVER reintroduce.** Mirror ON/OFF is **forbidden** on BLE-MIDI map, Deck glass, soft keys, and K1 BLE facade. Never reintroduce `primary.mirror` / `secondary.mirror`, MIRROR soft keys, Mirror sheet rows, Mirror CC bindings, Deck state TX snapshot fields, or Tab5 glass TX (`sendPrimaryMirror` and kin). No synonym stubs (FLIP/REV/SYM/MIRR).
+
+- Receipt authority: [`_scratch/mirror_purge_ble_20260809/PURGE_RECEIPT.md`](../../_scratch/mirror_purge_ble_20260809/PURGE_RECEIPT.md)
+- Internal render flag `CONFIG.MIRROR_ENABLED` may remain.
+- K1 USB serial `mirror_enabled=` / `secondary_mirror_enabled=` = **bringup-only** — not a product/Deck/BLE control. Do not toggle device Mirror unless Captain explicitly orders bringup.
+
+## STANDBY_DIMMING + silent_scale — HF-19 / HF-20
+
+**HARD FAIL / NEVER re-enable STANDBY_DIMMING** via UI, map, serial, NVS product path, or build flag. Factory false + boot force-off + Core-0 IIR compiled out. Do **not** weaken the Core-0 `silent_scale = silent_scale_last = 1.0f` pin in `i2s_audio.h`. `LINKED_LIT_PROOF.md` (Core-1-only) is superseded.
+
+## Pending haunt — HF-22 / HF-23
+
+**HARD FAIL:** resume full71 / blind full-map harness without anti-haunt proof. Disconnect/HELLO must call `deck_state_clear_pending_all` (clear `pending_active` + `gTxDirty`). Never claim anti-haunt PASS from source markers alone — soak required. After FAIL matrix, burn **FAIL subset only**; keep silence-gated SKIPs skipped.
+
+## Digest archaeology — HF-14
+
+**HARD FAIL:** cite `78fb9af9…`/`b60819a4…` or `d30c4fef…`/`cb549042…` as live. Re-read `k1_deck_identity_v1.h` (K1 + Tab5) and `docs/protocol/protocol-map-hashes.json`. Hash gates = admission/compatibility, not anti-spoof.
+
+## Latency claims — HF-15
+
+**HARD FAIL:** cite ~401 ms or ~4301 ms as BLE wire / apply RTT. Those are host-poll / harness-wall artefacts. Quote on-device T0→T2 only (`_scratch/deck16_latency_map_c6_20260809/LATENCY_RECEIPT.md`).
+
+## MAIN glass authority — HF-16 / HF-17 / HF-18
+
+**HARD FAIL:** treat `docs/protocol/deck16-layout-v1.json` (`param_set: NOT_CAPTAIN_APPROVED`), agent `LAYOUT_V1_16_CELL_MAIN=PASS`, or protocol 16/16 as Captain MAIN approval. Default MAIN = Tier-1 4-box. **Do not delete** the 16-grid — keep `DECK_UI_LAYOUT_MAP_DEBUG` default 0 (encoder-reserved). Banned on MAIN: chroma, saturation, mirror, `secondary.enabled`, `prism_count`.
+
+## Exclusive soak / identity — HF-24 / HF-25 / HF-26
+
+**HARD FAIL:** multi-hour C6 soak concurrent with other flash/port lanes; claim dropout from `linked=null` dial misses; substitute unknown USB serial (e.g. alien Espressif MAC) for Tab5 `30:ED:A0:E0:C1:A0` or bench `B489A500`. Absent peer → STOP.
+
+## BLE / HCI
+
+- **HARD FAIL:** Treat `BLE_HS_ETIMEOUT_HCI` as mandate to flash C6, run `flash_c6_official.sh`, or OTA slave without Captain go.
+- **H0 first:** Confirm `ESP_HCI_IF=4` (not 3) in binary — `_Static_assert`, runtime ABI log, wrapped `esp_hosted_tx` actual `if_type`.
+- **Ladder order:** H0 wire contract → H1 stock VHCI → H2 host 1.4.0 A/B → C6 only last.
+- **Never** `#define ESP_HCI_IF 3` locally — use `esp_hosted_interface.h` (SERIAL=3, HCI=4).
+- P4 USB-C **≠** C6 ROM — `DIRECT_C6_SERIAL_FLASH = BLOCKED`.
+
+## Protocol / TX
+
+- All BLE-MIDI TX via **map lookup** (`k1_ble_midi_map.h` / `k1-ble-midi-map.json`) — no hand-rolled CC bytes.
+- **`primary.photons`** = ch0 **CC14** MSB **1** / LSB **33** — **never CC7** for brightness.
+- **CC7** in map = enum/bool only (palette, incandescent, flags).
+
+## Product identity
+
+- Deck16 peer = **Tab5 peripheral** + **K1 central** — **K718 Remoted dial retired** for this lane.
+- Tab5 advertises `K1 Tab5`; K1 matches Apple BLE-MIDI UUID `03B80E5A-…`.
+
+## Operator UI
+
+- Mode/palette names from **`deck_ui_assets.py`** only — do not hand-edit `deck_names.h`.
+- Index column fixed **`%02u`** width (lock to `"40"` glyph width).
+- Run **`MODE_PALETTE_AUDIT.md`** / asset regen before UI firmware thrash.
+- **Countach Bold = hero numerals only** (`%02u` mode/palette indices). All words — mode names, palette names, labels, keys, brand text — stay **Berkeley Mono**. Never apply Countach to name strings; trial Countach is bench-only.
+
+### UI craft — native sim first
+
+- **Pre-code optical gate REQUIRED** before look/type/geometry edits — enter via
+  [`spectrasynq-ui-router`](../skills/spectrasynq-ui-router/SKILL.md) →
+  [`spectrasynq-ui-precode-optical-gate`](../skills/spectrasynq-ui-precode-optical-gate/SKILL.md)
+  (AGENT_OS §7a · §14). PASS = receipt + SHA-pinned MEASURED.json — not C++ skim.
+- **Iterate Operator MAIN on `native_sdl` before any Tab5 flash** for layout, type, theme, sheets, or palette-strip work.
+- Inventory: [`_scratch/deck16_tab5_k1_proof_20260807/DECK_UI_SURFACE_INVENTORY.md`](../../_scratch/deck16_tab5_k1_proof_20260807/DECK_UI_SURFACE_INVENTORY.md)
+- Sim receipt: [`DECK_UI_SIM_DEPLOY_RECEIPT.md`](../../_scratch/deck16_tab5_k1_proof_20260807/DECK_UI_SIM_DEPLOY_RECEIPT.md)
+- Run:
+  ```bash
+  cd tab5_firmware && pio run -e native_sdl && ./.pio/build/native_sdl/program --linked
+  ```
+- Tab5.DSP/simulator (LVGL 8 theme preview) and M5GFX encoder mocks are **not** Deck16 `deck_ui` — do not treat them as MAIN proof.
+- Flash Tab5 for UI only after sim PNG / layout dump shows the claimed craft (and Captain go).
+
+## Evidence
+
+- Tab5 TX log alone ≠ proof — require K1 `apply_ok` + `CONFIG.*` delta.
+- Link proof pack: `_scratch/deck16_tab5_k1_proof_20260807/`.
+- UI layout craft: prefer `native_sdl` screenshot / `--dump-layout` before device eyes-on thrash.
+
+## Flash discipline
+
+- No Tab5/C6 flash/upload without explicit Captain approval in session.
+- Bench K1 identity: chip `B489A500` only for Deck16 link tests.
+- No device flash for layout iteration when `native_sdl` can prove the change.

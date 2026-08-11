@@ -384,9 +384,18 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       // on these pads. Dedicated PDM macros consumed by init_i2s()'s PDM branch; the
       // i2s_std I2S_*_PIN above stay defined but UNUSED under the flag. Proven config:
       // clk 819.2 kHz (DSR_8S) / LR LOW = LEFT slot / falling edge.
-      #define K1_PDM_CLK_PIN 13   // PDM clock out
-      #define K1_PDM_DIN_PIN 12   // PDM data in
-      #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+      #ifdef K1_CUSTOM_LED_V1
+        // Custom dual-206 (2026-08-09): Data+CLK-only mic board — remapped off the
+        // SPH pads. SELECT/LR is not wired on this board; firmware still drives
+        // K1_PDM_LR_PIN LOW for the IM73D LEFT-slot path (pin left unconnected).
+        #define K1_PDM_CLK_PIN 39   // PDM clock out (IO39)
+        #define K1_PDM_DIN_PIN 38   // PDM data in  (IO38)
+        #define K1_PDM_LR_PIN  14   // unused on Data+CLK-only board; driven LOW
+      #else
+        #define K1_PDM_CLK_PIN 13   // PDM clock out
+        #define K1_PDM_DIN_PIN 12   // PDM data in
+        #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
+      #endif
     #endif
     #ifdef K1_MIC_IM69D_PDM_V1
       // IM69D130 dual-mic paths. SELECT is static hardware truth and is never

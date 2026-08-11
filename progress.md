@@ -2,7 +2,81 @@
 
 **Started:** 2026-05-25
 
-**Current focus (2026-08-05, authoritative — AP advice / IM69D):** IM69D130 dual-mic
+## 2026-08-11 — Dual IM69D130 resolution P0 (identity containment)
+
+**Active authority:** `docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`  
+**Lane:** `K1_DUAL_IM69D130_RESOLUTION_20260810` on `fix/dual-im69d130-resolution-20260810`  
+**Pack:** `_scratch/im69d_resolution_20260810/`
+
+- Captain truth: Unit 2 = dual IM69D130; IM73D deprecated; `k1_custom→im73d` = false authority.
+- P0 slice: correction doc, registry/handoff/spec, flash freeze, dirty-tree preserve, clean worktree.
+- **STOP:** pin receipt `CAPTAIN_PIN_AUTH=PENDING` — no Phase 1 firmware rewrite / no flash.
+
+## 2026-08-09 — Deck16 session close (handover written)
+
+### 2026-08-09 — Deck16 immune memory encoded (docs/process)
+
+- Canon: `docs/canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md` (F-1..F-17, HF-14..HF-28).
+- Skill: `k1-deck16-session-discipline` (+ mirrors); gate: `scripts/agent/deck16-first-contact-gate.sh`.
+- Guardrails amended; `docs/spec-index.md` + FIRST_CONTACT_PROMPT wired.
+- Receipt: `_scratch/deck16_session_handover_20260809/IMMUNE_MEMORY_ENCODING_RECEIPT.md`.
+- No flash / no commit. Peers absent at encode time (gate STEP1_STOP).
+
+**Session handover:** `_scratch/deck16_session_handover_20260809/HANDOVER.md` — read before
+resuming this lane.
+
+```text
+DECK16_B1_B2_CORE_FUNCTIONAL_PASS=PASS
+EXTENDED_RECOVERY_HARDENING=PASS
+STANDBY_DIMMING=STRUCK
+PRODUCTION_READY=NO
+MERGE_TO_MAIN=DONE 2026-08-11 (Captain-authorised)
+PROMOTION_TO_PRODUCTION=STILL_HOLD
+```
+
+Done this session:
+
+- B1→B2 core close + extended recovery R1–R3 silicon PASS (`_scratch/deck16_backend_b1b2_20260808/`).
+- Latency on-device T0→T2: p50 55.9 ms / p95 68.3 ms / max 74.1 ms over 111 device-complete samples;
+  conn interval 30 ms. Prior ~401 ms was a **host poll artefact**, not wire RTT.
+- Full-map layout v1 16/16 at the protocol layer (mood re-proof). Not a MAIN glass approval.
+- MAIN restored to Captain Tier-1 4-box; 16-grid **retained as ENCODER-RESERVED**
+  (`_scratch/deck16_layout16_authority_audit_20260809/`). The 16-param MAIN set has
+  **no Captain approval** — `deck16-layout-v1.json` `param_set=NOT_CAPTAIN_APPROVED`.
+- **STANDBY_DIMMING STRUCK** — permanent Core-0 `silent_scale` pin in `i2s_audio.h`, boot force-off
+  in `system.h`, factory default false, option removed from every operator surface. 122 s quiet-room
+  proof: `silent_scale` min=max=1.000, `dim=0` (`_scratch/k1_bench_dark_fade_20260809/`).
+- **Uncommanded PRISM root-caused**: `gTxDirty` was never cleared on BLE disconnect, so a stale
+  harness `map=` auto-fired on the next ARMED link. Fixed via `deck_state_clear_pending_all()` on
+  disconnect + new HELLO generation (Tab5 only). NVS already read `PRISM_COUNT: 1.0` — no restore
+  needed. Anti-haunt soak **not** re-run.
+- **MIRROR purged** from all BLE/Deck surfaces (last change of session, both devices flashed).
+  Live identity is now **68 controls**, registry MD5 `9b5db3fbb17438367adeaceb541db03b`,
+  layout SHA-256 `f8e40f6b1ba7…`. Earlier `d30c4fef…`/`cb549042…` and `78fb9af9…`/`b60819a4…`
+  are superseded archaeology.
+
+Open / paused:
+
+- full71 authority loop **PARTIAL** — 40 PASS / 27 FAIL / 4 SKIP. **PAUSED** during the PRISM lane;
+  resume only after confirming `clear_pending` is live and there is no dirty haunt.
+- C6 multi-hour soak **OPEN** — reconnect×5 PASS and interval 30 ms confirmed, but `bar_4h_met=false`
+  (longest attempt 645 s). Cause was parallel lanes `kill -9`ing port holders, **not** an HCI fail.
+  Needs an exclusive ≥4 h window with no flashing.
+- Encoders deferred to the end. Optical MEASURED pack owed before the next UI commit.
+- No commit, no merge, no C6 flash, no `F887A500` touched.
+
+**Current focus (2026-08-07, session canon locked):** Immune memory for the
+IM69D peakiness / joint-break / crash-loop / Deck16 Tab5 HCI / boot-show session
+is now canonical — do **not** rediscover HF-1..HF-13 by trial and error.
+
+- Canon: `docs/canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md`
+- Skill: `k1-vj-session-discipline` (`.claude` / `.cursor` / `.codex`)
+- Gate: `tests/test_session_canon_2026_08_07_static.py` (4 passed)
+- Spec-index + `AGENT_OS.md` keyword scan + `hardware-bringup` Integration updated
+- Product framing: **Tab5 Deck16**, not K718 Remoted dial
+- Structural finding: crest × level complementary; compose with **AND**
+
+**Also current (2026-08-05, AP advice / IM69D):** IM69D130 dual-mic
 evaluation on `feat/ap-advice-phase0-im69d-gain8` (PR #40). Phase 0 **PASS** at
 `K1_MIC_IM69D_INPUT_GAIN=4` (G=8 failed silence latch). Phases 1–2: Nyquist ghost
 retirement + GDFT ×2 global drop. Authority:
@@ -11,6 +85,29 @@ IM73D122 until IM69 lane closes.
 
 **Also landed on main (2026-07-26):** M2.1 `serial_menu` decomposition (R1+R2) +
 Shift+S save-show (`k1_show_state`) — host-green; device smoke Captain-gated.
+
+## 2026-08-07 Session Canon — Peakiness × Deck16 × Boot
+
+- Encoded HARD FAILs HF-1..HF-13 (crest-only OP empty; RMS learner poison; no
+  prediction-free soaks; `afplay` for music legs; Tab5≠K718; HCI timeout ≠
+  hardware blocked; boot lock after Shift+S; safe-mode null LED intro; chip ID
+  not port; worktree discipline).
+- Thinking models that would have shortened the session: systems, map–territory,
+  steel-man, red-team, OODA, model-router.
+
+## 2026-08-06 Deck16 P0 Host Gate
+
+- **Status:** host software gate complete for `k1_bench_im69d_ble`; physical flash
+  and **Tab5 Deck16** link proof remain Captain clean-window gated (K718 Remoted
+  dial framing is retired — see session canon).
+- **Env:** added non-shippable bench-only `k1_bench_im69d_ble`, extending
+  `k1_bench_im69d` with only `K1_BLE_REMOTED`, NimBLE, and the BLE-MIDI control
+  translation units. Registry binds it to bench chip `B489A500` only.
+- **Safety:** upload guard now fails closed for unmapped `k1_*` envs; production
+  `k1_hardware` radio isolation is proven by map/ELF/BIN string gate.
+- **Validation:** `k1_hardware` build PASS; `k1_bench_im69d_ble` build PASS;
+  scoped pytest PASS (`135 passed`); BLE-MIDI oracle diff/map gates PASS; synthetic
+  guard accepts bench and rejects main/cross-flash/typo env.
 
 ## 2026-07-26 Shift+S Save Show State (Lightwave parity)
 
@@ -130,8 +227,8 @@ Stage-B typed `type=value` dispatch: `serial_typed_cmd_table.def` (151 rows),
 ## 2026-07-04 IM73D + BLE-MIDI Demo Build (`k1_bench_im73d_ble`)
 
 - **Goal (Captain):** a bench K1 running the IM73D122 mic PLUS BLE-MIDI so the **K718 Remoted dial controls it live** for investor demos. **Separate workstream** from IM73D eval/tuning — do NOT measure mic SNR on this radio build (Core-0 BLE task; interference A/B open).
-- **Composition:** new `[env:k1_bench_im73d_ble]` = `extends k1_bench_im73d` + 3 BLE deltas (`network/ble_remoted_central.cpp` + `k1_ble_midi_decoder.cpp`, `-DSB_K1_BLE_REMOTED`, `NimBLE-Arduino@^2.5.0`); does NOT extend the harness → zero instrumentation, production byte-identical. Guard tuple line added. **Revert** = delete env block + guard line.
-- **4-SSA injection-point investigation** (ssa-management launch/return contracts; orchestrator re-ran the decisive claims): **linkage VERIFIED** (`sb_k1_control_apply()` at `sb_k1_control_facade.cpp:468` unconditional; `.ino:675/812` calls under `#ifdef SB_K1_BLE_REMOTED`); **RT/RF VERIFIED** (BLE app task `central.cpp:229` **and** NimBLE host both default Core-0 → confound real for *measurement*, moot for *demo*); **K718 protocol byte-exact match**; **device/gate VERIFIED**.
+- **Composition:** new `[env:k1_bench_im73d_ble]` = `extends k1_bench_im73d` + 3 BLE deltas (`network/ble_remoted_central.cpp` + `k1_ble_midi_decoder.cpp`, `-DK1_BLE_REMOTED`, `NimBLE-Arduino@^2.5.0`); does NOT extend the harness → zero instrumentation, production byte-identical. Guard tuple line added. **Revert** = delete env block + guard line.
+- **4-SSA injection-point investigation** (ssa-management launch/return contracts; orchestrator re-ran the decisive claims): **linkage VERIFIED** (`k1_control_apply()` at `k1_control_facade.cpp` unconditional; `.ino` calls under `#ifdef K1_BLE_REMOTED`); **RT/RF VERIFIED** (BLE app task and NimBLE host both defaulted Core-0 in that historical proof → confound real for *measurement*, moot for *demo*); **K718 protocol byte-exact match**; **device/gate VERIFIED**.
 - **Host gate GREEN:** `pio run -e k1_bench_im73d_ble` `[SUCCESS]` (RAM 38.0% / Flash 13.9%); `test_dev_instrumentation_boundary` + `test_token_scrub_static` = **13/13**.
 - **Flashed bench `B489A500` (2026-07-04):** guard-verified on `/dev/cu.usbmodem1101` (ports re-scrambled — `2101`=main, `101`=K718; identity by USB serial, not port); hash-verified. Runtime (passive read-only serial): boots clean, 0 crash markers, BLE central **`linked=1`** to the live K718 "SpectraSynq Remoted" peripheral (`JC3636_K718_REMOTED_BLE_V1`), `notify=0` → **control-proof (dial-turn) pending**. `linked=1` overrides SSA-3's provisional "K718 never flashed" (runtime > static audit).
 - **Outstanding:** (1) turn the K718 dial → confirm `notify/decoded/apply_ok` climb + `CONFIG.*` change; (2) K718-linked+streaming cal repro (crash condition); (3) Core-0 demo-robustness if glitching; (4) **this flash replaced the bench's `3e06f9d k1_bench_im73d` state → IM73D Phase 1.1 device-proof needs a radio-free reflash.**

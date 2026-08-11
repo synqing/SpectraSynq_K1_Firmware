@@ -122,7 +122,6 @@ SERIAL_TYPED_CMD("mirror_enabled", serial_typed_wrap_pure_setter, SC_TYPED_ONLY,
 SERIAL_TYPED_CMD("sweet_spot_min", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("sweet_spot_max", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("chromagram_range", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
-SERIAL_TYPED_CMD("standby_dimming", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("reverse_order", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("max_current_ma", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)
 SERIAL_TYPED_CMD("auto_color_shift", serial_typed_wrap_pure_setter, SC_TYPED_ONLY, CMD_PERSISTS)

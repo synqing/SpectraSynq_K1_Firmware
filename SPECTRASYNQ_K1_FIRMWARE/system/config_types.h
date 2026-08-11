@@ -130,12 +130,27 @@
   #define SECONDARY_LED_COUNT_VALUE 206
 #else
 #ifdef K1_CUSTOM_LED_V1
-  // Custom single-channel wall-bounce build (2026-07-06): 224 LEDs on the primary
-  // GPIO only, secondary channel dropped (see the .ino:670/693 guards). The 160-px
-  // render canvas (NATIVE_RESOLUTION) is UNCHANGED — scale_to_strip() resamples it
-  // onto 224 physical LEDs, exactly as strip-modes 61/91/160 already do. Output
-  // buffers are heap-allocated to CONFIG.LED_COUNT so 224 is memory-safe. Flag-gated:
+  // Custom RGBIC rig (env k1_custom ONLY): 224 primary / 160 secondary.
+  //
+  // MERGE NOTE 2026-08-12 — this value was contested. main (1219b94a) had retargeted
+  // K1_CUSTOM_LED_V1 to 206 back when `k1_custom` was believed to BE the Unit 2 build.
+  // Captain correction 2026-08-10 voided that: Unit 2 is dual IM69D130 and now owns its
+  // own flag K1_UNIT2_IM69D_V1 (206/206, the branch above), reached by env
+  // k1_unit2_im69d_right. The two flags are MUTUALLY EXCLUSIVE by design —
+  // K1_CUSTOM_LED_V1 drops the secondary strip in the .ino guards and would break
+  // 206/206. So this branch reverts to the RGBIC rig's own geometry; leaving it at 206
+  // would duplicate Unit 2's geometry onto an env that must never drive Unit 2.
+  //
+  // The 160-px render canvas (NATIVE_RESOLUTION) is UNCHANGED — scale_to_strip() /
+  // scale_to_secondary_strip() upsample onto the physical strip, exactly as
+  // strip-modes 61/91/160 already do. Output buffers are heap-allocated to
+  // CONFIG.LED_COUNT / SECONDARY_LED_COUNT so 224 is memory-safe. Flag-gated:
   // when K1_CUSTOM_LED_V1 is unset every env resolves 160 -> byte-identical.
+  //
+  // UNRESOLVED (Cursor plan P1.A, still open on BOTH sides of this merge):
+  // [env:k1_custom] still `extends = env:k1_bench_im73d_ble`. That IM73D inheritance is
+  // the false authority the 2026-08-10 correction voided. k1_custom stays under the
+  // P0.D flash freeze until that is fixed. Do NOT flash it to Unit 2 or B489.
   #define LED_COUNT_VALUE 224
   #define SECONDARY_LED_COUNT_VALUE 160
 #elif LED_STRIP_MODE == 1

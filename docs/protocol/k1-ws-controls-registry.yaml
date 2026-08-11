@@ -16,7 +16,7 @@ controls:
   - primary.mood
   - primary.saturation
   - primary.square_iter
-  - primary.mirror
+  # primary.mirror — PURGED 2026-08-09: NEVER reintroduce on BLE/Deck (serial bringup only)
   - primary.auto_color_shift
   - primary.reverse_order
   - primary.incandescent_mode
@@ -35,7 +35,7 @@ controls:
   - secondary.chroma
   - secondary.mood
   - secondary.saturation
-  - secondary.mirror
+  # secondary.mirror — PURGED 2026-08-09: NEVER reintroduce on BLE/Deck (serial bringup only)
   - secondary.incandescent_mode
   - secondary.incandescent_filter
   - secondary.base_coat
@@ -43,7 +43,6 @@ controls:
   - secondary.auto_color_shift
   - secondary.reverse_order
   - global.sensitivity
-  - global.standby_dimming
   - global.chroma_profile
   - global.chromagram_range
   - global.max_current_ma

@@ -139,7 +139,7 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         self.assertIn("k1_loud_guard_gdft_release_sec()", I2S)
         self.assertIn("K1_LOUD_GUARD_GDFT_ATTACK_SEC", I2S)
         # telemetry carries the active mode
-        self.assertIn("spec_sat=%.3f mode=%d", I2S)
+        self.assertIn("spec_sat=%.3f lg_mode=%d lightshow=%u", I2S)
         # runtime mode switching stays runtime-only (no persistence)
         block = typed_command_block("k1_loud_guard")
         self.assertIn("serial_cycle_k1_loud_guard_mode()", block)

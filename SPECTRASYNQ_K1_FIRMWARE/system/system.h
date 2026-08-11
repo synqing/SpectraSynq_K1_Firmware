@@ -437,7 +437,30 @@ void init_system() {
   // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
+#if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
+  // Keep the FastLED power cap at 2.5 A total @ 5 V even if a persisted save
+  // carried a lower product default. Matches dual-214 precedent.
+  //
+  // MERGE FIX 2026-08-12 — this boot-force was gated on K1_CUSTOM_LED_V1 ALONE,
+  // and K1_UNIT2_IM69D_V1 appeared NOWHERE in this file. The 2.5 A figure was
+  // sized for the dual-206 geometry (1219b94a), and after Captain correction
+  // 2026-08-10 that geometry belongs to Unit 2, not to k1_custom. Net effect of
+  // the old gate: Unit 2 drives 206 + 206 = 412 pixels — MORE than k1_custom's
+  // 224 + 160 = 384 — with NO boot-forced cap, falling back to whatever a
+  // persisted save happened to carry. Same defect class as the audio-profile
+  // guard fixed in this merge: a guard that does not sit on every route to the
+  // capability is not a guard. Both LED geometries are over 160/160 and both
+  // must be capped.
+  CONFIG.MAX_CURRENT_MA = 2500;
+#endif
   enforce_compiled_audio_timing_config();
+
+  // STANDBY_DIMMING STRUCK 2026-08-09: ignore any NVS/stored true from old configs.
+  // Field retained for CONFIG layout compatibility; runtime always forced false.
+  if (CONFIG.STANDBY_DIMMING) {
+    CONFIG.STANDBY_DIMMING = false;
+    save_config();
+  }
 
 #ifdef K1_MIC_PDM_RX_ANY_V1
   // PDM boot force-invalidate (IM73D 2026-07-02 / IM69 2026-08-05). A stale SPH0645
@@ -450,10 +473,6 @@ void init_system() {
   CONFIG.DC_OFFSET = 0;                                          // legal-invalid for PDM (HPF, DC≈0)
   CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW; // PDM domain (120); NEVER 0
   CONFIG.VU_LEVEL_FLOOR = 0.0f;
-  // STANDBY_DIMMING boot force-off REMOVED at the 2026-07-10 default-flip. Its rationale
-  // (an early-boot bad cal causing false silence -> blanked plate) no longer applies: go-dark
-  // detection is now raw-RMS + dwell (k1_silence_rms_raw), independent of SSL/cal. The
-  // broken-cal guard at ~:519 remains as belt-and-braces if cal is genuinely corrupt.
   for (uint8_t i = 0; i < NUM_FREQS; i++) noise_samples[i] = 0;
   calibration_profile_loaded = false;
   calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
@@ -528,12 +547,6 @@ void init_system() {
     USBSerial.println(CONFIG.SWEET_SPOT_MIN_LEVEL);
     CONFIG.DC_OFFSET = 0;
     CONFIG.VU_LEVEL_FLOOR = 0.0f;
-    // STANDBY_DIMMING force-off REMOVED at the 2026-07-10 default-flip. This guard tied
-    // go-dark to SSL-cal validity, but SSL fallback is the NORMAL state of a fresh unit until
-    // noise-cal settles — so it wrongly disabled go-dark on every fresh boot. Go-dark
-    // detection is now raw-RMS + dwell (k1_silence_rms_raw), independent of SSL/cal, so a
-    // fallback/broken cal cannot cause false silence. silent_scale only reaches 0 on genuine
-    // raw-RMS silence, which is correct regardless of cal state.
     // Also wipe persisted noise floor — if cal was bad, the 1.5x oversubtraction in GDFT.h
     // would kill the spectrogram and zero out chromagram → no audio reactivity in any mode.
     for (uint8_t i = 0; i < NUM_FREQS; i++) {

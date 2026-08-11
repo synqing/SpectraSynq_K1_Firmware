@@ -15,6 +15,9 @@
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
 #endif
+#ifdef K1_BLE_REMOTED
+#include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
+#endif
 
 extern void start_noise_cal();
 
@@ -284,14 +287,11 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   int32_t index_right = index_whole + 1;
 
   // Bounds guard (audit M1.3): every CRGB16 buffer is NATIVE_RESOLUTION-sized, so
-  // an out-of-range index must not read one past the buffer. LATENT in ALL current
-  // configs — SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h) so
-  // the only caller's lerp else-branch is dead, and the custom-224 build drops the
-  // secondary channel. This is defensive hardening that becomes LIVE only if a
-  // secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION, or a new
-  // out-of-range caller, is ever added. No-op for valid in-range indices
-  // (byte-identical for the shipping 160 config); at the top edge it clamps to the
-  // edge pixel, matching scale_to_strip's existing index_right guard.
+  // an out-of-range index must not read one past the buffer. LIVE for dual-206
+  // (SECONDARY_LED_COUNT=206 > NATIVE_RESOLUTION) via scale_to_secondary_strip().
+  // No-op for valid in-range indices (byte-identical for the shipping 160 config);
+  // at the top edge it clamps to the edge pixel, matching scale_to_strip's
+  // existing index_right guard.
   if (index_left  < 0) index_left  = 0;
   if (index_right < 0) index_right = 0;
   if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
@@ -407,6 +407,13 @@ inline void apply_brightness() {
   // NON-SHIPPABLE: VPML built-in previews are controlled VP stimuli, so silence
   // dimming must not alter the final-byte proof while the lab owns the frame.
   if (vpml_active) silent_scale = 1.0f;
+#endif
+#ifdef K1_BLE_REMOTED
+  // Core-0 write-site fix (i2s_audio.h) is the PRIMARY guard for K1_BLE_REMOTED:
+  // silent_scale and silent_scale_last are pinned to 1.0 there unconditionally,
+  // eliminating the IIR race and the link-flap hole. This belt-and-suspenders
+  // write here is retained as a defense-in-depth measure only.
+  silent_scale = 1.0f;
 #endif
 #ifdef K1_DROP_CUT_V1
   drop_cut_update();
@@ -877,6 +884,12 @@ inline void init_lerp_params() {
             // leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping 61/91/160 (down/equal)
             // modes never reach index_left == NR-1, so this is flag-gated to keep those
             // builds byte-identical.
+            //
+            // MERGE NOTE 2026-08-12 — main's side of this conflict guarded on
+            // K1_CUSTOM_LED_V1 ALONE. Taking it would have left every Unit 2 build
+            // (K1_UNIT2_IM69D_V1, 206 > NATIVE_RESOLUTION 160) with the clamp compiled
+            // out, reinstating the OOB read on the exact unit this lane measures.
+            // The disjunction is load-bearing: keep both flags.
             if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
                 led_lerp_params[i].index_right = NATIVE_RESOLUTION - 1;
             }
@@ -991,20 +1004,13 @@ inline void show_leds() {
   }
 #endif
   
-  // Only attempt to use secondary LEDs if explicitly enabled
-  if (ENABLE_SECONDARY_LEDS) {
-    // Put in try/catch-style protection
-    bool secondary_success = true;
-    
-    // Try to show secondary LEDs but don't crash if it fails
-    if (secondary_success) {
-      try {
-        show_secondary_leds();
-      } catch(...) {
-        secondary_success = false;
-        // If we had a system for logging errors, we'd do it here
-      }
-    }
+  // Only attempt to use secondary LEDs if explicitly enabled AND buffers exist.
+  // k1_show_state_load() can set ENABLE_SECONDARY_LEDS=true during init_fs(),
+  // before init_secondary_leds() runs (after init_system). C++ try/catch does
+  // not catch null deref on ESP32 — guard the pointer explicitly.
+  if (ENABLE_SECONDARY_LEDS && leds_scaled_secondary != nullptr &&
+      leds_out_secondary != nullptr) {
+    show_secondary_leds();
   }
   
 #if ENABLE_VPAB_PROBE
@@ -2230,6 +2236,9 @@ inline void init_secondary_leds() {
 }
 
 inline void scale_to_secondary_strip() {
+  if (leds_scaled_secondary == nullptr || leds_16_secondary == nullptr) {
+    return;
+  }
   if (SECONDARY_LED_COUNT == NATIVE_RESOLUTION) {
     memcpy(leds_scaled_secondary, leds_16_secondary, sizeof(CRGB16) * NATIVE_RESOLUTION);
   } else {

@@ -1,4 +1,6 @@
 # ── SpectraSynq K1 Firmware — .gitignore ───────────────────────────────────
+# british-english-guard: ignore — `artifacts/` is the literal on-disk directory
+# name in this repo and must be spelled that way to match real paths.
 # Clean-slate hygiene (audit 2026-06-23): scratch, agent state, and build
 # artefacts never enter the repo by construction.
 
@@ -102,3 +104,33 @@ k1_ota_signing_PRIVATE.pem
 
 # Stimulus WAVs >5MB — pre-commit rejects; keep local for eval replay only
 artifacts/**/stimulus_*.wav
+
+# ── Tab5 Deck16 controller (tab5_firmware/) — added 2026-08-11 ──────────────
+# The Tab5 tree ships SOURCE only. Everything below is a local build input or a
+# regenerable/licence-restricted asset and must never enter history. Without
+# these rules `git add -A` stages ~57.5k files / 5.6 GB of PlatformIO cache.
+# pinned PIO platforms + packages (5.6 GB local cache).
+# NOTE: .gitignore has NO trailing-comment support — a `pattern  # note` line
+# makes the comment part of the pattern and silently matches nothing.
+tab5_firmware/vendor/
+tab5_firmware/.pio/
+tab5_firmware/build/
+tab5_firmware/build.log
+tab5_firmware/managed_components/
+tab5_firmware/dependencies.lock
+tab5_firmware/sdkconfig.tab5_*.old
+# Studio Feixen TRIAL type specimens — TRIAL EULA, redistribution NOT granted.
+# Licensed release fonts live outside the repo; only generated LVGL glyph C
+# arrays that we are licensed to ship may be committed.
+tab5_firmware/fonts_unused/
+# Superseded pre-Countach LVGL font C arrays — regenerate via tab5_firmware/tools/
+tab5_firmware/_retired_fonts_pre_countach/
+
+# Parallel-lane git worktrees (3.9 GB). Worktree contents belong to their own
+# branches; the container directory must never be tracked from this checkout.
+.worktrees/
+
+# Editor / agent scratch copies left beside sources
+*.orig
+*.hardened.bak
+*.working
