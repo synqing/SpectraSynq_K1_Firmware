@@ -72,3 +72,12 @@ def test_palette_preview_uses_one_shared_subpixel_spatial_field():
     assert "GRAD_STRIP_RING_W" not in text
     assert "z->grad_buf[y * w + x] = px" in text
     assert "lv_obj_set_size(z->grad, z->grad_w, GRAD_STRIP_H)" in text
+
+
+def test_status_strip_does_not_rewrite_lvgl_labels_at_palette_tick_rate():
+    text = UI.read_text(encoding="utf-8")
+    body = text.split("static void refresh_status_strip(void)\n{", 1)[1]
+    body = body.split("\n}\n\nstatic void wing_event_cb", 1)[0]
+    assert "!gStatusUiInitialised" in body
+    assert "if (phase_changed) {\n    if (gPhaseLabel)" in body
+    assert body.count("lv_label_set_text(gPhaseLabel") == 1

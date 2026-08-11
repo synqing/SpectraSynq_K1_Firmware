@@ -131,6 +131,7 @@ static lv_obj_t* gWaitingScreen = nullptr;
 static bool gLinked = false;           /* BLE connected (transport) */
 static bool gArmed = false;            /* deck_state_rx_armed — command gate */
 static DeckLinkPhase gPhaseUi = DECK_LINK_DISCONNECTED;
+static bool gStatusUiInitialised = false;
 static uint32_t gLastRxRevision = 0;
 static uint32_t gLastConfirmedCount = 0;
 static bool gLastStale = false;
@@ -621,32 +622,34 @@ static void refresh_status_strip(void)
 {
   const DeckLinkPhase phase = deck_state_rx_phase();
   const bool armed = deck_state_rx_armed();
-  const bool phase_changed = (phase != gPhaseUi) || (armed != gArmed);
+  const bool phase_changed = !gStatusUiInitialised ||
+                             (phase != gPhaseUi) || (armed != gArmed);
   gPhaseUi = phase;
   gArmed = armed;
   gLinked = BleMidiTransport::connected() || phase > DECK_LINK_DISCONNECTED;
-
-  if (gPhaseLabel) {
-    lv_label_set_text(gPhaseLabel, phase_short_label(phase));
-    uint32_t col = DECK_COLOR_AMBER_DIM;
-    if (phase == DECK_LINK_LIVE) col = DECK_COLOR_LAMP_ON;
-    else if (phase == DECK_LINK_ARMED) col = DECK_COLOR_AMBER_HI;
-    else if (phase == DECK_LINK_STATE_SYNCING) col = DECK_COLOR_AMBER;
-    lv_obj_set_style_text_color(gPhaseLabel, lv_color_hex(col), LV_PART_MAIN);
-  }
-
-  if (gLinkLamp) {
-    /* Green only when ARMED/LIVE — BLE connect alone is not authority. */
-    set_lamp_visual(gLinkLamp, armed);
-  }
-  if (gLinkLabel) {
-    lv_obj_set_style_text_color(
-        gLinkLabel,
-        lv_color_hex(armed ? DECK_COLOR_AMBER : DECK_COLOR_AMBER_DIM),
-        LV_PART_MAIN);
-  }
+  gStatusUiInitialised = true;
 
   if (phase_changed) {
+    if (gPhaseLabel) {
+      lv_label_set_text(gPhaseLabel, phase_short_label(phase));
+      uint32_t col = DECK_COLOR_AMBER_DIM;
+      if (phase == DECK_LINK_LIVE) col = DECK_COLOR_LAMP_ON;
+      else if (phase == DECK_LINK_ARMED) col = DECK_COLOR_AMBER_HI;
+      else if (phase == DECK_LINK_STATE_SYNCING) col = DECK_COLOR_AMBER;
+      lv_obj_set_style_text_color(gPhaseLabel, lv_color_hex(col), LV_PART_MAIN);
+    }
+
+    if (gLinkLamp) {
+      /* Green only when ARMED/LIVE — BLE connect alone is not authority. */
+      set_lamp_visual(gLinkLamp, armed);
+    }
+    if (gLinkLabel) {
+      lv_obj_set_style_text_color(
+          gLinkLabel,
+          lv_color_hex(armed ? DECK_COLOR_AMBER : DECK_COLOR_AMBER_DIM),
+          LV_PART_MAIN);
+    }
+
     apply_armed_gate_visuals();
     layout_link_cluster();
   }
