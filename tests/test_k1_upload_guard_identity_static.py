@@ -86,6 +86,16 @@ def test_unknown_serial_rejected_for_protected_env():
     assert not ok and "expected" in msg, msg
 
 
+def test_unmapped_k1_environment_fails_closed():
+    ok, msg = GUARD.validate_upload_target(
+        "k1_bench_im69d_ble_typo",
+        BENCH[0],
+        _ports(MAIN, BENCH),
+    )
+    assert not ok and "upload blocked" in msg, msg
+    assert "unmapped K1 environment" in msg, msg
+
+
 # 6 — a stale/default upload_port cannot bypass the serial identity check
 def test_stale_default_port_cannot_bypass_serial():
     # 1401 is the configured-default port for main K1, but it now physically

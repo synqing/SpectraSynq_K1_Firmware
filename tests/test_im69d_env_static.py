@@ -41,6 +41,17 @@ def test_im69d_env_exists_and_extends_bench_reference():
     assert "K1_MIC_IM73D_PDM_V1" not in block
 
 
+def test_im69d_ble_env_extends_im69d_and_uses_only_ble_deltas():
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    block = _env_block(text, "k1_bench_im69d_ble")
+    assert "extends = env:k1_bench_im69d" in block
+    assert "+<network/ble_remoted_central.cpp>" in block
+    assert "+<network/k1_ble_midi_decoder.cpp>" in block
+    assert "-DK1_BLE_REMOTED" in block
+    assert "-DK1_MIC_IM73D_PDM_V1" not in block
+    assert "NimBLE-Arduino@^2.5.0" in block
+
+
 def test_im69d_flag_absent_from_production_and_im73d_envs():
     text = PLATFORMIO.read_text(encoding="utf-8")
     for env_name in PROD_ENVS:
@@ -105,8 +116,11 @@ def test_im69d_registered_in_upload_guard_and_pio_build_allowlist():
         e["envs"] for e in manifest["authorized"] if e["chip_id"] == "F887A500"
     )
     assert "k1_bench_im69d" in bench_envs
+    assert "k1_bench_im69d_ble" in bench_envs
     assert "k1_bench_im69d" not in main_envs
+    assert "k1_bench_im69d_ble" not in main_envs
     assert "k1_bench_im69d" in wrapper
+    assert "k1_bench_im69d_ble" in wrapper
 
 
 def test_im69d_not_alias_of_im73d_flag():

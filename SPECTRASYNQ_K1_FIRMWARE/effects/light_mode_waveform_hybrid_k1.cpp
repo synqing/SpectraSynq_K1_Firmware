@@ -107,18 +107,13 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   if (dt > 0.05f)  dt = 0.05f;
 
   // ---- audio (value-copy snapshots) ----------------------------------------
-  // MUST be the SB snapshot, not the K1 one. k1_audio_snapshot_update() is
-  // called from exactly one site — sb_audio_snapshot.cpp, inside #ifdef K1_STM —
-  // so on every env that does not define K1_STM (which is all of them except
-  // k1_hardware_stm) k1_audio_snapshot_current stays zero-initialised forever
-  // and k1_audio_snapshot_read() returns peak_scaled=0 / vu_level=0 for the
-  // life of the boot. Mode 32 was this dead surface's ONLY consumer, so nothing
-  // else in the firmware exhibited the fault. sb_audio_snapshot_update(t_now)
-  // runs every AP frame (SPECTRASYNQ_K1_FIRMWARE.ino:958) and carries the same
-  // peak_scaled / vu_level / silence fields under the same spinlock discipline.
+  // Snapshot is refreshed every AP frame via k1_audio_snapshot_update() in the
+  // main .ino (not STM-gated). Still OR with the live global peak so a torn or
+  // one-frame-stale snapshot cannot black the plate while AP peak_scaled is hot
+  // (Bench Unit 2 2026-08-09: silence cleared, peak~0.7, glass still looked dead).
   const K1AudioSnapshot snap = k1_audio_snapshot_read();
-  const float peak = wfhyb_clamp01(snap.peak_scaled);
-  const bool  silence = snap.silence;
+  const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+  const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
 
   // Signal-presence envelope (audioConfidence analogue): fast rise, ~500 ms
   // hold-decay so the effect does not cut during inter-beat gaps.
@@ -159,7 +154,13 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   bright01 = wfhyb_clamp01(bright01);
 
   // ── Peak/VU seed envelope (mirrors light_mode_waveform_hybrid.cpp:84–106) ──
-  const float blend = wfhyb_clamp01(chroma_energy * VP_WAVEFORM_CHROMA_BLEND_GAIN);
+  float blend = wfhyb_clamp01(chroma_energy * VP_WAVEFORM_CHROMA_BLEND_GAIN);
+  // When the chromagram sparseness gate leaves only a thin residual, prefer the
+  // peak-driven fallback colour. Otherwise particle colour stays near-black while
+  // AP peak_scaled is healthy (IM73D quiet floor / chroma gate_gain≪1).
+  if (chroma_energy < 0.15f && peak > WFHYB_PRESENCE_FLOOR) {
+    if (blend > 0.25f) blend = 0.25f;
+  }
   float seed_level = peak;
   if (fx.wfhyb_peak_last > seed_level) seed_level = fx.wfhyb_peak_last;
   const float vu = wfhyb_clamp01(snap.vu_level);

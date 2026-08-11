@@ -1,4 +1,4 @@
-{"control_count": 71, "protected_apply_count": 4, "registry_md5": "78fb9af986da36922fae33cb09de3b4b", "text_value_count": 21}
+{"control_count": 68, "protected_apply_count": 4, "registry_md5": "9b5db3fbb17438367adeaceb541db03b", "text_value_count": 21}
 {"channel": 0, "max_expr": "NUM_MODES - 1", "midi": "pc", "path": "primary.mode", "type": "mode"}
 {"cc": 102, "channel": 0, "max_expr": "gGradientPaletteCount - 1", "midi": "cc7", "path": "primary.palette", "type": "enum"}
 {"cc": 64, "channel": 0, "midi": "cc7", "path": "primary.palette_mode", "type": "bool"}
@@ -7,15 +7,14 @@
 {"cc_lsb": 35, "cc_msb": 3, "channel": 0, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "primary.mood", "type": "float"}
 {"cc_lsb": 36, "cc_msb": 4, "channel": 0, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "primary.saturation", "type": "float"}
 {"cc_lsb": 37, "cc_msb": 5, "channel": 0, "max": 8.0, "midi": "cc14", "min": 0.0, "path": "primary.square_iter", "type": "float"}
-{"cc": 65, "channel": 0, "midi": "cc7", "path": "primary.mirror", "type": "bool"}
-{"cc": 66, "channel": 0, "midi": "cc7", "path": "primary.auto_color_shift", "type": "bool"}
-{"cc": 67, "channel": 0, "midi": "cc7", "path": "primary.reverse_order", "type": "bool"}
-{"cc": 68, "channel": 0, "midi": "cc7", "path": "primary.incandescent_mode", "type": "bool"}
+{"cc": 65, "channel": 0, "midi": "cc7", "path": "primary.auto_color_shift", "type": "bool"}
+{"cc": 66, "channel": 0, "midi": "cc7", "path": "primary.reverse_order", "type": "bool"}
+{"cc": 67, "channel": 0, "midi": "cc7", "path": "primary.incandescent_mode", "type": "bool"}
 {"cc_lsb": 39, "cc_msb": 7, "channel": 0, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "primary.incandescent_filter", "type": "float"}
 {"cc_lsb": 40, "cc_msb": 8, "channel": 0, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "primary.bulb_opacity", "type": "float"}
-{"cc": 69, "channel": 0, "midi": "cc7", "path": "primary.base_coat", "type": "bool"}
+{"cc": 68, "channel": 0, "midi": "cc7", "path": "primary.base_coat", "type": "bool"}
 {"cc_lsb": 41, "cc_msb": 9, "channel": 0, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "primary.base_coat_intensity", "type": "float"}
-{"cc": 70, "channel": 0, "midi": "cc7", "path": "primary.temporal_dithering", "type": "bool"}
+{"cc": 69, "channel": 0, "midi": "cc7", "path": "primary.temporal_dithering", "type": "bool"}
 {"cc_lsb": 42, "cc_msb": 10, "channel": 0, "max": 8.0, "midi": "cc14", "min": 0.0, "path": "primary.prism_count", "type": "float"}
 {"accepted_text_values": ["default", "tinted_bulbs", "incandescent", "white", "classic"], "channel": 0, "midi": "nrpn", "nrpn_param": 0, "path": "primary.preset", "text_values": ["default", "tinted_bulbs", "incandescent", "white", "classic"], "type": "text"}
 {"channel": 1, "max_expr": "NUM_MODES - 1", "midi": "pc", "path": "secondary.mode", "type": "mode"}
@@ -26,15 +25,13 @@
 {"cc_lsb": 34, "cc_msb": 2, "channel": 1, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "secondary.chroma", "type": "float"}
 {"cc_lsb": 35, "cc_msb": 3, "channel": 1, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "secondary.mood", "type": "float"}
 {"cc_lsb": 36, "cc_msb": 4, "channel": 1, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "secondary.saturation", "type": "float"}
-{"cc": 66, "channel": 1, "midi": "cc7", "path": "secondary.mirror", "type": "bool"}
-{"cc": 67, "channel": 1, "midi": "cc7", "path": "secondary.incandescent_mode", "type": "bool"}
+{"cc": 66, "channel": 1, "midi": "cc7", "path": "secondary.incandescent_mode", "type": "bool"}
 {"cc_lsb": 37, "cc_msb": 5, "channel": 1, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "secondary.incandescent_filter", "type": "float"}
-{"cc": 68, "channel": 1, "midi": "cc7", "path": "secondary.base_coat", "type": "bool"}
+{"cc": 67, "channel": 1, "midi": "cc7", "path": "secondary.base_coat", "type": "bool"}
 {"cc_lsb": 39, "cc_msb": 7, "channel": 1, "max": 1.0, "midi": "cc14", "min": 0.0, "path": "secondary.base_coat_intensity", "type": "float"}
-{"cc": 69, "channel": 1, "midi": "cc7", "path": "secondary.auto_color_shift", "type": "bool"}
-{"cc": 70, "channel": 1, "midi": "cc7", "path": "secondary.reverse_order", "type": "bool"}
+{"cc": 68, "channel": 1, "midi": "cc7", "path": "secondary.auto_color_shift", "type": "bool"}
+{"cc": 69, "channel": 1, "midi": "cc7", "path": "secondary.reverse_order", "type": "bool"}
 {"cc_lsb": 33, "cc_msb": 1, "channel": 2, "max": "K1_SENSITIVITY_MAX", "midi": "cc14", "min": "K1_SENSITIVITY_MIN", "path": "global.sensitivity", "type": "float"}
-{"cc": 64, "channel": 2, "midi": "cc7", "path": "global.standby_dimming", "type": "bool"}
 {"cc": 102, "channel": 2, "max_expr": "2", "midi": "cc7", "path": "global.chroma_profile", "type": "enum"}
 {"cc_lsb": 34, "cc_msb": 2, "channel": 2, "max": "float(NUM_FREQS)", "midi": "cc14", "min": 1.0, "path": "global.chromagram_range", "type": "float"}
 {"cc_lsb": 35, "cc_msb": 3, "channel": 2, "max": 5000.0, "midi": "cc14", "min": 100.0, "path": "global.max_current_ma", "type": "float"}

@@ -83,6 +83,10 @@ static const float    K1_BEAT_SHIFT_PERCENT = 0.08f;
 // k1_update_tempo). A real tempo is an isolated peak -> ~1.0; a flat/drone or scattered
 // spectrum -> low. HOST-MEASURED (tempo_replay.py): clean beat 0.999 vs flat/drone 0.47, so
 // this threshold sits in the wide gap and a clean beat reads near-maximal (the metronome bar).
+// TOMBSTONE 2026-08-11 (Captain): an IM73D-gated override of 0.28 lived here,
+// measured on Bench Unit 2 under a mic identity that correction 2026-08-10
+// voided. Deleted rather than carried — see audio/k1_audio_profile.h. 0.60 is
+// the SPH0645 calibration and is now unconditional.
 static const float    K1_LOCK_CONFIDENCE = 0.60f;
 
 // Confidence main-lobe half-width (bins). The tempo Goertzel's main lobe spans ~5 BPM, so
@@ -264,7 +268,8 @@ static float    k1_confidence = 0.0f;
 // Lock FSM: acquire when conf_ema>=K1_LOCK_CONFIDENCE AND warmup done AND >=2 beats seen;
 // hold; release when conf_ema<K1_CONF_V2_REL (hysteresis); watchdog forces unlock after
 // K1_CONF_V2_WATCHDOG_N consecutive updates with conf_ema<K1_CONF_V2_FLOOR.
-// K1_LOCK_CONFIDENCE (0.60) is NOT lowered — the new metric must REACH it on real music.
+// K1_LOCK_CONFIDENCE is 0.60 for every build; the IM73D quiet-mic override was
+// tombstoned 2026-08-11 (audio/k1_audio_profile.h).
 
 // --- calibratable constants (all -D-overridable so the harness can sweep them) ---
 // CALIBRATED on the 36-track HarmonixSet corpus + synthetic silence/white-noise by
@@ -288,6 +293,7 @@ static float    k1_confidence = 0.0f;
 #define K1_CONF_V2_W3 0.25f          // periodicity weight (CALIBRATED)
 #endif
 #ifndef K1_CONF_V2_REL
+// TOMBSTONE 2026-08-11: IM73D override 0.18 deleted (k1_audio_profile.h).
 #define K1_CONF_V2_REL 0.42f         // lock-release threshold (hysteresis below 0.60; CALIBRATED)
 #endif
 #ifndef K1_CONF_V2_FLOOR
@@ -487,6 +493,10 @@ static void k1_update_scale(float tau) {
 
 // Silence = low contrast across the recent novelty window.
 static void k1_check_silence() {
+  // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated short-circuit lived here that
+  // disabled this gate entirely and returned early. It was derived from Bench
+  // Unit 2 behaviour under a voided mic identity — see audio/k1_audio_profile.h.
+  // The novelty-contrast gate now runs for every build.
   float min_val = 1.0f;
   float max_val = 0.0f;
   for (uint16_t i = 0; i < 128; i++) {
@@ -499,9 +509,10 @@ static void k1_check_silence() {
   }
   float contrast = fabsf(max_val - min_val);
   float silence_raw = 1.0f - contrast;
-  if (silence_raw > 0.5f) {
+  const float silence_enter = 0.5f;
+  if (silence_raw > silence_enter) {
     k1_silence_detected = true;
-    k1_silence_level = k1_t_clamp((silence_raw - 0.5f) * 2.0f, 0.0f, 1.0f);
+    k1_silence_level = k1_t_clamp((silence_raw - silence_enter) / fmaxf(1.0f - silence_enter, 1e-6f), 0.0f, 1.0f);
   } else {
     k1_silence_detected = false;
     k1_silence_level = 0.0f;
@@ -1332,6 +1343,11 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   uint32_t now_ms = audio.frame_ms;
   float novelty = k1_t_clamp(audio.novelty, 0.0f, 1.0f);
   if (audio.silence) novelty = 0.0f;
+  // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated `novelty *= 4.0f` boost lived
+  // here. The multiplier was fitted by trial (x2.5 then x4.0) against Bench Unit
+  // 2 under a voided mic identity, so it is deleted rather than carried — see
+  // audio/k1_audio_profile.h. Novelty now reaches the Goertzel/ACF stage
+  // unscaled on every build.
 
   // Prime on first call so the downsample window starts clean.
   if (!k1_tempo_primed) {

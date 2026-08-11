@@ -30,7 +30,7 @@ PURE = [
     "photons", "chroma", "mood", "palette_mode", "palette_index", "square_iter",
     "led_interpolation", "base_coat", "temporal_dithering", "sensitivity",
     "mirror_enabled", "sweet_spot_min", "sweet_spot_max", "chromagram_range",
-    "standby_dimming", "reverse_order", "max_current_ma", "auto_color_shift",
+    "reverse_order", "max_current_ma", "auto_color_shift",
     "incandescent_filter", "incandescent_mode", "bulb_opacity", "saturation", "prism_count",
 ]
 REBOOT = [

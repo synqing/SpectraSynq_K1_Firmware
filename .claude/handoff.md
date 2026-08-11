@@ -11,25 +11,79 @@ resume it and do not propose work that depends on it. Full notice:
 **The branch `lane/dual-sync-phase0` no longer describes its contents** — it now
 just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 
-## ▶ CURRENT LANE — AP ADVICE / IM69D130 DUAL-MIC EVALUATION
+## ▶ CURRENT LANE (2026-08-11) — DUAL IM69D130 RESOLUTION (`K1_DUAL_IM69D130_RESOLUTION_20260810`)
+
+**Binding correction:**
+[`docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`](../docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md)
+
+**Runbook:** `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`  
+**Pack:** [`_scratch/im69d_resolution_20260810/`](../_scratch/im69d_resolution_20260810/)
+
+**Where the code is (2026-08-11, post-merge):** the 2026-08-07..11 Deck16 /
+Tab5 / STANDBY / MIRROR / guard / doctrine work is **merged to `main`**
+(Captain-authorised) and pushed. `main` is the active branch; start new work
+from it. The lane branch `fix/tab5-phase1-softkey-wiring` is retained on origin
+as the pre-merge record.
+
+`fix/dual-im69d130-resolution-20260810` is still checked out in the worktree
+`.worktrees/unit2_slot_ab` and is now BEHIND `main`. It was deliberately never
+fast-forwarded — moving a ref out from under a live worktree corrupts it. If
+that worktree resumes, rebase or merge it onto `main` from inside the worktree.
+
+```text
+UNIT2_PHYSICAL_MIC=dual_IM69D130
+IM73D=DEPRECATED
+K1_CUSTOM_IM73D_INHERITANCE=FALSE_AUTHORITY
+PIN_RECEIPT=PENDING (CAPTAIN_PIN_AUTH required)
+FLASH_FREEZE=ACTIVE on Unit2 + B489 mic envs
+FIRMWARE_REWRITE=HOLD until pin GO
+FLASH=HOLD until CAPTAIN_FLASH_AUTH=GO
+```
+
+- **Unit 2** `0C54FC00` / `AC:A7:04:FC:54:0C` — physical dual IM69D130; silicon may still be IM73D-inherited `k1_custom` (**MISFLASH / wrong mic identity**). Rollback bin sha `f7f9b077…` retained.
+- **First slice:** P0 authority + freeze + dirty-tree preserve + clean worktree. **No** env retarget, **no** flash.
+- **Hard gate:** `_scratch/im69d_resolution_20260810/UNIT2_PIN_RECEIPT.md` needs `CAPTAIN_PIN_AUTH=GO` before Phase 1.
+- **Freeze:** `_scratch/im69d_resolution_20260810/FLASH_FREEZE.md`
+
+## ▶ SUSPENDED (flash) — DECK16 / TAB5 BLE (`K1_DECK16_TAB5_BLE_R1`)
+
+Software-only Deck16/Tab5 work may continue **if it does not upload** to Unit 2 or B489.
+
+**Handover (retained):**
+[`_scratch/deck16_session_handover_20260809/HANDOVER.md`](../_scratch/deck16_session_handover_20260809/HANDOVER.md)
+
+```text
+DECK16_B1_B2_CORE_FUNCTIONAL_PASS=PASS
+EXTENDED_RECOVERY_HARDENING=PASS
+STANDBY_DIMMING=STRUCK
+PRODUCTION_READY=NO
+MERGE_TO_MAIN=DONE 2026-08-11 (Captain-authorised; supersedes MERGE_OR_PROMOTION=HOLD)
+PROMOTION_TO_PRODUCTION=STILL_HOLD
+FLASH_TO_UNIT2_OR_B489=FROZEN_PENDING_IM69D_RESOLUTION
+```
+
+**Read the two merge lines together.** Captain authorised the **merge** of the
+2026-08-07..11 Deck16 / Tab5 / STANDBY / MIRROR / guard / doctrine lane to
+`main` on 2026-08-11. That is a source-integration decision and nothing more.
+`PRODUCTION_READY` is still **NO**: the boot-loop guard, the quiet-mic plate fix
+and the dual-206 retarget carry **host proof only**, `PHASE1_GATE=FAIL` stands
+on `B489A500` until the failing unit boots clean, and the flash freeze is
+unchanged. Do not read "merged" as "proven on silicon".
+
+- **Devices (last known):** bench K1 `B489A500` = `k1_bench_im69d_ble`; Tab5 P4 `30:ed:a0:e0:c1:a0` = `tab5_p4`.
+  Both last flashed 2026-08-09 ~07:57 (Mirror purge).
+- **Standing bans:** Precision Bay DEPRECATED · encoders LAST · never re-enable STANDBY_DIMMING ·
+  never reintroduce MIRROR to BLE/Deck · no chroma/saturation/mirror/`secondary.enabled`/`prism_count` on MAIN glass.
+
+## ▶ PREVIOUS LANE — AP ADVICE / IM69D130 DUAL-MIC EVALUATION
 
 - **Branch:** `feat/ap-advice-phase0-im69d-gain8` (PR #40 merge target).
 - **Authority:** [`docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md`](../docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md)
-  · design [`im69d130-dual-mic-eval-design-2026-08-05.md`](../docs/hardware/im69d130-dual-mic-eval-design-2026-08-05.md).
-- **Phase 0 (device-proven):** `K1_MIC_IM69D_INPUT_GAIN=4` (not G=8) — silence latch
-  PASS after Captain silence-go re-cal (`SSL=74`, quiet `silence=1` 100% / 30 s).
-- **Phases 1–2 (host + flash):** Nyquist ghost-bin retirement; GDFT ×2 globally
-  dropped (`K1_GDFT_X2_CROSSOVER_BIN=0`).
-- **Result so far:** in the raw domain the IM69D130 **beats** the productionised
-  IM73D122 — noise floor `raw_i16_rms` 12.8 vs 34.0, dynamic range 2.3–3.5×
-  better, no near-rail anywhere.
-- **Not tested:** AOP/loudness (needs a loudspeaker without onboard limiting);
-  mic B / RIGHT slot (Stage 1b); stereo (Stage 2).
-- **Deployed:** main `F887A500` = `k1_hardware @ 6f1325e`; bench `B489A500` =
-  `k1_bench_im69d` @ Phase 0 gain-4 proof. See
-  [`docs/hardware/device-build-registry.md`](../docs/hardware/device-build-registry.md).
-- **Safety:** identity by chip ID, never port; no cross-flash; `start_noise_cal`
-  requires Captain's spoken silence-go, always.
+  · design [`im69d130-dual-mic-eval-design-2026-08-05.md`](../docs/hardware/im69d130-dual-mic-eval-design-2026-08-05.md)
+  · **production-mic lines SUPERSEDED** by Captain correction 2026-08-10.
+- **Phase 0 (device-proven on B489):** `K1_MIC_IM69D_INPUT_GAIN=4` — silence latch PASS (`SSL=74`).
+- **Not tested:** AOP/loudness; mic B / RIGHT (Stage 1b); stereo (Stage 2).
+- **Safety:** identity by chip ID, never port; `start_noise_cal` requires spoken silence-go.
 
 ### Tooling added 2026-08-05 (reusable)
 
@@ -53,7 +107,7 @@ just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 
 - **RESUME BRIEF (Codex + any agent — READ FIRST):** [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](../docs/hardware/im73d-codex-resume-handover-2026-07-06.md) — the end-to-end work order: done-ledger, device table, ordered remaining queue (R1–R5 + Phase 2/3), escalation template, hard-rule set.
 - **Lane authority (deep context):** [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](../docs/hardware/im73d122-productionization-handover-2026-07-03.md) — §10 = audit + Captain D1/D2 decision; **§11 = the 2026-07-06 autonomous-execution outcomes** (UA shipped, MicFrontend decision, byte-oracle finding, DSR recipe, flip red-team).
-- **Decision (CLOSED — do not reopen):** IM73D122 = the K1 production mic (Captain-ratified 2026-07-03). Production pin map = **identical bench-proven clk13/din12/LR14** (Captain D1, 2026-07-06; all K1s same ESP32-S3 devboard; no PCB rev). MicFrontend runtime dispatch REJECTED (compile-time selection retained). `g=16`/DSR_8S stay.
+- **Decision (SUPERSEDED 2026-08-10):** IM73D122 was Captain-ratified production mic 2026-07-03 — **now DEPRECATED**. See [`CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`](../docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md). Historical pin map archive: clk13/din12/LR14.
 - **Branch:** `lane/im73d-pdm-eval` (verify live before work). Lanes consolidated (vibrancy `55c536b`, eyes-on PASSED on main K1). Latest green gate in this handoff pass: full pytest `648 passed, 1 skipped`; focused guard test PASS; `k1_hardware` + `k1_prod_im73d` compile clean.
 - **Deployed:** main K1 `F887A500` = `k1_hardware @ 67227da` (SPH0645/default production env, refreshed and post-upload readback proved; re-proved 2026-07-07 on `/dev/cu.usbmodem12401`). Bench `B489A500` was used for controlled-audio DSR8 (`k1_bench_im73d @ bc53ceb`) and DSR16 (`k1_bench_im73d_dsr16 @ 9d14463`) captures, then temporarily misflashed to `k1_prod_im73d @ f2f7c45` during the LED-pinmap incident and restored to `k1_bench_im73d @ f2f7c45`; read-only `:build`/`:dump` confirms `env=k1_bench_im73d`, chip `B489A500`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`, `CONFIG.CHROMA: 0.100000`, `CONFIG.SENSITIVITY: 0.870005`, and `AUDIO_RESPONSE_GAIN: 1.000000` on `/dev/cu.usbmodem1401`. Ports still drift daily, identity by USB MAC/chip only.
 - **SHIPPED this session (2026-07-06):** `k1_prod_im73d` production build path (`4b95e60`, `k1_hardware` LED map + `K1_MIC_IM73D_PDM_V1`, byte-identical-OFF, upload guard corrected on 2026-07-07 to bind to `F887A500` / `B4:3A:45:A5:87:F8`); `mic_stable_byte_gate.sh` trustworthy 3-section byte oracle (`d1ecc10`). Config-persistence un-freeze (`e2b62b5`) now has R1 device proof on the radio-free bench: `:chroma=0.150` survived `:reset`, restore to `CONFIG.CHROMA: 0.100000` is final-read proved, and `CAL_SOURCE: persisted_profile` stayed intact. No `start_noise_cal` was run.

@@ -1,0 +1,25 @@
+{
+  "schema": "spectrasynq.k1.protocol-map-hashes/1",
+  "architecture_revision": "K1_DECK16_TAB5_BLE_R1",
+  "date": "2026-08-09",
+  "hashes": {
+    "k1_ble_midi_map": {
+      "path": "docs/protocol/k1-ble-midi-map.json",
+      "registry_version": "2026-06-09",
+      "registry_md5": "9b5db3fbb17438367adeaceb541db03b",
+      "sha256": "2d1121bd5d1a54421b4b35ead62ba91bfba3a709c8259d35b166f25a6dc148ff",
+      "control_count": 68,
+      "note": "Mirror (primary.mirror / secondary.mirror) purged 2026-08-09 \u2014 NEVER reintroduce on BLE/Deck"
+    },
+    "deck16_layout_v1": {
+      "path": "docs/protocol/deck16-layout-v1.json",
+      "layout_revision": "K1_DECK16_LAYOUT_V1",
+      "sha256": "f8e40f6b1ba7b115bb5e9f7310ac69636e0a10c8e478f7584dd1d5547b941510",
+      "ui_main_glass": "NOT_CAPTAIN_APPROVED",
+      "sixteen_grid": "RETAINED_FOR_ENCODERS",
+      "param_set": "NOT_CAPTAIN_APPROVED",
+      "note": "Hash tracks protocol artefact only. P7/S8 blank after Mirror purge 2026-08-09."
+    }
+  },
+  "acceptance_rule": "K1 must refuse Deck16 control unless the provisioned deck identity, BLE-MIDI registry hash, and Deck16 layout hash match the expected values for the target K1."
+}

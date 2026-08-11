@@ -1,11 +1,8 @@
-"""Static guard for the silence go-dark fix (raw-RMS pre-gate port).
+"""Static guard for silence go-dark wiring + STANDBY_DIMMING struck state.
 
-Asserts the STRUCTURE of the fix without hardware: the raw-RMS signal is captured, the
-`silence` latch is driven off it (not the SSL/sweet_spot_state gate that never latched),
-the absolute thresholds + serial tuners + telemetry exist, and the feature ships DORMANT
-(STANDBY_DIMMING factory-default false). Behavioural calibration is validated on the bench
-(scripts/regression-harness/k1_godark_measure.py + k1_godark_validate.py); this test only
-prevents the wiring from silently regressing.
+Asserts the STRUCTURE of raw-RMS silence detection without hardware, and that
+STANDBY_DIMMING is permanently struck: factory default false, boot force-off for
+stale NVS, and Core-0 silent_scale pin (IIR dimming path inert).
 """
 import re
 import unittest
@@ -27,11 +24,14 @@ class RawRmsThresholds(unittest.TestCase):
         self.assertRegex(GLOBALS, r"inline\s+float\s+k1_silence_rms_raw\s*=")
 
     def test_exit_threshold_above_enter(self):
-        """Schmitt gap: exit must be strictly greater than enter."""
-        enter = float(re.search(r"K1_SILENCE_RMS_ENTER\s*=\s*([\d.]+)f?;", GLOBALS).group(1))
-        exit_ = float(re.search(r"K1_SILENCE_RMS_EXIT\s*=\s*([\d.]+)f?;", GLOBALS).group(1))
-        self.assertGreater(enter, 0.0)
-        self.assertGreater(exit_, enter)
+        """Schmitt gap: exit must be strictly greater than enter (every #if branch)."""
+        enters = [float(v) for v in re.findall(r"K1_SILENCE_RMS_ENTER\s*=\s*([\d.]+)f?;", GLOBALS)]
+        exits = [float(v) for v in re.findall(r"K1_SILENCE_RMS_EXIT\s*=\s*([\d.]+)f?;", GLOBALS)]
+        self.assertGreaterEqual(len(enters), 1)
+        self.assertEqual(len(enters), len(exits))
+        for enter, exit_ in zip(enters, exits):
+            self.assertGreater(enter, 0.0)
+            self.assertGreater(exit_, enter)
 
 
 class RawRmsSignalCaptured(unittest.TestCase):
@@ -54,9 +54,10 @@ class SilenceLatchDrivenByRawRms(unittest.TestCase):
         self.assertNotIn("} else if (sweet_spot_state == -1) {", I2S)
 
     def test_dwell_and_asymmetric_fade_preserved(self):
+        # Fade constants may remain for historical telemetry; dimming path itself is struck.
         self.assertIn("SILENCE_DWELL_MS", I2S)
-        self.assertIn("SILENT_FADE_DOWN_ALPHA", I2S)
-        self.assertIn("SILENT_FADE_UP_ALPHA", I2S)
+        self.assertIn("SILENT_FADE_DOWN_ALPHA", GLOBALS)
+        self.assertIn("SILENT_FADE_UP_ALPHA", GLOBALS)
 
 
 class TelemetryAndSerial(unittest.TestCase):
@@ -64,23 +65,27 @@ class TelemetryAndSerial(unittest.TestCase):
         self.assertIn("rms_raw=%.4f", I2S)
         self.assertIn("k1_silence_rms_raw, CONFIG.STANDBY_DIMMING", I2S)
 
-    def test_serial_tuners_present(self):
+    def test_serial_rms_tuners_present(self):
         self.assertTrue(typed_command_registered(SERIAL, "silence_rms_enter"))
         self.assertTrue(typed_command_registered(SERIAL, "silence_rms_exit"))
 
+    def test_standby_dimming_not_in_typed_table(self):
+        self.assertFalse(typed_command_registered(SERIAL, "standby_dimming"))
 
-class ShipsLive(unittest.TestCase):
-    def test_standby_dimming_factory_default_true(self):
-        # Default-flipped 2026-07-10 (Captain-signed): go-dark ships ON. Detection is raw-RMS
-        # + dwell, cal-independent; hardware-validated latch->true-black->wake.
-        self.assertRegex(GLOBALS_CFG, r"true,\s*//\s*STANDBY_DIMMING")
 
-    def test_no_boot_force_off(self):
-        # Both boot force-offs (unconditional IM73D-boot + SSL-cal-validity guard) are removed:
-        # go-dark detection is raw-RMS/cal-independent, so neither guard's rationale holds and
-        # both wrongly disabled go-dark on fresh units. No system.h boot path may force it false.
+class StandbyDimmingStruck(unittest.TestCase):
+    def test_standby_dimming_factory_default_false(self):
+        self.assertRegex(GLOBALS_CFG, r"false,\s*//\s*STANDBY_DIMMING")
+
+    def test_boot_force_off(self):
         SYSTEM = (FW / "system" / "system.h").read_text(encoding="utf-8")
-        self.assertEqual(SYSTEM.count("CONFIG.STANDBY_DIMMING = false;"), 0)
+        self.assertGreaterEqual(SYSTEM.count("CONFIG.STANDBY_DIMMING = false;"), 1)
+
+    def test_silent_scale_pinned_unconditionally(self):
+        """IIR dimming path must not be reachable via CONFIG.STANDBY_DIMMING."""
+        self.assertIn("silent_scale      = 1.0f;", I2S)
+        self.assertIn("silent_scale_last = 1.0f;", I2S)
+        self.assertNotIn("if (CONFIG.STANDBY_DIMMING)", I2S)
 
 
 if __name__ == "__main__":

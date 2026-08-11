@@ -8,7 +8,11 @@ Noise cal / stereo Stage 2 still open.
 **Lane:** NEW candidate lane. The ACTIVE lane is `lane/dual-sync-phase0` (dual-sync recovery).
 This design must not be merged into, or committed alongside, dual-sync work.
 **Target device:** bench K1, chip `B489A500`, USB serial `B4:3A:45:A5:89:B4` (port name drifts — identity is the chip ID).
-**Production mic decision:** UNCHANGED. IM73D122 remains the production mic (`k1_prod_im73d`). Nothing here reopens that.
+> **SUPERSEDED 2026-08-10:** IM73D122 is **deprecated**. Binding authority:
+> [`CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`](./CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md).
+> The historical line below is retained as archive only.
+
+**Production mic decision (ARCHIVE — superseded):** UNCHANGED. IM73D122 remains the production mic (`k1_prod_im73d`). Nothing here reopens that.
 
 ---
 
