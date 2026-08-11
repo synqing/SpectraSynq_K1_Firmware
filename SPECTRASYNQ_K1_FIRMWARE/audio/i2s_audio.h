@@ -995,7 +995,10 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
 #endif
 #ifdef K1_LOUD_GUARD_V1
-    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f mode=%d",
+    // lg_mode = loud-guard retune matrix (0/1/2). lightshow = CONFIG.LIGHTSHOW_MODE.
+    // Do NOT label lg_mode as "mode=" — that false-read as lightshow mode 2 on Unit 2
+    // and caused a silence-fix "PASS" while WAVEFORM_HYBRID_K1 (32) stayed dead.
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f lg_mode=%d lightshow=%u",
       k1_loud_guard_enabled ? 1 : 0,
       k1_loud_input_trim,
       k1_loud_gdft_trim,
@@ -1006,7 +1009,8 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_peak_pin_duty,
       k1_loud_spec_sat_duty,
       k1_loud_spec_sat_fraction,
-      k1_loud_guard_mode);
+      k1_loud_guard_mode,
+      (unsigned)CONFIG.LIGHTSHOW_MODE);
 #endif
 #ifdef K1_STM
     {
