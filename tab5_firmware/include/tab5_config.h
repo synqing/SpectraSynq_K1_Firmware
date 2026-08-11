@@ -4,18 +4,23 @@
 #define TAB5_LOG_ENABLED 1
 #endif
 
-// Phase B rendering pipeline flags (Operator UI).
-// Dual partial draw buffers in PSRAM (safe with M5GFX flush path).
+// Production rendering contract: a complete logical frame is rendered in
+// PSRAM, rotated by the ESP32-P4 PPA into a hidden DSI framebuffer, and then
+// presented at VSYNC.  Partial writes to the live scanout are forbidden.
 #ifndef TAB5_LVGL_DUAL_PARTIAL_FB
-#define TAB5_LVGL_DUAL_PARTIAL_FB 1
+#define TAB5_LVGL_DUAL_PARTIAL_FB 0
 #endif
-// Full-frame direct dual FB via esp_lvgl_port — deferred; keep 0 until measured.
 #ifndef TAB5_LVGL_FULL_DIRECT_FB
-#define TAB5_LVGL_FULL_DIRECT_FB 0
+#define TAB5_LVGL_FULL_DIRECT_FB 1
 #endif
-// PPA experimental — escape hatch; default OFF until device A/B vs pinned LVGL.
 #ifndef TAB5_USE_PPA
-#define TAB5_USE_PPA 0
+#define TAB5_USE_PPA 1
+#endif
+
+#if defined(TAB5_PRODUCTION_BUILD) && TAB5_PRODUCTION_BUILD
+#if TAB5_LVGL_DUAL_PARTIAL_FB || !TAB5_LVGL_FULL_DIRECT_FB || !TAB5_USE_PPA
+#error "Production Tab5 requires full-frame PPA rendering with VSYNC presentation"
+#endif
 #endif
 
 // UI tuning

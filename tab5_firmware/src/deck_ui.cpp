@@ -1150,9 +1150,14 @@ static void create_mega_slider(MegaSlider* s, lv_obj_t* parent, int x, int y, in
   lv_obj_set_pos(s->bus_label, 8, 4);
 
   s->value_label = make_label(s->root, "0%", DECK_TYPE_MONO_55, DECK_COLOR_AMBER_HI);
-  lv_obj_set_width(s->value_label, 104);
+  /* Berkeley Mono 55 is 33 px/cell.  "100%" therefore needs 132 px before
+   * any optical breathing room; the former 104 px box clipped the leading 1
+   * and made a full-scale value look like "00%". */
+  static constexpr int kValueLabelWidth = 144;
+  static constexpr int kValueLabelRightInset = 8;
+  lv_obj_set_width(s->value_label, kValueLabelWidth);
   lv_obj_set_style_text_align(s->value_label, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
-  lv_obj_set_pos(s->value_label, w - 112, 0);
+  lv_obj_set_pos(s->value_label, w - kValueLabelWidth - kValueLabelRightInset, 0);
 
   s->track = lv_obj_create(s->root);
   lv_obj_set_size(s->track, w - 16, 52);

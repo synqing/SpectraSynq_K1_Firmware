@@ -1,12 +1,26 @@
 /**
- * LVGL Bridge Implementation
+ * LVGL bridge for the M5Stack Tab5.
  *
- * Integrates LVGL 9.3.0 with M5Stack Tab5 (ESP32-P4) using M5GFX's framebuffer
+ * LVGL owns one complete 1280x720 RGB565 logical frame in PSRAM.  On the last
+ * flush of a refresh, the ESP32-P4 PPA rotates that complete frame into the
+ * hidden 720x1280 DSI framebuffer.  ESP-IDF switches the DPI DMA source at the
+ * following VSYNC.  No incomplete band is ever written to the live scanout.
  */
 
 #include "lvgl_bridge.h"
 #include "tab5_config.h"
+
+#include <atomic>
+#include <cstring>
+
+#include <esp_err.h>
 #include <esp_heap_caps.h>
+#include <esp_lcd_mipi_dsi.h>
+#include <esp_lcd_panel_ops.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+#include <driver/ppa.h>
+#include <lgfx/v1/platforms/esp32p4/Panel_DSI.hpp>
 
 #if TAB5_LOG_ENABLED
 #define BRIDGE_LOG(fmt, ...) Serial.printf("[lvgl_bridge] " fmt "\n", ##__VA_ARGS__)
@@ -15,155 +29,257 @@
 #endif
 
 namespace LVGLBridge {
-    // LVGL objects
-    static lv_display_t* _display = nullptr;
-    static lv_indev_t* _touch_indev = nullptr;
-    static uint16_t* _draw_buf = nullptr;
-    static uint16_t* _draw_buf2 = nullptr;
-    static constexpr uint16_t kScreenWidth  = 1280;
-    static constexpr uint16_t kScreenHeight = 720;
-    static constexpr uint16_t kBufferLines  = 64; // ~160 KB per partial buffer (RGB565)
+namespace {
 
-    // Forward declarations for callbacks
-    static void flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map);
-    static void touch_read_cb(lv_indev_t* indev, lv_indev_data_t* data);
-    static uint32_t tick_cb(void);
+constexpr uint16_t kLogicalWidth = 1280;
+constexpr uint16_t kLogicalHeight = 720;
+constexpr uint16_t kPhysicalWidth = 720;
+constexpr uint16_t kPhysicalHeight = 1280;
+constexpr size_t kFrameBytes =
+    static_cast<size_t>(kLogicalWidth) * kLogicalHeight * sizeof(uint16_t);
+constexpr size_t kCacheAlignment = 64;
+constexpr TickType_t kVsyncTimeout = pdMS_TO_TICKS(50);
 
-    bool init() {
-        BRIDGE_LOG("Initializing LVGL bridge...");
-#if TAB5_USE_PPA
-        BRIDGE_LOG("WARN: TAB5_USE_PPA=1 but M5GFX path has no PPA draw unit — flag is escape hatch only");
-#endif
-#if TAB5_LVGL_FULL_DIRECT_FB
-        BRIDGE_LOG("WARN: TAB5_LVGL_FULL_DIRECT_FB=1 ignored — esp_lvgl_port full FB deferred (debt)");
-#endif
+lv_display_t* gDisplay = nullptr;
+lv_indev_t* gTouchIndev = nullptr;
+uint16_t* gLogicalFrame = nullptr;
+void* gFrontFramebuffer = nullptr;
+void* gBackFramebuffer = nullptr;
+esp_lcd_panel_handle_t gPanelHandle = nullptr;
+ppa_client_handle_t gPpaHandle = nullptr;
+SemaphoreHandle_t gVsyncSemaphore = nullptr;
+std::atomic<uint32_t> gVsyncEpoch{0};
+uint32_t gSubmittedEpoch = 0;
+bool gPresentPending = false;
+bool gDisplayFault = false;
 
-        // Allocate scanline draw buffer(s) in PSRAM (RGB565 partial rendering).
-        // Dual partial FB is the Phase B incremental step; full-frame direct dual FB
-        // via esp_lvgl_port remains debt until measured on panel.
-        const size_t buf_size_bytes = kScreenWidth * kBufferLines * sizeof(uint16_t);
-        _draw_buf = static_cast<uint16_t*>(
-            heap_caps_malloc(buf_size_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
-        if (!_draw_buf) {
-            BRIDGE_LOG("ERROR: Failed to allocate LVGL draw buffer (%d bytes)", (int)buf_size_bytes);
+void flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map);
+void touch_read_cb(lv_indev_t* indev, lv_indev_data_t* data);
+uint32_t tick_cb(void);
+
+bool IRAM_ATTR on_refresh_done(esp_lcd_panel_handle_t panel,
+                               esp_lcd_dpi_panel_event_data_t* event,
+                               void* user_ctx)
+{
+    (void)panel;
+    (void)event;
+    (void)user_ctx;
+    gVsyncEpoch.fetch_add(1, std::memory_order_release);
+
+    BaseType_t high_task_woken = pdFALSE;
+    xSemaphoreGiveFromISR(gVsyncSemaphore, &high_task_woken);
+    return high_task_woken == pdTRUE;
+}
+
+bool wait_until_back_buffer_is_safe()
+{
+    if (!gPresentPending) return true;
+
+    const TickType_t started = xTaskGetTickCount();
+    while (static_cast<int32_t>(
+               gVsyncEpoch.load(std::memory_order_acquire) - gSubmittedEpoch) <= 0) {
+        const TickType_t elapsed = xTaskGetTickCount() - started;
+        if (elapsed >= kVsyncTimeout ||
+            xSemaphoreTake(gVsyncSemaphore, kVsyncTimeout - elapsed) != pdTRUE) {
+            BRIDGE_LOG("FATAL: VSYNC did not retire the submitted framebuffer");
             return false;
         }
-        memset(_draw_buf, 0, buf_size_bytes);
-        BRIDGE_LOG("Draw buffer[0] at %p (%zu bytes)", _draw_buf, buf_size_bytes);
+    }
 
-#if TAB5_LVGL_DUAL_PARTIAL_FB
-        _draw_buf2 = static_cast<uint16_t*>(
-            heap_caps_malloc(buf_size_bytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
-        if (!_draw_buf2) {
-            BRIDGE_LOG("WARN: dual partial FB alloc failed — falling back to single buffer");
-        } else {
-            memset(_draw_buf2, 0, buf_size_bytes);
-            BRIDGE_LOG("Draw buffer[1] at %p (%zu bytes)", _draw_buf2, buf_size_bytes);
-        }
+    gPresentPending = false;
+    return true;
+}
+
+bool rotate_complete_frame(void* destination)
+{
+    ppa_srm_oper_config_t operation = {};
+    operation.in.buffer = gLogicalFrame;
+    operation.in.pic_w = kLogicalWidth;
+    operation.in.pic_h = kLogicalHeight;
+    operation.in.block_w = kLogicalWidth;
+    operation.in.block_h = kLogicalHeight;
+    operation.in.srm_cm = PPA_SRM_COLOR_MODE_RGB565;
+
+    operation.out.buffer = destination;
+    operation.out.buffer_size = kFrameBytes;
+    operation.out.pic_w = kPhysicalWidth;
+    operation.out.pic_h = kPhysicalHeight;
+    operation.out.srm_cm = PPA_SRM_COLOR_MODE_RGB565;
+
+    // M5GFX rotation 3 maps the 1280x720 logical surface to a 90-degree
+    // counter-clockwise native panel frame.
+    operation.rotation_angle = PPA_SRM_ROTATION_ANGLE_90;
+    operation.scale_x = 1.0f;
+    operation.scale_y = 1.0f;
+    operation.byte_swap = true;
+    operation.mode = PPA_TRANS_MODE_BLOCKING;
+
+    const esp_err_t result = ppa_do_scale_rotate_mirror(gPpaHandle, &operation);
+    if (result != ESP_OK) {
+        BRIDGE_LOG("FATAL: PPA frame rotation failed: %s", esp_err_to_name(result));
+        return false;
+    }
+    return true;
+}
+
+bool present_complete_frame()
+{
+    if (!wait_until_back_buffer_is_safe()) return false;
+    if (!rotate_complete_frame(gBackFramebuffer)) return false;
+
+    const esp_err_t result = esp_lcd_panel_draw_bitmap(
+        gPanelHandle, 0, 0, kPhysicalWidth, kPhysicalHeight, gBackFramebuffer);
+    if (result != ESP_OK) {
+        BRIDGE_LOG("FATAL: DSI framebuffer submission failed: %s", esp_err_to_name(result));
+        return false;
+    }
+
+    void* submitted = gBackFramebuffer;
+    gBackFramebuffer = gFrontFramebuffer;
+    gFrontFramebuffer = submitted;
+    // Capture after submission.  Reuse of the old front buffer requires a
+    // strictly newer VSYNC, covering a callback that raced with submission.
+    gSubmittedEpoch = gVsyncEpoch.load(std::memory_order_acquire);
+    gPresentPending = true;
+    return true;
+}
+
+}  // namespace
+
+bool init()
+{
+#if !TAB5_LVGL_FULL_DIRECT_FB || !TAB5_USE_PPA || TAB5_LVGL_DUAL_PARTIAL_FB
+#error "Tab5 LVGL bridge requires full-frame PPA/VSYNC presentation"
 #endif
 
-        // Initialize LVGL
-        lv_init();
-        lv_tick_set_cb(tick_cb);
+    BRIDGE_LOG("Initialising atomic full-frame presenter...");
 
-        BRIDGE_LOG("LVGL core initialized");
+    auto* panel = static_cast<lgfx::Panel_DSI*>(M5.Display.getPanel());
+    if (!panel) {
+        BRIDGE_LOG("ERROR: M5GFX DSI panel is unavailable");
+        return false;
+    }
+    const auto detail = panel->config_detail();
+    gPanelHandle = panel->panel_handle();
+    gFrontFramebuffer = detail.buffer;
+    gBackFramebuffer = detail.buffer2;
+    if (!gPanelHandle || !gFrontFramebuffer || !gBackFramebuffer ||
+        gFrontFramebuffer == gBackFramebuffer) {
+        BRIDGE_LOG("ERROR: two distinct DSI framebuffers are required");
+        return false;
+    }
 
-        // Create display with M5GFX's framebuffer
-        _display = lv_display_create(kScreenWidth, kScreenHeight);
-        if (!_display) {
-            BRIDGE_LOG("ERROR: Failed to create LVGL display");
-            return false;
+    gLogicalFrame = static_cast<uint16_t*>(heap_caps_aligned_alloc(
+        kCacheAlignment, kFrameBytes, MALLOC_CAP_SPIRAM | MALLOC_CAP_DMA | MALLOC_CAP_8BIT));
+    if (!gLogicalFrame) {
+        BRIDGE_LOG("ERROR: full logical frame allocation failed (%zu bytes)", kFrameBytes);
+        return false;
+    }
+    std::memset(gLogicalFrame, 0, kFrameBytes);
+
+    gVsyncSemaphore = xSemaphoreCreateBinary();
+    if (!gVsyncSemaphore) {
+        BRIDGE_LOG("ERROR: VSYNC semaphore allocation failed");
+        return false;
+    }
+
+    const esp_lcd_dpi_panel_event_callbacks_t callbacks = {
+        .on_color_trans_done = nullptr,
+        .on_refresh_done = on_refresh_done,
+    };
+    esp_err_t result = esp_lcd_dpi_panel_register_event_callbacks(
+        gPanelHandle, &callbacks, nullptr);
+    if (result != ESP_OK) {
+        BRIDGE_LOG("ERROR: VSYNC callback registration failed: %s", esp_err_to_name(result));
+        return false;
+    }
+
+    const ppa_client_config_t ppa_config = {
+        .oper_type = PPA_OPERATION_SRM,
+        .max_pending_trans_num = 1,
+        .data_burst_length = PPA_DATA_BURST_LENGTH_128,
+    };
+    result = ppa_register_client(&ppa_config, &gPpaHandle);
+    if (result != ESP_OK) {
+        BRIDGE_LOG("ERROR: PPA client registration failed: %s", esp_err_to_name(result));
+        return false;
+    }
+
+    lv_init();
+    lv_tick_set_cb(tick_cb);
+    gDisplay = lv_display_create(kLogicalWidth, kLogicalHeight);
+    if (!gDisplay) {
+        BRIDGE_LOG("ERROR: LVGL display creation failed");
+        return false;
+    }
+    lv_display_set_color_format(gDisplay, LV_COLOR_FORMAT_RGB565);
+    lv_display_set_buffers(gDisplay, gLogicalFrame, nullptr,
+                           kFrameBytes, LV_DISPLAY_RENDER_MODE_DIRECT);
+    lv_display_set_flush_cb(gDisplay, flush_cb);
+
+    gTouchIndev = lv_indev_create();
+    if (!gTouchIndev) {
+        BRIDGE_LOG("ERROR: LVGL touch input creation failed");
+        return false;
+    }
+    lv_indev_set_type(gTouchIndev, LV_INDEV_TYPE_POINTER);
+    lv_indev_set_read_cb(gTouchIndev, touch_read_cb);
+
+    BRIDGE_LOG("Presenter ready: logical=%ux%u direct=%zu bytes, physical=%ux%u double-buffered",
+               kLogicalWidth, kLogicalHeight, kFrameBytes, kPhysicalWidth, kPhysicalHeight);
+    BRIDGE_LOG("PSRAM free after presenter init: %zu KB",
+               heap_caps_get_free_size(MALLOC_CAP_SPIRAM) / 1024);
+    return true;
+}
+
+void update()
+{
+    lv_timer_handler();
+}
+
+lv_display_t* getDisplay()
+{
+    return gDisplay;
+}
+
+lv_indev_t* getTouchDevice()
+{
+    return gTouchIndev;
+}
+
+namespace {
+
+void flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map)
+{
+    (void)area;
+    if (!gDisplayFault && lv_display_flush_is_last(disp)) {
+        if (px_map != reinterpret_cast<uint8_t*>(gLogicalFrame) ||
+            !present_complete_frame()) {
+            gDisplayFault = true;
+            BRIDGE_LOG("FATAL: presenter frozen on last complete frame");
         }
-
-        // Configure partial mode so LVGL calls flush_cb for updated regions
-        const uint32_t buf_px_cnt = static_cast<uint32_t>(kScreenWidth) * kBufferLines;
-        lv_display_set_buffers(_display, _draw_buf, _draw_buf2,
-                               buf_px_cnt, LV_DISPLAY_RENDER_MODE_PARTIAL);
-        lv_display_set_flush_cb(_display, flush_cb);
-
-        BRIDGE_LOG("Display configured: %ux%u, buffer %u lines (mode=PARTIAL dual=%d)",
-                   (unsigned)kScreenWidth, (unsigned)kScreenHeight,
-                   (unsigned)kBufferLines, _draw_buf2 ? 1 : 0);
-
-        // Create touch input device
-        _touch_indev = lv_indev_create();
-        if (!_touch_indev) {
-            BRIDGE_LOG("ERROR: Failed to create LVGL input device");
-            return false;
-        }
-
-        lv_indev_set_type(_touch_indev, LV_INDEV_TYPE_POINTER);
-        lv_indev_set_read_cb(_touch_indev, touch_read_cb);
-
-        BRIDGE_LOG("Touch input device configured");
-
-        // Log memory usage
-        size_t free_psram = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
-        size_t total_psram = heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
-        BRIDGE_LOG("PSRAM: %zu KB free of %zu KB total", free_psram / 1024, total_psram / 1024);
-
-        BRIDGE_LOG("Initialization complete");
-        return true;
     }
+    lv_display_flush_ready(disp);
+}
 
-    void update() {
-        // Process LVGL timers and events
-        lv_timer_handler();
+void touch_read_cb(lv_indev_t* indev, lv_indev_data_t* data)
+{
+    (void)indev;
+    const auto touch = M5.Touch.getDetail();
+    if (touch.isPressed()) {
+        data->point.x = touch.x;
+        data->point.y = touch.y;
+        data->state = LV_INDEV_STATE_PRESSED;
     }
-
-    lv_display_t* getDisplay() {
-        return _display;
-    }
-
-    lv_indev_t* getTouchDevice() {
-        return _touch_indev;
-    }
-
-    // ============================================================
-    // LVGL Callback Implementations
-    // ============================================================
-
-    /**
-     * Display flush callback
-     * Copy LVGL's rendered region to M5GFX display
-     * DPI will automatically refresh from M5GFX's framebuffer at 60 Hz
-     */
-    static void flush_cb(lv_display_t* disp, const lv_area_t* area, uint8_t* px_map) {
-        // Flush spam disabled - UI is rendering correctly
-
-        // Calculate dirty region dimensions
-        int32_t w = area->x2 - area->x1 + 1;
-        int32_t h = area->y2 - area->y1 + 1;
-
-        // Push pixels to the panel; M5GFX manages cache coherency / DSI transfer
-        M5.Display.startWrite();
-        M5.Display.pushImage(area->x1, area->y1, w, h, (uint16_t*)px_map);
-        M5.Display.endWrite();
-
-        lv_display_flush_ready(disp);
-    }
-
-    /**
-     * Touch input callback
-     * Reads from M5.Touch and provides data to LVGL
-     */
-    static void touch_read_cb(lv_indev_t* indev, lv_indev_data_t* data) {
-        auto t = M5.Touch.getDetail();
-
-        if (t.isPressed()) {
-            data->point.x = t.x;
-            data->point.y = t.y;
-            data->state = LV_INDEV_STATE_PRESSED;
-        } else {
-            data->state = LV_INDEV_STATE_RELEASED;
-        }
-    }
-
-    /**
-     * System tick callback
-     * Provides millisecond timestamp for LVGL timing
-     */
-    static uint32_t tick_cb(void) {
-        return millis();
+    else {
+        data->state = LV_INDEV_STATE_RELEASED;
     }
 }
+
+uint32_t tick_cb(void)
+{
+    return millis();
+}
+
+}  // namespace
+}  // namespace LVGLBridge
