@@ -49,8 +49,8 @@ def test_receiver_keeps_static_storage_and_production_value_logs_off() -> None:
     assert "K1DeckStateValue gSnapshotStage[K1_BLE_MIDI_CONTROL_COUNT]" in source
     assert "K1DeckStateValue gDeltaStage[K1_BLE_MIDI_CONTROL_COUNT]" in source
     assert source.count("#if TAB5_BLE_VERBOSE_DIAG") >= 2
-    assert "legacy 9b5d" in source
-    assert 'kCanonical71RegistryMd5[] = "78fb9af986da36922fae33cb09de3b4b"' in source
+    assert "canonical 68-control map" in source
+    assert 'kCanonicalRegistryMd5[] = "9b5db3fbb17438367adeaceb541db03b"' in source
 
 
 def test_latency_per_value_logs_are_compile_time_diagnostic_only() -> None:

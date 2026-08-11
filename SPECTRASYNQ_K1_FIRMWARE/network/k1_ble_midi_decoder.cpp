@@ -206,17 +206,27 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
 
   const K1BleMidiEntry* cc14_msb = find_cc14_msb(ch, cc);
   if (cc14_msb != nullptr) {
+    // A second MSB for the same key replaces and restarts the pairing window.
     state->cc14_msb[ch][cc] = value;
     state->cc14_msb_valid[ch][cc] = 1;
+    state->cc14_msb_ms[ch][cc] = state->now_ms;
     return K1_BLE_MIDI_DECODE_OK;
   }
 
   const K1BleMidiEntry* cc14_lsb = find_cc14_lsb(ch, cc);
   if (cc14_lsb != nullptr) {
-    if (!state->cc14_msb_valid[ch][cc14_lsb->cc_msb]) {
+    const uint8_t msb_cc = cc14_lsb->cc_msb;
+    if (!state->cc14_msb_valid[ch][msb_cc]) {
+      ++state->malformed_cc14;
       return K1_BLE_MIDI_DECODE_OK;
     }
-    const uint8_t high = state->cc14_msb[ch][cc14_lsb->cc_msb];
+    const uint32_t age = state->now_ms - state->cc14_msb_ms[ch][msb_cc];
+    if (age > K1_BLE_MIDI_CC14_PAIR_EXPIRY_MS) {
+      state->cc14_msb_valid[ch][msb_cc] = 0;
+      ++state->malformed_cc14;
+      return K1_BLE_MIDI_DECODE_OK;
+    }
+    const uint8_t high = state->cc14_msb[ch][msb_cc];
 #ifdef K1_BLE_MIDI_DECODER_FAULT_DROP_LSB
     const uint16_t n14 = static_cast<uint16_t>(high) << 7U;
 #elif defined(K1_BLE_MIDI_DECODER_FAULT_TWELVE_BIT)
@@ -227,7 +237,7 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
 #endif
     const float decoded = cc14_lsb->vmin + (static_cast<float>(n14) / 16383.0f) *
                                              (cc14_lsb->vmax - cc14_lsb->vmin);
-    state->cc14_msb_valid[ch][cc14_lsb->cc_msb] = 0;
+    state->cc14_msb_valid[ch][msb_cc] = 0;
     return emit_record(state, *cc14_lsb, K1_WIRELESS_VALUE_NUMBER, decoded, nullptr,
                        out_records, out_capacity, out_count);
   }
@@ -262,8 +272,26 @@ void k1_ble_midi_decoder_reset_partial(K1BleMidiDecoderState* state) {
   }
   const uint32_t next_record_id =
       state->next_record_id == 0 ? 1 : state->next_record_id;
+  const uint32_t malformed = state->malformed_cc14;
+  const uint32_t now_ms = state->now_ms;
   memset(state, 0, sizeof(*state));
   state->next_record_id = next_record_id;
+  state->malformed_cc14 = malformed;
+  state->now_ms = now_ms;
+}
+
+void k1_ble_midi_decoder_set_now_ms(K1BleMidiDecoderState* state, uint32_t now_ms) {
+  if (state == nullptr) {
+    return;
+  }
+  state->now_ms = now_ms;
+}
+
+uint32_t k1_ble_midi_decoder_malformed_cc14(const K1BleMidiDecoderState* state) {
+  if (state == nullptr) {
+    return 0;
+  }
+  return state->malformed_cc14;
 }
 
 K1BleMidiDecodeStatus k1_ble_midi_decode_packet(K1BleMidiDecoderState* state,

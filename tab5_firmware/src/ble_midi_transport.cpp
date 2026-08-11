@@ -2,6 +2,8 @@
 #include "k1_ble_midi_map.h"
 #include "k1_deck_identity_v1.h"
 #include "k1_deck_state_v1.h"
+#include "k1_claim_adv_v1.h"
+#include "deck_claim.h"
 #include "deck_state_rx.h"
 
 #include <cstring>
@@ -682,16 +684,28 @@ static void refresh_identity_wire()
   }
 }
 
+static void apply_claim_scan_response(BLEAdvertising* advertising)
+{
+  // Scan response: complete local name + claim_adv_v1 manufacturer data.
+  // Primary ADV keeps the three 128-bit service UUIDs (space-tight).
+  BLEAdvertisementData scanResp;
+  scanResp.setName("K1 Tab5");
+  uint8_t mfg[K1_CLAIM_ADV_V1_WIRE_LEN] = {};
+  if (deck_claim_encode_mfg(mfg, sizeof(mfg)) == (int)K1_CLAIM_ADV_V1_WIRE_LEN) {
+    scanResp.setManufacturerData(
+        String(reinterpret_cast<const char*>(mfg), K1_CLAIM_ADV_V1_WIRE_LEN));
+  }
+  advertising->setScanResponseData(scanResp);
+  advertising->setScanResponse(true);
+}
+
 static void start_advertising()
 {
   BLEAdvertising* advertising = BLEDevice::getAdvertising();
   advertising->addServiceUUID(BleMidiTransport::kServiceUuid);
   advertising->addServiceUUID(K1_DECK_IDENTITY_SERVICE_UUID);
   advertising->addServiceUUID(K1_DECK_STATE_SERVICE_UUID);
-  // Scan response carries the complete local name "K1 Tab5" so K1 can match
-  // by name if the 128-bit MIDI UUID does not fit in the primary ADV PDU.
-  advertising->setScanResponse(true);
-  advertising->setName("K1 Tab5");
+  apply_claim_scan_response(advertising);
   // Prefer 15–30 ms connection interval (12–24 × 1.25 ms) for Deck16 latency.
   // Prior silicon negotiated ~50 ms (40 units); PPCP was unset (0x00).
   advertising->setMinPreferred(0x0C);
@@ -1251,6 +1265,30 @@ bool disconnectCentral()
   return rc == 0;
 #else
   return false;
+#endif
+}
+
+void refreshClaimAdvertising()
+{
+#if TAB5_BLE_GATT_AVAILABLE
+  if (!gattAvailable() || !gServer) {
+    return;
+  }
+  BLEAdvertising* advertising = BLEDevice::getAdvertising();
+  if (!advertising) {
+    return;
+  }
+  /* Stop/start so centrals observe the new scan-response claim immediately. */
+  advertising->stop();
+  apply_claim_scan_response(advertising);
+  advertising->start();
+  K1ClaimAdvV1 c = {};
+  deck_claim_get(&c);
+  Serial.printf("[ble-midi] claim ADV refresh mode=%u unit=%08X gen=%u\n",
+                (unsigned)c.mode, (unsigned)c.k1_unit_id,
+                (unsigned)c.claim_gen);
+#else
+  return;
 #endif
 }
 

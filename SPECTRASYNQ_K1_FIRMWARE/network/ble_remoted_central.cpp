@@ -32,6 +32,7 @@
 #include "k1_enc8_identity_v1.h"
 #include "k1_deck_state_v1.h"
 #include "k1_deck_state_tx.h"
+#include "k1_claim_adv_v1.h"
 #include "config_types.h"
 
 #include <math.h>
@@ -321,6 +322,28 @@ class ScanCB : public NimBLEScanCallbacks {
                         dev->isAdvertisingService(NimBLEUUID(BLEMIDI_SERVICE_UUID)));
     if (!match) {
       return;
+    }
+    /* Claim filter (C1): fail-closed when claim_adv_v1 present. */
+    if (dev->haveManufacturerData()) {
+      const std::string mfg = dev->getManufacturerData();
+      K1ClaimAdvV1 claim = {};
+      if (k1_claim_adv_v1_decode(
+              reinterpret_cast<const uint8_t*>(mfg.data()), mfg.size(),
+              &claim) == 0) {
+        const uint32_t self =
+            k1_claim_unit_id_from_efuse_mac(ESP.getEfuseMac());
+        if (claim.mode == K1_CLAIM_MODE_NONE) {
+          return;
+        }
+        if (claim.mode == K1_CLAIM_MODE_UNIT && claim.k1_unit_id != self) {
+          return;
+        }
+        /* OPEN or UNIT(self): continue latch. */
+        Serial.printf("[ble_remoted] claim accept mode=%u unit=%08X gen=%u self=%08X\n",
+                      (unsigned)claim.mode, (unsigned)claim.k1_unit_id,
+                      (unsigned)claim.claim_gen, (unsigned)self);
+      }
+      /* Non-claim mfg data: ignore and fall through (legacy-compatible). */
     }
     portENTER_CRITICAL(&s_target_mux);
     s_target_addr = dev->getAddress();

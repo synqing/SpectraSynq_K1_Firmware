@@ -58,4 +58,7 @@ bool disconnectCentral();
 bool setIdentityFault(const char* mode);
 void dumpConnPerf();
 
+/** Rebuild scan-response Manufacturer Specific Data from deck_claim. */
+void refreshClaimAdvertising();
+
 } // namespace BleMidiTransport

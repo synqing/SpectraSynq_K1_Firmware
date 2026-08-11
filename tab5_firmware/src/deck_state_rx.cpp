@@ -2,8 +2,10 @@
 #include "deck_state.h"
 #include "deck_latency.h"
 #include "deck_ui_internal.h"
+#include "deck_claim.h"
 #include "k1_deck_identity_v1.h"
 #include "k1_deck_state_v1.h"
+#include "k1_claim_adv_v1.h"
 #include "k1_ble_midi_map.h"
 
 #include <Arduino.h>
@@ -15,10 +17,10 @@
 
 namespace {
 
-static_assert(K1_BLE_MIDI_CONTROL_COUNT == 71,
-              "Deck-state staging is sized for the canonical 71-control map");
+static_assert(K1_BLE_MIDI_CONTROL_COUNT == 68,
+              "Deck-state staging is sized for the canonical 68-control map");
 
-constexpr char kCanonical71RegistryMd5[] = "78fb9af986da36922fae33cb09de3b4b";
+constexpr char kCanonicalRegistryMd5[] = "9b5db3fbb17438367adeaceb541db03b";
 constexpr uint8_t kRequiredSnapshotMembers = 18;
 
 DeckLinkPhase gPhase = DECK_LINK_DISCONNECTED;
@@ -78,19 +80,19 @@ bool exact_compatibility_hello(const K1DeckStateHello& hello) {
     return false;
   }
   if (hello.protocol_min != K1_DECK_STATE_VERSION ||
-      hello.protocol_max != K1_DECK_STATE_VERSION || hello.flags != 0 ||
+      hello.protocol_max != K1_DECK_STATE_VERSION ||
+      (hello.flags != 0 &&
+       hello.flags != K1_DECK_STATE_HELLO_FLAG_K1_UNIT_ID) ||
       hello.session_generation == 0 ||
       memcmp(hello.deck_id, deck_id, sizeof(deck_id)) != 0 ||
       hello.short_id != K1_DECK_IDENTITY_BENCH_SHORT_ID) {
     return false;
   }
   /*
-   * Deliberate compatibility boundary: the generated 71-control map is the
-   * canonical 78fb... registry, while the current K1 and Tab5 identity wire
-   * contract still advertises legacy 9b5d.... Accept only that exact current
-   * K1 HELLO. This does not relabel the legacy digest as canonical.
+   * The generated control map and the identity wire contract share the same
+   * canonical registry digest. Reject a binary assembled from divergent maps.
    */
-  if (strcmp(K1_BLE_MIDI_REGISTRY_MD5, kCanonical71RegistryMd5) != 0) {
+  if (strcmp(K1_BLE_MIDI_REGISTRY_MD5, kCanonicalRegistryMd5) != 0) {
     return false;
   }
   return true;
@@ -129,6 +131,11 @@ bool value_in_range(const K1BleMidiEntry& entry, const K1DeckStateValue& value) 
 bool validate_value(const K1DeckStateValue& value, bool snapshot) {
   if (value.map_index >= K1_BLE_MIDI_CONTROL_COUNT) {
     ++gCounters.invalid_members;
+    Serial.printf("[deck_state_rx] invalid member map=%u type=%u status=%u value=%ld snapshot=%u reason=map\n",
+                  static_cast<unsigned>(value.map_index),
+                  static_cast<unsigned>(value.value_type),
+                  static_cast<unsigned>(value.status),
+                  static_cast<long>(value.value_i32), snapshot ? 1U : 0U);
     return false;
   }
   const K1BleMidiEntry& entry = kK1BleMidiMap[value.map_index];
@@ -138,6 +145,12 @@ bool validate_value(const K1DeckStateValue& value, bool snapshot) {
        value.status != K1_DECK_STATE_ST_CLAMPED) ||
       !value_in_range(entry, value)) {
     ++gCounters.invalid_members;
+    Serial.printf("[deck_state_rx] invalid member path=%s map=%u type=%u expected=%u status=%u value=%ld snapshot=%u\n",
+                  entry.path, static_cast<unsigned>(value.map_index),
+                  static_cast<unsigned>(value.value_type),
+                  static_cast<unsigned>(expected_value_type(entry)),
+                  static_cast<unsigned>(value.status),
+                  static_cast<long>(value.value_i32), snapshot ? 1U : 0U);
     return false;
   }
   return true;
@@ -330,6 +343,21 @@ void handle_record(const K1DeckStateRecordView& rec) {
         gSequenceValid = false;
         return;
       }
+      /* Post-connect unit proof (C1 property / SURVIVORS kill #2). */
+      deck_claim_clear_proven_unit();
+      if ((hello.flags & K1_DECK_STATE_HELLO_FLAG_K1_UNIT_ID) != 0) {
+        if (rec.payload_len <
+            K1_DECK_STATE_HELLO_PAYLOAD_SIZE + K1_DECK_STATE_HELLO_UNIT_ID_EXT_LEN) {
+          ++gMapMismatch;
+          gPhase = DECK_LINK_DISCONNECTED;
+          return;
+        }
+        const uint32_t unit = k1_claim_adv_v1_read_be32(
+            rec.payload + K1_DECK_STATE_HELLO_PAYLOAD_SIZE);
+        deck_claim_set_proven_unit(unit);
+        Serial.printf("[deck_state_rx] HELLO unit_proof=%08X\n",
+                      (unsigned)unit);
+      }
       if (gRequireNewGeneration && hello.session_generation == gSessionGeneration) {
         ++gCounters.decode_errors;
         fail_closed(false, false);
@@ -437,6 +465,26 @@ void handle_record(const K1DeckStateRecordView& rec) {
       gCommittedGeneration = gSessionGeneration;
       clear_transaction();
       deck_state_clear_confirmed_stale();
+      /* Claim unit proof must match before ARMED TX (kill #3). */
+      const uint8_t claim_mode = deck_claim_mode();
+      const uint32_t proven = deck_claim_proven_unit();
+      if (proven == 0) {
+        Serial.println("[deck_state_rx] ARMED blocked: missing unit proof");
+        fail_closed(true, false);
+        return;
+      }
+      if (claim_mode == K1_CLAIM_MODE_UNIT &&
+          proven != deck_claim_active_unit()) {
+        Serial.printf("[deck_state_rx] ARMED blocked: proven=%08X claim=%08X\n",
+                      (unsigned)proven, (unsigned)deck_claim_active_unit());
+        fail_closed(true, false);
+        return;
+      }
+      if (claim_mode == K1_CLAIM_MODE_NONE) {
+        Serial.println("[deck_state_rx] ARMED blocked: claim NONE");
+        fail_closed(true, false);
+        return;
+      }
       gPhase = DECK_LINK_ARMED;
       gDesynchronised = false;
       gRecoveryRequired = false;
@@ -562,6 +610,7 @@ void deck_state_rx_on_disconnect(void) {
   gRecoveryRequired = false;
   gRequireNewGeneration = gSessionGeneration != 0;
   gHelloAdmitted = false;
+  deck_claim_clear_proven_unit();
   deck_state_mark_confirmed_stale();
   // No stale pending survives into a new session — operator must act after re-link.
   deck_state_clear_pending_all();
@@ -715,7 +764,7 @@ void deck_state_rx_dump_status(void) {
       "crc_fail=%lu count_fail=%lu map_mismatch=%lu gaps=%lu stale=%lu "
       "desync=%u recovery=%u confirmed_stale=%u snap_open=%u items=%u "
       "snap_commit=%lu delta_commit=%lu snap_reject=%lu delta_reject=%lu "
-      "seq_fail=%lu decode=%lu ingress_loss=%lu timeout=%lu\n",
+      "seq_fail=%lu decode=%lu invalid=%lu ingress_loss=%lu timeout=%lu\n",
       phase_name(gPhase),
       deck_state_rx_armed() ? 1U : 0U,
       deck_state_rx_live() ? 1U : 0U,
@@ -737,6 +786,7 @@ void deck_state_rx_dump_status(void) {
       static_cast<unsigned long>(gCounters.delta_rejects),
       static_cast<unsigned long>(gCounters.packet_sequence_fail),
       static_cast<unsigned long>(gCounters.decode_errors),
+      static_cast<unsigned long>(gCounters.invalid_members),
       static_cast<unsigned long>(gCounters.ingress_losses),
       static_cast<unsigned long>(gCounters.incomplete_timeouts));
 }

@@ -67,7 +67,7 @@ K1DeckStateStatus k1_deck_state_decode_hello_payload(const uint8_t* in, size_t i
   if (in == nullptr) {
     return K1_DECK_STATE_ERR_NULL;
   }
-  if (in_len != K1_DECK_STATE_HELLO_PAYLOAD_SIZE) {
+  if (in_len < K1_DECK_STATE_HELLO_PAYLOAD_SIZE) {
     return K1_DECK_STATE_ERR_LENGTH;
   }
   out->protocol_min = in[0];

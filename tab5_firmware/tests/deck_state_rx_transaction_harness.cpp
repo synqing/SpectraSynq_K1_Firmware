@@ -2,6 +2,7 @@
 
 #include "Arduino.h"
 #include "deck_latency.h"
+#include "deck_claim.h"
 #include "deck_state.h"
 #include "deck_ui_internal.h"
 #include "k1_ble_midi_map.h"
@@ -24,6 +25,9 @@ uint32_t gApplyCount = 0;
 uint32_t gLatencyCount = 0;
 uint32_t gPendingClears = 0;
 bool gConfirmedStale = false;
+uint32_t gProvenUnit = 0;
+
+constexpr uint32_t kTestUnitId = 0xB489A500u;
 
 const char* const kRequiredPaths[] = {
     "primary.mode",        "primary.palette",      "primary.photons",
@@ -86,22 +90,26 @@ void send_record(uint16_t sequence, uint8_t type, uint32_t revision,
   deck_state_rx_on_packet(packet, static_cast<size_t>(size));
 }
 
-void send_hello(uint16_t sequence, uint32_t generation, bool canonical_digest = false) {
+void send_hello(uint16_t sequence, uint32_t generation, bool wrong_digest = false) {
   K1DeckStateHello hello = {};
   hello.protocol_min = 1;
   hello.protocol_max = 1;
+  hello.flags = K1_DECK_STATE_HELLO_FLAG_K1_UNIT_ID;
   hello.session_generation = generation;
-  const char* digest = canonical_digest ? "78fb9af986da36922fae33cb09de3b4b"
-                                        : K1_DECK_IDENTITY_REGISTRY_MD5_HEX;
+  const char* digest = wrong_digest ? "78fb9af986da36922fae33cb09de3b4b"
+                                    : K1_DECK_IDENTITY_REGISTRY_MD5_HEX;
   assert(k1_deck_identity_parse_hex(digest, hello.ble_midi_registry_md5, 16) == 0);
   assert(k1_deck_identity_parse_hex(K1_DECK_IDENTITY_LAYOUT_SHA256_HEX,
                                     hello.deck16_layout_sha256, 32) == 0);
   const uint8_t deck_id[16] = K1_DECK_IDENTITY_BENCH_DECK_ID_INIT;
   memcpy(hello.deck_id, deck_id, sizeof(deck_id));
   hello.short_id = K1_DECK_IDENTITY_BENCH_SHORT_ID;
-  uint8_t payload[K1_DECK_STATE_HELLO_PAYLOAD_SIZE] = {};
+  uint8_t payload[K1_DECK_STATE_HELLO_PAYLOAD_SIZE +
+                  K1_DECK_STATE_HELLO_UNIT_ID_EXT_LEN] = {};
   assert(k1_deck_state_encode_hello_payload(&hello, payload, sizeof(payload)) ==
          K1_DECK_STATE_HELLO_PAYLOAD_SIZE);
+  k1_claim_adv_v1_write_be32(payload + K1_DECK_STATE_HELLO_PAYLOAD_SIZE,
+                             kTestUnitId);
   send_record(sequence, K1_DECK_STATE_REC_HELLO, 0, payload, sizeof(payload));
 }
 
@@ -146,6 +154,7 @@ void reset_receiver() {
   gLatencyCount = 0;
   gPendingClears = 0;
   gConfirmedStale = false;
+  gProvenUnit = 0;
   deck_state_rx_init();
 }
 
@@ -164,12 +173,17 @@ void deck_state_clear_pending_all(void) { ++gPendingClears; }
 void deck_latency_note_t2(DeckControlId, uint16_t, int32_t) { ++gLatencyCount; }
 void deck_ui_set_key_lamp(DeckSheetId, bool) {}
 void deck_ui_sheets_apply_bool(const char*, bool) {}
+uint32_t deck_claim_active_unit(void) { return 0; }
+uint8_t deck_claim_mode(void) { return K1_CLAIM_MODE_OPEN; }
+uint32_t deck_claim_proven_unit(void) { return gProvenUnit; }
+void deck_claim_set_proven_unit(uint32_t unit) { gProvenUnit = unit; }
+void deck_claim_clear_proven_unit(void) { gProvenUnit = 0; }
 }
 
 int main() {
   const std::vector<uint16_t> required = required_indices();
 
-  /* Only the explicit legacy compatibility HELLO is admitted. */
+  /* A divergent registry digest is rejected; the canonical 68-map HELLO is admitted. */
   reset_receiver();
   send_hello(4, 7, true);
   assert(deck_state_rx_phase() == DECK_LINK_DISCONNECTED);
