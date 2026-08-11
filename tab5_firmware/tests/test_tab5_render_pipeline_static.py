@@ -54,21 +54,21 @@ def test_pinned_m5gfx_overlay_is_double_buffered_and_checksum_gated():
         assert match, name
 
 
-def test_palette_preview_is_seamless_dt_correct_transform_motion():
+def test_palette_preview_uses_one_shared_subpixel_spatial_field():
     text = UI.read_text(encoding="utf-8")
-    assert "GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)" in text
-    assert "kPaletteAnimationFrameMs = 16" in text
-    assert "kPaletteAnimationMaxDtMs = 50" in text
-    assert "kPaletteFlowSwellPeriod = 10.7f" in text
-    assert "kPaletteFlowWavePeriod = 4.3f" in text
-    assert "kPaletteFlowRipplePeriod = 2.17f" in text
-    assert "const float swell = sinf" in text
-    assert "const float wave = sinf" in text
-    assert "const float ripple = sinf" in text
-    assert "gPaletteFlow.phase += velocity * dt" in text
-    assert "Primary and Secondary can never drift apart" in text
-    assert "gPaletteFlow.phase * static_cast<float>(z.grad_w)" in text
+    assert "GRAD_STRIP_H      36" in text
+    assert "kPaletteAnimationFrameUs = 16000" in text
+    assert "kPaletteAnimationMaxDtUs = 50000" in text
+    assert "palette_flow_build_field(&gPaletteFlow" in text
+    assert "gPaletteSamplesQ16[pixel]" in text
+    assert "gPaletteLightDeltaQ8[pixel]" in text
+    assert "apply_palette_light" in text
+    assert "Circular 11-tap integration is executable host-tested" in text
+    assert "palette_flow_prefilter_rgb888(raw_lut, 256, z->palette_lut)" in text
+    assert "sample_palette_lut" in text
+    assert "if (z.grad_w != shared_width) return" in text
     assert "PaletteMotion gPaletteMotion[2]" not in text
-    assert "lv_obj_set_style_translate_x(z.grad, offset" in text
-    assert "z->grad_buf[y * ring_w + w + x] = px" in text
-    assert "lv_obj_set_size(z->grad, z->grad_w * 2" in text
+    assert "lv_obj_set_style_translate_x" not in text
+    assert "GRAD_STRIP_RING_W" not in text
+    assert "z->grad_buf[y * w + x] = px" in text
+    assert "lv_obj_set_size(z->grad, z->grad_w, GRAD_STRIP_H)" in text

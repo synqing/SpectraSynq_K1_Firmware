@@ -8,6 +8,7 @@
 #include "deck_motion.h"
 #include "deck_names.h"
 #include "deck_palette_stops.h"
+#include "palette_flow.h"
 #include "deck_type.h"
 #include "ble_midi_transport.h"
 
@@ -56,20 +57,10 @@
 #define KEYS_Y          604
 #define KEYS_H          108
 
-#define GRAD_STRIP_H      22
+#define GRAD_STRIP_H      36
 #define GRAD_STRIP_MAX_W  420
-#define GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)
-
-static constexpr uint32_t kPaletteAnimationFrameMs = 16;  /* panel-cadence motion */
-static constexpr uint32_t kPaletteAnimationMaxDtMs = 50;  /* never teleport after a stall */
-static constexpr float kPaletteFlowTau = 6.28318530718f;
-static constexpr float kPaletteFlowBaseSpeed = 0.195f;  /* cycles per second */
-static constexpr float kPaletteFlowSwellAmplitude = 0.075f;
-static constexpr float kPaletteFlowWaveAmplitude = 0.040f;
-static constexpr float kPaletteFlowRippleAmplitude = 0.018f;
-static constexpr float kPaletteFlowSwellPeriod = 10.7f;
-static constexpr float kPaletteFlowWavePeriod = 4.3f;
-static constexpr float kPaletteFlowRipplePeriod = 2.17f;
+static constexpr uint32_t kPaletteAnimationFrameUs = 16000;
+static constexpr uint32_t kPaletteAnimationMaxDtUs = 50000;
 
 typedef struct {
   lv_obj_t* zone;
@@ -82,18 +73,12 @@ typedef struct {
   lv_obj_t* grad;       /* palette spectrum image */
   lv_image_dsc_t grad_dsc;
   uint16_t* grad_buf;
+  uint32_t palette_lut[256];
   int grad_w;
   uint8_t grad_last;
   DeckControlId ctrl;
   bool is_palette;
 } SelectorZone;
-
-typedef struct {
-  float phase;
-  float swell_phase;
-  float wave_phase;
-  float ripple_phase;
-} PaletteFlow;
 
 typedef struct {
   lv_obj_t* root;
@@ -130,10 +115,14 @@ static SelectorZone gSelectors[4];
 static MegaSlider gSliders[4];  // sec_bri, sec_spd, pri_bri, pri_spd
 static SoftKey gKeys[7];
 
-static uint16_t gGradBuf0[GRAD_STRIP_RING_W * GRAD_STRIP_H];
-static uint16_t gGradBuf1[GRAD_STRIP_RING_W * GRAD_STRIP_H];
-static uint32_t gPaletteAnimationLastMs = 0;
-static PaletteFlow gPaletteFlow = {0.08f, 0.0f, 2.1f, 4.7f};
+static uint16_t gGradBuf0[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint16_t gGradBuf1[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint16_t gPaletteSamplesQ16[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static int8_t gPaletteLightDeltaQ8[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint32_t gPaletteAnimationLastUs = 0;
+static uint32_t gPaletteAnimationAccumUs = 0;
+static bool gPaletteSamplesReady = false;
+static PaletteFlowState gPaletteFlow = {};
 
 static lv_obj_t* gScrim = nullptr;
 static lv_obj_t* gSheets[DECK_SHEET_COUNT] = {nullptr};
@@ -178,7 +167,7 @@ static void refresh_key_lamp(SoftKey* k);
 static void layout_link_cluster(void);
 static void layout_palette_inline(SelectorZone* z);
 static void paint_palette_strip(SelectorZone* z, uint8_t pal_index);
-static void tick_palette_animation(uint32_t now_ms);
+static void tick_palette_animation(uint32_t now_us);
 static void refresh_all_controls(void);
 static void refresh_status_strip(void);
 static void apply_armed_gate_visuals(void);
@@ -286,96 +275,129 @@ static uint16_t rgb888_to_rgb565(uint32_t rgb)
   return static_cast<uint16_t>(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
 }
 
+static void prepare_palette_lut(SelectorZone* z, uint8_t pal_index)
+{
+  if (!z) return;
+  if (z->grad_last == pal_index) return;
+  z->grad_last = pal_index;
+  const DeckPaletteStrip* strip = deck_palette_strip(pal_index);
+  static uint32_t raw_lut[256];
+  for (uint16_t i = 0; i < 256; ++i) {
+    raw_lut[i] = sample_palette_rgb(strip, static_cast<uint8_t>(i));
+  }
+
+  /* Circular 11-tap integration is executable host-tested in palette_flow. */
+  palette_flow_prefilter_rgb888(raw_lut, 256, z->palette_lut);
+}
+
+static uint32_t sample_palette_lut(const SelectorZone* z, uint16_t sample_q16)
+{
+  const uint8_t index = static_cast<uint8_t>(sample_q16 >> 8);
+  const uint8_t next = static_cast<uint8_t>(index + 1u);
+  const uint16_t fraction = static_cast<uint16_t>(sample_q16 & 0xFFu);
+  const uint32_t a = z->palette_lut[index];
+  const uint32_t b = z->palette_lut[next];
+  const uint32_t inv = 256u - fraction;
+  const uint8_t r = static_cast<uint8_t>((((a >> 16) & 0xFFu) * inv +
+                                          ((b >> 16) & 0xFFu) * fraction) >> 8);
+  const uint8_t g = static_cast<uint8_t>((((a >> 8) & 0xFFu) * inv +
+                                          ((b >> 8) & 0xFFu) * fraction) >> 8);
+  const uint8_t bl = static_cast<uint8_t>(((a & 0xFFu) * inv +
+                                           (b & 0xFFu) * fraction) >> 8);
+  return (static_cast<uint32_t>(r) << 16) |
+         (static_cast<uint32_t>(g) << 8) | bl;
+}
+
+static uint16_t apply_palette_light(uint32_t rgb, int8_t light_delta_q8)
+{
+  const int32_t gain = 256 + static_cast<int32_t>(light_delta_q8);
+  uint32_t r = (((rgb >> 16) & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  uint32_t g = (((rgb >> 8) & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  uint32_t b = ((rgb & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  if (r > 255u) r = 255u;
+  if (g > 255u) g = 255u;
+  if (b > 255u) b = 255u;
+  return rgb888_to_rgb565((r << 16) | (g << 8) | b);
+}
+
+static void configure_palette_image(SelectorZone* z)
+{
+  if (!z || !z->grad || !z->grad_buf || z->grad_w <= 0) return;
+  z->grad_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+  z->grad_dsc.header.cf = LV_COLOR_FORMAT_RGB565;
+  z->grad_dsc.header.w = static_cast<uint32_t>(z->grad_w);
+  z->grad_dsc.header.h = static_cast<uint32_t>(GRAD_STRIP_H);
+  z->grad_dsc.header.stride = static_cast<uint32_t>(z->grad_w * 2);
+  z->grad_dsc.header.flags = 0;
+  z->grad_dsc.data_size = static_cast<uint32_t>(z->grad_w * GRAD_STRIP_H * 2);
+  z->grad_dsc.data = reinterpret_cast<const uint8_t*>(z->grad_buf);
+  lv_image_set_src(z->grad, &z->grad_dsc);
+}
+
 static void paint_palette_strip(SelectorZone* z, uint8_t pal_index)
 {
   if (!z || !z->grad || !z->grad_buf || z->grad_w <= 0) return;
-  if (z->grad_last == pal_index) return;
-  z->grad_last = pal_index;
-
-  const DeckPaletteStrip* strip = deck_palette_strip(pal_index);
+  prepare_palette_lut(z, pal_index);
   const int w = z->grad_w;
-  const int ring_w = w * 2;
   const int h = GRAD_STRIP_H;
-  for (int x = 0; x < w; ++x) {
-    const uint8_t t =
-        (w <= 1) ? 0 : static_cast<uint8_t>((static_cast<uint32_t>(x) * 255u) / static_cast<uint32_t>(w - 1));
-    const uint16_t px = rgb888_to_rgb565(sample_palette_rgb(strip, t));
-    for (int y = 0; y < h; ++y) {
-      z->grad_buf[y * ring_w + x] = px;
-      z->grad_buf[y * ring_w + w + x] = px;
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
+      const int pixel = y * w + x;
+      const uint16_t sample = gPaletteSamplesReady
+                                  ? gPaletteSamplesQ16[pixel]
+                                  : static_cast<uint16_t>((static_cast<uint32_t>(x) << 16) /
+                                                          static_cast<uint32_t>(w));
+      const int8_t light = gPaletteSamplesReady ? gPaletteLightDeltaQ8[pixel] : 0;
+      const uint16_t px = apply_palette_light(sample_palette_lut(z, sample), light);
+      z->grad_buf[y * w + x] = px;
     }
   }
-  z->grad_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
-  z->grad_dsc.header.cf = LV_COLOR_FORMAT_RGB565;
-  z->grad_dsc.header.w = static_cast<uint32_t>(ring_w);
-  z->grad_dsc.header.h = static_cast<uint32_t>(h);
-  z->grad_dsc.header.stride = static_cast<uint32_t>(ring_w * 2);
-  z->grad_dsc.header.flags = 0;
-  z->grad_dsc.data_size = static_cast<uint32_t>(ring_w * h * 2);
-  z->grad_dsc.data = reinterpret_cast<const uint8_t*>(z->grad_buf);
-  lv_image_set_src(z->grad, &z->grad_dsc);
   lv_obj_invalidate(z->grad);
 }
 
-static float wrap_phase(float phase)
-{
-  phase = fmodf(phase, kPaletteFlowTau);
-  return phase < 0.0f ? phase + kPaletteFlowTau : phase;
-}
-
 /**
- * One shared water current drives both palette swatches.  Three phase-modulated
- * waves use non-harmonic periods, so their interference creates irregularly
- * spaced swells without discrete retargets or a short visible loop.
+ * One shared subpixel sample field drives both palettes. Spatial harmonics make
+ * irregular wave spacing; C2-smoothed stochastic velocities prevent a short,
+ * mechanically predictable loop. No object translation or independent phase.
  */
-static void tick_palette_animation(uint32_t now_ms)
+static void tick_palette_animation(uint32_t now_us)
 {
-  if (gPaletteAnimationLastMs == 0) {
-    const uint32_t entropy = micros() ^ (now_ms * 0x9E3779B9u);
-    const float seed = static_cast<float>(entropy & 0xFFFFu) / 65535.0f;
-    gPaletteFlow.swell_phase = seed * kPaletteFlowTau;
-    gPaletteFlow.wave_phase = wrap_phase(gPaletteFlow.swell_phase + 2.1f);
-    gPaletteFlow.ripple_phase = wrap_phase(gPaletteFlow.swell_phase + 4.7f);
-    gPaletteAnimationLastMs = now_ms;
+  if (gPaletteAnimationLastUs == 0) {
+    palette_flow_init(&gPaletteFlow, now_us ^ 0x9E3779B9u);
+    gPaletteAnimationLastUs = now_us;
     return;
   }
 
-  const uint32_t elapsed_ms = now_ms - gPaletteAnimationLastMs;
-  if (elapsed_ms < kPaletteAnimationFrameMs) return;
-  gPaletteAnimationLastMs = now_ms;
+  const uint32_t elapsed_us = now_us - gPaletteAnimationLastUs;
+  gPaletteAnimationLastUs = now_us;
 
   /* Keep covered MAIN controls still; resume from the same phase after close. */
   if (deck_state_sheet() != DECK_SHEET_NONE) return;
+  gPaletteAnimationAccumUs += elapsed_us;
+  if (gPaletteAnimationAccumUs < kPaletteAnimationFrameUs) return;
+  const uint32_t step_us = gPaletteAnimationAccumUs > kPaletteAnimationMaxDtUs
+                               ? kPaletteAnimationMaxDtUs
+                               : gPaletteAnimationAccumUs;
+  gPaletteAnimationAccumUs %= kPaletteAnimationFrameUs;
 
-  const uint32_t dt_ms = elapsed_ms > kPaletteAnimationMaxDtMs
-                             ? kPaletteAnimationMaxDtMs
-                             : elapsed_ms;
-  const float dt = static_cast<float>(dt_ms) * 0.001f;
+  palette_flow_step(&gPaletteFlow, static_cast<float>(step_us) * 0.000001f);
 
-  gPaletteFlow.swell_phase = wrap_phase(
-      gPaletteFlow.swell_phase + (kPaletteFlowTau / kPaletteFlowSwellPeriod) * dt);
-  gPaletteFlow.wave_phase = wrap_phase(
-      gPaletteFlow.wave_phase + (kPaletteFlowTau / kPaletteFlowWavePeriod) * dt);
-  gPaletteFlow.ripple_phase = wrap_phase(
-      gPaletteFlow.ripple_phase + (kPaletteFlowTau / kPaletteFlowRipplePeriod) * dt);
-
-  const float swell = sinf(gPaletteFlow.swell_phase);
-  const float wave = sinf(gPaletteFlow.wave_phase + 0.42f * swell);
-  const float ripple = sinf(gPaletteFlow.ripple_phase + 0.35f * wave + 0.17f * swell);
-  const float velocity = kPaletteFlowBaseSpeed +
-                         kPaletteFlowSwellAmplitude * swell +
-                         kPaletteFlowWaveAmplitude * wave +
-                         kPaletteFlowRippleAmplitude * ripple;
-  gPaletteFlow.phase += velocity * dt;
-  gPaletteFlow.phase -= floorf(gPaletteFlow.phase);
-  if (gPaletteFlow.phase < 0.0f) gPaletteFlow.phase += 1.0f;
-
-  /* Exact shared phase: Primary and Secondary can never drift apart. */
+  int shared_width = 0;
   for (SelectorZone& z : gSelectors) {
     if (!z.is_palette || !z.grad || z.grad_w <= 0) continue;
-    const int32_t offset =
-        -static_cast<int32_t>(gPaletteFlow.phase * static_cast<float>(z.grad_w));
-    lv_obj_set_style_translate_x(z.grad, offset, LV_PART_MAIN);
+    if (shared_width == 0) shared_width = z.grad_w;
+    if (z.grad_w != shared_width) return;  /* fail closed: never desynchronise */
+  }
+  if (shared_width <= 0 || shared_width > GRAD_STRIP_MAX_W) return;
+
+  palette_flow_build_field(&gPaletteFlow,
+                           static_cast<size_t>(shared_width),
+                           GRAD_STRIP_H,
+                           gPaletteSamplesQ16,
+                           gPaletteLightDeltaQ8);
+  gPaletteSamplesReady = true;
+  for (SelectorZone& z : gSelectors) {
+    if (z.is_palette && z.grad) paint_palette_strip(&z, z.grad_last);
   }
 }
 
@@ -414,7 +436,7 @@ static void layout_palette_inline(SelectorZone* z)
   lv_obj_set_pos(z->name, index_x + num_col_w + gap, name_y);
   lv_obj_set_width(z->name, name_avail);
   /* Two-line wrap field capped above the fixed strip (strip never moves). */
-  const int strip_y = 100;
+  const int strip_y = 96;
   const int line_h = deck_type_font(DECK_TYPE_MONO_34)->line_height;
   int name_h = strip_y - name_y - 6;
   if (name_h < line_h) name_h = line_h;
@@ -431,7 +453,8 @@ static void layout_palette_inline(SelectorZone* z)
       z->grad_w = gw;
       z->grad_last = 0xFFu;  /* force repaint at new width */
       lv_obj_set_size(z->grad_view, gw, GRAD_STRIP_H);
-      lv_obj_set_size(z->grad, gw * 2, GRAD_STRIP_H);
+      lv_obj_set_size(z->grad, gw, GRAD_STRIP_H);
+      configure_palette_image(z);
     }
   }
 }
@@ -1201,7 +1224,7 @@ static void create_selector(SelectorZone* z, lv_obj_t* parent, int x, int y, int
     if (z->grad_w > GRAD_STRIP_MAX_W) z->grad_w = GRAD_STRIP_MAX_W;
     z->grad_view = lv_obj_create(z->zone);
     lv_obj_set_size(z->grad_view, z->grad_w, GRAD_STRIP_H);
-    lv_obj_set_pos(z->grad_view, WING_W + 10, 100);
+    lv_obj_set_pos(z->grad_view, WING_W + 10, 96);
     lv_obj_set_style_pad_all(z->grad_view, 0, LV_PART_MAIN);
     lv_obj_set_style_border_width(z->grad_view, 0, LV_PART_MAIN);
     lv_obj_set_style_bg_opa(z->grad_view, LV_OPA_TRANSP, LV_PART_MAIN);
@@ -1211,10 +1234,10 @@ static void create_selector(SelectorZone* z, lv_obj_t* parent, int x, int y, int
     lv_obj_clear_flag(z->grad_view, LV_OBJ_FLAG_SCROLLABLE);
 
     z->grad = lv_image_create(z->grad_view);
-    lv_obj_set_size(z->grad, z->grad_w * 2, GRAD_STRIP_H);
+    lv_obj_set_size(z->grad, z->grad_w, GRAD_STRIP_H);
     lv_obj_set_pos(z->grad, 0, 0);
-    lv_obj_set_style_translate_x(z->grad, 0, LV_PART_MAIN);
     lv_obj_clear_flag(z->grad, LV_OBJ_FLAG_CLICKABLE);
+    configure_palette_image(z);
   } else {
     /* Title Mono21 @ y6. Unified Countach hero @ y36.
      * Name Y retuned for numeral→name ink gap ∈ [12,14] (P3.0). */
@@ -1584,7 +1607,7 @@ void Deck_UI_Init(lv_display_t* disp)
 void Deck_UI_Tick(void)
 {
   const uint32_t now = millis();
-  tick_palette_animation(now);
+  tick_palette_animation(micros());
   refresh_status_strip();
 
   const uint32_t rev = deck_state_rx_revision();

@@ -9,6 +9,10 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 Use this skill for the Tab5 LVGL dashboard that controls K1.
 
+For procedural/ambient dashboard motion, also invoke
+`tab5-embedded-ui-motion-gate`. Static layout proof is necessary but cannot pass
+the on-glass motion rail.
+
 ## Canon
 
 - The K1 dashboard is a single-purpose K1 control page. Do not drag along unrelated LightwaveOS/PIPdeck pages.
@@ -41,6 +45,12 @@ If visual HTML is in scope, obey any protected-source instructions exactly. A pr
 5. Keep text inside bounds at 1280x720. Prefer shorter labels and stable widths over shrinking via viewport tricks.
 6. British spelling: `COLOUR`, `initialise`, `behaviour`, `centre`.
 7. Do not display loop-iteration counts as FPS. If the header shows FPS, use the dashboard frame interval or explicit display-flush telemetry, and expose the value through `UI_STATUS`.
+8. Present complete frames. The production Tab5 path is full logical RGB565 ->
+   PPA rotation -> hidden double DSI framebuffer -> VSYNC retirement. Do not
+   reintroduce partial scanout or RGB565 byte swapping.
+9. LVGL has one owner: loopTask. Radio callbacks enqueue bounded records only.
+10. Primary and Secondary palette previews must consume the same spatial/light
+    field. Similar speeds or separately seeded phases are not synchronisation.
 
 ## Battery Header Pattern
 
@@ -70,4 +80,7 @@ python3 tests/test_sb_tab5_wireless_controller_static.py
 pio run -e tab5 -d sb-tab5-wireless-controller
 ```
 
-If controls changed, run the live harness. If layout changed materially, capture/display the Tab5 page at 1280x720 or provide device evidence that the screen renders without overlap.
+If controls changed, run the live harness. If layout changed materially,
+capture/display the Tab5 page at 1280x720 and provide device evidence that the
+screen renders without overlap. If motion changed, follow the two-rail motion
+gate and do not claim perceptual success from a still or host test alone.

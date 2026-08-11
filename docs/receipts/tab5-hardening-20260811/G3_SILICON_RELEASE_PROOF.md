@@ -2,10 +2,23 @@
 
 ## Verdict
 
-**DEPLOYED FIX VERIFIED. HARDENING LANE CLOSED.**
+**DEPLOYED WDT/RSSI FIX VERIFIED. FULL ORIGINAL G3 CONTRACT NOT VERIFIED.**
 
-This receipt closes the Tab5 WDT/RSSI repair and its bounded reconnect proof. It
-does not override the standing Deck16 production/promotion authority.
+Audit correction recorded 2026-08-11: the durable evidence proves the bounded
+100-cycle reconnect/HELLO/SNAPSHOT result and identity-MD5 rejection/recovery.
+It does not contain the complete contracted corrupt/partial/gap/queue/peer/RSSI
+fault matrix, 10–15-minute dense fault soak, or 45–60-minute ordinary production
+soak. The earlier “lane closed” wording overreached the evidence and is
+superseded. Historical receipt status:
+
+```text
+WDT_RSSI_RECONNECT_REPAIR=PASS
+FULL_G3_FAULT_AND_ORDINARY_SOAK=NOT_VERIFIED
+```
+
+This receipt closes the Tab5 WDT/RSSI repair within its bounded reconnect proof.
+It does not close the full original G3 matrix and does not override the standing
+Deck16 production/promotion authority.
 
 ```text
 DECK16_B1_B2_CORE_FUNCTIONAL_PASS=PASS

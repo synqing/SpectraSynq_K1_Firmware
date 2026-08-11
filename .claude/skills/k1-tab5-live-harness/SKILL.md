@@ -28,13 +28,14 @@ sed -n '1,260p' sb-tab5-wireless-controller/src/ui/LightComposerUI.cpp
 pio device list
 ```
 
-Confirm current ports before live testing. Common session values have been:
+Confirm current ports before live testing. Never decide that a device is absent
+from a remembered port name. The 2026-08-11 Tab5 was continuously available at
+`/dev/cu.usbmodem12401`, but port names remain observations, not identity.
 
-- Tab5: `/dev/cu.usbmodem1101`
-- Main K1: `/dev/cu.usbmodem1401`
-- Bench/reference K1: `/dev/cu.usbmodem12201`
-
-Do not flash or disturb the bench/reference K1 unless Captain explicitly scopes it in.
+Before any Tab5 write, run `tab5_firmware/scripts/flash_tab5_p4.sh --port
+<explicit-port> --verify-only` and require ESP32-P4 MAC
+`30:ed:a0:e0:c1:a0`. Do not flash or disturb the C6, main K1, or another P4
+unless Captain explicitly scopes it in.
 
 ## Harness Commands
 

@@ -739,5 +739,5 @@ void loop()
   // Note: tick callback already set in LVGLBridge::init() - don't call lv_tick_inc() here
   LVGLBridge::update();
 
-  vTaskDelay(pdMS_TO_TICKS(5));  // 5ms delay for ~200Hz LVGL refresh
+  vTaskDelay(pdMS_TO_TICKS(1));  // fine-grained cadence; palette renderer gates itself at 16ms
 }
