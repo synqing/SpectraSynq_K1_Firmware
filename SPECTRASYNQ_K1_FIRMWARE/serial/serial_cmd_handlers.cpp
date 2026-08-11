@@ -11,6 +11,10 @@
 
 #include "serial_cmd_handlers.h"
 
+#ifdef K1_BLE_REMOTED
+#include "ble_remoted_central.h"
+#endif
+
 #ifdef K1_STM
 #include "k1_audio_snapshot.h"  // K1StmResult + k1_stm_read() for the `stm` readout (bench K1_STM only)
 #endif
@@ -102,6 +106,12 @@ void serial_print_beat_director_status();
 // ---------------------------------------------------------------------------
 bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_data) {
     if (false) {}
+
+#ifdef K1_BLE_REMOTED
+    else if (strcmp(command_type, "deck_proof") == 0) {
+      k1_ble_remoted_proof(command_data);
+    }
+#endif
 
     else if (strcmp(command_type, "photons") == 0) {
       float value = 0.0f;

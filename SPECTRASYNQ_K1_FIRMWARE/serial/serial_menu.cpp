@@ -2103,7 +2103,9 @@ void cmd_help() {
   USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
   USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
   USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+#ifdef K1_BLE_REMOTED
   USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
