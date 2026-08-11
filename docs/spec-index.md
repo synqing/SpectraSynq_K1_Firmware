@@ -99,6 +99,16 @@ UI look edits without `OPTICAL_GATE_RECEIPT.md` + SHA-pinned `MEASURED.json` = *
 | **Tab5 Deck16 HCI / BLE / operator UI** | [`docs/architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md`](architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md) · **[backend/haunt/latency canon 2026-08-09](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)** · skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md) · skill [`tab5-hosted-ble-debug`](../.claude/skills/tab5-hosted-ble-debug/SKILL.md) · guardrails [`.cursor/rules/tab5-deck16-guardrails.mdc`](../.cursor/rules/tab5-deck16-guardrails.mdc) | Before Tab5 P4 flash, identity-hash claims, deck_state pending TX, full71/C6 soak, dark-fade, MAIN authority, `BLE_HS_ETIMEOUT_HCI` triage, ESP_HCI_IF wire work, `deck_ui_assets.py` / BLE-MIDI TX edits. Proof: `_scratch/deck16_tab5_k1_proof_20260807/` + `_scratch/deck16_session_handover_20260809/`. |
 | **UI optical / typography / layout look** | [session canon 2026-08-09](canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md) · skill [`spectrasynq-ui-precode-optical-gate`](../.claude/skills/spectrasynq-ui-precode-optical-gate/SKILL.md) · rule [`.cursor/rules/spectrasynq-ui-precode-optical-gate.mdc`](../.cursor/rules/spectrasynq-ui-precode-optical-gate.mdc) | Before any `deck_ui*` / font / type-token / geometry / product-HTML-size edit. |
 
+## Tab5 GATE 0 — reproducible source baseline (BLOCKING)
+
+**Captain-frozen 2026-08-11.** Tab5 hardening Gates 1–4 are **blocked** until
+[`docs/process/TAB5-GATE-0-REPRODUCIBLE-SOURCE-BASELINE.md`](process/TAB5-GATE-0-REPRODUCIBLE-SOURCE-BASELINE.md)
+closes. 0.1 (calibration tombstone) and 0.2 (vendor inventory) are DONE; 0.4
+project-cold PASS; **0.3 / 0.5 / 0.6 OPEN**. The authoritative gate is 0.5
+environment-cold (clean clone + empty `PLATFORMIO_CORE_DIR`) — a warm build is
+evidence, not proof. End-state is non-negotiable: Tab5 is a pinned,
+clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination.
+
 ## Active lanes (updated 2026-08-05)
 
 | Lane | Authority doc | Status | Evidence anchor |
