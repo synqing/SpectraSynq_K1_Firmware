@@ -712,6 +712,21 @@ inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not 
 //   MEASURED: quiet room 1.24   ·   music 3.17
 #define K1_SILENCE_PEAK_WIN 64                    // ~0.48 s at the 133 Hz AP frame rate
 inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured audio, never silence
+// LEVEL FLOOR (2026-08-11, measured on Unit 2 at G=8): peakiness alone is NOT
+// sufficient once the gain revert lifted the quiet-room noise floor's dynamic
+// range. Measured over 90 s of a confirmed-quiet room (-59.4 dB on an
+// independent witness mic), pky p50 1.87 / p90 2.33 / max 2.72 — i.e. 21% of
+// QUIET frames cleared the 2.10 break on their own, and silence held only 7.4%
+// of the time. The quiet and music pky distributions overlap almost completely
+// (music mean 2.13, max 2.74), so no single-axis pky threshold separates them.
+// What DOES separate is absolute level at the moment of the spike:
+//     quiet   max_raw mean 254, max 343
+//     music   max_raw mean 446, max 1611
+// Quiet-room peakiness spikes occur at low absolute level; music has BOTH.
+// Requiring both axes kills the false-wake without touching music sensitivity.
+// Floor set to 500: ~1.46x above the highest quiet frame observed, and well
+// inside the music distribution.
+inline float    K1_SILENCE_PEAK_MIN_RAW = 500.0f;  // peakiness may only break silence at/above this level
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
