@@ -62,10 +62,14 @@
 
 static constexpr uint32_t kPaletteAnimationFrameMs = 16;  /* panel-cadence motion */
 static constexpr uint32_t kPaletteAnimationMaxDtMs = 50;  /* never teleport after a stall */
-static constexpr float kPaletteMotionMinSpeed = 0.16f;     /* cycles per second */
-static constexpr float kPaletteMotionMaxSpeed = 0.29f;
-static constexpr uint32_t kPaletteMotionMinSegmentMs = 1700;
-static constexpr uint32_t kPaletteMotionSegmentRangeMs = 3600;
+static constexpr float kPaletteFlowTau = 6.28318530718f;
+static constexpr float kPaletteFlowBaseSpeed = 0.195f;  /* cycles per second */
+static constexpr float kPaletteFlowSwellAmplitude = 0.075f;
+static constexpr float kPaletteFlowWaveAmplitude = 0.040f;
+static constexpr float kPaletteFlowRippleAmplitude = 0.018f;
+static constexpr float kPaletteFlowSwellPeriod = 10.7f;
+static constexpr float kPaletteFlowWavePeriod = 4.3f;
+static constexpr float kPaletteFlowRipplePeriod = 2.17f;
 
 typedef struct {
   lv_obj_t* zone;
@@ -85,14 +89,11 @@ typedef struct {
 } SelectorZone;
 
 typedef struct {
-  uint32_t rng;
   float phase;
-  float velocity;
-  float from_velocity;
-  float target_velocity;
-  uint32_t segment_elapsed_ms;
-  uint32_t segment_duration_ms;
-} PaletteMotion;
+  float swell_phase;
+  float wave_phase;
+  float ripple_phase;
+} PaletteFlow;
 
 typedef struct {
   lv_obj_t* root;
@@ -132,10 +133,7 @@ static SoftKey gKeys[7];
 static uint16_t gGradBuf0[GRAD_STRIP_RING_W * GRAD_STRIP_H];
 static uint16_t gGradBuf1[GRAD_STRIP_RING_W * GRAD_STRIP_H];
 static uint32_t gPaletteAnimationLastMs = 0;
-static PaletteMotion gPaletteMotion[2] = {
-    {0xA341316Cu, 0.08f, 0.19f, 0.19f, 0.24f, 0, 2600},
-    {0xC8013EA4u, 0.57f, -0.21f, -0.21f, -0.17f, 0, 3400},
-};
+static PaletteFlow gPaletteFlow = {0.08f, 0.0f, 2.1f, 4.7f};
 
 static lv_obj_t* gScrim = nullptr;
 static lv_obj_t* gSheets[DECK_SHEET_COUNT] = {nullptr};
@@ -319,52 +317,25 @@ static void paint_palette_strip(SelectorZone* z, uint8_t pal_index)
   lv_obj_invalidate(z->grad);
 }
 
-static uint32_t palette_rng_next(PaletteMotion& motion)
+static float wrap_phase(float phase)
 {
-  uint32_t x = motion.rng;
-  x ^= x << 13;
-  x ^= x >> 17;
-  x ^= x << 5;
-  motion.rng = x;
-  return x;
+  phase = fmodf(phase, kPaletteFlowTau);
+  return phase < 0.0f ? phase + kPaletteFlowTau : phase;
 }
 
-static float palette_smootherstep(float t)
-{
-  if (t <= 0.0f) return 0.0f;
-  if (t >= 1.0f) return 1.0f;
-  return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
-}
-
-static void palette_motion_retarget(PaletteMotion& motion)
-{
-  const uint32_t speed_bits = palette_rng_next(motion);
-  const uint32_t timing_bits = palette_rng_next(motion);
-  const float unit = static_cast<float>(speed_bits & 0xFFFFu) / 65535.0f;
-  const float speed =
-      kPaletteMotionMinSpeed + (kPaletteMotionMaxSpeed - kPaletteMotionMinSpeed) * unit;
-
-  /* Most segments preserve flow; one in four gently reverses direction. */
-  const float current_direction = motion.velocity < 0.0f ? -1.0f : 1.0f;
-  const float direction = ((speed_bits >> 16) & 0x3u) == 0u
-                              ? -current_direction
-                              : current_direction;
-  motion.from_velocity = motion.velocity;
-  motion.target_velocity = direction * speed;
-  motion.segment_elapsed_ms = 0;
-  motion.segment_duration_ms =
-      kPaletteMotionMinSegmentMs + (timing_bits % kPaletteMotionSegmentRangeMs);
-}
-
-/** Seamless organic preview: continuous position with eased, non-looping velocity. */
+/**
+ * One shared water current drives both palette swatches.  Three phase-modulated
+ * waves use non-harmonic periods, so their interference creates irregularly
+ * spaced swells without discrete retargets or a short visible loop.
+ */
 static void tick_palette_animation(uint32_t now_ms)
 {
   if (gPaletteAnimationLastMs == 0) {
     const uint32_t entropy = micros() ^ (now_ms * 0x9E3779B9u);
-    gPaletteMotion[0].rng ^= entropy | 1u;
-    gPaletteMotion[1].rng ^= (entropy << 16) | (entropy >> 16) | 1u;
-    palette_motion_retarget(gPaletteMotion[0]);
-    palette_motion_retarget(gPaletteMotion[1]);
+    const float seed = static_cast<float>(entropy & 0xFFFFu) / 65535.0f;
+    gPaletteFlow.swell_phase = seed * kPaletteFlowTau;
+    gPaletteFlow.wave_phase = wrap_phase(gPaletteFlow.swell_phase + 2.1f);
+    gPaletteFlow.ripple_phase = wrap_phase(gPaletteFlow.swell_phase + 4.7f);
     gPaletteAnimationLastMs = now_ms;
     return;
   }
@@ -380,27 +351,31 @@ static void tick_palette_animation(uint32_t now_ms)
                              ? kPaletteAnimationMaxDtMs
                              : elapsed_ms;
   const float dt = static_cast<float>(dt_ms) * 0.001f;
-  size_t motion_index = 0;
+
+  gPaletteFlow.swell_phase = wrap_phase(
+      gPaletteFlow.swell_phase + (kPaletteFlowTau / kPaletteFlowSwellPeriod) * dt);
+  gPaletteFlow.wave_phase = wrap_phase(
+      gPaletteFlow.wave_phase + (kPaletteFlowTau / kPaletteFlowWavePeriod) * dt);
+  gPaletteFlow.ripple_phase = wrap_phase(
+      gPaletteFlow.ripple_phase + (kPaletteFlowTau / kPaletteFlowRipplePeriod) * dt);
+
+  const float swell = sinf(gPaletteFlow.swell_phase);
+  const float wave = sinf(gPaletteFlow.wave_phase + 0.42f * swell);
+  const float ripple = sinf(gPaletteFlow.ripple_phase + 0.35f * wave + 0.17f * swell);
+  const float velocity = kPaletteFlowBaseSpeed +
+                         kPaletteFlowSwellAmplitude * swell +
+                         kPaletteFlowWaveAmplitude * wave +
+                         kPaletteFlowRippleAmplitude * ripple;
+  gPaletteFlow.phase += velocity * dt;
+  gPaletteFlow.phase -= floorf(gPaletteFlow.phase);
+  if (gPaletteFlow.phase < 0.0f) gPaletteFlow.phase += 1.0f;
+
+  /* Exact shared phase: Primary and Secondary can never drift apart. */
   for (SelectorZone& z : gSelectors) {
     if (!z.is_palette || !z.grad || z.grad_w <= 0) continue;
-    if (motion_index >= 2) break;
-    PaletteMotion& motion = gPaletteMotion[motion_index++];
-    motion.segment_elapsed_ms += dt_ms;
-    const float segment_t = static_cast<float>(motion.segment_elapsed_ms) /
-                            static_cast<float>(motion.segment_duration_ms);
-    const float eased = palette_smootherstep(segment_t);
-    motion.velocity = motion.from_velocity +
-                      (motion.target_velocity - motion.from_velocity) * eased;
-    motion.phase += motion.velocity * dt;
-    motion.phase -= floorf(motion.phase);
-    if (motion.phase < 0.0f) motion.phase += 1.0f;
-
     const int32_t offset =
-        -static_cast<int32_t>(motion.phase * static_cast<float>(z.grad_w));
+        -static_cast<int32_t>(gPaletteFlow.phase * static_cast<float>(z.grad_w));
     lv_obj_set_style_translate_x(z.grad, offset, LV_PART_MAIN);
-    if (motion.segment_elapsed_ms >= motion.segment_duration_ms) {
-      palette_motion_retarget(motion);
-    }
   }
 }
 

@@ -59,11 +59,16 @@ def test_palette_preview_is_seamless_dt_correct_transform_motion():
     assert "GRAD_STRIP_RING_W (GRAD_STRIP_MAX_W * 2)" in text
     assert "kPaletteAnimationFrameMs = 16" in text
     assert "kPaletteAnimationMaxDtMs = 50" in text
-    assert "palette_smootherstep" in text
-    assert "palette_motion_retarget" in text
-    assert "const uint32_t entropy = micros()" in text
-    assert "motion.phase += motion.velocity * dt" in text
-    assert "one in four gently reverses direction" in text
+    assert "kPaletteFlowSwellPeriod = 10.7f" in text
+    assert "kPaletteFlowWavePeriod = 4.3f" in text
+    assert "kPaletteFlowRipplePeriod = 2.17f" in text
+    assert "const float swell = sinf" in text
+    assert "const float wave = sinf" in text
+    assert "const float ripple = sinf" in text
+    assert "gPaletteFlow.phase += velocity * dt" in text
+    assert "Primary and Secondary can never drift apart" in text
+    assert "gPaletteFlow.phase * static_cast<float>(z.grad_w)" in text
+    assert "PaletteMotion gPaletteMotion[2]" not in text
     assert "lv_obj_set_style_translate_x(z.grad, offset" in text
     assert "z->grad_buf[y * ring_w + w + x] = px" in text
     assert "lv_obj_set_size(z->grad, z->grad_w * 2" in text
