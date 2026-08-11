@@ -142,6 +142,44 @@ class TestDeckStateV1(unittest.TestCase):
         self.assertIn("deck_ui_set_key_lamp(DECK_SHEET_RENDER", rx)
         self.assertIn("deck_ui_sheets_apply_bool", rx)
 
+    def test_tab5_nimble_callbacks_defer_application_state_to_loop_task(self):
+        """NimBLE Core 0 callbacks must never enter Deck state or LVGL directly."""
+        transport = (
+            ROOT / "tab5_firmware" / "src" / "ble_midi_transport.cpp"
+        ).read_text()
+        callback_block = transport[
+            transport.index("class MidiServerCallbacks") :
+            transport.index("static void wrap_ble_midi_packet")
+        ]
+        self.assertNotIn("deck_state_rx_on_packet", callback_block)
+        self.assertNotIn("deck_state_rx_on_disconnect", callback_block)
+        self.assertNotIn("deck_state_rx_on_identity_hint", callback_block)
+        self.assertNotIn("deck_ui_", callback_block)
+        self.assertNotIn("gConnected =", callback_block)
+        self.assertNotIn("gConnHandle =", callback_block)
+        for event_type in ("StateChunk", "Connected", "Disconnected"):
+            self.assertIn(f"HostEventType::{event_type}", callback_block)
+
+        tick_block = transport[
+            transport.index("void tick()") : transport.index("bool ready()")
+        ]
+        self.assertIn("drain_host_events()", tick_block)
+        self.assertIn("deck_state_rx_on_packet", transport)
+        self.assertIn("xQueueCreateStatic", transport)
+        self.assertIn("kHostEventReservedLinkSlots", transport)
+
+    def test_tab5_unknown_rssi_handle_transitions_to_disconnected(self):
+        """A dead controller handle must stop the 500 ms Read RSSI retry loop."""
+        transport = (
+            ROOT / "tab5_firmware" / "src" / "ble_midi_transport.cpp"
+        ).read_text()
+        rssi = transport[
+            transport.index("bool connectionRssi") :
+            transport.index("uint8_t unitToMidi7")
+        ]
+        self.assertIn("BLE_ERR_UNK_CONN_ID", rssi)
+        self.assertIn("apply_disconnected", rssi)
+
     def test_vivid_softkey_non_open_and_glass_forbidden(self):
         """Task 1.3 — VIVID non-open; chroma/sat remain glass-forbidden."""
         ui = (ROOT / "tab5_firmware" / "src" / "deck_ui.cpp").read_text()
