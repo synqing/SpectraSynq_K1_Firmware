@@ -731,13 +731,23 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 // — silence held 100% THROUGH MUSIC. An absolute constant cannot survive a
 // calibration change; a fraction of the learned floor can.
 //
-// Measured on Unit 2 after the 2026-08-11 recalibration (SSL=53), as multiples of SSL:
-//     quiet room   p50 0.91   p90 1.64   max  2.72
-//     music vol70  p50 13.96  p90 25.19  max 32.43
-// Separation between quiet's worst frame and music's median is a factor of 5.1.
-// Geometric midpoint sqrt(2.72 x 13.96) = 6.16 -> 6.0, giving 2.2x margin below
-// quiet's worst frame and 2.3x above music's median (symmetric in log space,
-// the correct space for a ratio-scaled quantity).
+// !! THE VALUE BELOW IS UNVERIFIED. THE FORM IS CORRECT; THE NUMBER IS NOT EARNED. !!
+//
+// 6.0 was derived from distributions captured on 2026-08-11 that are now known to
+// be CONTAMINATED: a concurrent session had reflashed the device with
+// k1_custom_silicon_closure @ 622997b, which runs input gain 4.0f (not 8.0f), PDM
+// pins 13/12 (not 39/38), and does NOT contain this gate at all. Every sample in
+// that derivation came from a different build than the one it was meant to tune.
+// The calibration taken in the same window (SSL 103 -> 53, DC -117 -> 220) is
+// likewise from the wrong gain domain and must be re-learned under this firmware.
+//
+// Re-derive with: flash this build, assert identity with
+// scripts/regression-harness/k1_device_identity_guard.py, recalibrate in a
+// Captain-authorised silence window, then measure quiet and music max_raw as
+// multiples of the NEW SSL. Choose the geometric midpoint of (quiet max) and
+// (music p50) — the correct centre for a ratio-scaled quantity.
+// Predictions P1/P2 in docs/forensics/unit2-joint-silence-predictions-2026-08-11.md
+// must BOTH hold; either alone is satisfiable by a broken gate.
 //
 // DIVERGENCE FROM CANON, deliberate and recorded: SESSION_CANON_2026-08-07 seeds
 // this at 1.25. That seed does not hold here — at 1.25 the threshold (66) falls
