@@ -18,7 +18,7 @@
 // DISPLAY SETTINGS
 // ============================================================
 #define LV_COLOR_DEPTH 16  // RGB565 (2 bytes per pixel)
-#define LV_COLOR_16_SWAP 1  // Swap bytes for M5GFX BGR565 format
+#define LV_COLOR_16_SWAP 0  // LVGL, PPA and the DSI framebuffer all use native-endian RGB565
 
 // ============================================================
 // PERFORMANCE
@@ -146,4 +146,3 @@
 // ============================================================
 #define LV_USE_DRAW_PXP 0
 #define LV_USE_DRAW_VG_LITE 0
-

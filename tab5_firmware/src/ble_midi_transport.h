@@ -16,7 +16,7 @@ bool gattAvailable();
 /** True while a BLE central is connected to the Tab5 peripheral. */
 bool connected();
 
-/** Peripheral-side connection RSSI (NimBLE ble_gap_conn_rssi). false if unlinked/unavailable. */
+/** Read loop-owned cached RSSI. Never sends HCI or blocks the UI path. */
 bool connectionRssi(int8_t* out_dbm);
 
 uint8_t unitToMidi7(float value);
@@ -57,5 +57,8 @@ bool disconnectCentral();
 /** mode: ok | md5 | product | short — mutates identity GATT then disconnects. */
 bool setIdentityFault(const char* mode);
 void dumpConnPerf();
+
+/** Rebuild scan-response Manufacturer Specific Data from deck_claim. */
+void refreshClaimAdvertising();
 
 } // namespace BleMidiTransport

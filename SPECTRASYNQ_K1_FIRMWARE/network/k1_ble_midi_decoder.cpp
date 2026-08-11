@@ -206,7 +206,7 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
 
   const K1BleMidiEntry* cc14_msb = find_cc14_msb(ch, cc);
   if (cc14_msb != nullptr) {
-    // Second MSB for same key replaces and restarts the pairing window.
+    // A second MSB for the same key replaces and restarts the pairing window.
     state->cc14_msb[ch][cc] = value;
     state->cc14_msb_valid[ch][cc] = 1;
     state->cc14_msb_ms[ch][cc] = state->now_ms;
@@ -217,7 +217,6 @@ K1BleMidiDecodeStatus decode_cc(K1BleMidiDecoderState* state,
   if (cc14_lsb != nullptr) {
     const uint8_t msb_cc = cc14_lsb->cc_msb;
     if (!state->cc14_msb_valid[ch][msb_cc]) {
-      // LSB-first / wrong-LSB / no matching MSB key.
       ++state->malformed_cc14;
       return K1_BLE_MIDI_DECODE_OK;
     }

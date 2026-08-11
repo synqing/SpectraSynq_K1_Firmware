@@ -28,9 +28,11 @@
 #include "deck_state.h"
 #include "deck_state_rx.h"
 #include "deck_tx.h"
+#include "deck_claim.h"
 #include "deck_latency.h"
 #include "deck_input.h"
 #include "ble_midi_transport.h"
+#include "network/WiFiAntenna.h"
 
 using namespace lgfx;
 
@@ -239,6 +241,8 @@ static void print_encoderless_help()
   LOG("[serial] map: map=<path>=<value>  (BLE-MIDI map paths; layout uses DeckControlId)");
   LOG("[serial] mirror: PURGED from BLE/Deck — use K1 USB mirror_enabled= bringup only");
   LOG("[serial] proof: cc=<ch>,<cc>,<0..127> identity_fault=ok|md5|product|short ble_disconnect");
+  LOG("[serial] claim: claim_status claim_open claim_none claim_unit=<8hex>");
+  LOG("[serial] claim: claim_switch=<8hex> claim_switch_confirm=<8hex> (confirm when LIVE)");
 }
 
 static bool handle_unit_command(const char* cmd,
@@ -470,6 +474,61 @@ static void handle_encoderless_serial_command(char* raw)
     return;
   }
 
+  if (strcmp(cmd, "claim_status") == 0) {
+    deck_claim_dump_status();
+    size_t n = 0;
+    const DeckClaimRosterEntry* r = deck_claim_roster(&n);
+    for (size_t i = 0; i < n; ++i) {
+      LOG("[serial] roster[%u]=%08X %s", (unsigned)i, (unsigned)r[i].k1_unit_id,
+          r[i].label ? r[i].label : "");
+    }
+    return;
+  }
+  if (strcmp(cmd, "claim_open") == 0) {
+    (void)deck_claim_set_open();
+    deck_claim_dump_status();
+    return;
+  }
+  if (strcmp(cmd, "claim_none") == 0) {
+    (void)deck_claim_set_none();
+    deck_claim_dump_status();
+    return;
+  }
+  if (strncmp(cmd, "claim_unit=", 11) == 0) {
+    uint32_t unit = 0;
+    if (k1_claim_parse_unit_hex(cmd + 11, &unit) != 0) {
+      LOG("[serial] claim_unit expects 8 hex chars");
+      return;
+    }
+    (void)deck_claim_set_unit(unit);
+    deck_claim_dump_status();
+    return;
+  }
+  if (strncmp(cmd, "claim_switch_confirm=", 21) == 0) {
+    uint32_t unit = 0;
+    if (k1_claim_parse_unit_hex(cmd + 21, &unit) != 0) {
+      LOG("[serial] claim_switch_confirm expects 8 hex chars");
+      return;
+    }
+    bool needs = false;
+    (void)deck_claim_request_switch(unit, true, &needs);
+    deck_claim_dump_status();
+    return;
+  }
+  if (strncmp(cmd, "claim_switch=", 13) == 0) {
+    uint32_t unit = 0;
+    if (k1_claim_parse_unit_hex(cmd + 13, &unit) != 0) {
+      LOG("[serial] claim_switch expects 8 hex chars");
+      return;
+    }
+    bool needs = false;
+    if (!deck_claim_request_switch(unit, false, &needs) && needs) {
+      LOG("[serial] LIVE: send claim_switch_confirm=%08X", (unsigned)unit);
+    }
+    deck_claim_dump_status();
+    return;
+  }
+
   if (strncmp(cmd, "identity_fault=", 15) == 0) {
     (void)BleMidiTransport::setIdentityFault(cmd + 15);
     return;
@@ -596,6 +655,9 @@ void setup()
   M5.begin(cfg);
   LOG("[init] M5.begin() returned");
 
+  // Drive RF_PTH via Lightwave WiFiAntenna (product path). Boot = INTERNAL.
+  initWiFiAntennaPin();
+
   LOG("[display] Waiting for DSI initialization (200ms)...");
   ::delay(200);
 
@@ -620,7 +682,7 @@ void setup()
   M5.Display.setRotation(3);
   LOG("[display] Rotation=3 (inverse landscape)");
   // Don't set EPD mode for LCD (only for e-ink displays)
-  M5.Display.setSwapBytes(false);                 // LV_COLOR_16_SWAP=1 → display must NOT swap
+  M5.Display.setSwapBytes(false);  // Full-frame presenter uses native-endian RGB565 throughout
   ::delay(50);
   LOG("[display] Display width=%d height=%d", M5.Display.width(), M5.Display.height());
 
@@ -629,13 +691,12 @@ void setup()
   xSemaphoreGive(gDisplayInitSemaphore);
   LOG("[display] Display ready for multi-core access");
 
-  init_transport();
-
   deck_state_init();
   deck_state_rx_init();
+  deck_claim_init();
   deck_tx_init();
   deck_input_init();
-  LOG("[deck] state/tx/rx/input scaffolding ready");
+  LOG("[deck] state/tx/rx/claim/input scaffolding ready");
 
   // Initialize LVGL bridge
   LOG("[lvgl] Initializing LVGL bridge...");
@@ -650,6 +711,10 @@ void setup()
   Deck_UI_Init(LVGLBridge::getDisplay());
   LOG("[ui] Deck16 4-box MAIN ready (LINK phase + armed gate)");
   print_encoderless_help();
+
+  // State, receiver and LVGL ownership must exist before advertising permits
+  // K1 to deliver the initial HELLO/SNAPSHOT burst.
+  init_transport();
 
   Deck_UI_ShowWaitingScreen(false, "");
   LOG("[ui] Blocking waiting overlay disabled; offline controls remain visible");
@@ -737,5 +802,5 @@ void loop()
   // Note: tick callback already set in LVGLBridge::init() - don't call lv_tick_inc() here
   LVGLBridge::update();
 
-  vTaskDelay(pdMS_TO_TICKS(5));  // 5ms delay for ~200Hz LVGL refresh
+  vTaskDelay(pdMS_TO_TICKS(1));  // fine-grained cadence; palette renderer gates itself at 16ms
 }

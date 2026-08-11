@@ -8,6 +8,7 @@
 #include "deck_motion.h"
 #include "deck_names.h"
 #include "deck_palette_stops.h"
+#include "palette_flow.h"
 #include "deck_type.h"
 #include "ble_midi_transport.h"
 
@@ -56,8 +57,10 @@
 #define KEYS_Y          604
 #define KEYS_H          108
 
-#define GRAD_STRIP_H      22
+#define GRAD_STRIP_H      36
 #define GRAD_STRIP_MAX_W  420
+static constexpr uint32_t kPaletteAnimationFrameUs = 16000;
+static constexpr uint32_t kPaletteAnimationMaxDtUs = 50000;
 
 typedef struct {
   lv_obj_t* zone;
@@ -66,9 +69,11 @@ typedef struct {
   lv_obj_t* title;
   lv_obj_t* number;
   lv_obj_t* name;
+  lv_obj_t* grad_view;  /* clipped palette viewport */
   lv_obj_t* grad;       /* palette spectrum image */
   lv_image_dsc_t grad_dsc;
   uint16_t* grad_buf;
+  uint32_t palette_lut[256];
   int grad_w;
   uint8_t grad_last;
   DeckControlId ctrl;
@@ -112,6 +117,12 @@ static SoftKey gKeys[7];
 
 static uint16_t gGradBuf0[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
 static uint16_t gGradBuf1[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint16_t gPaletteSamplesQ16[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static int8_t gPaletteLightDeltaQ8[GRAD_STRIP_MAX_W * GRAD_STRIP_H];
+static uint32_t gPaletteAnimationLastUs = 0;
+static uint32_t gPaletteAnimationAccumUs = 0;
+static bool gPaletteSamplesReady = false;
+static PaletteFlowState gPaletteFlow = {};
 
 static lv_obj_t* gScrim = nullptr;
 static lv_obj_t* gSheets[DECK_SHEET_COUNT] = {nullptr};
@@ -120,11 +131,11 @@ static lv_obj_t* gWaitingScreen = nullptr;
 static bool gLinked = false;           /* BLE connected (transport) */
 static bool gArmed = false;            /* deck_state_rx_armed — command gate */
 static DeckLinkPhase gPhaseUi = DECK_LINK_DISCONNECTED;
+static bool gStatusUiInitialised = false;
 static uint32_t gLastRxRevision = 0;
 static uint32_t gLastConfirmedCount = 0;
 static bool gLastStale = false;
 static int gLastRssiShown = 0x7fff;  /* sentinel: force first paint */
-static uint32_t gLastRssiPollMs = 0;
 
 typedef struct {
   lv_obj_t* state_lab;
@@ -157,6 +168,7 @@ static void refresh_key_lamp(SoftKey* k);
 static void layout_link_cluster(void);
 static void layout_palette_inline(SelectorZone* z);
 static void paint_palette_strip(SelectorZone* z, uint8_t pal_index);
+static void tick_palette_animation(uint32_t now_us);
 static void refresh_all_controls(void);
 static void refresh_status_strip(void);
 static void apply_armed_gate_visuals(void);
@@ -264,33 +276,130 @@ static uint16_t rgb888_to_rgb565(uint32_t rgb)
   return static_cast<uint16_t>(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
 }
 
+static void prepare_palette_lut(SelectorZone* z, uint8_t pal_index)
+{
+  if (!z) return;
+  if (z->grad_last == pal_index) return;
+  z->grad_last = pal_index;
+  const DeckPaletteStrip* strip = deck_palette_strip(pal_index);
+  static uint32_t raw_lut[256];
+  for (uint16_t i = 0; i < 256; ++i) {
+    raw_lut[i] = sample_palette_rgb(strip, static_cast<uint8_t>(i));
+  }
+
+  /* Circular 11-tap integration is executable host-tested in palette_flow. */
+  palette_flow_prefilter_rgb888(raw_lut, 256, z->palette_lut);
+}
+
+static uint32_t sample_palette_lut(const SelectorZone* z, uint16_t sample_q16)
+{
+  const uint8_t index = static_cast<uint8_t>(sample_q16 >> 8);
+  const uint8_t next = static_cast<uint8_t>(index + 1u);
+  const uint16_t fraction = static_cast<uint16_t>(sample_q16 & 0xFFu);
+  const uint32_t a = z->palette_lut[index];
+  const uint32_t b = z->palette_lut[next];
+  const uint32_t inv = 256u - fraction;
+  const uint8_t r = static_cast<uint8_t>((((a >> 16) & 0xFFu) * inv +
+                                          ((b >> 16) & 0xFFu) * fraction) >> 8);
+  const uint8_t g = static_cast<uint8_t>((((a >> 8) & 0xFFu) * inv +
+                                          ((b >> 8) & 0xFFu) * fraction) >> 8);
+  const uint8_t bl = static_cast<uint8_t>(((a & 0xFFu) * inv +
+                                           (b & 0xFFu) * fraction) >> 8);
+  return (static_cast<uint32_t>(r) << 16) |
+         (static_cast<uint32_t>(g) << 8) | bl;
+}
+
+static uint16_t apply_palette_light(uint32_t rgb, int8_t light_delta_q8)
+{
+  const int32_t gain = 256 + static_cast<int32_t>(light_delta_q8);
+  uint32_t r = (((rgb >> 16) & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  uint32_t g = (((rgb >> 8) & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  uint32_t b = ((rgb & 0xFFu) * static_cast<uint32_t>(gain)) >> 8;
+  if (r > 255u) r = 255u;
+  if (g > 255u) g = 255u;
+  if (b > 255u) b = 255u;
+  return rgb888_to_rgb565((r << 16) | (g << 8) | b);
+}
+
+static void configure_palette_image(SelectorZone* z)
+{
+  if (!z || !z->grad || !z->grad_buf || z->grad_w <= 0) return;
+  z->grad_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
+  z->grad_dsc.header.cf = LV_COLOR_FORMAT_RGB565;
+  z->grad_dsc.header.w = static_cast<uint32_t>(z->grad_w);
+  z->grad_dsc.header.h = static_cast<uint32_t>(GRAD_STRIP_H);
+  z->grad_dsc.header.stride = static_cast<uint32_t>(z->grad_w * 2);
+  z->grad_dsc.header.flags = 0;
+  z->grad_dsc.data_size = static_cast<uint32_t>(z->grad_w * GRAD_STRIP_H * 2);
+  z->grad_dsc.data = reinterpret_cast<const uint8_t*>(z->grad_buf);
+  lv_image_set_src(z->grad, &z->grad_dsc);
+}
+
 static void paint_palette_strip(SelectorZone* z, uint8_t pal_index)
 {
   if (!z || !z->grad || !z->grad_buf || z->grad_w <= 0) return;
-  if (z->grad_last == pal_index) return;
-  z->grad_last = pal_index;
-
-  const DeckPaletteStrip* strip = deck_palette_strip(pal_index);
+  prepare_palette_lut(z, pal_index);
   const int w = z->grad_w;
   const int h = GRAD_STRIP_H;
-  for (int x = 0; x < w; ++x) {
-    const uint8_t t =
-        (w <= 1) ? 0 : static_cast<uint8_t>((static_cast<uint32_t>(x) * 255u) / static_cast<uint32_t>(w - 1));
-    const uint16_t px = rgb888_to_rgb565(sample_palette_rgb(strip, t));
-    for (int y = 0; y < h; ++y) {
+  for (int y = 0; y < h; ++y) {
+    for (int x = 0; x < w; ++x) {
+      const int pixel = y * w + x;
+      const uint16_t sample = gPaletteSamplesReady
+                                  ? gPaletteSamplesQ16[pixel]
+                                  : static_cast<uint16_t>((static_cast<uint32_t>(x) << 16) /
+                                                          static_cast<uint32_t>(w));
+      const int8_t light = gPaletteSamplesReady ? gPaletteLightDeltaQ8[pixel] : 0;
+      const uint16_t px = apply_palette_light(sample_palette_lut(z, sample), light);
       z->grad_buf[y * w + x] = px;
     }
   }
-  z->grad_dsc.header.magic = LV_IMAGE_HEADER_MAGIC;
-  z->grad_dsc.header.cf = LV_COLOR_FORMAT_RGB565;
-  z->grad_dsc.header.w = static_cast<uint32_t>(w);
-  z->grad_dsc.header.h = static_cast<uint32_t>(h);
-  z->grad_dsc.header.stride = static_cast<uint32_t>(w * 2);
-  z->grad_dsc.header.flags = 0;
-  z->grad_dsc.data_size = static_cast<uint32_t>(w * h * 2);
-  z->grad_dsc.data = reinterpret_cast<const uint8_t*>(z->grad_buf);
-  lv_image_set_src(z->grad, &z->grad_dsc);
   lv_obj_invalidate(z->grad);
+}
+
+/**
+ * One shared subpixel sample field drives both palettes. Spatial harmonics make
+ * irregular wave spacing; C2-smoothed stochastic velocities prevent a short,
+ * mechanically predictable loop. No object translation or independent phase.
+ */
+static void tick_palette_animation(uint32_t now_us)
+{
+  if (gPaletteAnimationLastUs == 0) {
+    palette_flow_init(&gPaletteFlow, now_us ^ 0x9E3779B9u);
+    gPaletteAnimationLastUs = now_us;
+    return;
+  }
+
+  const uint32_t elapsed_us = now_us - gPaletteAnimationLastUs;
+  gPaletteAnimationLastUs = now_us;
+
+  /* Keep covered MAIN controls still; resume from the same phase after close. */
+  if (deck_state_sheet() != DECK_SHEET_NONE) return;
+  gPaletteAnimationAccumUs += elapsed_us;
+  if (gPaletteAnimationAccumUs < kPaletteAnimationFrameUs) return;
+  const uint32_t step_us = gPaletteAnimationAccumUs > kPaletteAnimationMaxDtUs
+                               ? kPaletteAnimationMaxDtUs
+                               : gPaletteAnimationAccumUs;
+  gPaletteAnimationAccumUs %= kPaletteAnimationFrameUs;
+
+  palette_flow_step(&gPaletteFlow, static_cast<float>(step_us) * 0.000001f);
+
+  int shared_width = 0;
+  for (SelectorZone& z : gSelectors) {
+    if (!z.is_palette || !z.grad || z.grad_w <= 0) continue;
+    if (shared_width == 0) shared_width = z.grad_w;
+    if (z.grad_w != shared_width) return;  /* fail closed: never desynchronise */
+  }
+  if (shared_width <= 0 || shared_width > GRAD_STRIP_MAX_W) return;
+
+  palette_flow_build_field(&gPaletteFlow,
+                           static_cast<size_t>(shared_width),
+                           GRAD_STRIP_H,
+                           gPaletteSamplesQ16,
+                           gPaletteLightDeltaQ8);
+  gPaletteSamplesReady = true;
+  for (SelectorZone& z : gSelectors) {
+    if (z.is_palette && z.grad) paint_palette_strip(&z, z.grad_last);
+  }
 }
 
 /** Anchored palette: fixed index X + two-line name; strip never recentres. */
@@ -328,7 +437,7 @@ static void layout_palette_inline(SelectorZone* z)
   lv_obj_set_pos(z->name, index_x + num_col_w + gap, name_y);
   lv_obj_set_width(z->name, name_avail);
   /* Two-line wrap field capped above the fixed strip (strip never moves). */
-  const int strip_y = 100;
+  const int strip_y = 96;
   const int line_h = deck_type_font(DECK_TYPE_MONO_34)->line_height;
   int name_h = strip_y - name_y - 6;
   if (name_h < line_h) name_h = line_h;
@@ -338,13 +447,15 @@ static void layout_palette_inline(SelectorZone* z)
   lv_obj_set_style_text_align(z->name, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN);
   (void)name_ls;
 
-  if (z->grad) {
+  if (z->grad && z->grad_view) {
     const int gw = content_w - 20;
-    lv_obj_set_pos(z->grad, content_x + 10, strip_y);
+    lv_obj_set_pos(z->grad_view, content_x + 10, strip_y);
     if (gw != z->grad_w && gw > 0 && gw <= GRAD_STRIP_MAX_W) {
       z->grad_w = gw;
       z->grad_last = 0xFFu;  /* force repaint at new width */
+      lv_obj_set_size(z->grad_view, gw, GRAD_STRIP_H);
       lv_obj_set_size(z->grad, gw, GRAD_STRIP_H);
+      configure_palette_image(z);
     }
   }
 }
@@ -511,32 +622,34 @@ static void refresh_status_strip(void)
 {
   const DeckLinkPhase phase = deck_state_rx_phase();
   const bool armed = deck_state_rx_armed();
-  const bool phase_changed = (phase != gPhaseUi) || (armed != gArmed);
+  const bool phase_changed = !gStatusUiInitialised ||
+                             (phase != gPhaseUi) || (armed != gArmed);
   gPhaseUi = phase;
   gArmed = armed;
   gLinked = BleMidiTransport::connected() || phase > DECK_LINK_DISCONNECTED;
-
-  if (gPhaseLabel) {
-    lv_label_set_text(gPhaseLabel, phase_short_label(phase));
-    uint32_t col = DECK_COLOR_AMBER_DIM;
-    if (phase == DECK_LINK_LIVE) col = DECK_COLOR_LAMP_ON;
-    else if (phase == DECK_LINK_ARMED) col = DECK_COLOR_AMBER_HI;
-    else if (phase == DECK_LINK_STATE_SYNCING) col = DECK_COLOR_AMBER;
-    lv_obj_set_style_text_color(gPhaseLabel, lv_color_hex(col), LV_PART_MAIN);
-  }
-
-  if (gLinkLamp) {
-    /* Green only when ARMED/LIVE — BLE connect alone is not authority. */
-    set_lamp_visual(gLinkLamp, armed);
-  }
-  if (gLinkLabel) {
-    lv_obj_set_style_text_color(
-        gLinkLabel,
-        lv_color_hex(armed ? DECK_COLOR_AMBER : DECK_COLOR_AMBER_DIM),
-        LV_PART_MAIN);
-  }
+  gStatusUiInitialised = true;
 
   if (phase_changed) {
+    if (gPhaseLabel) {
+      lv_label_set_text(gPhaseLabel, phase_short_label(phase));
+      uint32_t col = DECK_COLOR_AMBER_DIM;
+      if (phase == DECK_LINK_LIVE) col = DECK_COLOR_LAMP_ON;
+      else if (phase == DECK_LINK_ARMED) col = DECK_COLOR_AMBER_HI;
+      else if (phase == DECK_LINK_STATE_SYNCING) col = DECK_COLOR_AMBER;
+      lv_obj_set_style_text_color(gPhaseLabel, lv_color_hex(col), LV_PART_MAIN);
+    }
+
+    if (gLinkLamp) {
+      /* Green only when ARMED/LIVE — BLE connect alone is not authority. */
+      set_lamp_visual(gLinkLamp, armed);
+    }
+    if (gLinkLabel) {
+      lv_obj_set_style_text_color(
+          gLinkLabel,
+          lv_color_hex(armed ? DECK_COLOR_AMBER : DECK_COLOR_AMBER_DIM),
+          LV_PART_MAIN);
+    }
+
     apply_armed_gate_visuals();
     layout_link_cluster();
   }
@@ -552,11 +665,7 @@ static void refresh_status_strip(void)
     return;
   }
 
-  /* Throttle HCI Read RSSI — do not spam every LVGL tick. */
-  const uint32_t now = millis();
-  if (gLastRssiShown != 0x7fff && (now - gLastRssiPollMs) < 500) return;
-  gLastRssiPollMs = now;
-
+  /* Cache-only read. Transport maintenance owns the bounded HCI operation. */
   int8_t rssi = 0;
   if (!BleMidiTransport::connectionRssi(&rssi)) {
     if (gLastRssiShown != 0x7ffe) {
@@ -1110,17 +1219,28 @@ static void create_selector(SelectorZone* z, lv_obj_t* parent, int x, int y, int
   lv_label_set_long_mode(z->name, LV_LABEL_LONG_CLIP);
   lv_obj_clear_flag(z->name, LV_OBJ_FLAG_HIDDEN);
 
+  z->grad_view = nullptr;
   z->grad = nullptr;
   if (is_palette) {
     /* Anchored %02u|name; spectrum bar below at fixed Y. */
     z->grad_w = (w - 2 * WING_W) - 20;
     if (z->grad_w > GRAD_STRIP_MAX_W) z->grad_w = GRAD_STRIP_MAX_W;
-    z->grad = lv_image_create(z->zone);
+    z->grad_view = lv_obj_create(z->zone);
+    lv_obj_set_size(z->grad_view, z->grad_w, GRAD_STRIP_H);
+    lv_obj_set_pos(z->grad_view, WING_W + 10, 96);
+    lv_obj_set_style_pad_all(z->grad_view, 0, LV_PART_MAIN);
+    lv_obj_set_style_border_width(z->grad_view, 0, LV_PART_MAIN);
+    lv_obj_set_style_bg_opa(z->grad_view, LV_OPA_TRANSP, LV_PART_MAIN);
+    lv_obj_set_style_radius(z->grad_view, 5, LV_PART_MAIN);
+    lv_obj_set_style_clip_corner(z->grad_view, true, LV_PART_MAIN);
+    lv_obj_clear_flag(z->grad_view, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(z->grad_view, LV_OBJ_FLAG_SCROLLABLE);
+
+    z->grad = lv_image_create(z->grad_view);
     lv_obj_set_size(z->grad, z->grad_w, GRAD_STRIP_H);
-    lv_obj_set_pos(z->grad, WING_W + 10, 100);
-    lv_obj_set_style_radius(z->grad, 5, LV_PART_MAIN);
-    lv_obj_set_style_clip_corner(z->grad, true, LV_PART_MAIN);
+    lv_obj_set_pos(z->grad, 0, 0);
     lv_obj_clear_flag(z->grad, LV_OBJ_FLAG_CLICKABLE);
+    configure_palette_image(z);
   } else {
     /* Title Mono21 @ y6. Unified Countach hero @ y36.
      * Name Y retuned for numeral→name ink gap ∈ [12,14] (P3.0). */
@@ -1155,9 +1275,14 @@ static void create_mega_slider(MegaSlider* s, lv_obj_t* parent, int x, int y, in
   lv_obj_set_pos(s->bus_label, 8, 4);
 
   s->value_label = make_label(s->root, "0%", DECK_TYPE_MONO_55, DECK_COLOR_AMBER_HI);
-  lv_obj_set_width(s->value_label, 104);
+  /* Berkeley Mono 55 is 33 px/cell.  "100%" therefore needs 132 px before
+   * any optical breathing room; the former 104 px box clipped the leading 1
+   * and made a full-scale value look like "00%". */
+  static constexpr int kValueLabelWidth = 144;
+  static constexpr int kValueLabelRightInset = 8;
+  lv_obj_set_width(s->value_label, kValueLabelWidth);
   lv_obj_set_style_text_align(s->value_label, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN);
-  lv_obj_set_pos(s->value_label, w - 112, 0);
+  lv_obj_set_pos(s->value_label, w - kValueLabelWidth - kValueLabelRightInset, 0);
 
   s->track = lv_obj_create(s->root);
   lv_obj_set_size(s->track, w - 16, 52);
@@ -1484,6 +1609,8 @@ void Deck_UI_Init(lv_display_t* disp)
 
 void Deck_UI_Tick(void)
 {
+  const uint32_t now = millis();
+  tick_palette_animation(micros());
   refresh_status_strip();
 
   const uint32_t rev = deck_state_rx_revision();
@@ -1496,7 +1623,6 @@ void Deck_UI_Tick(void)
   const bool sheet_open = (deck_state_sheet() != DECK_SHEET_NONE);
 
   static uint32_t last = 0;
-  const uint32_t now = millis();
   const bool tick_due = (now - last >= 100);
 
   if (!authority_changed && !tick_due) return;
@@ -1523,7 +1649,7 @@ void Deck_UI_Tick(void)
 void Deck_UI_UpdateLinkStatus(bool linked)
 {
   gLinked = linked;
-  gLastRssiShown = 0x7fff;  /* force RSSI re-poll on link edge */
+  gLastRssiShown = 0x7fff;  /* force cached RSSI repaint on link edge */
   refresh_status_strip();
   apply_armed_gate_visuals();
 }

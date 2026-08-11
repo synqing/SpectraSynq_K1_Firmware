@@ -3,9 +3,21 @@
 #include "deck_state_rx.h"
 #include "deck_latency.h"
 #include "k1_ble_midi_map.h"
+#if !defined(DECK_UI_NATIVE_SIM)
+#include "deck_claim.h"
+#endif
 
 #include <Arduino.h>
 #include <string.h>
+
+static bool claim_tx_ok(void)
+{
+#if defined(DECK_UI_NATIVE_SIM)
+  return true;
+#else
+  return deck_claim_tx_permitted();
+#endif
+}
 
 static constexpr uint32_t kContinuousTxPeriodMs = 33;  // ≤30 Hz
 
@@ -77,8 +89,9 @@ bool deck_tx_ready(void)
 
 bool deck_tx_send(DeckControlId id)
 {
-  // Backend gate: no Deck16 outbound until K1 snapshot ARMED (R2 lifecycle).
-  if (!deck_state_rx_armed()) {
+  // Backend gate: no Deck16 outbound until K1 snapshot ARMED (R2 lifecycle)
+  // and claim unit proof matches active claim (C2 kill #3).
+  if (!deck_state_rx_armed() || !claim_tx_ok()) {
     return false;
   }
   bool ok = false;
@@ -245,7 +258,8 @@ static bool glass_path_forbidden(const char* path)
 
 bool deck_tx_send_bool(const char* path, bool value)
 {
-  if (!deck_state_rx_armed() || glass_path_forbidden(path)) {
+  if (!deck_state_rx_armed() || !claim_tx_ok() ||
+      glass_path_forbidden(path)) {
     return false;
   }
   const bool ok = BleMidiTransport::sendMappedBool(path, value);
@@ -257,7 +271,8 @@ bool deck_tx_send_bool(const char* path, bool value)
 
 bool deck_tx_send_number(const char* path, float value)
 {
-  if (!deck_state_rx_armed() || glass_path_forbidden(path)) {
+  if (!deck_state_rx_armed() || !claim_tx_ok() ||
+      glass_path_forbidden(path)) {
     return false;
   }
   const bool ok = BleMidiTransport::sendMappedNumber(path, value);
@@ -269,7 +284,7 @@ bool deck_tx_send_number(const char* path, float value)
 
 bool deck_tx_send_text(const char* path, uint8_t index)
 {
-  if (!deck_state_rx_armed()) {
+  if (!deck_state_rx_armed() || !claim_tx_ok()) {
     return false;
   }
   const bool ok = BleMidiTransport::sendMappedText(path, index);
@@ -281,7 +296,7 @@ bool deck_tx_send_text(const char* path, uint8_t index)
 
 bool deck_tx_send_path(const char* path, float value)
 {
-  if (!path || !deck_state_rx_armed()) {
+  if (!path || !deck_state_rx_armed() || !claim_tx_ok()) {
     return false;
   }
   const int16_t idx = map_index_for_path(path);

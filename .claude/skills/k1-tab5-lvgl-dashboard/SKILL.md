@@ -9,22 +9,9 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 Use this skill for the Tab5 LVGL dashboard that controls K1.
 
-## Pre-code optical gate REQUIRED (via UI router)
-
-**HARD BLOCK:** Before any design→code / look / type / geometry / soft-key chrome
-edits on this surface, enter via
-[`spectrasynq-ui-router`](../spectrasynq-ui-router/SKILL.md), which mandates
-**PASS** of
-[`spectrasynq-ui-precode-optical-gate`](../spectrasynq-ui-precode-optical-gate/SKILL.md)
-as the first hop. Do not skip the router and self-grant unlock.
-
-- Router: `.claude/skills/spectrasynq-ui-router/SKILL.md`
-- Canon: `docs/canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md`
-- Process: `docs/process/SPECTRASYNQ-UI-PRECODE-OPTICAL-GATE.md`
-- PASS keys: `OPTICAL_GATE_RECEIPT.md` + SHA-pinned `MEASURED.json` + crops — not prose
-- Declare tier T0/T1/T2; undeclared = T0
-- This skill is for **implementation after** optical PASS — it does not replace the gate
-  or own UI skill dispatch (router does)
+For procedural/ambient dashboard motion, also invoke
+`tab5-embedded-ui-motion-gate`. Static layout proof is necessary but cannot pass
+the on-glass motion rail.
 
 ## Canon
 
@@ -58,6 +45,12 @@ If visual HTML is in scope, obey any protected-source instructions exactly. A pr
 5. Keep text inside bounds at 1280x720. Prefer shorter labels and stable widths over shrinking via viewport tricks.
 6. British spelling: `COLOUR`, `initialise`, `behaviour`, `centre`.
 7. Do not display loop-iteration counts as FPS. If the header shows FPS, use the dashboard frame interval or explicit display-flush telemetry, and expose the value through `UI_STATUS`.
+8. Present complete frames. The production Tab5 path is full logical RGB565 ->
+   PPA rotation -> hidden double DSI framebuffer -> VSYNC retirement. Do not
+   reintroduce partial scanout or RGB565 byte swapping.
+9. LVGL has one owner: loopTask. Radio callbacks enqueue bounded records only.
+10. Primary and Secondary palette previews must consume the same spatial/light
+    field. Similar speeds or separately seeded phases are not synchronisation.
 
 ## Battery Header Pattern
 
@@ -87,4 +80,7 @@ python3 tests/test_sb_tab5_wireless_controller_static.py
 pio run -e tab5 -d sb-tab5-wireless-controller
 ```
 
-If controls changed, run the live harness. If layout changed materially, capture/display the Tab5 page at 1280x720 or provide device evidence that the screen renders without overlap.
+If controls changed, run the live harness. If layout changed materially,
+capture/display the Tab5 page at 1280x720 and provide device evidence that the
+screen renders without overlap. If motion changed, follow the two-rail motion
+gate and do not claim perceptual success from a still or host test alone.

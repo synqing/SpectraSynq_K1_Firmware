@@ -73,9 +73,14 @@ def _filter_archive(
 
 def main() -> None:
     project_dir = Path(env["PROJECT_DIR"])
-    package_root = project_dir / "vendor" / "pio_packages"
-    archive_tool = package_root / "toolchain-riscv32-esp" / "bin" / "riscv32-esp-elf-ar"
-    lib_dir = package_root / "framework-arduinoespressif32-libs" / "esp32p4" / "lib"
+    platform = env.PioPlatform()
+    toolchain_dir = platform.get_package_dir("toolchain-riscv32-esp")
+    framework_libs_dir = platform.get_package_dir("framework-arduinoespressif32-libs")
+    if not toolchain_dir or not framework_libs_dir:
+        print("[tab5_archives] unresolved PlatformIO package directory", file=sys.stderr)
+        env.Exit(1)
+    archive_tool = Path(toolchain_dir) / "bin" / "riscv32-esp-elf-ar"
+    lib_dir = Path(framework_libs_dir) / "esp32p4" / "lib"
     output_dir = project_dir / ".pio" / "generated" / "tab5_p4"
 
     if not archive_tool.exists():

@@ -1,0 +1,490 @@
+{
+  "coverage": [
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M8",
+    "M9"
+  ],
+  "mutation_count": 35,
+  "mutations": [
+    {
+      "after_sha256": "72e22e1b361598c28c280497dc7f89279670147ed0104fc03d42bb17c6cef856",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "deck_mutation"
+    },
+    {
+      "after_sha256": "998d78998284dd56321dfd73b78f3a142e88a035ad2c749f418d96fe60a4eeb9",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "lvgl_mutation"
+    },
+    {
+      "after_sha256": "28d217143ffb6e65d4083c77173c26e5e7034a01ceddafbc1653aef8a8906e4d",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "string_allocation"
+    },
+    {
+      "after_sha256": "cc3d224ebb945f6b3db3ca37d477475594cadf7658ad345d61021312905720da",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "byte_logging"
+    },
+    {
+      "after_sha256": "fa18a5f18207eb141b564ab48f0c60350a97ee89cb26f9b303c6ecd2b572ff48",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "hci_work"
+    },
+    {
+      "after_sha256": "d28c4ad1d7a09c3636d2a143ddd1865db9d6888e0da0a20958ec894f6b3d869f",
+      "before_sha256": "0c534fedbc79b2f9c54e3e27406750b1f0d87dfd75463faa7f6100a495104640",
+      "changed": true,
+      "finding": "M1",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M1"
+      ],
+      "target": "callback_specimen.cpp",
+      "variant": "lifecycle_work"
+    },
+    {
+      "after_sha256": "7cee329f767ea9a960be0ba1be91c9b5c5c941d8bcd86da7f9bfd1ecf45557d2",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M2",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M2"
+      ],
+      "target": "contract_policy.json",
+      "variant": "double_connect_owner"
+    },
+    {
+      "after_sha256": "8ea6de113995b5ccf8de431cf9017005f22c5b47ae948ebd7e860ea23ee93966",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M3",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M3"
+      ],
+      "target": "contract_policy.json",
+      "variant": "silent_queue_drop"
+    },
+    {
+      "after_sha256": "48dbddd7ca99b76d7a1722d9adfc0330a16770194e8c7e49ebbff25d3785d6ff",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M3",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M3"
+      ],
+      "target": "contract_policy.json",
+      "variant": "silent_oversize"
+    },
+    {
+      "after_sha256": "607894cef7f0e30fe1d03b58a5bacc9bd2d7c61b3fe1d5ea74ad766fa8f33b2d",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M4",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M4",
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "early_snapshot_apply"
+    },
+    {
+      "after_sha256": "da6cb5585b6513d80b522e01053f4b05454320110f11f8fa1e8c882a00126952",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "count"
+    },
+    {
+      "after_sha256": "51910f73df32c4e1b56a28f5039846307ede4e33d35fd122175dce2006d37e21",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "length"
+    },
+    {
+      "after_sha256": "c7dd9c2852ab9c0ab4e97de456f94a296e4049af7fb207195657a87117929b65",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "crc"
+    },
+    {
+      "after_sha256": "c2f9350501b341f7a278c1d2e5304e144d87a59ffa2794ed3e504be46285050f",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "generation"
+    },
+    {
+      "after_sha256": "2b0b83494f770c279600c11fe716da164cc1503b271ea8801b86fc9fb1057b4e",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "required"
+    },
+    {
+      "after_sha256": "bf4abbefd9640707392146f370a93939b51153f30725d325978c7f9692d54714",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "duplicate"
+    },
+    {
+      "after_sha256": "ef08c52025f7a9b4178d1a8c6da4a760bdcdad6d845ee7014236c165ee6713d5",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "unknown"
+    },
+    {
+      "after_sha256": "5ba96f8bd8935e64edfdcf1d0c448754920b7ebfa595199893ec341536130272",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M5",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M5"
+      ],
+      "target": "contract_policy.json",
+      "variant": "range"
+    },
+    {
+      "after_sha256": "0bc93eeac790d0a90c50dc9a195efb46325a7392b6dd82fd22e680d06217bc5a",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M6",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M6"
+      ],
+      "target": "contract_policy.json",
+      "variant": "partial"
+    },
+    {
+      "after_sha256": "af04ac539a2c1720e9749d4678896000fba58e2ab4ea0143e15af356481a4b34",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M6",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M6"
+      ],
+      "target": "contract_policy.json",
+      "variant": "stale"
+    },
+    {
+      "after_sha256": "11b411ec9370cbb69d14e4b2a541092c91bb4ae176f2c50cec62efd9d9e6197a",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M6",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M6"
+      ],
+      "target": "contract_policy.json",
+      "variant": "out_of_order"
+    },
+    {
+      "after_sha256": "16f5d6b0116f29950eec33dbdd842a538f8641b620d9230e9ca39c0ff03d4991",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M6",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M6"
+      ],
+      "target": "contract_policy.json",
+      "variant": "gap"
+    },
+    {
+      "after_sha256": "9a7458f67abdbf1c9b6beabcca53ea976937151d1a652d0083e1edf5ce9df026",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M6",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M6"
+      ],
+      "target": "contract_policy.json",
+      "variant": "cross_generation"
+    },
+    {
+      "after_sha256": "97a5d9b17cff9fd018c5690f8dc79f887e310d5d0363d28ffbd5d2d2d8a656f4",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M7",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M7"
+      ],
+      "target": "contract_policy.json",
+      "variant": "unknown_handle"
+    },
+    {
+      "after_sha256": "457a431879423ae8f2c9941ece5bab3846b55e2814799bda5a1f7af1a743f2f5",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M7",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M7"
+      ],
+      "target": "contract_policy.json",
+      "variant": "transient_backoff"
+    },
+    {
+      "after_sha256": "cb51b3787fc30d4a78bd24b8122eadfcbfdf69893c264c6d745c267e7c2becc7",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M7",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M7"
+      ],
+      "target": "contract_policy.json",
+      "variant": "fatal_suspend"
+    },
+    {
+      "after_sha256": "65cf98c2b9544796832a5dca8d4eb794cb438a7d8f9959d3f07430490ba352c5",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M7",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M7"
+      ],
+      "target": "contract_policy.json",
+      "variant": "stale_completion"
+    },
+    {
+      "after_sha256": "a136e361aec21b08d5ce1a555bdd856707f3c09054207de79eef090e3293df2f",
+      "before_sha256": "2ca44becdcbe8588c6fc875edbfe05e959efe5c9533f3a163e4d528c193da40d",
+      "changed": true,
+      "finding": "M7",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M7"
+      ],
+      "target": "contract_policy.json",
+      "variant": "multiple_inflight"
+    },
+    {
+      "after_sha256": "d3b231b278fda694ebdf14e4bbffa5cfb0e320738e87c65212035ae55944a8ad",
+      "before_sha256": "436aee3cfe601af9d7daf9cbbf1b9d90908ca3722d262020fac30d487749c1cc",
+      "changed": true,
+      "finding": "M8",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M8"
+      ],
+      "target": "platformio.ini",
+      "variant": "production_hci_enabled"
+    },
+    {
+      "after_sha256": "15e8b274b87f9934aa56b909c01f3db0ba14a76d26974d10f0941b986acb11f7",
+      "before_sha256": "436aee3cfe601af9d7daf9cbbf1b9d90908ca3722d262020fac30d487749c1cc",
+      "changed": true,
+      "finding": "M8",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M8"
+      ],
+      "target": "platformio.ini",
+      "variant": "production_value_diag_enabled"
+    },
+    {
+      "after_sha256": "b232590bd0e8bc30e46e43286a1239d2921e3746a779cfbdb1c14dedf8be91ff",
+      "before_sha256": "20b1412a0b8ca25254da8c99061bfccb8304d7438059a1e1fd6f69009a22a574",
+      "changed": true,
+      "finding": "M9",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M9"
+      ],
+      "target": "source_manifest.txt",
+      "variant": "protocol_missing"
+    },
+    {
+      "after_sha256": "b044b747d3d47a6cfdbc5fb4722a330e565421b98de00f7e75cb8478e51775b6",
+      "before_sha256": "20b1412a0b8ca25254da8c99061bfccb8304d7438059a1e1fd6f69009a22a574",
+      "changed": true,
+      "finding": "M9",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M9"
+      ],
+      "target": "source_manifest.txt",
+      "variant": "configuration_missing"
+    },
+    {
+      "after_sha256": "04a84fbb5aba195ed6d15d8fc0ae9bf8ffd83b2e53b39826d9337fc59e9c359c",
+      "before_sha256": "41a5dea05da7c66186559e982ed1065ecf74d9241046d4767ea30f9563e55292",
+      "changed": true,
+      "finding": "M9",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M9"
+      ],
+      "target": "source_parity/tab5_map.h",
+      "variant": "tab5_map_drift"
+    },
+    {
+      "after_sha256": "2dc286e2285de28419e24476df64c41464eaa53fb80c291ecd808330576d2193",
+      "before_sha256": "2bdadaf8e8cb51c09b10e810b5dc068cdb198d7da655bf534ff9e1426e3bc86a",
+      "changed": true,
+      "finding": "M9",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M9"
+      ],
+      "target": "source_parity/map.json",
+      "variant": "json_map_drift"
+    },
+    {
+      "after_sha256": "ebcaaf5988632211a9399c6e5437c825fc72af84a984985cc98c91883806c2e7",
+      "before_sha256": "a8408a29f90b24ee3f17323351499b0e22f86e62367b527e710c6e81567c6b3a",
+      "changed": true,
+      "finding": "M9",
+      "killed": true,
+      "mutation_error": null,
+      "observed_findings": [
+        "M9"
+      ],
+      "target": "source_parity/tab5_identity.h",
+      "variant": "identity_drift"
+    }
+  ],
+  "no_fail_everything_oracle": true,
+  "passed": true,
+  "positive_control": {
+    "failed_findings": [],
+    "finding_details": {
+      "M1": [],
+      "M2": [],
+      "M3": [],
+      "M4": [],
+      "M5": [],
+      "M6": [],
+      "M7": [],
+      "M8": [],
+      "M9": []
+    },
+    "passed": true
+  },
+  "schema": "spectrasynq-tab5-gate1-mutations-v1"
+}

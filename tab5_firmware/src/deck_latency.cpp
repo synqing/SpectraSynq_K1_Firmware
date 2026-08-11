@@ -5,6 +5,10 @@
 #include <Arduino.h>
 #include <string.h>
 
+#ifndef TAB5_BLE_VERBOSE_DIAG
+#define TAB5_BLE_VERBOSE_DIAG 0
+#endif
+
 namespace {
 
 constexpr uint32_t kRing = 128;
@@ -81,10 +85,12 @@ void deck_latency_note_t0(DeckControlId id, uint16_t map_index, int32_t value_i3
   s.has_t0 = true;
   s.has_t2 = false;
   ++gWrite;
+#if TAB5_BLE_VERBOSE_DIAG
   Serial.printf("DECK_LAT: evt=T0 map=%u val=%ld t0_us=%lu\n",
                 static_cast<unsigned>(map_index),
                 static_cast<long>(value_i32),
                 static_cast<unsigned long>(s.t0_us));
+#endif
 }
 
 void deck_latency_note_t2(DeckControlId id, uint16_t map_index, int32_t value_i32) {
@@ -92,10 +98,12 @@ void deck_latency_note_t2(DeckControlId id, uint16_t map_index, int32_t value_i3
   const int idx = find_open_t0(map_index, value_i32);
   const uint32_t now = micros();
   if (idx < 0) {
+#if TAB5_BLE_VERBOSE_DIAG
     Serial.printf("DECK_LAT: evt=T2_orphan map=%u val=%ld t2_us=%lu\n",
                   static_cast<unsigned>(map_index),
                   static_cast<long>(value_i32),
                   static_cast<unsigned long>(now));
+#endif
     return;
   }
   Sample& s = gRing[idx];
@@ -109,6 +117,7 @@ void deck_latency_note_t2(DeckControlId id, uint16_t map_index, int32_t value_i3
     ++gE2eCount;
   }
   ++gComplete;
+#if TAB5_BLE_VERBOSE_DIAG
   Serial.printf(
       "DECK_LAT: evt=T2 map=%u val=%ld t0_us=%lu t2_us=%lu e2e_us=%lu e2e_ms=%.2f n=%lu\n",
       static_cast<unsigned>(map_index),
@@ -118,6 +127,7 @@ void deck_latency_note_t2(DeckControlId id, uint16_t map_index, int32_t value_i3
       static_cast<unsigned long>(e2e),
       e2e / 1000.0f,
       static_cast<unsigned long>(gComplete));
+#endif
 }
 
 void deck_latency_dump_summary(void) {

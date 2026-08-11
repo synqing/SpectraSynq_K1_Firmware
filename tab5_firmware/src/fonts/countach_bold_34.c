@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 34 px
  * Bpp: 4
- * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 34 --font /Users/spectrasynq/Downloads/countach-font-family/Countach-Bold-TRIAL-BF63c5f2076e572.otf -r 0x20,0x2D,0x30-0x39,0x41-0x5A --lv-font-name countach_bold_34 -o /Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware/src/fonts/countach_bold_34.c
+ * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 34 --font Countach-Bold-TRIAL-BF63c5f2076e572.otf -r 0x20,0x2D,0x30-0x39,0x41-0x5A --lv-font-name countach_bold_34 -o src/fonts/countach_bold_34.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -1147,4 +1147,3 @@ lv_font_t countach_bold_34 = {
 
 
 #endif /*#if COUNTACH_BOLD_34*/
-

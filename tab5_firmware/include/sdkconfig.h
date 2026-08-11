@@ -31,7 +31,7 @@
   #ifdef CONFIG_ESP_HOST_WIFI_ENABLED
   #undef CONFIG_ESP_HOST_WIFI_ENABLED
   #endif
-  // Provide SDIO defaults for ESP-Hosted on Tab5 (ESP32-P4 host)
+  // Provide SDIO defaults for ESP-Hosted on Tab5 (ESP32-P4 host).
   #if defined(CONFIG_IDF_TARGET_ESP32P4)
     #ifndef CONFIG_ESP_SDIO_PIN_CLK
     #define CONFIG_ESP_SDIO_PIN_CLK 12
@@ -57,10 +57,10 @@
   #endif
 #endif
 
-// Pull in the actual sdkconfig generated for this build
+// Pull in the actual sdkconfig generated for this build.
 #include_next <sdkconfig.h>
 
-// Arduino BLE headers alias CONFIG_NIMBLE_ENABLED → CONFIG_BT_NIMBLE_ENABLED.
+// Arduino BLE headers alias CONFIG_NIMBLE_ENABLED to CONFIG_BT_NIMBLE_ENABLED.
 #if defined(CONFIG_BT_NIMBLE_ENABLED) && !defined(CONFIG_NIMBLE_ENABLED)
 #define CONFIG_NIMBLE_ENABLED CONFIG_BT_NIMBLE_ENABLED
 #endif

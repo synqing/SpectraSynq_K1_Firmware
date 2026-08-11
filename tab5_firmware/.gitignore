@@ -1,5 +1,14 @@
 # PlatformIO / build output
 .pio/
+vendor/
+components/
+_scratch/
+build.log
+platformio.ini.working
+src/*.bak
+src/*.orig
+_retired_fonts_pre_countach/
+fonts_unused/
 .ccls-cache/
 .vscode/
 cmake-build-*/

@@ -23,7 +23,7 @@ public:
 
 private:
   LvglTouchDriver() = default;
-  
+
   lv_indev_t* indev_ = nullptr;
 };
 

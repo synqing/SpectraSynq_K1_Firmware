@@ -4,10 +4,12 @@ set -euo pipefail
 # Flashing helper for ESP32-P4 (Tab5) using PlatformIO build artifacts.
 #
 # Usage:
-#   scripts/flash_tab5_p4.sh [--port /dev/tty.usbmodemXXXX] [--baud 1500000]
+#   scripts/flash_tab5_p4.sh --port /dev/tty.usbmodemXXXX [--baud 1500000]
+#                              [--verify-only]
 #
-# Defaults:
-#   PORT: auto-detected (tty.usbmodem*, tty.usbserial*, tty.SLAB*)
+# Safety:
+#   PORT: required; auto-detection is forbidden
+#   TARGET: ESP32-P4 with MAC 30:ed:a0:e0:c1:a0 only
 #   BAUD: 1500000
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -17,6 +19,8 @@ FLASHER_JSON="${BUILD_DIR}/flasher_args.json"
 
 PORT=""
 BAUD="1500000"
+EXPECTED_MAC="30:ed:a0:e0:c1:a0"
+VERIFY_ONLY=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -24,6 +28,8 @@ while [[ $# -gt 0 ]]; do
       PORT="$2"; shift 2;;
     --baud)
       BAUD="$2"; shift 2;;
+    --verify-only)
+      VERIFY_ONLY=true; shift;;
     -h|--help)
       grep '^#' "$0" | sed -e 's/^# \{0,1\}//'; exit 0;;
     *)
@@ -32,17 +38,15 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$PORT" ]]; then
-  # Try common macOS/Linux patterns
-  for pat in /dev/tty.usbmodem* /dev/tty.usbserial* /dev/tty.SLAB* /dev/ttyACM* /dev/ttyUSB*; do
-    match=( $pat )
-    if [[ -e "${match[0]:-}" ]]; then
-      PORT="${match[0]}"; break
-    fi
-  done
+  echo "Error: --port is required; target auto-detection is forbidden." >&2
+  exit 1
 fi
-
-if [[ -z "$PORT" ]]; then
-  echo "Error: Could not auto-detect serial port. Use --port." >&2
+if [[ ! -c "$PORT" ]]; then
+  echo "Error: explicit port is not a character device: $PORT" >&2
+  exit 1
+fi
+if [[ ! "$BAUD" =~ ^[0-9]+$ ]]; then
+  echo "Error: --baud must be an integer." >&2
   exit 1
 fi
 
@@ -185,18 +189,46 @@ if (( ${#FLASH_IMAGES[@]} == 0 )); then
   exit 1
 fi
 
-# Prefer esptool.py from PATH, then the repo-vendored Python shim used by
-# PlatformIO, then Python module fallback.
+# Prefer esptool from PATH, then the pinned PlatformIO environment, then a
+# Python module fallback. No repository-local extracted package is permitted.
 if command -v esptool.py >/dev/null 2>&1; then
   ESPTOOL=( esptool.py )
 elif command -v esptool >/dev/null 2>&1; then
   ESPTOOL=( esptool )
-elif [[ -x "${PROJ_DIR}/vendor/python/python" && -f "${PROJ_DIR}/vendor/pio_packages/tool-esptoolpy/esptool.py" ]]; then
-  ESPTOOL=( "${PROJ_DIR}/vendor/python/python" "${PROJ_DIR}/vendor/pio_packages/tool-esptoolpy/esptool.py" )
-elif [[ -x "${HOME}/.platformio/penv/bin/python" && -f "${PROJ_DIR}/vendor/pio_packages/tool-esptoolpy/esptool.py" ]]; then
-  ESPTOOL=( "${HOME}/.platformio/penv/bin/python" "${PROJ_DIR}/vendor/pio_packages/tool-esptoolpy/esptool.py" )
+elif [[ -x "${HOME}/.platformio/penv/bin/python" ]]; then
+  ESPTOOL=( "${HOME}/.platformio/penv/bin/python" -m esptool )
 else
   ESPTOOL=( python -m esptool )
+fi
+
+echo "Verifying ESP32-P4 identity before write..."
+if ! IDENTITY_OUTPUT=$("${ESPTOOL[@]}" \
+    --chip esp32p4 --port "$PORT" read_mac 2>&1); then
+  printf '%s\n' "$IDENTITY_OUTPUT" >&2
+  echo "Error: target identity probe failed; nothing was written." >&2
+  exit 1
+fi
+printf '%s\n' "$IDENTITY_OUTPUT"
+IDENTITY_NORMALISED=$(printf '%s' "$IDENTITY_OUTPUT" | tr '[:upper:]' '[:lower:]')
+if { [[ "$IDENTITY_NORMALISED" != *"chip type:"*"esp32-p4"* ]] &&
+     [[ "$IDENTITY_NORMALISED" != *"chip is esp32-p4"* ]]; } ||
+   [[ "$IDENTITY_NORMALISED" != *"mac:"*"$EXPECTED_MAC"* ]]; then
+  echo "Error: refusing target; expected ESP32-P4 MAC $EXPECTED_MAC." >&2
+  exit 1
+fi
+
+for required_offset in 0x2000 0x8000 0x10000; do
+  if ! has_offset "$required_offset"; then
+    echo "Error: incomplete flash plan; missing image at $required_offset." >&2
+    exit 1
+  fi
+done
+
+echo "Verified target: ESP32-P4 MAC $EXPECTED_MAC"
+shasum -a 256 "${BUILD_DIR}/firmware.elf" "${BUILD_DIR}/firmware.bin" 2>/dev/null || true
+if $VERIFY_ONLY; then
+  echo "Identity and flash plan verified; --verify-only requested, nothing written."
+  exit 0
 fi
 
 set -x

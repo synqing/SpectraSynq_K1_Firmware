@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 89 px
  * Bpp: 4
- * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 89 --font /Users/spectrasynq/Downloads/countach-font-family/Countach-BoldItalic-TRIAL-BF63c5f2076e1b8.otf -r 0x20,0x2D,0x30-0x39 --lv-font-name countach_bolditalic_89 -o src/fonts/countach_bolditalic_89.c
+ * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 89 --font Countach-BoldItalic-TRIAL-BF63c5f2076e1b8.otf -r 0x20,0x2D,0x30-0x39 --lv-font-name countach_bolditalic_89 -o src/fonts/countach_bolditalic_89.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -1899,4 +1899,3 @@ lv_font_t countach_bolditalic_89 = {
 
 
 #endif /*#if COUNTACH_BOLDITALIC_89*/
-

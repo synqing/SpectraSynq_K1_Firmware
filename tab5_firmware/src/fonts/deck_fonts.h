@@ -3,8 +3,9 @@
  * Deck font declarations — Countach Bold Italic (hero numerals) + Berkeley Mono (all words).
  * Generated/updated by tools/deck_fonts.sh. Do not hand-edit glyph .c files.
  *
- * LICENCE: Countach assets currently from TRIAL OTFs — bench eval flashes only.
- * After Captain licence lands, re-run deck_fonts.sh against licensed binaries.
+ * LICENCE: selected Countach and Berkeley Mono source inventories are marked
+ * TRIAL — bench evaluation flashes only. After embedded commercial licences
+ * land, re-run deck_fonts.sh against the licensed binaries.
  *
  * Canon: Countach Bold Italic = mode/palette index numerals ONLY (unified DISPLAY_55).
  *        Berkeley Mono        = every word (names, labels, keys, brand, state).

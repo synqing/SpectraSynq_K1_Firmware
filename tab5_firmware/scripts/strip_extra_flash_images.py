@@ -13,16 +13,13 @@ def sanitize_flash_images():
     generated bootloader in the upload set at the offset declared by
     flasher_args.json.
     """
-    project_dir = env.subst("$PROJECT_DIR")
     build_dir = env.subst("$BUILD_DIR")
 
     partitions_path = join(build_dir, "partitions.bin")
     bootloader_path = join(build_dir, "bootloader.bin")
+    framework_dir = env.PioPlatform().get_package_dir("framework-arduinoespressif32")
     boot_app0_path = join(
-        project_dir,
-        "vendor",
-        "pio_packages",
-        "framework-arduinoespressif32",
+        framework_dir or "",
         "tools",
         "partitions",
         "boot_app0.bin",
