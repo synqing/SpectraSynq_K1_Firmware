@@ -119,3 +119,29 @@ inverted would have silently accepted a starved acoustic path. Guards need their
 negative control.
 
 ---
+
+## Volume sweep + final verification, 2026-08-12 (firmware `3a6098a`, frac 2.5)
+
+| leg | silence | silent_scale | max_raw p50 / max | cleared 2.5×SSL |
+|---|---|---|---|---|
+| quiet (35f) | **100.0%** | **0.00** | 48 / 125 | **0/35** |
+| music vol40 (26f) | **0.0%** | **1.00** | 258 / 546 | 9/26 |
+| music vol30 (26f) | **0.0%** | **1.00** | 164 / 412 | 1/26 |
+
+P1 **PASS** (100% ≥ 95%) · P2 **PASS** (100% ≥ 80%) · P5 **PASS** (silent_scale 0.00).
+
+Wakes reliably down to volume 30. At the previous frac of 4.0, volume 40 cleared only
+2 frames of 26 and survived solely on the 5 s dwell latch.
+
+**Correction to the earlier result section above:** the quiet-room residual was NOT the
+legacy RMS Schmitt. `rms_raw` never exceeded 0.0386 against an EXIT of 0.08 in any leg at
+any volume — that path does not fire at these levels at all. The earlier 88.9% was
+post-flash dwell settling measured too soon after a music leg.
+
+**Open — the transfer question.** `frac` is recorded here as per-unit/per-room, but bench
+K1v2 runs the same AP code, same gain and same cadence, differing only in LED count
+(160 vs 206), capsule (LEFT vs RIGHT) and PDM pin map. If the same measurement on bench
+yields the same ×SSL distributions, the fraction transfers and the per-unit framing is
+wrong. Three candidate mechanisms if it does not: LED current coupling into the mic supply
+(206 px is ~29% more current on the noisiest rail), capsule-to-capsule sensitivity, PDM
+trace routing. Not yet run.
