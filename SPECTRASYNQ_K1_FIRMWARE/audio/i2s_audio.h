@@ -897,7 +897,8 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     static bool k1_rms_silent_state = false;
     if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
-        (float)max_waveform_val_raw >= K1_SILENCE_PEAK_MIN_RAW) {
+        (float)max_waveform_val_raw >=
+            (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
         k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
     } else if (k1_rms_silent_state) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above

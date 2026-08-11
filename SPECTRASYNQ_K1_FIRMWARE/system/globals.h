@@ -724,9 +724,27 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 //     music   max_raw mean 446, max 1611
 // Quiet-room peakiness spikes occur at low absolute level; music has BOTH.
 // Requiring both axes kills the false-wake without touching music sensitivity.
-// Floor set to 500: ~1.46x above the highest quiet frame observed, and well
-// inside the music distribution.
-inline float    K1_SILENCE_PEAK_MIN_RAW = 500.0f;  // peakiness may only break silence at/above this level
+// SSL-RELATIVE, not absolute (canon HF-3). An earlier revision of this gate used
+// an absolute floor of 500.0f. That was disproven on-device within the hour: a
+// recalibration moved the operating point down ~5.3x (quiet max_raw p50 254 -> 48)
+// and music at a normal listening level stopped clearing the fixed floor entirely
+// — silence held 100% THROUGH MUSIC. An absolute constant cannot survive a
+// calibration change; a fraction of the learned floor can.
+//
+// Measured on Unit 2 after the 2026-08-11 recalibration (SSL=53), as multiples of SSL:
+//     quiet room   p50 0.91   p90 1.64   max  2.72
+//     music vol70  p50 13.96  p90 25.19  max 32.43
+// Separation between quiet's worst frame and music's median is a factor of 5.1.
+// Geometric midpoint sqrt(2.72 x 13.96) = 6.16 -> 6.0, giving 2.2x margin below
+// quiet's worst frame and 2.3x above music's median (symmetric in log space,
+// the correct space for a ratio-scaled quantity).
+//
+// DIVERGENCE FROM CANON, deliberate and recorded: SESSION_CANON_2026-08-07 seeds
+// this at 1.25. That seed does not hold here — at 1.25 the threshold (66) falls
+// between this room's quiet p50 (48) and p90 (87). The seed was derived on bench
+// B489A500 in a different room. The composition is unchanged; only the fraction is
+// re-derived. See docs/forensics/unit2-joint-silence-predictions-2026-08-11.md
+inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 6.0f;  // peakiness may only break silence at/above SSL x this
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
