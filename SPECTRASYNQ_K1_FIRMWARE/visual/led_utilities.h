@@ -287,14 +287,11 @@ inline CRGB16 lerp_led_16(SQ15x16 index, CRGB16* led_array) {
   int32_t index_right = index_whole + 1;
 
   // Bounds guard (audit M1.3): every CRGB16 buffer is NATIVE_RESOLUTION-sized, so
-  // an out-of-range index must not read one past the buffer. LATENT in ALL current
-  // configs — SECONDARY_LED_COUNT is hardcoded == NATIVE_RESOLUTION (globals.h) so
-  // the only caller's lerp else-branch is dead, and the custom-224 build drops the
-  // secondary channel. This is defensive hardening that becomes LIVE only if a
-  // secondary strip with SECONDARY_LED_COUNT > NATIVE_RESOLUTION, or a new
-  // out-of-range caller, is ever added. No-op for valid in-range indices
-  // (byte-identical for the shipping 160 config); at the top edge it clamps to the
-  // edge pixel, matching scale_to_strip's existing index_right guard.
+  // an out-of-range index must not read one past the buffer. LIVE for dual-206
+  // (SECONDARY_LED_COUNT=206 > NATIVE_RESOLUTION) via scale_to_secondary_strip().
+  // No-op for valid in-range indices (byte-identical for the shipping 160 config);
+  // at the top edge it clamps to the edge pixel, matching scale_to_strip's
+  // existing index_right guard.
   if (index_left  < 0) index_left  = 0;
   if (index_right < 0) index_right = 0;
   if (index_left  > NATIVE_RESOLUTION - 1) index_left  = NATIVE_RESOLUTION - 1;
@@ -881,8 +878,8 @@ inline void init_lerp_params() {
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
 #ifdef K1_CUSTOM_LED_V1
-            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
-            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
+            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the dual-206
+            // custom build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
             // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
             // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
             // flag-gated to keep those builds byte-identical.

@@ -437,6 +437,11 @@ void init_system() {
   // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
+#ifdef K1_CUSTOM_LED_V1
+  // Dual-206: keep FastLED power cap at 2.5 A total @ 5 V even if a persisted
+  // save carried a lower product default. Matches dual-214 precedent.
+  CONFIG.MAX_CURRENT_MA = 2500;
+#endif
   enforce_compiled_audio_timing_config();
 
   // STANDBY_DIMMING STRUCK 2026-08-09: ignore any NVS/stored true from old configs.
