@@ -157,8 +157,9 @@ class TestDeckStateV1(unittest.TestCase):
         self.assertNotIn("deck_ui_", callback_block)
         self.assertNotIn("gConnected =", callback_block)
         self.assertNotIn("gConnHandle =", callback_block)
-        for event_type in ("StateChunk", "Connected", "Disconnected"):
-            self.assertIn(f"HostEventType::{event_type}", callback_block)
+        self.assertIn("PayloadEventType::State", callback_block)
+        for event_type in ("Connected", "Disconnected"):
+            self.assertIn(f"LinkEventType::{event_type}", callback_block)
 
         tick_block = transport[
             transport.index("void tick()") : transport.index("bool ready()")
@@ -166,7 +167,8 @@ class TestDeckStateV1(unittest.TestCase):
         self.assertIn("drain_host_events()", tick_block)
         self.assertIn("deck_state_rx_on_packet", transport)
         self.assertIn("xQueueCreateStatic", transport)
-        self.assertIn("kHostEventReservedLinkSlots", transport)
+        self.assertIn("kLinkQueueCapacity", transport)
+        self.assertIn("kPayloadQueueCapacity", transport)
 
     def test_tab5_unknown_rssi_handle_transitions_to_disconnected(self):
         """A dead controller handle must stop the 500 ms Read RSSI retry loop."""
@@ -174,11 +176,12 @@ class TestDeckStateV1(unittest.TestCase):
             ROOT / "tab5_firmware" / "src" / "ble_midi_transport.cpp"
         ).read_text()
         rssi = transport[
-            transport.index("bool connectionRssi") :
-            transport.index("uint8_t unitToMidi7")
+            transport.index("static void maintain_rssi") :
+            transport.index("static void refresh_identity_wire")
         ]
         self.assertIn("BLE_ERR_UNK_CONN_ID", rssi)
-        self.assertIn("apply_disconnected", rssi)
+        self.assertIn('deck_state_rx_on_ingress_loss("rssi_unknown_handle")', rssi)
+        self.assertIn('begin_controlled_recovery("RSSI_UNKNOWN_HANDLE")', rssi)
 
     def test_vivid_softkey_non_open_and_glass_forbidden(self):
         """Task 1.3 — VIVID non-open; chroma/sat remain glass-forbidden."""

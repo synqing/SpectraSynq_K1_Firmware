@@ -45,6 +45,9 @@ claim and does not supersede the G0–G3 receipts.
    discontinuity retain last-known-good state and require a complete resnapshot.
 10. **Never claim `fixed`, `fluid`, `organic`, `smooth`, `best`, or `production`
     beyond the evidence actually observed.**
+11. **The live Deck-state contract is 68 controls / `9b5db3...`.** The
+    71-control / `78fb9a...` registry is historical archaeology. Live
+    sender/receiver bytes outrank stale prose, memory, and branch ancestry.
 
 ## Incident and resolution inventory
 
@@ -53,7 +56,7 @@ claim and does not supersede the G0–G3 receipts.
 | 1 | `BLE_ERR_UNK_CONN_ID` repeated every ~0.5 s | `05 14 02 00 00` was HCI Read RSSI (`0x1405`) for handle `0x0000`; status `0x02` meant the controller no longer owned that connection. Handle zero itself is legal. | Cache RSSI; one bounded operation in flight; classify invalid handle and recover through the loop-owned state machine. | `test_tab5_g2_transport_static.py`; G2/G3 receipts. A prompt Command Complete proves the exchange, not connection health. |
 | 2 | IDLE0 watchdog named `nimble_host` | The RSSI spam was downstream smoke. The captured PC/RA symbolised to `lv_inv_area`; LVGL's assertion self-loop was entered because a NimBLE `onWrite` path changed widgets while loopTask rendered. | Callbacks enqueue bounded payload/link records only. loopTask drains and performs Deck/LVGL mutation. | G1 M1 mutants; G3 100-cycle silicon proof. Re-symbolise against the exact flashed ELF whenever image identity differs. |
 | 3 | Host state remained connected while the controller rejected handle zero | The wedged host could not run disconnect cleanup; `gConnected`/`gConnHandle` were also an unsynchronised cross-core pair. | One loop-owned connection state machine with handle + generation; callback events are tagged and deduplicated. | G1 M2/M7; G2 transport tests; G3 zero stale RSSI completions. |
-| 4 | Initial G0 source closure passed, then reopened | A clean build did not prove complete authority. `docs/protocol/k1-deck-state-v1.md` was absent and Tab5 carried a 68-control/old digest while K1 authority had 71 controls/new digest. | Track the protocol document; regenerate and checksum JSON, K1 header, Tab5 header, identity, and generator parity; rerun disposable empty-cache builds. | G0 reopen notice; G1 M9. Buildability is not protocol compatibility. |
+| 4 | Initial G0 source closure passed, then reopened | A clean build did not prove complete authority. A stale 71-control branch was mistaken for product truth and the live-proven 68-control Tab5 map was incorrectly classified as old. | Restore the 68-control contract, regenerate both headers, bind both identities and the receiver to `9b5db3...`, then verify the live Unit2 wire. | `tab5_protocol_parity_gate.py`; G1 M9. Buildability is not protocol compatibility, and newer ancestry is not necessarily authority. |
 | 5 | A G1 positive oracle risked becoming theatre | Current firmware initially violated the intended rules, so testing only an independent fixture could not claim source conformance. | Use the fixture to prove every mutant is detectable, then rerun unchanged oracles against hardened production source in G2. | 35/35 M1–M9 mutants killed; G1 claim boundary. |
 | 6 | Queue loss could silently continue | Drop/oversize counters alone do not preserve state consistency. | Any relevant loss sets a desynchronised latch, preserves last-known-good state, and blocks deltas until a complete valid snapshot commits. | G1 M3; transaction harness; G2 receipt. Queue depth is capacity tuning, not correctness. |
 | 7 | Snapshot and delta members could apply before transaction validation | Incremental mutation exposed partial state when END/CRC/count/member checks later failed. | Bounded static staging; validate the entire transaction before the first confirmed-state or LVGL mutation; commit once from loopTask. | G1 M4–M6; `deck_state_rx_transaction_harness.cpp`. |
@@ -75,6 +78,133 @@ claim and does not supersede the G0–G3 receipts.
 | 23 | Progress devolved into busy-work loops | After direct perceptual rejection, effort drifted toward more explanations, tests, and small parameter changes instead of changing what the user could see. | OODA re-entry: observe the current physical/native result, name the perceptual defect, choose the smallest mechanism-level change capable of falsifying it, act, and re-observe before claiming success. | Required by the motion skill and nested agent contract. More proof is valuable only when it can falsify the current claim. |
 | 24 | G3 receipt declared the lane closed beyond its durable evidence | The 100-cycle reconnect proof was strong, but the originally approved dense fault soak and 45–60-minute ordinary production soak were not completed; only identity-MD5 fault recovery is durably recorded. | Corrected the receipt to distinguish `WDT_RSSI_RECONNECT_REPAIR=PASS` from `FULL_G3_FAULT_AND_ORDINARY_SOAK=NOT_VERIFIED`. | Acceptance thresholds are immutable once execution begins. Missing rows produce PARTIAL/NOT_VERIFIED, never retroactive closure. |
 | 25 | A final P4 rebuild intermittently resolved the wrong shared framework package | The mutable global PlatformIO package cache had been replaced with Arduino 3.2.0 metadata while this project pins the official 3.3.1 archive. The checksum guard correctly refused to patch it. | Rebuilt with a dedicated empty `PLATFORMIO_CORE_DIR`; the isolated resolver fetched 3.3.1, passed every overlay checksum, and produced the final binary. | Release/source-closure builds must use an explicit task-owned PlatformIO core. A shared cache is an optimisation, never authority. |
+| 26 | Unit2 repeatedly linked, identified, then Tab5 terminated with `state_desynchronised` | Unit2 emitted the correct 68-control map while the flashed Tab5 interpreted a 71-control map. At index 16 the wire meant `primary.prism_count` / CC14, but Tab5 expected `primary.temporal_dithering` / BOOL. | Restore one 68-control JSON/header/identity/receiver contract and reflash only the identity-verified P4. | The parity gate regenerates and byte-compares both headers, checks both identity digests, claim-header parity, receiver count/digest, and kills a deliberate 71-control mutant. |
+| 27 | Source, staged state, committed state, and flashed image became difficult to distinguish | Multiple recovery edits accumulated in a dirty tree after earlier receipts and builds. A previously good commit did not include all intended palette, presenter, and Wi-Fi antenna work. | Reconstruct the intended diff from current source, receipts, build hashes, and device observations; preserve the later coherent state; commit it before integration. | Every runtime claim names source commit, dirty state, ELF/BIN hashes, target identity, and whether the capture predates later edits. |
+| 28 | A routine commit appeared to hang and became more process than product | The pre-commit hook captured a broad pytest run and emitted only its tail, so a cheap protocol contradiction waited behind an expensive opaque gate. | Add a sub-second protocol parity check before broad pytest/build work whenever coupled files are staged. | Fail fast on the precise 68/71 class; retain broad tests for the broader claims they actually cover. |
+| 29 | `ARMED` risked being reported as complete BLE control proof | `ARMED`, one snapshot commit, and zero faults prove admission and snapshot compatibility, but no operator delta had yet traversed the return path. | Freeze the claim boundary: full bidirectional proof requires `LIVE`, `sent>0`, and `delta_commit>0` after one harmless physical change. | The live-log mode of the parity gate validates the snapshot rail and deliberately does not upgrade it to delta proof. |
+| 30 | Bench discovery settings could be mistaken for production identity policy | Claim mode OPEN was useful for recovery and company ID `0xFFFF` is explicitly diagnostic/unassigned. | Keep both as named release risks; production defaults must use UNIT claim and an assigned company identifier. | Source parity checks mirrored claim headers but does not certify the placeholder as production-safe. |
+| 31 | “Everything passed” could overstate the actual close-out | The full root pytest was interrupted after 391 passing tests, dense fault injection and the 45–60 minute ordinary soak were not completed, and no harmless-control delta receipt was captured. | Record each as NOT VERIFIED rather than burying it under the successful build/flash/snapshot. | Acceptance evidence is additive: a focused fix can ship without inventing proof for adjacent unfinished gates. |
+| 32 | Focused regression failed after the hardened transport was already correct | Two static tests still searched for the retired `HostEventType::StateChunk` queue and expected HCI error handling inside the UI RSSI cache accessor. The implementation had split link/payload queues and moved HCI classification into `maintain_rssi()`. | Update assertions to verify the enduring safety boundary: callback copy-only queues, loop-owned drain, and controlled recovery on unknown handle. | Tests should bind to required behaviour and ownership seams, not obsolete internal names or a superseded function location. |
+
+## 2026-08-12 protocol and Git recovery closure
+
+This section supersedes every earlier statement that described 71 controls as
+the current K1/Tab5 authority.
+
+### Frozen product decision
+
+| Property | Current authority |
+|---|---|
+| Control count | **68** |
+| Registry MD5 | `9b5db3fbb17438367adeaceb541db03b` |
+| Unit2 proof | chip/unit `0C54FC00`, USB MAC `AC:A7:04:FC:54:0C` |
+| Tab5 proof | ESP32-P4 MAC `30:ed:a0:e0:c1:a0` |
+| Session ports | Unit2 `/dev/cu.usbmodem1101`; Tab5 `/dev/cu.usbmodem12401` |
+| Historical-only registry | 71 controls / `78fb9a...` |
+
+The contradiction was visible on the wire. Unit2 accepted the claim and
+identity, Tab5 logged `HELLO unit_proof=0C54FC00`, then rejected map index 16:
+
+```text
+invalid member path=primary.temporal_dithering map=16 type=4 expected=1
+```
+
+In the live 68-control sender, map index 16 is `primary.prism_count` encoded as
+CC14. The 71-control receiver reinterpreted the same index as
+`primary.temporal_dithering` encoded as BOOL. This was deterministic protocol
+misalignment, not radio instability, queue pressure, RSSI, or an unreliable
+Unit2.
+
+### Resolution and durable proof
+
+- Restored `docs/protocol/k1-ble-midi-map.json`, the K1 generated header, the
+  Tab5 generated header, both identity headers, and the receiver count/digest
+  to one 68-control contract.
+- Built the Tab5 P4 successfully: RAM `76,060 / 512,000`; flash
+  `1,347,463 / 3,145,728`.
+- Verified the P4 by MAC and flashed only `/dev/cu.usbmodem12401`.
+- Built image hashes: ELF
+  `a4642b7f0ca41bccf9286fc1d8ea45a76ac09fe180560dc5ead03c05380d266f`;
+  BIN `a15857b0483bf029bcfd411e32b571191259d620b6668a3914f60292c5ebedd5`.
+- Observed a valid post-flash snapshot:
+
+```text
+phase=ARMED armed=1 live=0 gen=5 rev=0 snap_commit=1 delta_commit=0
+snap_reject=0 map_mismatch=0 desync=0 recovery=0 invalid=0
+```
+
+- Committed the recovered source as `b1b32944`, merged through PR `#41`, and
+  integrated into `main` at `3628865e894648a0e8bea0bd530e67de242b7f9b`.
+
+### What the live proof does and does not establish
+
+The receipt proves the intended devices discovered each other, identity and map
+admission succeeded, and one complete snapshot committed without corruption or
+recovery. It does **not** prove the operator-to-K1 delta path, long-duration
+stability, production claim policy, or commercial company-ID readiness.
+
+Outstanding evidence remains explicit:
+
+1. make one harmless Unit2 control change and require `sent>0`, `phase=LIVE`,
+   and `delta_commit>0`;
+2. run 10–15 minutes of controlled fault injection;
+3. run 45–60 minutes of ordinary production operation;
+4. complete the root test suite that was interrupted after 391 passing tests;
+5. replace OPEN discovery and company ID `0xFFFF` before production release.
+
+### Mandatory future-agent workflow
+
+For every K1/Tab5 protocol edit or recovery:
+
+```text
+1. Identity: enumerate and verify chip/MAC; port names are observations.
+2. Wire: decode the first divergent packet/member before changing authority.
+3. Parity: run the fast source gate.
+4. Focused test: kill the exact failure class with a mutant.
+5. Build: record source commit/dirty state and isolated build hashes.
+6. Flash: pass the target port explicitly; never flash C6 or another K1 lane.
+7. Runtime: capture admission, snapshot, delta, fault counters, and claim boundary.
+8. Git: stage, inspect, commit, and integrate the exact source that built the image.
+```
+
+Fast source gate:
+
+```sh
+python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root .
+```
+
+Live receipt gate:
+
+```sh
+python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root . \
+  --serial-log /path/to/tab5-session.log
+```
+
+The pre-commit hook runs the source gate before broad pytest/build work whenever
+a coupled protocol file is staged. Its deliberate 71-control mutant must fail
+with `TAB5_HEADER_GENERATION_DRIFT`; a nonzero live invalid counter must fail
+with `LIVE_COUNTER_INVALID`.
+
+### Reasoning lessons frozen from the incident
+
+- **Systems:** the failure loop was stale authority → incompatible flash →
+  desynchronisation → more transport investigation → delayed correction.
+  The leverage point is parity before build, not more reconnect retries.
+- **Map–territory:** repository age, branch ancestry, documents, and memory are
+  maps. The decoded Unit2/Tab5 bytes are the compatibility territory.
+- **Archetypes:** “update everything to 71” was a Fix That Fails; broad tests
+  before a one-second parity check were Shifting the Burden.
+- **OODA:** observe identity and wire first, orient to the exact divergent map
+  member, decide which side violates the Captain-frozen contract, then change
+  and immediately re-observe the named devices.
+- **Steel-man:** 71 looked credible because it was newer, internally coherent,
+  and present in tracked K1 material. It still lost because the product decision
+  and live sender were 68.
+- **Red team:** mutate one coupled file to 71, mutate the identity digest, and
+  mutate a live fault counter. If any survives, the protection is decorative.
+- **Model combination:** use map–territory to select evidence, systems to place
+  the guard, OODA to minimise recovery time, and red-team mutants to prove the
+  guard detects the original class.
 
 ## Canonical architecture
 
@@ -227,6 +357,8 @@ a test that fails every mutant for the same unrelated reason is not evidence.
 | “Handle zero is invalid.” | Handle zero is legal. Status `0x02` says that specific controller connection does not exist now. |
 | “The watchdog named NimBLE, so BLE caused it.” | Symbolise the exact PC/RA. The task name identifies execution context, not root cause. |
 | “The port used to be different.” | Enumerate live devices and verify chip + MAC. Never target by remembered port. |
+| “The 71-control branch is newer, so it must be authoritative.” | Current product authority is 68 / `9b5db3...`. Decode live sender/receiver bytes and run the parity gate. |
+| “ARMED plus a snapshot proves the whole control loop.” | It proves admission and snapshot only. Require LIVE + sent delta + committed delta for bidirectional closure. |
 | “A small visual nudge does not need re-observation.” | Small visual changes can be total perceptual failures. Re-observe the touched surface. |
 | “One more document/test will show progress.” | Only add evidence that can kill a live hypothesis or prevent recurrence; otherwise change the product or stop. |
 
@@ -250,6 +382,10 @@ a test that fails every mutant for the same unrelated reason is not evidence.
   `tab5_firmware/tests/palette_flow_harness.cpp`
 - Motion mutation guard:
   `tab5_firmware/scripts/tab5_palette_motion_mutation.py`
+- K1/Tab5 protocol parity and live-receipt guard:
+  `scripts/agent/tab5_protocol_parity_gate.py`
+- Protocol guard tests and deliberate mutants:
+  `tests/test_tab5_protocol_parity_gate.py`
 
 ```sh
 cd /Users/spectrasynq/SpectraSynq_K1_Tab5_Hardening
@@ -261,6 +397,10 @@ tab5_firmware/scripts/flash_tab5_p4.sh \
 ```
 
 ## Claim boundary at capture
+
+The bullets below describe the original 2026-08-11 canon capture. They are
+historical, not current source status. The 2026-08-12 recovery above supersedes
+their Git/source boundary and records the merged 68-control state.
 
 - Last committed motion baseline: `0a07e73773761d3cbf373ccd967e5252173aa9b0`.
 - The shared 2D field, 36 px swatches, circular prefilter, and associated tests

@@ -30,6 +30,11 @@ task, read:
   sequence evidence plus eyes-on device confirmation.
 - A Captain eyes-on rejection reopens the perceptual gate even when all host
   tests are green.
+- The live Unit2/Tab5 Deck-state contract is **68 controls** with registry MD5
+  `9b5db3fbb17438367adeaceb541db03b`. The 71-control / `78fb9a...` registry is
+  archaeology, not a migration target. If prose or a stale branch disagrees
+  with live sender/receiver bytes, stop and reconcile the wire evidence before
+  changing either device.
 
 ## Device identity
 
@@ -52,11 +57,24 @@ metadata while a Tab5 build is in progress.
 
 ```sh
 cd /Users/spectrasynq/SpectraSynq_K1_Tab5_Hardening
+python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root .
 python3 -m pytest tab5_firmware/tests -q
 pio run -d tab5_firmware -e native_sdl
 PLATFORMIO_CORE_DIR=/tmp/tab5_pio_core_<receipt-id> \
   ~/.platformio/penv/bin/pio run -d tab5_firmware -e tab5_p4
 ```
+
+For a captured Unit2/Tab5 session, validate the receipt as well:
+
+```sh
+python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root . \
+  --serial-log /path/to/tab5-session.log
+```
+
+`phase=ARMED`, `snap_commit>=1`, and zero fault counters prove identity,
+compatibility, and one atomic snapshot. They do **not** prove bidirectional
+control: that additionally requires `phase=LIVE`, `sent>0`, and
+`delta_commit>0` after one harmless physical control change.
 
 For motion changes also run the palette motion mutation gate and inspect a
 continuous sequence on the named device. For display changes inspect page
