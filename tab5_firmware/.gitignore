@@ -1,0 +1,16 @@
+# PlatformIO / build output
+.pio/
+.ccls-cache/
+.vscode/
+cmake-build-*/
+build/
+.cache/
+.idea/
+
+# macOS
+.DS_Store
+
+# Crash dumps
+*.core
+coredump*.elf
+coredump*.bin
