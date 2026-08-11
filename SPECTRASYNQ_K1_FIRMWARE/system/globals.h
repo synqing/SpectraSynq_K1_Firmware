@@ -731,30 +731,32 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 // — silence held 100% THROUGH MUSIC. An absolute constant cannot survive a
 // calibration change; a fraction of the learned floor can.
 //
-// !! THE VALUE BELOW IS UNVERIFIED. THE FORM IS CORRECT; THE NUMBER IS NOT EARNED. !!
+// DERIVED 2026-08-11 from identity-pinned measurement on Unit 2. Every sample below
+// came from ONE verified build (git abb7fb5, env k1_unit2_im69d_right, asserted on
+// the wire before AND after the calibration), with a calibration learned under that
+// same firmware in a witness-verified silent room (-63.7 dB): SSL=136, ACCEPTED,
+// ssl_rejected=0, ssl_p50=68 ssl_p90=124.
 //
-// 6.0 was derived from distributions captured on 2026-08-11 that are now known to
-// be CONTAMINATED: a concurrent session had reflashed the device with
-// k1_custom_silicon_closure @ 622997b, which runs input gain 4.0f (not 8.0f), PDM
-// pins 13/12 (not 39/38), and does NOT contain this gate at all. Every sample in
-// that derivation came from a different build than the one it was meant to tune.
-// The calibration taken in the same window (SSL 103 -> 53, DC -117 -> 220) is
-// likewise from the wrong gain domain and must be re-learned under this firmware.
+//   as multiples of SSL      quiet (45 frames)     music vol70 (30 frames)
+//     max_raw p50                   0.49                   10.52
+//     max_raw p90                   0.91                   20.97
+//     max_raw max                   1.48                   26.18
+//     silence held                100.0%                    0.0%
+//     pky >= 2.10                  19/45                   28/30
 //
-// Re-derive with: flash this build, assert identity with
-// scripts/regression-harness/k1_device_identity_guard.py, recalibrate in a
-// Captain-authorised silence window, then measure quiet and music max_raw as
-// multiples of the NEW SSL. Choose the geometric midpoint of (quiet max) and
-// (music p50) — the correct centre for a ratio-scaled quantity.
-// Predictions P1/P2 in docs/forensics/unit2-joint-silence-predictions-2026-08-11.md
-// must BOTH hold; either alone is satisfiable by a broken gate.
+// Geometric midpoint of quiet max (1.48) and music p50 (10.52) = 3.95 -> 4.0.
+// Threshold = 4.0 x SSL. Margins: 2.7x above the loudest quiet frame, 2.6x below
+// music's median — symmetric in log space, the correct space for a ratio.
 //
-// DIVERGENCE FROM CANON, deliberate and recorded: SESSION_CANON_2026-08-07 seeds
-// this at 1.25. That seed does not hold here — at 1.25 the threshold (66) falls
-// between this room's quiet p50 (48) and p90 (87). The seed was derived on bench
-// B489A500 in a different room. The composition is unchanged; only the fraction is
-// re-derived. See docs/forensics/unit2-joint-silence-predictions-2026-08-11.md
-inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 6.0f;  // peakiness may only break silence at/above SSL x this
+// WHY BOTH AXES ARE REQUIRED, proven by the quiet column: 42% of quiet frames
+// (19/45) cleared the peakiness threshold on their own, yet silence held 100%
+// because the level term rejected every one. Peakiness alone false-wakes in this
+// room; level alone cannot tell music from a loud transient. Neither is sufficient.
+//
+// PER-UNIT, PER-ROOM. SESSION_CANON_2026-08-07 seeds this at 1.25 from bench
+// B489A500. That does not transfer — 1.25 here sits below this room's quiet p90.
+// Derive it against the unit and room in front of you; do not inherit it.
+inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 4.0f;  // peakiness may only break silence at/above SSL x this
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
