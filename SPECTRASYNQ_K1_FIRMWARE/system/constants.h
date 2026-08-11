@@ -389,12 +389,23 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_LR_PIN  14   // SELECT/LR driven LOW = LEFT / falling edge
     #endif
     #ifdef K1_MIC_IM69D_PDM_V1
+      // IM69D130 dual-mic paths. SELECT is static hardware truth and is never
+      // driven by firmware in either profile.
+      #ifndef K1_UNIT2_IM69D_V1
       // IM69D130 dual-mic PCB3 on SPH pads (bench eval, 2026-08-05).
       // CLK=GPIO14 / DATA=GPIO13. SELECT is hard-strapped on-board (IM1 HIGH /
       // IM2 LOW) — firmware does NOT drive GPIO12 as LR. Escape-hatch pin only.
       #define K1_PDM_CLK_PIN 14          // PDM clock out → board CLK_IN_3V3 (J1.3)
       #define K1_PDM_DIN_PIN 13          // PDM data in  ← board DATA_OUT_3V3 (J1.5)
       #define K1_IM69_PDM_SEL_PIN 12     // unused on PCB3; do not drive as LR
+      #else
+      // Unit 2 IM69D wiring (Captain CAPTAIN_PIN_AUTH, 2026-08-11): the mic
+      // moves off the SPH pads onto CLK=GPIO39 / DATA=GPIO38. PCB3 above is
+      // untouched. SELECT remains hard-strapped; GPIO12 is never driven.
+      #define K1_PDM_CLK_PIN 39
+      #define K1_PDM_DIN_PIN 38
+      #define K1_IM69_PDM_SEL_PIN 12     // unused on Unit 2; do not drive as LR
+      #endif
     #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3

@@ -122,6 +122,13 @@
 
 // LED strip mode selection: 1=61 LEDs, 2=91 LEDs, 3=160 LEDs (default).
 #define LED_STRIP_MODE 3
+#if defined(K1_UNIT2_IM69D_V1)
+  // Unit 2 hardware truth (Captain, 2026-08-11): two independent physical
+  // WS2812B channels of 206 pixels each. The effect/render canvas remains 160;
+  // both output paths resample that canvas onto their physical strip.
+  #define LED_COUNT_VALUE 206
+  #define SECONDARY_LED_COUNT_VALUE 206
+#else
 #ifdef K1_CUSTOM_LED_V1
   // Custom single-channel wall-bounce build (2026-07-06): 224 LEDs on the primary
   // GPIO only, secondary channel dropped (see the .ino:670/693 guards). The 160-px
@@ -130,13 +137,18 @@
   // buffers are heap-allocated to CONFIG.LED_COUNT so 224 is memory-safe. Flag-gated:
   // when K1_CUSTOM_LED_V1 is unset every env resolves 160 -> byte-identical.
   #define LED_COUNT_VALUE 224
+  #define SECONDARY_LED_COUNT_VALUE 160
 #elif LED_STRIP_MODE == 1
   #define LED_COUNT_VALUE 61
+  #define SECONDARY_LED_COUNT_VALUE 160
 #elif LED_STRIP_MODE == 2
   #define LED_COUNT_VALUE 91
+  #define SECONDARY_LED_COUNT_VALUE 160
 #else
   // Default to 160 LEDs (K1 / SB v9 hardware: 160 per channel)
   #define LED_COUNT_VALUE 160
+  #define SECONDARY_LED_COUNT_VALUE 160
+#endif
 #endif
 
 enum led_types {

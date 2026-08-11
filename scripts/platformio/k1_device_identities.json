@@ -78,6 +78,16 @@
         "k1_custom",
         "k1_sync_probe_bench"
       ]
+    },
+    {
+      "chip_id": "0C54FC00",
+      "usb_serial": "AC:A7:04:FC:54:0C",
+      "role": "K1 Bench Unit 2",
+      "pinmap": "bench IM69D130 PDM CLK=39/DATA=38, RIGHT slot; dual 206-px WS2812B on LED 4/5",
+      "advisory_port": "/dev/tty.usbmodem1101",
+      "envs": [
+        "k1_unit2_im69d_right"
+      ]
     }
   ],
   "quarantined": [

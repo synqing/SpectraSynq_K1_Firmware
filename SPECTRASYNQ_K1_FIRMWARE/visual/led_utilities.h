@@ -870,12 +870,13 @@ inline void init_lerp_params() {
             
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
-#ifdef K1_CUSTOM_LED_V1
+#if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
             // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
-            // build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
-            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
-            // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
-            // flag-gated to keep those builds byte-identical.
+            // build and Unit 2's 206-pixel dual-channel profile): the top output pixel
+            // resolves index_right == NATIVE_RESOLUTION, a 1-element OOB read of
+            // leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping 61/91/160 (down/equal)
+            // modes never reach index_left == NR-1, so this is flag-gated to keep those
+            // builds byte-identical.
             if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
                 led_lerp_params[i].index_right = NATIVE_RESOLUTION - 1;
             }

@@ -62,7 +62,11 @@ class SilenceLatchDrivenByRawRms(unittest.TestCase):
 class TelemetryAndSerial(unittest.TestCase):
     def test_ap_telemetry_exposes_rms_raw(self):
         self.assertIn("rms_raw=%.4f", I2S)
-        self.assertIn("k1_silence_rms_raw, CONFIG.STANDBY_DIMMING", I2S)
+        # k1_silence_rms_raw must still be a live argument of the same [AP] printf that
+        # reports STANDBY_DIMMING. Additional fields may be interleaved between them
+        # (e.g. the peakiness `pky` telemetry added by the silence-break gate), so the
+        # check is adjacency-within-the-argument-list, not literal adjacency.
+        self.assertRegex(I2S, r"k1_silence_rms_raw,[^;]*CONFIG\.STANDBY_DIMMING")
 
     def test_serial_tuners_present(self):
         self.assertTrue(typed_command_registered(SERIAL, "silence_rms_enter"))

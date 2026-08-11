@@ -271,6 +271,8 @@ void init_i2s() {
   // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
   // 16-bit mono Stage 1, DSR_16S default (1.6384 MHz @ 12.8k), slot LEFT.
   // Pins clk=14/din=13. SELECT is hard-strapped on-board — do NOT drive GPIO12.
+  // Stage 1 remains mono and requires an explicit slot for Unit 2 diagnostics;
+  // PCB3 retains its historical LEFT default.
   i2s_pdm_rx_config_t pdm_cfg = {
     .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
     .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
@@ -283,9 +285,23 @@ void init_i2s() {
 #ifdef K1_MIC_IM69D_DSR_16S_V1
   pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
 #endif
+#if defined(K1_MIC_IM69D_SLOT_LEFT) && defined(K1_MIC_IM69D_SLOT_RIGHT)
+#error "IM69D diagnostic build must select exactly one PDM slot"
+#elif defined(K1_MIC_IM69D_SLOT_LEFT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_LEFT;
+#elif defined(K1_MIC_IM69D_SLOT_RIGHT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_RIGHT;
+#elif defined(K1_UNIT2_IM69D_V1)
+#error "Unit 2 IM69D diagnostic builds require an explicit slot"
+#endif
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
   USBSerial.print("I2S PDM RX INIT: ");
-  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+  USBSerial.print(result == ESP_OK ? K1_PASS : K1_FAIL);
+#if defined(K1_MIC_IM69D_SLOT_RIGHT)
+  USBSerial.println(" slot=RIGHT");
+#else
+  USBSerial.println(" slot=LEFT");
+#endif
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,

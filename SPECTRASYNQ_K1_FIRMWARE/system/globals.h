@@ -881,7 +881,7 @@ inline CRGB *leds_out_secondary;              // Final output buffer
 // Secondary strip configuration
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;
-inline const uint16_t SECONDARY_LED_COUNT = 160;
+inline const uint16_t SECONDARY_LED_COUNT = SECONDARY_LED_COUNT_VALUE;
 inline const uint16_t SECONDARY_LED_COLOR_ORDER = GRB;
 inline uint8_t SECONDARY_LIGHTSHOW_MODE = LIGHT_MODE_WAVEFORM_TEMPO; // 1401 dual-tempo setup (2026-06-04): secondary boots on mode 18
 inline bool SECONDARY_MIRROR_ENABLED = true;
