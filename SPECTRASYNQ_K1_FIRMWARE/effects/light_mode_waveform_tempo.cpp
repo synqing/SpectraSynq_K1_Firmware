@@ -176,15 +176,10 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
 
   // Confidence gate + graceful fallback. t.confidence is already silence-scaled.
   float gate      = t_smoothstep(TEMPO_CONF_LO, TEMPO_CONF_HI, t.confidence);
-#if defined(K1_MIC_IM73D_PDM_V1)
-  // IM73D lock floor is 0.28; SPH-calibrated TEMPO_CONF_HI=0.60 leaves gate≈0
-  // while lock=1 and conf sits ~0.28–0.42. Prefer lock as velocity authority.
-  if (t.locked) {
-    float lock_gate = t_smoothstep(0.20f, 0.40f, t.confidence);
-    if (lock_gate < 0.55f) lock_gate = 0.55f;
-    if (gate < lock_gate) gate = lock_gate;
-  }
-#endif
+  // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated lock-as-velocity-authority
+  // override (floor 0.55 when t.locked) lived here. It existed only to
+  // compensate for the tombstoned 0.28 lock floor, so it goes with it — see
+  // audio/k1_audio_profile.h. Confidence is the sole velocity gate again.
   float idle_px_s = a.silence ? 0.0f : TEMPO_IDLE_RATE;      // halt in true silence
   float rate_px_s = idle_px_s + (tempo_px_s - idle_px_s) * gate;
 
