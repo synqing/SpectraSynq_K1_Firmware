@@ -286,6 +286,8 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
     }
 
     // Toggle Lightshow Mirroring ---------------------
+    // BRINGUP ONLY (USB serial). NOT a product control.
+    // Mirror purged from BLE/Deck 2026-08-09 — NEVER reintroduce on BLE/Deck.
     else if (strcmp(command_type, "mirror_enabled") == 0) {
       bool good = false;
       if (strcmp(command_data, "default") == 0) {
@@ -355,34 +357,8 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       tx_end();
     }
 
-    // Set Standby Dimming behavior -------
-    // Accepts the full boolean vocabulary via vp_parse_bool (on/off/true/false/1/0)
-    // plus the `default` reset token. Previously only true/false/default were handled,
-    // so `standby_dimming=on|off` fell through to bad_command — this dispatcher is
-    // reached (serial_menu.h ladder) before the newer go-dark A/B toggle handler, so it
-    // shadowed it. Output + save behaviour are unchanged for true/false/default (the
-    // serial_replay golden is preserved byte-for-byte).
-    else if (strcmp(command_type, "standby_dimming") == 0) {
-      bool good = false;
-      bool value = false;
-      if (strcmp(command_data, "default") == 0) {
-        CONFIG.STANDBY_DIMMING = CONFIG_DEFAULTS.STANDBY_DIMMING;
-        good = true;
-      } else if (vp_parse_bool(command_data, &value)) {
-        CONFIG.STANDBY_DIMMING = value;
-        good = true;
-      } else {
-        bad_command(command_type, command_data);
-      }
-
-      if (good) {
-        save_config_delayed();
-        tx_begin();
-        USBSerial.print("CONFIG.STANDBY_DIMMING: ");
-        USBSerial.println(CONFIG.STANDBY_DIMMING);
-        tx_end();
-      }
-    }
+    // Set Standby Dimming — STRUCK 2026-08-09: not operator-selectable.
+    // Legacy `:standby_dimming=*` falls through to bad_command.
 
     // Set if image should be reversed ------------------------
     else if (strcmp(command_type, "reverse_order") == 0) {
@@ -1474,6 +1450,8 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
       tx_end();
     }
 
+    // BRINGUP ONLY (USB serial). NOT a product control.
+    // Mirror purged from BLE/Deck 2026-08-09 — NEVER reintroduce on BLE/Deck.
     else if (strcmp(command_type, "secondary_mirror_enabled") == 0) {
       bool good = false;
       if (strcmp(command_data, "true") == 0) {

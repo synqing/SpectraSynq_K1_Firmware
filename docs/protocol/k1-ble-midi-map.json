@@ -2,8 +2,8 @@
   "schema": "k1.ble-midi-map/1",
   "generated_by": "scripts/regression-harness/golden/oracle_ble_midi_map.py",
   "registry_version": "2026-06-09",
-  "registry_md5": "78fb9af986da36922fae33cb09de3b4b",
-  "control_count": 71,
+  "registry_md5": "9b5db3fbb17438367adeaceb541db03b",
+  "control_count": 68,
   "channel_map": {
     "primary": 0,
     "secondary": 1,
@@ -97,7 +97,7 @@
       "encode": "v14 = round((value-min)/(max-min)*16383)"
     },
     {
-      "path": "primary.mirror",
+      "path": "primary.auto_color_shift",
       "channel": 0,
       "type": "bool",
       "midi": "cc7",
@@ -105,7 +105,7 @@
       "encode": "0=off,127=on"
     },
     {
-      "path": "primary.auto_color_shift",
+      "path": "primary.reverse_order",
       "channel": 0,
       "type": "bool",
       "midi": "cc7",
@@ -113,19 +113,11 @@
       "encode": "0=off,127=on"
     },
     {
-      "path": "primary.reverse_order",
-      "channel": 0,
-      "type": "bool",
-      "midi": "cc7",
-      "cc": 67,
-      "encode": "0=off,127=on"
-    },
-    {
       "path": "primary.incandescent_mode",
       "channel": 0,
       "type": "bool",
       "midi": "cc7",
-      "cc": 68,
+      "cc": 67,
       "encode": "0=off,127=on"
     },
     {
@@ -155,7 +147,7 @@
       "channel": 0,
       "type": "bool",
       "midi": "cc7",
-      "cc": 69,
+      "cc": 68,
       "encode": "0=off,127=on"
     },
     {
@@ -174,7 +166,7 @@
       "channel": 0,
       "type": "bool",
       "midi": "cc7",
-      "cc": 70,
+      "cc": 69,
       "encode": "0=off,127=on"
     },
     {
@@ -288,19 +280,11 @@
       "encode": "v14 = round((value-min)/(max-min)*16383)"
     },
     {
-      "path": "secondary.mirror",
-      "channel": 1,
-      "type": "bool",
-      "midi": "cc7",
-      "cc": 66,
-      "encode": "0=off,127=on"
-    },
-    {
       "path": "secondary.incandescent_mode",
       "channel": 1,
       "type": "bool",
       "midi": "cc7",
-      "cc": 67,
+      "cc": 66,
       "encode": "0=off,127=on"
     },
     {
@@ -319,7 +303,7 @@
       "channel": 1,
       "type": "bool",
       "midi": "cc7",
-      "cc": 68,
+      "cc": 67,
       "encode": "0=off,127=on"
     },
     {
@@ -338,7 +322,7 @@
       "channel": 1,
       "type": "bool",
       "midi": "cc7",
-      "cc": 69,
+      "cc": 68,
       "encode": "0=off,127=on"
     },
     {
@@ -346,7 +330,7 @@
       "channel": 1,
       "type": "bool",
       "midi": "cc7",
-      "cc": 70,
+      "cc": 69,
       "encode": "0=off,127=on"
     },
     {
@@ -360,14 +344,6 @@
       "max": "K1_SENSITIVITY_MAX",
       "encode": "v14 = round((value-min)/(max-min)*16383)",
       "range_symbolic": true
-    },
-    {
-      "path": "global.standby_dimming",
-      "channel": 2,
-      "type": "bool",
-      "midi": "cc7",
-      "cc": 64,
-      "encode": "0=off,127=on"
     },
     {
       "path": "global.chroma_profile",

@@ -15,6 +15,9 @@
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
 #endif
+#ifdef K1_BLE_REMOTED
+#include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
+#endif
 
 extern void start_noise_cal();
 
@@ -407,6 +410,13 @@ inline void apply_brightness() {
   // NON-SHIPPABLE: VPML built-in previews are controlled VP stimuli, so silence
   // dimming must not alter the final-byte proof while the lab owns the frame.
   if (vpml_active) silent_scale = 1.0f;
+#endif
+#ifdef K1_BLE_REMOTED
+  // Core-0 write-site fix (i2s_audio.h) is the PRIMARY guard for K1_BLE_REMOTED:
+  // silent_scale and silent_scale_last are pinned to 1.0 there unconditionally,
+  // eliminating the IIR race and the link-flap hole. This belt-and-suspenders
+  // write here is retained as a defense-in-depth measure only.
+  silent_scale = 1.0f;
 #endif
 #ifdef K1_DROP_CUT_V1
   drop_cut_update();

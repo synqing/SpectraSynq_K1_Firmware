@@ -525,15 +525,9 @@ bool serial_typed_k1_loud_guard(const char* command_type, char* command_data) {
 #endif
 
 bool serial_typed_standby_dimming(const char* command_type, char* command_data) {
-  bool value = false;
-      if (vp_parse_bool(command_data, &value)) {
-        CONFIG.STANDBY_DIMMING = value;
-        tx_begin();
-        USBSerial.print("STANDBY_DIMMING: "); USBSerial.println(value ? "on" : "off");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
+  // STRUCK 2026-08-09: not operator-selectable; reject any legacy typed call.
+  (void)command_data;
+  bad_command(command_type, "struck");
   return true;
 }
 

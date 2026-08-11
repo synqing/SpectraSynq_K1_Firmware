@@ -887,17 +887,13 @@ void acquire_sample_chunk(uint32_t t_now) {
       USBSerial.println(sweet_spot_state);
     }
 
-    if (CONFIG.STANDBY_DIMMING) {
-      // Asymmetric fade: slow to true black on sustained silence, near-instant wake on
-      // the first sound. silent_scale multiplies MASTER_BRIGHTNESS on the plate
-      // (led_utilities.h:399) → reaches 0 = fully dark. K1 has no indicator LEDs.
-      const float fade_target = silence ? 0.0f : 1.0f;
-      const float fade_a = (fade_target < silent_scale) ? SILENT_FADE_DOWN_ALPHA : SILENT_FADE_UP_ALPHA;
-      silent_scale = fade_target * fade_a + silent_scale_last * (1.0f - fade_a);
-      silent_scale_last = silent_scale;
-    } else {
-      silent_scale = 1.0;
-    }
+    // STANDBY_DIMMING STRUCK 2026-08-09 (Captain): option permanently removed from
+    // operator-selectable surfaces. Keep silent_scale pinned at Core 0 so NVS/UI
+    // cannot re-enable the IIR fade (silent_scale→0 dark plate). K1_BLE_REMOTED
+    // builds retain the same belt; product behaviour is dimming OFF everywhere.
+    (void)CONFIG.STANDBY_DIMMING;
+    silent_scale      = 1.0f;
+    silent_scale_last = 1.0f;
 
     sweet_spot_state_last = sweet_spot_state;
 

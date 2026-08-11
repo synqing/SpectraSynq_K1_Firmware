@@ -688,7 +688,8 @@ inline SQ15x16 min_silent_level_tracker = 65535.0; // Initialize high, tracks mi
 // static threshold (the min_silent_level_tracker decay above was commented out, pinning
 // threshold_silence at 100 decoupled from the learned SSL, so a quiet room NEVER latched
 // silence and the plate never went dark). These are DEGRADED-MODE first-guesses, tunable
-// at runtime for the hardware A/B via the :standby_dimming / :silence_* serial commands.
+// at runtime for silence RMS thresholds via the :silence_* serial commands.
+// STANDBY_DIMMING struck 2026-08-09 — not operator-selectable; silent_scale path inert.
 inline float    SILENCE_ENTER_SSL_FRAC = 0.35f;   // enter silence below this * SSL (smoothed peak)
 inline float    SILENCE_EXIT_SSL_FRAC  = 0.55f;   // leave silence above this * SSL (Schmitt gap: exit > enter)
 inline uint32_t SILENCE_DWELL_MS       = 5000;    // continuous quiet (ms) before the plate darkens
