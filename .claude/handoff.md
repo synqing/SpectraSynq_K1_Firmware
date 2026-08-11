@@ -54,9 +54,18 @@ DECK16_B1_B2_CORE_FUNCTIONAL_PASS=PASS
 EXTENDED_RECOVERY_HARDENING=PASS
 STANDBY_DIMMING=STRUCK
 PRODUCTION_READY=NO
-MERGE_OR_PROMOTION=HOLD
+MERGE_TO_MAIN=DONE 2026-08-11 (Captain-authorised; supersedes MERGE_OR_PROMOTION=HOLD)
+PROMOTION_TO_PRODUCTION=STILL_HOLD
 FLASH_TO_UNIT2_OR_B489=FROZEN_PENDING_IM69D_RESOLUTION
 ```
+
+**Read the two merge lines together.** Captain authorised the **merge** of the
+2026-08-07..11 Deck16 / Tab5 / STANDBY / MIRROR / guard / doctrine lane to
+`main` on 2026-08-11. That is a source-integration decision and nothing more.
+`PRODUCTION_READY` is still **NO**: the boot-loop guard, the quiet-mic plate fix
+and the dual-206 retarget carry **host proof only**, `PHASE1_GATE=FAIL` stands
+on `B489A500` until the failing unit boots clean, and the flash freeze is
+unchanged. Do not read "merged" as "proven on silicon".
 
 - **Devices (last known):** bench K1 `B489A500` = `k1_bench_im69d_ble`; Tab5 P4 `30:ed:a0:e0:c1:a0` = `tab5_p4`.
   Both last flashed 2026-08-09 ~07:57 (Mirror purge).

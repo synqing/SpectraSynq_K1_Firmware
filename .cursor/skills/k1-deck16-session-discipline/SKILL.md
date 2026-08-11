@@ -42,10 +42,14 @@ DECK16_B1_B2_CORE_FUNCTIONAL_PASS=PASS
 EXTENDED_RECOVERY_HARDENING=PASS
 STANDBY_DIMMING=STRUCK
 PRODUCTION_READY=NO
-MERGE_OR_PROMOTION=HOLD
+MERGE_TO_MAIN=DONE 2026-08-11 (Captain-authorised)
+PROMOTION_TO_PRODUCTION=STILL_HOLD
 ```
 
-Do not upgrade a line without a new on-disk receipt.
+Do not upgrade a line without a new on-disk receipt. `MERGE_TO_MAIN=DONE` is a
+source-integration fact only: the boot-loop guard, the quiet-mic plate fix and
+the dual-206 retarget carry HOST proof only, `PHASE1_GATE=FAIL` stands on
+`B489A500`, and the flash freeze is unchanged. Merged is not proven.
 
 ## HARD FAIL checklist (HF-14…HF-28)
 

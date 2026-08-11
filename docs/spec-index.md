@@ -80,8 +80,10 @@ C6 soak / dark-fade / MAIN glass authority / Mirror·STANDBY claims:**
 · gate `bash scripts/agent/deck16-first-contact-gate.sh`
 · handover [`_scratch/deck16_session_handover_20260809/HANDOVER.md`](../_scratch/deck16_session_handover_20260809/HANDOVER.md).
 Encodes HF-14…HF-28 (stale digests, host-RTT lies, false MAIN approval, Core-0
-pin, haunt clear, exclusive soak, absent-peer STOP). Authority claim block stays
-`PRODUCTION_READY=NO` / `MERGE_OR_PROMOTION=HOLD` until Captain.
+pin, haunt clear, exclusive soak, absent-peer STOP). Captain released the merge
+gate on 2026-08-11 (lane merged to `main`); the authority claim block stays
+`PRODUCTION_READY=NO` and promotion to production remains held pending device
+proof — merged is not proven.
 
 **Load BEFORE any SpectraSynq UI design→code (LVGL / fonts / product HTML sizes):**
 [`docs/canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md`](canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md)
