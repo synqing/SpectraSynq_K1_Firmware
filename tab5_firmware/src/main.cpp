@@ -629,8 +629,6 @@ void setup()
   xSemaphoreGive(gDisplayInitSemaphore);
   LOG("[display] Display ready for multi-core access");
 
-  init_transport();
-
   deck_state_init();
   deck_state_rx_init();
   deck_tx_init();
@@ -650,6 +648,10 @@ void setup()
   Deck_UI_Init(LVGLBridge::getDisplay());
   LOG("[ui] Deck16 4-box MAIN ready (LINK phase + armed gate)");
   print_encoderless_help();
+
+  // State, receiver and LVGL ownership must exist before advertising permits
+  // K1 to deliver the initial HELLO/SNAPSHOT burst.
+  init_transport();
 
   Deck_UI_ShowWaitingScreen(false, "");
   LOG("[ui] Blocking waiting overlay disabled; offline controls remain visible");

@@ -124,7 +124,6 @@ static uint32_t gLastRxRevision = 0;
 static uint32_t gLastConfirmedCount = 0;
 static bool gLastStale = false;
 static int gLastRssiShown = 0x7fff;  /* sentinel: force first paint */
-static uint32_t gLastRssiPollMs = 0;
 
 typedef struct {
   lv_obj_t* state_lab;
@@ -552,11 +551,7 @@ static void refresh_status_strip(void)
     return;
   }
 
-  /* Throttle HCI Read RSSI — do not spam every LVGL tick. */
-  const uint32_t now = millis();
-  if (gLastRssiShown != 0x7fff && (now - gLastRssiPollMs) < 500) return;
-  gLastRssiPollMs = now;
-
+  /* Cache-only read. Transport maintenance owns the bounded HCI operation. */
   int8_t rssi = 0;
   if (!BleMidiTransport::connectionRssi(&rssi)) {
     if (gLastRssiShown != 0x7ffe) {
@@ -1523,7 +1518,7 @@ void Deck_UI_Tick(void)
 void Deck_UI_UpdateLinkStatus(bool linked)
 {
   gLinked = linked;
-  gLastRssiShown = 0x7fff;  /* force RSSI re-poll on link edge */
+  gLastRssiShown = 0x7fff;  /* force cached RSSI repaint on link edge */
   refresh_status_strip();
   apply_armed_gate_visuals();
 }

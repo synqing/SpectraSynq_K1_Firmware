@@ -19,6 +19,16 @@
 #ifndef TAB5_HCI_PATH_DIAG
 #define TAB5_HCI_PATH_DIAG 0
 #endif
+#ifndef TAB5_BLE_VERBOSE_DIAG
+#define TAB5_BLE_VERBOSE_DIAG 0
+#endif
+#ifndef TAB5_PRODUCTION_BUILD
+#define TAB5_PRODUCTION_BUILD 0
+#endif
+
+#if TAB5_PRODUCTION_BUILD && (TAB5_HCI_PATH_DIAG || TAB5_BLE_VERBOSE_DIAG)
+#error "Production Tab5 build cannot enable HCI or per-value diagnostics"
+#endif
 
 #if TAB5_BLE_GATT_AVAILABLE
 #include <BLEDevice.h>
@@ -28,6 +38,7 @@
 #include <host/ble_att.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
+#include <freertos/task.h>
 #include "esp32-hal-hosted.h"
 #include "esp_log.h"
 #include <Wire.h>
@@ -226,104 +237,438 @@ static bool gConnected = false;
 static uint16_t gConnHandle = BLE_HS_CONN_HANDLE_NONE;
 static uint8_t gIdentityWire[K1_DECK_IDENTITY_V1_SIZE] = {};
 
-// NimBLE callbacks run on Core 0. Deck state and every LVGL mutation are owned
-// by loopTask on Core 1, so callbacks may only enqueue compact transport events.
-// Reserve two slots for link transitions so a snapshot burst cannot hide a
-// disconnect behind state chunks.
-static constexpr UBaseType_t kHostEventQueueCapacity = 12;
-static constexpr UBaseType_t kHostEventReservedLinkSlots = 2;
+// NimBLE callbacks run on Core 0. loopTask is the sole owner of connection
+// lifecycle, confirmed Deck state, recovery, cached RSSI and every LVGL call.
+// Link events have an independent static queue, so state bursts cannot hide a
+// disconnect. Callback work is bounded copy-only: no String, log, HCI or BLE
+// lifecycle call is permitted.
+static constexpr UBaseType_t kLinkQueueCapacity = 4;
+static constexpr UBaseType_t kPayloadQueueCapacity = 12;
+static constexpr uint8_t kPayloadDrainLimit = 8;
+static constexpr uint32_t kPayloadDrainBudgetUs = 1000;
 
-enum class HostEventType : uint8_t {
-  Connected = 0,
-  Disconnected,
-  StateChunk,
+enum class LinkEventType : uint8_t { Connected = 0, Disconnected };
+enum class PayloadEventType : uint8_t { Midi = 0, State };
+
+struct LinkEvent {
+  LinkEventType type;
+  uint16_t conn_handle;
+  uint32_t ingress_generation;
 };
 
-struct HostEvent {
-  HostEventType type;
+struct PayloadEvent {
+  PayloadEventType type;
   uint16_t conn_handle;
+  uint32_t ingress_generation;
   uint16_t data_len;
   uint8_t data[K1_DECK_STATE_MAX_PACKET];
 };
 
-static QueueHandle_t gHostEventQueue = nullptr;
-static StaticQueue_t gHostEventQueueStruct;
-static uint8_t gHostEventQueueStorage[
-    kHostEventQueueCapacity * sizeof(HostEvent)];
-static std::atomic<uint32_t> gHostEventDrops{0};
+static QueueHandle_t gLinkQueue = nullptr;
+static StaticQueue_t gLinkQueueStruct;
+static uint8_t gLinkQueueStorage[kLinkQueueCapacity * sizeof(LinkEvent)];
+static QueueHandle_t gPayloadQueue = nullptr;
+static StaticQueue_t gPayloadQueueStruct;
+static uint8_t gPayloadQueueStorage[kPayloadQueueCapacity * sizeof(PayloadEvent)];
+static std::atomic<uint32_t> gIngressDrops{0};
+static std::atomic<bool> gIngressLoss{false};
+static std::atomic<uint16_t> gIngressHandle{BLE_HS_CONN_HANDLE_NONE};
+static std::atomic<uint32_t> gIngressGeneration{0};
+static uint32_t gPayloadQueueHwm = 0;
+static uint32_t gConnectionGeneration = 0;
+static uint32_t gDuplicateConnects = 0;
+static uint32_t gStalePayloads = 0;
+static constexpr uint32_t kRecoveryDisconnectDeadlineMs = 2500;
+static bool gRecoveryInFlight = false;
+static uint32_t gRecoveryDeadlineMs = 0;
+static bool gAdvertisingPending = false;
+static uint8_t gAdvertisingBackoffStep = 0;
+static uint32_t gNextAdvertisingMs = 0;
 
-static bool enqueue_host_event(HostEventType type,
-                               uint16_t conn_handle,
-                               const uint8_t* data = nullptr,
-                               size_t len = 0)
+static void start_advertising();
+static void reset_rssi_state(uint32_t now);
+static bool time_reached(uint32_t now, uint32_t deadline);
+
+static void note_ingress_loss()
 {
-  if (!gHostEventQueue || len > K1_DECK_STATE_MAX_PACKET ||
-      (len > 0 && data == nullptr)) {
-    gHostEventDrops.fetch_add(1, std::memory_order_relaxed);
-    return false;
-  }
-  if (type == HostEventType::StateChunk &&
-      uxQueueSpacesAvailable(gHostEventQueue) <= kHostEventReservedLinkSlots) {
-    gHostEventDrops.fetch_add(1, std::memory_order_relaxed);
-    return false;
-  }
+  gIngressDrops.fetch_add(1, std::memory_order_relaxed);
+  gIngressLoss.store(true, std::memory_order_release);
+}
 
-  HostEvent event = {};
-  event.type = type;
-  event.conn_handle = conn_handle;
-  event.data_len = static_cast<uint16_t>(len);
-  if (len > 0) memcpy(event.data, data, len);
-  if (xQueueSend(gHostEventQueue, &event, 0) != pdTRUE) {
-    gHostEventDrops.fetch_add(1, std::memory_order_relaxed);
+static bool enqueue_link_event(LinkEventType type, uint16_t conn_handle)
+{
+  // Preserve the newest controller-side handle even if the bounded queue is
+  // full, so loop-owned recovery can still terminate an otherwise orphaned
+  // connection. This atomic hint is not application connection authority.
+  if (type == LinkEventType::Connected) {
+    const uint16_t prior =
+        gIngressHandle.exchange(conn_handle, std::memory_order_acq_rel);
+    if (prior != conn_handle) {
+      gIngressGeneration.fetch_add(1, std::memory_order_acq_rel);
+    }
+  } else {
+    gIngressHandle.store(BLE_HS_CONN_HANDLE_NONE, std::memory_order_release);
+  }
+  if (!gLinkQueue) {
+    note_ingress_loss();
+    return false;
+  }
+  LinkEvent event = {
+      type, conn_handle, gIngressGeneration.load(std::memory_order_acquire)};
+  if (xQueueSend(gLinkQueue, &event, 0) != pdTRUE) {
+    note_ingress_loss();
     return false;
   }
   return true;
 }
 
-static void apply_connected(uint16_t conn_handle)
+static bool enqueue_payload_event(PayloadEventType type,
+                                  const uint8_t* data,
+                                  size_t len)
 {
-  if (conn_handle == BLE_HS_CONN_HANDLE_NONE) return;
-  if (gConnected && gConnHandle == conn_handle) return;
+  if (!gPayloadQueue || !data || len == 0 || len > K1_DECK_STATE_MAX_PACKET) {
+    note_ingress_loss();
+    return false;
+  }
+  PayloadEvent event = {};
+  event.type = type;
+  event.conn_handle = gIngressHandle.load(std::memory_order_acquire);
+  event.ingress_generation =
+      gIngressGeneration.load(std::memory_order_acquire);
+  event.data_len = static_cast<uint16_t>(len);
+  memcpy(event.data, data, len);
+  if (xQueueSend(gPayloadQueue, &event, 0) != pdTRUE) {
+    note_ingress_loss();
+    return false;
+  }
+  return true;
+}
+
+static uint32_t advertising_backoff_ms()
+{
+  static constexpr uint16_t kBackoff[] = {250, 500, 1000, 2000, 4000};
+  const uint8_t index = gAdvertisingBackoffStep < 5 ? gAdvertisingBackoffStep : 4;
+  if (gAdvertisingBackoffStep < 4) ++gAdvertisingBackoffStep;
+  return kBackoff[index];
+}
+
+static void schedule_advertising(uint32_t now)
+{
+  gAdvertisingPending = true;
+  gNextAdvertisingMs = now + advertising_backoff_ms();
+}
+
+static void purge_payload_queue()
+{
+  if (gPayloadQueue) xQueueReset(gPayloadQueue);
+}
+
+static void apply_connected(uint16_t conn_handle, uint32_t ingress_generation)
+{
+  if (conn_handle == BLE_HS_CONN_HANDLE_NONE || ingress_generation == 0) return;
+  if (gConnected && gConnHandle == conn_handle &&
+      gConnectionGeneration == ingress_generation) {
+    ++gDuplicateConnects;
+    return;
+  }
+  if (gConnected) {
+    note_ingress_loss();
+    return;
+  }
   gConnected = true;
   gConnHandle = conn_handle;
+  gIngressHandle.store(conn_handle, std::memory_order_release);
+  gConnectionGeneration = ingress_generation;
+  gRecoveryInFlight = false;
+  gRecoveryDeadlineMs = 0;
+  gAdvertisingPending = false;
+  gAdvertisingBackoffStep = 0;
+  reset_rssi_state(millis());
   deck_state_rx_on_identity_hint();
-  Serial.printf("[ble-midi] central connected conn=%u\n",
-                static_cast<unsigned>(gConnHandle));
+  Serial.printf("[ble-midi] central connected conn=%u generation=%lu\n",
+                static_cast<unsigned>(gConnHandle),
+                static_cast<unsigned long>(gConnectionGeneration));
 }
 
 static void apply_disconnected(const char* reason)
 {
-  if (!gConnected && gConnHandle == BLE_HS_CONN_HANDLE_NONE) return;
   const uint16_t old_handle = gConnHandle;
+  const bool had_link = gConnected || old_handle != BLE_HS_CONN_HANDLE_NONE;
+  const bool was_recovery = gRecoveryInFlight;
   gConnected = false;
   gConnHandle = BLE_HS_CONN_HANDLE_NONE;
-  deck_state_rx_on_disconnect();
-  Serial.printf("[ble-midi] central disconnected conn=%u reason=%s\n",
-                static_cast<unsigned>(old_handle), reason ? reason : "GAP");
+  gIngressHandle.store(BLE_HS_CONN_HANDLE_NONE, std::memory_order_release);
+  purge_payload_queue();
+  reset_rssi_state(millis());
+  if (had_link || was_recovery) deck_state_rx_on_disconnect();
+  gRecoveryInFlight = false;
+  gRecoveryDeadlineMs = 0;
+  if (!gAdvertisingPending) schedule_advertising(millis());
+  if (had_link || was_recovery) {
+    Serial.printf("[ble-midi] central disconnected conn=%u reason=%s\n",
+                  static_cast<unsigned>(old_handle), reason ? reason : "GAP");
+  }
+}
+
+static void begin_controlled_recovery(const char* reason)
+{
+  if (gRecoveryInFlight) return;
+  gRecoveryInFlight = true;
+  deck_state_rx_clear_recovery_request();
+  purge_payload_queue();
+  const uint16_t recovery_handle =
+      gConnected ? gConnHandle
+                 : gIngressHandle.load(std::memory_order_acquire);
+  if (gServer && recovery_handle != BLE_HS_CONN_HANDLE_NONE) {
+    const int rc = gServer->disconnect(recovery_handle);
+    Serial.printf("[ble-midi] recovery disconnect reason=%s rc=%d generation=%lu\n",
+                  reason ? reason : "desynchronised", rc,
+                  static_cast<unsigned long>(gConnectionGeneration));
+    if (rc == 0) {
+      gRecoveryDeadlineMs = millis() + kRecoveryDisconnectDeadlineMs;
+      return;
+    }
+  }
+  apply_disconnected(reason);
+}
+
+static void maintain_recovery(uint32_t now)
+{
+  if (!gRecoveryInFlight || gRecoveryDeadlineMs == 0 ||
+      !time_reached(now, gRecoveryDeadlineMs)) {
+    return;
+  }
+  // A missing GAP callback must not wedge lifecycle ownership forever. Make one
+  // final controller disconnect request, then fail closed locally and re-enter
+  // the bounded advertising backoff path.
+  if (gConnected && gServer && gConnHandle != BLE_HS_CONN_HANDLE_NONE) {
+    (void)gServer->disconnect(gConnHandle);
+  }
+  apply_disconnected("RECOVERY_TIMEOUT");
 }
 
 static void drain_host_events()
 {
-  if (!gHostEventQueue) return;
-  HostEvent event = {};
-  while (xQueueReceive(gHostEventQueue, &event, 0) == pdTRUE) {
-    switch (event.type) {
-      case HostEventType::Connected:
-        apply_connected(event.conn_handle);
-        break;
-      case HostEventType::Disconnected:
-        apply_disconnected("GAP");
-        break;
-      case HostEventType::StateChunk:
-        deck_state_rx_on_packet(event.data, event.data_len);
-        break;
+  if (!gLinkQueue || !gPayloadQueue) return;
+  LinkEvent link = {};
+  while (xQueueReceive(gLinkQueue, &link, 0) == pdTRUE) {
+    if (link.type == LinkEventType::Connected) {
+      apply_connected(link.conn_handle, link.ingress_generation);
+    } else {
+      apply_disconnected("GAP");
     }
   }
 
-  const uint32_t drops = gHostEventDrops.exchange(0, std::memory_order_relaxed);
-  if (drops > 0) {
-    Serial.printf("[ble-midi] host event queue drops=%lu\n",
-                  static_cast<unsigned long>(drops));
+  const uint32_t depth = uxQueueMessagesWaiting(gPayloadQueue);
+  if (depth > gPayloadQueueHwm) gPayloadQueueHwm = depth;
+  const uint32_t start_us = micros();
+  PayloadEvent event = {};
+  uint8_t drained = 0;
+  while (drained < kPayloadDrainLimit &&
+         static_cast<uint32_t>(micros() - start_us) < kPayloadDrainBudgetUs &&
+         xQueueReceive(gPayloadQueue, &event, 0) == pdTRUE) {
+    ++drained;
+    if (!gConnected || event.ingress_generation != gConnectionGeneration ||
+        event.conn_handle != gConnHandle) {
+      ++gStalePayloads;
+      continue;
+    }
+    if (event.type == PayloadEventType::State) {
+      deck_state_rx_on_packet(event.data, event.data_len);
+    }
+#if TAB5_BLE_VERBOSE_DIAG
+    else {
+      Serial.printf("[ble-midi] loop-owned MIDI RX len=%u\n",
+                    static_cast<unsigned>(event.data_len));
+    }
+#endif
+  }
+
+  if (gIngressLoss.exchange(false, std::memory_order_acq_rel)) {
+    deck_state_rx_on_ingress_loss("transport_queue");
+  }
+  deck_state_rx_tick(millis());
+  if (deck_state_rx_recovery_required()) {
+    begin_controlled_recovery("state_desynchronised");
+  }
+}
+
+// Arduino BLE exposes Read RSSI as a synchronous NimBLE HCI call with an
+// internal two-second timeout. A single static maintenance worker contains that
+// wait; loopTask never blocks on HCI and remains the sole state-machine owner.
+static constexpr uint32_t kRssiIntervalMs = 2000;
+static constexpr uint32_t kRssiDeadlineMs = 2200;
+static constexpr UBaseType_t kRssiQueueCapacity = 1;
+static constexpr uint32_t kRssiWorkerStackWords = 3072;
+
+struct RssiRequest {
+  uint16_t conn_handle;
+  uint32_t generation;
+  uint32_t request_id;
+};
+
+struct RssiCompletion {
+  uint16_t conn_handle;
+  uint32_t generation;
+  uint32_t request_id;
+  int rc;
+  int8_t rssi;
+};
+
+static QueueHandle_t gRssiRequestQueue = nullptr;
+static StaticQueue_t gRssiRequestQueueStruct;
+static uint8_t gRssiRequestQueueStorage[kRssiQueueCapacity * sizeof(RssiRequest)];
+static QueueHandle_t gRssiCompletionQueue = nullptr;
+static StaticQueue_t gRssiCompletionQueueStruct;
+static uint8_t gRssiCompletionQueueStorage[
+    kRssiQueueCapacity * sizeof(RssiCompletion)];
+static StaticTask_t gRssiWorkerTaskStruct;
+static StackType_t gRssiWorkerStack[kRssiWorkerStackWords];
+static TaskHandle_t gRssiWorkerTask = nullptr;
+static std::atomic<bool> gRssiWorkerBusy{false};
+static bool gRssiInFlight = false;
+static bool gRssiTimedOut = false;
+static bool gCachedRssiValid = false;
+static int8_t gCachedRssi = 0;
+static uint8_t gRssiTransientFailures = 0;
+static uint32_t gRssiNextDueMs = 0;
+static uint32_t gRssiDeadlineAtMs = 0;
+static uint32_t gRssiRequestId = 0;
+static uint32_t gRssiTimeouts = 0;
+static uint32_t gRssiStaleCompletions = 0;
+
+static bool time_reached(uint32_t now, uint32_t deadline)
+{
+  return static_cast<int32_t>(now - deadline) >= 0;
+}
+
+static void rssi_worker(void*)
+{
+  RssiRequest request = {};
+  for (;;) {
+    if (xQueueReceive(gRssiRequestQueue, &request, portMAX_DELAY) != pdTRUE) {
+      continue;
+    }
+    RssiCompletion completion = {};
+    completion.conn_handle = request.conn_handle;
+    completion.generation = request.generation;
+    completion.request_id = request.request_id;
+    gRssiWorkerBusy.store(true, std::memory_order_release);
+    completion.rc = ble_gap_conn_rssi(request.conn_handle, &completion.rssi);
+    gRssiWorkerBusy.store(false, std::memory_order_release);
+    (void)xQueueOverwrite(gRssiCompletionQueue, &completion);
+  }
+}
+
+static uint32_t rssi_backoff_ms()
+{
+  if (gRssiTransientFailures < 5) ++gRssiTransientFailures;
+  uint32_t delay_ms = 2000UL << (gRssiTransientFailures - 1);
+  if (delay_ms > 30000UL) delay_ms = 30000UL;
+  return delay_ms;
+}
+
+static bool rssi_is_transient(int rc)
+{
+#ifdef BLE_HS_ETIMEOUT
+  if (rc == BLE_HS_ETIMEOUT) return true;
+#endif
+#ifdef BLE_HS_EBUSY
+  if (rc == BLE_HS_EBUSY) return true;
+#endif
+#ifdef BLE_HS_ENOMEM
+  if (rc == BLE_HS_ENOMEM) return true;
+#endif
+#ifdef BLE_HS_EAGAIN
+  if (rc == BLE_HS_EAGAIN) return true;
+#endif
+  return false;
+}
+
+static bool rssi_is_disconnected(int rc)
+{
+#ifdef BLE_HS_ENOTCONN
+  return rc == BLE_HS_ENOTCONN;
+#else
+  (void)rc;
+  return false;
+#endif
+}
+
+static void reset_rssi_state(uint32_t now)
+{
+  gRssiInFlight = false;
+  gRssiTimedOut = false;
+  gCachedRssiValid = false;
+  gRssiTransientFailures = 0;
+  gRssiNextDueMs = now + kRssiIntervalMs;
+  if (gRssiRequestQueue) xQueueReset(gRssiRequestQueue);
+  if (gRssiCompletionQueue) xQueueReset(gRssiCompletionQueue);
+}
+
+static void maintain_rssi(uint32_t now)
+{
+  RssiCompletion completion = {};
+  while (gRssiCompletionQueue &&
+         xQueueReceive(gRssiCompletionQueue, &completion, 0) == pdTRUE) {
+    if (!gRssiInFlight || completion.request_id != gRssiRequestId ||
+        completion.generation != gConnectionGeneration ||
+        completion.conn_handle != gConnHandle) {
+      ++gRssiStaleCompletions;
+      continue;
+    }
+    gRssiInFlight = false;
+    const bool was_timed_out = gRssiTimedOut;
+    gRssiTimedOut = false;
+    if (was_timed_out) {
+      gRssiNextDueMs = now + rssi_backoff_ms();
+      continue;
+    }
+    if (completion.rc == 0) {
+      gCachedRssi = completion.rssi;
+      gCachedRssiValid = true;
+      gRssiTransientFailures = 0;
+      gRssiNextDueMs = now + kRssiIntervalMs;
+      continue;
+    }
+    gCachedRssiValid = false;
+    if (completion.rc == BLE_HS_HCI_ERR(BLE_ERR_UNK_CONN_ID)) {
+      deck_state_rx_on_ingress_loss("rssi_unknown_handle");
+      begin_controlled_recovery("RSSI_UNKNOWN_HANDLE");
+    } else if (rssi_is_disconnected(completion.rc)) {
+      deck_state_rx_on_ingress_loss("rssi_disconnected");
+      begin_controlled_recovery("RSSI_DISCONNECTED");
+    } else if (rssi_is_transient(completion.rc)) {
+      gRssiNextDueMs = now + rssi_backoff_ms();
+    } else {
+      deck_state_rx_on_ingress_loss("rssi_fatal");
+      begin_controlled_recovery("RSSI_FATAL");
+    }
+  }
+
+  if (gRssiInFlight && !gRssiTimedOut && time_reached(now, gRssiDeadlineAtMs)) {
+    // The worker remains the one operation in flight. No replacement request is
+    // issued until its late completion arrives, so a wedged controller cannot
+    // create a task, queue or HCI storm.
+    gRssiTimedOut = true;
+    gCachedRssiValid = false;
+    ++gRssiTimeouts;
+  }
+  if (!gConnected || gRecoveryInFlight || gRssiInFlight ||
+      gRssiWorkerBusy.load(std::memory_order_acquire) ||
+      !time_reached(now, gRssiNextDueMs) || !gRssiRequestQueue) {
+    return;
+  }
+  RssiRequest request = {};
+  request.conn_handle = gConnHandle;
+  request.generation = gConnectionGeneration;
+  request.request_id = ++gRssiRequestId;
+  if (xQueueSend(gRssiRequestQueue, &request, 0) == pdTRUE) {
+    gRssiInFlight = true;
+    gRssiTimedOut = false;
+    gRssiDeadlineAtMs = now + kRssiDeadlineMs;
+  } else {
+    gRssiNextDueMs = now + rssi_backoff_ms();
   }
 }
 
@@ -358,8 +703,10 @@ class MidiServerCallbacks final : public BLEServerCallbacks {
 public:
   void onConnect(BLEServer* server) override
   {
-    const uint16_t handle = server ? server->getConnId() : BLE_HS_CONN_HANDLE_NONE;
-    (void)enqueue_host_event(HostEventType::Connected, handle);
+    /* The pinned Arduino 3.3.1 wrapper invokes this immediately before the
+     * descriptor overload. Enqueue only from the overload that carries the
+     * controller-authoritative handle so one link consumes one queue slot. */
+    (void)server;
   }
 
   void onConnect(BLEServer* server, ble_gap_conn_desc* desc) override
@@ -367,14 +714,14 @@ public:
     const uint16_t handle = desc ? desc->conn_handle
                                  : (server ? server->getConnId()
                                            : BLE_HS_CONN_HANDLE_NONE);
-    (void)enqueue_host_event(HostEventType::Connected, handle);
+    (void)enqueue_link_event(LinkEventType::Connected, handle);
   }
 
   void onDisconnect(BLEServer* server) override
   {
-    (void)enqueue_host_event(HostEventType::Disconnected,
+    (void)server;
+    (void)enqueue_link_event(LinkEventType::Disconnected,
                              BLE_HS_CONN_HANDLE_NONE);
-    if (server) server->startAdvertising();
   }
 };
 
@@ -383,12 +730,10 @@ public:
   void onWrite(BLECharacteristic* characteristic) override
   {
     if (!characteristic) return;
-    const String value = characteristic->getValue();
-    Serial.printf("[ble-midi] rx %u bytes", static_cast<unsigned>(value.length()));
-    for (size_t i = 0; i < value.length(); ++i) {
-      Serial.printf(" %02X", static_cast<uint8_t>(value[i]));
-    }
-    Serial.println();
+    if (characteristic->getLength() == 0) return;
+    (void)enqueue_payload_event(PayloadEventType::Midi,
+                                characteristic->getData(),
+                                characteristic->getLength());
   }
 };
 
@@ -397,12 +742,9 @@ public:
   void onWrite(BLECharacteristic* characteristic) override
   {
     if (!characteristic) return;
-    const String value = characteristic->getValue();
-    (void)enqueue_host_event(
-        HostEventType::StateChunk,
-        BLE_HS_CONN_HANDLE_NONE,
-        reinterpret_cast<const uint8_t*>(value.c_str()),
-        static_cast<size_t>(value.length()));
+    (void)enqueue_payload_event(PayloadEventType::State,
+                                characteristic->getData(),
+                                characteristic->getLength());
   }
 };
 
@@ -418,11 +760,17 @@ static void wrap_ble_midi_packet(const uint8_t* midi, size_t len, uint8_t* out, 
 
 static void log_packet(const char* label, const uint8_t* data, size_t len)
 {
+#if TAB5_BLE_VERBOSE_DIAG
   Serial.printf("[ble-midi] %s", label);
   for (size_t i = 0; i < len; ++i) {
     Serial.printf(" %02X", data[i]);
   }
   Serial.println();
+#else
+  (void)label;
+  (void)data;
+  (void)len;
+#endif
 }
 
 // BLE-MIDI header (2) + up to 4 tightly packed CC messages (12) = 14.
@@ -495,12 +843,26 @@ void init()
     return;
   }
 
-  gHostEventQueue = xQueueCreateStatic(kHostEventQueueCapacity,
-                                       sizeof(HostEvent),
-                                       gHostEventQueueStorage,
-                                       &gHostEventQueueStruct);
-  if (!gHostEventQueue) {
-    Serial.println("[ble-midi] host event queue creation FAILED");
+  gLinkQueue = xQueueCreateStatic(kLinkQueueCapacity, sizeof(LinkEvent),
+                                  gLinkQueueStorage, &gLinkQueueStruct);
+  gPayloadQueue = xQueueCreateStatic(kPayloadQueueCapacity, sizeof(PayloadEvent),
+                                     gPayloadQueueStorage, &gPayloadQueueStruct);
+  gRssiRequestQueue = xQueueCreateStatic(
+      kRssiQueueCapacity, sizeof(RssiRequest), gRssiRequestQueueStorage,
+      &gRssiRequestQueueStruct);
+  gRssiCompletionQueue = xQueueCreateStatic(
+      kRssiQueueCapacity, sizeof(RssiCompletion), gRssiCompletionQueueStorage,
+      &gRssiCompletionQueueStruct);
+  if (!gLinkQueue || !gPayloadQueue || !gRssiRequestQueue ||
+      !gRssiCompletionQueue) {
+    Serial.println("[ble-midi] static transport queue creation FAILED");
+    return;
+  }
+  gRssiWorkerTask = xTaskCreateStaticPinnedToCore(
+      rssi_worker, "tab5_rssi", kRssiWorkerStackWords, nullptr, 1,
+      gRssiWorkerStack, &gRssiWorkerTaskStruct, tskNO_AFFINITY);
+  if (!gRssiWorkerTask) {
+    Serial.println("[ble-midi] static RSSI worker creation FAILED");
     return;
   }
 
@@ -573,10 +935,29 @@ void tick()
   drain_host_events();
 #endif
   const uint32_t now = millis();
+#if TAB5_BLE_GATT_AVAILABLE
+  maintain_recovery(now);
+  if (gAdvertisingPending && time_reached(now, gNextAdvertisingMs)) {
+    gAdvertisingPending = false;
+    BLEDevice::startAdvertising();
+  }
+  maintain_rssi(now);
+#endif
   if (now - gLastStatusLogMs >= 30000UL) {
     gLastStatusLogMs = now;
 #if TAB5_BLE_GATT_AVAILABLE
-    Serial.printf("[ble-midi] status=advertising connected=%s\n", gConnected ? "yes" : "no");
+    Serial.printf(
+        "[ble-midi] status connected=%s generation=%lu drops=%lu hwm=%lu "
+        "stale_payloads=%lu duplicate_connects=%lu rssi_timeouts=%lu "
+        "rssi_stale=%lu\n",
+        gConnected ? "yes" : "no",
+        static_cast<unsigned long>(gConnectionGeneration),
+        static_cast<unsigned long>(gIngressDrops.load(std::memory_order_relaxed)),
+        static_cast<unsigned long>(gPayloadQueueHwm),
+        static_cast<unsigned long>(gStalePayloads),
+        static_cast<unsigned long>(gDuplicateConnects),
+        static_cast<unsigned long>(gRssiTimeouts),
+        static_cast<unsigned long>(gRssiStaleCompletions));
 #else
     Serial.println("[ble-midi] status=protocol-ready bearer=pending");
 #endif
@@ -611,17 +992,10 @@ bool connectionRssi(int8_t* out_dbm)
   if (!out_dbm) return false;
   *out_dbm = 0;
 #if TAB5_BLE_GATT_AVAILABLE
-  if (!gConnected || gConnHandle == BLE_HS_CONN_HANDLE_NONE) return false;
-  int8_t rssi = 0;
-  const int rc = ble_gap_conn_rssi(gConnHandle, &rssi);
-  if (rc != 0) {
-    if (rc == BLE_HS_HCI_ERR(BLE_ERR_UNK_CONN_ID)) {
-      apply_disconnected("RSSI_UNKNOWN_HANDLE");
-      if (gServer) gServer->startAdvertising();
-    }
-    return false;
-  }
-  *out_dbm = rssi;
+  // UI reads the loop-owned cache only. HCI acquisition happens at most once
+  // every two seconds in the bounded maintenance state machine.
+  if (!gConnected || !gCachedRssiValid) return false;
+  *out_dbm = gCachedRssi;
   return true;
 #else
   return false;
