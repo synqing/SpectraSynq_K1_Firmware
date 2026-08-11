@@ -221,6 +221,8 @@ Now combine peripherals and test the full system:
 **Required:** `superpowers:verification-before-completion` -- measurements at each layer ARE the pass criteria
 **Pairs with:** `/peripheral-bus-debugging` -- when Layer 4 fails
 **Pairs with:** `/firmware-crash-analysis` -- when Layer 2 reveals boot crashes
+**Pairs with:** `/k1-vj-session-discipline` -- IM69D silence soaks, Tab5 Deck16 BLE, boot-show lock, safe-mode LED null crashes (session canon 2026-08-07)
+**Reference:** `docs/canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md` -- HARD FAIL immune memory for this product lane
 **Reference:** `docs/PIN_MAP.md` -- Layer 3 cross-reference
 **Reference:** `docs/POWER_SEQUENCE.md` -- Layer 1 power-on ordering
 **Reference:** `docs/HARDWARE.md` -- schematic and PCB notes

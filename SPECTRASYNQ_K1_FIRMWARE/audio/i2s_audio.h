@@ -887,17 +887,13 @@ void acquire_sample_chunk(uint32_t t_now) {
       USBSerial.println(sweet_spot_state);
     }
 
-    if (CONFIG.STANDBY_DIMMING) {
-      // Asymmetric fade: slow to true black on sustained silence, near-instant wake on
-      // the first sound. silent_scale multiplies MASTER_BRIGHTNESS on the plate
-      // (led_utilities.h:399) → reaches 0 = fully dark. K1 has no indicator LEDs.
-      const float fade_target = silence ? 0.0f : 1.0f;
-      const float fade_a = (fade_target < silent_scale) ? SILENT_FADE_DOWN_ALPHA : SILENT_FADE_UP_ALPHA;
-      silent_scale = fade_target * fade_a + silent_scale_last * (1.0f - fade_a);
-      silent_scale_last = silent_scale;
-    } else {
-      silent_scale = 1.0;
-    }
+    // STANDBY_DIMMING STRUCK 2026-08-09 (Captain): option permanently removed from
+    // operator-selectable surfaces. Keep silent_scale pinned at Core 0 so NVS/UI
+    // cannot re-enable the IIR fade (silent_scale→0 dark plate). K1_BLE_REMOTED
+    // builds retain the same belt; product behaviour is dimming OFF everywhere.
+    (void)CONFIG.STANDBY_DIMMING;
+    silent_scale      = 1.0f;
+    silent_scale_last = 1.0f;
 
     sweet_spot_state_last = sweet_spot_state;
 
@@ -999,7 +995,10 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
 #endif
 #ifdef K1_LOUD_GUARD_V1
-    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f mode=%d",
+    // lg_mode = loud-guard retune matrix (0/1/2). lightshow = CONFIG.LIGHTSHOW_MODE.
+    // Do NOT label lg_mode as "mode=" — that false-read as lightshow mode 2 on Unit 2
+    // and caused a silence-fix "PASS" while WAVEFORM_HYBRID_K1 (32) stayed dead.
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f lg_mode=%d lightshow=%u",
       k1_loud_guard_enabled ? 1 : 0,
       k1_loud_input_trim,
       k1_loud_gdft_trim,
@@ -1010,7 +1009,8 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_peak_pin_duty,
       k1_loud_spec_sat_duty,
       k1_loud_spec_sat_fraction,
-      k1_loud_guard_mode);
+      k1_loud_guard_mode,
+      (unsigned)CONFIG.LIGHTSHOW_MODE);
 #endif
 #ifdef K1_STM
     {

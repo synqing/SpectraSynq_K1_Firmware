@@ -82,8 +82,19 @@ Merges/reverts/fixups are exempt (the hook skips them).
    origin (`scripts/git_session_end.sh "<msg>" [trailer]`), update the
    handoff. A session that ends with a dirty tree is a failed session,
    regardless of what it built.
-5. MERGE to main only with host gates green. Device proof is recorded
-   post-merge (registry row / `proof/` tag), never required for merge.
+5. MERGE to main only with host gates green + a dated CHANGELOG.md entry
+   for any behaviour change. Device proof is recorded post-merge (registry
+   row / `proof/` tag), never required for merge.
+6. SCOPE: write ONLY inside the repo this session was invoked in (plus its
+   `_scratch/`). Desktop, Downloads, Documents, home root: NEVER, for any
+   file, for any reason.
+7. BIRTH: every new file is either canonical (the repo's enumerated set,
+   updated in place) or `_scratch/<lane>_<YYYYMMDD>/`. A new permanent doc
+   requires an inbound reference (spec-index / docs link / CHANGELOG) in
+   the same commit. No nameable future reader = it is scratch.
+8. SWEEP: before the session-end commit, delete or move to `_graveyard/`
+   your own uncited scratch. Never delete history, evidence, or anything
+   cited from the canonical set — quarantine only.
 ```
 
 ## Enforcement (complete list — nothing else is authorised)
@@ -117,6 +128,9 @@ git config core.hooksPath .githooks && chmod +x .githooks/commit-msg scripts/git
 agent manual (`~/.claude/CLAUDE.md`) once, so every session in every repo
 inherits it; per-repo AGENTS.md copies are reinforcement, not the source of
 truth.
+
+The filesystem law behind stanza steps 6–8 (zones, quarantine, deny rules)
+lives in the sibling doc `docs/process/SPECTRASYNQ-HOUSEKEEPING-DOCTRINE.md`.
 
 Agents: this doctrine is intentionally minimal. Proposing additional gates,
 CI ceremony, branch-protection schemes, or "hardening" of this file without

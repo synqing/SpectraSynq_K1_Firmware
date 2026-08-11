@@ -104,6 +104,52 @@ count_named() {
   echo "$n"
 }
 
+
+# Preserve / re-assert SpectraSynq UI router + optical gate globals.
+# These are NOT in PLUGIN_SKILLS / PROJECT_SKILLS; without this, a future
+# blanket home-skills sync could orphan them. Idempotent symlinks → K1
+# canonical (or this project's .claude copy when present).
+link_ui_skills_global() {
+  # Globals MUST always point at K1 canonical — never at a project-local
+  # copy. setup-project-skills (premium-site/embedded-knob) copies these
+  # into other trees; preferring $PROJECT here would retarget ~/.*/skills
+  # away from the single inode and allow mutated copies to become "truth".
+  local K1_CANON="/Users/spectrasynq/SpectraSynq_K1_Firmware"
+  local name src dest target
+  for name in spectrasynq-ui-router spectrasynq-ui-precode-optical-gate; do
+    if [ -f "$K1_CANON/.claude/skills/$name/SKILL.md" ]; then
+      src="$K1_CANON/.claude/skills/$name"
+    elif [ -f "$PROJECT/.claude/skills/$name/SKILL.md" ]; then
+      # Emergency fallback only if K1 checkout missing/moved.
+      src="$PROJECT/.claude/skills/$name"
+      echo "  WARN global $name: K1 canonical missing; falling back to PROJECT=$PROJECT"
+    else
+      echo "  SKIP global $name (canonical missing)"
+      continue
+    fi
+    for dest in \
+      "$HOME/.claude/skills" \
+      "$HOME/.cursor/skills" \
+      "$HOME/.codex/skills" \
+      "$HOME/.agents/skills"
+    do
+      mkdir -p "$dest"
+      target="$dest/$name"
+      if [ -L "$target" ] || [ ! -e "$target" ]; then
+        rm -f "$target"
+        ln -s "$src" "$target"
+        echo "  GLOBAL $target -> $src"
+      elif [ -d "$target" ]; then
+        rm -rf "$target"
+        ln -s "$src" "$target"
+        echo "  GLOBAL (replaced dir) $target -> $src"
+      else
+        echo "  SKIP global $target (unexpected non-dir entry)"
+      fi
+    done
+  done
+}
+
 # Global availability for /claude-mem-router (Claude Code + Cursor + Codex).
 # Canonical body stays in the project; home skill dirs get symlinks.
 link_router_global() {
@@ -140,6 +186,8 @@ echo "  .claude/skills present: $(count_named "$PROJECT/.claude/skills")/$((${#P
 echo "  .cursor/skills present: $(count_named "$PROJECT/.cursor/skills")/$((${#PLUGIN_SKILLS[@]} + ${#PROJECT_SKILLS[@]}))"
 echo "  .codex/skills present:  $(count_named "$PROJECT/.codex/skills")/$((${#PLUGIN_SKILLS[@]} + ${#PROJECT_SKILLS[@]}))"
 link_router_global
+link_ui_skills_global
 echo "  invoke: /claude-mem-router  (scenario → one skill; project + GLOBAL)"
+echo "          /spectrasynq-ui-router  (UI dispatch; optical gate first hop; GLOBAL)"
 echo "          /mem-search /knowledge-agent /timeline-report /how-it-works /spec-recall"
 echo "          /smart-explore /learn-codebase /weekly-digests /memory-authority-gate"

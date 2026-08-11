@@ -1,0 +1,401 @@
+{
+  "schema": "spectrasynq.k1.deck16.layout/1",
+  "layout_revision": "K1_DECK16_LAYOUT_V1",
+  "architecture_revision": "K1_DECK16_TAB5_BLE_R1",
+  "date": "2026-08-06",
+  "captain_authority": {
+    "ui_main_glass": "NOT_CAPTAIN_APPROVED",
+    "sixteen_grid": "RETAINED_FOR_ENCODERS",
+    "param_set": "NOT_CAPTAIN_APPROVED",
+    "verdict": "Param selection in this file is NOT Captain-approved for MAIN glass. 16-grid layout geometry is retained for future dual Unit 8Encoder binding.",
+    "audit": "_scratch/deck16_layout16_authority_audit_20260809/AUTHORITY_AUDIT.md",
+    "receipt": "_scratch/deck16_layout16_authority_audit_20260809/MAIN_STRIP_RECEIPT.md",
+    "note": "Protocol/transport rules may survive. This file does NOT freeze Operator MAIN content. Captain MAIN today = v6 4-box + photons/mood + seven soft keys. Do not treat layout SHA as a UI param lock. Do not delete the 16-grid \u2014 it is encoder-reserved infrastructure.",
+    "banned_as_main_cells": [
+      "primary.chroma",
+      "primary.saturation",
+      "primary.mirror",
+      "primary.prism_count",
+      "secondary.enabled",
+      "secondary.chroma",
+      "secondary.saturation",
+      "secondary.mirror"
+    ],
+    "mirror_purge_utc": "2026-08-09",
+    "mirror_purge_note": "HARD: primary.mirror / secondary.mirror purged from BLE-MIDI map, facade, Deck TX/RX, and operator UI. NEVER reintroduce on BLE/Deck. K1 USB mirror_enabled= remains bringup-only, not a product control.",
+    "course_correct_utc": "2026-08-09"
+  },
+  "source_ble_midi_map": {
+    "path": "docs/protocol/k1-ble-midi-map.json",
+    "registry_version": "2026-06-09",
+    "registry_md5": "9b5db3fbb17438367adeaceb541db03b",
+    "control_count": 68
+  },
+  "hardware": {
+    "hmi": "M5Stack Tab5",
+    "primary_encoder_unit": {
+      "model": "M5Stack Unit 8Encoder",
+      "i2c_address": "0x41",
+      "row": "primary"
+    },
+    "secondary_encoder_unit": {
+      "model": "M5Stack Unit 8Encoder",
+      "i2c_address": "0x42",
+      "row": "secondary",
+      "requirement": "Provision and prove this non-factory address before integrated qualification."
+    }
+  },
+  "display": {
+    "width_px": 1280,
+    "height_px": 720,
+    "rows": 2,
+    "columns": 8,
+    "cell_width_px": 160
+  },
+  "rules": {
+    "state_authority": "K1",
+    "display_value": "K1-confirmed only",
+    "pending_value": "shown separately until confirmed",
+    "primary_secondary_banking": "forbidden",
+    "scheduler_max_hz_per_control": 30,
+    "idle_tx": "none"
+  },
+  "controls": [
+    {
+      "slot": "P1",
+      "row": "primary",
+      "column": 1,
+      "encoder_index": 0,
+      "control_id": "primary.mode",
+      "display_name": "Mode",
+      "channel": "primary",
+      "unit": "mode",
+      "value_type": "enum",
+      "step": {
+        "slow": 1,
+        "medium": 1,
+        "fast": 2
+      },
+      "push_action": {
+        "type": "cycle_next",
+        "control_id": "primary.mode"
+      },
+      "rgb_role": "primary_mode"
+    },
+    {
+      "slot": "P2",
+      "row": "primary",
+      "column": 2,
+      "encoder_index": 1,
+      "control_id": "primary.palette",
+      "display_name": "Palette",
+      "channel": "primary",
+      "unit": "palette",
+      "value_type": "enum",
+      "step": {
+        "slow": 1,
+        "medium": 1,
+        "fast": 2
+      },
+      "push_action": {
+        "type": "cycle_next",
+        "control_id": "primary.palette"
+      },
+      "rgb_role": "primary_colour"
+    },
+    {
+      "slot": "P3",
+      "row": "primary",
+      "column": 3,
+      "encoder_index": 2,
+      "control_id": "primary.photons",
+      "display_name": "Photons",
+      "channel": "primary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "primary_intensity"
+    },
+    {
+      "slot": "P4",
+      "row": "primary",
+      "column": 4,
+      "encoder_index": 3,
+      "control_id": "primary.chroma",
+      "display_name": "Chroma",
+      "channel": "primary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "primary_colour"
+    },
+    {
+      "slot": "P5",
+      "row": "primary",
+      "column": 5,
+      "encoder_index": 4,
+      "control_id": "primary.mood",
+      "display_name": "Mood",
+      "channel": "primary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "primary_mood"
+    },
+    {
+      "slot": "P6",
+      "row": "primary",
+      "column": 6,
+      "encoder_index": 5,
+      "control_id": "primary.saturation",
+      "display_name": "Saturation",
+      "channel": "primary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "primary_colour"
+    },
+    {
+      "slot": "P7",
+      "row": "primary",
+      "column": 7,
+      "encoder_index": 6,
+      "control_id": null,
+      "display_name": "",
+      "channel": "primary",
+      "unit": "blank",
+      "value_type": "none",
+      "step": {
+        "slow": 0,
+        "medium": 0,
+        "fast": 0
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "reserved_blank",
+      "note": "Mirror purged 2026-08-09 \u2014 NEVER reintroduce primary.mirror on BLE/Deck"
+    },
+    {
+      "slot": "P8",
+      "row": "primary",
+      "column": 8,
+      "encoder_index": 7,
+      "control_id": "primary.prism_count",
+      "display_name": "Prisms",
+      "channel": "primary",
+      "unit": "count",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "primary_geometry"
+    },
+    {
+      "slot": "S1",
+      "row": "secondary",
+      "column": 1,
+      "encoder_index": 0,
+      "control_id": "secondary.mode",
+      "display_name": "Mode",
+      "channel": "secondary",
+      "unit": "mode",
+      "value_type": "enum",
+      "step": {
+        "slow": 1,
+        "medium": 1,
+        "fast": 2
+      },
+      "push_action": {
+        "type": "cycle_next",
+        "control_id": "secondary.mode"
+      },
+      "rgb_role": "secondary_mode"
+    },
+    {
+      "slot": "S2",
+      "row": "secondary",
+      "column": 2,
+      "encoder_index": 1,
+      "control_id": "secondary.palette",
+      "display_name": "Palette",
+      "channel": "secondary",
+      "unit": "palette",
+      "value_type": "enum",
+      "step": {
+        "slow": 1,
+        "medium": 1,
+        "fast": 2
+      },
+      "push_action": {
+        "type": "cycle_next",
+        "control_id": "secondary.palette"
+      },
+      "rgb_role": "secondary_colour"
+    },
+    {
+      "slot": "S3",
+      "row": "secondary",
+      "column": 3,
+      "encoder_index": 2,
+      "control_id": "secondary.enabled",
+      "display_name": "Enabled",
+      "channel": "secondary",
+      "unit": "boolean",
+      "value_type": "bool",
+      "step": {
+        "slow": 1,
+        "medium": 1,
+        "fast": 1
+      },
+      "push_action": {
+        "type": "toggle",
+        "control_id": "secondary.enabled"
+      },
+      "rgb_role": "secondary_toggle"
+    },
+    {
+      "slot": "S4",
+      "row": "secondary",
+      "column": 4,
+      "encoder_index": 3,
+      "control_id": "secondary.photons",
+      "display_name": "Photons",
+      "channel": "secondary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "secondary_intensity"
+    },
+    {
+      "slot": "S5",
+      "row": "secondary",
+      "column": 5,
+      "encoder_index": 4,
+      "control_id": "secondary.chroma",
+      "display_name": "Chroma",
+      "channel": "secondary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "secondary_colour"
+    },
+    {
+      "slot": "S6",
+      "row": "secondary",
+      "column": 6,
+      "encoder_index": 5,
+      "control_id": "secondary.mood",
+      "display_name": "Mood",
+      "channel": "secondary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "secondary_mood"
+    },
+    {
+      "slot": "S7",
+      "row": "secondary",
+      "column": 7,
+      "encoder_index": 6,
+      "control_id": "secondary.saturation",
+      "display_name": "Saturation",
+      "channel": "secondary",
+      "unit": "normalised",
+      "value_type": "cc14",
+      "step": {
+        "slow": 64,
+        "medium": 256,
+        "fast": 768
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "secondary_colour"
+    },
+    {
+      "slot": "S8",
+      "row": "secondary",
+      "column": 8,
+      "encoder_index": 7,
+      "control_id": null,
+      "display_name": "",
+      "channel": "secondary",
+      "unit": "blank",
+      "value_type": "none",
+      "step": {
+        "slow": 0,
+        "medium": 0,
+        "fast": 0
+      },
+      "push_action": {
+        "type": "none"
+      },
+      "rgb_role": "reserved_blank",
+      "note": "Mirror purged 2026-08-09 \u2014 NEVER reintroduce secondary.mirror on BLE/Deck"
+    }
+  ],
+  "global_strip": [
+    "global.master_brightness",
+    "global.sensitivity",
+    "global.max_current_ma",
+    "global.chroma_profile",
+    "director.enabled",
+    "edge.enabled",
+    "vp.profile"
+  ]
+}

@@ -23,3 +23,6 @@ bool k1_ble_remoted_is_linked();
 
 // Print one coherent, fixed-schema snapshot for the F2 dial evidence contract.
 void k1_ble_remoted_status();
+
+// Phase-6 proof inject: disconnect | abort_snapshot | skip_rev
+void k1_ble_remoted_proof(const char* cmd);

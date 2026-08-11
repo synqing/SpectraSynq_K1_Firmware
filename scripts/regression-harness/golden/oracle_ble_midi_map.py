@@ -429,9 +429,9 @@ MUTATIONS = [
     (r'needs_number_range\(record, &result, 0\.05f, 1\.0f, "Primary photons',
      r'needs_number_range(record, &result, 0.05f, 2.0f, "Primary photons',
      "float range widened (primary.photons max 1.0->2.0)"),
-    (r'strcmp\(record\.control, "primary\.mirror"\)',
-     r'strcmp(record.control, "primary.mirror_DROPPED")',
-     "control path dropped from apply() (primary.mirror) -> missing-branch caught"),
+    (r'strcmp\(record\.control, "primary\.auto_color_shift"\)',
+     r'strcmp(record.control, "primary.auto_color_shift_DROPPED")',
+     "control path dropped from apply() (primary.auto_color_shift) -> missing-branch caught"),
     (r'parse_index\(record\.number_value, NUM_MODES - 1',
      r'parse_index(record.number_value, NUM_MODES - 2',
      "mode index range changed (NUM_MODES-1 -> NUM_MODES-2)"),
@@ -455,7 +455,7 @@ def assert_parity() -> int:
 
     fresh = build_map()                       # raises on coverage/collision failure
     controls = load_registry_controls()
-    check(f"registry control_count == 71 (got {len(controls)})", len(controls) == 71)
+    check(f"registry control_count == 68 (got {len(controls)})", len(controls) == 68)
     check(f"map covers exactly the registry set ({fresh['control_count']} entries)",
           {e["path"] for e in fresh["entries"]} == set(controls))
     check("every control typed (no unclassified)",
@@ -476,7 +476,7 @@ def assert_parity() -> int:
         check(f"committed map exists at {MAP_JSON.relative_to(ROOT)}", False)
 
     print("\nBLE_MIDI_MAP_PARITY:",
-          "PROVEN -- map covers 71/71, no collisions, in sync with registry+facade" if ok
+          "PROVEN -- map covers registry, no collisions, in sync with registry+facade" if ok
           else "FAILED -- map drifted from registry/facade; regenerate with --write")
     return 0 if ok else 1
 

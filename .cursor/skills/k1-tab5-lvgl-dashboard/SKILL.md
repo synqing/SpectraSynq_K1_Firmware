@@ -9,6 +9,23 @@ allowed-tools: Read, Edit, Write, Glob, Grep, Bash
 
 Use this skill for the Tab5 LVGL dashboard that controls K1.
 
+## Pre-code optical gate REQUIRED (via UI router)
+
+**HARD BLOCK:** Before any design→code / look / type / geometry / soft-key chrome
+edits on this surface, enter via
+[`spectrasynq-ui-router`](../spectrasynq-ui-router/SKILL.md), which mandates
+**PASS** of
+[`spectrasynq-ui-precode-optical-gate`](../spectrasynq-ui-precode-optical-gate/SKILL.md)
+as the first hop. Do not skip the router and self-grant unlock.
+
+- Router: `.claude/skills/spectrasynq-ui-router/SKILL.md`
+- Canon: `docs/canon/SESSION_CANON_2026-08-09_ui_precode_optical_gate.md`
+- Process: `docs/process/SPECTRASYNQ-UI-PRECODE-OPTICAL-GATE.md`
+- PASS keys: `OPTICAL_GATE_RECEIPT.md` + SHA-pinned `MEASURED.json` + crops — not prose
+- Declare tier T0/T1/T2; undeclared = T0
+- This skill is for **implementation after** optical PASS — it does not replace the gate
+  or own UI skill dispatch (router does)
+
 ## Canon
 
 - The K1 dashboard is a single-purpose K1 control page. Do not drag along unrelated LightwaveOS/PIPdeck pages.

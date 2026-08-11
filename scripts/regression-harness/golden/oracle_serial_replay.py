@@ -198,7 +198,6 @@ CORPUS = [
     "sweet_spot_min=100",
     "sweet_spot_max=900",
     "chromagram_range=24",
-    "standby_dimming=true",
     "reverse_order=true",
     "max_current_ma=1500",
     "auto_color_shift=true",

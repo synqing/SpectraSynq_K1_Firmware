@@ -237,7 +237,7 @@ def _samples(entry):
     if t == "bool":
         return [0, 1]
     if t == "mode":
-        return list(range(0, 30))            # every ordinal -> PC-addressable
+        return list(range(enabled_modes()["num_modes"]))  # every ordinal -> PC-addressable
     if t == "enum":
         return [0, 1, 2, 7, 17, 64, 127]
     if t == "float":
@@ -311,12 +311,15 @@ def run_property(m: dict, firmware_root: Path | None = None):
     em = enabled_modes(firmware_root)
     check(f"enabled modes re-derived from config_types.h == 23 (got {em['enabled_count']})",
           em["enabled_count"] == 23)
-    check(f"NUM_MODES roster == 30 (got {em['num_modes']})", em["num_modes"] == 30)
+    check(f"NUM_MODES roster == 33 (got {em['num_modes']})", em["num_modes"] == 33)
     check(f"mode 29 ({em['mode29_name']}) is enabled", em["mode29_enabled"])
 
     modes = [e for e in m["entries"] if e["type"] == "mode"]
     check(f"mode controls present ({len(modes)}: primary+secondary)", len(modes) == 2)
-    check("every ordinal 0..29 is PC-addressable (value<=127)", all(o <= 127 for o in range(30)))
+    check(
+        f"every ordinal 0..{em['num_modes'] - 1} is PC-addressable (value<=127)",
+        all(o <= 127 for o in range(em["num_modes"])),
+    )
 
     # 14-bit float monotonicity + resolution
     mono_ok = res_ok = True

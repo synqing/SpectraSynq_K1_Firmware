@@ -26,7 +26,7 @@ build_src_filter =
     +<network/k1_ble_midi_decoder.cpp>
 build_flags =
     ${env:k1_bench_im73d.build_flags}
-    -DSB_K1_BLE_REMOTED
+    -DK1_BLE_REMOTED
 lib_deps =
     ${env:k1_hardware.lib_deps}
     h2zero/NimBLE-Arduino@^2.5.0
@@ -40,12 +40,12 @@ Guard registration: `k1_bench_im73d_ble` added to the **bench K1 tuple** in `scr
 
 | SSA | Evidence question | Verdict | Orchestrator re-run |
 |-----|-------------------|---------|---------------------|
-| 1 · linkage | Does BLE→`sb_k1_control_apply` link & wire on the bench chain w/o harness or `sb_k1_wireless.cpp`? | **VERIFIED** | re-grep'd `.ino:675/812` calls under `#ifdef SB_K1_BLE_REMOTED`; `sb_k1_control_apply()` (`control/sb_k1_control_facade.cpp:468`) is **unconditional** (no ifdef strips it); **+ the actual compile** |
+| 1 · linkage | Does BLE→`k1_control_apply` link & wire on the bench chain w/o harness or `k1_wireless.cpp`? | **VERIFIED** | re-grep'd `.ino` calls under `#ifdef K1_BLE_REMOTED`; `k1_control_apply()` (`control/k1_control_facade.cpp`) is **unconditional** (no ifdef strips it); **+ the actual compile** |
 | 2 · RT/RF | Does a Core-0 NimBLE task confound the mic eval / perturb audio? | **VERIFIED (risk real)** | re-read `ble_remoted_central.cpp:229` (`xTaskCreatePinnedToCore(...,0)`) + NimBLE `nimconfig.h:213` (`CONFIG_BT_NIMBLE_PINNED_TO_CORE 0`) + the IM73D-specific I2S stall→silent-zero-fill branch. Both the app task **and** NimBLE host default to Core 0. Confound is real for *measurement*; moot for *demo* (separate workstreams). |
 | 3 · K718 protocol | Can the K718 emit matching BLE-MIDI, or is control blocked on K718-side work? | **provisional (later overridden by runtime — see below)** | static source audit only; not orchestrator-verified. Claimed the K718 TX sketch (`~/Downloads/k718_halo_phase1_source/full_sketch`) was protocol-byte-exact but never compiled/flashed. |
 | 4 · device/gate | Flash target + guard edit + gate safety? | **VERIFIED** | target = bench `B489A500` (NOT the drifted `1101=main` the *stale* registry claimed); 1 guard line; gate tests stay green on the clean bench chain (MUST-AVOID `extends=k1_ble_remoted_probe`). |
 
-**Verified wiring path:** K718 dial → NimBLE notify → `k1_ble_midi_decode_packet` → queue → `sb_k1_ble_remoted_poll()` (main loop) → `sb_k1_control_apply()` → `CONFIG.*` mutation + `save_config_delayed()`.
+**Verified wiring path:** K718 dial → NimBLE notify → `k1_ble_midi_decode_packet` → queue → `k1_ble_remoted_poll()` (main loop) → `k1_control_apply()` → `CONFIG.*` mutation + `save_config_delayed()`.
 
 ## Evidence
 

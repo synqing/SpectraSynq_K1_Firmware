@@ -1704,7 +1704,6 @@ bool serial_hotkey_is_immediate(char key) {
 	    "sweet_spot_min",
 	    "sweet_spot_max",
 	    "chromagram_range",
-	    "standby_dimming",
 	    "set_chroma_profile",
 	    "bass_mode",
 	    "max_current_ma",
@@ -2104,7 +2103,9 @@ void cmd_help() {
   USBSerial.println("                      vp_profile=[original/clean/candidate] | Apply VP diagnostic profile");
   USBSerial.println("                         ap_stream=[on/off] | Stream 1 Hz audio-pipeline telemetry");
   USBSerial.println("                         vp_stream=[on/off] | Stream 1 Hz VP diagnostic telemetry");
+#ifdef K1_BLE_REMOTED
   USBSerial.println("                         ble_stream=[on/off] | Stream 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build)");
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   USBSerial.println("                         nov_capture=[ms] | Non-shippable buffered accepted-novelty capture");
   USBSerial.println("                         nov_dump=1 | Dump buffered NOV rows after capture");
@@ -2165,7 +2166,7 @@ void cmd_help() {
   USBSerial.println("                                  mood=[0.00-1.00] | Set primary visual mood");
   USBSerial.println("                     palette_mode=[on/off] | Runtime-enable primary palette mode");
   USBSerial.println("                         palette_index=[int] | Set primary gradient palette");
-  USBSerial.println("          mirror_enabled=[true/false/default] | Remotely toggle lightshow mirroring");
+  USBSerial.println("          mirror_enabled=[true/false/default] | BRINGUP ONLY — not a product/Deck/BLE control");
   USBSerial.println("           reverse_order=[true/false/default] | Toggle whether image is flipped upside down before final rendering");
   USBSerial.println("                          get_mode_name=[int] | Get a mode's name by ID (index)");
   USBSerial.println("                                stream=[type] | Stream live data to a Serial Plotter.");
@@ -2189,7 +2190,6 @@ void cmd_help() {
   USBSerial.println("            sweet_spot_max=[int or 'default'] | Sets the maximum amplitude to be inside the 'Sweet Spot'");
   USBSerial.println("         chromagram_range=[1-80 or 'default'] | Range between 1 and 80, how many notes at the bottom of the");
   USBSerial.println("                                                spectrogram should be considered in chromagram sums");
-  USBSerial.println("         standby_dimming=[true/false/default] | Toggle dimming during detected silence");
   USBSerial.println("    set_chroma_profile=[default/bass/full] | Chromagram preset (global): default=v40102 (12/60), bass=0/24, full=0/80. Reboots only if note_offset changes");
   USBSerial.println("                       bass_mode=[true/false] | (alias) Toggle bass-mode; true=bass profile, false=default. Alters note_offset and chromagram_range for bass-y tunes");
   USBSerial.println("            max_current_ma=[int or 'default'] | Sets the maximum current FastLED will attempt to limit the LED consumption to");
@@ -2226,7 +2226,7 @@ void cmd_help() {
   USBSerial.println("                 secondary_mood=[0-1.0] | Set mood value for secondary LED strip");
   USBSerial.println("            secondary_saturation=[0-1.0] | Set saturation for secondary LED strip");
   USBSerial.println("          secondary_prism_count=[0-10] | Set prism count for secondary LED strip");
-  USBSerial.println("   secondary_mirror_enabled=[true/false] | Toggle mirroring on secondary LED strip");
+  USBSerial.println("   secondary_mirror_enabled=[true/false] | BRINGUP ONLY — not a product/Deck/BLE control");
   USBSerial.println("    secondary_reverse_order=[true/false] | Toggle image flipping on secondary LED strip");
   USBSerial.println("              secondary_base_coat=[true/false] | Enable dim backdrop on secondary LED strip");
   USBSerial.println("                  secondary_status | Display current status of secondary LED strip");
@@ -3213,20 +3213,7 @@ void parse_command(char* command_buf) {
     }
 #endif
 
-    // ── Silence go-dark A/B (2026-07-10) — runtime enable + tuning, no recompile. ──
-    // K1 has NO indicator LEDs; the plate is the only output. STANDBY_DIMMING ships OFF
-    // (dormant); enable it here to A/B the go-dark on hardware before the default flip.
-    else if (strcmp(command_type, "standby_dimming") == 0) {
-      bool value = false;
-      if (vp_parse_bool(command_data, &value)) {
-        CONFIG.STANDBY_DIMMING = value;
-        tx_begin();
-        USBSerial.print("STANDBY_DIMMING: "); USBSerial.println(value ? "on" : "off");
-        tx_end();
-      } else {
-        bad_command(command_type, command_data);
-      }
-    }
+    // STANDBY_DIMMING STRUCK 2026-08-09 — legacy A/B toggle removed from available options.
     else if (strcmp(command_type, "silence_enter") == 0) {
       SILENCE_ENTER_SSL_FRAC = (float)atof(command_data);
       tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();

@@ -7,6 +7,7 @@
 #
 #   docs / md / instructions / skills .... no build, no test  (instant)
 #   tests/**.py  scripts/regression-harness/**.py .... pytest only
+#   tab5_firmware/**  (in-repo Deck16 controller) ... pytest only
 #   sb-tab5-wireless-controller/** + Tab5 harness .... pytest + tab5 build
 #   SPECTRASYNQ_K1_FIRMWARE/** source  +  platformio.ini
 #     +  scripts/platformio/*.py (build pre-scripts) .... pytest + k1 build
@@ -37,6 +38,16 @@ classify_tier() {
       sb-tab5-wireless-controller/*|tools/tab5_k1_dashboard_harness.py|docs/protocol/k1-ws-contract.yaml|docs/protocol/k1-rest-contract.yaml)
         tab5=1 ;;
       tests/*.py|scripts/regression-harness/*.py)
+        pyharness=1 ;;
+      # In-repo Tab5 Deck16 controller (tab5_firmware/, ported 2026-08-06).
+      # Before this case it fell through to the "docs" tier and committed with
+      # NO gate at all, despite tests/test_deck_state_v1.py making 12 assertions
+      # by READING these sources — a Tab5 edit can and does break the host suite.
+      # Deliberately pytest and NOT a pio build: tab5_firmware/vendor/ (the
+      # pinned toolchain) is gitignored, so `pio run -d tab5_firmware` cannot run
+      # on a clean clone and a build tier here would fail-closed on every fresh
+      # checkout. This closes a hole in an existing gate; it adds no new gate class.
+      tab5_firmware/*)
         pyharness=1 ;;
     esac
   done

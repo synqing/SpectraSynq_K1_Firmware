@@ -758,8 +758,11 @@ def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
         remoted, "void onDisconnect(NimBLEClient*, int reason) override"
     )
     deferred_down = _function_body(remoted, "void emit_pending_link_down()")
-    assert remoted.count("writeValue(") == 1
-    assert "Serial.printf" not in remoted
+    # Two GATT writes by design:
+    # 1) send_pending_confirmation → rx_char (dial confirm CC)
+    # 2) emit_enc8_absolute_sync → midi_chr (ENC8 absolute path sync; no Deck state GATT)
+    assert remoted.count("writeValue(") == 2
+    assert "midi_chr->writeValue" in remoted
     assert "rx_char->writeValue" in send
     assert "send_pending_confirmation();" in task
     assert "emit_pending_link_down();" in task
@@ -771,6 +774,8 @@ def test_f2_remoted_gatt_write_remains_core1_and_status_is_allocation_free():
     assert "serial_print_formatted(line, written);" in deferred_down
     assert "static_cast<size_t>(written) < N" in remoted
     assert "[ble_remoted_diag] format_overflow" in remoted
+    # Hot paths stay allocation-free and Serial.printf-free.
+    # Cold ENC8 admit/sync + DECK_PROOF + optional K1_LAT in poll may use Serial.printf.
     for body in (send, status):
         assert "Serial.printf" not in body
         assert "snprintf(" in body
