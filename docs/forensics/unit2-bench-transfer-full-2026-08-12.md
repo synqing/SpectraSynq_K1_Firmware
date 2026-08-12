@@ -140,6 +140,70 @@ spoken silence-go. It is the single remaining action that closes the question.
 One incidental datum worth a look during that work: the DC offsets differ sharply —
 Unit 2 `DC=-220`, bench `DC=+137`.
 
+## RESOLVED — Captain silence-go given, Unit 2 recalibrated in situ
+
+Room witness-verified before firing: **mean −62.7 dBFS, max −49.4 dBFS**. Protocol
+per source: uppercase `N` to arm, `Y` within 5 s (lowercase `n` is a knob command).
+Cal result: `reason=none dc_valid=1 dc_samples=12288 dc_rejected=0 ssl_valid=1
+ssl_samples=112 ssl_rejected=0 ssl_p50=150.0 ssl_p90=208.0` → **NOISE CAL ACCEPTED**.
+
+| | before | after |
+|---|---|---|
+| Unit 2 SSL | 136 (`persisted_profile`) | **229** (`measured`) |
+| Unit 2 DC | −220 | −284 |
+
+**SSL rose 1.68×. The prediction made from the quiet/music contrast — before the
+calibration was touched — was 1.67×.**
+
+Post-cal paired quiet leg (bench untouched as control):
+
+| | pre-cal | post-cal |
+|---|---|---|
+| Unit2/bench quiet median | 1.54× | **1.03×** |
+| Unit 2 tail (p95/med) | 2.73 / 1.91 / 2.93 | **2.04** |
+| bench tail (control) | 1.89 / 1.89 / 3.07 | 2.39 |
+
+**Candidate B CONFIRMED. Candidate A REFUTED.** The median collapsed to parity *and*
+Unit 2's tail is now thinner than the bench's. Spiky link noise would have survived a
+recalibration — SSL is a level statistic and cannot absorb a fat tail. It did not
+survive, so it was never there. **The entire 1.25-vs-2.50 delta was a stale
+calibration: an SSL learned at Unit 2's previous placement and never re-learned after
+the board was moved.** Not the wiring, not the capsule, not the LEDs, not the silicon.
+
+### Canon correction
+
+`SESSION_CANON_2026-08-07`'s amendment — *"the joint fraction is derived per
+unit/room, never inherited"* — is **an artefact of an uncalibrated unit**. It should
+read: **calibrate at final placement; the fraction then transfers.** Placement is
+carried by SSL, which is exactly what SSL is for. A per-unit constant was being used
+to compensate for a calibration that had not been re-run.
+
+### The fraction, post-cal
+
+| unit | quiet p95 | music p10 | music p25 | usable window |
+|---|---|---|---|---|
+| Unit 2 | 1.41× | 0.60× | 1.49× | 1.41 – 1.49 |
+| bench | 1.60× | 0.91× | 2.38× | 1.60 – 2.38 |
+
+The windows **do not cleanly overlap** — Unit 2's music p25 (1.49) sits below the
+bench's quiet p95 (1.60), a residual overlap of ~0.11 (≈7%). A single level fraction
+near **1.5** is the best common value, and **the level term alone cannot fully
+separate quiet from music.** That is not a defect in the value; it is why the gate is
+**joint**. The peakiness term carries the residual, and peakiness is the
+placement-invariant half (5.9× vs 1.02× SPL sensitivity, measured above).
+
+Live consequence: **Unit 2's `2.50` was fitted to the stale `SSL=136` and is now
+mis-scaled** against `SSL=229`. It still functions — silence holds 72.2% quiet, wakes
+94% under music, and Captain's eyes-on passed — but it is no longer the value it was
+derived as, and both units' fractions should be re-derived from post-calibration data.
+
+### Eyes-on — PASSED
+
+**Captain, 2026-08-12: "Visuals are fine."** Both units driven side by side under
+music on the Bose at system vol 60, awake 100% of frames, `silent_scale` 1.00.
+This closes the product gate the lane had carried open since 2026-06-15 — the one
+the handover named as *"the only genuine product gate remaining"*.
+
 ## Corrections made during this session, recorded rather than quietly fixed
 
 1. **"Therefore per-room" was wrong.** The first side-by-side result was read as
