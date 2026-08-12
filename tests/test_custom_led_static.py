@@ -100,7 +100,11 @@ def test_dual_206_is_gated_on_the_unit2_flag_not_the_custom_flag():
         "Expected exactly one `#define LED_COUNT_VALUE 206` (in the "
         f"K1_UNIT2_IM69D_V1 block); found {len(primary_206)}."
     )
-    m = re.search(r"#if\s+defined\(K1_UNIT2_IM69D_V1\)(.*?)#else", text, re.DOTALL)
+    # Terminate on the sibling directive, NOT on `#else`: the Unit 2 block contains a
+    # nested `#ifdef K1_UNIT2_LED160_AB ... #else`, so an `#else` terminator stops at
+    # the INNER one and matches the A/B branch instead of the production geometry.
+    m = re.search(r"#if\s+defined\(K1_UNIT2_IM69D_V1\)(.*?)#ifdef\s+K1_CUSTOM_LED_V1",
+                  text, re.DOTALL)
     assert m, "Expected a `#if defined(K1_UNIT2_IM69D_V1)` geometry block."
     assert "LED_COUNT_VALUE 206" in m.group(1), (
         "LED_COUNT_VALUE 206 must live inside the K1_UNIT2_IM69D_V1 branch."

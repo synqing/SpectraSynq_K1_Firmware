@@ -126,8 +126,18 @@
   // Unit 2 hardware truth (Captain, 2026-08-11): two independent physical
   // WS2812B channels of 206 pixels each. The effect/render canvas remains 160;
   // both output paths resample that canvas onto their physical strip.
-  #define LED_COUNT_VALUE 206
-  #define SECONDARY_LED_COUNT_VALUE 206
+  #ifdef K1_UNIT2_LED160_AB
+    // A/B PROBE, default OFF (env k1_unit2_im69d_right_led160ab only). Non-shippable.
+    // Isolates LED drive current as a cause of mic-supply noise coupling: same
+    // silicon, same capsule, same PDM pins, same firmware — only the pixel count
+    // (and therefore the LED rail current) changes. 412 px -> 320 px.
+    // Precedent: the K1_GDFT_X2_AB_V1 optional A/B on k1_bench_im69d.
+    #define LED_COUNT_VALUE 160
+    #define SECONDARY_LED_COUNT_VALUE 160
+  #else
+    #define LED_COUNT_VALUE 206
+    #define SECONDARY_LED_COUNT_VALUE 206
+  #endif
 #else
 #ifdef K1_CUSTOM_LED_V1
   // Custom RGBIC rig (env k1_custom ONLY): 224 primary / 160 secondary.
