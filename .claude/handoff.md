@@ -19,6 +19,14 @@ just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 **Runbook:** `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`  
 **Pack:** [`_scratch/im69d_resolution_20260810/`](../_scratch/im69d_resolution_20260810/)
 
+**🎨 COLOUR FORENSICS (2026-08-13) — read BEFORE any colour/palette work:**
+canon `docs/canon/SESSION_CANON_2026-08-13_colour_forensics_config_poison.md` (HF-41..49) ·
+verdict `docs/forensics/colour-nuance-regression-verdict-2026-08-13.md` · skill `k1-colour-truth`.
+TL;DR: config poisoning (`CHROMAGRAM_RANGE` 60→1) + a real main colour-path regression vs the
+golden Aug-8 bin; golden oracle = readback `04215afb…` + the Aug-5 20:15 preflight config; bench
+left in the Captain-approved golden state (SSL 187 cal overwritten with era 253 — restore before
+main-era measurements); fix lane = hue-coverage metric first, ONE final eyes-on.
+
 **⛔ BINDING RULE (P2.B, 2026-08-12): IM69D floors are measured on IM69D silicon.**
 No silence/lock/novelty/presence value from any Aug-9 IM73D `#ifdef` (all tombstoned or
 archived — inventory: `docs/forensics/audio-profile/2026-08-12-im73d-scar-inventory-p2b.md`)
