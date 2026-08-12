@@ -199,7 +199,7 @@ derived as, and both units' fractions should be re-derived from post-calibration
 
 ### Eyes-on — PASSED
 
-**Captain, 2026-08-12: "Visuals are fine."** Both units driven side by side under
+**Captain, 2026-08-12: "Visuals are fine."** (at fraction 2.5) and, after the fraction was re-derived to 1.75 under true silence and both units reflashed at `a8b1912a`: **"Nah mate, looks good to me."** Eyes-on therefore PASSES at the SHIPPING value, not only at the superseded one. Both units driven side by side under
 music on the Bose at system vol 60, awake 100% of frames, `silent_scale` 1.00.
 This closes the product gate the lane had carried open since 2026-06-15 — the one
 the handover named as *"the only genuine product gate remaining"*.
