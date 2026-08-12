@@ -243,3 +243,22 @@ def test_stereo_probe_tu_preprocesses_to_nothing_when_flag_off():
     assert first_directive == "#ifdef K1_MIC_IM69D_STEREO_V1", (
         "k1_stereo_probe.cpp must open with the flag gate before any include"
     )
+
+
+def test_scap_dispatch_reaches_the_parse_command_ladder():
+    """The .def table is safety METADATA; live type=value dispatch is the
+    strcmp ladder in serial_menu.cpp. A row without a ladder call-site compiles
+    clean and answers `Bad command` on device (caught live 2026-08-12 — this
+    ratchet pins the fix)."""
+    menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" /
+            "serial_menu.cpp").read_text(encoding="utf-8")
+    m = re.search(
+        r"#ifdef\s+K1_MIC_IM69D_STEREO_V1\s*\n(.*?)#endif",
+        menu[menu.find("parse_command"):],
+        re.S,
+    )
+    assert m, "parse_command must carry a K1_MIC_IM69D_STEREO_V1-gated hop"
+    assert "k1_stereo_probe_dispatch(command_type, command_data)" in m.group(1), (
+        "the gated hop must call k1_stereo_probe_dispatch — the table row alone "
+        "does not dispatch"
+    )
