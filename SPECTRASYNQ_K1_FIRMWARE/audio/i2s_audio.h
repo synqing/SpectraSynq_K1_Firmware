@@ -271,6 +271,8 @@ void init_i2s() {
   // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
   // 16-bit mono Stage 1, DSR_16S default (1.6384 MHz @ 12.8k), slot LEFT.
   // Pins clk=14/din=13. SELECT is hard-strapped on-board — do NOT drive GPIO12.
+  // Stage 1 remains mono and requires an explicit slot for Unit 2 diagnostics;
+  // PCB3 retains its historical LEFT default.
   i2s_pdm_rx_config_t pdm_cfg = {
     .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
     .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
@@ -283,9 +285,23 @@ void init_i2s() {
 #ifdef K1_MIC_IM69D_DSR_16S_V1
   pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
 #endif
+#if defined(K1_MIC_IM69D_SLOT_LEFT) && defined(K1_MIC_IM69D_SLOT_RIGHT)
+#error "IM69D diagnostic build must select exactly one PDM slot"
+#elif defined(K1_MIC_IM69D_SLOT_LEFT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_LEFT;
+#elif defined(K1_MIC_IM69D_SLOT_RIGHT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_RIGHT;
+#elif defined(K1_UNIT2_IM69D_V1)
+#error "Unit 2 IM69D diagnostic builds require an explicit slot"
+#endif
   result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
   USBSerial.print("I2S PDM RX INIT: ");
-  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+  USBSerial.print(result == ESP_OK ? K1_PASS : K1_FAIL);
+#if defined(K1_MIC_IM69D_SLOT_RIGHT)
+  USBSerial.println(" slot=RIGHT");
+#else
+  USBSerial.println(" slot=LEFT");
+#endif
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
   // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
@@ -854,7 +870,55 @@ void acquire_sample_chunk(uint32_t t_now) {
     // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
     // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
     // is what keeps genuinely quiet *music* from darkening the plate.
+    // PEAKINESS (2026-08-06): the second discriminator, because RMS alone is blind
+    // here. MEASURED on this bench: music rms_raw p50 0.0027 vs quiet-room p50
+    // 0.0072 — music's MEDIAN RMS is LOWER than ambient's, and ~75% of music frames
+    // read at or below the loudest ambient frame. The room floor is narrowband hum
+    // (crest ~1.26, RMS ~= peak); music is peaky (RMS << peak). RMS is the one
+    // statistic on which steady hum beats music, so no level threshold can release
+    // the gate on music at any gain — which is exactly the reported failure.
+    // Peak-to-mean DOES separate: quiet room 1.24 vs music 3.17. It is a ratio, so
+    // it is gain-invariant and survives mic/gain changes.
+    // It may only BREAK silence, never cause it: the reported fault is a gate that
+    // will not RELEASE, so this path can only ever release earlier.
+    static float k1_pk_ring[K1_SILENCE_PEAK_WIN];
+    static uint16_t k1_pk_n = 0, k1_pk_i = 0;
+    static float k1_pk_sum = 0.0f;
+    if (k1_pk_n == K1_SILENCE_PEAK_WIN) k1_pk_sum -= k1_pk_ring[k1_pk_i]; else k1_pk_n++;
+    k1_pk_ring[k1_pk_i] = (float)max_waveform_val_raw;
+    k1_pk_sum += k1_pk_ring[k1_pk_i];
+    k1_pk_i = (uint16_t)((k1_pk_i + 1u) % K1_SILENCE_PEAK_WIN);
+    float k1_pk_max = 0.0f;
+    for (uint16_t i = 0; i < k1_pk_n; i++) { if (k1_pk_ring[i] > k1_pk_max) k1_pk_max = k1_pk_ring[i]; }
+    const float k1_pk_mean = (k1_pk_n > 0u) ? (k1_pk_sum / (float)k1_pk_n) : 0.0f;
+    // Ratio is only meaningful on a full window over a non-trivial floor.
+    k1_silence_peakiness = (k1_pk_n == K1_SILENCE_PEAK_WIN && k1_pk_mean >= 1.0f)
+                             ? (k1_pk_max / k1_pk_mean) : 0.0f;
+
     static bool k1_rms_silent_state = false;
+#if defined(K1_MIC_IM69D_PDM_V1)
+    // SCOPE-GATED 2026-08-12. This joint break-path and BOTH its constants
+    // (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC) were measured on
+    // IM69D130 silicon — bench B489A500 and Bench Unit 2. Until this gate existed they
+    // were behind NO #ifdef at all and compiled into EVERY environment, including
+    // k1_hardware, the SPH0645 production K1. That is the same escape-the-measurement-
+    // context defect GATE 0.1 (1bdf54d0) was created to stop, one degree worse: those
+    // constants were at least gated on the wrong flag, these were gated on nothing.
+    // The comment above the fraction even said "does not transfer, do not inherit it"
+    // while the code inherited it everywhere.
+    //
+    // The joint path exists because RMS provably cannot separate music from a room
+    // floor on this PDM mic (FINDING-rms-cannot-separate.md: music's median rms_raw
+    // reads BELOW quiet ambient's, because hum is crest ~1.26 and music is crest ~3-5).
+    // SPH0645 has no such problem — its RMS pair was calibrated on the 36-track
+    // HarmonixSet corpus — so SPH keeps its own characterised Schmitt below, untouched.
+    // peakiness itself stays computed for all builds; only the DECISION is gated.
+    if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
+        (float)max_waveform_val_raw >=
+            (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
+        k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
+    } else
+#endif
     if (k1_rms_silent_state) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
     } else {
@@ -938,10 +1002,10 @@ void acquire_sample_chunk(uint32_t t_now) {
   if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
     K1TempoEvent     tev = k1_tempo_read();
     K1OnsetBeatEvent oev = k1_onset_beat_read();
-    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f pky=%.2f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
       CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
       (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
-      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, (float)k1_silence_peakiness, CONFIG.STANDBY_DIMMING ? 1 : 0,
       calibration_source_name(), calibration_valid ? 1 : 0,
       noise_cal_reject_reason_name(noise_cal_reject_reason),
       (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,

@@ -122,22 +122,58 @@
 
 // LED strip mode selection: 1=61 LEDs, 2=91 LEDs, 3=160 LEDs (default).
 #define LED_STRIP_MODE 3
+#if defined(K1_UNIT2_IM69D_V1)
+  // Unit 2 hardware truth (Captain, 2026-08-11): two independent physical
+  // WS2812B channels of 206 pixels each. The effect/render canvas remains 160;
+  // both output paths resample that canvas onto their physical strip.
+  #ifdef K1_UNIT2_LED160_AB
+    // A/B PROBE, default OFF (env k1_unit2_im69d_right_led160ab only). Non-shippable.
+    // Isolates LED drive current as a cause of mic-supply noise coupling: same
+    // silicon, same capsule, same PDM pins, same firmware — only the pixel count
+    // (and therefore the LED rail current) changes. 412 px -> 320 px.
+    // Precedent: the K1_GDFT_X2_AB_V1 optional A/B on k1_bench_im69d.
+    #define LED_COUNT_VALUE 160
+    #define SECONDARY_LED_COUNT_VALUE 160
+  #else
+    #define LED_COUNT_VALUE 206
+    #define SECONDARY_LED_COUNT_VALUE 206
+  #endif
+#else
 #ifdef K1_CUSTOM_LED_V1
-  // Custom dual-channel build (2026-08-09 overwrite of 224 single-channel / 214 dual):
-  // 206 LEDs on BOTH primary and secondary (see globals.h SECONDARY_LED_COUNT).
+  // Custom RGBIC rig (env k1_custom ONLY): 224 primary / 160 secondary.
+  //
+  // MERGE NOTE 2026-08-12 — this value was contested. main (1219b94a) had retargeted
+  // K1_CUSTOM_LED_V1 to 206 back when `k1_custom` was believed to BE the Unit 2 build.
+  // Captain correction 2026-08-10 voided that: Unit 2 is dual IM69D130 and now owns its
+  // own flag K1_UNIT2_IM69D_V1 (206/206, the branch above), reached by env
+  // k1_unit2_im69d_right. The two flags are MUTUALLY EXCLUSIVE by design —
+  // K1_CUSTOM_LED_V1 drops the secondary strip in the .ino guards and would break
+  // 206/206. So this branch reverts to the RGBIC rig's own geometry; leaving it at 206
+  // would duplicate Unit 2's geometry onto an env that must never drive Unit 2.
+  //
   // The 160-px render canvas (NATIVE_RESOLUTION) is UNCHANGED — scale_to_strip() /
-  // scale_to_secondary_strip() upsample onto 206 physical LEDs, exactly as
+  // scale_to_secondary_strip() upsample onto the physical strip, exactly as
   // strip-modes 61/91/160 already do. Output buffers are heap-allocated to
-  // CONFIG.LED_COUNT / SECONDARY_LED_COUNT so 206 is memory-safe. Flag-gated:
+  // CONFIG.LED_COUNT / SECONDARY_LED_COUNT so 224 is memory-safe. Flag-gated:
   // when K1_CUSTOM_LED_V1 is unset every env resolves 160 -> byte-identical.
-  #define LED_COUNT_VALUE 206
+  //
+  // UNRESOLVED (Cursor plan P1.A, still open on BOTH sides of this merge):
+  // [env:k1_custom] still `extends = env:k1_bench_im73d_ble`. That IM73D inheritance is
+  // the false authority the 2026-08-10 correction voided. k1_custom stays under the
+  // P0.D flash freeze until that is fixed. Do NOT flash it to Unit 2 or B489.
+  #define LED_COUNT_VALUE 224
+  #define SECONDARY_LED_COUNT_VALUE 160
 #elif LED_STRIP_MODE == 1
   #define LED_COUNT_VALUE 61
+  #define SECONDARY_LED_COUNT_VALUE 160
 #elif LED_STRIP_MODE == 2
   #define LED_COUNT_VALUE 91
+  #define SECONDARY_LED_COUNT_VALUE 160
 #else
   // Default to 160 LEDs (K1 / SB v9 hardware: 160 per channel)
   #define LED_COUNT_VALUE 160
+  #define SECONDARY_LED_COUNT_VALUE 160
+#endif
 #endif
 
 enum led_types {

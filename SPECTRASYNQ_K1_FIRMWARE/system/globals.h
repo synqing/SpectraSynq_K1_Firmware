@@ -710,6 +710,98 @@ inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first 
 // characterised profile. The SPH0645 pair below is now unconditional.
 inline float    K1_SILENCE_RMS_ENTER = 0.04f;     // raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-room floor <0.02, ~8x margin.
 inline float    K1_SILENCE_RMS_EXIT  = 0.08f;     // raw RMS above this → not silent (Schmitt exit; > enter)
+// PEAKINESS discriminator (2026-08-06). RMS alone CANNOT separate music from a
+// narrowband room floor — measured on bench B489A500: music rms_raw p50 0.0027 vs
+// quiet-room p50 0.0072 (music's MEDIAN is LOWER), ~75% of music frames at or below
+// the loudest ambient frame. Peak-to-mean over a short window does separate, and
+// being a RATIO it is gain-invariant — it survives the mic/gain changes that
+// silently desynchronised the absolute thresholds above.
+//   MEASURED: quiet room 1.24   ·   music 3.17
+#define K1_SILENCE_PEAK_WIN 64                    // ~0.48 s at the 133 Hz AP frame rate
+inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured audio, never silence
+// LEVEL FLOOR (2026-08-11, measured on Unit 2 at G=8): peakiness alone is NOT
+// sufficient once the gain revert lifted the quiet-room noise floor's dynamic
+// range. Measured over 90 s of a confirmed-quiet room (-59.4 dB on an
+// independent witness mic), pky p50 1.87 / p90 2.33 / max 2.72 — i.e. 21% of
+// QUIET frames cleared the 2.10 break on their own, and silence held only 7.4%
+// of the time. The quiet and music pky distributions overlap almost completely
+// (music mean 2.13, max 2.74), so no single-axis pky threshold separates them.
+// What DOES separate is absolute level at the moment of the spike:
+//     quiet   max_raw mean 254, max 343
+//     music   max_raw mean 446, max 1611
+// Quiet-room peakiness spikes occur at low absolute level; music has BOTH.
+// Requiring both axes kills the false-wake without touching music sensitivity.
+// SSL-RELATIVE, not absolute (canon HF-3). An earlier revision of this gate used
+// an absolute floor of 500.0f. That was disproven on-device within the hour: a
+// recalibration moved the operating point down ~5.3x (quiet max_raw p50 254 -> 48)
+// and music at a normal listening level stopped clearing the fixed floor entirely
+// — silence held 100% THROUGH MUSIC. An absolute constant cannot survive a
+// calibration change; a fraction of the learned floor can.
+//
+// DERIVED 2026-08-11 from identity-pinned measurement on Unit 2. Every sample below
+// came from ONE verified build (git abb7fb5, env k1_unit2_im69d_right, asserted on
+// the wire before AND after the calibration), with a calibration learned under that
+// same firmware in a witness-verified silent room (-63.7 dB): SSL=136, ACCEPTED,
+// ssl_rejected=0, ssl_p50=68 ssl_p90=124.
+//
+//   as multiples of SSL      quiet (45 frames)     music vol70 (30 frames)
+//     max_raw p50                   0.49                   10.52
+//     max_raw p90                   0.91                   20.97
+//     max_raw max                   1.48                   26.18
+//     silence held                100.0%                    0.0%
+//     pky >= 2.10                  19/45                   28/30
+//
+// First derivation gave 3.95 -> 4.0 from a single volume (70). A volume sweep on
+// 2026-08-12 showed that was over-conservative and nearly reintroduced the original
+// fault at normal listening levels:
+//
+//   music vol40 (silence broke 96%)   max_raw p50 296, max 759
+//     cleared 4.0 x SSL (544)  ->   2 / 26 frames
+//     cleared 2.5 x SSL (340)  ->  10 / 26 frames
+//   quiet (35 frames)                 max_raw p50 48, max 87
+//     cleared 4.0 -> 0/35 ;  cleared 2.5 -> 0/35
+//
+// At 4.0, quiet music survives on TWO frames latched by the 5 s dwell — a hair from
+// going dark again. 2.5 gives 5x that margin and still clears ZERO quiet frames,
+// including the loudest quiet frame seen across every run this session (202 raw,
+// 1.7x below the 340 threshold). Strictly better on both axes; no trade.
+//
+// WHY BOTH AXES ARE REQUIRED, proven by the quiet column: 42% of quiet frames
+// (19/45) cleared the peakiness threshold on their own, yet silence held 100%
+// because the level term rejected every one. Peakiness alone false-wakes in this
+// room; level alone cannot tell music from a loud transient. Neither is sufficient.
+//
+// SUPERSEDED 2026-08-12 — the "PER-UNIT, PER-ROOM, do not inherit" rule that stood
+// here was an ARTEFACT OF AN UNCALIBRATED UNIT, not a property of the hardware.
+// Unit 2's SSL had been learned at a previous placement (the boards sat >1 ft apart)
+// and was never re-learned after the move, so a per-unit constant was silently
+// compensating for a calibration nobody had re-run. Recalibrating in situ moved
+// SSL 136 -> 229 (1.68x) against 1.67x PREDICTED from the quiet/music contrast before
+// the calibration was touched, and the inter-unit gap collapsed from 1.54x to 1.03x.
+//
+// CORRECT RULE: calibrate at final placement, then the fraction TRANSFERS.
+// Placement is carried by SSL — that is what SSL is for.
+//
+// DERIVED 2026-08-12 on both units, freshly calibrated side by side, verified TRUE
+// silence (witness mic -68.2 dBFS mean / -57.9 dBFS max, zero frames above -50 dBFS;
+// earlier "quiet" legs were contaminated by the agent's own build fan and are void):
+//
+//                 SSL   quiet p95   music p10   music p25   music med
+//   Unit 2        167       1.03        1.37        2.29        4.49
+//   bench         187       0.74        0.99        2.13        4.15
+//
+//   usable window = above the worst quiet p95 (1.03) and below the worst music
+//   p25 (2.13). Both units held silence 100% under true silence and 0% under music.
+//   1.75 sits ~70% above the quiet ceiling and ~18% below the music floor.
+//
+// The prior 2.5 was fitted against the STALE SSL=136; rescaled to SSL=167 that same
+// absolute threshold is 2.04, so 1.75 is slightly more willing to wake than the
+// behaviour Captain eyes-on-approved on 2026-08-12 — deliberately, because low-volume
+// music sat near 2.5 and was marginal. Narrowband hum cannot exploit the extra
+// sensitivity: the gate is an AND, and hum's crest ~1.26 is rejected by the
+// peakiness term regardless of level.
+inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75f; // peakiness may only break silence at/above SSL x this
+inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 
 // ------------------------------------------------------------
@@ -878,14 +970,17 @@ inline CRGB *leds_out_secondary;              // Final output buffer
 // Secondary strip configuration
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;
-#ifdef K1_CUSTOM_LED_V1
-// Custom dual-channel build (2026-08-09): 206 LEDs on the secondary channel
-// (matches LED_COUNT_VALUE=206 primary). scale_to_secondary_strip() upsamples
-// the 160 canvas → 206 (same resample path as primary; lerp_led_16 is clamp-guarded).
-inline const uint16_t SECONDARY_LED_COUNT = 206;
-#else
-inline const uint16_t SECONDARY_LED_COUNT = 160;
-#endif
+// Single source of truth: config_types.h already resolves SECONDARY_LED_COUNT_VALUE
+// for every geometry (Unit 2 K1_UNIT2_IM69D_V1 = 206, k1_custom RGBIC = 160,
+// strip-modes / default = 160). Derive, never restate.
+//
+// MERGE NOTE 2026-08-12 — main's side of this conflict hardcoded the pair here as
+// `#ifdef K1_CUSTOM_LED_V1 -> 206 #else -> 160`, which predates Unit 2 owning its own
+// flag. Post-merge that has no K1_UNIT2_IM69D_V1 case, so Unit 2 would fall to the
+// #else and run SECONDARY_LED_COUNT=160 against LED_COUNT=206 — the secondary channel
+// silently 46 pixels short of its physical strip. Deriving from the value macro keeps
+// the geometry decision in exactly one file.
+inline const uint16_t SECONDARY_LED_COUNT = SECONDARY_LED_COUNT_VALUE;
 inline const uint16_t SECONDARY_LED_COLOR_ORDER = GRB;
 inline uint8_t SECONDARY_LIGHTSHOW_MODE = LIGHT_MODE_WAVEFORM_TEMPO; // 1401 dual-tempo setup (2026-06-04): secondary boots on mode 18
 inline bool SECONDARY_MIRROR_ENABLED = true;

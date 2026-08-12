@@ -877,12 +877,19 @@ inline void init_lerp_params() {
             
             led_lerp_params[i].index_left = index.getInteger();
             led_lerp_params[i].index_right = led_lerp_params[i].index_left + 1;
-#ifdef K1_CUSTOM_LED_V1
-            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the dual-206
-            // custom build): the top output pixel resolves index_right == NATIVE_RESOLUTION, a
-            // 1-element OOB read of leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping
-            // 61/91/160 (down/equal) modes never reach index_left == NR-1, so this is
-            // flag-gated to keep those builds byte-identical.
+#if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
+            // UPSAMPLING guard (CONFIG.LED_COUNT > NATIVE_RESOLUTION, i.e. the 224 custom
+            // build and Unit 2's 206-pixel dual-channel profile): the top output pixel
+            // resolves index_right == NATIVE_RESOLUTION, a 1-element OOB read of
+            // leds_16[NATIVE_RESOLUTION]. Clamp it. The shipping 61/91/160 (down/equal)
+            // modes never reach index_left == NR-1, so this is flag-gated to keep those
+            // builds byte-identical.
+            //
+            // MERGE NOTE 2026-08-12 — main's side of this conflict guarded on
+            // K1_CUSTOM_LED_V1 ALONE. Taking it would have left every Unit 2 build
+            // (K1_UNIT2_IM69D_V1, 206 > NATIVE_RESOLUTION 160) with the clamp compiled
+            // out, reinstating the OOB read on the exact unit this lane measures.
+            // The disjunction is load-bearing: keep both flags.
             if (led_lerp_params[i].index_right >= NATIVE_RESOLUTION) {
                 led_lerp_params[i].index_right = NATIVE_RESOLUTION - 1;
             }
@@ -2282,6 +2289,12 @@ inline void apply_brightness_secondary() {
 }
 
 inline void show_secondary_leds() {
+  // Safety: init_secondary_leds() allocates both buffers; show_leds() may be
+  // called (e.g. from init_leds()) before that runs, if k1_show_state_load()
+  // has already restored ENABLE_SECONDARY_LEDS=true from persisted flash state.
+  // Return immediately rather than dereferencing a null pointer.
+  if (leds_scaled_secondary == nullptr || leds_out_secondary == nullptr) return;
+
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_secondary_prep_start_us = vp_perf.running ? esp_timer_get_time() : 0;
   uint32_t vp_perf_secondary_quant_us = 0;

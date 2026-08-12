@@ -99,3 +99,17 @@ dark-fade / STANDBY, MAIN glass authority, or Mirror claims, **also** load:
 
 Do not treat this skill alone as sufficient for that domain.
 )
+
+## Companion — device evidence integrity (2026-08-12)
+
+For any K1 device measurement, flash, calibration, or silence-gate value work,
+**also** load:
+
+- Canon: `docs/canon/SESSION_CANON_2026-08-12_device_evidence_integrity.md` (HF-29…HF-40)
+- Preflight: `bash scripts/agent/k1-session-preflight.sh K1_SILENCE_JOINT_LEVEL_SSL_FRAC K1_SILENCE_PEAKINESS_BREAK`
+
+Two corrections that supersede this skill's 2026-08-07 numbers: the joint level
+fraction ships at **1.75** (not 1.25/2.5), and it **TRANSFERS between units once
+each unit is calibrated at its final placement** — "per-unit, do not inherit"
+was an artefact of a stale calibration. The gate decision is IM69D-scoped
+(`K1_MIC_IM69D_PDM_V1`); SPH0645 keeps its own RMS Schmitt.

@@ -1,21 +1,34 @@
-"""Custom dual-206 build — static invariant gate.
+"""Oversize LED geometries — static invariant gate.
 
-`env:k1_custom` (2026-08-09 overwrite of 224 single-channel / 214 dual) drives
-TWO independent WS2812B channels of 206 LEDs each (primary + secondary). It
-changes the physical LED counts (`LED_COUNT_VALUE` + `SECONDARY_LED_COUNT`) and
-boot-forces `MAX_CURRENT_MA=2500` under `K1_CUSTOM_LED_V1`; the 160-px render
-canvas (`NATIVE_RESOLUTION`) is deliberately UNCHANGED —
-`scale_to_strip()` / `scale_to_secondary_strip()` upsample 160 -> 206.
+PREMISE CHANGED 2026-08-10 (Captain correction), tests updated 2026-08-12 at the
+fix/im69d-rms-gate merge. This file used to assert that `env:k1_custom` WAS the
+dual-206 build. It is not, and never was: Bench Unit 2 (`0C54FC00`) physically
+carries dual IM69D130, and `k1_custom` still `extends = env:k1_bench_im73d_ble`
+— the false-authority IM73D inheritance the correction voided.
+
+Two distinct oversize geometries now exist, on two mutually exclusive flags:
+
+  `K1_UNIT2_IM69D_V1`  Bench Unit 2, env `k1_unit2_im69d_right`
+                       206 primary + 206 secondary = 412 px
+  `K1_CUSTOM_LED_V1`   custom RGBIC rig, env `k1_custom` (BLOCKED in the upload
+                       guard until it stops extending an *im73d* env)
+                       224 primary + 160 secondary = 384 px
+
+They must never be set together — `K1_CUSTOM_LED_V1` drops the secondary strip in
+the `.ino` guards and would break 206/206. The 160-px render canvas
+(`NATIVE_RESOLUTION`) is deliberately UNCHANGED for both; `scale_to_strip()` /
+`scale_to_secondary_strip()` upsample onto the physical strip.
 
 This gate pins the invariants that keep every other env byte-identical:
   1. the custom flag is ONLY on `k1_custom`, never on production `k1_hardware`;
-  2. `LED_COUNT_VALUE 206` is reachable ONLY under `#ifdef K1_CUSTOM_LED_V1`;
-  3. `SECONDARY_LED_COUNT = 206` is reachable ONLY under the same flag;
-  4. the default (no-flag) primary/secondary counts stay 160;
-  5. `NATIVE_RESOLUTION` stays 160 (do NOT rebuild the canvas);
-  6. `k1_custom` is registered in the upload-guard identity manifest;
-  7. dual-channel is retained (secondary init is NOT gated off under the flag);
-  8. MAX_CURRENT_MA is boot-forced to 2500 under the flag.
+  2. `LED_COUNT_VALUE 206` is reachable ONLY under `K1_UNIT2_IM69D_V1`;
+  3. `K1_CUSTOM_LED_V1` owns 224/160 and must NOT claim 206;
+  4. `SECONDARY_LED_COUNT` DERIVES from config_types.h, never a second literal;
+  5. the default (no-flag) primary/secondary counts stay 160;
+  6. `NATIVE_RESOLUTION` stays 160 (do NOT rebuild the canvas);
+  7. `k1_custom` is registered in the upload-guard identity manifest;
+  8. dual-channel is retained (secondary init is NOT gated off under the flag);
+  9. BOTH oversize geometries hit the 2500 mA boot-force — not just one.
 """
 import re
 from pathlib import Path
@@ -69,40 +82,99 @@ def test_custom_flag_present_in_custom_env():
     )
 
 
-def test_led_count_206_is_flag_gated_only():
-    """`LED_COUNT_VALUE 206` must be reachable ONLY under #ifdef K1_CUSTOM_LED_V1."""
+def test_dual_206_is_gated_on_the_unit2_flag_not_the_custom_flag():
+    """206/206 belongs to K1_UNIT2_IM69D_V1, NOT K1_CUSTOM_LED_V1.
+
+    Premise change 2026-08-10 (Captain correction): `k1_custom` was believed to BE
+    the Unit 2 build, so 206/206 lived behind K1_CUSTOM_LED_V1. Unit 2 physically
+    carries dual IM69D130 and now owns K1_UNIT2_IM69D_V1 (env k1_unit2_im69d_right);
+    k1_custom reverted to the 224/160 RGBIC rig and still extends an *im73d* env.
+    The two flags are mutually exclusive — K1_CUSTOM_LED_V1 drops the secondary
+    strip in the .ino guards and would break 206/206.
+    """
     text = CONFIG_TYPES.read_text(encoding="utf-8")
-    assert text.count("LED_COUNT_VALUE 206") == 1, (
-        "Expected exactly one `#define LED_COUNT_VALUE 206` (inside the "
-        "#ifdef K1_CUSTOM_LED_V1 block)."
+    # Anchor on `#define LED_COUNT_VALUE` — a bare substring match also hits
+    # `SECONDARY_LED_COUNT_VALUE 206`, which legitimately sits on the next line.
+    primary_206 = re.findall(r"(?m)^\s*#define\s+LED_COUNT_VALUE\s+206\b", text)
+    assert len(primary_206) == 1, (
+        "Expected exactly one `#define LED_COUNT_VALUE 206` (in the "
+        f"K1_UNIT2_IM69D_V1 block); found {len(primary_206)}."
     )
+    # Terminate on the sibling directive, NOT on `#else`: the Unit 2 block contains a
+    # nested `#ifdef K1_UNIT2_LED160_AB ... #else`, so an `#else` terminator stops at
+    # the INNER one and matches the A/B branch instead of the production geometry.
+    m = re.search(r"#if\s+defined\(K1_UNIT2_IM69D_V1\)(.*?)#ifdef\s+K1_CUSTOM_LED_V1",
+                  text, re.DOTALL)
+    assert m, "Expected a `#if defined(K1_UNIT2_IM69D_V1)` geometry block."
+    assert "LED_COUNT_VALUE 206" in m.group(1), (
+        "LED_COUNT_VALUE 206 must live inside the K1_UNIT2_IM69D_V1 branch."
+    )
+    assert "SECONDARY_LED_COUNT_VALUE 206" in m.group(1), (
+        "Unit 2 is 206 on BOTH channels — the secondary must be 206 here too."
+    )
+    assert "LED_COUNT_VALUE 214" not in text, "Stale dual-214 count must be gone."
+
+
+def test_custom_led_flag_owns_the_224_rgbic_geometry():
+    """K1_CUSTOM_LED_V1 = 224 primary / 160 secondary, and must NOT claim 206."""
+    text = CONFIG_TYPES.read_text(encoding="utf-8")
     m = re.search(r"#ifdef\s+K1_CUSTOM_LED_V1(.*?)#elif", text, re.DOTALL)
-    assert m and "LED_COUNT_VALUE 206" in m.group(1), (
-        "LED_COUNT_VALUE 206 must live inside the `#ifdef K1_CUSTOM_LED_V1` branch "
-        "of the LED_STRIP_MODE block — an ungated define silently flips all envs."
-    )
-    assert "LED_COUNT_VALUE 224" not in text, (
-        "Stale single-channel 224 count must be gone — k1_custom is dual-206."
-    )
-    assert "LED_COUNT_VALUE 214" not in text, (
-        "Stale dual-214 count must be gone — k1_custom is dual-206."
+    assert m, "Expected the `#ifdef K1_CUSTOM_LED_V1` branch."
+    block = m.group(1)
+    assert "LED_COUNT_VALUE 224" in block, "k1_custom is the 224-px RGBIC rig."
+    assert "SECONDARY_LED_COUNT_VALUE 160" in block
+    assert "LED_COUNT_VALUE 206" not in block, (
+        "206 must NOT be reachable under K1_CUSTOM_LED_V1 — that duplicates Unit 2's "
+        "geometry onto an env that must never drive Unit 2 (it extends *im73d*)."
     )
 
 
-def test_secondary_count_206_is_flag_gated_only():
-    """`SECONDARY_LED_COUNT = 206` must live only under K1_CUSTOM_LED_V1."""
+def test_secondary_count_derives_from_the_single_source_of_truth():
+    """globals.h must DERIVE the secondary count, never restate a literal.
+
+    A hardcoded `#ifdef K1_CUSTOM_LED_V1 -> 206 #else -> 160` pair here has no
+    K1_UNIT2_IM69D_V1 case, so Unit 2 would silently run SECONDARY_LED_COUNT=160
+    against LED_COUNT=206 — 46 physical pixels dark.
+    """
     text = GLOBALS.read_text(encoding="utf-8")
-    assert text.count("SECONDARY_LED_COUNT = 206") == 1
-    m = re.search(r"#ifdef\s+K1_CUSTOM_LED_V1(.*?)#else", text, re.DOTALL)
-    assert m and "SECONDARY_LED_COUNT = 206" in m.group(1), (
-        "SECONDARY_LED_COUNT = 206 must live inside `#ifdef K1_CUSTOM_LED_V1`."
+    assert "SECONDARY_LED_COUNT = SECONDARY_LED_COUNT_VALUE" in text, (
+        "SECONDARY_LED_COUNT must derive from config_types.h's "
+        "SECONDARY_LED_COUNT_VALUE, which resolves every geometry in one place."
+    )
+    assert "SECONDARY_LED_COUNT = 206" not in text, (
+        "No literal 206 in globals.h — geometry lives in config_types.h only."
     )
 
 
 def test_default_led_counts_stay_160():
     """The no-flag defaults must remain 160 / 160 (production strip length)."""
-    assert "#define LED_COUNT_VALUE 160" in CONFIG_TYPES.read_text(encoding="utf-8")
-    assert "SECONDARY_LED_COUNT = 160" in GLOBALS.read_text(encoding="utf-8")
+    text = CONFIG_TYPES.read_text(encoding="utf-8")
+    assert "#define LED_COUNT_VALUE 160" in text
+    assert "#define SECONDARY_LED_COUNT_VALUE 160" in text
+
+
+def test_every_oversize_geometry_is_current_capped():
+    """Both >160 geometries must hit the 2.5 A boot-force. A guard that sits on
+    only one route is not a guard.
+
+    Regression origin 2026-08-12: the MAX_CURRENT_MA boot-force was gated on
+    K1_CUSTOM_LED_V1 alone while K1_UNIT2_IM69D_V1 appeared nowhere in system.h —
+    so Unit 2 drove 206+206=412 pixels (MORE than k1_custom's 224+160=384) with no
+    forced cap, falling back to whatever a persisted save carried.
+    """
+    sys_h = SYSTEM_H.read_text(encoding="utf-8")
+    m = re.search(
+        r"#if\s+defined\(K1_CUSTOM_LED_V1\)\s*\|\|\s*defined\(K1_UNIT2_IM69D_V1\)(.*?)#endif",
+        sys_h,
+        re.DOTALL,
+    )
+    assert m, (
+        "The MAX_CURRENT_MA boot-force must be gated on BOTH oversize geometries: "
+        "#if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)"
+    )
+    assert "CONFIG.MAX_CURRENT_MA = 2500" in m.group(1), (
+        "2.5 A cap must be inside that combined gate."
+    )
 
 
 def test_native_resolution_unchanged():

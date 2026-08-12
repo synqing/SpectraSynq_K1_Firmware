@@ -56,6 +56,37 @@
   // IM73D122 is DEPRECATED (Captain 2026-08-10) and no unit carrying this build
   // path has a characterised profile.
   #define K1_AUDIO_PROFILE K1_AUDIO_PROFILE_NOT_CHARACTERISED
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  // ─── GAP CLOSED 2026-08-12 (Captain: gate now, canonise after) ───────────────
+  // BEFORE this branch existed, IM69D fell through to the #else and was silently
+  // assigned SPH0645 — the guard below could never fire for it. The guard covered
+  // the deprecated mic that nothing runs and missed the only mic in service
+  // (bench B489A500 + Unit 2 0C54FC00). A guard that is not called is not a guard.
+  //
+  // The SPH0645 numbers are wrong for IM69D by MEASURED amounts, not by suspicion.
+  // Reconstructed 2026-08-12 from the bring-up captures on lane/k1-vj-ble-deck8
+  // (docs/forensics/im69d-bringup-2026-08-06/, bench B489A500 @ G=4):
+  //
+  //   SPH silence RMS EXIT   0.08  vs  IM69D max rms_raw EVER observed 0.0364
+  //                                -> threshold sits 2.2x above the signal
+  //                                   ceiling; the RMS Schmitt CANNOT fire.
+  //   SPH K1_LOCK_CONFIDENCE 0.60  vs  IM69D median music conf 0.58 (max 0.97)
+  //                                -> lock achieved on only 47.7% of frames of
+  //                                   music the device demonstrably hears
+  //                                   (bpm stable 96.0). Drops lock ~half the time.
+  //   Room floor crest ~1.26 (narrowband hum) vs music crest ~3-5: RMS is the one
+  //   statistic on which steady hum BEATS music, so music's median rms_raw (0.0027)
+  //   reads BELOW quiet ambient's (0.0072). No RMS threshold separates them at any
+  //   gain, in any domain -- docs/forensics/.../FINDING-rms-cannot-separate.md.
+  //
+  // So IM69D is NOT_CHARACTERISED, and every IM69D env must say so out loud.
+  // It is NOT yet profile 2: the joint level fraction this lane derived is 2.50 on
+  // Unit 2 against canon's 1.25 on the bench, and whether that delta is per-unit or
+  // per-ROOM is exactly what the open transfer test decides. Canonising a constant
+  // that the outstanding experiment exists to challenge is how the IM73D numbers
+  // escaped in the first place. Populate K1_AUDIO_PROFILE_IM69D130_UNIT2 when the
+  // transfer test closes -- not before.
+  #define K1_AUDIO_PROFILE K1_AUDIO_PROFILE_NOT_CHARACTERISED
 #else
   // SPH0645 — the calibrated reference. K1_LOCK_CONFIDENCE 0.60 and the silence
   // RMS pair were CALIBRATED on the 36-track HarmonixSet corpus plus synthetic

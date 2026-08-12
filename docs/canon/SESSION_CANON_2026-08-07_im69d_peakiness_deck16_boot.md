@@ -109,6 +109,9 @@ intro in safe mode.
 5. **Stimulus:** ambient leg = confirmed quiet; music leg = `afplay` (or named fixture) with path logged.
 6. **Serial:** leading `:`; read `[AP]` for `pky=`, `pky_brk=`, `pky_p95=`, `pky_frac=`, `pky_lvl=`, `SSL=`.
 7. **Joint seed (as of 2026-08-07):** `brk=2.10`, `K1_SILENCE_JOINT_LEVEL_SSL_FRAC=1.25`, dwell `5000`.
+   > **Superseded (2026-08-12)** — the fraction value and its transfer rule were corrected; see
+   > *Update — 2026-08-12* at the end of this file. Shipping value is `1.75`, and the fraction
+   > **transfers between units once each unit is calibrated at its final placement.**
 8. **Slice 2 learner:** gated ~5 room-states; may learn **two** numbers (crest + level frac); both need transition logs; **build gated on multi-day soak**, not one night.
 9. **After any flash that can trip safe-mode:** listen for `stable_clear=1` / no Guru Meditation before claiming soak validity.
 
@@ -196,3 +199,32 @@ Invoke `/thinking-model-router` before the next silence or BLE "obvious fix."
 - Tab5 C6 HCI root cause — **not established**; software diagnosis continues under binding flags
 - Uncommitted vj-lane dirty tree (silence AND, crash guards, Tab5 BLE retarget, boot show lock) — commit only when Captain asks and gates pass
 )
+
+---
+
+### Update — 2026-08-12: joint fraction corrected (value AND transfer rule)
+
+Landed with the `fix/im69d-rms-gate-and-gain-20260811` merge. Full evidence:
+`docs/canon/SESSION_CANON_2026-08-12_device_evidence_integrity.md` (HF-29…HF-40),
+`docs/forensics/unit2-bench-transfer-full-2026-08-12.md`, commits `9599714b` / `a8b1912a`.
+
+1. **Value:** `K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75` (was seed 1.25, then 2.5 on Unit 2).
+   The 2.5 was fitted against Unit 2's **stale** SSL=136; after in-situ recalibration
+   (Captain silence-go, witness-verified room) SSL moved 136→167/229-series and the usable
+   window re-derived to 1.75 — ~70% above the worst quiet p95 (1.03), ~18% under the worst
+   music p25 (2.13). Both units then held silence 100% under true silence and 0% under music.
+2. **Transfer rule:** the earlier "PER-UNIT, PER-ROOM, do not inherit" framing is **wrong** —
+   it was an artefact of comparing a freshly calibrated unit against a stale one.
+   Corrected rule: **calibrate at final placement, then the fraction TRANSFERS.** Placement
+   is carried by SSL, which is what SSL is for.
+3. **Scope:** the joint gate DECISION is now compiled only under `K1_MIC_IM69D_PDM_V1`
+   (`a8b1912a`); SPH0645 production keeps its own characterised RMS Schmitt. Static ratchet:
+   `test_joint_silence_gate_is_scoped_to_im69d`.
+
+---
+**Document Changelog**
+
+| Date | Author | Change |
+|------|--------|--------|
+| 2026-08-12 | agent:claude-code | Appended fraction correction (1.75, transfers after final-placement cal) + IM69D scoping; superseded marker on §8 item 7. Owed at merge per HANDOVER_2026-08-12_im69d_rms_gate.md. |
+| 2026-08-07 | agent:claude-code | Created (session canon, HF-1…HF-13). |

@@ -99,13 +99,16 @@
 #define NOISE_CAL_SSL_BOOT_FALLBACK_RAW 120U
 
 #ifndef K1_MIC_IM69D_INPUT_GAIN
-// Phase 0 silence-domain close (2026-08-05): G=16 quiet overflowed SSL learn
-// window; G=8 cal ACCEPTED (SSL=111) but post-cal ambient max_raw mean ~214–296
-// stayed above SSL×1.2 (~133) so silence never latched — self-noise / gain floor,
-// not "quieter room". Music still had headroom (max_raw~1785, near_pct=0).
-// Halve again to G=4 so quiet floor can sit under a learnable SSL+latch.
-// Behavior-change ticket: ap_advice Phase 0 / IM69D gain retune (Captain rage-valid).
-#define K1_MIC_IM69D_INPUT_GAIN 4.0f
+// Gain history. G=16 overflowed the SSL learn window. G=8 cal ACCEPTED (SSL=111,
+// p90 101 = 2.2x floor margin). G=4 (2026-08-05, commit 1ae9d4a) was then chosen
+// to make "silence latch" work — but that step was justified by ambient sitting
+// above SSL x1.2, i.e. threshold_loud_break, which was assigned once and NEVER
+// READ (removed 2026-08-06). The live latch is the RMS Schmitt, and it latches at
+// any of these gains, so the halving bought nothing and cost 4x of music headroom.
+// REVERTED to 8.0f 2026-08-06 (Captain) on SSL floor margin alone: 2.2x at G=8 vs
+// 1.47x at G=4, against an ambient floor that swings ~3x between sessions.
+// Ticket: ap_advice Phase 0 / IM69D gain retune.
+#define K1_MIC_IM69D_INPUT_GAIN 8.0f
 #endif
 
 #define K1_MIC_IM69D_RAW_I16_NEAR_RAIL 30000
@@ -395,12 +398,23 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #endif
     #endif
     #ifdef K1_MIC_IM69D_PDM_V1
+      // IM69D130 dual-mic paths. SELECT is static hardware truth and is never
+      // driven by firmware in either profile.
+      #ifndef K1_UNIT2_IM69D_V1
       // IM69D130 dual-mic PCB3 on SPH pads (bench eval, 2026-08-05).
       // CLK=GPIO14 / DATA=GPIO13. SELECT is hard-strapped on-board (IM1 HIGH /
       // IM2 LOW) — firmware does NOT drive GPIO12 as LR. Escape-hatch pin only.
       #define K1_PDM_CLK_PIN 14          // PDM clock out → board CLK_IN_3V3 (J1.3)
       #define K1_PDM_DIN_PIN 13          // PDM data in  ← board DATA_OUT_3V3 (J1.5)
       #define K1_IM69_PDM_SEL_PIN 12     // unused on PCB3; do not drive as LR
+      #else
+      // Unit 2 IM69D wiring (Captain CAPTAIN_PIN_AUTH, 2026-08-11): the mic
+      // moves off the SPH pads onto CLK=GPIO39 / DATA=GPIO38. PCB3 above is
+      // untouched. SELECT remains hard-strapped; GPIO12 is never driven.
+      #define K1_PDM_CLK_PIN 39
+      #define K1_PDM_DIN_PIN 38
+      #define K1_IM69_PDM_SEL_PIN 12     // unused on Unit 2; do not drive as LR
+      #endif
     #endif
   #else
     // K1 hardware production GPIO map from Lightwave-Ledstrip firmware-v3
