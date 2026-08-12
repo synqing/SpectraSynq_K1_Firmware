@@ -1072,6 +1072,32 @@ inline void show_leds() {
 #else
   FastLED.setDither(DISABLE_DITHER);
 #endif
+#ifdef K1_MATRIX_AUDIT_V1
+  // P5.B audit tap: scan the FINAL post-gamma output buffers (the artefact
+  // boundary — what the strips actually receive), both channels, O(n) reads.
+  {
+    uint8_t pmax = 0; uint16_t plit = 0;
+    for (uint16_t i = 0; i < CONFIG.LED_COUNT; i++) {
+      uint8_t m = leds_out[i].r;
+      if (leds_out[i].g > m) m = leds_out[i].g;
+      if (leds_out[i].b > m) m = leds_out[i].b;
+      if (m > pmax) pmax = m;
+      if (m > 2) plit++;
+    }
+    k1_mx_primary_max = pmax; k1_mx_primary_lit = plit;
+    uint8_t smax = 0; uint16_t slit = 0;
+    if (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) {
+      for (uint16_t i = 0; i < SECONDARY_LED_COUNT; i++) {
+        uint8_t m = leds_out_secondary[i].r;
+        if (leds_out_secondary[i].g > m) m = leds_out_secondary[i].g;
+        if (leds_out_secondary[i].b > m) m = leds_out_secondary[i].b;
+        if (m > smax) smax = m;
+        if (m > 2) slit++;
+      }
+    }
+    k1_mx_secondary_max = smax; k1_mx_secondary_lit = slit;
+  }
+#endif
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_show_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif

@@ -113,6 +113,9 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   const bool presence_ok = dforge_presence_ok(snap);
   const float inject_scale =
       (presence_ok && !hard_gate) ? 1.0f : 0.0f;
+#ifdef K1_MATRIX_AUDIT_V1
+  k1_mx_df_inject = inject_scale;  // P5.B witness: DF presence gate, live value
+#endif
 
 #ifdef K1_ONSET_V2
   const float transient = dforge_clamp01(ev.transient_level);

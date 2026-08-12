@@ -1078,6 +1078,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       im69d_raw_i16_rms,
       im69d_raw_i16_near_pct);
 #endif
+#ifdef K1_MATRIX_AUDIT_V1
+    // P5.B matrix witnesses: final output-buffer state (written on Core 1 in
+    // show_leds; volatile reads here) + DF presence gate. Same 1 Hz cadence.
+    USBSerial.printf(" | mx_pmax=%u mx_plit=%u mx_smax=%u mx_slit=%u mx_dfinj=%.2f mode=%d smode=%d",
+      (unsigned)k1_mx_primary_max, (unsigned)k1_mx_primary_lit,
+      (unsigned)k1_mx_secondary_max, (unsigned)k1_mx_secondary_lit,
+      (double)k1_mx_df_inject, (int)CONFIG.LIGHTSHOW_MODE, (int)SECONDARY_LIGHTSHOW_MODE);
+#endif
 #if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
     // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.
     {
