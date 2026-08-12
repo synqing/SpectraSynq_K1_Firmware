@@ -175,4 +175,3 @@ static inline const char* deck_palette_ident(uint8_t index)
   if (index < DECK_PALETTE_COUNT) return kDeckPaletteIdents[index];
   return "";
 }
-

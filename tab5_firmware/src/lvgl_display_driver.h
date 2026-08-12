@@ -27,13 +27,13 @@ public:
 
 private:
   LvglDisplayDriver() = default;
-  
+
   lv_display_t* display_ = nullptr;
   lv_color_t* draw_buf1_ = nullptr;
   lv_color_t* draw_buf2_ = nullptr;
-  
+
   static constexpr size_t DRAW_BUF_SIZE = 1280 * 100;  // 100 lines at a time
-  
+
   bool flush_in_progress_ = false;
 };
 

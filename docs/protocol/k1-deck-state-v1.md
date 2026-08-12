@@ -98,7 +98,6 @@ Tab5 MUST disarm and discard any prior confirmed baseline when
 `session_generation` differs from the last accepted HELLO. Matching map/layout
 hashes alone is not sufficient across a generation change.
 
-
 `STATE_ITEM` and `DELTA_BATCH` use map indices from
 `docs/protocol/k1-ble-midi-map.json`. The map hash must match before any index
 is accepted.

@@ -10,7 +10,7 @@
 #define K1_BLE_MIDI_MAX_PACKET 247
 #define K1_BLE_MIDI_MAX_RECORDS_PER_PACKET 16
 
-/** Frozen R2: MSB→LSB pairing window (wall-clock ms). */
+/** Frozen R2: MSB-to-LSB pairing window (wall-clock ms). */
 #ifndef K1_BLE_MIDI_CC14_PAIR_EXPIRY_MS
 #define K1_BLE_MIDI_CC14_PAIR_EXPIRY_MS 50u
 #endif

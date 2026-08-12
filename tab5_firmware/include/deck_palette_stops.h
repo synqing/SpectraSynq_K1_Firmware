@@ -475,4 +475,3 @@ static inline const DeckPaletteStrip* deck_palette_strip(uint8_t index) {
   if (index >= DECK_PALETTE_STOP_TABLE_COUNT) return &kDeckPaletteStrips[0];
   return &kDeckPaletteStrips[index];
 }
-

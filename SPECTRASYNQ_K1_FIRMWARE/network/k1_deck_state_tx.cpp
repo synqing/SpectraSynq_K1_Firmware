@@ -10,6 +10,7 @@
 #include "k1_ble_midi_map.h"
 #include "k1_deck_identity_v1.h"
 #include "k1_deck_state_v1.h"
+#include "k1_claim_adv_v1.h"
 #include "k1_edgemixer.h"
 #include "k1_smart_director.h"
 #include "k1_wireless_control.h"
@@ -160,7 +161,7 @@ bool send_hello() {
   K1DeckStateHello hello = {};
   hello.protocol_min = 1;
   hello.protocol_max = 1;
-  hello.flags = 0;
+  hello.flags = K1_DECK_STATE_HELLO_FLAG_K1_UNIT_ID;
   hello.session_generation = s_session_generation;
   (void)k1_deck_identity_parse_hex(K1_DECK_IDENTITY_REGISTRY_MD5_HEX,
                                    hello.ble_midi_registry_md5, 16);
@@ -169,12 +170,15 @@ bool send_hello() {
   const uint8_t deck_id[16] = K1_DECK_IDENTITY_BENCH_DECK_ID_INIT;
   memcpy(hello.deck_id, deck_id, 16);
   hello.short_id = K1_DECK_IDENTITY_BENCH_SHORT_ID;
-  uint8_t payload[K1_DECK_STATE_HELLO_PAYLOAD_SIZE];
+  uint8_t payload[K1_DECK_STATE_HELLO_PAYLOAD_SIZE +
+                  K1_DECK_STATE_HELLO_UNIT_ID_EXT_LEN] = {};
   if (k1_deck_state_encode_hello_payload(&hello, payload, sizeof(payload)) < 0) {
     return false;
   }
+  const uint32_t unit = k1_claim_unit_id_from_efuse_mac(ESP.getEfuseMac());
+  k1_claim_adv_v1_write_be32(payload + K1_DECK_STATE_HELLO_PAYLOAD_SIZE, unit);
   return send_record(K1_DECK_STATE_REC_HELLO, s_revision, payload,
-                     K1_DECK_STATE_HELLO_PAYLOAD_SIZE, true);
+                     static_cast<uint16_t>(sizeof(payload)), true);
 }
 
 float text_index_for_path(const char* path, const char* text) {

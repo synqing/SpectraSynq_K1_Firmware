@@ -2,17 +2,18 @@
 
 This directory is the canonical in-repo PlatformIO project for the M5Stack Tab5 controller firmware.
 
-The previous checkout under `Workspace_Management/Software/T-Keyboard-S3-Pro/K1.tab5/pio/deck` is historical only. Build, flash, and source edits for Tab5 firmware now happen from:
+The previous standalone checkout is historical only. Build, flash, and source
+edits for Tab5 firmware now happen from this directory:
 
 ```bash
-/Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware
+cd tab5_firmware
 ```
 
 ## Current Contract
 
 - Transport direction: BLE MIDI controller for K1, not STA Wi-Fi and not OSC.
 - `src/ble_midi_transport.cpp` owns BLE-MIDI packet/program-change/control-change output.
-- `src/net.cpp` is now a transport shim over BLE MIDI and keeps Wi-Fi offline.
+- The production P4 application does not compile the retired SoftAP/OSC path.
 - The UI stays usable without a host connection; the blocking "waiting for host" overlay is disabled.
 - Screen rotation is set for inverse landscape on the Tab5.
 - Berkeley Mono is the active LVGL font path.
@@ -55,14 +56,14 @@ Historical compile-time pending marker (stale once GATT is compiled in):
 ## Build
 
 ```bash
-cd /Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware
+cd tab5_firmware
 ~/.platformio/penv/bin/pio run -e tab5_p4
 ```
 
 The main firmware image is emitted at:
 
 ```bash
-/Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware/.pio/build/tab5_p4/firmware.bin
+.pio/build/tab5_p4/firmware.bin
 ```
 
 ## Flash Tab5
@@ -70,7 +71,7 @@ The main firmware image is emitted at:
 Use the explicit port. For the currently connected Tab5:
 
 ```bash
-cd /Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware
+cd tab5_firmware
 scripts/flash_tab5_p4.sh --port /dev/tty.usbmodem11401 --baud 1500000
 ```
 
@@ -107,7 +108,8 @@ Useful encoderless stop-gap commands:
 ## Build Options
 
 - `env:tab5_p4`: active Tab5 ESP32-P4 firmware.
-- `env:tab5_s3`: legacy CoreS3 target retained from the donor project.
+- `env:tab5_p4_hci_diag`: non-shippable hosted-HCI diagnostic build.
+- `env:native_sdl`: host simulator and transaction-test surface.
 - `env:diag_display`: display-only smoke target.
 
 ## Local Config

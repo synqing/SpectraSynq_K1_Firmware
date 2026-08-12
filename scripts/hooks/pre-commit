@@ -117,6 +117,24 @@ for f in "${STAGED[@]}"; do
 done
 say "  tier: ${tier}"
 
+# --- 4. K1/Tab5 protocol parity (cheap, before broad pytest/build) ----------
+# A 71-control Tab5 was once flashed against Unit2's live 68-control sender.
+# Kill that class at source in under a second whenever a coupled protocol file
+# or this guard changes. The authoritative live contract is 68 / 9b5db3….
+protocol_parity=0
+for f in "${STAGED[@]}"; do
+  case "$f" in
+    docs/protocol/k1-ble-midi-map.json|scripts/ble_midi/gen_k1_ble_midi_header.py|scripts/agent/tab5_protocol_parity_gate.py|tests/test_tab5_protocol_parity_gate.py|SPECTRASYNQ_K1_FIRMWARE/network/k1_ble_midi_map.h|SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_identity_v1.h|SPECTRASYNQ_K1_FIRMWARE/network/k1_claim_adv_v1.h|tab5_firmware/src/k1_ble_midi_map.h|tab5_firmware/src/deck_state_rx.cpp|tab5_firmware/include/k1_deck_identity_v1.h|tab5_firmware/include/k1_claim_adv_v1.h)
+      protocol_parity=1 ;;
+  esac
+done
+if [ "$protocol_parity" -eq 1 ]; then
+  say "  → python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root ."
+  if ! python3 scripts/agent/tab5_protocol_parity_gate.py --repo-root .; then
+    hr; say "GATE BLOCKED — K1/Tab5 protocol sources are not one live contract."; exit 1
+  fi
+fi
+
 # --- helpers: tool discovery ------------------------------------------------
 have_pytest() { python3 -c 'import pytest' >/dev/null 2>&1; }
 find_pio() {

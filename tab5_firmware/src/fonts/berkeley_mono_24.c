@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 24 px
  * Bpp: 4
- * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 24 --font /Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware/src/fonts/BerkeleyMono-Regular.ttf -r 0x20-0x7E --lv-font-name berkeley_mono_24 -o /Users/spectrasynq/SpectraSynq_K1_Firmware/tab5_firmware/src/fonts/berkeley_mono_24.c
+ * Opts: --no-compress --no-prefilter --bpp 4 --format lvgl --lv-include lvgl.h --size 24 --font src/fonts/BerkeleyMono-Regular.ttf -r 0x20-0x7E --lv-font-name berkeley_mono_24 -o src/fonts/berkeley_mono_24.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -1421,4 +1421,3 @@ lv_font_t berkeley_mono_24 = {
 
 
 #endif /*#if BERKELEY_MONO_24*/
-

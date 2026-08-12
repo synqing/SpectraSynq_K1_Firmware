@@ -1,0 +1,112 @@
+{
+  "schema": "spectrasynq-tab5-toolchain-lock-v1",
+  "captured_utc": "2026-08-10T20:35:00Z",
+  "baseline_commit": "21d0e593461af468d38394b140e2477bd58bf7f3",
+  "platformio_core": "6.1.19",
+  "platformio_python": "3.11.7",
+  "packages": [
+    {
+      "name": "platform-espressif32",
+      "version": "54.3.21",
+      "source": "https://github.com/pioarduino/platform-espressif32/releases/download/54.03.21/platform-espressif32.zip",
+      "sha256": "4a069f95ec901a375b4185000a7dd3b503f283fb9973a711a5beba0cad24e7d8",
+      "licence": "Apache-2.0"
+    },
+    {
+      "name": "framework-arduinoespressif32",
+      "version": "3.3.1",
+      "source": "https://github.com/espressif/arduino-esp32/releases/download/3.3.1/esp32-3.3.1.zip",
+      "sha256": "c4d46eb0ec73d3b24f43f69a2ae6d2097baae3a8b5c04989a6c81043845ffb67",
+      "licence": "LGPL-2.1-or-later",
+      "note": "The upstream archive package.json reports 3.3.0. The URL, archive checksum, hosted HAL checksums and fail-closed overlay identify the 3.3.1 source."
+    },
+    {
+      "name": "framework-arduinoespressif32-libs",
+      "version": "5.4.0+sha.858a988d6e",
+      "source": "https://github.com/espressif/esp32-arduino-lib-builder/releases/download/idf-release_v5.4/esp32-arduino-libs-idf-release_v5.4-858a988d-v1.zip",
+      "sha256": "4fc6eace642735036404c722d5602a379fe16378c72ffd060096cbef1c62d69d",
+      "licence": "LGPL-2.1-or-later"
+    },
+    {
+      "name": "framework-espidf",
+      "version": "5.4.2",
+      "source": "https://github.com/pioarduino/esp-idf/releases/download/v5.4.2/esp-idf-v5.4.2.zip",
+      "sha256": "616cf8bf0e3763e253d25f42c9ef2c04b19d20b308035708c094cf6a14fd6edd",
+      "licence": "Apache-2.0"
+    },
+    {
+      "name": "toolchain-riscv32-esp",
+      "version": "14.2.0+20241119",
+      "source": "https://github.com/pioarduino/registry/releases/download/0.0.1/riscv32-esp-elf-14.2.0_20241119.zip",
+      "installed_gxx_sha256": "0f8ec488c57bf783064bc6489926bb5c3386f42bf05e467cc9491c4627a0b8a7",
+      "installed_gcc_sha256": "2bc6b93e97fbe3b5662655bafab65377a84c2850fff1f2abda97abeb91f5690b",
+      "licence": "GPL-2.0-or-later"
+    },
+    {
+      "name": "tool-cmake",
+      "version": "3.30.2",
+      "source": "https://github.com/pioarduino/registry/releases/download/0.0.1/cmake-3.30.2.zip",
+      "installed_binary_sha256": "47e4ce9788dae262c74272290322ec68455cbace06d23454167be1a4b4a4bec9",
+      "licence": "BSD-3-Clause"
+    },
+    {
+      "name": "tool-ninja",
+      "version": "1.10.2",
+      "source": "https://github.com/pioarduino/registry/releases/download/0.0.1/ninja-1.10.2.zip",
+      "installed_binary_sha256": "b73f49c8e3005961a9d18f2290a2ca2eabe5b27540c857cf6c53068986883b95",
+      "licence": "Apache-2.0"
+    },
+    {
+      "name": "tool-esptoolpy",
+      "version": "5.0.0",
+      "source": "https://github.com/pioarduino/esptool/releases/download/v5.0.0-dev1/esptool.zip",
+      "sha256": "d1554f7cc3123e98dc95015a90175061a5a3d47cbb9190b45b487d48a65ccf5b",
+      "installed_entry_sha256": "de76aeaa85fe5633c5bfa051dde85d8694be4d325b198eaf70488c30e3494f3d",
+      "licence": "GPL-2.0-or-later"
+    },
+    {
+      "name": "tool-scons",
+      "version": "4.40801.0",
+      "source": "https://github.com/pioarduino/registry/releases/download/0.0.1/scons-4.8.1.zip",
+      "sha256": "289b1abf389b730ab5a1018ed9fc84e22d301e0d16c64548eb9db5bf8ba59d06",
+      "licence": "MIT"
+    },
+    {
+      "name": "tool-esp-rom-elfs",
+      "version": "2024.10.11",
+      "source": "https://github.com/pioarduino/registry/releases/download/0.0.1/esp-rom-elfs-20241011.zip",
+      "sha256": "8f1f9041a44390650994499c95dd20851222a4bdaa162dd68f6cef5af3e39501",
+      "licence": "Apache-2.0"
+    },
+    {
+      "name": "M5Unified",
+      "version": "0.2.19",
+      "source": "https://registry.platformio.org/libraries/m5stack/M5Unified/0.2.19",
+      "installed_tree_sha256": "66b8137dba378793ef165572eaa79de358ae8b07491e821a78a7f3be0e9cdcec",
+      "licence": "MIT"
+    },
+    {
+      "name": "M5GFX",
+      "version": "0.2.26",
+      "source": "https://registry.platformio.org/libraries/m5stack/M5GFX/0.2.26",
+      "installed_tree_sha256": "c31f7dcd6762a670dc8aeb0d1512dfc2822139c90b5539bba92ebfd47650f34f",
+      "licence": "MIT"
+    },
+    {
+      "name": "lvgl",
+      "version": "9.3.0",
+      "source": "https://registry.platformio.org/libraries/lvgl/lvgl/9.3.0",
+      "installed_tree_sha256": "c5fd3ce935da7fd5e9e801482dbf09a96c6fb81fe51522dc97c0b951ecf54149",
+      "licence": "MIT"
+    }
+  ],
+  "framework_overlay": {
+    "source_provenance": "https://github.com/espressif/arduino-esp32/pull/11804",
+    "upstream_head_commit": "99c7ceb61bb472ce49ea3b86d2128658506ea259",
+    "upstream_merge_commit": "2ca96fb20bad73a3baaae15ab942ef00f509cd6e",
+    "hosted_c_sha256": "c3dd9080dbae6a6d2ea79e93c22f7a052fffcba5eb6e79a7d6e1e810e3a39fbb",
+    "hosted_h_sha256": "d465214411ed910f10a691be9ee5a008d785c7339f4e37f912a112f29eb8fe2b",
+    "patched_wifi_sha256": "df813832ed42383ea6be7912e1d2f51df6665c0c66bf0c16a7c41309a2f672b7",
+    "patched_cmake_sha256": "daa88106af9d04ef5852905ce69c493bb8bb286415e335c7d9ad9ff06deb496d"
+  }
+}
