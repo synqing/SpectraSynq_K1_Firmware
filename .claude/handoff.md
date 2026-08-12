@@ -38,21 +38,27 @@ IM73D=DEPRECATED + P2.B QUARANTINE CLOSED (zero consumer floors in executable so
 K1_CUSTOM=recomposed onto k1_bench_im69d_ble; BLOCKED pending device nomination
 SILENCE_FLOOR=CLOSED (frac 1.75, IM69D-scoped, eyes-on PASSED)
 STAGE_1B=PASS (mic B / RIGHT alive on B489)
-STAGE_2=INSTRUMENT PROVEN; H_C NOT REJECTED (confounds: SPL SNR, 56% capture duty, D unmeasured)
-P5B_MATRIX=P1/P3/P4 PASS; P2 drain FAIL 18.6s (flywheel-persistence dwell-gate debt)
-LOCK_DF_FLOORS=BLOCKED-ON-SPL (Bose leg owed; profile 2 stays unpopulated)
+STAGE_2=CLOSED — H_C SUBSTANTIALLY REJECTED at product SPL; H_C2 = the live second-capsule value
+P5B_MATRIX=ALL PASS at product SPL (drain 9.1s; laptop 18.6s was fixture-induced)
+LOCK_DF_FLOORS=CLOSED; K1_AUDIO_PROFILE_IM69D130_UNIT2 POPULATED (ACK removed)
 ```
 
 - **Evidence:** `docs/forensics/im69d-stage1b-stage2-2026-08-12/` (Stage 1b receipt,
   Stage 2 + matrix receipt, decoded stereo JSON, matrix legs) ·
   `docs/forensics/im69d-consumer-baseline-2026-08-12/IM69D_CONSUMER_BASELINE.md` ·
   scar inventory `docs/forensics/audio-profile/2026-08-12-im73d-scar-inventory-p2b.md`.
-- **One Bose press unlocks the remaining three measurements:** Bose-SPL music leg
-  (`p4_baseline_leg.py`) → lock/DF floors + profile 2; Stage-2 decisive rerun
-  (`:scap_arm` + `stereo_probe_decode.py`); P5.B music rows at product SPL.
-- **Named debt:** dwell/persistence gate (P2 FAIL mechanism); stereo capture duty
-  56% (DMA descriptor sizing under stereo); dual-capsule topology on Unit 2 still
-  single-path evidenced; LED_160_AB env keep-or-remove call.
+- **Bose measurements CLOSED (2026-08-13, canonical fixture Demo Track 1):**
+  lock/DF floors closed (lock 0.60 measurement-cited; awake 100% from vol 40);
+  **profile 2 POPULATED** + IM69D ACK removed; **Stage 2 H_C SUBSTANTIALLY
+  REJECTED** (ρ≥0.97 to 3.5 kHz at product SPL — stereo visuals would be
+  synthesised, not sensed; H_C2 coherence robustness is the live justification
+  for the second capsule); P5.B product-SPL rows PASS incl. drain 9.1 s (the
+  laptop 18.6 s FAIL was fixture-induced).
+- **Named debt:** dwell/persistence gate (post-latch flashes + 18/21 drain
+  non-latch); stereo capture duty 56% (DMA descriptor sizing); dual-capsule
+  topology on Unit 2 single-path evidenced (Stage 1b proved the BENCH mic B);
+  spacing D unmeasured (O-4, formality); LED_160_AB env keep-or-remove call;
+  lock DUTY 9–27% routed to the tempo lane (FSM dynamics).
 
 ## ▶ SUSPENDED (flash) — DECK16 / TAB5 BLE (`K1_DECK16_TAB5_BLE_R1`)
 

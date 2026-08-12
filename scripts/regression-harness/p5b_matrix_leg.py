@@ -27,7 +27,7 @@ import serial
 label, port = sys.argv[1], sys.argv[2]
 p_ord, s_ord, DUR = int(sys.argv[3]), int(sys.argv[4]), float(sys.argv[5])
 VOL = int(sys.argv[6]) if len(sys.argv) > 6 else None
-TRACK = "/Users/spectrasynq/musica/apps/musica-vj/exports/moonlight-lyria-sequenced-composition.mp3"
+TRACK = "/Users/spectrasynq/Music/PioneerDJ/Demo Tracks/Demo Track 1.mp3"  # canonical fixture (transfer_leg.py default)
 FIELD = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)=(-?[\d.]+)")
 
 s = serial.Serial(port, 115200, timeout=0.1)

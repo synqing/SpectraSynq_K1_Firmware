@@ -23,7 +23,7 @@ import serial
 label, port, DUR = sys.argv[1], sys.argv[2], float(sys.argv[3])
 VOL = int(sys.argv[4]) if len(sys.argv) > 4 else None
 TRACK = sys.argv[5] if len(sys.argv) > 5 else \
-    "/Users/spectrasynq/musica/apps/musica-vj/exports/moonlight-lyria-sequenced-composition.mp3"
+    "/Users/spectrasynq/Music/PioneerDJ/Demo Tracks/Demo Track 1.mp3"
 
 FIELD = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)=(-?[\d.]+)")
 AP = re.compile(r"\[AP\][^\r\n]*")

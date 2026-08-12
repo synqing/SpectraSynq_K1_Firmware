@@ -50,7 +50,7 @@
 
 #define K1_AUDIO_PROFILE_NOT_CHARACTERISED 0
 #define K1_AUDIO_PROFILE_SPH0645           1
-// #define K1_AUDIO_PROFILE_IM69D130_UNIT2 2   // add ONLY on first-principles derivation
+#define K1_AUDIO_PROFILE_IM69D130_UNIT2    2   // populated 2026-08-13 — first-principles, see IM69D branch below
 
 #if defined(K1_MIC_IM73D_PDM_V1)
   // IM73D122 is DEPRECATED (Captain 2026-08-10) and no unit carrying this build
@@ -79,14 +79,30 @@
   //   reads BELOW quiet ambient's (0.0072). No RMS threshold separates them at any
   //   gain, in any domain -- docs/forensics/.../FINDING-rms-cannot-separate.md.
   //
-  // So IM69D is NOT_CHARACTERISED, and every IM69D env must say so out loud.
-  // It is NOT yet profile 2: the joint level fraction this lane derived is 2.50 on
-  // Unit 2 against canon's 1.25 on the bench, and whether that delta is per-unit or
-  // per-ROOM is exactly what the open transfer test decides. Canonising a constant
-  // that the outstanding experiment exists to challenge is how the IM73D numbers
-  // escaped in the first place. Populate K1_AUDIO_PROFILE_IM69D130_UNIT2 when the
-  // transfer test closes -- not before.
-  #define K1_AUDIO_PROFILE K1_AUDIO_PROFILE_NOT_CHARACTERISED
+  // ─── PROFILE 2 POPULATED 2026-08-13 — the transfer test CLOSED ──────────────
+  // The populate-condition written above ("when the transfer test closes") is
+  // met: the 1.25-vs-2.50 fraction discrepancy was an artefact of a STALE
+  // calibration (Unit 2's SSL learned at a previous placement), resolved by
+  // in-situ recalibration of both units under verified true silence. Corrected
+  // rule: calibrate at final placement, then the fraction TRANSFERS — placement
+  // is carried by SSL. Evidence: docs/forensics/unit2-bench-transfer-full-2026-08-12.md,
+  // commits 9599714b / a8b1912a; eyes-on PASSED at the shipping value (5dcbfc07).
+  //
+  // First-principles characterisation carried by this profile (measured on
+  // IM69D130 silicon, both units, calibrated at final placement):
+  //   • Silence: joint crest×level gate — K1_SILENCE_PEAKINESS_BREAK 2.10 AND
+  //     K1_SILENCE_JOINT_LEVEL_SSL_FRAC 1.75 (IM69D-scoped in i2s_audio.h; the
+  //     legacy RMS Schmitt cannot fire on this mic and is bypassed by design).
+  //     Both units: 100% silence under true silence, 0% under music.
+  //   • Lock: K1_LOCK_CONFIDENCE 0.60 RETAINED, now cited to IM69D measurement
+  //     (IM69D_CONSUMER_BASELINE.md 2026-08-12/13): ambient-quiet conf p95 0.58
+  //     sits just below; music conf p75 0.87–0.97 at product SPL sits above.
+  //     Lock duty (9–27%) is FSM-dynamics-limited, not floor-limited.
+  //   • Baselines: quiet/music raw + tempo distributions in
+  //     docs/forensics/im69d-consumer-baseline-2026-08-12/ (witnessed legs,
+  //     canonical fixture PioneerDJ Demo Track 1).
+  // Do NOT port these numbers to any other mic; the tombstone contract stands.
+  #define K1_AUDIO_PROFILE K1_AUDIO_PROFILE_IM69D130_UNIT2
 #else
   // SPH0645 — the calibrated reference. K1_LOCK_CONFIDENCE 0.60 and the silence
   // RMS pair were CALIBRATED on the 36-track HarmonixSet corpus plus synthetic
