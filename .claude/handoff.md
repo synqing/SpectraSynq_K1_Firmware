@@ -25,31 +25,34 @@ archived — inventory: `docs/forensics/audio-profile/2026-08-12-im73d-scar-inve
 may be ported, seeded, bounded, or "sanity-checked" into an IM69D profile. Phase-4 floors
 cite Unit2/B489 measurements only, calibrated at final placement.
 
-**Where the code is (2026-08-11, post-merge):** the 2026-08-07..11 Deck16 /
-Tab5 / STANDBY / MIRROR / guard / doctrine work is **merged to `main`**
-(Captain-authorised) and pushed. `main` is the active branch; start new work
-from it. The lane branch `fix/tab5-phase1-softkey-wiring` is retained on origin
-as the pre-merge record.
-
-`fix/dual-im69d130-resolution-20260810` is still checked out in the worktree
-`.worktrees/unit2_slot_ab` and is now BEHIND `main`. It was deliberately never
-fast-forwarded — moving a ref out from under a live worktree corrupts it. If
-that worktree resumes, rebase or merge it onto `main` from inside the worktree.
+**Lane status (2026-08-13, session close):** runbook items 1–4 of the outstanding
+set are CLOSED or honestly bounded. PR #43 (silence-gate lane, frac 1.75, IM69D
+scoping) **MERGED to main**; PR #44 (`chore/p2b-im73d-quarantine`) carries P2.B +
+P3.B/C + P4 + P5.B. Both devices restored and on the same tip (`2904c9b9`):
+Unit 2 = `k1_unit2_im69d_right` (cal intact SSL=167 measured), bench B489 =
+`k1_bench_im69d`.
 
 ```text
-UNIT2_PHYSICAL_MIC=dual_IM69D130
-IM73D=DEPRECATED
-K1_CUSTOM_IM73D_INHERITANCE=FALSE_AUTHORITY
-PIN_RECEIPT=PENDING (CAPTAIN_PIN_AUTH required)
-FLASH_FREEZE=ACTIVE on Unit2 + B489 mic envs
-FIRMWARE_REWRITE=HOLD until pin GO
-FLASH=HOLD until CAPTAIN_FLASH_AUTH=GO
+UNIT2_PHYSICAL_MIC=dual_IM69D130 (pins CLK=39/DATA=38 RIGHT — CAPTAIN_PIN_AUTH 2026-08-11)
+IM73D=DEPRECATED + P2.B QUARANTINE CLOSED (zero consumer floors in executable source)
+K1_CUSTOM=recomposed onto k1_bench_im69d_ble; BLOCKED pending device nomination
+SILENCE_FLOOR=CLOSED (frac 1.75, IM69D-scoped, eyes-on PASSED)
+STAGE_1B=PASS (mic B / RIGHT alive on B489)
+STAGE_2=INSTRUMENT PROVEN; H_C NOT REJECTED (confounds: SPL SNR, 56% capture duty, D unmeasured)
+P5B_MATRIX=P1/P3/P4 PASS; P2 drain FAIL 18.6s (flywheel-persistence dwell-gate debt)
+LOCK_DF_FLOORS=BLOCKED-ON-SPL (Bose leg owed; profile 2 stays unpopulated)
 ```
 
-- **Unit 2** `0C54FC00` / `AC:A7:04:FC:54:0C` — physical dual IM69D130; silicon may still be IM73D-inherited `k1_custom` (**MISFLASH / wrong mic identity**). Rollback bin sha `f7f9b077…` retained.
-- **First slice:** P0 authority + freeze + dirty-tree preserve + clean worktree. **No** env retarget, **no** flash.
-- **Hard gate:** `_scratch/im69d_resolution_20260810/UNIT2_PIN_RECEIPT.md` needs `CAPTAIN_PIN_AUTH=GO` before Phase 1.
-- **Freeze:** `_scratch/im69d_resolution_20260810/FLASH_FREEZE.md`
+- **Evidence:** `docs/forensics/im69d-stage1b-stage2-2026-08-12/` (Stage 1b receipt,
+  Stage 2 + matrix receipt, decoded stereo JSON, matrix legs) ·
+  `docs/forensics/im69d-consumer-baseline-2026-08-12/IM69D_CONSUMER_BASELINE.md` ·
+  scar inventory `docs/forensics/audio-profile/2026-08-12-im73d-scar-inventory-p2b.md`.
+- **One Bose press unlocks the remaining three measurements:** Bose-SPL music leg
+  (`p4_baseline_leg.py`) → lock/DF floors + profile 2; Stage-2 decisive rerun
+  (`:scap_arm` + `stereo_probe_decode.py`); P5.B music rows at product SPL.
+- **Named debt:** dwell/persistence gate (P2 FAIL mechanism); stereo capture duty
+  56% (DMA descriptor sizing under stereo); dual-capsule topology on Unit 2 still
+  single-path evidenced; LED_160_AB env keep-or-remove call.
 
 ## ▶ SUSPENDED (flash) — DECK16 / TAB5 BLE (`K1_DECK16_TAB5_BLE_R1`)
 
