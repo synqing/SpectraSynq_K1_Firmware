@@ -167,3 +167,98 @@ def test_joint_silence_gate_is_scoped_to_im69d():
     )
     # The plain RMS Schmitt must remain reachable for non-IM69D builds.
     assert "K1_SILENCE_RMS_EXIT" in i2s and "K1_SILENCE_RMS_ENTER" in i2s
+
+
+# ── Stage 1b / Stage 2 locks (2026-08-12, runbook P3.B/P3.C) ─────────────────
+
+def test_micb_env_selects_right_slot_and_differs_from_left_default():
+    """Stage 1b: k1_bench_im69d_micb = base + RIGHT slot, nothing else."""
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    block = _env_block(text, "k1_bench_im69d_micb")
+    assert "extends = env:k1_bench_im69d" in block
+    assert "-DK1_MIC_IM69D_SLOT_RIGHT" in block
+    assert "-DK1_MIC_IM69D_STEREO_V1" not in block
+    # The base env must NOT already select a slot — micb must be a real delta.
+    base = _env_block(text, "k1_bench_im69d")
+    assert "-DK1_MIC_IM69D_SLOT_RIGHT" not in base
+    assert "-DK1_MIC_IM69D_SLOT_LEFT" not in base
+
+
+def test_stereo_env_sets_stereo_flag_and_no_mono_slot():
+    """Stage 2: k1_bench_im69d_stereo = base + K1_MIC_IM69D_STEREO_V1 only."""
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    block = _env_block(text, "k1_bench_im69d_stereo")
+    assert "extends = env:k1_bench_im69d" in block
+    assert "-DK1_MIC_IM69D_STEREO_V1" in block
+    assert "-DK1_MIC_IM69D_SLOT_RIGHT" not in block
+    assert "-DK1_MIC_IM69D_SLOT_LEFT" not in block
+
+
+def test_stereo_flag_absent_from_production_and_all_other_envs():
+    """K1_MIC_IM69D_STEREO_V1 may appear in exactly one env: the stereo probe."""
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    for env_name in PROD_ENVS + ("k1_bench_im69d", "k1_bench_im69d_ble",
+                                 "k1_bench_im69d_micb", "k1_unit2_im69d_right",
+                                 "k1_custom"):
+        block = _env_block(text, env_name)
+        assert "-DK1_MIC_IM69D_STEREO_V1" not in block, (
+            f"{env_name} must not define the Stage 2 stereo flag"
+        )
+
+
+def test_stereo_init_mutually_excludes_mono_slot_selects():
+    """i2s_audio.h must #error when stereo is combined with a mono slot flag."""
+    text = I2S.read_text(encoding="utf-8")
+    assert re.search(
+        r"#if\s+defined\(K1_MIC_IM69D_STEREO_V1\)\s*&&\s*\(defined\(K1_MIC_IM69D_SLOT_LEFT\)\s*\|\|\s*defined\(K1_MIC_IM69D_SLOT_RIGHT\)\)",
+        text,
+    ), "stereo × mono-slot mutual exclusion #error missing from i2s_audio.h"
+    assert "I2S_SLOT_MODE_STEREO)" in text
+    assert "I2S_PDM_SLOT_BOTH" in text
+
+
+def test_scap_commands_are_gated_and_harness_class():
+    """scap_* typed rows exist only under the stereo flag, CMD_HARNESS class."""
+    table = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" /
+             "serial_typed_cmd_table.def").read_text(encoding="utf-8")
+    m = re.search(r"#ifdef\s+K1_MIC_IM69D_STEREO_V1(.*?)#endif", table, re.S)
+    assert m, "scap_* rows must sit under #ifdef K1_MIC_IM69D_STEREO_V1"
+    block = m.group(1)
+    for cmd in ("scap_arm", "scap_status", "scap_dump"):
+        assert f'"{cmd}"' in block, f"missing typed row for {cmd}"
+        assert "CMD_HARNESS" in block
+    # And never outside the gate.
+    outside = table.replace(m.group(0), "")
+    assert "scap_" not in outside, "scap_* leaked outside the stereo gate"
+
+
+def test_stereo_probe_tu_preprocesses_to_nothing_when_flag_off():
+    """The gate must sit BEFORE every #include (no global-ctor leak, lesson S1)."""
+    cpp = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" /
+           "k1_stereo_probe.cpp").read_text(encoding="utf-8")
+    first_directive = next(
+        line.strip() for line in cpp.splitlines()
+        if line.strip().startswith("#")
+    )
+    assert first_directive == "#ifdef K1_MIC_IM69D_STEREO_V1", (
+        "k1_stereo_probe.cpp must open with the flag gate before any include"
+    )
+
+
+def test_scap_dispatch_reaches_the_parse_command_ladder():
+    """The .def table is safety METADATA; live type=value dispatch is the
+    strcmp ladder in serial_menu.cpp. A row without a ladder call-site compiles
+    clean and answers `Bad command` on device (caught live 2026-08-12 — this
+    ratchet pins the fix)."""
+    menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" /
+            "serial_menu.cpp").read_text(encoding="utf-8")
+    m = re.search(
+        r"#ifdef\s+K1_MIC_IM69D_STEREO_V1\s*\n(.*?)#endif",
+        menu[menu.find("parse_command"):],
+        re.S,
+    )
+    assert m, "parse_command must carry a K1_MIC_IM69D_STEREO_V1-gated hop"
+    assert "k1_stereo_probe_dispatch(command_type, command_data)" in m.group(1), (
+        "the gated hop must call k1_stereo_probe_dispatch — the table row alone "
+        "does not dispatch"
+    )

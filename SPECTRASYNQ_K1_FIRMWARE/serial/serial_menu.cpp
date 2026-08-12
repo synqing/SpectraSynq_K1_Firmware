@@ -46,6 +46,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 // helpers switch on, plus the K1_STM gate.
 #include "k1_audio_snapshot.h"
 #include "k1_edgemixer.h"
+#ifdef K1_MIC_IM69D_STEREO_V1
+#include "k1_stereo_probe.h"  // scap_* dispatch (Stage 2 probe env only)
+#endif
 #include "k1_mode_selection.h"
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
@@ -2785,6 +2788,16 @@ void parse_command(char* command_buf) {
     // tests/test_gdft_harness_schema_static.py.
     else if (serial_cmd_dispatch_gdft_harness(command_type, command_data)) {
       // handled by the extracted gdft_harness dispatcher
+    }
+#endif
+
+#ifdef K1_MIC_IM69D_STEREO_V1
+    // scap_arm / scap_status / scap_dump — Stage 2 stereo capture instrument
+    // (audio/k1_stereo_probe.cpp). GATE-MATCHED: rows in serial_typed_cmd_table.def,
+    // wrapper in serial_typed_dispatch.cpp, and this call-site all sit behind
+    // K1_MIC_IM69D_STEREO_V1 (probe env only; production-OFF).
+    else if (k1_stereo_probe_dispatch(command_type, command_data)) {
+      // handled by the stereo probe instrument
     }
 #endif
 

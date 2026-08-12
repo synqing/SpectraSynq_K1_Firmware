@@ -28,6 +28,9 @@
 #if K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"
 #endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+#include "k1_stereo_probe.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -116,6 +119,11 @@ bool serial_typed_wrap_vivid(const char* command_type, char* command_data) {
 #if ENABLE_GDFT_HARNESS
 bool serial_typed_wrap_gdft_harness(const char* command_type, char* command_data) {
   return serial_cmd_dispatch_gdft_harness(command_type, command_data);
+}
+#endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data) {
+  return k1_stereo_probe_dispatch(command_type, command_data);
 }
 #endif
 #if K1_EFFECT_FRAMEWORK_V1

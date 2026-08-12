@@ -6,6 +6,9 @@
 #ifdef K1_MIC_AUTO_SENSE_V1
 #include "k1_mic_auto_sense.h"
 #endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+#include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -285,12 +288,20 @@ void init_i2s() {
 #ifdef K1_MIC_IM69D_DSR_16S_V1
   pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
 #endif
+#if defined(K1_MIC_IM69D_STEREO_V1) && (defined(K1_MIC_IM69D_SLOT_LEFT) || defined(K1_MIC_IM69D_SLOT_RIGHT))
+#error "IM69D stereo (K1_MIC_IM69D_STEREO_V1) excludes a mono slot select"
+#endif
 #if defined(K1_MIC_IM69D_SLOT_LEFT) && defined(K1_MIC_IM69D_SLOT_RIGHT)
 #error "IM69D diagnostic build must select exactly one PDM slot"
 #elif defined(K1_MIC_IM69D_SLOT_LEFT)
   pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_LEFT;
 #elif defined(K1_MIC_IM69D_SLOT_RIGHT)
   pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_RIGHT;
+#elif defined(K1_MIC_IM69D_STEREO_V1)
+  // Stage 2 (design §5.1): both PDM slots recovered as an interleaved L/R
+  // int16 stream. SELECT straps decide which mic drives which half-period.
+  pdm_cfg.slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO);
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_BOTH;
 #elif defined(K1_UNIT2_IM69D_V1)
 #error "Unit 2 IM69D diagnostic builds require an explicit slot"
 #endif
@@ -299,8 +310,13 @@ void init_i2s() {
   USBSerial.print(result == ESP_OK ? K1_PASS : K1_FAIL);
 #if defined(K1_MIC_IM69D_SLOT_RIGHT)
   USBSerial.println(" slot=RIGHT");
+#elif defined(K1_MIC_IM69D_STEREO_V1)
+  USBSerial.println(" slot=STEREO");
 #else
   USBSerial.println(" slot=LEFT");
+#endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+  k1_stereo_probe_init();  // PSRAM ring for the Stage 2 capture instrument
 #endif
 #else
   // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
@@ -367,7 +383,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   static float max_waveform_val_raw_smooth = 0.0; // Added for smoothing
 
   size_t bytes_read = 0;
-#ifdef K1_MIC_PDM_RX_ANY_V1
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * 2U * sizeof(int16_t);  // PDM stereo: 96*2ch*2 = 384 B (design §5.1)
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int16_t);  // PDM: 96*2 = 192 B
 #else
   const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int32_t);  // SPH0645: 96*4 = 384 B
@@ -393,6 +411,15 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
   }
   #elif defined(K1_MIC_IM69D_PDM_V1)
+  #ifdef K1_MIC_IM69D_STEREO_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < (size_t)CONFIG.SAMPLES_PER_CHUNK * 2U; z++) {
+      im69d_samples_i16_stereo[z] = 0;
+    }
+  }
+  #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
     const size_t samples_got = bytes_read / sizeof(int16_t);
@@ -400,6 +427,7 @@ void acquire_sample_chunk(uint32_t t_now) {
       im69d_samples_i16[z] = 0;
     }
   }
+  #endif
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
@@ -413,10 +441,24 @@ void acquire_sample_chunk(uint32_t t_now) {
   #ifdef K1_MIC_IM73D_PDM_V1
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im73d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
   #elif defined(K1_MIC_IM69D_PDM_V1)
+  #ifdef K1_MIC_IM69D_STEREO_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, portMAX_DELAY);
+  #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+  #endif
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
   #endif
+#endif
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  // Stage 2 de-interleave (design §5.1): the DSP chain consumes LEFT (mic A) —
+  // behaviour-identical to Stage 1 mono. RIGHT (mic B) exists ONLY for
+  // measurement (ρ / coherence via the k1_stereo_probe capture ring).
+  for (uint16_t di = 0; di < CONFIG.SAMPLES_PER_CHUNK; di++) {
+    im69d_samples_i16[di]       = im69d_samples_i16_stereo[2U * di];
+    im69d_samples_i16_right[di] = im69d_samples_i16_stereo[2U * di + 1U];
+  }
+  k1_stereo_probe_on_chunk(im69d_samples_i16_stereo, CONFIG.SAMPLES_PER_CHUNK);
 #endif
 #ifdef K1_MIC_AUTO_SENSE_V1
   k1_mic_auto_sense_note_i2s_result(
@@ -469,6 +511,21 @@ void acquire_sample_chunk(uint32_t t_now) {
   im69d_raw_i16_abs_peak = im69d_raw_peak;
   im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
   im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#ifdef K1_MIC_IM69D_STEREO_V1
+  // RIGHT-channel raw telemetry (measurement only — no DSP consumer).
+  {
+    uint16_t r_peak = 0;
+    uint64_t r_sum_sq = 0;
+    for (uint16_t ri = 0; ri < CONFIG.SAMPLES_PER_CHUNK; ri++) {
+      const int32_t r_sample = (int32_t)im69d_samples_i16_right[ri];
+      const uint32_t r_mag = (r_sample < 0) ? (uint32_t)(-r_sample) : (uint32_t)r_sample;
+      if (r_mag > r_peak) r_peak = (r_mag > 32768U) ? 32768U : (uint16_t)r_mag;
+      r_sum_sq += (uint64_t)r_mag * (uint64_t)r_mag;
+    }
+    im69d_right_raw_i16_abs_peak = r_peak;
+    im69d_right_raw_i16_rms = sqrtf((float)r_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  }
+#endif
 #endif
 #ifdef K1_STM
   // STM reactivity gate from the LIVE pre-AGC mic RMS. The broadband AGC envelope
@@ -1020,6 +1077,14 @@ void acquire_sample_chunk(uint32_t t_now) {
       im69d_raw_i16_abs_peak,
       im69d_raw_i16_rms,
       im69d_raw_i16_near_pct);
+#endif
+#ifdef K1_MATRIX_AUDIT_V1
+    // P5.B matrix witnesses: final output-buffer state (written on Core 1 in
+    // show_leds; volatile reads here) + DF presence gate. Same 1 Hz cadence.
+    USBSerial.printf(" | mx_pmax=%u mx_plit=%u mx_smax=%u mx_slit=%u mx_dfinj=%.2f mode=%d smode=%d",
+      (unsigned)k1_mx_primary_max, (unsigned)k1_mx_primary_lit,
+      (unsigned)k1_mx_secondary_max, (unsigned)k1_mx_secondary_lit,
+      (double)k1_mx_df_inject, (int)CONFIG.LIGHTSHOW_MODE, (int)SECONDARY_LIGHTSHOW_MODE);
 #endif
 #if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
     // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.

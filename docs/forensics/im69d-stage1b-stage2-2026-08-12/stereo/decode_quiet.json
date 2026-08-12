@@ -1,0 +1,69 @@
+{
+  "crc_ok": true,
+  "frames": 84576,
+  "seconds": 6.61,
+  "sample_rate": 12800,
+  "l_rms": 9.0,
+  "r_rms": 8.4,
+  "rho_broadband": 0.2406,
+  "bands": [
+    {
+      "band_hz": [
+        55,
+        110
+      ],
+      "rho": 0.8946,
+      "coherence_mean": 0.8907
+    },
+    {
+      "band_hz": [
+        110,
+        220
+      ],
+      "rho": 0.9317,
+      "coherence_mean": 0.8649
+    },
+    {
+      "band_hz": [
+        220,
+        440
+      ],
+      "rho": 0.8956,
+      "coherence_mean": 0.7617
+    },
+    {
+      "band_hz": [
+        440,
+        880
+      ],
+      "rho": 0.6703,
+      "coherence_mean": 0.4844
+    },
+    {
+      "band_hz": [
+        880,
+        1760
+      ],
+      "rho": 0.3948,
+      "coherence_mean": 0.2276
+    },
+    {
+      "band_hz": [
+        1760,
+        3520
+      ],
+      "rho": -0.1693,
+      "coherence_mean": 0.1855
+    },
+    {
+      "band_hz": [
+        3520,
+        6400
+      ],
+      "rho": 0.0253,
+      "coherence_mean": 0.0299
+    }
+  ],
+  "kill_criterion": "rho > 0.95 across all visual-driving bands",
+  "h_c_verdict": "NOT REJECTED on this capture"
+}

@@ -33,6 +33,9 @@ bool serial_typed_wrap_vivid(const char* command_type, char* command_data);
 #if ENABLE_GDFT_HARNESS
 bool serial_typed_wrap_gdft_harness(const char* command_type, char* command_data);
 #endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data);
+#endif
 #if K1_EFFECT_FRAMEWORK_V1
 bool serial_typed_wrap_beat_director(const char* command_type, char* command_data);
 #endif

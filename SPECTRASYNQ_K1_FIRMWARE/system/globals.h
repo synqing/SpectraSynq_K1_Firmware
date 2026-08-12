@@ -165,6 +165,27 @@ inline DRAM_ATTR int16_t im69d_samples_i16[1024]    = { 0 };
 inline uint16_t im69d_raw_i16_abs_peak = 0;
 inline float    im69d_raw_i16_rms = 0.0f;
 inline float    im69d_raw_i16_near_pct = 0.0f;
+#ifdef K1_MIC_IM69D_STEREO_V1
+// Stage 2 stereo probe (2026-08-12, design im69d130-dual-mic-eval §5): interleaved
+// L/R landing buffer + RIGHT-slot de-interleave target. Bench probe env only —
+// the DSP chain still consumes im69d_samples_i16 (LEFT / mic A), identical to
+// Stage 1; the RIGHT channel exists solely for measurement (ρ / coherence).
+inline DRAM_ATTR int16_t im69d_samples_i16_stereo[2048] = { 0 };
+inline DRAM_ATTR int16_t im69d_samples_i16_right[1024]  = { 0 };
+inline uint16_t im69d_right_raw_i16_abs_peak = 0;
+inline float    im69d_right_raw_i16_rms = 0.0f;
+#endif
+#endif
+#ifdef K1_MATRIX_AUDIT_V1
+// P5.B dual-206 numeric-matrix audit (2026-08-12, runbook §P5.B). Bounded,
+// lock-free witnesses of the FINAL post-gamma output buffers, written on Core 1
+// in show_leds()/show_secondary_leds(), read on the AP print path (1 Hz, off
+// hot path). Diag env only (k1_unit2_im69d_right_matrix) — never production.
+inline volatile uint8_t  k1_mx_primary_max = 0;     // max channel value across leds_out
+inline volatile uint16_t k1_mx_primary_lit = 0;     // pixels with max channel > 2
+inline volatile uint8_t  k1_mx_secondary_max = 0;
+inline volatile uint16_t k1_mx_secondary_lit = 0;
+inline volatile float    k1_mx_df_inject = -1.0f;   // last Dense Forge inject_scale (-1 = DF not rendering)
 #endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };

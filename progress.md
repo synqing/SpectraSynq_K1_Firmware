@@ -2,6 +2,32 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-12/13 — Outstanding-items session: PR #43 landed; P2.B/P3/P4/P5.B executed
+
+**Captain directive:** complete all 4 outstanding items this session.
+
+1. **Forward-merge + PR #43 MERGED** (silence-gate lane: frac 1.75, IM69D scoping,
+   transfer test resolved). Merge-owed canon appends landed (08-07 canon amendment,
+   SKILL companion pointers ×3, registry re-derivation close).
+2. **P2.B CLOSED** — scar inventory (zero IM73D consumer floors in executable source;
+   Aug-9 scars all tombstoned 2026-08-11); `k1_custom` recomposed off the im73d
+   inheritance (still guard-BLOCKED pending device nomination).
+3. **P3.B PASS** — `k1_bench_im69d_micb`, mic B / RIGHT alive on B489 (G1–G4, 5.5×
+   stimulus rise, floor 7–10 rms). **P3.C instrument PROVEN** — stereo env, PSRAM
+   capture ring, CRC-framed dumps, self-tested decoder; first data: ρ 0.95–0.96 in
+   the two lowest bands, decorrelated above 220 Hz → **H_C NOT rejected**, with
+   named confounds (laptop-SPL SNR, 56% capture duty, spacing D unmeasured).
+4. **P4.A** baseline doc (silence floor CLOSED at 1.75; lock/DF floors BLOCKED-ON-SPL,
+   laptop trap re-confirmed numerically). **P4.B** behavioural table gate over
+   live-parsed constants (7 tests; FRAC-mutation proven red). **P5.B** matrix with
+   pre-registered predicates: P1 18/18 duty 100/100 PASS · P3 18/21 DF-not-black
+   PASS · P4 DF quiet-live inject PASS · **P2 drain FAIL 18.6 s vs 15 s bound**
+   (tempo-flywheel persistence — the documented unimplemented dwell-gate debt).
+
+Devices restored to `2904c9b9`: Unit 2 `k1_unit2_im69d_right` (SSL=167 intact),
+bench `k1_bench_im69d`. No `start_noise_cal` fired. PR #44 = the session branch.
+**One Bose press unlocks:** lock/DF floors, Stage-2 decisive rerun, P5.B product-SPL rows.
+
 ## 2026-08-11 — Dual IM69D130 resolution P0 (identity containment)
 
 **Active authority:** `docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`  
