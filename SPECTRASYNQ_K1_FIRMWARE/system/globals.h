@@ -165,6 +165,16 @@ inline DRAM_ATTR int16_t im69d_samples_i16[1024]    = { 0 };
 inline uint16_t im69d_raw_i16_abs_peak = 0;
 inline float    im69d_raw_i16_rms = 0.0f;
 inline float    im69d_raw_i16_near_pct = 0.0f;
+#ifdef K1_MIC_IM69D_STEREO_V1
+// Stage 2 stereo probe (2026-08-12, design im69d130-dual-mic-eval §5): interleaved
+// L/R landing buffer + RIGHT-slot de-interleave target. Bench probe env only —
+// the DSP chain still consumes im69d_samples_i16 (LEFT / mic A), identical to
+// Stage 1; the RIGHT channel exists solely for measurement (ρ / coherence).
+inline DRAM_ATTR int16_t im69d_samples_i16_stereo[2048] = { 0 };
+inline DRAM_ATTR int16_t im69d_samples_i16_right[1024]  = { 0 };
+inline uint16_t im69d_right_raw_i16_abs_peak = 0;
+inline float    im69d_right_raw_i16_rms = 0.0f;
+#endif
 #endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };

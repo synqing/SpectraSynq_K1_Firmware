@@ -40,6 +40,11 @@ SERIAL_TYPED_CMD("frame_dump", serial_typed_frame_dump, SC_TYPED_ONLY, CMD_HARNE
 #if ENABLE_VP_PROBE_CMD
 SERIAL_TYPED_CMD("vp_probe", serial_typed_vp_probe, SC_TYPED_ONLY, CMD_HARNESS)
 #endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+SERIAL_TYPED_CMD("scap_arm", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("scap_status", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("scap_dump", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_HARNESS)
+#endif
 #if ENABLE_GDFT_HARNESS
 SERIAL_TYPED_CMD("gdft_probe", serial_typed_wrap_gdft_harness, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("gdft_sweep", serial_typed_wrap_gdft_harness, SC_TYPED_ONLY, CMD_HARNESS)
