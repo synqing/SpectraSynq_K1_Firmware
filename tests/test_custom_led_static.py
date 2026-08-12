@@ -3,15 +3,17 @@
 PREMISE CHANGED 2026-08-10 (Captain correction), tests updated 2026-08-12 at the
 fix/im69d-rms-gate merge. This file used to assert that `env:k1_custom` WAS the
 dual-206 build. It is not, and never was: Bench Unit 2 (`0C54FC00`) physically
-carries dual IM69D130, and `k1_custom` still `extends = env:k1_bench_im73d_ble`
-— the false-authority IM73D inheritance the correction voided.
+carries dual IM69D130, and `k1_custom` was recomposed off `env:k1_bench_im73d_ble` on 2026-08-12
+(P2.B) — it now extends `env:k1_bench_im69d_ble`; the false-authority IM73D
+inheritance the correction voided is gone from every live extends chain.
 
 Two distinct oversize geometries now exist, on two mutually exclusive flags:
 
   `K1_UNIT2_IM69D_V1`  Bench Unit 2, env `k1_unit2_im69d_right`
                        206 primary + 206 secondary = 412 px
-  `K1_CUSTOM_LED_V1`   custom RGBIC rig, env `k1_custom` (BLOCKED in the upload
-                       guard until it stops extending an *im73d* env)
+  `K1_CUSTOM_LED_V1`   custom RGBIC rig, env `k1_custom` (extends k1_bench_im69d_ble since
+                       2026-08-12; still BLOCKED in the upload guard until a
+                       physical device is nominated and its mic receipted)
                        224 primary + 160 secondary = 384 px
 
 They must never be set together — `K1_CUSTOM_LED_V1` drops the secondary strip in
@@ -88,7 +90,7 @@ def test_dual_206_is_gated_on_the_unit2_flag_not_the_custom_flag():
     Premise change 2026-08-10 (Captain correction): `k1_custom` was believed to BE
     the Unit 2 build, so 206/206 lived behind K1_CUSTOM_LED_V1. Unit 2 physically
     carries dual IM69D130 and now owns K1_UNIT2_IM69D_V1 (env k1_unit2_im69d_right);
-    k1_custom reverted to the 224/160 RGBIC rig and still extends an *im73d* env.
+    k1_custom reverted to the 224/160 RGBIC rig (extends k1_bench_im69d_ble since 2026-08-12).
     The two flags are mutually exclusive — K1_CUSTOM_LED_V1 drops the secondary
     strip in the .ino guards and would break 206/206.
     """
@@ -125,7 +127,7 @@ def test_custom_led_flag_owns_the_224_rgbic_geometry():
     assert "SECONDARY_LED_COUNT_VALUE 160" in block
     assert "LED_COUNT_VALUE 206" not in block, (
         "206 must NOT be reachable under K1_CUSTOM_LED_V1 — that duplicates Unit 2's "
-        "geometry onto an env that must never drive Unit 2 (it extends *im73d*)."
+        "geometry onto an env that must never drive Unit 2 (different rig, no device)."
     )
 
 

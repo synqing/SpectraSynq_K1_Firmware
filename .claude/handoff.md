@@ -19,6 +19,12 @@ just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 **Runbook:** `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`  
 **Pack:** [`_scratch/im69d_resolution_20260810/`](../_scratch/im69d_resolution_20260810/)
 
+**⛔ BINDING RULE (P2.B, 2026-08-12): IM69D floors are measured on IM69D silicon.**
+No silence/lock/novelty/presence value from any Aug-9 IM73D `#ifdef` (all tombstoned or
+archived — inventory: `docs/forensics/audio-profile/2026-08-12-im73d-scar-inventory-p2b.md`)
+may be ported, seeded, bounded, or "sanity-checked" into an IM69D profile. Phase-4 floors
+cite Unit2/B489 measurements only, calibrated at final placement.
+
 **Where the code is (2026-08-11, post-merge):** the 2026-08-07..11 Deck16 /
 Tab5 / STANDBY / MIRROR / guard / doctrine work is **merged to `main`**
 (Captain-authorised) and pushed. `main` is the active branch; start new work
