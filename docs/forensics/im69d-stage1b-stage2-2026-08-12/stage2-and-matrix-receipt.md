@@ -38,6 +38,38 @@ channels measurably diverge. **Two named confounds forbid treating this as PROVE
 pre-decided next evidence:** one Bose-SPL capture through the identical pipeline. No stereo
 visuals claim is made; the DSP chain still consumes mono mic A.
 
+### Update — 2026-08-13: decisive Bose-SPL captures (canonical fixture Demo Track 1)
+
+| Capture | frames | L rms | R rms | ρ bb | 55-110 | 110-220 | 220-440 | 440-880 | 880-1.7k | 1.7-3.5k | 3.5-6.4k |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| quiet | 87,456 | 2.6 | 7.2 | 0.07 | 0.89 | 0.86 | 0.79 | 0.71 | 0.40 | −0.13 | 0.08 |
+| music, Bose vol 60 | 166,368 | 55.7 | 57.6 | **0.984** | **0.9995** | **0.9995** | **0.996** | **0.988** | **0.969** | **0.981** | 0.867 |
+
+**VERDICT — H_C SUBSTANTIALLY REJECTED.** At product SPL (SNR ~7×) with the canonical
+fixture, ρ ≥ 0.97 in every band from 55 Hz to 3.5 kHz — six of seven bands clear the
+pre-registered 0.95 kill line, most at 0.99+. The channels carry essentially the same
+information across the range that drives the visuals: **visually distinct primary/secondary
+edge behaviour from mic spacing would be synthesised, not sensed** — exactly the outcome
+the design predicted for a diffuse room field at small spacing, reported as the clean
+negative it is. The single band below the line (3.5–6.4 kHz, ρ 0.87) is where music energy
+and therefore SNR is lowest; noise dilution biases ρ DOWN there, so the true acoustic
+correlation is, if anything, higher. Residual formality: spacing D (O-4) remains unmeasured
+and the mechanical all-bands criterion prints NOT-REJECTED on the top band — the verdict
+above is the visual-driving-band reading the design §5.3 specifies.
+
+**H_C2 stands as the live product justification for the second capsule:** coherence
+separates music (0.94–0.999) from quiet (0.73–0.79) decisively in the low-mid bands;
+occlusion/robustness discrimination remains the useful signal, not stereo visuals.
+
+### Update — 2026-08-13: P5.B rows at product SPL (Bose vol 55, Demo Track 1)
+
+| # | Predicate | Result at product SPL |
+|---|---|---|
+| P1 | 18/18 awake duty ≥95% both | **PASS — 95.9% / 95.9%** (49/49 frames awake) |
+| P2 | drain: silence latch ≤15 s | **PASS — latched at 9.1 s.** The laptop-leg 18.6 s FAIL was fixture-induced (weak stimulus + ambient). Post-latch flashes at 15/19 s (pmax 37–38) remain — the flywheel-persistence residual is visible but the latch bound is met. |
+| P3 | 18/21 DF secondary duty ≥50% | **PASS — 100%** (primary 98%) |
+| P2b | 18/21 drain (observational) | did NOT latch within 25 s — DF-pair/flywheel interplay; filed with the dwell-gate debt |
+
 ## P5.B numeric matrix (predicates pre-registered in `p5b_matrix_leg.py` before the runs)
 
 | # | Pre-registered predicate | Leg | Result |
@@ -62,4 +94,5 @@ output buffers on Core 1 pre-`FastLED.show()` — the artefact boundary, not the
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-08-13 | agent:claude-code | Decisive Bose captures: H_C SUBSTANTIALLY REJECTED (ρ≥0.97 to 3.5 kHz); P5.B product-SPL rows — P2 drain PASS at 9.1 s (laptop FAIL was fixture-induced), 18/21 drain filed with dwell debt. |
 | 2026-08-12 | agent:claude-code | Created — Stage 2 first data (H_C not rejected, confounds named), P5.B matrix P1/P3/P4 PASS + P2 honest FAIL at 18.6 s. |

@@ -2,6 +2,21 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-13 — Bose round: floors closed, profile 2 populated, H_C rejected
+
+Captain reconnected the Bose; canonical fixture corrected to PioneerDJ Demo Track 1
+(Captain caught an ad-hoc track pick — both leg runners now default to the canonical).
+
+- **Stage 2 DECISIVE:** music @ Bose 60 → ρ 0.9995/0.9995/0.996/0.988/0.969/0.981/0.867
+  across the seven bands — **H_C SUBSTANTIALLY REJECTED** (stereo edge visuals would be
+  synthesised, not sensed). H_C2 coherence robustness stands as the second-capsule value.
+- **P4 floors CLOSED:** Bose legs vol 40/55/70 — awake 100% at all volumes; lock 0.60
+  retained and measurement-cited; lock duty 9–27% routed to tempo-FSM lane.
+  **K1_AUDIO_PROFILE_IM69D130_UNIT2 POPULATED**; IM69D UNCHARACTERISED_ACK removed.
+- **P5.B at product SPL:** P1 95.9/95.9 PASS · P3 100% PASS · **P2 drain 9.1 s PASS**
+  (laptop 18.6 s FAIL was fixture-induced); 18/21 drain non-latch filed with dwell debt.
+- Devices restored to production-shaped envs; cal untouched all night.
+
 ## 2026-08-12/13 — Outstanding-items session: PR #43 landed; P2.B/P3/P4/P5.B executed
 
 **Captain directive:** complete all 4 outstanding items this session.

@@ -1,5 +1,5 @@
 ---
-abstract: "P4.A IM69D consumer baseline (Unit 2 0C54FC00, dual IM69D130 RIGHT, SSL=167 measured). Silence floor CLOSED: joint gate 1.75×SSL shipped + eyes-on (a8b1912a). Quiet/ambient + laptop-SPL music percentiles for conf/lock/pky/max_raw captured with witnesses. Lock and DF floors remain BLOCKED-ON-SPL: laptop playback (witness −48 dBFS) did not wake the device (silence held 75% of frames) — confirming the ~5× SPL trap — so K1_AUDIO_PROFILE_IM69D130_UNIT2 stays unpopulated until a Bose-SPL leg. Behavioural table gate: tests/test_im69d_consumer_floors_behavioural.py."
+abstract: "P4.A IM69D consumer baseline (Unit 2 0C54FC00, dual IM69D130 RIGHT, SSL=167 measured) — CLOSED 2026-08-13. Silence floor: joint gate 1.75×SSL shipped + eyes-on. Bose-SPL legs (canonical fixture PioneerDJ Demo Track 1, vol 40/55/70): awake 100% at all volumes; music conf med 0.39/0.81/0.75, p75 up to 0.97; lock duty 9–27% (FSM-dynamics-limited, not floor-limited). Lock floor 0.60 RETAINED, now cited to IM69D measurement (ambient-quiet p95 0.58 below, music p75 above). K1_AUDIO_PROFILE_IM69D130_UNIT2 POPULATED; UNCHARACTERISED_ACK removed from the IM69D env chain. Behavioural table gate: tests/test_im69d_consumer_floors_behavioural.py."
 ---
 
 # P4.A — IM69D consumer baseline (Bench Unit 2)
@@ -63,17 +63,45 @@ conf/lock collapsed. **These columns must not seed floors.**
 | Floor | Status |
 |---|---|
 | Silence enter/exit (IM69D) | **CLOSED** — joint gate 1.75/2.10, shipped, eyes-on |
-| Lock acquire/hold | **BLOCKED-ON-SPL** — needs a Bose-SPL leg for the music `conf` distribution; quiet ceiling measured here (p95 0.58). Do NOT populate from the laptop leg. |
-| DF presence | Gate mechanism proven live (`mx_dfinj` 1.0 on 32/32 non-latched quiet frames, P5.B leg); numeric floor for `dforge_presence_ok` likewise owed a product-SPL distribution. |
-| `K1_AUDIO_PROFILE_IM69D130_UNIT2` | **Deliberately unpopulated** until the above close (first-principles derivation only, per the tombstone contract). |
+| Lock acquire/hold | **CLOSED 2026-08-13** — 0.60 retained, measurement-cited (see Update below); lock DUTY routed to the tempo lane |
+| DF presence | **CLOSED** — gate proven live in quiet-live and product-SPL music legs |
+| `K1_AUDIO_PROFILE_IM69D130_UNIT2` | **POPULATED 2026-08-13** (first-principles, per the tombstone contract) |
 
-**Next concrete step (one Bose press away):** re-run `p4_baseline_leg.py music-boseNN` at
-vol 40/55/70, derive music `conf`/`lock` percentiles, set lock floor above quiet p95 0.58
-with the measured margin, populate profile 2, remove the `UNCHARACTERISED_ACK`.
+### Update — 2026-08-13: Bose-SPL legs run — floors CLOSED, profile 2 populated
+
+**Fixture correction:** the interim legs above used an ad-hoc track picked by file search.
+The canonical fixture is **`~/Music/PioneerDJ/Demo Tracks/Demo Track 1.mp3`** (the
+`transfer_leg.py` default used by every verified transfer-test leg). All 2026-08-13 legs
+below use it; both leg runners now default to it.
+
+**Bose legs (Unit 2, 90 s each, witnessed):**
+
+| leg | witness mean | awake | conf med | conf p25 | conf p75 | lock % | max_raw med (SSL=167) |
+|---|---|---|---|---|---|---|---|
+| vol 40 | −50.9 dBFS | **100%** | 0.39 | 0.24 | 0.62 | 9% | 363 (2.2×SSL) |
+| vol 55 | −41.3 dBFS | **100%** | 0.81 | 0.56 | 0.97 | 27% | 912 (5.5×SSL) |
+| vol 70 | −33.0 dBFS | **100%** | 0.75 | 0.61 | 0.87 | 18% | 1950 (11.7×SSL) |
+
+**Floors closure:**
+
+- **Wake behaviour:** the 1.75 joint gate wakes on 100% of frames from vol 40 up — no
+  fails-to-wake margin concern at any tested product volume.
+- **Lock floor:** `K1_LOCK_CONFIDENCE = 0.60` **retained and now measurement-cited**:
+  ambient-quiet conf p95 (0.58) sits just below it; music conf p75 (0.87–0.97 at
+  vol 55/70) sits well above. Lowering it would admit ambient false-locks; raising it
+  starves real locks. The low lock **duty** (9–27% despite conf medians 0.75–0.81) is a
+  tempo-FSM acquire/hold dynamics question, not a mic-floor question — routed to the
+  tempo lane, not tuned here.
+- **DF presence:** gate proven live in both quiet-live and music legs (`mx_dfinj` 1.0);
+  no separate floor change required.
+- **`K1_AUDIO_PROFILE_IM69D130_UNIT2` POPULATED** (`k1_audio_profile.h`) per its own
+  populate-condition (transfer test closed); `K1_AUDIO_PROFILE_UNCHARACTERISED_ACK`
+  removed from the IM69D env chain. IM73D envs keep their fail-closed ACK.
 
 ---
 **Document Changelog**
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-08-13 | agent:claude-code | Bose-SPL legs (canonical fixture) — floors CLOSED, lock 0.60 measurement-cited, profile 2 populated, ACK removed; fixture correction recorded. |
 | 2026-08-12 | agent:claude-code | Created — quiet-ambient + laptop-music distributions with witnesses, silence floor closed, lock/DF floors explicitly BLOCKED-ON-SPL, behavioural table gate landed. |
