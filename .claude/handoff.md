@@ -43,6 +43,8 @@ P5B_MATRIX=ALL PASS at product SPL (drain 9.1s; laptop 18.6s was fixture-induced
 LOCK_DF_FLOORS=CLOSED; K1_AUDIO_PROFILE_IM69D130_UNIT2 POPULATED (ACK removed)
 ```
 
+- **⭐ Canonical synthesis (read FIRST):** `docs/hardware/im69d130-dual-mic-learnings-2026-08-13.md`
+  — the complete end-to-end learnings document (Captain-requested); per-event receipts below.
 - **Evidence:** `docs/forensics/im69d-stage1b-stage2-2026-08-12/` (Stage 1b receipt,
   Stage 2 + matrix receipt, decoded stereo JSON, matrix legs) ·
   `docs/forensics/im69d-consumer-baseline-2026-08-12/IM69D_CONSUMER_BASELINE.md` ·
