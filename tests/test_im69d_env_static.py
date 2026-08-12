@@ -135,3 +135,35 @@ def test_im69d_not_alias_of_im73d_flag():
     # Env must not set the IM73D flag.
     block = _env_block(PLATFORMIO.read_text(encoding="utf-8"), "k1_bench_im69d")
     assert "-DK1_MIC_IM73D_PDM_V1" not in block
+
+
+def test_joint_silence_gate_is_scoped_to_im69d():
+    """The joint break-path must not compile into non-IM69D builds.
+
+    Both its constants (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC)
+    were measured on IM69D130 silicon. Until 2026-08-12 the decision that consumes
+    them sat behind NO #ifdef and compiled into every environment including
+    k1_hardware, the SPH0645 production K1 — the same escape-the-measurement-context
+    defect GATE 0.1 (1bdf54d0) was created to stop. SPH0645's RMS Schmitt is
+    separately calibrated on the HarmonixSet corpus and must keep its own behaviour.
+    """
+    i2s = I2S.read_text(encoding="utf-8")
+    m = re.search(
+        r"#if\s+defined\(K1_MIC_IM69D_PDM_V1\)(.*?)#endif",
+        i2s,
+        re.DOTALL,
+    )
+    assert m, (
+        "The joint silence break-path must be wrapped in "
+        "`#if defined(K1_MIC_IM69D_PDM_V1)` in i2s_audio.h."
+    )
+    block = m.group(1)
+    assert "K1_SILENCE_JOINT_LEVEL_SSL_FRAC" in block, (
+        "K1_SILENCE_JOINT_LEVEL_SSL_FRAC is consumed OUTSIDE the IM69D guard — it "
+        "would apply IM69D-measured values to SPH0645 production."
+    )
+    assert "K1_SILENCE_PEAKINESS_BREAK" in block, (
+        "K1_SILENCE_PEAKINESS_BREAK is consumed OUTSIDE the IM69D guard."
+    )
+    # The plain RMS Schmitt must remain reachable for non-IM69D builds.
+    assert "K1_SILENCE_RMS_EXIT" in i2s and "K1_SILENCE_RMS_ENTER" in i2s

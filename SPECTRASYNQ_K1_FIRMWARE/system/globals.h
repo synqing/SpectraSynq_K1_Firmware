@@ -771,10 +771,36 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 // because the level term rejected every one. Peakiness alone false-wakes in this
 // room; level alone cannot tell music from a loud transient. Neither is sufficient.
 //
-// PER-UNIT, PER-ROOM. SESSION_CANON_2026-08-07 seeds this at 1.25 from bench
-// B489A500. That does not transfer — 1.25 here sits below this room's quiet p90.
-// Derive it against the unit and room in front of you; do not inherit it.
-inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 2.5f;  // peakiness may only break silence at/above SSL x this
+// SUPERSEDED 2026-08-12 — the "PER-UNIT, PER-ROOM, do not inherit" rule that stood
+// here was an ARTEFACT OF AN UNCALIBRATED UNIT, not a property of the hardware.
+// Unit 2's SSL had been learned at a previous placement (the boards sat >1 ft apart)
+// and was never re-learned after the move, so a per-unit constant was silently
+// compensating for a calibration nobody had re-run. Recalibrating in situ moved
+// SSL 136 -> 229 (1.68x) against 1.67x PREDICTED from the quiet/music contrast before
+// the calibration was touched, and the inter-unit gap collapsed from 1.54x to 1.03x.
+//
+// CORRECT RULE: calibrate at final placement, then the fraction TRANSFERS.
+// Placement is carried by SSL — that is what SSL is for.
+//
+// DERIVED 2026-08-12 on both units, freshly calibrated side by side, verified TRUE
+// silence (witness mic -68.2 dBFS mean / -57.9 dBFS max, zero frames above -50 dBFS;
+// earlier "quiet" legs were contaminated by the agent's own build fan and are void):
+//
+//                 SSL   quiet p95   music p10   music p25   music med
+//   Unit 2        167       1.03        1.37        2.29        4.49
+//   bench         187       0.74        0.99        2.13        4.15
+//
+//   usable window = above the worst quiet p95 (1.03) and below the worst music
+//   p25 (2.13). Both units held silence 100% under true silence and 0% under music.
+//   1.75 sits ~70% above the quiet ceiling and ~18% below the music floor.
+//
+// The prior 2.5 was fitted against the STALE SSL=136; rescaled to SSL=167 that same
+// absolute threshold is 2.04, so 1.75 is slightly more willing to wake than the
+// behaviour Captain eyes-on-approved on 2026-08-12 — deliberately, because low-volume
+// music sat near 2.5 and was marginal. Narrowband hum cannot exploit the extra
+// sensitivity: the gate is an AND, and hum's crest ~1.26 is rejected by the
+// peakiness term regardless of level.
+inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75f; // peakiness may only break silence at/above SSL x this
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
 

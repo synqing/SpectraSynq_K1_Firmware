@@ -896,11 +896,30 @@ void acquire_sample_chunk(uint32_t t_now) {
                              ? (k1_pk_max / k1_pk_mean) : 0.0f;
 
     static bool k1_rms_silent_state = false;
+#if defined(K1_MIC_IM69D_PDM_V1)
+    // SCOPE-GATED 2026-08-12. This joint break-path and BOTH its constants
+    // (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC) were measured on
+    // IM69D130 silicon — bench B489A500 and Bench Unit 2. Until this gate existed they
+    // were behind NO #ifdef at all and compiled into EVERY environment, including
+    // k1_hardware, the SPH0645 production K1. That is the same escape-the-measurement-
+    // context defect GATE 0.1 (1bdf54d0) was created to stop, one degree worse: those
+    // constants were at least gated on the wrong flag, these were gated on nothing.
+    // The comment above the fraction even said "does not transfer, do not inherit it"
+    // while the code inherited it everywhere.
+    //
+    // The joint path exists because RMS provably cannot separate music from a room
+    // floor on this PDM mic (FINDING-rms-cannot-separate.md: music's median rms_raw
+    // reads BELOW quiet ambient's, because hum is crest ~1.26 and music is crest ~3-5).
+    // SPH0645 has no such problem — its RMS pair was calibrated on the 36-track
+    // HarmonixSet corpus — so SPH keeps its own characterised Schmitt below, untouched.
+    // peakiness itself stays computed for all builds; only the DECISION is gated.
     if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
         (float)max_waveform_val_raw >=
             (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
         k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
-    } else if (k1_rms_silent_state) {
+    } else
+#endif
+    if (k1_rms_silent_state) {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
     } else {
         k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
