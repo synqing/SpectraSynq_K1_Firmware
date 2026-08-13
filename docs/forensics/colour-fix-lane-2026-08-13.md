@@ -110,6 +110,41 @@ LED level, host-analyse). Applied:
   don't reflash the bench without recording that the golden state must be re-established
   (bin + era config recipe are preserved) for the final look.
 
+### Update — 2026-08-13 (later): DEFECT BASELINES MEASURED on-device
+
+Bench flashed `main @ adbc133e` / `k1_bench_im69d_hueaud` (k1-flash-verified.sh, identity
+OK). Music: Demo Track 1 on the Bose (acoustic-path proof gate in the driver:
+`silence=0` ≥80% required before any capture — one leg auto-aborted on a quiet passage,
+proving the gate). Driver: `scripts/regression-harness/colour_baseline_capture.py`.
+
+**Third residual poison field found by the full config diff (HF-42 done properly):**
+`NOTE_OFFSET` was **0** (era truth **12**) — the full71 `chroma_profile` stimulus zeroed it
+and the 08-13 era replay restored RANGE but not the offset, leaving a hybrid matching NO
+profile (shifted chromagram frequency window). **The 08-13 A/B ladder itself ran under
+NOTE_OFFSET=0.** Fixed via `:set_chroma_profile=default` (12/60 pair, persisted, reboots).
+
+**Three persistence stores discovered (config identity is FOUR-way, not (bin×blob×cal)):**
+config blob (RANGE/SENSITIVITY/NOTE_OFFSET, reboot-stable) · knob store (CHROMA/MOOD —
+reboot RESTORES knob values over the blob) · cal profile file (`/cal_profile_im69d.bin` —
+every PDM boot overwrites `SWEET_SPOT_MIN_LEVEL` from it; bench file currently holds 57,
+NOT the 187 measured 2026-08-12). Measurement config must therefore be re-applied per leg
+after any reboot — the capture driver does this by construction.
+
+**Baselines (mode set + verified, era knobs + SSL=187 applied per leg, 60 s, ~2950-3000
+frames each; artefacts in `docs/forensics/colour-fix-baselines-2026-08-13/`):**
+
+| Leg | Authored deployment (Naberius Gold, 4 buckets) | Missed | Stray (out-of-palette) | Entropy |
+|---|---|---|---|---|
+| mode 32, NOTE_OFFSET=12 | **1/4 (25%)** | gold 1,2 + violet 17 | 14,15,22,23 | 1.08–1.73 bits |
+| mode 3, NOTE_OFFSET=12 | **1/4 (25%)** | gold 1,2 + violet 17 | 0,14,15,22,23 | ~2.2 bits |
+| (mode 32, NOTE_OFFSET=0 — first pass, superseded) | 2/4 | gold 1,2 | 0,14,15,21,22,23 | 2.5–2.9 bits |
+
+Reading: the stray buckets are the authored arcs displaced ~2–3 buckets (auto-colour-shift
+hue rotation — ON in the era too, so era-authentic), while the WARM arc's chromatic mass is
+absent entirely (rendered achromatic → white — invisible to the hue gate). The regression
+target: fixed-main must deploy 4/4 authored buckets with zero warm-arc white-out, matching
+the palette-derived reference.
+
 ## Guard debt from the writer finding
 
 Any control-writing harness MUST `:dump`-snapshot before first write and restore + verify
