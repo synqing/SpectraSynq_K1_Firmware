@@ -78,9 +78,103 @@ per-palette references, capture driver with identity/acoustic/palette assertions
   re-verify silence latch + music coupling (corr(peak,lit) was 0.02); (2) the full-axis
   metric legs per HF-50; (3) promotion gates per the promotion plan; (4) golden side-by-side.
 
+## 5. Continuation 2026-08-14 (later session) — HF-61 REFUTED, real root cause found
+
+Three claims carried into this session were **wrong**, and all three were killed by
+measurement rather than argument. Recorded here so nobody re-derives them.
+
+| # | Carried claim | Verdict |
+|---|---|---|
+| **HF-61 (mechanism)** | "SSL fails BECAUSE its samples are evaluated under the stale DC" | **REFUTED.** `start_noise_cal()` sets `CONFIG.DC_OFFSET = 0` before Phase A, and the learned DC is stamped at iter 128 **before** Phase B samples SSL. The cal never runs under the stale DC. |
+| **True DC ≈ −1523** | carried in the handover | **REFUTED.** Measured `dc_learned=1894` (persisted was 91), `dc_samples=12192`, `dc_rejected=0`. |
+| **"×140 unexplained gain"** | raw rms 43 vs max_raw ~6000 | **REFUTED — a units error.** It compared a raw *RMS* against a processed *peak*. Measured `max_raw / raw_i16_abs_peak` = 19.4 = `INPUT_GAIN 8.0 × sensitivity ≈2.24`, exactly as documented. |
+
+The partial commit was still the right fix, for a **different** reason than the handover
+gave: SSL genuinely could not pass, so without partial commit the DC could never be
+refreshed at all. Device-proven — first cal result this lane ever kept.
+
+### HF-63 — Measure the drive on the band you actually USE
+
+**ROOT CAUSE of the silence-twitch.** The GDFT axis is semitone-spaced from A1=55 Hz;
+at `NOTE_OFFSET=12` its lowest bin is **110 Hz**. Sub-110 Hz energy contributes nothing to
+spectrum, chromagram, colour or tempo — but it landed in `max_waveform_val_raw` at full
+weight, and that peak is the reference for silence detection, the AGC floor and the
+follower. A ~94 Hz rumble was therefore setting the loudness the entire gain structure
+hangs off, while being invisible on the plate.
+
+**Rule:** a level/threshold measurement must be taken over the SAME band the consumer
+uses. A broadband peak feeding a band-limited consumer imports out-of-band energy as
+false signal. Fix: `K1_AP_SUBSONIC_HPF_V1` — HPF on the PEAK MEASUREMENT ONLY
+(`waveform[]` untouched, so GDFT input cannot move). Measured: `max_raw` p50 ~7135 → ~2873,
+floor 1959 → 685, i.e. **below the 1500 Phase-B gate for the first time**.
+
+### HF-64 — An external witness instrument beats any amount of self-consistent reasoning
+
+Captain's idea, and it broke a two-session deadlock. Every leg until then compared the K1
+against *itself* or against remembered numbers, so no leg could distinguish "the room is
+loud" from "the device is wrong". Recording the **MacBook microphone** simultaneously gave
+an independent measurement of the same room.
+
+It immediately killed the orchestrator's own leading theory (self-generated mic noise:
+the K1 swung *wider* than the room, so it was not floor-limited) and then exposed the real
+one (quiet AND STEADY room, 5.0 dB spread, vs K1 16.0 dB — non-acoustic excess).
+
+**Rule:** when a device's own telemetry is the only witness, you cannot separate
+"environment changed" from "device is wrong". Get a second, independent sensor before
+spending another session on inference. Reusable: `scratchpad/dual_mic_witness.py`.
+**Verify the witness is live** — a TCC-blocked mic returns all-zeros, i.e. success-shaped
+silence (check non-zero sample count, not just exit code).
+
+### HF-65 — Matched integration time, or the comparison is meaningless
+
+The first witness comparison correlated the K1's `raw_i16_rms` (a **7.5 ms** single-chunk
+snapshot emitted at 1 Hz) against the MacBook's **1-second** RMS. It produced r ≈ −0.06 and
+looked like a damning "the K1 does not track the room". It was an artefact of mismatched
+integration windows. **Re-run apples-to-apples before reporting any cross-instrument
+statistic.** Related: percentile spreads are also integration-time dependent.
+
+### HF-66 — A "seam" between non-contiguous samples is not a discontinuity
+
+The chunk-boundary probe reported `seam/inner = 10.14x`, which looks exactly like DMA
+corruption. It is meaningless: at 230400 baud the `:stream=audio` output DROPS chunks, so
+consecutive *printed* chunks are not consecutive in *time*. Any statistic that assumes
+adjacency across a lossy transport is invalid. (The genuine signal in that probe was the
+**within-chunk** smoothness: mean |sample| 5978 vs mean step 277 → dominant content
+≈ `fs/(2π) × 277/5978` ≈ 94 Hz.)
+
+### HF-67 — Confounded legs prove nothing; say INCONCLUSIVE
+
+The DSR_16S PDM-clock probe ran leg A under a confirmed silence window and leg B after
+music resumed. The delta is unattributable. It is recorded as **inconclusive**, not as a
+refutation — a confounded result must never be laundered into a verdict in either
+direction. The paired control is the fix: both legs under identical conditions, or a
+within-frame control that no condition can confound.
+
+### HF-68 — Another dead command (HF-48 recurrence)
+
+`:stream=magnitudes` **acks `K1OK` and emits nothing** — its emitter in `k1_gdft_core.cpp`
+is inside a `/* */` comment block. Second instance of this class after `:stream_agc`.
+**Verify a command's EMITTER exists on the flashed build before designing a measurement
+around it.** An ack is not evidence of an emitter.
+
+### Also this session
+
+- **Byte-gate drift was STALE-BY-TOOLCHAIN, not a leak.** `k1_hardware` stable sections at
+  `eb592b08` (pre-colour-lane) rebuild byte-identical to HEAD (`8802e9ca…`), and its
+  per-section hashes are exactly `72417182/afa23c99/d383aa70`. The Arduino framework was
+  reinstalled 2026-08-12, after the reference was recorded. Re-recorded; all three green.
+- **A leak detector that could not detect the leak.** The colour-fix ratchet anchored `-D`
+  to line start, so an inline `build_flags = -DFLAG` leak passed undetected. Found by
+  mutation-testing the *new* ratchet, which exposed the *old* one. Fixed for both.
+- **A constant that must not be constant.** The subsonic HPF cutoff was first hardcoded for
+  `NOTE_OFFSET=12`; `NOTE_OFFSET` is a RUNTIME value and 0 is shipped, where the filter
+  would have cut an octave of real bass. Now derived per frame and **proven on-device** by
+  moving NOTE_OFFSET and watching fc follow (0→55 Hz, 24→220 Hz, 12→110 Hz).
+
 ---
 **Document Changelog**
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-08-14 | agent:claude-code | Created at session close — HF-50..62, positive methods canon, handover state. |
+| 2026-08-14 | agent:claude-code | §5: HF-61/-1523/×140 all REFUTED by measurement; root cause found (HF-63, sub-GDFT-floor energy setting the drive peak); HF-64..68 added (external witness, matched integration, non-contiguous seam, confounded legs, dead command). |
