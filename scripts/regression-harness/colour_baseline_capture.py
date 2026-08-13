@@ -34,7 +34,7 @@ AP_RE = re.compile(r"\[AP\] .*silence=(?P<sil>[01]) ")
 HUEAUD_MODE_RE = re.compile(
     r"HUEAUD,ver=1,ch=p,lit=\d+,mode=(?P<mode>-?\d+)"
     r"(?:,pal=(?P<pal>\d+),pmode=(?P<pmode>[01]),acs=(?P<acs>[01]))?"
-    r"(?:,hp=(?P<hp>-?[0-9.]+),pct=(?P<pct>-?[0-9.]+))?,h=")
+    r"(?:,(?!h=)[a-z0-9_]+=[^,]*)*,h=")
 
 
 class Leg:

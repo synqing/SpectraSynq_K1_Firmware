@@ -250,3 +250,52 @@ Consolidated fixed-main candidate env: **`k1_bench_im69d_hueaud_s2psi`** (equali
 crescendo excursion + hue-safe smoothing + idempotent incandescent). Resident on the bench.
 Remaining before the ONE eyes-on: secondary side-door closure · GDFT-mode spot-check ·
 strip diag instrumentation from the candidate for the production flag set.
+
+### Update — 2026-08-13 (SSA round + consolidated candidate)
+
+- **Consolidated candidate `k1_bench_im69d_colourfix`** (all five fix flags) measured:
+  **3/4 authored deployment** on mode 32/Naberius (missed only bucket 2 sub-floor in-window;
+  strays only adjacent transitionals 0,18; entropy ≈2.0 bits ≈ authored 1.95). Resident on bench.
+- **Split probe (device, decisive): the edge-path teal author is the SECONDARY CHANNEL'S
+  CONTENT** — edge ON + `secondary_enabled=false` → teal 81.9%→0.0%. Mixer innocent.
+- **FB leg** (eq+fb): design-correct, effect masked by the then-active incandescent kill;
+  folded into the candidate on P1 grounds.
+- **SSA-BRIGHTNESS (NOT_VERIFIED, claim dies):** show topology proven single-scale-per-
+  rendered-frame, history stored pre-show, no feedback channel — no brightness compounding;
+  no patch. **Corollary: the incandescent "compounds ~10×" attribution is downgraded to
+  [HYPOTHESIS]** — K1_INCANDESCENT_OUTPUT_V1's wire gain (gold 0→11.8%) is measured fact,
+  but its mechanism needs a post-lane resolution (three show_leds call sites exist:
+  .ino 1159/1182/1457 — multiplicity per frame unaudited across all three).
+- Field-tolerant HUEAUD parsers (the hdn=/hd0= respin broke the driver's `,h=` anchor —
+  fixed generically).
+
+### Update — 2026-08-13 (close of SSA round): SIDE DOOR CLOSED — 3/4 in FULL PRODUCT CONFIG
+
+SSA-SIDEDOOR (VERIFIED, orchestrator re-ran the decisive artefact): the teal author is the
+**edge mixer's harmony rotation applied to the palette-authored PRIMARY buffer**
+(`k1_edgemixer_apply_primary`, gated at .ino:1408-1415 on dual-edge — which reconciles the
+split probe: secondary off ⇒ primary rotation skipped). The earlier hsv(note_colors[7])
+attribution was a hue-value coincidence, not provenance. Fix `K1_EDGE_PALETTE_HONOUR_V1`
+(skip the harmony matrix for palette-owned channels, both apply paths; STM value-only modes
+untouched) merged from `ssa/sidedoor-edge-palette-honour` and folded into the candidate.
+**Definitive leg, edge mixer ON (product config): 3/4 authored deployment, teal 0, strays
+only adjacent transitionals (0,18).** Merge-trap note: the first fold-in merged the
+worktree's default branch ("Already up to date" = nothing merged) and the leg correctly
+regressed — caught by measurement, refixed, re-proven.
+SSA-BRIGHTNESS: claim died properly (topology-proven single scale/frame). SSA-CONSOLIDATE:
+promotion plan pending at close. Candidate env: **k1_bench_im69d_colourfix** (six flags),
+resident on the bench @ bd74659f. Final gates: pytest 1060 passed, k1_hardware clean +
+sections byte-identical (72417182/afa23c99/d383aa70).
+
+### Delegation ledger close (SSA round, 2026-08-13)
+
+| SSA | Claim | CONSUMED AS | Orchestrator re-run |
+|---|---|---|---|
+| SIDEDOOR | edge harmony rotation on primary = the teal; gated fix | **verified evidence** | build+flash+leg: teal 0, 3/4 in product config |
+| BRIGHTNESS | no compounding (topology proof); no patch | **verified by refutation** | spot-checked cited call sites; claim dies, mechanism note adopted |
+| CONSOLIDATE | 5-FIX/2-DIAG/1-OBSOLETE split + 13-palette S2 risk + 4 blockers | **verified-by-audit** (inventory) / **provisional** (risk table) | citations match orchestrator's own edits; predicate controls documented. DELTA: +K1_EDGE_PALETTE_HONOUR_V1 → FIX set is SIX flags |
+
+**Promotion gates adopted from the plan:** fix-flag guard test (incl. BRIGHT/ENERGY mutual
+exclusion, mutation-checked) · production-shaped build of the six fixes without instruments
+· measure the O(256)/frame rank scan (or make it incremental) · S2 validation on the 13
+flagged palettes (or per-palette need term) · ENERGY_EXCURSION retirement per §4.
