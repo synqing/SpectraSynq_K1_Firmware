@@ -268,3 +268,21 @@ strip diag instrumentation from the candidate for the production flag set.
   .ino 1159/1182/1457 — multiplicity per frame unaudited across all three).
 - Field-tolerant HUEAUD parsers (the hdn=/hd0= respin broke the driver's `,h=` anchor —
   fixed generically).
+
+### Update — 2026-08-13 (close of SSA round): SIDE DOOR CLOSED — 3/4 in FULL PRODUCT CONFIG
+
+SSA-SIDEDOOR (VERIFIED, orchestrator re-ran the decisive artefact): the teal author is the
+**edge mixer's harmony rotation applied to the palette-authored PRIMARY buffer**
+(`k1_edgemixer_apply_primary`, gated at .ino:1408-1415 on dual-edge — which reconciles the
+split probe: secondary off ⇒ primary rotation skipped). The earlier hsv(note_colors[7])
+attribution was a hue-value coincidence, not provenance. Fix `K1_EDGE_PALETTE_HONOUR_V1`
+(skip the harmony matrix for palette-owned channels, both apply paths; STM value-only modes
+untouched) merged from `ssa/sidedoor-edge-palette-honour` and folded into the candidate.
+**Definitive leg, edge mixer ON (product config): 3/4 authored deployment, teal 0, strays
+only adjacent transitionals (0,18).** Merge-trap note: the first fold-in merged the
+worktree's default branch ("Already up to date" = nothing merged) and the leg correctly
+regressed — caught by measurement, refixed, re-proven.
+SSA-BRIGHTNESS: claim died properly (topology-proven single scale/frame). SSA-CONSOLIDATE:
+promotion plan pending at close. Candidate env: **k1_bench_im69d_colourfix** (six flags),
+resident on the bench @ bd74659f. Final gates: pytest 1060 passed, k1_hardware clean +
+sections byte-identical (72417182/afa23c99/d383aa70).
