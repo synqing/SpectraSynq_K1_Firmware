@@ -230,9 +230,33 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
 
   // Temporal RGB EMA (tau 0.163 s) — THE hybrid signature. dt-corrected.
   const float a_col = 1.0f - expf(-dt / WFHYB_TAU_COLOUR);
+#ifdef K1_POSITION_SMOOTH_V1
+  // S-candidate: HUE-SAFE smoothing (design P1 applied to smoothing). RGB EMA
+  // between distant palette colours passes through grey/red and is stage 1 of
+  // the measured gold kill. Instead: EMA the LUMINANCE trajectory only, and
+  // renormalise the smoothed colour back to the CURRENT frame's hue/sat ratios
+  // — motion stays as smooth (same tau on perceived level), hue stays a
+  // palette identity every frame.
+  {
+    const float cur_max = fmaxf(fmaxf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
+    float prev_lum = fmaxf(fmaxf(fx.wfhyb_dot_r, fx.wfhyb_dot_g), fx.wfhyb_dot_b);
+    const float lum = prev_lum + (cur_max - prev_lum) * a_col;
+    if (cur_max > 0.001f) {
+      const float k = lum / cur_max;
+      fx.wfhyb_dot_r = float(raw_col.r) * k;
+      fx.wfhyb_dot_g = float(raw_col.g) * k;
+      fx.wfhyb_dot_b = float(raw_col.b) * k;
+    } else {
+      fx.wfhyb_dot_r *= (1.0f - a_col);
+      fx.wfhyb_dot_g *= (1.0f - a_col);
+      fx.wfhyb_dot_b *= (1.0f - a_col);
+    }
+  }
+#else
   fx.wfhyb_dot_r += (float(raw_col.r) - fx.wfhyb_dot_r) * a_col;
   fx.wfhyb_dot_g += (float(raw_col.g) - fx.wfhyb_dot_g) * a_col;
   fx.wfhyb_dot_b += (float(raw_col.b) - fx.wfhyb_dot_b) * a_col;
+#endif
 
   // Gate the smoothed dot by confidence * silentScale (source order), FLOORED
   // while a real signal is present. `silence` latches true after 10 s of
