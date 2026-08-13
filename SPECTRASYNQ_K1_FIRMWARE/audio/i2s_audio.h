@@ -1106,6 +1106,12 @@ void acquire_sample_chunk(uint32_t t_now) {
       for (uint8_t hb = 0; hb < 24; hb++) {
         USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_primary[hb]);
       }
+      // Differential telemetry: PRE-pipeline histogram (leds_16, before
+      // incandescent/scaling) — divergence vs h= names the crushing stage.
+      USBSerial.print(",hpre=");
+      for (uint8_t hb = 0; hb < 24; hb++) {
+        USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_pre[hb]);
+      }
       USBSerial.println();
     }
 #endif

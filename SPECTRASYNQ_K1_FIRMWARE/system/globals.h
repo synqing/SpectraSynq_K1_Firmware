@@ -200,6 +200,7 @@ inline volatile uint16_t k1_hue_lit_primary = 0;          // last-frame chromati
 inline volatile float    k1_hue_sweep_pct = -1.0f;        // EQ drive percentile (-1 = legacy drive)
 inline volatile uint16_t k1_hd_fp_count = 0;              // primary HD cache: stop count
 inline volatile uint32_t k1_hd_fp_stop0 = 0;              // primary HD cache: stop-0 as 0xRRGGBB
+inline volatile uint32_t k1_hue_hist_pre[24] = { 0 };     // PRE-pipeline hue buckets (leds_16)
 #endif
 #ifdef K1_FALLBACK_HELD_U_V1
 // Colour-fix-lane S1 (design doc §2/P1): the palette engine's live musical
