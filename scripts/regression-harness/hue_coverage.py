@@ -43,7 +43,9 @@ DEFAULT_V_FLOOR = 40       # 0-255 V threshold: below = not lit (camera black le
 DEFAULT_S_FLOOR = 60       # 0-255 S threshold: below = white/grey, huemeaningless
 
 HUEAUD_RE = re.compile(
-    r"HUEAUD,ver=1,ch=(?P<ch>[ps]),lit=(?P<lit>\d+)(?:,mode=(?P<mode>-?\d+))?,h=(?P<h>[0-9,]+)")
+    r"HUEAUD,ver=1,ch=(?P<ch>[ps]),lit=(?P<lit>\d+)(?:,mode=(?P<mode>-?\d+))?"
+    r"(?:,pal=(?P<pal>\d+))?(?:,pmode=(?P<pmode>[01]))?(?:,acs=(?P<acs>[01]))?"
+    r",h=(?P<h>[0-9,]+)")
 
 
 @dataclass

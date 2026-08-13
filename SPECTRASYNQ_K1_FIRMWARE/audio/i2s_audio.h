@@ -1091,8 +1091,10 @@ void acquire_sample_chunk(uint32_t t_now) {
     // hue_coverage.py can match it standalone). Counters are cumulative;
     // the host diffs successive lines. Same 1 Hz cadence as the AP line.
     {
-      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,h=", (unsigned)k1_hue_lit_primary,
-        (int)CONFIG.LIGHTSHOW_MODE);
+      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,pal=%u,pmode=%u,acs=%u,h=",
+        (unsigned)k1_hue_lit_primary, (int)CONFIG.LIGHTSHOW_MODE,
+        (unsigned)CONFIG.PALETTE_INDEX, CONFIG.PALETTE_MODE_ENABLED ? 1U : 0U,
+        CONFIG.AUTO_COLOR_SHIFT ? 1U : 0U);
       for (uint8_t hb = 0; hb < 24; hb++) {
         USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_primary[hb]);
       }
