@@ -96,13 +96,40 @@ pure hues and destroy mixed ones — gold dies first, blue survives (methods §3
 before any cal, pre-check the mic's raw int16 floor — raw-quiet + processed-loud =
 processing artefact, not acoustics (HF-61/62).
 
-## Fix-lane status (2026-08-14)
+## Fix-lane status (2026-08-14, later session — ROOT CAUSE FOUND)
 
-Writer found · five colour layers fixed and measured · consolidated candidate
-`k1_bench_im69d_colourfix` at 3/4 authored deployment in product config · twitch
-decomposed, colour-side fixed (sweep rest v3 structure detector PROVEN: silence
-0.00000/s, music alive). **OPEN: HF-61 cal self-lock (stale DC → phantom ~4k
-baseline → visual response still wrong) — implement cal partial-commit, two
-Captain-gated cal passes, then full-axis legs → promotion gates → the ONE golden
-side-by-side.** Bench port drifted to `cu.usbmodem12401` (env pins 12201; use
-`--upload-port`); SSL manually 6000 pending the DC fix.
+Writer found · five colour layers fixed and measured · candidate
+`k1_bench_im69d_colourfix` at 3/4 authored deployment · twitch colour-side fixed.
+
+**HF-61 is REFUTED.** So are "true DC ≈ −1523" (measured **+1894**) and the
+"×140 unexplained gain" (a raw-rms-vs-processed-peak units error; the chain is
+19.4× exactly as documented). The cal never runs under the stale DC —
+`start_noise_cal()` zeroes it before Phase A.
+
+**REAL ROOT CAUSE (HF-63):** the GDFT's lowest bin is `55 Hz × 2^(NOTE_OFFSET/12)`
+= 110 Hz shipped, so **sub-110 Hz energy is invisible on the plate yet was setting
+`max_waveform_val_raw`** — the reference for silence detection, the AGC floor and
+the follower. `K1_AP_SUBSONIC_HPF_V1` high-passes the PEAK MEASUREMENT ONLY
+(`waveform[]` untouched ⇒ GDFT input cannot move), cutoff **derived from the live
+NOTE_OFFSET**. Measured `max_raw` floor 1959 → **685**, below the 1500 Phase-B gate
+for the first time. `K1_CAL_PARTIAL_COMMIT_V1` landed and persisted DC=1894.
+
+**NEXT: a Captain-gated silence window to run the cal and learn a real SSL**, then
+silence/music re-verification, then the full-axis legs → promotion → golden A/B.
+Device: bench `B489A500` on `cu.usbmodem12401` @ `k1_bench_im69d_hpf`.
+
+## Rules 11–13 (paid for 2026-08-14, later session)
+
+11. **Measure a level on the band its CONSUMER uses.** A broadband peak feeding a
+    band-limited consumer imports out-of-band energy as false signal. This was the
+    root cause above — and the same question applies to any threshold, AGC or gate.
+12. **Get an EXTERNAL witness before spending another session on inference.** When
+    the device's own telemetry is the only witness you cannot separate "the room
+    changed" from "the device is wrong". The MacBook mic
+    (`dual_mic_witness.py`) broke a two-session deadlock and killed the
+    orchestrator's own leading theory. Verify the witness is LIVE — a TCC-blocked
+    mic returns all-zeros, i.e. success-shaped silence. (HF-64)
+13. **Cross-instrument statistics need matched integration time**, adjacency
+    assumptions need a lossless transport, and confounded legs are INCONCLUSIVE —
+    never a refutation. Three separate wrong-looking results this session came from
+    violating these, not from the hardware. (HF-65/66/67)

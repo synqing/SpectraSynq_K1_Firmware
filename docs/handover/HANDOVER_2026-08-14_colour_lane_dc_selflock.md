@@ -1,8 +1,67 @@
 ---
-abstract: "Handover 2026-08-14 (session close). The colour fix lane is DONE at the colour layer (five layers fixed; candidate k1_bench_im69d_colourfix at 3/4 authored deployment in full product config; twitch colour-side fixed and ratcheted) but the plate still looks wrong because of ONE open root cause: HF-61 — the noise cal self-locks on a stale DC (phantom ~4k waveform baseline in silence drives every mode). NEXT MISSION step 1 = cal partial-commit fix, two Captain-gated cal passes, then full-axis verification. All lessons canonised as HF-50..62; mechanical ratchets live in CI. Read order, device truth, mission contract, and traps inside."
+abstract: "SUPERSEDED IN PART — read §MISSION UPDATE first. The colour layer is DONE (5 layers fixed; candidate k1_bench_im69d_colourfix at 3/4 authored deployment). The HF-61 stale-DC self-lock story is REFUTED by measurement, as are the -1523 DC figure and the ×140 gain. REAL ROOT CAUSE FOUND (HF-63): sub-110 Hz energy — below the GDFT's own lowest bin, so invisible on the plate — was setting max_waveform_val_raw, the reference for silence detection, AGC floor and follower. Gated subsonic HPF on the peak measurement drops the floor below the calibration gate for the first time. NEXT: one Captain-gated silence window to run the cal and learn a real SSL, then the full-axis colour legs."
 ---
 
 # Handover — 2026-08-14 session close → the DC/cal fix + full-axis verification
+
+## ⚠ MISSION UPDATE — 2026-08-14 (later session). READ THIS BEFORE THE SECTIONS BELOW.
+
+**The mission below is superseded.** Steps 1–2 were executed; their premise was wrong and
+the real root cause was found. Sections after this block are retained as history — treat
+their HF-61 framing as REFUTED, not as instruction.
+
+### Refuted by measurement (do not re-derive)
+- **HF-61 mechanism** — "SSL fails because it runs under the stale DC". FALSE:
+  `start_noise_cal()` zeroes `CONFIG.DC_OFFSET` before Phase A and the learned DC is
+  stamped at iter 128, before Phase B samples SSL.
+- **"true DC ≈ −1523"** — FALSE. Measured **+1894** (persisted was 91), 12192 samples,
+  0 rejected.
+- **"×140 unexplained gain"** — FALSE, a units error (raw *rms* vs processed *peak*).
+  Measured chain is **19.4×** = `INPUT_GAIN 8.0 × sensitivity ≈2.24`, exactly as documented.
+
+### What was fixed and proven on-device
+1. `K1_CAL_PARTIAL_COMMIT_V1` — a Phase-A-validated DC now survives an SSL refusal and
+   **persists**. First cal result this lane ever kept (`dc_committed=1894 persisted=1`).
+2. `K1_AP_SUBSONIC_HPF_V1` — **the root cause fix.** The GDFT's lowest bin is
+   `55 Hz × 2^(NOTE_OFFSET/12)` = 110 Hz at the shipped offset, so sub-110 Hz energy shows
+   on nothing yet was setting `max_waveform_val_raw` — the reference for silence detection,
+   AGC floor and follower. HPF applied to the **peak measurement only** (`waveform[]`
+   untouched ⇒ GDFT input unchanged). Cutoff **derived from the live NOTE_OFFSET** and
+   proven on-device (0→55 Hz, 24→220 Hz, 12→110 Hz).
+   Measured: `max_raw` p50 ~7135 → ~2873, floor 1959 → **685**, i.e. below the 1500
+   Phase-B gate that had rejected 112/112 frames.
+3. Byte gate repaired — the drift was **stale-by-toolchain, not a leak**; colour lane is
+   byte-inert on `k1_hardware`. Re-recorded, all three envs green.
+
+### NEXT AGENT — do this, in order
+1. **Run the calibration under a Captain-verbal-gated silence window** on
+   `k1_bench_im69d_hpf`. For the first time the drive floor sits below the Phase-B gate, so
+   SSL has a real path to validate. A learned SSL is what unlocks silence latching and the
+   follower normaliser — the drive the colour work needs.
+2. **Re-verify the twitch axes** with SSL learned: silence leg (sweep ~0, `silence` must
+   latch), music leg (coupling restored; corr(peak,lit) was 0.02).
+3. Then the **full-axis metric legs** (HF-50), the promotion gates, and the ONE golden
+   side-by-side.
+
+### Instruments built this session (reuse, do not rebuild)
+- `dual_mic_witness.py` — MacBook mic as an **independent witness** on the same room.
+  This is what broke the deadlock; use it whenever device telemetry is the only witness.
+  **Verify it returns non-zero audio** — a blocked mic returns success-shaped silence.
+- `ap_floor_probe.py` (AP floor), `run_cal.py` (gated cal), `chunk_boundary_probe.py`,
+  `spectrum_probe.py`. All in the session scratchpad; copy out what you need.
+
+### Traps added (full text: canon §5, HF-63..68)
+Matched integration time or the comparison is meaningless (HF-65) · a "seam" across
+non-contiguous samples is not a discontinuity (HF-66) · confounded legs are INCONCLUSIVE,
+never a refutation (HF-67) · `:stream=magnitudes` is a **dead command**, acks and emits
+nothing (HF-68) · a constant that must track a runtime config is a latent bug (the HPF
+cutoff vs NOTE_OFFSET).
+
+**Device at close:** bench `B489A500` on `/dev/cu.usbmodem12401`, running
+`k1_bench_im69d_hpf`, `DC=1894` (measured, persisted), `SSL=57` (still uncalibrated —
+that is step 1), `NOTE_OFFSET=12` restored after the on-device cutoff proof.
+
+---
 
 **Repo tip at close:** PRs #48–#55 merged; **PR #56** (twitch fixes + canon + ratchets) was
 merging on a watcher at close — VERIFY ITS STATE FIRST (`gh pr view 56`); if unmerged, the
@@ -96,3 +155,4 @@ hardening.
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-08-14 | agent:claude-code | Created at session close — mission (HF-61 first), device truth, traps, debt, landed list. |
+| 2026-08-14 | agent:claude-code | MISSION UPDATE prepended: HF-61 / -1523 / ×140 all refuted by measurement; root cause found and fixed (subsonic HPF on the drive peak); next mission is the cal under a silence window. |
