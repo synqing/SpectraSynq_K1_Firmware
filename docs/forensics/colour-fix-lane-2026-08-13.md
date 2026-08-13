@@ -376,3 +376,28 @@ not acoustic. Also worth a same-bench comparison against an IM73D build.
 `mic_stable_byte_gate.sh` *combined* reference was stale-by-toolchain (Arduino framework
 reinstalled 2026-08-12, after the reference was recorded). Reference re-recorded; all three
 envs now green. Evidence: `_scratch/byte_drift_bisect_2026-08-14.md`.
+
+#### PDM clock probe (DSR_16S) — INCONCLUSIVE, do not cite either way
+
+Hypothesis: the IM69D path takes `I2S_PDM_RX_CLK_DEFAULT_CONFIG(12800)` = **DSR_8S**
+=> PDM clock 12800 x 64 = **819 kHz**. `K1_MIC_IM69D_DSR_16S_V1` selects DSR_16S
+=> 1.638 MHz. If the modulator is being clocked outside its intended band, that could
+plausibly account for a ~35 dB floor excess that a normal DSR change (~2 dB) cannot.
+
+Env `k1_bench_im69d_calfix_dsr16` built, flashed and verified (git `19e7540f`,
+epoch 1786642801). Measured floor: `raw_i16_rms p50 284.7, peak p50 426` versus
+DSR_8S `p50 180 / 300`.
+
+**This comparison is CONFOUNDED and proves nothing.** The DSR_8S window was taken under
+a Captain-confirmed silence window; the DSR_16S window was taken after music resumed. The
+two legs differ in acoustic conditions as well as in the variable under test, so the delta
+is not attributable — the classic paired-control failure. The probe env is retained; the
+measurement must be REDONE with both legs under identical conditions before the PDM-clock
+hypothesis is either accepted or discarded.
+
+Device returned to `k1_bench_im69d_calfix` as the canonical state.
+
+**Recommended decisive test (condition-independent, no Captain):** enable
+`K1_MIC_IM69D_STEREO_V1` and emit the RIGHT-channel raw RMS on the `[AP]` line. Both
+channels see the same instant, so an unused/duplicate channel carrying the same floor is
+electrical, not acoustic — a within-frame control that no room condition can confound.
