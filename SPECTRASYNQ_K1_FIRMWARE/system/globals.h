@@ -229,11 +229,25 @@ inline float   ssl_cal_p50_raw = 0.0f;
 inline float   ssl_cal_p90_raw = 0.0f;
 #ifdef K1_AP_SUBSONIC_HPF_V1
 // Subsonic high-pass state for the PEAK measurement only (see i2s_audio.h).
-// One-pole: a = RC/(RC+dt), RC = 1/(2*pi*110), dt = 1/12800 -> 0.9488.
 // Core 0 only; single reader/writer, no cross-core sharing.
-#define K1_SUBSONIC_HPF_A 0.9488f
+//
+// The cutoff MUST track the GDFT's own lowest bin, which is
+// 55 Hz * 2^(CONFIG.NOTE_OFFSET/12) — a RUNTIME value. A constant tuned for
+// NOTE_OFFSET=12 (110 Hz) would silently cut an octave of real, displayed bass
+// at NOTE_OFFSET=0 (55 Hz), which is a shipped configuration. So derive it, and
+// recompute whenever NOTE_OFFSET moves.
+//
+// One-pole HPF: a = RC/(RC+dt) with RC = 1/(2*pi*fc), dt = 1/fs
+//            => a = fs / (fs + 2*pi*fc)      (fc=110, fs=12800 -> 0.9488)
 inline float   k1_subsonic_hpf_x1 = 0.0f;
 inline float   k1_subsonic_hpf_y  = 0.0f;
+inline float   k1_subsonic_hpf_a  = 0.0f;   // 0 = not yet derived
+inline int16_t k1_subsonic_hpf_note_offset_cached = -32768;
+
+// Lowest GDFT bin for the live NOTE_OFFSET; the filter must never reach above it.
+inline float k1_subsonic_hpf_cutoff_hz(int16_t note_offset) {
+  return 55.0f * powf(2.0f, (float)note_offset / 12.0f);
+}
 #endif
 
 inline bool    noise_cal_dc_valid = false;
