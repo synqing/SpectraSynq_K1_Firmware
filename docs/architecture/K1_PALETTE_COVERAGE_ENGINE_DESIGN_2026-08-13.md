@@ -131,6 +131,29 @@ metric; S3 is simultaneously the first determinism deliverable; state transparen
 (the dump/seed/replay plumbing) is its own follow-on lane, guided by the existing
 harness. Evolution under test, not revolution.
 
+## 6. NOTE_OFFSET / chromagram-window widening (Captain's question, answered)
+
+**Verdict: widening the window would most likely REDUCE colour novelty, not increase
+it.** Mechanism: `NOTE_OFFSET` + `CHROMAGRAM_RANGE` define which GDFT semitone bins
+fold (mod 12) into the chromagram — the colour system's voters. Folding MORE octaves
+in adds voters whose pitch-class votes average out: bass harmonics and leakage smear
+across classes, high bins carry noisy/percussive energy — the chromagram gets FLATTER.
+Flat chroma is literally the head of the documented collapse chain (flatness →
+sparseness gate → fallback dwell). Offset 12 exists to keep the worst-leakage octave
+and kick-drum rumble out of the hue vote; the era truth 12/60 is a sharpened window.
+The real resolution ceiling is pitch-class folding itself (12 classes), which no
+window change escapes; the centroid is already continuous (atan2 over the 12-vector).
+
+**Higher-yield novelty levers, in order:** the S2–S4 traversal/servo machinery
+(in flight); **the chord tracker** — `SB_CHORD_V2` ships a stable root+quality that is
+almost entirely unconsumed (only Dense Forge's `K1_CHORD_HUE_V1`) — routing chord ROOT
+into the anchor gives musically-caused hue changes on chord changes, far more
+perceptible than window statistics; and per-mode spatial arc spread. A *dynamic*
+window (e.g. bass-profile during drops) is a legitimate future experiment — but as an
+explicit, observable state per §5, measured with this lane's instrument, and only
+post-lane: NOTE_OFFSET changes reboot the GDFT table and re-statistic the whole colour
+drive, which would void every era comparison mid-lane (HF-47 class).
+
 ---
 **Document Changelog**
 
