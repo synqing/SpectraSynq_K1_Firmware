@@ -1,5 +1,5 @@
 ---
-abstract: "Colour fix lane — live execution doc (opened 2026-08-13). Status: RANGE=1 writer IDENTIFIED (full71 harness, see chromagram-range-poison-writer-2026-08-13.md); hue-coverage metric built + fault-battery-proven (scripts/regression-harness/hue_coverage.py); K1_HUE_AUDIT_V1 firmware tap + k1_bench_im69d_hueaud env added. Key design fact: the golden bin exposes NO pixel surface (verified: no vpab/matrix/frame_dump strings; vp_out_test prints hashes only), so the ORACLE instrument is camera video at the photon boundary, and the on-device HUEAUD tap is the fast bisect instrument on main. ORDERING LAW: capture the golden oracle video BEFORE anything reflashes the bench. Then bisect main vs the tap metric, ONE final eyes-on."
+abstract: "Colour fix lane — live execution doc (opened 2026-08-13). Status: RANGE=1 writer IDENTIFIED (full71 harness); hue-coverage metric built + fault-battery-proven (hue_coverage.py); instruments = K1_HUE_AUDIT_V1 1Hz tap + K1_RENDER_TRACE_V1 LED-level PSRAM frame capture (rtrace_arm/status/dump), both in env k1_bench_im69d_hueaud only. Captain override 2026-08-13: NO video — LED-level capture is the instrument; the golden bin exposes no pixel surface (HF-48-verified), so the numeric reference is the PALETTE-DERIVED target (authored hue arc = external denominator) and the golden bench state is only for the ONE final side-by-side eyes-on. Next: palette-reference extraction, then bisect main against the metric."
 ---
 
 # Colour fix lane — execution doc
@@ -15,6 +15,12 @@ abstract: "Colour fix lane — live execution doc (opened 2026-08-13). Status: R
 | 1. Hue-coverage metric | **BUILT** — `scripts/regression-harness/hue_coverage.py` (self-test fault battery incl. deliberate-RED + mutation check, all proven). Firmware tap `K1_HUE_AUDIT_V1` + env `k1_bench_im69d_hueaud` added. Oracle capture PENDING (needs Captain, below). |
 | 3. Bisect main's colour path | NOT STARTED — blocked on oracle number only for the final target; suspect-bounding work can start on the tap alone. |
 | 4. ONE final eyes-on | NOT STARTED |
+
+> **Superseded in part — see Update below.** Captain struck the camera-video oracle
+> (2026-08-13): no video of the K1 has ever been part of this process, and the
+> instrument is LED-level capture, not photons-via-phone. The HF-48 finding that the
+> golden bin has no pixel surface still stands; the oracle definition moves to the
+> palette-derived reference (Update section).
 
 ## Instrument design (deviation from the letter of the contract, recorded)
 
@@ -48,6 +54,10 @@ Captain esptool GO + config replay for nothing.)
 
 ## Oracle capture protocol (Captain-assisted, one session)
 
+> **Superseded** — Captain struck the video path; see Update 2026-08-13 below.
+> No capture session is needed; the numeric reference is palette-derived and the
+> bisect instrument is `rtrace`/`HUEAUD` on-device.
+
 1. Port check first (`lsof /dev/tty.usbmodem*`, Cursor monitor closed — HF-46). Optional
    single `:dump` to re-verify era config identity before capture; every serial open risks
    a device reset, so at most one, and the state is flash-persisted either way.
@@ -76,6 +86,30 @@ the mode-level fixes. **Bench cal note:** before any current-main measurement, r
 `:sweet_spot_min=187` (measured cal; era 253 overwrote it) — or recal under Captain
 silence-go.
 
+### Update — 2026-08-13: Captain override — LED-level capture, no video
+
+Captain: there has never been any video of the K1 in this process, and the intended
+instrument is the render-capture **process** (capture what is actually rendered at the
+LED level, host-analyse). Applied:
+
+- **`K1_RENDER_TRACE_V1`** (`visual/k1_render_trace.{h,cpp}`, env `k1_bench_im69d_hueaud`):
+  PSRAM ring capture of the FINAL post-gamma primary output buffer — arm→tick→dump per the
+  telemetry canon, 3000-frame capacity (~120 s at every_n=4). Serial surface
+  `:rtrace_arm=<s>[,every]` / `:rtrace_status=1` / `:rtrace_dump=1`; CRC-headed hex dump.
+  Decoder: `hue_coverage.py rtrace` (identical chromatic gate to the HUEAUD tap, so tap and
+  trace numbers agree by construction). Static ratchets: `tests/test_render_trace_static.py`.
+- **Camera-video mode remains in the tool but is NOT the oracle path.**
+- **Oracle redefinition:** the golden bin still cannot emit frames (HF-48 finding stands),
+  so the numeric reference becomes the **palette-derived target**: for each palette, the
+  authored hue set (from the palette definitions) is the denominator — an EXTERNAL
+  denominator per the completeness-claim rule — and the metric target is deployment of that
+  authored arc (coverage/entropy vs the palette's own). Captain's single golden-vs-fixed
+  side-by-side eyes-on remains the human validation of "matches what I remember".
+- Consequence: **no capture session is required before bisect work starts.** The bench's
+  resident golden state matters only for the final eyes-on; the ordering law relaxes to:
+  don't reflash the bench without recording that the golden state must be re-established
+  (bin + era config recipe are preserved) for the final look.
+
 ## Guard debt from the writer finding
 
 Any control-writing harness MUST `:dump`-snapshot before first write and restore + verify
@@ -89,3 +123,4 @@ is written.
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-08-13 | agent:claude-code | Opened the lane — writer DONE, metric built + proven, tap + env added, instrument design decision recorded, oracle capture protocol defined. |
+| 2026-08-13 | agent:claude-code | Captain override applied: video struck; K1_RENDER_TRACE_V1 LED-level capture added (+ratchets); oracle redefined as palette-derived target; capture-session dependency removed. |

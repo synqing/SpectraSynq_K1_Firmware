@@ -48,6 +48,7 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_edgemixer.h"
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // scap_* dispatch (Stage 2 probe env only)
+#include "k1_render_trace.h"  // rtrace_* dispatch (colour-fix-lane env only)
 #endif
 #include "k1_mode_selection.h"
 #include "k1_onset_beat.h"
@@ -2798,6 +2799,16 @@ void parse_command(char* command_buf) {
     // K1_MIC_IM69D_STEREO_V1 (probe env only; production-OFF).
     else if (k1_stereo_probe_dispatch(command_type, command_data)) {
       // handled by the stereo probe instrument
+    }
+#endif
+
+#ifdef K1_RENDER_TRACE_V1
+    // rtrace_arm / rtrace_status / rtrace_dump — LED-level render capture
+    // (visual/k1_render_trace.cpp). GATE-MATCHED: rows in serial_typed_cmd_table.def,
+    // wrapper in serial_typed_dispatch.cpp, and this call-site all sit behind
+    // K1_RENDER_TRACE_V1 (colour-fix-lane env only; production-OFF).
+    else if (k1_render_trace_dispatch(command_type, command_data)) {
+      // handled by the render trace instrument
     }
 #endif
 
