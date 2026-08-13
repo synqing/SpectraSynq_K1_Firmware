@@ -31,6 +31,9 @@
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"
 #endif
+#ifdef K1_RENDER_TRACE_V1
+#include "k1_render_trace.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -124,6 +127,11 @@ bool serial_typed_wrap_gdft_harness(const char* command_type, char* command_data
 #ifdef K1_MIC_IM69D_STEREO_V1
 bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data) {
   return k1_stereo_probe_dispatch(command_type, command_data);
+}
+#endif
+#ifdef K1_RENDER_TRACE_V1
+bool serial_typed_wrap_render_trace(const char* command_type, char* command_data) {
+  return k1_render_trace_dispatch(command_type, command_data);
 }
 #endif
 #if K1_EFFECT_FRAMEWORK_V1

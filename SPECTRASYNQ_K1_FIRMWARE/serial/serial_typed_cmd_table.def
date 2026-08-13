@@ -45,6 +45,11 @@ SERIAL_TYPED_CMD("scap_arm", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_
 SERIAL_TYPED_CMD("scap_status", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("scap_dump", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD_HARNESS)
 #endif
+#ifdef K1_RENDER_TRACE_V1
+SERIAL_TYPED_CMD("rtrace_arm", serial_typed_wrap_render_trace, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("rtrace_status", serial_typed_wrap_render_trace, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("rtrace_dump", serial_typed_wrap_render_trace, SC_TYPED_ONLY, CMD_HARNESS)
+#endif
 #if ENABLE_GDFT_HARNESS
 SERIAL_TYPED_CMD("gdft_probe", serial_typed_wrap_gdft_harness, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("gdft_sweep", serial_typed_wrap_gdft_harness, SC_TYPED_ONLY, CMD_HARNESS)

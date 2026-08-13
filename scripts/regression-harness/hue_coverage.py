@@ -162,6 +162,61 @@ def hueaud_samples(path: str, channel: str):
             prev = cur
 
 
+# ---------------------------------------------------------------- rtrace mode
+
+RTRACE_F_RE = re.compile(r"^F,(?P<idx>\d+),(?P<ms>\d+),(?P<mode>\d+),(?P<hex>[0-9a-f]+)\s*$")
+
+
+def rtrace_frames(path: str):
+    """Yield (t_seconds, ms, mode, rgb ndarray[px,3]) from an rtrace_dump log.
+    Frames live between [RTRACE-BEGIN ...] and [RTRACE-END]; each is
+    F,<idx>,<ms>,<mode>,<hex of px*3 bytes> (K1_RENDER_TRACE_V1)."""
+    t0 = None
+    with open(path, "r", errors="replace") as f:
+        for line in f:
+            m = RTRACE_F_RE.match(line.strip())
+            if not m:
+                continue
+            raw = bytes.fromhex(m.group("hex"))
+            if len(raw) % 3 != 0 or len(raw) == 0:
+                continue
+            rgb = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 3)
+            ms = int(m.group("ms"))
+            if t0 is None:
+                t0 = ms
+            yield (ms - t0) / 1000.0, ms, int(m.group("mode")), rgb
+
+
+def rgb_hue_hist(rgb: np.ndarray) -> tuple[np.ndarray, float]:
+    """Hue histogram of one frame using the SAME chromatic gate as the firmware
+    tap (max>2 AND max-min>=8) so tap and trace numbers agree by construction."""
+    r = rgb[:, 0].astype(np.int16)
+    g = rgb[:, 1].astype(np.int16)
+    b = rgb[:, 2].astype(np.int16)
+    mx = np.max(rgb, axis=1).astype(np.int16)
+    mn = np.min(rgb, axis=1).astype(np.int16)
+    d = mx - mn
+    chromatic = (mx > 2) & (d >= 8)
+    hist = np.zeros(HUE_BUCKETS, dtype=np.float64)
+    if not chromatic.any():
+        return hist, 0.0
+    rc, gc, bc = r[chromatic], g[chromatic], b[chromatic]
+    mxc, dc = mx[chromatic], d[chromatic]
+    h = np.where(mxc == rc, (43 * (gc - bc)) // dc,
+                 np.where(mxc == gc, 85 + (43 * (bc - rc)) // dc,
+                          171 + (43 * (rc - gc)) // dc)).astype(np.int16)
+    h = np.where(h < 0, h + 256, h)
+    buckets = (h.astype(np.uint16) * HUE_BUCKETS) >> 8
+    np.add.at(hist, np.clip(buckets, 0, HUE_BUCKETS - 1), 1.0)
+    return hist, float(chromatic.mean())
+
+
+def rtrace_samples(path: str):
+    for t, _ms, _mode, rgb in rtrace_frames(path):
+        hist, lit = rgb_hue_hist(rgb)
+        yield t, hist, lit
+
+
 # ---------------------------------------------------------------- self-test
 
 def synth(hues_deg: list[float], frames: int, jitter: float = 0.0, seed: int = 7):
@@ -238,6 +293,28 @@ def self_test() -> int:
           and got[1][1][0] == 45.0,
           f"samples={len(got)} deltas={[g[1][0] for g in got]}")
 
+    # Case 8: rtrace round-trip — a synthetic 2-frame dump (one pure red frame,
+    # one red+green+blue frame) must decode to the right hue buckets, and a
+    # corrupt hex line must be dropped, not crash.
+    red = "ff0000" * 160
+    rgbmix = ("ff0000" * 54) + ("00ff00" * 53) + ("0000ff" * 53)
+    dump = ("[RTRACE-BEGIN frames=2 every=4 px=160 fmt=rgb8hex crc32=0]\n"
+            f"F,0,1000,32,{red}\n"
+            f"F,1,1040,32,{rgbmix}\n"
+            "F,2,1080,32,zznothex\n"
+            "[RTRACE-END]\n")
+    with tempfile.NamedTemporaryFile("w", suffix=".log", delete=False) as tf:
+        tf.write(dump)
+        tmp = tf.name
+    frames = list(rtrace_samples(tmp))
+    os.unlink(tmp)
+    ok = (len(frames) == 2
+          and frames[0][1].argmax() == 0 and frames[0][1].sum() == 160.0
+          and (frames[1][1] > 0).sum() == 3)
+    check("rtrace-roundtrip", ok,
+          f"frames={len(frames)} f0_bucket={frames[0][1].argmax() if frames else '-'} "
+          f"f1_buckets={(frames[1][1] > 0).sum() if len(frames) > 1 else '-'}")
+
     print(f"self-test: {'PASS' if failures == 0 else f'FAIL ({failures} red)'}")
     return 1 if failures else 0
 
@@ -260,10 +337,17 @@ def main() -> int:
     h.add_argument("path")
     h.add_argument("--channel", choices=["p", "s"], default="p")
 
-    for p in (v, h):
+    r = sub.add_parser("rtrace", help="rtrace_dump log (LED-level frame capture)")
+    r.add_argument("path")
+
+    for p in (v, h, r):
         p.add_argument("--window", type=float, default=DEFAULT_WINDOW_S)
         p.add_argument("--floor", type=float, default=DEFAULT_MASS_FLOOR)
         p.add_argument("--json", dest="json_out", help="write windows JSON here")
+        p.add_argument("--palette", type=int, default=None,
+                       help="palette index for the authored-reference comparison")
+        p.add_argument("--palette-ref", default=None,
+                       help="palette_reference.json (from palette_reference.py generate)")
 
     sub.add_parser("self-test", help="fault battery (must show RED capability)")
 
@@ -274,6 +358,8 @@ def main() -> int:
     if args.cmd == "video":
         samples = video_samples(args.path, args.fps, args.v_floor, args.s_floor,
                                 tuple(args.roi) if args.roi else None)
+    elif args.cmd == "rtrace":
+        samples = rtrace_samples(args.path)
     else:
         samples = hueaud_samples(args.path, args.channel)
 
@@ -296,6 +382,30 @@ def main() -> int:
         "entropy_mean_bits": round(float(np.mean(ent)), 4),
         "entropy_min_bits": round(float(np.min(ent)), 4),
     }
+    if args.palette_ref is not None and args.palette is not None:
+        # Authored-reference comparison (palette-derived oracle): what fraction
+        # of the palette's AUTHORED hue arc did the render actually deploy?
+        ref = json.load(open(args.palette_ref))
+        pal = next((p for p in ref["palettes"] if p["index"] == args.palette), None)
+        if pal is None:
+            print(f"palette index {args.palette} not in {args.palette_ref}",
+                  file=sys.stderr)
+            return 2
+        agg = np.zeros(HUE_BUCKETS, dtype=np.float64)
+        for w in windows:
+            agg += np.asarray(w["hist"], dtype=np.float64)
+        total = agg.sum()
+        deployed = set(int(i) for i in np.where(agg / total >= args.floor)[0]) if total > 0 else set()
+        authored = set(pal["authored_buckets"])
+        hit = sorted(deployed & authored)
+        missed = sorted(authored - deployed)
+        stray = sorted(deployed - authored)
+        summary["palette"] = pal["name"]
+        summary["authored_deployment"] = round(len(hit) / len(authored), 4) if authored else 0.0
+        summary["authored_missed_buckets"] = missed
+        summary["out_of_palette_buckets"] = stray
+        print(f"PALETTE {pal['name']}: deployed {len(hit)}/{len(authored)} authored "
+              f"buckets ({summary['authored_deployment']:.0%}); missed={missed} stray={stray}")
     print("SUMMARY " + json.dumps(summary))
     if args.json_out:
         with open(args.json_out, "w") as f:

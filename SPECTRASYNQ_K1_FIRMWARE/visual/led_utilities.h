@@ -15,6 +15,9 @@
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
 #endif
+#ifdef K1_RENDER_TRACE_V1
+#include "k1_render_trace.h" // rtrace_* LED-level capture (colour-fix-lane env only)
+#endif
 #ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
 #endif
@@ -1122,6 +1125,12 @@ inline void show_leds() {
     }
     k1_hue_lit_primary = chromatic;
   }
+#endif
+#ifdef K1_RENDER_TRACE_V1
+  // LED-level render trace: capture the same post-gamma primary buffer into the
+  // PSRAM ring while armed (arm→tick→dump; no printf here — Core 1 hot path).
+  k1_render_trace_on_frame((const uint8_t*)leds_out, CONFIG.LED_COUNT,
+                           (uint8_t)CONFIG.LIGHTSHOW_MODE);
 #endif
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_show_start_us = vp_perf.running ? esp_timer_get_time() : 0;
