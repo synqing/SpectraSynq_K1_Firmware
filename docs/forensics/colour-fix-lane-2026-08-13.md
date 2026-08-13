@@ -233,3 +233,20 @@ brightness (bright gold survives stages 2–3) — which is precisely S2's cresc
 (b) position-space smoothing to remove stage 1; (c) `INCANDESCENT_FILTER` level is a
 Captain taste lever (0.5 era character vs hue fidelity — 0.25 halves the warm crush);
 (d) long-term P1: hue-safe output filtering (apply warm cast in position/luma space).
+
+### Update — 2026-08-13 (later night): GOLD ON THE WIRE — 4/4 authored deployment on mode 32
+
+Dose-response proved the incandescent crush is EXPONENTIAL (FILTER 0.10 → gold 31.4% ·
+0.25 → 1.5% · 0.50 → 0.1%): the in-place apply on the render buffer compounds ~10× per
+buffer lifetime (the brightness scale at led_utilities ~444 mutates leds_16 in place too —
+same class, dimming-only, recorded as follow-up). Two candidate fixes shipped and measured:
+- `K1_POSITION_SMOOTH_V1` (mode 32): EMA the luminance trajectory, renormalise to the
+  current frame's hue/sat — PRE-pipeline warm purified (b0 3%, gold 27→41.7%).
+- `K1_INCANDESCENT_OUTPUT_V1`: identical mix law applied ONCE at the output write in
+  quantize_color() instead of in-place — **WIRE gold 0.0% → 11.8%**; full wire arc:
+  amber 34% · gold 11.8% · blue-violet 24.8% · violet-magenta 16.6% = **4/4 authored
+  Naberius buckets deployed at the strip** for the first time in the lane.
+Consolidated fixed-main candidate env: **`k1_bench_im69d_hueaud_s2psi`** (equalised sweep +
+crescendo excursion + hue-safe smoothing + idempotent incandescent). Resident on the bench.
+Remaining before the ONE eyes-on: secondary side-door closure · GDFT-mode spot-check ·
+strip diag instrumentation from the candidate for the production flag set.
