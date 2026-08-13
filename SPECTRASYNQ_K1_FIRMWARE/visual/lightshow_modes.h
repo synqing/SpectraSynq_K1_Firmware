@@ -182,6 +182,16 @@ inline const CRGBPalette16& cached_gradient_palette(uint8_t palette_index, bool 
     primary_palette = CRGBPalette16(gGradientPalettes[palette_index]);
     primary_index = palette_index;
     palette_hd_unpack(palette_index, palette_hd_for_channel(false));
+#ifdef K1_HUE_AUDIT_V1
+    // Mirror the HD cache identity for the HUEAUD fingerprint (globals.h).
+    {
+      const PaletteStopsHD& fp = palette_hd_for_channel(false);
+      k1_hd_fp_count = fp.count;
+      k1_hd_fp_stop0 = (uint32_t(uint8_t(fp.r[0] * 255.0f)) << 16) |
+                       (uint32_t(uint8_t(fp.g[0] * 255.0f)) << 8) |
+                       uint32_t(uint8_t(fp.b[0] * 255.0f));
+    }
+#endif
   }
   return primary_palette;
 }

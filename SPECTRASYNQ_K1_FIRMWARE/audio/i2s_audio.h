@@ -1091,11 +1091,18 @@ void acquire_sample_chunk(uint32_t t_now) {
     // hue_coverage.py can match it standalone). Counters are cumulative;
     // the host diffs successive lines. Same 1 Hz cadence as the AP line.
     {
-      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,pal=%u,pmode=%u,acs=%u,hp=%.4f,pct=%.3f,h=",
+      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,pal=%u,pmode=%u,acs=%u,hp=%.4f,pct=%.3f,hdn=%u,hd0=%02x%02x%02x,h=",
         (unsigned)k1_hue_lit_primary, (int)CONFIG.LIGHTSHOW_MODE,
         (unsigned)CONFIG.PALETTE_INDEX, CONFIG.PALETTE_MODE_ENABLED ? 1U : 0U,
         CONFIG.AUTO_COLOR_SHIFT ? 1U : 0U,
-        (double)float(hue_position), (double)k1_hue_sweep_pct);
+        (double)float(hue_position), (double)k1_hue_sweep_pct,
+        // HD-cache identity fingerprint (MEASURE THE PROPERTY: which palette is
+        // the engine actually sampling?): primary HD stop count + stop-0 RGB,
+        // mirrored from cached_gradient_palette (globals.h).
+        (unsigned)k1_hd_fp_count,
+        (unsigned)((k1_hd_fp_stop0 >> 16) & 0xFF),
+        (unsigned)((k1_hd_fp_stop0 >> 8) & 0xFF),
+        (unsigned)(k1_hd_fp_stop0 & 0xFF));
       for (uint8_t hb = 0; hb < 24; hb++) {
         USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_primary[hb]);
       }
