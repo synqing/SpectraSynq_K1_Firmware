@@ -1906,10 +1906,15 @@ inline void process_color_shift() {
     const float pct = (nov_fill > 1U)
         ? (float(below) + 0.5f * float(equal - 1U)) / float(nov_fill - 1U)
         : 0.5f;
-    // pct^2 emphasises genuinely novel moments; base gives ~30 s typical
-    // full-arc traversal at the ~200 FPS render loop, ~6 s at sustained peaks.
-    const float adv = 0.0005f * pct * pct;
+    // LINEAR percentile: rank percentiles are uniform by construction, so the
+    // MEAN advance is exactly base/2 regardless of the novelty distribution —
+    // pct^2 collapsed on spiky novelty (most frames rank low; measured ~20x
+    // slow). base 0.0003 → ~35 s typical full arc at the ~200 FPS render loop.
+    const float adv = 0.0003f * pct;
     hue_shift_speed = SQ15x16(adv);
+#ifdef K1_HUE_AUDIT_V1
+    k1_hue_sweep_pct = pct;  // sweep telemetry (1 Hz HUEAUD line)
+#endif
   }
 #else
   SQ15x16 novelty_now = novelty_curve[rounded_index];

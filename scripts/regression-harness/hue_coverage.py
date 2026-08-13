@@ -45,6 +45,7 @@ DEFAULT_S_FLOOR = 60       # 0-255 S threshold: below = white/grey, huemeaningle
 HUEAUD_RE = re.compile(
     r"HUEAUD,ver=1,ch=(?P<ch>[ps]),lit=(?P<lit>\d+)(?:,mode=(?P<mode>-?\d+))?"
     r"(?:,pal=(?P<pal>\d+))?(?:,pmode=(?P<pmode>[01]))?(?:,acs=(?P<acs>[01]))?"
+    r"(?:,hp=(?P<hp>-?[0-9.]+))?(?:,pct=(?P<pct>-?[0-9.]+))?"
     r",h=(?P<h>[0-9,]+)")
 
 

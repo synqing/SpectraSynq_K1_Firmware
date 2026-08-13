@@ -33,7 +33,8 @@ import serial  # pyserial
 AP_RE = re.compile(r"\[AP\] .*silence=(?P<sil>[01]) ")
 HUEAUD_MODE_RE = re.compile(
     r"HUEAUD,ver=1,ch=p,lit=\d+,mode=(?P<mode>-?\d+)"
-    r"(?:,pal=(?P<pal>\d+),pmode=(?P<pmode>[01]),acs=(?P<acs>[01]))?,h=")
+    r"(?:,pal=(?P<pal>\d+),pmode=(?P<pmode>[01]),acs=(?P<acs>[01]))?"
+    r"(?:,hp=(?P<hp>-?[0-9.]+),pct=(?P<pct>-?[0-9.]+))?,h=")
 
 
 class Leg:
@@ -94,6 +95,9 @@ def main() -> int:
     ap.add_argument("--out", required=True)
     ap.add_argument("--skip-config", action="store_true",
                     help="knobs already applied this session; only mode+capture")
+    ap.add_argument("--edge-off", action="store_true",
+                    help="disable the edge mixer for this leg (layer-5 side door "
+                         "bleeds secondary HSV over the primary; runtime-only)")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -110,6 +114,10 @@ def main() -> int:
         leg.cmd_expect("chroma=0.05", "CHROMA")
         leg.cmd_expect("mood=0.05", "MOOD")
         leg.cmd_expect(f"sweet_spot_min={args.ssl}", "SWEET_SPOT")
+
+    if args.edge_off:
+        print("== edge mixer OFF for this leg")
+        leg.cmd("edge_enabled=off", 1.0)
 
     print(f"== mode {args.mode}")
     leg.cmd(f"set_mode={args.mode}", 1.5)
