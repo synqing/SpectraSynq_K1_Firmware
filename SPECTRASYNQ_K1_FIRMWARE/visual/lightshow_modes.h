@@ -463,7 +463,10 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
     // Silence gate (2026-08-13 twitch fix): in silence the AGC amplifies the
     // noise floor and `energy` jitters — the pull must not yank the position
     // around with no music. Latched-silence zeroes the pull.
-    if (hd_s2.count > 0 && !silence) {
+    // v2: crescendo threshold — the pull acts only on genuine peaks
+    // (energy > 0.35), never on AGC-amplified noise-floor energy; the
+    // latched-silence gate stays as a second barrier.
+    if (hd_s2.count > 0 && !silence && energy > 0.35f) {
       float d_s2 = hd_s2.bright_u - hue;
       if (d_s2 > 0.5f) d_s2 -= 1.0f;
       if (d_s2 < -0.5f) d_s2 += 1.0f;

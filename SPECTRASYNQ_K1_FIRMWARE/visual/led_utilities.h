@@ -1970,8 +1970,13 @@ inline void process_color_shift() {
     // legacy drive's rest came from its absolute floor; restore that property
     // via the pipeline's silence authority (the latched `silence` flag), with
     // a smooth ramp so the sweep parks and wakes without a pop.
+    // v2: the latched `silence` flag alone proved gate-calibration-fragile
+    // (measured 0/59 latches at SSL=187 in a subjectively silent room —
+    // fan/ambient noise holds it open). Rest on the ABSOLUTE novelty floor
+    // (the legacy drive's own 0.10 rest semantics), OR'd with the gate.
     static float k1_sweep_wake = 1.0f;
-    k1_sweep_wake += ((silence ? 0.0f : 1.0f) - k1_sweep_wake) * 0.02f;
+    const float wake_target = (!silence && nv > 0.10f) ? 1.0f : 0.0f;
+    k1_sweep_wake += (wake_target - k1_sweep_wake) * 0.02f;
     const float adv = 0.0003f * pct * k1_sweep_wake;
     hue_shift_speed = SQ15x16(adv);
 #ifdef K1_HUE_AUDIT_V1
