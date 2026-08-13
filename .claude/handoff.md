@@ -19,6 +19,8 @@ just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 **Runbook:** `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`  
 **Pack:** [`_scratch/im69d_resolution_20260810/`](../_scratch/im69d_resolution_20260810/)
 
+**▶ NEXT-AGENT HANDOVER (2026-08-13, session close): [`docs/handover/HANDOVER_2026-08-13_colour_fix_lane.md`](../docs/handover/HANDOVER_2026-08-13_colour_fix_lane.md) — READ FIRST.**
+
 **🎨 COLOUR FORENSICS (2026-08-13) — read BEFORE any colour/palette work:**
 canon `docs/canon/SESSION_CANON_2026-08-13_colour_forensics_config_poison.md` (HF-41..49) ·
 verdict `docs/forensics/colour-nuance-regression-verdict-2026-08-13.md` · skill `k1-colour-truth`.
