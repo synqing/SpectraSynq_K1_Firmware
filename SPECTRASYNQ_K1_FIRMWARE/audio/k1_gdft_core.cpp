@@ -253,6 +253,13 @@ void IRAM_ATTR process_GDFT() {
       USBSerial.print(dc_offset_samples);
       USBSerial.print(" dc_rejected=");
       USBSerial.print(dc_offset_rejected_samples);
+#ifdef K1_CAL_PARTIAL_COMMIT_V1
+      // The learned DC is still live in CONFIG here (the rollback happens below),
+      // so print it unconditionally: a REJECTED cal must still report what Phase A
+      // measured, otherwise every failed window teaches nothing about the DC.
+      USBSerial.print(" dc_learned=");
+      USBSerial.print((int)CONFIG.DC_OFFSET);
+#endif
       USBSerial.print(" ssl_valid=");
       USBSerial.print(noise_cal_ssl_valid ? 1 : 0);
       USBSerial.print(" ssl_samples=");
