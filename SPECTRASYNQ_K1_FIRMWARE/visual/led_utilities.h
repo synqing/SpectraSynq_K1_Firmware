@@ -1895,11 +1895,17 @@ inline void process_color_shift() {
     nov_ring[nov_i] = nv;
     nov_i = (nov_i + 1) & 255U;
     if (nov_fill < 256U) nov_fill++;
-    uint16_t rank = 0;
+    uint16_t below = 0, equal = 0;
     for (uint16_t ni = 0; ni < nov_fill; ni++) {
-      if (nov_ring[ni] < nv) rank++;
+      if (nov_ring[ni] < nv) below++;
+      else if (nov_ring[ni] == nv) equal++;
     }
-    const float pct = (nov_fill > 1U) ? float(rank) / float(nov_fill - 1U) : 0.0f;
+    // MID-RANK for ties: a flat/tied novelty stream must read as pct≈0.5, not 0
+    // — strict ranking re-creates the legacy freeze on exactly the degenerate
+    // input it exists to survive (measured: sweep ran ~10x slow on real music).
+    const float pct = (nov_fill > 1U)
+        ? (float(below) + 0.5f * float(equal - 1U)) / float(nov_fill - 1U)
+        : 0.5f;
     // pct^2 emphasises genuinely novel moments; base gives ~30 s typical
     // full-arc traversal at the ~200 FPS render loop, ~6 s at sustained peaks.
     const float adv = 0.0005f * pct * pct;

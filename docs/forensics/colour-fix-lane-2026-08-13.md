@@ -145,6 +145,40 @@ absent entirely (rendered achromatic → white — invisible to the hue gate). T
 target: fixed-main must deploy 4/4 authored buckets with zero warm-arc white-out, matching
 the palette-derived reference.
 
+### Update — 2026-08-13 (evening): THE COLLAPSE DECOMPOSED — five layers, all measured
+
+Bisect state on bench @ `k1_bench_im69d_hueaud_eq` (palette identity asserted per leg via
+the new `pal=/pmode=/acs=` HUEAUD fields; a live probe caught the bench on **palette 0**
+in one earlier window — show-state boot restore can override the boot palette lock and
+clamps out-of-range indices to 0 — so the driver now hard-fails any leg without pal=40).
+
+| # | Layer | Status | Evidence |
+|---|---|---|---|
+| 1 | `CHROMAGRAM_RANGE` 60→1 config poisoning | FIXED; writer identified (full71) | writer doc |
+| 2 | `NOTE_OFFSET` 0 residual poisoning (era 12) | FIXED (`set_chroma_profile=default`) | config diff |
+| 3 | **Auto-shift sweep FROZEN** — novelty-cubed drive below floor; dominant hue bucket static in every 10 s window | K1_HUE_DRIVE_EQ_V1 percentile drive: **sweep proven moving** (dominant migrated 23→0 across the minute, entropy 1.1→2.8 bits); runs ~10× slow due to strict-`<` tie-ranking on flat novelty — mid-rank fix staged | mode32 legs v1/v2 |
+| 4 | Thin-chroma fallback parked at the CHROMA-knob arc position (palette's first colour) | K1_FALLBACK_HELD_U_V1 staged (held-anchor seed); unmeasured | code + baseline |
+| 5 | **Edge-mixed SECONDARY bleeding non-palette HSV** — waveform_fast ignores palette mode; its note-G teal `hsv(note_colors[7])` (fingerprint-matched to FastLED rainbow 146 → post-gamma (0,.39b,b)) was **55% of all chromatic output**; `SECONDARY_PALETTE_MODE_ENABLED=true` is a dead annotation for it | PROVEN by live kill: `:edge_enabled=off` → teal buckets growth 0, Naberius arcs deploy cleanly (13450/95871/89903/34033 in buckets 0/16/17/18 over ~6 s) | edge-kill probe |
+
+Also disproven: the white-out hypothesis on this config — achromatic-lit is 4% at mean
+V=5/255 (dim greys). "Gold renders white" on the 08-13 ladder was under different
+identity (NOTE_OFFSET=0 / SSL=253 / possibly palette-0 window).
+
+Mode-name discipline: "mode 3" in these legs is **GDFT** (dense-index trap — the driver
+now logs `get_mode_name` and the analyst must read it; asserting the number is measuring
+the annotation).
+
+**Captain live observation (bench on the EQ experiment):** violet less vibrant than
+remembered — consistent with (a) the sweep no longer parking on violet and (b) mode 32's
+temporal RGB EMA desaturating while the position moves. Position-space smoothing (P1
+applied to smoothing: EMA the coordinate, sample the palette last) is the staged next
+candidate for the wake modes.
+
+**Next legs:** tie-rank fix flash → sweep-speed re-measure → eqfb leg → secondary
+palette-honouring fix for waveform_fast (side-door closure, P5.A frame) → S2 per-palette
+excursion. Target: 4/4 authored deployment on Naberius with entropy ≈ authored 1.95 bits,
+zero out-of-palette mass, then the ONE golden-vs-fixed eyes-on.
+
 ## Guard debt from the writer finding
 
 Any control-writing harness MUST `:dump`-snapshot before first write and restore + verify

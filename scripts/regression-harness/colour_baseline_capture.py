@@ -31,7 +31,9 @@ from pathlib import Path
 import serial  # pyserial
 
 AP_RE = re.compile(r"\[AP\] .*silence=(?P<sil>[01]) ")
-HUEAUD_MODE_RE = re.compile(r"HUEAUD,ver=1,ch=p,lit=\d+,mode=(?P<mode>-?\d+),h=")
+HUEAUD_MODE_RE = re.compile(
+    r"HUEAUD,ver=1,ch=p,lit=\d+,mode=(?P<mode>-?\d+)"
+    r"(?:,pal=(?P<pal>\d+),pmode=(?P<pmode>[01]),acs=(?P<acs>[01]))?,h=")
 
 
 class Leg:
@@ -114,14 +116,23 @@ def main() -> int:
     leg.cmd("get_mode_name", 1.0)
     # Verify via the HUEAUD line (1 Hz) — the applied mode, not the request.
     lines = leg.pump(3.0)
-    modes = [int(m.group("mode")) for l in lines
-             if (m := HUEAUD_MODE_RE.search(l))]
-    if not modes:
+    states = [m for l in lines if (m := HUEAUD_MODE_RE.search(l))]
+    if not states:
         raise SystemExit("FATAL: no HUEAUD lines — wrong build on device?")
-    if modes[-1] != args.mode:
-        raise SystemExit(f"FATAL: device reports mode {modes[-1]}, wanted {args.mode} "
-                         f"(dense-index trap — probe the right index)")
-    print(f"  ok mode={modes[-1]}")
+    last = states[-1]
+    if int(last.group("mode")) != args.mode:
+        raise SystemExit(f"FATAL: device reports mode {last.group('mode')}, wanted "
+                         f"{args.mode} (dense-index trap — probe the right index)")
+    # Palette-authority identity (HF-41): the measurement is VOID unless the
+    # palette state is proven. Builds with the pal= fields must show 40/1.
+    if last.group("pal") is not None:
+        pal, pmode = int(last.group("pal")), int(last.group("pmode"))
+        if pal != 40 or pmode != 1:
+            raise SystemExit(f"FATAL: palette state pal={pal} pmode={pmode} — expected "
+                             f"Naberius 40 with palette mode ON (show-state override?)")
+        print(f"  ok mode={last.group('mode')} pal={pal} pmode={pmode} acs={last.group('acs')}")
+    else:
+        print(f"  ok mode={last.group('mode')} (build has no pal= fields — palette UNPROVEN)")
 
     print("== acoustic path proof (10 s)")
     lines = leg.pump(10.0)
