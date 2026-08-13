@@ -193,3 +193,22 @@ is written.
 |------|--------|--------|
 | 2026-08-13 | agent:claude-code | Opened the lane — writer DONE, metric built + proven, tap + env added, instrument design decision recorded, oracle capture protocol defined. |
 | 2026-08-13 | agent:claude-code | Captain override applied: video struck; K1_RENDER_TRACE_V1 LED-level capture added (+ratchets); oracle redefined as palette-derived target; capture-session dependency removed. |
+
+### Update — 2026-08-13 (late): S2 shipped; the gold-hue crusher hunt (instrumented, one step open)
+
+- **S2 (`K1_PALETTE_BRIGHT_EXCURSION_V1`)**: per-palette brightest-stop attractor computed at
+  palette load; energy² pulls sampling toward it (env `k1_bench_im69d_hueaud_s2`). Gates green.
+- **Metric colour-space check**: output gamma is DISABLED (`ENABLE_OUTPUT_GAMMA 0`) — wire
+  bytes are engine bytes; the palette_reference space matches the boundary. Good.
+- **HD-cache identity fingerprint** (`hdn=`/`hd0=` on HUEAUD): **engine PROVEN sampling
+  Naberius** (`hd0=020014`, 10 stops) while the wire's warm mass sits at g/r≈0.17 vs authored
+  gold 0.55. The warm content matched Sunset Real's ratios by coincidence of the crush.
+- **Located so far**: the incandescent FILTER applies whenever `INCANDESCENT_FILTER>0`
+  (INCANDESCENT_MODE=0 does NOT disable it — line ~938); at the configured 0.50 with lookup
+  (1.0, 0.445, 0.156) it takes gold's g/r 0.55→0.397 (era-consistent — same code+value at
+  `db300db`). **Residual ×~0.43 g-crusher unidentified** — candidates: temporal RGB EMA
+  mixing gold with red-adjacent sweep states, S2 pull dynamics, another RGB-space op in the
+  show path. General law confirmed: per-channel nonlinear/multiplicative ops preserve PURE
+  hues (blue) and crush MIXED hues (gold) — the precise mechanism class of "gold dies".
+- **Next leg (defined)**: differential telemetry — log the engine's sampled colour
+  pre-pipeline alongside the wire bytes; the divergence point names the operator in one leg.
