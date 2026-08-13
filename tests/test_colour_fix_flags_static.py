@@ -42,7 +42,13 @@ def _effective_flags(env, sections, seen=None):
         return set()
     seen.add(env)
     body = sections[env]
-    flags = set(re.findall(r"^\s*-D([A-Za-z0-9_]+)", body, re.M))
+    # Match -D anywhere in the (uncommented) section body, not just at line start:
+    # `build_flags = -DFLAG` on one line is valid ini and would otherwise slip the
+    # leak check entirely. Verified by mutation — the line-anchored form missed it.
+    uncommented = "\n".join(
+        l for l in body.splitlines() if not l.lstrip().startswith(("#", ";"))
+    )
+    flags = set(re.findall(r"-D([A-Za-z0-9_]+)", uncommented))
     ext = re.search(r"^extends\s*=\s*env:([^\s]+)", body, re.M)
     if ext:
         flags |= _effective_flags(ext.group(1), sections, seen)
@@ -83,6 +89,53 @@ def test_fix_flags_do_not_leak_into_shippable_envs_pre_promotion():
     assert leaks == {}, (
         f"fix flags reached shippable envs before the gated promotion: {leaks} — "
         "promotion requires the plan's blockers closed + Captain eyes-on"
+    )
+
+
+CAL_FLAG = "K1_CAL_PARTIAL_COMMIT_V1"
+
+
+def test_cal_partial_commit_does_not_leak_into_shippable_envs():
+    """The partial commit changes calibration semantics (a valid DC survives an
+    SSL refusal). It is a bench instrument until device-proven; production must
+    stay byte-inert."""
+    sections = _sections()
+    leaks = sorted(
+        env for env in SHIPPABLE_ENVS
+        if env in sections and CAL_FLAG in _effective_flags(env, sections)
+    )
+    assert leaks == [], f"{CAL_FLAG} reached shippable envs: {leaks}"
+
+
+def test_cal_partial_commit_is_applied_at_every_rollback_exit():
+    """HF class 'a guard that is not called is not a guard': the rollback has TWO
+    exits (restore-previous and no-previous-valid-profile). A partial commit wired
+    to only one of them silently does nothing on the other path — which is exactly
+    the path taken when the previous profile is invalid."""
+    src = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "calibration" /
+           "noise_cal.h").read_text(encoding="utf-8")
+    body = re.search(
+        r"void noise_cal_restore_previous_or_invalidate\(\)\s*\{(.*?)\n\}",
+        src, re.S)
+    assert body, "rollback function not found"
+    calls = len(re.findall(r"noise_cal_commit_partial_dc\s*\(", body.group(1)))
+    assert calls == 2, (
+        f"partial commit is applied at {calls} of the 2 rollback exits — "
+        "an unreached guard is not a guard"
+    )
+
+
+def test_cal_partial_commit_persists_so_reboot_cannot_re_poison():
+    """The cal profile file overwrites CONFIG.DC_OFFSET at boot (bridge_fs.h), so a
+    RAM-only commit is undone by the next reboot (four-way identity, HF-58)."""
+    src = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "calibration" /
+           "noise_cal.h").read_text(encoding="utf-8")
+    fn = re.search(r"void noise_cal_commit_partial_dc\([^)]*\)\s*\{(.*?)\n\}",
+                   src, re.S)
+    assert fn, "noise_cal_commit_partial_dc not found"
+    assert "save_calibration_profile" in fn.group(1), (
+        "partial commit does not persist the profile — the boot-time profile "
+        "load would restore the stale DC on the next reboot"
     )
 
 

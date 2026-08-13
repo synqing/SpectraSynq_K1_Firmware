@@ -318,3 +318,86 @@ threshold >0.35). Remaining driver is UPSTREAM:
 - Device: bench @ a999a6fc+wake-v3 (k1_bench_im69d_colourfix), port drifted to
   cu.usbmodem12401 (override --upload-port; env pins 12201). SSL manually 6000 (units
   inflated by the DC phantom — revert after DC fix). Bose/room state: Captain present.
+
+### Update — 2026-08-14: cal partial-commit lands; root cause moves UPSTREAM to the mic
+
+Device-proven on bench `B489A500` @ `k1_bench_im69d_calfix` (git `1ce5db63`, epoch
+1786641564, flash verified by exit code + new epoch).
+
+**1. The partial-commit fix works — first calibration result this lane has ever kept.**
+Under a Captain-confirmed silence window:
+
+```
+NOISE CAL QUALITY: reason=ssl_samples dc_valid=1 dc_samples=12192 dc_rejected=0
+                   dc_learned=1894 ssl_valid=0 ssl_samples=0 ssl_rejected=112
+NOISE CAL PARTIAL: dc_committed=1894 ssl_kept=57 reason=ssl_samples persisted=1
+```
+Post-cal telemetry confirms `DC=1894 cal_source=measured` — committed AND persisted.
+
+**2. HF-61's DC figure is REFUTED; the mechanism is corrected.** The handover carried
+"true DC ≈ −1523". The measured value is **+1894** (persisted was 91). The claimed
+self-lock mechanism — "SSL fails *because* SSL is evaluated under the stale DC" — is
+also refuted by the code: `start_noise_cal()` zeroes `CONFIG.DC_OFFSET` before Phase A,
+and DC is stamped at iter 128 *before* Phase B samples SSL. The cal never runs under the
+stale DC. Partial commit is still correct and necessary, but for a different reason: SSL
+genuinely cannot pass in this room, so without it the DC could never be refreshed at all.
+
+**3. The "×140 unexplained" scaling is REFUTED — it was a units error.** Measured
+`max_raw / raw_i16_abs_peak` = 9575/494 = **19.4**, matching the documented chain
+`K1_MIC_IM69D_INPUT_GAIN (8.0) × k1_effective_sensitivity (≈2.24)`. The ×140 came from
+comparing a raw *RMS* against a processed *peak*. No missing gain stage exists.
+
+**4. ROOT CAUSE MOVES UPSTREAM: the microphone floor is ~35 dB too high.**
+In a Captain-confirmed silent room the RAW int16 (pre-gain, pre-DC) reads
+`rms p50 180, peak p50 300, peak max 845`. At the last ACCEPTED calibration on this same
+gain (G=8, 2026-08-05, SSL=111 / p90=101 waveform units) the equivalent raw peak was
+≈ 101/19.4 ≈ **5**. Today's floor is ~58× (~35 dB) higher.
+
+Consequences, all measured: 112/112 Phase-B frames exceed `NOISE_CAL_SSL_PHASE_B_MAX_RAW`
+(1500) so SSL can never learn; `silence` never latches (0/19 frames in silence); the tempo
+engine finds structure in the noise (`bpm=82..99`, onsets firing with zero sound) — which
+IS the "full-bore twitching in silence" report. The colour layer is downstream of all of it.
+
+Correcting DC 91 → 1894 removed the pedestal (silence `max_raw` floor 3530 → 1959) but did
+NOT fix the baseline, because the residue is AC mic noise, not DC.
+
+**Two live hypotheses, not yet separated** — next diagnostic, needs no Captain:
+(a) the room genuinely carries that noise (fan/aircon near the bench);
+(b) [favoured] the IM69D PDM front-end has regressed — clock/decimation/DSR mode or a
+    wiring fault generating noise at the raw int16 level.
+Decisive cheap test: enable `K1_MIC_IM69D_STEREO_V1` and emit the RIGHT-channel raw RMS on
+the AP line. If an unused/duplicate channel carries the same floor, the noise is electrical,
+not acoustic. Also worth a same-bench comparison against an IM73D build.
+
+**5. Production byte-drift resolved — NOT a leak.** `k1_hardware` stable sections at
+`eb592b08` (last commit before the colour/diag lane) are byte-identical to HEAD
+(`8802e9ca…`, orchestrator-verified by independent rebuild), and its per-section hashes are
+`72417182 / afa23c99 / d383aa70` — exactly the reference this lane has cited throughout. The
+`mic_stable_byte_gate.sh` *combined* reference was stale-by-toolchain (Arduino framework
+reinstalled 2026-08-12, after the reference was recorded). Reference re-recorded; all three
+envs now green. Evidence: `_scratch/byte_drift_bisect_2026-08-14.md`.
+
+#### PDM clock probe (DSR_16S) — INCONCLUSIVE, do not cite either way
+
+Hypothesis: the IM69D path takes `I2S_PDM_RX_CLK_DEFAULT_CONFIG(12800)` = **DSR_8S**
+=> PDM clock 12800 x 64 = **819 kHz**. `K1_MIC_IM69D_DSR_16S_V1` selects DSR_16S
+=> 1.638 MHz. If the modulator is being clocked outside its intended band, that could
+plausibly account for a ~35 dB floor excess that a normal DSR change (~2 dB) cannot.
+
+Env `k1_bench_im69d_calfix_dsr16` built, flashed and verified (git `19e7540f`,
+epoch 1786642801). Measured floor: `raw_i16_rms p50 284.7, peak p50 426` versus
+DSR_8S `p50 180 / 300`.
+
+**This comparison is CONFOUNDED and proves nothing.** The DSR_8S window was taken under
+a Captain-confirmed silence window; the DSR_16S window was taken after music resumed. The
+two legs differ in acoustic conditions as well as in the variable under test, so the delta
+is not attributable — the classic paired-control failure. The probe env is retained; the
+measurement must be REDONE with both legs under identical conditions before the PDM-clock
+hypothesis is either accepted or discarded.
+
+Device returned to `k1_bench_im69d_calfix` as the canonical state.
+
+**Recommended decisive test (condition-independent, no Captain):** enable
+`K1_MIC_IM69D_STEREO_V1` and emit the RIGHT-channel raw RMS on the `[AP]` line. Both
+channels see the same instant, so an unused/duplicate channel carrying the same floor is
+electrical, not acoustic — a within-frame control that no room condition can confound.

@@ -67,8 +67,16 @@ if [[ -n "$PORT" ]]; then
 fi
 
 # ── 2. flash. The pio upload guard verifies chip-id ↔ env on its own. ──────────
+# --port was previously used ONLY to verify identity, never to drive the upload,
+# so an explicit port was silently ignored and the env's pinned upload_port won.
+# USB port numbers drift between sessions while chip identity does not, so the
+# caller's port must reach pio too or the flash aborts on a stale pinned port.
 say "Flashing $ENV_NAME"
-pio run -e "$ENV_NAME" --target upload
+if [[ -n "$PORT" ]]; then
+  pio run -e "$ENV_NAME" --target upload --upload-port "$PORT"
+else
+  pio run -e "$ENV_NAME" --target upload
+fi
 
 # ── 3. prove the device is running what we just built ─────────────────────────
 sleep 6

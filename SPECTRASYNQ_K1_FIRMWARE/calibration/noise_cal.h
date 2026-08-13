@@ -16,7 +16,53 @@ void noise_cal_snapshot_current_profile() {
   }
 }
 
+#ifdef K1_CAL_PARTIAL_COMMIT_V1
+// Re-stamp a Phase-A-validated DC over whatever the rollback just restored, and
+// persist it if the resulting profile is self-consistent. Persistence matters:
+// the cal profile file overwrites CONFIG.DC_OFFSET at boot (bridge_fs.h), so a
+// RAM-only partial commit would be undone by the next reboot (four-way identity).
+void noise_cal_commit_partial_dc(int32_t dc_value) {
+  CONFIG.DC_OFFSET = dc_value;
+  USBSerial.print("NOISE CAL PARTIAL: dc_committed=");
+  USBSerial.print(dc_value);
+  USBSerial.print(" ssl_kept=");
+  USBSerial.print(CONFIG.SWEET_SPOT_MIN_LEVEL);
+  USBSerial.print(" reason=");
+  USBSerial.print(noise_cal_reject_reason_name(noise_cal_reject_reason));
+  if (calibration_profile_valid()) {
+    save_config();
+    save_calibration_profile(CAL_SOURCE_MEASURED);
+    calibration_refresh_status(CAL_SOURCE_MEASURED);
+    USBSerial.println(" persisted=1");
+  } else {
+    // SSL is out of its valid band, so the profile as a whole cannot be written.
+    // The DC still stands for this session; say so rather than implying a save.
+    USBSerial.println(" persisted=0 (profile invalid: SSL out of band)");
+  }
+}
+#endif
+
 void noise_cal_restore_previous_or_invalidate() {
+#ifdef K1_CAL_PARTIAL_COMMIT_V1
+  // PARTIAL COMMIT (2026-08-14). A multi-quantity calibration must be able to
+  // land the quantities that measured cleanly even when a sibling quantity
+  // legitimately refuses, otherwise it cannot self-heal.
+  //
+  // DC and SSL are measured independently and in that order: start_noise_cal()
+  // zeroes CONFIG.DC_OFFSET, Phase A (iters 0..127) learns the true mean from
+  // that zeroed base, and the result is stamped at iter 128 BEFORE Phase B
+  // samples SSL. So a Phase-B/SSL refusal says nothing about the DC's validity.
+  // The all-or-nothing rollback nevertheless discarded the good DC, and the
+  // runtime then kept animating on a stale DC pedestal. The room only has to be
+  // quiet enough for SSL to pass, never for DC — so under a persistently noisy
+  // ambient the DC could never be refreshed at all.
+  //
+  // Keep the freshly measured DC; restore everything else; report loudly.
+  const int32_t partial_dc_value = CONFIG.DC_OFFSET;
+  const bool partial_dc_commit =
+      noise_cal_dc_valid && !noise_cal_ssl_valid &&
+      calibration_abs_i32(partial_dc_value) <= NOISE_CAL_DC_MAX_VALID_ABS;
+#endif
   if (noise_cal_previous_valid) {
     CONFIG.DC_OFFSET = noise_cal_previous_dc_offset;
     CONFIG.SWEET_SPOT_MIN_LEVEL = noise_cal_previous_sweet_spot_min;
@@ -29,6 +75,11 @@ void noise_cal_restore_previous_or_invalidate() {
     calibration_profile_loaded = noise_cal_previous_profile_loaded;
     calibration_refresh_status(noise_cal_previous_source);
     USBSerial.println("NOISE CAL RESTORED PREVIOUS VALID PROFILE");
+#ifdef K1_CAL_PARTIAL_COMMIT_V1
+    if (partial_dc_commit) {
+      noise_cal_commit_partial_dc(partial_dc_value);
+    }
+#endif
     return;
   }
 
@@ -48,6 +99,11 @@ void noise_cal_restore_previous_or_invalidate() {
   max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // seed division denominator (NaN guard)
 #endif
   USBSerial.println("NOISE CAL HAS NO PREVIOUS VALID PROFILE");
+#ifdef K1_CAL_PARTIAL_COMMIT_V1
+  if (partial_dc_commit) {
+    noise_cal_commit_partial_dc(partial_dc_value);
+  }
+#endif
 }
 
 void start_noise_cal() {
