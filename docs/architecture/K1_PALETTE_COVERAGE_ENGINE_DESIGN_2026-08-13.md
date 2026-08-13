@@ -92,9 +92,49 @@ capture driver + metric are the fitness harness. The one genuinely new mechanism
 the running-CDF equaliser (S3) and the servo law (S4), both tiny (a quantile sketch
 and a per-bucket deficit bias).
 
+## 5. The determinism contract (Captain's follow-up: "does the AP need an overhaul
+## so it is deterministic and predictable?")
+
+**Opinion: yes to a determinism CONTRACT, no to a rewrite.** Three distinct properties
+are tangled in the word "deterministic"; the AP already has one, half-has another, and
+is missing the third:
+
+1. **Replay determinism** — same input → same features. The DSP core (GDFT, onset,
+   tempo, chord) already has this and it is harness-proven (the 1000-test replay gate,
+   vp_probe Tier A hashes). Keep; do not touch.
+2. **State transparency** — same (input × state × config) → same output, with NO hidden
+   state. This is where the pipeline fails today, and it is why behaviour feels
+   unpredictable: the adaptive mesh (per-band AGC, loud-guard, silence/joint/sparseness
+   gates, held-hue anchors, flywheels) carries memories that are not dumpable, not
+   seedable, and persist across boots in FOUR different stores (bin × blob × knob store
+   × cal profile — measured 2026-08-13). The overhaul: every adaptive memory becomes a
+   named, `:dump`-visible, replay-injectable state block, and the composition becomes a
+   contract-tested pure function of (input, state, config). Cost: mostly plumbing;
+   the replay harness then extends from DSP into the full colour drive, and HF-43's
+   "take the state" captures EVERYTHING — an approved look becomes reproducible forever.
+3. **Distribution predictability** — outputs with guaranteed statistics regardless of
+   programme material or gain staging. Stacked multiplicative adaptive gates can never
+   provide this (each was tuned in a different era; their product is regime-chaotic —
+   the collapse chain IS four adaptive stages compounding). The S3 percentile equaliser
+   provides it by construction: "the palette position is uniform over the arc in any
+   60 s window with music present" is a provable invariant, immune to upstream gain.
+
+**Two structural rules complete the contract:** gates decide WHETHER to render, never
+WHAT colour (authority must not change hands at a gate crossing — that hand-off is
+exactly how gold became white); and variety is authored stochasticity — seeded,
+bounded, replayable — never accidental (part of the remembered richness was NaN
+chaos; determinism of the machinery with deliberate bounded wander in the output
+keeps the character AND the reproducibility).
+
+**Sequencing:** do not block the colour fix lane on this. S1/S2 land first under the
+metric; S3 is simultaneously the first determinism deliverable; state transparency
+(the dump/seed/replay plumbing) is its own follow-on lane, guided by the existing
+harness. Evolution under test, not revolution.
+
 ---
 **Document Changelog**
 
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-08-13 | agent:claude-code | Created — diagnosis, principles (arc monism, equalisation, coverage servo), staged plan S1–S5, reuse map. In answer to Captain's palette-maximisation question. |
+| 2026-08-13 | agent:claude-code | §5 determinism contract added — replay determinism (have), state transparency (missing, the overhaul), distribution predictability (S3), gates-never-choose-colour rule, authored-stochasticity rule, sequencing. |
