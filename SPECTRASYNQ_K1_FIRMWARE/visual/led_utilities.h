@@ -1875,6 +1875,37 @@ inline void process_color_shift() {
     rounded_index += SPECTRAL_HISTORY_LENGTH;
   }
 
+#ifdef K1_HUE_DRIVE_EQ_V1
+  // S3 EQUALISED SWEEP DRIVE (colour fix lane, 2026-08-13 — design doc
+  // K1_PALETTE_COVERAGE_ENGINE_DESIGN §2/P3, §5/property 3). The legacy drive
+  // below maps ABSOLUTE novelty through strip-floor + cube + cap: any signal-
+  // chain change that halves novelty cuts sweep speed 8x and drops it under the
+  // floor — measured frozen for a full minute on the bench (dominant hue bucket
+  // static across every 10 s window). This path replaces it with the running
+  // PERCENTILE of novelty over the last 256 frames: whatever the programme
+  // material or gain staging, the sweep speed distribution is fixed by
+  // construction (distribution predictability). Music stays the driver — the
+  // silence path still decays the sweep to rest.
+  {
+    static float nov_ring[256] = { 0.0f };
+    static uint16_t nov_i = 0;
+    static uint16_t nov_fill = 0;
+    float nv = float(novelty_curve[rounded_index]);
+    if (!isfinite(nv) || nv < 0.0f) nv = 0.0f;
+    nov_ring[nov_i] = nv;
+    nov_i = (nov_i + 1) & 255U;
+    if (nov_fill < 256U) nov_fill++;
+    uint16_t rank = 0;
+    for (uint16_t ni = 0; ni < nov_fill; ni++) {
+      if (nov_ring[ni] < nv) rank++;
+    }
+    const float pct = (nov_fill > 1U) ? float(rank) / float(nov_fill - 1U) : 0.0f;
+    // pct^2 emphasises genuinely novel moments; base gives ~30 s typical
+    // full-arc traversal at the ~200 FPS render loop, ~6 s at sustained peaks.
+    const float adv = 0.0005f * pct * pct;
+    hue_shift_speed = SQ15x16(adv);
+  }
+#else
   SQ15x16 novelty_now = novelty_curve[rounded_index];
 
   // Remove bottom 10%, stretch values to still occupy full 0.0-1.0 range
@@ -1896,6 +1927,7 @@ inline void process_color_shift() {
   } else {
     hue_shift_speed *= SQ15x16(0.99);
   }
+#endif
 
   // Add and wrap
   hue_position += (hue_shift_speed * hue_push_direction);

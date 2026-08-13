@@ -119,8 +119,16 @@ static CRGB16 tempo_peak_fallback_colour(const RenderParams* rp, bool render_sec
     const CRGBPalette16& pal =
         cached_gradient_palette(render_params_palette_index(rp, render_secondary),
                                 render_secondary);
+#ifdef K1_FALLBACK_HELD_U_V1
+    // S1 fallback bound: seed from the engine's live musical anchor, not the
+    // CHROMA knob (see light_mode_waveform_hybrid_k1.cpp for the measurement).
+    const float fb_u = k1_palette_held_u_valid ? k1_palette_held_u : float(rp->CHROMA);
+    fallback_col = clamp_crgb16(
+        palette_manual_colour(pal, SQ15x16(fb_u), SQ15x16(fb)));
+#else
     fallback_col = clamp_crgb16(
         palette_manual_colour(pal, SQ15x16(rp->CHROMA), SQ15x16(fb)));
+#endif
     const float fb_max = fmaxf(fmaxf(float(fallback_col.r), float(fallback_col.g)),
                                float(fallback_col.b));
     if (fb > 0.0f && fb_max < 0.02f) {
