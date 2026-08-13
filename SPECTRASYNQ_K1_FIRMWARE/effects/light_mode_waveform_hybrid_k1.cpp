@@ -231,25 +231,41 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   // Temporal RGB EMA (tau 0.163 s) — THE hybrid signature. dt-corrected.
   const float a_col = 1.0f - expf(-dt / WFHYB_TAU_COLOUR);
 #ifdef K1_POSITION_SMOOTH_V1
-  // S-candidate: HUE-SAFE smoothing (design P1 applied to smoothing). RGB EMA
-  // between distant palette colours passes through grey/red and is stage 1 of
-  // the measured gold kill. Instead: EMA the LUMINANCE trajectory only, and
-  // renormalise the smoothed colour back to the CURRENT frame's hue/sat ratios
-  // — motion stays as smooth (same tau on perceived level), hue stays a
-  // palette identity every frame.
+  // v2 (2026-08-13 twitch fix): v1 renormalised to the CURRENT frame's hue,
+  // which made hue UNSMOOTHED — instant per-frame colour steps read as
+  // full-bore twitching, worst in silence/noise. v2 restores the legacy
+  // temporal RGB EMA (hue moves at the hybrid's authored tau again) and fixes
+  // the ORIGINAL defect differently: re-saturate the EMA'd colour toward the
+  // EMA of the INPUT saturations, so gold↔violet transitions no longer dwell
+  // in grey/white while hue stays temporally smooth.
   {
-    const float cur_max = fmaxf(fmaxf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
-    float prev_lum = fmaxf(fmaxf(fx.wfhyb_dot_r, fx.wfhyb_dot_g), fx.wfhyb_dot_b);
-    const float lum = prev_lum + (cur_max - prev_lum) * a_col;
-    if (cur_max > 0.001f) {
-      const float k = lum / cur_max;
-      fx.wfhyb_dot_r = float(raw_col.r) * k;
-      fx.wfhyb_dot_g = float(raw_col.g) * k;
-      fx.wfhyb_dot_b = float(raw_col.b) * k;
-    } else {
-      fx.wfhyb_dot_r *= (1.0f - a_col);
-      fx.wfhyb_dot_g *= (1.0f - a_col);
-      fx.wfhyb_dot_b *= (1.0f - a_col);
+    fx.wfhyb_dot_r += (float(raw_col.r) - fx.wfhyb_dot_r) * a_col;
+    fx.wfhyb_dot_g += (float(raw_col.g) - fx.wfhyb_dot_g) * a_col;
+    fx.wfhyb_dot_b += (float(raw_col.b) - fx.wfhyb_dot_b) * a_col;
+    // input saturation, EMA'd with the same tau (per-channel static state:
+    // primary/secondary render on distinct fx instances via this function).
+    const float cmx = fmaxf(fmaxf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
+    const float cmn = fminf(fminf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
+    const float cur_sat = (cmx > 0.001f) ? (1.0f - cmn / cmx) : 0.0f;
+    static float sat_ema_prim = 0.0f, sat_ema_sec = 0.0f;
+    float& sat_ema = render_secondary ? sat_ema_sec : sat_ema_prim;
+    sat_ema += (cur_sat - sat_ema) * a_col;
+    // re-saturate the EMA'd colour: pull the two lower channels toward the
+    // level that yields sat_ema, preserving the max channel (hue + level).
+    const float emx = fmaxf(fmaxf(fx.wfhyb_dot_r, fx.wfhyb_dot_g), fx.wfhyb_dot_b);
+    const float emn = fminf(fminf(fx.wfhyb_dot_r, fx.wfhyb_dot_g), fx.wfhyb_dot_b);
+    if (emx > 0.001f && emx > emn) {
+      const float have_sat = 1.0f - emn / emx;
+      if (sat_ema > have_sat + 0.01f) {
+        const float target_mn = emx * (1.0f - sat_ema);
+        const float k = (emx - target_mn) / (emx - emn);  // >1 never; scales spread up
+        fx.wfhyb_dot_r = emx - (emx - fx.wfhyb_dot_r) * k;
+        fx.wfhyb_dot_g = emx - (emx - fx.wfhyb_dot_g) * k;
+        fx.wfhyb_dot_b = emx - (emx - fx.wfhyb_dot_b) * k;
+        if (fx.wfhyb_dot_r < 0.0f) fx.wfhyb_dot_r = 0.0f;
+        if (fx.wfhyb_dot_g < 0.0f) fx.wfhyb_dot_g = 0.0f;
+        if (fx.wfhyb_dot_b < 0.0f) fx.wfhyb_dot_b = 0.0f;
+      }
     }
   }
 #else

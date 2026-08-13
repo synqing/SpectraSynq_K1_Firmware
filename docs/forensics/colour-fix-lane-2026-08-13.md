@@ -299,3 +299,22 @@ sections byte-identical (72417182/afa23c99/d383aa70).
 exclusion, mutation-checked) · production-shaped build of the six fixes without instruments
 · measure the O(256)/frame rank scan (or make it incremental) · S2 validation on the 13
 flagged palettes (or per-palette need term) · ENERGY_EXCURSION retirement per §4.
+
+### Update — 2026-08-13 (twitch root cause, AP level) — HANDOVER-CRITICAL
+
+Twitch chain fully traced. Colour-side fixes landed (sweep rest v3 = ring peak/mean
+structure detector, PROVEN: silence 0.00000/s, music 0.0025/s; smoothing v2; S2 energy
+threshold >0.35). Remaining driver is UPSTREAM:
+- Mic raw is QUIET in silence (int16 rms≈43 ≈ −57 dBFS) while max_raw reads 3-10k with
+  cv=0.37 — phantom baseline. AGC innocent (gain pinned 0.1).
+- **[HYPOTHESIS, strong] stale DC subtraction**: profile DC=91; cal's own DC pass measures
+  ≈−1523 (dc_valid=1, 12k samples, 0 rejected) but the ALL-OR-NOTHING rollback discards it
+  when SSL fails — and SSL fails BECAUSE silence samples evaluated against stale DC read
+  ~4000 → rejected-high (108-112/112, p50=0.0). Self-locking failure.
+- **FIX PLAN (next session, small + gated):** cal partial-commit — when dc_valid=1 &&
+  ssl_valid=0, commit the measured DC, keep prior SSL, report PARTIAL; then a second cal
+  pass yields clean SSL. Cal remains Captain-verbal-gated. Then re-verify silence latch +
+  music response (corr(peak,lit) was 0.02 — expect real coupling once DC is right).
+- Device: bench @ a999a6fc+wake-v3 (k1_bench_im69d_colourfix), port drifted to
+  cu.usbmodem12401 (override --upload-port; env pins 12201). SSL manually 6000 (units
+  inflated by the DC phantom — revert after DC fix). Bose/room state: Captain present.

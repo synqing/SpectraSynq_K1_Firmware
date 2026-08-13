@@ -1962,7 +1962,32 @@ inline void process_color_shift() {
     // MEAN advance is exactly base/2 regardless of the novelty distribution —
     // pct^2 collapsed on spiky novelty (most frames rank low; measured ~20x
     // slow). base 0.0003 → ~35 s typical full arc at the ~200 FPS render loop.
-    const float adv = 0.0003f * pct;
+    //
+    // SILENCE REST (2026-08-13 twitch regression fix): percentile equalisation
+    // deliberately destroys absolute scale, so the percentile of NOISE within
+    // noise is still uniform — without an absolute gate the sweep runs at mean
+    // speed in dead silence (measured: full-bore motion with zero sound). The
+    // legacy drive's rest came from its absolute floor; restore that property
+    // via the pipeline's silence authority (the latched `silence` flag), with
+    // a smooth ramp so the sweep parks and wakes without a pop.
+    // v3 REST SIGNAL = TEMPORAL STRUCTURE, not level (v1 gate-flag: never
+    // latched under ambient; v2 absolute 0.10 floor: above this chain's real
+    // novelty range — froze under LOUD MUSIC, measured). Music novelty is
+    // SPIKY, silence and steady fan noise are FLAT — so wake on the novelty
+    // ring's dynamic range relative to its mean (scale-free, self-calibrating,
+    // fan-immune). The latched silence gate stays as a second barrier.
+    static float k1_sweep_wake = 1.0f;
+    float ring_max = 0.0f, ring_sum = 0.0f;
+    for (uint16_t wi = 0; wi < nov_fill; wi++) {
+      if (nov_ring[wi] > ring_max) ring_max = nov_ring[wi];
+      ring_sum += nov_ring[wi];
+    }
+    const float ring_mean = (nov_fill > 0U) ? ring_sum / float(nov_fill) : 0.0f;
+    // structured = peaks stand well above the mean (music); flat = rest.
+    const bool structured = (ring_max > 1e-4f) && (ring_max > ring_mean * 2.5f);
+    const float wake_target = (!silence && structured) ? 1.0f : 0.0f;
+    k1_sweep_wake += (wake_target - k1_sweep_wake) * 0.02f;
+    const float adv = 0.0003f * pct * k1_sweep_wake;
     hue_shift_speed = SQ15x16(adv);
 #ifdef K1_HUE_AUDIT_V1
     k1_hue_sweep_pct = pct;  // sweep telemetry (1 Hz HUEAUD line)
