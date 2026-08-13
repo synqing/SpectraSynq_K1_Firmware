@@ -933,6 +933,31 @@ inline void show_leds() {
 #endif
   apply_brightness();
 
+#ifdef K1_HUE_AUDIT_V1
+  // PRE-PIPELINE hue tap (differential telemetry): histogram of leds_16 BEFORE
+  // incandescent/base-coat/scaling. Divergence between this and the post-gamma
+  // wire histogram names the stage that crushes mixed hues. Cumulative, like
+  // the wire tap; same chromatic gate.
+  {
+    for (uint16_t i = 0; i < NATIVE_RESOLUTION; i++) {
+      const float rf = float(leds_16[i].r), gf = float(leds_16[i].g), bf = float(leds_16[i].b);
+      const uint8_t r = uint8_t((rf < 0.f ? 0.f : (rf > 1.f ? 1.f : rf)) * 255.0f);
+      const uint8_t g = uint8_t((gf < 0.f ? 0.f : (gf > 1.f ? 1.f : gf)) * 255.0f);
+      const uint8_t b = uint8_t((bf < 0.f ? 0.f : (bf > 1.f ? 1.f : bf)) * 255.0f);
+      uint8_t mx = r; if (g > mx) mx = g; if (b > mx) mx = b;
+      uint8_t mn = r; if (g < mn) mn = g; if (b < mn) mn = b;
+      const uint8_t d = mx - mn;
+      if (mx <= 2 || d < 8) continue;
+      int16_t h;
+      if (mx == r)      h = int16_t(43 * (int16_t(g) - int16_t(b)) / d);
+      else if (mx == g) h = int16_t(85 + 43 * (int16_t(b) - int16_t(r)) / d);
+      else              h = int16_t(171 + 43 * (int16_t(r) - int16_t(g)) / d);
+      if (h < 0) h += 256;
+      const uint8_t bucket = uint8_t((uint16_t(h) * 24U) >> 8U);
+      k1_hue_hist_pre[bucket] = k1_hue_hist_pre[bucket] + 1U;
+    }
+  }
+#endif
   if (CONFIG.INCANDESCENT_MODE) {
     force_incandescent_colour(leds_16, NATIVE_RESOLUTION);
   } else if (CONFIG.INCANDESCENT_FILTER > 0.0) {
