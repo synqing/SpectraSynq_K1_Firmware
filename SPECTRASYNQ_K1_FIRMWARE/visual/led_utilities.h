@@ -1970,12 +1970,22 @@ inline void process_color_shift() {
     // legacy drive's rest came from its absolute floor; restore that property
     // via the pipeline's silence authority (the latched `silence` flag), with
     // a smooth ramp so the sweep parks and wakes without a pop.
-    // v2: the latched `silence` flag alone proved gate-calibration-fragile
-    // (measured 0/59 latches at SSL=187 in a subjectively silent room —
-    // fan/ambient noise holds it open). Rest on the ABSOLUTE novelty floor
-    // (the legacy drive's own 0.10 rest semantics), OR'd with the gate.
+    // v3 REST SIGNAL = TEMPORAL STRUCTURE, not level (v1 gate-flag: never
+    // latched under ambient; v2 absolute 0.10 floor: above this chain's real
+    // novelty range — froze under LOUD MUSIC, measured). Music novelty is
+    // SPIKY, silence and steady fan noise are FLAT — so wake on the novelty
+    // ring's dynamic range relative to its mean (scale-free, self-calibrating,
+    // fan-immune). The latched silence gate stays as a second barrier.
     static float k1_sweep_wake = 1.0f;
-    const float wake_target = (!silence && nv > 0.10f) ? 1.0f : 0.0f;
+    float ring_max = 0.0f, ring_sum = 0.0f;
+    for (uint16_t wi = 0; wi < nov_fill; wi++) {
+      if (nov_ring[wi] > ring_max) ring_max = nov_ring[wi];
+      ring_sum += nov_ring[wi];
+    }
+    const float ring_mean = (nov_fill > 0U) ? ring_sum / float(nov_fill) : 0.0f;
+    // structured = peaks stand well above the mean (music); flat = rest.
+    const bool structured = (ring_max > 1e-4f) && (ring_max > ring_mean * 2.5f);
+    const float wake_target = (!silence && structured) ? 1.0f : 0.0f;
     k1_sweep_wake += (wake_target - k1_sweep_wake) * 0.02f;
     const float adv = 0.0003f * pct * k1_sweep_wake;
     hue_shift_speed = SQ15x16(adv);
