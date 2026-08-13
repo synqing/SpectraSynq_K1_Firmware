@@ -396,6 +396,13 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
     held_hue_valid = true;
   }
 
+#ifdef K1_FALLBACK_HELD_U_V1
+  // Write-through mirror of the live anchor for effect-level fallbacks
+  // (globals.h). This engine's behaviour is unchanged.
+  k1_palette_held_u = held_centroid_hue;
+  k1_palette_held_u_valid = held_hue_valid;
+#endif
+
   if (!isfinite(hue_offset)) hue_offset = 0.0f;
   hue += hue_offset;
   hue -= floorf(hue);

@@ -1875,6 +1875,48 @@ inline void process_color_shift() {
     rounded_index += SPECTRAL_HISTORY_LENGTH;
   }
 
+#ifdef K1_HUE_DRIVE_EQ_V1
+  // S3 EQUALISED SWEEP DRIVE (colour fix lane, 2026-08-13 — design doc
+  // K1_PALETTE_COVERAGE_ENGINE_DESIGN §2/P3, §5/property 3). The legacy drive
+  // below maps ABSOLUTE novelty through strip-floor + cube + cap: any signal-
+  // chain change that halves novelty cuts sweep speed 8x and drops it under the
+  // floor — measured frozen for a full minute on the bench (dominant hue bucket
+  // static across every 10 s window). This path replaces it with the running
+  // PERCENTILE of novelty over the last 256 frames: whatever the programme
+  // material or gain staging, the sweep speed distribution is fixed by
+  // construction (distribution predictability). Music stays the driver — the
+  // silence path still decays the sweep to rest.
+  {
+    static float nov_ring[256] = { 0.0f };
+    static uint16_t nov_i = 0;
+    static uint16_t nov_fill = 0;
+    float nv = float(novelty_curve[rounded_index]);
+    if (!isfinite(nv) || nv < 0.0f) nv = 0.0f;
+    nov_ring[nov_i] = nv;
+    nov_i = (nov_i + 1) & 255U;
+    if (nov_fill < 256U) nov_fill++;
+    uint16_t below = 0, equal = 0;
+    for (uint16_t ni = 0; ni < nov_fill; ni++) {
+      if (nov_ring[ni] < nv) below++;
+      else if (nov_ring[ni] == nv) equal++;
+    }
+    // MID-RANK for ties: a flat/tied novelty stream must read as pct≈0.5, not 0
+    // — strict ranking re-creates the legacy freeze on exactly the degenerate
+    // input it exists to survive (measured: sweep ran ~10x slow on real music).
+    const float pct = (nov_fill > 1U)
+        ? (float(below) + 0.5f * float(equal - 1U)) / float(nov_fill - 1U)
+        : 0.5f;
+    // LINEAR percentile: rank percentiles are uniform by construction, so the
+    // MEAN advance is exactly base/2 regardless of the novelty distribution —
+    // pct^2 collapsed on spiky novelty (most frames rank low; measured ~20x
+    // slow). base 0.0003 → ~35 s typical full arc at the ~200 FPS render loop.
+    const float adv = 0.0003f * pct;
+    hue_shift_speed = SQ15x16(adv);
+#ifdef K1_HUE_AUDIT_V1
+    k1_hue_sweep_pct = pct;  // sweep telemetry (1 Hz HUEAUD line)
+#endif
+  }
+#else
   SQ15x16 novelty_now = novelty_curve[rounded_index];
 
   // Remove bottom 10%, stretch values to still occupy full 0.0-1.0 range
@@ -1896,6 +1938,7 @@ inline void process_color_shift() {
   } else {
     hue_shift_speed *= SQ15x16(0.99);
   }
+#endif
 
   // Add and wrap
   hue_position += (hue_shift_speed * hue_push_direction);

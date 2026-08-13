@@ -197,6 +197,15 @@ inline volatile float    k1_mx_df_inject = -1.0f;   // last Dense Forge inject_s
 // (k1_bench_im69d_hueaud) — never production.
 inline volatile uint32_t k1_hue_hist_primary[24] = { 0 }; // 15-deg hue buckets
 inline volatile uint16_t k1_hue_lit_primary = 0;          // last-frame chromatic px
+inline volatile float    k1_hue_sweep_pct = -1.0f;        // EQ drive percentile (-1 = legacy drive)
+#endif
+#ifdef K1_FALLBACK_HELD_U_V1
+// Colour-fix-lane S1 (design doc §2/P1): the palette engine's live musical
+// anchor (held centroid arc position), write-through mirrored from the statics
+// in palette_chroma_colour_with_offset so effect-level fallbacks can seed from
+// the LAST LIVE position instead of the CHROMA knob. Core-1 write, Core-1 read.
+inline float k1_palette_held_u = 0.0f;
+inline bool  k1_palette_held_u_valid = false;
 #endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };

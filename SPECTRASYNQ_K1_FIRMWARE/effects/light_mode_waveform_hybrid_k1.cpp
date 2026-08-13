@@ -196,8 +196,19 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   if (render_params_palette_owns_colour(rp, render_secondary)) {
     const CRGBPalette16& pal =
         cached_gradient_palette(render_params_palette_index(rp, render_secondary), render_secondary);
+#ifdef K1_FALLBACK_HELD_U_V1
+    // S1 fallback bound: seed from the LAST LIVE arc position (the engine's
+    // held musical anchor), not the CHROMA knob — the knob parked every thin-
+    // chroma frame at the palette's first colour (measured: the plate lived in
+    // the blue band for a full minute while gold was never visited).
+    const float fb_u = (k1_palette_held_u_valid ? k1_palette_held_u
+                                                : float(rp->CHROMA)) + hue_walk;
+    fallback_col = clamp_crgb16(
+        palette_manual_colour(pal, SQ15x16(fb_u), SQ15x16(fallback_bright)));
+#else
     fallback_col = clamp_crgb16(
         palette_manual_colour(pal, SQ15x16(rp->CHROMA + hue_walk), SQ15x16(fallback_bright)));
+#endif
     // A gradient stop can itself be black at this coordinate; HSV-synthesise
     // rather than emit nothing while a real signal is present.
     const float fb_max = fmaxf(fmaxf(float(fallback_col.r), float(fallback_col.g)),

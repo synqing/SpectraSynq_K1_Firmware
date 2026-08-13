@@ -43,7 +43,10 @@ DEFAULT_V_FLOOR = 40       # 0-255 V threshold: below = not lit (camera black le
 DEFAULT_S_FLOOR = 60       # 0-255 S threshold: below = white/grey, huemeaningless
 
 HUEAUD_RE = re.compile(
-    r"HUEAUD,ver=1,ch=(?P<ch>[ps]),lit=(?P<lit>\d+)(?:,mode=(?P<mode>-?\d+))?,h=(?P<h>[0-9,]+)")
+    r"HUEAUD,ver=1,ch=(?P<ch>[ps]),lit=(?P<lit>\d+)(?:,mode=(?P<mode>-?\d+))?"
+    r"(?:,pal=(?P<pal>\d+))?(?:,pmode=(?P<pmode>[01]))?(?:,acs=(?P<acs>[01]))?"
+    r"(?:,hp=(?P<hp>-?[0-9.]+))?(?:,pct=(?P<pct>-?[0-9.]+))?"
+    r",h=(?P<h>[0-9,]+)")
 
 
 @dataclass
@@ -172,19 +175,28 @@ def rtrace_frames(path: str):
     Frames live between [RTRACE-BEGIN ...] and [RTRACE-END]; each is
     F,<idx>,<ms>,<mode>,<hex of px*3 bytes> (K1_RENDER_TRACE_V1)."""
     t0 = None
+    dropped = 0
     with open(path, "r", errors="replace") as f:
         for line in f:
             m = RTRACE_F_RE.match(line.strip())
             if not m:
                 continue
-            raw = bytes.fromhex(m.group("hex"))
-            if len(raw) % 3 != 0 or len(raw) == 0:
+            hexs = m.group("hex")
+            # The 1 Hz AP/HUEAUD emitters can interleave mid-dump and truncate
+            # or splice a frame line; drop anything that isn't a whole number
+            # of RGB pixels rather than crashing (count and report).
+            if len(hexs) % 6 != 0 or len(hexs) == 0:
+                dropped += 1
                 continue
+            raw = bytes.fromhex(hexs)
             rgb = np.frombuffer(raw, dtype=np.uint8).reshape(-1, 3)
             ms = int(m.group("ms"))
             if t0 is None:
                 t0 = ms
             yield (ms - t0) / 1000.0, ms, int(m.group("mode")), rgb
+    if dropped:
+        print(f"rtrace: dropped {dropped} malformed frame lines (serial interleave)",
+              file=sys.stderr)
 
 
 def rgb_hue_hist(rgb: np.ndarray) -> tuple[np.ndarray, float]:

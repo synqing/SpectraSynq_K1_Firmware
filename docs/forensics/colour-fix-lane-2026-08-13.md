@@ -110,6 +110,75 @@ LED level, host-analyse). Applied:
   don't reflash the bench without recording that the golden state must be re-established
   (bin + era config recipe are preserved) for the final look.
 
+### Update — 2026-08-13 (later): DEFECT BASELINES MEASURED on-device
+
+Bench flashed `main @ adbc133e` / `k1_bench_im69d_hueaud` (k1-flash-verified.sh, identity
+OK). Music: Demo Track 1 on the Bose (acoustic-path proof gate in the driver:
+`silence=0` ≥80% required before any capture — one leg auto-aborted on a quiet passage,
+proving the gate). Driver: `scripts/regression-harness/colour_baseline_capture.py`.
+
+**Third residual poison field found by the full config diff (HF-42 done properly):**
+`NOTE_OFFSET` was **0** (era truth **12**) — the full71 `chroma_profile` stimulus zeroed it
+and the 08-13 era replay restored RANGE but not the offset, leaving a hybrid matching NO
+profile (shifted chromagram frequency window). **The 08-13 A/B ladder itself ran under
+NOTE_OFFSET=0.** Fixed via `:set_chroma_profile=default` (12/60 pair, persisted, reboots).
+
+**Three persistence stores discovered (config identity is FOUR-way, not (bin×blob×cal)):**
+config blob (RANGE/SENSITIVITY/NOTE_OFFSET, reboot-stable) · knob store (CHROMA/MOOD —
+reboot RESTORES knob values over the blob) · cal profile file (`/cal_profile_im69d.bin` —
+every PDM boot overwrites `SWEET_SPOT_MIN_LEVEL` from it; bench file currently holds 57,
+NOT the 187 measured 2026-08-12). Measurement config must therefore be re-applied per leg
+after any reboot — the capture driver does this by construction.
+
+**Baselines (mode set + verified, era knobs + SSL=187 applied per leg, 60 s, ~2950-3000
+frames each; artefacts in `docs/forensics/colour-fix-baselines-2026-08-13/`):**
+
+| Leg | Authored deployment (Naberius Gold, 4 buckets) | Missed | Stray (out-of-palette) | Entropy |
+|---|---|---|---|---|
+| mode 32, NOTE_OFFSET=12 | **1/4 (25%)** | gold 1,2 + violet 17 | 14,15,22,23 | 1.08–1.73 bits |
+| mode 3, NOTE_OFFSET=12 | **1/4 (25%)** | gold 1,2 + violet 17 | 0,14,15,22,23 | ~2.2 bits |
+| (mode 32, NOTE_OFFSET=0 — first pass, superseded) | 2/4 | gold 1,2 | 0,14,15,21,22,23 | 2.5–2.9 bits |
+
+Reading: the stray buckets are the authored arcs displaced ~2–3 buckets (auto-colour-shift
+hue rotation — ON in the era too, so era-authentic), while the WARM arc's chromatic mass is
+absent entirely (rendered achromatic → white — invisible to the hue gate). The regression
+target: fixed-main must deploy 4/4 authored buckets with zero warm-arc white-out, matching
+the palette-derived reference.
+
+### Update — 2026-08-13 (evening): THE COLLAPSE DECOMPOSED — five layers, all measured
+
+Bisect state on bench @ `k1_bench_im69d_hueaud_eq` (palette identity asserted per leg via
+the new `pal=/pmode=/acs=` HUEAUD fields; a live probe caught the bench on **palette 0**
+in one earlier window — show-state boot restore can override the boot palette lock and
+clamps out-of-range indices to 0 — so the driver now hard-fails any leg without pal=40).
+
+| # | Layer | Status | Evidence |
+|---|---|---|---|
+| 1 | `CHROMAGRAM_RANGE` 60→1 config poisoning | FIXED; writer identified (full71) | writer doc |
+| 2 | `NOTE_OFFSET` 0 residual poisoning (era 12) | FIXED (`set_chroma_profile=default`) | config diff |
+| 3 | **Auto-shift sweep FROZEN** — novelty-cubed drive below floor; dominant hue bucket static in every 10 s window | K1_HUE_DRIVE_EQ_V1 percentile drive: **sweep proven moving** (dominant migrated 23→0 across the minute, entropy 1.1→2.8 bits); runs ~10× slow due to strict-`<` tie-ranking on flat novelty — mid-rank fix staged | mode32 legs v1/v2 |
+| 4 | Thin-chroma fallback parked at the CHROMA-knob arc position (palette's first colour) | K1_FALLBACK_HELD_U_V1 staged (held-anchor seed); unmeasured | code + baseline |
+| 5 | **Edge-mixed SECONDARY bleeding non-palette HSV** — waveform_fast ignores palette mode; its note-G teal `hsv(note_colors[7])` (fingerprint-matched to FastLED rainbow 146 → post-gamma (0,.39b,b)) was **55% of all chromatic output**; `SECONDARY_PALETTE_MODE_ENABLED=true` is a dead annotation for it | PROVEN by live kill: `:edge_enabled=off` → teal buckets growth 0, Naberius arcs deploy cleanly (13450/95871/89903/34033 in buckets 0/16/17/18 over ~6 s) | edge-kill probe |
+
+Also disproven: the white-out hypothesis on this config — achromatic-lit is 4% at mean
+V=5/255 (dim greys). "Gold renders white" on the 08-13 ladder was under different
+identity (NOTE_OFFSET=0 / SSL=253 / possibly palette-0 window).
+
+Mode-name discipline: "mode 3" in these legs is **GDFT** (dense-index trap — the driver
+now logs `get_mode_name` and the analyst must read it; asserting the number is measuring
+the annotation).
+
+**Captain live observation (bench on the EQ experiment):** violet less vibrant than
+remembered — consistent with (a) the sweep no longer parking on violet and (b) mode 32's
+temporal RGB EMA desaturating while the position moves. Position-space smoothing (P1
+applied to smoothing: EMA the coordinate, sample the palette last) is the staged next
+candidate for the wake modes.
+
+**Next legs:** tie-rank fix flash → sweep-speed re-measure → eqfb leg → secondary
+palette-honouring fix for waveform_fast (side-door closure, P5.A frame) → S2 per-palette
+excursion. Target: 4/4 authored deployment on Naberius with entropy ≈ authored 1.95 bits,
+zero out-of-palette mass, then the ONE golden-vs-fixed eyes-on.
+
 ## Guard debt from the writer finding
 
 Any control-writing harness MUST `:dump`-snapshot before first write and restore + verify
