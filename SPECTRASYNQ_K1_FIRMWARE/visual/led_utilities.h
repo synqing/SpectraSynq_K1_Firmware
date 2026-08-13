@@ -450,6 +450,26 @@ inline void apply_brightness() {
 }
 
 inline void quantize_color(bool temporal_dithering) {
+#ifdef K1_INCANDESCENT_OUTPUT_V1
+  // Idempotent incandescent: the SAME mix law as apply_incandescent_filter(),
+  // applied exactly once per displayed frame at the output write instead of
+  // in-place on the persistent render buffer (which compounds exponentially).
+  SQ15x16 k1_inc_r(1.0), k1_inc_g(1.0), k1_inc_b(1.0);
+  if (!CONFIG.INCANDESCENT_MODE && CONFIG.INCANDESCENT_FILTER > 0.0f) {
+    const SQ15x16 mix = SQ15x16(CONFIG.INCANDESCENT_FILTER);
+    const SQ15x16 inv = SQ15x16(1.0) - mix;
+    k1_inc_r = inv + mix * incandescent_lookup.r;
+    k1_inc_g = inv + mix * incandescent_lookup.g;
+    k1_inc_b = inv + mix * incandescent_lookup.b;
+  }
+  #define K1_INC_R(x) ((x) * k1_inc_r)
+  #define K1_INC_G(x) ((x) * k1_inc_g)
+  #define K1_INC_B(x) ((x) * k1_inc_b)
+#else
+  #define K1_INC_R(x) (x)
+  #define K1_INC_G(x) (x)
+  #define K1_INC_B(x) (x)
+#endif
   if (temporal_dithering) {
     dither_step++;
     if (dither_step >= 4) {
@@ -466,7 +486,7 @@ inline void quantize_color(bool temporal_dithering) {
 
     for (uint16_t i = 0; i < CONFIG.LED_COUNT; i += 1) {
       // RED #####################################################
-      SQ15x16 decimal_r = leds_scaled[i].r * SQ15x16(254);
+      SQ15x16 decimal_r = K1_INC_R(leds_scaled[i].r) * SQ15x16(254);
       SQ15x16 whole_r = decimal_r.getInteger();
       SQ15x16 fract_r = decimal_r - whole_r;
 
@@ -478,7 +498,7 @@ inline void quantize_color(bool temporal_dithering) {
       leds_out[i].r = apply_gamma8(whole_r.getInteger());
 
       // GREEN ###################################################
-      SQ15x16 decimal_g = leds_scaled[i].g * SQ15x16(254);
+      SQ15x16 decimal_g = K1_INC_G(leds_scaled[i].g) * SQ15x16(254);
       SQ15x16 whole_g = decimal_g.getInteger();
       SQ15x16 fract_g = decimal_g - whole_g;
 
@@ -489,7 +509,7 @@ inline void quantize_color(bool temporal_dithering) {
       leds_out[i].g = apply_gamma8(whole_g.getInteger());
 
       // BLUE ####################################################
-      SQ15x16 decimal_b = leds_scaled[i].b * SQ15x16(254);
+      SQ15x16 decimal_b = K1_INC_B(leds_scaled[i].b) * SQ15x16(254);
       SQ15x16 whole_b = decimal_b.getInteger();
       SQ15x16 fract_b = decimal_b - whole_b;
 
@@ -502,9 +522,9 @@ inline void quantize_color(bool temporal_dithering) {
   } else {
     for (uint16_t i = 0; i < CONFIG.LED_COUNT; i += 1) {
       // Phase 1 2026-05-20: gamma at non-dither final write too.
-      leds_out[i].r = apply_gamma8(uint8_t(leds_scaled[i].r * 255));
-      leds_out[i].g = apply_gamma8(uint8_t(leds_scaled[i].g * 255));
-      leds_out[i].b = apply_gamma8(uint8_t(leds_scaled[i].b * 255));
+      leds_out[i].r = apply_gamma8(uint8_t(K1_INC_R(leds_scaled[i].r) * 255));
+      leds_out[i].g = apply_gamma8(uint8_t(K1_INC_G(leds_scaled[i].g) * 255));
+      leds_out[i].b = apply_gamma8(uint8_t(K1_INC_B(leds_scaled[i].b) * 255));
     }
   }
 }
@@ -960,9 +980,16 @@ inline void show_leds() {
 #endif
   if (CONFIG.INCANDESCENT_MODE) {
     force_incandescent_colour(leds_16, NATIVE_RESOLUTION);
-  } else if (CONFIG.INCANDESCENT_FILTER > 0.0) {
+  }
+#ifndef K1_INCANDESCENT_OUTPUT_V1
+  else if (CONFIG.INCANDESCENT_FILTER > 0.0) {
+    // In-place apply on the render buffer COMPOUNDS across show passes
+    // (dose-response measured 2026-08-13: gold dead at 0.25, alive at 0.10 —
+    // an exponential ×(mix)^n signature). The gated replacement applies the
+    // same law ONCE at the output write in quantize_color().
     apply_incandescent_filter();
   }
+#endif
 
   if (CONFIG.BASE_COAT == true) {
     const bool base_coat_visible = CONFIG.BASE_COAT_INTENSITY > 0.0f;
