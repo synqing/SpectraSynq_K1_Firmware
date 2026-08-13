@@ -286,3 +286,16 @@ SSA-BRIGHTNESS: claim died properly (topology-proven single scale/frame). SSA-CO
 promotion plan pending at close. Candidate env: **k1_bench_im69d_colourfix** (six flags),
 resident on the bench @ bd74659f. Final gates: pytest 1060 passed, k1_hardware clean +
 sections byte-identical (72417182/afa23c99/d383aa70).
+
+### Delegation ledger close (SSA round, 2026-08-13)
+
+| SSA | Claim | CONSUMED AS | Orchestrator re-run |
+|---|---|---|---|
+| SIDEDOOR | edge harmony rotation on primary = the teal; gated fix | **verified evidence** | build+flash+leg: teal 0, 3/4 in product config |
+| BRIGHTNESS | no compounding (topology proof); no patch | **verified by refutation** | spot-checked cited call sites; claim dies, mechanism note adopted |
+| CONSOLIDATE | 5-FIX/2-DIAG/1-OBSOLETE split + 13-palette S2 risk + 4 blockers | **verified-by-audit** (inventory) / **provisional** (risk table) | citations match orchestrator's own edits; predicate controls documented. DELTA: +K1_EDGE_PALETTE_HONOUR_V1 → FIX set is SIX flags |
+
+**Promotion gates adopted from the plan:** fix-flag guard test (incl. BRIGHT/ENERGY mutual
+exclusion, mutation-checked) · production-shaped build of the six fixes without instruments
+· measure the O(256)/frame rank scan (or make it incremental) · S2 validation on the 13
+flagged palettes (or per-palette need term) · ENERGY_EXCURSION retirement per §4.
