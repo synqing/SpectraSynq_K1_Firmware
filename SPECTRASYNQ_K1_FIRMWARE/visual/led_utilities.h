@@ -1098,6 +1098,31 @@ inline void show_leds() {
     k1_mx_secondary_max = smax; k1_mx_secondary_lit = slit;
   }
 #endif
+#ifdef K1_HUE_AUDIT_V1
+  // Hue-coverage tap: 24-bucket hue histogram of the FINAL post-gamma primary
+  // buffer (same artefact boundary as the matrix tap above). Integer HSV hue,
+  // chromatic pixels only (lit AND saturated enough for hue to mean anything).
+  // Cumulative counters — the 1 Hz AP reader diffs successive lines.
+  {
+    uint16_t chromatic = 0;
+    for (uint16_t i = 0; i < CONFIG.LED_COUNT; i++) {
+      const uint8_t r = leds_out[i].r, g = leds_out[i].g, b = leds_out[i].b;
+      uint8_t mx = r; if (g > mx) mx = g; if (b > mx) mx = b;
+      uint8_t mn = r; if (g < mn) mn = g; if (b < mn) mn = b;
+      const uint8_t d = mx - mn;
+      if (mx <= 2 || d < 8) continue; // unlit or achromatic (white/grey/black)
+      int16_t h; // 0..255 hue wheel
+      if (mx == r)      h = int16_t(43 * (int16_t(g) - int16_t(b)) / d);
+      else if (mx == g) h = int16_t(85 + 43 * (int16_t(b) - int16_t(r)) / d);
+      else              h = int16_t(171 + 43 * (int16_t(r) - int16_t(g)) / d);
+      if (h < 0) h += 256;
+      const uint8_t bucket = uint8_t((uint16_t(h) * 24U) >> 8U); // 0..23
+      k1_hue_hist_primary[bucket] = k1_hue_hist_primary[bucket] + 1U;
+      chromatic++;
+    }
+    k1_hue_lit_primary = chromatic;
+  }
+#endif
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_show_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif

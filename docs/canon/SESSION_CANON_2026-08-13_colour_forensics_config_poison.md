@@ -83,8 +83,10 @@ abstract: "SESSION CANON 2026-08-13 (colour forensics): HF-41..HF-49 failure tax
    mechanical rules and the metric-first fix lane will** (same conclusion as every prior canon).
 3. `K1_PALETTE_ENERGY_EXCURSION_V1` is a measured, parked, palette-coverage feature — the fix
    lane's likely centrepiece, to be tuned against the existing palette-coverage gate.
-4. Deck16/Tab5 wrote or clamped colour config (RANGE=1 vector unidentified) — **find the writer
-   before shipping any fix, or it re-poisons.**
+4. Deck16/Tab5 wrote or clamped colour config — **WRITER IDENTIFIED 2026-08-13**: the Aug-9
+   full71 control-map harness (stimulus `vmin+0.37` → `1.37` → `uint8_t`→1 → persisted, no
+   restore step; no load-time clamp exists). Full proof + guard rule:
+   `docs/forensics/chromagram-range-poison-writer-2026-08-13.md`.
 5. The next agent's fix lane is contractually defined in the verdict doc §Fix lane:
    hue-coverage metric on the matrix-audit machinery, golden bin = oracle, bisect against the
    metric, ONE final eyes-on.

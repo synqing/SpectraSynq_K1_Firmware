@@ -57,8 +57,10 @@ description: >-
   change era. (HF-49)
 - Cursor's serial monitor auto-reconnects and steals/resets the port — `lsof
   /dev/tty.usbmodem*` before calling a device dead; coordinate the port with Captain. (HF-46)
-- The RANGE=1 writer is UNIDENTIFIED (Tab5/Deck16 write or load-clamp) — find it before
-  shipping any fix or it re-poisons.
+- The RANGE=1 writer is IDENTIFIED (2026-08-13): the Aug-9 full71 harness stimulus
+  (`1.37` → truncated 1 → persisted; NO restore step; no load-time clamp exists) —
+  `docs/forensics/chromagram-range-poison-writer-2026-08-13.md`. Guard: any control-writing
+  harness MUST `:dump`-snapshot before and restore+verify after.
 
 ## Fix-lane contract (defined, not started)
 

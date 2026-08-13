@@ -24,9 +24,10 @@ audit `_scratch/colour_corruption_audit_20260810/` + live Captain-eyes A/B ladde
 `_scratch/im69d_vs_main_20260805/20260805T201538_im69d_vs_sph_ab/preflight_bench_im69d.log`)
 and is **1** in today's persisted config. Range 1 folds the note range into one bucket →
 one colour, on any firmware. Era values restored live: range 60, SENSITIVITY 2.40,
-SWEET_SPOT_MIN 253, CHROMA 0.05, MOOD 0.05. **Open sub-question: WHAT wrote 1** —
-candidates: Tab5/Deck16 control write, a default reset, or a load-time clamp added in a
-commit (if a clamp, the poison re-applies on reboot — must be checked before any fix ships).
+SWEET_SPOT_MIN 253, CHROMA 0.05, MOOD 0.05. ~~**Open sub-question: WHAT wrote 1**~~
+> **Resolved 2026-08-13:** the Aug-9 full71 control-map harness (stimulus 1.37, truncated
+> to 1, persisted, no restore; no load-time clamp exists so reboot does NOT re-poison).
+> Proof + guard rule: [`chromagram-range-poison-writer-2026-08-13.md`](./chromagram-range-poison-writer-2026-08-13.md).
 
 ## Defect 2 — FIRMWARE REGRESSION on main (proven, unfixed)
 
