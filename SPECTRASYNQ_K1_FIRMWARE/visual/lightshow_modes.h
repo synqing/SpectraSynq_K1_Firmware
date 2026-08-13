@@ -121,6 +121,11 @@ struct PaletteStopsHD {
   float    r[PAL_HD_MAX_STOPS];
   float    g[PAL_HD_MAX_STOPS];
   float    b[PAL_HD_MAX_STOPS];
+#ifdef K1_PALETTE_BRIGHT_EXCURSION_V1
+  // S2 (design doc §3): arc position of the palette's most LUMINOUS authored
+  // stop — the crescendo excursion's attractor (for Naberius Gold: the gold).
+  float    bright_u = 0.0f;
+#endif
 };
 
 inline PaletteStopsHD& palette_hd_for_channel(bool render_secondary) {
@@ -144,6 +149,14 @@ inline void palette_hd_unpack(uint8_t palette_index, PaletteStopsHD& out) {
     if (idx == 255) break;  // FastLED gradient terminator
   }
   out.count = n;
+#ifdef K1_PALETTE_BRIGHT_EXCURSION_V1
+  // Switch-time only: locate the most luminous authored stop.
+  float best = -1.0f;
+  for (uint16_t s = 0; s < n; s++) {
+    const float lum = 0.30f * out.r[s] + 0.59f * out.g[s] + 0.11f * out.b[s];
+    if (lum > best) { best = lum; out.bright_u = out.pos[s]; }
+  }
+#endif
 }
 
 inline const CRGBPalette16& cached_gradient_palette(uint8_t palette_index, bool render_secondary) {
@@ -428,6 +441,25 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   if (energy_fixed > brightness) brightness = energy_fixed;
   brightness = clamp01_fixed(brightness);
 
+#ifdef K1_PALETTE_BRIGHT_EXCURSION_V1
+  // S2 CRESCENDO EXCURSION (colour fix lane, design doc §3): pull the sampling
+  // position toward the palette's brightest authored stop as energy rises —
+  // crescendos wear the palette's luminance peak (gold appears AT brightness,
+  // where its hue survives gamma), quiet passages keep the musical anchor +
+  // sweep. energy^2 so only genuine peaks pull hard. Composes AFTER the sweep
+  // offset: idle behaviour is the equalised traversal, peaks are the pull.
+  {
+    const PaletteStopsHD& hd_s2 = palette_hd_for_channel(vp_render_secondary_channel);
+    if (hd_s2.count > 0) {
+      float d_s2 = hd_s2.bright_u - hue;
+      if (d_s2 > 0.5f) d_s2 -= 1.0f;
+      if (d_s2 < -0.5f) d_s2 += 1.0f;
+      hue += d_s2 * (energy * energy) * 0.85f;
+      hue -= floorf(hue);
+      if (hue < 0.0f) hue += 1.0f;
+    }
+  }
+#endif
 #ifdef K1_PALETTE_ENERGY_EXCURSION_V1
   // PALETTE-RESOLUTION lane item 2 ("value-ramp lite", 2026-06-11): chroma
   // energy sweeps the sampling coordinate UP-gradient from the harmonic anchor
