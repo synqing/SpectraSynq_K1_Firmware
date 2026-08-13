@@ -586,6 +586,24 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_guard_effective_sensitivity();
 #endif
 #endif
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  // Derive the subsonic cutoff from the LIVE NOTE_OFFSET once per frame (not per
+  // sample). It must sit at the GDFT's lowest bin so the filter can only ever
+  // remove content the spectrum cannot display — a fixed constant would cut real
+  // bass at NOTE_OFFSET=0. Recompute only when NOTE_OFFSET actually moves.
+  if (k1_subsonic_hpf_note_offset_cached != (int16_t)CONFIG.NOTE_OFFSET ||
+      k1_subsonic_hpf_a <= 0.0f) {
+    k1_subsonic_hpf_note_offset_cached = (int16_t)CONFIG.NOTE_OFFSET;
+    const float fs = (float)CONFIG.SAMPLE_RATE;
+    const float fc = k1_subsonic_hpf_cutoff_hz(k1_subsonic_hpf_note_offset_cached);
+    k1_subsonic_hpf_a = fs / (fs + 6.2831853f * fc);
+    if (!(k1_subsonic_hpf_a > 0.0f) || k1_subsonic_hpf_a >= 1.0f) {
+      k1_subsonic_hpf_a = 0.9488f;  // NaN/degenerate guard: the 110 Hz @ 12.8 kHz value
+    }
+    USBSerial.printf("SUBSONIC HPF: note_offset=%d fc=%.1fHz a=%.5f\n",
+                     (int)k1_subsonic_hpf_note_offset_cached, fc, k1_subsonic_hpf_a);
+  }
+#endif
   const bool noise_cal_phase_a_active = (!noise_complete && noise_iterations < NOISE_CAL_DC_PHASE_A_FRAMES);
   waveform_history_index++;
   if (waveform_history_index >= 4) {
@@ -660,7 +678,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     // on the high-passed copy. One-pole, a = RC/(RC+dt), fc = 110 Hz @ 12.8 kHz.
     {
       const float x = (float)waveform[i];
-      k1_subsonic_hpf_y = K1_SUBSONIC_HPF_A * (k1_subsonic_hpf_y + x - k1_subsonic_hpf_x1);
+      k1_subsonic_hpf_y = k1_subsonic_hpf_a * (k1_subsonic_hpf_y + x - k1_subsonic_hpf_x1);
       k1_subsonic_hpf_x1 = x;
       const float hp = k1_subsonic_hpf_y;
       uint32_t sample_abs = (uint32_t)(hp < 0.0f ? -hp : hp);

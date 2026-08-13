@@ -139,6 +139,41 @@ def test_cal_partial_commit_persists_so_reboot_cannot_re_poison():
     )
 
 
+def test_subsonic_hpf_cutoff_is_derived_from_note_offset():
+    """The HPF may only remove content the GDFT cannot display. Its lowest bin is
+    55 Hz * 2^(NOTE_OFFSET/12) — a RUNTIME value — so a hardcoded cutoff tuned for
+    NOTE_OFFSET=12 (110 Hz) would cut an octave of real, displayed bass at
+    NOTE_OFFSET=0 (a shipped configuration). The cutoff must be derived."""
+    g = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" /
+         "globals.h").read_text(encoding="utf-8")
+    i2s = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" /
+           "i2s_audio.h").read_text(encoding="utf-8")
+
+    fn = re.search(r"k1_subsonic_hpf_cutoff_hz\([^)]*\)\s*\{(.*?)\n\}", g, re.S)
+    assert fn, "cutoff helper missing — cutoff is not derived"
+    assert "note_offset" in fn.group(1) and "55.0f" in fn.group(1), (
+        "cutoff helper does not derive from NOTE_OFFSET and the 55 Hz origin"
+    )
+
+    blk = re.search(r"#ifdef\s+K1_AP_SUBSONIC_HPF_V1(.*?)#endif", i2s, re.S)
+    assert blk, "HPF derivation block not found in the audio path"
+    assert "CONFIG.NOTE_OFFSET" in blk.group(1), (
+        "the filter coefficient is not recomputed from the live NOTE_OFFSET"
+    )
+    assert "k1_subsonic_hpf_a" in i2s and "K1_SUBSONIC_HPF_A" not in i2s, (
+        "the filter still uses a hardcoded coefficient macro"
+    )
+
+
+def test_subsonic_hpf_does_not_leak_into_shippable_envs():
+    sections = _sections()
+    leaks = sorted(
+        env for env in SHIPPABLE_ENVS
+        if env in sections and "K1_AP_SUBSONIC_HPF_V1" in _effective_flags(env, sections)
+    )
+    assert leaks == [], f"K1_AP_SUBSONIC_HPF_V1 reached shippable envs: {leaks}"
+
+
 def test_equalised_sweep_drive_contains_a_rest_mechanism():
     """HF-51: a scale-blind drive without an explicit rest runs forever in
     silence (measured: full-bore motion with zero sound). The wake gate is
