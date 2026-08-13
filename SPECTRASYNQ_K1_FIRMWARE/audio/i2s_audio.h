@@ -639,10 +639,41 @@ void acquire_sample_chunk(uint32_t t_now) {
     // poisoned SSL calibration (DC-domain) and post-cal follower math (AC-domain),
     // producing the WAVEFORM-kill mutex. After this change, max_waveform_val_raw
     // is always in the same domain as waveform[i] and downstream math (line 123).
+#ifdef K1_AP_SUBSONIC_HPF_V1
+    // SUBSONIC HPF (2026-08-14) — measure the peak on the band we actually USE.
+    //
+    // The GDFT axis is semitone-spaced from A1=55 Hz and, at the shipped
+    // NOTE_OFFSET=12, its LOWEST bin is 110 Hz. Anything below that contributes
+    // nothing to the spectrum, chromagram, colour or tempo — but it lands in
+    // max_waveform_val_raw at full weight, and that peak is what drives silence
+    // detection, the AGC floor and the follower normaliser.
+    //
+    // Measured on bench B489A500 in a room an independent microphone confirmed
+    // was quiet AND steady (5.0 dB spread): the K1 swung 16.0 dB, and its
+    // waveform was smooth — mean |sample| 5978 against a mean sample-to-sample
+    // step of 277, i.e. dominant content near fs/(2*pi) * 277/5978 = ~94 Hz.
+    // Sub-110 Hz energy (supply ripple / structural coupling) was therefore
+    // setting the peak that the whole gain structure is referenced to.
+    //
+    // waveform[] itself is left untouched, so the GDFT input is unchanged and
+    // this cannot alter spectral behaviour; only the PEAK MEASUREMENT is taken
+    // on the high-passed copy. One-pole, a = RC/(RC+dt), fc = 110 Hz @ 12.8 kHz.
+    {
+      const float x = (float)waveform[i];
+      k1_subsonic_hpf_y = K1_SUBSONIC_HPF_A * (k1_subsonic_hpf_y + x - k1_subsonic_hpf_x1);
+      k1_subsonic_hpf_x1 = x;
+      const float hp = k1_subsonic_hpf_y;
+      uint32_t sample_abs = (uint32_t)(hp < 0.0f ? -hp : hp);
+      if (sample_abs > max_waveform_val_raw) {
+        max_waveform_val_raw = sample_abs;
+      }
+    }
+#else
     uint32_t sample_abs = abs(waveform[i]);
     if (sample_abs > max_waveform_val_raw) {
       max_waveform_val_raw = sample_abs;
     }
+#endif
   }
 
   // Apply smoothing to the raw max value

@@ -227,6 +227,15 @@ inline uint16_t ssl_cal_rejected_samples = 0;  // Phase-B samples rejected as ac
 inline float   ssl_cal_buf[112] = {0};  // ROBUST-SSL (2026-06-11): per-frame Phase-B silence peaks; SSL stamped from p90 at Phase-B end. Size = NOISE_CAL_SSL_PHASE_B_FRAMES (static_assert in i2s_audio.h). Cal-only, static, no heap.
 inline float   ssl_cal_p50_raw = 0.0f;
 inline float   ssl_cal_p90_raw = 0.0f;
+#ifdef K1_AP_SUBSONIC_HPF_V1
+// Subsonic high-pass state for the PEAK measurement only (see i2s_audio.h).
+// One-pole: a = RC/(RC+dt), RC = 1/(2*pi*110), dt = 1/12800 -> 0.9488.
+// Core 0 only; single reader/writer, no cross-core sharing.
+#define K1_SUBSONIC_HPF_A 0.9488f
+inline float   k1_subsonic_hpf_x1 = 0.0f;
+inline float   k1_subsonic_hpf_y  = 0.0f;
+#endif
+
 inline bool    noise_cal_dc_valid = false;
 inline bool    noise_cal_ssl_valid = false;
 inline bool    silence = false;
