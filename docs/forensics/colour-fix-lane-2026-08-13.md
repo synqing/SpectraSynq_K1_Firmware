@@ -212,3 +212,24 @@ is written.
   hues (blue) and crush MIXED hues (gold) — the precise mechanism class of "gold dies".
 - **Next leg (defined)**: differential telemetry — log the engine's sampled colour
   pre-pipeline alongside the wire bytes; the divergence point names the operator in one leg.
+
+### Update — 2026-08-13 (night): THE GOLD KILLER CONVICTED — three-stage hue erosion, measured end-to-end
+
+Differential telemetry (`hpre=` pre-pipeline tap vs `h=` wire tap, edge off, mode 32):
+**PRE gold(1+2) = 29.2% · WIRE gold = 0.0%** — the renderer produces gold in volume; the
+show path annihilates it. Live single-variable kill: `:incandescent_filter=0` → wire gold
+**0.0% → 22.4%**, bucket-0 red mass 43%→17%, violet 17 restored 15%→25%, magenta-shift 18
+gone. Anatomy (all three stages hue-unsafe per-channel ops — the P1-banned class):
+1. **Effect RGB EMA** erodes gold's g/r toward low bucket 1 pre-pipeline;
+2. **Incandescent filter** (applies whenever FILTER>0 — INCANDESCENT_MODE=0 does NOT gate
+   it; configured 0.50, lookup (1.0,0.445,0.156) → g×0.72, b×0.58) pushes warm hues under
+   the red boundary and rotates violet toward magenta;
+3. **Dim-pixel integer quantisation** (plate mostly dim; g of a dim gold rounds toward 0)
+   finishes the kill — measured wire pixels (13,2,0) = g/r 0.15.
+The filter code+value are era-identical (`db300db`), so era gold survived by CONTENT
+brightness (bright gold survives stages 2–3) — which is precisely S2's crescendo design.
+
+**Fix directions (product-taste split):** (a) S2 bright-gold crossings (shipped, tune);
+(b) position-space smoothing to remove stage 1; (c) `INCANDESCENT_FILTER` level is a
+Captain taste lever (0.5 era character vs hue fidelity — 0.25 halves the warm crush);
+(d) long-term P1: hue-safe output filtering (apply warm cast in position/luma space).
