@@ -250,3 +250,21 @@ Consolidated fixed-main candidate env: **`k1_bench_im69d_hueaud_s2psi`** (equali
 crescendo excursion + hue-safe smoothing + idempotent incandescent). Resident on the bench.
 Remaining before the ONE eyes-on: secondary side-door closure · GDFT-mode spot-check ·
 strip diag instrumentation from the candidate for the production flag set.
+
+### Update — 2026-08-13 (SSA round + consolidated candidate)
+
+- **Consolidated candidate `k1_bench_im69d_colourfix`** (all five fix flags) measured:
+  **3/4 authored deployment** on mode 32/Naberius (missed only bucket 2 sub-floor in-window;
+  strays only adjacent transitionals 0,18; entropy ≈2.0 bits ≈ authored 1.95). Resident on bench.
+- **Split probe (device, decisive): the edge-path teal author is the SECONDARY CHANNEL'S
+  CONTENT** — edge ON + `secondary_enabled=false` → teal 81.9%→0.0%. Mixer innocent.
+- **FB leg** (eq+fb): design-correct, effect masked by the then-active incandescent kill;
+  folded into the candidate on P1 grounds.
+- **SSA-BRIGHTNESS (NOT_VERIFIED, claim dies):** show topology proven single-scale-per-
+  rendered-frame, history stored pre-show, no feedback channel — no brightness compounding;
+  no patch. **Corollary: the incandescent "compounds ~10×" attribution is downgraded to
+  [HYPOTHESIS]** — K1_INCANDESCENT_OUTPUT_V1's wire gain (gold 0→11.8%) is measured fact,
+  but its mechanism needs a post-lane resolution (three show_leds call sites exist:
+  .ino 1159/1182/1457 — multiplicity per frame unaudited across all three).
+- Field-tolerant HUEAUD parsers (the hdn=/hd0= respin broke the driver's `,h=` anchor —
+  fixed generically).
