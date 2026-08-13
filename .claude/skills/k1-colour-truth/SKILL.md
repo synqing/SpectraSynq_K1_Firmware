@@ -11,8 +11,11 @@ description: >-
 
 # K1 Colour Truth — load-bearing rules
 
-**Canon:** `docs/canon/SESSION_CANON_2026-08-13_colour_forensics_config_poison.md`
+**Canon:** `docs/canon/SESSION_CANON_2026-08-13_colour_forensics_config_poison.md` (HF-41..49)
+· `docs/canon/SESSION_CANON_2026-08-14_colour_fix_twitch_instrumentation.md` (HF-50..62)
 **Verdict:** `docs/forensics/colour-nuance-regression-verdict-2026-08-13.md`
+**Lane ledger:** `docs/forensics/colour-fix-lane-2026-08-13.md` · Promotion:
+`docs/forensics/colour-fix-promotion-plan-2026-08-13.md`
 
 ## The five hard rules
 
@@ -62,9 +65,44 @@ description: >-
   `docs/forensics/chromagram-range-poison-writer-2026-08-13.md`. Guard: any control-writing
   harness MUST `:dump`-snapshot before and restore+verify after.
 
-## Fix-lane contract (defined, not started)
+## The second five hard rules (HF-50..62, paid for 2026-08-13/14)
 
-Hue-coverage metric on the matrix-audit machinery → golden bin sets the oracle number →
-check RANGE clamp/writer on main → bisect main's colour path against the metric
-(fallback bound · gate-thinning · held-centroid attractor · ENERGY_EXCURSION tuning) →
-ONE final side-by-side eyes-on.
+6. **Gate every colour fix on the FULL perceptual axis set** — coverage · temporal
+   stability (hue velocity) · silence rest · music coupling · brightness dynamics.
+   Optimising one axis regressed another twice in one night (HF-50). Windowed
+   histograms cannot see twitch.
+7. **Firmware identity is FOUR-way**: bin × config blob × knob store × cal profile
+   file. Boot restores CHROMA/MOOD from the knob store and SSL from the profile
+   file OVER the blob — re-apply and re-verify measurement config per leg after any
+   reboot; full-dump diff vs era, never remembered knobs. (HF-58/59)
+8. **Assert the mode NAME and the palette PROPERTY, never the number/annotation** —
+   `get_mode_name` per leg; live palette authority via the HUEAUD `pal=/pmode=/hd0=`
+   fields (boot palette lock is overridden by show-state restore; oob index clamps
+   to 0). (HF-54/60)
+9. **A value-fingerprint match is not provenance** — conviction needs the generating
+   mechanism (file:line) PLUS a live single-variable kill on the device. Live kills
+   (`:edge_enabled=off`-class) and dose-response curves are the sharpest attribution
+   instruments; use them before code archaeology. (HF-55, methods §3)
+10. **Flash verification = script EXIT CODE + NEW epoch in the post-flash identity.**
+    Never grep-filter a gated script in a `&&` pipeline (the before-flash identity
+    line will match). After merging SSA work, grep the gated symbols in YOUR tree —
+    merge the NAMED branch from the return contract, not the worktree default.
+    (HF-56/57)
+
+Drive-design corollaries: scale-blind (equalised) drives need an explicit structural
+rest mechanism (ring spikiness — never a bare constant, never only a calibration-
+dependent gate flag) (HF-51/52/53); per-channel multiplicative/nonlinear ops preserve
+pure hues and destroy mixed ones — gold dies first, blue survives (methods §3.6);
+before any cal, pre-check the mic's raw int16 floor — raw-quiet + processed-loud =
+processing artefact, not acoustics (HF-61/62).
+
+## Fix-lane status (2026-08-14)
+
+Writer found · five colour layers fixed and measured · consolidated candidate
+`k1_bench_im69d_colourfix` at 3/4 authored deployment in product config · twitch
+decomposed, colour-side fixed (sweep rest v3 structure detector PROVEN: silence
+0.00000/s, music alive). **OPEN: HF-61 cal self-lock (stale DC → phantom ~4k
+baseline → visual response still wrong) — implement cal partial-commit, two
+Captain-gated cal passes, then full-axis legs → promotion gates → the ONE golden
+side-by-side.** Bench port drifted to `cu.usbmodem12401` (env pins 12201; use
+`--upload-port`); SSL manually 6000 pending the DC fix.

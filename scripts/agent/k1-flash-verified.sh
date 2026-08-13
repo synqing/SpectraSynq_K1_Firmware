@@ -60,7 +60,10 @@ pio run -e "$ENV_NAME" >/dev/null
 # a surprise here is visible rather than silent.
 if [[ -n "$PORT" ]]; then
   say "Device BEFORE flash"
-  python3 "$GUARD" --port "$PORT" || echo "  (no identity — device may be unflashed or busy)"
+  # HF-57 (canon 2026-08-14): prefix so a grep for the verdict can NEVER match
+  # this pre-flash line. The ONLY success signals are this script's exit code 0
+  # and the FLASHED-AND-VERIFIED block below (post-flash identity, NEW epoch).
+  python3 "$GUARD" --port "$PORT" 2>&1 | sed 's/^/BEFORE-FLASH: /' || echo "  (no identity — device may be unflashed or busy)"
 fi
 
 # ── 2. flash. The pio upload guard verifies chip-id ↔ env on its own. ──────────
