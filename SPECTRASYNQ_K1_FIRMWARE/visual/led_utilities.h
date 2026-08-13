@@ -1962,7 +1962,17 @@ inline void process_color_shift() {
     // MEAN advance is exactly base/2 regardless of the novelty distribution —
     // pct^2 collapsed on spiky novelty (most frames rank low; measured ~20x
     // slow). base 0.0003 → ~35 s typical full arc at the ~200 FPS render loop.
-    const float adv = 0.0003f * pct;
+    //
+    // SILENCE REST (2026-08-13 twitch regression fix): percentile equalisation
+    // deliberately destroys absolute scale, so the percentile of NOISE within
+    // noise is still uniform — without an absolute gate the sweep runs at mean
+    // speed in dead silence (measured: full-bore motion with zero sound). The
+    // legacy drive's rest came from its absolute floor; restore that property
+    // via the pipeline's silence authority (the latched `silence` flag), with
+    // a smooth ramp so the sweep parks and wakes without a pop.
+    static float k1_sweep_wake = 1.0f;
+    k1_sweep_wake += ((silence ? 0.0f : 1.0f) - k1_sweep_wake) * 0.02f;
+    const float adv = 0.0003f * pct * k1_sweep_wake;
     hue_shift_speed = SQ15x16(adv);
 #ifdef K1_HUE_AUDIT_V1
     k1_hue_sweep_pct = pct;  // sweep telemetry (1 Hz HUEAUD line)

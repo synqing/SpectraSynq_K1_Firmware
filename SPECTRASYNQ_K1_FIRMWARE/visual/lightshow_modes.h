@@ -460,7 +460,10 @@ inline CRGB16 palette_chroma_colour_with_offset(const CRGBPalette16& pal, SQ15x1
   // offset: idle behaviour is the equalised traversal, peaks are the pull.
   {
     const PaletteStopsHD& hd_s2 = palette_hd_for_channel(vp_render_secondary_channel);
-    if (hd_s2.count > 0) {
+    // Silence gate (2026-08-13 twitch fix): in silence the AGC amplifies the
+    // noise floor and `energy` jitters — the pull must not yank the position
+    // around with no music. Latched-silence zeroes the pull.
+    if (hd_s2.count > 0 && !silence) {
       float d_s2 = hd_s2.bright_u - hue;
       if (d_s2 > 0.5f) d_s2 -= 1.0f;
       if (d_s2 < -0.5f) d_s2 += 1.0f;
