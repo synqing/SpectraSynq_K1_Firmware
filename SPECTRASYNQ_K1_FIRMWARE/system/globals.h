@@ -187,6 +187,17 @@ inline volatile uint8_t  k1_mx_secondary_max = 0;
 inline volatile uint16_t k1_mx_secondary_lit = 0;
 inline volatile float    k1_mx_df_inject = -1.0f;   // last Dense Forge inject_scale (-1 = DF not rendering)
 #endif
+#ifdef K1_HUE_AUDIT_V1
+// Colour-fix-lane hue-coverage tap (2026-08-13, docs/forensics/
+// colour-nuance-regression-verdict-2026-08-13.md §Fix lane). Same pattern as
+// K1_MATRIX_AUDIT_V1: bounded, lock-free witnesses of the FINAL post-gamma
+// primary output buffer, written on Core 1 in show_leds(), read on the 1 Hz AP
+// print path. Buckets are CUMULATIVE chromatic-pixel counts (single writer;
+// host diffs successive lines, so torn 1 Hz reads are harmless). Diag env only
+// (k1_bench_im69d_hueaud) — never production.
+inline volatile uint32_t k1_hue_hist_primary[24] = { 0 }; // 15-deg hue buckets
+inline volatile uint16_t k1_hue_lit_primary = 0;          // last-frame chromatic px
+#endif
 inline short   sample_window[SAMPLE_HISTORY_LENGTH] = { 0 };
 inline short   waveform[1024]                       = { 0 };
 inline SQ15x16 waveform_fixed_point[1024]           = { 0 };

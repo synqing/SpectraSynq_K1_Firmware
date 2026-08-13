@@ -1086,6 +1086,19 @@ void acquire_sample_chunk(uint32_t t_now) {
       (unsigned)k1_mx_secondary_max, (unsigned)k1_mx_secondary_lit,
       (double)k1_mx_df_inject, (int)CONFIG.LIGHTSHOW_MODE, (int)SECONDARY_LIGHTSHOW_MODE);
 #endif
+#ifdef K1_HUE_AUDIT_V1
+    // Hue-coverage tap line (own line so scripts/regression-harness/
+    // hue_coverage.py can match it standalone). Counters are cumulative;
+    // the host diffs successive lines. Same 1 Hz cadence as the AP line.
+    {
+      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,h=", (unsigned)k1_hue_lit_primary,
+        (int)CONFIG.LIGHTSHOW_MODE);
+      for (uint8_t hb = 0; hb < 24; hb++) {
+        USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_primary[hb]);
+      }
+      USBSerial.println();
+    }
+#endif
 #if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
     // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.
     {
