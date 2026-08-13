@@ -12,6 +12,13 @@
 #include "globals.h"  // agc_loudness_norm — the correct loudness gate for STM
 #endif
 
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+// Palette-authoritative edge gate reads the channel ownership flags:
+// CONFIG.PALETTE_MODE_ENABLED (primary) + SECONDARY_PALETTE_MODE_ENABLED
+// (secondary), both in globals.h. Compiled out without the flag.
+#include "globals.h"
+#endif
+
 // Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
 // loop. This is a PURE code-gen change — every operation in these helpers is
 // integer / SQ15x16 (int32/int64), so inlining cannot alter a single result
@@ -1016,6 +1023,22 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
   }
 #endif
 
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+  // PALETTE-AUTHORITATIVE EDGE (colour-fix lane P5.A side-door closure,
+  // 2026-08-13). Design law: while a palette owns a channel's colour, no path
+  // may re-author that channel's hues off-palette. The colour-harmony matrix
+  // below is a post-render RGB hue rotation — applied to a palette-authored
+  // buffer it emits hue-wheel colours the palette never contains (measured:
+  // rotated Naberius gold landed at hue ~146 teal = 55% of chromatic primary
+  // output under dual-edge SPLIT). While the SECONDARY channel is palette-owned,
+  // skip the rotation entirely (identity pass — the rendered palette colours go
+  // to the strip untouched). STM modes above are value-only (no hue authored)
+  // and remain allowed. Compiled out (byte-inert) without the flag.
+  if (SECONDARY_PALETTE_MODE_ENABLED) {
+    return;
+  }
+#endif
+
   // Snapshot the config-time SECONDARY matrix + fused map atomically. Keyed on the
   // stored mode + spread; the only per-frame delta is strength (see
   // k1_visual_hooks_apply_edge_config), which does not affect the coefficients.
@@ -1060,6 +1083,21 @@ void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMix
   if (strength <= 0.0f) {
     return;
   }
+
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+  // PALETTE-AUTHORITATIVE EDGE (colour-fix lane P5.A, 2026-08-13). This is THE
+  // convicted side-door: under dual-edge SPLIT/MIRROR this function hue-rotates
+  // the ENTIRE palette-authored PRIMARY buffer post-render (mirrored harmony
+  // angle), re-authoring palette arcs onto hue-wheel positions the palette
+  // never emits (measured fingerprint: hue ~146 / (0, ~0.39b, b) — identical in
+  // value to hsv(note_colors[7]), but authored HERE, not by an effect's
+  // chromatic branch). While the PRIMARY channel is palette-owned, the rotation
+  // is skipped — palette samples reach the strip unmodified. STM value-only
+  // modulation (handled above) remains allowed. Compiled out without the flag.
+  if (CONFIG.PALETTE_MODE_ENABLED) {
+    return;
+  }
+#endif
 
   // Snapshot the PRIMARY coefficient set + the dual-active flag atomically. If no
   // dual bake has been published yet (config says dual but set_config has not run),
