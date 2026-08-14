@@ -161,12 +161,20 @@ def run_fault_battery(device: serial.Serial) -> tuple[dict[str, object], list[st
         results[f"{fault}_recovered"] = recovered
 
     raw_log.extend(command(device, ":mic_health=challenge", 0.1))
-    raw_log.extend(command(device, ":mic_health=fail_challenge", 0.2))
-    no_response, lines = health_status(device)
-    raw_log.extend(lines)
+    fail_lines = command(device, ":mic_health=fail_challenge", 0.15)
+    raw_log.extend(fail_lines)
+    # NO_RESPONSE is emitted synchronously by the transition. Healthy raw frames
+    # then recover to LIVENESS_UNPROVEN (still fail-closed) after eight AP frames,
+    # so a later status query is intentionally not the fault-state witness.
+    no_response = kv_line(fail_lines, "MIC_HEALTH")
     if no_response.get("state") != "NO_RESPONSE":
         raise RuntimeError(f"explicit failed challenge did not reach NO_RESPONSE: {no_response}")
     results["failed_challenge"] = no_response
+    recovered, lines = health_status(device)
+    raw_log.extend(lines)
+    if recovered.get("state") != "LIVENESS_UNPROVEN":
+        raise RuntimeError(f"challenge failure did not recover fail-closed: {recovered}")
+    results["failed_challenge_recovered"] = recovered
     raw_log.extend(command(device, ":mic_health=reset", 0.35))
     return results, raw_log
 
