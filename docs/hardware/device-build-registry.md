@@ -13,12 +13,21 @@ Companion docs: pin-level hardware truth in
 [`k1-hardware-definition.md`](./k1-hardware-definition.md); routing authority
 in [`../spec-index.md`](../spec-index.md).
 
+> **G1 input contract (2026-08-15; policy, not a deployed-state claim):** on K1v2
+> `B489A500`, physical IM1 / board-left / SELECT HIGH is ESP-IDF PDM RIGHT and stereo PCM
+> index 0; physical IM2 / board-right / SELECT LOW is ESP-IDF PDM LEFT and index 1. Every
+> active mono IM69D bench/diagnostic environment now selects RIGHT explicitly. Stereo order
+> is RIGHT then LEFT with `clk_inv=false`. The future production source is IM1, but no
+> production slot promotion is authorised before P4. Unit 2's RIGHT electrical-slot policy
+> is retained without inferring its physical board position from B489's straps. Authority:
+> [`G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md`](../forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md).
+
 ## 1. The registered devices (identity is NON-NEGOTIABLE before any write)
 
 | Device | Role | Chip ID | Port (typical) | Permitted envs by configured route |
 |---|---|---|---|---|
 | **1401** | Main K1 (Captain's primary) | `F887A500` | `/dev/cu.usbmodem1401` / currently (2026-07-29) `/dev/cu.usbmodem112401` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route; `k1_sync_probe_main` (dual-K1 sync Phase-0 LEADER, non-shippable, F5 grant 2026-07-08). **⚠ CURRENT (2026-07-29):** running **deprecated donor** `esp32dev_audio_esv11_k1v2_32khz` from `Lightwave-Ledstrip/firmware-v3` — NOT a SpectraSynq_K1_Firmware env; restore `k1_hardware` or `k1_sync_probe_main` before product/sync work. |
-| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently (2026-07-27) `/dev/cu.usbmodem11401` | `k1_bench_reference`; non-shippable bench variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_bench_im69d`, `k1_bench_im69d_ble`; `k1_sync_probe_bench` (dual-K1 sync Phase-0 FOLLOWER, non-shippable, F5 grant 2026-07-08; **CURRENT 2026-07-27**). **`k1_custom` is NOT permitted here** (BLOCKED everywhere in the guard since 2026-08-12 — no nominated device; recomposed off *im73d* onto `k1_bench_im69d_ble`, P2.B). |
+| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently (2026-07-27) `/dev/cu.usbmodem11401` | `k1_bench_reference`; non-shippable bench variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_bench_im69d`, `k1_bench_im69d_ble`; AP input-integrity diagnostics `k1_bench_im69d_ap_integrity_probe` and deliberate RED mutation `k1_bench_im69d_ap_integrity_bad_probe`; `k1_sync_probe_bench` (dual-K1 sync Phase-0 FOLLOWER, non-shippable, F5 grant 2026-07-08; **CURRENT 2026-07-27**). **`k1_custom` is NOT permitted here** (BLOCKED everywhere in the guard since 2026-08-12 — no nominated device; recomposed off *im73d* onto `k1_bench_im69d_ble`, P2.B). |
 | **Bench Unit 2** | **K1 Bench Unit 2** (dual-206 custom) | `0C54FC00` (ESP MAC `AC:A7:04:FC:54:0C`) | `/dev/cu.usbmodem1101` (USB serial = MAC `AC:A7:04:FC:54:0C`; was WCH `5B7A114793`) | **`k1_unit2_im69d_right` only** — extends `k1_bench_im69d`; **never any `*im73d*` env**. **Physical mic = dual IM69D130** (Captain correction 2026-08-10). **PDM pins AUTHORISED: `CLK=GPIO39` / `DATA=GPIO38`, RIGHT slot**, under **`CAPTAIN_PIN_AUTH` 2026-08-11** — evidence [`im69d130-unit2-pin-receipt-2026-08-11.md`](./im69d130-unit2-pin-receipt-2026-08-11.md). **SELECT is static hardware truth and is never driven by firmware** (`constants.h`; GPIO12 is an escape-hatch pin only). Dual 206-px WS2812B on LED GPIO `4/5`, render canvas 160 — `K1_CUSTOM_LED_V1` is deliberately **NOT** set (it drops the secondary strip and would break 206/206). **⚠ Dual-capsule topology is UNPROVEN** — no complementary SELECT measurement, no shared-DATA contention proof, no per-capsule VDD/ground/clock record; only the RIGHT capsule path is evidenced. **Not** covered by the "two K1s are identical hardware" statement below. Distinct from Bench K1v2 (`B489A500`). |
 | **K718** | Remoted BLE-MIDI dial (Guition JC3636K718_P, **separate product**, not a K1) | MAC `ac:a7:04:ee:57:7c` (ESP32-S3R8, 8MB PSRAM, 16MB flash) | `/dev/cu.usbmodem101` (2026-06-30; drifts) | arduino-cli `JC3636_K718_REMOTED_BLE_V1` (knob repo) — **never a K1 pio env** |
 

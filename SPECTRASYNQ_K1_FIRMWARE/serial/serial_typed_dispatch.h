@@ -27,6 +27,9 @@ bool serial_typed_wrap_mode(const char* command_type, char* command_data);
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 bool serial_typed_wrap_ap_diag(const char* command_type, char* command_data);
 #endif
+#ifdef K1_AP_TWITCH_ORACLE_V1
+bool serial_typed_ap_twitch(const char* command_type, char* command_data);
+#endif
 #if K1_VIVID_PRECOMP_V1
 bool serial_typed_wrap_vivid(const char* command_type, char* command_data);
 #endif
@@ -47,6 +50,12 @@ bool serial_typed_wrap_beat_director(const char* command_type, char* command_dat
 bool serial_typed_vp_profile(const char* command_type, char* command_data);
 bool serial_typed_vp_all(const char* command_type, char* command_data);
 bool serial_typed_ap_stream(const char* command_type, char* command_data);
+#ifdef K1_MIC_HEALTH_V1
+bool serial_typed_mic_health(const char* command_type, char* command_data);
+#ifdef K1_MIC_HEALTH_FAULT_INJECT_V1
+bool serial_typed_mic_health_fault(const char* command_type, char* command_data);
+#endif
+#endif
 #if ENABLE_TEMPO_STREAM
 bool serial_typed_tempo_stream(const char* command_type, char* command_data);
 #endif

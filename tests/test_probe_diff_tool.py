@@ -38,8 +38,8 @@ def test_tool_detects_a_real_noop_on_the_live_ini():
 
 def test_tool_accepts_a_genuine_probe():
     r = subprocess.run(
-        [sys.executable, str(TOOL), "k1_bench_im69d_hpf_slotr",
-         "--expect", "K1_MIC_IM69D_SLOT_RIGHT"],
+        [sys.executable, str(TOOL), "k1_bench_im69d_hpf",
+         "--expect", "K1_AP_SUBSONIC_HPF_V1"],
         capture_output=True, text=True, cwd=str(ROOT))
     assert r.returncode == 0, (
         "probe_diff rejected a genuine single-variable probe:\n" + r.stdout)

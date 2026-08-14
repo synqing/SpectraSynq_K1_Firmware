@@ -18,6 +18,9 @@
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h" // rtrace_* LED-level capture (colour-fix-lane env only)
 #endif
+#ifdef K1_AP_TWITCH_ORACLE_V1
+#include "k1_ap_twitch_oracle.h"
+#endif
 #ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
 #endif
@@ -1093,6 +1096,16 @@ inline void show_leds() {
 
 #if ENABLE_VPAB_PROBE
   vpab_capture_tick(vpab_primary_quant_us);
+#endif
+
+#ifdef K1_AP_TWITCH_ORACLE_V1
+  // P2 oracle: every final post-gamma frame, immediately before transmission.
+  // The module keeps adjacency on-device; serial receives only complete aggregates.
+  k1_ap_twitch_oracle_tick(
+      leds_out, CONFIG.LED_COUNT,
+      (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? leds_out_secondary : nullptr,
+      (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? SECONDARY_LED_COUNT : 0,
+      millis());
 #endif
 
   if (debug_mode && (millis() % 10000 == 0)) {

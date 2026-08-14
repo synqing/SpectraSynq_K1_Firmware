@@ -6,11 +6,19 @@
 // is excluded — exposing a writer for it would be a control that does nothing.
 #pragma once
 
-#define K1_TUNABLE_COUNT 44
+#define K1_TUNABLE_COUNT 52
 
 inline const K1Tunable K1_TUNABLES[K1_TUNABLE_COUNT] = {
   { "AP_STREAM_ENABLED", K1_TUNE_BOOL, (void*)&AP_STREAM_ENABLED, "" },
   { "BLE_STREAM_ENABLED", K1_TUNE_BOOL, (void*)&BLE_STREAM_ENABLED, "gate for 1 Hz [ble_remoted] counters + heap telemetry (bench BLE build); toggle via :..." },
+  { "K1_AP_DRIVE_THRESHOLD_RAW_PEAK", K1_TUNE_F32, (void*)&K1_AP_DRIVE_THRESHOLD_RAW_PEAK, "" },
+  { "K1_AP_FOLLOWER_FLOOR_RAW_PEAK", K1_TUNE_F32, (void*)&K1_AP_FOLLOWER_FLOOR_RAW_PEAK, "" },
+  { "K1_AP_SILENCE_PEAKINESS_BREAK", K1_TUNE_F32, (void*)&K1_AP_SILENCE_PEAKINESS_BREAK, "" },
+  { "K1_AP_SILENCE_RAW_PEAK_ENTER", K1_TUNE_F32, (void*)&K1_AP_SILENCE_RAW_PEAK_ENTER, "" },
+  { "K1_AP_SILENCE_RAW_PEAK_EXIT", K1_TUNE_F32, (void*)&K1_AP_SILENCE_RAW_PEAK_EXIT, "" },
+  { "K1_AP_SILENCE_RMS_ENTER", K1_TUNE_F32, (void*)&K1_AP_SILENCE_RMS_ENTER, "" },
+  { "K1_AP_SILENCE_RMS_EXIT", K1_TUNE_F32, (void*)&K1_AP_SILENCE_RMS_EXIT, "" },
+  { "K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK", K1_TUNE_F32, (void*)&K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK, "" },
   { "K1_SILENCE_JOINT_LEVEL_SSL_FRAC", K1_TUNE_F32, (void*)&K1_SILENCE_JOINT_LEVEL_SSL_FRAC, "peakiness may only break silence at/above SSL x this" },
   { "K1_SILENCE_PEAKINESS_BREAK", K1_TUNE_F32, (void*)&K1_SILENCE_PEAKINESS_BREAK, "above this → structured audio, never silence" },
   { "K1_SILENCE_RMS_ENTER", K1_TUNE_F32, (void*)&K1_SILENCE_RMS_ENTER, "raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-ro..." },

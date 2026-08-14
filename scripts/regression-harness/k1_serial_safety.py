@@ -23,7 +23,7 @@ incident command lives in the typed table, while ``dump`` / ``start_noise_cal`` 
 ``factory_reset`` live in the bare table):
 
   SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def
-      git blob b7f97baf0187af59ffa76195519aa4825637256b   (151 rows)
+      git blob e83abf9eee23099a2b9b0a034d355350bf8aa9ce   (154 rows)
   SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def
       git blob 9246b0702f40f796eb0877bda2f8b8c1515ec009   (36 rows)
 
@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "dc75bbfe94a17543abf21621f2c0d27a6857939c"
+TYPED_DEF_BLOB_SHA = "e83abf9eee23099a2b9b0a034d355350bf8aa9ce"
 BARE_DEF_BLOB_SHA = "9246b0702f40f796eb0877bda2f8b8c1515ec009"
 
 # --------------------------------------------------------------------------
@@ -290,6 +290,8 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "mp_flash",
     "mp_off",
     "mp_status",
+    "mic_health",
+    "mic_health_fault",
     "mp_step",
     "nov_capture",
     "nov_clear",
@@ -323,6 +325,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "stream_spectrogram",
     "tempo_stream",
     "trace",
+    "twitch",
     "v",
     "version",
     "vivid",

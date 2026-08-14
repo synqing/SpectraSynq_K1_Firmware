@@ -12,7 +12,16 @@ SERIAL_TYPED_CMD("vivid_level", serial_typed_wrap_vivid, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("vivid_chroma", serial_typed_wrap_vivid, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("vivid_black", serial_typed_wrap_vivid, SC_TYPED_ONLY, 0)
 #endif
+#ifdef K1_AP_TWITCH_ORACLE_V1
+SERIAL_TYPED_CMD("twitch", serial_typed_ap_twitch, SC_TYPED_ONLY, CMD_HARNESS)
+#endif
 SERIAL_TYPED_CMD("ap_stream", serial_typed_ap_stream, SC_TYPED_ONLY, CMD_HARNESS)
+#ifdef K1_MIC_HEALTH_V1
+SERIAL_TYPED_CMD("mic_health", serial_typed_mic_health, SC_TYPED_ONLY, CMD_HARNESS)
+#ifdef K1_MIC_HEALTH_FAULT_INJECT_V1
+SERIAL_TYPED_CMD("mic_health_fault", serial_typed_mic_health_fault, SC_TYPED_ONLY, CMD_HARNESS)
+#endif
+#endif
 #if ENABLE_TEMPO_STREAM
 SERIAL_TYPED_CMD("tempo_stream", serial_typed_tempo_stream, SC_TYPED_ONLY, CMD_HARNESS)
 #endif

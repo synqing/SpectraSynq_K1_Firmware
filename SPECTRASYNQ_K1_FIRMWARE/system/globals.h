@@ -167,13 +167,13 @@ inline float    im69d_raw_i16_rms = 0.0f;
 inline float    im69d_raw_i16_near_pct = 0.0f;
 #ifdef K1_MIC_IM69D_STEREO_V1
 // Stage 2 stereo probe (2026-08-12, design im69d130-dual-mic-eval §5): interleaved
-// L/R landing buffer + RIGHT-slot de-interleave target. Bench probe env only —
-// the DSP chain still consumes im69d_samples_i16 (LEFT / mic A), identical to
-// Stage 1; the RIGHT channel exists solely for measurement (ρ / coherence).
+// ESP-IDF RIGHT/LEFT landing buffer + LEFT-slot de-interleave target. Bench probe
+// env only. The DSP consumes im69d_samples_i16 (RIGHT / physical IM1); LEFT /
+// physical IM2 exists solely for measurement (correlation / coherence).
 inline DRAM_ATTR int16_t im69d_samples_i16_stereo[2048] = { 0 };
-inline DRAM_ATTR int16_t im69d_samples_i16_right[1024]  = { 0 };
-inline uint16_t im69d_right_raw_i16_abs_peak = 0;
-inline float    im69d_right_raw_i16_rms = 0.0f;
+inline DRAM_ATTR int16_t im69d_samples_i16_left[1024]   = { 0 };
+inline uint16_t im69d_left_raw_i16_abs_peak = 0;
+inline float    im69d_left_raw_i16_rms = 0.0f;
 #endif
 #endif
 #ifdef K1_MATRIX_AUDIT_V1
@@ -418,6 +418,15 @@ inline double   ap_capture_follower_sum = 0.0;
 inline double   ap_capture_chroma_sum = 0.0;
 inline bool     ap_capture_silence_any = false;
 inline float    ap_capture_spec_sum[NUM_FREQS] = { 0.0f };
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+// P2 discovery/held-out distributions are accumulated on-device at AP cadence.
+// Serial receives only the final percentiles, so no adjacency statistic is ever
+// computed over the lossy transport. Peak bins are 8 raw units; RMS bins 0.0001.
+#define K1_AP_CAPTURE_PEAK_HIST_BINS 4096
+#define K1_AP_CAPTURE_RMS_HIST_BINS 2048
+inline uint16_t ap_capture_peak_hist[K1_AP_CAPTURE_PEAK_HIST_BINS] = { 0 };
+inline uint16_t ap_capture_rms_hist[K1_AP_CAPTURE_RMS_HIST_BINS] = { 0 };
+#endif
 #endif
 
 // PIO-FDUMP (2026-05-25): :frame_dump=<metric>,<mode>,<dur>,<every_n> VP Tier B per-frame
@@ -870,6 +879,21 @@ inline float    K1_SILENCE_PEAKINESS_BREAK = 2.10f; // above this → structured
 inline float    K1_SILENCE_JOINT_LEVEL_SSL_FRAC = 1.75f; // peakiness may only break silence at/above SSL x this
 inline float    k1_silence_peakiness = 0.0f;      // last computed max/mean over the peak window
 inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre floor-cut), set in calculate_vu()
+
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+// AP input-integrity Rev B: four semantic roles with independent storage.
+// These diagnostic defaults are deliberately not production-characterised. P2 freezes
+// them from a discovery capture and checks them against an independent held-out capture.
+// Units are named because raw-peak and normalised-RMS values are not interchangeable.
+inline float K1_AP_DRIVE_THRESHOLD_RAW_PEAK = 0.0f;
+inline float K1_AP_SILENCE_RAW_PEAK_ENTER = 64.0f;
+inline float K1_AP_SILENCE_RAW_PEAK_EXIT = 96.0f;
+inline float K1_AP_SILENCE_RMS_ENTER = 0.04f;
+inline float K1_AP_SILENCE_RMS_EXIT = 0.08f;
+inline float K1_AP_SILENCE_PEAKINESS_BREAK = 2.10f;
+inline float K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK = 128.0f;
+inline float K1_AP_FOLLOWER_FLOOR_RAW_PEAK = 64.0f;
+#endif
 
 // ------------------------------------------------------------
 // Cochlear-Inspired Multi-Band AGC (GDFT.h) ------------------

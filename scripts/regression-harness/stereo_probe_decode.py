@@ -2,8 +2,10 @@
 """Decode a k1_stereo_probe [SCAP] dump and judge the Stage 2 hypotheses.
 
 Input: a text file containing one `[SCAP-BEGIN len=.. crc32=.. frames=.. sr=..
-fmt=le_i16_LR]` header, hex body lines, and `[SCAP-END]` (raw serial log is fine
-— non-hex lines outside the markers are ignored).
+fmt=le_i16_RL]` header, hex body lines, and `[SCAP-END]` (raw serial log is fine
+— non-hex lines outside the markers are ignored). Historical `le_i16_LR` dumps
+are accepted as a legacy mislabel; their active-driver data order was also
+ESP-IDF RIGHT then LEFT.
 
 Outputs (stdout, JSON):
   - crc_ok, frames, seconds, sample_rate
@@ -12,8 +14,7 @@ Outputs (stdout, JSON):
     (third-octave-ish bands 55 Hz .. 6.4 kHz — the GDFT visual-driving range)
   - H_C verdict with the PRE-REGISTERED kill criterion:
         rho > 0.95 across the visual-driving bands  =>  H_C REJECTED
-  - H_C2 summary: coherence under the capture (music) — a hand-occlusion leg
-    should be captured separately and compared by re-running this tool.
+  - H_C2 summary: coherence under the retained music capture.
 
 Pre-registered criteria (design im69d130-dual-mic-eval-2026-08-05 §5.3, runbook
 P3.C C4) — written before the run; do not adjust after seeing the data.
@@ -37,7 +38,7 @@ KILL_RHO = 0.95
 def decode(path: Path):
     text = path.read_text(errors="replace")
     m = re.search(
-        r"\[SCAP-BEGIN len=(\d+) crc32=([0-9a-f]{8}) frames=(\d+) sr=(\d+) fmt=le_i16_LR\]"
+        r"\[SCAP-BEGIN len=(\d+) crc32=([0-9a-f]{8}) frames=(\d+) sr=(\d+) fmt=le_i16_(RL|LR)\]"
         r"(.*?)\[SCAP-END\]",
         text,
         re.S,
@@ -45,20 +46,21 @@ def decode(path: Path):
     if not m:
         raise SystemExit("no [SCAP-BEGIN]..[SCAP-END] block found")
     length, crc_expect, frames, sr = int(m.group(1)), int(m.group(2), 16), int(m.group(3)), int(m.group(4))
-    hex_body = "".join(re.findall(r"^[0-9a-f]+$", m.group(5), re.M))
+    wire_format = m.group(5)
+    hex_body = "".join(re.findall(r"^[0-9a-f]+$", m.group(6), re.M))
     raw = bytes.fromhex(hex_body)
     if len(raw) != length:
         raise SystemExit(f"length mismatch: header {length}, decoded {len(raw)}")
     crc_ok = (zlib.crc32(raw) & 0xFFFFFFFF) == crc_expect
     data = np.frombuffer(raw, dtype="<i2").astype(np.float64)
-    left, right = data[0::2], data[1::2]
-    assert len(left) == frames, (len(left), frames)
-    return left, right, sr, crc_ok
+    idf_right, idf_left = data[0::2], data[1::2]
+    assert len(idf_right) == frames, (len(idf_right), frames)
+    return idf_right, idf_left, sr, crc_ok, wire_format
 
 
-def band_metrics(left, right, sr):
-    n = len(left)
-    f, cxy = msc(left, right, fs=sr, nperseg=4096)
+def band_metrics(idf_right, idf_left, sr):
+    n = len(idf_right)
+    f, cxy = msc(idf_right, idf_left, fs=sr, nperseg=4096)
     freqs = np.fft.rfftfreq(n, 1.0 / sr)
     out = []
     for lo, hi in zip(BAND_EDGES_HZ[:-1], BAND_EDGES_HZ[1:]):
@@ -66,10 +68,10 @@ def band_metrics(left, right, sr):
         mask = (freqs >= lo) & (freqs < hi)
         if not mask.any():
             continue
-        L = np.fft.irfft(np.where(mask, np.fft.rfft(left), 0), n)
-        R = np.fft.irfft(np.where(mask, np.fft.rfft(right), 0), n)
-        denom = np.sqrt((L * L).sum() * (R * R).sum())
-        rho = float((L * R).sum() / denom) if denom > 0 else float("nan")
+        right_band = np.fft.irfft(np.where(mask, np.fft.rfft(idf_right), 0), n)
+        left_band = np.fft.irfft(np.where(mask, np.fft.rfft(idf_left), 0), n)
+        denom = np.sqrt((right_band * right_band).sum() * (left_band * left_band).sum())
+        rho = float((right_band * left_band).sum() / denom) if denom > 0 else float("nan")
         cband = cxy[(f >= lo) & (f < hi)]
         out.append({
             "band_hz": [lo, hi],
@@ -82,19 +84,21 @@ def band_metrics(left, right, sr):
 def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: stereo_probe_decode.py <capture.log>")
-    left, right, sr, crc_ok = decode(Path(sys.argv[1]))
-    denom = np.sqrt((left * left).sum() * (right * right).sum())
-    rho_broadband = float((left * right).sum() / denom) if denom > 0 else float("nan")
-    bands = band_metrics(left, right, sr)
+    idf_right, idf_left, sr, crc_ok, wire_format = decode(Path(sys.argv[1]))
+    denom = np.sqrt((idf_right * idf_right).sum() * (idf_left * idf_left).sum())
+    rho_broadband = float((idf_right * idf_left).sum() / denom) if denom > 0 else float("nan")
+    bands = band_metrics(idf_right, idf_left, sr)
     rhos = [b["rho"] for b in bands if b["rho"] == b["rho"]]
     hc_rejected = bool(rhos) and all(r > KILL_RHO for r in rhos)
     print(json.dumps({
         "crc_ok": crc_ok,
-        "frames": len(left),
-        "seconds": round(len(left) / sr, 2),
+        "frames": len(idf_right),
+        "seconds": round(len(idf_right) / sr, 2),
         "sample_rate": sr,
-        "l_rms": round(float(np.sqrt((left ** 2).mean())), 1),
-        "r_rms": round(float(np.sqrt((right ** 2).mean())), 1),
+        "wire_format": f"le_i16_{wire_format}",
+        "buffer_order": ["ESP_IDF_RIGHT", "ESP_IDF_LEFT"],
+        "idf_right_rms": round(float(np.sqrt((idf_right ** 2).mean())), 1),
+        "idf_left_rms": round(float(np.sqrt((idf_left ** 2).mean())), 1),
         "rho_broadband": round(rho_broadband, 4),
         "bands": bands,
         "kill_criterion": f"rho > {KILL_RHO} across all visual-driving bands",

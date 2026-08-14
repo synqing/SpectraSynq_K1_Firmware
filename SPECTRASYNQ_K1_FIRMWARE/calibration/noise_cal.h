@@ -107,6 +107,16 @@ void noise_cal_restore_previous_or_invalidate() {
 }
 
 void start_noise_cal() {
+#ifdef K1_MIC_HEALTH_V1
+  if (!k1_mic_health_allows_calibration()) {
+    const K1MicHealthContext health = k1_mic_health_read();
+    USBSerial.print("NOISE CAL REFUSED: mic_health=");
+    USBSerial.print(k1_mic_health_state_name(health.state));
+    USBSerial.print(" reason=");
+    USBSerial.println(k1_mic_health_reason_name(health.reason));
+    return;
+  }
+#endif
   noise_cal_snapshot_current_profile();
   noise_complete = false;
   max_waveform_val = 0;

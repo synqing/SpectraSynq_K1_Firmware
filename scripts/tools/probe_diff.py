@@ -34,6 +34,22 @@ def sections(text):
     return out
 
 
+def option_flags(body, option):
+    """Return -D names from one PlatformIO option and its indented continuations."""
+    match = re.search(
+        rf"^{re.escape(option)}\s*=\s*(.*(?:\n[ \t]+.*)*)",
+        body,
+        re.M,
+    )
+    if not match:
+        return set()
+    uncommented = "\n".join(
+        line for line in match.group(1).splitlines()
+        if not line.lstrip().startswith(("#", ";"))
+    )
+    return set(re.findall(r"-D([A-Za-z0-9_]+)", uncommented))
+
+
 def effective_flags(env, secs, seen=None):
     """All -D flags for an env, resolved through the whole `extends` chain.
 
@@ -45,13 +61,12 @@ def effective_flags(env, secs, seen=None):
         return set()
     seen.add(env)
     body = secs[env]
-    uncommented = "\n".join(
-        l for l in body.splitlines() if not l.lstrip().startswith(("#", ";"))
-    )
-    flags = set(re.findall(r"-D([A-Za-z0-9_]+)", uncommented))
+    flags = set()
     ext = re.search(r"^extends\s*=\s*env:(\S+)", body, re.M)
     if ext:
-        flags |= effective_flags(ext.group(1), secs, seen)
+        flags = effective_flags(ext.group(1), secs, seen)
+    flags |= option_flags(body, "build_flags")
+    flags -= option_flags(body, "build_unflags")
     return flags
 
 
@@ -109,6 +124,14 @@ extends = env:base
 # -DD is only mentioned in prose here
 build_flags =
     ${env:base.build_flags}
+
+[env:unflag_probe]
+extends = env:base
+build_unflags =
+    -DB
+build_flags =
+    ${env:base.build_flags}
+    -DC
 """
 
 
@@ -122,6 +145,8 @@ def self_test():
         ("real_probe", "base", "C", 0, "expected flag is in the delta"),
         ("real_probe", "base", "B", 1, "expected flag is already in the base"),
         ("comment_probe", "base", None, 1, "flag mentioned only in a comment"),
+        ("unflag_probe", "base", "B", 0, "removes an inherited flag"),
+        ("unflag_probe", "base", "C", 0, "adds while removing an inherited flag"),
     ]
     ok = True
     for probe, base, expect, want, why in cases:

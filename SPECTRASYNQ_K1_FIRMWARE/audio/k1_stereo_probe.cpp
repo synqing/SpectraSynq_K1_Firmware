@@ -15,7 +15,7 @@
 // 24 s ceiling: 24 s × 12800 Hz × 2 ch × 2 B = 2,457,600 B of 8 MB PSRAM.
 static const uint32_t K1_SCAP_MAX_SECONDS = 24;
 
-static int16_t*  s_buf = nullptr;          // PSRAM, interleaved L/R frames
+static int16_t*  s_buf = nullptr;          // PSRAM, interleaved ESP-IDF RIGHT/LEFT frames
 static uint32_t  s_capacity_frames = 0;    // total frames the buffer can hold
 static uint32_t  s_target_frames = 0;      // armed capture length
 static volatile uint32_t s_filled_frames = 0;
@@ -50,14 +50,15 @@ void k1_stereo_probe_on_chunk(const int16_t* interleaved, uint16_t frames) {
 
 static void scap_status() {
   USBSerial.printf("[SCAP] armed=%d filled=%lu target=%lu capacity=%lu buf=%s "
-                   "l_rms=%.1f l_peak=%u r_rms=%.1f r_peak=%u\n",
+                   "idf_right_rms=%.1f idf_right_peak=%u "
+                   "idf_left_rms=%.1f idf_left_peak=%u\n",
                    s_armed ? 1 : 0,
                    (unsigned long)s_filled_frames,
                    (unsigned long)s_target_frames,
                    (unsigned long)s_capacity_frames,
                    (s_buf != nullptr) ? "ok" : "NULL",
                    (double)im69d_raw_i16_rms, (unsigned)im69d_raw_i16_abs_peak,
-                   (double)im69d_right_raw_i16_rms, (unsigned)im69d_right_raw_i16_abs_peak);
+                   (double)im69d_left_raw_i16_rms, (unsigned)im69d_left_raw_i16_abs_peak);
 }
 
 static void scap_arm(uint32_t seconds) {
@@ -85,7 +86,7 @@ static void scap_dump() {
   const size_t total_bytes = (size_t)frames * 2U * sizeof(int16_t);
   const uint32_t crc = esp_crc32_le(0, (const uint8_t*)s_buf, total_bytes);
   // Header carries everything the decoder needs; sample_rate pins the time axis.
-  USBSerial.printf("[SCAP-BEGIN len=%u crc32=%08lx frames=%lu sr=%lu fmt=le_i16_LR]\n",
+  USBSerial.printf("[SCAP-BEGIN len=%u crc32=%08lx frames=%lu sr=%lu fmt=le_i16_RL]\n",
                    (unsigned)total_bytes, (unsigned long)crc,
                    (unsigned long)frames, (unsigned long)CONFIG.SAMPLE_RATE);
   const uint8_t* bytes = (const uint8_t*)s_buf;

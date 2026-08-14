@@ -65,6 +65,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
 #include "serial_cmd_handlers.h"
+#ifdef ENABLE_AP_STREAM
+extern void ap_capture_arm(uint32_t ms);
+#endif
 // Declarations + dispatch table (must precede system.h — init_serial lives here).
 #include "serial_menu.h"
 #include "led_utilities.h"

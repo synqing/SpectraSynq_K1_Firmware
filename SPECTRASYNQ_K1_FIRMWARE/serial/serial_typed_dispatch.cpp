@@ -34,6 +34,12 @@
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h"
 #endif
+#ifdef K1_MIC_HEALTH_V1
+#include "k1_mic_health.h"
+#endif
+#ifdef K1_AP_TWITCH_ORACLE_V1
+#include "k1_ap_twitch_oracle.h"
+#endif
 
 #include <string.h>
 #include <stdlib.h>
@@ -73,6 +79,9 @@ extern bool stream_agc_debug;
 extern void vp_apply_profile(uint8_t profile);
 extern const char* vp_bool_text(bool value);
 extern uint8_t raw_dump_request;
+#if ENABLE_VPAB_PROBE
+extern void vpab_command(const char* command_type, const char* command_data);
+#endif
 
 
 // ---- dispatcher family wrappers ----
@@ -180,6 +189,114 @@ bool serial_typed_ap_stream(const char* command_type, char* command_data) {
       }
   return true;
 }
+
+#ifdef K1_MIC_HEALTH_V1
+static void serial_print_mic_health() {
+  const K1MicHealthContext health = k1_mic_health_read();
+  tx_begin();
+  USBSerial.print("MIC_HEALTH state=");
+  USBSerial.print(k1_mic_health_state_name(health.state));
+  USBSerial.print(" reason=");
+  USBSerial.print(k1_mic_health_reason_name(health.reason));
+  USBSerial.print(" liveness=");
+  USBSerial.print(health.liveness_proven ? 1 : 0);
+  USBSerial.print(" challenge=");
+  USBSerial.print(health.challenge_active ? 1 : 0);
+  USBSerial.print(" inject=");
+  USBSerial.print(k1_mic_health_injection_name(health.injection));
+  USBSerial.print(" epoch=");
+  USBSerial.print(health.epoch);
+  USBSerial.print(" frames=");
+  USBSerial.print(health.frame_count);
+  USBSerial.print(" raw_peak_i16=");
+  USBSerial.print(health.last_raw_peak_i16);
+  USBSerial.print(" raw_rms_i16=");
+  USBSerial.print(health.last_raw_rms_i16, 2);
+  USBSerial.print(" challenge_baseline_peak_i16=");
+  USBSerial.print(health.challenge_baseline_peak_i16);
+  USBSerial.print(" challenge_baseline_rms_i16=");
+  USBSerial.println(health.challenge_baseline_rms_i16, 2);
+  tx_end();
+}
+
+bool serial_typed_mic_health(const char* command_type, char* command_data) {
+  const char* value = command_data == nullptr ? "" : command_data;
+  if (value[0] == '\0' || strcmp(value, "status") == 0) {
+    serial_print_mic_health();
+  } else if (strcmp(value, "challenge") == 0) {
+    k1_mic_health_begin_challenge(millis());
+    serial_print_mic_health();
+  } else if (strcmp(value, "fail_challenge") == 0) {
+    k1_mic_health_fail_challenge();
+    serial_print_mic_health();
+  } else if (strcmp(value, "reset") == 0) {
+    k1_mic_health_reset(millis());
+    serial_print_mic_health();
+  } else {
+    bad_command(command_type, command_data);
+  }
+  return true;
+}
+
+#ifdef K1_MIC_HEALTH_FAULT_INJECT_V1
+bool serial_typed_mic_health_fault(const char* command_type, char* command_data) {
+  const char* value = command_data == nullptr ? "" : command_data;
+  K1MicHealthFaultInjection injection = K1_MIC_INJECT_NONE;
+  bool valid = true;
+  if (strcmp(value, "none") == 0) {
+    injection = K1_MIC_INJECT_NONE;
+  } else if (strcmp(value, "stale") == 0) {
+    injection = K1_MIC_INJECT_STALE_I2S;
+  } else if (strcmp(value, "repeat") == 0) {
+    injection = K1_MIC_INJECT_REPEATED_BUFFER;
+  } else if (strcmp(value, "constant") == 0) {
+    injection = K1_MIC_INJECT_CONSTANT_BUFFER;
+  } else if (strcmp(value, "rail") == 0) {
+    injection = K1_MIC_INJECT_RAIL_LOCK;
+  } else {
+    valid = false;
+  }
+  if (!valid) {
+    bad_command(command_type, command_data);
+    return true;
+  }
+  k1_mic_health_set_fault_injection(injection);
+  serial_print_mic_health();
+  return true;
+}
+#endif
+#endif
+
+#ifdef K1_AP_TWITCH_ORACLE_V1
+bool serial_typed_ap_twitch(const char* command_type, char* command_data) {
+  const char* value = command_data == nullptr ? "" : command_data;
+  if (value[0] == '\0' || strcmp(value, "status") == 0) {
+    tx_begin();
+    k1_ap_twitch_oracle_print_status();
+    tx_end();
+    return true;
+  }
+  if (strcmp(value, "reset") == 0) {
+    k1_ap_twitch_oracle_reset();
+    tx_begin();
+    k1_ap_twitch_oracle_print_status();
+    tx_end();
+    return true;
+  }
+  unsigned long duration_value = 0UL;
+  unsigned long warmup_value = 30UL;
+  if (sscanf(value, "start,%lu,%lu", &duration_value, &warmup_value) >= 1 &&
+      duration_value >= 1000UL && duration_value <= 60000UL && warmup_value <= 1000UL) {
+    k1_ap_twitch_oracle_start(millis(), uint32_t(duration_value), uint32_t(warmup_value));
+    tx_begin();
+    k1_ap_twitch_oracle_print_status();
+    tx_end();
+    return true;
+  }
+  bad_command(command_type, command_data);
+  return true;
+}
+#endif
 
 #if ENABLE_TEMPO_STREAM
 bool serial_typed_tempo_stream(const char* command_type, char* command_data) {
