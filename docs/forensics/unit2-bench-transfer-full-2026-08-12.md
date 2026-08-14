@@ -4,6 +4,11 @@ abstract: "Full transfer-test gamut, 2026-08-12, both IM69D units on 68dd8d25 si
 
 # Transfer test — full gamut, both units, 2026-08-12
 
+> **P0.0 quarantine notice (2026-08-15):** cross-unit conclusions are inadmissible because
+> the B489 comparator used the IM69D mono-default epoch. Unit 2 RIGHT-slot data survives
+> only as single-device evidence. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Devices:** Unit 2 `0C54FC00` (dual IM69D130, 206+206 px) and bench K1v2 `B489A500`
 (IM69D130, 160+160 px), both on `68dd8d25`, **side by side facing the Bose**.
 **Captain's context, given mid-session and load-bearing:**

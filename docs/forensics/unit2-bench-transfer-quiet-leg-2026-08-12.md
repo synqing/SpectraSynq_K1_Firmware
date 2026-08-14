@@ -4,6 +4,11 @@ abstract: "Transfer-test QUIET leg, 2026-08-12: Unit 2 (0C54FC00) and bench (B48
 
 # Transfer test — QUIET leg, both units, 2026-08-12
 
+> **P0.0 quarantine notice (2026-08-15):** the B489 comparator belongs to the contaminated
+> IM69D mono-default epoch, so the transfer ratio is `RE-DERIVED`; Unit 2 RIGHT-slot data
+> remains valid only on its own. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Question this leg addresses:** the joint level fraction is **1.25** on the bench and
 **2.50** on Unit 2. Captain's position is that it should transfer, and that the
 "per-unit" framing is wrong. The handover's candidate mechanisms, in its order of

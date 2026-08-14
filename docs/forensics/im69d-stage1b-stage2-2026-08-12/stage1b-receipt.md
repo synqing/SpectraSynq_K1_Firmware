@@ -4,6 +4,12 @@ abstract: "Stage 1b receipt (runbook P3.B): mic B / RIGHT slot proven alive on b
 
 # Stage 1b — mic B / RIGHT slot proof (bench B489A500)
 
+> **G1 correction (2026-08-15):** RIGHT decoded-stream liveness/floor evidence is physical
+> IM1 / board-left / SELECT HIGH. This receipt alone did not prove both capsules; the later
+> CRC stereo evidence does, and G1 maps index 1 to physical IM2. No further physical test is
+> authorised. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Date:** 2026-08-12 evening · **Env:** `k1_bench_im69d_micb` @ `fa164732` (branch `chore/p2b-im73d-quarantine`)
 **Device:** bench K1v2, chip `B489A500`, MAC `b4:3a:45:a5:89:b4` (esptool receipt), port `/dev/cu.usbmodem12201`
 **Flash auth:** `_scratch/im69d_resolution_20260810/receipts/P3B_FLASH_AUTH.txt` (Captain in-session GO 2026-08-12)

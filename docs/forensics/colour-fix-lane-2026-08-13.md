@@ -4,6 +4,12 @@ abstract: "Colour fix lane — live execution doc (opened 2026-08-13). Status: R
 
 # Colour fix lane — execution doc
 
+> **P0.0 quarantine notice (2026-08-15):** absolute-level, silence-rest and malformed
+> quiet-normalisation conclusions from B489 mono-default descendants are `RE-DERIVED`.
+> Source reasoning, palette references and programme-relative findings retain their stated
+> scope pending verified-IM1 acceptance. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Contract:** [`colour-nuance-regression-verdict-2026-08-13.md`](./colour-nuance-regression-verdict-2026-08-13.md) §Fix lane
 · Canon: `docs/canon/SESSION_CANON_2026-08-13_colour_forensics_config_poison.md` · Skill: `k1-colour-truth`
 

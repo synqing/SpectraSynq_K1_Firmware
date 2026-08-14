@@ -4,6 +4,12 @@ abstract: "THE canonical end-to-end synthesis of everything learned about the du
 
 # Dual IM69D130 — end-to-end learnings
 
+> **P0.0/G1 correction (2026-08-15):** B489 absolute-level/calibration/silence measurements,
+> cross-unit amplitude ratios and profile-wide thresholds require re-derivation. Static and
+> programme-relative findings are not automatically invalidated. G1 maps ESP-IDF RIGHT to
+> physical IM1 and stereo index 0; LEFT to physical IM2 and index 1. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Consolidated 2026-08-13** from the 2026-08-05 → 2026-08-13 programme (design → bring-up →
 identity correction → gate derivation → transfer test → dual-capsule → floors → visual proof).
 This is the synthesis document; every claim links to its receipt. Merged evidence: PR #43, #44, #45.

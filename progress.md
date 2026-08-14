@@ -2,6 +2,26 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-15 — AP input-integrity takeover
+
+**Active authority:** `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`
+**Lane:** `K1_AP_INPUT_INTEGRITY_20260814` on `main`
+**Authorisation:** `CONDITIONAL_GO_P0_MEASUREMENT_ONLY`
+
+- P0's pre-registered kill criterion fired: both IM69D capsules are alive; the
+  remaining fault is mono slot semantics.
+- Static slot chain resolved: IM1 SELECT HIGH → Infineon LEFT → ESP-IDF mask RIGHT → PCM
+  index 0; IM2 SELECT LOW → Infineon RIGHT → ESP-IDF mask LEFT → PCM index 1.
+- Captain RATIFIED G1 on 2026-08-15: physical IM1 via `K1_MIC_IM69D_SLOT_RIGHT` is the
+  future programme source. No further physical microphone test is authorised.
+- T0.3 bench/diagnostic explicit-slot work and ratchets are complete. Full gate: 1079 passed,
+  1 skipped; affected builds and `k1_hardware` compile; protected production environments
+  are byte-identical. Production slot promotion remains held until P4.
+- P0.0 quarantine indexing is closed at
+  `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`; re-derivation remains
+  behind P2/P3. Its scope is narrowed to capsule identity, absolute level,
+  calibration/silence state and malformed quiet-state normalisation dependencies.
+
 ## 2026-08-13 — Bose round: floors closed, profile 2 populated, H_C rejected
 
 Captain reconnected the Bose; canonical fixture corrected to PioneerDJ Demo Track 1

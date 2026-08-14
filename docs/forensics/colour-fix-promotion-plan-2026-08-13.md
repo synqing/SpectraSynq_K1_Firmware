@@ -4,6 +4,12 @@ abstract: "Promotion plan for the colour-fix candidate (lane/colour-fix-goldkill
 
 # Colour-fix promotion plan — 2026-08-13
 
+> **P0.0 quarantine notice (2026-08-15):** promotion is not authorised from the historical
+> B489 metrics. Absolute-level, silence and quiet-normalised gates must be re-derived on
+> verified IM1 under Rev B; static findings, palette references and programme-relative
+> observations retain their narrower scope. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Status: NOT_VERIFIED per claim except where an explicit re-derivation is
 recorded below.** This is an audit, not an approval. No source, `platformio.ini`,
 commit or device action was taken. Branch audited: `lane/colour-fix-goldkiller`.

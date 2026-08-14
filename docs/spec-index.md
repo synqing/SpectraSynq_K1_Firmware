@@ -1,11 +1,11 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_lane: K1_DUAL_IM69D130_RESOLUTION_20260810
-active_authority: docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md
+active_lane: K1_AP_INPUT_INTEGRITY_20260814
+active_authority: docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md
 active_branch: main
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
-lane_branch: fix/dual-im69d130-resolution-20260810 (checked out in .worktrees/unit2_slot_ab)
-last_verified: 2026-08-11
+lane_branch: main
+last_verified: 2026-08-15
 ---
 
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
@@ -29,13 +29,14 @@ around it, and do not propose work that depends on it.** This supersedes every
   in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer). The branch name no
   longer describes what the lane is about.
 
-**Current authority (2026-08-11):** **Dual IM69D130 resolution** —
-[`docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`](hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md)
-· runbook `.cursor/plans/im69d_dual_resolution_d171d7f2.plan.md`
-· pack `_scratch/im69d_resolution_20260810/`.
-Unit 2 = dual IM69D130; IM73D deprecated; pin receipt PENDING.
-The 2026-08-05 IM69D eval docs and the long IM73D snapshot below are historical /
-superseded context — not live Unit 2 root-cause authority.
+**Current authority (2026-08-15):** **K1 AP input integrity** —
+[`docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md)
+· Rev B plan [`docs/plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md`](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md)
+· P0 findings [`docs/plans/P0_FINDINGS_2026-08-14.md`](plans/P0_FINDINGS_2026-08-14.md).
+Captain RATIFIED G1 on 2026-08-15: physical IM1 / SELECT HIGH / ESP-IDF RIGHT / PCM 0 is
+the future programme source. T0.3 bench/diagnostic explicit-slot work and ratchets are
+complete. No further physical microphone test is authorised. Production stays byte-inert
+until P4.
 
 **Last verified:** 2026-07-08 (git `lane/im73d-pdm-eval`; active lane = IM73D122 productionization - **Phase-1 firmware DONE**, R1 knob-persistence proof CLOSED, raw AP telemetry landed, controlled-audio DSR evidence captured, bench recovery proved, and sensitivity/telemetry schema hardening in progress). Vibrancy + IM73D mic-eval lanes are consolidated; `k1_prod_im73d` main/prod build path shipped (byte-identical-OFF, guard-mapped to main K1). Main `F887A500` is `k1_hardware @ 67227da` and remains the SPH reference/control. Bench `B489A500` proves the IM73D PDM mic path on the ratified `clk13/din12/LR14` pins. Captain has confirmed both K1s are identical hardware; env choice is configuration: `k1_bench_im73d` uses the bench-reference LED map `4/5`, while `k1_prod_im73d` uses the main/prod LED map `6/7`. A 2026-07-07 bench flash made both LED channels dark because the `6/7` env was used on the unit restored/proven as the `4/5` env; that is wrong-env evidence, not a physical hardware split. Bench was restored to radio-free `k1_bench_im73d @ f2f7c45`; read-only proof confirms `env=k1_bench_im73d`, chip `B489A500`, `CAL_SOURCE: persisted_profile`, `CAL_VALID: 1`, `CONFIG.CHROMA: 0.100000`, `CONFIG.SENSITIVITY: 0.870005`, and `AUDIO_RESPONSE_GAIN: 1.000000` on `/dev/cu.usbmodem1401`. **N2c watchdog correction:** a 2026-07-08 live `IDLE0` task-WDT on `B489A500` proved the bounded-read/loop-watchdog guard still needs a real idle-task slot; the audio loop tail now uses `vTaskDelay(1)` instead of `yield()`, and a 28 s recovery readback crossed the prior failure point with no WDT/backtrace/reboot markers. Raw pre-conditioning AP telemetry now exists as `raw_i16_abs_peak`, `raw_i16_rms`, and `raw_i16_near_pct`. Controlled-audio DSR16 vs DSR8 showed no raw rail risk, but quiet raw RMS rose and music raw-RMS-over-quiet response fell at every tested volume, so **DSR_16S is rejected** and `DSR_8S` remains the default. `global.sensitivity` now uses the same `0.10..20.0` scale as serial/hotkeys, and `:stream_agc` now separates legacy `floor` from active AGC `active_floor`. **Resume authority:** [`docs/hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md`](hardware/im73d-dsr16-controlled-audio-evidence-2026-07-06.md) + [`docs/hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md`](hardware/im73d-dsr16-quiet-only-evidence-2026-07-06.md) + [`docs/hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md`](hardware/im73d-r2-main-k1-swap-decision-handoff-2026-07-06.md) + [`docs/hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md`](hardware/im73d-audio-pipeline-purity-audit-2026-07-06.md) + [`docs/hardware/im73d-codex-resume-handover-2026-07-06.md`](hardware/im73d-codex-resume-handover-2026-07-06.md) -> [`docs/hardware/im73d122-productionization-handover-2026-07-03.md`](hardware/im73d122-productionization-handover-2026-07-03.md) §§10-11. The `k1_bench_im73d_ble` IM73D+BLE-MIDI demo build remains a parallel deliverable; do not measure mic SNR on the radio build. The earlier 2026-06-10 / 2026-06-15 status below is preserved for context but is NOT the current active lane; verify any claim against current git before acting.
 
@@ -111,11 +112,12 @@ environment-cold (clean clone + empty `PLATFORMIO_CORE_DIR`) — a warm build is
 evidence, not proof. End-state is non-negotiable: Tab5 is a pinned,
 clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination.
 
-## Active lanes (updated 2026-08-05)
+## Active lanes (updated 2026-08-15)
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
-| **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) · **[session canon 2026-08-07](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)** | **CURRENT.** Branch `feat/ap-advice-phase0-im69d-gain8`. Phase 0 device PASS at **G=4**; ghost retirement + ×2 drop landed. Bench `B489A500` = `k1_bench_im69d`. Peakiness/joint-break work continues on vj-lane. | `platformio.ini` `[env:k1_bench_im69d]`; `docs/hardware/device-build-registry.md`; vj-lane `docs/forensics/im69d-bringup-2026-08-06/` |
+| **K1 AP input integrity** | [handover](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md) · [Rev B plan](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md) · [G1 receipt](forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md) | **CURRENT. G1 RATIFIED; T0.3 COMPLETE.** No further physical mic test; production slot held until P4. | `_scratch/p0_stereo_20260814/`; `scripts/tools/probe_diff.py`; `scripts/regression-harness/mic_stable_byte_gate.sh` |
+| **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) · **[session canon 2026-08-07](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)** | **SUPERSEDED as current authority.** B489 mono-default device evidence is dispositioned by the P0.0 quarantine manifest; source-reasoned work retains only its stated scope. | `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`; historical env and receipts retained for provenance |
 | **Deck16 Tab5 BLE R1** | [docs/architecture/K1_DECK16_ARCHITECTURE_R1.md](architecture/K1_DECK16_ARCHITECTURE_R1.md) · [radio](architecture/RADIO_FALLBACK_DECISION.md) · **[Tab5 session canon 2026-08-07](architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md)** · **[backend/haunt/latency canon 2026-08-09](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)** · **[68-control recovery canon](canon/TAB5_SESSION_FAILURES_AND_ENGINEERING_CANON_2026-08-11.md)** · skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md) | **ACTIVE architecture + ACTIVE immune memory.** Current protocol is **68 controls / `9b5db3...`**; 71/`78fb9a...` is historical only. Source recovery merged; identity + snapshot proof passed on Unit2/Tab5. Bidirectional delta, long soak, assigned CID, and UNIT-default production claim remain open. **K718 Remoted dial retired.** PRODUCTION_READY=NO. | `docs/protocol/k1-ble-midi-map.json`; `tab5_firmware/`; `scripts/agent/deck16-first-contact-gate.sh`; `scripts/agent/tab5_protocol_parity_gate.py` |
 | **M2.1 serial_menu decomposition + save-show** | [docs/refactor/serial-menu-decomposition-plan-2026-07-26.md](refactor/serial-menu-decomposition-plan-2026-07-26.md) | **COMPLETE 2026-07-26** on main. R1+R2 typed dispatch; Shift+S / `:save_show` host-green. | `serial/serial_typed_cmd_table.def`, `control/k1_show_state.*` |
 | ~~**Dual-sync F0-F3 recovery**~~ | [DEPRECATED notice](../artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md) | **⛔ DEAD — SHELVED by Captain 2026-08-05.** Artefacts retained as historical evidence only. | `artifacts/k1_dual_sync_eval_2026-07-08/DEPRECATED.md` |

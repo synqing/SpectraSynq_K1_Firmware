@@ -1,5 +1,7 @@
 ---
-abstract: "READ FIRST. Handover 2026-08-14b. The colour lane's real blocker was found: the AP input. A fortnight of measurement went through a PDM path that produced no acoustic response. Authorisation is CONDITIONAL_GO_P0_MEASUREMENT_ONLY (Captain) against docs/plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md Rev B. P0's pre-registered kill criterion ALREADY FIRED: both IM69D capsules are alive, so the fault is MONO SLOT SEMANTICS, not a dead part. Next action is two PHYSICAL checks that only Captain can perform, then G1. Do not mutate config before G1; production stays byte-inert until P4. Skills k1-measurement-discipline and k1-colour-truth auto-load the rules."
+abstract: "READ FIRST. Handover 2026-08-14b. P0 refuted the dead/unpopulated diagnosis; Captain RATIFIED G1 on 2026-08-15. IM1 HIGH → ESP-IDF PDM RIGHT → PCM index 0 is the future programme source; IM2 LOW → ESP-IDF PDM LEFT → PCM index 1. T0.3 is COMPLETE: all active mono IM69D diagnostic envs resolve explicitly to RIGHT, stereo removes the inherited mono flag, misleading/no-op aliases are retired, full tests/builds pass, and protected production environments remain byte-identical. No further physical microphone test is authorised. Production slot promotion remains held until P4."
+status: active
+branch: main
 ---
 
 # HANDOVER — 2026-08-14b · AP input integrity
@@ -15,16 +17,16 @@ abstract: "READ FIRST. Handover 2026-08-14b. The colour lane's real blocker was 
 
 ## 2. Authorisation — read before touching anything
 
-**Captain verdict: `CONDITIONAL_GO_P0_MEASUREMENT_ONLY`.**
+**Captain verdict: G1 `RATIFIED` under the existing conditional lane authority.**
 
 | Authorised now | Held |
 |---|---|
-| P0.0 evidence quarantine · T0.1 · T0.1b · T0.2 | T0.3 accepted-config mutation → until **G1** |
-| | All production-env slot changes → until **P4** |
-| | P1/P2 implementation → Rev B is written; await ratification |
+| T0.3 is complete; documentation closeout/read-only audit | All production-env slot changes → until **P4** |
+| | P1/P2 implementation → existing later gates |
 
-**Do not mutate configuration before G1.** Source may be prepared in an isolated worktree.
-**Production must stay byte-inert until P4** — prove with `mic_stable_byte_gate.sh`.
+G1 has passed. **Production must stay byte-inert until P4** — prove with
+`mic_stable_byte_gate.sh`. No flash, calibration or physical microphone handling is
+authorised by T0.3.
 
 ## 3. Where the lane actually stands
 
@@ -32,11 +34,11 @@ abstract: "READ FIRST. Handover 2026-08-14b. The colour lane's real blocker was 
 through an instrument that could not see.** Six colour fixes landed and measured 3/4
 authored palette deployment. That result is not the blocker.
 
-**The blocker is the AP input.** For roughly nine days the bench read a PDM path that
-produced no acoustic response, and nothing in the system asked whether the input was real.
-Everything downstream followed: calibration rejecting 112/112 silence frames, silence never
-latching, the tempo engine locking 115 BPM in a dead-silent room, the plate 0–128 lit in
-silence and *more* active than with music.
+**The blocker is AP input integrity.** For roughly nine days the bench consumed physical
+IM2 under ambiguous inherited slot naming without checking that the selected input was
+suitable. Both capsules are alive. The affected calibration, silence, absolute-level and
+quiet-normalised plate conclusions require re-derivation on the ratified physical-IM1 source;
+unrelated code reasoning and programme-relative findings are not automatically destroyed.
 
 ### P0 already refuted the leading diagnosis
 
@@ -49,24 +51,39 @@ IDF 5.4.1 inversion already documented for the SPH0645 at `i2s_audio.h` ~L18-34.
 responds strongly in stereo while the mono default did not respond at all — **the mono
 single-slot path is not delivering what the stereo path delivers. Chase that.**
 
-## 4. YOUR NEXT ACTION
+## 4. T0.3 — complete
 
-**Two physical checks that only Captain can perform.** They gate G1 and therefore everything.
+All active mono IM69D environments now resolve to the ratified ESP-IDF RIGHT source. Stereo
+explicitly removes the inherited mono flag and selects both slots. The retired `micb`,
+`hpf_slotr` and no-op `calfix_dsr16` aliases are no longer active environments. Do not ask
+Captain to operate or interpret another measurement.
 
-1. **Directed near-field stimulus** at the IM1 position, then at the IM2 position.
-2. **Acoustic occlusion** of each capsule position in turn.
+```text
+PHYSICAL IM1 (SELECT HIGH) → Infineon PDM LEFT  → ESP-IDF mask RIGHT → PCM index 0
+PHYSICAL IM2 (SELECT LOW)  → Infineon PDM RIGHT → ESP-IDF mask LEFT  → PCM index 1
+RATIFIED FUTURE SHIPPED MONO SLOT → K1_MIC_IM69D_SLOT_RIGHT
+```
 
-Ask for them in one plain sentence. Two live signals is not the same as knowing which array
-is which capsule — a 15× level split could be sensitivity, placement or exposure.
+The chain is board SELECT strapping + the active ESP-IDF PDM enum + the retained
+mono/stereo floor fingerprint. Full authority:
+`docs/forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md`.
 
-Everything else in P0 (duplication, correlation, decoder-mapping swap) is **done**; the
-receipts are in `P0_FINDINGS_2026-08-14.md` and `_scratch/p0_stereo_20260814/`.
+The active build is ESP-IDF **5.4.1**, not 5.4.2. Freeze 5.4.1, the new PDM driver,
+`clk_inv=false`, and stereo order RIGHT then LEFT. This source-truth correction does not
+alter the mapping.
 
-While waiting, the one useful autonomous task is closing the **P0.0 quarantine manifest**
-(epoch-anchored, not calendar). Note `d1fae012` populated an audio profile from device
-measurement on 08-13, and `a8b1912a` re-derived the joint silence level fraction on 08-12 —
-both prime candidates. **Scope by device+config epoch:** Unit 2 (`0C54FC00`, pins 39/38) may
-be entirely unaffected and must not be swept up by date.
+Closeout authority and exact commands:
+`docs/forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md`.
+
+The earlier plate comparison and occlusion protocol is cancelled. Both render channels consume
+shared audio features, so plate-channel strength cannot identify a microphone. Occlusion is
+an uncontrolled fallback, not a baseline requirement.
+
+**Closed 2026-08-15:**
+`docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md` dispositions the
+`B489A500` IM69D mono-default epoch and its consumers. It quarantines only claims dependent
+on capsule identity, absolute level, calibration/silence state or malformed quiet
+normalisation. Re-derivation remains P2/P3 work.
 
 ## 5. Device truth
 
@@ -102,7 +119,7 @@ be entirely unaffected and must not be swept up by date.
 | `scripts/tools/gen_tunables.py` | regenerate the registry; ratcheted against drift |
 | `scratchpad/witness_ab.py` | paired A/B with the MacBook witness resolved by name |
 | `k1_bench_im69d_stereo` + `:scap_arm/status/dump` | both PDM channels, CRC-verified |
-| `k1_bench_im69d_micb` | mic B independently (`SLOT_RIGHT`) |
+| `k1_bench_im69d` | ratified physical IM1 programme source (`SLOT_RIGHT`) after T0.3 |
 | `scripts/agent/k1-flash-verified.sh` | flash + prove (honours `--port` since this session) |
 | `scripts/regression-harness/mic_stable_byte_gate.sh` | production byte-inertness |
 
@@ -129,4 +146,7 @@ was swept into PR #60 by a `git add -A docs/` — another lane's, harmless, reve
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-08-15 | Captain / agent:codex | G1 ratified; T0.3 bench/diagnostic work authorised; production held until P4; no further physical test authorised. |
+| 2026-08-15 | agent:codex | Replaced the invalid Captain-operated plate/occlusion procedure with the resolved static mapping and proposed G1 statement. |
+| 2026-08-15 | agent:codex | Added active authority metadata and linked the closed P0.0 device+config-epoch quarantine manifest. |
 | 2026-08-14 | agent:claude-code | Created at session close — P0 kill criterion fired; next action is two physical checks gating G1. |

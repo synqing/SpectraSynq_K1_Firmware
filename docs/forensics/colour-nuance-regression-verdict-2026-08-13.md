@@ -4,6 +4,12 @@ abstract: "Colour-nuance regression forensic VERDICT (2026-08-13, Captain-driven
 
 # Colour-nuance regression — forensic verdict (2026-08-13)
 
+> **P0.0 quarantine notice (2026-08-15):** the golden bin/config pair remains a visual and
+> configuration reproduction oracle only. It does not prove input health, absolute drive or
+> silence behaviour; those claims are `RE-DERIVED`. Static, palette-derived and
+> programme-relative findings are not automatically invalidated. See
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Method:** 5 parallel SSA excavations (`_scratch/colour_forensics_20260813/SSA1..5`) + prior
 audit `_scratch/colour_corruption_audit_20260810/` + live Captain-eyes A/B ladder on bench
 `B489A500` (esptool writes under explicit Captain GO).

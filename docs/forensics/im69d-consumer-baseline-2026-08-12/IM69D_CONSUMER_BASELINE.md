@@ -4,6 +4,11 @@ abstract: "P4.A IM69D consumer baseline (Unit 2 0C54FC00, dual IM69D130 RIGHT, S
 
 # P4.A — IM69D consumer baseline (Bench Unit 2)
 
+> **P0.0 quarantine notice (2026-08-15):** the Unit 2 RIGHT-slot raw legs remain valid
+> within that device/stream boundary, but the profile-wide characterisation and any
+> B489 transfer premise are `RE-DERIVED` in
+> `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`.
+
 **Date:** 2026-08-12 · **Device:** Unit 2 `0C54FC00`, dual IM69D130, RIGHT slot, `SSL=167` (`cal_source=measured`, final placement) · **Build:** `k1_unit2_im69d_right_matrix @ 947e2be8` (audio path identical to `k1_unit2_im69d_right`)
 **Raw legs:** `raw/leg_quiet-ambient.json` (96 frames, witness −67.8 dBFS mean), `raw/leg_music-laptop100.json` (123 frames, witness −48.0 dBFS mean, moonlight-lyria fixture, laptop speakers @100%)
 

@@ -5,8 +5,11 @@
 Authorisation: `CONDITIONAL_GO_P0_MEASUREMENT_ONLY` against
 `docs/plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md` (Rev B).
 P0's kill criterion FIRED — both IM69D capsules are alive; the fault is mono slot
-semantics. Next action: two PHYSICAL checks only Captain can perform, then G1.
-Do not mutate config before G1. Production byte-inert until P4.
+semantics. Static mapping now resolves IM1 → ESP-IDF RIGHT → PCM 0 and IM2 → ESP-IDF
+LEFT → PCM 1. Captain RATIFIED G1 on 2026-08-15. T0.3 is COMPLETE: bench/diagnostic
+IM69D envs are explicit, the ratchets/builds pass, and protected production environments
+are byte-identical. No further physical microphone test is authorised. Production slot
+promotion remains held until P4.
 
 Canon: `docs/canon/SESSION_CANON_2026-08-14b_MEASUREMENT_INTEGRITY.md` (HF-69..80).
 Skills `k1-measurement-discipline` + `k1-colour-truth` auto-load the rules.
@@ -28,7 +31,7 @@ resume it and do not propose work that depends on it. Full notice:
 **The branch `lane/dual-sync-phase0` no longer describes its contents** — it now
 just holds unrelated in-flight work (IM69D130 mic eval, WB-3 STM, edgemixer).
 
-## ▶ CURRENT LANE (2026-08-11) — DUAL IM69D130 RESOLUTION (`K1_DUAL_IM69D130_RESOLUTION_20260810`)
+## SUPERSEDED LANE (2026-08-11) — DUAL IM69D130 RESOLUTION (`K1_DUAL_IM69D130_RESOLUTION_20260810`)
 
 **Binding correction:**
 [`docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md`](../docs/hardware/CAPTAIN_CORRECTION_2026-08-10_unit2_im69d_im73d_deprecated.md)
