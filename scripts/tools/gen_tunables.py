@@ -44,11 +44,15 @@ CTYPE = {
 }
 
 
-# Per-frame pipeline directories. An assignment HERE means the value is recomputed
+# Per-frame pipeline sites. An assignment HERE means the value is recomputed
 # during normal operation, so exposing a setter would be a control that does nothing.
 # Assignments from control/, serial/, persistence/ and calibration/ are the existing
 # TUNING and restore paths — they do not make a parameter into state.
-HOT_PATH = ("/audio/", "/visual/", "/effects/", "/director/", "/diag/")
+# The .ino and system/system.h are included because the frame loop lives there and
+# writes LED_FPS / SYSTEM_FPS: those are OUTPUTS, and a setter for them is a control
+# wired to nothing (caught on-device after the first generation exposed LED_FPS).
+HOT_PATH = ("/audio/", "/visual/", "/effects/", "/director/", "/diag/",
+            ".ino", "/system/system.h", "/network/")
 
 
 def assigned_in_hot_path(name):

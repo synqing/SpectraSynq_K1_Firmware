@@ -6,7 +6,7 @@
 // is excluded — exposing a writer for it would be a control that does nothing.
 #pragma once
 
-#define K1_TUNABLE_COUNT 47
+#define K1_TUNABLE_COUNT 44
 
 inline const K1Tunable K1_TUNABLES[K1_TUNABLE_COUNT] = {
   { "AP_STREAM_ENABLED", K1_TUNE_BOOL, (void*)&AP_STREAM_ENABLED, "" },
@@ -15,12 +15,10 @@ inline const K1Tunable K1_TUNABLES[K1_TUNABLE_COUNT] = {
   { "K1_SILENCE_PEAKINESS_BREAK", K1_TUNE_F32, (void*)&K1_SILENCE_PEAKINESS_BREAK, "above this → structured audio, never silence" },
   { "K1_SILENCE_RMS_ENTER", K1_TUNE_F32, (void*)&K1_SILENCE_RMS_ENTER, "raw RMS below this → silence candidate (enter). Bench-calibrated 2026-07-10: quiet-ro..." },
   { "K1_SILENCE_RMS_EXIT", K1_TUNE_F32, (void*)&K1_SILENCE_RMS_EXIT, "raw RMS above this → not silent (Schmitt exit; > enter)" },
-  { "LED_FPS", K1_TUNE_F32, (void*)&LED_FPS, "" },
   { "SECONDARY_AUTO_COLOR_SHIFT", K1_TUNE_BOOL, (void*)&SECONDARY_AUTO_COLOR_SHIFT, "" },
   { "SECONDARY_BASE_COAT", K1_TUNE_BOOL, (void*)&SECONDARY_BASE_COAT, "" },
   { "SECONDARY_BASE_COAT_INTENSITY", K1_TUNE_F32, (void*)&SECONDARY_BASE_COAT_INTENSITY, "NEW: Secondary Base coat intensity control" },
   { "SECONDARY_CHROMA", K1_TUNE_F32, (void*)&SECONDARY_CHROMA, "" },
-  { "SECONDARY_LIGHTSHOW_MODE", K1_TUNE_U8, (void*)&SECONDARY_LIGHTSHOW_MODE, "1401 dual-tempo setup (2026-06-04): secondary boots on mode 18" },
   { "SECONDARY_MIRROR_ENABLED", K1_TUNE_BOOL, (void*)&SECONDARY_MIRROR_ENABLED, "" },
   { "SECONDARY_MOOD", K1_TUNE_F32, (void*)&SECONDARY_MOOD, "" },
   { "SECONDARY_PALETTE_INDEX", K1_TUNE_U8, (void*)&SECONDARY_PALETTE_INDEX, "boot palette lock (2026-08-05): K1_Naberius_Gold_gp" },
@@ -33,7 +31,6 @@ inline const K1Tunable K1_TUNABLES[K1_TUNABLE_COUNT] = {
   { "SILENCE_EXIT_SSL_FRAC", K1_TUNE_F32, (void*)&SILENCE_EXIT_SSL_FRAC, "leave silence above this * SSL (Schmitt gap: exit > enter)" },
   { "SILENT_FADE_DOWN_ALPHA", K1_TUNE_F32, (void*)&SILENT_FADE_DOWN_ALPHA, "slow fade to black (~1-2 s)" },
   { "SILENT_FADE_UP_ALPHA", K1_TUNE_F32, (void*)&SILENT_FADE_UP_ALPHA, "near-instant wake on first sound" },
-  { "SYSTEM_FPS", K1_TUNE_F32, (void*)&SYSTEM_FPS, "" },
   { "VP_BLOOM_ALPHA", K1_TUNE_F32, (void*)&VP_BLOOM_ALPHA, "" },
   { "VP_BLOOM_FORCE_SATURATION", K1_TUNE_BOOL, (void*)&VP_BLOOM_FORCE_SATURATION, "" },
   { "VP_BLOOM_SHIFT_SCALE", K1_TUNE_F32, (void*)&VP_BLOOM_SHIFT_SCALE, "" },
