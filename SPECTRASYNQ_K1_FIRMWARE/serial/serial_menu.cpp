@@ -35,6 +35,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "globals.h"    // CONFIG + global state (serial_menu.h:8)
 #include "constants.h"  // NUM_AGC_BANDS etc. (serial_menu.h:9)
 #include "k1_trace.h"   // (serial_menu.h:10)
+#ifdef K1_TUNABLE_REGISTRY_V1
+#include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
+#endif
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>     // strcmp
@@ -3250,6 +3253,61 @@ void parse_command(char* command_buf) {
       SILENCE_DWELL_MS = (uint32_t)atol(command_data);
       tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
     }
+#ifdef K1_TUNABLE_REGISTRY_V1
+    // Generic AP/VP parameter access, so any threshold under suspicion can be moved
+    // live instead of costing a rebuild-and-reflash per value.
+    //   :tune               list every parameter with its current value
+    //   :tune=NAME          read one
+    //   :tune=NAME,VALUE    write one
+    else if (strcmp(command_type, "tune") == 0) {
+      char buf[48];
+      char* comma = strchr(command_data, ',');
+      if (command_data[0] == '\0' || strcmp(command_data, "*") == 0) {
+        tx_begin();
+        USBSerial.print("TUNABLES "); USBSerial.println(K1_TUNABLE_COUNT);
+        for (uint16_t i = 0; i < K1_TUNABLE_COUNT; i++) {
+          k1_tunable_format(&K1_TUNABLES[i], buf, sizeof(buf));
+          USBSerial.print("  "); USBSerial.print(K1_TUNABLES[i].name);
+          USBSerial.print(" = "); USBSerial.println(buf);
+        }
+        tx_end();
+      } else if (comma == nullptr) {
+        const K1Tunable* t = k1_tunable_find(command_data);
+        tx_begin();
+        if (t == nullptr) {
+          USBSerial.print("TUNE UNKNOWN: "); USBSerial.println(command_data);
+        } else {
+          k1_tunable_format(t, buf, sizeof(buf));
+          USBSerial.print("TUNE "); USBSerial.print(t->name);
+          USBSerial.print(" = "); USBSerial.println(buf);
+        }
+        tx_end();
+      } else {
+        *comma = '\0';
+        const char* value = comma + 1;
+        const K1Tunable* t = k1_tunable_find(command_data);
+        tx_begin();
+        if (t == nullptr) {
+          USBSerial.print("TUNE UNKNOWN: "); USBSerial.println(command_data);
+        } else {
+          char before[48];
+          k1_tunable_format(t, before, sizeof(before));
+          if (!k1_tunable_apply(t, value)) {
+            USBSerial.print("TUNE REJECTED: "); USBSerial.print(t->name);
+            USBSerial.print(" <- "); USBSerial.println(value);
+          } else {
+            // Echo before AND after: a setter that silently no-ops is worse than one
+            // that refuses, so the receipt must show the value actually moved.
+            k1_tunable_format(t, buf, sizeof(buf));
+            USBSerial.print("TUNE "); USBSerial.print(t->name);
+            USBSerial.print(": "); USBSerial.print(before);
+            USBSerial.print(" -> "); USBSerial.println(buf);
+          }
+        }
+        tx_end();
+      }
+    }
+#endif
     // Raw-RMS absolute go-dark thresholds (firmware-v3 pre-gate port). Calibrate live from
     // [AP] rms_raw in a quiet room, then set enter above the floor with margin (exit > enter).
     else if (strcmp(command_type, "silence_rms_enter") == 0) {
