@@ -377,27 +377,95 @@ not acoustic. Also worth a same-bench comparison against an IM73D build.
 reinstalled 2026-08-12, after the reference was recorded). Reference re-recorded; all three
 envs now green. Evidence: `_scratch/byte_drift_bisect_2026-08-14.md`.
 
-#### PDM clock probe (DSR_16S) — INCONCLUSIVE, do not cite either way
+#### PDM clock probe (DSR_16S) — WITHDRAWN: the probe was a NO-OP, not "inconclusive"
 
-Hypothesis: the IM69D path takes `I2S_PDM_RX_CLK_DEFAULT_CONFIG(12800)` = **DSR_8S**
-=> PDM clock 12800 x 64 = **819 kHz**. `K1_MIC_IM69D_DSR_16S_V1` selects DSR_16S
-=> 1.638 MHz. If the modulator is being clocked outside its intended band, that could
-plausibly account for a ~35 dB floor excess that a normal DSR change (~2 dB) cannot.
+**Correction (same day).** This was first recorded as "inconclusive — confounded legs".
+That explanation was itself wrong. `[env:k1_bench_im69d]` — the base of the whole IM69D
+bench chain — **already defines `-DK1_MIC_IM69D_DSR_16S_V1`**. The probe env re-declared a
+flag that was already on, so it built a functionally identical binary. There was no
+variable under test at all; the room conditions were beside the point.
 
-Env `k1_bench_im69d_calfix_dsr16` built, flashed and verified (git `19e7540f`,
-epoch 1786642801). Measured floor: `raw_i16_rms p50 284.7, peak p50 426` versus
-DSR_8S `p50 180 / 300`.
+Two consequences:
+1. The whole IM69D bench chain (colourfix / calfix / hpf) runs **DSR_16S — PDM clock
+   12800 × 128 = 1.638 MHz**, not the DSR_8S / 819 kHz the original note claimed. Any
+   reasoning that assumed 819 kHz is void.
+2. The probe env has been **removed** rather than left as misleading machinery.
 
-**This comparison is CONFOUNDED and proves nothing.** The DSR_8S window was taken under
-a Captain-confirmed silence window; the DSR_16S window was taken after music resumed. The
-two legs differ in acoustic conditions as well as in the variable under test, so the delta
-is not attributable — the classic paired-control failure. The probe env is retained; the
-measurement must be REDONE with both legs under identical conditions before the PDM-clock
-hypothesis is either accepted or discarded.
+**Lesson (HF class):** resolve a flag through the FULL `extends` chain before building a
+probe on it. A probe whose variable is already set everywhere cannot fail — it is the
+"green light not wired to anything" failure applied to an experiment rather than a check.
+The repo already had the tool to catch this (`_effective_flags` in
+`tests/test_colour_fix_flags_static.py`); it simply was not run against the new env.
 
-Device returned to `k1_bench_im69d_calfix` as the canonical state.
 
-**Recommended decisive test (condition-independent, no Captain):** enable
-`K1_MIC_IM69D_STEREO_V1` and emit the RIGHT-channel raw RMS on the `[AP]` line. Both
-channels see the same instant, so an unused/duplicate channel carrying the same floor is
-electrical, not acoustic — a within-frame control that no room condition can confound.
+### Update — 2026-08-14 (late): the bench IM69D does NOT track the room
+
+Captain handed over the bench + playback. With the MacBook microphone as an independent
+witness — **resolved BY NAME each run**, because its avfoundation index shifts whenever a
+Bluetooth device connects (one earlier leg silently recorded the *EiP Microphone* and
+produced a witness number that was not the room) — paired A/B legs on
+`k1_bench_im69d_hpf`, real music (`stimulus_35s_30s.wav`, the lane's own stimulus):
+
+| leg | room (witness) | K1 raw_i16_rms | verdict |
+|---|---|---|---|
+| laptop speaker | +14.1 dB | **−1.0 dB** | no response |
+| loud pink noise | +22.4 dB | **+1.8 dB** | no response |
+| Bose, default out | +12.2 dB | **−0.4 dB** | no response |
+| Bose @ system vol 85 | **+24.6 dB** | **−6.1 dB** | no response |
+
+The K1's raw output sits at ~90–180 RMS regardless of a room that moved over 24 dB. It is
+**not receiving acoustic signal**. Everything previously chased downstream — the cal gate,
+the silence latch, the drive normaliser, the colour drive — is being fed a signal that is
+not sound.
+
+**Firmware config is NOT the regression.** Bench pins resolve to `CLK=14 / DIN=13`
+(`K1_BENCH_REFERENCE_PINMAP`, non-UNIT2 branch) and `git blame` puts them at `70b03e54`,
+**2026-08-05 22:45 — the same day this mic last passed a calibration** (SSL=111, p90=101,
+i.e. a raw peak near 5). They have not changed since. The gain chain is unchanged (G=8),
+and the PDM clock is DSR_16S/1.638 MHz (see the correction above).
+
+⇒ **The regression is physical on the bench K1's IM69D path** — wiring/connector/solder,
+a blocked or sealed acoustic port, a mounting that passes vibration but not air, or a
+failed part. Consistent with the residual being smooth ~94 Hz content (structure-borne
+rather than airborne) and with a floating data line producing low-level non-acoustic drift.
+Software cannot close this; it needs eyes and hands on the board.
+
+**Still-valid firmware work from this session** (keep — they are real, just not sufficient):
+partial-commit DC (accepted frames 0 → 35), subsonic HPF on the peak measurement
+(floor 1959 → 685), byte-gate repair, flash-script `--port` fix.
+
+### Update — 2026-08-14 (late): the bench IM69D does NOT track the room
+
+Captain handed over the bench + playback. With the MacBook microphone as an independent
+witness — **resolved BY NAME each run**, because its avfoundation index shifts whenever a
+Bluetooth device connects (one earlier leg silently recorded the *EiP Microphone* and
+produced a witness number that was not the room) — paired A/B legs on
+`k1_bench_im69d_hpf`, real music (`stimulus_35s_30s.wav`, the lane's own stimulus):
+
+| leg | room (witness) | K1 raw_i16_rms | verdict |
+|---|---|---|---|
+| laptop speaker | +14.1 dB | **-1.0 dB** | no response |
+| loud pink noise | +22.4 dB | **+1.8 dB** | no response |
+| Bose, default out | +12.2 dB | **-0.4 dB** | no response |
+| Bose @ system vol 85 | **+24.6 dB** | **-6.1 dB** | no response |
+
+The K1's raw output sits at ~90-180 RMS regardless of a room that moved over 24 dB. It is
+**not receiving acoustic signal**. Everything previously chased downstream — the cal gate,
+the silence latch, the drive normaliser, the colour drive — is being fed a signal that is
+not sound.
+
+**Firmware config is NOT the regression.** Bench pins resolve to `CLK=14 / DIN=13`
+(`K1_BENCH_REFERENCE_PINMAP`, non-UNIT2 branch) and `git blame` puts them at `70b03e54`,
+**2026-08-05 22:45 — the same day this mic last passed a calibration** (SSL=111, p90=101,
+i.e. a raw peak near 5). They have not changed since. The gain chain is unchanged (G=8),
+and the PDM clock is DSR_16S/1.638 MHz (see the correction above).
+
+=> **The regression is physical on the bench K1's IM69D path** — wiring/connector/solder,
+a blocked or sealed acoustic port, a mounting that passes vibration but not air, or a
+failed part. Consistent with the residual being smooth ~94 Hz content (structure-borne
+rather than airborne) and with a floating data line producing low-level non-acoustic drift.
+Software cannot close this; it needs eyes and hands on the board.
+
+**Still-valid firmware work from this session** (keep — they are real, just not sufficient):
+partial-commit DC (accepted frames 0 -> 35), subsonic HPF on the peak measurement
+(floor 1959 -> 685), byte-gate repair, flash-script `--port` fix.
