@@ -80,3 +80,15 @@ def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     assert "if (!k1_mic_health_allows_calibration())" in noise_cal
     assert "k1_ap_drive_contract_resolve" in i2s
     assert "k1_ap_twitch_oracle_tick" in led
+
+
+def test_ap_integrity_commands_reach_the_active_legacy_parser():
+    """The typed table is not yet the active Stage-B dispatcher; protect the real path."""
+    serial_menu = (FW / "serial" / "serial_menu.cpp").read_text(encoding="utf-8")
+    for name, handler in (
+        ("twitch", "serial_typed_ap_twitch"),
+        ("mic_health", "serial_typed_mic_health"),
+        ("mic_health_fault", "serial_typed_mic_health_fault"),
+    ):
+        assert f'else if (strcmp(command_type, "{name}") == 0)' in serial_menu
+        assert f"{handler}(command_type, command_data);" in serial_menu

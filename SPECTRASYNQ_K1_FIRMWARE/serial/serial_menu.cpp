@@ -2681,6 +2681,23 @@ void parse_command(char* command_buf) {
       }
     }
 
+#ifdef K1_AP_TWITCH_ORACLE_V1
+    else if (strcmp(command_type, "twitch") == 0) {
+      serial_typed_ap_twitch(command_type, command_data);
+    }
+#endif
+
+#ifdef K1_MIC_HEALTH_V1
+    else if (strcmp(command_type, "mic_health") == 0) {
+      serial_typed_mic_health(command_type, command_data);
+    }
+#ifdef K1_MIC_HEALTH_FAULT_INJECT_V1
+    else if (strcmp(command_type, "mic_health_fault") == 0) {
+      serial_typed_mic_health_fault(command_type, command_data);
+    }
+#endif
+#endif
+
     // The 4 vivid pre-comp handlers (vivid, vivid_level, vivid_chroma, vivid_black)
     // were lifted VERBATIM into serial/serial_cmd_handlers.cpp (Lane 2, S4.3 /
     // vivid slice). Each writes a VP_VIVID_* inline global — no save_config, no
