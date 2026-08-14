@@ -1,253 +1,290 @@
 ---
-abstract: "End-to-end execution plan after the 2026-08-14 finding that the bench IM69D was read on the wrong PDM slot for ~9 days, invalidating every device-measured constant in that window. Five phases, each with a falsifiable oracle: P0 establish hardware truth (can KILL the diagnosis), P1 mic-health integrity gate (the permanent fix), P2 split the overloaded SSL into three derived values (the spastic fix) + a plate-level twitch oracle, P3 re-verify the colour lane selectively, P4 promotion. Four Captain gates total. Read the Rules of Engagement before executing any task."
+abstract: "REV B (Captain conditional-GO amendments incorporated). End-to-end plan after the 2026-08-14 wrong-PDM-slot finding. Six phases. Key Rev B changes: P0.0 evidence quarantine anchored to a BUILD/CONFIG EPOCH not a calendar range; T0.1b channel-INDEPENDENCE proof (activity on two software arrays is not two microphones); G1 moved BEFORE any config mutation; production slot delta deferred to P4 so byte-inertness holds; mic health split into continuously-evaluable RAW INTEGRITY vs challenge-based ACOUSTIC LIVENESS (a quiet room and a dead mic are observationally identical); G2 bound to fail-closed suppression of audio features, not just logging; the AP contract restored to FOUR values including follower_floor; thresholds derived from distribution tails on a discovery capture and validated on a HELD-OUT capture; the plate oracle given numerical definitions and renamed a render-output oracle. Authorisation status: CONDITIONAL_GO_P0_MEASUREMENT_ONLY."
 ---
 
-# AP Input Integrity — end-to-end execution plan
+# AP Input Integrity — end-to-end execution plan · **REV B**
 
-**Created:** 2026-08-14 · **Bench:** K1v2 `B489A500` on `/dev/cu.usbmodem12401`
-**Origin:** the wrong-PDM-slot finding (PR #62) and the plate measurements that refuted
-"the audio front end is healthy".
-
----
-
-## 0. Why this plan exists (one paragraph, read it)
-
-A fortnight of colour work was measured through a microphone input that was reading a
-channel with nothing on it. The fixes were reasoned from code and may well be correct; the
-**measurements** taken in that window are not trustworthy. The deepest defect is not the
-wrong slot — it is that **nothing in the system asks whether its input is real**. A dead
-input presents as "a quiet room with a high floor", and the firmware calibrates around it
-and carries on. Every symptom chased for days (calibration rejecting 112/112 frames,
-silence never latching, a locked 115 BPM in a dead-silent room, the plate more active in
-silence than with music) is downstream of that single gap.
-
-## 1. Rules of engagement (binding on every task below)
-
-1. **P0 is blocking.** No task in P1+ is valid until the hardware truth is written down and
-   Captain-ratified. Measuring anything else first repeats the mistake this plan exists to
-   correct.
-2. **Every oracle must be shown to go RED.** A check never observed failing is not a check.
-   Each task states its mutation: break the thing, watch the right test fail, restore.
-3. **The plate is the deliverable.** AP telemetry alone misled for a full session. No task
-   closes on AP numbers where a plate-level measurement is possible (see T2.4).
-4. **One variable per measurement leg**, and re-assert measurement config after every
-   reboot — firmware identity is bin × config blob × knob store × cal profile.
-5. **Flash success = script exit code + a NEW epoch.** Never grep a gated pipeline.
-6. **Calibration only after Captain's verbal silence confirmation.** Always. No exceptions.
-7. **Production stays byte-inert** until P4. Prove it with
-   `scripts/regression-harness/mic_stable_byte_gate.sh`, not by assertion.
-8. **Record falsifications.** If a task's kill criterion fires, write it down and re-fork
-   the plan rather than reinterpreting the result.
-
-## 2. Captain gates (only four — everything else is autonomous)
-
-| Gate | Where | What is being asked |
-|------|-------|---------------------|
-| **G1** | end of P0 | Confirm which microphones are populated/working on this board revision, and ratify the shipped slot. |
-| **G2** | T1.3 | Product decision: what the K1 *does* when its microphone is unhealthy. |
-| **G3** | T3.4 | ONE eyes-on of the colour lane on a verified-good input. |
-| **G4** | T4.3 | Promotion sign-off + golden A/B (needs explicit esptool GO). |
-
-Everything else — builds, flashes, measurement legs, ratchets, docs — is agent-autonomous.
+**Bench:** K1v2 `B489A500` on `/dev/cu.usbmodem12401`
+**Authorisation:** `CONDITIONAL_GO_P0_MEASUREMENT_ONLY` (Captain, 2026-08-14).
+Authorised now: **P0.0 · T0.1 · T0.1b · T0.2**. Held: T0.3 accepted-config mutation until
+**G1**; all production-env slot changes until **P4**; P1/P2 implementation until this Rev B
+is ratified.
 
 ---
 
-## PHASE 0 — Establish hardware truth · BLOCKING
+## 0. Why this plan exists
 
-**Goal:** know, in writing, which physical microphone this board presents on which PDM
-slot. **This phase can kill the current diagnosis** — that is its job.
+A fortnight of colour work was measured through a microphone input reading a channel with
+nothing on it. The fixes were reasoned from code and may be correct; the **measurements**
+are not trustworthy. The deepest defect is not the wrong slot — **the system had no
+independent way to establish that its audio input represented a real microphone**, so a
+dead input was interpreted, calibrated and promoted as legitimate evidence.
 
-### T0.1 · Read both channels simultaneously
-- **Do:** flash `k1_bench_im69d_stereo` (exists; extends `k1_bench_im69d`). Capture both
-  channels' raw int16 floor and their response to the lane stimulus
-  (`stimulus_35s_30s.wav`) with the MacBook mic as an independent witness.
-- **Reuse, do not rebuild:** `scripts/regression-harness/stereo_probe_decode.py`,
-  `scratchpad/witness_ab.py` (resolves the witness BY NAME — its index shifts whenever a
-  Bluetooth device connects, and one leg on 08-14 silently recorded the wrong device).
-- **Oracle:** per-channel quiet floor and per-channel dB response to a witnessed room change.
-- **KILL CRITERION (pre-registered):** if **both** channels show a plausible floor and a
-  real response, the "one mic is dead/unpopulated" diagnosis is **REFUTED**. Stop, record
-  it, and re-fork: the fault is then in slot *semantics* (driver-version inversion, as
-  documented for the SPH0645 in `i2s_audio.h` ~L18-34), not in a dead part.
-- **Owner:** orchestrator (device). **Effort:** ~1 h.
+**Rev B exists because the first revision could have produced another convincing false
+PASS.** Each amendment below closes a route by which a *new* instrument could be fooled by
+the same class of ambiguity.
 
-### T0.2 · Map slot → physical mic
-- **Do:** reconcile T0.1 against the board strapping recorded in `constants.h`
-  ("SELECT is hard-strapped on-board (IM1 HIGH / IM2 LOW)") and the PCB3 documentation.
-- **Oracle:** a single unambiguous statement of the form *"IM<n> is populated and presents
-  on slot <LEFT|RIGHT>; IM<m> is <absent|dead|present-but-unused>"*, supported by T0.1 data.
-- **Trap:** the current LEFT default is inherited from the SPH0645, whose SELECT is tied to
-  3V3 — a cross-hardware-era port that was never re-derived. Do not treat any inherited
-  slot/pin value as truth for this board.
-- **Owner:** delegable (analysis, read-only). **Effort:** ~30 min.
+## 1. Rules of engagement (binding)
 
-### T0.3 · Write it into the registry and make the slot explicit
-- **Do:** record board revision → populated mic → slot in
-  `docs/hardware/device-build-registry.md`. Replace the *implicit* slot default with an
-  **explicit** `-DK1_MIC_IM69D_SLOT_<LEFT|RIGHT>` on every IM69D env, so no env ever again
-  depends on a driver default.
-- **Oracle:** a ratchet asserting every IM69D env carries exactly one explicit slot flag.
-  **Mutation:** delete the flag from one env → test goes red.
-- **Owner:** orchestrator (edits) + delegable (ratchet). **Effort:** ~1 h.
+1. **P0 is blocking.** Nothing in P1+ is valid until hardware truth is ratified at G1.
+2. **Every oracle must be shown to go RED**, via the mutation named in its execution-matrix
+   row. A check never observed failing is not a check.
+3. **The plate is the deliverable.** No task closes on AP telemetry where a render-output
+   measurement is possible.
+4. **One variable per leg**; re-assert measurement config after every reboot (identity is
+   bin × config blob × knob store × cal profile).
+5. **Flash success = script exit code + NEW epoch.** Never grep a gated pipeline.
+6. **Calibration only after Captain's verbal silence confirmation.** Always.
+7. **Production byte-inert until P4** — proven with `mic_stable_byte_gate.sh`, never asserted.
+8. **Record falsifications**; re-fork rather than reinterpret.
+9. **(Rev B)** Until `K1_MIC_HEALTH_V1` is operational, **every** P2/P3 capture receipt must
+   open with a witnessed input challenge and carry `INPUT_SOURCE_PROVEN`, `SLOT_MAPPING`
+   and `CAPTURE_EPOCH`. A capture without that header is inadmissible evidence.
+10. **(Rev B)** Never infer physical population from software array activity. See T0.1b.
 
-### 🚦 GATE G1 — Captain confirms the board truth and ratifies the shipped slot.
+## 2. Captain gates (four)
+
+| Gate | Position | Decision |
+|---|---|---|
+| **G1** | after T0.2, **before** T0.3 | Ratify board truth + shipped slot. |
+| **G2** | T1.3 | Runtime behaviour on invalid input (see §P1). |
+| **G3** | T3.4 | ONE pre-registered eyes-on. |
+| **G4** | T4.3 | Promotion sign-off, production slot enablement, `:tune` decision. |
+
+## 3. Execution matrix (the machine-readable contract)
+
+Every task carries these fields. Rows marked ⚠ were under-specified in Rev A.
+
+| Task | Input identity | Oracle | RED witness | GREEN witness | Kill condition | Owner |
+|---|---|---|---|---|---|---|
+| P0.0 | n/a | manifest completeness vs epoch scan | an artefact from a bad epoch absent from the manifest | every bad-epoch artefact dispositioned | — | delegable |
+| T0.1 | stereo env + epoch | per-channel floor + witnessed response | — | both channels characterised | — | orchestrator |
+| T0.1b | as T0.1 | **independence** (5 checks below) | swap decoder mapping ⇒ data must change | each slot uniquely attributable | ambiguous ⇒ electrical probe or driver-semantics fork | orchestrator + Captain (physical) |
+| T0.2 | T0.1b receipts | unambiguous slot↔mic statement | — | statement supported by data | contradicts strapping doc ⇒ escalate | delegable |
+| T0.3 | bench envs only | ratchet: every IM69D env has exactly one explicit slot flag | delete a flag ⇒ red | all bench envs explicit **and** production byte-identical | production byte delta ≠ 0 ⇒ STOP | orchestrator |
+| T1.2 | health build | raw-integrity states reachable | force each fault ⇒ its own state+reason | OK on known-good channel | — | orchestrator |
+| T1.4 | health build | full fault battery §P1.4 | each battery case ⇒ expected state | no false positive on quiet room or low-level music | false positive ⇒ criteria re-derive | orchestrator |
+| ⚠T2.2 | discovery capture | threshold sits outside both distribution tails | threshold inside a tail ⇒ red | validated on **held-out** capture | tails overlap ⇒ rms alone insufficient, use joint | orchestrator |
+| T2.5 | render-output oracle | §T2.4 numeric criteria | pre-fix config **and** re-inserted mutation | post-split config | — | orchestrator |
+| ⚠T3.1 | epoch manifest | every consumer of a bad-epoch artefact dispositioned | a live consumer with no disposition | manifest closed | — | delegable |
+| ⚠T3.3 | verified-good input | full-axis + render-output metrics | prior config red | all axes pass | any axis red ⇒ no G3 | orchestrator |
 
 ---
 
-## PHASE 1 — Mic health integrity gate · the permanent fix
+## PHASE 0 — Hardware truth · BLOCKING · **authorised**
 
-**Goal:** the system can tell when its own input is not a working microphone, and says so.
-This is the highest-leverage item in the plan: it converts a failure class that cost ~9 days
-into one that announces itself in seconds, and it protects every future bring-up.
+### P0.0 · Freeze and quarantine the contaminated evidence epoch ← *new in Rev B*
+Anchor to the first known-bad **firmware/config epoch**, **not** the calendar range
+2026-08-05..14. Calendar ranges miss constants copied later, cherry-picked values,
+cal profiles generated inside the window, conclusions transferred into docs, and golden
+artefacts still referenced elsewhere.
 
-### T1.1 · Derive the health criteria from measurement
-- **Do:** on the confirmed-good channel, measure the quiet-room floor band and the
-  response-to-stimulus band (witnessed). Derive: plausible floor range, minimum response,
-  staleness window.
-- **Oracle:** criteria stated as measured numbers with the capture that produced them —
-  **never guessed constants.** (The SSL cal gates were SPH-domain constants carried into an
-  IM69D chain and were structurally unreachable; do not repeat that.)
-- **Effort:** ~2 h.
+Manifest schema (one row per artefact):
+```
+artefact | originating build/config epoch | contamination mechanism |
+current consumers | disposition: TOMBSTONED | RE-DERIVED | UNAFFECTED | replacement evidence
+```
+Quarantine or visibly tombstone: raw measurement files · derived constants · calibration
+profiles · benchmark summaries · device-derived claims · golden screenshots/traces ·
+documentation statements resting on them.
+
+**Code-reasoned fixes do not require re-derivation, but every touched behaviour still needs
+its acceptance rerun** — a sound code argument does not prove the fix behaved correctly on
+a real input. This is where the project either breaks the
+*carried-and-labelled becomes carried-and-trusted* pattern or repeats it.
+
+### T0.1 · Simultaneous stereo capture
+Flash `k1_bench_im69d_stereo` (exists). Capture both channels' raw floor and response to
+`stimulus_35s_30s.wav`, witnessed by the MacBook mic (**resolved BY NAME** — its index
+shifts on Bluetooth connect; one 08-14 leg silently recorded the wrong device).
+Reuse `scripts/regression-harness/stereo_probe_decode.py`, `scratchpad/witness_ab.py`.
+
+### T0.1b · Channel-**independence** proof ← *new in Rev B*
+> Rev A's kill criterion ("both channels respond ⇒ diagnosis refuted") is **too weak**.
+> Both decoded channels can look plausible while only one real source exists: duplicated
+> DMA/de-interleave output, slot-decoder leakage, one mic appearing in both arrays,
+> inter-slot crosstalk, decoder semantic inversion, or a capture script reusing a channel.
+
+Required receipts:
+1. **Duplication check** — sample-by-sample equality/offset-copy test between arrays.
+2. **Independence** — inter-channel correlation/coherence across silence *and* stimulus.
+3. **Directed near-field stimulus** at the IM1 position, then at the IM2 position. *(physical — Captain)*
+4. **Acoustic occlusion** of each position in turn, where physically possible. *(physical — Captain)*
+5. **Decoder-mapping swap** — changing the mapping must change the **expressed result**,
+   not merely relabel identical data.
+
+**Oracle (replaces Rev A's):** *each decoded slot has been shown to correspond uniquely to
+a physical source, OR the unused slot has been shown to contain no independent microphone
+signal.* If ambiguous: inspect the PDM data electrically, or re-fork into the
+driver-semantics lane (the SPH0645 inversion documented at `i2s_audio.h` ~L18-34).
+
+### T0.2 · Physical mic ↔ slot mapping
+Reconcile T0.1b against the board strapping ("SELECT hard-strapped IM1 HIGH / IM2 LOW") and
+PCB3 documentation. Output one unambiguous statement.
+**Trap:** the current LEFT default is inherited from the SPH0645 (SELECT tied 3V3) — a
+cross-hardware-era port never re-derived. No inherited slot/pin value is truth for this board.
+
+### 🚦 G1 — Captain ratifies board truth + shipped slot. *(Rev B: now BEFORE T0.3.)*
+
+### T0.3 · Make the slot explicit — **two-stage** ← *amended in Rev B*
+Rev A conflicted with Rule 7: "every IM69D env gets the correct explicit flag" cannot
+co-exist with production byte-inertness if the correct slot ≠ the current production default.
+
+**Before P4:** bench/diagnostic IM69D envs made explicit; ratchet added for those envs;
+production change **prepared but promotion-gated**; existing production env **proven
+byte-identical**. If an explicit flag compiles byte-identical because it matches the
+current default, **demonstrate that with the byte gate** rather than assuming it.
+**At P4:** enable the explicit production slot; run byte-delta/golden comparison; treat the
+slot correction as the only authorised production audio-input delta alongside health.
+
+Source may be prepared in an isolated worktree before G1; it does not become accepted
+configuration until G1 passes.
+
+---
+
+## PHASE 1 — Mic health · **two contracts, not one** ← *restructured in Rev B*
+
+> A dead microphone and an acoustically silent room are **observationally equivalent**. A
+> runtime system cannot conclude "no response" merely because nothing happened recently.
+
+### T1.1a · Raw-stream integrity — continuously evaluable, no stimulus required
+I2S freshness · stuck samples · impossible rails/DC · implausible floor statistics ·
+repeated buffers · impossible entropy/variance · decoder/data-path discontinuity.
+
+### T1.1b · Acoustic liveness — **proven only after a known excitation**
+Controlled lane stimulus at bring-up · explicit diagnostic challenge · (optionally) a
+sufficiently unambiguous real-world transient, if production policy allows.
+
+**State semantics:**
+```
+UNKNOWN / LIVENESS_UNPROVEN   RAW_IMPLAUSIBLE   STALE_I2S   LIVENESS_PROVEN   OK
+```
+`NO_RESPONSE` is **redefined**: *a known challenge occurred and the microphone failed to
+exhibit the required response.* It must **never** mean *the room has been quiet.*
+Liveness proof is **per boot or per capture epoch**.
+
+Health is computed from **raw pre-gain samples** — a check reading a derived value inherits
+its blind spots.
 
 ### T1.2 · Implement `K1_MIC_HEALTH_V1`
-- **Do:** Core-0-safe, O(1) per frame, no heap/FS/serial in the hot path. Publish a health
-  state + reason on the `[AP]` line and to a status surface.
-- **States:** `OK` · `FLOOR_IMPLAUSIBLE` · `NO_RESPONSE` · `STALE_I2S` · `UNKNOWN` (boot).
-- **Trap:** health must be computed from the **raw pre-gain samples**, not from any value
-  the pipeline derives — a check reading a derived value inherits its blind spots.
-- **Effort:** ~1 day. **Owner:** orchestrator (hot path).
+Core-0 safe, O(1)/frame, no heap/FS/serial in the hot path. Publish state + reason on `[AP]`
+and a status surface.
 
-### T1.3 · 🚦 GATE G2 — fault behaviour (Captain decision)
-- **Options:** (a) telemetry only; (b) telemetry + refuse to calibrate; (c) b + a visible
-  operator signal on the plate.
-- **Recommendation: (b).** It cannot produce a false product behaviour, and it directly
-  blocks the specific failure that wasted this fortnight — calibrating against a dead input.
-  (c) needs a separate product-truth decision about what the plate is allowed to say.
+### T1.3 · 🚦 G2 — runtime behaviour on invalid input ← *expanded in Rev B*
+**Captain's selection: (b) expanded.** Telemetry/status reason **+ refuse calibration
++ invalidate audio-derived feature publication while health is invalid.** A gate that logs
+an error while continuing to publish invalid features reproduces the same pathological plate.
 
-### T1.4 · Prove the gate can fire
-- **Do:** force each fault state on hardware — wrong slot (now trivially reproducible),
-  and an induced stale-I2S condition.
-- **Oracle:** each condition produces its **own** state and reason; `OK` is reported on the
-  known-good channel. **This is a fault battery: cases expected to be RED must be observed
-  going red**, or the gate is undemonstrated.
-- **Effort:** ~half day.
+Downstream behaviour:
+- do not publish new audio features as valid;
+- drive audio-reactive energy to zero after a **bounded debounce**;
+- do not hold stale tempo/chromagram/onset values indefinitely;
+- leave non-audio modes and control operation unaffected;
+- **no special plate fault animation in this lane**;
+- expose the fault via AP/status/controller surfaces;
+- resume only after raw integrity is restored **and** liveness re-established.
 
-### T1.5 · CI ratchet
-- Pin: health is computed from raw samples; every state is reachable; the flag does not
-  leak into shippable envs pre-promotion. **Mutation-verify each.**
+This is **fail-closed suppression of invalid input**, not a reinstatement of standby dimming.
 
----
+### T1.4 · Fault battery ← *expanded in Rev B*
+boot→OK · OK→fault · fault→recovery · short-transient rejection · **genuinely quiet room
+(false-positive)** · **low-volume music (false-positive)** · repeated-buffer / stale-DMA ·
+**CPU-cycle and loop-budget impact**.
 
-## PHASE 2 — AP drive contract · the spastic fix
-
-**Goal:** the drive represents the room. Quiet room ⇒ ~zero drive ⇒ dark plate, without
-reinstating any dimming path.
-
-### T2.1 · Split the overloaded value
-`SWEET_SPOT_MIN_LEVEL` currently serves four incompatible roles: measured noise floor,
-silence-gate input, drive subtrahend, and follower floor. One measurement, three derived
-values:
-
-| value | source | measured 2026-08-14 |
-|---|---|---|
-| `mic_noise_floor` | calibration, as measured | 52 |
-| `drive_threshold` | floor × margin | needs ≈ 450 to behave |
-| `silence_threshold` | its own derivation | (T2.2) |
-
-- **Trap:** this is HF-49 already in the canon ("SSL is drive normaliser AND gate input —
-  don't knob-tune hybrids"). Fix the structure; do not tune the hybrid further.
-- **Effort:** ~1 day.
-
-### T2.2 · Derive the margins from the measured bands
-- Quiet vs music separate by roughly 20× at the plate-relevant statistic
-  (`max_raw` p50 **50** quiet vs **948** music; `rms_raw` **0.0015** vs **0.0180**).
-- **Oracle:** the chosen threshold sits between the measured bands **with both bands shown**.
-  A threshold justified only by "it makes silence latch" is rejected — that is tuning to
-  make a red light green.
-
-### T2.3 · Decide go-dark: recommend NO new dimming path
-`silent_scale` is pinned to 1.0f every frame by Captain's 2026-08-09 STANDBY_DIMMING strike.
-With a correct `drive_threshold` the plate darkens because there is nothing to draw — dark
-*because silent*, not dimmed by a timer. This respects the prior decision and reverses
-nothing. **Do not reinstate dimming without a fresh Captain decision.**
-
-### T2.4 · Build the plate-level twitch oracle ← *the missing instrument*
-- **Do:** an automated leg that measures **LED behaviour**, not AP telemetry: lit-pixel
-  count distribution and frame-to-frame delta, in silence and under music.
-- **Why this is mandatory:** on 2026-08-14 the AP numbers looked healthy while the plate was
-  0→128 lit in a silent room. **AP telemetry is not a proxy for the plate**, and every
-  future perceptual claim must be gated on this.
-- **Pass criteria (pre-registered):** silence ⇒ lit p50 ≈ 0 and small frame-to-frame delta;
-  music ⇒ lit clearly above silence. Both measured in the same session.
-- **Note:** the 1 Hz `[AP]`/HUEAUD cadence undersamples a 133 Hz loop by 133×. Either raise
-  the cadence for the leg or use the render trace; do not draw motion conclusions from 1 Hz.
-- **Effort:** ~1 day. **Owner:** delegable (harness) + orchestrator (criteria).
-
-### T2.5 · Verify and ratchet
-- Silence leg + music leg through T2.4. Mutation: revert `drive_threshold` to the raw floor
-  → the twitch oracle must go red.
+**Cross-unit constraint:** a permanent product health classifier must not be promoted from
+one B489A500 floor range. B489A500 establishes the bench implementation; **production
+thresholds must be conservative impossible-state checks or receive cross-unit validation
+before shipping.**
 
 ---
 
-## PHASE 3 — Re-verify the colour lane on a real input
+## PHASE 2 — AP drive contract · **four values** ← *corrected in Rev B*
 
-**Goal:** establish which colour-lane results survive, cheaply — not repeat the lane.
+Rev A listed four roles but only three replacements, leaving the old coupling a route to
+survive under a new name. All four are defined explicitly, even if two later prove equal:
 
-### T3.1 · Inventory what is actually suspect
-- **Do:** list every colour-lane constant/threshold **derived from bench measurement**
-  between 2026-08-05 and 2026-08-14. Code-reasoned fixes and palette-derived references are
-  *not* suspect; device-measured numbers are.
-- **Oracle:** each entry marked `code-reasoned` | `palette-derived` | `device-measured`.
-  Only the last class needs re-derivation.
-- **Owner:** delegable (audit, read-only). **Effort:** ~2 h.
+```
+mic_noise_floor      drive_threshold      silence_threshold      follower_floor
+```
 
-### T3.2 · Re-derive only the device-measured entries.
+Each requires: **source statistic · units/domain · derivation · valid range · consumer list
+· reset/update policy · calibrated|fixed|derived · an assertion preventing cross-use.**
+Names should carry units/domain where ambiguity is possible — a normalised RMS threshold and
+an integer raw-peak threshold must not look interchangeable in code.
+**No alias may be introduced merely because two values are numerically equal on one capture.**
 
-### T3.3 · Full-axis metric legs
-Per the existing promotion plan and HF-50: coverage · temporal stability (hue velocity) ·
-silence rest · music coupling · brightness dynamics — modes 32 and GDFT, ≥2 palettes
-including a flagged dark-attractor one. **Now including the T2.4 plate oracle.**
+### T2.2 · Threshold derivation from **distributions** ← *amended in Rev B*
+Medians are insufficient. Use: quiet **p95/p99** · low-level-music **p05/p10** ·
+ordinary-music distribution · **at least one held-out capture not used to choose the value.**
 
-### T3.4 · 🚦 GATE G3 — ONE Captain eyes-on
-One pre-registered look, one variable. Not a ladder.
+```
+discovery capture → choose derivation/margin → FREEZE → independent validation capture → mutation test
+```
+**Do not tune and validate against the same trace.** Include a **low-level music leg**: a
+threshold can make silence beautifully dark while silently deleting quiet programme material.
+
+### T2.3 · No new dimming path
+`silent_scale` stays pinned (Captain 2026-08-09). With a correct `drive_threshold` the plate
+darkens because there is nothing to draw. Do not reinstate dimming without a fresh decision.
+
+### T2.4 · **Render-output oracle** ← *renamed + numerically defined in Rev B*
+Primary authority: the **final render buffer immediately before LED transmission** — what
+the plate was commanded to display, avoiding AP-proxy error. It is a **render-output
+oracle, not a physical-light oracle**; G3 eyes-on (or a camera capture) remains the
+authority for optical appearance.
+
+Freeze numerically: capture point · duration + warm-up · effective frame rate · mode,
+palette, brightness, knob state · per-pixel luminance/channel threshold defining "lit" ·
+frame-to-frame delta definition · silence **p50/p95** limits · music-vs-silence separation ·
+permitted boundary transitions · whether first post-mode-change frames are excluded.
+
+**Test order (RED first):**
+```
+1 run the CURRENT bad configuration → observe RED
+2 apply the structural split
+3 observe GREEN
+4 re-insert raw-floor-as-drive-threshold → observe RED again
+```
 
 ---
+
+## PHASE 3 — Re-verify the colour lane
+
+**T3.1** consumes the **P0.0 epoch manifest** (not a calendar scan). Disposition every
+artefact; re-derive only `device-measured` entries; rerun acceptance for every touched
+behaviour regardless of provenance.
+**T3.3** full-axis metrics (coverage · temporal stability · silence rest · music coupling ·
+brightness dynamics), modes 32 and GDFT, ≥2 palettes incl. a flagged dark-attractor one,
+**plus the T2.4 render-output oracle**, all under Rule 9 capture receipts.
+**T3.4 · 🚦 G3** — one pre-registered eyes-on.
 
 ## PHASE 4 — Promotion
 
-- **T4.1** Close the five gates in `docs/forensics/colour-fix-promotion-plan-2026-08-13.md`.
-- **T4.2** Byte-inertness proof + golden side-by-side (needs explicit Captain esptool GO).
-- **T4.3** 🚦 **GATE G4** — promotion sign-off. Decide at the same time whether the
-  `:tune` registry ships to production (currently bench-gated by design).
+**T4.1 — pin the dependencies** ← *new in Rev B*: a mutable pathname is not promotion
+authority. Pin the referenced promotion plan's **commit hash**, the **gate identifiers**,
+expected artefacts and exact required results, before P4 starts.
+**T4.2** production slot enablement + health enablement + byte-delta/golden A/B (explicit
+Captain esptool GO).
+**T4.3 · 🚦 G4** — promotion sign-off + `:tune` production decision.
 
----
+## PHASE 5 — Parked, with reasons
 
-## PHASE 5 — Parked, with reasons (do not start these)
-
-| Item | Why parked |
+| Item | Why |
 |---|---|
-| Auto-sensitivity (`K1_MIC_AUTO_SENSE_V1`) | An adaptive gain loop on a drive chain that amplifies noise to full scale reduces predictability, and determinism is the stated goal. It also stalled mid-debug chasing a "gain chain ceiling" with `raw_i16_near=0` — a symptom shaped like the dead input just found. **Revisit only after P2, and re-check that hypothesis on known-good input first.** |
+| Auto-sensitivity | Adaptive gain on a chain that amplifies noise to full scale reduces predictability; determinism is the goal. Stalled chasing a "gain chain ceiling" with `raw_i16_near=0` — a symptom shaped like the dead input just found. Revisit after P2, re-checking that hypothesis on known-good input. |
 | IM73D deprecation cleanup | Its only auto-sense envs target a retired mic; fold into P4 housekeeping. |
-| `:tune` in production | Deliberate decision at G4, not a default. |
+| `:tune` in production | Decided at G4. |
 
----
+## Critical path
 
-## Effort summary
-
-| Phase | Effort | Blocking? |
-|---|---|---|
-| P0 hardware truth | ~half day | **yes — everything** |
-| P1 integrity gate | ~2 days | shipping |
-| P2 drive contract | ~2–3 days | the visible symptom |
-| P3 re-verify colour | ~1–2 days | promotion |
-| P4 promotion | ~1 day + gates | — |
-
-**Critical path to "Captain sees a good plate": P0 → P2 → T3.3 → G3.**
-P1 is parallel to P2 and blocks *shipping*, not *seeing*.
+`P0.0 → T0.1 → T0.1b → T0.2 → G1 → P2 → T3.3 → G3`
+P1 runs parallel after G1 and blocks **shipping**, not **seeing** — with Rule 9 receipts
+standing in for it until it is operational.
 
 ---
 **Document Changelog**
 
 | Date | Author | Change |
 |------|--------|--------|
-| 2026-08-14 | agent:claude-code | Created after the wrong-PDM-slot finding — five phases, four Captain gates, pre-registered kill criterion in P0, plate-level twitch oracle added as mandatory machinery. |
+| 2026-08-14 | agent:claude-code | Created — five phases, four gates, P0 kill criterion, plate oracle. |
+| 2026-08-14 | agent:claude-code | **REV B** — Captain conditional-GO amendments 1-11: P0.0 epoch-anchored quarantine; T0.1b channel-independence proof; G1 moved before T0.3; T0.3 split so production stays byte-inert; health split into raw-integrity vs challenge-based liveness with NO_RESPONSE redefined; G2 bound to fail-closed feature suppression + expanded battery + cross-unit constraint; AP contract restored to four values; distribution-tail thresholds with held-out validation and a low-level-music leg; render-output oracle numerically defined with RED-first ordering; promotion dependencies pinned; execution matrix added. |
