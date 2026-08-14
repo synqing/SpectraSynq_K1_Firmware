@@ -26,7 +26,7 @@ DEFAULT_CHIP_ID = "B489A500"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("identity", "fault-battery", "capture"))
+    parser.add_argument("mode", choices=("identity", "fault-battery", "challenge", "capture"))
     parser.add_argument("--usb-serial", default=DEFAULT_USB_SERIAL)
     parser.add_argument("--expect-chip", default=DEFAULT_CHIP_ID)
     parser.add_argument("--port", help="Optional assertion; never used as identity")
@@ -209,6 +209,30 @@ def run_capture(device: serial.Serial, duration_ms: int, warmup_frames: int) -> 
     return {"ap_distribution": ap, "twitch": twitch, "health": final_health}, lines
 
 
+def run_challenge(device: serial.Serial) -> tuple[dict[str, object], list[str]]:
+    before, lines = health_status(device)
+    assert_live_raw(before)
+    raw_log = list(lines)
+    raw_log.extend(command(device, ":mic_health=challenge", 0.15))
+    observations: list[dict[str, str]] = []
+    deadline = time.monotonic() + 5.2
+    after = before
+    while time.monotonic() < deadline:
+        after, lines = health_status(device, 0.18)
+        raw_log.extend(lines)
+        observations.append(after)
+        if after.get("state") in {"OK", "NO_RESPONSE"}:
+            break
+    assert_live_raw(after)
+    passed = after.get("state") == "OK" and after.get("liveness") == "1"
+    return {
+        "passed": passed,
+        "before": before,
+        "after": after,
+        "observations": observations,
+    }, raw_log
+
+
 def write_evidence(out_dir: Path, label: str, payload: dict[str, object], lines: list[str]) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
@@ -231,6 +255,8 @@ def main() -> int:
             result: dict[str, object] = {}
         elif args.mode == "fault-battery":
             result, lines = run_fault_battery(device)
+        elif args.mode == "challenge":
+            result, lines = run_challenge(device)
         else:
             result, lines = run_capture(device, args.duration_ms, args.warmup_frames)
 
@@ -248,6 +274,9 @@ def main() -> int:
     print(json.dumps(payload, indent=2, sort_keys=True))
     print(f"RAW_LOG={raw_path}")
     print(f"SUMMARY_JSON={json_path}")
+    if args.mode == "challenge" and not bool(result.get("passed")):
+        print(f"CHALLENGE FAILED: {result.get('after')}")
+        return 1
     return 0
 
 

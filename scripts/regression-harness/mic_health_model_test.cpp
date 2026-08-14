@@ -63,6 +63,16 @@ int main() {
   check(context.state == K1_MIC_HEALTH_OK && context.liveness_proven,
         "known challenge response establishes OK");
 
+  // A challenge armed on an already-loud musical frame must still be able to
+  // prove liveness from the dynamic range observed across the whole window.
+  k1_mic_health_model_reset(&context, 78U);
+  healthy_frames(&context, &now_ms, cfg.recovery_frames, 70.0f, 180U);
+  k1_mic_health_model_begin_challenge(&context, now_ms);
+  now_ms += 8U;
+  k1_mic_health_model_update(&context, frame(now_ms, 0x2100U, 22.0f, 70U), cfg);
+  check(context.state == K1_MIC_HEALTH_OK && context.liveness_proven,
+        "already-playing music establishes liveness from challenge-window span");
+
   healthy_frames(&context, &now_ms, 200U, 1.5f, 4U);
   check(context.state == K1_MIC_HEALTH_OK,
         "a genuinely quiet room is not a microphone fault");

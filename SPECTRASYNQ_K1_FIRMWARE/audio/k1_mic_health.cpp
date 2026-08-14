@@ -28,7 +28,11 @@ void k1_mic_health_model_begin_challenge(K1MicHealthContext* context, uint32_t n
   context->challenge_active = true;
   context->challenge_started_ms = now_ms;
   context->challenge_baseline_peak_i16 = context->last_raw_peak_i16;
+  context->challenge_min_peak_i16 = context->last_raw_peak_i16;
+  context->challenge_max_peak_i16 = context->last_raw_peak_i16;
   context->challenge_baseline_rms_i16 = context->last_raw_rms_i16;
+  context->challenge_min_rms_i16 = context->last_raw_rms_i16;
+  context->challenge_max_rms_i16 = context->last_raw_rms_i16;
   context->liveness_proven = false;
   context->state = K1_MIC_HEALTH_LIVENESS_UNPROVEN;
   context->reason = K1_MIC_REASON_LIVENESS_UNPROVEN;
@@ -111,19 +115,36 @@ void k1_mic_health_model_update(K1MicHealthContext* context,
   context->recovery_frames = k1_mic_health_sat_inc(context->recovery_frames);
 
   if (context->challenge_active) {
-    // Absolute level alone is not liveness: a high but static electrical/room floor
-    // must not pass. Require a positive response relative to the frame observed when
-    // Captain's explicit acoustic challenge was armed.
+    // The known excitation may already be playing when the diagnostic challenge is
+    // armed. Measure dynamic range across the complete challenge window rather than
+    // requiring every later frame to exceed one arbitrary musical starting frame.
+    // Absolute level alone still cannot pass: a static high electrical/room floor has
+    // no window span.
+    if (frame.raw_peak_i16 < context->challenge_min_peak_i16) {
+      context->challenge_min_peak_i16 = frame.raw_peak_i16;
+    }
+    if (frame.raw_peak_i16 > context->challenge_max_peak_i16) {
+      context->challenge_max_peak_i16 = frame.raw_peak_i16;
+    }
+    if (frame.raw_rms_i16 < context->challenge_min_rms_i16) {
+      context->challenge_min_rms_i16 = frame.raw_rms_i16;
+    }
+    if (frame.raw_rms_i16 > context->challenge_max_rms_i16) {
+      context->challenge_max_rms_i16 = frame.raw_rms_i16;
+    }
+
     const bool rms_response =
-        frame.raw_rms_i16 >= config.challenge_rms_min_i16 &&
-        frame.raw_rms_i16 >= context->challenge_baseline_rms_i16 + config.challenge_rms_delta_i16 &&
-        frame.raw_rms_i16 >= context->challenge_baseline_rms_i16 * config.challenge_rms_ratio;
-    const float peak_baseline = float(context->challenge_baseline_peak_i16);
+        context->challenge_max_rms_i16 >= config.challenge_rms_min_i16 &&
+        context->challenge_max_rms_i16 >=
+            context->challenge_min_rms_i16 + config.challenge_rms_delta_i16 &&
+        context->challenge_max_rms_i16 >=
+            context->challenge_min_rms_i16 * config.challenge_rms_ratio;
+    const float peak_min = float(context->challenge_min_peak_i16);
     const bool peak_response =
-        frame.raw_peak_i16 >= config.challenge_peak_min_i16 &&
-        uint32_t(frame.raw_peak_i16) >=
-            uint32_t(context->challenge_baseline_peak_i16) + uint32_t(config.challenge_peak_delta_i16) &&
-        float(frame.raw_peak_i16) >= peak_baseline * config.challenge_peak_ratio;
+        context->challenge_max_peak_i16 >= config.challenge_peak_min_i16 &&
+        uint32_t(context->challenge_max_peak_i16) >=
+            uint32_t(context->challenge_min_peak_i16) + uint32_t(config.challenge_peak_delta_i16) &&
+        float(context->challenge_max_peak_i16) >= peak_min * config.challenge_peak_ratio;
     const bool responded = rms_response || peak_response;
     if (responded) {
       context->challenge_active = false;

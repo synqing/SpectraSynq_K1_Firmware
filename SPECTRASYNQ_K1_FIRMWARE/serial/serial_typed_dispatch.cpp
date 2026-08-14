@@ -215,7 +215,15 @@ static void serial_print_mic_health() {
   USBSerial.print(" challenge_baseline_peak_i16=");
   USBSerial.print(health.challenge_baseline_peak_i16);
   USBSerial.print(" challenge_baseline_rms_i16=");
-  USBSerial.println(health.challenge_baseline_rms_i16, 2);
+  USBSerial.print(health.challenge_baseline_rms_i16, 2);
+  USBSerial.print(" challenge_min_peak_i16=");
+  USBSerial.print(health.challenge_min_peak_i16);
+  USBSerial.print(" challenge_max_peak_i16=");
+  USBSerial.print(health.challenge_max_peak_i16);
+  USBSerial.print(" challenge_min_rms_i16=");
+  USBSerial.print(health.challenge_min_rms_i16, 2);
+  USBSerial.print(" challenge_max_rms_i16=");
+  USBSerial.println(health.challenge_max_rms_i16, 2);
   tx_end();
 }
 

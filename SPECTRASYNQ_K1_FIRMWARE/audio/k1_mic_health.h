@@ -70,8 +70,12 @@ struct K1MicHealthContext {
   uint32_t last_buffer_hash;
   uint32_t challenge_started_ms;
   uint16_t challenge_baseline_peak_i16;
+  uint16_t challenge_min_peak_i16;
+  uint16_t challenge_max_peak_i16;
   uint16_t last_raw_peak_i16;
   float challenge_baseline_rms_i16;
+  float challenge_min_rms_i16;
+  float challenge_max_rms_i16;
   float last_raw_rms_i16;
   uint8_t repeated_frames;
   uint8_t fault_frames;
