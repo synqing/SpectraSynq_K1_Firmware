@@ -1,3 +1,20 @@
+# ACTIVE LANE POINTER
+
+**READ FIRST:** `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`
+
+Authorisation: `CONDITIONAL_GO_P0_MEASUREMENT_ONLY` against
+`docs/plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md` (Rev B).
+P0's kill criterion FIRED — both IM69D capsules are alive; the fault is mono slot
+semantics. Next action: two PHYSICAL checks only Captain can perform, then G1.
+Do not mutate config before G1. Production byte-inert until P4.
+
+Canon: `docs/canon/SESSION_CANON_2026-08-14b_MEASUREMENT_INTEGRITY.md` (HF-69..80).
+Skills `k1-measurement-discipline` + `k1-colour-truth` auto-load the rules.
+
+---
+(superseded) 2026-08-14 colour-lane DC/cal handover — the DC work landed; its
+premise (HF-61 stale-DC self-lock) is REFUTED. Do not act on it.
+
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
      repo, so paths and links must spell it that way. Prose here uses "artefacts". -->
 
