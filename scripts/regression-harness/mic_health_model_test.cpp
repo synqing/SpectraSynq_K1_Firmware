@@ -49,6 +49,8 @@ int main() {
   healthy_frames(&context, &now_ms, cfg.recovery_frames);
   check(context.state == K1_MIC_HEALTH_LIVENESS_UNPROVEN,
         "healthy raw boot remains liveness-unproven until an explicit challenge");
+  check(context.last_frame_now_ms == now_ms,
+        "health context retains the audio-frame clock used by runtime challenges");
 
   // A loud but static floor is not an acoustic response. Arm at the same level and
   // prove the first unchanged frame cannot self-certify liveness.

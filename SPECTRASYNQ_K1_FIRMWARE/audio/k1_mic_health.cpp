@@ -64,6 +64,7 @@ void k1_mic_health_model_update(K1MicHealthContext* context,
                                 const K1MicHealthConfig& config) {
   K1MicHealthFrame frame = source_frame;
   context->frame_count++;
+  context->last_frame_now_ms = frame.now_ms;
 
   if (context->injection == K1_MIC_INJECT_STALE_I2S) {
     frame.read_ok = false;
@@ -234,8 +235,14 @@ void k1_mic_health_reset(uint32_t epoch) {
   k1_mic_health_model_reset(&k1_mic_health_context, epoch);
 }
 
-void k1_mic_health_begin_challenge(uint32_t now_ms) {
-  k1_mic_health_model_begin_challenge(&k1_mic_health_context, now_ms);
+void k1_mic_health_begin_challenge() {
+  // The audio loop timestamps its frame before servicing serial commands. Using
+  // millis() here can therefore be newer than the very next frame timestamp;
+  // unsigned timeout arithmetic would interpret that ordinary ordering as a
+  // multi-week timeout. Start on the health model's own last frame clock.
+  k1_mic_health_model_begin_challenge(
+      &k1_mic_health_context,
+      k1_mic_health_context.last_frame_now_ms);
 }
 
 void k1_mic_health_fail_challenge() {

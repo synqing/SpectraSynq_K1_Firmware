@@ -69,6 +69,7 @@ struct K1MicHealthContext {
   K1MicHealthFaultInjection injection;
   uint32_t epoch;
   uint32_t frame_count;
+  uint32_t last_frame_now_ms;
   uint32_t fault_event_count;
   uint32_t last_fault_frame;
   uint32_t last_buffer_hash;
@@ -132,7 +133,7 @@ const char* k1_mic_health_injection_name(K1MicHealthFaultInjection injection);
 
 #ifdef K1_MIC_HEALTH_V1
 void k1_mic_health_reset(uint32_t epoch);
-void k1_mic_health_begin_challenge(uint32_t now_ms);
+void k1_mic_health_begin_challenge();
 void k1_mic_health_fail_challenge();
 void k1_mic_health_update(const K1MicHealthFrame& frame);
 K1MicHealthContext k1_mic_health_read();

@@ -242,7 +242,7 @@ bool serial_typed_mic_health(const char* command_type, char* command_data) {
   if (value[0] == '\0' || strcmp(value, "status") == 0) {
     serial_print_mic_health();
   } else if (strcmp(value, "challenge") == 0) {
-    k1_mic_health_begin_challenge(millis());
+    k1_mic_health_begin_challenge();
     serial_print_mic_health();
   } else if (strcmp(value, "fail_challenge") == 0) {
     k1_mic_health_fail_challenge();
