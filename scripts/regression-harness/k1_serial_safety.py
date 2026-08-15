@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "e83abf9eee23099a2b9b0a034d355350bf8aa9ce"
+TYPED_DEF_BLOB_SHA = "d3bf37921345e6e00e6c839d7396a4e1b46b387a"
 BARE_DEF_BLOB_SHA = "9246b0702f40f796eb0877bda2f8b8c1515ec009"
 
 # --------------------------------------------------------------------------
@@ -302,6 +302,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "rtrace_dump",
     "rtrace_status",
     "runtime_id",
+    "scheduling_trace",
     "secondary_mode",
     "secondary_status",
     "set_mode",

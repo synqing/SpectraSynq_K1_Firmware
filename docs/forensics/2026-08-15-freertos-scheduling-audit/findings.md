@@ -156,3 +156,67 @@ The K1 application buffers are safe to reuse after the copy; application double
 buffering does not fix the internal FastLED payload lifetime. Gate 1 will add an exact,
 trace-only RMT submit/TX-done oracle using static records and official completion
 callbacks. Gate 5 will decide the production lifetime fence from measured evidence.
+
+## Gate 1 trace-unit firmware preflight
+
+**Current truth.** Gate 0 is independently accepted. The main production K1
+`F887A500` is not currently enumerated. Bench `B489A500` is present on
+`/dev/cu.usbmodem12401`; another enumerated USB serial does not match the registered
+Unit 2 identity and is inadmissible. Existing AP/VP probes do not supply truthful sample
+timestamps or current-transfer RMT completion.
+
+**Change class.** Non-shippable scheduling trace instrumentation plus host/static
+oracles. Production behaviour and default build flags remain unchanged.
+
+**Files and seams touched.** One trace-only PlatformIO environment; fixed-size RMT
+submit/completion instrumentation in `diag/`; bounded AP/VP timing fields at existing
+acquire/publish/frame/show seams; parser/admission tests. Production algorithm files may
+receive compile-gated calls only where the timestamp boundary physically exists.
+
+**Known breakage avoided.** Do not relabel `show_us` as completion. Do not log, allocate,
+wake a task or send a queue item from the RMT ISR. Do not edit generated `.pio/libdeps`.
+Do not enable RMT DMA, serial streaming, radio, a pacing clock or a new audio task. Do
+not use the mismatched Unit 2 identity or cross-flash `k1_hardware` onto the bench pinmap.
+
+**State ownership.** Core 1 owns pending frame identity and submission. Each RMT channel
+ISR owns its own fixed completion slot/ring and commits sequence last. Deferred dump is
+the only reader. AP trace state is Core-0-owned; VP acquires published identity once.
+
+**Runtime proof.** Link-map/static gates must prove both RMT symbols are wrapped and
+both exact LED GPIO channels register official TX-done callbacks. Host fault tests must
+reject missing wraps, wrong GPIO, incomplete records, overwrite and missing completion.
+Build the production-equivalent and trace environments before any guarded bench upload.
+
+**Minimal edit.** Reuse ESP-IDF 5.4.1 public RMT callbacks/wait APIs, existing VP perf /
+APCAD capture ownership and current serial dump infrastructure. Static internal-RAM POD
+storage only.
+
+**Non-goals.** No Gate 2 GDFT change, Gate 3 publication change, Gate 4 control change,
+production RMT backend replacement, physical timing claim or perceptual claim.
+
+**Stop conditions.** Wrapper absence in the link map, callback registration failure,
+anything other than exactly two admitted LED channels, ring overwrite/drop, unmatched
+submit/complete, unbounded wait, trace perturbation above the Gate 0 margin, wrong device
+identity or missing Captain-confirmed audible fixture rejects the trace run.
+
+## Gate 1 connected-bench checkpoint
+
+The B489A500 trace smoke closed the source/link/callback mechanism without claiming the
+absent production baseline. Both exact wrappers linked, the allowlisted GPIO 4/5 build
+uploaded through `/dev/cu.usbmodem12401`, and a bounded capture returned 64 contiguous
+paired generations per channel with zero trace drops. Confirmed RMT durations were
+primary p99 4955 us and secondary p99 4919.5 us.
+
+Independent review then rejected the capture's original CRC seam: it hashed application
+buffers before FastLED scaling/dithering. The corrected wrapper hashes the actual 480-byte
+ESP-IDF payload and the caller can no longer supply CRCs. Host mutation proof and the main
+trace build are green, but the bench disconnected before recapture; the earlier completion
+timings remain valid while device final-byte identity is explicitly `NOT_VERIFIED`.
+
+The truthful APCAD timestamp lane also worked: assumption ID 1 was explicit, generations
+were contiguous, and timestamp order remained valid. However, short trace and minimal
+bench captures both failed sustainable 7500 us AP service: 101.61 Hz / active p95 10008 us
+and 95.57 Hz / active p95 11067 us respectively. Their ordering is not a trustworthy
+instrumentation-delta estimate, but both independently trigger the execution plan's Gate 2
+service-contract lane. Main F887A500, Captain-confirmed music, worst dual-channel crossfade
+and acoustic-to-photon proof remain open; see `evidence/gate1-bench-trace-smoke.md`.

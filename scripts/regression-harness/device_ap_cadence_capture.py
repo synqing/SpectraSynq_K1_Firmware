@@ -290,6 +290,7 @@ def describe_ms(values: list[float]) -> dict[str, float | None]:
         "median": statistics.median(values) if values else None,
         "p5": pct(values, 0.05),
         "p95": pct(values, 0.95),
+        "p99": pct(values, 0.99),
         "min": min(values) if values else None,
         "max": max(values) if values else None,
     }
@@ -353,6 +354,54 @@ def summarise_rows(
     acf_rows = sum(1 for row in rows if int(numeric(row, "acf")) == 1)
     silence_rows = sum(1 for row in rows if int(numeric(row, "sil")) == 1)
 
+    timestamp_rows = [
+        row
+        for row in rows
+        if all(
+            key in row
+            for key in (
+                "capture_seq",
+                "i2s_read_return_us",
+                "newest_sample_estimate_us",
+                "oldest_sample_estimate_us",
+                "ap_publish_us",
+                "sample_time_assumption_id",
+            )
+        )
+    ]
+    capture_sequences = int_values(timestamp_rows, "capture_seq")
+    capture_sequence_gaps = [
+        {
+            "at_index": idx,
+            "previous": capture_sequences[idx - 1],
+            "current": capture_sequences[idx],
+        }
+        for idx in range(1, len(capture_sequences))
+        if capture_sequences[idx] - capture_sequences[idx - 1] != 1
+    ]
+    timestamp_order_failure_count = sum(
+        1
+        for row in timestamp_rows
+        if not (
+            numeric(row, "i2s_read_start_us")
+            <= numeric(row, "i2s_read_return_us")
+            and numeric(row, "oldest_sample_estimate_us")
+            <= numeric(row, "newest_sample_estimate_us")
+            <= numeric(row, "ap_publish_us")
+        )
+    )
+    timestamp_assumptions = unique_sorted(timestamp_rows, "sample_time_assumption_id")
+    newest_to_publish_us = [
+        numeric(row, "newest_to_publish_us")
+        for row in timestamp_rows
+        if "newest_to_publish_us" in row
+    ]
+    oldest_to_publish_us = [
+        numeric(row, "oldest_to_publish_us")
+        for row in timestamp_rows
+        if "oldest_to_publish_us" in row
+    ]
+
     expected_ap_frame_hz = None
     expected_ap_dt_ms = None
     expected_novelty_rate_hz = None
@@ -390,6 +439,8 @@ def summarise_rows(
         "tempo_publish_elapsed_us": describe_ms([numeric(row, "tempo_publish_us") for row in rows]),
         "tempo_emit_elapsed_us": describe_ms([numeric(row, "tempo_emit_us") for row in rows]),
         "total_ap_loop_elapsed_us": describe_ms([numeric(row, "total_us") for row in rows]),
+        "newest_sample_to_ap_publish_us": describe_ms(newest_to_publish_us),
+        "oldest_sample_to_ap_publish_us": describe_ms(oldest_to_publish_us),
     }
     active_ap_work_us = [
         numeric(row, "total_us") - numeric(row, "i2s_us")
@@ -444,6 +495,11 @@ def summarise_rows(
         "frame_gaps_first10": frame_gaps[:10],
         "timestamp_regression_count": len(timestamp_regressions),
         "timestamp_regressions_first10": timestamp_regressions[:10],
+        "timestamp_identity_row_count": len(timestamp_rows),
+        "capture_sequence_gap_count": len(capture_sequence_gaps),
+        "capture_sequence_gaps_first10": capture_sequence_gaps[:10],
+        "timestamp_order_failure_count": timestamp_order_failure_count,
+        "sample_time_assumption_ids": timestamp_assumptions,
         "i2s_status_counts": dict(sorted(i2s_status_counts.items())),
         "i2s_not_ok_count": i2s_not_ok_count,
         "bytes_mismatch_count": bytes_mismatch_count,

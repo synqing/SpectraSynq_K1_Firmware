@@ -60,7 +60,10 @@ radio and 24 kHz/180-bin work    = separate programmes
 
 ## Immediate execution state
 
-The implementation branch begins at `9259a9d5`. Gate 0 is active. Production source does
-not change until the current harness inventory, determinism contract and named fault battery
-have demonstrated RED capability. Decision-critical units then advance serially through the
-Gate 0-8 DAG with an independently re-run post-integration gate.
+The implementation branch began at `9259a9d5`. Gate 0 was independently accepted at
+`68c9a51e`. Gate 1 now has a host/build-green trace surface and a guarded B489A500
+bench smoke: two-channel RMT completion is observed without drops, while both short
+scalar bench probes show AP service demand above the nominal 7.5 ms arrival period.
+That RED service-capacity result admits Gate 2 without authorising priority or task
+changes. Gate 1 remains open for the exact-production F887A500 quiet/music/crossfade
+baseline and Captain-confirmed audible real-music fixture.

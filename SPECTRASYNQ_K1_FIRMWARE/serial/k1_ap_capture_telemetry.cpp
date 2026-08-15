@@ -274,8 +274,14 @@ bool ap_cad_capture_arm(uint32_t duration_ms) {
 
 APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool emitted, uint32_t emit_delta_ms) {
   APCadenceCaptureSample sample = {};
+  sample.i2s_read_start_us = frame.i2s.read_start_us;
+  sample.i2s_read_return_us = frame.i2s.read_return_us;
+  sample.newest_sample_estimate_us = frame.i2s.newest_sample_estimate_us;
+  sample.oldest_sample_estimate_us = frame.i2s.oldest_sample_estimate_us;
+  sample.ap_publish_us = frame.i2s.ap_publish_us;
   sample.boot_ms = frame.boot_ms;
   sample.frame_index = frame.frame_index;
+  sample.capture_sequence = frame.i2s.capture_sequence;
   sample.frame_ms = frame.frame_ms;
   sample.emit_count = frame.tempo.emit_count;
   sample.emit_ms = frame.tempo.last_emit_ms;
@@ -289,6 +295,7 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
   sample.dma_frame_num = ap_capture_u16_sat(CONFIG.SAMPLES_PER_CHUNK);
   sample.bytes_requested = ap_capture_u16_sat(frame.i2s.bytes_requested);
   sample.bytes_read = ap_capture_u16_sat(frame.i2s.bytes_read);
+  sample.samples_read = ap_capture_u16_sat(frame.i2s.samples_read);
   sample.emit_delta_ms = ap_capture_u16_sat(emit_delta_ms);
   sample.declared_ap_hz_q8_8 = ap_nov_capture_q8_8(frame.tempo.declared_ap_frame_hz);
   sample.declared_nov_hz_q8_8 = ap_nov_capture_q8_8(frame.tempo.declared_novelty_rate_hz);
@@ -326,6 +333,7 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
     | ((frame.ap_core_id >= 0 && frame.vp_core_id >= 0 && frame.ap_core_id != frame.vp_core_id) ? 0x20 : 0x00)
     | (frame.tempo.v2_locked ? 0x40 : 0x00)
     | (frame.tempo.acf_spread_active ? 0x80 : 0x00);
+  sample.sample_time_assumption_id = frame.i2s.sample_time_assumption_id;
   return sample;
 }
 
@@ -729,6 +737,8 @@ void ap_cad_capture_dump() {
     USBSerial.print(sample.bytes_requested);
     USBSerial.print(",bytes_read=");
     USBSerial.print(sample.bytes_read);
+    USBSerial.print(",samples_read=");
+    USBSerial.print(sample.samples_read);
     USBSerial.print(",i2s_status=");
     USBSerial.print(sample.i2s_status);
     USBSerial.print(",stage=");
@@ -739,6 +749,28 @@ void ap_cad_capture_dump() {
     USBSerial.print(sample.vp_core_id);
     USBSerial.print(",i2s_us=");
     USBSerial.print(sample.i2s_read_elapsed_us);
+    USBSerial.print(",capture_seq=");
+    USBSerial.print(sample.capture_sequence);
+    USBSerial.print(",i2s_read_start_us=");
+    USBSerial.print((unsigned long long)sample.i2s_read_start_us);
+    USBSerial.print(",i2s_read_return_us=");
+    USBSerial.print((unsigned long long)sample.i2s_read_return_us);
+    USBSerial.print(",newest_sample_estimate_us=");
+    USBSerial.print((unsigned long long)sample.newest_sample_estimate_us);
+    USBSerial.print(",oldest_sample_estimate_us=");
+    USBSerial.print((unsigned long long)sample.oldest_sample_estimate_us);
+    USBSerial.print(",ap_publish_us=");
+    USBSerial.print((unsigned long long)sample.ap_publish_us);
+    USBSerial.print(",sample_time_assumption_id=");
+    USBSerial.print(sample.sample_time_assumption_id);
+    USBSerial.print(",newest_to_publish_us=");
+    USBSerial.print((sample.ap_publish_us >= sample.newest_sample_estimate_us)
+                      ? (unsigned long long)(sample.ap_publish_us - sample.newest_sample_estimate_us)
+                      : 0ULL);
+    USBSerial.print(",oldest_to_publish_us=");
+    USBSerial.print((sample.ap_publish_us >= sample.oldest_sample_estimate_us)
+                      ? (unsigned long long)(sample.ap_publish_us - sample.oldest_sample_estimate_us)
+                      : 0ULL);
     USBSerial.print(",gdft_us=");
     USBSerial.print(sample.gdft_elapsed_us);
     USBSerial.print(",novelty_us=");

@@ -62,6 +62,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_effect_queue.h"
 #include "k1_show_state.h"
 #include "k1_ap_capture_telemetry.h"
+#ifdef K1_SCHEDULING_TRACE_V1
+#include "k1_scheduling_trace_telemetry.h"
+#endif
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
 #include "serial_cmd_handlers.h"
@@ -1042,6 +1045,16 @@ void vp_perf_print_status() {
   USBSerial.print(vp_perf.over_budget_frames);
   USBSerial.print(" dropped=");
   USBSerial.println(vp_perf.dropped_frames);
+  USBSerial.print("VP_PERF_INTERVAL: avg=");
+  USBSerial.print(vp_perf_avg(vp_perf.frame_interval));
+  USBSerial.print(" max=");
+  USBSerial.println(vp_perf.frame_interval.max_us);
+  USBSerial.print("VP_PERF_STACK_HWM_WORDS: ap=");
+  USBSerial.print(vp_perf.ap_stack_hwm_min_words == 0xFFFFFFFFUL
+                    ? 0UL : vp_perf.ap_stack_hwm_min_words);
+  USBSerial.print(" vp=");
+  USBSerial.println(vp_perf.vp_stack_hwm_min_words == 0xFFFFFFFFUL
+                      ? 0UL : vp_perf.vp_stack_hwm_min_words);
   USBSerial.print("VP_PERF_HEAP: ");
   USBSerial.println(ESP.getFreeHeap());
 #else
@@ -3027,6 +3040,12 @@ void parse_command(char* command_buf) {
 	      vp_perf_command(command_type, command_data);
 	    }
 
+#ifdef K1_SCHEDULING_TRACE_V1
+    else if (strcmp(command_type, "scheduling_trace") == 0) {
+      k1_scheduling_trace_command(command_type, command_data);
+    }
+#endif
+
 	    // Extracted VERBATIM to serial_cmd_dispatch_smart_director() in
 	    // serial_cmd_handlers.cpp (smart_assist / smart_switching /
 	    // smart_confidence_floor / smart_scene). UNGATED. Behaviour-preserving —
@@ -4232,6 +4251,10 @@ void stream_vp_perf_data(uint32_t t_now) {
   USBSerial.print(vp_perf_avg(vp_perf.show));
   USBSerial.print('/');
   USBSerial.print(vp_perf.show.max_us);
+  USBSerial.print(",interval_us=");
+  USBSerial.print(vp_perf_avg(vp_perf.frame_interval));
+  USBSerial.print('/');
+  USBSerial.print(vp_perf.frame_interval.max_us);
   USBSerial.print(",frame_us=");
   USBSerial.print(vp_perf_avg(vp_perf.frame));
   USBSerial.print('/');
@@ -4241,7 +4264,13 @@ void stream_vp_perf_data(uint32_t t_now) {
   USBSerial.print(",dropped=");
   USBSerial.print(vp_perf.dropped_frames);
   USBSerial.print(",heap=");
-  USBSerial.println(ESP.getFreeHeap());
+  USBSerial.print(ESP.getFreeHeap());
+  USBSerial.print(",ap_stack_hwm_words=");
+  USBSerial.print(vp_perf.ap_stack_hwm_min_words == 0xFFFFFFFFUL
+                    ? 0UL : vp_perf.ap_stack_hwm_min_words);
+  USBSerial.print(",vp_stack_hwm_words=");
+  USBSerial.println(vp_perf.vp_stack_hwm_min_words == 0xFFFFFFFFUL
+                      ? 0UL : vp_perf.vp_stack_hwm_min_words);
 #else
   (void)t_now;
 #endif

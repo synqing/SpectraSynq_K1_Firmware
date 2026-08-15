@@ -653,7 +653,10 @@ struct VPPerfAuditState {
   VPPerfStat quant_primary;
   VPPerfStat quant_secondary;
   VPPerfStat show;
+  VPPerfStat frame_interval;
   VPPerfStat frame;
+  uint32_t ap_stack_hwm_min_words = 0xFFFFFFFFUL;
+  uint32_t vp_stack_hwm_min_words = 0xFFFFFFFFUL;
 };
 
 inline VPPerfAuditState vp_perf;
@@ -683,7 +686,10 @@ inline void vp_perf_clear_counters() {
   vp_perf_clear_stat(vp_perf.quant_primary);
   vp_perf_clear_stat(vp_perf.quant_secondary);
   vp_perf_clear_stat(vp_perf.show);
+  vp_perf_clear_stat(vp_perf.frame_interval);
   vp_perf_clear_stat(vp_perf.frame);
+  vp_perf.ap_stack_hwm_min_words = 0xFFFFFFFFUL;
+  vp_perf.vp_stack_hwm_min_words = 0xFFFFFFFFUL;
   vp_perf.running = was_running;
 }
 
@@ -711,11 +717,24 @@ inline void vp_perf_note_frame_start(uint32_t frame_start_us) {
   }
   if (vp_perf.last_frame_start_us != 0) {
     uint32_t delta_us = frame_start_us - vp_perf.last_frame_start_us;
+    vp_perf_record(vp_perf.frame_interval, delta_us);
     if (delta_us >= (VP_PERF_FRAME_BUDGET_US * 2UL)) {
       vp_perf.dropped_frames += (delta_us / VP_PERF_FRAME_BUDGET_US) - 1UL;
     }
   }
   vp_perf.last_frame_start_us = frame_start_us;
+}
+
+inline void vp_perf_note_ap_stack(uint32_t words) {
+  if (vp_perf.running && words < vp_perf.ap_stack_hwm_min_words) {
+    vp_perf.ap_stack_hwm_min_words = words;
+  }
+}
+
+inline void vp_perf_note_vp_stack(uint32_t words) {
+  if (vp_perf.running && words < vp_perf.vp_stack_hwm_min_words) {
+    vp_perf.vp_stack_hwm_min_words = words;
+  }
 }
 
 inline void vp_perf_note_frame_total(uint32_t frame_us) {

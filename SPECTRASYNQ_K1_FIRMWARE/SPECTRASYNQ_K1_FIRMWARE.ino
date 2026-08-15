@@ -37,6 +37,9 @@
 #include "bridge_fs.h"        // Filesystem access (save/load configuration)
 #include "utilities.h"        // Misc. math and other functions
 #include "i2s_audio.h"        // I2S Microphone audio capture
+#ifdef K1_SCHEDULING_TRACE_V1
+#include "k1_scheduling_trace_telemetry.h"  // Gate-1 bounded RMT completion trace
+#endif
 #include "led_utilities.h"    // LED color/transform utility functions
 #include "noise_cal.h"        // Background noise removal
 #include "buttons.h"          // Watch the status of buttons
@@ -686,6 +689,11 @@ void setup() {
 
   init_secondary_leds();
   ENABLE_SECONDARY_LEDS = true;   // Dual-channel (incl. K1_CUSTOM_LED_V1 dual-206)
+#ifdef K1_SCHEDULING_TRACE_V1
+  // Establish a non-zero trace epoch before the bootstrap show creates the two
+  // RMT channels. Capture remains disarmed until the typed start request lands.
+  k1_scheduling_trace_initialise();
+#endif
 #ifdef K1_WIRELESS_ENABLED
   k1_wireless_begin();
 #endif
@@ -923,6 +931,18 @@ void loop() {
   // Send AGC debug data if enabled
   stream_agc_data(t_now);
   stream_vp_data(t_now);
+#if ENABLE_VP_PERF_AUDIT
+  // FreeRTOS derives this watermark by scanning untouched stack-fill bytes.
+  // Sample at 1 Hz so the evidence does not become per-frame AP service work.
+  static uint32_t vp_perf_ap_stack_last_ms = 0;
+  if (!vp_perf.running) {
+    vp_perf_ap_stack_last_ms = 0;
+  } else if (vp_perf_ap_stack_last_ms == 0 ||
+             (uint32_t)(t_now - vp_perf_ap_stack_last_ms) >= 1000UL) {
+    vp_perf_note_ap_stack((uint32_t)uxTaskGetStackHighWaterMark(NULL));
+    vp_perf_ap_stack_last_ms = t_now;
+  }
+#endif
   stream_vp_perf_data(t_now);
 #ifdef ENABLE_AP_STREAM
   ap_capture_tick();   // PIO-APCAP: sample windowed AP capture here — post-GDFT, spectrogram/chromagram fresh
@@ -990,6 +1010,11 @@ void loop() {
     return;
 #endif
     k1_tempo_update(k1_audio_snapshot);  // beat/tempo-phase tracker (Core-0; self-clocks to 50 Hz, read-only consumer of novelty)
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    // Truthful probe timestamp: the complete current AP transaction is visible
+    // only after snapshot, onset, saliency and tempo have all published.
+    k1_audio_i2s_debug_note_ap_publish((uint64_t)esp_timer_get_time());
+#endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_TEMPO && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
@@ -1144,8 +1169,16 @@ void led_thread(void* arg) {
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
 #if ENABLE_VP_PERF_AUDIT
+      static int64_t vp_perf_vp_stack_last_us = 0;
       if (vp_perf.running) {
         vp_perf_note_frame_start(uint32_t(vp_frame_start_us));
+        if (vp_perf_vp_stack_last_us == 0 ||
+            vp_frame_start_us - vp_perf_vp_stack_last_us >= 1000000LL) {
+          vp_perf_note_vp_stack((uint32_t)uxTaskGetStackHighWaterMark(NULL));
+          vp_perf_vp_stack_last_us = vp_frame_start_us;
+        }
+      } else {
+        vp_perf_vp_stack_last_us = 0;
       }
 #endif
 

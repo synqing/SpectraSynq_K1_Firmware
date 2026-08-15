@@ -92,8 +92,14 @@ struct APCadenceFrameInput {
 };
 
 struct APCadenceCaptureSample {
+  uint64_t i2s_read_start_us;
+  uint64_t i2s_read_return_us;
+  uint64_t newest_sample_estimate_us;
+  uint64_t oldest_sample_estimate_us;
+  uint64_t ap_publish_us;
   uint32_t boot_ms;
   uint32_t frame_index;
+  uint32_t capture_sequence;
   uint32_t frame_ms;
   uint32_t emit_count;
   uint32_t emit_ms;
@@ -106,6 +112,7 @@ struct APCadenceCaptureSample {
   uint16_t dma_frame_num;
   uint16_t bytes_requested;
   uint16_t bytes_read;
+  uint16_t samples_read;
   uint16_t emit_delta_ms;
   uint16_t declared_ap_hz_q8_8;
   uint16_t declared_nov_hz_q8_8;
@@ -137,6 +144,7 @@ struct APCadenceCaptureSample {
   uint8_t k1_frame_ctr;
   uint8_t tempo_decimation;
   uint8_t flags;
+  uint8_t sample_time_assumption_id;
 };
 
 // ---- Capture state (moved from serial_menu.h `static` -> external linkage) --
