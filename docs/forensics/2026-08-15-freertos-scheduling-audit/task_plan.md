@@ -24,8 +24,8 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | 4. Amend the audit and write the standalone execution plan | complete | Markdown authorities |
 | 5. Produce and visually verify the retained-template document | complete | final DOCX; 8/8 pages inspected |
 | 6. Run structural/document validation and close proof ledger | complete | current-HEAD host and document gates |
-| 7. Activate implementation authority and branch routing | in progress | active handover; repo-truth PASS |
-| 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | pending | independently accepted Gate 0 receipt |
+| 7. Activate implementation authority and branch routing | complete | active handover; repo-truth PASS; commit `82e20197` |
+| 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | in progress | independently accepted Gate 0 receipt |
 | 9. Gate 1: exact-head AP/VP baseline | pending | admitted quiet/music/crossfade timing evidence |
 | 10. Gate 2: GDFT service contract | pending | measured retain/change decision |
 | 11. Gate 3: coherent AP frame and event semantics | pending | host interleavings + device lock/freshness proof |
@@ -42,3 +42,4 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | Full-history spawn rejected an explicit agent type | 1 | Relaunched with inherited agent type and received an agent id |
 | Packaged DOCX renderer lacked `pdf2image` in the selected Python runtime | 1 | Use the skill's documented manual LibreOffice -> PDF -> PNG render path; do not install dependencies |
 | Bootstrap repo-truth rejected the implementation branch because `docs/spec-index.md` still named `main`/AP input as current | 1 | Record Captain's new authority in a scheduling handover and atomically update the active branch/lane pointers before source work |
+| Source-manifest command was rejected because it used `rm -f` on a temporary glob | 1 | Use a fresh `mktemp -d` manifest directory and create no pre-existing targets |

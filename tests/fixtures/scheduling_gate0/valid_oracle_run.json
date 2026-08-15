@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "contract_id": "K1_SCHEDULING_GATE0_2026_08_15",
+  "fixture_class": "HOST_ORACLE_ONLY_NOT_DEVICE_EVIDENCE",
+  "expected": {
+    "device_identity_manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "effective_build_flags_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "firmware_bin_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "fixture_manifest_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "git_sha": "1111111111111111111111111111111111111111",
+    "mode_stress_contract_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "platformio_ini_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+    "source_manifest_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "test_inventory_sha256": "7777777777777777777777777777777777777777777777777777777777777777"
+  },
+  "observed": {
+    "device": {
+      "chip_id": "F887A500",
+      "environment": "k1_hardware",
+      "identity_verified": true,
+      "usb_serial": "B4:3A:45:A5:87:F8"
+    },
+    "device_identity_manifest_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "effective_build_flags_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "firmware_bin_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "fixture_manifest_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "git_sha": "1111111111111111111111111111111111111111",
+    "instrumentation": {
+      "bounded_probe": "scheduling_trace_v1",
+      "ordinary_streaming_enabled": false
+    },
+    "mode_stress": {
+      "discovery": "profile_every_enabled_primary_and_secondary_mode_then_select_measured_worst_complete_frame_pair",
+      "edge_mixer": "shipping_enabled_configuration",
+      "selection_frozen": true,
+      "stress_transition": "simultaneous_two_channel_crossfade"
+    },
+    "mode_stress_contract_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "platformio_ini_sha256": "9999999999999999999999999999999999999999999999999999999999999999",
+    "production_tuple": {
+      "platformio_environment": "k1_hardware",
+      "sample_rate_hz": 12800,
+      "samples_per_chunk": 96,
+      "tempo_novelty_decimation": 3
+    },
+    "source_manifest_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "test_inventory": {
+      "deleted_count": 0,
+      "deselected_count": 0,
+      "required_count": 12,
+      "skipped_count": 0,
+      "xfailed_count": 0
+    },
+    "test_inventory_sha256": "7777777777777777777777777777777777777777777777777777777777777777",
+    "trace_records": [
+      {
+        "ap_generation": 40,
+        "ap_publish_us": 1200,
+        "beat_epoch": 1,
+        "beat_sequence": 3,
+        "boot_epoch": 7,
+        "capture_sequence": 40,
+        "i2s_read_return_us": 1100,
+        "mixed_generation_count": 0,
+        "newest_sample_estimate_us": 1100,
+        "oldest_sample_estimate_us": 1000,
+        "onset_epoch": 1,
+        "onset_sequence": 5,
+        "primary_final_bytes_crc": "aa11aa11",
+        "render_start_us": 1400,
+        "rmt_complete_us": 1700,
+        "rmt_completion_confirmed": true,
+        "rmt_completion_source": "driver_completion_callback",
+        "rmt_submit_us": 1500,
+        "sample_time_assumption_id": "I2S_DMA_RETURN_ESTIMATE_V1",
+        "secondary_final_bytes_crc": "bb22bb22",
+        "trace_crc": "1234abcd",
+        "trace_drop_count": 0,
+        "vp_acquire_us": 1300,
+        "vp_frame_sequence": 80
+      },
+      {
+        "ap_generation": 41,
+        "ap_publish_us": 2200,
+        "beat_epoch": 1,
+        "beat_sequence": 4,
+        "boot_epoch": 7,
+        "capture_sequence": 41,
+        "i2s_read_return_us": 2100,
+        "mixed_generation_count": 0,
+        "newest_sample_estimate_us": 2100,
+        "oldest_sample_estimate_us": 2000,
+        "onset_epoch": 1,
+        "onset_sequence": 7,
+        "primary_final_bytes_crc": "cc33cc33",
+        "render_start_us": 2400,
+        "rmt_complete_us": 2700,
+        "rmt_completion_confirmed": true,
+        "rmt_completion_source": "driver_wait_tx_done",
+        "rmt_submit_us": 2500,
+        "sample_time_assumption_id": "I2S_DMA_RETURN_ESTIMATE_V1",
+        "secondary_final_bytes_crc": "dd44dd44",
+        "trace_crc": "5678efab",
+        "trace_drop_count": 0,
+        "vp_acquire_us": 2300,
+        "vp_frame_sequence": 81
+      }
+    ]
+  }
+}

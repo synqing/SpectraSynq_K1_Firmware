@@ -72,3 +72,67 @@ sample freshness, stack margin, RMT completion timing or physical latency.
   AP0/VP1 bulkhead. Retain bounded communication and stack/queue visibility only.
 - Atomic Agents is not a firmware dependency. Writing-skills routes recurring rules to
   executable ratchets rather than a new project-specific prose skill.
+
+## Gate 0 firmware-change preflight
+
+**Current truth.** Production is one Arduino `loopTask` on Core 0 plus `led_task` on
+Core 1. The VP loop is free-running, its documented whole-frame target is 8,333 us,
+and the separately defined effect-code ceiling is 2,000 us. Current source still
+permits mixed-age AP reads and volatile-only multi-field control commits. Current
+device service, freshness and lock budgets are not proven.
+
+**Change class.** Gate 0 is host-only verification infrastructure and authority
+reconciliation. It changes no production firmware behaviour.
+
+**Files and seams touched.** The unit may add a scheduling contract, provenance
+validator, mutation/fault battery and host tests under the existing audit, script and
+test trees. It may correct stale authority prose in the execution plan. It may not edit
+the AP, VP, effect, control, persistence, PlatformIO or device-identity implementation.
+
+**Known breakage avoided.** Do not introduce a pacing clock, task, queue, mutex, heap
+allocation, radio flag, sample tuple or GDFT change. Do not conflate the separate
+AP-input P4 lane with scheduling authority. Do not turn an expected hash into a
+self-referential file hash or allow an implementation unit to update its own oracle.
+
+**State ownership.** The Gate 0 contract is immutable input. The validator only reads
+repo/run manifests. Mutation fixtures are created in temporary directories and never
+replace the trusted files. The independent gate runner owns final acceptance.
+
+**Runtime proof.** None is claimed by Gate 0. Its job is to fail closed on wrong
+provenance, tuple, identity, mode-pair strategy, instrumentation state, trace schema,
+fixture hash, test inventory and corrupted generation. Gate 1 owns device measurement.
+
+**Minimal edit.** Reuse pytest, JSON and the existing device identity/build provenance
+surfaces. Add no framework dependency and no generated binary fixture.
+
+**Non-goals.** No production source change, build, upload, serial write, calibration,
+music playback, timing claim, GDFT selection or scheduler experiment.
+
+**Stop conditions.** Any required mutation that remains accepted, a non-deterministic
+host result, a dirty/unresolved trust root, or an unowned acceptance edit blocks all
+production work until Gate 0 is repaired and independently rerun.
+
+## Exhaustive current-source synthesis
+
+The seven manifest readers independently reconciled all 535 first-party source paths.
+Decision-critical additions to the original audit are:
+
+- the bounded I2S read can wait 100 ms, over thirteen nominal 7.5 ms arrivals; timeout
+  semantics must be separated from ordinary service time in Gate 1;
+- accepted calibration can synchronously persist from the AP/GDFT path;
+- three LittleFS open-failure paths can leak the current LED park/lock state, and one
+  direct blocking-flash path bypasses the normal park acknowledgement;
+- saliency/onset event surfaces remain overwriteable between VP frames, while audio,
+  semantic, onset and tempo snapshots have no shared aggregate generation;
+- effect-queue payloads and commit flags remain plain/volatile shared fields without a
+  complete release/acquire transaction;
+- several shipped effects and smoothing/fade paths remain per-render-call rather than
+  delta-time correct, so a cadence change would alter product motion as well as timing;
+- current host FreeRTOS stubs erase real cross-core interleavings, and current trace /
+  VPAB surfaces stop short of confirmed RMT completion and physical output;
+- the 8,333 us whole-frame target, 2,000 us effect ceiling and older 100 FPS comments
+  are genuinely inconsistent; Gate 0 therefore defines separate measured boundaries
+  and does not add a pacing clock.
+
+These findings strengthen the contained hardening order. They do not justify an actor
+rewrite or a speculative priority change.

@@ -1,7 +1,7 @@
 ---
-abstract: "Authoritative Gate 0-8 execution plan for contained K1 scheduling, ownership and timing hardening. Preserves AP0/VP1, rejects a broad RTOS rewrite, and keeps production byte-inert until the external AP-input-integrity P4 authority permits mutation."
-status: plan-only
-production_mutation_authority: blocked-before-AP-P4
+abstract: "Active Gate 0-8 implementation plan for contained K1 scheduling, ownership and timing hardening. Preserves AP0/VP1, rejects a broad RTOS rewrite, and operates under Captain's direct 2026-08-15 scheduling implementation authority."
+status: implementation-active
+production_mutation_authority: FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15
 observed_plan_fold_sha: 15d3a85d6d26e9698039a5b0d39dbaa1569718b4
 ---
 
@@ -56,7 +56,8 @@ FEATURE_LATENCY_CONTRACT          = REWRITE_REQUIRED
 VP_TARGET                         = 120_FPS_PER_LOAD_BEARING_REPO_CONTRACT
 VP_WHOLE_FRAME_MISS_POLICY        = GATE_0_RATIFICATION_REQUIRED
 SPECTRAL_24K_180_UPGRADE          = SEPARATE_BENCH_LANE
-PRODUCTION_MUTATION_BEFORE_AP_P4  = NO
+SCHEDULING_MUTATION_AUTHORITY      = DIRECT_CAPTAIN_GO_2026_08_15
+AP_INPUT_P4                        = OPEN_SEPARATE_PROGRAMME
 ```
 
 The repository's load-bearing instruction sets 120 FPS and a 2.0 ms effect-code
@@ -71,20 +72,18 @@ emission as one value. Gate 0 must replace it with named feature contracts.
 
 ## 3. Authority and provenance
 
-### 3.1 External production-mutation predecessor
+### 3.1 Scheduling implementation authority
 
-The active authority is
-`docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`. Its **P4** is named
-**AP-P4** in this plan. AP-P4 must permit production firmware mutation before Gate 1
-device work or any production source unit begins.
+Captain's direct 2026-08-15 instruction authorises full end-to-end scheduling
+implementation. The durable receipt is
+`docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`.
+Gate 0 still blocks production source mutation until the oracle proves GREEN control,
+RED fault witnesses and a frozen trust root; this is an engineering gate, not an
+authority gap.
 
-Before AP-P4:
-
-- documentation, source review and plan/oracle design only;
-- no scheduling firmware mutation;
-- no physical microphone test under this lane;
-- no build/flash/device action claimed by this plan;
-- production remains byte-inert.
+The separate AP-input-integrity P4 remains open and owns microphone slot, microphone
+health, calibration and colour-lane promotion. Scheduling units may measure the current
+production-equivalent AP path but may not bundle or imply completion of those changes.
 
 ### 3.2 SHA ledger
 
@@ -277,7 +276,7 @@ a 38-40 ms render stall.
 ## 7. Gate DAG
 
 ```text
-                              AP-P4 external authority
+                     Captain scheduling authority receipt
                                        |
 G0 authority/contracts/oracle ---------+
                                        |
@@ -329,7 +328,8 @@ not enter Gate 8.
 4. pre-registered AP, VP, lock, queue and instrumentation margins;
 5. frozen oracle/fixture hashes and acceptance ownership;
 6. current test/harness inventory before new machinery;
-7. AP-P4 authority receipt before production mutation.
+7. direct scheduling authority receipt and proof that AP-input P4 remains separately
+   scoped.
 
 Feature contract ledger:
 
@@ -355,7 +355,8 @@ an oracle defect and blocks all production lanes.
 
 ### Gate 1 — exact-current-head baseline
 
-**Dependencies:** Gate 0 and AP-P4.
+**Dependencies:** Gate 0. The separate AP-input P4 is not silently promoted by this
+baseline and no AP-input default changes may be bundled.
 
 Measure the exact 12.8 kHz / 96 / d3 production-equivalent path and paired trace build:
 
@@ -567,8 +568,9 @@ indefinitely against the same failure.
 
 ## 11. Autonomous execution boundary
 
-Do not launch an autonomous production fleet now. Gate 0 is open, AP-P4 owns production
-mutation, and the concurrency/timestamp oracle has not yet demonstrated fault evidence.
+Do not launch an autonomous production fleet before Gate 0 acceptance. Captain has
+authorised scheduling mutation, but the concurrency/timestamp oracle must demonstrate
+fault evidence first.
 
 If Captain later authorises autonomous execution:
 
@@ -590,7 +592,8 @@ dependency.
 This programme is complete only when:
 
 1. Gate 0 contracts and oracle are closed;
-2. AP-P4 authorises the production work;
+2. Captain's direct scheduling authority remains active and AP-input P4 remains a
+   separate, unpromoted programme;
 3. Gates 1-5 pass on exact evidence;
 4. Gate 6 is either independently passed or explicitly closed `NOT_REQUIRED`;
 5. Gate 7 is closed only for the persistence scope actually selected;
