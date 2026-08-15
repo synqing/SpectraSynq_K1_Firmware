@@ -88,3 +88,18 @@ acceptance now requires at least two authorised K1 units running different build
 simultaneously for 30–60 minutes across multiple real tracks. Only B489A500 is present,
 so Gate 2 is blocked/open and Gate 3 must not begin. The bench is restored to the cross0
 baseline; the durable `:build` readback names git `35de4e53` and the exact baseline env.
+
+Gate-2 decomposition then falsified further work spreading as a complete repair: even
+perfect three-frame levelling of the measured workload misses 6 ms under real music. A
+hop-incremental backend was implemented as a bounded probe and removed after it exceeded
+the one-code spectral bound and changed the impulse winner on 15/24 frames. The direct
+fixed-point recurrence is non-linear under per-step Q14 truncation and cannot be safely
+decomposed by a conventional sliding transform.
+
+An exact four-lane direct-recurrence probe remains non-shippable but reusable. Host
+differential is bit-identical across all 71 safe bins and adversarial fixtures. On
+B489A500 it reduced real-music GDFT median from 7.174 ms to 4.896 ms, but full AP p99 was
+still 8.590 ms and cadence 126.30 Hz. It therefore fails Gate 2 and is not promoted. The
+bench was restored again to `k1_bench_scheduling_baseline_probe`, running git `2c0db532`,
+epoch `1786786833`. The active engineering node is now non-shippable detailed residual-
+stage attribution; Gate 3 remains dependency-blocked.
