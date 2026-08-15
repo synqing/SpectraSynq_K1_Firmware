@@ -27,7 +27,7 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | 7. Activate implementation authority and branch routing | complete | active handover; repo-truth PASS; commit `82e20197` |
 | 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | complete | independently accepted at `68c9a51e`; 21/21 RED witnesses |
 | 9. Gate 1: exact-head AP/VP baseline | in progress — production hardware/music leg externally blocked; bench RMT smoke PASS and AP service RED | admitted quiet/music/crossfade timing evidence |
-| 10. Gate 2: GDFT service contract | ready — Gate 1 service-capacity entry predicate met on B489A500 | measured retain/change decision |
+| 10. Gate 2: GDFT service contract | in progress — one-variable cross0/40/80 host matrix and all three builds PASS; live musical/service selection blocked by disconnected bench | measured retain/change decision |
 | 11. Gate 3: coherent AP frame and event semantics | pending | host interleavings + device lock/freshness proof |
 | 12. Gate 4: transactional controls and scenes | pending | ordered/state/scene transaction proof |
 | 13. Gate 5: causal trace and startup visibility | pending | one identity through RMT completion |
@@ -47,3 +47,5 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | Full Gate-1 regression found two diagnostic envs outside the non-shippable name/label contract and a stale serial-safety registry | 1 | Rename the scalar env with the `probe` marker, put the trace label inside its section, regenerate the command literal and blob SHA; focused gate 63/63 PASS |
 | Main scheduling trace exceeded internal DRAM by 1200 bytes at link | 1 | Preserve the 64-record ISR rings; reduce only the duplicate serial-export staging buffer to 16 records and drain it iteratively; focused tests 14/14 and main trace link PASS |
 | Independent review proved the first CRC could be unrelated to FastLED's submitted bytes | 1 | Remove CRCs from the caller API; hash the actual ESP-IDF payload inside `__wrap_rmt_transmit`; add payload-mutation proof and mark the pre-fix device CRC fields inadmissible |
+| First Gate-2 matrix oracle inspected only local INI sections and manifest ownership | 1 | Resolve PlatformIO's effective graph and execute the real upload guard for authorised B489A500 and rejected F887A500 identities |
+| Second Gate-2 matrix oracle converted flags to sets, hiding duplicate/conflicting define order | 2 | Preserve the ordered flag list, require exact baseline-plus-one equality and assert one occurrence/value for every decision-critical macro |

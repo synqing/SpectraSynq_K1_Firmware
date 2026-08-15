@@ -67,3 +67,11 @@ scalar bench probes show AP service demand above the nominal 7.5 ms arrival peri
 That RED service-capacity result admits Gate 2 without authorising priority or task
 changes. Gate 1 remains open for the exact-production F887A500 quiet/music/crossfade
 baseline and Captain-confirmed audible real-music fixture.
+
+Gate 2 now has a source-parity, one-variable cross0/cross40/cross80 probe matrix. All
+three B489A500 environments build and 105 focused geometry/semantic/static tests pass.
+The actually executed resonator iteration totals are 34,254 / 18,550 / 17,109; the
+older 34,484 figure included bins skipped before the inner loop. No production crossover
+has been selected: the bench disconnected before paired device and Captain-confirmed
+real-music acceptance, so Gate 3 remains dependency-blocked rather than being started on
+an unproven GDFT service contract.
