@@ -1146,6 +1146,18 @@ void acquire_sample_chunk(uint32_t t_now) {
          }
     }
 
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    // `silence` is the input classifier, not a cosmetic dimmer. Once it has
+    // completed its dwell, no residual room-floor excursion is valid programme
+    // drive. Zero the shared drive at that boundary so every renderer sees the
+    // same semantic result; raw samples and the independent wake discriminators
+    // above remain untouched and can still release silence on real programme.
+    if (silence) {
+      max_waveform_val = 0.0f;
+      waveform_peak_scaled = 0.0f;
+    }
+#endif
+
     if (debug_mode && (t_now % 10000 == 0)) {
       USBSerial.print("DEBUG: silent_scale=");
       USBSerial.print(float(silent_scale));
@@ -1393,6 +1405,8 @@ void ap_capture_arm(uint32_t ms) {
 #ifdef K1_AP_DRIVE_CONTRACT_V1
   for (uint16_t i = 0; i < K1_AP_CAPTURE_PEAK_HIST_BINS; i++) ap_capture_peak_hist[i] = 0;
   for (uint16_t i = 0; i < K1_AP_CAPTURE_RMS_HIST_BINS; i++) ap_capture_rms_hist[i] = 0;
+  for (uint16_t i = 0; i < K1_AP_CAPTURE_PEAKINESS_HIST_BINS; i++) ap_capture_peakiness_hist[i] = 0;
+  ap_capture_silence_frames = 0;
 #endif
 }
 
@@ -1438,6 +1452,15 @@ void ap_capture_tick() {
                                    ? float(K1_AP_CAPTURE_RMS_HIST_BINS - 1U)
                                    : rms_scaled));
     if (ap_capture_rms_hist[rms_bin] != 0xFFFFU) ap_capture_rms_hist[rms_bin]++;
+    float peakiness_scaled = k1_silence_peakiness * 100.0f;
+    uint16_t peakiness_bin = uint16_t(peakiness_scaled <= 0.0f ? 0.0f :
+        (peakiness_scaled >= float(K1_AP_CAPTURE_PEAKINESS_HIST_BINS - 1U)
+          ? float(K1_AP_CAPTURE_PEAKINESS_HIST_BINS - 1U)
+          : peakiness_scaled));
+    if (ap_capture_peakiness_hist[peakiness_bin] != 0xFFFFU) {
+      ap_capture_peakiness_hist[peakiness_bin]++;
+    }
+    if (silence) ap_capture_silence_frames++;
   }
 #endif
   ap_capture_frames++;
@@ -1473,13 +1496,22 @@ void ap_capture_tick() {
       const uint16_t rp50 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 50);
       const uint16_t rp95 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 95);
       const uint16_t rp99 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 99);
+      const uint16_t kp05 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 5);
+      const uint16_t kp10 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 10);
+      const uint16_t kp50 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 50);
+      const uint16_t kp95 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 95);
+      const uint16_t kp99 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 99);
       const K1ApDriveContract dc = k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
-      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_struct=%.1f follower_floor=%.1f\n",
+      const float silence_fraction = ap_capture_frames
+          ? float(ap_capture_silence_frames) / float(ap_capture_frames) : 0.0f;
+      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_struct=%.1f follower_floor=%.1f\n",
         (unsigned long)ap_capture_frames,
         unsigned(pp05) * 8U, unsigned(pp10) * 8U, unsigned(pp50) * 8U,
         unsigned(pp95) * 8U, unsigned(pp99) * 8U,
         float(rp05) / 10000.0f, float(rp10) / 10000.0f, float(rp50) / 10000.0f,
         float(rp95) / 10000.0f, float(rp99) / 10000.0f,
+        float(kp05) / 100.0f, float(kp10) / 100.0f, float(kp50) / 100.0f,
+        float(kp95) / 100.0f, float(kp99) / 100.0f, silence_fraction,
         dc.mic_noise_floor_raw_peak, dc.drive_threshold_raw_peak,
         dc.silence_threshold.raw_peak_enter, dc.silence_threshold.raw_peak_exit,
         dc.silence_threshold.rms_enter, dc.silence_threshold.rms_exit,

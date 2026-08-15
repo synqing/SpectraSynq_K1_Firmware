@@ -79,6 +79,9 @@ def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     assert "im69d_samples_i16[i] = 0;" in i2s
     assert "if (!k1_mic_health_allows_calibration())" in noise_cal
     assert "k1_ap_drive_contract_resolve" in i2s
+    assert "if (silence) {\n      max_waveform_val = 0.0f;" in i2s
+    assert "ap_capture_peakiness_hist" in i2s
+    assert "silence_fraction=" in i2s
     assert "k1_ap_twitch_oracle_tick" in led
 
 

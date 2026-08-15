@@ -424,8 +424,14 @@ inline float    ap_capture_spec_sum[NUM_FREQS] = { 0.0f };
 // computed over the lossy transport. Peak bins are 8 raw units; RMS bins 0.0001.
 #define K1_AP_CAPTURE_PEAK_HIST_BINS 4096
 #define K1_AP_CAPTURE_RMS_HIST_BINS 2048
+#define K1_AP_CAPTURE_PEAKINESS_HIST_BINS 1024
 inline uint16_t ap_capture_peak_hist[K1_AP_CAPTURE_PEAK_HIST_BINS] = { 0 };
 inline uint16_t ap_capture_rms_hist[K1_AP_CAPTURE_RMS_HIST_BINS] = { 0 };
+// Crest/peakiness bins are 0.01 wide and saturate at 10.23. Keeping this
+// accumulation on-device avoids fabricating adjacency/distribution statistics
+// from the deliberately lossy serial stream.
+inline uint16_t ap_capture_peakiness_hist[K1_AP_CAPTURE_PEAKINESS_HIST_BINS] = { 0 };
+inline uint32_t ap_capture_silence_frames = 0;
 #endif
 #endif
 
