@@ -27,7 +27,7 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | 7. Activate implementation authority and branch routing | complete | active handover; repo-truth PASS; commit `82e20197` |
 | 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | complete | independently accepted at `68c9a51e`; 21/21 RED witnesses |
 | 9. Gate 1: exact-head AP/VP baseline | in progress — production hardware/music leg externally blocked; bench RMT smoke PASS and AP service RED | admitted quiet/music/crossfade timing evidence |
-| 10. Gate 2: GDFT service contract | open/unsatisfied — crossover matrix and sliding backend closed negative; exact lane-4 direct probe is bit-identical and cuts GDFT ~32%, but device active p99 remains 8.59 ms; detailed residual-stage attribution in progress | measured retain/change decision |
+| 10. Gate 2: GDFT service contract | open/unsatisfied — crossover matrix and sliding backend closed negative; exact lane-4 direct probe is bit-identical and cuts GDFT ~32%, but device active p99 remains 8.59 ms; full-loop residual-stage attribution is source/host/build accepted and awaits fresh complete device capture | measured retain/change decision |
 | 11. Gate 3: coherent AP frame and event semantics | dependency-blocked by open Gate 2 | host interleavings + device lock/freshness proof |
 | 12. Gate 4: transactional controls and scenes | pending | ordered/state/scene transaction proof |
 | 13. Gate 5: causal trace and startup visibility | pending | one identity through RMT completion |
@@ -55,3 +55,4 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | Bare `pytest` collected vendored ESP-IDF/PlatformIO test trees and stopped on 223 missing vendor dependencies | 1 | Use the canonical project boundary `python3 -m pytest -q tests`; 1,152 passed and 1 skipped |
 | Hop-incremental GDFT reduced modelled recurrence opportunities but violated the one-code spectral contract | 1 | Fire the pre-registered RED stop: remove the candidate; preserve the direct fixed-point oracle and record impulse winner changes plus Q14 truncation/root-unity limits |
 | Exact four-lane direct GDFT reduced device GDFT median by about 32% but whole-AP p99 remained 8.59 ms under real music | 1 | Keep the host-exact probe as reusable non-shippable machinery; reject promotion; attribute the remaining common/tempo/semantic stages before another optimisation |
+| First full-loop attribution review found the FULL endpoint before benchmark/encoder/debug service and a parser that could accept absent or all-zero attribution | 1 | Move the endpoint immediately before the scheduler wait; require every FULL offset/scalar, exact endpoint-duration reconciliation and non-empty spans while preserving explicit early-stage captures |

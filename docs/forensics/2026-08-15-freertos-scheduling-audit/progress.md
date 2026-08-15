@@ -89,3 +89,11 @@
   roughly 5.08 ms wire time each, and a too-fast free-running next frame can rewrite
   FastLED's internal non-DMA payload before the prior completion wait. The next trace
   unit must record official TX-done callbacks and cannot reuse `show_us` as completion.
+- Added capture-only full-loop AP stage attribution after the exact four-lane probe
+  remained above the Gate-2 service ceiling. The first independent review rejected an
+  endpoint that omitted benchmark/encoder/debug service and a fail-open parser; both
+  defects were repaired. Attempt 2 independently accepted thirteen ordered offsets,
+  exact derived-span checks, explicit unavailable GDFT internal split and a FULL
+  endpoint immediately before the deliberate scheduler wait. The complete host gate
+  passed (`1165 passed, 1 skipped`), and production plus the bench baseline probe both
+  build. Fresh complete B489A500 device capture remains the next proof boundary.

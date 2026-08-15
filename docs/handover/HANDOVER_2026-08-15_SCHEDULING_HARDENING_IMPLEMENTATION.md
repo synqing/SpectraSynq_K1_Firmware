@@ -103,3 +103,15 @@ still 8.590 ms and cadence 126.30 Hz. It therefore fails Gate 2 and is not promo
 bench was restored again to `k1_bench_scheduling_baseline_probe`, running git `2c0db532`,
 epoch `1786786833`. The active engineering node is now non-shippable detailed residual-
 stage attribution; Gate 3 remains dependency-blocked.
+
+The residual-stage attribution surface is now independently accepted at the
+source/host/build boundary. Capture-only timing records cover pre-I2S service, I2S,
+VU/sweet-spot work, GDFT, post-GDFT service, novelty, snapshot/configuration, onset,
+saliency, the full tempo call and the post-publication loop tail. Thirteen ordered
+offsets make each derived span mechanically checkable; the monolithic GDFT internal
+split is explicitly unavailable rather than fabricated. The FULL endpoint is after
+benchmark, optional encoder and debug service and immediately before `vTaskDelay(1)`.
+The parser rejects missing, zero, misordered or inconsistent FULL attribution. The
+canonical host gate passes (`1165 passed, 1 skipped`), and both `k1_hardware` and
+`k1_bench_scheduling_baseline_probe` build. This is not yet device evidence: the next
+node is an identity-gated complete B489A500 capture and attribution-led repair choice.

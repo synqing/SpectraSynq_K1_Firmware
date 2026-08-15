@@ -272,6 +272,18 @@ bool ap_cad_capture_arm(uint32_t duration_ms) {
   return true;
 }
 
+bool ap_cad_timing_active() {
+  return AP_CAD_CAPTURE_ACTIVE || AP_CAD_SOAK_ACTIVE;
+}
+
+static uint32_t ap_cad_stage_delta_us(uint64_t start_us, uint64_t end_us) {
+  if (start_us == 0 || end_us < start_us) {
+    return 0;
+  }
+  const uint64_t delta = end_us - start_us;
+  return delta > 0xFFFFFFFFULL ? 0xFFFFFFFFUL : (uint32_t)delta;
+}
+
 APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool emitted, uint32_t emit_delta_ms) {
   APCadenceCaptureSample sample = {};
   sample.i2s_read_start_us = frame.i2s.read_start_us;
@@ -289,6 +301,34 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
   sample.gdft_elapsed_us = frame.gdft_elapsed_us;
   sample.novelty_elapsed_us = frame.novelty_elapsed_us;
   sample.total_ap_loop_elapsed_us = frame.total_ap_loop_elapsed_us;
+  const APCadenceStageTiming& timing = frame.stage_timing;
+  sample.stage_timing_valid = timing.valid ? 1U : 0U;
+  sample.gdft_internal_split_valid = 0U;
+  if (timing.valid) {
+    sample.pre_i2s_service_elapsed_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.pre_i2s_end_us);
+    sample.post_i2s_frontend_elapsed_us = ap_cad_stage_delta_us(timing.i2s_end_us, timing.post_i2s_frontend_end_us);
+    sample.post_gdft_service_elapsed_us = ap_cad_stage_delta_us(timing.gdft_end_us, timing.novelty_start_us);
+    sample.pre_snapshot_config_elapsed_us = ap_cad_stage_delta_us(timing.novelty_end_us, timing.snapshot_start_us);
+    sample.snapshot_elapsed_us = ap_cad_stage_delta_us(timing.snapshot_start_us, timing.snapshot_end_us);
+    sample.onset_elapsed_us = ap_cad_stage_delta_us(timing.snapshot_end_us, timing.onset_end_us);
+    sample.saliency_elapsed_us = ap_cad_stage_delta_us(timing.onset_end_us, timing.saliency_end_us);
+    sample.tempo_total_elapsed_us = ap_cad_stage_delta_us(timing.saliency_end_us, timing.tempo_end_us);
+    sample.post_publish_tail_elapsed_us = ap_cad_stage_delta_us(timing.tempo_end_us, timing.loop_tail_end_us);
+
+    sample.stage_pre_i2s_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.pre_i2s_end_us);
+    sample.stage_i2s_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.i2s_end_us);
+    sample.stage_frontend_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.post_i2s_frontend_end_us);
+    sample.stage_gdft_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_start_us);
+    sample.stage_gdft_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_end_us);
+    sample.stage_novelty_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_start_us);
+    sample.stage_novelty_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_end_us);
+    sample.stage_snapshot_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.snapshot_start_us);
+    sample.stage_snapshot_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.snapshot_end_us);
+    sample.stage_onset_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.onset_end_us);
+    sample.stage_saliency_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.saliency_end_us);
+    sample.stage_tempo_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.tempo_end_us);
+    sample.stage_tail_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.loop_tail_end_us);
+  }
   sample.stage = frame.stage;
   sample.sample_rate = ap_capture_u16_sat(CONFIG.SAMPLE_RATE);
   sample.samples_per_chunk = ap_capture_u16_sat(CONFIG.SAMPLES_PER_CHUNK);
@@ -315,6 +355,13 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
   sample.tempo_phase_elapsed_us = ap_capture_u16_sat(frame.tempo.phase_elapsed_us);
   sample.tempo_publish_elapsed_us = ap_capture_u16_sat(frame.tempo.publish_elapsed_us);
   sample.tempo_emit_elapsed_us = ap_capture_u16_sat(frame.tempo.emit_elapsed_us);
+  // The tempo module's existing emit span starts after its entry gate,
+  // novelty-history decay/write and periodic scale update. The difference is
+  // therefore the previously untimed prefix plus bounded timer overhead. On
+  // non-emit rows emit_elapsed_us is a retained prior value, so publish zero.
+  if (emitted && sample.tempo_total_elapsed_us >= sample.tempo_emit_elapsed_us) {
+    sample.tempo_pre_timed_elapsed_us = sample.tempo_total_elapsed_us - sample.tempo_emit_elapsed_us;
+  }
   sample.acf_lag_cursor = ap_capture_u16_sat(frame.tempo.acf_lag_cursor);
   sample.acf_publish_count = frame.tempo.acf_publish_count;
   sample.i2s_status = ap_capture_i16_sat(frame.i2s.status);
@@ -775,6 +822,59 @@ void ap_cad_capture_dump() {
     USBSerial.print(sample.gdft_elapsed_us);
     USBSerial.print(",novelty_us=");
     USBSerial.print(sample.novelty_elapsed_us);
+    USBSerial.print(",pre_i2s_service_us=");
+    USBSerial.print(sample.pre_i2s_service_elapsed_us);
+    USBSerial.print(",post_i2s_frontend_us=");
+    USBSerial.print(sample.post_i2s_frontend_elapsed_us);
+    USBSerial.print(",post_gdft_service_us=");
+    USBSerial.print(sample.post_gdft_service_elapsed_us);
+    USBSerial.print(",pre_snapshot_config_us=");
+    USBSerial.print(sample.pre_snapshot_config_elapsed_us);
+    USBSerial.print(",snapshot_us=");
+    USBSerial.print(sample.snapshot_elapsed_us);
+    USBSerial.print(",onset_us=");
+    USBSerial.print(sample.onset_elapsed_us);
+    USBSerial.print(",saliency_us=");
+    USBSerial.print(sample.saliency_elapsed_us);
+    USBSerial.print(",tempo_total_us=");
+    USBSerial.print(sample.tempo_total_elapsed_us);
+    USBSerial.print(",tempo_pre_timed_us=");
+    USBSerial.print(sample.tempo_pre_timed_elapsed_us);
+    USBSerial.print(",post_publish_tail_us=");
+    USBSerial.print(sample.post_publish_tail_elapsed_us);
+    USBSerial.print(",stage_timing_valid=");
+    USBSerial.print(sample.stage_timing_valid);
+    USBSerial.print(",gdft_internal_split_valid=");
+    USBSerial.print(sample.gdft_internal_split_valid);
+    // The current GDFT implementation is one monolithic function. Keep these
+    // fields explicit and invalid instead of fabricating a kernel/post split.
+    USBSerial.print(",gdft_kernel_us=0,gdft_post_us=0");
+    USBSerial.print(",stage_pre_i2s_end_us=");
+    USBSerial.print(sample.stage_pre_i2s_end_offset_us);
+    USBSerial.print(",stage_i2s_end_us=");
+    USBSerial.print(sample.stage_i2s_end_offset_us);
+    USBSerial.print(",stage_frontend_end_us=");
+    USBSerial.print(sample.stage_frontend_end_offset_us);
+    USBSerial.print(",stage_gdft_start_us=");
+    USBSerial.print(sample.stage_gdft_start_offset_us);
+    USBSerial.print(",stage_gdft_end_us=");
+    USBSerial.print(sample.stage_gdft_end_offset_us);
+    USBSerial.print(",stage_novelty_start_us=");
+    USBSerial.print(sample.stage_novelty_start_offset_us);
+    USBSerial.print(",stage_novelty_end_us=");
+    USBSerial.print(sample.stage_novelty_end_offset_us);
+    USBSerial.print(",stage_snapshot_start_us=");
+    USBSerial.print(sample.stage_snapshot_start_offset_us);
+    USBSerial.print(",stage_snapshot_end_us=");
+    USBSerial.print(sample.stage_snapshot_end_offset_us);
+    USBSerial.print(",stage_onset_end_us=");
+    USBSerial.print(sample.stage_onset_end_offset_us);
+    USBSerial.print(",stage_saliency_end_us=");
+    USBSerial.print(sample.stage_saliency_end_offset_us);
+    USBSerial.print(",stage_tempo_end_us=");
+    USBSerial.print(sample.stage_tempo_end_offset_us);
+    USBSerial.print(",stage_tail_end_us=");
+    USBSerial.print(sample.stage_tail_end_offset_us);
     USBSerial.print(",total_us=");
     USBSerial.print(sample.total_ap_loop_elapsed_us);
     USBSerial.print(",k1_frame_ctr=");

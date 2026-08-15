@@ -296,6 +296,54 @@ def mode_or_none(values: list[int]) -> int | None:
     return Counter(values).most_common(1)[0][0]
 
 
+FULL_STAGE = 0
+FULL_STAGE_OFFSET_KEYS = (
+    "stage_pre_i2s_end_us",
+    "stage_i2s_end_us",
+    "stage_frontend_end_us",
+    "stage_gdft_start_us",
+    "stage_gdft_end_us",
+    "stage_novelty_start_us",
+    "stage_novelty_end_us",
+    "stage_snapshot_start_us",
+    "stage_snapshot_end_us",
+    "stage_onset_end_us",
+    "stage_saliency_end_us",
+    "stage_tempo_end_us",
+    "stage_tail_end_us",
+)
+FULL_STAGE_REQUIRED_SCALAR_KEYS = (
+    "i2s_us",
+    "pre_i2s_service_us",
+    "post_i2s_frontend_us",
+    "gdft_us",
+    "post_gdft_service_us",
+    "novelty_us",
+    "pre_snapshot_config_us",
+    "snapshot_us",
+    "onset_us",
+    "saliency_us",
+    "tempo_total_us",
+    "tempo_pre_timed_us",
+    "tempo_silence_us",
+    "tempo_acf_us",
+    "tempo_update_us",
+    "tempo_phase_us",
+    "tempo_publish_us",
+    "tempo_emit_us",
+    "post_publish_tail_us",
+    "total_us",
+    "gdft_internal_split_valid",
+    "gdft_kernel_us",
+    "gdft_post_us",
+    "emitted",
+)
+
+
+def row_has_numeric_keys(row: dict[str, object], keys: tuple[str, ...]) -> bool:
+    return all(isinstance(row.get(key), (int, float)) for key in keys)
+
+
 def describe_ms(values: list[float]) -> dict[str, float | None]:
     return {
         "median": statistics.median(values) if values else None,
@@ -413,6 +461,91 @@ def summarise_rows(
         if "oldest_to_publish_us" in row
     ]
 
+    full_stage_rows = [row for row in rows if int(numeric(row, "stage")) == FULL_STAGE]
+    early_stage_rows = [row for row in rows if int(numeric(row, "stage")) != FULL_STAGE]
+    timing_structural_rows = [
+        row
+        for row in full_stage_rows
+        if int(numeric(row, "stage_timing_valid")) == 1
+        and row_has_numeric_keys(row, FULL_STAGE_OFFSET_KEYS)
+    ]
+    valid_stage_rows = [
+        row
+        for row in timing_structural_rows
+        if row_has_numeric_keys(row, FULL_STAGE_REQUIRED_SCALAR_KEYS)
+    ]
+    stage_timing_missing_count = len(full_stage_rows) - len(timing_structural_rows)
+    stage_duration_missing_count = len(timing_structural_rows) - len(valid_stage_rows)
+    stage_timestamp_order_failure_count = 0
+    stage_tail_total_mismatch_count = 0
+    stage_duration_consistency_failure_count = 0
+    stage_nonempty_failure_count = 0
+    for row in valid_stage_rows:
+        offsets = [int(numeric(row, key, -1.0)) for key in FULL_STAGE_OFFSET_KEYS]
+        if any(value < 0 for value in offsets) or any(
+            offsets[index] > offsets[index + 1]
+            for index in range(len(offsets) - 1)
+        ):
+            stage_timestamp_order_failure_count += 1
+        if int(numeric(row, "stage_tail_end_us")) != int(numeric(row, "total_us")):
+            stage_tail_total_mismatch_count += 1
+
+        expected_durations = {
+            "pre_i2s_service_us": offsets[0],
+            "post_i2s_frontend_us": offsets[2] - offsets[1],
+            "gdft_us": offsets[4] - offsets[3],
+            "post_gdft_service_us": offsets[5] - offsets[4],
+            "novelty_us": offsets[6] - offsets[5],
+            "pre_snapshot_config_us": offsets[7] - offsets[6],
+            "snapshot_us": offsets[8] - offsets[7],
+            "onset_us": offsets[9] - offsets[8],
+            "saliency_us": offsets[10] - offsets[9],
+            "tempo_total_us": offsets[11] - offsets[10],
+            "post_publish_tail_us": offsets[12] - offsets[11],
+        }
+        duration_mismatch = any(
+            int(numeric(row, key, -1.0)) != expected
+            for key, expected in expected_durations.items()
+        )
+        emitted = int(numeric(row, "emitted")) == 1
+        expected_tempo_prefix = (
+            max(0, int(numeric(row, "tempo_total_us")) - int(numeric(row, "tempo_emit_us")))
+            if emitted
+            else 0
+        )
+        if int(numeric(row, "tempo_pre_timed_us", -1.0)) != expected_tempo_prefix:
+            duration_mismatch = True
+        if emitted:
+            tempo_subspan_sum = sum(
+                int(numeric(row, key))
+                for key in (
+                    "tempo_silence_us",
+                    "tempo_acf_us",
+                    "tempo_update_us",
+                    "tempo_phase_us",
+                    "tempo_publish_us",
+                )
+            )
+            if tempo_subspan_sum != int(numeric(row, "tempo_emit_us")):
+                duration_mismatch = True
+        split_valid = int(numeric(row, "gdft_internal_split_valid")) == 1
+        gdft_kernel = int(numeric(row, "gdft_kernel_us"))
+        gdft_post = int(numeric(row, "gdft_post_us"))
+        if split_valid:
+            if gdft_kernel + gdft_post != int(numeric(row, "gdft_us")):
+                duration_mismatch = True
+        elif gdft_kernel != 0 or gdft_post != 0:
+            duration_mismatch = True
+        if duration_mismatch:
+            stage_duration_consistency_failure_count += 1
+        if offsets[-1] <= 0 or int(numeric(row, "total_us")) <= 0 or int(numeric(row, "gdft_us")) <= 0:
+            stage_nonempty_failure_count += 1
+
+    gdft_split_rows = [
+        row for row in valid_stage_rows
+        if int(numeric(row, "gdft_internal_split_valid")) == 1
+    ]
+
     expected_ap_frame_hz = None
     expected_ap_dt_ms = None
     expected_novelty_rate_hz = None
@@ -452,6 +585,42 @@ def summarise_rows(
         "total_ap_loop_elapsed_us": describe_ms([numeric(row, "total_us") for row in rows]),
         "newest_sample_to_ap_publish_us": describe_ms(newest_to_publish_us),
         "oldest_sample_to_ap_publish_us": describe_ms(oldest_to_publish_us),
+        "pre_i2s_controls_service_elapsed_us": describe_ms(
+            [numeric(row, "pre_i2s_service_us") for row in valid_stage_rows]
+        ),
+        "post_i2s_vu_sweet_spot_elapsed_us": describe_ms(
+            [numeric(row, "post_i2s_frontend_us") for row in valid_stage_rows]
+        ),
+        "post_gdft_service_elapsed_us": describe_ms(
+            [numeric(row, "post_gdft_service_us") for row in valid_stage_rows]
+        ),
+        "pre_snapshot_config_elapsed_us": describe_ms(
+            [numeric(row, "pre_snapshot_config_us") for row in valid_stage_rows]
+        ),
+        "audio_snapshot_elapsed_us": describe_ms(
+            [numeric(row, "snapshot_us") for row in valid_stage_rows]
+        ),
+        "onset_elapsed_us": describe_ms(
+            [numeric(row, "onset_us") for row in valid_stage_rows]
+        ),
+        "musical_saliency_elapsed_us": describe_ms(
+            [numeric(row, "saliency_us") for row in valid_stage_rows]
+        ),
+        "tempo_total_elapsed_us": describe_ms(
+            [numeric(row, "tempo_total_us") for row in valid_stage_rows]
+        ),
+        "tempo_pre_timed_history_scale_and_gate_elapsed_us": describe_ms(
+            [numeric(row, "tempo_pre_timed_us") for row in valid_stage_rows if int(numeric(row, "emitted")) == 1]
+        ),
+        "post_publication_complete_loop_tail_elapsed_us": describe_ms(
+            [numeric(row, "post_publish_tail_us") for row in valid_stage_rows]
+        ),
+        "process_GDFT_kernel_elapsed_us": describe_ms(
+            [numeric(row, "gdft_kernel_us") for row in gdft_split_rows]
+        ),
+        "process_GDFT_post_processing_elapsed_us": describe_ms(
+            [numeric(row, "gdft_post_us") for row in gdft_split_rows]
+        ),
     }
     active_ap_work_us = [
         numeric(row, "total_us") - numeric(row, "i2s_us")
@@ -510,6 +679,16 @@ def summarise_rows(
         "capture_sequence_gap_count": len(capture_sequence_gaps),
         "capture_sequence_gaps_first10": capture_sequence_gaps[:10],
         "timestamp_order_failure_count": timestamp_order_failure_count,
+        "stage_timing_row_count": len(valid_stage_rows),
+        "full_stage_row_count": len(full_stage_rows),
+        "early_stage_row_count": len(early_stage_rows),
+        "stage_timing_missing_count": stage_timing_missing_count,
+        "stage_duration_missing_count": stage_duration_missing_count,
+        "stage_timestamp_order_failure_count": stage_timestamp_order_failure_count,
+        "stage_tail_total_mismatch_count": stage_tail_total_mismatch_count,
+        "stage_duration_consistency_failure_count": stage_duration_consistency_failure_count,
+        "stage_nonempty_failure_count": stage_nonempty_failure_count,
+        "gdft_internal_split_available": bool(gdft_split_rows),
         "sample_time_assumption_ids": timestamp_assumptions,
         "i2s_status_counts": dict(sorted(i2s_status_counts.items())),
         "i2s_not_ok_count": i2s_not_ok_count,
@@ -740,13 +919,27 @@ def apply_capture_completion(summary: dict[str, object], terminator_received: bo
     dropped = done.get("dropped") if isinstance(done, dict) else None
     counts_match = (
         isinstance(row_count, int)
+        and row_count > 0
         and row_count == begin_count
         and row_count == done_count
     )
     complete = terminator_received and counts_match
-    admissible = complete and dropped == 0
+    stage_attribution_ok = (
+        summary.get("stage_timing_missing_count", 0) == 0
+        and summary.get("stage_duration_missing_count", 0) == 0
+        and summary.get("stage_timestamp_order_failure_count", 0) == 0
+        and summary.get("stage_tail_total_mismatch_count", 0) == 0
+        and summary.get("stage_duration_consistency_failure_count", 0) == 0
+        and summary.get("stage_nonempty_failure_count", 0) == 0
+        and (
+            summary.get("full_stage_row_count", 0) == 0
+            or summary.get("stage_timing_row_count", 0) == summary.get("full_stage_row_count", 0)
+        )
+    )
+    admissible = complete and dropped == 0 and stage_attribution_ok
     summary["capture_complete"] = complete
     summary["capture_admissible"] = admissible
+    summary["stage_attribution_admissible"] = stage_attribution_ok
     if admissible:
         return
     if not complete:
@@ -756,9 +949,16 @@ def apply_capture_completion(summary: dict[str, object], terminator_received: bo
             "complete serial dump; statistics describe only the received rows"
         )
         return
-    summary["classification"] = "F_capture_loss"
+    if dropped != 0:
+        summary["classification"] = "F_capture_loss"
+        summary["classification_reason"] = (
+            "the complete device dump reports dropped records and is inadmissible"
+        )
+        return
+    summary["classification"] = "F_stage_attribution_invalid"
     summary["classification_reason"] = (
-        "the complete device dump reports dropped records and is inadmissible"
+        "the complete dump has missing, empty, misordered, duration-inconsistent, "
+        "or tail-inconsistent full-stage attribution"
     )
 
 

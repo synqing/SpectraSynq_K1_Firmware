@@ -775,20 +775,29 @@ void setup() {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 static void k1_ap_cadence_capture_frame(uint32_t t_now,
                                         uint32_t frame_index,
-                                        int64_t loop_start_us,
                                         uint32_t gdft_elapsed_us,
                                         uint32_t novelty_elapsed_us,
-                                        uint8_t stage) {
+                                        uint8_t stage,
+                                        const APCadenceStageTiming& stage_timing) {
+  if (!stage_timing.valid) {
+    return;
+  }
+  APCadenceStageTiming completed_timing = stage_timing;
+  if (completed_timing.loop_tail_end_us == 0) {
+    completed_timing.loop_tail_end_us = (uint64_t)esp_timer_get_time();
+  }
   APCadenceFrameInput ap_cadence_frame = {};
   ap_cadence_frame.boot_ms = t_now;
   ap_cadence_frame.frame_index = frame_index;
   ap_cadence_frame.frame_ms = t_now;
   ap_cadence_frame.gdft_elapsed_us = gdft_elapsed_us;
   ap_cadence_frame.novelty_elapsed_us = novelty_elapsed_us;
-  ap_cadence_frame.total_ap_loop_elapsed_us = (uint32_t)(esp_timer_get_time() - loop_start_us);
+  ap_cadence_frame.total_ap_loop_elapsed_us =
+      (uint32_t)(completed_timing.loop_tail_end_us - completed_timing.loop_start_us);
   ap_cadence_frame.stage = stage;
   ap_cadence_frame.ap_core_id = (int8_t)xPortGetCoreID();
   ap_cadence_frame.vp_core_id = k1_ap_cadence_vp_core_id;
+  ap_cadence_frame.stage_timing = completed_timing;
   ap_cadence_frame.i2s = k1_audio_i2s_read_debug_read();
   ap_cadence_frame.tempo = k1_tempo_debug_read();
   ap_cad_capture_tick(ap_cadence_frame);
@@ -817,9 +826,17 @@ void loop() {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   static uint32_t ap_cadence_frame_index = 0;
   const uint32_t ap_cadence_frame_index_now = ap_cadence_frame_index++;
-  const int64_t ap_cadence_loop_start_us = esp_timer_get_time();
+  const bool ap_cadence_timing_active = ap_cad_timing_active();
+  APCadenceStageTiming ap_cadence_stage_timing;
+  ap_cadence_stage_timing.valid = false;
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_timing = {};
+    ap_cadence_stage_timing.valid = true;
+    ap_cadence_stage_timing.loop_start_us = (uint64_t)esp_timer_get_time();
+  }
   uint32_t ap_cadence_gdft_us = 0;
   uint32_t ap_cadence_novelty_us = 0;
+  int64_t ap_cadence_stage_start_us = 0;
 #endif
 
   function_id = 0;     // These are for debug_function_timing() in system.h to see what functions take up the most time
@@ -851,7 +868,17 @@ void loop() {
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_timing.pre_i2s_end_us = (uint64_t)esp_timer_get_time();
+  }
+#endif
   acquire_sample_chunk(t_now);  // (i2s_audio.h)
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_timing.i2s_end_us = (uint64_t)esp_timer_get_time();
+  }
+#endif
 #if ENABLE_VP_PERF_AUDIT
   if (vp_perf.running && vp_perf_stage_start_us != 0) {
     vp_perf_record(vp_perf.audio_acq, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
@@ -868,6 +895,11 @@ void loop() {
   vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
   calculate_vu();
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_timing.post_i2s_frontend_end_us = (uint64_t)esp_timer_get_time();
+  }
+#endif
 #if ENABLE_VP_PERF_AUDIT
   if (vp_perf.running && vp_perf_stage_start_us != 0) {
     vp_perf_record(vp_perf.vu, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
@@ -877,10 +909,10 @@ void loop() {
 #if K1_ACQUISITION_ONLY_PROBE && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
-                              ap_cadence_loop_start_us,
                               0,
                               0,
-                              K1_AP_STAGE_ACQUISITION);
+                              K1_AP_STAGE_ACQUISITION,
+                              ap_cadence_stage_timing);
   vTaskDelay(1);
   return;
 #endif
@@ -890,11 +922,18 @@ void loop() {
   vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  int64_t ap_cadence_stage_start_us = esp_timer_get_time();
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_start_us = esp_timer_get_time();
+    ap_cadence_stage_timing.gdft_start_us = (uint64_t)ap_cadence_stage_start_us;
+  }
 #endif
   process_GDFT();  // (GDFT.h)
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  ap_cadence_gdft_us = (uint32_t)(esp_timer_get_time() - ap_cadence_stage_start_us);
+  if (ap_cadence_timing_active) {
+    const int64_t stage_end_us = esp_timer_get_time();
+    ap_cadence_gdft_us = (uint32_t)(stage_end_us - ap_cadence_stage_start_us);
+    ap_cadence_stage_timing.gdft_end_us = (uint64_t)stage_end_us;
+  }
 #endif
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_update(t_now);
@@ -918,10 +957,10 @@ void loop() {
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_GDFT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
-                              ap_cadence_loop_start_us,
                               ap_cadence_gdft_us,
                               0,
-                              K1_AP_STAGE_GDFT);
+                              K1_AP_STAGE_GDFT,
+                              ap_cadence_stage_timing);
   vTaskDelay(1);
   return;
 #endif
@@ -950,19 +989,26 @@ void loop() {
 
   // Watches the rate of change in the Goertzel bins to guide decisions for auto-colour shifting.
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  ap_cadence_stage_start_us = esp_timer_get_time();
+  if (ap_cadence_timing_active) {
+    ap_cadence_stage_start_us = esp_timer_get_time();
+    ap_cadence_stage_timing.novelty_start_us = (uint64_t)ap_cadence_stage_start_us;
+  }
 #endif
   calculate_novelty(t_now);
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-  ap_cadence_novelty_us = (uint32_t)(esp_timer_get_time() - ap_cadence_stage_start_us);
+  if (ap_cadence_timing_active) {
+    const int64_t stage_end_us = esp_timer_get_time();
+    ap_cadence_novelty_us = (uint32_t)(stage_end_us - ap_cadence_stage_start_us);
+    ap_cadence_stage_timing.novelty_end_us = (uint64_t)stage_end_us;
+  }
 #endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_NOVELTY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   k1_ap_cadence_capture_frame(t_now,
                               ap_cadence_frame_index_now,
-                              ap_cadence_loop_start_us,
                               ap_cadence_gdft_us,
                               ap_cadence_novelty_us,
-                              K1_AP_STAGE_NOVELTY);
+                              K1_AP_STAGE_NOVELTY,
+                              ap_cadence_stage_timing);
   vTaskDelay(1);
   return;
 #endif
@@ -974,38 +1020,58 @@ void loop() {
   (void)ap_smart_config;
   (void)ap_hook_config;
   {
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    if (ap_cadence_timing_active) {
+      ap_cadence_stage_timing.snapshot_start_us = (uint64_t)esp_timer_get_time();
+    }
+#endif
     k1_audio_snapshot_update(t_now);
     const K1AudioSnapshot k1_audio_snapshot = k1_audio_snapshot_read();
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    if (ap_cadence_timing_active) {
+      ap_cadence_stage_timing.snapshot_end_us = (uint64_t)esp_timer_get_time();
+    }
+#endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_SNAPSHOT && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
-                                ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                K1_AP_STAGE_SNAPSHOT);
+                                K1_AP_STAGE_SNAPSHOT,
+                                ap_cadence_stage_timing);
     vTaskDelay(1);
     return;
 #endif
     k1_onset_beat_update(k1_audio_snapshot);
     const K1OnsetBeatEvent k1_onset_beat_event = k1_onset_beat_read();
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    if (ap_cadence_timing_active) {
+      ap_cadence_stage_timing.onset_end_us = (uint64_t)esp_timer_get_time();
+    }
+#endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_ONSET && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
-                                ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                K1_AP_STAGE_ONSET);
+                                K1_AP_STAGE_ONSET,
+                                ap_cadence_stage_timing);
     vTaskDelay(1);
     return;
 #endif
     k1_musical_saliency_update(k1_audio_snapshot, &k1_onset_beat_event);
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    if (ap_cadence_timing_active) {
+      ap_cadence_stage_timing.saliency_end_us = (uint64_t)esp_timer_get_time();
+    }
+#endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_SALIENCY && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
-                                ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                K1_AP_STAGE_SALIENCY);
+                                K1_AP_STAGE_SALIENCY,
+                                ap_cadence_stage_timing);
     vTaskDelay(1);
     return;
 #endif
@@ -1013,27 +1079,21 @@ void loop() {
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     // Truthful probe timestamp: the complete current AP transaction is visible
     // only after snapshot, onset, saliency and tempo have all published.
-    k1_audio_i2s_debug_note_ap_publish((uint64_t)esp_timer_get_time());
+    const uint64_t ap_publish_mark_us = (uint64_t)esp_timer_get_time();
+    k1_audio_i2s_debug_note_ap_publish(ap_publish_mark_us);
+    if (ap_cadence_timing_active) {
+      ap_cadence_stage_timing.tempo_end_us = ap_publish_mark_us;
+    }
 #endif
 #if K1_AP_STAGE_PROBE_STOP_STAGE == K1_AP_STAGE_TEMPO && ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     k1_ap_cadence_capture_frame(t_now,
                                 ap_cadence_frame_index_now,
-                                ap_cadence_loop_start_us,
                                 ap_cadence_gdft_us,
                                 ap_cadence_novelty_us,
-                                K1_AP_STAGE_TEMPO);
+                                K1_AP_STAGE_TEMPO,
+                                ap_cadence_stage_timing);
     vTaskDelay(1);
     return;
-#endif
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
-    {
-      k1_ap_cadence_capture_frame(t_now,
-                                  ap_cadence_frame_index_now,
-                                  ap_cadence_loop_start_us,
-                                  ap_cadence_gdft_us,
-                                  ap_cadence_novelty_us,
-                                  K1_AP_STAGE_FULL);
-    }
 #endif
 #if ENABLE_TEMPO_STREAM
     stream_tempo_data(t_now);   // NON-SHIPPABLE: post-update tempo-lock proof CSV (k1_tempo_probe only)
@@ -1100,6 +1160,20 @@ void loop() {
     function_id = 31;
     debug_function_timing(t_now);
   }
+
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  if (ap_cadence_timing_active) {
+    // Complete Core-0 service endpoint: include benchmark, optional encoder
+    // service and debug timing; exclude only the deliberate scheduler wait.
+    ap_cadence_stage_timing.loop_tail_end_us = (uint64_t)esp_timer_get_time();
+    k1_ap_cadence_capture_frame(t_now,
+                                ap_cadence_frame_index_now,
+                                ap_cadence_gdft_us,
+                                ap_cadence_novelty_us,
+                                K1_AP_STAGE_FULL,
+                                ap_cadence_stage_timing);
+  }
+#endif
 
   // N2c: give CPU0's IDLE task a real FreeRTOS slot. yield() can immediately
   // reschedule loopTask and does not reliably feed the watched IDLE0 task.

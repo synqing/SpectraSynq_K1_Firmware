@@ -26,6 +26,28 @@
 #include <stdint.h>
 #include <math.h>                   // isfinite
 
+// Declared outside the diagnostic feature gate because the Arduino sketch
+// preprocessor emits function prototypes before evaluating the guarded body.
+// This is a type declaration only: production gets no object, timer read or
+// linked telemetry code.
+struct APCadenceStageTiming {
+  bool valid;
+  uint64_t loop_start_us;
+  uint64_t pre_i2s_end_us;
+  uint64_t i2s_end_us;
+  uint64_t post_i2s_frontend_end_us;
+  uint64_t gdft_start_us;
+  uint64_t gdft_end_us;
+  uint64_t novelty_start_us;
+  uint64_t novelty_end_us;
+  uint64_t snapshot_start_us;
+  uint64_t snapshot_end_us;
+  uint64_t onset_end_us;
+  uint64_t saliency_end_us;
+  uint64_t tempo_end_us;
+  uint64_t loop_tail_end_us;
+};
+
 // NOTE: the full i2s_audio.h is a guard-less *implementation* header that only
 // compiles inside the .ino's include context; this TU pulls only the shared
 // type/constant header above, never i2s_audio.h itself.
@@ -87,6 +109,7 @@ struct APCadenceFrameInput {
   uint8_t stage;
   int8_t ap_core_id;
   int8_t vp_core_id;
+  APCadenceStageTiming stage_timing;
   K1AudioI2SReadDebug i2s;
   K1TempoDebugSnapshot tempo;
 };
@@ -107,6 +130,29 @@ struct APCadenceCaptureSample {
   uint32_t gdft_elapsed_us;
   uint32_t novelty_elapsed_us;
   uint32_t total_ap_loop_elapsed_us;
+  uint32_t pre_i2s_service_elapsed_us;
+  uint32_t post_i2s_frontend_elapsed_us;
+  uint32_t post_gdft_service_elapsed_us;
+  uint32_t pre_snapshot_config_elapsed_us;
+  uint32_t snapshot_elapsed_us;
+  uint32_t onset_elapsed_us;
+  uint32_t saliency_elapsed_us;
+  uint32_t tempo_total_elapsed_us;
+  uint32_t tempo_pre_timed_elapsed_us;
+  uint32_t post_publish_tail_elapsed_us;
+  uint32_t stage_pre_i2s_end_offset_us;
+  uint32_t stage_i2s_end_offset_us;
+  uint32_t stage_frontend_end_offset_us;
+  uint32_t stage_gdft_start_offset_us;
+  uint32_t stage_gdft_end_offset_us;
+  uint32_t stage_novelty_start_offset_us;
+  uint32_t stage_novelty_end_offset_us;
+  uint32_t stage_snapshot_start_offset_us;
+  uint32_t stage_snapshot_end_offset_us;
+  uint32_t stage_onset_end_offset_us;
+  uint32_t stage_saliency_end_offset_us;
+  uint32_t stage_tempo_end_offset_us;
+  uint32_t stage_tail_end_offset_us;
   uint16_t sample_rate;
   uint16_t samples_per_chunk;
   uint16_t dma_frame_num;
@@ -145,7 +191,12 @@ struct APCadenceCaptureSample {
   uint8_t tempo_decimation;
   uint8_t flags;
   uint8_t sample_time_assumption_id;
+  uint8_t stage_timing_valid;
+  uint8_t gdft_internal_split_valid;
 };
+
+static_assert(sizeof(APCadenceCaptureSample) <= 256U,
+              "APCAD stage attribution must remain a bounded scalar record");
 
 // ---- Capture state (moved from serial_menu.h `static` -> external linkage) --
 extern bool AP_FRONTEND_DEBUG_ENABLED;
@@ -206,6 +257,7 @@ bool ap_cad_capture_ensure_buffer();
 void ap_cad_capture_status();
 void ap_cad_capture_clear();
 bool ap_cad_capture_arm(uint32_t duration_ms);
+bool ap_cad_timing_active();
 APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool emitted, uint32_t emit_delta_ms);
 uint32_t ap_cad_active_work_us(const APCadenceCaptureSample& sample);
 void ap_cad_capture_tick(const APCadenceFrameInput& frame);
