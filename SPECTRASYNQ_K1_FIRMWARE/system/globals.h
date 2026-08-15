@@ -888,19 +888,22 @@ inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre
 
 #ifdef K1_AP_DRIVE_CONTRACT_V1
 // AP input-integrity Rev B: four semantic roles with independent storage.
-// B489A500 discovery (2026-08-15): calibrated silence raw-peak p99=368..392;
-// low-level music p50=424 and p95=656. Candidate 2 was then frozen and passed an
-// independent on-device final-buffer oracle: settled silence lit/delta p50/p95=0,
-// while held-out low music retained 91 primary and 28 secondary lit LEDs at p50.
-// Values remain diagnostic-only until P4. Units are named because raw-peak and
-// normalised-RMS values are not interchangeable.
+// B489A500 discovery (2026-08-15), after correcting the selected capsule and
+// measuring the final render buffer: confirmed silence peak p99=632, RMS p99=.0180,
+// peakiness p95=3.58; low music peak p50=752, peakiness p05/p95=1.43/2.19.
+// The old one-frame "high crest means music" escape was backwards for this input:
+// the room-floor tail had the higher crest. Wake now requires a bounded music-like
+// crest, raw level above the silence p99, and a 20 ms continuous dwell. Values remain
+// diagnostic-only until P4.
 inline float K1_AP_DRIVE_THRESHOLD_RAW_PEAK = 416.0f;
 inline float K1_AP_SILENCE_RAW_PEAK_ENTER = 400.0f;
 inline float K1_AP_SILENCE_RAW_PEAK_EXIT = 512.0f;
-inline float K1_AP_SILENCE_RMS_ENTER = 0.0095f;
-inline float K1_AP_SILENCE_RMS_EXIT = 0.0105f;
-inline float K1_AP_SILENCE_PEAKINESS_BREAK = 1.25f;
-inline float K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK = 512.0f;
+inline float K1_AP_SILENCE_RMS_ENTER = 0.022f;
+inline float K1_AP_SILENCE_RMS_EXIT = 0.030f;
+inline float K1_AP_SILENCE_PEAKINESS_FLOOR = 1.42f;
+inline float K1_AP_SILENCE_PEAKINESS_CEILING = 2.80f;
+inline float K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK = 640.0f;
+inline uint32_t K1_AP_SILENCE_STRUCTURED_BREAK_DWELL_MS = 20U;
 // Denominator-only safety floor. Fixed independently below the smallest retained
 // post-threshold low-music excursions; it is not the calibrated microphone floor.
 inline float K1_AP_FOLLOWER_FLOOR_RAW_PEAK = 64.0f;

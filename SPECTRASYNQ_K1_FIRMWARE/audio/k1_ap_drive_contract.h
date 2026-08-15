@@ -1,12 +1,16 @@
 #pragma once
 
+#include <stdint.h>
+
 struct K1ApSilenceThreshold {
   float raw_peak_enter;
   float raw_peak_exit;
   float rms_enter;
   float rms_exit;
-  float peakiness_break;
+  float peakiness_floor;
+  float peakiness_ceiling;
   float structured_break_raw_peak;
+  uint32_t structured_break_dwell_ms;
 };
 
 struct K1ApDriveContract {
@@ -27,8 +31,10 @@ inline K1ApDriveContract k1_ap_drive_contract_resolve(float measured_mic_noise_f
       K1_AP_SILENCE_RAW_PEAK_EXIT,
       K1_AP_SILENCE_RMS_ENTER,
       K1_AP_SILENCE_RMS_EXIT,
-      K1_AP_SILENCE_PEAKINESS_BREAK,
+      K1_AP_SILENCE_PEAKINESS_FLOOR,
+      K1_AP_SILENCE_PEAKINESS_CEILING,
       K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK,
+      K1_AP_SILENCE_STRUCTURED_BREAK_DWELL_MS,
     },
     K1_AP_FOLLOWER_FLOOR_RAW_PEAK,
   };

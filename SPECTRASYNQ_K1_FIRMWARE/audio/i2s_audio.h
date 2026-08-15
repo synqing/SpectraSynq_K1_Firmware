@@ -1068,10 +1068,11 @@ void acquire_sample_chunk(uint32_t t_now) {
     // (crest ~1.26, RMS ~= peak); music is peaky (RMS << peak). RMS is the one
     // statistic on which steady hum beats music, so no level threshold can release
     // the gate on music at any gain — which is exactly the reported failure.
-    // Peak-to-mean DOES separate: quiet room 1.24 vs music 3.17. It is a ratio, so
-    // it is gain-invariant and survives mic/gain changes.
-    // It may only BREAK silence, never cause it: the reported fault is a gate that
-    // will not RELEASE, so this path can only ever release earlier.
+    // Peak-to-mean remains useful only as one member of a joint classifier. On the
+    // ratified IM1 input, matched captures showed that isolated silence transients
+    // have a higher crest tail than low music. Therefore a one-sided, one-frame
+    // crest test is invalid: wake requires the bounded band and continuous dwell
+    // below, together with raw level above the measured silence ceiling.
     static float k1_pk_ring[K1_SILENCE_PEAK_WIN];
     static uint16_t k1_pk_n = 0, k1_pk_i = 0;
     static float k1_pk_sum = 0.0f;
@@ -1087,26 +1088,30 @@ void acquire_sample_chunk(uint32_t t_now) {
                              ? (k1_pk_max / k1_pk_mean) : 0.0f;
 
     static bool k1_rms_silent_state = false;
+    static bool k1_structured_candidate_active = false;
+    static uint32_t k1_structured_candidate_since_ms = 0;
 #if defined(K1_MIC_IM69D_PDM_V1)
-    // SCOPE-GATED 2026-08-12. This joint break-path and BOTH its constants
-    // (K1_SILENCE_PEAKINESS_BREAK, K1_SILENCE_JOINT_LEVEL_SSL_FRAC) were measured on
-    // IM69D130 silicon — bench B489A500 and Bench Unit 2. Until this gate existed they
-    // were behind NO #ifdef at all and compiled into EVERY environment, including
-    // k1_hardware, the SPH0645 production K1. That is the same escape-the-measurement-
-    // context defect GATE 0.1 (1bdf54d0) was created to stop, one degree worse: those
-    // constants were at least gated on the wrong flag, these were gated on nothing.
-    // The comment above the fraction even said "does not transfer, do not inherit it"
-    // while the code inherited it everywhere.
-    //
-    // The joint path exists because RMS provably cannot separate music from a room
-    // floor on this PDM mic (FINDING-rms-cannot-separate.md: music's median rms_raw
-    // reads BELOW quiet ambient's, because hum is crest ~1.26 and music is crest ~3-5).
-    // SPH0645 has no such problem — its RMS pair was calibrated on the 36-track
-    // HarmonixSet corpus — so SPH keeps its own characterised Schmitt below, untouched.
-    // peakiness itself stays computed for all builds; only the DECISION is gated.
+    // Scope-gated to the IM69D diagnostic lane. The production SPH0645 path retains
+    // its independently characterised Schmitt trigger below. The new contract is
+    // derived from equal-window, Captain-confirmed silence and low-music captures on
+    // B489A500; it is not transferred to another capsule or configuration epoch.
 #ifdef K1_AP_DRIVE_CONTRACT_V1
-    if (k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_break &&
-        (float)max_waveform_val_raw >= ap_drive.silence_threshold.structured_break_raw_peak) {
+    const bool k1_structured_candidate =
+        k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_floor &&
+        k1_silence_peakiness <= ap_drive.silence_threshold.peakiness_ceiling &&
+        (float)max_waveform_val_raw >= ap_drive.silence_threshold.structured_break_raw_peak;
+    if (k1_structured_candidate) {
+      if (!k1_structured_candidate_active) {
+        k1_structured_candidate_active = true;
+        k1_structured_candidate_since_ms = t_now;
+      }
+    } else {
+      k1_structured_candidate_active = false;
+      k1_structured_candidate_since_ms = t_now;
+    }
+    if (k1_structured_candidate_active &&
+        uint32_t(t_now - k1_structured_candidate_since_ms) >=
+            ap_drive.silence_threshold.structured_break_dwell_ms) {
 #else
     if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
         (float)max_waveform_val_raw >=
@@ -1256,14 +1261,17 @@ void acquire_sample_chunk(uint32_t t_now) {
     {
       const K1ApDriveContract dc =
           k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
-      USBSerial.printf(" | mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_struct=%.1f follower_floor=%.1f",
+      USBSerial.printf(" | mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_wake_ms=%lu follower_floor=%.1f",
         dc.mic_noise_floor_raw_peak,
         dc.drive_threshold_raw_peak,
         dc.silence_threshold.raw_peak_enter,
         dc.silence_threshold.raw_peak_exit,
         dc.silence_threshold.rms_enter,
         dc.silence_threshold.rms_exit,
+        dc.silence_threshold.peakiness_floor,
+        dc.silence_threshold.peakiness_ceiling,
         dc.silence_threshold.structured_break_raw_peak,
+        (unsigned long)dc.silence_threshold.structured_break_dwell_ms,
         dc.follower_floor_raw_peak);
     }
 #endif
@@ -1504,7 +1512,7 @@ void ap_capture_tick() {
       const K1ApDriveContract dc = k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
       const float silence_fraction = ap_capture_frames
           ? float(ap_capture_silence_frames) / float(ap_capture_frames) : 0.0f;
-      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_struct=%.1f follower_floor=%.1f\n",
+      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_wake_ms=%lu follower_floor=%.1f\n",
         (unsigned long)ap_capture_frames,
         unsigned(pp05) * 8U, unsigned(pp10) * 8U, unsigned(pp50) * 8U,
         unsigned(pp95) * 8U, unsigned(pp99) * 8U,
@@ -1515,7 +1523,10 @@ void ap_capture_tick() {
         dc.mic_noise_floor_raw_peak, dc.drive_threshold_raw_peak,
         dc.silence_threshold.raw_peak_enter, dc.silence_threshold.raw_peak_exit,
         dc.silence_threshold.rms_enter, dc.silence_threshold.rms_exit,
-        dc.silence_threshold.structured_break_raw_peak, dc.follower_floor_raw_peak);
+        dc.silence_threshold.peakiness_floor, dc.silence_threshold.peakiness_ceiling,
+        dc.silence_threshold.structured_break_raw_peak,
+        (unsigned long)dc.silence_threshold.structured_break_dwell_ms,
+        dc.follower_floor_raw_peak);
     }
 #endif
     ap_capture_active = false;

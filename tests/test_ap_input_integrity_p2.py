@@ -82,6 +82,8 @@ def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     assert "if (silence) {\n      max_waveform_val = 0.0f;" in i2s
     assert "ap_capture_peakiness_hist" in i2s
     assert "silence_fraction=" in i2s
+    assert "k1_structured_candidate_since_ms" in i2s
+    assert "structured_break_dwell_ms" in i2s
     assert "k1_ap_twitch_oracle_tick" in led
 
 
