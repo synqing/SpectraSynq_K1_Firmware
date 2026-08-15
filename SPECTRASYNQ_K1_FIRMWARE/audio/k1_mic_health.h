@@ -64,9 +64,13 @@ struct K1MicHealthFrame {
 struct K1MicHealthContext {
   K1MicHealthState state;
   K1MicHealthReason reason;
+  K1MicHealthState last_fault_state;
+  K1MicHealthReason last_fault_reason;
   K1MicHealthFaultInjection injection;
   uint32_t epoch;
   uint32_t frame_count;
+  uint32_t fault_event_count;
+  uint32_t last_fault_frame;
   uint32_t last_buffer_hash;
   uint32_t challenge_started_ms;
   uint16_t challenge_baseline_peak_i16;
@@ -83,6 +87,7 @@ struct K1MicHealthContext {
   bool have_last_hash;
   bool liveness_proven;
   bool challenge_active;
+  bool last_fault_interrupted_challenge;
 };
 
 #ifndef K1_MIC_HEALTH_FAULT_DEBOUNCE_FRAMES

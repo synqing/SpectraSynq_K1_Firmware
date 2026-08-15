@@ -9,6 +9,16 @@ static uint8_t k1_mic_health_sat_inc(uint8_t value) {
 static void k1_mic_health_set_fault(K1MicHealthContext* context,
                                     K1MicHealthState state,
                                     K1MicHealthReason reason) {
+  // Latch fault transitions, not every frame in one sustained fault episode.
+  // Otherwise the next bad frame erases whether the first transition interrupted
+  // a challenge and inflates the counter into a frame counter.
+  if (context->state != state || context->reason != reason) {
+    context->last_fault_state = state;
+    context->last_fault_reason = reason;
+    context->fault_event_count++;
+    context->last_fault_frame = context->frame_count;
+    context->last_fault_interrupted_challenge = context->challenge_active;
+  }
   context->state = state;
   context->reason = reason;
   context->liveness_proven = false;
@@ -20,6 +30,8 @@ void k1_mic_health_model_reset(K1MicHealthContext* context, uint32_t epoch) {
   *context = {};
   context->state = K1_MIC_HEALTH_UNKNOWN;
   context->reason = K1_MIC_REASON_BOOT;
+  context->last_fault_state = K1_MIC_HEALTH_UNKNOWN;
+  context->last_fault_reason = K1_MIC_REASON_BOOT;
   context->injection = K1_MIC_INJECT_NONE;
   context->epoch = epoch;
 }

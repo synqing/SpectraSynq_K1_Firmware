@@ -198,6 +198,16 @@ static void serial_print_mic_health() {
   USBSerial.print(k1_mic_health_state_name(health.state));
   USBSerial.print(" reason=");
   USBSerial.print(k1_mic_health_reason_name(health.reason));
+  USBSerial.print(" last_fault_state=");
+  USBSerial.print(k1_mic_health_state_name(health.last_fault_state));
+  USBSerial.print(" last_fault_reason=");
+  USBSerial.print(k1_mic_health_reason_name(health.last_fault_reason));
+  USBSerial.print(" fault_events=");
+  USBSerial.print(health.fault_event_count);
+  USBSerial.print(" last_fault_frame=");
+  USBSerial.print(health.last_fault_frame);
+  USBSerial.print(" fault_interrupted_challenge=");
+  USBSerial.print(health.last_fault_interrupted_challenge ? 1 : 0);
   USBSerial.print(" liveness=");
   USBSerial.print(health.liveness_proven ? 1 : 0);
   USBSerial.print(" challenge=");

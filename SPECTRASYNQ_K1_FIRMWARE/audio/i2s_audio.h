@@ -1227,13 +1227,17 @@ void acquire_sample_chunk(uint32_t t_now) {
 #ifdef K1_MIC_HEALTH_V1
     {
       const K1MicHealthContext mh = k1_mic_health_read();
-      USBSerial.printf(" | mic_health=%s mic_reason=%s live=%d challenge=%d inject=%s health_epoch=%lu",
+      USBSerial.printf(" | mic_health=%s mic_reason=%s live=%d challenge=%d inject=%s health_epoch=%lu fault_events=%lu last_fault=%s/%s fault_interrupted_challenge=%d",
         k1_mic_health_state_name(mh.state),
         k1_mic_health_reason_name(mh.reason),
         mh.liveness_proven ? 1 : 0,
         mh.challenge_active ? 1 : 0,
         k1_mic_health_injection_name(mh.injection),
-        (unsigned long)mh.epoch);
+        (unsigned long)mh.epoch,
+        (unsigned long)mh.fault_event_count,
+        k1_mic_health_state_name(mh.last_fault_state),
+        k1_mic_health_reason_name(mh.last_fault_reason),
+        mh.last_fault_interrupted_challenge ? 1 : 0);
     }
 #endif
 #ifdef K1_AP_DRIVE_CONTRACT_V1

@@ -90,10 +90,25 @@ int main() {
   }
   check(context.state == K1_MIC_HEALTH_STALE_I2S,
         "sustained I2S failure enters STALE_I2S");
+  check(context.fault_event_count == 1U &&
+        context.last_fault_state == K1_MIC_HEALTH_STALE_I2S &&
+        context.last_fault_reason == K1_MIC_REASON_I2S_READ &&
+        context.last_fault_frame == context.frame_count &&
+        !context.last_fault_interrupted_challenge,
+        "a sustained I2S failure is latched for later observation");
+  const uint32_t latched_fault_frame = context.last_fault_frame;
+  now_ms += 8U;
+  k1_mic_health_model_update(&context, frame(now_ms, 0x3009U, 0.0f, 0U, false), cfg);
+  check(context.fault_event_count == 1U &&
+        context.last_fault_frame == latched_fault_frame,
+        "one sustained fault episode is not counted again on every bad frame");
 
   healthy_frames(&context, &now_ms, cfg.recovery_frames);
   check(context.state == K1_MIC_HEALTH_LIVENESS_UNPROVEN && !context.liveness_proven,
         "raw recovery requires liveness to be re-established");
+  check(context.fault_event_count == 1U &&
+        context.last_fault_reason == K1_MIC_REASON_I2S_READ,
+        "fault evidence survives recovery to liveness-unproven");
 
   k1_mic_health_model_begin_challenge(&context, now_ms);
   now_ms += 8U;
@@ -127,6 +142,10 @@ int main() {
   check(context.state == K1_MIC_HEALTH_NO_RESPONSE &&
         context.reason == K1_MIC_REASON_CHALLENGE_FAILED,
         "NO_RESPONSE is reachable only after an explicit failed challenge");
+  check(context.fault_event_count == 1U &&
+        context.last_fault_reason == K1_MIC_REASON_CHALLENGE_FAILED &&
+        context.last_fault_interrupted_challenge,
+        "a failed challenge is latched as a challenge-interrupting fault");
 
   if (failures != 0) {
     return 1;
