@@ -2,7 +2,12 @@
 
 **Date:** 2026-08-15  
 **Owner:** FRTOS-18, independent Gate 0 acceptance runner  
-**Verdict:** **REJECT**
+**Current verdict (Attempt 2):** **ACCEPT** at
+`68c9a51e898a3b1f998ca3369bbaade72796c179`  
+**Historical verdict (Attempt 1):** **REJECT** at
+`190479128fcfb907c2b04749ea8a43d3d36be322`
+
+## Attempt 1 — REJECT history
 
 The Gate 0 checks are reproducibly green at the exact anchored commit
 `190479128fcfb907c2b04749ea8a43d3d36be322` on
@@ -20,7 +25,7 @@ This receipt rejects the **host Gate 0 oracle and its frozen contract**. It is n
 firmware-build, device-runtime, physical-RMT, acoustic-to-photon, latency, scheduling,
 or perceptual evidence.
 
-## BLOCKER — correctness: self-invalidating source-population gate
+### BLOCKER — correctness: self-invalidating source-population gate
 
 `scripts/regression-harness/k1_scheduling_gate0.py:33-34,99-117` enumerates every
 matching source under `SPECTRASYNQ_K1_FIRMWARE/`, `scripts/`, and `tests/`, plus
@@ -46,7 +51,7 @@ by a deterministic per-run path/content manifest and the intended protected trus
 semantics, not by a permanent global file-count ceiling. FRTOS-18 did not repair this
 defect.
 
-## 1. Read contract
+### 1. Read contract
 
 The following inputs were read completely before the verdict:
 
@@ -64,7 +69,7 @@ The following inputs were read completely before the verdict:
 The repository execution standard, `AGENT_OS.md`, `.claude/CLAUDE.md`, and the
 `code-review` skill were also loaded before acceptance work.
 
-## 2. Repository anchor
+### 2. Repository anchor
 
 Exact command:
 
@@ -103,7 +108,7 @@ feat/k1-scheduling-generation-hardening
 <empty porcelain output>
 ```
 
-## 3. Trust root and tests
+### 3. Trust root and tests
 
 Exact command:
 
@@ -142,7 +147,7 @@ xfailed, and deselected counts all zero; the validator requires those zero count
 `k1_scheduling_gate0.py:293-299`. This green run proves present-head execution only; it
 does not cure the self-invalidating source-population assertion above.
 
-## 4. Fault battery and inner reasons
+### 4. Fault battery and inner reasons
 
 Exact command:
 
@@ -189,7 +194,7 @@ each value returned by `fault_mutations()` to a fresh deep copy, called
 The CLI does not merely count exceptions: `run_fault_battery()` rejects a wrong inner
 reason at `k1_scheduling_gate0.py:419-438` before it can print PASS.
 
-## 5. Deterministic good control
+### 5. Deterministic good control
 
 The following exact CLI was run three times by one read-only `subprocess.run()` wrapper:
 
@@ -209,7 +214,7 @@ identical_stdout_and_exit=true
 This kills both an always-reject oracle and a nondeterministic stdout/exit contract for
 the admitted host fixture.
 
-## 6. Fresh `/tmp` provenance snapshot
+### 6. Fresh `/tmp` provenance snapshot
 
 Exact creation commands:
 
@@ -249,7 +254,7 @@ The corrected assertion checked both the supplied `/tmp/...` path and its canoni
 `/private/tmp/...` mapping, and exited `0`. No repository file was written by either
 post-check.
 
-## 7. Trace semantics and threshold ownership
+### 7. Trace semantics and threshold ownership
 
 The contract defines the whole-frame endpoint as `rmt_completion_confirmed`
 (`contract.json:28-42`). Required trace fields include:
@@ -285,7 +290,7 @@ This is explicit in `contract.json:57-63`, protected by the trust root, asserted
 `test_scheduling_gate0.py:104-113`, and no production source imports the oracle
 (`test_scheduling_gate0.py:124-127`).
 
-## 8. Commit boundary
+### 8. Commit boundary
 
 Exact commands:
 
@@ -307,7 +312,7 @@ production_or_platformio_paths=[]
 No path under `SPECTRASYNQ_K1_FIRMWARE/` and no `platformio.ini` path changed in the
 reviewed commit.
 
-## 9. Acceptance boundary and next gate
+### 9. Acceptance boundary and next gate
 
 **Proven green but not accepted:** authority/branch/HEAD anchor, six-file trust-root
 hashes, host good-control admission, three-run deterministic CLI output, the exact
@@ -332,3 +337,257 @@ gates.
 oracle commit, freeze the exact Gate 0 snapshot as historical provenance, and rerun this
 complete independent acceptance against the new clean anchored HEAD. Production work
 must not enter Gate 1 on `19047912`.
+
+## Attempt 2 — ACCEPT at `68c9a51e`
+
+Attempt 2 independently accepts the repaired Gate 0 host oracle at full SHA
+`68c9a51e898a3b1f998ca3369bbaade72796c179` on
+`feat/k1-scheduling-generation-hardening`. Attempt 1's rejection above remains the
+historical record: it was correct for `19047912` and is not retroactively overwritten.
+
+### A. Repair reviewed
+
+The changed `tests/test_scheduling_gate0.py` and `gate0/trust_root.json` were read
+completely before this attempt. The exact `19047912..68c9a51e` diff was also reviewed.
+
+The former equality:
+
+```python
+assert manifest["count"] == 537
+```
+
+is gone. The replacement at `tests/test_scheduling_gate0.py:97-110` now:
+
+- creates the manifest twice and requires exact deterministic equality;
+- requires paths to be sorted and unique;
+- requires `platformio.ini` and each first-party root
+  (`SPECTRASYNQ_K1_FIRMWARE/`, `scripts/`, `tests/`) to be represented;
+- permits later source/test additions with `count >= 537`;
+- leaves per-candidate exact drift detection to the manifest digest comparison.
+
+The production validator still compares `expected.source_manifest_sha256` with
+`observed.source_manifest_sha256` fail-closed at
+`scripts/regression-harness/k1_scheduling_gate0.py:243-257`. The updated test SHA-256,
+`08202d5200a3fb4088e3d79666d747179aaf90d10306b653c24812d026b26302`,
+is bound into `gate0/trust_root.json:36-38`.
+
+The generated historical snapshot at
+`evidence/gate0-implementation-provenance.json` was inspected read-only. It is ignored
+by the repository as designed and reported:
+
+```text
+head=68c9a51e898a3b1f998ca3369bbaade72796c179
+branch=feat/k1-scheduling-generation-hardening
+dirty=false
+count=537
+path_list_sha256=1b12db4ba37b7598e3c717bfdea7c3ef57099324e3e4892a62e4112b7ec4ebb0
+content_manifest_sha256=9cfc8357d7fcdabee4ce6499e3625bb1c2c34f7094d597cc7a1dcd6b9ae42ecf
+```
+
+This resolves Attempt 1's blocker: ordinary later additions no longer require changing
+the protected oracle merely to keep Gate 0 green, while exact current-run content and
+path identity remain available through the per-run manifest.
+
+### B. Clean repository anchor
+
+Exact command:
+
+```bash
+bash scripts/agent/repo-truth.sh
+```
+
+Result: exit `0`, `OVERALL: PASS`.
+
+```text
+branch           : feat/k1-scheduling-generation-hardening
+active branch    : feat/k1-scheduling-generation-hardening
+active lane      : K1_SCHEDULING_HARDENING_20260815
+HEAD             : 68c9a51e
+dirty files      : no
+untracked files  : no
+```
+
+Exact commands:
+
+```bash
+git status --short --branch
+git rev-parse HEAD
+git branch --show-current
+git rev-list --left-right --count '@{upstream}...HEAD'
+git status --porcelain=v1
+```
+
+Results before this sole evidence-file edit:
+
+```text
+## feat/k1-scheduling-generation-hardening...origin/feat/k1-scheduling-generation-hardening
+68c9a51e898a3b1f998ca3369bbaade72796c179
+feat/k1-scheduling-generation-hardening
+0    0
+<empty porcelain output>
+```
+
+### C. Trust root and focused tests
+
+Exact command:
+
+```bash
+python3 scripts/regression-harness/k1_scheduling_gate0.py verify-trust-root docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/trust_root.json
+```
+
+Result: exit `0`.
+
+```text
+GATE0_TRUST_ROOT PASS files=6
+```
+
+Exact command:
+
+```bash
+python3 -m pytest tests/test_scheduling_gate0.py -q
+```
+
+Result: exit `0`.
+
+```text
+..............................                                           [100%]
+30 passed in 0.24s
+```
+
+All 30 collected cases passed. There was no skip, xfail, or deselection summary. This
+includes the repaired deterministic/first-party source-manifest test, the 21
+parametrised fault cases, good control, determinism, trust-root, contract,
+production-boundary, and CLI-battery checks.
+
+### D. Fault battery and registered inner reasons
+
+Exact command:
+
+```bash
+python3 scripts/regression-harness/k1_scheduling_gate0.py fault-battery tests/fixtures/scheduling_gate0/valid_oracle_run.json
+```
+
+Result: exit `0`.
+
+```text
+GATE0_FAULT_BATTERY PASS caught=21 names=wrong_git_sha,wrong_source_manifest,wrong_platformio_ini,wrong_build_flags,wrong_firmware_binary,wrong_device_identity_manifest,wrong_device_identity,wrong_sample_tuple,wrong_mode_stress_contract,missing_trace_field,regressed_timestamp,corrupt_generation,missing_final_bytes_crc,unconfirmed_rmt_completion,changed_frozen_fixture,changed_test_inventory_hash,deleted_required_test,skipped_required_test,xfailed_required_test,deselected_required_test,perturbing_stream_enabled
+```
+
+The direct read-only mutation audit was repeated against Attempt 2. Each fresh mutation
+was passed to `validate_run()` and the resulting `Gate0Error` was compared to
+`FAULT_EXPECTED_REASON[name]`. Result: exit `0`.
+
+```text
+mutation_count=21
+all_registered_inner_reasons_match=true
+```
+
+The per-mutation reason mapping is unchanged from the complete Attempt 1 table above;
+all 21 rows again reported `rejected=true` and `matched=true`.
+
+### E. Three-run deterministic good control
+
+The following exact CLI was run three times by a read-only subprocess wrapper:
+
+```bash
+python3 scripts/regression-harness/k1_scheduling_gate0.py validate tests/fixtures/scheduling_gate0/valid_oracle_run.json
+```
+
+Result: wrapper exit `0`.
+
+```text
+run=1 exit=0 stdout='GATE0_VALIDATE PASS checks=90 records=2' stderr=''
+run=2 exit=0 stdout='GATE0_VALIDATE PASS checks=90 records=2' stderr=''
+run=3 exit=0 stdout='GATE0_VALIDATE PASS checks=90 records=2' stderr=''
+identical_stdout_and_exit=true
+```
+
+### F. Fresh `/tmp` provenance snapshot
+
+Exact creation commands:
+
+```bash
+K1_GATE0_ATTEMPT2_TMP="$(mktemp -d /tmp/k1-gate0-acceptance-attempt2.XXXXXX)"
+K1_GATE0_ATTEMPT2_SNAPSHOT="$K1_GATE0_ATTEMPT2_TMP/provenance.json"
+python3 scripts/regression-harness/k1_scheduling_gate0.py snapshot --output "$K1_GATE0_ATTEMPT2_SNAPSHOT"
+```
+
+Result: snapshot CLI and read-only assertion both exited `0`.
+
+```text
+GATE0_SNAPSHOT PASS files=537 content_sha256=9cfc8357d7fcdabee4ce6499e3625bb1c2c34f7094d597cc7a1dcd6b9ae42ecf
+snapshot=/tmp/k1-gate0-acceptance-attempt2.BXDtCB/provenance.json
+resolved=/private/tmp/k1-gate0-acceptance-attempt2.BXDtCB/provenance.json
+head=68c9a51e898a3b1f998ca3369bbaade72796c179
+branch=feat/k1-scheduling-generation-hardening
+dirty=false dirty_paths=[]
+source_count=537
+path_list_sha256=1b12db4ba37b7598e3c717bfdea7c3ef57099324e3e4892a62e4112b7ec4ebb0
+content_manifest_sha256=9cfc8357d7fcdabee4ce6499e3625bb1c2c34f7094d597cc7a1dcd6b9ae42ecf
+path_argument_is_under_tmp=true
+resolved_path_is_macos_tmp=true
+dirty_is_false=true
+dirty_paths_empty=true
+head_matches=true
+branch_matches=true
+source_count_matches_current=true
+```
+
+The fresh `/tmp` snapshot exactly matches the inspected generated historical snapshot's
+path-list and content-manifest digests.
+
+### G. Exact repair diff and production boundary
+
+Exact commands:
+
+```bash
+git diff --no-ext-diff --name-status 190479128fcfb907c2b04749ea8a43d3d36be322..68c9a51e898a3b1f998ca3369bbaade72796c179
+git diff --no-ext-diff --stat 190479128fcfb907c2b04749ea8a43d3d36be322..68c9a51e898a3b1f998ca3369bbaade72796c179
+```
+
+Result:
+
+```text
+A docs/forensics/2026-08-15-freertos-scheduling-audit/evidence/gate0-independent-acceptance.md
+M docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/trust_root.json
+M docs/forensics/2026-08-15-freertos-scheduling-audit/progress.md
+M docs/forensics/2026-08-15-freertos-scheduling-audit/task_plan.md
+M tests/test_scheduling_gate0.py
+5 files changed, 356 insertions(+), 6 deletions(-)
+```
+
+A mechanical path filter over that exact diff returned exit `0`:
+
+```text
+changed_path_count=5
+all_paths_oracle_or_docs_evidence=true
+unexpected_paths=[]
+production_or_platformio_changed=false
+production_or_platformio_paths=[]
+```
+
+No path under `SPECTRASYNQ_K1_FIRMWARE/` and no `platformio.ini` path changed between
+the rejected and accepted anchors. The only non-document path is the protected Gate 0
+host test whose hash was updated in the trust root.
+
+### H. Final Attempt 2 verdict and boundary
+
+**ACCEPT** `68c9a51e898a3b1f998ca3369bbaade72796c179` as the independently qualified
+Gate 0 host oracle and contract.
+
+The Attempt 1 live-count blocker is corrected; the trust root, focused suite, exact
+fault membership and inner reasons, deterministic good control, provenance snapshot,
+trace CRC/RMT-completion semantics, threshold ownership, and production-source boundary
+are green at the new clean upstream-synchronised anchor.
+
+The acceptance boundary remains host-only. It does not prove a firmware build, device
+runtime, actual final-byte CRC generation, physical RMT completion, AP/VP scheduling,
+timing margins, instrumentation perturbation, acoustic-to-photon latency, or perceptual
+quality. Those remain later-gate obligations.
+
+**Attempt 2 files changed by FRTOS-18:** only this evidence file.  
+**Build/PlatformIO/device/serial/upload/flash:** not run.  
+**Git mutation:** none; no stage, commit, or push.  
+**Next mechanical truth:** Gate 1 may proceed from accepted anchor `68c9a51e`; any
+protected trust-root change requires a new authorised oracle commit and complete fresh
+Gate 0 requalification.

@@ -25,8 +25,8 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | 5. Produce and visually verify the retained-template document | complete | final DOCX; 8/8 pages inspected |
 | 6. Run structural/document validation and close proof ledger | complete | current-HEAD host and document gates |
 | 7. Activate implementation authority and branch routing | complete | active handover; repo-truth PASS; commit `82e20197` |
-| 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | in progress | independently accepted Gate 0 receipt |
-| 9. Gate 1: exact-head AP/VP baseline | pending | admitted quiet/music/crossfade timing evidence |
+| 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | complete | independently accepted at `68c9a51e`; 21/21 RED witnesses |
+| 9. Gate 1: exact-head AP/VP baseline | in progress | admitted quiet/music/crossfade timing evidence |
 | 10. Gate 2: GDFT service contract | pending | measured retain/change decision |
 | 11. Gate 3: coherent AP frame and event semantics | pending | host interleavings + device lock/freshness proof |
 | 12. Gate 4: transactional controls and scenes | pending | ordered/state/scene transaction proof |

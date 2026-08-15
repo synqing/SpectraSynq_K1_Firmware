@@ -136,3 +136,23 @@ Decision-critical additions to the original audit are:
 
 These findings strengthen the contained hardening order. They do not justify an actor
 rewrite or a speculative priority change.
+
+## RMT completion and payload lifetime
+
+The exact local FastLED 3.10.3/ESP-IDF 5.4.1 sources establish:
+
+- `FastLED.show()` copies/scales the K1 application buffers into FastLED-owned buffers,
+  submits RMT asynchronously and returns before the new transfers complete;
+- the current `show_us` metric therefore measures preparation/submission and any
+  remaining wait from the previous transfer, not current physical completion;
+- each default 160-pixel WS2812B channel uses about 5,080 us including the 280 us reset;
+  two controllers overlap on distinct RMT channels but are software-skewed, not
+  hardware-synchronised;
+- FastLED waits for the previous same-controller transfer in the next `drawAsync()`,
+  after its three-pass show path has already rewritten the retained internal payload.
+  ESP-IDF requires that payload to remain unchanged until completion.
+
+The K1 application buffers are safe to reuse after the copy; application double
+buffering does not fix the internal FastLED payload lifetime. Gate 1 will add an exact,
+trace-only RMT submit/TX-done oracle using static records and official completion
+callbacks. Gate 5 will decide the production lifetime fence from measured evidence.

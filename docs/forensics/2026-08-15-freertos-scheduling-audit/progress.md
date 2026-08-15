@@ -78,3 +78,14 @@
   into a false trust-root failure. The exact Gate 0 population remains anchored in the
   generated provenance artefact; the reusable test now proves deterministic manifest
   generation and first-party coverage while each gate freezes its own expected digest.
+- The corrected oracle landed and was pushed as `68c9a51e`. Independent FRTOS-18
+  acceptance then passed on the clean anchored commit: six-file trust root, 30 focused
+  tests with no skip/xfail/deselection, 21/21 registered RED witnesses, three identical
+  good-control validations and a clean 537-file provenance snapshot. Gate 0 is closed.
+- Generated the durable Gate 0 implementation provenance at `68c9a51e`: source-content
+  manifest SHA-256 `9cfc8357d7fcdabee4ce6499e3625bb1c2c34f7094d597cc7a1dcd6b9ae42ecf`.
+- Completed the FastLED 3.10.3 RMT5 source audit for Gate 1/5. `FastLED.show()` is an
+  asynchronous submit boundary, not RMT completion; two 160-pixel channels overlap at
+  roughly 5.08 ms wire time each, and a too-fast free-running next frame can rewrite
+  FastLED's internal non-DMA payload before the prior completion wait. The next trace
+  unit must record official TX-done callbacks and cannot reuse `show_us` as completion.

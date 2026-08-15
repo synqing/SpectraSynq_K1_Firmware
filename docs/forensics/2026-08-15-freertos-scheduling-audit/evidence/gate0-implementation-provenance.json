@@ -1,0 +1,2711 @@
+{
+  "captured_utc": "2026-08-15T04:53:37.498289+00:00",
+  "contract_sha256": "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849",
+  "device_identity_manifest_sha256": "794efdead286886086a126c0a68666a80b496b799a50f692a48d2851c96789c3",
+  "git": {
+    "branch": "feat/k1-scheduling-generation-hardening",
+    "dirty": false,
+    "dirty_paths": [],
+    "head": "68c9a51e898a3b1f998ca3369bbaade72796c179",
+    "tree": "46aa4ac4f41074fd9ecea5272cfecd357f1ab236"
+  },
+  "platformio_ini_sha256": "54d99fffcb2739a9a570870e66f188897d76c0b798f0df5f73ad4ad0570595e3",
+  "schema_version": 1,
+  "source_manifest": {
+    "content_manifest_sha256": "9cfc8357d7fcdabee4ce6499e3625bb1c2c34f7094d597cc7a1dcd6b9ae42ecf",
+    "count": 537,
+    "path_list_sha256": "1b12db4ba37b7598e3c717bfdea7c3ef57099324e3e4892a62e4112b7ec4ebb0",
+    "rows": [
+      {
+        "bytes": 65511,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino",
+        "sha256": "3d45162f27785bcdd664f8d7d00611232b8895c9cf7921c0aef05e4d04b5c993"
+      },
+      {
+        "bytes": 3274,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/GDFT.h",
+        "sha256": "272d29880f25c3551ca44bb6d8e8a2f161f8936f1ced15cf9a4e5e900ecd82f0"
+      },
+      {
+        "bytes": 21398,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/audio_transfer.h",
+        "sha256": "47e119889e41893730033c2e34f76584a1a366b654f678127bd99e319ed3863b"
+      },
+      {
+        "bytes": 79205,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h",
+        "sha256": "84052de573f714ccc5f66e8244a1995247e0992df542dd5947c2a4e718ae4b58"
+      },
+      {
+        "bytes": 1337,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_ap_drive_contract.h",
+        "sha256": "21c24d6c88a9a9d88dbc2b76688d132bf10f7258ec0f10972534711a1d4d1a6f"
+      },
+      {
+        "bytes": 1331,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_ap_structured_evidence.h",
+        "sha256": "e6607f74c0df94286ebee44929a17d82c1f7f374dbf02970ddf1433aff9394af"
+      },
+      {
+        "bytes": 8518,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_profile.h",
+        "sha256": "4222c7cb5a17cd1b90187f3b4e28385891fb1a60effb57af6275c55cf157e533"
+      },
+      {
+        "bytes": 4950,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.cpp",
+        "sha256": "f1008ceadd7bcd5dc31dcc92c8b53092d083c5175547ca72be9af1d7198d30fd"
+      },
+      {
+        "bytes": 5333,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.h",
+        "sha256": "d6408bf3286fe8f885f9509c2ad40aef26e1ada187c66292e8b68e7cd8b01fc1"
+      },
+      {
+        "bytes": 3810,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_chord_detect.cpp",
+        "sha256": "e421261d17e1241b0cd1872066dd2b345bdae282226c179613bfefeb1255ef8b"
+      },
+      {
+        "bytes": 28457,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp",
+        "sha256": "e8602920154e017fe73c0356722d46dc59223e1dcbc1619664b80fe446eb945a"
+      },
+      {
+        "bytes": 1634,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.h",
+        "sha256": "48ed85a500b0f06694dcb8375ab430aa8b4b5cf4f80787302c0395bdf57fe16a"
+      },
+      {
+        "bytes": 1222,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_i2s_capture_types.h",
+        "sha256": "85977fe436a2dfdb1e7bbae0a5078a6b4440e40d3c58daa0a925ea1a98796c97"
+      },
+      {
+        "bytes": 8911,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_mic_auto_sense.cpp",
+        "sha256": "591bbe9fa2ebf59232c7417bc5a2fcb24f5e4485f48bcb3a5b55bfa955096762"
+      },
+      {
+        "bytes": 16903,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_mic_auto_sense.h",
+        "sha256": "43e9a2b572df5ab14a2f1613d9057cf67042cb1d478f307351b18a309cfa8862"
+      },
+      {
+        "bytes": 11018,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_mic_health.cpp",
+        "sha256": "7240ee909cf4592f8019d4e262ea5cb4e180d7fde760f1c427b048f996b30ee4"
+      },
+      {
+        "bytes": 4375,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_mic_health.h",
+        "sha256": "db2befd9d057eb9e2de549c99e3a921c8154dc850405e84c8a6f9393931a471d"
+      },
+      {
+        "bytes": 11179,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_musical_saliency.cpp",
+        "sha256": "e9fdb6e89358b8a63127adb6c509355f684b37b035a09838ce552bbec6e41a2e"
+      },
+      {
+        "bytes": 1540,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_musical_saliency.h",
+        "sha256": "dd55a661ff6c59ba7aa206ec2d912693cab123529f412e9fa426b5429f29fbf8"
+      },
+      {
+        "bytes": 26663,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_onset_beat.cpp",
+        "sha256": "b973d1bf4663bfd13a368b222659f6c4340c45a9d981b07f2e9b2aecdd249e13"
+      },
+      {
+        "bytes": 171,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_onset_beat.h",
+        "sha256": "69f36f882972797b235e499a535ddbb7f1adf1f50d2d1d54fabca66b2b726ac3"
+      },
+      {
+        "bytes": 3765,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_semantic_state.cpp",
+        "sha256": "144e2f78c254b03f2dd9f9431096222ec4bbae1fc1fbccf53fd9824a0232e879"
+      },
+      {
+        "bytes": 5160,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_semantic_state.h",
+        "sha256": "8f08c1eb5a36427397565a30e2faaa5f82083bcf1b8bcdcba9a4c74de8d8887b"
+      },
+      {
+        "bytes": 10583,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_spectral_honesty.h",
+        "sha256": "efa27069668659b09e5656d308c7f2189249d75154bcbfe09de9bdf2f1dc7d65"
+      },
+      {
+        "bytes": 5337,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stereo_probe.cpp",
+        "sha256": "b1a0880209e2de618ec3490fbe5fb459fef067db40d2eb76861730f69693ed47"
+      },
+      {
+        "bytes": 1838,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stereo_probe.h",
+        "sha256": "086dbe9549f622aa1d0ee9d3267f7e04b325e26ccf683232fae5f87a96482e52"
+      },
+      {
+        "bytes": 9404,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stm.cpp",
+        "sha256": "f5176423b157cd387d09d728f013959170b0eed687792d81c684a69f150d43da"
+      },
+      {
+        "bytes": 4417,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stm.h",
+        "sha256": "a6cc095dddb01c5c012f0c689ad56e0ad6504ae46c6766a467b9963473915ef5"
+      },
+      {
+        "bytes": 6316,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stm_fft512_bench.cpp",
+        "sha256": "da98ea874dcc5c8718ccfbb6b2e8a3b011d0b09dff4ade5a45b43191aca13549"
+      },
+      {
+        "bytes": 1016,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_stm_fft512_bench.h",
+        "sha256": "458d1e368f51dce5f5e75ef1af8fb67927a5a489be3df05f04cf9950f98d3500"
+      },
+      {
+        "bytes": 79244,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+        "sha256": "1e4c69c8ec79519ac0d6dd60367446c3ea33a75185444c2d9187f17108ed0110"
+      },
+      {
+        "bytes": 3613,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+        "sha256": "111adf457a0c60a67e900f62824138a7304d689ead40de3b14df1c557369c884"
+      },
+      {
+        "bytes": 6189,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/calibration/noise_cal.h",
+        "sha256": "64f969be5490825e0a81243cdcf4edc1b2fffac3c1dcc01b0027cdd2c26e2175"
+      },
+      {
+        "bytes": 36496,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_control_facade.cpp",
+        "sha256": "5d674b3ca914e2838bb643b32467f6a6176e243f0f41f491d0b4e0193989fcc0"
+      },
+      {
+        "bytes": 366,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_control_facade.h",
+        "sha256": "972b7e54b5e6d642a9e771653dd2b53c2fbc251480b17bc277bd7e9f03d45246"
+      },
+      {
+        "bytes": 25350,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_effect_queue.cpp",
+        "sha256": "e1492d6f8b9e2e41fffd40c4b3dfd87918e125595a68c1429b9900323d3fe6f6"
+      },
+      {
+        "bytes": 9268,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_effect_queue.h",
+        "sha256": "226b61d81756cab7454b74aed3a3ea746e00c34dca52b5ecd2fd291f7e168d03"
+      },
+      {
+        "bytes": 1049,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_noise_cal_arm.cpp",
+        "sha256": "61c8b4454ace8731ebaecaf037834e7e7eca7e7051bda6b7e74bf7c78203082e"
+      },
+      {
+        "bytes": 271,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_noise_cal_arm.h",
+        "sha256": "22d3f43df44acd8352b34c5622b14605bd5136cdd81ec3ea0c786abe98418386"
+      },
+      {
+        "bytes": 10956,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_show_state.cpp",
+        "sha256": "d5f5b30cd7126bbc93a111c22a59ceb3ca8e760c1784f291dabfc189fbc3df0b"
+      },
+      {
+        "bytes": 1836,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_show_state.h",
+        "sha256": "f65f1ee4b255d0d7600d90287f0f4f4c27855a63ca1112a307300807b38f2b7c"
+      },
+      {
+        "bytes": 397,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_wireless_control.cpp",
+        "sha256": "10d4cef8698396211b2c5cfc31503aceaf5fff73269c5659a2d1721ecc672a15"
+      },
+      {
+        "bytes": 1273,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_wireless_control.h",
+        "sha256": "405c3c464b7c2437493daada24c8e6632ce39bcac58f7a82c44dd8d005e398b0"
+      },
+      {
+        "bytes": 7806,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/diagnostic_capture.cpp",
+        "sha256": "3d3f313a24b1b6a29b56db4ca4a9a8f2b6c04dafcfd4a3709161f3c151f8d939"
+      },
+      {
+        "bytes": 1679,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/diagnostic_capture.h",
+        "sha256": "eab69d3de64759d6793b9539732b38ad8241c9a31bd5ae1eba63b311257a1646"
+      },
+      {
+        "bytes": 28751,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/gdft_harness.h",
+        "sha256": "51f0c35a35a19887636e1fe5a426631754f17e517422ac756fdc18a0f690a7a0"
+      },
+      {
+        "bytes": 8496,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/k1_ap_twitch_oracle.cpp",
+        "sha256": "3905b2adefda005427abfa5ef978fcf9324db2a2e45cdb5b677264c4da29920b"
+      },
+      {
+        "bytes": 895,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/k1_ap_twitch_oracle.h",
+        "sha256": "c34c901f7981bcf456817e3f71d638f3301e1bf35d6b23a75a68dd200c38dec6"
+      },
+      {
+        "bytes": 10919,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/k1_pin_evidence.cpp",
+        "sha256": "2450c4afd88780732c2df9f83b2323db4b42bd746f206765f57fa708b682ed58"
+      },
+      {
+        "bytes": 2167,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/k1_pin_evidence.h",
+        "sha256": "f03c8c10c4eacd441d83b372596e7fc3cedc313bde7ad80adcf20c37d48d4b82"
+      },
+      {
+        "bytes": 1089,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/k1_trace.h",
+        "sha256": "59396ee9e061d0afbc34b32449ac26d1af1438cb4e7a93a4501e353d3ec50a8c"
+      },
+      {
+        "bytes": 23537,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/motion_probe.h",
+        "sha256": "2aa1b32b3607559603cebf40d37c4124e01b34964bc59bb7cb93aed3810dd4f2"
+      },
+      {
+        "bytes": 18097,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/vp_motion_lab.h",
+        "sha256": "6d23a16a0c2ea34ed02e7cf4f98facd2113db4377989a69d2e04154e329ec0ff"
+      },
+      {
+        "bytes": 31746,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/vpab_capture.cpp",
+        "sha256": "5acbdc4f4fbce8f64b63447f0d6d9093bac9ecccd300f6e6289bd47a6e85e5f2"
+      },
+      {
+        "bytes": 2503,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/diag/vpab_capture.h",
+        "sha256": "dffde2ea93103d4e6862fe68c29a9e805bdbefd5f6926bf5d68f34b46b481d88"
+      },
+      {
+        "bytes": 17048,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/beat_aware_director.cpp",
+        "sha256": "dbe69217302b9b8dfca825e6c8cc7f36bc668e0a6f8106801fd4eeca61f13174"
+      },
+      {
+        "bytes": 8483,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/beat_aware_director.h",
+        "sha256": "30c28b0d77241f0dfbe1d9d874bada894097c40bbf7de2458d8741be9f2b03a6"
+      },
+      {
+        "bytes": 52709,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.cpp",
+        "sha256": "b9c3ef505cd160f4eb864d71ddba0f59ff36730174697723049da40a58ce2394"
+      },
+      {
+        "bytes": 7687,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer.h",
+        "sha256": "c5336111c3bd5c1872426aaa1d7e3f2934c0c46b5fa658f4d31db937fb2469e0"
+      },
+      {
+        "bytes": 599,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_edgemixer_lite.h",
+        "sha256": "b6714873f6d9e1cc6d120a19ec46a89ddf2b20d3bca09e92a5e15b608ada2250"
+      },
+      {
+        "bytes": 5879,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_mode_selection.cpp",
+        "sha256": "48c89a4d6626f8497c73a118995b1e86ae4a3b1ca23108c888051004e7ee6165"
+      },
+      {
+        "bytes": 1232,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_mode_selection.h",
+        "sha256": "50381fc3c037f60e6e72df26c2b49545f8adc94cf3dce9202c72b5dae791ac36"
+      },
+      {
+        "bytes": 16331,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_smart_director.cpp",
+        "sha256": "e9e6437435f35b2ff3a37e27aa3f185cfccde5c5106ee69dd2ac3f283dcdfd6a"
+      },
+      {
+        "bytes": 1535,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_smart_director.h",
+        "sha256": "fdd5e15480933f2247064addd178f5134a7b080ae3487c4fbd6917a7bcf493a7"
+      },
+      {
+        "bytes": 5055,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_visual_hooks.cpp",
+        "sha256": "c63fb3b2f58fa4ed74c0a26b5d7775d084ed1cb9753c868a219d20cd78ee1905"
+      },
+      {
+        "bytes": 907,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/director/k1_visual_hooks.h",
+        "sha256": "6873f9cf9e72af2444f1f3017680210c6339eeb0249476a1f8c1fc98ba4ec6f3"
+      },
+      {
+        "bytes": 4547,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/BlendMode.h",
+        "sha256": "641db5ec769c3071bb339918fc6dc526c24bffa25706cfd4e1e20eef31ef71c0"
+      },
+      {
+        "bytes": 6102,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EasingCurves.h",
+        "sha256": "bb7e856b35137d76f507df2ae561029f91af763f22619c5beacfb19fb54b7f54"
+      },
+      {
+        "bytes": 12402,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectContext.h",
+        "sha256": "64c8c576862a99a6af0a33a327e54e59fca4e78323ba56b890a7aaaad36f6491"
+      },
+      {
+        "bytes": 1168,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectId.h",
+        "sha256": "0b6e3ebe0645afcced62d7f141c281f827ac50d631117f412cc93bf20895461d"
+      },
+      {
+        "bytes": 4508,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectMetadata.h",
+        "sha256": "796f1b46a2bc379e9f0d0d0a3fc6e9da3375dc89ed4e1080da6beccc26c0ce3a"
+      },
+      {
+        "bytes": 2496,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectParameter.h",
+        "sha256": "dcd363352692c7ff4865c9ebe74a7f7d28430540112e6e274c5b8a4bc36387a8"
+      },
+      {
+        "bytes": 24550,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectRegistry.cpp",
+        "sha256": "10c714c285c1acee0f68074c7f2fe36b337d279b84865ec6df37f54f5c323c51"
+      },
+      {
+        "bytes": 12328,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/EffectRegistry.h",
+        "sha256": "d8ed5d6077b3d592684114531fb564b0952394b14af42cff1d40f315d013b369"
+      },
+      {
+        "bytes": 2663,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/FrameBlend.cpp",
+        "sha256": "b14fb82eefa0c4a3b002899b3c96011437f8c5afa583f34db4b28cc7de6a9b7b"
+      },
+      {
+        "bytes": 2275,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/FrameBlend.h",
+        "sha256": "1380202c2a2c9ee3e6c67848d180bd181bb13dfc6f5b11465c3f7aee6b449e6c"
+      },
+      {
+        "bytes": 2386,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/IEffect.h",
+        "sha256": "6ad576d2a049a4933dc10184bda4da60e493219b1dbc33440fa4cfef519e952e"
+      },
+      {
+        "bytes": 12580,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/K1AudioContext.h",
+        "sha256": "039499858137692408fffcb0c6903496bf68ee18c7545207cd88902c5dd4bc6c"
+      },
+      {
+        "bytes": 7505,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/K1BufferView.h",
+        "sha256": "b952f27f8aed92203fc5180fa96ea2f655ae058a5ad62ff251d552d771bd0e5a"
+      },
+      {
+        "bytes": 2282,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/LegacyEffectAdapter.cpp",
+        "sha256": "16931361fec717d0d4aaa1222f958df8dd9793a9e6bdc386730bec28914c980f"
+      },
+      {
+        "bytes": 4848,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/LegacyEffectAdapter.h",
+        "sha256": "b4c19089d9bbfcee1a6ddd4c51c8b679ffa93d54d022a98c6aecb0a671e339b7"
+      },
+      {
+        "bytes": 8479,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/RenderPrimitives.cpp",
+        "sha256": "4bdf4d2513b33314fe6e782b088f6d1ca89aed2a677539212dff6080c4ee587c"
+      },
+      {
+        "bytes": 4937,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/RenderPrimitives.h",
+        "sha256": "49c136381bb6dd8ed55f39d2ddd964ca4a1245c44242eb9ebc6e9c02d59b9e77"
+      },
+      {
+        "bytes": 29024,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/TransitionEngine.cpp",
+        "sha256": "54b5783c4a7708778bdc2943775ce7201ad8febcc9e9bc161e8d37653832020d"
+      },
+      {
+        "bytes": 7743,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/TransitionEngine.h",
+        "sha256": "714f5c7cbdc30d31eefff6b676f2808673f2241c797bd0784e4ace0675381cd3"
+      },
+      {
+        "bytes": 4993,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/TransitionOverlay.cpp",
+        "sha256": "c5969223d123be9084610ee0c9f4cf3f165ca4a7ed9fd8bc0d3d4b30b3f94efb"
+      },
+      {
+        "bytes": 3927,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/TransitionOverlay.h",
+        "sha256": "72a85a22fb8b2761b29fed1a8f952017f8f489c9118c02c64f219d44a2c0a87f"
+      },
+      {
+        "bytes": 7923,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/TransitionTypes.h",
+        "sha256": "45e7934e2e3d0fd43a3876c643bb94f74d810b7ecc09a5597b7da8a41a554b7b"
+      },
+      {
+        "bytes": 9969,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/ZoneComposer.cpp",
+        "sha256": "949bd4b86d684fa804afbdb22552fe7e4c9735432749505966c19eeee659e337"
+      },
+      {
+        "bytes": 7993,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/ZoneComposer.h",
+        "sha256": "dada676d54a3ab79b3eb63489feace41f90b200bcd924b1d27bc9b8ca4817da4"
+      },
+      {
+        "bytes": 6219,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/ZoneDefinition.h",
+        "sha256": "615fbf928e83fd64e8b5102f112d691b325e9cf2d52910106c4d352865aec292"
+      },
+      {
+        "bytes": 6889,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/ZoneDemo.h",
+        "sha256": "4a2f548122643ac8100badd6a2dca95b82f8aea9e8bd68fe2618055e6923e31b"
+      },
+      {
+        "bytes": 12480,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_beat_pulse_resonant.cpp",
+        "sha256": "39dc1edfa5aecf4a529d05a97746b4c3013cea723cc1f52ded1725382e70da53"
+      },
+      {
+        "bytes": 3767,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_beat_pulse_resonant.h",
+        "sha256": "aa4d98b5ba101df212e63a9fb48f4a5882d829cecacf2bcd4db126a611114f14"
+      },
+      {
+        "bytes": 15804,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_beat_prism.cpp",
+        "sha256": "9d8379c8f4aa605b314c010f39600b6918fdaeaddd9fab989f8f9c8e7385d9f9"
+      },
+      {
+        "bytes": 5444,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_beat_prism.h",
+        "sha256": "313d015bd9e094bd0cb03b96eada6824f880d5fc3a6cb7c1f8ac39afbd3339ae"
+      },
+      {
+        "bytes": 15012,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_flux_rift.cpp",
+        "sha256": "8c5856dfdf5344a2c93a12883cc447d10e31b34d9e4d502e707f705ca17a168f"
+      },
+      {
+        "bytes": 5189,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_flux_rift.h",
+        "sha256": "71f63b0dfbd63dd77e81c0834d136b484ed8b3cf0c71b046af7b3614876c1cb8"
+      },
+      {
+        "bytes": 17505,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_harmonic_tide.cpp",
+        "sha256": "b647e7d242b3c12ca19cd7a449e3d2418bb50033f7c5453fb42660874fb08ef6"
+      },
+      {
+        "bytes": 3233,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_harmonic_tide.h",
+        "sha256": "535f1ae119dfa030a7d05a1d6354f64afcac700cbae722046c55b2fb6ecb0284"
+      },
+      {
+        "bytes": 18899,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_transient_lattice.cpp",
+        "sha256": "1f8bcd369a2046daf955bd057b3ab00c62212fb10aa3faeaf2d4f63c959101c2"
+      },
+      {
+        "bytes": 7452,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_transient_lattice.h",
+        "sha256": "8c9b2143d511d49af8716cf1a6be02d4155ecc4ff8cbe28ee09e86b88d9a87ae"
+      },
+      {
+        "bytes": 2914,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_registry_compile_probe.cpp",
+        "sha256": "0fe57ae70be4e4d53fdbae0971ca9ee122c513eb18b977f636045588d89035ae"
+      },
+      {
+        "bytes": 11090,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/framework_compile_probe.cpp",
+        "sha256": "e5e48cae2dc6cd7f4bc7c3e5c620c60400f3cc87855756df0a25c00adcc91061"
+      },
+      {
+        "bytes": 3906,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/framework/zone_composer_compile_probe.cpp",
+        "sha256": "0168adf51c2a3d5742eafa3000cd7ea9422ca8278070e70c39449a0bb4ecfbac"
+      },
+      {
+        "bytes": 3531,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_aurora.cpp",
+        "sha256": "062c8c5d0607c0d3804d3814288acb248f5e76a9bfdded1e26b959ceb687f150"
+      },
+      {
+        "bytes": 5196,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_bloom.cpp",
+        "sha256": "c60d3f981e84faf1ca038449b9c8baad58963f2c7ddbd72c1d9270edac249c58"
+      },
+      {
+        "bytes": 8230,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chroma_constellation.cpp",
+        "sha256": "ae87d5131c605b2799b1231e64cd4a12a6fa19f867e3b9f8b9084dde20bbb10d"
+      },
+      {
+        "bytes": 2617,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chromagram_dots.cpp",
+        "sha256": "f1a77f225c1252f836289feec3992e8e53dc0129b6873395bec365611adb168f"
+      },
+      {
+        "bytes": 4258,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chromagram_gradient.cpp",
+        "sha256": "48615c7ce66b0c950d2a5e06d26c2fd5c51c7040978ca10fd302e0ceac9feb1e"
+      },
+      {
+        "bytes": 9585,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_comet.cpp",
+        "sha256": "69f638c446ae5b74a4acfa47fb45df473b5453c5a1a754455bb163cef937c500"
+      },
+      {
+        "bytes": 9761,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp",
+        "sha256": "d203ee52d9fb7806eeb806f42f4161001cbcd393bc67d9d2c1dff7e4198b1e03"
+      },
+      {
+        "bytes": 12188,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp",
+        "sha256": "5ac41f7ccc96da0b337dd5b65b6ccd6b26ac97e81730a5f71c55145407bdcbe7"
+      },
+      {
+        "bytes": 4742,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_ember.cpp",
+        "sha256": "3adf9f00c0e0c4e3051c34396a6b1e5ada125d081e0a02d1848a8f848a298472"
+      },
+      {
+        "bytes": 4194,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_ember_v2.cpp",
+        "sha256": "a0d1f243012b489c271b10003dabb6c70dd3adaa542c0ab05e257a4e55d54aec"
+      },
+      {
+        "bytes": 6757,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_gdft.cpp",
+        "sha256": "6a672d2c0559d74c24b0c739c3f5dcad3e0894563b57f936bcd6dfb1bace03c1"
+      },
+      {
+        "bytes": 8180,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_kaleidoscope.cpp",
+        "sha256": "e3985a4826714b2c2bbc81914e2601ca6e708755ec84a398928252b2cee3fc74"
+      },
+      {
+        "bytes": 13290,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_percussion_burst.cpp",
+        "sha256": "da3160c7b42dbbcff7fc7920cdc751ae6c358c21b166549ade6d6aaed1154982"
+      },
+      {
+        "bytes": 6962,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_pulse_prism.cpp",
+        "sha256": "2ee4d029626ce3d77630e12665409f613898ed716a1d5a55f911cee073673224"
+      },
+      {
+        "bytes": 7236,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_quantum_collapse.cpp",
+        "sha256": "feb6e2416f3454a2250858b635f0635ce3185175e02358a9b35c19b55becd49f"
+      },
+      {
+        "bytes": 12636,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp",
+        "sha256": "2b03edc2fce854e65f4eb30271348099e271ed3022d38a1ef93d534a757684cb"
+      },
+      {
+        "bytes": 5338,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_snapwave.cpp",
+        "sha256": "91168d6a9bb418eeadc8c3cf00fcc4b95843bf1ad75496110312d566461200b0"
+      },
+      {
+        "bytes": 4454,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp",
+        "sha256": "6657ffa8bb7824508ae62549094ad98e83979455a3227c09674e471961620e55"
+      },
+      {
+        "bytes": 4926,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp",
+        "sha256": "f0b843bca831cb2bcc5b551fb27bf0f455300ab9bdb4c8559676c5cfff16b591"
+      },
+      {
+        "bytes": 10734,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet.cpp",
+        "sha256": "39c598ed2ba6cdfa976e433878593cfc98515184e7beb80cf035ec51f86323d3"
+      },
+      {
+        "bytes": 13668,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp",
+        "sha256": "a17950a3c12c9865c7e50045d01ec95db75a4ad36412a68b2f35f9caf7926317"
+      },
+      {
+        "bytes": 7839,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp",
+        "sha256": "51467c2ee7826b4f3f70f9fdecb2bb04dbbee698148d5e80e13eda77b604d7f9"
+      },
+      {
+        "bytes": 10840,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp",
+        "sha256": "ea04e78bcc31b51e9d4b98dbbb91550c859f1d531af7c62eb500ebf460dca8a8"
+      },
+      {
+        "bytes": 2038,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_vu.cpp",
+        "sha256": "9787a1c211c3cfee98f33a47429be9479b40f8b98723caddcc81f622d604f791"
+      },
+      {
+        "bytes": 2642,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_vu_dot.cpp",
+        "sha256": "0274d4ec9fdfcd376fc4e1d5c2eb38bc0de62899218043e37871da9ea6f222b1"
+      },
+      {
+        "bytes": 3929,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform.cpp",
+        "sha256": "4d23b353a10a0af4a80fb5568b91c020a3c783b0fab0f5400d342507941285f0"
+      },
+      {
+        "bytes": 8092,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_fast.cpp",
+        "sha256": "a0c459fc2a725a5e8587c3e5ddf2bed8f412da774d442ca8925b5ce8d500c90c"
+      },
+      {
+        "bytes": 8813,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid.cpp",
+        "sha256": "21161873d2d34f31d31f0ee9491eb8cb527e2c9c0a4aedce13982879ff20c47f"
+      },
+      {
+        "bytes": 21632,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp",
+        "sha256": "220c5017810e0e3d567b799a604742d41c040c79a7035bc4e4adaa2b3d3c59e6"
+      },
+      {
+        "bytes": 15883,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_tempo.cpp",
+        "sha256": "b0a1a35a37e1d168d25f3d82e8b3376aa554341b439754e7b6bbfad5a8f9b9b5"
+      },
+      {
+        "bytes": 44335,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/ble_remoted_central.cpp",
+        "sha256": "2127cf1727c5ac62953c17b69d89d80febbf609d68b7cd9f13c7592c5df29a26"
+      },
+      {
+        "bytes": 1201,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/ble_remoted_central.h",
+        "sha256": "c0dda8377916a59c94c4d8b5d13d80f6d2aca28dc05caf250d4487d3f70ad310"
+      },
+      {
+        "bytes": 12348,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_ble_midi_decoder.cpp",
+        "sha256": "9b4c2814b5b6fbf8acd50c5e6357c612acbc24a7e36beb4ceb66aa1331d9b172"
+      },
+      {
+        "bytes": 1850,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_ble_midi_decoder.h",
+        "sha256": "a4ac1490f4da841911631acb29d66baff0f4e0f4d7890f620b0fdc709dc51f2f"
+      },
+      {
+        "bytes": 6854,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_ble_midi_map.h",
+        "sha256": "39376411aba1a954c97eff3ba1ae68b37ee8b9284f35a0a45e5feadcceb3aef2"
+      },
+      {
+        "bytes": 5391,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_claim_adv_v1.h",
+        "sha256": "cd40ac852b32ab701063a6e7a698a11f8e26de34875858865217efabb6169e82"
+      },
+      {
+        "bytes": 6904,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_identity_v1.cpp",
+        "sha256": "e61206fd7dc893110bb3acba00c6c4e219c368ac2a16bd28e088e106f0a8d463"
+      },
+      {
+        "bytes": 3494,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_identity_v1.h",
+        "sha256": "a8408a29f90b24ee3f17323351499b0e22f86e62367b527e710c6e81567c6b3a"
+      },
+      {
+        "bytes": 19136,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_state_tx.cpp",
+        "sha256": "898fa98725ea134ebda7286dcbcd6568abbf7e0ccd1ef8da543ef6f2b6d9f400"
+      },
+      {
+        "bytes": 1696,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_state_tx.h",
+        "sha256": "dad6e3ae264313e7a7236b60fe154de66f9f10a35192ea0183f9672c0245e221"
+      },
+      {
+        "bytes": 7985,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_state_v1.cpp",
+        "sha256": "4ac52bcd33f0a4b32dab9fffb0dda88bd4d019a70179bb837dd20e137d14f8be"
+      },
+      {
+        "bytes": 4148,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_deck_state_v1.h",
+        "sha256": "51fac9e84555c5ac94809541789cc47a60343ce906307e235eff6880b79dc678"
+      },
+      {
+        "bytes": 3845,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_enc8_identity_v1.h",
+        "sha256": "58fa47d94868c2088f72860f659fbb6c4fe4f5a417a65866b5ea47187f2060db"
+      },
+      {
+        "bytes": 51260,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_sync_link.cpp",
+        "sha256": "9ca80db7e8f1a9612a941a5ee1fc16d296bf5636230658e536a2a7e849266998"
+      },
+      {
+        "bytes": 2509,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_sync_link.h",
+        "sha256": "835790bcc2bff43a44fde88d936a2d004654f8a7e708512d0a440dbca7f253af"
+      },
+      {
+        "bytes": 31101,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_wireless.cpp",
+        "sha256": "50d691d1b74642cf33f9e0b7313f379ff85bf1c0a073f093496f257c72ca0f63"
+      },
+      {
+        "bytes": 231,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_wireless.h",
+        "sha256": "14d494a5fc332d82064674049bd3fb336daa409fb01fc14dcecdcb8ea0614089"
+      },
+      {
+        "bytes": 25564,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h",
+        "sha256": "da9636dc50d77a1cfd0e935ad6819e14d7aa1717c9b2048c9c6cf826119172ae"
+      },
+      {
+        "bytes": 6653,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs_config_codec.h",
+        "sha256": "7983570dc725fc82ba34b7b468c59b47e6a4b05a88063fd2cb84dac58c08b217"
+      },
+      {
+        "bytes": 2724,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/persistence/buttons.h",
+        "sha256": "9b776f22e80e9d424446d40d20b07cc4036e711e397aa8b2e68c0981efd2e59f"
+      },
+      {
+        "bytes": 37910,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/persistence/encoders.h",
+        "sha256": "04a5ad4d4cf92e3c8b41c27a9e36ffbc36e49edc523cc5d9bc6cde3d6115a03a"
+      },
+      {
+        "bytes": 2963,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/persistence/knobs.h",
+        "sha256": "7b9f9271dee66545e5f8dead1798bdfaa63c661dc24a2b2130ccb820304a5b8b"
+      },
+      {
+        "bytes": 36620,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/k1_ap_capture_telemetry.cpp",
+        "sha256": "2920faab06d8f8426aea6dea86a388aa40264f135fa1d4bdb804c017118d3f97"
+      },
+      {
+        "bytes": 8694,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/k1_ap_capture_telemetry.h",
+        "sha256": "f65bb6302380b773d8999cc4e56726be29d7774535d87c68bc71119df3c1e1eb"
+      },
+      {
+        "bytes": 75464,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp",
+        "sha256": "7500e0d0f558cb8812b42c2eb32bb466f178be3d78bb3ebdd65a9ba5234d0df0"
+      },
+      {
+        "bytes": 10360,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.h",
+        "sha256": "a285364dda5a84c6967da3052c2760e45239323abee976ffe1a43c1a8aab9df3"
+      },
+      {
+        "bytes": 7526,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def",
+        "sha256": "c7094e524bbe6580230ce2a2060a2b72b51a7a8da24c1ea9d741c825ead010e1"
+      },
+      {
+        "bytes": 165670,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp",
+        "sha256": "f724edf90d2e920a5c3ebdc07d8df1e267956e9c5c91158f4ec1487f3889dd38"
+      },
+      {
+        "bytes": 29221,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h",
+        "sha256": "2fc89df504a0a07acbb211d54088de9bcc8b3a5f100a8be277ea8e2e5c791a7c"
+      },
+      {
+        "bytes": 1604,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_parse_helpers.cpp",
+        "sha256": "321ee3018bc87500d3a1af00f58076617baf27d63437ada8fba9f8c021e2fc86"
+      },
+      {
+        "bytes": 954,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_parse_helpers.h",
+        "sha256": "42ba0ab54ae6c92cf22fe5eb94d0ed1653145ff1f583d523493fe294592ccbb4"
+      },
+      {
+        "bytes": 2461,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_tx.cpp",
+        "sha256": "7f700daba183b7309f18211ef2a9fbcc17cd7be867e1b1bac447a0ae73cc2fa5"
+      },
+      {
+        "bytes": 1587,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_tx.h",
+        "sha256": "d1d10aed32005d7c62d5dc0f52c6a25f77c612d26c6bfd710cc9e8feda873231"
+      },
+      {
+        "bytes": 15137,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def",
+        "sha256": "b4cf74c458c7857725a4d856ac2c8aad88cec8916d9dba4aaa8709804dd869fb"
+      },
+      {
+        "bytes": 35854,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.cpp",
+        "sha256": "aafc47322ffac638ee7a6275e4783318510a83349d9ccacb126f2d92e2f58aaf"
+      },
+      {
+        "bytes": 5991,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.h",
+        "sha256": "5398334c5b842109e14b8bad67a2e5b81e6d55fa221d52ab37902bbacadcb02d"
+      },
+      {
+        "bytes": 17763,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/config_types.h",
+        "sha256": "892c5341e0fa9100eb7e91b5f67429e3c633f7350188bf9c495fbf303d6759a4"
+      },
+      {
+        "bytes": 31475,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/constants.h",
+        "sha256": "b1f596294b667cc7b82f97f42e5fae3a2dd512eb00429ed667c9c74efa22f14d"
+      },
+      {
+        "bytes": 3230,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/globals.cpp",
+        "sha256": "0708a96da3b0600944775b833d3b76f1e85e615e205dd589233aa3e1f008dd2a"
+      },
+      {
+        "bytes": 52774,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/globals.h",
+        "sha256": "3d5845f5a8375512753de3e1edfc17b49d2bbea9585a8f18174865d03bd7479e"
+      },
+      {
+        "bytes": 5851,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/globals_config.cpp",
+        "sha256": "f46003673a612b00e965630c4578f9f85f41d302f7646c0636808b7d0b38653f"
+      },
+      {
+        "bytes": 3849,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/k1_bootloop_guard.h",
+        "sha256": "94f806a9763cda0cb01f4f6b88ecf22f0b1c6a75993c11e0f964b18bbb7068cc"
+      },
+      {
+        "bytes": 3440,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/k1_tunables.h",
+        "sha256": "28b139412cadbb96448d026018361483c9ead7208781b50fc70a9a2a889a788f"
+      },
+      {
+        "bytes": 5726,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/k1_tunables_generated.h",
+        "sha256": "7db0ce95d357b00430c4e72f8940355f350b717d504573e5b9464bd453fb5246"
+      },
+      {
+        "bytes": 2993,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/presets.h",
+        "sha256": "11a99dd223996bc45901005984b5d03091c83cefd496811aa7ac237565a5457f"
+      },
+      {
+        "bytes": 27627,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/system.h",
+        "sha256": "b208d5b4ae34574e1547bf6b4c9d7f1f9b05b158750233929649c915388cf775"
+      },
+      {
+        "bytes": 591,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/user_config.h",
+        "sha256": "0edda85646b7c9e63c1458b7ddbf8b1a161a0a296fd48580fb1cdb6d74c50a3a"
+      },
+      {
+        "bytes": 4371,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/system/utilities.h",
+        "sha256": "e40b3290e096afbef27db51996ec9dbe5aa06b87234521f5c177dcb0fcbc345a"
+      },
+      {
+        "bytes": 17616,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/Palettes.cpp",
+        "sha256": "6d72d308674a6b0b9eb9871bf9da4c5d4952c39f37030252bb0a1a18f4ce4896"
+      },
+      {
+        "bytes": 5703,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/Palettes.h",
+        "sha256": "4a99e109dbf55579e25e2c07f70a9c91035b1b104eedb8cba1c452ee0267bd45"
+      },
+      {
+        "bytes": 11727,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h",
+        "sha256": "6ae50fcaa74a7281abf73e140db7a4722a6a848fa3654e836356dede0c72addf"
+      },
+      {
+        "bytes": 6036,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.cpp",
+        "sha256": "a8d88daac72c78d693de099eea1997216c4725949e62bdbdf4f8ff015d70100b"
+      },
+      {
+        "bytes": 2041,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.h",
+        "sha256": "7cb8487455a8c1c111e2cf765d7ae56c32991caa47e78d6f15c8d80910fbf9ee"
+      },
+      {
+        "bytes": 103808,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h",
+        "sha256": "a16d9bbca8e50ebaab2bbbed77113cab3323598aca6b4543ff4049e5d2c5cd05"
+      },
+      {
+        "bytes": 60605,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h",
+        "sha256": "1231d5b521a3c2565cb53c883f1141b437c7d6f02a95a4c6f727f93e4280ab3d"
+      },
+      {
+        "bytes": 2998,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/render_params.cpp",
+        "sha256": "159b1c2178a6fc9cf81cb54df27275a09f4ad476c0263fee81cef46ac54e1fa6"
+      },
+      {
+        "bytes": 2597,
+        "path": "SPECTRASYNQ_K1_FIRMWARE/visual/render_params.h",
+        "sha256": "7928caced844996ef8a7c2bd7c5b83b20e9ced8859fb8be65e4809ec4e012063"
+      },
+      {
+        "bytes": 73696,
+        "path": "platformio.ini",
+        "sha256": "54d99fffcb2739a9a570870e66f188897d76c0b798f0df5f73ad4ad0570595e3"
+      },
+      {
+        "bytes": 5169,
+        "path": "scripts/agent/deck16-first-contact-gate.sh",
+        "sha256": "99984a5163f4f164b96507b37df0e63fdad57cd1becd91622069a30e86c7dd26"
+      },
+      {
+        "bytes": 5118,
+        "path": "scripts/agent/k1-flash-verified.sh",
+        "sha256": "dba8951e5655199034d38cfa2dd00b7109945a6ca61ff80513c9726c851aaa69"
+      },
+      {
+        "bytes": 4463,
+        "path": "scripts/agent/k1-session-preflight.sh",
+        "sha256": "2d2569faed184ddc29b578a93ff3007ef851e178ac44bad90a26ef6c3ad0c33b"
+      },
+      {
+        "bytes": 2393,
+        "path": "scripts/agent/pio-build.sh",
+        "sha256": "c23bc5ad030107f86fb339eea5cb2f7b4408cca129ecd496f31e01715ffc5408"
+      },
+      {
+        "bytes": 8942,
+        "path": "scripts/agent/repo-truth.sh",
+        "sha256": "1c340cd9f93e25d913946a080d1c31285fc90074987ba934c6e4dea50e61c3f3"
+      },
+      {
+        "bytes": 5887,
+        "path": "scripts/agent/session-bootstrap.sh",
+        "sha256": "3b8f38db6ed7e00d3f68d923ad50561ef258c165655ea343450ab5c1ff011217"
+      },
+      {
+        "bytes": 6424,
+        "path": "scripts/agent/tab5_protocol_parity_gate.py",
+        "sha256": "7ef2c982cd2677c05b09f299363072a136fe276d1c4255e546ac0f2a5f56e79a"
+      },
+      {
+        "bytes": 4130,
+        "path": "scripts/ble_midi/gen_k1_ble_midi_header.py",
+        "sha256": "7baeef9bb9238aa1e2d6c66932bbba87b9513002425932dd2ec988db65b1e9a8"
+      },
+      {
+        "bytes": 4371,
+        "path": "scripts/ble_midi/guard_k1_radio_isolation.py",
+        "sha256": "5b9f21d189d00dc5abac754f8378a174146080ab07c89d224361e0acbbb8e6b2"
+      },
+      {
+        "bytes": 964,
+        "path": "scripts/dual_sync_probe/__init__.py",
+        "sha256": "a444a6f2a8a20173c2dafe808b541a43f53e79553a5d95439fcd5b2e202928aa"
+      },
+      {
+        "bytes": 30402,
+        "path": "scripts/dual_sync_probe/capture.py",
+        "sha256": "628de625d7c657f183f593a7319aa544d638ea50b6d51524cfbc35d0ee8e0f27"
+      },
+      {
+        "bytes": 10579,
+        "path": "scripts/dual_sync_probe/correlate.py",
+        "sha256": "4f0784f7e69516aa67f0009b6d975e98971cffb702bb107706286a86f1d8d65e"
+      },
+      {
+        "bytes": 69372,
+        "path": "scripts/dual_sync_probe/f2_capture.py",
+        "sha256": "5c6e653c0bf3011edb94f4c05ac043d35c0b3a027aaba48ee3608efdc0bac549"
+      },
+      {
+        "bytes": 27089,
+        "path": "scripts/dual_sync_probe/f2_flash.py",
+        "sha256": "c8eaf3d93f6e38ae67674a205eab073fdde5fc98bdd6a2f77d680ba5e5aa9465"
+      },
+      {
+        "bytes": 14029,
+        "path": "scripts/dual_sync_probe/f2_image_set.py",
+        "sha256": "5969bb4bec3eeaf7d02d957830e9134bef6f8fa2c1614336ce13f118ef877bea"
+      },
+      {
+        "bytes": 21457,
+        "path": "scripts/dual_sync_probe/f2_ports.py",
+        "sha256": "45e8ddc797c1d4f39e91ec4a243af38a1c55ec239b2f1e260b7ccd23c78d3570"
+      },
+      {
+        "bytes": 30615,
+        "path": "scripts/dual_sync_probe/f2_reboot.py",
+        "sha256": "4fa394b4dfa95469c1e48244cd1df50eeb67c47c5f0c96e01e8fc5064602bf66"
+      },
+      {
+        "bytes": 5273,
+        "path": "scripts/dual_sync_probe/f2_run.py",
+        "sha256": "8671a98688cc05a462bc5b98e109b12187a86dcfca173237abdf686a29b70d3a"
+      },
+      {
+        "bytes": 32777,
+        "path": "scripts/dual_sync_probe/f2_status.py",
+        "sha256": "133f7a9846942bd53efa2452f781af34d4e78e80bc53bfcf34b2628903a4d5c6"
+      },
+      {
+        "bytes": 19617,
+        "path": "scripts/dual_sync_probe/gate_eval.py",
+        "sha256": "744dd6585cd3d2ed1dbf6c2224c81cb81e26256cf3d4eb7671e3ddec7167336f"
+      },
+      {
+        "bytes": 17411,
+        "path": "scripts/dual_sync_probe/logfmt.py",
+        "sha256": "db49e0743b4a0c51133838201d541329db47dc54567d9626937ecf691f3e6e3a"
+      },
+      {
+        "bytes": 406,
+        "path": "scripts/dual_sync_probe/run_f2_abc.sh",
+        "sha256": "1af983cf5a5f8d10c031e31e525ef07c0723df1ca951c869a42e7a76e7f999f3"
+      },
+      {
+        "bytes": 253,
+        "path": "scripts/dual_sync_probe/run_f2_create.sh",
+        "sha256": "8807dbe4e592c236863f416fe51caf85e0da6bb571ed6389c9f26e03b9e4b506"
+      },
+      {
+        "bytes": 247,
+        "path": "scripts/dual_sync_probe/run_f2_finalise.sh",
+        "sha256": "f72c02a873d044cb8821d2d0c19e59abcdcb6c1c79be044c1eba7308380c7122"
+      },
+      {
+        "bytes": 303,
+        "path": "scripts/dual_sync_probe/run_f2_flash.sh",
+        "sha256": "9da873de7ab213215522994ec2810786caa79aa59499b4b2fe7f2932b8c4cca4"
+      },
+      {
+        "bytes": 249,
+        "path": "scripts/dual_sync_probe/run_f2_ports.sh",
+        "sha256": "31973b21faa57174708262cd4aadf83c77de4d17d91098d40ac1b1d608ba63bc"
+      },
+      {
+        "bytes": 255,
+        "path": "scripts/dual_sync_probe/run_f2_reboot.sh",
+        "sha256": "a7aa0adab2de35c54043855dd39b2db56ae4c501e9f34812414a6c512eab015e"
+      },
+      {
+        "bytes": 327,
+        "path": "scripts/dual_sync_probe/run_gate0_segments.sh",
+        "sha256": "51be3744043fd15e47642e845f6cac43d458b6afb269772bd8f36993e4c6855f"
+      },
+      {
+        "bytes": 9839,
+        "path": "scripts/dual_sync_probe/synth.py",
+        "sha256": "d05ee223814a590497824e93358c7f41f03d7d769c380b5de6973e91545a44e8"
+      },
+      {
+        "bytes": 1014,
+        "path": "scripts/git_session_end.sh",
+        "sha256": "7d75d23ed7358b93ea89fb7233cc06aefc484e358446ee22ab4d404203434dac"
+      },
+      {
+        "bytes": 3007,
+        "path": "scripts/hooks/framework-safety-gate.sh",
+        "sha256": "46d342c339722faefb807b68be416c206ca033596ab2ebf209140fe62bc6aaa9"
+      },
+      {
+        "bytes": 698,
+        "path": "scripts/hooks/install.sh",
+        "sha256": "1f70edfc69e1d29302c41e6a2d1fd963f1a23de8354bd43e213efd142ad96375"
+      },
+      {
+        "bytes": 1017,
+        "path": "scripts/hooks/wip-checkpoint.sh",
+        "sha256": "a0321294ea95bd73e0cce432130008e2c38ddb042c4f064dd423f31a143dbe0c"
+      },
+      {
+        "bytes": 6894,
+        "path": "scripts/install-claude-mem-skills.sh",
+        "sha256": "a18d500f30338408edd2b8eb1cbe35f253145bfe8055357a771cbba74dad3763"
+      },
+      {
+        "bytes": 1791,
+        "path": "scripts/install-thinking-skills.sh",
+        "sha256": "fbd0aad9460ddbab67cc75a39399373e307994ccee0e14fdb85d7c88850a834d"
+      },
+      {
+        "bytes": 9184,
+        "path": "scripts/loop/tempo_loop.py",
+        "sha256": "0546be785d948aa9bedd503cf56964b6fe8b968459b71d9bcbb451cdf3d9a12d"
+      },
+      {
+        "bytes": 2463,
+        "path": "scripts/platformio/k1_build_provenance.py",
+        "sha256": "df32a28f563df308fc132e375b0f5a5d83aae455a11578f0431a4eb0c38f0da0"
+      },
+      {
+        "bytes": 822,
+        "path": "scripts/platformio/k1_effect_framework_includes.py",
+        "sha256": "4ac818036ca1ab89841d9ed4de6dd0970fbe2d252cb67a7279931466f03b37e2"
+      },
+      {
+        "bytes": 1709,
+        "path": "scripts/platformio/k1_src_includes.py",
+        "sha256": "6c4806fc070b4ed302491db7f4415752008f763a9e5b15bb59c516b8ae816185"
+      },
+      {
+        "bytes": 10409,
+        "path": "scripts/platformio/k1_upload_guard.py",
+        "sha256": "7a1ac6b47182b3d0f3a6d2ccb3319ecfb45a5337c949916fecd87a8e8cd5496b"
+      },
+      {
+        "bytes": 10299,
+        "path": "scripts/refactor/build_serial_typed_dispatch.py",
+        "sha256": "ea8ffd201444b278800419ea97b439a09498b1c3e99b1323ae33bcd8abf58026"
+      },
+      {
+        "bytes": 1006,
+        "path": "scripts/refactor/extract_typed_handlers.py",
+        "sha256": "deb6d7765fc987ac9a1341dc16668cab6d272e66a5b9f232d8d9f687038b70ae"
+      },
+      {
+        "bytes": 8182,
+        "path": "scripts/refactor/gen_serial_typed_table.py",
+        "sha256": "2c2ac28c06d11ac1b3594ae50e8fc51fc7ebaff29bd8b41ead0108cd9265fccc"
+      },
+      {
+        "bytes": 6237,
+        "path": "scripts/refactor/r1_move_serial_menu_defs.py",
+        "sha256": "a5c56bd9ba9705ed80018c8542891e01b3cb68168390364a0522d43ce388bad0"
+      },
+      {
+        "bytes": 16627,
+        "path": "scripts/regression-harness/acf_ceiling_sweep.py",
+        "sha256": "d8c74ea4198b4eb8e243e19f1622cd25442bee5d3a96a28109137c3ad3e9193c"
+      },
+      {
+        "bytes": 12672,
+        "path": "scripts/regression-harness/acf_gap_ablation.py",
+        "sha256": "4107d42e1b598ec3957a3aa1c18bd4df316c1d8a2f90d298de1552fe80c9c9bd"
+      },
+      {
+        "bytes": 8234,
+        "path": "scripts/regression-harness/analyse_smart_edge_runtime_capture.py",
+        "sha256": "a759dbb89f100c9cf057e4b7e3a4cd0c35a8b12cb7f62dcec159e613fe063f1c"
+      },
+      {
+        "bytes": 4305,
+        "path": "scripts/regression-harness/ap_capture_leg.py",
+        "sha256": "98b9b2d77e139c6ea587f1eebb6dac27b69acdf5ca1c3c499f15654a580f4e9b"
+      },
+      {
+        "bytes": 1473,
+        "path": "scripts/regression-harness/ap_drive_contract_test.cpp",
+        "sha256": "deba29f4b8a37673ca25601bad0ccd2b723e966cd0c8af3c9c94e0ac6c770cc5"
+      },
+      {
+        "bytes": 14327,
+        "path": "scripts/regression-harness/ap_input_integrity_device.py",
+        "sha256": "494b242a4ae010eb481ffb720081b91fa8c74178454f96dbcea32dcdb9fe1a1c"
+      },
+      {
+        "bytes": 5773,
+        "path": "scripts/regression-harness/ap_input_twitch_oracle.py",
+        "sha256": "7d4f625eb92f095cfd3ee565501da5e103bf946e5d8bdf06924583fc13631b78"
+      },
+      {
+        "bytes": 1188,
+        "path": "scripts/regression-harness/ap_structured_evidence_test.cpp",
+        "sha256": "620f4e2f79aaf62792d604329df1b159deb1d469cdf363e71aaeef628af06882"
+      },
+      {
+        "bytes": 22353,
+        "path": "scripts/regression-harness/apstream_ingest.py",
+        "sha256": "4af84d6d9176db667962e6f1b68407d8dfcdfff7288d4ab7510d223d960050e1"
+      },
+      {
+        "bytes": 6309,
+        "path": "scripts/regression-harness/beat_aware_director_boundary_proof.py",
+        "sha256": "392aca68fd8580931c97249be387760776808fc33534b862e62fd3ffe304a821"
+      },
+      {
+        "bytes": 12379,
+        "path": "scripts/regression-harness/beat_aware_director_device_proof.py",
+        "sha256": "6cf5cb8c2f27e5f017f56859997ba02bda13b134c3b50acfd9ab82495ee3a017"
+      },
+      {
+        "bytes": 29206,
+        "path": "scripts/regression-harness/beat_semantic_metrics.py",
+        "sha256": "0da0a51a7e67ea6ab305acec0c9493ce774a6463bbada7972a7e62cf044c8cf9"
+      },
+      {
+        "bytes": 13947,
+        "path": "scripts/regression-harness/bt_acf_4way.py",
+        "sha256": "47aae9ecc6d70e030c68a1b4bc13daddcd89ed90bc0714f2f16f945b82aa9f78"
+      },
+      {
+        "bytes": 3348,
+        "path": "scripts/regression-harness/captain_fixture_spot_check.py",
+        "sha256": "c8cf3f6bc0adab275d736a15f73f683c6346bc180001d115de60a6f20aab72e0"
+      },
+      {
+        "bytes": 18131,
+        "path": "scripts/regression-harness/chord_saliency_replay.py",
+        "sha256": "b21cda76dee507007cf8248413fa6900d4cde1232c547cb6646593be604a4683"
+      },
+      {
+        "bytes": 7293,
+        "path": "scripts/regression-harness/colour_baseline_capture.py",
+        "sha256": "d70f2da16cd4803902cccffcc6b86ad76f8376cb68fbe14220ceed8614fbffb7"
+      },
+      {
+        "bytes": 648,
+        "path": "scripts/regression-harness/compile_stm_host.sh",
+        "sha256": "972b484c7556a31bd1a0756253ae69a48c7756d770616cb03d11ff8eac797bd4"
+      },
+      {
+        "bytes": 4102,
+        "path": "scripts/regression-harness/derive_bands.py",
+        "sha256": "b937509a9981f2c18ac97a008c6f4d18d073dd97a2138a88c5cf945ed4d65b2d"
+      },
+      {
+        "bytes": 35202,
+        "path": "scripts/regression-harness/device_ap_cadence_capture.py",
+        "sha256": "6edf992a89402ffcda3109659b28b045ac36d16a1b38ff9b7c9777ee3c971b27"
+      },
+      {
+        "bytes": 14368,
+        "path": "scripts/regression-harness/device_ap_cadence_matrix.py",
+        "sha256": "8075e58a040675f43ef765bfa8109e5ad1c5c501fe69526de2158268c9746134"
+      },
+      {
+        "bytes": 9833,
+        "path": "scripts/regression-harness/device_novelty_buffer_capture.py",
+        "sha256": "88f653cb3b11c21df91e365da4a4c2ead0cd71a4fd618606ec626d5f9f7df808"
+      },
+      {
+        "bytes": 16370,
+        "path": "scripts/regression-harness/device_novelty_replay.py",
+        "sha256": "09763fbd93a2cd26798df6ca4e7e3282e13ab0fbd1a2a1b14aa3e9ab68e386d1"
+      },
+      {
+        "bytes": 6668,
+        "path": "scripts/regression-harness/device_stm_telem_soak.py",
+        "sha256": "37de6492d3cf65955d4769377426fe86874f0a0e27f1f5aab23606ec8c25c6a5"
+      },
+      {
+        "bytes": 720,
+        "path": "scripts/regression-harness/edgemixer_host_shim/Arduino.h",
+        "sha256": "a21d323c4c8744231a9b37cebcd65e9703125d4e2b5b4d54b2d348e39aede0cc"
+      },
+      {
+        "bytes": 1131,
+        "path": "scripts/regression-harness/edgemixer_host_shim/constants.h",
+        "sha256": "ee20c218971434b6d3306002d3e1814fa568454924587b9a9ba375e78006f97d"
+      },
+      {
+        "bytes": 18931,
+        "path": "scripts/regression-harness/edgemixer_oklab_probe.cpp",
+        "sha256": "b679ab52c908bc3cce2de404db3fb6ac250ee9353150bd3ab13d84db20b16206"
+      },
+      {
+        "bytes": 7560,
+        "path": "scripts/regression-harness/edgemixer_parity_probe.cpp",
+        "sha256": "ef88a86d94a609e1d1a001346a4f4efea1b79e98b5a46b298816588449e802c7"
+      },
+      {
+        "bytes": 19917,
+        "path": "scripts/regression-harness/export_diagnostic_trajectories.py",
+        "sha256": "f56a1d65c273ffcd5ba59043e645f4f00f3ea15e232da537c6a52b3d6a5862b1"
+      },
+      {
+        "bytes": 2604,
+        "path": "scripts/regression-harness/fastled_stub_test.cpp",
+        "sha256": "7748a93961d4b163b4ad762d61df5abddcb18aec592fa2bd7fd95ee1ed4038d6"
+      },
+      {
+        "bytes": 6944,
+        "path": "scripts/regression-harness/fixtures/gen_fixtures.py",
+        "sha256": "d3f12b6e4ac973ca898e5b05d3164297a2a275711be9daad240a649b1f4390f6"
+      },
+      {
+        "bytes": 15331,
+        "path": "scripts/regression-harness/foote_ssm_boundary_lift.py",
+        "sha256": "3d40a46dc37ecb3861b96032608e6a9ce6e323825b6a8a44d849fd443c30dfc8"
+      },
+      {
+        "bytes": 10209,
+        "path": "scripts/regression-harness/gate0_selftest.py",
+        "sha256": "4f6db6655293aa45d881d0cab70023aa38c26bdb5f51d31c99fea1f70e5f3562"
+      },
+      {
+        "bytes": 11743,
+        "path": "scripts/regression-harness/gdft_center_honesty_model.py",
+        "sha256": "40ccb46329eb652a8acc23456e6b64ad8b165769c3f947ce98197c1b8b55ed7a"
+      },
+      {
+        "bytes": 11076,
+        "path": "scripts/regression-harness/gdft_check.py",
+        "sha256": "867066923076ebc4e98e0b04e43c830aa978ede0eab1077245826ce2594d515f"
+      },
+      {
+        "bytes": 11488,
+        "path": "scripts/regression-harness/gdft_true_center_scalloping.py",
+        "sha256": "faa90bcc2e11712ec887d474ab81b6b31529edf082c7eb879b7f8b1299edffb6"
+      },
+      {
+        "bytes": 11025,
+        "path": "scripts/regression-harness/golden/harness_selftest.py",
+        "sha256": "1418d98c3bd12563bb86feb9796575eb5019d2c5d3ca9471c6226b929e13aa58"
+      },
+      {
+        "bytes": 12984,
+        "path": "scripts/regression-harness/golden/oracle_agc_perband.py",
+        "sha256": "e10f52a7516302616d8177e8e9a41cb152eac6f6bc35bc723a9f214b8ecc9ca0"
+      },
+      {
+        "bytes": 20311,
+        "path": "scripts/regression-harness/golden/oracle_ble_midi_diff.py",
+        "sha256": "10a60d5333cf5c2b1d792b4dc17aac93ffbcf4c1abacc0a1bab7cbf6a2c59b2e"
+      },
+      {
+        "bytes": 21821,
+        "path": "scripts/regression-harness/golden/oracle_ble_midi_map.py",
+        "sha256": "1345b62bc04d4e1362e6b8e4aab9bc6e60bf780eb2948a6559a7971f5750d85e"
+      },
+      {
+        "bytes": 15182,
+        "path": "scripts/regression-harness/golden/oracle_bridge_fs_codec.py",
+        "sha256": "332722dbd33b720d5c1f98d41dcc9453f360b137287a0c530f275a2808f3aeaf"
+      },
+      {
+        "bytes": 19250,
+        "path": "scripts/regression-harness/golden/oracle_bridge_fs_config.py",
+        "sha256": "3731120e08a0075bb60f836f77f5586e83177c21b121139affb3d75c8f780be4"
+      },
+      {
+        "bytes": 6246,
+        "path": "scripts/regression-harness/golden/oracle_build_config_policy.py",
+        "sha256": "d9dfa4582117db89aa63ed32ce323091fa926773df80e0c368c054133bea5071"
+      },
+      {
+        "bytes": 19101,
+        "path": "scripts/regression-harness/golden/oracle_chord.py",
+        "sha256": "4657868e055271e49628d3f5f010041211f6ce2f19a72c5b8c86ae5d6d4366a0"
+      },
+      {
+        "bytes": 21828,
+        "path": "scripts/regression-harness/golden/oracle_gdft.py",
+        "sha256": "2f03c29d5d5f61a8c543b34bedf6d7e92586a240445a2031d871c253e63290d4"
+      },
+      {
+        "bytes": 3091,
+        "path": "scripts/regression-harness/golden/oracle_hostcompile.py",
+        "sha256": "115c9c05a7954fdff44cb58915e6b5893b6e623470f803fb89e29f641d2a915a"
+      },
+      {
+        "bytes": 12501,
+        "path": "scripts/regression-harness/golden/oracle_k1_bootloop.py",
+        "sha256": "1f8588eabe2c70e8887faad536219122dc1f3d2a1160f8ec4985f96e072042c5"
+      },
+      {
+        "bytes": 4866,
+        "path": "scripts/regression-harness/golden/oracle_onset_beat.py",
+        "sha256": "b9e39511c2556e37bf711a61215f5b799007176f8db140c3f186b5288b0ef88a"
+      },
+      {
+        "bytes": 24969,
+        "path": "scripts/regression-harness/golden/oracle_render.py",
+        "sha256": "8c7216d85674c0b752316ede9638e68c3dd46d4e4d9e3833d93ee3c431c741a9"
+      },
+      {
+        "bytes": 63900,
+        "path": "scripts/regression-harness/golden/oracle_serial_replay.py",
+        "sha256": "0084d4c6ba7f4f71daa28024454944571cb6f8abfb6f9f136af1911e79cbc58e"
+      },
+      {
+        "bytes": 35687,
+        "path": "scripts/regression-harness/golden/oracle_serial_struct.py",
+        "sha256": "f10faeeeab36b7ac11af76a3709b0761f322c092039d2ebcfb79b4c139b5f8cc"
+      },
+      {
+        "bytes": 23706,
+        "path": "scripts/regression-harness/golden/oracle_smart_director.py",
+        "sha256": "196ee7af2c10e695a3407945cce6d883946cdff98a86fca6cf0aba4b53a361ba"
+      },
+      {
+        "bytes": 17379,
+        "path": "scripts/regression-harness/golden/oracle_tempo.py",
+        "sha256": "f9eeb92204e4abfce7349d851397b6d9a7f5e5564dab45f9e620421dcc6c797c"
+      },
+      {
+        "bytes": 5862,
+        "path": "scripts/regression-harness/golden/serial_replay_host_stubs.h",
+        "sha256": "e86bb038a5b552ba16a5af4eb1eb4f0e28783905608ac91ca344404afb1691aa"
+      },
+      {
+        "bytes": 10156,
+        "path": "scripts/regression-harness/high_bin_alias_audit.py",
+        "sha256": "f907323df4d3335a3483aeb02821318fc8686c2938220e0044d7fe8fd92093c7"
+      },
+      {
+        "bytes": 18174,
+        "path": "scripts/regression-harness/hue_coverage.py",
+        "sha256": "c35bdc8187301c28aa86f764a1a59b79379d1291819cabb3709d9371b40d2e8c"
+      },
+      {
+        "bytes": 44167,
+        "path": "scripts/regression-harness/im73d_audio_eval.py",
+        "sha256": "4d99f60a9595a5376b200eb9754e17770b5a9e23cf641190c8e7d71ddc63c5a7"
+      },
+      {
+        "bytes": 28908,
+        "path": "scripts/regression-harness/k1_audio_visual_regression.py",
+        "sha256": "8468418d17edc06872279212a95a16e557eba7d69ccf300fca3a7ddd9ea7031b"
+      },
+      {
+        "bytes": 4403,
+        "path": "scripts/regression-harness/k1_av_event_quality.py",
+        "sha256": "8fd4b208168ef954db32b76cab20aa6645e35cc69165c68d0215bf75a44d500f"
+      },
+      {
+        "bytes": 14997,
+        "path": "scripts/regression-harness/k1_av_layer_classifier.py",
+        "sha256": "f3023414e34df2eb879b511758a380d539b7c16ab4f19dff9f7c46146c5d578f"
+      },
+      {
+        "bytes": 9686,
+        "path": "scripts/regression-harness/k1_av_manifest.py",
+        "sha256": "63f1c63c3940db6a4110120ccc6ca11084b52f55d2e76b9967e25e68f4b42ff2"
+      },
+      {
+        "bytes": 5049,
+        "path": "scripts/regression-harness/k1_device_identity_guard.py",
+        "sha256": "a94cdf0c5721a5bedf96abcc8d5cda4222a4d31a44d1b58f97a6e1ed2043ee5e"
+      },
+      {
+        "bytes": 2122,
+        "path": "scripts/regression-harness/k1_godark_darkproof.py",
+        "sha256": "697789ef74875cc515078ad6080cd243f87cd913994241ee158a70a293e0d3b9"
+      },
+      {
+        "bytes": 3125,
+        "path": "scripts/regression-harness/k1_godark_measure.py",
+        "sha256": "7eba7d12356d3b3eed4c847cba3e349c674dec4e31193a5a6abfec2c3191746e"
+      },
+      {
+        "bytes": 2951,
+        "path": "scripts/regression-harness/k1_godark_observe.py",
+        "sha256": "c297656a45694ca418e7482fb9d937609b36a4c26fe6355e053fc4ef3fb1b1a4"
+      },
+      {
+        "bytes": 4434,
+        "path": "scripts/regression-harness/k1_godark_validate.py",
+        "sha256": "5776994021c8dd89578312b568ad886619de77119c087b32470ea111a779cf92"
+      },
+      {
+        "bytes": 7301,
+        "path": "scripts/regression-harness/k1_loud_guard_ab_capture.py",
+        "sha256": "1d9c3360b213986a50a239e8324a98da3ccb0d95a00fe820e4be51d2bfef762c"
+      },
+      {
+        "bytes": 11510,
+        "path": "scripts/regression-harness/k1_optics.py",
+        "sha256": "94780ec51a407fce2ed79f214be08f8b35b2846cd20b6d9f74d8b6e51cdd2c47"
+      },
+      {
+        "bytes": 25295,
+        "path": "scripts/regression-harness/k1_paired_snappiness_capture.py",
+        "sha256": "68699c6065d74a278b14cae4c6c9034bce5df12c72443673ad10e44c12cf611a"
+      },
+      {
+        "bytes": 12674,
+        "path": "scripts/regression-harness/k1_phase345_runtime_proof.py",
+        "sha256": "39ab8c4404c5de8346a484eb41aae8181f1ad2415a375eff75b0caa6ee89ff8a"
+      },
+      {
+        "bytes": 9630,
+        "path": "scripts/regression-harness/k1_pin_evidence_summary.py",
+        "sha256": "334f996166c19cb822770c8a5361e2ba0072502f7b6ae5500dfc7b87d0991ec1"
+      },
+      {
+        "bytes": 26627,
+        "path": "scripts/regression-harness/k1_real_music_corpus_capture.py",
+        "sha256": "727d64f77d8a9050545916b03e3a039310dd9ca6907eacee910a9823ab54f1fe"
+      },
+      {
+        "bytes": 23169,
+        "path": "scripts/regression-harness/k1_response_normalisation_gate.py",
+        "sha256": "fdebec695507a55335eacc4ac1a80117205da210e0ab1ee8ab75215cab42b59e"
+      },
+      {
+        "bytes": 19096,
+        "path": "scripts/regression-harness/k1_scheduling_gate0.py",
+        "sha256": "fd8c49ad35e0d05323be2348d5a2ad66ac42fe68ef1577c3915a0bde860a55a4"
+      },
+      {
+        "bytes": 14057,
+        "path": "scripts/regression-harness/k1_serial_safety.py",
+        "sha256": "20f352209ce4b88b1ac67881b6435ee8a9c1fff602998aac21d48eea2dd5b3cc"
+      },
+      {
+        "bytes": 8093,
+        "path": "scripts/regression-harness/k1_smart_auto_validation.py",
+        "sha256": "36b97984ab155aa327425538397c92368c2a141f024142f105552926583a5435"
+      },
+      {
+        "bytes": 8528,
+        "path": "scripts/regression-harness/k1_stm_replay.py",
+        "sha256": "a72b319b773999dcedc7ac39074b9d695625a05395977d333f0b9b2220739250"
+      },
+      {
+        "bytes": 6468,
+        "path": "scripts/regression-harness/k1_trace_capture.py",
+        "sha256": "98828421e3ecb8a87fe97703919a01afdea460992e3bc617af98106544d3f833"
+      },
+      {
+        "bytes": 5181,
+        "path": "scripts/regression-harness/k1_trace_l1_gate.py",
+        "sha256": "835de85ca8848dc78aa9f2a4bf6b37c1a051f5f5b6d5309a2e710f467a01f7c5"
+      },
+      {
+        "bytes": 8924,
+        "path": "scripts/regression-harness/k1_vpab_visual_sync.py",
+        "sha256": "1ef15e3d164135d41dbd9985e0858d47b87cc6609caa737fb435f7599b280163"
+      },
+      {
+        "bytes": 3134,
+        "path": "scripts/regression-harness/k1_ws_registry_codegen.py",
+        "sha256": "0710d4784d685069c6412f803a36300da122105e21fdd3d7e0d37349415d4f30"
+      },
+      {
+        "bytes": 19192,
+        "path": "scripts/regression-harness/lgp_optics.py",
+        "sha256": "e110197141d38b4fe5330c60ad23a34b35df3243e3fe41d93c90760c91aefb24"
+      },
+      {
+        "bytes": 51486,
+        "path": "scripts/regression-harness/loop.py",
+        "sha256": "343a7e8e7313d978870a092281188efb111fc231f7cfbc34df835b2939be6836"
+      },
+      {
+        "bytes": 19499,
+        "path": "scripts/regression-harness/mic_ab_compare.py",
+        "sha256": "fc616c19315c9a36f3f4ffe73ce8c41d651adf63a9f0e5725128ceeb73748d0d"
+      },
+      {
+        "bytes": 6756,
+        "path": "scripts/regression-harness/mic_health_model_test.cpp",
+        "sha256": "5e4fe183dd3e4ad3779dc0aa97b4f78927c6a04f8361c881f38139d8627cf0d9"
+      },
+      {
+        "bytes": 4977,
+        "path": "scripts/regression-harness/mic_stable_byte_gate.sh",
+        "sha256": "56deb6a0b90560a4fa2f951fe00cd4600eb72b37e19c93e90d6255b7ff851b73"
+      },
+      {
+        "bytes": 3644,
+        "path": "scripts/regression-harness/mirex_rescore.py",
+        "sha256": "bf7a468f9462b4d2f9d7e2b5fd8d74bb82a66796b24d545743ba0915d9c403be"
+      },
+      {
+        "bytes": 21392,
+        "path": "scripts/regression-harness/musical_saliency_benchmark.py",
+        "sha256": "3d21b35f97320553136b142d80921eb0b1afafdc15b71e01a207baace78a1e5b"
+      },
+      {
+        "bytes": 3198,
+        "path": "scripts/regression-harness/noise_cal_quality_model.py",
+        "sha256": "86b0183f79133979e25063da68a9a36e4f6ee40d820ecf0e75163b8cf555c8fb"
+      },
+      {
+        "bytes": 2840,
+        "path": "scripts/regression-harness/novelty_decimation_model.py",
+        "sha256": "626fcff9060af8f8902ccea0474f72148f16629ebab2894d2cd19a7a49368e65"
+      },
+      {
+        "bytes": 10052,
+        "path": "scripts/regression-harness/novelty_from_wav.py",
+        "sha256": "5ce1cab28e8a8cd977e9002ccb936d4b8537716717e6ff37894d7d44995a47fe"
+      },
+      {
+        "bytes": 7631,
+        "path": "scripts/regression-harness/onset_beat_event_metrics.py",
+        "sha256": "c84f2a6c0e3b786c3798463596bb0181af66c3d73f1013e02d15cd5a4c0f2081"
+      },
+      {
+        "bytes": 14819,
+        "path": "scripts/regression-harness/onset_beat_replay.py",
+        "sha256": "e68e488d76f186cb831014be35aaaf58a55d98713a7bf8fe767dc2bfef573dab"
+      },
+      {
+        "bytes": 17155,
+        "path": "scripts/regression-harness/onset_v2_replay.py",
+        "sha256": "131d85e33937bbd40ef81ba81e31b44130d1ce4cf98583481a3fe896713cf11b"
+      },
+      {
+        "bytes": 3335,
+        "path": "scripts/regression-harness/p4_baseline_leg.py",
+        "sha256": "952a4ff124e3f407fa4efcdbb09c10e1aada0aa5bd74c25327ace4083950e390"
+      },
+      {
+        "bytes": 4109,
+        "path": "scripts/regression-harness/p5b_matrix_leg.py",
+        "sha256": "7558ca553392f3d9b8fa640f2d9d5ea6907290d8976dc70e3634a24e377f1935"
+      },
+      {
+        "bytes": 11713,
+        "path": "scripts/regression-harness/palette_coverage_gate.py",
+        "sha256": "78c59096180b9a412078dd198af9c88f2467db5166057bf982c222a7466b6b72"
+      },
+      {
+        "bytes": 8467,
+        "path": "scripts/regression-harness/palette_reference.py",
+        "sha256": "2bf544ad03cb96583154dde3a7cda51d5c979b005c9707c8e441b2e69f672ad2"
+      },
+      {
+        "bytes": 5455,
+        "path": "scripts/regression-harness/parse_serial.py",
+        "sha256": "e6b95d2a1fb1377e1139bc9959ed8de900216bd14d63bc7ba7503372b81ade7b"
+      },
+      {
+        "bytes": 7123,
+        "path": "scripts/regression-harness/recover_eval_summary.py",
+        "sha256": "48d598e838e39d6452d5993dd9f5a4399c2b52db2d792cb65ddd6aaeda7816bc"
+      },
+      {
+        "bytes": 6747,
+        "path": "scripts/regression-harness/registry_byte_gate.sh",
+        "sha256": "19c70aa765c781df49144c0c2b88738510d6e75fd25cf70ad9f8283b463af337"
+      },
+      {
+        "bytes": 9647,
+        "path": "scripts/regression-harness/render_diagnostics.py",
+        "sha256": "e2f432d578b03b62f1eae14caaef1eb94bb435dd035ebeb5dbb1d702d4eb393a"
+      },
+      {
+        "bytes": 3475,
+        "path": "scripts/regression-harness/render_host_globals.cpp",
+        "sha256": "67b9def5e4e0a2572c1c006b3cc0af7a76f182e8745a5d803c54202416c61355"
+      },
+      {
+        "bytes": 50958,
+        "path": "scripts/regression-harness/render_replay.py",
+        "sha256": "0e49641dcf772e71a7c7e95da1e177e48d090648eb0aef3459185639d8f8b9c5"
+      },
+      {
+        "bytes": 4776,
+        "path": "scripts/regression-harness/render_via_nbconvert.py",
+        "sha256": "e6277335340405960bc6ce4c9b33b49a201c807b03db8935a4c6a42954bde8aa"
+      },
+      {
+        "bytes": 6180,
+        "path": "scripts/regression-harness/replay_device_apdbg.py",
+        "sha256": "d100e7ecfafd90d50ca0b8d9d12a8dabb4d96c73e88e760f8dbae397e611641c"
+      },
+      {
+        "bytes": 14820,
+        "path": "scripts/regression-harness/row1_dispatch_table_test.cpp",
+        "sha256": "817056bc2b7125f10dce701b77604b058518bc955f38179ee5bfdd91764aa6dd"
+      },
+      {
+        "bytes": 201,
+        "path": "scripts/regression-harness/run_fft512_bench_eval.py",
+        "sha256": "26bc3b289ec357ca8307db5a666cdfa42db979cc11582e125a0032ac592f8dd7"
+      },
+      {
+        "bytes": 659,
+        "path": "scripts/regression-harness/run_row1_dispatch_table_test.sh",
+        "sha256": "0ac25723e8b3153b3c75fa70866da71862bb291f40e76ae430700b0cff3f6dc5"
+      },
+      {
+        "bytes": 8058,
+        "path": "scripts/regression-harness/sample_rate_32k_migration_model.py",
+        "sha256": "ceb049c681ea1fb978480921809e46655c7e365fc8a5969bdc9921c3a04b1bb8"
+      },
+      {
+        "bytes": 11620,
+        "path": "scripts/regression-harness/semantic_state_replay.py",
+        "sha256": "2af50a782538c9df8738edc402ebb06b3a079f1706ded2ffcbc3614befdfab85"
+      },
+      {
+        "bytes": 2194,
+        "path": "scripts/regression-harness/serial_menu_odr_driver.cpp",
+        "sha256": "faa0ac534cdd3521c176b5bff3f5a932c095713e9f7f8814f6cecd961f6531b4"
+      },
+      {
+        "bytes": 314,
+        "path": "scripts/regression-harness/serial_menu_second_tu_smoke.cpp",
+        "sha256": "3d6a6dd428e1106eac184e9448e778b267acc63ad0c91bd988d8c68b2295621d"
+      },
+      {
+        "bytes": 1879,
+        "path": "scripts/regression-harness/serial_typed_dispatch_table_test.cpp",
+        "sha256": "74c770e3c6c125d8e9b74ee8b2e4d16a5540a1652d2f02ab5fec57381574c682"
+      },
+      {
+        "bytes": 14148,
+        "path": "scripts/regression-harness/smart_auto_product_ab_capture.py",
+        "sha256": "1f9c9045bf9c5f8654c4e93deb7ffddc23a89dff99b833166b129843c952edcf"
+      },
+      {
+        "bytes": 23108,
+        "path": "scripts/regression-harness/smart_director_replay.py",
+        "sha256": "40f97c51fc1f50048870244417204d3fedc199df9df57620105fe54b8036d4d4"
+      },
+      {
+        "bytes": 9400,
+        "path": "scripts/regression-harness/smart_edge_runtime_capture.py",
+        "sha256": "c18ea6b1d7d8376603b0b8ba55e0e25549be691f0f026231ec305e4756763556"
+      },
+      {
+        "bytes": 8910,
+        "path": "scripts/regression-harness/smart_visuals_gate.py",
+        "sha256": "c6568ec75a8cd8c56727bd16cbe6f544c12a28e582edf357b2edbf4118430d4d"
+      },
+      {
+        "bytes": 3368,
+        "path": "scripts/regression-harness/spaces/lgp_animate.py",
+        "sha256": "847f2e12c0c38948627cd4353086a489302f1e12f2653358da9fc42f207d1de0"
+      },
+      {
+        "bytes": 4128,
+        "path": "scripts/regression-harness/spaces/lgp_bloom_sample.py",
+        "sha256": "25be16323545b6b552be0a5d5eef6194e49d83f03dd327572b94582bdc4ca3bc"
+      },
+      {
+        "bytes": 7340,
+        "path": "scripts/regression-harness/spaces/lgp_real_measure.py",
+        "sha256": "d78818ed34a5b62da8bf078ee4d82e6dd217d8dd8a1cd2d2efaeeb434150f32a"
+      },
+      {
+        "bytes": 5287,
+        "path": "scripts/regression-harness/spaces/lgp_real_render.py",
+        "sha256": "38c0e7edde5771e1566fe68cd9abeb1b21c93a97eb0056483d30f8ade0f3e234"
+      },
+      {
+        "bytes": 3840,
+        "path": "scripts/regression-harness/spaces/lgp_validate.py",
+        "sha256": "b313da2fbc29b3cbb20ccdf80a5f59bbc4202ce17ff4d924650a32c5dba3855a"
+      },
+      {
+        "bytes": 6732,
+        "path": "scripts/regression-harness/spectral_honesty_probe.cpp",
+        "sha256": "60c21d1b56b949dfa614d033fdf3653d414d073e97fc44e36b83dd99a46a960f"
+      },
+      {
+        "bytes": 4581,
+        "path": "scripts/regression-harness/stereo_probe_decode.py",
+        "sha256": "674960fc18fc42fe23e52727a5598a2fe0e3ef65c17b4436e67269899ca569fb"
+      },
+      {
+        "bytes": 3159,
+        "path": "scripts/regression-harness/stm_k1_native_host.py",
+        "sha256": "5bec13330b296eb389cc00b3d760eba67377132eb8930d5ca6f9b2b29680024a"
+      },
+      {
+        "bytes": 4057,
+        "path": "scripts/regression-harness/stm_reference_512.py",
+        "sha256": "e7f1c6bb9cbbf1415b67d230ebe4471195ccd45c1693e3825f225c5de0551527"
+      },
+      {
+        "bytes": 5964,
+        "path": "scripts/regression-harness/stm_vp_compare.py",
+        "sha256": "4e808dfc88fa3f0babe049494ca3ab97685bb2212205794cfcb5fba1f89ccaa4"
+      },
+      {
+        "bytes": 3431,
+        "path": "scripts/regression-harness/stm_vp_run_packet.py",
+        "sha256": "57f730275b54ac81f041afefd8a41928457393bb409ee2625b9cfb473571f8fe"
+      },
+      {
+        "bytes": 12258,
+        "path": "scripts/regression-harness/stubs/Arduino.h",
+        "sha256": "3580e9e1289a30dd7cf7a6b7ec777761124cc040cabca3fbc426602fdf9c8da9"
+      },
+      {
+        "bytes": 21493,
+        "path": "scripts/regression-harness/stubs/FastLED.h",
+        "sha256": "1e720f8418cd650170cb6ec5b205eddfc34b09c7a557db84af0d76bb872bc65d"
+      },
+      {
+        "bytes": 345,
+        "path": "scripts/regression-harness/stubs/FirmwareMSC.h",
+        "sha256": "a98990f43a1e64bb2a4da769f06a771839506a879a4231a89fcd62a0360cefcc"
+      },
+      {
+        "bytes": 585,
+        "path": "scripts/regression-harness/stubs/Ticker.h",
+        "sha256": "98c5233247258594e70d687e1fff52a836311a41d4596b9f4b3578cc04ca7a38"
+      },
+      {
+        "bytes": 877,
+        "path": "scripts/regression-harness/stubs/USB.h",
+        "sha256": "36858cadc9caf8e2801f1114c390c6e758ebd5f794afc5e6916523467edfb9a3"
+      },
+      {
+        "bytes": 481,
+        "path": "scripts/regression-harness/stubs/esp_random.h",
+        "sha256": "874acab40f6fa75b36734557937723a0e683afb769dfeadc3e852f724c68011d"
+      },
+      {
+        "bytes": 2394,
+        "path": "scripts/regression-harness/stubs/freertos/task.h",
+        "sha256": "6c9ddd62af74dc43ef0afe177ddee58976e91734a4852be1c109b2951937b307"
+      },
+      {
+        "bytes": 1072,
+        "path": "scripts/regression-harness/tab5_transcript_ingest.py",
+        "sha256": "8cfa78eca32209bf6b74d12c5db229e967eff2e719340d6f1dd681b8262bcbbb"
+      },
+      {
+        "bytes": 19887,
+        "path": "scripts/regression-harness/tempo_accuracy.py",
+        "sha256": "1e191df63b2a65d0b5fc2e0dd46f2867fc3dc3827fa9e585cd6a3dcbe4696517"
+      },
+      {
+        "bytes": 13912,
+        "path": "scripts/regression-harness/tempo_confv2_calibrate.py",
+        "sha256": "debdc6d767e86865a5b815ae131dfaa106b46507cce541f75c2713388d9c4dae"
+      },
+      {
+        "bytes": 23761,
+        "path": "scripts/regression-harness/tempo_replay.py",
+        "sha256": "d176ac0e38e4e99bc9fbc05acf2a4939fac1959dd30a5e45aa59a1e14e2f4755"
+      },
+      {
+        "bytes": 15776,
+        "path": "scripts/regression-harness/test_acf_salience.cpp",
+        "sha256": "08519cf6e144203335ee472d8e69fbfc7f2b3022b52e5915f47db62dd6cd493c"
+      },
+      {
+        "bytes": 1120,
+        "path": "scripts/regression-harness/test_wireless_ab_gate0.py",
+        "sha256": "b3333fbf3282a6f90b634167ce34ac4079bd02e8344eba90ec2aa424c8f78800"
+      },
+      {
+        "bytes": 5573,
+        "path": "scripts/regression-harness/transfer_leg.py",
+        "sha256": "ca5a174fbb28d5e70f35b676605649ae51de98297344cb18f48c4de462ea501d"
+      },
+      {
+        "bytes": 4271,
+        "path": "scripts/regression-harness/transfer_quiet_leg_dual.py",
+        "sha256": "7339f4246454902aac759cb97b8b464e973156b8f2ba684a1e5b4a3766acc496"
+      },
+      {
+        "bytes": 11177,
+        "path": "scripts/regression-harness/visual_hooks_replay.py",
+        "sha256": "b5b2986a6af2e9c8ebc87b1c1c6b5b01bbe42dae83a9ad73e2a3dcea1e9e01e6"
+      },
+      {
+        "bytes": 4260,
+        "path": "scripts/regression-harness/vp_bleed_check.py",
+        "sha256": "65ff038e4abc1a32ebb3a3383a5017673c1f6adf5d5fc62cba78133169740688"
+      },
+      {
+        "bytes": 3070,
+        "path": "scripts/regression-harness/vp_capture.py",
+        "sha256": "3b9f76877bab33519d94422f17e3d16f0ca7bbbe94a05865d7ee740b52a6f442"
+      },
+      {
+        "bytes": 6685,
+        "path": "scripts/regression-harness/vp_diff.py",
+        "sha256": "c481e243e41c770117c8e1a651fbe21dac2505137d5a4a216eebf46ab446ef09"
+      },
+      {
+        "bytes": 7560,
+        "path": "scripts/regression-harness/vpab_frame_capture.py",
+        "sha256": "90247ef86e31baa1fb0bfc626a5938b4b5ff03ce33ea40363f2968af659971a9"
+      },
+      {
+        "bytes": 16727,
+        "path": "scripts/regression-harness/vpab_frame_gate.py",
+        "sha256": "d5aeb8d15a66924496280cb9611f48b53d976167faf3712bd12f3de68de55de6"
+      },
+      {
+        "bytes": 19567,
+        "path": "scripts/regression-harness/vpab_gate.py",
+        "sha256": "35e7e80d64c5439185744a7cbbec3fb175f509e281671024443515bc7fe18215"
+      },
+      {
+        "bytes": 3226,
+        "path": "scripts/regression-harness/vpab_post_switch_capture.py",
+        "sha256": "385d760280e4a11de43dc46154b49b21e6528e02664584160efbee7e8e9c089d"
+      },
+      {
+        "bytes": 3792,
+        "path": "scripts/regression-harness/vpab_runtime_matrix.py",
+        "sha256": "9039dba5684faf2691a30c3d5187adb9825a6ae69fa114757db177059f69639d"
+      },
+      {
+        "bytes": 49191,
+        "path": "scripts/regression-harness/vpab_semantic_presentation.py",
+        "sha256": "52b01fb192464b36b46ebdee03ab2053a740f1bb5b6db103295ef61f2203f6f9"
+      },
+      {
+        "bytes": 11097,
+        "path": "scripts/regression-harness/vpml_compiler.py",
+        "sha256": "675a724c9928e4192c300517927a7a62348689f88fe946eb56a1c091b3cbb24d"
+      },
+      {
+        "bytes": 37529,
+        "path": "scripts/regression-harness/vpml_evidence_page.py",
+        "sha256": "8d4c76f67b8a0cb43e29e249f594ca057085f84a614faa2aa0912cffbdb1fd48"
+      },
+      {
+        "bytes": 17852,
+        "path": "scripts/regression-harness/vpml_host_surface.py",
+        "sha256": "d51b3fc2ffa235af582c3dbace27aa141d0d41e5bed278931bb95faf1349435d"
+      },
+      {
+        "bytes": 19038,
+        "path": "scripts/regression-harness/vpml_live_runner.py",
+        "sha256": "dd5e043afbf5dd157dd43188f1de9904fd4af3808cec1c434dca2a9bf2a7ed2c"
+      },
+      {
+        "bytes": 18877,
+        "path": "scripts/regression-harness/vpml_run_console.py",
+        "sha256": "a8b905ff46fd0f10e7314d4bf26c7e6859328e14d70898417b8a787de48fa619"
+      },
+      {
+        "bytes": 25862,
+        "path": "scripts/regression-harness/vpml_run_console_server.py",
+        "sha256": "eca91c2ba3c7f5f44f156c3a8b40a9505a9a85e17d2e040152c8d13c531918bd"
+      },
+      {
+        "bytes": 13556,
+        "path": "scripts/regression-harness/vpml_runtime_summary.py",
+        "sha256": "f357e929da6de4c317747fa6b62aa03370db4f7500052f0bd3557d2c3082939e"
+      },
+      {
+        "bytes": 34782,
+        "path": "scripts/regression-harness/vpml_workbench.py",
+        "sha256": "0d99e151b81da316a7421960cc61afe2ee18ff9c9f5356b35c36907cb8f962ec"
+      },
+      {
+        "bytes": 55273,
+        "path": "scripts/regression-harness/wireless_ab_bench.py",
+        "sha256": "dec3f100b4887af8a32306dbf858bc9c6195e3edd517cf810c3032939139b319"
+      },
+      {
+        "bytes": 9817,
+        "path": "scripts/release/make_factory_image.py",
+        "sha256": "0ba28cd3a47dbb167cc9dc371b75f24d99da0414d857ace05a62a1715abcabd6"
+      },
+      {
+        "bytes": 6169,
+        "path": "scripts/release/make_release.py",
+        "sha256": "d4cba33bbe40ea0adc6960f097ed40b2aeccd050f5ba49ac3ed445654e1fe2b9"
+      },
+      {
+        "bytes": 9628,
+        "path": "scripts/release/make_unit_nvs.py",
+        "sha256": "13d004b4acedc9711ba923e4ab706065a4a48a892b316643ab40cd92a7f8e312"
+      },
+      {
+        "bytes": 7115,
+        "path": "scripts/setup-project-skills.sh",
+        "sha256": "c7c04201c6272ba249ca3104becd60e84866be515deb046f6c26528aa1fe7663"
+      },
+      {
+        "bytes": 1089,
+        "path": "scripts/setup_global_git.sh",
+        "sha256": "a5feb73856b7744274a11c54b27e420b4852575778cedeb225a4455f4d86305c"
+      },
+      {
+        "bytes": 5474,
+        "path": "scripts/tools/gen_tunables.py",
+        "sha256": "597ab128c76189fc7c25484223d62251e7fe75a081515bfd4b4ea7a1e656c852"
+      },
+      {
+        "bytes": 6443,
+        "path": "scripts/tools/probe_diff.py",
+        "sha256": "8f00789c7fc4504af327f5982d476b39a808500c066c7c02bb84c4170877f5d1"
+      },
+      {
+        "bytes": 5204,
+        "path": "tests/_fwpath.py",
+        "sha256": "50e92263228cb54630060ba505a13599a4556a5ce0a534bc627270305ec655eb"
+      },
+      {
+        "bytes": 151,
+        "path": "tests/conftest.py",
+        "sha256": "851f49a7e315a97dc5f0d0eb91ab9441d56937d8c5e77805910924d4336ee06c"
+      },
+      {
+        "bytes": 0,
+        "path": "tests/tab5_harness_spec/__init__.py",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "bytes": 1714,
+        "path": "tests/tab5_harness_spec/mock_ui_state.py",
+        "sha256": "465c1e6c37fe46e60916a588806998b1076d5af6143e03713ef0db51c02bd705"
+      },
+      {
+        "bytes": 1370,
+        "path": "tests/tab5_harness_spec/replay_dispatch.py",
+        "sha256": "66f83afead8671639b8dbade8379f1dde153cc5cd662f349bee61e16135a4e5c"
+      },
+      {
+        "bytes": 6033,
+        "path": "tests/test_agc_perband_independence.py",
+        "sha256": "7c2022ebaf53648de694c53f6d9f02ff3f33142391477a0065f4aff72d437f6e"
+      },
+      {
+        "bytes": 4829,
+        "path": "tests/test_ap_input_integrity_p2.py",
+        "sha256": "a87855a095428930f5bc4759fe1102ccb3ef8555a128dc12de5cd8af4d9e18e6"
+      },
+      {
+        "bytes": 5342,
+        "path": "tests/test_audio_profile_tombstone_static.py",
+        "sha256": "6d86d3018b4cbc5f4e6ea4d0a62e7ae34e0f2c6da3a9d5f79032a76d27946105"
+      },
+      {
+        "bytes": 4764,
+        "path": "tests/test_audio_response_gain_static.py",
+        "sha256": "22a3d75de89533dd095d798f5e16c6e9b9e712a9f3fd14ab369a219cc840d7b9"
+      },
+      {
+        "bytes": 3694,
+        "path": "tests/test_audio_telemetry_schema_static.py",
+        "sha256": "fe7a8cd844d2f93dd5137000ff8393a1f97783fdb3dfb68b8b6c6f4a419c3ab7"
+      },
+      {
+        "bytes": 3345,
+        "path": "tests/test_beat_aware_director_boundary_proof.py",
+        "sha256": "cbc6cd2331c71406695196b99237e5acc1b80978b4182d38313d6bb7a017c038"
+      },
+      {
+        "bytes": 8359,
+        "path": "tests/test_beat_aware_director_static.py",
+        "sha256": "83b8ac0b57199516a4238e102c182aa2af4a23433623c0a82c23b85231263615"
+      },
+      {
+        "bytes": 13245,
+        "path": "tests/test_ble_midi_firmware_decoder.py",
+        "sha256": "da99f6360d75a17be55e6bad62697fe644a991149587049d1732bef743f0bce6"
+      },
+      {
+        "bytes": 4289,
+        "path": "tests/test_boot_intro_static.py",
+        "sha256": "0dfaee7d9b19ad2b4ebb6c0ed65ffac52ff2c613e13844ed4f2f893b4951d1a3"
+      },
+      {
+        "bytes": 5840,
+        "path": "tests/test_boot_palette_lock_static.py",
+        "sha256": "94b74ac4fee44c7f5fb517d6c0f95b7942a6ee91af4f8c0621f2756511c9b9c9"
+      },
+      {
+        "bytes": 4511,
+        "path": "tests/test_bootloop_guard_static.py",
+        "sha256": "74f7bc6611f0eb26949ce0f3f525e0093b499c649acb82569bd0b725c2334775"
+      },
+      {
+        "bytes": 5659,
+        "path": "tests/test_build_config_policy_static.py",
+        "sha256": "3ad7039274c5476a2ef30731ff32e70be25a87b2249778c43e29567ef47e52ae"
+      },
+      {
+        "bytes": 6971,
+        "path": "tests/test_build_provenance_static.py",
+        "sha256": "812135610ad524ddc47ba7ea0643627af7f77c9815144be3df815dc49a6c4b4b"
+      },
+      {
+        "bytes": 11764,
+        "path": "tests/test_calibration_profile_static.py",
+        "sha256": "7d14b07372cf5b6db84bf0e5ecdb8f312a0f1ee3e2554d6888d9b40b4d99f5d0"
+      },
+      {
+        "bytes": 5153,
+        "path": "tests/test_cc14_productisation.py",
+        "sha256": "8d3fa36295cd882776e170cfc7d553bf01322730d1ccecefee46f6d2b02119eb"
+      },
+      {
+        "bytes": 4336,
+        "path": "tests/test_chord_hue_consumer_static.py",
+        "sha256": "c9fb79c155dbcd6a415ace3a198c3fa446b8524d3d4e4a9c3f11f187796e2875"
+      },
+      {
+        "bytes": 1332,
+        "path": "tests/test_chord_saliency_replay.py",
+        "sha256": "588b3d72f7b571c47a917d76be892ea29e330db44bc5637a57643d4058be308d"
+      },
+      {
+        "bytes": 8304,
+        "path": "tests/test_colour_fix_flags_static.py",
+        "sha256": "53cf8bd3bb7e43353dff8bbb9359ec565e468fdcddb6c6d49055fd7d7cbcc64e"
+      },
+      {
+        "bytes": 5213,
+        "path": "tests/test_commit_gate_classification.py",
+        "sha256": "efcaaad67031649668ed5d5822f6894fd95365d5b9dcbe96163997dfda562c26"
+      },
+      {
+        "bytes": 11280,
+        "path": "tests/test_custom_led_static.py",
+        "sha256": "4b6dc003be06f6025e8acf3c3cf778bc838be029dac1a35d3fda14666bfa8fef"
+      },
+      {
+        "bytes": 6578,
+        "path": "tests/test_deck_identity_v1.py",
+        "sha256": "b505120123a95fe60e7f845a523281993d377869e2576333a987cf004f6de5ec"
+      },
+      {
+        "bytes": 10386,
+        "path": "tests/test_deck_state_v1.py",
+        "sha256": "871791eabf98743d6e546048d3fe28d72f3e1c25914775f6caf9876949bdbbc5"
+      },
+      {
+        "bytes": 9340,
+        "path": "tests/test_dev_instrumentation_boundary.py",
+        "sha256": "17996492be1271ed17b83d629b4c6e862c38bf6477d42c63117c5218a4071fdc"
+      },
+      {
+        "bytes": 6612,
+        "path": "tests/test_diag_capture_static.py",
+        "sha256": "aa605165df9eb50c571cd34f406e6f0467c4b3de15d110343e90204c9c1e6ee3"
+      },
+      {
+        "bytes": 72732,
+        "path": "tests/test_dual_sync_oracle.py",
+        "sha256": "b2cde76e0cc5d0a582384a35a06963f51ee58370bcab3f2ac6a9f89690fb96ae"
+      },
+      {
+        "bytes": 33379,
+        "path": "tests/test_dual_sync_probe_firmware_static.py",
+        "sha256": "b86e7dd931de4c7081569f89bf740ce71e4c45f8881c5aa2f7e3b8a66be7916a"
+      },
+      {
+        "bytes": 9390,
+        "path": "tests/test_edgemixer_oklab_native.py",
+        "sha256": "6fc9e7cebdbf94dae197196fa4309b53badd88904db385337f08223f84a99f53"
+      },
+      {
+        "bytes": 4648,
+        "path": "tests/test_edgemixer_parity_native.py",
+        "sha256": "4381e8e09e352e40d4875f62d870582df61c4dcba4d1098b3e825214b738ae06"
+      },
+      {
+        "bytes": 2470,
+        "path": "tests/test_edgemixer_static.py",
+        "sha256": "3d8dd5025059bbb53e679d3c0125161c48065c9f7b2fc93b02dd9f405574ebd1"
+      },
+      {
+        "bytes": 14389,
+        "path": "tests/test_effect_queue_static.py",
+        "sha256": "16193e3d9af92ccb5af776b7bba94a9d4cec14d0aa22f861f50dbf7c5f4140c8"
+      },
+      {
+        "bytes": 6720,
+        "path": "tests/test_effect_registry_dense_static.py",
+        "sha256": "bfeb1a13cb58c2e4f45fc917f8e110ce9480c23115d46009d2ab7d606eebaea4"
+      },
+      {
+        "bytes": 8256,
+        "path": "tests/test_effect_registry_sanitize_static.py",
+        "sha256": "71d2132208200b4b25902b16185c6d5e9a7ec53bffd83532a5eaaa4e3e9f6668"
+      },
+      {
+        "bytes": 30134,
+        "path": "tests/test_f2_ports_reboot.py",
+        "sha256": "cc9aba644a93503b6c23d417a604907aa5d34fbef25c1b92b61dd99e68c70456"
+      },
+      {
+        "bytes": 15533,
+        "path": "tests/test_f2_status.py",
+        "sha256": "87ac2aa7ee59ab4790fa0be3fd816920b9468f9429e1c499c33f494f2e8c2fca"
+      },
+      {
+        "bytes": 7688,
+        "path": "tests/test_factory_tooling_static.py",
+        "sha256": "f6e685980e5c1da65687fd7a5bf2f612ab6e7fef21eb6b0377b54391c5ced7fd"
+      },
+      {
+        "bytes": 1983,
+        "path": "tests/test_fw_strings_removed_static.py",
+        "sha256": "1379f925306eb6b368f5e667a389a9406a0a844ba1f1c1813f2956d188ae7eb6"
+      },
+      {
+        "bytes": 12820,
+        "path": "tests/test_gdft_center_honesty.py",
+        "sha256": "a97ea8d7709899efd931555bd3476b7dc0391b5539b692c45eec06b0d24fc9cb"
+      },
+      {
+        "bytes": 7387,
+        "path": "tests/test_gdft_harness_schema_static.py",
+        "sha256": "481b692ab0a833c7ad60c3884ce81a5e0f4bf7b6d6c71083a8b14eb5367ca5e5"
+      },
+      {
+        "bytes": 4749,
+        "path": "tests/test_gdft_int64_magnitude.py",
+        "sha256": "a27b9f89b1f73df26d06c32824179f2986099512948539fb537b71e27255e4b1"
+      },
+      {
+        "bytes": 4999,
+        "path": "tests/test_gdft_int64_recurrence.py",
+        "sha256": "d7c8c648d45edc1f19c8941d8ca38779ad725277b3c793b49d420e5037572de2"
+      },
+      {
+        "bytes": 3429,
+        "path": "tests/test_golden_master.py",
+        "sha256": "c70830f457fc5bf4f3805fb002b6862e0d1373e7f3c62e53212205b552fb0265"
+      },
+      {
+        "bytes": 695,
+        "path": "tests/test_harness_selftest.py",
+        "sha256": "77bce48172d76f048a5cad66fb9a3ff7ee0fec41ff1dad42799085a35caeadae"
+      },
+      {
+        "bytes": 6800,
+        "path": "tests/test_i2s_watchdog_static.py",
+        "sha256": "e25d02262843d6052e5352036c620ed355e2223f0fea28a3e25dcc084ae5f064"
+      },
+      {
+        "bytes": 3723,
+        "path": "tests/test_im69d_consumer_floors_behavioural.py",
+        "sha256": "7c62e877b0fdf0bc64e40077a16526a582623a39cf227544fbf789fa2c0a7414"
+      },
+      {
+        "bytes": 15633,
+        "path": "tests/test_im69d_env_static.py",
+        "sha256": "f89de523fac3c5fb888a525f16b5db22a50cb5f1bcc060a13ccaf22f2ed1389c"
+      },
+      {
+        "bytes": 14668,
+        "path": "tests/test_im73d_audio_eval_harness.py",
+        "sha256": "5c8350502077af9f91c4dee3bcceb8efa970623097359a18ba6aa0fdad0f9e69"
+      },
+      {
+        "bytes": 3781,
+        "path": "tests/test_im73d_audio_purity_static.py",
+        "sha256": "72c5f2146f8f906db6ca31dd90b56ec74945d9fc2e7e3e39386478ed07f82c5c"
+      },
+      {
+        "bytes": 4088,
+        "path": "tests/test_impact_lane_static.py",
+        "sha256": "35911240255169e83e4ba5b1611384a00586797b5e57c91a89b8bdcbf3648c89"
+      },
+      {
+        "bytes": 33147,
+        "path": "tests/test_k1_av_regression_static.py",
+        "sha256": "d097de6ef2ac0af7c65a96b41cbdbd194c1b7b8af898e75c7d73a7dc2704523b"
+      },
+      {
+        "bytes": 2818,
+        "path": "tests/test_k1_device_identity_guard.py",
+        "sha256": "0bafd691031ef2ce2fa31a7f6c68c8f31747aef00465804d1430057c88e669aa"
+      },
+      {
+        "bytes": 4646,
+        "path": "tests/test_k1_godark_static.py",
+        "sha256": "4063659e49f75d347fb9d573e5a32d14395c8a3710887668b7b2c2e7eb9a8223"
+      },
+      {
+        "bytes": 8288,
+        "path": "tests/test_k1_loud_guard_static.py",
+        "sha256": "943b803c0af634b4cae79fd856e564e5aa056879e92d1cabc021113c4b2c3fc9"
+      },
+      {
+        "bytes": 7626,
+        "path": "tests/test_k1_optics_static.py",
+        "sha256": "94adc05ab1c492ccb0e9f8dcc6bce18e0c6c18c1a612bf44014f0a0fd4718dfd"
+      },
+      {
+        "bytes": 8805,
+        "path": "tests/test_k1_paired_snappiness_capture.py",
+        "sha256": "2657fd9b98b20ab600beb4657067992d110e1742a0bef223ccb7b468909cdc36"
+      },
+      {
+        "bytes": 6986,
+        "path": "tests/test_k1_palette_registry_static.py",
+        "sha256": "af71d68076d920734c3dbd11e07b0f30860cf9e13fe82edc5dea8f7f991a7661"
+      },
+      {
+        "bytes": 5380,
+        "path": "tests/test_k1_pin_evidence_parser.py",
+        "sha256": "e6fa643433d847077836e2820dc6443dae57feaa52d71cf2f552f7b4ce077e3d"
+      },
+      {
+        "bytes": 3853,
+        "path": "tests/test_k1_pin_evidence_static.py",
+        "sha256": "a7ea2268ea3ef15e65e399fba4e1ce274e66a06c8987d31f5600d275ce199d88"
+      },
+      {
+        "bytes": 9255,
+        "path": "tests/test_k1_real_music_corpus_capture.py",
+        "sha256": "7b5212fc65146dadaf77c9d75e143472160149d7a8da579734619e9fd34970e7"
+      },
+      {
+        "bytes": 8177,
+        "path": "tests/test_k1_response_normalisation_gate.py",
+        "sha256": "773c29bf8c47e038e5e4798b2c319cd90bd4c8861530a19f6163bd026b0dd337"
+      },
+      {
+        "bytes": 7185,
+        "path": "tests/test_k1_serial_safety.py",
+        "sha256": "2d597a10e45cc7f70e465551a776ad52ec0a08c772905e3a4df62a3d3857b159"
+      },
+      {
+        "bytes": 1037,
+        "path": "tests/test_k1_stm_replay.py",
+        "sha256": "70101f16890c746f8d902f64a5c84c8894c930efdcd094726d7bb1e888877b4d"
+      },
+      {
+        "bytes": 3034,
+        "path": "tests/test_k1_trace_l1_gate.py",
+        "sha256": "30560cceb9bd118e1d70e32f6daa330ef627a166486fe457e01c21c1ae8d5913"
+      },
+      {
+        "bytes": 13186,
+        "path": "tests/test_k1_upload_guard.py",
+        "sha256": "95208a47928d789a30c3c771f16a8ec89117a54d31ccac694537d5a7da4d00b9"
+      },
+      {
+        "bytes": 7759,
+        "path": "tests/test_k1_upload_guard_identity_static.py",
+        "sha256": "c4c0ee3711f58014f8f19770deb70c99cf06e939ebbe45d5b1633942ebcde560"
+      },
+      {
+        "bytes": 17119,
+        "path": "tests/test_k1_wireless_control_static.py",
+        "sha256": "58c467f13f3ce9e715c08ad57cca95b3cc29b902f986fca584b61ee471a3aa43"
+      },
+      {
+        "bytes": 1309,
+        "path": "tests/test_k1_ws_registry_codegen.py",
+        "sha256": "aa1ba61907de93dd8856a53e8a59babed753da67d2715318fa40a221202b9935"
+      },
+      {
+        "bytes": 6020,
+        "path": "tests/test_led_index_bounds_static.py",
+        "sha256": "afed966dcdbe4f597de0bf3fb7bb02845e9a1a2b9cc8f03e4a9c18fb38aa6f09"
+      },
+      {
+        "bytes": 13683,
+        "path": "tests/test_loop.py",
+        "sha256": "7f0b8de0c17f70d3d1ef8bbb1d41304c1c08701a9807c3fc7ea7d4b4775729ee"
+      },
+      {
+        "bytes": 20149,
+        "path": "tests/test_mic_auto_sense_controller.py",
+        "sha256": "a55af9725d3334925a28d852ee31a5596e7a368df7ff52542211ce6a1c7fd9c3"
+      },
+      {
+        "bytes": 6909,
+        "path": "tests/test_mic_auto_sense_static.py",
+        "sha256": "9037f715b2cddc3dd2ce5366182a8c529a53797568e64c583919a9e5034ce46e"
+      },
+      {
+        "bytes": 1531,
+        "path": "tests/test_mic_health_model.py",
+        "sha256": "481e0543a0b5dda4d2b147593d8e4d7d8800225f32acc9fec26c1e3bcf59ab27"
+      },
+      {
+        "bytes": 2299,
+        "path": "tests/test_mic_stable_byte_gate_static.py",
+        "sha256": "f0cf960b96c65d79bcd39ef4d9fdaa653e59c49e67f7eb9b3b39563c48f9863a"
+      },
+      {
+        "bytes": 6369,
+        "path": "tests/test_mutation_anchor_uniqueness_static.py",
+        "sha256": "b36af3c3915962c7cb4e524ee1bf2437bb263869a4593d5fec47453895699d93"
+      },
+      {
+        "bytes": 5659,
+        "path": "tests/test_new_effects_batch_static.py",
+        "sha256": "fbf1c491080260e6c9c010c4fcc1a6c6540343b42073da9c3bcc359a5795fb77"
+      },
+      {
+        "bytes": 4668,
+        "path": "tests/test_noise_cal_quality_model.py",
+        "sha256": "6b55aa1b096ae59a13cb0a211b8a9cb823b8b0050b0e91efc79dbef4ffd3a560"
+      },
+      {
+        "bytes": 4413,
+        "path": "tests/test_novelty_decimation_smoothing.py",
+        "sha256": "f3a22241e9ae1f12f3dc83021b82591aeb4d39d894ccbadd71f194433d35336d"
+      },
+      {
+        "bytes": 14436,
+        "path": "tests/test_nyquist_bin_hygiene_static.py",
+        "sha256": "aca27007b11b6aadc08905092ed93a1b19bd4216fd01d46c39d070a6baf719bc"
+      },
+      {
+        "bytes": 5237,
+        "path": "tests/test_onset_beat_event_metrics.py",
+        "sha256": "69e102004f8f5ba3d66fde5fdb9b273be17b4344b0309d6a6b7af3c8e85697ca"
+      },
+      {
+        "bytes": 1308,
+        "path": "tests/test_onset_beat_replay.py",
+        "sha256": "f858e12cf11ff3b0e86cea7aba6cca794ce3053d785d3c93e71157015cf6a044"
+      },
+      {
+        "bytes": 3458,
+        "path": "tests/test_palette_authority_static.py",
+        "sha256": "10e1e2221136a35e7f76681b4f3bbe0060cd85df85347e0c2043bb0a30c12262"
+      },
+      {
+        "bytes": 4281,
+        "path": "tests/test_palette_coverage_static.py",
+        "sha256": "38c46c10f06d144d0954ebf4eb99b402c338c845d17f7852a29cab9e763fd1a3"
+      },
+      {
+        "bytes": 1937,
+        "path": "tests/test_palette_hd_static.py",
+        "sha256": "a7537630f06677de4cd7a3555e5748e98f13f97e5c1731834c863342b20296c1"
+      },
+      {
+        "bytes": 2912,
+        "path": "tests/test_percussion_event_status_static.py",
+        "sha256": "be3310ba044ffab243d130e0159aed096761dfc3003bfc03ae628436e510092d"
+      },
+      {
+        "bytes": 3161,
+        "path": "tests/test_phase345_runtime_proof.py",
+        "sha256": "e1b19b3aa995c8e55d69c5af0e61bce9129a17b8551ef1f230f2600ef57b4694"
+      },
+      {
+        "bytes": 2026,
+        "path": "tests/test_probe_diff_tool.py",
+        "sha256": "722fde47d75974bddaed1f7dc7c3afe2388f9c87ed3af1596afdc26d87c80381"
+      },
+      {
+        "bytes": 19045,
+        "path": "tests/test_rate_consistency.py",
+        "sha256": "fc722677933df3e4b6f13092f40070390d61f45a3738d249984dade78a4454c4"
+      },
+      {
+        "bytes": 3876,
+        "path": "tests/test_render_trace_static.py",
+        "sha256": "c6e0cce8e9b18fff5ba74e2dafe06180871c9aeae89fa5179e404a8caf78e551"
+      },
+      {
+        "bytes": 4883,
+        "path": "tests/test_scheduling_gate0.py",
+        "sha256": "08202d5200a3fb4088e3d79666d747179aaf90d10306b653c24812d026b26302"
+      },
+      {
+        "bytes": 1261,
+        "path": "tests/test_semantic_state_replay.py",
+        "sha256": "3cf7031b697d9483fef50201ed6088d890462aa1414a4d3a683899489acb9af1"
+      },
+      {
+        "bytes": 7767,
+        "path": "tests/test_serial_hotkeys_static.py",
+        "sha256": "432bc0bb2966a5c79cc1f207037f2d78b5bf3c761fa4134148902ccd7d22257f"
+      },
+      {
+        "bytes": 2895,
+        "path": "tests/test_serial_menu_odr_static.py",
+        "sha256": "e1065963b3ec8a9fc3bc5165faa9976668a3ecb7cf6907462f8f5a6a502a81af"
+      },
+      {
+        "bytes": 1115,
+        "path": "tests/test_serial_typed_dispatch_table_static.py",
+        "sha256": "891f0253a4d834394fa393f67b8c66e7f5a9a25584297299c3e82b432bdba804"
+      },
+      {
+        "bytes": 1596,
+        "path": "tests/test_session_canon_2026_08_07_static.py",
+        "sha256": "bba95b99916f68fe332e5cee9ba83927b873f9626749427f9c12f7ce6f19a5ca"
+      },
+      {
+        "bytes": 10322,
+        "path": "tests/test_show_state_static.py",
+        "sha256": "0c0a93da11a5e5cbe209f1fa2f871d0b7e1f80147686a097e502cc8389311da3"
+      },
+      {
+        "bytes": 5037,
+        "path": "tests/test_smart_auto_product_ab_capture.py",
+        "sha256": "d734458411222f3e1cbd9300f5955648b95fe0b61c88f6358a83e41d8fc0f08c"
+      },
+      {
+        "bytes": 708,
+        "path": "tests/test_smart_director_replay.py",
+        "sha256": "4a2fff3161cd2c57b2d4d2c45dffee4a6a8f0d02aa9c17080d5e664a947cbc57"
+      },
+      {
+        "bytes": 3425,
+        "path": "tests/test_smart_edge_runtime_analysis.py",
+        "sha256": "93a402d76b1d985857a086d116d51bf7f5723455eba7ef45e7d8786bebdce085"
+      },
+      {
+        "bytes": 32577,
+        "path": "tests/test_smart_visual_engine_static.py",
+        "sha256": "6373df9e20bdc4a6c6f3c7430f5268e61814f823228bb9a9b86e83d4627bf557"
+      },
+      {
+        "bytes": 3696,
+        "path": "tests/test_smart_visuals_gate.py",
+        "sha256": "8ad44b2950b61236011aad1b9b5cabe186d5250d3441c9fb18cd57d32414c937"
+      },
+      {
+        "bytes": 5789,
+        "path": "tests/test_snapwave_pulse_static.py",
+        "sha256": "dac52861040bda5a77f89301397605e42b8790665bfef0a3c7c271a81a9a9cc9"
+      },
+      {
+        "bytes": 9276,
+        "path": "tests/test_spectral_honesty.py",
+        "sha256": "cb0ebd6fd34dde47a4717d696d2fcf2e17bc71b1e8efe42f26a92077de03343a"
+      },
+      {
+        "bytes": 3175,
+        "path": "tests/test_stm_vp_compare.py",
+        "sha256": "951ae21bc662cf9eaa5e88b30d3be637ae63a5f852cd5d6144396966e1c22047"
+      },
+      {
+        "bytes": 7350,
+        "path": "tests/test_tab5_dashboard_harness.py",
+        "sha256": "dccfda2123604eec0434829d8fc162e86a40e3643aa72d5219f1e03bfabb80bb"
+      },
+      {
+        "bytes": 1361,
+        "path": "tests/test_tab5_dispatch_replay.py",
+        "sha256": "f1db2a556fac46002126a7511d964f21987a732abcd25112aefb9374d368516a"
+      },
+      {
+        "bytes": 3642,
+        "path": "tests/test_tab5_harness_strict_mode.py",
+        "sha256": "0302099af72980d88bfb26075053c57a2630d7a072eafb55aac3b047749459f7"
+      },
+      {
+        "bytes": 3683,
+        "path": "tests/test_tab5_harness_transcript_replay.py",
+        "sha256": "910223fa201c169363ac0283b872036a0b71ef91322a21f2b0e5382f39b9a5df"
+      },
+      {
+        "bytes": 6297,
+        "path": "tests/test_tab5_protocol_parity_gate.py",
+        "sha256": "1a9278146e2fabb48e899f4225bb1c41b6089c6619e48239b0defd4e1bb1c53d"
+      },
+      {
+        "bytes": 5363,
+        "path": "tests/test_token_scrub_static.py",
+        "sha256": "34c685ccf718e5580fa36d2ebff4d3e94eccd7ecce605f218b5bd8f1e6890914"
+      },
+      {
+        "bytes": 4195,
+        "path": "tests/test_trace_dev_static.py",
+        "sha256": "cd8d51fb28bda938623fc6cfd660e877214dd2a727251a35be0a1c9e7f65316a"
+      },
+      {
+        "bytes": 3665,
+        "path": "tests/test_tunables_registry.py",
+        "sha256": "da100ec5ad7ca394ad4a363f76b47fafb214a7303de4e0cfc701ec7d98a4ac5e"
+      },
+      {
+        "bytes": 693,
+        "path": "tests/test_visual_hooks_replay.py",
+        "sha256": "07c47ea0576682394b65fb23d4a2776a3d6c160d3bee2f12c4a9e3644ff6110a"
+      },
+      {
+        "bytes": 9369,
+        "path": "tests/test_vivid_precomp_static.py",
+        "sha256": "f3192e6996eaaf81364ed17e55af43be6d89f8079184be6e02dee35473d575bb"
+      },
+      {
+        "bytes": 9033,
+        "path": "tests/test_vp_motion_lab_static.py",
+        "sha256": "3c6e9409a9bbf8ab4a0f18e201beff33ff3d8b76b43eddd5e0173a4b471bab58"
+      },
+      {
+        "bytes": 1694,
+        "path": "tests/test_vp_probe_mode_coverage_static.py",
+        "sha256": "66a2e6b46b23bf67e8ed7a9a53f1f327af0e68b7c4b08c3d3a0443d568aaa07e"
+      },
+      {
+        "bytes": 6004,
+        "path": "tests/test_vpab_frame_gate.py",
+        "sha256": "e6966fa4d19d0f70e9efb369b17c6b34a3ac1bc7c4c8742a3e81034498fc6016"
+      },
+      {
+        "bytes": 9063,
+        "path": "tests/test_vpab_gate.py",
+        "sha256": "1133cea60d37768800ccd498f899a141abf71bd9815141cd7b78acbe0c5dc45a"
+      },
+      {
+        "bytes": 3835,
+        "path": "tests/test_vpab_semantic_presentation.py",
+        "sha256": "ed7c17989784d261278da9b6c4ca57aff062ce60fe56d01750c273d291ebfdc0"
+      },
+      {
+        "bytes": 21893,
+        "path": "tests/test_vpml_evidence_page.py",
+        "sha256": "8736da38d21f39471b8bd459692124d78edc36b93448733090bcd4b51f1855b8"
+      },
+      {
+        "bytes": 6996,
+        "path": "tests/test_vpml_host_surface.py",
+        "sha256": "3346ff172e9cc0196f4ef7e9495ae5ee4ab9bacbcd5bfba649833fd884b6a2fc"
+      },
+      {
+        "bytes": 8220,
+        "path": "tests/test_vpml_live_runner.py",
+        "sha256": "4f8673d948868f69d96f5082a0261f48bd0ffb8570e5422bc16f78942d60cca3"
+      },
+      {
+        "bytes": 10436,
+        "path": "tests/test_vpml_run_console.py",
+        "sha256": "af8dba5d43467240a6d3e9255bddbfe4b9c495fd3c6f259321a74e96674fdf2b"
+      },
+      {
+        "bytes": 9025,
+        "path": "tests/test_vpml_run_console_server.py",
+        "sha256": "13eb0fca6f62504baac5630ddca1e91a989941d74b34d9d535b8e246e890052d"
+      },
+      {
+        "bytes": 6444,
+        "path": "tests/test_vpml_run_console_server_smoke.py",
+        "sha256": "c6418e25db924abe8e5c01d77fd5c5cbff895484ec7aa2b958ff93dc2712d247"
+      },
+      {
+        "bytes": 5485,
+        "path": "tests/test_vpml_runtime_summary.py",
+        "sha256": "f94fe2cd6dd11fe7f87f2eaaf47051b1783e174118b65f259dd986b7254e9873"
+      },
+      {
+        "bytes": 3344,
+        "path": "tests/test_waveform_hybrid_k1_static.py",
+        "sha256": "78cf1ad48dcb1e9bda9c47c80ecb8868c9bf9546f9fadf0c1419a746662c997e"
+      },
+      {
+        "bytes": 15164,
+        "path": "tests/test_wireless_ab_bench_static.py",
+        "sha256": "48488be1b323915bd210b5788de9710604110835b3ba72573280efc3260ada56"
+      }
+    ]
+  },
+  "toolchain": {
+    "git": "git version 2.52.0",
+    "platformio": "PlatformIO Core, version 6.1.19",
+    "python": "3.14.3"
+  }
+}
