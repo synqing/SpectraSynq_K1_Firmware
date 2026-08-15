@@ -26,13 +26,23 @@ DEFAULT_CHIP_ID = "B489A500"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("identity", "fault-battery", "challenge", "capture"))
+    parser.add_argument(
+        "mode",
+        choices=("identity", "fault-battery", "challenge", "calibrate", "tune", "capture"),
+    )
     parser.add_argument("--usb-serial", default=DEFAULT_USB_SERIAL)
     parser.add_argument("--expect-chip", default=DEFAULT_CHIP_ID)
     parser.add_argument("--port", help="Optional assertion; never used as identity")
     parser.add_argument("--duration-ms", type=int, default=10_000)
     parser.add_argument("--warmup-frames", type=int, default=300)
     parser.add_argument("--label", default="ap_input")
+    parser.add_argument(
+        "--set",
+        action="append",
+        default=[],
+        metavar="NAME=VALUE",
+        help="Runtime tunable assignment; valid only in tune mode",
+    )
     parser.add_argument("--out-dir", default=str(ROOT / "evidence" / "ap-input-integrity"))
     return parser.parse_args()
 
@@ -233,6 +243,63 @@ def run_challenge(device: serial.Serial) -> tuple[dict[str, object], list[str]]:
     }, raw_log
 
 
+def run_calibration(device: serial.Serial) -> tuple[dict[str, object], list[str]]:
+    before, lines = health_status(device)
+    assert_live_raw(before)
+    if before.get("state") != "OK" or before.get("liveness") != "1":
+        raise RuntimeError(f"calibration requires proven live input: {before}")
+
+    raw_log = list(lines)
+    device.reset_input_buffer()
+    device.write(b"N")
+    device.flush()
+    armed_lines = read_lines(device, 0.25)
+    raw_log.extend(armed_lines)
+    if not any("NOISE_CAL: armed" in line for line in armed_lines):
+        raise RuntimeError(f"noise calibration did not arm: {armed_lines}")
+
+    device.write(b"Y")
+    device.flush()
+    calibration_lines = read_lines(device, 6.0)
+    raw_log.extend(calibration_lines)
+    accepted = any("NOISE CAL ACCEPTED" in line for line in calibration_lines)
+    failed_lines = [line for line in calibration_lines if "NOISE CAL FAILED" in line]
+    after, lines = health_status(device)
+    raw_log.extend(lines)
+    assert_live_raw(after)
+    return {
+        "passed": accepted and not failed_lines,
+        "before": before,
+        "after": after,
+        "accepted": accepted,
+        "failure_lines": failed_lines,
+        "calibration_lines": calibration_lines,
+    }, raw_log
+
+
+def run_tune(device: serial.Serial, assignments: list[str]) -> tuple[dict[str, object], list[str]]:
+    if not assignments:
+        raise RuntimeError("tune mode requires at least one --set NAME=VALUE")
+    raw_log: list[str] = []
+    results: dict[str, object] = {}
+    for assignment in assignments:
+        if "=" not in assignment:
+            raise RuntimeError(f"invalid tunable assignment: {assignment}")
+        name, value = assignment.split("=", 1)
+        write_lines = command(device, f":tune={name},{value}", 0.3)
+        raw_log.extend(write_lines)
+        if any("TUNE REJECTED" in line or "TUNE UNKNOWN" in line for line in write_lines):
+            raise RuntimeError(f"tunable write failed for {name}: {write_lines}")
+        read_lines_result = command(device, f":tune={name}", 0.3)
+        raw_log.extend(read_lines_result)
+        marker = f"TUNE {name} = "
+        readbacks = [line.split(marker, 1)[1] for line in read_lines_result if marker in line]
+        if len(readbacks) != 1:
+            raise RuntimeError(f"missing unique readback for {name}: {read_lines_result}")
+        results[name] = {"requested": value, "readback": readbacks[0]}
+    return results, raw_log
+
+
 def write_evidence(out_dir: Path, label: str, payload: dict[str, object], lines: list[str]) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = time.strftime("%Y%m%d_%H%M%S", time.localtime())
@@ -257,6 +324,10 @@ def main() -> int:
             result, lines = run_fault_battery(device)
         elif args.mode == "challenge":
             result, lines = run_challenge(device)
+        elif args.mode == "calibrate":
+            result, lines = run_calibration(device)
+        elif args.mode == "tune":
+            result, lines = run_tune(device, args.set)
         else:
             result, lines = run_capture(device, args.duration_ms, args.warmup_frames)
 
@@ -274,8 +345,8 @@ def main() -> int:
     print(json.dumps(payload, indent=2, sort_keys=True))
     print(f"RAW_LOG={raw_path}")
     print(f"SUMMARY_JSON={json_path}")
-    if args.mode == "challenge" and not bool(result.get("passed")):
-        print(f"CHALLENGE FAILED: {result.get('after')}")
+    if args.mode in {"challenge", "calibrate"} and not bool(result.get("passed")):
+        print(f"{args.mode.upper()} FAILED: {result}")
         return 1
     return 0
 
