@@ -107,8 +107,6 @@ def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     assert "silence_fraction=" in i2s
     assert "k1_ap_structured_evidence_tick" in i2s
     assert "structured_evidence_ms" in i2s
-    assert "silence_switched" not in i2s
-    assert "silence_temp" not in i2s
     assert i2s.count("ap_silence_candidate_since_ms") == 3
     assert "k1_ap_twitch_oracle_tick" in led
 

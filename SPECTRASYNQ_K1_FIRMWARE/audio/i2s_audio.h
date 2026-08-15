@@ -405,10 +405,14 @@ void init_i2s() {
 
 void acquire_sample_chunk(uint32_t t_now) {
   static int8_t sweet_spot_state_last = 0;
+  static bool silence_temp = false;
+  static uint32_t silence_switched = 0;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
   // Dedicated timer for the AP input classifier. The Sweet Spot state machine
   // below must never reset it: doing so couples two independent hysteresis loops
   // and can keep confirmed silence visually active forever.
   static uint32_t ap_silence_candidate_since_ms = 0;
+#endif
   static float silent_scale_last = 1.0;
   static uint32_t last_state_change_time = 0;
   static const uint32_t MIN_STATE_DURATION_MS = 1500; // 1 second minimum in each state
@@ -1003,6 +1007,9 @@ void acquire_sample_chunk(uint32_t t_now) {
             last_state_change_time = t_now;
 
             if (sweet_spot_state == -1) {
+                silence_temp = true;
+                silence_switched = t_now;
+
                 if (previous_state != -1) {
                      // *** Use RAW value for deadband check ***
                      float agc_delta = threshold_silence - max_waveform_val_raw; // Use pre-calculated threshold
@@ -1135,9 +1142,19 @@ void acquire_sample_chunk(uint32_t t_now) {
              USBSerial.println("DEBUG: Silence broken (audio detected)");
         }
         silence = false;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
         ap_silence_candidate_since_ms = t_now;
+#else
+        silence_temp = false;
+        silence_switched = t_now;
+#endif
     } else {
+#ifdef K1_AP_DRIVE_CONTRACT_V1
          if (t_now - ap_silence_candidate_since_ms >= SILENCE_DWELL_MS) {
+#else
+         silence_temp = true;
+         if (t_now - silence_switched >= SILENCE_DWELL_MS) {
+#endif
             if (!silence && debug_mode) {
                 USBSerial.println("DEBUG: Extended silence detected (dwell met)");
             }
