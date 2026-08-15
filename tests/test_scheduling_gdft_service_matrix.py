@@ -94,6 +94,7 @@ def test_resolved_matrix_preserves_the_exact_service_tuple_and_one_flag_delta():
         "env:k1_bench_scheduling_gdft_cross80_probe": "-DK1_GDFT_X2_CROSSOVER_BIN=80u",
     }
     baseline = resolved[baseline_name]
+    assert baseline["upload_speed"] == 460800
     baseline_flags = list(baseline["build_flags"])
     baseline_defines = _define_values(baseline_flags)
     required = {

@@ -67,3 +67,63 @@ def test_summary_fails_visible_on_sequence_gap_and_timestamp_inversion():
     summary = module.summarise_rows(rows, {}, 12800, 96, 3)
     assert summary["capture_sequence_gap_count"] == 1
     assert summary["timestamp_order_failure_count"] == 1
+
+
+def test_quiet_capture_option_disables_audio_player_and_records_the_boundary():
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert '"--no-playback"' in source
+    branch = source.index("if args.no_playback:")
+    popen = source.index("subprocess.Popen(", branch)
+    else_branch = source.rfind("else:", branch, popen)
+    assert branch < else_branch < popen
+    assert '"no audio playback"' in source
+
+
+def test_buffered_dump_wait_is_bounded_but_long_enough_for_complete_export():
+    source = SCRIPT.read_text(encoding="utf-8")
+    assert '"--dump-timeout-seconds"' in source
+    assert "default=90.0" in source
+    assert '"APCAD_CAPTURE_DONE",\n                args.dump_timeout_seconds' in source
+    assert 'dump_timeout_seconds < 15.0 or args.dump_timeout_seconds > 300.0' in source
+
+
+def test_incomplete_serial_dump_overrides_any_prefix_classification():
+    module = load_capture_module()
+    summary = {
+        "classification": "D_legacy_nov_capture_not_comparable",
+        "row_count": 100,
+        "capture_metadata": {"begin": {"count": 120}, "done": {}},
+    }
+    module.apply_capture_completion(summary, False)
+    assert summary["capture_complete"] is False
+    assert summary["capture_admissible"] is False
+    assert summary["classification"] == "F_incomplete_serial_dump"
+    assert "received rows" in summary["classification_reason"]
+
+    complete = {
+        "classification": "B_ap_compute_overrun",
+        "row_count": 120,
+        "capture_metadata": {
+            "begin": {"count": 120},
+            "done": {"count": 120, "dropped": 0},
+        },
+    }
+    module.apply_capture_completion(complete, True)
+    assert complete["capture_complete"] is True
+    assert complete["capture_admissible"] is True
+
+
+def test_completed_dump_with_device_loss_is_inadmissible():
+    module = load_capture_module()
+    summary = {
+        "classification": "D_legacy_nov_capture_not_comparable",
+        "row_count": 120,
+        "capture_metadata": {
+            "begin": {"count": 120},
+            "done": {"count": 120, "dropped": 1},
+        },
+    }
+    module.apply_capture_completion(summary, True)
+    assert summary["capture_complete"] is True
+    assert summary["capture_admissible"] is False
+    assert summary["classification"] == "F_capture_loss"

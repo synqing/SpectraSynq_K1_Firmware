@@ -36,6 +36,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--baud", type=int, default=115200, help="Serial baud")
     parser.add_argument("--duration-ms", type=int, default=15000, help="Capture duration in milliseconds")
     parser.add_argument("--post-wait-ms", type=int, default=1000, help="Delay before dumping the buffered capture")
+    parser.add_argument(
+        "--dump-timeout-seconds",
+        type=float,
+        default=90.0,
+        help="Bounded wait for the complete buffered serial dump",
+    )
     parser.add_argument("--out-dir", default=str(DEFAULT_OUT_DIR), help="Output directory")
     parser.add_argument("--label", default="control127_apcad", help="Filename label")
     parser.add_argument("--from-raw-log", help="Classify an existing raw capture log without opening serial or playing audio")
@@ -43,6 +49,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--expected-samples-per-chunk", type=int, default=DEFAULT_EXPECTED_SAMPLES_PER_CHUNK)
     parser.add_argument("--expected-novelty-decimation", type=int, default=DEFAULT_EXPECTED_NOVELTY_DECIMATION)
     parser.add_argument("--player", choices=("afplay", "ffplay"), default="afplay")
+    parser.add_argument(
+        "--no-playback",
+        action="store_true",
+        help="Capture device timing without starting any host audio player",
+    )
     parser.add_argument("--start-ms", type=int, default=0, help="Playback offset for ffplay-backed captures")
     parser.add_argument("--playback-gain-db", type=float, default=0.0, help="Optional ffplay volume gain")
     parser.add_argument("--compact-soak", action="store_true", help="Use apcad_soak compact counters instead of buffered row dump")
@@ -718,16 +729,51 @@ def write_outputs(out_dir: Path, stem: str, raw_lines: list[str], summary: dict[
     return {"raw_log": str(raw_path), "apcad_log": str(apcad_path), "summary_json": str(summary_path)}
 
 
+def apply_capture_completion(summary: dict[str, object], terminator_received: bool) -> None:
+    """Fail closed unless the complete, lossless device buffer reached the host."""
+    metadata = summary.get("capture_metadata", {})
+    begin = metadata.get("begin", {}) if isinstance(metadata, dict) else {}
+    done = metadata.get("done", {}) if isinstance(metadata, dict) else {}
+    row_count = summary.get("row_count")
+    begin_count = begin.get("count") if isinstance(begin, dict) else None
+    done_count = done.get("count") if isinstance(done, dict) else None
+    dropped = done.get("dropped") if isinstance(done, dict) else None
+    counts_match = (
+        isinstance(row_count, int)
+        and row_count == begin_count
+        and row_count == done_count
+    )
+    complete = terminator_received and counts_match
+    admissible = complete and dropped == 0
+    summary["capture_complete"] = complete
+    summary["capture_admissible"] = admissible
+    if admissible:
+        return
+    if not complete:
+        summary["classification"] = "F_incomplete_serial_dump"
+        summary["classification_reason"] = (
+            "the completion terminator and begin/done/exported counts did not prove a "
+            "complete serial dump; statistics describe only the received rows"
+        )
+        return
+    summary["classification"] = "F_capture_loss"
+    summary["classification_reason"] = (
+        "the complete device dump reports dropped records and is inadmissible"
+    )
+
+
 def main() -> int:
     args = parse_args()
     track = Path(args.track).expanduser()
-    if not track.exists():
+    if not args.no_playback and not track.exists():
         raise RuntimeError(f"track does not exist: {track}")
     max_duration_ms = 600000 if args.compact_soak else 20000
     if args.duration_ms <= 0 or args.duration_ms > max_duration_ms:
         raise RuntimeError(f"duration-ms must be in (0, {max_duration_ms}]")
     if args.post_wait_ms < 0 or args.post_wait_ms > 10000:
         raise RuntimeError("post-wait-ms must be in [0, 10000]")
+    if args.dump_timeout_seconds < 15.0 or args.dump_timeout_seconds > 300.0:
+        raise RuntimeError("dump-timeout-seconds must be in [15, 300]")
 
     out_dir = Path(args.out_dir).expanduser()
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -757,6 +803,10 @@ def main() -> int:
                 args.expected_samples_per_chunk,
                 args.expected_novelty_decimation,
             )
+            apply_capture_completion(
+                summary,
+                any("APCAD_CAPTURE_DONE" in line for line in raw_lines),
+            )
         summary.update(
             {
                 "capture_start": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
@@ -768,14 +818,19 @@ def main() -> int:
         )
         paths = write_outputs(out_dir, stem, raw_lines, summary)
         print(json.dumps({"classification": summary["classification"], **paths}, indent=2, sort_keys=True))
-        return 0
+        return 0 if summary.get("capture_admissible", True) else 2
 
     raw_lines: list[str] = [
         f"# capture_start={time.strftime('%Y-%m-%dT%H:%M:%S%z')}",
         f"# port={args.port} baud={args.baud} duration_ms={args.duration_ms}",
-        f"# track={track}",
-        f"# track_sha256={sha_file_if_exists(track)}",
-        f"# player={args.player} start_ms={args.start_ms} playback_gain_db={args.playback_gain_db}",
+        f"# track={track if not args.no_playback else '<none>'}",
+        f"# track_sha256={sha_file_if_exists(track) if not args.no_playback else None}",
+        (
+            f"# player={args.player} start_ms={args.start_ms} "
+            f"playback_gain_db={args.playback_gain_db}"
+            if not args.no_playback
+            else "# player=<disabled>"
+        ),
         "# non_actions=no calibration,no tempo tuning,no production DSP change",
     ]
     identity = serial_identity(args.port)
@@ -803,9 +858,16 @@ def main() -> int:
             send(ser, cmd)
             raw_lines.extend(read_lines(ser, wait_s))
 
-        playback_cmd = build_playback_command(args, track)
-        raw_lines.append(f"# playback_cmd={' '.join(playback_cmd)}")
-        afplay = subprocess.Popen(playback_cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if args.no_playback:
+            raw_lines.append("# playback_cmd=<disabled>")
+        else:
+            playback_cmd = build_playback_command(args, track)
+            raw_lines.append(f"# playback_cmd={' '.join(playback_cmd)}")
+            afplay = subprocess.Popen(
+                playback_cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
         deadline = time.time() + (args.duration_ms / 1000.0)
         carry = ""
         while time.time() < deadline:
@@ -826,7 +888,11 @@ def main() -> int:
             raw_lines.append(f"# apcad_soak_status_done={done}")
         else:
             send(ser, "apcad_dump=1")
-            done, dump_lines = read_until_done(ser, "APCAD_CAPTURE_DONE", 15.0)
+            done, dump_lines = read_until_done(
+                ser,
+                "APCAD_CAPTURE_DONE",
+                args.dump_timeout_seconds,
+            )
             raw_lines.extend(dump_lines)
             raw_lines.append(f"# apcad_dump_done={done}")
         send(ser, "apcad_abort=1")
@@ -861,14 +927,19 @@ def main() -> int:
             args.expected_samples_per_chunk,
             args.expected_novelty_decimation,
         )
+        apply_capture_completion(
+            summary,
+            any("# apcad_dump_done=True" in line for line in raw_lines),
+        )
     summary.update(
         {
             "capture_start": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "port": args.port,
             "baud": args.baud,
             "duration_ms_requested": args.duration_ms,
-            "track_file": str(track),
-            "track_sha256": sha_file_if_exists(track),
+            "dump_timeout_seconds": args.dump_timeout_seconds,
+            "track_file": str(track) if not args.no_playback else None,
+            "track_sha256": sha_file_if_exists(track) if not args.no_playback else None,
             "serial_identity": identity,
             "actions": [
                 "stop",
@@ -879,20 +950,25 @@ def main() -> int:
                 "tempo_stream=off",
                 "ap_stream=off",
                 arm_cmd,
-                f"{args.player} playback",
+                f"{args.player} playback" if not args.no_playback else "no playback",
                 "apcad_soak_status=1" if args.compact_soak else "apcad_dump=1",
                 "apcad_abort=1",
             ],
-            "player": args.player,
+            "player": args.player if not args.no_playback else None,
             "start_ms": args.start_ms,
             "playback_gain_db": args.playback_gain_db,
             "compact_soak_mode": bool(args.compact_soak),
-            "non_actions": ["no calibration command", "no tempo tuning", "no production DSP change"],
+            "non_actions": [
+                "no calibration command",
+                "no tempo tuning",
+                "no production DSP change",
+            ]
+            + (["no audio playback"] if args.no_playback else []),
         }
     )
     paths = write_outputs(out_dir, stem, raw_lines, summary)
     print(json.dumps({"classification": summary["classification"], **paths}, indent=2, sort_keys=True))
-    return 0
+    return 0 if summary.get("capture_admissible", True) else 2
 
 
 if __name__ == "__main__":

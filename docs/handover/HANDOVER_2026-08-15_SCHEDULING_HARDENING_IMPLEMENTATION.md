@@ -75,3 +75,16 @@ older 34,484 figure included bins skipped before the inner loop. No production c
 has been selected: the bench disconnected before paired device and Captain-confirmed
 real-music acceptance, so Gate 3 remains dependency-blocked rather than being started on
 an unproven GDFT service contract.
+
+The bench subsequently reconnected. The first six 15-second acquisitions were only
+partial serial-export prefixes and are retained solely as negative witnesses. The
+capture path now fails incomplete dumps visibly, and a corrected complete six-run matrix
+was recorded on B489A500: cross0/cross40/cross80 with no host playback and with
+Captain-confirmed audible `Anchor Point`. Cross0 ran 92.86 Hz under music; cross40
+recovered 127.85 Hz; cross80 recovered 132.68 Hz. All three miss the pre-registered 6 ms
+active-work p99 ceiling (music p99 11.82 / 8.72 / 8.42 ms respectively). The sequential
+20-second eyes-on A/B was explicitly rejected by Captain as inconclusive. Product
+acceptance now requires at least two authorised K1 units running different builds
+simultaneously for 30–60 minutes across multiple real tracks. Only B489A500 is present,
+so Gate 2 is blocked/open and Gate 3 must not begin. The bench is restored to the cross0
+baseline; the durable `:build` readback names git `35de4e53` and the exact baseline env.

@@ -27,8 +27,8 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | 7. Activate implementation authority and branch routing | complete | active handover; repo-truth PASS; commit `82e20197` |
 | 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | complete | independently accepted at `68c9a51e`; 21/21 RED witnesses |
 | 9. Gate 1: exact-head AP/VP baseline | in progress — production hardware/music leg externally blocked; bench RMT smoke PASS and AP service RED | admitted quiet/music/crossfade timing evidence |
-| 10. Gate 2: GDFT service contract | in progress — one-variable cross0/40/80 host matrix and all three builds PASS; live musical/service selection blocked by disconnected bench | measured retain/change decision |
-| 11. Gate 3: coherent AP frame and event semantics | pending | host interleavings + device lock/freshness proof |
+| 10. Gate 2: GDFT service contract | blocked — corrected complete six-run matrix proves all candidates miss the 6 ms p99 tail margin; Captain rejected 20 s sequential product A/B as inconclusive and requires two simultaneous authorised units for 30–60 min / multiple tracks | measured retain/change decision |
+| 11. Gate 3: coherent AP frame and event semantics | dependency-blocked by open Gate 2 | host interleavings + device lock/freshness proof |
 | 12. Gate 4: transactional controls and scenes | pending | ordered/state/scene transaction proof |
 | 13. Gate 5: causal trace and startup visibility | pending | one identity through RMT completion |
 | 14. Gate 6: conditional explicit audio-task A/B | pending | PASS or NOT_REQUIRED receipt |
@@ -49,3 +49,7 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | Independent review proved the first CRC could be unrelated to FastLED's submitted bytes | 1 | Remove CRCs from the caller API; hash the actual ESP-IDF payload inside `__wrap_rmt_transmit`; add payload-mutation proof and mark the pre-fix device CRC fields inadmissible |
 | First Gate-2 matrix oracle inspected only local INI sections and manifest ownership | 1 | Resolve PlatformIO's effective graph and execute the real upload guard for authorised B489A500 and rejected F887A500 identities |
 | Second Gate-2 matrix oracle converted flags to sets, hiding duplicate/conflicting define order | 2 | Preserve the ordered flag list, require exact baseline-plus-one equality and assert one occurrence/value for every decision-critical macro |
+| First Gate-2 device upload lost its final acknowledgement at 921600 after writing 100% | 1 | Do not blindly retry; prove running build/chip identity, then hold every matrix environment at the same conservative 460800 transport speed; four subsequent guarded uploads PASS |
+| Single-unit 20-second sequential product A/B could not expose meaningful nuance | 1 | Mark inconclusive; require two simultaneous authorised K1 units, different builds, multiple real tracks and 30–60 minutes before product selection |
+| Initial 15-second APCAD acquisitions did not finish serial export | 1 | Downgrade all six to partial negative witnesses; make incomplete export fail visibly and non-zero; rerun a complete five-second matrix with a bounded 90-second dump wait and exact begin/done/row reconciliation |
+| Bare `pytest` collected vendored ESP-IDF/PlatformIO test trees and stopped on 223 missing vendor dependencies | 1 | Use the canonical project boundary `python3 -m pytest -q tests`; 1,152 passed and 1 skipped |
