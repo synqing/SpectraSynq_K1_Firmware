@@ -9,7 +9,7 @@ float K1_AP_SILENCE_RMS_EXIT = 0.02f;
 float K1_AP_SILENCE_PEAKINESS_FLOOR = 1.4f;
 float K1_AP_SILENCE_PEAKINESS_CEILING = 2.8f;
 float K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK = 128.0f;
-uint32_t K1_AP_SILENCE_STRUCTURED_BREAK_DWELL_MS = 20U;
+uint32_t K1_AP_SILENCE_STRUCTURED_EVIDENCE_MS = 300U;
 float K1_AP_FOLLOWER_FLOOR_RAW_PEAK = 32.0f;
 
 #define K1_AP_DRIVE_CONTRACT_V1
@@ -30,7 +30,7 @@ int main() {
       contract.silence_threshold.peakiness_floor != 1.4f ||
       contract.silence_threshold.peakiness_ceiling != 2.8f ||
       contract.silence_threshold.structured_break_raw_peak != 128.0f ||
-      contract.silence_threshold.structured_break_dwell_ms != 20U) return 4;
+      contract.silence_threshold.structured_evidence_ms != 300U) return 4;
   std::puts("AP_DRIVE_CONTRACT PASS");
   return 0;
 }

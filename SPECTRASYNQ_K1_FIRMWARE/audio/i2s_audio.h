@@ -11,6 +11,7 @@
 #endif
 #ifdef K1_AP_DRIVE_CONTRACT_V1
 #include "k1_ap_drive_contract.h"
+#include "k1_ap_structured_evidence.h"
 #if !defined(K1_MIC_IM69D_PDM_V1)
 #error "K1_AP_DRIVE_CONTRACT_V1 is characterised only for the IM69D diagnostic lane"
 #endif
@@ -1071,8 +1072,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     // Peak-to-mean remains useful only as one member of a joint classifier. On the
     // ratified IM1 input, matched captures showed that isolated silence transients
     // have a higher crest tail than low music. Therefore a one-sided, one-frame
-    // crest test is invalid: wake requires the bounded band and continuous dwell
-    // below, together with raw level above the measured silence ceiling.
+    // crest test is invalid: wake requires the bounded band and accumulated
+    // time-domain evidence below, together with raw level above the measured
+    // silence ceiling.
     static float k1_pk_ring[K1_SILENCE_PEAK_WIN];
     static uint16_t k1_pk_n = 0, k1_pk_i = 0;
     static float k1_pk_sum = 0.0f;
@@ -1088,8 +1090,9 @@ void acquire_sample_chunk(uint32_t t_now) {
                              ? (k1_pk_max / k1_pk_mean) : 0.0f;
 
     static bool k1_rms_silent_state = false;
-    static bool k1_structured_candidate_active = false;
-    static uint32_t k1_structured_candidate_since_ms = 0;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    static K1ApStructuredEvidenceState k1_structured_evidence = {};
+#endif
 #if defined(K1_MIC_IM69D_PDM_V1)
     // Scope-gated to the IM69D diagnostic lane. The production SPH0645 path retains
     // its independently characterised Schmitt trigger below. The new contract is
@@ -1100,18 +1103,12 @@ void acquire_sample_chunk(uint32_t t_now) {
         k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_floor &&
         k1_silence_peakiness <= ap_drive.silence_threshold.peakiness_ceiling &&
         (float)max_waveform_val_raw >= ap_drive.silence_threshold.structured_break_raw_peak;
-    if (k1_structured_candidate) {
-      if (!k1_structured_candidate_active) {
-        k1_structured_candidate_active = true;
-        k1_structured_candidate_since_ms = t_now;
-      }
-    } else {
-      k1_structured_candidate_active = false;
-      k1_structured_candidate_since_ms = t_now;
-    }
-    if (k1_structured_candidate_active &&
-        uint32_t(t_now - k1_structured_candidate_since_ms) >=
-            ap_drive.silence_threshold.structured_break_dwell_ms) {
+    const bool k1_structured_audio = k1_ap_structured_evidence_tick(
+        k1_structured_evidence,
+        k1_structured_candidate,
+        t_now,
+        ap_drive.silence_threshold.structured_evidence_ms);
+    if (k1_structured_audio) {
 #else
     if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
         (float)max_waveform_val_raw >=
@@ -1261,7 +1258,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     {
       const K1ApDriveContract dc =
           k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
-      USBSerial.printf(" | mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_wake_ms=%lu follower_floor=%.1f",
+      USBSerial.printf(" | mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_evidence_ms=%lu follower_floor=%.1f",
         dc.mic_noise_floor_raw_peak,
         dc.drive_threshold_raw_peak,
         dc.silence_threshold.raw_peak_enter,
@@ -1271,7 +1268,7 @@ void acquire_sample_chunk(uint32_t t_now) {
         dc.silence_threshold.peakiness_floor,
         dc.silence_threshold.peakiness_ceiling,
         dc.silence_threshold.structured_break_raw_peak,
-        (unsigned long)dc.silence_threshold.structured_break_dwell_ms,
+        (unsigned long)dc.silence_threshold.structured_evidence_ms,
         dc.follower_floor_raw_peak);
     }
 #endif
@@ -1415,6 +1412,7 @@ void ap_capture_arm(uint32_t ms) {
   for (uint16_t i = 0; i < K1_AP_CAPTURE_RMS_HIST_BINS; i++) ap_capture_rms_hist[i] = 0;
   for (uint16_t i = 0; i < K1_AP_CAPTURE_PEAKINESS_HIST_BINS; i++) ap_capture_peakiness_hist[i] = 0;
   ap_capture_silence_frames = 0;
+  ap_capture_structured_candidate_frames = 0;
 #endif
 }
 
@@ -1469,6 +1467,13 @@ void ap_capture_tick() {
       ap_capture_peakiness_hist[peakiness_bin]++;
     }
     if (silence) ap_capture_silence_frames++;
+    const K1ApDriveContract dc =
+        k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
+    if (k1_silence_peakiness >= dc.silence_threshold.peakiness_floor &&
+        k1_silence_peakiness <= dc.silence_threshold.peakiness_ceiling &&
+        mr >= dc.silence_threshold.structured_break_raw_peak) {
+      ap_capture_structured_candidate_frames++;
+    }
   }
 #endif
   ap_capture_frames++;
@@ -1512,7 +1517,9 @@ void ap_capture_tick() {
       const K1ApDriveContract dc = k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
       const float silence_fraction = ap_capture_frames
           ? float(ap_capture_silence_frames) / float(ap_capture_frames) : 0.0f;
-      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_wake_ms=%lu follower_floor=%.1f\n",
+      const float structured_fraction = ap_capture_frames
+          ? float(ap_capture_structured_candidate_frames) / float(ap_capture_frames) : 0.0f;
+      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f structured_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_evidence_ms=%lu follower_floor=%.1f\n",
         (unsigned long)ap_capture_frames,
         unsigned(pp05) * 8U, unsigned(pp10) * 8U, unsigned(pp50) * 8U,
         unsigned(pp95) * 8U, unsigned(pp99) * 8U,
@@ -1520,12 +1527,13 @@ void ap_capture_tick() {
         float(rp95) / 10000.0f, float(rp99) / 10000.0f,
         float(kp05) / 100.0f, float(kp10) / 100.0f, float(kp50) / 100.0f,
         float(kp95) / 100.0f, float(kp99) / 100.0f, silence_fraction,
+        structured_fraction,
         dc.mic_noise_floor_raw_peak, dc.drive_threshold_raw_peak,
         dc.silence_threshold.raw_peak_enter, dc.silence_threshold.raw_peak_exit,
         dc.silence_threshold.rms_enter, dc.silence_threshold.rms_exit,
         dc.silence_threshold.peakiness_floor, dc.silence_threshold.peakiness_ceiling,
         dc.silence_threshold.structured_break_raw_peak,
-        (unsigned long)dc.silence_threshold.structured_break_dwell_ms,
+        (unsigned long)dc.silence_threshold.structured_evidence_ms,
         dc.follower_floor_raw_peak);
     }
 #endif

@@ -10,7 +10,7 @@ struct K1ApSilenceThreshold {
   float peakiness_floor;
   float peakiness_ceiling;
   float structured_break_raw_peak;
-  uint32_t structured_break_dwell_ms;
+  uint32_t structured_evidence_ms;
 };
 
 struct K1ApDriveContract {
@@ -34,7 +34,7 @@ inline K1ApDriveContract k1_ap_drive_contract_resolve(float measured_mic_noise_f
       K1_AP_SILENCE_PEAKINESS_FLOOR,
       K1_AP_SILENCE_PEAKINESS_CEILING,
       K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK,
-      K1_AP_SILENCE_STRUCTURED_BREAK_DWELL_MS,
+      K1_AP_SILENCE_STRUCTURED_EVIDENCE_MS,
     },
     K1_AP_FOLLOWER_FLOOR_RAW_PEAK,
   };

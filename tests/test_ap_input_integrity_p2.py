@@ -71,6 +71,29 @@ def test_four_role_contract_mutation_goes_red(tmp_path):
     assert "drive threshold aliased" in result.stderr
 
 
+def test_structured_evidence_rejects_transient_and_mutation_goes_red(tmp_path):
+    compiler = shutil.which("c++") or shutil.which("clang++") or shutil.which("g++")
+    assert compiler
+    harness = ROOT / "scripts" / "regression-harness" / "ap_structured_evidence_test.cpp"
+    include = FW / "audio"
+
+    normal = tmp_path / "ap-structured-evidence-normal"
+    subprocess.run(
+        [compiler, "-std=c++17", "-Wall", "-Wextra", "-Werror", "-I", str(include), str(harness), "-o", str(normal)],
+        check=True,
+        cwd=ROOT,
+    )
+    assert subprocess.run([normal], cwd=ROOT).returncode == 0
+
+    mutated = tmp_path / "ap-structured-evidence-mutated"
+    subprocess.run(
+        [compiler, "-std=c++17", "-Wall", "-Wextra", "-Werror", "-DK1_AP_STRUCTURED_EVIDENCE_MUTATION_ONE_FRAME", "-I", str(include), str(harness), "-o", str(mutated)],
+        check=True,
+        cwd=ROOT,
+    )
+    assert subprocess.run([mutated], cwd=ROOT).returncode != 0
+
+
 def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     i2s = (FW / "audio" / "i2s_audio.h").read_text(encoding="utf-8")
     noise_cal = (FW / "calibration" / "noise_cal.h").read_text(encoding="utf-8")
@@ -82,8 +105,8 @@ def test_health_and_drive_paths_are_flag_gated_and_fail_closed():
     assert "if (silence) {\n      max_waveform_val = 0.0f;" in i2s
     assert "ap_capture_peakiness_hist" in i2s
     assert "silence_fraction=" in i2s
-    assert "k1_structured_candidate_since_ms" in i2s
-    assert "structured_break_dwell_ms" in i2s
+    assert "k1_ap_structured_evidence_tick" in i2s
+    assert "structured_evidence_ms" in i2s
     assert "k1_ap_twitch_oracle_tick" in led
 
 

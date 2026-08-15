@@ -432,6 +432,7 @@ inline uint16_t ap_capture_rms_hist[K1_AP_CAPTURE_RMS_HIST_BINS] = { 0 };
 // from the deliberately lossy serial stream.
 inline uint16_t ap_capture_peakiness_hist[K1_AP_CAPTURE_PEAKINESS_HIST_BINS] = { 0 };
 inline uint32_t ap_capture_silence_frames = 0;
+inline uint32_t ap_capture_structured_candidate_frames = 0;
 #endif
 #endif
 
@@ -893,7 +894,9 @@ inline float    k1_silence_rms_raw   = 0.0f;      // last raw per-frame RMS (pre
 // peakiness p95=3.58; low music peak p50=752, peakiness p05/p95=1.43/2.19.
 // The old one-frame "high crest means music" escape was backwards for this input:
 // the room-floor tail had the higher crest. Wake now requires a bounded music-like
-// crest, raw level above the silence p99, and a 20 ms continuous dwell. Values remain
+// crest, raw level above the silence distribution, and 300 ms of net time-domain
+// evidence. Candidate time fills the accumulator and non-candidate time drains it,
+// rejecting isolated room transients without using frame-count timing. Values remain
 // diagnostic-only until P4.
 inline float K1_AP_DRIVE_THRESHOLD_RAW_PEAK = 416.0f;
 inline float K1_AP_SILENCE_RAW_PEAK_ENTER = 400.0f;
@@ -903,7 +906,7 @@ inline float K1_AP_SILENCE_RMS_EXIT = 0.030f;
 inline float K1_AP_SILENCE_PEAKINESS_FLOOR = 1.42f;
 inline float K1_AP_SILENCE_PEAKINESS_CEILING = 2.80f;
 inline float K1_AP_SILENCE_STRUCTURED_BREAK_RAW_PEAK = 640.0f;
-inline uint32_t K1_AP_SILENCE_STRUCTURED_BREAK_DWELL_MS = 20U;
+inline uint32_t K1_AP_SILENCE_STRUCTURED_EVIDENCE_MS = 300U;
 // Denominator-only safety floor. Fixed independently below the smallest retained
 // post-threshold low-music excursions; it is not the calibrated microphone floor.
 inline float K1_AP_FOLLOWER_FLOOR_RAW_PEAK = 64.0f;
