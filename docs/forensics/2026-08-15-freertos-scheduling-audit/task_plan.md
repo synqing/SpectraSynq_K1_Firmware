@@ -43,3 +43,4 @@ Captain's 2026-08-15 unrestricted implementation authority.
 | Packaged DOCX renderer lacked `pdf2image` in the selected Python runtime | 1 | Use the skill's documented manual LibreOffice -> PDF -> PNG render path; do not install dependencies |
 | Bootstrap repo-truth rejected the implementation branch because `docs/spec-index.md` still named `main`/AP input as current | 1 | Record Captain's new authority in a scheduling handover and atomically update the active branch/lane pointers before source work |
 | Source-manifest command was rejected because it used `rm -f` on a temporary glob | 1 | Use a fresh `mktemp -d` manifest directory and create no pre-existing targets |
+| First anchored Gate 0 test froze the live source-file count at 537 | 1 | Reject commit `19047912` before acceptance; keep the exact historical population in the provenance artefact and make the reusable manifest test deterministic while allowing later gate source/tests |

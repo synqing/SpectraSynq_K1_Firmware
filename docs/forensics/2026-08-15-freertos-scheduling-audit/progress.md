@@ -72,3 +72,9 @@
 - Gate 0 remains `in progress` until the oracle unit is committed/pushed and an
   independent runner verifies the clean anchored commit and writes the acceptance
   receipt.
+- Root review rejected the first anchored oracle commit `19047912` before independent
+  acceptance: its focused test asserted that the live first-party source count must
+  remain exactly 537. That would turn every later gate's required source/test addition
+  into a false trust-root failure. The exact Gate 0 population remains anchored in the
+  generated provenance artefact; the reusable test now proves deterministic manifest
+  generation and first-party coverage while each gate freezes its own expected digest.
