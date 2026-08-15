@@ -46,3 +46,29 @@ sample freshness, stack margin, RMT completion timing or physical latency.
   configured.
 - The current skills.sh pages still do not provide a higher-authority FreeRTOS/K1
   planning skill than the repo-local embedded and architecture guidance. No install.
+
+## Implementation authority and model synthesis — 2026-08-15
+
+- Captain's new directive authorises the scheduling Gate 0-8 implementation and
+  supersedes the scheduling lane's pre-implementation byte hold.
+- The AP-input P4 promotion remains a distinct programme: do not bundle microphone
+  slot/health/calibration changes into scheduling commits.
+- Cynefin classification: governance and structural ratchets are clear; ownership and
+  concurrency design are complicated; device timing and perceptual GDFT choice are
+  complex safe-to-fail probes.
+- Systems leverage order remains service demand -> freshness -> publication ownership ->
+  scheduler experiment; priority changes cannot repay accumulated sample age.
+- TRIZ separations retained: shared publication versus VP-local lifetime; continuous
+  state versus discrete events; request isolation versus flash/cache coexistence.
+- Margin values must be pre-registered from the exact baseline, not guessed from the
+  nominal 7.5 ms/8.33 ms periods.
+- Agent Reach used Jina Reader. Current skills.sh results list `embedded-systems`,
+  `freertos` and `esp32-firmware-engineer`; none outranks current repo/source/ESP-IDF
+  authority and none was installed.
+- ESP-IDF 5.4.1 official documentation confirms the modified dual-core ESP-IDF FreeRTOS
+  implementation and provides ring-buffer/idle-hook primitives. Primitive availability
+  is not evidence that a new task or queue benefits K1.
+- The installed generic actor skill's Core-1 DSP premise conflicts with K1's measured
+  AP0/VP1 bulkhead. Retain bounded communication and stack/queue visibility only.
+- Atomic Agents is not a firmware dependency. Writing-skills routes recurring rules to
+  executable ratchets rather than a new project-specific prose skill.

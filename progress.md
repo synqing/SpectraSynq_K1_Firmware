@@ -2,6 +2,21 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-15 — Scheduling hardening implementation takeover
+
+**Active authority:** `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
+**Lane:** `K1_SCHEDULING_HARDENING_20260815` on
+`feat/k1-scheduling-generation-hardening`
+**Authorisation:** `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15`
+
+- Captain authorised end-to-end implementation of the committed Gate 0-8 plan.
+- This supersedes the scheduling lane's byte-inert planning hold without declaring the
+  separate AP-input-integrity P4 promotion complete.
+- Gate 0 is active: inventory and prove the oracle/fault battery before any production
+  implementation unit.
+- Locked topology remains AP/Core 0 and VP/Core 1; broad actor rewrite, Core-1 DSP and
+  speculative priority/pacing changes remain rejected.
+
 ## 2026-08-15 — AP input-integrity takeover
 
 **Active authority:** `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`

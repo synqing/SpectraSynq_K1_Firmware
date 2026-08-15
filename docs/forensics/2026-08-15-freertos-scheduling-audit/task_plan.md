@@ -1,14 +1,15 @@
-# Scheduling hardening plan-fold task
+# Scheduling hardening implementation
 
 ## Goal
 
-Fold Captain's post-review recommendations into the reconciled K1 FreeRTOS
-execution plan without changing firmware or crossing the active P4 boundary.
+Implement and verify the complete K1 scheduling hardening Gate 0-8 programme under
+Captain's 2026-08-15 unrestricted implementation authority.
 
 ## Constraints
 
 - Current source and on-disk lane authority outrank historical evidence.
-- Production firmware remains byte-inert.
+- Captain's new directive authorises scheduling-source mutation after Gate 0; the
+  separate AP-input P4 slot/health promotion remains open.
 - The result must distinguish state, discrete events, commands and telemetry.
 - No task extraction is an assumed destination.
 - Every implementation gate must have an external, fault-evident acceptance gate.
@@ -23,6 +24,16 @@ execution plan without changing firmware or crossing the active P4 boundary.
 | 4. Amend the audit and write the standalone execution plan | complete | Markdown authorities |
 | 5. Produce and visually verify the retained-template document | complete | final DOCX; 8/8 pages inspected |
 | 6. Run structural/document validation and close proof ledger | complete | current-HEAD host and document gates |
+| 7. Activate implementation authority and branch routing | in progress | active handover; repo-truth PASS |
+| 8. Gate 0: provenance, contracts, deterministic oracle and RED fault battery | pending | independently accepted Gate 0 receipt |
+| 9. Gate 1: exact-head AP/VP baseline | pending | admitted quiet/music/crossfade timing evidence |
+| 10. Gate 2: GDFT service contract | pending | measured retain/change decision |
+| 11. Gate 3: coherent AP frame and event semantics | pending | host interleavings + device lock/freshness proof |
+| 12. Gate 4: transactional controls and scenes | pending | ordered/state/scene transaction proof |
+| 13. Gate 5: causal trace and startup visibility | pending | one identity through RMT completion |
+| 14. Gate 6: conditional explicit audio-task A/B | pending | PASS or NOT_REQUIRED receipt |
+| 15. Gate 7A/7B: service requests and flash/cache safety | pending | independently closed selected scope |
+| 16. Gate 8: one-HEAD integration and promotion | pending | full gates, rollback and Captain sign-off |
 
 ## Errors encountered
 
@@ -30,3 +41,4 @@ execution plan without changing firmware or crossing the active P4 boundary.
 |---|---:|---|
 | Full-history spawn rejected an explicit agent type | 1 | Relaunched with inherited agent type and received an agent id |
 | Packaged DOCX renderer lacked `pdf2image` in the selected Python runtime | 1 | Use the skill's documented manual LibreOffice -> PDF -> PNG render path; do not install dependencies |
+| Bootstrap repo-truth rejected the implementation branch because `docs/spec-index.md` still named `main`/AP input as current | 1 | Record Captain's new authority in a scheduling handover and atomically update the active branch/lane pointers before source work |

@@ -1,18 +1,18 @@
 # ACTIVE LANE POINTER
 
-**READ FIRST:** `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`
+**READ FIRST:**
+`docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
-Authorisation: `CONDITIONAL_GO_P0_MEASUREMENT_ONLY` against
-`docs/plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md` (Rev B).
-P0's kill criterion FIRED — both IM69D capsules are alive; the fault is mono slot
-semantics. Static mapping now resolves IM1 → ESP-IDF RIGHT → PCM 0 and IM2 → ESP-IDF
-LEFT → PCM 1. Captain RATIFIED G1 on 2026-08-15. T0.3 is COMPLETE: bench/diagnostic
-IM69D envs are explicit, the ratchets/builds pass, and protected production environments
-are byte-identical. No further physical microphone test is authorised. Production slot
-promotion remains held until P4.
+Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
+`feat/k1-scheduling-generation-hardening`.
 
-Canon: `docs/canon/SESSION_CANON_2026-08-14b_MEASUREMENT_INTEGRITY.md` (HF-69..80).
-Skills `k1-measurement-discipline` + `k1-colour-truth` auto-load the rules.
+The active programme is the contained Gate 0-8 scheduling hardening plan. AP stays on
+Core 0, VP stays on Core 1, the harness/fault battery precedes production units, and an
+explicit audio task remains conditional. The separate AP-input-integrity P4 promotion is
+still open; no unrelated microphone slot/health/calibration change is implied by this lane.
+
+Physical proof still requires exact device identity, guarded environment pairing and
+Captain-confirmed acoustic conditions.
 
 ---
 (superseded) 2026-08-14 colour-lane DC/cal handover — the DC work landed; its

@@ -33,14 +33,14 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
-**Active lane (2026-08-15):** `K1_AP_INPUT_INTEGRITY_20260814` on `main`.
-Authority: `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`.
-P0 refuted the dead-capsule diagnosis and resolved the slot mapping statically:
-IM1 SELECT HIGH → ESP-IDF RIGHT → PCM 0; IM2 SELECT LOW → ESP-IDF LEFT → PCM 1.
-Captain RATIFIED G1 on 2026-08-15. T0.3 is complete: bench/diagnostic IM69D environments
-are explicit and ratcheted; do not ask Captain to operate or interpret another microphone
-measurement. No production slot change is authorised before P4, and production
-byte-inertness is proved with `scripts/regression-harness/mic_stable_byte_gate.sh`.
+**Active lane (2026-08-15):** `K1_SCHEDULING_HARDENING_20260815` on
+`feat/k1-scheduling-generation-hardening`.
+Authority:
+`docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`.
+Captain authorised end-to-end Gate 0-8 scheduling implementation. AP remains on Core 0,
+VP remains on Core 1, and the fault-evident oracle precedes production units. The separate
+AP-input-integrity P4 slot/health promotion remains open; scheduling authority does not
+silently promote microphone or calibration changes.
 
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 

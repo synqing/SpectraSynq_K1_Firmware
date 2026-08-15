@@ -26,3 +26,14 @@
   AP-input-integrity P2 tests passed, and production radio isolation was proven.
 - Closed the plan-fold lane without production firmware, build, device, serial or GUI
   mutation. The next implementation branch remains inert until AP-P4 permits work.
+
+## 2026-08-15 — implementation start
+
+- Captain authorised full end-to-end implementation on the dedicated scheduling branch.
+- Restored the committed planning ledger, ran session bootstrap and found a deliberate
+  branch/active-lane mismatch: the feature branch existed but governance still named
+  `main` and the AP-input lane.
+- Classified Captain's directive as a scheduling implementation override, not a silent
+  completion of the separate AP-input P4 promotion.
+- Began the atomic active-handover/spec-index/handoff/progress update required to make
+  repo-truth pass before source mutation.
