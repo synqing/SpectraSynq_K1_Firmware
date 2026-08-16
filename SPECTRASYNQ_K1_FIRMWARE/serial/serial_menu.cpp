@@ -35,6 +35,8 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "globals.h"    // CONFIG + global state (serial_menu.h:8)
 #include "constants.h"  // NUM_AGC_BANDS etc. (serial_menu.h:9)
 #include "k1_trace.h"   // (serial_menu.h:10)
+#include "k1_prsm.h"
+#include "k1_authored_source.h"
 #ifdef K1_TUNABLE_REGISTRY_V1
 #include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
 #endif
@@ -3753,18 +3755,28 @@ void check_serial(uint32_t t_now) {
   serial_iter++;
 
   // Non-blocking Serial input, without overwriting unprocessed data
-  static uint32_t last_check = 0;
   static bool command_mode = false;
+  static k1_prsm_scanner_t prsm_scanner = {};
 
-  if (t_now - last_check > 10) {
-    last_check = t_now;
-
+  /* Drain every AP tick (not 10 ms). 120 Hz PRSM is 4080 B/s; a 32-byte/10 ms
+   * cap starves the stream. Magic scanner MUST run before hotkeys: PRSM is
+   * 'P''R''S''M' and P/R/S are immediate hotkeys. */
     uint8_t bytes_processed = 0;
-    while (USBSerial.available() && bytes_processed < 32) {
+    while (USBSerial.available() && bytes_processed < 128) {
       uint8_t byte = USBSerial.read();
       bytes_processed++;
 
       if (!command_mode) {
+        k1_prsm_frame_t prsm_frame;
+        const k1_prsm_scan_result_t scan =
+            k1_prsm_scanner_push(&prsm_scanner, byte, &prsm_frame);
+        if (scan != K1_PRSM_SCAN_NONE) {
+          if (scan == K1_PRSM_SCAN_FRAME_OK) {
+            k1_authored_on_frame(&prsm_frame, t_now);
+          }
+          continue;
+        }
+
         if (byte == ':') {
           command_mode = true;
           memset(&command_buf, 0, sizeof(char) * 128);
@@ -3802,7 +3814,6 @@ void check_serial(uint32_t t_now) {
         }
       }
     }
-  }
 }
 void stream_agc_data(uint32_t t_now) {
   if (!stream_agc_debug || t_now % 100 != 0) {

@@ -48,6 +48,7 @@
 #include "system.h"           // Watch how fast I can check if settings were updated... yada yada..
 #include "GDFT.h"             // Conversion to (and post-processing of) frequency data! (hey, something cool!)
 #include "k1_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
+#include "k1_authored_source.h" // PRSM authored ingress (one snapshot writer)
 #include "k1_onset_beat.h"    // Smart Visual Engine AP onset/beat event lane
 #include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
@@ -1035,7 +1036,26 @@ void loop() {
       ap_cadence_stage_timing.snapshot_start_us = (uint64_t)esp_timer_get_time();
     }
 #endif
-    k1_audio_snapshot_update(t_now);
+    k1_authored_tick(t_now);
+    if (k1_authored_suppresses_live_update()) {
+      k1_authored_intent_t authored;
+      if (k1_authored_intent(&authored)) {
+        K1AudioSnapshot next = {};
+        next.frame_ms = authored.frame_ms;
+        next.peak_scaled = authored.peak_scaled;
+        next.vu_level = authored.vu_level;
+        next.novelty = authored.novelty;
+        next.spectral_energy = authored.spectral_energy;
+        next.low_energy = authored.low_energy;
+        next.mid_energy = authored.mid_energy;
+        next.high_energy = authored.high_energy;
+        next.chroma_strength = 0.0f;
+        next.silence = authored.silence;
+        k1_audio_snapshot_publish(next);
+      }
+    } else {
+      k1_audio_snapshot_update(t_now);
+    }
     const K1AudioSnapshot k1_audio_snapshot = k1_audio_snapshot_read();
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
