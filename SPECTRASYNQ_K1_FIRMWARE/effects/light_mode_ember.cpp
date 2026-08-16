@@ -1,5 +1,6 @@
 #include "lightshow_modes.h"
 #include "k1_audio_snapshot.h"
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_ember — "Ember Field": a continuous, breathing field of glowing
@@ -40,7 +41,7 @@ void light_mode_ember(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       cached_gradient_palette(render_params_palette_index(rp, render_secondary), render_secondary);
   const uint16_t HALF = NATIVE_RESOLUTION / 2;
 
-  K1AudioSnapshot snap = k1_audio_snapshot_read();
+  K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   float energy = snap.spectral_energy;
   if (!isfinite(energy) || energy < 0.0f) energy = 0.0f;
   if (energy > 1.0f) energy = 1.0f;

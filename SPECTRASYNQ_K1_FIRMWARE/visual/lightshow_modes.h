@@ -7,6 +7,7 @@
 #include "Palettes.h" // Needed for palettes
 #include "render_params.h" // RenderParams visible to all light_mode_*.cpp
 #include "channel_effect_state.h" // Per-channel effect state for vu_dot/kaleidoscope
+#include "k1_vp_audio_access.h"
 
 // Row 2: tx_begin/tx_end have external linkage and are defined in serial_menu.h,
 // compiled in the .ino TU. The inline vp_run_output_probe harness below calls them.
@@ -20,7 +21,7 @@ inline void get_smooth_spectrogram() {
   static SQ15x16 spectrogram_smooth_last[NUM_FREQS];
 
   for (uint8_t bin = 0; bin < NUM_FREQS; bin++) {
-    SQ15x16 note_brightness = spectrogram[bin];
+    SQ15x16 note_brightness = k1_vp_spectrogram[bin];
 
     // Phase 1 2026-05-20: asymmetric attack/release (was symmetric 0.75/0.75 — flattened transients).
     if (spectrogram_smooth[bin] < note_brightness) {

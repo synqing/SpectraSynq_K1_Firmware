@@ -12,7 +12,7 @@
  *                          / broadband + per-band onset (kick/snare/hihat).
  *
  * READ-ONLY ADAPTER. This type holds const pointers to caller-owned K1 structs
- * and maps their fields on demand. It does NOT call `k1_audio_snapshot_read()`
+ * and maps their fields on demand. It does NOT call `k1_vp_audio_snapshot_read()`
  * and adds NO behaviour to any build — the render-path wiring that actually
  * populates it from the live snapshot is P3. The K1 audio DSP is untouched.
  *
@@ -48,6 +48,7 @@
 
 // K1 audio read surface (READ — we include the header, add no behaviour).
 #include "k1_audio_snapshot.h"
+#include "k1_vp_audio_access.h"
 
 namespace k1 {
 namespace effects {

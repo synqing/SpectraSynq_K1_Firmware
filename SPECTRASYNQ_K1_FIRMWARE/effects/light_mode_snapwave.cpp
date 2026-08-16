@@ -2,6 +2,7 @@
 #include "k1_audio_snapshot.h"
 #include "k1_tempo.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_snapwave — tonal chroma phase-interference oscillator.
@@ -51,8 +52,8 @@ void light_mode_snapwave(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  K1AudioSnapshot snap = k1_audio_snapshot_read();
-  K1TempoEvent tempo = k1_tempo_read();
+  K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+  K1TempoEvent tempo = k1_vp_tempo_read();
 
   const float peak = snap_clamp01(snap.peak_scaled);
   const float beat_strength = snap_clamp01(tempo.beat_strength);

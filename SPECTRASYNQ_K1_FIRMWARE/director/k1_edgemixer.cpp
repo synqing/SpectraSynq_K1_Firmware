@@ -17,6 +17,7 @@
 // CONFIG.PALETTE_MODE_ENABLED (primary) + SECONDARY_PALETTE_MODE_ENABLED
 // (secondary), both in globals.h. Compiled out without the flag.
 #include "globals.h"
+#include "k1_vp_audio_access.h"
 #endif
 
 // Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
@@ -971,7 +972,7 @@ static void k1_edge_apply_stm(CRGB16* buf, uint16_t count, K1EdgeMixerMode mode,
   }
   // Loudness-gated modulation depth. agc_loudness_norm (globals.h) is the pre-
   // normalisation broadband loudness — the ONLY signal that tracks volume, because
-  // spectrogram[] / peak_scaled are AGC-flattened (measured near-constant across
+  // k1_vp_spectrogram[] / peak_scaled are AGC-flattened (measured near-constant across
   // silence vs loud EDM: peak_scaled 0.58 vs 0.67). Silence-gated -> depth 0 (strips
   // untouched); louder -> deeper STM modulation, so the strips pulse with the
   // actual dynamics rather than dimming by a constant amount.

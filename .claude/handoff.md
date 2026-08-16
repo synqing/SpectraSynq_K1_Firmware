@@ -6,13 +6,24 @@
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
 
+**Live task plan (2026-08-16 evening restamp):**
+[`docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md`](../docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md)
+
 The active programme is the contained Gate 0-8 scheduling hardening plan. AP stays on
 Core 0, VP stays on Core 1, the harness/fault battery precedes production units, and an
-explicit audio task remains conditional. Captain stamped G0R **A** (2026-08-16 AWST):
-deployed 7.5 ms hop remains controlling; Gate 2 stays red against 6 ms p99; Gate 3
-blocked; B489 flash HOLD until a separate GO. The separate AP-input-integrity P4
-promotion is still open; no unrelated microphone slot/health/calibration change is
-implied by this lane.
+explicit audio task remains conditional.
+
+**Captain restamp (2026-08-16 evening AWST):**
+- Hop remains 12.8 kHz / 96 / d3 / 7.5 ms (stamp **A**: no 10 ms hop).
+- AP service p99 = **8000 µs** (the 6 ms / 0.8 fraction is STRUCK).
+- Gate 2 close-out = promote **Cross40 + Lane-4** onto `k1_hardware`.
+- Gate 3 is **UNBLOCKED** after that G2 close-out (not forever blocked).
+- G0R cadence plan is **SUPERSEDED for live execution**.
+- B489 flash only under named GO tokens; F887 NO until G8.
+- Rolling ACF / scheduler theatre are out of programme.
+
+The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
+slot/health/calibration change is implied by this lane.
 
 Physical proof still requires exact device identity, guarded environment pairing and
 Captain-confirmed acoustic conditions.

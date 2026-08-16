@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "amendment_id": "G2_SERVICE_8000_2026_08_16",
+  "status": "CAPTAIN_STAMPED",
+  "captain_stamp": "SERVICE_P99_8000",
+  "captain_authority_date": "2026-08-16 AWST",
+  "supersedes_service_limit": {
+    "former_formula": "ap_arrival_period_us * ap_service_p99_max_fraction_of_arrival",
+    "former_value_us": 6000,
+    "former_fraction": 0.8,
+    "reason_struck": "Captain never authorised the 0.8 haircut; AP service p99 target is and always has been 8000 \u00b5s"
+  },
+  "deployed_contract_path": "docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/contract.json",
+  "prior_contract_sha256_at_g0r_stamp_a": "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849",
+  "new_contract_sha256": "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0",
+  "fields": {
+    "AP_ARRIVAL_PERIOD_US": {
+      "old": 7500,
+      "new": 7500
+    },
+    "TEN_MS_AP_HOP_AUTHORISED": {
+      "old": false,
+      "new": false
+    },
+    "AP_SERVICE_P99_LIMIT_US": {
+      "old": 6000,
+      "new": 8000
+    },
+    "AP_PUBLICATION_FRESHNESS_BUDGET_P99_US": {
+      "old": 6000,
+      "new": 8000
+    },
+    "G2_GDFT_CONTRACT": {
+      "old": "OPEN_CHARACTERISATION",
+      "new": "CROSS40_PLUS_LANE4"
+    },
+    "G3_IMPLEMENTATION": {
+      "old": "BLOCKED",
+      "new": "UNBLOCKED_AFTER_G2_CLOSE_OUT"
+    }
+  },
+  "live_task_plan": "docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md",
+  "g0r_plan_status": "SUPERSEDED_FOR_LIVE_EXECUTION_STAMP_A_CLOSED_10MS"
+}

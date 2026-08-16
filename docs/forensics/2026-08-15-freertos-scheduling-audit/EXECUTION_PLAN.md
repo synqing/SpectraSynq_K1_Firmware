@@ -1,19 +1,63 @@
 ---
-abstract: "Active Gate 0-8 implementation plan for contained K1 scheduling, ownership and timing hardening. Preserves AP0/VP1, rejects a broad RTOS rewrite, and operates under Captain's direct 2026-08-15 scheduling implementation authority."
+abstract: "Active Gate 0-8 implementation plan for contained K1 scheduling, ownership and timing hardening. Preserves AP0/VP1, rejects a broad RTOS rewrite, and operates under Captain's direct 2026-08-15 scheduling implementation authority. Captain 2026-08-16 evening restamp: AP service p99 ≤ 8000 µs (strike 0.8×7500=6000), G2 = Cross40+Lane4 close-out, G3 unblocked."
 status: implementation-active
 production_mutation_authority: FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15
 observed_plan_fold_sha: 15d3a85d6d26e9698039a5b0d39dbaa1569718b4
+captain_service_restamp: AP_SERVICE_P99_8000_US_2026_08_16
+active_task_plan: docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md
 ---
 
 # K1 scheduling and musical-generation hardening — execution plan
 
-> **2026-08-16 G0R stamp A:** Gate 0 **oracle machinery** remains CLOSED. Captain
-> stamped **A** — deployed `gate0/contract.json` (12.8 kHz / 96 / d3 / 7.5 ms)
-> remains controlling; no 10 ms AP hop. Gate 2 service stays **RED** against the
-> frozen 6 ms p99. Gate 3 remains BLOCKED. B489 flash HOLD (this stamp is not
-> the flash GO). Plan:
-> [`docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`](../../superpowers/plans/2026-08-16-g0r-cadence-authority.md).
-> Do not erase the negative matrix below.
+> **2026-08-16 Captain restamp (evening AWST):** Gate 0 **oracle machinery** remains
+> CLOSED. Stamp **A** still holds: deployed hop is 12.8 kHz / 96 / d3 / **7500 µs**;
+> **no 10 ms AP hop**. The **6 ms** service p99 (0.8 × 7500) is **STRUCK** — Captain
+> never authorised it. Controlling AP service gate is now **p99 ≤ 8000 µs**.
+> Gate 2 close-out = promote **Cross40 + Lane-4** onto `k1_hardware`, then CLOSED.
+> Gate 3 is **UNBLOCKED** after that G2 close-out unit. Rolling ACF / scheduler theatre
+> are **out of programme**. Live task plan:
+> [`docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md`](../../superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md).
+> G0R cadence plan is **SUPERSEDED for live execution** (stamp A closed the 10 ms
+> question). Do not erase the historical Cross0/40/80 negative matrix below.
+
+## Gate status after restamp
+
+| Gate | Status | Meaning |
+|---|---|---|
+| 0 oracle | CLOSED | machinery / trust root unchanged |
+| 0 content | AMENDED | absolute `ap_service_p99_max_us: 8000`; 0.8 fraction struck |
+| 1 | PARTIAL | B489 smoke stands; F887 baseline still absent — does not block G2 close-out or G3 host work |
+| 2 | CLOSE-OUT UNIT | promote Cross40+Lane4; host/build green; B489 music p99 ≤ 8000 µs + Captain eyes-on; then CLOSED |
+| 3–8 | SCOPED / UNBLOCKED in sequence | coherent frame → commands → causal trace → conditional audio task → persistence → promotion |
+
+```text
+EXECUTION_MODE                    = SEQUENTIAL_SINGLE_LANE
+AP_ARRIVAL_PERIOD_US              = 7500
+AP_SERVICE_P99_LIMIT_US           = 8000
+TEN_MS_AP_HOP_AUTHORISED          = NO
+G2_GDFT_CONTRACT                  = CROSS40_PLUS_LANE4
+G3_IMPLEMENTATION                 = UNBLOCKED_AFTER_G2_CLOSE_OUT
+F887_FLASH                        = NO_UNTIL_G8_SEPARATE_GO
+B489_FLASH                        = NAMED_GATES_ONLY_SEPARATE_GO
+ROLLING_ACF / SCHEDULER_THEATRE   = OUT_OF_PROGRAMME
+```
+
+Hop health remains **separate** from the 8 ms CPU gate: cadence ~133 Hz,
+`max_consecutive_over_period ≤ 1`, sample-age STABLE on music. Emit frames may exceed
+7500 µs wall-clock and still pass 8000 µs service p99.
+
+## Red-team stops (binding)
+
+- **G3 copy cost:** if publish+acquire lock hold pushes music p99 above 8000 µs, do not
+  “fix” with a 10 ms hop or priority raise. Fall back to Candidate B (three-slot) or
+  revert G3.
+- **8 ms vs 7.5 ms hop:** passing 8000 µs does not mean emit frames fit in the DMA
+  period. Cadence + consecutive-over-period remain admission. If G2+G3 makes
+  `max_consecutive_over_period > 1` or music sample-age GROWING, stop.
+- **Two-slot pointer / AP FIFO queues:** rejected forever.
+- **Infinite G2 mill:** after Cross40+Lane4 is on `k1_hardware` and p99 ≤ 8000 µs (or
+  fails with a named residual), G2 is **closed**. No ACF/rolling/Cross80 in this DAG.
+- **F887:** no flash until a named GO. G2/G3 device work = B489 only.
 
 ## 1. Decision
 
@@ -47,7 +91,7 @@ SPECULATIVE_PRIORITY_OR_PACING    = REJECT
 DSP_OR_PARALLEL_RENDER_ON_CORE1   = REJECT
 
 CURRENT_HEAD_BASELINE             = REQUIRED
-GDFT_SERVICE_CONTRACT             = REOPEN_AND_MEASURE
+GDFT_SERVICE_CONTRACT             = CROSS40_PLUS_LANE4_CLOSE_OUT
 COHERENT_AP_FRAME                 = REQUIRED
 DISCRETE_EVENT_SEMANTICS          = REQUIRED
 CONTROL_SCENE_TRANSACTIONS        = REQUIRED
@@ -66,6 +110,7 @@ VP_WHOLE_FRAME_MISS_POLICY        = GATE_0_RATIFICATION_REQUIRED
 SPECTRAL_24K_180_UPGRADE          = SEPARATE_BENCH_LANE
 SCHEDULING_MUTATION_AUTHORITY      = DIRECT_CAPTAIN_GO_2026_08_15
 AP_INPUT_P4                        = OPEN_SEPARATE_PROGRAMME
+AP_SERVICE_P99_LIMIT_US            = 8000
 ```
 
 The repository's load-bearing instruction sets 120 FPS and a 2.0 ms effect-code
@@ -386,20 +431,20 @@ If service cannot sustain arrival, proceed only to Gate 2. Do not tune priority.
 
 **Dependencies:** Gate 1. **Behaviour-changing lane.**
 
-Compare current `x2_cross=0` against pre-registered shorter-window candidates such as
-provisional `x2_cross=40` and global legacy `x2`. Keep 24 kHz/180 bins out of this gate.
-
-Require source/model parity, representable spectral geometry, sustainable service with
-margin, bounded sample age/backlog, semantic regression checks and the pre-registered
-real-music perceptual comparison.
-
-If no candidate meets both compute and product contracts, retain the current formula and
-reopen cadence/feature requirements. Do not hide the deficit with a larger hop or higher
-priority. Gate 2 is one reversible behaviour-change unit.
+**Captain restamp close-out (2026-08-16):** selected contract is **Cross40 + Lane-4**
+(`K1_GDFT_X2_CROSSOVER_BIN=40u` + `K1_GDFT_LANE4_V1=1` on `k1_hardware`). Historical
+Cross0/40/80 matrix and the admitted combined probe
+`docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/` remain evidence. Service
+acceptance is **p99 ≤ 8000 µs** (not 6000). Close-out unit: promote flags → host/build
+green → B489 music soak ≤ 8000 µs + Captain eyes-on → write CLOSED receipt. Cross80
+stays HOLD fallback outside this DAG. Do not reopen ACF/rolling work as a Gate 2 closer.
+Do not hide a deficit with a larger hop or higher priority.
 
 ### Gate 3 — coherent AP frame and event semantics
 
-**Dependencies:** Gate 2.
+**Dependencies:** Gate 2 **CLOSED** (Cross40+Lane4 promoted). Host G3 work may begin
+once the G2 close-out unit has landed on `k1_hardware` at host/build green; device G3
+still requires a separate B489 GO.
 
 Implement Candidate A first. Remove direct Core-1 reads of live AP globals and independent
 audio/onset/tempo reads from effects/directors. Acquire once at VP frame-top. Add event

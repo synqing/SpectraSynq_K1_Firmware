@@ -161,7 +161,8 @@
 
 // Phase 2 (ap_advice): Goertzel Rayleigh crossover for the legacy ×2 window.
 // Bins with index < crossover keep ×2 sizing; at/above use fs/Δf (1-semitone).
-// CTO 2026-08-05: default 0 = global drop of ×2 (simplest correct formula).
+// Header default 0 = global drop of ×2. Production k1_hardware (2026-08-16
+// Gate-2 close-out) overrides via -DK1_GDFT_X2_CROSSOVER_BIN=40u.
 #ifndef K1_GDFT_X2_CROSSOVER_BIN
 #define K1_GDFT_X2_CROSSOVER_BIN 0u
 #endif

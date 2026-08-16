@@ -231,6 +231,7 @@ BeatAwareDecision bad_director_decide(BeatAwareDirectorState* state,
 #include "k1_effect_queue.h"
 #include "TransitionOverlay.h"
 #include "TransitionTypes.h"
+#include "k1_vp_audio_access.h"
 
 static BeatAwareDirectorConfig g_bad_config = bad_director_default_config();
 static BeatAwareDirectorState  g_bad_state  = {};
@@ -298,7 +299,7 @@ uint8_t bad_director_current_mode() {
 bool bad_director_tempo_locked() {
   AudioSemanticState sem = {};
 #ifdef K1_SEMANTIC_STATE
-  audio_semantic_read(&sem);
+  k1_vp_audio_semantic_read(&sem);
 #endif
   return sem.tempo_locked;
 }
@@ -306,7 +307,7 @@ bool bad_director_tempo_locked() {
 float bad_director_bpm() {
   AudioSemanticState sem = {};
 #ifdef K1_SEMANTIC_STATE
-  audio_semantic_read(&sem);
+  k1_vp_audio_semantic_read(&sem);
 #endif
   return sem.bpm;
 }
@@ -314,7 +315,7 @@ float bad_director_bpm() {
 float bad_director_tempo_confidence() {
   AudioSemanticState sem = {};
 #ifdef K1_SEMANTIC_STATE
-  audio_semantic_read(&sem);
+  k1_vp_audio_semantic_read(&sem);
 #endif
   return sem.tempo_confidence;
 }
@@ -347,7 +348,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
   }
 
   // Read K1's OWN audio surface directly — no firmware-v3 thresholds.
-  K1AudioSnapshot audio = k1_audio_snapshot_read();
+  K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
 
   // Smooth spectral energy for the phrase/energy gate (frame-rate-independent
   // first-order EMA, ~180 ms tau — mirrors SmartDirector's energy smoothing).
@@ -361,7 +362,7 @@ uint8_t bad_director_tick(uint32_t now_ms) {
 
   AudioSemanticState sem = {};
 #ifdef K1_SEMANTIC_STATE
-  audio_semantic_read(&sem);
+  k1_vp_audio_semantic_read(&sem);
 #endif
 
   BeatAwareAudioView view;

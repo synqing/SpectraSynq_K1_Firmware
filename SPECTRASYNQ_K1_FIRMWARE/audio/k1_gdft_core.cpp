@@ -30,11 +30,21 @@
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 
+// Production selector for the exact four-lane Goertzel backend.
+#ifndef K1_GDFT_LANE4_V1
+#define K1_GDFT_LANE4_V1 0
+#endif
+// Compatibility alias: non-shippable probe envs may still pass
+// -DK1_GDFT_LANE4_PROBE=1. It selects the identical backend.
 #ifndef K1_GDFT_LANE4_PROBE
 #define K1_GDFT_LANE4_PROBE 0
 #endif
+#if K1_GDFT_LANE4_PROBE && !K1_GDFT_LANE4_V1
+#undef K1_GDFT_LANE4_V1
+#define K1_GDFT_LANE4_V1 1
+#endif
 
-#if K1_GDFT_LANE4_PROBE
+#if K1_GDFT_LANE4_V1
 #ifdef ENABLE_GDFT_HARNESS
 #define K1_GDFT_LANE4_Q0_OBSERVE(q0_value)                                      \
   do {                                                                          \
@@ -49,11 +59,11 @@
 #undef K1_GDFT_LANE4_Q0_OBSERVE
 
 #if !K1_GDFT_INT64_RECURRENCE_V1 || !K1_GDFT_INT64_MAGNITUDE_V1
-#error "K1_GDFT_LANE4_PROBE requires the current int64 recurrence and magnitude contract"
+#error "K1_GDFT_LANE4_V1 requires the current int64 recurrence and magnitude contract"
 #endif
 
 #if K1_SPECTRAL_WINDOW_V1
-#error "K1_GDFT_LANE4_PROBE is an exact direct-recurrence probe; spectral windowing is outside its contract"
+#error "K1_GDFT_LANE4_V1 is an exact direct-recurrence path; spectral windowing is outside its contract"
 #endif
 #endif
 
@@ -132,12 +142,13 @@ void IRAM_ATTR process_GDFT() {
   // Fixed-point code adapted from example here: https://sourceforge.net/p/freetel/code/HEAD/tree/misc/goertzal/goertzal.c
   const uint8_t nyquist_safe_bin_hi =
       k1_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
-#if K1_GDFT_LANE4_PROBE
-  // NON-SHIPPABLE Gate-2 ILP probe. Four adjacent bins consume their shared
-  // newest-sample prefix together. Each lane keeps its coefficient and q-state
-  // local, executes the exact production int64 ASR14 recurrence in the exact
-  // per-bin sample-age order, then runs its own residual tail. Bins remain
-  // independent: magnitude, normalisation and EMA commit in ascending bin order.
+#if K1_GDFT_LANE4_V1
+  // Exact four-lane direct recurrence (Gate-2 close-out / production path when
+  // -DK1_GDFT_LANE4_V1=1). Four adjacent bins consume their shared newest-sample
+  // prefix together. Each lane keeps its coefficient and q-state local, executes
+  // the exact production int64 ASR14 recurrence in the exact per-bin sample-age
+  // order, then runs its own residual tail. Bins remain independent: magnitude,
+  // normalisation and EMA commit in ascending bin order.
   const uint16_t lane_safe_bin_count =
       (nyquist_safe_bin_hi < NUM_FREQS) ? nyquist_safe_bin_hi : NUM_FREQS;
   for (uint16_t lane_base = 0; lane_base < lane_safe_bin_count; lane_base += 4u) {
@@ -329,7 +340,7 @@ void IRAM_ATTR process_GDFT() {
                                    + (magnitudes_normalized_avg[i] * (1.0f - coeff));
     }
   }
-#endif  // K1_GDFT_LANE4_PROBE
+#endif  // K1_GDFT_LANE4_V1
 
   // Gather per-bin noise only from the same accepted quiet Phase-B frames that
   // learn the broadband SSL floor. Earlier legacy code gathered throughout the

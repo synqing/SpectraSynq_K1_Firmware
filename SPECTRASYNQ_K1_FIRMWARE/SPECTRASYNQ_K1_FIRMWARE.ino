@@ -49,6 +49,10 @@
 #include "GDFT.h"             // Conversion to (and post-processing of) frequency data! (hey, something cool!)
 #include "k1_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
 #include "k1_onset_beat.h"    // Smart Visual Engine AP onset/beat event lane
+#ifdef K1_AUDIO_FRAME_V1
+#include "k1_audio_frame.h"
+#include "k1_vp_audio_access.h"
+#endif
 #include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
 #include "k1_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
@@ -441,8 +445,8 @@ void render_channel_via_framework(uint8_t mode, RenderChannelState& channel) {
   // Live audio surface (read-only adapter over K1's own snapshot + onset event).
   static K1AudioSnapshot fw_audio_snapshot;
   static K1OnsetBeatEvent fw_beat_event;
-  fw_audio_snapshot = k1_audio_snapshot_read();
-  fw_beat_event = k1_onset_beat_read();
+  fw_audio_snapshot = k1_vp_audio_snapshot_read();
+  fw_beat_event = k1_vp_onset_beat_read();
 
   // Real frame delta (P2 NEXT item): measured µs since the last VP frame.
   const int64_t now_us = esp_timer_get_time();
@@ -1086,6 +1090,45 @@ void loop() {
     return;
 #endif
     k1_tempo_update(k1_audio_snapshot);  // beat/tempo-phase tracker (Core-0; self-clocks to 50 Hz, read-only consumer of novelty)
+#ifdef K1_AUDIO_FRAME_V1
+    {
+      static uint32_t s_af_generation = 0;
+      static uint32_t s_onset_sequence = 0;
+      static uint32_t s_beat_sequence = 0;
+      static uint32_t s_onset_epoch = 1;
+      static uint32_t s_beat_epoch = 1;
+      K1AudioFrame producer_next = {};
+      producer_next.boot_epoch = 1;
+      producer_next.ap_generation = ++s_af_generation;
+      producer_next.capture_sequence = producer_next.ap_generation;
+      const uint32_t now_us = (uint32_t)esp_timer_get_time();
+      producer_next.i2s_read_return_us = now_us;
+      producer_next.newest_sample_estimate_us = now_us;
+      producer_next.oldest_sample_estimate_us =
+          now_us - (uint32_t)((CONFIG.SAMPLES_PER_CHUNK > 1 ? (CONFIG.SAMPLES_PER_CHUNK - 1) : 0) *
+                              (1000000u / (CONFIG.SAMPLE_RATE ? CONFIG.SAMPLE_RATE : 12800)));
+      producer_next.sample_time_assumption_id = 1;
+      if (k1_onset_beat_event.onset) {
+        s_onset_sequence++;
+        producer_next.last_onset_time_us = now_us;
+        producer_next.last_onset_strength = k1_onset_beat_event.onset_strength;
+      }
+      producer_next.onset_epoch = s_onset_epoch;
+      producer_next.onset_sequence_total = s_onset_sequence;
+      const K1TempoEvent tempo_ev = k1_tempo_read();
+      if (tempo_ev.beat_tick) {
+        s_beat_sequence++;
+        producer_next.last_beat_time_us = now_us;
+      }
+      producer_next.beat_epoch = s_beat_epoch;
+      producer_next.beat_sequence_total = s_beat_sequence;
+#ifdef K1_SEMANTIC_STATE
+      audio_semantic_read(&producer_next.semantic);
+#endif
+      producer_next.ap_publish_us = (uint32_t)esp_timer_get_time();
+      k1_audio_frame_publish(producer_next);
+    }
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
     // Truthful probe timestamp: the complete current AP transaction is visible
     // only after snapshot, onset, saliency and tempo have all published.
@@ -1252,6 +1295,14 @@ void led_thread(void* arg) {
     if (led_thread_halt == false) {
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
+#ifdef K1_AUDIO_FRAME_V1
+      {
+        K1AudioFrame vp_frame = {};
+        if (k1_audio_frame_acquire(&vp_frame)) {
+          k1_vp_bundle_begin_frame(vp_frame);
+        }
+      }
+#endif
 #if ENABLE_VP_PERF_AUDIT
       static int64_t vp_perf_vp_stack_last_us = 0;
       if (vp_perf.running) {
@@ -1383,8 +1434,8 @@ void led_thread(void* arg) {
 	        K1OnsetBeatEvent smart_event = {};
 	        {
 	          K1_TRACE_SCOPE("vp_bus_read");
-	          smart_audio = k1_audio_snapshot_read();
-	          smart_event = k1_onset_beat_read();
+	          smart_audio = k1_vp_audio_snapshot_read();
+	          smart_event = k1_vp_onset_beat_read();
 	        }
 	        uint32_t smart_now_ms = uint32_t(vp_frame_start_us / 1000);
 	        K1SmartDirectorOutput smart_output = k1_smart_director_tick(smart_audio, smart_now_ms, &smart_event);

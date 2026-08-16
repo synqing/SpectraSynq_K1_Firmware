@@ -28,8 +28,20 @@ LIVE_G0R_AMENDMENT = (
     / "amendments"
     / "G0R_2026-08-16.draft.json"
 )
-DEPLOYED_CONTRACT_SHA256 = (
+HISTORICAL_G0R_CONTRACT_SHA256 = (
     "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+)
+CURRENT_CONTRACT_SHA256 = (
+    "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0"
+)
+SERVICE_RESTAMP = (
+    ROOT
+    / "docs"
+    / "forensics"
+    / "2026-08-15-freertos-scheduling-audit"
+    / "gate0"
+    / "amendments"
+    / "G2_SERVICE_8000_2026-08-16.json"
 )
 TUPLE_96 = {
     "sample_rate_hz": 12800,
@@ -62,13 +74,21 @@ def test_live_g0r_amendment_is_captain_stamped_a(oracle):
     assert doc["candidate_scope"]["status"] == "NOT_CREATED"
     assert doc["candidate_scope"]["scope"] == "NONE"
     assert doc["candidate_scope"]["applicable_envs"] == []
-    assert doc["old_contract_sha256"] == DEPLOYED_CONTRACT_SHA256
-    assert oracle.sha256_file(CONTRACT) == DEPLOYED_CONTRACT_SHA256
+    # Stamp A froze the hop against the then-deployed contract bytes.
+    assert doc["old_contract_sha256"] == HISTORICAL_G0R_CONTRACT_SHA256
     for name, field in doc["fields"].items():
         assert "old" in field and "new" in field, name
         assert field["new"] == field["old"], name
     assert not (LIVE_G0R_AMENDMENT.parent / "live_pointer.json").exists()
     assert oracle.DEFAULT_CONTRACT.resolve() == CONTRACT.resolve()
+    # Evening restamp moved the service p99 to 8000 without reopening 10 ms.
+    assert oracle.sha256_file(CONTRACT) == CURRENT_CONTRACT_SHA256
+    restamp = json.loads(SERVICE_RESTAMP.read_text(encoding="utf-8"))
+    assert restamp["status"] == "CAPTAIN_STAMPED"
+    assert restamp["fields"]["AP_SERVICE_P99_LIMIT_US"]["new"] == 8000
+    assert restamp["fields"]["TEN_MS_AP_HOP_AUTHORISED"]["new"] is False
+    assert restamp["prior_contract_sha256_at_g0r_stamp_a"] == HISTORICAL_G0R_CONTRACT_SHA256
+    assert restamp["new_contract_sha256"] == CURRENT_CONTRACT_SHA256
 
 
 def test_pointer_to_stamped_a_amendment_is_not_a_selectable_candidate(oracle, tmp_path):

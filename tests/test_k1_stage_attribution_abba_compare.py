@@ -1344,6 +1344,6 @@ def test_perturbation_limits_are_frozen_from_deployed_contract() -> None:
 def test_service_check_limits_come_from_deployed_contract() -> None:
     limits = abba.service_limits_from_contract()
     assert limits["ap_arrival_period_us"] == 7500
-    assert limits["ap_service_p99_max_us"] == 6000
+    assert limits["ap_service_p99_max_us"] == 8000
     assert limits["measured_ap_rate_min_hz"] == pytest.approx(132.0)
     assert limits["measured_ap_rate_max_hz"] == pytest.approx(134.5)
