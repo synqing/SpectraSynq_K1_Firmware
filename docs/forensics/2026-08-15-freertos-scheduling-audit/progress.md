@@ -1,23 +1,33 @@
 # Progress — plan fold
 
-## 2026-08-16 — G0R map–territory
+## 2026-08-16 — G0R Captain stamp A
 
 ```text
+G0R_CAPTAIN_STAMP            = A
 G0_ORACLE_IMPLEMENTATION     = CLOSED
-G0_CONTRACT_CONTENT          = REOPENED  (G0R)
+G0_CONTRACT_CONTENT          = STAMPED_A_AFFIRMS_DEPLOYED
+TEN_MS_AP_HOP_AUTHORISED     = NO
 G1_B489_SMOKE                = VALID_CURRENT_IMPLEMENTATION
 G1_F887_PRODUCTION           = ABSENT
-G2_7P5_CHARACTERISATION      = COMPLETE_ENOUGH_FOR_SERVICE_DEFICIT
-G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
+G2_7P5_CHARACTERISATION      = VALID_AGAINST_CONTROLLING_7P5
+G2_PRODUCT_SELECTION         = CLOSED_AS_A_7P5
+G2_SERVICE                   = RED_6MS_P99
 G3                           = BLOCKED
 B489_ABBA_FLASH_NOW          = HOLD
+B489_ABBA_PLAN_ON_7P5        = UNHELD_AWAITING_SEPARATE_FLASH_GO
 HARNESS_FIRMWARE_PIN_SHA     = 14c53d239524aa891e71470880f6917d4adf2ea6
 FINAL_ABBA_TOOLCHAIN_PIN_SHA = c1aba345603bc2cacc8cf30648768d346f572779
 ```
 
 Authority: `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`.
-Deployed `gate0/contract.json` unchanged (7.5 ms). Draft amendment
-`gate0/amendments/G0R_2026-08-16.draft.json` is `DRAFT_AWAITING_CAPTAIN` only.
+Deployed `gate0/contract.json` unchanged (7.5 ms). Amendment
+`gate0/amendments/G0R_2026-08-16.draft.json` is `CAPTAIN_STAMPED` / A;
+`fields.new` = `fields.old`; not a live pointer; not a 10 ms candidate.
+
+## 2026-08-16 — G0R map–territory
+
+Superseded later the same day by stamp A. Prior state was
+`DRAFT_AWAITING_CAPTAIN` with G2 product selection blocked by G0R.
 
 ## 2026-08-15
 

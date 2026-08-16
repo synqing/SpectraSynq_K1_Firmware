@@ -1,15 +1,17 @@
 ---
-abstract: "ACTIVE under G0R. Gate 0 oracle CLOSED; Gate 0 contract content REOPENED as cadence-authority reconciliation. Deployed 7.5 ms contract remains controlling. Gate 2 BLOCKED_OPEN; Gate 3 BLOCKED; flash HOLD. Separate AP-input-integrity P4 remains open. AP0/VP1 locked."
+abstract: "ACTIVE. G0R Captain stamp A (2026-08-16 AWST): deployed 12.8 kHz/96/d3/7.5 ms remains controlling; no 10 ms AP hop. Gate 0 oracle CLOSED. Gate 2 RED against 6 ms p99. Gate 3 BLOCKED. B489 flash HOLD (stamp is not the flash GO). Separate AP-input-integrity P4 remains open. AP0/VP1 locked."
 status: active
 branch: feat/k1-scheduling-generation-hardening
 active_lane: K1_SCHEDULING_HARDENING_20260815
 authority_plan: docs/forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md
 g0r_plan: docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md
 captain_authorisation: FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15
+g0r_captain_stamp: A
 ap_input_p4_status: OPEN_SEPARATE_PROGRAMME
 g0_oracle_implementation: CLOSED
-g0_contract_content: REOPENED_G0R
-g2_product_selection: BLOCKED_BY_G0R
+g0_contract_content: STAMPED_A_AFFIRMS_DEPLOYED
+g2_product_selection: CLOSED_AS_A_7P5
+g2_service: RED_6MS_P99
 g3: BLOCKED
 b489_abba_flash_now: HOLD
 harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
@@ -70,21 +72,27 @@ radio and 24 kHz/180-bin work    = separate programmes
 
 ```text
 G0_ORACLE_IMPLEMENTATION     = CLOSED
-G0_CONTRACT_CONTENT          = REOPENED  (G0R)
+G0_CONTRACT_CONTENT          = STAMPED_A_AFFIRMS_DEPLOYED
+G0R_CAPTAIN_STAMP            = A
+TEN_MS_AP_HOP_AUTHORISED     = NO
 G1_B489_SMOKE                = VALID_CURRENT_IMPLEMENTATION
 G1_F887_PRODUCTION           = ABSENT
-G2_7P5_CHARACTERISATION      = COMPLETE_ENOUGH_FOR_SERVICE_DEFICIT
-G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
+G2_7P5_CHARACTERISATION      = VALID_AGAINST_CONTROLLING_7P5
+G2_PRODUCT_SELECTION         = CLOSED_AS_A_7P5
+G2_SERVICE                   = RED_6MS_P99
 G3                           = BLOCKED
 B489_ABBA_FLASH_NOW          = HOLD
+B489_ABBA_PLAN_ON_7P5        = UNHELD_AWAITING_SEPARATE_FLASH_GO
 HARNESS_FIRMWARE_PIN_SHA     = 14c53d239524aa891e71470880f6917d4adf2ea6
 FINAL_ABBA_TOOLCHAIN_PIN_SHA = c1aba345603bc2cacc8cf30648768d346f572779
 ```
 
 G0R authority: `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`.
-Deployed contract `gate0/contract.json` (SHA-256
-`d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849`) remains live.
-Draft amendment awaits Captain A–E stamp; no live pointer to the draft.
+Captain stamped **A** on 2026-08-16 AWST. Deployed contract `gate0/contract.json`
+(SHA-256 `d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849`)
+remains live and byte-for-byte unchanged. The stamped amendment is not a live
+pointer and is not a selectable 10 ms candidate. This stamp is not B489 flash
+authorisation.
 
 The implementation branch began at `9259a9d5`. Gate 0 oracle was independently accepted at
 `68c9a51e`. Gate 1 now has a host/build-green trace surface and a guarded B489A500

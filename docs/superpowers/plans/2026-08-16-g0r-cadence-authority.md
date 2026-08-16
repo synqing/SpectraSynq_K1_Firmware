@@ -34,6 +34,11 @@ isProject: false
 
 # G0R Cadence-Authority Reconciliation — Amended Execution Plan
 
+> **Captain stamp A recorded 2026-08-16 AWST.** Deployed 12.8 kHz / 96 / d3 / 7.5 ms
+> remains controlling. `TEN_MS_AP_HOP_AUTHORISED=NO`. Gate 2 stays red against 6 ms
+> p99. Gate 3 blocked. B489 flash still HOLD until a **separate** GO. Do not treat
+> this banner as flash authorisation.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans. Sequential single-agent implementation through R0–R5. Do **not** fan out parallel implementers. Steps use checkbox (`- [ ]`) syntax for tracking.
 >
 > **Do not execute the 13:38 draft.** Captain stamp: `PLAN_DIRECTION=PASS`, `EXECUTE_LITERAL_PLAN_AS_WRITTEN=NO`, `DISPOSITION=APPROVE_WITH_MANDATORY_AMENDMENTS`. Execution mode locked: `SEQUENTIAL_SINGLE_AGENT`.

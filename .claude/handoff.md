@@ -8,8 +8,11 @@ Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 
 The active programme is the contained Gate 0-8 scheduling hardening plan. AP stays on
 Core 0, VP stays on Core 1, the harness/fault battery precedes production units, and an
-explicit audio task remains conditional. The separate AP-input-integrity P4 promotion is
-still open; no unrelated microphone slot/health/calibration change is implied by this lane.
+explicit audio task remains conditional. Captain stamped G0R **A** (2026-08-16 AWST):
+deployed 7.5 ms hop remains controlling; Gate 2 stays red against 6 ms p99; Gate 3
+blocked; B489 flash HOLD until a separate GO. The separate AP-input-integrity P4
+promotion is still open; no unrelated microphone slot/health/calibration change is
+implied by this lane.
 
 Physical proof still requires exact device identity, guarded environment pairing and
 Captain-confirmed acoustic conditions.

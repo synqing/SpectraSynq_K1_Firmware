@@ -1,58 +1,62 @@
-# G0R cadence-authority amendment (draft)
+# G0R cadence-authority amendment — Captain stamp A
 
-Date: 2026-08-16  
-Status: `DRAFT_AWAITING_CAPTAIN`  
-Deployed contract SHA-256 (verified): `d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849`  
-Draft path: `docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/amendments/G0R_2026-08-16.draft.json`
+Date: 2026-08-16 AWST  
+Status: `CAPTAIN_STAMPED` (`A`)  
+Deployed contract SHA-256 (verified, unchanged): `d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849`  
+Amendment path: `docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/amendments/G0R_2026-08-16.draft.json`
+
+## Captain authority (verbatim)
+
+> **Captain authority — 2026-08-16 AWST:**
+> **A — The deployed 12.8 kHz / 96-sample / tempo-decimation-3 / 7.5 ms AP hop remains controlling. No authoritative product decision has been established that supersedes it with a 10 ms AP hop. The June 12.8 kHz / 128-sample and 16 kHz / 160-sample results remain probe evidence, not product authority. Do not alter the service thresholds or use a larger hop to green Gate 2.**
+
+```text
+G0R_CAPTAIN_STAMP                = A
+TEN_MS_AP_HOP_AUTHORISED         = NO
+CONTROLLING_SAMPLE_RATE_HZ       = 12800
+CONTROLLING_CHUNK_SAMPLES        = 96
+CONTROLLING_TEMPO_DECIMATION     = 3
+CONTROLLING_AP_HOP_US            = 7500
+GATE2_SERVICE_P99_LIMIT_US       = 6000
+GATE2_RAW_DEADLINE_US            = 7500
+B489_ABBA_FLASH_NOW              = HOLD
+F887_PRODUCTION_FLASH            = NO
+G3_DEVICE_IMPLEMENTATION         = BLOCKED
+```
 
 ## Roles (do not collapse)
 
 | Role | Path / meaning |
 |---|---|
-| DEPLOYED_CONTRACT | `gate0/contract.json` — 12800/96/d3/7500 µs; live `DEFAULT_CONTRACT` |
-| STAMPED_TARGET | Pending Captain A–E stamp |
-| CANDIDATE_ONLY | May exist after stamp B/C for named probe envs only; `promotion_status=NOT_PRODUCTION` until Gate 8 |
+| DEPLOYED_CONTRACT | `gate0/contract.json` — 12800/96/d3/7500 µs; live `DEFAULT_CONTRACT`; **byte-for-byte unchanged** |
+| STAMPED_TARGET | Affirmed as the same deployed tuple (stamp A). This amendment is **not** a selectable candidate contract. |
+| CANDIDATE_ONLY | **Not created.** Stamp A does not authorise a 10 ms hop or hop128 probe pair. |
 
-Live production pointer must **not** target this draft. Loader rule: pointer to `DRAFT_AWAITING_CAPTAIN` fails closed.
+Live production pointer remains `gate0/contract.json`. A pointer targeting this stamped amendment must fail closed (`scope=NONE`).
 
-## Split rate schema (source-confirmed)
+## Cadence fields
 
-Confirmed against `SPECTRASYNQ_K1_FIRMWARE.ino` and `audio/k1_tempo.cpp` at inventory/amendment time:
+Every `fields.new` equals the corresponding `fields.old`. No 10 ms AP-hop decision was located or reissued.
 
-| Field | Old (deployed 7.5 ms) | Notes |
-|---|---|---|
-| AP_ACQUISITION_RATE_HZ | 133.333 | 12800/96 |
-| GDFT_INVOCATION_RATE_HZ | 133.333 | once per AP hop |
-| SPECTRAL_FLUX_CALC_RATE_HZ | 133.333 | `calculate_novelty` per hop |
-| ONSET_UPDATE_RATE_HZ | 133.333 | per hop |
-| SEMANTIC_PUBLICATION_RATE_HZ | 133.333 | per hop |
-| TEMPO_NOVELTY_INGEST_RATE_HZ | 44.444 | `K1_NOVELTY_DECIMATION=3` |
-| TEMPO_HEAVY_UPDATE_RATE_HZ | 44.444 | emit frames only |
-| TEMPO_PUBLICATION_RATE_HZ | heavy 44.444; flywheel may stale-clear republish on non-emit | not novelty-alone |
-| AP_HEAVY_DSP_INVOCATION_PERIOD_US | 7500 | equals semantic period while binding below is true |
+| Field | Old = new |
+|---|---|
+| AP_ACQUISITION_RATE_HZ | 133.333 |
+| GDFT_INVOCATION_RATE_HZ | 133.333 |
+| SPECTRAL_FLUX_CALC_RATE_HZ | 133.333 |
+| ONSET_UPDATE_RATE_HZ | 133.333 |
+| SEMANTIC_PUBLICATION_RATE_HZ | 133.333 |
+| TEMPO_NOVELTY_INGEST_RATE_HZ | 44.444 |
+| TEMPO_HEAVY_UPDATE_RATE_HZ | 44.444 |
+| TEMPO_PUBLICATION_RATE_HZ | heavy 44.444; flywheel may stale-clear republish on non-emit |
+| AP_HEAVY_DSP_INVOCATION_PERIOD_US | 7500 |
+| AP_ARRIVAL_PERIOD_US | 7500 |
+| AP_SERVICE_P99_MAX_US | 6000 |
 
-`fields.new` are all `null` in the draft. June hop128 numbers live only under `probe_candidates[]`.
+June hop128 / 16 kHz numbers remain under `probe_candidates[]` only.
 
-## Heavy-transaction binding
+## Gate consequences
 
-```text
-HEAVY_AP_TRANSACTION_ONCE_PER_SEMANTIC_PERIOD = true
-```
-
-GDFT + novelty calc + onset + semantic publication execute once per AP semantic period. Tempo heavy work is separately decimated. Service p99 therefore remains `0.8 × 7500 µs = 6000 µs` against the deployed contract until a stamped candidate is selected by env+tuple match.
-
-## Loader
-
-`scripts/regression-harness/k1_scheduling_gate0.py::select_contract()`:
-
-1. No pointer → deployed 7.5 ms (`no_pointer_deployed_contract`)
-2. Draft pointer → `Gate0Error` / `DRAFT_AWAITING_CAPTAIN`
-3. Stamped candidate, wrong env or tuple → fail closed
-4. Stamped candidate, matching env+tuple → `CANDIDATE_ONLY`
-5. `promotion_status=PRODUCTION` → `production_promotion_not_authorised_before_gate8`
-
-## Explicit non-claims
-
-- This draft does not close Gate 2 or authorise flash.
-- This draft does not move `DEFAULT_CONTRACT`.
-- Gate 3 remains blocked.
+- Gate 2 remains **red** against the frozen 6 ms active-work p99. Cross0/40/80 and lane-4 results are valid 7.5 ms characterisation, not 10 ms proof.
+- Gate 3 remains **blocked**.
+- The 7.5 ms min/full A-B-B-A *plan* at pin `H` is unheld; **flash still requires a separate GO**. This stamp is not that GO.
+- Unpaired five-second attribution captures remain stress/diagnostic evidence only.

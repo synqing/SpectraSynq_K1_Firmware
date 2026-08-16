@@ -7,11 +7,12 @@ observed_plan_fold_sha: 15d3a85d6d26e9698039a5b0d39dbaa1569718b4
 
 # K1 scheduling and musical-generation hardening — execution plan
 
-> **2026-08-16 G0R pointer:** Gate 0 **oracle machinery** remains CLOSED. Gate 0
-> **product timing content** is REOPENED under
+> **2026-08-16 G0R stamp A:** Gate 0 **oracle machinery** remains CLOSED. Captain
+> stamped **A** — deployed `gate0/contract.json` (12.8 kHz / 96 / d3 / 7.5 ms)
+> remains controlling; no 10 ms AP hop. Gate 2 service stays **RED** against the
+> frozen 6 ms p99. Gate 3 remains BLOCKED. B489 flash HOLD (this stamp is not
+> the flash GO). Plan:
 > [`docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`](../../superpowers/plans/2026-08-16-g0r-cadence-authority.md).
-> Deployed `gate0/contract.json` (7.5 ms) stays controlling until Gate 8 / Captain A–E.
-> Gate 2 product selection is BLOCKED_BY_G0R; Gate 3 remains BLOCKED; flash HOLD.
 > Do not erase the negative matrix below.
 
 ## 1. Decision
