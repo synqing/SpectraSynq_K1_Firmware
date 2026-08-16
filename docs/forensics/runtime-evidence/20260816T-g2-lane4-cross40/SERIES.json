@@ -1,0 +1,79 @@
+{
+  "legs": [
+    {
+      "bin_sha256": "ec6798f68a7ff2576ef932239960dc1a34d23b1f04db987e8bf791793d40469c",
+      "capture": {
+        "buffered": {
+          "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__apcad.log",
+          "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__raw.log",
+          "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__summary.json"
+        },
+        "classification": "paired_capture_admissible",
+        "compact": {
+          "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__apcad.log",
+          "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__raw.log",
+          "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__summary.json"
+        },
+        "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__pair_manifest.json",
+        "pair_manifest_sha256": "e7771cd73ef2a05bec12e30fae03a45d5785fead588784d8369975d91551a80c"
+      },
+      "chip_id": "B489A500",
+      "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+      "expect_git": "cd9c5bea",
+      "fixture": "no_playback",
+      "identity": {
+        "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+        "expect_git": "cd9c5bea",
+        "identity_line": "IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957",
+        "port": "/dev/cu.usbmodem12401"
+      },
+      "leg_id": "L1_noplay",
+      "port": "/dev/cu.usbmodem12401",
+      "usb_serial": "B4:3A:45:A5:89:B4"
+    },
+    {
+      "bin_sha256": "ec6798f68a7ff2576ef932239960dc1a34d23b1f04db987e8bf791793d40469c",
+      "capture": {
+        "buffered": {
+          "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__apcad.log",
+          "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__raw.log",
+          "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__summary.json"
+        },
+        "classification": "paired_capture_admissible",
+        "compact": {
+          "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__apcad.log",
+          "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__raw.log",
+          "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__summary.json"
+        },
+        "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__pair_manifest.json",
+        "pair_manifest_sha256": "1f2f44a784f861e579e010f768175fc653fbfeda8e604a770a42577d6e13cb77"
+      },
+      "chip_id": "B489A500",
+      "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+      "expect_git": "cd9c5bea",
+      "fixture": "music",
+      "identity": {
+        "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+        "expect_git": "cd9c5bea",
+        "identity_line": "IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957",
+        "port": "/dev/cu.usbmodem12401"
+      },
+      "leg_id": "L2_anchor",
+      "port": "/dev/cu.usbmodem12401",
+      "usb_serial": "B4:3A:45:A5:89:B4"
+    }
+  ],
+  "provenance": {
+    "T_frozen": "c1aba345603bc2cacc8cf30648768d346f572779",
+    "bin_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/build/k1_bench_scheduling_gdft_cross40_lane4_full_probe/firmware.bin",
+    "bin_sha256": "ec6798f68a7ff2576ef932239960dc1a34d23b1f04db987e8bf791793d40469c",
+    "capture_runner_sha256": "115832edf25d8d60a282d31f4379039a45b39c5051df6e646ac42d037566140b",
+    "drain_sha256": "b311db5775200fc5348bbb475dd156d20269b2498c9f2c84a28c85d82a72dd8d",
+    "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+    "experiment": "G2_LANE4_CROSS40_COMBINED",
+    "git_short": "cd9c5bea",
+    "measurement_firmware_pin_H": "14c53d239524aa891e71470880f6917d4adf2ea6",
+    "output_device": "Bose Mini II SoundLink",
+    "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938"
+  }
+}

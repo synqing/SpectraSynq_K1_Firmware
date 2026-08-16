@@ -1,0 +1,113 @@
+{
+  "experiment": "G2_TEMPO_BEHAVIOURAL_EQUIVALENCE_V1",
+  "inventory_date": "2026-08-16",
+  "rule": "Do not relax a published field until this table says INTERNAL_ONLY or DIAGNOSTIC_ONLY. PRODUCT_CONSUMED fields are judged by fixture truth and product-gate decisions, not by spread bit-identity.",
+  "public_event_K1TempoEvent": {
+    "bpm": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "light_mode_waveform_tempo (scroll rate)",
+        "light_mode_tempo_river / tempo_river_walk (envelope rate)",
+        "light_mode_tempo_comet / tempo_comet_anticipate (velocity)",
+        "light_mode_pulse_prism (bpm-derived motion)",
+        "k1_control_facade / k1_wireless (tempo_bpm telemetry)",
+        "AudioSemanticState.bpm → beat_aware_director"
+      ],
+      "host_rule": "Settled stationary lock must equal the fixture BPM (1 BPM bin). Earlier correct lock is allowed. Wrong-octave episodes must be no worse than spread."
+    },
+    "phase01": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "waveform_tempo / tempo_river / tempo_river_walk (intra-beat envelope)",
+        "tempo_comet PLL error",
+        "dense_forge / dense_forge_chord (phase_b = phase01 * conf)",
+        "snapwave (sin(phase01))",
+        "AudioSemanticState.beat_phase01"
+      ],
+      "host_rule": "Once settled, beat-event timing error vs analytical click <= 7500 us. Do not judge solely vs spread."
+    },
+    "confidence": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "waveform_tempo / river / comet: smoothstep(0.30, 0.60, confidence) velocity/presence gate",
+        "dense_forge: conf scales phase modulation",
+        "snapwave: confidence scales phase wobble",
+        "beat_aware_director: tempo_locked AND tempo_confidence >= 0.45 (director default floor)",
+        "k1_audio_profile.h: lock floor is microphone-specific; 0.60 is current K1_LOCK_CONFIDENCE"
+      ],
+      "not_consumers": [
+        "k1_smart_director.confidence_floor is novelty/energy mode_intent, NOT tempo confidence"
+      ],
+      "host_rule": "No numeric epsilon. Discretise to product bands: <0.30 idle, >=0.45 director-trust, >=0.60 lock/full-gate. Silence must not enter the lock band. Continuous values retained for later eyes-on."
+    },
+    "locked": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "K1TempoEvent.locked = (conf > 0.60) && !silence under CONF_V2 flywheel path",
+        "pulse_prism spawn: locked && beat_tick && beat_strength > 0.55",
+        "k1_effect_queue: beat_tick && locked",
+        "beat_aware_director: tempo_locked",
+        "wireless tempo_locked"
+      ],
+      "host_rule": "Silence false locks = 0. Settled click trains must lock. Acquisition may be earlier than spread. Wrong lock no worse than spread."
+    },
+    "beat_tick": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "pulse_prism spawn",
+        "k1_effect_queue on_beat",
+        "beat_aware_director fresh_beat",
+        "AudioSemanticState.beat_tick",
+        "stale-republish clearer on non-emit AP frames (one-shot contract)"
+      ],
+      "host_rule": "Silence ticks = 0. Settled extra/missing beats vs analytical fixture = 0. Timing error <= 7500 us."
+    },
+    "beat_strength": {
+      "class": "PRODUCT_CONSUMED",
+      "consumers": [
+        "pulse_prism: hard threshold 0.55 plus continuous beat_mod",
+        "snapwave: continuous amplitude/brightness",
+        "tempo_comet / comet_anticipate: continuous size/velocity",
+        "AudioSemanticState.beat_strength"
+      ],
+      "host_rule": "Hard gate beat_strength > 0.55 must not fire incorrectly (silence / unlocked). Continuous magnitude is eyes-on later; no invented epsilon."
+    }
+  },
+  "debug_K1TempoDebugSnapshot": {
+    "acf_valid": {
+      "class": "DIAGNOSTIC_ONLY",
+      "internal_use": "Gates ACF salience vs Goertzel-confidence fallback inside k1_tempo.cpp",
+      "external_consumers": "serial tempo_stream / APCAD flags only (#if ENABLE_TEMPO_STREAM)",
+      "product_effects": "none",
+      "host_rule": "MAY_DIFFER. Earlier true is expected for rolling ACF."
+    },
+    "candidate_bin": {
+      "class": "DIAGNOSTIC_ONLY",
+      "internal_use": "Winner hysteresis inside k1_update_winner",
+      "external_consumers": "serial debug / host dump only",
+      "host_rule": "MAY_DIFFER."
+    },
+    "winner_bin": {
+      "class": "INTERNAL_ONLY",
+      "note": "Published product field is bpm (winner centre), not the bin index. Bin index is debug.",
+      "host_rule": "MAY_DIFFER if bpm remains the correct fixture BPM."
+    },
+    "v2_locked": {
+      "class": "DIAGNOSTIC_ONLY",
+      "note": "Serial/APCAD. Product lock is K1TempoEvent.locked.",
+      "host_rule": "MAY_DIFFER if product locked matches truth."
+    },
+    "raw_ACF_cells": {
+      "class": "INTERNAL_ONLY",
+      "host_rule": "MAY_DIFFER. 6e-5–2e-4 abs err does not kill the candidate."
+    }
+  },
+  "drop_cut": {
+    "class": "NOT_A_TEMPO_CONSUMER",
+    "source": "k1_audio_snapshot energy, not K1TempoEvent"
+  },
+  "smart_director_confidence_floor": {
+    "class": "NOT_A_TEMPO_CONSUMER",
+    "source": "novelty/energy mode_intent.confidence, not tempo.confidence"
+  }
+}

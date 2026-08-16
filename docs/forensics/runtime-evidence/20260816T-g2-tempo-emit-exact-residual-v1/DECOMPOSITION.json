@@ -1,0 +1,67 @@
+{
+  "experiment": "G2_TEMPO_EMIT_EXACT_RESIDUAL_V1",
+  "reference_result": "20260816T-g2-lane4-cross40",
+  "reference_rerun": "NOT_REQUIRED",
+  "surface": "admitted full-attribution APCAD; no new USB fields",
+  "terminology": {
+    "tempo_only_apcad_class": "tempo_emit_onset_unknown",
+    "reason": "APCAD has no onset event marker; missing marker is not an onset exonerate"
+  },
+  "outer_timer_reconciliation_music_buffered": {
+    "source": "L2_anchor buffered summary",
+    "tempo_pre_timed_history_scale_and_gate_elapsed_us": {
+      "median": 95.0,
+      "p99": 147.78,
+      "maps_to": "novelty/history insertion + scale"
+    },
+    "tempo_silence_elapsed_us": {"median": 174.0, "p99": 244.0, "maps_to": "silence/freeze contrast"},
+    "tempo_acf_elapsed_us": {"median": 723.5, "p99": 1233.0, "max": 1285.0, "maps_to": "ACF maintenance or sweep"},
+    "tempo_update_elapsed_us": {"median": 767.0, "p99": 1070.0, "max": 1074.0, "maps_to": "Goertzel two-bin refresh + 96-bin smooth + winner + confidence/lock"},
+    "tempo_phase_elapsed_us": {"median": 58.0, "p99": 105.0, "maps_to": "PLL/phase advancement + beat-event decision"},
+    "tempo_publish_elapsed_us": {"median": 12.0, "p99": 28.0, "maps_to": "publication/copy"},
+    "tempo_emit_elapsed_us": {"median": 1744.0, "p99": 2447.0, "max": 2556.0},
+    "named_sum_of_p99_is_not_a_frame_sum": true,
+    "worst_compact_row_split": {
+      "tempo_acf_us": "1080-1284",
+      "tempo_update_us": "836-1099",
+      "note": "ACF spreading already on (16 lags/emit). Remaining ACF cost is the O(nlag_slice * HISTORY) inner product, not a missing spread."
+    },
+    "unaccounted": "esp_timer granularity plus the history decay walk, which is outside tempo_emit_us and appears as tempo_pre_timed_us = tempo_total_us - tempo_emit_us"
+  },
+  "internal_op_counts_on_emit": {
+    "novelty_history_insertion": "512 FMUL decay + 1 insert; scale max-scan every 3 emits",
+    "acf_spread_slice": "16 lags * ~(512-lag) products against a frozen mean-subtracted snapshot",
+    "acf_publish_comb": "96 bins * 4 parabolic teeth, deferred to the wrap emit",
+    "lag_peak_candidate_search": "inside k1_update_winner over 96 selection scores",
+    "harmonic_octave_scoring": "inside k1_acf_publish_salience",
+    "confidence_lock_update": "inside k1_update_confidence_v2",
+    "pll_phase": "k1_advance_phase_flywheel",
+    "beat_event_decision": "inside the flywheel wrap",
+    "publication_copy": "k1_build_output + portMUX copy",
+    "goertzel": "two 512-sample recurrences every emit; all bins use block_size 512"
+  },
+  "required_reduction_music_tempo_emit": {
+    "current_p99_ms": 7.792,
+    "limit_p99_ms": 6.0,
+    "required_ms": 1.792,
+    "non_emit_headroom_ms": 0.358,
+    "naive_three_way_split_of_2_52ms_would_add": 0.84,
+    "naive_spread_cannot_pass": true
+  },
+  "selected_candidate": {
+    "id": "K1_TEMPO_ACF_INCREMENTAL_V1",
+    "class": "exact rolling/incremental maintenance of the decaying novelty ACF",
+    "also": "shared linearized Goertzel window so the identical 512-sample gather is not paid twice",
+    "not": [
+      "fewer lags",
+      "reduced search range",
+      "approximate ACF",
+      "lower update cadence",
+      "stale publication",
+      "extra output-frame latency",
+      "new task or Core-1 offload",
+      "another ACF spread"
+    ],
+    "total_work": "O(nlag + HISTORY) per emit instead of O(16 * HISTORY) lag products; Goertzel gather paid once"
+  }
+}

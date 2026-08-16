@@ -1,0 +1,36 @@
+{
+  "STOP": true,
+  "series_status": "ABORTED_FAIL_CLOSED",
+  "aborted_leg": "S1_B2",
+  "GATE2": "STILL_RED",
+  "GATE3_DEVICE_IMPLEMENTATION": "BLOCKED",
+  "POST_ABBA_FIRMWARE_MUTATION": "HOLD",
+  "F887_PRODUCTION_FLASH": "NO",
+  "STAGE_ATTRIBUTION_SURFACE": "NOT_DECIDED",
+  "FULL_ATTRIBUTION_SURFACE": "NOT_DECIDED",
+  "perturbation_verdict": "INCOMPLETE_SERIES",
+  "reason": "S1_B2 compact soak declared worst_count=16 but the host parsed 15 APCAD_SOAK_WORST records. Rank 0 arrived as a truncated fragment because vp_perf=start was sent 5 ms after APCAD_SOAK_DONE, colliding with the trailing worst-row dump.",
+  "not_an_ap_tuple_fault": true,
+  "tuple_on_admissible_legs": {
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 96,
+    "tempo_decimation": 3,
+    "ap_arrival_period_us": 7500
+  },
+  "completed_admissible_legs": ["S1_A1", "S1_B1"],
+  "inadmissible_legs": ["S1_B2"],
+  "not_started": ["S1_A2", "S2_A1", "S2_B1", "S2_B2", "S2_A2"],
+  "do_not_treat_A1_vs_B1_as_series_verdict": true,
+  "unofficial_A1_B1_compact_p99_us": {
+    "note": "Not a perturbation verdict. Series incomplete.",
+    "S1_A1_MIN_active_ap_work_p99": [11808, 11840],
+    "S1_B1_FULL_active_ap_work_p99": [11840, 11872],
+    "both_far_above_service_limit_us": 6000,
+    "both_classify": "AP compute overrun / 7.5 ms hop not met"
+  },
+  "next_requires_new_captain_decision": [
+    "Do not recapture in place without a new GO.",
+    "A pack-local drain window after APCAD_SOAK_DONE before vp_perf=start would address the host race; that is a runner change, not a firmware or tuple change.",
+    "Gate 3, Cross probes, F887, calibration, and production promotion remain forbidden."
+  ]
+}

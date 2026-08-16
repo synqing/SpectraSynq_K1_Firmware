@@ -1,0 +1,112 @@
+2026-08-16T19:16:39 START G2_LANE4_CROSS40_COMBINED B489
+2026-08-16T19:16:39 CMD git rev-parse --short HEAD
+cd9c5bea
+
+2026-08-16T19:16:39 PREFLIGHT {"T_frozen": "c1aba345603bc2cacc8cf30648768d346f572779", "bin_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/build/k1_bench_scheduling_gdft_cross40_lane4_full_probe/firmware.bin", "bin_sha256": "ec6798f68a7ff2576ef932239960dc1a34d23b1f04db987e8bf791793d40469c", "capture_runner_sha256": "115832edf25d8d60a282d31f4379039a45b39c5051df6e646ac42d037566140b", "drain_sha256": "b311db5775200fc5348bbb475dd156d20269b2498c9f2c84a28c85d82a72dd8d", "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe", "experiment": "G2_LANE4_CROSS40_COMBINED", "git_short": "cd9c5bea", "measurement_firmware_pin_H": "14c53d239524aa891e71470880f6917d4adf2ea6", "output_device": "Bose Mini II SoundLink", "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938"}
+2026-08-16T19:16:39 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-16T19:16:39 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_gdft_cross40_lane4_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_gdft_cross40_lane4_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-16T19:16:39 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/.pio/build/k1_bench_scheduling_gdft_cross40_lane4_full_probe/firmware.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c0fff...
+Compressed 723776 bytes to 402603...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba90... (8 %)
+Writing at 0x00029326... (12 %)
+Writing at 0x00036ba8... (16 %)
+Writing at 0x000443e7... (20 %)
+Writing at 0x0004998b... (24 %)
+Writing at 0x0004fae1... (28 %)
+Writing at 0x000554b3... (32 %)
+Writing at 0x0005b761... (36 %)
+Writing at 0x00061871... (40 %)
+Writing at 0x00067945... (44 %)
+Writing at 0x0006da69... (48 %)
+Writing at 0x000739ac... (52 %)
+Writing at 0x000792e8... (56 %)
+Writing at 0x0007e7fa... (60 %)
+Writing at 0x00084331... (64 %)
+Writing at 0x00089eec... (68 %)
+Writing at 0x0008efac... (72 %)
+Writing at 0x00094a99... (76 %)
+Writing at 0x0009a492... (80 %)
+Writing at 0x000a2564... (84 %)
+Writing at 0x000abc70... (88 %)
+Writing at 0x000b1a94... (92 %)
+Writing at 0x000b75c3... (96 %)
+Writing at 0x000bd4d9... (100 %)
+Wrote 723776 bytes (402603 compressed) at 0x00010000 in 6.0 seconds (effective 966.7 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-16T19:16:55 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git cd9c5bea --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+
+2026-08-16T19:16:56 IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+2026-08-16T19:16:56 === LEG L1_noplay fixture=no_playback ===
+2026-08-16T19:16:56 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git cd9c5bea --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+
+2026-08-16T19:16:57 IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+2026-08-16T19:16:57 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay --label L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback --no-playback
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__pair_manifest.json",
+  "pair_manifest_sha256": "e7771cd73ef2a05bec12e30fae03a45d5785fead588784d8369975d91551a80c"
+}
+
+2026-08-16T19:19:43 LEG OK L1_noplay
+2026-08-16T19:19:43 === LEG L2_anchor fixture=music ===
+2026-08-16T19:19:43 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git cd9c5bea --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+
+2026-08-16T19:19:44 IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957
+2026-08-16T19:19:44 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-16T19:19:44 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-16T19:19:44 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor --label L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music --track /Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L2_anchor/L2_anchor_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260816_191944__pair_manifest.json",
+  "pair_manifest_sha256": "1f2f44a784f861e579e010f768175fc653fbfeda8e604a770a42577d6e13cb77"
+}
+
+2026-08-16T19:22:30 LEG OK L2_anchor
+2026-08-16T19:22:30 BOTH LEGS COMPLETE

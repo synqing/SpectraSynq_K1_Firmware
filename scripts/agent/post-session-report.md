@@ -5,6 +5,50 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-16 G2_TEMPO_EMIT_EXACT_RESIDUAL_V1 host stop
+
+```text
+session_objective:       Execute Captain GO G2_TEMPO_EMIT_EXACT_RESIDUAL_V1: decompose emit residual, one exact tempo candidate, host bit-identity vs Cross40×Lane-4 spread, flash B489 only if host PASS.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ cd9c5bea dirty.
+branch_head_at_end:      same HEAD; incremental ACF + tests + evidence uncommitted (no commit authorised).
+files_changed:           k1_tempo.cpp K1_TEMPO_ACF_INCREMENTAL_V1=0 default; new B489-only env; identities; pio-build allowlist; tests/test_tempo_emit_exact_residual_v1.py; pack 20260816T-g2-tempo-emit-exact-residual-v1.
+commands_run:            clang++ host replay of 15 fixtures vs spread reference; pytest static/upload-guard PASS; published-field equivalence FAIL; no pio-build of candidate env; no flash.
+validation_results:      HOST_EQUIVALENCE FAIL_NOT_EXACT. All 15 fixtures mismatch. Event fields (BPM/phase/beat_strength/winner) diverge. Incremental ACF not bit-identical to unspread full recompute (abs err ~1e-4). Device run blocked.
+evidence_captured:       DECOMPOSITION.json HOST_EQUIVALENCE.json STOP.json.
+blockers:                Candidate is not exact versus the admitted spread reference. Needs a behavioural-equivalence contract or a different bit-identical loop-restructure candidate.
+generated_files_ignored: none flashed.
+safety_constraints:      F887 NO; no cal; no flash; no Cross80; no Gate 3; no onset/cadence/task/priority.
+thinking_skill_used:     thinking-model-router (scientific method): emit residual is ACF+Goertzel, not another Cross.
+skills_used:             Agent OS bootstrap; spec-recall; dsp-test-fixtures; sensorybridge-doctrine (exact ACF, no lag cut).
+specialists_used:        none.
+claude_mem_observations: pending this session.
+next_recommended_action: STOP. Request behavioural-equivalence contract for rolling current-history ACF vs spread-stale ACF, or authorise a bit-identical frozen-snapshot loop restructure. Do not flash.
+```
+
+---
+
+## Session Report — 2026-08-16 G2 Lane-4 × Cross40 combined
+
+```text
+session_objective:       Execute Captain GO G2_LANE4_CROSS40_COMBINED: host Cross40 scalar vs Lane-4 bit-identity, one full-attribution B489 candidate, two legs vs 6 ms p99.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ cd9c5bea dirty.
+branch_head_at_end:      same HEAD; env/identities/tests/evidence uncommitted (no commit authorised).
+files_changed:           platformio.ini combined env; k1_device_identities.json B489 allowlist; pio-build.sh allowlist; tests/test_gdft_lane4_cross40_combined.py; evidence pack 20260816T-g2-lane4-cross40. No firmware source behaviour edits.
+commands_run:            session-bootstrap PASS; pytest Cross40×Lane-4 host gate PASS; pio-build k1_bench_scheduling_gdft_cross40_lane4_full_probe SUCCESS git=cd9c5bea; esptool flash B489 only; two paired 120s+5s captures; evaluate vs 6 ms.
+validation_results:      Host bit-identity PASS. Device: cadence 133.33 Hz both legs. Compact active p99 7.52–7.71 ms. Gate 2 FAIL. Outcome 2 (neither ≤6 ms, tempo_only >6 ms). Cross80 HOLD. Gate 3 BLOCKED.
+evidence_captured:       docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/RESULT.json PREFLIGHT.json SERIES.json bins/cross40_lane4_full.bin.
+blockers:                6 ms p99 still missed; residual is the heavy tempo-emit frame (~2.5 ms tempo p99), not GDFT (~3.1 ms p99 both classes).
+generated_files_ignored: evidence pack logs/bins.
+safety_constraints:      F887 not present; no cal; no scheduler/priority/audio-task; no Cross80; no Gate 3; no production promotion.
+thinking_skill_used:     thinking-model-router (evaluate/scientific method); Captain GO already selected the experiment.
+skills_used:             Agent OS bootstrap; spec-recall; k1-lineage-routing; dsp-test-fixtures; claude-mem-router (search empty for Cross40/Lane4).
+specialists_used:        none.
+claude_mem_observations: observation_add blocked (worker runtime).
+next_recommended_action: STOP. Next authorised experiment if stamped: exact tempo/onset work spreading, same outputs. Do not run Cross80, ABBA, or scheduler work.
+```
+
+---
+
 ## Session Report — 2026-08-09 Deck16 B1→B2 Phase 6 HOLD close-out
 
 ```text

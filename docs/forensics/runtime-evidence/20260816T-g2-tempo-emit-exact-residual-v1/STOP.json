@@ -1,0 +1,20 @@
+{
+  "experiment": "G2_TEMPO_EMIT_EXACT_RESIDUAL_V1",
+  "phase": "3_host_semantic_equivalence",
+  "verdict": "FAIL_NOT_EXACT",
+  "B489_FLASH": "BLOCKED",
+  "GATE3": "BLOCKED",
+  "CROSS80": "HOLD",
+  "ONSET_CHANGE": "HOLD",
+  "F887": "NO",
+  "PRIORITY_TUNING": "NO",
+  "AUDIO_TASK": "NO",
+  "CADENCE_CHANGE": "NO",
+  "reference": "CROSS40_X_LANE4 spread ACF",
+  "candidate": "K1_TEMPO_ACF_INCREMENTAL_V1 rolling ACF + shared Goertzel window",
+  "why": "Published BPM, phase, beat_strength and winner diverge from the spread reference on every required fixture. Incremental ACF also fails bit-identity against unspread full recompute (max abs lag error ~1e-4). No tolerances applied.",
+  "next_requires_captain": [
+    "behavioural-equivalence contract for rolling current-history ACF versus spread-stale ACF",
+    "or a separate bit-identical loop-restructure candidate that preserves spread snapshot semantics"
+  ]
+}

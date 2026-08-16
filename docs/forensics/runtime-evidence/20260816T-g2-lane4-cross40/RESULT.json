@@ -1,0 +1,356 @@
+{
+  "CROSS80": "HOLD_AS_FALLBACK",
+  "G2_SERVICE_GATE": "FAIL",
+  "GATE3": "BLOCKED",
+  "PRODUCTION_PROMOTION": "NO",
+  "arrival_period_us": 7500,
+  "contract_p99_limit_us": 6000,
+  "experiment": "G2_LANE4_CROSS40_COMBINED",
+  "legs": {
+    "L1_noplay": {
+      "buffered_row_count": 666,
+      "capture_admissible": true,
+      "compact": {
+        "bytes_mismatch": 0,
+        "frame_gap": 0,
+        "i2s_not_ok": 0,
+        "max_consecutive_over_period": 1,
+        "max_us": 7920,
+        "mean_us": 5421.139,
+        "meas_ap_hz": 133.337,
+        "over_period_count": 216,
+        "p50_high_us": 5184,
+        "p50_low_us": 5152,
+        "p99_high_us": 7552,
+        "p99_low_us": 7520,
+        "rows": 15999,
+        "timestamp_regression": 0
+      },
+      "compact_max_consecutive_over_period": 1,
+      "consecutive": {
+        "first_recovery_hops": 1,
+        "max_consecutive_over_period": 1
+      },
+      "consecutive_for_admission": {
+        "first_recovery_hops": 1,
+        "max_consecutive_over_period": 1
+      },
+      "decision": {
+        "CROSS80": "HOLD_AS_FALLBACK",
+        "G2_SERVICE_GATE": "FAIL",
+        "GATE3": "BLOCKED",
+        "health_ok": false,
+        "label": "GDFT_REDUCED_RESIDUAL_COLLISION",
+        "neither_p99_us": 5545.71,
+        "onset_only_status": "MISSING_MARKER",
+        "outcome": 2,
+        "p99_high_us": 7552,
+        "service_ok": false,
+        "tempo_and_onset_status": "MISSING_MARKER",
+        "tempo_only_p99_us": 7630.23
+      },
+      "drops": 0,
+      "frame_classes": {
+        "exclusive": {
+          "neither": {
+            "active_ap_work": {
+              "max": 5659.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 444,
+              "p95": 5364.949999999999,
+              "p99": 5545.71,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "gdft": {
+              "max": 3123.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 444,
+              "p95": 2992.3999999999996,
+              "p99": 3092.14,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 444,
+            "percentile_method": "linear",
+            "status": "COMPLETE"
+          },
+          "onset_only": {
+            "active_ap_work": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "gdft": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 0,
+            "percentile_method": "linear",
+            "status": "MISSING_MARKER"
+          },
+          "tempo_and_onset": {
+            "active_ap_work": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "gdft": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 0,
+            "percentile_method": "linear",
+            "status": "MISSING_MARKER"
+          },
+          "tempo_only": {
+            "active_ap_work": {
+              "max": 7710.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 222,
+              "p95": 7349.099999999999,
+              "p99": 7630.23,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "gdft": {
+              "max": 3113.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 222,
+              "p95": 2991.2,
+              "p99": 3084.64,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 222,
+            "percentile_method": "linear",
+            "status": "COMPLETE"
+          }
+        },
+        "marginal": {
+          "onset_any": {
+            "n": 0
+          },
+          "tempo_any": {
+            "n": 222
+          }
+        },
+        "onset_marker_present": false,
+        "row_count": 666
+      },
+      "generation_discontinuities": 0,
+      "i2s_failures": 0,
+      "leg_id": "L1_noplay",
+      "sample_age": {
+        "delta_us": 821.7142857142862,
+        "first_mean_us": 12000.015037593985,
+        "growing": true,
+        "last_mean_us": 12821.729323308271,
+        "n": 666,
+        "status": "GROWING"
+      },
+      "timestamp_order_failures": 0,
+      "trace_corruption": 0
+    },
+    "L2_anchor": {
+      "buffered_row_count": 666,
+      "capture_admissible": true,
+      "compact": {
+        "bytes_mismatch": 0,
+        "frame_gap": 0,
+        "i2s_not_ok": 0,
+        "max_consecutive_over_period": 1,
+        "max_us": 8027,
+        "mean_us": 5677.001,
+        "meas_ap_hz": 133.334,
+        "over_period_count": 599,
+        "p50_high_us": 5376,
+        "p50_low_us": 5344,
+        "p99_high_us": 7712,
+        "p99_low_us": 7680,
+        "rows": 16000,
+        "timestamp_regression": 0
+      },
+      "compact_max_consecutive_over_period": 1,
+      "consecutive": {
+        "first_recovery_hops": 1,
+        "max_consecutive_over_period": 1
+      },
+      "consecutive_for_admission": {
+        "first_recovery_hops": 1,
+        "max_consecutive_over_period": 1
+      },
+      "decision": {
+        "CROSS80": "HOLD_AS_FALLBACK",
+        "G2_SERVICE_GATE": "FAIL",
+        "GATE3": "BLOCKED",
+        "health_ok": true,
+        "label": "GDFT_REDUCED_RESIDUAL_COLLISION",
+        "neither_p99_us": 5642.12,
+        "onset_only_status": "MISSING_MARKER",
+        "outcome": 2,
+        "p99_high_us": 7712,
+        "service_ok": false,
+        "tempo_and_onset_status": "MISSING_MARKER",
+        "tempo_only_p99_us": 7791.780000000001
+      },
+      "drops": 0,
+      "frame_classes": {
+        "exclusive": {
+          "neither": {
+            "active_ap_work": {
+              "max": 5691.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 443,
+              "p95": 5588.5,
+              "p99": 5642.12,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "gdft": {
+              "max": 3163.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 443,
+              "p95": 3126.0,
+              "p99": 3144.16,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 443,
+            "percentile_method": "linear",
+            "status": "COMPLETE"
+          },
+          "onset_only": {
+            "active_ap_work": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "gdft": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 0,
+            "percentile_method": "linear",
+            "status": "MISSING_MARKER"
+          },
+          "tempo_and_onset": {
+            "active_ap_work": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "gdft": {
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 0,
+            "percentile_method": "linear",
+            "status": "MISSING_MARKER"
+          },
+          "tempo_only": {
+            "active_ap_work": {
+              "max": 7887.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 223,
+              "p95": 7651.5,
+              "p99": 7791.780000000001,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "gdft": {
+              "max": 3150.0,
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 223,
+              "p95": 3123.8,
+              "p99": 3130.7799999999997,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "minimum_n_for_p95": 20,
+            "minimum_n_for_p99": 100,
+            "n": 223,
+            "percentile_method": "linear",
+            "status": "COMPLETE"
+          }
+        },
+        "marginal": {
+          "onset_any": {
+            "n": 0
+          },
+          "tempo_any": {
+            "n": 223
+          }
+        },
+        "onset_marker_present": false,
+        "row_count": 666
+      },
+      "generation_discontinuities": 0,
+      "i2s_failures": 0,
+      "leg_id": "L2_anchor",
+      "sample_age": {
+        "delta_us": 177.2255639097748,
+        "first_mean_us": 12815.135338345865,
+        "growing": false,
+        "last_mean_us": 12992.36090225564,
+        "n": 666,
+        "status": "STABLE"
+      },
+      "timestamp_order_failures": 0,
+      "trace_corruption": 0
+    }
+  },
+  "note": "Compact soak p99_high is the controlling service number. Do not substitute mean or nominal Hz. Onset classes remain MISSING_MARKER unless APCAD carries onset_event/onset_accepted.",
+  "service_limits": {
+    "ap_arrival_period_us": 7500,
+    "ap_max_consecutive_over_period": 1,
+    "ap_recovery_hops_max": 2,
+    "ap_service_p99_max_us": 6000,
+    "expected_ap_rate_hz": 133.33333333333334,
+    "measured_ap_rate_max_hz": 134.5,
+    "measured_ap_rate_min_hz": 132.0
+  },
+  "worst_outcome": 2
+}
