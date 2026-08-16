@@ -8,7 +8,7 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Added
 
-- **PRISM authored ingress (option A):** 34-byte PRSM parser and magic-first byte scanner (`audio/k1_prsm.*`), source arbitration STANDALONE/AUTHORED/RECOVERY (`audio/k1_authored_source.*`, freshness 80 ms), and `k1_audio_snapshot_publish()` as the single store write. `check_serial()` demuxes PRSM before immediate hotkeys (`P`/`R`/`S` collide with magic `PRSM`). Live microphone update is suppressed while authored is fresh; stale frames hand back to the live snapshot, not USB-bridge GPIO fallback. Host gate: `tests/test_authored_ingress_native.py`. No second renderer. No eFuse / erase_flash.
+- **PRISM authored ingress (option A):** 34-byte PRSM parser and magic-first byte scanner (`audio/k1_prsm.*`), source arbitration STANDALONE/AUTHORED/RECOVERY (`audio/k1_authored_source.*`, freshness **50 ms**), and `k1_audio_snapshot_publish()` as the single store write. `check_serial()` demuxes PRSM before immediate hotkeys (`P`/`R`/`S` collide with magic `PRSM`). Live microphone update is suppressed while authored is fresh; stale frames hand back to the live snapshot, not USB-bridge GPIO fallback. AUTHORED freezes Core-1 chromagram and forces drop-cut scale to 1. Host gate: `tests/test_authored_ingress_native.py`. No second renderer. No eFuse / erase_flash.
 
 ### Removed
 - **BREAKING — `global.standby_dimming` struck from every operator surface**

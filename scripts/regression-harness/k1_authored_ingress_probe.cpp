@@ -115,11 +115,11 @@ int main() {
   }
   if (intent.low_energy <= 0.0f) return fail("mass_map");
 
-  k1_authored_tick(1000 + 79);
-  if (k1_authored_state() != K1_SRC_AUTHORED) return fail("fresh_79");
-  k1_authored_tick(1000 + 81);
-  if (k1_authored_state() != K1_SRC_RECOVERY) return fail("stale_81_recovery");
-  k1_authored_tick(1000 + 82);
+  k1_authored_tick(1000 + 49);
+  if (k1_authored_state() != K1_SRC_AUTHORED) return fail("fresh_49");
+  k1_authored_tick(1000 + 51);
+  if (k1_authored_state() != K1_SRC_RECOVERY) return fail("stale_51_recovery");
+  k1_authored_tick(1000 + 52);
   if (k1_authored_state() != K1_SRC_STANDALONE) return fail("recovery_to_standalone");
   if (k1_authored_suppresses_live_update()) return fail("handback_live");
 

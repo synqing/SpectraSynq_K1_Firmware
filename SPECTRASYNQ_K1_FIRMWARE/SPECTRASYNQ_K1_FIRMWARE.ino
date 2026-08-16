@@ -1347,8 +1347,13 @@ void led_thread(void* arg) {
       vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
 #endif
-      get_smooth_spectrogram();
-      make_smooth_chromagram();
+      if (k1_authored_suppresses_live_update()) {
+        /* AUTHORED: freeze Core-1 chroma/spectrum so Ember hue is palette-only. */
+        memset(chromagram_smooth, 0, sizeof(chromagram_smooth));
+      } else {
+        get_smooth_spectrogram();
+        make_smooth_chromagram();
+      }
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running && vp_perf_stage_start_us != 0) {
         vp_perf_record(vp_perf.smooth, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));

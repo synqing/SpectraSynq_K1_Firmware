@@ -13,7 +13,7 @@ extern "C" {
  * Freshness 80 ms is derived in docs/K1_SOURCE_ARBITRATION.md (spine G7).
  * Do not copy the USB-bridge 250 ms GPIO fallback. */
 
-#define K1_AUTHORED_FRESHNESS_MS 80u
+#define K1_AUTHORED_FRESHNESS_MS 50u
 #define K1_AUTHORED_HZ_MIN 30u
 #define K1_AUTHORED_HZ_MAX 240u
 #define K1_AUTHORED_SEQ_GAP_MAX 3u
