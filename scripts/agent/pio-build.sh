@@ -23,9 +23,12 @@ ENV="$1"
 # k1_bench_im73d_ble = standing Captain "bench K1 firmware" (registry 2026-07-06).
 # k1_bench_im69d_ble = Deck16 P0 radio baseline on the active IM69D bench base.
 # k1_custom = dual-206 custom strip length (K1_CUSTOM_LED_V1); non-shippable.
-ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench"
+# k1_bench_scheduling_stage_{min,full}_probe = non-shippable B489 Gate-2
+# measurement envs (identity still enforced by k1_upload_guard.py; this wrapper
+# builds only — never upload).
+ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench k1_bench_scheduling_stage_min_probe k1_bench_scheduling_stage_full_probe"
 case "$ENV" in
-  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench)
+  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench|k1_bench_scheduling_stage_min_probe|k1_bench_scheduling_stage_full_probe)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2

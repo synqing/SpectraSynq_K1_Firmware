@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "trust_root_id": "K1_SCHEDULING_GATE0_TRUST_ROOT_2026_08_15",
+  "qualification_parent_commit": "82e201972fcae6dcb8380f9aadeb3d54ad394a7c",
+  "pre_gate0_source_population": {
+    "count": 535,
+    "path_list_sha256": "06b03c3d0a3c6352e5383ffea151f579636adc66394c73b556add68f74c5e0b7",
+    "read_contracts": [
+      "FRTOS-09",
+      "FRTOS-10",
+      "FRTOS-11",
+      "FRTOS-12",
+      "FRTOS-13",
+      "FRTOS-14",
+      "FRTOS-15"
+    ]
+  },
+  "ownership": {
+    "production_unit_may_edit": false,
+    "qualification_requires_independent_runner": true,
+    "change_rule": "new_authorised_oracle_commit_and_complete_gate0_requalification"
+  },
+  "files": [
+    {
+      "path": "docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/contract.json",
+      "sha256": "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+    },
+    {
+      "path": "scripts/regression-harness/k1_scheduling_gate0.py",
+      "sha256": "8080a9ee4568f9b0bae88b8883c5a1c205819bca2ed02f377e6b7ddae4f0be35"
+    },
+    {
+      "path": "tests/fixtures/scheduling_gate0/valid_oracle_run.json",
+      "sha256": "1167e9a2100003a5ca6f2a5c9fd4954935ea99c87f820e87641f3d8b85751a55"
+    },
+    {
+      "path": "tests/test_scheduling_gate0.py",
+      "sha256": "6ab0f747dfcb1a77173ca09a494682b3d548f0f019142bf05be7800024a4bc32"
+    },
+    {
+      "path": "docs/forensics/2026-08-15-freertos-scheduling-audit/evidence/gate0-harness-inventory.md",
+      "sha256": "cae6c2458788fd72058e0096613e2e59af3bac3e7af3692efc28fc6b37a0e189"
+    },
+    {
+      "path": "docs/forensics/2026-08-15-freertos-scheduling-audit/evidence/gate0-fault-battery-review.md",
+      "sha256": "9b41df8534b4820a3373328d8236a58deb8da354282db646808dbf74b189beb4"
+    }
+  ]
+}

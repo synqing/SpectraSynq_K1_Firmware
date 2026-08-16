@@ -1,0 +1,40 @@
+{
+  "applicable_envs": [
+    "k1_bench_scheduling_hop128_d2_min_probe",
+    "k1_bench_scheduling_hop128_d2_full_probe"
+  ],
+  "candidate_scope": {
+    "applicable_envs": [
+      "k1_bench_scheduling_hop128_d2_min_probe",
+      "k1_bench_scheduling_hop128_d2_full_probe"
+    ],
+    "promotion_status": "PRODUCTION",
+    "scope": "CANDIDATE_ONLY",
+    "status": "CAPTAIN_STAMPED"
+  },
+  "contract_id": "K1_SCHEDULING_G0R_PRODUCTION_PROMOTION_FIXTURE",
+  "margin_rules": {
+    "ap_max_consecutive_over_period": 1,
+    "ap_max_must_fit_measured_dma_cushion": true,
+    "ap_recovery_hops_max": 2,
+    "ap_service_p99_max_fraction_of_arrival": 0.8,
+    "binding_rule": "Gate_1_binds_measured_baseline_values_to_these_pre_registered_formulas",
+    "instrumented_capture_drop_max": 0,
+    "instrumented_vs_minimal_p99_regression_max_fraction": 0.05,
+    "queue_capacity_rule": "ceil(measured_peak_arrival_rate_times_measured_worst_drain_pause)+one_slot",
+    "queue_saturation_must_be_visible": true,
+    "shared_copy_lock_max_fraction_of_ap_period": 0.05,
+    "shared_copy_lock_p99_max_fraction_of_ap_period": 0.02
+  },
+  "production_tuple": {
+    "ap_arrival_period_us": 10000,
+    "platformio_environment": "k1_bench_scheduling_hop128_d2_min_probe",
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 128,
+    "tempo_novelty_decimation": 2
+  },
+  "promotion_status": "PRODUCTION",
+  "schema_version": 1,
+  "scope": "CANDIDATE_ONLY",
+  "status": "CAPTAIN_STAMPED"
+}

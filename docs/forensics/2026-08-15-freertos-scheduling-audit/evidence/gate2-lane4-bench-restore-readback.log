@@ -1,0 +1,10 @@
+Gate 2 lane-4 bench restoration readback
+Date: 2026-08-15
+Port: /dev/cu.usbmodem12401
+Device: B489A500 / B4:3A:45:A5:89:B4
+Command: :build
+Response:
+sbr{{
+BUILD: version=40103 git=2c0db532 epoch=1786786833 env=k1_bench_scheduling_baseline_probe
+}}
+BOOT_LOOP_GUARD: stable_clear=1

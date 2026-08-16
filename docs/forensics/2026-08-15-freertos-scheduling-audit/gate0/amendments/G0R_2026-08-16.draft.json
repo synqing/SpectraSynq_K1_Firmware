@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "amendment_id": "G0R_2026_08_16",
+  "status": "CAPTAIN_STAMPED",
+  "captain_stamp": "A",
+  "captain_authority_date": "2026-08-16 AWST",
+  "TEN_MS_AP_HOP_AUTHORISED": false,
+  "supersedes_contract_id": "K1_SCHEDULING_GATE0_2026_08_15",
+  "old_contract_path": "docs/forensics/2026-08-15-freertos-scheduling-audit/gate0/contract.json",
+  "old_contract_sha256": "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849",
+  "deployed_contract_role": "DEPLOYED_CONTRACT",
+  "stamped_target_role": "DEPLOYED_CONTRACT",
+  "stamped_target_note": "Stamp A affirms the deployed 12.8 kHz / 96 / d3 / 7.5 ms tuple. This amendment is not a selectable candidate contract and must not become the live production pointer.",
+  "candidate_scope": {
+    "status": "NOT_CREATED",
+    "scope": "NONE",
+    "applicable_envs": [],
+    "promotion_status": "NOT_PRODUCTION",
+    "reason": "stamp_A_does_not_authorise_a_10ms_candidate_contract"
+  },
+  "HEAVY_AP_TRANSACTION_ONCE_PER_SEMANTIC_PERIOD": true,
+  "HEAVY_AP_TRANSACTION_ONCE_PER_SEMANTIC_PERIOD_note": "locked_architecture.ap_pipeline=single_complete_transaction; process_GDFT, calculate_novelty, onset update, and semantic snapshot run once per AP hop (7500 µs). Tempo heavy ACF/PLL is separately decimated and is not part of that once-per-semantic-period binding. Service p99 therefore uses AP_ARRIVAL_PERIOD_US (7500) × 0.8 = 6000 µs.",
+  "fields": {
+    "AP_ACQUISITION_RATE_HZ": {
+      "old": 133.333,
+      "new": 133.333,
+      "source": "DEFAULT_SAMPLE_RATE / DEFAULT_SAMPLES_PER_CHUNK = 12800/96"
+    },
+    "GDFT_INVOCATION_RATE_HZ": {
+      "old": 133.333,
+      "new": 133.333,
+      "source": "process_GDFT() once per AP iteration in SPECTRASYNQ_K1_FIRMWARE.ino"
+    },
+    "SPECTRAL_FLUX_CALC_RATE_HZ": {
+      "old": 133.333,
+      "new": 133.333,
+      "source": "calculate_novelty() once per AP iteration"
+    },
+    "ONSET_UPDATE_RATE_HZ": {
+      "old": 133.333,
+      "new": 133.333,
+      "source": "k1_onset_beat_update() once per AP iteration"
+    },
+    "SEMANTIC_PUBLICATION_RATE_HZ": {
+      "old": 133.333,
+      "new": 133.333,
+      "source": "AP snapshot publish path once per AP iteration"
+    },
+    "TEMPO_NOVELTY_INGEST_RATE_HZ": {
+      "old": 44.444,
+      "new": 44.444,
+      "source": "K1_NOVELTY_DECIMATION=3 → AP_frame_hz/3 in k1_tempo.cpp"
+    },
+    "TEMPO_HEAVY_UPDATE_RATE_HZ": {
+      "old": 44.444,
+      "new": 44.444,
+      "source": "heavy ACF/PLL path on novelty emit frames only"
+    },
+    "TEMPO_PUBLICATION_RATE_HZ": {
+      "old": {
+        "heavy_emit_publish_hz": 44.444,
+        "stale_republish_clear": "Under K1_TEMPO_FLYWHEEL_V2, non-emit AP frames may republish the held event with beat_tick forced false; without flywheel, non-emit frames return without republish"
+      },
+      "new": {
+        "heavy_emit_publish_hz": 44.444,
+        "stale_republish_clear": "Under K1_TEMPO_FLYWHEEL_V2, non-emit AP frames may republish the held event with beat_tick forced false; without flywheel, non-emit frames return without republish"
+      },
+      "source": "k1_tempo.cpp ~1368–1478; do not collapse to novelty-alone 44.444 Hz"
+    },
+    "AP_HEAVY_DSP_INVOCATION_PERIOD_US": {
+      "old": 7500,
+      "new": 7500,
+      "source": "equals ap_arrival_period_us while HEAVY_AP_TRANSACTION_ONCE_PER_SEMANTIC_PERIOD is true"
+    },
+    "AP_ARRIVAL_PERIOD_US": {
+      "old": 7500,
+      "new": 7500
+    },
+    "AP_SERVICE_P99_MAX_US": {
+      "old": 6000,
+      "new": 6000
+    }
+  },
+  "probe_candidates": [
+    {
+      "id": "june_12800_128_d2",
+      "sample_rate_hz": 12800,
+      "samples_per_chunk": 128,
+      "tempo_novelty_decimation": 2,
+      "ap_arrival_period_us": 10000,
+      "measured_ap_hz": 100.04,
+      "measured_novelty_hz": 50.007,
+      "authority": "PROBE_CANDIDATE_ONLY",
+      "citation": "docs/forensics/tempo_tracking_refactor/2026-06-06-ap0-vp1-implementation-handover.md §7"
+    },
+    {
+      "id": "june_16000_160_d2",
+      "sample_rate_hz": 16000,
+      "samples_per_chunk": 160,
+      "tempo_novelty_decimation": 2,
+      "ap_arrival_period_us": 10000,
+      "measured_ap_hz": 100.027,
+      "measured_novelty_hz": 50.003,
+      "authority": "PROBE_CANDIDATE_ONLY_NOT_THIS_LANE",
+      "citation": "docs/forensics/tempo_tracking_refactor/2026-06-06-ap0-vp1-implementation-handover.md §7"
+    }
+  ],
+  "captain_verbatim_authority": "Captain authority — 2026-08-16 AWST: A — The deployed 12.8 kHz / 96-sample / tempo-decimation-3 / 7.5 ms AP hop remains controlling. No authoritative product decision has been established that supersedes it with a 10 ms AP hop. The June 12.8 kHz / 128-sample and 16 kHz / 160-sample results remain probe evidence, not product authority. Do not alter the service thresholds or use a larger hop to green Gate 2.",
+  "stamp_consequences": {
+    "gate0_contract_json": "BYTE_FOR_BYTE_UNCHANGED",
+    "gate2_service_p99_limit_us": 6000,
+    "gate2_raw_deadline_us": 7500,
+    "gate2_status": "RED_AGAINST_6MS_P99",
+    "gate3": "BLOCKED",
+    "b489_abba_flash_now": "HOLD",
+    "f887_production_flash": "NO",
+    "abba_plan_on_7p5_min_full_at_H": "UNHELD_AWAITING_SEPARATE_FLASH_GO",
+    "ten_ms_ap_hop_authorised": false,
+    "reason": "no_authoritative_10ms_ap_hop_decision_located_or_reissued"
+  },
+  "notes": [
+    "Deployed contract.json remains controlling until Gate 8. Stamp A does not move the production pointer.",
+    "fields.new equal fields.old because Captain stamped A (deployed 7.5 ms hop remains controlling).",
+    "June hop128 / 16 kHz numbers remain probe_candidates[] only.",
+    "This file is not a selectable CANDIDATE_ONLY contract. A pointer targeting it must fail closed.",
+    "This stamp is not B489 flash authorisation. R8 must not begin until a distinct flash GO."
+  ]
+}

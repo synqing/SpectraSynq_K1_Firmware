@@ -56,6 +56,12 @@ extern void vp_print_status();
 extern void vp_run_output_probe();
 extern void vp_run_secondary_bleed_probe();
 extern void vp_perf_command(const char* command_type, const char* command_data);
+#if ENABLE_TEMPO_STREAM
+extern bool TEMPO_STREAM_ENABLED;
+#endif
+#ifdef K1_SCHEDULING_TRACE_V1
+#include "k1_scheduling_trace_telemetry.h"
+#endif
 extern void motion_probe_arm_step(float interval_ms, int size_px, float lum);
 extern void motion_probe_arm_flash(int a_px, int b_px, float gap_ms, float lum, float on_ms);
 extern void motion_probe_off();
@@ -515,6 +521,12 @@ bool serial_typed_vp_perf(const char* command_type, char* command_data) {
   vp_perf_command(command_type, command_data);
   return true;
 }
+
+#ifdef K1_SCHEDULING_TRACE_V1
+bool serial_typed_scheduling_trace(const char* command_type, char* command_data) {
+  return k1_scheduling_trace_command(command_type, command_data);
+}
+#endif
 
 #if ENABLE_DIAG_CAPTURE
 bool serial_typed_diag(const char* command_type, char* command_data) {

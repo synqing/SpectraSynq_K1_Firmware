@@ -99,3 +99,36 @@ one 5-minute request-for-partial retry; fallback owner: orchestrator-local.
 - Failure mode: letting implementation agents self-certify or building a harness larger
   than the contained firmware changes.
 - Consumption: orchestrator retains only gates tied to a concrete failure or decision.
+
+## Implementation read-through and Gate 0 delegations
+
+### Shared contract — FRTOS-09 through FRTOS-17
+
+```text
+classification:          load-bearing
+classification_rationale: full-source priming and independent Gate 0 evidence are prerequisites to production implementation
+forbidden_actions:       no firmware/test/harness/CI edits; no build, upload, flash, erase, serial/device action, commit, push or edit outside the named evidence file
+checkpoint_timeout:      5 minutes
+bounded_retry:           one 3-minute request for a useful partial after the first miss
+fallback_owner:          orchestrator-local
+final_answer_dependency: no
+escalation_condition:    second missed checkpoint or failure to produce the named artefact
+consumption_rule:        reconcile against live source; missing evidence blocks the affected gate until orchestrator-local replacement
+collaboration_rule:      other agents share this checkout; never revert, reformat or overwrite their work
+```
+
+| ID | Role / task | Expected output | Source scope | Write scope |
+|---|---|---|---|---|
+| FRTOS-09 | exhaustive source reader 1; read every file in manifest chunk 1 in full and identify scheduling/publication/timing implications | complete file ledger plus findings in `evidence/codebase-read-1.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_1.txt` | named evidence file only |
+| FRTOS-10 | exhaustive source reader 2; same contract for chunk 2 | `evidence/codebase-read-2.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_2.txt` | named evidence file only |
+| FRTOS-11 | exhaustive source reader 3; same contract for chunk 3 | `evidence/codebase-read-3.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_3.txt` | named evidence file only |
+| FRTOS-12 | exhaustive source reader 4; same contract for chunk 4 | `evidence/codebase-read-4.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_4.txt` | named evidence file only |
+| FRTOS-13 | exhaustive source reader 5; same contract for chunk 5 | `evidence/codebase-read-5.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_5.txt` | named evidence file only |
+| FRTOS-14 | exhaustive source reader 6; same contract for chunk 6 | `evidence/codebase-read-6.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_6.txt` | named evidence file only |
+| FRTOS-15 | exhaustive source reader 7; same contract for chunk 7 | `evidence/codebase-read-7.md` | `/tmp/k1-source-manifest.WdLSdO/chunk_7.txt` | named evidence file only |
+| FRTOS-16 | verification-harness auditor; inventory existing deterministic, replay, property, mutation, timing and device gates reusable for Gate 0 | `evidence/gate0-harness-inventory.md`; minimum partial is a boundary-to-oracle table with blind spots | `tests/`, `scripts/regression-harness/`, `scripts/agent/`, `platformio.ini` | named evidence file only |
+| FRTOS-17 | adversarial Gate 0 architect; attack authority, determinism, fault battery, anti-gaming and acceptance ownership | `evidence/gate0-fault-battery-review.md`; minimum partial is the smallest fault battery that can kill each required failure class | execution plan, existing audit evidence, current tests and harness scripts | named evidence file only |
+
+All seven source readers must include the manifest SHA, every assigned path, an explicit
+`READ_IN_FULL` or failure status per file, and a final count matching the chunk. A grep-only
+summary does not satisfy `learn-codebase`.

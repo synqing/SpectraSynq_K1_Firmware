@@ -35,6 +35,8 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "globals.h"    // CONFIG + global state (serial_menu.h:8)
 #include "constants.h"  // NUM_AGC_BANDS etc. (serial_menu.h:9)
 #include "k1_trace.h"   // (serial_menu.h:10)
+#include "k1_prsm.h"
+#include "k1_authored_source.h"
 #ifdef K1_TUNABLE_REGISTRY_V1
 #include "k1_tunables.h"  // generic AP/VP runtime parameter access (:tune)
 #endif
@@ -62,6 +64,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_effect_queue.h"
 #include "k1_show_state.h"
 #include "k1_ap_capture_telemetry.h"
+#ifdef K1_SCHEDULING_TRACE_V1
+#include "k1_scheduling_trace_telemetry.h"
+#endif
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
 #include "serial_cmd_handlers.h"
@@ -1042,6 +1047,16 @@ void vp_perf_print_status() {
   USBSerial.print(vp_perf.over_budget_frames);
   USBSerial.print(" dropped=");
   USBSerial.println(vp_perf.dropped_frames);
+  USBSerial.print("VP_PERF_INTERVAL: avg=");
+  USBSerial.print(vp_perf_avg(vp_perf.frame_interval));
+  USBSerial.print(" max=");
+  USBSerial.println(vp_perf.frame_interval.max_us);
+  USBSerial.print("VP_PERF_STACK_HWM_WORDS: ap=");
+  USBSerial.print(vp_perf.ap_stack_hwm_min_words == 0xFFFFFFFFUL
+                    ? 0UL : vp_perf.ap_stack_hwm_min_words);
+  USBSerial.print(" vp=");
+  USBSerial.println(vp_perf.vp_stack_hwm_min_words == 0xFFFFFFFFUL
+                      ? 0UL : vp_perf.vp_stack_hwm_min_words);
   USBSerial.print("VP_PERF_HEAP: ");
   USBSerial.println(ESP.getFreeHeap());
 #else
@@ -3027,6 +3042,12 @@ void parse_command(char* command_buf) {
 	      vp_perf_command(command_type, command_data);
 	    }
 
+#ifdef K1_SCHEDULING_TRACE_V1
+    else if (strcmp(command_type, "scheduling_trace") == 0) {
+      k1_scheduling_trace_command(command_type, command_data);
+    }
+#endif
+
 	    // Extracted VERBATIM to serial_cmd_dispatch_smart_director() in
 	    // serial_cmd_handlers.cpp (smart_assist / smart_switching /
 	    // smart_confidence_floor / smart_scene). UNGATED. Behaviour-preserving —
@@ -3734,18 +3755,28 @@ void check_serial(uint32_t t_now) {
   serial_iter++;
 
   // Non-blocking Serial input, without overwriting unprocessed data
-  static uint32_t last_check = 0;
   static bool command_mode = false;
+  static k1_prsm_scanner_t prsm_scanner = {};
 
-  if (t_now - last_check > 10) {
-    last_check = t_now;
-
+  /* Drain every AP tick (not 10 ms). 120 Hz PRSM is 4080 B/s; a 32-byte/10 ms
+   * cap starves the stream. Magic scanner MUST run before hotkeys: PRSM is
+   * 'P''R''S''M' and P/R/S are immediate hotkeys. */
     uint8_t bytes_processed = 0;
-    while (USBSerial.available() && bytes_processed < 32) {
+    while (USBSerial.available() && bytes_processed < 128) {
       uint8_t byte = USBSerial.read();
       bytes_processed++;
 
       if (!command_mode) {
+        k1_prsm_frame_t prsm_frame;
+        const k1_prsm_scan_result_t scan =
+            k1_prsm_scanner_push(&prsm_scanner, byte, &prsm_frame);
+        if (scan != K1_PRSM_SCAN_NONE) {
+          if (scan == K1_PRSM_SCAN_FRAME_OK) {
+            k1_authored_on_frame(&prsm_frame, t_now);
+          }
+          continue;
+        }
+
         if (byte == ':') {
           command_mode = true;
           memset(&command_buf, 0, sizeof(char) * 128);
@@ -3783,7 +3814,6 @@ void check_serial(uint32_t t_now) {
         }
       }
     }
-  }
 }
 void stream_agc_data(uint32_t t_now) {
   if (!stream_agc_debug || t_now % 100 != 0) {
@@ -4232,6 +4262,10 @@ void stream_vp_perf_data(uint32_t t_now) {
   USBSerial.print(vp_perf_avg(vp_perf.show));
   USBSerial.print('/');
   USBSerial.print(vp_perf.show.max_us);
+  USBSerial.print(",interval_us=");
+  USBSerial.print(vp_perf_avg(vp_perf.frame_interval));
+  USBSerial.print('/');
+  USBSerial.print(vp_perf.frame_interval.max_us);
   USBSerial.print(",frame_us=");
   USBSerial.print(vp_perf_avg(vp_perf.frame));
   USBSerial.print('/');
@@ -4241,7 +4275,13 @@ void stream_vp_perf_data(uint32_t t_now) {
   USBSerial.print(",dropped=");
   USBSerial.print(vp_perf.dropped_frames);
   USBSerial.print(",heap=");
-  USBSerial.println(ESP.getFreeHeap());
+  USBSerial.print(ESP.getFreeHeap());
+  USBSerial.print(",ap_stack_hwm_words=");
+  USBSerial.print(vp_perf.ap_stack_hwm_min_words == 0xFFFFFFFFUL
+                    ? 0UL : vp_perf.ap_stack_hwm_min_words);
+  USBSerial.print(",vp_stack_hwm_words=");
+  USBSerial.println(vp_perf.vp_stack_hwm_min_words == 0xFFFFFFFFUL
+                      ? 0UL : vp_perf.vp_stack_hwm_min_words);
 #else
   (void)t_now;
 #endif

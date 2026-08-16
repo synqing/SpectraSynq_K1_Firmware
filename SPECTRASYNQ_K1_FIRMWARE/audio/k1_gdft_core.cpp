@@ -30,6 +30,33 @@
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
 
+#ifndef K1_GDFT_LANE4_PROBE
+#define K1_GDFT_LANE4_PROBE 0
+#endif
+
+#if K1_GDFT_LANE4_PROBE
+#ifdef ENABLE_GDFT_HARNESS
+#define K1_GDFT_LANE4_Q0_OBSERVE(q0_value)                                      \
+  do {                                                                          \
+    if ((q0_value) > (int64_t)INT32_MAX || (q0_value) < (int64_t)INT32_MIN) {  \
+      k1_gdft_q0_overflow_count++;                                              \
+    }                                                                           \
+  } while (0)
+#else
+#define K1_GDFT_LANE4_Q0_OBSERVE(q0_value) do { (void)(q0_value); } while (0)
+#endif
+#include "k1_gdft_lane4_exact.h"
+#undef K1_GDFT_LANE4_Q0_OBSERVE
+
+#if !K1_GDFT_INT64_RECURRENCE_V1 || !K1_GDFT_INT64_MAGNITUDE_V1
+#error "K1_GDFT_LANE4_PROBE requires the current int64 recurrence and magnitude contract"
+#endif
+
+#if K1_SPECTRAL_WINDOW_V1
+#error "K1_GDFT_LANE4_PROBE is an exact direct-recurrence probe; spectral windowing is outside its contract"
+#endif
+#endif
+
 // ----------------------------------------------------------------------------
 // Cross-TU symbol resolution (classic-Arduino layout).
 //
@@ -105,6 +132,91 @@ void IRAM_ATTR process_GDFT() {
   // Fixed-point code adapted from example here: https://sourceforge.net/p/freetel/code/HEAD/tree/misc/goertzal/goertzal.c
   const uint8_t nyquist_safe_bin_hi =
       k1_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
+#if K1_GDFT_LANE4_PROBE
+  // NON-SHIPPABLE Gate-2 ILP probe. Four adjacent bins consume their shared
+  // newest-sample prefix together. Each lane keeps its coefficient and q-state
+  // local, executes the exact production int64 ASR14 recurrence in the exact
+  // per-bin sample-age order, then runs its own residual tail. Bins remain
+  // independent: magnitude, normalisation and EMA commit in ascending bin order.
+  const uint16_t lane_safe_bin_count =
+      (nyquist_safe_bin_hi < NUM_FREQS) ? nyquist_safe_bin_hi : NUM_FREQS;
+  for (uint16_t lane_base = 0; lane_base < lane_safe_bin_count; lane_base += 4u) {
+    const uint8_t lane_count =
+        (uint8_t)(((lane_safe_bin_count - lane_base) < 4u)
+                      ? (lane_safe_bin_count - lane_base)
+                      : 4u);
+
+    K1GdftLane4ExactState lane[4] = {};
+    uint16_t common_prefix = UINT16_MAX;
+    for (uint8_t j = 0; j < lane_count; j++) {
+      const uint16_t bin = lane_base + j;
+      lane[j].coeff_q14 = frequencies[bin].coeff_q14;
+      lane[j].block_size = frequencies[bin].block_size;
+      lane[j].q1 = 0;
+      lane[j].q2 = 0;
+      if (lane[j].block_size < common_prefix) {
+        common_prefix = lane[j].block_size;
+      }
+    }
+
+    // Load each common sample age once, then advance all live lane states. The
+    // explicit calls expose four independent multiply/accumulate chains to the
+    // compiler without changing any lane's recurrence or sample order.
+    for (uint16_t n = 0; n < common_prefix; n++) {
+      const int32_t sample =
+          (int32_t)sample_window[SAMPLE_HISTORY_LENGTH - 1u - n];
+      k1_gdft_lane4_exact_step(lane[0], sample);
+      if (lane_count > 1u) k1_gdft_lane4_exact_step(lane[1], sample);
+      if (lane_count > 2u) k1_gdft_lane4_exact_step(lane[2], sample);
+      if (lane_count > 3u) k1_gdft_lane4_exact_step(lane[3], sample);
+    }
+
+    for (uint8_t j = 0; j < lane_count; j++) {
+      k1_gdft_lane4_exact_tail(
+          lane[j], sample_window, SAMPLE_HISTORY_LENGTH, common_prefix);
+    }
+
+    for (uint8_t j = 0; j < lane_count; j++) {
+      const uint16_t i = lane_base + j;
+      int32_t coeff_q14 = lane[j].coeff_q14;
+      int32_t q1 = lane[j].q1;
+      int32_t q2 = lane[j].q2;
+
+      int64_t coeff_term = ((int64_t)coeff_q14 * (int64_t)q1) >> 14;
+      int64_t mag2 = ((int64_t)q2 * (int64_t)q2)
+                   + ((int64_t)q1 * (int64_t)q1)
+                   - (coeff_term * (int64_t)q2);
+      if (mag2 < 0) {
+        mag2 = 0;
+      }
+      magnitudes[i] = sqrtf((float)mag2);
+
+      float normalized_magnitude =
+          magnitudes[i] * frequencies[i].inv_block_size_half;
+      magnitudes_normalized[i] = normalized_magnitude;
+
+      if (frequencies[i].target_freq == 440.0) {
+        // USBSerial.println(magnitudes_normalized[i]);
+      }
+
+      {
+        const float lane4_attack_coeff = MAGNITUDES_AVG_ATTACK;
+        float coeff = (magnitudes_normalized[i] > magnitudes_normalized_avg[i])
+                          ? lane4_attack_coeff
+                          : MAGNITUDES_AVG_RELEASE;
+        magnitudes_normalized_avg[i] =
+            (magnitudes_normalized[i] * coeff)
+            + (magnitudes_normalized_avg[i] * (1.0f - coeff));
+      }
+    }
+  }
+
+  for (uint16_t i = lane_safe_bin_count; i < NUM_FREQS; i++) {
+    magnitudes[i] = 0;
+    magnitudes_normalized[i] = 0.0f;
+    magnitudes_normalized_avg[i] = 0.0f;
+  }
+#else
   for (uint16_t i = 0; i < NUM_FREQS; i++) {  // Run NUM_FREQS times
     if (i >= nyquist_safe_bin_hi) {
       magnitudes[i] = 0;
@@ -217,6 +329,7 @@ void IRAM_ATTR process_GDFT() {
                                    + (magnitudes_normalized_avg[i] * (1.0f - coeff));
     }
   }
+#endif  // K1_GDFT_LANE4_PROBE
 
   // Gather per-bin noise only from the same accepted quiet Phase-B frames that
   // learn the broadband SSL floor. Earlier legacy code gathered throughout the

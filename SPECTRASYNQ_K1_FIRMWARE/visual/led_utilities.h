@@ -11,12 +11,16 @@
 #include "utilities.h" // Row 2: led_utilities uses fabs_fixed/fmod_fixed/random_float (after globals/constants so SQ15x16 is visible)
 #ifdef K1_DROP_CUT_V1
 #include "k1_audio_snapshot.h" // drop-cut detector reads the published AP snapshot (Core-1 read idiom)
+#include "k1_authored_source.h" // AUTHORED must not apply live drop-cut policy
 #endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
 #endif
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h" // rtrace_* LED-level capture (colour-fix-lane env only)
+#endif
+#ifdef K1_SCHEDULING_TRACE_V1
+#include "k1_scheduling_trace_telemetry.h"
 #endif
 #ifdef K1_AP_TWITCH_ORACLE_V1
 #include "k1_ap_twitch_oracle.h"
@@ -422,7 +426,11 @@ inline void apply_brightness() {
   silent_scale = 1.0f;
 #endif
 #ifdef K1_DROP_CUT_V1
-  drop_cut_update();
+  if (k1_authored_suppresses_live_update()) {
+    drop_cut_scale = 1.0f;
+  } else {
+    drop_cut_update();
+  }
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale * SQ15x16(drop_cut_scale);
 #else
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale;
@@ -1199,6 +1207,12 @@ inline void show_leds() {
 #endif
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_show_start_us = vp_perf.running ? esp_timer_get_time() : 0;
+#endif
+#ifdef K1_SCHEDULING_TRACE_V1
+  // This is the precise buffer-lifetime seam: wait for the prior two physical
+  // transfers before FastLED can rewrite its internal RMT payload. The linker
+  // wrapper hashes the actual post-scale/dither bytes submitted to ESP-IDF.
+  k1_scheduling_trace_before_fastled_show();
 #endif
   FastLED.show(); // This will update both LED strips
 #if ENABLE_VP_PERF_AUDIT

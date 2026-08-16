@@ -26,6 +26,39 @@
 #include <stdint.h>
 #include <math.h>                   // isfinite
 
+#ifndef K1_AP_STAGE_ATTRIBUTION_DETAIL
+#define K1_AP_STAGE_ATTRIBUTION_DETAIL 0
+#endif
+
+#if K1_AP_STAGE_ATTRIBUTION_DETAIL != 0 && K1_AP_STAGE_ATTRIBUTION_DETAIL != 1
+#error "K1_AP_STAGE_ATTRIBUTION_DETAIL must be 0 or 1"
+#endif
+
+#define K1_AP_CADENCE_SCHEMA_VERSION 2U
+
+// Declared outside the diagnostic feature gate because the Arduino sketch
+// preprocessor emits function prototypes before evaluating the guarded body.
+// This is a type declaration only: production gets no object, timer read or
+// linked telemetry code.
+struct APCadenceStageTiming {
+  bool valid;
+  bool detail_enabled;
+  uint64_t loop_start_us;
+  uint64_t pre_i2s_end_us;
+  uint64_t i2s_end_us;
+  uint64_t post_i2s_frontend_end_us;
+  uint64_t gdft_start_us;
+  uint64_t gdft_end_us;
+  uint64_t novelty_start_us;
+  uint64_t novelty_end_us;
+  uint64_t snapshot_start_us;
+  uint64_t snapshot_end_us;
+  uint64_t onset_end_us;
+  uint64_t saliency_end_us;
+  uint64_t tempo_end_us;
+  uint64_t loop_tail_end_us;
+};
+
 // NOTE: the full i2s_audio.h is a guard-less *implementation* header that only
 // compiles inside the .ino's include context; this TU pulls only the shared
 // type/constant header above, never i2s_audio.h itself.
@@ -60,10 +93,10 @@ const char* vp_bool_text(bool value);
 #define AP_CAD_SOAK_WORST_COUNT 16
 #endif
 #ifndef AP_CAD_SOAK_HIST_BUCKET_US
-#define AP_CAD_SOAK_HIST_BUCKET_US 128UL
+#define AP_CAD_SOAK_HIST_BUCKET_US 32UL
 #endif
 #ifndef AP_CAD_SOAK_HIST_BUCKETS
-#define AP_CAD_SOAK_HIST_BUCKETS 128
+#define AP_CAD_SOAK_HIST_BUCKETS 512
 #endif
 
 // ---- Sample structs (verbatim from serial_menu.h) --------------------------
@@ -87,13 +120,20 @@ struct APCadenceFrameInput {
   uint8_t stage;
   int8_t ap_core_id;
   int8_t vp_core_id;
+  APCadenceStageTiming stage_timing;
   K1AudioI2SReadDebug i2s;
   K1TempoDebugSnapshot tempo;
 };
 
 struct APCadenceCaptureSample {
+  uint64_t i2s_read_start_us;
+  uint64_t i2s_read_return_us;
+  uint64_t newest_sample_estimate_us;
+  uint64_t oldest_sample_estimate_us;
+  uint64_t ap_publish_us;
   uint32_t boot_ms;
   uint32_t frame_index;
+  uint32_t capture_sequence;
   uint32_t frame_ms;
   uint32_t emit_count;
   uint32_t emit_ms;
@@ -101,11 +141,35 @@ struct APCadenceCaptureSample {
   uint32_t gdft_elapsed_us;
   uint32_t novelty_elapsed_us;
   uint32_t total_ap_loop_elapsed_us;
+  uint32_t pre_i2s_service_elapsed_us;
+  uint32_t post_i2s_frontend_elapsed_us;
+  uint32_t post_gdft_service_elapsed_us;
+  uint32_t pre_snapshot_config_elapsed_us;
+  uint32_t snapshot_elapsed_us;
+  uint32_t onset_elapsed_us;
+  uint32_t saliency_elapsed_us;
+  uint32_t tempo_total_elapsed_us;
+  uint32_t tempo_pre_timed_elapsed_us;
+  uint32_t post_publish_tail_elapsed_us;
+  uint32_t stage_pre_i2s_end_offset_us;
+  uint32_t stage_i2s_end_offset_us;
+  uint32_t stage_frontend_end_offset_us;
+  uint32_t stage_gdft_start_offset_us;
+  uint32_t stage_gdft_end_offset_us;
+  uint32_t stage_novelty_start_offset_us;
+  uint32_t stage_novelty_end_offset_us;
+  uint32_t stage_snapshot_start_offset_us;
+  uint32_t stage_snapshot_end_offset_us;
+  uint32_t stage_onset_end_offset_us;
+  uint32_t stage_saliency_end_offset_us;
+  uint32_t stage_tempo_end_offset_us;
+  uint32_t stage_tail_end_offset_us;
   uint16_t sample_rate;
   uint16_t samples_per_chunk;
   uint16_t dma_frame_num;
   uint16_t bytes_requested;
   uint16_t bytes_read;
+  uint16_t samples_read;
   uint16_t emit_delta_ms;
   uint16_t declared_ap_hz_q8_8;
   uint16_t declared_nov_hz_q8_8;
@@ -137,7 +201,14 @@ struct APCadenceCaptureSample {
   uint8_t k1_frame_ctr;
   uint8_t tempo_decimation;
   uint8_t flags;
+  uint8_t sample_time_assumption_id;
+  uint8_t stage_detail;
+  uint8_t stage_timing_valid;
+  uint8_t gdft_internal_split_valid;
 };
+
+static_assert(sizeof(APCadenceCaptureSample) <= 256U,
+              "APCAD stage attribution must remain a bounded scalar record");
 
 // ---- Capture state (moved from serial_menu.h `static` -> external linkage) --
 extern bool AP_FRONTEND_DEBUG_ENABLED;
@@ -177,10 +248,24 @@ extern uint32_t AP_CAD_SOAK_CORE_BAD;
 extern uint32_t AP_CAD_SOAK_ACTIVE_OVER_7500;
 extern uint32_t AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500;
 extern uint32_t AP_CAD_SOAK_ACTIVE_MAX_US;
+extern uint64_t AP_CAD_SOAK_ACTIVE_SUM_US;
+extern uint32_t AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500;
+extern uint32_t AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500;
 extern uint16_t AP_CAD_SOAK_WORST_USED;
 extern bool AP_CAD_SOAK_HAVE_PREV;
 extern APCadenceCaptureSample AP_CAD_SOAK_WORST[AP_CAD_SOAK_WORST_COUNT];
 extern uint32_t AP_CAD_SOAK_ACTIVE_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_FRESHNESS_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_ACTIVE_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_COUNT;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_MAX_US;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US;
+extern uint64_t AP_CAD_SOAK_PREV_READ_RETURN_US;
+extern bool AP_CAD_SOAK_HAVE_PREV_READ_RETURN;
 
 // ---- Capture handler prototypes (bodies in k1_ap_capture_telemetry.cpp) -----
 uint16_t ap_nov_capture_q16(float value);
@@ -198,6 +283,7 @@ bool ap_cad_capture_ensure_buffer();
 void ap_cad_capture_status();
 void ap_cad_capture_clear();
 bool ap_cad_capture_arm(uint32_t duration_ms);
+bool ap_cad_timing_active();
 APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool emitted, uint32_t emit_delta_ms);
 uint32_t ap_cad_active_work_us(const APCadenceCaptureSample& sample);
 void ap_cad_capture_tick(const APCadenceFrameInput& frame);

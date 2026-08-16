@@ -132,6 +132,9 @@ struct K1OnsetBeatEvent {
 };
 
 void k1_audio_snapshot_update(uint32_t frame_ms);
+/* Single store write. Live update() and authored ingress both publish here.
+ * Callers must honour source arbitration — one writer at a time. */
+void k1_audio_snapshot_publish(const K1AudioSnapshot& next);
 K1AudioSnapshot k1_audio_snapshot_read();
 
 #ifdef K1_STM

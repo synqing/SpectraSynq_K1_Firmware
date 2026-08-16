@@ -1,0 +1,269 @@
+{
+  "acf_lag_cursor": {
+    "max": 181.0,
+    "median": 112.0,
+    "min": 16.0,
+    "p5": 16.0,
+    "p95": 181.0,
+    "p99": 181.0
+  },
+  "acf_publish_count_max": 530.0,
+  "acf_spread_active_rows": 393,
+  "acf_valid_rows": 256,
+  "actions": [
+    "stop",
+    "version",
+    "apcad_abort=1",
+    "apcad_clear=1",
+    "apdbg=off",
+    "tempo_stream=off",
+    "ap_stream=off",
+    "apcad_capture=5000",
+    "afplay playback",
+    "apcad_dump=1",
+    "apcad_abort=1"
+  ],
+  "active_ap_work_over_7500_count": 465,
+  "active_sample_rate_mode": 12800,
+  "active_samples_per_chunk_mode": 96,
+  "active_tempo_decimation_mode": 3,
+  "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/build/audio-semantic-metrics/device-ap-cadence-capture/gate2v3_music_cross0_20260815_152005__apcad.log",
+  "baud": 115200,
+  "bytes_mismatch_count": 0,
+  "capture_admissible": true,
+  "capture_complete": true,
+  "capture_metadata": {
+    "begin": {
+      "capacity": 2304,
+      "count": 465,
+      "dropped": 0,
+      "end_ms": 214141,
+      "start_ms": 209141
+    },
+    "done": {
+      "count": 465,
+      "dropped": 0
+    }
+  },
+  "capture_sequence_gap_count": 0,
+  "capture_sequence_gaps_first10": [],
+  "capture_start": "2026-08-15T15:20:22+0800",
+  "classification": "B_ap_compute_overrun",
+  "classification_reason": "active config and I2S read integrity are clean, but AP frame cadence is slow and the I2S read returns immediately, indicating backlog from a late AP loop",
+  "compact_soak_mode": false,
+  "declared_accepted_novelty_rate_hz_from_binary": 44.44531,
+  "declared_ap_frame_hz_from_binary": 133.33203,
+  "dump_timeout_seconds": 90.0,
+  "duration_ms": 4997,
+  "duration_ms_requested": 5000,
+  "emitted_active_ap_work_over_7500_count": 155,
+  "expected_accepted_novelty_dt_ms_from_active_config": 22.499999999999996,
+  "expected_accepted_novelty_rate_hz_from_active_config": 44.44444444444445,
+  "expected_ap_frame_dt_ms_from_active_config": 7.499999999999999,
+  "expected_ap_frame_rate_hz_from_active_config": 133.33333333333334,
+  "first_frame": 20227,
+  "first_t_ms": 209141,
+  "frame_gap_count": 0,
+  "frame_gaps_first10": [],
+  "i2s_not_ok_count": 0,
+  "i2s_status_counts": {
+    "0": 465
+  },
+  "last_frame": 20691,
+  "last_t_ms": 214138,
+  "measured_ap_frame_dt_ms": {
+    "max": 13.0,
+    "median": 11.0,
+    "min": 9.0,
+    "p5": 9.0,
+    "p95": 12.849999999999966,
+    "p99": 13.0
+  },
+  "measured_ap_frame_rate_hz": 92.85571342805683,
+  "measured_emitted_novelty_count": 155,
+  "measured_emitted_novelty_dt_ms": {
+    "max": 35.0,
+    "median": 32.0,
+    "min": 29.0,
+    "p5": 30.0,
+    "p95": 35.0,
+    "p99": 35.0
+  },
+  "measured_emitted_novelty_rate_hz": 30.942334739803094,
+  "non_actions": [
+    "no calibration command",
+    "no tempo tuning",
+    "no production DSP change"
+  ],
+  "playback_gain_db": 0.0,
+  "player": "afplay",
+  "port": "/dev/cu.usbmodem12401",
+  "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/build/audio-semantic-metrics/device-ap-cadence-capture/gate2v3_music_cross0_20260815_152005__raw.log",
+  "row_count": 465,
+  "sample_time_assumption_ids": [
+    1
+  ],
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem12401",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4",
+    "location": "0-1.2.4",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:89:B4",
+    "vid": 12346
+  },
+  "silence_rows": 95,
+  "source_contract_novelty_decimation": 3,
+  "source_contract_sample_rate": 12800,
+  "source_contract_samples_per_chunk": 96,
+  "start_ms": 0,
+  "timestamp_identity_row_count": 465,
+  "timestamp_order_failure_count": 0,
+  "timestamp_regression_count": 0,
+  "timestamp_regressions_first10": [],
+  "timing_us": {
+    "active_ap_work_elapsed_us": {
+      "max": 11913.0,
+      "median": 9375.0,
+      "min": 8096.0,
+      "p5": 8294.4,
+      "p95": 11425.4,
+      "p99": 11820.04
+    },
+    "calculate_novelty_elapsed_us": {
+      "max": 79.0,
+      "median": 35.0,
+      "min": 18.0,
+      "p5": 21.0,
+      "p95": 56.0,
+      "p99": 67.72000000000003
+    },
+    "emitted_active_ap_work_elapsed_us": {
+      "max": 11913.0,
+      "median": 10849.0,
+      "min": 9510.0,
+      "p5": 9815.5,
+      "p95": 11772.7,
+      "p99": 11889.68
+    },
+    "i2s_read_elapsed_us": {
+      "max": 68.0,
+      "median": 34.0,
+      "min": 20.0,
+      "p5": 21.80000000000001,
+      "p95": 52.799999999999955,
+      "p99": 56.0
+    },
+    "newest_sample_to_ap_publish_us": {
+      "max": 11807.0,
+      "median": 9300.0,
+      "min": 8027.0,
+      "p5": 8215.0,
+      "p95": 11345.399999999998,
+      "p99": 11736.68
+    },
+    "oldest_sample_to_ap_publish_us": {
+      "max": 19228.0,
+      "median": 16721.0,
+      "min": 15448.0,
+      "p5": 15636.0,
+      "p95": 18766.399999999998,
+      "p99": 19157.68
+    },
+    "process_GDFT_elapsed_us": {
+      "max": 7625.0,
+      "median": 7174.0,
+      "min": 6469.0,
+      "p5": 6710.6,
+      "p95": 7536.6,
+      "p99": 7598.360000000001
+    },
+    "tempo_acf_elapsed_us": {
+      "max": 1198.0,
+      "median": 671.0,
+      "min": 108.0,
+      "p5": 240.80000000000007,
+      "p95": 1099.9999999999989,
+      "p99": 1173.0
+    },
+    "tempo_emit_elapsed_us": {
+      "max": 2484.0,
+      "median": 1637.0,
+      "min": 1003.0,
+      "p5": 1231.0,
+      "p95": 2372.1999999999994,
+      "p99": 2456.0
+    },
+    "tempo_phase_elapsed_us": {
+      "max": 106.0,
+      "median": 57.0,
+      "min": 32.0,
+      "p5": 33.0,
+      "p95": 96.59999999999991,
+      "p99": 106.0
+    },
+    "tempo_publish_elapsed_us": {
+      "max": 38.0,
+      "median": 14.0,
+      "min": 6.0,
+      "p5": 7.0,
+      "p95": 25.799999999999955,
+      "p99": 30.0
+    },
+    "tempo_silence_elapsed_us": {
+      "max": 232.0,
+      "median": 158.0,
+      "min": 81.0,
+      "p5": 84.0,
+      "p95": 222.0,
+      "p99": 231.0
+    },
+    "tempo_update_elapsed_us": {
+      "max": 1151.0,
+      "median": 771.0,
+      "min": 501.0,
+      "p5": 532.0,
+      "p95": 1059.8,
+      "p99": 1147.0
+    },
+    "total_ap_loop_elapsed_us": {
+      "max": 11946.0,
+      "median": 9412.0,
+      "min": 8127.0,
+      "p5": 8337.0,
+      "p95": 11458.8,
+      "p99": 11856.119999999999
+    }
+  },
+  "track_file": "/Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3",
+  "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938",
+  "unique_ap_core_id": [
+    0
+  ],
+  "unique_dma_desc_num": [
+    3
+  ],
+  "unique_dma_frame_num": [
+    96
+  ],
+  "unique_sample_rate": [
+    12800
+  ],
+  "unique_samples_per_chunk": [
+    96
+  ],
+  "unique_slot_bit_width": [
+    32
+  ],
+  "unique_slot_mode": [
+    2
+  ],
+  "unique_stage": [
+    0
+  ],
+  "unique_vp_core_id": [
+    1
+  ]
+}

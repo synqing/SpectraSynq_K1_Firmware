@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "contract_id": "K1_SCHEDULING_GATE0_2026_08_15",
+  "authority": {
+    "branch": "feat/k1-scheduling-generation-hardening",
+    "handover": "docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md",
+    "captain_authorisation": "FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15",
+    "separate_open_lane": "AP_INPUT_INTEGRITY_P4"
+  },
+  "locked_architecture": {
+    "ap_core": 0,
+    "vp_core": 1,
+    "ap_pipeline": "single_complete_transaction",
+    "vp_pipeline": "single_frame_top_acquire_then_local_const_frame",
+    "broad_rtos_rewrite": false,
+    "multi_actor_audio_pipeline": false,
+    "added_pacing_clock": false,
+    "radio_programme_in_scope": false,
+    "spectral_24k_180_programme_in_scope": false
+  },
+  "production_tuple": {
+    "platformio_environment": "k1_hardware",
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 96,
+    "tempo_novelty_decimation": 3,
+    "ap_arrival_period_us": 7500
+  },
+  "vp_contract": {
+    "target_fps": 120,
+    "target_period_us": 8333,
+    "cadence": "free_running_measured_no_added_clock",
+    "frame_start_boundary": "led_thread_vp_frame_start_us",
+    "whole_frame_endpoint": "rmt_completion_confirmed",
+    "miss_definition": "frame_start_delta_us_gt_8333",
+    "admission": {
+      "frame_start_delta_p99_max_us": 8333,
+      "arithmetic_mean_max_us": 8333,
+      "max_consecutive_misses": 1,
+      "recovery_frames_max": 2
+    },
+    "effect_code_hard_ceiling_us": 2000,
+    "effect_code_scope": "one_effect_render_call_excluding_frame_smoothing_composition_quantisation_and_rmt"
+  },
+  "margin_rules": {
+    "ap_service_p99_max_fraction_of_arrival": 0.8,
+    "ap_max_must_fit_measured_dma_cushion": true,
+    "ap_max_consecutive_over_period": 1,
+    "ap_recovery_hops_max": 2,
+    "shared_copy_lock_p99_max_fraction_of_ap_period": 0.02,
+    "shared_copy_lock_max_fraction_of_ap_period": 0.05,
+    "queue_capacity_rule": "ceil(measured_peak_arrival_rate_times_measured_worst_drain_pause)+one_slot",
+    "queue_saturation_must_be_visible": true,
+    "instrumented_vs_minimal_p99_regression_max_fraction": 0.05,
+    "instrumented_capture_drop_max": 0,
+    "binding_rule": "Gate_1_binds_measured_baseline_values_to_these_pre_registered_formulas"
+  },
+  "threshold_ownership": {
+    "product_contract_owner": "Captain",
+    "oracle_owner": "independent_harness_owner",
+    "acceptance_runner": "independent_gate_runner",
+    "production_unit_may_edit_thresholds": false,
+    "change_rule": "separate_authorised_contract_commit_then_complete_gate0_requalification_before_candidate_measurement",
+    "empirical_binding_rule": "freeze_gate1_baseline_distribution_and_derived_values_before_candidate_A_B"
+  },
+  "feature_latency_contracts": [
+    {
+      "feature": "raw_peak_vu",
+      "origin": "newest_sample_estimate_us",
+      "endpoint": "rmt_complete_us_of_first_intended_visible_change",
+      "budget_us": 25000
+    },
+    {
+      "feature": "transient_onset_after_acceptance",
+      "origin": "accepted_onset_event_timestamp_us",
+      "endpoint": "rmt_complete_us_of_first_intended_visible_response",
+      "budget_us": 25000
+    },
+    {
+      "feature": "transient_onset_from_acoustic_event",
+      "origin": "instrumented_acoustic_transient_us",
+      "endpoint": "first_visible_photon_us",
+      "budget_formula": "analysis_reference_age_us+confirmation_hops*7500+25000"
+    },
+    {
+      "feature": "bass_energy",
+      "origin": "bass_analysis_window_centre_us",
+      "endpoint": "rmt_complete_us_of_first_bass_driven_output",
+      "budget_us": 25000
+    },
+    {
+      "feature": "tempo_beat_phase",
+      "origin": "accepted_beat_or_phase_event_us",
+      "endpoint": "rmt_complete_us_of_phase_aligned_output",
+      "budget_us": 25000,
+      "excludes": "tempo_lock_acquisition_time"
+    },
+    {
+      "feature": "harmonic_chord_colour",
+      "origin": "harmonic_analysis_window_centre_us",
+      "endpoint": "rmt_complete_us_of_first_intended_colour_change",
+      "budget_us": 35000
+    },
+    {
+      "feature": "ap_publication_freshness",
+      "origin": "newest_sample_estimate_us",
+      "endpoint": "ap_publish_us",
+      "budget_p99_us": 6000
+    },
+    {
+      "feature": "vp_generation_age",
+      "origin": "ap_publish_us",
+      "endpoint": "vp_acquire_us",
+      "budget_p99_us": 8333
+    },
+    {
+      "feature": "rmt_output",
+      "origin": "rmt_submit_us",
+      "endpoint": "rmt_complete_us",
+      "budget_formula": "physical_wire_time_us+500"
+    },
+    {
+      "feature": "physical_product",
+      "origin": "instrumented_acoustic_reference_us",
+      "endpoint": "instrumented_first_visible_photon_us",
+      "budget_formula": "named_feature_analysis_age_us+named_feature_transport_budget_us"
+    }
+  ],
+  "sample_time_assumptions": [
+    {
+      "id": "I2S_DMA_RETURN_ESTIMATE_V1",
+      "newest_sample": "i2s_read_return_us",
+      "oldest_sample_formula": "i2s_read_return_us-(samples_read-1)*1000000/sample_rate_hz",
+      "limitation": "descriptor_residency_before_read_is_unknown_until_backlog_instrumentation_reports_it"
+    }
+  ],
+  "mode_stress_contract": {
+    "discovery": "profile_every_enabled_primary_and_secondary_mode_then_select_measured_worst_complete_frame_pair",
+    "stress_transition": "simultaneous_two_channel_crossfade",
+    "edge_mixer": "shipping_enabled_configuration",
+    "selection_must_be_frozen_before_admission_capture": true
+  },
+  "required_trace_fields": [
+    "boot_epoch",
+    "capture_sequence",
+    "i2s_read_return_us",
+    "newest_sample_estimate_us",
+    "oldest_sample_estimate_us",
+    "sample_time_assumption_id",
+    "ap_generation",
+    "ap_publish_us",
+    "onset_epoch",
+    "onset_sequence",
+    "beat_epoch",
+    "beat_sequence",
+    "vp_frame_sequence",
+    "vp_acquire_us",
+    "render_start_us",
+    "rmt_submit_us",
+    "rmt_complete_us",
+    "primary_final_bytes_crc",
+    "secondary_final_bytes_crc",
+    "rmt_completion_confirmed",
+    "rmt_completion_source",
+    "mixed_generation_count",
+    "trace_drop_count",
+    "trace_crc"
+  ],
+  "required_faults": [
+    "wrong_git_sha",
+    "wrong_source_manifest",
+    "wrong_platformio_ini",
+    "wrong_build_flags",
+    "wrong_firmware_binary",
+    "wrong_device_identity_manifest",
+    "wrong_device_identity",
+    "wrong_sample_tuple",
+    "wrong_mode_stress_contract",
+    "missing_trace_field",
+    "regressed_timestamp",
+    "corrupt_generation",
+    "missing_final_bytes_crc",
+    "unconfirmed_rmt_completion",
+    "changed_frozen_fixture",
+    "changed_test_inventory_hash",
+    "deleted_required_test",
+    "skipped_required_test",
+    "xfailed_required_test",
+    "deselected_required_test",
+    "perturbing_stream_enabled"
+  ]
+}

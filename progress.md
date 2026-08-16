@@ -2,6 +2,48 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-16 — G0R Captain stamp A
+
+**Active authority:** `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
+· G0R plan `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`
+**Lane:** `K1_SCHEDULING_HARDENING_20260815` on `feat/k1-scheduling-generation-hardening`
+
+```text
+G0R_CAPTAIN_STAMP            = A
+G0_ORACLE_IMPLEMENTATION     = CLOSED
+G0_CONTRACT_CONTENT          = STAMPED_A_AFFIRMS_DEPLOYED
+TEN_MS_AP_HOP_AUTHORISED     = NO
+G2_PRODUCT_SELECTION         = CLOSED_AS_A_7P5
+G2_SERVICE                   = RED_6MS_P99
+G3                           = BLOCKED
+B489_ABBA_FLASH_NOW          = HOLD
+HARNESS_FIRMWARE_PIN_SHA     = 14c53d23…
+FINAL_ABBA_TOOLCHAIN_PIN_SHA = c1aba345…
+```
+
+Deployed 12.8 kHz / 96 / d3 / 7.5 ms remains controlling. `gate0/contract.json`
+unchanged. Gate 2 stays red against 6 ms p99. This stamp is not B489 flash
+authorisation. No Gate 3.
+
+## 2026-08-16 — G0R cadence-authority (map–territory)
+
+Superseded later the same day by stamp A (see above). Prior state: G0 content
+reopened as G0R; G2 product selection blocked pending A–E.
+
+## 2026-08-15 — Scheduling hardening implementation takeover
+
+**Active authority:** `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
+**Lane:** `K1_SCHEDULING_HARDENING_20260815` on
+`feat/k1-scheduling-generation-hardening`
+**Authorisation:** `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15`
+
+- Captain authorised end-to-end implementation of the committed Gate 0-8 plan.
+- This supersedes the scheduling lane's byte-inert planning hold without declaring the
+  separate AP-input-integrity P4 promotion complete.
+- *(Superseded 2026-08-16: Gate 0 oracle CLOSED; contract content reopened as G0R — see above.)*
+- Locked topology remains AP/Core 0 and VP/Core 1; broad actor rewrite, Core-1 DSP and
+  speculative priority/pacing changes remain rejected.
+
 ## 2026-08-15 — AP input-integrity takeover
 
 **Active authority:** `docs/handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md`

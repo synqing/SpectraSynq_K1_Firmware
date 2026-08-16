@@ -101,6 +101,10 @@ static K1AudioI2SReadDebug k1_audio_i2s_read_debug = {};
 K1AudioI2SReadDebug k1_audio_i2s_read_debug_read() {
   return k1_audio_i2s_read_debug;
 }
+
+void k1_audio_i2s_debug_note_ap_publish(uint64_t ap_publish_us) {
+  k1_audio_i2s_read_debug.ap_publish_us = ap_publish_us;
+}
 #endif
 
 // Raw I2S frame dump request flag (one-shot diagnostic, fires once and clears).
@@ -504,10 +508,31 @@ void acquire_sample_chunk(uint32_t t_now) {
     t_now);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  const uint64_t i2s_read_return_us = (uint64_t)esp_timer_get_time();
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const uint32_t k1_i2s_samples_read =
+      (uint32_t)(bytes_read / (2U * sizeof(int16_t)));
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
+  const uint32_t k1_i2s_samples_read = (uint32_t)(bytes_read / sizeof(int16_t));
+#else
+  const uint32_t k1_i2s_samples_read = (uint32_t)(bytes_read / sizeof(int32_t));
+#endif
+  static uint32_t k1_i2s_capture_sequence = 0;
+  k1_audio_i2s_read_debug.read_start_us = (uint64_t)i2s_read_start_us;
+  k1_audio_i2s_read_debug.read_return_us = i2s_read_return_us;
+  k1_audio_i2s_read_debug.newest_sample_estimate_us = i2s_read_return_us;
+  k1_audio_i2s_read_debug.oldest_sample_estimate_us =
+      k1_i2s_estimate_oldest_sample_us(
+          i2s_read_return_us, k1_i2s_samples_read, CONFIG.SAMPLE_RATE);
+  k1_audio_i2s_read_debug.ap_publish_us = 0;
+  k1_audio_i2s_read_debug.capture_sequence = ++k1_i2s_capture_sequence;
+  k1_audio_i2s_read_debug.samples_read = k1_i2s_samples_read;
   k1_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
   k1_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
   k1_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
-  k1_audio_i2s_read_debug.elapsed_us = (uint32_t)(esp_timer_get_time() - i2s_read_start_us);
+  k1_audio_i2s_read_debug.elapsed_us =
+      (uint32_t)(i2s_read_return_us - (uint64_t)i2s_read_start_us);
+  k1_audio_i2s_read_debug.sample_time_assumption_id = 1U;
 #else
 #ifndef K1_MIC_AUTO_SENSE_V1
   (void)i2s_read_status;
