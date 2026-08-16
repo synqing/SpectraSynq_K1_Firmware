@@ -134,3 +134,99 @@ def test_no_production_file_imports_gate0_oracle():
     for path in (ROOT / "SPECTRASYNQ_K1_FIRMWARE").rglob("*"):
         if path.is_file() and path.suffix in {".ino", ".h", ".cpp"}:
             assert "k1_scheduling_gate0" not in path.read_text(encoding="utf-8", errors="ignore")
+
+
+G0R_FIXTURES = ROOT / "tests" / "fixtures" / "scheduling_gate0" / "g0r_selection"
+TUPLE_96 = {
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 96,
+    "tempo_novelty_decimation": 3,
+    "ap_arrival_period_us": 7500,
+}
+TUPLE_128_D2 = {
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 128,
+    "tempo_novelty_decimation": 2,
+    "ap_arrival_period_us": 10000,
+}
+
+
+@pytest.fixture(scope="module")
+def g0r_fixtures():
+    return G0R_FIXTURES
+
+
+def test_draft_exists_no_pointer_selects_deployed_75ms(oracle, g0r_fixtures):
+    sel = oracle.select_contract(
+        g0r_fixtures,
+        pointer_path=None,
+        build_env="k1_hardware",
+        measured_tuple=TUPLE_96,
+    )
+    assert sel.selected_contract_id == "K1_SCHEDULING_GATE0_2026_08_15"
+    assert sel.selected_period_us == 7500
+    assert sel.selected_p99_limit_us == 6000
+    assert sel.selection_reason == "no_pointer_deployed_contract"
+    assert sel.scope == "DEPLOYED"
+    assert sel.selected_contract_path.resolve() == (g0r_fixtures / "contract.json").resolve()
+    assert sel.selected_contract_sha256 == oracle.sha256_file(g0r_fixtures / "contract.json")
+    assert (
+        sel.selected_contract_sha256
+        == "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+    )
+
+
+def test_pointer_to_draft_fails_closed(oracle, g0r_fixtures):
+    with pytest.raises(oracle.Gate0Error, match="DRAFT_AWAITING_CAPTAIN"):
+        oracle.select_contract(
+            g0r_fixtures,
+            pointer_path=g0r_fixtures / "pointers" / "draft.json",
+            build_env="k1_hardware",
+            measured_tuple=TUPLE_96,
+        )
+
+
+def test_stamped_candidate_wrong_env_fails_closed(oracle, g0r_fixtures):
+    with pytest.raises(oracle.Gate0Error, match="applicable_envs"):
+        oracle.select_contract(
+            g0r_fixtures,
+            pointer_path=g0r_fixtures / "pointers" / "stamped_wrong_env.json",
+            build_env="k1_hardware",
+            measured_tuple=TUPLE_128_D2,
+        )
+
+
+def test_stamped_candidate_matching_env_and_tuple_accepted(oracle, g0r_fixtures):
+    candidate = g0r_fixtures / "amendments" / "stamped_candidate.json"
+    sel = oracle.select_contract(
+        g0r_fixtures,
+        pointer_path=g0r_fixtures / "pointers" / "stamped_matching_env.json",
+        build_env="k1_bench_scheduling_hop128_d2_min_probe",
+        measured_tuple=TUPLE_128_D2,
+    )
+    assert sel.scope == "CANDIDATE_ONLY"
+    assert sel.selected_period_us == 10000
+    assert sel.selected_p99_limit_us == 8000
+    assert sel.selection_reason == "candidate_env_and_tuple_match"
+    assert sel.selected_contract_id == "K1_SCHEDULING_G0R_CANDIDATE_128_D2_FIXTURE"
+    assert sel.selected_contract_path.resolve() == candidate.resolve()
+    assert sel.selected_contract_sha256 == oracle.sha256_file(candidate)
+
+
+def test_production_promotion_pointer_fails_closed(oracle, g0r_fixtures):
+    with pytest.raises(
+        oracle.Gate0Error, match="production_promotion_not_authorised_before_gate8"
+    ):
+        oracle.select_contract(
+            g0r_fixtures,
+            pointer_path=g0r_fixtures / "pointers" / "production_promotion.json",
+            build_env="k1_bench_scheduling_hop128_d2_min_probe",
+            measured_tuple=TUPLE_128_D2,
+        )
+
+
+def test_default_contract_still_deployed_75ms(oracle):
+    assert oracle.DEFAULT_CONTRACT.resolve() == CONTRACT.resolve()
+    assert oracle.sha256_file(oracle.DEFAULT_CONTRACT) == (
+        "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+    )

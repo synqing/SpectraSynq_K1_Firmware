@@ -77,6 +77,25 @@ class ValidationResult:
     records: int
 
 
+@dataclass(frozen=True)
+class ContractSelection:
+    selected_contract_path: Path
+    selected_contract_id: str
+    selected_contract_sha256: str
+    selected_period_us: int
+    selected_p99_limit_us: int
+    selection_reason: str
+    scope: str  # DEPLOYED | CANDIDATE_ONLY
+
+
+_TUPLE_COMPARE_KEYS = (
+    "sample_rate_hz",
+    "samples_per_chunk",
+    "tempo_novelty_decimation",
+    "ap_arrival_period_us",
+)
+
+
 def _canonical_json(value: Any) -> bytes:
     return json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
@@ -333,6 +352,151 @@ def validate_run(contract: dict[str, Any], evidence: dict[str, Any]) -> Validati
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _resolve_deployed_contract_path(
+    root: Path, deployed_contract_path: Path | None
+) -> Path:
+    if deployed_contract_path is not None:
+        return deployed_contract_path
+    candidate = root / "contract.json"
+    if candidate.is_file():
+        return candidate
+    return DEFAULT_CONTRACT if root == ROOT else root / "contract.json"
+
+
+def _p99_limit_us(contract: dict[str, Any]) -> int:
+    period = int(contract["production_tuple"]["ap_arrival_period_us"])
+    fraction = float(contract["margin_rules"]["ap_service_p99_max_fraction_of_arrival"])
+    return int(period * fraction)
+
+
+def _selection_from_contract(
+    path: Path,
+    contract: dict[str, Any],
+    *,
+    reason: str,
+    scope: str,
+) -> ContractSelection:
+    return ContractSelection(
+        selected_contract_path=path.resolve(),
+        selected_contract_id=str(contract["contract_id"]),
+        selected_contract_sha256=sha256_file(path),
+        selected_period_us=int(contract["production_tuple"]["ap_arrival_period_us"]),
+        selected_p99_limit_us=_p99_limit_us(contract),
+        selection_reason=reason,
+        scope=scope,
+    )
+
+
+def _tuple_matches(expected: dict[str, Any], measured: dict[str, Any] | None) -> bool:
+    if measured is None:
+        return False
+    for key in _TUPLE_COMPARE_KEYS:
+        if key not in expected:
+            continue
+        if measured.get(key) != expected[key]:
+            return False
+    return True
+
+
+def select_contract(
+    root: Path,
+    *,
+    pointer_path: Path | None = None,
+    build_env: str | None = None,
+    measured_tuple: dict[str, Any] | None = None,
+    deployed_contract_path: Path | None = None,
+) -> ContractSelection:
+    """Select the controlling Gate-0 contract without promoting drafts.
+
+    Live DEFAULT_CONTRACT remains the deployed 7.5 ms file. A pointer is required
+    before any stamped candidate may be selected, and production promotion is
+    rejected until Gate 8.
+    """
+    deployed_path = _resolve_deployed_contract_path(root, deployed_contract_path)
+    if not deployed_path.is_file():
+        raise Gate0Error(f"deployed_contract_missing:{deployed_path}")
+
+    if pointer_path is None or not pointer_path.is_file():
+        return _selection_from_contract(
+            deployed_path,
+            load_json(deployed_path),
+            reason="no_pointer_deployed_contract",
+            scope="DEPLOYED",
+        )
+
+    pointer = load_json(pointer_path)
+    target_rel = pointer.get("target_path") or pointer.get("contract_path")
+    if not target_rel:
+        raise Gate0Error("pointer_missing_target_path")
+    target_path = Path(target_rel)
+    if not target_path.is_absolute():
+        target_path = (root / target_path).resolve()
+    if not target_path.is_file():
+        raise Gate0Error(f"pointer_target_missing:{target_path}")
+
+    target = load_json(target_path)
+    status = str(target.get("status", ""))
+    if status == "DRAFT_AWAITING_CAPTAIN":
+        raise Gate0Error("DRAFT_AWAITING_CAPTAIN")
+
+    candidate_scope = target.get("candidate_scope") or target.get("scope_block") or {}
+    if isinstance(target.get("scope"), str) and not candidate_scope:
+        candidate_scope = {
+            "scope": target.get("scope"),
+            "applicable_envs": target.get("applicable_envs", []),
+            "promotion_status": target.get("promotion_status", "NOT_PRODUCTION"),
+            "status": status,
+        }
+
+    promotion = str(
+        candidate_scope.get("promotion_status")
+        or target.get("promotion_status")
+        or "NOT_PRODUCTION"
+    )
+    if promotion == "PRODUCTION":
+        raise Gate0Error("production_promotion_not_authorised_before_gate8")
+
+    if status != "CAPTAIN_STAMPED":
+        raise Gate0Error(f"pointer_target_status_not_admissible:{status or 'missing'}")
+
+    scope = str(candidate_scope.get("scope") or target.get("scope") or "")
+    if scope != "CANDIDATE_ONLY":
+        raise Gate0Error(f"pointer_target_scope_not_candidate:{scope or 'missing'}")
+
+    applicable = list(candidate_scope.get("applicable_envs") or target.get("applicable_envs") or [])
+    if build_env not in applicable:
+        raise Gate0Error("applicable_envs")
+
+    # Candidate files may embed a nested contract object or carry contract fields
+    # at the top level (status/scope alongside production_tuple).
+    contract_body = target
+    if "contract" in target and isinstance(target["contract"], dict):
+        contract_body = {**target["contract"]}
+        if "contract_id" not in contract_body and "contract_id" in target:
+            contract_body["contract_id"] = target["contract_id"]
+        if "production_tuple" not in contract_body and "production_tuple" in target:
+            contract_body["production_tuple"] = target["production_tuple"]
+        if "margin_rules" not in contract_body and "margin_rules" in target:
+            contract_body["margin_rules"] = target["margin_rules"]
+
+    production_tuple = contract_body.get("production_tuple")
+    if not isinstance(production_tuple, dict):
+        raise Gate0Error("candidate_missing_production_tuple")
+    if not _tuple_matches(production_tuple, measured_tuple):
+        raise Gate0Error("measured_tuple_mismatch")
+    if "contract_id" not in contract_body:
+        raise Gate0Error("candidate_missing_contract_id")
+    if "margin_rules" not in contract_body:
+        raise Gate0Error("candidate_missing_margin_rules")
+
+    return _selection_from_contract(
+        target_path,
+        contract_body,
+        reason="candidate_env_and_tuple_match",
+        scope="CANDIDATE_ONLY",
+    )
 
 
 def fault_mutations(valid: dict[str, Any]) -> dict[str, dict[str, Any]]:
