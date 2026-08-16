@@ -13,7 +13,7 @@ g2_product_selection: BLOCKED_BY_G0R
 g3: BLOCKED
 b489_abba_flash_now: HOLD
 harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
-final_abba_toolchain_pin_sha: PENDING_R5
+final_abba_toolchain_pin_sha: c1aba345603bc2cacc8cf30648768d346f572779
 ---
 
 # Handover — K1 scheduling hardening implementation
@@ -78,7 +78,7 @@ G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
 G3                           = BLOCKED
 B489_ABBA_FLASH_NOW          = HOLD
 HARNESS_FIRMWARE_PIN_SHA     = 14c53d239524aa891e71470880f6917d4adf2ea6
-FINAL_ABBA_TOOLCHAIN_PIN_SHA = PENDING_R5
+FINAL_ABBA_TOOLCHAIN_PIN_SHA = c1aba345603bc2cacc8cf30648768d346f572779
 ```
 
 G0R authority: `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`.

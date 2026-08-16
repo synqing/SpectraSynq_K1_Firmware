@@ -15,7 +15,7 @@ G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
 G3                           = BLOCKED
 B489_ABBA_FLASH_NOW          = HOLD
 HARNESS_FIRMWARE_PIN_SHA     = 14c53d23…
-FINAL_ABBA_TOOLCHAIN_PIN_SHA = PENDING_R5
+FINAL_ABBA_TOOLCHAIN_PIN_SHA = c1aba345…
 ```
 
 Deployed 7.5 ms contract remains controlling. Flash HOLD. No Gate 3.
