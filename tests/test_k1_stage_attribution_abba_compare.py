@@ -1274,3 +1274,76 @@ def test_repeatability_uses_maximum_possible_delta_not_midpoint(tmp_path: Path) 
     result = abba._repeatability(wide, wide)
     assert result["maximum_possible_delta_pp"] == 5.2
     assert result["status"] == "INCONCLUSIVE"
+
+
+def _frame_row(
+    *,
+    emitted: int = 0,
+    onset_event: int = 0,
+    active_ap_work_us: float = 1000.0,
+    gdft_us: float = 400.0,
+) -> dict:
+    return {
+        "emitted": emitted,
+        "onset_event": onset_event,
+        "active_ap_work_us": active_ap_work_us,
+        "gdft_us": gdft_us,
+    }
+
+
+def test_exclusive_classes_partition_the_rows() -> None:
+    rows = [
+        _frame_row(emitted=0, onset_event=0),
+        _frame_row(emitted=1, onset_event=0),
+        _frame_row(emitted=0, onset_event=1),
+        _frame_row(emitted=1, onset_event=1),
+        _frame_row(emitted=1, onset_event=0),
+    ]
+    dist = abba.frame_class_distributions(rows)
+    assert set(dist["exclusive"]) == {"neither", "tempo_only", "onset_only", "tempo_and_onset"}
+    assert sum(dist["exclusive"][k]["n"] for k in dist["exclusive"]) == len(rows)
+    assert dist["exclusive"]["neither"]["n"] == 1
+    assert dist["exclusive"]["tempo_only"]["n"] == 2
+    assert dist["exclusive"]["onset_only"]["n"] == 1
+    assert dist["exclusive"]["tempo_and_onset"]["n"] == 1
+
+
+def test_insufficient_n_does_not_emit_authoritative_p99() -> None:
+    tiny_tempo_and_onset = [
+        _frame_row(emitted=1, onset_event=1, active_ap_work_us=float(1000 + i))
+        for i in range(5)
+    ]
+    dist = abba.frame_class_distributions(tiny_tempo_and_onset)
+    assert dist["exclusive"]["tempo_and_onset"]["status"] == "INSUFFICIENT_N"
+    assert "p99" not in dist["exclusive"]["tempo_and_onset"]["active_ap_work"]
+
+
+def test_min_full_deltas_are_per_class() -> None:
+    min_rows = [_frame_row(emitted=1, onset_event=0, active_ap_work_us=1000.0, gdft_us=400.0) for _ in range(120)]
+    full_rows = [_frame_row(emitted=1, onset_event=0, active_ap_work_us=1100.0, gdft_us=450.0) for _ in range(120)]
+    cmp = abba.compare_frame_classes(min_rows, full_rows)
+    assert "tempo_only" in cmp
+    assert {
+        "active_ap_p99_delta_us",
+        "gdft_p99_delta_us",
+        "rate_delta_hz",
+        "classification_changed",
+    } <= set(cmp["tempo_only"])
+    assert cmp["tempo_only"]["active_ap_p99_delta_us"] == pytest.approx(100.0)
+    assert cmp["tempo_only"]["gdft_p99_delta_us"] == pytest.approx(50.0)
+
+
+def test_perturbation_limits_are_frozen_from_deployed_contract() -> None:
+    deployed_contract = abba.load_deployed_contract()
+    limits = abba.perturbation_limits(deployed_contract)
+    assert limits["ap_p99_delta_max_us"] == 375
+    assert limits["instrumented_capture_drop_max"] == 0
+    assert limits["throughput_delta_max_hz"] == abba.PERTURBATION_THROUGHPUT_DELTA_MAX_HZ
+
+
+def test_service_check_limits_come_from_deployed_contract() -> None:
+    limits = abba.service_limits_from_contract()
+    assert limits["ap_arrival_period_us"] == 7500
+    assert limits["ap_service_p99_max_us"] == 6000
+    assert limits["measured_ap_rate_min_hz"] == pytest.approx(132.0)
+    assert limits["measured_ap_rate_max_hz"] == pytest.approx(134.5)

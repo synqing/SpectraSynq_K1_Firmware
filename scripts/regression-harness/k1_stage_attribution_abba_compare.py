@@ -101,6 +101,25 @@ DETAIL_FLAGS = {
     "FULL": f"-D{DETAIL_DEFINE}=1",
 }
 ROOT = Path(__file__).resolve().parents[2]
+DEPLOYED_CONTRACT_PATH = (
+    ROOT
+    / "docs"
+    / "forensics"
+    / "2026-08-15-freertos-scheduling-audit"
+    / "gate0"
+    / "contract.json"
+)
+EXCLUSIVE_FRAME_CLASSES = ("neither", "tempo_only", "onset_only", "tempo_and_onset")
+FRAME_CLASS_MINIMUM_N_FOR_P95 = 20
+FRAME_CLASS_MINIMUM_N_FOR_P99 = 100
+FRAME_CLASS_PERCENTILE_METHOD = "linear"
+# Frozen AP rate tolerance around contract-derived expected Hz (preserves 132.0–134.5 at 133.⅓).
+SERVICE_RATE_TOLERANCE_LOW_HZ = 133.33333333333334 - 132.0
+SERVICE_RATE_TOLERANCE_HIGH_HZ = 134.5 - 133.33333333333334
+# Frozen throughput / gap limits for perturbation verdict (pre-registered; do not retune after R8).
+PERTURBATION_THROUGHPUT_DELTA_MAX_HZ = 2.0
+PERTURBATION_FRAME_GAP_DELTA_MAX = 0
+PERTURBATION_I2S_DELTA_MAX = 0
 AUDIT_RECEIPT_PATH = (
     "docs/forensics/2026-08-15-freertos-scheduling-audit/evidence/"
     "gate2-stage-attribution-abba-comparator-implementation.md"
@@ -266,6 +285,223 @@ def _worst_status(statuses: Iterable[str]) -> str:
     values = list(statuses)
     _require(bool(values), "cannot classify an empty status set")
     return max(values, key=_status_rank)
+
+
+def load_deployed_contract(path: Path | None = None) -> dict[str, Any]:
+    contract_path = path or DEPLOYED_CONTRACT_PATH
+    return _load_json(contract_path)
+
+
+def perturbation_limits(contract: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Freeze min/full perturbation verdict limits from the deployed contract."""
+
+    contract = contract or load_deployed_contract()
+    period = int(contract["production_tuple"]["ap_arrival_period_us"])
+    fraction = float(contract["margin_rules"]["instrumented_vs_minimal_p99_regression_max_fraction"])
+    drop_max = int(contract["margin_rules"]["instrumented_capture_drop_max"])
+    return {
+        "ap_arrival_period_us": period,
+        "ap_p99_delta_max_us": int(round(fraction * period)),
+        "ap_p99_delta_max_fraction": fraction,
+        "throughput_delta_max_hz": PERTURBATION_THROUGHPUT_DELTA_MAX_HZ,
+        "frame_gap_delta_max": PERTURBATION_FRAME_GAP_DELTA_MAX,
+        "i2s_delta_max": PERTURBATION_I2S_DELTA_MAX,
+        "instrumented_capture_drop_max": drop_max,
+        "stage_attribution_overhead_fraction": fraction,
+        "repeatability_admission_limit_pp": 2.0,
+        "source": "deployed_contract_margin_rules",
+    }
+
+
+def service_limits_from_contract(contract: dict[str, Any] | None = None) -> dict[str, Any]:
+    contract = contract or load_deployed_contract()
+    period = int(contract["production_tuple"]["ap_arrival_period_us"])
+    fraction = float(contract["margin_rules"]["ap_service_p99_max_fraction_of_arrival"])
+    sample_rate = float(contract["production_tuple"]["sample_rate_hz"])
+    chunk = float(contract["production_tuple"]["samples_per_chunk"])
+    expected_hz = sample_rate / chunk
+    return {
+        "ap_arrival_period_us": period,
+        "ap_service_p99_max_us": int(period * fraction),
+        "expected_ap_rate_hz": expected_hz,
+        "measured_ap_rate_min_hz": expected_hz - SERVICE_RATE_TOLERANCE_LOW_HZ,
+        "measured_ap_rate_max_hz": expected_hz + SERVICE_RATE_TOLERANCE_HIGH_HZ,
+        "ap_max_consecutive_over_period": int(contract["margin_rules"]["ap_max_consecutive_over_period"]),
+        "ap_recovery_hops_max": int(contract["margin_rules"]["ap_recovery_hops_max"]),
+    }
+
+
+def _row_flag(row: dict[str, Any], *keys: str) -> bool | None:
+    for key in keys:
+        if key in row and row[key] is not None:
+            value = row[key]
+            if isinstance(value, bool):
+                return value
+            try:
+                return int(value) == 1
+            except (TypeError, ValueError):
+                return bool(value)
+    return None
+
+
+def classify_frame_row(row: dict[str, Any]) -> str:
+    """Mutually exclusive frame class from tempo emit + onset event markers."""
+
+    tempo_active = bool(_row_flag(row, "tempo_event", "emitted"))
+    onset_active = bool(_row_flag(row, "onset_event", "onset_accepted"))
+    if tempo_active and onset_active:
+        return "tempo_and_onset"
+    if tempo_active:
+        return "tempo_only"
+    if onset_active:
+        return "onset_only"
+    return "neither"
+
+
+def _percentile_linear(sorted_values: list[float], percentile: float) -> float:
+    """Numpy default linear percentile on a pre-sorted non-empty sequence."""
+
+    if not sorted_values:
+        raise ValueError("percentile requires at least one value")
+    if len(sorted_values) == 1:
+        return float(sorted_values[0])
+    rank = (len(sorted_values) - 1) * (percentile / 100.0)
+    low = int(math.floor(rank))
+    high = int(math.ceil(rank))
+    if low == high:
+        return float(sorted_values[low])
+    weight = rank - low
+    return float(sorted_values[low] * (1.0 - weight) + sorted_values[high] * weight)
+
+
+def _metric_values(rows: list[dict[str, Any]], key: str) -> list[float]:
+    values: list[float] = []
+    for row in rows:
+        if key not in row or row[key] is None:
+            continue
+        try:
+            values.append(float(row[key]))
+        except (TypeError, ValueError):
+            continue
+    return values
+
+
+def _class_metric_block(
+    values: list[float], *, onset_marker_present: bool, class_name: str
+) -> dict[str, Any]:
+    needs_onset = class_name in {"onset_only", "tempo_and_onset"}
+    if needs_onset and not onset_marker_present:
+        return {
+            "n": len(values),
+            "status": "MISSING_MARKER",
+            "percentile_method": FRAME_CLASS_PERCENTILE_METHOD,
+            "minimum_n_for_p95": FRAME_CLASS_MINIMUM_N_FOR_P95,
+            "minimum_n_for_p99": FRAME_CLASS_MINIMUM_N_FOR_P99,
+        }
+    n = len(values)
+    block: dict[str, Any] = {
+        "n": n,
+        "percentile_method": FRAME_CLASS_PERCENTILE_METHOD,
+        "minimum_n_for_p95": FRAME_CLASS_MINIMUM_N_FOR_P95,
+        "minimum_n_for_p99": FRAME_CLASS_MINIMUM_N_FOR_P99,
+    }
+    if n == 0:
+        block["status"] = "INSUFFICIENT_N"
+        return block
+    ordered = sorted(values)
+    block["max"] = ordered[-1]
+    if n < FRAME_CLASS_MINIMUM_N_FOR_P99:
+        block["status"] = "INSUFFICIENT_N"
+        if n >= FRAME_CLASS_MINIMUM_N_FOR_P95:
+            block["p95"] = _percentile_linear(ordered, 95.0)
+        return block
+    block["status"] = "COMPLETE"
+    block["p95"] = _percentile_linear(ordered, 95.0)
+    block["p99"] = _percentile_linear(ordered, 99.0)
+    return block
+
+
+def frame_class_distributions(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    """Partition rows into exclusive tempo/onset classes plus optional marginal views."""
+
+    onset_marker_present = any(
+        key in row for row in rows for key in ("onset_event", "onset_accepted")
+    )
+    buckets: dict[str, list[dict[str, Any]]] = {name: [] for name in EXCLUSIVE_FRAME_CLASSES}
+    for row in rows:
+        buckets[classify_frame_row(row)].append(row)
+
+    exclusive: dict[str, Any] = {}
+    for name, members in buckets.items():
+        active = _class_metric_block(
+            _metric_values(members, "active_ap_work_us")
+            or _metric_values(members, "active_ap_work"),
+            onset_marker_present=onset_marker_present,
+            class_name=name,
+        )
+        gdft = _class_metric_block(
+            _metric_values(members, "gdft_us") or _metric_values(members, "gdft_elapsed_us"),
+            onset_marker_present=onset_marker_present,
+            class_name=name,
+        )
+        exclusive[name] = {
+            "n": len(members),
+            "status": active["status"],
+            "percentile_method": FRAME_CLASS_PERCENTILE_METHOD,
+            "minimum_n_for_p95": FRAME_CLASS_MINIMUM_N_FOR_P95,
+            "minimum_n_for_p99": FRAME_CLASS_MINIMUM_N_FOR_P99,
+            "active_ap_work": active,
+            "gdft": gdft,
+        }
+
+    tempo_any = buckets["tempo_only"] + buckets["tempo_and_onset"]
+    onset_any = buckets["onset_only"] + buckets["tempo_and_onset"]
+    return {
+        "exclusive": exclusive,
+        "marginal": {
+            "tempo_any": {"n": len(tempo_any)},
+            "onset_any": {"n": len(onset_any)},
+        },
+        "onset_marker_present": onset_marker_present,
+        "row_count": len(rows),
+    }
+
+
+def compare_frame_classes(
+    min_rows: list[dict[str, Any]], full_rows: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Per-class min versus full deltas required for ABBA stage attribution."""
+
+    min_dist = frame_class_distributions(min_rows)
+    full_dist = frame_class_distributions(full_rows)
+    comparison: dict[str, Any] = {}
+    for name in EXCLUSIVE_FRAME_CLASSES:
+        min_n = min_dist["exclusive"][name]["n"]
+        full_n = full_dist["exclusive"][name]["n"]
+        min_active = min_dist["exclusive"][name]["active_ap_work"]
+        full_active = full_dist["exclusive"][name]["active_ap_work"]
+        min_gdft = min_dist["exclusive"][name]["gdft"]
+        full_gdft = full_dist["exclusive"][name]["gdft"]
+
+        def _delta(left: dict[str, Any], right: dict[str, Any], key: str) -> float | None:
+            if key not in left or key not in right:
+                return None
+            return float(right[key]) - float(left[key])
+
+        rate_min = min_n / max(len(min_rows), 1)
+        rate_full = full_n / max(len(full_rows), 1)
+        comparison[name] = {
+            "min_n": min_n,
+            "full_n": full_n,
+            "active_ap_p99_delta_us": _delta(min_active, full_active, "p99"),
+            "active_ap_max_delta_us": _delta(min_active, full_active, "max"),
+            "gdft_p99_delta_us": _delta(min_gdft, full_gdft, "p99"),
+            "rate_delta_hz": rate_full - rate_min,
+            "classification_changed": min_n != full_n,
+            "min_status": min_active.get("status"),
+            "full_status": full_active.get("status"),
+        }
+    return comparison
 
 
 def _normalise_flags(flags: Any, label: str) -> list[str]:
@@ -1439,43 +1675,87 @@ def _repeatability(first: dict[str, float], second: dict[str, float]) -> dict[st
     }
 
 
-def _service_check(summary: dict[str, Any]) -> dict[str, Any]:
+def _service_check(
+    summary: dict[str, Any],
+    contract: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    limits = service_limits_from_contract(contract)
+    p99_limit = float(limits["ap_service_p99_max_us"])
+    period_limit = float(limits["ap_arrival_period_us"])
+    rate_min = float(limits["measured_ap_rate_min_hz"])
+    rate_max = float(limits["measured_ap_rate_max_hz"])
+    consecutive_limit = int(limits["ap_max_consecutive_over_period"])
+    recovery_limit = int(limits["ap_recovery_hops_max"])
+
     p99 = _require_mapping(summary["p99_bounds_us"], "service p99 bounds")
     checks: dict[str, dict[str, Any]] = {}
     for metric in ("active_ap_work", "newest_sample_to_ap_publish"):
         interval = _require_mapping(p99[metric], f"service {metric}")
         low = _number(interval["low"], f"service {metric}.low")
         high = _number(interval["high"], f"service {metric}.high")
-        status = "PASS" if high <= 6000 else "FAIL" if low > 6000 else "INCONCLUSIVE"
-        checks[f"{metric}_p99"] = {"status": status, "limit_us": 6000, "low_us": low, "high_us": high}
+        status = "PASS" if high <= p99_limit else "FAIL" if low > p99_limit else "INCONCLUSIVE"
+        checks[f"{metric}_p99"] = {
+            "status": status,
+            "limit_us": p99_limit,
+            "low_us": low,
+            "high_us": high,
+        }
 
     soak = summary.get("compact_soak") if isinstance(summary.get("compact_soak"), dict) else {}
     mean = summary.get("active_ap_work_mean_us", soak.get("active_mean_us"))
     if isinstance(mean, (int, float)) and not isinstance(mean, bool):
         mean_value = _number(mean, "active AP work mean")
-        checks["active_ap_work_mean"] = {"status": "PASS" if mean_value < 7500 else "FAIL", "limit_us": 7500, "value_us": mean_value}
+        checks["active_ap_work_mean"] = {
+            "status": "PASS" if mean_value < period_limit else "FAIL",
+            "limit_us": period_limit,
+            "value_us": mean_value,
+        }
     else:
-        checks["active_ap_work_mean"] = {"status": "INCOMPLETE", "reason": "compact summary does not expose arithmetic mean"}
+        checks["active_ap_work_mean"] = {
+            "status": "INCOMPLETE",
+            "reason": "compact summary does not expose arithmetic mean",
+        }
 
-    over_count = _integer(summary.get("active_ap_work_over_7500_count"), "active over 7500 count")
-    consecutive = summary.get("max_consecutive_active_frames_over_7500", soak.get("max_consecutive_active_over_7500"))
+    over_count = _integer(summary.get("active_ap_work_over_7500_count"), "active over period count")
+    consecutive = summary.get(
+        "max_consecutive_active_frames_over_7500", soak.get("max_consecutive_active_over_7500")
+    )
     recovery = summary.get("recovery_hops_after_active_over_7500", soak.get("recovery_hops"))
     if over_count == 0:
         consecutive = 0
         recovery = 0
     if isinstance(consecutive, (int, float)) and not isinstance(consecutive, bool):
-        consecutive_value = _integer(consecutive, "max consecutive active frames over 7500")
-        checks["max_consecutive_active_frames_over_7500"] = {"status": "PASS" if consecutive_value <= 1 else "FAIL", "limit": 1, "value": consecutive_value}
+        consecutive_value = _integer(consecutive, "max consecutive active frames over period")
+        checks["max_consecutive_active_frames_over_7500"] = {
+            "status": "PASS" if consecutive_value <= consecutive_limit else "FAIL",
+            "limit": consecutive_limit,
+            "value": consecutive_value,
+        }
     else:
-        checks["max_consecutive_active_frames_over_7500"] = {"status": "INCOMPLETE", "reason": "compact summary does not expose consecutive-run length"}
+        checks["max_consecutive_active_frames_over_7500"] = {
+            "status": "INCOMPLETE",
+            "reason": "compact summary does not expose consecutive-run length",
+        }
     if isinstance(recovery, (int, float)) and not isinstance(recovery, bool):
         recovery_value = _integer(recovery, "recovery hops")
-        checks["recovery_hops"] = {"status": "PASS" if recovery_value <= 2 else "FAIL", "limit": 2, "value": recovery_value}
+        checks["recovery_hops"] = {
+            "status": "PASS" if recovery_value <= recovery_limit else "FAIL",
+            "limit": recovery_limit,
+            "value": recovery_value,
+        }
     else:
-        checks["recovery_hops"] = {"status": "INCOMPLETE", "reason": "compact summary does not expose recovery hops"}
+        checks["recovery_hops"] = {
+            "status": "INCOMPLETE",
+            "reason": "compact summary does not expose recovery hops",
+        }
 
     rate = _number(summary.get("measured_ap_frame_rate_hz"), "measured AP rate")
-    checks["measured_ap_rate"] = {"status": "PASS" if 132.0 <= rate <= 134.5 else "FAIL", "minimum_hz": 132.0, "maximum_hz": 134.5, "value_hz": rate}
+    checks["measured_ap_rate"] = {
+        "status": "PASS" if rate_min <= rate <= rate_max else "FAIL",
+        "minimum_hz": rate_min,
+        "maximum_hz": rate_max,
+        "value_hz": rate,
+    }
     return {"status": _worst_status(check["status"] for check in checks.values()), "checks": checks}
 
 
