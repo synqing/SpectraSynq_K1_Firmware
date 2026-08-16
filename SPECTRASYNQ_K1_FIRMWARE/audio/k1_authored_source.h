@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 /* Source arbitration — one writer at a time to the audio snapshot.
- * Freshness 80 ms is derived in docs/K1_SOURCE_ARBITRATION.md (spine G7).
+ * Freshness 50 ms is derived in spine docs/K1_SOURCE_ARBITRATION.md.
  * Do not copy the USB-bridge 250 ms GPIO fallback. */
 
 #define K1_AUTHORED_FRESHNESS_MS 50u
