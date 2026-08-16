@@ -107,6 +107,8 @@ def test_incomplete_serial_dump_overrides_any_prefix_classification():
             "begin": {"count": 120},
             "done": {"count": 120, "dropped": 0},
         },
+        "full_stage_row_count": 0,
+        "early_stage_row_count": 120,
     }
     module.apply_capture_completion(complete, True)
     assert complete["capture_complete"] is True

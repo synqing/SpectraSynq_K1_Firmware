@@ -26,12 +26,23 @@
 #include <stdint.h>
 #include <math.h>                   // isfinite
 
+#ifndef K1_AP_STAGE_ATTRIBUTION_DETAIL
+#define K1_AP_STAGE_ATTRIBUTION_DETAIL 0
+#endif
+
+#if K1_AP_STAGE_ATTRIBUTION_DETAIL != 0 && K1_AP_STAGE_ATTRIBUTION_DETAIL != 1
+#error "K1_AP_STAGE_ATTRIBUTION_DETAIL must be 0 or 1"
+#endif
+
+#define K1_AP_CADENCE_SCHEMA_VERSION 2U
+
 // Declared outside the diagnostic feature gate because the Arduino sketch
 // preprocessor emits function prototypes before evaluating the guarded body.
 // This is a type declaration only: production gets no object, timer read or
 // linked telemetry code.
 struct APCadenceStageTiming {
   bool valid;
+  bool detail_enabled;
   uint64_t loop_start_us;
   uint64_t pre_i2s_end_us;
   uint64_t i2s_end_us;
@@ -82,10 +93,10 @@ const char* vp_bool_text(bool value);
 #define AP_CAD_SOAK_WORST_COUNT 16
 #endif
 #ifndef AP_CAD_SOAK_HIST_BUCKET_US
-#define AP_CAD_SOAK_HIST_BUCKET_US 128UL
+#define AP_CAD_SOAK_HIST_BUCKET_US 32UL
 #endif
 #ifndef AP_CAD_SOAK_HIST_BUCKETS
-#define AP_CAD_SOAK_HIST_BUCKETS 128
+#define AP_CAD_SOAK_HIST_BUCKETS 512
 #endif
 
 // ---- Sample structs (verbatim from serial_menu.h) --------------------------
@@ -191,6 +202,7 @@ struct APCadenceCaptureSample {
   uint8_t tempo_decimation;
   uint8_t flags;
   uint8_t sample_time_assumption_id;
+  uint8_t stage_detail;
   uint8_t stage_timing_valid;
   uint8_t gdft_internal_split_valid;
 };
@@ -236,10 +248,24 @@ extern uint32_t AP_CAD_SOAK_CORE_BAD;
 extern uint32_t AP_CAD_SOAK_ACTIVE_OVER_7500;
 extern uint32_t AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500;
 extern uint32_t AP_CAD_SOAK_ACTIVE_MAX_US;
+extern uint64_t AP_CAD_SOAK_ACTIVE_SUM_US;
+extern uint32_t AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500;
+extern uint32_t AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500;
 extern uint16_t AP_CAD_SOAK_WORST_USED;
 extern bool AP_CAD_SOAK_HAVE_PREV;
 extern APCadenceCaptureSample AP_CAD_SOAK_WORST[AP_CAD_SOAK_WORST_COUNT];
 extern uint32_t AP_CAD_SOAK_ACTIVE_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_FRESHNESS_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+extern uint32_t AP_CAD_SOAK_ACTIVE_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_COUNT;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT;
+extern uint32_t AP_CAD_SOAK_FRESHNESS_MAX_US;
+extern uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US;
+extern uint64_t AP_CAD_SOAK_PREV_READ_RETURN_US;
+extern bool AP_CAD_SOAK_HAVE_PREV_READ_RETURN;
 
 // ---- Capture handler prototypes (bodies in k1_ap_capture_telemetry.cpp) -----
 uint16_t ap_nov_capture_q16(float value);

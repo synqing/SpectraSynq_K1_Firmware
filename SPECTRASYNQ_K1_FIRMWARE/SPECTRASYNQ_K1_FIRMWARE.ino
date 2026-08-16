@@ -117,6 +117,13 @@ M5ROTATE8 rotate8; // Global M5Rotate8 object - Defined here, declared extern in
 #define K1_ACQUISITION_ONLY_PROBE 0
 #endif
 
+// Non-shippable one-variable perturbation flag. The scalar APCAD control still
+// times the complete AP loop, GDFT, novelty and publication freshness. Only the
+// intermediate attribution endpoints compile when this flag is explicitly on.
+#if K1_AP_STAGE_ATTRIBUTION_DETAIL && !(ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG)
+#error "K1_AP_STAGE_ATTRIBUTION_DETAIL requires the non-shippable APCAD probe surface"
+#endif
+
 #define K1_AP_STAGE_FULL 0
 #define K1_AP_STAGE_ACQUISITION 1
 #define K1_AP_STAGE_GDFT 2
@@ -779,29 +786,31 @@ static void k1_ap_cadence_capture_frame(uint32_t t_now,
                                         uint32_t novelty_elapsed_us,
                                         uint8_t stage,
                                         const APCadenceStageTiming& stage_timing) {
-  if (!stage_timing.valid) {
-    return;
+  // Capture activation is latched at frame entry, so an arm command observed
+  // partway through this iteration cannot publish an incomplete timing row.
+  // The scalar baseline is valid without intermediate attribution endpoints.
+  if (stage_timing.valid) {
+    APCadenceStageTiming completed_timing = stage_timing;
+    if (completed_timing.loop_tail_end_us == 0) {
+      completed_timing.loop_tail_end_us = (uint64_t)esp_timer_get_time();
+    }
+    APCadenceFrameInput ap_cadence_frame = {};
+    ap_cadence_frame.boot_ms = t_now;
+    ap_cadence_frame.frame_index = frame_index;
+    ap_cadence_frame.frame_ms = t_now;
+    ap_cadence_frame.gdft_elapsed_us = gdft_elapsed_us;
+    ap_cadence_frame.novelty_elapsed_us = novelty_elapsed_us;
+    ap_cadence_frame.total_ap_loop_elapsed_us =
+        (uint32_t)(completed_timing.loop_tail_end_us - completed_timing.loop_start_us);
+    ap_cadence_frame.stage = stage;
+    ap_cadence_frame.ap_core_id = (int8_t)xPortGetCoreID();
+    ap_cadence_frame.vp_core_id = k1_ap_cadence_vp_core_id;
+    ap_cadence_frame.stage_timing = completed_timing;
+    ap_cadence_frame.i2s = k1_audio_i2s_read_debug_read();
+    ap_cadence_frame.tempo = k1_tempo_debug_read();
+    ap_cad_capture_tick(ap_cadence_frame);
+    ap_cad_soak_tick(ap_cadence_frame);
   }
-  APCadenceStageTiming completed_timing = stage_timing;
-  if (completed_timing.loop_tail_end_us == 0) {
-    completed_timing.loop_tail_end_us = (uint64_t)esp_timer_get_time();
-  }
-  APCadenceFrameInput ap_cadence_frame = {};
-  ap_cadence_frame.boot_ms = t_now;
-  ap_cadence_frame.frame_index = frame_index;
-  ap_cadence_frame.frame_ms = t_now;
-  ap_cadence_frame.gdft_elapsed_us = gdft_elapsed_us;
-  ap_cadence_frame.novelty_elapsed_us = novelty_elapsed_us;
-  ap_cadence_frame.total_ap_loop_elapsed_us =
-      (uint32_t)(completed_timing.loop_tail_end_us - completed_timing.loop_start_us);
-  ap_cadence_frame.stage = stage;
-  ap_cadence_frame.ap_core_id = (int8_t)xPortGetCoreID();
-  ap_cadence_frame.vp_core_id = k1_ap_cadence_vp_core_id;
-  ap_cadence_frame.stage_timing = completed_timing;
-  ap_cadence_frame.i2s = k1_audio_i2s_read_debug_read();
-  ap_cadence_frame.tempo = k1_tempo_debug_read();
-  ap_cad_capture_tick(ap_cadence_frame);
-  ap_cad_soak_tick(ap_cadence_frame);
 }
 #endif
 
@@ -832,6 +841,7 @@ void loop() {
   if (ap_cadence_timing_active) {
     ap_cadence_stage_timing = {};
     ap_cadence_stage_timing.valid = true;
+    ap_cadence_stage_timing.detail_enabled = (K1_AP_STAGE_ATTRIBUTION_DETAIL != 0);
     ap_cadence_stage_timing.loop_start_us = (uint64_t)esp_timer_get_time();
   }
   uint32_t ap_cadence_gdft_us = 0;
@@ -868,13 +878,13 @@ void loop() {
 #if ENABLE_VP_PERF_AUDIT
   int64_t vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
   if (ap_cadence_timing_active) {
     ap_cadence_stage_timing.pre_i2s_end_us = (uint64_t)esp_timer_get_time();
   }
 #endif
   acquire_sample_chunk(t_now);  // (i2s_audio.h)
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
   if (ap_cadence_timing_active) {
     ap_cadence_stage_timing.i2s_end_us = (uint64_t)esp_timer_get_time();
   }
@@ -895,7 +905,7 @@ void loop() {
   vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
   calculate_vu();
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
   if (ap_cadence_timing_active) {
     ap_cadence_stage_timing.post_i2s_frontend_end_us = (uint64_t)esp_timer_get_time();
   }
@@ -1020,14 +1030,14 @@ void loop() {
   (void)ap_smart_config;
   (void)ap_hook_config;
   {
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
       ap_cadence_stage_timing.snapshot_start_us = (uint64_t)esp_timer_get_time();
     }
 #endif
     k1_audio_snapshot_update(t_now);
     const K1AudioSnapshot k1_audio_snapshot = k1_audio_snapshot_read();
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
       ap_cadence_stage_timing.snapshot_end_us = (uint64_t)esp_timer_get_time();
     }
@@ -1044,7 +1054,7 @@ void loop() {
 #endif
     k1_onset_beat_update(k1_audio_snapshot);
     const K1OnsetBeatEvent k1_onset_beat_event = k1_onset_beat_read();
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
       ap_cadence_stage_timing.onset_end_us = (uint64_t)esp_timer_get_time();
     }
@@ -1060,7 +1070,7 @@ void loop() {
     return;
 #endif
     k1_musical_saliency_update(k1_audio_snapshot, &k1_onset_beat_event);
-#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
       ap_cadence_stage_timing.saliency_end_us = (uint64_t)esp_timer_get_time();
     }

@@ -61,10 +61,24 @@ uint32_t AP_CAD_SOAK_CORE_BAD = 0;
 uint32_t AP_CAD_SOAK_ACTIVE_OVER_7500 = 0;
 uint32_t AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500 = 0;
 uint32_t AP_CAD_SOAK_ACTIVE_MAX_US = 0;
+uint64_t AP_CAD_SOAK_ACTIVE_SUM_US = 0;
+uint32_t AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500 = 0;
+uint32_t AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500 = 0;
 uint16_t AP_CAD_SOAK_WORST_USED = 0;
 bool AP_CAD_SOAK_HAVE_PREV = false;
 APCadenceCaptureSample AP_CAD_SOAK_WORST[AP_CAD_SOAK_WORST_COUNT];
 uint32_t AP_CAD_SOAK_ACTIVE_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+uint32_t AP_CAD_SOAK_FRESHNESS_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST[AP_CAD_SOAK_HIST_BUCKETS];
+uint32_t AP_CAD_SOAK_ACTIVE_HIST_SATURATION = 0;
+uint32_t AP_CAD_SOAK_FRESHNESS_HIST_SATURATION = 0;
+uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION = 0;
+uint32_t AP_CAD_SOAK_FRESHNESS_COUNT = 0;
+uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT = 0;
+uint32_t AP_CAD_SOAK_FRESHNESS_MAX_US = 0;
+uint32_t AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US = 0;
+uint64_t AP_CAD_SOAK_PREV_READ_RETURN_US = 0;
+bool AP_CAD_SOAK_HAVE_PREV_READ_RETURN = false;
 
 // ---- Capture handlers (verbatim from serial_menu.h 644-1397) ---------------
 uint16_t ap_nov_capture_q16(float value) {
@@ -258,6 +272,11 @@ bool ap_cad_capture_arm(uint32_t duration_ms) {
   if (duration_ms == 0 || duration_ms > AP_CAD_CAPTURE_MAX_MS) {
     return false;
   }
+#if ENABLE_VP_PERF_AUDIT
+  // The perturbation contract excludes VP-perf timers and its one-hertz stack
+  // scan from every measured APCAD window. Stack evidence is collected after.
+  vp_perf.running = false;
+#endif
   if (!ap_cad_capture_ensure_buffer()) {
     return false;
   }
@@ -302,32 +321,36 @@ APCadenceCaptureSample ap_cad_make_sample(const APCadenceFrameInput& frame, bool
   sample.novelty_elapsed_us = frame.novelty_elapsed_us;
   sample.total_ap_loop_elapsed_us = frame.total_ap_loop_elapsed_us;
   const APCadenceStageTiming& timing = frame.stage_timing;
+  sample.stage_detail = timing.detail_enabled ? 1U : 0U;
   sample.stage_timing_valid = timing.valid ? 1U : 0U;
   sample.gdft_internal_split_valid = 0U;
   if (timing.valid) {
+    // Common minimal envelope: these spans and endpoints exist in both legs.
+    sample.post_gdft_service_elapsed_us = ap_cad_stage_delta_us(timing.gdft_end_us, timing.novelty_start_us);
+    sample.post_publish_tail_elapsed_us = ap_cad_stage_delta_us(timing.tempo_end_us, timing.loop_tail_end_us);
+    sample.stage_gdft_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_start_us);
+    sample.stage_gdft_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_end_us);
+    sample.stage_novelty_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_start_us);
+    sample.stage_novelty_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_end_us);
+    sample.stage_tempo_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.tempo_end_us);
+    sample.stage_tail_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.loop_tail_end_us);
+  }
+  if (timing.valid && timing.detail_enabled) {
     sample.pre_i2s_service_elapsed_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.pre_i2s_end_us);
     sample.post_i2s_frontend_elapsed_us = ap_cad_stage_delta_us(timing.i2s_end_us, timing.post_i2s_frontend_end_us);
-    sample.post_gdft_service_elapsed_us = ap_cad_stage_delta_us(timing.gdft_end_us, timing.novelty_start_us);
     sample.pre_snapshot_config_elapsed_us = ap_cad_stage_delta_us(timing.novelty_end_us, timing.snapshot_start_us);
     sample.snapshot_elapsed_us = ap_cad_stage_delta_us(timing.snapshot_start_us, timing.snapshot_end_us);
     sample.onset_elapsed_us = ap_cad_stage_delta_us(timing.snapshot_end_us, timing.onset_end_us);
     sample.saliency_elapsed_us = ap_cad_stage_delta_us(timing.onset_end_us, timing.saliency_end_us);
     sample.tempo_total_elapsed_us = ap_cad_stage_delta_us(timing.saliency_end_us, timing.tempo_end_us);
-    sample.post_publish_tail_elapsed_us = ap_cad_stage_delta_us(timing.tempo_end_us, timing.loop_tail_end_us);
 
     sample.stage_pre_i2s_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.pre_i2s_end_us);
     sample.stage_i2s_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.i2s_end_us);
     sample.stage_frontend_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.post_i2s_frontend_end_us);
-    sample.stage_gdft_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_start_us);
-    sample.stage_gdft_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.gdft_end_us);
-    sample.stage_novelty_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_start_us);
-    sample.stage_novelty_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.novelty_end_us);
     sample.stage_snapshot_start_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.snapshot_start_us);
     sample.stage_snapshot_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.snapshot_end_us);
     sample.stage_onset_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.onset_end_us);
     sample.stage_saliency_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.saliency_end_us);
-    sample.stage_tempo_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.tempo_end_us);
-    sample.stage_tail_end_offset_us = ap_cad_stage_delta_us(timing.loop_start_us, timing.loop_tail_end_us);
   }
   sample.stage = frame.stage;
   sample.sample_rate = ap_capture_u16_sat(CONFIG.SAMPLE_RATE);
@@ -436,10 +459,24 @@ void ap_cad_soak_reset() {
   AP_CAD_SOAK_ACTIVE_OVER_7500 = 0;
   AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500 = 0;
   AP_CAD_SOAK_ACTIVE_MAX_US = 0;
+  AP_CAD_SOAK_ACTIVE_SUM_US = 0;
+  AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500 = 0;
+  AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500 = 0;
   AP_CAD_SOAK_WORST_USED = 0;
   AP_CAD_SOAK_HAVE_PREV = false;
+  AP_CAD_SOAK_ACTIVE_HIST_SATURATION = 0;
+  AP_CAD_SOAK_FRESHNESS_HIST_SATURATION = 0;
+  AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION = 0;
+  AP_CAD_SOAK_FRESHNESS_COUNT = 0;
+  AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT = 0;
+  AP_CAD_SOAK_FRESHNESS_MAX_US = 0;
+  AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US = 0;
+  AP_CAD_SOAK_PREV_READ_RETURN_US = 0;
+  AP_CAD_SOAK_HAVE_PREV_READ_RETURN = false;
   for (uint16_t i = 0; i < AP_CAD_SOAK_HIST_BUCKETS; i++) {
     AP_CAD_SOAK_ACTIVE_HIST[i] = 0;
+    AP_CAD_SOAK_FRESHNESS_HIST[i] = 0;
+    AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST[i] = 0;
   }
   K1TempoDebugSnapshot td = k1_tempo_debug_read();
   AP_CAD_SOAK_LAST_EMIT = td.emit_count;
@@ -450,6 +487,9 @@ bool ap_cad_soak_arm(uint32_t duration_ms) {
   if (duration_ms == 0 || duration_ms > AP_CAD_SOAK_MAX_MS) {
     return false;
   }
+#if ENABLE_VP_PERF_AUDIT
+  vp_perf.running = false;
+#endif
   ap_cad_soak_reset();
   AP_CAD_SOAK_START_MS = millis();
   AP_CAD_SOAK_END_MS = AP_CAD_SOAK_START_MS + duration_ms;
@@ -520,22 +560,99 @@ void ap_cad_soak_tick(const APCadenceFrameInput& frame) {
   AP_CAD_SOAK_HAVE_PREV = true;
 
   AP_CAD_SOAK_ROW_COUNT++;
+  AP_CAD_SOAK_ACTIVE_SUM_US += active_us;
   if ((sample.flags & 0x08) == 0) AP_CAD_SOAK_I2S_NOT_OK++;
   if ((sample.flags & 0x10) == 0) AP_CAD_SOAK_BYTES_MISMATCH++;
   if ((sample.flags & 0x20) == 0) AP_CAD_SOAK_CORE_BAD++;
   if (active_us > 7500UL) {
     AP_CAD_SOAK_ACTIVE_OVER_7500++;
+    AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500++;
+    if (AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500 >
+        AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500) {
+      AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500 =
+          AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500;
+    }
     if (emitted) AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500++;
+  } else {
+    AP_CAD_SOAK_ACTIVE_CONSECUTIVE_OVER_7500 = 0;
   }
   if (active_us > AP_CAD_SOAK_ACTIVE_MAX_US) {
     AP_CAD_SOAK_ACTIVE_MAX_US = active_us;
   }
-  uint16_t bucket = (uint16_t)(active_us / AP_CAD_SOAK_HIST_BUCKET_US);
-  if (bucket >= AP_CAD_SOAK_HIST_BUCKETS) {
-    bucket = AP_CAD_SOAK_HIST_BUCKETS - 1;
+  uint64_t bucket_index = (uint64_t)active_us / AP_CAD_SOAK_HIST_BUCKET_US;
+  if (bucket_index >= AP_CAD_SOAK_HIST_BUCKETS) {
+    AP_CAD_SOAK_ACTIVE_HIST_SATURATION++;
+    bucket_index = AP_CAD_SOAK_HIST_BUCKETS - 1;
   }
+  uint16_t bucket = (uint16_t)bucket_index;
   AP_CAD_SOAK_ACTIVE_HIST[bucket]++;
+
+  if (sample.ap_publish_us >= sample.newest_sample_estimate_us &&
+      sample.newest_sample_estimate_us != 0) {
+    const uint64_t freshness_delta = sample.ap_publish_us - sample.newest_sample_estimate_us;
+    const uint32_t freshness_us = freshness_delta > 0xFFFFFFFFULL
+      ? 0xFFFFFFFFUL : (uint32_t)freshness_delta;
+    if (freshness_us > AP_CAD_SOAK_FRESHNESS_MAX_US) {
+      AP_CAD_SOAK_FRESHNESS_MAX_US = freshness_us;
+    }
+    bucket_index = freshness_delta / AP_CAD_SOAK_HIST_BUCKET_US;
+    if (bucket_index >= AP_CAD_SOAK_HIST_BUCKETS) {
+      AP_CAD_SOAK_FRESHNESS_HIST_SATURATION++;
+      bucket_index = AP_CAD_SOAK_HIST_BUCKETS - 1;
+    }
+    bucket = (uint16_t)bucket_index;
+    AP_CAD_SOAK_FRESHNESS_HIST[bucket]++;
+    AP_CAD_SOAK_FRESHNESS_COUNT++;
+  } else {
+    AP_CAD_SOAK_TIMESTAMP_REGRESSIONS++;
+  }
+
+  if (AP_CAD_SOAK_HAVE_PREV_READ_RETURN) {
+    if (sample.i2s_read_return_us > AP_CAD_SOAK_PREV_READ_RETURN_US) {
+      const uint64_t interval = sample.i2s_read_return_us - AP_CAD_SOAK_PREV_READ_RETURN_US;
+      const uint32_t interval_us = interval > 0xFFFFFFFFULL
+        ? 0xFFFFFFFFUL : (uint32_t)interval;
+      if (interval_us > AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US) {
+        AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US = interval_us;
+      }
+      bucket_index = interval / AP_CAD_SOAK_HIST_BUCKET_US;
+      if (bucket_index >= AP_CAD_SOAK_HIST_BUCKETS) {
+        AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION++;
+        bucket_index = AP_CAD_SOAK_HIST_BUCKETS - 1;
+      }
+      bucket = (uint16_t)bucket_index;
+      AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST[bucket]++;
+      AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT++;
+    } else {
+      AP_CAD_SOAK_TIMESTAMP_REGRESSIONS++;
+    }
+  }
+  AP_CAD_SOAK_PREV_READ_RETURN_US = sample.i2s_read_return_us;
+  AP_CAD_SOAK_HAVE_PREV_READ_RETURN = sample.i2s_read_return_us != 0;
   ap_cad_soak_record_worst(sample, active_us);
+}
+
+static void ap_cad_soak_hist_percentile_bounds(const uint32_t* histogram,
+                                               uint32_t sample_count,
+                                               uint8_t percentile,
+                                               uint32_t* low_us,
+                                               uint32_t* high_us) {
+  *low_us = 0;
+  *high_us = 0;
+  if (sample_count == 0) {
+    return;
+  }
+  uint32_t target = (sample_count * (uint32_t)percentile + 99UL) / 100UL;
+  if (target == 0) target = 1;
+  uint32_t seen = 0;
+  for (uint16_t i = 0; i < AP_CAD_SOAK_HIST_BUCKETS; i++) {
+    seen += histogram[i];
+    if (seen >= target) {
+      *low_us = (uint32_t)i * AP_CAD_SOAK_HIST_BUCKET_US;
+      *high_us = ((uint32_t)i + 1UL) * AP_CAD_SOAK_HIST_BUCKET_US;
+      return;
+    }
+  }
 }
 
 uint32_t ap_cad_soak_hist_percentile(uint8_t percentile) {
@@ -555,7 +672,9 @@ uint32_t ap_cad_soak_hist_percentile(uint8_t percentile) {
 }
 
 void ap_cad_soak_print_worst_sample(uint8_t rank, const APCadenceCaptureSample& sample) {
-  USBSerial.print("APCAD_SOAK_WORST,ver=1,rank=");
+  USBSerial.print("APCAD_SOAK_WORST,schema_ver=2,stage_detail=");
+  USBSerial.print(sample.stage_detail);
+  USBSerial.print(",rank=");
   USBSerial.print(rank);
   USBSerial.print(",frame=");
   USBSerial.print(sample.frame_index);
@@ -604,7 +723,73 @@ void ap_cad_soak_status() {
       (float)(AP_CAD_SOAK_LAST_EMIT_MS - AP_CAD_SOAK_FIRST_EMIT_MS);
   }
 
-  USBSerial.print("APCAD_SOAK_DONE,ver=1,active=");
+  uint32_t active_p50_low_us = 0;
+  uint32_t active_p50_high_us = 0;
+  uint32_t active_p95_low_us = 0;
+  uint32_t active_p95_high_us = 0;
+  uint32_t active_p99_low_us = 0;
+  uint32_t active_p99_high_us = 0;
+  uint32_t freshness_p50_low_us = 0;
+  uint32_t freshness_p50_high_us = 0;
+  uint32_t freshness_p95_low_us = 0;
+  uint32_t freshness_p95_high_us = 0;
+  uint32_t freshness_p99_low_us = 0;
+  uint32_t freshness_p99_high_us = 0;
+  uint32_t interval_p50_low_us = 0;
+  uint32_t interval_p50_high_us = 0;
+  uint32_t interval_p95_low_us = 0;
+  uint32_t interval_p95_high_us = 0;
+  uint32_t interval_p99_low_us = 0;
+  uint32_t interval_p99_high_us = 0;
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_ACTIVE_HIST,
+                                     AP_CAD_SOAK_ROW_COUNT,
+                                     50,
+                                     &active_p50_low_us,
+                                     &active_p50_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_ACTIVE_HIST,
+                                     AP_CAD_SOAK_ROW_COUNT,
+                                     95,
+                                     &active_p95_low_us,
+                                     &active_p95_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_ACTIVE_HIST,
+                                     AP_CAD_SOAK_ROW_COUNT,
+                                     99,
+                                     &active_p99_low_us,
+                                     &active_p99_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_FRESHNESS_HIST,
+                                     AP_CAD_SOAK_FRESHNESS_COUNT,
+                                     50,
+                                     &freshness_p50_low_us,
+                                     &freshness_p50_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_FRESHNESS_HIST,
+                                     AP_CAD_SOAK_FRESHNESS_COUNT,
+                                     95,
+                                     &freshness_p95_low_us,
+                                     &freshness_p95_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_FRESHNESS_HIST,
+                                     AP_CAD_SOAK_FRESHNESS_COUNT,
+                                     99,
+                                     &freshness_p99_low_us,
+                                     &freshness_p99_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST,
+                                     AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT,
+                                     50,
+                                     &interval_p50_low_us,
+                                     &interval_p50_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST,
+                                     AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT,
+                                     95,
+                                     &interval_p95_low_us,
+                                     &interval_p95_high_us);
+  ap_cad_soak_hist_percentile_bounds(AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST,
+                                     AP_CAD_SOAK_READ_RETURN_INTERVAL_COUNT,
+                                     99,
+                                     &interval_p99_low_us,
+                                     &interval_p99_high_us);
+
+  USBSerial.print("APCAD_SOAK_DONE,schema_ver=2,stage_detail=");
+  USBSerial.print((uint8_t)K1_AP_STAGE_ATTRIBUTION_DETAIL);
+  USBSerial.print(",active=");
   USBSerial.print(AP_CAD_SOAK_ACTIVE ? 1 : 0);
   USBSerial.print(",rows=");
   USBSerial.print(AP_CAD_SOAK_ROW_COUNT);
@@ -614,12 +799,26 @@ void ap_cad_soak_status() {
   USBSerial.print(AP_CAD_SOAK_START_MS);
   USBSerial.print(",end_ms=");
   USBSerial.print(AP_CAD_SOAK_END_MS);
+  USBSerial.print(",requested_duration_ms=");
+  USBSerial.print(AP_CAD_SOAK_END_MS - AP_CAD_SOAK_START_MS);
+  USBSerial.print(",first_frame_ms=");
+  USBSerial.print(AP_CAD_SOAK_FIRST_FRAME_MS);
+  USBSerial.print(",last_frame_ms=");
+  USBSerial.print(AP_CAD_SOAK_LAST_FRAME_MS);
+  USBSerial.print(",observed_duration_ms=");
+  USBSerial.print(AP_CAD_SOAK_ROW_COUNT >= 2
+                    ? AP_CAD_SOAK_LAST_FRAME_MS - AP_CAD_SOAK_FIRST_FRAME_MS
+                    : 0UL);
   USBSerial.print(",sample_rate=");
   USBSerial.print(CONFIG.SAMPLE_RATE);
   USBSerial.print(",samples_per_chunk=");
   USBSerial.print(CONFIG.SAMPLES_PER_CHUNK);
   USBSerial.print(",tempo_decim=");
   USBSerial.print(K1_TEMPO_NOVELTY_DECIMATION);
+  USBSerial.print(",hist_bucket_us=");
+  USBSerial.print(AP_CAD_SOAK_HIST_BUCKET_US);
+  USBSerial.print(",hist_bucket_count=");
+  USBSerial.print(AP_CAD_SOAK_HIST_BUCKETS);
   USBSerial.print(",meas_ap_hz=");
   USBSerial.print(measured_ap_hz, 3);
   USBSerial.print(",meas_nov_hz=");
@@ -640,8 +839,66 @@ void ap_cad_soak_status() {
   USBSerial.print(AP_CAD_SOAK_EMITTED_ACTIVE_OVER_7500);
   USBSerial.print(",active_p95_us=");
   USBSerial.print(ap_cad_soak_hist_percentile(95));
+  USBSerial.print(",active_ap_work_p50_low_us=");
+  USBSerial.print(active_p50_low_us);
+  USBSerial.print(",active_ap_work_p50_high_us=");
+  USBSerial.print(active_p50_high_us);
+  USBSerial.print(",active_ap_work_p95_low_us=");
+  USBSerial.print(active_p95_low_us);
+  USBSerial.print(",active_ap_work_p95_high_us=");
+  USBSerial.print(active_p95_high_us);
+  USBSerial.print(",active_ap_work_p99_low_us=");
+  USBSerial.print(active_p99_low_us);
+  USBSerial.print(",active_ap_work_p99_high_us=");
+  USBSerial.print(active_p99_high_us);
+  USBSerial.print(",active_ap_work_hist_saturation=");
+  USBSerial.print(AP_CAD_SOAK_ACTIVE_HIST_SATURATION);
+  USBSerial.print(",active_ap_work_max_us=");
+  USBSerial.print(AP_CAD_SOAK_ACTIVE_MAX_US);
+  USBSerial.print(",newest_sample_to_ap_publish_p50_low_us=");
+  USBSerial.print(freshness_p50_low_us);
+  USBSerial.print(",newest_sample_to_ap_publish_p50_high_us=");
+  USBSerial.print(freshness_p50_high_us);
+  USBSerial.print(",newest_sample_to_ap_publish_p95_low_us=");
+  USBSerial.print(freshness_p95_low_us);
+  USBSerial.print(",newest_sample_to_ap_publish_p95_high_us=");
+  USBSerial.print(freshness_p95_high_us);
+  USBSerial.print(",newest_sample_to_ap_publish_p99_low_us=");
+  USBSerial.print(freshness_p99_low_us);
+  USBSerial.print(",newest_sample_to_ap_publish_p99_high_us=");
+  USBSerial.print(freshness_p99_high_us);
+  USBSerial.print(",newest_sample_to_ap_publish_hist_saturation=");
+  USBSerial.print(AP_CAD_SOAK_FRESHNESS_HIST_SATURATION);
+  USBSerial.print(",newest_sample_to_ap_publish_max_us=");
+  USBSerial.print(AP_CAD_SOAK_FRESHNESS_MAX_US);
+  USBSerial.print(",ap_read_return_interval_p50_low_us=");
+  USBSerial.print(interval_p50_low_us);
+  USBSerial.print(",ap_read_return_interval_p50_high_us=");
+  USBSerial.print(interval_p50_high_us);
+  USBSerial.print(",ap_read_return_interval_p95_low_us=");
+  USBSerial.print(interval_p95_low_us);
+  USBSerial.print(",ap_read_return_interval_p95_high_us=");
+  USBSerial.print(interval_p95_high_us);
+  USBSerial.print(",ap_read_return_interval_p99_low_us=");
+  USBSerial.print(interval_p99_low_us);
+  USBSerial.print(",ap_read_return_interval_p99_high_us=");
+  USBSerial.print(interval_p99_high_us);
+  USBSerial.print(",ap_read_return_interval_hist_saturation=");
+  USBSerial.print(AP_CAD_SOAK_READ_RETURN_INTERVAL_HIST_SATURATION);
+  USBSerial.print(",ap_read_return_interval_max_us=");
+  USBSerial.print(AP_CAD_SOAK_READ_RETURN_INTERVAL_MAX_US);
   USBSerial.print(",active_max_us=");
   USBSerial.print(AP_CAD_SOAK_ACTIVE_MAX_US);
+  USBSerial.print(",active_sum_us=");
+  USBSerial.print((unsigned long long)AP_CAD_SOAK_ACTIVE_SUM_US);
+  USBSerial.print(",active_mean_us=");
+  USBSerial.print(AP_CAD_SOAK_ROW_COUNT > 0
+                    ? (double)AP_CAD_SOAK_ACTIVE_SUM_US /
+                        (double)AP_CAD_SOAK_ROW_COUNT
+                    : 0.0,
+                  3);
+  USBSerial.print(",max_consecutive_active_over_7500=");
+  USBSerial.print(AP_CAD_SOAK_ACTIVE_MAX_CONSECUTIVE_OVER_7500);
   USBSerial.print(",worst_count=");
   USBSerial.println(AP_CAD_SOAK_WORST_USED);
 
@@ -713,7 +970,9 @@ void ap_cad_capture_print_health() {
   const bool nov_rate_ok = ap_cad_rate_within_2pct(measured_nov_hz, declared_nov_hz);
   const bool health_ok = ap_rate_ok && nov_rate_ok && core_ok && i2s_ok && bytes_ok;
 
-  USBSerial.print("APCAD_HEALTH,ver=1,health_ok=");
+  USBSerial.print("APCAD_HEALTH,schema_ver=2,stage_detail=");
+  USBSerial.print((uint8_t)K1_AP_STAGE_ATTRIBUTION_DETAIL);
+  USBSerial.print(",health_ok=");
   USBSerial.print(health_ok ? 1 : 0);
   USBSerial.print(",sample_rate=");
   USBSerial.print(ref != nullptr ? ref->sample_rate : 0);
@@ -749,7 +1008,9 @@ void ap_cad_capture_print_health() {
 
 void ap_cad_capture_dump() {
   AP_CAD_CAPTURE_ACTIVE = false;
-  USBSerial.print("APCAD_CAPTURE_BEGIN,count=");
+  USBSerial.print("APCAD_CAPTURE_BEGIN,schema_ver=2,stage_detail=");
+  USBSerial.print((uint8_t)K1_AP_STAGE_ATTRIBUTION_DETAIL);
+  USBSerial.print(",count=");
   USBSerial.print(AP_CAD_CAPTURE_COUNT);
   USBSerial.print(",capacity=");
   USBSerial.print(AP_CAD_CAPTURE_CAPACITY);
@@ -762,7 +1023,9 @@ void ap_cad_capture_dump() {
   ap_cad_capture_print_health();
   for (uint16_t i = 0; i < AP_CAD_CAPTURE_COUNT; i++) {
     const APCadenceCaptureSample& sample = AP_CAD_CAPTURE_BUFFER[i];
-    USBSerial.print("APCAD,boot_ms=");
+    USBSerial.print("APCAD,schema_ver=2,stage_detail=");
+    USBSerial.print(sample.stage_detail);
+    USBSerial.print(",boot_ms=");
     USBSerial.print(sample.boot_ms);
     USBSerial.print(",frame=");
     USBSerial.print(sample.frame_index);
@@ -948,7 +1211,9 @@ void ap_cad_capture_dump() {
       vTaskDelay(1);
     }
   }
-  USBSerial.print("APCAD_CAPTURE_DONE,count=");
+  USBSerial.print("APCAD_CAPTURE_DONE,schema_ver=2,stage_detail=");
+  USBSerial.print((uint8_t)K1_AP_STAGE_ATTRIBUTION_DETAIL);
+  USBSerial.print(",count=");
   USBSerial.print(AP_CAD_CAPTURE_COUNT);
   USBSerial.print(",dropped=");
   USBSerial.println(AP_CAD_CAPTURE_DROPPED);
@@ -1070,6 +1335,11 @@ bool serial_diag_ap_dispatch(const char* command_type, char* command_data) {
         USBSerial.print("APCAD_SOAK: armed ");
         USBSerial.print(ms);
         USBSerial.println(" ms compact=1");
+        USBSerial.print("APCAD_SOAK_BEGIN,schema_ver=2,stage_detail=");
+        USBSerial.print((uint8_t)K1_AP_STAGE_ATTRIBUTION_DETAIL);
+        USBSerial.print(",duration_ms=");
+        USBSerial.print(ms);
+        USBSerial.println(",compact=1");
         tx_end();
       } else {
         bad_command(command_type, command_data);
