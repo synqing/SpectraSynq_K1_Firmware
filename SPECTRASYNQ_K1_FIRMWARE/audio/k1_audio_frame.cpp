@@ -4,14 +4,21 @@
 
 #if defined(ARDUINO) && !defined(K1_AUDIO_FRAME_HOST_TEST)
 #include <Arduino.h>
+#include "constants.h"
+#include "globals.h"
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
 static portMUX_TYPE k1_audio_frame_mux = portMUX_INITIALIZER_UNLOCKED;
 #define K1_AF_ENTER() portENTER_CRITICAL(&k1_audio_frame_mux)
 #define K1_AF_EXIT() portEXIT_CRITICAL(&k1_audio_frame_mux)
 #define K1_AF_COPY_SEGMENT()                                                   \
   do {                                                                         \
   } while (0)
+#define K1_AF_NOW_US() ((uint32_t)esp_timer_get_time())
 #else
 #include "k1_audio_frame_host_shim.h"
+#define K1_AF_NOW_US() (0u)
 #endif
 
 static K1AudioFrame s_published;
@@ -23,6 +30,16 @@ static K1AudioFrameStats s_stats = {};
 #if defined(K1_AUDIO_FRAME_V1) && !defined(K1_AUDIO_FRAME_HOST_TEST)
 static K1AudioFrame s_vp_frame;
 static bool s_vp_valid = false;
+#if defined(ARDUINO)
+static K1TempoEvent s_pub_tempo;
+static K1OnsetBeatEvent s_pub_onset;
+static K1AudioSnapshot s_pub_snapshot;
+static SQ15x16 s_pub_spectrogram[NUM_FREQS];
+static K1TempoEvent s_acq_tempo;
+static K1OnsetBeatEvent s_acq_onset;
+static K1AudioSnapshot s_acq_snapshot;
+static SQ15x16 s_acq_spectrogram[NUM_FREQS];
+#endif
 
 const K1AudioFrame& k1_vp_audio_frame(void) {
   return s_vp_frame;
@@ -36,6 +53,30 @@ void k1_vp_audio_frame_store(const K1AudioFrame& frame) {
   s_vp_frame = frame;
   s_vp_valid = true;
 }
+
+#if defined(ARDUINO)
+void k1_audio_frame_copy_acquired_sidecars(K1TempoEvent* tempo,
+                                           K1OnsetBeatEvent* onset,
+                                           K1AudioSnapshot* snapshot,
+                                           void* spectrogram_out,
+                                           size_t spectrogram_bytes) {
+  if (tempo) {
+    *tempo = s_acq_tempo;
+  }
+  if (onset) {
+    *onset = s_acq_onset;
+  }
+  if (snapshot) {
+    *snapshot = s_acq_snapshot;
+  }
+  if (spectrogram_out && spectrogram_bytes) {
+    const size_t n = spectrogram_bytes < sizeof(s_acq_spectrogram)
+                         ? spectrogram_bytes
+                         : sizeof(s_acq_spectrogram);
+    memcpy(spectrogram_out, s_acq_spectrogram, n);
+  }
+}
+#endif
 #endif
 
 static void k1_af_copy_frame(K1AudioFrame* dst, const K1AudioFrame* src) {
@@ -90,15 +131,33 @@ static void k1_af_copy_frame(K1AudioFrame* dst, const K1AudioFrame* src) {
 }
 
 void k1_audio_frame_publish(const K1AudioFrame& producer_next) {
+#if defined(ARDUINO) && !defined(K1_AUDIO_FRAME_HOST_TEST)
+  // Core 0, end of hop: these producers are this generation. Read outside the
+  // frame lock so we never nest portMUX. Copy into the published slot inside.
+  const K1TempoEvent tempo = k1_tempo_read();
+  const K1OnsetBeatEvent onset = k1_onset_beat_read();
+  const K1AudioSnapshot snapshot = k1_audio_snapshot_read();
+#endif
+  const uint32_t t_enter = K1_AF_NOW_US();
   K1_AF_ENTER();
   if (s_has_publication && (!s_have_acquired ||
                             s_last_acquired_generation != s_published.ap_generation)) {
     s_stats.generation_skip_count++;
   }
   k1_af_copy_frame(&s_published, &producer_next);
+#if defined(ARDUINO) && !defined(K1_AUDIO_FRAME_HOST_TEST)
+  s_pub_tempo = tempo;
+  s_pub_onset = onset;
+  s_pub_snapshot = snapshot;
+  memcpy(s_pub_spectrogram, spectrogram, sizeof(s_pub_spectrogram));
+#endif
   s_has_publication = true;
   s_stats.publish_count++;
   K1_AF_EXIT();
+  const uint32_t hold = K1_AF_NOW_US() - t_enter;
+  if (hold > s_stats.publish_lock_hold_us_max) {
+    s_stats.publish_lock_hold_us_max = hold;
+  }
 }
 
 bool k1_audio_frame_acquire(K1AudioFrame* out) {
@@ -112,6 +171,7 @@ bool k1_audio_frame_acquire(K1AudioFrame* out) {
   }
   k1_af_host_suppress_yield(1);
 #endif
+  const uint32_t t_enter = K1_AF_NOW_US();
   K1_AF_ENTER();
   if (!s_has_publication) {
     K1_AF_EXIT();
@@ -121,10 +181,20 @@ bool k1_audio_frame_acquire(K1AudioFrame* out) {
     return false;
   }
   k1_af_copy_frame(out, &s_published);
+#if defined(ARDUINO) && !defined(K1_AUDIO_FRAME_HOST_TEST)
+  s_acq_tempo = s_pub_tempo;
+  s_acq_onset = s_pub_onset;
+  s_acq_snapshot = s_pub_snapshot;
+  memcpy(s_acq_spectrogram, s_pub_spectrogram, sizeof(s_acq_spectrogram));
+#endif
   s_last_acquired_generation = out->ap_generation;
   s_have_acquired = true;
   s_stats.acquire_count++;
   K1_AF_EXIT();
+  const uint32_t hold = K1_AF_NOW_US() - t_enter;
+  if (hold > s_stats.acquire_lock_wait_us_max) {
+    s_stats.acquire_lock_wait_us_max = hold;
+  }
 #if defined(K1_AUDIO_FRAME_HOST_TEST)
   k1_af_host_suppress_yield(0);
 #endif

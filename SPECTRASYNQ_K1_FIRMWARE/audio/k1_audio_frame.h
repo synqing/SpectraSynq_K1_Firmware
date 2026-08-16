@@ -80,4 +80,16 @@ void k1_audio_frame_stats_reset(void);
 const K1AudioFrame& k1_vp_audio_frame(void);
 bool k1_vp_audio_frame_valid(void);
 void k1_vp_audio_frame_store(const K1AudioFrame& frame);
+#if defined(ARDUINO)
+#include "k1_audio_snapshot.h"
+#include "k1_onset_beat.h"
+#include "k1_tempo.h"
+// Frozen with the acquired frame under the same spinlock. Core-1 must not
+// re-read live AP producers after acquire.
+void k1_audio_frame_copy_acquired_sidecars(K1TempoEvent* tempo,
+                                           K1OnsetBeatEvent* onset,
+                                           K1AudioSnapshot* snapshot,
+                                           void* spectrogram_out,
+                                           size_t spectrogram_bytes);
+#endif
 #endif

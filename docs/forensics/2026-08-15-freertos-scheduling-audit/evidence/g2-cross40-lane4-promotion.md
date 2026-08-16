@@ -8,13 +8,16 @@
 
 ```text
 G2_HOST_PROMOTION     = CLOSED
-G2_DEVICE_CONFIRM     = HOLD
-HOLD_REASON           = B489_G2_CONFIRM_FLASH not issued; no flash/upload performed
-G2_UNIT_STATUS        = HOST_CLOSED_DEVICE_HOLD
-G3_UNBLOCK            = YES (Captain restamp; host close-out unit complete)
+G2_DEVICE_CONFIRM     = CLOSED
+G2_UNIT_STATUS        = CLOSED
+G2_DEVICE             = CLOSED
+HOLD_REASON           = none
+G3_UNBLOCK            = YES
 ```
 
-This promotion is a **compile-time configuration change** proven on host and on the prior probe environment. Device eyes-on on the promoted `k1_hardware` binary remains outstanding until a named Captain GO.
+Captain 2026-08-17: eyes-on PASS on bench K1v2 `B489A500` running `k1_bench_im69d` @ `e911f86d` (epoch `1786903366`). Live `:build` identity confirmed 2026-08-17 before the stamp.
+
+2026-08-17 B489 package A/B soak (`docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/`): eight admissible legs, contract p99 **8000 µs**. Arm B (`e911f86d` Cross40+Lane4 full probe) quiet p99_high **7680 µs** / music **7776 µs**, consecutive over-period **1**, sample_age STABLE, drops 0, generation discontinuities 0. Arm A (pre-restamp Cross0 full probe) quiet **11840 µs** / music mean **11984 µs**. Historical G2 music 7712 µs remains `REFERENCE_ONLY_NOT_AN_ABBA_LEG`. Numeric probe PASS plus Captain eyes-on PASS stamp `G2_DEVICE = CLOSED`.
 
 ## Production flags added to `env:k1_hardware`
 
@@ -60,6 +63,12 @@ Caveats carried forward:
 - `tests/test_gdft_lane4_cross40_combined.py`
 - `tests/test_scheduling_gdft_service_matrix.py` (Cross0 baseline via `build_unflags`)
 
-## Device close predicate (not executed)
+## Device close predicate — CLOSED 2026-08-17
 
-Requires `B489_G2_CONFIRM_FLASH = GO` plus Captain-confirmed audible fixture. Then: compact soak p99 ≤ 8000 µs, max consecutive over-period ≤ 1, recovery hops ≤ 2, measured AP rate in [132.0, 134.5] Hz, sample_age ≠ GROWING, drops == 0, generation discontinuities == 0, max fits cushion, Captain perceptual A/B = PASS.
+**Already promoted:** Cross40+Lane-4 flags are in `k1_hardware`. Bench silicon is `k1_bench_im69d` @ `e911f86d` (epoch `1786903366`). Probe numeric gate PASS (quiet 7680 µs, music 7776 µs vs 8000). Captain eyes-on PASS. `G2_DEVICE = CLOSED`.
+
+**Remaining ship path after G2:**
+
+1. G3–G7A host units on this branch (this session). No F887 flash.
+2. G7B needs a named `B489_G7B_FLASH` GO.
+3. G8 + a **separate Captain GO** flashes main K1 (`F887A500`). That is main-unit promote.

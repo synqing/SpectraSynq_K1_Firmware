@@ -53,6 +53,11 @@
 #include "k1_audio_frame.h"
 #include "k1_vp_audio_access.h"
 #endif
+#ifdef K1_COMMAND_CHANNELS_V1
+#include "k1_command_channels.h"
+#endif
+#include "k1_startup_ratchet.h"
+#include "k1_persistence_request.h"
 #include "k1_musical_saliency.h"  // Smart Visual Engine AP saliency state and events
 #include "k1_tempo.h"         // Smart Visual Engine AP tempo / beat-phase tracker (Core-0)
 #include "k1_smart_director.h" // Smart Visual Engine Assist mode intent + render modulation
@@ -742,6 +747,14 @@ void setup() {
     led_thread, "led_task", 8192, NULL, tskIDLE_PRIORITY + 1, &led_task, K1_LED_TASK_CORE);
   const int ap_core = xPortGetCoreID();
   const bool ledTaskCreated = (led_task_create_result == pdPASS);
+  k1_startup_ratchet_reset();
+  k1_startup_ratchet_require(K1_STARTUP_TASK_LED);
+  k1_startup_ratchet_note_created(K1_STARTUP_TASK_LED, ledTaskCreated ? 1 : 0);
+  k1_startup_ratchet_validate_handle(K1_STARTUP_TASK_LED, led_task);
+  if (k1_startup_ratchet_is_degraded()) {
+    USBSerial.print("STARTUP_RATCHET: degraded missing=");
+    USBSerial.println(k1_startup_ratchet_missing_name());
+  }
   const bool timingOk = (CONFIG.SAMPLE_RATE == DEFAULT_SAMPLE_RATE)
     && (CONFIG.SAMPLES_PER_CHUNK == DEFAULT_SAMPLES_PER_CHUNK);
   const bool coreOk = ledTaskCreated && (ap_core != K1_LED_TASK_CORE);
@@ -863,6 +876,7 @@ void loop() {
 
   function_id = 2;
   check_settings(t_now);  // (system.h)
+  k1_persist_service_stub_once();
   // Check if the settings have changed
 
   function_id = 3;
@@ -1300,6 +1314,21 @@ void led_thread(void* arg) {
         K1AudioFrame vp_frame = {};
         if (k1_audio_frame_acquire(&vp_frame)) {
           k1_vp_bundle_begin_frame(vp_frame);
+        }
+      }
+#endif
+#ifdef K1_COMMAND_CHANNELS_V1
+      {
+        K1CmdScene scene = {};
+        if (k1_cmd_scene_acquire(&scene)) {
+          static uint32_t s_vp_scene_gen = 0;
+          if (scene.generation != s_vp_scene_gen) {
+            s_vp_scene_gen = scene.generation;
+            SECONDARY_LIGHTSHOW_MODE = scene.secondary_mode;
+            if (!mode_transition_queued) {
+              CONFIG.LIGHTSHOW_MODE = scene.primary_mode;
+            }
+          }
         }
       }
 #endif

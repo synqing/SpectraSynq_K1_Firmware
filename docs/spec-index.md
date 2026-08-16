@@ -5,7 +5,7 @@ active_authority: docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEME
 active_branch: feat/k1-scheduling-generation-hardening
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
 lane_branch: feat/k1-scheduling-generation-hardening
-last_verified: 2026-08-16
+last_verified: 2026-08-17
 ---
 
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
@@ -13,6 +13,9 @@ last_verified: 2026-08-16
      uses "artefacts". -->
 
 # SensoryBridge K1 — Spec Index
+
+**Ship path required (Captain 2026-08-17):** never withhold ship / promote / close
+without the remaining numbered path in the same answer. `/ship-path-required`.
 
 ## ⛔ DUAL-K1 SYNC IS DEAD — Captain decision, 2026-08-05
 
@@ -118,7 +121,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
-| **K1 scheduling hardening** | [active handover](handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md) · [Gate 0-8 plan](forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md) · [G0R plan](superpowers/plans/2026-08-16-g0r-cadence-authority.md) | **CURRENT. G0R stamp A: 7.5 ms hop controlling; no 10 ms AP hop. G2 RED @ 6 ms p99; G3 BLOCKED; B489 flash HOLD (not this stamp).** H=`14c53d23` R=`6b48c51e` T=`c1aba345`. AP0/VP1 locked. | `docs/forensics/2026-08-15-freertos-scheduling-audit/` |
+| **K1 scheduling hardening** | [active handover](handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md) · [Gate 0-8 plan](forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md) | **CURRENT. Stamp A: 7.5 ms hop; service p99 8000 µs; no 10 ms hop. `G2_DEVICE = CLOSED` 2026-08-17: bench `B489A500` / `k1_bench_im69d` @ `e911f86d` (epoch `1786903366`, Captain eyes-on PASS). G3–G7A host-wired on branch. G5 causal and G7B still need named B489 GOs. F887 NO until G8.** AP0/VP1 locked. | `docs/forensics/2026-08-15-freertos-scheduling-audit/` |
 | **K1 AP input integrity** | [handover](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md) · [Rev B plan](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md) · [G1 receipt](forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md) | **PARALLEL AUTHORITY. G1 RATIFIED; T0.3 COMPLETE.** No further physical mic test; AP P4 slot/health promotion remains open and separate. | `_scratch/p0_stereo_20260814/`; `scripts/tools/probe_diff.py`; `scripts/regression-harness/mic_stable_byte_gate.sh` |
 | **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) · **[session canon 2026-08-07](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)** | **SUPERSEDED as current authority.** B489 mono-default device evidence is dispositioned by the P0.0 quarantine manifest; source-reasoned work retains only its stated scope. | `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`; historical env and receipts retained for provenance |
 | **Deck16 Tab5 BLE R1** | [docs/architecture/K1_DECK16_ARCHITECTURE_R1.md](architecture/K1_DECK16_ARCHITECTURE_R1.md) · [radio](architecture/RADIO_FALLBACK_DECISION.md) · **[Tab5 session canon 2026-08-07](architecture/TAB5_DECK16_SESSION_CANON_2026-08-07.md)** · **[backend/haunt/latency canon 2026-08-09](canon/SESSION_CANON_2026-08-09_deck16_ble_backend_haunt_latency.md)** · **[68-control recovery canon](canon/TAB5_SESSION_FAILURES_AND_ENGINEERING_CANON_2026-08-11.md)** · skill [`k1-deck16-session-discipline`](../.claude/skills/k1-deck16-session-discipline/SKILL.md) | **ACTIVE architecture + ACTIVE immune memory.** Current protocol is **68 controls / `9b5db3...`**; 71/`78fb9a...` is historical only. Source recovery merged; identity + snapshot proof passed on Unit2/Tab5. Bidirectional delta, long soak, assigned CID, and UNIT-default production claim remain open. **K718 Remoted dial retired.** PRODUCTION_READY=NO. | `docs/protocol/k1-ble-midi-map.json`; `tab5_firmware/`; `scripts/agent/deck16-first-contact-gate.sh`; `scripts/agent/tab5_protocol_parity_gate.py` |

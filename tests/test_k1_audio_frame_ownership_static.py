@@ -53,6 +53,14 @@ def test_core1_sources_never_read_live_ap_state():
     assert offenders == [], "\n".join(offenders)
 
 
+def test_vp_bundle_does_not_reread_live_ap():
+    text = (FW / "audio" / "k1_vp_audio_access.cpp").read_text(encoding="utf-8")
+    assert "k1_tempo_read(" not in text
+    assert "k1_onset_beat_read(" not in text
+    assert "k1_audio_snapshot_read(" not in text
+    assert "memcpy(k1_vp_spectrogram, spectrogram" not in text
+
+
 def test_k1_hardware_enables_audio_frame_v1():
     pio = (ROOT / "platformio.ini").read_text(encoding="utf-8")
     start = pio.index("[env:k1_hardware]\n")

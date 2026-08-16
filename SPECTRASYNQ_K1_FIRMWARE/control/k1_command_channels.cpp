@@ -141,3 +141,14 @@ bool k1_cmd_edge_pop(K1CmdEdge* out) {
   K1_CMD_EXIT();
   return true;
 }
+
+void k1_cmd_publish_dual_scene(uint8_t primary_mode, uint8_t secondary_mode,
+                               uint16_t crossfade_ms) {
+  static uint32_t s_scene_pub_gen = 0;
+  K1CmdScene scene = {};
+  scene.primary_mode = primary_mode;
+  scene.secondary_mode = secondary_mode;
+  scene.crossfade_ms = crossfade_ms;
+  scene.generation = ++s_scene_pub_gen;
+  k1_cmd_scene_publish(scene);
+}

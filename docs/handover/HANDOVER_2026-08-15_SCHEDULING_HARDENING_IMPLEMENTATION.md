@@ -96,8 +96,10 @@ AP_SERVICE_P99_LIMIT_US      = 8000
 G1_B489_SMOKE                = VALID_CURRENT_IMPLEMENTATION
 G1_F887_PRODUCTION           = ABSENT
 G2_GDFT_CONTRACT             = CROSS40_PLUS_LANE4_CLOSE_OUT
-G2_SERVICE                   = CLOSE_OUT_PENDING_PROMOTION
-G3                           = UNBLOCKED_AFTER_G2_CLOSE_OUT
+G2_SERVICE                   = CLOSED
+G2_DEVICE                    = CLOSED
+G3                           = HOST_CLOSED
+G6                           = NOT_REQUIRED
 B489_FLASH                   = NAMED_GATES_ONLY_SEPARATE_GO
 F887_FLASH                   = NO_UNTIL_G8
 DEPLOYED_CONTRACT_SHA256     = 8b0f5b31000d5dec27aecbdb84505f24ad5e0711a7fc8460827b13dde26df2cc
@@ -105,10 +107,11 @@ LIVE_TASK_PLAN               = docs/superpowers/plans/2026-08-16-scheduling-hard
 G0R_PLAN                     = SUPERSEDED_FOR_LIVE_EXECUTION
 ```
 
-Next firmware unit: promote `-DK1_GDFT_X2_CROSSOVER_BIN=40u` and
-`-DK1_GDFT_LANE4_V1=1` onto `k1_hardware`, prove host/build green, then B489 only
-under `B489_G2_CONFIRM_FLASH`. Do **not** start rolling ACF or Gate 3 device work
-before that close-out receipt.
+G2 is CLOSED on bench `k1_bench_im69d` @ `e911f86d`. Next firmware units on
+this branch are already in source (G3 sidecar freeze, G4 scene apply, G5
+ratchet, G7A request mailbox). Remaining device work: named `B489_G3_FLASH`
+(lock-margin), named `B489_G7B_FLASH` (real persist/cache), then G8 + separate
+`F887_PRODUCTION_FLASH` GO. Do **not** start rolling ACF.
 
 Historical Cross0/40/80 matrix and
 `docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/` remain admissible

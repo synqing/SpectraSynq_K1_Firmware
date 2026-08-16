@@ -53,3 +53,7 @@ bool k1_cmd_scene_acquire(K1CmdScene* out);
 // Non-idempotent edge queue: at-most-once consume, visible full policy.
 bool k1_cmd_edge_push(const K1CmdEdge& edge);   // false => rejected (full or regressed)
 bool k1_cmd_edge_pop(K1CmdEdge* out);           // false => empty
+
+// Publish primary+secondary as one generation so VP can apply both on one frame.
+void k1_cmd_publish_dual_scene(uint8_t primary_mode, uint8_t secondary_mode,
+                               uint16_t crossfade_ms);

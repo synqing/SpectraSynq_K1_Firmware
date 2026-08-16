@@ -4,8 +4,6 @@
 
 #include <string.h>
 
-#include "globals.h"
-
 SQ15x16 k1_vp_spectrogram[NUM_FREQS];
 
 static K1TempoEvent s_tempo;
@@ -18,10 +16,8 @@ static bool s_ready = false;
 
 void k1_vp_bundle_begin_frame(const K1AudioFrame& frame) {
   k1_vp_audio_frame_store(frame);
-  memcpy(k1_vp_spectrogram, spectrogram, sizeof(k1_vp_spectrogram));
-  s_tempo = k1_tempo_read();
-  s_onset = k1_onset_beat_read();
-  s_snapshot = k1_audio_snapshot_read();
+  k1_audio_frame_copy_acquired_sidecars(
+      &s_tempo, &s_onset, &s_snapshot, k1_vp_spectrogram, sizeof(k1_vp_spectrogram));
 #ifdef K1_SEMANTIC_STATE
   s_semantic = frame.semantic;
 #endif

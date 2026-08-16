@@ -7,6 +7,7 @@
 #include "config_types.h"
 #include "globals.h"
 #include "Palettes.h"
+#include "k1_command_channels.h"
 #include "k1_edgemixer.h"
 #include "k1_mode_selection.h"
 #include "k1_noise_cal_arm.h"
@@ -479,6 +480,9 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     }
     mode_transition_queued = true;
     mode_destination = light_mode_next_enabled(uint8_t(mode), 1);
+#ifdef K1_COMMAND_CHANNELS_V1
+    k1_cmd_publish_dual_scene(mode_destination, SECONDARY_LIGHTSHOW_MODE, 0);
+#endif
     save_config_delayed();
     return ok_number(float(mode_destination));
   }
@@ -628,6 +632,11 @@ K1WirelessControlResult k1_control_apply(const K1WirelessControlRecord& record) 
     }
     SECONDARY_LIGHTSHOW_MODE = light_mode_next_enabled(uint8_t(mode), 1);
     ENABLE_SECONDARY_LEDS = true;
+#ifdef K1_COMMAND_CHANNELS_V1
+    k1_cmd_publish_dual_scene(
+        mode_transition_queued ? mode_destination : CONFIG.LIGHTSHOW_MODE,
+        SECONDARY_LIGHTSHOW_MODE, 0);
+#endif
     return ok_number(float(SECONDARY_LIGHTSHOW_MODE));
   }
 

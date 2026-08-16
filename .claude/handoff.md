@@ -22,6 +22,17 @@ explicit audio task remains conditional.
 - B489 flash only under named GO tokens; F887 NO until G8.
 - Rolling ACF / scheduler theatre are out of programme.
 
+**Silicon (2026-08-17):** bench K1v2 `B489A500` on
+`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `e911f86d`**
+(epoch `1786903366`). Live `:build` confirmed. F887 not flashed.
+
+**G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on that binary).
+
+**Ship path after G2 (G3–G7A now in source on this branch):**
+1. Named `B489_G3_FLASH` GO for lock-margin capture of the sidecar-freeze binary.
+2. Named `B489_G7B_FLASH` GO for real persist/cache coexistence (G5 causal trace can ride the same named-GO capture if the trace env is specified).
+3. G8 + separate Captain GO flashes main K1 (`F887A500`). That is main-unit ship.
+
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
 

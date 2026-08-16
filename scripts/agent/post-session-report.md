@@ -5,6 +5,50 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-17 G2 CLOSED, G3–G7A wired on branch
+
+```text
+session_objective:       Confirm k1_bench_im69d @ e911f86d on bench K1; stamp G2 PASSED/promoted; run G3–G7 on branch.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ e911f86d
+branch_head_at_end:      same branch; G2 stamp + G3 sidecar freeze + G4/G5/G7A wiring committed if gate green.
+files_changed:           k1_audio_frame sidecar freeze; k1_vp_audio_access no live AP re-read; dual-scene command publish/apply; startup ratchet at led_task create; persist request push + loop stub; G2–G7A evidence; registry/handoff/plan.
+commands_run:            identity guard 12401 IDENTITY OK git=e911f86d env=k1_bench_im69d epoch=1786903366; pytest 1347 passed, 1 skipped; pio-build k1_hardware SUCCESS.
+validation_results:      G2_DEVICE CLOSED (Captain eyes-on PASS). G3 host CLOSED; G3 lock-margin NOT_TAKEN. G4 host+firmware WIRED. G5 ratchet WIRED, causal NOT_PROVEN. G6 NOT_REQUIRED. G7A CLOSED. G7B NOT_STARTED. G8 OPEN.
+evidence_captured:       evidence/g2-cross40-lane4-promotion.md CLOSED; g3–g7a + g8 readiness.
+blockers:                none for host land. Device G3 lock-margin / G5 causal / G7B need named B489 GOs. F887 NO.
+generated_files_ignored: e2e pack bins remain untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no new flash this session.
+thinking_skill_used:     thinking-map-territory (silicon identity vs working-tree G3–G7A).
+skills_used:             ship-path-required; Agent OS; spec-recall via on-disk handover.
+specialists_used:        none.
+claude_mem_observations: on-disk identity + G2 stamp is authority.
+next_recommended_action: Captain named B489_G3_FLASH or B489_G7B_FLASH. Do not flash F887.
+```
+
+---
+
+## Session Report — 2026-08-17 B489 G2/G3 E2E A/B soak
+
+```text
+session_objective:       Execute locked B489 package A/B: eight-leg ABBA of pre-restamp Cross0 probe vs e911f86d Cross40+Lane4+G3/G4, score vs contract 8000 µs, restore production.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ e911f86d dirty docs.
+branch_head_at_end:      same HEAD; pack/runner/tests/docs uncommitted (no commit authorised).
+files_changed:           pack 20260817T-g2g3-e2e-ab-b489; tests/test_e2e_abba_flash_policy.py; superpowers plan; registry restore row; g2-cross40-lane4-promotion NUMERIC_PASS. No firmware source behaviour edits. No C env (B passed).
+commands_run:            pytest flash-policy 5 PASS; pio-build A@8f53c48e and B@e911f86d; one run_e2e_ab.py primary eight legs; evaluate_e2e_ab.py; k1-flash-verified k1_bench_im69d on 12401.
+validation_results:      package_gate PASS. B quiet p99_high 7680 µs, music 7776 µs, consec=1, sample_age STABLE, drops 0. A quiet 11840 / music mean 11984. G2_DEVICE NOT_CLOSED. C not run.
+evidence_captured:       PREFLIGHT.json SERIES.json RESULT.json RESTORE.json findings.md bins/A.bin bins/B.bin.
+blockers:                none for numeric probe gate; Captain eyes-on still required for G2_DEVICE CLOSED.
+generated_files_ignored: pack bins/logs; A worktree removed.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; flash B489 only; restore k1_bench_im69d @ e911f86d epoch 1786903366.
+thinking_skill_used:     thinking-map-territory + thinking-red-team (probe p99 is map; production+eyes-on is territory).
+skills_used:             thinking-router; find-skills (in-repo capture stack, no skills.sh add); discover-specialists (none dispatched onto device); scipy (no invented stats; two-repeat min/max/mean only); brainstorming skipped (plan already locked).
+specialists_used:        none on the device series.
+claude_mem_observations: on-disk pack is authority.
+next_recommended_action: Captain eyes-on of production k1_bench_im69d. Do not stamp G2_DEVICE CLOSED from this pack. Commit when authorised.
+```
+
+---
+
 ## Session Report — 2026-08-16 G2_TEMPO_EMIT_EXACT_RESIDUAL_V1 host stop
 
 ```text
