@@ -1,11 +1,19 @@
 ---
-abstract: "ACTIVE. Captain authorised end-to-end implementation of the K1 scheduling hardening Gate 0-8 programme on feat/k1-scheduling-generation-hardening. This supersedes the scheduling lane's pre-implementation hold, while leaving the separate AP-input-integrity P4 promotion decision open. AP0/VP1 remains locked; harness and fault evidence precede production units."
+abstract: "ACTIVE under G0R. Gate 0 oracle CLOSED; Gate 0 contract content REOPENED as cadence-authority reconciliation. Deployed 7.5 ms contract remains controlling. Gate 2 BLOCKED_OPEN; Gate 3 BLOCKED; flash HOLD. Separate AP-input-integrity P4 remains open. AP0/VP1 locked."
 status: active
 branch: feat/k1-scheduling-generation-hardening
 active_lane: K1_SCHEDULING_HARDENING_20260815
 authority_plan: docs/forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md
+g0r_plan: docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md
 captain_authorisation: FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15
 ap_input_p4_status: OPEN_SEPARATE_PROGRAMME
+g0_oracle_implementation: CLOSED
+g0_contract_content: REOPENED_G0R
+g2_product_selection: BLOCKED_BY_G0R
+g3: BLOCKED
+b489_abba_flash_now: HOLD
+harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
+final_abba_toolchain_pin_sha: PENDING_R5
 ---
 
 # Handover — K1 scheduling hardening implementation
@@ -58,15 +66,33 @@ radio and 24 kHz/180-bin work    = separate programmes
 - Host/build green is not device, photon or perceptual proof.
 - No implementation unit may weaken the oracle, fixtures, thresholds or CI that accepts it.
 
-## Immediate execution state
+## Immediate execution state (map–territory, 2026-08-16)
 
-The implementation branch began at `9259a9d5`. Gate 0 was independently accepted at
+```text
+G0_ORACLE_IMPLEMENTATION     = CLOSED
+G0_CONTRACT_CONTENT          = REOPENED  (G0R)
+G1_B489_SMOKE                = VALID_CURRENT_IMPLEMENTATION
+G1_F887_PRODUCTION           = ABSENT
+G2_7P5_CHARACTERISATION      = COMPLETE_ENOUGH_FOR_SERVICE_DEFICIT
+G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
+G3                           = BLOCKED
+B489_ABBA_FLASH_NOW          = HOLD
+HARNESS_FIRMWARE_PIN_SHA     = 14c53d239524aa891e71470880f6917d4adf2ea6
+FINAL_ABBA_TOOLCHAIN_PIN_SHA = PENDING_R5
+```
+
+G0R authority: `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`.
+Deployed contract `gate0/contract.json` (SHA-256
+`d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849`) remains live.
+Draft amendment awaits Captain A–E stamp; no live pointer to the draft.
+
+The implementation branch began at `9259a9d5`. Gate 0 oracle was independently accepted at
 `68c9a51e`. Gate 1 now has a host/build-green trace surface and a guarded B489A500
 bench smoke: two-channel RMT completion is observed without drops, while both short
 scalar bench probes show AP service demand above the nominal 7.5 ms arrival period.
-That RED service-capacity result admits Gate 2 without authorising priority or task
-changes. Gate 1 remains open for the exact-production F887A500 quiet/music/crossfade
-baseline and Captain-confirmed audible real-music fixture.
+That RED service-capacity result admits Gate 2 characterisation without authorising
+priority or task changes. Gate 1 remains open for the exact-production F887A500
+quiet/music/crossfade baseline and Captain-confirmed audible real-music fixture.
 
 Gate 2 now has a source-parity, one-variable cross0/cross40/cross80 probe matrix. All
 three B489A500 environments build and 105 focused geometry/semantic/static tests pass.

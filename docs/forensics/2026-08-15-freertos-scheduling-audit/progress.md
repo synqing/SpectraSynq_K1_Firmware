@@ -1,5 +1,24 @@
 # Progress — plan fold
 
+## 2026-08-16 — G0R map–territory
+
+```text
+G0_ORACLE_IMPLEMENTATION     = CLOSED
+G0_CONTRACT_CONTENT          = REOPENED  (G0R)
+G1_B489_SMOKE                = VALID_CURRENT_IMPLEMENTATION
+G1_F887_PRODUCTION           = ABSENT
+G2_7P5_CHARACTERISATION      = COMPLETE_ENOUGH_FOR_SERVICE_DEFICIT
+G2_PRODUCT_SELECTION         = BLOCKED_BY_G0R
+G3                           = BLOCKED
+B489_ABBA_FLASH_NOW          = HOLD
+HARNESS_FIRMWARE_PIN_SHA     = 14c53d239524aa891e71470880f6917d4adf2ea6
+FINAL_ABBA_TOOLCHAIN_PIN_SHA = PENDING_R5
+```
+
+Authority: `docs/superpowers/plans/2026-08-16-g0r-cadence-authority.md`.
+Deployed `gate0/contract.json` unchanged (7.5 ms). Draft amendment
+`gate0/amendments/G0R_2026-08-16.draft.json` is `DRAFT_AWAITING_CAPTAIN` only.
+
 ## 2026-08-15
 
 - Reloaded the reconciled audit, delegation contracts and named planning/system skills.
