@@ -1,0 +1,72 @@
+{
+  "F887_FLASH": "NO",
+  "F887_present": false,
+  "G3": "BLOCKED",
+  "H": "14c53d239524aa891e71470880f6917d4adf2ea6",
+  "HEAD": "cd9c5bea1f430f5b6bcb45af34849ec934d15778",
+  "POST_ABBA_FIRMWARE_MUTATION": "HOLD",
+  "R": "6b48c51ece1a56c4bb99765fccc9f60a6e557dd1",
+  "T": "c1aba345603bc2cacc8cf30648768d346f572779",
+  "all_ports": [
+    {
+      "device": "/dev/cu.debug-console",
+      "hwid": "n/a",
+      "serial": null
+    },
+    {
+      "device": "/dev/cu.Bluetooth-Incoming-Port",
+      "hwid": "n/a",
+      "serial": null
+    },
+    {
+      "device": "/dev/cu.usbmodem12401",
+      "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4",
+      "serial": "B4:3A:45:A5:89:B4"
+    },
+    {
+      "device": "/dev/cu.wchusbserial5AAF2781791",
+      "hwid": "USB VID:PID=1A86:55D3 SER=5AAF278179 LOCATION=1-1",
+      "serial": "5AAF278179"
+    }
+  ],
+  "baked_git_in_pinned_bins": "be8dd1aa",
+  "baked_git_note": "Bins were built from the dirty tree that became H while HEAD was still be8dd1aa. Receipt hashes match. Do not rebuild.",
+  "branch": "feat/k1-scheduling-generation-hardening",
+  "capture_runner_note": "Pack-local capture omits beat_director=off (K1_EFFECT_FRAMEWORK_V1 off) and bare show_state (typed table unwired in parse_command; live Bad command). Scene fingerprint is dump+secondary_status+edge_status. T evaluate_series preamble remains inapplicable; perturbation uses T frozen numeric limits.",
+  "capture_runner_sha256": "bc0684dae1da9dfc5d735084302e578f963c425019a84f254d5208f57f9c6ad1",
+  "comparator_sha256": "a96fbe6d0dba5dcf6377a9fc01c9f79d79fb874e309e0c915fb62812953ebf43",
+  "contract_sha256": "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849",
+  "device": {
+    "device": "/dev/cu.usbmodem12401",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4",
+    "serial": "B4:3A:45:A5:89:B4"
+  },
+  "first_leg_abort": "S1_A1 aborted on beat_director=off; min bin was already flashed and identity-ok",
+  "output_device": "MacBook Pro Speakers",
+  "output_muted": false,
+  "output_volume": 19,
+  "pinned_bins": {
+    "full": {
+      "bytes": 723264,
+      "path": "docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/bins/full.bin",
+      "sha256": "9fec6e2514945262df510da47afbb168ae000c86cbfec62730301a556898aa9a"
+    },
+    "min": {
+      "bytes": 722976,
+      "path": "docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/bins/min.bin",
+      "sha256": "c66c9dafd8e141d91878e6d98cc59a2ff778ea2f20876447ec4ceb3e0a325da2"
+    }
+  },
+  "playback_gain_db": 0.0,
+  "player": "ffplay",
+  "protocol": "two_independent_ABBA_series_not_T_mixed_eight_leg",
+  "timestamp": "2026-08-16T15:13:57+0800",
+  "track": "/Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3",
+  "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938",
+  "tuple": {
+    "ap_arrival_period_us": 7500,
+    "sample_rate_hz": 12800,
+    "samples_per_chunk": 96,
+    "tempo_novelty_decimation": 3
+  }
+}

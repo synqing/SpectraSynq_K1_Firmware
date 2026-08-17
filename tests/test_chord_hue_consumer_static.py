@@ -41,7 +41,7 @@ class ChordHueConsumerStaticTest(unittest.TestCase):
 
     def test_consumer_is_flag_gated_and_uses_snapshot_read_idiom(self):
         self.assertIn("#ifdef K1_CHORD_HUE_V1", VARIANT)
-        self.assertIn("k1_audio_snapshot_read()", VARIANT)
+        self.assertIn("k1_vp_audio_snapshot_read()", VARIANT)
         self.assertIn("chord.rootNote", VARIANT)
         self.assertIn("K1ChordType::NONE", VARIANT)
         # Off-flag fallback keeps the original centroid colour path.

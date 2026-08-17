@@ -202,10 +202,10 @@ void k1_print_smart_status();
 // serial/serial_menu.cpp (M2.1 Phase R1, batch 2). Declarations stay here for the
 // in-header hotkey dispatch and the extracted serial_cmd_dispatch_edge_mixer
 // (serial_cmd_handlers.cpp already forward-declares k1_print_edge_status /
-// k1_edge_warn_if_collapsed). Behaviour-preserving: goldens reproduce byte-for-byte.
+// k1_edge_echo_if_coerced). Behaviour-preserving: goldens reproduce byte-for-byte.
 // ---------------------------------------------------------------------------
 void k1_print_edge_status();
-void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e);
+void k1_edge_echo_if_coerced(const K1EdgeMixerConfig& requested);
 void serial_edge_toggle_enabled();
 void serial_edge_cycle_mode();
 void serial_edge_adjust_spread(int delta);

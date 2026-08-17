@@ -25,6 +25,7 @@ Cursor).
 
 ## Hard rules (from AGENT_OS.md)
 
+- Never say a result does not mean ship / promote / close without the remaining numbered ship path in the same answer (`/ship-path-required`, Captain 2026-08-17).
 - No firmware source edits unless explicitly scoped.
 - No `platformio.ini` env behavior changes unless explicitly scoped.
 - No flash / upload / erase / serial monitor without explicit approval.

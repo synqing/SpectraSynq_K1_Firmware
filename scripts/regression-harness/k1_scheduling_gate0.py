@@ -366,9 +366,27 @@ def _resolve_deployed_contract_path(
 
 
 def _p99_limit_us(contract: dict[str, Any]) -> int:
-    period = int(contract["production_tuple"]["ap_arrival_period_us"])
-    fraction = float(contract["margin_rules"]["ap_service_p99_max_fraction_of_arrival"])
-    return int(period * fraction)
+    """Resolve AP service p99 limit.
+
+    Prefer absolute ``margin_rules.ap_service_p99_max_us`` (Captain 2026-08-16
+    restamp: 8000 µs). Fall back to legacy fraction×arrival only when the
+    absolute key is absent (candidate fixtures that still carry 0.8).
+    Fail closed if both are present — exactly one authority for the number.
+    """
+    rules = contract["margin_rules"]
+    has_abs = "ap_service_p99_max_us" in rules
+    has_frac = "ap_service_p99_max_fraction_of_arrival" in rules
+    if has_abs and has_frac:
+        raise Gate0Error(
+            "ap_service_p99_dual_authority:"
+            "both ap_service_p99_max_us and ap_service_p99_max_fraction_of_arrival present"
+        )
+    if has_abs:
+        return int(rules["ap_service_p99_max_us"])
+    if has_frac:
+        period = int(contract["production_tuple"]["ap_arrival_period_us"])
+        return int(period * float(rules["ap_service_p99_max_fraction_of_arrival"]))
+    raise Gate0Error("ap_service_p99_missing:no absolute or fraction margin")
 
 
 def _selection_from_contract(

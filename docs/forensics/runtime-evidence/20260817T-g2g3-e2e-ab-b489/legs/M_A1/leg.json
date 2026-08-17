@@ -1,0 +1,35 @@
+{
+  "arm": "A",
+  "bin_sha256": "ade17c0e6329e9d0dadc46736c69521d58bba89929d2c3f4630cd5808ea29d95",
+  "capture": {
+    "buffered": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__summary.json"
+    },
+    "classification": "paired_capture_admissible",
+    "compact": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__summary.json"
+    },
+    "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__pair_manifest.json",
+    "pair_manifest_sha256": "50ec52425ae40522cedef2db7595b1b321b1d204f5e7e66ca070ca0e087a1e9d"
+  },
+  "chip_id": "B489A500",
+  "env": "k1_bench_scheduling_stage_full_probe",
+  "expect_git": "8f53c48e",
+  "fixture": "music",
+  "flashed": false,
+  "identity": {
+    "arm": "A",
+    "env": "k1_bench_scheduling_stage_full_probe",
+    "expect_git": "8f53c48e",
+    "identity_line": "IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716",
+    "port": "/dev/cu.usbmodem12401"
+  },
+  "leg_id": "M_A1",
+  "port": "/dev/cu.usbmodem12401",
+  "resumed_existing": false,
+  "usb_serial": "B4:3A:45:A5:89:B4"
+}

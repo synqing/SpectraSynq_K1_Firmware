@@ -42,11 +42,13 @@ if [ -d "$FW_DIR" ]; then
   fi
 fi
 
-# --- CL-1: the framework-gated lock_leds() body must not be empty -----------
-# Extract the lock_leds(){ ... } body that sits under #ifdef K1_EFFECT_FRAMEWORK_V1
-# (the FIRST definition in globals.h) and confirm it contains real statements.
+# --- CL-1: the park-gated lock_leds() body must not be empty -----------
+# Extract the lock_leds(){ ... } body that sits under #ifdef K1_LED_PARK_V1
+# (or the legacy #ifdef K1_EFFECT_FRAMEWORK_V1) and confirm it contains real
+# statements. G7B compiles the same barrier via K1_PERSIST_PARK_V1.
 if [ -f "$GLOBALS" ]; then
   body="$(awk '
+    /#ifdef K1_LED_PARK_V1/ { inflag=1 }
     /#ifdef K1_EFFECT_FRAMEWORK_V1/ { inflag=1 }
     inflag && /inline void lock_leds\(\)/ { grab=1 }
     grab {

@@ -6,13 +6,78 @@
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
 
+**Live task plan (2026-08-16 evening restamp):**
+[`docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md`](../docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md)
+
 The active programme is the contained Gate 0-8 scheduling hardening plan. AP stays on
 Core 0, VP stays on Core 1, the harness/fault battery precedes production units, and an
-explicit audio task remains conditional. Captain stamped G0R **A** (2026-08-16 AWST):
-deployed 7.5 ms hop remains controlling; Gate 2 stays red against 6 ms p99; Gate 3
-blocked; B489 flash HOLD until a separate GO. The separate AP-input-integrity P4
-promotion is still open; no unrelated microphone slot/health/calibration change is
-implied by this lane.
+explicit audio task remains conditional.
+
+**Captain restamp (2026-08-16 evening AWST):**
+- Hop remains 12.8 kHz / 96 / d3 / 7.5 ms (stamp **A**: no 10 ms hop).
+- AP service p99 = **8000 µs** (the 6 ms / 0.8 fraction is STRUCK).
+- Gate 2 close-out = promote **Cross40 + Lane-4** onto `k1_hardware`.
+- Gate 3 is **UNBLOCKED** after that G2 close-out (not forever blocked).
+- G0R cadence plan is **SUPERSEDED for live execution**.
+- B489 flash only under named GO tokens; F887 NO until G8.
+- Rolling ACF / scheduler theatre are out of programme.
+
+**Silicon (2026-08-18, 01:28 AWST):** bench K1v2 `B489A500` on
+`/dev/cu.usbmodem12401` is running **`k1_bench_im69d_wfhyb_fade` @ `836fde39`**
+(epoch `1786987759`, Captain flash-NOW 2026-08-18, verified
+`IDENTITY OK: git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759`).
+This binary carries three levers: mode-11 origin deposit
+(`K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`), the mode-32 comparison pack
+(`K1_WFHYB_M32_VARIANTS_V1` — bench modes 33–37 FLUX/NOTE/WIDE/SUM/STEP), and
+`K1_EDGE_PALETTE_HONOUR_V1` (skip EdgeMixer hue rotation while a palette owns
+the channel). Prior: `1be4930a` crushed the primary under `edge_enabled`;
+fade-turnover @ `45afaee1` FAILED (centre colour flash); mode-32 sheet is
+VP-side (centroid collapse), NOT AP.
+G7B/G8 binary `k1_bench_im69d @ 1d457740` is OFF this unit until restore.
+
+**EdgeMixer primary crush (Captain 2026-08-18): ON SILICON @ `836fde39`.**
+Mechanism = convicted P5.A side-door (dual-edge SPLIT shipping default
+hue-rotates the palette-authored PRIMARY buffer). Not a compounding/feedback
+bug. Honour gate skips both edge rotations while a palette owns that channel;
+chromatic channels keep the rotation (that split IS the effect). Production
+promotion of the flag stays gated by `test_colour_fix_flags_static.py` (needs
+Captain eyes-on + the colour-fix promotion plan, NOT this lane).
+
+**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
+consultancy / development). No F887 flash is possible until Captain has a
+replacement unit. G8 is deferred, not cancelled.
+
+**G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on `e911f86d`).
+**G3 = CLOSED** (Captain perceptual PASS 2026-08-17 on `c671ddf3`).
+**G7B = CLOSED** (Captain save-park PASS 2026-08-17 on `1d457740`).
+**G8 host = GREEN** (pytest 1353 passed / 1 skipped; `k1_hardware` SUCCESS;
+bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
+**G8 device surface = bench `B489A500`, but not this binary.** Restore
+`k1_bench_im69d @ 1d457740` under a named GO before a G8 look.
+
+**Ship path after this lock:**
+1. ~~Trail flash~~ **DONE** — `1be4930a`.
+2. ~~Edge-honour flash~~ **DONE** — `836fde39` on B489.
+   Stamp = `IDENTITY OK: git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759`.
+3. ~~Captain A/B~~ **KEEP ALL 33–37** (2026-08-18). Do not port one winner into
+   mode 32. Overlay env still holds trail-deposit + variants + honour.
+4. **Captain names `B489_WFHYB_PROMOTE`.** **Agent** un-gates 33–37 (selectable
+   off the overlay flag), rides trail-deposit + honour onto `k1_bench_im69d`
+   (this unit’s home env; honour is legal there — `k1_hardware` stays off-flag
+   until the colour-fix promotion plan). Host gate, then flash B489
+   `k1_bench_im69d` via `k1-flash-verified.sh`. Stamp =
+   `IDENTITY OK git=<new> env=k1_bench_im69d`. Then the overlay env can die.
+5. `k1_hardware` + F887 replacement flash is the production stamp (F887 offsite
+   until `F887_PRODUCTION_FLASH`). Honour onto `k1_hardware` is that same close,
+   not a silent leak. Rollback until step 4 lands: reflash this overlay
+   `@ 836fde39`, or G8 restore `k1_bench_im69d @ 1d457740`.
+
+The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
+slot/health/calibration change is implied by this lane.
+
+**Merge 2026-08-18:** `origin/main` PRISM authored ingress (`3fc8cd8f`) is in this
+tree (`k1_prsm` + `k1_authored_source`). Live snapshot update is suppressed while
+authored is fresh. That does not change G2/G3 close or the wfhyb overlay ship path.
 
 Physical proof still requires exact device identity, guarded environment pairing and
 Captain-confirmed acoustic conditions.

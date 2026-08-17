@@ -90,6 +90,13 @@ EffectEntry g_registry[] = {
     { legacy_id(LIGHT_MODE_BEAT_PULSE),           "beat_pulse",           "BEAT PULSE",            nullptr, nullptr, false, false, AudioDeps::BEAT | AudioDeps::LEVEL,  LIGHT_MODE_BEAT_PULSE },
     { legacy_id(LIGHT_MODE_BLOOM_BT),             "bloom_bt",             "BLOOM BASSTREBLE",      nullptr, nullptr, false, false, AudioDeps::LEVEL,                  LIGHT_MODE_BLOOM_BT },
     { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),   "waveform_hybrid_k1",   "WAVEFORM HYBRID K1",    nullptr, nullptr, true,  false, AudioDeps::LEVEL,                  LIGHT_MODE_WAVEFORM_HYBRID_K1 },
+    // Mode-32 comparison pack (2026-08-17): enabled mirrors production
+    // light_mode_is_enabled() (false — bench flag K1_WFHYB_M32_VARIANTS_V1 only).
+    { legacy_id(LIGHT_MODE_WFHYB_K1_FLUX),        "wfhyb_k1_flux",        "WFHYB K1 FLUX",         nullptr, nullptr, false, false, AudioDeps::CHORD | AudioDeps::LEVEL, LIGHT_MODE_WFHYB_K1_FLUX },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_NOTE),        "wfhyb_k1_note",        "WFHYB K1 NOTE",         nullptr, nullptr, false, false, AudioDeps::CHORD | AudioDeps::LEVEL, LIGHT_MODE_WFHYB_K1_NOTE },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_WIDE),        "wfhyb_k1_wide",        "WFHYB K1 WIDE",         nullptr, nullptr, false, false, AudioDeps::CHORD | AudioDeps::LEVEL, LIGHT_MODE_WFHYB_K1_WIDE },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_SUM),         "wfhyb_k1_sum",         "WFHYB K1 SUM",          nullptr, nullptr, false, false, AudioDeps::CHORD | AudioDeps::LEVEL, LIGHT_MODE_WFHYB_K1_SUM },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_STEP),        "wfhyb_k1_step",        "WFHYB K1 STEP",         nullptr, nullptr, false, false, AudioDeps::CHORD | AudioDeps::LEVEL, LIGHT_MODE_WFHYB_K1_STEP },
 
     // ── Native family 0x10/0x11/0x12: the ported-but-dead IEffects go live here ──
     { 0x1001, "beat_pulse_resonant",   "Beat Pulse (Resonant)",  nullptr, nullptr, true, true, AudioDeps::BEAT | AudioDeps::LEVEL,  kNoLegacy },
@@ -148,6 +155,11 @@ constexpr RegId k_reg_ids[] = {
     { legacy_id(LIGHT_MODE_BEAT_PULSE),            LIGHT_MODE_BEAT_PULSE },
     { legacy_id(LIGHT_MODE_BLOOM_BT),              LIGHT_MODE_BLOOM_BT },
     { legacy_id(LIGHT_MODE_WAVEFORM_HYBRID_K1),    LIGHT_MODE_WAVEFORM_HYBRID_K1 },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_FLUX),         LIGHT_MODE_WFHYB_K1_FLUX },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_NOTE),         LIGHT_MODE_WFHYB_K1_NOTE },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_WIDE),         LIGHT_MODE_WFHYB_K1_WIDE },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_SUM),          LIGHT_MODE_WFHYB_K1_SUM },
+    { legacy_id(LIGHT_MODE_WFHYB_K1_STEP),         LIGHT_MODE_WFHYB_K1_STEP },
     { 0x1001, kNoLegacy },
     { 0x1101, kNoLegacy },
     { 0x1201, kNoLegacy },
@@ -200,7 +212,9 @@ K1_REG_ROW_GUARD(16); K1_REG_ROW_GUARD(17); K1_REG_ROW_GUARD(18); K1_REG_ROW_GUA
 K1_REG_ROW_GUARD(20); K1_REG_ROW_GUARD(21); K1_REG_ROW_GUARD(22); K1_REG_ROW_GUARD(23);
 K1_REG_ROW_GUARD(24); K1_REG_ROW_GUARD(25); K1_REG_ROW_GUARD(26); K1_REG_ROW_GUARD(27);
 K1_REG_ROW_GUARD(28); K1_REG_ROW_GUARD(29); K1_REG_ROW_GUARD(30); K1_REG_ROW_GUARD(31);
-K1_REG_ROW_GUARD(32); K1_REG_ROW_GUARD(33); K1_REG_ROW_GUARD(34);
+K1_REG_ROW_GUARD(32); K1_REG_ROW_GUARD(33); K1_REG_ROW_GUARD(34); K1_REG_ROW_GUARD(35);
+K1_REG_ROW_GUARD(36); K1_REG_ROW_GUARD(37); K1_REG_ROW_GUARD(38); K1_REG_ROW_GUARD(39);
+K1_REG_ROW_GUARD(40); K1_REG_ROW_GUARD(41); K1_REG_ROW_GUARD(42);
 
 #undef K1_REG_ROW_GUARD
 

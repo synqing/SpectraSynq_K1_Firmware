@@ -1,6 +1,7 @@
 #include "lightshow_modes.h"
 #include "k1_tempo.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_tempo_comet — "Tempo Comet": beat-grid-locked travelling comets,
@@ -81,7 +82,7 @@ void light_mode_tempo_comet(ChannelEffectState& fx) {
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
     t.beat_tick = false; t.locked = true; t.beat_strength = 1.0f;
   } else {
-    t = k1_tempo_read();
+    t = k1_vp_tempo_read();
   }
 
   // 1. Fade the persisted trail in place.

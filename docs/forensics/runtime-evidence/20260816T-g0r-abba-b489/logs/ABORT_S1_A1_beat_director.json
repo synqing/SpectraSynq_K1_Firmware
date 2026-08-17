@@ -1,0 +1,4 @@
+{
+  "error": "S1_A1 capture rc=1: Traceback (most recent call last):\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_ap_cadence_capture.py\", line 2426, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_ap_cadence_capture.py\", line 1843, in main\n    validate_paired_command_response(cmd, response)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/device_ap_cadence_capture.py\", line 526, in validate_paired_command_response\n    raise RuntimeError(f\"paired command {command!r} failed: {errors}\")\nRuntimeError: paired command 'beat_director=off' failed: ['Bad command: beat_director=off']\n",
+  "completed_legs": []
+}

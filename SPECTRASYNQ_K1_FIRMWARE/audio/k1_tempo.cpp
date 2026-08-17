@@ -71,6 +71,12 @@ static const uint16_t K1_HISTORY_LENGTH = 512;
 #ifndef K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH
 #define K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH 0
 #endif
+#ifndef K1_TEMPO_ACF_INCREMENTAL_V1
+#define K1_TEMPO_ACF_INCREMENTAL_V1 0
+#endif
+#if K1_TEMPO_ACF_INCREMENTAL_V1 && K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH
+#error "K1_TEMPO_ACF_INCREMENTAL_V1 publishes every emit; SKIP_UPDATE_ON_PUBLISH is not a valid pairing"
+#endif
 
 // Per-emit decay so the Goertzel weights recent novelty more (fades stale beats).
 static const float    K1_NOVELTY_DECAY = 0.999f;
@@ -208,6 +214,14 @@ static float      k1_acf_salience[K1_NUM_TEMPI];   // HARMONIC-COMB salience (wi
 static float      k1_acf_point[K1_NUM_TEMPI];      // POINT ACF salience (CONFIDENCE only — un-spread)
 static float      k1_acf_work[K1_HISTORY_LENGTH];
 static float      k1_acf_lag_table[200];
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+// Uncentered biased ACF of the unscaled novelty ring, indexed by lag_min + i.
+// Maintained by an exact drop-oldest / decay-rest / append-new recurrence so
+// each emit costs O(nlag) instead of O(nlag_slice * HISTORY). Mean-subtraction
+// and novelty_scale are applied only at publish via the algebraic identity.
+static float      k1_acf_r[200];
+static float      k1_goertzel_window[K1_HISTORY_LENGTH];
+#endif
 static bool       k1_acf_valid = false;
 static uint8_t    k1_acf_refresh_ctr = 0;
 #if K1_TEMPO_ACF_SPREAD_PROBE
@@ -555,6 +569,49 @@ static float k1_compute_magnitude(uint16_t bin) {
   return sqrtf(mag_sq) / ((float)block_size * 0.5f);
 }
 
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+// Linearise the ring oldest->newest once per emit and apply the same 4.0 clamp
+// as k1_compute_magnitude. Both Goertzel bins share this window, so the gather
+// is not paid twice. Index order matches block_size == HISTORY:
+//   idx = (spectral_index + i) % HISTORY.
+static void k1_goertzel_fill_window() {
+  uint16_t idx = k1_spectral_index;
+  for (uint16_t i = 0; i < K1_HISTORY_LENGTH; i++) {
+    k1_goertzel_window[i] = k1_t_clamp(k1_spectral_curve[idx] * k1_novelty_scale, 0.0f, 4.0f);
+    idx = (uint16_t)((idx + 1u) % K1_HISTORY_LENGTH);
+  }
+}
+
+static float k1_compute_magnitude_from_window(uint16_t bin) {
+  uint32_t block_size = k1_tempi[bin].block_size;
+  if (block_size > K1_HISTORY_LENGTH) block_size = K1_HISTORY_LENGTH;
+  const uint32_t offset = K1_HISTORY_LENGTH - block_size;
+
+  float q1 = 0.0f;
+  float q2 = 0.0f;
+  const float coeff = k1_tempi[bin].coeff;
+
+  for (uint32_t i = 0; i < block_size; i++) {
+    const float sample = k1_goertzel_window[offset + i];
+    const float q0 = coeff * q1 - q2 + sample;
+    q2 = q1;
+    q1 = q0;
+  }
+
+  float real = q1 - q2 * k1_tempi[bin].cosine;
+  float imag = q2 * k1_tempi[bin].sine;
+
+  float phase = atan2f(imag, real) + (K1_PI * K1_BEAT_SHIFT_PERCENT);
+  if (phase > K1_PI)        phase -= K1_TWO_PI;
+  else if (phase < -K1_PI)  phase += K1_TWO_PI;
+  k1_tempi[bin].phase = phase;
+
+  float mag_sq = q1 * q1 + q2 * q2 - q1 * q2 * coeff;
+  if (mag_sq < 0.0f) mag_sq = 0.0f;
+  return sqrtf(mag_sq) / ((float)block_size * 0.5f);
+}
+#endif
+
 // ----------------------------------------------------------------------------------------
 // Harmonic-comb ACF salience (octave defence — "comb-plus-prior", task 2026-06-04)
 // ----------------------------------------------------------------------------------------
@@ -693,6 +750,56 @@ static void k1_compute_acf_salience() {
   (void)k1_acf_compute_lag_rows(k1_acf_lag_table, lag_min, nlag, 0, (uint16_t)nlag);
   k1_acf_publish_salience(k1_acf_lag_table, nlag, lag_min);
 }
+
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+// Exact rolling update of the uncentered ACF of the unscaled novelty ring.
+// Call BEFORE decay+insert, with `x_new` equal to the sample about to be written.
+//
+// Linearised oldest->newest x[k] = curve[(index+k) % N].
+// After drop-oldest, decay-rest by α, append x_new:
+//   R'[lag] = α² (R[lag] − x[0] x[lag]) + α x_new x[N−lag]
+static void k1_acf_incremental_step(float x_new) {
+  const int lag_min = k1_acf_lag_min();
+  const int nlag = k1_acf_nlag(lag_min);
+  const uint16_t idx = k1_spectral_index;
+  const float x0 = k1_spectral_curve[idx];
+  const float a = K1_NOVELTY_DECAY;
+  const float a2 = a * a;
+  for (int i = 0; i < nlag; i++) {
+    const uint16_t lag = (uint16_t)(lag_min + i);
+    const float x_lag = k1_spectral_curve[(uint16_t)((idx + lag) % K1_HISTORY_LENGTH)];
+    const float x_nl = k1_spectral_curve[(uint16_t)((idx + K1_HISTORY_LENGTH - lag) % K1_HISTORY_LENGTH)];
+    k1_acf_r[i] = a2 * (k1_acf_r[i] - x0 * x_lag) + a * x_new * x_nl;
+  }
+}
+
+// Reconstruct the mean-subtracted scaled lag table from R and the current ring,
+// then run the existing comb publisher. O(N + nlag), not O(nlag * N).
+static void k1_acf_incremental_publish() {
+  const int lag_min = k1_acf_lag_min();
+  const int nlag = k1_acf_nlag(lag_min);
+  static float prefix[K1_HISTORY_LENGTH + 1];
+  prefix[0] = 0.0f;
+  uint16_t idx = k1_spectral_index;
+  for (uint16_t k = 0; k < K1_HISTORY_LENGTH; k++) {
+    prefix[k + 1] = prefix[k] + k1_spectral_curve[idx];
+    idx = (uint16_t)((idx + 1u) % K1_HISTORY_LENGTH);
+  }
+  const float S = prefix[K1_HISTORY_LENGTH];
+  const float mu = S / (float)K1_HISTORY_LENGTH;
+  const float scale_sq = k1_novelty_scale * k1_novelty_scale;
+  for (int i = 0; i < nlag; i++) {
+    const int lag = lag_min + i;
+    const float sum_tail = S - prefix[lag];
+    const float sum_head = prefix[K1_HISTORY_LENGTH - (uint16_t)lag];
+    const float centered =
+        k1_acf_r[i] - mu * (sum_tail + sum_head) +
+        (float)(K1_HISTORY_LENGTH - lag) * mu * mu;
+    k1_acf_lag_table[i] = scale_sq * centered;
+  }
+  k1_acf_publish_salience(k1_acf_lag_table, nlag, lag_min);
+}
+#endif
 
 #if K1_TEMPO_ACF_SPREAD_PROBE
 static bool k1_compute_acf_salience_spread(bool start_refresh) {
@@ -934,8 +1041,14 @@ static void k1_update_winner() {
 static void k1_update_tempo(float delta_sec) {
   uint16_t bin0 = k1_calc_bin;
   uint16_t bin1 = (uint16_t)((k1_calc_bin + 1) % K1_NUM_TEMPI);
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+  k1_goertzel_fill_window();
+  k1_tempi[bin0].magnitude_raw = k1_compute_magnitude_from_window(bin0);
+  k1_tempi[bin1].magnitude_raw = k1_compute_magnitude_from_window(bin1);
+#else
   k1_tempi[bin0].magnitude_raw = k1_compute_magnitude(bin0);
   k1_tempi[bin1].magnitude_raw = k1_compute_magnitude(bin1);
+#endif
   k1_calc_bin = (uint16_t)((k1_calc_bin + 2) % K1_NUM_TEMPI);
 
   float max_val = 0.01f;
@@ -1270,6 +1383,9 @@ void k1_tempo_reset() {
   for (uint16_t i = 0; i < K1_NUM_TEMPI; i++) k1_acf_point[i] = 0.0f;
   k1_acf_valid = false;
   k1_acf_refresh_ctr = 0;
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+  for (uint16_t i = 0; i < 200; i++) k1_acf_r[i] = 0.0f;
+#endif
 #if K1_TEMPO_ACF_SPREAD_PROBE
   k1_acf_spread_active = false;
   k1_acf_spread_publish_pending = false;
@@ -1392,6 +1508,10 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   float sample = k1_accum;
   k1_accum = 0.0f;
 
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+  k1_acf_incremental_step(sample);
+#endif
+
   // Decay history then write the new sample (so the new value is undecayed).
   for (uint16_t i = 0; i < K1_HISTORY_LENGTH; i++) k1_spectral_curve[i] *= K1_NOVELTY_DECAY;
   k1_spectral_curve[k1_spectral_index] = sample;
@@ -1433,7 +1553,10 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
     }
   }
 #endif
-#if K1_TEMPO_ACF_SPREAD_PROBE
+#if K1_TEMPO_ACF_INCREMENTAL_V1
+  (void)k1_acf_refresh_now;
+  k1_acf_incremental_publish();
+#elif K1_TEMPO_ACF_SPREAD_PROBE
   const bool k1_acf_published_now = k1_compute_acf_salience_spread(k1_acf_refresh_now);
 #else
   if (k1_acf_refresh_now) {
@@ -1636,6 +1759,35 @@ void k1_tempo_debug_dump(float* out_smooth, int n, int* winner_bin,
 // from the quartic/smoothing/selection stages downstream.
 void k1_tempo_debug_dump_raw(float* out_raw, int n) {
   for (int i = 0; i < (int)K1_NUM_TEMPI && i < n; i++) out_raw[i] = k1_tempi[i].magnitude_raw;
+}
+
+void k1_tempo_debug_dump_selection(int* winner_bin, int* candidate_bin, int* silence, int* acf_valid) {
+  if (winner_bin) *winner_bin = (int)k1_validate_winner();
+  if (candidate_bin) *candidate_bin = (int)k1_candidate_bin;
+  if (silence) *silence = k1_silence_detected ? 1 : 0;
+  if (acf_valid) *acf_valid = k1_acf_valid ? 1 : 0;
+}
+
+void k1_tempo_debug_dump_acf_lags(float* out, int n, int* nlag_out, int* lag_min_out) {
+  const int lag_min = k1_acf_lag_min();
+  const int nlag = k1_acf_nlag(lag_min);
+  if (nlag_out) *nlag_out = nlag;
+  if (lag_min_out) *lag_min_out = lag_min;
+  for (int i = 0; i < nlag && i < n; i++) out[i] = k1_acf_lag_table[i];
+}
+
+void k1_tempo_debug_dump_acf_full_recompute(float* out, int n, int* nlag_out, int* lag_min_out) {
+  const int lag_min = k1_acf_lag_min();
+  const int nlag = k1_acf_nlag(lag_min);
+  if (nlag_out) *nlag_out = nlag;
+  if (lag_min_out) *lag_min_out = lag_min;
+  float work_save[K1_HISTORY_LENGTH];
+  for (uint16_t k = 0; k < K1_HISTORY_LENGTH; k++) work_save[k] = k1_acf_work[k];
+  k1_acf_prepare_work();
+  float tmp[200];
+  (void)k1_acf_compute_lag_rows(tmp, lag_min, nlag, 0, (uint16_t)nlag);
+  for (int i = 0; i < nlag && i < n; i++) out[i] = tmp[i];
+  for (uint16_t k = 0; k < K1_HISTORY_LENGTH; k++) k1_acf_work[k] = work_save[k];
 }
 
 #ifdef K1_TEMPO_FLYWHEEL_V2

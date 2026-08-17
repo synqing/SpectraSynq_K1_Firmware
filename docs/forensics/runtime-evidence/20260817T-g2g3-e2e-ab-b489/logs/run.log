@@ -1,0 +1,487 @@
+2026-08-17T01:37:23 START E2E_AB mode=primary
+2026-08-17T01:37:23 === LEG Q_A1 arm=A fixture=no_playback flash=True ===
+2026-08-17T01:37:23 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-17T01:37:23 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_stage_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_stage_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-17T01:37:23 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/bins/A.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting.....
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c0fff...
+Compressed 723264 bytes to 402113...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba92... (8 %)
+Writing at 0x00029326... (12 %)
+Writing at 0x00036b7d... (16 %)
+Writing at 0x000443d5... (20 %)
+Writing at 0x00049981... (24 %)
+Writing at 0x0004fad3... (28 %)
+Writing at 0x000554a9... (32 %)
+Writing at 0x0005b759... (36 %)
+Writing at 0x00061867... (40 %)
+Writing at 0x00067943... (44 %)
+Writing at 0x0006da6f... (48 %)
+Writing at 0x000739c1... (52 %)
+Writing at 0x000792eb... (56 %)
+Writing at 0x0007e7e7... (60 %)
+Writing at 0x00084337... (64 %)
+Writing at 0x00089efc... (68 %)
+Writing at 0x0008efb2... (72 %)
+Writing at 0x00094aa0... (76 %)
+Writing at 0x0009a49c... (80 %)
+Writing at 0x000a2583... (84 %)
+Writing at 0x000abc74... (88 %)
+Writing at 0x000b1afe... (92 %)
+Writing at 0x000b76b7... (96 %)
+Writing at 0x000bd5b6... (100 %)
+Wrote 723264 bytes (402113 compressed) at 0x00010000 in 6.0 seconds (effective 967.7 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-17T01:37:39 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git 8f53c48e --expect-env k1_bench_scheduling_stage_full_probe
+IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+
+2026-08-17T01:37:40 IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+2026-08-17T01:37:40 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1 --label Q_A1_k1_bench_scheduling_stage_full_probe_no_playback --no-playback
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A1/Q_A1_k1_bench_scheduling_stage_full_probe_no_playback_20260817_013740__pair_manifest.json",
+  "pair_manifest_sha256": "dcf63140e0f41e670208bd08a7e2e4065c496bb8d3d83605b4cf4d57c4dd4baf"
+}
+
+2026-08-17T01:40:25 LEG OK Q_A1
+2026-08-17T01:40:25 === LEG Q_B1 arm=B fixture=no_playback flash=True ===
+2026-08-17T01:40:25 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-17T01:40:25 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_gdft_cross40_lane4_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_gdft_cross40_lane4_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-17T01:40:25 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/bins/B.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c1fff...
+Compressed 725488 bytes to 403488...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba54... (8 %)
+Writing at 0x00029315... (12 %)
+Writing at 0x00036bdd... (16 %)
+Writing at 0x000444c5... (20 %)
+Writing at 0x00049a01... (24 %)
+Writing at 0x0004faf3... (28 %)
+Writing at 0x0005550f... (32 %)
+Writing at 0x0005b76f... (36 %)
+Writing at 0x00061997... (40 %)
+Writing at 0x0006790d... (44 %)
+Writing at 0x0006daf3... (48 %)
+Writing at 0x00073a7a... (52 %)
+Writing at 0x00079450... (56 %)
+Writing at 0x0007e916... (60 %)
+Writing at 0x000843df... (64 %)
+Writing at 0x0008a010... (68 %)
+Writing at 0x0008efc3... (72 %)
+Writing at 0x00094b7b... (76 %)
+Writing at 0x0009a509... (80 %)
+Writing at 0x000a24e2... (84 %)
+Writing at 0x000abcd5... (88 %)
+Writing at 0x000b1d00... (92 %)
+Writing at 0x000b7773... (96 %)
+Writing at 0x000bd4f8... (100 %)
+Wrote 725488 bytes (403488 compressed) at 0x00010000 in 5.4 seconds (effective 1068.6 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-17T01:40:40 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git e911f86d --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+
+2026-08-17T01:40:41 IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+2026-08-17T01:40:41 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1 --label Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback --no-playback
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B1/Q_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014041__pair_manifest.json",
+  "pair_manifest_sha256": "a44aac35507a795b011a830f18d9393800b580ee283037d5e9124cca94887cfb"
+}
+
+2026-08-17T01:43:27 LEG OK Q_B1
+2026-08-17T01:43:27 === LEG Q_B2 arm=B fixture=no_playback flash=False ===
+2026-08-17T01:43:27 skip flash; same arm B still on device
+2026-08-17T01:43:27 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git e911f86d --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+
+2026-08-17T01:43:28 IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+2026-08-17T01:43:28 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2 --label Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback --no-playback
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__pair_manifest.json",
+  "pair_manifest_sha256": "5d2635e6dd4caba64a13c573c14b0f20dba2d97cbe1142c3cd3a4aa978799717"
+}
+
+2026-08-17T01:46:14 LEG OK Q_B2
+2026-08-17T01:46:14 === LEG Q_A2 arm=A fixture=no_playback flash=True ===
+2026-08-17T01:46:14 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-17T01:46:14 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_stage_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_stage_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-17T01:46:14 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/bins/A.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c0fff...
+Compressed 723264 bytes to 402113...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba92... (8 %)
+Writing at 0x00029326... (12 %)
+Writing at 0x00036b7d... (16 %)
+Writing at 0x000443d5... (20 %)
+Writing at 0x00049981... (24 %)
+Writing at 0x0004fad3... (28 %)
+Writing at 0x000554a9... (32 %)
+Writing at 0x0005b759... (36 %)
+Writing at 0x00061867... (40 %)
+Writing at 0x00067943... (44 %)
+Writing at 0x0006da6f... (48 %)
+Writing at 0x000739c1... (52 %)
+Writing at 0x000792eb... (56 %)
+Writing at 0x0007e7e7... (60 %)
+Writing at 0x00084337... (64 %)
+Writing at 0x00089efc... (68 %)
+Writing at 0x0008efb2... (72 %)
+Writing at 0x00094aa0... (76 %)
+Writing at 0x0009a49c... (80 %)
+Writing at 0x000a2583... (84 %)
+Writing at 0x000abc74... (88 %)
+Writing at 0x000b1afe... (92 %)
+Writing at 0x000b76b7... (96 %)
+Writing at 0x000bd5b6... (100 %)
+Wrote 723264 bytes (402113 compressed) at 0x00010000 in 5.9 seconds (effective 980.5 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-17T01:46:30 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git 8f53c48e --expect-env k1_bench_scheduling_stage_full_probe
+IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+
+2026-08-17T01:46:31 IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+2026-08-17T01:46:31 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2 --label Q_A2_k1_bench_scheduling_stage_full_probe_no_playback --no-playback
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__pair_manifest.json",
+  "pair_manifest_sha256": "ae388b93d9ab8a088ddeb9c6ffda680f2214581ef6ad62a33cb38f57e75a9779"
+}
+
+2026-08-17T01:49:15 LEG OK Q_A2
+2026-08-17T01:49:15 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:49:15 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:49:15 === LEG M_A1 arm=A fixture=music flash=False ===
+2026-08-17T01:49:15 skip flash; same arm A still on device
+2026-08-17T01:49:15 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git 8f53c48e --expect-env k1_bench_scheduling_stage_full_probe
+IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+
+2026-08-17T01:49:16 IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+2026-08-17T01:49:16 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:49:16 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:49:17 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1 --label M_A1_k1_bench_scheduling_stage_full_probe_music --track /Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A1/M_A1_k1_bench_scheduling_stage_full_probe_music_20260817_014917__pair_manifest.json",
+  "pair_manifest_sha256": "50ec52425ae40522cedef2db7595b1b321b1d204f5e7e66ca070ca0e087a1e9d"
+}
+
+2026-08-17T01:52:01 LEG OK M_A1
+2026-08-17T01:52:01 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:52:02 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:52:02 === LEG M_B1 arm=B fixture=music flash=True ===
+2026-08-17T01:52:02 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-17T01:52:02 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_gdft_cross40_lane4_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_gdft_cross40_lane4_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-17T01:52:02 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/bins/B.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c1fff...
+Compressed 725488 bytes to 403488...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba54... (8 %)
+Writing at 0x00029315... (12 %)
+Writing at 0x00036bdd... (16 %)
+Writing at 0x000444c5... (20 %)
+Writing at 0x00049a01... (24 %)
+Writing at 0x0004faf3... (28 %)
+Writing at 0x0005550f... (32 %)
+Writing at 0x0005b76f... (36 %)
+Writing at 0x00061997... (40 %)
+Writing at 0x0006790d... (44 %)
+Writing at 0x0006daf3... (48 %)
+Writing at 0x00073a7a... (52 %)
+Writing at 0x00079450... (56 %)
+Writing at 0x0007e916... (60 %)
+Writing at 0x000843df... (64 %)
+Writing at 0x0008a010... (68 %)
+Writing at 0x0008efc3... (72 %)
+Writing at 0x00094b7b... (76 %)
+Writing at 0x0009a509... (80 %)
+Writing at 0x000a24e2... (84 %)
+Writing at 0x000abcd5... (88 %)
+Writing at 0x000b1d00... (92 %)
+Writing at 0x000b7773... (96 %)
+Writing at 0x000bd4f8... (100 %)
+Wrote 725488 bytes (403488 compressed) at 0x00010000 in 6.0 seconds (effective 963.7 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-17T01:52:17 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git e911f86d --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+
+2026-08-17T01:52:18 IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+2026-08-17T01:52:18 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:52:18 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:52:19 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1 --label M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music --track /Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B1/M_B1_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015219__pair_manifest.json",
+  "pair_manifest_sha256": "99208fc97ee89cb989b49ffd9bac14c35ad0b2a43bd09e12255797a5d6702f49"
+}
+
+2026-08-17T01:55:04 LEG OK M_B1
+2026-08-17T01:55:04 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:55:04 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:55:04 === LEG M_B2 arm=B fixture=music flash=False ===
+2026-08-17T01:55:04 skip flash; same arm B still on device
+2026-08-17T01:55:04 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git e911f86d --expect-env k1_bench_scheduling_gdft_cross40_lane4_full_probe
+IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+
+2026-08-17T01:55:05 IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711
+2026-08-17T01:55:05 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:55:05 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:55:05 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2 --label M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music --track /Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_B2/M_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_music_20260817_015506__pair_manifest.json",
+  "pair_manifest_sha256": "7427f629534a90efb343199f069cf44c95c19d3c9f727e257329685aca19b793"
+}
+
+2026-08-17T01:57:52 LEG OK M_B2
+2026-08-17T01:57:52 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:57:52 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:57:52 === LEG M_A2 arm=A fixture=music flash=True ===
+2026-08-17T01:57:52 identity-before-flash port=/dev/cu.usbmodem12401
+2026-08-17T01:57:52 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/platformio/k1_upload_guard.py --env k1_bench_scheduling_stage_full_probe --upload-port /dev/cu.usbmodem12401
+k1_bench_scheduling_stage_full_probe: /dev/cu.usbmodem12401 verified as 2nd bench K1 (B4:3A:45:A5:89:B4, chip B489A500, bench-reference GPIO assignment)
+
+2026-08-17T01:57:52 CMD /Users/spectrasynq/.platformio/penv/bin/python /Users/spectrasynq/.platformio/packages/tool-esptoolpy/esptool.py --chip esp32s3 --port /dev/cu.usbmodem12401 --baud 460800 --before default_reset --after hard_reset write_flash -z 0x10000 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/bins/A.bin
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem12401
+Connecting...
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:89:b4
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00010000 to 0x000c0fff...
+Compressed 723264 bytes to 402113...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001ba92... (8 %)
+Writing at 0x00029326... (12 %)
+Writing at 0x00036b7d... (16 %)
+Writing at 0x000443d5... (20 %)
+Writing at 0x00049981... (24 %)
+Writing at 0x0004fad3... (28 %)
+Writing at 0x000554a9... (32 %)
+Writing at 0x0005b759... (36 %)
+Writing at 0x00061867... (40 %)
+Writing at 0x00067943... (44 %)
+Writing at 0x0006da6f... (48 %)
+Writing at 0x000739c1... (52 %)
+Writing at 0x000792eb... (56 %)
+Writing at 0x0007e7e7... (60 %)
+Writing at 0x00084337... (64 %)
+Writing at 0x00089efc... (68 %)
+Writing at 0x0008efb2... (72 %)
+Writing at 0x00094aa0... (76 %)
+Writing at 0x0009a49c... (80 %)
+Writing at 0x000a2583... (84 %)
+Writing at 0x000abc74... (88 %)
+Writing at 0x000b1afe... (92 %)
+Writing at 0x000b76b7... (96 %)
+Writing at 0x000bd5b6... (100 %)
+Wrote 723264 bytes (402113 compressed) at 0x00010000 in 5.8 seconds (effective 996.7 kbit/s)...
+Hash of data verified.
+Hard resetting via RTS pin...
+
+2026-08-17T01:58:07 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/k1_device_identity_guard.py --port /dev/cu.usbmodem12401 --expect-git 8f53c48e --expect-env k1_bench_scheduling_stage_full_probe
+IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+
+2026-08-17T01:58:08 IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716
+2026-08-17T01:58:08 CMD SwitchAudioSource -s Bose Mini II SoundLink
+output audio device set to "Bose Mini II SoundLink"
+
+2026-08-17T01:58:08 CMD SwitchAudioSource -c -t output
+Bose Mini II SoundLink
+
+2026-08-17T01:58:08 CMD /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py --port /dev/cu.usbmodem12401 --paired-compact-buffer --pre-roll-seconds 10 --dump-timeout-seconds 180 --expected-sample-rate 12800 --expected-samples-per-chunk 96 --expected-novelty-decimation 3 --expected-output-device Bose Mini II SoundLink --player ffplay --playback-gain-db 0.0 --out-dir /Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2 --label M_A2_k1_bench_scheduling_stage_full_probe_music --track /Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3
+{
+  "buffered": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__buffered__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__buffered__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__buffered__summary.json"
+  },
+  "classification": "paired_capture_admissible",
+  "compact": {
+    "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__compact__apcad.log",
+    "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__compact__raw.log",
+    "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__compact__summary.json"
+  },
+  "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__pair_manifest.json",
+  "pair_manifest_sha256": "64c448b1dec9ebbcd1e1804acd657b68f9a571260931d765a8e3c8166a4cb9be"
+}
+
+2026-08-17T02:00:53 LEG OK M_A2
+2026-08-17T02:00:53 SERIES COMPLETE n=8 music_hold=False

@@ -1,0 +1,35 @@
+{
+  "arm": "B",
+  "bin_sha256": "1bf5b47fd51d4c01ffa7913a37d5afef621514f9da5f1a7d6106a3a2b23a2379",
+  "capture": {
+    "buffered": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__buffered__summary.json"
+    },
+    "classification": "paired_capture_admissible",
+    "compact": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__compact__summary.json"
+    },
+    "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_B2/Q_B2_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260817_014328__pair_manifest.json",
+    "pair_manifest_sha256": "5d2635e6dd4caba64a13c573c14b0f20dba2d97cbe1142c3cd3a4aa978799717"
+  },
+  "chip_id": "B489A500",
+  "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+  "expect_git": "e911f86d",
+  "fixture": "no_playback",
+  "flashed": false,
+  "identity": {
+    "arm": "B",
+    "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+    "expect_git": "e911f86d",
+    "identity_line": "IDENTITY OK: git=e911f86d env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786901711",
+    "port": "/dev/cu.usbmodem12401"
+  },
+  "leg_id": "Q_B2",
+  "port": "/dev/cu.usbmodem12401",
+  "resumed_existing": false,
+  "usb_serial": "B4:3A:45:A5:89:B4"
+}

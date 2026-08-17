@@ -2,6 +2,7 @@
 #include "k1_audio_snapshot.h"
 #include "k1_onset_beat.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_percussion_burst — "Percussion Burst" (mode 26): the drum kit
@@ -125,8 +126,8 @@ void light_mode_percussion_burst(CRGB16* leds_prev_buffer, ChannelEffectState& f
   if (dt > 0.05f)  dt = 0.05f;
   const float frame = dt * 120.0f;
 
-  K1AudioSnapshot snap = k1_audio_snapshot_read();
-  K1OnsetBeatEvent ev = k1_onset_beat_read();
+  K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
 
   const bool hard_gate = snap.silence;
   const bool presence_ok = pburst_presence_ok(snap);

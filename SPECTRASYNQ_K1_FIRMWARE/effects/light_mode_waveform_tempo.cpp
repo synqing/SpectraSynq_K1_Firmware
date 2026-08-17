@@ -17,9 +17,9 @@
 // FACTS from source [FACT]:
 //   - k1_tempo IS wired into the Core-0 audio loop at this base (the .wip era it
 //     was not): SPECTRASYNQ_K1_FIRMWARE.ino calls k1_tempo_init() in setup and
-//     k1_tempo_update(k1_audio_snapshot_read()) per AP frame (~133 Hz; self-clocks
+//     k1_tempo_update(k1_vp_audio_snapshot_read()) per AP frame (~133 Hz; self-clocks
 //     a 44.4 Hz novelty feed). So K1TempoEvent is live; this effect is a read-only
-//     consumer (k1_tempo_read() — value-copy under a portMUX, safe from Core-1).
+//     consumer (k1_vp_tempo_read() — value-copy under a portMUX, safe from Core-1).
 //   - K1TempoEvent (k1_tempo.h): bpm (60..156); phase01∈[0,1), 0==beat;
 //     confidence∈[0,1] (already silence-scaled); locked; beat_tick; beat_strength.
 //   - K1AudioSnapshot.silence halts tempo scroll in true silence; without an active
@@ -43,7 +43,7 @@
 //   - BELT AND BRACES: should it ever be added to a probe, the effect itself is
 //     made reproducible — when led_thread is halted (vp_run_output_probe sets
 //     led_thread_halt=true before rendering) the effect uses a FIXED dt and a
-//     FROZEN synthetic tempo event instead of millis()/k1_tempo_read(), so two
+//     FROZEN synthetic tempo event instead of millis()/k1_vp_tempo_read(), so two
 //     probe runs produce an identical frame. (cf. the Quantum Collapse lesson:
 //     the probehalts led_thread but NOT Core-0/k1_tempo, so live reads diverge.)
 //
@@ -67,6 +67,7 @@
 #include "k1_tempo.h"
 #include "k1_audio_snapshot.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 static const float TEMPO_QUIET_ALPHA = 0.82f;  // history drain when presence lost (matches Dense Forge)
 static const float TEMPO_PRESENCE_FLOOR = 0.02f;
@@ -170,8 +171,8 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
     a.spectral_energy = 0.5f; a.low_energy = 0.5f; a.mid_energy = 0.5f;
     a.high_energy = 0.5f; a.chroma_strength = 0.5f; a.silence = false;
   } else {
-    t = k1_tempo_read();
-    a = k1_audio_snapshot_read();
+    t = k1_vp_tempo_read();
+    a = k1_vp_audio_snapshot_read();
   }
 
   float base_px_s = TEMPO_PX_PER_BEAT * (t.bpm / 60.0f);     // [FACT bpm ∈ 60..156]
@@ -207,7 +208,7 @@ static void tempo_scroll_step(float& accum, uint32_t& last_ms, const RenderParam
 void light_mode_waveform_tempo(ChannelEffectState& fx) {
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
-  const K1AudioSnapshot snap = k1_audio_snapshot_read();
+  const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   // OR live global peak so a torn/stale snapshot cannot black the plate while
   // AP peak_scaled is hot (same Unit-2 lesson as hybrid_k1).
   const float peak =
@@ -242,7 +243,7 @@ void light_mode_waveform_tempo(ChannelEffectState& fx) {
       const uint32_t now_ms = millis();
       if (now_ms - m18_dbg_last_ms >= 1000) {
         m18_dbg_last_ms = now_ms;
-        const K1TempoEvent te = k1_tempo_read();
+        const K1TempoEvent te = k1_vp_tempo_read();
         USBSerial.printf(
             "[M18] ledmax=0.0000 dark=1 peak=%.3f vu=%.3f gpeak=%.3f "
             "silence=%d presence=%d conf=%.2f lock=%d phase=%.2f bpm=%.1f\n",
@@ -290,7 +291,7 @@ void light_mode_waveform_tempo(ChannelEffectState& fx) {
         if (g > led_max) led_max = g;
         if (b > led_max) led_max = b;
       }
-      const K1TempoEvent te = k1_tempo_read();
+      const K1TempoEvent te = k1_vp_tempo_read();
       USBSerial.printf(
           "[M18] ledmax=%.4f dark=0 peak=%.3f vu=%.3f gpeak=%.3f amp=%.3f "
           "pos=%u col=%.3f/%.3f/%.3f colmax=%.3f silence=%d presence=%d "

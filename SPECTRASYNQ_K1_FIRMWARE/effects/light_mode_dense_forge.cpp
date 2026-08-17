@@ -2,6 +2,7 @@
 #include "k1_audio_snapshot.h"
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_dense_forge — "Dense Forge": Novelty Shear Lattice motion engine.
@@ -95,9 +96,9 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   if (dt < 0.001f) dt = 0.001f;
   if (dt > 0.05f)  dt = 0.05f;
 
-  K1AudioSnapshot snap = k1_audio_snapshot_read();
-  K1OnsetBeatEvent ev = k1_onset_beat_read();
-  K1TempoEvent tempo = k1_tempo_read();
+  K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+  K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+  K1TempoEvent tempo = k1_vp_tempo_read();
 
   const float novelty = dforge_clamp01(snap.novelty);
   const float energy = dforge_clamp01(snap.spectral_energy);

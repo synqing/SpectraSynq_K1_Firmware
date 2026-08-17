@@ -1,0 +1,19 @@
+---
+description: "HARD FAIL — never withhold ship/promote/close without the remaining numbered ship path in the same answer. Captain 2026-08-17."
+alwaysApply: true
+---
+
+# Ship path required
+
+**HARD FAIL** if violated.
+
+Never tell Captain that a result "does not mean ship it", "does not mean promote", "does not close the gate", "is not production", or any equivalent withhold, unless the **same answer** contains the remaining ship path.
+
+Required in that same answer:
+
+1. What is already promoted / already on silicon / already in source.
+2. Numbered remaining steps to ship or promote.
+3. Who acts on each step (Captain vs agent).
+4. The exact stamp or flash that means shipped.
+
+A hold without a ship path is a failed answer. Do not end on "eyes-on still required" with no next action and no close stamp.

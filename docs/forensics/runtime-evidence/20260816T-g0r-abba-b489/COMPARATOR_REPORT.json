@@ -1,0 +1,1652 @@
+{
+  "T_evaluate_series": {
+    "reasons": [
+      "Captain protocol is two independent A-B-B-A series, not T mixed quiet/music order",
+      "HEAD cd9c5bea is not the baked measurement git be8dd1aa",
+      "probe firmware does not dispatch beat_director or show_state"
+    ],
+    "status": "INAPPLICABLE"
+  },
+  "T_functions_used": [
+    "perturbation_limits",
+    "service_limits_from_contract",
+    "_interval_status",
+    "_repeatability",
+    "_service_check",
+    "frame_class_distributions",
+    "compare_frame_classes"
+  ],
+  "hard_stop": {
+    "F887_PRODUCTION_FLASH": "NO",
+    "GATE3_DEVICE_IMPLEMENTATION": "BLOCKED",
+    "POST_ABBA_FIRMWARE_MUTATION": "HOLD",
+    "STOP": true
+  },
+  "onset_marker_note": "APCAD rows expose emitted (tempo) but no onset_event/onset_accepted boolean. onset_only and tempo_and_onset must be MISSING_MARKER/INSUFFICIENT_N, not a synthetic PASS.",
+  "pairs": {
+    "music_repeat_1": {
+      "drops": {
+        "full": 0,
+        "limit": 0,
+        "min": 0,
+        "status": "PASS"
+      },
+      "frame_class_distributions": {
+        "full": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10047.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 9972.0,
+                "p99": 10019.84,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7563.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 7524.4,
+                "p99": 7550.84,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 305,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12275.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 11964.4,
+                "p99": 12039.92,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7552.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 7521.400000000001,
+                "p99": 7540.4400000000005,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 153,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 153
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 458
+        },
+        "min": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10062.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 9962.4,
+                "p99": 10027.880000000001,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7565.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 7534.6,
+                "p99": 7557.88,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 305,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12267.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 11997.8,
+                "p99": 12188.0,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7559.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 7531.400000000001,
+                "p99": 7552.48,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 153,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 153
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 458
+        }
+      },
+      "frame_classes": {
+        "neither": {
+          "active_ap_max_delta_us": -15.0,
+          "active_ap_p99_delta_us": -8.040000000000873,
+          "classification_changed": false,
+          "full_n": 305,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -7.039999999999964,
+          "min_n": 305,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": 0.0
+        },
+        "onset_only": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_and_onset": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_only": {
+          "active_ap_max_delta_us": 8.0,
+          "active_ap_p99_delta_us": -148.07999999999993,
+          "classification_changed": false,
+          "full_n": 153,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -12.039999999999054,
+          "min_n": 153,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": 0.0
+        }
+      },
+      "full_leg": "S2_B1",
+      "metrics": {
+        "active_ap_work": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11968.0,
+          "full_low_us": 11936.0,
+          "minimum_high_us": 11968.0,
+          "minimum_low_us": 11936.0,
+          "regression_high_pp": 0.2680965147453085,
+          "regression_low_pp": -0.2673796791443861,
+          "status": "PASS"
+        },
+        "ap_read_return_interval": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 13024.0,
+          "full_low_us": 12992.0,
+          "minimum_high_us": 13024.0,
+          "minimum_low_us": 12992.0,
+          "regression_high_pp": 0.24630541871921707,
+          "regression_low_pp": -0.24570024570024218,
+          "status": "PASS"
+        },
+        "newest_sample_to_ap_publish": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11712.0,
+          "full_low_us": 11680.0,
+          "minimum_high_us": 11680.0,
+          "minimum_low_us": 11648.0,
+          "regression_high_pp": 0.5494505494505475,
+          "regression_low_pp": 0.0,
+          "status": "PASS"
+        }
+      },
+      "min_leg": "S2_A1",
+      "status": "PASS"
+    },
+    "music_repeat_2": {
+      "drops": {
+        "full": 0,
+        "limit": 0,
+        "min": 0,
+        "status": "PASS"
+      },
+      "frame_class_distributions": {
+        "full": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10068.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 9961.6,
+                "p99": 10014.960000000001,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7562.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 305,
+                "p95": 7510.8,
+                "p99": 7546.799999999999,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 305,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12395.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 152,
+                "p95": 11836.45,
+                "p99": 12277.82,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7562.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 152,
+                "p95": 7508.799999999999,
+                "p99": 7551.92,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 152,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 152
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 457
+        },
+        "min": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10182.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 303,
+                "p95": 9984.9,
+                "p99": 10029.920000000002,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7564.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 303,
+                "p95": 7548.7,
+                "p99": 7560.98,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 303,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12386.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 11979.6,
+                "p99": 12289.6,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7584.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 7551.0,
+                "p99": 7566.4,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 153,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 153
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 456
+        }
+      },
+      "frame_classes": {
+        "neither": {
+          "active_ap_max_delta_us": -114.0,
+          "active_ap_p99_delta_us": -14.960000000000946,
+          "classification_changed": true,
+          "full_n": 305,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -14.180000000000291,
+          "min_n": 303,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": 0.002922377058620307
+        },
+        "onset_only": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_and_onset": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_only": {
+          "active_ap_max_delta_us": 9.0,
+          "active_ap_p99_delta_us": -11.780000000000655,
+          "classification_changed": true,
+          "full_n": 152,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -14.479999999999563,
+          "min_n": 153,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": -0.002922377058620307
+        }
+      },
+      "full_leg": "S2_B2",
+      "metrics": {
+        "active_ap_work": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 12032.0,
+          "full_low_us": 12000.0,
+          "minimum_high_us": 11936.0,
+          "minimum_low_us": 11904.0,
+          "regression_high_pp": 1.0752688172043001,
+          "regression_low_pp": 0.536193029490617,
+          "status": "PASS"
+        },
+        "ap_read_return_interval": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 13024.0,
+          "full_low_us": 12992.0,
+          "minimum_high_us": 13024.0,
+          "minimum_low_us": 12992.0,
+          "regression_high_pp": 0.24630541871921707,
+          "regression_low_pp": -0.24570024570024218,
+          "status": "PASS"
+        },
+        "newest_sample_to_ap_publish": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11744.0,
+          "full_low_us": 11712.0,
+          "minimum_high_us": 11680.0,
+          "minimum_low_us": 11648.0,
+          "regression_high_pp": 0.8241758241758212,
+          "regression_low_pp": 0.273972602739736,
+          "status": "PASS"
+        }
+      },
+      "min_leg": "S2_A2",
+      "status": "PASS"
+    },
+    "no_playback_repeat_1": {
+      "drops": {
+        "full": 0,
+        "limit": 0,
+        "min": 0,
+        "status": "PASS"
+      },
+      "frame_class_distributions": {
+        "full": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10021.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 304,
+                "p95": 9970.1,
+                "p99": 10011.79,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7557.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 304,
+                "p95": 7503.85,
+                "p99": 7534.0,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 304,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12377.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 11874.2,
+                "p99": 12050.719999999998,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7532.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 153,
+                "p95": 7491.2,
+                "p99": 7517.8,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 153,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 153
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 457
+        },
+        "min": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10074.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 311,
+                "p95": 9972.0,
+                "p99": 10008.800000000001,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7557.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 311,
+                "p95": 7515.5,
+                "p99": 7548.8,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 311,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12237.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 157,
+                "p95": 11827.6,
+                "p99": 12140.64,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7558.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 157,
+                "p95": 7531.4,
+                "p99": 7551.76,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 157,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 157
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 468
+        }
+      },
+      "frame_classes": {
+        "neither": {
+          "active_ap_max_delta_us": -53.0,
+          "active_ap_p99_delta_us": 2.9899999999997817,
+          "classification_changed": true,
+          "full_n": 304,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -14.800000000000182,
+          "min_n": 311,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": 0.0006779629317922309
+        },
+        "onset_only": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_and_onset": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_only": {
+          "active_ap_max_delta_us": 140.0,
+          "active_ap_p99_delta_us": -89.92000000000189,
+          "classification_changed": true,
+          "full_n": 153,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -33.960000000000036,
+          "min_n": 157,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": -0.0006779629317922309
+        }
+      },
+      "full_leg": "S1_B1",
+      "metrics": {
+        "active_ap_work": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11872.0,
+          "full_low_us": 11840.0,
+          "minimum_high_us": 11840.0,
+          "minimum_low_us": 11808.0,
+          "regression_high_pp": 0.5420054200542035,
+          "regression_low_pp": 0.0,
+          "status": "PASS"
+        },
+        "ap_read_return_interval": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 12992.0,
+          "full_low_us": 12960.0,
+          "minimum_high_us": 12992.0,
+          "minimum_low_us": 12960.0,
+          "regression_high_pp": 0.24691358024691024,
+          "regression_low_pp": -0.24630541871921707,
+          "status": "PASS"
+        },
+        "newest_sample_to_ap_publish": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11552.0,
+          "full_low_us": 11520.0,
+          "minimum_high_us": 11552.0,
+          "minimum_low_us": 11520.0,
+          "regression_high_pp": 0.2777777777777768,
+          "regression_low_pp": -0.27700831024930483,
+          "status": "PASS"
+        }
+      },
+      "min_leg": "S1_A1",
+      "status": "PASS"
+    },
+    "no_playback_repeat_2": {
+      "drops": {
+        "full": 0,
+        "limit": 0,
+        "min": 0,
+        "status": "PASS"
+      },
+      "frame_class_distributions": {
+        "full": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 9146.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 324,
+                "p95": 8966.7,
+                "p99": 9008.39,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7515.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 324,
+                "p95": 7362.65,
+                "p99": 7485.93,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 324,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 11228.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 163,
+                "p95": 11019.800000000001,
+                "p99": 11124.38,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7485.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 163,
+                "p95": 7407.200000000001,
+                "p99": 7461.5599999999995,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 163,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 163
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 487
+        },
+        "min": {
+          "exclusive": {
+            "neither": {
+              "active_ap_work": {
+                "max": 10009.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 309,
+                "p95": 9777.6,
+                "p99": 9952.44,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7534.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 309,
+                "p95": 7410.5999999999985,
+                "p99": 7513.92,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 309,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            },
+            "onset_only": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_and_onset": {
+              "active_ap_work": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "gdft": {
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 0,
+                "percentile_method": "linear",
+                "status": "MISSING_MARKER"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 0,
+              "percentile_method": "linear",
+              "status": "MISSING_MARKER"
+            },
+            "tempo_only": {
+              "active_ap_work": {
+                "max": 12122.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 156,
+                "p95": 11761.5,
+                "p99": 11957.349999999999,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "gdft": {
+                "max": 7533.0,
+                "minimum_n_for_p95": 20,
+                "minimum_n_for_p99": 100,
+                "n": 156,
+                "p95": 7432.25,
+                "p99": 7529.25,
+                "percentile_method": "linear",
+                "status": "COMPLETE"
+              },
+              "minimum_n_for_p95": 20,
+              "minimum_n_for_p99": 100,
+              "n": 156,
+              "percentile_method": "linear",
+              "status": "COMPLETE"
+            }
+          },
+          "marginal": {
+            "onset_any": {
+              "n": 0
+            },
+            "tempo_any": {
+              "n": 156
+            }
+          },
+          "onset_marker_present": false,
+          "row_count": 465
+        }
+      },
+      "frame_classes": {
+        "neither": {
+          "active_ap_max_delta_us": -863.0,
+          "active_ap_p99_delta_us": -944.0500000000011,
+          "classification_changed": true,
+          "full_n": 324,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -27.98999999999978,
+          "min_n": 309,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": 0.0007816122408424997
+        },
+        "onset_only": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_and_onset": {
+          "active_ap_max_delta_us": null,
+          "active_ap_p99_delta_us": null,
+          "classification_changed": false,
+          "full_n": 0,
+          "full_status": "MISSING_MARKER",
+          "gdft_p99_delta_us": null,
+          "min_n": 0,
+          "min_status": "MISSING_MARKER",
+          "rate_delta_hz": 0.0
+        },
+        "tempo_only": {
+          "active_ap_max_delta_us": -894.0,
+          "active_ap_p99_delta_us": -832.9699999999993,
+          "classification_changed": true,
+          "full_n": 163,
+          "full_status": "COMPLETE",
+          "gdft_p99_delta_us": -67.69000000000051,
+          "min_n": 156,
+          "min_status": "COMPLETE",
+          "rate_delta_hz": -0.0007816122408425552
+        }
+      },
+      "full_leg": "S1_B2",
+      "metrics": {
+        "active_ap_work": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11648.0,
+          "full_low_us": 11616.0,
+          "minimum_high_us": 11744.0,
+          "minimum_low_us": 11712.0,
+          "regression_high_pp": -0.5464480874316946,
+          "regression_low_pp": -1.0899182561307952,
+          "status": "PASS"
+        },
+        "ap_read_return_interval": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 12960.0,
+          "full_low_us": 12928.0,
+          "minimum_high_us": 12960.0,
+          "minimum_low_us": 12928.0,
+          "regression_high_pp": 0.24752475247524774,
+          "regression_low_pp": -0.24691358024691024,
+          "status": "PASS"
+        },
+        "newest_sample_to_ap_publish": {
+          "admission_limit_percent": 5.0,
+          "full_high_us": 11360.0,
+          "full_low_us": 11328.0,
+          "minimum_high_us": 11488.0,
+          "minimum_low_us": 11456.0,
+          "regression_high_pp": -0.8379888268156388,
+          "regression_low_pp": -1.392757660167132,
+          "status": "PASS"
+        }
+      },
+      "min_leg": "S1_A2",
+      "status": "PASS"
+    }
+  },
+  "perturbation_limits": {
+    "ap_arrival_period_us": 7500,
+    "ap_p99_delta_max_fraction": 0.05,
+    "ap_p99_delta_max_us": 375,
+    "frame_gap_delta_max": 0,
+    "i2s_delta_max": 0,
+    "instrumented_capture_drop_max": 0,
+    "repeatability_admission_limit_pp": 2.0,
+    "source": "deployed_contract_margin_rules",
+    "stage_attribution_overhead_fraction": 0.05,
+    "throughput_delta_max_hz": 2.0
+  },
+  "perturbation_verdict": {
+    "FULL_ATTRIBUTION_SURFACE": "ADMISSIBLE",
+    "GATE2": "STILL_RED",
+    "STAGE_ATTRIBUTION_SURFACE": "ADMISSIBLE",
+    "authorises_stage_instrument_as_evidence": true,
+    "does_not_close_gate_2_or_promote_gdft": true,
+    "status": "PASS"
+  },
+  "repeatability": {
+    "music": {
+      "active_ap_work": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 1.3426484963486862,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.2680965147453085,
+        "status": "PASS"
+      },
+      "ap_read_return_interval": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 0.49200566441945925,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.0,
+        "status": "PASS"
+      },
+      "newest_sample_to_ap_publish": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 0.8241758241758212,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.0,
+        "status": "PASS"
+      }
+    },
+    "no_playback": {
+      "active_ap_work": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 1.6319236761849987,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.5464480874316946,
+        "status": "PASS"
+      },
+      "ap_read_return_interval": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 0.4938301711944648,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.0,
+        "status": "PASS"
+      },
+      "newest_sample_to_ap_publish": {
+        "admission_limit_pp": 2.0,
+        "maximum_possible_delta_pp": 1.6705354379449089,
+        "method": "conservative regression-interval separation",
+        "minimum_possible_delta_pp": 0.560980516566334,
+        "status": "PASS"
+      }
+    }
+  },
+  "service_contract": {
+    "GATE2": "STILL_RED",
+    "legs": {
+      "S1_A1": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 9892.688
+          },
+          "active_ap_work_p99": {
+            "high_us": 11840.0,
+            "limit_us": 6000.0,
+            "low_us": 11808.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11239
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 93.659
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11552.0,
+            "limit_us": 6000.0,
+            "low_us": 11520.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S1_A2": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 9723.694
+          },
+          "active_ap_work_p99": {
+            "high_us": 11744.0,
+            "limit_us": 6000.0,
+            "low_us": 11712.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11464
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 95.536
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11488.0,
+            "limit_us": 6000.0,
+            "low_us": 11456.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S1_B1": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 9739.522
+          },
+          "active_ap_work_p99": {
+            "high_us": 11872.0,
+            "limit_us": 6000.0,
+            "low_us": 11840.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11277
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 93.981
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11552.0,
+            "limit_us": 6000.0,
+            "low_us": 11520.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S1_B2": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 9467.41
+          },
+          "active_ap_work_p99": {
+            "high_us": 11648.0,
+            "limit_us": 6000.0,
+            "low_us": 11616.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11517
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 95.985
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11360.0,
+            "limit_us": 6000.0,
+            "low_us": 11328.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S2_A1": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 10097.037
+          },
+          "active_ap_work_p99": {
+            "high_us": 11968.0,
+            "limit_us": 6000.0,
+            "low_us": 11936.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 10973
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 91.447
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11680.0,
+            "limit_us": 6000.0,
+            "low_us": 11648.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S2_A2": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 10017.744
+          },
+          "active_ap_work_p99": {
+            "high_us": 11936.0,
+            "limit_us": 6000.0,
+            "low_us": 11904.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11031
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 91.93
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11680.0,
+            "limit_us": 6000.0,
+            "low_us": 11648.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S2_B1": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 9992.158
+          },
+          "active_ap_work_p99": {
+            "high_us": 11968.0,
+            "limit_us": 6000.0,
+            "low_us": 11936.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 11000
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 91.67
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11712.0,
+            "limit_us": 6000.0,
+            "low_us": 11680.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      },
+      "S2_B2": {
+        "checks": {
+          "active_ap_work_mean": {
+            "limit_us": 7500.0,
+            "status": "FAIL",
+            "value_us": 10067.84
+          },
+          "active_ap_work_p99": {
+            "high_us": 12032.0,
+            "limit_us": 6000.0,
+            "low_us": 12000.0,
+            "status": "FAIL"
+          },
+          "max_consecutive_active_frames_over_7500": {
+            "limit": 1,
+            "status": "FAIL",
+            "value": 10949
+          },
+          "measured_ap_rate": {
+            "maximum_hz": 134.5,
+            "minimum_hz": 132.0,
+            "status": "FAIL",
+            "value_hz": 91.245
+          },
+          "newest_sample_to_ap_publish_p99": {
+            "high_us": 11744.0,
+            "limit_us": 6000.0,
+            "low_us": 11712.0,
+            "status": "FAIL"
+          },
+          "recovery_hops": {
+            "reason": "compact summary does not expose recovery hops",
+            "status": "INCOMPLETE"
+          }
+        },
+        "status": "FAIL"
+      }
+    },
+    "separate_from_perturbation_verdict": true,
+    "status": "FAIL"
+  },
+  "service_limits": {
+    "ap_arrival_period_us": 7500,
+    "ap_max_consecutive_over_period": 1,
+    "ap_recovery_hops_max": 2,
+    "ap_service_p99_max_us": 6000,
+    "expected_ap_rate_hz": 133.33333333333334,
+    "measured_ap_rate_max_hz": 134.5,
+    "measured_ap_rate_min_hz": 132.0
+  }
+}

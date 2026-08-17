@@ -5,6 +5,270 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-18 B489 edge-honour flash
+
+```text
+session_objective:       Captain flash-NOW: put K1_EDGE_PALETTE_HONOUR_V1 on B489 silicon.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 836fde39 (fix already committed).
+branch_head_at_end:      836fde39 + docs stamp.
+files_changed:           device-build-registry.md; .claude/handoff.md; CAPTAIN_AB_CARD.md; this report.
+commands_run:            k1-flash-verified.sh k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401
+validation_results:      FLASHED AND VERIFIED. BEFORE git=1be4930a. AFTER IDENTITY OK git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759. Guard: 12401 = B489A500 (B4:3A:45:A5:89:B4). 1101 and F887 not touched. No cal. No erase.
+evidence_captured:       Registry §2 current row @ 836fde39; 1be4930a row superseded.
+blockers:                none for flash. Captain eyes-on is the close (edge crush + 7/11/32-37).
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     spec-recall (on-disk registry + handoff before flash).
+skills_used:             Agent OS; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain: palette_mode=on, edge_enabled ON, confirm primary not crushed; then cycle 7↔11↔32↔33..37. Restore = k1_bench_im69d @ 1d457740.
+```
+
+---
+
+## Session Report — 2026-08-18 edge_enabled primary crush → palette-honour fix
+
+```text
+session_objective:       Captain: edge_enabled colour-crushes the primary — bug or algorithm flaw? Diagnose, then Captain GO: apply the fix.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 1be4930a + docs stamp.
+branch_head_at_end:      edge-fix commit (platformio.ini + test + docs).
+files_changed:           platformio.ini (wfhyb env + K1_EDGE_PALETTE_HONOUR_V1 with rationale); tests/test_wfhyb_k1_variant_pack_static.py (+pin test); CAPTAIN_AB_CARD.md (known defect + workaround); handoff (finding + ship path); this report.
+commands_run:            pytest full 1369 passed / 1 skipped; pio-build k1_bench_im69d_wfhyb_fade SUCCESS. No upload.
+validation_results:      Initial compounding/feedback theory REFUTED by source read: every trail mode seeds/stores its history at render time, pre-transform (apply_brightness would compound identically otherwise). Actual mechanism = convicted P5.A side-door: dual-edge SPLIT (shipping default, gate-2 2026-07-09) hue-rotates the palette-authored PRIMARY buffer post-render at the mirrored angle. The measured fix (K1_EDGE_PALETTE_HONOUR_V1, 2026-08-13) was stranded in k1_bench_im69d_colourfix and absent from every binary this lane flashed. Now rides the wfhyb env. Chromatic channels keep the rotation by design.
+evidence_captured:       k1_edgemixer.cpp:1098-1111 primary honour gate (in-code conviction + measured fingerprint); handoff EdgeMixer paragraph; A/B card defect note.
+blockers:                fix is in source + built, NOT on silicon — needs a named flash GO.
+generated_files_ignored: none new.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash without named GO.
+thinking_skill_used:     scientific method — mode-7/brightness control refuted the compounding hypothesis before any code was cut.
+skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine (edge/VP path).
+specialists_used:        none.
+claude_mem_observations: on-disk handoff is authority.
+next_recommended_action: Captain names the edge-fix flash GO (B489, k1_bench_im69d_wfhyb_fade). Until then A/B with :edge_enabled=off.
+```
+
+---
+
+## Session Report — 2026-08-18 B489 trail-deposit + variant-pack flash
+
+```text
+session_objective:       Captain approved flash. Commit both levers, flash k1_bench_im69d_wfhyb_fade to B489 only, stamp registry.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 5830bea3 dirty.
+branch_head_at_end:      1be4930a (levers committed through gate) + docs stamp commit.
+files_changed:           commit 1be4930a = 18 files (both levers, tests, goldens, docs). Post-flash stamp: device-build-registry.md; .claude/handoff.md; post-session-report.md.
+commands_run:            commit gate: pytest 1368 passed / 1 skipped + pio k1_hardware SUCCESS. k1-flash-verified k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401 (attempt 1 EBUSY — Cursor Serial Monitor held tty.usbmodem12401; Captain closed it; attempt 2 SUCCESS).
+validation_results:      FLASHED AND VERIFIED. IDENTITY OK git=1be4930a env=k1_bench_im69d_wfhyb_fade epoch=1786984083. Guard: 12401 = B489A500. 1101 and F887 not touched. No cal. No erase.
+evidence_captured:       Registry §2 current row @ 1be4930a; 45afaee1 row superseded.
+blockers:                none for flash. Captain 7↔11↔32↔33-37 eyes-on is the close.
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     runtime-target-source-truth (port EBUSY → holder identified via lsof before any kill; no process killed).
+skills_used:             Agent OS; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain cycles 7↔11↔32↔33..37 on this binary: PASS/FAIL 11 trail + pick among 33-37. Restore = k1_bench_im69d @ 1d457740.
+```
+
+---
+
+## Session Report — 2026-08-17 mode-32 sheet verdict → variant comparison pack
+
+```text
+session_objective:       Captain: mode 32 still a single sheet, suspected AP-side. Diagnose; Captain redirect: build variant modes isolating each colour lever for cycle-and-pick A/B. No flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 45afaee1 dirty (trail-deposit lever).
+branch_head_at_end:      same HEAD; variant pack uncommitted alongside trail deposit.
+files_changed:           config_types.h enum 33-37 + is_enabled gate; NEW effects/light_mode_wfhyb_k1_variants.cpp (FLUX/NOTE/WIDE/SUM/STEP on verbatim m32 chassis); lightshow_modes.h decls + vp_probe dispatch/print; .ino dispatch; system.h mode names; EffectRegistry.cpp rows+companion+guards; platformio.ini K1_WFHYB_M32_VARIANTS_V1 on wfhyb env; pio-build.sh allowlist +wfhyb env; NEW tests/test_wfhyb_k1_variant_pack_static.py; ble_midi_diff golden+MANIFEST refrozen (disabled roster grew); LEVER.md; CAPTAIN_AB_CARD.md; handoff.
+commands_run:            pytest full 1367 passed / 1 skipped (after golden refreeze + wrapper-order fix); pio-build k1_hardware SUCCESS; pio-build k1_bench_im69d_wfhyb_fade SUCCESS. No upload.
+validation_results:      AP hypothesis REFUTED (mode 7 lively from same chromagram_smooth; mode 32 collapses 12 bins to centroid + loudness walk + 0.080s EMA). Pack modes compiled everywhere, unselectable off-flag; k1_hardware behaviour unchanged. Host gate GREEN.
+evidence_captured:       LEVER.md mode-32 section (mechanism + pack table); CAPTAIN_AB_CARD next-A/B script 7..37.
+blockers:                named B489_WFHYB_TRAIL_FLASH (commit first — flash script refuses dirty firmware).
+generated_files_ignored: runtime-evidence bins left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this session.
+thinking_skill_used:     thinking-model-router → Scientific Method (mode-7 control refutes AP hypothesis).
+skills_used:             sensorybridge-doctrine; k1-effect-development; ship-path-required; Agent OS.
+specialists_used:        none.
+claude_mem_observations: on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_TRAIL_FLASH. Agent commits, flashes B489 only, stamps registry. Captain cycles 7↔11↔32↔33..37: PASS/FAIL 11 trail + pick among 33-37 for mode 32.
+```
+
+---
+
+## Session Report — 2026-08-17 mode-11 fade FAIL → trail deposit
+
+```text
+session_objective:       Captain fade-turnover FAIL (centre colour flash). Replace with origin trail-deposit lever in source. No flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 5830bea3.
+branch_head_at_end:      same HEAD; trail-deposit uncommitted.
+files_changed:           light_mode_waveform_hybrid.cpp (K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1 origin-only write); platformio.ini env flag swap; tests; LEVER.md; CAPTAIN_AB_CARD.md; registry Why; handoff ship path.
+commands_run:            pytest 1359 passed / 1 skipped; pio-build k1_hardware SUCCESS. No upload.
+validation_results:      Fade-turnover FAIL. Next lever = origin deposit. k1_hardware off-flag. Host gate GREEN.
+evidence_captured:       LEVER.md FAIL + next lever. Silicon still 45afaee1 fade-turnover until named flash.
+blockers:                named B489_WFHYB_TRAIL_FLASH (commit first — flash script refuses dirty firmware).
+generated_files_ignored: runtime-evidence bins left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this unit.
+thinking_skill_used:     thinking-model-router → Scientific Method (overwrite vs origin insert).
+skills_used:             sensorybridge-doctrine; k1-effect-development; ship-path-required; Agent OS.
+specialists_used:        none.
+claude_mem_observations: on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_TRAIL_FLASH. Agent commits then flashes B489 only. 7↔11↔32: colour must ride the trail.
+```
+
+---
+
+## Session Report — 2026-08-17 B489_WFHYB_FADE_FLASH
+
+```text
+session_objective:       Flash k1_bench_im69d_wfhyb_fade to B489 only under Captain B489_WFHYB_FADE_FLASH; stamp registry.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 45afaee1.
+branch_head_at_end:      same HEAD; docs stamp committed if gate allows.
+files_changed:           device-build-registry.md; .claude/handoff.md; LEVER.md; CAPTAIN_AB_CARD.md; post-session-report.md.
+commands_run:            session-bootstrap PASS (WARN dirty registry); k1-flash-verified k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401.
+validation_results:      FLASHED AND VERIFIED. IDENTITY OK git=45afaee1 env=k1_bench_im69d_wfhyb_fade epoch=1786978486. Guard: 12401 = B489A500. 1101 and F887 not flashed. No cal. No erase.
+evidence_captured:       live :build after flash. Registry §2 current row.
+blockers:                none for flash. Captain 7↔11↔32 eyes-on is the close.
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     runtime-target-source-truth (port 12401 vs 1101).
+skills_used:             Agent OS; spec-recall; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain 7↔11↔32 on this binary. PASS/FAIL mode 11 liveliness. Restore G7B = k1_bench_im69d @ 1d457740.
+```
+
+---
+
+## Session Report — 2026-08-17 palette utilisation 7↔11↔32 fork
+
+```text
+session_objective:       Implement the 7 FAST / 11 HYBRID / 32 HYBRID K1 causal fork: Captain A/B, no coverage harness, one lever after mode-11 verdict.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 25bec114.
+branch_head_at_end:      same HEAD; fade-turnover ifdef + bench env + tests + forensic cards uncommitted. No flash.
+files_changed:           light_mode_waveform_hybrid.cpp (K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1); platformio.ini env k1_bench_im69d_wfhyb_fade; k1_device_identities.json B489 list; tests/test_waveform_hybrid_fade_turnover_static.py; docs/forensics/2026-08-17-palette-utilisation-7-11-32/{CAPTAIN_AB_CARD,COVERAGE_GATE_RECEIPT,LEVER}.md.
+commands_run:            session-bootstrap PASS; pytest 1359 passed / 1 skipped; pio-build k1_hardware SUCCESS (704178 flash bytes). No upload.
+validation_results:      Captain mode-11 = reluctant. Lever = fade turnover only (not mode 32, not seed radius, not classic). k1_hardware off-flag. Host gate GREEN.
+evidence_captured:       A/B card, coverage receipt, lever pick. No device capture.
+blockers:                named B489_WFHYB_FADE_FLASH to put the lever on silicon.
+generated_files_ignored: none this unit.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this session.
+thinking_skill_used:     thinking-model-router → Scientific Method (mode 11 control).
+skills_used:             Agent OS; spec-recall; ship-path-required; sensorybridge-doctrine (palette clarity vs wake persistence).
+specialists_used:        none.
+claude_mem_observations: worker-runtime blocked observation_add; on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_FADE_FLASH. Agent flashes k1_bench_im69d_wfhyb_fade to B489 only. Repeat 7↔11↔32. Classic waveform stays later.
+```
+
+---
+
+## Session Report — 2026-08-17 EdgeMixer dead-cell coerce
+
+```text
+session_objective:       Implement approved EdgeMixer coerce: complementary+mirror → split at set_config; honest echo; hotkey y skip; tests+k1_hardware; no flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 1d457740 dirty (prior G8/docs).
+branch_head_at_end:      same HEAD; colour unit uncommitted (no commit authorised).
+files_changed:           k1_edgemixer.cpp/.h coerce; serial_menu echo+y skip; serial_cmd_handlers; test_edgemixer_static; serial_struct golden+MANIFEST. No platformio.ini. No G8 mix.
+commands_run:            pytest 1355 passed, 1 skipped; pio-build k1_hardware SUCCESS (704178 flash bytes). No upload.
+validation_results:      Host gate GREEN. Silicon unchanged (bench still G8 HEAD 1d457740 until named GO).
+evidence_captured:       none on device. Colour unit is source+host only.
+blockers:                none for host land. Device needs named B489_EDGE_COERCE_FLASH.
+generated_files_ignored: prior e2e/archify untracked left alone.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this unit.
+thinking_skill_used:     Type 2 coerce already decided in attached plan; no new architecture fork.
+skills_used:             ship-path-required; Agent OS (no firmware edit outside scoped unit).
+specialists_used:        none.
+claude_mem_observations: on-disk source is authority; silicon still 1d457740.
+next_recommended_action: Captain commit if wanted; named B489_EDGE_COERCE_FLASH for bench silicon. Do not flash F887.
+```
+
+---
+
+## Session Report — 2026-08-17 G2 CLOSED, G3–G7A wired on branch
+
+```text
+session_objective:       Confirm k1_bench_im69d @ e911f86d on bench K1; stamp G2 PASSED/promoted; run G3–G7 on branch.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ e911f86d
+branch_head_at_end:      same branch; G2 stamp + G3 sidecar freeze + G4/G5/G7A wiring committed if gate green.
+files_changed:           k1_audio_frame sidecar freeze; k1_vp_audio_access no live AP re-read; dual-scene command publish/apply; startup ratchet at led_task create; persist request push + loop stub; G2–G7A evidence; registry/handoff/plan.
+commands_run:            identity guard 12401 IDENTITY OK git=e911f86d env=k1_bench_im69d epoch=1786903366; pytest 1347 passed, 1 skipped; pio-build k1_hardware SUCCESS.
+validation_results:      G2_DEVICE CLOSED (Captain eyes-on PASS). G3 host CLOSED; G3 lock-margin NOT_TAKEN. G4 host+firmware WIRED. G5 ratchet WIRED, causal NOT_PROVEN. G6 NOT_REQUIRED. G7A CLOSED. G7B NOT_STARTED. G8 OPEN.
+evidence_captured:       evidence/g2-cross40-lane4-promotion.md CLOSED; g3–g7a + g8 readiness.
+blockers:                none for host land. Device G3 lock-margin / G5 causal / G7B need named B489 GOs. F887 NO.
+generated_files_ignored: e2e pack bins remain untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no new flash this session.
+thinking_skill_used:     thinking-map-territory (silicon identity vs working-tree G3–G7A).
+skills_used:             ship-path-required; Agent OS; spec-recall via on-disk handover.
+specialists_used:        none.
+claude_mem_observations: on-disk identity + G2 stamp is authority.
+next_recommended_action: Captain named B489_G3_FLASH or B489_G7B_FLASH. Do not flash F887.
+```
+
+---
+
+## Session Report — 2026-08-17 B489 G2/G3 E2E A/B soak
+
+```text
+session_objective:       Execute locked B489 package A/B: eight-leg ABBA of pre-restamp Cross0 probe vs e911f86d Cross40+Lane4+G3/G4, score vs contract 8000 µs, restore production.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ e911f86d dirty docs.
+branch_head_at_end:      same HEAD; pack/runner/tests/docs uncommitted (no commit authorised).
+files_changed:           pack 20260817T-g2g3-e2e-ab-b489; tests/test_e2e_abba_flash_policy.py; superpowers plan; registry restore row; g2-cross40-lane4-promotion NUMERIC_PASS. No firmware source behaviour edits. No C env (B passed).
+commands_run:            pytest flash-policy 5 PASS; pio-build A@8f53c48e and B@e911f86d; one run_e2e_ab.py primary eight legs; evaluate_e2e_ab.py; k1-flash-verified k1_bench_im69d on 12401.
+validation_results:      package_gate PASS. B quiet p99_high 7680 µs, music 7776 µs, consec=1, sample_age STABLE, drops 0. A quiet 11840 / music mean 11984. G2_DEVICE NOT_CLOSED. C not run.
+evidence_captured:       PREFLIGHT.json SERIES.json RESULT.json RESTORE.json findings.md bins/A.bin bins/B.bin.
+blockers:                none for numeric probe gate; Captain eyes-on still required for G2_DEVICE CLOSED.
+generated_files_ignored: pack bins/logs; A worktree removed.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; flash B489 only; restore k1_bench_im69d @ e911f86d epoch 1786903366.
+thinking_skill_used:     thinking-map-territory + thinking-red-team (probe p99 is map; production+eyes-on is territory).
+skills_used:             thinking-router; find-skills (in-repo capture stack, no skills.sh add); discover-specialists (none dispatched onto device); scipy (no invented stats; two-repeat min/max/mean only); brainstorming skipped (plan already locked).
+specialists_used:        none on the device series.
+claude_mem_observations: on-disk pack is authority.
+next_recommended_action: Captain eyes-on of production k1_bench_im69d. Do not stamp G2_DEVICE CLOSED from this pack. Commit when authorised.
+```
+
+---
+
+## Session Report — 2026-08-16 G2_TEMPO_EMIT_EXACT_RESIDUAL_V1 host stop
+
+```text
+session_objective:       Execute Captain GO G2_TEMPO_EMIT_EXACT_RESIDUAL_V1: decompose emit residual, one exact tempo candidate, host bit-identity vs Cross40×Lane-4 spread, flash B489 only if host PASS.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ cd9c5bea dirty.
+branch_head_at_end:      same HEAD; incremental ACF + tests + evidence uncommitted (no commit authorised).
+files_changed:           k1_tempo.cpp K1_TEMPO_ACF_INCREMENTAL_V1=0 default; new B489-only env; identities; pio-build allowlist; tests/test_tempo_emit_exact_residual_v1.py; pack 20260816T-g2-tempo-emit-exact-residual-v1.
+commands_run:            clang++ host replay of 15 fixtures vs spread reference; pytest static/upload-guard PASS; published-field equivalence FAIL; no pio-build of candidate env; no flash.
+validation_results:      HOST_EQUIVALENCE FAIL_NOT_EXACT. All 15 fixtures mismatch. Event fields (BPM/phase/beat_strength/winner) diverge. Incremental ACF not bit-identical to unspread full recompute (abs err ~1e-4). Device run blocked.
+evidence_captured:       DECOMPOSITION.json HOST_EQUIVALENCE.json STOP.json.
+blockers:                Candidate is not exact versus the admitted spread reference. Needs a behavioural-equivalence contract or a different bit-identical loop-restructure candidate.
+generated_files_ignored: none flashed.
+safety_constraints:      F887 NO; no cal; no flash; no Cross80; no Gate 3; no onset/cadence/task/priority.
+thinking_skill_used:     thinking-model-router (scientific method): emit residual is ACF+Goertzel, not another Cross.
+skills_used:             Agent OS bootstrap; spec-recall; dsp-test-fixtures; sensorybridge-doctrine (exact ACF, no lag cut).
+specialists_used:        none.
+claude_mem_observations: pending this session.
+next_recommended_action: STOP. Request behavioural-equivalence contract for rolling current-history ACF vs spread-stale ACF, or authorise a bit-identical frozen-snapshot loop restructure. Do not flash.
+```
+
+---
+
+## Session Report — 2026-08-16 G2 Lane-4 × Cross40 combined
+
+```text
+session_objective:       Execute Captain GO G2_LANE4_CROSS40_COMBINED: host Cross40 scalar vs Lane-4 bit-identity, one full-attribution B489 candidate, two legs vs 6 ms p99.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ cd9c5bea dirty.
+branch_head_at_end:      same HEAD; env/identities/tests/evidence uncommitted (no commit authorised).
+files_changed:           platformio.ini combined env; k1_device_identities.json B489 allowlist; pio-build.sh allowlist; tests/test_gdft_lane4_cross40_combined.py; evidence pack 20260816T-g2-lane4-cross40. No firmware source behaviour edits.
+commands_run:            session-bootstrap PASS; pytest Cross40×Lane-4 host gate PASS; pio-build k1_bench_scheduling_gdft_cross40_lane4_full_probe SUCCESS git=cd9c5bea; esptool flash B489 only; two paired 120s+5s captures; evaluate vs 6 ms.
+validation_results:      Host bit-identity PASS. Device: cadence 133.33 Hz both legs. Compact active p99 7.52–7.71 ms. Gate 2 FAIL. Outcome 2 (neither ≤6 ms, tempo_only >6 ms). Cross80 HOLD. Gate 3 BLOCKED.
+evidence_captured:       docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/RESULT.json PREFLIGHT.json SERIES.json bins/cross40_lane4_full.bin.
+blockers:                6 ms p99 still missed; residual is the heavy tempo-emit frame (~2.5 ms tempo p99), not GDFT (~3.1 ms p99 both classes).
+generated_files_ignored: evidence pack logs/bins.
+safety_constraints:      F887 not present; no cal; no scheduler/priority/audio-task; no Cross80; no Gate 3; no production promotion.
+thinking_skill_used:     thinking-model-router (evaluate/scientific method); Captain GO already selected the experiment.
+skills_used:             Agent OS bootstrap; spec-recall; k1-lineage-routing; dsp-test-fixtures; claude-mem-router (search empty for Cross40/Lane4).
+specialists_used:        none.
+claude_mem_observations: observation_add blocked (worker runtime).
+next_recommended_action: STOP. Next authorised experiment if stamped: exact tempo/onset work spreading, same outputs. Do not run Cross80, ABBA, or scheduler work.
+```
+
+---
+
 ## Session Report — 2026-08-09 Deck16 B1→B2 Phase 6 HOLD close-out
 
 ```text

@@ -1,0 +1,57 @@
+{
+  "lane": "G2_TEMPO_BEHAVIOURAL_EQUIVALENCE_V1",
+  "captain_selection": "OPTION_1",
+  "phase": "host_qualification",
+  "closed_predecessor": "G2_TEMPO_EMIT_EXACT_RESIDUAL_V1 CLOSED_FAIL_NOT_EXACT",
+  "ACF_HOST_BEHAVIOURAL_GATE": "PASS",
+  "TEMPO_GOERTZEL_EXACT_GATE": "PASS",
+  "FEASIBILITY_STOP": "HOLD_FLASH_NOT_CREDIBLE_TO_1_8MS",
+  "combined_host_verdict": "BEHAVIOUR_AND_GOERTZEL_PASS_FEASIBILITY_BLOCKS_DEVICE",
+  "B489_FLASH": "HOLD",
+  "F887": "NO",
+  "GATE3": "BLOCKED",
+  "CROSS80": "HOLD",
+  "ONSET": "HOLD",
+  "GDFT": "FROZEN",
+  "CADENCE": "FROZEN_12800_96_D3",
+  "PRIORITY": "UNCHANGED",
+  "AUDIO_TASK": "NO",
+  "MABUTRACE": "NOT_REQUIRED_FOR_G2_SERVICE_P99",
+  "APCAD": "CONTROLLING_SERVICE_TIME_ORACLE_AFTER_A_CREDIBLE_1_8MS_CANDIDATE",
+  "receipts": {
+    "contract": "docs/forensics/runtime-evidence/20260816T-g2-tempo-behavioural-equivalence-v1/CONTRACT.json",
+    "field_reachability": "docs/forensics/runtime-evidence/20260816T-g2-tempo-behavioural-equivalence-v1/FIELD_REACHABILITY.json",
+    "host_behavioural": "docs/forensics/runtime-evidence/20260816T-g2-tempo-behavioural-equivalence-v1/HOST_BEHAVIOURAL.json",
+    "host_goertzel": "docs/forensics/runtime-evidence/20260816T-g2-tempo-behavioural-equivalence-v1/HOST_GOERTZEL.json",
+    "feasibility": "docs/forensics/runtime-evidence/20260816T-g2-tempo-behavioural-equivalence-v1/FEASIBILITY.json"
+  },
+  "what_passed": {
+    "rolling_acf_vs_fixture_truth": "No rolling regression versus spread on lock/unlock, octave, wrong-BPM, acquisition time, reacquisition, silence false locks/ticks, noise false locks/ticks, or settled beat count. Earlier correct lock is observed on jumps (feature).",
+    "shared_window_goertzel": "k1_tempi[*].magnitude_raw bit-identical to spread k1_compute_magnitude (max abs err 0, -ffp-contract=off).",
+    "production": "K1_TEMPO_ACF_INCREMENTAL_V1 remains 0 on k1_hardware."
+  },
+  "control_gaps_not_rolling_regressions": {
+    "steady_128_and_144": "Neither spread nor rolling locked the synthetic click train after history fill. The host corpus does not prove those BPMs.",
+    "captain_7500us_beat_timing": "The spread control itself routinely misses 7.5 ms versus novelty-grid clicks (median offsets of 0-67 ms; p99 often one novelty hop). Rolling is no worse on median. The 7.5 ms bound is tighter than the existing flywheel, which can only tick on emit frames.",
+    "history_fill_lock": "First correct lock is 11520 ms = 512 novelty samples × 22.5 ms. That is ring-fill, not a rolling delay."
+  },
+  "feasibility_arithmetic": {
+    "required_us": 1792,
+    "plausible_combined_us": [700, 1250],
+    "zero_acf_remainder_ms": 6.559,
+    "why_no_flash": "Rolling ACF plus exact shared-window Goertzel cannot credibly remove 1.8 ms on the S3. Do not spend a B489 cycle pretending this pair closes Gate 2."
+  },
+  "honest_remaining_choices": [
+    "Cross80 (HOLD)",
+    "another semantic tempo redesign with a larger saving",
+    "onset/base-frame work (HOLD)",
+    "reopen the 6 ms reserve contract"
+  ],
+  "not_done": [
+    "No B489 flash",
+    "No F887 flash",
+    "No MabuTrace",
+    "No cadence/priority/audio-task change",
+    "No commit unless Captain asks"
+  ]
+}

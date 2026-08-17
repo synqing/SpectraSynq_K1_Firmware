@@ -1,0 +1,198 @@
+{
+  "boot_nonce": "174ddbe24a6b0093",
+  "buffered_arm_monotonic_ms": 2454440041,
+  "buffered_host_start_monotonic_ms": 2454440041,
+  "buffered_raw_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/legs/S2_B1/S2_B1_FULL_music_20260816_182313__buffered__raw.log",
+  "buffered_raw_sha256": "ad6cf84d6416a28f2529e9cc8c4a389bc9e5787971a0b922a38401eadf81cd0e",
+  "buffered_summary_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/legs/S2_B1/S2_B1_FULL_music_20260816_182313__buffered__summary.json",
+  "buffered_summary_sha256": "8ba7cf693223467a6f5b39e48d16e66f3c54a29d78ab4cb7d91f005b380dc60b",
+  "compact_end_monotonic_ms": 2454437938,
+  "compact_raw_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/legs/S2_B1/S2_B1_FULL_music_20260816_182313__compact__raw.log",
+  "compact_raw_sha256": "5445683390334321a92f88234a3e3cfc3c3396a3b65a376c22be4421727c63b0",
+  "compact_summary_path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/legs/S2_B1/S2_B1_FULL_music_20260816_182313__compact__summary.json",
+  "compact_summary_sha256": "a94a1306a1dbaee83491e4f0006df3c70590a676dd84af4d43252cbf47f35029",
+  "continuity_gap_ms": 2103,
+  "dump_response_sha256": "578f390ebc839dd99d1aa6b401c3ee94a8bb0c68db1e1734ce74ed9c5b3e4130",
+  "fixture": "music",
+  "fixture_contract": {
+    "playback_gain_db": 0.0,
+    "pre_roll_seconds": 10.0,
+    "track_file": "/Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3",
+    "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938"
+  },
+  "fixture_session_id": "fixture-b0d2bd0813bb8bcc0884",
+  "observed_output_device": "Bose Mini II SoundLink",
+  "pair_id": "pair-eae3accf70cb20402259",
+  "player": "ffplay start_ms=0 playback_gain_db=0.0",
+  "reset_reason": 11,
+  "runtime_contract": {
+    "runtime_ids": [
+      {
+        "boot_nonce": "174ddbe24a6b0093",
+        "reset_reason": 11,
+        "uptime_ms": 17731
+      },
+      {
+        "boot_nonce": "174ddbe24a6b0093",
+        "reset_reason": 11,
+        "uptime_ms": 172155
+      }
+    ],
+    "scene": {
+      "edge_enabled": true,
+      "edge_mode": "split",
+      "edge_strength": 0.45,
+      "master_brightness": 1.0,
+      "primary_mode": 32,
+      "primary_palette": "ABSENT_FROM_DUMP",
+      "sample_rate": 12800,
+      "samples_per_chunk": 96,
+      "scene_surface": "dump+secondary_status+edge_status",
+      "secondary_enabled": true,
+      "secondary_mode": 7,
+      "secondary_palette": 40,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    },
+    "transition_inference_basis": {
+      "device_settled_field_available": false,
+      "minimum_mutation_free_pre_roll_ms": 10000,
+      "no_scene_mutation_through_buffered_done": true,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    }
+  },
+  "scene_fields": {
+    "edge_enabled": true,
+    "edge_mode": "split",
+    "edge_strength": 0.45,
+    "master_brightness": 1.0,
+    "primary_mode": 32,
+    "primary_palette": "ABSENT_FROM_DUMP",
+    "sample_rate": 12800,
+    "samples_per_chunk": 96,
+    "scene_surface": "dump+secondary_status+edge_status",
+    "secondary_enabled": true,
+    "secondary_mode": 7,
+    "secondary_palette": 40,
+    "transition_max_duration_ms": 3000,
+    "transition_state": "settled_inferred"
+  },
+  "scene_post": {
+    "dump_response_sha256": "b18ccd1660898636a22494d3c2df84121edae4d226157aee67bec9fbae13f58f",
+    "edge_status_lines": [
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: split",
+      "EDGE_STRENGTH: 0.450",
+      "EDGE_SPREAD: 38",
+      "EDGE_ROTATION: faithful",
+      "EDGE_SPATIAL: uniform",
+      "EDGE_DUAL: split"
+    ],
+    "scene_fields": {
+      "edge_enabled": true,
+      "edge_mode": "split",
+      "edge_strength": 0.45,
+      "master_brightness": 1.0,
+      "primary_mode": 32,
+      "primary_palette": "ABSENT_FROM_DUMP",
+      "sample_rate": 12800,
+      "samples_per_chunk": 96,
+      "scene_surface": "dump+secondary_status+edge_status",
+      "secondary_enabled": true,
+      "secondary_mode": 7,
+      "secondary_palette": 40,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    },
+    "secondary_status_lines": [
+      "SECONDARY_ENABLED: true",
+      "SECONDARY_CONTROL: false (encoders control primary channel)",
+      "SECONDARY_MODE: 7 (WAVEFORM-FAST)",
+      "SECONDARY_PHOTONS: 1.000000",
+      "SECONDARY_CHROMA: 0.000000",
+      "SECONDARY_MOOD: 0.100000",
+      "SECONDARY_SATURATION: 1.000000",
+      "SECONDARY_PRISM_COUNT: 1.00",
+      "SECONDARY_MIRROR_ENABLED: true",
+      "SECONDARY_REVERSE_ORDER: false",
+      "SECONDARY_BASE_COAT: false",
+      "SECONDARY_PALETTE_MODE_ENABLED: true",
+      "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)",
+      "NOTE: This command is deprecated, please use secondary_status instead"
+    ],
+    "show_state_lines": []
+  },
+  "scene_pre": {
+    "dump_response_sha256": "578f390ebc839dd99d1aa6b401c3ee94a8bb0c68db1e1734ce74ed9c5b3e4130",
+    "edge_status_lines": [
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: split",
+      "EDGE_STRENGTH: 0.450",
+      "EDGE_SPREAD: 38",
+      "EDGE_ROTATION: faithful",
+      "EDGE_SPATIAL: uniform",
+      "EDGE_DUAL: split"
+    ],
+    "scene_fields": {
+      "edge_enabled": true,
+      "edge_mode": "split",
+      "edge_strength": 0.45,
+      "master_brightness": 1.0,
+      "primary_mode": 32,
+      "primary_palette": "ABSENT_FROM_DUMP",
+      "sample_rate": 12800,
+      "samples_per_chunk": 96,
+      "scene_surface": "dump+secondary_status+edge_status",
+      "secondary_enabled": true,
+      "secondary_mode": 7,
+      "secondary_palette": 40,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    },
+    "secondary_status_lines": [
+      "SECONDARY_ENABLED: true",
+      "SECONDARY_CONTROL: false (encoders control primary channel)",
+      "SECONDARY_MODE: 7 (WAVEFORM-FAST)",
+      "SECONDARY_PHOTONS: 1.000000",
+      "SECONDARY_CHROMA: 0.000000",
+      "SECONDARY_MOOD: 0.100000",
+      "SECONDARY_SATURATION: 1.000000",
+      "SECONDARY_PRISM_COUNT: 1.00",
+      "SECONDARY_MIRROR_ENABLED: true",
+      "SECONDARY_REVERSE_ORDER: false",
+      "SECONDARY_BASE_COAT: false",
+      "SECONDARY_PALETTE_MODE_ENABLED: true",
+      "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)",
+      "NOTE: This command is deprecated, please use secondary_status instead"
+    ],
+    "show_state_lines": []
+  },
+  "scene_status_sha256": "d9ea534a11aca3c725dbc4a1ba00e7c87901995f38265bd0e8d9316ab209addc",
+  "schema_ver": "k1-stage-attribution-pair/v1",
+  "secondary_status_lines": [
+    "SECONDARY_ENABLED: true",
+    "SECONDARY_CONTROL: false (encoders control primary channel)",
+    "SECONDARY_MODE: 7 (WAVEFORM-FAST)",
+    "SECONDARY_PHOTONS: 1.000000",
+    "SECONDARY_CHROMA: 0.000000",
+    "SECONDARY_MOOD: 0.100000",
+    "SECONDARY_SATURATION: 1.000000",
+    "SECONDARY_PRISM_COUNT: 1.00",
+    "SECONDARY_MIRROR_ENABLED: true",
+    "SECONDARY_REVERSE_ORDER: false",
+    "SECONDARY_BASE_COAT: false",
+    "SECONDARY_PALETTE_MODE_ENABLED: true",
+    "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)",
+    "NOTE: This command is deprecated, please use secondary_status instead"
+  ],
+  "serial_session_id": "serial-991c0c56edc4bccc3247",
+  "show_state_lines": [],
+  "transition_inference_basis": {
+    "device_settled_field_available": false,
+    "minimum_mutation_free_pre_roll_ms": 10000,
+    "no_scene_mutation_through_buffered_done": true,
+    "transition_max_duration_ms": 3000,
+    "transition_state": "settled_inferred"
+  }
+}

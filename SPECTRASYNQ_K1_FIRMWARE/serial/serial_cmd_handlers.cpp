@@ -962,7 +962,7 @@ bool k1_parse_edge_mode(const char* text, K1EdgeMixerMode* out_mode);
 bool k1_parse_edge_rotation(const char* text, K1EdgeMixerRotationSpace* out_space);
 bool k1_parse_edge_dual(const char* text, K1EdgeMixerDualEdge* out_dual);
 bool k1_parse_edge_uniform(const char* text, bool* out_uniform);
-void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e);
+void k1_edge_echo_if_coerced(const K1EdgeMixerConfig& e);
 
 // ---------------------------------------------------------------------------
 // serial_cmd_dispatch_smart_director — smart-director control (smart_assist /
@@ -1088,7 +1088,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         }
         k1_edgemixer_set_config(config);
         k1_print_edge_status();
-        k1_edge_warn_if_collapsed(config);  // close the edge_mode= warn gap (mirror+complementary via mode)
+        k1_edge_echo_if_coerced(config);
       } else {
         bad_command(command_type, command_data);
       }
@@ -1168,7 +1168,7 @@ bool serial_cmd_dispatch_edge_mixer(const char* command_type, char* command_data
         config.dualEdge = dual;
         k1_edgemixer_set_config(config);
         k1_print_edge_status();
-        k1_edge_warn_if_collapsed(config);
+        k1_edge_echo_if_coerced(config);
       } else {
         bad_command(command_type, command_data);
       }

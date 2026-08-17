@@ -49,6 +49,10 @@ The most expensive mistake on this surface is confusing CoWork OS for a K1 devel
 
 Per `GAP_ANALYSIS.md` Gaps 1-3: hardware loops, device validation, and K-Cycles are N/A for CoWork OS. Anyone proposing CoWork as substrate is mis-scoping; route to Claude Code skills. CoWork OS is at most a coordination shell around K1 work — and even that role is bounded.
 
+## Ship path required (Captain 2026-08-17)
+
+Never tell Captain a K1 result does not mean ship / promote / close without the remaining numbered ship path in the same answer. Skill `/ship-path-required`.
+
 ## Where CoWork OS *Can* Help K1 (the Narrow Slice)
 
 | Permitted job | CoWork primitive | Precondition |

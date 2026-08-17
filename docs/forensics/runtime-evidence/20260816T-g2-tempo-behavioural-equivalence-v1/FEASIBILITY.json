@@ -1,0 +1,75 @@
+{
+  "lane": "G2_TEMPO_BEHAVIOURAL_EQUIVALENCE_V1",
+  "subgate": "FEASIBILITY_STOP",
+  "host_cpu_benchmark_as_s3_predictor": "FORBIDDEN",
+  "required_device_emit_saving_us": 1792,
+  "required_device_emit_saving_ms": 1.792,
+  "reference_music_tempo_emit_p99_ms": 7.792,
+  "gate2_limit_ms": 6.0,
+  "device_stage_p99_us": {
+    "acf": 1233,
+    "tempo_update_two_goertzel_plus_smooth_winner_conf": 1070,
+    "source": "docs/forensics/runtime-evidence/20260816T-g2-tempo-emit-exact-residual-v1/DECOMPOSITION.json"
+  },
+  "operation_counts_per_emit": {
+    "nlag": 181,
+    "history": 512,
+    "spread_lags_per_emit": 16,
+    "mean_lag_in_band": 105,
+    "spread_lag_products": 6512,
+    "spread_prepare_amortised": "1024 ops every ~12 emits when a sweep starts",
+    "spread_comb_amortised": "96 bins * 4 teeth every completed sweep (~12 emits)",
+    "rolling_step_flops": "181 * (2 ring loads + scale/decay muls)",
+    "rolling_prefix": 512,
+    "rolling_centering": 181,
+    "rolling_comb_every_emit": "96 bins * 4 teeth — more often than spread",
+    "goertzel_recurrence_per_bin": 512,
+    "goertzel_bins_per_emit": 2,
+    "shared_window_gather": "512 scale+clamp+index paid once instead of twice"
+  },
+  "plausible_saving_us": {
+    "rolling_acf_vs_spread_slice": {
+      "low": 600,
+      "high": 1000,
+      "note": "Replaces ~6512 lag MACs with O(nlag+N) plus a comb publish every emit. Comb is cheap versus the lag inner product, but it is no longer amortised. Do not claim the full 1233 us ACF p99 disappears."
+    },
+    "shared_window_goertzel_gather": {
+      "low": 100,
+      "high": 250,
+      "note": "The two 512-point recurrences stay. Only the second ring gather/clamp is removed. Interleaving both recurrences over one window walk is still exact per bin and might add tens of microseconds, not hundreds."
+    },
+    "combined": {
+      "low": 700,
+      "high": 1250
+    }
+  },
+  "zero_acf_still_fails_gate2": {
+    "music_tempo_emit_p99_ms": 7.792,
+    "acf_p99_ms": 1.233,
+    "remainder_ms": 6.559,
+    "note": "Even a fictional ACF cost of zero leaves ~6.56 ms. Exact Goertzel work cannot close a 1.79 ms hole by itself either."
+  },
+  "verdict": "HOLD_FLASH_NOT_CREDIBLE_TO_1_8MS",
+  "B489_FLASH": "HOLD",
+  "reason": "Combined rolling current-history ACF plus exact shared-window Goertzel does not have a credible route to a 1.8 ms S3 emit saving. The paper range is ~0.7-1.25 ms. Do not spend a B489 cycle on this pair as a Gate-2 closer.",
+  "not_authorised": [
+    "fewer lags",
+    "approximate ACF",
+    "cadence cut",
+    "stale publish",
+    "Core-1 offload",
+    "scheduler/priority theatre",
+    "host CPU wall time as an ESP32-S3 predictor"
+  ],
+  "honest_remaining_choices_if_host_behavioural_passes": [
+    "Cross80 (currently HOLD)",
+    "another semantic tempo redesign with a larger exact or behavioural saving",
+    "onset/base-frame optimisation (currently HOLD)",
+    "reopen the 6 ms reserve contract"
+  ],
+  "GATE3": "BLOCKED",
+  "F887": "NO",
+  "CROSS80": "HOLD",
+  "ONSET": "HOLD",
+  "MABUTRACE": "NOT_REQUIRED_FOR_G2_SERVICE_P99"
+}

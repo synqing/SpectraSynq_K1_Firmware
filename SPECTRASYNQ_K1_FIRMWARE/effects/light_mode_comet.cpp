@@ -1,5 +1,6 @@
 #include "lightshow_modes.h"
 #include "k1_onset_beat.h"
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_comet — "Comet": onset-driven traveling heads with palette trails.
@@ -94,7 +95,7 @@ void light_mode_comet(ChannelEffectState& fx) {
   //    rise), so it is the most perceptually-unambiguous "hit". Broadband `onset`
   //    (which also fires on pads/sweeps/vocals) is deliberately IGNORED so EVERY
   //    comet == a kick: the viewer's rule is trivial and never wrong.
-  const K1OnsetBeatEvent ev = k1_onset_beat_read();
+  const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
   const bool fresh = (ev.event_id != fx.comet_last_event_id);
   fx.comet_last_event_id = ev.event_id;
   if (fresh && ev.bass_onset) {

@@ -52,6 +52,19 @@ def _define_values(flags: list[str]) -> dict[str, list[str]]:
     return values
 
 
+def _effective_flags(env: dict[str, object]) -> list[str]:
+    """Apply PlatformIO build_unflags so inherited production GDFT flags disappear."""
+    flags = list(env.get("build_flags") or [])
+    unflags = set(env.get("build_unflags") or [])
+    return [flag for flag in flags if flag not in unflags]
+
+
+def _last_defines(env: dict[str, object]) -> dict[str, str]:
+    """Last -D wins when the same macro appears more than once after unflags."""
+    values = _define_values(_effective_flags(env))
+    return {name: entries[-1] for name, entries in values.items()}
+
+
 def test_candidate_envs_inherit_the_exact_scalar_baseline_and_change_one_flag():
     pio = PIO.read_text(encoding="utf-8")
     candidates = {
@@ -63,12 +76,7 @@ def test_candidate_envs_inherit_the_exact_scalar_baseline_and_change_one_flag():
         assert "non-shippable" in section.lower()
         assert "extends = env:k1_bench_scheduling_baseline_probe" in section
         assert "${env:k1_bench_scheduling_baseline_probe.build_flags}" in section
-        added_flags = [
-            line.strip()
-            for line in section.splitlines()
-            if line.strip().startswith("-")
-        ]
-        assert added_flags == [f"-DK1_GDFT_X2_CROSSOVER_BIN={crossover}"]
+        assert f"-DK1_GDFT_X2_CROSSOVER_BIN={crossover}" in section
         assert "K1_GDFT_X2_AB_V1" not in section
 
 
@@ -90,13 +98,12 @@ def test_resolved_matrix_preserves_the_exact_service_tuple_and_one_flag_delta():
     resolved = _resolved_envs()
     baseline_name = "env:k1_bench_scheduling_baseline_probe"
     candidate_values = {
-        "env:k1_bench_scheduling_gdft_cross40_probe": "-DK1_GDFT_X2_CROSSOVER_BIN=40u",
-        "env:k1_bench_scheduling_gdft_cross80_probe": "-DK1_GDFT_X2_CROSSOVER_BIN=80u",
+        "env:k1_bench_scheduling_gdft_cross40_probe": "40u",
+        "env:k1_bench_scheduling_gdft_cross80_probe": "80u",
     }
     baseline = resolved[baseline_name]
     assert baseline["upload_speed"] == 460800
-    baseline_flags = list(baseline["build_flags"])
-    baseline_defines = _define_values(baseline_flags)
+    baseline_defines = _last_defines(baseline)
     required = {
         "ARDUINO_RUNNING_CORE": "0",
         "K1_LED_TASK_CORE": "1",
@@ -108,27 +115,41 @@ def test_resolved_matrix_preserves_the_exact_service_tuple_and_one_flag_delta():
         "K1_GDFT_INT64_RECURRENCE_V1": "1",
     }
     for name, value in required.items():
-        assert baseline_defines.get(name) == [value]
+        assert baseline_defines.get(name) == value
+    # Cross0 scalar: production Cross40+Lane4 must be unflagged away.
     assert "K1_GDFT_X2_CROSSOVER_BIN" not in baseline_defines
+    assert "K1_GDFT_LANE4_V1" not in baseline_defines
     assert "#define K1_GDFT_X2_CROSSOVER_BIN 0u" in CONSTANTS.read_text(encoding="utf-8")
+    assert "-DK1_GDFT_X2_CROSSOVER_BIN=40u" in list(baseline.get("build_unflags") or [])
+    assert "-DK1_GDFT_LANE4_V1=1" in list(baseline.get("build_unflags") or [])
 
     forbidden_defines = {
         "K1_GDFT_X2_AB_V1",
         "K1_GDFT_TRUE_CENTER_V1",
         "K1_SPECTRAL_WINDOW_V1",
     }
-    for name, expected_delta in candidate_values.items():
+    for name, expected_crossover in candidate_values.items():
         candidate = resolved[name]
-        candidate_flags = list(candidate["build_flags"])
-        candidate_defines = _define_values(candidate_flags)
-        assert candidate_flags == baseline_flags + [expected_delta]
-        assert candidate_defines["K1_GDFT_X2_CROSSOVER_BIN"] == [expected_delta.rsplit("=", 1)[1]]
+        candidate_defines = _last_defines(candidate)
+        assert candidate_defines["K1_GDFT_X2_CROSSOVER_BIN"] == expected_crossover
+        assert "K1_GDFT_LANE4_V1" not in candidate_defines
         for required_name, required_value in required.items():
-            assert candidate_defines.get(required_name) == [required_value]
+            assert candidate_defines.get(required_name) == required_value
         assert forbidden_defines.isdisjoint(candidate_defines)
+        # One-variable delta vs Cross0 baseline: only the crossover macro differs.
+        baseline_keys = set(baseline_defines)
+        candidate_keys = set(candidate_defines)
+        assert candidate_keys - baseline_keys == {"K1_GDFT_X2_CROSSOVER_BIN"}
+        shared = baseline_keys & candidate_keys
+        for key in shared:
+            assert candidate_defines[key] == baseline_defines[key]
         assert candidate["extends"] == [baseline_name]
-        baseline_nonlocal = {k: v for k, v in baseline.items() if k not in {"extends", "build_flags"}}
-        candidate_nonlocal = {k: v for k, v in candidate.items() if k not in {"extends", "build_flags"}}
+        baseline_nonlocal = {
+            k: v for k, v in baseline.items() if k not in {"extends", "build_flags", "build_unflags"}
+        }
+        candidate_nonlocal = {
+            k: v for k, v in candidate.items() if k not in {"extends", "build_flags", "build_unflags"}
+        }
         assert candidate_nonlocal == baseline_nonlocal
 
 

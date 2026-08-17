@@ -12,6 +12,7 @@
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
 #include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
+#include "k1_persistence_request.h"
 
 extern void reboot(); // system.h
 
@@ -182,6 +183,7 @@ void save_config() {
       USBSerial.print(config_filename);
       USBSerial.println(" for writing!");
     }
+    unlock_leds();
     return;
   } else {
     file.seek(0);
@@ -217,6 +219,13 @@ void save_config_delayed() {
   }
   next_save_time = millis()+5000;
   settings_updated = true;
+  static uint32_t s_persist_seq = 0;
+  K1PersistRequest req = {};
+  req.sequence = ++s_persist_seq;
+  req.op = K1_PERSIST_OP_SAVE_CONFIG;
+  req.idempotent = 1;
+  req.arg = 0;
+  (void)k1_persist_request_push(req);
 }
 
 // Load configuration from LittleFS
@@ -268,6 +277,7 @@ void load_config() {
       USBSerial.println(" for reading!");
     }
     k1_apply_boot_palette_lock();
+    unlock_leds();
     return;
   }
 
@@ -355,6 +365,7 @@ void save_ambient_noise_calibration() {
     if (debug_mode) {
       USBSerial.println("Failed to open file for writing!");
     }
+    unlock_leds();
     return;
   }
 
@@ -397,6 +408,7 @@ void load_ambient_noise_calibration() {
     if (debug_mode) {
       USBSerial.println("Failed to open file for reading!");
     }
+    unlock_leds();
     return;
   }
 

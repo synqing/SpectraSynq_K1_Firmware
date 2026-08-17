@@ -157,8 +157,11 @@ def test_probe_is_one_flag_non_shippable_and_bench_only():
     section = pio[start : end if end >= 0 else len(pio)]
     assert "NON-SHIPPABLE" in section
     assert "extends = env:k1_bench_scheduling_baseline_probe" in section
-    added = [line.strip() for line in section.splitlines() if line.strip().startswith("-")]
-    assert added == ["-DK1_GDFT_LANE4_PROBE=1"]
+    # Production Cross40 must stay unflagged so this env is Cross0 + Lane4 only.
+    assert "build_unflags =" in section
+    assert "-DK1_GDFT_X2_CROSSOVER_BIN=40u" in section
+    assert "-DK1_GDFT_LANE4_V1=1" in section
+    assert section.index("build_unflags") < section.index("-DK1_GDFT_LANE4_V1=1")
 
     manifest = json.loads(IDENTITIES.read_text(encoding="utf-8"))
     owners = [row["chip_id"] for row in manifest["authorized"]
@@ -169,9 +172,9 @@ def test_probe_is_one_flag_non_shippable_and_bench_only():
 def test_scalar_path_remains_present_and_probe_is_strictly_gated():
     core = CORE.read_text(encoding="utf-8")
     kernel = KERNEL.read_text(encoding="utf-8")
-    assert "#if K1_GDFT_LANE4_PROBE" in core
+    assert "#if K1_GDFT_LANE4_V1" in core
     assert "#else\n  for (uint16_t i = 0; i < NUM_FREQS; i++)" in core
-    assert "#endif  // K1_GDFT_LANE4_PROBE" in core
+    assert "#endif  // K1_GDFT_LANE4_V1" in core
     assert "requires the current int64 recurrence and magnitude contract" in core
     assert "spectral windowing is outside its contract" in core
     assert "(int64_t)state.coeff_q14 * (int64_t)state.q1" in kernel
@@ -200,14 +203,14 @@ def test_operation_counts_preserve_every_recurrence_and_lock_shared_load_count()
 def test_prior_gdft_oracle_fixture_is_byte_exact_under_current_int64_contract():
     oracle = _load(ORACLE_PATH, "oracle_gdft_lane4_prior_fixture")
     scalar = _capture(PRODUCTION_INT64_DEFINES, oracle.DRIVER)
-    lane4 = _capture(PRODUCTION_INT64_DEFINES + ["K1_GDFT_LANE4_PROBE=1"], oracle.DRIVER)
+    lane4 = _capture(PRODUCTION_INT64_DEFINES + ["K1_GDFT_LANE4_V1=1"], oracle.DRIVER)
     assert lane4 == scalar
 
 
 def test_random_adversarial_and_all_safe_bin_histories_are_code_exact():
     driver = _exact_driver()
     scalar = _capture(PRODUCTION_INT64_DEFINES, driver)
-    lane4 = _capture(PRODUCTION_INT64_DEFINES + ["K1_GDFT_LANE4_PROBE=1"], driver)
+    lane4 = _capture(PRODUCTION_INT64_DEFINES + ["K1_GDFT_LANE4_V1=1"], driver)
     assert scalar.startswith("safe=71 frames=120\n")
     assert lane4 == scalar
 
@@ -218,6 +221,6 @@ def test_non_monotonic_crossover_inside_lane_is_code_exact():
     driver = _exact_driver()
     defines = PRODUCTION_INT64_DEFINES + ["K1_GDFT_X2_CROSSOVER_BIN=41u"]
     scalar = _capture(defines, driver)
-    lane4 = _capture(defines + ["K1_GDFT_LANE4_PROBE=1"], driver)
+    lane4 = _capture(defines + ["K1_GDFT_LANE4_V1=1"], driver)
     assert scalar.startswith("safe=71 frames=120\n")
     assert lane4 == scalar

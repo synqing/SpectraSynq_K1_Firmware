@@ -485,18 +485,23 @@ inline CRGB *leds_out;
 inline SQ15x16 hue_shift = 0.0; // Used in auto color cycling
 
 inline uint8_t dither_step = 0;
-#ifdef K1_EFFECT_FRAMEWORK_V1
-// CL-1 cross-core ack-barrier (framework only). led_thread_halt is the existing
-// cross-core halt flag; under the framework it gates a real flash/PSRAM barrier
-// so it MUST be a volatile load/store at every site (no compiler caching across
-// the core boundary). render_thread_parked is the render task's acknowledgement
-// that it is parked at frame-top and is NOT touching PSRAM. lock_leds() waits on
-// it so a flash-cache-disable window (LittleFS/NVS write) can never land while
-// the framework render is mid-frame in PSRAM.
+#if defined(K1_EFFECT_FRAMEWORK_V1) || defined(K1_PERSIST_PARK_V1)
+#ifndef K1_LED_PARK_V1
+#define K1_LED_PARK_V1 1
+#endif
+#endif
+#ifdef K1_LED_PARK_V1
+// CL-1 cross-core ack-barrier. led_thread_halt is the existing cross-core halt
+// flag; it MUST be a volatile load/store at every site (no compiler caching
+// across the core boundary). render_thread_parked is the render task's
+// acknowledgement that it is parked at frame-top and is NOT touching PSRAM.
+// lock_leds() waits on it so a flash-cache-disable window (LittleFS/NVS write)
+// can never land while Core 1 is mid-frame in PSRAM.
 //
-// Flag-OFF keeps the verbatim non-volatile declaration so the shipping
-// k1_hardware binary stays byte-identical (lock_leds is a no-op there and the
-// flag is never read cross-core for a flash barrier).
+// Compiled when K1_EFFECT_FRAMEWORK_V1 (framework PSRAM) or K1_PERSIST_PARK_V1
+// (G7B production persist/cache coexistence) is set. REVERT G7B = delete
+// -DK1_PERSIST_PARK_V1=1 from [env:k1_hardware] (lock_leds becomes a no-op
+// again unless the framework flag is also on).
 inline volatile bool led_thread_halt = false;
 inline volatile bool render_thread_parked = false;
 #else
@@ -1056,15 +1061,19 @@ inline char config_filename[24];
 inline float MASTER_BRIGHTNESS = 0.0;
 inline float last_sample = 0;
 
-#ifdef K1_EFFECT_FRAMEWORK_V1
-// CL-1: real cross-core mutual exclusion. The framework render path touches
-// PSRAM, which FAULTS (illegal cache access) while flash is being written
-// (LittleFS/NVS). lock_leds() halts the render task and SPINS until the task
-// acknowledges it is parked at frame-top (render_thread_parked == true), with a
-// bounded timeout so a never-acknowledging task cannot deadlock the flash path.
+#ifdef K1_LED_PARK_V1
+// CL-1: real cross-core mutual exclusion. Core 1 render touches PSRAM, which
+// FAULTS (illegal cache access) while flash is being written (LittleFS/NVS).
+// lock_leds() halts the render task and SPINS until the task acknowledges it
+// is parked at frame-top (render_thread_parked == true), with a bounded
+// timeout so a never-acknowledging task cannot deadlock the flash path.
 // This is an ack-barrier handshake, NOT a bare delay.
 inline void lock_leds(){
   led_thread_halt = true;
+  if (led_task == nullptr) {
+    // Boot: init_fs() runs before led_task exists. No park partner; fail open.
+    return;
+  }
   // Bounded wait for the render task to confirm it has parked (≈ a few frames
   // at 100 FPS; cap well above worst-case frame time, then fail open).
   const uint32_t LOCK_LEDS_ACK_TIMEOUT_MS = 100;

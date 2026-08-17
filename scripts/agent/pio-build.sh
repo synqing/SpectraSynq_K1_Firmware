@@ -26,9 +26,15 @@ ENV="$1"
 # k1_bench_scheduling_stage_{min,full}_probe = non-shippable B489 Gate-2
 # measurement envs (identity still enforced by k1_upload_guard.py; this wrapper
 # builds only — never upload).
-ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench k1_bench_scheduling_stage_min_probe k1_bench_scheduling_stage_full_probe"
+# k1_bench_scheduling_gdft_cross40_lane4_full_probe = non-shippable combined
+# Cross40 × Lane-4 exact backend with full stage attribution (B489 only).
+# k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe = same surface plus
+# exact rolling ACF residual candidate (B489 only).
+# k1_bench_im69d_wfhyb_fade = waveform-hybrid colour-novelty A/B (mode-11 trail
+# deposit + mode-32 variant pack 33-37); non-shippable, B489 only, build-only here.
+ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench k1_bench_scheduling_stage_min_probe k1_bench_scheduling_stage_full_probe k1_bench_scheduling_gdft_cross40_lane4_full_probe k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe k1_bench_im69d_wfhyb_fade"
 case "$ENV" in
-  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench|k1_bench_scheduling_stage_min_probe|k1_bench_scheduling_stage_full_probe)
+  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench|k1_bench_scheduling_stage_min_probe|k1_bench_scheduling_stage_full_probe|k1_bench_scheduling_gdft_cross40_lane4_full_probe|k1_bench_im69d_wfhyb_fade|k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2

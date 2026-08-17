@@ -25,6 +25,17 @@
     "tempo_novelty_decimation": 3,
     "ap_arrival_period_us": 7500
   },
+  "gdft_service_contract": {
+    "selection": "CROSS40_PLUS_LANE4",
+    "authority": "Captain restamp 2026-08-16",
+    "x2_crossover_bin": 40,
+    "lane4_exact_backend": true,
+    "lane4_production_define": "K1_GDFT_LANE4_V1",
+    "lane4_probe_alias": "K1_GDFT_LANE4_PROBE",
+    "spectral_windowing": false,
+    "ap_service_p99_limit_us": 8000,
+    "revert": "delete -DK1_GDFT_X2_CROSSOVER_BIN=40u and -DK1_GDFT_LANE4_V1=1 from env:k1_hardware"
+  },
   "vp_contract": {
     "target_fps": 120,
     "target_period_us": 8333,
@@ -42,7 +53,8 @@
     "effect_code_scope": "one_effect_render_call_excluding_frame_smoothing_composition_quantisation_and_rmt"
   },
   "margin_rules": {
-    "ap_service_p99_max_fraction_of_arrival": 0.8,
+    "ap_service_p99_max_us": 8000,
+    "ap_service_p99_note": "Captain 2026-08-16: absolute service p99; former 0.8×arrival (=6000) struck",
     "ap_max_must_fit_measured_dma_cushion": true,
     "ap_max_consecutive_over_period": 1,
     "ap_recovery_hops_max": 2,
@@ -104,7 +116,7 @@
       "feature": "ap_publication_freshness",
       "origin": "newest_sample_estimate_us",
       "endpoint": "ap_publish_us",
-      "budget_p99_us": 6000
+      "budget_p99_us": 8000
     },
     {
       "feature": "vp_generation_age",

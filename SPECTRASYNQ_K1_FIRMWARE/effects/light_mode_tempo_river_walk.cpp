@@ -1,6 +1,7 @@
 #include "lightshow_modes.h"
 #include "k1_tempo.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_tempo_river_walk — "Tempo River Walk": Tempo River with its palette
@@ -18,7 +19,7 @@
 //   around the palette once per counted bar (4 beats).
 // PASS 2 (verbs): Count beats -> Step target per bar -> Slew offset -> Flow ->
 //   Clear centre -> Inject (palette position + offset) -> Clamp -> Mirror.
-// PASS 3 (layers): L1 adds the tempo beat edge (phase01 wrap from k1_tempo_read(),
+// PASS 3 (layers): L1 adds the tempo beat edge (phase01 wrap from k1_vp_tempo_read(),
 //   the same event source Tempo River reads); L2 adds five fx.trwalk_* fields;
 //   L4 (colour) is the ONLY layer altered — sample position = original + offset,
 //   wrapped [0,1); L3/L5/L6 are identical to Tempo River.
@@ -105,7 +106,7 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
     t.beat_tick = false; t.locked = true; t.beat_strength = 1.0f;
   } else {
-    t = k1_tempo_read();
+    t = k1_vp_tempo_read();
   }
 
   // ── Tempo-locked outward drift VELOCITY (px THIS frame) ──────────────────────

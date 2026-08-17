@@ -38,6 +38,7 @@ This is the memory/recall counterpart to `/thinking-model-router`.
 | One sweeping "Journey Into …" narrative | `/timeline-report` | weekly-digests |
 | Week-by-week / serial chapters / "story by week" | `/weekly-digests` | timeline-report |
 | "How does claude-mem work?" / injection / where data lives | `/how-it-works` | spec-recall |
+| Withhold / "does not mean ship" / promote / close a gate | `/ship-path-required` **in the same answer** | ending on hold with no numbered path |
 | Memory returns zero / worker unhealthy / contradicts Tier 0 | `/memory-authority-gate` | re-litigate from episodic memory |
 
 ## Default session ladder (K1)

@@ -240,7 +240,7 @@ bool k1_parse_edge_uniform(const char* text, bool* out_uniform) {
 // Edge-mixer status + live-hotkey control (moved VERBATIM from serial_menu.h,
 // M2.1 Phase R1 batch 2). These call the batch-1 edge name helpers above (same
 // TU) + tx_begin/tx_end (serial_tx.h) + vp_bool_text (forward-declared above).
-// Source order preserved so k1_edge_warn_if_collapsed precedes its callers.
+// Source order preserved so k1_edge_echo_if_coerced precedes its callers.
 // ---------------------------------------------------------------------------
 
 void k1_print_edge_status() {
@@ -263,16 +263,22 @@ void k1_print_edge_status() {
   tx_end();
 }
 
-// A-lane UX guard: MIRROR + COMPLEMENTARY makes both edges rotate +/-180deg to the
-// SAME hue (2*180 = 360 = 0 separation), collapsing the two edges into one. Honest
-// maths, but a UX trap — so warn (informative, NOT a hard block) whenever a change
-// makes that combo active. Called from the mode + dual-edge change handlers.
-void k1_edge_warn_if_collapsed(const K1EdgeMixerConfig& e) {
-  if (e.dualEdge == K1_EDGE_DUAL_MIRROR && e.mode == K1_EDGE_MIXER_COMPLEMENTARY) {
-    tx_begin();
-    USBSerial.println("EDGE_WARN: mirror+complementary collapses both edges to the same hue (2x180=0 separation) - use split at complementary, or mirror at analogous/triadic.");
-    tx_end();
+// Echo when set_config coerced complementary+mirror to split. Compare the
+// requested pair against stored config — never warn about a pair that can
+// no longer exist in k1_edge_config.
+void k1_edge_echo_if_coerced(const K1EdgeMixerConfig& requested) {
+  if (requested.dualEdge != K1_EDGE_DUAL_MIRROR ||
+      requested.mode != K1_EDGE_MIXER_COMPLEMENTARY) {
+    return;
   }
+  K1EdgeMixerConfig stored = k1_edgemixer_config();
+  if (stored.dualEdge != K1_EDGE_DUAL_SPLIT ||
+      stored.mode != K1_EDGE_MIXER_COMPLEMENTARY) {
+    return;
+  }
+  tx_begin();
+  USBSerial.println("EDGE_COERCED: mirror+complementary -> split");
+  tx_end();
 }
 
 // --- EdgeMixer live-hotkey helpers (each mutates the transplanted config via
@@ -308,7 +314,7 @@ void serial_edge_cycle_mode() {
   USBSerial.print("EDGE_MODE: ");
   USBSerial.println(k1_edge_mode_name(e.mode));
   tx_end();
-  k1_edge_warn_if_collapsed(e);
+  k1_edge_echo_if_coerced(e);
 }
 
 void serial_edge_adjust_spread(int delta) {
@@ -358,27 +364,31 @@ void serial_edge_toggle_rotation() {
 
 void serial_edge_toggle_dual_edge() {
   K1EdgeMixerConfig e = k1_edgemixer_config();
-  // 3-way cycle: one_sided -> split -> mirror -> one_sided. Symmetric dual-edge
-  // (A lane) — the plate A/B for "make BOTH edges participate about the 79/80
-  // centre". one_sided = only the secondary strip shifts (certified default);
-  // split = both edges +/- theta/2; mirror = both edges +/- theta.
+  // Default 3-way cycle: one_sided -> split -> mirror -> one_sided.
+  // Complementary θ = π makes mirror a dead cell; skip it so one keypress
+  // always changes the plate. set_config still coerces if another path asks.
   switch (e.dualEdge) {
     case K1_EDGE_DUAL_ONE_SIDED:
       e.dualEdge = K1_EDGE_DUAL_SPLIT;
       break;
     case K1_EDGE_DUAL_SPLIT:
-      e.dualEdge = K1_EDGE_DUAL_MIRROR;
+      if (e.mode == K1_EDGE_MIXER_COMPLEMENTARY) {
+        e.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
+      } else {
+        e.dualEdge = K1_EDGE_DUAL_MIRROR;
+      }
       break;
     default:
       e.dualEdge = K1_EDGE_DUAL_ONE_SIDED;
       break;
   }
   k1_edgemixer_set_config(e);
+  K1EdgeMixerConfig stored = k1_edgemixer_config();
   tx_begin();
   USBSerial.print("EDGE_DUAL: ");
-  USBSerial.println(k1_edge_dual_name(e.dualEdge));
+  USBSerial.println(k1_edge_dual_name(stored.dualEdge));
   tx_end();
-  k1_edge_warn_if_collapsed(e);
+  k1_edge_echo_if_coerced(e);
 }
 
 void serial_edge_toggle_uniform() {
@@ -1550,7 +1560,7 @@ bool serial_hotkey_is_immediate(char key) {
     case 'g':  // toggle EdgeMixer on/off
     case 'G':  // cycle edge_mode
     case 'u':  // toggle rotation faithful<->luma
-    case 'y':  // cycle dual-edge one_sided->split->mirror (A lane)
+    case 'y':  // cycle dual-edge; complementary skips mirror (dead cell)
 #ifndef ENABLE_MOTION_PROBE
     // ref E spatial toggle (SHIPPING). 'm' doubles as the motion-probe "B knob +"
     // key under ENABLE_MOTION_PROBE (see the guarded block below); the two are
@@ -2160,7 +2170,7 @@ void cmd_help() {
 	  USBSerial.println("                  edge_rotation=[faithful/luma/oklab] | EdgeMixer rotation space (faithful=grey-axis; luma=+BT.601 rescale; oklab=perceptual OKLab)");
 	  USBSerial.println("                  edge_dual=[one_sided/split/mirror] | EdgeMixer symmetric dual-edge (one_sided=secondary only; split=both +/-theta/2; mirror=both +/-theta)");
 	  USBSerial.println("                  edge_uniform=[uniform/masked] | EdgeMixer spatial weighting (uniform=even; masked=fades from the 79/80 centre to the ends) (ref E)");
-	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror | m spatial uniform<->masked");
+	  USBSerial.println("     EdgeMixer keys: g on/off | G cycle mode | -/= spread -/+5 | _/+ strength -/+0.1 | u rotation faithful->luma->oklab | y dual one_sided->split->mirror (skip mirror at complementary) | m spatial uniform<->masked");
 #if ENABLE_VPAB_PROBE
 	  USBSerial.println("                   vpab=[once/start,N/stop/status] | Harness-only final-byte VP A/B probe");
 #endif

@@ -1,0 +1,376 @@
+{
+  "acf_lag_cursor": {
+    "max": 181.0,
+    "median": 112.0,
+    "min": 16.0,
+    "p5": 16.0,
+    "p95": 181.0,
+    "p99": 181.0
+  },
+  "acf_publish_count_max": 143.0,
+  "acf_spread_active_rows": 392,
+  "acf_valid_rows": 464,
+  "actions": [
+    "stop",
+    "version",
+    "apcad_abort=1",
+    "apcad_clear=1",
+    "apdbg=off",
+    "tempo_stream=off",
+    "ap_stream=off",
+    "apcad_capture=5000",
+    "ffplay playback",
+    "apcad_dump=1",
+    "apcad_abort=1"
+  ],
+  "active_ap_work_over_7500_count": 464,
+  "active_sample_rate_mode": 12800,
+  "active_samples_per_chunk_mode": 96,
+  "active_tempo_decimation_mode": 3,
+  "apcad_log": "docs/forensics/runtime-evidence/20260816T-gate2-stage-attribution-781c40a9/stage_attr_anchorpoint_5s_20260816_031555__apcad.log",
+  "baud": 115200,
+  "bytes_mismatch_count": 0,
+  "capture_admissible": true,
+  "capture_complete": true,
+  "capture_metadata": {
+    "begin": {
+      "capacity": 2304,
+      "count": 464,
+      "dropped": 0,
+      "end_ms": 62532,
+      "start_ms": 57532
+    },
+    "done": {
+      "count": 464,
+      "dropped": 0
+    }
+  },
+  "capture_sequence_gap_count": 0,
+  "capture_sequence_gaps_first10": [],
+  "capture_start": "2026-08-16T03:16:14+0800",
+  "classification": "B_ap_compute_overrun",
+  "classification_reason": "active config and I2S read integrity are clean, but AP frame cadence is slow and the I2S read returns immediately, indicating backlog from a late AP loop",
+  "compact_soak_mode": false,
+  "declared_accepted_novelty_rate_hz_from_binary": 44.44531,
+  "declared_ap_frame_hz_from_binary": 133.33203,
+  "dump_timeout_seconds": 90.0,
+  "duration_ms": 4985,
+  "duration_ms_requested": 5000,
+  "early_stage_row_count": 0,
+  "emitted_active_ap_work_over_7500_count": 155,
+  "expected_accepted_novelty_dt_ms_from_active_config": 22.499999999999996,
+  "expected_accepted_novelty_rate_hz_from_active_config": 44.44444444444445,
+  "expected_ap_frame_dt_ms_from_active_config": 7.499999999999999,
+  "expected_ap_frame_rate_hz_from_active_config": 133.33333333333334,
+  "first_frame": 5134,
+  "first_t_ms": 57544,
+  "frame_gap_count": 0,
+  "frame_gaps_first10": [],
+  "full_stage_row_count": 464,
+  "gdft_internal_split_available": false,
+  "i2s_not_ok_count": 0,
+  "i2s_status_counts": {
+    "0": 464
+  },
+  "last_frame": 5597,
+  "last_t_ms": 62529,
+  "measured_ap_frame_dt_ms": {
+    "max": 13.0,
+    "median": 10.0,
+    "min": 10.0,
+    "p5": 10.0,
+    "p95": 12.0,
+    "p99": 13.0
+  },
+  "measured_ap_frame_rate_hz": 92.87863590772317,
+  "measured_emitted_novelty_count": 155,
+  "measured_emitted_novelty_dt_ms": {
+    "max": 34.0,
+    "median": 32.0,
+    "min": 31.0,
+    "p5": 31.0,
+    "p95": 34.0,
+    "p99": 34.0
+  },
+  "measured_emitted_novelty_rate_hz": 30.954773869346734,
+  "non_actions": [
+    "no calibration command",
+    "no tempo tuning",
+    "no production DSP change"
+  ],
+  "playback_gain_db": 0.0,
+  "player": "ffplay",
+  "port": "/dev/cu.usbmodem12401",
+  "raw_log": "docs/forensics/runtime-evidence/20260816T-gate2-stage-attribution-781c40a9/stage_attr_anchorpoint_5s_20260816_031555__raw.log",
+  "row_count": 464,
+  "sample_time_assumption_ids": [
+    1
+  ],
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem12401",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4",
+    "location": "0-1.2.4",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:89:B4",
+    "vid": 12346
+  },
+  "silence_rows": 0,
+  "source_contract_novelty_decimation": 3,
+  "source_contract_sample_rate": 12800,
+  "source_contract_samples_per_chunk": 96,
+  "stage_attribution_admissible": true,
+  "stage_duration_consistency_failure_count": 0,
+  "stage_duration_missing_count": 0,
+  "stage_nonempty_failure_count": 0,
+  "stage_tail_total_mismatch_count": 0,
+  "stage_timestamp_order_failure_count": 0,
+  "stage_timing_missing_count": 0,
+  "stage_timing_row_count": 464,
+  "start_ms": 45000,
+  "timestamp_identity_row_count": 464,
+  "timestamp_order_failure_count": 0,
+  "timestamp_regression_count": 0,
+  "timestamp_regressions_first10": [],
+  "timing_us": {
+    "active_ap_work_elapsed_us": {
+      "max": 11918.0,
+      "median": 9486.0,
+      "min": 8882.0,
+      "p5": 9114.45,
+      "p95": 11514.099999999999,
+      "p99": 11731.11
+    },
+    "audio_snapshot_elapsed_us": {
+      "max": 284.0,
+      "median": 178.0,
+      "min": 95.0,
+      "p5": 99.0,
+      "p95": 254.84999999999997,
+      "p99": 262.0
+    },
+    "calculate_novelty_elapsed_us": {
+      "max": 81.0,
+      "median": 35.0,
+      "min": 18.0,
+      "p5": 20.150000000000002,
+      "p95": 58.0,
+      "p99": 68.74000000000001
+    },
+    "emitted_active_ap_work_elapsed_us": {
+      "max": 11918.0,
+      "median": 11109.0,
+      "min": 9224.0,
+      "p5": 10580.8,
+      "p95": 11703.300000000001,
+      "p99": 11815.1
+    },
+    "i2s_read_elapsed_us": {
+      "max": 58.0,
+      "median": 32.0,
+      "min": 19.0,
+      "p5": 23.0,
+      "p95": 52.849999999999966,
+      "p99": 56.0
+    },
+    "musical_saliency_elapsed_us": {
+      "max": 201.0,
+      "median": 111.0,
+      "min": 54.0,
+      "p5": 56.0,
+      "p95": 168.0,
+      "p99": 179.37
+    },
+    "newest_sample_to_ap_publish_us": {
+      "max": 11610.0,
+      "median": 9196.5,
+      "min": 8625.0,
+      "p5": 8807.45,
+      "p95": 11204.0,
+      "p99": 11433.220000000001
+    },
+    "oldest_sample_to_ap_publish_us": {
+      "max": 19031.0,
+      "median": 16617.5,
+      "min": 16046.0,
+      "p5": 16228.449999999999,
+      "p95": 18624.999999999996,
+      "p99": 18854.22
+    },
+    "onset_elapsed_us": {
+      "max": 1050.0,
+      "median": 792.0,
+      "min": 482.0,
+      "p5": 538.45,
+      "p95": 1010.85,
+      "p99": 1039.37
+    },
+    "post_gdft_service_elapsed_us": {
+      "max": 202.0,
+      "median": 109.5,
+      "min": 62.0,
+      "p5": 65.15,
+      "p95": 169.0,
+      "p99": 192.37
+    },
+    "post_i2s_vu_sweet_spot_elapsed_us": {
+      "max": 100.0,
+      "median": 59.0,
+      "min": 26.0,
+      "p5": 29.0,
+      "p95": 85.0,
+      "p99": 92.85000000000002
+    },
+    "post_publication_complete_loop_tail_elapsed_us": {
+      "max": 321.0,
+      "median": 206.5,
+      "min": 113.0,
+      "p5": 125.15,
+      "p95": 292.84999999999997,
+      "p99": 315.37
+    },
+    "pre_i2s_controls_service_elapsed_us": {
+      "max": 115.0,
+      "median": 66.5,
+      "min": 34.0,
+      "p5": 43.0,
+      "p95": 99.5499999999999,
+      "p99": 110.0
+    },
+    "pre_snapshot_config_elapsed_us": {
+      "max": 46.0,
+      "median": 16.0,
+      "min": 5.0,
+      "p5": 7.0,
+      "p95": 25.0,
+      "p99": 29.370000000000005
+    },
+    "process_GDFT_elapsed_us": {
+      "max": 7575.0,
+      "median": 7077.5,
+      "min": 6655.0,
+      "p5": 6710.15,
+      "p95": 7425.9,
+      "p99": 7528.74
+    },
+    "process_GDFT_kernel_elapsed_us": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "p5": null,
+      "p95": null,
+      "p99": null
+    },
+    "process_GDFT_post_processing_elapsed_us": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "p5": null,
+      "p95": null,
+      "p99": null
+    },
+    "tempo_acf_elapsed_us": {
+      "max": 1151.0,
+      "median": 709.0,
+      "min": 120.0,
+      "p5": 244.65,
+      "p95": 1044.5499999999997,
+      "p99": 1092.0
+    },
+    "tempo_emit_elapsed_us": {
+      "max": 2302.0,
+      "median": 1755.0,
+      "min": 901.0,
+      "p5": 1237.1499999999999,
+      "p95": 2212.1,
+      "p99": 2293.0
+    },
+    "tempo_phase_elapsed_us": {
+      "max": 111.0,
+      "median": 57.0,
+      "min": 30.0,
+      "p5": 31.0,
+      "p95": 91.84999999999997,
+      "p99": 98.0
+    },
+    "tempo_pre_timed_history_scale_and_gate_elapsed_us": {
+      "max": 145.0,
+      "median": 98.0,
+      "min": 0.0,
+      "p5": 64.0,
+      "p95": 127.29999999999998,
+      "p99": 138.38000000000002
+    },
+    "tempo_publish_elapsed_us": {
+      "max": 39.0,
+      "median": 18.0,
+      "min": 7.0,
+      "p5": 8.0,
+      "p95": 26.0,
+      "p99": 35.0
+    },
+    "tempo_silence_elapsed_us": {
+      "max": 234.0,
+      "median": 147.0,
+      "min": 79.0,
+      "p5": 82.3,
+      "p95": 212.0,
+      "p99": 217.0
+    },
+    "tempo_total_elapsed_us": {
+      "max": 2413.0,
+      "median": 28.0,
+      "min": 14.0,
+      "p5": 14.0,
+      "p95": 2185.6499999999996,
+      "p99": 2349.8100000000004
+    },
+    "tempo_update_elapsed_us": {
+      "max": 1070.0,
+      "median": 818.0,
+      "min": 512.0,
+      "p5": 545.9000000000001,
+      "p95": 1016.0,
+      "p99": 1070.0
+    },
+    "total_ap_loop_elapsed_us": {
+      "max": 11955.0,
+      "median": 9515.0,
+      "min": 8912.0,
+      "p5": 9150.45,
+      "p95": 11552.95,
+      "p99": 11766.849999999999
+    }
+  },
+  "track_file": "/Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3",
+  "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938",
+  "unique_ap_core_id": [
+    0
+  ],
+  "unique_dma_desc_num": [
+    3
+  ],
+  "unique_dma_frame_num": [
+    96
+  ],
+  "unique_sample_rate": [
+    12800
+  ],
+  "unique_samples_per_chunk": [
+    96
+  ],
+  "unique_slot_bit_width": [
+    32
+  ],
+  "unique_slot_mode": [
+    2
+  ],
+  "unique_stage": [
+    0
+  ],
+  "unique_vp_core_id": [
+    1
+  ]
+}

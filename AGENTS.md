@@ -3,6 +3,11 @@ It is load-bearing and defines the fidelity, craft, value, and proof bars.
 
 Any agent who engages in busy work will be destroyed. Before you begin a task or even THINK, you will first ask yourself: "Can I be absolutely sure what I'm about to do is not busy work" - If the answer is no. STOP.
 
+**Ship path required (Captain 2026-08-17):** never say a result does not mean
+ship / promote / close without the remaining numbered ship path in the same
+answer (already on silicon or in source; remaining steps; who acts; stamp or
+flash that means shipped). Skill: `/ship-path-required`.
+
 ---
 abstract: "SensoryBridge K1 firmware (ESP32-S3): audio-reactive LEDs via Goertzel GDFT (80-bin frequency spectrum + 24 perceptual bands) + tempo tracking (PLL flywheel), onset detection (per-band log-flux), chord saliency, AGC. Dual-core: Core 0 = hard real-time audio pipeline; Core 1 = 100 FPS visual render. 30 enumerated lightshow modes, with 22 currently enabled by light_mode_is_enabled(). PlatformIO build (pioarduino 54.03.20, FastLED 3.10.3), comprehensive pytest host gate (54 test files, 427 tests at 2026-06-15). Audio-semantic forward-graft promoted to production (2026-06-05); device eyes-on is final gate. Code naming: sb_*() DSP functions, SB* structs, light_mode_* effects, snake_case actions. Load-bearing rules at .claude/CLAUDE.md."
 ---
@@ -567,6 +572,7 @@ ls /dev/cu.usbmodem*
 5. **Git Discipline** — Use branches and commits for recovery checkpoints; pre-commit gate prevents broken code
 6. **Parallel-Agent Orchestration** — Parallel work requires delegation contracts with classification and evidence rules
 7. **Commit Cadence** — Commit frequently (every green checkpoint), but only after verification
+8. **Ship path required (Captain 2026-08-17)** — Never say a result does not mean ship / promote / close without the remaining numbered ship path in the same answer (`/ship-path-required`)
 
 Full rules and rationale: **[`.claude/CLAUDE.md`](./.claude/CLAUDE.md)**
 

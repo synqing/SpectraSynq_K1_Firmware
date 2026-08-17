@@ -1,0 +1,87 @@
+{
+  "lane": "G2_TEMPO_BEHAVIOURAL_EQUIVALENCE_V1",
+  "captain_selection": "OPTION_1",
+  "closed_predecessor": {
+    "id": "G2_TEMPO_EMIT_EXACT_RESIDUAL_V1",
+    "verdict": "CLOSED_FAIL_NOT_EXACT",
+    "receipt": "docs/forensics/runtime-evidence/20260816T-g2-tempo-emit-exact-residual-v1/HOST_EQUIVALENCE.json"
+  },
+  "doctrine": {
+    "behavioural_reference": "KNOWN_FIXTURE_TRUTH",
+    "spread_implementation": "REGRESSION_CONTROL",
+    "spread_output": "NOT_ABSOLUTE_GROUND_TRUTH",
+    "correct_lock_may_occur_earlier": true,
+    "no_arbitrary_epsilon_vs_stale_spread": true,
+    "MABUTRACE_FOR_THIS_GATE": "NOT_REQUIRED",
+    "APCAD": "CONTROLLING_SERVICE_TIME_ORACLE_AFTER_HOST_GATES",
+    "sample_age": "Independent health signal. Not a host-gate reject. Eventual device candidate must be STABLE on both fixtures."
+  },
+  "frozen": {
+    "GDFT": "FROZEN",
+    "CROSS80": "HOLD",
+    "ONSET": "HOLD",
+    "CADENCE": "12800_96_D3",
+    "PRIORITY": "UNCHANGED",
+    "AUDIO_TASK": "NO",
+    "GATE3": "BLOCKED",
+    "F887": "NO",
+    "B489_FLASH": "HOLD_UNTIL_BOTH_HOST_GATES_AND_FEASIBILITY"
+  },
+  "product_gates_no_incorrect_regression": [
+    {"id": "lock_unlock", "predicate": "locked"},
+    {"id": "tempo_trustworthy_director", "predicate": "locked && confidence >= 0.45"},
+    {"id": "effect_confidence_idle", "predicate": "confidence < 0.30"},
+    {"id": "effect_confidence_full", "predicate": "confidence >= 0.60"},
+    {"id": "beat_accept_queue", "predicate": "beat_tick && locked"},
+    {"id": "pulse_prism_spawn", "predicate": "locked && beat_tick && beat_strength > 0.55"},
+    {"id": "silence_freeze", "predicate": "silence_detected || snapshot.silence"}
+  ],
+  "silence": {
+    "false_locks": 0,
+    "false_beat_ticks": 0,
+    "non_zero_tempo_assertions": "locked/beat_tick/prism-spawn/full-confidence-gate; bpm field may retain last winner and is not itself an assertion",
+    "lock_release": "no slower than spread after silence onset"
+  },
+  "stationary_click_trains_bpm": [60, 90, 112, 120, 128, 144],
+  "settled": {
+    "octave_family": "correct fixture BPM (1 BPM quantised bin)",
+    "unexpected_lock_releases": 0,
+    "extra_or_missing_beat_events": 0,
+    "beat_timing_error_max_us": 7500,
+    "beat_timing_oracle": "analytical AP clicks mapped onto the peak-held novelty emit (frames 3,6,9,...). The flywheel can only tick on emit frames; raw AP-click times would confuse decimation with tracker error. Spread is not the oracle."
+  },
+  "acquisition_and_jumps": {
+    "same_frame_as_spread": "NOT_REQUIRED",
+    "correct_lock_acquired": "<= reference acquisition time",
+    "wrong_octave_episodes": "<= reference",
+    "wrong_bpm_episodes": "<= reference",
+    "reacquisition_after_bpm_jump": "<= reference",
+    "false_beats_in_transition": "<= reference"
+  },
+  "dropouts": "no worse than spread on false unlock, coast, beat count, BPM recovery, phase recovery",
+  "acf_may_differ": [
+    "raw ACF cells",
+    "floating-point ACF values",
+    "acf_valid timing",
+    "candidate_bin",
+    "intermediate winner",
+    "lag-table contents"
+  ],
+  "goertzel_exact_subgate": {
+    "intent": "no semantic change",
+    "required": true,
+    "before": "combined device candidate",
+    "identity": "For the same novelty history, k1_tempi[*].magnitude_raw under rolling ACF + shared window must match spread + k1_compute_magnitude (bit-identical, -ffp-contract=off)."
+  },
+  "feasibility_stop": {
+    "required_device_emit_saving_us": 1792,
+    "host_cpu_benchmark_as_s3_predictor": "FORBIDDEN",
+    "rule": "Combined candidate earns B489 only if operation-count evidence makes >=1.8 ms S3 saving plausible. If exact Goertzel can only plausibly save 100-200 us and rolling ACF cannot close the rest, HOLD the flash."
+  },
+  "map_territory": [
+    "Host novelty trains are not MEMS+GDFT novelty. Passing this gate does not prove Anchor Point lock.",
+    "APCAD active_us is CPU demand, not acoustic-to-light latency.",
+    "Spread ACF encodes sweep staleness. Disagreeing with spread is not automatically incorrect.",
+    "Shared-window Goertzel is an exactness claim and is tested as such, separately from ACF freshness."
+  ]
+}

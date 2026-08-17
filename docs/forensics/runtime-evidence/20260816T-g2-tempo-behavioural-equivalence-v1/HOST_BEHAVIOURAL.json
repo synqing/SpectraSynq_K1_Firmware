@@ -1,0 +1,679 @@
+{
+  "B489_FLASH": "HOLD",
+  "CROSS80": "HOLD",
+  "F887": "NO",
+  "GATE3": "BLOCKED",
+  "MABUTRACE": "NOT_REQUIRED_FOR_G2_SERVICE_P99",
+  "ONSET": "HOLD",
+  "control_gaps": [
+    "abrupt_82_to_108",
+    "abrupt_bpm_change",
+    "double_time_ambiguity",
+    "flat_then_train",
+    "novelty_ring_wrap",
+    "silence_then_exit",
+    "steady_112",
+    "steady_128",
+    "steady_144",
+    "steady_60",
+    "steady_90"
+  ],
+  "failures": {},
+  "fixtures": {
+    "abrupt_82_to_108": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 0.0,
+          "n_matched": 17,
+          "n_ticks": 17,
+          "n_truth": 17,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 10
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 22000.0,
+          "n_matched": 17,
+          "n_ticks": 17,
+          "n_truth": 17,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 5
+        }
+      },
+      "cand_lock_ms": 20543,
+      "cand_pre_lock_ms": 11520,
+      "cand_reacquire_ms": 20543,
+      "kind": "jump",
+      "ref_lock_ms": 20858,
+      "ref_pre_lock_ms": 11520,
+      "ref_reacquire_ms": 20858,
+      "timing_7500_unmet_by_control": true,
+      "transition_ticks": {
+        "cand": 10,
+        "ref": 10
+      },
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "abrupt_bpm_change": {
+      "cand_lock_ms": null,
+      "cand_pre_lock_ms": 11520,
+      "cand_reacquire_ms": null,
+      "control_cannot_reacquire": true,
+      "kind": "jump",
+      "ref_lock_ms": null,
+      "ref_pre_lock_ms": 11520,
+      "ref_reacquire_ms": null,
+      "transition_ticks": {
+        "cand": 3,
+        "ref": 3
+      }
+    },
+    "adversarial_noise": {
+      "false_lock": 0,
+      "false_tick": 0,
+      "kind": "noise"
+    },
+    "double_time_ambiguity": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 23000.0,
+          "n_matched": 6,
+          "n_ticks": 6,
+          "n_truth": 6,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 2
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 270000.0,
+          "median_err_us": 157000.0,
+          "n_matched": 6,
+          "n_ticks": 6,
+          "n_truth": 6,
+          "p99_err_us": 203000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 23108,
+      "cand_pre_lock_ms": 11520,
+      "cand_reacquire_ms": 23108,
+      "kind": "jump",
+      "ref_lock_ms": 23490,
+      "ref_pre_lock_ms": 11520,
+      "ref_reacquire_ms": 23490,
+      "timing_7500_unmet_by_control": true,
+      "transition_ticks": {
+        "cand": 17,
+        "ref": 17
+      },
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "flat_then_train": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 22000.0,
+          "n_matched": 20,
+          "n_ticks": 20,
+          "n_truth": 20,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 10
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 0.0,
+          "n_matched": 20,
+          "n_ticks": 20,
+          "n_truth": 20,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 12
+        }
+      },
+      "cand_lock_ms": 11520,
+      "false_lock": 0,
+      "false_tick": 0,
+      "kind": "silence_then_train",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "lock_acquire_release": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 472000.0,
+          "n_matched": 12,
+          "n_ticks": 13,
+          "n_truth": 12,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 472000.0,
+          "n_matched": 12,
+          "n_ticks": 13,
+          "n_truth": 12,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "release",
+      "ref_lock_ms": 11520,
+      "silence_locked_frames": {
+        "cand": 318,
+        "ref": 318
+      },
+      "silence_ticks": {
+        "cand": 5,
+        "ref": 5
+      },
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "long_consecutive": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 495000.0,
+          "n_matched": 32,
+          "n_ticks": 33,
+          "n_truth": 32,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 495000.0,
+          "n_matched": 32,
+          "n_ticks": 33,
+          "n_truth": 32,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "novelty_ring_wrap": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 22000.0,
+          "n_matched": 19,
+          "n_ticks": 19,
+          "n_truth": 19,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 7
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 23000.0,
+          "n_matched": 19,
+          "n_ticks": 19,
+          "n_truth": 19,
+          "p99_err_us": 45000.0,
+          "within_7500_us": 5
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "phase_cross_offset_0": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 495000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 473000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "phase_cross_offset_1": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 495000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 473000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "phase_cross_offset_2": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 473000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 473000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "silence_then_exit": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 0.0,
+          "n_matched": 20,
+          "n_ticks": 20,
+          "n_truth": 20,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 12
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 0.0,
+          "n_matched": 20,
+          "n_ticks": 20,
+          "n_truth": 20,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 12
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "silence_then_train",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "steady_112": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 22000.0,
+          "n_matched": 19,
+          "n_ticks": 19,
+          "n_truth": 19,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 7
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 45000.0,
+          "median_err_us": 23000.0,
+          "n_matched": 19,
+          "n_ticks": 19,
+          "n_truth": 19,
+          "p99_err_us": 45000.0,
+          "within_7500_us": 5
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "steady_120": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 495000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 1,
+          "max_err_us": 495000.0,
+          "median_err_us": 473000.0,
+          "n_matched": 20,
+          "n_ticks": 21,
+          "n_truth": 20,
+          "p99_err_us": 495000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "steady_128": {
+      "cand_lock_ms": null,
+      "control_cannot_lock": true,
+      "kind": "stationary",
+      "ref_lock_ms": null
+    },
+    "steady_144": {
+      "cand_lock_ms": null,
+      "control_cannot_lock": true,
+      "kind": "stationary",
+      "ref_lock_ms": null
+    },
+    "steady_60": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 225000.0,
+          "median_err_us": 45000.0,
+          "n_matched": 10,
+          "n_ticks": 10,
+          "n_truth": 10,
+          "p99_err_us": 157000.0,
+          "within_7500_us": 1
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 135000.0,
+          "median_err_us": 67000.0,
+          "n_matched": 10,
+          "n_ticks": 10,
+          "n_truth": 10,
+          "p99_err_us": 113000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "steady_90": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 22000.0,
+          "n_matched": 15,
+          "n_ticks": 15,
+          "n_truth": 15,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 7
+        },
+        "ref": {
+          "count_delta": 0,
+          "max_err_us": 23000.0,
+          "median_err_us": 0.0,
+          "n_matched": 15,
+          "n_ticks": 15,
+          "n_truth": 15,
+          "p99_err_us": 23000.0,
+          "within_7500_us": 9
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "stationary",
+      "ref_lock_ms": 11520,
+      "timing_7500_unmet_by_control": true,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    },
+    "weak_intermittent": {
+      "beat_sorted": {
+        "cand": {
+          "count_delta": 9,
+          "max_err_us": 4500000.0,
+          "median_err_us": 2970000.0,
+          "n_matched": 12,
+          "n_ticks": 21,
+          "n_truth": 12,
+          "p99_err_us": 4478000.0,
+          "within_7500_us": 0
+        },
+        "ref": {
+          "count_delta": 9,
+          "max_err_us": 4500000.0,
+          "median_err_us": 2970000.0,
+          "n_matched": 12,
+          "n_ticks": 21,
+          "n_truth": 12,
+          "p99_err_us": 4478000.0,
+          "within_7500_us": 0
+        }
+      },
+      "cand_lock_ms": 11520,
+      "kind": "dropout",
+      "ref_lock_ms": 11520,
+      "unlocks": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_bpm_frames": {
+        "cand": 0,
+        "ref": 0
+      },
+      "wrong_octave_frames": {
+        "cand": 0,
+        "ref": 0
+      }
+    }
+  },
+  "goertzel_max_abs_err": 0.0,
+  "goertzel_raw_bit_identical": true,
+  "lane": "G2_TEMPO_BEHAVIOURAL_EQUIVALENCE_V1",
+  "timing_oracle": "Analytical AP clicks are mapped onto the peak-held novelty emit (frames 3,6,9,...) before the 7500 us bound is applied. The flywheel can only tick on emit frames; judging vs raw AP clicks would confuse decimation with tracker error.",
+  "verdict": "PASS"
+}

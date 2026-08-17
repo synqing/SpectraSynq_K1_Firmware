@@ -1,6 +1,7 @@
 #include "lightshow_modes.h"
 #include "k1_audio_snapshot.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_waveform_hybrid_k1 — faithful port of firmware-v3 effect 0x1313
@@ -111,7 +112,7 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   // main .ino (not STM-gated). Still OR with the live global peak so a torn or
   // one-frame-stale snapshot cannot black the plate while AP peak_scaled is hot
   // (Bench Unit 2 2026-08-09: silence cleared, peak~0.7, glass still looked dead).
-  const K1AudioSnapshot snap = k1_audio_snapshot_read();
+  const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
   const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
 

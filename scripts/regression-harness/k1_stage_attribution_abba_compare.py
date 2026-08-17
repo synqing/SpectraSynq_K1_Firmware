@@ -316,13 +316,28 @@ def perturbation_limits(contract: dict[str, Any] | None = None) -> dict[str, Any
 def service_limits_from_contract(contract: dict[str, Any] | None = None) -> dict[str, Any]:
     contract = contract or load_deployed_contract()
     period = int(contract["production_tuple"]["ap_arrival_period_us"])
-    fraction = float(contract["margin_rules"]["ap_service_p99_max_fraction_of_arrival"])
+    rules = contract["margin_rules"]
+    has_abs = "ap_service_p99_max_us" in rules
+    has_frac = "ap_service_p99_max_fraction_of_arrival" in rules
+    if has_abs and has_frac:
+        raise EvidenceError(
+            "ap_service_p99_dual_authority:"
+            "both ap_service_p99_max_us and ap_service_p99_max_fraction_of_arrival present"
+        )
+    if has_abs:
+        service_max_us = int(rules["ap_service_p99_max_us"])
+    elif has_frac:
+        service_max_us = int(
+            period * float(rules["ap_service_p99_max_fraction_of_arrival"])
+        )
+    else:
+        raise EvidenceError("ap_service_p99_missing:no absolute or fraction margin")
     sample_rate = float(contract["production_tuple"]["sample_rate_hz"])
     chunk = float(contract["production_tuple"]["samples_per_chunk"])
     expected_hz = sample_rate / chunk
     return {
         "ap_arrival_period_us": period,
-        "ap_service_p99_max_us": int(period * fraction),
+        "ap_service_p99_max_us": service_max_us,
         "expected_ap_rate_hz": expected_hz,
         "measured_ap_rate_min_hz": expected_hz - SERVICE_RATE_TOLERANCE_LOW_HZ,
         "measured_ap_rate_max_hz": expected_hz + SERVICE_RATE_TOLERANCE_HIGH_HZ,

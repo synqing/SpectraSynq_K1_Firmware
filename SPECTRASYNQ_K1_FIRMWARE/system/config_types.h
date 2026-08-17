@@ -226,6 +226,16 @@ enum lightshow_modes {
   LIGHT_MODE_BEAT_PULSE,            // -- ID reserve 30 (tombstone; no body on this branch)
   LIGHT_MODE_BLOOM_BT,              // -- ID reserve 31 (tombstone; no body on this branch)
   LIGHT_MODE_WAVEFORM_HYBRID_K1,    // -- Waveform Hybrid K1: amplitude-bouncing dot + decaying scroll trail (2026-08-05 all-builds)
+  // Mode-32 colour-novelty COMPARISON PACK (2026-08-17). Five variants on the
+  // WAVEFORM_HYBRID_K1 chassis; each isolates ONE colour-coordinate strategy so
+  // Captain can A/B them by cycling modes on one flash (bench B489 only).
+  // Compiled in every build (light_mode_*.cpp filter) but SELECTABLE only when
+  // K1_WFHYB_M32_VARIANTS_V1 is defined — production cycling never reaches them.
+  LIGHT_MODE_WFHYB_K1_FLUX,         // -- 33: palette walk kicked by chroma NOVELTY (flux), decays between changes
+  LIGHT_MODE_WFHYB_K1_NOTE,         // -- 34: palette coordinate = strongest chroma note (hysteresis), discrete jumps
+  LIGHT_MODE_WFHYB_K1_WIDE,         // -- 35: parametric-only — 4x wider loudness walk + lighter colour EMA
+  LIGHT_MODE_WFHYB_K1_SUM,          // -- 36: 12-note palette SUM (mode-7 colour idiom on the m32 chassis)
+  LIGHT_MODE_WFHYB_K1_STEP,         // -- 37: golden-ratio palette step latched per musical event (refractory)
 
   NUM_MODES  // used to know the length of this list if it changes in the future
 };
@@ -247,6 +257,15 @@ inline bool light_mode_is_enabled(uint8_t mode) {
     case LIGHT_MODE_EMBER_V2:   // pulled 2026-06-02 (Captain: "fucked, not going anywhere"); code kept, unselectable
     case LIGHT_MODE_BEAT_PULSE: // ID reserve 30 — unselectable on this branch (no effect body)
     case LIGHT_MODE_BLOOM_BT:   // ID reserve 31 — unselectable on this branch (no effect body)
+#ifndef K1_WFHYB_M32_VARIANTS_V1
+    // Mode-32 comparison pack (33–37): bodies compiled everywhere, selectable
+    // only on the bench variants build. Production cycling skips them.
+    case LIGHT_MODE_WFHYB_K1_FLUX:
+    case LIGHT_MODE_WFHYB_K1_NOTE:
+    case LIGHT_MODE_WFHYB_K1_WIDE:
+    case LIGHT_MODE_WFHYB_K1_SUM:
+    case LIGHT_MODE_WFHYB_K1_STEP:
+#endif
       return false;
     default:
       return true;

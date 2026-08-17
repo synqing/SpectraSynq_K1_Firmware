@@ -1,0 +1,370 @@
+{
+  "B489_FLASH": "BLOCKED",
+  "CROSS80": "HOLD",
+  "GATE3": "BLOCKED",
+  "any_line_mismatch_fixtures": [
+    "abrupt_bpm_change",
+    "double_time_ambiguity",
+    "flat_then_train",
+    "half_time_60",
+    "lock_acquire_release",
+    "long_consecutive",
+    "novelty_ring_wrap",
+    "phase_cross_offset_0",
+    "phase_cross_offset_1",
+    "phase_cross_offset_2",
+    "silence_then_exit",
+    "steady_120",
+    "steady_144",
+    "steady_90",
+    "weak_intermittent"
+  ],
+  "experiment": "G2_TEMPO_EMIT_EXACT_RESIDUAL_V1",
+  "mismatches": {
+    "abrupt_bpm_change": {
+      "acf_max_abs_err": 0.000158309937,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04387031 0 1 11 53",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05752894 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 3200,
+      "n_ref": 3200
+    },
+    "double_time_ambiguity": {
+      "acf_max_abs_err": 0.00018119812,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2132,
+      "n_ref": 2132
+    },
+    "flat_then_train": {
+      "acf_max_abs_err": 6.48498535e-05,
+      "first_diff": {
+        "candidate": "T 405 108.0 0.00000000 0 0.72900015 0 0.00000000 0 1 48 95",
+        "index": 54,
+        "reference": "T 405 82.0 0.00000000 0 0.72804677 0 0.12718850 0 0 22 22"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 405 108.0 0.00000000 0 0.72900015 0 0.00000000 0 1 48 95",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 54,
+        "reference": "T 405 82.0 0.00000000 0 0.72804677 0 0.12718850 0 0 22 22"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 1599,
+      "n_ref": 1599
+    },
+    "half_time_60": {
+      "acf_max_abs_err": 0.000154495239,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04387031 0 1 11 53",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05752894 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "lock_acquire_release": {
+      "acf_max_abs_err": 0.000146865845,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "long_consecutive": {
+      "acf_max_abs_err": 0.000286102295,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 4000,
+      "n_ref": 4000
+    },
+    "novelty_ring_wrap": {
+      "acf_max_abs_err": 0.000247955322,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04387031 0 1 11 53",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05752894 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2666,
+      "n_ref": 2666
+    },
+    "phase_cross_offset_0": {
+      "acf_max_abs_err": 0.000160217285,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 1600,
+      "n_ref": 1600
+    },
+    "phase_cross_offset_1": {
+      "acf_max_abs_err": 0.00023651123,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 1601,
+      "n_ref": 1601
+    },
+    "phase_cross_offset_2": {
+      "acf_max_abs_err": 0.000179290771,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 1602,
+      "n_ref": 1602
+    },
+    "silence_then_exit": {
+      "acf_max_abs_err": 0.000179290771,
+      "first_diff": {
+        "candidate": "T 4365 126.0 0.00000000 0 0.92647153 0 0.34975198 0 1 66 92",
+        "index": 582,
+        "reference": "T 4365 126.0 0.00000000 0 0.92647153 0 0.34975198 0 0 66 66"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 4455 126.0 0.11350182 0 0.11381747 0 0.41237801 0 1 66 64",
+        "changed_fields": [
+          "confidence"
+        ],
+        "index": 594,
+        "reference": "T 4455 126.0 0.00000000 0 0.11381747 0 0.41237801 0 0 66 66"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "steady_120": {
+      "acf_max_abs_err": 0.000377655029,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04171843 0 1 11 61",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05358691 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "steady_144": {
+      "acf_max_abs_err": 0.000495910645,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 148.0 0.14198595 0 0.77378708 0 0.00000000 0 1 88 88",
+        "changed_fields": [
+          "bpm",
+          "confidence",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05752894 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "steady_90": {
+      "acf_max_abs_err": 0.000129699707,
+      "first_diff": {
+        "candidate": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 1 11 92",
+        "index": 51,
+        "reference": "T 383 71.0 0.00000000 0 0.60870516 0 0.03140385 0 0 11 11"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 518 71.0 0.00000000 0 0.77083540 0 0.04387031 0 1 11 53",
+        "changed_fields": [
+          "bpm",
+          "phase01",
+          "beat_strength",
+          "winner"
+        ],
+        "index": 69,
+        "reference": "T 518 83.0 0.00000000 0 0.77129543 0 0.05752894 0 0 23 23"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    },
+    "weak_intermittent": {
+      "acf_max_abs_err": 8.39233398e-05,
+      "first_diff": {
+        "candidate": "T 877 104.0 0.00000000 0 0.56920278 0 0.34975186 0 1 44 92",
+        "index": 117,
+        "reference": "T 877 104.0 0.00000000 0 0.56920278 0 0.34975186 0 0 44 44"
+      },
+      "first_event_field_diff": {
+        "candidate": "T 1058 104.0 0.00000190 0 0.88489997 0 0.40893811 0 1 44 61",
+        "changed_fields": [
+          "confidence"
+        ],
+        "index": 141,
+        "reference": "T 1058 104.0 0.00000000 0 0.88489997 0 0.40893811 0 0 44 44"
+      },
+      "matches_unspread_full_acf": false,
+      "n_cand": 2133,
+      "n_ref": 2133
+    }
+  },
+  "published_event_mismatch_fixtures": [
+    "abrupt_bpm_change",
+    "double_time_ambiguity",
+    "flat_then_train",
+    "half_time_60",
+    "lock_acquire_release",
+    "long_consecutive",
+    "novelty_ring_wrap",
+    "phase_cross_offset_0",
+    "phase_cross_offset_1",
+    "phase_cross_offset_2",
+    "silence_then_exit",
+    "steady_120",
+    "steady_144",
+    "steady_90",
+    "weak_intermittent"
+  ],
+  "reason": "Candidate published tempo fields are not bit-identical to the Cross40\u00d7Lane-4 spread reference. No tolerances applied. Device run blocked.",
+  "requested": "behavioural-equivalence contract for rolling ACF versus spread-stale ACF, or a separate bit-identical loop-restructure candidate",
+  "verdict": "FAIL"
+}

@@ -219,6 +219,11 @@ repo-truth or commit evidence.
 
 ## 7. Forbidden actions
 
+- Tell Captain a result does not mean ship / promote / close / done without
+  immediately giving the remaining numbered ship path in the **same** answer
+  (what is already on silicon or in source; remaining steps; who acts; the
+  stamp or flash that means shipped). A hold without a ship path is a failed
+  answer. Captain standing order 2026-08-17. Skill: `/ship-path-required`.
 - Edit firmware source unless explicitly scoped
 - Change `platformio.ini` default envs or build behavior unless explicitly scoped
 - Flash, upload, erase flash, or open a serial monitor without explicit approval

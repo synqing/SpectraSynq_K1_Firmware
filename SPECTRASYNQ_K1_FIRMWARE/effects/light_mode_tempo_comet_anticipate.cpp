@@ -1,6 +1,7 @@
 #include "lightshow_modes.h"
 #include "k1_tempo.h"
 #include <math.h>
+#include "k1_vp_audio_access.h"
 
 // ============================================================================
 // light_mode_tempo_comet_anticipate — "Tempo Comet Anticipate" (mode 27):
@@ -28,7 +29,7 @@
 //   P2 VERBS: Fade → Flywheel → Spawn(target) → Ease+Slew → Decay → Draw →
 //      Clamp → Mirror. Purely audio-derived clocking; no wall-clock oscillator
 //      beyond the original's beat flywheel.
-//   P3 LAYERS: L1 = k1_tempo_read() (bpm/phase01/confidence/beat_strength);
+//   P3 LAYERS: L1 = k1_vp_tempo_read() (bpm/phase01/confidence/beat_strength);
 //      L2 = per-channel tcanta_* pool + own flywheel copies; L3 = centre spawn,
 //      eased outward travel, mirror fold; L4 = live shared colour helper every
 //      frame (trail encodes chromatic history); L5 = ease-out transport + fixed
@@ -96,7 +97,7 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
     t.bpm = 120.0f; t.phase01 = 0.0f; t.confidence = 1.0f;
     t.beat_tick = false; t.locked = true; t.beat_strength = 1.0f;
   } else {
-    t = k1_tempo_read();
+    t = k1_vp_tempo_read();
   }
 
   // 1. Fade the persisted trail in place.

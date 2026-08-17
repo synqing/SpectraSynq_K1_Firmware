@@ -1,0 +1,35 @@
+{
+  "arm": "A",
+  "bin_sha256": "ade17c0e6329e9d0dadc46736c69521d58bba89929d2c3f4630cd5808ea29d95",
+  "capture": {
+    "buffered": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__buffered__summary.json"
+    },
+    "classification": "paired_capture_admissible",
+    "compact": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__compact__summary.json"
+    },
+    "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/Q_A2/Q_A2_k1_bench_scheduling_stage_full_probe_no_playback_20260817_014631__pair_manifest.json",
+    "pair_manifest_sha256": "ae388b93d9ab8a088ddeb9c6ffda680f2214581ef6ad62a33cb38f57e75a9779"
+  },
+  "chip_id": "B489A500",
+  "env": "k1_bench_scheduling_stage_full_probe",
+  "expect_git": "8f53c48e",
+  "fixture": "no_playback",
+  "flashed": true,
+  "identity": {
+    "arm": "A",
+    "env": "k1_bench_scheduling_stage_full_probe",
+    "expect_git": "8f53c48e",
+    "identity_line": "IDENTITY OK: git=8f53c48e env=k1_bench_scheduling_stage_full_probe epoch=1786901716",
+    "port": "/dev/cu.usbmodem12401"
+  },
+  "leg_id": "Q_A2",
+  "port": "/dev/cu.usbmodem12401",
+  "resumed_existing": false,
+  "usb_serial": "B4:3A:45:A5:89:B4"
+}

@@ -9,6 +9,7 @@
 #include "globals.h" // Assuming globals contains necessary definitions
 #include "constants.h" // Assuming constants contains necessary definitions
 #include "utilities.h" // Row 2: led_utilities uses fabs_fixed/fmod_fixed/random_float (after globals/constants so SQ15x16 is visible)
+#include "k1_vp_audio_access.h"
 #ifdef K1_DROP_CUT_V1
 #include "k1_audio_snapshot.h" // drop-cut detector reads the published AP snapshot (Core-1 read idiom)
 #include "k1_authored_source.h" // AUTHORED must not apply live drop-cut policy
@@ -341,7 +342,7 @@ inline void drop_cut_update() {
   static uint32_t last_ms = 0;
   static bool cutting = false;
 
-  const K1AudioSnapshot snap = k1_audio_snapshot_read();
+  const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   const uint32_t now = millis();
   float dt = (last_ms != 0) ? float(now - last_ms) * 0.001f : 0.01f;
   if (dt < 0.001f) dt = 0.001f;
@@ -1785,6 +1786,7 @@ inline SQ15x16 apply_contrast_fixed(SQ15x16 value, SQ15x16 intensity) {
 }
 
 #include <stdint.h>
+#include "k1_vp_audio_access.h"
 
 inline uint8_t apply_contrast(uint8_t value, uint8_t intensity) {
   uint16_t mid_point = NATIVE_RESOLUTION;

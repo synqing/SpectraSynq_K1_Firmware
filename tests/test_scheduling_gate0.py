@@ -165,14 +165,14 @@ def test_draft_exists_no_pointer_selects_deployed_75ms(oracle, g0r_fixtures):
     )
     assert sel.selected_contract_id == "K1_SCHEDULING_GATE0_2026_08_15"
     assert sel.selected_period_us == 7500
-    assert sel.selected_p99_limit_us == 6000
+    assert sel.selected_p99_limit_us == 8000
     assert sel.selection_reason == "no_pointer_deployed_contract"
     assert sel.scope == "DEPLOYED"
     assert sel.selected_contract_path.resolve() == (g0r_fixtures / "contract.json").resolve()
     assert sel.selected_contract_sha256 == oracle.sha256_file(g0r_fixtures / "contract.json")
     assert (
         sel.selected_contract_sha256
-        == "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+        == "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0"
     )
 
 
@@ -228,5 +228,9 @@ def test_production_promotion_pointer_fails_closed(oracle, g0r_fixtures):
 def test_default_contract_still_deployed_75ms(oracle):
     assert oracle.DEFAULT_CONTRACT.resolve() == CONTRACT.resolve()
     assert oracle.sha256_file(oracle.DEFAULT_CONTRACT) == (
-        "d17aa7c66b05281b79bafed2178f40f823ce92c04463b920d51fae63df919849"
+        "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0"
     )
+    contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+    assert contract["production_tuple"]["ap_arrival_period_us"] == 7500
+    assert contract["margin_rules"]["ap_service_p99_max_us"] == 8000
+    assert "ap_service_p99_max_fraction_of_arrival" not in contract["margin_rules"]

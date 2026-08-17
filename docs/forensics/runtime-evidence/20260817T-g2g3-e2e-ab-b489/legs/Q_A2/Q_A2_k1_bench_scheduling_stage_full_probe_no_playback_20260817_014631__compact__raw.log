@@ -1,0 +1,265 @@
+# paired_capture_schema=k1-stage-attribution-pair/v1
+# pair_id=pair-e7bc01e93dd8bc093e96
+# serial_session_id=serial-9864b46ecc649b8e8467
+# fixture_session_id=fixture-804ea9eb2e6dcff020f6
+# paired_phase=compact
+# capture_start=2026-08-17T01:46:31+0800
+# port=/dev/cu.usbmodem12401 baud=115200 duration_ms=15000
+# track=<none>
+# track_sha256=None
+# player=<disabled>
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# observed_output_device=Bose Mini II SoundLink
+# pre_roll_seconds=10.0
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem12401", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4", "location": "0-1.2.4", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:89:B4", "vid": 12346}
+BOOT_LOOP_GUARD: stable_clear=1
+# action_ts_monotonic_ms=2480893747 action=stop phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+K1OK
+# action_ts_monotonic_ms=2480894172 action=version phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+VERSION: 40103
+}}
+# action_ts_monotonic_ms=2480895204 action=build phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+BUILD: version=40103 git=8f53c48e epoch=1786901716 env=k1_bench_scheduling_stage_full_probe
+}}
+# action_ts_monotonic_ms=2480896225 action=image_id phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+IMAGE_ID: app_elf_sha256=645997c1a878e15b06e11c4218d6a1ae7de86b351031f126180836b1eee174c8
+}}
+# action_ts_monotonic_ms=2480897241 action=runtime_id phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+RUNTIME_ID: boot_nonce=a2076d017962bbb5 uptime_ms=17518 reset_reason=11
+}}
+# action_ts_monotonic_ms=2480898260 action=apcad_abort=1 phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+APCAD_ABORT: stopped
+}}
+# action_ts_monotonic_ms=2480898592 action=apcad_clear=1 phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+# action_ts_monotonic_ms=2480899020 action=vp_perf=stop phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 0
+VP_PERF_FRAME: avg=0 max=0 over=0 dropped=0
+VP_PERF_INTERVAL: avg=0 max=0
+VP_PERF_STACK_HWM_WORDS: ap=0 vp=0
+VP_PERF_HEAP: 129640
+}}
+# action_ts_monotonic_ms=2480899461 action=apdbg=off phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+# action_ts_monotonic_ms=2480899798 action=tempo_stream=off phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+TEMPO_STREAM: off
+}}
+# action_ts_monotonic_ms=2480900130 action=ap_stream=off phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+AP_STREAM: off
+}}
+# action_ts_monotonic_ms=2480900467 action=smart_assist=off phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+SMART_ASSIST: off
+SMART_SWITCHING: off
+SMART_DIRECTOR_AUTONOMY: off
+SMART_HOOKS: off
+SMART_CONFIDENCE_FLOOR: 0.080
+SMART_APPLIED_MODE: 3
+SMART_LAST_REQUESTED_MODE: 3
+SMART_SWITCHES_IN_WINDOW: 0
+SMART_MANUAL_OWNER_ACTIVE: 0
+SMART_LAST_REASON: 0
+SMART_STATE: 0
+SMART_INTENT_MODE: 3
+SMART_INTENT_CONFIDENCE: 0.000
+SMART_INTENT_WANTS_SWITCH: 0
+SMART_SCALAR_PHOTONS: 1.000
+SMART_SCALAR_CHROMA: 1.000
+SMART_SCALAR_MOOD: 1.000
+SMART_SCALAR_SATURATION: 1.000
+SMART_PALETTE_OVERLAY: 0
+SMART_PALETTE_INDEX: 0
+SMART_AUTO_COLOUR_SHIFT: 0
+SMART_MIN_DWELL_MS: 8000
+SMART_COOLDOWN_MS: 20000
+SMART_SWITCH_WINDOW_MS: 60000
+SMART_MAX_SWITCHES: 2
+SMART_AUDIO_NOVELTY: 0.0358
+SMART_AUDIO_ENERGY: 0.2512
+SMART_EVENT_ID: 120
+SMART_EVENT_AGE_MS: 404
+SMART_ONSET: 0
+SMART_BASS_ONSET: 0
+SMART_BEAT_CONFIDENCE: 0.000
+SMART_TRANSIENT: 0
+SMART_KICK: 0
+SMART_SNARE: 0
+SMART_HIHAT: 0
+SMART_TRANSIENT_LEVEL: 0.000
+SMART_KICK_LEVEL: 0.000
+SMART_SNARE_LEVEL: 0.000
+SMART_HIHAT_LEVEL: 0.010
+SMART_SNARE_EVENT_ID: 54
+SMART_HIHAT_EVENT_ID: 95
+}}
+# action_ts_monotonic_ms=2480900901 action=queue_mode=off phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+QUEUE_MODE: off
+}}
+# action_ts_monotonic_ms=2480901339 action=edge_status phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+EDGE_ENABLED: on
+EDGE_MODE: split
+EDGE_STRENGTH: 0.450
+EDGE_SPREAD: 38
+EDGE_ROTATION: faithful
+EDGE_SPATIAL: uniform
+EDGE_DUAL: split
+}}
+# action_ts_monotonic_ms=2480902164 action=secondary_status phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+SECONDARY_ENABLED: true
+SECONDARY_CONTROL: false (encoders control primary channel)
+SECONDARY_MODE: 7 (WAVEFORM-FAST)
+SECONDARY_PHOTONS: 1.000000
+SECONDARY_CHROMA: 0.000000
+SECONDARY_MOOD: 0.100000
+SECONDARY_SATURATION: 1.000000
+SECONDARY_PRISM_COUNT: 1.00
+SECONDARY_MIRROR_ENABLED: true
+SECONDARY_REVERSE_ORDER: false
+SECONDARY_BASE_COAT: false
+SECONDARY_PALETTE_MODE_ENABLED: true
+SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)
+NOTE: This command is deprecated, please use secondary_status instead
+}}
+# action_ts_monotonic_ms=2480902978 action=dump phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+FIRMWARE_VERSION: 40103
+CHIP ID: B489A500
+noise_button.pressed: 0
+noise_button.last_down: 0
+noise_button.last_up: 0
+noise_button.pin: 255
+mode_button.pressed: 0
+mode_button.last_down: 0
+mode_button.last_up: 0
+mode_button.pin: 255
+CONFIG.PHOTONS: 1.000000
+CONFIG.CHROMA: 0.100000
+CONFIG.MOOD: 0.000000
+CONFIG.LIGHTSHOW_MODE: 32
+CONFIG.MIRROR_ENABLED: 1
+CONFIG.CHROMAGRAM_RANGE: 60
+CONFIG.SAMPLE_RATE: 12800
+CONFIG.NOTE_OFFSET: 12
+CONFIG.SQUARE_ITER: 1.00
+CONFIG.LED_TYPE: 0
+CONFIG.LED_COUNT: 160
+CONFIG.LED_COLOR_ORDER: 66
+CONFIG.SAMPLES_PER_CHUNK: 96
+CONFIG.SENSITIVITY: 2.400000
+AUDIO_RESPONSE_GAIN: 1.000000
+CONFIG.BOOT_ANIMATION: 1
+CONFIG.SWEET_SPOT_MIN_LEVEL: 259
+CONFIG.SWEET_SPOT_MAX_LEVEL: 30000
+CONFIG.DC_OFFSET: -53
+CAL_SOURCE: persisted_profile
+CAL_VALID: 1
+CAL_PROFILE_LOADED: 1
+NOISE_CAL_REASON: none
+NOISE_CAL_DC_SAMPLES: 0
+NOISE_CAL_SSL_P50: 0.0
+NOISE_CAL_SSL_P90: 0.0
+CONFIG.STANDBY_DIMMING: 0
+CONFIG.REVERSE_ORDER: 0
+CONFIG.MAX_CURRENT_MA: 1913
+CONFIG.TEMPORAL_DITHERING: 1
+CONFIG.AUTO_COLOR_SHIFT: 1
+CONFIG.INCANDESCENT_FILTER: 0.50
+CONFIG.INCANDESCENT_MODE: 0
+CONFIG.BULB_OPACITY: 0.00
+CONFIG.SATURATION: 1.00
+CONFIG.PRISM_COUNT: 1.00
+CONFIG.BASE_COAT: 0
+CONFIG.BASE_COAT_INTENSITY: 0.050
+MASTER_BRIGHTNESS: 1.00
+stream_audio: 0
+stream_fps: 0
+stream_max_mags: 0
+stream_max_mags_followers: 0
+stream_magnitudes: 0
+stream_spectrogram: 0
+stream_chromagram: 0
+debug_mode: 0
+noise_complete: 1
+noise_iterations: 0
+next_save_time: 0
+settings_updated: 0
+I2S_PORT: 0
+SAMPLE_HISTORY_LENGTH: 4096
+silence: 0
+mode_destination: -1
+SYSTEM_FPS: 95.77
+LED_FPS: 202.89
+}}
+# action_ts_monotonic_ms=2480905185 action=vp_perf=stop phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 0
+VP_PERF_FRAME: avg=0 max=0 over=0 dropped=0
+VP_PERF_INTERVAL: avg=0 max=0
+VP_PERF_STACK_HWM_WORDS: ap=0 vp=0
+VP_PERF_HEAP: 129640
+}}
+# playback_cmd=<disabled>
+# action_ts_monotonic_ms=2480905623 action=quiet_settle_start phase=paired_setup pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+# phase_ts_monotonic_ms=2480915656 phase=paired_compact event=begin pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+# host_capture_window_start_monotonic_ms=2480915656
+# action_ts_monotonic_ms=2480915656 action=apcad_soak=120000 phase=paired_compact pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+APCAD_SOAK: armed 120000 ms compact=1
+APCAD_SOAK_BEGIN,schema_ver=2,stage_detail=1,duration_ms=120000,compact=1
+}}
+# host_capture_window_end_monotonic_ms=2481036212
+# action_ts_monotonic_ms=2481036212 action=apcad_soak_status=1 phase=paired_compact pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+APCAD_SOAK_DONE,schema_ver=2,stage_detail=1,active=0,rows=11089,emitted=3697,start_ms=35933,end_ms=155933,requested_duration_ms=120000,first_frame_ms=35946,last_frame_ms=155928,observed_duration_ms=119982,sample_rate=12800,samples_per_chunk=96,tempo_decim=3,hist_bucket_us=32,hist_bucket_count=512,meas_ap_hz=92.414,meas_nov_hz=30.804,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=11089,emitted_active_over_7500=3697,active_p95_us=11520,active_ap_work_p50_low_us=9504,active_ap_work_p50_high_us=9536,active_ap_work_p95_low_us=11488,active_ap_work_p95_high_us=11520,active_ap_work_p99_low_us=11808,active_ap_work_p99_high_us=11840,active_ap_work_hist_saturation=0,active_ap_work_max_us=12236,newest_sample_to_ap_publish_p50_low_us=9216,newest_sample_to_ap_publish_p50_high_us=9248,newest_sample_to_ap_publish_p95_low_us=11168,newest_sample_to_ap_publish_p95_high_us=11200,newest_sample_to_ap_publish_p99_low_us=11520,newest_sample_to_ap_publish_p99_high_us=11552,newest_sample_to_ap_publish_hist_saturation=0,newest_sample_to_ap_publish_max_us=11949,ap_read_return_interval_p50_low_us=10016,ap_read_return_interval_p50_high_us=10048,ap_read_return_interval_p95_low_us=12096,ap_read_return_interval_p95_high_us=12128,ap_read_return_interval_p99_low_us=12960,ap_read_return_interval_p99_high_us=12992,ap_read_return_interval_hist_saturation=0,ap_read_return_interval_max_us=13046,active_max_us=12236,active_sum_us=110504502,active_mean_us=9965.236,max_consecutive_active_over_7500=11089,worst_count=16
+# apcad_soak_status_done=True
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=0,frame=7647,t=83219,active_us=12176,total_us=12233,i2s_us=57,gdft_us=7319,novelty_us=34,tempo_acf_us=947,tempo_update_us=761,tempo_emit_us=2002,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=196,win_bpm=113.00000,top1_bpm=115.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=1,frame=7650,t=83254,active_us=12075,total_us=12118,i2s_us=43,gdft_us=7197,novelty_us=37,tempo_acf_us=1062,tempo_update_us=735,tempo_emit_us=2071,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=196,win_bpm=113.00000,top1_bpm=115.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=2,frame=12738,t=138359,active_us=12078,total_us=12114,i2s_us=36,gdft_us=7275,novelty_us=32,tempo_acf_us=870,tempo_update_us=1089,tempo_emit_us=2303,emitted=1,acf_spread=1,acf_lag_cursor=128,acf_pub=326,win_bpm=69.00000,top1_bpm=69.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=3,frame=4686,t=51233,active_us=12114,total_us=12146,i2s_us=32,gdft_us=7321,novelty_us=21,tempo_acf_us=1098,tempo_update_us=1096,tempo_emit_us=2489,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=120,win_bpm=79.00000,top1_bpm=79.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=4,frame=10887,t=118278,active_us=12088,total_us=12131,i2s_us=43,gdft_us=7298,novelty_us=22,tempo_acf_us=1108,tempo_update_us=1091,tempo_emit_us=2496,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=279,win_bpm=124.00000,top1_bpm=124.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=5,frame=14043,t=152522,active_us=12193,total_us=12251,i2s_us=58,gdft_us=7219,novelty_us=29,tempo_acf_us=1221,tempo_update_us=1092,tempo_emit_us=2605,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=360,win_bpm=135.00000,top1_bpm=78.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=6,frame=11529,t=125255,active_us=12092,total_us=12151,i2s_us=59,gdft_us=7273,novelty_us=25,tempo_acf_us=892,tempo_update_us=1044,tempo_emit_us=2250,emitted=1,acf_spread=1,acf_lag_cursor=128,acf_pub=295,win_bpm=118.00000,top1_bpm=118.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=7,frame=12837,t=139449,active_us=12129,total_us=12176,i2s_us=47,gdft_us=7226,novelty_us=22,tempo_acf_us=1118,tempo_update_us=1071,tempo_emit_us=2490,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=329,win_bpm=69.00000,top1_bpm=70.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=8,frame=13659,t=148368,active_us=12236,total_us=12293,i2s_us=57,gdft_us=7279,novelty_us=31,tempo_acf_us=1082,tempo_update_us=1050,tempo_emit_us=2434,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=350,win_bpm=135.00000,top1_bpm=135.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=9,frame=10509,t=114184,active_us=12044,total_us=12076,i2s_us=32,gdft_us=7581,novelty_us=23,tempo_acf_us=967,tempo_update_us=1053,tempo_emit_us=2325,emitted=1,acf_spread=1,acf_lag_cursor=96,acf_pub=269,win_bpm=124.00000,top1_bpm=124.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=10,frame=4956,t=54182,active_us=12137,total_us=12177,i2s_us=40,gdft_us=7195,novelty_us=34,tempo_acf_us=1139,tempo_update_us=802,tempo_emit_us=2233,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=127,win_bpm=82.00000,top1_bpm=82.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=11,frame=11472,t=124630,active_us=12181,total_us=12213,i2s_us=32,gdft_us=7495,novelty_us=22,tempo_acf_us=1111,tempo_update_us=1077,tempo_emit_us=2496,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=294,win_bpm=118.00000,top1_bpm=118.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=12,frame=11319,t=122950,active_us=12212,total_us=12245,i2s_us=33,gdft_us=7221,novelty_us=33,tempo_acf_us=1075,tempo_update_us=1070,tempo_emit_us=2455,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=290,win_bpm=118.00000,top1_bpm=118.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=13,frame=12741,t=138394,active_us=12034,total_us=12079,i2s_us=45,gdft_us=7253,novelty_us=34,tempo_acf_us=834,tempo_update_us=1084,tempo_emit_us=2239,emitted=1,acf_spread=1,acf_lag_cursor=144,acf_pub=326,win_bpm=69.00000,top1_bpm=69.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=14,frame=11403,t=123865,active_us=12035,total_us=12067,i2s_us=32,gdft_us=7499,novelty_us=21,tempo_acf_us=1017,tempo_update_us=1081,tempo_emit_us=2405,emitted=1,acf_spread=1,acf_lag_cursor=80,acf_pub=292,win_bpm=118.00000,top1_bpm=118.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=1,rank=15,frame=9882,t=107411,active_us=12168,total_us=12226,i2s_us=58,gdft_us=7268,novelty_us=26,tempo_acf_us=985,tempo_update_us=1078,tempo_emit_us=2361,emitted=1,acf_spread=1,acf_lag_cursor=80,acf_pub=253,win_bpm=124.00000,top1_bpm=124.00000
+# apcad_worst_row_drain=complete
+# phase_ts_monotonic_ms=2481036244 phase=paired_compact event=end pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+# phase_ts_monotonic_ms=2481036244 phase=paired_stack_hwm event=begin pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+# action_ts_monotonic_ms=2481036244 action=vp_perf=start phase=paired_stack_hwm pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=32,smode=7,sec=1,acq_us=793/793,vu_us=60/60,gdft_us=7013/7013,smooth_us=72/73,pri_render_us=549/549,sec_render_us=78263962/156527295,pri_prep_us=236/262,sec_prep_us=124/132,quant_pri_us=76/87,quant_sec_us=64/69,show_us=2023/2030,interval_us=5000/5000,frame_us=4021/4045,over=0,dropped=0,heap=129640,ap_stack_hwm_words=4748,vp_stack_hwm_words=5096
+VPF,ver=1,seq=2,mode=32,smode=7,sec=1,acq_us=699/911,vu_us=55/94,gdft_us=7325/7705,smooth_us=74/94,pri_render_us=550/691,sec_render_us=767969/156527295,pri_prep_us=224/272,sec_prep_us=118/148,quant_pri_us=69/96,quant_sec_us=62/78,show_us=2078/2703,interval_us=4950/5014,frame_us=3920/4414,over=0,dropped=0,heap=129640,ap_stack_hwm_words=4748,vp_stack_hwm_words=5096
+# action_ts_monotonic_ms=2481037480 action=vp_perf=stop phase=paired_stack_hwm pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 2
+VP_PERF_FRAME: avg=3923 max=4414 over=0 dropped=0
+VP_PERF_INTERVAL: avg=4947 max=5014
+VP_PERF_STACK_HWM_WORDS: ap=4748 vp=5096
+VP_PERF_HEAP: 129640
+}}
+# phase_ts_monotonic_ms=2481038290 phase=paired_stack_hwm event=end pair_id=pair-e7bc01e93dd8bc093e96 serial_session_id=serial-9864b46ecc649b8e8467

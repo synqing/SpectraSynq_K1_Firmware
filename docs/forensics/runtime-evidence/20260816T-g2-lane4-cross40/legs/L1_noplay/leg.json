@@ -1,0 +1,31 @@
+{
+  "bin_sha256": "ec6798f68a7ff2576ef932239960dc1a34d23b1f04db987e8bf791793d40469c",
+  "capture": {
+    "buffered": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__buffered__summary.json"
+    },
+    "classification": "paired_capture_admissible",
+    "compact": {
+      "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__apcad.log",
+      "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__raw.log",
+      "summary_json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__compact__summary.json"
+    },
+    "pair_manifest": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/legs/L1_noplay/L1_noplay_k1_bench_scheduling_gdft_cross40_lane4_full_probe_no_playback_20260816_191657__pair_manifest.json",
+    "pair_manifest_sha256": "e7771cd73ef2a05bec12e30fae03a45d5785fead588784d8369975d91551a80c"
+  },
+  "chip_id": "B489A500",
+  "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+  "expect_git": "cd9c5bea",
+  "fixture": "no_playback",
+  "identity": {
+    "env": "k1_bench_scheduling_gdft_cross40_lane4_full_probe",
+    "expect_git": "cd9c5bea",
+    "identity_line": "IDENTITY OK: git=cd9c5bea env=k1_bench_scheduling_gdft_cross40_lane4_full_probe epoch=1786878957",
+    "port": "/dev/cu.usbmodem12401"
+  },
+  "leg_id": "L1_noplay",
+  "port": "/dev/cu.usbmodem12401",
+  "usb_serial": "B4:3A:45:A5:89:B4"
+}

@@ -1,0 +1,4 @@
+{
+  "error": "S1_A1 capture rc=1: Traceback (most recent call last):\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py\", line 2428, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py\", line 1845, in main\n    validate_paired_command_response(cmd, response)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py\", line 526, in validate_paired_command_response\n    raise RuntimeError(f\"paired command {command!r} failed: {errors}\")\nRuntimeError: paired command 'show_state' failed: ['Bad command: show_state']\n",
+  "completed_legs": []
+}

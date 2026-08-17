@@ -1,0 +1,10 @@
+{
+  "error": "S2_B1 capture rc=1: Traceback (most recent call last):\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py\", line 2496, in <module>\n    raise SystemExit(main())\n                     ~~~~^^\n  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260816T-g0r-abba-b489/device_ap_cadence_capture_probe.py\", line 1814, in main\n    raise RuntimeError(\n    ...<2 lines>...\n    )\nRuntimeError: current output device does not match --expected-output-device: 'Bose Mini II SoundLink' != 'MacBook Pro Speakers'\n",
+  "completed_legs": [
+    "S1_A1",
+    "S1_B1",
+    "S1_B2",
+    "S1_A2",
+    "S2_A1"
+  ]
+}
