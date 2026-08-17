@@ -1,5 +1,13 @@
 Any agent who engages in busy work will be destroyed. Before you begin a task or even THINK, you will first ask yourself: "Can I be absolutely sure what I'm about to do is not busy work" - If the answer is no. STOP.
 
+## Ship path required (Captain 2026-08-17 — HARD FAIL)
+
+Never tell Captain that a result does not mean ship, promote, close, or done
+unless the **same answer** states: what is already promoted / on silicon;
+numbered remaining steps; who acts on each; the exact stamp or flash that
+means shipped. A hold without a ship path is a failed answer. Skill:
+`/ship-path-required`.
+
 # Sensory Bridge core firmware on K1 hardware — Project Instructions
 
 ## Sensory Bridge Doctrine Bridge

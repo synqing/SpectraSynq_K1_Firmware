@@ -30,6 +30,8 @@ Passing fidelity alone is bureaucratic failure.
 - Do not substitute reports, doctrine, or broad test runs for the next decisive
   product or falsification step.
 - Do not claim completion without evidence proportional to the claim.
+- Never withhold ship / promote / close without the remaining numbered ship
+  path in the same answer (`/ship-path-required`, Captain 2026-08-17).
 - If a test cannot kill the relevant failure class, it is not a gate.
 - If current live evidence contradicts a document, branch, memory, or generated
   source, stop and reconcile the contradiction. Never overwrite the territory
