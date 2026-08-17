@@ -1,0 +1,522 @@
+{
+  "acf_lag_cursor": {
+    "max": 181.0,
+    "median": 112.0,
+    "min": 16.0,
+    "p5": 16.0,
+    "p95": 181.0,
+    "p99": 181.0
+  },
+  "acf_publish_count_max": 384.0,
+  "acf_spread_active_rows": 388,
+  "acf_valid_rows": 460,
+  "actions": [
+    "apcad_capture=5000",
+    "apcad_dump=1",
+    "edge_status",
+    "secondary_status",
+    "dump",
+    "runtime_id"
+  ],
+  "active_ap_work_over_7500_count": 460,
+  "active_sample_rate_mode": 12800,
+  "active_samples_per_chunk_mode": 96,
+  "active_tempo_decimation_mode": 3,
+  "apcad_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__buffered__apcad.log",
+  "baud": 115200,
+  "boot_nonce": "460f3f328dba6a4e",
+  "bytes_mismatch_count": 0,
+  "capture_admissible": true,
+  "capture_complete": true,
+  "capture_metadata": {
+    "begin": {
+      "capacity": 2304,
+      "count": 460,
+      "dropped": 0,
+      "end_ms": 163718,
+      "schema_ver": 2,
+      "stage_detail": 1,
+      "start_ms": 158718
+    },
+    "done": {
+      "count": 460,
+      "dropped": 0,
+      "schema_ver": 2,
+      "stage_detail": 1
+    }
+  },
+  "capture_sequence_gap_count": 0,
+  "capture_sequence_gaps_first10": [],
+  "classification": "B_ap_compute_overrun",
+  "classification_reason": "active config and I2S read integrity are clean, but AP frame cadence is slow and the I2S read returns immediately, indicating backlog from a late AP loop",
+  "compact_soak_mode": false,
+  "control_stage_consistency_failure_count": 0,
+  "control_stage_missing_count": 0,
+  "control_stage_valid_row_count": 0,
+  "declared_accepted_novelty_rate_hz_from_binary": 44.44531,
+  "declared_ap_frame_hz_from_binary": 133.33203,
+  "duration_ms": 4979,
+  "duration_ms_requested": 5000,
+  "early_stage_row_count": 0,
+  "emitted_active_ap_work_over_7500_count": 154,
+  "expected_accepted_novelty_dt_ms_from_active_config": 22.499999999999996,
+  "expected_accepted_novelty_rate_hz_from_active_config": 44.44444444444445,
+  "expected_ap_frame_dt_ms_from_active_config": 7.499999999999999,
+  "expected_ap_frame_rate_hz_from_active_config": 133.33333333333334,
+  "first_frame": 14542,
+  "first_t_ms": 158730,
+  "fixture_session_id": "fixture-38062413f25e5cc247d2",
+  "frame_gap_count": 0,
+  "frame_gaps_first10": [],
+  "full_stage_row_count": 460,
+  "gdft_internal_split_available": false,
+  "i2s_not_ok_count": 0,
+  "i2s_status_counts": {
+    "0": 460
+  },
+  "invalid_stage_attribution_mode_count": 0,
+  "last_frame": 15001,
+  "last_t_ms": 163709,
+  "legacy_stage_attribution_inferred_row_count": 0,
+  "measured_ap_frame_dt_ms": {
+    "max": 13.0,
+    "median": 11.0,
+    "min": 9.0,
+    "p5": 10.0,
+    "p95": 13.0,
+    "p99": 13.0
+  },
+  "measured_ap_frame_rate_hz": 92.18718618196425,
+  "measured_emitted_novelty_count": 154,
+  "measured_emitted_novelty_dt_ms": {
+    "max": 34.0,
+    "median": 32.0,
+    "min": 30.0,
+    "p5": 31.0,
+    "p95": 34.0,
+    "p99": 34.0
+  },
+  "measured_emitted_novelty_rate_hz": 30.72289156626506,
+  "non_actions": [
+    "no calibration command",
+    "no tempo tuning",
+    "no production DSP change",
+    "no playback or fixture restart between paired windows"
+  ],
+  "observed_output_device": "Bose Mini II SoundLink",
+  "pair_id": "pair-8a73bbd8f960db6c2e5e",
+  "paired_capture_schema": "k1-stage-attribution-pair/v1",
+  "paired_phase": "buffered",
+  "perturbation_control_admissible": false,
+  "playback_gain_db": 0.0,
+  "player": "ffplay start_ms=0 playback_gain_db=0.0",
+  "port": "/dev/cu.usbmodem12401",
+  "pre_roll_seconds": 10.0,
+  "raw_log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/forensics/runtime-evidence/20260817T-g2g3-e2e-ab-b489/legs/M_A2/M_A2_k1_bench_scheduling_stage_full_probe_music_20260817_015808__buffered__raw.log",
+  "reset_reason": 11,
+  "row_count": 460,
+  "sample_time_assumption_ids": [
+    1
+  ],
+  "scene_post": {
+    "dump_response_sha256": "f63b9620339bc57329ba60051f99effa6aaae9c82f471d730a944bf9b9ef5371",
+    "edge_status_lines": [
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: split",
+      "EDGE_STRENGTH: 0.450",
+      "EDGE_SPREAD: 38",
+      "EDGE_ROTATION: faithful",
+      "EDGE_SPATIAL: uniform",
+      "EDGE_DUAL: split"
+    ],
+    "scene_fields": {
+      "edge_enabled": true,
+      "edge_mode": "split",
+      "edge_strength": 0.45,
+      "master_brightness": 1.0,
+      "primary_mode": 32,
+      "primary_palette": "ABSENT_FROM_DUMP",
+      "sample_rate": 12800,
+      "samples_per_chunk": 96,
+      "scene_surface": "dump+secondary_status+edge_status",
+      "secondary_enabled": true,
+      "secondary_mode": 7,
+      "secondary_palette": 40,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    },
+    "secondary_status_lines": [
+      "SECONDARY_ENABLED: true",
+      "SECONDARY_CONTROL: false (encoders control primary channel)",
+      "SECONDARY_MODE: 7 (WAVEFORM-FAST)",
+      "SECONDARY_PHOTONS: 1.000000",
+      "SECONDARY_CHROMA: 0.000000",
+      "SECONDARY_MOOD: 0.100000",
+      "SECONDARY_SATURATION: 1.000000",
+      "SECONDARY_PRISM_COUNT: 1.00",
+      "SECONDARY_MIRROR_ENABLED: true",
+      "SECONDARY_REVERSE_ORDER: false",
+      "SECONDARY_BASE_COAT: false",
+      "SECONDARY_PALETTE_MODE_ENABLED: true",
+      "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)",
+      "NOTE: This command is deprecated, please use secondary_status instead"
+    ],
+    "show_state_lines": []
+  },
+  "scene_pre": {
+    "dump_response_sha256": "cd964bfdc30c3e9049bfcefe44d92ce4aa931ea52f24d2ee0756cf81c9b5c51a",
+    "edge_status_lines": [
+      "EDGE_ENABLED: on",
+      "EDGE_MODE: split",
+      "EDGE_STRENGTH: 0.450",
+      "EDGE_SPREAD: 38",
+      "EDGE_ROTATION: faithful",
+      "EDGE_SPATIAL: uniform",
+      "EDGE_DUAL: split"
+    ],
+    "scene_fields": {
+      "edge_enabled": true,
+      "edge_mode": "split",
+      "edge_strength": 0.45,
+      "master_brightness": 1.0,
+      "primary_mode": 32,
+      "primary_palette": "ABSENT_FROM_DUMP",
+      "sample_rate": 12800,
+      "samples_per_chunk": 96,
+      "scene_surface": "dump+secondary_status+edge_status",
+      "secondary_enabled": true,
+      "secondary_mode": 7,
+      "secondary_palette": 40,
+      "transition_max_duration_ms": 3000,
+      "transition_state": "settled_inferred"
+    },
+    "secondary_status_lines": [
+      "SECONDARY_ENABLED: true",
+      "SECONDARY_CONTROL: false (encoders control primary channel)",
+      "SECONDARY_MODE: 7 (WAVEFORM-FAST)",
+      "SECONDARY_PHOTONS: 1.000000",
+      "SECONDARY_CHROMA: 0.000000",
+      "SECONDARY_MOOD: 0.100000",
+      "SECONDARY_SATURATION: 1.000000",
+      "SECONDARY_PRISM_COUNT: 1.00",
+      "SECONDARY_MIRROR_ENABLED: true",
+      "SECONDARY_REVERSE_ORDER: false",
+      "SECONDARY_BASE_COAT: false",
+      "SECONDARY_PALETTE_MODE_ENABLED: true",
+      "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)",
+      "NOTE: This command is deprecated, please use secondary_status instead"
+    ],
+    "show_state_lines": []
+  },
+  "scene_status_sha256": "d9ea534a11aca3c725dbc4a1ba00e7c87901995f38265bd0e8d9316ab209addc",
+  "schema_ver": 2,
+  "serial_identity": {
+    "description": "USB JTAG/serial debug unit",
+    "device": "/dev/cu.usbmodem12401",
+    "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:89:B4 LOCATION=0-1.2.4",
+    "location": "0-1.2.4",
+    "manufacturer": "Espressif",
+    "pid": 4097,
+    "product": "USB JTAG/serial debug unit",
+    "serial_number": "B4:3A:45:A5:89:B4",
+    "vid": 12346
+  },
+  "serial_session_id": "serial-f25b1ad9706ab57a4b9e",
+  "silence_rows": 460,
+  "source_contract_novelty_decimation": 3,
+  "source_contract_sample_rate": 12800,
+  "source_contract_samples_per_chunk": 96,
+  "stage_attribution_admissible": true,
+  "stage_attribution_applicable": true,
+  "stage_coverage_failure_count": 0,
+  "stage_detail": 1,
+  "stage_detail_full_row_count": 460,
+  "stage_detail_minimal_row_count": 0,
+  "stage_duration_consistency_failure_count": 0,
+  "stage_duration_missing_count": 0,
+  "stage_header_mode_mismatch_count": 0,
+  "stage_nonempty_failure_count": 0,
+  "stage_schema_versions": [
+    2
+  ],
+  "stage_tail_total_mismatch_count": 0,
+  "stage_timestamp_order_failure_count": 0,
+  "stage_timing_missing_count": 0,
+  "stage_timing_row_count": 460,
+  "start_ms": 0,
+  "timestamp_identity_row_count": 460,
+  "timestamp_order_failure_count": 0,
+  "timestamp_regression_count": 0,
+  "timestamp_regressions_first10": [],
+  "timing_envelope_admissible": true,
+  "timing_us": {
+    "acquire_sample_chunk_non_read_residual_elapsed_us": {
+      "max": 908.0,
+      "median": 683.5,
+      "min": 372.0,
+      "p5": 391.85,
+      "p95": 834.05,
+      "p99": 870.8199999999999
+    },
+    "acquire_sample_chunk_total_elapsed_us": {
+      "max": 946.0,
+      "median": 717.5,
+      "min": 398.0,
+      "p5": 426.0,
+      "p95": 881.1999999999998,
+      "p99": 920.41
+    },
+    "active_ap_work_elapsed_us": {
+      "max": 12215.0,
+      "median": 9615.0,
+      "min": 8546.0,
+      "p5": 8900.5,
+      "p95": 11601.75,
+      "p99": 12061.509999999998
+    },
+    "audio_snapshot_elapsed_us": {
+      "max": 276.0,
+      "median": 179.5,
+      "min": 99.0,
+      "p5": 102.0,
+      "p95": 255.0,
+      "p99": 261.0
+    },
+    "calculate_novelty_elapsed_us": {
+      "max": 86.0,
+      "median": 38.0,
+      "min": 19.0,
+      "p5": 21.0,
+      "p95": 63.0,
+      "p99": 74.0
+    },
+    "emitted_active_ap_work_elapsed_us": {
+      "max": 12215.0,
+      "median": 11160.0,
+      "min": 8796.0,
+      "p5": 10448.15,
+      "p95": 11988.05,
+      "p99": 12160.9
+    },
+    "i2s_read_elapsed_us": {
+      "max": 65.0,
+      "median": 33.0,
+      "min": 20.0,
+      "p5": 24.950000000000003,
+      "p95": 55.0,
+      "p99": 58.0
+    },
+    "musical_saliency_elapsed_us": {
+      "max": 199.0,
+      "median": 116.0,
+      "min": 51.0,
+      "p5": 59.0,
+      "p95": 172.04999999999995,
+      "p99": 194.0
+    },
+    "newest_sample_to_ap_publish_us": {
+      "max": 11941.0,
+      "median": 9315.0,
+      "min": 8301.0,
+      "p5": 8621.6,
+      "p95": 11308.449999999999,
+      "p99": 11782.51
+    },
+    "oldest_sample_to_ap_publish_us": {
+      "max": 19362.0,
+      "median": 16736.0,
+      "min": 15722.0,
+      "p5": 16042.6,
+      "p95": 18729.449999999997,
+      "p99": 19203.51
+    },
+    "onset_elapsed_us": {
+      "max": 1068.0,
+      "median": 808.0,
+      "min": 479.0,
+      "p5": 520.0,
+      "p95": 1031.05,
+      "p99": 1058.0499999999997
+    },
+    "post_gdft_service_elapsed_us": {
+      "max": 195.0,
+      "median": 109.0,
+      "min": 63.0,
+      "p5": 73.70000000000002,
+      "p95": 169.0,
+      "p99": 188.40999999999997
+    },
+    "post_i2s_vu_sweet_spot_elapsed_us": {
+      "max": 103.0,
+      "median": 58.0,
+      "min": 24.0,
+      "p5": 27.0,
+      "p95": 86.0,
+      "p99": 95.2299999999999
+    },
+    "post_publication_complete_loop_tail_elapsed_us": {
+      "max": 352.0,
+      "median": 205.0,
+      "min": 111.0,
+      "p5": 127.9,
+      "p95": 295.04999999999995,
+      "p99": 317.40999999999997
+    },
+    "pre_gdft_entry_overhead_elapsed_us": {
+      "max": 33.0,
+      "median": 8.0,
+      "min": 4.0,
+      "p5": 5.0,
+      "p95": 20.0,
+      "p99": 25.0
+    },
+    "pre_i2s_controls_service_elapsed_us": {
+      "max": 109.0,
+      "median": 62.0,
+      "min": 31.0,
+      "p5": 41.95,
+      "p95": 90.04999999999995,
+      "p99": 102.0
+    },
+    "pre_snapshot_config_elapsed_us": {
+      "max": 34.0,
+      "median": 16.0,
+      "min": 5.0,
+      "p5": 7.0,
+      "p95": 23.049999999999955,
+      "p99": 29.0
+    },
+    "process_GDFT_elapsed_us": {
+      "max": 7564.0,
+      "median": 7164.5,
+      "min": 6413.0,
+      "p5": 6630.95,
+      "p95": 7521.099999999999,
+      "p99": 7544.82
+    },
+    "process_GDFT_kernel_elapsed_us": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "p5": null,
+      "p95": null,
+      "p99": null
+    },
+    "process_GDFT_post_processing_elapsed_us": {
+      "max": null,
+      "median": null,
+      "min": null,
+      "p5": null,
+      "p95": null,
+      "p99": null
+    },
+    "tempo_acf_elapsed_us": {
+      "max": 1227.0,
+      "median": 687.0,
+      "min": 153.0,
+      "p5": 182.0,
+      "p95": 1042.0,
+      "p99": 1199.0
+    },
+    "tempo_emit_elapsed_us": {
+      "max": 2604.0,
+      "median": 1628.0,
+      "min": 922.0,
+      "p5": 1164.0,
+      "p95": 2232.0,
+      "p99": 2448.0
+    },
+    "tempo_phase_elapsed_us": {
+      "max": 103.0,
+      "median": 57.0,
+      "min": 31.0,
+      "p5": 32.0,
+      "p95": 87.0,
+      "p99": 98.86999999999978
+    },
+    "tempo_pre_timed_history_scale_and_gate_elapsed_us": {
+      "max": 166.0,
+      "median": 95.5,
+      "min": 0.0,
+      "p5": 59.25,
+      "p95": 129.35,
+      "p99": 145.94
+    },
+    "tempo_publish_elapsed_us": {
+      "max": 51.0,
+      "median": 16.0,
+      "min": 7.0,
+      "p5": 7.0,
+      "p95": 27.0,
+      "p99": 49.0
+    },
+    "tempo_silence_elapsed_us": {
+      "max": 260.0,
+      "median": 152.5,
+      "min": 79.0,
+      "p5": 82.0,
+      "p95": 228.0,
+      "p99": 252.0
+    },
+    "tempo_total_elapsed_us": {
+      "max": 2688.0,
+      "median": 27.5,
+      "min": 13.0,
+      "p5": 14.0,
+      "p95": 2171.1000000000004,
+      "p99": 2378.33
+    },
+    "tempo_update_elapsed_us": {
+      "max": 1086.0,
+      "median": 739.0,
+      "min": 498.0,
+      "p5": 528.0,
+      "p95": 1056.0,
+      "p99": 1077.0
+    },
+    "total_ap_loop_elapsed_us": {
+      "max": 12254.0,
+      "median": 9647.5,
+      "min": 8577.0,
+      "p5": 8938.0,
+      "p95": 11635.699999999997,
+      "p99": 12102.1
+    }
+  },
+  "track_file": "/Users/spectrasynq/Music/Music/Media.localized/Music/Ahmed Spins_Stevo Atambire/Anchor Point EP/Anchor Point.mp3",
+  "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938",
+  "transition_inference_basis": {
+    "device_settled_field_available": false,
+    "minimum_mutation_free_pre_roll_ms": 10000,
+    "no_scene_mutation_through_buffered_done": true,
+    "transition_max_duration_ms": 3000,
+    "transition_state": "settled_inferred"
+  },
+  "unique_ap_core_id": [
+    0
+  ],
+  "unique_dma_desc_num": [
+    3
+  ],
+  "unique_dma_frame_num": [
+    96
+  ],
+  "unique_sample_rate": [
+    12800
+  ],
+  "unique_samples_per_chunk": [
+    96
+  ],
+  "unique_slot_bit_width": [
+    32
+  ],
+  "unique_slot_mode": [
+    2
+  ],
+  "unique_stage": [
+    0
+  ],
+  "unique_vp_core_id": [
+    1
+  ]
+}

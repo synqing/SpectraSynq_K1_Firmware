@@ -872,6 +872,16 @@ void k1_edgemixer_set_config(const K1EdgeMixerConfig& config) {
       break;
   }
 
+  // Complementary rotation is fixed θ = π. Mirror applies +θ / −θ, and
+  // cos(π) = cos(−π) with sin(π) = sin(−π) = 0, so both strips bake the
+  // same matrix (zero edge separation while EDGE_DUAL still says mirror).
+  // Coerce to SPLIT: complementary colour stays, both edges stay active,
+  // separation becomes ±π/2. REVERT = delete this block.
+  if (next.mode == K1_EDGE_MIXER_COMPLEMENTARY &&
+      next.dualEdge == K1_EDGE_DUAL_MIRROR) {
+    next.dualEdge = K1_EDGE_DUAL_SPLIT;
+  }
+
   // Per-strip rotation-angle factors for the dual-edge split (A lane):
   //   ONE_SIDED — secondary x1.0 (unchanged / certified), primary not applied.
   //   SPLIT     — secondary x+0.5, primary x-0.5 (centred; edge-to-edge span theta).

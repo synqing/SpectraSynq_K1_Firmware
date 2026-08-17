@@ -67,6 +67,37 @@ class EdgeMixerStaticTest(unittest.TestCase):
         hits = [pattern for pattern in forbidden if re.search(pattern, source)]
         self.assertEqual(hits, [])
 
+    def test_complementary_mirror_is_coerced_to_split(self):
+        source = read(EDGE_CPP)
+        self.assertRegex(
+            source,
+            r"next\.mode\s*==\s*K1_EDGE_MIXER_COMPLEMENTARY"
+            r"[\s\S]{0,160}next\.dualEdge\s*==\s*K1_EDGE_DUAL_MIRROR"
+            r"[\s\S]{0,160}next\.dualEdge\s*=\s*K1_EDGE_DUAL_SPLIT",
+            "set_config must coerce complementary+mirror to split before matrix bake.",
+        )
+        self.assertNotRegex(
+            source,
+            r"\bUSBSerial\b",
+            "Coerce lives in the mixer TU; serial I/O stays in serial_menu.",
+        )
+
+    def test_hotkey_y_skips_mirror_under_complementary(self):
+        menu = read(FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "serial_menu.cpp")
+        self.assertIn("serial_edge_toggle_dual_edge", menu)
+        self.assertRegex(
+            menu,
+            r"case K1_EDGE_DUAL_SPLIT:"
+            r"[\s\S]*?if \(e\.mode == K1_EDGE_MIXER_COMPLEMENTARY\)"
+            r"[\s\S]*?e\.dualEdge = K1_EDGE_DUAL_ONE_SIDED",
+            "Hotkey y must skip mirror when mode is complementary.",
+        )
+        self.assertIn("EDGE_COERCED: mirror+complementary -> split", menu)
+        self.assertNotIn("k1_edge_warn_if_collapsed", menu)
+        handlers = read(FwDir(ROOT / "SPECTRASYNQ_K1_FIRMWARE") / "serial_cmd_handlers.cpp")
+        self.assertIn("k1_edge_echo_if_coerced", handlers)
+        self.assertNotIn("k1_edge_warn_if_collapsed", handlers)
+
 
 if __name__ == "__main__":
     unittest.main()

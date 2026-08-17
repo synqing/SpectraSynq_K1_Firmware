@@ -1,0 +1,55 @@
+{
+  "schema": "archify.living_map.receipt.v1",
+  "map_id": "k1-runtime.architecture",
+  "diagram_type": "architecture",
+  "archify_pin": "2.14.0",
+  "archify_skill_root": "/Users/spectrasynq/.cursor/skills/archify",
+  "authored_at": "2026-08-17T10:11:10Z",
+  "repository": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware",
+    "name": "SpectraSynq_K1_Firmware",
+    "git_sha": "b18068dbb72ddc3585f77d26e3312215e6e0d02d",
+    "remote": "https://github.com/synqing/SpectraSynq_K1_Firmware.git"
+  },
+  "artefacts": {
+    "json": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/architecture/archify/k1-runtime.architecture.json",
+    "html": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/architecture/archify/k1-runtime.architecture.html",
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/architecture/archify/k1-runtime.architecture.receipt.json"
+  },
+  "validate": {
+    "ok": true,
+    "quality_profile": "showcase",
+    "composition_errors": 0,
+    "composition_warnings": 0,
+    "artifact_checks": 9
+  },
+  "deliver": {
+    "ok": true,
+    "specification": {
+      "sha256": "a998f8e4a267319cd49d99582d489d3f63fdf1c9103b8a76bfdd0d0f0718897a",
+      "bytes": 6577
+    },
+    "artifact": {
+      "sha256": "71121a6f7628908886f366c514503200c69fb48e9ae4e88be2f3b697e789a6a4",
+      "bytes": 642098
+    }
+  },
+  "visual_check": {
+    "ok": true,
+    "status": "pass",
+    "visualReview": "pending",
+    "containment": "pass",
+    "sidecars": {
+      "receipt": "k1-runtime.architecture.visual-check.json",
+      "contactSheet": "k1-runtime.architecture.visual-check.html"
+    },
+    "png_inspected": "/Users/spectrasynq/SpectraSynq_K1_Firmware/docs/architecture/archify/k1-runtime.architecture.visual-check.1440x900.light.png"
+  },
+  "pixel_inspect": {
+    "verdict": "PASS",
+    "craft_claim": "Mic\u2192Core0\u2192SBAudioSnapshot\u2192Core1\u2192LEDs is the obvious main path; control ingress sits above.",
+    "notes": "Read 1440x900 light PNG: dual-core boundary, main audio path, Operator I/O + AP WebSocket\u2192Control Facade\u2192Core1, LittleFS side path all legible. SUBJECT_RECOGNISABLE for K1 runtime topology.",
+    "inspected_at": "2026-08-17T10:11:10Z",
+    "inspector": "cto-agent"
+  }
+}

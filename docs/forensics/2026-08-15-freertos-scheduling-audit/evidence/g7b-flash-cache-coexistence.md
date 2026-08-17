@@ -3,9 +3,11 @@
 **Date:** 2026-08-17
 
 ```text
-G7B_HOST          = WIRED
-G7B_DEVICE        = PENDING_B489_G7B_FLASH
-F887              = OFFSITE_CONSULTANCY (G8 deferred until a replacement main unit exists)
+G7B_HOST          = CLOSED
+G7B_DEVICE        = CLOSED
+G7B_FLASH         = B489A500 k1_bench_im69d @ 1d457740 epoch 1786962873
+G7B_CAPTAIN       = SAVE_PARK_PASS_2026-08-17
+F887              = OFFSITE_CONSULTANCY (G8 production flash deferred until a replacement main unit exists)
 REVERT            = delete -DK1_PERSIST_PARK_V1=1 from [env:k1_hardware]
 ```
 
@@ -21,24 +23,15 @@ Shipping `k1_hardware` (and inheriting `k1_bench_im69d`) now compiles the existi
 
 Host: `tests/test_k1_persist_park_static.py` plus the existing persist-boundary test.
 
-## Device proof still owed (named `B489_G7B_FLASH` only)
+## Device proof (Captain 2026-08-17)
 
-Record measurement, not intention, on bench `B489A500` / `k1_bench_im69d`:
+Captain save-park PASS on bench `B489A500` / `k1_bench_im69d` @ `1d457740` (epoch `1786962873`): setting change, ~5 s debounce, lights parked then resumed, config survived reboot, music look held vs G3.
 
-```text
-cache-disable behaviour during a real flash write
-render and cache safety while the write is in flight
-park acknowledgement from the render owner before the write begins
-measured write duration / park ack
-AP discontinuity across the write
-config survives reboot
-```
-
-A red rolls back flash servicing (delete the park flag and restore the last known-good bench binary) without invalidating G7A.
+Named residuals (not required to close G7B): instrumented write-duration histogram, cache-disable trace, AP discontinuity across the write. G5 causal remains `NOT_PROVEN`.
 
 ## Ship path
 
-1. Already: G2+G3 on bench `k1_bench_im69d` @ `c671ddf3`; G7B park in `k1_hardware` source on this branch.
-2. Agent: host/build green, then named bench flash of the G7B HEAD to `B489A500` only (`B489_G7B_FLASH`).
-3. Captain: confirm a real config save parks lights, write completes, lights resume, config survives reboot.
-4. G8 waits until Captain has a replacement main unit, then a separate `F887_PRODUCTION_FLASH`. That flash is shipped.
+1. Already: G2+G3+G7B CLOSED on bench `k1_bench_im69d` @ `1d457740` epoch `1786962873`.
+2. Agent: G8 host integration (manifest, full suite, rollback artefact). No flash.
+3. Captain: when a replacement main unit exists, issue `F887_PRODUCTION_FLASH`.
+4. Agent: named production flash of that unit. **That flash is shipped.**

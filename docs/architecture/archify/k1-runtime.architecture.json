@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "K1 Firmware Runtime",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/synqing/SpectraSynq_K1_Firmware.git",
+      "revision": "1d45774059c3967fcb5e9e853f0105a7e2a28cf6"
+    },
+    "views": [
+      {
+        "id": "mic-to-led",
+        "label": "Mic to LED path",
+        "focus": ["mic", "core0_audio", "snapshot", "core1_render", "leds"],
+        "note": "Primary perceptual path: I2S capture and GDFT on Core 0, snapshot handoff, Core 1 render to dual strips."
+      },
+      {
+        "id": "control-ingress",
+        "label": "Control ingress",
+        "focus": ["operator_io", "ap_ws", "control", "core1_render"],
+        "note": "Serial, encoders, and AP WebSocket feed the control facade; render stays on Core 1."
+      },
+      {
+        "id": "persist",
+        "label": "Persistence",
+        "focus": ["control", "persistence", "core1_render"],
+        "note": "LittleFS holds chip-keyed CONFIG, noise cal, and presets beside the live path."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "mic",
+      "type": "external",
+      "label": "MEMS Mic",
+      "sublabel": "I2S / PDM",
+      "pos": [40, 340],
+      "size": [120, 56],
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 107, "label": "Core0 audio" }
+      ]
+    },
+    {
+      "id": "core0_audio",
+      "type": "backend",
+      "label": "Core 0 Audio",
+      "sublabel": "I2S · GDFT · onset",
+      "pos": [230, 340],
+      "size": [150, 64],
+      "tag": "AP path",
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 107, "end_line": 109, "label": "Runtime arch" },
+        { "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.h", "line": 26, "label": "GDFT Core0" }
+      ]
+    },
+    {
+      "id": "snapshot",
+      "type": "messagebus",
+      "label": "SBAudioSnapshot",
+      "sublabel": "portMUX spinlock",
+      "pos": [460, 340],
+      "size": [150, 56],
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 110, "label": "Cross-core" }
+      ]
+    },
+    {
+      "id": "core1_render",
+      "type": "backend",
+      "label": "Core 1 Render",
+      "sublabel": "led_thread · effects",
+      "pos": [700, 340],
+      "size": [150, 64],
+      "tag": "VP path",
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 108, "end_line": 112, "label": "led_thread" }
+      ]
+    },
+    {
+      "id": "leds",
+      "type": "external",
+      "label": "LED Strips",
+      "sublabel": "2×160 WS2812",
+      "pos": [920, 340],
+      "size": [130, 56],
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 80, "label": "LED output" }
+      ]
+    },
+    {
+      "id": "operator_io",
+      "type": "frontend",
+      "label": "Operator I/O",
+      "sublabel": "Serial · M5ROTATE8",
+      "pos": [500, 60],
+      "size": [150, 56],
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 81, "end_line": 82, "label": "LIVE ingress" }
+      ]
+    },
+    {
+      "id": "ap_ws",
+      "type": "cloud",
+      "label": "AP WebSocket",
+      "sublabel": "k1_wireless /ws",
+      "pos": [500, 180],
+      "size": [150, 56],
+      "tag": "AP-only",
+      "sources": [
+        { "path": "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino", "line": 68, "label": "WS ingress" },
+        { "path": "SPECTRASYNQ_K1_FIRMWARE/network/k1_wireless.h", "line": 7, "end_line": 10, "label": "AP API" }
+      ]
+    },
+    {
+      "id": "control",
+      "type": "backend",
+      "label": "Control Facade",
+      "sublabel": "commands · show state",
+      "pos": [700, 120],
+      "size": [150, 56],
+      "sources": [
+        { "path": "SPECTRASYNQ_K1_FIRMWARE/control/k1_control_facade.h", "line": 1, "label": "Facade" }
+      ]
+    },
+    {
+      "id": "persistence",
+      "type": "database",
+      "label": "LittleFS",
+      "sublabel": "CONFIG · presets",
+      "pos": [920, 120],
+      "size": [130, 56],
+      "sources": [
+        { "path": "docs/architecture/firmware-capability-overview.md", "line": 85, "label": "Persistence" }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "ESP32-S3 FreeRTOS dual-core",
+      "wraps": ["core0_audio", "snapshot", "core1_render", "control", "persistence", "ap_ws"]
+    },
+    {
+      "kind": "security-group",
+      "label": "Control ingress",
+      "wraps": ["operator_io", "ap_ws", "control"]
+    }
+  ],
+  "connections": [
+    { "id": "mic-to-audio", "from": "mic", "to": "core0_audio", "label": "I2S samples", "variant": "emphasis" },
+    { "id": "audio-to-snap", "from": "core0_audio", "to": "snapshot", "label": "publish", "variant": "emphasis" },
+    { "id": "snap-to-render", "from": "snapshot", "to": "core1_render", "label": "consume", "variant": "emphasis" },
+    { "id": "render-to-leds", "from": "core1_render", "to": "leds", "label": "FastLED.show", "variant": "emphasis" },
+    { "id": "operator-to-control", "from": "operator_io", "to": "control", "label": "commands" },
+    { "id": "ws-to-control", "from": "ap_ws", "to": "control", "label": "WS cmds", "variant": "dashed" },
+    {
+      "id": "control-to-render",
+      "from": "control",
+      "to": "core1_render",
+      "label": "mode / params",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 48
+    },
+    { "id": "control-to-fs", "from": "control", "to": "persistence", "label": "deferred save", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Main path",
+      "items": [
+        "Core 0 owns I2S capture, GDFT, and snapshot publish",
+        "Core 1 owns led_thread, effects, Smart-Director, and FastLED.show",
+        "Cross-core handoff is a single portMUX-guarded SBAudioSnapshot"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Control surfaces",
+      "items": [
+        "USB serial and M5ROTATE8 are LIVE operator ingress",
+        "AP-only WebSocket (k1_wireless) is command ingress, not the perceptual path",
+        "Control facade feeds render params and show state"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Evidence",
+      "items": [
+        "Grounded in firmware-capability-overview.md and live module headers",
+        "Revision pinned to source git SHA at map authoring",
+        "Optional WS sequence omitted to keep this architecture map sparse"
+      ]
+    }
+  ]
+}

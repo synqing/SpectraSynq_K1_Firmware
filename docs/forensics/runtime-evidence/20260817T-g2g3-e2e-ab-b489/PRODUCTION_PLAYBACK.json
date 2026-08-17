@@ -1,0 +1,47 @@
+{
+  "G2_DEVICE": "NOT_CLOSED",
+  "experiment": "B489_PRODUCTION_TERRITORY_PLAYBACK",
+  "identity": {
+    "env": "k1_bench_im69d",
+    "epoch": "1786903366",
+    "git": "e911f86d",
+    "version": "40103"
+  },
+  "music": {
+    "bpm_mean": 114.95798319327731,
+    "conf_mean": 0.6840336134453782,
+    "lock_frac": 0.44537815126050423,
+    "max_raw_max": 3969.0,
+    "max_raw_mean": 1244.2689075630253,
+    "max_raw_min": 100.0,
+    "n": 119,
+    "silence_frac": 0.05042016806722689
+  },
+  "music_s": 120,
+  "music_tail": [
+    "[AP] SSL=259 DC=-53 max_raw=974 follower=1378 peak_scaled=0.468 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=789 rms_raw=0.0131 pky=1.61 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=123.0 conf=0.95 lock=1 phase=0.18 beat=0 bstr=0.70 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=48 raw_i16_rms=24.5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.917 agc_gain=1.142 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.135 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32",
+    "[AP] SSL=259 DC=-53 max_raw=1397 follower=1364 peak_scaled=1.022 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=1176 rms_raw=0.0233 pky=2.82 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=123.0 conf=0.94 lock=1 phase=0.34 beat=0 bstr=0.64 | onset=0 bass=1 ostr=0.09 | raw_i16_abs_peak=74 raw_i16_rms=40.5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.867 agc_gain=1.351 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.148 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32",
+    "[AP] SSL=259 DC=-53 max_raw=3076 follower=2734 peak_scaled=1.195 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=2688 rms_raw=0.0695 pky=2.59 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=123.0 conf=0.94 lock=1 phase=0.31 beat=0 bstr=0.63 | onset=0 bass=1 ostr=0.20 | raw_i16_abs_peak=163 raw_i16_rms=109.8 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.848 agc_gain=1.001 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.307 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32"
+  ],
+  "not_a_p99_gate": true,
+  "output_device": "Bose Mini II SoundLink",
+  "port": "/dev/cu.usbmodem12401",
+  "quiet": {
+    "bpm_mean": 114.19047619047619,
+    "conf_mean": 0.2652380952380953,
+    "lock_frac": 0.09523809523809523,
+    "max_raw_max": 302.0,
+    "max_raw_mean": 120.71428571428571,
+    "max_raw_min": 34.0,
+    "n": 21,
+    "silence_frac": 0.2857142857142857
+  },
+  "quiet_s": 20,
+  "quiet_tail": [
+    "[AP] SSL=259 DC=-53 max_raw=283 follower=259 peak_scaled=0.089 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=269 rms_raw=0.0076 pky=1.29 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=111.0 conf=0.71 lock=1 phase=0.04 beat=0 bstr=0.02 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=12 raw_i16_rms=10.5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=3.148 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.001 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32",
+    "[AP] SSL=259 DC=-53 max_raw=110 follower=259 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=129 rms_raw=0.0000 pky=1.37 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=111.0 conf=0.70 lock=1 phase=0.88 beat=0 bstr=0.05 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=3 raw_i16_rms=2.3 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=3.135 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32",
+    "[AP] SSL=259 DC=-53 max_raw=72 follower=259 peak_scaled=0.000 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=81 rms_raw=0.0000 pky=2.11 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=111.0 conf=0.48 lock=0 phase=0.75 beat=0 bstr=0.10 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=1 raw_i16_rms=0.6 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=3.977 agc_env=0.000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32"
+  ],
+  "track_sha256": "02925982cf3900d1925fa0338db8e26432c265f7ca18ee93a06818dd4079a938",
+  "usb_serial": "B4:3A:45:A5:89:B4"
+}

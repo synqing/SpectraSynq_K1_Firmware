@@ -99,6 +99,8 @@ struct K1EdgeMixerConfig {
   // second primary-angle coefficient set applied via k1_edgemixer_apply_primary().
   // The default member initialiser guarantees every construction path defaults to
   // ONE_SIDED even where fields are set individually; sanitised again on set.
+  // Complementary + MIRROR is coerced to SPLIT in set_config (θ = π makes
+  // +θ/−θ the same hue). Analogous / triadic / tetradic still accept MIRROR.
   K1EdgeMixerDualEdge dualEdge = K1_EDGE_DUAL_ONE_SIDED;
 };
 

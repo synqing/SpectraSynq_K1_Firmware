@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-17 EdgeMixer dead-cell coerce
+
+```text
+session_objective:       Implement approved EdgeMixer coerce: complementary+mirror → split at set_config; honest echo; hotkey y skip; tests+k1_hardware; no flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 1d457740 dirty (prior G8/docs).
+branch_head_at_end:      same HEAD; colour unit uncommitted (no commit authorised).
+files_changed:           k1_edgemixer.cpp/.h coerce; serial_menu echo+y skip; serial_cmd_handlers; test_edgemixer_static; serial_struct golden+MANIFEST. No platformio.ini. No G8 mix.
+commands_run:            pytest 1355 passed, 1 skipped; pio-build k1_hardware SUCCESS (704178 flash bytes). No upload.
+validation_results:      Host gate GREEN. Silicon unchanged (bench still G8 HEAD 1d457740 until named GO).
+evidence_captured:       none on device. Colour unit is source+host only.
+blockers:                none for host land. Device needs named B489_EDGE_COERCE_FLASH.
+generated_files_ignored: prior e2e/archify untracked left alone.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this unit.
+thinking_skill_used:     Type 2 coerce already decided in attached plan; no new architecture fork.
+skills_used:             ship-path-required; Agent OS (no firmware edit outside scoped unit).
+specialists_used:        none.
+claude_mem_observations: on-disk source is authority; silicon still 1d457740.
+next_recommended_action: Captain commit if wanted; named B489_EDGE_COERCE_FLASH for bench silicon. Do not flash F887.
+```
+
+---
+
 ## Session Report — 2026-08-17 G2 CLOSED, G3–G7A wired on branch
 
 ```text

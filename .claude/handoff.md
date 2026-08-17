@@ -23,8 +23,8 @@ explicit audio task remains conditional.
 - Rolling ACF / scheduler theatre are out of programme.
 
 **Silicon (2026-08-17):** bench K1v2 `B489A500` on
-`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `c671ddf3`**
-(epoch `1786912321`, G3 sidecar freeze). Live `:build` confirmed.
+`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `1d457740`**
+(epoch `1786962873`, G7B persist park, Captain save-park PASS). Live `:build` confirmed.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
 consultancy / development). No F887 flash is possible until Captain has a
@@ -32,12 +32,16 @@ replacement unit. G8 is deferred, not cancelled.
 
 **G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on `e911f86d`).
 **G3 = CLOSED** (Captain perceptual PASS 2026-08-17 on `c671ddf3`).
-**G4 / G6 / G7A = CLOSED in source.** G5 causal = NOT_PROVEN (named).
-**This phase (G2–G3 device + G3–G7A host) is LOCKED. G7B park is wired in source.**
+**G7B = CLOSED** (Captain save-park PASS 2026-08-17 on `1d457740`).
+**G8 host = GREEN** (pytest 1353 passed / 1 skipped; `k1_hardware` SUCCESS;
+bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
+**G8 device surface = bench `B489A500` (Captain 2026-08-17). No reflash.**
 
 **Ship path after this lock:**
-1. **G7B is wired in source.** Next named action = `B489_G7B_FLASH` of that HEAD to bench `B489A500` only, then Captain confirms a real config save parks / resumes / survives reboot.
-2. **G8 waits** until Captain has a replacement main unit, then a separate `F887_PRODUCTION_FLASH` GO. That flash is shipped.
+1. **Captain:** one G8 look — music still G3, saves still park. Say PASS or FAIL.
+2. PASS → stamp `G8_DEVICE = CLOSED`. That closes the scheduling programme on the live K1.
+3. FAIL → agent reverts the named unit on this branch.
+4. When a replacement main unit exists: Captain issues `F887_PRODUCTION_FLASH`, agent copies this HEAD. **That flash is shipped.**
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
