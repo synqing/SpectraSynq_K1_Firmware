@@ -14,7 +14,7 @@ That single verdict decides the fork:
 
 ## Device
 
-Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d_wfhyb_fade` @ `836fde39`** epoch `1786987759` (`B489_WFHYB_EDGE_FLASH`: origin deposit + modes 33–37 + `K1_EDGE_PALETTE_HONOUR_V1`). Main `F887A500` is offsite. No cal. No erase.
+Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d` @ `573206c0`** epoch `1787004384` (`B489_WFHYB_PROMOTE`: origin deposit + modes 33–37 + `K1_EDGE_PALETTE_HONOUR_V1` on the home env). Main `F887A500` is offsite. No cal. No erase.
 
 **Edge crush: ON THIS SILICON.** Dual-edge SPLIT still ships ON. With `:palette_mode=on`, EdgeMixer hue rotation on both channels is skipped (palette samples reach the strip). Confirm the primary is no longer crushed **with `edge_enabled` left ON** — do not A/B with it off, that would hide the gate. Chromatic (non-palette) channels still rotate; leave `/` (palette) on.
 
@@ -47,19 +47,18 @@ Do **not** replay modes 8 or 18 for this fork. Do **not** sweep `:tune` knobs (t
 mode 7 is lively from the same chromagram on the same silicon; mode 32 averages
 the 12 bins into one centroid coordinate. See `LEVER.md`.
 
-Levers now ON silicon @ `836fde39`:
+Levers now ON silicon @ `573206c0` (`k1_bench_im69d`):
 - Mode 11 origin deposit (`K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`).
-- Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — bench-only modes 33–37.
+- Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — modes 33–37.
 - EdgeMixer palette honour (`K1_EDGE_PALETTE_HONOUR_V1`) — primary crush gate.
 
 ## Verdict (Captain 2026-08-18 late) — KEEP ALL 33–37
 
 **Keep em.** Do not fold a single winner into mode 32. Modes 33–37 stay as their own lightshow modes (FLUX / NOTE / WIDE / SUM / STEP). Mode 32 remains the centroid control.
 
-Edge-honour and mode-11 origin deposit stay on this silicon (`836fde39`).
-**B489_WFHYB_PROMOTE (Captain 2026-08-18):** those three levers ride
-`k1_bench_im69d` so a home-env restore no longer drops them. Overlay env
-becomes an alias. `k1_hardware` stays off-flag.
+**B489_WFHYB_PROMOTE CLOSED on silicon** — stamp
+`IDENTITY OK: git=573206c0 env=k1_bench_im69d epoch=1787004384`.
+Overlay env is an alias. `k1_hardware` stays off-flag.
 
 ## Next A/B (after the trail flash)
 
