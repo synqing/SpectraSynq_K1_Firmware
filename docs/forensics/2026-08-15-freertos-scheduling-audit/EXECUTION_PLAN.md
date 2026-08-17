@@ -28,13 +28,13 @@ active_task_plan: docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.m
 | 0 content | AMENDED | absolute `ap_service_p99_max_us: 8000`; 0.8 fraction struck |
 | 1 | PARTIAL | B489 smoke stands; F887 baseline still absent — does not block G2 close-out or G3 host work |
 | 2 | CLOSED | Cross40+Lane4 on `k1_hardware`; B489 `k1_bench_im69d` @ `e911f86d`; Captain eyes-on PASS 2026-08-17 |
-| 3 | HOST_CLOSED | coherent frame + sidecar freeze; lock-margin capture not taken |
+| 3 | CLOSED | sidecar freeze on `c671ddf3`; Captain perceptual PASS 2026-08-17 |
 | 4 | HOST_CLOSED | command channels wired for dual-scene publish/apply |
 | 5 | PARTIAL | startup ratchet wired; causal trace NOT_PROVEN |
 | 6 | NOT_REQUIRED | tail tracks GDFT, not service scheduling |
 | 7A | CLOSED | persist request boundary, no filesystem |
-| 7B | NOT_STARTED | needs `B489_G7B_FLASH` |
-| 8 | OPEN | needs `F887_PRODUCTION_FLASH` GO |
+| 7B | NEXT | real persist/cache on bench `B489A500` only |
+| 8 | DEFERRED | main K1 `F887A500` OFFSITE until a replacement unit exists |
 
 ```text
 EXECUTION_MODE                    = SEQUENTIAL_SINGLE_LANE

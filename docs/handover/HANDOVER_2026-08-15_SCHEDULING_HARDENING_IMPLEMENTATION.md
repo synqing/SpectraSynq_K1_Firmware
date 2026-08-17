@@ -1,5 +1,5 @@
 ---
-abstract: "ACTIVE. Captain 2026-08-16 evening restamp: AP service p99 ≤ 8000 µs (6 ms / 0.8 fraction STRUCK). Hop remains 12.8 kHz/96/d3/7.5 ms (stamp A: no 10 ms hop). Gate 2 close-out = Cross40+Lane4 on k1_hardware. Gate 3 UNBLOCKED after G2 close-out. Live plan: docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md. G0R cadence plan SUPERSEDED for live execution. AP-input P4 remains open. AP0/VP1 locked. F887 flash NO until G8 separate GO."
+abstract: "ACTIVE. G2+G3 CLOSED 2026-08-17 on bench k1_bench_im69d @ c671ddf3. Next = G7B on B489. Main K1 F887A500 OFFSITE (consultancy) — G8 deferred until a replacement unit. Hop 7.5 ms, AP service p99 8000 µs. AP0/VP1 locked."
 status: active
 branch: feat/k1-scheduling-generation-hardening
 active_lane: K1_SCHEDULING_HARDENING_20260815
@@ -15,9 +15,10 @@ g0_oracle_implementation: CLOSED
 g0_contract_content: AMENDED_SERVICE_P99_8000
 g2_product_selection: CROSS40_PLUS_LANE4_CLOSE_OUT
 g2_service: CLOSE_OUT_P99_8000
-g3: UNBLOCKED_AFTER_G2_CLOSE_OUT
+g3: CLOSED
+g7b: NEXT_ON_B489
+f887_flash: DEFERRED_UNIT_OFFSITE
 b489_flash: NAMED_GATES_ONLY_SEPARATE_GO
-f887_flash: NO_UNTIL_G8
 harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
 final_abba_toolchain_pin_sha: c1aba345603bc2cacc8cf30648768d346f572779
 deployed_contract_sha256: 8b0f5b31000d5dec27aecbdb84505f24ad5e0711a7fc8460827b13dde26df2cc
@@ -98,20 +99,22 @@ G1_F887_PRODUCTION           = ABSENT
 G2_GDFT_CONTRACT             = CROSS40_PLUS_LANE4_CLOSE_OUT
 G2_SERVICE                   = CLOSED
 G2_DEVICE                    = CLOSED
-G3                           = HOST_CLOSED
+G3                           = CLOSED
 G6                           = NOT_REQUIRED
+G7A                          = CLOSED
+G7B                          = NEXT_ON_B489
 B489_FLASH                   = NAMED_GATES_ONLY_SEPARATE_GO
-F887_FLASH                   = NO_UNTIL_G8
+F887_FLASH                   = DEFERRED_UNIT_OFFSITE
+F887_UNIT                    = OFFSITE_CONSULTANCY_2026_08_17
 DEPLOYED_CONTRACT_SHA256     = 8b0f5b31000d5dec27aecbdb84505f24ad5e0711a7fc8460827b13dde26df2cc
 LIVE_TASK_PLAN               = docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md
 G0R_PLAN                     = SUPERSEDED_FOR_LIVE_EXECUTION
 ```
 
-G2 is CLOSED on bench `k1_bench_im69d` @ `e911f86d`. Next firmware units on
-this branch are already in source (G3 sidecar freeze, G4 scene apply, G5
-ratchet, G7A request mailbox). Remaining device work: named `B489_G3_FLASH`
-(lock-margin), named `B489_G7B_FLASH` (real persist/cache), then G8 + separate
-`F887_PRODUCTION_FLASH` GO. Do **not** start rolling ACF.
+G2–G3 device and G3–G7A host are LOCKED (Captain 2026-08-17). Main K1
+`F887A500` is **OFFSITE** (consultancy / development) until a replacement
+unit exists. Next firmware unit: G7B real persist/cache on bench `B489A500`
+only. Do **not** start rolling ACF. Do **not** attempt F887 flash.
 
 Historical Cross0/40/80 matrix and
 `docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/` remain admissible

@@ -23,15 +23,21 @@ explicit audio task remains conditional.
 - Rolling ACF / scheduler theatre are out of programme.
 
 **Silicon (2026-08-17):** bench K1v2 `B489A500` on
-`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `e911f86d`**
-(epoch `1786903366`). Live `:build` confirmed. F887 not flashed.
+`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `c671ddf3`**
+(epoch `1786912321`, G3 sidecar freeze). Live `:build` confirmed.
 
-**G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on that binary).
+**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
+consultancy / development). No F887 flash is possible until Captain has a
+replacement unit. G8 is deferred, not cancelled.
 
-**Ship path after G2 (G3–G7A now in source on this branch):**
-1. Named `B489_G3_FLASH` GO for lock-margin capture of the sidecar-freeze binary.
-2. Named `B489_G7B_FLASH` GO for real persist/cache coexistence (G5 causal trace can ride the same named-GO capture if the trace env is specified).
-3. G8 + separate Captain GO flashes main K1 (`F887A500`). That is main-unit ship.
+**G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on `e911f86d`).
+**G3 = CLOSED** (Captain perceptual PASS 2026-08-17 on `c671ddf3`).
+**G4 / G6 / G7A = CLOSED in source.** G5 causal = NOT_PROVEN (named).
+**This phase (G2–G3 device + G3–G7A host) is LOCKED.**
+
+**Ship path after this lock:**
+1. **Next phase = G7B on the bench only** (`B489_G7B_FLASH`). Real save-to-flash / cache park. Agent runs it on `B489A500`.
+2. **G8 waits** until Captain has a replacement main unit, then a separate `F887_PRODUCTION_FLASH` GO. That flash is shipped.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
