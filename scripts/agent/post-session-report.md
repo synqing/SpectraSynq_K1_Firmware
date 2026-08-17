@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-17 B489_WFHYB_FADE_FLASH
+
+```text
+session_objective:       Flash k1_bench_im69d_wfhyb_fade to B489 only under Captain B489_WFHYB_FADE_FLASH; stamp registry.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 45afaee1.
+branch_head_at_end:      same HEAD; docs stamp committed if gate allows.
+files_changed:           device-build-registry.md; .claude/handoff.md; LEVER.md; CAPTAIN_AB_CARD.md; post-session-report.md.
+commands_run:            session-bootstrap PASS (WARN dirty registry); k1-flash-verified k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401.
+validation_results:      FLASHED AND VERIFIED. IDENTITY OK git=45afaee1 env=k1_bench_im69d_wfhyb_fade epoch=1786978486. Guard: 12401 = B489A500. 1101 and F887 not flashed. No cal. No erase.
+evidence_captured:       live :build after flash. Registry §2 current row.
+blockers:                none for flash. Captain 7↔11↔32 eyes-on is the close.
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     runtime-target-source-truth (port 12401 vs 1101).
+skills_used:             Agent OS; spec-recall; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain 7↔11↔32 on this binary. PASS/FAIL mode 11 liveliness. Restore G7B = k1_bench_im69d @ 1d457740.
+```
+
+---
+
 ## Session Report — 2026-08-17 palette utilisation 7↔11↔32 fork
 
 ```text

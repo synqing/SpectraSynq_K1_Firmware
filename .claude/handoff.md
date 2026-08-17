@@ -22,9 +22,10 @@ explicit audio task remains conditional.
 - B489 flash only under named GO tokens; F887 NO until G8.
 - Rolling ACF / scheduler theatre are out of programme.
 
-**Silicon (2026-08-17):** bench K1v2 `B489A500` on
-`/dev/cu.usbmodem12401` is running **`k1_bench_im69d` @ `1d457740`**
-(epoch `1786962873`, G7B persist park, Captain save-park PASS). Live `:build` confirmed.
+**Silicon (2026-08-17 evening):** bench K1v2 `B489A500` on
+`/dev/cu.usbmodem12401` is running **`k1_bench_im69d_wfhyb_fade` @ `45afaee1`**
+(epoch `1786978486`, Captain `B489_WFHYB_FADE_FLASH`). Live `:build` confirmed.
+G7B/G8 binary `k1_bench_im69d @ 1d457740` is OFF this unit until restore.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
 consultancy / development). No F887 flash is possible until Captain has a
@@ -35,13 +36,14 @@ replacement unit. G8 is deferred, not cancelled.
 **G7B = CLOSED** (Captain save-park PASS 2026-08-17 on `1d457740`).
 **G8 host = GREEN** (pytest 1353 passed / 1 skipped; `k1_hardware` SUCCESS;
 bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
-**G8 device surface = bench `B489A500` (Captain 2026-08-17). No reflash.**
+**G8 device surface = bench `B489A500`, but not this binary.** Restore
+`k1_bench_im69d @ 1d457740` under a named GO before a G8 look.
 
 **Ship path after this lock:**
-1. **Captain:** one G8 look — music still G3, saves still park. Say PASS or FAIL.
-2. PASS → stamp `G8_DEVICE = CLOSED`. That closes the scheduling programme on the live K1.
-3. FAIL → agent reverts the named unit on this branch.
-4. When a replacement main unit exists: Captain issues `F887_PRODUCTION_FLASH`, agent copies this HEAD. **That flash is shipped.**
+1. **Captain:** 7 ↔ 11 ↔ 32 on this fade binary, same track, `:palette_mode=on`. Say whether mode 11 is now lively.
+2. PASS → this look A/B is closed on bench. Promoting the flag onto `k1_hardware` is a separate named GO.
+3. FAIL → named restore `k1_bench_im69d` @ `1d457740`.
+4. After the A/B: named restore of G7B if still overwritten, then Captain G8 look. When a replacement main unit exists: Captain issues `F887_PRODUCTION_FLASH`. **That flash is shipped.**
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

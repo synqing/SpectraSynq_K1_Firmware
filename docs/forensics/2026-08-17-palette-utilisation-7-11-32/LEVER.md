@@ -1,5 +1,5 @@
 ---
-abstract: "Mode 11 reluctant. One lever chosen: active-trail fade turnover behind K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1. Mode 32 and classic waveform untouched. No flash."
+abstract: "Mode 11 reluctant. One lever on silicon: active-trail fade turnover behind K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1. Mode 32 and classic waveform untouched. B489_WFHYB_FADE_FLASH verified."
 date: 2026-08-17
 ---
 
@@ -29,7 +29,9 @@ Not picked: seed-radius shrink (would erase hybrid's signature), mode-32 RGB EMA
 
 ## Ship path
 
-1. Host gate: pytest + `pio-build k1_hardware` (this change).
-2. **Captain** names `B489_WFHYB_FADE_FLASH`.
-3. **Agent** flashes `k1_bench_im69d_wfhyb_fade` to `B489A500` only.
-4. **Captain** repeats 7 ↔ 11 ↔ 32. Stamp is the flash row in `docs/hardware/device-build-registry.md` plus PASS/FAIL on mode 11 liveliness.
+1. Host gate: pytest + `pio-build k1_hardware` — done (`45afaee1`).
+2. **Captain** named `B489_WFHYB_FADE_FLASH` — done.
+3. **Agent** flashed `k1_bench_im69d_wfhyb_fade` to `B489A500` only — done.
+   `IDENTITY OK: git=45afaee1 env=k1_bench_im69d_wfhyb_fade epoch=1786978486`.
+4. **Captain** repeats 7 ↔ 11 ↔ 32. PASS/FAIL on mode 11 liveliness is the close.
+   Restore G7B: reflash `k1_bench_im69d` @ `1d457740`.
