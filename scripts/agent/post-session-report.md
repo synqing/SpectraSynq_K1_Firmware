@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-18 edge_enabled primary crush → palette-honour fix
+
+```text
+session_objective:       Captain: edge_enabled colour-crushes the primary — bug or algorithm flaw? Diagnose, then Captain GO: apply the fix.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 1be4930a + docs stamp.
+branch_head_at_end:      edge-fix commit (platformio.ini + test + docs).
+files_changed:           platformio.ini (wfhyb env + K1_EDGE_PALETTE_HONOUR_V1 with rationale); tests/test_wfhyb_k1_variant_pack_static.py (+pin test); CAPTAIN_AB_CARD.md (known defect + workaround); handoff (finding + ship path); this report.
+commands_run:            pytest full 1369 passed / 1 skipped; pio-build k1_bench_im69d_wfhyb_fade SUCCESS. No upload.
+validation_results:      Initial compounding/feedback theory REFUTED by source read: every trail mode seeds/stores its history at render time, pre-transform (apply_brightness would compound identically otherwise). Actual mechanism = convicted P5.A side-door: dual-edge SPLIT (shipping default, gate-2 2026-07-09) hue-rotates the palette-authored PRIMARY buffer post-render at the mirrored angle. The measured fix (K1_EDGE_PALETTE_HONOUR_V1, 2026-08-13) was stranded in k1_bench_im69d_colourfix and absent from every binary this lane flashed. Now rides the wfhyb env. Chromatic channels keep the rotation by design.
+evidence_captured:       k1_edgemixer.cpp:1098-1111 primary honour gate (in-code conviction + measured fingerprint); handoff EdgeMixer paragraph; A/B card defect note.
+blockers:                fix is in source + built, NOT on silicon — needs a named flash GO.
+generated_files_ignored: none new.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash without named GO.
+thinking_skill_used:     scientific method — mode-7/brightness control refuted the compounding hypothesis before any code was cut.
+skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine (edge/VP path).
+specialists_used:        none.
+claude_mem_observations: on-disk handoff is authority.
+next_recommended_action: Captain names the edge-fix flash GO (B489, k1_bench_im69d_wfhyb_fade). Until then A/B with :edge_enabled=off.
+```
+
+---
+
 ## Session Report — 2026-08-18 B489 trail-deposit + variant-pack flash
 
 ```text

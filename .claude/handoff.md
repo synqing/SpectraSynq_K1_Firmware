@@ -34,6 +34,20 @@ Prior round: fade-turnover @ `45afaee1` FAILED (centre colour flash); mode-32
 sheet diagnosed VP-side (centroid collapse), NOT AP.
 G7B/G8 binary `k1_bench_im69d @ 1d457740` is OFF this unit until restore.
 
+**EdgeMixer primary crush (Captain 2026-08-18): FIX IN SOURCE, NOT ON SILICON.**
+`edge_enabled` colour-crushes the primary because dual-edge SPLIT (shipping
+default) hue-rotates the palette-authored primary buffer post-render — the
+convicted P5.A side-door, NOT a compounding/feedback bug (trail modes seed and
+store their history pre-transform, so nothing compounds). The measured fix
+`K1_EDGE_PALETTE_HONOUR_V1` (2026-08-13, stranded in `k1_bench_im69d_colourfix`)
+now rides `k1_bench_im69d_wfhyb_fade`; it skips both edge rotations while a
+palette owns that channel. Chromatic channels keep the rotation (that split IS
+the effect). Lands on the next `B489_WFHYB_*` flash; until then run the A/B with
+`:edge_enabled=off`. Pinned by
+`tests/test_wfhyb_k1_variant_pack_static.py::test_edge_palette_honour_rides_the_bench_env`.
+Production promotion stays gated by `test_colour_fix_flags_static.py` (needs
+Captain eyes-on + the colour-fix promotion plan, NOT this lane).
+
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
 consultancy / development). No F887 flash is possible until Captain has a
 replacement unit. G8 is deferred, not cancelled.
@@ -50,14 +64,19 @@ bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
 1. ~~Captain names the flash~~ **DONE 2026-08-18** — Captain approved; agent
    committed `1be4930a` (gate green: 1368 pytest, `k1_hardware` SUCCESS),
    flashed `k1_bench_im69d_wfhyb_fade` to `B489A500` only, stamped the registry.
-2. **Captain (NOW):** cycle 7 ↔ 11 ↔ 32 ↔ 33 ↔ 34 ↔ 35 ↔ 36 ↔ 37 (same track/palette;
+2. **Captain:** name the edge-fix flash GO (same env `k1_bench_im69d_wfhyb_fade`,
+   now + `K1_EDGE_PALETTE_HONOUR_V1`; gate green, built). **Agent** flashes via
+   `k1-flash-verified.sh`, stamps the registry. Until that flash, A/B with
+   `:edge_enabled=off`.
+3. **Captain:** cycle 7 ↔ 11 ↔ 32 ↔ 33 ↔ 34 ↔ 35 ↔ 36 ↔ 37 (same track/palette;
    card: `docs/forensics/2026-08-17-palette-utilisation-7-11-32/CAPTAIN_AB_CARD.md`).
    Verdicts: PASS/FAIL on 11's trail; pick (or reject-all) among 33–37 for
-   mode 32's colour engine.
-3. A pick → **agent** ports the winner into mode 32 behind its own flag; a
+   mode 32's colour engine; confirm `edge_enabled` no longer crushes the primary
+   under palette mode.
+4. A pick → **agent** ports the winner into mode 32 behind its own flag; a
    later named `k1_hardware` promotion GO + F887 replacement flash is the
    production stamp.
-4. FAIL or stop → named restore `k1_bench_im69d` @ `1d457740`, then G8 look. F887 stays offsite until `F887_PRODUCTION_FLASH`.
+5. FAIL or stop → named restore `k1_bench_im69d` @ `1d457740`, then G8 look. F887 stays offsite until `F887_PRODUCTION_FLASH`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

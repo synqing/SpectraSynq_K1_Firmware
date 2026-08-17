@@ -14,7 +14,9 @@ That single verdict decides the fork:
 
 ## Device
 
-Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d_wfhyb_fade` @ `45afaee1`** epoch `1786978486` (`B489_WFHYB_FADE_FLASH`). Main `F887A500` is offsite. No cal. No erase.
+Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d_wfhyb_fade` @ `1be4930a`** epoch `1786984083` (`B489_WFHYB_TRAIL_FLASH`: mode-11 origin deposit + modes 33–37). Main `F887A500` is offsite. No cal. No erase.
+
+**Known defect on this silicon (Captain 2026-08-18): `edge_enabled` colour-crushes the primary.** Dual-edge SPLIT is the shipping default, so the EdgeMixer hue-rotates the palette-authored primary buffer post-render (convicted P5.A side-door). Fix `K1_EDGE_PALETTE_HONOUR_V1` is now in this env in source — it lands on the NEXT flash. Until then run the A/B with `:edge_enabled=off` (or accept the crush as a known artefact; it does not change the 7/11/32-37 colour-strategy ranking because all modes are crushed equally).
 
 This env does **not** define `K1_EFFECT_REGISTRY_V1`, so `set_mode` takes the **ordinal** (7 / 11 / 32), not a dense menu index.
 

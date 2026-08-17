@@ -102,6 +102,19 @@ class WfhybK1VariantPackStaticTest(unittest.TestCase):
         # And it rides the same env as the mode-11 trail-deposit lever.
         self.assertIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", env_block)
 
+    def test_edge_palette_honour_rides_the_bench_env(self):
+        """Captain 2026-08-18: edge_enabled colour-crushed the PRIMARY channel.
+        Root cause is the convicted P5.A side-door — dual-edge SPLIT (shipping
+        default) hue-rotates the palette-authored primary buffer post-render.
+        The measured fix (K1_EDGE_PALETTE_HONOUR_V1, 2026-08-13) was stranded
+        in env:k1_bench_im69d_colourfix and never rode this lane's flashes.
+        Pin it to the wfhyb bench env so the fix cannot silently drop off the
+        next binary (HF-56 class: a fix that isn't in the flag chain never
+        lands)."""
+        env_block = PLATFORMIO.split("[env:k1_bench_im69d_wfhyb_fade]", 1)[1]
+        env_block = env_block.split("[env:", 1)[0]
+        self.assertIn("-DK1_EDGE_PALETTE_HONOUR_V1", env_block)
+
     def test_original_mode_32_untouched(self):
         self.assertNotIn(FLAG, ORIGINAL)
         self.assertNotIn("wfhyb_variant", ORIGINAL)
