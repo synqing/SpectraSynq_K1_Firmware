@@ -48,6 +48,7 @@
 #include "system.h"           // Watch how fast I can check if settings were updated... yada yada..
 #include "GDFT.h"             // Conversion to (and post-processing of) frequency data! (hey, something cool!)
 #include "k1_audio_snapshot.h" // Smart Visual Engine AP snapshot (post-VU/GDFT/novelty)
+#include "k1_authored_source.h" // PRSM authored ingress (one snapshot writer)
 #include "k1_onset_beat.h"    // Smart Visual Engine AP onset/beat event lane
 #ifdef K1_AUDIO_FRAME_V1
 #include "k1_audio_frame.h"
@@ -1064,7 +1065,26 @@ void loop() {
       ap_cadence_stage_timing.snapshot_start_us = (uint64_t)esp_timer_get_time();
     }
 #endif
-    k1_audio_snapshot_update(t_now);
+    k1_authored_tick(t_now);
+    if (k1_authored_suppresses_live_update()) {
+      k1_authored_intent_t authored;
+      if (k1_authored_intent(&authored)) {
+        K1AudioSnapshot next = {};
+        next.frame_ms = authored.frame_ms;
+        next.peak_scaled = authored.peak_scaled;
+        next.vu_level = authored.vu_level;
+        next.novelty = authored.novelty;
+        next.spectral_energy = authored.spectral_energy;
+        next.low_energy = authored.low_energy;
+        next.mid_energy = authored.mid_energy;
+        next.high_energy = authored.high_energy;
+        next.chroma_strength = 0.0f;
+        next.silence = authored.silence;
+        k1_audio_snapshot_publish(next);
+      }
+    } else {
+      k1_audio_snapshot_update(t_now);
+    }
     const K1AudioSnapshot k1_audio_snapshot = k1_audio_snapshot_read();
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
     if (ap_cadence_timing_active) {
@@ -1419,8 +1439,13 @@ void led_thread(void* arg) {
       vp_perf_stage_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
 #endif
-      get_smooth_spectrogram();
-      make_smooth_chromagram();
+      if (k1_authored_suppresses_live_update()) {
+        /* AUTHORED: freeze Core-1 chroma/spectrum so Ember hue is palette-only. */
+        memset(chromagram_smooth, 0, sizeof(chromagram_smooth));
+      } else {
+        get_smooth_spectrogram();
+        make_smooth_chromagram();
+      }
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running && vp_perf_stage_start_us != 0) {
         vp_perf_record(vp_perf.smooth, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));

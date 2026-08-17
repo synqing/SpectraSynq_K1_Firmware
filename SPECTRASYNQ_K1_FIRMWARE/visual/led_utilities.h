@@ -12,6 +12,7 @@
 #include "k1_vp_audio_access.h"
 #ifdef K1_DROP_CUT_V1
 #include "k1_audio_snapshot.h" // drop-cut detector reads the published AP snapshot (Core-1 read idiom)
+#include "k1_authored_source.h" // AUTHORED must not apply live drop-cut policy
 #endif
 #if ENABLE_VPAB_PROBE
 #include "vpab_capture.h"
@@ -426,7 +427,11 @@ inline void apply_brightness() {
   silent_scale = 1.0f;
 #endif
 #ifdef K1_DROP_CUT_V1
-  drop_cut_update();
+  if (k1_authored_suppresses_live_update()) {
+    drop_cut_scale = 1.0f;
+  } else {
+    drop_cut_update();
+  }
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale * SQ15x16(drop_cut_scale);
 #else
   SQ15x16 brightness = MASTER_BRIGHTNESS * photons_curve * silent_scale;

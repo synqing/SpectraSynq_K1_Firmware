@@ -43,6 +43,8 @@ bool k1_show_state_load() { return false; }
 void vp_run_output_probe() {}
 void vp_print_secondary_state() {}
 K1AudioSnapshot k1_audio_snapshot_read() { return {}; }
+void k1_audio_snapshot_update(uint32_t) {}
+void k1_audio_snapshot_publish(const K1AudioSnapshot&) {}
 bool benchmark_running = false;
 uint32_t benchmark_start_time = 0;
 uint32_t system_fps_sum = 0;

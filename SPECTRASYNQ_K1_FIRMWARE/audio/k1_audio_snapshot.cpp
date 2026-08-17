@@ -116,6 +116,10 @@ void k1_audio_snapshot_update(uint32_t frame_ms) {
   k1_stm_process(k1_stm_spectrum, (uint8_t)NUM_FREQS, silence, &next.stm);
 #endif
 
+  k1_audio_snapshot_publish(next);
+}
+
+void k1_audio_snapshot_publish(const K1AudioSnapshot& next) {
   portENTER_CRITICAL(&k1_audio_snapshot_mux);
   k1_audio_snapshot_current = next;
   portEXIT_CRITICAL(&k1_audio_snapshot_mux);

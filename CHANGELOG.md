@@ -6,6 +6,11 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ## [Unreleased]
 
+### Added
+
+- **PRISM authored ingress (option A):** 34-byte PRSM parser and magic-first byte scanner (`audio/k1_prsm.*`), source arbitration STANDALONE/AUTHORED/RECOVERY (`audio/k1_authored_source.*`, freshness **50 ms**), and `k1_audio_snapshot_publish()` as the single store write. `check_serial()` demuxes PRSM before immediate hotkeys (`P`/`R`/`S` collide with magic `PRSM`). Live microphone update is suppressed while authored is fresh; stale frames hand back to the live snapshot, not USB-bridge GPIO fallback. AUTHORED freezes Core-1 chromagram and forces drop-cut scale to 1. Host gate: `tests/test_authored_ingress_native.py`. No second renderer. No eFuse / erase_flash.
+- **First silicon proof** on bench `B489A500` (`/dev/cu.usbmodem12401`, USB serial `B4:3A:45:A5:89:B4`), env `k1_bench_im69d`, firmware `feb472ba`. Ember 16 pinned. Three G5 fixture streams: snapshot `SMART_AUDIO_ENERGY` = 1.0 while authored full-scale pressure held; stale >50 ms returned to live energy; no watchdog reset. Harness: `scripts/agent/k1_authored_silicon_proof.py`. Typed commands must use `:cmd` (bare `smart_status` hits hotkeys).
+
 ### Removed
 - **BREAKING — `global.standby_dimming` struck from every operator surface**
   (2026-08-11, Captain order 2026-08-09). Removed from the BLE-MIDI/WebSocket

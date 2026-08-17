@@ -75,6 +75,10 @@ bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
 
+**Merge 2026-08-18:** `origin/main` PRISM authored ingress (`3fc8cd8f`) is in this
+tree (`k1_prsm` + `k1_authored_source`). Live snapshot update is suppressed while
+authored is fresh. That does not change G2/G3 close or the wfhyb overlay ship path.
+
 Physical proof still requires exact device identity, guarded environment pairing and
 Captain-confirmed acoustic conditions.
 

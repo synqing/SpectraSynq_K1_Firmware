@@ -58,6 +58,7 @@ SNAPSHOT_STUB = r"""
 #include "k1_audio_snapshot.h"
 static K1AudioSnapshot g_snap = {};
 void k1_audio_snapshot_update(uint32_t frame_ms) { g_snap.frame_ms = frame_ms; }
+void k1_audio_snapshot_publish(const K1AudioSnapshot& next) { g_snap = next; }
 K1AudioSnapshot k1_audio_snapshot_read() { return g_snap; }
 // host-test entry points used by the driver to inject a snapshot
 extern "C" void host_set_snapshot_frame_ms(uint32_t ms) { g_snap.frame_ms = ms; }

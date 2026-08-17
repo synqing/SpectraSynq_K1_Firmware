@@ -39,6 +39,8 @@ MODULE_CPPS = [
     "serial/serial_cmd_handlers.cpp",
     "serial/serial_menu.cpp",
     "serial/serial_typed_dispatch.cpp",
+    "audio/k1_prsm.cpp",
+    "audio/k1_authored_source.cpp",
     "director/k1_smart_director.cpp",
     "director/k1_edgemixer.cpp",
     "director/k1_visual_hooks.cpp",

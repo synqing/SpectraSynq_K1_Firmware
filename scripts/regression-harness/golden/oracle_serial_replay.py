@@ -126,6 +126,8 @@ MODULE_CPPS = [
                                        # calls serial_cmd_dispatch_pure_setter() here;
                                        # the golden must reproduce byte-for-byte (the
                                        # identity IS the S4 behaviour-preservation proof).
+    "audio/k1_prsm.cpp",
+    "audio/k1_authored_source.cpp",
     "serial/serial_menu.cpp",          # M2.1 R1: out-of-line home for serial_menu.h's
                                        # non-inline defs (ODR-bomb kill). The driver
                                        # #includes serial_menu.h (now the prototypes for
@@ -520,6 +522,8 @@ bool k1_show_state_load() { return false; }
 void vp_run_output_probe() {}
 void vp_print_secondary_state() {}
 K1AudioSnapshot k1_audio_snapshot_read() { K1AudioSnapshot s = {}; return s; }
+void k1_audio_snapshot_update(uint32_t) {}
+void k1_audio_snapshot_publish(const K1AudioSnapshot&) {}
 
 // benchmark / FPS-stream globals: serial_menu.h declares these extern (real
 // storage is in the .ino TU). Provide host storage so the FPS-stream branches link.
