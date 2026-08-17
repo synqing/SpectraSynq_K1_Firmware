@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-18 B489 trail-deposit + variant-pack flash
+
+```text
+session_objective:       Captain approved flash. Commit both levers, flash k1_bench_im69d_wfhyb_fade to B489 only, stamp registry.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 5830bea3 dirty.
+branch_head_at_end:      1be4930a (levers committed through gate) + docs stamp commit.
+files_changed:           commit 1be4930a = 18 files (both levers, tests, goldens, docs). Post-flash stamp: device-build-registry.md; .claude/handoff.md; post-session-report.md.
+commands_run:            commit gate: pytest 1368 passed / 1 skipped + pio k1_hardware SUCCESS. k1-flash-verified k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401 (attempt 1 EBUSY — Cursor Serial Monitor held tty.usbmodem12401; Captain closed it; attempt 2 SUCCESS).
+validation_results:      FLASHED AND VERIFIED. IDENTITY OK git=1be4930a env=k1_bench_im69d_wfhyb_fade epoch=1786984083. Guard: 12401 = B489A500. 1101 and F887 not touched. No cal. No erase.
+evidence_captured:       Registry §2 current row @ 1be4930a; 45afaee1 row superseded.
+blockers:                none for flash. Captain 7↔11↔32↔33-37 eyes-on is the close.
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     runtime-target-source-truth (port EBUSY → holder identified via lsof before any kill; no process killed).
+skills_used:             Agent OS; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain cycles 7↔11↔32↔33..37 on this binary: PASS/FAIL 11 trail + pick among 33-37. Restore = k1_bench_im69d @ 1d457740.
+```
+
+---
+
 ## Session Report — 2026-08-17 mode-32 sheet verdict → variant comparison pack
 
 ```text
