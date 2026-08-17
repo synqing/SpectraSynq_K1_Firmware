@@ -33,10 +33,10 @@ replacement unit. G8 is deferred, not cancelled.
 **G2 = CLOSED** (Captain eyes-on PASS 2026-08-17 on `e911f86d`).
 **G3 = CLOSED** (Captain perceptual PASS 2026-08-17 on `c671ddf3`).
 **G4 / G6 / G7A = CLOSED in source.** G5 causal = NOT_PROVEN (named).
-**This phase (G2–G3 device + G3–G7A host) is LOCKED.**
+**This phase (G2–G3 device + G3–G7A host) is LOCKED. G7B park is wired in source.**
 
 **Ship path after this lock:**
-1. **Next phase = G7B on the bench only** (`B489_G7B_FLASH`). Real save-to-flash / cache park. Agent runs it on `B489A500`.
+1. **G7B is wired in source.** Next named action = `B489_G7B_FLASH` of that HEAD to bench `B489A500` only, then Captain confirms a real config save parks / resumes / survives reboot.
 2. **G8 waits** until Captain has a replacement main unit, then a separate `F887_PRODUCTION_FLASH` GO. That flash is shipped.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone

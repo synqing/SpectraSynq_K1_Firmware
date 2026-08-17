@@ -1,5 +1,5 @@
 ---
-abstract: "ACTIVE. G2+G3 CLOSED 2026-08-17 on bench k1_bench_im69d @ c671ddf3. Next = G7B on B489. Main K1 F887A500 OFFSITE (consultancy) — G8 deferred until a replacement unit. Hop 7.5 ms, AP service p99 8000 µs. AP0/VP1 locked."
+abstract: "ACTIVE. G2+G3 CLOSED 2026-08-17 on bench k1_bench_im69d @ c671ddf3. G7B park wired in source; device proof pending B489_G7B_FLASH. Main K1 F887A500 OFFSITE (consultancy) — G8 deferred until a replacement unit. Hop 7.5 ms, AP service p99 8000 µs. AP0/VP1 locked."
 status: active
 branch: feat/k1-scheduling-generation-hardening
 active_lane: K1_SCHEDULING_HARDENING_20260815
@@ -16,7 +16,7 @@ g0_contract_content: AMENDED_SERVICE_P99_8000
 g2_product_selection: CROSS40_PLUS_LANE4_CLOSE_OUT
 g2_service: CLOSE_OUT_P99_8000
 g3: CLOSED
-g7b: NEXT_ON_B489
+g7b: HOST_WIRED_DEVICE_PENDING
 f887_flash: DEFERRED_UNIT_OFFSITE
 b489_flash: NAMED_GATES_ONLY_SEPARATE_GO
 harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
@@ -102,7 +102,7 @@ G2_DEVICE                    = CLOSED
 G3                           = CLOSED
 G6                           = NOT_REQUIRED
 G7A                          = CLOSED
-G7B                          = NEXT_ON_B489
+G7B                          = HOST_WIRED_DEVICE_PENDING
 B489_FLASH                   = NAMED_GATES_ONLY_SEPARATE_GO
 F887_FLASH                   = DEFERRED_UNIT_OFFSITE
 F887_UNIT                    = OFFSITE_CONSULTANCY_2026_08_17
@@ -111,10 +111,11 @@ LIVE_TASK_PLAN               = docs/superpowers/plans/2026-08-16-scheduling-hard
 G0R_PLAN                     = SUPERSEDED_FOR_LIVE_EXECUTION
 ```
 
-G2–G3 device and G3–G7A host are LOCKED (Captain 2026-08-17). Main K1
-`F887A500` is **OFFSITE** (consultancy / development) until a replacement
-unit exists. Next firmware unit: G7B real persist/cache on bench `B489A500`
-only. Do **not** start rolling ACF. Do **not** attempt F887 flash.
+G2–G3 device and G3–G7A host are LOCKED (Captain 2026-08-17). G7B park is
+**wired in source** (`K1_PERSIST_PARK_V1` on `k1_hardware`). Device proof is
+the next named bench flash (`B489_G7B_FLASH`) on `B489A500` only. Main K1
+`F887A500` is **OFFSITE** until a replacement unit exists. Do **not** start
+rolling ACF. Do **not** attempt F887 flash.
 
 Historical Cross0/40/80 matrix and
 `docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/` remain admissible

@@ -183,6 +183,7 @@ void save_config() {
       USBSerial.print(config_filename);
       USBSerial.println(" for writing!");
     }
+    unlock_leds();
     return;
   } else {
     file.seek(0);
@@ -276,6 +277,7 @@ void load_config() {
       USBSerial.println(" for reading!");
     }
     k1_apply_boot_palette_lock();
+    unlock_leds();
     return;
   }
 
@@ -363,6 +365,7 @@ void save_ambient_noise_calibration() {
     if (debug_mode) {
       USBSerial.println("Failed to open file for writing!");
     }
+    unlock_leds();
     return;
   }
 
@@ -405,6 +408,7 @@ void load_ambient_noise_calibration() {
     if (debug_mode) {
       USBSerial.println("Failed to open file for reading!");
     }
+    unlock_leds();
     return;
   }
 

@@ -1,6 +1,6 @@
 # Gate 8 — Promotion readiness
 
-**Status:** `DEFERRED` — G2–G7A locked on branch and bench; G7B is the next bench phase; main K1 is offsite.
+**Status:** `DEFERRED` — G2–G7A locked on branch and bench; G7B park is wired in source; device proof pending `B489_G7B_FLASH`; main K1 is offsite.
 
 ## Included units (this HEAD series)
 
@@ -18,7 +18,7 @@
 G2_DEVICE               = CLOSED (bench B489)
 G3_DEVICE_PERCEPTUAL    = CLOSED (c671ddf3)
 G5_CAUSAL_TRACE         = NOT_PROVEN
-G7B                     = NEXT_ON_B489
+G7B                     = HOST_WIRED_DEVICE_PENDING
 F887_UNIT               = OFFSITE_CONSULTANCY_2026_08_17
 F887_FLASH              = DEFERRED until a replacement main unit exists
 TEN_MS_AP_HOP           = still NO

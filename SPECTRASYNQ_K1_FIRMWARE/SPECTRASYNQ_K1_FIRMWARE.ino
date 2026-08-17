@@ -1279,11 +1279,12 @@ void led_thread(void* arg) {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
     esp_task_wdt_reset();  // N2: feed the render-task watchdog each frame
 #endif
-#ifdef K1_EFFECT_FRAMEWORK_V1
+#ifdef K1_LED_PARK_V1
     // CL-1 ack-barrier: when the flash/preset path requests a halt, park here at
-    // frame-top and publish the acknowledgement BEFORE touching any PSRAM. The
-    // framework render reads/writes PSRAM, which faults during a flash-write
-    // cache-disable window; parking guarantees we are idle for that window.
+    // frame-top and publish the acknowledgement BEFORE touching any PSRAM.
+    // Render (and framework PSRAM) faults during a flash-write cache-disable
+    // window; parking guarantees we are idle for that window. G7B compiles this
+    // on shipping k1_hardware via K1_PERSIST_PARK_V1 without the effect framework.
     // Self-heal watchdog: a missed unlock_leds() (e.g. an early-return on the
     // flash path) must NEVER freeze the show. If parked far longer than any
     // legitimate flash-write window, force-resume — no LittleFS/NVS write runs

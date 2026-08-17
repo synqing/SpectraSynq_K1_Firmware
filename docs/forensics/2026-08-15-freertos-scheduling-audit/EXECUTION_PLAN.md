@@ -33,7 +33,7 @@ active_task_plan: docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.m
 | 5 | PARTIAL | startup ratchet wired; causal trace NOT_PROVEN |
 | 6 | NOT_REQUIRED | tail tracks GDFT, not service scheduling |
 | 7A | CLOSED | persist request boundary, no filesystem |
-| 7B | NEXT | real persist/cache on bench `B489A500` only |
+| 7B | HOST_WIRED | park/ack on `k1_hardware` via `K1_PERSIST_PARK_V1`; device proof pending `B489_G7B_FLASH` |
 | 8 | DEFERRED | main K1 `F887A500` OFFSITE until a replacement unit exists |
 
 ```text
