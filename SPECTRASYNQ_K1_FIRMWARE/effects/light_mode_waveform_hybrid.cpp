@@ -108,10 +108,24 @@ void light_mode_waveform_hybrid(CRGB16* leds_previous, CRGB16& last_color, float
 
   float target_fade = VP_WAVEFORM_IDLE_FADE;
   if (waveform_seed_active) {
+#ifdef K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1
+    // Captain 2026-08-17: mode 11 reluctant vs FAST despite the same
+    // two-coordinate sampler. Active fade was locked in [IDLE 0.985, 0.999]
+    // under a radius-3..10 seed — sequential palette colours could not coexist.
+    // ONE lever: fade turnover. Seed geometry unchanged. FAST polarity (loud
+    // fades more) at FAST's 0.10 reduction; no IDLE floor on the active path.
+    // REVERT = delete -DK1_WAVEFORM_HYBRID_FADE_TURNOVER_V1 on the bench env.
+    static const float WFHYB_TURNOVER_FADE_REDUCTION = 0.10f;
+    float active_fade = 1.0f - (WFHYB_TURNOVER_FADE_REDUCTION * seed_level);
+    if (active_fade < 0.50f) active_fade = 0.50f;
+    if (active_fade > 0.999f) active_fade = 0.999f;
+    target_fade = active_fade;
+#else
     float active_fade = 1.0f - (VP_WAVEFORM_ACTIVE_FADE_REDUCTION * (1.0f - seed_level));
     if (active_fade < VP_WAVEFORM_IDLE_FADE) active_fade = VP_WAVEFORM_IDLE_FADE;
     if (active_fade > 0.999f) active_fade = 0.999f;
     target_fade = active_fade;
+#endif
   }
   if (target_fade < 0.0f) target_fade = 0.0f;
   if (target_fade > 0.999f) target_fade = 0.999f;

@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-17 palette utilisation 7↔11↔32 fork
+
+```text
+session_objective:       Implement the 7 FAST / 11 HYBRID / 32 HYBRID K1 causal fork: Captain A/B, no coverage harness, one lever after mode-11 verdict.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 25bec114.
+branch_head_at_end:      same HEAD; fade-turnover ifdef + bench env + tests + forensic cards uncommitted. No flash.
+files_changed:           light_mode_waveform_hybrid.cpp (K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1); platformio.ini env k1_bench_im69d_wfhyb_fade; k1_device_identities.json B489 list; tests/test_waveform_hybrid_fade_turnover_static.py; docs/forensics/2026-08-17-palette-utilisation-7-11-32/{CAPTAIN_AB_CARD,COVERAGE_GATE_RECEIPT,LEVER}.md.
+commands_run:            session-bootstrap PASS; pytest 1359 passed / 1 skipped; pio-build k1_hardware SUCCESS (704178 flash bytes). No upload.
+validation_results:      Captain mode-11 = reluctant. Lever = fade turnover only (not mode 32, not seed radius, not classic). k1_hardware off-flag. Host gate GREEN.
+evidence_captured:       A/B card, coverage receipt, lever pick. No device capture.
+blockers:                named B489_WFHYB_FADE_FLASH to put the lever on silicon.
+generated_files_ignored: none this unit.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this session.
+thinking_skill_used:     thinking-model-router → Scientific Method (mode 11 control).
+skills_used:             Agent OS; spec-recall; ship-path-required; sensorybridge-doctrine (palette clarity vs wake persistence).
+specialists_used:        none.
+claude_mem_observations: worker-runtime blocked observation_add; on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_FADE_FLASH. Agent flashes k1_bench_im69d_wfhyb_fade to B489 only. Repeat 7↔11↔32. Classic waveform stays later.
+```
+
+---
+
 ## Session Report — 2026-08-17 EdgeMixer dead-cell coerce
 
 ```text
