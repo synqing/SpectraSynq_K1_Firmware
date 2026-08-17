@@ -52,6 +52,12 @@ Levers now ON silicon @ `836fde39`:
 - Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — bench-only modes 33–37.
 - EdgeMixer palette honour (`K1_EDGE_PALETTE_HONOUR_V1`) — primary crush gate.
 
+## Verdict (Captain 2026-08-18 late) — KEEP ALL 33–37
+
+**Keep em.** Do not fold a single winner into mode 32. Modes 33–37 stay as their own lightshow modes (FLUX / NOTE / WIDE / SUM / STEP). Mode 32 remains the centroid control.
+
+Edge-honour and mode-11 origin deposit stay on this silicon (`836fde39`). They are still overlay-env flags: a restore to `k1_bench_im69d` drops all three.
+
 ## Next A/B (after the trail flash)
 
 Same track, same palette, cycle:

@@ -56,20 +56,21 @@ bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
 `k1_bench_im69d @ 1d457740` under a named GO before a G8 look.
 
 **Ship path after this lock:**
-1. ~~Captain names the trail flash~~ **DONE 2026-08-18** — `1be4930a` on B489.
-2. ~~Captain names the edge-fix flash~~ **DONE 2026-08-18** — Captain flash-NOW;
-   agent flashed `k1_bench_im69d_wfhyb_fade` @ `836fde39` to `B489A500` only.
+1. ~~Trail flash~~ **DONE** — `1be4930a`.
+2. ~~Edge-honour flash~~ **DONE** — `836fde39` on B489.
    Stamp = `IDENTITY OK: git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759`.
-3. **Captain (NOW):** with `:palette_mode=on` and `edge_enabled` ON, confirm the
-   primary is no longer colour-crushed; then cycle 7 ↔ 11 ↔ 32 ↔ 33–37
-   (card: `docs/forensics/2026-08-17-palette-utilisation-7-11-32/CAPTAIN_AB_CARD.md`).
-   Verdicts: PASS/FAIL on 11's trail; pick (or reject-all) among 33–37; PASS/FAIL
-   on the edge-honour gate.
-4. A pick → **agent** ports the winner into mode 32 behind its own flag; a
-   later named `k1_hardware` promotion GO + F887 replacement flash is the
-   production stamp. Honour-flag promotion onto `k1_hardware` is a separate
-   colour-fix plan close, not this lane.
-5. FAIL or stop → named restore `k1_bench_im69d` @ `1d457740`, then G8 look. F887 stays offsite until `F887_PRODUCTION_FLASH`.
+3. ~~Captain A/B~~ **KEEP ALL 33–37** (2026-08-18). Do not port one winner into
+   mode 32. Overlay env still holds trail-deposit + variants + honour.
+4. **Captain names `B489_WFHYB_PROMOTE`.** **Agent** un-gates 33–37 (selectable
+   off the overlay flag), rides trail-deposit + honour onto `k1_bench_im69d`
+   (this unit’s home env; honour is legal there — `k1_hardware` stays off-flag
+   until the colour-fix promotion plan). Host gate, then flash B489
+   `k1_bench_im69d` via `k1-flash-verified.sh`. Stamp =
+   `IDENTITY OK git=<new> env=k1_bench_im69d`. Then the overlay env can die.
+5. `k1_hardware` + F887 replacement flash is the production stamp (F887 offsite
+   until `F887_PRODUCTION_FLASH`). Honour onto `k1_hardware` is that same close,
+   not a silent leak. Rollback until step 4 lands: reflash this overlay
+   `@ 836fde39`, or G8 restore `k1_bench_im69d @ 1d457740`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
