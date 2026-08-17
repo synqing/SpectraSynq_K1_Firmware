@@ -1,5 +1,5 @@
 ---
-abstract: "Captain eyes-on card for the 7 FAST ↔ 11 HYBRID ↔ 32 HYBRID K1 palette-utilisation fork. Fade lever is on silicon. Repeat 7↔11↔32."
+abstract: "Captain eyes-on card for the 7 FAST ↔ 11 HYBRID ↔ 32 HYBRID K1 palette-utilisation fork. Fade-turnover FAIL (centre flash); next mode-11 lever is origin trail deposit. Mode 32 single-sheet = VP-side; next flash adds comparison-pack modes 33-37 (FLUX/NOTE/WIDE/SUM/STEP) for a cycle-and-pick A/B."
 date: 2026-08-17
 ---
 
@@ -39,4 +39,30 @@ Do **not** replay modes 8 or 18 for this fork. Do **not** sweep `:tune` knobs (t
 
 **Mode 11 = reluctant.**
 
-Fork closed: sampler is insufficient. Lever is on silicon: `k1_bench_im69d_wfhyb_fade` @ `45afaee1` epoch `1786978486` (`B489_WFHYB_FADE_FLASH`). See `LEVER.md`. Repeat 7 ↔ 11 ↔ 32.
+**Mode 11 fade-turnover = FAIL** (Captain 2026-08-17 evening). Colour novelty was a centre flash, not trail.
+
+**Mode 32 = still a single sheet** (Captain 2026-08-17 late). VP-side, not AP:
+mode 7 is lively from the same chromagram on the same silicon; mode 32 averages
+the 12 bins into one centroid coordinate. See `LEVER.md`.
+
+Next levers in source (NOT on silicon until named `B489_WFHYB_TRAIL_FLASH`):
+- Mode 11 origin deposit (`K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`).
+- Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — new bench-only modes.
+
+## Next A/B (after the trail flash)
+
+Same track, same palette, cycle:
+
+```text
+:set_mode=7     → WAVEFORM-FAST        (lively reference)
+:set_mode=11    → WAVEFORM_HYBRID      (judge: colour rides the trail?)
+:set_mode=32    → WAVEFORM HYBRID K1   (unchanged control — the sheet)
+:set_mode=33    → WFHYB K1 FLUX        (novelty-kicked palette walk)
+:set_mode=34    → WFHYB K1 NOTE        (strongest-note jumps)
+:set_mode=35    → WFHYB K1 WIDE        (4× loudness walk, lighter EMA)
+:set_mode=36    → WFHYB K1 SUM         (12-note palette sum, mode-7 idiom)
+:set_mode=37    → WFHYB K1 STEP        (golden-step band per musical event)
+```
+
+Two verdicts wanted: PASS/FAIL on mode 11's trail, and a pick (or reject-all)
+among 33–37 for mode 32's replacement colour engine.

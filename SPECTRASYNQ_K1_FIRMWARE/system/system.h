@@ -427,6 +427,11 @@ void init_system() {
   set_mode_name(30, "BEAT PULSE");
   set_mode_name(31, "BLOOM BASSTREBLE");
   set_mode_name(32, "WAVEFORM HYBRID K1");
+  set_mode_name(33, "WFHYB K1 FLUX");
+  set_mode_name(34, "WFHYB K1 NOTE");
+  set_mode_name(35, "WFHYB K1 WIDE");
+  set_mode_name(36, "WFHYB K1 SUM");
+  set_mode_name(37, "WFHYB K1 STEP");
 
   init_serial(SERIAL_BAUD);
   init_sweet_spot();

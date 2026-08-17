@@ -24,7 +24,13 @@ explicit audio task remains conditional.
 
 **Silicon (2026-08-17 evening):** bench K1v2 `B489A500` on
 `/dev/cu.usbmodem12401` is running **`k1_bench_im69d_wfhyb_fade` @ `45afaee1`**
-(epoch `1786978486`, Captain `B489_WFHYB_FADE_FLASH`). Live `:build` confirmed.
+(epoch `1786978486`, Captain `B489_WFHYB_FADE_FLASH`). Fade-turnover **FAIL**
+(centre colour flash). Mode 32 **still a single sheet** on this binary —
+diagnosed VP-side (centroid collapse), NOT AP (mode 7 lively from the same
+chromagram). In source, not on this silicon: mode-11 origin deposit
+(`K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`) + mode-32 comparison pack
+(`K1_WFHYB_M32_VARIANTS_V1`, new bench modes 33–37 FLUX/NOTE/WIDE/SUM/STEP —
+see `docs/forensics/2026-08-17-palette-utilisation-7-11-32/LEVER.md`).
 G7B/G8 binary `k1_bench_im69d @ 1d457740` is OFF this unit until restore.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17: sent to product
@@ -40,10 +46,16 @@ bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
 `k1_bench_im69d @ 1d457740` under a named GO before a G8 look.
 
 **Ship path after this lock:**
-1. **Captain:** 7 ↔ 11 ↔ 32 on this fade binary, same track, `:palette_mode=on`. Say whether mode 11 is now lively.
-2. PASS → this look A/B is closed on bench. Promoting the flag onto `k1_hardware` is a separate named GO.
-3. FAIL → named restore `k1_bench_im69d` @ `1d457740`.
-4. After the A/B: named restore of G7B if still overwritten, then Captain G8 look. When a replacement main unit exists: Captain issues `F887_PRODUCTION_FLASH`. **That flash is shipped.**
+1. **Captain** names `B489_WFHYB_TRAIL_FLASH` (one flash carries BOTH the mode-11
+   origin-deposit lever and the mode-32 variant pack 33–37).
+2. **Agent** commits (flash script refuses a dirty firmware tree), flashes
+   `k1_bench_im69d_wfhyb_fade` to `B489A500` only, stamps the registry.
+3. **Captain:** cycle 7 ↔ 11 ↔ 32 ↔ 33 ↔ 34 ↔ 35 ↔ 36 ↔ 37 (same track/palette;
+   card: `docs/forensics/2026-08-17-palette-utilisation-7-11-32/CAPTAIN_AB_CARD.md`).
+   Verdicts: PASS/FAIL on 11's trail; pick (or reject-all) among 33–37 for
+   mode 32's colour engine. A pick → agent ports the winner into mode 32 behind
+   its own flag for a later `k1_hardware` promotion GO.
+4. FAIL or stop → named restore `k1_bench_im69d` @ `1d457740`, then G8 look. F887 stays offsite until `F887_PRODUCTION_FLASH`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

@@ -403,6 +403,17 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
   } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
     // Waveform Hybrid K1: bouncing dot + trail, self-managed history.
     light_mode_waveform_hybrid_k1(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_FLUX) {
+    // Mode-32 comparison pack (33–37): same self-managed-history contract as 32.
+    light_mode_wfhyb_k1_flux(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_NOTE) {
+    light_mode_wfhyb_k1_note(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_WIDE) {
+    light_mode_wfhyb_k1_wide(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_SUM) {
+    light_mode_wfhyb_k1_sum(channel.history, *channel.effect);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_STEP) {
+    light_mode_wfhyb_k1_step(channel.history, *channel.effect);
   }
 }
 

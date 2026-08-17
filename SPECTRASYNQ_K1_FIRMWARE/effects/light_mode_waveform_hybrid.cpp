@@ -108,13 +108,10 @@ void light_mode_waveform_hybrid(CRGB16* leds_previous, CRGB16& last_color, float
 
   float target_fade = VP_WAVEFORM_IDLE_FADE;
   if (waveform_seed_active) {
-#ifdef K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1
-    // Captain 2026-08-17: mode 11 reluctant vs FAST despite the same
-    // two-coordinate sampler. Active fade was locked in [IDLE 0.985, 0.999]
-    // under a radius-3..10 seed — sequential palette colours could not coexist.
-    // ONE lever: fade turnover. Seed geometry unchanged. FAST polarity (loud
-    // fades more) at FAST's 0.10 reduction; no IDLE floor on the active path.
-    // REVERT = delete -DK1_WAVEFORM_HYBRID_FADE_TURNOVER_V1 on the bench env.
+#if defined(K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1) || defined(K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1)
+    // FAST polarity (loud fades more) at FAST's 0.10 reduction; no IDLE floor.
+    // Needed so origin-deposited colours can coexist in the outward trail.
+    // Fade-turnover ALONE (fat ASSIGN + this fade) FAILED 2026-08-17: centre flash.
     static const float WFHYB_TURNOVER_FADE_REDUCTION = 0.10f;
     float active_fade = 1.0f - (WFHYB_TURNOVER_FADE_REDUCTION * seed_level);
     if (active_fade < 0.50f) active_fade = 0.50f;
@@ -203,6 +200,14 @@ void light_mode_waveform_hybrid(CRGB16* leds_previous, CRGB16& last_color, float
           last_color.g * seed_gain * width_scale * waveform_shape_scale,
           last_color.b * seed_gain * width_scale * waveform_shape_scale
         };
+#ifdef K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1
+        // WFHYB_TRAIL_DEPOSIT_ORIGIN_ONLY: colour enters at centre and rides
+        // waveform_shift_outward. Do not ASSIGN last_color across radius 3–10 —
+        // that is a centre billboard / flash, not a trail.
+        if (r != 0) {
+          continue;
+        }
+#endif
         if (centre_left >= r) {
           leds_16[centre_left - r] = seed_color;
         }
@@ -221,6 +226,11 @@ void light_mode_waveform_hybrid(CRGB16* leds_previous, CRGB16& last_color, float
           last_color.g * seed_gain * width_scale,
           last_color.b * seed_gain * width_scale
         };
+#ifdef K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1
+        if (r != 0) {
+          continue;
+        }
+#endif
         if (centre_left >= r) {
           leds_16[centre_left - r] = seed_color;
         }

@@ -5,6 +5,50 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-17 mode-32 sheet verdict → variant comparison pack
+
+```text
+session_objective:       Captain: mode 32 still a single sheet, suspected AP-side. Diagnose; Captain redirect: build variant modes isolating each colour lever for cycle-and-pick A/B. No flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 45afaee1 dirty (trail-deposit lever).
+branch_head_at_end:      same HEAD; variant pack uncommitted alongside trail deposit.
+files_changed:           config_types.h enum 33-37 + is_enabled gate; NEW effects/light_mode_wfhyb_k1_variants.cpp (FLUX/NOTE/WIDE/SUM/STEP on verbatim m32 chassis); lightshow_modes.h decls + vp_probe dispatch/print; .ino dispatch; system.h mode names; EffectRegistry.cpp rows+companion+guards; platformio.ini K1_WFHYB_M32_VARIANTS_V1 on wfhyb env; pio-build.sh allowlist +wfhyb env; NEW tests/test_wfhyb_k1_variant_pack_static.py; ble_midi_diff golden+MANIFEST refrozen (disabled roster grew); LEVER.md; CAPTAIN_AB_CARD.md; handoff.
+commands_run:            pytest full 1367 passed / 1 skipped (after golden refreeze + wrapper-order fix); pio-build k1_hardware SUCCESS; pio-build k1_bench_im69d_wfhyb_fade SUCCESS. No upload.
+validation_results:      AP hypothesis REFUTED (mode 7 lively from same chromagram_smooth; mode 32 collapses 12 bins to centroid + loudness walk + 0.080s EMA). Pack modes compiled everywhere, unselectable off-flag; k1_hardware behaviour unchanged. Host gate GREEN.
+evidence_captured:       LEVER.md mode-32 section (mechanism + pack table); CAPTAIN_AB_CARD next-A/B script 7..37.
+blockers:                named B489_WFHYB_TRAIL_FLASH (commit first — flash script refuses dirty firmware).
+generated_files_ignored: runtime-evidence bins left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this session.
+thinking_skill_used:     thinking-model-router → Scientific Method (mode-7 control refutes AP hypothesis).
+skills_used:             sensorybridge-doctrine; k1-effect-development; ship-path-required; Agent OS.
+specialists_used:        none.
+claude_mem_observations: on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_TRAIL_FLASH. Agent commits, flashes B489 only, stamps registry. Captain cycles 7↔11↔32↔33..37: PASS/FAIL 11 trail + pick among 33-37 for mode 32.
+```
+
+---
+
+## Session Report — 2026-08-17 mode-11 fade FAIL → trail deposit
+
+```text
+session_objective:       Captain fade-turnover FAIL (centre colour flash). Replace with origin trail-deposit lever in source. No flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 5830bea3.
+branch_head_at_end:      same HEAD; trail-deposit uncommitted.
+files_changed:           light_mode_waveform_hybrid.cpp (K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1 origin-only write); platformio.ini env flag swap; tests; LEVER.md; CAPTAIN_AB_CARD.md; registry Why; handoff ship path.
+commands_run:            pytest 1359 passed / 1 skipped; pio-build k1_hardware SUCCESS. No upload.
+validation_results:      Fade-turnover FAIL. Next lever = origin deposit. k1_hardware off-flag. Host gate GREEN.
+evidence_captured:       LEVER.md FAIL + next lever. Silicon still 45afaee1 fade-turnover until named flash.
+blockers:                named B489_WFHYB_TRAIL_FLASH (commit first — flash script refuses dirty firmware).
+generated_files_ignored: runtime-evidence bins left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; no flash this unit.
+thinking_skill_used:     thinking-model-router → Scientific Method (overwrite vs origin insert).
+skills_used:             sensorybridge-doctrine; k1-effect-development; ship-path-required; Agent OS.
+specialists_used:        none.
+claude_mem_observations: on-disk LEVER.md is authority.
+next_recommended_action: Captain names B489_WFHYB_TRAIL_FLASH. Agent commits then flashes B489 only. 7↔11↔32: colour must ride the trail.
+```
+
+---
+
 ## Session Report — 2026-08-17 B489_WFHYB_FADE_FLASH
 
 ```text

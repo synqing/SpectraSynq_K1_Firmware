@@ -738,6 +738,13 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx);  // Tempo Comet 
 void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // River Surge — Spectrum River v2 + build/drop macro-dynamics (2026-06-11)
 void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Tempo River Walk — palette walks one step per bar (2026-06-11)
 void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState& fx);  // Waveform Hybrid K1 — amplitude-bouncing dot + decaying scroll trail (2026-08-05)
+// Mode-32 colour-novelty comparison pack (2026-08-17) — modes 33–37, selectable
+// only under K1_WFHYB_M32_VARIANTS_V1 (bench). Same chassis, one colour lever each.
+void light_mode_wfhyb_k1_flux(CRGB16* leds_prev_buffer, ChannelEffectState& fx);   // 33: chroma-novelty palette walk
+void light_mode_wfhyb_k1_note(CRGB16* leds_prev_buffer, ChannelEffectState& fx);   // 34: strongest-note coordinate + hysteresis
+void light_mode_wfhyb_k1_wide(CRGB16* leds_prev_buffer, ChannelEffectState& fx);   // 35: 4x loudness walk + lighter EMA
+void light_mode_wfhyb_k1_sum(CRGB16* leds_prev_buffer, ChannelEffectState& fx);    // 36: 12-note palette sum (mode-7 idiom)
+void light_mode_wfhyb_k1_step(CRGB16* leds_prev_buffer, ChannelEffectState& fx);   // 37: golden-ratio step per musical event
 
 inline uint16_t waveform_full_strip_position(float amp) {
   if (amp > 1.0f) amp = 1.0f;
@@ -1039,6 +1046,16 @@ inline uint32_t vp_probe_dispatch_and_hash(uint8_t mode, uint32_t& energy) {
     // Tombstone ID reserve 31 — unselectable; no render body on this branch.
   } else if (mode == LIGHT_MODE_WAVEFORM_HYBRID_K1) {
     light_mode_waveform_hybrid_k1(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_FLUX) {
+    light_mode_wfhyb_k1_flux(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_NOTE) {
+    light_mode_wfhyb_k1_note(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_WIDE) {
+    light_mode_wfhyb_k1_wide(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_SUM) {
+    light_mode_wfhyb_k1_sum(leds_16_prev, effect_state_primary);
+  } else if (mode == LIGHT_MODE_WFHYB_K1_STEP) {
+    light_mode_wfhyb_k1_step(leds_16_prev, effect_state_primary);
   }
 
   energy = vp_probe_energy(leds_16);
@@ -1160,6 +1177,11 @@ inline void vp_run_output_probe() {
   vp_probe_print_mode(LIGHT_MODE_BEAT_PULSE);
   vp_probe_print_mode(LIGHT_MODE_BLOOM_BT);
   vp_probe_print_mode(LIGHT_MODE_WAVEFORM_HYBRID_K1);
+  vp_probe_print_mode(LIGHT_MODE_WFHYB_K1_FLUX);
+  vp_probe_print_mode(LIGHT_MODE_WFHYB_K1_NOTE);
+  vp_probe_print_mode(LIGHT_MODE_WFHYB_K1_WIDE);
+  vp_probe_print_mode(LIGHT_MODE_WFHYB_K1_SUM);
+  vp_probe_print_mode(LIGHT_MODE_WFHYB_K1_STEP);
   USBSerial.println("VPO,ver=1,event=end");
   tx_end(false);
 
