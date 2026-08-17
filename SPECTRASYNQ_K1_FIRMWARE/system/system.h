@@ -442,6 +442,10 @@ void init_system() {
   // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
+#ifdef K1_MAIN_RPL_PINMAP_V1
+  // Centre-split DIN-A/B on both WS2816 PCBs — NVS must not revive single-wire NEOPIXEL.
+  CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
+#endif
 #if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
   // Keep the FastLED power cap at 2.5 A total @ 5 V even if a persisted save
   // carried a lower product default. Matches dual-214 precedent.

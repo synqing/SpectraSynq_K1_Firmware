@@ -57,7 +57,11 @@ conf CONFIG = {
   DEFAULT_SAMPLE_RATE, // SAMPLE_RATE
   12,                  // NOTE_OFFSET
   1.0f,                // SQUARE_ITER
+#ifdef K1_MAIN_RPL_PINMAP_V1
+  LED_NEOPIXEL_X2,     // LED_TYPE — centre-split DIN-A/B on Main RPL WS2816 PCBs
+#else
   LED_NEOPIXEL,        // LED_TYPE
+#endif
   161,                 // LED_COUNT (will be overwritten below)
   GRB,                 // LED_COLOR_ORDER
   true,                // LED_INTERPOLATION

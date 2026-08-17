@@ -110,7 +110,9 @@ def test_gate_falpha_decision_tracks_identity_data():
     targets, quarantined, blocked = GUARD.load_identities()
     # mutate main K1's authoritative serial -> the real device is now "wrong"
     mutated = tuple(
-        dataclasses.replace(t, usb_serial="00:00:00:00:00:00") if t.role == "main K1" else t
+        dataclasses.replace(t, usb_serial="00:00:00:00:00:00")
+        if t.chip_id == "F887A500"
+        else t
         for t in targets
     )
     ok, _ = GUARD.validate_upload_target(
@@ -131,6 +133,7 @@ def test_gate_falpha_decision_tracks_identity_data():
 def test_list_identities_dump_has_no_device_io():
     text = GUARD.format_identities()
     assert "main K1" in text
+    assert "Main RPL" in text
     assert "KNOWN_QUARANTINED" in text and QUARANTINED_SERIAL in text
     assert "k1_sample_rate_32k_spike" in text
 

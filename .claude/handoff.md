@@ -35,8 +35,11 @@ Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
 while a palette owns that channel. Production promotion of the flag stays
 gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 
-**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17). No F887 flash until a
-replacement unit. G8 is deferred, not cancelled.
+**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).  
+**Main RPL = REGISTERED** (Captain 2026-08-18): USB `B4:3A:45:A5:87:90` on
+`/dev/cu.usbmodem1401`, chip-id guess `9087A500`. Pin receipt
+[`docs/hardware/main-rpl-pin-receipt-2026-08-18.md`](../docs/hardware/main-rpl-pin-receipt-2026-08-18.md).
+**Flash FREEZE** (`envs: []`). Not F887. G8 deferred, not cancelled.
 
 **G2 = CLOSED** · **G3 = CLOSED** · **G7B = CLOSED** · **G8 host = GREEN**.
 **B489_WFHYB_PROMOTE = CLOSED on silicon.**
@@ -47,9 +50,16 @@ replacement unit. G8 is deferred, not cancelled.
 3. ~~Captain A/B~~ **KEEP ALL 33–37**.
 4. ~~`B489_WFHYB_PROMOTE`~~ **DONE** — stamp
    `IDENTITY OK: git=573206c0 env=k1_bench_im69d epoch=1787004384`.
-5. `k1_hardware` + F887 replacement flash is the production stamp
-   (`F887_PRODUCTION_FLASH`). Honour onto `k1_hardware` is that same close,
-   not a silent leak. Rollback of look: overlay `@ 836fde39`.
+5. ~~Main RPL named + pin-receipted~~ **DONE** — identity in
+   `k1_device_identities.json`, registry §1/§2, receipt on disk.
+6. **Agent:** Main RPL dedicated pinmap/env (WS2816 dual-DIN 17/18+15/16,
+   IM69D 9/8; I2C displaced; resolve RNG_SEED vs CLK=8) — then map that env
+   onto the Main RPL serial.
+7. **Captain:** `MAIN_RPL_BRINGUP_FLASH` (or equivalent named GO).
+8. **Shipped stamp:** `IDENTITY OK: git=<sha> env=<main_rpl_env> epoch=…`
+   on USB `B4:3A:45:A5:87:90`. Honour onto a production env remains a separate
+   close (`F887_PRODUCTION_FLASH` / Main RPL production promote — not a silent
+   leak of colour-fix flags). Rollback of B489 look: overlay `@ 836fde39`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

@@ -2433,8 +2433,16 @@ inline void init_secondary_leds() {
   leds_scaled_secondary = new CRGB16[SECONDARY_LED_COUNT];
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
+#ifdef K1_MAIN_RPL_PINMAP_V1
+  // Secondary WS2816 centre-split: DIN-A=15, DIN-B=16 (half strip each).
+  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(
+      leds_out_secondary, 0, SECONDARY_LED_COUNT / 2);
+  FastLED.addLeds<WS2812B, SECONDARY_LED_CLOCK_PIN, GRB>(
+      leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2);
+#else
   // Use constants for FastLED template arguments
   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
+#endif
   
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);

@@ -369,7 +369,44 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 // GPIO PINS #######################################################
 
 #if defined(K1_HARDWARE)
-  #if defined(K1_BENCH_REFERENCE_PINMAP)
+  #if defined(K1_MAIN_RPL_PINMAP_V1)
+    // Main RPL (main K1 replacement, Captain 2026-08-18 / MAIN_RPL_BRINGUP_FLASH):
+    //   Primary WS2816 PCB:  DIN-A=GPIO17, DIN-B=GPIO18 (centre-split X2)
+    //   Secondary WS2816 PCB: DIN-A=GPIO15, DIN-B=GPIO16 (centre-split X2)
+    //   Dual IM69D130: DATA=GPIO9, CLK=GPIO8 (SELECT hard-strapped; not driven)
+    // I2C 17/18 DISPLACED by LED DINs. K1_HAS_ROTATE8 is already 0 under K1_HARDWARE.
+    #define I2S_BCLK_PIN 13
+    #define I2S_LRCLK_PIN 11
+    #define I2S_DIN_PIN 14
+
+    #define LED_DATA_PIN 17
+    #define LED_CLOCK_PIN 18
+    #define SECONDARY_LED_DATA_PIN 15
+    #define SECONDARY_LED_CLOCK_PIN 16
+
+    #ifdef K1_MIC_IM69D_PDM_V1
+      #define K1_PDM_CLK_PIN 8
+      #define K1_PDM_DIN_PIN 9
+      #define K1_IM69_PDM_SEL_PIN 12
+    #else
+      #error "K1_MAIN_RPL_PINMAP_V1 requires K1_MIC_IM69D_PDM_V1 (dual IM69D130 on 8/9)"
+    #endif
+
+    #define I2C_SDA_PIN (-1)
+    #define I2C_SCL_PIN (-1)
+
+    #define PHOTONS_PIN (-1)
+    #define CHROMA_PIN (-1)
+    #define MOOD_PIN (-1)
+    #define NOISE_CAL_PIN (-1)
+    #define MODE_PIN (-1)
+    #define SWEET_SPOT_LEFT_PIN (-1)
+    #define SWEET_SPOT_CENTER_PIN (-1)
+    #define SWEET_SPOT_RIGHT_PIN (-1)
+
+    #define RNG_SEED_PIN 10
+
+  #elif defined(K1_BENCH_REFERENCE_PINMAP)
     // K1 bench-reference GPIO map.
     // Primary/secondary WS2812 channels: GPIO 4/5.
     // SPH0645: BCLK=14, DOUT->DIN=13, LRCL/WS=12. SEL wiring matches default K1.
@@ -439,13 +476,16 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
       #define K1_PDM_LR_PIN  14   // SELECT/LR LOW = LEFT / falling edge (= SPH DIN pad, freed)
     #endif
     #ifdef K1_MIC_IM69D_PDM_V1
-      #error "K1_MIC_IM69D_PDM_V1 is bench-reference only (SPH pad CLK=14/DATA=13); refuse production pinmap"
+      #error "K1_MIC_IM69D_PDM_V1 is bench-reference only (SPH pad CLK=14/DATA=13); refuse production pinmap (use K1_MAIN_RPL_PINMAP_V1 for Main RPL)"
     #endif
   #endif
 
+  #ifndef I2C_SDA_PIN
   #define I2C_SDA_PIN 17
   #define I2C_SCL_PIN 18
+  #endif
 
+  #ifndef PHOTONS_PIN
   #define PHOTONS_PIN (-1)
   #define CHROMA_PIN (-1)
   #define MOOD_PIN (-1)
@@ -454,8 +494,11 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
   #define SWEET_SPOT_LEFT_PIN (-1)
   #define SWEET_SPOT_CENTER_PIN (-1)
   #define SWEET_SPOT_RIGHT_PIN (-1)
+  #endif
 
+  #ifndef RNG_SEED_PIN
   #define RNG_SEED_PIN 8
+  #endif
 #else
   #define PHOTONS_PIN 1
   #define CHROMA_PIN 2

@@ -6,8 +6,9 @@
             "chip_id": "F887A500",
             "usb_serial": "B4:3A:45:A5:87:F8",
             "role": "main K1",
-            "pinmap": "default K1 hardware GPIO assignment",
-            "advisory_port": "/dev/tty.usbmodem1401",
+            "pinmap": "default K1 hardware GPIO assignment (legacy 6/7 LEDs); OFFSITE 2026-08-17",
+            "advisory_port": "OFFSITE",
+            "_note_2026_08_18": "F887 sent to product consultancy. Port /dev/cu.usbmodem1401 is now Main RPL (B4:3A:45:A5:87:90). Do not flash any other unit as F887.",
             "envs": [
                 "k1_agc_probe",
                 "k1_ap_frontend_probe",
@@ -52,6 +53,17 @@
                 "k1_tempo_probe",
                 "k1_vp_motion_lab",
                 "k1_wireless_ab_probe"
+            ]
+        },
+        {
+            "chip_id": "9087A500",
+            "usb_serial": "B4:3A:45:A5:87:90",
+            "role": "Main RPL (main K1 replacement)",
+            "pinmap": "WS2816 dual-DIN primary GPIO17/18 + secondary GPIO15/16; dual IM69D130 PDM DATA=GPIO9 CLK=GPIO8; I2C 17/18 DISPLACED by LED DIN-A/B",
+            "advisory_port": "/dev/tty.usbmodem1401",
+            "_registration_2026_08_18": "Captain named unit Main RPL. Pin receipt: docs/hardware/main-rpl-pin-receipt-2026-08-18.md. Chip ID derived from USB serial pattern (90||87||A500); confirm with :chip_id after first bring-up flash.",
+            "envs": [
+                "k1_main_rpl_im69d"
             ]
         },
         {

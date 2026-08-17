@@ -1104,8 +1104,14 @@ inline CRGB16 *leds_scaled_secondary;         // For scaling to actual LED count
 inline CRGB *leds_out_secondary;              // Final output buffer
 
 // Secondary strip configuration
+#ifndef SECONDARY_LED_DATA_PIN
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
+#endif
+#ifdef K1_MAIN_RPL_PINMAP_V1
+inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL_X2;
+#else
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;
+#endif
 // Single source of truth: config_types.h already resolves SECONDARY_LED_COUNT_VALUE
 // for every geometry (Unit 2 K1_UNIT2_IM69D_V1 = 206, k1_custom RGBIC = 160,
 // strip-modes / default = 160). Derive, never restate.
