@@ -58,19 +58,15 @@ bin SHA `86539d33…`, 704608 bytes). G5 causal = NOT_PROVEN (named).
 **Ship path after this lock:**
 1. ~~Trail flash~~ **DONE** — `1be4930a`.
 2. ~~Edge-honour flash~~ **DONE** — `836fde39` on B489.
-   Stamp = `IDENTITY OK: git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759`.
-3. ~~Captain A/B~~ **KEEP ALL 33–37** (2026-08-18). Do not port one winner into
-   mode 32. Overlay env still holds trail-deposit + variants + honour.
-4. **Captain names `B489_WFHYB_PROMOTE`.** **Agent** un-gates 33–37 (selectable
-   off the overlay flag), rides trail-deposit + honour onto `k1_bench_im69d`
-   (this unit’s home env; honour is legal there — `k1_hardware` stays off-flag
-   until the colour-fix promotion plan). Host gate, then flash B489
-   `k1_bench_im69d` via `k1-flash-verified.sh`. Stamp =
-   `IDENTITY OK git=<new> env=k1_bench_im69d`. Then the overlay env can die.
+3. ~~Captain A/B~~ **KEEP ALL 33–37** (2026-08-18).
+4. **`B489_WFHYB_PROMOTE` named.** Agent rides trail-deposit + honour + 33–37
+   onto `k1_bench_im69d`, host-gates, flashes B489. Stamp =
+   `IDENTITY OK git=<new> env=k1_bench_im69d`. Overlay env is now an alias.
 5. `k1_hardware` + F887 replacement flash is the production stamp (F887 offsite
    until `F887_PRODUCTION_FLASH`). Honour onto `k1_hardware` is that same close,
-   not a silent leak. Rollback until step 4 lands: reflash this overlay
-   `@ 836fde39`, or G8 restore `k1_bench_im69d @ 1d457740`.
+   not a silent leak. Rollback until step 4 verifies: overlay `@ 836fde39`, or
+   G8 restore `k1_bench_im69d @ 1d457740` (that restore now also carries the
+   three levers once this HEAD is on silicon).
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

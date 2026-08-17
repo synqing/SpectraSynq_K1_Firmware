@@ -39,8 +39,8 @@
 //
 // SELECTABILITY: bodies compile in every build (light_mode_*.cpp filter) but
 // light_mode_is_enabled() keeps 33–37 unselectable unless
-// K1_WFHYB_M32_VARIANTS_V1 is defined (bench env k1_bench_im69d_wfhyb_fade
-// only). Production cycling and the director never reach them.
+// K1_WFHYB_M32_VARIANTS_V1 is defined (bench env k1_bench_im69d;
+// B489_WFHYB_PROMOTE). Production cycling and the director never reach them.
 // REVERT = delete this file + the enum/dispatch/name/registry rows + env flag.
 // ============================================================================
 

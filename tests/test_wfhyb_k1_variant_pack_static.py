@@ -9,12 +9,13 @@ Contract pinned here:
   * Enum ordinals 33-37, appended after WAVEFORM_HYBRID_K1 (32), before
     NUM_MODES (append-only rule).
   * Production-disabled: all five sit in the light_mode_is_enabled() disabled
-    block, wrapped in #ifndef K1_WFHYB_M32_VARIANTS_V1 so ONLY the bench
-    variants env can select them.
+    block, wrapped in #ifndef K1_WFHYB_M32_VARIANTS_V1 so k1_hardware cycling
+    never reaches them.
   * Wired everywhere the enum demands: .ino dispatch, vp_probe dispatch +
     print roster, set_mode_name, EffectRegistry rows (enabled=false).
-  * The flag is defined ONLY by env:k1_bench_im69d_wfhyb_fade; k1_hardware
-    and the mode-32 original stay untouched.
+  * The flag is defined by env:k1_bench_im69d (B489_WFHYB_PROMOTE 2026-08-18).
+    Overlay env k1_bench_im69d_wfhyb_fade is an alias. k1_hardware and the
+    mode-32 original stay untouched.
   * The variants chassis is the mode-32 chassis: trail/scroll/dot constants
     must match light_mode_waveform_hybrid_k1.cpp verbatim, so any visual
     difference is attributable to the colour strategy alone.
@@ -94,26 +95,27 @@ class WfhybK1VariantPackStaticTest(unittest.TestCase):
             # enabled column false: production mirror (bench flag only).
             self.assertIn("false,", row)
 
-    def test_flag_only_in_bench_variants_env(self):
+    def test_flag_on_home_bench_env(self):
         self.assertEqual(PLATFORMIO.count(f"-D{FLAG}"), 1)
-        env_block = PLATFORMIO.split("[env:k1_bench_im69d_wfhyb_fade]", 1)[1]
+        env_block = PLATFORMIO.split("[env:k1_bench_im69d]", 1)[1]
         env_block = env_block.split("[env:", 1)[0]
         self.assertIn(f"-D{FLAG}", env_block)
-        # And it rides the same env as the mode-11 trail-deposit lever.
         self.assertIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", env_block)
+        hardware = PLATFORMIO.split("[env:k1_hardware]", 1)[1]
+        hardware = hardware.split("[env:", 1)[0]
+        self.assertNotIn(f"-D{FLAG}", hardware)
 
-    def test_edge_palette_honour_rides_the_bench_env(self):
-        """Captain 2026-08-18: edge_enabled colour-crushed the PRIMARY channel.
-        Root cause is the convicted P5.A side-door — dual-edge SPLIT (shipping
-        default) hue-rotates the palette-authored primary buffer post-render.
-        The measured fix (K1_EDGE_PALETTE_HONOUR_V1, 2026-08-13) was stranded
-        in env:k1_bench_im69d_colourfix and never rode this lane's flashes.
-        Pin it to the wfhyb bench env so the fix cannot silently drop off the
-        next binary (HF-56 class: a fix that isn't in the flag chain never
-        lands)."""
-        env_block = PLATFORMIO.split("[env:k1_bench_im69d_wfhyb_fade]", 1)[1]
+    def test_edge_palette_honour_rides_the_home_bench_env(self):
+        """Captain 2026-08-18 B489_WFHYB_PROMOTE: honour is legal on this
+        unit's home env. k1_hardware stays off-flag until the colour-fix
+        promotion plan. Pin it here so a restore to k1_bench_im69d no longer
+        drops the P5.A gate (HF-56 class)."""
+        env_block = PLATFORMIO.split("[env:k1_bench_im69d]", 1)[1]
         env_block = env_block.split("[env:", 1)[0]
         self.assertIn("-DK1_EDGE_PALETTE_HONOUR_V1", env_block)
+        hardware = PLATFORMIO.split("[env:k1_hardware]", 1)[1]
+        hardware = hardware.split("[env:", 1)[0]
+        self.assertNotIn("-DK1_EDGE_PALETTE_HONOUR_V1", hardware)
 
     def test_original_mode_32_untouched(self):
         self.assertNotIn(FLAG, ORIGINAL)

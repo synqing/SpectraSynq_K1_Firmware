@@ -3,7 +3,8 @@
 Captain 2026-08-17: WAVEFORM_HYBRID (11) fade-turnover FAIL — new palette
 colour was a centre flash, not trail. Next lever is origin deposit
 (K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1). Mode 32 untouched. Production
-k1_hardware must not define the flag.
+k1_hardware must not define the flag. B489_WFHYB_PROMOTE rides the flag
+onto k1_bench_im69d.
 """
 
 from __future__ import annotations
@@ -49,14 +50,13 @@ class WaveformHybridTrailDepositStaticTest(unittest.TestCase):
         self.assertNotIn("K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", block)
         self.assertNotIn("K1_WAVEFORM_HYBRID_FADE_TURNOVER_V1", block)
 
-    def test_bench_env_opts_in_trail_deposit_only(self):
-        block = _env_block("k1_bench_im69d_wfhyb_fade")
+    def test_home_bench_env_opts_in_trail_deposit(self):
+        block = _env_block("k1_bench_im69d")
         self.assertIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", block)
         self.assertNotIn("-DK1_WAVEFORM_HYBRID_FADE_TURNOVER_V1", block)
-        self.assertIn("extends = env:k1_bench_im69d", block)
-        self.assertNotIn(
-            "K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", _env_block("k1_bench_im69d")
-        )
+        overlay = _env_block("k1_bench_im69d_wfhyb_fade")
+        self.assertIn("extends = env:k1_bench_im69d", overlay)
+        self.assertNotIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", overlay)
 
 
 if __name__ == "__main__":

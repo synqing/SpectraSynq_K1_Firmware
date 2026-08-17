@@ -230,7 +230,8 @@ enum lightshow_modes {
   // WAVEFORM_HYBRID_K1 chassis; each isolates ONE colour-coordinate strategy so
   // Captain can A/B them by cycling modes on one flash (bench B489 only).
   // Compiled in every build (light_mode_*.cpp filter) but SELECTABLE only when
-  // K1_WFHYB_M32_VARIANTS_V1 is defined — production cycling never reaches them.
+  // K1_WFHYB_M32_VARIANTS_V1 is defined (B489_WFHYB_PROMOTE: k1_bench_im69d).
+  // k1_hardware cycling never reaches them.
   LIGHT_MODE_WFHYB_K1_FLUX,         // -- 33: palette walk kicked by chroma NOVELTY (flux), decays between changes
   LIGHT_MODE_WFHYB_K1_NOTE,         // -- 34: palette coordinate = strongest chroma note (hysteresis), discrete jumps
   LIGHT_MODE_WFHYB_K1_WIDE,         // -- 35: parametric-only — 4x wider loudness walk + lighter colour EMA
@@ -259,7 +260,7 @@ inline bool light_mode_is_enabled(uint8_t mode) {
     case LIGHT_MODE_BLOOM_BT:   // ID reserve 31 — unselectable on this branch (no effect body)
 #ifndef K1_WFHYB_M32_VARIANTS_V1
     // Mode-32 comparison pack (33–37): bodies compiled everywhere, selectable
-    // only on the bench variants build. Production cycling skips them.
+    // on k1_bench_im69d (B489_WFHYB_PROMOTE). Production cycling skips them.
     case LIGHT_MODE_WFHYB_K1_FLUX:
     case LIGHT_MODE_WFHYB_K1_NOTE:
     case LIGHT_MODE_WFHYB_K1_WIDE:

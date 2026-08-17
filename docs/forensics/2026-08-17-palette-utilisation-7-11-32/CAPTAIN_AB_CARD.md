@@ -56,7 +56,10 @@ Levers now ON silicon @ `836fde39`:
 
 **Keep em.** Do not fold a single winner into mode 32. Modes 33–37 stay as their own lightshow modes (FLUX / NOTE / WIDE / SUM / STEP). Mode 32 remains the centroid control.
 
-Edge-honour and mode-11 origin deposit stay on this silicon (`836fde39`). They are still overlay-env flags: a restore to `k1_bench_im69d` drops all three.
+Edge-honour and mode-11 origin deposit stay on this silicon (`836fde39`).
+**B489_WFHYB_PROMOTE (Captain 2026-08-18):** those three levers ride
+`k1_bench_im69d` so a home-env restore no longer drops them. Overlay env
+becomes an alias. `k1_hardware` stays off-flag.
 
 ## Next A/B (after the trail flash)
 

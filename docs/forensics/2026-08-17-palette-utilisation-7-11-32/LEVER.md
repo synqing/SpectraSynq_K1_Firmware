@@ -24,7 +24,9 @@ Not picked: seed-radius shrink as the look (the fat ASSIGN *was* the flash). Mod
 ## Where it lives
 
 - Source: `SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid.cpp` behind `#ifdef`.
-- Opt-in env: `k1_bench_im69d_wfhyb_fade` now defines `K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1` (not fade-turnover). `k1_hardware` and `k1_bench_im69d` stay off-flag.
+- Opt-in env: `k1_bench_im69d` defines `K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`
+  (B489_WFHYB_PROMOTE 2026-08-18). Overlay `k1_bench_im69d_wfhyb_fade` is an
+  alias. `k1_hardware` stays off-flag.
 - REVERT = delete the env block + identity list entry + the ifdef.
 
 ## Mode 32 — single sheet is VP-side; answered with a comparison pack
