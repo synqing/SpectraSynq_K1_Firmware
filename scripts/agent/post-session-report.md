@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-18 B489 edge-honour flash
+
+```text
+session_objective:       Captain flash-NOW: put K1_EDGE_PALETTE_HONOUR_V1 on B489 silicon.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 836fde39 (fix already committed).
+branch_head_at_end:      836fde39 + docs stamp.
+files_changed:           device-build-registry.md; .claude/handoff.md; CAPTAIN_AB_CARD.md; this report.
+commands_run:            k1-flash-verified.sh k1_bench_im69d_wfhyb_fade --port /dev/cu.usbmodem12401
+validation_results:      FLASHED AND VERIFIED. BEFORE git=1be4930a. AFTER IDENTITY OK git=836fde39 env=k1_bench_im69d_wfhyb_fade epoch=1786987759. Guard: 12401 = B489A500 (B4:3A:45:A5:89:B4). 1101 and F887 not touched. No cal. No erase.
+evidence_captured:       Registry §2 current row @ 836fde39; 1be4930a row superseded.
+blockers:                none for flash. Captain eyes-on is the close (edge crush + 7/11/32-37).
+generated_files_ignored: runtime-evidence **/bins/ left untracked.
+safety_constraints:      F887 NO; 1101 NO; no cal; no erase; B489 only.
+thinking_skill_used:     spec-recall (on-disk registry + handoff before flash).
+skills_used:             Agent OS; ship-path-required; k1-flash-verified.
+specialists_used:        none.
+claude_mem_observations: on-disk registry is authority.
+next_recommended_action: Captain: palette_mode=on, edge_enabled ON, confirm primary not crushed; then cycle 7↔11↔32↔33..37. Restore = k1_bench_im69d @ 1d457740.
+```
+
+---
+
 ## Session Report — 2026-08-18 edge_enabled primary crush → palette-honour fix
 
 ```text

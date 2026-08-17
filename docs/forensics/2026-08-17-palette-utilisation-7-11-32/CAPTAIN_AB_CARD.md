@@ -14,9 +14,9 @@ That single verdict decides the fork:
 
 ## Device
 
-Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d_wfhyb_fade` @ `1be4930a`** epoch `1786984083` (`B489_WFHYB_TRAIL_FLASH`: mode-11 origin deposit + modes 33–37). Main `F887A500` is offsite. No cal. No erase.
+Bench K1v2 `B489A500` on `/dev/cu.usbmodem12401`, env **`k1_bench_im69d_wfhyb_fade` @ `836fde39`** epoch `1786987759` (`B489_WFHYB_EDGE_FLASH`: origin deposit + modes 33–37 + `K1_EDGE_PALETTE_HONOUR_V1`). Main `F887A500` is offsite. No cal. No erase.
 
-**Known defect on this silicon (Captain 2026-08-18): `edge_enabled` colour-crushes the primary.** Dual-edge SPLIT is the shipping default, so the EdgeMixer hue-rotates the palette-authored primary buffer post-render (convicted P5.A side-door). Fix `K1_EDGE_PALETTE_HONOUR_V1` is now in this env in source — it lands on the NEXT flash. Until then run the A/B with `:edge_enabled=off` (or accept the crush as a known artefact; it does not change the 7/11/32-37 colour-strategy ranking because all modes are crushed equally).
+**Edge crush: ON THIS SILICON.** Dual-edge SPLIT still ships ON. With `:palette_mode=on`, EdgeMixer hue rotation on both channels is skipped (palette samples reach the strip). Confirm the primary is no longer crushed **with `edge_enabled` left ON** — do not A/B with it off, that would hide the gate. Chromatic (non-palette) channels still rotate; leave `/` (palette) on.
 
 This env does **not** define `K1_EFFECT_REGISTRY_V1`, so `set_mode` takes the **ordinal** (7 / 11 / 32), not a dense menu index.
 
@@ -47,9 +47,10 @@ Do **not** replay modes 8 or 18 for this fork. Do **not** sweep `:tune` knobs (t
 mode 7 is lively from the same chromagram on the same silicon; mode 32 averages
 the 12 bins into one centroid coordinate. See `LEVER.md`.
 
-Next levers in source (NOT on silicon until named `B489_WFHYB_TRAIL_FLASH`):
+Levers now ON silicon @ `836fde39`:
 - Mode 11 origin deposit (`K1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`).
-- Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — new bench-only modes.
+- Mode-32 comparison pack (`K1_WFHYB_M32_VARIANTS_V1`) — bench-only modes 33–37.
+- EdgeMixer palette honour (`K1_EDGE_PALETTE_HONOUR_V1`) — primary crush gate.
 
 ## Next A/B (after the trail flash)
 
@@ -66,5 +67,6 @@ Same track, same palette, cycle:
 :set_mode=37    → WFHYB K1 STEP        (golden-step band per musical event)
 ```
 
-Two verdicts wanted: PASS/FAIL on mode 11's trail, and a pick (or reject-all)
+Three verdicts wanted: PASS/FAIL on the edge-honour gate (primary not crushed
+with `edge_enabled` ON), PASS/FAIL on mode 11's trail, and a pick (or reject-all)
 among 33–37 for mode 32's replacement colour engine.
