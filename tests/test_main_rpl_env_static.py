@@ -42,6 +42,7 @@ def test_main_rpl_pinmap_macros():
     assert "#define LED_CLOCK_PIN 18" in region
     assert "#define SECONDARY_LED_DATA_PIN 15" in region
     assert "#define SECONDARY_LED_CLOCK_PIN 16" in region
+    assert "LEDs 1–80" in region or "LEDs 1-80" in region or "1–80" in region
     assert "#define K1_PDM_CLK_PIN 8" in region
     assert "#define K1_PDM_DIN_PIN 9" in region
     assert "#define RNG_SEED_PIN 10" in region
@@ -59,3 +60,28 @@ def test_main_rpl_identity_and_build_allowlist():
     )
     wrapper = PIO_BUILD.read_text(encoding="utf-8")
     assert ENV in wrapper
+
+
+def test_main_rpl_led_init_is_contiguous_dual_din():
+    """Each PCB = one 160 buffer; DIN-A [0..79], DIN-B [80..159] — not centre-origin art."""
+    led = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h").read_text(
+        encoding="utf-8"
+    )
+    blocks = re.findall(
+        r"#ifdef K1_MAIN_RPL_PINMAP_V1\n(.*?)(?:\n#else|\n#endif)",
+        led,
+        flags=re.S,
+    )
+    assert len(blocks) >= 2
+    primary, secondary = blocks[0], blocks[1]
+    assert "leds_out, 0, CONFIG.LED_COUNT / 2" in primary
+    assert "leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2" in primary
+    assert "LED_DATA_PIN" in primary and "LED_CLOCK_PIN" in primary
+    assert "if (CONFIG.LED_TYPE" not in primary
+    assert "leds_out_secondary, 0, SECONDARY_LED_COUNT / 2" in secondary
+    assert (
+        "leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2"
+        in secondary
+    )
+    assert "centre-split" not in primary.lower()
+    assert "centre-split" not in secondary.lower()

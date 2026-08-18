@@ -58,7 +58,7 @@ conf CONFIG = {
   12,                  // NOTE_OFFSET
   1.0f,                // SQUARE_ITER
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  LED_NEOPIXEL_X2,     // LED_TYPE — centre-split DIN-A/B on Main RPL WS2816 PCBs
+  LED_NEOPIXEL_X2,     // LED_TYPE — Main RPL: DIN-A leds 1-80, DIN-B leds 81-160
 #else
   LED_NEOPIXEL,        // LED_TYPE
 #endif

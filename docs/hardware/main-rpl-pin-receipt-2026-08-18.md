@@ -26,13 +26,16 @@ Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as coveri
 
 | Function | GPIO | Notes |
 |---|---|---|
-| Primary WS2816 DIN-A | **17** | Dual-data lane A |
-| Primary WS2816 DIN-B | **18** | Dual-data lane B |
-| Secondary WS2816 DIN-A | **15** | Dual-data lane A |
-| Secondary WS2816 DIN-B | **16** | Dual-data lane B |
-| LED geometry | 2× 160 px WS2816 PCBs | Primary + secondary channels |
+| Primary DIN-A | **17** | LEDs **1–80** of the primary 160-LED strip |
+| Primary DIN-B | **18** | LEDs **81–160** of the same primary strip |
+| Secondary DIN-A | **15** | LEDs **1–80** of the secondary 160-LED strip |
+| Secondary DIN-B | **16** | LEDs **81–160** of the same secondary strip |
+| LED geometry | 2× 160 px WS2816 PCBs | Each PCB = one continuous strip, two data lines |
 | IM69D130 DATA | **9** | Dual capsule board |
 | IM69D130 CLK | **8** | Dual capsule board |
+
+Firmware: `LED_NEOPIXEL_X2` / Main RPL fail-closed init —
+`addLeds(DIN-A, 0, 80)` + `addLeds(DIN-B, 80, 80)` per channel.
 
 ## Conflicts with existing firmware pinmaps
 

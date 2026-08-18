@@ -371,8 +371,11 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 #if defined(K1_HARDWARE)
   #if defined(K1_MAIN_RPL_PINMAP_V1)
     // Main RPL (main K1 replacement, Captain 2026-08-18 / MAIN_RPL_BRINGUP_FLASH):
-    //   Primary WS2816 PCB:  DIN-A=GPIO17, DIN-B=GPIO18 (centre-split X2)
-    //   Secondary WS2816 PCB: DIN-A=GPIO15, DIN-B=GPIO16 (centre-split X2)
+    //   Each WS2816 PCB = ONE continuous 160-LED strip on TWO data lines:
+    //     DIN-A = LEDs 1–80  (buffer [0..79])
+    //     DIN-B = LEDs 81–160 (buffer [80..159])
+    //   Primary:   DIN-A=GPIO17, DIN-B=GPIO18
+    //   Secondary: DIN-A=GPIO15, DIN-B=GPIO16
     //   Dual IM69D130: DATA=GPIO9, CLK=GPIO8 (SELECT hard-strapped; not driven)
     // I2C 17/18 DISPLACED by LED DINs. K1_HAS_ROTATE8 is already 0 under K1_HARDWARE.
     #define I2S_BCLK_PIN 13

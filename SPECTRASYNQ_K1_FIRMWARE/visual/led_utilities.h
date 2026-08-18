@@ -1251,6 +1251,14 @@ inline void init_leds() {
   // Initialize the lerp parameters for scale_to_strip optimization
   init_lerp_params();
 
+#ifdef K1_MAIN_RPL_PINMAP_V1
+  // Fail-closed: one continuous 160-LED strip per channel, two DINs.
+  // DIN-A → leds[0..79] (LEDs 1–80); DIN-B → leds[80..159] (LEDs 81–160).
+  // Do NOT consult CONFIG.LED_TYPE — a stale NEOPIXEL would leave DIN-B dark.
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
+  FastLED.addLeds<WS2812B, LED_CLOCK_PIN, GRB>(
+      leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2);
+#else
   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
     if (CONFIG.LED_COLOR_ORDER == RGB) {
       FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(leds_out, CONFIG.LED_COUNT);
@@ -1283,6 +1291,7 @@ inline void init_leds() {
       FastLED.addLeds<DOTSTAR, LED_DATA_PIN, LED_CLOCK_PIN, BGR>(leds_out, CONFIG.LED_COUNT);
     }
   }
+#endif
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
 
@@ -2434,7 +2443,7 @@ inline void init_secondary_leds() {
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  // Secondary WS2816 centre-split: DIN-A=15, DIN-B=16 (half strip each).
+  // Secondary: same contiguous 160-LED / dual-DIN map as primary (DIN-A 1–80, DIN-B 81–160).
   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(
       leds_out_secondary, 0, SECONDARY_LED_COUNT / 2);
   FastLED.addLeds<WS2812B, SECONDARY_LED_CLOCK_PIN, GRB>(
