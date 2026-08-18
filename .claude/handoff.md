@@ -66,10 +66,14 @@ displaced (Captain item 6). B489 / 1101 / F887 not touched.
    `MAIN_RPL_FIRST_LIGHT_PASS` · `CHIP ID: 9087A500` · SSL=173 DC=−265.
 8. ~~IM69D SELECT / RIGHT-capsule docs debt~~ **DONE** —
    `MAIN_RPL_SELECT_CLOSED_AS` (SEL unused, `SLOT_RIGHT`, PDM 8/9).
-9. **Agent:** annex Lever-2 (`K1_WS2816_LEVER2_V1`) onto
-   `k1_main_rpl_im69d` only — not `k1_hardware`. Honour/production promote
-   remains a separate close. Rollback of B489 look: overlay `@ 836fde39`.
-   Rollback of Main RPL WS2816 topology: reflash `@ cd18d89c` (first-light).
+9. ~~Dull-show diagnosis~~ **CLOSED-AS look-flag gap** — path is alive
+   (live lock=1 / conf 0.90; SSL in-family). `k1_main_rpl_im69d` now carries
+   the B489 lively flags (honour + trail-deposit + m32). Not on `k1_hardware`.
+   Do **not** re-fire cal. Lever-2 is **parked host-only** (no flash).
+10. **Agent:** flash the look-flag binary via `k1-flash-verified.sh`, then
+    restamp `IDENTITY OK`. Honour/production promote of those flags onto
+    `k1_hardware` remains a separate close. Rollback of Main RPL first-light:
+    reflash `@ cd18d89c`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

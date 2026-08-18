@@ -481,6 +481,10 @@ inline SQ15x16 ui_mask_height = 0.0;
 
 inline CRGB16 *leds_scaled;
 inline CRGB *leds_out;
+#ifdef K1_WS2816_LEVER2_V1
+inline CRGB *ws2816_wire;
+inline CRGB *ws2816_wire_secondary;
+#endif
 
 inline SQ15x16 hue_shift = 0.0; // Used in auto color cycling
 

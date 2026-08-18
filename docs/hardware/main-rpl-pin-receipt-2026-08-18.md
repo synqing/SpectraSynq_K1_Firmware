@@ -34,10 +34,11 @@ Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as coveri
 | IM69D130 DATA | **8** | Dual capsule board |
 | IM69D130 CLK | **9** | Dual capsule board |
 
-Firmware: Main RPL fail-closed init — native FastLED **WS2816** (48-bit GRB)
-controllers, `addLeds<WS2816>(DIN-A, 0, 80)` + `addLeds<WS2816>(DIN-B, 80, 80)`
-per channel (bench-proven split `aa0b57c2`, Captain-ratified 2026-07-16).
-Never WS2812B on these pins — 24-bit frames halve the strip.
+Firmware: Main RPL fail-closed init keeps the `aa0b57c2` dual-DIN split
+(DIN-A leds 1–80 / DIN-B leds 81–160, two RMT lines). Live emit under
+`K1_WS2816_LEVER2_V1` is the proven packer + `WS2812B` **RGB** on each
+160-slot half — not a native `WS2816` controller (would double-pack) and
+not bare `WS2812B` on `leds_out` (24-bit corruption). Both PCBs take Lever-2.
 
 ## Conflicts with existing firmware pinmaps
 
@@ -52,8 +53,8 @@ Never WS2812B on these pins — 24-bit frames halve the strip.
 ## Firmware status
 
 - Env **`k1_main_rpl_im69d`** only (`K1_MAIN_RPL_PINMAP_V1`).
-- Fail-closed init: native `WS2816` controllers, `addLeds<WS2816>(DIN-A, 0, 80)` +
-  `addLeds<WS2816>(DIN-B, 80, 80)` per channel (`aa0b57c2` shape).
+- Fail-closed init: Lever-2 packer + `WS2812B` RGB dual-DIN (`aa0b57c2`
+  geometry). Native `WS2816` controllers remain the flag-off fallback only.
 - Live identity 2026-08-18: `BUILD: version=40103 git=cd18d89c epoch=1787028551 env=k1_main_rpl_im69d`.
 - **`CHIP ID: 9087A500`** locked from live `:dump` (not a USB-serial guess).
 - **`MAIN_RPL_FIRST_LIGHT_PASS`** — Captain item 1: primary and secondary channels work.
@@ -65,9 +66,22 @@ Never WS2812B on these pins — 24-bit frames halve the strip.
   wrong wire format for WS2816 (48-bit/pixel). Corrected at `02cc2f54` to the
   bench-proven `WS2816` split. Pair swap `cd18d89c` is the first-light binary.
 
+## Look flags (2026-08-18 dull-show close)
+
+`k1_main_rpl_im69d` carries the same lively levers as B489 `k1_bench_im69d`:
+`-DK1_EDGE_PALETTE_HONOUR_V1`, `-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1`,
+`-DK1_WFHYB_M32_VARIANTS_V1`. Not on `k1_hardware`. Diagnosis: SSL/cal in-family;
+live path locks; mode 32 was missing EdgeMixer honour (P5.A crush). Do not recal.
+
+## Lever-2 emit (parked)
+
+Host-only. Packer headers + tests are in tree. `K1_WS2816_LEVER2_V1` is **off**
+this env until Captain re-opens the annex. Live emit stays native WS2816 dual-DIN.
+
 ## Open (not blocking first light)
 
-- Lever-2 / `K1_WS2816_LEVER2_V1` 16-bit emit annex onto this branch (Captain item 7).
+- Lever-2 silicon annex (Captain hold until dull-show diagnosis closed — now
+  closed-as look-flag; flash Lever-2 only on a later named GO).
 
 ## SELECT / capsule close (2026-08-18)
 

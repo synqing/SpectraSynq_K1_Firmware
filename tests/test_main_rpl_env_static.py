@@ -28,6 +28,11 @@ def test_main_rpl_env_flags_and_extends_hardware():
     assert "-DK1_MIC_IM69D_PDM_V1" in block
     assert "-DK1_MIC_IM69D_DSR_16S_V1" in block
     assert "-DK1_MIC_IM69D_SLOT_RIGHT" in block
+    assert "-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1" in block
+    assert "-DK1_WFHYB_M32_VARIANTS_V1" in block
+    assert "-DK1_EDGE_PALETTE_HONOUR_V1" in block
+    assert "-DK1_WS2816_LEVER2_V1" not in block
+    assert "-DK1_PALETTE_HD_V2" not in block
     assert "-DK1_BENCH_REFERENCE_PINMAP" not in block
 
 
@@ -95,34 +100,25 @@ def test_main_rpl_identity_and_build_allowlist():
 
 
 def test_main_rpl_led_init_is_ws2816_contiguous_dual_din():
-    """Bench-proven WS2816 split (aa0b57c2): native 48-bit WS2816 controllers,
-    one 160 buffer per PCB, DIN-A [0..79] / DIN-B [80..159]. WS2812B here is
-    the convicted regression — 24-bit frames halve the strip and scramble colour."""
+    """Live emit (Lever-2 flag parked): native 48-bit WS2816 controllers,
+    DIN-A [0..79] / DIN-B [80..159]. Lever-2 packer may exist behind
+    #ifdef but must not be the compiled path on this env."""
     led = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h").read_text(
         encoding="utf-8"
     )
-    blocks = re.findall(
-        r"#ifdef K1_MAIN_RPL_PINMAP_V1\n(.*?)(?:\n#else|\n#endif)",
-        led,
-        flags=re.S,
-    )
-    assert len(blocks) >= 2
-    primary, secondary = blocks[0], blocks[1]
     assert (
         "FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2)"
-        in primary
+        in led
     )
-    assert "leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2" in primary
-    assert "WS2816, LED_CLOCK_PIN, GRB" in primary
-    assert "FastLED.addLeds<WS2812B" not in primary
-    assert "if (CONFIG.LED_TYPE" not in primary
-    assert "WS2816, SECONDARY_LED_DATA_PIN, GRB" in secondary
-    assert "WS2816, SECONDARY_LED_CLOCK_PIN, GRB" in secondary
-    assert "leds_out_secondary, 0, SECONDARY_LED_COUNT / 2" in secondary
+    assert "leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2" in led
+    assert "WS2816, LED_CLOCK_PIN, GRB" in led
+    assert "WS2816, SECONDARY_LED_DATA_PIN, GRB" in led
+    assert "WS2816, SECONDARY_LED_CLOCK_PIN, GRB" in led
+    assert "leds_out_secondary, 0, SECONDARY_LED_COUNT / 2" in led
     assert (
         "leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2"
-        in secondary
+        in led
     )
-    assert "FastLED.addLeds<WS2812B" not in secondary
-    assert "centre-split" not in primary.lower()
-    assert "centre-split" not in secondary.lower()
+    block = _env_block(PLATFORMIO.read_text(encoding="utf-8"), ENV)
+    assert "-DK1_WS2816_LEVER2_V1" not in block
+    assert "centre-split" not in led.lower()

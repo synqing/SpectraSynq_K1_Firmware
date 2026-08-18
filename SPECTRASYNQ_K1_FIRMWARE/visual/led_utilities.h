@@ -29,6 +29,9 @@
 #ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
 #endif
+#ifdef K1_WS2816_LEVER2_V1
+#include "k1_lever2_emit.h"
+#endif
 
 extern void start_noise_cal();
 
@@ -993,7 +996,7 @@ inline void show_leds() {
   if (CONFIG.INCANDESCENT_MODE) {
     force_incandescent_colour(leds_16, NATIVE_RESOLUTION);
   }
-#ifndef K1_INCANDESCENT_OUTPUT_V1
+#if !defined(K1_INCANDESCENT_OUTPUT_V1) && !defined(K1_WS2816_LEVER2_V1)
   else if (CONFIG.INCANDESCENT_FILTER > 0.0) {
     // In-place apply on the render buffer COMPOUNDS across show passes
     // (dose-response measured 2026-08-13: gold dead at 0.25, alive at 0.10 —
@@ -1079,6 +1082,29 @@ inline void show_leds() {
       leds_out_secondary != nullptr) {
     show_secondary_leds();
   }
+
+#ifdef K1_WS2816_LEVER2_V1
+  // Explicit 48-bit packer + WS2812B RGB. On Main RPL this is the dual-DIN
+  // emit (160 logical pixels → 320 wire slots, two 160-slot halves). Do not
+  // consult LED_TYPE here — persisted X2 must not skip the packer.
+  if (CONFIG.REVERSE_ORDER == false && ws2816_wire != nullptr) {
+    SQ15x16 k1_inc_r(1.0), k1_inc_g(1.0), k1_inc_b(1.0);
+    if (!CONFIG.INCANDESCENT_MODE && CONFIG.INCANDESCENT_FILTER > 0.0f) {
+      const SQ15x16 mix = SQ15x16(CONFIG.INCANDESCENT_FILTER);
+      const SQ15x16 inv = SQ15x16(1.0) - mix;
+      k1_inc_r = inv + mix * incandescent_lookup.r;
+      k1_inc_g = inv + mix * incandescent_lookup.g;
+      k1_inc_b = inv + mix * incandescent_lookup.b;
+    }
+    const uint64_t budget_proxy =
+        (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
+    k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
+                         budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b);
+    FastLED.setDither(DISABLE_DITHER);
+    FastLED.show();
+    return;
+  }
+#endif
   
 #if ENABLE_VPAB_PROBE
   uint32_t vpab_primary_quant_us = 0;
@@ -1252,20 +1278,35 @@ inline void init_leds() {
   init_lerp_params();
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  // Fail-closed WS2816 split (bench-proven aa0b57c2, Captain-ratified 2026-07-16):
-  // ONE continuous 160-px image on 160 physical WS2816 LEDs fed by TWO 80-LED
-  // data inputs. DIN-A → px 0–79 (LEDs 1–80); DIN-B → px 80–159 (LEDs 81–160).
-  // WS2816 is 48-bit/pixel at WS2812 timing — a single 160-LED run costs
-  // 9.88 ms incl. latch (~101 Hz ceiling); two 80-LED halves transmit in
-  // parallel on separate RMT channels at 5.08 ms each. The native FastLED
-  // WS2816 controller emits the 48-bit GRB wire payload (user order applied
-  // once in 16-bit space; inner WS2812 forced RGB) — NEVER register WS2812B
-  // here: 24-bit frames feed each physical LED two half-pixels (half strip
-  // dark, colours garbage). Do NOT consult CONFIG.LED_TYPE — a stale
-  // persisted value must not reroute the wire format during bring-up.
+#ifdef K1_WS2816_LEVER2_V1
+  // Lever-2 on Main RPL: keep the dual-DIN split (aa0b57c2 geometry) but emit
+  // with the proven packer + WS2812B RGB — not a native WS2816 controller
+  // (would double-pack) and not bare WS2812B (24-bit corruption).
+  // 160 logical pixels → 320 wire slots; DIN-A/DIN-B each take 160 slots
+  // (80 physical WS2816 LEDs). Ignore persisted LED_TYPE.
+  ws2816_wire = new CRGB[CONFIG.LED_COUNT * 2];
+  if (CONFIG.REVERSE_ORDER == false) {
+    FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT);
+    FastLED.addLeds<WS2812B, LED_CLOCK_PIN, RGB>(
+        ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
+    FastLED.setCorrection(CRGB(255, 255, 255));
+    FastLED.setTemperature(CRGB(255, 255, 255));
+    FastLED.setDither(DISABLE_DITHER);
+    for (uint16_t x = 0; x < (uint16_t)(CONFIG.LED_COUNT * 2); x++) {
+      ws2816_wire[x] = CRGB(0, 0, 0);
+    }
+    show_leds();
+    leds_started = true;
+    USBSerial.print("INIT_LEDS: ");
+    USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
+    return;
+  }
+#else
+  // Flag-off bring-up: native FastLED WS2816 48-bit controllers (aa0b57c2).
   FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
   FastLED.addLeds<WS2816, LED_CLOCK_PIN, GRB>(
       leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2);
+#endif
 #else
   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
     if (CONFIG.LED_COLOR_ORDER == RGB) {
@@ -2451,15 +2492,24 @@ inline void init_secondary_leds() {
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  // Secondary WS2816 PCB: same contiguous 160-LED / dual-DIN split as primary
-  // (DIN-A px 0–79 = LEDs 1–80, DIN-B px 80–159 = LEDs 81–160). Native WS2816
-  // 48-bit controllers — never WS2812B (see init_leds() Main RPL comment).
-  // This is the 1313 rig's ratified "phase 2" shape: secondary registered on
-  // its own pin pair with the same 2×(count/2) offset split.
+#ifdef K1_WS2816_LEVER2_V1
+  // Both Main RPL PCBs are WS2816. Apply the same packer + WS2812B RGB
+  // dual-DIN emit as primary (skill's "secondary stays 8-bit" is the
+  // single-strip eval default; it does not apply here).
+  ws2816_wire_secondary = new CRGB[SECONDARY_LED_COUNT * 2];
+  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, RGB>(
+      ws2816_wire_secondary, 0, SECONDARY_LED_COUNT);
+  FastLED.addLeds<WS2812B, SECONDARY_LED_CLOCK_PIN, RGB>(
+      ws2816_wire_secondary, SECONDARY_LED_COUNT, SECONDARY_LED_COUNT);
+  for (uint16_t x = 0; x < (uint16_t)(SECONDARY_LED_COUNT * 2); x++) {
+    ws2816_wire_secondary[x] = CRGB(0, 0, 0);
+  }
+#else
   FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(
       leds_out_secondary, 0, SECONDARY_LED_COUNT / 2);
   FastLED.addLeds<WS2816, SECONDARY_LED_CLOCK_PIN, GRB>(
       leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2);
+#endif
 #else
   // Use constants for FastLED template arguments
   FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary, SECONDARY_LED_COUNT);
@@ -2547,6 +2597,27 @@ inline void show_secondary_leds() {
   if (SECONDARY_INCANDESCENT_MODE) {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }
+#ifdef K1_WS2816_LEVER2_V1
+  if (ws2816_wire_secondary != nullptr && CONFIG.REVERSE_ORDER == false) {
+    SQ15x16 k1_inc_r(1.0), k1_inc_g(1.0), k1_inc_b(1.0);
+    const float sec_filter = (VP_FIX_SECONDARY_CLEAN || SECONDARY_INCANDESCENT_MODE)
+                                 ? 0.0f
+                                 : SECONDARY_INCANDESCENT_FILTER;
+    if (!SECONDARY_INCANDESCENT_MODE && sec_filter > 0.0f) {
+      const SQ15x16 mix = SQ15x16(sec_filter);
+      const SQ15x16 inv = SQ15x16(1.0) - mix;
+      k1_inc_r = inv + mix * incandescent_lookup.r;
+      k1_inc_g = inv + mix * incandescent_lookup.g;
+      k1_inc_b = inv + mix * incandescent_lookup.b;
+    }
+    const uint64_t budget_proxy =
+        (uint64_t)SECONDARY_LED_COUNT * 3ull * 65535ull;
+    k1_lever2_pack_frame(leds_scaled_secondary, SECONDARY_LED_COUNT,
+                         ws2816_wire_secondary, budget_proxy, k1_inc_r,
+                         k1_inc_g, k1_inc_b);
+    return;
+  }
+#endif
   // Quantization needs to happen *after* filtering if filter uses scaled values
   // quantize_color_secondary(CONFIG.TEMPORAL_DITHERING); // Moved down
 

@@ -96,11 +96,15 @@ class WfhybK1VariantPackStaticTest(unittest.TestCase):
             self.assertIn("false,", row)
 
     def test_flag_on_home_bench_env(self):
-        self.assertEqual(PLATFORMIO.count(f"-D{FLAG}"), 1)
+        # B489 home + Main RPL bring-up. Not on k1_hardware.
+        self.assertEqual(PLATFORMIO.count(f"-D{FLAG}"), 2)
         env_block = PLATFORMIO.split("[env:k1_bench_im69d]", 1)[1]
         env_block = env_block.split("[env:", 1)[0]
         self.assertIn(f"-D{FLAG}", env_block)
         self.assertIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", env_block)
+        rpl = PLATFORMIO.split("[env:k1_main_rpl_im69d]", 1)[1]
+        rpl = rpl.split("[env:", 1)[0]
+        self.assertIn(f"-D{FLAG}", rpl)
         hardware = PLATFORMIO.split("[env:k1_hardware]", 1)[1]
         hardware = hardware.split("[env:", 1)[0]
         self.assertNotIn(f"-D{FLAG}", hardware)
