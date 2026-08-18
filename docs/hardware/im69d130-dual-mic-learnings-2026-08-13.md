@@ -57,6 +57,13 @@ measured on IM69D silicon and carried by `K1_AUDIO_PROFILE_IM69D130_UNIT2`.
 | LEDs | 160/160 | dual **206**-px WS2812B on GPIO 4/5, render canvas 160 |
 | Envs | `k1_bench_im69d`(_ble/_micb/_stereo) | `k1_unit2_im69d_right`(_led160ab/_matrix) |
 
+**Main RPL (`9087A500`, 2026-08-18):** dual IM69D130 on **DATA=GPIO8 / CLK=GPIO9**,
+env `k1_main_rpl_im69d`, **`K1_MIC_IM69D_SLOT_RIGHT`**. SELECT is hard-strapped;
+GPIO12 (`K1_IM69_PDM_SEL_PIN`) is unused-by-design and is never driven.
+Dual-capsule electrical identity is **`MAIN_RPL_SELECT_CLOSED_AS`** (mono RIGHT
+path + single PDM pair 8/9) — the second capsule is not electrically proven.
+Receipt: [`main-rpl-im69d-select-close-2026-08-18.md`](./main-rpl-im69d-select-close-2026-08-18.md).
+
 **Load-bearing rule:** identity is chip-ID/MAC, never port; both units are ESP32-S3 devboards
 but their **GPIO maps differ — never cross-flash**. `SELECT` is decided by copper, not code —
 the IM73D habit of driving an LR pin does not exist on the IM69D path.
@@ -66,6 +73,10 @@ the IM73D habit of driving an LR pin does not exist on the IM69D path.
 - **Unit 2's own dual-capsule topology** — only its RIGHT capsule path is evidenced. Stage 1b
   proved the **bench's** mic B. No complementary-SELECT measurement, shared-DATA contention
   proof, or per-capsule supply record exists for Unit 2's board.
+- **Main RPL dual-capsule topology** — firmware/docs debt is **CLOSED-AS**
+  (`MAIN_RPL_SELECT_CLOSED_AS`: SEL unused, `SLOT_RIGHT`, PDM 8/9). The second
+  capsule remains electrically unproven; do not re-open the pin receipt as
+  “SELECT unmeasured forever”.
 - **Capsule spacing D** (design O-4) — unmeasured on both boards; a formality for interpreting
   ρ physically, not a blocker for the verdict in §6.
 

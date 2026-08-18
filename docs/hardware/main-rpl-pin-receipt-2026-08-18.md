@@ -67,7 +67,15 @@ Never WS2812B on these pins — 24-bit frames halve the strip.
 
 ## Open (not blocking first light)
 
-- IM69D SELECT strap / which capsule is mono RIGHT — still unmeasured electrically
-  (Unit 2 dual-capsule UNPROVEN class). Firmware path is `SLOT_RIGHT` + SEL GPIO12
-  unused; close in the SELECT receipt, not by driving SELECT.
 - Lever-2 / `K1_WS2816_LEVER2_V1` 16-bit emit annex onto this branch (Captain item 7).
+
+## SELECT / capsule close (2026-08-18)
+
+**Stamp:** `MAIN_RPL_SELECT_CLOSED_AS` — SEL unused, `SLOT_RIGHT`, single PDM pair 8/9.
+
+Firmware treats the live mono path as **ESP-IDF PDM RIGHT**
+(`-DK1_MIC_IM69D_SLOT_RIGHT` → `I2S_PDM_SLOT_RIGHT`). `K1_IM69_PDM_SEL_PIN` is
+GPIO12 and is **unused-by-design** — never driven (hard-strap assumed; same rule
+as PCB3 / Unit 2). The second capsule is **not electrically proven** on this
+unit. Receipt:
+[`main-rpl-im69d-select-close-2026-08-18.md`](./main-rpl-im69d-select-close-2026-08-18.md).

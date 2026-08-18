@@ -45,7 +45,39 @@ def test_main_rpl_pinmap_macros():
     assert "LEDs 1–80" in region or "LEDs 1-80" in region or "1–80" in region
     assert "#define K1_PDM_CLK_PIN 9" in region
     assert "#define K1_PDM_DIN_PIN 8" in region
+    assert "#define K1_IM69_PDM_SEL_PIN 12" in region
+    assert "do not drive as LR" in region
+    assert "K1_PDM_LR_PIN" not in region
     assert "#define RNG_SEED_PIN 10" in region
+
+
+def test_main_rpl_im69d_slot_right_sel_unused():
+    """Main RPL mono path is ESP-IDF PDM RIGHT; SELECT GPIO12 is never driven."""
+    constants = CONSTANTS.read_text(encoding="utf-8")
+    i2s = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "i2s_audio.h").read_text(
+        encoding="utf-8"
+    )
+    region = constants[
+        constants.index("K1_MAIN_RPL_PINMAP_V1") : constants.index(
+            "K1_BENCH_REFERENCE_PINMAP"
+        )
+    ]
+    assert "K1_MIC_IM69D_SLOT_RIGHT" in _env_block(
+        PLATFORMIO.read_text(encoding="utf-8"), ENV
+    )
+    assert "unused on Main RPL" in region
+    im69_init = re.search(
+        r"#elif defined\(K1_MIC_IM69D_PDM_V1\)(.*?)PIO-MIGRATION-STAGE-7",
+        i2s,
+        flags=re.S,
+    )
+    assert im69_init, "missing IM69 init_i2s elif branch"
+    init_text = im69_init.group(1)
+    assert "gpio_set_level" not in init_text
+    assert "K1_PDM_LR_PIN" not in init_text
+    assert "K1_IM69_PDM_SEL_PIN" not in init_text
+    assert "I2S_PDM_SLOT_RIGHT" in init_text
+    assert 'USBSerial.println(" slot=RIGHT")' in init_text
 
 
 def test_main_rpl_identity_and_build_allowlist():

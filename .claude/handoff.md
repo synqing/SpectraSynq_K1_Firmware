@@ -64,12 +64,12 @@ displaced (Captain item 6). B489 / 1101 / F887 not touched.
    `IDENTITY OK: git=cd18d89c env=k1_main_rpl_im69d epoch=1787028551`.
 7. ~~First light + measured cal + chip lock~~ **DONE** —
    `MAIN_RPL_FIRST_LIGHT_PASS` · `CHIP ID: 9087A500` · SSL=173 DC=−265.
-8. **Agent:** close IM69D SELECT / RIGHT-capsule docs debt (mono path,
-   SEL unused, `SLOT_RIGHT`, PDM 8/9) — then annex Lever-2 onto
-   `k1_main_rpl_im69d` only. Honour/production promote remains a separate
-   close. Rollback of B489 look: overlay `@ 836fde39`.
-   Rollback of Main RPL WS2816 topology: reflash `@ 02cc2f54` (native WS2816,
-   pre-pair-swap) or `@ cd18d89c` (current first-light).
+8. ~~IM69D SELECT / RIGHT-capsule docs debt~~ **DONE** —
+   `MAIN_RPL_SELECT_CLOSED_AS` (SEL unused, `SLOT_RIGHT`, PDM 8/9).
+9. **Agent:** annex Lever-2 (`K1_WS2816_LEVER2_V1`) onto
+   `k1_main_rpl_im69d` only — not `k1_hardware`. Honour/production promote
+   remains a separate close. Rollback of B489 look: overlay `@ 836fde39`.
+   Rollback of Main RPL WS2816 topology: reflash `@ cd18d89c` (first-light).
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
