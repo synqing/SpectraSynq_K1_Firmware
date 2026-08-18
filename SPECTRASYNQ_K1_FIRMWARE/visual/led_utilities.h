@@ -1252,11 +1252,19 @@ inline void init_leds() {
   init_lerp_params();
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  // Fail-closed: one continuous 160-LED strip per channel, two DINs.
-  // DIN-A → leds[0..79] (LEDs 1–80); DIN-B → leds[80..159] (LEDs 81–160).
-  // Do NOT consult CONFIG.LED_TYPE — a stale NEOPIXEL would leave DIN-B dark.
-  FastLED.addLeds<WS2812B, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
-  FastLED.addLeds<WS2812B, LED_CLOCK_PIN, GRB>(
+  // Fail-closed WS2816 split (bench-proven aa0b57c2, Captain-ratified 2026-07-16):
+  // ONE continuous 160-px image on 160 physical WS2816 LEDs fed by TWO 80-LED
+  // data inputs. DIN-A → px 0–79 (LEDs 1–80); DIN-B → px 80–159 (LEDs 81–160).
+  // WS2816 is 48-bit/pixel at WS2812 timing — a single 160-LED run costs
+  // 9.88 ms incl. latch (~101 Hz ceiling); two 80-LED halves transmit in
+  // parallel on separate RMT channels at 5.08 ms each. The native FastLED
+  // WS2816 controller emits the 48-bit GRB wire payload (user order applied
+  // once in 16-bit space; inner WS2812 forced RGB) — NEVER register WS2812B
+  // here: 24-bit frames feed each physical LED two half-pixels (half strip
+  // dark, colours garbage). Do NOT consult CONFIG.LED_TYPE — a stale
+  // persisted value must not reroute the wire format during bring-up.
+  FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
+  FastLED.addLeds<WS2816, LED_CLOCK_PIN, GRB>(
       leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2);
 #else
   if (CONFIG.LED_TYPE == LED_NEOPIXEL) {
@@ -2443,10 +2451,14 @@ inline void init_secondary_leds() {
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
-  // Secondary: same contiguous 160-LED / dual-DIN map as primary (DIN-A 1–80, DIN-B 81–160).
-  FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(
+  // Secondary WS2816 PCB: same contiguous 160-LED / dual-DIN split as primary
+  // (DIN-A px 0–79 = LEDs 1–80, DIN-B px 80–159 = LEDs 81–160). Native WS2816
+  // 48-bit controllers — never WS2812B (see init_leds() Main RPL comment).
+  // This is the 1313 rig's ratified "phase 2" shape: secondary registered on
+  // its own pin pair with the same 2×(count/2) offset split.
+  FastLED.addLeds<WS2816, SECONDARY_LED_DATA_PIN, GRB>(
       leds_out_secondary, 0, SECONDARY_LED_COUNT / 2);
-  FastLED.addLeds<WS2812B, SECONDARY_LED_CLOCK_PIN, GRB>(
+  FastLED.addLeds<WS2816, SECONDARY_LED_CLOCK_PIN, GRB>(
       leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2);
 #else
   // Use constants for FastLED template arguments

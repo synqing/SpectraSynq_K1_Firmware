@@ -62,8 +62,10 @@ def test_main_rpl_identity_and_build_allowlist():
     assert ENV in wrapper
 
 
-def test_main_rpl_led_init_is_contiguous_dual_din():
-    """Each PCB = one 160 buffer; DIN-A [0..79], DIN-B [80..159] — not centre-origin art."""
+def test_main_rpl_led_init_is_ws2816_contiguous_dual_din():
+    """Bench-proven WS2816 split (aa0b57c2): native 48-bit WS2816 controllers,
+    one 160 buffer per PCB, DIN-A [0..79] / DIN-B [80..159]. WS2812B here is
+    the convicted regression — 24-bit frames halve the strip and scramble colour."""
     led = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h").read_text(
         encoding="utf-8"
     )
@@ -74,14 +76,21 @@ def test_main_rpl_led_init_is_contiguous_dual_din():
     )
     assert len(blocks) >= 2
     primary, secondary = blocks[0], blocks[1]
-    assert "leds_out, 0, CONFIG.LED_COUNT / 2" in primary
+    assert (
+        "FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2)"
+        in primary
+    )
     assert "leds_out, CONFIG.LED_COUNT / 2, CONFIG.LED_COUNT / 2" in primary
-    assert "LED_DATA_PIN" in primary and "LED_CLOCK_PIN" in primary
+    assert "WS2816, LED_CLOCK_PIN, GRB" in primary
+    assert "FastLED.addLeds<WS2812B" not in primary
     assert "if (CONFIG.LED_TYPE" not in primary
+    assert "WS2816, SECONDARY_LED_DATA_PIN, GRB" in secondary
+    assert "WS2816, SECONDARY_LED_CLOCK_PIN, GRB" in secondary
     assert "leds_out_secondary, 0, SECONDARY_LED_COUNT / 2" in secondary
     assert (
         "leds_out_secondary, SECONDARY_LED_COUNT / 2, SECONDARY_LED_COUNT / 2"
         in secondary
     )
+    assert "FastLED.addLeds<WS2812B" not in secondary
     assert "centre-split" not in primary.lower()
     assert "centre-split" not in secondary.lower()

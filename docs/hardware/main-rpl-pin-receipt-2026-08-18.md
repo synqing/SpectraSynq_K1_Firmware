@@ -1,5 +1,5 @@
 ---
-abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, chip-id guess 9087A500. Captain-named 2026-08-18. Dual 160-px WS2816 PCBs on primary DIN-A/B GPIO17/18 and secondary DIN-A/B GPIO15/16; dual IM69D130 PDM DATA=GPIO9 CLK=GPIO8. No firmware env yet — flash FREEZE until a dedicated pinmap ships. I2C on 17/18 is displaced by LED DINs."
+abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, chip 9087A500. Dual 160-px WS2816 PCBs — each one continuous strip, DIN-A leds 1–80 / DIN-B leds 81–160 — primary GPIO17/18, secondary GPIO15/16; dual IM69D130 PDM DATA=GPIO9 CLK=GPIO8. On silicon k1_main_rpl_im69d @ 31668e16. I2C on 17/18 is displaced by LED DINs."
 ---
 
 # Main RPL — Pin Receipt (2026-08-18)
@@ -18,7 +18,7 @@ abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90
 |---|---|---|
 | Chip | `F887A500` | `9087A500` (derived) |
 | USB serial | `B4:3A:45:A5:87:F8` | `B4:3A:45:A5:87:90` |
-| Status | OFFSITE (consultancy) | Assembled; **not flashed** |
+| Status | OFFSITE (consultancy) | Flashed `k1_main_rpl_im69d` @ `31668e16` |
 
 Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as covering this serial.
 
@@ -34,8 +34,10 @@ Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as coveri
 | IM69D130 DATA | **9** | Dual capsule board |
 | IM69D130 CLK | **8** | Dual capsule board |
 
-Firmware: `LED_NEOPIXEL_X2` / Main RPL fail-closed init —
-`addLeds(DIN-A, 0, 80)` + `addLeds(DIN-B, 80, 80)` per channel.
+Firmware: Main RPL fail-closed init — native FastLED **WS2816** (48-bit GRB)
+controllers, `addLeds<WS2816>(DIN-A, 0, 80)` + `addLeds<WS2816>(DIN-B, 80, 80)`
+per channel (bench-proven split `aa0b57c2`, Captain-ratified 2026-07-16).
+Never WS2812B on these pins — 24-bit frames halve the strip.
 
 ## Conflicts with existing firmware pinmaps
 
@@ -49,17 +51,12 @@ Firmware: `LED_NEOPIXEL_X2` / Main RPL fail-closed init —
 
 ## Firmware status
 
-- Identity registered in `scripts/platformio/k1_device_identities.json` with **`envs: []`**.
-- Upload guard will **refuse every K1 env** for this serial until a dedicated env is mapped.
-- WS2816 dual-DIN emit (true DIN-A + DIN-B per edge) is **not** a pin remap of `LED_DATA_PIN` / `LED_CLOCK_PIN` alone.
-
-## Flash freeze
-
-**No flash** until:
-
-1. Dedicated pinmap + env (proposed name: `k1_main_rpl_im69d_ws2816` or similar).  
-2. Captain `CAPTAIN_FLASH_AUTH` / named token (e.g. `MAIN_RPL_BRINGUP_FLASH`).  
-3. Post-flash stamp: `IDENTITY OK: git=<sha> env=<env> epoch=…` on USB `B4:3A:45:A5:87:90`.
+- Env **`k1_main_rpl_im69d`** only (`K1_MAIN_RPL_PINMAP_V1`).
+- Fail-closed init: native `WS2816` controllers, `addLeds<WS2816>(DIN-A, 0, 80)` +
+  `addLeds<WS2816>(DIN-B, 80, 80)` per channel.
+- **Scar:** `31668e16` / `5fb237ae` registered `WS2812B` (24-bit) on these pins —
+  wrong wire format for WS2816 (48-bit/pixel). Corrected to the bench-proven
+  `WS2816` split from `aa0b57c2`.
 
 ## Open (not blocking registration)
 
