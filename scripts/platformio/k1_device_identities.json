@@ -59,7 +59,7 @@
             "chip_id": "9087A500",
             "usb_serial": "B4:3A:45:A5:87:90",
             "role": "Main RPL (main K1 replacement)",
-            "pinmap": "WS2816 dual-DIN primary GPIO17/18 + secondary GPIO15/16; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9; I2C 17/18 DISPLACED by LED DIN-A/B",
+            "pinmap": "WS2816 dual-DIN primary GPIO15/16 + secondary GPIO17/18; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9; I2C 17/18 DISPLACED by secondary LED DIN-A/B",
             "advisory_port": "/dev/tty.usbmodem1401",
             "_registration_2026_08_18": "Captain named unit Main RPL. Pin receipt: docs/hardware/main-rpl-pin-receipt-2026-08-18.md. Chip ID derived from USB serial pattern (90||87||A500); confirm with :chip_id after first bring-up flash.",
             "envs": [
