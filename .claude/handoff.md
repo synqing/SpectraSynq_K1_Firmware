@@ -35,14 +35,15 @@ Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
 while a palette owns that channel. Production promotion of the flag stays
 gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 
-**Main RPL = ON SILICON @ `3b425805` / `k1_main_rpl_im69d`**
+**Main RPL = ON SILICON @ `a6149b29` / `k1_main_rpl_im69d`**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
 Live `:dump` 2026-08-18: **`CHIP ID: 9087A500`** (locked — not a USB-serial guess).
-Native FastLED WS2816 48-bit dual-DIN (`aa0b57c2` shape): DIN-A [0..79] /
+Lever-2 packer + WS2812B RGB dual-DIN (`aa0b57c2` geometry): DIN-A [0..79] /
 DIN-B [80..159]; **primary GPIO15/16**, **secondary GPIO17/18**.
 IM69D DATA=GPIO8 CLK=GPIO9, `K1_MIC_IM69D_SLOT_RIGHT`, SEL not driven.
-Look flags (same as B489 home): honour + trail-deposit + m32. Lever-2 parked.
-`IDENTITY OK: git=3b425805 env=k1_main_rpl_im69d epoch=1787030866`.
+Look flags (same as B489 home): honour + trail-deposit + m32.
+**`-DK1_WS2816_LEVER2_V1` ON this env.**
+`IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`.
 **`MAIN_RPL_FIRST_LIGHT_PASS`** (Captain item 1 — Pri/Sec channels work).
 **CAL_SOURCE measured**, SSL=173, DC=−265, `cal_valid=1` (Captain item 2 —
 accepted; do **not** re-fire `start_noise_cal`). Encoders stay dead; I2C 17/18
@@ -70,12 +71,13 @@ displaced (Captain item 6). B489 / 1101 / F887 not touched.
 9. ~~Dull-show diagnosis~~ **CLOSED-AS look-flag gap** — path is alive
    (live lock=1 / conf 0.90; SSL in-family). `k1_main_rpl_im69d` now carries
    the B489 lively flags (honour + trail-deposit + m32). Not on `k1_hardware`.
-   Do **not** re-fire cal. Lever-2 is **parked host-only** (no flash).
-10. ~~Look-flag flash~~ **DONE** —
-    `IDENTITY OK: git=3b425805 env=k1_main_rpl_im69d epoch=1787030866`.
-    Captain: eyes-on mode 32 vs B489. Agent: Lever-2 flash only on a later
-    named GO. Honour onto `k1_hardware` stays a separate close. Rollback of
-    first-light topology: reflash `@ cd18d89c`.
+   Do **not** re-fire cal.
+10. ~~Look-flag flash~~ **DONE** — `3b425805`.
+11. ~~Lever-2 flash~~ **DONE** —
+    `IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`.
+    **Captain:** eyes-on Lever-2 look (and mode 32 vs B489). Honour onto
+    `k1_hardware` stays a separate close. Rollback of first-light topology:
+    reflash `@ cd18d89c`. Rollback of look-flags-only: `@ 3b425805`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
