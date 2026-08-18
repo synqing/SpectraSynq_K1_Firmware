@@ -18,7 +18,7 @@ abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90
 |---|---|---|
 | Chip | `F887A500` | `9087A500` (live `:dump` lock) |
 | USB serial | `B4:3A:45:A5:87:F8` | `B4:3A:45:A5:87:90` |
-| Status | OFFSITE (consultancy) | Flashed `k1_main_rpl_im69d` @ `cd18d89c`; **`MAIN_RPL_FIRST_LIGHT_PASS`** |
+| Status | OFFSITE (consultancy) | Flashed `k1_main_rpl_im69d` @ `3b425805`; **`MAIN_RPL_FIRST_LIGHT_PASS`** |
 
 Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as covering this serial.
 
@@ -55,7 +55,8 @@ not bare `WS2812B` on `leds_out` (24-bit corruption). Both PCBs take Lever-2.
 - Env **`k1_main_rpl_im69d`** only (`K1_MAIN_RPL_PINMAP_V1`).
 - Fail-closed init: Lever-2 packer + `WS2812B` RGB dual-DIN (`aa0b57c2`
   geometry). Native `WS2816` controllers remain the flag-off fallback only.
-- Live identity 2026-08-18: `BUILD: version=40103 git=cd18d89c epoch=1787028551 env=k1_main_rpl_im69d`.
+- Live identity 2026-08-18: `BUILD: version=40103 git=3b425805 epoch=1787030866 env=k1_main_rpl_im69d`.
+  First-light topology rollback remains `@ cd18d89c`.
 - **`CHIP ID: 9087A500`** locked from live `:dump` (not a USB-serial guess).
 - **`MAIN_RPL_FIRST_LIGHT_PASS`** — Captain item 1: primary and secondary channels work.
 - **CAL_SOURCE measured**, SSL=173, DC=−265, `cal_valid=1`, `NOISE_CAL_REASON: none`
