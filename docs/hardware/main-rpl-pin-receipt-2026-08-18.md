@@ -1,12 +1,12 @@
 ---
-abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, chip 9087A500. Dual 160-px WS2816 PCBs — each one continuous strip, DIN-A leds 1–80 / DIN-B leds 81–160 — primary GPIO15/16, secondary GPIO17/18; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9. I2C on 17/18 is displaced by secondary LED DINs."
+abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, CHIP ID 9087A500 locked live. Dual 160-px WS2816 PCBs — each one continuous strip, DIN-A leds 1–80 / DIN-B leds 81–160 — primary GPIO15/16, secondary GPIO17/18; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9 SLOT_RIGHT. MAIN_RPL_FIRST_LIGHT_PASS. CAL measured SSL=173 DC=-265. Encoders stay dead; I2C 17/18 displaced."
 ---
 
 # Main RPL — Pin Receipt (2026-08-18)
 
 **Device name:** Main RPL (main K1 replacement)  
 **USB serial:** `B4:3A:45:A5:87:90`  
-**Chip ID (derived from USB serial pattern):** `9087A500` — confirm with `:chip_id` after first bring-up flash  
+**Chip ID (locked live 2026-08-18):** `9087A500` — `:chip_id` / `:dump` on `/dev/cu.usbmodem1401` printed `CHIP ID: 9087A500`  
 **Port at registration:** `/dev/cu.usbmodem1401`  
 **Date:** 2026-08-18 (AWST)  
 **Captain unit name:** `Main RPL`  
@@ -16,9 +16,9 @@ abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90
 
 | | Offsite main | Main RPL |
 |---|---|---|
-| Chip | `F887A500` | `9087A500` (derived) |
+| Chip | `F887A500` | `9087A500` (live `:dump` lock) |
 | USB serial | `B4:3A:45:A5:87:F8` | `B4:3A:45:A5:87:90` |
-| Status | OFFSITE (consultancy) | Flashed `k1_main_rpl_im69d` @ `31668e16` |
+| Status | OFFSITE (consultancy) | Flashed `k1_main_rpl_im69d` @ `cd18d89c`; **`MAIN_RPL_FIRST_LIGHT_PASS`** |
 
 Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as covering this serial.
 
@@ -53,13 +53,21 @@ Never WS2812B on these pins — 24-bit frames halve the strip.
 
 - Env **`k1_main_rpl_im69d`** only (`K1_MAIN_RPL_PINMAP_V1`).
 - Fail-closed init: native `WS2816` controllers, `addLeds<WS2816>(DIN-A, 0, 80)` +
-  `addLeds<WS2816>(DIN-B, 80, 80)` per channel.
+  `addLeds<WS2816>(DIN-B, 80, 80)` per channel (`aa0b57c2` shape).
+- Live identity 2026-08-18: `BUILD: version=40103 git=cd18d89c epoch=1787028551 env=k1_main_rpl_im69d`.
+- **`CHIP ID: 9087A500`** locked from live `:dump` (not a USB-serial guess).
+- **`MAIN_RPL_FIRST_LIGHT_PASS`** — Captain item 1: primary and secondary channels work.
+- **CAL_SOURCE measured**, SSL=173, DC=−265, `cal_valid=1`, `NOISE_CAL_REASON: none`
+  (Captain item 2 — accepted; do **not** re-fire `start_noise_cal`).
+- Encoders stay dead. I2C 17/18 remains displaced by secondary LED DIN-A/B
+  (Captain item 6 — do not remap).
 - **Scar:** `31668e16` / `5fb237ae` registered `WS2812B` (24-bit) on these pins —
-  wrong wire format for WS2816 (48-bit/pixel). Corrected to the bench-proven
-  `WS2816` split from `aa0b57c2`.
+  wrong wire format for WS2816 (48-bit/pixel). Corrected at `02cc2f54` to the
+  bench-proven `WS2816` split. Pair swap `cd18d89c` is the first-light binary.
 
-## Open (not blocking registration)
+## Open (not blocking first light)
 
-- IM69D SELECT strap / which capsule is mono RIGHT — unmeasured (same class of debt as Unit 2 dual-capsule UNPROVEN).  
-- Whether encoders return on alternate I2C GPIOs.  
-- Lever-2 / `K1_WS2816_LEVER2_V1` vs bring-up WS2812B compatibility path for first light.
+- IM69D SELECT strap / which capsule is mono RIGHT — still unmeasured electrically
+  (Unit 2 dual-capsule UNPROVEN class). Firmware path is `SLOT_RIGHT` + SEL GPIO12
+  unused; close in the SELECT receipt, not by driving SELECT.
+- Lever-2 / `K1_WS2816_LEVER2_V1` 16-bit emit annex onto this branch (Captain item 7).

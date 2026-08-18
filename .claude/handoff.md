@@ -35,14 +35,23 @@ Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
 while a palette owns that channel. Production promotion of the flag stays
 gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 
-**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).  
-**Main RPL = REGISTERED** (Captain 2026-08-18): USB `B4:3A:45:A5:87:90` on
-`/dev/cu.usbmodem1401`, chip-id guess `9087A500`. Pin receipt
-[`docs/hardware/main-rpl-pin-receipt-2026-08-18.md`](../docs/hardware/main-rpl-pin-receipt-2026-08-18.md).
-**Flash FREEZE** (`envs: []`). Not F887. G8 deferred, not cancelled.
+**Main RPL = ON SILICON @ `cd18d89c` / `k1_main_rpl_im69d`**
+(USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
+Live `:dump` 2026-08-18: **`CHIP ID: 9087A500`** (locked — not a USB-serial guess).
+Native FastLED WS2816 48-bit dual-DIN (`aa0b57c2` shape): DIN-A [0..79] /
+DIN-B [80..159]; **primary GPIO15/16**, **secondary GPIO17/18**.
+IM69D DATA=GPIO8 CLK=GPIO9, `K1_MIC_IM69D_SLOT_RIGHT`, SEL not driven.
+`IDENTITY OK: git=cd18d89c env=k1_main_rpl_im69d epoch=1787028551`.
+**`MAIN_RPL_FIRST_LIGHT_PASS`** (Captain item 1 — Pri/Sec channels work).
+**CAL_SOURCE measured**, SSL=173, DC=−265, `cal_valid=1` (Captain item 2 —
+accepted; do **not** re-fire `start_noise_cal`). Encoders stay dead; I2C 17/18
+displaced (Captain item 6). B489 / 1101 / F887 not touched.
+
+**Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 
 **G2 = CLOSED** · **G3 = CLOSED** · **G7B = CLOSED** · **G8 host = GREEN**.
 **B489_WFHYB_PROMOTE = CLOSED on silicon.**
+**MAIN_RPL_FIRST_LIGHT_PASS = CLOSED on silicon.**
 
 **Ship path after this lock:**
 1. ~~Trail flash~~ **DONE** — `1be4930a`.
@@ -50,16 +59,17 @@ gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 3. ~~Captain A/B~~ **KEEP ALL 33–37**.
 4. ~~`B489_WFHYB_PROMOTE`~~ **DONE** — stamp
    `IDENTITY OK: git=573206c0 env=k1_bench_im69d epoch=1787004384`.
-5. ~~Main RPL named + pin-receipted~~ **DONE** — identity in
-   `k1_device_identities.json`, registry §1/§2, receipt on disk.
-6. **Agent:** Main RPL dedicated pinmap/env (WS2816 dual-DIN 17/18+15/16,
-   IM69D 9/8; I2C displaced; resolve RNG_SEED vs CLK=8) — then map that env
-   onto the Main RPL serial.
-7. **Captain:** `MAIN_RPL_BRINGUP_FLASH` (or equivalent named GO).
-8. **Shipped stamp:** `IDENTITY OK: git=<sha> env=<main_rpl_env> epoch=…`
-   on USB `B4:3A:45:A5:87:90`. Honour onto a production env remains a separate
-   close (`F887_PRODUCTION_FLASH` / Main RPL production promote — not a silent
-   leak of colour-fix flags). Rollback of B489 look: overlay `@ 836fde39`.
+5. ~~Main RPL named + pin-receipted + env~~ **DONE**.
+6. ~~`MAIN_RPL_BRINGUP_FLASH` + WS2816 dual-DIN + GPIO pair swap~~ **DONE** —
+   `IDENTITY OK: git=cd18d89c env=k1_main_rpl_im69d epoch=1787028551`.
+7. ~~First light + measured cal + chip lock~~ **DONE** —
+   `MAIN_RPL_FIRST_LIGHT_PASS` · `CHIP ID: 9087A500` · SSL=173 DC=−265.
+8. **Agent:** close IM69D SELECT / RIGHT-capsule docs debt (mono path,
+   SEL unused, `SLOT_RIGHT`, PDM 8/9) — then annex Lever-2 onto
+   `k1_main_rpl_im69d` only. Honour/production promote remains a separate
+   close. Rollback of B489 look: overlay `@ 836fde39`.
+   Rollback of Main RPL WS2816 topology: reflash `@ 02cc2f54` (native WS2816,
+   pre-pair-swap) or `@ cd18d89c` (current first-light).
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.
