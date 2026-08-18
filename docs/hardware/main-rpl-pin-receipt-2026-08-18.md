@@ -1,5 +1,5 @@
 ---
-abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, chip 9087A500. Dual 160-px WS2816 PCBs — each one continuous strip, DIN-A leds 1–80 / DIN-B leds 81–160 — primary GPIO17/18, secondary GPIO15/16; dual IM69D130 PDM DATA=GPIO9 CLK=GPIO8. On silicon k1_main_rpl_im69d @ 31668e16. I2C on 17/18 is displaced by LED DINs."
+abstract: "Pin receipt for Main RPL (main K1 replacement): USB B4:3A:45:A5:87:90 on /dev/cu.usbmodem1401, chip 9087A500. Dual 160-px WS2816 PCBs — each one continuous strip, DIN-A leds 1–80 / DIN-B leds 81–160 — primary GPIO17/18, secondary GPIO15/16; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9. I2C on 17/18 is displaced by LED DINs."
 ---
 
 # Main RPL — Pin Receipt (2026-08-18)
@@ -31,8 +31,8 @@ Do **not** flash Main RPL as F887. Do **not** treat F887 standing auth as coveri
 | Secondary DIN-A | **15** | LEDs **1–80** of the secondary 160-LED strip |
 | Secondary DIN-B | **16** | LEDs **81–160** of the same secondary strip |
 | LED geometry | 2× 160 px WS2816 PCBs | Each PCB = one continuous strip, two data lines |
-| IM69D130 DATA | **9** | Dual capsule board |
-| IM69D130 CLK | **8** | Dual capsule board |
+| IM69D130 DATA | **8** | Dual capsule board |
+| IM69D130 CLK | **9** | Dual capsule board |
 
 Firmware: Main RPL fail-closed init — native FastLED **WS2816** (48-bit GRB)
 controllers, `addLeds<WS2816>(DIN-A, 0, 80)` + `addLeds<WS2816>(DIN-B, 80, 80)`
@@ -44,9 +44,9 @@ Never WS2812B on these pins — 24-bit frames halve the strip.
 | Existing assignment | Conflict |
 |---|---|
 | `I2C_SDA_PIN=17` / `I2C_SCL_PIN=18` | **Displaced** — LED DIN-A/B now own 17/18. No encoder I2C on this unit until remapped. |
-| `RNG_SEED_PIN=8` | **Collides** with PDM CLK — seed pin must move or be unused under Main RPL pinmap. |
+| `RNG_SEED_PIN=8` | **Collides** with PDM DATA — seed is already remapped to GPIO10 under this pinmap. |
 | Prod LEDs `6/7` / bench LEDs `4/5` | **Wrong** for this board — single-wire WS2812B maps do not drive 17/18+15/16. |
-| Bench IM69D `CLK=14/DATA=13` / Unit 2 `39/38` | **Wrong** — this board is `CLK=8/DATA=9`. |
+| Bench IM69D `CLK=14/DATA=13` / Unit 2 `39/38` | **Wrong** — this board is `DATA=8/CLK=9`. |
 | Production `#error` on `K1_MIC_IM69D_PDM_V1` | IM69D on a “main” role needs a **new** pinmap branch, not `k1_hardware` as-is. |
 
 ## Firmware status

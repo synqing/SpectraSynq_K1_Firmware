@@ -43,8 +43,8 @@ def test_main_rpl_pinmap_macros():
     assert "#define SECONDARY_LED_DATA_PIN 15" in region
     assert "#define SECONDARY_LED_CLOCK_PIN 16" in region
     assert "LEDs 1–80" in region or "LEDs 1-80" in region or "1–80" in region
-    assert "#define K1_PDM_CLK_PIN 8" in region
-    assert "#define K1_PDM_DIN_PIN 9" in region
+    assert "#define K1_PDM_CLK_PIN 9" in region
+    assert "#define K1_PDM_DIN_PIN 8" in region
     assert "#define RNG_SEED_PIN 10" in region
 
 

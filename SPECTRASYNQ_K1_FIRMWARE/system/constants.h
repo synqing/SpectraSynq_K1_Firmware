@@ -376,7 +376,7 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     //     DIN-B = LEDs 81–160 (buffer [80..159])
     //   Primary:   DIN-A=GPIO17, DIN-B=GPIO18
     //   Secondary: DIN-A=GPIO15, DIN-B=GPIO16
-    //   Dual IM69D130: DATA=GPIO9, CLK=GPIO8 (SELECT hard-strapped; not driven)
+    //   Dual IM69D130: DATA=GPIO8, CLK=GPIO9 (SELECT hard-strapped; not driven)
     // I2C 17/18 DISPLACED by LED DINs. K1_HAS_ROTATE8 is already 0 under K1_HARDWARE.
     #define I2S_BCLK_PIN 13
     #define I2S_LRCLK_PIN 11
@@ -388,8 +388,8 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SECONDARY_LED_CLOCK_PIN 16
 
     #ifdef K1_MIC_IM69D_PDM_V1
-      #define K1_PDM_CLK_PIN 8
-      #define K1_PDM_DIN_PIN 9
+      #define K1_PDM_CLK_PIN 9
+      #define K1_PDM_DIN_PIN 8
       #define K1_IM69_PDM_SEL_PIN 12
     #else
       #error "K1_MAIN_RPL_PINMAP_V1 requires K1_MIC_IM69D_PDM_V1 (dual IM69D130 on 8/9)"
