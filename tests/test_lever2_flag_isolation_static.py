@@ -1,8 +1,7 @@
 """Static ratchets for K1_WS2816_LEVER2_V1 isolation.
 
-Shippable envs must not define the flag. Lever-2 is parked host-only
-(Captain 2026-08-18: do not flash onto Main RPL until the dull-show
-diagnosis is closed). Palette HD V2 stays off.
+Shippable envs must not define the flag. Main RPL bring-up
+(k1_main_rpl_im69d) is the named carrier. Palette HD V2 stays off.
 """
 
 from __future__ import annotations
@@ -53,13 +52,13 @@ def test_default_envs_unchanged():
     assert m.group(1) == "k1_hardware"
 
 
-def test_lever2_is_parked_off_main_rpl_and_shippable():
+def test_lever2_env_exists_and_carries_flag():
     sections = _sections()
     assert "k1_main_rpl_im69d" in sections
     body = sections["k1_main_rpl_im69d"]
     assert re.search(r"^extends\s*=\s*env:k1_hardware\s*$", body, re.M)
     have = _effective_flags("k1_main_rpl_im69d", sections)
-    assert FLAG not in have
+    assert FLAG in have
     assert HD_FLAG not in have
     assert "PalettesHD_RangeV2.cpp" not in body
     assert "k1_ws2816_lever2" not in sections
