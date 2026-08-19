@@ -1,0 +1,47 @@
+{
+  "port": "/dev/cu.usbmodem1401",
+  "t0": 1787141217.433556,
+  "build": "sbr{{\r\nBUILD: version=40103 git=b318a0ec epoch=1787141154 env=k1_main_rpl_fps_agc_probe\r\n}}",
+  "skip_ack": "sbr{{\r\nSHOW_SKIP: on ms=5000\r\n}}",
+  "skip_status": "sbr{{\r\nSHOW_SKIP: until_ms=59059 remaining_ms=4392\r\n}}\r\nVPF,ver=1,seq=14,mode=32,smode=18,sec=1,acq_us=1668/4473,vu_us=93/292,gdft_us=5762/8104,smooth_us=76/107,pri_render_us=15168/41661221,sec_render_us=315/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=4587/5511,frame_us=3561/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644",
+  "off_ack": "sbr{{\r\nSHOW_SKIP: off\r\n}}\r\nVPF,ver=1,seq=21,mode=32,smode=18,sec=1,acq_us=2316/4473,vu_us=74/292,gdft_us=4537/8104,smooth_us=75/110,pri_render_us=8020/41661221,sec_render_us=319/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2431/3560,interval_us=3619/5511,frame_us=2578/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644",
+  "led_fps": [
+    202.52
+  ],
+  "fps_baseline": [
+    78.7,
+    82.98,
+    78.83,
+    80.84,
+    82.59,
+    81.78
+  ],
+  "fps_pre": [
+    78.01,
+    76.17,
+    76.48,
+    78.24
+  ],
+  "fps_during": [
+    132.74,
+    135.84,
+    135.1,
+    135.88,
+    135.86,
+    132.75,
+    133.52,
+    135.13,
+    81.23,
+    78.63,
+    76.83,
+    79.06
+  ],
+  "fps_post": [
+    80.49,
+    74.22,
+    74.15,
+    80.11,
+    79.85,
+    75.14
+  ]
+}

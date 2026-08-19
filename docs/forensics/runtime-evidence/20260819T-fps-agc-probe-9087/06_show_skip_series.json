@@ -1,0 +1,156 @@
+{
+  "skip_ack": "sbr{{\r\nSHOW_SKIP: on ms=5000\r\n}}",
+  "skip_status": "sbr{{\r\nSHOW_SKIP: until_ms=59059 remaining_ms=4392\r\n}}\r\nVPF,ver=1,seq=14,mode=32,smode=18,sec=1,acq_us=1668/4473,vu_us=93/292,gdft_us=5762/8104,smooth_us=76/107,pri_render_us=15168/41661221,sec_render_us=315/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=4587/5511,frame_us=3561/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644",
+  "off_ack": "sbr{{\r\nSHOW_SKIP: off\r\n}}\r\nVPF,ver=1,seq=21,mode=32,smode=18,sec=1,acq_us=2316/4473,vu_us=74/292,gdft_us=4537/8104,smooth_us=75/110,pri_render_us=8020/41661221,sec_render_us=319/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2431/3560,interval_us=3619/5511,frame_us=2578/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644",
+  "led_fps": "sbr{{\r\nLED_FPS: 202.52\r\n}}",
+  "pre": [
+    {
+      "phase": "pre",
+      "t": 1787141235.294156,
+      "fps": 78.01,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 78.01\r\n}}\r\nVPF,ver=1,seq=11,mode=32,smode=18,sec=1,acq_us=1471/2831,vu_us=99/292,gdft_us=6157/8104,smooth_us=77/92,pri_render_us=21008/41661221,sec_render_us=317/462,pri_prep_us=184/210,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2431/3560,interval_us=4941/5511,frame_us=3920/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "pre",
+      "t": 1787141235.9545448,
+      "fps": 76.17,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 76.17\r\n}}"
+    },
+    {
+      "phase": "pre",
+      "t": 1787141236.618061,
+      "fps": 76.48,
+      "raw": "VPF,ver=1,seq=12,mode=32,smode=18,sec=1,acq_us=1471/2831,vu_us=99/292,gdft_us=6151/8104,smooth_us=77/92,pri_render_us=19159/41661221,sec_render_us=311/462,pri_prep_us=185/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2435/3560,interval_us=4940/5511,frame_us=3919/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644\r\nsbr{{\r\nSYSTEM_FPS: 76.48\r\n}}"
+    },
+    {
+      "phase": "pre",
+      "t": 1787141237.2797341,
+      "fps": 78.24,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 78.24\r\n}}\r\nVPF,ver=1,seq=13,mode=32,smode=18,sec=1,acq_us=1480/2831,vu_us=100/292,gdft_us=6159/8104,smooth_us=77/92,pri_render_us=17609/41661221,sec_render_us=313/462,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2434/3560,interval_us=4941/5511,frame_us=3919/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    }
+  ],
+  "during": [
+    {
+      "phase": "show_skip",
+      "t": 1787141238.9488251,
+      "dt_s": 9.5367431640625e-07,
+      "fps": 132.74,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 132.74\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141239.50962,
+      "dt_s": 0.560795783996582,
+      "fps": 135.84,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 135.84\r\n}}\r\nVPF,ver=1,seq=15,mode=32,smode=18,sec=1,acq_us=1912/4473,vu_us=86/292,gdft_us=5302/8104,smooth_us=76/109,pri_render_us=12964/41661221,sec_render_us=316/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=4200/5511,frame_us=3167/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141240.07279,
+      "dt_s": 1.1239657402038574,
+      "fps": 135.1,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 135.10\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141240.631959,
+      "dt_s": 1.6831347942352295,
+      "fps": 135.88,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 135.88\r\n}}\r\nVPF,ver=1,seq=16,mode=32,smode=18,sec=1,acq_us=2106/4473,vu_us=81/292,gdft_us=4936/8104,smooth_us=75/109,pri_render_us=11338/41661221,sec_render_us=317/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=3913/5511,frame_us=2876/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141241.190909,
+      "dt_s": 2.2420847415924072,
+      "fps": 135.86,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 135.86\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141241.742912,
+      "dt_s": 2.7940878868103027,
+      "fps": 132.75,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 132.75\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141242.30162,
+      "dt_s": 3.3527958393096924,
+      "fps": 133.52,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 133.52\r\n}}\r\nVPF,ver=1,seq=18,mode=32,smode=18,sec=1,acq_us=2396/4473,vu_us=72/292,gdft_us=4392/8104,smooth_us=75/110,pri_render_us=9092/41661221,sec_render_us=318/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=3517/5511,frame_us=2474/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141242.861943,
+      "dt_s": 3.913118839263916,
+      "fps": 135.13,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 135.13\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141243.423189,
+      "dt_s": 4.474364757537842,
+      "fps": 81.23,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 81.23\r\n}}\r\nVPF,ver=1,seq=19,mode=32,smode=18,sec=1,acq_us=2396/4473,vu_us=72/292,gdft_us=4384/8104,smooth_us=75/110,pri_render_us=8606/41661221,sec_render_us=318/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2429/3560,interval_us=3514/5511,frame_us=2470/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141243.977519,
+      "dt_s": 5.0286948680877686,
+      "fps": 78.63,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 78.63\r\n}}"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141244.533736,
+      "dt_s": 5.584911823272705,
+      "fps": 76.83,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 76.83\r\n}}\r\nVPF,ver=1,seq=20,mode=32,smode=18,sec=1,acq_us=2352/4473,vu_us=73/292,gdft_us=4461/8104,smooth_us=75/110,pri_render_us=8303/41661221,sec_render_us=319/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2430/3560,interval_us=3568/5511,frame_us=2526/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "show_skip",
+      "t": 1787141245.09007,
+      "dt_s": 6.1412458419799805,
+      "fps": 79.06,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 79.06\r\n}}"
+    }
+  ],
+  "post": [
+    {
+      "phase": "post",
+      "t": 1787141246.057027,
+      "fps": 80.49,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 80.49\r\n}}"
+    },
+    {
+      "phase": "post",
+      "t": 1787141246.716344,
+      "fps": 74.22,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 74.22\r\n}}"
+    },
+    {
+      "phase": "post",
+      "t": 1787141247.3762481,
+      "fps": 74.15,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 74.15\r\n}}\r\nVPF,ver=1,seq=23,mode=32,smode=18,sec=1,acq_us=2251/4473,vu_us=76/292,gdft_us=4670/8104,smooth_us=75/110,pri_render_us=7511/41661221,sec_render_us=319/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=3710/5511,frame_us=2671/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    },
+    {
+      "phase": "post",
+      "t": 1787141248.0339231,
+      "fps": 80.11,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 80.11\r\n}}"
+    },
+    {
+      "phase": "post",
+      "t": 1787141248.689827,
+      "fps": 79.85,
+      "raw": "VPF,ver=1,seq=24,mode=32,smode=18,sec=1,acq_us=2221/4473,vu_us=76/292,gdft_us=4726/8104,smooth_us=75/110,pri_render_us=7283/41661221,sec_render_us=319/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2431/3560,interval_us=3751/5511,frame_us=2711/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644\r\nsbr{{\r\nSYSTEM_FPS: 79.85\r\n}}"
+    },
+    {
+      "phase": "post",
+      "t": 1787141249.345255,
+      "fps": 75.14,
+      "raw": "sbr{{\r\nSYSTEM_FPS: 75.14\r\n}}\r\nVPF,ver=1,seq=25,mode=32,smode=18,sec=1,acq_us=2195/4473,vu_us=77/292,gdft_us=4778/8104,smooth_us=75/110,pri_render_us=7068/41661221,sec_render_us=320/556,pri_prep_us=184/214,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=123/146,show_us=2432/3560,interval_us=3789/5511,frame_us=2750/4960,over=0,dropped=0,heap=122292,ap_stack_hwm_words=4740,vp_stack_hwm_words=4644"
+    }
+  ]
+}

@@ -35,19 +35,19 @@ Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
 while a palette owns that channel. Production promotion of the flag stays
 gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 
-**Main RPL = ON SILICON @ `a6149b29` / `k1_main_rpl_im69d`**
+**Main RPL = ON SILICON @ `b318a0ec` / `k1_main_rpl_fps_agc_probe` (NON-SHIP)**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-Live `:dump` 2026-08-18: **`CHIP ID: 9087A500`** (locked — not a USB-serial guess).
-Lever-2 packer + WS2812B RGB dual-DIN (`aa0b57c2` geometry): DIN-A [0..79] /
-DIN-B [80..159]; **primary GPIO15/16**, **secondary GPIO17/18**.
-IM69D DATA=GPIO8 CLK=GPIO9, `K1_MIC_IM69D_SLOT_RIGHT`, SEL not driven.
-Look flags (same as B489 home): honour + trail-deposit + m32.
-**`-DK1_WS2816_LEVER2_V1` ON this env.**
-`IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`.
-**`MAIN_RPL_FIRST_LIGHT_PASS`** (Captain item 1 — Pri/Sec channels work).
-**CAL_SOURCE measured**, SSL=173, DC=−265, `cal_valid=1` (Captain item 2 —
-accepted; do **not** re-fire `start_noise_cal`). Encoders stay dead; I2C 17/18
-displaced (Captain item 6). B489 / 1101 / F887 not touched.
+Live `:dump` 2026-08-19: **`CHIP ID: 9087A500`** · `IDENTITY OK: git=b318a0ec env=k1_main_rpl_fps_agc_probe epoch=1787141154`.
+Probe flags: VP perf + show-skip **on**; clock-fix **forced off**. Cal inherited
+(`persisted_profile`, SSL 172, DC −247). Do **not** re-fire `start_noise_cal`.
+**Probe RESULT:** `show_us` ~2.4/3.6 ms (not serialisation); show-skip
+`SYSTEM_FPS` **~78 → ~135** convicts Core-0 LED-wire *servicing*. Evidence:
+`docs/forensics/runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md`.
+**Restore Lever-2 ship look:** reflash `k1_main_rpl_im69d` @ **`a6149b29`**
+(`IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`).
+Geometry unchanged: DIN-A [0..79] / DIN-B [80..159]; primary GPIO15/16,
+secondary GPIO17/18; IM69D DATA=8 CLK=9 `SLOT_RIGHT`. Encoders stay dead.
+B489 / 1101 / F887 not touched. Never promote the probe env.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 

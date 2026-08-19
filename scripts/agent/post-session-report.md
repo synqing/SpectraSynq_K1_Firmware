@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-19 FPS / AGC probe flash (Captain GO)
+
+```text
+session_objective:       Captain GO: flash k1_main_rpl_fps_agc_probe to 9087A500 only; stamp pack/show + show-skip SYSTEM_FPS.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ b318a0ec (parser fix on silicon after dec5fb53).
+branch_head_at_end:      b318a0ec; stamps uncommitted unless Captain names a docs commit.
+files_changed:           RESULT.md + capture artefacts; device-build-registry.md §2; .claude/handoff.md silicon; FPS-AGC-clock-step5-stamp.md; this report.
+commands_run:            capture_probe.py on /dev/cu.usbmodem1401 (DTR true / RTS false). No cal. No B489/F887 flash.
+validation_results:      IDENTITY OK git=b318a0ec env=k1_main_rpl_fps_agc_probe epoch=1787141154. CHIP ID 9087A500. SHOW_SKIP on ms=5000 remaining_ms=4392. pack_us 123/146. show_us ~2.4/3.6 ms. SYSTEM_FPS armed skip 132.7–135.9 (mean 134.6) vs pre ~76–78. Convicts Core-0 LED-wire servicing. Serialisation NOT convicted.
+evidence_captured:       docs/forensics/runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md
+blockers:                none for the discriminator. Next named GOs: restore a6149b29 look, or clock-fix ship flash + music eyes-on, or ISR-core lane.
+generated_files_ignored: tools/webflash/; runtime-evidence **/bins/.
+safety_constraints:      F887 NO; B489 NO; no cal; no erase; probe NON-SHIP; I2S LED struck.
+thinking_skill_used:     Cynefin (measure AP hole) + scientific method (show-skip discriminator).
+skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine (AP/VP timing).
+specialists_used:        none.
+claude_mem_observations: on-disk RESULT.md is authority for the probe decision.
+next_recommended_action: Captain names restore (a6149b29) or k1_main_rpl_im69d clock-fix ship flash. Do not promote probe env.
+```
+
+---
+
 ## Session Report — 2026-08-19 FPS / AGC clock decoupling (handover hybrid r1)
 
 ```text
