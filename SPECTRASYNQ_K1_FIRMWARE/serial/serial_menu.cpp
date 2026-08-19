@@ -3118,6 +3118,10 @@ void parse_command(char* command_buf) {
 	      vp_perf_command(command_type, command_data);
 	    }
 
+	    else if (strcmp(command_type, "show_skip") == 0) {
+	      show_skip_command(command_type, command_data);
+	    }
+
 #ifdef K1_SCHEDULING_TRACE_V1
     else if (strcmp(command_type, "scheduling_trace") == 0) {
       k1_scheduling_trace_command(command_type, command_data);

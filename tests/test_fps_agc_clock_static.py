@@ -63,6 +63,7 @@ def test_show_skip_command_and_render_gate_exist():
     assert 'SERIAL_TYPED_CMD("show_skip"' in typed
     serial = SERIAL.read_text(encoding="utf-8")
     assert "void show_skip_command" in serial
+    assert 'strcmp(command_type, "show_skip") == 0' in serial
     ino = INO.read_text(encoding="utf-8")
     assert "K1_SHOW_SKIP_DISCRIMINATOR_V1" in ino
     assert "k1_show_skip_until_ms" in ino
