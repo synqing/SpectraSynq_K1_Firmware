@@ -56,9 +56,11 @@ under palette ownership (it modulates; it does not synthesize hues).
   blend by amount with the same endpoint-exact discipline as `k1_edge_mix`.
 - Fail-closed: generation 0 or count 0 → identity, never garbage.
 
-`K1_EDGE_PALETTE_HONOUR_V1` keeps its name and env placement (evolved
-implementation, same invariant). Off on `k1_hardware`; on on
-`k1_main_rpl_im69d` and `k1_bench_im69d`.
+`K1_EDGE_PALETTE_HONOUR_V1` keeps its name (evolved implementation, same
+invariant). **On `k1_hardware` as of Captain GO 2026-08-20.** Child envs
+`k1_main_rpl_im69d` and `k1_bench_im69d` keep an explicit `-D` so a parent
+revert cannot silently drop them. The other five colour-fix flags stay off
+shippable envs.
 
 ## Serial channel semantic
 
@@ -140,3 +142,9 @@ Gold + complementary OFF → `[23, 121, 240]` (azure, bucket 14, not authored).
 Family ON stays on-curve. Veil desaturates. Silicon twin ON ≠ OFF ≠ identity.
 
 This closes the perceptual script Captain declined to eyes-on.
+
+## Production promote (Captain GO 2026-08-20)
+
+`K1_EDGE_PALETTE_HONOUR_V1` is on `[env:k1_hardware]`. The remaining five
+colour-fix flags stay leak-blocked. B489 flash of the resolver is a
+separate named GO on `k1_bench_im69d`. F887 remains OFFSITE.

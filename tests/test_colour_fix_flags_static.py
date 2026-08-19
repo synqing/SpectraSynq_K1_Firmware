@@ -7,7 +7,8 @@ promotion plan blocker #1). Each pins a failure class that already burned time:
   fix that silently never landed; this pins the flag half of that class).
 - The equalised sweep drive must contain an explicit rest mechanism (HF-51:
   scale-blind drives never rest on their own; the wake gate is load-bearing).
-- Fix flags must not leak into shippable envs before the gated promotion.
+- Unpromoted fix flags must not leak into shippable envs. Honour is
+  production (Captain 2026-08-20); the other five stay leak-blocked.
 """
 
 import re
@@ -22,6 +23,10 @@ FIX_FLAGS = {
     "K1_PALETTE_BRIGHT_EXCURSION_V1",
     "K1_POSITION_SMOOTH_V1",
     "K1_INCANDESCENT_OUTPUT_V1",
+    "K1_EDGE_PALETTE_HONOUR_V1",
+}
+# Captain 2026-08-20: honour alone is production. The other five stay leak-blocked.
+PROMOTED_FIX_FLAGS = {
     "K1_EDGE_PALETTE_HONOUR_V1",
 }
 SHIPPABLE_ENVS = {"k1_hardware", "k1_prod_im73d", "k1_bench_reference"}
@@ -81,14 +86,26 @@ def test_consolidated_candidate_carries_every_fix_flag():
 
 def test_fix_flags_do_not_leak_into_shippable_envs_pre_promotion():
     sections = _sections()
+    blocked = FIX_FLAGS - PROMOTED_FIX_FLAGS
     leaks = {
-        env: sorted(FIX_FLAGS & _effective_flags(env, sections))
+        env: sorted(blocked & _effective_flags(env, sections))
         for env in SHIPPABLE_ENVS
-        if env in sections and FIX_FLAGS & _effective_flags(env, sections)
+        if env in sections and blocked & _effective_flags(env, sections)
     }
     assert leaks == {}, (
-        f"fix flags reached shippable envs before the gated promotion: {leaks} — "
-        "promotion requires the plan's blockers closed + Captain eyes-on"
+        f"unpromoted fix flags reached shippable envs: {leaks} — "
+        "only PROMOTED_FIX_FLAGS may land on k1_hardware until the rest of "
+        "the colour-fix plan closes"
+    )
+
+
+def test_honour_v1_is_on_k1_hardware():
+    """Captain 2026-08-20: palette-safe honour is production on k1_hardware."""
+    sections = _sections()
+    have = _effective_flags("k1_hardware", sections)
+    assert "K1_EDGE_PALETTE_HONOUR_V1" in have, (
+        "K1_EDGE_PALETTE_HONOUR_V1 missing from k1_hardware after the "
+        "2026-08-20 production promote"
     )
 
 

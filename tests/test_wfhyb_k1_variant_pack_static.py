@@ -38,6 +38,18 @@ VARIANTS = (FW / "effects" / "light_mode_wfhyb_k1_variants.cpp").read_text()
 ORIGINAL = (FW / "effects" / "light_mode_waveform_hybrid_k1.cpp").read_text()
 PLATFORMIO = (ROOT / "platformio.ini").read_text()
 
+
+def _env_section(name: str) -> str:
+    """Body of [env:name] until the next env header. Comments may mention
+    other `[env:` names; a naive split would truncate mid-section."""
+    m = re.search(
+        rf"^\[env:{re.escape(name)}\]\n(.*?)(?=^\[env:|\Z)",
+        PLATFORMIO,
+        re.M | re.S,
+    )
+    assert m, f"missing [env:{name}]"
+    return m.group(1)
+
 FLAG = "K1_WFHYB_M32_VARIANTS_V1"
 PACK = [
     ("LIGHT_MODE_WFHYB_K1_FLUX", 33, "WFHYB K1 FLUX", "light_mode_wfhyb_k1_flux"),
@@ -98,28 +110,23 @@ class WfhybK1VariantPackStaticTest(unittest.TestCase):
     def test_flag_on_home_bench_env(self):
         # B489 home + Main RPL bring-up. Not on k1_hardware.
         self.assertEqual(PLATFORMIO.count(f"-D{FLAG}"), 2)
-        env_block = PLATFORMIO.split("[env:k1_bench_im69d]", 1)[1]
-        env_block = env_block.split("[env:", 1)[0]
+        env_block = _env_section("k1_bench_im69d")
         self.assertIn(f"-D{FLAG}", env_block)
         self.assertIn("-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1", env_block)
-        rpl = PLATFORMIO.split("[env:k1_main_rpl_im69d]", 1)[1]
-        rpl = rpl.split("[env:", 1)[0]
+        rpl = _env_section("k1_main_rpl_im69d")
         self.assertIn(f"-D{FLAG}", rpl)
-        hardware = PLATFORMIO.split("[env:k1_hardware]", 1)[1]
-        hardware = hardware.split("[env:", 1)[0]
+        hardware = _env_section("k1_hardware")
         self.assertNotIn(f"-D{FLAG}", hardware)
 
     def test_edge_palette_honour_rides_the_home_bench_env(self):
         """Captain 2026-08-18 B489_WFHYB_PROMOTE: honour is legal on this
-        unit's home env. k1_hardware stays off-flag until the colour-fix
-        promotion plan. Pin it here so a restore to k1_bench_im69d no longer
-        drops the P5.A gate (HF-56 class)."""
-        env_block = PLATFORMIO.split("[env:k1_bench_im69d]", 1)[1]
-        env_block = env_block.split("[env:", 1)[0]
+        unit's home env. Captain 2026-08-20 promoted the same flag onto
+        k1_hardware. Pin the bench -D so a restore to k1_bench_im69d cannot
+        drop the P5.A gate if the parent flag is later reverted (HF-56)."""
+        env_block = _env_section("k1_bench_im69d")
         self.assertIn("-DK1_EDGE_PALETTE_HONOUR_V1", env_block)
-        hardware = PLATFORMIO.split("[env:k1_hardware]", 1)[1]
-        hardware = hardware.split("[env:", 1)[0]
-        self.assertNotIn("-DK1_EDGE_PALETTE_HONOUR_V1", hardware)
+        hardware = _env_section("k1_hardware")
+        self.assertIn("-DK1_EDGE_PALETTE_HONOUR_V1", hardware)
 
     def test_original_mode_32_untouched(self):
         self.assertNotIn(FLAG, ORIGINAL)
