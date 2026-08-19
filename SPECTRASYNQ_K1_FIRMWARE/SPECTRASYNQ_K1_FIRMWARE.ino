@@ -1688,7 +1688,13 @@ void led_thread(void* arg) {
 #ifdef ENABLE_FRAME_DUMP
       frame_dump_tick();   // PIO-FDUMP: sample primary render (leds_16) before display transform
 #endif
+#if K1_SHOW_SKIP_DISCRIMINATOR_V1
+      if (k1_show_skip_until_ms == 0 || millis() >= k1_show_skip_until_ms) {
+        show_leds();
+      }
+#else
       show_leds();
+#endif
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running) {
         vp_perf_note_frame_total(uint32_t(esp_timer_get_time() - vp_frame_start_us));

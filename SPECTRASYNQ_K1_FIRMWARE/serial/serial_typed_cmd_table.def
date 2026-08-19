@@ -74,6 +74,7 @@ SERIAL_TYPED_CMD("dump_raw", serial_typed_dump_raw, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("vp_stream", serial_typed_vp_stream, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("ble_stream", serial_typed_ble_stream, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("vp_perf", serial_typed_vp_perf, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("show_skip", serial_typed_show_skip, SC_TYPED_ONLY, CMD_HARNESS)
 #ifdef K1_SCHEDULING_TRACE_V1
 SERIAL_TYPED_CMD("scheduling_trace", serial_typed_scheduling_trace, SC_TYPED_ONLY, CMD_HARNESS)
 #endif

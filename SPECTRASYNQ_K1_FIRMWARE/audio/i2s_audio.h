@@ -19,6 +19,7 @@
 #ifdef K1_MIC_AUTO_SENSE_V1
 #include "k1_mic_auto_sense.h"
 #endif
+#include "k1_agc_dt_clock.h"  // follower / peak_scaled α = dt/(τ+dt)
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
@@ -628,11 +629,10 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
 #endif
 #ifdef K1_STM
-  // STM reactivity gate from the LIVE pre-AGC mic RMS. The broadband AGC envelope
-  // (agc_envelope) is dead code on hardware — measured stuck at 0, gate always
-  // closed. This RMS is live and discriminating: ~8 in silence, ~32-60 under EDM,
-  // ~144 on peaks (bench-measured). Normalise to [0,1]; it spikes on beats, so the
-  // STM modulation pulses with the music.
+  // STM reactivity gate from the LIVE pre-AGC mic RMS. The GDFT broadband AGC
+  // (agc_gain on spectrogram[]) is also live — [AP] agc_gain moves. STM still
+  // uses this RMS because it is beat-discriminating (~8 silence, ~32-60 EDM,
+  // ~144 peaks). Normalise to [0,1]; it spikes on beats, so STM pulses with music.
   {
     float raw_rms_for_stm = 0.0f;
 #if defined(K1_MIC_IM73D_PDM_V1)
@@ -938,12 +938,42 @@ void acquire_sample_chunk(uint32_t t_now) {
     const float response_gain = k1_audio_response_gain_effective();
     max_waveform_val *= response_gain;
 
+#if K1_AGC_DT_CLOCK_V1
+    static int64_t follow_dt_last_us = 0;
+    const float follow_dt_s = k1_agc_measure_dt_s(&follow_dt_last_us);
+    const float follow_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_FOLLOW_TAU_ATTACK_S);
+    const float follow_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_FOLLOW_TAU_RELEASE_S);
+#ifdef K1_PEAK_ASYM_ENV
+    const float peak_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_ATTACK_SNAP_S);
+    const float peak_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_RELEASE_SNAP_S);
+#else
+    const float peak_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_ATTACK_SYM_S);
+    const float peak_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_RELEASE_SYM_S);
+#endif
+#else
+    const float follow_attack_a = 0.25f;
+    const float follow_release_a = 0.005f;
+#ifdef K1_PEAK_ASYM_ENV
+    const float peak_attack_a = 0.65f;
+    const float peak_release_a = 0.15f;
+#else
+    const float peak_attack_a = 0.25f;
+    const float peak_release_a = 0.25f;
+#endif
+#endif
+
     if (max_waveform_val > max_waveform_val_follower) {
       float delta = max_waveform_val - max_waveform_val_follower;
-      max_waveform_val_follower += delta * 0.25;
+      max_waveform_val_follower += delta * follow_attack_a;
     } else if (max_waveform_val < max_waveform_val_follower) {
       float delta = max_waveform_val_follower - max_waveform_val;
-      max_waveform_val_follower -= delta * 0.005;
+      max_waveform_val_follower -= delta * follow_release_a;
 
 #ifdef K1_AP_DRIVE_CONTRACT_V1
       if (max_waveform_val_follower < ap_drive.follower_floor_raw_peak) {
@@ -978,23 +1008,12 @@ void acquire_sample_chunk(uint32_t t_now) {
 
     if (waveform_peak_scaled_raw > waveform_peak_scaled) {
       float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
-#ifdef K1_PEAK_ASYM_ENV
-      // ATTACK SNAP (2026-06-11, Captain-directed item 5): asymmetric envelope —
-      // fast attack so transients reach the LEDs in ~1-2 AP frames (~8-15 ms vs
-      // ~80 ms at the old symmetric 0.25), slow release below so trails keep
-      // their grace. The method doc's "raw trigger + smoothed body" archetype,
-      // applied at the shared drive signal. REVERT = delete the -D flag.
-      waveform_peak_scaled += delta * 0.65;
-#else
-      waveform_peak_scaled += delta * 0.25;
-#endif
+      // ATTACK SNAP (2026-06-11): asymmetric envelope when K1_PEAK_ASYM_ENV.
+      // Alphas are dt-derived when K1_AGC_DT_CLOCK_V1 so wall-clock stays put.
+      waveform_peak_scaled += delta * peak_attack_a;
     } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
       float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
-#ifdef K1_PEAK_ASYM_ENV
-      waveform_peak_scaled -= delta * 0.15;
-#else
-      waveform_peak_scaled -= delta * 0.25;
-#endif
+      waveform_peak_scaled -= delta * peak_release_a;
     }
 
     // Use the maximum amplitude of the captured frame to set
@@ -1390,7 +1409,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     // lg_mode = loud-guard retune matrix (0/1/2). lightshow = CONFIG.LIGHTSHOW_MODE.
     // Do NOT label lg_mode as "mode=" — that false-read as lightshow mode 2 on Unit 2
     // and caused a silence-fix "PASS" while WAVEFORM_HYBRID_K1 (32) stayed dead.
-    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.3f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f lg_mode=%d lightshow=%u",
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.4f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f lg_mode=%d lightshow=%u",
       k1_loud_guard_enabled ? 1 : 0,
       k1_loud_input_trim,
       k1_loud_gdft_trim,
@@ -1403,6 +1422,11 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_loud_spec_sat_fraction,
       k1_loud_guard_mode,
       (unsigned)CONFIG.LIGHTSHOW_MODE);
+#endif
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    USBSerial.printf(" | i2s_wait_us=%u i2s_seq=%u",
+                     (unsigned)k1_audio_i2s_read_debug.elapsed_us,
+                     (unsigned)k1_audio_i2s_read_debug.capture_sequence);
 #endif
 #ifdef K1_STM
     {

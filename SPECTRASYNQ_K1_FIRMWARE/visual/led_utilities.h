@@ -964,6 +964,7 @@ inline void scale_to_strip() {
 
 inline void show_leds() {
 #if ENABLE_VP_PERF_AUDIT
+  vp_perf_pack_accum_us = 0;
   int64_t vp_perf_primary_prep_start_us = vp_perf.running ? esp_timer_get_time() : 0;
 #endif
   apply_brightness();
@@ -1098,10 +1099,31 @@ inline void show_leds() {
     }
     const uint64_t budget_proxy =
         (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
+#if ENABLE_VP_PERF_AUDIT
+    const int64_t vp_perf_pack_start_us =
+        vp_perf.running ? esp_timer_get_time() : 0;
+#endif
     k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
                          budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b);
+#if ENABLE_VP_PERF_AUDIT
+    if (vp_perf.running && vp_perf_pack_start_us != 0) {
+      vp_perf_record(
+          vp_perf.pack,
+          vp_perf_pack_accum_us +
+              uint32_t(esp_timer_get_time() - vp_perf_pack_start_us));
+      vp_perf_pack_accum_us = 0;
+    }
+    const int64_t vp_perf_lever2_show_start_us =
+        vp_perf.running ? esp_timer_get_time() : 0;
+#endif
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
+#if ENABLE_VP_PERF_AUDIT
+    if (vp_perf.running && vp_perf_lever2_show_start_us != 0) {
+      vp_perf_record(vp_perf.show,
+                     uint32_t(esp_timer_get_time() - vp_perf_lever2_show_start_us));
+    }
+#endif
     return;
   }
 #endif
@@ -2612,9 +2634,19 @@ inline void show_secondary_leds() {
     }
     const uint64_t budget_proxy =
         (uint64_t)SECONDARY_LED_COUNT * 3ull * 65535ull;
+#if ENABLE_VP_PERF_AUDIT
+    const int64_t vp_perf_sec_pack_start_us =
+        vp_perf.running ? esp_timer_get_time() : 0;
+#endif
     k1_lever2_pack_frame(leds_scaled_secondary, SECONDARY_LED_COUNT,
                          ws2816_wire_secondary, budget_proxy, k1_inc_r,
                          k1_inc_g, k1_inc_b);
+#if ENABLE_VP_PERF_AUDIT
+    if (vp_perf.running && vp_perf_sec_pack_start_us != 0) {
+      vp_perf_pack_accum_us +=
+          uint32_t(esp_timer_get_time() - vp_perf_sec_pack_start_us);
+    }
+#endif
     return;
   }
 #endif

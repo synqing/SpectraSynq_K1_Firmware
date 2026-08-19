@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-19 FPS / AGC clock decoupling (handover hybrid r1)
+
+```text
+session_objective:       Implement fps_agc_clock_fix_21bb9c1b. No flash. τ ref 100 Hz.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 293b211c (firmware == a6149b29).
+branch_head_at_end:      same HEAD; clock/probe/packer/tests uncommitted (no commit authorised).
+files_changed:           k1_agc_dt_clock.h; k1_gdft_core.cpp; i2s_audio.h; k1_lever2_emit.h; led_utilities.h; globals.h; serial menu/dispatch; platformio.ini probe env; identities; tests; FPS-AGC-clock-step5-stamp.md; LED_FPS-bench-liveness-1.3.md.
+commands_run:            pytest tests/ 1420 passed / 1 skipped; pio-build k1_hardware + k1_bench_im69d + k1_main_rpl_im69d SUCCESS. No upload.
+validation_results:      Host gate GREEN. Silicon unchanged (RPL still a6149b29 Lever-2; bench 573206c0). Probe env in source only.
+evidence_captured:       docs/forensics/ws2816-degamma-audit-2026-08-18/FPS-AGC-clock-step5-stamp.md; LED_FPS-bench-liveness-1.3.md.
+blockers:                named GO to flash k1_main_rpl_fps_agc_probe to 9087A500 only; then music eyes-on for follower blast radius.
+generated_files_ignored: runtime-evidence bins + tools/webflash left untracked (pre-existing).
+safety_constraints:      F887 NO; no cal; no erase; no flash this session; probe not in pio-build allowlist.
+thinking_skill_used:     Cynefin (measure AP hole before RMT) + systems (two live AP clocks).
+skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine (AP/VP timing).
+specialists_used:        none.
+claude_mem_observations: on-disk step5 stamp is authority.
+next_recommended_action: Captain names probe flash GO for 9087A500. Then music eyes-on. Commit when authorised.
+```
+
+---
+
 ## Session Report — 2026-08-18 B489 edge-honour flash
 
 ```text

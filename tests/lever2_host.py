@@ -34,6 +34,9 @@ def apply_q16(ch: int, s: int) -> int:
 def pack_frame_u16(
     rgb16: Sequence[Tuple[int, int, int]], budget_proxy: int
 ) -> List[WirePixel]:
+    n = len(rgb16)
+    if budget_proxy >= n * 3 * 65535:
+        return [pack_pixel(r, g, b) for r, g, b in rgb16]
     total = sum(r + g + b for r, g, b in rgb16)
     s = scale_q16(total, budget_proxy)
     return [

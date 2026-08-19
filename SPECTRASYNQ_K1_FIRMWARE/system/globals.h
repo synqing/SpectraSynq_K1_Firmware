@@ -526,6 +526,14 @@ inline volatile uint16_t function_hits[32] = {0};
 inline float SYSTEM_FPS = 0.0;
 inline float LED_FPS    = 0.0;
 
+#ifndef K1_SHOW_SKIP_DISCRIMINATOR_V1
+#define K1_SHOW_SKIP_DISCRIMINATOR_V1 0
+#endif
+#if K1_SHOW_SKIP_DISCRIMINATOR_V1
+// Core 1 render loop reads; serial command writes. 0 = not skipping.
+inline volatile uint32_t k1_show_skip_until_ms = 0;
+#endif
+
 // ------------------------------------------------------------
 // Buttons (buttons.h) ----------------------------------------
 
@@ -661,6 +669,7 @@ struct VPPerfAuditState {
   VPPerfStat secondary_prep;
   VPPerfStat quant_primary;
   VPPerfStat quant_secondary;
+  VPPerfStat pack;
   VPPerfStat show;
   VPPerfStat frame_interval;
   VPPerfStat frame;
@@ -669,6 +678,9 @@ struct VPPerfAuditState {
 };
 
 inline VPPerfAuditState vp_perf;
+// Secondary Lever-2 pack time is added here, then consumed on the primary
+// pack+show path so one VPF sample is pack_primary + pack_secondary.
+inline uint32_t vp_perf_pack_accum_us = 0;
 
 inline void vp_perf_clear_stat(VPPerfStat &stat) {
   stat.sum_us = 0;
@@ -694,6 +706,7 @@ inline void vp_perf_clear_counters() {
   vp_perf_clear_stat(vp_perf.secondary_prep);
   vp_perf_clear_stat(vp_perf.quant_primary);
   vp_perf_clear_stat(vp_perf.quant_secondary);
+  vp_perf_clear_stat(vp_perf.pack);
   vp_perf_clear_stat(vp_perf.show);
   vp_perf_clear_stat(vp_perf.frame_interval);
   vp_perf_clear_stat(vp_perf.frame);

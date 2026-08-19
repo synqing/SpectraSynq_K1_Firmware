@@ -78,8 +78,8 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "d3bf37921345e6e00e6c839d7396a4e1b46b387a"
-BARE_DEF_BLOB_SHA = "9246b0702f40f796eb0877bda2f8b8c1515ec009"
+TYPED_DEF_BLOB_SHA = "49c31b7e648957cd089e8f006374cd704efa2df5"
+BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
 # Literals generated from the two .def files (see module docstring).
@@ -218,6 +218,7 @@ ROW1_BARE_COMMANDS = frozenset({
     "reset_reason",
     "restore_defaults",
     "runtime_id",
+    "save_show",
     "slot_list",
     "smart_status",
     "start_noise_cal",
@@ -307,6 +308,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "secondary_status",
     "set_mode",
     "show_state",
+    "show_skip",
     "scap_arm",
     "scap_dump",
     "scap_status",

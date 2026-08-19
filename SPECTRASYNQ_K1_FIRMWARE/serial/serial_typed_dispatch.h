@@ -78,6 +78,7 @@ bool serial_typed_dump_raw(const char* command_type, char* command_data);
 bool serial_typed_vp_stream(const char* command_type, char* command_data);
 bool serial_typed_ble_stream(const char* command_type, char* command_data);
 bool serial_typed_vp_perf(const char* command_type, char* command_data);
+bool serial_typed_show_skip(const char* command_type, char* command_data);
 #ifdef K1_SCHEDULING_TRACE_V1
 bool serial_typed_scheduling_trace(const char* command_type, char* command_data);
 #endif

@@ -29,6 +29,7 @@
 #include "utilities.h"           // low_pass_array() — all-inline, ODR-safe (also incl. by k1_chord_detect.cpp)
 #include "k1_gdft_core.h"        // own declarations (process_GDFT / calculate_novelty)
 #include "k1_spectral_honesty.h" // K1_HANN_COHERENT_GAIN (gated windowing only)
+#include "k1_agc_dt_clock.h"     // α = dt/(τ+dt) at 100 Hz reference; no expf
 
 // Production selector for the exact four-lane Goertzel backend.
 #ifndef K1_GDFT_LANE4_V1
@@ -478,11 +479,26 @@ void IRAM_ATTR process_GDFT() {
   // agc_envelope / agc_noise_floor / agc_gated are reset at noise_cal completion
   // (see end-of-cal block ~30 lines below) so they start fresh on every cal cycle.
 
-  // Time constants at SYSTEM_FPS ≈ 100 Hz
-  const SQ15x16 ATTACK_ALPHA  = SQ15x16(0.28);   // 30 ms
+  // Time constants: 100 Hz reference (attack 0.28 / release 0.02 / noise 0.001 /
+  // gain 0.05). When K1_AGC_DT_CLOCK_V1, α = dt/(τ+dt) from measured AP dt so
+  // 93 Hz and 139 Hz mean the same milliseconds. Probe env forces the flag off.
+#if K1_AGC_DT_CLOCK_V1
+  static int64_t agc_dt_last_us = 0;
+  const float agc_dt_s = k1_agc_measure_dt_s(&agc_dt_last_us);
+  const SQ15x16 ATTACK_ALPHA =
+      SQ15x16(k1_alpha_from_tau_s(agc_dt_s, K1_AGC_TAU_ATTACK_S));
+  const SQ15x16 RELEASE_ALPHA =
+      SQ15x16(k1_alpha_from_tau_s(agc_dt_s, K1_AGC_TAU_RELEASE_S));
+  const SQ15x16 NOISE_ALPHA =
+      SQ15x16(k1_alpha_from_tau_s(agc_dt_s, K1_AGC_TAU_NOISE_S));
+  const SQ15x16 GAIN_SMOOTH =
+      SQ15x16(k1_alpha_from_tau_s(agc_dt_s, K1_AGC_TAU_GAIN_S));
+#else
+  const SQ15x16 ATTACK_ALPHA  = SQ15x16(0.28);   // 30 ms at 100 Hz
   const SQ15x16 RELEASE_ALPHA = SQ15x16(0.02);   // 500 ms
   const SQ15x16 NOISE_ALPHA   = SQ15x16(0.001);  // 10 s
   const SQ15x16 GAIN_SMOOTH   = SQ15x16(0.05);   // ~200 ms gain settle
+#endif
   const SQ15x16 AGC_TARGET    = SQ15x16(0.4);    // ~40 % headroom under saturation
   const SQ15x16 AGC_MAX_GAIN  = SQ15x16(10.0);
   const SQ15x16 AGC_EPS           = SQ15x16(0.001);
@@ -633,9 +649,10 @@ void IRAM_ATTR process_GDFT() {
   SQ15x16 gate_close_th = agc_noise_floor * SQ15x16(2.5);
   if (agc_gated && agc_envelope > gate_open_th)  agc_gated = false;
   if (!agc_gated && agc_envelope < gate_close_th) agc_gated = true;
-  // NOTE: agc_envelope/agc_gated here are effectively inert on hardware (measured
-  // stuck at 0 / permanently gated). agc_loudness_norm for STM is therefore sourced
-  // from the LIVE pre-AGC mic RMS in i2s_audio.h, NOT from this envelope.
+  // LIVE: agc_gain is applied to spectrogram[] below and printed as [AP] agc_gain
+  // (agc_bands[0].gain). Bidirectional dumps (2026-08-19) prove the gate opens.
+  // [AP] agc_env=0.000 was %.3f of a quiet-room envelope, not a dead path.
+  // agc_loudness_norm for STM is still sourced from pre-AGC mic RMS in i2s_audio.h.
 
   // 5+6. Target gain (only adapts when ungated; frozen during silence)
   static SQ15x16 agc_gain = SQ15x16(1.0);

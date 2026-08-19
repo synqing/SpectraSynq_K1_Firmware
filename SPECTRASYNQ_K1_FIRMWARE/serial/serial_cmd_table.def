@@ -56,6 +56,7 @@ SERIAL_CMD("get_num_modes",   0, cmd_get_num_modes,           SC_SAFE,          
 SERIAL_CMD("get_mode",        0, cmd_get_mode,                SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("reset_reason",    0, cmd_reset_reason,            SC_SAFE,                  0,                                 IS_BOTH       )
 SERIAL_CMD("dump",            0, cmd_dump,                    SC_SAFE,                  0,                                 IS_BOTH       )
+SERIAL_CMD("save_show",       0, cmd_save_show,               SC_TYPED_ONLY,            CMD_PERSISTS,                      IS_TYPED_ONLY )
 SERIAL_CMD("stop",            0, cmd_stop,                    SC_SAFE,                  0,                                 IS_BOTH       )
 #if FEATURE_MABUTRACE
 SERIAL_CMD("trace",           0, cmd_trace_dump,              SC_TYPED_ONLY,            CMD_HARNESS,                       IS_TYPED_ONLY )

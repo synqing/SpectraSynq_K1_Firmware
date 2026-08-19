@@ -220,6 +220,8 @@ void vp_perf_print_status();
 
 void vp_perf_command(const char* command_type, const char* command_data);
 
+void show_skip_command(const char* command_type, const char* command_data);
+
 #if ENABLE_VPAB_PROBE
 void vpab_command(const char* command_type, const char* command_data);
 #endif
@@ -500,6 +502,8 @@ void cmd_get_mode();
 void cmd_reset_reason();
 
 void cmd_dump();
+
+void cmd_save_show();
 
 void cmd_stop();
 

@@ -47,11 +47,15 @@ class ImpactLaneStaticTest(unittest.TestCase):
     # ---- #5 attack snap -----------------------------------------------------
     def test_peak_envelope_is_asymmetric_under_flag_with_legacy_retained(self):
         self.assertIn("#ifdef K1_PEAK_ASYM_ENV", I2S)
-        self.assertIn("waveform_peak_scaled += delta * 0.65;", I2S)
-        self.assertIn("waveform_peak_scaled -= delta * 0.15;", I2S)
-        # Legacy symmetric path retained for off-flag builds.
-        self.assertIn("waveform_peak_scaled += delta * 0.25;", I2S)
-        self.assertIn("waveform_peak_scaled -= delta * 0.25;", I2S)
+        self.assertIn("waveform_peak_scaled += delta * peak_attack_a;", I2S)
+        self.assertIn("waveform_peak_scaled -= delta * peak_release_a;", I2S)
+        self.assertIn("K1_PEAK_TAU_ATTACK_SNAP_S", I2S)
+        self.assertIn("K1_PEAK_TAU_RELEASE_SNAP_S", I2S)
+        # Clock-off / probe path retains the original per-frame literals.
+        self.assertIn("const float peak_attack_a = 0.65f;", I2S)
+        self.assertIn("const float peak_release_a = 0.15f;", I2S)
+        self.assertIn("const float peak_attack_a = 0.25f;", I2S)
+        self.assertIn("const float peak_release_a = 0.25f;", I2S)
 
     # ---- #3 pairing presets -------------------------------------------------
     def test_pairing_presets_exist_with_correct_mode_pairs(self):

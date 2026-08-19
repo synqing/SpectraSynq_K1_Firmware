@@ -42,6 +42,17 @@ static inline uint16_t k1_lever2_sq_to_u16(SQ15x16 ch, SQ15x16 inc) {
 static inline void k1_lever2_pack_frame(const CRGB16 *scaled, uint16_t n, CRGB *wire,
                                         uint64_t budget_proxy, SQ15x16 inc_r,
                                         SQ15x16 inc_g, SQ15x16 inc_b) {
+  // Pass 1 is identity when the budget is n*3*65535 (the shipped proxy). Skip
+  // the sum; pack at s=65535. Behaviour-identical to scale_q16(total, max).
+  if (budget_proxy >= (uint64_t)n * 3ull * 65535ull) {
+    for (uint16_t i = 0; i < n; i++) {
+      ws2816_pack_pixel(wire, i,
+                        k1_lever2_sq_to_u16(scaled[i].r, inc_r),
+                        k1_lever2_sq_to_u16(scaled[i].g, inc_g),
+                        k1_lever2_sq_to_u16(scaled[i].b, inc_b));
+    }
+    return;
+  }
   uint64_t total = 0;
   for (uint16_t i = 0; i < n; i++) {
     total += k1_lever2_sq_to_u16(scaled[i].r, inc_r);

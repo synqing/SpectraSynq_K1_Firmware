@@ -1061,6 +1061,14 @@ void vp_perf_print_status() {
   USBSerial.print(vp_perf_avg(vp_perf.frame_interval));
   USBSerial.print(" max=");
   USBSerial.println(vp_perf.frame_interval.max_us);
+  USBSerial.print("VP_PERF_PACK: avg=");
+  USBSerial.print(vp_perf_avg(vp_perf.pack));
+  USBSerial.print(" max=");
+  USBSerial.println(vp_perf.pack.max_us);
+  USBSerial.print("VP_PERF_SHOW: avg=");
+  USBSerial.print(vp_perf_avg(vp_perf.show));
+  USBSerial.print(" max=");
+  USBSerial.println(vp_perf.show.max_us);
   USBSerial.print("VP_PERF_STACK_HWM_WORDS: ap=");
   USBSerial.print(vp_perf.ap_stack_hwm_min_words == 0xFFFFFFFFUL
                     ? 0UL : vp_perf.ap_stack_hwm_min_words);
@@ -1108,6 +1116,49 @@ void vp_perf_command(const char* command_type, const char* command_data) {
   } else {
     bad_command(command_type, command_data);
   }
+#endif
+}
+
+void show_skip_command(const char* command_type, const char* command_data) {
+#if K1_SHOW_SKIP_DISCRIMINATOR_V1
+  const uint32_t now_ms = millis();
+  tx_begin();
+  if (strcmp(command_data, "status") == 0) {
+    USBSerial.print("SHOW_SKIP: until_ms=");
+    USBSerial.print(k1_show_skip_until_ms);
+    USBSerial.print(" remaining_ms=");
+    if (k1_show_skip_until_ms != 0 && now_ms < k1_show_skip_until_ms) {
+      USBSerial.println(k1_show_skip_until_ms - now_ms);
+    } else {
+      USBSerial.println(0);
+    }
+  } else if (strcmp(command_data, "off") == 0) {
+    k1_show_skip_until_ms = 0;
+    USBSerial.println("SHOW_SKIP: off");
+  } else {
+    long ms = 5000;
+    if (command_data[0] != 0 && strcmp(command_data, "on") != 0) {
+      ms = atol(command_data);
+    }
+    if (ms <= 0) {
+      k1_show_skip_until_ms = 0;
+      USBSerial.println("SHOW_SKIP: off");
+    } else {
+      if (ms > 30000L) {
+        ms = 30000L;
+      }
+      k1_show_skip_until_ms = now_ms + (uint32_t)ms;
+      USBSerial.print("SHOW_SKIP: on ms=");
+      USBSerial.println((uint32_t)ms);
+    }
+  }
+  tx_end();
+#else
+  (void)command_type;
+  (void)command_data;
+  tx_begin();
+  USBSerial.println("SHOW_SKIP: disabled (compile with K1_SHOW_SKIP_DISCRIMINATOR_V1=1)");
+  tx_end();
 #endif
 }
 #if ENABLE_VPAB_PROBE
@@ -2384,6 +2435,21 @@ void cmd_reset_reason() {
 void cmd_dump() {
   tx_begin();
   dump_info();
+  tx_end();
+}
+// Bare-vocabulary twin of the 'S' hotkey (case 'S' below) and of
+// serial_typed_save_show(). save_show was registered only in
+// serial_typed_cmd_table.def, but it takes no `=value`, so the typed parser
+// never reaches it and `:save_show` fell through to "Bad command" — the bare
+// path resolves through SERIAL_CMD_TABLE (serial_cmd_table.def) only.
+void cmd_save_show() {
+  const bool ok = k1_show_state_save();
+  tx_begin();
+  USBSerial.print("SHOW_STATE_SAVED");
+  if (!ok) {
+    USBSerial.print(" FAIL");
+  }
+  USBSerial.println();
   tx_end();
 }
 void cmd_stop() {
@@ -4268,6 +4334,10 @@ void stream_vp_perf_data(uint32_t t_now) {
   USBSerial.print(vp_perf_avg(vp_perf.quant_secondary));
   USBSerial.print('/');
   USBSerial.print(vp_perf.quant_secondary.max_us);
+  USBSerial.print(",pack_us=");
+  USBSerial.print(vp_perf_avg(vp_perf.pack));
+  USBSerial.print('/');
+  USBSerial.print(vp_perf.pack.max_us);
   USBSerial.print(",show_us=");
   USBSerial.print(vp_perf_avg(vp_perf.show));
   USBSerial.print('/');

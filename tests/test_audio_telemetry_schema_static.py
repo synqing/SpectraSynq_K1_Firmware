@@ -54,7 +54,7 @@ def test_ap_stream_schema_keeps_front_end_and_loud_guard_fields():
         "input_trim=%.3f",
         "gdft_trim=%.3f",
         "agc_gain=%.3f",
-        "agc_env=%.3f",
+        "agc_env=%.4f",
         "clip_pct=%.3f",
         "near_pct=%.3f",
         "peak_pin=%.3f",

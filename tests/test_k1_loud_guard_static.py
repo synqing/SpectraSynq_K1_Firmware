@@ -113,7 +113,7 @@ class K1LoudGuardStaticTest(unittest.TestCase):
         update_index = INO.index("k1_loud_guard_update(t_now);")
         self.assertLess(gdft_index, update_index)
         self.assertIn("k1_loud=%d input_trim=%.3f gdft_trim=%.3f", I2S)
-        self.assertIn("agc_gain=%.3f agc_env=%.3f", I2S)
+        self.assertIn("agc_gain=%.3f agc_env=%.4f", I2S)
         self.assertIn("clip_pct=%.3f near_pct=%.3f peak_pin=%.3f", I2S)
         self.assertIn("spec_pin=%.3f spec_sat=%.3f", I2S)
 

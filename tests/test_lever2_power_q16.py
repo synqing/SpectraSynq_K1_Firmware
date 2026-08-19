@@ -91,3 +91,15 @@ def test_limiter_disabled_equals_packer():
     packed = pack_frame_u16(rgb, budget_proxy=total)
     direct = [pack_pixel(r, g, b) for r, g, b in rgb]
     assert packed == direct
+
+
+def test_identity_budget_skips_pass1_and_matches_direct_pack():
+    rgb = [(0x12AB, 0x34CD, 0x56EF), (0, 0x0100, 0xFFFF), (65535, 1, 0)]
+    identity = len(rgb) * 3 * 65535
+    packed = pack_frame_u16(rgb, budget_proxy=identity)
+    direct = [pack_pixel(r, g, b) for r, g, b in rgb]
+    assert packed == direct
+    header = (
+        ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "k1_lever2_emit.h"
+    ).read_text(encoding="utf-8")
+    assert "budget_proxy >= (uint64_t)n * 3ull * 65535ull" in header

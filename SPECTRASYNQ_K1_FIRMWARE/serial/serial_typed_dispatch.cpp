@@ -56,6 +56,7 @@ extern void vp_print_status();
 extern void vp_run_output_probe();
 extern void vp_run_secondary_bleed_probe();
 extern void vp_perf_command(const char* command_type, const char* command_data);
+extern void show_skip_command(const char* command_type, const char* command_data);
 #if ENABLE_TEMPO_STREAM
 extern bool TEMPO_STREAM_ENABLED;
 #endif
@@ -519,6 +520,11 @@ bool serial_typed_ble_stream(const char* command_type, char* command_data) {
 
 bool serial_typed_vp_perf(const char* command_type, char* command_data) {
   vp_perf_command(command_type, command_data);
+  return true;
+}
+
+bool serial_typed_show_skip(const char* command_type, char* command_data) {
+  show_skip_command(command_type, command_data);
   return true;
 }
 
