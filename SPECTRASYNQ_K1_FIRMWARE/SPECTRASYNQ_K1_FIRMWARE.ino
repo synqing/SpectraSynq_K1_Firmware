@@ -742,9 +742,15 @@ void setup() {
   FastLED.setCorrection(TypicalLEDStrip);
 #endif
 
+#if K1_RMT_ALLOC_ON_VP_CORE_V1
+  // Intro and the bootstrap FastLED.show() run on Core 0 (setup). They are
+  // the first loadPixelData and pin RMT IRQs on the audio core. VP's first
+  // show_leds() allocates instead. See 20260819T-fps-agc-probe-9087 RESULT.
+#else
   if (CONFIG.BOOT_ANIMATION == true) {
     intro_animation();
   }
+#endif
 
   for (uint16_t x = 0; x < CONFIG.LED_COUNT; x++) {
     leds_out[x] = CRGB(0, 0, 0);
@@ -752,7 +758,9 @@ void setup() {
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
+#if !K1_RMT_ALLOC_ON_VP_CORE_V1
   FastLED.show();
+#endif
 
   // Create thread specifically for LED updates
   BaseType_t led_task_create_result = xTaskCreatePinnedToCore(

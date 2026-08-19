@@ -35,6 +35,13 @@
 
 extern void start_noise_cal();
 
+#ifndef K1_LED_TASK_CORE
+#define K1_LED_TASK_CORE 1
+#endif
+#ifndef K1_RMT_ALLOC_ON_VP_CORE_V1
+#define K1_RMT_ALLOC_ON_VP_CORE_V1 0
+#endif
+
 // Effects-queue DIP transition scalars (control/k1_effect_queue.cpp). Composed
 // by multiplication into the final brightness of each channel, at the same
 // application points as drop_cut_scale. 1.0 whenever no dip is active.
@@ -963,9 +970,27 @@ inline void scale_to_strip() {
 }
 
 inline void show_leds() {
+#if K1_RMT_ALLOC_ON_VP_CORE_V1
+  // FastLED IDF5 creates RMT channels on the first loadPixelData/show.
+  // A Core-0 bootstrap show pins refill IRQs on the audio core (~202 Hz,
+  // 1.5–3.5 ms/frame). Skip every Core-0 show so the first alloc is on VP.
+  if (xPortGetCoreID() != K1_LED_TASK_CORE) {
+    return;
+  }
+#endif
 #if ENABLE_VP_PERF_AUDIT
   vp_perf_pack_accum_us = 0;
   int64_t vp_perf_primary_prep_start_us = vp_perf.running ? esp_timer_get_time() : 0;
+#endif
+#if K1_RMT_ALLOC_ON_VP_CORE_V1
+  {
+    static bool s_rmt_first_show_logged = false;
+    if (!s_rmt_first_show_logged) {
+      s_rmt_first_show_logged = true;
+      USBSerial.print("RMT_ALLOC: first_show core=");
+      USBSerial.println((int)xPortGetCoreID());
+    }
+  }
 #endif
   apply_brightness();
 

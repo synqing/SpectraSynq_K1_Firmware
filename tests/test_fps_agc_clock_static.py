@@ -33,10 +33,12 @@ def test_probe_env_is_non_shippable_rpl_only():
     assert "-DENABLE_VP_PERF_AUDIT=1" in block
     assert "-DK1_SHOW_SKIP_DISCRIMINATOR_V1=1" in block
     assert "-DK1_AGC_DT_CLOCK_V1=0" in block
+    assert "-DK1_RMT_ALLOC_ON_VP_CORE_V1=1" in block
     assert "-DENABLE_AP_FRONTEND_DEBUG=1" in block
     rpl = _env_block(ini, "k1_main_rpl_im69d")
     assert "-DENABLE_VP_PERF_AUDIT" not in rpl
     assert "-DK1_SHOW_SKIP_DISCRIMINATOR" not in rpl
+    assert "-DK1_RMT_ALLOC_ON_VP_CORE_V1" not in rpl
 
 
 def test_probe_identity_is_9087_only():
@@ -56,6 +58,17 @@ def test_lever2_pack_show_timers_are_before_return():
     assert "vp_perf.pack" in block
     assert "vp_perf.show" in block
     assert "FastLED.show()" in block
+
+
+def test_rmt_alloc_on_vp_core_skips_core0_show():
+    led = LED.read_text(encoding="utf-8")
+    ino = INO.read_text(encoding="utf-8")
+    assert "K1_RMT_ALLOC_ON_VP_CORE_V1" in led
+    assert "xPortGetCoreID() != K1_LED_TASK_CORE" in led
+    assert "RMT_ALLOC: first_show core=" in led
+    assert "#if K1_RMT_ALLOC_ON_VP_CORE_V1" in ino
+    assert "#if !K1_RMT_ALLOC_ON_VP_CORE_V1" in ino
+    assert "FastLED.show();" in ino
 
 
 def test_show_skip_command_and_render_gate_exist():
