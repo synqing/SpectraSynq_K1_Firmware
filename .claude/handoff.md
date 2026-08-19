@@ -3,11 +3,11 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
-**Live lane (2026-08-20):** palette-safe EdgeMixer resolver (HONOUR_V1
-evolution) **ON SILICON** at `79d220fa`. Contract:
-[`docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md`](../docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md).
+**Live lane (2026-08-20):** palette-safe EdgeMixer resolver **ON SILICON** at
+`79d220fa`. LED-buffer rtrace **PASS**
+([`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`](../docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md)).
 Flag name unchanged. Main RPL `9087A500` / `k1_main_rpl_im69d` only. No cal.
-B489 / F887 not touched. Captain eyes-on is the perceptual close.
+B489 / F887 not touched.
 
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
@@ -51,8 +51,8 @@ EdgeMixer resolver** (HONOUR evolved: no bypass). Post-flash dump:
 `EDGE_EFFECTIVE_PRIMARY: complementary_palette`. Cal inherited. Do **not**
 re-fire `start_noise_cal`. Prior ship `4a2c7393` is the restore target if
 Captain rejects the look. Probe proof remains `b8cd4ca9`. B489 / 1101 /
-F887 not touched. **Captain: eyes-on** for the resolver (palette ON/OFF vs
-harmony family + veil) and remaining music look.
+F887 not touched. **LED-buffer rtrace PASS** closes the resolver
+(`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 

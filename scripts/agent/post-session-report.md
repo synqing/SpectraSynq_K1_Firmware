@@ -8,20 +8,20 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 ## Session Report — 2026-08-20 palette-safe EdgeMixer resolver
 
 ```text
-session_objective:       Implement Palette-Safe EdgeMixer Resolver (HONOUR_V1 evolution); flash Main RPL only; stamp registry.
+session_objective:       Implement Palette-Safe EdgeMixer Resolver (HONOUR_V1 evolution); flash Main RPL only; close via LED-buffer rtrace (Captain declined eyes-on).
 branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 4a2c7393 (RMT-on-VP ship on silicon).
-branch_head_at_end:      79d220fa firmware + follow-on stamp docs.
-files_changed:           k1_palette_edge_bridge.*; k1_edgemixer.*; lightshow_modes.h unpack publish; serial_cmd_handlers :palette_mode=; serial_menu EDGE_EFFECTIVE; tests/goldens/ratchets; forensic note; registry; handoff.
-commands_run:            pytest 1424 passed / 1 skipped; pio-build k1_hardware + k1_main_rpl_im69d + k1_bench_im69d SUCCESS; k1-flash-verified k1_main_rpl_im69d --port /dev/cu.usbmodem1401.
-validation_results:      BEFORE git=4a2c7393. AFTER IDENTITY OK git=79d220fa env=k1_main_rpl_im69d epoch=1787158141 CHIP 9087A500. SYSTEM_FPS 137.69 LED_FPS 152.46. EDGE_EFFECTIVE_* complementary_palette (not untouched). No cal. B489/F887 untouched.
-evidence_captured:       docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md
-blockers:                Captain eyes-on for perceptual close (palette ON/OFF vs harmony family + veil + channel targeting).
+branch_head_at_end:      79d220fa firmware + stamp docs + rtrace gate.
+files_changed:           k1_palette_edge_bridge.*; k1_edgemixer.*; lightshow_modes.h unpack publish; serial_cmd_handlers :palette_mode=; serial_menu EDGE_EFFECTIVE; tests/goldens/ratchets; forensic note; registry; handoff; rtrace host probe + scorer.
+commands_run:            pytest 1424 passed / 1 skipped; pio-build k1_hardware + k1_main_rpl_im69d + k1_bench_im69d SUCCESS; k1-flash-verified k1_main_rpl_im69d --port /dev/cu.usbmodem1401; host rtrace probe + score_palette_resolver_rtrace.py PASS.
+validation_results:      BEFORE git=4a2c7393. AFTER IDENTITY OK git=79d220fa env=k1_main_rpl_im69d epoch=1787158141 CHIP 9087A500. SYSTEM_FPS 137.69 LED_FPS 152.46. EDGE_EFFECTIVE_* complementary_palette (not untouched). Gold+comp ON [54,24,241] indigo 0.10deg; OFF [23,121,240] azure bucket 14. Family ON on-curve. Veil desaturates. No cal. B489/F887 untouched.
+evidence_captured:       docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md; docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/
+blockers:                none. Resolver close = rtrace PASS + registry row @ 79d220fa.
 generated_files_ignored: tools/webflash/; runtime-evidence **/bins/.
 safety_constraints:      F887 NO; B489 NO; no cal; no erase; honour flag name unchanged; k1_hardware honour OFF.
 thinking_skill_used:     First principles (palette as vocabulary, not ownership-as-bypass) + systems (EdgeMixer as spatial relation).
 skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine; spec-recall.
 specialists_used:        none.
-next_recommended_action: Captain eyes-on script in the forensic note. Restore = reflash k1_main_rpl_im69d @ 4a2c7393.
+next_recommended_action: Lane closed. Restore if needed = reflash k1_main_rpl_im69d @ 4a2c7393.
 ```
 
 ---

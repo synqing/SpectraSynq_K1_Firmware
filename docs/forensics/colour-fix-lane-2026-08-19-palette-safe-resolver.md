@@ -126,7 +126,17 @@ resolver is live: old honour would have echoed identity while a palette
 owned both channels. Cal inherited. No `start_noise_cal`. B489 / F887 not
 touched.
 
-Captain eyes-on remains: palette OFF + complementary = RGB split; palette
-ON + complementary = in-palette opponent; cycle analogous / split / triadic
-/ tetradic under palette ON; veil under palette ON; `secondary_control`
-then `:palette_mode=off` names secondary.
+## LED-buffer rtrace (2026-08-20) — PASS
+
+Ship env does not compile `K1_RENDER_TRACE_V1`. The LED-buffer gate ran the
+same `k1_edgemixer.cpp` / `k1_palette_edge_bridge.cpp` as `79d220fa`, dumped
+rtrace hex, and scored with `hue_coverage.py`'s decoder.
+
+Evidence:
+[`runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`](runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md).
+
+Gold + complementary ON → `[54, 24, 241]` (Naberius indigo, 0.10°).
+Gold + complementary OFF → `[23, 121, 240]` (azure, bucket 14, not authored).
+Family ON stays on-curve. Veil desaturates. Silicon twin ON ≠ OFF ≠ identity.
+
+This closes the perceptual script Captain declined to eyes-on.

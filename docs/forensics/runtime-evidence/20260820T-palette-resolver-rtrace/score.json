@@ -1,0 +1,307 @@
+{
+  "verdict": "PASS",
+  "failed": [],
+  "frames": {
+    "gold_on_comp_full": {
+      "lit": 1.0,
+      "deployed": [
+        16
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 0.101,
+      "p95_hue_deg": 0.101,
+      "chroma_mean": 217.0,
+      "gold_identity": false,
+      "px0": [
+        54,
+        24,
+        241
+      ],
+      "px79": [
+        54,
+        24,
+        241
+      ],
+      "chromatic_px": 160,
+      "effective": "complementary_palette"
+    },
+    "gold_off_comp_full": {
+      "lit": 1.0,
+      "deployed": [
+        14
+      ],
+      "teal_buckets": [
+        14
+      ],
+      "max_hue_deg": 31.235,
+      "p95_hue_deg": 31.235,
+      "chroma_mean": 217.0,
+      "gold_identity": false,
+      "px0": [
+        23,
+        121,
+        240
+      ],
+      "px79": [
+        23,
+        121,
+        240
+      ],
+      "chromatic_px": 160,
+      "effective": "complementary_rgb"
+    },
+    "gold_on_comp_silicon": {
+      "lit": 1.0,
+      "deployed": [
+        0,
+        1,
+        2,
+        20,
+        21,
+        22,
+        23
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 19.167,
+      "p95_hue_deg": 12.878,
+      "chroma_mean": 151.35,
+      "gold_identity": false,
+      "px0": [
+        169,
+        65,
+        156
+      ],
+      "px79": [
+        254,
+        140,
+        1
+      ],
+      "chromatic_px": 160,
+      "effective": "complementary_palette"
+    },
+    "gold_off_comp_silicon": {
+      "lit": 1.0,
+      "deployed": [
+        0,
+        1,
+        2,
+        23
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 4.966,
+      "p95_hue_deg": 3.222,
+      "chroma_mean": 173.34,
+      "gold_identity": false,
+      "px0": [
+        236,
+        137,
+        144
+      ],
+      "px79": [
+        255,
+        140,
+        1
+      ],
+      "chromatic_px": 160,
+      "effective": "complementary_rgb"
+    },
+    "gold_on_veil_full": {
+      "lit": 1.0,
+      "deployed": [
+        2
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 0.082,
+      "p95_hue_deg": 0.082,
+      "chroma_mean": 129.0,
+      "gold_identity": false,
+      "px0": [
+        207,
+        149,
+        78
+      ],
+      "px79": [
+        207,
+        149,
+        78
+      ],
+      "chromatic_px": 160,
+      "effective": "saturation_veil"
+    },
+    "sweep_on_comp_full": {
+      "lit": 1.0,
+      "deployed": [
+        0,
+        1,
+        2,
+        16,
+        17
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 1.111,
+      "p95_hue_deg": 0.474,
+      "chroma_mean": 143.97,
+      "gold_identity": false,
+      "px0": [
+        8,
+        0,
+        17
+      ],
+      "px79": [
+        226,
+        88,
+        56
+      ],
+      "chromatic_px": 160,
+      "effective": "complementary_palette"
+    },
+    "sweep_off_comp_full": {
+      "lit": 0.9938,
+      "deployed": [
+        4,
+        5,
+        13,
+        14
+      ],
+      "teal_buckets": [
+        13,
+        14
+      ],
+      "max_hue_deg": 105.52,
+      "p95_hue_deg": 54.224,
+      "chroma_mean": 139.86,
+      "gold_identity": false,
+      "px0": [
+        13,
+        14,
+        0
+      ],
+      "px79": [
+        145,
+        227,
+        13
+      ],
+      "chromatic_px": 159,
+      "effective": "complementary_rgb"
+    },
+    "sweep_on_analogous_full": {
+      "lit": 1.0,
+      "deployed": [
+        1,
+        16,
+        17,
+        23
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 4.379,
+      "p95_hue_deg": 3.97,
+      "chroma_mean": 169.62,
+      "gold_identity": false,
+      "px0": [
+        1,
+        0,
+        20
+      ],
+      "px79": [
+        116,
+        0,
+        255
+      ],
+      "chromatic_px": 160,
+      "effective": "analogous_palette"
+    },
+    "sweep_on_split_full": {
+      "lit": 1.0,
+      "deployed": [
+        1,
+        2,
+        16,
+        17,
+        19,
+        22
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 9.463,
+      "p95_hue_deg": 9.148,
+      "chroma_mean": 139.59,
+      "gold_identity": false,
+      "px0": [
+        6,
+        1,
+        18
+      ],
+      "px79": [
+        236,
+        104,
+        6
+      ],
+      "chromatic_px": 160,
+      "effective": "split_palette"
+    },
+    "sweep_on_triadic_full": {
+      "lit": 1.0,
+      "deployed": [
+        1,
+        2,
+        16,
+        17
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 0.392,
+      "p95_hue_deg": 0.159,
+      "chroma_mean": 141.17,
+      "gold_identity": false,
+      "px0": [
+        4,
+        1,
+        17
+      ],
+      "px79": [
+        223,
+        127,
+        13
+      ],
+      "chromatic_px": 160,
+      "effective": "triadic_palette"
+    },
+    "sweep_on_tetradic_full": {
+      "lit": 1.0,
+      "deployed": [
+        2,
+        16,
+        17
+      ],
+      "teal_buckets": [],
+      "max_hue_deg": 0.153,
+      "p95_hue_deg": 0.113,
+      "chroma_mean": 145.28,
+      "gold_identity": false,
+      "px0": [
+        3,
+        1,
+        17
+      ],
+      "px79": [
+        88,
+        20,
+        223
+      ],
+      "chromatic_px": 160,
+      "effective": "tetradic_palette"
+    }
+  },
+  "thresholds": {
+    "max_on_hue_deg": 15.0,
+    "min_off_hue_deg": 25.0,
+    "teal_buckets": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ]
+  }
+}
