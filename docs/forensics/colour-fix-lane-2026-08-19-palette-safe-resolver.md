@@ -104,5 +104,29 @@ return; `k1_edge_apply_palette_run` at both gates; `EDGE_EFFECTIVE_*` echo;
 
 ## Revert
 
-Single-commit `git revert` restores the bypass semantics. The flag remains
-the compile-out switch.
+Single-commit `git revert 79d220fa` restores the bypass semantics. The flag
+remains the compile-out switch.
+
+## Silicon (2026-08-20)
+
+Main RPL `9087A500` on `/dev/cu.usbmodem1401`:
+
+```
+IDENTITY OK: git=79d220fa env=k1_main_rpl_im69d epoch=1787158141
+CHIP ID: 9087A500
+SYSTEM_FPS: 137.69
+LED_FPS: 152.46
+EDGE_MODE: complementary
+EDGE_EFFECTIVE_SECONDARY: complementary_palette
+EDGE_EFFECTIVE_PRIMARY: complementary_palette
+```
+
+`complementary_palette` (not `untouched`) is the serial proof that the
+resolver is live: old honour would have echoed identity while a palette
+owned both channels. Cal inherited. No `start_noise_cal`. B489 / F887 not
+touched.
+
+Captain eyes-on remains: palette OFF + complementary = RGB split; palette
+ON + complementary = in-palette opponent; cycle analogous / split / triadic
+/ tetradic under palette ON; veil under palette ON; `secondary_control`
+then `:palette_mode=off` names secondary.

@@ -3,11 +3,11 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
-**Live lane (2026-08-19/20):** palette-safe EdgeMixer resolver (HONOUR_V1
-evolution). Contract:
+**Live lane (2026-08-20):** palette-safe EdgeMixer resolver (HONOUR_V1
+evolution) **ON SILICON** at `79d220fa`. Contract:
 [`docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md`](../docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md).
-Flag name unchanged. Flash target: Main RPL `9087A500` / `k1_main_rpl_im69d`
-only. No cal. B489 / F887 not touched.
+Flag name unchanged. Main RPL `9087A500` / `k1_main_rpl_im69d` only. No cal.
+B489 / F887 not touched. Captain eyes-on is the perceptual close.
 
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
@@ -36,18 +36,23 @@ Home env now carries trail-deposit + modes 33–37 + EdgeMixer honour.
 Prior overlay `k1_bench_im69d_wfhyb_fade @ 836fde39` is OFF this unit (alias
 only). Calibration inherited, not re-fired. 1101 and F887 not touched.
 
-**EdgeMixer primary crush (Captain 2026-08-18): ON SILICON @ `573206c0`.**
-Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
-while a palette owns that channel. Production promotion of the flag stays
-gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
+**EdgeMixer primary crush (Captain 2026-08-18): ON SILICON @ `573206c0`
+(B489, bypass honour).** Main RPL `79d220fa` evolved the same flag into the
+palette-safe resolver (no bypass). Production promotion of the flag onto
+`k1_hardware` stays gated by `test_colour_fix_flags_static.py`.
 
-**Main RPL = ON SILICON @ `4a2c7393` / `k1_main_rpl_im69d`**
+**Main RPL = ON SILICON @ `79d220fa` / `k1_main_rpl_im69d`**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-`IDENTITY OK: git=4a2c7393 env=k1_main_rpl_im69d epoch=1787143096`.
-Clock-fix ON + RMT alloc on VP core + Lever-2 look. Post-flash dump:
-`SYSTEM_FPS: 135.50` `LED_FPS: 165.41`. Cal inherited. Do **not** re-fire
-`start_noise_cal`. Probe proof remains `b8cd4ca9`. B489 / 1101 / F887 not
-touched. **Captain: music eyes-on** (silence gate, sweet-spot, WAVEFORM-family).
+`IDENTITY OK: git=79d220fa env=k1_main_rpl_im69d epoch=1787158141`.
+Clock-fix ON + RMT alloc on VP core + Lever-2 look + **palette-safe
+EdgeMixer resolver** (HONOUR evolved: no bypass). Post-flash dump:
+`SYSTEM_FPS: 137.69` `LED_FPS: 152.46`. After `:edge_mode=complementary`:
+`EDGE_EFFECTIVE_SECONDARY: complementary_palette` /
+`EDGE_EFFECTIVE_PRIMARY: complementary_palette`. Cal inherited. Do **not**
+re-fire `start_noise_cal`. Prior ship `4a2c7393` is the restore target if
+Captain rejects the look. Probe proof remains `b8cd4ca9`. B489 / 1101 /
+F887 not touched. **Captain: eyes-on** for the resolver (palette ON/OFF vs
+harmony family + veil) and remaining music look.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 
