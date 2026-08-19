@@ -1,0 +1,134 @@
+{
+  "port": "/dev/cu.usbmodem1401",
+  "t0": 1787171635.049091,
+  "build": "sbr{{\r\nBUILD: version=40103 git=f96390e3 epoch=1787171579 env=k1_main_rpl_fps_agc_probe\r\n}}",
+  "skip_ack": "sbr{{\r\nSHOW_SKIP: on ms=5000\r\n}}\r\nVPF,ver=1,seq=17,mode=32,smode=18,sec=1,acq_us=3879/4659,vu_us=29/54,gdft_us=1752/1825,smooth_us=334/825,pri_render_us=18230/36838596,sec_render_us=1315/2733,pri_prep_us=199/299,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=129/193,show_us=1082/1446,interval_us=6944/8513,frame_us=5801/7061,over=0,dropped=0,heap=120212,ap_stack_hwm_words=4968,vp_stack_hwm_words=4576",
+  "baseline": [
+    {
+      "phase": "baseline",
+      "t": 1787171638.908609,
+      "system_fps": 136.96,
+      "led_fps": 146.29
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171639.974587,
+      "system_fps": 132.74,
+      "led_fps": 145.29
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171641.037133,
+      "system_fps": 140.09,
+      "led_fps": 145.27
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171642.1018639,
+      "system_fps": 135.93,
+      "led_fps": 145.5
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171643.167545,
+      "system_fps": 133.53,
+      "led_fps": 145.36
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171644.2424161,
+      "system_fps": 135.95,
+      "led_fps": 145.61
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171645.311284,
+      "system_fps": 138.3,
+      "led_fps": 146.11
+    },
+    {
+      "phase": "baseline",
+      "t": 1787171646.3766441,
+      "system_fps": 135.94,
+      "led_fps": 144.84
+    }
+  ],
+  "pre": [
+    {
+      "phase": "pre_skip",
+      "t": 1787171659.219491,
+      "system_fps": 137.24,
+      "led_fps": 144.87
+    },
+    {
+      "phase": "pre_skip",
+      "t": 1787171660.2869298,
+      "system_fps": 135.12,
+      "led_fps": 144.96
+    },
+    {
+      "phase": "pre_skip",
+      "t": 1787171661.353017,
+      "system_fps": 138.69,
+      "led_fps": 146.08
+    },
+    {
+      "phase": "pre_skip",
+      "t": 1787171662.419275,
+      "system_fps": 135.92,
+      "led_fps": 142.14
+    }
+  ],
+  "during": [
+    137.75,
+    134.11,
+    139.16,
+    134.11,
+    134.93,
+    135.91,
+    134.88,
+    134.89,
+    136.92,
+    135.91,
+    134.91,
+    135.54
+  ],
+  "post": [
+    {
+      "phase": "post_skip",
+      "t": 1787171671.6453278,
+      "system_fps": 140.07,
+      "led_fps": 142.99
+    },
+    {
+      "phase": "post_skip",
+      "t": 1787171672.712886,
+      "system_fps": 138.31,
+      "led_fps": 144.39
+    },
+    {
+      "phase": "post_skip",
+      "t": 1787171673.786109,
+      "system_fps": 134.14,
+      "led_fps": 144.63
+    },
+    {
+      "phase": "post_skip",
+      "t": 1787171674.857078,
+      "system_fps": 135.92,
+      "led_fps": 145.14
+    },
+    {
+      "phase": "post_skip",
+      "t": 1787171675.922463,
+      "system_fps": 135.93,
+      "led_fps": 145.19
+    },
+    {
+      "phase": "post_skip",
+      "t": 1787171676.9896991,
+      "system_fps": 138.29,
+      "led_fps": 145.16
+    }
+  ]
+}
