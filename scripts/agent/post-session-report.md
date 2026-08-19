@@ -5,6 +5,27 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-19 RMT-on-VP-core (Captain rolling GO)
+
+```text
+session_objective:       After show-skip conviction, defer FastLED RMT alloc to Core 1; flash probe; prove SYSTEM_FPS hop with show running; promote flag onto k1_main_rpl_im69d.
+branch_head_at_start:    b318a0ec (probe on silicon, skip-convicted).
+branch_head_at_end:      b8cd4ca9 + follow-on stamp/promote commit.
+files_changed:           led_utilities.h Core-0 show skip; ino skip intro/bootstrap show; probe + k1_main_rpl_im69d -DK1_RMT_ALLOC_ON_VP_CORE_V1=1; static tests; RESULT + registry.
+commands_run:            pytest 1421 passed; pio-build k1_hardware SUCCESS; k1-flash-verified k1_main_rpl_fps_agc_probe 1401.
+validation_results:      BEFORE git=b318a0ec. AFTER IDENTITY OK git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506 CHIP 9087A500. SYSTEM_FPS 134–138 with show on. gdft 1.75ms acq 3.8ms LED_FPS ~163. No cal. B489/F887 untouched.
+evidence_captured:       docs/forensics/runtime-evidence/20260819T-rmt-vp-core-9087/RESULT.md
+blockers:                product look still needs k1_main_rpl_im69d flash + music eyes-on.
+generated_files_ignored: tools/webflash/; other runtime-evidence bins.
+safety_constraints:      F887 NO; B489 NO; no cal; probe NON-SHIP; I2S LED struck.
+thinking_skill_used:     Scientific method (show-skip then first-show alloc on VP core).
+skills_used:             Agent OS; ship-path-required; sensorybridge-doctrine; esp32-render-path-safety.
+specialists_used:        none.
+next_recommended_action: Flash k1_main_rpl_im69d (clock ON + RMT-on-VP) then Captain music eyes-on.
+```
+
+---
+
 ## Session Report — 2026-08-19 FPS / AGC probe flash (Captain GO)
 
 ```text

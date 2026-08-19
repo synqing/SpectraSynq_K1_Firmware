@@ -38,7 +38,9 @@ def test_probe_env_is_non_shippable_rpl_only():
     rpl = _env_block(ini, "k1_main_rpl_im69d")
     assert "-DENABLE_VP_PERF_AUDIT" not in rpl
     assert "-DK1_SHOW_SKIP_DISCRIMINATOR" not in rpl
-    assert "-DK1_RMT_ALLOC_ON_VP_CORE_V1" not in rpl
+    assert "-DK1_RMT_ALLOC_ON_VP_CORE_V1=1" in rpl
+    hw = _env_block(ini, "k1_hardware")
+    assert "-DK1_RMT_ALLOC_ON_VP_CORE_V1" not in hw
 
 
 def test_probe_identity_is_9087_only():

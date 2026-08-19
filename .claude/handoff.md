@@ -35,19 +35,16 @@ Mechanism = convicted P5.A side-door. Honour gate skips both edge rotations
 while a palette owns that channel. Production promotion of the flag stays
 gated by `test_colour_fix_flags_static.py` (colour-fix plan / F887 GO).
 
-**Main RPL = ON SILICON @ `b318a0ec` / `k1_main_rpl_fps_agc_probe` (NON-SHIP)**
+**Main RPL = ON SILICON @ `b8cd4ca9` / `k1_main_rpl_fps_agc_probe` (NON-SHIP)**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-Live `:dump` 2026-08-19: **`CHIP ID: 9087A500`** · `IDENTITY OK: git=b318a0ec env=k1_main_rpl_fps_agc_probe epoch=1787141154`.
-Probe flags: VP perf + show-skip **on**; clock-fix **forced off**. Cal inherited
-(`persisted_profile`, SSL 172, DC −247). Do **not** re-fire `start_noise_cal`.
-**Probe RESULT:** `show_us` ~2.4/3.6 ms (not serialisation); show-skip
-`SYSTEM_FPS` **~78 → ~135** convicts Core-0 LED-wire *servicing*. Evidence:
-`docs/forensics/runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md`.
-**Restore Lever-2 ship look:** reflash `k1_main_rpl_im69d` @ **`a6149b29`**
-(`IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`).
-Geometry unchanged: DIN-A [0..79] / DIN-B [80..159]; primary GPIO15/16,
-secondary GPIO17/18; IM69D DATA=8 CLK=9 `SLOT_RIGHT`. Encoders stay dead.
-B489 / 1101 / F887 not touched. Never promote the probe env.
+`IDENTITY OK: git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506`.
+**RMT-on-VP-core PROVEN:** `SYSTEM_FPS` **~135–138 with show running** (was ~76–80
+@ `b318a0ec`). `LED_FPS` ~163. `gdft_us` ~1.75 ms; `acq_us` ~3.8 ms (I2S wait).
+Evidence: `docs/forensics/runtime-evidence/20260819T-rmt-vp-core-9087/RESULT.md`.
+Clock-fix still forced **off** on this probe. Cal inherited. Do **not** re-fire
+`start_noise_cal`. B489 / 1101 / F887 not touched. Never promote the probe env.
+**Product next:** flash `k1_main_rpl_im69d` (clock ON + `K1_RMT_ALLOC_ON_VP_CORE_V1`)
+then music eyes-on. Look-without-AP-fix restore remains `@ a6149b29`.
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 

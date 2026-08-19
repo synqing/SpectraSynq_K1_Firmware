@@ -1,40 +1,38 @@
 # FPS / AGC clock — step 5 stamp (2026-08-19)
 
 **Lane:** handover hybrid r1 (`feat/k1-scheduling-generation-hardening`)  
-**Flash this session:** `k1_main_rpl_fps_agc_probe` → `9087A500` only @ **`b318a0ec`**.
+**Flash this session:** probe @ **`b8cd4ca9`** on `9087A500`.
 
 ## Already on silicon / in source
 
-- **On silicon (Main RPL):** `IDENTITY OK: git=b318a0ec env=k1_main_rpl_fps_agc_probe epoch=1787141154`. Probe NON-SHIPPABLE; clock flag **forced OFF**.
-- **In source (not this binary):** `α=dt/(τ+dt)` default ON for ship envs (`K1_AGC_DT_CLOCK_V1=1`); identity-budget packer skip; `:show_skip=` routed in `parse_command` like `:vp_perf=`.
-- Lever-2 ship restore remains `k1_main_rpl_im69d` @ **`a6149b29`**.
+- **On silicon (Main RPL):** `IDENTITY OK: git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506`. Probe NON-SHIPPABLE; clock **forced OFF**. **RMT alloc on VP core proven** (`SYSTEM_FPS` ~135–138 with show on).
+- **In source:** `α=dt/(τ+dt)` default ON for ship envs; identity-budget packer skip; `K1_RMT_ALLOC_ON_VP_CORE_V1=1` on `k1_main_rpl_im69d` (and the probe). Not on `k1_hardware`.
+- Look-without-AP-fix restore remains `k1_main_rpl_im69d` @ **`a6149b29`**.
 - I2S0 is the mic; RMT 4×48 FIT; I2S LED **struck**.
 
 ## Host gate
 
-- `pytest tests/`: **1420 passed, 1 skipped** (commits `dec5fb53` + `b318a0ec`).
-- `pio-build.sh k1_hardware`: SUCCESS on those commits.
-- Probe env is **not** in the `pio-build.sh` allowlist; flashed via `k1-flash-verified.sh`.
+- `pytest tests/`: **1421 passed, 1 skipped** (`b8cd4ca9`).
+- `pio-build.sh k1_hardware`: SUCCESS.
 
 ## Probe decision (on disk)
 
-Evidence: [`docs/forensics/runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md`](../runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md)
+Show-skip control: [`20260819T-fps-agc-probe-9087/RESULT.md`](../runtime-evidence/20260819T-fps-agc-probe-9087/RESULT.md)  
+RMT-on-VP: [`20260819T-rmt-vp-core-9087/RESULT.md`](../runtime-evidence/20260819T-rmt-vp-core-9087/RESULT.md)
 
 | Rule | Number | Verdict |
 |---|---|---|
-| `pack_us` | 123 / 146 µs | Cheap; not the AP hole |
-| `show_us` | ~2.4 ms avg / 3.6 ms max | **Not** ≳ 9.6 ms — does not convict serialisation |
-| `LED_FPS` | ~203 | VP interval ~4.9 ms — consistent |
-| Show-skip `SYSTEM_FPS` | **~78 → 132.7–135.9** (mean 134.6) while armed; back to ~76–80 after | **Convicts LED-wire *servicing* (ISR/bus) on Core 0** |
-
-C4 is closed for this unit: the 93-vs-133 hole is AP contention from `show()` servicing, not Lever-2 pack cost and not RMT wire serialisation.
+| Show-skip @ `b318a0ec` | ~78 → ~135 | Convicts Core-0 LED-wire *servicing* |
+| SYSTEM_FPS with show @ `b8cd4ca9` | **134–138** | Hop recovered; first-show pinning **fixed** |
+| gdft_us | 6.1 ms → **1.75 ms** | AP no longer spliced |
+| acq_us | 1.5 ms → **3.8 ms** | Healthy I2S wait |
+| LED_FPS | 203 → **~163** | Core 1 now owns RMT IRQs; still >100 FPS |
 
 ## Remaining ship path
 
-1. **Agent (done):** probe flash + pack/show + armed show-skip series + this stamp + registry §2.
-2. **Captain:** named GO to **restore** Lever-2 look (`k1_main_rpl_im69d` @ `a6149b29`) **or** flash clock-fix ship (`k1_main_rpl_im69d` at `dec5fb53`+ lineage — not the probe env).
-3. **Captain:** eyes-on under **music** after the clock-fix ship build (follower blast radius: silence gate, sweet-spot, WAVEFORM-family).
-4. **Captain (new lane, not this probe):** ISR-core / RMT channel-allocation measurement. I2S LED stays struck. Do not treat this RESULT as a wire-driver swap.
-5. **Shipped for this probe step:** `IDENTITY OK: git=b318a0ec env=k1_main_rpl_fps_agc_probe epoch=1787141154` plus `RESULT.md`. Honour / `k1_hardware` / F887 / dull-show **#119716** stay separate. Bench `LED_FPS` remains RPL-only unless a later `B489A500` GO.
+1. **Agent (this commit):** `K1_RMT_ALLOC_ON_VP_CORE_V1=1` on `k1_main_rpl_im69d`.
+2. **Agent / Captain:** flash **`k1_main_rpl_im69d`** (clock ON + RMT-on-VP + Lever-2 look) to `9087A500`. Stamp: `IDENTITY OK: git=<that SHA> env=k1_main_rpl_im69d`.
+3. **Captain:** eyes-on under **music** (silence gate, sweet-spot, WAVEFORM-family).
+4. Honour / `k1_hardware` / F887 / dull-show **#119716** stay separate.
 
-**Close stamp for the probe discriminator:** show-skip jump on `9087A500` at `b318a0ec`. Device look restore / clock-fix music eyes-on are the next named GOs.
+**Close stamp for the AP hole on this unit:** `IDENTITY OK: git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506` plus the RMT-on-VP RESULT. Product look+clock is the `k1_main_rpl_im69d` flash above.
