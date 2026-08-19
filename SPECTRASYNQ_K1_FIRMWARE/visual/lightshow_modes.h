@@ -8,6 +8,9 @@
 #include "render_params.h" // RenderParams visible to all light_mode_*.cpp
 #include "channel_effect_state.h" // Per-channel effect state for vu_dot/kaleidoscope
 #include "k1_vp_audio_access.h"
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+#include "k1_palette_edge_bridge.h"
+#endif
 
 // Row 2: tx_begin/tx_end have external linkage and are defined in serial_menu.h,
 // compiled in the .ino TU. The inline vp_run_output_probe harness below calls them.
@@ -175,6 +178,12 @@ inline const CRGBPalette16& cached_gradient_palette(uint8_t palette_index, bool 
       secondary_palette = CRGBPalette16(gGradientPalettes[palette_index]);
       secondary_index = palette_index;
       palette_hd_unpack(palette_index, palette_hd_for_channel(true));
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+      {
+        const PaletteStopsHD& hd = palette_hd_for_channel(true);
+        k1_palette_edge_bridge_publish(true, hd.pos, hd.r, hd.g, hd.b, hd.count);
+      }
+#endif
     }
     return secondary_palette;
   }
@@ -183,6 +192,12 @@ inline const CRGBPalette16& cached_gradient_palette(uint8_t palette_index, bool 
     primary_palette = CRGBPalette16(gGradientPalettes[palette_index]);
     primary_index = palette_index;
     palette_hd_unpack(palette_index, palette_hd_for_channel(false));
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+    {
+      const PaletteStopsHD& hd = palette_hd_for_channel(false);
+      k1_palette_edge_bridge_publish(false, hd.pos, hd.r, hd.g, hd.b, hd.count);
+    }
+#endif
 #ifdef K1_HUE_AUDIT_V1
     // Mirror the HD cache identity for the HUEAUD fingerprint (globals.h).
     {

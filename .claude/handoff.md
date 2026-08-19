@@ -3,6 +3,12 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
+**Live lane (2026-08-19/20):** palette-safe EdgeMixer resolver (HONOUR_V1
+evolution). Contract:
+[`docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md`](../docs/forensics/colour-fix-lane-2026-08-19-palette-safe-resolver.md).
+Flag name unchanged. Flash target: Main RPL `9087A500` / `k1_main_rpl_im69d`
+only. No cal. B489 / F887 not touched.
+
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
 

@@ -1,7 +1,7 @@
 {"cmd":"photons=0.8","emitted":"sbr{{\nCONFIG.PHOTONS: 0.800000\n}}\n","config_delta":{"PHOTONS":0.800000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"chroma=0.5","emitted":"sbr{{\nCONFIG.CHROMA: 0.500000\n}}\n","config_delta":{"CHROMA":0.500000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"mood=0.6","emitted":"sbr{{\nCONFIG.MOOD: 0.600000\n}}\n","config_delta":{"MOOD":0.600000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
-{"cmd":"palette_mode=true","emitted":"sbr{{\nPALETTE_MODE: on\n}}\n","config_delta":{"PALETTE_MODE_ENABLED":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
+{"cmd":"palette_mode=true","emitted":"sbr{{\nPALETTE_MODE (primary): on\n}}\n","config_delta":{"PALETTE_MODE_ENABLED":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"palette_index=2","emitted":"sbr{{\nPALETTE: 2 (es_ocean_breeze_036_gp)\n}}\n","config_delta":{"PALETTE_INDEX":2.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"square_iter=4","emitted":"sbr{{\nCONFIG.SQUARE_ITER: 4.00\n}}\n","config_delta":{"SQUARE_ITER":4.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
 {"cmd":"led_interpolation=true","emitted":"sbr{{\nCONFIG.LED_INTERPOLATION: 1\n}}\n","config_delta":{"LED_INTERPOLATION":1.000000},"save_config":false,"save_config_delayed":true,"reboot":false,"bad_command":false}
@@ -113,8 +113,9 @@
 {"cmd":"secondary_mirror_enabled=true","emitted":"sbr{{\nSECONDARY_MIRROR_ENABLED: 1\n}}\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_reverse_order=true","emitted":"sbr{{\nSECONDARY_REVERSE_ORDER: 1\n}}\n","config_delta":{"SECONDARY_REVERSE_ORDER":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_control=true","emitted":"sbr{{\nSECONDARY_CONTROL: ENABLED (encoders control secondary channel)\n}}\n","config_delta":{"secondaryMode":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"palette_mode=false","emitted":"sbr{{\nPALETTE_MODE (secondary): off\n}}\n","config_delta":{"SECONDARY_PALETTE_MODE_ENABLED":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_control=toggle","emitted":"sbr{{\nSECONDARY_CONTROL: DISABLED (encoders control primary channel)\n}}\n","config_delta":{"secondaryMode":0.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
-{"cmd":"secondary_palette_mode=true","emitted":"sbr{{\nSECONDARY_PALETTE_MODE_ENABLED: true\n}}\n","config_delta":{},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
+{"cmd":"secondary_palette_mode=true","emitted":"sbr{{\nSECONDARY_PALETTE_MODE_ENABLED: true\n}}\n","config_delta":{"SECONDARY_PALETTE_MODE_ENABLED":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_palette_index=2","emitted":"sbr{{\nSECONDARY_PALETTE_INDEX: 2 (es_ocean_breeze_036_gp)\n}}\n","config_delta":{"SECONDARY_PALETTE_INDEX":2.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_base_coat=true","emitted":"sbr{{\nSECONDARY_BASE_COAT: 1\n}}\n","config_delta":{"SECONDARY_BASE_COAT":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}
 {"cmd":"secondary_photons=2.0","emitted":"sbr{{\nSECONDARY_PHOTONS: 1.000000\n}}\n","config_delta":{"SECONDARY_PHOTONS":1.000000},"save_config":false,"save_config_delayed":false,"reboot":false,"bad_command":false}

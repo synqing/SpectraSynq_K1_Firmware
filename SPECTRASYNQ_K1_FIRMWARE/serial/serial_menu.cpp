@@ -260,6 +260,10 @@ void k1_print_edge_status() {
   USBSerial.println(edge.spatialUniform ? "uniform" : "masked");
   USBSerial.print("EDGE_DUAL: ");
   USBSerial.println(k1_edge_dual_name(edge.dualEdge));
+  USBSerial.print("EDGE_EFFECTIVE_SECONDARY: ");
+  USBSerial.println(k1_edge_effective_name(edge, false));
+  USBSerial.print("EDGE_EFFECTIVE_PRIMARY: ");
+  USBSerial.println(k1_edge_effective_name(edge, true));
   tx_end();
 }
 

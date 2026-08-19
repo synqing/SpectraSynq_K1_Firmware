@@ -3,6 +3,21 @@
 #include <stdint.h>
 #include "constants.h"
 
+// ── COLOUR PIPELINE CONTRACT (frozen, Captain 2026-08-19) ───────────────────
+// A palette defines the available colour vocabulary; effects and EdgeMixer may
+// arrange, select, interpolate and modulate that vocabulary, but must not
+// synthesize unrelated hues while palette ownership is active.
+//
+//   Effect decides what is happening.
+//   Palette decides what colours the world contains.
+//   EdgeMixer decides how those colours relate across space.
+//
+// Under K1_EDGE_PALETTE_HONOUR_V1 that invariant is a palette-SAFE colour
+// resolver: chroma modes rotate in palette-POSITION space (output is always a
+// palette sample). SATURATION_VEIL still executes (modulates, does not
+// synthesize hues). The retired implementation (palette active → bare return)
+// made EDGE_MODE a lie while a palette owned the channel.
+
 enum K1EdgeMixerMode : uint8_t {
   K1_EDGE_MIXER_OFF = 0,
   K1_EDGE_MIXER_ANALOGOUS,
@@ -113,6 +128,13 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
 // secondary render scope, on the primary strip's own buffer. Same frozen per-pixel
 // transform as k1_edgemixer_apply — only the baked angle differs.
 void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMixerConfig& config);
+
+// Truthful effective relation for serial echo (compiled in ALL builds).
+// for_primary_strip selects which strip's palette-ownership flag is consulted.
+// Names: off | untouched | <mode>_rgb | <mode>_palette | blocked:vocab_cold |
+// saturation_veil | stm_dual | stm_spectral_map.
+const char* k1_edge_effective_name(const K1EdgeMixerConfig& config,
+                                   bool for_primary_strip);
 
 #ifdef K1_EDGEMIXER_HOST_TEST
 // Host-only parity-test hooks (compiled out of every production/device build;

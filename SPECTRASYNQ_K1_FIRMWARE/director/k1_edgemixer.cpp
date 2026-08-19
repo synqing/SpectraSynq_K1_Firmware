@@ -13,11 +13,11 @@
 #endif
 
 #ifdef K1_EDGE_PALETTE_HONOUR_V1
-// Palette-authoritative edge gate reads the channel ownership flags:
-// CONFIG.PALETTE_MODE_ENABLED (primary) + SECONDARY_PALETTE_MODE_ENABLED
-// (secondary), both in globals.h. Compiled out without the flag.
+// Palette-safe resolver reads channel ownership flags and the vocabulary
+// snapshot published at palette-switch time. Compiled out without the flag.
 #include "globals.h"
 #include "k1_vp_audio_access.h"
+#include "k1_palette_edge_bridge.h"
 #endif
 
 // Lever (a): force-inline the OKLab render-path leaves into the per-pixel hot
@@ -116,6 +116,26 @@ static SQ15x16 k1_edge_oklab_fmat_primary[9] = {
   SQ15x16(0.0f), SQ15x16(0.0f), SQ15x16(1.0f)
 };
 static bool k1_edge_dual_active = false;  // true when dualEdge != ONE_SIDED
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+// Palette-space shift precomputed at set_config (θ/2π × per-strip factor).
+// Strength changes never touch these — same property as the RGB matrices.
+static float k1_edge_sat_retain = 1.0f;
+static float k1_edge_delta_sec = 0.0f;
+static float k1_edge_delta_pri = 0.0f;
+#endif
+
+static bool k1_edge_mode_is_chroma(K1EdgeMixerMode mode) {
+  switch (mode) {
+    case K1_EDGE_MIXER_ANALOGOUS:
+    case K1_EDGE_MIXER_COMPLEMENTARY:
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
+    case K1_EDGE_MIXER_TRIADIC:
+    case K1_EDGE_MIXER_TETRADIC:
+      return true;
+    default:
+      return false;
+  }
+}
 
 static K1EdgeMixerMode k1_edge_mode_or_off(K1EdgeMixerMode mode) {
   switch (mode) {
@@ -155,6 +175,39 @@ static uint8_t k1_edge_sat_scale(uint8_t spreadDegrees) {
   return (uint8_t)(255 - ((uint16_t)spreadDegrees * 230 / 60));
 }
 
+static void k1_edge_mode_theta_sat(K1EdgeMixerMode mode, uint8_t spreadDegrees,
+                                   float* theta, float* satRetain) {
+  *theta = 0.0f;
+  *satRetain = 1.0f;
+  switch (mode) {
+    case K1_EDGE_MIXER_ANALOGOUS:
+      *theta = (float)spreadDegrees * (K1_EDGE_PI / 180.0f);
+      break;
+    case K1_EDGE_MIXER_COMPLEMENTARY:
+      *theta = K1_EDGE_PI;
+      *satRetain = 217.0f / 255.0f;
+      break;
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
+      *theta = 150.0f * (K1_EDGE_PI / 180.0f);
+      *satRetain = 230.0f / 255.0f;
+      break;
+    case K1_EDGE_MIXER_SATURATION_VEIL:
+      *satRetain = (float)k1_edge_sat_scale(spreadDegrees) / 255.0f;
+      break;
+    case K1_EDGE_MIXER_TRIADIC:
+      *theta = 120.0f * (K1_EDGE_PI / 180.0f);
+      *satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
+      break;
+    case K1_EDGE_MIXER_TETRADIC:
+      *theta = 90.0f * (K1_EDGE_PI / 180.0f);
+      *satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
+      break;
+    case K1_EDGE_MIXER_OFF:
+    default:
+      break;
+  }
+}
+
 // Recompute the 3x3 colour-harmony matrix (hue rotation about the grey axis,
 // composed with a BT.601 desaturation) into outMatrix[9] (row-major SQ15x16).
 //
@@ -175,34 +228,7 @@ static void k1_edge_recompute_matrix(K1EdgeMixerMode mode, uint8_t spreadDegrees
   float mat[9] = {1, 0, 0,  0, 1, 0,  0, 0, 1};
   float theta = 0.0f;
   float satRetain = 1.0f;
-
-  switch (mode) {
-    case K1_EDGE_MIXER_ANALOGOUS:
-      theta = (float)spreadDegrees * (K1_EDGE_PI / 180.0f);
-      break;
-    case K1_EDGE_MIXER_COMPLEMENTARY:
-      theta = K1_EDGE_PI;
-      satRetain = 217.0f / 255.0f;
-      break;
-    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
-      theta = 150.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 230.0f / 255.0f;
-      break;
-    case K1_EDGE_MIXER_SATURATION_VEIL:
-      satRetain = (float)k1_edge_sat_scale(spreadDegrees) / 255.0f;
-      break;
-    case K1_EDGE_MIXER_TRIADIC:
-      theta = 120.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
-      break;
-    case K1_EDGE_MIXER_TETRADIC:
-      theta = 90.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
-      break;
-    case K1_EDGE_MIXER_OFF:
-    default:
-      break;  // Identity retained.
-  }
+  k1_edge_mode_theta_sat(mode, spreadDegrees, &theta, &satRetain);
 
   // Dual-edge angle split (A lane): scale the rotation angle by angleFactor
   // (secondary vs primary get +/- fractions of theta). angleFactor == 1.0f leaves
@@ -669,34 +695,7 @@ static void k1_edge_recompute_oklab(K1EdgeMixerMode mode, uint8_t spreadDegrees,
                                     float angleFactor, SQ15x16* outF) {
   float theta = 0.0f;
   float satRetain = 1.0f;
-
-  switch (mode) {
-    case K1_EDGE_MIXER_ANALOGOUS:
-      theta = (float)spreadDegrees * (K1_EDGE_PI / 180.0f);
-      break;
-    case K1_EDGE_MIXER_COMPLEMENTARY:
-      theta = K1_EDGE_PI;
-      satRetain = 217.0f / 255.0f;
-      break;
-    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY:
-      theta = 150.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 230.0f / 255.0f;
-      break;
-    case K1_EDGE_MIXER_SATURATION_VEIL:
-      satRetain = (float)k1_edge_sat_scale(spreadDegrees) / 255.0f;
-      break;
-    case K1_EDGE_MIXER_TRIADIC:
-      theta = 120.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
-      break;
-    case K1_EDGE_MIXER_TETRADIC:
-      theta = 90.0f * (K1_EDGE_PI / 180.0f);
-      satRetain = 1.0f - ((float)spreadDegrees / 60.0f) * 0.30f;
-      break;
-    case K1_EDGE_MIXER_OFF:
-    default:
-      break;  // identity (F = I)
-  }
+  k1_edge_mode_theta_sat(mode, spreadDegrees, &theta, &satRetain);
 
   // Dual-edge angle split (A lane): scale the rotation angle by angleFactor before
   // baking the fused map. angleFactor == 1.0f leaves theta bit-for-bit unchanged
@@ -916,6 +915,15 @@ void k1_edgemixer_set_config(const K1EdgeMixerConfig& config) {
                             next_oklab_f_primary);
   }
 
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+  float theta0 = 0.0f;
+  float satR = 1.0f;
+  k1_edge_mode_theta_sat(next.mode, next.spreadDegrees, &theta0, &satR);
+  const float inv_two_pi = 1.0f / (2.0f * K1_EDGE_PI);
+  const float next_delta_sec = (theta0 * sec_factor) * inv_two_pi;
+  const float next_delta_pri = (theta0 * pri_factor) * inv_two_pi;
+#endif
+
   portENTER_CRITICAL(&k1_edge_config_mux);
   k1_edge_config = next;
   for (int i = 0; i < 9; ++i) {
@@ -927,6 +935,11 @@ void k1_edgemixer_set_config(const K1EdgeMixerConfig& config) {
     }
   }
   k1_edge_dual_active = primary_active;
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+  k1_edge_sat_retain = satR;
+  k1_edge_delta_sec = next_delta_sec;
+  k1_edge_delta_pri = next_delta_pri;
+#endif
   portEXIT_CRITICAL(&k1_edge_config_mux);
 }
 
@@ -942,6 +955,90 @@ static void k1_edge_apply_run(CRGB16* buf, uint16_t count,
     buf[i] = k1_edge_mix(buf[i], matrix, amount, space, fmat);
   }
 }
+
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+// Palette-space resolver. Geometry (centre mask, strength) matches k1_edge_apply_run.
+// Colour relation is a palette-position rotation: sample the vocabulary at
+// wrap(hue_to_u[pixel_hue] + delta_strip), rescale to the pixel's brightness,
+// apply satRetain toward the pixel's BT.601 luma, blend by amount.
+// Fail-closed: missing vocabulary → identity (leave buffer).
+static void k1_edge_apply_palette_run(CRGB16* buf, uint16_t count,
+                                      const K1EdgeMixerConfig& config,
+                                      float strength, bool isPrimary) {
+  const K1PaletteEdgeVocab* vocab = k1_palette_edge_vocab(!isPrimary);
+  if (vocab == nullptr || vocab->generation == 0 || vocab->count == 0 || buf == nullptr) {
+    return;
+  }
+
+  float delta = 0.0f;
+  float satRetain = 1.0f;
+  portENTER_CRITICAL(&k1_edge_config_mux);
+  delta = isPrimary ? k1_edge_delta_pri : k1_edge_delta_sec;
+  satRetain = k1_edge_sat_retain;
+  portEXIT_CRITICAL(&k1_edge_config_mux);
+
+  const float inv = 1.0f - satRetain;
+  for (uint16_t i = 0; i < count; i++) {
+    float amount = config.spatialUniform ? strength
+                                         : strength * k1_edge_mask(i, count);
+    if (amount <= 0.0f) {
+      continue;
+    }
+
+    const float pr = float(buf[i].r);
+    const float pg = float(buf[i].g);
+    const float pb = float(buf[i].b);
+    const float mx = (pr > pg) ? ((pr > pb) ? pr : pb) : ((pg > pb) ? pg : pb);
+    if (mx <= (2.0f / 255.0f)) {
+      continue;
+    }
+
+    float hue01 = 0.0f;
+    if (!k1_palette_rgb_hue01(pr, pg, pb, &hue01)) {
+      continue;
+    }
+
+    int bin = (int)floorf(hue01 * float(K1_PALETTE_EDGE_HUE_BINS));
+    if (bin < 0) bin = 0;
+    if (bin >= (int)K1_PALETTE_EDGE_HUE_BINS) {
+      bin = (int)K1_PALETTE_EDGE_HUE_BINS - 1;
+    }
+    float u = vocab->hue_to_u[bin] + delta;
+    u -= floorf(u);
+    if (u < 0.0f) u += 1.0f;
+
+    float sr, sg, sb;
+    k1_palette_vocab_sample(vocab, u, &sr, &sg, &sb);
+    const float smx = (sr > sg) ? ((sr > sb) ? sr : sb) : ((sg > sb) ? sg : sb);
+    if (smx > 1.0e-6f) {
+      const float scale = mx / smx;
+      sr *= scale;
+      sg *= scale;
+      sb *= scale;
+    }
+
+    const float y = 0.299f * pr + 0.587f * pg + 0.114f * pb;
+    sr = satRetain * sr + inv * y;
+    sg = satRetain * sg + inv * y;
+    sb = satRetain * sb + inv * y;
+
+    CRGB16 resolved;
+    resolved.r = k1_edge_clamp01(SQ15x16(sr));
+    resolved.g = k1_edge_clamp01(SQ15x16(sg));
+    resolved.b = k1_edge_clamp01(SQ15x16(sb));
+
+    SQ15x16 a = SQ15x16(k1_edge_clamp_float01(amount));
+    if (a >= SQ15x16(1.0f)) {
+      buf[i] = resolved;
+    } else if (a > SQ15x16(0.0f)) {
+      SQ15x16 keep = SQ15x16(1.0f) - a;
+      buf[i].r = k1_edge_clamp01((buf[i].r * keep) + (resolved.r * a));
+      buf[i].g = k1_edge_clamp01((buf[i].g * keep) + (resolved.g * a));
+      buf[i].b = k1_edge_clamp01((buf[i].b * keep) + (resolved.b * a));
+    }
+  }
+}
+#endif  // K1_EDGE_PALETTE_HONOUR_V1
 
 #ifdef K1_STM
 // LED -> STM spectral-ripple bin map, regenerated for the 40-bin K1 producer (the
@@ -1035,17 +1132,14 @@ void k1_edgemixer_apply(CRGB16* secondary, uint16_t count, const K1EdgeMixerConf
 #endif
 
 #ifdef K1_EDGE_PALETTE_HONOUR_V1
-  // PALETTE-AUTHORITATIVE EDGE (colour-fix lane P5.A side-door closure,
-  // 2026-08-13). Design law: while a palette owns a channel's colour, no path
-  // may re-author that channel's hues off-palette. The colour-harmony matrix
-  // below is a post-render RGB hue rotation — applied to a palette-authored
-  // buffer it emits hue-wheel colours the palette never contains (measured:
-  // rotated Naberius gold landed at hue ~146 teal = 55% of chromatic primary
-  // output under dual-edge SPLIT). While the SECONDARY channel is palette-owned,
-  // skip the rotation entirely (identity pass — the rendered palette colours go
-  // to the strip untouched). STM modes above are value-only (no hue authored)
-  // and remain allowed. Compiled out (byte-inert) without the flag.
-  if (SECONDARY_PALETTE_MODE_ENABLED) {
+  // PALETTE-SAFE COLOUR RESOLVER (HONOUR_V1 evolution, 2026-08-19).
+  // Frozen contract: A palette defines the available colour vocabulary; effects
+  // and EdgeMixer may arrange, select, interpolate and modulate that vocabulary,
+  // but must not synthesize unrelated hues while palette ownership is active.
+  // Palette active → palette-safe colour resolver (NOT a bare return).
+  // SATURATION_VEIL falls through to the frozen matrix (θ=0, desaturation only).
+  if (SECONDARY_PALETTE_MODE_ENABLED && k1_edge_mode_is_chroma(mode)) {
+    k1_edge_apply_palette_run(secondary, count, config, strength, /*isPrimary=*/false);
     return;
   }
 #endif
@@ -1096,16 +1190,11 @@ void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMix
   }
 
 #ifdef K1_EDGE_PALETTE_HONOUR_V1
-  // PALETTE-AUTHORITATIVE EDGE (colour-fix lane P5.A, 2026-08-13). This is THE
-  // convicted side-door: under dual-edge SPLIT/MIRROR this function hue-rotates
-  // the ENTIRE palette-authored PRIMARY buffer post-render (mirrored harmony
-  // angle), re-authoring palette arcs onto hue-wheel positions the palette
-  // never emits (measured fingerprint: hue ~146 / (0, ~0.39b, b) — identical in
-  // value to hsv(note_colors[7]), but authored HERE, not by an effect's
-  // chromatic branch). While the PRIMARY channel is palette-owned, the rotation
-  // is skipped — palette samples reach the strip unmodified. STM value-only
-  // modulation (handled above) remains allowed. Compiled out without the flag.
-  if (CONFIG.PALETTE_MODE_ENABLED) {
+  // PALETTE-SAFE COLOUR RESOLVER (HONOUR_V1 evolution, 2026-08-19). Same
+  // contract as k1_edgemixer_apply: palette active → palette-safe colour
+  // resolver, not a bare return. Veil falls through. STM handled above.
+  if (CONFIG.PALETTE_MODE_ENABLED && k1_edge_mode_is_chroma(mode)) {
+    k1_edge_apply_palette_run(primary, count, config, strength, /*isPrimary=*/true);
     return;
   }
 #endif
@@ -1128,6 +1217,61 @@ void k1_edgemixer_apply_primary(CRGB16* primary, uint16_t count, const K1EdgeMix
   }
 
   k1_edge_apply_run(primary, count, config, strength, matrix, oklabF);
+}
+
+const char* k1_edge_effective_name(const K1EdgeMixerConfig& config,
+                                   bool for_primary_strip) {
+  const K1EdgeMixerMode mode = k1_edge_mode_or_off(config.mode);
+  const float strength = k1_edge_clamp_float01(config.strength);
+  if (!config.enabled || mode == K1_EDGE_MIXER_OFF || strength <= 0.0f) {
+    return "off";
+  }
+#ifdef K1_STM
+  if (mode == K1_EDGE_MIXER_STM_DUAL) {
+    return "stm_dual";
+  }
+  if (mode == K1_EDGE_MIXER_STM_SPECTRAL_MAP) {
+    return "stm_spectral_map";
+  }
+#endif
+  if (for_primary_strip && config.dualEdge == K1_EDGE_DUAL_ONE_SIDED) {
+    return "untouched";
+  }
+  if (mode == K1_EDGE_MIXER_SATURATION_VEIL) {
+    return "saturation_veil";
+  }
+#ifdef K1_EDGE_PALETTE_HONOUR_V1
+  const bool owned = for_primary_strip ? CONFIG.PALETTE_MODE_ENABLED
+                                       : SECONDARY_PALETTE_MODE_ENABLED;
+  if (owned && k1_edge_mode_is_chroma(mode)) {
+#if defined(K1_RENDER_HOST_TEST) || defined(K1_SERIAL_REPLAY_HOST)
+    const bool vocab_ready = true;
+#else
+    const K1PaletteEdgeVocab* vocab = k1_palette_edge_vocab(!for_primary_strip);
+    const bool vocab_ready =
+        (vocab != nullptr && vocab->generation != 0 && vocab->count != 0);
+#endif
+    if (!vocab_ready) {
+      return "blocked:vocab_cold";
+    }
+    switch (mode) {
+      case K1_EDGE_MIXER_ANALOGOUS: return "analogous_palette";
+      case K1_EDGE_MIXER_COMPLEMENTARY: return "complementary_palette";
+      case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split_palette";
+      case K1_EDGE_MIXER_TRIADIC: return "triadic_palette";
+      case K1_EDGE_MIXER_TETRADIC: return "tetradic_palette";
+      default: break;
+    }
+  }
+#endif
+  switch (mode) {
+    case K1_EDGE_MIXER_ANALOGOUS: return "analogous_rgb";
+    case K1_EDGE_MIXER_COMPLEMENTARY: return "complementary_rgb";
+    case K1_EDGE_MIXER_SPLIT_COMPLEMENTARY: return "split_rgb";
+    case K1_EDGE_MIXER_TRIADIC: return "triadic_rgb";
+    case K1_EDGE_MIXER_TETRADIC: return "tetradic_rgb";
+    default: return "off";
+  }
 }
 
 #ifdef K1_EDGEMIXER_HOST_TEST

@@ -368,6 +368,7 @@ CORPUS = [
     "secondary_mirror_enabled=true",     # SECONDARY_MIRROR_ENABLED = true
     "secondary_reverse_order=true",      # SECONDARY_REVERSE_ORDER = true
     "secondary_control=true",            # secondaryMode = true
+    "palette_mode=false",                # channel-aware: writes SECONDARY (locks routing)
     "secondary_control=toggle",          # secondaryMode = !secondaryMode (toggle branch)
     "secondary_palette_mode=true",       # SECONDARY_PALETTE_MODE_ENABLED = true
     "secondary_palette_index=2",         # SECONDARY_PALETTE_INDEX = 2 (+ paletteNames echo)

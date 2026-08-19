@@ -158,12 +158,20 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
     else if (strcmp(command_type, "palette_mode") == 0) {
       bool value = false;
       if (vp_parse_bool(command_data, &value)) {
-        CONFIG.PALETTE_MODE_ENABLED = value;
-        save_config_delayed();
-        tx_begin();
-        USBSerial.print("PALETTE_MODE: ");
-        USBSerial.println(CONFIG.PALETTE_MODE_ENABLED ? "on" : "off");
-        tx_end();
+        if (!secondaryMode) {
+          CONFIG.PALETTE_MODE_ENABLED = value;
+          save_config_delayed();
+          tx_begin();
+          USBSerial.print("PALETTE_MODE (primary): ");
+          USBSerial.println(CONFIG.PALETTE_MODE_ENABLED ? "on" : "off");
+          tx_end();
+        } else {
+          SECONDARY_PALETTE_MODE_ENABLED = value;
+          tx_begin();
+          USBSerial.print("PALETTE_MODE (secondary): ");
+          USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "on" : "off");
+          tx_end();
+        }
       } else {
         bad_command(command_type, command_data);
       }

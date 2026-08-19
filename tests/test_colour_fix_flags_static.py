@@ -192,3 +192,60 @@ def test_equalised_sweep_drive_contains_a_rest_mechanism():
         "the wake gate exists but is not applied to the advance — a guard that "
         "is not on the path is not a guard"
     )
+
+
+def test_honour_v1_uses_palette_resolver_not_bare_bypass():
+    """Captain 2026-08-19: HONOUR must not skip EdgeMixer. The crude
+    `palette active → return` gate is retired; chroma modes must call the
+    palette-space resolver."""
+    src = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "director" /
+           "k1_edgemixer.cpp").read_text(encoding="utf-8")
+    assert "k1_edge_apply_palette_run" in src, (
+        "palette-space resolver is missing — HONOUR would be identity again"
+    )
+    assert re.search(
+        r"if\s*\(\s*SECONDARY_PALETTE_MODE_ENABLED\s*&&\s*"
+        r"k1_edge_mode_is_chroma\s*\(\s*mode\s*\)\s*\)\s*\{"
+        r"\s*k1_edge_apply_palette_run\s*\(",
+        src,
+    ), "secondary honour block must dispatch the palette resolver"
+    assert re.search(
+        r"if\s*\(\s*CONFIG\.PALETTE_MODE_ENABLED\s*&&\s*"
+        r"k1_edge_mode_is_chroma\s*\(\s*mode\s*\)\s*\)\s*\{"
+        r"\s*k1_edge_apply_palette_run\s*\(",
+        src,
+    ), "primary honour block must dispatch the palette resolver"
+    assert not re.search(
+        r"if\s*\(\s*SECONDARY_PALETTE_MODE_ENABLED\s*\)\s*\{\s*return\s*;",
+        src,
+    ), "crude secondary bypass return came back"
+    assert not re.search(
+        r"if\s*\(\s*CONFIG\.PALETTE_MODE_ENABLED\s*\)\s*\{\s*return\s*;",
+        src,
+    ), "crude primary bypass return came back"
+
+
+def test_edge_status_emits_effective_primary_and_secondary():
+    """Never again is EDGE_MODE the only answer while a pixel path is identity."""
+    menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" /
+            "serial_menu.cpp").read_text(encoding="utf-8")
+    assert "EDGE_EFFECTIVE_SECONDARY" in menu
+    assert "EDGE_EFFECTIVE_PRIMARY" in menu
+    assert "k1_edge_effective_name" in menu
+
+
+def test_palette_mode_handler_is_channel_aware():
+    """`:palette_mode=` must obey secondaryMode, matching the hotkey."""
+    handlers = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" /
+                "serial_cmd_handlers.cpp").read_text(encoding="utf-8")
+    idx = handlers.find('strcmp(command_type, "palette_mode")')
+    assert idx != -1, "palette_mode handler missing"
+    chunk = handlers[idx:idx + 900]
+    assert "secondaryMode" in chunk, (
+        ":palette_mode= still always writes primary"
+    )
+    assert "SECONDARY_PALETTE_MODE_ENABLED" in chunk, (
+        ":palette_mode= does not write the secondary ownership flag"
+    )
+    assert "PALETTE_MODE (primary)" in chunk
+    assert "PALETTE_MODE (secondary)" in chunk
