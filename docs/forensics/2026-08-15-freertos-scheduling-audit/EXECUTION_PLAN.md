@@ -34,7 +34,7 @@ active_task_plan: docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.m
 | 6 | NOT_REQUIRED | tail tracks GDFT, not service scheduling |
 | 7A | CLOSED | persist request boundary, no filesystem |
 | 7B | CLOSED | Captain save-park PASS 2026-08-17 on `k1_bench_im69d` @ `1d457740` / `B489A500` |
-| 8 | HOST_GREEN_AWAITING_BENCH_PASS | Captain: G8 on bench, not F887. Host pack GREEN. Silicon already `1d457740`. |
+| 8 | CLOSED_ON_BENCH | Captain 2026-08-20. B489 `k1_bench_im69d` @ `69e21140`. Honour on `k1_hardware`. F887 copy deferred. |
 
 ```text
 EXECUTION_MODE                    = SEQUENTIAL_SINGLE_LANE

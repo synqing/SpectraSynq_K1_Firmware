@@ -1,5 +1,5 @@
 ---
-abstract: "ACTIVE. G2+G3+G7B CLOSED 2026-08-17. G8 host GREEN on HEAD 1d457740. G8 device = bench B489A500 (Captain: do G8 on the bench). Awaiting Captain G8 PASS. F887 copy deferred until a replacement main unit. Hop 7.5 ms, AP service p99 8000 µs. AP0/VP1 locked."
+abstract: "ACTIVE. G2+G3+G7B CLOSED 2026-08-17. G8 CLOSED on bench B489A500 @ 69e21140 (Captain 2026-08-20). Honour on k1_hardware. F887 copy deferred. Hop 7.5 ms, AP service p99 8000 µs. AP0/VP1 locked. P4 open."
 status: active
 branch: feat/k1-scheduling-generation-hardening
 active_lane: K1_SCHEDULING_HARDENING_20260815
@@ -17,7 +17,7 @@ g2_product_selection: CROSS40_PLUS_LANE4_CLOSE_OUT
 g2_service: CLOSE_OUT_P99_8000
 g3: CLOSED
 g7b: CLOSED
-g8: HOST_GREEN_AWAITING_BENCH_PASS
+g8: CLOSED_ON_BENCH
 f887_flash: DEFERRED_UNIT_OFFSITE
 b489_flash: NAMED_GATES_ONLY_SEPARATE_GO
 harness_firmware_pin_sha: 14c53d239524aa891e71470880f6917d4adf2ea6
@@ -104,7 +104,7 @@ G3                           = CLOSED
 G6                           = NOT_REQUIRED
 G7A                          = CLOSED
 G7B                          = CLOSED
-G8                           = HOST_GREEN_AWAITING_BENCH_PASS
+G8                           = CLOSED_ON_BENCH
 B489_FLASH                   = NAMED_GATES_ONLY_SEPARATE_GO
 F887_FLASH                   = DEFERRED_UNIT_OFFSITE
 F887_UNIT                    = OFFSITE_CONSULTANCY_2026_08_17
@@ -113,12 +113,12 @@ LIVE_TASK_PLAN               = docs/superpowers/plans/2026-08-16-scheduling-hard
 G0R_PLAN                     = SUPERSEDED_FOR_LIVE_EXECUTION
 ```
 
-G2–G7B are LOCKED (Captain 2026-08-17). G8 host is GREEN on HEAD `1d457740`.
-Captain 2026-08-17: G8 device surface is the bench (`B489A500` /
-`k1_bench_im69d` @ `1d457740`, epoch `1786962873`), not F887. No reflash:
-that silicon already is the integration HEAD. Captain G8 PASS is the close
-stamp. Main K1 `F887A500` remains OFFSITE; a later `F887_PRODUCTION_FLASH`
-copies this HEAD. Do **not** start rolling ACF. Do **not** attempt F887 flash.
+G2–G7B are LOCKED (Captain 2026-08-17). G8 **CLOSED on bench** 2026-08-20:
+`k1_bench_im69d` @ `69e21140` / `B489A500` / epoch `1787164605`
+([`g8-bench-close-2026-08-20.md`](../forensics/2026-08-15-freertos-scheduling-audit/g8-bench-close-2026-08-20.md)).
+Honour is on `k1_hardware`. Main K1 `F887A500` remains OFFSITE; a later
+`F887_PRODUCTION_FLASH` copies this HEAD. Do **not** start rolling ACF.
+Do **not** attempt F887 flash. AP-input P4 stays a separate programme.
 
 Historical Cross0/40/80 matrix and
 `docs/forensics/runtime-evidence/20260816T-g2-lane4-cross40/` remain admissible

@@ -5,6 +5,27 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-20 honour promote + B489 G8
+
+```text
+session_objective:       Captain GO: close resolver lane; promote honour onto k1_hardware; flash B489; close G8 on bench; leave P4 open.
+branch_head_at_start:    8bd7c123
+branch_head_at_end:      69e21140 + docs stamp
+files_changed:           platformio.ini k1_hardware honour; colour-fix leak ratchet split; wfhyb env-section parser; registry/handoff/G8 receipt.
+commands_run:            pytest 1426 passed / 1 skipped; pio-build k1_hardware SUCCESS; k1-flash-verified k1_bench_im69d --port /dev/cu.usbmodem1101; GATE0_TRUST_ROOT PASS.
+validation_results:      1401 still 79d220fa k1_main_rpl_im69d. 1101 BEFORE 573206c0. AFTER IDENTITY OK git=69e21140 env=k1_bench_im69d epoch=1787164605 CHIP B489A500 USB B4:3A:45:A5:89:B4. SYSTEM_FPS 136.63 LED_FPS 202.34. EDGE_EFFECTIVE split_palette. Cal inherited. No cal fired. F887 untouched.
+evidence_captured:       docs/forensics/2026-08-15-freertos-scheduling-audit/g8-bench-close-2026-08-20.md
+blockers:                F887_PRODUCTION_FLASH when unit returns. Gate 5 causal trace NOT_PROVEN. Remaining five colour-fix flags off.
+generated_files_ignored: tools/webflash/; runtime-evidence **/bins/.
+safety_constraints:      F887 NO; 1401 not flashed; no cal; honour name unchanged; only honour of the colour-fix set promoted.
+thinking_skill_used:     Reversibility (honour -D is Type 2) + map-territory (1101 is B489 this session, not Unit 2).
+skills_used:             Agent OS; spec-recall; k1-lineage-routing; k1-colour-truth; thinking-model-router; ship-path-required.
+specialists_used:        none.
+next_recommended_action: Stop. F887 copy is a later named GO. P4 stays separate.
+```
+
+---
+
 ## Session Report — 2026-08-20 palette-safe EdgeMixer resolver
 
 ```text

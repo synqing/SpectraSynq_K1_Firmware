@@ -3,17 +3,19 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
-**Live lane (2026-08-20):** palette-safe EdgeMixer resolver **ON SILICON** at
-`79d220fa`. LED-buffer rtrace **PASS**
-([`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`](../docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md)).
-Flag name unchanged. Main RPL `9087A500` / `k1_main_rpl_im69d` only. No cal.
-B489 / F887 not touched.
+**Live lane (2026-08-20):** palette-safe honour **closed**. `K1_EDGE_PALETTE_HONOUR_V1`
+is on `k1_hardware` (`69e21140`). Main RPL `9087A500` remains `79d220fa`.
+B489 `B489A500` on `/dev/cu.usbmodem1101` is `k1_bench_im69d` @ `69e21140`
+(`IDENTITY OK` epoch `1787164605`, `split_palette`). G8 **CLOSED on bench**.
+F887 OFFSITE. AP-input P4 stays open. No cal.
 
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
 
 **Live task plan (2026-08-16 evening restamp):**
 [`docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md`](../docs/superpowers/plans/2026-08-16-scheduling-hardening-g2-g8.md)
+G8 close receipt:
+[`docs/forensics/2026-08-15-freertos-scheduling-audit/g8-bench-close-2026-08-20.md`](../docs/forensics/2026-08-15-freertos-scheduling-audit/g8-bench-close-2026-08-20.md)
 
 The active programme is the contained Gate 0-8 scheduling hardening plan. AP stays on
 Core 0, VP stays on Core 1, the harness/fault battery precedes production units, and an
@@ -28,18 +30,17 @@ explicit audio task remains conditional.
 - B489 flash only under named GO tokens; F887 NO until G8.
 - Rolling ACF / scheduler theatre are out of programme.
 
-**Silicon (2026-08-18):** bench K1v2 `B489A500` on `/dev/cu.usbmodem12401` is
-running **`k1_bench_im69d` @ `573206c0`** (epoch `1787004384`, Captain
-`B489_WFHYB_PROMOTE`, verified
-`IDENTITY OK: git=573206c0 env=k1_bench_im69d epoch=1787004384`).
-Home env now carries trail-deposit + modes 33–37 + EdgeMixer honour.
-Prior overlay `k1_bench_im69d_wfhyb_fade @ 836fde39` is OFF this unit (alias
-only). Calibration inherited, not re-fired. 1101 and F887 not touched.
+**Silicon (2026-08-20):** bench K1v2 `B489A500` on `/dev/cu.usbmodem1101` is
+running **`k1_bench_im69d` @ `69e21140`** (epoch `1787164605`, Captain honour
+promote + resolver + G8, verified
+`IDENTITY OK: git=69e21140 env=k1_bench_im69d epoch=1787164605`).
+`:edge_status` `split_palette` / `split_palette`. Cal inherited. F887 not
+touched. Port 1401 is Main RPL, not this chip.
 
 **EdgeMixer primary crush (Captain 2026-08-18): ON SILICON @ `573206c0`
-(B489, bypass honour).** Main RPL `79d220fa` evolved the same flag into the
-palette-safe resolver (no bypass). Production promotion of the flag onto
-`k1_hardware` stays gated by `test_colour_fix_flags_static.py`.
+(B489, bypass honour) then evolved 2026-08-20 to palette-safe @ `69e21140`.**
+Production honour is on `k1_hardware` as of `69e21140`. The other five
+colour-fix flags stay leak-blocked.
 
 **Main RPL = ON SILICON @ `79d220fa` / `k1_main_rpl_im69d`**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
@@ -56,8 +57,8 @@ F887 not touched. **LED-buffer rtrace PASS** closes the resolver
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
 
-**G2 = CLOSED** · **G3 = CLOSED** · **G7B = CLOSED** · **G8 host = GREEN**.
-**B489_WFHYB_PROMOTE = CLOSED on silicon.**
+**G2 = CLOSED** · **G3 = CLOSED** · **G7B = CLOSED** · **G8 = CLOSED_ON_BENCH**.
+**B489_WFHYB_PROMOTE = CLOSED on silicon** (superseded by resolver `69e21140`).
 **MAIN_RPL_FIRST_LIGHT_PASS = CLOSED on silicon.**
 
 **Ship path after this lock:**
@@ -80,9 +81,17 @@ F887 not touched. **LED-buffer rtrace PASS** closes the resolver
 10. ~~Look-flag flash~~ **DONE** — `3b425805`.
 11. ~~Lever-2 flash~~ **DONE** —
     `IDENTITY OK: git=a6149b29 env=k1_main_rpl_im69d epoch=1787031584`.
-    **Captain:** eyes-on Lever-2 look (and mode 32 vs B489). Honour onto
-    `k1_hardware` stays a separate close. Rollback of first-light topology:
-    reflash `@ cd18d89c`. Rollback of look-flags-only: `@ 3b425805`.
+    **Captain:** eyes-on Lever-2 look (and mode 32 vs B489). Rollback of
+    first-light topology: reflash `@ cd18d89c`. Rollback of look-flags-only:
+    `@ 3b425805`.
+12. ~~Honour onto `k1_hardware`~~ **DONE** — `69e21140`. Other five colour-fix
+    flags stay leak-blocked.
+13. ~~B489 palette-safe resolver flash~~ **DONE** —
+    `IDENTITY OK: git=69e21140 env=k1_bench_im69d epoch=1787164605`.
+14. ~~G8 on bench~~ **DONE** — receipt
+    `docs/forensics/2026-08-15-freertos-scheduling-audit/g8-bench-close-2026-08-20.md`.
+    Residual: `F887_PRODUCTION_FLASH` when that unit returns. Gate 5 causal
+    trace remains `NOT_PROVEN`.
 
 The separate AP-input-integrity P4 promotion is still open; no unrelated microphone
 slot/health/calibration change is implied by this lane.

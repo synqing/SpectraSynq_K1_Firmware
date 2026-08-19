@@ -125,8 +125,21 @@ EDGE_EFFECTIVE_PRIMARY: complementary_palette
 
 `complementary_palette` (not `untouched`) is the serial proof that the
 resolver is live: old honour would have echoed identity while a palette
-owned both channels. Cal inherited. No `start_noise_cal`. B489 / F887 not
-touched.
+owned both channels. Cal inherited. No `start_noise_cal`.
+
+B489 `B489A500` on `/dev/cu.usbmodem1101` (2026-08-20):
+
+```
+IDENTITY OK: git=69e21140 env=k1_bench_im69d epoch=1787164605
+CHIP ID: B489A500
+SYSTEM_FPS: 136.63
+LED_FPS: 202.34
+EDGE_MODE: split
+EDGE_EFFECTIVE_SECONDARY: split_palette
+EDGE_EFFECTIVE_PRIMARY: split_palette
+```
+
+F887 not touched.
 
 ## LED-buffer rtrace (2026-08-20) — PASS
 
