@@ -76,6 +76,9 @@ extern void ap_capture_arm(uint32_t ms);
 // Declarations + dispatch table (must precede system.h — init_serial lives here).
 #include "serial_menu.h"
 #include "led_utilities.h"
+#ifdef K1_LED_I2S_DIRECT_V1
+#include "k1_i2s_emit.h"
+#endif
 #ifndef K1_SERIAL_REPLAY_HOST
 #include "lightshow_modes.h"  // vp_run_output_probe / vp_print_secondary_state (inline)
 #endif
@@ -2927,6 +2930,12 @@ void parse_command(char* command_buf) {
     // K1_RENDER_TRACE_V1 (colour-fix-lane env only; production-OFF).
     else if (k1_render_trace_dispatch(command_type, command_data)) {
       // handled by the render trace instrument
+    }
+#endif
+
+#ifdef K1_LED_I2S_DIRECT_V1
+    else if (k1_i2s_pattern_dispatch(command_type, command_data)) {
+      // i2s_pattern=-1..5 — WS2816 T0H vectors, probe-only
     }
 #endif
 

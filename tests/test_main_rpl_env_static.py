@@ -102,17 +102,25 @@ def test_main_rpl_identity_and_build_allowlist():
 def test_main_rpl_led_init_is_ws2816_contiguous_dual_din():
     """aa0b57c2 dual-DIN + Lever-2 packer: WS2812B RGB on each packed half.
     Bare WS2812B on leds_out is the 24-bit corruption; native WS2816
-    controllers would double-pack."""
+    controllers would double-pack.
+
+    The I2S probe wraps addLeds in #else of K1_LED_I2S_DIRECT_V1. Slice each
+    K1_MAIN_RPL_PINMAP_V1 region to the next pinmap (or EOF) so nested #else
+    does not truncate before the production addLeds strings.
+    """
     led = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h").read_text(
         encoding="utf-8"
     )
-    blocks = re.findall(
-        r"#ifdef K1_MAIN_RPL_PINMAP_V1\n(.*?)(?:\n#else|\n#endif)",
-        led,
-        flags=re.S,
+    marker = "#ifdef K1_MAIN_RPL_PINMAP_V1"
+    first = led.find(marker)
+    second = led.find(marker, first + 1) if first >= 0 else -1
+    generic = led.find("if (CONFIG.LED_TYPE == LED_NEOPIXEL)", first)
+    generic_sec = led.find(
+        "FastLED.addLeds<WS2812B, SECONDARY_LED_DATA_PIN, GRB>(leds_out_secondary",
+        second,
     )
-    assert len(blocks) >= 2
-    primary, secondary = blocks[0], blocks[1]
+    assert first >= 0 and second > first and generic > first and generic_sec > second
+    primary, secondary = led[first:generic], led[second:generic_sec]
     assert "K1_WS2816_LEVER2_V1" in primary
     assert (
         "FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT)"
