@@ -5,7 +5,7 @@
 
 ## Already on silicon / in source
 
-- **On silicon (Main RPL):** `IDENTITY OK: git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506`. Probe NON-SHIPPABLE; clock **forced OFF**. **RMT alloc on VP core proven** (`SYSTEM_FPS` ~135–138 with show on).
+- **On silicon (Main RPL):** `IDENTITY OK: git=4a2c7393 env=k1_main_rpl_im69d epoch=1787143096`. Clock-fix ON + RMT-on-VP. Dump `SYSTEM_FPS 135.50` / `LED_FPS 165.41`.
 - **In source:** `α=dt/(τ+dt)` default ON for ship envs; identity-budget packer skip; `K1_RMT_ALLOC_ON_VP_CORE_V1=1` on `k1_main_rpl_im69d` (and the probe). Not on `k1_hardware`.
 - Look-without-AP-fix restore remains `k1_main_rpl_im69d` @ **`a6149b29`**.
 - I2S0 is the mic; RMT 4×48 FIT; I2S LED **struck**.
@@ -30,9 +30,8 @@ RMT-on-VP: [`20260819T-rmt-vp-core-9087/RESULT.md`](../runtime-evidence/20260819
 
 ## Remaining ship path
 
-1. **Agent (this commit):** `K1_RMT_ALLOC_ON_VP_CORE_V1=1` on `k1_main_rpl_im69d`.
-2. **Agent / Captain:** flash **`k1_main_rpl_im69d`** (clock ON + RMT-on-VP + Lever-2 look) to `9087A500`. Stamp: `IDENTITY OK: git=<that SHA> env=k1_main_rpl_im69d`.
-3. **Captain:** eyes-on under **music** (silence gate, sweet-spot, WAVEFORM-family).
-4. Honour / `k1_hardware` / F887 / dull-show **#119716** stay separate.
+1. **Agent (done):** flag on `k1_main_rpl_im69d` and flashed.
+2. **Captain:** eyes-on under **music** (silence gate, sweet-spot, WAVEFORM-family). PASS stamps this lane closed on RPL.
+3. Honour / `k1_hardware` / F887 / dull-show **#119716** stay separate.
 
-**Close stamp for the AP hole on this unit:** `IDENTITY OK: git=b8cd4ca9 env=k1_main_rpl_fps_agc_probe epoch=1787142506` plus the RMT-on-VP RESULT. Product look+clock is the `k1_main_rpl_im69d` flash above.
+**Close stamp for RPL silicon this lane:** `IDENTITY OK: git=4a2c7393 env=k1_main_rpl_im69d epoch=1787143096`. Music eyes-on is the remaining Captain act.
