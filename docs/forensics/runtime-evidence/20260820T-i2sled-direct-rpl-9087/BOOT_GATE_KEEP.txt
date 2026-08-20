@@ -1,0 +1,2018 @@
+58 peak_scaled=0.399 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=1152 rms_raw=0.0101 pky=2.84 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=118.0 conf=0.42 lock=0 phase=0.73 beat=0 bstr=0.07 | onset=1 bass=0 ostr=0.00 | raw_i16_abs_peak=40 raw_i16_rms=28.5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=0.968 gdft_trim=0.993 agc_gain=0.145 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.007 spec_pin=0.002 spec_sat=0.000 lg_mode=2 lightshow=32
+[AP] SSL=121 DC=-205 max_raw=2038 follower=3421 peak_scaled=0.682 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=2181 rms_raw=0.0322 pky=2.38 dim=0 cal_source=persisted_profile cal_valid=1 cal_reason=none | bpm=119.0 conf=0.32 lock=0 phase=0.71 beat=0 bstr=0.37 | onset=0 bass=1 ostr=0.13 | raw_i16_abs_peak=119 raw_i16_rms=54.3 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=0.982 gdft_trim=0.998 agc_gain=0.208 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.027 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32
+[AP] SSL=121 DC=-205 max_raw=327 follower=2434 peak_scaled=0.186 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=438 rms_raw=0.0013 pky=3.53 dim=0 cal_source=persisted_profile cal_valid=1 ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x42005361
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (165) esp_core_dump_flash: Core dump data check failed:
+Calculated checksum='be5eb93d'
+Image checksum='ffffffff'
+---------------------------
+K1 | VER: 40103
+---------------------------
+
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+[    39][E][vfs_api.cpp:99] open(): /littlefs/SHOW_STATE_V1.BIN does not exist, no permits for creation
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S PDM RX INIT: PASS slot=RIGHT
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.432 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 4.462 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.068 MS
+SYSTEM INIT COMPLETE!
+BOOT_LOOP_GUARD: reset_reason=11 fail_count=0 safe_mode=0
+WAVEFORM_HISTORY: OK @ 0x3C0A09D8
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+RMT_ALLOC: first_show core=1
+ slots=160
+Guru Meditation Error: Core  1 panic'ed (Unknown reason). 
+
+Core  1 register dump:
+PC      : 0x4203f7df  PS      : 0x00060630  A0      : 0x82028514  A1      : 0x3fcbea00  
+A2      : 0x3c0ae470  A3      : 0x3fcbea2c  A4      : 0x3c0a87c0  A5      : 0x00005c42  
+A6      : 0x3c0ae414  A7      : 0x3fcbea1c  A8      : 0x00000001  A9      : 0x3fcbe9e0  
+A10     : 0x00000010  A11     : 0x3c0ae470  A12     : 0x3fcbea1c  A13     : 0x00060623  
+A14     : 0x00000001  A15     : 0x3fc96e74  SAR     : 0x00000004  EXCCAUSE: 0x0000001c  
+EXCVADDR: 0x8202851c  LBEG    : 0x420073e1  LEND    : 0x42007413  LCOUNT  : 0x00000000  
+
+
+Backtrace: 0x4203f7dc:0x3fcbea00 0x42028511:0x3fcbea50 0x420285fe:0x3fcbead0 0x42007ab2:0x3fcbeaf0 0x42009084:0x3fcbeb50 0x4037ddaa:0x3fcbf100
+
+
+
+
+ELF file SHA256: 5b23f25c6
+
+Guru Meditation Error: Core  1 panic'ed (Unknown reason). 
+
+Core  1 register dump:
+PC      : 0x42042b3f  PS      : 0x00060334  A0      : 0x82041b86  A1      : 0x3fcb1390  
+A2      : 0x3fcb1520  A3      : 0x3fcb14fc  A4      : 0x00000020  A5      : 0x00ff0000  
+A6      : 0x464c457f  A7      : 0x00010101  A8      : 0x00000000  A9      : 0x3fcb1370  
+A10     : 0x641c9586  A11     : 0xffffffff  A12     : 0x00000000  A13     : 0x00000020  
+A14     : 0x3fcb134c  A15     : 0x00000020  SAR     : 0x00000015  EXCCAUSE: 0x0000001d  
+EXCVADDR: 0x82041b86  LBEG    : 0x40056f5c  LEND    : 0x40056f72  LCOUNT  : 0xffffffff  
+
+
+Backtrace: 0x42042b3c:0x3fcb1390 0x42041b83:0x3fcb13b0 0x4204236a:0x3fcb13e0 0x42042aab:0x3fcb1480 0x420419ff:0x3fcb1550
+
+
+
+
+ELF file SHA256: 5b23f25c6
+
+Re-entered core dump! Exception happened during core dump!
+Rebooting...
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0xc (RTC_SW_CPU_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037a2ee
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (138) esp_image: Checksum failed. Calculated 0x89 read 0xcc
+E (138) boot: OTA app partition slot 0 is not bootable
+E (138) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (144) boot: OTA app partition slot 1 is not bootable
+E (149) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x55 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xb7 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x5 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x3c read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd1 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (26) flash_parts: Incorrect MD5 checksum
+E (26) boot: Failed to verify partition table
+E (27) boot: load partition table error!
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x3a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xf0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x33 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x63 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x41 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x81 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc4 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x1c read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x60 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xcb read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x5a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x1c read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xea read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x80 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x71 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x42 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x53 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x92 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xee read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x5e read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x85 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x40 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x60 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xe0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xa4 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xb1 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xe9 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xaf read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xf4 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x91 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x2f read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xa read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x1 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x47 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xaf read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xf9 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xb9 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc7 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x2a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x82 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd1 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x5 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xe5 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x72 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x8b read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x85 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x8b read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x49 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xba read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x30 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x14 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x64 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x23 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x46 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x23 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xba read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x87 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x42 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd8 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xb0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x18 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x16 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x87 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x53 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xa6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x7b read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x7a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x69 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x89 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc9 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xae read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x48 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x79 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xdd read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x3 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xb6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xf0 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x22 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x20 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xaf read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x7 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x16 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd3 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xad read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xca read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x86 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x27 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xa8 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (26) flash_parts: Incorrect MD5 checksum
+E (26) boot: Failed to verify partition table
+E (27) boot: load partition table error!
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x7b read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc5 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x55 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xec read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x41 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x6f read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x6 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xcb read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x5f read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xd7 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xed read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xe1 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x9a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x7e read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x98 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xf3 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0xc2 read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x2a read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x1f read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (137) esp_image: Checksum failed. Calculated 0x4d read 0xcc
+E (137) boot: OTA app partition slot 0 is not bootable
+E (137) esp_image: image at 0x650000 has invalid magic byte (nothing flashed here?)
+E (143) boot: OTA app partition slot 1 is not bootable
+E (148) boot: No bootable app partitions in the partition table
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x3 (RTC_SW_SYS_RST),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x403ccf65
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8

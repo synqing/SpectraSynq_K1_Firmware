@@ -1,0 +1,60 @@
+esptool.py v4.8.9
+Serial port /dev/cu.usbmodem1401
+Connecting....
+Chip is ESP32-S3 (QFN56) (revision v0.2)
+Features: WiFi, BLE, Embedded PSRAM 8MB (AP_3v3)
+Crystal is 40MHz
+USB mode: USB-Serial/JTAG
+MAC: b4:3a:45:a5:87:90
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00000000 to 0x00004fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x000b8fff...
+Compressed 20208 bytes to 13058...
+Writing at 0x00000000... (100 %)
+Wrote 20208 bytes (13058 compressed) at 0x00000000 in 0.4 seconds (effective 359.4 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 146...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (146 compressed) at 0x00008000 in 0.1 seconds (effective 308.2 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.2 seconds (effective 427.9 kbit/s)...
+Hash of data verified.
+Compressed 691568 bytes to 386706...
+Writing at 0x00010000... (4 %)
+Writing at 0x0001b403... (8 %)
+Writing at 0x0002827c... (12 %)
+Writing at 0x0003982c... (16 %)
+Writing at 0x00043594... (20 %)
+Writing at 0x00048abe... (25 %)
+Writing at 0x0004df6b... (29 %)
+Writing at 0x0005392d... (33 %)
+Writing at 0x00059b61... (37 %)
+Writing at 0x000600e3... (41 %)
+Writing at 0x0006614c... (45 %)
+Writing at 0x0006bf87... (50 %)
+Writing at 0x00071c70... (54 %)
+Writing at 0x0007748e... (58 %)
+Writing at 0x0007cc36... (62 %)
+Writing at 0x00082797... (66 %)
+Writing at 0x000879e2... (70 %)
+Writing at 0x0008d171... (75 %)
+Writing at 0x00092d93... (79 %)
+Writing at 0x00099d62... (83 %)
+Writing at 0x000a3f48... (87 %)
+Writing at 0x000a99ab... (91 %)
+Writing at 0x000af49b... (95 %)
+Writing at 0x000b5317... (100 %)
+Wrote 691568 bytes (386706 compressed) at 0x00010000 in 5.4 seconds (effective 1031.6 kbit/s)...
+Hash of data verified.
+Staying in bootloader.
+
+---

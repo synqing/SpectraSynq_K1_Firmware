@@ -1,0 +1,22 @@
+{
+  "verdict": "FAIL_PARKED",
+  "chip": "9087A500",
+  "mac": "b4:3a:45:a5:87:90",
+  "port": "/dev/cu.usbmodem1401",
+  "silicon_now": {
+    "git": "d276fd68",
+    "env": "k1_main_rpl_im69d",
+    "epoch": 1787175949,
+    "system_fps": 136.89,
+    "led_fps": 144.48,
+    "cal_valid": 1
+  },
+  "probe_attempt": {
+    "git": "293490b4",
+    "env": "k1_main_rpl_i2sled_probe",
+    "host_image_checksum": "0xcc valid",
+    "esptool_verify": "OK",
+    "rom": "esp_image Checksum failed; no bootable app partitions"
+  },
+  "do_not_reflash_probe": true
+}
