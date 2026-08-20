@@ -1,0 +1,444 @@
+{
+  "when": "2026-08-19T19:16:12Z",
+  "fixture": "Captain-played music in the room. No afplay.",
+  "identities": {
+    "main_rpl": {
+      "version": "40103",
+      "git": "79d220fa",
+      "epoch": "1787158141",
+      "env": "k1_main_rpl_im69d",
+      "chip": "9087A500",
+      "port": "/dev/cu.usbmodem1401"
+    },
+    "bench_b489": {
+      "version": "40103",
+      "git": "69e21140",
+      "epoch": "1787164605",
+      "env": "k1_bench_im69d",
+      "chip": "B489A500",
+      "port": "/dev/cu.usbmodem1101"
+    }
+  },
+  "config": {
+    "main_rpl": {
+      "secondary_palette": 40,
+      "secondary_name": "K1_Naberius_Gold_gp",
+      "chroma": 0.0,
+      "mood": 0.05
+    },
+    "bench_b489": {
+      "secondary_palette": 40,
+      "secondary_name": "K1_Naberius_Gold_gp",
+      "chroma": 0.1,
+      "mood": 0.0
+    }
+  },
+  "acks": [
+    {
+      "unit": "main_rpl",
+      "want": "K1_Naberius_Gold_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 40 (K1_Naberius_Gold_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)"
+    },
+    {
+      "unit": "bench_b489",
+      "want": "K1_Naberius_Gold_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 40 (K1_Naberius_Gold_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 40 (K1_Naberius_Gold_gp)"
+    },
+    {
+      "unit": "main_rpl",
+      "want": "K1_Vepar_Pink_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 41 (K1_Vepar_Pink_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 41 (K1_Vepar_Pink_gp)"
+    },
+    {
+      "unit": "bench_b489",
+      "want": "K1_Vepar_Pink_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 41 (K1_Vepar_Pink_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 41 (K1_Vepar_Pink_gp)"
+    },
+    {
+      "unit": "main_rpl",
+      "want": "K1_Tropical_Ultraviolet_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 34 (K1_Tropical_Ultraviolet_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 34 (K1_Tropical_Ultraviolet_gp)"
+    },
+    {
+      "unit": "bench_b489",
+      "want": "K1_Tropical_Ultraviolet_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 34 (K1_Tropical_Ultraviolet_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 34 (K1_Tropical_Ultraviolet_gp)"
+    },
+    {
+      "unit": "main_rpl",
+      "want": "Blue_Cyan_Yellow_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 32 (Blue_Cyan_Yellow_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 32 (Blue_Cyan_Yellow_gp)"
+    },
+    {
+      "unit": "bench_b489",
+      "want": "Blue_Cyan_Yellow_gp",
+      "primary_ok": true,
+      "secondary_ok": true,
+      "primary_ack": "PALETTE: 32 (Blue_Cyan_Yellow_gp)",
+      "secondary_ack": "SECONDARY_PALETTE_INDEX: 32 (Blue_Cyan_Yellow_gp)"
+    }
+  ],
+  "phases": {
+    "main_rpl": {
+      "hold": {
+        "ap": {
+          "n": 10,
+          "silence_frac": 0.0,
+          "lock_frac": 0.1,
+          "peak_mean": 0.1525,
+          "peak_max": 0.41,
+          "conf_mean": 0.076,
+          "bpm_mean": 111.1
+        },
+        "fps": {
+          "system": {
+            "n": 5,
+            "p50": 135.3,
+            "min": 134.12,
+            "max": 136.71,
+            "mean": 135.27
+          },
+          "led": {
+            "n": 5,
+            "p50": 139.91,
+            "min": 139.3,
+            "max": 154.95,
+            "mean": 142.802
+          }
+        },
+        "edge": []
+      },
+      "pal_40": {
+        "palette": "K1_Naberius_Gold_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 0.0,
+          "lock_frac": 0.0,
+          "peak_mean": 8.333333333333333e-05,
+          "peak_max": 0.001,
+          "conf_mean": 0.10583333333333333,
+          "bpm_mean": 103.25
+        },
+        "fps": {
+          "system": {
+            "n": 6,
+            "p50": 135.93,
+            "min": 134.15,
+            "max": 140.68,
+            "mean": 136.20000000000002
+          },
+          "led": {
+            "n": 6,
+            "p50": 160.0,
+            "min": 148.61,
+            "max": 162.32,
+            "mean": 155.53
+          }
+        },
+        "edge": []
+      },
+      "pal_41": {
+        "palette": "K1_Vepar_Pink_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 0.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.011166666666666667,
+          "peak_max": 0.134,
+          "conf_mean": 0.09166666666666667,
+          "bpm_mean": 109.16666666666667
+        },
+        "fps": {
+          "system": {
+            "n": 6,
+            "p50": 136.89,
+            "min": 134.51,
+            "max": 139.67,
+            "mean": 136.83166666666665
+          },
+          "led": {
+            "n": 6,
+            "p50": 159.63,
+            "min": 147.38,
+            "max": 160.56,
+            "mean": 157.075
+          }
+        },
+        "edge": []
+      },
+      "pal_34": {
+        "palette": "K1_Tropical_Ultraviolet_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 0.3333333333333333,
+          "lock_frac": 0.08333333333333333,
+          "peak_mean": 0.030416666666666665,
+          "peak_max": 0.207,
+          "conf_mean": 0.22,
+          "bpm_mean": 105.0
+        },
+        "fps": {
+          "system": {
+            "n": 6,
+            "p50": 137.75,
+            "min": 134.92,
+            "max": 138.7,
+            "mean": 136.63
+          },
+          "led": {
+            "n": 6,
+            "p50": 161.3,
+            "min": 143.19,
+            "max": 162.87,
+            "mean": 158.01333333333332
+          }
+        },
+        "edge": []
+      },
+      "pal_32": {
+        "palette": "Blue_Cyan_Yellow_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.023,
+          "peak_max": 0.215,
+          "conf_mean": 0.0,
+          "bpm_mean": 96.58333333333333
+        },
+        "fps": {
+          "system": {
+            "n": 6,
+            "p50": 138.32,
+            "min": 135.29,
+            "max": 140.75,
+            "mean": 137.64
+          },
+          "led": {
+            "n": 6,
+            "p50": 161.21,
+            "min": 147.29,
+            "max": 162.57,
+            "mean": 157.42
+          }
+        },
+        "edge": []
+      }
+    },
+    "bench_b489": {
+      "hold": {
+        "ap": {
+          "n": 10,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.0165,
+          "peak_max": 0.165,
+          "conf_mean": 0.0,
+          "bpm_mean": 87.0
+        },
+        "fps": {
+          "system": {
+            "n": 5,
+            "p50": 137.18,
+            "min": 133.53,
+            "max": 140.42,
+            "mean": 137.648
+          },
+          "led": {
+            "n": 5,
+            "p50": 200.35,
+            "min": 200.14,
+            "max": 202.34,
+            "mean": 200.704
+          }
+        },
+        "edge": []
+      },
+      "pal_40": {
+        "palette": "K1_Naberius_Gold_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.06958333333333333,
+          "peak_max": 0.527,
+          "conf_mean": 0.0,
+          "bpm_mean": 87.0
+        },
+        "fps": {
+          "system": {
+            "n": 7,
+            "p50": 144.06,
+            "min": 141.17,
+            "max": 147.12,
+            "mean": 143.88
+          },
+          "led": {
+            "n": 7,
+            "p50": 200.66,
+            "min": 200.27,
+            "max": 202.45,
+            "mean": 200.8542857142857
+          }
+        },
+        "edge": [
+          [
+            "SECONDARY",
+            "split_palette"
+          ],
+          [
+            "PRIMARY",
+            "split_palette"
+          ]
+        ]
+      },
+      "pal_41": {
+        "palette": "K1_Vepar_Pink_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.0,
+          "peak_max": 0.0,
+          "conf_mean": 0.0,
+          "bpm_mean": 87.0
+        },
+        "fps": {
+          "system": {
+            "n": 7,
+            "p50": 140.46,
+            "min": 137.18,
+            "max": 142.87,
+            "mean": 140.58142857142857
+          },
+          "led": {
+            "n": 7,
+            "p50": 200.34,
+            "min": 200.12,
+            "max": 200.7,
+            "mean": 200.36714285714285
+          }
+        },
+        "edge": [
+          [
+            "SECONDARY",
+            "split_palette"
+          ],
+          [
+            "PRIMARY",
+            "split_palette"
+          ]
+        ]
+      },
+      "pal_34": {
+        "palette": "K1_Tropical_Ultraviolet_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.028333333333333335,
+          "peak_max": 0.34,
+          "conf_mean": 0.0,
+          "bpm_mean": 87.0
+        },
+        "fps": {
+          "system": {
+            "n": 7,
+            "p50": 137.17,
+            "min": 136.38,
+            "max": 142.22,
+            "mean": 138.5142857142857
+          },
+          "led": {
+            "n": 7,
+            "p50": 200.34,
+            "min": 200.21,
+            "max": 200.57,
+            "mean": 200.35
+          }
+        },
+        "edge": [
+          [
+            "SECONDARY",
+            "split_palette"
+          ],
+          [
+            "PRIMARY",
+            "split_palette"
+          ]
+        ]
+      },
+      "pal_32": {
+        "palette": "Blue_Cyan_Yellow_gp",
+        "ap": {
+          "n": 12,
+          "silence_frac": 1.0,
+          "lock_frac": 0.0,
+          "peak_mean": 0.02975,
+          "peak_max": 0.292,
+          "conf_mean": 0.0,
+          "bpm_mean": 87.0
+        },
+        "fps": {
+          "system": {
+            "n": 7,
+            "p50": 142.78,
+            "min": 138.11,
+            "max": 144.6,
+            "mean": 142.40571428571428
+          },
+          "led": {
+            "n": 7,
+            "p50": 201.19,
+            "min": 200.49,
+            "max": 203.11,
+            "mean": 201.3357142857143
+          }
+        },
+        "edge": [
+          [
+            "SECONDARY",
+            "split_palette"
+          ],
+          [
+            "PRIMARY",
+            "split_palette"
+          ]
+        ]
+      }
+    }
+  },
+  "restore": {
+    "main_rpl": {
+      "want": 40,
+      "got": 40
+    },
+    "bench_b489": {
+      "want": 40,
+      "got": 40
+    }
+  },
+  "ack_all_ok": true,
+  "honour_ok": true
+}
