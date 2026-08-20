@@ -51,8 +51,9 @@ EdgeMixer resolver** (HONOUR evolved: no bypass). Post-flash dump:
 `EDGE_EFFECTIVE_SECONDARY: complementary_palette` /
 `EDGE_EFFECTIVE_PRIMARY: complementary_palette`. Cal inherited. Do **not**
 re-fire `start_noise_cal`. Prior ship `4a2c7393` is the restore target if
-Captain rejects the look. Probe proof remains `b8cd4ca9`. B489 / 1101 /
-F887 not touched. **LED-buffer rtrace PASS** closes the resolver
+Captain rejects the look. Probe proof remains `b8cd4ca9`. F887 not touched.
+B489 later @ `69e21140` on `/dev/cu.usbmodem1101`. **LED-buffer rtrace PASS**
+closes the resolver
 (`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).
 
 **Main K1 (`F887A500`) = OFFSITE** (Captain 2026-08-17).
