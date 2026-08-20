@@ -227,6 +227,23 @@ inline void reverse_leds(CRGB arr[], uint16_t size) {
   }
 }
 
+// Lever-2 packs from CRGB16; reverse before pack so REVERSE_ORDER does not
+// abandon the wire buffer (which would leave FastLED showing a stale frame).
+inline void reverse_leds_16(CRGB16 arr[], uint16_t size) {
+  if (arr == nullptr || size < 2) {
+    return;
+  }
+  uint16_t start = 0;
+  uint16_t end = size - 1;
+  while (start < end) {
+    CRGB16 temp = arr[start];
+    arr[start] = arr[end];
+    arr[end] = temp;
+    start++;
+    end--;
+  }
+}
+
 static inline void write_sweet_spot_pwm(uint8_t channel, uint32_t duty) {
 #if K1_HAS_SWEET_SPOT_LEDS
   ledcWrite(channel, duty);
@@ -1086,8 +1103,13 @@ inline void show_leds() {
 #ifdef K1_WS2816_LEVER2_V1
   // Explicit 48-bit packer + WS2812B RGB. On Main RPL this is the dual-DIN
   // emit (160 logical pixels → 320 wire slots, two 160-slot halves). Do not
-  // consult LED_TYPE here — persisted X2 must not skip the packer.
-  if (CONFIG.REVERSE_ORDER == false && ws2816_wire != nullptr) {
+  // consult LED_TYPE here — persisted X2 must not skip the packer. Reverse
+  // happens on the CRGB16 source before pack so the wire controllers stay
+  // live (gating the packer on REVERSE_ORDER left FastLED on a stale wire).
+  if (ws2816_wire != nullptr) {
+    if (CONFIG.REVERSE_ORDER) {
+      reverse_leds_16(leds_scaled, CONFIG.LED_COUNT);
+    }
     SQ15x16 k1_inc_r(1.0), k1_inc_g(1.0), k1_inc_b(1.0);
     if (!CONFIG.INCANDESCENT_MODE && CONFIG.INCANDESCENT_FILTER > 0.0f) {
       const SQ15x16 mix = SQ15x16(CONFIG.INCANDESCENT_FILTER);
@@ -1284,23 +1306,24 @@ inline void init_leds() {
   // (would double-pack) and not bare WS2812B (24-bit corruption).
   // 160 logical pixels → 320 wire slots; DIN-A/DIN-B each take 160 slots
   // (80 physical WS2816 LEDs). Ignore persisted LED_TYPE.
+  // Always register the wire controllers — REVERSE_ORDER is applied at pack
+  // time. Gating addLeds on REVERSE_ORDER==false left a persisted reverse
+  // boot with zero controllers and a dark plate.
   ws2816_wire = new CRGB[CONFIG.LED_COUNT * 2];
-  if (CONFIG.REVERSE_ORDER == false) {
-    FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT);
-    FastLED.addLeds<WS2812B, LED_CLOCK_PIN, RGB>(
-        ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
-    FastLED.setCorrection(CRGB(255, 255, 255));
-    FastLED.setTemperature(CRGB(255, 255, 255));
-    FastLED.setDither(DISABLE_DITHER);
-    for (uint16_t x = 0; x < (uint16_t)(CONFIG.LED_COUNT * 2); x++) {
-      ws2816_wire[x] = CRGB(0, 0, 0);
-    }
-    show_leds();
-    leds_started = true;
-    USBSerial.print("INIT_LEDS: ");
-    USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
-    return;
+  FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT);
+  FastLED.addLeds<WS2812B, LED_CLOCK_PIN, RGB>(
+      ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
+  FastLED.setCorrection(CRGB(255, 255, 255));
+  FastLED.setTemperature(CRGB(255, 255, 255));
+  FastLED.setDither(DISABLE_DITHER);
+  for (uint16_t x = 0; x < (uint16_t)(CONFIG.LED_COUNT * 2); x++) {
+    ws2816_wire[x] = CRGB(0, 0, 0);
   }
+  show_leds();
+  leds_started = true;
+  USBSerial.print("INIT_LEDS: ");
+  USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
+  return;
 #else
   // Flag-off bring-up: native FastLED WS2816 48-bit controllers (aa0b57c2).
   FastLED.addLeds<WS2816, LED_DATA_PIN, GRB>(leds_out, 0, CONFIG.LED_COUNT / 2);
@@ -2598,7 +2621,10 @@ inline void show_secondary_leds() {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }
 #ifdef K1_WS2816_LEVER2_V1
-  if (ws2816_wire_secondary != nullptr && CONFIG.REVERSE_ORDER == false) {
+  if (ws2816_wire_secondary != nullptr) {
+    if (SECONDARY_REVERSE_ORDER) {
+      reverse_leds_16(leds_scaled_secondary, SECONDARY_LED_COUNT);
+    }
     SQ15x16 k1_inc_r(1.0), k1_inc_g(1.0), k1_inc_b(1.0);
     const float sec_filter = (VP_FIX_SECONDARY_CLEAN || SECONDARY_INCANDESCENT_MODE)
                                  ? 0.0f

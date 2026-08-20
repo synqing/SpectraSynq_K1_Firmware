@@ -106,7 +106,38 @@ def test_init_leds_lever2_skips_max_power():
     init_block = next(b for b in blocks if "addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire" in b)
     assert "setMaxPower" not in init_block
     assert "DISABLE_DITHER" in init_block
-    assert "REVERSE_ORDER" in init_block
+    # Controllers must register even when REVERSE_ORDER is persisted true.
+    assert "CONFIG.REVERSE_ORDER" not in _uncommented(init_block)
+    assert "addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire" in init_block
+    assert "return;" in init_block
+
+
+def test_lever2_reverse_packs_into_wire_not_leds_out():
+    """Persisted/runtime REVERSE_ORDER must not abandon the Lever-2 wire path.
+
+    Pre-fix: init gated addLeds on REVERSE_ORDER==false (dark boot) and
+    show gated pack on the same flag (stale wire / frozen plate).
+    """
+    assert "reverse_leds_16" in LED
+    blocks = _ifdef_blocks(LED, "K1_WS2816_LEVER2_V1")
+    show_primary = next(
+        b
+        for b in blocks
+        if "k1_lever2_pack_frame(leds_scaled," in b and "ws2816_wire," in b
+    )
+    assert "CONFIG.REVERSE_ORDER == false" not in show_primary
+    assert "reverse_leds_16(leds_scaled, CONFIG.LED_COUNT)" in show_primary
+    show_secondary = next(
+        b
+        for b in blocks
+        if "k1_lever2_pack_frame(leds_scaled_secondary," in b
+    )
+    assert "CONFIG.REVERSE_ORDER == false" not in show_secondary
+    assert "SECONDARY_REVERSE_ORDER" in show_secondary
+    assert (
+        "reverse_leds_16(leds_scaled_secondary, SECONDARY_LED_COUNT)"
+        in show_secondary
+    )
 
 
 def test_ws2816_wire_symbol_is_flag_gated():
