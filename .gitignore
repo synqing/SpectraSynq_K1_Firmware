@@ -75,6 +75,11 @@ artifacts/**/knob_build_*/
 artifacts/**/*.bin
 artifacts/**/*.elf
 artifacts/**/*.map
+
+# Web-flasher generated flash set — regenerate via tools/webflash/make_manifest.py
+tools/webflash/firmware/**/*.bin
+tools/webflash/assets/boot_app0.bin
+tools/webflash/manifest.json
 artifacts/ble_midi_71_20260628/
 
 # Heavy media / capture binaries (kept in the archive repo, not here)

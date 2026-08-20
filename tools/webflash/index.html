@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpectraSynq K1 — Web Flasher</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2335e0c8'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='%2307090d'/%3E%3Cpath d='M8 22 L14 10 L18 18 L24 8' stroke='url(%23g)' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090d;
+      --card: #0d1117;
+      --accent: #35e0c8;
+      --accent-2: #8b5cf6;
+      --text: #e9eef6;
+      --muted: #8b98ab;
+      --border: rgba(255, 255, 255, 0.08);
+      --success: #5af29e;
+      --error: #ff6b6b;
+      --warn: #ffb454;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(53, 224, 200, 0.07), transparent 32%),
+        radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.09), transparent 34%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 18px 64px;
+      font-size: 14px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; display: grid; gap: 18px; }
+    header {
+      background: linear-gradient(135deg, rgba(53, 224, 200, 0.07), rgba(139, 92, 246, 0.06));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px 24px 26px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; padding: 6px 12px; border-radius: 999px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
+      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    h1 {
+      margin: 12px 0 8px;
+      font-family: "Saira Condensed", sans-serif;
+      font-weight: 700;
+      font-size: clamp(34px, 4.4vw, 52px);
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.02;
+    }
+    h1 .spectral {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    header p { margin: 0; max-width: 780px; color: var(--muted); line-height: 1.55; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-family: "Saira Condensed", sans-serif;
+      font-weight: 600; font-size: 19px;
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .card p { margin: 0; color: var(--muted); line-height: 1.55; }
+    .controls { display: flex; flex-direction: column; gap: 14px; }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    select {
+      border-radius: 10px; border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.04); color: var(--text);
+      padding: 10px 12px; font-size: 13px; font-weight: 500;
+      font-family: inherit; appearance: none;
+      max-width: 100%;
+    }
+    select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(53,224,200,0.2); }
+    .text-input {
+      flex: 1; min-width: 220px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);
+      color: var(--text); padding: 11px 12px; font-size: 13px; font-family: inherit;
+    }
+    .text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(53,224,200,0.2); }
+    .check {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);
+      color: var(--text); font-size: 13px; font-weight: 500;
+      user-select: none; cursor: pointer;
+    }
+    .check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
+    button {
+      border: none; cursor: pointer; font-size: 14px; padding: 12px 20px;
+      border-radius: 10px; font-weight: 700; font-family: inherit; color: #06110f;
+      background: linear-gradient(135deg, var(--accent), #4fd0ff);
+      box-shadow: 0 12px 32px rgba(53, 224, 200, 0.28);
+      transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.2s;
+    }
+    button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    .ghost { background: rgba(255,255,255,0.05); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
+    .status-line { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; color: var(--muted); font-size: 13.5px; align-items: center; }
+    .hint {
+      margin-top: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.5;
+      padding: 10px 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.02);
+    }
+    .hint strong { color: var(--text); }
+    .hint .warn { color: var(--warn); }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
+      border-radius: 8px; border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03); font-size: 12.5px; color: var(--muted);
+    }
+    .pill strong { color: var(--text); }
+    .log {
+      background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; min-height: 140px; max-height: 240px; overflow-y: auto;
+      font-size: 12.5px; color: #aebdd6; line-height: 1.45;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .progress {
+      width: 100%; height: 10px; border-radius: 999px;
+      background: rgba(255,255,255,0.05); overflow: hidden;
+      border: 1px solid var(--border); margin-top: 8px;
+    }
+    .progress span {
+      display: block; height: 100%; width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.12s ease;
+    }
+    .split { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; }
+    .stack { display: grid; gap: 14px; align-content: start; }
+    .steps { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; }
+    .steps li {
+      list-style: none; padding: 10px 12px; border-radius: 10px;
+      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
+      color: var(--muted); line-height: 1.5; font-size: 12.5px;
+    }
+    .steps li strong { color: var(--text); }
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 999px;
+      background: rgba(90, 242, 158, 0.12); color: var(--success);
+      font-size: 12px; border: 1px solid rgba(90, 242, 158, 0.4);
+    }
+    table.map { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+    table.map th, table.map td {
+      text-align: left; padding: 5px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.06); color: var(--muted);
+    }
+    table.map th { color: var(--text); font-weight: 500; letter-spacing: 0.04em; }
+    table.map td.num { color: var(--accent); }
+    .error { color: var(--error); }
+    .warn-text { color: var(--warn); }
+    .ok-text { color: var(--success); }
+    .mono { font-family: inherit; }
+    /* Simple (customer) mode — enabled with ?mode=simple */
+    .update-hero { display: none; }
+    body.simple .advanced { display: none !important; }
+    body.simple .update-hero {
+      display: block; width: 100%;
+      font-family: "Saira Condensed", sans-serif;
+      font-size: 27px; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 20px 18px; border-radius: 14px;
+    }
+    code { color: var(--accent); font-family: inherit; font-size: 0.95em; }
+    footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; text-align: center; }
+    @media (max-width: 980px) {
+      body { padding: 20px 14px 60px; }
+      .split { grid-template-columns: 1fr; }
+    }
+  </style>
+  <!-- Vendored (pinned, works offline): crypto-js 4.1.1 + esptool-js 0.6.1 -->
+  <script src="assets/crypto-js-4.1.1.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="eyebrow">SpectraSynq · K1 · ESP32-S3</div>
+      <h1>Flash the <span class="spectral">K1</span> straight from your browser</h1>
+      <p>Web Serial flasher powered by esptool-js. Pick a firmware variant, connect the K1 over USB, and flash — offsets, images and MD5 checksums come from <code>manifest.json</code>, generated from the real build outputs and the real partition table.</p>
+    </header>
+
+    <div class="split">
+      <div class="stack">
+        <div class="card">
+          <h2>Control</h2>
+          <div class="controls">
+            <button id="updateBtn" class="update-hero">Update K1</button>
+            <div class="actions advanced">
+              <button id="connectBtn">Connect</button>
+              <button id="flashBtn" class="ghost" disabled>Flash</button>
+              <label class="check" title="Full flash erase before writing (esptool erase-flash)">
+                <input id="eraseAll" type="checkbox">
+                Erase
+              </label>
+              <label class="check" title="Also write the app image to the ota_1 slot">
+                <input id="seedOta1" type="checkbox">
+                Seed OTA-1
+              </label>
+              <select id="variantSelect" aria-label="Firmware variant">
+                <option value="">Loading variants…</option>
+              </select>
+              <select id="baudSelect" aria-label="Baud rate">
+                <option value="460800">460800 baud</option>
+                <option value="921600">921600 baud</option>
+                <option value="115200">115200 baud</option>
+              </select>
+            </div>
+            <div class="status-line">
+              <span id="statusText">Ready to connect.</span>
+              <span id="chipText" class="pill" style="display:none;"></span>
+              <span id="identityText" class="pill" style="display:none;"></span>
+              <span id="manifestText" class="pill" style="display:none;"></span>
+            </div>
+            <div class="hint advanced">
+              <strong>Erase</strong> performs a full flash erase before writing.
+              <span class="warn">It wipes NVS — persisted K1 configuration and calibration state go with it.</span>
+              Only use it to clear boot-loops or OTA slot errors.
+              <strong>Seed OTA-1</strong> additionally writes the app to the second OTA slot so a failed future OTA always has a sane fallback.
+              Every image is MD5-verified against the manifest before it is written, and esptool verifies MD5 on-chip after writing.
+            </div>
+            <div class="progress" aria-label="Flash progress"><span id="progressBar"></span></div>
+            <div class="log" id="log"></div>
+          </div>
+        </div>
+
+        <div class="card advanced">
+          <h2>Serial monitor</h2>
+          <p>Independent UART terminal. K1 talks at 115200 — serial tokens can be sent directly from here.</p>
+          <div class="controls" style="margin-top:12px;">
+            <div class="actions">
+              <button id="monitorBtn" class="ghost">Monitor</button>
+              <select id="monitorBaudSelect" aria-label="Monitor baud rate">
+                <option value="115200">115200 baud</option>
+                <option value="460800">460800 baud</option>
+                <option value="921600">921600 baud</option>
+              </select>
+              <button id="clearMonitorBtn" class="ghost">Clear</button>
+            </div>
+            <div class="status-line">
+              <span id="monitorStatusText">Monitor disconnected.</span>
+            </div>
+            <div class="log" id="monitorLog"></div>
+            <div class="actions">
+              <input id="monitorInput" class="text-input" type="text" placeholder="Type text to send over UART">
+              <button id="monitorSendBtn" class="ghost" disabled>Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <h2>Build info</h2>
+          <p id="releaseInfo">Loading manifest…</p>
+          <table class="map" id="flashMap" style="display:none;">
+            <thead><tr><th>Image</th><th>Offset</th><th>Size</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="card">
+          <h2>How to flash</h2>
+          <div class="steps">
+            <li><strong>Normal flow:</strong> plug the K1 in over USB, click Connect, pick the port. The S3's native USB usually drops into the bootloader automatically.</li>
+            <li><strong>ROM mode:</strong> if sync fails, hold BOOT, tap RESET, release BOOT — the flasher retries for 20 seconds.</li>
+            <li><strong>Close serial hogs:</strong> quit <code>pio device monitor</code> or anything else holding the port.</li>
+            <li><strong>After flashing:</strong> the board resets itself; press RESET if it doesn't.</li>
+          </div>
+        </div>
+        <div class="card advanced">
+          <h2>What happens</h2>
+          <p>esptool-js enters the ROM stub, raises the baud rate, then writes each image at the offset recorded in <code>manifest.json</code> — bootloader, partition table, OTA data seed and app. Flash header parameters are kept exactly as built (<code>keep</code>).</p>
+        </div>
+        <div class="card advanced">
+          <h2>Prefer the CLI?</h2>
+          <p>The same images live in <code>firmware/&lt;env&gt;/</code> — flash with <code>pio run -e &lt;env&gt; -t upload</code> from the repo (which also enforces the device-identity guard), or with plain esptool at the manifest offsets.</p>
+        </div>
+        <div class="card">
+          <h2>Browser support</h2>
+          <p>Chrome or Edge on desktop, over HTTPS or localhost. Web Serial is required — other browsers will show a warning here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    SpectraSynq K1 firmware — <span id="pageVersion" class="mono">Web flasher v1.0.0</span>
+  </footer>
+
+  <script type="module">
+    import { ESPLoader, Transport } from "./assets/esptool-js-0.6.1.bundle.js";
+
+    const ui = {
+      status: document.getElementById("statusText"),
+      chip: document.getElementById("chipText"),
+      identity: document.getElementById("identityText"),
+      updateBtn: document.getElementById("updateBtn"),
+      manifest: document.getElementById("manifestText"),
+      log: document.getElementById("log"),
+      progress: document.getElementById("progressBar"),
+      connectBtn: document.getElementById("connectBtn"),
+      flashBtn: document.getElementById("flashBtn"),
+      eraseAll: document.getElementById("eraseAll"),
+      seedOta1: document.getElementById("seedOta1"),
+      baud: document.getElementById("baudSelect"),
+      variant: document.getElementById("variantSelect"),
+      releaseInfo: document.getElementById("releaseInfo"),
+      flashMap: document.getElementById("flashMap"),
+      pageVersion: document.getElementById("pageVersion"),
+      monitorBtn: document.getElementById("monitorBtn"),
+      clearMonitorBtn: document.getElementById("clearMonitorBtn"),
+      monitorBaud: document.getElementById("monitorBaudSelect"),
+      monitorStatus: document.getElementById("monitorStatusText"),
+      monitorLog: document.getElementById("monitorLog"),
+      monitorInput: document.getElementById("monitorInput"),
+      monitorSendBtn: document.getElementById("monitorSendBtn"),
+    };
+
+    const state = {
+      manifest: null,
+      runningIdentity: null,
+      simpleMode: false,
+      port: null,
+      onDisconnect: null,
+      transport: null,
+      esploader: null,
+      chip: null,
+      connected: false,
+      isFlashing: false,
+      autoFlash: false,
+      autoFlashTriggered: false,
+      monitorPort: null,
+      monitorReader: null,
+      monitorWriter: null,
+      monitorOnDisconnect: null,
+      monitorPipe: null,
+      monitorConnected: false,
+    };
+
+    const PAGE_VERSION = "1.1.0";
+    const CONNECT_TIMEOUT_MS = 20000;
+    const CONNECT_RETRY_DELAY_MS = 500;
+    // K1 build-identity handshake (firmware `build` serial command, stamped by
+    // k1_build_provenance.py): "BUILD: version=40103 git=f7d062dc epoch=... env=k1_main_rpl_im69d"
+    const BUILD_RE = /BUILD:\s*version=(\S+)\s+git=(\S+)\s+epoch=(\S+)\s+env=(\S+)/;
+    const IDENTIFY_TIMEOUT_MS = 1800;
+    const VERIFY_SETTLE_MS = 2500;
+    const VERIFY_ATTEMPTS = 6;
+    const VERIFY_ATTEMPT_TIMEOUT_MS = 2500;
+    const monitorEncoder = new TextEncoder();
+    const commandEncoder = new TextEncoder();
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+    // Send one serial command at 115200 and read until `matcher` hits or the
+    // timeout lapses. Opens and closes the port around the exchange
+    // (janos-proven pattern). Returns { matched, identity? }.
+    const probeBuild = async (port, timeoutMs, onLine) => {
+      await port.open({ baudRate: 115200 });
+      let reader = null;
+      let writer = null;
+      let received = "";
+      let bufferedLine = "";
+      let timedOut = false;
+      const decoder = new TextDecoder();
+      const emitLines = (text) => {
+        bufferedLine += text.replace(/\r/g, "");
+        const lines = bufferedLine.split("\n");
+        bufferedLine = lines.pop() || "";
+        for (const line of lines) if (line.trim()) onLine?.(line);
+      };
+      try {
+        reader = port.readable.getReader();
+        writer = port.writable.getWriter();
+        await writer.write(commandEncoder.encode("build\n"));
+        const timer = setTimeout(() => {
+          timedOut = true;
+          reader.cancel().catch(() => {});
+        }, timeoutMs);
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            if (!value) continue;
+            const text = decoder.decode(value, { stream: true });
+            received += text;
+            emitLines(text);
+            const m = received.match(BUILD_RE);
+            if (m) {
+              return { matched: true, identity: { version: m[1], git: m[2], epoch: m[3], env: m[4] } };
+            }
+          }
+          return { matched: false };
+        } catch (err) {
+          if (timedOut) return { matched: false };
+          throw err;
+        } finally {
+          clearTimeout(timer);
+        }
+      } finally {
+        try { if (reader) await reader.cancel(); } catch {}
+        try { if (reader) reader.releaseLock(); } catch {}
+        try { if (writer) writer.releaseLock(); } catch {}
+        try { await port.close(); } catch {}
+      }
+    };
+
+    const identityLabel = (id) =>
+      `${id.env} · git ${id.git} · v${id.version}`;
+
+    const showIdentity = (id) => {
+      state.runningIdentity = id;
+      ui.identity.style.display = "inline-flex";
+      ui.identity.textContent = `Running: ${identityLabel(id)}`;
+    };
+
+    // Optional pre-flash identify: a blank or ROM-mode board simply won't
+    // answer, and we fall through to the normal esptool connection.
+    const identifyRunningFirmware = async () => {
+      try {
+        setStatus("Checking for running K1 firmware…");
+        log("Probing `build` @ 115200…");
+        const res = await probeBuild(state.port, IDENTIFY_TIMEOUT_MS, (line) => log(`K1: ${line}`));
+        if (!res.matched) {
+          log("No build response — board is blank, in ROM mode, or running non-K1 firmware.");
+          return null;
+        }
+        log(`Identified running firmware: ${identityLabel(res.identity)}`);
+        showIdentity(res.identity);
+        const v = selectedVariant();
+        const mGit = state.manifest?.git?.sha;
+        if (v && mGit && res.identity.git === mGit && res.identity.env === v.env) {
+          log(`Installed matches available (git ${mGit}) — reflashing is still fine (recovery semantics).`);
+          setStatus(`K1 running ${res.identity.env} git ${res.identity.git} — already current.`);
+        } else if (mGit) {
+          setStatus(`K1 running git ${res.identity.git} → available git ${mGit}.`);
+        }
+        return res.identity;
+      } catch (err) {
+        log(`Identify probe unavailable: ${err?.message || err}`);
+        try { if (state.port?.readable || state.port?.writable) await state.port.close(); } catch {}
+        return null;
+      }
+    };
+
+    // Release esptool's hold on the port but keep the SerialPort object so the
+    // post-flash boot verification can reopen it.
+    const releaseFlasherKeepPort = async () => {
+      // Drop the disconnect listener first: USB re-enumeration during reboot
+      // would otherwise fire it and clobber the verification status.
+      if (state.port && state.onDisconnect) {
+        try { state.port.removeEventListener("disconnect", state.onDisconnect); } catch {}
+      }
+      state.onDisconnect = null;
+      try { if (state.transport) await state.transport.disconnect(); } catch {}
+      state.transport = null;
+      state.esploader = null;
+      state.chip = null;
+      state.connected = false;
+      ui.chip.style.display = "none";
+      ui.connectBtn.textContent = "Connect";
+    };
+
+    // After reset the S3's native USB CDC re-enumerates; the old SerialPort
+    // object can go stale. Try it first, then fall back to the granted-ports
+    // list (no chooser prompt — permission persists).
+    const reacquirePort = async () => {
+      const candidates = [];
+      if (state.port) candidates.push(state.port);
+      try {
+        const granted = await navigator.serial.getPorts();
+        for (const p of granted) if (!candidates.includes(p)) candidates.push(p);
+      } catch {}
+      return candidates;
+    };
+
+    const verifyBoot = async () => {
+      const variant = selectedVariant();
+      const mGit = state.manifest?.git?.sha;
+      setStatus("Verifying boot — waiting for the K1 to come up…");
+      log(`Boot verification: settling ${VERIFY_SETTLE_MS} ms for USB re-enumeration…`);
+      await releaseFlasherKeepPort();
+      await sleep(VERIFY_SETTLE_MS);
+      for (let attempt = 1; attempt <= VERIFY_ATTEMPTS; attempt++) {
+        const candidates = await reacquirePort();
+        for (const port of candidates) {
+          try {
+            const res = await probeBuild(port, VERIFY_ATTEMPT_TIMEOUT_MS, (line) => log(`K1: ${line}`));
+            if (res.matched) {
+              const id = res.identity;
+              showIdentity(id);
+              state.port = port;
+              const envOk = !variant || id.env === variant.env;
+              const gitOk = !mGit || id.git === mGit;
+              if (envOk && gitOk) {
+                setStatus(`Verified: K1 booted ${id.env} git ${id.git} (v${id.version}).`);
+                log(`VERIFIED — booted ${identityLabel(id)}.`);
+              } else if (!envOk) {
+                setStatus(`Boot verify MISMATCH: device reports env ${id.env}, expected ${variant.env}.`, "error");
+                log(`MISMATCH — device env ${id.env} ≠ flashed ${variant.env}. The write may not have taken.`);
+              } else {
+                setStatus(`Booted ${id.env}, but git ${id.git} ≠ manifest git ${mGit} — manifest and binaries may be out of step.`);
+                log(`WARNING — booted git ${id.git} vs manifest git ${mGit}. Re-run make_manifest.py after building if this is unexpected.`);
+              }
+              return;
+            }
+          } catch (err) {
+            log(`Verify attempt ${attempt}: ${err?.message || err}`);
+          }
+        }
+        await sleep(500);
+      }
+      setStatus("Flash written and MD5-verified, but no boot response — unplug/replug and open the monitor to inspect.", "error");
+      log("No `build` response after flashing. The images were MD5-verified on-chip; the boot handshake did not answer.");
+    };
+
+    const log = (msg) => {
+      const time = new Date().toLocaleTimeString();
+      const lines = Array.isArray(msg) ? msg : [msg];
+      for (const line of lines) ui.log.textContent += `[${time}] ${line}\n`;
+      ui.log.scrollTop = ui.log.scrollHeight;
+    };
+
+    const setStatus = (text, level = "info") => {
+      ui.status.textContent = text;
+      ui.status.classList.toggle("error", level === "error");
+    };
+
+    const setMonitorStatus = (text, level = "info") => {
+      ui.monitorStatus.textContent = text;
+      ui.monitorStatus.classList.toggle("error", level === "error");
+    };
+
+    const monitorLogText = (text) => {
+      ui.monitorLog.textContent += text;
+      ui.monitorLog.scrollTop = ui.monitorLog.scrollHeight;
+    };
+
+    const monitorLine = (msg) => {
+      const time = new Date().toLocaleTimeString();
+      monitorLogText(`[${time}] ${msg}\n`);
+    };
+
+    const bytesToBinaryString = (bytes) => {
+      const chunk = 0x8000;
+      let result = "";
+      for (let i = 0; i < bytes.length; i += chunk) {
+        result += String.fromCharCode(...bytes.subarray(i, i + chunk));
+      }
+      return result;
+    };
+
+    const md5Hex = (bytes) =>
+      CryptoJS.MD5(CryptoJS.enc.Latin1.parse(bytesToBinaryString(bytes))).toString();
+
+    const fmtSize = (n) => n >= 1048576 ? `${(n / 1048576).toFixed(2)} MB`
+                        : n >= 1024 ? `${(n / 1024).toFixed(1)} KB` : `${n} B`;
+
+    const hex = (n) => `0x${n.toString(16).toUpperCase()}`;
+
+    const withCacheBust = (url) => {
+      const u = new URL(url, window.location.href);
+      u.searchParams.set("cb", Date.now().toString());
+      return u.toString();
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const manifestUrl = params.get("manifest") || "manifest.json";
+
+    const applyQueryParams = () => {
+      const auto = params.get("auto") || params.get("autoflash");
+      if (auto) {
+        const n = auto.trim().toLowerCase();
+        state.autoFlash = n === "1" || n === "true" || n === "yes";
+      }
+      const mode = (params.get("mode") || "").trim().toLowerCase();
+      if (mode === "simple" || mode === "customer") {
+        state.simpleMode = true;
+        state.autoFlash = true; // one action: connect → flash → verify
+        document.body.classList.add("simple");
+      }
+    };
+
+    const selectedVariant = () => {
+      if (!state.manifest) return null;
+      return (state.manifest.variants || []).find((v) => v.env === ui.variant.value)
+        || (state.manifest.variants || [])[0] || null;
+    };
+
+    const renderVariant = () => {
+      const m = state.manifest;
+      const v = selectedVariant();
+      if (!m || !v) return;
+      const git = m.git || {};
+      const dirty = git.dirty ? " (dirty)" : "";
+      ui.manifest.style.display = "inline-flex";
+      ui.manifest.textContent = `${v.env} · git ${git.sha || "n/a"}${dirty}`;
+      const fwv = v.firmwareVersion != null ? ` · v${v.firmwareVersion}` : "";
+      ui.releaseInfo.innerHTML =
+        `<span class="badge">Manifest</span> ${m.name || "K1"} · chip ${m.chipFamily || "ESP32-S3"}${fwv}<br>` +
+        `env <code>${v.env}</code> · built ${v.builtAt || "n/a"}<br>` +
+        `git <code>${git.sha || "n/a"}${dirty}</code> · manifest ${m.generatedAt || "n/a"}`;
+      const tbody = ui.flashMap.querySelector("tbody");
+      tbody.innerHTML = "";
+      for (const p of v.parts) {
+        const tr = document.createElement("tr");
+        const name = p.path.split("/").pop();
+        tr.innerHTML = `<td>${name}</td><td class="num">${hex(p.offset)}</td><td>${fmtSize(p.size)}</td>`;
+        tbody.appendChild(tr);
+      }
+      if (v.otaSeedOffset != null) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>firmware.bin (OTA-1 seed, optional)</td><td class="num">${hex(v.otaSeedOffset)}</td><td>—</td>`;
+        tbody.appendChild(tr);
+      }
+      ui.flashMap.style.display = "table";
+      ui.pageVersion.textContent = `Web flasher v${PAGE_VERSION} · ${v.env} · git ${git.sha || "n/a"}${dirty}`;
+    };
+
+    const loadManifest = async () => {
+      try {
+        const res = await fetch(withCacheBust(manifestUrl), { cache: "no-store" });
+        if (!res.ok) throw new Error(`Manifest fetch failed: ${res.status} ${res.statusText}`);
+        const manifest = await res.json();
+        if (!Array.isArray(manifest.variants) || manifest.variants.length === 0) {
+          throw new Error("Manifest has no variants");
+        }
+        state.manifest = manifest;
+        ui.variant.innerHTML = "";
+        for (const v of manifest.variants) {
+          const opt = document.createElement("option");
+          opt.value = v.env;
+          opt.textContent = v.label || v.env;
+          ui.variant.appendChild(opt);
+        }
+        const wanted = params.get("variant");
+        if (wanted && manifest.variants.some((v) => v.env === wanted)) ui.variant.value = wanted;
+        renderVariant();
+        setStatus("Manifest loaded.");
+        log(`Manifest: ${manifestUrl} — ${manifest.variants.length} variant(s), git ${manifest.git?.sha || "n/a"}`);
+      } catch (err) {
+        setStatus("Manifest not found. Run make_manifest.py first.", "error");
+        ui.releaseInfo.textContent = "No manifest available — run tools/webflash/make_manifest.py after building, then reload.";
+        throw err;
+      }
+    };
+
+    const ensureSupport = () => {
+      if (!("serial" in navigator)) {
+        setStatus("Web Serial not available. Use Chrome/Edge over HTTPS or localhost.", "error");
+        throw new Error("Web Serial unavailable");
+      }
+    };
+
+    const connect = async () => {
+      ensureSupport();
+      if (state.connected) { await disconnect(); return; }
+      if (state.monitorConnected) {
+        monitorLine("Stopping serial monitor to free the port for flashing.");
+        await disconnectMonitor();
+      }
+      ui.connectBtn.disabled = true;
+      ui.flashBtn.disabled = true;
+      state.autoFlashTriggered = false;
+      setStatus("Requesting serial port…");
+      log("Requesting port access…");
+      try {
+        state.port = await navigator.serial.requestPort({});
+        state.onDisconnect = () => {
+          log("Device disconnected.");
+          disconnect().catch(() => {});
+          setStatus("Device disconnected. Reconnect to flash.", "error");
+        };
+        try { state.port.addEventListener("disconnect", state.onDisconnect); } catch {}
+        await identifyRunningFirmware();
+        const baud = parseInt(ui.baud.value, 10);
+        state.transport = new Transport(state.port, true);
+        const loaderOptions = {
+          transport: state.transport,
+          baudrate: baud,
+          terminal: {
+            clean() {},
+            writeLine(data) { log(data); },
+            write(data) { log(data); },
+          },
+          debugLogging: false,
+        };
+        setStatus(`Syncing with chip (hold BOOT + tap RESET if needed). Timeout ${Math.round(CONNECT_TIMEOUT_MS / 1000)}s`);
+        log("Syncing with chip…");
+
+        const start = Date.now();
+        let lastErr = null;
+        while (Date.now() - start < CONNECT_TIMEOUT_MS) {
+          try {
+            state.esploader = new ESPLoader(loaderOptions);
+            log("Connecting…");
+            state.chip = await state.esploader.main();
+            lastErr = null;
+            break;
+          } catch (err) {
+            lastErr = err;
+            const remainingS = Math.ceil(Math.max(0, CONNECT_TIMEOUT_MS - (Date.now() - start)) / 1000);
+            setStatus(`Failed to connect. Hold BOOT + tap RESET, retrying… (${remainingS}s)`);
+            log(`Error: ${err?.message || err}`);
+            await sleep(CONNECT_RETRY_DELAY_MS);
+          }
+        }
+        if (lastErr) throw lastErr;
+        state.connected = true;
+        ui.chip.style.display = "inline-flex";
+        ui.chip.textContent = `Chip ${state.chip}`;
+        ui.connectBtn.textContent = "Disconnect";
+        setStatus(`Connected to ${state.chip}. Ready to flash.`);
+        log(`Connected: ${state.chip}`);
+        ui.flashBtn.disabled = false;
+
+        if (state.autoFlash && !state.autoFlashTriggered && !state.isFlashing) {
+          state.autoFlashTriggered = true;
+          await flash();
+        }
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Connection failed", "error");
+        log(`Error: ${err.message || err}`);
+        await disconnect();
+        throw err;
+      } finally {
+        ui.connectBtn.disabled = false;
+      }
+    };
+
+    const fetchFiles = async () => {
+      if (!state.manifest) await loadManifest();
+      const variant = selectedVariant();
+      if (!variant) throw new Error("No firmware variant selected");
+      const files = [];
+      let appImage = null;
+      for (const part of variant.parts) {
+        const url = withCacheBust(part.path);
+        setStatus(`Downloading ${part.path}…`);
+        log(`Fetching ${part.path} @ ${hex(part.offset)}`);
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`Fetch ${part.path} failed (${res.status} ${res.statusText})`);
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        if (part.md5) {
+          const got = md5Hex(bytes);
+          if (got !== part.md5) {
+            throw new Error(`MD5 mismatch for ${part.path}: manifest ${part.md5}, downloaded ${got}. ` +
+              "Manifest and binaries are out of step — re-run make_manifest.py.");
+          }
+          log(`MD5 ok ${part.path} (${part.md5})`);
+        }
+        files.push({ data: bytes, address: part.offset });
+        if (part.path.endsWith("firmware.bin")) appImage = bytes;
+      }
+      if (ui.seedOta1.checked && variant.otaSeedOffset != null && appImage) {
+        log(`Seeding OTA-1: app image also queued @ ${hex(variant.otaSeedOffset)}`);
+        files.push({ data: appImage, address: variant.otaSeedOffset });
+      }
+      return files;
+    };
+
+    const flash = async () => {
+      ensureSupport();
+      if (!state.esploader) await connect();
+      ui.flashBtn.disabled = true;
+      ui.connectBtn.disabled = true;
+      ui.variant.disabled = true;
+      state.isFlashing = true;
+      ui.progress.style.width = "0%";
+      try {
+        const files = await fetchFiles();
+        setStatus("Uploading stub and flashing…");
+        log(`Writing ${files.length} image(s); flash params kept as built (mode/size/freq = keep).`);
+        const flashOptions = {
+          fileArray: files,
+          flashSize: "keep",
+          flashMode: "keep",
+          flashFreq: "keep",
+          eraseAll: !!ui.eraseAll.checked,
+          compress: true,
+          reportProgress: (fileIndex, written, total) => {
+            const pct = Math.min(100, Math.round((written / total) * 100));
+            ui.progress.style.width = `${pct}%`;
+            setStatus(`Flashing ${fileIndex + 1}/${files.length} — ${pct}%`);
+          },
+          calculateMD5Hash: (image) => md5Hex(image),
+        };
+        await state.esploader.writeFlash(flashOptions);
+        await state.esploader.after();
+        ui.progress.style.width = "100%";
+        log("Flash complete. Starting boot verification…");
+        await verifyBoot();
+      } catch (err) {
+        console.error(err);
+        setStatus(err.message || "Flash failed", "error");
+        log(`Error: ${err.message || err}`);
+      } finally {
+        state.isFlashing = false;
+        ui.flashBtn.disabled = false;
+        ui.connectBtn.disabled = false;
+        ui.variant.disabled = false;
+      }
+    };
+
+    const monitorReadLoop = async () => {
+      try {
+        while (state.monitorConnected && state.monitorReader) {
+          const { value, done } = await state.monitorReader.read();
+          if (done) break;
+          if (value) monitorLogText(value);
+        }
+      } catch (err) {
+        monitorLine(`Read error: ${err?.message || err}`);
+      }
+    };
+
+    const disconnectMonitor = async () => {
+      if (state.monitorPort && state.monitorOnDisconnect) {
+        try { state.monitorPort.removeEventListener("disconnect", state.monitorOnDisconnect); } catch {}
+      }
+      try { if (state.monitorReader) await state.monitorReader.cancel(); } catch {}
+      try { if (state.monitorReader) state.monitorReader.releaseLock(); } catch {}
+      try { if (state.monitorWriter) state.monitorWriter.releaseLock(); } catch {}
+      try { if (state.monitorPipe) await state.monitorPipe; } catch {}
+      try { if (state.monitorPort) await state.monitorPort.close(); } catch {}
+      state.monitorPort = null;
+      state.monitorReader = null;
+      state.monitorWriter = null;
+      state.monitorOnDisconnect = null;
+      state.monitorPipe = null;
+      state.monitorConnected = false;
+      ui.monitorBtn.textContent = "Monitor";
+      ui.monitorSendBtn.disabled = true;
+      setMonitorStatus("Monitor disconnected.");
+    };
+
+    const connectMonitor = async () => {
+      ensureSupport();
+      if (state.monitorConnected) { await disconnectMonitor(); return; }
+      if (state.isFlashing) throw new Error("Cannot start monitor while flashing is in progress.");
+      if (state.connected) {
+        monitorLine("Disconnecting flasher session to start serial monitor.");
+        await disconnect();
+      }
+      ui.monitorBtn.disabled = true;
+      setMonitorStatus("Requesting serial port…");
+      try {
+        state.monitorPort = await navigator.serial.requestPort({});
+        state.monitorOnDisconnect = () => {
+          monitorLine("Monitor port disconnected.");
+          disconnectMonitor().catch(() => {});
+          setMonitorStatus("Monitor disconnected by device.", "error");
+        };
+        try { state.monitorPort.addEventListener("disconnect", state.monitorOnDisconnect); } catch {}
+        const baud = parseInt(ui.monitorBaud.value, 10) || 115200;
+        await state.monitorPort.open({ baudRate: baud });
+        const decoder = new TextDecoderStream();
+        state.monitorPipe = state.monitorPort.readable.pipeTo(decoder.writable).catch(() => {});
+        state.monitorReader = decoder.readable.getReader();
+        state.monitorWriter = state.monitorPort.writable.getWriter();
+        state.monitorConnected = true;
+        ui.monitorBtn.textContent = "Stop monitor";
+        ui.monitorSendBtn.disabled = false;
+        setMonitorStatus(`Monitor connected @ ${baud} baud.`);
+        monitorLine(`Monitor connected @ ${baud} baud.`);
+        monitorReadLoop().catch(() => {});
+      } catch (err) {
+        await disconnectMonitor();
+        setMonitorStatus(err.message || "Monitor connection failed.", "error");
+        monitorLine(`Error: ${err?.message || err}`);
+        throw err;
+      } finally {
+        ui.monitorBtn.disabled = false;
+      }
+    };
+
+    const sendMonitor = async () => {
+      if (!state.monitorConnected || !state.monitorWriter) return;
+      const text = ui.monitorInput.value;
+      if (!text) return;
+      await state.monitorWriter.write(monitorEncoder.encode(`${text}\r\n`));
+      monitorLine(`> ${text}`);
+      ui.monitorInput.value = "";
+      ui.monitorInput.focus();
+    };
+
+    const disconnect = async () => {
+      if (state.port && state.onDisconnect) {
+        try { state.port.removeEventListener("disconnect", state.onDisconnect); } catch {}
+      }
+      try {
+        if (state.transport) await state.transport.disconnect();
+        else if (state.port && state.port.close) await state.port.close();
+      } catch {}
+      state.port = null;
+      state.onDisconnect = null;
+      state.transport = null;
+      state.esploader = null;
+      state.chip = null;
+      state.connected = false;
+      ui.chip.style.display = "none";
+      ui.flashBtn.disabled = true;
+      ui.connectBtn.textContent = "Connect";
+      setStatus("Disconnected.");
+    };
+
+    ui.connectBtn.addEventListener("click", () => connect().catch(() => {}));
+    ui.flashBtn.addEventListener("click", () => flash().catch(() => {}));
+    ui.updateBtn.addEventListener("click", () => {
+      ui.updateBtn.disabled = true;
+      connect().catch(() => {}).finally(() => { ui.updateBtn.disabled = false; });
+    });
+    ui.variant.addEventListener("change", renderVariant);
+    ui.monitorBtn.addEventListener("click", () => connectMonitor().catch(() => {}));
+    ui.clearMonitorBtn.addEventListener("click", () => { ui.monitorLog.textContent = ""; });
+    ui.monitorSendBtn.addEventListener("click", () => sendMonitor().catch((err) => {
+      setMonitorStatus(err.message || "Send failed.", "error");
+      monitorLine(`Error: ${err?.message || err}`);
+    }));
+    ui.monitorInput.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      sendMonitor().catch((err) => {
+        setMonitorStatus(err.message || "Send failed.", "error");
+        monitorLine(`Error: ${err?.message || err}`);
+      });
+    });
+
+    applyQueryParams();
+    loadManifest().catch(() => {});
+  </script>
+</body>
+</html>

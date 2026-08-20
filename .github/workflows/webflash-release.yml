@@ -1,0 +1,88 @@
+# Webflash release packaging (Lane: release engineering).
+#
+# Builds the curated web-flasher env(s), generates tools/webflash/manifest.json
+# from the REAL build artefacts (offsets parsed from each env's partitions.bin
+# by make_manifest.py — no handwritten flash-layout truth), and packages the
+# transport-agnostic bundle. The bundle drops verbatim into a public GitHub
+# Pages repo when the public /flash channel goes live.
+#
+# Triggers:
+#   - manual (workflow_dispatch), with an optional env-list override
+#   - tag push webflash-v* → also creates a GitHub Release carrying the bundle
+name: Webflash release
+
+on:
+  workflow_dispatch:
+    inputs:
+      envs:
+        description: "Comma-separated PlatformIO envs to package"
+        required: false
+        default: "k1_main_rpl_im69d"
+  push:
+    tags: ["webflash-v*"]
+
+concurrency:
+  group: webflash-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    name: Build + package web-flasher bundle
+    runs-on: ubuntu-latest
+    env:
+      ENVS: ${{ github.event.inputs.envs || 'k1_main_rpl_im69d' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            ~/.cache/pip
+          key: pio-webflash-${{ runner.os }}-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Build curated env(s)
+        run: |
+          for e in ${ENVS//,/ }; do
+            echo "::group::pio run -e $e"
+            pio run -e "$e"
+            echo "::endgroup::"
+          done
+
+      - name: Generate manifest from build artefacts
+        run: python3 tools/webflash/make_manifest.py --envs "$ENVS"
+
+      - name: Assemble bundle
+        run: |
+          mkdir -p dist bundle
+          cp tools/webflash/index.html bundle/
+          cp tools/webflash/manifest.json bundle/
+          cp -r tools/webflash/assets bundle/
+          cp -r tools/webflash/firmware bundle/
+          (cd bundle && zip -qr ../dist/k1-webflash-bundle.zip .)
+          echo "Bundle contents:" && unzip -l dist/k1-webflash-bundle.zip
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: k1-webflash-bundle
+          path: dist/k1-webflash-bundle.zip
+          if-no-files-found: error
+
+      - name: Create GitHub Release (tag pushes only)
+        if: startsWith(github.ref, 'refs/tags/webflash-v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/k1-webflash-bundle.zip \
+            --title "K1 web flasher $GITHUB_REF_NAME" \
+            --notes "Web-flasher bundle for envs: $ENVS. Serve the zip contents from any static host (GitHub Pages) or localhost — manifest paths are relative." \
+            || gh release upload "$GITHUB_REF_NAME" dist/k1-webflash-bundle.zip --clobber
