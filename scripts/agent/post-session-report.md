@@ -5,6 +5,69 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-21 look library commit + Main RPL flash
+
+```text
+session_objective:       Captain GO: commit look library and flash Main RPL now.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ dc1e6991 dirty look-lib
+branch_head_at_end:      38428a82 (firmware) + docs stamp pending
+files_changed:           k1_look.* packer CONFIG serial z-hotkey platformio RPL -DK1_LOOK_LIB_V1 tests goldens PROCEDURE; registry+handoff stamp
+commands_run:            pytest 1464 passed / 1 skipped; pio k1_hardware SUCCESS (hook); k1-flash-verified.sh k1_main_rpl_im69d --port /dev/cu.usbmodem1401
+validation_results:      BEFORE 445c79ce. AFTER IDENTITY OK git=38428a82 env=k1_main_rpl_im69d epoch=1787324114. Guard Main RPL B4:3A:45:A5:87:90 chip 9087A500. Hash verified. Wrote 710368 bytes. No cal. F887/B489 not flashed.
+evidence_captured:       FLASHED AND VERIFIED. Silicon stamp: IDENTITY OK git=38428a82 env=k1_main_rpl_im69d
+blockers:                none. Eyes-on is Captain: tap z (letter only) vs boot identity.
+generated_files_ignored: i2sled 20260820 pack left uncommitted (parked other lane)
+safety_constraints:      F887 NO; B489 NO; no cal; 1401 only
+thinking_skill_used:     map-territory + ship-path-required
+skills_used:             Agent OS; ship-path-required; hardware-truth-gate (k1-flash-verified)
+specialists_used:        none
+next_recommended_action: Captain eyes-on boot (slot 0 IDENTITY) vs tap z (slot 1 tonight). Close stamp LOOK_LIB_EYES_ON_PASS when the plate is judged.
+```
+
+---
+
+## Session Report — 2026-08-21 VP 16-bit occupancy ADR (Captain audit)
+
+```text
+session_objective:       Thorough VP bit-depth audit: is K1 an 8-bit CRGB peephole into WS2816? Architecture ADR + specialist forensic pack. No firmware edit, no flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ dc1e6991 dirty
+branch_head_at_end:      dc1e6991 (docs only; firmware untouched)
+files_changed:           docs/architecture/ADR-2026-08-21-vp-ws2816-working-precision.md; docs/forensics/vp-16bit-occupancy-audit-2026-08-21/{DTA_BITWIDTH,LEGACY_CRGB_LEAKS,ORCH_STAGE_MAP}.md
+commands_run:            session-bootstrap PASS; mem-search WS2816/CRGB/Lever-2/quantize_color; ctx source crush of CRGB16/packer/palette/hsv/look; three specialists
+validation_results:      Hypothesis MIXED/env-forked. Working canvas SQ15x16. Lever-2 on RPL is TRUE16 pack, skips quantize. Column-2 FastLED WS2816(leds_out) is the peephole but no current env compiles it. Native modes occupy low bytes via sprite alpha; hsv/ColorFromPalette crush chroma. KEEP/KILL not closed.
+evidence_captured:       ADR + DTA/legacy/orch reports under docs/forensics/vp-16bit-occupancy-audit-2026-08-21/
+blockers:                Native RGB16 bypass A/B needs Captain GO; look-lib still dirty
+generated_files_ignored: none
+safety_constraints:      F887 NO; B489 NO; no cal; no flash; no firmware edits
+thinking_skill_used:     thinking-router → second-order + systems + bayesian + red-team + steel-manning + archetypes
+skills_used:             Agent OS; spec-recall; mem-search; claude-mem-router; architecture; architecture-patterns; k1-ws2816-lever2; esp32-render-path-safety; discover-specialists; ship-path-required
+specialists_used:        deep-technical-analyst; legacy-modernizer; Agents Orchestrator
+next_recommended_action: Captain GO or defer native RGB16 bypass A/B on 9087 / k1_main_rpl_im69d. Optional host packed-u16 histogram. Do not kill WS2816 on the peephole theory. Do not claim 16-bit opportunity closed.
+```
+
+---
+
+## Session Report — 2026-08-21 VP 16-bit occupancy stage map (read-only)
+
+```text
+session_objective:       Orchestrate READ-ONLY synthesis of K1 VP bit-depth occupancy; write ORCH_STAGE_MAP.md. No implement, no flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ dc1e6991 dirty Look Library
+branch_head_at_end:      dc1e6991 (docs-only audit file added; firmware untouched)
+files_changed:           docs/forensics/vp-16bit-occupancy-audit-2026-08-21/ORCH_STAGE_MAP.md
+commands_run:            session-bootstrap PASS; source reads of show_leds / lever2 emit / look lib / platformio RPL vs 445c79ce; CRUSH_MAP line pin
+validation_results:      Map only. No pytest, no pio, no flash. Silicon still 445c79ce Lever-2 + always-on degamma. Occupancy / KEEP-KILL WS2816 not closed.
+evidence_captured:       docs/forensics/vp-16bit-occupancy-audit-2026-08-21/ORCH_STAGE_MAP.md
+blockers:                Native RGB16 bypass A/B needs Captain GO; look-lib still dirty so flash script would refuse
+generated_files_ignored: none
+safety_constraints:      F887 NO; B489 NO; no cal; no nested edit agents
+thinking_skill_used:     map-territory (source ≠ silicon; transport ≠ occupancy) + systems-thinking + ship-path-required
+skills_used:             Agent OS; spec-recall; k1-ws2816-lever2; sensorybridge-doctrine (gate only); thinking-model-router
+specialists_used:        none (orchestrator solo, read-only)
+next_recommended_action: Agent host occupancy histogram of packed u16; Captain commit look-lib if that is the A/B baseline; named GO for RGB16 bypass A/B on 9087 before KEEP/KILL WS2816.
+```
+
+---
+
 ## Session Report — 2026-08-21 K1 Look Library phases A–D (source)
 
 ```text
