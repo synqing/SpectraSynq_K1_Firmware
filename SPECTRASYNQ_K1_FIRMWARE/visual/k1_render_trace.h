@@ -1,22 +1,24 @@
 // ============================================================================
-//  k1_render_trace.h — colour-fix-lane LED-level render capture (bench only)
+//  k1_render_trace.h — LED-level render capture (diagnostic envs only)
 //
-//  Gated ENTIRELY on K1_RENDER_TRACE_V1 (env k1_bench_im69d_hueaud). This is a
-//  MEASUREMENT instrument, not a product feature: it captures the FINAL
-//  post-gamma primary output buffer (leds_out — the artefact boundary, the
-//  bytes the strip receives) into a PSRAM ring (arm → tick → dump, per the
-//  firmware-telemetry-instrumentation discipline — no live printf on the
-//  render path) so hue-coverage/entropy can be computed OFFLINE against the
-//  palette-derived reference (docs/forensics/colour-fix-lane-2026-08-13.md).
+//  Gated ENTIRELY on K1_RENDER_TRACE_V1. MEASUREMENT instrument, not a
+//  product feature. Arm → tick → dump: PSRAM ring, no live printf on the
+//  render path (firmware-telemetry-instrumentation).
+//
+//  Two artefact taps (only one fires per env):
+//    k1_render_trace_on_frame     WS2812 path: post-gamma RGB8 leds_out
+//    k1_render_trace_on_frame16   Lever-2 path: packed WS2816 wire
+//                                 (6 bytes/logical LED, GRB 16-bit split)
+//                                 MUST be called before the Lever-2 return
+//                                 in show_leds — leds_out is never filled.
 //
 //  Serial surface (typed, CMD_HARNESS):
-//    :rtrace_arm=<seconds 1..600>[,<every_n 1..100>]  arm; captures every Nth
-//                                                     rendered frame (default 4)
-//    :rtrace_status=1                                 armed/frames/capacity line
-//    :rtrace_dump=1    [RTRACE-BEGIN ...] hex frames [RTRACE-END]; blocking,
-//                      post-capture only — render starves during dump by design
+//    :rtrace_arm=<seconds 1..600>[,<every_n 1..100>]
+//    :rtrace_status=1
+//    :rtrace_dump=1    [RTRACE-BEGIN fmt=rgb8hex|rgb16hex ...] ... [RTRACE-END]
 //
-//  Decoder: scripts/regression-harness/hue_coverage.py (rtrace mode)
+//  rgb16hex dump is unpacked R16BE G16BE B16BE per pixel (host occupancy).
+//  Decoder: hue_coverage.py (rgb8) / score_rtrace_occupancy.py (rgb16).
 // ============================================================================
 #ifdef K1_RENDER_TRACE_V1
 #ifndef K1_RENDER_TRACE_H
@@ -25,14 +27,12 @@
 #include <stdint.h>
 #include <stddef.h>
 
-// Render-path hook: called once per show_leds() on Core 1 with the final
-// post-gamma primary buffer. O(n) memcpy while armed, heap-free, silent.
 void k1_render_trace_on_frame(const uint8_t* rgb_bytes, uint16_t led_count,
                               uint8_t lightshow_mode);
 
-// Typed serial dispatch for rtrace_arm / rtrace_status / rtrace_dump.
-// Returns true when the command was handled. Allocates the PSRAM ring
-// lazily on first arm (loud failure if PSRAM refuses).
+void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
+                                uint8_t lightshow_mode);
+
 bool k1_render_trace_dispatch(const char* command_type, char* command_data);
 
 #endif  // K1_RENDER_TRACE_H

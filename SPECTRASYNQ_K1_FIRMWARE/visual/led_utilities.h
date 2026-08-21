@@ -1187,6 +1187,12 @@ inline void show_leds() {
     const int64_t vp_perf_lever2_show_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#ifdef K1_RENDER_TRACE_V1
+    // Artefact tap: packed WS2816 wire (6 bytes/logical LED). Must sit
+    // before this block's return — leds_out is never filled on Lever-2.
+    k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
+                               (uint8_t)CONFIG.LIGHTSHOW_MODE);
+#endif
 #ifdef K1_LED_I2S_DIRECT_V1
     if (!k1_i2s_emit_ready()) {
       static const int pins[4] = {

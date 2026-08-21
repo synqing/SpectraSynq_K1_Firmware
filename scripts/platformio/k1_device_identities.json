@@ -65,7 +65,8 @@
             "envs": [
                 "k1_main_rpl_fps_agc_probe",
                 "k1_main_rpl_i2sled_probe",
-                "k1_main_rpl_im69d"
+                "k1_main_rpl_im69d",
+                "k1_main_rpl_rtrace_probe"
             ]
         },
         {
@@ -132,12 +133,12 @@
             ]
         },
         {
-            "chip_id": "PENDING_LIVE_P4_WIFI6",
+            "chip_id": "0743E200",
             "usb_serial": "5AAF278179",
             "role": "Waveshare ESP32-P4-WIFI6 lab (ADR-0007)",
             "pinmap": "IM69 PDM CLK=22/DATA=21; LED DIN-A/B GPIO4/5; no secondary strip; C6 SDIO 14-19 unused (RF off)",
             "advisory_port": "/dev/tty.wchusbserial5AAF2781791",
-            "_registration_2026_08_21": "Live pyserial USB serial is 5AAF278179; macOS device node appends a trailing 1. Live ESP32-P4 :chip_id still pending. Never usbmodem (Tab5/S3). Flash 115200. Console is UART0 @ SERIAL_BAUD 230400. Do not start_noise_cal without Captain.",
+            "_registration_2026_08_21": "Live pyserial USB serial is 5AAF278179; macOS device node appends a trailing 1. Live :dump CHIP ID 0743E200 on 2026-08-22. Never usbmodem (Tab5/S3). Flash 115200. Console is UART0 @ 115200, DTR deasserted. Do not start_noise_cal without Captain.",
             "envs": [
                 "k1_p4_wifi6"
             ]
