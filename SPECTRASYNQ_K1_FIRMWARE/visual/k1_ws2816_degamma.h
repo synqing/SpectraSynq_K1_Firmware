@@ -10,7 +10,8 @@
 // First-cut γ=2.2 (EXP_X100=220). Changing the exponent requires regenerating
 // both arrays. No serial knob. Flag-off is identity.
 //
-// Compile this header only under K1_WS2816_DEGAMMA_V1 (see k1_lever2_emit.h).
+// Compile this header from the look unit (k1_look.h) under K1_LOOK_LIB_V1.
+// Do not re-introduce a packer-level K1_WS2816_DEGAMMA_V1 #ifdef.
 
 #ifndef K1_WS2816_DEGAMMA_EXP_X100
 #define K1_WS2816_DEGAMMA_EXP_X100 220

@@ -8,6 +8,9 @@
 #include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
 #include "k1_show_state.h"   // K1_SHOW_STATE_FILE + boot restore after load_config
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
+#ifdef K1_LOOK_LIB_V1
+#include "k1_look.h"
+#endif
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
@@ -307,8 +310,28 @@ void load_config() {
       USBSerial.println("READ CONFIG SUCCESSFULLY");
     }
   } else if (decision == CFG_MIGRATE) {
-    // Headerless legacy image at offset 0: adopt it, then re-save with a header.
-    memcpy(&CONFIG, config_buffer, sizeof(CONFIG));
+    memcpy(&CONFIG, &CONFIG_DEFAULTS, sizeof(CONFIG));
+    uint32_t leading_magic = 0;
+    if (bytes_read >= 4) {
+      memcpy(&leading_magic, config_buffer, 4);
+    }
+    if (leading_magic == (uint32_t)CONFIG_BLOB_MAGIC &&
+        bytes_read >= sizeof(ConfigBlobHeader)) {
+      ConfigBlobHeader header;
+      memcpy(&header, config_buffer, sizeof(ConfigBlobHeader));
+      size_t copy_n = (size_t)header.length;
+      if (copy_n > sizeof(CONFIG)) {
+        copy_n = sizeof(CONFIG);
+      }
+      if (bytes_read >= sizeof(ConfigBlobHeader) + copy_n) {
+        memcpy(&CONFIG, config_buffer + sizeof(ConfigBlobHeader), copy_n);
+      }
+    } else {
+      size_t copy_n = bytes_read < sizeof(CONFIG) ? bytes_read : sizeof(CONFIG);
+      memcpy(&CONFIG, config_buffer, copy_n);
+    }
+    CONFIG.LOOK = 0;
+    CONFIG.SECONDARY_LOOK = 255;
     need_resave = true;
     if (debug_mode) {
       USBSerial.println("MIGRATED LEGACY CONFIG");
@@ -329,6 +352,10 @@ void load_config() {
 #else
   CONFIG.LIGHTSHOW_MODE = light_mode_sanitize_persisted(CONFIG.LIGHTSHOW_MODE);
   SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
+#endif
+
+#ifdef K1_LOOK_LIB_V1
+  k1_look_boot_from_config(CONFIG.LOOK, CONFIG.SECONDARY_LOOK);
 #endif
 
   // Applied AFTER the persisted blob is adopted, so a stored palette cannot win.

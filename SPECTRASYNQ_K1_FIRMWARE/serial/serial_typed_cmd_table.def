@@ -206,3 +206,10 @@ SERIAL_TYPED_CMD("start_benchmark", serial_typed_start_benchmark, SC_TYPED_ONLY,
 SERIAL_TYPED_CMD("stream_spectrogram", serial_typed_stream_spectrogram, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("stream_agc", serial_typed_stream_agc, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("stream_chromagram", serial_typed_stream_chromagram, SC_TYPED_ONLY, CMD_HARNESS)
+#ifdef K1_LOOK_LIB_V1
+SERIAL_TYPED_CMD("look", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_PERSISTS)
+SERIAL_TYPED_CMD("secondary_look", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_PERSISTS)
+SERIAL_TYPED_CMD("look_status", serial_typed_wrap_look, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("look_load", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_DISRUPTIVE)
+SERIAL_TYPED_CMD("look_clear", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_DISRUPTIVE)
+#endif

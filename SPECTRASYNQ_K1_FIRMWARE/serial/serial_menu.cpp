@@ -100,6 +100,10 @@ extern void ap_capture_arm(uint32_t ms);
 #ifdef K1_EFFECT_FRAMEWORK_V1
 #include "beat_aware_director.h"
 #endif
+#ifdef K1_LOOK_LIB_V1
+#include "k1_look.h"
+#include "k1_look_file.h"
+#endif
 
 extern bool benchmark_running;
 extern uint32_t benchmark_start_time;
@@ -673,6 +677,25 @@ void dump_info() {
 
   USBSerial.print("CHIP ID: ");
   print_chip_id();
+
+#ifdef K1_LOOK_LIB_V1
+  {
+    const uint8_t slot = k1_look_slot;
+    const uint8_t sec = k1_look_slot_sec;
+    const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : 0xFF;
+    USBSerial.print("LOOK: slot=");
+    USBSerial.print(slot);
+    USBSerial.print(" type=");
+    USBSerial.print(k1_look_type_name(type));
+    USBSerial.print(" sec=");
+    if (sec == 255) {
+      USBSerial.print("inherit");
+    } else {
+      USBSerial.print(sec);
+    }
+    USBSerial.println();
+  }
+#endif
 
   USBSerial.print("noise_button.pressed: ");
   USBSerial.println(noise_button.pressed);
@@ -1535,6 +1558,11 @@ void serial_print_hotkey_help() {
   USBSerial.println("  . palette next");
   USBSerial.println("  / palette mode");
   USBSerial.println();
+#ifdef K1_LOOK_LIB_V1
+  USBSerial.println("Look");
+  USBSerial.println("  z cycle look (0 last-night / 1 tonight / 2 tungsten / 3 identity)");
+  USBSerial.println();
+#endif
   USBSerial.println("Streams");
   USBSerial.println("  a AP stream");
   USBSerial.println("  s VP stream");
@@ -1688,6 +1716,10 @@ bool serial_hotkey_is_immediate(char key) {
     case 'S':  // save show state (primary+secondary+edge) for next boot
     case 'd':
     case 'f':
+#if defined(K1_LOOK_LIB_V1) && !defined(ENABLE_MOTION_PROBE)
+    case 'z':  // cycle compiled look 0–3 (identity / tonight / tungsten / identity)
+    case 'Z':
+#endif
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
     case 'v':
 #endif
@@ -1747,6 +1779,10 @@ bool serial_hotkey_is_immediate(char key) {
 	    case ',':
 	    case '.':
 	    case '/':
+#if defined(K1_LOOK_LIB_V1) && !defined(ENABLE_MOTION_PROBE)
+	    case 'z':
+	    case 'Z':
+#endif
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
 	    case 'v':
 #endif
@@ -1817,7 +1853,8 @@ bool serial_hotkey_is_immediate(char key) {
 	    "chromatic",
 	    "slot_load",
 	    "slot_arm",
-	    "commit"
+	    "commit",
+	    "look"
 	  };
 	  for (const char* manual_command : manual_commands) {
 	    if (strcmp(command_type, manual_command) == 0) {
@@ -1826,6 +1863,36 @@ bool serial_hotkey_is_immediate(char key) {
 	  }
 	  return false;
 	}
+#ifdef K1_LOOK_LIB_V1
+static void serial_look_print_line() {
+  const uint8_t slot = k1_look_slot;
+  const uint8_t sec = k1_look_slot_sec;
+  const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : K1_LOOK_EMPTY;
+  USBSerial.print("LOOK: slot=");
+  USBSerial.print(slot);
+  USBSerial.print(" type=");
+  USBSerial.print(k1_look_type_name(type));
+  USBSerial.print(" sec=");
+  if (sec == 255) {
+    USBSerial.print("inherit");
+  } else {
+    USBSerial.print(sec);
+  }
+  USBSerial.println();
+}
+
+static void serial_look_cycle_hotkey() {
+  const uint8_t slot = k1_look_slot;
+  uint8_t next = (slot >= 3) ? 0 : (uint8_t)(slot + 1);
+  if (!k1_look_publish(next)) {
+    next = 0;
+    (void)k1_look_publish(0);
+  }
+  CONFIG.LOOK = next;
+  save_config_delayed();
+  serial_look_print_line();
+}
+#endif
 	void serial_handle_hotkey(char key) {
 	  if (serial_hotkey_marks_manual_visual_control(key)) {
 	    k1_smart_director_mark_manual_control(millis(), K1_MANUAL_REASON_SERIAL_HOTKEY);
@@ -2084,6 +2151,12 @@ bool serial_hotkey_is_immediate(char key) {
       stop_streams();
       USBSerial.println("STREAMS: off");
       break;
+#if defined(K1_LOOK_LIB_V1) && !defined(ENABLE_MOTION_PROBE)
+    case 'z':
+    case 'Z':
+      serial_look_cycle_hotkey();
+      break;
+#endif
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
     case 'v':
       serial_toggle_vivid_precomp();
@@ -2185,6 +2258,12 @@ void cmd_help() {
   USBSerial.println("                                          fps | Return the system FPS");
   USBSerial.println("                                      led_fps | Return the LED FPS");
   USBSerial.println("                                      chip_id | Return the chip id (MAC) of the CPU");
+#ifdef K1_LOOK_LIB_V1
+  USBSerial.println("                                   look=[0-3] | Select compiled look (0=identity last-night, 1=tonight, 2=tungsten)");
+  USBSerial.println("                      secondary_look=[0-3|255] | Secondary look; 255 inherits primary");
+  USBSerial.println("                                  look_status | Print live look slot/type/sec");
+  USBSerial.println("                       z (hotkey, no colon) | Cycle look 0-1-2-3");
+#endif
   USBSerial.println("                                     get_mode | Get lightshow mode's ID (index)");
   USBSerial.println("                                get_num_modes | Return the number of modes available");
   USBSerial.println("                  noise calibration | press N to arm, then Y within 5s (typed start_noise_cal is disabled)");
@@ -3858,6 +3937,21 @@ void check_serial(uint32_t t_now) {
     while (USBSerial.available() && bytes_processed < 128) {
       uint8_t byte = USBSerial.read();
       bytes_processed++;
+
+#ifdef K1_LOOK_LIB_V1
+      if (k1_look_rx_need > 0 && k1_look_rx_got < k1_look_rx_need) {
+        const uint32_t need = k1_look_rx_need;
+        const bool done = (k1_look_rx_got + 1u >= need);
+        const bool ok = k1_look_rx_push(byte);
+        if (done) {
+          tx_begin();
+          USBSerial.print("LOOK_LOAD: ");
+          USBSerial.println(ok ? "ok" : "fail");
+          tx_end();
+        }
+        continue;
+      }
+#endif
 
       if (!command_mode) {
         k1_prsm_frame_t prsm_frame;

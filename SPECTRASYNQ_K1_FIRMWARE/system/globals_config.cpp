@@ -95,6 +95,8 @@ conf CONFIG = {
   // --- Palette Defaults ---
   K1_BOOT_PALETTE_INDEX,  // PALETTE_INDEX (K1_Naberius_Gold_gp — boot palette lock, 2026-08-05)
   true,                   // PALETTE_MODE_ENABLED (palette mode ON at boot, both channels)
+  0,                      // LOOK (identity / last-night print)
+  255,                    // SECONDARY_LOOK (255 = inherit primary)
 };
 
 // Ensure LED count is set from the single #define in constants.h

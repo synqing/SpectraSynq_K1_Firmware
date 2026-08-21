@@ -1167,8 +1167,14 @@ inline void show_leds() {
     const int64_t vp_perf_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#ifdef K1_LOOK_LIB_V1
     k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
-                         budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b);
+                         budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b,
+                         k1_look_slot);
+#else
+    k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
+                         budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b, 0);
+#endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_pack_start_us != 0) {
       vp_perf_record(
@@ -2740,9 +2746,15 @@ inline void show_secondary_leds() {
     const int64_t vp_perf_sec_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#ifdef K1_LOOK_LIB_V1
     k1_lever2_pack_frame(leds_scaled_secondary, SECONDARY_LED_COUNT,
                          ws2816_wire_secondary, budget_proxy, k1_inc_r,
-                         k1_inc_g, k1_inc_b);
+                         k1_inc_g, k1_inc_b, k1_look_effective_sec());
+#else
+    k1_lever2_pack_frame(leds_scaled_secondary, SECONDARY_LED_COUNT,
+                         ws2816_wire_secondary, budget_proxy, k1_inc_r,
+                         k1_inc_g, k1_inc_b, 0);
+#endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_sec_pack_start_us != 0) {
       vp_perf_pack_accum_us +=

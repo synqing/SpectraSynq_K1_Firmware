@@ -101,17 +101,17 @@ def test_fault_identity_fails_curve():
     assert abs(mid_id - exact(32768)) > 1000
 
 
-def test_fault_emit_only_breaks_limiter_consistency():
+def test_fault_prelook_curve_in_limiter_sum_differs():
+    """Limiter must see pre-look codes. Curving the sum is the old site."""
     pixels = [(8000, 0, 0), (12000, 0, 0)]
     budget = 6000
-    good = pack_frame_u16(pixels, budget_proxy=budget, degamma=True)
-    bad = pack_frame_u16(
-        pixels, budget_proxy=budget, degamma=False, degamma_emit_only=True
-    )
-    assert good != bad
+    correct = pack_frame_u16(pixels, budget_proxy=budget, look_slot=1)
+    curved = [(apply_u16(r), apply_u16(g), apply_u16(b)) for r, g, b in pixels]
+    wrong = pack_frame_u16(curved, budget_proxy=budget, look_slot=0)
+    assert correct != wrong
 
 
-def test_firmware_applies_inside_sq_to_u16():
+def test_firmware_applies_look_after_limiter():
     start = EMIT.index("static inline uint16_t k1_lever2_sq_to_u16")
     brace = EMIT.index("{", start)
     depth = 0
@@ -125,7 +125,8 @@ def test_firmware_applies_inside_sq_to_u16():
                 body = EMIT[brace : i + 1]
                 break
     assert body is not None
-    assert "k1_ws2816_degamma_u16" in body
-    assert "#ifdef K1_WS2816_DEGAMMA_V1" in body
+    assert "k1_ws2816_degamma_u16" not in body
     pack = EMIT[EMIT.index("k1_lever2_pack_frame") :]
-    assert "k1_ws2816_degamma_u16" not in pack.split("k1_lever2_sq_to_u16", 1)[0]
+    assert "k1_look_apply_u16" in pack
+    limited = pack[pack.index("k1_lever2_apply_q16") :]
+    assert limited.index("k1_lever2_apply_q16") < limited.index("k1_look_apply_u16")

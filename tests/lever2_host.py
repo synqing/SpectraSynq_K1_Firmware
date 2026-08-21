@@ -31,19 +31,41 @@ def apply_q16(ch: int, s: int) -> int:
     return min(65535, (ch * s + 32768) >> 16)
 
 
+def apply_look_u16(
+    r: int, g: int, b: int, look_slot: int
+) -> Tuple[int, int, int]:
+    """Mirror k1_look_apply_u16. Slots 0/3/empty are identity."""
+    if look_slot in (0, 3) or look_slot < 0 or look_slot > 3:
+        return r, g, b
+    if look_slot == 1:
+        from ws2816_degamma_lut import apply_u16 as degamma_u16
+
+        return degamma_u16(r), degamma_u16(g), degamma_u16(b)
+    if look_slot == 2:
+        from look_tungsten_lut import apply_rgb as tungsten_rgb
+
+        return tungsten_rgb(r, g, b)
+    return r, g, b
+
+
 def pack_frame_u16(
     rgb16: Sequence[Tuple[int, int, int]],
     budget_proxy: int,
     degamma: bool = False,
     degamma_emit_only: bool = False,
+    look_slot: int = 0,
 ) -> List[WirePixel]:
     """Mirror k1_lever2_pack_frame.
 
-    degamma=True applies the cube-spaced inverse-gamma at the sq_to_u16
-    site (both accumulate and emit). degamma_emit_only is the S9 fault
-    case: curve on emit only, so a tight budget measures the wrong total.
+    Convert is identity. The Q16 limiter runs on pre-look codes. Look is
+    applied after apply_q16 and before pack. degamma=True is the legacy
+    alias for look_slot=1 (max-budget wire still matches always-on
+    inverse-gamma). degamma_emit_only is the S9 fault case only.
     """
     from ws2816_degamma_lut import apply_u16 as degamma_u16
+
+    if degamma:
+        look_slot = 1
 
     n = len(rgb16)
     if degamma_emit_only:
@@ -63,20 +85,18 @@ def pack_frame_u16(
             for r, g, b in rgb16
         ]
 
-    mapped = [
-        (degamma_u16(r) if degamma else r,
-         degamma_u16(g) if degamma else g,
-         degamma_u16(b) if degamma else b)
-        for r, g, b in rgb16
-    ]
+    mapped = list(rgb16)
     if budget_proxy >= n * 3 * 65535:
-        return [pack_pixel(r, g, b) for r, g, b in mapped]
-    total = sum(r + g + b for r, g, b in mapped)
-    s = scale_q16(total, budget_proxy)
-    return [
-        pack_pixel(apply_q16(r, s), apply_q16(g, s), apply_q16(b, s))
-        for r, g, b in mapped
-    ]
+        s = 65535
+    else:
+        total = sum(r + g + b for r, g, b in mapped)
+        s = scale_q16(total, budget_proxy)
+    out: List[WirePixel] = []
+    for r, g, b in mapped:
+        r16, g16, b16 = apply_q16(r, s), apply_q16(g, s), apply_q16(b, s)
+        r16, g16, b16 = apply_look_u16(r16, g16, b16, look_slot)
+        out.append(pack_pixel(r16, g16, b16))
+    return out
 
 
 # Firmware constants.h: inline CRGB16 incandescent_lookup

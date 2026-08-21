@@ -83,13 +83,12 @@ def test_limiter_functions_have_no_float():
         assert "double" not in body
 
 
-def test_degamma_is_flag_gated_inside_sq_to_u16():
-    assert '#ifdef K1_WS2816_DEGAMMA_V1' in EMIT
-    assert '#include "k1_ws2816_degamma.h"' in EMIT
-    body = _fn_body(EMIT, "k1_lever2_sq_to_u16")
-    assert "k1_ws2816_degamma_u16" in body
+def test_degamma_is_not_in_sq_to_u16():
+    convert = _fn_body(EMIT, "k1_lever2_sq_to_u16")
+    assert "k1_ws2816_degamma_u16" not in convert
+    assert '#ifdef K1_WS2816_DEGAMMA_V1' not in EMIT
     pack_start = EMIT.index("static inline void k1_lever2_pack_frame")
-    assert "k1_ws2816_degamma_u16" not in EMIT[pack_start:]
+    assert "k1_look_apply_u16" in EMIT[pack_start:]
 
 
 def test_quantize_color_remains_on_flag_off_path():

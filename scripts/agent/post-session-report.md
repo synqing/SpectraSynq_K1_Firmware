@@ -5,6 +5,27 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-21 K1 Look Library phases A–D (source)
+
+```text
+session_objective:       Implement the Look Library phased plan in source. A7 host+pio. A8 flash blocked on commit. B/C/D source+procedure; their device GOs stay later.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ dc1e6991 (docs). Silicon still 445c79ce.
+branch_head_at_end:      dc1e6991 (look library uncommitted; no commit authorised)
+files_changed:           k1_look.h / k1_look_tungsten.h / k1_look_file.h; lever2 emit after limiter; CONFIG LOOK+SECONDARY_LOOK + blob v2 MIGRATE; serial :look= :look_load=; RPL -DK1_LOOK_LIB_V1 (degamma flag absorbed); host tests; D chart PROCEDURE + C FPS_PROBE.
+commands_run:            pytest look+isolation+serial+boot 96 passed; pio-build k1_main_rpl_im69d SUCCESS 22s; pio-build k1_hardware SUCCESS 20s (no leak); k1-flash-verified.sh REFUSED dirty firmware.
+validation_results:      Host GREEN. RPL binary linked (Flash 709626). k1_hardware built without LOOK_LIB. Silicon unchanged: IDENTITY still git=445c79ce env=k1_main_rpl_im69d (always-on degamma). No cal. F887/B489 not flashed.
+evidence_captured:       docs/forensics/runtime-evidence/20260821T-k1-look-lgp-chart/PROCEDURE.md + FPS_PROBE.md
+blockers:                A8: flash script refuses dirty SPECTRASYNQ_K1_FIRMWARE + platformio.ini. Plan forbids commit unless Captain says commit.
+generated_files_ignored: prior i2sled RESULT.* left untouched (other lane).
+safety_constraints:      F887 NO; B489 NO; no cal; flag only on k1_main_rpl_im69d; slot 3 remains IDENTITY (no invented film).
+thinking_skill_used:     map-territory (source ≠ silicon) + ship-path-required
+skills_used:             Agent OS; ship-path-required; hardware-truth-gate (flash script identity+dirty)
+specialists_used:        none
+next_recommended_action: Captain says commit → agent commits look-library set (not i2sled leftovers) → k1-flash-verified.sh k1_main_rpl_im69d --port /dev/cu.usbmodem1401 → Captain eyes-on :look=0 vs 1 vs 2 vs 3; boot :look_status slot=0 IDENTITY; SYSTEM_FPS ~135.
+```
+
+---
+
 ## Session Report — 2026-08-21 Main RPL boot intro on Core 1
 
 ```text

@@ -37,7 +37,14 @@
 // Bump whenever the on-disk meaning of the raw CONFIG image changes. A header
 // whose version != CONFIG_BLOB_VERSION is rejected (FALLBACK), never blindly
 // memcpy'd into a struct that may have been re-laid-out.
-#define CONFIG_BLOB_VERSION 1U
+//
+// Version 2 (2026-08-21): LOOK + SECONDARY_LOOK occupy the two trailing pad
+// bytes of the old 112-byte conf. sizeof(conf) stayed 112, so length cannot
+// be the grow signal — version 1 blobs MIGRATE (LOOK=0, SECONDARY_LOOK=255)
+// instead of LOAD, which would treat pad zeros as SECONDARY_LOOK=0.
+#define CONFIG_BLOB_VERSION 2U
+#define CONFIG_BLOB_PRE_LOOK_VERSION 1U
+#define CONFIG_BLOB_PRE_LOOK_CONF_SIZE 112U
 
 // 12 bytes, no padding (4 + 2 + 2 + 4, all naturally aligned). Mirrors the
 // magic+version header pattern already used by the calibration profile in
@@ -81,12 +88,16 @@ enum ConfigLoadDecision {
 //   * file_len >= sizeof(ConfigBlobHeader)+config_size AND the header validates
 //     (magic==MAGIC && version==VERSION && length==config_size &&
 //      crc32==crc(payload))                                  -> CFG_LOAD
+//   * else if magic+crc OK and (version==PRE_LOOK_VERSION with length<=config_size,
+//     OR current version with length < config_size): layout grow / LOOK fields
+//                                                    -> CFG_MIGRATE
 //   * else if first 4 bytes == MAGIC (a header is present but failed validation:
-//     bad crc / wrong version / wrong length / truncated payload) -> CFG_FALLBACK
+//     bad crc / unknown future version / truncated payload) -> CFG_FALLBACK
 //     (do NOT migrate a corrupt headered blob — a flipped CRC must not be
 //      reinterpreted as legacy and trusted)
 //   * else (no magic at offset 0 = headerless legacy image):
 //       - file_len >= config_size                            -> CFG_MIGRATE
+//       - file_len >= CONFIG_BLOB_PRE_LOOK_CONF_SIZE         -> CFG_MIGRATE
 //       - else (too short to even be a legacy image)         -> CFG_FALLBACK
 //
 // The header is read via memcpy into a local (not a pointer-cast) so an unaligned
@@ -108,6 +119,30 @@ static inline ConfigLoadDecision bridge_fs_classify_config(const uint8_t* file_b
     }
   }
 
+  // Path 1b: headered layout migrate. Version 1 LOOK-less blobs (sizeof stayed
+  // 112; meaning of the last two bytes changed) and current-version blobs whose
+  // payload is shorter than this build's conf. CRC must still match the stamped
+  // length. Brace is on the next line so the LOAD crc mutation stays unique.
+  if (file_len >= header_size) {
+    ConfigBlobHeader header;
+    memcpy(&header, file_bytes, header_size);
+    if (header.magic == CONFIG_BLOB_MAGIC &&
+        header.length > 0 &&
+        (size_t)header.length <= config_size &&
+        file_len >= header_size + (size_t)header.length &&
+        bridge_fs_crc32(file_bytes + header_size, (size_t)header.length) == header.crc32
+    ) {
+      if (header.version == CONFIG_BLOB_PRE_LOOK_VERSION) {
+        return CFG_MIGRATE;
+      }
+      if ((size_t)header.length < config_size) {
+        if (header.version == CONFIG_BLOB_VERSION) {
+          return CFG_MIGRATE;
+        }
+      }
+    }
+  }
+
   // Path 2: a header is present at offset 0 but the blob did NOT validate above
   // (bad crc / version / length, or truncated after the magic). Recover to
   // defaults — never trust or migrate a corrupt headered blob.
@@ -122,6 +157,9 @@ static inline ConfigLoadDecision bridge_fs_classify_config(const uint8_t* file_b
   // Path 3: headerless legacy image (no magic at offset 0). Adopt it if it is at
   // least a full raw CONFIG image; otherwise it is too short to use -> defaults.
   if (file_len >= config_size) {
+    return CFG_MIGRATE;
+  }
+  if (file_len >= (size_t)CONFIG_BLOB_PRE_LOOK_CONF_SIZE) {
     return CFG_MIGRATE;
   }
   return CFG_FALLBACK;

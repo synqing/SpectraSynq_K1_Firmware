@@ -158,6 +158,21 @@ int main() {
         emit("headerless_legacy", bridge_fs_classify_config(buf, sizeof(buf), CONFIG_SIZE));
     }
 
+    // ---- headered_v1_legacy: valid v1 blob, same payload size -> MIGRATE ----
+    // LOOK fields reused trailing pad so sizeof(conf) did not grow; version is
+    // the migrate signal. CRC matches the stamped v1 payload.
+    {
+        uint8_t buf[HDR + CONFIG_SIZE];
+        uint8_t payload[CONFIG_SIZE];
+        fill_payload(payload, CONFIG_SIZE);
+        ConfigBlobHeader h;
+        bridge_fs_fill_header(&h, payload, CONFIG_SIZE);
+        h.version = CONFIG_BLOB_PRE_LOOK_VERSION;
+        std::memcpy(buf, &h, HDR);
+        std::memcpy(buf + HDR, payload, CONFIG_SIZE);
+        emit("headered_v1_legacy", bridge_fs_classify_config(buf, sizeof(buf), CONFIG_SIZE));
+    }
+
     return 0;
 }
 """
@@ -169,6 +184,7 @@ EXPECTED = {
     "version_skew": 2,      # CFG_FALLBACK
     "truncated": 2,         # CFG_FALLBACK
     "headerless_legacy": 1, # CFG_MIGRATE
+    "headered_v1_legacy": 1, # CFG_MIGRATE (LOOK layout; do not FALLBACK)
 }
 
 

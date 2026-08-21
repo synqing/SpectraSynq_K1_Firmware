@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "49c31b7e648957cd089e8f006374cd704efa2df5"
+TYPED_DEF_BLOB_SHA = "8ecf7546b78bb1e7d56d93b587ac909c68ff20d5"
 BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
@@ -94,6 +94,8 @@ DISRUPTIVE_COMMANDS = frozenset({
     "led_color_order",
     "led_count",
     "led_type",
+    "look_clear",
+    "look_load",
     "note_offset",
     "reset",
     "restore_defaults",
@@ -120,6 +122,7 @@ PERSISTING_COMMANDS = frozenset({
     "led_count",
     "led_interpolation",
     "led_type",
+    "look",
     "max_current_ma",
     "mirror_enabled",
     "mood",
@@ -142,6 +145,7 @@ PERSISTING_COMMANDS = frozenset({
     "secondary_control",
     "secondary_enabled",
     "secondary_incandescent_mode",
+    "secondary_look",
     "secondary_mirror_enabled",
     "secondary_mood",
     "secondary_palette_index",
@@ -288,6 +292,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "image_id",
     "k1_pin_evidence",
     "led_fps",
+    "look_status",
     "mp_flash",
     "mp_off",
     "mp_status",

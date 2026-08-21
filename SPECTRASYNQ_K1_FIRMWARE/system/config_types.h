@@ -347,6 +347,11 @@ struct conf {
   // --- Palette Settings ---
   uint8_t PALETTE_INDEX;         // Index of the currently selected palette
   bool    PALETTE_MODE_ENABLED;  // True if palette mode is active
+
+  // Look library (appended 2026-08-21). Must stay at the end so old blobs
+  // MIGRATE by copying the prefix. LOOK=0 identity; SECONDARY_LOOK=255 inherit.
+  uint8_t LOOK;
+  uint8_t SECONDARY_LOOK;
 };
 
 // Boot palette lock (Captain standing order, 2026-08-05): EVERY K1 — bench and

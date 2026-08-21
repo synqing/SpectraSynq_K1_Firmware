@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>K1 look library — LUTs, identity, runtime switch</title>
+<style>
+  :root {
+    --ink: #1a1612;
+    --paper: #f4efe6;
+    --paper-2: #ebe4d6;
+    --rule: #cfc6b4;
+    --mute: #6b6256;
+    --gold: #b8862a;
+    --gold-d: #8a6418;
+    --teal: #1f6f6a;
+    --coral: #c44b2b;
+    --ok: #2d6a3a;
+    --led: #0b0a09;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: "Avenir Next", "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 17px/1.5 var(--serif);
+  }
+  header.mast {
+    padding: 2.2rem 6vw 1.4rem;
+    border-bottom: 1px solid var(--rule);
+    background: linear-gradient(180deg, #faf6ee 0%, var(--paper) 100%);
+  }
+  .kicker { font: 600 11px/1 var(--sans); letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold-d); }
+  h1 { font: 700 2.1rem/1.15 var(--serif); margin: 0.35rem 0 0.6rem; max-width: 22ch; }
+  .lede { max-width: 62ch; color: var(--ink); margin: 0; }
+  .lede strong { color: var(--coral); }
+  nav.toc {
+    display: flex; flex-wrap: wrap; gap: 0.4rem 1rem;
+    padding: 0.7rem 6vw; border-bottom: 1px solid var(--rule);
+    font: 600 12px/1 var(--sans); letter-spacing: 0.04em;
+    background: var(--paper-2); position: sticky; top: 0; z-index: 8;
+  }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; }
+  nav.toc a:hover { border-bottom-color: var(--gold); }
+  section { padding: 2.4rem 6vw; border-bottom: 1px solid var(--rule); }
+  h2 { font: 700 1.55rem/1.2 var(--serif); margin: 0 0 0.8rem; }
+  h3 { font: 650 1.15rem/1.3 var(--serif); margin: 1.4rem 0 0.45rem; }
+  p { max-width: 68ch; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; }
+  @media (max-width: 860px) { .grid-2 { grid-template-columns: 1fr; } }
+  .card {
+    background: #fffdf8; border: 1px solid var(--rule); padding: 1rem 1.1rem 1.15rem;
+  }
+  .card h3 { margin-top: 0; }
+  .tag {
+    display: inline-block; font: 600 10px/1 var(--sans); letter-spacing: 0.12em;
+    text-transform: uppercase; padding: 0.22rem 0.45rem; border: 1px solid currentColor;
+  }
+  .tag.on { color: var(--ok); }
+  .tag.off { color: var(--mute); }
+  .tag.warn { color: var(--coral); }
+  .tag.gold { color: var(--gold-d); }
+  label { font: 600 12px/1.3 var(--sans); color: var(--mute); display: block; margin: 0.55rem 0 0.2rem; }
+  select, input[type=range], button {
+    font: 600 13px/1.2 var(--sans);
+  }
+  select, button {
+    background: var(--ink); color: var(--paper); border: 0; padding: 0.45rem 0.7rem;
+    cursor: pointer;
+  }
+  button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+  button.active { background: var(--gold-d); }
+  .row { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0.4rem 0 0.7rem; }
+  canvas.curve { width: 100%; height: 220px; background: #11100e; display: block; cursor: crosshair; }
+  .strip {
+    display: flex; height: 36px; margin-top: 0.55rem; background: var(--led);
+    padding: 4px; gap: 2px;
+  }
+  .strip i { flex: 1; min-width: 0; }
+  .swatches { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.7rem; }
+  .swatch { width: 72px; text-align: center; }
+  .swatch b { display: block; height: 44px; border: 1px solid var(--rule); }
+  .swatch span { font: 600 10px/1.3 var(--mono); color: var(--mute); }
+  table.honest { border-collapse: collapse; width: 100%; max-width: 820px; font-size: 0.92rem; }
+  table.honest th, table.honest td { border-bottom: 1px solid var(--rule); padding: 0.45rem 0.5rem; text-align: left; vertical-align: top; }
+  table.honest th { font: 600 11px/1.2 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); }
+  .mono { font-family: var(--mono); font-size: 0.86em; }
+  .callout { border-left: 3px solid var(--gold); padding: 0.2rem 0 0.2rem 0.9rem; max-width: 68ch; }
+  .pipe { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin: 1rem 0; }
+  .pipe span {
+    font: 600 11px/1 var(--sans); letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.45rem 0.55rem; background: var(--paper-2); border: 1px solid var(--rule);
+  }
+  .pipe span.look { background: #f3d9a8; border-color: var(--gold); }
+  .pipe span.ghosted { opacity: 0.45; text-decoration: line-through; }
+  .meter { height: 10px; background: #ddd6c6; margin: 0.25rem 0 0.7rem; max-width: 420px; }
+  .meter > i { display: block; height: 100%; background: var(--teal); }
+  .meter.warn > i { background: var(--coral); }
+  .cube-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 1rem; }
+  @media (max-width: 860px) { .cube-wrap { grid-template-columns: 1fr; } }
+  footer { padding: 1.5rem 6vw 2.5rem; font: 14px/1.45 var(--sans); color: var(--mute); }
+  .ans { font-size: 1.15rem; max-width: 62ch; }
+  code { font-family: var(--mono); font-size: 0.86em; background: var(--paper-2); padding: 0.05em 0.28em; }
+  .tiny { font: 13px/1.45 var(--sans); color: var(--mute); max-width: 68ch; }
+</style>
+</head>
+<body>
+<header class="mast">
+  <div class="kicker">SpectraSynq K1 · colour science · 21 Aug 2026</div>
+  <h1>A look is a map. A library is several maps you can change while the music is playing.</h1>
+  <p class="lede">
+    Yes — K1 can load and switch LUTs at runtime. It does <strong>not</strong> do that today.
+    Tonight’s inverse-gamma is compiled in. Palettes already switch live.
+    The four words from the last note — per-channel, 3D, authored, flag-off identity — are four different machines.
+    This page lets you drive them.
+  </p>
+</header>
+<nav class="toc">
+  <a href="#answer">Answer</a>
+  <a href="#studio">Studio</a>
+  <a href="#words">Four words</a>
+  <a href="#today">On silicon now</a>
+  <a href="#runtime">Runtime switch</a>
+  <a href="#cost">Cost</a>
+  <a href="#proposal">Proposal</a>
+  <a href="#ship">Ship path</a>
+</nav>
+
+<section id="answer">
+  <h2>The short answer</h2>
+  <p class="ans">A LUT is a function <span class="mono">RGB → RGB</span>. If that function lives in RAM or flash as a table, Core 1 can point at a different table on the next frame. That is a runtime look switch. No rebuild. No reflash.</p>
+  <p>What you have tonight is the opposite: <code>K1_WS2816_DEGAMMA_V1</code> is an <code>#ifdef</code>. Off means the function is not in the binary. On means one curve, always, every pixel, both DINs. That is a <em>build look</em>, not a library.</p>
+  <div class="callout">
+    <p>Palettes are already a library. <code>:palette_index=29</code> picks which colours the show is painted with. A look library would sit <em>after</em> that painting, and decide how those codes hit the WS2816 silicon. Same song, different print.</p>
+  </div>
+</section>
+
+<section id="studio">
+  <h2>Studio — drive the four machines</h2>
+  <p class="tiny">The left strip is the firmware colour as painted (identity). The right strip is after the look. Same eight hues. Nothing here is a white-balance gel unless you choose the per-channel mode and pull the channels apart.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="kicker">Look machine</div>
+      <div class="row" id="mode-row">
+        <button data-mode="shared" class="active">Shared 1D</button>
+        <button data-mode="rgb">Per-channel 1D</button>
+        <button data-mode="cube">3D lattice</button>
+      </div>
+      <label for="preset">Preset</label>
+      <select id="preset"></select>
+      <div id="shared-ctrls">
+        <label>Gamma exponent (1.0 = identity) <span id="g-read" class="mono">2.20</span></label>
+        <input id="gamma" type="range" min="40" max="320" value="220">
+        <label>Contrast (S-curve, 0 = flat)</label>
+        <input id="contrast" type="range" min="0" max="100" value="0">
+      </div>
+      <div id="rgb-ctrls" hidden>
+        <label>Red gain <span id="rg-read" class="mono">1.00</span></label>
+        <input id="rg" type="range" min="50" max="160" value="100">
+        <label>Green gain <span id="gg-read" class="mono">1.00</span></label>
+        <input id="gg" type="range" min="50" max="160" value="100">
+        <label>Blue gain <span id="bg-read" class="mono">1.00</span></label>
+        <input id="bb" type="range" min="50" max="160" value="100">
+        <p class="tiny">This is the only mode on this page that can do a Kelvin slide. Shared 1D cannot.</p>
+      </div>
+      <div id="cube-ctrls" hidden>
+        <label>Teal–orange split (3D only)</label>
+        <input id="split" type="range" min="0" max="100" value="55">
+        <p class="tiny">Reds swing warm, cyans swing cool. A 1D curve cannot do that: it has no idea which <em>mix</em> it is looking at.</p>
+      </div>
+      <p class="tiny" id="mode-blurb"></p>
+    </div>
+    <div class="card">
+      <div class="kicker">Transfer</div>
+      <canvas class="curve" id="curve" width="640" height="280"></canvas>
+      <p class="tiny" id="curve-cap">Shared 1D · one curve, all three channels.</p>
+      <div class="kicker" style="margin-top:1rem">Painted → printed</div>
+      <div class="strip" id="strip-in" title="Identity / painted"></div>
+      <div class="strip" id="strip-out" title="After look"></div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+  </div>
+</section>
+
+<section id="words">
+  <h2>The four words, unpacked</h2>
+  <div class="grid-2">
+    <div class="card">
+      <h3>1. Per-channel</h3>
+      <p>Three 1D tables: one each for R, G, B. Same shape? That is tonight’s degamma — a print curve, not a gel. Different shapes? Now you can warm or cool the plate, kill a green spike, or hold blue in the darks.</p>
+      <p>Memory: 256 × 3 × 2 bytes = <span class="mono">1.5&nbsp;KB</span>. Switch: swap three pointers.</p>
+    </div>
+    <div class="card">
+      <h3>2. 3D</h3>
+      <p>A cube of RGB nodes. Input colour indexes a cell; the output is interpolated from the eight corners. The look can depend on the <em>mix</em>: saturate only the reds, rotate only the cyans, leave neutrals alone.</p>
+      <p>That is why film scanners and cameras ship .cube files. A 1D LUT is a tone curve. A 3D LUT is a grade.</p>
+    </div>
+    <div class="card">
+      <h3>3. Authored</h3>
+      <p>Someone decided the numbers. Not <code>pow(v, 1/2.2)</code> generated at compile. A colourist, or you, or a measured chart of this exact LGP + WS2816C batch.</p>
+      <p>Authored looks live as data: arrays in flash, later a file. Generated looks are formulae wearing a LUT costume. Tonight’s table is generated. A library wants authored slots plus one generated identity.</p>
+    </div>
+    <div class="card">
+      <h3>4. Flag-off identity</h3>
+      <p>When the feature is compiled out, or slot 0 is selected, the function is <code>return rgb</code>. No table walk. No “almost identity” lerp error. The plate matches last night’s Lever-2 ship.</p>
+      <p>This is the same law as <code>ENABLE_OUTPUT_GAMMA 0</code> and as <code>:palette_hd=off</code>. Off is a first-class look named <em>Identity</em>, not the absence of care.</p>
+    </div>
+  </div>
+
+  <h3>What each machine can and cannot do</h3>
+  <table class="honest">
+    <thead>
+      <tr><th>Machine</th><th>Can</th><th>Cannot</th><th>K1 tonight</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Shared 1D</td>
+        <td>Lift darks, crush mids, film S-curve</td>
+        <td>Change white point; hue-dependent grade</td>
+        <td><span class="tag warn">On · degamma 2.2</span></td>
+      </tr>
+      <tr>
+        <td>Per-channel 1D</td>
+        <td>All of the above + white balance + channel trim</td>
+        <td>Teal–orange split; “only the reds”</td>
+        <td><span class="tag off">Not built</span></td>
+      </tr>
+      <tr>
+        <td>3D lattice</td>
+        <td>Full grade; cross-talk; leave grey, move chroma</td>
+        <td>Cheap at huge N; needs authored data</td>
+        <td><span class="tag off">Not built</span></td>
+      </tr>
+      <tr>
+        <td>Palette index</td>
+        <td>Pick which colours the effect paints with</td>
+        <td>Change how a painted pixel hits silicon</td>
+        <td><span class="tag on">Runtime · serial</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="today">
+  <h2>What is already on the metal</h2>
+  <div class="pipe" aria-label="Current emit path">
+    <span>Effects → CRGB16</span>
+    <span>Brightness</span>
+    <span>Vivid</span>
+    <span>Clip</span>
+    <span>Scale</span>
+    <span>Incandescent</span>
+    <span class="look">Degamma 2.2 · compiled</span>
+    <span>48-bit pack</span>
+    <span>WS2816 γ 4-bit</span>
+  </div>
+  <p>Main RPL <span class="mono">9087A500</span> @ <span class="mono">445c79ce</span> / <code>k1_main_rpl_im69d</code>. The gold box is not a slot. It cannot be turned off without a new binary.</p>
+  <p>Bench K1 <span class="mono">B489A500</span> never enters that box. It quantises to 8-bit WS2812B. Comparing the two plates is comparing two printers.</p>
+  <p>Runtime colour controls that <em>do</em> exist: <code>:palette_index=</code>, <code>:palette_mode=</code>, <code>:chroma=</code>, <code>:vivid_chroma=</code>, edge mode. Those change the paint, not the print.</p>
+</section>
+
+<section id="runtime">
+  <h2>Can it switch at runtime? Yes — here is the shape</h2>
+  <p>Core 1 already owns the show. A look is just another buffer that stage reads. The safe switch is a pointer swap at the start of a frame, never mid-pixel.</p>
+  <div class="pipe">
+    <span>Effects → CRGB16</span>
+    <span>Brightness</span>
+    <span>Vivid</span>
+    <span>Clip</span>
+    <span>Scale</span>
+    <span>Incandescent</span>
+    <span class="look">look_apply(slot)</span>
+    <span>48-bit pack</span>
+    <span>WS2816</span>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Slot 0 is law</h3>
+      <p class="mono">look_apply(rgb, 0) == rgb</p>
+      <p>Compile the identity as a function, not a table of 0,1,2,… so there is no lerp dust. Slots 1…N are tables in flash. <code>:look=0</code> is last night. <code>:look=1</code> can be tonight’s degamma if you still want it as a print, not as destiny.</p>
+    </div>
+    <div class="card">
+      <h3>Where the bytes live</h3>
+      <p><strong>Phase A — compiled slots.</strong> Four looks in PROGMEM. Serial <code>:look=</code> picks one. No upload path. No LittleFS. This is the whole first ship.</p>
+      <p><strong>Phase B — load.</strong> Tab5 or USB writes a slot into PSRAM or LittleFS. Checksum, version, LED-count-agnostic (it is a colour map, not a pixel map). Still applied on Core 1 only.</p>
+    </div>
+  </div>
+  <h3>Why this is not a palette</h3>
+  <p>A palette answers “which yellow.” A look answers “what does that yellow become on this silicon, in this room.” You can keep palette 29 and flip looks. You can keep Identity and flip palettes. Mixing them into one blob is how you lose revert.</p>
+</section>
+
+<section id="cost">
+  <h2>What it costs on this chip</h2>
+  <p>ESP32-S3: 512&nbsp;KB SRAM, 8&nbsp;MB PSRAM, 16&nbsp;MB flash. Visual canvas 160 LEDs × two DINs. Target ~100–135 FPS. Numbers below are exact for packed RGB u16.</p>
+  <div class="card">
+    <label>Lattice edge N (3D) <span id="n-read" class="mono">17</span></label>
+    <input id="nlat" type="range" min="5" max="33" value="17">
+    <label>Authored 1D slots</label>
+    <input id="n1d" type="range" min="1" max="16" value="4">
+    <p class="mono" id="cost-out"></p>
+    <div class="meter" id="cost-meter"><i></i></div>
+    <p class="tiny">Green bar = fraction of 320&nbsp;KB internal heap-ish budget (conservative). Over 25% goes coral — still fine in PSRAM, not something to drop on the audio core.</p>
+  </div>
+  <table class="honest">
+    <thead><tr><th>Object</th><th>Bytes</th><th>Per-frame work (160 px)</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>Identity function</td><td>0 tables</td><td>return</td><td>Always legal</td></tr>
+      <tr><td>Shared 1D · 256 nodes</td><td>512</td><td>160 × 3 lerps</td><td>Noise</td></tr>
+      <tr><td>Per-channel 1D · 256</td><td>1 536</td><td>same</td><td>Phase A default</td></tr>
+      <tr><td>3D · 17³ × RGB u16</td><td>29 478</td><td>160 × trilinear</td><td>Fine on Core 1</td></tr>
+      <tr><td>3D · 33³ × RGB u16</td><td>215 622</td><td>same, more cache</td><td>PSRAM, not SRAM</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="proposal">
+  <h2>Proposal — a look library, not another #ifdef</h2>
+  <p>Not built. Not on silicon. One stage, four compiled slots, serial switch, Identity as slot 0. Degamma becomes slot 1 so you can A/B it against the bench without a flash.</p>
+  <table class="honest">
+    <thead><tr><th>Slot</th><th>Name</th><th>Machine</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">0</td><td>Identity</td><td>function</td><td>Flag-off / last-night Lever-2</td></tr>
+      <tr><td class="mono">1</td><td>Degamma 2.2</td><td>shared 1D</td><td>Tonight’s curve, now optional</td></tr>
+      <tr><td class="mono">2</td><td>Tungsten trim</td><td>per-channel 1D</td><td>Prove WB is a look, not a myth</td></tr>
+      <tr><td class="mono">3</td><td>Measured LGP</td><td>authored 3D or RGB 1D</td><td>Empty until you measure this plate</td></tr>
+    </tbody>
+  </table>
+  <p>Command shape, matching the palette habit: <code>:look=0</code> persist in NVS. Tab5 later gets a wheel. No look upload in phase A — authored slot 3 stays identity until a chart exists. Do not invent a film grade in firmware.</p>
+  <div class="callout">
+    <p>The August 18 S9 audit already said the “8-bit path has gamma, Lever-2 does not” premise is false. A library does not re-litigate that. It gives you a print selector so a curve is a choice, not a religion.</p>
+  </div>
+</section>
+
+<section id="ship">
+  <h2>Already true / remaining if you want this</h2>
+  <p><strong>Already on silicon:</strong> one compiled shared-1D degamma on Main RPL; Lever-2 packer; runtime palettes. Bench has none of the LUT.</p>
+  <ol>
+    <li><strong>You</strong> — say whether phase A (four compiled slots + <code>:look=</code>) is the next firmware GO, or whether tonight’s degamma should revert to identity first.</li>
+    <li><strong>Agent</strong> — if GO: look stage after incandescent, slot 0 identity, slot 1 = current table, flag isolation tests, no 3D until slot 3 has a measured file.</li>
+    <li><strong>You</strong> — flash GO for <code>k1_main_rpl_im69d</code> on <span class="mono">9087A500</span> only.</li>
+    <li><strong>Shipped</strong> — <span class="mono">IDENTITY OK: git=… env=k1_main_rpl_im69d</span> and <code>:look=0</code> matches last night’s plate, <code>:look=1</code> matches tonight.</li>
+  </ol>
+  <p class="tiny">This HTML is education, not a firmware edit. No look loader exists in the tree. Opening it does not change the device.</p>
+</section>
+
+<footer>
+  Authority: <span class="mono">docs/research/k1-runtime-lut-look-library.html</span> ·
+  Silicon cited: RPL <span class="mono">445c79ce</span> ·
+  Degamma insertion: <span class="mono">k1_lever2_sq_to_u16</span> ·
+  Palette runtime already: <span class="mono">serial_typed_cmd_table.def</span>
+</footer>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+
+  const PAINT = [
+    [1.00, 0.18, 0.10],
+    [1.00, 0.55, 0.12],
+    [0.98, 0.86, 0.22],
+    [0.20, 0.78, 0.32],
+    [0.12, 0.72, 0.78],
+    [0.18, 0.32, 0.95],
+    [0.62, 0.20, 0.88],
+    [0.92, 0.92, 0.90]
+  ];
+
+  const PRESETS = {
+    shared: [
+      { id: "id", name: "Identity — flag-off", g: 100, c: 0 },
+      { id: "deg", name: "Tonight — inverse γ 2.2", g: 220, c: 0 },
+      { id: "enc", name: "Old washout suspect — encode γ 2.2", g: 45, c: 0 },
+      { id: "film", name: "Authored-ish S-curve", g: 100, c: 55 }
+    ],
+    rgb: [
+      { id: "id", name: "Identity", r: 100, g: 100, b: 100 },
+      { id: "tung", name: "Tungsten trim (warm)", r: 118, g: 100, b: 78 },
+      { id: "day", name: "Daylight trim (cool)", r: 88, g: 100, b: 118 },
+      { id: "nogreen", name: "Kill green spike", r: 100, g: 72, b: 100 }
+    ],
+    cube: [
+      { id: "id", name: "Identity cube", s: 0 },
+      { id: "to", name: "Teal–orange split", s: 55 },
+      { id: "hard", name: "Hard split (grade)", s: 100 }
+    ]
+  };
+
+  let mode = "shared";
+
+  function tone(v, g, c) {
+    const gamma = g / 100;
+    let x = Math.pow(clamp01(v), 1 / gamma);
+    if (c > 0) {
+      const k = c / 100;
+      const s = 0.5 + Math.tanh((x - 0.5) * (1 + 3 * k)) * 0.5 / Math.tanh(0.5 * (1 + 3 * k));
+      x = lerp(x, s, k);
+    }
+    return clamp01(x);
+  }
+
+  function applyShared(rgb) {
+    const g = +$("gamma").value;
+    const c = +$("contrast").value;
+    return rgb.map((ch) => tone(ch, g, c));
+  }
+
+  function applyRgb(rgb) {
+    const g = [+$("rg").value, +$("gg").value, +$("bb").value].map((n) => n / 100);
+    return rgb.map((ch, i) => clamp01(tone(ch, +$("gamma").value, +$("contrast").value) * g[i]));
+  }
+
+  function applyCube(rgb) {
+    const s = +$("split").value / 100;
+    const [r, g, b] = rgb;
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    const cr = r - luma, cg = g - luma, cb = b - luma;
+    const warm = Math.max(0, cr - cb);
+    const cool = Math.max(0, cb - cr);
+    const r2 = clamp01(r + s * 0.35 * warm - s * 0.12 * cool);
+    const g2 = clamp01(g - s * 0.06 * warm + s * 0.04 * cool);
+    const b2 = clamp01(b - s * 0.28 * warm + s * 0.32 * cool);
+    return [r2, g2, b2];
+  }
+
+  function apply(rgb) {
+    if (mode === "shared") return applyShared(rgb);
+    if (mode === "rgb") return applyRgb(rgb);
+    return applyCube(rgb);
+  }
+
+  function css(rgb) {
+    const z = rgb.map((v) => Math.round(clamp01(v) * 255));
+    return "rgb(" + z.join(",") + ")";
+  }
+
+  function fillPresetSelect() {
+    const sel = $("preset");
+    sel.innerHTML = "";
+    PRESETS[mode].forEach((p) => {
+      const o = document.createElement("option");
+      o.value = p.id; o.textContent = p.name;
+      sel.appendChild(o);
+    });
+    sel.selectedIndex = mode === "shared" ? 1 : 0;
+    applyPreset();
+  }
+
+  function applyPreset() {
+    const id = $("preset").value;
+    const p = PRESETS[mode].find((x) => x.id === id);
+    if (!p) return;
+    if (mode === "shared") {
+      $("gamma").value = p.g; $("contrast").value = p.c;
+    } else if (mode === "rgb") {
+      $("rg").value = p.r; $("gg").value = p.g; $("bb").value = p.b;
+      $("gamma").value = 100; $("contrast").value = 0;
+    } else {
+      $("split").value = p.s;
+    }
+    render();
+  }
+
+  function drawCurve() {
+    const cv = $("curve");
+    const ctx = cv.getContext("2d");
+    const w = cv.width, h = cv.height;
+    ctx.fillStyle = "#11100e";
+    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#3a342c";
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo((w * i) / 4, 0); ctx.lineTo((w * i) / 4, h);
+      ctx.moveTo(0, (h * i) / 4); ctx.lineTo(w, (h * i) / 4);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = "#5a5348";
+    ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w, 0); ctx.stroke();
+
+    const colors = mode === "rgb"
+      ? [["#e24a2b", 0], ["#3aa35a", 1], ["#3a7adf", 2]]
+      : [["#e8b86d", 0]];
+
+    colors.forEach(([col, ch]) => {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 2.2;
+      ctx.beginPath();
+      for (let x = 0; x <= w; x++) {
+        const v = x / w;
+        const rgb = [v, v, v];
+        const out = apply(rgb)[ch];
+        const y = h - out * h;
+        if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+  }
+
+  function drawStrip(el, mapped) {
+    el.innerHTML = "";
+    const steps = 40;
+    for (let i = 0; i < steps; i++) {
+      const t = i / (steps - 1);
+      const src = PAINT[Math.min(PAINT.length - 1, Math.floor(t * PAINT.length))];
+      const mixNext = PAINT[Math.min(PAINT.length - 1, Math.floor(t * PAINT.length) + (t * PAINT.length % 1 > 0.01 ? 1 : 0))];
+      const u = (t * PAINT.length) % 1;
+      const painted = src.map((v, k) => lerp(v, mixNext[k], u));
+      const rgb = mapped ? apply(painted) : painted;
+      const d = document.createElement("i");
+      d.style.background = css(rgb);
+      el.appendChild(d);
+    }
+  }
+
+  function drawSwatches() {
+    const box = $("swatches");
+    box.innerHTML = "";
+    PAINT.forEach((p) => {
+      const wrap = document.createElement("div");
+      wrap.className = "swatch";
+      const a = document.createElement("b"); a.style.background = css(p);
+      const b = document.createElement("b"); b.style.background = css(apply(p));
+      const s = document.createElement("span");
+      s.textContent = "in → out";
+      wrap.appendChild(a); wrap.appendChild(b); wrap.appendChild(s);
+      box.appendChild(wrap);
+    });
+  }
+
+  const BLURB = {
+    shared: "One curve, cloned onto R, G and B. Tonight’s degamma lives here. White point cannot move.",
+    rgb: "Three gains (and, if you like, three curves). This is the smallest machine that can white-balance.",
+    cube: "Output depends on the mix. Greys can stay put while reds and cyans walk apart. That is a grade."
+  };
+
+  function render() {
+    $("g-read").textContent = (+$("gamma").value / 100).toFixed(2);
+    $("rg-read").textContent = (+$("rg").value / 100).toFixed(2);
+    $("gg-read").textContent = (+$("gg").value / 100).toFixed(2);
+    $("bg-read").textContent = (+$("bb").value / 100).toFixed(2);
+    $("mode-blurb").textContent = BLURB[mode];
+    const cap = {
+      shared: "Shared 1D · gold line is the print curve. Diagonal hairline is identity.",
+      rgb: "Per-channel 1D · red / green / blue curves. Split them and the white point moves.",
+      cube: "3D look · the gold line is what happens to neutrals. Chroma is remapped off-axis (see the strips)."
+    };
+    $("curve-cap").textContent = cap[mode];
+    drawCurve();
+    drawStrip($("strip-in"), false);
+    drawStrip($("strip-out"), true);
+    drawSwatches();
+  }
+
+  function setMode(next) {
+    mode = next;
+    document.querySelectorAll("#mode-row button").forEach((b) => {
+      b.classList.toggle("active", b.dataset.mode === mode);
+    });
+    $("shared-ctrls").hidden = mode === "cube";
+    $("rgb-ctrls").hidden = mode !== "rgb";
+    $("cube-ctrls").hidden = mode !== "cube";
+    fillPresetSelect();
+  }
+
+  document.querySelectorAll("#mode-row button").forEach((b) => {
+    b.addEventListener("click", () => setMode(b.dataset.mode));
+  });
+  ["gamma", "contrast", "rg", "gg", "bb", "split"].forEach((id) => {
+    $(id).addEventListener("input", render);
+  });
+  $("preset").addEventListener("change", applyPreset);
+
+  function cost() {
+    const n = +$("nlat").value;
+    const slots = +$("n1d").value;
+    $("n-read").textContent = String(n);
+    const b1 = slots * 256 * 3 * 2;
+    const b3 = n * n * n * 3 * 2;
+    const tot = b1 + b3;
+    $("cost-out").textContent =
+      slots + " × per-channel 1D = " + b1.toLocaleString() + " B   ·   " +
+      n + "³ 3D = " + b3.toLocaleString() + " B   ·   together " + tot.toLocaleString() + " B";
+    const frac = tot / (320 * 1024);
+    const meter = $("cost-meter");
+    meter.classList.toggle("warn", frac > 0.25);
+    meter.firstElementChild.style.width = Math.min(100, frac * 100) + "%";
+  }
+  $("nlat").addEventListener("input", cost);
+  $("n1d").addEventListener("input", cost);
+
+  setMode("shared");
+  cost();
+})();
+</script>
+</body>
+</html>

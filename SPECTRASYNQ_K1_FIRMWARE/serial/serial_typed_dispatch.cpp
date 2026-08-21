@@ -41,9 +41,10 @@
 #include "k1_ap_twitch_oracle.h"
 #endif
 
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
+#ifdef K1_LOOK_LIB_V1
+#include "k1_look.h"
+#include "k1_look_file.h"
+#endif
 
 extern void check_current_function();
 extern void reboot();
@@ -1043,3 +1044,113 @@ bool serial_typed_stream_chromagram(const char* command_type, char* command_data
       USBSerial.println(stream_chromagram);
   return true;
 }
+
+#ifdef K1_LOOK_LIB_V1
+static void k1_look_print_status() {
+  const uint8_t slot = k1_look_slot;
+  const uint8_t sec = k1_look_slot_sec;
+  const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : K1_LOOK_EMPTY;
+  USBSerial.print("LOOK: slot=");
+  USBSerial.print(slot);
+  USBSerial.print(" type=");
+  USBSerial.print(k1_look_type_name(type));
+  USBSerial.print(" sec=");
+  if (sec == 255) {
+    USBSerial.print("inherit");
+  } else {
+    USBSerial.print(sec);
+  }
+  USBSerial.print(" env=k1_main_rpl_im69d");
+  USBSerial.println();
+}
+
+bool serial_typed_wrap_look(const char* command_type, char* command_data) {
+  if (strcmp(command_type, "look_status") == 0) {
+    tx_begin();
+    k1_look_print_status();
+    tx_end();
+    return true;
+  }
+  if (strcmp(command_type, "look") == 0) {
+    const int n = atoi(command_data);
+    if (n < 0 || n > 15 || !k1_look_publish((uint8_t)n)) {
+      bad_command(command_type, command_data);
+      tx_begin();
+      USBSerial.println("LOOK: empty");
+      tx_end();
+      return true;
+    }
+    CONFIG.LOOK = (uint8_t)n;
+    save_config_delayed();
+    tx_begin();
+    k1_look_print_status();
+    tx_end();
+    return true;
+  }
+  if (strcmp(command_type, "secondary_look") == 0) {
+    const int n = atoi(command_data);
+    if (n != 255 && (n < 0 || n > 15 || !k1_look_publish_sec((uint8_t)n))) {
+      bad_command(command_type, command_data);
+      return true;
+    }
+    if (n == 255) {
+      k1_look_publish_sec(255);
+    }
+    CONFIG.SECONDARY_LOOK = (n == 255) ? 255 : (uint8_t)n;
+    save_config_delayed();
+    tx_begin();
+    k1_look_print_status();
+    tx_end();
+    return true;
+  }
+  if (strcmp(command_type, "look_clear") == 0) {
+    const int n = atoi(command_data);
+    if (n < 8 || n > 15 || !k1_look_fs_clear((uint8_t)n)) {
+      bad_command(command_type, command_data);
+      return true;
+    }
+    tx_begin();
+    USBSerial.print("LOOK_CLEAR: ");
+    USBSerial.println(n);
+    tx_end();
+    return true;
+  }
+  if (strcmp(command_type, "look_load") == 0) {
+    char *comma = strchr(command_data, ',');
+    int n = atoi(command_data);
+    if (n < 8 || n > 15) {
+      bad_command(command_type, command_data);
+      return true;
+    }
+    if (comma != nullptr) {
+      const uint32_t nbytes = (uint32_t)atol(comma + 1);
+      if (!k1_look_rx_arm((uint8_t)n, nbytes)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      tx_begin();
+      USBSerial.print("LOOK_LOAD: READY slot=");
+      USBSerial.print(n);
+      USBSerial.print(" bytes=");
+      USBSerial.println(nbytes);
+      tx_end();
+      return true;
+    }
+    if (!k1_look_fs_load((uint8_t)n)) {
+      bad_command(command_type, command_data);
+      tx_begin();
+      USBSerial.println("LOOK_LOAD: missing");
+      tx_end();
+      return true;
+    }
+    tx_begin();
+    USBSerial.print("LOOK_LOAD: ok slot=");
+    USBSerial.println(n);
+    tx_end();
+    return true;
+  }
+  bad_command(command_type, command_data);
+  return true;
+}
+#endif
+
