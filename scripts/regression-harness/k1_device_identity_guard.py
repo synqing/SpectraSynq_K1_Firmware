@@ -44,14 +44,18 @@ def parse_build_line(text: str) -> dict[str, str] | None:
     return dict(m.groupdict()) if m else None
 
 
-def read_identity(port: str, baud: int = 115200, timeout_s: float = 4.0) -> dict[str, str]:
+def read_identity(
+    port: str,
+    baud: int = 115200,
+    timeout_s: float = 4.0,
+    dtr: bool = True,
+    rts: bool = False,
+) -> dict[str, str]:
     """Ask the device who it is. Read-only: sends only ':build'.
 
-    DTR must be asserted — the CDC console gates on it, and a port opened without
-    it returns zero bytes while looking perfectly healthy.
-
-    Default baud 115200 matches S3 USB-CDC (baud ignored). P4-WIFI6 CH343 UART
-    must pass baud=230400 (K1 SERIAL_BAUD).
+    S3 USB-CDC: DTR must be asserted (default). P4-WIFI6 CH343 UART: DTR asserted
+    holds EN in reset — pass dtr=False. Baud 115200 matches S3 CDC (ignored) and
+    P4 UART0 / IDF console.
     """
     import serial  # imported here so the parser stays testable without pyserial
 
@@ -59,8 +63,8 @@ def read_identity(port: str, baud: int = 115200, timeout_s: float = 4.0) -> dict
     s.port = port
     s.baudrate = baud
     s.timeout = 0.3
-    s.dtr = True   # REQUIRED. Never set False — that is a hardware reset on USB-Serial-JTAG.
-    s.rts = False
+    s.dtr = dtr
+    s.rts = rts
     s.open()
     try:
         time.sleep(0.6)
@@ -96,9 +100,10 @@ def assert_identity(
     expect_env: str | None = None,
     expect_epoch: str | None = None,
     baud: int = 115200,
+    dtr: bool = True,
 ) -> dict[str, str]:
     """Read identity and refuse to proceed unless it matches expectations."""
-    ident = read_identity(port, baud=baud)
+    ident = read_identity(port, baud=baud, dtr=dtr)
     problems = []
     if expect_git and not ident["git"].startswith(expect_git[: len(ident["git"])][:40]):
         if not (ident["git"].startswith(expect_git) or expect_git.startswith(ident["git"])):
@@ -120,6 +125,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", default="/dev/cu.usbmodem1101")
     ap.add_argument("--baud", type=int, default=115200)
+    ap.add_argument(
+        "--no-dtr",
+        action="store_true",
+        help="Leave DTR deasserted (required for P4-WIFI6 CH343; S3 CDC needs DTR).",
+    )
     ap.add_argument("--expect-git")
     ap.add_argument("--expect-env")
     ap.add_argument("--expect-epoch")
@@ -131,6 +141,7 @@ def main() -> int:
             args.expect_env,
             args.expect_epoch,
             baud=args.baud,
+            dtr=not args.no_dtr,
         )
     except IdentityMismatch as exc:
         print(f"IDENTITY FAIL: {exc}", file=sys.stderr)

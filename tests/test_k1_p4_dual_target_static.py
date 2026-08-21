@@ -60,6 +60,8 @@ def test_p4_env_is_arduino_on_p4_beside_s3():
     assert "platform/k1_p4_led_transport.cpp" in p4
     assert "K1_WIRELESS_ENABLED" not in p4
     assert "tab5" not in p4.lower()
+    assert "-DARDUINO_USB_CDC_ON_BOOT=0" in p4
+    assert "-DARDUINO_USB_MODE=0" in p4
 
 
 def test_p4_inherits_frozen_hop_not_p4_nano_40ms():

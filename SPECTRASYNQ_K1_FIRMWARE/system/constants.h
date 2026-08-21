@@ -21,6 +21,12 @@
 // AUDIO #######################################################
 
 #define SERIAL_BAUD 230400
+#ifdef K1_PLATFORM_P4
+// CH343 UART0 (GPIO37/38) shares the IDF console at 115200. Native USB CDC
+// is off on this env — see platformio.ini [env:k1_p4_wifi6].
+#undef SERIAL_BAUD
+#define SERIAL_BAUD 115200
+#endif
 #define SAMPLE_HISTORY_LENGTH 4096
 
 // Noise-calibration AP floor guards. A completed acquisition is not automatically

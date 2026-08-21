@@ -19,13 +19,3 @@
 #if defined(K1_PLATFORM_P4) && defined(K1_WIRELESS_ENABLED)
 #  error "K1_WIRELESS_ENABLED is not authorised on P4-WIFI6 (ADR-0007 radio-last)."
 #endif
-
-#if defined(K1_PLATFORM_P4) && defined(ARDUINO)
-// Lab cable is the CH343 UART (wchusbserial), not native USB CDC. Product
-// code prints to USBSerial; remap it onto UART0 so :build / IDENTITY land
-// on the plugged port.
-#ifdef USBSerial
-#undef USBSerial
-#endif
-#define USBSerial Serial0
-#endif
