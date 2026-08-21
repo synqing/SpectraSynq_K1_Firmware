@@ -2,6 +2,9 @@
 
 #include <stdint.h>
 #include "ws2816_pack.h"
+#ifdef K1_WS2816_DEGAMMA_V1
+#include "k1_ws2816_degamma.h"
+#endif
 
 // K1 Lever-2 emit helper: SQ15x16 → uint16, incandescent-once, Q16 limiter,
 // then ws2816_pack_pixel. Does not call FastLED.show.
@@ -36,7 +39,11 @@ static inline uint16_t k1_lever2_sq_to_u16(SQ15x16 ch, SQ15x16 inc) {
   if (v > 65535) {
     return 65535;
   }
+#ifdef K1_WS2816_DEGAMMA_V1
+  return k1_ws2816_degamma_u16((uint16_t)v);
+#else
   return (uint16_t)v;
+#endif
 }
 
 static inline void k1_lever2_pack_frame(const CRGB16 *scaled, uint16_t n, CRGB *wire,

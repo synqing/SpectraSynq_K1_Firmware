@@ -19,6 +19,7 @@ MANIFEST = json.loads(
 )
 
 FLAG = "K1_WS2816_LEVER2_V1"
+DEGAMMA_FLAG = "K1_WS2816_DEGAMMA_V1"
 HD_FLAG = "K1_PALETTE_HD_V2"
 SHIPPABLE_ENVS = {"k1_hardware", "k1_prod_im73d", "k1_bench_reference"}
 
@@ -59,6 +60,7 @@ def test_lever2_env_exists_and_carries_flag():
     assert re.search(r"^extends\s*=\s*env:k1_hardware\s*$", body, re.M)
     have = _effective_flags("k1_main_rpl_im69d", sections)
     assert FLAG in have
+    assert DEGAMMA_FLAG in have
     assert HD_FLAG not in have
     assert "PalettesHD_RangeV2.cpp" not in body
     assert "k1_ws2816_lever2" not in sections
@@ -66,7 +68,7 @@ def test_lever2_env_exists_and_carries_flag():
 
 def test_shippable_envs_do_not_define_lever2():
     sections = _sections()
-    banned = {FLAG, HD_FLAG}
+    banned = {FLAG, DEGAMMA_FLAG, HD_FLAG}
     leaks = {
         env: sorted(_effective_flags(env, sections) & banned)
         for env in SHIPPABLE_ENVS

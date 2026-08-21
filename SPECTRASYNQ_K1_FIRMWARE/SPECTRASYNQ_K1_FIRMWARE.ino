@@ -743,9 +743,9 @@ void setup() {
 #endif
 
 #if K1_RMT_ALLOC_ON_VP_CORE_V1
-  // Intro and the bootstrap FastLED.show() run on Core 0 (setup). They are
-  // the first loadPixelData and pin RMT IRQs on the audio core. VP's first
-  // show_leds() allocates instead. See 20260819T-fps-agc-probe-9087 RESULT.
+  // Do not show() from setup: the first loadPixelData pins RMT refill IRQs
+  // on this core (AP). Intro moves to led_thread on K1_LED_TASK_CORE.
+  // See 20260819T-fps-agc-probe-9087 RESULT.
 #else
   if (CONFIG.BOOT_ANIMATION == true) {
     intro_animation();
@@ -1308,6 +1308,15 @@ void led_thread(void* arg) {
     USBSerial.println(registry_ok ? "PASS" : "FAIL (legacy fallback)");
   }
 #endif
+#endif
+#if K1_RMT_ALLOC_ON_VP_CORE_V1
+  // First show() on this core allocates RMT. Play the boot bounce here so it
+  // is visible without pinning refill IRQs on AP. Before TWDT subscribe:
+  // 112 frames of dual-DIN show can exceed the freeze-guard timeout.
+  if (CONFIG.BOOT_ANIMATION == true) {
+    USBSerial.println("INTRO: vp_core");
+    intro_animation();
+  }
 #endif
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
   if (esp_task_wdt_status(NULL) != ESP_OK) {

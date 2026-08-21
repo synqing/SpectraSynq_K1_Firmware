@@ -71,6 +71,12 @@ def test_rmt_alloc_on_vp_core_skips_core0_show():
     assert "#if K1_RMT_ALLOC_ON_VP_CORE_V1" in ino
     assert "#if !K1_RMT_ALLOC_ON_VP_CORE_V1" in ino
     assert "FastLED.show();" in ino
+    setup = ino[ino.index("void setup()") : ino.index("void led_thread")]
+    led_head = ino[ino.index("void led_thread") : ino.index("while (true) {", ino.index("void led_thread"))]
+    assert "intro_animation();" in setup
+    assert setup.index("#else") < setup.index("intro_animation();")
+    assert "intro_animation();" in led_head
+    assert 'INTRO: vp_core' in led_head
 
 
 def test_show_skip_command_and_render_gate_exist():

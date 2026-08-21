@@ -32,16 +32,50 @@ def apply_q16(ch: int, s: int) -> int:
 
 
 def pack_frame_u16(
-    rgb16: Sequence[Tuple[int, int, int]], budget_proxy: int
+    rgb16: Sequence[Tuple[int, int, int]],
+    budget_proxy: int,
+    degamma: bool = False,
+    degamma_emit_only: bool = False,
 ) -> List[WirePixel]:
+    """Mirror k1_lever2_pack_frame.
+
+    degamma=True applies the cube-spaced inverse-gamma at the sq_to_u16
+    site (both accumulate and emit). degamma_emit_only is the S9 fault
+    case: curve on emit only, so a tight budget measures the wrong total.
+    """
+    from ws2816_degamma_lut import apply_u16 as degamma_u16
+
     n = len(rgb16)
+    if degamma_emit_only:
+        if budget_proxy >= n * 3 * 65535:
+            return [
+                pack_pixel(degamma_u16(r), degamma_u16(g), degamma_u16(b))
+                for r, g, b in rgb16
+            ]
+        total = sum(r + g + b for r, g, b in rgb16)
+        s = scale_q16(total, budget_proxy)
+        return [
+            pack_pixel(
+                degamma_u16(apply_q16(r, s)),
+                degamma_u16(apply_q16(g, s)),
+                degamma_u16(apply_q16(b, s)),
+            )
+            for r, g, b in rgb16
+        ]
+
+    mapped = [
+        (degamma_u16(r) if degamma else r,
+         degamma_u16(g) if degamma else g,
+         degamma_u16(b) if degamma else b)
+        for r, g, b in rgb16
+    ]
     if budget_proxy >= n * 3 * 65535:
-        return [pack_pixel(r, g, b) for r, g, b in rgb16]
-    total = sum(r + g + b for r, g, b in rgb16)
+        return [pack_pixel(r, g, b) for r, g, b in mapped]
+    total = sum(r + g + b for r, g, b in mapped)
     s = scale_q16(total, budget_proxy)
     return [
         pack_pixel(apply_q16(r, s), apply_q16(g, s), apply_q16(b, s))
-        for r, g, b in rgb16
+        for r, g, b in mapped
     ]
 
 

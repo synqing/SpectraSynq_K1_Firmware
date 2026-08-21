@@ -30,12 +30,31 @@ class TestBootIntroStatic(unittest.TestCase):
 
         setup = read(INO)
         setup_start = setup.index("void setup()")
-        setup = setup[setup_start:]
+        setup_end = setup.index("void led_thread")
+        setup = setup[setup_start:setup_end]
         intro_pos = setup.index("intro_animation();")
         self.assertLess(setup.index("init_secondary_leds();"), intro_pos)
         self.assertLess(setup.index("ENABLE_SECONDARY_LEDS = true;"), intro_pos)
         self.assertLess(setup.index("FastLED.setCorrection(TypicalLEDStrip);"), intro_pos)
         self.assertLess(intro_pos, setup.index("xTaskCreatePinnedToCore"))
+        self.assertIn("#if K1_RMT_ALLOC_ON_VP_CORE_V1", setup)
+        self.assertLess(setup.index("#if K1_RMT_ALLOC_ON_VP_CORE_V1"), intro_pos)
+        self.assertLess(setup.index("#else"), intro_pos)
+
+    def test_rmt_vp_intro_runs_on_led_thread_before_wdt(self):
+        """Main RPL (K1_RMT_ALLOC_ON_VP_CORE_V1) plays intro on Core 1, not setup."""
+        source = read(INO)
+        led_start = source.index("void led_thread")
+        loop_start = source.index("while (true) {", led_start)
+        led_head = source[led_start:loop_start]
+        self.assertIn("#if K1_RMT_ALLOC_ON_VP_CORE_V1", led_head)
+        self.assertIn("intro_animation();", led_head)
+        self.assertIn('USBSerial.println("INTRO: vp_core");', led_head)
+        self.assertIn("CONFIG.BOOT_ANIMATION == true", led_head)
+        intro_pos = led_head.index("intro_animation();")
+        wdt_pos = source.index("esp_task_wdt_add", led_start)
+        self.assertLess(led_start + intro_pos, wdt_pos)
+        self.assertLess(wdt_pos, source.index("while (true) {", led_start))
 
     def test_intro_writes_and_clears_both_channels(self):
         region = intro_region()

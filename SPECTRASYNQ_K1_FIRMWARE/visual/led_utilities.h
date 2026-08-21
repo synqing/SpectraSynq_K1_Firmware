@@ -29,6 +29,9 @@
 #ifdef K1_BLE_REMOTED
 #include "ble_remoted_central.h" // k1_ble_remoted_is_linked() — BLE standby-dim pin
 #endif
+#if defined(K1_WS2816_DEGAMMA_V1) && !defined(K1_WS2816_LEVER2_V1)
+#error "K1_WS2816_DEGAMMA_V1 requires K1_WS2816_LEVER2_V1"
+#endif
 #ifdef K1_WS2816_LEVER2_V1
 #include "k1_lever2_emit.h"
 #endif

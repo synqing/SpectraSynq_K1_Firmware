@@ -32,6 +32,7 @@ def test_main_rpl_env_flags_and_extends_hardware():
     assert "-DK1_WFHYB_M32_VARIANTS_V1" in block
     assert "-DK1_EDGE_PALETTE_HONOUR_V1" in block
     assert "-DK1_WS2816_LEVER2_V1" in block
+    assert "-DK1_WS2816_DEGAMMA_V1" in block
     assert "-DK1_PALETTE_HD_V2" not in block
     assert "-DK1_BENCH_REFERENCE_PINMAP" not in block
 
