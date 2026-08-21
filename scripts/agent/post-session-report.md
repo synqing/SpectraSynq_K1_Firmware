@@ -5,6 +5,69 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-21 Main RPL boot intro on Core 1
+
+```text
+session_objective:       Captain GO: restore boot intro on Core 1, then flash Main RPL.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 2e6af75f
+branch_head_at_end:      445c79ce
+files_changed:           .ino led_thread intro; degamma LUT + lever2 emit + platformio RPL -D; static tests; registry + handoff stamp
+commands_run:            pytest 1437 passed / 1 skipped; pio k1_hardware SUCCESS (hook); k1-flash-verified.sh k1_main_rpl_im69d --port /dev/cu.usbmodem1401
+validation_results:      BEFORE d276fd68. AFTER IDENTITY OK git=445c79ce env=k1_main_rpl_im69d epoch=1787313914. Guard Main RPL B4:3A:45:A5:87:90 chip 9087A500. Hash verified. No cal.
+evidence_captured:       flash script FLASHED AND VERIFIED. Follow-up :dump blocked (port busy — likely Captain serial).
+blockers:                Captain eyes-on for the bounce. Port 1401 busy after flash.
+generated_files_ignored: none
+safety_constraints:      F887 NO; B489 not flashed; no cal
+thinking_skill_used:     scientific-method (prior) + TWDT-before-subscribe placement
+skills_used:             Agent OS; ship-path-required; hardware-truth-gate (identity before write)
+specialists_used:        none
+next_recommended_action: Captain watches boot bounce. Power-cycle if the flash reset already passed. Close = bounce visible + SYSTEM_FPS still ~135.
+```
+
+---
+
+## Session Report — 2026-08-21 WS2816C inverse-gamma (Main RPL)
+
+```text
+session_objective:       Implement K1_WS2816_DEGAMMA_V1 inverse-gamma on Lever-2 packer; host-gate only; no flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 2e6af75f
+branch_head_at_end:      2e6af75f (uncommitted degamma working tree)
+files_changed:           k1_ws2816_degamma.h (new cube-spaced LUT); k1_lever2_emit.h sq_to_u16 site; led_utilities.h require-LEVER2 error; platformio.ini k1_main_rpl_im69d -D; lever2 host/tests.
+commands_run:            pytest tests/ 1436 passed / 1 skipped; bash scripts/agent/pio-build.sh k1_main_rpl_im69d SUCCESS (23.88s). No flash. No cal.
+validation_results:      Cube LUT worst error 2 codes vs exact v^(1/2.2); segment-0 at v=61 is 2745 vs exact 2746 (uniform-256 would undershoot ~54%). Firmware bin SHA256 db09d42c… (local .pio, not shipped). k1_hardware / B489 / F887 not flashed.
+evidence_captured:       tests/ws2816_degamma_lut.py generator is the LUT oracle.
+blockers:                Waiting Captain flash GO for 9087A500. Average current will rise after de-gamma; Q16 limiter still a no-op; measured mA budget is a later lane.
+generated_files_ignored: unrelated dirty i2sled RESULT.* left untouched.
+safety_constraints:      No flash; no cal; flag only on k1_main_rpl_im69d; no serial knob.
+thinking_skill_used:     S9 fix-feasibility (cube-spaced nodes, insert in sq_to_u16 before limiter).
+skills_used:             Agent OS; ship-path-required; k1-ws2816-lever2 audit S1–S9.
+specialists_used:        none.
+next_recommended_action: Captain GO → commit this working set → k1-flash-verified.sh k1_main_rpl_im69d --port /dev/cu.usbmodem1401 → side-by-side eyes-on.
+```
+
+---
+
+## Session Report — 2026-08-21 I2S probe host checksum diagnosis
+
+```text
+session_objective:       Captain "Get it done": close the named remaining agent step (host-only why ROM XOR ≠ stored 0xcc / INIT_LEDS false gate). No flash.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 2e6af75f
+branch_head_at_end:      2e6af75f (docs in evidence pack; working tree already had unrelated lever2 degamma dirty — not touched)
+files_changed:           docs/forensics/runtime-evidence/20260820T-i2sled-direct-rpl-9087/{DIAGNOSIS.md,RESULT.md,RESULT.json,flash_and_gate.py,flash_plan.md,image_info_*.txt}
+commands_run:            session-bootstrap PASS; esptool image_info on staged probe/restore bins (venv python); SHA256SUMS verified; no pio upload; no serial write
+validation_results:      Probe image Checksum 0xcc valid, SHA 33e163cf… valid, ELF 5b23f25c6 matches KEEP boot. Bootloader+partitions identical to restore. Two stacked failures: (1) --flash_size 16MB SHA-updated bootloader → varying XOR; (2) keep write booted then Core 1 LoadProhibited on Yves first show. INIT_LEDS PASS is Core-0 show skip. Silicon unchanged d276fd68 / k1_main_rpl_im69d.
+evidence_captured:       DIAGNOSIS.md + image_info_probe.txt + image_info_restore.txt
+blockers:                I2S/LCD_CAM stays PARKED. Yves show() still panics — keep is not a reflash licence.
+generated_files_ignored: none in this step (bins already in pack, gitignored)
+safety_constraints:      no flash; no cal; F887 NO; did not touch dirty lever2 degamma files
+thinking_skill_used:     Scientific method (host image_info vs BOOT_GATE vs KEEP ELF SHA) + map-territory (verify_flash ≠ bootable; INIT_LEDS ≠ I2S_EMIT)
+skills_used:             Agent OS; spec-recall; firmware-crash-analysis; ship-path-required
+specialists_used:        none
+next_recommended_action: Stop. Captain names a new Yves-safe image before any i2sled flash. F887_PRODUCTION_FLASH when F887 returns.
+```
+
+---
+
 ## Session Report — 2026-08-20 honour promote + B489 G8
 
 ```text

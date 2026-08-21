@@ -3,11 +3,11 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
-**Live lane (2026-08-20):** palette-safe honour **closed**. `K1_EDGE_PALETTE_HONOUR_V1`
-is on `k1_hardware` (`69e21140`). Main RPL `9087A500` remains `79d220fa`.
-B489 `B489A500` on `/dev/cu.usbmodem1101` is `k1_bench_im69d` @ `69e21140`
-(`IDENTITY OK` epoch `1787164605`, `split_palette`). G8 **CLOSED on bench**.
-F887 OFFSITE. AP-input P4 stays open. No cal.
+**Live lane (2026-08-21):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @ `445c79ce`**
+(`IDENTITY OK` epoch `1787313914`) — VP-core boot intro + WS2816 degamma.
+Palette-safe honour **closed** on `k1_hardware` (`69e21140`). B489 `B489A500` on
+`/dev/cu.usbmodem1101` last stamped `k1_bench_im69d` @ `d276fd68`. G8 **CLOSED
+on bench**. F887 OFFSITE. AP-input P4 stays open. No cal.
 
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
@@ -42,16 +42,12 @@ touched. Port 1401 is Main RPL, not this chip.
 Production honour is on `k1_hardware` as of `69e21140`. The other five
 colour-fix flags stay leak-blocked.
 
-**Main RPL = ON SILICON @ `79d220fa` / `k1_main_rpl_im69d`**
+**Main RPL = ON SILICON @ `445c79ce` / `k1_main_rpl_im69d`**
 (USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-`IDENTITY OK: git=79d220fa env=k1_main_rpl_im69d epoch=1787158141`.
-Clock-fix ON + RMT alloc on VP core + Lever-2 look + **palette-safe
-EdgeMixer resolver** (HONOUR evolved: no bypass). Post-flash dump:
-`SYSTEM_FPS: 137.69` `LED_FPS: 152.46`. After `:edge_mode=complementary`:
-`EDGE_EFFECTIVE_SECONDARY: complementary_palette` /
-`EDGE_EFFECTIVE_PRIMARY: complementary_palette`. Cal inherited. Do **not**
-re-fire `start_noise_cal`. Prior ship `4a2c7393` is the restore target if
-Captain rejects the look. Probe proof remains `b8cd4ca9`. F887 not touched.
+`IDENTITY OK: git=445c79ce env=k1_main_rpl_im69d epoch=1787313914`.
+Clock-fix ON + RMT alloc on VP core + Lever-2 look + palette-safe resolver +
+**boot intro on `led_thread`** + `K1_WS2816_DEGAMMA_V1`. Cal inherited. Do
+**not** re-fire `start_noise_cal`. Prior restore `d276fd68`. F887 not touched.
 B489 later @ `69e21140` on `/dev/cu.usbmodem1101`. **LED-buffer rtrace PASS**
 closes the resolver
 (`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).
