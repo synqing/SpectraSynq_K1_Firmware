@@ -10,7 +10,7 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 ```text
 session_objective:       Captain GO: commit look library and flash Main RPL now.
 branch_head_at_start:    feat/k1-scheduling-generation-hardening @ dc1e6991 dirty look-lib
-branch_head_at_end:      38428a82 (firmware) + docs stamp pending
+branch_head_at_end:      38428a82 (firmware on silicon) + docs registry/handoff stamp
 files_changed:           k1_look.* packer CONFIG serial z-hotkey platformio RPL -DK1_LOOK_LIB_V1 tests goldens PROCEDURE; registry+handoff stamp
 commands_run:            pytest 1464 passed / 1 skipped; pio k1_hardware SUCCESS (hook); k1-flash-verified.sh k1_main_rpl_im69d --port /dev/cu.usbmodem1401
 validation_results:      BEFORE 445c79ce. AFTER IDENTITY OK git=38428a82 env=k1_main_rpl_im69d epoch=1787324114. Guard Main RPL B4:3A:45:A5:87:90 chip 9087A500. Hash verified. Wrote 710368 bytes. No cal. F887/B489 not flashed.
