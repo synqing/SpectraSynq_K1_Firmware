@@ -17,7 +17,7 @@ HOST_GLOBALS = HARNESS / "render_host_globals.cpp"
 FIXEDPOINTS = ROOT / "libraries" / "FixedPoints" / "src"
 FW_SUBDIRS = [
     "serial", "system", "control", "director", "visual", "audio",
-    "effects", "diag", "calibration", "persistence", "network",
+    "effects", "diag", "calibration", "persistence", "network", "platform",
 ]
 
 DEFINES = [

@@ -38,6 +38,7 @@
 #ifdef K1_LED_I2S_DIRECT_V1
 #include "k1_i2s_emit.h"
 #endif
+#include "k1_led_emit.h"
 
 extern void start_noise_cal();
 
@@ -1343,7 +1344,11 @@ inline void show_leds() {
   // wrapper hashes the actual post-scale/dither bytes submitted to ESP-IDF.
   k1_scheduling_trace_before_fastled_show();
 #endif
+#ifdef K1_PLATFORM_P4
+  k1_led_emit_show(leds_out, CONFIG.LED_COUNT);
+#else
   FastLED.show(); // This will update both LED strips
+#endif
 #if ENABLE_VP_PERF_AUDIT
   if (vp_perf.running && vp_perf_show_start_us != 0) {
     vp_perf_record(vp_perf.show, uint32_t(esp_timer_get_time() - vp_perf_show_start_us));
@@ -1378,6 +1383,15 @@ inline void init_leds() {
   
   // Initialize the lerp parameters for scale_to_strip optimization
   init_lerp_params();
+
+#ifdef K1_PLATFORM_P4
+  k1_p4_chip_guard_boot();
+  leds_started = k1_p4_led_init();
+  show_leds();
+  USBSerial.print("INIT_LEDS: ");
+  USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
+  return;
+#endif
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
 #ifdef K1_WS2816_LEVER2_V1
@@ -2608,6 +2622,15 @@ inline CRGB16 adjust_hue_and_saturation(CRGB16 color, SQ15x16 hue, SQ15x16 satur
 inline void init_secondary_leds() {
   leds_scaled_secondary = new CRGB16[SECONDARY_LED_COUNT];
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
+
+#ifdef K1_PLATFORM_P4
+  // Named hardware delta (ADR-0007): this lab loom has dual-DIN primary only.
+  for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
+    leds_out_secondary[x] = CRGB(0, 0, 0);
+  }
+  USBSerial.println("INIT_SECONDARY_LEDS: skipped (P4-WIFI6 primary dual-DIN only)");
+  return;
+#endif
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
 #ifdef K1_WS2816_LEVER2_V1

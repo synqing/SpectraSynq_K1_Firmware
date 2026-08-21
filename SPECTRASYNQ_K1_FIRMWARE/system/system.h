@@ -6,6 +6,7 @@
 #include "constants.h" // For band definitions, NUM_FREQS etc.
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
+#include "k1_led_emit.h"
 
 uint32_t timing_start = 0;
 extern void run_sweet_spot();
@@ -24,9 +25,13 @@ void reboot() {
     show_leds();
     FastLED.delay(12); // Takes ~250ms total
   }
-  FastLED.setBrightness(0);
-  FastLED.show();
-  ESP.restart();
+    FastLED.setBrightness(0);
+#ifdef K1_PLATFORM_P4
+    k1_led_emit_show(leds_out, CONFIG.LED_COUNT);
+#else
+    FastLED.show();
+#endif
+    ESP.restart();
 }
 
 void start_timing(const char* func_name) {
@@ -168,7 +173,9 @@ void init_usb() {
 
 #if defined(K1_HARDWARE)
   USBSerial.setTxBufferSize(4096);
+#ifndef K1_PLATFORM_P4
   USBSerial.setTxTimeoutMs(20);
+#endif
   USBSerial.begin(SERIAL_BAUD);
 #else
   USB.begin();

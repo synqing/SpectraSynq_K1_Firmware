@@ -101,7 +101,7 @@ HOST_GLOBALS = ROOT / "scripts" / "regression-harness" / "render_host_globals.cp
 # Firmware subdirs added to -I (mirrors oracle_gdft.py FW_SUBDIRS — the full set a
 # globals.h TU reaches).
 FW_SUBDIRS = ("audio", "visual", "effects", "director", "serial", "system",
-              "persistence", "calibration", "diag", "control", "network")
+              "persistence", "calibration", "diag", "control", "network", "platform")
 
 # COMMON substrate the render/GDFT oracles use to satisfy globals.h's data globals
 # + palette tables + the host singletons (Serial/FastLED/ESP/CONFIG).

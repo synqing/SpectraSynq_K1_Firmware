@@ -67,8 +67,10 @@
 #endif
 #ifdef K1_MIC_IM69D_PDM_V1
 #include <esp_idf_version.h>
+#ifndef K1_PLATFORM_P4
 #if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
 #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
+#endif
 #endif
 // ESP-IDF PDM electrical naming is the inverse of Infineon's microphone naming:
 // RIGHT means SELECT HIGH; LEFT means SELECT LOW. With clk_inv=false, stereo DMA

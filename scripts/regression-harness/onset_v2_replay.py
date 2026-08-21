@@ -208,7 +208,7 @@ def build_replay(defines, workdir, compiler="clang++"):
     binary = workdir / "onset_v2_replay"
     cmd = [compiler, "-std=c++17", "-O2", "-I", str(stub), "-I", str(FIRMWARE)]
     for d in ("audio", "visual", "effects", "director", "serial", "system",
-              "persistence", "calibration", "diag"):
+              "persistence", "calibration", "diag", "platform"):
         cmd += ["-I", str(FIRMWARE / d)]
     for d in defines:
         cmd += [f"-D{d}"]

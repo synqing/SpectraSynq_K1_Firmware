@@ -49,6 +49,9 @@ def read_identity(port: str, baud: int = 115200, timeout_s: float = 4.0) -> dict
 
     DTR must be asserted — the CDC console gates on it, and a port opened without
     it returns zero bytes while looking perfectly healthy.
+
+    Default baud 115200 matches S3 USB-CDC (baud ignored). P4-WIFI6 CH343 UART
+    must pass baud=230400 (K1 SERIAL_BAUD).
     """
     import serial  # imported here so the parser stays testable without pyserial
 
@@ -92,9 +95,10 @@ def assert_identity(
     expect_git: str | None = None,
     expect_env: str | None = None,
     expect_epoch: str | None = None,
+    baud: int = 115200,
 ) -> dict[str, str]:
     """Read identity and refuse to proceed unless it matches expectations."""
-    ident = read_identity(port)
+    ident = read_identity(port, baud=baud)
     problems = []
     if expect_git and not ident["git"].startswith(expect_git[: len(ident["git"])][:40]):
         if not (ident["git"].startswith(expect_git) or expect_git.startswith(ident["git"])):
@@ -115,12 +119,19 @@ def assert_identity(
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--port", default="/dev/cu.usbmodem1101")
+    ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--expect-git")
     ap.add_argument("--expect-env")
     ap.add_argument("--expect-epoch")
     args = ap.parse_args()
     try:
-        ident = assert_identity(args.port, args.expect_git, args.expect_env, args.expect_epoch)
+        ident = assert_identity(
+            args.port,
+            args.expect_git,
+            args.expect_env,
+            args.expect_epoch,
+            baud=args.baud,
+        )
     except IdentityMismatch as exc:
         print(f"IDENTITY FAIL: {exc}", file=sys.stderr)
         return 2

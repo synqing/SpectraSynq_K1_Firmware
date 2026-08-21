@@ -2,6 +2,15 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-21 — ADR-0007 K1 full-parity dual-target (S3 + P4-WIFI6)
+
+**Authority:** `docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md`
+**Lane:** accepted architecture; not a flash GO; not the shipping stamp.
+
+Captain locked product-first full parity: shared K1 in this tree, `env:k1_p4_wifi6` beside intact `k1_hardware` (54.03.20 / IDF 5.4.1). P4-Nano is donor-only. WS2816 protocol stays in the P4 LED adapter. Hop remains 12.8 kHz / 96 / d3 / 7.5 ms. Radio last.
+
+This is not a union of live lanes onto `main`. Scheduling hardening / Main RPL silicon remain as previously stamped.
+
 ## 2026-08-16 — G0R Captain stamp A
 
 **Active authority:** `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`

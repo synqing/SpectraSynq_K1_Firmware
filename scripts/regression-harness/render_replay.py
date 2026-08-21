@@ -67,7 +67,7 @@ BYTE_COUNT = LED_COUNT * 3
 # k1-firmware-restructure-and-rebrand-plan.md). Added to -I so bare #includes
 # resolve regardless of subdir; also prefixed onto the compiled .cpp paths.
 FW_SUBDIRS = ("audio", "visual", "effects", "director", "serial", "system",
-              "persistence", "calibration", "diag")
+              "persistence", "calibration", "diag", "platform")
 
 # Common firmware sources every mode needs (render-param boundary + palette data
 # + the Row-3 data TU). globals.cpp is the firmware's own hand-written data

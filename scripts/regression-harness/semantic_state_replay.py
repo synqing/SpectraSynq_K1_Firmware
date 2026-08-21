@@ -224,7 +224,7 @@ def run_replay(compiler="clang++", keep_dir=None, defines=None):
             "-I", str(stub_dir),
             "-I", str(FW),
             *[a for d in ("audio", "visual", "effects", "director", "serial",
-                          "system", "persistence", "calibration", "diag")
+                          "system", "persistence", "calibration", "diag", "platform")
               for a in ("-I", str(FW / d))],
             str(FW / "audio" / "k1_semantic_state.cpp"),
             str(FW / "audio" / "k1_tempo.cpp"),

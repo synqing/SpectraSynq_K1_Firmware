@@ -174,6 +174,34 @@ def validate_upload_target(
     if port is None:
         return False, f"{pioenv}: {upload_port} is not currently enumerated"
 
+    device = str(port.get("device") or upload_port)
+    if pioenv == "k1_p4_wifi6":
+        if "usbmodem" in device:
+            return (
+                False,
+                (
+                    f"{pioenv}: {upload_port} is native USB CDC (usbmodem) — "
+                    "refuses Tab5 and S3. P4-WIFI6 lab upload is wchusbserial only "
+                    "(ADR-0007)."
+                ),
+            )
+        if "wchusbserial" not in device:
+            return (
+                False,
+                (
+                    f"{pioenv}: {upload_port} is not a WCH UART bridge; "
+                    "P4-WIFI6 upload is wchusbserial only (ADR-0007)."
+                ),
+            )
+    elif "wchusbserial" in device:
+        return (
+            False,
+            (
+                f"{pioenv}: {upload_port} is a P4 WCH UART bridge; "
+                "S3 K1 envs refuse wchusbserial (ADR-0007)."
+            ),
+        )
+
     actual = _norm_serial(port.get("serial_number"))
     matched = next(
         (t for t in candidates if actual == _norm_serial(t.usb_serial)),

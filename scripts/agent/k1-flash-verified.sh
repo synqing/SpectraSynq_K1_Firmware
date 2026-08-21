@@ -38,6 +38,10 @@ fi
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 GUARD="scripts/regression-harness/k1_device_identity_guard.py"
+IDENTITY_BAUD=115200
+if [[ "$ENV_NAME" == "k1_p4_wifi6" ]]; then
+  IDENTITY_BAUD=230400
+fi
 
 say() { printf '\n\033[1m== %s\033[0m\n' "$*"; }
 
@@ -63,7 +67,7 @@ if [[ -n "$PORT" ]]; then
   # HF-57 (canon 2026-08-14): prefix so a grep for the verdict can NEVER match
   # this pre-flash line. The ONLY success signals are this script's exit code 0
   # and the FLASHED-AND-VERIFIED block below (post-flash identity, NEW epoch).
-  python3 "$GUARD" --port "$PORT" 2>&1 | sed 's/^/BEFORE-FLASH: /' || echo "  (no identity — device may be unflashed or busy)"
+  python3 "$GUARD" --port "$PORT" --baud "$IDENTITY_BAUD" 2>&1 | sed 's/^/BEFORE-FLASH: /' || echo "  (no identity — device may be unflashed or busy)"
 fi
 
 # ── 2. flash. The pio upload guard verifies chip-id ↔ env on its own. ──────────
@@ -85,7 +89,7 @@ if [[ -z "$PORT" ]]; then
           | sed -n 's/^upload_port *= *//p' | head -1 | sed 's#/dev/tty#/dev/cu#')"
 fi
 say "Device AFTER flash — must be $EXPECT_GIT"
-if ! python3 "$GUARD" --port "$PORT" --expect-git "$EXPECT_GIT" --expect-env "$ENV_NAME"; then
+if ! python3 "$GUARD" --port "$PORT" --baud "$IDENTITY_BAUD" --expect-git "$EXPECT_GIT" --expect-env "$ENV_NAME"; then
   echo >&2
   echo "FLASH NOT VERIFIED. The device is not running the build we just made." >&2
   echo "Do NOT collect evidence from it. Resolve device ownership first." >&2
@@ -93,9 +97,9 @@ if ! python3 "$GUARD" --port "$PORT" --expect-git "$EXPECT_GIT" --expect-env "$E
 fi
 
 # ── 4. registry-ready line — deployed state is part of the flash, not a chore ──
-CHIP="$(python3 - "$PORT" <<'PY' 2>/dev/null || true
+CHIP="$(python3 - "$PORT" "$IDENTITY_BAUD" <<'PY' 2>/dev/null || true
 import sys, time, serial
-s = serial.Serial(); s.port = sys.argv[1]; s.baudrate = 115200; s.timeout = 0.3
+s = serial.Serial(); s.port = sys.argv[1]; s.baudrate = int(sys.argv[2]); s.timeout = 0.3
 s.dtr = True; s.rts = False; s.open(); time.sleep(0.6); s.reset_input_buffer()
 s.write(b":dump\n"); s.flush()
 buf = bytearray(); t = time.time() + 3

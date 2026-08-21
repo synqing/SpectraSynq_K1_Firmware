@@ -264,6 +264,39 @@ class K1UploadGuardTest(unittest.TestCase):
             f"(cross-flash brick risk — register them): {missing}",
         )
 
+    def test_p4_env_accepts_wch_serial_and_refuses_s3_cdc(self):
+        p4_ports = [
+            {
+                "device": "/dev/tty.wchusbserial5AAF2781791",
+                "serial_number": "5AAF278179",
+                "location": "0-1",
+                "hwid": "SER=5AAF278179",
+            }
+        ]
+        ok, message = self.guard.validate_upload_target(
+            "k1_p4_wifi6",
+            "/dev/tty.wchusbserial5AAF2781791",
+            p4_ports,
+        )
+        self.assertTrue(ok, message)
+        self.assertIn("PENDING_LIVE_P4_WIFI6", message)
+
+        ok2, message2 = self.guard.validate_upload_target(
+            "k1_p4_wifi6",
+            "/dev/tty.usbmodem1401",
+            self.ports,
+        )
+        self.assertFalse(ok2, message2)
+        self.assertIn("usbmodem", message2)
+
+        ok3, message3 = self.guard.validate_upload_target(
+            "k1_hardware",
+            "/dev/tty.wchusbserial5AAF2781791",
+            p4_ports,
+        )
+        self.assertFalse(ok3, message3)
+        self.assertIn("wchusbserial", message3)
+
 
 if __name__ == "__main__":
     unittest.main()

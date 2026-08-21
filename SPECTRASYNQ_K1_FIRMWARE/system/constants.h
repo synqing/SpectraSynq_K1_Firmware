@@ -5,6 +5,7 @@
 #include <FixedPointsCommon.h> // Row 2 (Finding #1b): SQ15x16 alias lives here, not in FixedPoints.h — self-contained for multi-TU include
 #include <stdint.h>      // Include for uint32_t type used within
 #include "config_types.h" // PIO-SPIKE2: ODR-safe enums/macros (LED_STRIP_MODE, LED_COUNT_VALUE, DEFAULT_SAMPLE_RATE, led_types, lightshow_modes) + struct conf, shared with globals_config.cpp
+#include "k1_platform.h"  // ADR-0007 dual-target chip guard
 
 // Coarse firmware version echoed on serial (:version/:build) and in NVS config paths.
 #ifndef FIRMWARE_VERSION
@@ -369,7 +370,43 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 // GPIO PINS #######################################################
 
 #if defined(K1_HARDWARE)
-  #if defined(K1_MAIN_RPL_PINMAP_V1)
+  #if defined(K1_P4_WIFI6_PINMAP_V1)
+    // Waveshare ESP32-P4-WIFI6 lab board (ADR-0007). Not bench-S3 GPIO 4/5.
+    // IM69D130 PDM CLK=22 / DATA=21. LED DIN-A=GPIO4, DIN-B=GPIO5 (one 160-px
+    // bar split 80/80). Secondary strip is unwired on this loom. Do not steal
+    // C6 SDIO 14–19. RNG on free GPIO31 (GPIO8 is ES8311 SCL on this schematic).
+    #define I2S_BCLK_PIN 12
+    #define I2S_LRCLK_PIN 10
+    #define I2S_DIN_PIN 11
+
+    #define LED_DATA_PIN 4
+    #define LED_CLOCK_PIN 5
+    #define SECONDARY_LED_DATA_PIN 31
+    #define SECONDARY_LED_CLOCK_PIN 31
+
+    #ifdef K1_MIC_IM69D_PDM_V1
+      #define K1_PDM_CLK_PIN 22
+      #define K1_PDM_DIN_PIN 21
+      #define K1_IM69_PDM_SEL_PIN 12
+    #else
+      #error "K1_P4_WIFI6_PINMAP_V1 requires K1_MIC_IM69D_PDM_V1 (IM69 on 22/21)"
+    #endif
+
+    #define I2C_SDA_PIN (-1)
+    #define I2C_SCL_PIN (-1)
+
+    #define PHOTONS_PIN (-1)
+    #define CHROMA_PIN (-1)
+    #define MOOD_PIN (-1)
+    #define NOISE_CAL_PIN (-1)
+    #define MODE_PIN (-1)
+    #define SWEET_SPOT_LEFT_PIN (-1)
+    #define SWEET_SPOT_CENTER_PIN (-1)
+    #define SWEET_SPOT_RIGHT_PIN (-1)
+
+    #define RNG_SEED_PIN 31
+
+  #elif defined(K1_MAIN_RPL_PINMAP_V1)
     // Main RPL (main K1 replacement, Captain 2026-08-18 / MAIN_RPL_BRINGUP_FLASH):
     //   Each WS2816 PCB = ONE continuous 160-LED strip on TWO data lines:
     //     DIN-A = LEDs 1–80  (buffer [0..79])

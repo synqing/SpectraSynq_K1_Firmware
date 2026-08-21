@@ -58,7 +58,7 @@ BYTE_COUNT = LED_COUNT * 3
 
 # Firmware subdirs added to -I (mirrors render_replay.py FW_SUBDIRS)
 FW_SUBDIRS = ("audio", "visual", "effects", "director", "serial", "system",
-              "persistence", "calibration", "diag")
+              "persistence", "calibration", "diag", "platform")
 
 # Sources compiled for every mode (mirrors render_replay.py COMMON_SOURCES)
 COMMON_SOURCES = [

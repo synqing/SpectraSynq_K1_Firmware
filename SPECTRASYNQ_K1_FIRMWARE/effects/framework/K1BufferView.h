@@ -33,7 +33,7 @@
 
 #include <cstdint>
 
-#include <FastLED.h>          // CRGB (v3 24-bit pixel)
+#include "k1_rgb.h"           // CRGB (v3 24-bit pixel; FastLED on Arduino)
 #include "constants.h"        // CRGB16 (Q8.8 SQ15x16), NATIVE_RESOLUTION
 
 namespace k1 {

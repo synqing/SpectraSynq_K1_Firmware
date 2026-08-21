@@ -3,6 +3,8 @@
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
+**Dual-target (2026-08-21, not flash GO):** [ADR-0007](../docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) — `env:k1_p4_wifi6` in this tree; P4-Nano donor-only. Does **not** displace the silicon stamps below.
+
 **Live lane (2026-08-21):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @ `38428a82`**
 (`IDENTITY OK` epoch `1787324114`) — look library (`K1_LOOK_LIB_V1`); boot slot 0 IDENTITY; tap `z` for tonight.
 Palette-safe honour **closed** on `k1_hardware` (`69e21140`). B489 `B489A500` on

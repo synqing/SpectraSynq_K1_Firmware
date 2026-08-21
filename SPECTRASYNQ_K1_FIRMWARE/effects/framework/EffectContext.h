@@ -49,7 +49,7 @@
 #include <cstdint>
 #include <cmath>
 
-#include <FastLED.h>
+#include "k1_rgb.h"
 
 #include "K1AudioContext.h"
 #include "K1BufferView.h"
