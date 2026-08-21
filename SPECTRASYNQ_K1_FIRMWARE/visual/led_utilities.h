@@ -1162,6 +1162,17 @@ inline void show_leds() {
       k1_inc_g = inv + mix * incandescent_lookup.g;
       k1_inc_b = inv + mix * incandescent_lookup.b;
     }
+#ifdef K1_RENDER_TRACE_V1
+    if (k1_render_trace_stim_active()) {
+      // Packer occupancy stimulus: unique low bytes, independent of mic.
+      for (uint16_t i = 0; i < CONFIG.LED_COUNT; i++) {
+        const float t = (float)(i + 1) / (float)(CONFIG.LED_COUNT + 1);
+        leds_scaled[i].r = SQ15x16(t);
+        leds_scaled[i].g = SQ15x16((float)(((i * 3u) + 7u) % 251u) / 251.0f);
+        leds_scaled[i].b = SQ15x16(0.37f + (0.001f * (float)(i & 7)));
+      }
+    }
+#endif
     const uint64_t budget_proxy =
         (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
 #if ENABLE_VP_PERF_AUDIT

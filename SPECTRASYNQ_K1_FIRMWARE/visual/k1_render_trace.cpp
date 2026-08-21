@@ -30,6 +30,7 @@ static uint16_t  s_every_n = 4;
 static uint32_t  s_tick = 0;
 static uint16_t  s_px = K1_RTRACE_PX;
 static uint8_t   s_bpp = 0;  // 8 or 16; 0 until first captured frame
+static volatile bool s_stim = false;
 
 static bool rtrace_init() {
   if (s_buf != nullptr) return true;
@@ -82,6 +83,10 @@ void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
   rtrace_store(packed6, led_count, lightshow_mode, 16);
 }
 
+bool k1_render_trace_stim_active(void) {
+  return s_stim && s_armed;
+}
+
 static void rtrace_status() {
   USBSerial.printf("[RTRACE] armed=%d frames=%lu capacity=%lu every=%u px=%u bpp=%u buf=%s\n",
                    s_armed ? 1 : 0, (unsigned long)s_frames,
@@ -93,10 +98,15 @@ static void rtrace_status() {
 static void rtrace_arm(char* args) {
   if (!rtrace_init()) { USBSerial.println("[RTRACE] ARM FAIL: no buffer"); return; }
   long seconds = 30; long every = 4;
+  bool stim = false;
   if (args != nullptr && args[0] != '\0') {
     char* comma = strchr(args, ',');
     seconds = atol(args);
-    if (comma != nullptr) every = atol(comma + 1);
+    if (comma != nullptr) {
+      every = atol(comma + 1);
+      char* comma2 = strchr(comma + 1, ',');
+      if (comma2 != nullptr && strstr(comma2, "stim") != nullptr) stim = true;
+    }
   }
   if (seconds < 1) seconds = 1;
   if (seconds > 600) seconds = 600;
@@ -107,11 +117,13 @@ static void rtrace_arm(char* args) {
   s_tick = 0;
   s_px = K1_RTRACE_PX;
   s_bpp = 0;
+  s_stim = stim;
   s_every_n = (uint16_t)every;
   s_end_ms = millis() + (uint32_t)seconds * 1000U;
   s_armed = true;
-  USBSerial.printf("[RTRACE] ARMED: %ld s, every %ld frames (cap %lu)\n",
-                   seconds, every, (unsigned long)K1_RTRACE_MAX_FRAMES);
+  USBSerial.printf("[RTRACE] ARMED: %ld s, every %ld frames (cap %lu)%s\n",
+                   seconds, every, (unsigned long)K1_RTRACE_MAX_FRAMES,
+                   stim ? " stim=1" : "");
 }
 
 static void rtrace_dump() {

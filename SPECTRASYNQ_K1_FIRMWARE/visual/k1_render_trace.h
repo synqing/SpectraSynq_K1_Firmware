@@ -33,6 +33,10 @@ void k1_render_trace_on_frame(const uint8_t* rgb_bytes, uint16_t led_count,
 void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
                                 uint8_t lightshow_mode);
 
+// Diagnostic paint: when arm args include ",stim", overwrite leds_scaled
+// with a TRUE16 ramp so occupancy can be scored without live audio.
+bool k1_render_trace_stim_active(void);
+
 bool k1_render_trace_dispatch(const char* command_type, char* command_data);
 
 #endif  // K1_RENDER_TRACE_H

@@ -137,6 +137,17 @@ def test_rtrace_on_frame16_is_declared_and_gated():
     assert "fmt=rgb16hex" in cpp or '"rgb16hex"' in cpp
 
 
+def test_rtrace_stim_paints_before_pack():
+    led = (FW / "visual" / "led_utilities.h").read_text(encoding="utf-8")
+    stim = led.find("k1_render_trace_stim_active")
+    pack = led.find("k1_lever2_pack_frame")
+    assert 0 < stim < pack, "stim ramp must overwrite leds_scaled before pack"
+    header = (FW / "visual" / "k1_render_trace.h").read_text(encoding="utf-8")
+    assert "k1_render_trace_stim_active" in header
+    cpp = (FW / "visual" / "k1_render_trace.cpp").read_text(encoding="utf-8")
+    assert "stim" in cpp and "s_stim" in cpp
+
+
 def test_rtrace_probe_env_is_non_shippable_and_allowlisted():
     ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
     wrapper = (ROOT / "scripts" / "agent" / "pio-build.sh").read_text(encoding="utf-8")
