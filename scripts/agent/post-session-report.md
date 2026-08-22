@@ -5,6 +5,28 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-22 critical-bug automation (G7B persist park hole)
+
+```text
+session_objective:       Cron critical-bug scan; fix only high-severity correctness bugs with concrete triggers.
+branch_head_at_start:    cursor/critical-bug-management-a0bf @ 293b211 (matched origin/main).
+branch_head_at_end:      3ef2e79 on cursor/critical-bug-management-a0bf; PR #68 open.
+files_changed:           k1_show_state.cpp; k1_effect_queue.cpp; test_k1_persist_park_static.py.
+commands_run:            session-bootstrap (repo-truth FAIL expected: automation branch ≠ active_branch); pytest park/show/queue static (34 passed); git commit+push; open_git_pr.
+validation_results:      Host static PASS. No PIO in cloud env. No flash.
+evidence_captured:       PR https://github.com/synqing/SpectraSynq_K1_Firmware/pull/68; automation MEMORIES.md entry. Prior Lever-2 PR #67 still open.
+blockers:                repo-truth branch mismatch (intentional automation branch); PlatformIO unavailable here.
+generated_files_ignored: none.
+safety_constraints:      no flash/upload/cal; no platformio.ini env behaviour change; minimal persist-park fix only.
+thinking_skill_used:     first-principles + inversion on G7B park coverage (which LittleFS writers lack lock_leds).
+skills_used:             Agent OS bootstrap; k1-firmware-change-gate (compact); ship-path-required.
+specialists_used:        none.
+claude_mem_observations: claude-mem unreachable; on-disk + git + automation MEMORIES used.
+next_recommended_action: Review/merge PR #68; Captain flash k1_hardware (or inheriting bench) and eyes-on Shift+S + preset save without reboot. PR #67 still awaits Lever-2 reverse review.
+```
+
+---
+
 ## Session Report — 2026-08-18 B489 edge-honour flash
 
 ```text

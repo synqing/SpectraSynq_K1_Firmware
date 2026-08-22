@@ -357,8 +357,11 @@ bool read_preset_record(File& file, PresetSlot& slot) {
 }
 
 bool slots_write_file() {
+  // G7B: park Core 1 across LittleFS (same crash class as save_config).
+  lock_leds();
   File file = LittleFS.open(K1_PRESET_SLOTS_FILE, FILE_WRITE);
   if (!file) {
+    unlock_leds();
     return false;
   }
   uint32_t magic = K1_PRESET_SLOTS_MAGIC;
@@ -372,6 +375,7 @@ bool slots_write_file() {
     ok = write_preset_record(file, g_slots[i]);
   }
   file.close();
+  unlock_leds();
   return ok;
 }
 
@@ -381,8 +385,10 @@ void slots_ensure_loaded() {
   }
   g_slots_loaded = true;  // attempt once per boot; absent file = all-invalid
 
+  lock_leds();
   File file = LittleFS.open(K1_PRESET_SLOTS_FILE, FILE_READ);
   if (!file) {
+    unlock_leds();
     return;  // no slots saved yet — every slot stays invalid
   }
 
@@ -397,6 +403,7 @@ void slots_ensure_loaded() {
       version != K1_PRESET_SLOTS_VERSION ||
       slot_count != K1_PRESET_SLOT_COUNT) {
     file.close();
+    unlock_leds();
     return;  // unrecognised file — fail to defaults (all slots invalid)
   }
   PresetSlot loaded[K1_PRESET_SLOT_COUNT] = {};
@@ -404,6 +411,7 @@ void slots_ensure_loaded() {
     ok = read_preset_record(file, loaded[i]);
   }
   file.close();
+  unlock_leds();
   if (!ok) {
     return;
   }
