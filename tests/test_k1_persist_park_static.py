@@ -11,6 +11,8 @@ BRIDGE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "persistence" / "bridge_fs.h"
 INO = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "SPECTRASYNQ_K1_FIRMWARE.ino"
 PERSIST_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "persistence" / "k1_persistence_request.cpp"
 SYSTEM_H = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "system.h"
+SHOW_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "k1_show_state.cpp"
+QUEUE_CPP = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "k1_effect_queue.cpp"
 
 
 def _k1_hardware_section() -> str:
@@ -90,3 +92,27 @@ def test_g7a_mailbox_is_not_the_flash_writer():
     ino = INO.read_text(encoding="utf-8")
     assert "check_settings(t_now);" in ino
     assert "k1_persist_service_stub_once();" in ino
+
+
+def test_runtime_littlefs_writers_park_core1():
+    """Shift+S / preset-slot saves must park Core 1 like save_config.
+
+    G7B closed the config debounce path; SHOW_STATE and PRESETS writers were
+    still bare LittleFS opens while Core 1 could be mid-frame in PSRAM.
+    """
+    show = SHOW_CPP.read_text(encoding="utf-8")
+    save = _fn_body(show, "bool k1_show_state_save()")
+    assert "lock_leds();" in save
+    assert _failed_open_unlocks(save)
+    assert save.index("unlock_leds();") < save.index("save_config();")
+    load = _fn_body(show, "bool k1_show_state_load()")
+    assert "lock_leds();" in load
+    assert _failed_open_unlocks(load)
+
+    queue = QUEUE_CPP.read_text(encoding="utf-8")
+    write = _fn_body(queue, "bool slots_write_file()")
+    assert "lock_leds();" in write
+    assert _failed_open_unlocks(write)
+    ensure = _fn_body(queue, "void slots_ensure_loaded()")
+    assert "lock_leds();" in ensure
+    assert "unlock_leds();" in ensure

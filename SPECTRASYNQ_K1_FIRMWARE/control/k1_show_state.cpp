@@ -255,12 +255,17 @@ bool k1_show_state_save() {
   if (n == 0) {
     return false;
   }
+  // G7B: park Core 1 across this LittleFS write. save_config() takes its own
+  // lock/unlock pair — release before calling it (lock_leds is not recursive).
+  lock_leds();
   File file = LittleFS.open(K1_SHOW_STATE_FILE, FILE_WRITE);
   if (!file) {
+    unlock_leds();
     return false;
   }
   const size_t wrote = file.write(buf, n);
   file.close();
+  unlock_leds();
   if (wrote != n) {
     return false;
   }
@@ -270,13 +275,16 @@ bool k1_show_state_save() {
 }
 
 bool k1_show_state_load() {
+  lock_leds();
   File file = LittleFS.open(K1_SHOW_STATE_FILE, FILE_READ);
   if (!file) {
+    unlock_leds();
     return false;
   }
   uint8_t buf[512];
   const size_t n = file.read(buf, sizeof(buf));
   file.close();
+  unlock_leds();
   if (n == 0) {
     return false;
   }
