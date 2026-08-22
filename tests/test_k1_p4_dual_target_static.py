@@ -14,7 +14,7 @@ CONSTANTS = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "constants.h"
 I2S = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio" / "i2s_audio.h"
 LED = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h"
 EFFECT_CTX = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "effects" / "framework" / "EffectContext.h"
-ENCODE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "platform" / "k1_p4_ws2816_encode.h"
+ENCODE = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "platform" / "k1_p4_ws2812_encode.h"
 TRANSPORT = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "platform" / "k1_p4_led_transport.cpp"
 PLATFORM = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "k1_platform.h"
 RGB = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system" / "k1_rgb.h"
@@ -58,6 +58,9 @@ def test_p4_env_is_arduino_on_p4_beside_s3():
     assert "-DK1_P4_WIFI6_PINMAP_V1=1" in p4
     assert "-DK1_MIC_IM69D_PDM_V1" in p4
     assert "platform/k1_p4_led_transport.cpp" in p4
+    assert "-DK1_P4_LED_ADAPTER_V1=1" in p4
+    assert "-DK1_P4_LED_PROTOCOL_WS2812=1" in p4
+    assert "K1_P4_LED_PROTOCOL_WS2816" not in p4
     assert "K1_WIRELESS_ENABLED" not in p4
     assert "tab5" not in p4.lower()
     assert "-DARDUINO_USB_CDC_ON_BOOT=0" in p4
@@ -91,7 +94,11 @@ def test_p4_pinmap_is_not_bench_s3_or_tab5():
     assert "#define K1_PDM_CLK_PIN 22" in block
     assert "#define K1_PDM_DIN_PIN 21" in block
     assert "#define LED_DATA_PIN 4" in block
-    assert "#define LED_CLOCK_PIN 5" in block
+    assert "#define SECONDARY_LED_DATA_PIN 5" in block
+    assert "#define LED_CLOCK_PIN (-1)" in block
+    assert "#define SECONDARY_LED_CLOCK_PIN (-1)" in block
+    assert "#define LED_CLOCK_PIN 5" not in block
+    assert "#define LED_CLOCK_PIN 31" not in block
     assert "C6 SDIO" in block
     assert "#define LED_DATA_PIN 6" not in block
     assert "#define K1_PDM_CLK_PIN 14" not in block
@@ -117,8 +124,11 @@ def test_crgb_seam_and_logical_frame_above_protocol():
     assert "spi_bus_dma_memory_alloc" in transport
     assert "spi_device_queue_trans" in transport
     assert "spi_device_get_trans_result" in transport
-    assert "expand8" in transport
-    assert "* 257u" in transport
+    assert "ws2812_encode_pixel" in transport
+    assert "k1_p4_ws2812_encode.h" in transport
+    assert "expand8" not in transport
+    assert "* 257u" not in transport
+    assert "LED_CLOCK_PIN < 0" in transport
     assert "spi_bus_dma_memory_alloc(kLaneHost" in transport
     led = LED.read_text(encoding="utf-8")
     assert "FastLED.show(); // This will update both LED strips" in led
@@ -140,7 +150,7 @@ def test_full_surface_is_all_light_modes_not_seven():
 def test_p4_identity_is_wch_only_and_not_on_s3_chips():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     by_chip = {a["chip_id"]: a for a in data["authorized"]}
-    p4 = by_chip["PENDING_LIVE_P4_WIFI6"]
+    p4 = by_chip["0743E200"]
     assert p4["envs"] == ["k1_p4_wifi6"]
     assert p4["usb_serial"] == "5AAF278179"
     for s3 in ("F887A500", "B489A500", "9087A500", "0C54FC00"):

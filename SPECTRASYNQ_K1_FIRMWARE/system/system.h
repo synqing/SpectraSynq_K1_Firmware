@@ -27,7 +27,12 @@ void reboot() {
   }
     FastLED.setBrightness(0);
 #ifdef K1_PLATFORM_P4
-    k1_led_emit_show(leds_out, CONFIG.LED_COUNT);
+    k1_led_emit_show(
+        leds_out, CONFIG.LED_COUNT,
+        (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? leds_out_secondary
+                                                                 : nullptr,
+        (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? SECONDARY_LED_COUNT
+                                                                 : 0);
 #else
     FastLED.show();
 #endif
@@ -449,6 +454,10 @@ void init_system() {
   // source) until the K1_MIC_IM73D_PDM_V1 force-invalidate below scrubs it. Do NOT
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
+#ifdef K1_PLATFORM_P4
+  // Two single-wire 160-px WS2812 strips. NVS must not revive NEOPIXEL_X2 (80/80).
+  CONFIG.LED_TYPE = LED_NEOPIXEL;
+#endif
 #ifdef K1_MAIN_RPL_PINMAP_V1
   // Centre-split DIN-A/B on both WS2816 PCBs — NVS must not revive single-wire NEOPIXEL.
   CONFIG.LED_TYPE = LED_NEOPIXEL_X2;

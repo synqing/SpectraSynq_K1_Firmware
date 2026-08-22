@@ -19,3 +19,11 @@
 #if defined(K1_PLATFORM_P4) && defined(K1_WIRELESS_ENABLED)
 #  error "K1_WIRELESS_ENABLED is not authorised on P4-WIFI6 (ADR-0007 radio-last)."
 #endif
+
+#if defined(K1_PLATFORM_P4) && defined(K1_WS2816_LEVER2_V1)
+#  error "P4-WIFI6 is two WS2812 data lines (GPIO4/5). Lever-2 is Main RPL only."
+#endif
+
+#if defined(K1_PLATFORM_P4) && defined(K1_P4_LED_PROTOCOL_WS2816)
+#  error "Captain 2026-08-22: this loom is WS2812, not WS2816 dual-DIN."
+#endif

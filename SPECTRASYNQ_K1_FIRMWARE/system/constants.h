@@ -377,18 +377,21 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
 #if defined(K1_HARDWARE)
   #if defined(K1_P4_WIFI6_PINMAP_V1)
-    // Waveshare ESP32-P4-WIFI6 lab board (ADR-0007). Not bench-S3 GPIO 4/5.
-    // IM69D130 PDM CLK=22 / DATA=21. LED DIN-A=GPIO4, DIN-B=GPIO5 (one 160-px
-    // bar split 80/80). Secondary strip is unwired on this loom. Do not steal
-    // C6 SDIO 14–19. RNG on free GPIO31 (GPIO8 is ES8311 SCL on this schematic).
+    // Waveshare ESP32-P4-WIFI6 lab board (ADR-0007). Not bench-S3 coincidence.
+    // IM69D130 PDM CLK=22 / DATA=21.
+    // Captain 2026-08-22: TWO physically separate WS2812 strips, 160 px each.
+    // GPIO4 = primary DATA. GPIO5 = secondary DATA. There is no LED clock
+    // wire — WS2812 and WS2816 are single-wire data. Do not steal C6 SDIO 14–19.
+    // LED_CLOCK_PIN / SECONDARY_LED_CLOCK_PIN stay -1 so FastLED's leftover
+    // "clock" name cannot claim a GPIO. RNG on GPIO31 (GPIO8 is ES8311 SCL).
     #define I2S_BCLK_PIN 12
     #define I2S_LRCLK_PIN 10
     #define I2S_DIN_PIN 11
 
     #define LED_DATA_PIN 4
-    #define LED_CLOCK_PIN 5
-    #define SECONDARY_LED_DATA_PIN 31
-    #define SECONDARY_LED_CLOCK_PIN 31
+    #define SECONDARY_LED_DATA_PIN 5
+    #define LED_CLOCK_PIN (-1)
+    #define SECONDARY_LED_CLOCK_PIN (-1)
 
     #ifdef K1_MIC_IM69D_PDM_V1
       #define K1_PDM_CLK_PIN 22

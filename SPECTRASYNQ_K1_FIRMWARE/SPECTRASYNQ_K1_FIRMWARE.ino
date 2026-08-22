@@ -717,7 +717,7 @@ void setup() {
 
   init_secondary_leds();
 #ifdef K1_PLATFORM_P4
-  ENABLE_SECONDARY_LEDS = false;  // ADR-0007: lab P4-WIFI6 has no secondary strip
+  ENABLE_SECONDARY_LEDS = true;  // Two separate 160-px WS2812 strips (GPIO4/5)
 #else
   ENABLE_SECONDARY_LEDS = true;   // Dual-channel (incl. K1_CUSTOM_LED_V1 dual-206)
 #endif
@@ -763,7 +763,8 @@ void setup() {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
 #if defined(K1_PLATFORM_P4)
-  k1_led_emit_show(leds_out, CONFIG.LED_COUNT);
+  k1_led_emit_show(leds_out, CONFIG.LED_COUNT,
+                   leds_out_secondary, SECONDARY_LED_COUNT);
 #endif
 #if !K1_RMT_ALLOC_ON_VP_CORE_V1
 #ifndef K1_PLATFORM_P4

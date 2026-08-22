@@ -1433,7 +1433,7 @@ inline void init_leds() {
   USBSerial.print("INIT_LEDS: ");
   USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
   return;
-#endif
+#else
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
 #ifdef K1_WS2816_LEVER2_V1
@@ -1527,6 +1527,7 @@ inline void init_leds() {
 
   USBSerial.print("INIT_LEDS: ");
   USBSerial.println(leds_started == true ? K1_PASS : K1_FAIL);
+#endif  // !K1_PLATFORM_P4
 }
 
 inline void blocking_flash(CRGB16 col) {
@@ -2673,7 +2674,7 @@ inline void init_secondary_leds() {
   }
   USBSerial.println("INIT_SECONDARY_LEDS: P4-WIFI6 GPIO5 WS2812 160 (SPI3)");
   return;
-#endif
+#else
 
 #ifdef K1_MAIN_RPL_PINMAP_V1
 #ifdef K1_WS2816_LEVER2_V1
@@ -2714,6 +2715,7 @@ inline void init_secondary_leds() {
   
   USBSerial.print("INIT_SECONDARY_LEDS: ");
   USBSerial.println(K1_PASS);
+#endif  // !K1_PLATFORM_P4
 }
 
 inline void scale_to_secondary_strip() {

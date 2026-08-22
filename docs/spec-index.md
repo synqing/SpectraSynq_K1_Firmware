@@ -17,6 +17,9 @@ last_verified: 2026-08-21
 **Ship path required (Captain 2026-08-17):** never withhold ship / promote / close
 without the remaining numbered path in the same answer. `/ship-path-required`.
 
+**Plain English work summaries (Captain 2026-08-22):** summary of agent work MUST
+be plain English. `/plain-english-work-summaries`.
+
 ## ⛔ DUAL-K1 SYNC IS DEAD — Captain decision, 2026-08-05
 
 **The dual-sync lane is DEPRECATED and SHELVED. Do not resume it, do not plan
@@ -121,7 +124,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
-| **K1 full-parity dual-target (S3 + P4-WIFI6)** | **[ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md)** | **ACCEPTED architecture.** `env:k1_p4_wifi6` in this tree. P4-Nano is donor-only. Not a flash GO. Not complete until both targets run the same K1. WS2816 protocol stays in the P4 adapter. | `platformio.ini` `[env:k1_p4_wifi6]`; `SPECTRASYNQ_K1_FIRMWARE/platform/`; `scripts/platformio/k1_device_identities.json` |
+| **K1 full-parity dual-target (S3 + P4-WIFI6)** | **[ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md)** | **ACCEPTED architecture.** `env:k1_p4_wifi6` in this tree. P4-Nano is donor-only. Not complete until both targets run the same K1. Lab loom is two WS2812 160-px strips on GPIO4/5 (data only). | `platformio.ini` `[env:k1_p4_wifi6]`; `SPECTRASYNQ_K1_FIRMWARE/platform/`; `scripts/platformio/k1_device_identities.json` |
 | **K1 scheduling hardening** | [active handover](handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md) · [Gate 0-8 plan](forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md) | **CURRENT. G2+G3+G7B CLOSED. G8 host GREEN on `1d457740`. G8 device = bench `B489A500` (Captain 2026-08-17); awaiting G8 PASS. F887 copy deferred until a replacement main unit.** AP0/VP1 locked. | `docs/forensics/2026-08-15-freertos-scheduling-audit/` |
 | **K1 AP input integrity** | [handover](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md) · [Rev B plan](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md) · [G1 receipt](forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md) | **PARALLEL AUTHORITY. G1 RATIFIED; T0.3 COMPLETE.** No further physical mic test; AP P4 slot/health promotion remains open and separate. | `_scratch/p0_stereo_20260814/`; `scripts/tools/probe_diff.py`; `scripts/regression-harness/mic_stable_byte_gate.sh` |
 | **IM69D130 dual-mic / AP advice (Phases 0–2)** | [docs/hardware/im69d130-vs-main-k1-eval-2026-08-05.md](hardware/im69d130-vs-main-k1-eval-2026-08-05.md) · [design](hardware/im69d130-dual-mic-eval-design-2026-08-05.md) · **[session canon 2026-08-07](canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md)** | **SUPERSEDED as current authority.** B489 mono-default device evidence is dispositioned by the P0.0 quarantine manifest; source-reasoned work retains only its stated scope. | `docs/forensics/P0_0_AP_INPUT_QUARANTINE_MANIFEST_2026-08-15.md`; historical env and receipts retained for provenance |
@@ -169,7 +172,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 |--------|---------|------------------------------------|
 | 1401 (main K1) | `F887A500` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route |
 | 12201 (bench K1v2) | `B489A500` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
-| Waveshare ESP32-P4-WIFI6 (lab) | pending live `:chip_id` (USB serial `5AAF2781791`) | **`k1_p4_wifi6` only.** Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. |
+| Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6` only.** Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `c45b9763` 2026-08-22. |
 
 > **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of the 2026-07-06 R1 run: bench `B489A500` = `/dev/cu.usbmodem101`, main `F887A500` = `/dev/cu.usbmodem1101`. Registry §2 deployed-state table is authoritative.
 

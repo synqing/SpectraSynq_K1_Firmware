@@ -279,7 +279,7 @@ class K1UploadGuardTest(unittest.TestCase):
             p4_ports,
         )
         self.assertTrue(ok, message)
-        self.assertIn("PENDING_LIVE_P4_WIFI6", message)
+        self.assertIn("0743E200", message)
 
         ok2, message2 = self.guard.validate_upload_target(
             "k1_p4_wifi6",

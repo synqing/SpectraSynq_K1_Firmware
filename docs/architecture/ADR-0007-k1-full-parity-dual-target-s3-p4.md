@@ -52,7 +52,7 @@ First seams (this landing):
 |------|---------------|------------|------------|
 | Colour scratch | `CRGB` via `k1_rgb.h`; working canvas `CRGB16` | FastLED RMT / Lever-2 packer | Dual-SPI queue-all/wait-all |
 | Capture | hop 12.8 kHz / 96 / d3 | SPH or IM69 per pinmap; IDF 5.4.1 frozen | IM69 PDM GPIO22/21; slot asserts restamped; no 5.4.1 `#error` |
-| GPIO | `K1_P4_WIFI6_PINMAP_V1` vs production 6/7 vs bench 4/5 | unchanged | 4/5 DIN-A/B, PDM 22/21 |
+| GPIO | `K1_P4_WIFI6_PINMAP_V1` vs production 6/7 vs bench 4/5 | unchanged | GPIO4 primary **data**, GPIO5 secondary **data**, PDM 22/21. No LED clock pin. |
 | USB / FS | existing Arduino USB CDC + LittleFS | S3 native USB | P4 USB 24/25; WCH UART for upload |
 | Identity | `k1_upload_guard.py` | F887 / B489 / 9087 usbmodem | `k1_p4_wifi6` on `wchusbserial` only; refuse Tab5 usbmodem |
 
@@ -84,7 +84,7 @@ A faster P4 implementation of the **same algorithm** is welcome. A different alg
 
 - **S3:** keep pioarduino **54.03.20** / IDF **5.4.1** / FastLED 3.10.3. Do not drag `k1_hardware` to Tab5’s 54.03.21 / 3.3.1 to make P4 easier.
 - **P4:** new PlatformIO `env:k1_p4_wifi6`, Arduino-on-P4 (same family as Tab5, not a second IDF product tree). Adapters may use IDF APIs. Restamp IM69 slot assertions against the P4 IDF; do not copy the 5.4.1 `#error` onto P4 and do not relax it on S3.
-- P4-Nano C is **pattern donor** (SPI DMA `spi_bus_dma_memory_alloc`, WS2816 encoder *if that protocol is later selected*, PDM pins). Copy into K1 P4 adapters; do not grow P4-Nano as K1.
+- P4-Nano C is **pattern donor** (SPI DMA `spi_bus_dma_memory_alloc`, WS2812 2.5 MHz encoder, PDM pins). Copy into K1 P4 adapters; do not grow P4-Nano as K1.
 
 ---
 
@@ -120,16 +120,18 @@ Those do **not** authorise changing product semantics above them.
 
 P4 LED adapter must not be two RMT-DMA devices, sequential blocking refreshes, or a 320-px software mirror. Dual-SPI queue-all/wait-all (donor) or a later-selected protocol — chosen **below** the logical frame.
 
-### Named deltas on this lab board (2026-08-21)
+### Named deltas on this lab board (restamped 2026-08-22)
+
+Captain 2026-08-22: the two strips on IO4 and IO5 are **physically separate WS2812** lengths, 160 pixels each, **one data line per strip**. This is not a WS2816C-1313 bar split over DIN-A and DIN-B. Neither WS2812 nor WS2816 has a clock pin; `LED_CLOCK_PIN` on this pinmap is `-1`.
 
 | Delta | Why | Closest behaviour-preserving implementation |
 |-------|-----|-----------------------------------------------|
-| LED transport is dual-SPI, not dual RMT | P4 has one GDMA RMT TX | Donor queue-all/wait-all SPI on GPIO4/5 |
-| Wire protocol currently WS2816 48-bit | Parts on DIN-A/B are WS2816; shared types stay `CRGB16` / funnel `CRGB` | Adapter expands 8-bit funnel bytes with `v * 257` at the **adapter** boundary (named REPLICATE8). Not Lever-2. Not a shared-domain WS2816 type. |
+| LED transport is dual-SPI, not dual RMT | P4 has one GDMA RMT TX | Donor queue-all/wait-all SPI: SPI2 MOSI=GPIO4, SPI3 MOSI=GPIO5 |
+| Wire protocol is WS2812 24-bit GRB | Two independent WS2812 strips | Adapter encodes 8-bit funnel `CRGB` with 2.5 MHz 3-symbol/bit SPI (`0→100`, `1→110`). Shared types stay `CRGB16` / funnel `CRGB`. Not Lever-2. Not WS2816 48-bit. |
 | PDM CLK=22 DATA=21 | IM69 breakout on this board | Same `K1_MIC_IM69D_PDM_V1` path as bench/RPL; different pins |
-| Secondary strip unwired | Only one dual-DIN bar on the lab loom | `ENABLE_SECONDARY_LEDS` forced false; primary 160 split 80/80 on DIN-A/B |
+| Two full 160-px canvases | Separate physical strips | `ENABLE_SECONDARY_LEDS` true. GPIO4 gets `leds_out[0..159]`. GPIO5 gets `leds_out_secondary[0..159]`. Centre-origin 79/80 is **on each strip**. |
 | Upload UART is WCH `wchusbserial*`, 115200 | CH343 bridge; S3/Tab5 enumerate `usbmodem*` | New identity row; refuse usbmodem (Tab5 + S3) |
-| Arduino-on-P4 IDF 5.5.x | pioarduino 54.03.21 family | Slot `static_assert` kept; 5.4.1 `#error` S3-only |
+| Arduino-on-P4 IDF 5.4.0 libs via 54.03.21 | pioarduino 54.03.21 family | Slot `static_assert` kept; 5.4.1 `#error` S3-only |
 | RF off | Shipping K1 RF is off; C6 not in this programme yet | Do not enable `K1_WIRELESS_ENABLED`; do not copy Tab5 SDIO 8–13 onto C6 14–19 |
 
 ---
@@ -186,7 +188,7 @@ The P4 build is **K1 Firmware running on ESP32-P4**, not a P4 application inspir
 3. **Captain:** named flash GO for the WCH serial P4-WIFI6 only (`k1-flash-verified.sh k1_p4_wifi6`).
 4. **Agent:** capture hop 12.8 kHz / 96 / d3 on device; AP p99 ≤ 8000 µs.
 5. **Captain:** product-look across modes/funnel/honour — not first light.
-6. **Captain:** live `:chip_id` restamp of the P4 identity row (today: USB serial `5AAF2781791`, chip id pending).
+6. **Captain:** live `:chip_id` restamp of the P4 identity row (done 2026-08-22: USB serial `5AAF278179`, chip `0743E200`).
 7. **Stamp:** `IDENTITY OK: git=… env=k1_p4_wifi6` on P4 **and** `k1_hardware` still authority on S3.
 
 ---
