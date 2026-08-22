@@ -753,6 +753,15 @@ void dump_info() {
 
   USBSerial.print("CONFIG.LED_COUNT: ");
   USBSerial.println(CONFIG.LED_COUNT);
+#ifdef K1_PLATFORM_P4
+  USBSerial.print("ENABLE_SECONDARY_LEDS: ");
+  USBSerial.println(ENABLE_SECONDARY_LEDS ? "true" : "false");
+  USBSerial.print("SECONDARY_LED_COUNT: ");
+  USBSerial.println(SECONDARY_LED_COUNT);
+  USBSerial.print("SECONDARY_PHOTONS: ");
+  USBSerial.println(SECONDARY_PHOTONS, 6);
+  k1_p4_led_dump_status();
+#endif
 
   USBSerial.print("CONFIG.LED_COLOR_ORDER: ");
   USBSerial.println(CONFIG.LED_COLOR_ORDER);
@@ -3823,6 +3832,9 @@ void parse_command(char* command_buf) {
       USBSerial.println(SECONDARY_BASE_COAT ? "true" : "false");
       USBSerial.print("SECONDARY_PALETTE_MODE_ENABLED: ");
       USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "true" : "false");
+#ifdef K1_PLATFORM_P4
+      k1_p4_led_dump_status();
+#endif
       USBSerial.print("SECONDARY_PALETTE_INDEX: ");
       USBSerial.print(SECONDARY_PALETTE_INDEX);
       if (SECONDARY_PALETTE_MODE_ENABLED) {

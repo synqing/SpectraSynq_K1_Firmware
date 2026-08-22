@@ -97,6 +97,7 @@ def test_p4_pinmap_is_not_bench_s3_or_tab5():
     assert "#define SECONDARY_LED_DATA_PIN 5" in block
     assert "#define LED_CLOCK_PIN (-1)" in block
     assert "#define SECONDARY_LED_CLOCK_PIN (-1)" in block
+    assert "#define K1_P4_SPI3_DUMMY_SCLK_GPIO 26" in block
     assert "#define LED_CLOCK_PIN 5" not in block
     assert "#define LED_CLOCK_PIN 31" not in block
     assert "C6 SDIO" in block
@@ -130,6 +131,11 @@ def test_crgb_seam_and_logical_frame_above_protocol():
     assert "* 257u" not in transport
     assert "LED_CLOCK_PIN < 0" in transport
     assert "spi_bus_dma_memory_alloc(kLaneHost" in transport
+    assert "SPI_DEVICE_HALFDUPLEX" in transport
+    assert "SPICOMMON_BUSFLAG_GPIO_PINS" in transport
+    assert "K1_P4_SPI3_DUMMY_SCLK_GPIO" in transport
+    assert "k1_p4_led_dump_status" in transport
+    assert "enc_nz" in transport
     led = LED.read_text(encoding="utf-8")
     assert "FastLED.show(); // This will update both LED strips" in led
     assert "k1_led_emit_show" in led

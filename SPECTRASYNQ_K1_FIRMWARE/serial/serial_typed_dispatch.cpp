@@ -989,6 +989,9 @@ bool serial_typed_secondary_status(const char* command_type, char* command_data)
       USBSerial.println(SECONDARY_BASE_COAT ? "true" : "false");
       USBSerial.print("SECONDARY_PALETTE_MODE_ENABLED: ");
       USBSerial.println(SECONDARY_PALETTE_MODE_ENABLED ? "true" : "false");
+#ifdef K1_PLATFORM_P4
+      k1_p4_led_dump_status();
+#endif
       USBSerial.print("SECONDARY_PALETTE_INDEX: ");
       USBSerial.print(SECONDARY_PALETTE_INDEX);
       if (SECONDARY_PALETTE_MODE_ENABLED) {

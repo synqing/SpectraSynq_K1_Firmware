@@ -8,6 +8,7 @@ bool k1_p4_led_init();
 void k1_p4_led_show(const CRGB* primary, uint16_t n_pri,
                     const CRGB* secondary, uint16_t n_sec);
 void k1_p4_chip_guard_boot();
+void k1_p4_led_dump_status();
 #endif
 
 inline void k1_led_emit_show(const CRGB* logical, uint16_t count,

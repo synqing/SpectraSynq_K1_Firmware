@@ -392,6 +392,10 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SECONDARY_LED_DATA_PIN 5
     #define LED_CLOCK_PIN (-1)
     #define SECONDARY_LED_CLOCK_PIN (-1)
+    // ESP32-P4 SPI3 has no IOMUX pins. The GPSPI bit engine still needs a
+    // clock pad or MOSI on GPIO5 never shifts. Park it on a free header GPIO
+    // that is NOT wired to either strip. This is not a WS2812 clock.
+    #define K1_P4_SPI3_DUMMY_SCLK_GPIO 26
 
     #ifdef K1_MIC_IM69D_PDM_V1
       #define K1_PDM_CLK_PIN 22
