@@ -175,7 +175,7 @@ def validate_upload_target(
         return False, f"{pioenv}: {upload_port} is not currently enumerated"
 
     device = str(port.get("device") or upload_port)
-    if pioenv == "k1_p4_wifi6":
+    if pioenv.startswith("k1_p4_wifi6"):
         if "usbmodem" in device:
             return (
                 False,

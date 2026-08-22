@@ -1,0 +1,16 @@
+# P4-WIFI6 hop proof — silicon 65639525 before apcad-flag flash
+# Port /dev/cu.wchusbserial5AAF2781791  baud 115200  dtr=False
+# Captured 2026-08-22. Chip 0743E200. Do not start_noise_cal.
+
+CHIP_GUARD: target=ESP32-P4 env=k1_p4_wifi6
+CHIP_GUARD: PDM clk=22 data=21 LED pri=4 sec=5 proto=WS2812 160+160
+P4_LED: dual-SPI WS2812 init OK pri=160 sec=160
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+BUILD: version=40103 git=65639525 epoch=1787391354 env=k1_p4_wifi6
+CHIP ID: 0743E200
+CONFIG.SAMPLE_RATE: 12800
+CONFIG.SAMPLES_PER_CHUNK: 96
+CONFIG.LED_TYPE: 0
+CONFIG.LED_COUNT: 160
+CAL_SOURCE: default_invalid
+CAL_VALID: 0

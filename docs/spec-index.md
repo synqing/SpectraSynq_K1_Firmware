@@ -172,7 +172,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 |--------|---------|------------------------------------|
 | 1401 (main K1) | `F887A500` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route |
 | 12201 (bench K1v2) | `B489A500` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
-| Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6` only.** Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `c45b9763` 2026-08-22. |
+| Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6` only.** Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `65639525` 2026-08-22. Two WS2812 160-px strips on GPIO4/5 (data only). |
 
 > **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of the 2026-07-06 R1 run: bench `B489A500` = `/dev/cu.usbmodem101`, main `F887A500` = `/dev/cu.usbmodem1101`. Registry §2 deployed-state table is authoritative.
 

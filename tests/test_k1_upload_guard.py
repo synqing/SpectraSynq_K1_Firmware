@@ -281,6 +281,14 @@ class K1UploadGuardTest(unittest.TestCase):
         self.assertTrue(ok, message)
         self.assertIn("0743E200", message)
 
+        ok_probe, message_probe = self.guard.validate_upload_target(
+            "k1_p4_wifi6_apcad_probe",
+            "/dev/tty.wchusbserial5AAF2781791",
+            p4_ports,
+        )
+        self.assertTrue(ok_probe, message_probe)
+        self.assertIn("0743E200", message_probe)
+
         ok2, message2 = self.guard.validate_upload_target(
             "k1_p4_wifi6",
             "/dev/tty.usbmodem1401",

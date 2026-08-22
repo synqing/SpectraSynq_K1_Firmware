@@ -151,7 +151,8 @@ def test_p4_identity_is_wch_only_and_not_on_s3_chips():
     data = json.loads(MANIFEST.read_text(encoding="utf-8"))
     by_chip = {a["chip_id"]: a for a in data["authorized"]}
     p4 = by_chip["0743E200"]
-    assert p4["envs"] == ["k1_p4_wifi6"]
+    assert p4["envs"][0] == "k1_p4_wifi6"
+    assert "k1_p4_wifi6_apcad_probe" in p4["envs"]
     assert p4["usb_serial"] == "5AAF278179"
     for s3 in ("F887A500", "B489A500", "9087A500", "0C54FC00"):
         assert "k1_p4_wifi6" not in by_chip[s3]["envs"]

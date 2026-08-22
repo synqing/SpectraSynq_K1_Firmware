@@ -41,7 +41,7 @@ GUARD="scripts/regression-harness/k1_device_identity_guard.py"
 IDENTITY_BAUD=115200
 IDENTITY_DTR=()
 IDENTITY_DTR_BOOL=1
-if [[ "$ENV_NAME" == "k1_p4_wifi6" ]]; then
+if [[ "$ENV_NAME" == k1_p4_wifi6* ]]; then
   IDENTITY_BAUD=115200
   IDENTITY_DTR=(--no-dtr)
   IDENTITY_DTR_BOOL=0
