@@ -17,6 +17,7 @@ abstract: "Lever-2 packed-wire occupancy KEEP, then C2 hsv paint PASS_TRUE16 on 
 | Port | `/dev/cu.usbmodem1401` |
 | C2 probe | `IDENTITY OK: git=a30d38e1 env=k1_main_rpl_rtrace_probe epoch=1787388705` (working tree; SHA is HEAD at flash, bytes include uncommitted hsv/palette) |
 | Product after PASS | `IDENTITY OK: git=a30d38e1 env=k1_main_rpl_im69d epoch=1787388790` |
+| Product stamp | `IDENTITY OK: git=c2738b88 env=k1_main_rpl_im69d epoch=1787390639` |
 | Tap | `k1_render_trace_on_frame16` on `ws2816_wire` before the Lever-2 return |
 | Scorer | `scripts/regression-harness/score_rtrace_occupancy.py` |
 

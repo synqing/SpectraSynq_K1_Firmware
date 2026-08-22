@@ -158,19 +158,18 @@ Revisit:
 4. rtrace retap + occupancy scorer — in source. Receipt: `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`.  
 5. This ADR + forensic reports — in source.  
 6. Standing order `/instrument-not-captain-eyes` — installed 2026-08-22.  
-7. C2 hsv stim dump **PASS_TRUE16** (`mismatch_frac=0.664583`) then product `IDENTITY OK: git=a30d38e1 env=k1_main_rpl_im69d epoch=1787388790` on `9087A500`. Probe flag is off this env. Provenance SHA is HEAD at flash; bytes include the C1/C2 working tree.  
+7. C1/C2 on silicon: hsv stim dump **PASS_TRUE16** (`mismatch_frac=0.664583`) then product stamp `IDENTITY OK: git=c2738b88 env=k1_main_rpl_im69d epoch=1787390639` on `9087A500`. Probe flag is off this env.  
 8. Standing order `/no-reapprove-already-given` — installed 2026-08-22.
 
 **Remaining (numbered)**
 
-1. **Agent** — commit this tree (host gate), then stamp-flash `k1_main_rpl_im69d` so `IDENTITY` SHA matches the commit that contains C1/C2. Same bytes already PASS on silicon.  
-2. **Agent** — native music occupancy remains INCONCLUSIVE (silent dump had zeros). Optional later dump under music. Do not ask Captain to look at the plate.  
-3. **Agent** — C3 bloom CRGB8 round-trip and authored palette **vertices** still 8-bit (interpolant is Q16). Separate lane.
+1. **Agent** — native music occupancy remains INCONCLUSIVE (silent dump had zeros). Optional later dump under music. Do not ask Captain to look at the plate.  
+2. **Agent** — C3 bloom CRGB8 round-trip and authored palette **vertices** still 8-bit (interpolant is Q16). Separate lane.
 
 **Stamp that means shipped**
 
 - Packer KEEP (codes): **closed** — `PASS_TRUE16` (`mismatch_frac=0.995833`, 328 unique codes).  
-- C1/C2 KEEP (codes): **closed** — hsv stim `PASS_TRUE16` plus product `env=k1_main_rpl_im69d` epoch `1787388790` on `9087A500`. SHA match after stamp-flash.  
+- C1/C2 KEEP (codes): **closed** — hsv stim `PASS_TRUE16` plus product `IDENTITY OK: git=c2738b88 env=k1_main_rpl_im69d epoch=1787390639` on `9087A500`.  
 - Captain looking at the plate is **not** the stamp.
 
 ## Appendix — leak classes (on-path, Lever-2)
