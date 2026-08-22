@@ -45,13 +45,9 @@ void light_mode_vu_dot(ChannelEffectState& fx) {
   if ((render_secondary && SECONDARY_PALETTE_MODE_ENABLED) || 
       (!render_secondary && CONFIG.PALETTE_MODE_ENABLED)) {
       // Use palette color based on brightness
-      uint8_t index = uint8_t(float(brightness) * 255); // Simple mapping
-      // Create a temporary CRGBPalette16 from the gradient palette
       uint8_t palette_to_use = render_secondary ? SECONDARY_PALETTE_INDEX : CONFIG.PALETTE_INDEX;
       const CRGBPalette16& pal = cached_gradient_palette(palette_to_use, render_secondary);
-      // Use the CRGBPalette16 with ColorFromPalette
-      CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(index), uint8_t(float(brightness) * 255));
-      color = crgb_to_crgb16(rgb_color);
+      color = palette_manual_colour(pal, brightness, brightness);
   } else {
       // Original hue calculation
       SQ15x16 hue = chroma_val + hue_position;

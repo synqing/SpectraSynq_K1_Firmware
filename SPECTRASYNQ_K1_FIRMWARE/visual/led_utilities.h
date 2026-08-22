@@ -190,19 +190,41 @@ inline void apply_vivid_precomp_count(CRGB16*, uint16_t) {}
 #endif
 
 inline CRGB16 hsv(SQ15x16 h, SQ15x16 s, SQ15x16 v) {
-  while (h > 1.0) { h -= 1.0; }
-  while (h < 0.0) { h += 1.0; }
-
-  CRGB base_color = CHSV(uint8_t(h * 255.0), uint8_t(s * 255.0), 255);
-
-  CRGB16 col = { base_color.r / 255.0, base_color.g / 255.0, base_color.b / 255.0 };
-  //col = desaturate(col, SQ15x16(1.0) - s);
-
-  col.r *= v;
-  col.g *= v;
-  col.b *= v;
-
-  return col;
+  // Geometric HSV on SQ15x16. Do not round-trip CHSV uint8 — that was the C2
+  // chroma crush (256 hues / 256 sats) in front of the 16-bit canvas.
+  float hf = float(h);
+  float sf = float(s);
+  float vf = float(v);
+  if (!isfinite(hf)) hf = 0.0f;
+  if (!isfinite(sf)) sf = 0.0f;
+  if (!isfinite(vf)) vf = 0.0f;
+  hf -= floorf(hf);
+  if (hf < 0.0f) hf += 1.0f;
+  if (sf < 0.0f) sf = 0.0f;
+  if (sf > 1.0f) sf = 1.0f;
+  if (vf < 0.0f) vf = 0.0f;
+  if (vf > 1.0f) vf = 1.0f;
+  if (sf <= 0.0f) {
+    const SQ15x16 grey = SQ15x16(vf);
+    return CRGB16{grey, grey, grey};
+  }
+  const float h6 = hf * 6.0f;
+  int sector = (int)h6;
+  if (sector >= 6) sector = 0;
+  const float f = h6 - (float)sector;
+  const float p = vf * (1.0f - sf);
+  const float q = vf * (1.0f - sf * f);
+  const float t = vf * (1.0f - sf * (1.0f - f));
+  float r, g, b;
+  switch (sector) {
+    case 0: r = vf; g = t; b = p; break;
+    case 1: r = q; g = vf; b = p; break;
+    case 2: r = p; g = vf; b = t; break;
+    case 3: r = p; g = q; b = vf; break;
+    case 4: r = t; g = p; b = vf; break;
+    default: r = vf; g = p; b = q; break;
+  }
+  return CRGB16{SQ15x16(r), SQ15x16(g), SQ15x16(b)};
 }
 
 inline void clip_led_values_count(CRGB16* buffer, uint16_t count) {
@@ -1164,12 +1186,10 @@ inline void show_leds() {
     }
 #ifdef K1_RENDER_TRACE_V1
     if (k1_render_trace_stim_active()) {
-      // Packer occupancy stimulus: unique low bytes, independent of mic.
+      // C2 occupancy: paint through hsv(), not a raw RGB ramp.
       for (uint16_t i = 0; i < CONFIG.LED_COUNT; i++) {
-        const float t = (float)(i + 1) / (float)(CONFIG.LED_COUNT + 1);
-        leds_scaled[i].r = SQ15x16(t);
-        leds_scaled[i].g = SQ15x16((float)(((i * 3u) + 7u) % 251u) / 251.0f);
-        leds_scaled[i].b = SQ15x16(0.37f + (0.001f * (float)(i & 7)));
+        leds_scaled[i] = hsv(SQ15x16((float)i / (float)CONFIG.LED_COUNT),
+                             SQ15x16(1.0f), SQ15x16(0.55f));
       }
     }
 #endif
@@ -1362,7 +1382,12 @@ inline void show_leds() {
   k1_scheduling_trace_before_fastled_show();
 #endif
 #ifdef K1_PLATFORM_P4
-  k1_led_emit_show(leds_out, CONFIG.LED_COUNT);
+  k1_led_emit_show(
+      leds_out, CONFIG.LED_COUNT,
+      (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? leds_out_secondary
+                                                               : nullptr,
+      (ENABLE_SECONDARY_LEDS && leds_out_secondary != nullptr) ? SECONDARY_LED_COUNT
+                                                               : 0);
 #else
   FastLED.show(); // This will update both LED strips
 #endif
@@ -2641,11 +2666,12 @@ inline void init_secondary_leds() {
   leds_out_secondary = new CRGB[SECONDARY_LED_COUNT];
 
 #ifdef K1_PLATFORM_P4
-  // Named hardware delta (ADR-0007): this lab loom has dual-DIN primary only.
+  // Secondary is a full 160-px WS2812 strip on GPIO5 (SPI3). FastLED is not
+  // used; k1_p4_led_init already owns both SPI hosts.
   for (uint16_t x = 0; x < SECONDARY_LED_COUNT; x++) {
     leds_out_secondary[x] = CRGB(0, 0, 0);
   }
-  USBSerial.println("INIT_SECONDARY_LEDS: skipped (P4-WIFI6 primary dual-DIN only)");
+  USBSerial.println("INIT_SECONDARY_LEDS: P4-WIFI6 GPIO5 WS2812 160 (SPI3)");
   return;
 #endif
 

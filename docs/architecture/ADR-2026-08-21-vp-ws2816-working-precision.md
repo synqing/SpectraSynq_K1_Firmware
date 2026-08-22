@@ -143,35 +143,34 @@ Revisit:
 
 1. [x] Source forensic (this ADR + evidence pack). No flash.  
 2. [x] **Agent:** rtrace retap onto Lever-2 packed WS2816 wire (`k1_render_trace_on_frame16` before the early return). Host scorer `scripts/regression-harness/score_rtrace_occupancy.py` (REPLICATE8 lattice vs TRUE16). Diagnostic env `k1_main_rpl_rtrace_probe` only — flag stays off `k1_hardware` / `k1_main_rpl_im69d`.  
-3. [ ] **Captain:** named GO to flash `k1_main_rpl_rtrace_probe` on `9087A500` only — or explicitly defer.  
-4. [ ] **Agent (only after GO):** flash that probe, arm `:rtrace_*`, dump, score. Optional flagged bypass renderer after occupancy is scored. Do **not** ask Captain to look at the plate.  
-5. [ ] **Close stamp:** occupancy JSON + `RESULT.md` (TRUE16 vs REPLICATE8; native vs hsv occupancy). KEEP / KILL / KEEP-and-retire-C1-C2 is that receipt.  
-6. [ ] **Agent (only if KEEP and separately scoped):** `hsv()` native SQ15x16 (C2), then seven `ColorFromPalette` → `palette_manual_colour` swaps (C1). CRUSH_MAP §3a–3d freeze still binds until that scope is named.
+3. [x] **Captain:** named GO 2026-08-22 to flash `k1_main_rpl_rtrace_probe` on `9087A500`.  
+4. [x] **Agent:** flashed probe `a30d38e1`, dumped packed wire, scored. Stim ramp **PASS_TRUE16**. Restored `k1_main_rpl_im69d` same SHA. Did not ask Captain to look at the plate.  
+5. [x] **Close stamp (packer):** `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md` — KEEP. Native music occupancy INCONCLUSIVE (silence). C1/C2 not closed.  
+6. [x] **Agent (2026-08-22):** `hsv()` native geometric SQ15x16 (C2). Seven live `ColorFromPalette` sites → `palette_manual_colour` (C1). Flashed **after** dump PASS, **then** commit. Cold-cache fallback in `palette_manual_colour` still FastLED uint8.
 
-## Ship path (this result does not close KEEP/KILL)
+## Ship path (packer KEEP closed; C1/C2 codes closed)
 
 **Already on silicon / in source**
 
 1. Working canvas `leds_16[]` / `CRGB16` / `SQ15x16` 0..1 — in source on all K1 envs.  
-2. Lever-2 TRUE16 pack + dual-DIN WS2812B-as-container — **on silicon** `9087A500` (see registry; look-lib lane later restamped — do not treat this ADR’s older `445c79ce` row as live without `device-build-registry.md`).  
-3. `quantize_color` bypassed on that env. REPLICATE8 not on that path.  
-4. rtrace itself — in source (`k1_render_trace.*`, `:rtrace_*`). Palette-resolver already closed with LED-buffer rtrace PASS (`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).  
-5. This ADR + three forensic reports — in source.  
+2. Lever-2 TRUE16 pack + dual-DIN WS2812B-as-container — **on silicon** `9087A500`.  
+3. `quantize_color` bypassed on that env. REPLICATE8 not on that path. Occupancy dump **PASS_TRUE16**.  
+4. rtrace retap + occupancy scorer — in source. Receipt: `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`.  
+5. This ADR + forensic reports — in source.  
 6. Standing order `/instrument-not-captain-eyes` — installed 2026-08-22.  
-7. Lever-2 rtrace retap + occupancy scorer + `k1_main_rpl_rtrace_probe` — **in source** 2026-08-22. Not flashed.  
+7. C2 hsv stim dump **PASS_TRUE16** (`mismatch_frac=0.664583`) then product `IDENTITY OK: git=a30d38e1 env=k1_main_rpl_im69d epoch=1787388790` on `9087A500`. Probe flag is off this env. Provenance SHA is HEAD at flash; bytes include the C1/C2 working tree.  
 8. Standing order `/no-reapprove-already-given` — installed 2026-08-22.
 
 **Remaining (numbered)**
 
-1. **Captain** — GO or defer flash of `k1_main_rpl_rtrace_probe` on `9087A500` only. Agent will not flash without GO.  
-2. **Agent** — after GO: `bash scripts/agent/pio-build.sh k1_main_rpl_rtrace_probe`, flash only that chip, arm `:rtrace_arm`, `:rtrace_dump`, score with `score_rtrace_occupancy.py`.  
-3. **Agent** — write occupancy `RESULT.md`. That is KEEP or KILL as codes.  
-4. **Agent** — update `docs/hardware/device-build-registry.md` with the new SHA/epoch after that stamp.
+1. **Agent** — commit this tree (host gate), then stamp-flash `k1_main_rpl_im69d` so `IDENTITY` SHA matches the commit that contains C1/C2. Same bytes already PASS on silicon.  
+2. **Agent** — native music occupancy remains INCONCLUSIVE (silent dump had zeros). Optional later dump under music. Do not ask Captain to look at the plate.  
+3. **Agent** — C3 bloom CRGB8 round-trip and authored palette **vertices** still 8-bit (interpolant is Q16). Separate lane.
 
 **Stamp that means shipped**
 
-- KEEP (codes): occupancy dump shows TRUE16 (not `k*257` lattice) on the five stimuli, scored PASS, plus `IDENTITY OK: git=<SHA> env=k1_main_rpl_im69d` on `9087A500`.  
-- KILL: the same dump FAIL (or no occupancy gain vs 8-bit) plus a named restore flash. KILL without a dump is not a close.  
+- Packer KEEP (codes): **closed** — `PASS_TRUE16` (`mismatch_frac=0.995833`, 328 unique codes).  
+- C1/C2 KEEP (codes): **closed** — hsv stim `PASS_TRUE16` plus product `env=k1_main_rpl_im69d` epoch `1787388790` on `9087A500`. SHA match after stamp-flash.  
 - Captain looking at the plate is **not** the stamp.
 
 ## Appendix — leak classes (on-path, Lever-2)

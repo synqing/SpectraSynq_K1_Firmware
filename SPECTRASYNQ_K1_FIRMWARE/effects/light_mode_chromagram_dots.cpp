@@ -16,38 +16,18 @@ void light_mode_chromagram_dots() {
 
   for (uint8_t i = 0; i < 12; i++) {
     SQ15x16 led_hue;
-    uint8_t paletteIndex = 0;
-    
-    if ((render_secondary && SECONDARY_PALETTE_MODE_ENABLED) || 
-        (!render_secondary && CONFIG.PALETTE_MODE_ENABLED)) {
-        // Use palette color based on brightness
-        paletteIndex = uint8_t(float(i) / 12.0f * 255.0f); // Map note index to palette index
-        // Use the CRGBPalette16 with ColorFromPalette
-        CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(paletteIndex), uint8_t(float(chromagram_smooth[i]) * 255));
-        led_hue = SQ15x16(rgb_color.r/255.0);
-    } else {
-        // Use CHROMA directly
-        led_hue = SQ15x16(rp->CHROMA) + hue_position + (sqrt(float(1.0)) * SQ15x16(0.05));
-    }
-
     SQ15x16 magnitude = chromagram_smooth[i] * 1.0;
     if (magnitude > 1.0) { magnitude = 1.0; }
-
     magnitude = magnitude * magnitude;
 
     CRGB16 col;
-    if ((render_secondary && SECONDARY_PALETTE_MODE_ENABLED) || 
+    if ((render_secondary && SECONDARY_PALETTE_MODE_ENABLED) ||
         (!render_secondary && CONFIG.PALETTE_MODE_ENABLED)) {
-        // --- Palette Mode ---
-        // Use the CRGBPalette16 with ColorFromPalette
-        CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(paletteIndex), uint8_t(float(magnitude) * 255));
-        col = crgb_to_crgb16(rgb_color);
+        col = palette_manual_colour(pal, SQ15x16((float)i / 12.0f), magnitude);
     } else {
-        // --- Original Hue/Chromatic Mode ---
         if (chromatic_mode == true) {
             led_hue = note_colors[i];
         } else {
-            // Use CHROMA directly
             led_hue = SQ15x16(rp->CHROMA) + hue_position + (sqrt(float(1.0)) * SQ15x16(0.05));
         }
         col = hsv(led_hue, SQ15x16(rp->SATURATION), magnitude);

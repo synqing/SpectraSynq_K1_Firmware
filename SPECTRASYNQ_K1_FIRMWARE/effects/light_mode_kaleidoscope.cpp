@@ -143,9 +143,8 @@ void light_mode_kaleidoscope(ChannelEffectState& fx) {
 
     CRGB16 col;
     if (palette_owns_colour) {
-      uint8_t palette_index = (half_res > 1) ? uint8_t((float(i) / float(half_res - 1)) * 255.0f) : 0;
-      CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(palette_index), uint8_t(float(brightness) * 255));
-      col = crgb_to_crgb16(rgb_color);
+      SQ15x16 palette_hue = (half_res > 1) ? (SQ15x16)i / (SQ15x16)(half_res - 1) : SQ15x16(0.0);
+      col = palette_manual_colour(pal, palette_hue, brightness);
     } else {
       col = { r_val, g_val, b_val };
 

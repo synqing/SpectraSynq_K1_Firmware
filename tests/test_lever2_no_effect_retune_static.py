@@ -1,8 +1,8 @@
 """E2 freeze: this slice must not retune hsv/palette/nscale8 effect files.
 
-First on-device effects when a K1 is named later: CRGB16-native
-(palette_manual_colour callers: comet, ember, tempo_river, dense_forge).
-Not light_mode_waveform_fast.cpp.
+C1 (2026-08-22) retired ColorFromPalette on seven live modes via
+palette_manual_colour. Those files are no longer in FORBIDDEN.
+Waveform / bloom / framework stay frozen until a named rewrite.
 """
 
 from __future__ import annotations
@@ -20,14 +20,7 @@ FORBIDDEN = [
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_tempo.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_gdft.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_kaleidoscope.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_quantum_collapse.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_vu.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_vu_dot.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_bloom.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chromagram_dots.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chromagram_gradient.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_transient_lattice.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_flux_rift.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_beat_pulse_resonant.cpp",

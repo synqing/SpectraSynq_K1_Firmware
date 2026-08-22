@@ -146,11 +146,8 @@ void light_mode_quantum_collapse() {
     if (palette_owns_colour) {
         // --- Palette Mode ---
         // Map position and probability/brightness to palette index
-        uint8_t index = uint8_t(float(position) * 192) + uint8_t(float(brightness) * 63); // Example mapping
-        // Use the CRGBPalette16 with ColorFromPalette
-        CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(index), uint8_t(float(brightness) * 255));
-        // Convert to CRGB16
-        leds_16[i] = crgb_to_crgb16(rgb_color);
+        SQ15x16 palette_hue = position * SQ15x16(192.0f / 255.0f) + brightness * SQ15x16(63.0f / 255.0f);
+        leds_16[i] = palette_manual_colour(pal, palette_hue, brightness);
     } else {
         // --- Original HSV Mode ---
         SQ15x16 velocity_mod = fluid_velocity[i] * 0.5; // Use velocity mod only in HSV mode

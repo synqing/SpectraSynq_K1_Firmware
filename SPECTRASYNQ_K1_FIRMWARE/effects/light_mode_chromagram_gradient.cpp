@@ -47,17 +47,13 @@ void light_mode_chromagram_gradient() {
 
     // Calculate hue
     SQ15x16 led_hue;
-    uint8_t paletteIndex = 0;
     CRGB16 col;
     
     if ((render_secondary && SECONDARY_PALETTE_MODE_ENABLED) ||
         (!render_secondary && CONFIG.PALETTE_MODE_ENABLED)) {
         // --- Palette Mode ---
         // Phase 1 2026-05-20: `pal_cg` and `palette_to_use_cg` now hoisted above the for(i) loop.
-        paletteIndex = uint8_t(float(prog) * 255); // Map progress across half-strip to palette index
-        // Use the CRGBPalette16 with ColorFromPalette
-        CRGB rgb_color = ColorFromPalette(pal_cg, palette_index_with_phase(paletteIndex), uint8_t(float(note_magnitude * note_magnitude) * 255));
-        col = crgb_to_crgb16(rgb_color);
+        col = palette_manual_colour(pal_cg, prog, note_magnitude * note_magnitude);
     } else {
         // --- Original Hue/Chromatic Mode ---
         if (chromatic_mode == true) {

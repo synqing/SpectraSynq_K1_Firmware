@@ -83,10 +83,7 @@ void light_mode_gdft() {
     if (palette_owns_colour) {
         // --- Palette Mode ---
         // Phase 1 2026-05-20: `pal` and `palette_to_use` now hoisted above the for(i) loop.
-        uint8_t paletteIndex = uint8_t(float(freq_prog) * 255); // Map frequency progress (0-1) to palette index (0-255)
-        // Use the CRGBPalette16 with ColorFromPalette
-        CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(paletteIndex), uint8_t(float(bin) * 255));
-        final_color = crgb_to_crgb16(rgb_color);
+        final_color = palette_manual_colour(pal, freq_prog, bin);
     } else {
         // --- Original Hue/Chromatic Mode ---
         SQ15x16 led_hue;

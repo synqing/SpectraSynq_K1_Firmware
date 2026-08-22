@@ -49,9 +49,7 @@ void light_mode_vu(SQ15x16& level_smooth, SQ15x16& max_level) {
     SQ15x16 value = brightness * coverage;
     CRGB16 color;
     if (palette_owns_colour) {
-      uint8_t palette_index = uint8_t(float(inner) * 255.0f);
-      CRGB rgb_color = ColorFromPalette(pal, palette_index_with_phase(palette_index), uint8_t(float(value) * 255.0f));
-      color = crgb_to_crgb16(rgb_color);
+      color = palette_manual_colour(pal, inner, value);
     } else {
       SQ15x16 hue = chroma_val + hue_position;
       color = hsv(hue, SQ15x16(rp->SATURATION), value);

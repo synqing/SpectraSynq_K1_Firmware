@@ -1,15 +1,23 @@
 # ACTIVE LANE POINTER
 
+**STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** pull Captain into LED/plate visual inspection. Use rtrace / LED-buffer dump (`/instrument-not-captain-eyes`). Occupancy and “what did we emit” close with a scored dump, not eyes-on.
+
+**STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
+
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
 **Dual-target (2026-08-21, not flash GO):** [ADR-0007](../docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) — `env:k1_p4_wifi6` in this tree; P4-Nano donor-only. Does **not** displace the silicon stamps below.
 
-**Live lane (2026-08-21):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @ `38428a82`**
-(`IDENTITY OK` epoch `1787324114`) — look library (`K1_LOOK_LIB_V1`); boot slot 0 IDENTITY; tap `z` for tonight.
-Palette-safe honour **closed** on `k1_hardware` (`69e21140`). B489 `B489A500` on
-`/dev/cu.usbmodem1101` last stamped `k1_bench_im69d` @ `d276fd68`. G8 **CLOSED
-on bench**. F887 OFFSITE. AP-input P4 stays open. No cal.
+**Live lane (2026-08-22):** Main RPL `9087A500` is **`k1_main_rpl_im69d`**
+(`IDENTITY OK` epoch `1787388790`, git stamp `a30d38e1` on a dirty C1/C2 tree) —
+geometric hsv + seven palette_manual_colour swaps on silicon after hsv dump
+**PASS_TRUE16**. B489 `B489A500` last stamped `k1_bench_im69d` @ `d276fd68`.
+G8 **CLOSED on bench**. F887 OFFSITE. No cal.
+
+**Occupancy (2026-08-22, KEEP packer + hsv paint):** packed-wire dump
+`docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`.
+Do not ask Captain to look at the plate.
 
 Authorisation: `FULL_UNRESTRICTED_SCHEDULING_IMPLEMENTATION_GO_2026-08-15` on
 `feat/k1-scheduling-generation-hardening`.
