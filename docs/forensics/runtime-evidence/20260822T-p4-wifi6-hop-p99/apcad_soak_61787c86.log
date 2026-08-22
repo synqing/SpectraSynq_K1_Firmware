@@ -1,0 +1,57 @@
+ESP-ROM:esp32p4-eco2-20240710
+Build:Jul 10 2024
+rst:0x1 (POWERON),boot:0x20f (SPI_FAST_FLASH_BOOT)
+SPI mode:DIO, clock div:1
+load:0x4ff33ce0,len:0x118c
+load:0x4ff2abd0,len:0xcd0
+load:0x4ff2cbd0,len:0x3304
+entry 0x4ff2abd0
+---------------------------
+K1 | VER: 40103
+---------------------------
+
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+[     9][E][vfs_api.cpp:99] open(): /littlefs/CONFIG_IM69_40103.BIN does not exist, no permits for creation
+[    28][E][vfs_api.cpp:99] open(): /littlefs/SHOW_STATE_V1.BIN does not exist, no permits for creation
+[    38][E][vfs_api.cpp:99] open(): /littlefs/cal_profile_im69d.bin does not exist, no permits for creation
+CHIP_GUARD: target=ESP32-P4 env=k1_p4_wifi6
+CHIP_GUARD: PDM clk=22 data=21 LED pri=4 sec=5 proto=WS2812 160+160
+P4_LED: dual-SPI WS2812 init OK pri=160 sec=160
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S PDM RX INIT: PASS slot=RIGHT
+I2S ENABLE: PASS
+GENERATING A-WEIGHTS: DONE IN 0.385 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 1.976 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.060 MS
+SYSTEM INIT COMPLETE!
+BOOT_LOOP_GUARD: reset_reason=1 fail_count=0 safe_mode=0
+WAVEFORM_HISTORY: OK @ 0x48000A10
+INIT_SECONDARY_LEDS: P4-WIFI6 GPIO5 WS2812 160 (SPI3)
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+sbr{{
+BUILD: version=40103 git=61787c86 epoch=1787395530 env=k1_p4_wifi6_apcad_probe
+}}
+sbr{{
+APCAD_SOAK: armed 120000 ms compact=1
+APCAD_SOAK_BEGIN,schema_ver=2,stage_detail=0,duration_ms=120000,compact=1
+}}
+BOOT_LOOP_GUARD: stable_clear=1
+APCAD_SOAK_DONE,schema_ver=2,stage_detail=0,active=0,rows=15999,emitted=5333,start_ms=8052,end_ms=128052,requested_duration_ms=120000,first_frame_ms=8059,last_frame_ms=128044,observed_duration_ms=119985,sample_rate=12800,samples_per_chunk=96,tempo_decim=3,hist_bucket_us=32,hist_bucket_count=512,meas_ap_hz=133.333,meas_nov_hz=44.444,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=1824,active_ap_work_p50_low_us=1344,active_ap_work_p50_high_us=1376,active_ap_work_p95_low_us=1792,active_ap_work_p95_high_us=1824,active_ap_work_p99_low_us=1824,active_ap_work_p99_high_us=1856,active_ap_work_hist_saturation=0,active_ap_work_max_us=1904,newest_sample_to_ap_publish_p50_low_us=1312,newest_sample_to_ap_publish_p50_high_us=1344,newest_sample_to_ap_publish_p95_low_us=1760,newest_sample_to_ap_publish_p95_high_us=1792,newest_sample_to_ap_publish_p99_low_us=1824,newest_sample_to_ap_publish_p99_high_us=1856,newest_sample_to_ap_publish_hist_saturation=0,newest_sample_to_ap_publish_max_us=1874,ap_read_return_interval_p50_low_us=7488,ap_read_return_interval_p50_high_us=7520,ap_read_return_interval_p95_low_us=7488,ap_read_return_interval_p95_high_us=7520,ap_read_return_interval_p99_low_us=7520,ap_read_return_interval_p99_high_us=7552,ap_read_return_interval_hist_saturation=0,ap_read_return_interval_max_us=7538,active_max_us=1904,active_sum_us=23370892,active_mean_us=1460.772,max_consecutive_active_over_7500=0,worst_count=16
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=0,frame=10026,t=76055,active_us=1898,total_us=7025,i2s_us=5127,gdft_us=1026,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=257,win_bpm=104.00000,top1_bpm=108.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=1,frame=6399,t=48852,active_us=1897,total_us=7506,i2s_us=5609,gdft_us=1029,novelty_us=6,tempo_acf_us=251,tempo_update_us=187,tempo_emit_us=470,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=164,win_bpm=100.00000,top1_bpm=106.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=2,frame=5112,t=39200,active_us=1892,total_us=6994,i2s_us=5102,gdft_us=1026,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=131,win_bpm=101.00000,top1_bpm=91.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=3,frame=4410,t=33934,active_us=1898,total_us=7991,i2s_us=6093,gdft_us=993,novelty_us=7,tempo_acf_us=288,tempo_update_us=186,tempo_emit_us=506,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=113,win_bpm=111.00000,top1_bpm=101.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=4,frame=7686,t=58505,active_us=1898,total_us=7013,i2s_us=5115,gdft_us=994,novelty_us=6,tempo_acf_us=288,tempo_update_us=189,tempo_emit_us=508,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=197,win_bpm=87.00000,top1_bpm=87.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=5,frame=10962,t=83075,active_us=1900,total_us=7031,i2s_us=5131,gdft_us=993,novelty_us=6,tempo_acf_us=288,tempo_update_us=188,tempo_emit_us=515,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=281,win_bpm=83.00000,top1_bpm=83.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=6,frame=8037,t=61137,active_us=1900,total_us=7517,i2s_us=5617,gdft_us=1030,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=470,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=206,win_bpm=102.00000,top1_bpm=103.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=7,frame=4761,t=36567,active_us=1900,total_us=7501,i2s_us=5601,gdft_us=1029,novelty_us=6,tempo_acf_us=251,tempo_update_us=189,tempo_emit_us=472,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=122,win_bpm=111.00000,top1_bpm=101.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=8,frame=11313,t=85707,active_us=1899,total_us=7532,i2s_us=5633,gdft_us=1030,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=290,win_bpm=83.00000,top1_bpm=97.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=9,frame=9324,t=70790,active_us=1899,total_us=7022,i2s_us=5123,gdft_us=992,novelty_us=6,tempo_acf_us=288,tempo_update_us=188,tempo_emit_us=507,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=239,win_bpm=104.00000,top1_bpm=81.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=10,frame=8388,t=63770,active_us=1892,total_us=7011,i2s_us=5119,gdft_us=1024,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=215,win_bpm=102.00000,top1_bpm=89.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=11,frame=6048,t=46220,active_us=1900,total_us=7007,i2s_us=5107,gdft_us=993,novelty_us=6,tempo_acf_us=289,tempo_update_us=188,tempo_emit_us=508,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=155,win_bpm=100.00000,top1_bpm=100.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=12,frame=5463,t=41832,active_us=1892,total_us=7496,i2s_us=5604,gdft_us=988,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=478,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=140,win_bpm=101.00000,top1_bpm=100.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=13,frame=9675,t=73422,active_us=1903,total_us=7528,i2s_us=5625,gdft_us=1031,novelty_us=7,tempo_acf_us=252,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=248,win_bpm=104.00000,top1_bpm=109.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=14,frame=1485,t=11997,active_us=1904,total_us=7488,i2s_us=5584,gdft_us=995,novelty_us=7,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=478,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=38,win_bpm=110.00000,top1_bpm=97.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=15,frame=11664,t=88340,active_us=1892,total_us=7027,i2s_us=5135,gdft_us=1024,novelty_us=6,tempo_acf_us=251,tempo_update_us=188,tempo_emit_us=471,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=299,win_bpm=97.00000,top1_bpm=97.00000
