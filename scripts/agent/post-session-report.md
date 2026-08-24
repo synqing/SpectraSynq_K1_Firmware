@@ -5,6 +5,90 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-24 K1 web flasher Vercel deploy
+
+```text
+session_objective:       Deploy existing tools/webflash static bundle to Vercel Hobby; prove production bytes match dist.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ 863921de dirty
+branch_head_at_end:      863921de (no commit); dist/webflash-deploy untracked
+files_changed:           tools/webflash/manifest.json + firmware copies (gitignored regen); dist/webflash-deploy assembled locally; no index.html / make_manifest.py / platformio.ini content change this session
+commands_run:            session-bootstrap WARN; pio-build.sh k1_main_rpl_im69d SUCCESS; make_manifest.py OK; vercel login elroy-7436; vercel deploy --yes --name k1-webflash; vercel --prod --yes; scripted GET/MD5
+validation_results:      ALL MATCH vs https://k1-webflash.vercel.app. Parts 0x0/0x8000/0xE000/0x10000. firmware.bin 708880 md5 df7e3c5f887eaa4fa1810058c6fa720d. esptool bundle 200 immutable. Protected SHA of index.html and make_manifest.py unchanged vs P0.
+evidence_captured:       production URL; MD5 table in session report to Captain
+blockers:                none for hosting. Silicon flash not done (Captain bench).
+generated_files_ignored: dist/webflash-deploy (untracked); tools/webflash/firmware/**/*.bin and manifest.json gitignored
+safety_constraints:      no firmware source edits; no flash; no cal; no commit; no auth in front of page
+thinking_skill_used:     thinking-router → inversion (half-arse skips) then execute approved plan
+skills_used:             writing-plans (prior); executing-plans; instrument-not-captain-eyes; no-reapprove-already-given; plain-english-work-summaries; ship-path-required; session-bootstrap
+specialists_used:        none
+next_recommended_action: Captain: first bench flash from https://k1-webflash.vercel.app against Main RPL. Do not treat Vercel MATCH as silicon proof.
+```
+
+---
+
+## Session Report — 2026-08-22 native music occupancy KEEP
+
+```text
+session_objective:       Captain: music playing; dump live show occupancy; restore product.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ b625e89a
+branch_head_at_end:      b625e89a (docs/receipt uncommitted); silicon k1_main_rpl_im69d @ b625e89a epoch 1787400761
+files_changed:           occupancy RESULT.md/json; registry current row + changelog; ADR remaining; handoff live lane
+commands_run:            prior turn: flash k1_main_rpl_rtrace_probe, capture.py 25s no stim, score_rtrace_occupancy, restore k1_main_rpl_im69d
+validation_results:      Probe IDENTITY OK git=b625e89a env=k1_main_rpl_rtrace_probe epoch=1787400579. Music dump PASS_TRUE16 mismatch_frac=0.78067 unique_chromatic=21475 frames=866 silence=0 bpm=124 lock=1 lightshow=7. Restore IDENTITY OK git=b625e89a env=k1_main_rpl_im69d epoch=1787400761. Guard 9087A500. No cal. B489/P4 not flashed.
+evidence_captured:       docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/{rtrace_music.log,rtrace_music.occupancy.json,RESULT.md,RESULT.json}
+blockers:                none for packer/C1/C2/music occupancy. C3 bloom CRGB8 + authored vertices remain a separate lane.
+generated_files_ignored: none
+safety_constraints:      9087 only; no cal; no B489; no i2sled; no Captain plate look
+thinking_skill_used:     thinking-router → execute music dump GO (no re-ask)
+skills_used:             spec-recall; instrument-not-captain-eyes; no-reapprove-already-given; ship-path-required; plain-english-work-summaries; hardware-truth-gate
+specialists_used:        none
+next_recommended_action: C3/vertices only if Captain names that rewrite. Do not reflash the probe. Commit occupancy receipt + registry when asked.
+```
+
+---
+
+## Session Report — 2026-08-22 occupancy flash GO
+
+```text
+session_objective:       Captain GO: flash occupancy probe on Main RPL, score dump, restore product env.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening @ c45b9763 dirty occupancy retap
+branch_head_at_end:      a30d38e1 (firmware committed); silicon k1_main_rpl_im69d @ a30d38e1 epoch 1787340461
+files_changed:           k1_render_trace.* led_utilities.h platformio.ini identities pio-build scorer tests ADR occupancy pack registry
+commands_run:            session-bootstrap; identity 1401=38428a82 then probe then restore; k1-flash-verified probe then im69d; capture.py stim dump
+validation_results:      Probe IDENTITY OK git=a30d38e1 env=k1_main_rpl_rtrace_probe epoch=1787340306. Stim dump PASS_TRUE16 mismatch_frac=0.995833 unique_chromatic=328. Silence dump INCONCLUSIVE (0 chromatic). Restore IDENTITY OK git=a30d38e1 env=k1_main_rpl_im69d epoch=1787340461. Guard 9087A500. No cal. B489/P4 not flashed.
+evidence_captured:       docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md
+blockers:                none for packer KEEP. C1/C2 waits named scope. Music occupancy optional later GO.
+generated_files_ignored: none for this close
+safety_constraints:      9087 only; no cal; no B489; no i2sled probe
+thinking_skill_used:     thinking-router → execute flash GO (no re-ask)
+skills_used:             hardware-bringup; hardware-truth-gate; k1-ws2816-lever2; instrument-not-captain-eyes; no-reapprove-already-given; ship-path-required
+specialists_used:        none
+next_recommended_action: C1/C2 only if Captain names that rewrite. Do not reflash the probe without a new GO.
+```
+
+---
+
+## Session Report — 2026-08-22 instrument-not-captain-eyes mandate
+
+```text
+session_objective:       Encode Captain standing order: stop pulling Captain into LED visual inspection when rtrace exists. Correct VP 16-bit ship path.
+branch_head_at_start:    feat/k1-scheduling-generation-hardening (dirty look-lib + ADR)
+branch_head_at_end:      same (docs/rules/skills; no firmware; no flash; no commit)
+files_changed:           ~/.cursor/rules/instrument-not-captain-eyes.mdc; skills on Claude/Cursor/Codex/Agents; CANONICAL_DECISIONS §6; ADR ship path; K1 handoff/CLAUDE/AGENT_OS
+commands_run:            session-bootstrap PASS; mem-search rtrace; source crush of k1_render_trace + show_leds Lever-2 return
+validation_results:      rtrace exists (:rtrace_arm/dump). Hook is RGB8 leds_out AFTER Lever-2 early return — cannot close 16-bit occupancy until retapped. Mandate installed. No flash.
+evidence_captured:       ADR restamp; ledger §6; skill /instrument-not-captain-eyes
+blockers:                Lever-2 rtrace retap is agent work; needs Captain GO only if a diagnostic flash is required
+generated_files_ignored: none
+safety_constraints:      F887 NO; B489 NO; no cal; no flash; no firmware edits
+thinking_skill_used:     thinking-router → red-team + steel-manning + archetypes + systems
+skills_used:             context-stack; context-mode; claude-mem-router; mem-search; ship-path-required; instrument-not-captain-eyes
+specialists_used:        none
+next_recommended_action: Agent retap rtrace onto Lever-2 packed u16 and score occupancy. Do not ask Captain to look at the plate.
+```
+
+---
+
 ## Session Report — 2026-08-21 look library commit + Main RPL flash
 
 ```text

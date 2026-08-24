@@ -170,11 +170,12 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Device | Chip ID | Permitted envs by configured route |
 |--------|---------|------------------------------------|
-| 1401 (main K1) | `F887A500` | `k1_hardware`; `k1_prod_im73d` only when this unit is intentionally configured for the IM73D `6/7` route |
+| 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only.** Current silicon `b625e89a` epoch `1787400761`. Never `k1_hardware`. |
+| F887 (OFFSITE) | `F887A500` | Historical `k1_hardware` allowlist. Do not flash any other serial as F887. |
 | 12201 (bench K1v2) | `B489A500` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
-| Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6` only** (apcad probe is non-shippable, restored off). Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `61787c86` 2026-08-22. Two WS2812 160-px strips on GPIO4/5 (data only). |
+| Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6`** (GPIO4/5, 160/160). Child **`k1_p4_wifi6_led150`** (GPIO39/40, 150/150) exists in source, not on silicon until flash GO. Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `61787c86` 2026-08-22. |
 
-> **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of the 2026-07-06 R1 run: bench `B489A500` = `/dev/cu.usbmodem101`, main `F887A500` = `/dev/cu.usbmodem1101`. Registry §2 deployed-state table is authoritative.
+> **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of 2026-08-22: Main RPL `9087A500` = `/dev/cu.usbmodem1401`; bench `B489A500` typical `/dev/cu.usbmodem1101`. Registry §2 deployed-state table is authoritative. F887 is OFFSITE.
 
 The two envs differ by GPIO map — never cross-flash. Identity = chip ID, never the port name. The earlier VMEWT-incident caveat is superseded by the registry's deployed-state table.
 
