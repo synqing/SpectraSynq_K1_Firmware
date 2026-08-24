@@ -997,6 +997,7 @@ void loop() {
     ap_cadence_stage_timing.gdft_end_us = (uint64_t)stage_end_us;
   }
 #endif
+#if K1_AUDIO_SOURCE_MIC
 #ifdef K1_LOUD_GUARD_V1
   k1_loud_guard_update(t_now);
 #endif
@@ -1006,6 +1007,7 @@ void loop() {
 #ifdef K1_MIC_AUTO_SENSE_V1
   k1_mic_auto_sense_update_frame(t_now);
   k1_mic_auto_sense_update(t_now);
+#endif
 #endif
 #endif
 #ifdef K1_PIN_EVIDENCE_V1

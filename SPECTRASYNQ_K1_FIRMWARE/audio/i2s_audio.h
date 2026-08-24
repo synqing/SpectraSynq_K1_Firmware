@@ -23,6 +23,10 @@
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
+#include "k1_audio_source.h"
+#if K1_AUDIO_SOURCE_USB
+#include "k1_usb_audio_input.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -62,16 +66,21 @@
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
 #ifdef K1_MIC_PDM_RX_ANY_V1
+#if K1_AUDIO_SOURCE_MIC
 #include <driver/i2s_pdm.h>   // PDM RX (IM73D / IM69); flag-OFF token stream unchanged
 #include <math.h>             // isfinite() for the PDM follower/NaN guard
+#endif
 #endif
 #ifdef K1_MIC_IM69D_PDM_V1
 #include <esp_idf_version.h>
 #ifndef K1_PLATFORM_P4
+#if K1_AUDIO_SOURCE_MIC
 #if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
 #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
 #endif
 #endif
+#endif
+#if K1_AUDIO_SOURCE_MIC
 // ESP-IDF PDM electrical naming is the inverse of Infineon's microphone naming:
 // RIGHT means SELECT HIGH; LEFT means SELECT LOW. With clk_inv=false, stereo DMA
 // order is RIGHT then LEFT. These assertions turn a driver-definition change red.
@@ -80,6 +89,7 @@ static_assert((int)I2S_PDM_SLOT_RIGHT == 1,
 static_assert((int)I2S_PDM_SLOT_LEFT == 2,
               "ESP-IDF PDM LEFT must mean SELECT LOW / stereo PCM index 1");
 #define K1_IM69D_PDM_CLK_INV false
+#endif
 #endif
 #ifdef K1_MIC_IM73D_PDM_V1
 #include <driver/gpio.h>      // LR-select GPIO drive (IM73D only; IM69 SELECT is hard-strapped)
@@ -269,7 +279,12 @@ static inline int16_t audio_response_gain_apply_sample(int32_t sample) {
   return (int16_t)scaled;
 }
 
+#include "k1_audio_ingress.h"
+
 void init_i2s() {
+#if !K1_AUDIO_SOURCE_MIC
+  return;
+#else
 #ifdef K1_MIC_HEALTH_V1
   k1_mic_health_reset(millis());
 #endif
@@ -408,9 +423,18 @@ void init_i2s() {
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#endif
 }
 
 void acquire_sample_chunk(uint32_t t_now) {
+#if K1_AUDIO_SOURCE_USB
+  int16_t usb_pcm[96];
+  k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
+  k1_audio_commit_canonical_frame(usb_pcm, t_now);
+  k1_usb_audio_poll_telemetry(t_now);
+  return;
+#endif
+#if K1_AUDIO_SOURCE_MIC
   static int8_t sweet_spot_state_last = 0;
   static bool silence_temp = false;
   static uint32_t silence_switched = 0;
@@ -1454,6 +1478,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     last_ap_dbg = millis();
   }
 }
+#endif
 
 #ifdef ENABLE_AP_STREAM
 // PIO-APCAP (2026-05-25): :ap_capture=<ms> windowed AP harness capture. ap_capture_tick()

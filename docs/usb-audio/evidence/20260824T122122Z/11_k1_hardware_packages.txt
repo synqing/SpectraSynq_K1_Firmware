@@ -1,0 +1,19 @@
+Resolving k1_hardware dependencies...
+Platform espressif32 @ 54.3.20 (required: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip)
+├── framework-arduinoespressif32 @ 3.2.0 (required: https://github.com/espressif/arduino-esp32/releases/download/3.2.0/esp32-3.2.0.zip)
+├── framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a (required: https://github.com/espressif/esp32-arduino-lib-builder/releases/download/idf-release_v5.4/esp32-arduino-libs-idf-release_v5.4-2f7dcd86-v1.zip)
+├── tool-cppcheck @ 1.21100.241030 (required: platformio/tool-cppcheck @ ~1.21100)
+├── tool-esptoolpy @ 4.8.9 (required: https://github.com/pioarduino/esptool/releases/download/v4.8.9/esptool.zip)
+├── tool-mkfatfs @ 2.0.1 (required: platformio/tool-mkfatfs @ ~2.0.0)
+├── tool-mklittlefs @ 3.2.0 (required: tasmota/tool-mklittlefs @ ^3.2.0)
+├── tool-mkspiffs @ 2.230.0 (required: platformio/tool-mkspiffs @ ~2.230.0)
+├── tool-openocd-esp32 @ 2.1100.20220706 (required: platformio/tool-openocd-esp32 @ ~2.1100.0)
+├── tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 (required: platformio/tool-riscv32-esp-elf-gdb @ 14.2.0+20240403)
+├── tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 (required: platformio/tool-xtensa-esp-elf-gdb @ 14.2.0+20240403)
+├── toolchain-riscv32-esp @ 14.2.0+20241119 (required: platformio/toolchain-riscv32-esp @ 14.2.0+20241119)
+└── toolchain-xtensa-esp-elf @ 14.2.0+20241119 (required: platformio/toolchain-xtensa-esp-elf @ 14.2.0+20241119)
+
+Libraries
+├── FastLED @ 3.10.3 (required: fastled/FastLED @ 3.10.3)
+├── FixedPoints @ 1.1.2 (required: file://libraries/FixedPoints)
+└── M5ROTATE8 @ 0.4.1 (required: file://libraries/M5ROTATE8)

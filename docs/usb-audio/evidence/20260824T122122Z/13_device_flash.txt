@@ -1,0 +1,18 @@
+DEVICE_FLASH = HOLD_NO_AUTHORISED_TARGET
+timestamp_utc=20260824T143500Z
+probe_env=k1_usb_audio_mac_probe
+identities_hit=ABSENT (k1_usb_audio_mac_probe is not in scripts/platformio/k1_device_identities.json)
+upload_guard=fail-closed for unmapped K1 environments
+
+Never flash:
+  F887A500  OFFSITE former main K1
+  9087A500  Main RPL — k1_main_rpl_* only; OTG probe would steal native USB
+  B489A500  bench IM69D — not named for this OTG probe
+  P4 / Tab5 / K718
+
+Enumerated serial this session (not a K1 S3, not flashed):
+  /dev/cu.usbmodem183912401  VID:PID=16C0:0483 SER=18391240  (Teensy-class, unrelated)
+
+No erase, NVS, cal, or eFuse. ROM download recovery remains: hold BOOT, pulse RESET, release BOOT, then guarded upload to the newly enumerated ROM port.
+
+Captain must name a live lab ESP32-S3 and add an identities row before any probe flash.

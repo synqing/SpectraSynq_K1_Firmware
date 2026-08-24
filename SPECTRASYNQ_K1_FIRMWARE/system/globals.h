@@ -1037,7 +1037,11 @@ inline uint8_t brightness_levels[NUM_FREQS] = { 0 };
 #if K1_ENABLE_USB_MSC_UPDATE
 inline FirmwareMSC MSC_Update;
 #endif
-#if defined(K1_HARDWARE)
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+#include <USB.h>
+#include <USBCDC.h>
+extern USBCDC USBSerial;
+#elif defined(K1_HARDWARE)
 #define USBSerial Serial
 #else
 inline USBCDC USBSerial;

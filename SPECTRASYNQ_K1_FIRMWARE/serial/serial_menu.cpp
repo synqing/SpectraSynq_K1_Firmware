@@ -647,13 +647,23 @@ void k1_print_smart_status() {
 bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
 #endif
 void init_serial(uint32_t baud_rate) {
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  if (!USBSerial) {
+    USBSerial.begin(baud_rate);
+  }
+#else
   USBSerial.begin(baud_rate);  // Default 500,000 baud
+#endif
   bool timeout = false;
   bool serial_started = true;
   uint32_t t_start = millis();
   uint32_t t_timeout = t_start + 250;
 
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  while (!USBSerial && timeout == false) {
+#else
   while (!Serial && timeout == false) {
+#endif
     if (millis() >= t_timeout) {
       timeout = true;  // Must not be connected to PC
       serial_started = false;

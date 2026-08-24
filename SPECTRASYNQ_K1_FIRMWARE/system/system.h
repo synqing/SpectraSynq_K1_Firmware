@@ -3,6 +3,9 @@
 #include <FastLED.h>
 #include <esp_system.h> // For ESP.restart()
 #include "globals.h" // For global variables like MASTER_BRIGHTNESS, debug_mode, frequencies etc.
+#if defined(K1_USB_AUDIO_PROTOTYPE)
+#include "k1_usb_audio_input.h"
+#endif
 #include "constants.h" // For band definitions, NUM_FREQS etc.
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
@@ -169,6 +172,9 @@ void enable_usb_update_mode() {
 #endif
 
 void init_usb() {
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  k1_usb_audio_start();
+#else
 #if K1_USB_CUSTOM_DESCRIPTORS
   USB.productName("SpectraSynq SB");
   USB.manufacturerName("SpectraSynq");
@@ -185,6 +191,7 @@ void init_usb() {
 #else
   USB.begin();
   USBSerial.begin();
+#endif
 #endif
 }
 
