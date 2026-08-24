@@ -17,10 +17,14 @@
 #include "globals.h"
 
 // Dual-SPI queue-all/wait-all. Donor: P4-Nano led_renderer.c (2026-08-13).
-// Logical frames are K1 CRGB after the existing funnel — one 160-px canvas
-// per physically separate WS2812 strip (Captain 2026-08-22).
+// Logical frames are K1 CRGB after the existing funnel — one canvas per
+// physically separate WS2812 strip. Default loom (Captain 2026-08-22):
 //   GPIO4 / SPI2 MOSI = primary DATA, 160 px
 //   GPIO5 / SPI3 MOSI = secondary DATA, 160 px
+// Proto loom K1_P4_PROTO_150_GPIO39_40_V1 (Captain 2026-08-24):
+//   GPIO39 / SPI2 MOSI = primary DATA, 150 px (SD DAT0)
+//   GPIO40 / SPI3 MOSI = secondary DATA, 150 px (SD DAT1)
+// GPIO6/54 are C6 radio control. Do not put LED data there.
 // WS2812 has no clock wire. ESP32-P4 SPI3 has no IOMUX pins; the GPSPI bit
 // engine still needs a clock *pad* or MOSI never shifts. Park that pad on a
 // free unused header GPIO. It is not connected to either strip.
@@ -31,6 +35,12 @@ static_assert(LED_DATA_PIN != SECONDARY_LED_DATA_PIN,
               "primary and secondary LED data must be distinct GPIOs");
 static_assert(LED_CLOCK_PIN < 0 && SECONDARY_LED_CLOCK_PIN < 0,
               "WS2812 has no clock; do not assign LED_CLOCK_PIN a GPIO");
+static_assert(LED_DATA_PIN != 6 && LED_DATA_PIN != 54 &&
+                  SECONDARY_LED_DATA_PIN != 6 && SECONDARY_LED_DATA_PIN != 54,
+              "GPIO6/54 are C6 control (C6_IO2 / C6_CHIP_PU), not LED data");
+static_assert((LED_DATA_PIN < 14 || LED_DATA_PIN > 19) &&
+                  (SECONDARY_LED_DATA_PIN < 14 || SECONDARY_LED_DATA_PIN > 19),
+              "C6 SDIO 14-19 is not LED data");
 static_assert(K1_P4_SPI3_DUMMY_SCLK_GPIO != LED_DATA_PIN,
               "SPI3 dummy SCLK must not steal primary data");
 static_assert(K1_P4_SPI3_DUMMY_SCLK_GPIO != SECONDARY_LED_DATA_PIN,
@@ -48,6 +58,10 @@ static_assert(K1_P4_SPI3_DUMMY_SCLK_GPIO != 24 && K1_P4_SPI3_DUMMY_SCLK_GPIO != 
               "SPI3 dummy SCLK must not steal USB 24/25");
 static_assert(K1_P4_SPI3_DUMMY_SCLK_GPIO < 39 || K1_P4_SPI3_DUMMY_SCLK_GPIO > 44,
               "SPI3 dummy SCLK must not steal microSD 39-44");
+#if defined(K1_P4_PROTO_150_GPIO39_40_V1)
+static_assert(LED_DATA_PIN == 39 && SECONDARY_LED_DATA_PIN == 40,
+              "k1_p4_wifi6_led150 loom is GPIO39 primary / GPIO40 secondary");
+#endif
 
 namespace {
 

@@ -163,6 +163,12 @@
   // P0.D flash freeze until that is fixed. Do NOT flash it to Unit 2 or B489.
   #define LED_COUNT_VALUE 224
   #define SECONDARY_LED_COUNT_VALUE 160
+#elif defined(K1_P4_PROTO_150_GPIO39_40_V1) || defined(K1_BENCH_LED150_GPIO39_40_V1)
+  // Dual independent WS2812, 150 px/channel. Canvas stays 160; output
+  // downsamples. P4 env k1_p4_wifi6_led150 or S3 env k1_bench_im69d_led150.
+  // Mutually exclusive with K1_CUSTOM_LED_V1 and K1_UNIT2_IM69D_V1.
+  #define LED_COUNT_VALUE 150
+  #define SECONDARY_LED_COUNT_VALUE 150
 #elif LED_STRIP_MODE == 1
   #define LED_COUNT_VALUE 61
   #define SECONDARY_LED_COUNT_VALUE 160

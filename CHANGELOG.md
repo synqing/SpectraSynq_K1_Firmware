@@ -8,6 +8,8 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Added
 
+- **P4 proto 150-px loom:** `env:k1_p4_wifi6_led150` — dual independent WS2812 channels, 150 LEDs each, data GPIO39 (primary) / GPIO40 (secondary) on the P4 lab board. Default `k1_p4_wifi6` stays GPIO4/5 at 160/160.
+- **Bench S3 proto 150-px loom:** `env:k1_bench_im69d_led150` — same 150/150 WS2812 geometry on bench K1 `B489A500`, GPIO39/40, IM69 mic stays CLK=14/DATA=13. Default `k1_bench_im69d` stays GPIO4/5 at 160/160. Canvas remains 160; output downsamples.
 - **PRISM authored ingress (option A):** 34-byte PRSM parser and magic-first byte scanner (`audio/k1_prsm.*`), source arbitration STANDALONE/AUTHORED/RECOVERY (`audio/k1_authored_source.*`, freshness **50 ms**), and `k1_audio_snapshot_publish()` as the single store write. `check_serial()` demuxes PRSM before immediate hotkeys (`P`/`R`/`S` collide with magic `PRSM`). Live microphone update is suppressed while authored is fresh; stale frames hand back to the live snapshot, not USB-bridge GPIO fallback. AUTHORED freezes Core-1 chromagram and forces drop-cut scale to 1. Host gate: `tests/test_authored_ingress_native.py`. No second renderer. No eFuse / erase_flash.
 - **B489_WFHYB_PROMOTE:** mode-11 origin deposit, modes 33–37, and EdgeMixer palette honour ride `k1_bench_im69d` (B489 home env). `k1_hardware` stays off-flag. Overlay `k1_bench_im69d_wfhyb_fade` is a no-flag alias.
 

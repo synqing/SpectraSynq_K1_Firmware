@@ -718,6 +718,10 @@ void setup() {
   init_secondary_leds();
 #ifdef K1_PLATFORM_P4
   ENABLE_SECONDARY_LEDS = true;  // Two separate 160-px WS2812 strips (GPIO4/5)
+  // Persisted secondary mode 18 (WAVEFORM TEMPO) leaves the second canvas
+  // almost empty while primary mode 3 fills ~145 px. Clone the live primary
+  // so both SPI lanes carry the same occupancy on this lab board.
+  SECONDARY_LIGHTSHOW_MODE = CONFIG.LIGHTSHOW_MODE;
 #else
   ENABLE_SECONDARY_LEDS = true;   // Dual-channel (incl. K1_CUSTOM_LED_V1 dual-206)
 #endif

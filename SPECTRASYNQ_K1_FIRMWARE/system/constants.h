@@ -380,16 +380,26 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     // Waveshare ESP32-P4-WIFI6 lab board (ADR-0007). Not bench-S3 coincidence.
     // IM69D130 PDM CLK=22 / DATA=21.
     // Captain 2026-08-22: TWO physically separate WS2812 strips, 160 px each.
-    // GPIO4 = primary DATA. GPIO5 = secondary DATA. There is no LED clock
-    // wire — WS2812 and WS2816 are single-wire data. Do not steal C6 SDIO 14–19.
+    // GPIO4 = primary DATA. GPIO5 = secondary DATA (free header). GPIO6 is
+    // C6_IO2 — not a LED pad. There is no LED clock wire — WS2812 and WS2816
+    // are single-wire data. Do not steal C6 SDIO 14–19 or C6 control 6/54.
     // LED_CLOCK_PIN / SECONDARY_LED_CLOCK_PIN stay -1 so FastLED's leftover
     // "clock" name cannot claim a GPIO. RNG on GPIO31 (GPIO8 is ES8311 SCL).
     #define I2S_BCLK_PIN 12
     #define I2S_LRCLK_PIN 10
     #define I2S_DIN_PIN 11
 
+    #if defined(K1_P4_PROTO_150_GPIO39_40_V1)
+    // Captain 2026-08-24: dual independent WS2812, 150 px/channel.
+    // Primary DATA GPIO39, secondary DATA GPIO40. Default loom GPIO4/5
+    // stays on env:k1_p4_wifi6. On ESP32-P4-WIFI6 these are SD DAT0/DAT1
+    // (Waveshare wiki: d0=39, d1=40, clk=43, cmd=44). Leave the TF slot empty.
+    #define LED_DATA_PIN 39
+    #define SECONDARY_LED_DATA_PIN 40
+    #else
     #define LED_DATA_PIN 4
     #define SECONDARY_LED_DATA_PIN 5
+    #endif
     #define LED_CLOCK_PIN (-1)
     #define SECONDARY_LED_CLOCK_PIN (-1)
     // ESP32-P4 SPI3 has no IOMUX pins. The GPSPI bit engine still needs a
@@ -471,8 +481,17 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define I2S_LRCLK_PIN 12
     #define I2S_DIN_PIN 13
 
+    #if defined(K1_BENCH_LED150_GPIO39_40_V1)
+    // Captain 2026-08-24: dual WS2812 150 px, GPIO39 primary / GPIO40 secondary.
+    // LED_CLOCK_PIN is the second data line (same pattern as GPIO4/5).
+    // Mic stays IM69 PCB3 CLK=14/DATA=13. Never combine with K1_UNIT2_IM69D_V1
+    // (that flag moves PDM onto GPIO39).
+    #define LED_DATA_PIN 39
+    #define LED_CLOCK_PIN 40
+    #else
     #define LED_DATA_PIN 4
     #define LED_CLOCK_PIN 5
+    #endif
 
     #ifdef K1_MIC_IM73D_PDM_V1
       // IM73D122 PDM mic (bench eval, 2026-07-02) — physically replaces the SPH0645

@@ -82,6 +82,7 @@
                 "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1",
                 "k1_bench_ap_frontend_probe_matrix_16000_120_d3_ap0_vp1_acf_spread4",
                 "k1_bench_im69d",
+                "k1_bench_im69d_led150",
                 "k1_bench_im69d_ap_integrity_bad_probe",
                 "k1_bench_im69d_ap_integrity_probe",
                 "k1_bench_im69d_ble",
@@ -136,12 +137,13 @@
             "chip_id": "0743E200",
             "usb_serial": "5AAF278179",
             "role": "Waveshare ESP32-P4-WIFI6 lab (ADR-0007)",
-            "pinmap": "IM69 PDM CLK=22/DATA=21; two physically separate WS2812 160-px strips, data GPIO4 (primary) and GPIO5 (secondary); no LED clock pin; C6 SDIO 14-19 unused (RF off)",
+            "pinmap": "IM69 PDM CLK=22/DATA=21; default loom two WS2812 160-px strips GPIO4/5; proto env k1_p4_wifi6_led150 is 150-px/channel on GPIO39/40 (SD DAT0/DAT1 — leave TF empty); no LED clock pin; C6 SDIO 14-19 unused (RF off)",
             "advisory_port": "/dev/tty.wchusbserial5AAF2781791",
             "_registration_2026_08_21": "Live pyserial USB serial is 5AAF278179; macOS device node appends a trailing 1. Live :dump CHIP ID 0743E200 on 2026-08-22. Never usbmodem (Tab5/S3). Flash 115200. Console is UART0 @ 115200, DTR deasserted. Do not start_noise_cal without Captain.",
             "envs": [
                 "k1_p4_wifi6",
-                "k1_p4_wifi6_apcad_probe"
+                "k1_p4_wifi6_apcad_probe",
+                "k1_p4_wifi6_led150"
             ]
         }
     ],

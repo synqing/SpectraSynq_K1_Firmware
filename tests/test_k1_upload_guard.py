@@ -58,6 +58,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_im73d_mic_auto_telemetry",  # IM73D mic auto-sense telemetry - bench B489A500 only
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
             "k1_bench_im69d",  # IM69D130 dual-mic PCB3 PDM eval — bench B489A500 only
+            "k1_bench_im69d_led150",  # 150-px WS2812 on GPIO39/40 — bench B489A500 only
             "k1_bench_im69d_ble",  # IM69D + BLE-MIDI Deck16 P0 baseline — bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
@@ -288,6 +289,14 @@ class K1UploadGuardTest(unittest.TestCase):
         )
         self.assertTrue(ok_probe, message_probe)
         self.assertIn("0743E200", message_probe)
+
+        ok_led150, message_led150 = self.guard.validate_upload_target(
+            "k1_p4_wifi6_led150",
+            "/dev/tty.wchusbserial5AAF2781791",
+            p4_ports,
+        )
+        self.assertTrue(ok_led150, message_led150)
+        self.assertIn("0743E200", message_led150)
 
         ok2, message2 = self.guard.validate_upload_target(
             "k1_p4_wifi6",

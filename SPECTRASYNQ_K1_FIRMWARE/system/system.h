@@ -455,7 +455,8 @@ void init_system() {
   // insert any calibration consumer between init_fs() and that block.
   CONFIG.LED_COUNT = LED_COUNT_VALUE;  // Force compile-time LED count to win over any stale saved config
 #ifdef K1_PLATFORM_P4
-  // Two single-wire 160-px WS2812 strips. NVS must not revive NEOPIXEL_X2 (80/80).
+  // Two single-wire WS2812 strips. Count comes from LED_COUNT_VALUE.
+  // NVS must not revive NEOPIXEL_X2 (80/80).
   CONFIG.LED_TYPE = LED_NEOPIXEL;
 #endif
 #ifdef K1_MAIN_RPL_PINMAP_V1

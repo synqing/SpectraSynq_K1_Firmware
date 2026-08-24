@@ -52,7 +52,7 @@ First seams (this landing):
 |------|---------------|------------|------------|
 | Colour scratch | `CRGB` via `k1_rgb.h`; working canvas `CRGB16` | FastLED RMT / Lever-2 packer | Dual-SPI queue-all/wait-all |
 | Capture | hop 12.8 kHz / 96 / d3 | SPH or IM69 per pinmap; IDF 5.4.1 frozen | IM69 PDM GPIO22/21; slot asserts restamped; no 5.4.1 `#error` |
-| GPIO | `K1_P4_WIFI6_PINMAP_V1` vs production 6/7 vs bench 4/5 | unchanged | GPIO4 primary **data**, GPIO5 secondary **data**, PDM 22/21. No LED clock pin. |
+| GPIO | `K1_P4_WIFI6_PINMAP_V1` vs production 6/7 vs bench 4/5 | unchanged | GPIO4 primary **data**, GPIO5 secondary **data**, PDM 22/21. GPIO6 is C6_IO2. No LED clock pin. |
 | USB / FS | existing Arduino USB CDC + LittleFS | S3 native USB | P4 USB 24/25; WCH UART for upload |
 | Identity | `k1_upload_guard.py` | F887 / B489 / 9087 usbmodem | `k1_p4_wifi6` on `wchusbserial` only; refuse Tab5 usbmodem |
 
@@ -122,7 +122,9 @@ P4 LED adapter must not be two RMT-DMA devices, sequential blocking refreshes, o
 
 ### Named deltas on this lab board (restamped 2026-08-22)
 
-Captain 2026-08-22: the two strips on IO4 and IO5 are **physically separate WS2812** lengths, 160 pixels each, **one data line per strip**. This is not a WS2816C-1313 bar split over DIN-A and DIN-B. Neither WS2812 nor WS2816 has a clock pin; `LED_CLOCK_PIN` on this pinmap is `-1`.
+Captain 2026-08-22: the two strips on IO4 and IO5 are **physically separate WS2812** lengths, 160 pixels each, **one data line per strip**. GPIO6 is C6 radio control (`C6_IO2`) and is not a LED pad. This is not a WS2816C-1313 bar split over DIN-A and DIN-B. Neither WS2812 nor WS2816 has a clock pin; `LED_CLOCK_PIN` on this pinmap is `-1`.
+
+Captain 2026-08-24: child env `k1_p4_wifi6_led150` keeps that default loom intact and adds a proto map — 150 px/channel on GPIO39 (primary) / GPIO40 (secondary). Those pads are Waveshare SD DAT0/DAT1; leave the TF slot empty. Canvas stays 160.
 
 | Delta | Why | Closest behaviour-preserving implementation |
 |-------|-----|-----------------------------------------------|

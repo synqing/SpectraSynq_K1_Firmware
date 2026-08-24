@@ -95,6 +95,7 @@ def test_p4_pinmap_is_not_bench_s3_or_tab5():
     assert "#define K1_PDM_DIN_PIN 21" in block
     assert "#define LED_DATA_PIN 4" in block
     assert "#define SECONDARY_LED_DATA_PIN 5" in block
+    assert "#define SECONDARY_LED_DATA_PIN 6" not in block
     assert "#define LED_CLOCK_PIN (-1)" in block
     assert "#define SECONDARY_LED_CLOCK_PIN (-1)" in block
     assert "#define K1_P4_SPI3_DUMMY_SCLK_GPIO 26" in block
@@ -103,6 +104,10 @@ def test_p4_pinmap_is_not_bench_s3_or_tab5():
     assert "C6 SDIO" in block
     assert "#define LED_DATA_PIN 6" not in block
     assert "#define K1_PDM_CLK_PIN 14" not in block
+    ino = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "SPECTRASYNQ_K1_FIRMWARE.ino").read_text(
+        encoding="utf-8"
+    )
+    assert "SECONDARY_LIGHTSHOW_MODE = CONFIG.LIGHTSHOW_MODE;" in ino
 
 
 def test_im69_idf_freeze_stays_on_s3_only():
@@ -134,6 +139,7 @@ def test_crgb_seam_and_logical_frame_above_protocol():
     assert "SPI_DEVICE_HALFDUPLEX" in transport
     assert "SPICOMMON_BUSFLAG_GPIO_PINS" in transport
     assert "K1_P4_SPI3_DUMMY_SCLK_GPIO" in transport
+    assert "GPIO6/54 are C6 control" in transport
     assert "k1_p4_led_dump_status" in transport
     assert "enc_nz" in transport
     led = LED.read_text(encoding="utf-8")
@@ -159,6 +165,7 @@ def test_p4_identity_is_wch_only_and_not_on_s3_chips():
     p4 = by_chip["0743E200"]
     assert p4["envs"][0] == "k1_p4_wifi6"
     assert "k1_p4_wifi6_apcad_probe" in p4["envs"]
+    assert "k1_p4_wifi6_led150" in p4["envs"]
     assert p4["usb_serial"] == "5AAF278179"
     for s3 in ("F887A500", "B489A500", "9087A500", "0C54FC00"):
         assert "k1_p4_wifi6" not in by_chip[s3]["envs"]
