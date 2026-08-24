@@ -68,7 +68,8 @@ microphone tail does. USB must not include `i2s_audio.h` from a second TU.
 | noise_cal / SSL persist | not written |
 | USB floor | 0 (no SSL) |
 
-Post-canonical tail **does** run: history, window, response gain, fixed-point.
+Post-canonical tail **does** run: history, window, response gain, fixed-point,
+and the waveform peak envelope (`waveform_peak_scaled`).
 
 ## 8. Queue depth 4 + drop-oldest
 
@@ -76,11 +77,21 @@ Post-canonical tail **does** run: history, window, response gain, fixed-point.
 drops the oldest complete frame. Partial bytes never enter the mailbox; they
 stay in the assembler until 192 bytes arrive.
 
-## 9. Underflow and inactive pacing
+## 9. Underflow, pacing, and waveform envelope
 
-Active stream: wait up to 10 ms for a live-generation frame, then one zero
-frame. Inactive: 7-then-8 tick `vTaskDelayUntil` (mean 7.5 ms). The `.ino`
-`vTaskDelay(1)` is unchanged.
+Active stream: block on the complete-frame task notify (20 ms stall
+timeout) so AP consume rate follows USB produce rate (~133 Hz), not
+`loop()` (~167 Hz). If the mailbox is still empty after the wait, hold the
+last live hop instead of writing 96 zeros. Inactive: 7-then-8 tick
+`vTaskDelayUntil` (mean 7.5 ms). The `.ino` `vTaskDelay(1)` is unchanged.
+
+USB commit also runs the waveform peak envelope (`waveform_peak_scaled`
+follower, USB floor 0). The microphone tail that normally updates that
+scalar is skipped by the USB early-return; without this step every
+waveform-family effect sits at centre / dark. In-RAM
+`CONFIG.SWEET_SPOT_MIN_LEVEL = 0` on first USB hop so SSL-relative
+reactive gates do not compare USB peaks to a leftover microphone floor.
+This is not persisted.
 
 ## 10. Composite UAC + CDC
 

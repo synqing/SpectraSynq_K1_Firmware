@@ -40,7 +40,9 @@ def test_production_platform_pin_unchanged():
 def test_probe_env_is_isolated_55_03_311_otg():
     probe = _env_block("k1_usb_audio_mac_probe")
     assert "55.03.311/platform-espressif32.zip" in probe
-    assert "extends = env:k1_hardware" in probe
+    assert "extends = env:k1_main_rpl_im69d" in probe
+    assert "-DK1_MAIN_RPL_PINMAP_V1=1" in _env_block("k1_main_rpl_im69d")
+    assert "-DK1_WS2816_LEVER2_V1" in _env_block("k1_main_rpl_im69d")
     assert "-DK1_USB_AUDIO_PROTOTYPE=1" in probe
     assert "-DK1_AUDIO_SOURCE_USB=1" in probe
     assert "-DK1_AUDIO_SOURCE_MIC=0" in probe
@@ -56,6 +58,18 @@ def test_probe_env_is_isolated_55_03_311_otg():
 
 def test_pio_build_allowlists_probe():
     assert "k1_usb_audio_mac_probe" in PIO_BUILD
+    assert "pio-build-usb-audio.sh" in PIO_BUILD
+
+
+def test_usb_probe_uses_isolated_platformio_root():
+    wrapper = (ROOT / "scripts" / "agent" / "pio-build-usb-audio.sh").read_text(encoding="utf-8")
+    assert "PLATFORMIO_PACKAGES_DIR" in wrapper
+    assert "PLATFORMIO_PLATFORMS_DIR" in wrapper
+    assert "PLATFORMIO_CACHE_DIR" in wrapper
+    assert ".pio-usb-audio" in wrapper
+    assert "k1_usb_audio_mac_probe" in wrapper
+    assert "--target" not in wrapper
+    assert "upload" not in wrapper.lower() or "Never upload" in wrapper
 
 
 def test_source_selectors_fail_closed():

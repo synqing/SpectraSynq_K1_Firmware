@@ -66,5 +66,11 @@ if [[ "$ENV" == *"upload"* ]] || \
   exit 1
 fi
 
+# USB probe must not install Arduino 3.3.11 into the shared production package
+# store. Route it through the isolated wrapper.
+if [[ "$ENV" == "k1_usb_audio_mac_probe" ]]; then
+  exec bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/pio-build-usb-audio.sh"
+fi
+
 # Execute the narrowly-scoped build command only.
 exec pio run -e "$ENV"

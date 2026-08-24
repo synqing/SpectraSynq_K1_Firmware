@@ -81,6 +81,8 @@ static uint32_t s_last_telem_ms = 0;
 static TickType_t s_inactive_wake = 0;
 static uint8_t s_inactive_phase = 0;
 static bool s_inactive_pacer_inited = false;
+static int16_t s_hold[DEFAULT_SAMPLES_PER_CHUNK];
+static bool s_hold_valid = false;
 
 static bool k1_usb_stream_valid() {
   return s_usb_started && !s_usb_suspended && s_speaker_enabled &&
@@ -283,6 +285,7 @@ void k1_usb_audio_take_canonical_samples(int16_t *out96, uint32_t t_now) {
 
   if (!k1_usb_stream_valid()) {
     k1_usb_inactive_wait();
+    s_hold_valid = false;
     memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
     return;
   }
@@ -290,13 +293,19 @@ void k1_usb_audio_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   s_inactive_pacer_inited = false;
   K1UsbPcmFrame frame;
   bool got = k1_usb_pop_live_frame(&frame);
-  if (!got) {
-    (void)ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(10));
+  while (!got && k1_usb_stream_valid()) {
+    if (ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(20)) == 0) {
+      break;
+    }
     got = k1_usb_pop_live_frame(&frame);
   }
   if (!got) {
     s_underflows++;
-    memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
+    if (s_hold_valid) {
+      memcpy(out96, s_hold, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
+    } else {
+      memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
+    }
     return;
   }
 
@@ -305,6 +314,8 @@ void k1_usb_audio_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   } else {
     memcpy(out96, frame.bytes, K1_USB_PCM_FRAME_BYTES);
   }
+  memcpy(s_hold, out96, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
+  s_hold_valid = true;
   const int64_t now = esp_timer_get_time();
   uint32_t age = 0;
   if (now > frame.received_us) {

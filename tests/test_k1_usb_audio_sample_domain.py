@@ -31,6 +31,23 @@ class UsbAudioSampleDomainTest(unittest.TestCase):
         self.assertIn("k1_audio_commit_canonical_frame", INGRESS)
         self.assertIn("audio_response_gain_apply_sample", INGRESS)
 
+    def test_usb_commit_runs_waveform_peak_envelope(self):
+        self.assertIn("k1_usb_update_waveform_peak_envelope", INGRESS)
+        self.assertIn("waveform_peak_scaled", INGRESS)
+        self.assertIn("max_waveform_val_follower", INGRESS)
+        self.assertIn("CONFIG.SWEET_SPOT_MIN_LEVEL = 0", INGRESS)
+
+    def test_usb_underflow_holds_last_frame_instead_of_zeros(self):
+        self.assertIn("s_hold_valid", USB_CPP)
+        self.assertIn("pdMS_TO_TICKS(20)", USB_CPP)
+        self.assertIn("memcpy(out96, s_hold", USB_CPP)
+        take = USB_CPP.split("void k1_usb_audio_take_canonical_samples", 1)[1]
+        take = take.split("void k1_usb_audio_poll_telemetry", 1)[0]
+        underflow = take.split("s_underflows++", 1)[1]
+        self.assertIn("s_hold_valid", underflow)
+        self.assertIn("memcpy(out96, s_hold", underflow)
+        # Zeros remain only as the cold-start fallback before any live hop.
+
     def test_usb_acquire_is_early_return_before_i2s_read(self):
         acquire_idx = I2S.index("void acquire_sample_chunk")
         usb_idx = I2S.index("k1_usb_audio_take_canonical_samples", acquire_idx)

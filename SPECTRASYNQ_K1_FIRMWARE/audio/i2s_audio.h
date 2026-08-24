@@ -432,6 +432,15 @@ void acquire_sample_chunk(uint32_t t_now) {
   k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
   k1_audio_commit_canonical_frame(usb_pcm, t_now);
   k1_usb_audio_poll_telemetry(t_now);
+  {
+    static uint32_t s_usb_wf_dbg_ms = 0;
+    if ((t_now - s_usb_wf_dbg_ms) >= 1000) {
+      s_usb_wf_dbg_ms = t_now;
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL);
+    }
+  }
   return;
 #endif
 #if K1_AUDIO_SOURCE_MIC

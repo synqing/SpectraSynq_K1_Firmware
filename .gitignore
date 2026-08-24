@@ -12,6 +12,8 @@
 
 # PlatformIO build output + generated compile DB
 .pio/
+# Isolated USB-audio PlatformIO workspace (Arduino 3.3.11 / 55.03.311)
+.pio-usb-audio/
 compile_commands.json
 # PIO preprocesses the sketch to <Sketch>.ino.cpp inside src_dir on every build
 *.ino.cpp
