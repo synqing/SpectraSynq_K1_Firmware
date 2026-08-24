@@ -18,8 +18,21 @@
 // so the hop commit must run the same envelope with USB floor = 0.
 static inline void k1_usb_update_waveform_peak_envelope(void) {
   static bool s_usb_env_started = false;
+#ifdef K1_USB_FORCE_PRESENT_DIAGNOSTIC
+  // K1_USB_FORCE_PRESENT_DIAGNOSTIC: forces silence=false so peak-path effects
+  // (e.g. waveform/VU) can activate during bench smoke tests without USB digital
+  // silence semantics being implemented. This is a peak-path bypass, NOT complete
+  // USB silence detection. Full USB silence requires: valid_stream + host_mute_off
+  // + hop RMS/peak below threshold + hysteresis + minimum quiet-frame count.
+  // PROBE ENV ONLY — must never appear in k1_hardware or any production build.
   silence = false;
   silent_scale = 1.0f;
+#else
+  // Without K1_USB_FORCE_PRESENT_DIAGNOSTIC, silence state is not overridden here.
+  // USB digital silence (full FSM) is not implemented in this probe; this path
+  // leaves silence/silent_scale as-is. Extend this block when implementing
+  // complete USB silence detection (K1_USB_SILENCE_SEMANTICS_V1 or equivalent).
+#endif
 
   float drive = max_waveform_val_raw;
   if (drive < 0.0f) {
@@ -121,4 +134,7 @@ static inline void k1_audio_commit_canonical_frame(const int16_t samples[K1_USB_
   }
 
   k1_usb_update_waveform_peak_envelope();
+  // agc_loudness_norm (K1_STM) is written by the caller (i2s_audio.h USB branch)
+  // after this commit, guarded by #ifdef K1_STM, so the value is always in
+  // the correct scope and never referenced here without the guard.
 }

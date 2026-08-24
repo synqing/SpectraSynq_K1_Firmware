@@ -3,7 +3,12 @@
 Non-shippable ESP32-S3 UAC1 speaker-only ingress. A Mac can stream 12.8 kHz mono
 S16 PCM into K1. Production `k1_hardware` remains the microphone authority.
 
-Evidence: `docs/usb-audio/evidence/20260824T122122Z/`.
+**Silicon close (2026-08-24):** Main RPL parented, gated, then **taken off**.
+Product restored: `k1_main_rpl_im69d` @ `b625e89a` epoch `1787591762`.
+Prototype is **not** A16–A26 PASS (A22 FAIL, A25 FAIL, A24 HOLD, A27 NOT_RUN).
+
+Evidence: `docs/usb-audio/evidence/20260824T122122Z/` (host) and
+`docs/usb-audio/evidence/20260824T165900Z-corrected-parent/` (silicon).
 
 ## 1. Purpose
 
@@ -47,7 +52,9 @@ This prototype is speaker-only (host → device). No USB microphone.
 | Rate | 12800 Hz |
 | Hop | 96 samples / 192 bytes / 7.5 ms |
 
-No resampler unless macOS rejects 12.8 kHz (Phase 17, not executed).
+No resampler on this prototype. 12.8 kHz was accepted by macOS on Main RPL.
+A 48 kHz UAC endpoint is **not** a licence to run AP at 48 kHz.
+Authority: [ADR-0008](../architecture/ADR-0008-usb-audio-keeps-12800-ap.md).
 
 ## 6. Canonical PCM boundary
 
@@ -81,9 +88,26 @@ stay in the assembler until 192 bytes arrive.
 
 Active stream: block on the complete-frame task notify (20 ms stall
 timeout) so AP consume rate follows USB produce rate (~133 Hz), not
-`loop()` (~167 Hz). If the mailbox is still empty after the wait, hold the
-last live hop instead of writing 96 zeros. Inactive: 7-then-8 tick
-`vTaskDelayUntil` (mean 7.5 ms). The `.ino` `vTaskDelay(1)` is unchanged.
+`loop()` (~167 Hz). Inactive pacing: 7-then-8 tick `vTaskDelayUntil`
+(mean 7.5 ms). The `.ino` `vTaskDelay(1)` is unchanged.
+
+**Underflow policy (amended 2026-08-25, Captain verdict):**
+
+- Inactive (stream not valid): emit zeros. Hold is not cleared here;
+  clearing on every inactive hop would penalise rapid reconnect.
+- Gen-bump (disconnect / suspend / rate change): `s_hold_valid = false`
+  and `s_consecutive_underflows = 0` immediately. Resume must wait for
+  the first complete fresh frame.
+- First missing hop within a generation (`s_consecutive_underflows == 0`
+  while `s_hold_valid`): emit a **tail-to-zero ramp** — a linear fade
+  applied to the last valid 96-sample frame, not a full PCM replay.
+  Replaying the hop verbatim would fabricate a 133.33 Hz periodic signal.
+  After emission the hold is invalidated; conceal budget is consumed.
+  Comment in source: *holding a ramp from last sample, not derived
+  envelope, not a repeated hop.*
+- Second or subsequent consecutive underflow, or no prior valid hold:
+  emit zeros.
+- Concealment is damage-control. PASS requires steady-state underflows=0.
 
 USB commit also runs the waveform peak envelope (`waveform_peak_scaled`
 follower, USB floor 0). The microphone tail that normally updates that
@@ -92,6 +116,43 @@ waveform-family effect sits at centre / dark. In-RAM
 `CONFIG.SWEET_SPOT_MIN_LEVEL = 0` on first USB hop so SSL-relative
 reactive gates do not compare USB peaks to a leftover microphone floor.
 This is not persisted.
+
+## 9a. Shared finaliser ownership table
+
+Every field written in `acquire_sample_chunk` is either **shared** (both
+sources call the same finaliser) or **mic-only** (USB path legitimately
+skips it). Fields that are **USB-pending** are those where a USB-neutral
+implementation is deferred.
+
+| Field / function | Status | Why |
+|---|---|---|
+| `waveform[]`, `waveform_history[]` | **shared** — `k1_audio_commit_canonical_frame` | canonical PCM copy; source-neutral |
+| `sample_window[]` | **shared** — `k1_audio_commit_canonical_frame` | `audio_response_gain_apply_sample`; source-neutral |
+| `waveform_fixed_point[]` | **shared** — `k1_audio_commit_canonical_frame` | SQ15x16 normalise; source-neutral |
+| `max_waveform_val_raw`, `max_waveform_val` | **shared** — `k1_audio_commit_canonical_frame` | digital peak of the hop; source-neutral (USB floor = 0) |
+| `waveform_peak_scaled` / `max_waveform_val_follower` | **shared** — `k1_usb_update_waveform_peak_envelope` (ingress) | USB follower with floor 0; source-neutral; `CONFIG.SWEET_SPOT_MIN_LEVEL = 0` on first hop |
+| `agc_loudness_norm` | **shared** — USB branch in `acquire_sample_chunk` (`#ifdef K1_STM`) | USB: peak/32768 normalised from canonical hop. Mic: pre-AGC raw RMS (i2s_audio.h ~681). Both paths are inside `#ifdef K1_STM`. EdgeMixer STM reads this; without the USB write STM modulation depth is always 0. `[USB-WF]` emits `loudness=BLOCKED` if `K1_STM` absent. |
+| `CONFIG.SWEET_SPOT_MIN_LEVEL` | mic-only (set to 0 at USB start) | SSL is a mic-RMS concept; USB sets to 0 once at first hop |
+| `silence` / `silent_scale` | mic-only (full silence FSM); probe bypass via `K1_USB_FORCE_PRESENT_DIAGNOSTIC` | USB digital silence not implemented; see §9b |
+| `i2s_channel_read` / `im69d/im73d` raw RMS | mic-only | hardware PDM; not applicable to USB |
+| `loud_guard`, `mic_health`, `auto_sense`, `noise_cal`, `SSL persist` | mic-only | IM69D130 mic-specific quality pipeline |
+| AGC feedback (`agc_envelope`, `agc_noise_floor`) | mic-only | audio feedback control; USB has no AGC |
+| `raw_dump_request` handler | mic-only | PDM raw frame debug; not applicable |
+
+## 9b. USB digital silence — diagnostic only
+
+`K1_USB_FORCE_PRESENT_DIAGNOSTIC` (added 2026-08-25) is set in the probe
+env build flags. It forces `silence = false` so peak-reactive effects can
+activate during bench smoke tests. This is a **peak-path smoke bypass**,
+not complete USB silence semantics.
+
+Full USB digital silence requires: `valid_stream` + host mute off + hop
+RMS/peak below threshold + hysteresis + minimum quiet-frame count. That
+FSM (`K1_USB_SILENCE_SEMANTICS_V1` or equivalent) does not exist in this
+probe. Do not claim fixture silence sections are valid until it does.
+
+Never set `K1_USB_FORCE_PRESENT_DIAGNOSTIC` in `k1_hardware` or any
+production env.
 
 ## 10. Composite UAC + CDC
 
@@ -103,7 +164,7 @@ DFU, USB mic, HID, MIDI, WebUSB, or second CDC. Strings: manufacturer
 
 ```bash
 bash scripts/agent/pio-build.sh k1_hardware
-bash scripts/agent/pio-build.sh k1_usb_audio_mac_probe
+bash scripts/agent/pio-build-usb-audio.sh
 python3 -m pytest tests/test_k1_usb_audio_*.py tests/test_im69d_env_static.py
 ```
 
@@ -112,10 +173,17 @@ Probe env: `[env:k1_usb_audio_mac_probe]`. Production src-filter excludes
 
 ## 12. Guarded flash procedure
 
-Flash **HOLD** until Captain names a lab ESP32-S3 and an identities row exists
-for this OTG probe.
+Captain named Main RPL (`9087A500` / MAC `B4:3A:45:A5:87:90`) for this OTG
+probe. Identities JSON maps `k1_usb_audio_mac_probe` to that serial.
 
-Never flash F887. Never flash 9087 with this OTG probe. Never P4 / K718 / Tab5.
+Never flash F887. Never P4 / K718 / Tab5. Do not burn `USB_PHY_SEL`.
+
+ROM-download (1200 bps on TinyUSB CDC, or BOOT/RESET) is the recovery path
+once the app owns USB-OTG. TinyUSB CDC is expected on this composite; it is
+not Serial-JTAG. DTR must be asserted to receive `[UAC]` lines. Missing CDC
+is not automatically “expected OTG failure”.
+
+Product restore after the probe: `k1_main_rpl_im69d` @ `b625e89a`.
 
 ## 13. ROM-download recovery
 
@@ -131,9 +199,10 @@ Do not burn USB-OTG eFuse.
 
 ## 14. macOS selection
 
-After a future authorised flash: Audio MIDI Setup → SpectraSynq K1 USB Audio →
-output → mono → 16-bit integer → 12800 Hz. Score `[UAC]` serial, not plate
-eyes.
+Audio MIDI Setup → TinyUSB UAC1 (product `SpectraSynq K1 USB Audio`) →
+output → mono → 16-bit integer → 12800 Hz. Score `[UAC]` / `[USB-WF]` serial,
+not plate eyes. `afplay` follows the Mac default output — switch to TinyUSB
+UAC1, then restore Multi-Output Device.
 
 ## 15. Fixture command
 
@@ -160,7 +229,12 @@ Host mute zeros samples. Volume is logged only; `applyVolume()` is not called.
 
 ## 17. Acceptance results
 
-Evidence: `docs/usb-audio/evidence/20260824T122122Z/`.
+Host evidence: `docs/usb-audio/evidence/20260824T122122Z/`.
+Silicon evidence: `docs/usb-audio/evidence/20260824T165900Z-corrected-parent/`.
+
+Corrected-parent factory: 791328 B, SHA-256
+`a257809e39d2d377ac3f31dc8f1ceea7b2f951fc291ec7870135b4dff7b92d71`,
+git=`c1b53860`, env=`k1_usb_audio_mac_probe`, extends `k1_main_rpl_im69d`.
 
 | ID | Result | Note |
 |---|---|---|
@@ -179,36 +253,59 @@ Evidence: `docs/usb-audio/evidence/20260824T122122Z/`.
 | A12 | PASS | Host mailbox depth-4 drop-oldest + underflow. |
 | A13 | PASS | USB sample-domain tests (no IM69 ×8, no DC, no `applyVolume`). |
 | A14 | PASS | Final `k1_hardware` SUCCESS. Bin SHA-256 `baf23454df448b1cd90c5c9b630005fe6a3273b9aa9a1944636f9f8245213a09` (712416 bytes). Hash moved vs A2 because `i2s_audio.h` gained fail-closed USB `#if` seams + `k1_audio_ingress.h`; `nm` has `i2s_channel_read` and no `USBAudioCard`. Packages remain Arduino 3.2.0 / 54.03.20. |
-| A15 | PASS | Probe SUCCESS. Bin SHA-256 `ba0630154cc8cb23be4df0668b07dc9a38f87f0e315b46d04ae3dcd79dff1040` (725088 bytes). `i2s_channel_read` absent. |
-| A16 | NOT_RUN | No authorised flash. |
-| A17 | NOT_RUN | No authorised flash. |
-| A18 | NOT_RUN | No authorised flash. |
-| A19 | NOT_RUN | No authorised flash. |
-| A20 | NOT_RUN | No authorised flash. |
-| A21 | NOT_RUN | No authorised flash. |
-| A22 | NOT_RUN | No authorised flash. |
-| A23 | NOT_RUN | No authorised flash. |
-| A24 | NOT_RUN | No authorised flash. |
-| A25 | NOT_RUN | No authorised flash. |
-| A26 | NOT_RUN | No authorised flash. |
-| A27 | NOT_RUN | Suspend/resume not attempted. |
-| A28 | PASS | USB path has no NVS mic-cal writes (host static + source). |
-| A29 | HOLD | `DEVICE_FLASH = HOLD_NO_AUTHORISED_TARGET`. Never F887. Never 9087 with this OTG probe. ROM-download recovery is documented, not silicon-proven. |
+| A15 | PASS | Probe SUCCESS (Main-RPL parent, isolated PIO). Factory SHA-256 `a257809e…` (791328 bytes). |
+| A16 | PASS | TinyUSB CDC `/dev/cu.usbmodem9087A5453AB41`, product `SpectraSynq K1 USB Audio`. `SPUSBDataType` was empty this host; ioreg + pyserial used. |
+| A17 | PASS | Core Audio output `TinyUSB UAC1`, manufacturer SpectraSynq. |
+| A18 | PASS | Negotiated 12800 Hz mono S16 (`Current SampleRate: 12800`, `[UAC] rate=12800`). |
+| A19 | PASS | 44 s fixture: `bytes_delta=1155840` (~25628 B/s). |
+| A20 | PASS | `frames_delta=6020` (~133.5 fps); assembled=enqueued=consumed. |
+| A21 | PASS | `[USB-WF]` tone peak_scaled 0.785 > silence 0.668; 110 Hz hop raw rose to ~8191. No GDFT bin print on the USB early-return path. |
+| A22 | FAIL | `[AP]` onset/tempo never emits on USB: `acquire_sample_chunk` returns before the `[AP]` printf. `:ap_stream=on` acknowledged. Click energy is visible on `[USB-WF]` during the 120 BPM section. `process_GDFT()` still runs after acquire. |
+| A23 | PASS | Fixture 440 Hz window: drop_ss_delta=0, underflow_ss_delta=0. Totals: dropped=0, underflows=3 (startup only), queue_high_water=1, rate_mismatches=0. |
+| A24 | HOLD | `apcad_soak` is not compiled on this probe (plan: reuse only if already compiled). Queue age p50≈32 µs / p99≈40–50 µs; hop cadence ~133 Hz. Production AP p99 was not re-measured. |
+| A25 | FAIL | 30 min soak aborted at play 22/41 (~16 min): UAC/CDC disappeared. Until then drop_ss_delta=0, underflow_ss_delta=0, heap 172768→172584 (−184 B), reset_reason stayed 11, queue_high_water=1. Device later reappeared as Serial-JTAG product `SpectraSynq K1 ESP32-S3-WROOM N16R8`. |
+| A26 | PASS | Ten 1200-bps disconnect → JTAG → hard_reset → UAC+CDC → 6 s fixture. 10/10 PCM. Heap 172768 stable. `esptool` via PlatformIO penv python. |
+| A27 | NOT_RUN | Mac suspend/resume not attempted (would disrupt the operator). |
+| A28 | PASS | USB path has no NVS mic-cal writes (host static + source). Restore inherited `SSL=157 persisted_profile`. |
+| A29 | PASS | ROM-download proven twice on 9087: 1200 bps → USB-Serial/JTAG serial `B4:3A:45:A5:87:90` → esptool `read_mac` + factory `0x0` + `verify_flash` OK (probe and product restore). Never F887. Never eFuse. |
 | A30 | PASS | Focused USB tests green; `test_all_k1_chip_bound_envs_are_registered_in_guard` and tempo-inc wrapper gate re-checked after blocking the probe env. Full `pytest tests` log in `19_final_full_pytest.log` (two misses were this lane; both now fixed). |
-| A31 | PASS | Lane commit on `feat/k1-usb-audio-input` (this document). Not pushed. |
+| A31 | PASS | Lane commit on `feat/k1-usb-audio-input` (parent + isolation). Not pushed. |
 
 ## 18. Known limitations
 
-- Device enumeration is unproven until Captain names a lab ESP32-S3 and an identities row exists for `k1_usb_audio_mac_probe`.
-- macOS 12.8 kHz acceptance is unknown. No resampler in this lane.
-- PlatformIO's unhashed `framework-arduinoespressif32` package is shared: building the probe installs 3.3.11; building `k1_hardware` restores 3.2.0. Always rebuild the env you intend to flash.
+- `[AP]` 1 Hz onset/tempo is compiled but unreachable on USB because
+  `acquire_sample_chunk` returns first. A22 stays FAIL until that print (or a
+  USB-side equivalent) is moved before the return, then re-flashed.
+- 30-minute soak did not complete; UAC vanished at ~16 min (A25 FAIL).
+- `system_profiler SPUSBDataType` returned 0 bytes on this host; ioreg and
+  Core Audio were used instead.
+- TinyUSB CDC needs DTR asserted. Opening Serial-JTAG after TinyUSB hard_reset
+  sometimes needs a host open to finish PHY handoff.
+- Isolated PIO root `~/.platformio-k1-usb-audio` + `.pio-usb-audio/` is
+  mandatory. Homebrew `pio` is not the production Core.
+- PlatformIO's unhashed `framework-arduinoespressif32` package is shared:
+  building the probe installs 3.3.11 into a **separate** package dir; production
+  stays 3.2.0 in `~/.platformio/packages`. Always rebuild the env you intend to
+  flash.
 
-## 19. Direct-rate fallback status
+## 19. Direct-rate fallback status (ADR-0008)
 
-Not started. Isolation before any 16 kHz or 48 kHz resampler.
+**This prototype stays 12.8 kHz / 96 / 7.5 ms.** Do not set
+`DEFAULT_SAMPLE_RATE` to 48000. Do not put a resampler in `loopTask`,
+`acquire_sample_chunk`, canonical commit, GDFT, tempo, or the TinyUSB
+`onData` callback.
+
+macOS Multi-Output Device is **not** a contract that 12.8 kHz K1 plus 48 kHz
+speakers will convert correctly. The preferred path is Mac-side grouped
+output: 48 kHz to Bose / laptop, independent SRC to 12.8 kHz for K1.
+
+If native mixed-rate Multi-Output becomes a named product requirement, that
+is a **new** lane (`K1_USB_AUDIO_48K_TRANSPORT_SRC`): UAC 48 kHz copy-only
+callback → Core-1 4/15 polyphase 360→96 → existing mailbox → unchanged AP.
+No measurement, no promotion. See ADR-0008.
 
 ## 20. Production authority
 
-`k1_hardware` remains microphone/production authority. This prototype does not
-promote USB ingress, does not change the 54.03.20 platform pin, and does not
-ship until a later named promotion.
+`k1_hardware` remains microphone/production authority. Main RPL silicon was
+restored to `k1_main_rpl_im69d` @ `b625e89a` epoch `1787591762`
+(`IDENTITY OK` on `:build`). This prototype does not promote USB ingress.

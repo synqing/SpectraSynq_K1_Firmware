@@ -54,6 +54,23 @@ def test_probe_env_is_isolated_55_03_311_otg():
     assert "-DARDUINO_USB_MSC_ON_BOOT=0" in probe
     assert "-DARDUINO_USB_DFU_ON_BOOT=0" in probe
     assert "+<audio/k1_usb_audio_input.cpp>" in probe
+    assert "-DDEFAULT_SAMPLE_RATE=48000" not in probe
+    assert "-DDEFAULT_SAMPLE_RATE=44100" not in probe
+    assert "-DK1_USB_AUDIO_SAMPLE_RATE=48000" not in probe
+
+
+def test_usb_ingress_does_not_retarget_ap_lattice():
+    """ADR-0008: USB may later accept 48 kHz transport. AP must stay 12.8 kHz/96."""
+    assert "static_assert(DEFAULT_SAMPLE_RATE == 12800" in USB_CPP
+    start = USB_CPP.index("static void k1_usb_on_spk_data")
+    end = USB_CPP.index("static void k1_usb_event_handler")
+    body = USB_CPP[start:end]
+    lowered = body.lower()
+    assert "polyphase" not in lowered
+    assert "resample" not in lowered
+    assert "48000" not in body
+    assert "process_GDFT" not in body
+    assert "k1_usb_pcm_assembler_feed" in body
 
 
 def test_pio_build_allowlists_probe():

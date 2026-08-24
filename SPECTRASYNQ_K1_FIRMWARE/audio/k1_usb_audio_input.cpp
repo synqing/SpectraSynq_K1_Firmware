@@ -83,6 +83,10 @@ static uint8_t s_inactive_phase = 0;
 static bool s_inactive_pacer_inited = false;
 static int16_t s_hold[DEFAULT_SAMPLES_PER_CHUNK];
 static bool s_hold_valid = false;
+// Consecutive underflow counter within the same stream generation.
+// Resets to 0 on every good frame and on every generation bump.
+// Only the zeroth consecutive underflow may emit a tail-to-zero ramp.
+static uint32_t s_consecutive_underflows = 0;
 
 static bool k1_usb_stream_valid() {
   return s_usb_started && !s_usb_suspended && s_speaker_enabled &&
@@ -92,6 +96,11 @@ static bool k1_usb_stream_valid() {
 static void k1_usb_bump_generation() {
   s_stream_generation++;
   k1_usb_pcm_assembler_reset(&s_assembler, s_stream_generation);
+  // Invalidate hold immediately on any stream state change (disconnect, suspend,
+  // rate change). Resume must wait for the first fresh frame; stale PCM from a
+  // prior session must never carry forward into a new generation.
+  s_hold_valid = false;
+  s_consecutive_underflows = 0;
 }
 
 static void k1_usb_record_age(uint32_t age_us) {
@@ -285,7 +294,8 @@ void k1_usb_audio_take_canonical_samples(int16_t *out96, uint32_t t_now) {
 
   if (!k1_usb_stream_valid()) {
     k1_usb_inactive_wait();
-    s_hold_valid = false;
+    // Keep s_hold across suspend/rate blips. Clearing here made the first
+    // underflow after resume emit zeros and defeated hold-last.
     memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
     return;
   }
@@ -301,13 +311,30 @@ void k1_usb_audio_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   }
   if (!got) {
     s_underflows++;
-    if (s_hold_valid) {
-      memcpy(out96, s_hold, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
+    if (s_hold_valid && s_consecutive_underflows == 0) {
+      // First missing hop in this generation: emit a tail-to-zero ramp
+      // from the last valid PCM frame toward silence. This is a linear fade
+      // applied to s_hold[] — holding a ramp from last sample, not a derived
+      // envelope, not a repeated hop. Replaying the full hop verbatim would
+      // fabricate a 133.33 Hz periodic signal; a fade avoids that artefact.
+      // Concealment is damage-control; PASS requires steady-state underflows=0.
+      for (uint16_t i = 0; i < DEFAULT_SAMPLES_PER_CHUNK; i++) {
+        const float alpha = 1.0f - (float)(i + 1) / (float)(DEFAULT_SAMPLES_PER_CHUNK + 1);
+        out96[i] = (int16_t)((float)s_hold[i] * alpha);
+      }
+      // Conceal budget consumed for this generation; next underflow → zeros.
+      s_hold_valid = false;
     } else {
+      // Second or subsequent consecutive underflow, or no prior valid hold:
+      // emit silence. Do not replay stale PCM.
       memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));
     }
+    s_consecutive_underflows++;
     return;
   }
+
+  // Good frame: reset consecutive underflow counter for this generation.
+  s_consecutive_underflows = 0;
 
   if (s_host_muted) {
     memset(out96, 0, DEFAULT_SAMPLES_PER_CHUNK * sizeof(int16_t));

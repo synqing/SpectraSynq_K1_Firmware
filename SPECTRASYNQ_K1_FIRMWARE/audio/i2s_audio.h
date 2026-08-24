@@ -431,14 +431,34 @@ void acquire_sample_chunk(uint32_t t_now) {
   int16_t usb_pcm[96];
   k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
   k1_audio_commit_canonical_frame(usb_pcm, t_now);
+#ifdef K1_STM
+  // Source-neutral loudness for USB: normalise the digital peak of the canonical
+  // hop to [0,1]. NOT mic IM69 raw RMS, NOT SSL floor.
+  // EdgeMixer STM reads agc_loudness_norm; without this write modulation depth
+  // stays 0.0 on USB (USB-dead STM bug). mic path writes this from pre-AGC raw
+  // RMS at i2s_audio.h ~681. This block is USB-only; K1_STM guards the variable.
+  {
+    float usb_peak_norm = max_waveform_val_raw / 32768.0f;
+    if (usb_peak_norm < 0.0f) usb_peak_norm = 0.0f;
+    if (usb_peak_norm > 1.0f) usb_peak_norm = 1.0f;
+    agc_loudness_norm = SQ15x16(usb_peak_norm);
+  }
+#endif
   k1_usb_audio_poll_telemetry(t_now);
   {
     static uint32_t s_usb_wf_dbg_ms = 0;
     if ((t_now - s_usb_wf_dbg_ms) >= 1000) {
       s_usb_wf_dbg_ms = t_now;
-      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u\n",
+#ifdef K1_STM
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=%.3f\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL,
+                       float(agc_loudness_norm));
+#else
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=BLOCKED\n",
                        (float)max_waveform_val_raw, (float)max_waveform_val_follower,
                        (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL);
+#endif
     }
   }
   return;
