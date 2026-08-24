@@ -563,6 +563,7 @@ ls /dev/cu.usbmodem*
 6. **Parallel-Agent Orchestration** — Parallel work requires delegation contracts with classification and evidence rules
 7. **Commit Cadence** — Commit frequently (every green checkpoint), but only after verification
 8. **Ship path required (Captain 2026-08-17)** — Never say a result does not mean ship / promote / close without the remaining numbered ship path in the same answer (`/ship-path-required`)
+9. **Plain English work summaries (Captain 2026-08-22)** — Summary of agent work MUST be plain English (`/plain-english-work-summaries`)
 
 Full rules and rationale: **[`.claude/CLAUDE.md`](./.claude/CLAUDE.md)**
 

@@ -1,5 +1,16 @@
 Any agent who engages in busy work will be destroyed. Before you begin a task or even THINK, you will first ask yourself: "Can I be absolutely sure what I'm about to do is not busy work" - If the answer is no. STOP.
 
+## Do not re-approve work already approved (Captain 2026-08-22 — HARD FAIL)
+
+If approval is already given or implied, execute. Do not ask again. Skill:
+`/no-reapprove-already-given`.
+
+## Instrument, not Captain eyes (Captain 2026-08-22 — HARD FAIL)
+
+Do not pull Captain into LED/plate visual inspection when rtrace / LED-buffer
+dump exists. Score the dump. Wrong tap → move the tap. Skill:
+`/instrument-not-captain-eyes`.
+
 ## Ship path required (Captain 2026-08-17 — HARD FAIL)
 
 Never tell Captain that a result does not mean ship, promote, close, or done
@@ -7,6 +18,12 @@ unless the **same answer** states: what is already promoted / on silicon;
 numbered remaining steps; who acts on each; the exact stamp or flash that
 means shipped. A hold without a ship path is a failed answer. Skill:
 `/ship-path-required`.
+
+## Plain English work summaries (Captain 2026-08-22 — HARD FAIL)
+
+Summary of agent work MUST be plain English: what happened, what is true now,
+what is left. Do not lead with labels or jargon. Skill:
+`/plain-english-work-summaries`.
 
 # Sensory Bridge core firmware on K1 hardware — Project Instructions
 

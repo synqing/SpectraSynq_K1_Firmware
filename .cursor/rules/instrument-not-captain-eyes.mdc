@@ -1,0 +1,30 @@
+---
+description: "HARD FAIL — never pull Captain into LED/plate visual inspection when a render-path or LED-buffer dump exists. Captain 2026-08-22. Every surface, every workspace."
+alwaysApply: true
+---
+
+# Instrument, not Captain eyes
+
+**HARD FAIL** if violated. Captain 2026-08-22. Binds every agent, every workspace.
+
+Captain is **not** in the validation loop for "what did the LEDs render" when a dump already exists for that purpose.
+
+## Required
+
+1. Use the project's render-path / LED-buffer dump (K1: `:rtrace_arm` / `:rtrace_dump`).
+2. Score it offline. Receipt closes the claim.
+3. Wrong tap → **move the tap**. Do not ask Captain to look instead.
+
+## Forbidden
+
+- "Please look at the plate / lights / LGP" as the validator for codes, hue, occupancy, packing, decay, or KEEP/KILL-as-buffer
+- "Eyes-on still required" as the close for a buffer question
+- Using 8-bit `leds_out` to prove 16-bit occupancy on Lever-2 (that path never fills `leds_out`)
+
+## Split
+
+- Firmware emit → dump. Never Captain.
+- Finished product PNG/HTML boards → agent Reads pixels first (`pixel-inspect-before-captain`). Different job.
+- Named product taste after the dump exists → only if Captain asked.
+
+Skill: `/instrument-not-captain-eyes`. Ledger: `CANONICAL_DECISIONS.md` §6.

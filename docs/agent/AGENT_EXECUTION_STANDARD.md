@@ -32,6 +32,11 @@ Passing fidelity alone is bureaucratic failure.
 - Do not claim completion without evidence proportional to the claim.
 - Never withhold ship / promote / close without the remaining numbered ship
   path in the same answer (`/ship-path-required`, Captain 2026-08-17).
+- Do not re-request approval after it is given or implied
+  (`/no-reapprove-already-given`, Captain 2026-08-22).
+- Summary of agent work MUST be plain English (`/plain-english-work-summaries`,
+  Captain 2026-08-22): what happened, what is true now, what is left. Labels
+  and jargon are evidence, not the summary.
 - If a test cannot kill the relevant failure class, it is not a gate.
 - If current live evidence contradicts a document, branch, memory, or generated
   source, stop and reconcile the contradiction. Never overwrite the territory

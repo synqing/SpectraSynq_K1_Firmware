@@ -1,0 +1,22 @@
+---
+description: "HARD FAIL — never re-request approval after it is already given or implied. Captain 2026-08-22. Every surface, every workspace."
+alwaysApply: true
+---
+
+# Do not re-approve work already approved
+
+**HARD FAIL** if violated. Captain 2026-08-22. Binds every agent, every workspace.
+
+If approval is already given or implied — including "progress", "next phase", "do it", "continue" — **execute**. Do not ask again.
+
+## Forbidden
+
+- "Shall I proceed?" / "tick this" / "I need a GO to start what you just ordered"
+- Re-listing options Captain already picked
+- Stopping the pipeline to re-litigate a closed decision
+
+## Still gated (not a re-ask)
+
+Flash, erase, `start_noise_cal`, push, destroy — only if those were **never** authorised.
+
+Skill: `/no-reapprove-already-given`. Ledger: `CANONICAL_DECISIONS.md` §7.

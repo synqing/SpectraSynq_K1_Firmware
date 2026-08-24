@@ -296,7 +296,7 @@ Before any non-`wip/*` commit:
 3. The pre-commit hook runs automatically
 4. For IM73D changes, `bash scripts/agent/pio-build.sh k1_bench_im73d` must also be clean
 
-For visual-only changes, host-green is sufficient; device eyes-on is a tracked non-blocking follow-up.
+For visual-only changes, host-green is sufficient. LED-output / occupancy / packing claims close with a scored rtrace or LED-buffer dump (`/instrument-not-captain-eyes`), not Captain looking at the plate. Product PNG craft boards still follow pixel-inspect. Do not re-request approval after it is given or implied (`/no-reapprove-already-given`).
 
 ---
 
