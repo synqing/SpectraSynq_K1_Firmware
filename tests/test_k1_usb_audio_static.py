@@ -96,12 +96,12 @@ def test_globals_usbserial_branch():
     assert "#define USBSerial Serial" in GLOBALS
 
 
-def test_probe_env_is_upload_blocked_until_named_chip():
+def test_probe_env_is_mapped_to_named_main_rpl_only():
     import json
 
     data = json.loads(
         (ROOT / "scripts" / "platformio" / "k1_device_identities.json").read_text(encoding="utf-8")
     )
-    assert "k1_usb_audio_mac_probe" in data["blocked_envs"]
-    for row in data["authorized"]:
-        assert "k1_usb_audio_mac_probe" not in row["envs"]
+    assert "k1_usb_audio_mac_probe" not in data["blocked_envs"]
+    mapped = [row["chip_id"] for row in data["authorized"] if "k1_usb_audio_mac_probe" in row["envs"]]
+    assert mapped == ["9087A500"]

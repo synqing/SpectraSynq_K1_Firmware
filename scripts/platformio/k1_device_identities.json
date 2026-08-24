@@ -62,11 +62,13 @@
             "pinmap": "WS2816 dual-DIN primary GPIO15/16 + secondary GPIO17/18; dual IM69D130 PDM DATA=GPIO8 CLK=GPIO9; I2C 17/18 DISPLACED by secondary LED DIN-A/B",
             "advisory_port": "/dev/tty.usbmodem1401",
             "_registration_2026_08_18": "Captain named unit Main RPL. Pin receipt: docs/hardware/main-rpl-pin-receipt-2026-08-18.md. Chip ID LOCKED live 2026-08-18: :chip_id / :dump on /dev/cu.usbmodem1401 printed CHIP ID: 9087A500. MAIN_RPL_FIRST_LIGHT_PASS. CAL measured SSL=173 DC=-265. Do not re-fire start_noise_cal.",
+            "_usb_audio_probe_2026_08_24": "Captain named this live unit for k1_usb_audio_mac_probe on /dev/cu.usbmodem112201 (USB serial B4:3A:45:A5:87:90). Native USB-OTG takes over the USB PHY; USB-Serial/JTAG 303A:1001 will disappear after this flash.",
             "envs": [
                 "k1_main_rpl_fps_agc_probe",
                 "k1_main_rpl_i2sled_probe",
                 "k1_main_rpl_im69d",
-                "k1_main_rpl_rtrace_probe"
+                "k1_main_rpl_rtrace_probe",
+                "k1_usb_audio_mac_probe"
             ]
         },
         {
@@ -159,7 +161,6 @@
     "blocked_envs": {
         "k1_sample_rate_32k_spike": "32 kHz spike is build-only until acquisition-only, AP/VP, calibration, and watchdog gates are explicitly re-opened",
         "k1_prod_im73d": "production IM73D env inherits the k1_hardware production LED GPIO map (6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A 2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed un-block) after the forensic root-cause of the bench audio+LED corruption. Unblock only when a correctly-wired production IM73D unit exists.",
-        "k1_custom": "BLOCKED \u2014 device nomination outstanding. UPDATED 2026-08-12 (P2.B): k1_custom no longer extends any *im73d* env; it now extends k1_bench_im69d_ble (IM69D + BLE-MIDI parent) with -DK1_CUSTOM_LED_V1 (224/160 RGBIC rig). The first unblock condition (Cursor plan P1.A) is MET. Still BLOCKED because no physical device is nominated for this env and the rig's mic identity has never been receipted \u2014 before unblocking: nominate a device, receipt its physical mic + PDM pins (P0.C pattern), verify they match this composition. Unit 2 (0C54FC00) is NOT this env; it is k1_unit2_im69d_right.",
-        "k1_usb_audio_mac_probe": "NON-SHIPPABLE native UAC1 speaker-ingress prototype. USB-OTG steals the native USB PHY. BLOCKED until Captain names a live lab ESP32-S3 and an identities row exists. Never F887A500. Never 9087A500 (Main RPL). Never P4/Tab5."
+        "k1_custom": "BLOCKED \u2014 device nomination outstanding. UPDATED 2026-08-12 (P2.B): k1_custom no longer extends any *im73d* env; it now extends k1_bench_im69d_ble (IM69D + BLE-MIDI parent) with -DK1_CUSTOM_LED_V1 (224/160 RGBIC rig). The first unblock condition (Cursor plan P1.A) is MET. Still BLOCKED because no physical device is nominated for this env and the rig's mic identity has never been receipted \u2014 before unblocking: nominate a device, receipt its physical mic + PDM pins (P0.C pattern), verify they match this composition. Unit 2 (0C54FC00) is NOT this env; it is k1_unit2_im69d_right."
     }
 }

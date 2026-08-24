@@ -1477,8 +1477,8 @@ void acquire_sample_chunk(uint32_t t_now) {
     USBSerial.println();
     last_ap_dbg = millis();
   }
-}
 #endif
+}
 
 #ifdef ENABLE_AP_STREAM
 // PIO-APCAP (2026-05-25): :ap_capture=<ms> windowed AP harness capture. ap_capture_tick()
