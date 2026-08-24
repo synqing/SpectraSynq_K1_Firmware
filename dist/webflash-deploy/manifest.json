@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "name": "SpectraSynq K1",
+  "chipFamily": "ESP32-S3",
+  "flash": {
+    "size": "keep",
+    "mode": "keep",
+    "freq": "keep"
+  },
+  "generatedAt": "2026-08-24T09:34:03+00:00",
+  "git": {
+    "sha": "863921de",
+    "dirty": true
+  },
+  "variants": [
+    {
+      "env": "k1_main_rpl_im69d",
+      "label": "K1 Main RPL \u2014 IM69D (k1_main_rpl_im69d)",
+      "builtAt": "2026-08-24T09:32:20+00:00",
+      "parts": [
+        {
+          "path": "firmware/k1_main_rpl_im69d/bootloader.bin",
+          "offset": 0,
+          "size": 20208,
+          "md5": "3a1751f965c8e51e47513a9c42a7d3c8"
+        },
+        {
+          "path": "firmware/k1_main_rpl_im69d/partitions.bin",
+          "offset": 32768,
+          "size": 3072,
+          "md5": "118cbdbfce82eb12bbdeb7c59af2fce8"
+        },
+        {
+          "path": "firmware/k1_main_rpl_im69d/boot_app0.bin",
+          "offset": 57344,
+          "size": 8192,
+          "md5": "e6327541e2dc394ca2c3b3280ac0f39f"
+        },
+        {
+          "path": "firmware/k1_main_rpl_im69d/firmware.bin",
+          "offset": 65536,
+          "size": 708880,
+          "md5": "df7e3c5f887eaa4fa1810058c6fa720d"
+        }
+      ],
+      "partitionMap": [
+        {
+          "name": "nvs",
+          "subtype": "nvs",
+          "offset": 36864,
+          "size": 20480
+        },
+        {
+          "name": "otadata",
+          "subtype": "otadata",
+          "offset": 57344,
+          "size": 8192
+        },
+        {
+          "name": "app0",
+          "subtype": "ota_0",
+          "offset": 65536,
+          "size": 6553600
+        },
+        {
+          "name": "app1",
+          "subtype": "ota_1",
+          "offset": 6619136,
+          "size": 6553600
+        },
+        {
+          "name": "spiffs",
+          "subtype": "spiffs",
+          "offset": 13172736,
+          "size": 3538944
+        },
+        {
+          "name": "coredump",
+          "subtype": "coredump",
+          "offset": 16711680,
+          "size": 65536
+        }
+      ],
+      "otaSeedOffset": 6619136,
+      "firmwareVersion": 40103
+    }
+  ]
+}
