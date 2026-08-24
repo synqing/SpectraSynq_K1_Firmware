@@ -15,8 +15,18 @@
     "git": "293490b4",
     "env": "k1_main_rpl_i2sled_probe",
     "host_image_checksum": "0xcc valid",
+    "host_validation_hash": "33e163cf…9539b03f valid",
+    "elf_sha256_prefix": "5b23f25c6",
     "esptool_verify": "OK",
     "rom": "esp_image Checksum failed; no bootable app partitions"
+  },
+  "host_diagnosis": {
+    "date": "2026-08-21",
+    "doc": "DIAGNOSIS.md",
+    "verdict": "image_valid; two stacked failures",
+    "failure_1": "write_flash --flash_size 16MB updated bootloader SHA; varying XOR + intermittent partition MD5",
+    "failure_2": "keep write booted probe ELF; Core 1 LoadProhibited on first Yves show; INIT_LEDS PASS is Core-0 skip",
+    "flash_size_pin": "keep"
   },
   "do_not_reflash_probe": true
 }

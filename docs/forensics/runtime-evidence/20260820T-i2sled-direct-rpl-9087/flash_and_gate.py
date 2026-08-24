@@ -92,8 +92,11 @@ def write_chain(kind: str) -> bool:
             "dio",
             "--flash_freq",
             "80m",
+            # 16MB rewrites the bootloader SHA ("SHA digest in image updated")
+            # and this USB-JTAG S3 then XOR-rejects the app. keep was the
+            # unbrick. See DIAGNOSIS.md. Never 16MB on 9087A500.
             "--flash_size",
-            "16MB",
+            "keep",
             "0x0",
             str(src / "bootloader.bin"),
             "0x8000",
@@ -219,10 +222,13 @@ def main() -> int:
     ok_init = "INIT_LEDS: PASS" in boot
     ok_id = "env=k1_main_rpl_i2sled_probe" in boot
     ok_i2s = "I2S_EMIT: init core=1" in boot
+    panic = "Guru Meditation" in boot
     print("boot INIT_LEDS", ok_init, "IDENTITY", ok_id, "I2S_EMIT core1", ok_i2s)
-    if bad or not (ok_init and ok_id and ok_i2s):
+    # INIT_LEDS PASS is Core-0 show skip under K1_RMT_ALLOC_ON_VP_CORE_V1.
+    # Yves is proven only by a complete I2S_EMIT init line without a panic.
+    if bad or panic or not (ok_id and ok_i2s):
         return restore_now(
-            f"boot gate fail init={ok_init} id={ok_id} i2s={ok_i2s} bad={bad}"
+            f"boot gate fail init={ok_init} id={ok_id} i2s={ok_i2s} panic={panic} bad={bad}"
         )
     print("BOOT GATE PASS")
     return 0

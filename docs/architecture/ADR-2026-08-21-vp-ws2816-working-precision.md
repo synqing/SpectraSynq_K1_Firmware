@@ -118,7 +118,7 @@ Forces:
 
 **Archetype.** Degamma-as-always-on-packer is **shifting the burden** (a print compensating silicon gamma instead of a measured LGP transfer). `hsv()` surviving next to a 16-bit packer is **success to the successful**: native modes get the extra bits “for free”; waveform/VU never will until C1/C2 retire.
 
-**Red team against “already 16-bit”.** (1) `CRGB16` comment still says Q8.8 — stale, trap for the next agent. (2) Occupancy of live shows is a **polyline**, not a volume — 8-bit vertices, Q16 edges. (3) Dirty look-lib is not silicon; 9087 @ `445c79ce` has always-on degamma in the packer. (4) No packed-u16 histogram from a live frame has been captured in this audit. (5) Framework `nscale8`/`toCrgb16` is real but `K1_EFFECT_FRAMEWORK_V1` is off on the three named envs.
+**Red team against “already 16-bit”.** (1) `CRGB16` comment still says Q8.8 — stale, trap for the next agent. (2) Occupancy of live shows is a **polyline**, not a volume — 8-bit vertices, Q16 edges. Native music dump 2026-08-22 is **PASS_TRUE16** (`mismatch_frac=0.78067`, 21475 unique) — that closes packer occupancy, not authored vertices. (3) Dirty look-lib is not silicon; 9087 @ `445c79ce` has always-on degamma in the packer. (4) Packed-u16 histogram **captured**: `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/`. (5) Framework `nscale8`/`toCrgb16` is real but `K1_EFFECT_FRAMEWORK_V1` is off on the three named envs.
 
 ## Consequences
 
@@ -145,7 +145,7 @@ Revisit:
 2. [x] **Agent:** rtrace retap onto Lever-2 packed WS2816 wire (`k1_render_trace_on_frame16` before the early return). Host scorer `scripts/regression-harness/score_rtrace_occupancy.py` (REPLICATE8 lattice vs TRUE16). Diagnostic env `k1_main_rpl_rtrace_probe` only — flag stays off `k1_hardware` / `k1_main_rpl_im69d`.  
 3. [x] **Captain:** named GO 2026-08-22 to flash `k1_main_rpl_rtrace_probe` on `9087A500`.  
 4. [x] **Agent:** flashed probe `a30d38e1`, dumped packed wire, scored. Stim ramp **PASS_TRUE16**. Restored `k1_main_rpl_im69d` same SHA. Did not ask Captain to look at the plate.  
-5. [x] **Close stamp (packer):** `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md` — KEEP. Native music occupancy INCONCLUSIVE (silence). C1/C2 not closed.  
+5. [x] **Close stamp (packer):** `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md` — KEEP. Native music occupancy **PASS_TRUE16** 2026-08-22.  
 6. [x] **Agent (2026-08-22):** `hsv()` native geometric SQ15x16 (C2). Seven live `ColorFromPalette` sites → `palette_manual_colour` (C1). Flashed **after** dump PASS, **then** commit. Cold-cache fallback in `palette_manual_colour` still FastLED uint8.
 
 ## Ship path (packer KEEP closed; C1/C2 codes closed)
@@ -158,18 +158,17 @@ Revisit:
 4. rtrace retap + occupancy scorer — in source. Receipt: `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`.  
 5. This ADR + forensic reports — in source.  
 6. Standing order `/instrument-not-captain-eyes` — installed 2026-08-22.  
-7. C1/C2 on silicon: hsv stim dump **PASS_TRUE16** (`mismatch_frac=0.664583`) then product stamp `IDENTITY OK: git=c2738b88 env=k1_main_rpl_im69d epoch=1787390639` on `9087A500`. Probe flag is off this env.  
+7. C1/C2 on silicon: hsv stim dump **PASS_TRUE16** (`mismatch_frac=0.664583`). Native music dump **PASS_TRUE16** (`mismatch_frac=0.78067`, 21475 unique). Product stamp `IDENTITY OK: git=b625e89a env=k1_main_rpl_im69d epoch=1787400761` on `9087A500`. Probe flag is off this env.  
 8. Standing order `/no-reapprove-already-given` — installed 2026-08-22.
 
 **Remaining (numbered)**
 
-1. **Agent** — native music occupancy remains INCONCLUSIVE (silent dump had zeros). Optional later dump under music. Do not ask Captain to look at the plate.  
-2. **Agent** — C3 bloom CRGB8 round-trip and authored palette **vertices** still 8-bit (interpolant is Q16). Separate lane.
+1. **Agent** — C3 bloom CRGB8 round-trip and authored palette **vertices** still 8-bit (interpolant is Q16). Separate lane.
 
 **Stamp that means shipped**
 
-- Packer KEEP (codes): **closed** — `PASS_TRUE16` (`mismatch_frac=0.995833`, 328 unique codes).  
-- C1/C2 KEEP (codes): **closed** — hsv stim `PASS_TRUE16` plus product `IDENTITY OK: git=c2738b88 env=k1_main_rpl_im69d epoch=1787390639` on `9087A500`.  
+- Packer KEEP (codes): **closed** — stim `PASS_TRUE16` plus native music `PASS_TRUE16` (`mismatch_frac=0.78067`, 21475 unique).  
+- C1/C2 KEEP (codes): **closed** — hsv stim `PASS_TRUE16` plus product `IDENTITY OK: git=b625e89a env=k1_main_rpl_im69d epoch=1787400761` on `9087A500`.  
 - Captain looking at the plate is **not** the stamp.
 
 ## Appendix — leak classes (on-path, Lever-2)

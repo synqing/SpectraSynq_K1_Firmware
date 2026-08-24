@@ -45,6 +45,11 @@ def main() -> int:
     p.add_argument("--port", default="/dev/cu.usbmodem1401")
     p.add_argument("--seconds", type=int, default=20)
     p.add_argument("--every", type=int, default=4)
+    p.add_argument(
+        "--stim",
+        action="store_true",
+        help="paint hsv/RGB stim instead of the live show (not for music occupancy)",
+    )
     p.add_argument("--out", required=True)
     args = p.parse_args()
     out = Path(args.out)
@@ -61,7 +66,10 @@ def main() -> int:
     with out.open("w", buffering=1, errors="replace") as log:
         build = cmd(s, log, "build", 1.5)
         print("\n".join(build[-8:]))
-        armed = cmd(s, log, f"rtrace_arm={args.seconds},{args.every},stim", 2.0)
+        arm = f"rtrace_arm={args.seconds},{args.every}"
+        if args.stim:
+            arm += ",stim"
+        armed = cmd(s, log, arm, 2.0)
         joined = "\n".join(armed)
         if "ARMED" not in joined:
             print("ARM FAIL:\n" + joined)

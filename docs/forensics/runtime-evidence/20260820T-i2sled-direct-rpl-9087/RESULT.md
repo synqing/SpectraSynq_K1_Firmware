@@ -38,10 +38,15 @@ Full-chain rewrite with `--flash_size keep` + `--after watchdog_reset`
 
 1. **Already on silicon / in source:** production RMT look `k1_main_rpl_im69d`
    @ `d276fd68` is running. Direct-driver source stays flag-gated in
-   `293490b4`; production code path is unchanged.
-2. **Agent:** host-only diagnosis of why ROM XOR ≠ stored checksum on the
-   probe `.bin` (and why a keep-flash once printed `INIT_LEDS: PASS` before
-   a false-positive restore). No device write.
-3. **Captain:** named GO if a new probe image is ever offered.
+   `293490b4`; production code path is unchanged. Host diagnosis is on disk:
+   `DIAGNOSIS.md` (2026-08-21). Probe `.bin` XOR/SHA are valid; the bootloader
+   `16MB` SHA rewrite plus Yves first-show LoadProhibited explain the ROM
+   storm and the `INIT_LEDS: PASS` false gate.
+2. **Agent:** no further host work on this checksum. Do not flash the probe.
+   `flash_and_gate.py` / `flash_plan.md` now say `--flash_size keep`.
+3. **Captain:** named GO only if a **new** probe image is offered (Yves
+   `show()` on Core 1 still panics — keep-flash is not enough). F887 copy
+   when that unit returns is a separate stamp.
 4. **Shipped for this lane:** the restore identity above. I2S/LCD_CAM eval
-   stays PARKED until that GO.
+   stays PARKED until that GO. Close stamp for the diagnosis step =
+   `DIAGNOSIS.md` in this pack.
