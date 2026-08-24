@@ -105,6 +105,8 @@ static inline bool k1_look_build_k1lt(uint8_t type, uint16_t node_n, const uint8
 #include <LittleFS.h>
 #include <esp_heap_caps.h>
 
+#include "globals.h"  // lock_leds / unlock_leds (G7B Core-1 park)
+
 #ifndef K1_LOOK_RX_MAX
 #define K1_LOOK_RX_MAX 32768
 #endif
@@ -216,13 +218,18 @@ static inline bool k1_look_fs_load(uint8_t slot) {
   }
   char path[24];
   k1_look_slot_path(slot, path, sizeof(path));
+  // G7B: park Core 1 across LittleFS (same crash class as save_config /
+  // SHOW_STATE). Main RPL inherits K1_PERSIST_PARK_V1 from k1_hardware.
+  lock_leds();
   File file = LittleFS.open(path, FILE_READ);
   if (!file) {
+    unlock_leds();
     return false;
   }
   const size_t n = (size_t)file.size();
   if (n < (K1LT_HEADER_SIZE + 4U) || n > K1_LOOK_RX_MAX) {
     file.close();
+    unlock_leds();
     return false;
   }
   uint8_t *buf = (uint8_t *)heap_caps_malloc(n, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
@@ -231,6 +238,7 @@ static inline bool k1_look_fs_load(uint8_t slot) {
   }
   if (buf == nullptr) {
     file.close();
+    unlock_leds();
     return false;
   }
   size_t got = 0;
@@ -242,6 +250,7 @@ static inline bool k1_look_fs_load(uint8_t slot) {
     buf[got++] = (uint8_t)b;
   }
   file.close();
+  unlock_leds();
   const bool ok = (got == n) && k1_look_install_parsed(slot, buf, n);
   heap_caps_free(buf);
   return ok;
@@ -254,15 +263,18 @@ static inline bool k1_look_fs_save(uint8_t slot, const uint8_t *bytes, size_t n)
   if (!k1_look_heap_ok("look_save")) {
     return false;
   }
-  LittleFS.mkdir("/look");
   char path[24];
   k1_look_slot_path(slot, path, sizeof(path));
+  lock_leds();
+  LittleFS.mkdir("/look");
   File file = LittleFS.open(path, FILE_WRITE);
   if (!file) {
+    unlock_leds();
     return false;
   }
   const size_t wrote = file.write(bytes, n);
   file.close();
+  unlock_leds();
   return wrote == n;
 }
 
@@ -272,7 +284,9 @@ static inline bool k1_look_fs_clear(uint8_t slot) {
   }
   char path[24];
   k1_look_slot_path(slot, path, sizeof(path));
+  lock_leds();
   LittleFS.remove(path);
+  unlock_leds();
   k1_look_free_slot_ram(slot);
   k1_look_table[slot].type = K1_LOOK_EMPTY;
   k1_look_table[slot].payload = nullptr;

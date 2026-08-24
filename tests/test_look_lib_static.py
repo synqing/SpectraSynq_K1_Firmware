@@ -181,6 +181,42 @@ def test_look_cycle_is_a_hotkey():
     assert "case 'z':" in menu
 
 
+def test_look_fs_writers_park_core1():
+    """look_load / look_save / look_clear must park Core 1 like save_config.
+
+    Main RPL inherits K1_PERSIST_PARK_V1. Bare LittleFS while Core 1 touches
+    PSRAM is the G7B flash-cache-disable crash class.
+    """
+    look_file = (
+        ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "k1_look_file.h"
+    ).read_text(encoding="utf-8")
+    assert '#include "globals.h"' in look_file
+
+    def failed_open_unlocks(body: str) -> bool:
+        idx = body.find("if (!file)")
+        if idx < 0:
+            idx = body.find("if(!file)")
+        if idx < 0:
+            return False
+        return "unlock_leds();" in body[idx : idx + 600]
+
+    load = _fn_body(look_file, "k1_look_fs_load")
+    assert "lock_leds();" in load
+    assert failed_open_unlocks(load)
+    assert load.index("unlock_leds();") < load.index("k1_look_install_parsed")
+
+    save = _fn_body(look_file, "k1_look_fs_save")
+    assert "lock_leds();" in save
+    assert failed_open_unlocks(save)
+    assert save.index("lock_leds();") < save.index("LittleFS.mkdir")
+
+    clear = _fn_body(look_file, "k1_look_fs_clear")
+    assert "lock_leds();" in clear
+    assert "LittleFS.remove" in clear
+    assert clear.index("lock_leds();") < clear.index("LittleFS.remove")
+    assert clear.index("unlock_leds();") < clear.index("k1_look_free_slot_ram")
+
+
 def test_tab5_reuses_typed_look_command():
     typed = (
         ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_typed_cmd_table.def"
