@@ -115,17 +115,42 @@ USB source-specific transport ────┘
 
 That unification needs golden equivalence tests on the microphone path.
 
-## Product restore target (next act)
+## Product restore (done 2026-08-25)
 
 ```text
-device       Main RPL 9087A500
-MAC          b4:3a:45:a5:87:90
-environment  k1_main_rpl_im69d
-commit       b625e89a
-factory      docs/usb-audio/evidence/20260824T165900Z-corrected-parent/restore_k1_main_rpl_im69d_b625e89a.factory.bin
-SHA-256      973084b464c8a22cab9b1db434a7e385a95c6b1755dc8946ac5af01633a69ce3
-NVS          keep (probe did not erase)
+PRODUCT_RESTORE = PASS
+device          Main RPL 9087A500
+MAC             b4:3a:45:a5:87:90
+environment     k1_main_rpl_im69d
+commit          b625e89a
+epoch           1787591762
+factory SHA-256 973084b464c8a22cab9b1db434a7e385a95c6b1755dc8946ac5af01633a69ce3
+NVS             kept — SSL=157 DC=-238 persisted_profile cal_valid=1
 ```
 
-Do not use `k1-flash-verified.sh` for this restore: it rebuilds HEAD
-(`0136de67`), not `b625e89a`. Re-resolve identity after ROM entry.
+Identity after ROM entry: TinyUSB CDC `/dev/cu.usbmodem9087A5453AB41` → 1200 baud
+→ JTAG `/dev/cu.usbmodem112401` serial `B4:3A:45:A5:87:90`. `read_mac`
+`b4:3a:45:a5:87:90`. Never F887.
+
+Write: esptool `write_flash 0x0` then in-write **Hash of data verified.**
+A later `verify-flash` against the archive file printed digest mismatch because
+esptool v5 updates the image SHA on write (`SHA digest in image updated`).
+Runtime identity is the close, not that file compare.
+
+Live product (serial, not plate):
+
+```text
+BUILD: version=40103 git=b625e89a epoch=1787591762 env=k1_main_rpl_im69d
+CHIP ID: 9087A500
+INIT I2S (channel): PASS
+I2S PDM RX INIT: PASS slot=RIGHT
+I2S ENABLE: PASS
+INIT_LEDS: PASS
+INIT_SECONDARY_LEDS: PASS
+SYSTEM_FPS: 134–137
+LED_FPS: 127.35 (settled; 0.00 immediately after serial-open reset)
+TinyUSB UAC1 / SpectraSynq K1 USB Audio: ABSENT
+product CDC/JTAG: /dev/cu.usbmodem112401
+```
+
+`k1-flash-verified.sh` was not used: it would have rebuilt HEAD, not `b625e89a`.

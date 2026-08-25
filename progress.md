@@ -2,14 +2,16 @@
 
 **Started:** 2026-05-25
 
-## 2026-08-25 — USB-audio diagnostic PASS; product restore GO
+## 2026-08-25 — USB-audio diagnostic PASS; product restored
 
 Captain closed the USB ingress diagnostic on Main RPL `9087A500`.
 `k1_usb_audio_mac_probe` @ `0136de67` factory SHA `fc5854a5…` proved 12.8 kHz
 mono delivery, matched frames, steady-state drops/underflows 0, and a moving
 waveform envelope. `loudness=BLOCKED` is N/A (`K1_STM` not in the probe).
-No second flash. Restore target remains `k1_main_rpl_im69d` @ `b625e89a`.
-Evidence: `docs/usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md`.
+No second probe flash. Product restored: **`k1_main_rpl_im69d` @ `b625e89a`**
+epoch `1787591762`. Live `:build` matches. IM69 PDM RIGHT and both LED inits
+PASS. TinyUSB UAC gone. Evidence:
+`docs/usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md`.
 
 ## 2026-08-24 — USB-audio corrected parent gated, product restored
 

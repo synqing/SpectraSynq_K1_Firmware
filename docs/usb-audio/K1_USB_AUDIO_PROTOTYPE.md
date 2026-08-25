@@ -6,8 +6,8 @@ S16 PCM into K1. Production `k1_hardware` remains the microphone authority.
 **Diagnostic close (2026-08-25):** `K1_USB_AUDIO_DIAGNOSTIC = PASS` on Main RPL
 `9087A500`. Mac 12.8 kHz mono S16 entered the 96-sample hop and moved the
 canonical waveform envelope. Not product. Not STM loudness. Shared finaliser
-remains `OPEN`. Captain: do not rebuild for `K1_STM`. Restore
-`k1_main_rpl_im69d` @ `b625e89a`.
+remains `OPEN`. Product restored: `k1_main_rpl_im69d` @ `b625e89a` epoch
+`1787591762`.
 
 Evidence: [`20260825T073600Z-amendment-diagnostic/RESULT.md`](evidence/20260825T073600Z-amendment-diagnostic/RESULT.md).
 Earlier corrected-parent gate (then product restore):

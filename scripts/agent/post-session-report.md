@@ -5,6 +5,48 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-25 USB-audio diagnostic PASS + product restore
+
+```text
+session_objective:       Freeze USB diagnostic evidence, commit registry, restore k1_main_rpl_im69d @ b625e89a on 9087.
+branch_head_at_start:    feat/k1-usb-audio-input @ 0136de67
+branch_head_at_end:      615c2a17 + this restore docs commit
+files_changed:           registry; handoff; spec-index; progress; prototype; evidence pack RESULT + serial; ADR-0008
+commands_run:            session-bootstrap FAIL=expected branch mismatch; factory SHA check; 1200 ROM; esptool read_mac + write_flash 0x0; live :build/:dump
+validation_results:      K1_USB_AUDIO_DIAGNOSTIC=PASS. Restore live BUILD git=b625e89a env=k1_main_rpl_im69d epoch=1787591762 CHIP 9087A500. IM69 PDM RIGHT PASS. INIT_LEDS + INIT_SECONDARY_LEDS PASS. TinyUSB UAC absent. Cal SSL=157 inherited. Never F887. No cal. No push.
+evidence_captured:       docs/usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md
+blockers:                USB_SHARED_FINALISER_UNIFICATION still OPEN. Not product promotion.
+generated_files_ignored: _scratch/; most evidence/ (force-added this pack)
+safety_constraints:      9087 only; named factory not HEAD rebuild; no K1_STM second probe; no plate eyes
+thinking_skill_used:     execute approved restore (no re-ask)
+skills_used:             spec-recall; hardware-bringup; instrument-not-captain-eyes; no-reapprove-already-given; ship-path-required; plain-english-work-summaries
+specialists_used:        Identify 9087 then flash (030ac87b) earlier; this turn parent restore
+next_recommended_action: Product is restored. Do not reflash USB without a new named GO. Shared-finaliser unification is later debt with mic golden tests.
+```
+
+---
+
+## Session Report — 2026-08-24 USB-audio corrected-parent close
+
+```text
+session_objective:       Close USB-audio on corrected Main RPL parent; restore product.
+branch_head_at_start:    feat/k1-usb-audio-input @ c1b53860
+branch_head_at_end:      c1b53860 (docs dirty, not committed); silicon k1_main_rpl_im69d @ b625e89a epoch 1787591762
+files_changed:           registry current+changelog; prototype A16–A29; handoff epoch; progress.md; evidence RESULT.md
+commands_run:            prior: isolated probe flash+A16–A29; product restore esptool 0x0 verify; SwitchAudioSource Multi-Output Device
+validation_results:      Probe A16–A21/A23/A26/A29 PASS. A22 FAIL ([AP] unreachable on USB). A24 HOLD. A25 FAIL (~16 min UAC loss). A27 NOT_RUN. Restore IDENTITY OK git=b625e89a env=k1_main_rpl_im69d epoch=1787591762. Cal SSL=157 inherited. Never F887. No cal. No push.
+evidence_captured:       docs/usb-audio/evidence/20260824T165900Z-corrected-parent/RESULT.md
+blockers:                USB prototype not A16–A26 PASS. Product is restored.
+generated_files_ignored: evidence/ (gitignored); restore factory bin in evidence pack
+safety_constraints:      9087 only; no eFuse; no resampler; no webflash; no shared PIO 3.3.11; no Captain plate look
+thinking_skill_used:     execute approved plan (no re-ask)
+skills_used:             hardware-truth-gate; instrument-not-captain-eyes; no-reapprove-already-given; ship-path-required; plain-english-work-summaries
+specialists_used:        none
+next_recommended_action: Do not reflash USB without a new Captain GO. If GO: move [AP]/onset onto USB path, isolated rebuild, re-score A22+A25. Commit registry+prototype when asked. Do not push.
+```
+
+---
+
 ## Session Report — 2026-08-24 K1 web flasher Vercel deploy
 
 ```text
