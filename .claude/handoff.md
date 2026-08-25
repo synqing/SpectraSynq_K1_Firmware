@@ -9,9 +9,11 @@
 
 **Dual-target (2026-08-21, not flash GO):** [ADR-0007](../docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) — `env:k1_p4_wifi6` in this tree; P4-Nano donor-only. Does **not** displace the silicon stamps below.
 
-**Live lane (2026-08-22):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @ `b625e89a`**
-(`IDENTITY OK` epoch `1787400761`) — product restored after native music occupancy
-**PASS_TRUE16**. B489 `B489A500` last stamped `k1_bench_im69d` @ `d276fd68`.
+**Live lane (2026-08-25):** Main RPL `9087A500` still holds the USB-audio
+diagnostic `k1_usb_audio_mac_probe` @ `0136de67` (factory SHA `fc5854a5…`).
+Captain: `K1_USB_AUDIO_DIAGNOSTIC=PASS`, `DIAGNOSTIC_FINISHED=YES`, restore
+**`k1_main_rpl_im69d` @ `b625e89a`**. No `K1_STM` second probe. **ADR-0008:**
+keep 12.8 kHz AP. B489 `B489A500` last stamped `k1_bench_im69d` @ `d276fd68`.
 G8 **CLOSED on bench**. F887 OFFSITE. No cal.
 
 **Occupancy (2026-08-22, KEEP packer + hsv paint + native music):** packed-wire dump
@@ -52,11 +54,12 @@ touched. Port 1401 is Main RPL, not this chip.
 Production honour is on `k1_hardware` as of `69e21140`. The other five
 colour-fix flags stay leak-blocked.
 
-**Main RPL = ON SILICON @ `b625e89a` / `k1_main_rpl_im69d`**
-(USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-`IDENTITY OK: git=b625e89a env=k1_main_rpl_im69d epoch=1787400761`.
-Look library on. Native music occupancy KEEP. Cal inherited. Do
-**not** re-fire `start_noise_cal`. Prior stamp `c2738b88` / look-lib `38428a82`.
+**Main RPL = ON SILICON @ `0136de67` / `k1_usb_audio_mac_probe`**
+(USB `B4:3A:45:A5:87:90`; factory SHA `fc5854a5…`; live `:build` banner stale
+`c1b53860`). `K1_USB_AUDIO_DIAGNOSTIC=PASS`. Restore target
+`k1_main_rpl_im69d` @ `b625e89a` epoch `1787591762`. Look library on product.
+Cal inherited SSL=157. Do **not** re-fire `start_noise_cal`. Prior product
+epoch `1787400761`. Prior stamp `c2738b88` / look-lib `38428a82`.
 F887 not touched. B489 later @ `69e21140` on `/dev/cu.usbmodem1101`.
 **LED-buffer rtrace PASS** closes the resolver
 (`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).

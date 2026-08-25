@@ -2,6 +2,24 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-25 — USB-audio diagnostic PASS; product restore GO
+
+Captain closed the USB ingress diagnostic on Main RPL `9087A500`.
+`k1_usb_audio_mac_probe` @ `0136de67` factory SHA `fc5854a5…` proved 12.8 kHz
+mono delivery, matched frames, steady-state drops/underflows 0, and a moving
+waveform envelope. `loudness=BLOCKED` is N/A (`K1_STM` not in the probe).
+No second flash. Restore target remains `k1_main_rpl_im69d` @ `b625e89a`.
+Evidence: `docs/usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md`.
+
+## 2026-08-24 — USB-audio corrected parent gated, product restored
+
+Main RPL `9087A500` ran `k1_usb_audio_mac_probe` @ `c1b53860` (Main RPL parent,
+isolated PIO 3.3.11), then was restored to **`k1_main_rpl_im69d` @ `b625e89a`**
+epoch `1787591762`. USB prototype is **not** A16–A26 PASS (onset serial FAIL,
+soak lost UAC at ~16 min). Evidence:
+`docs/usb-audio/evidence/20260824T165900Z-corrected-parent/RESULT.md`.
+Not pushed. Do not reflash USB without a new Captain GO.
+
 ## 2026-08-21 — ADR-0007 K1 full-parity dual-target (S3 + P4-WIFI6)
 
 **Authority:** `docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md`

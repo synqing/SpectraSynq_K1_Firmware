@@ -3,12 +3,15 @@
 Non-shippable ESP32-S3 UAC1 speaker-only ingress. A Mac can stream 12.8 kHz mono
 S16 PCM into K1. Production `k1_hardware` remains the microphone authority.
 
-**Silicon close (2026-08-24):** Main RPL parented, gated, then **taken off**.
-Product restored: `k1_main_rpl_im69d` @ `b625e89a` epoch `1787591762`.
-Prototype is **not** A16–A26 PASS (A22 FAIL, A25 FAIL, A24 HOLD, A27 NOT_RUN).
+**Diagnostic close (2026-08-25):** `K1_USB_AUDIO_DIAGNOSTIC = PASS` on Main RPL
+`9087A500`. Mac 12.8 kHz mono S16 entered the 96-sample hop and moved the
+canonical waveform envelope. Not product. Not STM loudness. Shared finaliser
+remains `OPEN`. Captain: do not rebuild for `K1_STM`. Restore
+`k1_main_rpl_im69d` @ `b625e89a`.
 
-Evidence: `docs/usb-audio/evidence/20260824T122122Z/` (host) and
-`docs/usb-audio/evidence/20260824T165900Z-corrected-parent/` (silicon).
+Evidence: [`20260825T073600Z-amendment-diagnostic/RESULT.md`](evidence/20260825T073600Z-amendment-diagnostic/RESULT.md).
+Earlier corrected-parent gate (then product restore):
+`docs/usb-audio/evidence/20260824T165900Z-corrected-parent/`.
 
 ## 1. Purpose
 

@@ -124,6 +124,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
+| **K1 USB-audio 12.8 kHz hop** | **[ADR-0008](architecture/ADR-0008-usb-audio-keeps-12800-ap.md)** · [prototype](usb-audio/K1_USB_AUDIO_PROTOTYPE.md) | **ACCEPTED architecture. Diagnostic PASS 2026-08-25** on Main RPL (`0136de67` factory `fc5854a5…`). UAC stays 12.8 kHz/96/7.5 ms. Not product. Restore `k1_main_rpl_im69d` @ `b625e89a`. | [`20260825T073600Z-amendment-diagnostic/RESULT.md`](usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md) |
 | **K1 full-parity dual-target (S3 + P4-WIFI6)** | **[ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md)** | **ACCEPTED architecture.** `env:k1_p4_wifi6` in this tree. P4-Nano is donor-only. Not complete until both targets run the same K1. Lab loom is two WS2812 160-px strips on GPIO4/5 (data only). | `platformio.ini` `[env:k1_p4_wifi6]`; `SPECTRASYNQ_K1_FIRMWARE/platform/`; `scripts/platformio/k1_device_identities.json` |
 | **K1 scheduling hardening** | [active handover](handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md) · [Gate 0-8 plan](forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md) | **CURRENT. G2+G3+G7B CLOSED. G8 host GREEN on `1d457740`. G8 device = bench `B489A500` (Captain 2026-08-17); awaiting G8 PASS. F887 copy deferred until a replacement main unit.** AP0/VP1 locked. | `docs/forensics/2026-08-15-freertos-scheduling-audit/` |
 | **K1 AP input integrity** | [handover](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md) · [Rev B plan](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md) · [G1 receipt](forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md) | **PARALLEL AUTHORITY. G1 RATIFIED; T0.3 COMPLETE.** No further physical mic test; AP P4 slot/health promotion remains open and separate. | `_scratch/p0_stereo_20260814/`; `scripts/tools/probe_diff.py`; `scripts/regression-harness/mic_stable_byte_gate.sh` |
@@ -153,6 +154,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Doc | Use for | Do **not** use for |
 |-----|---------|-------------------|
+| [ADR-0008](architecture/ADR-0008-usb-audio-keeps-12800-ap.md) | USB prototype stays 12.8 kHz AP; Mac SRC; future 48 kHz transport only off Core 0 | Setting `DEFAULT_SAMPLE_RATE=48000`; SRC in AP or the UAC callback; treating Multi-Output as a guaranteed 12.8↔48 converter |
 | [ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) | Dual-target K1 on S3 + Waveshare ESP32-P4-WIFI6; `env:k1_p4_wifi6`; P4-Nano as donor | Finishing P4-Nano as K1; retargeting `k1_hardware`; flashing Tab5; treating compile/first-light as shipped |
 | `2026-06-07-vmewt-transport-incident.md` | VME hardware-capture stop order, invalid-evidence correction, transport reopen gate | Payload proof, production VME promotion, or survivor-row analysis |
 | `2026-06-07-vme-l1-waveform-sandbox-handover.md` | VME Level 1 Waveform-family sandbox start, target modes 7/8/18, quarantine rules | Production VME promotion or dirty-lane acceptance |
@@ -170,7 +172,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Device | Chip ID | Permitted envs by configured route |
 |--------|---------|------------------------------------|
-| 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only.** Current silicon `b625e89a` epoch `1787400761`. Never `k1_hardware`. |
+| 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only** (standing). Diagnostic probe `k1_usb_audio_mac_probe` @ `0136de67` on silicon 2026-08-25 (`K1_USB_AUDIO_DIAGNOSTIC=PASS`). Restore target `b625e89a`. Never `k1_hardware`. |
 | F887 (OFFSITE) | `F887A500` | Historical `k1_hardware` allowlist. Do not flash any other serial as F887. |
 | 12201 (bench K1v2) | `B489A500` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
 | Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6`** (GPIO4/5, 160/160). Child **`k1_p4_wifi6_led150`** (GPIO39/40, 150/150) exists in source, not on silicon until flash GO. Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `61787c86` 2026-08-22. |
