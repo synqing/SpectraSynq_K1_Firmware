@@ -149,12 +149,62 @@ static inline void k1_look_free_slot_ram(uint8_t slot) {
   }
 }
 
+// Core 1 applies k1_look_table[slot] every pack frame. EMPTY the table
+// BEFORE freeing slot RAM so dyn_rgb / cube pointers never dangle under
+// the render path. Does not change k1_look_slot / k1_look_slot_sec —
+// EMPTY apply is a no-op (identity) for the gap until reinstall.
+static inline void k1_look_detach_slot_payload(uint8_t slot) {
+  if (slot > 15) {
+    return;
+  }
+  k1_look_table[slot].type = K1_LOOK_EMPTY;
+  k1_look_table[slot].payload = nullptr;
+  k1_look_free_slot_ram(slot);
+}
+
+static inline void k1_look_retire_slot(uint8_t slot) {
+  if (slot > 15) {
+    return;
+  }
+  if (k1_look_slot == slot) {
+    k1_look_slot = 0;
+  }
+  if (k1_look_slot_sec == slot) {
+    k1_look_slot_sec = 255;
+  }
+  k1_look_detach_slot_payload(slot);
+}
+
+static inline bool k1_look_payload_installable(const K1LookParsed *live) {
+  if (live == nullptr) {
+    return false;
+  }
+  if (live->type == K1_LOOK_RGB_1D_256 && live->node_n == 256 &&
+      live->payload_bytes >= (uint32_t)(256u * 2u * 4u)) {
+    return true;
+  }
+  if (live->type == K1_LOOK_MATRIX_3X4 && live->payload_bytes >= 48) {
+    return true;
+  }
+  if (live->type == K1_LOOK_CUBE_17 &&
+      live->payload_bytes >= (17u * 17u * 17u * 3u * 2u)) {
+    return true;
+  }
+  if (live->type == K1_LOOK_SHARED_1D_256) {
+    return true;
+  }
+  return false;
+}
+
 static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_bytes, size_t file_len) {
   if (!k1_look_slot_loadable(slot)) {
     return false;
   }
   K1LookParsed parsed;
   if (!k1_look_parse_k1lt(file_bytes, file_len, &parsed)) {
+    return false;
+  }
+  if (!k1_look_payload_installable(&parsed)) {
     return false;
   }
   uint8_t *copy = (uint8_t *)heap_caps_malloc(file_len, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
@@ -166,15 +216,15 @@ static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_byte
   }
   memcpy(copy, file_bytes, file_len);
   K1LookParsed live;
-  if (!k1_look_parse_k1lt(copy, file_len, &live)) {
+  if (!k1_look_parse_k1lt(copy, file_len, &live) || !k1_look_payload_installable(&live)) {
     heap_caps_free(copy);
     return false;
   }
-  k1_look_free_slot_ram(slot);
+  // Validate succeeded — only now EMPTY the live table entry and free old RAM.
+  k1_look_detach_slot_payload(slot);
   k1_look_slot_ram[slot] = copy;
   k1_look_slot_ram_n[slot] = file_len;
-  if (live.type == K1_LOOK_RGB_1D_256 && live.node_n == 256 &&
-      live.payload_bytes >= (uint32_t)(256u * 2u * 4u)) {
+  if (live.type == K1_LOOK_RGB_1D_256) {
     static K1LookRgb1d dyn_rgb[16];
     const uint16_t *base = reinterpret_cast<const uint16_t *>(live.payload);
     dyn_rgb[slot].x = base;
@@ -185,26 +235,22 @@ static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_byte
     k1_look_table[slot].payload = &dyn_rgb[slot];
     return true;
   }
-  if (live.type == K1_LOOK_MATRIX_3X4 && live.payload_bytes >= 48) {
+  if (live.type == K1_LOOK_MATRIX_3X4) {
     k1_look_table[slot].type = K1_LOOK_MATRIX_3X4;
     k1_look_table[slot].payload = live.payload;
     return true;
   }
-  if (live.type == K1_LOOK_CUBE_17 && live.payload_bytes >= (17u * 17u * 17u * 3u * 2u)) {
+  if (live.type == K1_LOOK_CUBE_17) {
     static K1LookCube17 dyn_cube[16];
     dyn_cube[slot].rgb = reinterpret_cast<const uint16_t *>(live.payload);
     k1_look_table[slot].type = K1_LOOK_CUBE_17;
     k1_look_table[slot].payload = &dyn_cube[slot];
     return true;
   }
-  if (live.type == K1_LOOK_SHARED_1D_256) {
-    k1_look_table[slot].type = K1_LOOK_SHARED_1D_256;
-    k1_look_table[slot].payload = nullptr;
-    return true;
-  }
-  heap_caps_free(copy);
-  k1_look_slot_ram[slot] = nullptr;
-  return false;
+  // SHARED_1D_256
+  k1_look_table[slot].type = K1_LOOK_SHARED_1D_256;
+  k1_look_table[slot].payload = nullptr;
+  return true;
 }
 
 static inline bool k1_look_fs_load(uint8_t slot) {
@@ -273,15 +319,8 @@ static inline bool k1_look_fs_clear(uint8_t slot) {
   char path[24];
   k1_look_slot_path(slot, path, sizeof(path));
   LittleFS.remove(path);
-  k1_look_free_slot_ram(slot);
-  k1_look_table[slot].type = K1_LOOK_EMPTY;
-  k1_look_table[slot].payload = nullptr;
-  if (k1_look_slot == slot) {
-    k1_look_publish(0);
-  }
-  if (k1_look_slot_sec == slot) {
-    k1_look_publish_sec(255);
-  }
+  // Retarget + EMPTY before free — same Core-1 UAF gate as install.
+  k1_look_retire_slot(slot);
   return true;
 }
 

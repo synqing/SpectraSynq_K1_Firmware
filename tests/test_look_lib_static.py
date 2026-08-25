@@ -181,6 +181,36 @@ def test_look_cycle_is_a_hotkey():
     assert "case 'z':" in menu
 
 
+def test_look_slot_detach_empties_table_before_free():
+    """Core-1 UAF gate: EMPTY + null payload must precede heap_caps_free.
+
+    look_load / look_clear run on the serial core while Lever-2 pack applies
+    k1_look_table[slot] every frame. Freeing dyn_rgb/cube payload RAM first
+    leaves dangling pointers for k1_look_apply_u16.
+    """
+    look_file = (
+        ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "k1_look_file.h"
+    ).read_text(encoding="utf-8")
+    detach = _fn_body(look_file, "k1_look_detach_slot_payload")
+    assert "K1_LOOK_EMPTY" in detach
+    assert "payload = nullptr" in detach
+    empty_at = detach.index("K1_LOOK_EMPTY")
+    free_at = detach.index("k1_look_free_slot_ram")
+    assert empty_at < free_at
+    install = _fn_body(look_file, "k1_look_install_parsed")
+    assert "k1_look_payload_installable" in install
+    assert "k1_look_detach_slot_payload" in install
+    # Must refuse unsupported types before mutating the live slot.
+    first_installable = install.index("k1_look_payload_installable")
+    detach_at = install.index("k1_look_detach_slot_payload")
+    assert first_installable < detach_at
+    clear = _fn_body(look_file, "k1_look_fs_clear")
+    assert "k1_look_retire_slot" in clear
+    assert clear.index("k1_look_retire_slot") < clear.index("return true")
+    # Old free-before-EMPTY order must not return.
+    assert "k1_look_free_slot_ram(slot);\n  k1_look_table[slot].type" not in look_file
+
+
 def test_tab5_reuses_typed_look_command():
     typed = (
         ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_typed_cmd_table.def"
