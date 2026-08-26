@@ -119,6 +119,8 @@ def test_bench_s3_led150_env_is_b489_only():
     block = _env_block(bench_env)
     assert "extends = env:k1_bench_im69d" in block
     assert "-DK1_BENCH_LED150_GPIO39_40_V1" in _build_flags(bench_env)
+    assert "-DK1_LOOK_LIB_V1" not in _build_flags(bench_env)
+    assert "-DK1_LOOK_LIB_WS2812_V1" in _build_flags(bench_env)
     assert "-DK1_UNIT2_IM69D_V1" not in _build_flags(bench_env)
     assert "-DK1_CUSTOM_LED_V1" not in _build_flags(bench_env)
     assert "-DK1_PLATFORM_P4" not in _build_flags(bench_env)

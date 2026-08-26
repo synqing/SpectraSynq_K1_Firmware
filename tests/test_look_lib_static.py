@@ -23,7 +23,13 @@ LED = (
 ).read_text(encoding="utf-8")
 
 FLAG = "K1_LOOK_LIB_V1"
-BANNED_ENVS = ("k1_hardware", "k1_bench_im69d", "k1_bench_reference")
+# led150 is the WS2812 sibling owner later; it must never inherit RPL look/Lever-2.
+BANNED_ENVS = (
+    "k1_hardware",
+    "k1_bench_im69d",
+    "k1_bench_reference",
+    "k1_bench_im69d_led150",
+)
 LOCKED_TYPES = {
     "IDENTITY": 0,
     "SHARED_1D_256": 1,
@@ -84,6 +90,13 @@ def test_look_lib_flag_rpl_only():
     assert "-DK1_WS2816_DEGAMMA_V1" not in uncommented
     for env in BANNED_ENVS:
         assert FLAG not in _effective_flags(env, sections), env
+    led150 = _effective_flags("k1_bench_im69d_led150", sections)
+    assert FLAG not in led150
+    assert "K1_WS2816_LEVER2_V1" not in led150
+    assert "K1_WS2816_DEGAMMA_V1" not in led150
+    assert "K1_LOOK_LIB_WS2812_V1" in led150
+    for env in ("k1_hardware", "k1_bench_im69d", "k1_bench_reference", "k1_main_rpl_im69d"):
+        assert "K1_LOOK_LIB_WS2812_V1" not in _effective_flags(env, sections), env
 
 
 def test_packer_has_no_degamma_ifdef_on_convert():
@@ -144,7 +157,9 @@ def test_dump_and_help_are_flag_gated():
         ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.cpp"
     ).read_text(encoding="utf-8")
     assert "LOOK: slot=" in menu
-    assert menu.count("#ifdef K1_LOOK_LIB_V1") >= 2
+    assert "K1_LOOK_LIB_V1" in menu
+    assert "K1_LOOK_LIB_WS2812_V1" in menu
+    assert "serial_look_cycle_hotkey" in menu
 
 
 def test_both_din_pack_sites_share_emit_header():

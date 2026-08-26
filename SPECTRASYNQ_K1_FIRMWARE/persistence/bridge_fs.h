@@ -8,7 +8,7 @@
 #include "k1_effect_queue.h" // K1_PRESET_SLOTS_FILE (factory_reset enumeration)
 #include "k1_show_state.h"   // K1_SHOW_STATE_FILE + boot restore after load_config
 #include "bridge_fs_config_codec.h" // N1: ConfigBlobHeader + bridge_fs_classify_config()
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 #include "k1_look.h"
 #endif
 #ifdef K1_EFFECT_REGISTRY_V1
@@ -354,7 +354,7 @@ void load_config() {
   SECONDARY_LIGHTSHOW_MODE = light_mode_sanitize_persisted(SECONDARY_LIGHTSHOW_MODE);
 #endif
 
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
   k1_look_boot_from_config(CONFIG.LOOK, CONFIG.SECONDARY_LOOK);
 #endif
 
