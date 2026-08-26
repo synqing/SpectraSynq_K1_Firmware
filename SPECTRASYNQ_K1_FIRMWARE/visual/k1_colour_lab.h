@@ -259,6 +259,7 @@ static inline int k1_colour_lab_rgb1d_valid(const uint16_t *nodes) {
 }
 
 #ifdef K1_COLOUR_LAB_V1
+void k1_colour_lab_boot();
 void k1_colour_lab_latch_frame();
 void k1_colour_lab_apply_primary(void *leds, uint16_t n);
 void k1_colour_lab_apply_secondary(void *leds, uint16_t n);

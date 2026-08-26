@@ -22,20 +22,29 @@ static uint8_t s_live_idx = 0;
 static K1ColourLabState s_live;
 static K1ColourLabState s_edit;
 static K1ColourLabTune s_tune;
-static bool s_inited = false;
+static volatile bool s_inited = false;
+static portMUX_TYPE s_lab_mux = portMUX_INITIALIZER_UNLOCKED;
 
 static void k1_colour_lab_ensure_init() {
   if (s_inited) {
     return;
   }
-  k1_colour_lab_state_boot(&s_buf[0]);
-  k1_colour_lab_state_boot(&s_buf[1]);
-  k1_colour_lab_state_boot(&s_live);
-  k1_colour_lab_state_boot(&s_edit);
-  k1_colour_lab_tune_identity(&s_tune);
-  s_pub_idx = 0;
-  s_live_idx = 0;
-  s_inited = true;
+  portENTER_CRITICAL(&s_lab_mux);
+  if (!s_inited) {
+    k1_colour_lab_state_boot(&s_buf[0]);
+    k1_colour_lab_state_boot(&s_buf[1]);
+    k1_colour_lab_state_boot(&s_live);
+    k1_colour_lab_state_boot(&s_edit);
+    k1_colour_lab_tune_identity(&s_tune);
+    s_pub_idx = 0;
+    s_live_idx = 0;
+    s_inited = true;
+  }
+  portEXIT_CRITICAL(&s_lab_mux);
+}
+
+void k1_colour_lab_boot() {
+  k1_colour_lab_ensure_init();
 }
 
 static void k1_colour_lab_publish(const K1ColourLabState *cand) {

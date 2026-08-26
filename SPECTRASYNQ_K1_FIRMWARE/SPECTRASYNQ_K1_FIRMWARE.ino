@@ -675,6 +675,9 @@ void setup() {
   }
 
   init_system();  // (system.h) Initialize all hardware and arrays
+#ifdef K1_COLOUR_LAB_V1
+  k1_colour_lab_boot();
+#endif
 #ifdef K1_BOOTLOOP_GUARD_V1
   // N2b: report the boot-loop decision now that init_serial() (inside init_system)
   // has brought USBSerial up. The eval ran at the top of setup(); load_config() has
