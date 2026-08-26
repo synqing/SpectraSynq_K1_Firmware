@@ -1,0 +1,848 @@
+{
+  "lane": {
+    "rpl": {
+      "present": true,
+      "fmt": "rgb16hex",
+      "px": 160,
+      "card_slot0": {
+        "greys": [
+          {
+            "in_u8": 0,
+            "out": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "in_u8": 1,
+            "out": [
+              256.0,
+              256.0,
+              256.0
+            ]
+          },
+          {
+            "in_u8": 16,
+            "out": [
+              4111.0,
+              4111.0,
+              4111.0
+            ]
+          },
+          {
+            "in_u8": 32,
+            "out": [
+              8223.0,
+              8223.0,
+              8223.0
+            ]
+          },
+          {
+            "in_u8": 64,
+            "out": [
+              16447.0,
+              16447.0,
+              16447.0
+            ]
+          },
+          {
+            "in_u8": 96,
+            "out": [
+              24671.0,
+              24671.0,
+              24671.0
+            ]
+          },
+          {
+            "in_u8": 128,
+            "out": [
+              32895.0,
+              32895.0,
+              32895.0
+            ]
+          },
+          {
+            "in_u8": 160,
+            "out": [
+              41119.0,
+              41119.0,
+              41119.0
+            ]
+          },
+          {
+            "in_u8": 192,
+            "out": [
+              49343.0,
+              49343.0,
+              49343.0
+            ]
+          },
+          {
+            "in_u8": 224,
+            "out": [
+              57567.0,
+              57567.0,
+              57567.0
+            ]
+          },
+          {
+            "in_u8": 240,
+            "out": [
+              61679.0,
+              61679.0,
+              61679.0
+            ]
+          },
+          {
+            "in_u8": 254,
+            "out": [
+              65278.0,
+              65278.0,
+              65278.0
+            ]
+          },
+          {
+            "in_u8": 255,
+            "out": [
+              65535.0,
+              65535.0,
+              65535.0
+            ]
+          }
+        ],
+        "red": [
+          65535.0,
+          0.0,
+          0.0
+        ],
+        "green": [
+          0.0,
+          65535.0,
+          0.0
+        ],
+        "blue": [
+          0.0,
+          0.0,
+          65535.0
+        ],
+        "gold": [
+          65535.0,
+          35979.0,
+          0.0
+        ],
+        "red_is_red": true,
+        "green_is_green": true,
+        "blue_is_blue": true,
+        "gold_r_gt_g_gt_b": true,
+        "black_near_zero": true,
+        "white_high": true
+      },
+      "card_slot0_frame": {
+        "frame_index": 0,
+        "card_flags": 6,
+        "energy": 30906.856
+      },
+      "paint": "PASS",
+      "card_slot1_gold_g": [
+        65535.0,
+        49900.0,
+        0.0
+      ],
+      "paint_off": {
+        "card_white_minus_black": 65535.0,
+        "off_same_regions_span": 23305.6,
+        "off_does_not_match_card": true
+      },
+      "true16": "PASS_TRUE16",
+      "true16_source": "rpl_card_slot2_dump.txt",
+      "true16_detail": {
+        "verdict": "PASS_TRUE16",
+        "mismatch_frac": 0.624444,
+        "unique_codes": 33
+      },
+      "tungsten": {
+        "per_grey": [
+          {
+            "in_u8": 0,
+            "identity": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "tungsten": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "ratio_vs_identity": [
+              null,
+              null,
+              null
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 1,
+            "identity": [
+              256.0,
+              256.0,
+              256.0
+            ],
+            "tungsten": [
+              302.0,
+              256.0,
+              199.0
+            ],
+            "ratio_vs_identity": [
+              1.1797,
+              1.0,
+              0.7773
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 16,
+            "identity": [
+              4111.0,
+              4111.0,
+              4111.0
+            ],
+            "tungsten": [
+              4851.0,
+              4111.0,
+              3206.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.7799
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 32,
+            "identity": [
+              8223.0,
+              8223.0,
+              8223.0
+            ],
+            "tungsten": [
+              9703.0,
+              8223.0,
+              6414.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 64,
+            "identity": [
+              16447.0,
+              16447.0,
+              16447.0
+            ],
+            "tungsten": [
+              19408.0,
+              16447.0,
+              12828.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 96,
+            "identity": [
+              24671.0,
+              24671.0,
+              24671.0
+            ],
+            "tungsten": [
+              29112.0,
+              24671.0,
+              19243.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 128,
+            "identity": [
+              32895.0,
+              32895.0,
+              32895.0
+            ],
+            "tungsten": [
+              38816.0,
+              32895.0,
+              25658.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 160,
+            "identity": [
+              41119.0,
+              41119.0,
+              41119.0
+            ],
+            "tungsten": [
+              48521.0,
+              41119.0,
+              32073.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 192,
+            "identity": [
+              49343.0,
+              49343.0,
+              49343.0
+            ],
+            "tungsten": [
+              58225.0,
+              49343.0,
+              38487.0
+            ],
+            "ratio_vs_identity": [
+              1.18,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 224,
+            "identity": [
+              57567.0,
+              57567.0,
+              57567.0
+            ],
+            "tungsten": [
+              65535.0,
+              57567.0,
+              44902.0
+            ],
+            "ratio_vs_identity": [
+              1.1384,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 240,
+            "identity": [
+              61679.0,
+              61679.0,
+              61679.0
+            ],
+            "tungsten": [
+              65535.0,
+              61679.0,
+              48109.0
+            ],
+            "ratio_vs_identity": [
+              1.0625,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 254,
+            "identity": [
+              65278.0,
+              65278.0,
+              65278.0
+            ],
+            "tungsten": [
+              65535.0,
+              65278.0,
+              50917.0
+            ],
+            "ratio_vs_identity": [
+              1.0039,
+              1.0,
+              0.78
+            ],
+            "neutral_to_warm": true
+          },
+          {
+            "in_u8": 255,
+            "identity": [
+              65535.0,
+              65535.0,
+              65535.0
+            ],
+            "tungsten": [
+              65535.0,
+              65535.0,
+              65535.0
+            ],
+            "ratio_vs_identity": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "neutral_to_warm": true
+          }
+        ],
+        "red_clip_onset_in_u8": 224,
+        "delta_254_vs_255_tungsten": [
+          0.0,
+          257.0,
+          14618.0
+        ],
+        "terminal_blue_jump": 14618.0,
+        "identity_254_255_delta": [
+          257.0,
+          257.0,
+          257.0
+        ],
+        "tungsten_minus_identity_254": [
+          257.0,
+          0.0,
+          -14361.0
+        ],
+        "tungsten_minus_identity_255": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mid_grey_warm": true
+      },
+      "slot15": {
+        "per_grey": [
+          {
+            "in_u8": 0,
+            "identity": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "slot15": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "ratio": [
+              null,
+              null,
+              null
+            ]
+          },
+          {
+            "in_u8": 1,
+            "identity": [
+              256.0,
+              256.0,
+              256.0
+            ],
+            "slot15": [
+              256.0,
+              179.0,
+              103.0
+            ],
+            "ratio": [
+              1.0,
+              0.6992,
+              0.4023
+            ]
+          },
+          {
+            "in_u8": 16,
+            "identity": [
+              4111.0,
+              4111.0,
+              4111.0
+            ],
+            "slot15": [
+              4111.0,
+              2877.0,
+              1645.0
+            ],
+            "ratio": [
+              1.0,
+              0.6998,
+              0.4001
+            ]
+          },
+          {
+            "in_u8": 32,
+            "identity": [
+              8223.0,
+              8223.0,
+              8223.0
+            ],
+            "slot15": [
+              8223.0,
+              5756.0,
+              3290.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4001
+            ]
+          },
+          {
+            "in_u8": 64,
+            "identity": [
+              16447.0,
+              16447.0,
+              16447.0
+            ],
+            "slot15": [
+              16447.0,
+              11513.0,
+              6579.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 96,
+            "identity": [
+              24671.0,
+              24671.0,
+              24671.0
+            ],
+            "slot15": [
+              24671.0,
+              17269.0,
+              9869.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 128,
+            "identity": [
+              32895.0,
+              32895.0,
+              32895.0
+            ],
+            "slot15": [
+              32895.0,
+              23026.0,
+              13158.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 160,
+            "identity": [
+              41119.0,
+              41119.0,
+              41119.0
+            ],
+            "slot15": [
+              41119.0,
+              28783.0,
+              16448.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 192,
+            "identity": [
+              49343.0,
+              49343.0,
+              49343.0
+            ],
+            "slot15": [
+              49343.0,
+              34540.0,
+              19738.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 224,
+            "identity": [
+              57567.0,
+              57567.0,
+              57567.0
+            ],
+            "slot15": [
+              57567.0,
+              40297.0,
+              23027.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 240,
+            "identity": [
+              61679.0,
+              61679.0,
+              61679.0
+            ],
+            "slot15": [
+              61679.0,
+              43175.0,
+              24672.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 254,
+            "identity": [
+              65278.0,
+              65278.0,
+              65278.0
+            ],
+            "slot15": [
+              65278.0,
+              45695.0,
+              26111.0
+            ],
+            "ratio": [
+              1.0,
+              0.7,
+              0.4
+            ]
+          },
+          {
+            "in_u8": 255,
+            "identity": [
+              65535.0,
+              65535.0,
+              65535.0
+            ],
+            "slot15": [
+              65535.0,
+              65535.0,
+              65535.0
+            ],
+            "ratio": [
+              1.0,
+              1.0,
+              1.0
+            ]
+          }
+        ],
+        "mid128_g_pulled": true,
+        "mid128_b_pulled": true,
+        "mid128_r_near_identity": true
+      },
+      "slot15_reload_max_abs_delta": 0.0
+    },
+    "bench": {
+      "present": true,
+      "fmt": "rgb8hex",
+      "px": 150,
+      "card_slot0": {
+        "greys": [
+          {
+            "in_u8": 0,
+            "out": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          {
+            "in_u8": 1,
+            "out": [
+              0.667,
+              0.667,
+              0.667
+            ]
+          },
+          {
+            "in_u8": 16,
+            "out": [
+              15.778,
+              15.778,
+              15.778
+            ]
+          },
+          {
+            "in_u8": 32,
+            "out": [
+              31.778,
+              31.778,
+              31.778
+            ]
+          },
+          {
+            "in_u8": 64,
+            "out": [
+              63.444,
+              63.444,
+              63.444
+            ]
+          },
+          {
+            "in_u8": 96,
+            "out": [
+              95.5,
+              95.5,
+              95.5
+            ]
+          },
+          {
+            "in_u8": 128,
+            "out": [
+              127.222,
+              127.222,
+              127.222
+            ]
+          },
+          {
+            "in_u8": 160,
+            "out": [
+              159.333,
+              159.333,
+              159.333
+            ]
+          },
+          {
+            "in_u8": 192,
+            "out": [
+              191.0,
+              191.0,
+              191.0
+            ]
+          },
+          {
+            "in_u8": 224,
+            "out": [
+              223.0,
+              223.0,
+              223.0
+            ]
+          },
+          {
+            "in_u8": 240,
+            "out": [
+              239.0,
+              239.0,
+              239.0
+            ]
+          },
+          {
+            "in_u8": 254,
+            "out": [
+              253.0,
+              253.0,
+              253.0
+            ]
+          },
+          {
+            "in_u8": 255,
+            "out": [
+              254.0,
+              254.0,
+              254.0
+            ]
+          }
+        ],
+        "red": [
+          254.0,
+          0.0,
+          0.0
+        ],
+        "green": [
+          0.0,
+          254.0,
+          0.0
+        ],
+        "blue": [
+          0.0,
+          0.0,
+          254.0
+        ],
+        "gold": [
+          254.0,
+          139.25,
+          0.0
+        ],
+        "red_is_red": true,
+        "green_is_green": true,
+        "blue_is_blue": true,
+        "gold_r_gt_g_gt_b": true,
+        "black_near_zero": true,
+        "white_high": true
+      },
+      "card_slot0_frame": {
+        "frame_index": 0,
+        "card_flags": 6,
+        "energy": 119.131
+      },
+      "paint": "PASS",
+      "card_slot1_gold_g": [
+        255.0,
+        194.0,
+        0.0
+      ],
+      "paint_off": {
+        "card_white_minus_black": 254.0,
+        "off_same_regions_span": -39.778,
+        "off_does_not_match_card": true
+      }
+    }
+  },
+  "acceptance": {
+    "COLOUR_JOB_PARITY": "PASS_JOB_ONLY",
+    "WS2816_TRUE16": "PASS_TRUE16",
+    "PHOTON_PARITY": "NOT_CLAIMED",
+    "TUNGSTEN_GREY": "PASS",
+    "COLOUR_LAB_PAINT_RPL": "PASS",
+    "COLOUR_LAB_PAINT_BENCH": "PASS",
+    "RUNTIME_SLOT15_RPL": "PASS",
+    "WS2812_RUNTIME_SLOT15": "NOT_IMPLEMENTED",
+    "VISUAL_INSPECTION": "NOT_USED_AS_EVIDENCE"
+  }
+}
