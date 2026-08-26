@@ -25,6 +25,7 @@ SHIPPABLE = {
 RTRACE_DIAG_ENVS = {
     "env:k1_bench_im69d_hueaud]",
     "env:k1_main_rpl_rtrace_probe]",
+    "env:k1_bench_im69d_led150_rtrace]",
 }
 
 
@@ -79,8 +80,9 @@ def test_rtrace_def_rows_are_gated_and_complete():
 
 
 def test_rtrace_flag_only_on_diag_envs():
-    """K1_RENDER_TRACE_V1 is hueaud (RGB8) plus the RPL Lever-2 probe.
-    K1_HUE_AUDIT_V1 stays hueaud-only. Neither reaches a shippable env."""
+    """K1_RENDER_TRACE_V1 is hueaud (RGB8), the RPL Lever-2 probe, and the
+    led150 WS2812 probe. K1_HUE_AUDIT_V1 stays hueaud-only. None reach a
+    shippable env."""
     ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
     rtrace = set(_flag_carriers(ini, "K1_RENDER_TRACE_V1"))
     assert rtrace == RTRACE_DIAG_ENVS, f"K1_RENDER_TRACE_V1 carriers: {rtrace}"
@@ -166,3 +168,19 @@ def test_rtrace_probe_env_is_non_shippable_and_allowlisted():
     assert "-DK1_RENDER_TRACE_V1" in block
     assert "k1_main_rpl_rtrace_probe" in wrapper
     assert "k1_main_rpl_rtrace_probe" in identities
+
+
+def test_led150_rtrace_probe_env_is_non_shippable_and_allowlisted():
+    ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
+    wrapper = (ROOT / "scripts" / "agent" / "pio-build.sh").read_text(encoding="utf-8")
+    m = re.search(
+        r"\[env:k1_bench_im69d_led150_rtrace\](.*?)(?=\n\[env:|\Z)",
+        ini,
+        flags=re.S,
+    )
+    assert m, "missing [env:k1_bench_im69d_led150_rtrace]"
+    block = m.group(0)
+    assert "NON-SHIPPABLE" in block
+    assert "extends = env:k1_bench_im69d_led150" in block
+    assert "-DK1_RENDER_TRACE_V1" in block
+    assert "k1_bench_im69d_led150_rtrace" in wrapper
