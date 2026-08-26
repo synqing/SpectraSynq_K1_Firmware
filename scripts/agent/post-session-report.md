@@ -5,6 +5,153 @@ file:line spam. Audit trail goes to git, changelogs, evidence manifests.
 
 ---
 
+## Session Report — 2026-08-26 WS2812 look-lib committed reflash B489
+
+```text
+session_objective:       Four Captain corrections, source commit, second B489 led150 flash from clean worktree, stamp evidence files.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c dirty look-lib
+branch_head_at_end:      637c5f18 + pending evidence-file commit
+files_changed:           look-lib source already in 637c5f18; this report + registry + progress after silicon
+commands_run:            pytest 1536 passed (ignore untracked webflash); pio-build.sh led150+main_rpl+k1_hardware SUCCESS; commit 637c5f18; worktree /tmp/k1-led150-look-flash; OpenOCD program_esp 0x10000 serial B4:3A:45:A5:89:B4 Verify OK; identity guard; :look=/:look_status/z/:dump; worktree removed
+validation_results:      IDENTITY OK git=637c5f18 env=k1_bench_im69d_led150 epoch=1787752658 CHIP ID B489A500. :look_status slot=0 IDENTITY. :look=1 WS2812_PROOF, 2/3 RESERVED_IDENTITY, 0 IDENTITY. z 0→1→2→3→0. :secondary_look=255 inherit ACK. :dump agrees slot 0 IDENTITY. CAL persisted_profile VALID=1. Parked slot 0. LED_BUFFER_DIFF=NOT_RUN. App sha256 f8727a77… 716990 B. No degamma/proof_cube. Main RPL 87:90 not opened. No start_noise_cal.
+evidence_captured:       docs/hardware/device-build-registry.md B489 row epoch 1787752658; /tmp/k1-led150-look-evidence.txt
+blockers:                UART k1-flash-verified.sh CDC busy (DualMCU Serial Monitor). JTAG write used instead. Phase B .klut ABI still HOLD. No LED-buffer tap this close.
+generated_files_ignored: worktree .pio firmware.bin (tree removed)
+safety_constraints:      B489 only; never 9087/F887/0C54; no erase; no start_noise_cal; no push; no rtrace add
+thinking_skill_used:     execute Captain COMMIT GO + named second flash; no re-ask
+skills_used:             ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries; cua-driver (CDC holder diagnosis only)
+specialists_used:        none
+next_recommended_action: None for this close. Future buffer tap before byte-identity or Main-RPL colour match claims. Phase B .klut layout pick is a separate HOLD.
+```
+
+---
+
+## Session Report — 2026-08-26 WS2812 look-lib flash B489
+
+```text
+session_objective:       Flash k1_bench_im69d_led150 with K1_LOOK_LIB_WS2812_V1 onto B489; list new/edited paths.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c dirty look-lib
+branch_head_at_end:      8ed45e9c (no commit)
+files_changed:           look-lib firmware/tests/spec as listed to Captain; registry + progress + this report after flash
+commands_run:            upload-guard PASS 1401=B489; refuse 1101=9087; pio upload k1_bench_im69d_led150 --upload-port /dev/cu.usbmodem1401 SUCCESS 33s; identity guard epoch 1787703514; z cycle + :dump LOOK; strings WS2812_PROOF
+validation_results:      Guard verified 2nd bench K1 B4:3A:45:A5:89:B4 chip B489A500. IDENTITY OK git=8ed45e9c env=k1_bench_im69d_led150 epoch=1787703514. z: IDENTITY / WS2812_PROOF / RESERVED_IDENTITY. :dump CHIP ID B489A500 LOOK slot=0 IDENTITY CAL persisted_profile VALID=1 SYSTEM_FPS~140 LED_FPS~215. App sha256 ac8928c7… 710560 B. No degamma/tungsten/proof_cube strings. Typed :look= not dispatched (parse_command never calls serial_typed_cmd_lookup). Main RPL not opened. No start_noise_cal.
+evidence_captured:       docs/hardware/device-build-registry.md B489 row epoch 1787703514
+blockers:                k1-flash-verified.sh refuses dirty tree (expected). Typed :look=/:look_status need parse_command hook + named second flash. rtrace not on led150. Provenance SHA is HEAD not the uncommitted look-lib.
+generated_files_ignored: .pio/build/k1_bench_im69d_led150/firmware.bin
+safety_constraints:      B489 only; never 9087/F887/0C54; no erase; no start_noise_cal; no commit; no push
+thinking_skill_used:     execute Captain flash GO; no re-ask
+skills_used:             ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries; k1-ws2816-lever2 (env isolation only)
+specialists_used:        none
+next_recommended_action: Captain uses z on the bench. Commit look-lib when asked. Named GO to wire typed :look= then reflash.
+```
+
+---
+
+## Session Report — 2026-08-26 webflash variant shortlist
+
+```text
+session_objective:       Three-home webflash shortlist with MAC identity gate; rebuild from one HEAD; production MD5 ALL MATCH. No silicon flash.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c dirty
+branch_head_at_end:      8ed45e9c (no commit)
+files_changed:           tools/webflash/make_manifest.py CURATED_ENVS+identity stamp; tools/webflash/index.html MAC gate v1.2.0; tools/webflash/README.md; scripts/agent/pio-build.sh allow k1_unit2_im69d_right; tests/test_webflash_shortlist_static.py; .github/workflows/webflash-release.yml default three; manifest+firmware copies; dist/webflash-deploy assembled
+commands_run:            session-bootstrap (repo-truth FAIL pre-existing branch vs spec-index); pytest 35 passed; pio-build.sh main_rpl+led150+unit2 SUCCESS git 8ed45e9c; make_manifest.py 3 variants DIRTY; vercel whoami elroy-7436; vercel deploy --yes; vercel --prod --yes; P10 GET/MD5 vs https://k1-webflash.vercel.app
+validation_results:      Production ALL MATCH. 12/12 parts. Offsets 0x0/0x8000/0xE000/0x10000. firmware.md5 main 0aae54280fc508c435b69c6bb2837050 (708816); led150 ee599f9acd910abb9f754ea91dae9429 (710560); unit2 57151d0bc05a4e5783cefca791cf41fc (708400). index b0715e300c8c8e9689c58a824f599c9b. manifest 4fbf87e59f83d954a508126b18e45064. esptool immutable 200. platformio.ini not edited. No flash.
+evidence_captured:       P10 in Captain report. Preview https://k1-webflash-jkb1n9zrv-spectrasynqs-projects.vercel.app (not used for verify). Prod inspect Gs9PpUwp9oW5qGXZwKKDzzQiAw37
+blockers:                k1.spectrasynq.com still DNS-blocked at GoDaddy until Captain adds A k1 → 76.76.21.21. Live Main RPL silicon remains b625e89a restore; flasher serves 8ed45e9c dirty.
+generated_files_ignored: .pio/build/{k1_main_rpl_im69d,k1_bench_im69d_led150,k1_unit2_im69d_right}/; tools/webflash/firmware/**/*.bin
+safety_constraints:      no firmware-source / platformio.ini behaviour change; no silicon flash; no git add dist; no nameserver change
+thinking_skill_used:     execute named Cursor plan; default three homes (Captain implement without retick)
+skills_used:             ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries; agent-os
+specialists_used:        none
+next_recommended_action: Captain first matching-unit bench flash from https://k1-webflash.vercel.app. Commit when asked.
+```
+
+---
+
+## Session Report — 2026-08-26 K1 webflash Vercel granular plan
+
+```text
+session_objective:       Fail-closed Hobby deploy of current web-flasher bundle; byte-identity close stamp ALL MATCH.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c dirty
+branch_head_at_end:      8ed45e9c (no commit)
+files_changed:           tools/webflash/manifest.json + firmware copies via make_manifest.py; dist/webflash-deploy assembled; protected index.html / make_manifest.py / platformio.ini SHA unchanged this job
+commands_run:            session-bootstrap (repo-truth FAIL pre-existing); pio-build.sh k1_main_rpl_im69d SUCCESS; make_manifest.py OK git 8ed45e9c DIRTY; vercel whoami elroy-7436; vercel deploy --yes --name k1-webflash; vercel --prod --yes; P10 GET/MD5
+validation_results:      ALL MATCH vs https://k1-webflash.vercel.app. Offsets 0x0/0x8000/0xE000/0x10000. firmware.bin 708880 md5 c80e9707e77e0192093316bba0cfa0f6. esptool immutable 200. Protected SHA equal P0.4. No flash. No commit.
+evidence_captured:       P10 table in Captain report; PREVIEW https://k1-webflash-3rsro4kvu-spectrasynqs-projects.vercel.app (not used for verify)
+blockers:                npx vercel failed ENOENT package.json in dist; used global vercel CLI with same --name. Did not guess scope.
+generated_files_ignored: .pio/build/k1_main_rpl_im69d/; tools/webflash/firmware/**/*.bin
+safety_constraints:      no other env bins; no index.html/platformio.ini/firmware-source edits this job; no silicon flash; no git add dist
+thinking_skill_used:     execute named Cursor plan without re-ask
+skills_used:             ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries; agent-os
+specialists_used:        none
+next_recommended_action: Captain first Main RPL bench flash from PROD URL. Do not commit dist unless asked.
+```
+
+---
+
+## Session Report — 2026-08-26 look-lib plan rewrite + Task 1
+
+```text
+session_objective:       Rewrite WS2812 look-lib PLAN.md to one design (direct u8); classify dirty tree; Task 1 isolation only.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c
+branch_head_at_end:      same; tests dirty; platformio.ini clean
+files_changed:           tests/test_look_lib_static.py; tests/test_lever2_flag_isolation_static.py; tests/test_p4_led150_static.py; gitignored _scratch/ws2812-look-lib-scope PLAN/LEDGER/BASELINE/TASK1
+commands_run:            session-bootstrap (FAIL=pre-existing branch vs spec-index active_branch); pytest 26 passed; sneak -DK1_LOOK_LIB_V1 then revert
+validation_results:      26 passed. Sneak path 3 failed. Look -D only on k1_main_rpl_im69d. No firmware. No flash. No worktree.
+evidence_captured:       _scratch/ws2812-look-lib-scope/TASK1.md
+blockers:                Tasks 2-9 HOLD until Captain re-ticks rewritten PLAN.md. repo-truth FAIL is checkout vs scheduling active_branch; do not switch.
+generated_files_ignored: _scratch/ws2812-look-lib-scope/
+safety_constraints:      no worktree; no look -D on led150; no Tasks 2-9; no flash
+thinking_skill_used:     execute approved Cursor plan (ruling already scored)
+skills_used:             ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries; agent-os
+specialists_used:        none this turn (prior cpp-pro consume already in ledger)
+next_recommended_action: Captain re-tick rewritten Tasks 2-9. Commit the three test files when asked. Do not start authorship/hook/flag.
+```
+
+---
+
+## Session Report — 2026-08-26 F4 webflash production deploy
+
+```text
+session_objective:       Put F4 field on live tools/webflash and deploy k1-webflash to Vercel production.
+branch_head_at_start:    feat/k1-usb-audio-input (pre-existing repo-truth branch mismatch)
+branch_head_at_end:      same; index.html field CSS dirty; no commit
+files_changed:           tools/webflash/index.html (.page equal pad; .console 1430 / 840+510 / gap 80 / margin auto); DESIGN-IS WAIVER.md; dist/webflash-deploy assembled
+commands_run:            assemble dist; vercel deploy --yes; vercel --prod --yes; scripted GET/MD5; live 1920×900 rect measure
+validation_results:      Production https://k1-webflash.vercel.app index MD5 77e8f13015eda3da0624b458202e18e5 MATCH. All four parts MATCH. Live wells 840 / 80 / 510. No silicon flash.
+evidence_captured:       _scratch/webflash-f4-deploy-20260826/DEPLOY_RECEIPT.md
+blockers:                .pio/build/k1_main_rpl_im69d missing — reused 2026-08-24 firmware bundle, did not remanifest
+generated_files_ignored: dist/webflash-deploy/
+safety_constraints:      no flash; no make_manifest rewrite; no platformio.ini; optical T2 waived by Captain deploy order
+thinking_skill_used:     execute named deploy (no re-ask)
+skills_used:             spectrasynq-ui-router; spectrasynq-ui-precode-optical-gate (Captain waiver); ship-path-required; no-reapprove-already-given; instrument-not-captain-eyes; plain-english-work-summaries
+specialists_used:        none
+next_recommended_action: Captain first bench flash on Main RPL if they want silicon proof. Commit index.html when asked. Next UI look edit needs a new optical pack.
+```
+
+---
+
+## Session Report — 2026-08-25 B489 150-LED testbed flash
+
+```text
+session_objective:       Flash current-tree 150-LED sibling of Main RPL firmware to bench testbed on usbmodem11401.
+branch_head_at_start:    feat/k1-usb-audio-input @ 8ed45e9c
+branch_head_at_end:      8ed45e9c (docs dirty: registry/handoff/spec-index/progress)
+files_changed:           device-build-registry; handoff; spec-index; progress; post-session-report
+commands_run:            k1-flash-verified.sh led150 (CDC busy); OpenOCD program_esp 0x10000 serial-bound B4:3A:45:A5:89:B4; identity guard
+validation_results:      IDENTITY OK git=8ed45e9c env=k1_bench_im69d_led150 epoch=1787639868 CHIP B489A500. JTAG Verify OK. SYSTEM_FPS 135.66 LED_FPS 207.91 cal inherited. 9087/112401 not opened. No cal.
+evidence_captured:       live :build/:dump; registry deployed-state 2026-08-25 current
+blockers:                none for this flash. UART esptool blocked by Cursor Serial Monitor (worked around via JTAG).
+generated_files_ignored: .pio/build/k1_bench_im69d_led150/
+safety_constraints:      B489 only; never k1_main_rpl_im69d on bench; no plate eyes; no start_noise_cal
+thinking_skill_used:     execute named flash (no re-ask)
+skills_used:             claude-mem-router; mem-search; context-stack; context-mode; instrument-not-captain-eyes; no-reapprove-already-given; ship-path-required; plain-english-work-summaries
+specialists_used:        none
+next_recommended_action: Bench 150-LED stamp is on silicon. Commit registry/docs if Captain wants the stamp in git. Do not flash USB-audio onto 9087 without a new GO.
+```
+
+---
+
 ## Session Report — 2026-08-25 USB-audio diagnostic PASS + product restore
 
 ```text

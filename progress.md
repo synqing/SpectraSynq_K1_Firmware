@@ -2,6 +2,32 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-26 — WS2812 look library committed on the 150-LED bench
+
+The 150-LED bench now runs the committed 8-bit look library. Colon commands
+`:look=`, `:look_status` and `:secondary_look=` work. Hotkey `z` still steps
+identity, proof look, two reserved identity slots, and back. Main RPL was
+not touched. Calibration was inherited. The device is parked on slot 0.
+
+Live: `IDENTITY OK: git=637c5f18 env=k1_bench_im69d_led150 epoch=1787752658`
+on `/dev/cu.usbmodem1401` (USB `B4:3A:45:A5:89:B4`). App SHA-256
+`f8727a7755ae6a47c8626f28cec7e0caa3870c312fd43d3f9c02b2928a7cb5a6`.
+`LED_BUFFER_DIFF = NOT_RUN`. No `start_noise_cal`.
+
+Dirty-source bring-up epoch `1787703514` (`8ed45e9c` on the chip while the
+library was uncommitted) is superseded.
+
+## 2026-08-25 — Bench 150-LED testbed flashed (B489)
+
+Captain: put the current-tree 150-LED sibling of Main RPL firmware on the
+testbed at `/dev/tty.usbmodem11401`. Guard confirmed chip `B489A500` /
+USB `B4:3A:45:A5:89:B4`. Cursor Serial Monitor held CDC, so UART esptool
+could not take the port. Write used OpenOCD JTAG `program_esp` @ `0x10000`
+bound to that USB serial only. **Verify OK.** Live
+`IDENTITY OK: git=8ed45e9c env=k1_bench_im69d_led150 epoch=1787639868`.
+Main RPL `9087A500` on `112401` not opened. Cal inherited. No
+`start_noise_cal`. This is not `k1_main_rpl_im69d` @ `b625e89a` (wrong map).
+
 ## 2026-08-25 — USB-audio diagnostic PASS; product restored
 
 Captain closed the USB ingress diagnostic on Main RPL `9087A500`.
