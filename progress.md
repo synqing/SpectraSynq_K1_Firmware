@@ -2,6 +2,45 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-27 — Colour Lab paint and tungsten grey closed
+
+Both devices ran a known colour card through the real look path. The dumps
+were scored offline. Main RPL dual-channel grey at 140 tripped the watchdog;
+primary-only full-scale card was the measurement path. Product restore on
+Main RPL is clean `acaecaa8` with a 0.30 both-target scale so default
+`paint=card` no longer resets the unit. The 150-LED bench is product
+`f2014c29`. Calibration inherited. No `start_noise_cal`.
+
+```text
+COLOUR_JOB_PARITY      = PASS_JOB_ONLY
+WS2816_TRUE16          = PASS_TRUE16
+TUNGSTEN_GREY          = PASS
+COLOUR_LAB_PAINT_RPL   = PASS
+COLOUR_LAB_PAINT_BENCH = PASS
+RUNTIME_SLOT15_RPL     = PASS
+PHOTON_PARITY          = NOT_CLAIMED
+```
+
+Live: 9087 `IDENTITY OK: git=acaecaa8 env=k1_main_rpl_im69d epoch=1787773671`
+on `/dev/cu.usbmodem1101`.  B489 `git=f2014c29 env=k1_bench_im69d_led150
+epoch=1787771217` on `/dev/cu.usbmodem1401`. Evidence:
+`docs/forensics/colour-lab-rtrace-20260827/VERDICT.md`.
+
+## 2026-08-26 — Eight looks on the 150-LED bench
+
+The 150-LED bench now runs eight real colour prints. `z` / `:look=0..7` name
+identity, gold restore, tungsten, amber, daylight, moon, punch, crush.
+Slot 8 is refused. Parked on identity. Main RPL was not touched. Calibration
+was inherited.
+
+Live: `IDENTITY OK: git=9b48ce5f env=k1_bench_im69d_led150 epoch=1787757776`
+on `/dev/cu.usbmodem1401` (USB `B4:3A:45:A5:89:B4`). The git stamp is HEAD;
+the eight-print roster was uncommitted source in this tree. App SHA-256
+`8c7a692cbf8d038ebf51a95935b5eb5f928e9754100d33e64a4fc60b59824757`.
+`LED_BUFFER_DIFF = NOT_RUN`. No `start_noise_cal`.
+
+Four-slot proof stub epoch `1787752658` (`637c5f18`) is superseded.
+
 ## 2026-08-26 — WS2812 look library committed on the 150-LED bench
 
 The 150-LED bench now runs the committed 8-bit look library. Colon commands
