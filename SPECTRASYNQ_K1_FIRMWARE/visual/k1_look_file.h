@@ -37,6 +37,7 @@ static inline bool k1_look_parse_k1lt(const uint8_t *data, size_t len, K1LookPar
     return false;
   }
   memset(out, 0, sizeof(*out));
+  // Need header + trailing CRC before any payload_bytes-sized walk.
   if (len < K1LT_HEADER_SIZE + 4U) {
     return false;
   }
@@ -54,7 +55,10 @@ static inline bool k1_look_parse_k1lt(const uint8_t *data, size_t len, K1LookPar
   if (h.type > K1_LOOK_SHAPER_CUBE) {
     return false;
   }
-  if (len < K1LT_HEADER_SIZE + 4U + (size_t)h.payload_bytes) {
+  // Overflow-safe bound: never form HEADER+4+payload_bytes as a sum.
+  // On 32-bit ESP32 that sum wraps (e.g. payload_bytes=0xFFFFFFEC → need=0)
+  // and a forged look file would pass, then bridge_fs_crc32() walks OOB.
+  if (h.payload_bytes > (len - K1LT_HEADER_SIZE - 4U)) {
     return false;
   }
   const uint8_t *payload = data + K1LT_HEADER_SIZE;
@@ -77,10 +81,14 @@ static inline bool k1_look_build_k1lt(uint8_t type, uint16_t node_n, const uint8
   if (type == K1_LOOK_IDENTITY || payload == nullptr || out == nullptr) {
     return false;
   }
-  const size_t need = K1LT_HEADER_SIZE + (size_t)payload_bytes + 4U;
-  if (out_n < need) {
+  if (out_n < K1LT_HEADER_SIZE + 4U) {
     return false;
   }
+  // Same overflow-safe bound as parse (32-bit size_t wrap).
+  if (payload_bytes > (out_n - K1LT_HEADER_SIZE - 4U)) {
+    return false;
+  }
+  const size_t need = K1LT_HEADER_SIZE + (size_t)payload_bytes + 4U;
   K1LTHeader h;
   h.magic = K1LT_MAGIC;
   h.version = K1LT_VERSION;
