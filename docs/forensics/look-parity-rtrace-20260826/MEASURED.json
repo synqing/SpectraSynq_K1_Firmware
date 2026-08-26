@@ -1,0 +1,63 @@
+{
+  "generated": "2026-08-26",
+  "investigation": "look-parity-rtrace-20260826",
+  "stim": "HSV ramp hue 0-1 at sat=1.0 val=0.55",
+  "rpl": {
+    "device": "RPL_9087A500_WS2816",
+    "fmt": "rgb16hex",
+    "scale": 65535,
+    "slot_frame_counts": {
+      "0": 1675,
+      "1": 1550,
+      "2": 1506
+    },
+    "gold_mean_g_slot0": 15541.18,
+    "gold_mean_g_slot1": 29029.94,
+    "gold_delta_g": 13488.76,
+    "gold_delta_g_pct": 20.58,
+    "gold_n_pixels_slot0": 36850,
+    "gold_n_pixels_slot1": 26350,
+    "gold_direction": "LIFT",
+    "grey_mean_sat_slot1": 1.0,
+    "grey_mean_sat_slot2": 1.0,
+    "gold_rg_ratio_slot0": 4.477,
+    "gold_rg_ratio_slot1": 1.947,
+    "gold_rg_delta": -2.53,
+    "gold_rg_direction": "MORE_GOLDEN"
+  },
+  "bench": {
+    "device": "BENCH_B489A500_WS2812",
+    "fmt": "rgb8hex",
+    "scale": 255,
+    "slot_frame_counts": {
+      "0": 2570,
+      "1": 2576,
+      "2": 2549
+    },
+    "gold_mean_g_slot0": 11.32,
+    "gold_mean_g_slot1": 54.65,
+    "gold_delta_g": 43.33,
+    "gold_delta_g_pct": 16.99,
+    "gold_n_pixels_slot0": 757,
+    "gold_n_pixels_slot1": 15436,
+    "gold_direction": "LIFT",
+    "grey_mean_sat_slot1": 0.918,
+    "grey_mean_sat_slot2": 0.9379,
+    "gold_rg_ratio_slot0": 6.184,
+    "gold_rg_ratio_slot1": 2.138,
+    "gold_rg_delta": -4.046,
+    "gold_rg_direction": "MORE_GOLDEN"
+  },
+  "parity": {
+    "verdict": "JOB_ONLY",
+    "reason": "Both devices lift G for gold. Direction match (LIFT). Cannot claim FULL parity \u2014 different LED types, hardware gamma, and bit depth; dump values are not comparable across devices.",
+    "rpl_gold_direction": "LIFT",
+    "bench_gold_direction": "LIFT",
+    "rpl_delta_g": 13488.76,
+    "rpl_delta_g_pct": 20.58,
+    "bench_delta_g": 13488.76,
+    "bench_delta_g_pct_actual": 16.99,
+    "rpl_delta_g_pct_actual": 20.58,
+    "bench_delta_g_actual": 43.33
+  }
+}
