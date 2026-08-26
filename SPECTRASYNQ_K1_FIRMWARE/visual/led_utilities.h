@@ -38,6 +38,9 @@
 #ifdef K1_LOOK_LIB_WS2812_V1
 #include "k1_look_ws2812.h"
 #endif
+#ifdef K1_COLOUR_LAB_V1
+#include "k1_colour_lab.h"
+#endif
 #ifdef K1_LED_I2S_DIRECT_V1
 #include "k1_i2s_emit.h"
 #endif
@@ -1161,6 +1164,10 @@ inline void show_leds() {
 #endif
 
   scale_to_strip();
+#ifdef K1_COLOUR_LAB_V1
+  k1_colour_lab_latch_frame();
+  k1_colour_lab_apply_primary(leds_scaled, CONFIG.LED_COUNT);
+#endif
 #ifdef K1_LOOK_LIB_WS2812_V1
   k1_look_ws2812_latch_frame();
 #endif
@@ -1203,6 +1210,10 @@ inline void show_leds() {
                              SQ15x16(1.0f), SQ15x16(0.55f));
       }
     }
+#endif
+#ifdef K1_COLOUR_LAB_V1
+    // Product paint wins over the harness stim so paint=card dumps stay honest.
+    k1_colour_lab_apply_primary(leds_scaled, CONFIG.LED_COUNT);
 #endif
     const uint64_t budget_proxy =
         (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
@@ -2800,6 +2811,9 @@ inline void show_secondary_leds() {
   clip_led_values_count(leds_16_secondary, NATIVE_RESOLUTION);
   scale_to_secondary_strip();
   apply_brightness_secondary();
+#ifdef K1_COLOUR_LAB_V1
+  k1_colour_lab_apply_secondary(leds_scaled_secondary, SECONDARY_LED_COUNT);
+#endif
   if (SECONDARY_INCANDESCENT_MODE) {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }

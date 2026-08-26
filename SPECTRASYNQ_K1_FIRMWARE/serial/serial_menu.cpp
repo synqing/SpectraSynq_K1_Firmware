@@ -106,6 +106,9 @@ extern void ap_capture_arm(uint32_t ms);
 #ifdef K1_LOOK_LIB_V1
 #include "k1_look_file.h"
 #endif
+#ifdef K1_COLOUR_LAB_V1
+#include "k1_colour_lab.h"
+#endif
 
 extern bool benchmark_running;
 extern uint32_t benchmark_start_time;
@@ -1570,7 +1573,7 @@ void serial_print_hotkey_help() {
   USBSerial.println();
 #ifdef K1_LOOK_LIB_WS2812_V1
   USBSerial.println("Look");
-  USBSerial.println("  z cycle look (0 identity / 1 WS2812_PROOF / 2-3 reserved identity)");
+  USBSerial.println("  z cycle look (0 identity / 1 gold / 2 tungsten / 3 amber / 4 daylight / 5 moon / 6 punch / 7 crush)");
   USBSerial.println();
 #elif defined(K1_LOOK_LIB_V1)
   USBSerial.println("Look");
@@ -1868,7 +1871,18 @@ bool serial_hotkey_is_immediate(char key) {
 	    "slot_load",
 	    "slot_arm",
 	    "commit",
-	    "look"
+	    "look",
+	    "paint",
+	    "paint_target",
+	    "paint_rgb",
+	    "paint_sv",
+	    "paint_stops",
+	    "paint_status",
+	    "tune_gain",
+	    "tune_gamma",
+	    "tune_reset",
+	    "tune_save",
+	    "tune_status"
 	  };
 	  for (const char* manual_command : manual_commands) {
 	    if (strcmp(command_type, manual_command) == 0) {
@@ -1896,7 +1910,11 @@ static void serial_look_print_line() {
 
 static void serial_look_cycle_hotkey() {
   const uint8_t slot = k1_look_slot;
+#ifdef K1_LOOK_LIB_WS2812_V1
+  uint8_t next = (slot >= K1_LOOK_WS2812_SLOT_MAX) ? 0 : (uint8_t)(slot + 1);
+#else
   uint8_t next = (slot >= 3) ? 0 : (uint8_t)(slot + 1);
+#endif
   if (!k1_look_publish(next)) {
     next = 0;
     (void)k1_look_publish(0);
@@ -2272,10 +2290,10 @@ void cmd_help() {
   USBSerial.println("                                      led_fps | Return the LED FPS");
   USBSerial.println("                                      chip_id | Return the chip id (MAC) of the CPU");
 #ifdef K1_LOOK_LIB_WS2812_V1
-  USBSerial.println("                                   look=[0-3] | Select WS2812 look (0=identity, 1=WS2812_PROOF, 2-3 reserved identity)");
-  USBSerial.println("                      secondary_look=[0-3|255] | Secondary look; 255 inherits primary");
+  USBSerial.println("                                   look=[0-7] | Select WS2812 look (0=identity 1=gold 2=tungsten 3=amber 4=daylight 5=moon 6=punch 7=crush)");
+  USBSerial.println("                      secondary_look=[0-7|255] | Secondary look; 255 inherits primary");
   USBSerial.println("                                  look_status | Print live look slot/type/sec");
-  USBSerial.println("                       z (hotkey, no colon) | Cycle look 0-1-2-3");
+  USBSerial.println("                       z (hotkey, no colon) | Cycle look 0-7");
 #elif defined(K1_LOOK_LIB_V1)
   USBSerial.println("                                   look=[0-3] | Select compiled look (0=identity last-night, 1=tonight, 2=tungsten)");
   USBSerial.println("                      secondary_look=[0-3|255] | Secondary look; 255 inherits primary");
@@ -2800,6 +2818,19 @@ void parse_command(char* command_buf) {
       }
     }
 #endif
+#ifdef K1_COLOUR_LAB_V1
+    if (strcmp(command_buf, "paint_status") == 0 ||
+        strcmp(command_buf, "tune_status") == 0 ||
+        strcmp(command_buf, "tune_reset") == 0 ||
+        strcmp(command_buf, "tune_save") == 0) {
+      const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_buf);
+      if (typed != nullptr) {
+        char empty_data[1] = {0};
+        (void)serial_dispatch_typed_setter(typed, command_buf, empty_data);
+        return;
+      }
+    }
+#endif
     // Trailing space+token, e.g. `factory_reset CONFIRM`. This branch is scoped
     // to SC_FORBIDDEN_SINGLE_BYTE rows ONLY — those are the only commands that
     // take an argument (the CONFIRM token, D6). For any other head row (SAFE /
@@ -3040,6 +3071,12 @@ void parse_command(char* command_buf) {
     // K1_RENDER_TRACE_V1 (colour-fix-lane env only; production-OFF).
     else if (k1_render_trace_dispatch(command_type, command_data)) {
       // handled by the render trace instrument
+    }
+#endif
+
+#ifdef K1_COLOUR_LAB_V1
+    else if (k1_colour_lab_dispatch(command_type, command_data)) {
+      // paint / tune — Colour Lab product surface
     }
 #endif
 

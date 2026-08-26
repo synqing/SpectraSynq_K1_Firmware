@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "1c1418718e2f9e375fd5e8800a04090c9e4ca685"
+TYPED_DEF_BLOB_SHA = "49552843b2af399229b36482f53add4fc1e24b26"
 BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
@@ -123,6 +123,7 @@ PERSISTING_COMMANDS = frozenset({
     "led_interpolation",
     "led_type",
     "look",
+    "tune_save",
     "max_current_ma",
     "mirror_enabled",
     "mood",
@@ -303,6 +304,12 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "nov_clear",
     "nov_dump",
     "nov_status",
+    "paint",
+    "paint_rgb",
+    "paint_status",
+    "paint_stops",
+    "paint_sv",
+    "paint_target",
     "reset_reason",
     "rtrace_arm",
     "rtrace_dump",
@@ -333,6 +340,10 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "stream_spectrogram",
     "tempo_stream",
     "trace",
+    "tune_gain",
+    "tune_gamma",
+    "tune_reset",
+    "tune_status",
     "twitch",
     "v",
     "version",

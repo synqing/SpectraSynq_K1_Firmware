@@ -48,6 +48,9 @@
 #ifdef K1_LOOK_LIB_V1
 #include "k1_look_file.h"
 #endif
+#ifdef K1_COLOUR_LAB_V1
+#include "k1_colour_lab.h"
+#endif
 
 extern void check_current_function();
 extern void reboot();
@@ -152,6 +155,11 @@ bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data
 #ifdef K1_RENDER_TRACE_V1
 bool serial_typed_wrap_render_trace(const char* command_type, char* command_data) {
   return k1_render_trace_dispatch(command_type, command_data);
+}
+#endif
+#ifdef K1_COLOUR_LAB_V1
+bool serial_typed_wrap_colour_lab(const char* command_type, char* command_data) {
+  return k1_colour_lab_dispatch(command_type, command_data);
 }
 #endif
 #if K1_EFFECT_FRAMEWORK_V1
@@ -1084,7 +1092,8 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     long n = 0;
 #ifdef K1_LOOK_LIB_WS2812_V1
     const bool parsed = k1_look_parse_int_token(command_data, &n);
-    if (!parsed || n < 0 || n > 3 || !k1_look_publish((uint8_t)n)) {
+    if (!parsed || n < 0 || n > (long)K1_LOOK_WS2812_SLOT_MAX ||
+        !k1_look_publish((uint8_t)n)) {
 #else
     const bool parsed = k1_look_parse_int_token(command_data, &n);
     if (!parsed || n < 0 || n > 15 || !k1_look_publish((uint8_t)n)) {
@@ -1106,7 +1115,9 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     long n = 0;
 #ifdef K1_LOOK_LIB_WS2812_V1
     const bool parsed = k1_look_parse_int_token(command_data, &n);
-    if (!parsed || (n != 255 && (n < 0 || n > 3 || !k1_look_publish_sec((uint8_t)n)))) {
+    if (!parsed ||
+        (n != 255 && (n < 0 || n > (long)K1_LOOK_WS2812_SLOT_MAX ||
+                      !k1_look_publish_sec((uint8_t)n)))) {
 #else
     const bool parsed = k1_look_parse_int_token(command_data, &n);
     if (!parsed || (n != 255 && (n < 0 || n > 15 || !k1_look_publish_sec((uint8_t)n)))) {

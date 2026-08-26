@@ -15,6 +15,7 @@
 // before ws2816_pack_pixel. Slot 0 is identity (last night). Slot 1 is the
 // cube-spaced WS2816 inverse-gamma (tonight). Slot 2 is tungsten RGB 1D.
 // Slot 3 is identity until a measured plate print exists.
+// Slot 15 is USER_CUSTOM (loadable RGB_1D_256 from Colour Lab / .klut).
 //
 // Type tags 0–6 are frozen. Do not renumber.
 
@@ -402,11 +403,13 @@ static inline void k1_look_boot_from_config(uint8_t look, uint8_t secondary_look
 #endif  // K1_LOOK_LIB_V1
 
 #ifdef K1_LOOK_LIB_WS2812_V1
+inline constexpr uint8_t K1_LOOK_WS2812_SLOT_MAX = 7;
+
 inline volatile uint8_t k1_look_slot = 0;
 inline volatile uint8_t k1_look_slot_sec = 255;
 
 static inline bool k1_look_publish(uint8_t slot) {
-  if (slot > 3) {
+  if (slot > K1_LOOK_WS2812_SLOT_MAX) {
     return false;
   }
   k1_look_slot = slot;
@@ -418,7 +421,7 @@ static inline bool k1_look_publish_sec(uint8_t slot) {
     k1_look_slot_sec = 255;
     return true;
   }
-  if (slot > 3) {
+  if (slot > K1_LOOK_WS2812_SLOT_MAX) {
     return false;
   }
   k1_look_slot_sec = slot;
@@ -438,10 +441,19 @@ static inline const char *k1_look_status_type_name(uint8_t slot) {
     case 0:
       return "IDENTITY";
     case 1:
-      return "WS2812_PROOF";
+      return "GOLD_LIFT";
     case 2:
+      return "TUNGSTEN";
     case 3:
-      return "RESERVED_IDENTITY";
+      return "AMBER_HOLD";
+    case 4:
+      return "DAYLIGHT";
+    case 5:
+      return "MOON";
+    case 6:
+      return "PUNCH";
+    case 7:
+      return "CRUSH";
     default:
       return "EMPTY";
   }
