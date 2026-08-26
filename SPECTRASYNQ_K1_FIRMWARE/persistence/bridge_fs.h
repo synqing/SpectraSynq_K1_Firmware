@@ -11,6 +11,9 @@
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 #include "k1_look.h"
 #endif
+#ifdef K1_LOOK_LIB_V1
+#include "k1_look_file.h"
+#endif
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h" // registry_sanitize_persisted() (R2b NVS sanitiser)
 #endif
@@ -355,6 +358,11 @@ void load_config() {
 #endif
 
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
+#ifdef K1_LOOK_LIB_V1
+  // Slot 15 USER_CUSTOM: load+validate the complete payload before restoring
+  // a persisted selection. Failure leaves the slot empty → identity fallback.
+  (void)k1_look_fs_load(15);
+#endif
   k1_look_boot_from_config(CONFIG.LOOK, CONFIG.SECONDARY_LOOK);
 #endif
 

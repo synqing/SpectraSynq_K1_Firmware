@@ -122,5 +122,8 @@ bool serial_typed_stream_chromagram(const char* command_type, char* command_data
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 bool serial_typed_wrap_look(const char* command_type, char* command_data);
 #endif
+#ifdef K1_COLOUR_LAB_V1
+bool serial_typed_wrap_colour_lab(const char* command_type, char* command_data);
+#endif
 
 #endif // SERIAL_TYPED_DISPATCH_H

@@ -170,6 +170,16 @@ static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_byte
     heap_caps_free(copy);
     return false;
   }
+  const uint8_t live_slot = k1_look_slot;
+  const uint8_t sec_slot = k1_look_slot_sec;
+  const bool live_hit = (live_slot == slot);
+  const bool sec_hit = (sec_slot == slot);
+  if (live_hit) {
+    k1_look_publish(0);
+  }
+  if (sec_hit) {
+    k1_look_publish_sec(255);
+  }
   k1_look_free_slot_ram(slot);
   k1_look_slot_ram[slot] = copy;
   k1_look_slot_ram_n[slot] = file_len;
@@ -183,11 +193,19 @@ static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_byte
     dyn_rgb[slot].b = base + 768;
     k1_look_table[slot].type = K1_LOOK_RGB_1D_256;
     k1_look_table[slot].payload = &dyn_rgb[slot];
+    if (live_hit) {
+      k1_look_publish(slot);
+    }
+    if (sec_hit) {
+      k1_look_publish_sec(slot);
+    }
     return true;
   }
   if (live.type == K1_LOOK_MATRIX_3X4 && live.payload_bytes >= 48) {
     k1_look_table[slot].type = K1_LOOK_MATRIX_3X4;
     k1_look_table[slot].payload = live.payload;
+    if (live_hit) k1_look_publish(slot);
+    if (sec_hit) k1_look_publish_sec(slot);
     return true;
   }
   if (live.type == K1_LOOK_CUBE_17 && live.payload_bytes >= (17u * 17u * 17u * 3u * 2u)) {
@@ -195,11 +213,15 @@ static inline bool k1_look_install_parsed(uint8_t slot, const uint8_t *file_byte
     dyn_cube[slot].rgb = reinterpret_cast<const uint16_t *>(live.payload);
     k1_look_table[slot].type = K1_LOOK_CUBE_17;
     k1_look_table[slot].payload = &dyn_cube[slot];
+    if (live_hit) k1_look_publish(slot);
+    if (sec_hit) k1_look_publish_sec(slot);
     return true;
   }
   if (live.type == K1_LOOK_SHARED_1D_256) {
     k1_look_table[slot].type = K1_LOOK_SHARED_1D_256;
     k1_look_table[slot].payload = nullptr;
+    if (live_hit) k1_look_publish(slot);
+    if (sec_hit) k1_look_publish_sec(slot);
     return true;
   }
   heap_caps_free(copy);
@@ -256,14 +278,26 @@ static inline bool k1_look_fs_save(uint8_t slot, const uint8_t *bytes, size_t n)
   }
   LittleFS.mkdir("/look");
   char path[24];
+  char tmp[28];
   k1_look_slot_path(slot, path, sizeof(path));
-  File file = LittleFS.open(path, FILE_WRITE);
+  snprintf(tmp, sizeof(tmp), "/look/%02u.klut.tmp", (unsigned)slot);
+  LittleFS.remove(tmp);
+  File file = LittleFS.open(tmp, FILE_WRITE);
   if (!file) {
     return false;
   }
   const size_t wrote = file.write(bytes, n);
   file.close();
-  return wrote == n;
+  if (wrote != n) {
+    LittleFS.remove(tmp);
+    return false;
+  }
+  LittleFS.remove(path);
+  if (!LittleFS.rename(tmp, path)) {
+    LittleFS.remove(tmp);
+    return false;
+  }
+  return true;
 }
 
 static inline bool k1_look_fs_clear(uint8_t slot) {

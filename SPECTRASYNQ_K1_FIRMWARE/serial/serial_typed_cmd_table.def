@@ -215,3 +215,18 @@ SERIAL_TYPED_CMD("look_status", serial_typed_wrap_look, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("look_load", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_DISRUPTIVE)
 SERIAL_TYPED_CMD("look_clear", serial_typed_wrap_look, SC_TYPED_ONLY, CMD_DISRUPTIVE)
 #endif
+#ifdef K1_COLOUR_LAB_V1
+SERIAL_TYPED_CMD("paint", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("paint_target", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("paint_rgb", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("paint_sv", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("paint_stops", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("paint_status", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+#ifdef K1_LOOK_LIB_V1
+SERIAL_TYPED_CMD("tune_gain", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("tune_gamma", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("tune_reset", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("tune_save", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, CMD_PERSISTS)
+SERIAL_TYPED_CMD("tune_status", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
+#endif
+#endif
