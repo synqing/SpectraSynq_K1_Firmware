@@ -124,6 +124,8 @@ def test_boot_state_is_off_conservative_defaults():
     assert "K1_PAINT_OFF" in HEADER
     assert "K1_COLOUR_LAB_RAMP_V 0.55f" in HEADER
     assert "K1_COLOUR_LAB_DEFAULT_U8 140" in HEADER
+    assert "K1_COLOUR_LAB_BOTH_SCALE 0.30f" in HEADER
+    assert "K1_PAINT_TARGET_BOTH" in CPP and "K1_COLOUR_LAB_BOTH_SCALE" in CPP
 
 
 def test_solid_and_ramp_and_stops_fills():

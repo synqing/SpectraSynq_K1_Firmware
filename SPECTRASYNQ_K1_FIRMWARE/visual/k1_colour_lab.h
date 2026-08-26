@@ -14,6 +14,10 @@
 #define K1_COLOUR_LAB_USER_SLOT 15
 #define K1_COLOUR_LAB_RAMP_V 0.55f
 #define K1_COLOUR_LAB_DEFAULT_U8 140 /* round(0.55 * 255) — conservative solid */
+/* Dual-channel WS2816 160+160: measured 2026-08-27 on 9087A500.
+ * paint=solid both at 140 trips TG1WDT; both at 80 holds; primary card holds.
+ * Scale both-target apply so peak 255 ≈ 76. Host pixel math stays full-scale. */
+#define K1_COLOUR_LAB_BOTH_SCALE 0.30f
 #define K1_COLOUR_LAB_GAIN_MIN 0.0f
 #define K1_COLOUR_LAB_GAIN_MAX 2.0f
 #define K1_COLOUR_LAB_GAMMA_MIN 0.20f
