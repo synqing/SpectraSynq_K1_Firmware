@@ -100,8 +100,10 @@ extern void ap_capture_arm(uint32_t ms);
 #ifdef K1_EFFECT_FRAMEWORK_V1
 #include "beat_aware_director.h"
 #endif
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 #include "k1_look.h"
+#endif
+#ifdef K1_LOOK_LIB_V1
 #include "k1_look_file.h"
 #endif
 
@@ -678,15 +680,14 @@ void dump_info() {
   USBSerial.print("CHIP ID: ");
   print_chip_id();
 
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
   {
     const uint8_t slot = k1_look_slot;
     const uint8_t sec = k1_look_slot_sec;
-    const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : 0xFF;
     USBSerial.print("LOOK: slot=");
     USBSerial.print(slot);
     USBSerial.print(" type=");
-    USBSerial.print(k1_look_type_name(type));
+    USBSerial.print(k1_look_status_type_name(slot));
     USBSerial.print(" sec=");
     if (sec == 255) {
       USBSerial.print("inherit");
@@ -1567,7 +1568,11 @@ void serial_print_hotkey_help() {
   USBSerial.println("  . palette next");
   USBSerial.println("  / palette mode");
   USBSerial.println();
-#ifdef K1_LOOK_LIB_V1
+#ifdef K1_LOOK_LIB_WS2812_V1
+  USBSerial.println("Look");
+  USBSerial.println("  z cycle look (0 identity / 1 WS2812_PROOF / 2-3 reserved identity)");
+  USBSerial.println();
+#elif defined(K1_LOOK_LIB_V1)
   USBSerial.println("Look");
   USBSerial.println("  z cycle look (0 last-night / 1 tonight / 2 tungsten / 3 identity)");
   USBSerial.println();
@@ -1725,8 +1730,8 @@ bool serial_hotkey_is_immediate(char key) {
     case 'S':  // save show state (primary+secondary+edge) for next boot
     case 'd':
     case 'f':
-#if defined(K1_LOOK_LIB_V1) && !defined(ENABLE_MOTION_PROBE)
-    case 'z':  // cycle compiled look 0–3 (identity / tonight / tungsten / identity)
+#if (defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)) && !defined(ENABLE_MOTION_PROBE)
+    case 'z':  // cycle compiled look 0–3
     case 'Z':
 #endif
 #if defined(K1_VIVID_PRECOMP_V1) && !defined(ENABLE_MOTION_PROBE)
@@ -1872,15 +1877,14 @@ bool serial_hotkey_is_immediate(char key) {
 	  }
 	  return false;
 	}
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 static void serial_look_print_line() {
   const uint8_t slot = k1_look_slot;
   const uint8_t sec = k1_look_slot_sec;
-  const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : K1_LOOK_EMPTY;
   USBSerial.print("LOOK: slot=");
   USBSerial.print(slot);
   USBSerial.print(" type=");
-  USBSerial.print(k1_look_type_name(type));
+  USBSerial.print(k1_look_status_type_name(slot));
   USBSerial.print(" sec=");
   if (sec == 255) {
     USBSerial.print("inherit");
@@ -2160,7 +2164,7 @@ static void serial_look_cycle_hotkey() {
       stop_streams();
       USBSerial.println("STREAMS: off");
       break;
-#if defined(K1_LOOK_LIB_V1) && !defined(ENABLE_MOTION_PROBE)
+#if (defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)) && !defined(ENABLE_MOTION_PROBE)
     case 'z':
     case 'Z':
       serial_look_cycle_hotkey();
@@ -2267,7 +2271,12 @@ void cmd_help() {
   USBSerial.println("                                          fps | Return the system FPS");
   USBSerial.println("                                      led_fps | Return the LED FPS");
   USBSerial.println("                                      chip_id | Return the chip id (MAC) of the CPU");
-#ifdef K1_LOOK_LIB_V1
+#ifdef K1_LOOK_LIB_WS2812_V1
+  USBSerial.println("                                   look=[0-3] | Select WS2812 look (0=identity, 1=WS2812_PROOF, 2-3 reserved identity)");
+  USBSerial.println("                      secondary_look=[0-3|255] | Secondary look; 255 inherits primary");
+  USBSerial.println("                                  look_status | Print live look slot/type/sec");
+  USBSerial.println("                       z (hotkey, no colon) | Cycle look 0-1-2-3");
+#elif defined(K1_LOOK_LIB_V1)
   USBSerial.println("                                   look=[0-3] | Select compiled look (0=identity last-night, 1=tonight, 2=tungsten)");
   USBSerial.println("                      secondary_look=[0-3|255] | Secondary look; 255 inherits primary");
   USBSerial.println("                                  look_status | Print live look slot/type/sec");
@@ -2778,6 +2787,19 @@ void parse_command(char* command_buf) {
       serial_dispatch_typed_row(row, "");
       return;
     }
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
+    // Bare `:look_status` has no '=' so it never reaches the metadata ladder.
+    // Do not generalise this to the whole typed table: empty `:chroma` must
+    // not become a setter (k1_serial_safety scar).
+    if (strcmp(command_buf, "look_status") == 0) {
+      const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_buf);
+      if (typed != nullptr) {
+        char empty_data[1] = {0};
+        (void)serial_dispatch_typed_setter(typed, command_buf, empty_data);
+        return;
+      }
+    }
+#endif
     // Trailing space+token, e.g. `factory_reset CONFIRM`. This branch is scoped
     // to SC_FORBIDDEN_SINGLE_BYTE rows ONLY — those are the only commands that
     // take an argument (the CONFIRM token, D6). For any other head row (SAFE /
@@ -3927,6 +3949,21 @@ void parse_command(char* command_buf) {
       stream_spectrogram = !stream_spectrogram;
       USBSerial.print("STREAM_SPECTROGRAM: ");
       USBSerial.println(stream_spectrogram);
+    }
+
+    // Look Phase-A controls live in the typed table, not the strcmp ladder.
+    // Do not fall through the whole typed table here: that would silently
+    // re-route family-dispatcher commands (secondary_*, chroma, …) when a
+    // dispatcher call-site is severed, and would activate dormant typed rows.
+    else if (strcmp(command_type, "look") == 0 ||
+             strcmp(command_type, "look_status") == 0 ||
+             strcmp(command_type, "secondary_look") == 0) {
+      const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_type);
+      if (typed != nullptr) {
+        (void)serial_dispatch_typed_setter(typed, command_type, command_data);
+      } else {
+        bad_command(command_type, command_data);
+      }
     }
 
     else {

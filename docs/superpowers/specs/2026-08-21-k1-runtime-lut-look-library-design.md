@@ -1,18 +1,19 @@
 # K1 Look Library — full design
 
-**Status:** Proposed (not on silicon, not approved)  
-**Date:** 2026-08-21  
-**Deciders:** Captain  
-**Visual authority:** [`docs/research/k1-runtime-lut-look-library-SPEC.html`](../../research/k1-runtime-lut-look-library-SPEC.html)  
-**Educational precursor:** [`docs/research/k1-runtime-lut-look-library.html`](../../research/k1-runtime-lut-look-library.html)
+**Status:** Two-track Phase A is the implementation contract.
 
-This document is the implementation contract for the entire look-library possibility space. Phases A–D are scheduled so later machines do not break the Phase A ABI. Nothing here is firmware until Captain GO.
+| Track | Env | Flag | Device |
+|---|---|---|---|
+| RPL Phase A | `k1_main_rpl_im69d` | `K1_LOOK_LIB_V1` | `9087A500` |
+| WS2812 sibling Phase A | `k1_bench_im69d_led150` | `K1_LOOK_LIB_WS2812_V1` | `B489A500` |
+
+Phase B `.klut` file loading is **HOLD** until the on-disk layout in §7 and `k1_look_file.h` are made identical. Later machines still must not break the Phase A ABI.
 
 ---
 
 ## 1. One sentence
 
-A look is a typed `RGB u16 → RGB u16` print applied on Core 1 after incandescent mix and before the 48-bit pack (Lever-2) or before 8-bit quantize (bench stub). Slot 0 is identity. Switching slots is a pointer publish at a frame boundary. Palettes stay the paint.
+A look is a typed `RGB u16 → RGB u16` print applied on Core 1 after incandescent mix and before the 48-bit pack (Lever-2) or before 8-bit quantize (bench stub). Slot 0 is identity. Switching slots is a pointer publish at a frame boundary. Palettes stay the paint. **Sibling amendment:** on `k1_bench_im69d_led150` the bench path is a **direct u8** apply after integer quantize and before `apply_gamma8`, not a u16 widen.
 
 ## 2. Problem this solves
 
@@ -42,19 +43,21 @@ S9 (2026-08-18) already proved the “8-bit path has gamma, Lever-2 does not” 
 | Switch | Atomic · NVS persist · optional crossfade | A: atomic+persist. C: crossfade |
 | Load | Compiled PROGMEM · LittleFS `/look/NN.klut` · serial blob · Tab5 WS | A: compiled only |
 | Authorship | Generated (formula) · authored (file) · measured (chart) | A: generated identity + degamma. D: measured |
-| Target env | `k1_main_rpl_im69d` first · bench stub identity · `k1_hardware` later | A: RPL only |
+| Target env | `k1_main_rpl_im69d` (RPL) · `k1_bench_im69d_led150` (WS2812 sibling) · `k1_hardware` later | A: both tracks; never RPL env/flag on B489 |
 | Boot default | Slot 0 identity | Locked. Tonight’s plate is `:look=1` |
 
 ## 5. Locked decisions
 
 1. **Flag** `K1_LOOK_LIB_V1`. First env: `k1_main_rpl_im69d` only. Isolation test: `k1_hardware` and `k1_bench_im69d` do not define it.
+
+   **§5.1a — later WS2812 bench (sibling, not RPL).** After an authored WS2812B roster exists on disk, `k1_bench_im69d_led150` may define `K1_LOOK_LIB_WS2812_V1`. `K1_LOOK_LIB_V1` remains `k1_main_rpl_im69d` only. Isolation: `k1_hardware`, `k1_bench_im69d` (parent), `k1_bench_reference`, and `k1_bench_im69d_led150` do **not** define `K1_LOOK_LIB_V1`. A led150 build must not compile `k1_ws2816_degamma.h`, `k1_look_tungsten.h`, or `k1_look_install_proof_cube`. Both flags at once is a compile error.
 2. **Absorb** `K1_WS2816_DEGAMMA_V1`. When the library is on, that `#ifdef` is not a second path. Its table becomes compiled slot 1. Isolation tests update: degamma flag may remain as a *table generator* guard inside the look unit, not as a packer `#ifdef`.
 3. **Insert** inside `k1_lever2_sq_to_u16` (or a renamed `k1_look_apply_u16` called from that site): after SQ→u16, after the Q16 limiter scale, before `ws2816_pack_pixel`. Same site, both primary and secondary pack calls.
 4. **Limiter stays pre-look.** `budget_proxy` is still `n*3*65535` (identity today). Look may brighten the plate. Do not re-limit after the print in Phase A.
 5. **Slot 0** is a function `return ch`, not a 256-entry ramp. No lerp dust.
 6. **Boot** `CONFIG.LOOK = 0`, `CONFIG.SECONDARY_LOOK = 255` (inherit). Persist like `palette_index`.
 7. **Switch** on Core 1 at the start of `k1_lever2_pack_frame` only. Serial/Tab5 write a `volatile uint8_t`. No mutex on the audio core. No mid-pixel swap.
-8. **8-bit path** (`quantize_color`): when the flag is off, nothing changes. When someone later enables the library on a WS2812B env, apply is identity until an authored WS2812B look exists. Never ship the WS2816 degamma table onto B489 as a “match.”
+8. **8-bit path** (`quantize_color`): when the RPL flag is off, nothing changes. **§5.8 hook (WS2812 sibling).** After incandescent mix, `quantize_color` / `quantize_color_secondary` produce an integer 0–255 (Bayer or `*255` cast). Apply is `k1_look_ws2812_apply_u8` on that integer **before** `apply_gamma8` writes `leds_out`. No u16 widen, no binary search, no lerp. `ENABLE_OUTPUT_GAMMA` stays 0. Latch primary and secondary slots once per `show_leds`, after `scale_to_strip` and before `show_secondary_leds`. Never ship the WS2816 degamma table onto B489 as a match.
 9. **Max compiled slots Phase A:** 4. Max ABI slots: 16 (`0..15`). Loadable slots `8..15` reserved, unused until Phase B.
 10. **File magic** `K1LT` (0x4B314C54), little-endian, CRC-32 of payload, version 1. Unknown type → refuse load, keep previous slot.
 11. **No look IO on Core 0.** LittleFS open stays on the serial/loop core (existing heap-precondition law).
@@ -91,6 +94,8 @@ offset  size  field
 
 Identity is never a file. Slot 0 cannot be overwritten.
 
+**HOLD (Captain 2026-08-26):** this table places CRC at offset 16 and payload at offset 20. `k1_look_file.h` currently writes payload at offset 16 and appends CRC after the payload. Phase B file loading must not ship until one layout is selected and the contract, parser, and builder tests are identical. This mismatch does not block the compiled led150 sibling roster.
+
 ## 8. Runtime objects
 
 ```
@@ -110,9 +115,9 @@ volatile uint8_t k1_look_slot_sec;     // 255 = inherit
 
 | Command | Phase | Persist | Notes |
 |---|---|---|---|
-| `:look=N` | A | yes | N 0..15, unknown empty slot → NACK, stay |
-| `:secondary_look=N` | A | yes | 255 inherit |
-| `:look_status` | A | no | prints slot, type name, env, crc |
+| `:look=N` | A | yes | RPL: N 0..15, unknown empty slot → NACK, stay. Sibling: N 0..3, slots 2 and 3 ACK as reserved identity |
+| `:secondary_look=N` | A | yes | 255 inherit. Sibling range 0..3 or 255 |
+| `:look_status` | A | no | prints slot, type name, env, crc. Live Phase-A control, not a dormant table row |
 | `:look_load=N` | B | file | N 8..15 only, then wait for blob |
 | `:look_clear=N` | B | file | N 8..15, revert that slot to empty |
 | Tab5 wheel | B | via `:look=` | no new protocol until WS already used for palette |
@@ -127,6 +132,17 @@ Regen `serial_typed_cmd_table.def` + `k1_serial_safety` SHA. `CMD_PERSISTS` on t
 | 1 | Degamma 2.2 | 1 | Tonight’s table, now optional |
 | 2 | Tungsten trim | 2 | Proves per-channel ≠ shared 1D |
 | 3 | Reserved measured | 0 until file | Do not invent a film grade |
+
+**Sibling roster (`K1_LOOK_LIB_WS2812_V1` on `k1_bench_im69d_led150` only):**
+
+| Slot | Name | Machine | Why |
+|---:|---|---|---|
+| 0 | Identity | pass-through | flag-off equivalent |
+| 1 | WS2812_PROOF | three `uint8[256]`, direct index | Locked `g[i]=(i*220)/255`; ≠ RPL; **not** a Main RPL match |
+| 2 | Reserved measured | identity | Legal no-op. ACK. Not a grade. |
+| 3 | Reserved | identity | Legal no-op. ACK. `z` wraps 0–3. |
+
+Slots 0–3 ACK as reserved identity **only in this sibling roster**. The RPL roster still NACKs empty/reserved loadable slots. Do not NACK sibling 0–3 as empty.
 
 ## 11. Interaction with existing machinery
 
@@ -153,7 +169,7 @@ Regen `serial_typed_cmd_table.def` + `k1_serial_safety` SHA. `CMD_PERSISTS` on t
 
 | Event | Action |
 |---|---|
-| `:look=` empty/reserved slot | NACK, keep previous |
+| `:look=` empty/reserved slot | RPL: NACK, keep previous. Sibling slots 2 and 3 ACK as reserved identity |
 | CRC fail on load | Refuse, keep previous, serial reason |
 | Unknown type | Refuse |
 | Flag compiled out | Commands absent (typed table `#ifdef`) |
@@ -170,6 +186,9 @@ Regen `serial_typed_cmd_table.def` + `k1_serial_safety` SHA. `CMD_PERSISTS` on t
 - Serial regen / safety blob.
 - No Core-0 include of look apply.
 - 8-bit env: look symbols absent or identity-only.
+- `K1_LOOK_LIB_V1` never effective on `k1_bench_im69d_led150`.
+- `K1_LOOK_LIB_WS2812_V1` only on `k1_bench_im69d_led150`.
+- Sibling slot 0 bit-identical to pre-look 8-bit replica; slot 1 ≠ identity and ≠ degamma/tungsten on the published sample set.
 
 ## 15. Forbidden (do not “just add”)
 
@@ -179,13 +198,19 @@ Regen `serial_typed_cmd_table.def` + `k1_serial_safety` SHA. `CMD_PERSISTS` on t
 - Runtime HSV “make it richer.”
 - Uploading a 65³ cube into SRAM.
 - Treating look as calibration.
-- Flashing B489 or F887 with this env.
+- Flashing `k1_main_rpl_im69d` or `K1_LOOK_LIB_V1` onto B489A500. The authorised sibling flash is `k1_bench_im69d_led150` / `K1_LOOK_LIB_WS2812_V1` on B489 only.
+- Flashing F887 / `k1_hardware` with either look flag until a named production flash.
 - Enabling I2S LED to “get more bits for the LUT.”
 - Crossfading by mixing packed bytes.
 
 ## 16. Phases (full breadth, one ABI)
 
-**A — compiled library (first GO).** Flag, slot 0–3, `:look=` / `:secondary_look=` / `:look_status`, absorb degamma, host tests, RPL flash. Default slot 0. Captain A/B 0 vs 1 vs bench.
+**A — compiled library (first GO).** Two tracks, mutually exclusive flags.
+
+- RPL Phase A: `k1_main_rpl_im69d` / `K1_LOOK_LIB_V1` / `9087A500`. Slots 0–3, absorb degamma, host tests, Main-RPL flash.
+- WS2812 sibling Phase A: `k1_bench_im69d_led150` / `K1_LOOK_LIB_WS2812_V1` / `B489A500`. Direct u8 apply, slots 2 and 3 ACK as reserved identity, no RPL proof cube.
+
+Default slot 0 on both. `:look=` / `:secondary_look=` / `:look_status` are live Phase-A controls on the compiled track.
 
 **B — loadable slots.** `.klut` LittleFS, `:look_load=`, Tab5 send. Still no 3D required.
 
@@ -195,14 +220,14 @@ Regen `serial_typed_cmd_table.def` + `k1_serial_safety` SHA. `CMD_PERSISTS` on t
 
 ## 17. Ship stamps
 
-**Already on silicon:** `445c79ce` / `k1_main_rpl_im69d` on `9087A500` with compiled degamma always-on. Intro on Core 1. No look library.
+**Already on silicon (RPL):** look library on `k1_main_rpl_im69d` / `9087A500` (`K1_LOOK_LIB_V1`). Restore authority is the device-build registry, not this paragraph’s historic SHA.
 
-**This spec shipped (docs only) when:** the HTML + this file exist. Not firmware.
+**Already on silicon (WS2812 sibling):** `k1_bench_im69d_led150` / `K1_LOOK_LIB_WS2812_V1` / `B489A500` after a committed-source flash whose live `:build` git SHA **is** the look-library commit. A dirty-source bench bring-up is engineering only; app-image SHA-256 plus the dirty allowlist is provenance for that image, not the Task 10 ship stamp.
 
-**Phase A on silicon when:** `IDENTITY OK: git=<sha> env=k1_main_rpl_im69d` and `:look_status` reports `slot=0 type=IDENTITY` at boot, `:look=1` reproduces tonight’s plate, `:look=0` reproduces last night. No `start_noise_cal`.
+**This spec shipped (docs) when:** the HTML + this file exist and the two-track amendment is present.
 
-**Who:** Captain approves this spec (or amends locked rows) → agent implements A → Captain flash GO for 1401 only → Captain eyes-on 0 vs 1 vs bench.
+**RPL Phase A on silicon when:** `IDENTITY OK: git=<sha> env=k1_main_rpl_im69d` and `:look_status` reports `slot=0 type=IDENTITY` at boot.
 
----
+**WS2812 sibling Phase A on silicon when:** `IDENTITY OK: git=<source_commit_sha> env=k1_bench_im69d_led150` on `B489A500`, boot slot 0 IDENTITY, `:look=0..3` ACK with sibling type names, calibration unchanged, `LED_BUFFER_DIFF = NOT_RUN`. No `start_noise_cal`. Not a Main-RPL match claim.
 
-*Approve, amend a locked row, or reject. Do not implement on silence.*
+**Who:** Captain approves this spec (or amends locked rows) → agent implements the named track → Captain flash GO for that device only.

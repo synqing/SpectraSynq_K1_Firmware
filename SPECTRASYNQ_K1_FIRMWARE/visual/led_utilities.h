@@ -35,6 +35,9 @@
 #ifdef K1_WS2816_LEVER2_V1
 #include "k1_lever2_emit.h"
 #endif
+#ifdef K1_LOOK_LIB_WS2812_V1
+#include "k1_look_ws2812.h"
+#endif
 #ifdef K1_LED_I2S_DIRECT_V1
 #include "k1_i2s_emit.h"
 #endif
@@ -574,11 +577,8 @@ inline void quantize_color(bool temporal_dithering) {
       if (fract_r >= dither_table[(noise_origin_r + i) % 4]) {
         whole_r += SQ15x16(1);
       }
+      uint8_t out_r = whole_r.getInteger();
 
-      // Phase 1 2026-05-20: apply output gamma at the final uint8 write.
-      leds_out[i].r = apply_gamma8(whole_r.getInteger());
-
-      // GREEN ###################################################
       SQ15x16 decimal_g = K1_INC_G(leds_scaled[i].g) * SQ15x16(254);
       SQ15x16 whole_g = decimal_g.getInteger();
       SQ15x16 fract_g = decimal_g - whole_g;
@@ -586,10 +586,8 @@ inline void quantize_color(bool temporal_dithering) {
       if (fract_g >= dither_table[(noise_origin_g + i) % 4]) {
         whole_g += SQ15x16(1);
       }
+      uint8_t out_g = whole_g.getInteger();
 
-      leds_out[i].g = apply_gamma8(whole_g.getInteger());
-
-      // BLUE ####################################################
       SQ15x16 decimal_b = K1_INC_B(leds_scaled[i].b) * SQ15x16(254);
       SQ15x16 whole_b = decimal_b.getInteger();
       SQ15x16 fract_b = decimal_b - whole_b;
@@ -597,15 +595,25 @@ inline void quantize_color(bool temporal_dithering) {
       if (fract_b >= dither_table[(noise_origin_b + i) % 4]) {
         whole_b += SQ15x16(1);
       }
-
-      leds_out[i].b = apply_gamma8(whole_b.getInteger());
+      uint8_t out_b = whole_b.getInteger();
+#ifdef K1_LOOK_LIB_WS2812_V1
+      k1_look_ws2812_apply_u8(k1_look_ws2812_latched_pri, out_r, out_g, out_b);
+#endif
+      leds_out[i].r = apply_gamma8(out_r);
+      leds_out[i].g = apply_gamma8(out_g);
+      leds_out[i].b = apply_gamma8(out_b);
     }
   } else {
     for (uint16_t i = 0; i < CONFIG.LED_COUNT; i += 1) {
-      // Phase 1 2026-05-20: gamma at non-dither final write too.
-      leds_out[i].r = apply_gamma8(uint8_t(K1_INC_R(leds_scaled[i].r) * 255));
-      leds_out[i].g = apply_gamma8(uint8_t(K1_INC_G(leds_scaled[i].g) * 255));
-      leds_out[i].b = apply_gamma8(uint8_t(K1_INC_B(leds_scaled[i].b) * 255));
+      uint8_t out_r = uint8_t(K1_INC_R(leds_scaled[i].r) * 255);
+      uint8_t out_g = uint8_t(K1_INC_G(leds_scaled[i].g) * 255);
+      uint8_t out_b = uint8_t(K1_INC_B(leds_scaled[i].b) * 255);
+#ifdef K1_LOOK_LIB_WS2812_V1
+      k1_look_ws2812_apply_u8(k1_look_ws2812_latched_pri, out_r, out_g, out_b);
+#endif
+      leds_out[i].r = apply_gamma8(out_r);
+      leds_out[i].g = apply_gamma8(out_g);
+      leds_out[i].b = apply_gamma8(out_b);
     }
   }
 }
@@ -1153,6 +1161,9 @@ inline void show_leds() {
 #endif
 
   scale_to_strip();
+#ifdef K1_LOOK_LIB_WS2812_V1
+  k1_look_ws2812_latch_frame();
+#endif
 #if ENABLE_VP_PERF_AUDIT
   if (vp_perf.running && vp_perf_primary_prep_start_us != 0) {
     vp_perf_record(vp_perf.primary_prep, uint32_t(esp_timer_get_time() - vp_perf_primary_prep_start_us));
@@ -2858,9 +2869,15 @@ inline void show_secondary_leds() {
       // Need to divide by 255*256 - approximate by dividing by 2^16 (>> 16)
       uint8_t green_reduction = (green_reduction_fp >> 16);
 
-      leds_out_secondary[i].r = r_raw; // Red remains unchanged in this simple filter
-      leds_out_secondary[i].g = (g_raw > green_reduction) ? g_raw - green_reduction : 0;
-      leds_out_secondary[i].b = (b_raw > blue_reduction) ? b_raw - blue_reduction : 0;
+      uint8_t out_r = r_raw; // Red remains unchanged in this simple filter
+      uint8_t out_g = (g_raw > green_reduction) ? g_raw - green_reduction : 0;
+      uint8_t out_b = (b_raw > blue_reduction) ? b_raw - blue_reduction : 0;
+#ifdef K1_LOOK_LIB_WS2812_V1
+      k1_look_ws2812_apply_u8(k1_look_ws2812_latched_sec, out_r, out_g, out_b);
+#endif
+      leds_out_secondary[i].r = out_r;
+      leds_out_secondary[i].g = out_g;
+      leds_out_secondary[i].b = out_b;
     }
   } else {
     // If filter is off, just quantize directly
@@ -3018,27 +3035,37 @@ inline void quantize_color_secondary(bool temporal_dither) {
       SQ15x16 whole_r = decimal_r.getInteger();
       SQ15x16 fract_r = decimal_r - whole_r;
       if (fract_r >= dither_table[(noise_origin_r_s + i) % 4]) whole_r += SQ15x16(1);
-      // Phase 1 2026-05-20: gamma applied at final uint8 write (secondary, dither path).
-      leds_out_secondary[i].r = apply_gamma8(whole_r.getInteger());
+      uint8_t out_r = whole_r.getInteger();
 
       SQ15x16 decimal_g = leds_scaled_secondary[i].g * SQ15x16(254);
       SQ15x16 whole_g = decimal_g.getInteger();
       SQ15x16 fract_g = decimal_g - whole_g;
       if (fract_g >= dither_table[(noise_origin_g_s + i) % 4]) whole_g += SQ15x16(1);
-      leds_out_secondary[i].g = apply_gamma8(whole_g.getInteger());
+      uint8_t out_g = whole_g.getInteger();
 
       SQ15x16 decimal_b = leds_scaled_secondary[i].b * SQ15x16(254);
       SQ15x16 whole_b = decimal_b.getInteger();
       SQ15x16 fract_b = decimal_b - whole_b;
       if (fract_b >= dither_table[(noise_origin_b_s + i) % 4]) whole_b += SQ15x16(1);
-      leds_out_secondary[i].b = apply_gamma8(whole_b.getInteger());
+      uint8_t out_b = whole_b.getInteger();
+#ifdef K1_LOOK_LIB_WS2812_V1
+      k1_look_ws2812_apply_u8(k1_look_ws2812_latched_sec, out_r, out_g, out_b);
+#endif
+      leds_out_secondary[i].r = apply_gamma8(out_r);
+      leds_out_secondary[i].g = apply_gamma8(out_g);
+      leds_out_secondary[i].b = apply_gamma8(out_b);
     }
   } else {
     for (uint16_t i = 0; i < SECONDARY_LED_COUNT; i++) {
-      // Phase 1 2026-05-20: gamma applied at final uint8 write (secondary, non-dither path).
-      leds_out_secondary[i].r = apply_gamma8(uint8_t(leds_scaled_secondary[i].r * 255));
-      leds_out_secondary[i].g = apply_gamma8(uint8_t(leds_scaled_secondary[i].g * 255));
-      leds_out_secondary[i].b = apply_gamma8(uint8_t(leds_scaled_secondary[i].b * 255));
+      uint8_t out_r = uint8_t(leds_scaled_secondary[i].r * 255);
+      uint8_t out_g = uint8_t(leds_scaled_secondary[i].g * 255);
+      uint8_t out_b = uint8_t(leds_scaled_secondary[i].b * 255);
+#ifdef K1_LOOK_LIB_WS2812_V1
+      k1_look_ws2812_apply_u8(k1_look_ws2812_latched_sec, out_r, out_g, out_b);
+#endif
+      leds_out_secondary[i].r = apply_gamma8(out_r);
+      leds_out_secondary[i].g = apply_gamma8(out_g);
+      leds_out_secondary[i].b = apply_gamma8(out_b);
     }
   }
 }

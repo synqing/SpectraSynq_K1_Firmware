@@ -79,6 +79,16 @@ def test_shippable_envs_do_not_define_lever2():
     assert leaks == {}, f"eval flags leaked into shippable envs: {leaks}"
 
 
+def test_led150_env_excludes_look_lever2_degamma():
+    """WS2812 150-px bench must not carry the RPL look or Lever-2 flags."""
+    sections = _sections()
+    have = _effective_flags("k1_bench_im69d_led150", sections)
+    assert LOOK_FLAG not in have
+    assert FLAG not in have
+    assert DEGAMMA_FLAG not in have
+    assert "K1_LOOK_LIB_WS2812_V1" in have
+
+
 def test_lever2_eval_env_is_not_reintroduced():
     assert "k1_ws2816_lever2" not in MANIFEST.get("blocked_envs", [])
     assert "k1_ws2816_lever2" not in {

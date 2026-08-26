@@ -41,8 +41,11 @@
 #include "k1_ap_twitch_oracle.h"
 #endif
 
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 #include "k1_look.h"
+#include "k1_look_serial_token.h"
+#endif
+#ifdef K1_LOOK_LIB_V1
 #include "k1_look_file.h"
 #endif
 
@@ -1048,22 +1051,25 @@ bool serial_typed_stream_chromagram(const char* command_type, char* command_data
   return true;
 }
 
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 static void k1_look_print_status() {
   const uint8_t slot = k1_look_slot;
   const uint8_t sec = k1_look_slot_sec;
-  const uint8_t type = (slot <= 15) ? k1_look_table[slot].type : K1_LOOK_EMPTY;
   USBSerial.print("LOOK: slot=");
   USBSerial.print(slot);
   USBSerial.print(" type=");
-  USBSerial.print(k1_look_type_name(type));
+  USBSerial.print(k1_look_status_type_name(slot));
   USBSerial.print(" sec=");
   if (sec == 255) {
     USBSerial.print("inherit");
   } else {
     USBSerial.print(sec);
   }
+#ifdef K1_LOOK_LIB_WS2812_V1
+  USBSerial.print(" env=k1_bench_im69d_led150");
+#else
   USBSerial.print(" env=k1_main_rpl_im69d");
+#endif
   USBSerial.println();
 }
 
@@ -1075,8 +1081,14 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     return true;
   }
   if (strcmp(command_type, "look") == 0) {
-    const int n = atoi(command_data);
-    if (n < 0 || n > 15 || !k1_look_publish((uint8_t)n)) {
+    long n = 0;
+#ifdef K1_LOOK_LIB_WS2812_V1
+    const bool parsed = k1_look_parse_int_token(command_data, &n);
+    if (!parsed || n < 0 || n > 3 || !k1_look_publish((uint8_t)n)) {
+#else
+    const bool parsed = k1_look_parse_int_token(command_data, &n);
+    if (!parsed || n < 0 || n > 15 || !k1_look_publish((uint8_t)n)) {
+#endif
       bad_command(command_type, command_data);
       tx_begin();
       USBSerial.println("LOOK: empty");
@@ -1091,8 +1103,14 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     return true;
   }
   if (strcmp(command_type, "secondary_look") == 0) {
-    const int n = atoi(command_data);
-    if (n != 255 && (n < 0 || n > 15 || !k1_look_publish_sec((uint8_t)n))) {
+    long n = 0;
+#ifdef K1_LOOK_LIB_WS2812_V1
+    const bool parsed = k1_look_parse_int_token(command_data, &n);
+    if (!parsed || (n != 255 && (n < 0 || n > 3 || !k1_look_publish_sec((uint8_t)n)))) {
+#else
+    const bool parsed = k1_look_parse_int_token(command_data, &n);
+    if (!parsed || (n != 255 && (n < 0 || n > 15 || !k1_look_publish_sec((uint8_t)n)))) {
+#endif
       bad_command(command_type, command_data);
       return true;
     }
@@ -1106,6 +1124,7 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     tx_end();
     return true;
   }
+#ifdef K1_LOOK_LIB_V1
   if (strcmp(command_type, "look_clear") == 0) {
     const int n = atoi(command_data);
     if (n < 8 || n > 15 || !k1_look_fs_clear((uint8_t)n)) {
@@ -1152,6 +1171,7 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data) {
     tx_end();
     return true;
   }
+#endif
   bad_command(command_type, command_data);
   return true;
 }

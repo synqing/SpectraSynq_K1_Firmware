@@ -1,12 +1,15 @@
 #pragma once
 
+#include "k1_look_flags.h"
 #include <stdint.h>
 #include <stddef.h>
 #ifdef ARDUINO
 #include <esp_heap_caps.h>
 #endif
+#ifdef K1_LOOK_LIB_V1
 #include "k1_ws2816_degamma.h"
 #include "k1_look_tungsten.h"
+#endif
 
 // K1 Look Library (K1_LOOK_LIB_V1). Core 1 only. Apply after Q16 limiter,
 // before ws2816_pack_pixel. Slot 0 is identity (last night). Slot 1 is the
@@ -149,6 +152,13 @@ static inline const char *k1_look_type_name(uint8_t type) {
     default:
       return "EMPTY";
   }
+}
+
+static inline const char *k1_look_status_type_name(uint8_t slot) {
+  if (slot > 15) {
+    return "EMPTY";
+  }
+  return k1_look_type_name(k1_look_table[slot].type);
 }
 
 static inline uint16_t k1_look_lerp_1d(uint16_t v, const uint16_t *xs, const uint16_t *ys) {
@@ -368,6 +378,15 @@ static inline bool k1_look_install_proof_cube() {
 }
 #endif
 
+static inline void k1_look_restore_slots_from_config(uint8_t look, uint8_t secondary_look) {
+  if (!k1_look_publish(look)) {
+    k1_look_slot = 0;
+  }
+  if (!k1_look_publish_sec(secondary_look)) {
+    k1_look_slot_sec = 255;
+  }
+}
+
 static inline void k1_look_boot_from_config(uint8_t look, uint8_t secondary_look) {
 #ifdef ARDUINO
   (void)k1_look_install_proof_cube();
@@ -381,3 +400,63 @@ static inline void k1_look_boot_from_config(uint8_t look, uint8_t secondary_look
 }
 
 #endif  // K1_LOOK_LIB_V1
+
+#ifdef K1_LOOK_LIB_WS2812_V1
+inline volatile uint8_t k1_look_slot = 0;
+inline volatile uint8_t k1_look_slot_sec = 255;
+
+static inline bool k1_look_publish(uint8_t slot) {
+  if (slot > 3) {
+    return false;
+  }
+  k1_look_slot = slot;
+  return true;
+}
+
+static inline bool k1_look_publish_sec(uint8_t slot) {
+  if (slot == 255) {
+    k1_look_slot_sec = 255;
+    return true;
+  }
+  if (slot > 3) {
+    return false;
+  }
+  k1_look_slot_sec = slot;
+  return true;
+}
+
+static inline uint8_t k1_look_effective_sec() {
+  const uint8_t sec = k1_look_slot_sec;
+  if (sec == 255) {
+    return k1_look_slot;
+  }
+  return sec;
+}
+
+static inline const char *k1_look_status_type_name(uint8_t slot) {
+  switch (slot) {
+    case 0:
+      return "IDENTITY";
+    case 1:
+      return "WS2812_PROOF";
+    case 2:
+    case 3:
+      return "RESERVED_IDENTITY";
+    default:
+      return "EMPTY";
+  }
+}
+
+static inline void k1_look_restore_slots_from_config(uint8_t look, uint8_t secondary_look) {
+  if (!k1_look_publish(look)) {
+    k1_look_slot = 0;
+  }
+  if (!k1_look_publish_sec(secondary_look)) {
+    k1_look_slot_sec = 255;
+  }
+}
+
+static inline void k1_look_boot_from_config(uint8_t look, uint8_t secondary_look) {
+  k1_look_restore_slots_from_config(look, secondary_look);
+}
+#endif  // K1_LOOK_LIB_WS2812_V1

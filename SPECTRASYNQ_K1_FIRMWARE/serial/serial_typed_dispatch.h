@@ -119,7 +119,7 @@ bool serial_typed_stream_spectrogram(const char* command_type, char* command_dat
 bool serial_typed_stream_agc(const char* command_type, char* command_data);
 bool serial_typed_stream_chromagram(const char* command_type, char* command_data);
 
-#ifdef K1_LOOK_LIB_V1
+#if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
 bool serial_typed_wrap_look(const char* command_type, char* command_data);
 #endif
 
