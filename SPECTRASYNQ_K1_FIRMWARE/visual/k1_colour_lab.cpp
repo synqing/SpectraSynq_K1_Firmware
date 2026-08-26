@@ -77,6 +77,13 @@ static void k1_colour_lab_apply(CRGB16 *leds, uint16_t n, uint8_t mask) {
   for (uint16_t i = 0; i < n; i++) {
     float r = 0.0f, g = 0.0f, b = 0.0f;
     k1_colour_lab_pixel(&s_live, i, n, &r, &g, &b);
+#ifdef K1_WS2816_LEVER2_V1
+    if (s_live.target == K1_PAINT_TARGET_BOTH) {
+      r *= K1_COLOUR_LAB_BOTH_SCALE;
+      g *= K1_COLOUR_LAB_BOTH_SCALE;
+      b *= K1_COLOUR_LAB_BOTH_SCALE;
+    }
+#endif
     leds[i].r = SQ15x16(r);
     leds[i].g = SQ15x16(g);
     leds[i].b = SQ15x16(b);
