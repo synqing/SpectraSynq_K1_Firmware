@@ -1,0 +1,49 @@
+{
+  "method": "numpy CSS identity + Playwright getBoundingClientRect",
+  "css": {
+    "page_padding": "36px 28px 96px 56px",
+    "console": "max-width:1180px; margin:4vh 0 0 auto; grid 1.1fr 0.95fr; gap:80px",
+    "source": "tools/webflash/index.html:61-65"
+  },
+  "live_playwright": {
+    "1440x900": {
+      "console_x": 232,
+      "console_w": 1180,
+      "left_void": 232,
+      "right_void": 28,
+      "hands_w": 590,
+      "guide_w": 510,
+      "gap": 80,
+      "well_h": 849,
+      "guide_empty_chrome_under_pockets": 187
+    },
+    "1920x900": {
+      "console_x": 712,
+      "console_w": 1180,
+      "left_void": 712,
+      "right_void": 28,
+      "hands_w": 590,
+      "guide_w": 510,
+      "gap": 80
+    }
+  },
+  "css_identity_left_void": {
+    "formula": "V - 1180 - 28",
+    "1440": 232,
+    "1728": 520,
+    "1920": 712,
+    "2143": 935,
+    "2560": 1352
+  },
+  "n80_modules_left_void": {
+    "1440": 2.9,
+    "1920": 8.9,
+    "2143": 11.69,
+    "2560": 16.9
+  },
+  "captain_still": {
+    "path": "/Users/spectrasynq/Desktop/Screenshot 2026-08-25 at 13.59.16.png",
+    "px": "2143x1110",
+    "note": "Window chrome / capture lift; leftover authority is CSS + live rects, not lum-threshold on the PNG"
+  }
+}
