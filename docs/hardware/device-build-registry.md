@@ -1,5 +1,5 @@
 ---
-abstract: "CANONICAL device↔env↔build registry for the registered K1 units: Main RPL (CHIP ID 9087A500 / USB B4:3A:45:A5:87:90 on usbmodem1401 — k1_main_rpl_im69d @ b625e89a epoch 1787400761, native music occupancy PASS_TRUE16 then product restored 2026-08-22), bench K1v2 B489A500 on usbmodem1101 — k1_bench_im69d @ d276fd68 (I2S reverted; honour/G8 look), and Bench Unit 2 (0C54FC00, not on 1101 this session). I2S/LCD_CAM eval PARKED. k1_hardware carries K1_EDGE_PALETTE_HONOUR_V1. F887A500 OFFSITE. Verify against live git/device before trusting the deployed-state table; update the table on every flash."
+abstract: "CANONICAL device↔env↔build registry for the registered K1 units. Latest Colour Lab verification: Main RPL 9087A500 on usbmodem1101 runs k1_main_rpl_im69d @ acaecaa8; Bench B489A500 on usbmodem1401 runs k1_bench_im69d_led150 @ f2014c29. COLOUR_LAB_WEB_UI_HARDWARE_PASS 2026-08-28 on both units: Paint off on both; Main slot 15 deliberately identity-saved; Bench Tune unavailable. No flash or calibration command occurred. F887A500 remains OFFSITE. Verify against live git/device before trusting any port name or deployed-state row."
 ---
 
 # K1 Device ↔ Build Registry (canonical)
@@ -105,7 +105,18 @@ Ports are badly scrambled vs the typical map; verified by chip type + MAC:
   demo env to the bench (guard-verified `B489A500` on `1101`) — see §2 top row +
   `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`.
 
-## 2. Deployed state (UPDATE ON EVERY FLASH)
+## 2. Latest verified state
+
+| Device | Live identity | Colour Lab leave-state | Evidence |
+|---|---|---|---|
+| **Main RPL `9087A500`**, USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1101` | `git=acaecaa8 epoch=1787773671 env=k1_main_rpl_im69d` | Paint off; look 0 IDENTITY; Secondary inherit; slot 15 deliberately identity-saved | `tools/colourlab/VERIFICATION.md` |
+| **Bench `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem1401` | `git=f2014c29 epoch=1787771217 env=k1_bench_im69d_led150` | Paint off; look 0 IDENTITY; Secondary inherit; Tune `type=na` and not offered | `tools/colourlab/VERIFICATION.md` |
+
+This table is newer than any conflicting `current` label retained in the historical
+flash ledger below. Identity came from live `:chip_id` and `:build`; port names did
+not establish identity. No firmware was flashed and `start_noise_cal` was not sent.
+
+## 3. Historical deployed-state ledger (UPDATE ON EVERY FLASH)
 
 | Device | Commit | Build/env | Why | Since |
 |---|---|---|---|---|

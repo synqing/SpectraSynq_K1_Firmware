@@ -170,3 +170,24 @@ def test_accessibility_and_responsive_contracts_are_present():
     assert "button:focus-visible" in html
     assert "@media (max-width: 760px)" in html
     assert "@media (prefers-reduced-motion: reduce)" in html
+
+
+def test_bench_profile_hides_and_guards_unsupported_tune_mutations():
+    html = HTML.read_text(encoding="utf-8")
+    app = APP.read_text(encoding="utf-8")
+    assert 'id="tunePanel"' in html
+    assert "function tuneSupportedByProfile()" in app
+    assert 'return !known || CL.showTune(known);' in app
+    assert '$("tunePanel").hidden = !tuneAvailable;' in app
+    assert "if (!tuneSupportedByProfile() || !bundle.decision.deviceTestAllowed" in app
+    assert "if (!tuneSupportedByProfile() || !bundle.decision.saveAllowed" in app
+
+
+def test_main_only_both_scale_is_disclosed_from_the_verified_profile():
+    html = HTML.read_text(encoding="utf-8")
+    app = APP.read_text(encoding="utf-8")
+    assert 'id="scaleDetailRow" hidden' in html
+    assert 'id="scaleDetail"' in html
+    assert "CL.showBothScale(known)" in app
+    assert '$("scaleDetailRow").hidden = !showBothScale;' in app
+    assert '"Both target applies ×" + known.both_scale.toFixed(2)' in app

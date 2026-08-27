@@ -200,6 +200,10 @@
   }
 
   function profile() { return coreState.deviceProfile; }
+  function tuneSupportedByProfile() {
+    var known = profile();
+    return !known || CL.showTune(known);
+  }
   function localN(which) {
     var known = profile();
     var count = known && (which === "secondary" ? known.secondary_led_count : known.primary_led_count);
@@ -662,7 +666,8 @@
 
   async function applyTuneTransaction() {
     var bundle = decisionBundle();
-    if (!bundle.decision.deviceTestAllowed || !app.tuneDirty || transaction) return;
+    if (!tuneSupportedByProfile() || !bundle.decision.deviceTestAllowed ||
+        !app.tuneDirty || transaction) return;
     var revisionAtStart = app.tuneRevision;
     var confirmedCount = 0;
     transaction = "tune";
@@ -714,7 +719,7 @@
 
   async function saveTune() {
     var bundle = decisionBundle();
-    if (!bundle.decision.saveAllowed ||
+    if (!tuneSupportedByProfile() || !bundle.decision.saveAllowed ||
         coreState.slot15Content.status !== "known-this-session" || transaction) return;
     transaction = "save";
     applyCore({ type: "SAVE_START" });
@@ -1155,6 +1160,13 @@
       (demo ? " · browser fixture" : "");
     $("connectionChip").classList.toggle("ok", connection === "ready");
     var known = profile();
+    var tuneAvailable = tuneSupportedByProfile();
+    $("tunePanel").hidden = !tuneAvailable;
+    var showBothScale = !!(known && CL.showBothScale(known));
+    $("scaleDetailRow").hidden = !showBothScale;
+    $("scaleDetail").textContent = showBothScale
+      ? "Both target applies ×" + known.both_scale.toFixed(2) + " on this verified profile."
+      : "Verified profile scale unavailable.";
     $("profileChip").textContent = known
       ? known.identity_status + " · " + (known.env || "unknown env") + " · " +
         (known.chip_id || "unknown chip") + " · " + localN("primary") + "/" +
@@ -1191,6 +1203,7 @@
         decision: CA.resolveOutputDecision({ safety: safetyFailure, policy: { ok: false, issues: [] }, transportReady: false }),
       };
     }
+    var tuneAvailable = tuneSupportedByProfile();
     var safetyBlocked = bundle.decision.kind === "safety_blocked";
     var policyBlocked = bundle.decision.kind === "policy_blocked";
     var suppressChromaticPath = chromaticPathProhibited(bundle.policy);
@@ -1219,9 +1232,12 @@
       ? "Command sequence in progress · unsent fields retained"
       : "Previewed locally · persistence unchanged";
     $("sendStimulusBtn").disabled = !app.sourceDirty || !bundle.decision.deviceTestAllowed || !!transaction;
-    $("applyTuneBtn").disabled = !app.tuneDirty || !bundle.decision.deviceTestAllowed || !!transaction;
-    $("saveBtn").disabled = !bundle.decision.saveAllowed ||
+    $("applyTuneBtn").disabled = !tuneAvailable || !app.tuneDirty ||
+      !bundle.decision.deviceTestAllowed || !!transaction;
+    $("saveBtn").disabled = !tuneAvailable || !bundle.decision.saveAllowed ||
       coreState.slot15Content.status !== "known-this-session" || app.tuneDirty || !!transaction;
+    $("identityBtn").disabled = !tuneAvailable || !!transaction;
+    $("revertBtn").disabled = !tuneAvailable || !coreState.sessionBaseline || !!transaction;
     $("exportBtn").disabled = !bundle.decision.exportAllowed;
     $("sendStimulusBtn").textContent = safetyBlocked
       ? "Blocked · use Stop output"
@@ -1493,9 +1509,11 @@
   bindPreviewStrip("primary");
   bindPreviewStrip("secondary");
 
-  if (demo === "ready" || demo === "policy" || demo === "safety" || demo === "transport") {
-    var fixturePrimaryLook = 15;
-    var fixtureSecondaryLook = "unknown";
+  if (demo === "ready" || demo === "policy" || demo === "safety" ||
+      demo === "transport" || demo === "bench") {
+    var demoIsBench = demo === "bench";
+    var fixturePrimaryLook = demoIsBench ? 0 : 15;
+    var fixtureSecondaryLook = demoIsBench ? "inherit" : "unknown";
     var fixtureSlotKnown = previewFixture !== "slotUnknown" &&
       previewFixture !== "slotUnknownDirect";
     if (previewFixture === "inherit15" || previewFixture === "slotUnknown") {
@@ -1513,9 +1531,9 @@
       fixtureSecondaryLook = 15;
     }
     var demoProfile = CL.resolveDeviceProfile({
-      chip_id: "9087A500",
-      build_env: "k1_main_rpl_im69d",
-      look_env: "k1_main_rpl_im69d",
+      chip_id: demoIsBench ? "B489A500" : "9087A500",
+      build_env: demoIsBench ? "k1_bench_im69d_led150" : "k1_main_rpl_im69d",
+      look_env: demoIsBench ? "k1_bench_im69d_led150" : "k1_main_rpl_im69d",
       active_primary_look: fixturePrimaryLook,
       active_secondary_look: fixtureSecondaryLook,
     });
@@ -1533,7 +1551,7 @@
       },
       seq: 1,
     });
-    if (fixtureSlotKnown) {
+    if (fixtureSlotKnown && !demoIsBench) {
       coreState = CL.reduce(coreState, {
         type: "DEVICE_TUNE",
         tune: Object.assign({}, mockDevice.tune),

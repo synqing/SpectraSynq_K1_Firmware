@@ -2,6 +2,25 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-28 — Colour Lab shipped slice passed and isolated for main
+
+Production Preview R1.1, the browser/state matrix and the no-flash programme on
+both connected K1s passed. Main `9087A500` was left Paint off with slot 15
+identity-saved. Bench `B489A500` was left Paint off with Tune unavailable.
+Product rtrace is unavailable, so no wire/LED-buffer claim was made.
+
+The integration excludes unrelated USB-audio and Webflash ancestry from the
+Colour Lab lane. Authority and evidence: `tools/colourlab/EXECUTION.md` and
+`tools/colourlab/VERIFICATION.md`.
+
+```text
+COLOUR_LAB_WEB_UI_HARDWARE_PASS = PASS
+MAIN_PAINT                       = OFF
+BENCH_PAINT                      = OFF
+MAIN_SLOT15_LEAVE_STATE          = IDENTITY_SAVED
+WIRE_TRUTH                       = NOT_CLAIMED
+```
+
 ## 2026-08-21 — ADR-0007 K1 full-parity dual-target (S3 + P4-WIFI6)
 
 **Authority:** `docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md`

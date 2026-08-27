@@ -4,15 +4,23 @@
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
 
+**COLOUR LAB SHIPPED LANE (2026-08-28):** Production Preview R1.1 and the
+two-device no-flash programme passed. `COLOUR_LAB_WEB_UI_HARDWARE_PASS` is
+recorded in `tools/colourlab/VERIFICATION.md`. Main `9087A500` was left Paint
+off with slot 15 deliberately identity-saved; Bench `B489A500` was left Paint
+off with Tune unavailable. Product rtrace is unavailable, so wire truth is not
+claimed. The isolated Colour Lab integration is the merge authority; the
+unrelated USB-audio/Webflash ancestry of `lane/colourlab-bench` is excluded.
+
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
 **Dual-target (2026-08-21, not flash GO):** [ADR-0007](../docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) — `env:k1_p4_wifi6` in this tree; P4-Nano donor-only. Does **not** displace the silicon stamps below.
 
-**Live lane (2026-08-22):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @ `b625e89a`**
-(`IDENTITY OK` epoch `1787400761`) — product restored after native music occupancy
-**PASS_TRUE16**. B489 `B489A500` last stamped `k1_bench_im69d` @ `d276fd68`.
-G8 **CLOSED on bench**. F887 OFFSITE. No cal.
+**Live devices verified 2026-08-28:** Main RPL `9087A500` is
+`k1_main_rpl_im69d @ acaecaa8`; Bench `B489A500` is
+`k1_bench_im69d_led150 @ f2014c29`. Both were left Paint off. No flash and no
+calibration command occurred in the Colour Lab verification programme.
 
 **Occupancy (2026-08-22, KEEP packer + hsv paint + native music):** packed-wire dump
 `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`

@@ -1,132 +1,121 @@
-# Colour Lab — what was actually run
+# Colour Lab — production and hardware verification
 
 Date: 2026-08-28
 Branch: `lane/colourlab-bench`
+Browser-slice commit: `14d5ddbd`
 Contract: `tools/colourlab/README.md`
-Optical authority: **PASS — PRODUCTION PREVIEW R1.1 CUTOVER**
 
-## Stamps (do not collapse these)
+## Stamps
 
-| Stamp | Meaning | Status |
-|-------|---------|--------|
-| Host Colour Lab pytest | Colour Lab tests execute the shipped JS authorities | **PASS — 90 tests** |
-| Browser / a11y verify | Chromium, keyboard, 740/390 px, 200% reflow, 13 states | **PASS — zero failures** |
-| **`DEVICE_IDENTITY_VERIFIED`** | Both expected devices connected and profiled correctly | **NOT RUN in this branch-freeze receipt** |
-| **`COLOUR_LAB_WEB_UI_HARDWARE_PASS`** | The load-bearing real-device programme passed on both units | **NOT RUN** — this, not identity alone, closes the lane |
+| Stamp | Result |
+|---|---|
+| Production Preview R1.1 optical gate | **PASS** |
+| Host Colour Lab pytest | **PASS — 92 tests** |
+| Browser / accessibility / responsive gate | **PASS — 14 states, zero failures** |
+| `DEVICE_IDENTITY_VERIFIED` | **PASS — both named units** |
+| Real-device protocol matrix | **PASS — both named units** |
+| Production DOM/controller → real devices | **PASS — both named units** |
+| `COLOUR_LAB_WEB_UI_HARDWARE_PASS` | **PASS** |
+| Wire/LED-buffer truth | **NOT CLAIMED — product builds reject `rtrace_status`** |
 
-Connecting to `9087A500` and `B489A500` and writing those strings here
-would only establish `DEVICE_IDENTITY_VERIFIED`. It would **not** close
-the implementation lane.
+## Exact live identities
 
-## Already true (host)
+| Role | Port observed this run | Chip | Build |
+|---|---|---|---|
+| Main RPL | `/dev/cu.usbmodem1101` | `9087A500` | `git=acaecaa8 epoch=1787773671 env=k1_main_rpl_im69d` |
+| Bench led150 | `/dev/cu.usbmodem1401` | `B489A500` | `git=f2014c29 epoch=1787771217 env=k1_bench_im69d_led150` |
 
-- `colourlab-core.js` owns protocol, effective-look resolution, Preview
-  framing/comparison/inspection and safety classifiers (SHA
-  `5314b24a9ae2eef1e2f3c62619d7b7a27e9ee7080012cf29654272c1bf0670c2`).
-- `index.html` and `workbench.html` are byte-identical production entries
-  (SHA `ce023f219b54bb1b7c7b3d6c0e26f69afaf716df131f5df0b1e806167aa0b43e`).
-- Host pytest `tests/test_colourlab_*.py`: **90 passed**.
-- No firmware and no `platformio.ini` edits.
+Identity came from each unit's `:chip_id` and `:build` replies. Port names were
+not used as identity. No firmware was flashed and no calibration command was sent.
 
-## Browser (ran)
+## Main RPL — `9087A500`
 
-Local `python3 tools/colourlab/verify_workbench.py` (Chromium, headless):
+| Case | Measured result |
+|---|---|
+| Connect + profile | Production controller resolved verified Main RPL, `160/160`, `ws2816_u16` |
+| Capability | Tune visible; Preview details showed `Both target applies ×0.30 on this verified profile.` |
+| Source modes | `off`, `solid`, `stops`, `card` each returned matching `PAINT:`; forbidden `ramp` was never sent |
+| Targets | `primary`, `secondary`, `both` each confirmed with solid K1 amber `255,184,77` |
+| Stops | One stop `140,140,140` and eight warm-family stops confirmed; payload length below 159 |
+| Gain bounds | `0.000`, `1.000`, `2.000` each confirmed for R/G/B |
+| Gamma bounds | `0.200`, `1.000`, `4.000` each confirmed |
+| Session baseline / Revert | Identity established first; exact gain-then-gamma baseline sequence confirmed |
+| Reset | Non-identity `1.200,1.100,0.900 / 1.100` reset live to exact identity |
+| Save | Exact identity written, `TUNE_SAVE: ok`, then re-queried |
+| Reboot / reconnect | CDC reopen reset the unit; profile returned 160/160 and runtime tune returned identity/type 2 |
+| Disconnect while active | Production Disconnect queued a current-turn `:paint=off`, received `PAINT: mode=off`, then closed |
+| Instrumentation capability | `:rtrace_status=1` → `Bad command`; no wire/LED-buffer claim |
+| Final leave-state | Paint off; look 0 IDENTITY; Secondary inherit; slot 15 deliberately **identity-saved** |
 
-| URL | What I checked |
-|-----|----------------|
-| `/index.html` | Disconnected local model; Connect and Stop Output visible |
-| `?demo=ready` | Asymmetric Primary-known / Secondary-unknown truth |
-| inheritance matrix | `P15/S=inherit`, `P0/S=inherit`, unknown inheritance |
-| slot-unknown matrix | inherited and direct slot 15 both remain pre-correction with no tune claim |
-| transport fixture | local-first Source and Tune sequences; Stop pre-emption; recovery |
-| safety / policy | Preview unavailable for safety; local analysis retained for policy failure |
-| keyboard / pointer / touch | one shared selected LED reads both cached frames |
-| 740 px, 390 px and 200% reflow | no horizontal document overflow; 13 stills saved |
+## Bench — `B489A500`
 
-Browser failures: **0**.
+| Case | Measured result |
+|---|---|
+| Connect + profile | Production controller resolved verified Bench, `150/150`, `ws2812_u8` |
+| Capability | Tune hidden and all Tune mutation controls disabled; Main-only ×0.30 row hidden |
+| Source modes | `off`, `solid`, `stops`, `card` each returned matching `PAINT:`; forbidden `ramp` was never sent |
+| Targets | `primary`, `secondary`, `both` each confirmed with solid K1 amber `255,184,77` |
+| Stops | One stop and the same eight warm-family stops confirmed |
+| Tune | Only `tune_status` was read; it returned `type=na`; no Tune mutation was sent |
+| Reconnect | CDC reopen reset and re-profiled the unit as 150/150 |
+| Disconnect while active | Production Disconnect received current-turn Paint-off confirmation before close |
+| Instrumentation capability | `:rtrace_status=1` → `Bad command`; no wire/LED-buffer claim |
+| Final leave-state | Paint off; look 0 IDENTITY; Secondary inherit; Tune not offered |
 
-Production stills: `tools/colourlab/screenshots/workbench-r1.1/`.
-The design verdict is closed; these stills remain browser evidence, not device proof.
+## Production UI integration boundary
 
-`?demo=` is a local store only. It does not open a serial port.
+The exact production `index.html` and `colourlab-workbench.js` were run in
+headless Chromium. The browser's secure native serial chooser cannot be granted
+in headless Playwright (`Unknown permission: serial`), so a test adapter supplied
+the same `navigator.serial` port/reader/writer interface and carried bytes to the
+real pyserial ports. No command, reply, profile, queue decision or reducer event
+was mocked.
 
-## Device programme (mandatory — not run in this branch-freeze receipt)
+This run proved on each real unit:
 
-No firmware flash is authorised. `:rtrace_dump` is sent only if the running
-build proves that capability.
+1. production Connect/hydration resolved the live chip, environment and geometry;
+2. production Source sent `paint_target → paint_rgb → paint` and consumed real replies;
+3. Main production Tune sent `tune_gain → tune_gamma` and consumed real replies;
+4. production Disconnect waited for a new Paint-off reply before closing;
+5. the hardware-exposed Bench capability defect was closed: Tune is hidden and
+   mutation handlers now fail closed by profile even if called programmatically;
+6. Main-only Both-target scaling is disclosed as ×0.30 and absent on Bench.
 
-When both units are plugged in, run **this** programme on each
-identity. Record every row. Do not substitute “we saw the chip id”.
+The bypassed boundary is Chrome's user-mediated permission chooser, not Colour Lab
+application logic or K1 hardware behaviour.
 
-### On `9087A500` (Main RPL, `k1_main_rpl_im69d`)
+## Persist / reboot ledger — Main RPL
 
-| Case | Expected | Result |
-|------|----------|--------|
-| Connect + profile | chip `9087A500`, env `k1_main_rpl_im69d`, LEDs **160/160**, look backend WS2816 u16 | |
-| Capability | Both-scale shown (×0.30); Tune band shown | |
-| Paint modes | off, solid, stops and card each confirm `PAINT:`; forbidden legacy ramp is never requested | |
-| Targets | primary, secondary, both; both-scale only on both | |
-| Stops | 1-stop and 8-stop; string &lt; 159 chars | |
-| Gain | 0.0, 1.0, 2.0 | |
-| Gamma | 0.20, 1.0, 4.00 | |
-| Set Identity before baseline | action is Set Identity; after success slot-15 known-this-session | |
-| Reset | live identity; does not persist; does not restore last-saved | |
-| Revert Session | appears only after a known session baseline exists; resends that baseline | |
-| Save | `TUNE_SAVE: ok` then re-query; UI persist=saved this session only | |
-| Reboot / reconnect | slot-15 unknown again; pre-LUT label; Set Identity, not Revert; no Device Effective | |
-| Unplug / reconnect | re-profile; LUT knowledge discarded | |
-| Stop Output | discards queued mutations; `paint=off`; unknown-on-timeout if no confirm. **Does not prove Disconnect.** | |
-| Disconnect with paint active | Paint active → Disconnect → this-turn `paint=off` accepted **before** port close; or timeout/failure, close, output unknown. Must not claim safe shutdown from a previously confirmed Paint Off. Distinct from Stop Output. | |
-| Slot-15 leave-state | Fill the persist ledger below. Do not write "restored" without known-this-session rewrite authority. Do not leave a verification curve. | |
-| `:rtrace_dump` | only after the running build proves the command; else record unavailable | |
+| Field | Recorded value |
+|---|---|
+| Pre-test persisted LUT | `unknown` — boot `TUNE:` is not LUT readback |
+| Exact tuning saved | `gain=1.000,1.000,1.000 gamma=1.000` |
+| Save reply | `TUNE_SAVE: ok` |
+| Reboot result | runtime identity/type 2; browser session knowledge correctly returns to unknown |
+| Final state intentionally left | `identity-saved` |
+| Restoration authority | `none`; prior unknown LUT was not falsely described as restored |
+| Leave-state classifier claim | valid `identity-saved`; never `invalid-restore` or `test-curve-left` |
 
-### On `B489A500` (bench led150, `k1_bench_im69d_led150`)
+## Failures encountered and contained
 
-| Case | Expected | Result |
-|------|----------|--------|
-| Connect + profile | chip `B489A500`, env `k1_bench_im69d_led150`, LEDs **150/150**, look backend WS2812 u8 | |
-| Capability | Both-scale **hidden**; Tune band **hidden** | |
-| Paint modes | off, solid, stops and card each confirm `PAINT:`; forbidden legacy ramp is never requested | |
-| Targets | primary, secondary, both; **no** both-scale transform shown | |
-| Stops | 1-stop and 8-stop | |
-| Tune mutations | not offered; `tune_status` may print `TUNE: type=na` and still must not create LUT knowledge | |
-| Unplug / reconnect | re-profile 150/150 | |
-| Stop Output | same priority path. **Does not prove Disconnect.** | |
-| Disconnect with paint active | Same this-turn wait as Main. Tune/Save N/A. | |
-| Slot-15 leave-state | N/A — Tune hidden; no Save. Record "not offered". | |
-| `:rtrace_dump` | capability-gated as above | |
+Two verifier expectations were initially too literal:
 
-## Persist / reboot ledger (Main RPL — mandatory for hardware PASS)
+- firmware returned `Bad command` rather than lowercase `bad_command` for unavailable rtrace;
+- the production serializer sent compact `1,1,1` / `1`, not `1.000,1.000,1.000` / `1`.
 
-Boot `TUNE:` is identity even when slot 15 already holds a saved curve.
-That is **not** pre-test LUT knowledge and **not** restoration authority.
+Neither was a device failure. The first stopped after Main was already Paint off and
+identity-saved. The second stopped with Main Paint active; a direct current-turn
+`:paint=off` was immediately sent and confirmed before the run resumed. Final
+read-only audits on both units passed after all browser/device work.
 
-| Field | Value (fill on device; do not invent) |
-|-------|----------------------------------------|
-| Pre-test persisted LUT | `unknown` / `known-this-session {gain,gamma}` / `could-not-reconstruct` |
-| Exact tuning saved during the test | gain_r, gain_g, gain_b, gamma |
-| Reboot result | slot-15 status, Set Identity vs Revert, `TUNE:` line |
-| Final state intentionally left | `identity-saved` / `prior-restored` / `test-curve-left` / `could-not-reconstruct` |
-| Restoration authority | `none` / `session snapshot rewritten` |
-| `classifyPersistLeaveState` claim | must not be `invalid-restore` or `test-curve-left` |
+## Final stamp
 
-Required close-out when the prior LUT cannot be reconstructed: Set
-Identity + Save, then record **identity-saved**. Hardware PASS is refused
-if the leave-state is a leftover verification curve.
-
-Only when **every row on both devices** is filled and matches expected
-may `COLOUR_LAB_WEB_UI_HARDWARE_PASS` be written.
-
-No flash unless a required Colour Lab command is absent from the
-running build — that is a separate Captain gate.
-
-## Source mismatch still in force
-
-`tune_status` on bench still prints `TUNE:` with `type=na`. That reply
-does not create slot-15 knowledge.
-
-## Lane close
-
-The Colour Lab Web UI lane closes on **`COLOUR_LAB_WEB_UI_HARDWARE_PASS`**.
-Host green + optical PASS + browser verify are necessary and already
-true. They are not sufficient.
+```text
+COLOUR_LAB_WEB_UI_HARDWARE_PASS
+devices = 9087A500, B489A500
+main_slot15_leave_state = identity-saved
+main_paint = off
+bench_paint = off
+wire_truth = NOT_CLAIMED
+merge_to_main = HOLD pending explicit merge action
+```

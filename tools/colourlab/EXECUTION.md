@@ -1,7 +1,7 @@
 ---
 abstract: "Live task ledger for the Colour Lab palette-bench lane (branch lane/colourlab-bench). One row per task with dependency, done-when condition, gate and evidence. Read this to know exactly what is done, what is in flight and what is blocked. Plan authority: ~/.claude/plans/create-a-detailed-phased-deep-penguin.md."
 branch: lane/colourlab-bench
-status: active
+status: ready_for_merge
 ---
 
 # Colour Lab — execution ledger
@@ -55,10 +55,11 @@ computed-text signatures, annotated-board SHA
 | GF-3 | Tested authoring/policy module | DONE | Real RGB/shortest-arc HSV/OKLCH, uniform ≤8 compilation, approximation metrics and separate gates pass |
 | GF-4 | Greenfield `workbench.html` | DONE | Production surface loads `colourlab-core.js`, `colourlab-authoring.js` and `colourlab-workbench.js`; no illustrative maths remains |
 | GF-5 | Serial/local-first parity | DONE | Browser gate proves source `target→stops→mode`, tune `gain→gamma`, persistence, recovery and asymmetric per-channel Preview truth |
-| GF-6 | Browser/a11y/responsive proof | DONE | `verify_workbench.py`: 0 failures, 13 stills; 1600/740/390/800, keyboard focus, diffusion, policy, safety, inheritance, slot-unknown, device-loss, failed-Resync and recovery attacks checked; Colour Lab 89 passed |
+| GF-6 | Browser/a11y/responsive proof | DONE | `verify_workbench.py`: 0 failures, 14 stills; 1600/740/390/800, keyboard focus, diffusion, policy, safety, inheritance, slot-unknown, device-loss, failed-Resync, recovery and Bench-profile capability layout checked; Colour Lab 92 passed |
 | GF-7 | Deliberate cutover | DONE | `COLOURLAB_WORKBENCH_R1_UI_CUTOVER=ACCEPT`; old oracle SHA pinned above; accepted Workbench is byte-identical at `index.html` and `workbench.html`; legacy UI is no longer shipped |
 | GF-8 | Preview R1.1 production cutover | DONE | Core effective-look resolution, output/basis comparison and exact-frame inspection are live in the byte-identical production entries; Preview is read-only, the curve is under Tune, and post-build optical predicates pass |
 | GF-9 | Remove false Source/Tune sequencing | DONE | `01` / `02` markers and `.step` styling removed from both byte-identical entries; static regression and refreshed 13-still browser gate pass |
+| GF-10 | Hardware-exposed capability containment | DONE | Bench hides and hard-guards unsupported Tune; Main alone discloses its ×0.30 Both scale; browser and live-profile checks pass |
 
 Everything below this ruling is retained as historical implementation evidence. Any old TODO that
 conflicts with the greenfield ruling (especially the planned `spectrum` stimulus) is cancelled.
@@ -254,8 +255,8 @@ The browser gate now fails non-zero on draft-send, simulation-inspector or asymm
 | CL-4.4 | WCAG AA contrast; no colour-only status | `index.html` | CL-3.8 | Each new pairing measured and recorded | — | DONE | T0 production receipt |
 | CL-4.5 | 740px viewport and 200% zoom usable | `index.html` | CL-4.1 | Both stills legible, no horizontal body scroll | browser | DONE | 740=740; 800=800 |
 | CL-4.6 | Zero console errors and warnings | — | CL-4.5 | Browser gate has zero failures | browser | DONE | `FAILURES=0` |
-| CL-4.7 | Regenerate every still | `screenshots/` | CL-4.6 | All stills show the new body | browser | DONE | `workbench-r1.1/`, 13 stills |
-| CL-4.8 | Refresh pinned hashes and craft claim | `MEASURED.json`, `OPTICAL_GATE_RECEIPT.md` | CL-4.7 | Hashes match shipped files; claim matches the screen | — | DONE | Production HTML `ce023f21…`; 90 tests |
+| CL-4.7 | Regenerate every still | `screenshots/` | CL-4.6 | All stills show the new body | browser | DONE | `workbench-r1.1/`, 14 stills |
+| CL-4.8 | Refresh pinned hashes and craft claim | `MEASURED.json`, `OPTICAL_GATE_RECEIPT.md` | CL-4.7 | Hashes match shipped files; claim matches the screen | — | DONE | Production HTML `e335b399…`; 92 tests |
 
 ### Phase 5 — Targeted device verification
 
@@ -265,28 +266,28 @@ freeze is not a lane close and does not authorise a merge to `main`.
 
 | id | task | files | dep | done-when | gate | status | evidence |
 |---|---|---|---|---|---|---|---|
-| CL-5.1 | Confirm both device identities against the registry | — | CL-4.8 | Chip id, env and build stamp recorded for both | — | TODO | |
-| CL-5.2 | Targeted case list on 9087A500 and B489A500 | — | CL-5.1 | Every case passes or is recorded as a limitation | — | TODO | |
-| CL-5.3 | Record results | `VERIFICATION.md` | CL-5.2 | Section present; carve-outs explicit | — | TODO | |
+| CL-5.1 | Confirm both device identities against the registry | — | CL-4.8 | Chip id, env and build stamp recorded for both | — | DONE | `9087A500/acaecaa8`; `B489A500/f2014c29` |
+| CL-5.2 | Targeted case list on 9087A500 and B489A500 | — | CL-5.1 | Every applicable case passes or is recorded as a limitation | — | DONE | Source/tune/reconnect/disconnect matrices passed; product rtrace unavailable |
+| CL-5.3 | Record results | `VERIFICATION.md` | CL-5.2 | Section present; carve-outs explicit | — | DONE | `COLOUR_LAB_WEB_UI_HARDWARE_PASS` with native chooser boundary disclosed |
 
 ### Phase 6 — Close
 
 | id | task | files | dep | done-when | gate | status | evidence |
 |---|---|---|---|---|---|---|---|
-| CL-6.1 | Update the contract reference for renamed surfaces | `README.md` | CL-5.3 | No stale panel or control names | — | TODO | |
-| CL-6.2 | Close stamp | `progress.md` | CL-6.1 | Stamp block present | — | TODO | |
-| CL-6.3 | Flip lane status | `docs/spec-index.md`, `.claude/handoff.md` | CL-6.2 | No stale active-lane pointer | — | TODO | |
-| CL-6.4 | Commit final evidence through the pre-commit gate and push | — | CL-6.3 | Gate passes on a real run | pytest | TODO | |
-| CL-6.5 | Merge gate | — | CL-6.4 | `COLOUR_LAB_WEB_UI_HARDWARE_PASS` exists for both named units before merge | — | TODO | **HOLD until Phase 5 passes** |
+| CL-6.1 | Update the contract reference for renamed surfaces | `README.md` | CL-5.3 | No stale panel or control names | — | DONE | Preview/Tune/Source names current |
+| CL-6.2 | Close stamp | `progress.md` | CL-6.1 | Stamp block present | — | DONE | Hardware PASS recorded |
+| CL-6.3 | Mark lane ready for merge | `docs/spec-index.md`, `.claude/handoff.md` | CL-6.2 | Active pointer remains until merge; status is unambiguous | — | DONE | `ready_for_merge` |
+| CL-6.4 | Commit final evidence through the pre-commit gate and push | — | CL-6.3 | Gate passes on a real run | pytest | DONE | Full gate: 1692 passed, 1 skipped; final evidence commit/push close sequence |
+| CL-6.5 | Merge gate | — | CL-6.4 | Explicit merge action after hardware stamp | — | HOLD | Hardware gate passed; no merge instruction executed |
 
 ## Close stamp — fill at CL-6.2
 
 ```text
-CL_DRAFT_LOOP        =
-CL_CORE_CURVE_API    =
-CL_STAGE_CURVE_LOOK  =
-CL_BROWSER_VERIFY    =
-CL_DEVICE_VERIFY     =
+CL_DRAFT_LOOP        = PASS
+CL_CORE_CURVE_API    = PASS
+CL_STAGE_CURVE_LOOK  = PASS (Preview R1.1 supersedes Stage)
+CL_BROWSER_VERIFY    = PASS (92 tests; 14 states; 0 failures)
+CL_DEVICE_VERIFY     = COLOUR_LAB_WEB_UI_HARDWARE_PASS
 CL_WIRE_TRUTH        = NOT_CLAIMED
 ```
 
