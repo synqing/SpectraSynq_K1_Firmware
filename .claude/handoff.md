@@ -6,11 +6,12 @@
 
 **ACTIVE LANE (2026-08-28): COLOUR_LAB_PALETTE_BENCH** — branch `lane/colourlab-bench`.
 Ledger and authority: **`tools/colourlab/EXECUTION.md`** (per-task status, gates, evidence).
-Production Preview R1.1 is accepted and the UI design lane is frozen. Current operation is the
-mandatory no-flash device programme on `9087A500` and `B489A500`; identity is chip ID, never port.
-Serial Test/Apply/Save/recovery transactions are authorised for this programme. Do not run
-`start_noise_cal`, do not redesign, do not merge to `main`, and capability-gate `:rtrace_dump`.
-Close requires `COLOUR_LAB_WEB_UI_HARDWARE_PASS` plus clean slot-15 leave-state.
+Production Preview R1.1 and the two-device programme passed.
+`COLOUR_LAB_WEB_UI_HARDWARE_PASS` is recorded in `tools/colourlab/VERIFICATION.md`.
+Main `9087A500` is Paint off with slot 15 deliberately identity-saved; Bench `B489A500` is
+Paint off with Tune unavailable. Product rtrace is unavailable, so wire truth is not claimed.
+The lane is ready for merge after the final evidence commit/push; do not merge to `main`
+without the separate explicit merge action.
 
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`

@@ -85,6 +85,12 @@ def browser_state(page: Page) -> dict:
             needsResync: api.coreState.needsResync,
             outputStateUnknown: api.coreState.outputStateUnknown,
             recoveryPending: api.recoveryPending,
+            profile: api.coreState.deviceProfile,
+            tuneHidden: document.getElementById('tunePanel').hidden,
+            identityDisabled: document.getElementById('identityBtn').disabled,
+            revertDisabled: document.getElementById('revertBtn').disabled,
+            scaleHidden: document.getElementById('scaleDetailRow').hidden,
+            scaleText: document.getElementById('scaleDetail').textContent,
             legacyForbiddenDetected: api.legacyForbiddenDetected,
             legacyRecoveryGeneration: api.legacyRecoveryGeneration,
             legacyRecoveryOffGeneration: api.legacyRecoveryOffGeneration,
@@ -174,8 +180,32 @@ def main() -> int:
             require(not normal_errors, "normal console/page errors: " + " | ".join(normal_errors))
             normal.close()
 
+            bench, bench_errors = open_page("?demo=bench")
+            bench_state = browser_state(bench)
+            require(bench_state["profile"]["chip_id"] == "B489A500",
+                    "Bench fixture did not resolve the B489 profile")
+            require(bench_state["profile"]["primary_led_count"] == 150 and
+                    bench_state["profile"]["secondary_led_count"] == 150,
+                    "Bench fixture did not resolve 150/150 geometry")
+            require(bench_state["tuneHidden"],
+                    "Bench profile exposes unsupported Tune controls")
+            require(bench_state["applyDisabled"] and bench_state["saveDisabled"] and
+                    bench_state["identityDisabled"] and bench_state["revertDisabled"],
+                    "Bench profile leaves a Tune mutation path enabled")
+            require(bench_state["scaleHidden"],
+                    "Bench profile exposes the Main-only Both scale")
+            bench.screenshot(
+                path=str(SCREENSHOTS / "bench-profile-full-1600@2x.png"),
+                full_page=True,
+            )
+            require(not bench_errors,
+                    "bench console/page errors: " + " | ".join(bench_errors))
+            bench.close()
+
             ready, ready_errors = open_page("?demo=ready")
             asymmetric = browser_state(ready)
+            require(not asymmetric["scaleHidden"] and "×0.30" in asymmetric["scaleText"],
+                    "Main profile does not disclose its Both-target ×0.30 scale")
             require(asymmetric["primarySelection"] == "post", "Primary known look is not post-LUT")
             require(asymmetric["secondarySelection"] == "pre", "Secondary unknown look is not pre-LUT")
             require(asymmetric["primaryPixels"] != asymmetric["secondaryPixels"],

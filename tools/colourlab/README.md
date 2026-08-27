@@ -344,20 +344,24 @@ or both (default both).
 
 Already on disk: the production-routed greenfield Workbench, exact K1 core model,
 tested authoring maths, local-first command-sequence wiring, separate safety/policy
-gates, 90 passing Colour Lab tests, and a clean thirteen-still browser/a11y/responsive
+gates, 92 passing Colour Lab tests, and a clean fourteen-still browser/a11y/responsive
 and adversarial evidence run.
 
-Remaining:
+Hardware proof is now recorded in `VERIFICATION.md`:
 
-1. **Agent** — freeze the exact browser slice through the real pre-commit gate,
-   commit it on `lane/colourlab-bench`, and push that branch. Do not merge it.
-2. **Agent** — establish `9087A500` and `B489A500`
-   (`DEVICE_IDENTITY_VERIFIED`), then run the load-bearing programme
-   in `VERIFICATION.md` on both units. `:rtrace_dump` only after the
-   running build proves the command. No flash is authorised by this programme.
-3. **Agent** — write `COLOUR_LAB_WEB_UI_HARDWARE_PASS` only when that
-   programme passes, commit and push the resulting evidence, then request the
-   merge to `main`. Identity-in-the-file is not enough.
+1. `DEVICE_IDENTITY_VERIFIED` — both named units passed.
+2. The source/tune/disconnect/reconnect programme passed on the applicable unit.
+3. `COLOUR_LAB_WEB_UI_HARDWARE_PASS` — earned with Main slot 15 deliberately
+   left identity-saved and both devices left Paint off.
 
-The lane closes on `COLOUR_LAB_WEB_UI_HARDWARE_PASS`. A branch commit is not
-that stamp, and the branch must not merge to `main` before it is earned.
+Remaining ship path:
+
+1. **Agent** — commit the hardware-exposed capability fix and evidence through
+   the real gate, then push `lane/colourlab-bench`.
+2. **Captain / merger** — merge that exact branch to `main`. No firmware flash
+   is part of this web-instrument shipment.
+3. **Ship stamp** — the merge commit containing `COLOUR_LAB_WEB_UI_HARDWARE_PASS`
+   is the source shipment boundary.
+
+The hardware stamp is earned. The branch is ready for the separate merge action;
+it has not been merged to `main`.

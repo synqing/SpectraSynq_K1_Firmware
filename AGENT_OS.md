@@ -36,9 +36,10 @@ Then read this file and the files it flags as current. Do not proceed until you 
 **Active lane (2026-08-28):** `COLOUR_LAB_PALETTE_BENCH_20260827` on
 `lane/colourlab-bench`.
 Authority: `tools/colourlab/EXECUTION.md`.
-Production Preview R1.1 is frozen. The live task is the explicit no-flash verification programme
-on `9087A500` and `B489A500`, including serial mutations and clean leave-state. No firmware
-change, flash, further UI redesign or merge to `main` is authorised by this lane.
+Production Preview R1.1 and the no-flash programme on `9087A500` / `B489A500` passed.
+The lane is `ready_for_merge`; `COLOUR_LAB_WEB_UI_HARDWARE_PASS` and clean leave-state are in
+`tools/colourlab/VERIFICATION.md`. No firmware change or flash occurred. Merge to `main`
+remains a separate explicit action.
 
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
