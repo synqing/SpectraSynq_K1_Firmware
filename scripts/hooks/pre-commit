@@ -49,6 +49,15 @@ classify_tier() {
       # checkout. This closes a hole in an existing gate; it adds no new gate class.
       tab5_firmware/*)
         pyharness=1 ;;
+      # Colour Lab web instrument (tools/colourlab/, added 2026-08-27). Same hole
+      # as tab5_firmware/ above: it fell through to the "docs" tier and committed
+      # with NO gate at all, despite tests/test_colourlab_static.py asserting
+      # directly by READING index.html (the banned-duplicate-math token list and
+      # the disconnect() call-order regex) and the parity/state/protocol suites
+      # executing colourlab-core.js itself through node. A Colour Lab edit can and
+      # does break the host suite. pytest and NOT a build: nothing here compiles.
+      tools/colourlab/*)
+        pyharness=1 ;;
     esac
   done
   if   [ "$firmware" -eq 1 ] && [ "$tab5" -eq 1 ]; then tier="firmware+tab5"

@@ -617,6 +617,14 @@
         var next = emptyKnowledge();
         next.connection = keptConn;
         next.hydrateTuneOptional = !!action.tuneOptional;
+        /* Profiling begins an evidence transaction. Until every required
+         * status reply succeeds, physical output state remains unknown even
+         * though stale confirmed values are discarded. */
+        next.needsResync = true;
+        next.outputStateUnknown = true;
+        next.paintMayBeActive = s.paintMayBeActive ||
+          !!(s.confirmed.paint && s.confirmed.paint.mode !== "off");
+        next.lastError = OUTPUT_UNKNOWN;
         return next;
       }
       case "PROFILE_RESOLVED":
@@ -632,9 +640,9 @@
         s.slot15Content = { status: "unknown" };
         s.sessionBaseline = null;
         s.persistence = "unknown";
-        s.needsResync = false;
-        s.lastError = null;
-        s.outputStateUnknown = false;
+        s.needsResync = true;
+        s.lastError = OUTPUT_UNKNOWN;
+        s.outputStateUnknown = true;
         if (action.tuneOptional != null) s.hydrateTuneOptional = !!action.tuneOptional;
         return s;
       case "DEVICE_PAINT":
@@ -721,15 +729,33 @@
         s.lastError = "rejected: " + (action.command || "");
         s.pending = null;
         return s;
+      case "COMMAND_SEQUENCE_PARTIAL":
+        s.lastError = "partial " + (action.sequence || "command") +
+          " sequence: " + (action.confirmedCount || 0) + " command(s) confirmed";
+        s.needsResync = true;
+        s.outputStateUnknown = true;
+        s.pending = null;
+        return s;
       case "OUTPUT_STATE_UNKNOWN":
         s.outputStateUnknown = true;
         s.lastError = OUTPUT_UNKNOWN;
         return s;
+      case "RECOVERY_FAILED":
+        s.needsResync = true;
+        s.outputStateUnknown = true;
+        s.lastError = "recovery failed: " + (action.detail || OUTPUT_UNKNOWN);
+        return s;
       case "RESYNC_DONE":
+        if (!s.confirmed.paint) return s;
         s.needsResync = false;
+        s.outputStateUnknown = false;
+        s.lastError = null;
         return s;
       case "DEVICE_LOST":
         s.connection = "device-lost";
+        s.needsResync = true;
+        s.outputStateUnknown = true;
+        s.lastError = OUTPUT_UNKNOWN;
         return s;
       case "DISCONNECTED":
         Object.assign(s, emptyKnowledge());
@@ -755,7 +781,8 @@
   }
 
   function controlsEnabled(state) {
-    return state.connection === "ready";
+    return state.connection === "ready" && !state.needsResync &&
+      !state.outputStateUnknown;
   }
 
   function identityAction(state) {
@@ -775,22 +802,300 @@
       profile.exact_parity);
   }
 
-  function previewFraming(state, channel) {
-    var slotKnown = state.slot15Content &&
-      state.slot15Content.status === "known-this-session";
-    var look = channel === "secondary"
+  function resolveEffectiveLook(state, channel) {
+    state = state || initialState(true);
+    channel = channel === "secondary" ? "secondary" : "primary";
+    var reported = channel === "secondary"
       ? state.activeLookSecondary
       : state.activeLookPrimary;
-    if (!slotKnown || look === "unknown") {
-      return { kind: "pre_lut", label: PRE_LUT_LABEL, applyLut: false };
+
+    if (channel === "secondary" && reported === "inherit") {
+      var inherited = resolveEffectiveLook(state, "primary");
+      return {
+        relation: "inherit",
+        reported: "inherit",
+        effectiveKnown: inherited.effectiveKnown,
+        effectiveSlot: inherited.effectiveKnown ? inherited.effectiveSlot : null,
+        inheritedFrom: "primary",
+      };
     }
-    if (look === USER_SLOT) {
-      return { kind: "device_effective", label: "Device Effective", applyLut: true };
+
+    if (reported === "unknown" || reported === "inherit" || reported == null) {
+      return {
+        relation: "unknown",
+        reported: reported == null ? "unknown" : reported,
+        effectiveKnown: false,
+        effectiveSlot: null,
+        inheritedFrom: null,
+      };
+    }
+
+    return {
+      relation: "direct",
+      reported: reported,
+      effectiveKnown: true,
+      effectiveSlot: reported,
+      inheritedFrom: null,
+    };
+  }
+
+  function previewFraming(state, channel, resolvedLook) {
+    var slotKnown = state.slot15Content &&
+      state.slot15Content.status === "known-this-session";
+    var look = resolvedLook || resolveEffectiveLook(state, channel);
+    var slot15Knowledge = slotKnown ? "known-this-session" : "unknown";
+    if (!look.effectiveKnown || !slotKnown) {
+      return {
+        kind: "pre_lut",
+        label: PRE_LUT_LABEL,
+        applyLut: false,
+        reason: !look.effectiveKnown ? "effective_look_unknown" : "slot15_unknown",
+        lookResolution: look,
+        slot15Knowledge: slot15Knowledge,
+      };
+    }
+    if (look.effectiveSlot === USER_SLOT) {
+      return {
+        kind: "device_effective",
+        label: "Device Effective",
+        applyLut: true,
+        reason: null,
+        lookResolution: look,
+        slot15Knowledge: slot15Knowledge,
+      };
     }
     return {
       kind: "simulate_session",
       label: "Simulate Known Session Tune",
       applyLut: true,
+      reason: null,
+      lookResolution: look,
+      slot15Knowledge: slot15Knowledge,
+    };
+  }
+
+  /* Resolve one channel's complete Stage truth in one place. Rendering and
+   * inspection must consume the returned pixels instead of independently
+   * choosing pre/post buffers. Source and transform are deliberately separate:
+   * a browser-generated stimulus may still use a locally modelled transform. */
+  function stageFrame(input) {
+    input = input || {};
+    var state = input.state || initialState(true);
+    var channel = input.channel === "secondary" ? "secondary" : "primary";
+    var lookResolution = resolveEffectiveLook(state, channel);
+    var framing = previewFraming(state, channel, lookResolution);
+    var stimulus = clone(input.paint);
+    var requestedTune = Object.assign({}, identityTune(), input.tune || {});
+    var tuneDraft = state.draft && state.draft.tune ? state.draft.tune : {};
+    var hasTuneDraft = Object.keys(tuneDraft).length > 0;
+    var slotTune = state.slot15Content || {};
+    var hasKnownTune = slotTune.status === "known-this-session" &&
+      [slotTune.gain_r, slotTune.gain_g, slotTune.gain_b, slotTune.gamma].every(function (value) {
+        return typeof value === "number" && Number.isFinite(value);
+      });
+    var knownTune = hasKnownTune ? {
+      gain_r: slotTune.gain_r,
+      gain_g: slotTune.gain_g,
+      gain_b: slotTune.gain_b,
+      gamma: slotTune.gamma,
+    } : null;
+    /* A device/session claim always renders the exact tune held by state. An
+     * arbitrary caller-supplied tune may only drive an explicitly local draft. */
+    var tune = !hasTuneDraft && framing.applyLut && knownTune
+      ? Object.assign({}, knownTune)
+      : requestedTune;
+    var framingApplyLut = framing.applyLut && !!knownTune;
+    var requestedSimulation = !!input.simulate_draft && !framing.applyLut;
+    var applyDraftSimulation = requestedSimulation && hasTuneDraft;
+    var applyLut = applyDraftSimulation || (hasTuneDraft && framing.applyLut) || framingApplyLut;
+    var selection = applyLut ? "post" : "pre";
+    var rendered = renderChannel(stimulus, tune, channel, {
+      n: input.n,
+      both_scale_enabled: !!input.both_scale_enabled,
+      both_scale: input.both_scale,
+    });
+
+    /* Paint provenance cannot be promoted from DOM equality. Outside the local
+     * fallback, use conservative wording that remains true for confirmed,
+     * pending and locally edited control values. */
+    var source = input.local_stimulus ? {
+      kind: "local_stimulus",
+      label: "Local stimulus",
+      qualifier: input.source_in_flight
+        ? "command sequence in progress · local draft retained"
+        : "browser-generated · nothing sent",
+    } : {
+      kind: "current_paint_controls",
+      label: "Current paint controls",
+      qualifier: "browser-rendered · device output not claimed",
+    };
+
+    var transform;
+    var simulation = false;
+    if (hasTuneDraft && applyLut) {
+      simulation = true;
+      transform = {
+        kind: "local_draft_simulated",
+        label: "Local draft simulated",
+        qualifier: framing.kind === "device_effective"
+          ? "browser LUT · device confirmation may be partial or pending"
+          : framing.kind === "simulate_session"
+            ? "unsent browser LUT · active device look is not modelled"
+            : "unsent browser LUT · not device state",
+      };
+    } else if (framing.kind === "device_effective" && framingApplyLut) {
+      transform = {
+        kind: "device_confirmed_tune",
+        label: "Device-confirmed tune",
+        qualifier: "browser parity model · LUT nodes not read back",
+      };
+    } else if (framing.kind === "simulate_session" && framingApplyLut) {
+      simulation = true;
+      transform = {
+        kind: "known_session_simulated",
+        label: "Known session tune simulated",
+        qualifier: "browser parity model · active device look is not modelled",
+      };
+    } else {
+      transform = {
+        kind: "reference_pre_lut",
+        label: "Reference / pre-LUT",
+        qualifier: framing.reason === "slot15_unknown"
+          ? "slot-15 contents unknown · no correction applied"
+          : "active look unknown · no correction applied",
+      };
+    }
+
+    var targeted = !!(rendered.pre || rendered.post);
+    var bothScaleApplied = targeted && stimulus && stimulus.target === "both" &&
+      !!input.both_scale_enabled;
+    source.pattern = stimulus ? stimulus.mode : null;
+    source.target = stimulus ? stimulus.target : null;
+    source.applied = targeted;
+
+    return {
+      channel: channel,
+      n: input.n,
+      stimulus: stimulus,
+      tune: selection === "post" ? tune : null,
+      source: source,
+      transform: transform,
+      framingKind: framing.kind,
+      framingReason: framing.reason,
+      lookResolution: lookResolution,
+      slot15Knowledge: framing.slot15Knowledge,
+      renderContext: {
+        bothScaleApplied: bothScaleApplied,
+        bothScale: bothScaleApplied
+          ? (input.both_scale != null ? input.both_scale : BOTH_SCALE)
+          : 1.0,
+      },
+      simulationAvailable: !framingApplyLut,
+      simulation: simulation,
+      selection: selection,
+      pixels: selection === "post" ? rendered.post : rendered.pre,
+      label: "Source: " + source.label + " · Transform: " + transform.label,
+      qualifier: source.qualifier + " · " + transform.qualifier,
+    };
+  }
+
+  var STAGE_BASIS_REASON_ORDER = [
+    "source_provenance", "source_pattern", "source_targeting",
+    "correction_provenance", "preview_selection", "look_relationship",
+    "effective_look", "slot15_knowledge", "applied_tune", "render_scale",
+  ];
+
+  function sameJson(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  function compareStageOutput(primary, secondary) {
+    if (!primary || !secondary || !primary.pixels || !secondary.pixels) {
+      return {
+        status: "unavailable",
+        primaryLedCount: primary ? primary.n : null,
+        secondaryLedCount: secondary ? secondary.n : null,
+        sharedLedCount: 0,
+        differingLedCount: 0,
+        unmatchedLedCount: 0,
+        firstDifferingLed: null,
+        reasons: ["frame_unavailable"],
+      };
+    }
+
+    var shared = Math.min(primary.n, secondary.n);
+    var differing = 0;
+    var first = null;
+    for (var led = 0; led < shared; led++) {
+      var offset = led * 3;
+      if (primary.pixels[offset] !== secondary.pixels[offset] ||
+          primary.pixels[offset + 1] !== secondary.pixels[offset + 1] ||
+          primary.pixels[offset + 2] !== secondary.pixels[offset + 2]) {
+        differing++;
+        if (first == null) first = led;
+      }
+    }
+
+    var unmatched = Math.abs(primary.n - secondary.n);
+    var reasons = [];
+    if (unmatched) reasons.push("led_count");
+    if (differing) reasons.push("pixel_values");
+    return {
+      status: reasons.length ? "differ" : "match",
+      primaryLedCount: primary.n,
+      secondaryLedCount: secondary.n,
+      sharedLedCount: shared,
+      differingLedCount: differing,
+      unmatchedLedCount: unmatched,
+      firstDifferingLed: first,
+      reasons: reasons,
+    };
+  }
+
+  function stageBasisReasons(primary, secondary) {
+    var checks = {
+      source_provenance: primary.source.kind !== secondary.source.kind,
+      source_pattern: !sameJson(primary.stimulus, secondary.stimulus),
+      source_targeting: primary.source.applied !== secondary.source.applied ||
+        primary.source.target !== secondary.source.target,
+      correction_provenance: primary.transform.kind !== secondary.transform.kind,
+      preview_selection: primary.selection !== secondary.selection ||
+        primary.simulation !== secondary.simulation,
+      look_relationship: primary.lookResolution.relation !== secondary.lookResolution.relation,
+      effective_look: primary.lookResolution.effectiveKnown !== secondary.lookResolution.effectiveKnown ||
+        primary.lookResolution.effectiveSlot !== secondary.lookResolution.effectiveSlot,
+      slot15_knowledge: primary.slot15Knowledge !== secondary.slot15Knowledge,
+      applied_tune: !sameJson(primary.tune, secondary.tune),
+      render_scale: !sameJson(primary.renderContext, secondary.renderContext),
+    };
+    return STAGE_BASIS_REASON_ORDER.filter(function (reason) { return checks[reason]; });
+  }
+
+  function compareStageFrames(primary, secondary) {
+    var output = compareStageOutput(primary, secondary);
+    if (!primary || !secondary) {
+      return {
+        output: output,
+        basis: { status: "unavailable", reasons: ["frame_unavailable"] },
+      };
+    }
+    var reasons = stageBasisReasons(primary, secondary);
+    return {
+      output: output,
+      basis: { status: reasons.length ? "differ" : "match", reasons: reasons },
+    };
+  }
+
+  function inspectStageFrame(frame, selectedLed) {
+    if (!frame || !frame.pixels) return { kind: "unavailable" };
+    if (!Number.isInteger(selectedLed) || selectedLed < 0) return { kind: "invalid" };
+    if (selectedLed >= frame.n) return { kind: "not_present", n: frame.n };
+    var offset = selectedLed * 3;
+    var rgb16 = frame.pixels.slice(offset, offset + 3);
+    return {
+      kind: "value",
+      rgb16: rgb16,
+      rgb8: rgb16.map(function (value) { return value >> 8; }),
     };
   }
 
@@ -853,6 +1158,15 @@
         pump();
         return;
       }
+      if (entry.supersededAfterWrite) {
+        inFlight = null;
+        onSettle({
+          id: entry.id, cmd: entry.cmd, line: entry.line,
+          outcome: "superseded", priority: !!entry.priority,
+        });
+        pump();
+        return;
+      }
       armTimer(entry);
     }
 
@@ -887,6 +1201,7 @@
         timer: null,
         sentAt: null,
         writeCompleted: false,
+        supersededAfterWrite: false,
       };
     }
 
@@ -903,20 +1218,35 @@
         return entry.id;
       },
       enqueuePriorityStop: function () {
-        queue = queue.filter(function (e) {
-          return !isMutationCommand(e.cmd) || e.priority;
+        var retained = [];
+        queue.forEach(function (queuedEntry) {
+          if (!isMutationCommand(queuedEntry.cmd) || queuedEntry.priority) {
+            retained.push(queuedEntry);
+            return;
+          }
+          onSettle({
+            id: queuedEntry.id, cmd: queuedEntry.cmd, line: queuedEntry.line,
+            outcome: "superseded", priority: false,
+          });
         });
+        queue = retained;
         var entry = makeEntry("paint", serialize.paint("off"), {
           priority: true,
           expect: "paint",
         });
         if (inFlight && !inFlight.writeCompleted) {
+          inFlight.supersededAfterWrite = true;
           queue.unshift(entry);
           return entry.id;
         }
         if (inFlight) {
-          if (inFlight.timer) clearTimer(inFlight.timer);
+          var superseded = inFlight;
+          if (superseded.timer) clearTimer(superseded.timer);
           inFlight = null;
+          onSettle({
+            id: superseded.id, cmd: superseded.cmd, line: superseded.line,
+            outcome: "superseded", priority: !!superseded.priority,
+          });
         }
         queue.unshift(entry);
         pump();
@@ -949,6 +1279,10 @@
           return false;
         }
         if (ev.kind === "bad_command") { settle("rejected"); return true; }
+        if (e.priority && e.cmd === "paint" && ev.kind === "paint") {
+          if (ev.mode === "off") { settle("ok"); return true; }
+          return false;
+        }
         if (e.expect === "look" && (ev.kind === "look" || ev.kind === "look_empty")) {
           settle("ok");
           return true;
@@ -1224,8 +1558,16 @@
       }
       case "identityAction":
         return { action: identityAction(req.state) };
+      case "resolveEffectiveLook":
+        return resolveEffectiveLook(req.state, req.channel || "primary");
       case "previewFraming":
         return previewFraming(req.state, req.channel || "primary");
+      case "stageFrame":
+        return stageFrame(req);
+      case "compareStageFrames":
+        return compareStageFrames(req.primary, req.secondary);
+      case "inspectStageFrame":
+        return inspectStageFrame(req.frame, req.selectedLed);
       case "resolveProfile":
         return resolveDeviceProfile(req);
       case "queue":
@@ -1301,7 +1643,11 @@
     showTune: showTune,
     showBothScale: showBothScale,
     canClaimExactParity: canClaimExactParity,
+    resolveEffectiveLook: resolveEffectiveLook,
     previewFraming: previewFraming,
+    stageFrame: stageFrame,
+    compareStageFrames: compareStageFrames,
+    inspectStageFrame: inspectStageFrame,
     isMutationCommand: isMutationCommand,
     createCommandQueue: createCommandQueue,
     buildSnapshot: buildSnapshot,

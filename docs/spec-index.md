@@ -1,11 +1,12 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_lane: K1_SCHEDULING_HARDENING_20260815
-active_authority: docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md
-active_branch: feat/k1-scheduling-generation-hardening
+active_lane: COLOUR_LAB_PALETTE_BENCH_20260827
+active_authority: tools/colourlab/EXECUTION.md
+active_branch: lane/colourlab-bench
+previous_lane: K1_SCHEDULING_HARDENING_20260815 (authority docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md, branch feat/k1-scheduling-generation-hardening)
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
-lane_branch: feat/k1-scheduling-generation-hardening
-last_verified: 2026-08-21
+lane_branch: lane/colourlab-bench
+last_verified: 2026-08-28
 ---
 
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
@@ -172,10 +173,10 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 |--------|---------|------------------------------------|
 | 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only.** Current silicon `b625e89a` epoch `1787400761`. Never `k1_hardware`. |
 | F887 (OFFSITE) | `F887A500` | Historical `k1_hardware` allowlist. Do not flash any other serial as F887. |
-| 12201 (bench K1v2) | `B489A500` | `k1_bench_reference`; non-shippable/IM73D variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_custom` when explicitly selected |
+| 12201 (bench K1v2) | `B489A500` (USB `B4:3A:45:A5:89:B4`, live 2026-08-25 `/dev/cu.usbmodem11401`) | Current silicon **`k1_bench_im69d_led150` @ `8ed45e9c`** epoch `1787639868` (150-px WS2812 GPIO39/40). Permitted: `k1_bench_reference` and bench IM69/IM73 variants including `k1_bench_im69d_led150`. Never `k1_main_rpl_im69d`. |
 | Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6`** (GPIO4/5, 160/160). Child **`k1_p4_wifi6_led150`** (GPIO39/40, 150/150) exists in source, not on silicon until flash GO. Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `61787c86` 2026-08-22. |
 
-> **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of 2026-08-22: Main RPL `9087A500` = `/dev/cu.usbmodem1401`; bench `B489A500` typical `/dev/cu.usbmodem1101`. Registry §2 deployed-state table is authoritative. F887 is OFFSITE.
+> **Ports drift every session — identity is USB serial / chip-ID, never the port name.** As of 2026-08-25: Main RPL `9087A500` = `/dev/cu.usbmodem112401`; bench `B489A500` = `/dev/cu.usbmodem11401`. Registry §2 deployed-state table is authoritative. F887 is OFFSITE.
 
 The two envs differ by GPIO map — never cross-flash. Identity = chip ID, never the port name. The earlier VMEWT-incident caveat is superseded by the registry's deployed-state table.
 

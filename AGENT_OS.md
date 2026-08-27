@@ -33,14 +33,12 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
-**Active lane (2026-08-15):** `K1_SCHEDULING_HARDENING_20260815` on
-`feat/k1-scheduling-generation-hardening`.
-Authority:
-`docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`.
-Captain authorised end-to-end Gate 0-8 scheduling implementation. AP remains on Core 0,
-VP remains on Core 1, and the fault-evident oracle precedes production units. The separate
-AP-input-integrity P4 slot/health promotion remains open; scheduling authority does not
-silently promote microphone or calibration changes.
+**Active lane (2026-08-28):** `COLOUR_LAB_PALETTE_BENCH_20260827` on
+`lane/colourlab-bench`.
+Authority: `tools/colourlab/EXECUTION.md`.
+Production Preview R1.1 is frozen. The live task is the explicit no-flash verification programme
+on `9087A500` and `B489A500`, including serial mutations and clean leave-state. No firmware
+change, flash, further UI redesign or merge to `main` is authorised by this lane.
 
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
@@ -72,11 +70,10 @@ The current live lane is declared in the machine-readable frontmatter of
 
 At this revision:
 
-- **Branch:** `lane/dual-sync-phase0`
+- **Branch:** `lane/colourlab-bench`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** dual-sync F0-F3 recovery.
-- **Authority:**
-  `artifacts/k1_dual_sync_eval_2026-07-08/recovery/recovery-plan.md`
+- **Focus:** Colour Lab production Workbench device verification and clean close.
+- **Authority:** `tools/colourlab/EXECUTION.md`
 
 Before any work, verify the checked-out branch matches `active_branch` and the
 authority path exists. `scripts/agent/repo-truth.sh` enforces both. If either
