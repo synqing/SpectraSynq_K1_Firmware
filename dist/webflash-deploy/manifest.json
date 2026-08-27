@@ -7,16 +7,61 @@
     "mode": "keep",
     "freq": "keep"
   },
-  "generatedAt": "2026-08-24T09:34:03+00:00",
+  "generatedAt": "2026-08-25T23:51:57+00:00",
   "git": {
-    "sha": "863921de",
+    "sha": "8ed45e9c",
     "dirty": true
   },
+  "identityPolicy": {
+    "unknownMac": "refuse",
+    "simpleEnv": "k1_main_rpl_im69d"
+  },
+  "knownDevices": [
+    {
+      "chipId": "F887A500",
+      "usbSerial": "B4:3A:45:A5:87:F8",
+      "role": "main K1",
+      "allowedCuratedEnvs": []
+    },
+    {
+      "chipId": "9087A500",
+      "usbSerial": "B4:3A:45:A5:87:90",
+      "role": "Main RPL (main K1 replacement)",
+      "allowedCuratedEnvs": [
+        "k1_main_rpl_im69d"
+      ]
+    },
+    {
+      "chipId": "B489A500",
+      "usbSerial": "B4:3A:45:A5:89:B4",
+      "role": "2nd bench K1",
+      "allowedCuratedEnvs": [
+        "k1_bench_im69d_led150"
+      ]
+    },
+    {
+      "chipId": "0C54FC00",
+      "usbSerial": "AC:A7:04:FC:54:0C",
+      "role": "K1 Bench Unit 2",
+      "allowedCuratedEnvs": [
+        "k1_unit2_im69d_right"
+      ]
+    },
+    {
+      "chipId": "0743E200",
+      "usbSerial": "5AAF278179",
+      "role": "Waveshare ESP32-P4-WIFI6 lab (ADR-0007)",
+      "allowedCuratedEnvs": []
+    }
+  ],
+  "quarantinedUsbSerials": [
+    "FC:01:2C:DA:2B:38"
+  ],
   "variants": [
     {
       "env": "k1_main_rpl_im69d",
-      "label": "K1 Main RPL \u2014 IM69D (k1_main_rpl_im69d)",
-      "builtAt": "2026-08-24T09:32:20+00:00",
+      "label": "Main RPL \u00b7 9087 \u00b7 WS2816 160 GPIO15/16+17/18",
+      "builtAt": "2026-08-25T23:50:32+00:00",
       "parts": [
         {
           "path": "firmware/k1_main_rpl_im69d/bootloader.bin",
@@ -39,8 +84,8 @@
         {
           "path": "firmware/k1_main_rpl_im69d/firmware.bin",
           "offset": 65536,
-          "size": 708880,
-          "md5": "df7e3c5f887eaa4fa1810058c6fa720d"
+          "size": 708816,
+          "md5": "0aae54280fc508c435b69c6bb2837050"
         }
       ],
       "partitionMap": [
@@ -82,7 +127,170 @@
         }
       ],
       "otaSeedOffset": 6619136,
-      "firmwareVersion": 40103
+      "firmwareVersion": 40103,
+      "permittedChipIds": [
+        "9087A500"
+      ],
+      "usbSerial": [
+        "B4:3A:45:A5:87:90"
+      ],
+      "role": "Main RPL (main K1 replacement)"
+    },
+    {
+      "env": "k1_bench_im69d_led150",
+      "label": "Bench K1v2 \u00b7 B489 \u00b7 WS2812 150 GPIO39/40",
+      "builtAt": "2026-08-25T23:51:06+00:00",
+      "parts": [
+        {
+          "path": "firmware/k1_bench_im69d_led150/bootloader.bin",
+          "offset": 0,
+          "size": 20208,
+          "md5": "3a1751f965c8e51e47513a9c42a7d3c8"
+        },
+        {
+          "path": "firmware/k1_bench_im69d_led150/partitions.bin",
+          "offset": 32768,
+          "size": 3072,
+          "md5": "118cbdbfce82eb12bbdeb7c59af2fce8"
+        },
+        {
+          "path": "firmware/k1_bench_im69d_led150/boot_app0.bin",
+          "offset": 57344,
+          "size": 8192,
+          "md5": "e6327541e2dc394ca2c3b3280ac0f39f"
+        },
+        {
+          "path": "firmware/k1_bench_im69d_led150/firmware.bin",
+          "offset": 65536,
+          "size": 710560,
+          "md5": "ee599f9acd910abb9f754ea91dae9429"
+        }
+      ],
+      "partitionMap": [
+        {
+          "name": "nvs",
+          "subtype": "nvs",
+          "offset": 36864,
+          "size": 20480
+        },
+        {
+          "name": "otadata",
+          "subtype": "otadata",
+          "offset": 57344,
+          "size": 8192
+        },
+        {
+          "name": "app0",
+          "subtype": "ota_0",
+          "offset": 65536,
+          "size": 6553600
+        },
+        {
+          "name": "app1",
+          "subtype": "ota_1",
+          "offset": 6619136,
+          "size": 6553600
+        },
+        {
+          "name": "spiffs",
+          "subtype": "spiffs",
+          "offset": 13172736,
+          "size": 3538944
+        },
+        {
+          "name": "coredump",
+          "subtype": "coredump",
+          "offset": 16711680,
+          "size": 65536
+        }
+      ],
+      "otaSeedOffset": 6619136,
+      "firmwareVersion": 40103,
+      "permittedChipIds": [
+        "B489A500"
+      ],
+      "usbSerial": [
+        "B4:3A:45:A5:89:B4"
+      ],
+      "role": "2nd bench K1"
+    },
+    {
+      "env": "k1_unit2_im69d_right",
+      "label": "Bench Unit 2 \u00b7 0C54 \u00b7 WS2812 206 GPIO4/5 PDM CLK39/DATA38",
+      "builtAt": "2026-08-25T23:51:36+00:00",
+      "parts": [
+        {
+          "path": "firmware/k1_unit2_im69d_right/bootloader.bin",
+          "offset": 0,
+          "size": 20208,
+          "md5": "3a1751f965c8e51e47513a9c42a7d3c8"
+        },
+        {
+          "path": "firmware/k1_unit2_im69d_right/partitions.bin",
+          "offset": 32768,
+          "size": 3072,
+          "md5": "118cbdbfce82eb12bbdeb7c59af2fce8"
+        },
+        {
+          "path": "firmware/k1_unit2_im69d_right/boot_app0.bin",
+          "offset": 57344,
+          "size": 8192,
+          "md5": "e6327541e2dc394ca2c3b3280ac0f39f"
+        },
+        {
+          "path": "firmware/k1_unit2_im69d_right/firmware.bin",
+          "offset": 65536,
+          "size": 708400,
+          "md5": "57151d0bc05a4e5783cefca791cf41fc"
+        }
+      ],
+      "partitionMap": [
+        {
+          "name": "nvs",
+          "subtype": "nvs",
+          "offset": 36864,
+          "size": 20480
+        },
+        {
+          "name": "otadata",
+          "subtype": "otadata",
+          "offset": 57344,
+          "size": 8192
+        },
+        {
+          "name": "app0",
+          "subtype": "ota_0",
+          "offset": 65536,
+          "size": 6553600
+        },
+        {
+          "name": "app1",
+          "subtype": "ota_1",
+          "offset": 6619136,
+          "size": 6553600
+        },
+        {
+          "name": "spiffs",
+          "subtype": "spiffs",
+          "offset": 13172736,
+          "size": 3538944
+        },
+        {
+          "name": "coredump",
+          "subtype": "coredump",
+          "offset": 16711680,
+          "size": 65536
+        }
+      ],
+      "otaSeedOffset": 6619136,
+      "firmwareVersion": 40103,
+      "permittedChipIds": [
+        "0C54FC00"
+      ],
+      "usbSerial": [
+        "AC:A7:04:FC:54:0C"
+      ],
+      "role": "K1 Bench Unit 2"
     }
   ]
 }

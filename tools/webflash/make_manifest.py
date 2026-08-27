@@ -26,14 +26,23 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 
-# ── Curated env list (Captain-ruled 2026-08-18). Add envs here or via --envs.
+# ── Curated env list (Captain-ruled 2026-08-18; shortlist 2026-08-26).
+# Default three homes. Add rows only when Captain names them. Never dump
+# platformio.ini. ESP32-P4 (k1_p4_*) is a different chip family — not this page.
 CURATED_ENVS = [
     "k1_main_rpl_im69d",
+    "k1_bench_im69d_led150",
+    "k1_unit2_im69d_right",
 ]
 
+SIMPLE_ENV = "k1_main_rpl_im69d"
+
+# Human labels name device + pin fact, not just the env string.
 LABELS = {
-    "k1_hardware": "K1 Main (k1_hardware)",
-    "k1_main_rpl_im69d": "K1 Main RPL — IM69D (k1_main_rpl_im69d)",
+    "k1_hardware": "F887 · legacy LED 6/7 (k1_hardware)",
+    "k1_main_rpl_im69d": "Main RPL · 9087 · WS2816 160 GPIO15/16+17/18",
+    "k1_bench_im69d_led150": "Bench K1v2 · B489 · WS2812 150 GPIO39/40",
+    "k1_unit2_im69d_right": "Bench Unit 2 · 0C54 · WS2812 206 GPIO4/5 PDM CLK39/DATA38",
 }
 
 # ESP32-S3 ROM constants (chip-fixed, not project-tunable).
@@ -42,6 +51,9 @@ PARTITION_TABLE_OFFSET = 0x8000
 
 WEBFLASH_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(WEBFLASH_DIR, "..", ".."))
+IDENTITIES_PATH = os.path.join(
+    PROJECT_ROOT, "scripts", "platformio", "k1_device_identities.json",
+)
 
 
 def md5_of(path):
@@ -95,6 +107,80 @@ def firmware_version():
     except OSError:
         pass
     return None
+
+
+def load_identities():
+    try:
+        with open(IDENTITIES_PATH) as f:
+            return json.load(f)
+    except OSError as exc:
+        sys.exit(f"ERROR: cannot read device identities at {IDENTITIES_PATH}: {exc}")
+
+
+def records_for_env(identities, env):
+    return [r for r in identities.get("authorized", []) if env in r.get("envs", [])]
+
+
+def stamp_variant_identity(variant, identities):
+    """Fail closed: every webflash row must name the chips/MACs allowed to take it."""
+    env = variant["env"]
+    if env.startswith("k1_p4_"):
+        sys.exit(f"ERROR: {env} is ESP32-P4 — this flasher is chipFamily ESP32-S3 only.")
+    recs = records_for_env(identities, env)
+    if not recs:
+        sys.exit(
+            f"ERROR: {env} has no authorized device in k1_device_identities.json "
+            "— refusing to ship an ungated webflash row."
+        )
+    chips, serials, roles = [], [], []
+    for rec in recs:
+        cid = rec.get("chip_id")
+        serial = rec.get("usb_serial")
+        if cid:
+            cid_u = str(cid).upper()
+            if cid_u.startswith("0743"):
+                sys.exit(
+                    f"ERROR: {env} is bound to ESP32-P4 chip {cid}; "
+                    "this flasher is ESP32-S3 only."
+                )
+            chips.append(cid_u)
+        if serial:
+            serials.append(str(serial).upper())
+        if rec.get("role"):
+            roles.append(rec["role"])
+    if not chips or not serials:
+        sys.exit(f"ERROR: {env} identity record is missing chip_id or usb_serial.")
+    variant["permittedChipIds"] = chips
+    variant["usbSerial"] = serials
+    if roles:
+        variant["role"] = roles[0]
+    return variant
+
+
+def known_devices_for_page(identities, curated):
+    """Registry units, with only curated envs listed as allowed on this page."""
+    curated_set = set(curated)
+    devices = []
+    for rec in identities.get("authorized", []):
+        serial = rec.get("usb_serial")
+        if not serial:
+            continue
+        allowed = [e for e in rec.get("envs", []) if e in curated_set]
+        devices.append({
+            "chipId": rec.get("chip_id"),
+            "usbSerial": str(serial).upper(),
+            "role": rec.get("role") or "",
+            "allowedCuratedEnvs": allowed,
+        })
+    return devices
+
+
+def quarantined_serials(identities):
+    return [
+        str(rec["usb_serial"]).upper()
+        for rec in identities.get("quarantined", [])
+        if rec.get("usb_serial")
+    ]
 
 
 def git_stamp():
@@ -179,9 +265,11 @@ def main():
     if not variants:
         sys.exit("ERROR: no variants produced — build the curated envs first (pio run -e <env>).")
 
+    identities = load_identities()
     fw_version = firmware_version()
     for v in variants:
         v["firmwareVersion"] = fw_version
+        stamp_variant_identity(v, identities)
 
     manifest = {
         "schema": 1,
@@ -190,6 +278,12 @@ def main():
         "flash": {"size": "keep", "mode": "keep", "freq": "keep"},
         "generatedAt": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "git": git_stamp(),
+        "identityPolicy": {
+            "unknownMac": "refuse",
+            "simpleEnv": SIMPLE_ENV,
+        },
+        "knownDevices": known_devices_for_page(identities, envs),
+        "quarantinedUsbSerials": quarantined_serials(identities),
         "variants": variants,
     }
     out = os.path.join(WEBFLASH_DIR, "manifest.json")

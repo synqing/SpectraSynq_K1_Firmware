@@ -17,7 +17,7 @@ on:
       envs:
         description: "Comma-separated PlatformIO envs to package"
         required: false
-        default: "k1_main_rpl_im69d"
+        default: "k1_main_rpl_im69d,k1_bench_im69d_led150,k1_unit2_im69d_right"
   push:
     tags: ["webflash-v*"]
 
@@ -30,7 +30,7 @@ jobs:
     name: Build + package web-flasher bundle
     runs-on: ubuntu-latest
     env:
-      ENVS: ${{ github.event.inputs.envs || 'k1_main_rpl_im69d' }}
+      ENVS: ${{ github.event.inputs.envs || 'k1_main_rpl_im69d,k1_bench_im69d_led150,k1_unit2_im69d_right' }}
     steps:
       - uses: actions/checkout@v4
 
