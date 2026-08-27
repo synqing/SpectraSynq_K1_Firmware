@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SpectraSynq K1 — Colour Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23060606'/%3E%3Cpath d='M8 22 L14 10 L18 18 L24 8' stroke='%23FFB84D' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+/* COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1 — reuse webflash void/gold only. */
+:root {
+  --void: #060606;
+  --gold: #FFB84D;
+  --ink: #F2F2F2;
+  --muted: #A3A3A3;
+  --line: rgba(255, 255, 255, 0.08);
+  --err: #FF4D4D;
+  --pitch: 20px;
+  --dot-r: 0.82px;
+  --dot-t: 1.00px;
+  --dot-a: 0.34;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --press: 140ms;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  min-height: 100vh;
+  background: var(--void);
+  color: var(--ink);
+  font: 12.5px/1.45 "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+.floor {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--void);
+  background-image: radial-gradient(circle, rgba(255,255,255,var(--dot-a)) var(--dot-r), transparent var(--dot-t));
+  background-size: var(--pitch) var(--pitch);
+}
+.lg-inspect { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.lg-inspect .sky {
+  position: absolute; left: 0; right: 0; top: 0; height: 42%;
+  background: radial-gradient(ellipse at 50% -12%, rgba(255,255,255,0.2), transparent 70%);
+  mix-blend-mode: screen;
+}
+.lg-inspect .lintel {
+  position: absolute; left: 8%; right: 8%; top: 0; height: 10px;
+  background: #141414; box-shadow: 0 12px 40px rgba(255,255,255,0.06);
+}
+.page-rail {
+  position: fixed; left: 14px; bottom: 28px; z-index: 8;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,184,77,0.5); pointer-events: none; user-select: none;
+}
+.page { position: relative; z-index: 3; padding: 36px 28px 96px; }
+.instrument {
+  width: min(100%, 1430px);
+  margin: 2vh auto 0;
+  display: grid;
+  gap: 18px;
+}
+.mast { margin: 0 0 4px; }
+.kicker {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+  margin: 0 0 4px;
+}
+.kicker::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); margin-right: 8px; box-shadow: 0 0 8px var(--gold); vertical-align: 1px;
+}
+h1 {
+  margin: 4px 0 6px;
+  font: 700 clamp(28px, 3.6vw, 44px)/1.02 "Saira Condensed", sans-serif;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+  text-wrap: balance;
+}
+h1 em {
+  font-style: normal;
+  background: linear-gradient(180deg, #fff6e4, #FFB84D 42%, #7a4e10 58%, #ffe3b0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.quiet { color: var(--muted); margin: 0 0 8px; }
+.bands {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 18px;
+  align-items: start;
+}
+.bands .span-2 { grid-column: 1 / -1; }
+.well {
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.1) 0.55px, transparent 0.7px),
+    linear-gradient(#171717, #0e0e0e);
+  background-size: 4px 4px, auto;
+  border-radius: 18px;
+  padding: 16px 18px 14px;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.1),
+    inset 0 -2px 8px rgba(0,0,0,0.82),
+    0 0 0 1px #1c1c1c,
+    0 28px 56px -18px rgba(0,0,0,0.92);
+  position: relative;
+}
+.well::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.03) 50%, #090909);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+fieldset {
+  margin: 0; padding: 0; border: 0; min-width: 0;
+}
+legend, h2 {
+  margin: 0 0 10px;
+  font: 600 15px/1 "Saira Condensed", sans-serif;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink);
+}
+.row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); }
+.note { color: var(--muted); margin: 0 0 10px; }
+.mono, code { font-family: inherit; color: var(--ink); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px;
+  border-radius: 8px; border: 1px solid var(--line); background: #0c0c0c;
+  font-size: 11px; color: var(--muted);
+}
+.chip.live { color: var(--ink); border-color: rgba(255,184,77,0.28); }
+button {
+  border: 0; border-radius: 10px; padding: 10px 16px; font-weight: 700;
+  font-family: inherit; cursor: pointer; color: #f4f4f4;
+  background: linear-gradient(#2e2e2e, #141414);
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.15), inset 0 -2px 8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.16);
+  transition: transform var(--press) var(--ease);
+}
+button.ghost {
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.14);
+}
+button.stop {
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,0.15),
+    inset 0 -2px 8px rgba(0,0,0,0.8),
+    0 0 0 1px rgba(255,184,77,0.55);
+  color: var(--gold);
+}
+#btnConnect {
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.15), inset 0 -2px 8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,184,77,0.45);
+}
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:active:not(:disabled) { transform: scale(0.97); }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--gold); outline-offset: 3px;
+}
+input[type="number"], select {
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(#161616,#0c0c0c); color: var(--ink);
+  font-family: inherit; padding: 8px 10px; font-size: 13px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.55);
+  min-width: 4.5rem;
+}
+select { min-width: 8rem; appearance: none; }
+canvas {
+  display: block; width: 100%; height: 28px; image-rendering: pixelated;
+  background: #050505; border-radius: 8px; border: 1px solid rgba(255,184,77,0.18);
+}
+#cvCurve { height: 128px; margin-top: 10px; }
+#log {
+  min-height: 8rem; max-height: 14rem; overflow: auto; white-space: pre-wrap;
+  background: #050505; border-radius: 10px; border: 1px solid rgba(255,184,77,0.28);
+  padding: 8px 10px; color: #c4c4c4; margin-top: 8px;
+}
+.warn { color: var(--err); font-weight: 600; margin: 8px 0 0; }
+.hidden { display: none !important; }
+.device-actions { justify-content: space-between; }
+.device-actions .safety { margin-left: auto; }
+.strip-label { color: var(--muted); margin: 10px 0 4px; }
+details.drawer { padding-top: 12px; }
+details.drawer summary {
+  cursor: pointer; font: 600 15px/1 "Saira Condensed", sans-serif;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+@media (max-width: 980px) {
+  .bands { grid-template-columns: 1fr; }
+  .page { padding: 24px 16px 80px; }
+  .page-rail { left: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
+  button:active:not(:disabled) { transform: none; }
+}
+  </style>
+</head>
+<body>
+  <div class="floor" aria-hidden="true"></div>
+  <div class="lg-inspect" aria-hidden="true"><i class="lintel"></i><i class="sky"></i></div>
+  <div class="page-rail">SpectraSynq · K1 · Colour Lab</div>
+  <div class="page">
+    <header class="mast">
+      <p class="kicker">SpectraSynq K1 · USB CDC · 115200</p>
+      <h1>Colour <em>Lab</em></h1>
+      <p class="quiet">Serial instrument. Envelopes <code>sbr{{</code> / <code>sberr[[</code>. No wireless path. Digital code-value preview — not a physical colour match.</p>
+    </header>
+
+    <div class="instrument">
+      <section class="well span-2" aria-labelledby="deviceLegend">
+        <fieldset>
+          <legend id="deviceLegend">Device</legend>
+          <div class="row device-actions">
+            <span id="serialSupport">Web Serial: checking…</span>
+            <button type="button" id="btnConnect">Connect</button>
+            <button type="button" id="btnDisconnect" class="ghost" disabled>Disconnect</button>
+            <span id="connState" class="chip">disconnected</span>
+            <div class="safety">
+              <button type="button" id="btnStop" class="stop" aria-keyshortcuts="Escape">Stop Output</button>
+            </div>
+          </div>
+          <p id="profileChip" class="chip live">No profile</p>
+          <p id="statusLine" class="chip">paint: — · persist: unknown · slot-15: unknown</p>
+          <p id="outputUnknown" class="warn hidden" role="alert">Output state unknown — paint=off was not confirmed. Device output may still be active.</p>
+        </fieldset>
+      </section>
+
+      <div class="bands">
+        <section class="well" id="paintBand" aria-labelledby="paintLegend">
+          <fieldset>
+            <legend id="paintLegend">Paint / stimulus</legend>
+            <p class="note">RGB is Solid only. S/V is Ramp only. Stops are uniformly spaced — they cannot be positioned.</p>
+            <div class="row">
+              <label>Target
+                <select id="paintTarget" disabled>
+                  <option value="primary">Primary</option>
+                  <option value="secondary">Secondary</option>
+                  <option value="both">Both</option>
+                </select>
+              </label>
+              <label>Mode
+                <select id="paintMode" disabled>
+                  <option value="off">Off</option>
+                  <option value="solid">Solid</option>
+                  <option value="ramp">Ramp</option>
+                  <option value="stops">Stops</option>
+                  <option value="card">Card</option>
+                </select>
+              </label>
+              <span id="bothScaleReadout" class="chip hidden">Both-scale ×0.30 (Lever-2 only)</span>
+            </div>
+            <div id="solidCtrls" class="row hidden">
+              <label>R <input id="rgbR" type="number" min="0" max="255" value="140" disabled></label>
+              <label>G <input id="rgbG" type="number" min="0" max="255" value="140" disabled></label>
+              <label>B <input id="rgbB" type="number" min="0" max="255" value="140" disabled></label>
+              <button type="button" id="btnRgb" disabled>Send RGB</button>
+            </div>
+            <div id="rampCtrls" class="row hidden">
+              <label>S <input id="svS" type="number" min="0" max="1" step="0.001" value="1" disabled></label>
+              <label>V <input id="svV" type="number" min="0" max="1" step="0.001" value="0.55" disabled></label>
+              <button type="button" id="btnSv" disabled>Send S/V</button>
+            </div>
+            <div id="stopsCtrls" class="hidden">
+              <p class="note">1–8 RGB triples, uniformly distributed. Whole data string must be shorter than 159 characters.</p>
+              <div id="stopList"></div>
+              <div class="row">
+                <button type="button" id="btnAddStop" class="ghost" disabled>Add stop</button>
+                <button type="button" id="btnRemoveStop" class="ghost" disabled>Remove stop</button>
+                <button type="button" id="btnStops" disabled>Send stops</button>
+              </div>
+            </div>
+            <p id="cardNote" class="note hidden">Card: 17 regions (13 greys, red, green, blue, gold 255,140,0) from <code>(i×17)/n</code>.</p>
+          </fieldset>
+        </section>
+
+        <section class="well" aria-labelledby="outputLegend">
+          <fieldset>
+            <legend id="outputLegend">Output view</legend>
+            <p id="previewLabel">Pre-LUT stimulus preview — effective hardware correction unknown.</p>
+            <p class="note">MODELLED: paint → target scale (if profile enables it) → known slot-15 LUT → u16 quantisation. NOT MODELLED: brightness / scale_to_strip, unread looks, physical LEDs.</p>
+            <p class="note">Digital code-value preview — not a physical colour match.</p>
+            <p id="parityNote" class="chip"></p>
+            <p class="strip-label">Primary <span id="nPrimary" class="mono">n=?</span></p>
+            <canvas id="cvPrimary" width="160" height="24" aria-label="Primary code-value preview"></canvas>
+            <p class="strip-label">Secondary <span id="nSecondary" class="mono">n=?</span></p>
+            <canvas id="cvSecondary" width="160" height="24" aria-label="Secondary code-value preview"></canvas>
+            <p id="pixelInspect" class="note" aria-live="polite">Hover a strip for per-pixel u16.</p>
+            <p id="a11ySummary" class="note"></p>
+          </fieldset>
+        </section>
+
+        <section class="well span-2" id="tuneBand" aria-labelledby="tuneLegend">
+          <fieldset>
+            <legend id="tuneLegend">Tune / persistence</legend>
+            <p class="note">A hydrated <code>TUNE:</code> line is not LUT knowledge and not a session baseline. Revert Session appears only after this session establishes knowledge.</p>
+            <div class="row">
+              <label>Gain R <input id="gainR" type="number" min="0" max="2" step="0.001" value="1" disabled></label>
+              <label>Gain G <input id="gainG" type="number" min="0" max="2" step="0.001" value="1" disabled></label>
+              <label>Gain B <input id="gainB" type="number" min="0" max="2" step="0.001" value="1" disabled></label>
+              <label>Gamma <input id="gamma" type="number" min="0.2" max="4" step="0.001" value="1" disabled></label>
+            </div>
+            <div class="row">
+              <button type="button" id="btnGain" disabled>Send gain</button>
+              <button type="button" id="btnGamma" disabled>Send gamma</button>
+              <button type="button" id="btnIdentity">Set Identity</button>
+              <button type="button" id="btnReset" class="ghost" disabled>Reset</button>
+              <button type="button" id="btnSave" disabled>Save</button>
+              <button type="button" id="btnResync" class="ghost" disabled>Resync</button>
+            </div>
+            <p id="tuneKnowledge" class="chip">slot-15 unknown · baseline absent</p>
+            <canvas id="cvCurve" width="256" height="128" aria-label="Transfer curves"></canvas>
+          </fieldset>
+        </section>
+      </div>
+
+      <details class="well drawer span-2">
+        <summary>Session console</summary>
+        <div class="row">
+          <button type="button" id="btnExport" class="ghost">Export session snapshot</button>
+        </div>
+        <div id="log" class="mono" role="log"></div>
+      </details>
+    </div>
+  </div>
+
+  <script src="colourlab-core.js"></script>
+  <script>
+(function () {
+  "use strict";
+  var CL = globalThis.ColourLab;
+  if (!CL) throw new Error("colourlab-core.js failed to load");
+
+  var $ = function (id) { return document.getElementById(id); };
+  var serialOk = !!(navigator.serial);
+  var state = CL.initialState(serialOk);
+  var parser = CL.createLineParser();
+  var queue = null;
+  var port = null;
+  var reader = null;
+  var writer = null;
+  var readLoop = false;
+  var waiters = {};
+  var demo = new URLSearchParams(location.search).get("demo");
+  var demoPaint = new URLSearchParams(location.search).get("paint");
+  var stops = [[140, 140, 140]];
+  var disconnecting = false;
+  var pendingPriority = null;
+
+  function log(kind, text) {
+    var line = new Date().toISOString() + " " + kind + " " + text;
+    $("log").textContent += line + "\n";
+    $("log").scrollTop = $("log").scrollHeight;
+  }
+
+  function apply(action) {
+    state = CL.reduce(state, action);
+    render();
+  }
+
+  function enabled() {
+    return state.connection === "ready" && !demoUnsupported();
+  }
+
+  function demoUnsupported() { return demo === "unsupported"; }
+
+  function profile() { return state.deviceProfile; }
+
+  function ledN(which) {
+    var p = profile();
+    if (!p) return null;
+    return which === "secondary" ? p.secondary_led_count : p.primary_led_count;
+  }
+
+  function paintDraft() {
+    var c = state.confirmed.paint || {
+      mode: $("paintMode").value, target: $("paintTarget").value,
+      r: +$("rgbR").value, g: +$("rgbG").value, b: +$("rgbB").value,
+      s: +$("svS").value, v: +$("svV").value, stops: stops,
+    };
+    return {
+      mode: $("paintMode").value,
+      target: $("paintTarget").value,
+      r: +$("rgbR").value, g: +$("rgbG").value, b: +$("rgbB").value,
+      s: +$("svS").value, v: +$("svV").value,
+      stops: stops.map(function (t) { return t.slice(); }),
+    };
+  }
+
+  function tuneDraft() {
+    var t = state.confirmed.tune || CL.identityTune();
+    return {
+      gain_r: +$("gainR").value,
+      gain_g: +$("gainG").value,
+      gain_b: +$("gainB").value,
+      gamma: +$("gamma").value,
+    };
+  }
+
+  function setupQueue() {
+    queue = CL.createCommandQueue({
+      send: function (line) {
+        log("TX", line);
+        if (!writer) return Promise.resolve();
+        var payload = line.endsWith("\n") ? line : line + "\n";
+        return writer.write(new TextEncoder().encode(payload));
+      },
+      onSettle: function (info) {
+        if (info.priority && pendingPriority) {
+          var pri = pendingPriority;
+          pendingPriority = null;
+          pri(info);
+        }
+        if (waiters[info.id]) {
+          waiters[info.id](info);
+          delete waiters[info.id];
+        }
+        if (info.outcome === "timeout") {
+          apply({
+            type: "COMMAND_TIMEOUT",
+            command: info.cmd,
+            priorityStop: !!info.priority,
+          });
+          if (info.warning) log("WARN", info.warning);
+          return;
+        }
+        if (info.outcome === "rejected") {
+          apply({ type: "COMMAND_REJECTED", command: info.cmd });
+          log("RX", "bad_command " + (info.event && info.event.command));
+          return;
+        }
+        var ev = info.event;
+        if (!ev) return;
+        log("RX", ev.kind);
+        if (ev.kind === "paint") {
+          apply({ type: "DEVICE_PAINT", paint: ev, seq: info.id });
+        } else if (ev.kind === "tune") {
+          apply({
+            type: "DEVICE_TUNE",
+            tune: ev,
+            seq: info.id,
+            established_by: info.established_by || null,
+          });
+        } else if (ev.kind === "save_ok") {
+          apply({ type: "DEVICE_SAVE_OK" });
+        } else if (ev.kind === "save_fail") {
+          apply({ type: "DEVICE_SAVE_FAIL" });
+        } else if (ev.kind === "look") {
+          apply({ type: "LOOK_STATUS", look: ev });
+        }
+      },
+    });
+  }
+
+  function request(cmd, line, extra) {
+    extra = extra || {};
+    return new Promise(function (resolve) {
+      var id = queue.enqueue(cmd, line, extra);
+      waiters[id] = resolve;
+    });
+  }
+
+  function consumeEvents(events) {
+    events.forEach(function (ev) {
+      if (ev.kind === "chatter") log("CHAT", ev.line);
+      else if (ev.kind === "malformed") log("BAD", ev.line);
+      if (!queue || !queue.onEvent(ev)) {
+        if (ev.kind === "paint") apply({ type: "DEVICE_PAINT", paint: ev });
+        else if (ev.kind === "tune") apply({ type: "DEVICE_TUNE", tune: ev });
+        else if (ev.kind === "save_ok") apply({ type: "DEVICE_SAVE_OK" });
+        else if (ev.kind === "save_fail") apply({ type: "DEVICE_SAVE_FAIL" });
+      }
+    });
+  }
+
+  async function pumpReader() {
+    var dec = new TextDecoder();
+    readLoop = true;
+    try {
+      while (readLoop && reader) {
+        var chunk = await reader.read();
+        if (chunk.done) break;
+        consumeEvents(parser.feed(dec.decode(chunk.value, { stream: true })));
+      }
+    } catch (err) {
+      if (readLoop) {
+        log("ERR", String(err));
+        apply({ type: "DEVICE_LOST" });
+      }
+    }
+  }
+
+  async function hydrate() {
+    apply({ type: "PROFILE_START" });
+    parser = CL.createLineParser();
+    var chip = await request("chip_id", CL.serialize.chipId());
+    var build = await request("build", CL.serialize.build());
+    var look = await request("look_status", CL.serialize.lookStatus());
+    var chipId = chip.event && chip.event.chip_id;
+    var buildEnv = build.event && build.event.env;
+    var lookEv = look.event && look.event.kind === "look" ? look.event : null;
+    var resolved = CL.resolveDeviceProfile({
+      chip_id: chipId,
+      build_env: buildEnv,
+      look_env: lookEv && lookEv.env,
+      active_primary_look: lookEv ? lookEv.slot : "unknown",
+      active_secondary_look: lookEv ? lookEv.sec : "unknown",
+    });
+    apply({ type: "PROFILE_RESOLVED", profile: resolved, look: lookEv });
+    await request("paint_status", CL.serialize.paintStatus());
+    await request("tune_status", CL.serialize.tuneStatus());
+  }
+
+  async function connect() {
+    if (!serialOk) {
+      apply({ type: "PORT_OPEN_FAILED", error: "Web Serial unavailable" });
+      return;
+    }
+    apply({ type: "REQUEST_PORT" });
+    try {
+      port = await navigator.serial.requestPort();
+      apply({ type: "PORT_OPENING" });
+      await port.open({ baudRate: 115200 });
+      writer = port.writable.getWriter();
+      reader = port.readable.getReader();
+      port.addEventListener("disconnect", function () {
+        apply({ type: "DEVICE_LOST" });
+        log("WARN", "Unexpected disconnect. If paint was active the device may still be outputting.");
+      });
+      setupQueue();
+      pumpReader();
+      await hydrate();
+    } catch (err) {
+      log("ERR", String(err && err.message ? err.message : err));
+      if (String(err.name) === "NotFoundError") apply({ type: "REQUEST_CANCELLED" });
+      else apply({ type: "PORT_OPEN_FAILED", error: String(err) });
+    }
+  }
+
+  function waitForPrioritySettle(ms) {
+    return Promise.race([
+      new Promise(function (resolve) { pendingPriority = resolve; }),
+      new Promise(function (resolve) {
+        setTimeout(function () {
+          if (pendingPriority) pendingPriority = null;
+          resolve({ outcome: "timeout", event: null, priority: true });
+        }, ms);
+      }),
+    ]);
+  }
+
+  async function disconnect() {
+    if (disconnecting) return;
+    disconnecting = true;
+    render();
+    var hadActive = !!(state.confirmed.paint && state.confirmed.paint.mode !== "off") ||
+      !!state.paintMayBeActive || !!state.outputStateUnknown;
+    var inFlight = !!(queue && queue.depth() > 0);
+    var shutdown;
+    try {
+      if (queue && port && (hadActive || inFlight)) {
+        var settleP = waitForPrioritySettle(CL.DISCONNECT_WAIT_MS);
+        queue.enqueuePriorityStop();
+        var info = await settleP;
+        var ev = info.event;
+        shutdown = CL.classifyDisconnectShutdown({
+          stopOutcome: info.outcome,
+          paintModeFromReply: ev && ev.kind === "paint" ? ev.mode : null,
+          hadActivePaint: hadActive,
+          inFlightAtStart: inFlight || hadActive,
+        });
+      } else {
+        shutdown = CL.classifyDisconnectShutdown({
+          stopOutcome: null,
+          paintModeFromReply: null,
+          hadActivePaint: hadActive,
+          inFlightAtStart: inFlight,
+        });
+      }
+    } catch (err) {
+      shutdown = CL.classifyDisconnectShutdown({
+        stopOutcome: "write-error",
+        paintModeFromReply: null,
+        hadActivePaint: hadActive,
+        inFlightAtStart: inFlight,
+      });
+      log("ERR", "Disconnect stop failed: " + (err && err.message ? err.message : err));
+    }
+    if (queue && queue.flush) queue.flush();
+    readLoop = false;
+    try { if (reader) await reader.cancel(); } catch (e) {}
+    try { if (writer) writer.releaseLock(); } catch (e) {}
+    try { if (port) await port.close(); } catch (e) {}
+    reader = writer = port = queue = null;
+    disconnecting = false;
+    apply({
+      type: "DISCONNECTED",
+      shutdown: shutdown.claim,
+      paintStopped: shutdown.paintStopped,
+      outputUnknown: shutdown.outputUnknown,
+      paintMayBeActive: !shutdown.paintStopped && hadActive,
+    });
+    if (shutdown.claim === "confirmed-off") {
+      log("OK", "Disconnect: paint=off accepted before port close.");
+    } else if (shutdown.claim === "already-idle") {
+      log("OK", "Disconnect: no active paint; closed idle.");
+    } else {
+      log("WARN", "Disconnect closed without confirmed paint=off. Device output is unknown.");
+    }
+  }
+
+  function stopOutput() {
+    if (queue) queue.enqueuePriorityStop();
+    else apply({ type: "OUTPUT_STATE_UNKNOWN" });
+  }
+
+  function sendPaintMode() {
+    if (!queue) return;
+    queue.enqueue("paint", CL.serialize.paint($("paintMode").value));
+  }
+  function sendTarget() {
+    if (!queue) return;
+    queue.enqueue("paint_target", CL.serialize.paintTarget($("paintTarget").value));
+  }
+  function sendRgb() {
+    if (!queue) return;
+    queue.enqueue("paint_rgb", CL.serialize.paintRgb(+$("rgbR").value, +$("rgbG").value, +$("rgbB").value));
+  }
+  function sendSv() {
+    if (!queue) return;
+    queue.enqueue("paint_sv", CL.serialize.paintSv(+$("svS").value, +$("svV").value), { supersessionClass: "sv" });
+  }
+  function sendStops() {
+    if (!queue) return;
+    queue.enqueue("paint_stops", CL.serialize.paintStops(stops));
+  }
+  function sendGain() {
+    if (!queue) return;
+    queue.enqueue("tune_gain", CL.serialize.tuneGain(+$("gainR").value, +$("gainG").value, +$("gainB").value), {
+      supersessionClass: "gain",
+      established_by: "tune_gain",
+    });
+  }
+  function sendGamma() {
+    if (!queue) return;
+    queue.enqueue("tune_gamma", CL.serialize.tuneGamma(+$("gamma").value), {
+      supersessionClass: "gamma",
+      established_by: "tune_gamma",
+    });
+  }
+  function sendIdentity() {
+    if (!queue) return;
+    if (CL.identityAction(state) === "revert_session") {
+      CL.serialize.revertSession(state.sessionBaseline).forEach(function (line, i) {
+        var cmd = i === 0 ? "tune_gain" : "tune_gamma";
+        queue.enqueue(cmd, line, { established_by: cmd });
+      });
+      return;
+    }
+    queue.enqueue("tune_reset", CL.serialize.setIdentity(), { established_by: "tune_reset" });
+  }
+  function sendReset() {
+    if (!queue) return;
+    queue.enqueue("tune_reset", CL.serialize.tuneReset(), { established_by: "tune_reset" });
+    queue.enqueue("tune_status", CL.serialize.tuneStatus());
+  }
+  function sendSave() {
+    if (!queue) return;
+    apply({ type: "SAVE_START" });
+    queue.enqueue("tune_save", CL.serialize.tuneSave());
+    queue.enqueue("tune_status", CL.serialize.tuneStatus());
+  }
+  function resync() {
+    if (!port) return;
+    hydrate();
+  }
+
+  function drawStrip(canvas, pixels, n) {
+    canvas.width = n || 1;
+    canvas.height = 24;
+    var ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#111";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!pixels || !n) return;
+    for (var i = 0; i < n; i++) {
+      var r = pixels[3 * i] >> 8;
+      var g = pixels[3 * i + 1] >> 8;
+      var b = pixels[3 * i + 2] >> 8;
+      ctx.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+      ctx.fillRect(i, 0, 1, 24);
+    }
+  }
+
+  function drawCurves() {
+    var t = Object.assign({}, CL.identityTune(), state.confirmed.tune, state.draft.tune);
+    var nodes = CL.buildRgb1d(t);
+    var cv = $("cvCurve");
+    var ctx = cv.getContext("2d");
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.strokeStyle = "#888";
+    ctx.beginPath();
+    ctx.moveTo(0, cv.height);
+    ctx.lineTo(cv.width, 0);
+    ctx.stroke();
+    [["r", "#c00"], ["g", "#080"], ["b", "#00c"]].forEach(function (pair) {
+      ctx.strokeStyle = pair[1];
+      ctx.beginPath();
+      for (var i = 0; i < 256; i++) {
+        var x = i;
+        var y = cv.height - (nodes[pair[0]][i] / 65535) * cv.height;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    });
+  }
+
+  function bindInspect(canvas, which) {
+    canvas.onmousemove = function (ev) {
+      var n = ledN(which);
+      if (!n) return;
+      var x = Math.floor(ev.offsetX / canvas.clientWidth * n);
+      if (x < 0 || x >= n) return;
+      var paint = paintDraft();
+      var tune = Object.assign({}, CL.identityTune(), state.confirmed.tune, state.draft.tune);
+      var p = profile();
+      var rendered = CL.renderChannel(paint, tune, which, {
+        n: n,
+        both_scale_enabled: !!(p && p.both_scale_enabled),
+        both_scale: p && p.both_scale,
+      });
+      var framing = CL.previewFraming(state, which);
+      var buf = framing.applyLut ? rendered.post : rendered.pre;
+      if (!buf) {
+        $("pixelInspect").textContent = which + " [" + x + "] not written (off or untargeted)";
+        return;
+      }
+      $("pixelInspect").textContent =
+        which + " [" + x + "] u16 " + buf[3 * x] + "," + buf[3 * x + 1] + "," + buf[3 * x + 2];
+    };
+  }
+
+  function renderStops() {
+    var box = $("stopList");
+    box.textContent = "";
+    stops.forEach(function (t, i) {
+      var row = document.createElement("div");
+      row.className = "row";
+      row.appendChild(document.createTextNode("Stop " + (i + 1) + " "));
+      ["r", "g", "b"].forEach(function (ch, ci) {
+        var inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.max = "255";
+        inp.value = String(t[ci]);
+        inp.disabled = !enabled();
+        inp.oninput = function () { stops[i][ci] = +inp.value; renderPreview(); };
+        row.appendChild(inp);
+      });
+      box.appendChild(row);
+    });
+  }
+
+  function renderPreview() {
+    var p = profile();
+    var nP = ledN("primary");
+    var nS = ledN("secondary");
+    $("nPrimary").textContent = nP == null ? "n unknown" : "n=" + nP;
+    $("nSecondary").textContent = nS == null ? "n unknown" : "n=" + nS;
+    $("cvPrimary").width = nP || 1;
+    $("cvSecondary").width = nS || 1;
+    var paint = paintDraft();
+    var tune = Object.assign({}, CL.identityTune(), state.confirmed.tune, state.draft.tune);
+    var optsP = { n: nP || 1, both_scale_enabled: !!(p && p.both_scale_enabled), both_scale: p && p.both_scale };
+    var optsS = { n: nS || 1, both_scale_enabled: !!(p && p.both_scale_enabled), both_scale: p && p.both_scale };
+    var prim = nP ? CL.renderChannel(paint, tune, "primary", optsP) : { pre: null, post: null };
+    var sec = nS ? CL.renderChannel(paint, tune, "secondary", optsS) : { pre: null, post: null };
+    var frP = CL.previewFraming(state, "primary");
+    $("previewLabel").textContent = frP.label;
+    drawStrip($("cvPrimary"), frP.applyLut ? prim.post : prim.pre, nP);
+    drawStrip($("cvSecondary"), CL.previewFraming(state, "secondary").applyLut ? sec.post : sec.pre, nS);
+    $("a11ySummary").textContent =
+      "Mode " + paint.mode + " target " + paint.target +
+      (nP ? (" primary " + nP + " px") : " primary n unknown") +
+      (nS ? (" secondary " + nS + " px") : "");
+    $("parityNote").textContent = (p && CL.canClaimExactParity(p))
+      ? "Verified device profile — render uses that LED count."
+      : "Unverified Device Profile — no exact-parity claim.";
+    drawCurves();
+  }
+
+  function render() {
+    if (demoUnsupported()) state.connection = "unsupported";
+    $("serialSupport").textContent = (serialOk && !demoUnsupported())
+      ? "Web Serial: available"
+      : "Web Serial: unavailable (use Chrome/Edge on localhost or https)";
+    $("connState").textContent = state.connection;
+    $("btnConnect").disabled = disconnecting || !serialOk || demoUnsupported() ||
+      (state.connection !== "disconnected" && state.connection !== "error" && state.connection !== "device-lost");
+    $("btnDisconnect").disabled = disconnecting || !(port || (demo && !demoUnsupported()));
+    $("btnDisconnect").textContent = disconnecting ? "Disconnecting…" : "Disconnect";
+    var p = profile();
+    if (!p) $("profileChip").textContent = "No profile";
+    else if (p.identity_status === "unverified") {
+      $("profileChip").textContent = "Unverified Device Profile · chip " +
+        (p.chip_id || "?") + " · env " + (p.env || "?") + " · no exact-parity claim";
+    } else {
+      $("profileChip").textContent = p.env + " · " + p.chip_id + " · " +
+        p.primary_led_count + "/" + p.secondary_led_count + " · " + p.look_backend;
+    }
+    var paint = state.confirmed.paint;
+    var active = document.activeElement;
+    var typing = active && (active.tagName === "INPUT" || active.tagName === "SELECT");
+    if (paint && !typing) {
+      $("paintMode").value = paint.mode;
+      $("paintTarget").value = paint.target;
+      $("rgbR").value = paint.r;
+      $("rgbG").value = paint.g;
+      $("rgbB").value = paint.b;
+      $("svS").value = paint.s;
+      $("svV").value = paint.v;
+    }
+    if (state.confirmed.tune && !typing) {
+      $("gainR").value = state.confirmed.tune.gain_r;
+      $("gainG").value = state.confirmed.tune.gain_g;
+      $("gainB").value = state.confirmed.tune.gain_b;
+      $("gamma").value = state.confirmed.tune.gamma;
+    }
+    $("statusLine").textContent =
+      "paint: " + (paint ? paint.mode + "/" + paint.target : "—") +
+      " · persist: " + state.persistence +
+      " · slot-15: " + state.slot15Content.status +
+      (state.lastShutdown ? " · last close: " + state.lastShutdown : "");
+    $("outputUnknown").classList.toggle("hidden", !state.outputStateUnknown);
+    $("bothScaleReadout").classList.toggle("hidden", !CL.showBothScale(p));
+    var showTune = CL.showTune(p);
+    $("tuneBand").classList.toggle("hidden", p ? !showTune : false);
+
+    var on = enabled();
+    ["paintTarget", "paintMode", "rgbR", "rgbG", "rgbB", "btnRgb",
+     "svS", "svV", "btnSv", "btnAddStop", "btnRemoveStop", "btnStops",
+     "gainR", "gainG", "gainB", "gamma", "btnGain", "btnGamma",
+     "btnIdentity", "btnReset", "btnSave", "btnResync"].forEach(function (id) {
+      var el = $(id);
+      if (el) el.disabled = !on || (id.indexOf("gain") === 0 || id === "gamma" ||
+        id === "btnGain" || id === "btnGamma" || id === "btnIdentity" ||
+        id === "btnReset" || id === "btnSave") && p && !showTune;
+    });
+    $("btnIdentity").textContent = CL.identityAction(state) === "revert_session"
+      ? "Revert Session" : "Set Identity";
+    $("tuneKnowledge").textContent =
+      "slot-15 " + state.slot15Content.status +
+      " · baseline " + (state.sessionBaseline
+        ? state.sessionBaseline.gain_r + "," + state.sessionBaseline.gain_g + "," +
+          state.sessionBaseline.gain_b + " γ" + state.sessionBaseline.gamma
+        : "absent");
+
+    var mode = $("paintMode").value;
+    $("solidCtrls").classList.toggle("hidden", mode !== "solid");
+    $("rampCtrls").classList.toggle("hidden", mode !== "ramp");
+    $("stopsCtrls").classList.toggle("hidden", mode !== "stops");
+    $("cardNote").classList.toggle("hidden", mode !== "card");
+    renderStops();
+    renderPreview();
+  }
+
+  function exportSession() {
+    var snap = CL.buildSnapshot(state);
+    var blob = new Blob([JSON.stringify(snap, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "colourlab-session.json";
+    a.click();
+  }
+
+  function applyDemo() {
+    if (!demo || demo === "unsupported") { render(); return; }
+    var spec = {
+      main: { chip_id: "9087A500", look_env: "k1_main_rpl_im69d" },
+      bench: { chip_id: "B489A500", look_env: "k1_bench_im69d_led150" },
+      unverified: { chip_id: "DEADBEEF", look_env: "k1_mystery" },
+    }[demo] || { chip_id: "9087A500", look_env: "k1_main_rpl_im69d" };
+    var resolved = CL.resolveDeviceProfile(spec);
+    apply({ type: "PROFILE_START" });
+    apply({ type: "PROFILE_RESOLVED", profile: resolved });
+    var mode = (demoPaint && ["off", "solid", "ramp", "stops", "card"].indexOf(demoPaint) >= 0)
+      ? demoPaint : "off";
+    apply({ type: "DEVICE_PAINT", paint: {
+      mode: mode, target: "both", r: 140, g: 140, b: 140, s: 1, v: 0.55, stops: 0,
+    }, seq: 1 });
+    apply({ type: "DEVICE_TUNE", tune: CL.identityTune(), seq: 1 });
+    log("DEMO", "Local store only — not a device. demo=" + demo);
+  }
+
+  $("btnConnect").onclick = connect;
+  $("btnDisconnect").onclick = disconnect;
+  $("btnStop").onclick = stopOutput;
+  $("paintMode").onchange = function () { render(); if (enabled() && queue) sendPaintMode(); };
+  $("paintTarget").onchange = function () { render(); if (enabled() && queue) sendTarget(); };
+  $("btnRgb").onclick = sendRgb;
+  $("btnSv").onclick = sendSv;
+  $("btnStops").onclick = sendStops;
+  $("btnAddStop").onclick = function () {
+    if (stops.length < 8) { stops.push([255, 255, 255]); render(); }
+  };
+  $("btnRemoveStop").onclick = function () {
+    if (stops.length > 1) { stops.pop(); render(); }
+  };
+  $("btnGain").onclick = sendGain;
+  $("btnGamma").onclick = sendGamma;
+  $("btnIdentity").onclick = sendIdentity;
+  $("btnReset").onclick = sendReset;
+  $("btnSave").onclick = sendSave;
+  $("btnResync").onclick = resync;
+  $("btnExport").onclick = exportSession;
+  ["rgbR", "rgbG", "rgbB", "svS", "svV", "gainR", "gainG", "gainB", "gamma"].forEach(function (id) {
+    $(id).oninput = renderPreview;
+  });
+  bindInspect($("cvPrimary"), "primary");
+  bindInspect($("cvSecondary"), "secondary");
+
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Escape") return;
+    var tag = (ev.target && ev.target.tagName) || "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    ev.preventDefault();
+    stopOutput();
+  });
+  window.addEventListener("beforeunload", function (ev) {
+    if (state.confirmed.paint && state.confirmed.paint.mode !== "off") {
+      ev.preventDefault();
+      ev.returnValue = "";
+    }
+  });
+
+  if (demoUnsupported()) {
+    $("serialSupport").textContent = "Web Serial: unavailable (demo)";
+    state = CL.initialState(false);
+  }
+  setupQueue();
+  applyDemo();
+  render();
+})();
+  </script>
+</body>
+</html>

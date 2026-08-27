@@ -1,0 +1,25 @@
+{
+  "surface": "tools/colourlab/index.html",
+  "kind": "LOOK_LAYER_ON_CONTRACT_CORE",
+  "waiver": "COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1",
+  "not_optical_pass": true,
+  "craft_claim": "Webflash void/gold identity is readable on Colour Lab: gold title, Stop Output always visible, Set Identity while slot-15 unknown, Main 160+Tune+Both-scale, bench 150 and Tune hidden, Unverified fail-closed, card strip shows grey then R/G/B/gold.",
+  "stills_read": [
+    "tools/colourlab/screenshots/look-disconnected.png",
+    "tools/colourlab/screenshots/look-ready-main.png",
+    "tools/colourlab/screenshots/look-ready-bench.png",
+    "tools/colourlab/screenshots/look-unverified.png",
+    "tools/colourlab/screenshots/look-unsupported.png",
+    "tools/colourlab/screenshots/look-paint-solid.png",
+    "tools/colourlab/screenshots/look-paint-card.png",
+    "tools/colourlab/screenshots/look-viewport-740.png"
+  ],
+  "SUBJECT_RECOGNISABLE": true,
+  "option_craft_obvious": true,
+  "look_tokens_present": true,
+  "core_sha256_at_look_capture": "489322322c042bd9c9bf74db13827215dc57f7e38911324634ddc4dfad89a01e",
+  "core_sha256_after_safety_edit": "ea8c6f60e53379ef33a16c91ee3a2006769eb3ff7f719f155a42551310a53a29",
+  "verdict": "PASS_FOR_HUMAN_REVIEW",
+  "design_verdict": "OPEN",
+  "note": "Look stills are the post-waiver page, not the rejected T3 shell. Pixel inspect only licences showing them. Captain's visual verdict is still open."
+}

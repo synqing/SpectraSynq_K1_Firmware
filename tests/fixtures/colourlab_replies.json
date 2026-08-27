@@ -1,0 +1,204 @@
+{
+  "description": "Serial reply parser fixtures for the Colour Lab web instrument. Each case feeds `chunks` (in order) into the line parser and expects exactly `events` classified Colour Lab events. Lines that are neither PAINT:/TUNE:/TUNE_SAVE:/Bad command: are `chatter`; lines with a Colour Lab prefix that fail strict grammar are `malformed`. Grammar frozen in tools/colourlab/README.md section 1.2.",
+  "cases": [
+    {
+      "name": "simple_paint_lf",
+      "chunks": ["PAINT: mode=solid target=both rgb=140,140,140 s=1.000 v=0.550 stops=0\n"],
+      "events": [
+        {"kind": "paint", "mode": "solid", "target": "both", "r": 140, "g": 140, "b": 140, "s": 1.0, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "fragmented_across_three_chunks",
+      "chunks": ["PAINT: mo", "de=ramp target=primary rgb=255,0,0 s=0.", "800 v=0.550 stops=0\n"],
+      "events": [
+        {"kind": "paint", "mode": "ramp", "target": "primary", "r": 255, "g": 0, "b": 0, "s": 0.8, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "multiple_replies_one_chunk",
+      "chunks": ["PAINT: mode=card target=secondary rgb=200,64,10 s=1.000 v=0.550 stops=2\nTUNE: gain=1.000,1.000,1.000 gamma=1.000 slot=15 type=2\n"],
+      "events": [
+        {"kind": "paint", "mode": "card", "target": "secondary", "r": 200, "g": 64, "b": 10, "s": 1.0, "v": 0.55, "stops": 2},
+        {"kind": "tune", "gain_r": 1.0, "gain_g": 1.0, "gain_b": 1.0, "gamma": 1.0, "slot": 15, "type": "2"}
+      ]
+    },
+    {
+      "name": "crlf_line_endings",
+      "chunks": ["TUNE: gain=0.500,1.000,2.000 gamma=2.200 slot=15 type=2\r\n"],
+      "events": [
+        {"kind": "tune", "gain_r": 0.5, "gain_g": 1.0, "gain_b": 2.0, "gamma": 2.2, "slot": 15, "type": "2"}
+      ]
+    },
+    {
+      "name": "cr_only_line_endings",
+      "chunks": ["TUNE_SAVE: ok\rPAINT: mode=off target=both rgb=140,140,140 s=1.000 v=0.550 stops=0\r"],
+      "events": [
+        {"kind": "save_ok"},
+        {"kind": "paint", "mode": "off", "target": "both", "r": 140, "g": 140, "b": 140, "s": 1.0, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "boot_chatter_before_status",
+      "chunks": ["ESP-ROM:esp32s3-20210327\nBuild:Mar 27 2021\nrst:0x15 (USB_UART_CHIP_RESET)\nSPECTRASYNQ K1 boot\nPAINT: mode=off target=both rgb=140,140,140 s=1.000 v=0.550 stops=0\n"],
+      "events": [
+        {"kind": "chatter", "line": "ESP-ROM:esp32s3-20210327"},
+        {"kind": "chatter", "line": "Build:Mar 27 2021"},
+        {"kind": "chatter", "line": "rst:0x15 (USB_UART_CHIP_RESET)"},
+        {"kind": "chatter", "line": "SPECTRASYNQ K1 boot"},
+        {"kind": "paint", "mode": "off", "target": "both", "r": 140, "g": 140, "b": 140, "s": 1.0, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "unrelated_logs_between_replies",
+      "chunks": ["PAINT: mode=solid target=primary rgb=10,20,30 s=1.000 v=0.550 stops=0\nfps: 100.2 gdft: 133.1\naudio silent\nTUNE: gain=1.000,1.000,1.000 gamma=1.000 slot=15 type=2\n"],
+      "events": [
+        {"kind": "paint", "mode": "solid", "target": "primary", "r": 10, "g": 20, "b": 30, "s": 1.0, "v": 0.55, "stops": 0},
+        {"kind": "chatter", "line": "fps: 100.2 gdft: 133.1"},
+        {"kind": "chatter", "line": "audio silent"},
+        {"kind": "tune", "gain_r": 1.0, "gain_g": 1.0, "gain_b": 1.0, "gamma": 1.0, "slot": 15, "type": "2"}
+      ]
+    },
+    {
+      "name": "malformed_paint_truncated",
+      "chunks": ["PAINT: mode=solid target=\n"],
+      "events": [
+        {"kind": "malformed", "line": "PAINT: mode=solid target="}
+      ]
+    },
+    {
+      "name": "malformed_tune_bad_float",
+      "chunks": ["TUNE: gain=1.000,abc,1.000 gamma=1.000 slot=15 type=2\n"],
+      "events": [
+        {"kind": "malformed", "line": "TUNE: gain=1.000,abc,1.000 gamma=1.000 slot=15 type=2"}
+      ]
+    },
+    {
+      "name": "save_ok",
+      "chunks": ["TUNE_SAVE: ok\n"],
+      "events": [
+        {"kind": "save_ok"}
+      ]
+    },
+    {
+      "name": "save_fail_preceded_by_bad_command",
+      "chunks": ["Bad command: tune_save\nTUNE_SAVE: fail\n"],
+      "events": [
+        {"kind": "bad_command", "command": "tune_save"},
+        {"kind": "save_fail"}
+      ]
+    },
+    {
+      "name": "bad_command_with_data",
+      "chunks": ["Bad command: paint_rgb=300,0,0\n"],
+      "events": [
+        {"kind": "bad_command", "command": "paint_rgb=300,0,0"}
+      ]
+    },
+    {
+      "name": "partial_tail_stays_buffered_then_completes",
+      "chunks": ["PAINT: mode=stops target=both rgb=255,140,0 s=1.000 v=0.550 stops=8", "\n"],
+      "events": [
+        {"kind": "paint", "mode": "stops", "target": "both", "r": 255, "g": 140, "b": 0, "s": 1.0, "v": 0.55, "stops": 8}
+      ]
+    },
+    {
+      "name": "tune_type_na_without_look_lib",
+      "chunks": ["TUNE: gain=1.000,1.000,1.000 gamma=1.000 slot=15 type=na\n"],
+      "events": [
+        {"kind": "tune", "gain_r": 1.0, "gain_g": 1.0, "gain_b": 1.0, "gamma": 1.0, "slot": 15, "type": "na"}
+      ]
+    },
+    {
+      "name": "parser_recovers_after_malformed",
+      "chunks": ["PAINT: garbage garbage\nPAINT: mode=solid target=both rgb=1,254,255 s=0.000 v=1.000 stops=0\n"],
+      "events": [
+        {"kind": "malformed", "line": "PAINT: garbage garbage"},
+        {"kind": "paint", "mode": "solid", "target": "both", "r": 1, "g": 254, "b": 255, "s": 0.0, "v": 1.0, "stops": 0}
+      ]
+    },
+    {
+      "name": "empty_lines_ignored",
+      "chunks": ["\n\r\n\nTUNE_SAVE: ok\n\n"],
+      "events": [
+        {"kind": "save_ok"}
+      ]
+    },
+    {
+      "name": "framed_paint_success",
+      "chunks": ["sbr{{\nPAINT: mode=solid target=both rgb=140,140,140 s=1.000 v=0.550 stops=0\n}}\n"],
+      "events": [
+        {"kind": "paint", "mode": "solid", "target": "both", "r": 140, "g": 140, "b": 140, "s": 1.0, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "framed_tune_success",
+      "chunks": ["sbr{{\nTUNE: gain=1.000,1.000,1.000 gamma=1.000 slot=15 type=2\n}}\n"],
+      "events": [
+        {"kind": "tune", "gain_r": 1.0, "gain_g": 1.0, "gain_b": 1.0, "gamma": 1.0, "slot": 15, "type": "2"}
+      ]
+    },
+    {
+      "name": "framed_save_ok",
+      "chunks": ["sbr{{\nTUNE_SAVE: ok\n}}\n"],
+      "events": [
+        {"kind": "save_ok"}
+      ]
+    },
+    {
+      "name": "framed_save_fail_error_then_success",
+      "chunks": ["sberr[[\nBad command: tune_save\n]]\nsbr{{\nTUNE_SAVE: fail\n}}\n"],
+      "events": [
+        {"kind": "bad_command", "command": "tune_save"},
+        {"kind": "save_fail"}
+      ]
+    },
+    {
+      "name": "framed_bad_command_with_data",
+      "chunks": ["sberr[[\nBad command: paint_rgb=300,0,0\n]]\n"],
+      "events": [
+        {"kind": "bad_command", "command": "paint_rgb=300,0,0"}
+      ]
+    },
+    {
+      "name": "framed_chip_id",
+      "chunks": ["sbr{{\n9087A500\n}}\n"],
+      "events": [
+        {"kind": "chip_id", "chip_id": "9087A500"}
+      ]
+    },
+    {
+      "name": "framed_build",
+      "chunks": ["sbr{{\nBUILD: version=40103 git=acaecaa8 epoch=1787773671 env=k1_main_rpl_im69d\n}}\n"],
+      "events": [
+        {"kind": "build", "version": "40103", "git": "acaecaa8", "epoch": "1787773671", "env": "k1_main_rpl_im69d"}
+      ]
+    },
+    {
+      "name": "framed_look_status_main",
+      "chunks": ["sbr{{\nLOOK: slot=0 type=IDENTITY sec=inherit env=k1_main_rpl_im69d\n}}\n"],
+      "events": [
+        {"kind": "look", "slot": 0, "type": "IDENTITY", "sec": "inherit", "env": "k1_main_rpl_im69d"}
+      ]
+    },
+    {
+      "name": "framed_look_status_bench",
+      "chunks": ["sbr{{\nLOOK: slot=3 type=RGB_1D_256 sec=2 env=k1_bench_im69d_led150\n}}\n"],
+      "events": [
+        {"kind": "look", "slot": 3, "type": "RGB_1D_256", "sec": 2, "env": "k1_bench_im69d_led150"}
+      ]
+    },
+    {
+      "name": "framed_fragmented_envelope",
+      "chunks": ["sbr{{\nPAINT: mode=card tar", "get=primary rgb=200,64,10 s=1.000 v=0.550 stops=0\n}}\n"],
+      "events": [
+        {"kind": "paint", "mode": "card", "target": "primary", "r": 200, "g": 64, "b": 10, "s": 1.0, "v": 0.55, "stops": 0}
+      ]
+    },
+    {
+      "name": "envelope_markers_are_not_events",
+      "chunks": ["sbr{{\n}}\nsberr[[\n]]\n"],
+      "events": []
+    }
+  ]
+}
