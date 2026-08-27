@@ -1,19 +1,27 @@
 # Colour Lab — Web Serial control instrument
 
-`tools/colourlab/index.html` is a desktop-first, self-contained Web Serial
-instrument for the K1 Colour Lab firmware surface (`K1_COLOUR_LAB_V1`).
-Shared logic lives in `tools/colourlab/colourlab-core.js` — the page loads
-that file, and Node tests `require()` the same file. No build step, no
-framework, no backend, no wireless path.
+`tools/colourlab/index.html` is the desktop-first K1 Colour Lab Workbench for
+the `K1_COLOUR_LAB_V1` serial surface. It has no build step, framework,
+backend or wireless path. The production surface loads three distinct
+authorities:
 
-The look layer reuses the established webflash void/gold identity under
-**`COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1`**. That waiver is not an optical
-PASS — see `OPTICAL_GATE_RECEIPT.md` and `WAIVER.md`. The T3 no-look
-shell is historical; it is not the current page.
+- `colourlab-core.js` — wire protocol, queue, state, exact K1 Paint/LUT model;
+- `colourlab-authoring.js` — tested RGB, shortest-arc HSV and OKLCH authoring,
+  rich-draft compilation and output policy;
+- `colourlab-workbench.js` — local-first interaction and Web Serial wiring.
+
+The Workbench layout was cleared by the 2026-08-28 T0 optical gate before
+production writes. The exact 43-role evidence pack and independent PASS are in
+`_scratch/colourlab_workbench_r0_20260828/OPTICAL_GATE_RECEIPT.md`.
 
 The screen preview is an **exact Colour Lab code-path preview through the
 source-modelled stages**. It is not a physical or colorimetric match, and
 it is not a claim about the whole firmware pipeline.
+
+The permanent SpectraSynq product rule is fail-closed: no full hue wheel,
+rainbow, spectrum sweep or wheel-spanning palette is selectable, rendered,
+sent, saved or exported. Legacy `PAINT: mode=ramp` replies are recognised only
+to trigger priority `paint=off`; they are never reproduced by this surface.
 
 ---
 
@@ -114,10 +122,10 @@ All Colour Lab parsing is `k1_colour_lab_dispatch`
 
 | # | Command | Data / clamp | Effect | Reply |
 |---|---------|--------------|--------|-------|
-| 1 | `paint` | `off\|solid\|ramp\|stops\|card`; `stops` rejected while `stop_n < 1` | Sets paint mode | `PAINT:` |
+| 1 | `paint` | Firmware accepts `off\|solid\|ramp\|stops\|card`; the product Workbench permits `off\|solid\|stops\|card` only and treats a reported `ramp` as a recovery condition | Sets paint mode | `PAINT:` |
 | 2 | `paint_target` | `primary\|secondary\|both` | Sets target mask | `PAINT:` |
 | 3 | `paint_rgb` | `R,G,B`, each 0–255 integer, strict `%d,%d,%d` **no trailing characters** | Solid-mode colour only | `PAINT:` |
-| 4 | `paint_sv` | `S,V`, each finite 0.0–1.0, strict `%f,%f` no trailing chars | Ramp-mode S/V only | `PAINT:` |
+| 4 | `paint_sv` | Firmware protocol fact only; the product Workbench never emits it because geometric hue-wheel Ramp is prohibited | Ramp-mode S/V only | `PAINT:` |
 | 5 | `paint_stops` | 1–8 `R,G,B` triples joined by `;`; **`strlen(data) < 159`** (`parse_stops` rejects `>= 159`, `k1_colour_lab.cpp:186-195`); n==1 also copies stop 0 into `rgb` | Sets stops table | `PAINT:` |
 | 6 | `paint_status` | bare | none (read) | `PAINT:` |
 | 7 | `tune_gain` | `R,G,B` floats, each finite 0.0–2.0 | Live slot-15 LUT regen | `TUNE:` |
@@ -267,24 +275,30 @@ stage whose live parameters this UI cannot read.
 
 ## 2. Using the instrument
 
-1. Open `index.html` in Chrome/Edge over `https:` or `http://localhost`.
+1. From `tools/colourlab`, run `python3 -m http.server 8767 --bind 127.0.0.1`,
+   then open `http://127.0.0.1:8767/index.html` in Chrome or Edge.
 2. **Connect** → pick the K1 USB CDC port. Profiling
    (`chip_id` / `build` / `look_status`) then hydration
    (`paint_status` / `tune_status`) run before controls enable.
    `tune_status` does **not** unlock Revert Session or Device Effective.
-3. Paint band: target and mode; only the controls the selected mode
-   reads are enabled. Both-scale readout appears only on profiles that
-   enable it.
-4. Output view: Primary and Secondary previews at the **connected
-   device's LED counts**, with a modelled / not-modelled legend.
-5. Tune band (Main RPL only): gain/gamma; **Set Identity** until a
-   session baseline exists, then **Revert Session**; **Reset**
-   (`tune_reset`); **Save** (`tune_save`); **Resync** (re-profile +
-   re-hydrate; does not create slot-15 knowledge).
-6. **Stop Output** (always visible, and `Escape` outside text fields)
-   uses the priority path.
-7. Session drawer: TX/RX log. Phase 1 = **export** a session snapshot.
-   Import is Phase 2.
+3. Source: choose an authorised product source or bounded diagnostic, target
+   and values locally. **Test on device** sends one ordered source command sequence;
+   controls never write merely because they changed.
+4. Tune: edit gain and gamma as one local draft. **Apply tune** sends gain then
+   gamma and clears the submitted draft only after both are confirmed. Edits made
+   during the sequence remain drafted. **Save slot 15** is
+   separate persistence.
+5. Preview: compare Primary and Secondary as two permanent, independently
+   resolved rows. **LED values** and the **Diffusion model** draw the same
+   cached frames; one persistent LED selector reads both rows through the
+   exact frame inspector. Output equality and Preview-basis equality remain
+   separate facts. Preview is read-only: Test belongs to Source and Apply/Save
+   belong to Tune.
+6. Workbench: edit a rich positional palette, compare real RGB/OKLCH/HSV paths,
+   and compile visibly to at most eight uniformly distributed RGB Paint stops.
+   Device Safety and Product Colour Policy are independent gates.
+7. **Stop Output** is always visible and uses the priority path.
+8. Session disclosure: implementation boundary and TX/RX evidence.
 
 State discipline: draft drives local preview; confirmed values change
 only on a matching reply; a timeout never promotes a draft; reconnect
@@ -295,19 +309,22 @@ resets LUT knowledge and re-profiles.
 ## 3. Files
 
 ```
-tools/colourlab/index.html                    look layer on the contract-correct shell
+tools/colourlab/index.html                    production Workbench entry point
+tools/colourlab/workbench.html                byte-identical greenfield parity twin
 tools/colourlab/colourlab-core.js             shipped parse/serialise/paint/LUT/state
+tools/colourlab/colourlab-authoring.js        authoring maths, compiler and two policy gates
+tools/colourlab/colourlab-workbench.js        local-first UI and Web Serial command sequences
 tools/colourlab/README.md                     this contract
-tools/colourlab/WAIVER.md                     COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1
-tools/colourlab/OPTICAL_GATE_RECEIPT.md       T0 BLOCKED; look unlocked by waiver only
-tools/colourlab/MEASURED.json                 verdict WAIVED — not optical PASS
 tools/colourlab/VERIFICATION.md               stamps: identity vs hardware PASS
-tools/colourlab/screenshots/                  T3 + look stills (not a device proof)
+tools/colourlab/screenshots/workbench-r1.1/   thirteen browser/a11y/state stills, not device proof
+tools/colourlab/verify_workbench.py           safe headless browser/state gate
 tests/colourlab_node.py                       spawn node, require core, JSON in/out
 tests/test_colourlab_static.py                allowlist / clamp / static gates
 tests/test_colourlab_protocol.py              executes shipped parser on fixtures
 tests/test_colourlab_preview_parity.py        Python expected vs Node core
 tests/test_colourlab_state.py                 knowledge / queue / profile transitions
+tests/test_colourlab_authoring.py             colour maths, compiler and policy gates
+tests/test_colourlab_workbench_static.py      greenfield wiring/no-rainbow/a11y contract
 tests/generate_colourlab_fixtures.py          regenerate render vectors
 tests/fixtures/colourlab_replies.json         serial reply cases
 tests/fixtures/colourlab_render_vectors.json  golden renders
@@ -325,21 +342,22 @@ or both (default both).
 
 ## 4. Ship path
 
-Already on disk: this contract, `colourlab-core.js` (look layer did not
-rewrite it; later safety classifiers for Disconnect and persist
-leave-state live in the same file), the waived void/gold instrument,
-Node-executed pytest, framed + n=150 fixtures, browser/a11y look verify.
+Already on disk: the production-routed greenfield Workbench, exact K1 core model,
+tested authoring maths, local-first command-sequence wiring, separate safety/policy
+gates, 90 passing Colour Lab tests, and a clean thirteen-still browser/a11y/responsive
+and adversarial evidence run.
 
 Remaining:
 
-1. **Captain** — plug in both K1s. Name a flash only if a required
-   Colour Lab command is missing on the running build.
+1. **Agent** — freeze the exact browser slice through the real pre-commit gate,
+   commit it on `lane/colourlab-bench`, and push that branch. Do not merge it.
 2. **Agent** — establish `9087A500` and `B489A500`
    (`DEVICE_IDENTITY_VERIFIED`), then run the load-bearing programme
    in `VERIFICATION.md` on both units. `:rtrace_dump` only after the
-   running build proves the command.
-3. **Stamp** — `COLOUR_LAB_WEB_UI_HARDWARE_PASS` is written only when
-   that programme passes. Identity-in-the-file is not enough.
+   running build proves the command. No flash is authorised by this programme.
+3. **Agent** — write `COLOUR_LAB_WEB_UI_HARDWARE_PASS` only when that
+   programme passes, commit and push the resulting evidence, then request the
+   merge to `main`. Identity-in-the-file is not enough.
 
-The lane closes on `COLOUR_LAB_WEB_UI_HARDWARE_PASS`. It does not mean
-a firmware promote, a flash, or an optical look PASS.
+The lane closes on `COLOUR_LAB_WEB_UI_HARDWARE_PASS`. A branch commit is not
+that stamp, and the branch must not merge to `main` before it is earned.

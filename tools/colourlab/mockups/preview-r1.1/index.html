@@ -1,0 +1,1337 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Preview R1.1 mockup for independently resolved K1 Primary and Secondary colour frames.">
+  <title>SpectraSynq K1 — Preview R1.1</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b0b0b'/%3E%3Cpath d='M8 21h16M8 16h16M8 11h16' stroke='%23f1ad43' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --void: #070707;
+      --panel: #11110f;
+      --panel-raised: #171613;
+      --panel-deep: #0b0b0a;
+      --line: #34312b;
+      --line-soft: #24221e;
+      --ink: #f2f0eb;
+      --muted: #b8b2a8;
+      --quiet: #918b81;
+      --gold: #f1ad43;
+      --gold-soft: #ffd28a;
+      --warn: #f0b55d;
+      --danger: #ff756c;
+      --focus: #ffd28a;
+      --sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --condensed: "Arial Narrow", "Roboto Condensed", "Helvetica Neue", sans-serif;
+      --mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--void); }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background: var(--void);
+      font: 15px/1.5 var(--sans);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, a { font: inherit; }
+    button, a, input { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .shell {
+      width: min(calc(100% - 40px), 1160px);
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+    .proposal-bar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 18px;
+    }
+    .brandline {
+      margin: 0 0 4px;
+      color: var(--gold);
+      font: 800 12px/1 var(--condensed);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .proposal-bar h1 {
+      margin: 0;
+      font: 800 28px/.98 var(--condensed);
+      letter-spacing: -.02em;
+      text-transform: uppercase;
+    }
+    .mockup-stamp {
+      max-width: 310px;
+      margin: 0;
+      color: var(--quiet);
+      font: 12px/1.4 var(--mono);
+      text-align: right;
+    }
+
+    .evidence-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 0 1px 12px;
+      scrollbar-width: thin;
+    }
+    .evidence-nav > span {
+      flex: 0 0 auto;
+      margin-right: 3px;
+      color: var(--quiet);
+      font: 700 11px/1 var(--condensed);
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .evidence-nav a {
+      flex: 0 0 auto;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 11px;
+      border: 1px solid var(--line-soft);
+      border-radius: 9px;
+      color: var(--muted);
+      background: #0d0d0c;
+      text-decoration: none;
+      font-size: 12px;
+    }
+    .evidence-nav a[aria-current="page"] {
+      border-color: #765826;
+      color: var(--ink);
+      background: #201b13;
+    }
+
+    .preview {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .36), inset 0 1px rgba(255,255,255,.035);
+    }
+    .preview-main { padding: 28px 30px 0; }
+    .preview-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: start;
+    }
+    .preview-kicker {
+      margin: 0 0 7px;
+      color: var(--gold);
+      font: 800 11px/1 var(--condensed);
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .preview-header h2 {
+      margin: 0;
+      font: 800 25px/1 var(--condensed);
+      letter-spacing: .01em;
+      text-transform: uppercase;
+    }
+    .purpose {
+      max-width: 680px;
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .view-choice {
+      min-width: 248px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .view-choice legend {
+      margin-bottom: 7px;
+      color: var(--quiet);
+      font: 800 11px/1 var(--condensed);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .view-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #090909;
+    }
+    .view-options input { position: absolute; opacity: 0; pointer-events: none; }
+    .view-options label {
+      min-height: 40px;
+      display: grid;
+      place-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .view-options input:checked + label {
+      color: var(--ink);
+      background: #272218;
+      box-shadow: inset 0 0 0 1px #5e4823;
+    }
+    .view-options input:focus-visible + label {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .preview-boundary {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      align-items: start;
+      margin: 22px 0 0;
+      padding: 13px 15px;
+      border-left: 3px solid var(--gold);
+      background: #0d0d0c;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+    .boundary-label {
+      color: var(--gold-soft);
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    .gate-banner {
+      display: none;
+      margin: 18px 0 0;
+      padding: 15px 16px;
+      border: 1px solid #71552a;
+      border-radius: 12px;
+      background: #211a11;
+    }
+    .gate-banner.visible { display: block; }
+    .gate-banner.safety { border-color: #7f3835; background: #231110; }
+    .gate-banner strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+    .gate-banner span { color: var(--muted); font-size: 13px; }
+
+    .comparison {
+      margin: 24px 0 0;
+      padding: 18px 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .section-label {
+      display: block;
+      margin: 0 0 11px;
+      color: var(--quiet);
+      font: 800 11px/1 var(--condensed);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 22px;
+    }
+    .comparison-fact {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 70px minmax(0, 1fr);
+      gap: 12px;
+      align-items: baseline;
+    }
+    .comparison-fact > span {
+      color: var(--quiet);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+    }
+    .comparison-fact strong {
+      font: 800 19px/1.25 var(--condensed);
+      letter-spacing: .005em;
+    }
+    .comparison-note {
+      grid-column: 2;
+      margin: -4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .channels { padding-top: 8px; }
+    .channel {
+      padding: 20px 0 22px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .channel:last-child { border-bottom: 0; }
+    .channel-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 8px;
+    }
+    .channel-heading h3 {
+      margin: 0;
+      font: 800 18px/1 var(--condensed);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .channel-heading span {
+      color: var(--quiet);
+      font: 12px/1 var(--mono);
+    }
+    .channel-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 22px;
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .channel-summary strong { color: var(--ink); font-weight: 650; }
+    .channel-summary .fact-name {
+      margin-right: 5px;
+      color: var(--quiet);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .strip-wrap {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #454038;
+      border-radius: 12px;
+      background: #050505;
+    }
+    canvas.strip {
+      display: block;
+      width: 100%;
+      height: 62px;
+      touch-action: pan-y;
+      cursor: crosshair;
+    }
+    .diffusion-view canvas.strip { height: 80px; }
+    .channel-unavailable {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      padding: 12px;
+      color: var(--muted);
+      background: #050505;
+      text-align: center;
+      font-size: 13px;
+    }
+    .strip-wrap.unavailable .channel-unavailable { display: grid; }
+
+    .inspector {
+      margin-top: 8px;
+      padding: 22px 0 24px;
+      border-top: 1px solid var(--line);
+    }
+    .inspector-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .inspector-heading h3 {
+      margin: 0;
+      font: 800 18px/1 var(--condensed);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .led-input-label {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .led-input-label input {
+      width: 92px;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid #5c5549;
+      border-radius: 9px;
+      color: var(--ink);
+      background: #080808;
+      font: 14px/1 var(--mono);
+    }
+    .inspector-help {
+      margin: 8px 0 14px;
+      color: var(--quiet);
+      font-size: 12px;
+    }
+    .input-error {
+      margin: -5px 0 13px;
+      color: var(--danger);
+      font-size: 13px;
+    }
+    .inspector-values {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: var(--panel-deep);
+    }
+    .inspector-values caption {
+      padding: 0 0 8px;
+      color: var(--muted);
+      text-align: left;
+      font-size: 13px;
+    }
+    .inspector-values th, .inspector-values td {
+      padding: 11px 13px;
+      border: 1px solid var(--line-soft);
+      text-align: left;
+      vertical-align: top;
+    }
+    .inspector-values thead th {
+      color: var(--quiet);
+      font: 700 11px/1 var(--mono);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .inspector-values tbody th {
+      width: 118px;
+      font: 800 14px/1.4 var(--condensed);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .inspector-values output {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      color: var(--ink);
+      font: 13px/1.45 var(--mono);
+    }
+    .component { white-space: nowrap; }
+    .inspector-evidence {
+      margin: 10px 0 0;
+      color: var(--quiet);
+      font-size: 12px;
+    }
+
+    details.preview-details {
+      border-top: 1px solid var(--line);
+    }
+    details.preview-details summary {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+      list-style: none;
+    }
+    details.preview-details summary::-webkit-details-marker { display: none; }
+    details.preview-details summary::after { content: "+"; color: var(--gold); font: 18px/1 var(--mono); }
+    details.preview-details[open] summary::after { content: "−"; }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px 24px;
+      padding: 0 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .details-grid p { margin: 0; }
+    .details-grid strong { display: block; margin-bottom: 2px; color: var(--ink); }
+
+    .next-handoff {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: center;
+      padding: 20px 30px;
+      border-top: 1px solid var(--line);
+      background: var(--panel-raised);
+    }
+    .next-handoff span {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--gold);
+      font: 800 11px/1 var(--condensed);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+    .next-handoff strong { display: block; font-size: 13.5px; }
+    .next-handoff a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 14px;
+      border: 1px solid #725728;
+      border-radius: 10px;
+      color: var(--gold-soft);
+      background: #201a11;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .footer-note {
+      margin: 15px 2px 0;
+      color: var(--quiet);
+      font: 11px/1.5 var(--mono);
+    }
+
+    @media (max-width: 760px) {
+      .shell { width: min(calc(100% - 24px), 700px); padding-top: 18px; }
+      .proposal-bar { align-items: flex-start; flex-direction: column; gap: 7px; }
+      .mockup-stamp { max-width: none; text-align: left; }
+      .preview-main { padding: 18px 20px 0; }
+      .preview-header { grid-template-columns: minmax(0, 1fr) 224px; gap: 16px; }
+      .view-choice { min-width: 0; width: 224px; }
+      .purpose { font-size: 14px; }
+      .preview-boundary { margin-top: 10px; padding: 8px 12px; }
+      .comparison { margin-top: 10px; padding: 10px 0; }
+      .comparison-grid { gap: 14px; }
+      .comparison-fact { grid-template-columns: 58px minmax(0, 1fr); gap: 8px; }
+      .comparison-fact strong { font-size: 19px; }
+      .comparison-note { margin-top: -2px; font-size: 12px; }
+      .channel { padding: 10px 0 17px; }
+      canvas.strip { height: 58px; }
+      .diffusion-view canvas.strip { height: 74px; }
+      .next-handoff { padding: 18px 20px; }
+    }
+
+    @media (max-width: 540px) {
+      .shell { width: calc(100% - 18px); }
+      .preview-main { padding: 20px 14px 0; }
+      .proposal-bar h1 { font-size: 24px; }
+      .preview-header h2 { font-size: 23px; }
+      .preview-header { grid-template-columns: 1fr; gap: 16px; }
+      .view-choice { width: min(100%, 310px); }
+      .preview-boundary { grid-template-columns: 1fr; gap: 4px; padding: 12px; }
+      .boundary-label { white-space: normal; }
+      .comparison-grid { grid-template-columns: 1fr; gap: 10px; }
+      .comparison-fact { grid-template-columns: 62px minmax(0, 1fr); gap: 8px; }
+      .comparison-fact strong { font-size: 19px; }
+      .comparison-note { grid-column: 1 / -1; margin-left: 70px; }
+      .channel-heading { align-items: flex-start; flex-direction: column; gap: 5px; }
+      .channel-summary { display: grid; grid-template-columns: 1fr; gap: 5px; }
+      .inspector-heading { align-items: flex-start; flex-direction: column; }
+      .led-input-label { width: 100%; justify-content: space-between; }
+      .inspector-values, .inspector-values tbody, .inspector-values tr, .inspector-values th, .inspector-values td {
+        display: block;
+        width: 100%;
+      }
+      .inspector-values caption { display: block; width: 100%; }
+      .inspector-values thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+      .inspector-values tbody tr { padding: 11px 12px; border: 1px solid var(--line-soft); }
+      .inspector-values tbody tr + tr { border-top: 0; }
+      .inspector-values tbody th, .inspector-values tbody td { padding: 3px 0; border: 0; }
+      .inspector-values tbody th { margin-bottom: 4px; }
+      .inspector-values td::before {
+        content: attr(data-label);
+        display: block;
+        margin: 5px 0 2px;
+        color: var(--quiet);
+        font: 700 10px/1 var(--mono);
+        letter-spacing: .05em;
+        text-transform: uppercase;
+      }
+      .details-grid { grid-template-columns: 1fr; }
+      .next-handoff { grid-template-columns: 1fr; }
+      .next-handoff a { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behaviour: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="proposal-bar" id="mockupTop">
+      <div>
+        <p class="brandline">SpectraSynq K1 · Colour Lab</p>
+        <h1>Preview R1.1</h1>
+      </div>
+      <p class="mockup-stamp">Greenfield interaction mockup · no Web Serial · no device writes · production untouched</p>
+    </header>
+
+    <nav class="evidence-nav" aria-label="Mockup evidence states">
+      <span>Evidence state</span>
+      <a href="?state=inherit15" data-scenario-link="inherit15">Inherited look</a>
+      <a href="?state=same" data-scenario-link="same">Same basis</a>
+      <a href="?state=asymmetric" data-scenario-link="asymmetric">Asymmetric</a>
+      <a href="?state=inheritUnknown" data-scenario-link="inheritUnknown">Unknown inherit</a>
+      <a href="?state=slotUnknown" data-scenario-link="slotUnknown">Unknown slot · inherited</a>
+      <a href="?state=slotUnknownDirect" data-scenario-link="slotUnknownDirect">Unknown slot · direct</a>
+      <a href="?state=safety" data-scenario-link="safety">Safety failure</a>
+      <a href="?state=policy" data-scenario-link="policy">Policy failure</a>
+    </nav>
+
+    <section class="preview" id="previewPanel" aria-labelledby="previewTitle">
+      <div class="preview-main">
+        <header class="preview-header">
+          <div>
+            <p class="preview-kicker">Read-only comparison</p>
+            <h2 id="previewTitle">Preview</h2>
+            <p class="purpose">Compare Primary and Secondary before testing changes on K1.</p>
+          </div>
+          <fieldset class="view-choice">
+            <legend>View</legend>
+            <div class="view-options">
+              <input type="radio" name="previewView" id="viewLed" value="led" checked>
+              <label for="viewLed">LED values</label>
+              <input type="radio" name="previewView" id="viewDiffusion" value="diffusion">
+              <label for="viewDiffusion">Diffusion model</label>
+            </div>
+          </fieldset>
+        </header>
+
+        <p class="preview-boundary" id="previewBoundary">
+          <span class="boundary-label">Browser model</span>
+          <span>Not device readback, LUT readback or a physical colour match.</span>
+        </p>
+
+        <div class="gate-banner safety" id="safetyBanner" role="alert">
+          <strong>Device Safety gate failed · Preview unavailable</strong>
+          <span>The output state is unsafe or unknowable. Preview remains dark; recovery belongs outside this read-only surface.</span>
+        </div>
+        <div class="gate-banner" id="policyBanner" role="alert">
+          <strong>Non-product analysis · device, save and export locked</strong>
+          <span>Local bounded analysis remains visible. This state cannot be promoted to a SpectraSynq product output.</span>
+        </div>
+
+        <section class="comparison" aria-labelledby="comparisonTitle">
+          <h3 class="section-label" id="comparisonTitle">Channel comparison</h3>
+          <div class="comparison-grid">
+            <div class="comparison-fact">
+              <span>Output</span>
+              <strong id="outputComparison">LED values match</strong>
+              <p class="comparison-note" id="outputComparisonNote"></p>
+            </div>
+            <div class="comparison-fact">
+              <span>Basis</span>
+              <strong id="basisComparison">Preview basis differs</strong>
+              <p class="comparison-note" id="basisComparisonNote">Secondary inherits Primary look.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="channels">
+          <article class="channel" aria-labelledby="primaryHeading">
+            <div class="channel-heading">
+              <h3 id="primaryHeading">Primary</h3>
+              <span id="primaryGeometry">150 LEDs · centre 74/75</span>
+            </div>
+            <p class="channel-summary" id="primarySummary">
+              <span><span class="fact-name">Pattern</span><strong id="primaryPattern">Current settings</strong></span>
+              <span><span class="fact-name">Correction</span><strong id="primaryCorrection">Confirmed tune · browser model</strong></span>
+            </p>
+            <div class="strip-wrap" id="primaryStripWrap">
+              <canvas class="strip" id="primaryCanvas" width="1200" height="96" role="img" aria-label="Primary LED-values preview, 150 LEDs" aria-describedby="previewBoundary primarySummary selectedLedHelp"></canvas>
+              <span class="channel-unavailable" id="primaryUnavailable">Preview unavailable</span>
+            </div>
+          </article>
+
+          <article class="channel" aria-labelledby="secondaryHeading">
+            <div class="channel-heading">
+              <h3 id="secondaryHeading">Secondary</h3>
+              <span id="secondaryGeometry">150 LEDs · centre 74/75</span>
+            </div>
+            <p class="channel-summary" id="secondarySummary">
+              <span><span class="fact-name">Pattern</span><strong id="secondaryPattern">Current settings</strong></span>
+              <span><span class="fact-name">Correction</span><strong id="secondaryCorrection">Inherits Primary look · slot 15 browser model</strong></span>
+            </p>
+            <div class="strip-wrap" id="secondaryStripWrap">
+              <canvas class="strip" id="secondaryCanvas" width="1200" height="96" role="img" aria-label="Secondary LED-values preview, 150 LEDs" aria-describedby="previewBoundary secondarySummary selectedLedHelp"></canvas>
+              <span class="channel-unavailable" id="secondaryUnavailable">Preview unavailable</span>
+            </div>
+          </article>
+        </div>
+
+        <section class="inspector" aria-labelledby="inspectorTitle">
+          <div class="inspector-heading">
+            <h3 id="inspectorTitle">Inspect LED</h3>
+            <label class="led-input-label" for="selectedLedInput">
+              LED
+              <input id="selectedLedInput" name="selectedLed" type="number" min="0" max="149" step="1" inputmode="numeric" value="86" aria-describedby="selectedLedRange selectedLedHelp selectedLedError">
+            </label>
+          </div>
+          <p class="inspector-help" id="selectedLedRange">Available range: 0 to 149.</p>
+          <p class="inspector-help" id="selectedLedHelp">Point to or touch either preview, use the arrow keys, or enter an LED index.</p>
+          <p class="input-error" id="selectedLedError" role="alert" hidden></p>
+
+          <table class="inspector-values" aria-describedby="inspectorEvidence">
+            <caption id="inspectorCaption">Computed colour values at LED 86</caption>
+            <thead>
+              <tr><th scope="col">Channel</th><th scope="col">RGB16</th><th scope="col">RGB8</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Primary</th>
+                <td data-label="RGB16"><output id="primaryRgb16" for="selectedLedInput"></output></td>
+                <td data-label="RGB8"><output id="primaryRgb8" for="selectedLedInput"></output></td>
+              </tr>
+              <tr>
+                <th scope="row">Secondary</th>
+                <td data-label="RGB16"><output id="secondaryRgb16" for="selectedLedInput"></output></td>
+                <td data-label="RGB8"><output id="secondaryRgb8" for="selectedLedInput"></output></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="inspector-evidence" id="inspectorEvidence">Values come from the exact cached frames drawn above. Diffusion view does not change these values.</p>
+          <p class="sr-only" id="inspectorAnnouncement" aria-live="polite" aria-atomic="true"></p>
+        </section>
+
+        <details class="preview-details">
+          <summary>Preview details</summary>
+          <div class="details-grid">
+            <p><strong>Frame authority</strong>Primary and Secondary are resolved independently. Neither row borrows the other channel’s pixels or inspector values.</p>
+            <p><strong>Inheritance</strong><span id="inheritDetail">Secondary reports inherit and resolves Primary’s effective look inside its own frame.</span></p>
+            <p><strong>Output comparison</strong>Exact cached RGB16 triplets and LED counts. Canvas appearance is never compared.</p>
+            <p><strong>Basis comparison</strong>Pattern, correction, pre/post selection, look relationship, session knowledge, tune and render scale.</p>
+          </div>
+        </details>
+      </div>
+
+      <footer class="next-handoff">
+        <div>
+          <span>Next</span>
+          <strong id="nextState">Tune draft has not been applied.</strong>
+        </div>
+        <a id="nextLink" href="#mockupTop" title="Mockup handoff only; no device action">Review Tune <span aria-hidden="true">→</span></a>
+      </footer>
+    </section>
+
+    <p class="footer-note">R1.1 evidence surface. Warm centre-out colour family only. The mockup contains no transport, persistence or export boundary.</p>
+  </main>
+
+  <script id="previewModel">
+  (function (root, factory) {
+    var api = factory();
+    if (typeof module === "object" && module.exports) module.exports = api;
+    else root.PreviewR11 = api;
+  }(typeof globalThis !== "undefined" ? globalThis : this, function () {
+    "use strict";
+
+    var USER_SLOT = 15;
+    var BASIS_REASON_ORDER = [
+      "source_provenance", "source_pattern", "source_targeting",
+      "correction_provenance", "preview_selection", "look_relationship",
+      "effective_look", "slot15_knowledge", "applied_tune", "render_scale"
+    ];
+
+    function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
+    function clone(value) { return JSON.parse(JSON.stringify(value)); }
+    function sameJson(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+
+    function resolveLook(state, channel) {
+      var reported = channel === "secondary" ? state.secondaryLook : state.primaryLook;
+      if (channel === "secondary" && reported === "inherit") {
+        var inherited = resolveLook(state, "primary");
+        return {
+          relation: "inherit",
+          reported: "inherit",
+          effectiveKnown: inherited.effectiveKnown,
+          effectiveSlot: inherited.effectiveKnown ? inherited.effectiveSlot : null,
+          inheritedFrom: "primary"
+        };
+      }
+      if (reported === "unknown" || reported == null) {
+        return {
+          relation: "unknown", reported: "unknown", effectiveKnown: false,
+          effectiveSlot: null, inheritedFrom: null
+        };
+      }
+      return {
+        relation: "direct", reported: reported, effectiveKnown: true,
+        effectiveSlot: reported, inheritedFrom: null
+      };
+    }
+
+    function framingFor(state, lookResolution) {
+      if (!state.slot15Known || !lookResolution.effectiveKnown) {
+        return { kind: "pre_lut", selection: "pre", applyTune: false };
+      }
+      if (lookResolution.effectiveSlot === USER_SLOT) {
+        return { kind: "device_effective", selection: "post", applyTune: true };
+      }
+      return { kind: "simulate_session", selection: "post", applyTune: true };
+    }
+
+    function hslToRgb(h, s, l) {
+      h = ((h % 360) + 360) % 360;
+      var c = (1 - Math.abs(2 * l - 1)) * s;
+      var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      var m = l - c / 2;
+      var q = Math.floor(h / 60), rgb;
+      if (q === 0) rgb = [c, x, 0];
+      else if (q === 1) rgb = [x, c, 0];
+      else if (q === 2) rgb = [0, c, x];
+      else if (q === 3) rgb = [0, x, c];
+      else if (q === 4) rgb = [x, 0, c];
+      else rgb = [c, 0, x];
+      return rgb.map(function (v) { return clamp(v + m, 0, 1); });
+    }
+
+    function sourcePixel(index, n) {
+      var centreLeft = Math.floor((n - 1) / 2);
+      var centreRight = Math.ceil((n - 1) / 2);
+      var distance = index < centreLeft ? centreLeft - index : index > centreRight ? index - centreRight : 0;
+      var maximum = Math.max(centreLeft, n - 1 - centreRight, 1);
+      var outward = clamp(distance / maximum, 0, 1);
+      var hue = 42 - outward * 13;
+      var saturation = 0.91 - outward * 0.18;
+      var lightness = 0.62 - outward * 0.43;
+      return hslToRgb(hue, saturation, lightness).map(function (v) { return Math.round(v * 65535); });
+    }
+
+    function applyTune(rgb, tune) {
+      var gains = [tune.gain_r, tune.gain_g, tune.gain_b];
+      return rgb.map(function (value, index) {
+        var normal = clamp(value / 65535, 0, 1);
+        return Math.round(clamp(Math.pow(normal, 1 / tune.gamma) * gains[index], 0, 1) * 65535);
+      });
+    }
+
+    function correctionText(frame) {
+      var look = frame.lookResolution;
+      if (!look.effectiveKnown) {
+        return look.relation === "inherit"
+          ? "Inherits Primary look · Primary look unknown"
+          : "Before correction · device correction unknown";
+      }
+      if (frame.slot15Knowledge !== "known-this-session") {
+        var absentKnowledge = look.effectiveSlot === USER_SLOT
+          ? "slot-15 contents unknown"
+          : "correction knowledge unavailable";
+        return look.relation === "inherit"
+          ? "Inherits Primary look · " + absentKnowledge
+          : "Before correction · " + absentKnowledge;
+      }
+      if (frame.framingKind === "device_effective") {
+        return look.relation === "inherit"
+          ? "Inherits Primary look · slot 15 browser model"
+          : "Confirmed tune · browser model";
+      }
+      return look.relation === "inherit"
+        ? "Inherits Primary look · active look " + look.effectiveSlot + " not modelled"
+        : "Known tune simulation · active look " + look.effectiveSlot + " not modelled";
+    }
+
+    function stageFrame(input) {
+      var state = input.state;
+      var channel = input.channel === "secondary" ? "secondary" : "primary";
+      var n = channel === "secondary" ? state.secondaryN : state.primaryN;
+      var targeted = state.target === "both" || state.target === channel;
+      var lookResolution = resolveLook(state, channel);
+      var framing = framingFor(state, lookResolution);
+      var tune = clone(state.tune);
+      var pixels = targeted ? [] : null;
+      if (targeted) {
+        for (var i = 0; i < n; i++) {
+          var rgb = sourcePixel(i, n);
+          if (framing.applyTune) rgb = applyTune(rgb, tune);
+          pixels.push(rgb[0], rgb[1], rgb[2]);
+        }
+      }
+      return {
+        channel: channel,
+        n: n,
+        pixels: pixels,
+        source: { kind: state.sourceKind, pattern: state.pattern, applied: targeted },
+        transform: { kind: framing.kind },
+        framingKind: framing.kind,
+        selection: framing.selection,
+        simulation: framing.kind === "simulate_session",
+        tune: framing.selection === "post" ? tune : null,
+        lookResolution: lookResolution,
+        slot15Knowledge: state.slot15Known ? "known-this-session" : "unknown",
+        renderContext: { bothScaleApplied: false, bothScale: 1.0 },
+        patternText: targeted ? "Current settings" : "Not targeted",
+        correctionText: targeted ? null : "Not evaluated"
+      };
+    }
+
+    function compareOutput(primary, secondary) {
+      if (!primary || !secondary || !primary.pixels || !secondary.pixels) {
+        return {
+          status: "unavailable", primaryLedCount: primary ? primary.n : null,
+          secondaryLedCount: secondary ? secondary.n : null,
+          sharedLedCount: 0, differingLedCount: 0, unmatchedLedCount: 0,
+          firstDifferingLed: null, reasons: ["frame_unavailable"]
+        };
+      }
+      var shared = Math.min(primary.n, secondary.n);
+      var differing = 0;
+      var first = null;
+      for (var led = 0; led < shared; led++) {
+        var offset = led * 3;
+        if (primary.pixels[offset] !== secondary.pixels[offset] ||
+            primary.pixels[offset + 1] !== secondary.pixels[offset + 1] ||
+            primary.pixels[offset + 2] !== secondary.pixels[offset + 2]) {
+          differing++;
+          if (first == null) first = led;
+        }
+      }
+      var unmatched = Math.abs(primary.n - secondary.n);
+      var reasons = [];
+      if (unmatched) reasons.push("led_count");
+      if (differing) reasons.push("pixel_values");
+      return {
+        status: reasons.length ? "differ" : "match",
+        primaryLedCount: primary.n,
+        secondaryLedCount: secondary.n,
+        sharedLedCount: shared,
+        differingLedCount: differing,
+        unmatchedLedCount: unmatched,
+        firstDifferingLed: first,
+        reasons: reasons
+      };
+    }
+
+    function basisReasons(primary, secondary) {
+      var checks = {
+        source_provenance: primary.source.kind !== secondary.source.kind,
+        source_pattern: primary.source.pattern !== secondary.source.pattern,
+        source_targeting: primary.source.applied !== secondary.source.applied,
+        correction_provenance: primary.transform.kind !== secondary.transform.kind,
+        preview_selection: primary.selection !== secondary.selection || primary.simulation !== secondary.simulation,
+        look_relationship: primary.lookResolution.relation !== secondary.lookResolution.relation,
+        effective_look: primary.lookResolution.effectiveKnown !== secondary.lookResolution.effectiveKnown ||
+          primary.lookResolution.effectiveSlot !== secondary.lookResolution.effectiveSlot,
+        slot15_knowledge: primary.slot15Knowledge !== secondary.slot15Knowledge,
+        applied_tune: !sameJson(primary.tune, secondary.tune),
+        render_scale: !sameJson(primary.renderContext, secondary.renderContext)
+      };
+      return BASIS_REASON_ORDER.filter(function (reason) { return checks[reason]; });
+    }
+
+    function compareStageFrames(primary, secondary) {
+      var output = compareOutput(primary, secondary);
+      if (!primary || !secondary) {
+        return { output: output, basis: { status: "unavailable", reasons: ["frame_unavailable"] } };
+      }
+      var reasons = basisReasons(primary, secondary);
+      return { output: output, basis: { status: reasons.length ? "differ" : "match", reasons: reasons } };
+    }
+
+    function baseState() {
+      return {
+        primaryLook: USER_SLOT,
+        secondaryLook: "inherit",
+        slot15Known: true,
+        primaryN: 150,
+        secondaryN: 150,
+        target: "both",
+        sourceKind: "current_settings",
+        pattern: "k1_gold_centre_out",
+        tune: { gain_r: 1.0, gain_g: 0.93, gain_b: 0.82, gamma: 1.12 },
+        safetyBlocked: false,
+        policyBlocked: false,
+        nextState: "Tune draft has not been applied.",
+        nextLabel: "Review Tune",
+        nextHref: "../../index.html#tuneTitle"
+      };
+    }
+
+    function scenario(name) {
+      var state = baseState();
+      var scenarioName = name || "inherit15";
+      if (scenarioName === "same") state.secondaryLook = USER_SLOT;
+      else if (scenarioName === "asymmetric") state.secondaryLook = "unknown";
+      else if (scenarioName === "inherit0") state.primaryLook = 0;
+      else if (scenarioName === "inheritUnknown") {
+        state.primaryLook = "unknown";
+        state.nextState = "Primary look is unknown; device truth needs review.";
+        state.nextLabel = "Return to Device";
+        state.nextHref = "../../index.html#deviceTitle";
+      }
+      else if (scenarioName === "slotUnknown" || scenarioName === "slotUnknownDirect") {
+        state.slot15Known = false;
+        if (scenarioName === "slotUnknownDirect") state.secondaryLook = USER_SLOT;
+        state.nextState = "Slot-15 contents are unknown; device truth needs review.";
+        state.nextLabel = "Return to Device";
+        state.nextHref = "../../index.html#deviceTitle";
+      }
+      else if (scenarioName === "geometry") state.secondaryN = 140;
+      else if (scenarioName === "outputDiffer") { /* exact-frame comparator fixture */ }
+      else if (scenarioName === "safety") {
+        state.safetyBlocked = true;
+        state.nextState = "Device truth must be re-established before Preview.";
+        state.nextLabel = "Return to Device";
+        state.nextHref = "../../index.html#deviceTitle";
+      }
+      else if (scenarioName === "policy") {
+        state.policyBlocked = true;
+        state.nextState = "Product colour policy blocks this source.";
+        state.nextLabel = "Review Source";
+        state.nextHref = "../../index.html#sourceTitle";
+      }
+      else if (scenarioName !== "inherit15") scenarioName = "inherit15";
+
+      var primary = state.safetyBlocked ? null : stageFrame({ state: state, channel: "primary" });
+      var secondary = state.safetyBlocked ? null : stageFrame({ state: state, channel: "secondary" });
+      if (scenarioName === "outputDiffer" && secondary && secondary.pixels) {
+        secondary.pixels[9] = clamp(secondary.pixels[9] + 257, 0, 65535);
+      }
+      if (primary) primary.correctionText = correctionText(primary);
+      if (secondary) secondary.correctionText = correctionText(secondary);
+      return {
+        name: scenarioName,
+        state: state,
+        primary: primary,
+        secondary: secondary,
+        comparison: compareStageFrames(primary, secondary)
+      };
+    }
+
+    function inspectFrame(frame, selectedLed) {
+      if (!frame || !frame.pixels) return { kind: "unavailable" };
+      if (selectedLed >= frame.n) return { kind: "not_present", n: frame.n };
+      var offset = selectedLed * 3;
+      var rgb16 = frame.pixels.slice(offset, offset + 3);
+      return { kind: "value", rgb16: rgb16, rgb8: rgb16.map(function (value) { return value >> 8; }) };
+    }
+
+    function dispatch(request) {
+      if (request.op === "scenario") return scenario(request.name);
+      if (request.op === "resolveLook") return resolveLook(request.state, request.channel);
+      if (request.op === "compare") return compareStageFrames(request.primary, request.secondary);
+      if (request.op === "inspect") return inspectFrame(request.frame, request.selectedLed);
+      throw new Error("Unknown Preview R1.1 operation: " + request.op);
+    }
+
+    return {
+      USER_SLOT: USER_SLOT,
+      resolveLook: resolveLook,
+      stageFrame: stageFrame,
+      compareStageFrames: compareStageFrames,
+      inspectFrame: inspectFrame,
+      scenario: scenario,
+      dispatch: dispatch
+    };
+  }));
+  </script>
+
+  <script>
+  (function () {
+    "use strict";
+    var Model = globalThis.PreviewR11;
+    var params = new URLSearchParams(location.search);
+    var requestedState = params.get("state") || "inherit15";
+    var data = Model.scenario(requestedState);
+    var stageFrames = { primary: data.primary, secondary: data.secondary };
+    var selectedLed = 86;
+    var currentView = params.get("view") === "diffusion" ? "diffusion" : "led";
+    var pointerActive = false;
+    var $ = function (id) { return document.getElementById(id); };
+
+    function outputText(output, primary, secondary) {
+      if (output.status === "unavailable") return { title: "Output comparison unavailable", note: "Preview frames are not available." };
+      if (output.unmatchedLedCount) {
+        return { title: "LED geometry differs", note: output.primaryLedCount + " Primary · " + output.secondaryLedCount + " Secondary" };
+      }
+      var activeLookUnknown = primary && secondary &&
+        (!primary.lookResolution.effectiveKnown || !secondary.lookResolution.effectiveKnown);
+      var slotContentsUnknown = primary && secondary &&
+        (primary.slot15Knowledge === "unknown" || secondary.slot15Knowledge === "unknown");
+      var correctionUnknown = activeLookUnknown || slotContentsUnknown;
+      if (output.status === "match" && correctionUnknown) {
+        return {
+          title: "Pre-correction references match",
+          note: activeLookUnknown
+            ? "Correction output is not claimed until the active look is known."
+            : "Correction output is not claimed until slot-15 contents are known."
+        };
+      }
+      if (output.status === "match") return { title: "LED values match", note: "All " + output.sharedLedCount + " cached LED values are equal." };
+      return { title: "LED values differ at " + output.differingLedCount + " LEDs", note: "First difference at LED " + output.firstDifferingLed + "." };
+    }
+
+    function basisText(basis, secondary) {
+      if (basis.status === "unavailable") return { title: "Preview basis unavailable", note: "Frame authority is not established." };
+      if (basis.status === "match") return { title: "Preview basis matches", note: "Pattern, correction and look relationship match." };
+      var inheritsUnknown = secondary && secondary.lookResolution.relation === "inherit" &&
+        !secondary.lookResolution.effectiveKnown;
+      var labels = {
+        source_provenance: "Source provenance differs.",
+        source_pattern: "Pattern differs.",
+        source_targeting: "Targeting differs.",
+        correction_provenance: "Correction evidence differs.",
+        preview_selection: "Pre/post selection differs.",
+        look_relationship: inheritsUnknown
+          ? "Secondary inherits an unknown Primary look."
+          : "Secondary inherits Primary look.",
+        effective_look: "Effective looks differ.",
+        slot15_knowledge: "Slot-15 knowledge differs.",
+        applied_tune: "Applied tune differs.",
+        render_scale: "Render scale differs."
+      };
+      return { title: "Preview basis differs", note: basis.reasons.map(function (reason) { return labels[reason]; }).join(" ") };
+    }
+
+    function formatTriplet(values) {
+      return '<span class="component">R ' + values[0] + '</span>' +
+        '<span class="component">G ' + values[1] + '</span>' +
+        '<span class="component">B ' + values[2] + '</span>';
+    }
+
+    function setOutput(which, reading) {
+      var rgb16 = $(which + "Rgb16");
+      var rgb8 = $(which + "Rgb8");
+      if (data.state.safetyBlocked) {
+        rgb16.textContent = "Unavailable — Device Safety gate failed";
+        rgb8.textContent = "No cached value shown";
+      } else if (reading.kind === "not_present") {
+        rgb16.textContent = "Not present — " + reading.n + " LEDs";
+        rgb8.textContent = "Not present";
+      } else if (reading.kind !== "value") {
+        rgb16.textContent = "Unavailable — preview frame not established";
+        rgb8.textContent = "Unavailable";
+      } else {
+        rgb16.innerHTML = formatTriplet(reading.rgb16);
+        rgb8.innerHTML = formatTriplet(reading.rgb8);
+      }
+    }
+
+    function announceSelection() {
+      var primary = Model.inspectFrame(stageFrames.primary, selectedLed);
+      var secondary = Model.inspectFrame(stageFrames.secondary, selectedLed);
+      function phrase(which, reading) {
+        return reading.kind === "value"
+          ? which + " RGB8 " + reading.rgb8.join(", ") + "."
+          : which + " " + (reading.kind === "not_present" ? "not present." : "unavailable.");
+      }
+      $("inspectorAnnouncement").textContent = "LED " + selectedLed + ". " + phrase("Primary", primary) + " " + phrase("Secondary", secondary);
+    }
+
+    function renderInspector() {
+      $("selectedLedInput").value = String(selectedLed);
+      $("inspectorCaption").textContent = "Computed colour values at LED " + selectedLed;
+      setOutput("primary", Model.inspectFrame(stageFrames.primary, selectedLed));
+      setOutput("secondary", Model.inspectFrame(stageFrames.secondary, selectedLed));
+    }
+
+    function clearInputError() {
+      $("selectedLedInput").removeAttribute("aria-invalid");
+      $("selectedLedError").hidden = true;
+      $("selectedLedError").textContent = "";
+    }
+
+    function setSelectedLed(candidate, inputKind, announce) {
+      var maximum = Math.max(stageFrames.primary ? stageFrames.primary.n : 0, stageFrames.secondary ? stageFrames.secondary.n : 0) - 1;
+      var value = Number(candidate);
+      if (!Number.isFinite(value) || !Number.isInteger(value) || value < 0 || value > maximum) {
+        if (inputKind === "number") {
+          $("selectedLedInput").setAttribute("aria-invalid", "true");
+          $("selectedLedError").textContent = "Enter a whole LED index from 0 to " + maximum + ".";
+          $("selectedLedError").hidden = false;
+        }
+        return false;
+      }
+      clearInputError();
+      selectedLed = value;
+      renderAllCanvases();
+      renderInspector();
+      if (announce) announceSelection();
+      globalThis.__previewR11.selectedLed = selectedLed;
+      return true;
+    }
+
+    function drawStrip(canvas, frame) {
+      var ctx = canvas.getContext("2d");
+      var width = canvas.width;
+      var height = canvas.height;
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = "#050505";
+      ctx.fillRect(0, 0, width, height);
+      if (!frame || !frame.pixels || data.state.safetyBlocked) return;
+      var pitch = width / frame.n;
+      var row = [];
+      for (var led = 0; led < frame.n; led++) {
+        var offset = led * 3;
+        row.push([frame.pixels[offset] >> 8, frame.pixels[offset + 1] >> 8, frame.pixels[offset + 2] >> 8]);
+      }
+      if (currentView === "diffusion") {
+        row = row.map(function (_, index) {
+          var sum = [0, 0, 0], weightSum = 0;
+          for (var delta = -6; delta <= 6; delta++) {
+            var sample = clamp(index + delta, 0, frame.n - 1);
+            var weight = Math.exp(-(delta * delta) / 12);
+            weightSum += weight;
+            for (var component = 0; component < 3; component++) sum[component] += row[sample][component] * weight;
+          }
+          return sum.map(function (value) { return Math.round(value / weightSum); });
+        });
+      }
+      row.forEach(function (rgb, index) {
+        if (currentView === "diffusion") {
+          var gradient = ctx.createLinearGradient(0, 0, 0, height);
+          gradient.addColorStop(0, "rgba(" + rgb.join(",") + ",.12)");
+          gradient.addColorStop(.5, "rgba(" + rgb.join(",") + ",1)");
+          gradient.addColorStop(1, "rgba(" + rgb.join(",") + ",.12)");
+          ctx.fillStyle = gradient;
+        } else ctx.fillStyle = "rgb(" + rgb.join(",") + ")";
+        ctx.fillRect(Math.floor(index * pitch), 0, Math.ceil(pitch + 1), height);
+      });
+      if (selectedLed < frame.n) {
+        var markerX = Math.round((selectedLed + .5) / frame.n * width);
+        ctx.fillStyle = "rgba(0,0,0,.9)";
+        ctx.fillRect(markerX - 2, 0, 5, height);
+        ctx.fillStyle = "rgba(255,255,255,.96)";
+        ctx.fillRect(markerX, 0, 1, height);
+      }
+    }
+
+    function clamp(value, low, high) { return Math.max(low, Math.min(high, value)); }
+
+    function renderAllCanvases() {
+      drawStrip($("primaryCanvas"), stageFrames.primary);
+      drawStrip($("secondaryCanvas"), stageFrames.secondary);
+    }
+
+    function setChannel(which, frame) {
+      var unavailable = !frame || !frame.pixels || data.state.safetyBlocked;
+      $(which + "StripWrap").classList.toggle("unavailable", unavailable);
+      $(which + "Unavailable").textContent = data.state.safetyBlocked
+        ? "Preview unavailable — Device Safety gate failed"
+        : "Preview frame not established";
+      if (!frame) {
+        $(which + "Pattern").textContent = "Unavailable";
+        $(which + "Correction").textContent = "Not evaluated";
+        return;
+      }
+      $(which + "Geometry").textContent = frame.n + " LEDs · centre " + (Math.floor((frame.n - 1) / 2)) + "/" + (Math.ceil((frame.n - 1) / 2));
+      $(which + "Pattern").textContent = frame.patternText;
+      $(which + "Correction").textContent = frame.correctionText;
+      $(which + "Canvas").setAttribute("aria-label", (which === "primary" ? "Primary" : "Secondary") + " " + (currentView === "diffusion" ? "diffusion-model" : "LED-values") + " preview, " + frame.n + " LEDs");
+    }
+
+    function renderTruth() {
+      var output = outputText(data.comparison.output, stageFrames.primary, stageFrames.secondary);
+      var basis = basisText(data.comparison.basis, stageFrames.secondary);
+      $("outputComparison").textContent = output.title;
+      $("outputComparisonNote").textContent = output.note;
+      $("basisComparison").textContent = basis.title;
+      $("basisComparisonNote").textContent = basis.note;
+      $("safetyBanner").classList.toggle("visible", data.state.safetyBlocked);
+      $("policyBanner").classList.toggle("visible", data.state.policyBlocked);
+      $("previewPanel").classList.toggle("diffusion-view", currentView === "diffusion");
+      setChannel("primary", stageFrames.primary);
+      setChannel("secondary", stageFrames.secondary);
+      var secondaryLook = stageFrames.secondary && stageFrames.secondary.lookResolution;
+      $("inheritDetail").textContent = secondaryLook && secondaryLook.relation === "inherit"
+        ? "Secondary reports inherit and resolves " + (secondaryLook.effectiveKnown ? "effective look " + secondaryLook.effectiveSlot : "an unknown Primary look") + " inside its own frame."
+        : "Secondary reports its own look directly; its frame remains independent.";
+      $("nextState").textContent = data.state.nextState;
+      $("nextLink").innerHTML = data.state.nextLabel + ' <span aria-hidden="true">→</span>';
+      $("nextLink").href = data.state.nextHref;
+      $("selectedLedInput").disabled = data.state.safetyBlocked;
+      var maximum = Math.max(stageFrames.primary ? stageFrames.primary.n : 0, stageFrames.secondary ? stageFrames.secondary.n : 0) - 1;
+      $("selectedLedInput").max = String(Math.max(maximum, 0));
+      $("selectedLedRange").textContent = data.state.safetyBlocked ? "LED inspection unavailable until device truth is re-established." : "Available range: 0 to " + maximum + ".";
+    }
+
+    function bindStrip(which) {
+      var canvas = $(which + "Canvas");
+      function indexFromEvent(event) {
+        var frame = stageFrames[which];
+        if (!frame || !frame.pixels) return null;
+        var rect = canvas.getBoundingClientRect();
+        return clamp(Math.floor((event.clientX - rect.left) / rect.width * frame.n), 0, frame.n - 1);
+      }
+      canvas.addEventListener("pointermove", function (event) {
+        if (event.pointerType !== "mouse" && !pointerActive) return;
+        var index = indexFromEvent(event);
+        if (index != null) setSelectedLed(index, "pointer", false);
+      });
+      canvas.addEventListener("pointerdown", function (event) {
+        pointerActive = true;
+        canvas.setPointerCapture(event.pointerId);
+        var index = indexFromEvent(event);
+        if (index != null) setSelectedLed(index, "pointer", false);
+      });
+      function release(event) {
+        if (!pointerActive) return;
+        pointerActive = false;
+        if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+        announceSelection();
+      }
+      canvas.addEventListener("pointerup", release);
+      canvas.addEventListener("pointercancel", release);
+    }
+
+    document.querySelectorAll('[data-scenario-link]').forEach(function (link) {
+      if (link.dataset.scenarioLink === data.name) link.setAttribute("aria-current", "page");
+    });
+    $(currentView === "diffusion" ? "viewDiffusion" : "viewLed").checked = true;
+    document.querySelectorAll('input[name="previewView"]').forEach(function (input) {
+      input.addEventListener("change", function () {
+        currentView = input.value;
+        renderTruth();
+        renderAllCanvases();
+        globalThis.__previewR11.view = currentView;
+      });
+    });
+    $("selectedLedInput").addEventListener("input", function () {
+      setSelectedLed(this.value, "number", true);
+    });
+    $("selectedLedInput").addEventListener("keydown", function (event) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      setSelectedLed(selectedLed + (event.key === "ArrowRight" ? 1 : -1), "number", true);
+    });
+    $("selectedLedInput").addEventListener("change", function () {
+      setSelectedLed(this.value, "number", true);
+    });
+    bindStrip("primary");
+    bindStrip("secondary");
+
+    globalThis.__previewR11 = {
+      scenario: data.name,
+      state: data.state,
+      stageFrames: stageFrames,
+      comparison: data.comparison,
+      selectedLed: selectedLed,
+      view: currentView,
+      setSelectedLed: setSelectedLed
+    };
+    renderTruth();
+    renderAllCanvases();
+    renderInspector();
+  }());
+  </script>
+</body>
+</html>

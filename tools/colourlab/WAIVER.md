@@ -2,6 +2,10 @@
 
 Issued by Captain 2026-08-27. Named string is load-bearing.
 
+> Historical pre-cutover authority. The greenfield production Workbench now has
+> its own T0 PASS in `OPTICAL_GATE_RECEIPT.md`; this waiver is retained only to
+> preserve the decision trail.
+
 ```text
 CAPTAIN_WAIVER_UI_PRECODE_OPTICAL_GATE
 named: COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1

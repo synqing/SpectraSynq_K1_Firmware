@@ -1,15 +1,62 @@
 {
-  "surface_id": "k1.colourlab.web",
-  "still_png": "/Users/spectrasynq/SpectraSynq_K1_Firmware/tools/colourlab/screenshots/look-ready-main.png",
-  "still_sha256": "a2f4da99122d7d5774a8ee0e3a7d180665f6bead9d1b4672f135ecd740269ba8",
+  "surface_id": "colourlab.preview.production.r1.1",
+  "tier": "T0",
+  "verdict": "PASS_PRODUCTION_PREVIEW_CUTOVER",
   "source_paths_sha256": {
-    "tools/colourlab/index.html": "c042a1b12e69db74278168f214eed02cc3847b9ae780b22add68d79203f2c40d",
-    "tools/colourlab/colourlab-core.js": "ea8c6f60e53379ef33a16c91ee3a2006769eb3ff7f719f155a42551310a53a29"
+    "tools/colourlab/index.html": "ce023f219b54bb1b7c7b3d6c0e26f69afaf716df131f5df0b1e806167aa0b43e",
+    "tools/colourlab/workbench.html": "ce023f219b54bb1b7c7b3d6c0e26f69afaf716df131f5df0b1e806167aa0b43e",
+    "tools/colourlab/colourlab-workbench.js": "78e6e31cc7ceb2a961563875ce093c2b5d0d094fede340659ea2d1cc0f59af54",
+    "tools/colourlab/colourlab-core.js": "5314b24a9ae2eef1e2f3c62619d7b7a27e9ee7080012cf29654272c1bf0670c2",
+    "tools/colourlab/verify_workbench.py": "b14517da2f1d5c2a8961151f95be9e4a10970cbcbb84295a17bf89a91fcca2c3"
   },
-  "roles": [],
-  "ladder_sorted_optical_desc": [],
-  "p0_inversions": [],
-  "notes": "T0 optical pack not produced. Unlock is COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1 (reuse webflash void/gold only). No invented ink_height_px. Verdict is WAIVED, not PASS.",
-  "waiver": "COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1",
-  "verdict": "WAIVED"
+  "geometry": {
+    "desktop_1600": {
+      "client_width": 1600,
+      "scroll_width": 1600,
+      "primary_strip_height": 62
+    },
+    "narrow_740": {
+      "client_width": 740,
+      "scroll_width": 740,
+      "primary_strip_offset": 313.31,
+      "primary_strip_height": 58,
+      "secondary_strip_bottom": 508.03,
+      "inspector_caption_width": 686
+    },
+    "narrow_390": {
+      "client_width": 390,
+      "scroll_width": 390,
+      "primary_strip_height": 58,
+      "inspector_caption_width": 336
+    },
+    "zoom_200pc_equivalent_800": {
+      "client_width": 800,
+      "scroll_width": 800,
+      "primary_strip_height": 62
+    }
+  },
+  "truth_cases": {
+    "p15_sinherit_slot_known": "post_post_inherit_visible",
+    "p0_sinherit_slot_known": "post_post_non15_simulation_visible",
+    "punknown_sinherit": "pre_pre_primary_unknown_visible",
+    "p15_sinherit_slot_unknown": "pre_pre_no_tune_claim",
+    "p15_s15_slot_unknown": "pre_pre_no_tune_claim",
+    "byte_identical_different_basis": "separate_output_and_basis_results",
+    "different_channel_counts": "absent_index_returns_not_present",
+    "source_tune_numbered_steps": "absent"
+  },
+  "browser_gate": {
+    "colourlab_tests_passed": 90,
+    "browser_failures": 0,
+    "fresh_stills": 13,
+    "source_hue_sector_counts": {
+      "neutral": 0,
+      "solid": 1,
+      "bounded": 2,
+      "card": 3,
+      "isolated_rgb": 3,
+      "single_hue_sv": 1
+    }
+  },
+  "p0_inversions": []
 }

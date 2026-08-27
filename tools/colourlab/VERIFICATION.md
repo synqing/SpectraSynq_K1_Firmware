@@ -1,17 +1,17 @@
 # Colour Lab — what was actually run
 
-Date: 2026-08-27  
-Branch: `feat/k1-usb-audio-input`  
-Contract: `tools/colourlab/README.md`  
-Look unlock: **`COLOUR_LAB_WEB_UI_T0_LOOK_WAIVER_V1`** (not optical PASS)
+Date: 2026-08-28
+Branch: `lane/colourlab-bench`
+Contract: `tools/colourlab/README.md`
+Optical authority: **PASS — PRODUCTION PREVIEW R1.1 CUTOVER**
 
 ## Stamps (do not collapse these)
 
 | Stamp | Meaning | Status |
 |-------|---------|--------|
-| Host Colour Lab pytest | Colour Lab tests execute shipped `colourlab-core.js` | **PASS** (re-run after Disconnect/persist classifiers) |
-| Browser / a11y look verify | Chromium, keyboard, 740 px, 200% zoom, 0 console errors | **PASS** (demo store only) |
-| **`DEVICE_IDENTITY_VERIFIED`** | Both expected devices connected and profiled correctly | **NOT RUN** — no USB serial ports present |
+| Host Colour Lab pytest | Colour Lab tests execute the shipped JS authorities | **PASS — 90 tests** |
+| Browser / a11y verify | Chromium, keyboard, 740/390 px, 200% reflow, 13 states | **PASS — zero failures** |
+| **`DEVICE_IDENTITY_VERIFIED`** | Both expected devices connected and profiled correctly | **NOT RUN in this branch-freeze receipt** |
 | **`COLOUR_LAB_WEB_UI_HARDWARE_PASS`** | The load-bearing real-device programme passed on both units | **NOT RUN** — this, not identity alone, closes the lane |
 
 Connecting to `9087A500` and `B489A500` and writing those strings here
@@ -20,46 +20,40 @@ the implementation lane.
 
 ## Already true (host)
 
-- `colourlab-core.js` is the functional oracle. Look work did not rewrite
-  it. A later safety edit added `classifyDisconnectShutdown` and
-  `classifyPersistLeaveState` (SHA
-  `ea8c6f60e53379ef33a16c91ee3a2006769eb3ff7f719f155a42551310a53a29`).
-- `index.html` is the same IDs and script, with the webflash void/gold
-  layer applied under the named waiver. Disconnect now waits for a
-  this-turn `paint=off` before closing the port.
-- Host pytest `tests/test_colourlab_*.py`: **34 passed**.
+- `colourlab-core.js` owns protocol, effective-look resolution, Preview
+  framing/comparison/inspection and safety classifiers (SHA
+  `5314b24a9ae2eef1e2f3c62619d7b7a27e9ee7080012cf29654272c1bf0670c2`).
+- `index.html` and `workbench.html` are byte-identical production entries
+  (SHA `ce023f219b54bb1b7c7b3d6c0e26f69afaf716df131f5df0b1e806167aa0b43e`).
+- Host pytest `tests/test_colourlab_*.py`: **90 passed**.
 - No firmware and no `platformio.ini` edits.
 
 ## Browser (ran)
 
-Local `python3 tools/colourlab/verify_browser.py` (Chromium, headless):
+Local `python3 tools/colourlab/verify_workbench.py` (Chromium, headless):
 
 | URL | What I checked |
 |-----|----------------|
-| `/index.html` | Disconnected; Connect enabled; Stop Output visible; Set Identity |
-| `?demo=unsupported` | Connection `unsupported`; paint/tune disabled |
-| `?demo=main` | Ready · `9087A500` · 160/160 · Both-scale shown · Tune shown · **Set Identity** · slot-15 unknown · pre-LUT label |
-| `?demo=bench` | Ready · `B489A500` · 150/150 · Both-scale hidden · Tune well hidden |
-| `?demo=unverified` | Unverified Device Profile · no exact-parity claim |
-| `?demo=main&paint=solid` | RGB 140/140/140 + Send RGB; status `paint: solid/both` |
-| `?demo=main&paint=card` | Card strip: greys then R/G/B/gold; n=160 both channels |
-| keyboard Tab | Stop Output is reachable (`#btnStop`) |
-| 740 px and 200% zoom | Page still usable; stills saved |
+| `/index.html` | Disconnected local model; Connect and Stop Output visible |
+| `?demo=ready` | Asymmetric Primary-known / Secondary-unknown truth |
+| inheritance matrix | `P15/S=inherit`, `P0/S=inherit`, unknown inheritance |
+| slot-unknown matrix | inherited and direct slot 15 both remain pre-correction with no tune claim |
+| transport fixture | local-first Source and Tune sequences; Stop pre-emption; recovery |
+| safety / policy | Preview unavailable for safety; local analysis retained for policy failure |
+| keyboard / pointer / touch | one shared selected LED reads both cached frames |
+| 740 px, 390 px and 200% reflow | no horizontal document overflow; 13 stills saved |
 
-Console: **0 errors, 0 warnings**.
+Browser failures: **0**.
 
-Look stills (post-waiver page; **not** the rejected T3 shell):
-`tools/colourlab/screenshots/look-ready-main.png`,
-`look-ready-bench.png`, `look-paint-card.png`, `look-disconnected.png`.
-Pixel-inspected: `PIXEL_INSPECT_RECEIPT.json`. Design verdict is **open**.
-These are not a device proof.
+Production stills: `tools/colourlab/screenshots/workbench-r1.1/`.
+The design verdict is closed; these stills remain browser evidence, not device proof.
 
 `?demo=` is a local store only. It does not open a serial port.
 
-## Device programme (mandatory — not run)
+## Device programme (mandatory — not run in this branch-freeze receipt)
 
-No `/dev/cu.usbmodem*` or `/dev/tty.usb*` was present. I did not flash
-either K1. I did not send `:rtrace_dump`.
+No firmware flash is authorised. `:rtrace_dump` is sent only if the running
+build proves that capability.
 
 When both units are plugged in, run **this** programme on each
 identity. Record every row. Do not substitute “we saw the chip id”.
@@ -70,7 +64,7 @@ identity. Record every row. Do not substitute “we saw the chip id”.
 |------|----------|--------|
 | Connect + profile | chip `9087A500`, env `k1_main_rpl_im69d`, LEDs **160/160**, look backend WS2816 u16 | |
 | Capability | Both-scale shown (×0.30); Tune band shown | |
-| Paint modes | off, solid, ramp, stops, card each confirm `PAINT:` | |
+| Paint modes | off, solid, stops and card each confirm `PAINT:`; forbidden legacy ramp is never requested | |
 | Targets | primary, secondary, both; both-scale only on both | |
 | Stops | 1-stop and 8-stop; string &lt; 159 chars | |
 | Gain | 0.0, 1.0, 2.0 | |
@@ -92,7 +86,7 @@ identity. Record every row. Do not substitute “we saw the chip id”.
 |------|----------|--------|
 | Connect + profile | chip `B489A500`, env `k1_bench_im69d_led150`, LEDs **150/150**, look backend WS2812 u8 | |
 | Capability | Both-scale **hidden**; Tune band **hidden** | |
-| Paint modes | off, solid, ramp, stops, card each confirm `PAINT:` | |
+| Paint modes | off, solid, stops and card each confirm `PAINT:`; forbidden legacy ramp is never requested | |
 | Targets | primary, secondary, both; **no** both-scale transform shown | |
 | Stops | 1-stop and 8-stop | |
 | Tune mutations | not offered; `tune_status` may print `TUNE: type=na` and still must not create LUT knowledge | |
@@ -134,5 +128,5 @@ does not create slot-15 knowledge.
 ## Lane close
 
 The Colour Lab Web UI lane closes on **`COLOUR_LAB_WEB_UI_HARDWARE_PASS`**.
-Host green + look waiver + browser verify are necessary and already
+Host green + optical PASS + browser verify are necessary and already
 true. They are not sufficient.

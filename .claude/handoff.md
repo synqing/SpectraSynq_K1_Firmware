@@ -4,6 +4,14 @@
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
 
+**ACTIVE LANE (2026-08-28): COLOUR_LAB_PALETTE_BENCH** — branch `lane/colourlab-bench`.
+Ledger and authority: **`tools/colourlab/EXECUTION.md`** (per-task status, gates, evidence).
+Production Preview R1.1 is accepted and the UI design lane is frozen. Current operation is the
+mandatory no-flash device programme on `9087A500` and `B489A500`; identity is chip ID, never port.
+Serial Test/Apply/Save/recovery transactions are authorised for this programme. Do not run
+`start_noise_cal`, do not redesign, do not merge to `main`, and capability-gate `:rtrace_dump`.
+Close requires `COLOUR_LAB_WEB_UI_HARDWARE_PASS` plus clean slot-15 leave-state.
+
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
@@ -13,8 +21,9 @@
 `b625e89a`** (`IDENTITY` epoch `1787591762`) after USB-audio diagnostic PASS
 and product restore. Probe `k1_usb_audio_mac_probe` @ `0136de67` is off
 silicon. No `K1_STM` second probe. **ADR-0008:** keep 12.8 kHz AP. B489
-`B489A500` last stamped `k1_bench_im69d` @ `d276fd68`. G8 **CLOSED on bench**.
-F887 OFFSITE. No cal.
+`B489A500` on `/dev/cu.usbmodem11401` now **`k1_bench_im69d_led150` @
+`8ed45e9c`** (`IDENTITY` epoch `1787639868`, 150-px GPIO39/40). Not the Main
+RPL binary. G8 **CLOSED on bench**. F887 OFFSITE. No cal.
 
 **Occupancy (2026-08-22, KEEP packer + hsv paint + native music):** packed-wire dump
 `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`

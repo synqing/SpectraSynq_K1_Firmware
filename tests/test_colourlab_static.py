@@ -17,6 +17,7 @@ PIO = ROOT / "platformio.ini"
 WIRELESS = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "control" / "k1_control_facade.cpp"
 CORE_SRC = require_core()
 INDEX = ROOT / "tools" / "colourlab" / "index.html"
+WORKBENCH_APP = ROOT / "tools" / "colourlab" / "colourlab-workbench.js"
 GENERATOR = ROOT / "tests" / "generate_colourlab_fixtures.py"
 
 COLOUR_LAB_NAMES = (
@@ -135,10 +136,20 @@ def test_no_wireless_colour_lab_path():
 
 
 def test_no_firmware_or_platformio_edits():
+    """The Colour Lab change set must not modify firmware.
+
+    Scoped to the STAGED set (`--cached`), not the whole working tree. The claim
+    this gate exists to defend is "this commit does not touch firmware" — not
+    "nobody anywhere in the checkout has a dirty firmware file". Against the
+    working tree it went red whenever an unrelated lane had an uncommitted
+    firmware edit, which is a false failure with nothing to do with Colour Lab.
+    At commit time the staged set is exactly the lane-owned change set.
+    """
     proc = subprocess.run(
         [
             "git",
             "diff",
+            "--cached",
             "--name-only",
             "HEAD",
             "--",
@@ -150,7 +161,9 @@ def test_no_firmware_or_platformio_edits():
         text=True,
         check=True,
     )
-    assert proc.stdout.strip() == "", proc.stdout
+    assert proc.stdout.strip() == "", (
+        "staged change set modifies firmware or platformio.ini:\n" + proc.stdout
+    )
 
 
 def test_generator_can_emit_160_and_150():
@@ -180,9 +193,35 @@ def test_index_html_if_present_imports_core_without_duplicate_math():
         assert token not in html, f"index.html must not re-derive {token}"
 
 
-def test_disconnect_waits_for_this_turn_stop_before_close():
+def test_preview_render_comparison_and_inspector_share_resolved_channel_frames():
     html = INDEX.read_text(encoding="utf-8")
-    match = re.search(r"async function disconnect\(\) \{(.*?)\n  \}", html, re.S)
+    app = WORKBENCH_APP.read_text(encoding="utf-8")
+    assert 'id="primaryPattern"' in html
+    assert 'id="secondaryCorrection"' in html
+    assert 'id="selectedLedInput"' in html
+    assert "var stageFrames = { primary: null, secondary: null };" in app
+
+    inspect = re.search(r"function renderInspector\(safetyBlocked\) \{(.*?)\n  \}", app, re.S)
+    assert inspect, "renderInspector() missing"
+    inspect_body = inspect.group(1)
+    assert "CL.inspectStageFrame(stageFrames.primary, selectedLed)" in inspect_body
+    assert "CL.inspectStageFrame(stageFrames.secondary, selectedLed)" in inspect_body
+    assert "CL.stageFrame" not in inspect_body
+    assert "CL.renderChannel" not in inspect_body
+
+    assert 'stageFrames.primary = CL.stageFrame' in app
+    assert 'stageFrames.secondary = CL.stageFrame' in app
+    assert "CL.compareStageFrames(stageFrames.primary, stageFrames.secondary)" in app
+    assert 'drawStrip($("primaryCanvas"), stageFrames.primary' in app
+    assert 'drawStrip($("secondaryCanvas"), stageFrames.secondary' in app
+    assert "function bindPreviewStrip(which)" in app
+    assert "setSelectedLed(index, \"pointer\", false)" in app
+    assert "device-reported LUT" not in html + app
+
+
+def test_disconnect_waits_for_this_turn_stop_before_close():
+    app = WORKBENCH_APP.read_text(encoding="utf-8")
+    match = re.search(r"async function disconnect\(\) \{(.*?)\n  \}", app, re.S)
     assert match, "disconnect() missing"
     body = match.group(1)
     assert "classifyDisconnectShutdown" in body

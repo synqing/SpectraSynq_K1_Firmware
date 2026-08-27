@@ -48,6 +48,8 @@ def test_controls_disabled_until_ready():
         ]
     )
     assert st["connection"] == "ready"
+    assert call_core({"op": "controlsEnabled", "state": st})["enabled"] is False
+    st = _reduce([{"type": "RESYNC_DONE"}], state=st)
     assert call_core({"op": "controlsEnabled", "state": st})["enabled"] is True
 
 
@@ -227,9 +229,251 @@ def test_device_effective_requires_known_slot15_and_active_look_15():
     )
     framing = call_core({"op": "previewFraming", "state": st, "channel": "primary"})
     assert framing["kind"] == "device_effective"
+    secondary = call_core({"op": "previewFraming", "state": st, "channel": "secondary"})
+    assert secondary["kind"] == "device_effective"
+    assert secondary["lookResolution"] == {
+        "relation": "inherit",
+        "reported": "inherit",
+        "effectiveKnown": True,
+        "effectiveSlot": 15,
+        "inheritedFrom": "primary",
+    }
     st["activeLookPrimary"] = 0
     framing = call_core({"op": "previewFraming", "state": st, "channel": "primary"})
     assert framing["kind"] == "simulate_session"
+    secondary = call_core({"op": "previewFraming", "state": st, "channel": "secondary"})
+    assert secondary["kind"] == "simulate_session"
+    assert secondary["lookResolution"]["effectiveSlot"] == 0
+
+
+def _stage_frame(state, channel, *, simulate_draft=False, local_stimulus=False):
+    return call_core(
+        {
+            "op": "stageFrame",
+            "state": state,
+            "channel": channel,
+            "paint": _paint("solid", r=96, g=64, b=32),
+            "tune": _tune(0.5, 1.0, 1.0, 1.0),
+            "n": 8,
+            "both_scale_enabled": False,
+            "both_scale": None,
+            "simulate_draft": simulate_draft,
+            "local_stimulus": local_stimulus,
+        }
+    )
+
+
+def test_stage_frame_primary_known_secondary_unknown_are_independent():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(0.5, 1.0, 1.0, 1.0),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = 15
+    st["activeLookSecondary"] = "unknown"
+
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+
+    assert primary["selection"] == "post"
+    assert primary["transform"]["kind"] == "device_confirmed_tune"
+    assert secondary["selection"] == "pre"
+    assert secondary["transform"]["kind"] == "reference_pre_lut"
+    assert primary["pixels"] != secondary["pixels"]
+
+
+def test_stage_frame_primary_unknown_secondary_known_are_independent():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(0.5, 1.0, 1.0, 1.0),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = "unknown"
+    st["activeLookSecondary"] = 15
+
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+
+    assert primary["selection"] == "pre"
+    assert primary["transform"]["kind"] == "reference_pre_lut"
+    assert secondary["selection"] == "post"
+    assert secondary["transform"]["kind"] == "device_confirmed_tune"
+    assert primary["pixels"] != secondary["pixels"]
+
+
+def test_stage_frame_keeps_source_and_transform_orthogonal():
+    st = call_core({"op": "initialState", "supported": True})
+    st["draft"]["tune"] = {"gain_r": 0.5}
+
+    frame = _stage_frame(
+        st,
+        "primary",
+        simulate_draft=True,
+        local_stimulus=True,
+    )
+
+    assert frame["source"]["kind"] == "local_stimulus"
+    assert frame["transform"]["kind"] == "local_draft_simulated"
+    assert frame["selection"] == "post"
+    assert frame["stimulus"]["mode"] == "solid"
+    assert frame["tune"]["gain_r"] == 0.5
+    assert "Local stimulus" in frame["label"]
+    assert "Local draft simulated" in frame["label"]
+
+
+def test_stage_frame_known_session_simulation_is_not_device_confirmation():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(0.5, 1.0, 1.0, 1.0),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = 0
+
+    frame = _stage_frame(st, "primary")
+
+    assert frame["selection"] == "post"
+    assert frame["transform"]["kind"] == "known_session_simulated"
+    assert "Device-confirmed" not in frame["label"]
+    assert "device-reported LUT" not in frame["qualifier"]
+
+
+def test_stage_frame_device_claim_ignores_mismatched_caller_tune():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(1.0, 1.0, 1.0, 1.0),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = 15
+
+    frame = _stage_frame(st, "primary")
+
+    assert frame["transform"]["kind"] == "device_confirmed_tune"
+    assert frame["tune"] == _tune(1.0, 1.0, 1.0, 1.0)
+    assert frame["pixels"] == call_core({
+        "op": "render",
+        "paint": _paint("solid", r=96, g=64, b=32),
+        "tune": _tune(1.0, 1.0, 1.0, 1.0),
+        "n": 8,
+    })["primary_post"]
+
+
+def test_effective_look_unknown_propagates_through_secondary_inherit():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = "unknown"
+    st["activeLookSecondary"] = "inherit"
+
+    resolved = call_core({"op": "resolveEffectiveLook", "state": st, "channel": "secondary"})
+    assert resolved == {
+        "relation": "inherit",
+        "reported": "inherit",
+        "effectiveKnown": False,
+        "effectiveSlot": None,
+        "inheritedFrom": "primary",
+    }
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+    assert primary["selection"] == secondary["selection"] == "pre"
+    assert secondary["lookResolution"] == resolved
+
+
+def test_slot15_unknown_inherited_is_pre_without_applied_tune_claim():
+    st = _reduce([{"type": "LOOK_STATUS", "look": {"slot": 15, "sec": "inherit"}}])
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+
+    for frame in (primary, secondary):
+        assert frame["selection"] == "pre"
+        assert frame["tune"] is None
+        assert frame["framingReason"] == "slot15_unknown"
+        assert frame["transform"]["kind"] == "reference_pre_lut"
+        assert "slot-15 contents unknown" in frame["transform"]["qualifier"]
+        assert "tune simulated" not in frame["label"].lower()
+    assert secondary["lookResolution"]["relation"] == "inherit"
+    assert secondary["lookResolution"]["effectiveSlot"] == 15
+
+
+def test_slot15_unknown_direct_secondary_is_pre_without_applied_tune_claim():
+    st = _reduce([{"type": "LOOK_STATUS", "look": {"slot": 15, "sec": 15}}])
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+
+    for frame in (primary, secondary):
+        assert frame["selection"] == "pre"
+        assert frame["tune"] is None
+        assert frame["framingReason"] == "slot15_unknown"
+        assert frame["lookResolution"]["relation"] == "direct"
+        assert "slot-15 contents unknown" in frame["transform"]["qualifier"]
+
+
+def test_equal_pixels_do_not_promote_different_preview_basis():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = 15
+    st["activeLookSecondary"] = "unknown"
+    primary = _stage_frame(st, "primary")
+    secondary = _stage_frame(st, "secondary")
+
+    compared = call_core({
+        "op": "compareStageFrames",
+        "primary": primary,
+        "secondary": secondary,
+    })
+    assert primary["pixels"] == secondary["pixels"]
+    assert compared["output"]["status"] == "match"
+    assert compared["basis"]["status"] == "differ"
+    assert "preview_selection" in compared["basis"]["reasons"]
+    assert "effective_look" in compared["basis"]["reasons"]
+
+
+def test_different_channel_counts_and_shared_inspector_absence_are_explicit():
+    st = _reduce([{
+        "type": "DEVICE_TUNE",
+        "tune": _tune(),
+        "seq": 1,
+        "established_by": "tune_gain",
+    }])
+    st["activeLookPrimary"] = 15
+    st["activeLookSecondary"] = 15
+    primary = _stage_frame(st, "primary")
+    secondary = call_core({
+        "op": "stageFrame",
+        "state": st,
+        "channel": "secondary",
+        "paint": _paint("solid", r=96, g=64, b=32),
+        "tune": _tune(),
+        "n": 6,
+        "both_scale_enabled": False,
+        "both_scale": None,
+        "simulate_draft": False,
+        "local_stimulus": False,
+    })
+
+    compared = call_core({
+        "op": "compareStageFrames",
+        "primary": primary,
+        "secondary": secondary,
+    })
+    assert compared["output"]["status"] == "differ"
+    assert compared["output"]["unmatchedLedCount"] == 2
+    assert "led_count" in compared["output"]["reasons"]
+    assert call_core({"op": "inspectStageFrame", "frame": primary, "selectedLed": 7})["kind"] == "value"
+    assert call_core({"op": "inspectStageFrame", "frame": secondary, "selectedLed": 7}) == {
+        "kind": "not_present",
+        "n": 6,
+    }
 
 
 def test_stop_output_discards_queued_mutations_and_jumps():
@@ -261,6 +505,132 @@ def test_stop_output_discards_queued_mutations_and_jumps():
     assert ":paint_sv=0.5,0.5" not in out["sent"]
     assert any(s.get("followUp") == ":paint_status" for s in out["settled"])
     assert out["queued"] == ["paint_status"] or out["inFlight"] == "paint_status"
+
+
+def test_priority_stop_settles_preempted_inflight_mutation():
+    paint_reply = {
+        "kind": "paint", "mode": "off", "target": "both",
+        "r": 140, "g": 140, "b": 140, "s": 1.0, "v": 0.55, "stops": 0,
+    }
+    out = call_core(
+        {
+            "op": "queue",
+            "autoRequery": False,
+            "steps": [
+                {"enqueue": {"cmd": "tune_gain", "line": ":tune_gain=1.1,1,1"}},
+                {"priorityStop": True},
+                {"event": paint_reply},
+            ],
+        }
+    )
+    mutation = [item for item in out["settled"] if item["id"] == 1]
+    stop = [item for item in out["settled"] if item["id"] == 2]
+    assert len(mutation) == 1
+    assert mutation[0]["outcome"] == "superseded"
+    assert len(stop) == 1
+    assert stop[0]["outcome"] == "ok"
+    assert out["depth"] == 0
+
+
+def test_priority_stop_ignores_late_non_off_paint_reply():
+    late_solid = {
+        "kind": "paint", "mode": "solid", "target": "both",
+        "r": 255, "g": 40, "b": 0, "s": 1.0, "v": 0.55, "stops": 0,
+    }
+    confirmed_off = dict(late_solid, mode="off", r=140, g=140, b=140)
+    waiting = call_core(
+        {
+            "op": "queue",
+            "autoRequery": False,
+            "steps": [
+                {"enqueue": {"cmd": "paint_target", "line": ":paint_target=both"}},
+                {"priorityStop": True},
+                {"event": late_solid},
+            ],
+        }
+    )
+    assert waiting["inFlight"] == "paint"
+    assert not [item for item in waiting["settled"] if item["id"] == 2]
+
+    completed = call_core(
+        {
+            "op": "queue",
+            "autoRequery": False,
+            "steps": [
+                {"enqueue": {"cmd": "paint_target", "line": ":paint_target=both"}},
+                {"priorityStop": True},
+                {"event": late_solid},
+                {"event": confirmed_off},
+            ],
+        }
+    )
+    stop = [item for item in completed["settled"] if item["id"] == 2]
+    assert len(stop) == 1
+    assert stop[0]["outcome"] == "ok"
+    assert stop[0]["event"]["mode"] == "off"
+
+
+def test_device_lost_fails_closed_until_resync():
+    state = _reduce([
+        {"type": "DEVICE_PAINT", "paint": _paint("solid"), "seq": 1},
+        {"type": "DEVICE_TUNE", "tune": _tune(), "seq": 1},
+        {"type": "DEVICE_LOST"},
+    ])
+    assert state["connection"] == "device-lost"
+    assert state["needsResync"] is True
+    assert state["outputStateUnknown"] is True
+    assert state["lastError"] == "output state unknown"
+
+
+def test_profile_start_preserves_uncertainty_until_explicit_resync_done():
+    state = _reduce([
+        {"type": "DEVICE_PAINT", "paint": _paint("solid"), "seq": 1},
+        {"type": "DEVICE_LOST"},
+        {"type": "PROFILE_START"},
+    ])
+    assert state["connection"] == "profiling"
+    assert state["paintMayBeActive"] is True
+    assert state["needsResync"] is True
+    assert state["outputStateUnknown"] is True
+
+    state = _reduce([
+        {
+            "type": "PROFILE_RESOLVED",
+            "profile": call_core(
+                {"op": "resolveProfile", "chip_id": "9087A500", "look_env": "k1_main_rpl_im69d"}
+            ),
+        },
+        {"type": "DEVICE_PAINT", "paint": _paint("off"), "seq": 2},
+        {"type": "DEVICE_TUNE", "tune": _tune(), "seq": 2},
+    ], state=state)
+    assert state["connection"] == "ready"
+    assert state["needsResync"] is True
+
+    state = _reduce([{"type": "RESYNC_DONE"}], state=state)
+    assert state["needsResync"] is False
+    assert state["outputStateUnknown"] is False
+    assert state["lastError"] is None
+
+
+def test_failed_recovery_fails_closed_until_resync():
+    state = _reduce([{
+        "type": "RECOVERY_FAILED",
+        "detail": "rejected paint=off",
+    }])
+    assert state["needsResync"] is True
+    assert state["outputStateUnknown"] is True
+    assert state["lastError"] == "recovery failed: rejected paint=off"
+
+
+def test_partial_command_sequence_requires_resync_and_marks_output_unknown():
+    state = _reduce([{
+        "type": "COMMAND_SEQUENCE_PARTIAL",
+        "sequence": "Tune",
+        "confirmedCount": 1,
+    }])
+    assert state["needsResync"] is True
+    assert state["outputStateUnknown"] is True
+    assert "partial Tune sequence" in state["lastError"]
 
 
 def test_stop_timeout_surfaces_output_state_unknown():

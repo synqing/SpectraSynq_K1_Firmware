@@ -2,6 +2,16 @@
 
 **Started:** 2026-05-25
 
+## 2026-08-28 — Colour Lab production Preview accepted; hardware gate active
+
+**Active authority:** `tools/colourlab/EXECUTION.md`
+**Lane:** `COLOUR_LAB_PALETTE_BENCH_20260827` on `lane/colourlab-bench`
+
+Production Preview R1.1 is accepted, the residual Source/Tune step numbers are removed, and the
+UI design lane is frozen. The exact browser slice must be committed and pushed on the lane before
+the no-flash programme runs on `9087A500` and `B489A500`. Merge remains held until
+`COLOUR_LAB_WEB_UI_HARDWARE_PASS` and a clean slot-15 leave-state are recorded.
+
 ## 2026-08-27 — Colour Lab paint and tungsten grey closed
 
 Both devices ran a known colour card through the real look path. The dumps

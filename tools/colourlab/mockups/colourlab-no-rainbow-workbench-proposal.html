@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>SpectraSynq K1 — Colour Lab Workbench</title>
+  <title>SpectraSynq K1 — Colour Lab Workbench Proposal</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23070707'/%3E%3Cpath d='M7 23L13 10l5 9 7-12' stroke='%23ffb84d' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
     :root {
@@ -66,7 +66,6 @@
       outline-offset: 3px;
     }
     button:disabled { cursor: not-allowed; opacity: 0.45; }
-    .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 
     .shell {
       width: min(100% - 44px, 1560px);
@@ -202,15 +201,28 @@
     .btn.quiet { color: var(--muted); }
     .btn.small { min-height: 32px; padding: 6px 10px; font-size: var(--type-panel-guidance); }
 
+    .review-switch { display: inline-flex; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: #090909; }
+    .review-switch button {
+      min-height: 30px;
+      padding: 5px 9px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: var(--type-control);
+    }
+    .review-switch button.active { color: var(--ink); background: #26221b; box-shadow: inset 0 0 0 1px rgba(255,184,77,0.28); }
+
     .main-grid {
       display: grid;
       grid-template-columns: minmax(310px, 0.68fr) minmax(620px, 1.32fr);
-      grid-template-areas: "rail preview";
+      grid-template-areas: "rail stage";
       gap: 18px;
       align-items: start;
     }
     .left-rail { grid-area: rail; display: flex; flex-direction: column; gap: 18px; }
-    .preview-panel { grid-area: preview; padding: 22px; }
+    .stage { grid-area: stage; padding: 18px; min-height: 658px; }
     .control-panel { padding: 17px; }
 
     .panel-head {
@@ -227,6 +239,13 @@
       text-transform: uppercase;
     }
     .panel-head p, .workbench-title p { margin: 7px 0 0; color: var(--muted); font-size: var(--type-panel-guidance); }
+    .step {
+      flex: 0 0 auto;
+      color: var(--gold);
+      font: 800 var(--type-panel-guidance)/1 var(--condensed);
+      letter-spacing: 0.12em;
+    }
+
     .seg {
       width: 100%;
       gap: 4px;
@@ -319,69 +338,56 @@
     }
     .blocked-mark::after { content: ""; position: absolute; left: 3px; right: 3px; top: 8px; height: 2px; background: var(--danger); transform: rotate(-42deg); }
 
-    .preview-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: start; }
-    .preview-kicker { margin: 0 0 6px; color: var(--gold); font: 800 var(--type-control)/1 var(--condensed); letter-spacing: .13em; text-transform: uppercase; }
-    .preview-header h2 { margin: 0; font: 800 25px/1 var(--condensed); letter-spacing: .01em; text-transform: uppercase; }
-    .preview-purpose { max-width: 680px; margin: 8px 0 0; color: var(--muted); font-size: var(--type-body); }
-    .view-choice { min-width: 250px; margin: 0; padding: 0; border: 0; }
-    .view-choice legend { margin-bottom: 7px; color: var(--dim); font: 800 var(--type-qualifier)/1 var(--condensed); letter-spacing: .1em; text-transform: uppercase; }
-    .view-options { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 11px; background: #090909; }
-    .view-options input { position: absolute; opacity: 0; pointer-events: none; }
-    .view-options label { min-height: 40px; display: grid; place-items: center; padding: 8px 10px; border-radius: 8px; color: var(--muted); cursor: pointer; font-size: var(--type-control); font-weight: 700; white-space: nowrap; }
-    .view-options input:checked + label { color: var(--ink); background: #27231d; box-shadow: inset 0 0 0 1px rgba(255,184,77,.35); }
-    .view-options input:focus-visible + label { outline: 2px solid var(--gold); outline-offset: 3px; }
-    .preview-boundary { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 10px; margin: 19px 0 0; padding: 11px 13px; border-left: 3px solid var(--gold); background: #0a0a0a; color: var(--muted); font-size: var(--type-control); }
-    .preview-boundary b { color: var(--gold-soft); white-space: nowrap; }
-    .comparison { margin-top: 18px; padding: 15px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-    .comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
-    .comparison-fact { display: grid; grid-template-columns: 62px minmax(0,1fr); gap: 9px 12px; align-items: baseline; }
-    .comparison-fact > span { color: var(--dim); font-size: var(--type-control); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-    .comparison-fact strong { font: 800 19px/1.25 var(--condensed); }
-    .comparison-note { grid-column: 2; margin: -6px 0 0; color: var(--muted); font-size: var(--type-control); }
-    .channels { padding-top: 6px; }
-    .channel { padding: 17px 0 19px; border-bottom: 1px solid var(--line); }
-    .channel:last-child { border-bottom: 0; }
-    .channel-heading { display: flex; justify-content: space-between; gap: 14px; align-items: baseline; margin-bottom: 7px; }
-    .channel-heading h3 { margin: 0; font: 800 var(--type-channel-title)/1 var(--condensed); letter-spacing: .07em; text-transform: uppercase; }
-    .channel-heading span { color: var(--dim); font-size: var(--type-compact); }
-    .channel-summary { display: flex; flex-wrap: wrap; gap: 5px 22px; margin: 0 0 10px; color: var(--muted); font-size: var(--type-control); }
-    .channel-summary strong { color: var(--ink); font-weight: 650; }
-    .fact-name { margin-right: 5px; color: var(--dim); font-size: var(--type-evidence); font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-    .strip-wrap { position: relative; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 10px; background: #050505; }
-    canvas.strip { display: block; width: 100%; height: 62px; background: #050505; image-rendering: pixelated; touch-action: pan-y; cursor: crosshair; }
-    .diffusion-view canvas.strip { height: 80px; image-rendering: auto; }
-    .channel-unavailable { position: absolute; inset: 0; display: none; place-items: center; padding: 12px; color: var(--muted); background: #050505; text-align: center; font-size: var(--type-control); }
-    .strip-wrap.unavailable .channel-unavailable { display: grid; }
-    .inspector { margin-top: 6px; padding: 18px 0 20px; border-top: 1px solid var(--line); }
-    .inspector-heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .inspector-heading h3 { margin: 0; font: 800 var(--type-channel-title)/1 var(--condensed); letter-spacing: .06em; text-transform: uppercase; }
-    .led-input-label { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: var(--type-control); font-weight: 700; }
-    .led-input-label input { width: 90px; min-height: 42px; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--ink); background: #080808; }
-    .inspector-help { margin: 7px 0 12px; color: var(--dim); font-size: var(--type-qualifier); }
-    .input-error { margin: -4px 0 12px; color: var(--danger); font-size: var(--type-control); }
-    .inspector-values { width: 100%; border-collapse: collapse; table-layout: fixed; background: #090909; }
-    .inspector-values caption { padding: 0 0 7px; color: var(--muted); text-align: left; font-size: var(--type-control); }
-    .inspector-values th, .inspector-values td { padding: 10px 12px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
-    .inspector-values thead th { color: var(--dim); font-size: var(--type-evidence); letter-spacing: .05em; text-transform: uppercase; }
-    .inspector-values tbody th { width: 112px; font: 800 var(--type-cell-title)/1.4 var(--condensed); letter-spacing: .04em; text-transform: uppercase; }
-    .inspector-values output { display: flex; flex-wrap: wrap; gap: 4px 12px; color: var(--ink); font-size: var(--type-control); }
-    .component { white-space: nowrap; }
-    .inspector-evidence { margin: 9px 0 0; color: var(--dim); font-size: var(--type-qualifier); }
-    details.preview-details, details.tune-curve-details { border-top: 1px solid var(--line); }
-    details.preview-details summary, details.tune-curve-details summary { min-height: 45px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; color: var(--muted); font-size: var(--type-control); font-weight: 700; list-style: none; }
-    details.preview-details summary::-webkit-details-marker, details.tune-curve-details summary::-webkit-details-marker { display: none; }
-    details.preview-details summary::after, details.tune-curve-details summary::after { content: "+"; color: var(--gold); font: 18px/1 var(--mono); }
-    details.preview-details[open] summary::after, details.tune-curve-details[open] summary::after { content: "−"; }
-    .details-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 11px 22px; padding-bottom: 17px; color: var(--muted); font-size: var(--type-control); }
-    .details-grid p { margin: 0; }
-    .details-grid strong { display: block; margin-bottom: 2px; color: var(--ink); }
-    .next-handoff { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 18px; align-items: center; margin: 0 -22px -22px; padding: 17px 22px; border-top: 1px solid var(--line); background: rgba(29,27,23,.75); }
-    .next-handoff span { display: block; margin-bottom: 3px; color: var(--gold); font: 800 var(--type-evidence)/1 var(--condensed); letter-spacing: .1em; text-transform: uppercase; }
-    .next-handoff strong { display: block; font-size: var(--type-control); }
-    .next-handoff a { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; padding: 8px 13px; border: 1px solid rgba(255,184,77,.38); border-radius: 9px; color: var(--gold-soft); background: #201a11; text-decoration: none; font-size: var(--type-control); font-weight: 700; white-space: nowrap; }
+    .stage-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+    .stage-tabs { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: #090909; }
+    .stage-tabs button {
+      min-height: 31px;
+      padding: 6px 10px;
+      border: 0;
+      border-radius: 7px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: var(--type-control);
+      font-weight: 700;
+    }
+    .stage-tabs button.active { color: var(--ink); background: #26221b; }
+    .truth-key { color: var(--dim); font-size: var(--type-qualifier); text-align: right; }
 
-    .tune-curve-details { margin-top: 13px; }
-    .tune-curve-details .curve-wrap { padding-bottom: 4px; }
+    .channel { margin-top: 15px; }
+    .channel:first-of-type { margin-top: 0; }
+    .channel-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .channel-name { font: 800 var(--type-channel-title)/1 var(--condensed); letter-spacing: 0.08em; text-transform: uppercase; }
+    .channel-count { color: var(--muted); font-size: var(--type-compact); }
+    .truth-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+      margin: 8px 0 7px;
+    }
+    .truth {
+      min-height: 53px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #0a0a0a;
+    }
+    .truth dt { margin: 0 0 3px; color: var(--dim); font-size: var(--type-micro); letter-spacing: 0.14em; text-transform: uppercase; }
+    .truth dd { margin: 0; color: var(--ink); font-size: var(--type-control); }
+    .truth dd small { display: block; margin-top: 2px; color: var(--muted); font-size: var(--type-evidence); }
+    canvas.strip {
+      display: block;
+      width: 100%;
+      height: 88px;
+      border: 1px solid rgba(255,255,255,0.13);
+      border-radius: 10px;
+      background: #050505;
+      image-rendering: pixelated;
+    }
+    .lgp-mode canvas.strip { height: 116px; image-rendering: auto; }
+    .stage-caption { margin: 7px 0 0; color: var(--dim); font-size: var(--type-qualifier); }
+
+    .curve-wrap { margin-top: 17px; padding-top: 15px; border-top: 1px solid var(--line); }
     .curve-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; color: var(--muted); font-size: var(--type-compact); }
     .curve-box {
       position: relative;
@@ -433,11 +439,7 @@
       text-align: left;
     }
     .stop-swatch { display: block; height: 38px; }
-    .stop-hex { display: block; padding: 4px 6px; color: var(--dim); font-size: var(--type-micro); }
-    .stop-hex input { width: 100%; min-height: 27px; padding: 3px 5px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: #090909; font: inherit; text-transform: uppercase; }
-    .stop-position { display: block; padding: 0 6px 5px; color: var(--dim); font-size: var(--type-micro); }
-    .stop-position input { width: 100%; min-height: 27px; padding: 3px 5px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: #090909; font-size: var(--type-micro); }
-    .drafted { border-style: dashed !important; border-color: rgba(255,184,77,0.62) !important; }
+    .stop code { display: block; padding: 5px 6px; color: var(--muted); font-size: var(--type-micro); }
     .hue-control { margin-top: 12px; }
     .hue-value { float: right; color: var(--ink); }
 
@@ -505,7 +507,7 @@
 
     details.console { margin-top: 18px; padding: 15px 18px; }
     details.console summary { cursor: pointer; font: 800 var(--type-cell-title)/1 var(--condensed); letter-spacing: 0.11em; text-transform: uppercase; }
-    .console pre { min-height: 96px; max-height: 280px; margin: 14px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: #050505; color: var(--muted); font: var(--type-compact)/1.55 var(--mono); white-space: pre-wrap; }
+    .console pre { margin: 14px 0 0; padding: 12px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; background: #050505; color: var(--muted); font: var(--type-compact)/1.55 var(--mono); }
 
     .toast {
       position: fixed;
@@ -530,9 +532,9 @@
     .mock-note { margin: 16px 0 0; color: var(--dim); font-size: var(--type-qualifier); text-align: right; }
 
     @media (max-width: 1120px) {
-      .main-grid { grid-template-columns: 1fr; grid-template-areas: "rail" "preview"; }
+      .main-grid { grid-template-columns: 1fr; grid-template-areas: "rail" "stage"; }
       .left-rail { display: grid; grid-template-columns: 1fr 1fr; }
-      .preview-panel { min-height: 0; }
+      .stage { min-height: 0; }
       .bench-grid { grid-template-columns: 1fr 1fr; }
       .diagnostics { grid-column: 1 / -1; }
       .gate-stack { grid-column: 1 / -1; grid-row: auto; grid-template-columns: 1fr 1fr; }
@@ -546,36 +548,13 @@
       .left-rail, .bench-grid { display: grid; grid-template-columns: 1fr; }
       .diagnostics { grid-column: auto; }
       .gate-stack { grid-column: auto; grid-template-columns: 1fr; }
-      .preview-panel, .control-panel, .workbench { padding: 14px; }
-      .preview-header { grid-template-columns: minmax(0, 1fr) 224px; gap: 16px; }
-      .view-choice { min-width: 0; width: 224px; }
-      .preview-boundary { margin-top: 10px; padding: 8px 12px; }
-      .comparison { margin-top: 10px; padding: 10px 0; }
-      .comparison-grid { gap: 14px; }
-      .channel { padding: 10px 0 16px; }
-      .next-handoff { margin: 0 -14px -14px; padding: 15px 14px; }
+      .stage, .control-panel, .workbench { padding: 14px; }
+      .stage-toolbar, .workbench-head { align-items: stretch; flex-direction: column; }
+      .truth-key { text-align: left; }
+      .truth-grid { grid-template-columns: 1fr; }
       .facts { justify-content: flex-start; }
-      canvas.strip { height: 58px; }
-      .diffusion-view canvas.strip { height: 74px; }
-    }
-    @media (max-width: 540px) {
-      .preview-header { grid-template-columns: 1fr; gap: 14px; }
-      .view-choice { width: min(100%, 300px); }
-      .preview-boundary { grid-template-columns: 1fr; gap: 3px; padding: 11px; }
-      .comparison-grid, .details-grid { grid-template-columns: 1fr; }
-      .comparison-note { grid-column: 1 / -1; margin-left: 74px; }
-      .channel-heading, .inspector-heading { align-items: flex-start; flex-direction: column; gap: 6px; }
-      .channel-summary { display: grid; grid-template-columns: 1fr; }
-      .led-input-label { width: 100%; justify-content: space-between; }
-      .next-handoff { grid-template-columns: 1fr; }
-      .next-handoff a { width: 100%; }
-      .inspector-values, .inspector-values tbody, .inspector-values tr, .inspector-values th, .inspector-values td { display: block; width: 100%; }
-      .inspector-values caption { display: block; width: 100%; }
-      .inspector-values thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-      .inspector-values tbody tr { padding: 10px 11px; border: 1px solid var(--line); }
-      .inspector-values tbody tr + tr { border-top: 0; }
-      .inspector-values tbody th, .inspector-values tbody td { padding: 3px 0; border: 0; }
-      .inspector-values td::before { content: attr(data-label); display: block; margin: 5px 0 2px; color: var(--dim); font-size: var(--type-micro); letter-spacing: .05em; text-transform: uppercase; }
+      canvas.strip { height: 72px; }
+      .lgp-mode canvas.strip { height: 92px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
@@ -588,11 +567,11 @@
       <div>
         <p class="eyebrow">SpectraSynq K1 · Colour authority</p>
         <h1>Colour <span>Lab</span></h1>
-        <p class="subtitle">Author locally, verify device safety and product policy independently, then send one intentional command sequence. Preview compares each channel’s calculated output without writing to K1.</p>
+        <p class="subtitle">Author locally, verify device safety and product policy independently, then send one intentional transaction. Stage keeps source truth separate from transform truth.</p>
       </div>
       <div class="proposal-stamp">
-        <b>Production workbench · R1.1</b>
-        <span>Local-first · serial writes require an intentional command sequence</span>
+        <b>Workbench proposal · R0</b>
+        <span>Self-contained mockup · zero device writes</span>
       </div>
     </header>
 
@@ -600,18 +579,21 @@
       <div>
         <div class="device-top">
           <h2 class="section-label" id="deviceTitle">Device</h2>
-          <span class="chip" id="connectionChip">Disconnected · local authoring available</span>
-          <span class="chip live" id="serialChip">Checking Web Serial</span>
+          <span class="chip ok">Ready</span>
+          <span class="chip live">Web Serial available</span>
         </div>
         <div class="device-meta">
-          <span class="chip" id="profileChip">No verified device profile · local geometry 160/160</span>
-          <span class="chip" id="deviceStateChip">paint state unknown · slot-15 unknown · no device claim</span>
+          <span class="chip live">k1_main_rpl_im69d · 9087A500 · 160/160 · ws2816_u16</span>
+          <span class="chip" id="deviceStateChip">paint off/both · slot-15 known this session · active P=15 · S=unknown</span>
         </div>
       </div>
       <div class="actions">
-        <button type="button" class="btn primary" id="connectBtn">Connect</button>
-        <button type="button" class="btn quiet" id="disconnectBtn" disabled>Disconnect</button>
-        <button type="button" class="btn quiet" id="resyncBtn" disabled>Resync</button>
+        <div class="review-switch" aria-label="Review mockup state">
+          <button type="button" class="active" data-state="normal">Normal</button>
+          <button type="button" data-state="policy">Policy blocked</button>
+          <button type="button" data-state="safety">Safety blocked</button>
+        </div>
+        <button type="button" class="btn quiet" id="resyncBtn">Resync</button>
         <button type="button" class="btn safety" id="stopBtn">Stop output</button>
       </div>
     </section>
@@ -624,6 +606,7 @@
               <h2 id="sourceTitle">Source / stimulus</h2>
               <p>Choose and stage locally. Mode and target do not write hardware.</p>
             </div>
+            <span class="step">01</span>
           </div>
 
           <span class="mini-label">Product sources</span>
@@ -634,10 +617,10 @@
           </div>
 
           <div class="subsection">
-            <span class="mini-label">Diagnostic references · structurally validated</span>
+            <span class="mini-label">Diagnostic references · local only</span>
             <div class="seg" id="diagnosticSeg">
               <button type="button" data-stimulus="card">K1 card · 17</button>
-              <button type="button" data-stimulus="rgb">Isolated R / G / B ramps</button>
+              <button type="button" data-stimulus="rgb">R / G / B ramps</button>
               <button type="button" data-stimulus="sv">Single-hue S/V</button>
             </div>
           </div>
@@ -660,8 +643,8 @@
           </div>
 
           <div class="draft-summary">
-            <div><strong id="sourceDraftTitle">Neutral transfer · Both</strong><span id="sourceDraftState">Local draft · no command sent</span></div>
-            <button type="button" class="btn primary small" id="sendStimulusBtn" disabled>Test on device</button>
+            <div><strong id="sourceDraftTitle">Neutral transfer · Both</strong><span>Local draft · no command sent</span></div>
+            <button type="button" class="btn primary small" id="sendStimulusBtn">Send 1 change</button>
           </div>
         </section>
 
@@ -669,15 +652,16 @@
           <div class="panel-head">
             <div>
               <h2 id="tuneTitle">Tune / persistence</h2>
-              <p>Gain and gamma form one draft and one ordered device command sequence.</p>
+              <p>Gain and gamma form one draft and one device transaction.</p>
             </div>
+            <span class="step">02</span>
           </div>
 
           <div class="control-row">
             <label>Gain R<input type="number" class="tune-input" id="gainR" min="0" max="2" step="0.001" value="1.000"></label>
-            <label>Gain G<input type="number" class="tune-input" id="gainG" min="0" max="2" step="0.001" value="1.000"></label>
-            <label>Gain B<input type="number" class="tune-input" id="gainB" min="0" max="2" step="0.001" value="1.000"></label>
-            <label>Gamma<input type="number" class="tune-input" id="gamma" min="0.2" max="4" step="0.001" value="1.000"></label>
+            <label>Gain G<input type="number" class="tune-input" id="gainG" min="0" max="2" step="0.001" value="0.936"></label>
+            <label>Gain B<input type="number" class="tune-input" id="gainB" min="0" max="2" step="0.001" value="0.982"></label>
+            <label>Gamma<input type="number" class="tune-input" id="gamma" min="0.2" max="4" step="0.001" value="2.200"></label>
           </div>
 
           <div class="subsection">
@@ -689,112 +673,71 @@
           </div>
 
           <div class="draft-summary">
-            <div><strong id="tuneDraftTitle">No tune draft</strong><span id="tuneDraftState">Edit locally · persistence unchanged</span></div>
-            <button type="button" class="btn primary small" id="applyTuneBtn" disabled>Apply tune</button>
+            <div><strong>4 tune values drafted</strong><span>Previewed locally · persistence unchanged</span></div>
+            <button type="button" class="btn primary small" id="applyTuneBtn">Apply tune (4)</button>
           </div>
-
-          <details class="tune-curve-details">
-            <summary>Transfer curve details</summary>
-            <div class="curve-wrap">
-              <div class="curve-head"><span>Input to output</span><span>Unity reference + R/G/B browser model</span></div>
-              <div class="curve-box"><canvas id="curveCanvas" width="1600" height="312" aria-label="Transfer curves" aria-describedby="curveSummary"></canvas></div>
-              <p class="sr-only" id="curveSummary">Identity transfer curve for red, green and blue.</p>
-            </div>
-          </details>
         </section>
       </aside>
 
-      <section class="panel preview-panel" id="previewPanel" aria-labelledby="previewTitle">
-        <header class="preview-header">
+      <section class="panel stage" id="stagePanel" aria-labelledby="stageTitle">
+        <div class="panel-head">
           <div>
-            <p class="preview-kicker">Read-only comparison</p>
-            <h2 id="previewTitle">Preview</h2>
-            <p class="preview-purpose">Compare Primary and Secondary before testing changes on K1.</p>
+            <h2 id="stageTitle">Stage</h2>
+            <p>One resolved frame per channel drives both the picture and the inspector.</p>
           </div>
-          <fieldset class="view-choice">
-            <legend>View</legend>
-            <div class="view-options">
-              <input type="radio" name="previewView" id="viewLed" value="led" checked>
-              <label for="viewLed">LED values</label>
-              <input type="radio" name="previewView" id="viewDiffusion" value="diffusion">
-              <label for="viewDiffusion">Diffusion model</label>
-            </div>
-          </fieldset>
-        </header>
-
-        <p class="preview-boundary" id="previewBoundary"><b>Browser model</b><span id="viewQualifier">Not device readback, LUT readback or a physical colour match.</span></p>
+          <span class="step">03</span>
+        </div>
 
         <div class="blocked-banner policy" id="policyBanner" role="alert">
           <i class="blocked-mark" aria-hidden="true"></i>
-          <div><b>Non-product analysis · device, save and export locked</b><span>Local bounded analysis remains visible. This state cannot be promoted to a SpectraSynq product output.</span></div>
+          <div><b>Non-product reference · promotion blocked</b><span>Local analysis remains visible. Device Test, Apply, Save and product export are disabled by the Product Colour Policy gate.</span></div>
         </div>
 
         <div class="blocked-banner" id="safetyBanner" role="alert">
           <i class="blocked-mark" aria-hidden="true"></i>
-          <div><b>Device Safety gate failed · Preview unavailable</b><span>The output state is unsafe or unknowable. Preview remains dark; recovery belongs outside this read-only surface.</span></div>
+          <div><b>Unsafe or misleading device state intercepted</b><span>Stage is dark because modelling this state would be unsafe or epistemically false. Stop output is the only permitted recovery command.</span></div>
         </div>
 
         <div class="non-product-stamp" id="nonProductStamp">Non-product · local analysis only · device and export locked</div>
 
-        <section class="comparison" aria-labelledby="comparisonTitle">
-          <h3 class="section-label" id="comparisonTitle">Channel comparison</h3>
-          <div class="comparison-grid">
-            <div class="comparison-fact"><span>Output</span><strong id="outputComparison">Comparison unavailable</strong><p class="comparison-note" id="outputComparisonNote">Preview frames are not available.</p></div>
-            <div class="comparison-fact"><span>Basis</span><strong id="basisComparison">Basis unavailable</strong><p class="comparison-note" id="basisComparisonNote">Frame authority is not established.</p></div>
+        <div class="stage-toolbar">
+          <div class="stage-tabs" aria-label="Stage view">
+            <button type="button" class="active" data-view="code">Code values</button>
+            <button type="button" data-view="lgp">LGP audition</button>
           </div>
-        </section>
-
-        <div class="channels">
-          <article class="channel" aria-labelledby="primaryHeading">
-            <div class="channel-heading"><h3 id="primaryHeading">Primary</h3><span id="primaryGeometry">160 LEDs · centre 79/80</span></div>
-            <p class="channel-summary" id="primarySummary"><span><span class="fact-name">Pattern</span><strong id="primaryPattern">Current settings</strong></span><span><span class="fact-name">Correction</span><strong id="primaryCorrection">Before correction · knowledge unavailable</strong></span></p>
-            <div class="strip-wrap" id="primaryStripWrap">
-              <canvas class="strip" id="primaryCanvas" width="1280" height="112" role="img" aria-label="Primary LED-values preview, 160 LEDs" aria-describedby="previewBoundary primarySummary selectedLedHelp"></canvas>
-              <span class="channel-unavailable" id="primaryUnavailable">Preview unavailable</span>
-            </div>
-          </article>
-
-          <article class="channel" aria-labelledby="secondaryHeading">
-            <div class="channel-heading"><h3 id="secondaryHeading">Secondary</h3><span id="secondaryGeometry">160 LEDs · centre 79/80</span></div>
-            <p class="channel-summary" id="secondarySummary"><span><span class="fact-name">Pattern</span><strong id="secondaryPattern">Current settings</strong></span><span><span class="fact-name">Correction</span><strong id="secondaryCorrection">Before correction · knowledge unavailable</strong></span></p>
-            <div class="strip-wrap" id="secondaryStripWrap">
-              <canvas class="strip" id="secondaryCanvas" width="1280" height="112" role="img" aria-label="Secondary LED-values preview, 160 LEDs" aria-describedby="previewBoundary secondarySummary selectedLedHelp"></canvas>
-              <span class="channel-unavailable" id="secondaryUnavailable">Preview unavailable</span>
-            </div>
-          </article>
+          <div class="truth-key" id="viewQualifier">Digital preview · not device readback or a physical colour match</div>
         </div>
 
-        <section class="inspector" aria-labelledby="inspectorTitle">
-          <div class="inspector-heading"><h3 id="inspectorTitle">Inspect LED</h3><label class="led-input-label" for="selectedLedInput">LED<input id="selectedLedInput" name="selectedLed" type="number" min="0" max="159" step="1" inputmode="numeric" value="86" aria-describedby="selectedLedRange selectedLedHelp selectedLedError"></label></div>
-          <p class="inspector-help" id="selectedLedRange">Available range: 0 to 159.</p>
-          <p class="inspector-help" id="selectedLedHelp">Point to or touch either preview, use the left and right arrow keys, or enter an LED index.</p>
-          <p class="input-error" id="selectedLedError" role="alert" hidden></p>
-          <table class="inspector-values" aria-describedby="inspectorEvidence">
-            <caption id="inspectorCaption">Computed colour values at LED 86</caption>
-            <thead><tr><th scope="col">Channel</th><th scope="col">RGB16</th><th scope="col">RGB8</th></tr></thead>
-            <tbody>
-              <tr><th scope="row">Primary</th><td data-label="RGB16"><output id="primaryRgb16" for="selectedLedInput"></output></td><td data-label="RGB8"><output id="primaryRgb8" for="selectedLedInput"></output></td></tr>
-              <tr><th scope="row">Secondary</th><td data-label="RGB16"><output id="secondaryRgb16" for="selectedLedInput"></output></td><td data-label="RGB8"><output id="secondaryRgb8" for="selectedLedInput"></output></td></tr>
-            </tbody>
-          </table>
-          <p class="inspector-evidence" id="inspectorEvidence">Values come from the exact cached frames drawn above. Diffusion view does not change these values.</p>
-          <p class="sr-only" id="inspectorAnnouncement" aria-live="polite" aria-atomic="true"></p>
-        </section>
-
-        <details class="preview-details">
-          <summary>Preview details</summary>
-          <div class="details-grid">
-            <p><strong>Frame authority</strong>Primary and Secondary are resolved independently. Neither row borrows the other channel’s pixels or inspector values.</p>
-            <p><strong>Inheritance</strong><span id="inheritDetail">Secondary look relationship is resolved inside its own frame.</span></p>
-            <p><strong>Output comparison</strong>Exact cached RGB16 triplets and LED counts. Canvas appearance is never compared.</p>
-            <p><strong>Basis comparison</strong>Pattern, correction, pre/post selection, look relationship, session knowledge, tune and render scale.</p>
+        <article class="channel" aria-labelledby="primaryName">
+          <div class="channel-head">
+            <span class="channel-name" id="primaryName">Primary</span>
+            <span class="channel-count">n=160 · centre 79/80</span>
           </div>
-        </details>
+          <dl class="truth-grid">
+            <div class="truth"><dt>Source</dt><dd id="primarySource">Local neutral transfer<small>browser-generated · nothing sent</small></dd></div>
+            <div class="truth"><dt>Transform</dt><dd id="primaryTransform">Device-effective prediction<small>confirmed tune · browser parity model</small></dd></div>
+          </dl>
+          <canvas class="strip" id="primaryCanvas" width="1280" height="176" aria-label="Primary code-value preview"></canvas>
+          <p class="stage-caption" id="primaryCaption">Input 0…65535 sampled at each LED · hover inspection is production work, omitted from this static proposal.</p>
+        </article>
 
-        <footer class="next-handoff">
-          <div><span>Next</span><strong id="nextState">Review the pending authoring draft.</strong></div>
-          <a id="nextLink" href="#sourceTitle">Review Source <span aria-hidden="true">→</span></a>
-        </footer>
+        <article class="channel" aria-labelledby="secondaryName">
+          <div class="channel-head">
+            <span class="channel-name" id="secondaryName">Secondary</span>
+            <span class="channel-count">n=160 · centre 79/80</span>
+          </div>
+          <dl class="truth-grid">
+            <div class="truth"><dt>Source</dt><dd id="secondarySource">Local neutral transfer<small>browser-generated · nothing sent</small></dd></div>
+            <div class="truth"><dt>Transform</dt><dd id="secondaryTransform">Local draft simulation<small>active look unknown · not device-confirmed</small></dd></div>
+          </dl>
+          <canvas class="strip" id="secondaryCanvas" width="1280" height="176" aria-label="Secondary code-value preview"></canvas>
+          <p class="stage-caption" id="secondaryCaption">The channel’s own framing controls its pixels and labels; Primary state is never reused.</p>
+        </article>
+
+        <div class="curve-wrap">
+          <div class="curve-head"><span>Transfer · input to output</span><span>Unity reference + R/G/B channel model</span></div>
+          <div class="curve-box"><canvas id="curveCanvas" width="1600" height="312" aria-label="Transfer curves"></canvas></div>
+        </div>
       </section>
     </div>
 
@@ -805,10 +748,9 @@
           <p>Reference palettes stay immutable; edits become drafts. Device safety and product-colour policy are evaluated independently before any output boundary.</p>
         </div>
         <div class="facts">
-          <span class="chip live" id="paletteNameChip">Draft · Amber Ember</span>
-          <span class="chip" id="sourceStopCount">4 source stops</span>
-          <span class="chip" id="compiledStopCount">Rich local draft → 8 Paint stops</span>
-          <span class="chip" id="approximationChip">Approximation pending</span>
+          <span class="chip live">Draft · Amber Ember</span>
+          <span class="chip">4 source stops</span>
+          <span class="chip">Rich local draft → ≤8 Paint stops</span>
         </div>
       </div>
 
@@ -817,11 +759,6 @@
           <div class="palette-name"><h3 id="paletteTitle">Palette stops</h3><span class="chip">bounded family</span></div>
           <p>Hue is numeric and bounded around one base. No wheel is exposed.</p>
           <div class="stop-row" id="stopRow"></div>
-          <div class="control-row" style="margin-top:8px">
-            <button type="button" class="btn quiet small" id="addStopBtn">Add local stop</button>
-            <button type="button" class="btn quiet small" id="removeStopBtn">Remove stop</button>
-            <button type="button" class="btn quiet small" id="exportBtn">Export ≤8 stops</button>
-          </div>
           <label class="hue-control"><span class="mini-label">Base hue <span class="hue-value" id="baseHueValue">48°</span></span><input type="range" id="baseHue" min="0" max="359" value="48"></label>
         </section>
 
@@ -831,11 +768,6 @@
           <div class="compare-row"><div class="compare-label"><b>Firmware RGB</b><span>current device path</span></div><div class="compare-track" id="rgbTrack"></div></div>
           <div class="compare-row"><div class="compare-label"><b>OKLCH</b><span>perceptual authoring view</span></div><div class="compare-track" id="oklchTrack"></div></div>
           <div class="compare-row"><div class="compare-label"><b>Shortest-arc HSV</b><span>comparison only</span></div><div class="compare-track" id="hsvTrack"></div></div>
-          <div class="seg" id="interpolationSeg" aria-label="Authoring interpolation used for compilation" style="margin-top:11px">
-            <button type="button" data-space="rgb">Compile RGB</button>
-            <button type="button" class="active" data-space="oklch">Compile OKLCH</button>
-            <button type="button" data-space="hsv">Compile HSV</button>
-          </div>
         </section>
 
         <section class="bench-cell diagnostics" aria-labelledby="diagnosticsTitle">
@@ -843,24 +775,24 @@
           <p>Local, bounded controls for channel, transfer and card parity. No full hue-wheel stimulus exists in this product surface.</p>
           <div class="diagnostic-list">
             <div class="diagnostic-ref"><div><b>K1 Card · 17 regions</b><small>13 greys · R · G · B · K1 Gold</small></div><div class="diagnostic-track diagnostic-card"></div></div>
-            <div class="diagnostic-ref"><div><b>Channel ramps</b><small>R, G and B are isolated with black separation</small></div><div class="diagnostic-track diagnostic-rgb"></div></div>
+            <div class="diagnostic-ref"><div><b>Channel ramps</b><small>R, G and B are isolated, not sequenced as a spectrum</small></div><div class="diagnostic-track diagnostic-rgb"></div></div>
             <div class="diagnostic-ref"><div><b>Single-hue S/V</b><small>Bounded to the selected base hue</small></div><div class="diagnostic-track diagnostic-sv"></div></div>
           </div>
         </section>
 
         <div class="gate-stack">
           <section class="bench-cell gate" id="safetyGate" aria-labelledby="safetyGateTitle">
-            <div class="gate-status"><div><h3 id="safetyGateTitle">Device safety gate</h3><p>Governs whether Preview and device output can be trusted.</p></div><strong id="safetyGateStatus">PASS</strong></div>
+            <div class="gate-status"><div><h3 id="safetyGateTitle">Device safety gate</h3><p>Governs whether Stage and device output can be trusted.</p></div><strong id="safetyGateStatus">PASS</strong></div>
             <div class="gate-line"><span>Model state</span><b id="safetyModelState">Coherent</b></div>
-            <div class="gate-line"><span>Recovery path</span><b id="safetyRecoveryValue">No device output path</b></div>
-            <div class="gate-lock">FAIL makes Preview unavailable and permits recovery only.</div>
+            <div class="gate-line"><span>Recovery path</span><b>Stop output armed</b></div>
+            <div class="gate-lock">FAIL makes Stage dark and permits recovery only.</div>
           </section>
 
           <section class="bench-cell gate" id="policyGate" aria-labelledby="policyGateTitle">
             <div class="gate-status"><div><h3 id="policyGateTitle">Product colour policy</h3><p>One decision authority for device Test, Save and product export.</p></div><strong id="policyGateStatus">PASS</strong></div>
             <div class="gate-line"><span>Ordered hue travel</span><b id="hueTravelValue">60° / 80° max</b></div>
             <div class="gate-line"><span>Hue families</span><b id="hueFamilyValue">3 / 3 max</b></div>
-            <div class="gate-line"><span>Prohibited chromatic path</span><b id="wheelSpanValue">Absent</b></div>
+            <div class="gate-line"><span>Wheel-spanning sequence</span><b>Absent</b></div>
             <div class="gate-line"><span>Near-white bloom risk</span><b id="nearWhiteValue">Absent</b></div>
             <div class="gate-lock">FAIL preserves local analysis but blocks every device and product-output boundary.</div>
           </section>
@@ -870,19 +802,296 @@
 
     <details class="panel console">
       <summary>Session console and implementation evidence</summary>
-      <pre id="log" role="log">MODELLED   source → target → known/draft transform → u16 quantisation
+      <pre>MODELLED   source → target → known/draft transform → u16 quantisation
 NOT MODELLED physical LED emission, acrylic diffusion truth, brightness or unread LUT nodes
-POLICY     product-policy FAIL remains locally visible; device safety FAIL makes Preview unavailable
-SERIAL     disconnected — no writes</pre>
+POLICY     product-policy FAIL remains locally visible; device safety FAIL renders Stage dark
+SERIAL     mockup disabled — zero Web Serial calls</pre>
     </details>
 
-    <p class="mock-note">Production boundary: LED values and the relative Diffusion model are browser models. Physical emission, acrylic diffusion truth and unread LUT nodes are never claimed.</p>
+    <p class="mock-note">Proposal fidelity: current K1 main profile, 160/160 geometry, slot-15 truth language and transaction boundaries are represented. LGP audition remains explicitly simulated.</p>
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="colourlab-core.js"></script>
-  <script src="colourlab-authoring.js"></script>
-  <script src="colourlab-workbench.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    var state = {
+      stimulus: "neutral",
+      target: "both",
+      view: "code",
+      reviewState: (function () {
+        var requested = new URLSearchParams(location.search).get("state");
+        if (requested === "blocked") return "safety";
+        return requested === "policy" || requested === "safety" ? requested : "normal";
+      }()),
+      baseHue: 48
+    };
+    var $ = function (id) { return document.getElementById(id); };
+    var N = 160;
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+    function hslToRgb(h, s, l) {
+      h = ((h % 360) + 360) % 360;
+      s = clamp(s, 0, 1); l = clamp(l, 0, 1);
+      var c = (1 - Math.abs(2 * l - 1)) * s;
+      var x = c * (1 - Math.abs((h / 60) % 2 - 1));
+      var m = l - c / 2;
+      var q = Math.floor(h / 60), rgb;
+      if (q === 0) rgb = [c, x, 0];
+      else if (q === 1) rgb = [x, c, 0];
+      else if (q === 2) rgb = [0, c, x];
+      else if (q === 3) rgb = [0, x, c];
+      else if (q === 4) rgb = [x, 0, c];
+      else rgb = [c, 0, x];
+      return rgb.map(function (v) { return Math.round((v + m) * 255); });
+    }
+    function hex(rgb) { return "#" + rgb.map(function (v) { return clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0"); }).join(""); }
+    function palette() {
+      var h = state.baseHue;
+      var offsets = [0, -20, -40, -60];
+      var lights = state.reviewState === "policy" ? [0.96, 0.88, 0.48, 0.30] : [0.72, 0.53, 0.44, 0.30];
+      return [
+        hslToRgb(h + offsets[0], 0.96, lights[0]),
+        hslToRgb(h + offsets[1], 1.00, lights[1]),
+        hslToRgb(h + offsets[2], 0.91, lights[2]),
+        hslToRgb(h + offsets[3], 0.72, lights[3])
+      ];
+    }
+    function mix(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
+    function samplePalette(t) {
+      var p = palette();
+      var x = clamp(t, 0, 1) * (p.length - 1);
+      var i = Math.min(p.length - 2, Math.floor(x));
+      return mix(p[i], p[i + 1], x - i);
+    }
+    function tune(rgb) {
+      var gains = [+$('gainR').value, +$('gainG').value, +$('gainB').value];
+      var gamma = clamp(+$('gamma').value, 0.2, 4);
+      return rgb.map(function (v, i) {
+        return 255 * Math.pow(clamp(v / 255, 0, 1), 1 / gamma) * gains[i];
+      }).map(function (v) { return clamp(v, 0, 255); });
+    }
+    function safetyBlocked() { return state.reviewState === "safety"; }
+    function policyBlocked() { return state.reviewState === "policy"; }
+    function stimulusPixel(i) {
+      var t = i / (N - 1);
+      if (state.stimulus === "solid") return [+$('solidR').value, +$('solidG').value, +$('solidB').value];
+      if (state.stimulus === "bounded") return samplePalette(t);
+      if (state.stimulus === "card") {
+        var greys = [0, 1, 16, 32, 64, 96, 128, 160, 192, 224, 240, 254, 255];
+        var region = Math.min(16, Math.floor((i * 17) / N));
+        if (region < 13) return [greys[region], greys[region], greys[region]];
+        if (region === 13) return [255, 0, 0];
+        if (region === 14) return [0, 255, 0];
+        if (region === 15) return [0, 0, 255];
+        return [255, 140, 0];
+      }
+      if (state.stimulus === "rgb") {
+        var lane = Math.min(2, Math.floor(t * 3));
+        var local = (t * 3) - lane;
+        var value = Math.round(local * 255);
+        return lane === 0 ? [value, 0, 0] : lane === 1 ? [0, value, 0] : [0, 0, value];
+      }
+      if (state.stimulus === "sv") {
+        if (t < 0.5) return hslToRgb(state.baseHue, t * 2, 0.50);
+        return hslToRgb(state.baseHue, 1, 1 - t);
+      }
+      var v = Math.round(t * 255);
+      return [v, v, v];
+    }
+    function isTargeted(which) { return state.target === "both" || state.target === which; }
+
+    function drawStrip(canvas, which) {
+      var ctx = canvas.getContext("2d");
+      var w = canvas.width, h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = safetyBlocked() ? "#000000" : "#050505";
+      ctx.fillRect(0, 0, w, h);
+      if (safetyBlocked() || !isTargeted(which)) {
+        return;
+      }
+      var pitch = w / N;
+      var rows = [];
+      for (var i = 0; i < N; i++) rows.push(tune(stimulusPixel(i)));
+      if (state.view === "lgp") {
+        var blurred = rows.map(function (_, i) {
+          var out = [0,0,0], sum = 0;
+          for (var d = -5; d <= 5; d++) {
+            var j = clamp(i + d, 0, N - 1);
+            var weight = Math.exp(-(d * d) / 8);
+            sum += weight;
+            for (var c = 0; c < 3; c++) out[c] += rows[j][c] * weight;
+          }
+          return out.map(function (v) { return v / sum; });
+        });
+        for (var k = 0; k < N; k++) {
+          var grd = ctx.createLinearGradient(0, 0, 0, h);
+          var col = blurred[k].map(Math.round);
+          grd.addColorStop(0, "rgba(" + col.join(",") + ",.18)");
+          grd.addColorStop(.5, "rgba(" + col.join(",") + ",1)");
+          grd.addColorStop(1, "rgba(" + col.join(",") + ",.18)");
+          ctx.fillStyle = grd;
+          ctx.fillRect(k * pitch - 1, 0, pitch + 2, h);
+        }
+      } else {
+        for (var j = 0; j < N; j++) {
+          ctx.fillStyle = hex(rows[j]);
+          ctx.fillRect(Math.floor(j * pitch), 0, Math.ceil(pitch + 0.5), h);
+        }
+        ctx.fillStyle = "rgba(0,0,0,.48)";
+        ctx.fillRect(w / 2 - 1, 0, 2, h);
+      }
+    }
+
+    function drawCurve() {
+      var cv = $('curveCanvas'), ctx = cv.getContext('2d');
+      var w = cv.width, h = cv.height;
+      ctx.clearRect(0, 0, w, h);
+      if (safetyBlocked()) return;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(255,255,255,.32)';
+      ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w, 0); ctx.stroke();
+      var gains = [+$('gainR').value, +$('gainG').value, +$('gainB').value];
+      var gamma = clamp(+$('gamma').value, .2, 4);
+      var cols = ['#ff786d', '#88c98b', '#7797f5'];
+      gains.forEach(function (gain, ci) {
+        ctx.strokeStyle = cols[ci];
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (var i = 0; i <= 255; i++) {
+          var y = 255 * Math.pow(i / 255, 1 / gamma) * gain;
+          var px = i / 255 * w;
+          var py = h - clamp(y / 255, 0, 1) * h;
+          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      });
+    }
+
+    function setTruth(which) {
+      var sourceEl = $(which + 'Source');
+      var transformEl = $(which + 'Transform');
+      if (safetyBlocked()) {
+        sourceEl.innerHTML = 'Safety-blocked device state<small>recognised for recovery only</small>';
+        transformEl.innerHTML = 'Not evaluated<small>no preview pixels rendered</small>';
+        return;
+      }
+      if (!isTargeted(which)) {
+        sourceEl.innerHTML = 'Untargeted channel<small>no source pixels written</small>';
+        transformEl.innerHTML = 'Not evaluated<small>channel remains black</small>';
+        return;
+      }
+      var names = {neutral:'Local neutral transfer', solid:'Local solid colour', bounded:'Bounded palette draft', card:'K1 diagnostic card', rgb:'Isolated channel ramps', sv:'Single-hue S/V reference'};
+      sourceEl.innerHTML = names[state.stimulus] + '<small>' + (policyBlocked() ? 'NON-PRODUCT · local analysis only' : 'browser-generated · nothing sent') + '</small>';
+      if (which === 'primary') transformEl.innerHTML = 'Device-effective prediction<small>confirmed tune · browser parity model</small>';
+      else transformEl.innerHTML = 'Local draft simulation<small>active look unknown · not device-confirmed</small>';
+    }
+
+    function renderPalette() {
+      var p = palette();
+      $('stopRow').innerHTML = p.map(function (rgb, i) {
+        return '<div class="stop" aria-label="Stop ' + (i + 1) + ' ' + hex(rgb) + '"><span class="stop-swatch" style="background:' + hex(rgb) + '"></span><code>' + hex(rgb).toUpperCase() + '</code></div>';
+      }).join('');
+      var stops = p.map(function (rgb, i) { return hex(rgb) + ' ' + Math.round(i / (p.length - 1) * 100) + '%'; }).join(',');
+      $('rgbTrack').style.background = 'linear-gradient(90deg,' + stops + ')';
+      var a = p[0], b = p[1], c = p[2], d = p[3];
+      $('oklchTrack').style.background = 'linear-gradient(90deg,' + hex(a) + ', ' + hex(mix(a,b,.55)) + ', ' + hex(b) + ', ' + hex(mix(b,c,.55)) + ', ' + hex(c) + ', ' + hex(d) + ')';
+      $('hsvTrack').style.background = 'linear-gradient(90deg,' + hex(a) + ', ' + hex(b) + ' 38%, ' + hex(c) + ' 68%, ' + hex(d) + ')';
+      $('baseHueValue').textContent = state.baseHue + '°';
+    }
+
+    function render() {
+      $('policyBanner').classList.toggle('visible', policyBlocked());
+      $('safetyBanner').classList.toggle('visible', safetyBlocked());
+      $('nonProductStamp').classList.toggle('visible', policyBlocked());
+      $('stagePanel').classList.toggle('lgp-mode', state.view === 'lgp');
+      $('deviceStateChip').textContent = safetyBlocked()
+        ? 'device safety FAIL · Stage dark · paint=off recovery prepared'
+        : policyBlocked()
+          ? 'product policy FAIL · local analysis visible · device and export locked'
+          : 'paint off/both · slot-15 known this session · active P=15 · S=unknown';
+      $('viewQualifier').textContent = state.view === 'lgp'
+        ? 'Relative diffusion audition · browser model, never hardware truth'
+        : 'Digital preview · not device readback or a physical colour match';
+      var stimulusName = {neutral:'Neutral transfer', solid:'Solid', bounded:'Bounded palette', card:'K1 Card · 17', rgb:'R / G / B ramps', sv:'Single-hue S/V'}[state.stimulus];
+      var targetName = state.target.charAt(0).toUpperCase() + state.target.slice(1);
+      $('sourceDraftTitle').textContent = stimulusName + ' · ' + targetName;
+      var blocked = policyBlocked() || safetyBlocked();
+      $('sendStimulusBtn').disabled = blocked;
+      $('applyTuneBtn').disabled = blocked;
+      $('saveBtn').disabled = blocked;
+      $('sendStimulusBtn').textContent = safetyBlocked() ? 'Blocked · use Stop output' : policyBlocked() ? 'NON-PRODUCT · blocked' : 'Send 1 change';
+      $('applyTuneBtn').textContent = blocked ? 'Blocked by gate' : 'Apply tune (4)';
+      $('safetyGate').classList.toggle('fail', safetyBlocked());
+      $('safetyGateStatus').textContent = safetyBlocked() ? 'FAIL' : 'PASS';
+      $('safetyModelState').textContent = safetyBlocked() ? 'Unsafe / unknown' : 'Coherent';
+      $('policyGate').classList.toggle('fail', policyBlocked());
+      $('policyGateStatus').textContent = policyBlocked() ? 'FAIL' : 'PASS';
+      $('hueTravelValue').textContent = '60° / 80° max';
+      $('hueFamilyValue').textContent = '3 / 3 max';
+      $('nearWhiteValue').textContent = policyBlocked() ? 'Present · blocked' : 'Absent';
+      setTruth('primary'); setTruth('secondary');
+      drawStrip($('primaryCanvas'), 'primary');
+      drawStrip($('secondaryCanvas'), 'secondary');
+      drawCurve();
+      renderPalette();
+    }
+
+    function bindSegment(hostId, key, dataKey) {
+      $(hostId).querySelectorAll('button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          state[key] = btn.dataset[dataKey];
+          $(hostId).querySelectorAll('button').forEach(function (x) { x.classList.toggle('active', x === btn); });
+          render();
+        });
+      });
+    }
+    bindSegment('targetSeg', 'target', 'target');
+    document.querySelectorAll('[data-stimulus]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.stimulus = btn.dataset.stimulus;
+        document.querySelectorAll('[data-stimulus]').forEach(function (x) { x.classList.toggle('active', x === btn); });
+        render();
+      });
+    });
+
+    document.querySelectorAll('.stage-tabs button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.view = btn.dataset.view;
+        document.querySelectorAll('.stage-tabs button').forEach(function (x) { x.classList.toggle('active', x === btn); });
+        render();
+      });
+    });
+    document.querySelectorAll('.review-switch button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.reviewState = btn.dataset.state;
+        document.querySelectorAll('.review-switch button').forEach(function (x) { x.classList.toggle('active', x === btn); });
+        render();
+      });
+    });
+
+    function toast(message) {
+      var el = $('toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+    }
+    $('sendStimulusBtn').addEventListener('click', function () { toast('Proposal only: one validated stimulus transaction would be sent here.'); });
+    $('applyTuneBtn').addEventListener('click', function () { toast('Proposal only: gain and gamma would apply as one tune transaction.'); });
+    $('resyncBtn').addEventListener('click', function () { toast('Proposal only: device truth would be rehydrated before local drafts are reconciled.'); });
+    $('stopBtn').addEventListener('click', function () { toast('Safety path: paint=off takes priority over every queued operation.'); });
+    $('identityBtn').addEventListener('click', function () { ['gainR','gainG','gainB','gamma'].forEach(function (id) { $(id).value = '1.000'; }); render(); });
+    $('revertBtn').addEventListener('click', function () { $('gainR').value='1.000'; $('gainG').value='0.936'; $('gainB').value='0.982'; $('gamma').value='2.200'; render(); });
+    $('saveBtn').addEventListener('click', function () { toast('Proposal only: save remains separate, explicit and persistence-labelled.'); });
+    ['solidR','solidG','solidB','gainR','gainG','gainB','gamma'].forEach(function (id) { $(id).addEventListener('input', render); });
+    $('baseHue').addEventListener('input', function () { state.baseHue = +this.value; render(); });
+
+    document.querySelectorAll('.review-switch button').forEach(function (b) { b.classList.toggle('active', b.dataset.state === state.reviewState); });
+    render();
+  }());
+  </script>
 </body>
 </html>
