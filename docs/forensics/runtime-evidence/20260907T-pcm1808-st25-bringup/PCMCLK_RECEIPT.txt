@@ -1,0 +1,38 @@
+PCM1808 digital clock gate — live Main RPL 9087A500
+Date: 2026-09-07
+Probe: k1_main_rpl_pcm1808_probe @ e54f4728 epoch=1788793692
+USB: B4:3A:45:A5:87:90  port=/dev/cu.usbmodem1101 (ephemeral)
+Identity after flash: git=e54f4728 env=k1_main_rpl_pcm1808_probe
+Restore dump: restore-pre-pcm-probe-0x0-2MB.bin sha256=1e2744256eaaaf170f18600f5daafc39bc33bce1521bd1067f92f48a6a3a3a8e
+Product still restorable: k1_main_rpl_im69d @ acaecaa8 (dumped before probe flash)
+
+Assumed physical (from execution brief, not re-measured with a meter):
+OP1=OPEN  OP2=SHORT  OP3=OPEN  MCLK=NC
+
+[PCMCLK] lrck_hz=47985.9
+[PCMCLK] bclk_hz=3069048.5
+[PCMCLK] ratio=63.957
+[PCMCLK] mode=48K_MASTER_I2S24
+[PCMCLK] gate=PASS
+[PCMCLK] MCLK=UNMEASURED logic=UNMEASURED_EXTERNALLY jitter=UNMEASURED
+
+[PCM1808] init=PASS i2s=1 pins=10,13,14 slot=24in32 philips
+[PCMRATE] frames=48000 us=1000043 hz=47997.9 gate=PASS
+[PCM_RATE_PROOF] PASS
+[PCMING] source=pcm1808 canonical_hz=12800 hop=96
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96
+
+UNMEASURED_ELECTRICAL_ITEMS:
+MCLK/SCKI frequency = UNMEASURED
+logic-high voltage  = UNMEASURED_EXTERNALLY
+clock jitter        = UNMEASURED
+rise/fall time      = UNMEASURED
+overshoot/ringing   = UNMEASURED
+
+60s soak (live window t=2.1..62.2): dma_hz=46782 err=0 short=0 clip=0 PASS_STREAM=1
+10 min soak: dma_hz=46823.5 tspan=596.95s err=0 short=0 clip=0 n=299 PASS_STREAM=1
+
+NOT YET PROVEN:
+physical L/R DMA slot map (Mac afplay on Multi-Output Device did not
+move PCM RMS vs baseline; analog path to PCM1808 not confirmed)
+ST25 identity / RFAL / combined coexistence

@@ -9,6 +9,9 @@
 #if K1_AUDIO_SOURCE_PCM1808
 #include "k1_pcm1808_input.h"
 #endif
+#ifdef K1_ST25_PROBE_V1
+#include "k1_st25_probe.h"
+#endif
 #include "constants.h" // For band definitions, NUM_FREQS etc.
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
@@ -619,6 +622,9 @@ void init_system() {
   init_i2s();
 #if K1_AUDIO_SOURCE_PCM1808
   k1_pcm1808_begin();
+#endif
+#ifdef K1_ST25_PROBE_V1
+  k1_st25_begin();
 #endif
   generate_a_weights();
   generate_window_lookup();

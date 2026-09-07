@@ -1,0 +1,79 @@
+CMRAW] frames=2939040 short=0 err=0 rmsL=21445 rmsR=21049 minL=-79651 maxL=87548 minR=-81882 maxR=76609 clip=0 n=93600
+[PCMRS] in=2939040 out=783744 blocks=8164 invariant=PASS
+[PCMRAW] frames=3032640 short=0 err=0 rmsL=21943 rmsR=22919 minL=-103166 maxL=97942 minR=-85605 maxR=93591 clip=0 n=93600
+[PCMRS] in=3032640 out=808704 blocks=8424 invariant=PASS
+[PCMRAW] frames=3126240 short=0 err=0 rmsL=25967 rmsR=27291 minL=-99932 maxL=103054 minR=-114130 maxR=97509 clip=0 n=93600
+[PCMRS] in=3126240 out=833664 blocks=8684 invariant=PASS
+[PCMRAW] frames=3220200 short=0 err=0 rmsL=32481 rmsR=29564 minL=-110925 maxL=121396 minR=-119043 maxR=131458 clip=0 n=93960
+[PCMRS] in=3220200 out=858720 blocks=8945 invariant=PASS
+[PCMRAW] frames=3314160 short=0 err=0 rmsL=27152 rmsR=26797 minL=-104790 maxL=123824 minR=-103443 maxR=121493 clip=0 n=93960
+[PCMRS] in=3314160 out=883776 blocks=9206 invariant=PASS
+[PCMRAW]ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x15 (USB_UART_CHIP_RESET),boot:0x8 (SPI_FAST_FLASH_BOOT)
+Saved PC:0x4037aa1e
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+---------------------------
+K1 | VER: 40103
+---------------------------
+
+INIT_SERIAL: PASS
+INIT FILESYSTEM: PASS
+[    77][E][vfs_api.cpp:99] open(): /littlefs/SHOW_STATE_V1.BIN does not exist, no permits for creation
+INIT_LEDS: PASS
+[PCMCLK] lrck_hz=47985.9
+[PCMCLK] bclk_hz=3069048.5
+[PCMCLK] ratio=63.957
+[PCMCLK] mode=48K_MASTER_I2S24
+[PCMCLK] gate=PASS
+[PCMCLK] MCLK=UNMEASURED logic=UNMEASURED_EXTERNALLY jitter=UNMEASURED
+[PCM1808] init=PASS i2s=1 pins=10,13,14 slot=24in32 philips
+[PCMRATE] frames=48000 us=1000043 hz=47997.9 gate=PASS
+[PCM_RATE_PROOF] PASS
+[PCMING] source=pcm1808 canonical_hz=12800 hop=96
+GENERATING A-WEIGHTS: DONE IN 0.428 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 4.466 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.063 MS
+SYSTEM INIT COMPLETE!
+BOOT_LOOP_GUARD: reset_reason=11 fail_count=0 safe_mode=0
+WAVEFORM_HISTORY: OK @ 0x3C0B09D8
+INIT_SECONDARY_LEDS: PASS
+INTRO:
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444RMT_ALLOC: first_show core=1
+ response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+[PCMRAW] frames=37440 short=0 err=0 rmsL=32085 rmsR=45587 minL=-144933 maxL=138624 minR=-168118 maxR=146922 clip=0 n=37440
+[PCMRS] in=37440 out=9984 blocks=104 invariant=PASS
+[PCMSNAP] frames=2048 bytes=12288 dump=hex24le
+[PCMSNAP] 0 4CABFF 798400
+[PCMSNAP] 1 D6B7FF 858400
+[PCMSNAP] 2 29C1FF D88D00
+[PCMSNAP] 3 DBD5FF 44A300
+[PCMSNAP] 4 CCE9FF C7A600
+[PCMSNAP] 5 2DF9FF B29800
+[PCMSNAP] 6 FD0900 E59700
+[PCMSNAP] 7 C52000 309E00
+[PCMSNAP] 8 942E00 739600
+[PCMSNAP] 9 FA3800 F68B00
+[PCMSNAP] 10 A04900 228F00
+[PCMSNAP] 11 CE5A00 AE9200
+[PCMSNAP] 12 636100 618500
+[PCMSNAP] 13 F05C00 C56C00
+[PCMSNAP] 14 155A00 115400
+[PCMSNAP] 15 926000 DF4A00
+[PCMRAW] frames=131400 short=0 err=0 rmsL=36085 rmsR=43691 minL=-157674 maxL=165941 minR=-161291 maxR=177101 clip=0 n=93960
+[PCMRS] in=131400 out=35040 blocks=365 invariant=PASS
+[PCMRAW] frames=225000 short=0 err=0 rmsL=30206 rmsR=31381 minL=-166424 maxL=153262 minR=-158416 maxR=160854 clip=0 n=93600
+[PCMRS] in=225000 out=60000 blocks=625 invariant=PASS
+[PCMRAW] frames=318600 short=0 err=0 rmsL=34689 rmsR=42232 minL=-162852 maxL=157305 minR=-171085 maxR=160404 clip=0 n=93600
+[PCMRS] in=318600 out=84960 blocks=885 invariant=PASS
+BOOT_LOOP_GUARD: stable_clear=1
+[PCMRAW] frames=412200 short=0 err=0 rmsL=28841 rmsR=31562 minL=-147272 maxL=150147 minR=-167663 maxR=162006 clip=0 n=93600
+[PCMRS] in=412200 out=109920 blocks=1145 invariant=PASS
+[PCMRAW] frames=505800 short=0 err=0 rmsL=18182 rmsR=17770 minL=-156790 maxL=98792 minR=-154805 maxR=100967 clip=0 n=93600
+[PCMRS] in=505800 out=134880 blocks=1405 invariant=PASS

@@ -9,6 +9,7 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 ### Added
 
 - **PCM1808 Main RPL probe env** `k1_main_rpl_pcm1808_probe`: PCNT digital clock gate on GPIO14/13, I2S1 24-in-32 Philips slave RX on GPIO10/13/14, 4/15 polyphase SRC into the existing 12.8 kHz / 96 hop. Isolated from `k1_main_rpl_im69d`. Chip `9087A500` only.
+- **ST25R3916B Main RPL identity probe env** `k1_main_rpl_st25_probe`: SPI2 on GPIO7/6/5/4, IRQ GPIO2, IC_IDENTITY read. Isolated from `k1_hardware` (GPIO6/7 are LEDs there). Chip `9087A500` only. No RFAL yet.
 
 - **P4 proto 150-px loom:** `env:k1_p4_wifi6_led150` — dual independent WS2812 channels, 150 LEDs each, data GPIO39 (primary) / GPIO40 (secondary) on the P4 lab board. Default `k1_p4_wifi6` stays GPIO4/5 at 160/160.
 - **Bench S3 proto 150-px loom:** `env:k1_bench_im69d_led150` — same 150/150 WS2812 geometry on bench K1 `B489A500`, GPIO39/40, IM69 mic stays CLK=14/DATA=13. Default `k1_bench_im69d` stays GPIO4/5 at 160/160. Canvas remains 160; output downsamples.

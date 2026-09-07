@@ -1,5 +1,5 @@
 ---
-abstract: "Active authority for the Main RPL PCM1808 + ST25R3916B bench bring-up. Status active on branch lane/pcm1808-st25r3916b-bringup. Hardware clocks first; no PCM firmware until default 96 kHz proof. Colour Lab remains ready_for_merge and is not this lane."
+abstract: "Active authority for the Main RPL PCM1808 + ST25R3916B bench bring-up. PCM clock gate PASS at 47.986 kHz on k1_main_rpl_pcm1808_probe @ e54f4728 / 9087A500. Product restore remains k1_main_rpl_im69d @ acaecaa8. ST25 identity probe not yet on silicon. Colour Lab remains ready_for_merge."
 branch: lane/pcm1808-st25r3916b-bringup
 status: active
 ---
@@ -44,4 +44,5 @@ Previous lane `COLOUR_LAB_PALETTE_BENCH_20260827` is **ready_for_merge** on `lan
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-09-07 | agent:grok | PCM probe on silicon `e54f4728`: `[PCMCLK] gate=PASS` 47.986 kHz / ratio 63.957, DMA 47.998 kHz, hop 12800/96. Analog L/R map not proven. ST25 next. |
 | 2026-09-07 | agent:grok | Created as active authority for PCM1808 + ST25R3916B Main RPL bring-up. |
