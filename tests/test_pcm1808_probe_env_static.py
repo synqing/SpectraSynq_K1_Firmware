@@ -127,3 +127,33 @@ def test_overflow_isr_has_no_printf_or_heap():
         assert "printf" not in body, name
         assert "malloc" not in body, name
         assert "new " not in body, name
+
+
+def test_pcmraw_dispatch_reaches_the_parse_command_ladder():
+    """The .def table is safety METADATA; live type=value dispatch is the
+    strcmp ladder in serial_menu.cpp. A row without a ladder call-site
+    compiles clean and answers `Bad command` on device (2026-09-08 silicon)."""
+    menu = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_menu.cpp").read_text(
+        encoding="utf-8"
+    )
+    parse = menu[menu.find("parse_command") :]
+    m = re.search(r"#ifdef\s+K1_PCM1808_PROBE_V1\s*\n(.*?)#endif", parse, re.S)
+    assert m, "parse_command must carry a K1_PCM1808_PROBE_V1-gated hop"
+    assert "k1_pcm1808_dispatch(command_type, command_data)" in m.group(1), (
+        "the gated hop must call k1_pcm1808_dispatch — the table row alone "
+        "does not dispatch"
+    )
+    assert '#include "k1_pcm1808_input.h"' in menu
+
+
+def test_pcmraw_def_rows_are_gated_and_complete():
+    table = (
+        ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "serial" / "serial_typed_cmd_table.def"
+    ).read_text(encoding="utf-8")
+    m = re.search(r"#ifdef\s+K1_PCM1808_PROBE_V1\s*\n(.*?)#endif", table, re.S)
+    assert m, "serial_typed_cmd_table.def must carry a K1_PCM1808_PROBE_V1 block"
+    block = m.group(0)
+    for cmd in ("pcmraw_arm", "pcmraw_status", "pcmraw_dump"):
+        assert f'SERIAL_TYPED_CMD("{cmd}"' in block, f"missing gated row for {cmd}"
+    outside = table.replace(block, "")
+    assert "pcmraw_" not in outside, "pcmraw rows leaked outside the flag gate"

@@ -55,6 +55,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_stereo_probe.h"  // scap_* dispatch (Stage 2 probe env only)
 #include "k1_render_trace.h"  // rtrace_* dispatch (colour-fix-lane env only)
 #endif
+#ifdef K1_PCM1808_PROBE_V1
+#include "k1_pcm1808_input.h"  // pcmraw_* dispatch (PCM1808 probe env only)
+#endif
 #include "k1_mode_selection.h"
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
@@ -3081,6 +3084,17 @@ void parse_command(char* command_buf) {
     // K1_RENDER_TRACE_V1 (colour-fix-lane env only; production-OFF).
     else if (k1_render_trace_dispatch(command_type, command_data)) {
       // handled by the render trace instrument
+    }
+#endif
+
+#ifdef K1_PCM1808_PROBE_V1
+    // pcmraw_arm / pcmraw_status / pcmraw_dump — timed signed-24 stereo from the
+    // continuous capture task (audio/k1_pcm1808_input.cpp). GATE-MATCHED: rows in
+    // serial_typed_cmd_table.def, wrapper in serial_typed_dispatch.cpp, and this
+    // call-site all sit behind K1_PCM1808_PROBE_V1. The typed table is safety
+    // metadata; without this hop the commands compile and answer Bad command.
+    else if (k1_pcm1808_dispatch(command_type, command_data)) {
+      // handled by the PCM1808 raw-capture instrument
     }
 #endif
 
