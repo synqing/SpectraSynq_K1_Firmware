@@ -1,0 +1,44 @@
+{
+  "PASS": true,
+  "mac": {
+    "output_volume": 100,
+    "route": "External Headphones"
+  },
+  "pre_rms": 1444.9826814309633,
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "hw_fill": 2040,
+    "filled": 48000,
+    "target": 48000
+  },
+  "rms_slot0": 5012778.520466064,
+  "rms_slot1": 5022969.280072219,
+  "peak_slot0": 7645147,
+  "peak_slot1": 7661740,
+  "thd_slot0_RIGHT": {
+    "n": 48000,
+    "fundamental_bin": 997,
+    "fundamental_hz": 997.0,
+    "thd": 0.00014538519259702325,
+    "thd_db": -76.74959641789445,
+    "thdn": 0.7407479752550397,
+    "sinad_db": 2.6065905387423918,
+    "h2_db": -79.45068293807165,
+    "h3_db": -81.17170846737146,
+    "label": "END_TO_END_LINE_LANE_METRIC"
+  },
+  "thd_slot1_LEFT": {
+    "n": 48000,
+    "fundamental_bin": 997,
+    "fundamental_hz": 997.0,
+    "thd": 0.0001377836015132687,
+    "thd_db": -77.21604928597559,
+    "thdn": 0.7407484649860706,
+    "sinad_db": 2.6065847962382964,
+    "h2_db": -79.96914529264441,
+    "h3_db": -81.54674985143649,
+    "label": "END_TO_END_LINE_LANE_METRIC"
+  },
+  "label": "END_TO_END_LINE_LANE_METRIC"
+}

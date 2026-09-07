@@ -1,5 +1,5 @@
 ---
-abstract: "P3 partial. Route PASS. DMA0=physical RIGHT. Crosstalk noise-floor-limited. Amplitude staircase VOL=56 peak-linear to digital 1.0; ADC clip not reached (~16.7 dB peak headroom). THD/FR pending higher Mac volume."
+abstract: "P3 closed enough for architecture. Route PASS. DMA0=physical RIGHT. VOL=56 peak-linear to digital 1.0. VOL=100 digital FS reaches −0.8 dBFS peak without ADC clip. 997 Hz H2/H3 ≈ −79/−81 dB. Crosstalk still noise-floor-limited, bound now ≤ −51/−56 dB. FR not done."
 ---
 
 # P3 — Line-In characterisation (partial)
@@ -72,9 +72,44 @@ Peak tracks digital amplitude through 1.0. ADC clipping **not reached**. Headroo
 
 Quiet floor in the same captures ≈ 1.7k–2.0k RMS. Fill deltas: ovf=0, ring_drop=0. Lifetime ring_drop still climbs during hex dump because dump runs on the serial/AP core; that is a dump artefact, not a lost capture.
 
-## Not yet measured
+## Mac volume extension — MEASURED_ON_SILICON (digital amp 1.0)
 
-997 Hz THD/SINAD at a few dB below ADC clip (clip not found at VOL=56). Quiet PSD/DC at that drive. Crosstalk at the higher clean level. Frequency response. Mac volume 80/100 extension after dump no longer interleaves `[PCMRAW]` telemetry.
+| Mac volume | peak slot0 | RMS dBFS | clip samples |
+|---:|---:|---:|---:|
+| 56 | 1 230 508 | −21.4 | 0 |
+| 80 | 3 536 401 | −10.6 | 0 |
+| 100 | 7 643 706 | −4.34 | 0 |
+
+Peak 7.64e6 / 8.39e6 ≈ **−0.81 dBFS**. ADC clipping **still not reached** on this Mac + cable + module path at max output volume. This is the highest clean level this fixture can produce. Subsequent line characterisation used VOL=100.
+
+## Quiet PSD at VOL=100 setup (no stimulus)
+
+RMS ≈ 2080, DC ≈ 193 counts, 50 Hz bin small, 60 Hz bin small, spectral peak at 1 Hz. Not a 50/60 Hz dominated floor.
+
+## 997 Hz THD — END_TO_END_LINE_LANE_METRIC
+
+At VOL=100, digital FS, peak ≈ 7.65e6:
+
+- H2 ≈ −79.5 dB
+- H3 ≈ −81.2 dB
+- THD (H2…H7) ≈ −76.7 dB
+
+A naive all-bin THD+N/SINAD (2.6 dB) is **rejected** — it sums every FFT bin of noise against one fundamental bin and is not a SINAD. Residual SINAD was not closed (1 s dump still lost hex to non-PCMRAW serial). Harmonic THD is the number that answers the architectural question: this line path is not the distortion limiter.
+
+## Crosstalk at high clean level — still NOISE-FLOOR-LIMITED
+
+VOL=100, digital FS:
+
+| Stimulus | active RMS | inactive RMS | bound |
+|---|---:|---:|---|
+| Mac LEFT | slot1 681 194 | slot0 1 893 | ≤ −51.1 dB |
+| Mac RIGHT | slot0 679 079 | slot1 1 024 | ≤ −56.4 dB |
+
+Inactive slots remain at the quiet floor. True isolation may be much better. Bound improved from ≤ −28/−30 dB because the active level is ~20 dB higher, not because we resolved leakage.
+
+## Frequency response
+
+Not measured. Not required to close the architectural questions (lossless ingress, drive headroom, channel map, floor-limited isolation). Do not FR from coarse RMS telemetry. Log-sweep/deconvolution remains optional before product claims.
 
 No Line-In conditioning constant is frozen.
 
@@ -82,6 +117,7 @@ No Line-In conditioning constant is frozen.
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-09-08 | agent:grok | VOL=100 near-FS, THD ~−77 dB, crosstalk bound ≤ −51/−56 dB still floor-limited. FR not done. |
 | 2026-09-08 | agent:grok | Amplitude staircase VOL=56: peak-linear to digital 1.0, ADC clip not reached, 16.7 dB peak headroom. |
 | 2026-09-08 | agent:grok | Crosstalk reclassified NOISE-FLOOR-LIMITED; tone was only −42.6 dBFS. |
 | 2026-09-08 | agent:grok | Route + L/R map + noise/crosstalk from exclusive External Headphones. |

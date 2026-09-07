@@ -7,8 +7,8 @@
 **ACTIVE LANE (2026-09-08): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
 Authority: **`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`**.
 Continuation evidence: **`docs/forensics/runtime-evidence/20260908T-audio-source-architecture/`**.
-Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_probe` @ **`9361a027`**.
-P1: hop-drain overflow was real. P2: 10 min lossless capture ring PASS. P3: AUX route PASS; DMA0=physical RIGHT. NFC parked. Product restore still `k1_main_rpl_im69d` @ `acaecaa8`.
+Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_probe` @ **`798c269f`** (epoch `1788818754`).
+P1: hop-drain overflow was real. P2: 10 min lossless capture ring PASS. P3 architectural close: AUX route PASS; DMA0=physical RIGHT; VOL=100 near-FS no ADC clip; 997 Hz THD ≈ −77 dB; crosstalk still floor-limited. FR not done. NFC parked. Product restore still `k1_main_rpl_im69d` @ `acaecaa8`. Next: P4 dual capture.
 
 Previous lane Colour Lab remains **ready_for_merge** on `lane/colourlab-bench`
 (`tools/colourlab/EXECUTION.md`). Do not merge it from this branch. Unrelated
