@@ -33,13 +33,14 @@ Then read this file and the files it flags as current. Do not proceed until you 
 - active lane
 - whether handoff docs are stale
 
-**Active lane (2026-08-28):** `COLOUR_LAB_PALETTE_BENCH_20260827` on
-`lane/colourlab-bench`.
-Authority: `tools/colourlab/EXECUTION.md`.
-Production Preview R1.1 and the no-flash programme on `9087A500` / `B489A500` passed.
-The lane is `ready_for_merge`; `COLOUR_LAB_WEB_UI_HARDWARE_PASS` and clean leave-state are in
-`tools/colourlab/VERIFICATION.md`. No firmware change or flash occurred. Merge to `main`
-remains a separate explicit action.
+**Active lane (2026-09-07):** `PCM1808_ST25R3916B_BRINGUP_20260907` on
+`lane/pcm1808-st25r3916b-bringup`.
+Authority: `docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`.
+Evidence: `docs/forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md`.
+Hardware clocks first; no PCM firmware until default 96 kHz proof.
+
+Previous lane `COLOUR_LAB_PALETTE_BENCH_20260827` on `lane/colourlab-bench` remains
+`ready_for_merge` (`tools/colourlab/EXECUTION.md`). Do not merge it from this branch.
 
 **If the task touches K1 vs donor lineage, migration, flash identity, or "latest build":** read `docs/agent/K1_LINEAGE_AGENT_ORACLE.md` and load `.claude/skills/k1-lineage-routing/SKILL.md` before any build/flash/port answer. Cross-repo canonical: `Lightwave-Ledstrip/instructions/k1-lineage-agent-oracle.md`.
 
@@ -71,10 +72,10 @@ The current live lane is declared in the machine-readable frontmatter of
 
 At this revision:
 
-- **Branch:** `lane/colourlab-bench`
+- **Branch:** `lane/pcm1808-st25r3916b-bringup`
 - **Project:** `SPECTRASYNQ_K1_FIRMWARE`
-- **Focus:** Colour Lab production Workbench device verification and clean close.
-- **Authority:** `tools/colourlab/EXECUTION.md`
+- **Focus:** Main RPL PCM1808 line-in + ST25R3916B bench bring-up. Colour Lab is ready_for_merge, not this lane.
+- **Authority:** `docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`
 
 Before any work, verify the checked-out branch matches `active_branch` and the
 authority path exists. `scripts/agent/repo-truth.sh` enforces both. If either

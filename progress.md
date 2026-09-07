@@ -2,6 +2,20 @@
 
 **Started:** 2026-05-25
 
+## 2026-09-07 — Main RPL PCM1808 + ST25 bring-up preflight
+
+**Active authority:** `docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`
+**Lane:** `PCM1808_ST25R3916B_BRINGUP_20260907` on `lane/pcm1808-st25r3916b-bringup`
+
+Live Main RPL on `/dev/cu.usbmodem1101` is chip `9087A500`, USB `B4:3A:45:A5:87:90`,
+running `k1_main_rpl_im69d` @ `acaecaa8` epoch `1788173468`. Hop is still 12.8 kHz / 96.
+I2S0 is the IM69 PDM mic on GPIO 8/9. I2S1 is free. Candidate PCM pins 13/14/10 are
+free on this env. Candidate NFC pins 7/6/5/4/2 are free on this env and **not** on
+`k1_hardware` (6/7 are LEDs there). PCM firmware is not written. Next step is a
+human 96 kHz clock measurement on the untouched module.
+
+Colour Lab stays ready_for_merge; it is not this lane.
+
 ## 2026-08-28 — Colour Lab production Preview and hardware gate passed
 
 **Active authority:** `tools/colourlab/EXECUTION.md`

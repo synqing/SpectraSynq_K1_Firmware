@@ -1,17 +1,22 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_lane: COLOUR_LAB_PALETTE_BENCH_20260827
-active_authority: tools/colourlab/EXECUTION.md
-active_branch: lane/colourlab-bench
-previous_lane: K1_SCHEDULING_HARDENING_20260815 (authority docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md, branch feat/k1-scheduling-generation-hardening)
+active_lane: PCM1808_ST25R3916B_BRINGUP_20260907
+active_authority: docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md
+active_branch: lane/pcm1808-st25r3916b-bringup
+previous_lane: COLOUR_LAB_PALETTE_BENCH_20260827 (authority tools/colourlab/EXECUTION.md, branch lane/colourlab-bench, status ready_for_merge)
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
-lane_branch: lane/colourlab-bench
-last_verified: 2026-08-28
+lane_branch: lane/pcm1808-st25r3916b-bringup
+last_verified: 2026-09-07
 ---
 
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
      repo, so every path and link must spell it that way or the link breaks. Prose in this file
      uses "artefacts". -->
+
+**Current authority (2026-09-07):** Main RPL PCM1808 + ST25R3916B bench bring-up —
+[`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`](handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md)
+· evidence [`docs/forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md`](forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md).
+Colour Lab (`tools/colourlab/EXECUTION.md`) is **ready_for_merge**, not this lane.
 
 # SensoryBridge K1 — Spec Index
 

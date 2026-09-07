@@ -4,14 +4,15 @@
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
 
-**ACTIVE LANE (2026-08-28): COLOUR_LAB_PALETTE_BENCH** — branch `lane/colourlab-bench`.
-Ledger and authority: **`tools/colourlab/EXECUTION.md`** (per-task status, gates, evidence).
-Production Preview R1.1 and the two-device programme passed.
-`COLOUR_LAB_WEB_UI_HARDWARE_PASS` is recorded in `tools/colourlab/VERIFICATION.md`.
-Main `9087A500` is Paint off with slot 15 deliberately identity-saved; Bench `B489A500` is
-Paint off with Tune unavailable. Product rtrace is unavailable, so wire truth is not claimed.
-The lane is ready for merge after the final evidence commit/push; do not merge to `main`
-without the separate explicit merge action.
+**ACTIVE LANE (2026-09-07): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
+Authority: **`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`**.
+Evidence: **`docs/forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md`**.
+Hardware clocks first. No PCM firmware until default 96 kHz proof.
+
+Previous lane Colour Lab remains **ready_for_merge** on `lane/colourlab-bench`
+(`tools/colourlab/EXECUTION.md`). Do not merge it from this branch. Unrelated
+Colour Lab / BLE-iPhone dirty files travel with the working tree; do not commit
+them into this bring-up.
 
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
