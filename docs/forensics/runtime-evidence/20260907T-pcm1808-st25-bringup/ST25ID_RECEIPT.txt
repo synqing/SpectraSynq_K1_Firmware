@@ -1,0 +1,17 @@
+ST25R3916B SPI identity — live Main RPL 9087A500
+Date: 2026-09-07
+Probe: k1_main_rpl_st25_probe @ a66273c9 epoch=1788795126
+USB: B4:3A:45:A5:87:90  port=/dev/cu.usbmodem1101 (ephemeral)
+Pins: SCLK=7 MOSI=6 MISO=5 CS=4 IRQ=2 (input, not LED)
+SPI: SPI2_HOST mode=1 1 MHz register-read 0x7F (addr 0x3F)
+
+First boot after flash:
+[ST25ID] hex=0x31 irq=0 pins=sclk7 mosi6 miso5 cs4
+[ST25ID] gate=FAIL reason=UNEXPECTED_IDENTITY
+
+0x31 is not 0x00/0xFF (bus is alive). bits 7:3 = 00110 = type 0x30,
+which is the ST25R3916B ic_type (3916 A-silicon is type 0x28 / 0x2A).
+Classifier was too narrow; source updated to accept type 0x30 as 3916B.
+
+RFAL: not started. Tag test: not run. Combined PCM+NFC: not run.
+Product restore remains k1_main_rpl_im69d @ acaecaa8.

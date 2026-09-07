@@ -11,7 +11,8 @@
 // IC_IDENTITY is 0x3F. Command byte 0x7F, then one dummy clocked-in byte.
 static const uint8_t K1_ST25_CMD_READ_IDENTITY = 0x7F;
 static const uint8_t K1_ST25_TYPE_MASK = 0xF8;
-static const uint8_t K1_ST25_TYPE_3916 = 0x28;  // bits 7:3 = 00101
+static const uint8_t K1_ST25_TYPE_3916 = 0x28;   // bits 7:3 = 00101
+static const uint8_t K1_ST25_TYPE_3916B = 0x30;  // bits 7:3 = 00110 (live 0x31 on this module)
 
 static spi_device_handle_t s_spi;
 
@@ -71,7 +72,10 @@ void k1_st25_begin() {
     USBSerial.println("[ST25ID] gate=FAIL reason=NO_DEVICE_OR_BUS_STUCK");
     return;
   }
-  if ((id & K1_ST25_TYPE_MASK) == K1_ST25_TYPE_3916) {
+  const uint8_t type = (uint8_t)(id & K1_ST25_TYPE_MASK);
+  if (type == K1_ST25_TYPE_3916B) {
+    USBSerial.println("[ST25ID] gate=PASS family=ST25R3916B");
+  } else if (type == K1_ST25_TYPE_3916) {
     USBSerial.println("[ST25ID] gate=PASS family=ST25R3916");
   } else {
     USBSerial.println("[ST25ID] gate=FAIL reason=UNEXPECTED_IDENTITY");
