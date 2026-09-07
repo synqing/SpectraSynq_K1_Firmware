@@ -71,6 +71,19 @@ def test_probe_binds_i2s1_not_auto():
     assert "I2S_ROLE_SLAVE" in CPP
 
 
+def test_capture_task_owns_i2s_read():
+    assert "k1_pcm_capture_task" in CPP
+    assert "xTaskCreatePinnedToCore" in CPP
+    assert "pcm_cap" in CPP
+    assert "K1_PCM_RING_FRAMES = 2048" in CPP
+    assert "k1_pcm_ring_push" in CPP
+    assert "k1_pcm_ring_pop" in CPP
+    # AP hop must not i2s_channel_read after the capture task exists.
+    take = CPP.split("k1_pcm1808_take_canonical_samples", 1)[1]
+    take = take.split("void k1_pcm1808_poll_telemetry", 1)[0]
+    assert "i2s_channel_read" not in take
+
+
 def test_overflow_callback_is_registered_before_enable():
     init = CPP.split("k1_pcm_init_i2s1", 1)[1]
     ovf_at = init.find("i2s_channel_register_event_callback")

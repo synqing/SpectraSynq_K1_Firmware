@@ -14,6 +14,7 @@
 
 #include "k1_pcm1808_clock_gate.h"
 #include "k1_pcm1808_unpack.h"
+#include "k1_pcm1808_ring.h"
 #include "k1_resample_48k_to_12k8.h"
 
 #ifndef DEFAULT_SAMPLE_RATE
@@ -26,10 +27,10 @@
 static_assert(DEFAULT_SAMPLE_RATE == 12800, "PCM probe must not retarget K1 DSP rate");
 static_assert(DEFAULT_SAMPLES_PER_CHUNK == 96, "PCM probe must keep the 96-sample hop");
 
-static const int K1_PCM_STEREO_FRAME_BYTES = 6;
 static const int K1_PCM_HOP_FRAMES = 360;
 static const int K1_PCM_DMA_FRAMES = 60;
 static const int K1_PCM_SNAP_FRAMES = 2048;
+static const int K1_PCM_RING_FRAMES = 2048;  // 42.7 ms at 48 kHz
 
 static i2s_chan_handle_t s_rx;
 static int s_gate_pass;
@@ -60,7 +61,12 @@ static uint32_t s_src_out;
 static volatile uint32_t s_rx_ovf_events;
 static volatile uint32_t s_rx_ovf_bytes;
 static volatile uint32_t s_acq_frames;
-static uint32_t s_ring_dropped_frames;  // 0 until P2 ring exists
+static uint32_t s_ring_dropped_frames;
+static uint32_t s_pop_frames;
+static uint32_t s_ring_high_water;
+static uint8_t s_ring_store[K1_PCM_RING_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
+static K1PcmRing s_ring;
+static TaskHandle_t s_cap_task;
 static int64_t s_rate_poll_t0_us;
 static uint32_t s_rate_poll_acq0;
 static uint32_t s_rate_poll_cons0;
@@ -81,6 +87,26 @@ static bool IRAM_ATTR k1_pcm_on_recv_q_ovf(i2s_chan_handle_t, i2s_event_data_t *
     __atomic_fetch_add(&s_rx_ovf_bytes, (uint32_t)event->size, __ATOMIC_RELAXED);
   }
   return false;
+}
+
+static void k1_pcm_capture_task(void *) {
+  for (;;) {
+    size_t got = 0;
+    const esp_err_t e =
+        i2s_channel_read(s_rx, s_dma, sizeof(s_dma), &got, pdMS_TO_TICKS(20));
+    if (e != ESP_OK) {
+      s_err++;
+      continue;
+    }
+    if (got % (size_t)K1_PCM_STEREO_FRAME_BYTES) {
+      s_short++;
+    }
+    const uint32_t frames = (uint32_t)(got / (size_t)K1_PCM_STEREO_FRAME_BYTES);
+    s_frames += frames;
+    k1_pcm_ring_push(&s_ring, s_dma, frames);
+    s_ring_dropped_frames = s_ring.dropped_frames;
+    s_ring_high_water = s_ring.high_water;
+  }
 }
 
 static void k1_pcm_hold_nfc_inert(void) {
@@ -237,6 +263,11 @@ void k1_pcm1808_begin() {
   s_rx_ovf_bytes = 0;
   s_acq_frames = 0;
   s_ring_dropped_frames = 0;
+  s_pop_frames = 0;
+  s_ring_high_water = 0;
+  s_ring.buf = s_ring_store;
+  s_ring.cap_frames = (uint32_t)K1_PCM_RING_FRAMES;
+  k1_pcm_ring_reset(&s_ring);
   s_rate_poll_t0_us = 0;
   s_rate_poll_acq0 = 0;
   s_rate_poll_cons0 = 0;
@@ -279,6 +310,18 @@ void k1_pcm1808_begin() {
   }
   s_gate_pass = 1;
   s_rate_t0_us = esp_timer_get_time();
+  if (s_cap_task == nullptr) {
+    const BaseType_t ok = xTaskCreatePinnedToCore(
+        k1_pcm_capture_task, "pcm_cap", 3072, NULL, tskIDLE_PRIORITY + 2, &s_cap_task, 0);
+    USBSerial.printf("[PCMCAP] task=%s core=0 pri=%d ring_frames=%d ring_ms=%.1f\n",
+                     (ok == pdPASS) ? "ok" : "FAIL", (int)(tskIDLE_PRIORITY + 2), K1_PCM_RING_FRAMES,
+                     (double)K1_PCM_RING_FRAMES * 1000.0 / 48000.0);
+    if (ok != pdPASS) {
+      s_gate_pass = 0;
+      USBSerial.println("[PCM1808] capture task FAIL — canonical source NOT armed");
+      return;
+    }
+  }
   USBSerial.println("[PCMING] source=pcm1808 canonical_hz=12800 hop=96");
 }
 
@@ -305,31 +348,30 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
     memset(out96, 0, 96 * sizeof(int16_t));
     return;
   }
-  while (s_hop_fill < K1_PCM_HOP_FRAMES) {
-    size_t got = 0;
-    const esp_err_t e =
-        i2s_channel_read(s_rx, s_dma, sizeof(s_dma), &got, pdMS_TO_TICKS(20));
-    if (e != ESP_OK) {
-      s_err++;
-      break;
+  const uint32_t t0 = millis();
+  while (k1_pcm_ring_used(&s_ring) < (uint32_t)K1_PCM_HOP_FRAMES && (millis() - t0) < 25) {
+    taskYIELD();
+  }
+  if (k1_pcm_ring_used(&s_ring) < (uint32_t)K1_PCM_HOP_FRAMES) {
+    memset(out96, 0, 96 * sizeof(int16_t));
+    return;
+  }
+  uint8_t hop_bytes[K1_PCM_HOP_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
+  const uint32_t got = k1_pcm_ring_pop(&s_ring, hop_bytes, (uint32_t)K1_PCM_HOP_FRAMES);
+  s_pop_frames += got;
+  s_hop_fill = 0;
+  for (uint32_t i = 0; i < got && s_hop_fill < K1_PCM_HOP_FRAMES; i++) {
+    const uint8_t *fr = hop_bytes + i * (uint32_t)K1_PCM_STEREO_FRAME_BYTES;
+    const int32_t l = k1_pcm1808_unpack_le24(fr);
+    const int32_t r = k1_pcm1808_unpack_le24(fr + 3);
+    k1_pcm_note_sample(l, r);
+    if (s_snap_armed && s_snap_n < (uint32_t)K1_PCM_SNAP_FRAMES) {
+      memcpy(s_snap + s_snap_n * (uint32_t)K1_PCM_STEREO_FRAME_BYTES, fr,
+             (size_t)K1_PCM_STEREO_FRAME_BYTES);
+      s_snap_n++;
     }
-    if (got < sizeof(s_dma)) {
-      s_short++;
-    }
-    const uint32_t frames = (uint32_t)(got / K1_PCM_STEREO_FRAME_BYTES);
-    s_frames += frames;
-    for (uint32_t i = 0; i < frames && s_hop_fill < K1_PCM_HOP_FRAMES; i++) {
-      const uint8_t *fr = s_dma + i * K1_PCM_STEREO_FRAME_BYTES;
-      const int32_t l = k1_pcm1808_unpack_le24(fr);
-      const int32_t r = k1_pcm1808_unpack_le24(fr + 3);
-      k1_pcm_note_sample(l, r);
-      if (s_snap_armed && s_snap_n < K1_PCM_SNAP_FRAMES) {
-        memcpy(s_snap + s_snap_n * K1_PCM_STEREO_FRAME_BYTES, fr, K1_PCM_STEREO_FRAME_BYTES);
-        s_snap_n++;
-      }
-      const int32_t mono = s_channel ? r : l;
-      s_hop_in[s_hop_fill++] = (float)mono;
-    }
+    const int32_t mono = s_channel ? r : l;
+    s_hop_in[s_hop_fill++] = (float)mono;
   }
   if (s_hop_fill < K1_PCM_HOP_FRAMES) {
     memset(out96, 0, 96 * sizeof(int16_t));
@@ -371,21 +413,21 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   const uint32_t signaled =
       (ovf_b >= (uint32_t)K1_PCM_STEREO_FRAME_BYTES) ? (ovf_b / (uint32_t)K1_PCM_STEREO_FRAME_BYTES) : 0u;
   USBSerial.printf(
-      "[PCMOVF] ovf=%u ovf_bytes=%u dropped_frames_signaled=%u dropped_exact=UNKNOWN ring_drop=%u acq=%u cons=%u canon=%u\n",
+      "[PCMOVF] ovf=%u ovf_bytes=%u dropped_frames_signaled=%u dropped_exact=UNKNOWN ring_drop=%u acq=%u cons=%u canon=%u hw=%u\n",
       (unsigned)ovf, (unsigned)ovf_b, (unsigned)signaled, (unsigned)s_ring_dropped_frames, (unsigned)acq,
-      (unsigned)s_frames, (unsigned)s_src_blocks);
+      (unsigned)s_pop_frames, (unsigned)s_src_blocks, (unsigned)s_ring_high_water);
   const int64_t t_us = esp_timer_get_time();
   if (s_rate_poll_t0_us > 0 && t_us > s_rate_poll_t0_us) {
     const double dt = (double)(t_us - s_rate_poll_t0_us) / 1000000.0;
     const double acq_hz = (double)(acq - s_rate_poll_acq0) / dt;
-    const double cons_hz = (double)(s_frames - s_rate_poll_cons0) / dt;
+    const double cons_hz = (double)(s_pop_frames - s_rate_poll_cons0) / dt;
     const double canon_hz = (double)(s_src_blocks - s_rate_poll_canon0) / dt;
     USBSerial.printf("[PCMRATE2] dt_s=%.3f acq_hz=%.1f cons_hz=%.1f canon_hz=%.2f lrck_hz=%.1f authority=esp_timer\n",
                      dt, acq_hz, cons_hz, canon_hz, (double)s_clk.lrck_hz);
   }
   s_rate_poll_t0_us = t_us;
   s_rate_poll_acq0 = acq;
-  s_rate_poll_cons0 = s_frames;
+  s_rate_poll_cons0 = s_pop_frames;
   s_rate_poll_canon0 = s_src_blocks;
   s_lmin = 8388607;
   s_lmax = -8388608;
