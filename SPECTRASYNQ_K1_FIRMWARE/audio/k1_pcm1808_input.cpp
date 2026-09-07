@@ -15,7 +15,14 @@
 #include "k1_pcm1808_clock_gate.h"
 #include "k1_pcm1808_unpack.h"
 #include "k1_pcm1808_ring.h"
+#include "k1_pcm1808_map.h"
 #include "k1_resample_48k_to_12k8.h"
+#ifdef K1_PCM1808_PROBE_V1
+#include <stdlib.h>
+#include "esp_crc.h"
+#include "esp32-hal-psram.h"
+#include "esp_task_wdt.h"
+#endif
 
 #ifndef DEFAULT_SAMPLE_RATE
 #define DEFAULT_SAMPLE_RATE 12800
@@ -46,7 +53,7 @@ static uint32_t s_clip;
 static int32_t s_lmin, s_lmax, s_rmin, s_rmax;
 static int64_t s_lsum, s_rsum, s_lsumsq, s_rsumsq;
 static uint32_t s_stat_n;
-static int s_channel; // 0=DMA left slot after R3/R4; start as 0
+static int s_channel;  // 0 = DMA slot 0 = physical RIGHT (do not silently swap)
 static uint8_t s_snap[K1_PCM_SNAP_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
 static uint32_t s_snap_n;
 static int s_snap_armed;
@@ -67,6 +74,17 @@ static uint32_t s_ring_high_water;
 static uint8_t s_ring_store[K1_PCM_RING_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
 static K1PcmRing s_ring;
 static TaskHandle_t s_cap_task;
+#ifdef K1_PCM1808_PROBE_V1
+static const uint32_t K1_PCMRAW_MAX_MS = 8000;
+static uint8_t *s_raw;
+static uint32_t s_raw_cap_frames;
+static volatile uint32_t s_raw_n;
+static volatile uint32_t s_raw_target;
+static volatile int s_raw_armed;
+static int64_t s_raw_t0_us;
+static uint32_t s_raw_seq0;
+static char s_raw_fixture[65];
+#endif
 static int64_t s_rate_poll_t0_us;
 static uint32_t s_rate_poll_acq0;
 static uint32_t s_rate_poll_cons0;
@@ -106,6 +124,29 @@ static void k1_pcm_capture_task(void *) {
     k1_pcm_ring_push(&s_ring, s_dma, frames);
     s_ring_dropped_frames = s_ring.dropped_frames;
     s_ring_high_water = s_ring.high_water;
+#ifdef K1_PCM1808_PROBE_V1
+    if (s_raw_armed && s_raw != nullptr) {
+      uint32_t n = s_raw_n;
+      const uint32_t target = s_raw_target;
+      if (n < target) {
+        uint32_t take = frames;
+        if (n + take > target) {
+          take = target - n;
+        }
+        if (n == 0) {
+          s_raw_t0_us = esp_timer_get_time();
+          s_raw_seq0 = s_frames - frames;
+        }
+        memcpy(s_raw + (size_t)n * (size_t)K1_PCM_STEREO_FRAME_BYTES, s_dma,
+               (size_t)take * (size_t)K1_PCM_STEREO_FRAME_BYTES);
+        n += take;
+        s_raw_n = n;
+        if (n >= target) {
+          s_raw_armed = 0;
+        }
+      }
+    }
+#endif
   }
 }
 
@@ -323,6 +364,20 @@ void k1_pcm1808_begin() {
     }
   }
   USBSerial.println("[PCMING] source=pcm1808 canonical_hz=12800 hop=96");
+  USBSerial.println("[PCMMAP] slot0=RIGHT slot1=LEFT policy=LINE_LEFT:slot1 LINE_RIGHT:slot0 LINE_MID:(s1+s0)/2");
+#ifdef K1_PCM1808_PROBE_V1
+  if (s_raw == nullptr) {
+    s_raw_cap_frames = (48000u * K1_PCMRAW_MAX_MS) / 1000u;
+    s_raw = (uint8_t *)ps_malloc((size_t)s_raw_cap_frames * (size_t)K1_PCM_STEREO_FRAME_BYTES);
+    if (s_raw == nullptr) {
+      s_raw_cap_frames = 0;
+      USBSerial.println("[PCMRAW24] INIT FAIL: ps_malloc NULL — timed capture disabled");
+    } else {
+      USBSerial.printf("[PCMRAW24] INIT PASS cap_frames=%u cap_ms=%u\n",
+                       (unsigned)s_raw_cap_frames, (unsigned)K1_PCMRAW_MAX_MS);
+    }
+  }
+#endif
 }
 
 int k1_pcm1808_clock_gate_pass() { return s_gate_pass; }
@@ -448,5 +503,108 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
     }
   }
 }
+
+#ifdef K1_PCM1808_PROBE_V1
+static void k1_pcmraw_status(void) {
+  const uint32_t ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  USBSerial.printf(
+      "[PCMRAW24] armed=%d filled=%u target=%u cap=%u t0_us=%lld seq0=%u ovf=%u "
+      "ring_drop=%u hw=%u slot0=RIGHT slot1=LEFT fixture=%s buf=%s\n",
+      s_raw_armed ? 1 : 0, (unsigned)s_raw_n, (unsigned)s_raw_target, (unsigned)s_raw_cap_frames,
+      (long long)s_raw_t0_us, (unsigned)s_raw_seq0, (unsigned)ovf, (unsigned)s_ring_dropped_frames,
+      (unsigned)s_ring_high_water, s_raw_fixture[0] ? s_raw_fixture : "-",
+      (s_raw != nullptr) ? "ok" : "NULL");
+}
+
+static void k1_pcmraw_arm(uint32_t ms, const char *fixture) {
+  if (s_raw == nullptr) {
+    USBSerial.println("[PCMRAW24] ARM FAIL: no buffer");
+    return;
+  }
+  if (ms < 100) {
+    ms = 100;
+  }
+  if (ms > K1_PCMRAW_MAX_MS) {
+    ms = K1_PCMRAW_MAX_MS;
+  }
+  s_raw_armed = 0;
+  s_raw_n = 0;
+  s_raw_t0_us = 0;
+  s_raw_seq0 = 0;
+  s_raw_target = (48000u * ms) / 1000u;
+  if (s_raw_target > s_raw_cap_frames) {
+    s_raw_target = s_raw_cap_frames;
+  }
+  s_raw_fixture[0] = 0;
+  if (fixture != nullptr && fixture[0]) {
+    strncpy(s_raw_fixture, fixture, sizeof(s_raw_fixture) - 1);
+    s_raw_fixture[sizeof(s_raw_fixture) - 1] = 0;
+  }
+  s_raw_armed = 1;
+  USBSerial.printf("[PCMRAW24] ARMED ms=%u frames=%u fixture=%s\n", (unsigned)ms,
+                   (unsigned)s_raw_target, s_raw_fixture[0] ? s_raw_fixture : "-");
+}
+
+static void k1_pcmraw_dump(void) {
+  if (s_raw == nullptr || s_raw_n == 0) {
+    USBSerial.println("[PCMRAW24-BEGIN bytes=0 crc32=0]");
+    USBSerial.println("[PCMRAW24-END]");
+    return;
+  }
+  s_raw_armed = 0;
+  const uint32_t frames = s_raw_n;
+  const size_t nbytes = (size_t)frames * (size_t)K1_PCM_STEREO_FRAME_BYTES;
+  const uint32_t crc = esp_crc32_le(0, s_raw, nbytes);
+  const uint32_t ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  USBSerial.printf(
+      "[PCMRAW24-BEGIN bytes=%u crc32=%08lx frames=%u sr=48000 fmt=le24_s0s1 "
+      "slot0=RIGHT slot1=LEFT t0_us=%lld seq0=%u ovf=%u ring_drop=%u hw=%u fixture=%s]\n",
+      (unsigned)nbytes, (unsigned long)crc, (unsigned)frames, (long long)s_raw_t0_us,
+      (unsigned)s_raw_seq0, (unsigned)ovf, (unsigned)s_ring_dropped_frames,
+      (unsigned)s_ring_high_water, s_raw_fixture[0] ? s_raw_fixture : "-");
+  char line[129];
+  static const char *hex = "0123456789abcdef";
+  for (size_t off = 0; off < nbytes; off += 64) {
+    size_t n = nbytes - off;
+    if (n > 64) {
+      n = 64;
+    }
+    for (size_t i = 0; i < n; i++) {
+      const uint8_t b = s_raw[off + i];
+      line[i * 2] = hex[b >> 4];
+      line[i * 2 + 1] = hex[b & 0x0F];
+    }
+    line[n * 2] = 0;
+    USBSerial.println(line);
+    if (((off >> 6) & 0x3F) == 0x3F) {
+      esp_task_wdt_reset();
+      vTaskDelay(1);
+    }
+  }
+  USBSerial.println("[PCMRAW24-END]");
+}
+
+bool k1_pcm1808_dispatch(const char *command_type, char *command_data) {
+  if (strcmp(command_type, "pcmraw_arm") == 0) {
+    char *comma = strchr(command_data, ',');
+    const char *fx = nullptr;
+    if (comma) {
+      *comma = 0;
+      fx = comma + 1;
+    }
+    k1_pcmraw_arm((uint32_t)atoi(command_data), fx);
+    return true;
+  }
+  if (strcmp(command_type, "pcmraw_status") == 0) {
+    k1_pcmraw_status();
+    return true;
+  }
+  if (strcmp(command_type, "pcmraw_dump") == 0) {
+    k1_pcmraw_dump();
+    return true;
+  }
+  return false;
+}
+#endif  // K1_PCM1808_PROBE_V1
 
 #endif  // K1_AUDIO_SOURCE_PCM1808

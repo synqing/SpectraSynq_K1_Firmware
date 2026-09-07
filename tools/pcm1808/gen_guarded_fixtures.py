@@ -139,6 +139,15 @@ def main() -> None:
         mus.append((l, r))
     rec(write_wav("09_reference_music_excerpt.wav", guarded(mus)))
 
+    # Amplitude staircase: 1 s 997 Hz + 0.5 s guards, digital FS fractions.
+    ns1 = int(FS * 1.0)
+    for amp in (0.20, 0.40, 0.60, 0.80, 1.00):
+        stim = [(amp * math.sin(2 * math.pi * 997.0 * n / FS),
+                 amp * math.sin(2 * math.pi * 997.0 * n / FS)) for n in range(ns1)]
+        g = [(0.0, 0.0)] * int(FS * 0.5)
+        name = f"10_amp_{int(amp * 100):03d}_997hz_guarded.wav"
+        rec(write_wav(name, g + stim + g))
+
     man = {
         "fs": FS,
         "sampwidth_bytes": 3,

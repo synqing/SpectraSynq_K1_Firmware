@@ -22,4 +22,7 @@ void k1_pcm1808_begin();
 void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now);
 void k1_pcm1808_poll_telemetry(uint32_t t_now);
 int k1_pcm1808_clock_gate_pass();
+#ifdef K1_PCM1808_PROBE_V1
+bool k1_pcm1808_dispatch(const char *command_type, char *command_data);
+#endif
 #endif

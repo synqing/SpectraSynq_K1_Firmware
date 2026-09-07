@@ -71,6 +71,17 @@ def test_probe_binds_i2s1_not_auto():
     assert "I2S_ROLE_SLAVE" in CPP
 
 
+def test_raw_tap_is_on_capture_task_not_canonical():
+    task = CPP.split("k1_pcm_capture_task", 1)[1].split("void k1_pcm_hold_nfc_inert", 1)[0]
+    assert "s_raw" in task
+    take = CPP.split("k1_pcm1808_take_canonical_samples", 1)[1]
+    take = take.split("void k1_pcm1808_poll_telemetry", 1)[0]
+    assert "s_raw" not in take
+    assert "pcmraw_arm" in CPP
+    assert "fmt=le24_s0s1" in CPP
+    assert "slot0=RIGHT" in CPP
+
+
 def test_capture_task_owns_i2s_read():
     assert "k1_pcm_capture_task" in CPP
     assert "xTaskCreatePinnedToCore" in CPP
