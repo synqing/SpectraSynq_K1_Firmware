@@ -6,6 +6,9 @@
 #if defined(K1_USB_AUDIO_PROTOTYPE)
 #include "k1_usb_audio_input.h"
 #endif
+#if K1_AUDIO_SOURCE_PCM1808
+#include "k1_pcm1808_input.h"
+#endif
 #include "constants.h" // For band definitions, NUM_FREQS etc.
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
@@ -614,6 +617,9 @@ void init_system() {
 #endif
 
   init_i2s();
+#if K1_AUDIO_SOURCE_PCM1808
+  k1_pcm1808_begin();
+#endif
   generate_a_weights();
   generate_window_lookup();
   precompute_goertzel_constants();

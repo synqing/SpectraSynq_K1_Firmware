@@ -27,6 +27,9 @@
 #if K1_AUDIO_SOURCE_USB
 #include "k1_usb_audio_input.h"
 #endif
+#if K1_AUDIO_SOURCE_PCM1808
+#include "k1_pcm1808_input.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -461,6 +464,13 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
     }
   }
+  return;
+#endif
+#if K1_AUDIO_SOURCE_PCM1808
+  int16_t pcm_hop[96];
+  k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
+  k1_audio_commit_canonical_frame(pcm_hop, t_now);
+  k1_pcm1808_poll_telemetry(t_now);
   return;
 #endif
 #if K1_AUDIO_SOURCE_MIC

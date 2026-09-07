@@ -10,10 +10,19 @@
 #ifndef K1_AUDIO_SOURCE_MIC
 #define K1_AUDIO_SOURCE_MIC 1
 #endif
+#ifndef K1_AUDIO_SOURCE_PCM1808
+#define K1_AUDIO_SOURCE_PCM1808 0
+#endif
 
 #if K1_AUDIO_SOURCE_USB && K1_AUDIO_SOURCE_MIC
 #error "K1 USB and microphone capture cannot both own ingress in this build"
 #endif
-#if !K1_AUDIO_SOURCE_USB && !K1_AUDIO_SOURCE_MIC
+#if K1_AUDIO_SOURCE_USB && K1_AUDIO_SOURCE_PCM1808
+#error "K1 USB and PCM1808 capture cannot both own ingress in this build"
+#endif
+#if K1_AUDIO_SOURCE_MIC && K1_AUDIO_SOURCE_PCM1808
+#error "K1 microphone and PCM1808 capture cannot both own ingress in this build"
+#endif
+#if !K1_AUDIO_SOURCE_USB && !K1_AUDIO_SOURCE_MIC && !K1_AUDIO_SOURCE_PCM1808
 #error "No K1 audio source selected"
 #endif

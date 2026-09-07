@@ -1,0 +1,31 @@
+diff --git a/platformio.ini b/platformio.ini
+index 2492a473..c4af111e 100644
+--- a/platformio.ini
++++ b/platformio.ini
+@@ -930,6 +930,26 @@ lib_deps =
+     ${env:k1_hardware.lib_deps}
+     h2zero/NimBLE-Arduino@^2.5.0
+ 
++; ─────────────────────────────────────────────────────────────────────────────
++; BLE IPHONE PERIPHERAL PROBE (2026-09-04, Option A): K1 advertises Apple
++; BLE-MIDI; iPhone is central. Reuses decoder + 68-map + k1_control_apply.
++; Does NOT compile ble_remoted_central (no deck scan). Does NOT touch
++; k1_hardware. NON-SHIPPABLE until a later radio-in-production GO.
++; Flash: pio run -e k1_ble_iphone_probe -t upload  (identity-gated; bench only)
++[env:k1_ble_iphone_probe]
++; NON-SHIPPABLE: K1 as Apple BLE-MIDI peripheral for the iPhone app.
++extends = env:k1_hardware
++build_src_filter =
++    ${env:k1_hardware.build_src_filter}
++    +<network/k1_ble_midi_peripheral.cpp>
++    +<network/k1_ble_midi_decoder.cpp>
++build_flags =
++    ${env:k1_hardware.build_flags}
++    -DK1_BLE_MIDI_PERIPHERAL
++lib_deps =
++    ${env:k1_hardware.lib_deps}
++    h2zero/NimBLE-Arduino@^2.5.0
++
+ ; ─────────────────────────────────────────────────────────────────────────────
+ ; ⛔ DEAD LANE — DUAL-K1 SYNC IS DEPRECATED AND SHELVED (Captain, 2026-08-05).
+ ; Do NOT flash these envs as part of any lane, and do NOT propose work that

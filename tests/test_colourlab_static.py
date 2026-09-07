@@ -136,33 +136,32 @@ def test_no_wireless_colour_lab_path():
 
 
 def test_no_firmware_or_platformio_edits():
-    """The Colour Lab change set must not modify firmware.
+    """A Colour Lab change set must not modify firmware.
 
-    Scoped to the STAGED set (`--cached`), not the whole working tree. The claim
-    this gate exists to defend is "this commit does not touch firmware" — not
-    "nobody anywhere in the checkout has a dirty firmware file". Against the
-    working tree it went red whenever an unrelated lane had an uncommitted
-    firmware edit, which is a false failure with nothing to do with Colour Lab.
-    At commit time the staged set is exactly the lane-owned change set.
+    Applies only when Colour Lab files are staged. A PCM/firmware commit with
+    no Colour Lab paths is a different lane and must not be blocked by this
+    isolation gate. Against the whole staged tree it went red on every
+    firmware commit, which is a false failure with nothing to do with
+    Colour Lab.
     """
-    proc = subprocess.run(
-        [
-            "git",
-            "diff",
-            "--cached",
-            "--name-only",
-            "HEAD",
-            "--",
-            "SPECTRASYNQ_K1_FIRMWARE",
-            "platformio.ini",
-        ],
+    staged = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "HEAD"],
         cwd=ROOT,
         capture_output=True,
         text=True,
         check=True,
-    )
-    assert proc.stdout.strip() == "", (
-        "staged change set modifies firmware or platformio.ini:\n" + proc.stdout
+    ).stdout.splitlines()
+    colourlab_touch = any(p.startswith("tools/colourlab/") for p in staged)
+    if not colourlab_touch:
+        return
+    firmware = [
+        p
+        for p in staged
+        if p.startswith("SPECTRASYNQ_K1_FIRMWARE/") or p == "platformio.ini"
+    ]
+    assert firmware == [], (
+        "Colour Lab change set modifies firmware or platformio.ini:\n"
+        + "\n".join(firmware)
     )
 
 

@@ -1,0 +1,42 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+______________ test_literal_sets_match_a_fresh_parse_of_both_defs ______________
+tests/test_k1_serial_safety.py:158: in test_literal_sets_match_a_fresh_parse_of_both_defs
+    assert set(flags) == set(SAFETY.ALL_COMMANDS)
+E   AssertionError: assert {'H', 'SB?', ..._stream', ...} == {'H', 'SB?', ..._stream', ...}
+E     
+E     Extra items in the left set:
+E     'ble_iphone'
+E     Use -v to get more diff
+_____________ test_row1_bare_table_membership_matches_fresh_parse ______________
+tests/test_k1_serial_safety.py:181: in test_row1_bare_table_membership_matches_fresh_parse
+    assert set(_parse_def(BARE_DEF, typed=False)) == set(SAFETY.ROW1_BARE_COMMANDS)
+E   AssertionError: assert {'H', 'SB?', ... 'build', ...} == {'H', 'SB?', ...chip_id', ...}
+E     
+E     Extra items in the left set:
+E     'ble_iphone'
+E     Use -v to get more diff
+___________________ test_recorded_def_blob_shas_are_current ____________________
+tests/test_k1_serial_safety.py:191: in test_recorded_def_blob_shas_are_current
+    assert _blob_sha(BARE_DEF) == SAFETY.BARE_DEF_BLOB_SHA
+E   AssertionError: assert '88c548255e27...b9a5e0834e5e2' == '7d13ad05eed1...e8515ebe3aac5'
+E     
+E     - 7d13ad05eed1af875563d9d46a5e8515ebe3aac5
+E     + 88c548255e27cff6f5a27f9b768b9a5e0834e5e2
+____ K1UploadGuardTest.test_all_k1_chip_bound_envs_are_registered_in_guard _____
+tests/test_k1_upload_guard.py:261: in test_all_k1_chip_bound_envs_are_registered_in_guard
+    self.assertEqual(
+E   AssertionError: Lists differ: ['k1_ble_iphone_probe'] != []
+E   
+E   First list contains 1 additional elements.
+E   First extra element 0:
+E   'k1_ble_iphone_probe'
+E   
+E   - ['k1_ble_iphone_probe']
+E   + [] : K1 chip-bound envs missing from upload-guard K1_TARGETS (cross-flash brick risk — register them): ['k1_ble_iphone_probe']
+=========================== short test summary info ============================
+FAILED tests/test_k1_serial_safety.py::test_literal_sets_match_a_fresh_parse_of_both_defs
+FAILED tests/test_k1_serial_safety.py::test_row1_bare_table_membership_matches_fresh_parse
+FAILED tests/test_k1_serial_safety.py::test_recorded_def_blob_shas_are_current
+FAILED tests/test_k1_upload_guard.py::K1UploadGuardTest::test_all_k1_chip_bound_envs_are_registered_in_guard
+4 failed in 0.07s

@@ -8,6 +8,8 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Added
 
+- **PCM1808 Main RPL probe env** `k1_main_rpl_pcm1808_probe`: PCNT digital clock gate on GPIO14/13, I2S1 24-in-32 Philips slave RX on GPIO10/13/14, 4/15 polyphase SRC into the existing 12.8 kHz / 96 hop. Isolated from `k1_main_rpl_im69d`. Chip `9087A500` only.
+
 - **P4 proto 150-px loom:** `env:k1_p4_wifi6_led150` — dual independent WS2812 channels, 150 LEDs each, data GPIO39 (primary) / GPIO40 (secondary) on the P4 lab board. Default `k1_p4_wifi6` stays GPIO4/5 at 160/160.
 - **Bench S3 proto 150-px loom:** `env:k1_bench_im69d_led150` — same 150/150 WS2812 geometry on bench K1 `B489A500`, GPIO39/40, IM69 mic stays CLK=14/DATA=13. Default `k1_bench_im69d` stays GPIO4/5 at 160/160. Canvas remains 160; output downsamples.
 - **PRISM authored ingress (option A):** 34-byte PRSM parser and magic-first byte scanner (`audio/k1_prsm.*`), source arbitration STANDALONE/AUTHORED/RECOVERY (`audio/k1_authored_source.*`, freshness **50 ms**), and `k1_audio_snapshot_publish()` as the single store write. `check_serial()` demuxes PRSM before immediate hotkeys (`P`/`R`/`S` collide with magic `PRSM`). Live microphone update is suppressed while authored is fresh; stale frames hand back to the live snapshot, not USB-bridge GPIO fallback. AUTHORED freezes Core-1 chromagram and forces drop-cut scale to 1. Host gate: `tests/test_authored_ingress_native.py`. No second renderer. No eFuse / erase_flash.

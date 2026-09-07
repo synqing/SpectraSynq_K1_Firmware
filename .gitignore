@@ -143,3 +143,6 @@ tab5_firmware/_retired_fonts_pre_countach/
 *.orig
 *.hardened.bak
 *.working
+
+# Generated PCM1808 bring-up WAV fixtures (regenerate via tools/pcm1808/gen_wav_fixtures.py)
+tools/pcm1808/fixtures/

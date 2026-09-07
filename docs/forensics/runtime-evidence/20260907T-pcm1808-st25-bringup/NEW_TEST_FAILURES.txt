@@ -1,0 +1,8 @@
+FROZEN_4:
+tests/test_k1_serial_safety.py::test_literal_sets_match_a_fresh_parse_of_both_defs extra ble_iphone
+tests/test_k1_serial_safety.py::test_row1_bare_table_membership_matches_fresh_parse extra ble_iphone
+tests/test_k1_serial_safety.py::test_recorded_def_blob_shas_are_current sha 88c54825 vs 7d13ad05
+tests/test_k1_upload_guard.py::K1UploadGuardTest::test_all_k1_chip_bound_envs_are_registered_in_guard k1_ble_iphone_probe
+
+AFTER_PCM_EDIT:
+3 serial_safety failures remain (subset). upload-guard PASS because leftover BLE env was not kept in platformio.ini.
