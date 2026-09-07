@@ -4,7 +4,7 @@ abstract: "P2 design (not yet on silicon): continuous I2S1 drain into a bounded 
 
 # P2 — continuous PCM capture service (design)
 
-Status: **SOURCE_PROVEN design, UNMEASURED on silicon until P1 soak closes.**
+Status: **on silicon @ `9361a027`.** 10 min soak PASS. See `P2_CAPTURE_SOAK.md`.
 
 Current hop-drain (`k1_pcm1808_take_canonical_samples`) blocks the AP path on `i2s_channel_read` until 360 frames, then SRC, then K1 DSP. DMA is 4 descriptors × 60 stereo frames = 240 frames ≈ **5.0 ms** at 48 kHz. Hop is 7.5 ms; AP service p99 contract is 8000 µs. If DSP holds the core past ~5 ms without a reader, the IDF RX queue overflows.
 

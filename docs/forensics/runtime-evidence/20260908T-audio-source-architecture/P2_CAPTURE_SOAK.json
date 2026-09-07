@@ -1,0 +1,2801 @@
+{
+  "port": "/dev/cu.usbmodem1101",
+  "seconds_requested": 600.0,
+  "host_elapsed_s": 600.0798990726471,
+  "ovf_last": {
+    "ovf": 0,
+    "ovf_bytes": 0,
+    "dropped_frames_signaled": 0,
+    "dropped_exact": "UNKNOWN",
+    "ring_drop": 0,
+    "acq": 34592580,
+    "cons": 34544520,
+    "canon": 95957,
+    "host_t": 599.4663469791412
+  },
+  "rates": [
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.3,
+      "cons_hz": 47988.3,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.0005819797515869141
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.6,
+      "cons_hz": 47994.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.0012469291687011719
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.2,
+      "cons_hz": 47991.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.0019061565399169922
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.0025739669799804688
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47999.3,
+      "cons_hz": 47999.3,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.0032308101654052734
+    },
+    {
+      "dt_s": 2.022,
+      "acq_hz": 47527.9,
+      "cons_hz": 47527.9,
+      "canon_hz": 132.02,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.003949880599975586
+    },
+    {
+      "dt_s": 1.983,
+      "acq_hz": 48461.1,
+      "cons_hz": 48461.1,
+      "canon_hz": 134.61,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.004609823226928711
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.3,
+      "cons_hz": 47992.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.005239963531494141
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.005864858627319336
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.0,
+      "cons_hz": 47998.0,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 0.7007699012756348
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.8,
+      "cons_hz": 47990.8,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 2.7034568786621094
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 4.705849885940552
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.4,
+      "cons_hz": 47992.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 8.710420846939087
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 8.711105823516846
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.4,
+      "cons_hz": 47995.4,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 10.71345591545105
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.4,
+      "cons_hz": 47994.4,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 12.716002941131592
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.4,
+      "cons_hz": 47989.4,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 14.718355894088745
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 16.720901012420654
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.8,
+      "cons_hz": 47995.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 18.723243951797485
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 20.725747108459473
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.2,
+      "cons_hz": 47990.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 22.728142976760864
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.8,
+      "cons_hz": 47995.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 24.73052406311035
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47987.4,
+      "cons_hz": 47987.4,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 26.73322892189026
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 28.7356379032135
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 30.73818302154541
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 32.740450859069824
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.4,
+      "cons_hz": 47989.4,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 34.74318504333496
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.2,
+      "cons_hz": 47997.2,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 36.745445013046265
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 38.748051166534424
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 40.75043296813965
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.0,
+      "cons_hz": 47990.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 42.753100872039795
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.0,
+      "cons_hz": 47996.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 44.75851583480835
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.4,
+      "cons_hz": 47988.4,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 46.75798201560974
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.3,
+      "cons_hz": 47997.3,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 48.76037383079529
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 50.76282000541687
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.6,
+      "cons_hz": 47992.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 52.76529407501221
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 54.7697319984436
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 56.77031493186951
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.0,
+      "cons_hz": 47992.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 58.772804975509644
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 60.77517795562744
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 62.77765893936157
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.9,
+      "cons_hz": 47993.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 66.78200697898865
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.9,
+      "cons_hz": 47989.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 66.78267693519592
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.6,
+      "cons_hz": 47995.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 68.78510785102844
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.6,
+      "cons_hz": 47992.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 70.78751707077026
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.7,
+      "cons_hz": 47990.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 72.79002594947815
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 76.79479598999023
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.3,
+      "cons_hz": 47988.3,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 76.79543495178223
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.7,
+      "cons_hz": 47994.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 78.7975971698761
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.9,
+      "cons_hz": 47996.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 80.7998480796814
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.7,
+      "cons_hz": 47992.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 82.80237412452698
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.0,
+      "cons_hz": 47991.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 84.80493688583374
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.1,
+      "cons_hz": 47994.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 86.8073320388794
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 88.80989694595337
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.6,
+      "cons_hz": 47990.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 90.81250286102295
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 92.81496477127075
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.2,
+      "cons_hz": 47993.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 94.8172960281372
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.8,
+      "cons_hz": 47994.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 96.81981897354126
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 98.82218313217163
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.0,
+      "cons_hz": 47993.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 100.82471013069153
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.9,
+      "cons_hz": 47988.9,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 102.82734084129333
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.4,
+      "cons_hz": 47994.4,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 104.82976818084717
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.1,
+      "cons_hz": 47998.1,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 106.83193373680115
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.9,
+      "cons_hz": 47990.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 108.83461117744446
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 110.83735585212708
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 112.83968091011047
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.6,
+      "cons_hz": 47995.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 114.84195280075073
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.0,
+      "cons_hz": 47989.0,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 116.84464883804321
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.6,
+      "cons_hz": 47996.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 118.84680891036987
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.3,
+      "cons_hz": 47993.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 120.84946298599243
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.2,
+      "cons_hz": 47991.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 122.85194492340088
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.7,
+      "cons_hz": 47990.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 124.8545310497284
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.6,
+      "cons_hz": 47995.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 126.85691094398499
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.3,
+      "cons_hz": 47994.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 128.85949397087097
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.2,
+      "cons_hz": 47991.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 130.86180901527405
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.3,
+      "cons_hz": 47994.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 132.86421704292297
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.0,
+      "cons_hz": 47989.0,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 134.86686205863953
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47999.5,
+      "cons_hz": 47999.5,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 136.86906480789185
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.8,
+      "cons_hz": 47989.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 138.8717658519745
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.2,
+      "cons_hz": 47989.2,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 140.87433314323425
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.5,
+      "cons_hz": 47996.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 142.87672305107117
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.1,
+      "cons_hz": 47990.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 144.8792519569397
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47999.2,
+      "cons_hz": 47999.2,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 146.8814299106598
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.3,
+      "cons_hz": 47988.3,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 148.88421487808228
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 150.8865728378296
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.9,
+      "cons_hz": 47988.9,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 152.88915181159973
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47999.2,
+      "cons_hz": 47999.2,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 154.89137983322144
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47983.3,
+      "cons_hz": 47983.3,
+      "canon_hz": 133.29,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 156.89427089691162
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.7,
+      "cons_hz": 47998.7,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 158.89929795265198
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.7,
+      "cons_hz": 47990.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 160.90363192558289
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.6,
+      "cons_hz": 47997.6,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 162.90828204154968
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 164.91302394866943
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.8,
+      "cons_hz": 47992.8,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 166.91727304458618
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.5,
+      "cons_hz": 47996.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 168.9213809967041
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.2,
+      "cons_hz": 47991.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 170.92525005340576
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 172.92873692512512
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.2,
+      "cons_hz": 47993.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 174.9325180053711
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.1,
+      "cons_hz": 47995.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 176.9357349872589
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47986.9,
+      "cons_hz": 47986.9,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 178.93929481506348
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.3,
+      "cons_hz": 47997.3,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 180.9422471523285
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.4,
+      "cons_hz": 47991.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 182.94549894332886
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.8,
+      "cons_hz": 47993.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 184.948961019516
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.2,
+      "cons_hz": 47989.2,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 186.95159792900085
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 188.95437097549438
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.9,
+      "cons_hz": 47993.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 190.9572639465332
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.1,
+      "cons_hz": 47990.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 192.96023392677307
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 194.96286511421204
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.0,
+      "cons_hz": 47991.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 196.965726852417
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.4,
+      "cons_hz": 47994.4,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 198.96834897994995
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.9,
+      "cons_hz": 47995.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 200.97092294692993
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.3,
+      "cons_hz": 47989.3,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 202.9737949371338
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.6,
+      "cons_hz": 47996.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 204.97623705863953
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 206.97887706756592
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 208.98141884803772
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.6,
+      "cons_hz": 47990.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 210.9841330051422
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.3,
+      "cons_hz": 47991.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 212.98674488067627
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.5,
+      "cons_hz": 47998.5,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 214.98903107643127
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 216.9917118549347
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 218.99444198608398
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 220.99690103530884
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.5,
+      "cons_hz": 47996.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 222.999587059021
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 225.00203585624695
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.5,
+      "cons_hz": 47997.5,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 227.00438499450684
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.5,
+      "cons_hz": 47992.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 229.00698590278625
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.1,
+      "cons_hz": 47991.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 231.00943875312805
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.6,
+      "cons_hz": 47990.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 233.01201701164246
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.2,
+      "cons_hz": 47996.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 235.01456809043884
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.0,
+      "cons_hz": 47990.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 237.01703214645386
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.4,
+      "cons_hz": 47997.4,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 239.01936388015747
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.1,
+      "cons_hz": 47992.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 241.02204608917236
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.7,
+      "cons_hz": 47990.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 243.02451491355896
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.3,
+      "cons_hz": 47993.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 245.0270528793335
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.7,
+      "cons_hz": 47994.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 247.0295569896698
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 249.03197193145752
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 251.0345277786255
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.3,
+      "cons_hz": 47992.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 253.03716492652893
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.6,
+      "cons_hz": 47995.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 255.03956604003906
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.8,
+      "cons_hz": 47993.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 257.0420379638672
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 259.04442405700684
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.2,
+      "cons_hz": 47997.2,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 261.0467178821564
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.3,
+      "cons_hz": 47991.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 263.0494120121002
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 265.05202293395996
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.0,
+      "cons_hz": 47997.0,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 267.0543038845062
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.9,
+      "cons_hz": 47990.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 269.05696082115173
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.5,
+      "cons_hz": 47994.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 271.05941104888916
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 273.0615839958191
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 275.06430101394653
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.4,
+      "cons_hz": 47991.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 277.06665992736816
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 279.069393157959
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.3,
+      "cons_hz": 47993.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 281.0719199180603
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.5,
+      "cons_hz": 47998.5,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 283.07412791252136
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.4,
+      "cons_hz": 47988.4,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 285.0767767429352
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.1,
+      "cons_hz": 47996.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 287.0792028903961
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.7,
+      "cons_hz": 47994.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 289.08174896240234
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.1,
+      "cons_hz": 47992.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 291.0840759277344
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47987.9,
+      "cons_hz": 47987.9,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 293.0868179798126
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 295.08922696113586
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.4,
+      "cons_hz": 47992.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 297.091835975647
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.1,
+      "cons_hz": 47996.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 299.09416484832764
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.7,
+      "cons_hz": 47995.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 301.09638690948486
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.1,
+      "cons_hz": 47989.1,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 303.0991220474243
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 305.10381507873535
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 307.10393476486206
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 309.10669207572937
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.1,
+      "cons_hz": 47997.1,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 311.10901379585266
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.9,
+      "cons_hz": 47993.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 313.1114249229431
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.2,
+      "cons_hz": 47992.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 315.11398100852966
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.7,
+      "cons_hz": 47992.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 317.1165590286255
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.6,
+      "cons_hz": 47990.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 319.1188819408417
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.2,
+      "cons_hz": 47993.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 321.1214408874512
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.1,
+      "cons_hz": 47996.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 323.12375688552856
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.1,
+      "cons_hz": 47988.1,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 325.12657713890076
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.6,
+      "cons_hz": 47997.6,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 327.12886691093445
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 329.13126587867737
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 331.13382172584534
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.9,
+      "cons_hz": 47993.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 333.1367378234863
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.9,
+      "cons_hz": 47989.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 335.13894176483154
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.0,
+      "cons_hz": 47996.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 337.14125990867615
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.3,
+      "cons_hz": 47994.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 339.1436789035797
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.6,
+      "cons_hz": 47991.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 341.1462869644165
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 343.1487741470337
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.1,
+      "cons_hz": 47994.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 345.1512999534607
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.8,
+      "cons_hz": 47994.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 347.1542110443115
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.1,
+      "cons_hz": 47990.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 349.15629291534424
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.3,
+      "cons_hz": 47996.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 351.1586630344391
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 353.16108894348145
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.7,
+      "cons_hz": 47990.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 355.1637008190155
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.3,
+      "cons_hz": 47992.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 357.1675407886505
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.4,
+      "cons_hz": 47992.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 359.1685769557953
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.5,
+      "cons_hz": 47996.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 361.17108392715454
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.6,
+      "cons_hz": 47991.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 363.1735529899597
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 365.17601203918457
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47987.6,
+      "cons_hz": 47987.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 367.1787099838257
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.6,
+      "cons_hz": 47994.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 369.18115401268005
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 371.1834979057312
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.6,
+      "cons_hz": 47994.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 373.1859219074249
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 375.1884880065918
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.6,
+      "cons_hz": 47993.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 377.1910288333893
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 379.1934151649475
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.0,
+      "cons_hz": 47996.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 381.19586396217346
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.6,
+      "cons_hz": 47991.6,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 383.19838881492615
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.9,
+      "cons_hz": 47988.9,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 385.20110988616943
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 387.20346307754517
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.7,
+      "cons_hz": 47996.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 389.20577907562256
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.7,
+      "cons_hz": 47992.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 391.2083189487457
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 393.21079897880554
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.9,
+      "cons_hz": 47992.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 395.21325397491455
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.9,
+      "cons_hz": 47989.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 397.21588492393494
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.8,
+      "cons_hz": 47996.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 399.21821880340576
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.7,
+      "cons_hz": 47988.7,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 401.22086095809937
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 403.22328901290894
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.8,
+      "cons_hz": 47989.8,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 405.2259109020233
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.3,
+      "cons_hz": 47997.3,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 407.2282118797302
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.0,
+      "cons_hz": 47992.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 409.2307529449463
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 411.233304977417
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.7,
+      "cons_hz": 47996.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 413.2356159687042
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.1,
+      "cons_hz": 47994.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 415.23813009262085
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 417.24068808555603
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.0,
+      "cons_hz": 47994.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 419.24315309524536
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.0,
+      "cons_hz": 47991.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 421.24565386772156
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.1,
+      "cons_hz": 47992.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 423.248211145401
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 425.2505249977112
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.4,
+      "cons_hz": 47990.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 427.25308990478516
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.5,
+      "cons_hz": 47995.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 429.2554988861084
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.5,
+      "cons_hz": 47989.5,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 431.2580919265747
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.5,
+      "cons_hz": 47997.5,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 433.26052689552307
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 435.2627999782562
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.2,
+      "cons_hz": 47989.2,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 437.2655220031738
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.7,
+      "cons_hz": 47994.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 439.2679331302643
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.2,
+      "cons_hz": 47992.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 441.2704689502716
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 443.273157119751
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.1,
+      "cons_hz": 47994.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 445.2754719257355
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47998.9,
+      "cons_hz": 47998.9,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 447.2777588367462
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.1,
+      "cons_hz": 47992.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 449.2802629470825
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.5,
+      "cons_hz": 47991.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 451.28289699554443
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 453.2852940559387
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 455.2879390716553
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 457.2903687953949
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 459.2927300930023
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.0,
+      "cons_hz": 47989.0,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 461.29546785354614
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.4,
+      "cons_hz": 47992.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 463.29785799980164
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.2,
+      "cons_hz": 47996.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 465.30025577545166
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 467.3026819229126
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.6,
+      "cons_hz": 47988.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 469.305438041687
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.7,
+      "cons_hz": 47994.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 471.30778098106384
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.3,
+      "cons_hz": 47994.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 473.31030106544495
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.8,
+      "cons_hz": 47988.8,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 475.3128139972687
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.9,
+      "cons_hz": 47995.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 477.3152458667755
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.0,
+      "cons_hz": 47994.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 479.31761503219604
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.1,
+      "cons_hz": 47992.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 481.32014298439026
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.9,
+      "cons_hz": 47994.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 483.3225598335266
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.6,
+      "cons_hz": 47988.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 485.3252799510956
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.0,
+      "cons_hz": 47997.0,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 487.32752084732056
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.9,
+      "cons_hz": 47992.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 489.33026099205017
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.0,
+      "cons_hz": 47988.0,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 491.33265709877014
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.6,
+      "cons_hz": 47996.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 493.3350319862366
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 495.3375840187073
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.5,
+      "cons_hz": 47992.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 497.33990502357483
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.2,
+      "cons_hz": 47995.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 499.34238290786743
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.3,
+      "cons_hz": 47992.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 501.3449239730835
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.9,
+      "cons_hz": 47993.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 503.3473250865936
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 505.34981298446655
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.2,
+      "cons_hz": 47992.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 507.3523020744324
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.8,
+      "cons_hz": 47993.8,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 509.35468888282776
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.0,
+      "cons_hz": 47991.0,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 511.35740303993225
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 513.3597619533539
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.7,
+      "cons_hz": 47992.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 515.3622560501099
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.9,
+      "cons_hz": 47992.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 517.364777803421
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 519.3673539161682
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 521.3700561523438
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 523.3723318576813
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 525.3747320175171
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47988.7,
+      "cons_hz": 47988.7,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 527.3773939609528
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.7,
+      "cons_hz": 47993.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 529.3797929286957
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.0,
+      "cons_hz": 47994.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 531.3822438716888
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 533.3847498893738
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.4,
+      "cons_hz": 47997.4,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 535.3870589733124
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 537.3896479606628
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.3,
+      "cons_hz": 47995.3,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 539.39213514328
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.2,
+      "cons_hz": 47989.2,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 541.3946740627289
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.1,
+      "cons_hz": 47996.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 543.3971199989319
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.9,
+      "cons_hz": 47992.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 545.3995749950409
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 547.4021217823029
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 549.4044787883759
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.5,
+      "cons_hz": 47989.5,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 551.4076249599457
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.6,
+      "cons_hz": 47995.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 553.4095358848572
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.9,
+      "cons_hz": 47991.9,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 555.4120879173279
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.3,
+      "cons_hz": 47991.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 557.4144759178162
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47997.1,
+      "cons_hz": 47997.1,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 559.4168848991394
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47987.5,
+      "cons_hz": 47987.5,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 561.4196970462799
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47996.2,
+      "cons_hz": 47996.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 563.4218530654907
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.1,
+      "cons_hz": 47994.1,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 565.4244120121002
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47990.5,
+      "cons_hz": 47990.5,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 567.4269740581512
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.0,
+      "cons_hz": 47995.0,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 569.4293479919434
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.7,
+      "cons_hz": 47995.7,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 571.431746006012
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.4,
+      "cons_hz": 47992.4,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 573.4342110157013
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47983.9,
+      "cons_hz": 47983.9,
+      "canon_hz": 133.29,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 575.4372189044952
+    },
+    {
+      "dt_s": 2.002,
+      "acq_hz": 48000.2,
+      "cons_hz": 48000.2,
+      "canon_hz": 133.33,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 577.4393179416656
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.4,
+      "cons_hz": 47993.4,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 579.4426338672638
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.1,
+      "cons_hz": 47993.1,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 581.4443171024323
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.6,
+      "cons_hz": 47994.6,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 583.4466841220856
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.2,
+      "cons_hz": 47991.2,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 585.449236869812
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.3,
+      "cons_hz": 47992.3,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 587.4517910480499
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47994.2,
+      "cons_hz": 47994.2,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 589.4541201591492
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47991.7,
+      "cons_hz": 47991.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 591.4567210674286
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47989.6,
+      "cons_hz": 47989.6,
+      "canon_hz": 133.3,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 593.4592869281769
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47995.9,
+      "cons_hz": 47995.9,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 595.4616920948029
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47993.5,
+      "cons_hz": 47993.5,
+      "canon_hz": 133.32,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 597.4642519950867
+    },
+    {
+      "dt_s": 2.003,
+      "acq_hz": 47992.7,
+      "cons_hz": 47992.7,
+      "canon_hz": 133.31,
+      "lrck_hz": 47996.4,
+      "authority": "esp_timer",
+      "host_t": 599.4666311740875
+    }
+  ],
+  "wdt_or_reset_lines": 0,
+  "n_lines": 1236
+}
