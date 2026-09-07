@@ -69,3 +69,37 @@ def test_probe_binds_i2s1_not_auto():
     assert "I2S_SLOT_BIT_WIDTH_32BIT" in CPP
     assert "I2S_DATA_BIT_WIDTH_24BIT" in CPP
     assert "I2S_ROLE_SLAVE" in CPP
+
+
+def test_overflow_callback_is_registered_before_enable():
+    init = CPP.split("k1_pcm_init_i2s1", 1)[1]
+    ovf_at = init.find("i2s_channel_register_event_callback")
+    en_at = init.find("i2s_channel_enable")
+    assert ovf_at > 0
+    assert en_at > ovf_at
+    assert "on_recv_q_ovf" in CPP
+    assert "dropped_exact=UNKNOWN" in CPP
+    assert "IRAM_ATTR k1_pcm_on_recv_q_ovf" in CPP
+    assert "IRAM_ATTR k1_pcm_on_recv" in CPP
+
+
+def test_overflow_isr_has_no_printf_or_heap():
+    for name in ("k1_pcm_on_recv", "k1_pcm_on_recv_q_ovf"):
+        start = CPP.find(f"IRAM_ATTR {name}")
+        assert start > 0, name
+        brace = CPP.find("{", start)
+        depth = 0
+        end = brace
+        for i, ch in enumerate(CPP[brace:], brace):
+            if ch == "{":
+                depth += 1
+            elif ch == "}":
+                depth -= 1
+                if depth == 0:
+                    end = i
+                    break
+        body = CPP[brace : end + 1]
+        assert "USBSerial" not in body, name
+        assert "printf" not in body, name
+        assert "malloc" not in body, name
+        assert "new " not in body, name

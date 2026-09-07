@@ -56,6 +56,32 @@ static int s_dma_rate_pass;
 static uint32_t s_src_blocks;
 static uint32_t s_src_in;
 static uint32_t s_src_out;
+// P1 overflow / rate witnesses. ISR touches only the atomics.
+static volatile uint32_t s_rx_ovf_events;
+static volatile uint32_t s_rx_ovf_bytes;
+static volatile uint32_t s_acq_frames;
+static uint32_t s_ring_dropped_frames;  // 0 until P2 ring exists
+static int64_t s_rate_poll_t0_us;
+static uint32_t s_rate_poll_acq0;
+static uint32_t s_rate_poll_cons0;
+static uint32_t s_rate_poll_canon0;
+
+static bool IRAM_ATTR k1_pcm_on_recv(i2s_chan_handle_t, i2s_event_data_t *event, void *) {
+  if (event != nullptr && event->size >= (size_t)K1_PCM_STEREO_FRAME_BYTES) {
+    __atomic_fetch_add(&s_acq_frames,
+                       (uint32_t)(event->size / (size_t)K1_PCM_STEREO_FRAME_BYTES),
+                       __ATOMIC_RELAXED);
+  }
+  return false;
+}
+
+static bool IRAM_ATTR k1_pcm_on_recv_q_ovf(i2s_chan_handle_t, i2s_event_data_t *event, void *) {
+  __atomic_fetch_add(&s_rx_ovf_events, 1u, __ATOMIC_RELAXED);
+  if (event != nullptr) {
+    __atomic_fetch_add(&s_rx_ovf_bytes, (uint32_t)event->size, __ATOMIC_RELAXED);
+  }
+  return false;
+}
 
 static void k1_pcm_hold_nfc_inert(void) {
   gpio_config_t io = {};
@@ -152,6 +178,13 @@ static int k1_pcm_init_i2s1(void) {
     USBSerial.println("[PCM1808] init=FAIL i2s_std");
     return 0;
   }
+  i2s_event_callbacks_t cbs = {};
+  cbs.on_recv = k1_pcm_on_recv;
+  cbs.on_recv_q_ovf = k1_pcm_on_recv_q_ovf;
+  if (i2s_channel_register_event_callback(s_rx, &cbs, NULL) != ESP_OK) {
+    USBSerial.println("[PCM1808] init=FAIL i2s_event_cb");
+    return 0;
+  }
   if (i2s_channel_enable(s_rx) != ESP_OK) {
     USBSerial.println("[PCM1808] init=FAIL i2s_enable");
     return 0;
@@ -200,6 +233,14 @@ void k1_pcm1808_begin() {
   s_channel = 0;
   s_snap_armed = 1;
   s_snap_n = 0;
+  s_rx_ovf_events = 0;
+  s_rx_ovf_bytes = 0;
+  s_acq_frames = 0;
+  s_ring_dropped_frames = 0;
+  s_rate_poll_t0_us = 0;
+  s_rate_poll_acq0 = 0;
+  s_rate_poll_cons0 = 0;
+  s_rate_poll_canon0 = 0;
   s_lmin = 8388607;
   s_lmax = -8388608;
   s_rmin = 8388607;
@@ -324,6 +365,28 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   USBSerial.printf("[PCMRS] in=%u out=%u blocks=%u invariant=%s\n", (unsigned)s_src_in,
                    (unsigned)s_src_out, (unsigned)s_src_blocks,
                    (s_src_in * 4u == s_src_out * 15u) ? "PASS" : "FAIL");
+  const uint32_t ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  const uint32_t ovf_b = __atomic_load_n(&s_rx_ovf_bytes, __ATOMIC_RELAXED);
+  const uint32_t acq = __atomic_load_n(&s_acq_frames, __ATOMIC_RELAXED);
+  const uint32_t signaled =
+      (ovf_b >= (uint32_t)K1_PCM_STEREO_FRAME_BYTES) ? (ovf_b / (uint32_t)K1_PCM_STEREO_FRAME_BYTES) : 0u;
+  USBSerial.printf(
+      "[PCMOVF] ovf=%u ovf_bytes=%u dropped_frames_signaled=%u dropped_exact=UNKNOWN ring_drop=%u acq=%u cons=%u canon=%u\n",
+      (unsigned)ovf, (unsigned)ovf_b, (unsigned)signaled, (unsigned)s_ring_dropped_frames, (unsigned)acq,
+      (unsigned)s_frames, (unsigned)s_src_blocks);
+  const int64_t t_us = esp_timer_get_time();
+  if (s_rate_poll_t0_us > 0 && t_us > s_rate_poll_t0_us) {
+    const double dt = (double)(t_us - s_rate_poll_t0_us) / 1000000.0;
+    const double acq_hz = (double)(acq - s_rate_poll_acq0) / dt;
+    const double cons_hz = (double)(s_frames - s_rate_poll_cons0) / dt;
+    const double canon_hz = (double)(s_src_blocks - s_rate_poll_canon0) / dt;
+    USBSerial.printf("[PCMRATE2] dt_s=%.3f acq_hz=%.1f cons_hz=%.1f canon_hz=%.2f lrck_hz=%.1f authority=esp_timer\n",
+                     dt, acq_hz, cons_hz, canon_hz, (double)s_clk.lrck_hz);
+  }
+  s_rate_poll_t0_us = t_us;
+  s_rate_poll_acq0 = acq;
+  s_rate_poll_cons0 = s_frames;
+  s_rate_poll_canon0 = s_src_blocks;
   s_lmin = 8388607;
   s_lmax = -8388608;
   s_rmin = 8388607;
