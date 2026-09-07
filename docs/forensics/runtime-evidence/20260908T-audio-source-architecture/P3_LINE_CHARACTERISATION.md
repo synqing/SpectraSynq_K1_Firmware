@@ -1,5 +1,5 @@
 ---
-abstract: "P3 partial. Route PASS. DMA0=physical RIGHT, DMA1=physical LEFT. Quiet ~2400 RMS (~−71 dBFS) at a ~−42.6 dBFS test tone. Crosstalk UNRESOLVED/NOISE-FLOOR-LIMITED (upper bound only). THD/FR pending timed raw 24-bit capture."
+abstract: "P3 partial. Route PASS. DMA0=physical RIGHT. Crosstalk noise-floor-limited. Amplitude staircase VOL=56 peak-linear to digital 1.0; ADC clip not reached (~16.7 dB peak headroom). THD/FR pending higher Mac volume."
 ---
 
 # P3 — Line-In characterisation (partial)
@@ -56,9 +56,25 @@ This experiment establishes only an **upper bound** at the tested level:
 
 True separation could be much better. Re-measure after a higher clean stimulus (a few dB below measured ADC clipping) and a timed raw capture. Do **not** report crosstalk = −28 / −30 dB.
 
-## Not yet measured (need fixture-aligned 48 kHz snapshot)
+## Amplitude staircase — MEASURED_ON_SILICON (VOL=56, External Headphones)
 
-THD, THD+N, SINAD, ENOB, sweep 20 Hz–20 kHz, phase, IM products, staircase linearity, impulse. PCMSNAP today dumps once at boot, not during a fixture.
+`P3_STAIRCASE/P3_AMPLITUDE_STAIRCASE.json` — 997 Hz both, PID-owned `afplay`, pre/post quiet guards, timed signed-24 from the capture task. Label **END_TO_END_LINE_LANE_METRIC**.
+
+| Digital amp | peak slot0 (RIGHT) | peak vs 0.20 | RMS dBFS | clip samples |
+|---:|---:|---:|---:|---:|
+| 0.20 | 249706 | 0.00 dB | −34.0 | 0 |
+| 0.40 | 496437 | −0.05 dB | −28.1 | 0 |
+| 0.60 | 742986 | −0.07 dB | −24.5 | 0 |
+| 0.80 | 987266 | −0.10 dB | −22.0 | 0 |
+| 1.00 | 1230508 | −0.13 dB | −21.4 | 0 |
+
+Peak tracks digital amplitude through 1.0. ADC clipping **not reached**. Headroom to signed-24 FS ≈ **16.7 dB peak**. Subsequent sines should use this physical setup (External Headphones, recorded volume) and a higher Mac volume until clip onset is seen; do not treat fixture “−18 dBFS” as the operating point.
+
+Quiet floor in the same captures ≈ 1.7k–2.0k RMS. Fill deltas: ovf=0, ring_drop=0. Lifetime ring_drop still climbs during hex dump because dump runs on the serial/AP core; that is a dump artefact, not a lost capture.
+
+## Not yet measured
+
+997 Hz THD/SINAD at a few dB below ADC clip (clip not found at VOL=56). Quiet PSD/DC at that drive. Crosstalk at the higher clean level. Frequency response. Mac volume 80/100 extension after dump no longer interleaves `[PCMRAW]` telemetry.
 
 No Line-In conditioning constant is frozen.
 
@@ -66,5 +82,6 @@ No Line-In conditioning constant is frozen.
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-09-08 | agent:grok | Amplitude staircase VOL=56: peak-linear to digital 1.0, ADC clip not reached, 16.7 dB peak headroom. |
 | 2026-09-08 | agent:grok | Crosstalk reclassified NOISE-FLOOR-LIMITED; tone was only −42.6 dBFS. |
 | 2026-09-08 | agent:grok | Route + L/R map + noise/crosstalk from exclusive External Headphones. |

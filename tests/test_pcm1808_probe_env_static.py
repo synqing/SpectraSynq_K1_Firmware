@@ -80,6 +80,11 @@ def test_raw_tap_is_on_capture_task_not_canonical():
     assert "pcmraw_arm" in CPP
     assert "fmt=le24_s0s1" in CPP
     assert "slot0=RIGHT" in CPP
+    assert "s_raw_dumping" in CPP
+    dump = CPP.split("k1_pcmraw_dump", 1)[1].split("bool k1_pcm1808_dispatch", 1)[0]
+    assert "s_raw_dumping = 1" in dump
+    poll = CPP.split("k1_pcm1808_poll_telemetry", 1)[1].split("void k1_pcm1808_take_snap", 1)[0]
+    assert "s_raw_dumping" in poll
 
 
 def test_capture_task_owns_i2s_read():

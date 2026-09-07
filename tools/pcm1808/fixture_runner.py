@@ -18,7 +18,10 @@ import serial
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from pcmraw24_decode import decode_text, rms
 
-STATUS = re.compile(r"\[PCMRAW24\] armed=(\d+) filled=(\d+) target=(\d+)")
+STATUS = re.compile(
+    r"\[PCMRAW24\] armed=(\d+) filled=(\d+) target=(\d+) cap=(\d+) t0_us=(\-?\d+) "
+    r"seq0=(\d+) ovf=(\d+) ring_drop=(\d+) hw=(\d+)"
+)
 FS = 8388607.0
 ROUTE = "External Headphones"
 
@@ -63,18 +66,64 @@ def read_until(ser: serial.Serial, needle: str, timeout: float) -> str:
     return buf
 
 
-def arm_and_dump(ser: serial.Serial, ms: int, fixture_hash: str, timeout: float) -> str:
+def wait_live(ser: serial.Serial, timeout: float = 10.0) -> str:
+    buf = read_until(ser, "[PCMRATE2]", timeout)
+    if "[PCMRATE2]" not in buf and "[PCMING]" not in buf:
+        raise SystemExit("REFUSE: PCM capture telemetry not live")
+    return buf
+
+
+def drain(ser: serial.Serial, linger: float = 0.08) -> None:
+    t0 = time.time()
+    while time.time() - t0 < linger:
+        n = ser.in_waiting
+        if n:
+            ser.read(n)
+            t0 = time.time()
+        else:
+            time.sleep(0.01)
+
+
+def status_now(ser: serial.Serial) -> dict:
+    last = ""
+    for _ in range(4):
+        drain(ser, 0.06)
+        send(ser, ":pcmraw_status=1", 0.02)
+        buf = read_until(ser, "[PCMRAW24]", 4.0)
+        last = buf
+        m = STATUS.search(buf)
+        if m:
+            return {
+                "armed": int(m.group(1)),
+                "filled": int(m.group(2)),
+                "target": int(m.group(3)),
+                "ovf": int(m.group(7)),
+                "ring_drop": int(m.group(8)),
+                "hw": int(m.group(9)),
+                "raw": m.group(0),
+            }
+    raise SystemExit("no [PCMRAW24] status: " + last[-500:])
+
+
+def arm_and_dump(ser: serial.Serial, ms: int, fixture_hash: str, timeout: float) -> tuple[str, dict]:
+    before = status_now(ser)
     send(ser, f":pcmraw_arm={ms},{fixture_hash}", 0.05)
     t0 = time.time()
+    after = before
     while time.time() - t0 < timeout:
-        send(ser, ":pcmraw_status=1", 0.05)
-        buf = read_until(ser, "[PCMRAW24]", 1.0)
-        m = STATUS.search(buf)
-        if m and int(m.group(1)) == 0 and int(m.group(2)) >= int(m.group(3)) > 0:
+        after = status_now(ser)
+        if after["armed"] == 0 and after["filled"] >= after["target"] > 0:
             break
-        time.sleep(0.2)
+        time.sleep(0.15)
     send(ser, ":pcmraw_dump=1", 0.05)
-    return read_until(ser, "[PCMRAW24-END]", timeout)
+    dump = read_until(ser, "[PCMRAW24-END]", max(timeout, 20.0))
+    return dump, {
+        "ovf_delta_fill": after["ovf"] - before["ovf"],
+        "drop_delta_fill": after["ring_drop"] - before["ring_drop"],
+        "hw_fill": after["hw"],
+        "filled": after["filled"],
+        "target": after["target"],
+    }
 
 
 def stop_pid(proc: subprocess.Popen) -> None:
@@ -89,12 +138,21 @@ def stop_pid(proc: subprocess.Popen) -> None:
 
 
 def capture_quiet(ser: serial.Serial, ms: int) -> dict:
-    dump = arm_and_dump(ser, ms, "quiet", timeout=ms / 1000.0 + 8)
+    dump, fill = arm_and_dump(ser, ms, "quiet", timeout=ms / 1000.0 + 20)
     d = decode_text(dump)
     r0, r1 = rms(d["slot0"]), rms(d["slot1"])
-    return {"rms_slot0": r0, "rms_slot1": r1, "peak_slot0": int(abs(d["slot0"]).max()),
-            "peak_slot1": int(abs(d["slot1"]).max()), "frames": d["frames"],
-            "ovf": d["ovf"], "ring_drop": d["ring_drop"]}
+    return {
+        "rms_slot0": r0,
+        "rms_slot1": r1,
+        "peak_slot0": int(abs(d["slot0"]).max()),
+        "peak_slot1": int(abs(d["slot1"]).max()),
+        "frames": d["frames"],
+        "crc_ok": d["crc_ok"],
+        "ovf": d["ovf"],
+        "ring_drop": d["ring_drop"],
+        "ovf_delta_fill": fill["ovf_delta_fill"],
+        "drop_delta_fill": fill["drop_delta_fill"],
+    }
 
 
 def main() -> int:
@@ -114,8 +172,9 @@ def main() -> int:
         raise SystemExit(f"REFUSE: route is {vol['route']!r}, want {ROUTE!r}")
 
     ser = serial.Serial(args.port, 115200, timeout=0.2)
-    time.sleep(0.3)
+    time.sleep(0.8)
     ser.reset_input_buffer()
+    wait_live(ser, 12.0)
 
     pre = capture_quiet(ser, args.quiet_ms)
     if max(pre["rms_slot0"], pre["rms_slot1"]) > args.quiet_rms_max:
@@ -126,7 +185,6 @@ def main() -> int:
 
     arm_ms = args.arm_ms
     if arm_ms <= 0:
-        # 48k 24-bit stereo wav duration
         import wave
         with wave.open(str(wav), "r") as w:
             arm_ms = int(round(1000.0 * w.getnframes() / w.getframerate()))
@@ -135,11 +193,12 @@ def main() -> int:
     proc = subprocess.Popen(["afplay", str(wav)])
     fixture_pid = proc.pid
     try:
-        dump = arm_and_dump(ser, arm_ms, fx, timeout=arm_ms / 1000.0 + 15)
+        dump, fill = arm_and_dump(ser, arm_ms, fx, timeout=arm_ms / 1000.0 + 25)
     finally:
         stop_pid(proc)
 
     stim = decode_text(dump)
+    time.sleep(0.6)
     post = capture_quiet(ser, args.quiet_ms)
     ser.close()
 
@@ -150,8 +209,10 @@ def main() -> int:
     stim_rms = (rms(s0), rms(s1))
     post_ok = max(post["rms_slot0"], post["rms_slot1"]) <= args.quiet_rms_max * 2
     stim_ok = max(stim_rms) > max(pre["rms_slot0"], pre["rms_slot1"]) * 5
+    fill_ok = fill["ovf_delta_fill"] == 0 and fill["filled"] >= fill["target"] > 0
     result = {
-        "PASS": bool(stim_ok and post_ok and stim["crc_ok"] and stim["ovf"] == 0 and stim["ring_drop"] == 0),
+        "PASS": bool(stim_ok and post_ok and stim["crc_ok"] and fill_ok),
+        "fill": fill,
         "wav": str(wav),
         "fixture_sha256": fx,
         "fixture_pid": fixture_pid,
@@ -174,9 +235,11 @@ def main() -> int:
             "dbfs_slot1": 20 * __import__("math").log10((stim_rms[1] + 1) / FS),
             "slot0_physical": "RIGHT",
             "slot1_physical": "LEFT",
+            "fill": fill,
         },
         "stim_ok": stim_ok,
         "post_guard_ok": post_ok,
+        "fill_ok": fill_ok,
         "label": "END_TO_END_LINE_LANE_METRIC",
     }
     Path(args.out).write_text(json.dumps(result, indent=2) + "\n")

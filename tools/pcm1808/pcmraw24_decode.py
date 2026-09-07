@@ -27,8 +27,8 @@ def decode_text(text: str) -> dict:
     if end < 0:
         raise SystemExit("no PCMRAW24-END")
     nbytes, crc_expect, frames, sr = int(m.group(1)), int(m.group(2), 16), int(m.group(3)), int(m.group(4))
-    body = text[m.end() : end]
-    hex_body = "".join(re.findall(r"^[0-9a-f]+$", body, re.M))
+    body = text[m.end() : end].replace("\r", "")
+    hex_body = "".join(re.findall(r"^[0-9a-f]+$", body, re.M | re.I))
     raw = bytes.fromhex(hex_body)
     if len(raw) != nbytes:
         raise SystemExit(f"length mismatch header={nbytes} decoded={len(raw)}")

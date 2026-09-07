@@ -1,0 +1,66 @@
+{
+  "PASS": true,
+  "wav": "10_amp_040_997hz_guarded.wav",
+  "amp": 0.4,
+  "fixture_sha256": "c8d514e7900a326a8a121b10cc01c4220fe7db6e33f54840a9ae807a047ee0e0",
+  "fixture_pid": 33840,
+  "mac": {
+    "output_volume": 56,
+    "route": "External Headphones"
+  },
+  "pre": {
+    "rms_slot0": 3490.501684482476,
+    "rms_slot1": 3520.133065925622,
+    "peak_slot0": 11384,
+    "peak_slot1": 11437,
+    "frames": 19200,
+    "crc_ok": true,
+    "ovf": 0,
+    "ring_drop": 132060,
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "settle_tries": 1
+  },
+  "post": {
+    "rms_slot0": 6365.961343433822,
+    "rms_slot1": 6475.312108127009,
+    "peak_slot0": 16036,
+    "peak_slot1": 16113,
+    "frames": 19200,
+    "crc_ok": true,
+    "ovf": 0,
+    "ring_drop": 168780,
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0
+  },
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "hw_fill": 2040,
+    "filled": 43200,
+    "target": 43200
+  },
+  "stim_ok": true,
+  "post_guard_ok": true,
+  "fill_ok": true,
+  "stim": {
+    "crc_ok": true,
+    "frames": 43200,
+    "t0_us": 486273560,
+    "seq0": 23278980,
+    "ovf": 0,
+    "ring_drop": 142620,
+    "hw": 2040,
+    "rms_slot0": 331263.8006580049,
+    "rms_slot1": 332114.82798423077,
+    "peak_slot0": 496437,
+    "peak_slot1": 497934,
+    "clip_samples_slot0": 0,
+    "clip_samples_slot1": 0,
+    "dbfs_slot0": -28.07029114351777,
+    "dbfs_slot1": -28.04800549582023,
+    "slot0_physical": "RIGHT",
+    "slot1_physical": "LEFT"
+  },
+  "label": "END_TO_END_LINE_LANE_METRIC"
+}

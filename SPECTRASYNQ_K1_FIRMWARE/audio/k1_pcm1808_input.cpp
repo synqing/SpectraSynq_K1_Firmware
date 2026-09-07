@@ -81,6 +81,7 @@ static uint32_t s_raw_cap_frames;
 static volatile uint32_t s_raw_n;
 static volatile uint32_t s_raw_target;
 static volatile int s_raw_armed;
+static volatile int s_raw_dumping;
 static int64_t s_raw_t0_us;
 static uint32_t s_raw_seq0;
 static char s_raw_fixture[65];
@@ -446,6 +447,11 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
 
 void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   static uint32_t last;
+#ifdef K1_PCM1808_PROBE_V1
+  if (s_raw_dumping) {
+    return;
+  }
+#endif
   if ((t_now - last) < 2000) {
     return;
   }
@@ -546,9 +552,11 @@ static void k1_pcmraw_arm(uint32_t ms, const char *fixture) {
 }
 
 static void k1_pcmraw_dump(void) {
+  s_raw_dumping = 1;
   if (s_raw == nullptr || s_raw_n == 0) {
     USBSerial.println("[PCMRAW24-BEGIN bytes=0 crc32=0]");
     USBSerial.println("[PCMRAW24-END]");
+    s_raw_dumping = 0;
     return;
   }
   s_raw_armed = 0;
@@ -582,6 +590,7 @@ static void k1_pcmraw_dump(void) {
     }
   }
   USBSerial.println("[PCMRAW24-END]");
+  s_raw_dumping = 0;
 }
 
 bool k1_pcm1808_dispatch(const char *command_type, char *command_data) {
