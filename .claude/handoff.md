@@ -4,10 +4,11 @@
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
 
-**ACTIVE LANE (2026-09-07): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
+**ACTIVE LANE (2026-09-08): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
 Authority: **`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`**.
-Evidence: **`docs/forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md`**.
-Hardware clocks first. No PCM firmware until default 96 kHz proof.
+Continuation evidence: **`docs/forensics/runtime-evidence/20260908T-audio-source-architecture/`**.
+Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_probe` @ **`9361a027`**.
+P1: hop-drain overflow was real. P2: 10 min lossless capture ring PASS. P3: AUX route PASS; DMA0=physical RIGHT. NFC parked. Product restore still `k1_main_rpl_im69d` @ `acaecaa8`.
 
 Previous lane Colour Lab remains **ready_for_merge** on `lane/colourlab-bench`
 (`tools/colourlab/EXECUTION.md`). Do not merge it from this branch. Unrelated
