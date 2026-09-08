@@ -58,6 +58,11 @@ SERIAL_TYPED_CMD("scap_dump", serial_typed_wrap_stereo_probe, SC_TYPED_ONLY, CMD
 SERIAL_TYPED_CMD("pcmraw_arm", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("pcmraw_status", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
 SERIAL_TYPED_CMD("pcmraw_dump", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
+#if K1_PCM1808_SHADOW
+SERIAL_TYPED_CMD("pcmpair_arm", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("pcmpair_status", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
+SERIAL_TYPED_CMD("pcmpair_dump", serial_typed_wrap_pcmraw, SC_TYPED_ONLY, CMD_HARNESS)
+#endif
 #endif
 #ifdef K1_RENDER_TRACE_V1
 SERIAL_TYPED_CMD("rtrace_arm", serial_typed_wrap_render_trace, SC_TYPED_ONLY, CMD_HARNESS)

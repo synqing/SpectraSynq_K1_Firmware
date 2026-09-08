@@ -27,7 +27,7 @@
 #if K1_AUDIO_SOURCE_USB
 #include "k1_usb_audio_input.h"
 #endif
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_PRESENT
 #include "k1_pcm1808_input.h"
 #endif
 
@@ -474,6 +474,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   return;
 #endif
 #if K1_AUDIO_SOURCE_MIC
+#if K1_PCM1808_SHADOW
+  k1_pcm1808_pair_hop_begin();
+#endif
   static int8_t sweet_spot_state_last = 0;
   static bool silence_temp = false;
   static uint32_t silence_switched = 0;
@@ -572,6 +575,18 @@ void acquire_sample_chunk(uint32_t t_now) {
     (uint32_t)bytes_read,
     (uint32_t)bytes_requested,
     t_now);
+#endif
+#if K1_PCM1808_SHADOW
+  // IM69 tap is the hardware-decimated 12.8 kHz buffer BEFORE mic gain.
+  // Shadow drain pops the 48 kHz ring so I2S1 cannot overflow while AP
+  // continues to own ingress.
+#ifdef K1_MIC_IM69D_PDM_V1
+  k1_pcm1808_pair_note_mic(
+      im69d_samples_i16,
+      i2s_read_status == ESP_OK && bytes_read >= bytes_requested);
+#endif
+  k1_pcm1808_shadow_drain();
+  k1_pcm1808_poll_telemetry(t_now);
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   const uint64_t i2s_read_return_us = (uint64_t)esp_timer_get_time();

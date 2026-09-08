@@ -63,6 +63,17 @@ static inline uint32_t k1_pcm_ring_push(K1PcmRing *q, const uint8_t *src, uint32
   return frames;
 }
 
+// Advance the read index without copying. Shadow drain uses this so the 48 kHz
+// producer cannot overflow while the AP is not consuming canonical frames.
+static inline uint32_t k1_pcm_ring_discard(K1PcmRing *q, uint32_t frames) {
+  const uint32_t used = k1_pcm_ring_used(q);
+  if (frames > used) {
+    frames = used;
+  }
+  q->r += frames;
+  return frames;
+}
+
 static inline uint32_t k1_pcm_ring_pop(K1PcmRing *q, uint8_t *dst, uint32_t frames) {
   const uint32_t used = k1_pcm_ring_used(q);
   if (frames > used) {

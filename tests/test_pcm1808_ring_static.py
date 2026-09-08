@@ -55,6 +55,13 @@ int main() {
   if (e[2 * 6] != 200) { printf("FAIL wrap seam %u\n", e[12]); fail = 1; }
   expect_u32("high_water", q.high_water, 7);
   expect_u32("no_partial", (uint32_t)K1_PCM_STEREO_FRAME_BYTES, 6);
+
+  k1_pcm_ring_reset(&q);
+  expect_u32("push7b", k1_pcm_ring_push(&q, c, 7), 7);
+  expect_u32("discard3", k1_pcm_ring_discard(&q, 3), 3);
+  expect_u32("used_after_discard", k1_pcm_ring_used(&q), 4);
+  expect_u32("discard_all", k1_pcm_ring_discard(&q, 99), 4);
+  expect_u32("empty_after_discard", k1_pcm_ring_used(&q), 0);
   return fail;
 }
 """

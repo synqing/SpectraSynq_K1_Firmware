@@ -993,6 +993,9 @@ void loop() {
   }
 #endif
   process_GDFT();  // (GDFT.h)
+#if K1_PCM1808_SHADOW
+  k1_pcm1808_pair_hop_end();
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   if (ap_cadence_timing_active) {
     const int64_t stage_end_us = esp_timer_get_time();

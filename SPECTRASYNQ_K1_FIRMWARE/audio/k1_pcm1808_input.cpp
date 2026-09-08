@@ -1,6 +1,6 @@
 #include "k1_pcm1808_input.h"
 
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_PRESENT
 
 #include <Arduino.h>
 #include "globals.h"
@@ -99,6 +99,40 @@ static int64_t s_raw_t1_us;
 static uint32_t s_raw_seq1;
 static int s_raw_epoch_valid;
 static char s_raw_fixture[65];
+#if K1_PCM1808_SHADOW
+static const uint32_t K1_PCMPAIR_MAX_MS = 4000;
+static const uint32_t K1_PCMPAIR_MIC_CAP = (12800u * K1_PCMPAIR_MAX_MS) / 1000u;
+static const uint32_t K1_PCMPAIR_HOP_CAP = ((K1_PCMPAIR_MAX_MS * 200u) / 1000u) + 32u;
+static int16_t *s_mic;
+static uint16_t *s_hop_us;
+static uint32_t s_mic_cap;
+static uint32_t s_hop_cap;
+static volatile uint32_t s_mic_n;
+static volatile uint32_t s_mic_target;
+static volatile uint32_t s_hop_n;
+static volatile uint32_t s_mic_err;
+static volatile int s_pair_armed;
+static volatile int s_cap_pause;
+static int s_pair_mic_only;
+static int s_pair_epoch_valid;
+static int64_t s_pair_t0_us;
+static int64_t s_pair_t1_us;
+static int64_t s_pair_hop_t0_us;
+static uint32_t s_pair_arm_ovf;
+static uint32_t s_pair_arm_ring_drop;
+static uint32_t s_pair_arm_hw;
+static uint32_t s_pair_end_ovf;
+static uint32_t s_pair_end_ring_drop;
+static uint32_t s_pair_end_hw;
+static uint32_t s_pair_end_mic_err;
+static uint32_t s_hop_mean;
+static uint32_t s_hop_p95;
+static uint32_t s_hop_p99;
+static uint32_t s_hop_max;
+static uint32_t s_cap_read_us_epoch;
+static volatile uint32_t s_cap_read_us_acc;
+static volatile uint32_t s_cap_loops;
+#endif
 #endif
 static int64_t s_rate_poll_t0_us;
 static uint32_t s_rate_poll_acq0;
@@ -122,11 +156,34 @@ static bool IRAM_ATTR k1_pcm_on_recv_q_ovf(i2s_chan_handle_t, i2s_event_data_t *
   return false;
 }
 
+#if K1_PCM1808_SHADOW && defined(K1_PCM1808_PROBE_V1)
+static void k1_pcmpair_maybe_freeze(void);
+#endif
+#ifdef K1_PCM1808_PROBE_V1
+static void k1_pcm_hex_dump(const uint8_t *p, size_t nbytes);
+#endif
+
 static void k1_pcm_capture_task(void *) {
   for (;;) {
+#ifdef K1_PCM1808_PROBE_V1
+#if K1_PCM1808_SHADOW
+    if (s_cap_pause) {
+      vTaskDelay(1);
+      continue;
+    }
+#endif
+#endif
     size_t got = 0;
+#if K1_PCM1808_SHADOW && defined(K1_PCM1808_PROBE_V1)
+    const int64_t t_read0 = esp_timer_get_time();
+#endif
     const esp_err_t e =
         i2s_channel_read(s_rx, s_dma, sizeof(s_dma), &got, pdMS_TO_TICKS(20));
+#if K1_PCM1808_SHADOW && defined(K1_PCM1808_PROBE_V1)
+    __atomic_fetch_add(&s_cap_read_us_acc,
+                       (uint32_t)(esp_timer_get_time() - t_read0), __ATOMIC_RELAXED);
+    __atomic_fetch_add(&s_cap_loops, 1u, __ATOMIC_RELAXED);
+#endif
     if (e != ESP_OK) {
       s_err++;
       continue;
@@ -165,6 +222,9 @@ static void k1_pcm_capture_task(void *) {
           s_raw_end_hw = s_ring_high_water;
           s_raw_epoch_valid = 1;
           s_raw_armed = 0;
+#if K1_PCM1808_SHADOW
+          k1_pcmpair_maybe_freeze();
+#endif
         }
       }
     }
@@ -385,7 +445,11 @@ void k1_pcm1808_begin() {
       return;
     }
   }
+#if K1_PCM1808_SHADOW
+  USBSerial.println("[PCMING] source=im69d shadow=pcm1808 canonical_hz=12800 hop=96");
+#else
   USBSerial.println("[PCMING] source=pcm1808 canonical_hz=12800 hop=96");
+#endif
   USBSerial.println("[PCMMAP] slot0=RIGHT slot1=LEFT policy=LINE_LEFT:slot1 LINE_RIGHT:slot0 LINE_MID:(s1+s0)/2");
 #ifdef K1_PCM1808_PROBE_V1
   if (s_raw == nullptr) {
@@ -399,6 +463,22 @@ void k1_pcm1808_begin() {
                        (unsigned)s_raw_cap_frames, (unsigned)K1_PCMRAW_MAX_MS);
     }
   }
+#if K1_PCM1808_SHADOW
+  if (s_mic == nullptr) {
+    s_mic_cap = K1_PCMPAIR_MIC_CAP;
+    s_hop_cap = K1_PCMPAIR_HOP_CAP;
+    s_mic = (int16_t *)ps_malloc((size_t)s_mic_cap * sizeof(int16_t));
+    s_hop_us = (uint16_t *)ps_malloc((size_t)s_hop_cap * sizeof(uint16_t));
+    if (s_mic == nullptr || s_hop_us == nullptr) {
+      s_mic_cap = 0;
+      s_hop_cap = 0;
+      USBSerial.println("[PCMPAIR] INIT FAIL: ps_malloc NULL — paired capture disabled");
+    } else {
+      USBSerial.printf("[PCMPAIR] INIT PASS mic_cap=%u hop_cap=%u cap_ms=%u store=PSRAM\n",
+                       (unsigned)s_mic_cap, (unsigned)s_hop_cap, (unsigned)K1_PCMPAIR_MAX_MS);
+    }
+  }
+#endif
 #endif
 }
 
@@ -419,6 +499,7 @@ static void k1_pcm_note_sample(int32_t l, int32_t r) {
   }
 }
 
+#if K1_AUDIO_SOURCE_PCM1808
 void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   (void)t_now;
   if (!s_gate_pass) {
@@ -465,6 +546,71 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
     out96[i] = k1_pcm1808_s24_to_s16(v);
   }
 }
+#endif  // K1_AUDIO_SOURCE_PCM1808
+
+#if K1_PCM1808_SHADOW
+void k1_pcm1808_shadow_drain() {
+  if (!s_gate_pass) {
+    return;
+  }
+  uint32_t n = 0;
+  while (k1_pcm_ring_used(&s_ring) >= (uint32_t)K1_PCM_HOP_FRAMES && n < 2u) {
+    const uint32_t got = k1_pcm_ring_discard(&s_ring, (uint32_t)K1_PCM_HOP_FRAMES);
+    s_pop_frames += got;
+    n++;
+  }
+}
+
+void k1_pcm1808_pair_hop_begin() {
+#ifdef K1_PCM1808_PROBE_V1
+  s_pair_hop_t0_us = esp_timer_get_time();
+#endif
+}
+
+void k1_pcm1808_pair_hop_end() {
+#ifdef K1_PCM1808_PROBE_V1
+  if (!s_pair_armed || s_hop_us == nullptr) {
+    return;
+  }
+  uint32_t us = (uint32_t)(esp_timer_get_time() - s_pair_hop_t0_us);
+  if (us > 65535u) {
+    us = 65535u;
+  }
+  const uint32_t n = s_hop_n;
+  if (n < s_hop_cap) {
+    s_hop_us[n] = (uint16_t)us;
+    s_hop_n = n + 1u;
+  }
+#endif
+}
+
+void k1_pcm1808_pair_note_mic(const int16_t *samples96, int i2s_ok) {
+#ifdef K1_PCM1808_PROBE_V1
+  if (!s_pair_armed || s_mic == nullptr) {
+    return;
+  }
+  if (!i2s_ok) {
+    __atomic_fetch_add(&s_mic_err, 1u, __ATOMIC_RELAXED);
+  }
+  uint32_t n = s_mic_n;
+  const uint32_t target = s_mic_target;
+  if (n >= target) {
+    k1_pcmpair_maybe_freeze();
+    return;
+  }
+  uint32_t take = 96u;
+  if (n + take > target) {
+    take = target - n;
+  }
+  memcpy(s_mic + n, samples96, (size_t)take * sizeof(int16_t));
+  s_mic_n = n + take;
+  k1_pcmpair_maybe_freeze();
+#else
+  (void)samples96;
+  (void)i2s_ok;
+#endif
+}
+#endif  // K1_PCM1808_SHADOW
 
 void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   static uint32_t last;
@@ -616,6 +762,12 @@ static void k1_pcmraw_dump(void) {
       (unsigned)(s_raw_end_ring_drop - s_raw_arm_ring_drop), (unsigned)s_raw_end_hw,
       s_raw_epoch_valid,
       (long long)(s_raw_epoch_valid ? (s_raw_t1_us - s_raw_t0_us) : 0));
+  k1_pcm_hex_dump(s_raw, nbytes);
+  USBSerial.println("[PCMRAW24-END]");
+  s_raw_dumping = 0;
+}
+
+static void k1_pcm_hex_dump(const uint8_t *p, size_t nbytes) {
   char line[129];
   static const char *hex = "0123456789abcdef";
   for (size_t off = 0; off < nbytes; off += 64) {
@@ -624,7 +776,7 @@ static void k1_pcmraw_dump(void) {
       n = 64;
     }
     for (size_t i = 0; i < n; i++) {
-      const uint8_t b = s_raw[off + i];
+      const uint8_t b = p[off + i];
       line[i * 2] = hex[b >> 4];
       line[i * 2 + 1] = hex[b & 0x0F];
     }
@@ -635,9 +787,234 @@ static void k1_pcmraw_dump(void) {
       vTaskDelay(1);
     }
   }
-  USBSerial.println("[PCMRAW24-END]");
+}
+
+#if K1_PCM1808_SHADOW
+static int k1_u16_cmp(const void *a, const void *b) {
+  const uint16_t ua = *(const uint16_t *)a;
+  const uint16_t ub = *(const uint16_t *)b;
+  return (ua > ub) - (ua < ub);
+}
+
+static void k1_pcmpair_hop_stats(void) {
+  const uint32_t n = s_hop_n;
+  s_hop_mean = 0;
+  s_hop_p95 = 0;
+  s_hop_p99 = 0;
+  s_hop_max = 0;
+  if (n == 0 || s_hop_us == nullptr) {
+    return;
+  }
+  static uint16_t sortbuf[K1_PCMPAIR_HOP_CAP];
+  uint32_t sum = 0;
+  uint32_t mx = 0;
+  const uint32_t take = (n > s_hop_cap) ? s_hop_cap : n;
+  for (uint32_t i = 0; i < take; i++) {
+    const uint16_t v = s_hop_us[i];
+    sortbuf[i] = v;
+    sum += v;
+    if (v > mx) {
+      mx = v;
+    }
+  }
+  qsort(sortbuf, take, sizeof(uint16_t), k1_u16_cmp);
+  s_hop_mean = sum / take;
+  s_hop_max = mx;
+  uint32_t i95 = (take * 95u) / 100u;
+  uint32_t i99 = (take * 99u) / 100u;
+  if (i95 >= take) {
+    i95 = take - 1u;
+  }
+  if (i99 >= take) {
+    i99 = take - 1u;
+  }
+  s_hop_p95 = sortbuf[i95];
+  s_hop_p99 = sortbuf[i99];
+}
+
+static void k1_pcmpair_set_pause(int pause) {
+  if (pause) {
+    s_cap_pause = 1;
+    vTaskDelay(pdMS_TO_TICKS(25));
+    if (s_rx != nullptr) {
+      i2s_channel_disable(s_rx);
+    }
+  } else {
+    if (s_rx != nullptr) {
+      i2s_channel_enable(s_rx);
+    }
+    s_cap_pause = 0;
+  }
+}
+
+static void k1_pcmpair_maybe_freeze(void) {
+  if (!s_pair_armed) {
+    return;
+  }
+  const int pcm_done = s_pair_mic_only || (s_raw_target > 0 && s_raw_n >= s_raw_target);
+  const int mic_done = (s_mic_target > 0 && s_mic_n >= s_mic_target);
+  if (!pcm_done || !mic_done) {
+    return;
+  }
+  s_pair_t1_us = esp_timer_get_time();
+  s_pair_end_ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  s_pair_end_ring_drop = s_ring_dropped_frames;
+  s_pair_end_hw = s_ring_high_water;
+  s_pair_end_mic_err = s_mic_err;
+  s_cap_read_us_epoch = __atomic_load_n(&s_cap_read_us_acc, __ATOMIC_RELAXED);
+  k1_pcmpair_hop_stats();
+  s_pair_epoch_valid = 1;
+  s_pair_armed = 0;
+  s_raw_armed = 0;
+  if (s_pair_mic_only) {
+    k1_pcmpair_set_pause(0);
+  }
+}
+
+static void k1_pcmpair_status(void) {
+  const uint32_t ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  const uint32_t ovf_epoch = s_pair_end_ovf - s_pair_arm_ovf;
+  const uint32_t drop_epoch = s_pair_end_ring_drop - s_pair_arm_ring_drop;
+  const int fill_ok = s_pair_epoch_valid && ovf_epoch == 0 && drop_epoch == 0 &&
+                      s_pair_end_mic_err == 0 &&
+                      s_mic_n >= s_mic_target && s_mic_target > 0 &&
+                      (s_pair_mic_only || (s_raw_n >= s_raw_target && s_raw_target > 0));
+  USBSerial.printf(
+      "[PCMPAIR] armed=%d pcm_filled=%u pcm_target=%u mic_filled=%u mic_target=%u "
+      "mic_err=%u ovf=%u ring_drop=%u hw=%u hop_n=%u mic_only=%d buf=%s\n",
+      s_pair_armed ? 1 : 0, (unsigned)s_raw_n, (unsigned)s_raw_target, (unsigned)s_mic_n,
+      (unsigned)s_mic_target, (unsigned)s_mic_err, (unsigned)ovf,
+      (unsigned)s_ring_dropped_frames, (unsigned)s_ring_high_water, (unsigned)s_hop_n,
+      s_pair_mic_only, (s_mic != nullptr && s_raw != nullptr) ? "ok" : "NULL");
+  USBSerial.printf(
+      "[PCMPAIR-EPOCH] valid=%d ovf_epoch=%u ring_drop_epoch=%u mic_err_epoch=%u "
+      "hw_epoch=%u t0_us=%lld t1_us=%lld dur_us=%lld fill_ok=%d "
+      "hop_mean=%u hop_p95=%u hop_p99=%u hop_max=%u cap_read_us=%u ap_source=im69d\n",
+      s_pair_epoch_valid, (unsigned)ovf_epoch, (unsigned)drop_epoch,
+      (unsigned)s_pair_end_mic_err, (unsigned)s_pair_end_hw, (long long)s_pair_t0_us,
+      (long long)s_pair_t1_us,
+      (long long)(s_pair_epoch_valid ? (s_pair_t1_us - s_pair_t0_us) : 0), fill_ok ? 1 : 0,
+      (unsigned)s_hop_mean, (unsigned)s_hop_p95, (unsigned)s_hop_p99, (unsigned)s_hop_max,
+      (unsigned)s_cap_read_us_epoch);
+}
+
+static void k1_pcmpair_arm(uint32_t ms, const char *fixture) {
+  if (s_mic == nullptr || s_raw == nullptr || s_hop_us == nullptr) {
+    USBSerial.println("[PCMPAIR] ARM FAIL: no buffer");
+    return;
+  }
+  if (ms < 100) {
+    ms = 100;
+  }
+  if (ms > K1_PCMPAIR_MAX_MS) {
+    ms = K1_PCMPAIR_MAX_MS;
+  }
+  s_pair_armed = 0;
+  s_raw_armed = 0;
+  s_pair_mic_only = 0;
+  if (fixture != nullptr && strstr(fixture, "cost_mic_only") != nullptr) {
+    s_pair_mic_only = 1;
+  }
+  s_raw_n = 0;
+  s_mic_n = 0;
+  s_hop_n = 0;
+  s_mic_err = 0;
+  s_cap_read_us_acc = 0;
+  s_cap_loops = 0;
+  s_raw_target = (48000u * ms) / 1000u;
+  if (s_raw_target > s_raw_cap_frames) {
+    s_raw_target = s_raw_cap_frames;
+  }
+  s_mic_target = (12800u * ms) / 1000u;
+  if (s_mic_target > s_mic_cap) {
+    s_mic_target = s_mic_cap;
+  }
+  s_raw_fixture[0] = 0;
+  if (fixture != nullptr && fixture[0]) {
+    strncpy(s_raw_fixture, fixture, sizeof(s_raw_fixture) - 1);
+    s_raw_fixture[sizeof(s_raw_fixture) - 1] = 0;
+  }
+  s_pair_epoch_valid = 0;
+  s_raw_epoch_valid = 0;
+  s_pair_t0_us = esp_timer_get_time();
+  s_pair_t1_us = 0;
+  s_hop_mean = s_hop_p95 = s_hop_p99 = s_hop_max = 0;
+  s_cap_read_us_epoch = 0;
+  s_pair_arm_ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  s_pair_arm_ring_drop = s_ring_dropped_frames;
+  s_pair_arm_hw = s_ring_high_water;
+  s_pair_end_ovf = s_pair_arm_ovf;
+  s_pair_end_ring_drop = s_pair_arm_ring_drop;
+  s_pair_end_hw = s_pair_arm_hw;
+  s_pair_end_mic_err = 0;
+  s_raw_arm_ovf = s_pair_arm_ovf;
+  s_raw_arm_ring_drop = s_pair_arm_ring_drop;
+  s_raw_arm_hw = s_pair_arm_hw;
+  s_raw_end_ovf = s_raw_arm_ovf;
+  s_raw_end_ring_drop = s_raw_arm_ring_drop;
+  s_raw_end_hw = s_raw_arm_hw;
+  if (s_pair_mic_only) {
+    k1_pcmpair_set_pause(1);
+  } else {
+    s_raw_armed = 1;
+  }
+  s_pair_armed = 1;
+  USBSerial.printf("[PCMPAIR] ARMED ms=%u pcm_frames=%u mic_samples=%u mic_only=%d fixture=%s\n",
+                   (unsigned)ms, (unsigned)s_raw_target, (unsigned)s_mic_target, s_pair_mic_only,
+                   s_raw_fixture[0] ? s_raw_fixture : "-");
+}
+
+static void k1_pcmpair_dump(void) {
+  if (s_pair_armed) {
+    USBSerial.println("[PCMPAIR] DUMP REFUSED: epoch still armed — freeze first");
+    return;
+  }
+  s_raw_dumping = 1;
+  const uint32_t ovf_epoch = s_pair_end_ovf - s_pair_arm_ovf;
+  const uint32_t drop_epoch = s_pair_end_ring_drop - s_pair_arm_ring_drop;
+  const int fill_ok = s_pair_epoch_valid && ovf_epoch == 0 && drop_epoch == 0 &&
+                      s_pair_end_mic_err == 0 &&
+                      s_mic_n >= s_mic_target && s_mic_target > 0 &&
+                      (s_pair_mic_only || (s_raw_n >= s_raw_target && s_raw_target > 0));
+  const size_t pcm_bytes = (size_t)s_raw_n * (size_t)K1_PCM_STEREO_FRAME_BYTES;
+  const size_t mic_bytes = (size_t)s_mic_n * sizeof(int16_t);
+  const size_t hop_bytes = (size_t)s_hop_n * sizeof(uint16_t);
+  const uint32_t pcm_crc = (s_raw != nullptr && pcm_bytes) ? esp_crc32_le(0, s_raw, pcm_bytes) : 0;
+  const uint32_t mic_crc =
+      (s_mic != nullptr && mic_bytes) ? esp_crc32_le(0, (const uint8_t *)s_mic, mic_bytes) : 0;
+  USBSerial.printf(
+      "[PCMPAIR-BEGIN] epoch_valid=%d fill_ok=%d ovf_epoch=%u ring_drop_epoch=%u "
+      "mic_err_epoch=%u dur_us=%lld pcm_frames=%u mic_samples=%u hop_n=%u "
+      "hop_mean=%u hop_p95=%u hop_p99=%u hop_max=%u cap_read_us=%u "
+      "slot0=RIGHT slot1=LEFT ap_source=im69d mic_only=%d fixture=%s\n",
+      s_pair_epoch_valid, fill_ok ? 1 : 0, (unsigned)ovf_epoch, (unsigned)drop_epoch,
+      (unsigned)s_pair_end_mic_err,
+      (long long)(s_pair_epoch_valid ? (s_pair_t1_us - s_pair_t0_us) : 0), (unsigned)s_raw_n,
+      (unsigned)s_mic_n, (unsigned)s_hop_n, (unsigned)s_hop_mean, (unsigned)s_hop_p95,
+      (unsigned)s_hop_p99, (unsigned)s_hop_max, (unsigned)s_cap_read_us_epoch, s_pair_mic_only,
+      s_raw_fixture[0] ? s_raw_fixture : "-");
+  USBSerial.printf("[PCMPAIR-PCM bytes=%u crc32=%08lx sr=48000 fmt=le24_s0s1]\n",
+                   (unsigned)pcm_bytes, (unsigned long)pcm_crc);
+  if (s_raw != nullptr && pcm_bytes) {
+    k1_pcm_hex_dump(s_raw, pcm_bytes);
+  }
+  USBSerial.println("[PCMPAIR-PCM-END]");
+  USBSerial.printf("[PCMPAIR-MIC bytes=%u crc32=%08lx sr=12800 fmt=s16le pre_gain=1]\n",
+                   (unsigned)mic_bytes, (unsigned long)mic_crc);
+  if (s_mic != nullptr && mic_bytes) {
+    k1_pcm_hex_dump((const uint8_t *)s_mic, mic_bytes);
+  }
+  USBSerial.println("[PCMPAIR-MIC-END]");
+  USBSerial.printf("[PCMPAIR-HOP bytes=%u n=%u fmt=u16le_us]\n", (unsigned)hop_bytes,
+                   (unsigned)s_hop_n);
+  if (s_hop_us != nullptr && hop_bytes) {
+    k1_pcm_hex_dump((const uint8_t *)s_hop_us, hop_bytes);
+  }
+  USBSerial.println("[PCMPAIR-HOP-END]");
+  USBSerial.println("[PCMPAIR-END]");
   s_raw_dumping = 0;
 }
+#endif  // K1_PCM1808_SHADOW
 
 bool k1_pcm1808_dispatch(const char *command_type, char *command_data) {
   if (strcmp(command_type, "pcmraw_arm") == 0) {
@@ -658,8 +1035,28 @@ bool k1_pcm1808_dispatch(const char *command_type, char *command_data) {
     k1_pcmraw_dump();
     return true;
   }
+#if K1_PCM1808_SHADOW
+  if (strcmp(command_type, "pcmpair_arm") == 0) {
+    char *comma = strchr(command_data, ',');
+    const char *fx = nullptr;
+    if (comma) {
+      *comma = 0;
+      fx = comma + 1;
+    }
+    k1_pcmpair_arm((uint32_t)atoi(command_data), fx);
+    return true;
+  }
+  if (strcmp(command_type, "pcmpair_status") == 0) {
+    k1_pcmpair_status();
+    return true;
+  }
+  if (strcmp(command_type, "pcmpair_dump") == 0) {
+    k1_pcmpair_dump();
+    return true;
+  }
+#endif
   return false;
 }
 #endif  // K1_PCM1808_PROBE_V1
 
-#endif  // K1_AUDIO_SOURCE_PCM1808
+#endif  // K1_PCM1808_PRESENT

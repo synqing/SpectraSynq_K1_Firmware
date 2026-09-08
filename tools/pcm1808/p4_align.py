@@ -354,9 +354,33 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="P4 LINE/MIC alignment and drift")
     ap.add_argument("--selftest", action="store_true",
                     help="validate the estimator against known lag and known ppm")
+    ap.add_argument("--dump", default="",
+                    help="post-epoch PCMPAIR dump text; LINE=PCM slot0 @ 48 kHz, MIC @ 12.8 kHz")
+    ap.add_argument("--json", default="")
     args = ap.parse_args()
     if args.selftest:
         return selftest()
+    if args.dump:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from p4_pair_decode import decode_text  # noqa: E402
+        d = decode_text(Path(args.dump).read_text(errors="replace"))
+        line = [float(v) for v in d["slot0"]]
+        mic = [float(v) for v in d["mic"]]
+        align = estimate_alignment(line, 48000.0, mic, 12800.0)
+        drift = estimate_drift(line, 48000.0, mic, 12800.0)
+        out = {
+            "clean": d["clean"],
+            "fill_ok": d["fill_ok"],
+            "ovf_epoch": d["ovf_epoch"],
+            "ring_drop_epoch": d["ring_drop_epoch"],
+            "mic_err_epoch": d["mic_err_epoch"],
+            "alignment": align,
+            "drift": drift,
+        }
+        print(json.dumps(out, indent=2))
+        if args.json:
+            Path(args.json).write_text(json.dumps(out, indent=2) + "\n")
+        return 0 if d["clean"] and align.get("valid") else 1
     ap.print_help()
     return 0
 

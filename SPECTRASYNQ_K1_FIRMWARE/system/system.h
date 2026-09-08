@@ -6,7 +6,7 @@
 #if defined(K1_USB_AUDIO_PROTOTYPE)
 #include "k1_usb_audio_input.h"
 #endif
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_PRESENT
 #include "k1_pcm1808_input.h"
 #endif
 #ifdef K1_ST25_PROBE_V1
@@ -620,7 +620,7 @@ void init_system() {
 #endif
 
   init_i2s();
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_PRESENT
   k1_pcm1808_begin();
 #endif
 #ifdef K1_ST25_PROBE_V1

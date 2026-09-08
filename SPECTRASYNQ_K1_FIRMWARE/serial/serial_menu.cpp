@@ -3088,13 +3088,13 @@ void parse_command(char* command_buf) {
 #endif
 
 #ifdef K1_PCM1808_PROBE_V1
-    // pcmraw_arm / pcmraw_status / pcmraw_dump — timed signed-24 stereo from the
-    // continuous capture task (audio/k1_pcm1808_input.cpp). GATE-MATCHED: rows in
+    // pcmraw_arm / pcmraw_status / pcmraw_dump / pcmpair_* — timed capture from
+    // the continuous PCM task (audio/k1_pcm1808_input.cpp). GATE-MATCHED: rows in
     // serial_typed_cmd_table.def, wrapper in serial_typed_dispatch.cpp, and this
     // call-site all sit behind K1_PCM1808_PROBE_V1. The typed table is safety
     // metadata; without this hop the commands compile and answer Bad command.
     else if (k1_pcm1808_dispatch(command_type, command_data)) {
-      // handled by the PCM1808 raw-capture instrument
+      // handled by the PCM1808 raw-capture / P4 pair instrument
     }
 #endif
 
