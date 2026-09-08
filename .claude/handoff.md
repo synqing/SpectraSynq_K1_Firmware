@@ -7,31 +7,19 @@
 **ACTIVE LANE (2026-09-08): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
 Authority: **`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`**.
 Continuation evidence: **`docs/forensics/runtime-evidence/20260908T-audio-source-architecture/`**.
-Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_probe` @ **`798c269f`** (epoch `1788818754`).
-P1: hop-drain overflow was real. P2: 10 min lossless capture ring PASS. P3 architectural close: AUX route PASS; DMA0=physical RIGHT; VOL=100 near-FS no ADC clip; 997 Hz THD ≈ −77 dB; crosstalk still floor-limited. FR not done. NFC parked. Product restore still `k1_main_rpl_im69d` @ `acaecaa8`. Next: P4 dual capture.
+Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_shadow` @ **`a08dc10e`**
+(epoch `1788847940`). IM69 remains the AP source; PCM I2S1 runs in shadow.
+P1/P2/P3 still hold. P4 instrument is on silicon: dump-after-freeze, `fill_ok`
+requires ovf=0 **and** ring-drop=0, dump refused while armed. Electrical AUX
+PASS. Acoustic/room path did not couple on this bench (MIC stayed at quiet
+floor on speakers, DELL, and Multi-Output). Alignment/drift not scored.
+Shadow AP cost +162 µs p99 vs MIC-only, still under 8 ms. NFC parked.
+Product restore still `k1_main_rpl_im69d` @ `acaecaa8`.
+Evidence: `docs/forensics/runtime-evidence/20260908T-audio-source-architecture/P4_DUAL/`.
 
-**P4 PREP LANDED @ `ee33a046` (host only, NOT a P4 close).** Alignment/drift
-estimator `tools/pcm1808/p4_align.py` (envelope cross-correlation; LINE is the
-time reference; drift is the slope of lag vs time in ppm) validated against
-KNOWN lag and KNOWN ppm — run `python3 tools/pcm1808/p4_align.py --selftest`.
-Jittered transient fixture `gen_p4_align_fixtures.py`: a PERIODIC train aliases
-by one period (psr 1.06 vs 3.23 jittered), so the estimator flags
-`ambiguous=true` below psr 1.5 and the shipped fixture is jittered. `fill_ok`
-now requires ring drop == 0 as well as ovf == 0 (`fill_is_clean`). Firmware
-latches counters at ARM and at fill-completion and reports `[PCMRAW24EPOCH]` /
-`ovf_epoch` / `ring_drop_epoch`, so a PASS is judged on the measurement epoch
-rather than on counters read while the dump is perturbing them.
-
-**BLOCKERS BEFORE P4 CAN RUN:**
-1. The firmware edit is **UNBUILT** — no ESP32 toolchain was available. Build
-   `k1_main_rpl_pcm1808_probe` before flashing anything.
-2. **MIC+PCM simultaneous capture is not wired.** `k1_audio_source.h`
-   hard-`#error`s on `MIC && PCM1808` because they are modelled as exclusive
-   INGRESS OWNERS. P4 needs PCM present *without* owning ingress — that wants a
-   distinct shadow flag (`K1_PCM1808_SHADOW`), not a loosened guard. Deliberately
-   not invented.
-3. No paired IM69 buffer, no AP-timing capture, no MIC-only-vs-MIC+PCM cost
-   comparison yet.
+**P4 NOT CLOSED.** Next: a speaker the IM69 can hear on the same programme as
+the AUX cable, then jittered-transient lag/drift, then P5. Do not invent
+AudioSourceManager. Do not leak Mac volume 56 into firmware.
 
 Previous lane Colour Lab remains **ready_for_merge** on `lane/colourlab-bench`
 (`tools/colourlab/EXECUTION.md`). Do not merge it from this branch. Unrelated
