@@ -17,6 +17,19 @@
 #define K1_PCM1808_NFC_CS_HOLD_PIN 4
 #endif
 
+#define K1_PCM1808_MONO_RIGHT 0
+#define K1_PCM1808_MONO_LEFT 1
+#define K1_PCM1808_MONO_MID 2
+#ifndef K1_PCM1808_MONO_POLICY
+#define K1_PCM1808_MONO_POLICY K1_PCM1808_MONO_RIGHT
+#endif
+#ifndef K1_PCM1808_CANON_TRIM_Q15
+#define K1_PCM1808_CANON_TRIM_Q15 32768
+#endif
+#if K1_PCM1808_CANON_TRIM_Q15 < 1 || K1_PCM1808_CANON_TRIM_Q15 > 32768
+#error "K1_PCM1808_CANON_TRIM_Q15 must be in [1,32768]"
+#endif
+
 #if K1_PCM1808_PRESENT
 void k1_pcm1808_begin();
 void k1_pcm1808_poll_telemetry(uint32_t t_now);

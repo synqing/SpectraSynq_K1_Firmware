@@ -53,7 +53,6 @@ static uint32_t s_clip;
 static int32_t s_lmin, s_lmax, s_rmin, s_rmax;
 static int64_t s_lsum, s_rsum, s_lsumsq, s_rsumsq;
 static uint32_t s_stat_n;
-static int s_channel;  // 0 = DMA slot 0 = physical RIGHT (do not silently swap)
 static uint8_t s_snap[K1_PCM_SNAP_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
 static uint32_t s_snap_n;
 static int s_snap_armed;
@@ -379,7 +378,6 @@ static int k1_pcm_dma_rate_proof(void) {
 void k1_pcm1808_begin() {
   s_gate_pass = 0;
   s_hop_fill = 0;
-  s_channel = 0;
   s_snap_armed = 1;
   s_snap_n = 0;
   s_rx_ovf_events = 0;
@@ -501,6 +499,24 @@ static void k1_pcm_note_sample(int32_t l, int32_t r) {
 
 #if K1_AUDIO_SOURCE_PCM1808
 static K1PcmCanonicalReadTiming s_canon_read_timing = {};
+static uint64_t s_canon_sumsq = 0;
+static uint32_t s_canon_n = 0;
+static uint32_t s_canon_peak = 0;
+
+static inline int32_t k1_pcm1808_select_program_mono(int32_t slot0, int32_t slot1) {
+#if K1_PCM1808_MONO_POLICY == K1_PCM1808_MONO_LEFT
+  return k1_pcm_physical_left(slot0, slot1);
+#elif K1_PCM1808_MONO_POLICY == K1_PCM1808_MONO_MID
+  return k1_pcm_physical_mid(slot0, slot1);
+#else
+  return k1_pcm_physical_right(slot0, slot1);
+#endif
+}
+
+static inline int32_t k1_pcm1808_apply_canon_trim(int32_t s24) {
+  const int64_t scaled = (int64_t)s24 * (int64_t)K1_PCM1808_CANON_TRIM_Q15;
+  return (int32_t)(scaled / 32768LL);
+}
 
 K1PcmCanonicalReadTiming k1_pcm1808_last_canonical_read_timing() {
   return s_canon_read_timing;
@@ -553,7 +569,7 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
              (size_t)K1_PCM_STEREO_FRAME_BYTES);
       s_snap_n++;
     }
-    const int32_t mono = s_channel ? r : l;
+    const int32_t mono = k1_pcm1808_select_program_mono(l, r);
     s_hop_in[s_hop_fill++] = (float)mono;
   }
   if (s_hop_fill < K1_PCM_HOP_FRAMES) {
@@ -568,7 +584,12 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   s_src_out += 96;
   for (int i = 0; i < 96; i++) {
     int32_t v = (int32_t)lrintf(outf[i]);
+    v = k1_pcm1808_apply_canon_trim(v);
     out96[i] = k1_pcm1808_s24_to_s16(v);
+    const int32_t a = (out96[i] < 0) ? -(int32_t)out96[i] : (int32_t)out96[i];
+    if ((uint32_t)a > s_canon_peak) s_canon_peak = (uint32_t)a;
+    s_canon_sumsq += (uint64_t)((int64_t)out96[i] * (int64_t)out96[i]);
+    s_canon_n++;
   }
 }
 #endif  // K1_AUDIO_SOURCE_PCM1808
@@ -682,6 +703,23 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   s_rate_poll_acq0 = acq;
   s_rate_poll_cons0 = s_pop_frames;
   s_rate_poll_canon0 = s_src_blocks;
+#if K1_AUDIO_SOURCE_PCM1808
+  if (s_canon_n > 0) {
+    const double canon_rms = sqrt((double)s_canon_sumsq / (double)s_canon_n);
+    const char *mono_name =
+#if K1_PCM1808_MONO_POLICY == K1_PCM1808_MONO_LEFT
+        "LEFT";
+#elif K1_PCM1808_MONO_POLICY == K1_PCM1808_MONO_MID
+        "MID";
+#else
+        "RIGHT";
+#endif
+    USBSerial.printf("[PCMCAN] rms=%.1f peak=%u n=%u trim_q15=%u mono=%s\n",
+                     canon_rms, (unsigned)s_canon_peak, (unsigned)s_canon_n,
+                     (unsigned)K1_PCM1808_CANON_TRIM_Q15, mono_name);
+    s_canon_sumsq = 0; s_canon_n = 0; s_canon_peak = 0;
+  }
+#endif
   s_lmin = 8388607;
   s_lmax = -8388608;
   s_rmin = 8388607;
