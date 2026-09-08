@@ -22,7 +22,18 @@ void k1_pcm1808_begin();
 void k1_pcm1808_poll_telemetry(uint32_t t_now);
 int k1_pcm1808_clock_gate_pass();
 #if K1_AUDIO_SOURCE_PCM1808
+struct K1PcmCanonicalReadTiming {
+  uint64_t wait_start_us;
+  uint64_t ready_us;
+  uint64_t newest_sample_estimate_us;
+  uint64_t oldest_sample_estimate_us;
+  uint32_t wait_us;
+  uint32_t frames_requested;
+  uint32_t frames_read;
+  int32_t status;
+};
 void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now);
+K1PcmCanonicalReadTiming k1_pcm1808_last_canonical_read_timing();
 #endif
 #if K1_PCM1808_SHADOW
 void k1_pcm1808_shadow_drain();

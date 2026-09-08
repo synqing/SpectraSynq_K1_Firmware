@@ -469,6 +469,25 @@ void acquire_sample_chunk(uint32_t t_now) {
 #if K1_AUDIO_SOURCE_PCM1808
   int16_t pcm_hop[96];
   k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  {
+    static uint32_t k1_pcm_capture_sequence = 0;
+    const K1PcmCanonicalReadTiming rt = k1_pcm1808_last_canonical_read_timing();
+    k1_audio_i2s_read_debug.read_start_us = rt.wait_start_us;
+    k1_audio_i2s_read_debug.read_return_us = rt.ready_us;
+    k1_audio_i2s_read_debug.newest_sample_estimate_us = rt.newest_sample_estimate_us;
+    k1_audio_i2s_read_debug.oldest_sample_estimate_us = rt.oldest_sample_estimate_us;
+    k1_audio_i2s_read_debug.ap_publish_us = 0;
+    k1_audio_i2s_read_debug.capture_sequence = ++k1_pcm_capture_sequence;
+    k1_audio_i2s_read_debug.samples_read = 96U;
+    k1_audio_i2s_read_debug.bytes_requested = rt.frames_requested * 6U;
+    k1_audio_i2s_read_debug.bytes_read = rt.frames_read * 6U;
+    k1_audio_i2s_read_debug.status = rt.status;
+    k1_audio_i2s_read_debug.elapsed_us = rt.wait_us;
+    // Assumption 2: PCM sample time inferred from ring backlog at the proven ~48 kHz source rate.
+    k1_audio_i2s_read_debug.sample_time_assumption_id = 2U;
+  }
+#endif
   k1_audio_commit_canonical_frame(pcm_hop, t_now);
   k1_pcm1808_poll_telemetry(t_now);
   return;

@@ -500,22 +500,47 @@ static void k1_pcm_note_sample(int32_t l, int32_t r) {
 }
 
 #if K1_AUDIO_SOURCE_PCM1808
+static K1PcmCanonicalReadTiming s_canon_read_timing = {};
+
+K1PcmCanonicalReadTiming k1_pcm1808_last_canonical_read_timing() {
+  return s_canon_read_timing;
+}
+
 void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
   (void)t_now;
+  s_canon_read_timing = {};
+  s_canon_read_timing.frames_requested = (uint32_t)K1_PCM_HOP_FRAMES;
   if (!s_gate_pass) {
+    s_canon_read_timing.status = -1;
     memset(out96, 0, 96 * sizeof(int16_t));
     return;
   }
   const uint32_t t0 = millis();
+  const uint64_t wait_start_us = (uint64_t)esp_timer_get_time();
   while (k1_pcm_ring_used(&s_ring) < (uint32_t)K1_PCM_HOP_FRAMES && (millis() - t0) < 25) {
     taskYIELD();
   }
-  if (k1_pcm_ring_used(&s_ring) < (uint32_t)K1_PCM_HOP_FRAMES) {
+  const uint64_t ready_us = (uint64_t)esp_timer_get_time();
+  s_canon_read_timing.wait_start_us = wait_start_us;
+  s_canon_read_timing.ready_us = ready_us;
+  s_canon_read_timing.wait_us = (uint32_t)(ready_us - wait_start_us);
+  const uint32_t used_at_pop = k1_pcm_ring_used(&s_ring);
+  if (used_at_pop < (uint32_t)K1_PCM_HOP_FRAMES) {
+    s_canon_read_timing.status = -2;
     memset(out96, 0, 96 * sizeof(int16_t));
     return;
   }
+  const uint32_t backlog_after_hop = used_at_pop - (uint32_t)K1_PCM_HOP_FRAMES;
+  const uint64_t backlog_us = (uint64_t)backlog_after_hop * 1000000ULL / 48000ULL;
+  const uint64_t newest_us = (backlog_us <= ready_us) ? (ready_us - backlog_us) : 0ULL;
+  const uint64_t hop_span_us = ((uint64_t)K1_PCM_HOP_FRAMES - 1ULL) * 1000000ULL / 48000ULL;
+  s_canon_read_timing.newest_sample_estimate_us = newest_us;
+  s_canon_read_timing.oldest_sample_estimate_us =
+      (hop_span_us <= newest_us) ? (newest_us - hop_span_us) : 0ULL;
   uint8_t hop_bytes[K1_PCM_HOP_FRAMES * K1_PCM_STEREO_FRAME_BYTES];
   const uint32_t got = k1_pcm_ring_pop(&s_ring, hop_bytes, (uint32_t)K1_PCM_HOP_FRAMES);
+  s_canon_read_timing.frames_read = got;
+  s_canon_read_timing.status = (got == (uint32_t)K1_PCM_HOP_FRAMES) ? 0 : -3;
   s_pop_frames += got;
   s_hop_fill = 0;
   for (uint32_t i = 0; i < got && s_hop_fill < K1_PCM_HOP_FRAMES; i++) {
