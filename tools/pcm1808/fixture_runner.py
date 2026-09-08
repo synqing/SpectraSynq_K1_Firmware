@@ -126,6 +126,25 @@ def arm_and_dump(ser: serial.Serial, ms: int, fixture_hash: str, timeout: float)
     }
 
 
+def fill_is_clean(fill: dict) -> bool:
+    """Evidence-epoch cleanliness.
+
+    P4 addendum (Captain, 2026-09-08): ``arm_and_dump`` already returns both
+    ``ovf_delta_fill`` and ``drop_delta_fill``, but the P3-era ``fill_ok`` only
+    required zero overflow and a complete fill. Ring drop during the fill is an
+    equally real loss of evidence, so BOTH must be zero from P4 onward.
+
+    The P3 scripts (``run_p3_drive.py``, ``run_staircase.py``) deliberately keep
+    their original looser expression so the recorded P3 results still describe
+    exactly what was asserted at the time.
+    """
+    return (
+        fill["ovf_delta_fill"] == 0
+        and fill["drop_delta_fill"] == 0
+        and fill["filled"] >= fill["target"] > 0
+    )
+
+
 def stop_pid(proc: subprocess.Popen) -> None:
     if proc.poll() is not None:
         return
@@ -209,7 +228,7 @@ def main() -> int:
     stim_rms = (rms(s0), rms(s1))
     post_ok = max(post["rms_slot0"], post["rms_slot1"]) <= args.quiet_rms_max * 2
     stim_ok = max(stim_rms) > max(pre["rms_slot0"], pre["rms_slot1"]) * 5
-    fill_ok = fill["ovf_delta_fill"] == 0 and fill["filled"] >= fill["target"] > 0
+    fill_ok = fill_is_clean(fill)
     result = {
         "PASS": bool(stim_ok and post_ok and stim["crc_ok"] and fill_ok),
         "fill": fill,

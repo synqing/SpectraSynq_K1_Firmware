@@ -84,6 +84,20 @@ static volatile int s_raw_armed;
 static volatile int s_raw_dumping;
 static int64_t s_raw_t0_us;
 static uint32_t s_raw_seq0;
+// Evidence-epoch counter snapshots (P4 addendum, Captain 2026-09-08).
+// The hex dump runs on the serial/AP core and itself provokes ring drop, so
+// counters read AT DUMP TIME describe the dump, not the measurement. These are
+// latched at ARM and again the instant the fill completes, so the epoch delta is
+// authoritative and independent of host poll timing.
+static uint32_t s_raw_arm_ovf;
+static uint32_t s_raw_arm_ring_drop;
+static uint32_t s_raw_arm_hw;
+static uint32_t s_raw_end_ovf;
+static uint32_t s_raw_end_ring_drop;
+static uint32_t s_raw_end_hw;
+static int64_t s_raw_t1_us;
+static uint32_t s_raw_seq1;
+static int s_raw_epoch_valid;
 static char s_raw_fixture[65];
 #endif
 static int64_t s_rate_poll_t0_us;
@@ -143,6 +157,13 @@ static void k1_pcm_capture_task(void *) {
         n += take;
         s_raw_n = n;
         if (n >= target) {
+          // EPOCH END. Latch before anything can be serialised.
+          s_raw_t1_us = esp_timer_get_time();
+          s_raw_seq1 = s_frames;
+          s_raw_end_ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+          s_raw_end_ring_drop = s_ring_dropped_frames;
+          s_raw_end_hw = s_ring_high_water;
+          s_raw_epoch_valid = 1;
           s_raw_armed = 0;
         }
       }
@@ -520,6 +541,17 @@ static void k1_pcmraw_status(void) {
       (long long)s_raw_t0_us, (unsigned)s_raw_seq0, (unsigned)ovf, (unsigned)s_ring_dropped_frames,
       (unsigned)s_ring_high_water, s_raw_fixture[0] ? s_raw_fixture : "-",
       (s_raw != nullptr) ? "ok" : "NULL");
+  // Epoch-scoped evidence. These are the numbers a PASS must be judged on; the
+  // lifetime counters above keep rising while the dump is being emitted.
+  USBSerial.printf(
+      "[PCMRAW24EPOCH] valid=%d ovf_epoch=%u ring_drop_epoch=%u hw_epoch=%u "
+      "t0_us=%lld t1_us=%lld dur_us=%lld seq0=%u seq1=%u frames_seen=%u\n",
+      s_raw_epoch_valid, (unsigned)(s_raw_end_ovf - s_raw_arm_ovf),
+      (unsigned)(s_raw_end_ring_drop - s_raw_arm_ring_drop), (unsigned)s_raw_end_hw,
+      (long long)s_raw_t0_us, (long long)s_raw_t1_us,
+      (long long)(s_raw_epoch_valid ? (s_raw_t1_us - s_raw_t0_us) : 0),
+      (unsigned)s_raw_seq0, (unsigned)s_raw_seq1,
+      (unsigned)(s_raw_epoch_valid ? (s_raw_seq1 - s_raw_seq0) : 0));
 }
 
 static void k1_pcmraw_arm(uint32_t ms, const char *fixture) {
@@ -546,6 +578,15 @@ static void k1_pcmraw_arm(uint32_t ms, const char *fixture) {
     strncpy(s_raw_fixture, fixture, sizeof(s_raw_fixture) - 1);
     s_raw_fixture[sizeof(s_raw_fixture) - 1] = 0;
   }
+  s_raw_epoch_valid = 0;
+  s_raw_t1_us = 0;
+  s_raw_seq1 = 0;
+  s_raw_arm_ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
+  s_raw_arm_ring_drop = s_ring_dropped_frames;
+  s_raw_arm_hw = s_ring_high_water;
+  s_raw_end_ovf = s_raw_arm_ovf;
+  s_raw_end_ring_drop = s_raw_arm_ring_drop;
+  s_raw_end_hw = s_raw_arm_hw;
   s_raw_armed = 1;
   USBSerial.printf("[PCMRAW24] ARMED ms=%u frames=%u fixture=%s\n", (unsigned)ms,
                    (unsigned)s_raw_target, s_raw_fixture[0] ? s_raw_fixture : "-");
@@ -566,10 +607,15 @@ static void k1_pcmraw_dump(void) {
   const uint32_t ovf = __atomic_load_n(&s_rx_ovf_events, __ATOMIC_RELAXED);
   USBSerial.printf(
       "[PCMRAW24-BEGIN bytes=%u crc32=%08lx frames=%u sr=48000 fmt=le24_s0s1 "
-      "slot0=RIGHT slot1=LEFT t0_us=%lld seq0=%u ovf=%u ring_drop=%u hw=%u fixture=%s]\n",
+      "slot0=RIGHT slot1=LEFT t0_us=%lld seq0=%u ovf=%u ring_drop=%u hw=%u fixture=%s "
+      "ovf_epoch=%u ring_drop_epoch=%u hw_epoch=%u epoch_valid=%d dur_us=%lld]\n",
       (unsigned)nbytes, (unsigned long)crc, (unsigned)frames, (long long)s_raw_t0_us,
       (unsigned)s_raw_seq0, (unsigned)ovf, (unsigned)s_ring_dropped_frames,
-      (unsigned)s_ring_high_water, s_raw_fixture[0] ? s_raw_fixture : "-");
+      (unsigned)s_ring_high_water, s_raw_fixture[0] ? s_raw_fixture : "-",
+      (unsigned)(s_raw_end_ovf - s_raw_arm_ovf),
+      (unsigned)(s_raw_end_ring_drop - s_raw_arm_ring_drop), (unsigned)s_raw_end_hw,
+      s_raw_epoch_valid,
+      (long long)(s_raw_epoch_valid ? (s_raw_t1_us - s_raw_t0_us) : 0));
   char line[129];
   static const char *hex = "0123456789abcdef";
   for (size_t off = 0; off < nbytes; off += 64) {
