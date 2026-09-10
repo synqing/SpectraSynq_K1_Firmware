@@ -19,7 +19,12 @@ abstract: "Adversarial read-only backtest of whether K1 SensoryBridge's CRGB16/S
 ### Relevant Rules
 
 - [FACT] Architecture does not count as success if musical responsiveness, independent dual-channel behaviour, colour clarity, motion memory, or visual captivation regresses. Source: `AGENTS.md`.
-- [FACT] Visual pipeline changes must preserve centre-origin behaviour, no heap in render, 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, and sub-8 ms audio-to-visual latency. Source: `AGENTS.md`.
+- [FACT] Visual pipeline changes must preserve centre-origin behaviour, no heap in render, 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, and a `<50 ms` audio-to-LED latency budget. Source: `AGENTS.md`.
+
+> **Corrected 2026-09-10.** Previously read "sub-8 ms audio-to-visual latency"
+> sourced to `AGENTS.md`, which says `<50 ms` and never said 8 ms. Measured on
+> hardware: **11,596 µs p50** newest sample to `rmt_complete`. See
+> `docs/forensics/runtime-evidence/20260910T-audio-to-led-latency/RESULT.md`.
 - [FACT] Agents must not open the serial port, and compile/upload are not runtime proof. Source: `AGENTS.md`.
 
 ### K1 Evidence Touched

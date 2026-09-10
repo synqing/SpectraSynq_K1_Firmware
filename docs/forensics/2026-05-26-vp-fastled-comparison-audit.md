@@ -18,7 +18,12 @@ abstract: "Read-only SSA audit comparing K1 SensoryBridge's active visual pipeli
 ### Relevant Rules
 
 - [FACT] K1 visual doctrine makes architecture subordinate to musical responsiveness, independent dual-channel behaviour, colour clarity, motion memory, and visual captivation. Source: `AGENTS.md`.
-- [FACT] Render-path changes are constrained by centre-origin behaviour, no rainbows, no heap in render, a 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, and sub-8 ms audio-to-visual latency. Source: `AGENTS.md`.
+- [FACT] Render-path changes are constrained by centre-origin behaviour, no rainbows, no heap in render, a 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, and a `<50 ms` audio-to-LED latency budget. Source: `AGENTS.md`.
+
+> **Corrected 2026-09-10.** Previously read "sub-8 ms audio-to-visual latency"
+> sourced to `AGENTS.md`, which says `<50 ms` and never said 8 ms. Measured on
+> hardware: **11,596 µs p50** newest sample to `rmt_complete`. See
+> `docs/forensics/runtime-evidence/20260910T-audio-to-led-latency/RESULT.md`.
 - [FACT] Agents must not open the serial port. Runtime proof must come from Captain-provided captures, not from agent-side serial access. Source: `AGENTS.md`.
 - [FACT] A compile or upload is not runtime proof. Source: `AGENTS.md`.
 
