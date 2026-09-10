@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>K1 Dual UART — live</title>
+<style>
+  :root {
+    --bg: #0b0d10;
+    --panel: #14181e;
+    --line: #2a313c;
+    --text: #e8edf4;
+    --mute: #8b97a8;
+    --ok: #3dff9a;
+    --warn: #ffcc4d;
+    --off: #3a424e;
+    --peak: #6ea8ff;
+    --energy: #ff7ad9;
+    --nov: #7dffc3;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text);
+    font: 13px/1.35 "Saira", "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+  header { display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 14px 8px; border-bottom: 1px solid var(--line); }
+  header h1 { margin: 0; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+  header .st { font-size: 11px; color: var(--mute); }
+  header .st.live { color: var(--ok); }
+  header .st.dead { color: #ff5d6c; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; height: calc(100% - 40px); }
+  .unit { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+    display: flex; flex-direction: column; min-height: 0; }
+  .who { display: flex; justify-content: space-between; align-items: baseline; color: var(--mute); font-size: 11px;
+    letter-spacing: .12em; text-transform: uppercase; }
+  .bpm { font-size: 56px; font-weight: 700; letter-spacing: -.04em; line-height: 1; margin: 8px 0 4px; }
+  .bpm small { font-size: 14px; color: var(--mute); font-weight: 500; letter-spacing: .08em; }
+  .leds { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 8px 0 12px; }
+  .led { text-align: center; padding: 8px 0; border-radius: 6px; background: #0e1217; border: 1px solid var(--line);
+    color: var(--mute); font-size: 10px; letter-spacing: .1em; }
+  .led.on { color: #04140c; background: var(--ok); border-color: var(--ok); font-weight: 700; }
+  .row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+  .lab { width: 72px; color: var(--mute); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
+  .bar { flex: 1; height: 8px; background: #0e1217; border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+  .fill { height: 100%; width: 0; background: var(--peak); }
+  .fill.energy { background: var(--energy); }
+  .fill.nov { background: var(--nov); }
+  .fill.conf { background: var(--warn); }
+  .num { width: 44px; text-align: right; font-variant-numeric: tabular-nums; }
+  .fps { margin-top: auto; padding-top: 10px; color: var(--mute); font-size: 11px; display: flex; justify-content: space-between; }
+  .err { padding: 20px; color: #ff5d6c; }
+</style>
+</head>
+<body>
+<header>
+  <h1>K1 Dual UART</h1>
+  <div id="st" class="st">connecting…</div>
+</header>
+<div class="grid">
+  <section class="unit" id="bench"></section>
+  <section class="unit" id="main"></section>
+</div>
+<script>
+const KEYS = ["BPM","Beat conf","Lock","Beat","Onset","Bass onset","Silence","AGC gain","Peak scaled","Energy","Novelty","System FPS","LED FPS"];
+function n(map, k){ const v = map[k]; return (v===undefined||v===null||Number.isNaN(Number(v))) ? 0 : Number(v); }
+function led(on, label){ return `<div class="led${on? " on":""}">${label}</div>`; }
+function bar(label, val, max, cls){
+  const pct = Math.max(0, Math.min(100, (val/max)*100));
+  return `<div class="row"><div class="lab">${label}</div><div class="bar"><div class="fill ${cls||""}" style="width:${pct}%"></div></div><div class="num">${val.toFixed(2)}</div></div>`;
+}
+function unit(title, chip, m){
+  const bpm = n(m,"BPM");
+  return `<div class="who"><span>${title}</span><span>${chip}</span></div>
+    <div class="bpm">${bpm.toFixed(0)}<small> BPM</small></div>
+    <div class="leds">
+      ${led(n(m,"Lock")>=0.5,"LOCK")}
+      ${led(n(m,"Beat")>=0.5,"BEAT")}
+      ${led(n(m,"Onset")>=0.5,"ONSET")}
+      ${led(n(m,"Bass onset")>=0.5,"BASS")}
+      ${led(n(m,"Silence")>=0.5,"SIL")}
+    </div>
+    ${bar("conf", n(m,"Beat conf"), 1, "conf")}
+    ${bar("peak", n(m,"Peak scaled"), 1, "")}
+    ${bar("energy", n(m,"Energy"), 1, "energy")}
+    ${bar("nov", n(m,"Novelty"), 1, "nov")}
+    ${bar("agc", n(m,"AGC gain"), 1, "")}
+    <div class="fps"><span>sys ${n(m,"System FPS").toFixed(0)} Hz</span><span>led ${n(m,"LED FPS").toFixed(0)} Hz</span></div>`;
+}
+function pick(groups, prefix){
+  const g = (groups||[]).find(x => String(x.title||"").startsWith(prefix));
+  const map = {};
+  if (!g) return map;
+  for (const ds of g.datasets||[]) map[ds.title] = ds.numericValue;
+  return map;
+}
+async function tick(){
+  const st = document.getElementById("st");
+  try {
+    const r = await fetch("/live", {cache:"no-store"});
+    if (!r.ok) throw new Error("HTTP "+r.status);
+    const j = await r.json();
+    const age = j.age_ms;
+    st.textContent = age>1500 ? ("STALE "+Math.round(age/1000)+"s") : ("LIVE  "+new Date(j.ts).toLocaleTimeString());
+    st.className = "st" + (age>1500 ? " dead" : " live");
+    document.getElementById("bench").innerHTML = unit("Bench", "B489A500", j.bench||{});
+    document.getElementById("main").innerHTML = unit("Main RPL", "9087A500", j.main||{});
+  } catch (e) {
+    st.textContent = "NO BRIDGE  "+e.message;
+    st.className = "st dead";
+  }
+}
+setInterval(tick, 120);
+tick();
+</script>
+</body>
+</html>

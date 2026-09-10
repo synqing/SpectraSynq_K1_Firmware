@@ -1,0 +1,23 @@
+{
+  "id": "system_fps",
+  "schema_lock": "1.2",
+  "note": "Firmware SYSTEM_FPS: prefix with space after colon. record_kind=3.",
+  "lines": [
+    "SYSTEM_FPS: 100"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 3,
+      "host_parse_seq": 1,
+      "values": {
+        "system_fps": 100
+      },
+      "written": [
+        "system_fps",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

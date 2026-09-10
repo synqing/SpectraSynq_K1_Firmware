@@ -1,0 +1,23 @@
+{
+  "id": "led_fps",
+  "schema_lock": "1.2",
+  "note": "Firmware LED_FPS: prefix with space after colon. record_kind=4.",
+  "lines": [
+    "LED_FPS: 99"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 4,
+      "host_parse_seq": 1,
+      "values": {
+        "led_fps": 99
+      },
+      "written": [
+        "led_fps",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}
