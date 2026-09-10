@@ -1246,6 +1246,15 @@ inline void show_leds() {
     k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
                                (uint8_t)CONFIG.LIGHTSHOW_MODE);
 #endif
+#ifdef K1_SCHEDULING_TRACE_V1
+    // Same reason as the render tap above: this block RETURNS before the
+    // common seam at the bottom of the function, so the scheduling trace was
+    // never armed on the Lever-2 lane and every WS2816 capture came back with
+    // request still pending, active=0, frames=0 and zero confirmed
+    // completions — while p_submit climbed, because the linker wrapper sees
+    // submits regardless of the hook. Measured 2026-09-10 on 9087A500.
+    k1_scheduling_trace_before_fastled_show();
+#endif
 #ifdef K1_LED_I2S_DIRECT_V1
     if (!k1_i2s_emit_ready()) {
       static const int pins[4] = {
