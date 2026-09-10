@@ -1,0 +1,238 @@
+# capture_start=2026-09-09T00:01:26+0800
+# port=/dev/cu.usbmodem1101 baud=115200 duration_ms=30000
+# track=build/audio-source-p5/demo_track1_t60_45s.wav
+# track_sha256=2c561dacb4fbbd9dc3a4e071e8b5ec472f2cf3dc9f83d81ca89f21c18bd017d0
+# player=afplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# observed_output_device=Multi-Output Device
+# pre_roll_seconds=8.0
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem1101", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:90 LOCATION=1-1", "location": "1-1", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:90", "vid": 12346}
+canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=5709000 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=5757060 cons=5708880 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47998.9 cons_hz=47998.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=5805120 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=5853120 cons=5805000 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47972.0 cons_hz=48002.0 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=5901240 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=5949240 cons=5901120 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=48000.0 cons_hz=48000.0 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=5997360 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6045360 cons=5997240 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47998.8 cons_hz=47998.8 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6093420 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6141480 cons=6093360 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.9 cons_hz=47999.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6189540 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6237540 cons=6189480 canon=0 hw=1500
+[PCMRAW] frames=6285660 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6333660 cons=6285600 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.6 cons_hz=48000.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6381780 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6429780 cons=6381720 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47997.6 cons_hz=47997.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6477840 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6525900 cons=6477840 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.6 cons_hz=47999.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6573960 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6621960 cons=6573960 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47970.0 cons_hz=47999.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=6670080 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6718080 cons=6670080 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48002.0 cons_hz=48002.0 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33350237 action=stop
+K1OK
+# action_ts_monotonic_ms=33350665 action=version
+sbr{{
+VERSION: 40103
+}}
+# action_ts_monotonic_ms=33351671 action=build
+sbr{{
+BUILD: version=40103 git=31335307 epoch=1788883120 env=k1_main_rpl_pcm1808_shadow_p5_probe
+}}
+[PCMRAW] frames=6766200 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6814200 cons=6766200 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47998.9 cons_hz=47998.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33352706 action=image_id
+sbr{{
+IMAGE_ID: app_elf_sha256=552b7be371476828b70dba239f414db0c5705ecfc809a0965bf013105e3ad485
+}}
+# action_ts_monotonic_ms=33353727 action=runtime_id
+sbr{{
+RUNTIME_ID: boot_nonce=115599cf34fe5589 uptime_ms=143920 reset_reason=11
+}}
+[PCMRAW] frames=6862260 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=6910320 cons=6861960 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.8 cons_hz=47820.0 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33354767 action=apcad_abort=1
+sbr{{
+APCAD_ABORT: stopped
+}}
+# action_ts_monotonic_ms=33355100 action=apcad_clear=1
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+# action_ts_monotonic_ms=33355534 action=vp_perf=stop
+sbr{{
+VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+}}
+# action_ts_monotonic_ms=33355969 action=apdbg=off
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+[PCMRAW] frames=6958380 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7006440 cons=6958080 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47998.2 cons_hz=47998.2 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33356296 action=tempo_stream=off
+sbr{{
+TEMPO_STREAM: off
+}}
+# action_ts_monotonic_ms=33356619 action=ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+# playback_cmd=/usr/bin/afplay build/audio-source-p5/demo_track1_t60_45s.wav
+# action_ts_monotonic_ms=33356964 action=playback_start
+[PCMRAW] frames=7054500 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7102500 cons=7054200 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47971.9 cons_hz=48001.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7150620 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7198620 cons=7150320 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.1 cons_hz=48000.1 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7246680 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7294740 cons=7246440 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47998.1 cons_hz=47998.1 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7342800 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7390860 cons=7342560 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48001.6 cons_hz=48001.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# host_capture_window_start_monotonic_ms=33364997
+# action_ts_monotonic_ms=33364997 action=apcad_soak=30000
+sbr{{
+APCAD_SOAK: armed 30000 ms compact=1
+APCAD_SOAK_BEGIN,schema_ver=2,stage_detail=0,duration_ms=30000,compact=1
+}}
+[PCMRAW] frames=7438920 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7486920 cons=7438680 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47970.6 cons_hz=48000.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7535040 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7583040 cons=7534800 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.3 cons_hz=48000.3 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7631160 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7679160 cons=7630920 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.8 cons_hz=47999.8 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7727220 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7775280 cons=7727040 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47997.7 cons_hz=47997.7 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7823340 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7871340 cons=7823160 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47969.3 cons_hz=47999.3 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=7919460 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=7967460 cons=7919280 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48002.7 cons_hz=48002.7 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8015580 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8063580 cons=8015400 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.6 cons_hz=48000.6 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8111640 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8159700 cons=8111520 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47997.4 cons_hz=47997.4 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8207760 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8255760 cons=8207640 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47972.3 cons_hz=48002.2 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8303880 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8351880 cons=8303760 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.2 cons_hz=47999.2 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8400000 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8448000 cons=8399880 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48001.9 cons_hz=48001.9 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8496060 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8544120 cons=8496000 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47997.3 cons_hz=47997.3 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8592180 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8640180 cons=8592120 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47970.1 cons_hz=48000.1 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8688300 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8736300 cons=8688240 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.8 cons_hz=48000.8 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+[PCMRAW] frames=8784420 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=8832420 cons=8784360 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=48000.8 cons_hz=48000.8 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# host_capture_window_end_monotonic_ms=33395573
+# action_ts_monotonic_ms=33396576 action=apcad_soak_status=1
+APCAD_SOAK_DONE,schema_ver=2,stage_detail=0,active=0,rows=3999,emitted=1333,start_ms=155193,end_ms=185193,requested_duration_ms=30000,first_frame_ms=155200,last_frame_ms=185186,observed_duration_ms=29986,sample_rate=12800,samples_per_chunk=96,tempo_decim=3,hist_bucket_us=32,hist_bucket_count=512,meas_ap_hz=133.329,meas_nov_hz=44.444,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=4704,active_ap_work_p50_low_us=3328,active_ap_work_p50_high_us=3360,active_ap_work_p95_low_us=4672,active_ap_work_p95_high_us=4704,active_ap_work_p99_low_us=4800,active_ap_work_p99_high_us=4832,active_ap_work_hist_saturation=0,active_ap_work_max_us=4960,newest_sample_to_ap_publish_p50_low_us=3104,newest_sample_to_ap_publish_p50_high_us=3136,newest_sample_to_ap_publish_p95_low_us=4480,newest_sample_to_ap_publish_p95_high_us=4512,newest_sample_to_ap_publish_p99_low_us=4608,newest_sample_to_ap_publish_p99_high_us=4640,newest_sample_to_ap_publish_hist_saturation=0,newest_sample_to_ap_publish_max_us=4727,ap_read_return_interval_p50_low_us=7488,ap_read_return_interval_p50_high_us=7520,ap_read_return_interval_p95_low_us=7488,ap_read_return_interval_p95_high_us=7520,ap_read_return_interval_p99_low_us=7488,ap_read_return_interval_p99_high_us=7520,ap_read_return_interval_hist_saturation=0,ap_read_return_interval_max_us=8653,active_max_us=4960,active_sum_us=14687966,active_mean_us=3672.910,max_consecutive_active_over_7500=0,worst_count=16
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=0,frame=22977,t=173583,active_us=4859,total_us=8490,i2s_
+us=3631,gdft_us=1806,novelty_us=33,tempo_acf_us=715,tempo_update_us=637,tempo_emit_us=1546,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=589,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=1,frame=24261,t=183213,active_us=4914,total_us=8505,i2s_us=3591,gdft_us=1805,novelty_us=32,tempo_acf_us=775,tempo_update_us=606,tempo_emit_us=1580,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=622,win_bpm=64.00000,top1_bpm=85.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=2,frame=21537,t=162783,active_us=4867,total_us=8503,i2s_us=3636,gdft_us=1758,novelty_us=24,tempo_acf_us=634,tempo_update_us=652,tempo_emit_us=1492,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=552,win_bpm=127.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=3,frame=21999,t=166248,active_us=4896,total_us=8518,i2s_us=3622,gdft_us=1788,novelty_us=39,tempo_acf_us=785,tempo_update_us=586,tempo_emit_us=1604,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=564,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=4,frame=21738,t=164291,active_us=4891,total_us=7923,i2s_us=3032,gdft_us=1801,novelty_us=35,tempo_acf_us=579,tempo_update_us=651,tempo_emit_us=1484,emitted=1,acf_spread=1,acf_lag_cursor=80,acf_pub=557,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=5,frame=24417,t=184383,active_us=4928,total_us=8537,i2s_us=3609,gdft_us=1767,novelty_us=22,tempo_acf_us=754,tempo_update_us=598,tempo_emit_us=1509,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=626,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=6,frame=22701,t=171513,active_us=4911,total_us=8527,i2s_us=3616,gdft_us=1762,novelty_us=24,tempo_acf_us=724,tempo_update_us=650,tempo_emit_us=1531,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=582,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=7,frame=22896,t=172976,active_us=4870,total_us=7947,i2s_us=3077,gdft_us=1804,novelty_us=24,tempo_acf_us=690,tempo_update_us=610,tempo_emit_us=1517,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=587,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=8,frame=23052,t=174145,active_us=4960,total_us=9001,i2s_us=4041,gdft_us=1812,novelty_us=27,tempo_acf_us=784,tempo_update_us=637,tempo_emit_us=1577,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=591,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=9,frame=23520,t=177656,active_us=4886,total_us=8020,i2s_us=3134,gdft_us=1755,novelty_us=27,tempo_acf_us=775,tempo_update_us=582,tempo_emit_us=1521,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=603,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=10,frame=22473,t=169803,active_us=4857,total_us=8497,i2s_us=3640,gdft_us=1767,novelty_us=23,tempo_acf_us=707,tempo_update_us=599,tempo_emit_us=1464,emitted=1,acf_spread=1,acf_lag_cursor=48,acf_pub=576,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=11,frame=22671,t=171288,active_us=4855,total_us=8485,i2s_us=3630,gdft_us=1758,novelty_us=23,tempo_acf_us=602,tempo_update_us=631,tempo_emit_us=1414,emitted=1,acf_spread=1,acf_lag_cursor=64,acf_pub=581,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=12,frame=22389,t=169173,active_us=4929,total_us=8452,i2s_us=3523,gdft_us=1759,novelty_us=26,tempo_acf_us=767,tempo_update_us=579,tempo_emit_us=1509,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=574,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=13,frame=23796,t=179726,active_us=4859,total_us=7996,i2s_us=3137,gdft_us=1776,novelty_us=23,tempo_acf_us=655,tempo_update_us=617,tempo_emit_us=1438,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=610,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=14,frame=22392,t=169196,active_us=4865,total_us=8004,i2s_us=3139,gdft_us=1762,novelty_us=24,tempo_acf_us=729,tempo_update_us=560,tempo_emit_us=1451,emitted=1,acf_spread=1,acf_lag_cursor=32,acf_pub=574,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=15,frame=20634,t=156011,active_us=4876,total_us=7923,i2s_us=3047,gdft_us=1794,novelty_us=24,tempo_acf_us=716,tempo_update_us=585,tempo_emit_us=1531,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=529,win_bpm=127.00000,top1_bpm=127.00000
+# apcad_soak_status_done=True
+# action_ts_monotonic_ms=33397615 action=vp_perf=start
+sbr{{
+VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+}}
+[PCMRAW] frames=8976600 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=9024660 cons=8976600 canon=0 hw=1500
+[PCMRATE2] dt_s=2.003 acq_hz=47999.7 cons_hz=47999.7 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33398831 action=vp_perf=stop
+sbr{{
+VP_PERF: disabled (compile with ENABLE_VP_PERF_AUDIT=1)
+}}
+# action_ts_monotonic_ms=33399642 action=runtime_id
+sbr{{
+RUNTIME_ID: boot_nonce=115599cf34fe5589 uptime_ms=189843 reset_reason=11
+}}
+[PCMRAW] frames=9072720 short=0 err=0 rmsL=0 rmsR=0 minL=8388607 maxL=-8388608 minR=8388607 maxR=-8388608 clip=0 n=0
+[PCMRS] in=0 out=0 blocks=0 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=9120720 cons=9072720 canon=0 hw=1500
+[PCMRATE2] dt_s=2.002 acq_hz=47971.1 cons_hz=48001.0 canon_hz=0.00 lrck_hz=47994.3 authority=esp_timer
+# action_ts_monotonic_ms=33400453 action=apcad_abort=1
+sbr{{
+APCAD_ABORT: stopped
+}}
+# action_ts_monotonic_ms=33400779 action=stop
+K1OK

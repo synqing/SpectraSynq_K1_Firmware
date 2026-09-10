@@ -1,0 +1,185 @@
+chroma_final_max=1.0000 chroma_final_mean=0.6509 agc_gain=1.4889 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3814 render_avg=4110 render_max=6944
+[PCMRAW] frames=23587560 short=0 err=0 rmsL=31965 rmsR=32556 minL=-79688 maxL=71023 minR=-80793 maxR=71848 clip=0 n=96120
+[PCMRS] in=23587560 out=6290016 blocks=65521 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=23635620 cons=23587560 canon=65521 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.9 cons_hz=47991.9 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:0.16,0.10,0.06,0.03;gain:1.53,2.59,3.76,7.60;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=68491 chroma_flatness=0.1351 chroma_norm_max=0.9169 chroma_norm_mean=0.7818 chroma_final_max=0.2251 chroma_final_mean=0.1879 agc_gain=1.5907 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3806 render_avg=4151 render_max=6944
+sbs((agc_debug=0.15,0.11,0.06,0.03;gain:1.66,2.40,3.71,8.44;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=68630 chroma_flatness=0.2117 chroma_norm_max=0.9912 chroma_norm_mean=0.7795 chroma_final_max=0.5867 chroma_final_mean=0.4473 agc_gain=1.6733 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4895 render_avg=4247 render_max=6944
+[PCMRAW] frames=23683680 short=0 err=0 rmsL=21524 rmsR=21844 minL=-42992 maxL=70946 minR=-43355 maxR=71868 clip=0 n=96120
+[PCMRS] in=23683680 out=6315648 blocks=65788 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=23731740 cons=23683680 canon=65788 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.4 cons_hz=47993.4 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:0.15,0.09,0.06,0.03;gain:1.69,2.69,3.90,9.33;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbr{{
+AP_STREAM: off
+}}
+[VP] profile=custom fix=111011 chroma_seq=68769 chroma_flatness=0.1689 chroma_norm_max=0.7148 chroma_norm_mean=0.5459 chroma_final_max=0.2733 chroma_final_mean=0.1982 agc_gain=1.5372 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4165 render_avg=4015 render_max=6944
+sbs((agc_debug=energy:0.15,0.10,0.07,0.03;gain:1.58,2.60,4.18,9.64;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=68911 chroma_flatness=0.0070 chroma_norm_max=1.0024 chroma_norm_mean=0.9954 chroma_final_max=0.0000 chroma_final_mean=0.0000 agc_gain=0.2108 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3726 render_avg=3765 render_max=6944
+[PCMRAW] frames=23779800 short=0 err=0 rmsL=1298689 rmsR=1288123 minL=-6886019 maxL=6495686 minR=-6884752 maxR=6556284 clip=0 n=96120
+[PCMRS] in=23779800 out=6341280 blocks=66055 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=23827860 cons=23779800 canon=66055 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47986.9 cons_hz=47986.9 canon_hz=133.30 lrck_hz=47981.8 authority=esp_timer
+[VP] profile=custom fix=111011 chroma_seq=69051 chroma_flatness=0.1265 chroma_norm_max=0.8641 chroma_norm_mean=0.7376 chroma_final_max=0.1776 chroma_final_mean=0.1482 agc_gain=0.1004 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3924 render_avg=4003 render_max=6944
+[VP] profile=custom fix=111011 chroma_seq=69191 chroma_flatness=0.0417 chroma_norm_max=0.4328 chroma_norm_mean=0.3911 chroma_final_max=0.0000 chroma_final_mean=0.0000 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3938 render_avg=3973 render_max=6944
+sbs((agc_debug=energy:25.57,12.07,6.05,1.91;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=23875920 short=0 err=0 rmsL=1759730 rmsR=1757894 minL=-6969328 maxL=6396464 minR=-7002511 maxR=6171940 clip=0 n=96120
+[PCMRS] in=23875920 out=6366912 blocks=66322 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=23923980 cons=23875920 canon=66322 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.4 cons_hz=47991.4 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:27.48,12.01,5.19,2.43;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=69333 chroma_flatness=0.1434 chroma_norm_max=0.8665 chroma_norm_mean=0.7231 chroma_final_max=0.2430 chroma_final_mean=0.1975 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4206 render_avg=4014 render_max=6944
+sbs((agc_debug=energy:26.45,16.26,6.15,2.05;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:30.08,13.67,5.40,2.43;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=69476 chroma_flatness=0.0931 chroma_norm_max=0.9156 chroma_norm_mean=0.8225 chroma_final_max=0.0536 chroma_final_mean=0.0475 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4209 render_avg=4087 render_max=6944
+sbs((agc_debug=energy:26.42,13.16,6.84,2.37;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=23972040 short=0 err=0 rmsL=1890050 rmsR=1888108 minL=-7498329 maxL=6293877 minR=-7612305 maxR=6140407 clip=0 n=96120
+[PCMRS] in=23972040 out=6392544 blocks=66589 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24020100 cons=23972040 canon=66589 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47989.2 cons_hz=47989.2 canon_hz=133.30 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:28.90,10.90,5.58,2.31;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=69617 chroma_flatness=0.1155 chroma_norm_max=1.0208 chroma_norm_mean=0.9053 chroma_final_max=0.1636 chroma_final_mean=0.1431 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4020 render_avg=4052 render_max=6944
+sbs((agc_debug=energy:38.22,14.61,6.40,2.79;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:32.75,11.44,5.10,2.34;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=69758 chroma_flatness=0.0951 chroma_norm_max=1.0091 chroma_norm_mean=0.9140 chroma_final_max=0.0688 chroma_final_mean=0.0616 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3733 render_avg=4167 render_max=6944
+sbs((agc_debug=energy:26.14,11.15,5.10,2.26;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:38.80,11.71,5.10,2.53;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24068160 short=0 err=0 rmsL=1866379 rmsR=1869480 minL=-7313139 maxL=6333255 minR=-7273515 maxR=6151442 clip=0 n=96120
+[PCMRS] in=24068160 out=6418176 blocks=66856 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24116220 cons=24068160 canon=66856 hw=1440
+[PCMRATE2] dt_s=2.002 acq_hz=48004.2 cons_hz=48004.2 canon_hz=133.35 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:34.12,14.83,6.29,2.42;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=69900 chroma_flatness=0.0769 chroma_norm_max=1.0375 chroma_norm_mean=0.9606 chroma_final_max=0.0000 chroma_final_mean=0.0000 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3999 render_avg=3999 render_max=6944
+sbr{{
+AP_STREAM: on
+}}
+sbs((agc_debug=energy:30.28,15.87,7.29,2.96;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70041 chroma_flatness=0.1368 chroma_norm_max=0.9786 chroma_norm_mean=0.8419 chroma_final_max=0.2494 chroma_final_mean=0.2106 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3876 render_avg=4096 render_max=6944
+sbs((agc_debug=energy:25.25,11.71,5.88,2.24;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24164280 short=0 err=0 rmsL=1995747 rmsR=1985059 minL=-7008075 maxL=6471533 minR=-7014835 maxR=6379169 clip=0 n=96120
+[PCMRS] in=24164280 out=6443808 blocks=67123 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24212340 cons=24164280 canon=67123 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.1 cons_hz=47991.1 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:25.76,13.79,5.73,2.37;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70180 chroma_flatness=0.1271 chroma_norm_max=0.7574 chroma_norm_mean=0.6303 chroma_final_max=0.1548 chroma_final_mean=0.1249 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4151 render_avg=3971 render_max=6944
+sbs((agc_debug=energy:31.84,12.29,4.94,2.01;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70320 chroma_flatness=0.2001 chroma_norm_max=1.0122 chroma_norm_mean=0.8121 chroma_final_max=0.5477 chroma_final_mean=0.4275 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4495 render_avg=4114 render_max=6944
+[PCMRAW] frames=24260400 short=0 err=0 rmsL=1731100 rmsR=1736418 minL=-7096507 maxL=6459172 minR=-7094066 maxR=6164919 clip=0 n=96120
+[PCMRS] in=24260400 out=6469440 blocks=67390 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24308460 cons=24260400 canon=67390 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.1 cons_hz=47993.1 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+[VP] profile=custom fix=111011 chroma_seq=70460 chroma_flatness=0.1419 chroma_norm_max=0.9912 chroma_norm_mean=0.8493 chroma_final_max=0.2759 chroma_final_mean=0.2319 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4558 render_avg=3913 render_max=6944
+sbs((agc_debug=energy:25.73,11.61,5.15,2.27;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70600 chroma_flatness=0.1613 chroma_norm_max=0.8877 chroma_norm_mean=0.7264 chroma_final_max=0.3204 chroma_final_mean=0.2547 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3539 render_avg=3824 render_max=6944
+[PCMRAW] frames=24356520 short=0 err=0 rmsL=1928999 rmsR=1928313 minL=-7680506 maxL=6594882 minR=-7692970 maxR=6542525 clip=0 n=96120
+[PCMRS] in=24356520 out=6495072 blocks=67657 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24404580 cons=24356520 canon=67657 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.4 cons_hz=47991.4 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:37.82,14.26,5.44,2.41;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70740 chroma_flatness=0.1802 chroma_norm_max=1.0774 chroma_norm_mean=0.8971 chroma_final_max=0.4899 chroma_final_mean=0.3995 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4201 render_avg=3984 render_max=6944
+sbs((agc_debug=energy:27.24,11.82,5.18,2.04;gain:0.10,0.10,0.10,0.14;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=70880 chroma_flatness=0.1166 chroma_norm_max=1.0251 chroma_norm_mean=0.9085 chroma_final_max=0.1693 chroma_final_mean=0.1479 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3463 render_avg=3896 render_max=6944
+[PCMRAW] frames=24452640 short=0 err=0 rmsL=1999762 rmsR=2003121 minL=-7332164 maxL=6488060 minR=-7355465 maxR=6376734 clip=0 n=96120
+[PCMRS] in=24452640 out=6520704 blocks=67924 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24500700 cons=24452640 canon=67924 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47995.5 cons_hz=47995.5 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:32.84,17.36,6.61,2.56;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=71022 chroma_flatness=0.1257 chroma_norm_max=0.8327 chroma_norm_mean=0.7070 chroma_final_max=0.1674 chroma_final_mean=0.1387 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4099 render_avg=3930 render_max=6944
+sbs((agc_debug=energy:26.27,12.75,6.66,2.29;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=71162 chroma_flatness=0.0845 chroma_norm_max=0.6358 chroma_norm_mean=0.5513 chroma_final_max=0.0120 chroma_final_mean=0.0101 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4180 render_avg=3977 render_max=6944
+sbs((agc_debug=energy:29.61,15.93,7.12,2.56;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24548760 short=0 err=0 rmsL=1870116 rmsR=1860106 minL=-7174647 maxL=6433815 minR=-7269189 maxR=6184000 clip=0 n=96120
+[PCMRS] in=24548760 out=6546336 blocks=68191 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24596820 cons=24548760 canon=68191 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47990.1 cons_hz=47990.1 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+[VP] profile=custom fix=111011 chroma_seq=71301 chroma_flatness=0.1426 chroma_norm_max=0.8299 chroma_norm_mean=0.6873 chroma_final_max=0.2286 chroma_final_mean=0.1839 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4747 render_avg=4153 render_max=6944
+[VP] profile=custom fix=111011 chroma_seq=71441 chroma_flatness=0.1146 chroma_norm_max=0.9657 chroma_norm_mean=0.8512 chroma_final_max=0.1498 chroma_final_mean=0.1299 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3786 render_avg=4117 render_max=6944
+[PCMRAW] frames=24644880 short=0 err=0 rmsL=1906373 rmsR=1909892 minL=-7796428 maxL=6565382 minR=-7874482 maxR=6536092 clip=0 n=96120
+[PCMRS] in=24644880 out=6571968 blocks=68458 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24692940 cons=24644880 canon=68458 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.5 cons_hz=47991.5 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+[VP] profile=custom fix=111011 chroma_seq=71579 chroma_flatness=0.1162 chroma_norm_max=0.9459 chroma_norm_mean=0.8297 chroma_final_max=0.1531 chroma_final_mean=0.1320 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3819 render_avg=4137 render_max=6944
+sbs((agc_debug=energy:27.96,10.74,5.36,2.46;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=71718 chroma_flatness=0.0929 chroma_norm_max=1.0367 chroma_norm_mean=0.9438 chroma_final_max=0.0603 chroma_final_mean=0.0543 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3685 render_avg=4106 render_max=6944
+sbs((agc_debug=energy:37.97,13.99,6.10,2.58;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24741000 short=0 err=0 rmsL=1887198 rmsR=1884393 minL=-7333657 maxL=6762309 minR=-7376541 maxR=6802148 clip=0 n=96120
+[PCMRS] in=24741000 out=6597600 blocks=68725 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24789060 cons=24741000 canon=68725 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.1 cons_hz=47993.1 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:31.35,11.31,4.98,2.27;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=71857 chroma_flatness=0.1259 chroma_norm_max=1.0502 chroma_norm_mean=0.9243 chroma_final_max=0.2180 chroma_final_mean=0.1891 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3655 render_avg=4155 render_max=6944
+sbs((agc_debug=energy:27.56,12.12,5.52,2.15;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:37.63,11.42,4.96,2.64;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:33.14,17.32,6.88,2.41;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=71999 chroma_flatness=0.1026 chroma_norm_max=0.9981 chroma_norm_mean=0.8956 chroma_final_max=0.1013 chroma_final_mean=0.0898 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3555 render_avg=3759 render_max=6944
+sbs((agc_debug=energy:32.12,15.17,6.93,2.90;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24837120 short=0 err=0 rmsL=2041229 rmsR=2038002 minL=-7280036 maxL=6516015 minR=-7311774 maxR=6407525 clip=0 n=96120
+[PCMRS] in=24837120 out=6623232 blocks=68992 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24885180 cons=24837120 canon=68992 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.1 cons_hz=47993.1 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:26.32,11.77,5.66,2.14;gain:0.10,0.10,0.10,0.12;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72140 chroma_flatness=0.1404 chroma_norm_max=0.8953 chroma_norm_mean=0.7549 chroma_final_max=0.2400 chroma_final_mean=0.1976 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3764 render_avg=3960 render_max=6944
+sbs((agc_debug=energy:28.62,11.24,5.72,2.65;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:28.68,15.83,6.02,2.51;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72280 chroma_flatness=0.1901 chroma_norm_max=0.8344 chroma_norm_mean=0.6443 chroma_final_max=0.4042 chroma_final_mean=0.2996 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3559 render_avg=4007 render_max=6944
+sbs((agc_debug=energy:32.16,12.44,4.98,2.03;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=24933240 short=0 err=0 rmsL=1743548 rmsR=1744977 minL=-7185547 maxL=6405680 minR=-7198979 maxR=6409644 clip=0 n=96120
+[PCMRS] in=24933240 out=6648864 blocks=69259 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=24981300 cons=24933240 canon=69259 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47994.1 cons_hz=47994.1 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:24.54,10.89,5.20,1.45;gain:0.10,0.10,0.10,0.15;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:24.34,10.48,4.88,1.82;gain:0.10,0.10,0.10,0.14;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72419 chroma_flatness=0.1313 chroma_norm_max=0.9748 chroma_norm_mean=0.8435 chroma_final_max=0.2244 chroma_final_mean=0.1907 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4009 render_avg=3959 render_max=6944
+sbs((agc_debug=energy:24.21,13.26,5.96,2.00;gain:0.10,0.10,0.10,0.13;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72559 chroma_flatness=0.1466 chroma_norm_max=0.8259 chroma_norm_mean=0.6793 chroma_final_max=0.2418 chroma_final_mean=0.1930 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3986 render_avg=3964 render_max=6944
+[PCMRAW] frames=25029360 short=0 err=0 rmsL=1881719 rmsR=1882737 minL=-7664301 maxL=6451967 minR=-7749727 maxR=6249058 clip=0 n=96120
+[PCMRS] in=25029360 out=6674496 blocks=69526 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25077420 cons=25029360 canon=69526 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47990.3 cons_hz=47990.3 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:23.73,11.07,4.87,1.72;gain:0.10,0.10,0.10,0.13;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72699 chroma_flatness=0.1831 chroma_norm_max=1.0875 chroma_norm_mean=0.9044 chroma_final_max=0.5092 chroma_final_mean=0.4148 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3811 render_avg=3991 render_max=6944
+sbs((agc_debug=energy:34.67,12.99,5.08,2.16;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72839 chroma_flatness=0.1454 chroma_norm_max=1.0352 chroma_norm_mean=0.8897 chroma_final_max=0.3060 chroma_final_mean=0.2584 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4188 render_avg=4003 render_max=6944
+sbs((agc_debug=energy:29.75,12.38,5.94,2.01;gain:0.10,0.10,0.10,0.11;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=25125480 short=0 err=0 rmsL=1847940 rmsR=1843542 minL=-7349540 maxL=6326244 minR=-7362664 maxR=6394296 clip=0 n=96120
+[PCMRS] in=25125480 out=6700128 blocks=69793 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25173540 cons=25125480 canon=69793 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.8 cons_hz=47993.8 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:38.53,11.99,5.12,2.49;gain:0.10,0.10,0.10,0.13;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=72978 chroma_flatness=0.0740 chroma_norm_max=0.8477 chroma_norm_mean=0.7738 chroma_final_max=0.0000 chroma_final_mean=0.0000 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4186 render_avg=4095 render_max=6944
+sbs((agc_debug=energy:35.47,17.70,7.17,2.69;gain:0.10,0.10,0.10,0.10;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=73119 chroma_flatness=0.1572 chroma_norm_max=0.9071 chroma_norm_mean=0.7499 chroma_final_max=0.3117 chroma_final_mean=0.2510 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4057 render_avg=4165 render_max=6944
+[PCMRAW] frames=25221600 short=0 err=0 rmsL=1876047 rmsR=1841097 minL=-7330347 maxL=6582606 minR=-7310103 maxR=6626343 clip=0 n=96120
+[PCMRS] in=25221600 out=6725760 blocks=70060 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25269660 cons=25221600 canon=70060 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47995.4 cons_hz=47995.4 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:12.99,14.13,4.20,1.38;gain:0.10,0.10,0.10,0.16;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=73259 chroma_flatness=0.2171 chroma_norm_max=0.8277 chroma_norm_mean=0.6106 chroma_final_max=0.4989 chroma_final_mean=0.3501 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3667 render_avg=4067 render_max=6944
+sbs((agc_debug=energy:29.20,13.06,3.56,1.54;gain:0.10,0.10,0.10,0.20;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=73396 chroma_flatness=0.1110 chroma_norm_max=0.7887 chroma_norm_mean=0.6777 chroma_final_max=0.1036 chroma_final_mean=0.0872 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4408 render_avg=4128 render_max=6944
+sbs((agc_debug=energy:9.78,12.56,1.79,0.89;gain:0.10,0.10,0.13,0.27;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=25317720 short=0 err=0 rmsL=830491 rmsR=699464 minL=-3824534 maxL=6056325 minR=-3264519 maxR=5696927 clip=0 n=96120
+[PCMRS] in=25317720 out=6751392 blocks=70327 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25365780 cons=25317720 canon=70327 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47991.9 cons_hz=47991.9 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+[VP] profile=custom fix=111011 chroma_seq=73536 chroma_flatness=0.1478 chroma_norm_max=1.0751 chroma_norm_mean=0.9273 chroma_final_max=0.3305 chroma_final_mean=0.2804 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4232 render_avg=4035 render_max=6944
+sbs((agc_debug=energy:11.48,13.35,3.04,1.79;gain:0.10,0.10,0.13,0.21;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:7.79,6.43,1.58,0.85;gain:0.10,0.10,0.13,0.25;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=73678 chroma_flatness=0.1148 chroma_norm_max=0.3550 chroma_norm_mean=0.2403 chroma_final_max=0.0444 chroma_final_mean=0.0244 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=4816 render_avg=4208 render_max=6944
+[PCMRAW] frames=25413840 short=0 err=0 rmsL=896988 rmsR=823560 minL=-4437132 maxL=5276522 minR=-3983596 maxR=5093079 clip=0 n=96120
+[PCMRS] in=25413840 out=6777024 blocks=70594 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25461900 cons=25413840 canon=70594 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47996.6 cons_hz=47996.6 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:8.82,9.02,3.35,1.17;gain:0.10,0.10,0.28,0.39;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=73814 chroma_flatness=0.2509 chroma_norm_max=1.0129 chroma_norm_mean=0.7620 chroma_final_max=0.7802 chroma_final_mean=0.5658 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3518 render_avg=3831 render_max=6944
+[VP] profile=custom fix=111011 chroma_seq=73956 chroma_flatness=0.2304 chroma_norm_max=0.5584 chroma_norm_mean=0.3280 chroma_final_max=0.3448 chroma_final_mean=0.1715 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3988 render_avg=4131 render_max=6944
+sbs((agc_debug=energy:6.84,4.58,0.87,0.61;gain:0.10,0.10,0.24,0.35;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[PCMRAW] frames=25509960 short=0 err=0 rmsL=581596 rmsR=584575 minL=-3142558 maxL=5912573 minR=-3354763 maxR=5829358 clip=0 n=96120
+[PCMRS] in=25509960 out=6802656 blocks=70861 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=25558020 cons=25509960 canon=70861 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47990.2 cons_hz=47990.2 canon_hz=133.31 lrck_hz=47981.8 authority=esp_timer
+sbs((agc_debug=energy:4.30,4.60,0.84,0.53;gain:0.10,0.10,0.30,0.42;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+sbs((agc_debug=energy:31.65,18.90,6.82,2.12;gain:0.10,0.10,0.13,0.19;threshold:0.10,0.15,0.20,0.25;floor:32768.00,32768.00,32768.00,32768.00;active_floor:0.00,0.00,0.00,0.00))
+[VP] profile=custom fix=111011 chroma_seq=74098 chroma_flatness=0.0685 chroma_norm_max=1.0098 chroma_norm_mean=0.9412 chroma_final_max=0.0000 chroma_final_mean=0.0000 agc_gain=0.1000 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=3463 render_avg=3727 render_max=6944

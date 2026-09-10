@@ -27,6 +27,7 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parent / "fixtures"
 FS = 48000
 AMP = 0.125          # -18 dBFS, matching the existing fixture family
+AMP_FULLSCALE = 1.0    # P4 bench alignment: IM69 needs stronger acoustic SNR
 SECS = 8.0           # long enough for a head/tail drift estimate
 SEED = 20260908
 JITTER = 0.35        # +/- 35 % of the nominal spacing
@@ -76,6 +77,20 @@ def main() -> None:
     n = int(FS * SECS)
     train = jittered_train(n)
     write_wav("p4_align_transients_jittered.wav", [(v, v) for v in train])
+
+    # Same deterministic timing at full digital scale. The low-level fixture is
+    # useful as a control, but the Main RPL IM69 acoustic path is close to its
+    # raw noise floor at -18 dBFS on the current MacBook-speaker geometry. P4
+    # therefore uses this stronger sibling for alignment; timing/seed are
+    # identical and only amplitude changes.
+    global AMP
+    amp_saved = AMP
+    try:
+        AMP = AMP_FULLSCALE
+        train_fs = jittered_train(n)
+    finally:
+        AMP = amp_saved
+    write_wav("p4_align_transients_jittered_fullscale.wav", [(v, v) for v in train_fs])
 
     # A strictly periodic sibling, kept ONLY as the negative control that
     # demonstrates the aliasing the jittered fixture avoids. Do not use it to

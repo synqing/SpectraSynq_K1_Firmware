@@ -1,0 +1,53 @@
+{
+  "route": "Multi-Output Device",
+  "volume": {
+    "output_volume": -1,
+    "route": "Multi-Output Device"
+  },
+  "ms": 2000,
+  "wav": "tools/pcm1808/fixtures/guarded/10_amp_100_997hz_guarded.wav",
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "filled": 96000,
+    "target": 96000,
+    "mic_err_epoch": 0,
+    "epoch_valid": 1,
+    "hop": {
+      "hop_n": 267,
+      "hop_mean": 5710,
+      "hop_p95": 6569,
+      "hop_p99": 6643,
+      "hop_max": 8302
+    }
+  },
+  "fill_is_clean": true,
+  "decoded": {
+    "epoch_valid": true,
+    "fill_ok": true,
+    "ovf_epoch": 0,
+    "ring_drop_epoch": 0,
+    "mic_err_epoch": 0,
+    "dur_us": 1999902,
+    "pcm_frames": 96000,
+    "mic_samples": 25600,
+    "hop_n": 267,
+    "hop_mean": 5710,
+    "hop_p95": 6569,
+    "hop_p99": 6643,
+    "hop_max": 8302,
+    "cap_read_us": 1963748,
+    "mic_only": false,
+    "fixture": "9f0e6517ce494a86",
+    "ap_source": "im69d",
+    "slot0_physical": "RIGHT",
+    "slot1_physical": "LEFT",
+    "pcm_crc_ok": true,
+    "mic_crc_ok": true,
+    "hop_n_decoded": 267,
+    "clean": true
+  },
+  "pcm_rms_slot0": 1156401.6308224238,
+  "pcm_rms_slot1": 1158719.097631916,
+  "mic_rms": 57.24114628591045
+}
