@@ -196,4 +196,21 @@ Steps (1)–(4) above ran. Full record: `_scratch/b489-ws2816-reference-20261013
 - Mic: fresh reads (sequence advancing, status 0, 192/192 B), but the samples are constant at −30935. The cause is unresolved, and there is no music-reference claim.
 - Registry §2 updated. Still TBD: the mic input cause, optical and music parity, and the Titan suite (the other team owns it).
 - Gate record: the authoritative gate was the original run (PID 46580). It passed 1801 tests (15 skipped) plus the `k1_hardware` build, and landed `f3ee66e8`. A duplicate gate that I started by mistake was stopped by the parent orchestrator, not the Captain. It was not a test failure and landed nothing.
+- **Recovered IM69D init contract versus installed source (2026-10-14, source-only):**
+  - The proven prior working firmware on this B489 is **`fa164732`** (2026-08-12), env `k1_bench_im69d_micb`. Receipt: `docs/forensics/im69d-stage1b-stage2-2026-08-12/stage1b-receipt.md`, with the 2026-08-15 G1 slot-naming correction. G1 doc commit `39f75731` is documentary, not an installed build.
+  - Its init in `SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h`:
+    1. `i2s_new_channel` (RX master, no TX).
+    2. `i2s_pdm_rx_config_t`: `I2S_PDM_RX_CLK_DEFAULT_CONFIG(12800)`, `I2S_PDM_RX_SLOT_DEFAULT_CONFIG(16BIT, MONO)`, `clk=K1_PDM_CLK_PIN 14`, `din=K1_PDM_DIN_PIN 13` (PCB3 bench branch of `system/constants.h`), `clk_inv=0`.
+    3. `dn_sample_mode=I2S_PDM_DSR_16S` (`K1_MIC_IM69D_DSR_16S_V1`).
+    4. `slot_mask=I2S_PDM_SLOT_RIGHT` (`K1_MIC_IM69D_SLOT_RIGHT`).
+    5. `i2s_channel_init_pdm_rx_mode`.
+    6. The shared `i2s_channel_enable(rx_chan)` epilogue.
+    No SELECT GPIO is driven. Board J1 power comes from host 3V3 through the on-board 1.8 V LDO; there is no host enable.
+  - Installed `f3ee66e8` (B489 env through `K1_B489_WS2816_V1`) compiles the same calls and values: CLK 14 / DATA 13 by override, DSR16S, mono RIGHT, `clk_inv=false`, the same enable epilogue. No missing or different init step was found in source.
+  - The constant −30935 also predates the candidate: it was observed on `eff9bf47`, before any flash.
+  - Root cause is **unresolved**. Equal init functions cannot rule out other startup or runtime software activity, or driver state. The "static GPIO13 data" idea is a **hypothesis only**, not a hardware diagnosis.
+  - A stereo-diagnostic reflash was proposed and then **rejected by the parent** under current scope (no stereo bring-up or blind slots; it would also move the LEDs to 4/5). It was not run.
+  - Boot banner (`INIT I2S (channel)` / `I2S PDM RX INIT` / `I2S ENABLE`) was **not captured**. No existing capture holds it, and the existing boot procedure needs `:reset`, which `k1_serial_safety` refuses as `CMD_DISRUPTIVE`. Not bypassed; no device command was sent.
+  - Indirect: the post-boot reads (`status=0`, 192/192 B, sequence advancing) imply under the driver contract that the channel was running, but that is not banner proof.
+  - Details: checkpoint § "Parent corrections to the source comparison". The app was left rendering `f3ee66e8`.
 - **Installed app readback (18:59Z, read-only):** 730816 B read directly from B489 at `0x10000` with the existing guarded route (USB serial and lsof, ROM MAC, `read_flash`, hard reset). SHA `5fbf34ef…`, descriptor ELF `b3c12ee1…`: byte-identical to the build artefact. So the installed device ELF equals the source artefact ELF, from commit `f3ee66e8`. Afterwards the app answered the same build/env/epoch, with identical config lines and rendering continuing (SYSTEM_FPS about 135, LED_FPS about 149). This covers the application bytes only; it is not a full-flash or 6.5 MB restore trial. Mic samples are still constant at −30935, so there is no music reference.
