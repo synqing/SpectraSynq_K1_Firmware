@@ -416,6 +416,7 @@ flash records.
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-10-14 | agent:claude-opus-5-5 | **B489A500 installed-app readback (read-only, 18:59Z).** Read 730816 B at `0x10000` from the device (USB guard, ROM MAC `B4:3A:45:A5:89:B4`, `read_flash`, hard reset): SHA `5fbf34ef…`, descriptor ELF `b3c12ee1…`, byte-identical to the `f3ee66e8` build artefact. App then answered `f3ee66e8` / `k1_b489_ws2816_reference_capture` / `1791917615`; config unchanged. §2 row unchanged. |
 | 2026-10-14 | agent:claude-opus-5-5 | **B489A500 → `k1_b489_ws2816_reference_capture` @ `f3ee66e8`** (epoch `1791917615`). Before it: controlled saved-app restore of `eff9bf47` / `k1_bench_im69d_led150` with the reviewed helper (exit 0, app0 SHA/ELF readback, otadata unchanged, app answered). Upload pre-action bound the 3 segment files to the pins. NVS not written; calibration not fired. §2 row added. |
 | 2026-09-08 | agent:grok | **Main RPL P4 shadow @ `a08dc10e`.** Epoch `1788847940`. IM69 AP + PCM shadow. Electrical PASS; acoustic routing gate; cost +162 µs p99. Product restore still `acaecaa8`. |
 | 2026-09-08 | agent:grok | **Main RPL PCM probe @ `798c269f`.** Dump-mute + P3 drive evidence. Epoch `1788818754`. Product restore still `acaecaa8`. |
