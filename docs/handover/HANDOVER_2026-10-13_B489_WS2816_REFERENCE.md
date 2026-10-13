@@ -184,3 +184,14 @@ Incident: during a host mutation check, a mutant without the fixture refusal let
 Ownership: Titan and E2Lite moved to another team. This lane has no access to them and used none. B489 S3 remains in this lane.
 
 Remaining ship path: (1) independent read-only review of this diff; (2) commit through the gate; (3) forward flash of the reviewed candidate with the segment check; (4) dual-edge capture and input validity on that boot. Not done.
+
+## Deployed and captured — 2026-10-14 (additive)
+
+Steps (1)–(4) above ran. Full record: `_scratch/b489-ws2816-reference-20261013/resume-20261014/CHECKPOINT.md` § "Deployment and capture"; evidence `…/deploy-20261014/`.
+
+- Commit `f3ee66e8` passed the firmware-tier gate (1801 passed, 15 skipped, `k1_hardware` SUCCESS).
+- Controlled saved-app restore with the reviewed helper: exit 0, app0 readback SHA `3d3b929e…` / ELF `7edb8848…`, otadata unchanged, app answered `eff9bf47`. Settings lines were identical before and after. App-only: bootloader, NVS and the other regions were not read.
+- B489 now runs `k1_b489_ws2816_reference_capture` @ `f3ee66e8`, epoch `1791917615`, `firmware.bin` `5fbf34ef…`, ELF `b3c12ee1…`. The upload pre-action bound the bootloader, partition and boot_app0 files to the pins.
+- Both final packed WS2816 edges were captured in the same frames: 11 frames × 2 edges × 160 px RGB16, CRC `0f564f2e` verified, `PASS_TRUE16`, contiguous order, monotonic times, END present. Rendering continued (SYSTEM_FPS about 134–139, LED_FPS about 147–149 before, during and after). This is transport evidence, not optical parity.
+- Mic: fresh reads (sequence advancing, status 0, 192/192 B), but the samples are constant at −30935. The cause is unresolved, and there is no music-reference claim.
+- Registry §2 updated. Still TBD: the mic input cause, optical and music parity, and the Titan suite (the other team owns it).
