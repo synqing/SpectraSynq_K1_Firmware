@@ -1,3 +1,5 @@
+<!-- Current scoped Captain assignment,13October2026: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md on fix/b489-ws2816-reference-capture. Historical assignments below remain preserved. -->
+
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25

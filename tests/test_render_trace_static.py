@@ -26,6 +26,7 @@ RTRACE_DIAG_ENVS = {
     "env:k1_bench_im69d_hueaud]",
     "env:k1_main_rpl_rtrace_probe]",
     "env:k1_bench_im69d_led150_rtrace]",
+    "env:k1_b489_ws2816_reference_capture]",
 }
 
 
@@ -81,7 +82,8 @@ def test_rtrace_def_rows_are_gated_and_complete():
 
 def test_rtrace_flag_only_on_diag_envs():
     """K1_RENDER_TRACE_V1 is hueaud (RGB8), the RPL Lever-2 probe, and the
-    led150 WS2812 probe. K1_HUE_AUDIT_V1 stays hueaud-only. None reach a
+    led150 WS2812 and B489 WS2816 reference probes. K1_HUE_AUDIT_V1 stays
+    hueaud-only. None reach a
     shippable env."""
     ini = (ROOT / "platformio.ini").read_text(encoding="utf-8")
     rtrace = set(_flag_carriers(ini, "K1_RENDER_TRACE_V1"))

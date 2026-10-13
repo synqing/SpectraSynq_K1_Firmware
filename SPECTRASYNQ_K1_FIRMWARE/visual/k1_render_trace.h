@@ -19,6 +19,13 @@
 //
 //  rgb16hex dump is unpacked R16BE G16BE B16BE per pixel (host occupancy).
 //  Decoder: hue_coverage.py (rgb8) / score_rtrace_occupancy.py (rgb16).
+//  B489 dual extension: edges=2, F,index,millis,primary_mode,RGB16,RGB16;
+//  CRC covers both padded 160-pixel GRB16 edge slots in emitted frame order.
+//  Legacy single-edge marker/CRC stride and capacity 3000 remain unchanged.
+//  B489 dual capacity is 2000.
+//  B489 dump returns immediately and drains on a diagnostic task. Stop serial
+//  diagnostic streams before requesting it and send no commands until END;
+//  music processing/rendering continue. Arm is rejected while drain is busy.
 // ============================================================================
 #ifdef K1_RENDER_TRACE_V1
 #ifndef K1_RENDER_TRACE_H
@@ -32,6 +39,17 @@ void k1_render_trace_on_frame(const uint8_t* rgb_bytes, uint16_t led_count,
 
 void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
                                 uint8_t lightshow_mode);
+
+#ifdef K1_B489_WS2816_V1
+// Score qualification tap: capture the two registered logical-edge buffers in
+// the same frame. A primary-only dump cannot prove secondary coherence or the
+// four physical DIN submissions driven from these two 960-byte buffers.
+void k1_render_trace_on_frame16_dual(const uint8_t* primary_packed6,
+                                     const uint8_t* secondary_packed6,
+                                     uint16_t led_count,
+                                     uint8_t lightshow_mode);
+
+#endif
 
 // Diagnostic paint: when arm args include ",stim", overwrite leds_scaled
 // with a TRUE16 ramp so occupancy can be scored without live audio.

@@ -1,3 +1,5 @@
+<!-- Current scoped Captain assignment,13October2026: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md on fix/b489-ws2816-reference-capture. Historical assignments below remain preserved. -->
+
 # ACTIVE LANE POINTER
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** pull Captain into LED/plate visual inspection. Use rtrace / LED-buffer dump (`/instrument-not-captain-eyes`). Occupancy and “what did we emit” close with a scored dump, not eyes-on.

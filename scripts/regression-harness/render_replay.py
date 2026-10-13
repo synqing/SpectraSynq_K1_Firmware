@@ -82,7 +82,7 @@ COMMON_SOURCES = ["visual/render_params.cpp", "visual/Palettes.cpp",
                   "system/globals.cpp"]
 
 # Candidate host compilers, in preference order (GCC required — see module docstring).
-GPP_CANDIDATES = ["g++-15", "g++-14", "g++-13", "g++-12", "g++"]
+GPP_CANDIDATES = ["g++-16", "g++-15", "g++-14", "g++-13", "g++-12", "g++"]
 
 
 # ============================================================================

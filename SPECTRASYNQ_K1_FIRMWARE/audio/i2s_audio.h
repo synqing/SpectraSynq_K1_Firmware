@@ -588,6 +588,14 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
   k1_stereo_probe_on_chunk(im69d_samples_i16_stereo, CONFIG.SAMPLES_PER_CHUNK);
 #endif
+#ifdef K1_B489_WS2816_V1
+  ++b489_i2s_read_sequence;
+  b489_i2s_last_status = (int32_t)i2s_read_status;
+  b489_i2s_last_bytes = (uint32_t)bytes_read;
+  b489_i2s_expected_bytes = (uint32_t)bytes_requested;
+  b489_i2s_raw_min = 32767;
+  b489_i2s_raw_max = -32768;
+#endif
 #ifdef K1_MIC_AUTO_SENSE_V1
   k1_mic_auto_sense_note_i2s_result(
     i2s_read_status == ESP_OK && bytes_read >= bytes_requested,
@@ -669,6 +677,10 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
   for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
     const int32_t raw_sample = (int32_t)im69d_samples_i16[i];
+#ifdef K1_B489_WS2816_V1
+    if (raw_sample < b489_i2s_raw_min) b489_i2s_raw_min = (int16_t)raw_sample;
+    if (raw_sample > b489_i2s_raw_max) b489_i2s_raw_max = (int16_t)raw_sample;
+#endif
     const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
     if (raw_mag > im69d_raw_peak) im69d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
     if (raw_mag >= K1_MIC_IM69D_RAW_I16_NEAR_RAIL) im69d_raw_near_count++;

@@ -56,7 +56,7 @@ COMMON_SOURCES = [
 
 class SerialMenuOdrSmokeTest(unittest.TestCase):
     def test_second_tu_links_without_duplicate_symbols(self):
-        cc = shutil.which("g++-15") or shutil.which("g++-14") or shutil.which("g++")
+        cc = shutil.which("g++-16") or shutil.which("g++-15") or shutil.which("g++-14") or shutil.which("g++")
         self.assertIsNotNone(cc, "need g++ for ODR smoke compile")
         binary = ROOT / ".pytest_cache" / "serial_menu_odr_smoke_bin"
         binary.parent.mkdir(parents=True, exist_ok=True)

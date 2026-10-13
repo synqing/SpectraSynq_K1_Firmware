@@ -472,7 +472,7 @@ void init_system() {
   // NVS must not revive NEOPIXEL_X2 (80/80).
   CONFIG.LED_TYPE = LED_NEOPIXEL;
 #endif
-#ifdef K1_MAIN_RPL_PINMAP_V1
+#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
   // Centre-split DIN-A/B on both WS2816 PCBs — NVS must not revive single-wire NEOPIXEL.
   CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
 #endif

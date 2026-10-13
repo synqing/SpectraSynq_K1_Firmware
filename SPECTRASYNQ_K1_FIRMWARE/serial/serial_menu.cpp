@@ -696,6 +696,23 @@ void dump_info() {
   USBSerial.print("CHIP ID: ");
   print_chip_id();
 
+#ifdef K1_B489_WS2816_V1
+  // Report the compiled electrical profile alongside the saved settings. These
+  // values identify the requested driver setup, not a physical wiring test.
+  USBSerial.printf("LED_PROFILE: protocol=WS2816 bits_per_channel=16 edges=2 pixels_per_edge=%u pixels_per_din=%u lower_din=%u,%u upper_din=%u,%u\n",
+                   (unsigned)CONFIG.LED_COUNT, (unsigned)(CONFIG.LED_COUNT / 2U),
+                   (unsigned)LED_DATA_PIN, (unsigned)LED_CLOCK_PIN,
+                   (unsigned)SECONDARY_LED_DATA_PIN, (unsigned)SECONDARY_LED_CLOCK_PIN);
+  USBSerial.printf("MIC_PROFILE: device=IM69D130 mode=PDM data_gpio=%u clock_gpio=%u pcm_hz=%u pcm_bits=16 dsr=16s slots=RIGHT programme=IM1 select=hardware_strap\n",
+                   (unsigned)K1_PDM_DIN_PIN, (unsigned)K1_PDM_CLK_PIN,
+                   (unsigned)CONFIG.SAMPLE_RATE);
+  USBSerial.printf("MIC_LAST_READ: sequence=%lu status=%ld bytes=%lu expected=%lu raw_min=%d raw_max=%d\n",
+                   (unsigned long)b489_i2s_read_sequence,
+                   (long)b489_i2s_last_status, (unsigned long)b489_i2s_last_bytes,
+                   (unsigned long)b489_i2s_expected_bytes,
+                   (int)b489_i2s_raw_min, (int)b489_i2s_raw_max);
+#endif
+
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
   {
     const uint8_t slot = k1_look_slot;

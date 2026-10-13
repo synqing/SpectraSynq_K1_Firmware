@@ -1,8 +1,8 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_lane: PCM1808_ST25R3916B_BRINGUP_20260907
-active_authority: docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md
-active_branch: lane/pcm1808-st25r3916b-bringup
+active_lane: B489_WS2816_REFERENCE_20261013
+active_authority: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md
+active_branch: fix/b489-ws2816-reference-capture
 previous_lane: COLOUR_LAB_PALETTE_BENCH_20260827 (authority tools/colourlab/EXECUTION.md, branch lane/colourlab-bench, status ready_for_merge)
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
 lane_branch: lane/pcm1808-st25r3916b-bringup

@@ -75,7 +75,7 @@ _MODE_SOURCES = [
 
 # Compiler preference order (must be GCC for FixedPoints SQ15x16 compound-literal
 # compat; mirrors render_replay.py GPP_CANDIDATES)
-_GPP_CANDIDATES = ["g++-15", "g++-14", "g++-13", "g++-12", "g++"]
+_GPP_CANDIDATES = ["g++-16", "g++-15", "g++-14", "g++-13", "g++-12", "g++"]
 
 # ---------------------------------------------------------------------------
 # Oracle identity

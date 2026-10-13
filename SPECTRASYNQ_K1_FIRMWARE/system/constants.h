@@ -429,7 +429,7 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
 
     #define RNG_SEED_PIN 31
 
-  #elif defined(K1_MAIN_RPL_PINMAP_V1)
+  #elif defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
     // Main RPL (main K1 replacement, Captain 2026-08-18 / MAIN_RPL_BRINGUP_FLASH):
     //   Each WS2816 PCB = ONE continuous 160-LED strip on TWO data lines:
     //     DIN-A = LEDs 1–80  (buffer [0..79])
@@ -452,8 +452,20 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SECONDARY_LED_CLOCK_PIN 18
 
     #ifdef K1_MIC_IM69D_PDM_V1
-      #define K1_PDM_CLK_PIN 9
-      #define K1_PDM_DIN_PIN 8
+      #ifdef K1_B489_WS2816_V1
+        // Captain-confirmed B489 reference wiring, 13 October 2026.
+        // The four LED DINs match RPL; its microphone pin map does not.
+        #define K1_PDM_CLK_PIN 14
+        #define K1_PDM_DIN_PIN 13
+        static_assert(K1_PDM_CLK_PIN == 14 && K1_PDM_DIN_PIN == 13,
+                      "B489 reference microphone: CLK14 / DATA13");
+#if !defined(K1_MIC_IM69D_DSR_16S_V1) || !defined(K1_MIC_IM69D_SLOT_RIGHT) || defined(K1_MIC_IM69D_STEREO_V1)
+#error "B489 reference preserves IM69D130 DSR16S / mono RIGHT programme input"
+#endif
+      #else
+        #define K1_PDM_CLK_PIN 9
+        #define K1_PDM_DIN_PIN 8
+      #endif
       #define K1_IM69_PDM_SEL_PIN 12     // unused on Main RPL; do not drive as LR
     #else
       #error "K1_MAIN_RPL_PINMAP_V1 requires K1_MIC_IM69D_PDM_V1 (dual IM69D130 on 8/9)"
