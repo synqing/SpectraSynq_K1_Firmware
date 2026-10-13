@@ -18,7 +18,24 @@
 #   bash scripts/agent/k1-flash-verified.sh <env> [--port /dev/cu.usbmodemXXXX]
 #
 # Exit codes: 0 flashed+verified · 1 usage/build/flash failure · 3 identity mismatch
+#
+# Pinned saved-app restore (2026-10-14) — puts ONE pinned app image back into the
+# slot the bootloader already selects. No build, no `pio run`, app region only:
+#   bash scripts/agent/k1-flash-verified.sh --restore-saved-app --port <cu node> \
+#     --image <pinned file> --sha256 <pin> --size <pin> --slot 0 --offset 0x10000 \
+#     --expect-git <pin> --expect-env <pin> --expect-chip <pin> --expect-usb-serial <pin> \
+#     [--plan-only --otadata-file F --partition-file F --ports-json F]
+# Admission is USB serial + live ROM MAC, so it works when the app never answers
+# `:build`. Restore exit codes: 0 bytes+app verified · 1 write failed (rerun the
+# same restore) · 2 refused, chip not written · 3 readback/app mismatch · 4 bytes
+# verified, app silent. Contract:
+# _scratch/b489-ws2816-reference-20261013/resume-20261014/recovery-contract.md
 set -euo pipefail
+
+if [[ "${1:-}" == "--restore-saved-app" ]]; then
+  cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+  exec python3 scripts/platformio/k1_upload_guard.py "$@"
+fi
 
 ENV_NAME="${1:-}"
 shift || true
@@ -62,6 +79,11 @@ EXPECT_GIT="$(git rev-parse --short=7 HEAD)"
 
 say "Building $ENV_NAME @ $EXPECT_GIT"
 pio run -e "$ENV_NAME" >/dev/null
+
+# A PlatformIO upload also writes bootloader, partitions and otadata
+# (boot_app0.bin). For an env with a pinned saved-app restore, the upload guard's
+# pre-action (k1_upload_guard._guard_upload_action) hashes the exact files the
+# upload command consumes and aborts the upload if they differ from the pins.
 
 # ── 1. who is on the port BEFORE we write? ─────────────────────────────────────
 # Not fatal — it is legitimately a different (older) build. But it is recorded, so

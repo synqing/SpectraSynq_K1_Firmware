@@ -160,3 +160,27 @@ The remaining host-gate failures were two more outdated GCC discovery sites
 mutually exclusive opening braces. The native output guards now use one common
 brace with the same compiled conditions. Focused affected checks passed; no
 assertion or golden expectation was removed or relaxed.
+
+## Resume checkpoint — 2026-10-13 17:26 UTC
+
+Additive only. The mandate above is unchanged. Full notes: `_scratch/b489-ws2816-reference-20261013/resume-20261014/CHECKPOINT.md`.
+
+The committed env `k1_b489_ws2816_reference_capture` at `be0a97e3` built in 20.20s. Application flash 730,414 bytes. `firmware.bin` SHA-256 `c2ab0880253be2e598c4519d3638c71c9c6936d2a0f68a910f689a2359a4b27b`. `firmware.elf` SHA-256 `bd0dd0cdb62b1f3710b651d883c3813ec4095da28559a89131513a58af7cadc3`. Provenance epoch `1791912339`. It was not uploaded.
+
+`/dev/cu.usbmodem11301` is Espressif USB serial `B4:3A:45:A5:89:B4`, and nothing owned that port. The running `:build` line and the chip register were not read: the native checker refused the serial open. That refusal was not bypassed. Titan and E2 were not operated.
+
+The 16 MiB backup hash still matches. app1 in that backup is empty. The OTA select CRC at `0xE000` did not validate with the standard CRC32 of the sequence word, so the active slot is not certified from the file parse. `k1-flash-verified.sh`, the factory flash runbook, and the dual-sync exact-image writer do not restore `original-app-app0.bin`. No esptool restore was invented. Flash stays stopped until a supported exact app-only restore of that saved image exists, and until a read-only open of this Espressif port is allowed.
+
+S3-C and S3-D did not run. No musical-reference claim. No optical claim.
+
+## Restore implementation and test-escape incident — 2026-10-14 (additive)
+
+Executor: model `claude-opus-5-5`. Full record: `_scratch/b489-ws2816-reference-20261013/resume-20261014/CHECKPOINT.md` § "Incident 2026-10-14" and `recovery-contract.md` § "Amendment 1". Raw evidence: `…/resume-20261014/incident-20261014-test-escape/`.
+
+The pinned saved-app restore now exists as code. It is uncommitted and not yet independently reviewed. Files: `scripts/platformio/k1_upload_guard.py`, `scripts/agent/k1-flash-verified.sh` (`--restore-saved-app`; forward path also checks bootloader, partitions and boot_app0 against the pins), and `tests/test_k1_saved_app_restore.py`. Admission is USB serial plus ROM MAC, not `:build`. The only write is the pinned image at `0x10000`, followed by readback of hash and ELF. Every esptool session ends in a hard reset.
+
+Incident: during a host mutation check, a mutant without the fixture refusal let a test run the real restore against B489 before review. That included one write attempt on app0. *Correction, 2026-10-14 revision 2:* the kernel record does not name commands. It shows seven USB-serial port-close times, 18:19:00.5 to 18:20:58.9Z. Matching them to `:build`, `read_mac`, the otadata read, the partition read, `read_mac`, `write_flash` (about 42 s) and the readback is an inference from the code's fixed order plus the temp-file times. The write's return code and all esptool output were lost with the killed test. That `write_flash` completed is inferred, not observed. The escaped code used `--after no_reset`, and no reset ran. Directly observed afterwards: `:build` was silent; a read-only app0 readback of all 6553600 bytes gave `3d3b929e…` (= pin) and ended with a hard reset; `:build` then answered `eff9bf47` / `k1_bench_im69d_led150` / `1789046479`. B489 is running the confirmed original image, not the candidate. Otadata, NVS, the partition table and the bootloader were not re-read afterwards. The escape is not a qualified restore trial. A controlled, reviewed restore trial is still required, and this event does not count towards it. Tests are now confined at the OS/subprocess boundary, and the confinement is itself tested with the checks deleted. Revision 2 results are in the checkpoint.
+
+Ownership: Titan and E2Lite moved to another team. This lane has no access to them and used none. B489 S3 remains in this lane.
+
+Remaining ship path: (1) independent read-only review of this diff; (2) commit through the gate; (3) forward flash of the reviewed candidate with the segment check; (4) dual-edge capture and input validity on that boot. Not done.
