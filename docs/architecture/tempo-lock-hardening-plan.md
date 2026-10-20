@@ -117,8 +117,63 @@ data shows reaching the ~50% ceiling, and it stays inside `sb_tempo.cpp`. (a) is
 a smaller step is wanted first. Re-run any time: `python3 scripts/regression-harness/tempo_accuracy.py`.
 
 ---
+
+## Update — 2026-10-20: Main RPL "weak lock" is a false silence inside the tracker; input-contrast fix measured, not merged
+
+Measured on `k1_main_rpl_im69d` (k1_tempo.cpp: ACF spread + CONF_V2 + flywheel; novelty
+from `calculate_novelty()` in `audio/k1_gdft_core.cpp`, which replaced the `GDFT.h` lines
+cited above). Firmware `aaa1f307`; emulator replay `tools/esp_emulator` (esp-emu 0.49.0);
+host replay = unmodified `k1_tempo.cpp` with the product defines.
+
+**Mechanism (FACT).** On the R3 music passage (loreen_127, scored hops 1600-2933) the
+tracker *does* lock internally: `k1_locked_v2` is true on 100 % of scored frames at 127 BPM,
+`k1_conf_ema` 0.81 mean / 0.95 max. Its own novelty-contrast silence detector
+(`k1_tempo.cpp` ~509-535: `1-(max-min) > 0.5` over the last 128 normalised emits) declares
+silence on 100 % of those frames although the producer's silence flag is 0 throughout. The
+output gates then hide everything: `locked && !silence`, `beat_tick && !silence`, confidence
+× `(1 - silence_level)`. Result: 0 published locks, 0 ticks, max published confidence 0.664 —
+the retained `PASS_timing_but_weak_lock`. Instrumented with `ENABLE_TEMPO_STREAM` debug
+fields on the host; host replay of the emulator's captured novelty reproduces the emulator's
+published tempo exactly.
+
+**Why the contrast is low (FACT).** The tempo input is `sqrtf(novelty_now)`
+(`k1_gdft_core.cpp:737`). The square root compresses the onset/steady contrast (p90/p10
+6.9 → 2.6 on this passage); the loud-guard GDFT trim (mean 0.62 here) already squeezes the
+spectrogram it is computed from. Without the square root the silence detector stays off.
+
+**Candidate measured (FACT).** `K1_TEMPO_NOVELTY_LINEAR_V1`: the pre-sqrt `novelty_now` in a
+separate snapshot field read only by `k1_tempo_update`; `novelty_curve`, spectrogram, AGC,
+onset, director and colour shift untouched. Patch:
+`_scratch/esp-emulator/next-phase-tempo-candidate-001/candidate-K1_TEMPO_NOVELTY_LINEAR_V1.patch`
+(sha256 76df3146…; local evidence, not committed). Emulator, music case:
+`PASS_timing_and_tempo`, lock 1323/1334 near 127 BPM, 21 beat ticks all received by the
+render thread at the producer's generation (median spacing 483.75 ms vs 472 ms per beat),
+edge A (BLOOM) byte-identical to baseline, only edge B (WAVEFORM_TEMPO, the confidence/phase
+consumer) changes, shared render state unchanged, exact repeat.
+
+**Corpus gate (FACT) — fails.** 36 HarmonixSet clips (gold BPM), each run through the real
+emulated firmware, captured tempo input replayed as shipped (A) and pre-sqrt (B):
+
+| | Acc1 | Acc2 | locked (lock ≥ 0.5 of scored window) | locked correct | locked wrong |
+|---|---|---|---|---|---|
+| A shipped | 17/36 | 19/36 | 2 | 1 | 1 |
+| B pre-sqrt | 17/36 | 19/36 | 27 | 13 | 14 |
+
+Host-vs-emulator fidelity 36/36. B chooses the same tempi as A; it only stops the false
+silence, so it publishes the tracker's choice — right about half the time. Confidence does
+not separate right from wrong (AUC ≈ 0.5 for A and B, model study). Merging B would make the
+lamp lock confidently to a wrong beat on roughly 4 in 10 songs. **Not merged.**
+
+**Next decision.** The input fix is only safe together with better winner selection (or a
+confidence term that tracks correctness): this plan's option (b), ACF-salience + prior
+hybrid, is the recorded route and is a tracker change with its own gate. Thresholds were not
+touched. Stale facts corrected here: the tempo history is 512 emits at 44.44 Hz = 11.52 s
+(not 10.24 s at 50 Hz), so the emulator's 12 s preroll clears warm-up by ~0.5 s.
+
+---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
+| 2026-10-20 | agent:claude-code (next phase) | Update: Main RPL weak lock = tracker-internal false silence on sqrt-compressed novelty; pre-sqrt candidate fixes the music passage end to end but fails the 36-track corpus gate (wrong-tempo locks 1→14); not merged. |
 | 2026-06-03 | agent:claude-opus | Update (PM): real-music baseline MEASURED via the digital pipe — premise revised. Dominant failure is the Goertzel tempo SPECTRUM (Acc2 14–17% vs autocorrelation ceiling 50% on the same novelty), not octave error (~6%). Step 2 implemented in sb_tempo.cpp: log-Gaussian tactus prior (octave-err→0) + Goertzel un-clamp (the real ~2× win: in-range Acc1 9.4→25%, Acc2 15.6→28%). Metronome lock preserved; ESP32 build SUCCESS. Remaining gap is architectural (Fourier vs ACF); recommend ACF-salience+prior hybrid next. |
