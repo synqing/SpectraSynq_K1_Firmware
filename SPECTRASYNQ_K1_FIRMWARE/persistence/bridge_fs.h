@@ -647,12 +647,19 @@ void init_fs() {
 
   update_config_filename(FIRMWARE_VERSION);
 
+#if defined(K1_EMU_FIXTURE) && !defined(K1_EMU_UART0)
+  // Physical PCM replay boots the compiled defaults, same as the emulator's
+  // blank filesystem. The saved show and calibration files stay on flash.
+  load_ambient_noise_calibration();
+  k1_apply_boot_palette_lock();
+#else
   load_ambient_noise_calibration();
   load_config();
   // Soft restore of secondary/edge/show overlay; missing or corrupt file is a
   // no-op (primary CONFIG from load_config() remains authoritative alone).
   (void)k1_show_state_load();
   load_calibration_profile_if_config_invalid();
+#endif
   unlock_leds();
 }
 

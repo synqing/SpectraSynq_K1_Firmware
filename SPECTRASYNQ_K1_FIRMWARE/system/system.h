@@ -523,7 +523,12 @@ void init_system() {
   // PDM cal persistence: scrub removed SPH-file-derived state; restore last
   // accepted PDM cal from CAL_PROFILE_FILE (never an SPH file).
   CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
+#if defined(K1_EMU_FIXTURE) && !defined(K1_EMU_UART0)
+  // Keep the blank-boot fallback. Do not read or rewrite the saved profile.
+  if (false) {
+#else
   if (load_calibration_profile_if_config_invalid()) {
+#endif
     max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // persisted SSL (cal_valid=1, source=persisted_profile)
   } else {
     CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;   // no/invalid profile -> fallback, NEVER 0
