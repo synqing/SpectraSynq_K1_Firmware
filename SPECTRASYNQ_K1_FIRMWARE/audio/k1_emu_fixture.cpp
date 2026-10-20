@@ -99,6 +99,14 @@ uint32_t k1_emu_fixture_shown(void) {
   return s_shown_generation;
 }
 
+extern "C" uint32_t k1_emu_fixture_time_ms(void) {
+  return s_admitted_samples * 1000u / 12800u;
+}
+
+extern "C" uint32_t k1_emu_fixture_time_us(void) {
+  return k1_emu_fixture_time_ms() * 1000u;
+}
+
 void k1_emu_fixture_on_render_store(uint32_t capture_index) {
   if (capture_index >= kMaxSidecar) return;
   // The render thread records the acquired generation before it draws.

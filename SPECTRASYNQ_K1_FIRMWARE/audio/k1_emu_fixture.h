@@ -34,6 +34,17 @@ void k1_emu_fixture_note_consumed(uint32_t generation);
 void k1_emu_fixture_note_shown(uint32_t generation);
 uint32_t k1_emu_fixture_shown(void);
 
+// Hop clock. A command's print time must not move the beat or the gain.
+// C linkage so a fixture build can redirect Arduino millis/micros here.
+#ifdef __cplusplus
+extern "C" {
+#endif
+uint32_t k1_emu_fixture_time_ms(void);
+uint32_t k1_emu_fixture_time_us(void);
+#ifdef __cplusplus
+}
+#endif
+
 // Called from the existing dual-edge store with the renderer's acquired frame.
 void k1_emu_fixture_on_render_store(uint32_t capture_index);
 

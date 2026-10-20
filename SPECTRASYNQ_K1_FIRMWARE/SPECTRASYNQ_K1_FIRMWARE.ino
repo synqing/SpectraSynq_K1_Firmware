@@ -786,6 +786,19 @@ void setup() {
   // The boot animation calls show_leds before the render loop acquires audio.
   // Scoring that bounce records generation 0. The replay starts on the real loop.
   CONFIG.BOOT_ANIMATION = false;
+  // Bloom leaves the primary edge dark on this clip, so a photons change
+  // cannot show up. Both edges use the secondary's waveform-tempo mode.
+  CONFIG.LIGHTSHOW_MODE = 18;
+  // Product boot leaves MASTER_BRIGHTNESS at 0 and apply_brightness() only
+  // climbs it after millis() passes one second. The scored music window is
+  // shorter than that. Secondary brightness does not multiply MASTER_BRIGHTNESS,
+  // so the primary edge stayed packed black while the secondary edge was lit.
+  // The fade formula is untouched. This image scores the loop at full master.
+  MASTER_BRIGHTNESS = 1.0f;
+  // The legacy power estimate is one gain for both edges. A photons change
+  // on one edge would otherwise rescale the other. The estimate and the
+  // pack formula stay. This budget does not bind on the scored clip.
+  CONFIG.MAX_CURRENT_MA = 65535;
 #endif
   // Create thread specifically for LED updates
   BaseType_t led_task_create_result = xTaskCreatePinnedToCore(
@@ -886,6 +899,10 @@ void loop() {
 #endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
   uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
+#ifdef K1_EMU_FIXTURE
+  t_now = k1_emu_fixture_time_ms();
+  t_now_us = t_now * 1000u;
+#endif
 #ifdef K1_BOOTLOOP_GUARD_V1
   // N2b: once the device has run K1_BOOTLOOP_STABLE_MS without crashing, this boot is
   // "good" — clear the crash streak so the next reboot starts clean. Fires once, and
