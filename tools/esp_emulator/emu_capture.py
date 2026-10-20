@@ -356,7 +356,10 @@ def accept(cap: Capture | None, expect: Expect, process: Process, decode_error: 
             break
     # Epoch hand-off into the processed-sample clock.
     epoch_us = None
-    if len(cap.epochs) != 1:
+    staged_none = (not complete and len(cap.ends) == 1 and cap.ends[0].get("staged_hops") == "0")
+    if staged_none and not cap.epochs:
+        pass  # a failure before the first hop has no clock hand-off to report
+    elif len(cap.epochs) != 1:
         reasons.append(f"EMU_EPOCH count {len(cap.epochs)} != 1")
     else:
         ep = cap.epochs[0]

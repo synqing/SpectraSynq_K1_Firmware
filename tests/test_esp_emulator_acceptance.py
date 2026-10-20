@@ -8,6 +8,7 @@ prints them and require the right rejection reason for each defect.
 from __future__ import annotations
 
 import json
+import re
 import struct
 import sys
 import zlib
@@ -180,6 +181,18 @@ def test_recovery_run_must_not_issue_commands():
     exp = make_expect(recovery=True)
     text = make_uart(exp).replace("EMU_SS gen=0", "EMU_CMD hop=0 sample=0 text=save_show\nEMU_SS gen=0")
     assert any("recovery run issued" in r for r in reasons_for(text, exp))
+
+
+def test_stall_before_first_hop_needs_no_epoch_but_complete_runs_do():
+    exp = make_expect(end_reason="stall")
+    text = make_uart(exp, end_reason="stall")
+    text = "\n".join(l for l in text.splitlines() if not l.startswith(("EMU_EPOCH", "S,", "V,", "F,")))
+    text = text.replace("staged_hops=8", "staged_hops=0").replace("captured=8", "captured=0")
+    text = re.sub(r"\[RTRACE-BEGIN [^\]]*\]", "[RTRACE-BEGIN frames=0 crc32=0]", text) + "\n"
+    assert reasons_for(text, exp) == []
+    eof = make_expect()
+    no_epoch = "\n".join(l for l in make_uart(eof).splitlines() if not l.startswith("EMU_EPOCH")) + "\n"
+    assert any("EMU_EPOCH count 0" in r for r in reasons_for(no_epoch, eof))
 
 
 def test_stall_end_requires_reported_positions():
