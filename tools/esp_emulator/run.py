@@ -1129,8 +1129,8 @@ def write_report(sc: dict, out: Path, result: dict, results: dict, check: bool =
             "invocation": {"id": result["invocation_id"], "overall": result["overall"], "scenario": sc["name"],
                            "source": {"head": result["source"]["head"],
                                       "dirty_inputs_sha256": result["source"]["dirty_inputs_sha256"]},
-                           "criteria": result["criteria"]},
-            "cases": cases, "comparisons": comps}
+                           },
+            "criteria": result["criteria"], "cases": cases, "comparisons": comps}
     (out / "report-data.json").write_text(json.dumps(data) + "\n")
     try:
         import report  # noqa: WPS433 - sibling module (WP7)

@@ -235,6 +235,7 @@ def build_payload(data: dict) -> tuple[dict, list[str]]:
         rec["b_idx"] = pos.get(comp.get("b"))
         comps.append(rec)
     meta = {"schema": data.get("schema"), "invocation": data.get("invocation") or {},
+            "criteria": data.get("criteria") or [],
             "cases": [_case_meta(c) for c in cases], "comparisons": comps,
             "pixels": PIXELS, "wire_bytes": WIRE_BYTES}
     return meta, [_case_blob(c) for c in cases]
@@ -357,6 +358,17 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin:
   .lanelabels div { white-space: normal; line-height: 1.15; text-align: right; }
 }
 </style>
+<style>
+#inv-criteria table.crit { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px; }
+#inv-criteria th, #inv-criteria td { text-align: left; vertical-align: top; padding: 4px 8px; border-top: 1px solid rgba(127,127,127,.25); }
+#inv-criteria td.crit-ev { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  #inv-criteria thead { display: none; }
+  #inv-criteria tr { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; border-top: 1px solid rgba(127,127,127,.25); padding: 6px 0; }
+  #inv-criteria td { border-top: none; padding: 0 4px; }
+  #inv-criteria td.crit-ev { grid-column: 1 / -1; }
+}
+</style>
 </head>
 <body>
 <main>
@@ -366,6 +378,7 @@ details summary { cursor: pointer; color: var(--muted); font-size: 13px; margin:
     <div class="row"><span class="mono" id="inv-id"></span><span id="inv-overall"></span></div>
   </div>
   <div class="kv" id="inv-kv"></div>
+  <div id="inv-criteria"></div>
   <p class="note">Logical channels <strong>A</strong> (primary) and <strong>B</strong> (secondary), 160 logical pixels each, captured as the packed WS2816 wire (G R B, 16-bit big-endian per channel). Channel names are logical, not physical positions.</p>
 </header>
 
@@ -538,6 +551,18 @@ function renderHeader() {
   Object.keys(inv).forEach(function (k) { if (['id', 'overall', 'scenario', 'source'].indexOf(k) < 0) add(k, fmt(inv[k])); });
   add('Schema', fmt(META.schema));
   add('Cases / comparisons', META.cases.length + ' / ' + META.comparisons.length);
+  var crit = clear($('inv-criteria'));
+  if (META.criteria && META.criteria.length) {
+    var tb = h('tbody');
+    META.criteria.forEach(function (c) {
+      var st = String(c.status || '');
+      var chip = statusChip(st === 'DEFERRED_EXTERNAL' || st === 'NOT_APPLICABLE' || st === 'NOT_RUN' ? st : st);
+      tb.appendChild(h('tr', null, h('td', { cls: 'mono', text: c.id + (c.optional ? ' (optional)' : '') }),
+        h('td', null, chip), h('td', { cls: 'crit-ev', text: fmt(c.evidence) })));
+    });
+    crit.appendChild(h('table', { cls: 'crit' }, h('thead', null, h('tr', null, h('th', { text: 'Criterion' }),
+      h('th', { text: 'Status' }), h('th', { text: 'Evidence (this invocation)' }))), tb));
+  }
 }
 
 function caseCard(ci, role) {
