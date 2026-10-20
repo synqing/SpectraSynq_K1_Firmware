@@ -782,6 +782,11 @@ void setup() {
 #endif
 #endif
 
+#ifdef K1_EMU_FIXTURE
+  // The boot animation calls show_leds before the render loop acquires audio.
+  // Scoring that bounce records generation 0. The replay starts on the real loop.
+  CONFIG.BOOT_ANIMATION = false;
+#endif
   // Create thread specifically for LED updates
   BaseType_t led_task_create_result = xTaskCreatePinnedToCore(
     led_thread, "led_task", 8192, NULL, tskIDLE_PRIORITY + 1, &led_task, K1_LED_TASK_CORE);
@@ -1211,6 +1216,11 @@ void loop() {
       k1_emu_fixture_note_publication(producer_next.ap_generation);
 #endif
       k1_audio_frame_publish(producer_next);
+#ifdef K1_EMU_FIXTURE
+      while (k1_emu_fixture_shown() != producer_next.ap_generation) {
+        vTaskDelay(1);
+      }
+#endif
     }
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
@@ -1387,14 +1397,29 @@ void led_thread(void* arg) {
     render_thread_parked = false;
 #endif
     if (led_thread_halt == false) {
+#ifdef K1_EMU_FIXTURE
+      uint32_t k1_emu_show_generation = 0;
+#endif
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
 #ifdef K1_AUDIO_FRAME_V1
       {
         K1AudioFrame vp_frame = {};
-        if (k1_audio_frame_acquire(&vp_frame)) {
+        const bool k1_af_got = k1_audio_frame_acquire(&vp_frame);
+        if (k1_af_got) {
           k1_vp_bundle_begin_frame(vp_frame);
         }
+#ifdef K1_EMU_FIXTURE
+        // One show per published hop. A repeat of the generation already shown
+        // would make the emulator and the lamp disagree once FastLED.show takes time.
+        if (!k1_af_got || vp_frame.ap_generation == 0 ||
+            vp_frame.ap_generation == k1_emu_fixture_shown()) {
+          vTaskDelay(1);
+          continue;
+        }
+        k1_emu_fixture_note_consumed(vp_frame.ap_generation);
+        k1_emu_show_generation = vp_frame.ap_generation;
+#endif
       }
 #endif
 #ifdef K1_COMMAND_CHANNELS_V1
@@ -1742,6 +1767,9 @@ void led_thread(void* arg) {
       }
 #else
       show_leds();
+#endif
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_note_shown(k1_emu_show_generation);
 #endif
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running) {

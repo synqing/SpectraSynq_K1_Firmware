@@ -247,6 +247,21 @@ def near(pair: tuple[float, float], expected: tuple[float, float]) -> bool:
     return abs(pair[0] - expected[0]) < 1e-3 and abs(pair[1] - expected[1]) < 1e-3
 
 
+def generations_ok(decoded: dict) -> bool:
+    """The renderer must record a real consumed publication, not a zero frame."""
+    gens = []
+    for frame in decoded["frames"]:
+        side = decoded["sidecars"].get(frame["sequence"])
+        if side is None:
+            return False
+        gens.append(int(side["generation"]))
+    if not gens or any(generation == 0 for generation in gens):
+        return False
+    if any(gens[index] > gens[index + 1] for index in range(len(gens) - 1)):
+        return False
+    return gens[-1] > 1 and len(gens) == len(decoded["frames"])
+
+
 def ok_capture(item: dict) -> bool:
     decoded = item.get("decoded")
     if not decoded:
@@ -527,8 +542,8 @@ def main() -> int:
         {"id": "A01", "result": "PASS", "evidence": f"esp-emu sha {lock['executable_sha256']} matched tool-lock; not reinstalled"},
         {"id": "A02", "result": "PASS", "evidence": f"fixture elf {sha256(image_dir(FIXTURE_ENV)/'firmware.elf')} normal elf {sha256(normal_elf)}"},
         {"id": "A03", "result": "PASS" if r0a["decoded"] and r0a["decoded"]["fs"] else "FAIL", "evidence": "EMU_FS_BEGIN and fixture arm from this invocation"},
-        {"id": "A04", "result": "PASS" if ok_capture(r0a) else "FAIL", "evidence": "real PCM admitted, production trace dumped both packed edges"},
-        {"id": "A05", "result": "PASS" if ok_capture(r0a) else "FAIL", "evidence": f"R0-a frames={0 if not r0a['decoded'] else len(r0a['decoded']['frames'])} samples={SAMPLES}"},
+        {"id": "A04", "result": "PASS" if ok_capture(r0a) and generations_ok(r0a["decoded"]) else "FAIL", "evidence": "real PCM admitted, production trace dumped both packed edges, consumed generation is nonzero"},
+        {"id": "A05", "result": "PASS" if ok_capture(r0a) and generations_ok(r0a["decoded"]) else "FAIL", "evidence": f"R0-a frames={0 if not r0a['decoded'] else len(r0a['decoded']['frames'])} samples={SAMPLES} generations={[r0a['decoded']['sidecars'][f['sequence']]['generation'] for f in r0a['decoded']['frames'][:3]] if r0a['decoded'] else []}"},
         {"id": "A06", "result": "PASS" if r0_match else "FAIL", "evidence": "R0-a and R0-b packed edges"},
         {"id": "A07", "result": "PASS" if r1_ok and r2_ok else "FAIL", "evidence": f"R1 readback={r1_read} {r1_iso[1]}; R2 readback={r2_read} {r2_iso[1]}"},
         {"id": "A08", "result": "PASS" if r3_ok else "FAIL", "evidence": f"commit={commit_ok} flash_changed={flash_changed} boot={None if recovered is None else recovered['state']} visible={r3_visible}"},

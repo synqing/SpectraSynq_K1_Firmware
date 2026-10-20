@@ -27,6 +27,10 @@ static uint32_t s_render_generation[kMaxSidecar];
 static uint32_t s_render_samples[kMaxSidecar];
 static uint32_t s_pub_generation = 0;
 static uint32_t s_pub_samples = 0;
+static uint32_t s_consumed_generation = 0;
+static uint32_t s_consumed_notes = 0;
+static uint32_t s_consumed_nonzero = 0;
+static volatile uint32_t s_shown_generation = 0;
 
 // Patched in the merged image before a scenario run. '0' is the untouched default.
 static const char k1_emu_plan_tag[] __attribute__((used)) = "K1EMUP0!";
@@ -79,9 +83,28 @@ void k1_emu_fixture_note_publication(uint32_t generation) {
   s_pub_samples = s_admitted_samples;
 }
 
+void k1_emu_fixture_note_consumed(uint32_t generation) {
+  s_consumed_generation = generation;
+  s_consumed_notes++;
+  if (generation != 0) {
+    s_consumed_nonzero++;
+  }
+}
+
+void k1_emu_fixture_note_shown(uint32_t generation) {
+  s_shown_generation = generation;
+}
+
+uint32_t k1_emu_fixture_shown(void) {
+  return s_shown_generation;
+}
+
 void k1_emu_fixture_on_render_store(uint32_t capture_index) {
   if (capture_index >= kMaxSidecar) return;
-  s_render_generation[capture_index] = k1_vp_audio_frame().ap_generation;
+  // The render thread records the acquired generation before it draws.
+  // The VP-frame copy is the same value when acquire succeeded.
+  const uint32_t consumed = s_consumed_generation;
+  s_render_generation[capture_index] = consumed != 0 ? consumed : k1_vp_audio_frame().ap_generation;
   s_render_samples[capture_index] = s_pub_samples;
 }
 
@@ -119,6 +142,9 @@ void k1_emu_fixture_poll(void) {
   K1_EMU_LOG.println("EMU_FIXTURE_DUMP_REQUESTED");
   K1_EMU_LOG.printf("EMU_PCM admitted_samples=%lu hops=%lu\n",
                     (unsigned long)s_admitted_samples, (unsigned long)s_hop);
+  K1_EMU_LOG.printf("EMU_CONSUMED notes=%lu nonzero=%lu last=%lu published=%lu\n",
+                    (unsigned long)s_consumed_notes, (unsigned long)s_consumed_nonzero,
+                    (unsigned long)s_consumed_generation, (unsigned long)s_pub_generation);
 }
 
 #endif

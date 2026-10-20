@@ -25,6 +25,15 @@ void k1_emu_fixture_poll(void);
 // watermark of the hops already admitted for that publication.
 void k1_emu_fixture_note_publication(uint32_t generation);
 
+// Record the generation the render thread just acquired for this frame.
+// Zero means this frame did not consume a published audio frame.
+void k1_emu_fixture_note_consumed(uint32_t generation);
+
+// The render thread has finished showing this generation. The producer waits
+// for it so the fixture stores one frame per hop on the emulator and on silicon.
+void k1_emu_fixture_note_shown(uint32_t generation);
+uint32_t k1_emu_fixture_shown(void);
+
 // Called from the existing dual-edge store with the renderer's acquired frame.
 void k1_emu_fixture_on_render_store(uint32_t capture_index);
 
