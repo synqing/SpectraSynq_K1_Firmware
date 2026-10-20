@@ -635,7 +635,15 @@ bool clear_calibration_profile() {
 void init_fs() {
   lock_leds();
   USBSerial.print("INIT FILESYSTEM: ");
-  USBSerial.println(LittleFS.begin(true) == true ? K1_PASS : K1_FAIL);
+  const bool k1_fs_ok = LittleFS.begin(true);
+  USBSerial.println(k1_fs_ok == true ? K1_PASS : K1_FAIL);
+#ifdef K1_EMU_FIXTURE
+#ifdef K1_EMU_UART0
+  Serial0.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
+#else
+  USBSerial.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
+#endif
+#endif
 
   update_config_filename(FIRMWARE_VERSION);
 

@@ -651,6 +651,9 @@ void attempt_rotate8_init(bool verbose) {
 
 // Setup, runs only one time ---------------------------------------------------------
 void setup() {
+#ifdef K1_EMU_UART0
+  Serial0.begin(115200);
+#endif
 #ifdef K1_BOOTLOOP_GUARD_V1
   // N2b boot-loop guard: evaluate the crash streak BEFORE the first heap alloc below
   // (which can itself crash) and BEFORE init_system()/load_config() consume safe mode.
@@ -872,6 +875,9 @@ static void k1_ap_cadence_capture_frame(uint32_t t_now,
 void loop() {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
   feedLoopWDT();  // N2: feed the audio-loop watchdog every iteration (~133 Hz << 5s)
+#endif
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_poll();
 #endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
   uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
@@ -1201,6 +1207,9 @@ void loop() {
       audio_semantic_read(&producer_next.semantic);
 #endif
       producer_next.ap_publish_us = (uint32_t)esp_timer_get_time();
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_note_publication(producer_next.ap_generation);
+#endif
       k1_audio_frame_publish(producer_next);
     }
 #endif

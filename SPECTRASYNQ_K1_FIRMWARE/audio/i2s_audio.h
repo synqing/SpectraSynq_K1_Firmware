@@ -24,6 +24,9 @@
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
 #include "k1_audio_source.h"
+#ifdef K1_EMU_FIXTURE
+#include "k1_emu_fixture.h"
+#endif
 #if K1_AUDIO_SOURCE_USB
 #include "k1_usb_audio_input.h"
 #endif
@@ -423,9 +426,16 @@ void init_i2s() {
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
 
+#ifdef K1_EMU_FIXTURE
+  // esp-emu 0.49.0 never clears I2S_RX_UPDATE, so channel start spins.
+  // Fixture mode skips that setup. The samples below are still production PCM.
+  result = ESP_OK;
+  USBSerial.println("I2S ENABLE: FIXTURE_SKIP");
+#else
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#endif
 #endif
 }
 
@@ -548,7 +558,11 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
   }
   #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+#endif
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
     const size_t samples_got = bytes_read / sizeof(int16_t);
     for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
@@ -572,7 +586,11 @@ void acquire_sample_chunk(uint32_t t_now) {
   #ifdef K1_MIC_IM69D_STEREO_V1
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, portMAX_DELAY);
   #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+#endif
   #endif
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);

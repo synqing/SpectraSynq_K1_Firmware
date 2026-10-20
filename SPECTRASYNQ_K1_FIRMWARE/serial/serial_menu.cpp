@@ -2603,6 +2603,13 @@ void cmd_save_show() {
   }
   USBSerial.println();
   tx_end();
+#ifdef K1_EMU_FIXTURE
+#ifdef K1_EMU_UART0
+  Serial0.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
+#else
+  USBSerial.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
+#endif
+#endif
 }
 void cmd_stop() {
   stop_streams();

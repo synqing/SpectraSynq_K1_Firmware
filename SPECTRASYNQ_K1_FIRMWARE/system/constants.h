@@ -452,9 +452,10 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SECONDARY_LED_CLOCK_PIN 18
 
     #ifdef K1_MIC_IM69D_PDM_V1
-      #ifdef K1_B489_WS2816_V1
+      #if defined(K1_B489_WS2816_V1) && !defined(K1_MAIN_RPL_PINMAP_V1)
         // Captain-confirmed B489 reference wiring, 13 October 2026.
         // The four LED DINs match RPL; its microphone pin map does not.
+        // Main RPL keeps DATA=8 / CLK=9 even when the shared WS2816 packer is on.
         #define K1_PDM_CLK_PIN 14
         #define K1_PDM_DIN_PIN 13
         static_assert(K1_PDM_CLK_PIN == 14 && K1_PDM_DIN_PIN == 13,

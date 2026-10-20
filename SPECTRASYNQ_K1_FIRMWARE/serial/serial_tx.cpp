@@ -55,6 +55,13 @@ void bad_command(const char* command_type, const char* command_data) {
 
   USBSerial.println();
   tx_end(true);
+#ifdef K1_EMU_FIXTURE
+#ifdef K1_EMU_UART0
+  Serial0.printf("EMU_REJECT %s\n", command_type);
+#else
+  USBSerial.printf("EMU_REJECT %s\n", command_type);
+#endif
+#endif
 }
 
 void stop_streams() {

@@ -1361,8 +1361,12 @@ inline void show_leds() {
     }
     k1_i2s_emit_show();
 #else
+#ifdef K1_EMU_SKIP_EMIT
+    // Packed bytes are already retained. esp-emu does not complete RMT shows.
+#else
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
+#endif
 #endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_lever2_show_start_us != 0) {

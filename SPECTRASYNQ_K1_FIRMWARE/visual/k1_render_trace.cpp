@@ -11,6 +11,14 @@
 #include "esp32-hal-psram.h"
 #include "../system/globals.h"
 #include "k1_render_trace.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"
+#endif
+#ifdef K1_EMU_UART0
+// USB CDC is not the emulator UART. This TU's existing dump text goes to UART0.
+#undef USBSerial
+#define USBSerial Serial0
+#endif
 
 static const uint16_t K1_RTRACE_PX = 160;
 static const size_t K1_RTRACE_EDGE_BYTES = (size_t)K1_RTRACE_PX * 6U;
@@ -127,6 +135,9 @@ static void rtrace_store(const uint8_t* primary, const uint8_t* secondary,
   s_bpp = bpp;
   s_edges = edges;
   s_frames = f + 1;
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_on_render_store(f);
+#endif
 }
 
 void k1_render_trace_on_frame(const uint8_t* rgb_bytes, uint16_t led_count,
@@ -255,6 +266,9 @@ static void rtrace_write_dump() {
   // rgb8: 6 hex chars/px. rgb16 unpacked R16BE G16BE B16BE: 12 hex chars/px.
   static char line[K1_RTRACE_PX * 12 + 1];
   for (uint32_t f = 0; f < frames; f++) {
+#ifdef K1_EMU_FIXTURE
+    k1_emu_fixture_write_sidecar(f);
+#endif
     USBSerial.printf("F,%lu,%lu,%u", (unsigned long)f, (unsigned long)s_ms[f],
                      (unsigned)s_mode[f]);
     for (uint8_t edge = 0; edge < s_edges; ++edge) {
