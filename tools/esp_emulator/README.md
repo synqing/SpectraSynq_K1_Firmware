@@ -235,6 +235,26 @@ python3 tools/esp_emulator/run.py --scenario tools/esp_emulator/s3_music_regress
   --suite client --output _scratch/esp-emulator/<fresh-name>
 ```
 
+## Watching a run (`player.py`)
+
+```bash
+python3 tools/esp_emulator/player.py --run _scratch/esp-emulator/<run> \
+  --case music-a --case client-a --case startup-sqr --output _scratch/esp-emulator/<run>/player.html
+open _scratch/esp-emulator/<run>/player.html
+```
+
+A self-contained page that plays the captured A/B frames in time with the
+exact PCM the firmware processed, with the render thread's tempo, confidence,
+lock, beat ticks and onsets per frame, a seekable timeline (beat ticks and
+commands marked), frame stepping (arrow keys) and native 16-bit values on
+hover. Only accepted cases are played; audio is rebuilt from the run's own
+`scenario.json` and attached only when its sha256 equals the case record.
+A frame shows from its hop-end time: replay application time, not device
+latency, and the same display projection as `report.py`, not an optical
+model. The page embeds the audio, so keep players of private music local.
+esp-emu itself has no LED view (its browser dashboard shows CPU, GPIO pads,
+registers and memory), and LED emission is suppressed in this profile.
+
 ## Acceptance (`emu_capture.accept`)
 
 One function serves every run, comparison and planted case. It rejects any of
