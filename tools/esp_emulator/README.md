@@ -240,6 +240,28 @@ smoothed spectrogram and chromagram. Every captured frame also has
 scale, `LED_FPS`, VU and waveform peak). Use these to localise any future
 repeat divergence to the producer or the render side.
 
+## Determinism stress and divergence localisation
+
+```bash
+python3 tools/esp_emulator/stress_repeat.py run --case music-a --runs 20 --parallel 4 \
+  --output _scratch/esp-emulator/<fresh>
+python3 tools/esp_emulator/stress_repeat.py analyse <uart.txt> ...
+```
+
+`run` repeats one case under parallel host load, with `trace_novelty`
+forced on. It groups the native payloads, reports where each divergent run
+first departs (producer, hand-off or render, with the first differing
+hop/field/pixels), and prints the 3/N bound. Exit status is 0 only for zero
+divergences with every run accepted. `tests/test_esp_emulator_seams_static.py`
+ratchets the seams that make replays deterministic.
+
+## Lessons and traps (read before changing anything here)
+
+`/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/docs/LESSONS.md`
+is the canonical inventory of the R3 session's failures (F1–F26), their
+causes, fixes and guards. The skill `k1-esp-emulator-replay` loads its
+must-follow rules.
+
 ## Not covered (by design)
 
 Microphone wiring, PDM/I2S/DMA/GPIO/RMT wire timing, hardware scheduling,

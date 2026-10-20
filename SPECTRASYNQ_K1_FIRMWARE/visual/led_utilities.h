@@ -1381,7 +1381,9 @@ inline void show_leds() {
 #ifdef K1_EMU_SKIP_EMIT
     // Packed bytes are already retained. esp-emu does not complete RMT shows.
     // Record the scale an installed FastLED power limit would apply here.
+#ifdef K1_EMU_FIXTURE
     k1_emu_fixture_note_submission();
+#endif
 #else
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
