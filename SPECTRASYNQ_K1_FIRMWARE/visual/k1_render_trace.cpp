@@ -14,8 +14,12 @@
 #ifdef K1_EMU_FIXTURE
 #include "../audio/k1_emu_fixture.h"
 #endif
-#ifdef K1_EMU_UART0
-// USB CDC is not the emulator UART. This TU's existing dump text goes to UART0.
+#if defined(K1_EMU_UART0) && defined(K1_EMU_FIXTURE)
+// USB CDC is not the emulator trace. This TU's existing dump text goes to the
+// fixture trace port (UART0, or UART1 for a client-transport run).
+#undef USBSerial
+#define USBSerial (k1_emu_log_port())
+#elif defined(K1_EMU_UART0)
 #undef USBSerial
 #define USBSerial Serial0
 #endif

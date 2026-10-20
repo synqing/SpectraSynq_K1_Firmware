@@ -162,6 +162,79 @@ boundary.
 | `EMU_END reason=eof\|stall\|... run= admitted= processed= staged_hops= total_hops= published= last_generation= consumed= shown= last_shown= pre_audio_shows= captured= commands= rejects= saves= unstaged_admits= publications_without_hop= app_us=` | Terminal event. |
 | `[RTRACE-BEGIN frames= every=1 px=160 fmt=rgb16hex bpp=16 edges=2 crc32=]`, then `S,idx,generation,admitted,processed,app_us,limit_scale,power_mw` and `F,idx,ms,mode,A,B` | The native capture. The CRC is esp_crc32_le (= zlib.crc32) over the wire bytes of A then B for every frame. |
 
+## Client transport (existing client → emulated product)
+
+A case with a `client` block is driven by the existing control client through
+the product's own USBSerial and production receive loop (`check_serial` →
+`parse_command`), instead of fixture-scheduled commands.
+
+```
+pio device monitor --baud 115200 --eol LF --raw --project-dir <run>/<case>/client-project --port <run-owned pty>
+   ⇅ run-owned pty (emu_client.py; bytes forwarded unchanged)
+esp-emu --console usb-jtag            (stdin/stdout = USB-Serial/JTAG EP1 = product USBSerial)
+esp-emu --uart1-tcp 127.0.0.1:<port>  (fixture trace on UART1, read by the runner)
+```
+
+- **Client.** The scenario's top-level `client` names it. No dedicated scripted
+  typed-command client exists in the repository; `pio device monitor` is the
+  documented local client for `:` command lines. The runner supplies
+  `--project-dir` (a run-owned empty directory) and `--port` (the pty it
+  allocated); a scenario argv that sets either, or `-e`, is rejected, because
+  the product envs declare `monitor_port` as a physical device. The client is
+  typed at through a second run-owned pty, as an operator would. If the
+  executable is not on `PATH` the case is `DEFERRED_EXTERNAL` (a named
+  dependency); nothing is installed or replaced.
+- **Why UART1.** Measured on esp-emu 0.49.0: `--console usb-jtag` discards
+  UART0 output; `--uart-tcp` disconnects stdio entirely, even with
+  `--console usb-jtag`; `--uart1-tcp` leaves stdio on EP1. Output on a TCP UART
+  before a client connects is dropped. So a client-transport blob (flag bit 4)
+  moves the fixture trace (`K1_EMU_LOG`, the rtrace dump, `EMU_FS_BEGIN`,
+  `EMU_SHOW_COMMIT`) to UART1 on GPIO 6/7 (the Arduino defaults 15/16 are the
+  Main RPL LED pins), and the fixture prints nothing until it reads
+  `K1EMU-GO` on UART1. The runner sends that once the client reports its port
+  open (`EMU_CLIENT_READY`).
+- **Where a line applies.** A blob command record's second word is its kind:
+  0 scheduled (the fixture runs it, as before), 1 client. Before staging a hop
+  with client records the fixture prints `EMU_CLIENT_GATE hop= expect=`, then
+  keeps calling the production `check_serial()` itself until the parser has
+  taken that many lines from USBSerial (bounded by `stall_ms`), then
+  `EMU_CLIENT_GATE_DONE`. The runner types a hop's lines only after its gate,
+  one at a time, each after the previous line's `EMU_HCMD_DONE` and the
+  client's display of the product reply. So a client line applies before the
+  declared hop exactly like a scheduled one, independent of host timing; its
+  first possible effect is generation `hop+1`. The fixture sends nothing on
+  USBSerial and changes no state itself.
+- **Observation.** `check_serial` reports each parsed line under the fixture:
+  `EMU_HCMD hop= sample= text=` (original text, before the parser tokenises
+  it), `EMU_HCMD_DONE hop= rejected= ...`, then `EMU_SS when=hcmd`.
+  `EMU_FIXTURE_ARMED` carries `commands=` (scheduled), `client_commands=` and
+  `transport=client|scheduled`; `EMU_END` carries `host_commands=`, and
+  `rejects=` counts both kinds.
+- **End and save.** `--exit-on` follows the USB console, so the runner watches
+  the UART1 trace for `[RTRACE-END]` and stops esp-emu with SIGINT, which
+  exits 0 and still writes the flash back under `--save-state`. Then it sends
+  the client its quit key (Ctrl+C), escalating to terminate/kill on its own
+  process only. Raw records stay in the case directory: `uart.txt` (trace),
+  `usb-device-to-client.bin`, `usb-client-to-device.bin`, `client-terminal.txt`,
+  `emu-stderr.txt`, and `result.json` `cases.<id>.client` (argv, pty, typed
+  lines with terminal offsets, events, exit codes, failure reasons).
+- **Readback.** Each applied line must show a framed product reply
+  (`sbr{{…}}`) without `Bad command`; each rejected line must show
+  `Bad command: <name>` on the client's own terminal.
+- **Scope.** This qualifies the local client chain only, not physical USB,
+  HWCDC timing or a host driver.
+
+The `client` suite runs the client cases with their scheduled references:
+`client-a`/`client-b` must equal `ctl-a`/`ctl-b` exactly and isolate their
+edge; `client-reject` must equal `smoke-a`; `client-comp-save` →
+`client-comp-recover` must recover every K1ShowState field with zero commands
+and equal `comp-ref` (SW13).
+
+```bash
+python3 tools/esp_emulator/run.py --scenario tools/esp_emulator/s3_music_regression.json \
+  --suite client --output _scratch/esp-emulator/<fresh-name>
+```
+
 ## Acceptance (`emu_capture.accept`)
 
 One function serves every run, comparison and planted case. It rejects any of
@@ -182,8 +255,11 @@ the following:
   without a hop)
 - commands not executed at their requested hop in order, or a rejection
   outcome different from the declared one
-- a recovery run that issued commands or saves
+- a recovery run that issued commands, client lines or saves
 - a failure end without positions
+- client lines parsed at another hop, with other text or another outcome than
+  declared, a missing or incomplete `EMU_CLIENT_GATE`, an undeclared client
+  line, or a client-transport run without `EMU_CLIENT_READY`
 
 Run ids and wall-clock fields are never part of repeat equality
 (`deterministic_view`).
@@ -273,3 +349,4 @@ audiovisual quality. No software trace here proves any of them.
 | Date | Author | Change |
 |---|---|---|
 | 2026-10-20 | agent:claude-code (R3 owner) | Replaced the R2 one-hop GDB contract with the PCM → production processing → paired-capture/control/persistence interface. |
+| 2026-10-20 | agent:claude-code (next phase) | Added the client transport: existing client → run-owned pty → USB-Serial/JTAG → production receive loop, trace on UART1, client gates, SW13 cases. |

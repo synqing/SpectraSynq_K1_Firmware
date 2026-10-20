@@ -13,7 +13,14 @@
 #ifdef K1_EMU_FIXTURE
 
 #ifdef K1_EMU_UART0
-#define K1_EMU_LOG Serial0
+// The fixture trace port. UART0 for scheduled runs (esp-emu --console uart0).
+// A client-transport run (scenario flag) moves it to UART1: the product's own
+// USBSerial then carries an external client on --console usb-jtag, which
+// discards UART0 output, and esp-emu 0.49.0 disconnects stdio entirely while
+// --uart-tcp is active, so the trace leaves on --uart1-tcp instead.
+class HardwareSerial;
+HardwareSerial& k1_emu_log_port(void);
+#define K1_EMU_LOG (k1_emu_log_port())
 #else
 #define K1_EMU_LOG USBSerial
 #endif
@@ -72,6 +79,13 @@ void k1_emu_fixture_note_save(const char* kind, bool ok);
 
 // The production parser rejected a command (serial_tx reject path).
 void k1_emu_fixture_note_reject(const char* command_type);
+
+// The production receive loop (check_serial) is about to parse, and has parsed,
+// one command line that arrived on USBSerial from an external client. Reports
+// the text, the replay hop it applies before, the parser outcome and the
+// resulting show state. State changes stay with the production parser.
+void k1_emu_fixture_host_command_begin(const char* text);
+void k1_emu_fixture_host_command_end(void);
 
 // Application clock. Before the first hop it stays at the epoch (0); afterwards
 // it is processed_samples * 1e6 / sample_rate with a 64-bit intermediate.

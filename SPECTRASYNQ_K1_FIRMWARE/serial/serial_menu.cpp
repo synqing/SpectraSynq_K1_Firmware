@@ -73,6 +73,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
 #include "serial_cmd_handlers.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"  // emulator replay only: client command observation
+#endif
 #ifdef ENABLE_AP_STREAM
 extern void ap_capture_arm(uint32_t ms);
 #endif
@@ -2605,7 +2608,7 @@ void cmd_save_show() {
   tx_end();
 #ifdef K1_EMU_FIXTURE
 #ifdef K1_EMU_UART0
-  Serial0.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
+  K1_EMU_LOG.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
 #else
   USBSerial.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
 #endif
@@ -4119,7 +4122,13 @@ void check_serial(uint32_t t_now) {
       if (byte == '\r' || byte == '\n') {
         if (command_buf_index > 0) {
           command_buf[command_buf_index] = '\0';
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_begin(command_buf);
+#endif
           parse_command(command_buf);
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_end();
+#endif
         }
         memset(&command_buf, 0, sizeof(char) * 128);
         command_buf_index = 0;
@@ -4128,7 +4137,13 @@ void check_serial(uint32_t t_now) {
         command_buf[command_buf_index++] = byte;
         if (command_buf_index >= 127) {
           command_buf[127] = '\0';
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_begin(command_buf);
+#endif
           parse_command(command_buf);
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_end();
+#endif
           memset(&command_buf, 0, sizeof(char) * 128);
           command_buf_index = 0;
           command_mode = false;

@@ -19,6 +19,9 @@
 #endif
 #include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
 #include "k1_persistence_request.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"  // emulator replay only: trace port
+#endif
 
 extern void reboot(); // system.h
 
@@ -642,7 +645,7 @@ void init_fs() {
   USBSerial.println(k1_fs_ok == true ? K1_PASS : K1_FAIL);
 #ifdef K1_EMU_FIXTURE
 #ifdef K1_EMU_UART0
-  Serial0.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
+  K1_EMU_LOG.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
 #else
   USBSerial.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
 #endif

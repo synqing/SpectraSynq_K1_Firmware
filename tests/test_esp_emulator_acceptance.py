@@ -43,27 +43,41 @@ def make_expect(**over) -> ec.Expect:
 
 def make_uart(exp: ec.Expect, *, end_reason: str = "eof") -> str:
     hops = exp.captured_hops()
-    lines = ["EMU_FS_BEGIN PASS",
+    lines = (["EMU_CLIENT_READY trace=uart1 tx=6 rx=7"] if exp.client_transport else []) + [
+             "EMU_FS_BEGIN PASS",
              f"EMU_FIXTURE_ARMED run={exp.run_id} source=blob valid=1 invalid=- rate={exp.rate_hz} "
              f"hop={exp.hop_samples} real_samples={exp.real_samples} pad_samples={exp.pad_samples} "
              f"total_hops={exp.total_hops} capture={exp.capture_start_hop}..{exp.capture_end_hop} "
              f"every={exp.capture_every} recovery={int(exp.recovery)} commands={len(exp.commands)} "
+             f"client_commands={len(exp.client_commands)} "
+             f"transport={'client' if exp.client_transport else 'scheduled'} "
              f"payload_crc32={exp.payload_crc32:08x} stall_ms=20000 clock=hop_end_us epoch={exp.epoch_policy} "
              f"mode=lockstep rng=xorshift32:9e3779b9",
              "EMU_SS gen=0 when=boot hop=0 hex=00",
              f"EMU_EPOCH policy={exp.epoch_policy} epoch_us={exp.declared_epoch_us or 0} boot_us=79561 pre_audio_shows=0"]
+    gates: dict[int, int] = {}
+    for c in exp.client_commands:
+        gates[c["hop"]] = gates.get(c["hop"], 0) + 1
+    for hop, n_lines in gates.items():
+        lines.append(f"EMU_CLIENT_GATE hop={hop} expect={n_lines}")
+        for c in (c for c in exp.client_commands if c["hop"] == hop):
+            lines.append(f"EMU_HCMD hop={hop} sample={hop * 96} text={c['text']}")
+            rej = 1 if c.get("expect") == "rejected" else 0
+            lines.append(f"EMU_HCMD_DONE hop={hop} rejected={rej} photons=1.0 secondary_photons=1.0 mode=3 "
+                         f"secondary_mode=18 max_current_ma=2500")
+        lines.append(f"EMU_CLIENT_GATE_DONE hop={hop} received={n_lines}")
     for c in exp.commands:
         lines.append(f"EMU_CMD hop={c['hop']} sample={c['hop'] * 96} text={c['text']}")
         rej = 1 if c.get("expect") == "rejected" else 0
         lines.append(f"EMU_CMD_DONE hop={c['hop']} rejected={rej} photons=1.0 secondary_photons=1.0 mode=3 "
                      f"secondary_mode=18 max_current_ma=2500")
     n = exp.total_hops
-    rejects = sum(1 for c in exp.commands if c.get("expect") == "rejected")
+    rejects = sum(1 for c in exp.commands + exp.client_commands if c.get("expect") == "rejected")
     lines.append(f"EMU_END reason={end_reason} where=poll run={exp.run_id} admitted={exp.real_samples} "
                  f"processed={n * 96} staged_hops={n} total_hops={n} published={n} last_generation={n} "
                  f"consumed={n} shown={n} last_shown={n} pre_audio_shows=113 captured={len(hops)} "
-                 f"commands={len(exp.commands)} rejects={rejects} saves=0 unstaged_admits=0 "
-                 f"publications_without_hop=0 app_us=1")
+                 f"commands={len(exp.commands)} host_commands={len(exp.client_commands)} rejects={rejects} "
+                 f"saves=0 unstaged_admits=0 publications_without_hop=0 app_us=1")
     frames = []
     crc = 0
     for i, hop in enumerate(hops):
@@ -183,6 +197,91 @@ def test_recovery_run_must_not_issue_commands():
     assert any("recovery run issued" in r for r in reasons_for(text, exp))
 
 
+# ---- client transport (existing client -> pty -> USBSerial -> production parser) ----
+
+CLIENT_LINES = [{"hop": 2, "text": "photons=0.25", "expect": "applied"},
+                {"hop": 5, "text": "photons=not-a-number", "expect": "rejected"}]
+
+
+def test_client_lines_are_accepted_at_their_gates():
+    exp = make_expect(client_commands=CLIENT_LINES, client_transport=True)
+    assert reasons_for(make_uart(exp), exp) == []
+
+
+@pytest.mark.parametrize("name,mutate,needle", [
+    ("parsed at another hop", lambda t: t.replace("EMU_HCMD hop=2 ", "EMU_HCMD hop=3 "), "client commands parsed"),
+    ("different text", lambda t: t.replace("text=photons=0.25", "text=photons=0.30"), "client commands parsed"),
+    ("missing result", lambda t: _edit_first(t, "EMU_HCMD_DONE hop=2", lambda l: None), "no EMU_HCMD_DONE"),
+    ("outcome flipped", lambda t: t.replace("EMU_HCMD_DONE hop=5 rejected=1", "EMU_HCMD_DONE hop=5 rejected=0"),
+     "rejected=False, expected rejected"),
+    ("no gate", lambda t: _edit_first(t, "EMU_CLIENT_GATE hop=2", lambda l: None), "client gates"),
+    ("gate incomplete", lambda t: t.replace("EMU_CLIENT_GATE_DONE hop=5 received=1",
+                                            "EMU_CLIENT_GATE_DONE hop=5 received=0"), "client gates completed"),
+    ("not ready", lambda t: _edit_first(t, "EMU_CLIENT_READY", lambda l: None), "EMU_CLIENT_READY count 0"),
+    ("host count", lambda t: t.replace("host_commands=2", "host_commands=1"), "end host_commands"),
+    ("scheduled transport", lambda t: t.replace("transport=client", "transport=scheduled"), "armed transport"),
+])
+def test_client_defects_are_rejected(name, mutate, needle):
+    exp = make_expect(client_commands=CLIENT_LINES, client_transport=True)
+    reasons = reasons_for(mutate(make_uart(exp)), exp)
+    assert any(needle in r for r in reasons), (name, reasons)
+
+
+def test_undeclared_client_line_is_rejected():
+    exp = make_expect()
+    text = make_uart(exp).replace("EMU_SS gen=0", "EMU_HCMD hop=1 sample=96 text=photons=0.1\nEMU_SS gen=0")
+    assert any("client commands parsed" in r for r in reasons_for(text, exp))
+
+
+def test_recovery_run_must_not_take_client_lines():
+    exp = make_expect(recovery=True)
+    text = make_uart(exp).replace("EMU_SS gen=0", "EMU_HCMD hop=0 sample=0 text=save_show\nEMU_SS gen=0")
+    assert any("recovery run issued" in r for r in reasons_for(text, exp))
+
+
+def test_client_argv_may_not_choose_a_port_or_environment():
+    import emu_client
+    emu_client.check_client_argv(["pio", "device", "monitor", "--baud", "115200"])
+    for bad in (["pio", "device", "monitor", "--port", "/dev/cu.usbmodem1401"],
+                ["pio", "device", "monitor", "-e", "k1_main_rpl_im69d"],
+                ["pio", "device", "monitor", "--project-dir=/tmp"], []):
+        with pytest.raises(emu_client.ClientSpecError):
+            emu_client.check_client_argv(bad)
+    with pytest.raises(emu_client.ClientSpecError):
+        emu_client.run_client_case(emu_argv=["esp-emu", "--console", "uart0"], client_argv=["pio"],
+                                   lines=[], run_dir=Path("/nonexistent"), timeout_s=1)
+
+
+def test_client_readback_needs_the_products_reply():
+    import emu_client
+    term = (b"boot\r\n" + b"sbr{{\r\nCONFIG.PHOTONS: 0.250000\r\n}}\r\n"
+            + b"sberr[[\r\nBad command: photons=not-a-number\r\n]]\r\n")
+    typed = [{"text": "photons=0.25", "expect": "applied", "terminal_offset": 6},
+             {"text": "photons=not-a-number", "expect": "rejected", "terminal_offset": 6 + 38}]
+    reasons, segs = emu_client.check_readback(term, typed)
+    assert reasons == [] and "0.250000" in segs[0]["reply"]
+    swapped = [dict(typed[0], expect="rejected"), dict(typed[1], expect="applied")]
+    bad, _ = emu_client.check_readback(term, swapped)
+    assert any("no rejection" in r for r in bad) and any("rejection for applied" in r for r in bad)
+    silent, _ = emu_client.check_readback(b"", [dict(typed[0], terminal_offset=0)])
+    assert any("no reply" in r for r in silent)
+
+
+def test_client_scenario_rejections(tmp_path):
+    sc = json.loads(SCENARIO.read_text())
+    sc["cases"]["client-a"]["client"]["commands"][0]["text"] = "reboot=1"
+    with pytest.raises(runner.ScenarioError, match="unsupported command"):
+        runner.load_scenario(_write(tmp_path, sc))
+    sc = json.loads(SCENARIO.read_text())
+    sc["client"]["argv"] += ["--port", "/dev/cu.usbmodem1401"]
+    with pytest.raises(runner.ScenarioError, match="may not set"):
+        runner.load_scenario(_write(tmp_path, sc))
+    sc = json.loads(SCENARIO.read_text())
+    sc["cases"]["client-comp-recover"]["client"] = {"commands": [{"hop": 0, "text": "photons=1"}]}
+    with pytest.raises(runner.ScenarioError, match="recovery run may not"):
+        runner.load_scenario(_write(tmp_path, sc))
+
+
 def test_stall_before_first_hop_needs_no_epoch_but_complete_runs_do():
     exp = make_expect(end_reason="stall")
     text = make_uart(exp, end_reason="stall")
@@ -264,6 +363,20 @@ def test_blob_header_layout_and_crcs():
     assert blob[f["cmd_off"] + 8:f["cmd_off"] + 8 + 11] == b"photons=0.5"
     # Real samples are padded to a hop boundary inside the blob; padding is not counted as real.
     assert len(blob) - f["pcm_off"] == 2 * 192
+    # Scheduled records keep kind 0 (the word older blobs always wrote as zero).
+    assert struct.unpack_from("<II", blob, f["cmd_off"]) == (1, emu_blob.CMD_SCHEDULED)
+
+
+def test_blob_client_lines_need_the_client_transport():
+    base = dict(run_id=RUN_ID, sample_rate=12800, hop_samples=96, pcm=b"\x00\x00" * 96, pad_samples=0,
+                capture_start_hop=0, capture_end_hop=1, capture_every=1, recovery=False, stall_ms=1000)
+    with pytest.raises(ValueError, match="client transport"):
+        emu_blob.build_blob(emu_blob.BlobSpec(commands=[(0, "photons=0.5", emu_blob.CMD_CLIENT)], **base))
+    blob, _ = emu_blob.build_blob(emu_blob.BlobSpec(commands=[(0, "photons=0.5", emu_blob.CMD_CLIENT)],
+                                                    client_transport=True, **base))
+    h = struct.unpack_from("<8sII48s14IQ124sI", blob, 0)
+    assert h[4 + 7] & emu_blob.FLAG_CLIENT_TRANSPORT
+    assert struct.unpack_from("<II", blob, h[4 + 9]) == (0, emu_blob.CMD_CLIENT)
 
 
 def test_show_state_oracle_round_trip():

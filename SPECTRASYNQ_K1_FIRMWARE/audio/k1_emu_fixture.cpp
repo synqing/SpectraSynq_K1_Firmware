@@ -17,6 +17,7 @@
 #include "../control/k1_show_state.h"
 
 extern void parse_command(char* command_buf);
+extern void check_serial(uint32_t t_now);
 bool k1_render_trace_dispatch(const char* command_type, char* command_data);
 
 // Builtin smoke PCM: used only when the run-owned scenario blob is absent.
@@ -44,6 +45,18 @@ constexpr uint32_t kFlagDeclaredEpoch = 1u << 2;
 // every publication, dumped as N lines at the end (diagnostic, opt-in).
 constexpr uint32_t kFlagNoveltyTrace = 1u << 3;
 constexpr uint32_t kMaxNovelty = 16000;  // 120 s of hops
+// Client transport: an external client drives the product's USBSerial on
+// esp-emu --console usb-jtag. The fixture trace moves to UART1 (--uart1-tcp)
+// and the fixture waits for the runner's ready line before printing anything.
+constexpr uint32_t kFlagClientTransport = 1u << 4;
+// UART1 pins for the client-transport trace. The Arduino defaults (15/16) are
+// the Main RPL LED data/clock pins; 6/7 are unused there and not strapping/USB.
+constexpr int kClientTraceTx = 6;
+constexpr int kClientTraceRx = 7;
+constexpr char kClientReady[] = "K1EMU-GO";
+// Command record kind (the word after the hop, zero in older blobs).
+constexpr uint32_t kCmdScheduled = 0;  // the fixture runs it through parse_command
+constexpr uint32_t kCmdClient = 1;     // a client sends it; the fixture only waits
 
 struct __attribute__((packed)) BlobHeader {
   char magic[8];
@@ -72,6 +85,7 @@ static_assert(sizeof(BlobHeader) == kHeaderBytes, "scenario header is 256 bytes"
 
 struct Command {
   uint32_t hop;
+  uint32_t kind;
   char text[kCommandText];
 };
 
@@ -94,8 +108,11 @@ uint32_t s_stall_ms = 20000;
 uint32_t s_pcm_offset = 0;
 uint32_t s_payload_crc = 0;
 uint32_t s_cmd_count = 0;
+uint32_t s_sched_count = 0;    // kCmdScheduled records
+uint32_t s_gate_count = 0;     // kCmdClient records
 Command s_cmds[kMaxCommands];
 const char* s_invalid = nullptr;
+bool s_client = false;         // client transport: trace on UART1
 
 // ---- Progression ----
 bool s_started = false;
@@ -113,6 +130,10 @@ uint32_t s_last_pub_gen = 0;
 uint32_t s_saves = 0;
 uint32_t s_rejects = 0;
 uint32_t s_commands_run = 0;
+uint32_t s_host_commands = 0;  // lines the production receive loop parsed from USBSerial
+uint32_t s_host_rejects_before = 0;
+uint32_t s_host_hop = 0;
+bool s_in_host_command = false;
 uint32_t s_power_mw = 0;       // 0 = no FastLED power limit installed
 bool s_audio_started = false;  // first hop staged: clock is epoch + processed
 constexpr uint32_t kEmuRngSeed = 0x9E3779B9u;
@@ -238,6 +259,9 @@ void load_blob() {
   if (h.version != kVersion || h.header_bytes != kHeaderBytes) {
     return fail_scenario("version");
   }
+  // Decided first, so a later scenario failure is still reported on the port
+  // the runner listens to.
+  s_client = (h.flags & kFlagClientTransport) != 0;
   h.run_id[sizeof(h.run_id) - 1] = '\0';
   memcpy(s_run_id, h.run_id, sizeof(s_run_id));
   // Rate and hop are checked against the loaded CONFIG at the first poll.
@@ -274,12 +298,23 @@ void load_blob() {
       return fail_scenario("read");
     }
     memcpy(&s_cmds[i].hop, raw, sizeof(uint32_t));
+    memcpy(&s_cmds[i].kind, raw + 4, sizeof(uint32_t));
     memcpy(s_cmds[i].text, raw + 8, kCommandText);
     s_cmds[i].text[kCommandText - 1] = '\0';
     if (i > 0 && s_cmds[i].hop < s_cmds[i - 1].hop) return fail_scenario("command_order");
+    if (s_cmds[i].kind == kCmdScheduled) {
+      s_sched_count++;
+    } else if (s_cmds[i].kind == kCmdClient) {
+      s_gate_count++;
+    } else {
+      return fail_scenario("command_kind");
+    }
   }
   if ((h.flags & kFlagRecovery) != 0 && h.command_count != 0) {
     return fail_scenario("recovery_with_commands");
+  }
+  if (s_gate_count != 0 && (h.flags & kFlagClientTransport) == 0) {
+    return fail_scenario("client_commands_without_client_transport");
   }
   s_rate = h.sample_rate;
   s_real_samples = h.real_samples;
@@ -316,15 +351,16 @@ void print_counters(const char* reason, const char* where) {
   K1_EMU_LOG.printf(
       "EMU_END reason=%s where=%s run=%s admitted=%llu processed=%llu staged_hops=%lu "
       "total_hops=%lu published=%lu last_generation=%lu consumed=%lu shown=%lu "
-      "last_shown=%lu pre_audio_shows=%lu captured=%lu commands=%lu rejects=%lu saves=%lu rng_draws=%lu "
+      "last_shown=%lu pre_audio_shows=%lu captured=%lu commands=%lu host_commands=%lu rejects=%lu "
+      "saves=%lu rng_draws=%lu "
       "unstaged_admits=%lu publications_without_hop=%lu app_us=%llu\n",
       reason, where, s_run_id, (unsigned long long)s_admitted, (unsigned long long)s_processed,
       (unsigned long)s_next_hop, (unsigned long)s_total_hops, (unsigned long)s_pub_count,
       (unsigned long)s_last_pub_gen, (unsigned long)s_consumed_notes,
       (unsigned long)s_shown_notes, (unsigned long)s_shown_gen,
       (unsigned long)s_pre_audio_shows, (unsigned long)s_captured,
-      (unsigned long)s_commands_run, (unsigned long)s_rejects, (unsigned long)s_saves,
-      (unsigned long)s_rng_draws,
+      (unsigned long)s_commands_run, (unsigned long)s_host_commands, (unsigned long)s_rejects,
+      (unsigned long)s_saves, (unsigned long)s_rng_draws,
       (unsigned long)s_unstaged_admits, (unsigned long)s_pub_without_hop,
       (unsigned long long)k1_emu_fixture_app_us());
 }
@@ -371,7 +407,7 @@ void stage_next_hop() {
   const uint32_t hop = s_next_hop;
   // Commands apply at the replay boundary before this hop is processed.
   for (uint32_t i = 0; i < s_cmd_count; i++) {
-    if (s_cmds[i].hop == hop) run_command(hop, s_cmds[i].text);
+    if (s_cmds[i].hop == hop && s_cmds[i].kind == kCmdScheduled) run_command(hop, s_cmds[i].text);
   }
   if (!s_audio_started) {
     const uint64_t boot_us = (uint64_t)esp_timer_get_time();
@@ -408,12 +444,80 @@ void stage_next_hop() {
   s_staged = true;
 }
 
+// Replay boundary a command line received now applies before: the staged hop
+// once staging has happened, otherwise the next hop to stage.
+uint32_t current_hop() { return s_staged ? s_next_hop - 1 : s_next_hop; }
+
+// Client gate: the scenario says a client delivers N command lines before this
+// hop. Replay would otherwise outrun a host round trip, so the producer holds
+// the hop and keeps running the production receive loop (check_serial) itself
+// until the parser has taken N lines from USBSerial. The fixture sends nothing
+// and decides nothing; the runner types only after seeing EMU_CLIENT_GATE, so
+// the hop of application does not depend on host timing. Bounded by stall_ms.
+void wait_client_gate(uint32_t hop) {
+  uint32_t want = 0;
+  for (uint32_t i = 0; i < s_cmd_count; i++) {
+    if (s_cmds[i].hop == hop && s_cmds[i].kind == kCmdClient) want++;
+  }
+  if (want == 0) return;
+  const uint32_t before = s_host_commands;
+  K1_EMU_LOG.printf("EMU_CLIENT_GATE hop=%lu expect=%lu\n", (unsigned long)hop, (unsigned long)want);
+  const int64_t start = esp_timer_get_time();
+  while (s_host_commands - before < want) {
+    if (esp_timer_get_time() - start > (int64_t)s_stall_ms * 1000) finish("stall", "client_gate");
+    check_serial(k1_emu_fixture_time_ms());
+    feedLoopWDT();
+    vTaskDelay(1);
+  }
+  K1_EMU_LOG.printf("EMU_CLIENT_GATE_DONE hop=%lu received=%lu\n", (unsigned long)hop,
+                    (unsigned long)(s_host_commands - before));
+}
+
+// Client transport: wait for the runner's ready line on UART1 so no trace text
+// is printed before its TCP bridge is connected (esp-emu drops it otherwise).
+void wait_client_ready() {
+  Serial1.begin(115200, SERIAL_8N1, kClientTraceRx, kClientTraceTx);
+  char line[16] = {};
+  size_t n = 0;
+  const int64_t start = esp_timer_get_time();
+  for (;;) {
+    while (Serial1.available()) {
+      const char c = (char)Serial1.read();
+      if (c == '\r' || c == '\n') {
+        line[n] = '\0';
+        if (strcmp(line, kClientReady) == 0) {
+          Serial1.printf("EMU_CLIENT_READY trace=uart1 tx=%d rx=%d\n", kClientTraceTx, kClientTraceRx);
+          return;
+        }
+        n = 0;
+      } else if (n + 1 < sizeof(line)) {
+        line[n++] = c;
+      }
+    }
+    if (esp_timer_get_time() - start > (int64_t)s_stall_ms * 1000) {
+      return fail_scenario("client_ready_timeout");
+    }
+    vTaskDelay(1);
+  }
+}
+
 }  // namespace
+
+#ifdef K1_EMU_UART0
+HardwareSerial& k1_emu_log_port(void) { return s_client ? Serial1 : Serial0; }
+#endif
 
 void k1_emu_fixture_begin(void) {
   s_cap = (CapRecord*)ps_malloc(sizeof(CapRecord) * kMaxSidecar);
   if (s_cap != nullptr) memset(s_cap, 0, sizeof(CapRecord) * kMaxSidecar);
   load_blob();
+  if (s_client) {
+#ifdef K1_EMU_UART0
+    wait_client_ready();
+#else
+    fail_scenario("client_transport_needs_uart_trace");
+#endif
+  }
   if (!s_from_blob) {
     s_valid = true;
     s_real_samples = sizeof(k1_emu_pcm) / sizeof(int16_t);
@@ -446,14 +550,15 @@ void k1_emu_fixture_poll(void) {
     K1_EMU_LOG.printf(
         "EMU_FIXTURE_ARMED run=%s source=%s valid=%d invalid=%s rate=%lu hop=%lu "
         "real_samples=%lu pad_samples=%lu total_hops=%lu capture=%lu..%lu every=%lu "
-        "recovery=%d commands=%lu payload_crc32=%08lx stall_ms=%lu clock=hop_end_us epoch=%s "
-        "mode=lockstep rng=xorshift32:%08lx\n",
+        "recovery=%d commands=%lu client_commands=%lu transport=%s payload_crc32=%08lx stall_ms=%lu "
+        "clock=hop_end_us epoch=%s mode=lockstep rng=xorshift32:%08lx\n",
         s_run_id, s_from_blob ? "blob" : "builtin", s_valid ? 1 : 0,
         s_invalid ? s_invalid : "-", (unsigned long)s_rate, (unsigned long)kHop,
         (unsigned long)s_real_samples, (unsigned long)s_pad_samples,
         (unsigned long)s_total_hops, (unsigned long)s_cap_start, (unsigned long)s_cap_end,
         (unsigned long)s_cap_every, (s_flags & kFlagRecovery) ? 1 : 0,
-        (unsigned long)s_cmd_count, (unsigned long)s_payload_crc, (unsigned long)s_stall_ms,
+        (unsigned long)s_sched_count, (unsigned long)s_gate_count, s_client ? "client" : "scheduled",
+        (unsigned long)s_payload_crc, (unsigned long)s_stall_ms,
         epoch_policy(), (unsigned long)kEmuRngSeed);
     K1_EMU_LOG.printf("EMU_STATE photons=%.4f secondary_photons=%.4f secondary_mode=%u mode=%u "
                       "max_current_ma=%lu boot_animation=%d\n",
@@ -477,6 +582,7 @@ void k1_emu_fixture_poll(void) {
     }
   }
   if (s_next_hop < s_total_hops) {
+    wait_client_gate(s_next_hop);
     stage_next_hop();
     return;
   }
@@ -617,6 +723,27 @@ void k1_emu_fixture_note_save(const char* kind, bool ok) {
 void k1_emu_fixture_note_reject(const char* command_type) {
   s_rejects++;
   K1_EMU_LOG.printf("EMU_REJECT %s\n", command_type);
+}
+
+void k1_emu_fixture_host_command_begin(const char* text) {
+  // Printed before parsing: the parser tokenises the buffer in place.
+  s_in_host_command = true;
+  s_host_rejects_before = s_rejects;
+  s_host_hop = current_hop();
+  K1_EMU_LOG.printf("EMU_HCMD hop=%lu sample=%lu text=%s\n", (unsigned long)s_host_hop,
+                    (unsigned long)(s_host_hop * kHop), text);
+}
+
+void k1_emu_fixture_host_command_end(void) {
+  if (!s_in_host_command) return;
+  s_in_host_command = false;
+  s_host_commands++;
+  K1_EMU_LOG.printf("EMU_HCMD_DONE hop=%lu rejected=%d photons=%.4f secondary_photons=%.4f "
+                    "mode=%u secondary_mode=%u max_current_ma=%lu\n",
+                    (unsigned long)s_host_hop, s_rejects != s_host_rejects_before ? 1 : 0, CONFIG.PHOTONS,
+                    SECONDARY_PHOTONS, (unsigned)CONFIG.LIGHTSHOW_MODE,
+                    (unsigned)SECONDARY_LIGHTSHOW_MODE, (unsigned long)CONFIG.MAX_CURRENT_MA);
+  print_show_state(s_shown_gen, "hcmd", s_host_hop, false);
 }
 
 void k1_emu_fixture_write_sidecar(uint32_t capture_index) {

@@ -38,6 +38,7 @@ sys.path.insert(0, str(HERE))
 
 import emu_blob  # noqa: E402
 import emu_capture as ec  # noqa: E402
+import emu_client  # noqa: E402
 import emu_report_data as rd  # noqa: E402
 
 STATUSES = ("PASS", "FAIL", "NOT_RUN", "DEFERRED_EXTERNAL", "NOT_APPLICABLE")
@@ -67,7 +68,9 @@ def sha256_file(path: Path) -> str:
 HOST_CHECK_KEYS = {"pytest", "builds", "requires_git"}
 TOP_KEYS = {"schema", "name", "description", "profile", "tool_lock", "time", "assets",
             "compositions", "cases", "comparisons", "planted", "suites", "historical",
-            "host_checks", "fields_doc"}
+            "host_checks", "fields_doc", "client"}
+CLIENT_KEYS = {"name", "argv", "note"}          # top-level: the existing control client
+CASE_CLIENT_KEYS = {"composition", "commands", "note"}
 PROFILE_KEYS = {"env", "product_env", "adapter_flags", "forbidden_in_product", "trace", "emulator",
                 "limiter"}
 TRACE_KEYS = {"edges", "px", "bpp", "fmt", "native_order", "boundary"}
@@ -76,7 +79,8 @@ TIME_KEYS = {"rate_hz", "hop_samples", "convention", "coordinate", "elapsed_form
 ASSET_KEYS = {"kind", "path", "inventory", "fixture_id", "excerpt", "conversion", "sha256",
               "samples", "origin", "qualification", "segments", "note", "source_sha256"}
 CASE_KEYS = {"purpose", "pcm", "tail_hops", "partial_hop", "epoch", "capture", "commands",
-             "composition", "flash", "save_state", "stall_ms", "expect", "semantic", "trace_novelty"}
+             "composition", "flash", "save_state", "stall_ms", "expect", "semantic", "trace_novelty",
+             "client"}
 CAPTURE_KEYS = {"start_hop", "end_hop", "every"}
 COMMAND_KEYS = {"hop", "text", "expect"}
 FLASH_KEYS = {"from", "recovery"}
@@ -177,12 +181,29 @@ def load_scenario(path: Path) -> dict:
                 raise ScenarioError(f"{where}: command expect must be applied or rejected")
             if not isinstance(c["hop"], int) or c["hop"] < 0:
                 raise ScenarioError(f"{where}: command hop must be a non-negative hop boundary")
+        if "client" in case:
+            cl = case["client"]
+            _check_keys(cl, CASE_CLIENT_KEYS, f"{where}.client")
+            if "client" not in sc:
+                raise ScenarioError(f"{where}: client lines need the top-level client declaration")
+            if cl.get("composition") and cl["composition"] not in sc.get("compositions", {}):
+                raise ScenarioError(f"{where}.client: unknown composition {cl['composition']!r}")
+            if not cl.get("composition") and not cl.get("commands"):
+                raise ScenarioError(f"{where}.client: declares no client lines")
+            for c in cl.get("commands", []):
+                _check_keys(c, COMMAND_KEYS, f"{where}.client.commands")
+                if _command_name(c["text"]) not in SUPPORTED_COMMANDS:
+                    raise ScenarioError(f"{where}.client: unsupported command {c['text']!r}")
+                if c.get("expect", "applied") not in {"applied", "rejected"}:
+                    raise ScenarioError(f"{where}.client: command expect must be applied or rejected")
+                if not isinstance(c["hop"], int) or c["hop"] < 0:
+                    raise ScenarioError(f"{where}.client: command hop must be a non-negative hop boundary")
         fl = case.get("flash", {"from": "blank", "recovery": False})
         _check_keys(fl, FLASH_KEYS, f"{where}.flash")
         if fl["from"] != "blank" and fl["from"] not in sc["cases"]:
             raise ScenarioError(f"{where}.flash: unknown source case {fl['from']!r}")
-        if fl.get("recovery") and (case.get("commands") or case.get("composition")):
-            raise ScenarioError(f"{where}: a recovery run may not schedule commands or a composition")
+        if fl.get("recovery") and (case.get("commands") or case.get("composition") or case.get("client")):
+            raise ScenarioError(f"{where}: a recovery run may not schedule commands, client lines or a composition")
         if fl["from"] != "blank" and not sc["cases"][fl["from"]].get("save_state"):
             raise ScenarioError(f"{where}.flash: source case {fl['from']!r} does not save state")
         _check_keys(case.get("expect", {}), EXPECT_KEYS, f"{where}.expect")
@@ -193,6 +214,12 @@ def load_scenario(path: Path) -> dict:
         for key in ("a", "b", "before_case", "default_case"):
             if key in comp and comp[key] not in sc["cases"]:
                 raise ScenarioError(f"comparison {comp['id']}: unknown case {comp[key]!r}")
+    if "client" in sc:
+        _check_keys(sc["client"], CLIENT_KEYS, "client")
+        try:
+            emu_client.check_client_argv(sc["client"].get("argv"))
+        except emu_client.ClientSpecError as exc:
+            raise ScenarioError(f"client: {exc}") from None
     _check_keys(sc.get("host_checks", {}), HOST_CHECK_KEYS, "host_checks")
     for name, members in sc["suites"].items():
         for cid in members:
@@ -461,6 +488,33 @@ def case_commands(sc: dict, case: dict) -> list[dict]:
     return [cmds[i] for i in order]
 
 
+def case_client_lines(sc: dict, case: dict) -> list[dict]:
+    """Command lines the existing client delivers, each at its declared replay hop."""
+    cl = case.get("client") or {}
+    lines = []
+    if cl.get("composition"):
+        lines += [{"hop": 0, "text": t, "expect": "applied"} for t in sc["compositions"][cl["composition"]]["commands"]]
+    lines += [{"hop": c["hop"], "text": c["text"], "expect": c.get("expect", "applied")} for c in cl.get("commands", [])]
+    order = sorted(range(len(lines)), key=lambda i: (lines[i]["hop"], i))
+    return [lines[i] for i in order]
+
+
+def resolve_client(sc: dict) -> tuple[list[str] | None, dict]:
+    """The declared existing client, resolved on PATH. Never installed or fetched."""
+    spec = sc.get("client") or {}
+    argv = list(spec.get("argv") or [])
+    exe = shutil.which(argv[0]) if argv else None
+    rec = {"name": spec.get("name"), "declared_argv": argv, "executable": exe}
+    if exe is None:
+        return None, rec
+    try:
+        rec["version"] = subprocess.run([exe, "--version"], capture_output=True, text=True,
+                                        timeout=60).stdout.strip().splitlines()[-1:]
+    except (OSError, subprocess.SubprocessError) as exc:
+        rec["version_error"] = repr(exc)
+    return [exe, *argv[1:]], rec
+
+
 def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: dict,
              results: dict) -> dict:
     case = sc["cases"][cid]
@@ -491,20 +545,33 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
         rec.update(status="FAIL", reasons=[f"window needs {n_capture} frames; trace capacity is 2000"])
         return rec
     cmds = case_commands(sc, case)
-    for c in cmds:
+    client_lines = case_client_lines(sc, case)
+    client_argv = None
+    if client_lines:
+        client_argv, client_rec = resolve_client(sc)
+        rec["client_resolution"] = client_rec
+        if client_argv is None:
+            rec.update(status="DEFERRED_EXTERNAL",
+                       reasons=[f"declared client {client_rec['declared_argv'][:1]} is not on PATH (named dependency)"])
+            return rec
+    for c in cmds + client_lines:
         if c["hop"] >= total_hops:
             rec.update(status="FAIL", reasons=[f"command at hop {c['hop']} is beyond the {total_hops} declared hops"])
             return rec
+    blob_cmds = [(c["hop"], c["text"]) for c in cmds] + [(c["hop"], c["text"], emu_blob.CMD_CLIENT)
+                                                        for c in client_lines]
+    blob_cmds.sort(key=lambda e: e[0])
     ep = case.get("epoch", {"policy": "boot_monotonic"})
     flash_spec = case.get("flash", {"from": "blank", "recovery": False})
     run_id = uuid.uuid4().hex
     spec = emu_blob.BlobSpec(run_id=run_id, sample_rate=rate, hop_samples=hop, pcm=pcm,
                              pad_samples=tail_hops * hop, capture_start_hop=start, capture_end_hop=end,
                              capture_every=every, recovery=bool(flash_spec.get("recovery")),
-                             commands=[(c["hop"], c["text"]) for c in cmds],
+                             commands=blob_cmds,
                              stall_ms=case.get("stall_ms", 20000), epoch_policy=ep["policy"],
                              declared_epoch_us=ep.get("us", 0),
-                             novelty_trace=bool(case.get("trace_novelty")))
+                             novelty_trace=bool(case.get("trace_novelty")),
+                             client_transport=bool(client_lines))
     blob, payload_crc = emu_blob.build_blob(spec)
     boot = (build_dir / "bootloader.bin").read_bytes()
     parts = (build_dir / "partitions.bin").read_bytes()
@@ -538,37 +605,57 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
     elf = run_dir / "firmware.elf"
     shutil.copy(build_dir / "firmware.elf", elf)
     emu_cfg = sc["profile"]["emulator"]
-    argv = [str(emu), "--chip", emu_cfg["chip"], "--firmware", str(flash_path), "--elf", str(elf),
-            "--psram-size", emu_cfg["psram"], "--net", "user", "--console", "uart0",
-            "--batch-size", str(emu_cfg["batch_size"]), "--timeout", f"{emu_cfg['timeout_s']}s",
-            "--exit-on", "[RTRACE-END]"]
+    base = [str(emu), "--chip", emu_cfg["chip"], "--firmware", str(flash_path), "--elf", str(elf),
+            "--psram-size", emu_cfg["psram"], "--net", "user",
+            "--batch-size", str(emu_cfg["batch_size"]), "--timeout", f"{emu_cfg['timeout_s']}s"]
     if case.get("save_state"):
-        argv.append("--save-state")
+        base.append("--save-state")
     t0 = time.time()
-    with (run_dir / "uart.txt").open("w") as so, (run_dir / "emu-stderr.txt").open("w") as se:
-        try:
-            proc = subprocess.run(argv, stdout=so, stderr=se, timeout=emu_cfg["timeout_s"] + 60)
-            code = proc.returncode
-        except subprocess.TimeoutExpired:
-            code = -9
+    client_reasons: list[str] = []
+    if client_lines:
+        # Existing client -> run-owned pty -> product USBSerial; trace on UART1.
+        cres = emu_client.run_client_case(
+            emu_argv=base, client_argv=client_argv,
+            lines=[emu_client.ClientLine(c["hop"], c["text"], c["expect"]) for c in client_lines],
+            run_dir=run_dir, timeout_s=emu_cfg["timeout_s"] + 60)
+        code = cres.exit_code
+        argv = [str(emu), *cres.record["emulator_argv"]]
+        client_reasons = [f"client: {r}" for r in cres.reasons]
+        terminal = (run_dir / "client-terminal.txt").read_bytes()
+        rb_reasons, segments = emu_client.check_readback(terminal, cres.record["typed"])
+        client_reasons += [f"client readback: {r}" for r in rb_reasons]
+        rec["client"] = {**cres.record, "readback": segments}
+        # The emulator's own --exit-on follows the USB console, so the runner
+        # observes the terminal string on the UART1 trace and stops the child.
+        process = ec.Process(code, cres.terminal_observed)
+    else:
+        argv = [*base[:base.index("--batch-size")], "--console", "uart0", *base[base.index("--batch-size"):],
+                "--exit-on", "[RTRACE-END]"]
+        with (run_dir / "uart.txt").open("w") as so, (run_dir / "emu-stderr.txt").open("w") as se:
+            try:
+                proc = subprocess.run(argv, stdout=so, stderr=se, timeout=emu_cfg["timeout_s"] + 60)
+                code = proc.returncode
+            except subprocess.TimeoutExpired:
+                code = -9
+        stderr = (run_dir / "emu-stderr.txt").read_text(errors="replace")
+        process = ec.Process(code, "Exit-on string" in stderr)
     wall = round(time.time() - t0, 2)
     uart = (run_dir / "uart.txt").read_text(errors="replace")
-    stderr = (run_dir / "emu-stderr.txt").read_text(errors="replace")
-    process = ec.Process(code, "Exit-on string" in stderr)
     (run_dir / "exit_code.txt").write_text(f"{code}\n")
     expect = ec.Expect(
         run_id=run_id, payload_crc32=payload_crc, real_samples=real, pad_samples=tail_hops * hop,
         rate_hz=rate, hop_samples=hop, capture_start_hop=start, capture_end_hop=end, capture_every=every,
         recovery=bool(flash_spec.get("recovery")), commands=cmds,
         end_reason=case.get("expect", {}).get("end_reason", "eof"), saves=case.get("expect", {}).get("saves"),
-        epoch_policy=ep["policy"], declared_epoch_us=ep.get("us"))
+        epoch_policy=ep["policy"], declared_epoch_us=ep.get("us"),
+        client_commands=client_lines, client_transport=bool(client_lines))
     decode_error = None
     cap_obj = None
     try:
         cap_obj = ec.decode(uart)
     except ec.CaptureError as exc:
         decode_error = str(exc)
-    reasons = ec.accept(cap_obj, expect, process, decode_error)
+    reasons = ec.accept(cap_obj, expect, process, decode_error) + client_reasons
     status = "PASS" if not reasons else "FAIL"
     flash_after = None
     if case.get("save_state"):
@@ -580,7 +667,8 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
         "exit_on_found": process.exit_on_found, "wall_seconds": wall, "executed": executed,
         "requested": {"real_samples": real, "tail_hops": tail_hops, "total_hops": total_hops,
                       "capture": {"start_hop": start, "end_hop": end, "every": every, "frames": n_capture},
-                      "epoch": ep, "commands": cmds, "flash": flash_spec, "stall_ms": spec.stall_ms},
+                      "epoch": ep, "commands": cmds, "client_commands": client_lines,
+                      "flash": flash_spec, "stall_ms": spec.stall_ms},
         "flash_after": flash_after,
     })
     if cap_obj is not None:
@@ -593,6 +681,19 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
             "nonzero_frames": {"A": sum(1 for f in cap_obj.frames if any(f.A)),
                                "B": sum(1 for f in cap_obj.frames if any(f.B))},
         }
+        if client_lines:
+            # Original text, parser outcome, and the generation the applied state
+            # first reaches (a line applied before hop h affects generation h+1).
+            hstates = [s for s in cap_obj.show_states if s.get("when") == "hcmd"]
+            rec["observed"]["client_commands"] = [
+                {"hop": int(h.get("hop", -1)), "text": h.get("text"),
+                 "rejected": (r or {}).get("rejected") == "1",
+                 "first_effect_generation": int(h.get("hop", -1)) + 1,
+                 "show_state_hex": (s or {}).get("hex")}
+                for h, r, s in zip(cap_obj.host_commands,
+                                   cap_obj.host_results + [None] * len(cap_obj.host_commands),
+                                   hstates + [None] * len(cap_obj.host_commands))]
+            rec["observed"]["client_gates"] = cap_obj.client_gates
     rec["_capture"] = cap_obj
     rec["_uart"] = uart
     rec["_expect"] = expect
@@ -684,7 +785,7 @@ def requested_fields_mismatch(commands: list[dict], state: dict) -> list[str]:
 
 def last_state_before_save(cap: ec.Capture) -> str | None:
     """Applied show state (shown readback) immediately before the save command."""
-    save_hop = next((int(c["hop"]) for c in cap.commands if c["text"] == "save_show"), None)
+    save_hop = next((int(c["hop"]) for c in cap.commands + cap.host_commands if c["text"] == "save_show"), None)
     best = None
     for st in cap.show_states:
         if st["when"] == "shown" and save_hop is not None and int(st["gen"]) <= save_hop:
@@ -846,8 +947,9 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
                 fields.append("enable_secondary")
         saves_ok = any(s.get("kind") == "show" and s.get("ok") == "1" for s in save.saves)
         changed_fs = results[comp["before_case"]]["executed"].get("littlefs_changed")
-        cmds = len(cb.commands)
-        requested = [c for c in results[comp["before_case"]]["requested"]["commands"] if c["hop"] == 0]
+        cmds = len(cb.commands) + len(cb.host_commands)
+        req = results[comp["before_case"]]["requested"]
+        requested = [c for c in req["commands"] + req.get("client_commands", []) if c["hop"] == 0]
         not_applied = requested_fields_mismatch(requested, _decode_show_state(saved)) if saved else ["no state"]
         ok = (bool(saved) and saved == recovered and saves_ok and changed_fs and cmds == 0 and not cb.saves
               and not not_applied)
@@ -1235,12 +1337,20 @@ def criteria_matrix(sc, results, comparisons, planted, product, hosts, emu_build
                  "evidence": ("no learned-model runtime in the product ELF (no tflite/tensorflow/interpreter/esp_nn/"
                               "MicroInterpreter symbols); model inference is not active on k1_main_rpl_im69d") if not model_syms
                              else f"model-like symbols present: {model_syms[:5]}"})
-    rows.append({"id": "SW13", "status": "NOT_RUN", "optional": True,
-                 "evidence": ("optional host-client chain not implemented in R3. Verified prerequisite: the product's own "
-                              "USBSerial (HWCDC, ARDUINO_USB_MODE=1) runs on esp-emu --console usb-jtag. Missing: a local "
-                              "pty adapter from emulator stdin/stdout (EP1) to a serial path, UART0 via --uart-tcp for the "
-                              "fixture trace, and an existing typed-command client pointed at it. Scheduled production-parser "
-                              "execution (mandatory) is delivered.")})
+    client_runs = [r for r in results.values() if r.get("requested", {}).get("client_commands")
+                   or r.get("client_resolution")]
+    if by_crit.get("SW13") or client_runs:
+        deferred = [r["case"] for r in client_runs if r.get("status") == "DEFERRED_EXTERNAL"]
+        client_ok = bool(client_runs) and all(r.get("status") == "PASS" for r in client_runs)
+        from_comps("SW13", by_crit.get("SW13", []), client_ok and not deferred,
+                   note=(f"local client chain (existing client -> run-owned pty -> esp-emu USB-Serial/JTAG -> "
+                         f"production parser), not physical USB; client cases "
+                         f"{[(r['case'], r.get('status')) for r in client_runs]}"))
+        if deferred and all(r.get("status") == "DEFERRED_EXTERNAL" for r in client_runs):
+            rows[-1]["status"] = "DEFERRED_EXTERNAL"
+    else:
+        rows.append({"id": "SW13", "status": "NOT_RUN", "optional": True,
+                     "evidence": "no client-transport case in this suite"})
     rows.append({"id": "EX01", "status": "DEFERRED_EXTERNAL",
                  "evidence": "physical parity, device/optical/AV/leave-state evidence: shelved by the Captain's R3 instruction; no hardware accessed"})
     rows.append({"id": "EX02", "status": "DEFERRED_EXTERNAL",

@@ -21,6 +21,9 @@ FLAG_RECOVERY = 1 << 0
 FLAG_BOOT_EPOCH = 1 << 1
 FLAG_DECLARED_EPOCH = 1 << 2
 FLAG_NOVELTY_TRACE = 1 << 3
+FLAG_CLIENT_TRANSPORT = 1 << 4   # product USBSerial carries a client; trace on UART1
+CMD_SCHEDULED = 0                # the fixture runs the text through parse_command
+CMD_CLIENT = 1                   # a client sends the text; the fixture holds the hop for it
 EPOCH_POLICIES = ("zero", "boot_monotonic", "declared")
 
 FLASH_SIZE = 16 * 1024 * 1024
@@ -45,11 +48,12 @@ class BlobSpec:
     capture_end_hop: int
     capture_every: int
     recovery: bool
-    commands: list[tuple[int, str]]
+    commands: list[tuple[int, str]]    # scheduled: (hop, text); a client line: (hop, text, CMD_CLIENT)
     stall_ms: int
     epoch_policy: str = "boot_monotonic"
     declared_epoch_us: int = 0
     novelty_trace: bool = False
+    client_transport: bool = False
 
 
 def _epoch_flag(spec: BlobSpec) -> int:
@@ -72,11 +76,17 @@ def build_blob(spec: BlobSpec) -> tuple[bytes, int]:
     hops_real = -(-real_samples // spec.hop_samples)
     pcm_padded = spec.pcm + b"\0" * (hops_real * spec.hop_samples * 2 - len(spec.pcm))
     cmd_blob = bytearray()
-    for hop, text in spec.commands:
+    for entry in spec.commands:
+        hop, text = entry[0], entry[1]
+        kind = entry[2] if len(entry) > 2 else CMD_SCHEDULED
+        if kind not in (CMD_SCHEDULED, CMD_CLIENT):
+            raise ValueError(f"unknown command kind {kind!r}")
+        if kind == CMD_CLIENT and not spec.client_transport:
+            raise ValueError("client command lines need the client transport")
         raw = text.encode("ascii")
         if len(raw) >= COMMAND_TEXT:
             raise ValueError(f"command text too long: {text!r}")
-        cmd_blob += struct.pack("<II", hop, 0) + raw + b"\0" * (COMMAND_TEXT - len(raw))
+        cmd_blob += struct.pack("<II", hop, kind) + raw + b"\0" * (COMMAND_TEXT - len(raw))
     command_offset = HEADER_BYTES
     pcm_offset = command_offset + len(cmd_blob)
     pcm_offset += (-pcm_offset) % 4
@@ -91,7 +101,8 @@ def build_blob(spec: BlobSpec) -> tuple[bytes, int]:
         spec.sample_rate, spec.hop_samples, real_samples, spec.pad_samples,
         spec.capture_start_hop, spec.capture_end_hop, spec.capture_every,
         (FLAG_RECOVERY if spec.recovery else 0) | _epoch_flag(spec)
-        | (FLAG_NOVELTY_TRACE if spec.novelty_trace else 0),
+        | (FLAG_NOVELTY_TRACE if spec.novelty_trace else 0)
+        | (FLAG_CLIENT_TRANSPORT if spec.client_transport else 0),
         len(spec.commands), command_offset,
         pcm_offset, spec.stall_ms, blob_bytes, payload_crc, spec.declared_epoch_us, b"\0" * 124,
     )

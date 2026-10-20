@@ -146,6 +146,12 @@ class Capture:
     end_marker_count: int
     computed_crc32: int
     panics: list[str] = field(default_factory=list)
+    # Client transport: lines the production receive loop parsed from USBSerial.
+    host_commands: list[dict[str, str]] = field(default_factory=list)
+    host_results: list[dict[str, str]] = field(default_factory=list)
+    client_gates: list[dict[str, str]] = field(default_factory=list)
+    client_gate_dones: list[dict[str, str]] = field(default_factory=list)
+    client_ready: list[dict[str, str]] = field(default_factory=list)
 
 
 def decode(uart: str) -> Capture:
@@ -156,6 +162,7 @@ def decode(uart: str) -> Capture:
     frames: list[Frame] = []
     sidecars: dict[int, Sidecar] = {}
     armed, ends, commands, results, states, saves, limits, epochs = [], [], [], [], [], [], [], []
+    host_commands, host_results, gates, gate_dones, ready = [], [], [], [], []
     rejects: list[str] = []
     panics: list[str] = []
     seen_frames: set[int] = set()
@@ -225,6 +232,19 @@ def decode(uart: str) -> Capture:
             entry = parse_fields(head, "EMU_CMD")
             entry["text"] = text
             commands.append(entry)
+        elif line.startswith("EMU_HCMD_DONE "):
+            host_results.append(parse_fields(line[len("EMU_HCMD_DONE "):], "EMU_HCMD_DONE"))
+        elif line.startswith("EMU_HCMD "):
+            head, _, text = line[len("EMU_HCMD "):].partition(" text=")
+            entry = parse_fields(head, "EMU_HCMD")
+            entry["text"] = text
+            host_commands.append(entry)
+        elif line.startswith("EMU_CLIENT_GATE_DONE "):
+            gate_dones.append(parse_fields(line[len("EMU_CLIENT_GATE_DONE "):], "EMU_CLIENT_GATE_DONE"))
+        elif line.startswith("EMU_CLIENT_GATE "):
+            gates.append(parse_fields(line[len("EMU_CLIENT_GATE "):], "EMU_CLIENT_GATE"))
+        elif line.startswith("EMU_CLIENT_READY "):
+            ready.append(parse_fields(line[len("EMU_CLIENT_READY "):], "EMU_CLIENT_READY"))
         elif line.startswith("EMU_SS "):
             states.append(parse_fields(line[len("EMU_SS "):], "EMU_SS"))
         elif line.startswith("EMU_SAVE "):
@@ -246,7 +266,8 @@ def decode(uart: str) -> Capture:
         commands=commands, command_results=results, show_states=states, saves=saves,
         rejects=rejects, power_limits=limits, epochs=epochs, meanings=meanings, novelty=novelty, render_state=render_state, begin_count=len(begins),
         end_marker_count=uart.count("[RTRACE-END]"), computed_crc32=crc & 0xFFFFFFFF,
-        panics=panics,
+        panics=panics, host_commands=host_commands, host_results=host_results,
+        client_gates=gates, client_gate_dones=gate_dones, client_ready=ready,
     )
 
 
@@ -268,6 +289,10 @@ class Expect:
     saves: int | None = None     # exact EMU_SAVE count when declared
     epoch_policy: str = "boot_monotonic"
     declared_epoch_us: int | None = None
+    # Client transport: command lines an external client delivers through the
+    # product's USBSerial, each applied at its declared replay hop.
+    client_commands: list[dict] = field(default_factory=list)
+    client_transport: bool = False
 
     @property
     def total_hops(self) -> int:
@@ -405,6 +430,8 @@ def accept(cap: Capture | None, expect: Expect, process: Process, decode_error: 
             "every": str(expect.capture_every), "recovery": "1" if expect.recovery else "0",
             "commands": str(len(expect.commands)), "payload_crc32": f"{expect.payload_crc32:08x}",
             "clock": "hop_end_us", "mode": "lockstep", "epoch": expect.epoch_policy,
+            "client_commands": str(len(expect.client_commands)),
+            "transport": "client" if expect.client_transport else "scheduled",
         }
         for key, want in checks.items():
             if a.get(key) != want:
@@ -425,7 +452,9 @@ def accept(cap: Capture | None, expect: Expect, process: Process, decode_error: 
             "staged_hops": str(n), "total_hops": str(n), "published": str(n),
             "last_generation": str(n), "consumed": str(n), "shown": str(n), "last_shown": str(n),
             "captured": str(len(hops)), "commands": str(len(expect.commands)),
-            "rejects": str(sum(1 for c in expect.commands if c.get("expect") == "rejected")),
+            "host_commands": str(len(expect.client_commands)),
+            "rejects": str(sum(1 for c in expect.commands + expect.client_commands
+                               if c.get("expect") == "rejected")),
             "unstaged_admits": "0", "publications_without_hop": "0",
         }
         if expect.end_reason != "eof":
@@ -451,8 +480,34 @@ def accept(cap: Capture | None, expect: Expect, process: Process, decode_error: 
             rejected = res.get("rejected") == "1"
             if rejected != (req.get("expect") == "rejected"):
                 reasons.append(f"command {req['text']!r} rejected={rejected}, expected {req.get('expect', 'applied')}")
-    if expect.recovery and (cap.commands or cap.saves):
-        reasons.append(f"recovery run issued commands={len(cap.commands)} saves={len(cap.saves)}")
+    # Client-delivered command lines: parsed by the production receive loop at
+    # the declared hop, in order, with the declared outcome, each behind a gate.
+    got_host = [(int(c.get("hop", -1)), c.get("text", "")) for c in cap.host_commands]
+    want_host = [(int(c["hop"]), c["text"]) for c in expect.client_commands]
+    if got_host != want_host:
+        reasons.append(f"client commands parsed {got_host[:4]} != declared {want_host[:4]}")
+    elif len(cap.host_results) != len(expect.client_commands):
+        reasons.append("a client command has no EMU_HCMD_DONE result")
+    else:
+        for res, req in zip(cap.host_results, expect.client_commands):
+            rejected = res.get("rejected") == "1"
+            if rejected != (req.get("expect") == "rejected"):
+                reasons.append(f"client command {req['text']!r} rejected={rejected}, "
+                               f"expected {req.get('expect', 'applied')}")
+    want_gates: dict[int, int] = {}
+    for c in expect.client_commands:
+        want_gates[int(c["hop"])] = want_gates.get(int(c["hop"]), 0) + 1
+    got_gates = {int(g.get("hop", -1)): int(g.get("expect", -1)) for g in cap.client_gates}
+    got_done = {int(g.get("hop", -1)): int(g.get("received", -1)) for g in cap.client_gate_dones}
+    if len(cap.client_gates) != len(want_gates) or got_gates != want_gates:
+        reasons.append(f"client gates {got_gates} != declared {want_gates}")
+    elif got_done != want_gates:
+        reasons.append(f"client gates completed {got_done} != declared {want_gates}")
+    if expect.client_transport and len(cap.client_ready) != 1:
+        reasons.append(f"EMU_CLIENT_READY count {len(cap.client_ready)} != 1 on a client-transport run")
+    if expect.recovery and (cap.commands or cap.saves or cap.host_commands):
+        reasons.append(f"recovery run issued commands={len(cap.commands)} client_commands={len(cap.host_commands)} "
+                       f"saves={len(cap.saves)}")
     return reasons
 
 

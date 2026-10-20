@@ -143,6 +143,11 @@
       ]
     }
   },
+  "client": {
+    "name": "pio device monitor",
+    "argv": ["pio", "device", "monitor", "--baud", "115200", "--eol", "LF", "--raw"],
+    "note": "The existing local control client documented for typed ':' command lines (AGENTS.md 'pio device monitor' serial monitor with command input). No dedicated scripted typed-command client exists in the repository. The runner adds --project-dir <run-owned empty dir> and --port <run-owned pty> (product envs declare monitor_port as a physical device, so no project environment is ever loaded) and types each declared line at its keyboard after the fixture's EMU_CLIENT_GATE."
+  },
   "cases": {
     "smoke-a": {
       "purpose": "Corrected normal-profile smoke replay: compiled defaults, normal startup animation and fade, declared epoch 1.0 s (the product's own fade gate), 128 real hops, no tail.",
@@ -292,6 +297,91 @@
       },
       "flash": {
         "from": "comp-save",
+        "recovery": true
+      },
+      "expect": {
+        "saves": 0
+      }
+    },
+    "client-a": {
+      "purpose": "ctl-a delivered by the existing client through the product's USBSerial and production receive loop: photons=0.25 applied before hop 40.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "client": {
+        "commands": [
+          {
+            "hop": 40,
+            "text": "photons=0.25"
+          }
+        ]
+      }
+    },
+    "client-b": {
+      "purpose": "ctl-b delivered by the existing client: secondary_photons=0.15 applied before hop 40.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "client": {
+        "commands": [
+          {
+            "hop": 40,
+            "text": "secondary_photons=0.15"
+          }
+        ]
+      }
+    },
+    "client-reject": {
+      "purpose": "reject delivered by the existing client: photons=not-a-number before hop 30 is rejected by the production parser, the client sees the rejection and neither output changes.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "client": {
+        "commands": [
+          {
+            "hop": 30,
+            "text": "photons=not-a-number",
+            "expect": "rejected"
+          }
+        ]
+      }
+    },
+    "client-comp-save": {
+      "purpose": "comp-save delivered by the existing client: the studio_ab composition before hop 0, then save_show before hop 64, into run-owned emulator flash.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "client": {
+        "composition": "studio_ab",
+        "commands": [
+          {
+            "hop": 64,
+            "text": "save_show"
+          }
+        ]
+      },
+      "save_state": true,
+      "expect": {
+        "saves": 2
+      }
+    },
+    "client-comp-recover": {
+      "purpose": "Fresh process from client-comp-save's LittleFS: recovery issues no command (scheduled or client), reapplication or save.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "flash": {
+        "from": "client-comp-save",
         "recovery": true
       },
       "expect": {
@@ -523,6 +613,67 @@
       "a": "startup-sqr",
       "criterion": "SW09",
       "label": "meaning continuity across startup, zero section and return"
+    },
+    {
+      "id": "client-a-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-a",
+      "b": "client-a",
+      "criterion": "SW13",
+      "label": "client-delivered A change == the same change scheduled at the same hop"
+    },
+    {
+      "id": "client-iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-a",
+      "edge": "A",
+      "from_hop": 40,
+      "criterion": "SW13",
+      "label": "client A-only intervention changes only edge A from hop 40 (nonbinding limit)"
+    },
+    {
+      "id": "client-b-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-b",
+      "b": "client-b",
+      "criterion": "SW13",
+      "label": "client-delivered B change == the same change scheduled at the same hop"
+    },
+    {
+      "id": "client-iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-b",
+      "edge": "B",
+      "from_hop": 40,
+      "criterion": "SW13",
+      "label": "client B-only intervention changes only edge B from hop 40 (nonbinding limit)"
+    },
+    {
+      "id": "client-reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "client-reject",
+      "criterion": "SW13",
+      "label": "client-delivered rejected input leaves both outputs unchanged"
+    },
+    {
+      "id": "client-recovery-state",
+      "kind": "recovery_state",
+      "before_case": "client-comp-save",
+      "a": "client-comp-save",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "client-applied composition: every serialized K1ShowState field recovered with zero commands"
+    },
+    {
+      "id": "client-recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "recovered client-applied composition output == equivalent reference"
     }
   ],
   "planted": {
@@ -546,7 +697,23 @@
       "cfg-recover",
       "music-a",
       "music-b",
-      "startup-sqr"
+      "startup-sqr",
+      "client-a",
+      "client-b",
+      "client-reject",
+      "client-comp-save",
+      "client-comp-recover"
+    ],
+    "client": [
+      "smoke-a",
+      "ctl-a",
+      "ctl-b",
+      "comp-ref",
+      "client-a",
+      "client-b",
+      "client-reject",
+      "client-comp-save",
+      "client-comp-recover"
     ]
   },
   "historical": [
