@@ -79,9 +79,10 @@ static inline float k1_alpha_from_tau_s(float dt_s, float tau_s) {
 
 static inline float k1_agc_measure_dt_s(int64_t *last_us) {
 #ifdef K1_EMU_FIXTURE
-  // Admitted-sample time. A command print sits inside the same hop and must
-  // not stretch the follower or the GDFT gain for that hop.
-  const int64_t now = (int64_t)k1_emu_fixture_time_ms() * 1000;
+  // Processed-sample application time (hop end, microseconds). A command
+  // print sits inside the same hop and must not stretch the follower or the
+  // GDFT gain for that hop.
+  const int64_t now = (int64_t)k1_emu_fixture_app_us();
 #else
   const int64_t now = esp_timer_get_time();
 #endif

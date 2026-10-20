@@ -19,6 +19,9 @@
 #endif
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h" // rtrace_* LED-level capture (colour-fix-lane env only)
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"
+#endif
 #endif
 #ifdef K1_SCHEDULING_TRACE_V1
 #include "k1_scheduling_trace_telemetry.h"
@@ -1338,6 +1341,20 @@ inline void show_leds() {
                                     (const uint8_t*)ws2816_wire_secondary,
                                     CONFIG.LED_COUNT,
                                     (uint8_t)CONFIG.LIGHTSHOW_MODE);
+#elif defined(K1_EMU_FIXTURE)
+    // Emulator replay of the normal path: both packed edges, after the
+    // secondary pack in show_secondary_leds() and the primary pack above,
+    // before submission. The secondary buffer is the one submitted even when
+    // ENABLE_SECONDARY_LEDS is off, so retain it as held.
+    if (ws2816_wire_secondary != nullptr) {
+      k1_render_trace_on_frame16_dual((const uint8_t*)ws2816_wire,
+                                      (const uint8_t*)ws2816_wire_secondary,
+                                      CONFIG.LED_COUNT,
+                                      (uint8_t)CONFIG.LIGHTSHOW_MODE);
+    } else {
+      k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
+                                 (uint8_t)CONFIG.LIGHTSHOW_MODE);
+    }
 #else
     k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
                                (uint8_t)CONFIG.LIGHTSHOW_MODE);
@@ -1363,6 +1380,8 @@ inline void show_leds() {
 #else
 #ifdef K1_EMU_SKIP_EMIT
     // Packed bytes are already retained. esp-emu does not complete RMT shows.
+    // Record the scale an installed FastLED power limit would apply here.
+    k1_emu_fixture_note_submission();
 #else
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
@@ -2054,7 +2073,11 @@ inline void intro_animation() {
   for (uint16_t frame = 0; frame < frame_count; frame++) {
     vp_intro_render_frame(frame, frame_count);
     show_leds();
+#ifdef K1_EMU_SKIP_EMIT
+    delay(2);  // FastLED.delay() would submit again; submission is suppressed.
+#else
     FastLED.delay(2);
+#endif
   }
 
   clear_intro_led_buffers();

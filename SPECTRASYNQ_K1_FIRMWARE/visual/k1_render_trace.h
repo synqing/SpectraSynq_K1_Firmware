@@ -22,7 +22,8 @@
 //  B489 dual extension: edges=2, F,index,millis,primary_mode,RGB16,RGB16;
 //  CRC covers both padded 160-pixel GRB16 edge slots in emitted frame order.
 //  Legacy single-edge marker/CRC stride and capacity 3000 remain unchanged.
-//  B489 dual capacity is 2000.
+//  B489 dual capacity is 2000. The emulator fixture (K1_EMU_FIXTURE) uses the
+//  same dual layout, capacity and drain task for the normal Main RPL path.
 //  B489 dump returns immediately and drains on a diagnostic task. Stop serial
 //  diagnostic streams before requesting it and send no commands until END;
 //  music processing/rendering continue. Arm is rejected while drain is busy.
@@ -34,13 +35,20 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// Dual-edge storage: the B489 measurement image, and the emulator replay of
+// the normal Main RPL path (K1_EMU_FIXTURE). Every other env keeps the legacy
+// single-edge layout and capacity.
+#if defined(K1_B489_WS2816_V1) || defined(K1_EMU_FIXTURE)
+#define K1_RTRACE_DUAL 1
+#endif
+
 void k1_render_trace_on_frame(const uint8_t* rgb_bytes, uint16_t led_count,
                               uint8_t lightshow_mode);
 
 void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
                                 uint8_t lightshow_mode);
 
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
 // Score qualification tap: capture the two registered logical-edge buffers in
 // the same frame. A primary-only dump cannot prove secondary coherence or the
 // four physical DIN submissions driven from these two 960-byte buffers.

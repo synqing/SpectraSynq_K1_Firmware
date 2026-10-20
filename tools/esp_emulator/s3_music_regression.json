@@ -1,0 +1,580 @@
+{
+  "schema": "k1-emu-scenario/2",
+  "name": "s3-music-regression",
+  "description": "R3 maintained scenario for the K1 Main RPL emulator replay. Every case feeds identified PCM through the production acquisition/DSP/publication/render/pack path of k1_main_rpl_im69d and captures both logical channels (A primary, B secondary) before submission. README.md documents every field.",
+  "profile": {
+    "env": "k1_main_rpl_emu",
+    "product_env": "k1_main_rpl_im69d",
+    "adapter_flags": [
+      "K1_RENDER_TRACE_V1",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0"
+    ],
+    "forbidden_in_product": [
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_RENDER_TRACE_V1",
+      "K1_B489_WS2816_V1"
+    ],
+    "trace": {
+      "edges": [
+        "A",
+        "B"
+      ],
+      "px": 160,
+      "bpp": 16,
+      "fmt": "rgb16hex",
+      "native_order": "per logical pixel G16BE R16BE B16BE (Lever-2 ws2816_pack_pixel); the rgb16hex dump is R16 G16 B16, a lossless reorder",
+      "boundary": "ws2816_wire and ws2816_wire_secondary after show_secondary_leds() and the primary Lever-2 pack, before FastLED.show() (submission suppressed by K1_EMU_SKIP_EMIT)"
+    },
+    "limiter": "Main RPL Lever-2 packs each edge with budget_proxy = n*3*65535 (identity) and init_leds() returns before FastLED.setMaxPowerInVoltsAndMilliamps(), so the compiled 2500 mA default installs no limit. The production max_current_ma command installs FastLED's shared power limit; the fixture records the scale FastLED would apply at submission per captured frame (limit_scale, power_mw).",
+    "emulator": {
+      "chip": "esp32s3",
+      "psram": "8M",
+      "batch_size": 2000000,
+      "timeout_s": 600
+    }
+  },
+  "tool_lock": "tool-lock.json",
+  "time": {
+    "rate_hz": 12800,
+    "hop_samples": 96,
+    "convention": "hop_end",
+    "coordinate": "replay sample index; a command at hop h applies at sample h*96, before hop h is processed",
+    "elapsed_formula": "app_us = epoch_us + processed_samples * 1000000 / 12800 (64-bit); one full hop = 7500 us"
+  },
+  "assets": {
+    "smoke": {
+      "kind": "c_array_inc",
+      "path": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+      "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4",
+      "samples": 12288,
+      "qualification": "synthetic_diagnostic",
+      "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage."
+    },
+    "loreen_src": {
+      "kind": "inventory_excerpt",
+      "inventory": "scripts/regression-harness/fixtures/k1_av_regression_fixtures.template.json",
+      "fixture_id": "loreen_127",
+      "source_sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+      "excerpt": {
+        "start_ms": 56000,
+        "duration_ms": 99000
+      },
+      "conversion": {
+        "tool": "ffmpeg",
+        "rate_hz": 12800,
+        "channels": 1,
+        "downmix": "ffmpeg -ac 1 (mean of L/R)",
+        "resampler": "ffmpeg default (swr)",
+        "gain": {
+          "peak": 4096,
+          "rule": "one uniform gain so the excerpt peak is 4096 (-18 dBFS), the level of the smoke diagnostic and of loud playback on the device microphone"
+        }
+      },
+      "qualification": "real_music",
+      "origin": "Inventory fixture loreen_127 (status active, required, known_real_music, expected 127 BPM): Loreen, My Heart Is Refusing Me. Private local file; never published. Original-file coordinates = excerpt.start_ms + offset.",
+      "note": "Excerpt chosen from the per-second loudness profile: 56-60 s build, 60-75 s sustained chorus, 137-148 s breakdown, 149-155 s return."
+    },
+    "music_chorus": {
+      "kind": "concat",
+      "qualification": "real_music",
+      "segments": [
+        {
+          "asset": "loreen_src",
+          "from_ms": 0,
+          "to_ms": 22000,
+          "label": "original 56.0-78.0 s: build into sustained chorus"
+        }
+      ],
+      "origin": "Real music passage: 22.000 s = 281600 samples = 2933.33 hops (final partial hop zero-padded and labelled)."
+    },
+    "startup_quiet_return": {
+      "kind": "concat",
+      "qualification": "diagnostic_composite",
+      "segments": [
+        {
+          "asset": "loreen_src",
+          "from_ms": 74000,
+          "to_ms": 81000,
+          "label": "active: original 130.0-137.0 s"
+        },
+        {
+          "zeros_ms": 3000,
+          "label": "declared diagnostic zero section (not natural musical quiet)"
+        },
+        {
+          "asset": "loreen_src",
+          "from_ms": 93000,
+          "to_ms": 99000,
+          "label": "return: original 149.0-155.0 s"
+        }
+      ],
+      "origin": "Diagnostic composite of real music around a declared zero section: 16.000 s = 2133.33 hops (final partial hop zero-padded and labelled)."
+    }
+  },
+  "compositions": {
+    "studio_ab": {
+      "note": "Deliberately different supported A/B composition: A WAVEFORM_HYBRID_K1 (32) palette 12, B SPECTRUM_RIVER (14) palette 27, distinct per-edge photons and chroma, secondary enabled, EdgeMixer analogous 0.6 / 30 deg. Every field is part of the K1ShowState V1 record.",
+      "commands": [
+        "set_mode=32",
+        "secondary_mode=14",
+        "palette_index=12",
+        "secondary_palette_index=27",
+        "photons=0.70",
+        "secondary_photons=0.55",
+        "chroma=0.35",
+        "secondary_chroma=0.80",
+        "secondary_enabled=true",
+        "edge_enabled=true",
+        "edge_mode=analogous",
+        "edge_strength=0.60",
+        "edge_spread=30"
+      ]
+    },
+    "primary_only": {
+      "note": "Primary CONFIG fields only; used to produce a flash with a saved CONFIG and no show-state file (missing-show fallback).",
+      "commands": [
+        "set_mode=32",
+        "photons=0.70",
+        "chroma=0.35"
+      ]
+    }
+  },
+  "cases": {
+    "smoke-a": {
+      "purpose": "Corrected normal-profile smoke replay: compiled defaults, normal startup animation and fade, declared epoch 1.0 s (the product's own fade gate), 128 real hops, no tail.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      }
+    },
+    "smoke-b": {
+      "purpose": "Fresh repeat of smoke-a in a new process.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      }
+    },
+    "time-zero-tail": {
+      "purpose": "Zero epoch: first real hop is processed sample 96 at 7500 us. Declared 8-hop zero tail advances processed time while admitted stays 12288.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "zero"
+      },
+      "tail_hops": 8
+    },
+    "stall-probe": {
+      "purpose": "Progress deadline: a 1 ms real-time show deadline must end the run as a reported stall with positions and the partial capture.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "stall_ms": 1,
+      "expect": {
+        "end_reason": "stall"
+      }
+    },
+    "ctl-a": {
+      "purpose": "A-only brightness: production photons=0.25 at hop 40.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "commands": [
+        {
+          "hop": 40,
+          "text": "photons=0.25"
+        }
+      ]
+    },
+    "ctl-b": {
+      "purpose": "B-only brightness: production secondary_photons=0.15 at hop 40.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "commands": [
+        {
+          "hop": 40,
+          "text": "secondary_photons=0.15"
+        }
+      ]
+    },
+    "reject": {
+      "purpose": "Known rejected input: photons=not-a-number at hop 30 must be rejected by the production parser and leave both outputs unchanged.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "commands": [
+        {
+          "hop": 30,
+          "text": "photons=not-a-number",
+          "expect": "rejected"
+        }
+      ]
+    },
+    "limit-base": {
+      "purpose": "Binding limiter: the production max_current_ma=300 command installs FastLED's shared power limit (5 V x 300 mA).",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "commands": [
+        {
+          "hop": 0,
+          "text": "max_current_ma=300"
+        }
+      ]
+    },
+    "limit-a": {
+      "purpose": "Binding limiter plus A-only photons=0.25 at hop 40.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "commands": [
+        {
+          "hop": 0,
+          "text": "max_current_ma=300"
+        },
+        {
+          "hop": 40,
+          "text": "photons=0.25"
+        }
+      ]
+    },
+    "comp-save": {
+      "purpose": "Apply the studio_ab composition through the production parser at hop 0, confirm it applied, then save_show at hop 64 into run-owned emulator flash.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "composition": "studio_ab",
+      "commands": [
+        {
+          "hop": 64,
+          "text": "save_show"
+        }
+      ],
+      "save_state": true,
+      "expect": {
+        "saves": 2
+      }
+    },
+    "comp-ref": {
+      "purpose": "Equivalent reference: the same composition applied before the first hop, same PCM, startup and epoch, no save.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "composition": "studio_ab"
+    },
+    "comp-recover": {
+      "purpose": "Fresh process from comp-save's LittleFS: recovery mode issues no command, reapplication or save.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "flash": {
+        "from": "comp-save",
+        "recovery": true
+      },
+      "expect": {
+        "saves": 0
+      }
+    },
+    "cfg-save": {
+      "purpose": "Primary-only commands at hop 0; the product's delayed CONFIG save fires 5 s later (declared 600-hop zero tail). No show-state file is written.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "composition": "primary_only",
+      "tail_hops": 600,
+      "capture": {
+        "start_hop": 0,
+        "end_hop": 128,
+        "every": 1
+      },
+      "save_state": true,
+      "expect": {
+        "saves": 1
+      }
+    },
+    "cfg-recover": {
+      "purpose": "Missing show-state fallback: boot from a flash with a saved CONFIG and no SHOW_STATE_V1.BIN.",
+      "pcm": "smoke",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "flash": {
+        "from": "cfg-save",
+        "recovery": true
+      },
+      "expect": {
+        "saves": 0
+      }
+    },
+    "music-a": {
+      "purpose": "Real-music passage through the default composition (A BLOOM 3, B WAVEFORM_TEMPO 18) with normal startup. Warm-up comes from the estimator: the tempo novelty window is 512 samples at 50 Hz = 10.24 s (k1_tempo.cpp:45) and lock needs confidence >= 0.60 plus two observed beats (k1_tempo.cpp:282), so hops 0-1599 (12.0 s) are uncaptured preroll and hops 1600-2933 (10.0 s) are scored.",
+      "pcm": "music_chorus",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "capture": {
+        "start_hop": 1600,
+        "end_hop": 2934,
+        "every": 1
+      },
+      "partial_hop": "zero_pad",
+      "trace_novelty": true
+    },
+    "music-b": {
+      "purpose": "Fresh repeat of music-a.",
+      "pcm": "music_chorus",
+      "epoch": {
+        "policy": "declared",
+        "us": 1000000
+      },
+      "capture": {
+        "start_hop": 1600,
+        "end_hop": 2934,
+        "every": 1
+      },
+      "partial_hop": "zero_pad",
+      "trace_novelty": true
+    },
+    "startup-sqr": {
+      "purpose": "Normal startup on the boot-monotonic epoch, then active music, a declared zero section and the return; every second hop captured.",
+      "pcm": "startup_quiet_return",
+      "epoch": {
+        "policy": "boot_monotonic"
+      },
+      "partial_hop": "zero_pad",
+      "capture": {
+        "start_hop": 0,
+        "end_hop": null,
+        "every": 2
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "id": "repeat-smoke",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW02",
+      "label": "fresh repeat, strict equivalence"
+    },
+    {
+      "id": "time-zero-tail",
+      "kind": "case",
+      "a": "time-zero-tail",
+      "criterion": "SW03",
+      "label": "zero epoch hop-end time and declared zero tail"
+    },
+    {
+      "id": "stall",
+      "kind": "case",
+      "a": "stall-probe",
+      "criterion": "SW03",
+      "label": "stalled run ends as a reported failure"
+    },
+    {
+      "id": "repeat-time",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW03",
+      "label": "identical declared-epoch progression"
+    },
+    {
+      "id": "iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-a",
+      "edge": "A",
+      "from_hop": 40,
+      "criterion": "SW05",
+      "label": "intended A-only photons change (nonbinding limit)"
+    },
+    {
+      "id": "iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-b",
+      "edge": "B",
+      "from_hop": 40,
+      "criterion": "SW05",
+      "label": "intended B-only photons change (nonbinding limit)"
+    },
+    {
+      "id": "limit-coupling",
+      "kind": "limit_coupling",
+      "a": "limit-base",
+      "b": "limit-a",
+      "edge": "A",
+      "from_hop": 40,
+      "criterion": "SW05",
+      "label": "binding shared FastLED power limit"
+    },
+    {
+      "id": "reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "reject",
+      "criterion": "SW06",
+      "label": "rejected input leaves both outputs unchanged"
+    },
+    {
+      "id": "recovery-state",
+      "kind": "recovery_state",
+      "before_case": "comp-save",
+      "a": "comp-save",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "every serialized K1ShowState field recovered before any intervention"
+    },
+    {
+      "id": "recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "recovered composition output == equivalent reference"
+    },
+    {
+      "id": "fallback-missing-show",
+      "kind": "fallback_state",
+      "before_case": "cfg-save",
+      "default_case": "smoke-a",
+      "a": "cfg-save",
+      "b": "cfg-recover",
+      "criterion": "SW06",
+      "label": "missing show-state file follows the implementation fallback"
+    },
+    {
+      "id": "repeat-music",
+      "kind": "equal",
+      "a": "music-a",
+      "b": "music-b",
+      "criterion": "SW08",
+      "label": "real-music passage repeats exactly"
+    },
+    {
+      "id": "startup-quiet-return",
+      "kind": "startup_quiet_return",
+      "a": "startup-sqr",
+      "criterion": "SW08",
+      "label": "normal startup, active music, declared zero section, return",
+      "expect": {
+        "min_startup_frames": 112,
+        "fade_gate_us": 1000000,
+        "zero_from_hop": 934,
+        "return_hop": 1334
+      },
+      "note": "Expected values come from the implementation: intro_animation() shows 112 frames and leaves MASTER_BRIGHTNESS at 0; apply_brightness() starts the primary fade only once millis() >= 1000 (the secondary does not use MASTER_BRIGHTNESS); the silence path (dwell + silent_scale) darkens both edges in a sustained zero section and breaks on the first structured hop. Hop 934 is the first all-zero hop (zero section starts at sample 89600) and hop 1334 the first all-return hop (sample 128000)."
+    },
+    {
+      "id": "music-tempo-lane",
+      "kind": "tempo_lane",
+      "a": "music-a",
+      "criterion": "SW08",
+      "label": "sustained beat response on real music: existing production tempo-lane rule",
+      "expect": {
+        "expected_bpm": 127,
+        "fixture_type": "known_real_music",
+        "accept": [
+          "PASS_timing_and_tempo",
+          "PASS_timing_but_weak_lock"
+        ]
+      },
+      "note": "Target behaviour: the selected composition's tempo producer reports the fixture's known 127 BPM over the scored window after the estimator warm-up. Graded by k1_av_layer_classifier.classify_production_tempo, the repository rule; the classification (including a weak lock) is reported verbatim."
+    },
+    {
+      "id": "music-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "music-a",
+      "criterion": "SW09",
+      "label": "tempo/onset/beat meaning reaches the render thread at the same generation"
+    },
+    {
+      "id": "startup-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "startup-sqr",
+      "criterion": "SW09",
+      "label": "meaning continuity across startup, zero section and return"
+    }
+  ],
+  "planted": {
+    "base_case": "smoke-a"
+  },
+  "suites": {
+    "default": [
+      "smoke-a",
+      "smoke-b",
+      "time-zero-tail",
+      "stall-probe",
+      "ctl-a",
+      "ctl-b",
+      "reject",
+      "limit-base",
+      "limit-a",
+      "comp-save",
+      "comp-ref",
+      "comp-recover",
+      "cfg-save",
+      "cfg-recover",
+      "music-a",
+      "music-b",
+      "startup-sqr"
+    ]
+  },
+  "historical": [
+    {
+      "id": "R2-continuation-r1-007-R0-a",
+      "profile": "B489 preparation on emulator, forced brightness/mode/current (R2)",
+      "path": "~/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/continuation-r1-007/R0-a/uart.txt",
+      "crc32": "0b550234",
+      "sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f"
+    },
+    {
+      "id": "R2-physical-rpl-004",
+      "profile": "B489 preparation on Main RPL hardware (R2)",
+      "path": "~/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/physical-rpl-004/uart.txt",
+      "crc32": "0b550234",
+      "sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f"
+    }
+  ],
+  "host_checks": {
+    "pytest": [
+      "tests/"
+    ],
+    "builds": [
+      "k1_hardware"
+    ]
+  },
+  "fields_doc": {
+    "readme": "tools/esp_emulator/README.md",
+    "deferred": []
+  }
+}

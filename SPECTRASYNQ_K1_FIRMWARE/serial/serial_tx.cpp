@@ -6,6 +6,9 @@
 */
 
 #include "serial_tx.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"
+#endif
 
 // stop_streams() resets the AP-capture telemetry active flags, but only when
 // the probe gate is on. Those flags live (with external linkage) in the S1
@@ -56,11 +59,7 @@ void bad_command(const char* command_type, const char* command_data) {
   USBSerial.println();
   tx_end(true);
 #ifdef K1_EMU_FIXTURE
-#ifdef K1_EMU_UART0
-  Serial0.printf("EMU_REJECT %s\n", command_type);
-#else
-  USBSerial.printf("EMU_REJECT %s\n", command_type);
-#endif
+  k1_emu_fixture_note_reject(command_type);
 #endif
 }
 

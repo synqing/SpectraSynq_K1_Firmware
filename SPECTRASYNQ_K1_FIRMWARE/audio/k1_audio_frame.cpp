@@ -22,10 +22,7 @@ static portMUX_TYPE k1_audio_frame_mux = portMUX_INITIALIZER_UNLOCKED;
 #endif
 
 static K1AudioFrame s_published;
-// Cross-core flag. A plain bool can be cached on one side of the spinlock
-// when the lock body is visible to the optimiser, so acquire never observes
-// a publication that core 0 has already finished.
-static volatile uint32_t s_has_publication = 0;
+static bool s_has_publication = false;
 static uint32_t s_last_acquired_generation = 0;
 static bool s_have_acquired = false;
 static K1AudioFrameStats s_stats = {};
@@ -143,8 +140,8 @@ void k1_audio_frame_publish(const K1AudioFrame& producer_next) {
 #endif
   const uint32_t t_enter = K1_AF_NOW_US();
   K1_AF_ENTER();
-  if (s_has_publication != 0 && (!s_have_acquired ||
-                                 s_last_acquired_generation != s_published.ap_generation)) {
+  if (s_has_publication && (!s_have_acquired ||
+                            s_last_acquired_generation != s_published.ap_generation)) {
     s_stats.generation_skip_count++;
   }
   k1_af_copy_frame(&s_published, &producer_next);
@@ -154,7 +151,7 @@ void k1_audio_frame_publish(const K1AudioFrame& producer_next) {
   s_pub_snapshot = snapshot;
   memcpy(s_pub_spectrogram, spectrogram, sizeof(s_pub_spectrogram));
 #endif
-  s_has_publication = 1;
+  s_has_publication = true;
   s_stats.publish_count++;
   K1_AF_EXIT();
   const uint32_t hold = K1_AF_NOW_US() - t_enter;
@@ -176,7 +173,7 @@ bool k1_audio_frame_acquire(K1AudioFrame* out) {
 #endif
   const uint32_t t_enter = K1_AF_NOW_US();
   K1_AF_ENTER();
-  if (s_has_publication == 0) {
+  if (!s_has_publication) {
     K1_AF_EXIT();
 #if defined(K1_AUDIO_FRAME_HOST_TEST)
     k1_af_host_suppress_yield(0);
@@ -216,7 +213,7 @@ void k1_audio_frame_stats(K1AudioFrameStats* out) {
 void k1_audio_frame_stats_reset(void) {
   K1_AF_ENTER();
   memset(&s_stats, 0, sizeof(s_stats));
-  s_has_publication = 0;
+  s_has_publication = false;
   s_have_acquired = false;
   s_last_acquired_generation = 0;
   memset(&s_published, 0, sizeof(s_published));

@@ -216,6 +216,9 @@ void save_config() {
   }
   file.close();
   unlock_leds();
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_note_save("config", true);
+#endif
 }
 
 // Save configuration to LittleFS a few seconds from now

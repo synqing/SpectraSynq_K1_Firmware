@@ -22,7 +22,7 @@
 
 static const uint16_t K1_RTRACE_PX = 160;
 static const size_t K1_RTRACE_EDGE_BYTES = (size_t)K1_RTRACE_PX * 6U;
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
 // B489: 2000 dual-edge frames × 1920 B = 3.84 MB (+ 10 KB sidecars).
 static const uint32_t K1_RTRACE_MAX_FRAMES = 2000;
 static const size_t K1_RTRACE_FRAME_BYTES = K1_RTRACE_EDGE_BYTES * 2U;
@@ -58,7 +58,7 @@ class CaptureLock {
   CaptureLock& operator=(const CaptureLock&) = delete;
 };
 
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
 // The serial command runs on the audio owner. Drain on an idle-priority task,
 // otherwise a multi-megabyte USB write would prevent new microphone hops.
 // Created once from the command path; no task/heap operations in render.
@@ -105,8 +105,12 @@ static void rtrace_store(const uint8_t* primary, const uint8_t* secondary,
                          uint16_t led_count, uint8_t mode, uint8_t bpp) {
   const CaptureLock lock;
   if (!s_armed || s_buf == nullptr || primary == nullptr) return;
+#ifdef K1_EMU_FIXTURE
+  // Scenario window and cadence select frames by the consumed hop.
+  if (!k1_emu_fixture_capture_wanted()) return;
+#endif
   if (++s_tick % s_every_n != 0) return;
-#ifndef K1_B489_WS2816_V1
+#ifndef K1_RTRACE_DUAL
   if (secondary != nullptr) return;  // Legacy storage has only one edge slot.
 #endif
   const uint8_t edges = (secondary != nullptr) ? 2u : 1u;
@@ -121,7 +125,7 @@ static void rtrace_store(const uint8_t* primary, const uint8_t* secondary,
   const size_t copy = (size_t)px * (bpp == 16 ? 6U : 3U);
   memcpy(dst, primary, copy);
   memset(dst + copy, 0, K1_RTRACE_EDGE_BYTES - copy);
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
   if (secondary != nullptr) {
     memcpy(dst + K1_RTRACE_EDGE_BYTES, secondary, copy);
     memset(dst + K1_RTRACE_EDGE_BYTES + copy, 0, K1_RTRACE_EDGE_BYTES - copy);
@@ -150,7 +154,7 @@ void k1_render_trace_on_frame16(const uint8_t* packed6, uint16_t led_count,
   rtrace_store(packed6, nullptr, led_count, lightshow_mode, 16);
 }
 
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
 void k1_render_trace_on_frame16_dual(const uint8_t* primary_packed6,
                                      const uint8_t* secondary_packed6,
                                      uint16_t led_count,
@@ -188,7 +192,7 @@ static void rtrace_status() {
 }
 
 static void rtrace_arm(char* args) {
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
   bool busy;
   { const CaptureLock lock; busy = s_drain_busy; }
   if (busy) { USBSerial.println("[RTRACE] ARM FAIL: drain busy"); return; }
@@ -302,7 +306,7 @@ static void rtrace_write_dump() {
   USBSerial.println("[RTRACE-END]");
 }
 
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
 static void rtrace_drain_once() {
   rtrace_write_dump();
   const CaptureLock lock;
@@ -311,7 +315,7 @@ static void rtrace_drain_once() {
 #endif
 
 static void rtrace_dump() {
-#ifdef K1_B489_WS2816_V1
+#ifdef K1_RTRACE_DUAL
   if (!rtrace_init_drain()) {
     USBSerial.println("[RTRACE] DUMP FAIL: drain task unavailable");
     return;

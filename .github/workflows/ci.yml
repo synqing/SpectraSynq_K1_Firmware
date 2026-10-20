@@ -46,7 +46,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        env: [k1_hardware, k1_prod_im73d]
+        # k1_main_rpl_im69d: the normal Main RPL target the emulator replay derives from.
+        # k1_main_rpl_emu: build-only check of the emulator replay env (tools/esp_emulator).
+        # Running esp-emu here needs a Linux-pinned esp-emu executable hash (not yet locked).
+        env: [k1_hardware, k1_prod_im73d, k1_main_rpl_im69d, k1_main_rpl_emu]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
