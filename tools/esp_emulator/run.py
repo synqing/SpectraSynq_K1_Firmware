@@ -64,7 +64,7 @@ def sha256_file(path: Path) -> str:
 # rejected before anything is built or run.
 # --------------------------------------------------------------------------
 
-HOST_CHECK_KEYS = {"pytest", "builds"}
+HOST_CHECK_KEYS = {"pytest", "builds", "requires_git"}
 TOP_KEYS = {"schema", "name", "description", "profile", "tool_lock", "time", "assets",
             "compositions", "cases", "comparisons", "planted", "suites", "historical",
             "host_checks", "fields_doc"}
@@ -987,16 +987,22 @@ def host_checks(sc: dict, out: Path) -> dict:
     """Repository commit gate: the declared pytest selection and the shipping builds."""
     cfg = sc.get("host_checks", {})
     tests = cfg.get("pytest", [])
+    # A clean export has no .git. Tests that read git history (pinned-commit receipts, tracked-file
+    # checks) cannot run there; they are excluded by name, recorded, and run in the checkout.
+    excluded = list(cfg.get("requires_git", [])) if identity_kind() == "export" else []
+    ignore = [f"--ignore={p}" for p in excluded]
     log = out / "host-pytest.log"
     with log.open("w") as fh:
-        rc = subprocess.run([sys.executable, "-m", "pytest", "-q", *tests], cwd=REPO, stdout=fh,
-                            stderr=subprocess.STDOUT).returncode
+        rc = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider", *ignore, *tests],
+                            cwd=REPO, stdout=fh, stderr=subprocess.STDOUT).returncode
     tail = log.read_text().strip().splitlines()[-1:] or [""]
     builds = [build(env, out / f"build-{env}.log") for env in cfg.get("builds", [])]
     ok = rc == 0 and all(b["exit_code"] == 0 for b in builds)
     summary = tail[0] + "".join(f"; pio run -e {b['env']} exit={b['exit_code']}" for b in builds)
+    if excluded:
+        summary += f"; {len(excluded)} git-history test file(s) excluded in this export (run in the checkout)"
     return {"status": "PASS" if ok else "FAIL", "exit_code": rc, "tests": tests, "summary": summary,
-            "log": str(log), "builds": builds}
+            "log": str(log), "builds": builds, "excluded_without_git": excluded}
 
 
 # --------------------------------------------------------------------------

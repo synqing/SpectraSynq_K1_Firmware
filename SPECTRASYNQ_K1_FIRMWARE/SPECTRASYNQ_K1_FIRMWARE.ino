@@ -1376,6 +1376,9 @@ void led_thread(void* arg) {
     esp_task_wdt_add(NULL);  // N2: subscribe led_task (core 1) to the TWDT
   }
 #endif
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_note_render_loop();  // startup done; the replay may stage hop 0
+#endif
   while (true) {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
     esp_task_wdt_reset();  // N2: feed the render-task watchdog each frame

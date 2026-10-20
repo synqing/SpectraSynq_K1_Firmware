@@ -48,7 +48,7 @@ def make_uart(exp: ec.Expect, *, end_reason: str = "eof") -> str:
              f"total_hops={exp.total_hops} capture={exp.capture_start_hop}..{exp.capture_end_hop} "
              f"every={exp.capture_every} recovery={int(exp.recovery)} commands={len(exp.commands)} "
              f"payload_crc32={exp.payload_crc32:08x} stall_ms=20000 clock=hop_end_us epoch={exp.epoch_policy} "
-             f"mode=lockstep",
+             f"mode=lockstep rng=xorshift32:9e3779b9",
              "EMU_SS gen=0 when=boot hop=0 hex=00",
              f"EMU_EPOCH policy={exp.epoch_policy} epoch_us={exp.declared_epoch_us or 0} boot_us=79561 pre_audio_shows=0"]
     for c in exp.commands:

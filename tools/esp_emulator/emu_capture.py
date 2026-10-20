@@ -140,7 +140,8 @@ class Capture:
     power_limits: list[dict[str, str]]
     epochs: list[dict[str, str]]
     meanings: dict[int, Meaning]
-    novelty: dict[int, tuple[float, float, int]]
+    novelty: dict[int, tuple]
+    render_state: dict[int, tuple]
     begin_count: int
     end_marker_count: int
     computed_crc32: int
@@ -159,7 +160,8 @@ def decode(uart: str) -> Capture:
     panics: list[str] = []
     seen_frames: set[int] = set()
     meanings: dict[int, Meaning] = {}
-    novelty: dict[int, tuple[float, float, int]] = {}
+    novelty: dict[int, tuple] = {}
+    render_state: dict[int, tuple] = {}
     for line in uart.splitlines():
         line = line.rstrip("\r")
         if line.startswith("F,"):
@@ -185,14 +187,21 @@ def decode(uart: str) -> Capture:
             if values[0] in sidecars:
                 raise CaptureError(f"duplicate sidecar {values[0]}")
             sidecars[values[0]] = Sidecar(*values)
+        elif line.startswith("R,"):
+            parts = line.split(",")
+            if len(parts) != 9:
+                raise CaptureError(f"render-state line has {len(parts)} fields, expected 9")
+            if int(parts[1]) in render_state:
+                raise CaptureError(f"duplicate render-state line {parts[1]}")
+            render_state[int(parts[1])] = tuple(parts[2:])
         elif line.startswith("N,"):
             parts = line.split(",")
-            if len(parts) != 5:
-                raise CaptureError(f"novelty line has {len(parts)} fields, expected 5")
+            if len(parts) != 6:
+                raise CaptureError(f"novelty line has {len(parts)} fields, expected 6")
             gen = int(parts[1])
             if gen in novelty:
                 raise CaptureError(f"duplicate novelty line {gen}")
-            novelty[gen] = (float(parts[2]), float(parts[3]), int(parts[4]))
+            novelty[gen] = (float(parts[2]), float(parts[3]), int(parts[4]), parts[5])
         elif line.startswith("V,"):
             parts = line.split(",")
             if len(parts) != 20:
@@ -235,7 +244,7 @@ def decode(uart: str) -> Capture:
     return Capture(
         header=header, frames=frames, sidecars=sidecars, armed=armed, ends=ends,
         commands=commands, command_results=results, show_states=states, saves=saves,
-        rejects=rejects, power_limits=limits, epochs=epochs, meanings=meanings, novelty=novelty, begin_count=len(begins),
+        rejects=rejects, power_limits=limits, epochs=epochs, meanings=meanings, novelty=novelty, render_state=render_state, begin_count=len(begins),
         end_marker_count=uart.count("[RTRACE-END]"), computed_crc32=crc & 0xFFFFFFFF,
         panics=panics,
     )
@@ -397,6 +406,8 @@ def accept(cap: Capture | None, expect: Expect, process: Process, decode_error: 
         for key, want in checks.items():
             if a.get(key) != want:
                 reasons.append(f"armed {key}={a.get(key)!r} != {want!r}")
+        if not str(a.get("rng", "")).startswith("xorshift32:"):
+            reasons.append(f"armed rng={a.get('rng')!r}: product randomness is not on the declared seeded generator")
     if not cap.show_states or cap.show_states[0].get("when") != "boot":
         reasons.append("no boot show-state readback before the first hop")
     # Terminal event and counters.

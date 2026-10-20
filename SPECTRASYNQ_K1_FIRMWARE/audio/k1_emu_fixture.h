@@ -44,6 +44,11 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame);
 // into a reported failure with the last positions and the partial capture.
 void k1_emu_fixture_wait_shown(uint32_t generation);
 
+// Render thread: entered its frame loop (product startup animation finished).
+// The producer does not stage the first hop before this, so startup always runs
+// entirely on the pre-audio clock and the epoch hand-off is deterministic.
+void k1_emu_fixture_note_render_loop(void);
+
 // Render thread: the generation acquired for this frame (0 = none) and the
 // generation just shown.
 void k1_emu_fixture_note_consumed(const K1AudioFrame& frame);
@@ -77,6 +82,9 @@ extern "C" {
 uint32_t k1_emu_fixture_time_ms(void);
 uint32_t k1_emu_fixture_time_us(void);
 uint64_t k1_emu_fixture_app_us(void);
+// Declared deterministic replacement for esp_random() in product randomness
+// (random_float): xorshift32, seed kEmuRngSeed, reported as rng= in EMU_FIXTURE_ARMED.
+uint32_t k1_emu_fixture_random_u32(void);
 #ifdef __cplusplus
 }
 #endif

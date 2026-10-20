@@ -119,6 +119,22 @@ boundary.
   processed. Its first possible effect is generation `h+1`. Original-file
   positions are `excerpt.start_ms` plus the segment offset recorded in the
   case's `pcm` metadata. Declared padding is never counted as original audio.
+- **Startup ordering.** The producer does not stage hop 0 until the render
+  task has finished the product startup animation and entered its frame loop
+  (`k1_emu_fixture_note_render_loop()`). Startup always runs entirely on the
+  pre-audio clock, and the hand-off is deterministic (`pre_audio_shows=113`).
+- **Render-loop application-time seam.** Under the fixture, `vp_frame_start_us`
+  (the effects-queue tick and the beat-aware/smart director clocks), `LED_FPS`
+  dt correction and the effect-context dt use the frame's application time.
+  That time is sampled when the fixture accepts a new generation, while the
+  producer is blocked. Perf counters keep the emulator timer. Without this
+  seam, render output depended on emulation speed, which shifts with host
+  load and diagnostic work.
+- **Seeded randomness.** Under the fixture, `random_float()` (auto colour
+  shift, quantum collapse) draws from xorshift32 seed `0x9E3779B9`
+  (`rng=` in `EMU_FIXTURE_ARMED`, `rng_draws=` in `EMU_END`) instead of
+  `esp_random()`. `esp_random()` XORs a timing-dependent number of RNG
+  register reads.
 - **Lockstep.** The producer waits until the render thread has shown each
   generation, so every hop is shown exactly once. This deterministic mode does
   not model hardware scheduling. The wait has a real-time deadline
@@ -201,6 +217,28 @@ all rejected before anything is built.
   `fallback_state`, `differs` and `case`, each mapped to an SW criterion.
 - `planted.base_case`: the fresh capture that the planted negative cases
   mutate.
+
+## Host checks and clean exports
+
+`host_checks.pytest` (the repository suite) and `host_checks.builds` (the
+shipping `k1_hardware` build) run on every invocation. In a clean export
+(`git archive`, no `.git`), the test files listed in
+`host_checks.requires_git` cannot run, because they read git history. They are
+excluded by name, the exclusion is recorded in `result.json`
+(`host_checks.excluded_without_git`), and they run in the maintained checkout
+at the same commit. The export carries its commit in
+`.k1-source-identity.json`, and `SW11` passes only for an export
+invocation.
+
+## Diagnostics (opt-in, never part of acceptance)
+
+`"trace_novelty": true` adds one `N,generation,novelty,vu_level,silence,producer_crc`
+line per hop. `producer_crc` covers the published audio snapshot, spectrogram,
+smoothed spectrogram and chromagram. Every captured frame also has
+`V,` lines (producer and render-thread audio meaning for its generation) and
+`R,` lines (raw render-thread hue position and mix, master brightness, silent
+scale, `LED_FPS`, VU and waveform peak). Use these to localise any future
+repeat divergence to the producer or the render side.
 
 ## Not covered (by design)
 

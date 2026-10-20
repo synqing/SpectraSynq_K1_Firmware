@@ -76,7 +76,14 @@ inline void low_pass_array_fixed(SQ15x16* new_frame, SQ15x16* last_frame, uint16
 }
 
 inline float random_float(){
+#ifdef K1_EMU_FIXTURE
+    // Emulator replay: a declared seeded generator, so auto colour shift and
+    // other product randomness repeat exactly (the hardware RNG stream is also
+    // drawn by unrelated subsystems at timing-dependent moments).
+    return k1_emu_fixture_random_u32() / (float)UINT32_MAX;
+#else
     return esp_random() / (float)UINT32_MAX;
+#endif
 }
 
 inline SQ15x16 mood_scale(SQ15x16 center, SQ15x16 range){

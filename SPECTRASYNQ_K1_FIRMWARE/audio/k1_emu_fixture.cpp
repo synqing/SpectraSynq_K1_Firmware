@@ -115,6 +115,9 @@ uint32_t s_rejects = 0;
 uint32_t s_commands_run = 0;
 uint32_t s_power_mw = 0;       // 0 = no FastLED power limit installed
 bool s_audio_started = false;  // first hop staged: clock is epoch + processed
+constexpr uint32_t kEmuRngSeed = 0x9E3779B9u;
+uint32_t s_rng = kEmuRngSeed;
+uint32_t s_rng_draws = 0;
 uint64_t s_epoch_us = 0;
 uint64_t s_declared_epoch_us = 0;
 
@@ -178,6 +181,7 @@ constexpr uint32_t kRing = 16;
 PubRecord s_ring[kRing];
 
 volatile uint32_t s_consumed_gen = 0;
+volatile bool s_render_ready = false;
 volatile uint32_t s_shown_gen = 0;
 uint32_t s_consumed_notes = 0;
 uint32_t s_shown_notes = 0;
@@ -194,12 +198,14 @@ struct CapRecord {
   uint8_t limit_scale;
   Meaning producer;
   Meaning consumed;
+  uint32_t render_state[7];  // raw bits of render-thread globals at store time
 };
 CapRecord* s_cap = nullptr;
 struct NoveltyRecord {
   float novelty;
   float vu_level;
   uint8_t silence;
+  uint32_t producer_crc;  // snapshot + spectrogram + chromagram_smooth at publication
 };
 NoveltyRecord* s_nov = nullptr;
 uint32_t s_nov_count = 0;
@@ -310,7 +316,7 @@ void print_counters(const char* reason, const char* where) {
   K1_EMU_LOG.printf(
       "EMU_END reason=%s where=%s run=%s admitted=%llu processed=%llu staged_hops=%lu "
       "total_hops=%lu published=%lu last_generation=%lu consumed=%lu shown=%lu "
-      "last_shown=%lu pre_audio_shows=%lu captured=%lu commands=%lu rejects=%lu saves=%lu "
+      "last_shown=%lu pre_audio_shows=%lu captured=%lu commands=%lu rejects=%lu saves=%lu rng_draws=%lu "
       "unstaged_admits=%lu publications_without_hop=%lu app_us=%llu\n",
       reason, where, s_run_id, (unsigned long long)s_admitted, (unsigned long long)s_processed,
       (unsigned long)s_next_hop, (unsigned long)s_total_hops, (unsigned long)s_pub_count,
@@ -318,6 +324,7 @@ void print_counters(const char* reason, const char* where) {
       (unsigned long)s_shown_notes, (unsigned long)s_shown_gen,
       (unsigned long)s_pre_audio_shows, (unsigned long)s_captured,
       (unsigned long)s_commands_run, (unsigned long)s_rejects, (unsigned long)s_saves,
+      (unsigned long)s_rng_draws,
       (unsigned long)s_unstaged_admits, (unsigned long)s_pub_without_hop,
       (unsigned long long)k1_emu_fixture_app_us());
 }
@@ -326,8 +333,8 @@ void print_counters(const char* reason, const char* where) {
   s_finished = true;
   if (s_nov != nullptr) {
     for (uint32_t i = 0; i < s_nov_count; i++) {
-      K1_EMU_LOG.printf("N,%lu,%.6f,%.6f,%u\n", (unsigned long)(i + 1), s_nov[i].novelty,
-                        s_nov[i].vu_level, (unsigned)s_nov[i].silence);
+      K1_EMU_LOG.printf("N,%lu,%.6f,%.6f,%u,%08lx\n", (unsigned long)(i + 1), s_nov[i].novelty,
+                        s_nov[i].vu_level, (unsigned)s_nov[i].silence, (unsigned long)s_nov[i].producer_crc);
       if ((i & 0xFF) == 0xFF) {
         feedLoopWDT();
         vTaskDelay(1);
@@ -440,14 +447,14 @@ void k1_emu_fixture_poll(void) {
         "EMU_FIXTURE_ARMED run=%s source=%s valid=%d invalid=%s rate=%lu hop=%lu "
         "real_samples=%lu pad_samples=%lu total_hops=%lu capture=%lu..%lu every=%lu "
         "recovery=%d commands=%lu payload_crc32=%08lx stall_ms=%lu clock=hop_end_us epoch=%s "
-        "mode=lockstep\n",
+        "mode=lockstep rng=xorshift32:%08lx\n",
         s_run_id, s_from_blob ? "blob" : "builtin", s_valid ? 1 : 0,
         s_invalid ? s_invalid : "-", (unsigned long)s_rate, (unsigned long)kHop,
         (unsigned long)s_real_samples, (unsigned long)s_pad_samples,
         (unsigned long)s_total_hops, (unsigned long)s_cap_start, (unsigned long)s_cap_end,
         (unsigned long)s_cap_every, (s_flags & kFlagRecovery) ? 1 : 0,
         (unsigned long)s_cmd_count, (unsigned long)s_payload_crc, (unsigned long)s_stall_ms,
-        epoch_policy());
+        epoch_policy(), (unsigned long)kEmuRngSeed);
     K1_EMU_LOG.printf("EMU_STATE photons=%.4f secondary_photons=%.4f secondary_mode=%u mode=%u "
                       "max_current_ma=%lu boot_animation=%d\n",
                       CONFIG.PHOTONS, SECONDARY_PHOTONS, (unsigned)SECONDARY_LIGHTSHOW_MODE,
@@ -460,6 +467,15 @@ void k1_emu_fixture_poll(void) {
     if (!s_valid) finish("scenario_invalid", s_invalid ? s_invalid : "-");
   }
   if (s_staged) return;  // acquisition has not taken the staged hop yet
+  if (!s_audio_started) {
+    // Startup ordering: hold the first hop until the render loop is running.
+    const int64_t start = esp_timer_get_time();
+    while (!s_render_ready) {
+      if (esp_timer_get_time() - start > (int64_t)s_stall_ms * 1000) finish("stall", "startup");
+      feedLoopWDT();
+      vTaskDelay(1);
+    }
+  }
   if (s_next_hop < s_total_hops) {
     stage_next_hop();
     return;
@@ -496,7 +512,11 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
   r.meaning = meaning_of(frame, true);
   if (s_nov != nullptr && generation >= 1 && generation <= kMaxNovelty) {
     const K1AudioSnapshot snap = k1_audio_snapshot_read();
-    s_nov[generation - 1] = {snap.novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0)};
+    uint32_t crc = esp_crc32_le(0, (const uint8_t*)&snap, sizeof(snap));
+    crc = esp_crc32_le(crc, (const uint8_t*)spectrogram, sizeof(spectrogram));
+    crc = esp_crc32_le(crc, (const uint8_t*)spectrogram_smooth, sizeof(SQ15x16) * NUM_FREQS);
+    crc = esp_crc32_le(crc, (const uint8_t*)chromagram_smooth, sizeof(SQ15x16) * 12);
+    s_nov[generation - 1] = {snap.novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
     if (generation > s_nov_count) s_nov_count = generation;
   }
   s_last_pub_gen = generation;
@@ -513,6 +533,8 @@ void k1_emu_fixture_wait_shown(uint32_t generation) {
   }
   print_show_state(generation, "shown", generation, true);
 }
+
+void k1_emu_fixture_note_render_loop(void) { s_render_ready = true; }
 
 void k1_emu_fixture_note_consumed(const K1AudioFrame& frame) {
   s_last_consumed = meaning_of(frame, false);
@@ -552,6 +574,19 @@ void k1_emu_fixture_on_render_store(uint32_t capture_index) {
   c.power_mw = s_power_mw;
   c.consumed = s_last_consumed;
   c.producer = known ? r.meaning : Meaning{};
+  {
+    // Render-thread view of shared state that both edges' injection uses.
+    const float fps = LED_FPS, master = MASTER_BRIGHTNESS, silent = silent_scale, peak = waveform_peak_scaled;
+    const int32_t hue = hue_position.getInternal(), mix = hue_shifting_mix.getInternal(),
+                  vu = audio_vu_level.getInternal();
+    memcpy(&c.render_state[0], &hue, 4);
+    memcpy(&c.render_state[1], &mix, 4);
+    memcpy(&c.render_state[2], &master, 4);
+    memcpy(&c.render_state[3], &silent, 4);
+    memcpy(&c.render_state[4], &fps, 4);
+    memcpy(&c.render_state[5], &vu, 4);
+    memcpy(&c.render_state[6], &peak, 4);
+  }
   s_pending_lim_idx = (int32_t)capture_index;
   s_captured = capture_index + 1;
 }
@@ -599,6 +634,11 @@ void k1_emu_fixture_write_sidecar(uint32_t capture_index) {
                     (unsigned long)c.onset_seq, (unsigned long)c.beat_seq, c.onset_strength, c.bpm,
                     c.phase01, c.confidence, c.locked ? 1 : 0, c.beat_tick ? 1 : 0);
   const CapRecord& s = s_cap[capture_index];
+  K1_EMU_LOG.printf("R,%lu,%08lx,%08lx,%08lx,%08lx,%08lx,%08lx,%08lx\n", (unsigned long)capture_index,
+                    (unsigned long)s.render_state[0], (unsigned long)s.render_state[1],
+                    (unsigned long)s.render_state[2], (unsigned long)s.render_state[3],
+                    (unsigned long)s.render_state[4], (unsigned long)s.render_state[5],
+                    (unsigned long)s.render_state[6]);
   K1_EMU_LOG.printf("S,%lu,%lu,%lu,%lu,%lu,%u,%lu\n", (unsigned long)capture_index,
                     (unsigned long)s.generation, (unsigned long)s.admitted,
                     (unsigned long)s.processed, (unsigned long)s.app_us,
@@ -610,6 +650,16 @@ extern "C" uint64_t k1_emu_fixture_app_us(void) {
     return monotonic_pre_audio() ? (uint64_t)esp_timer_get_time() : 0;
   }
   return s_epoch_us + (s_processed * 1000000ull) / (uint64_t)s_rate;
+}
+
+extern "C" uint32_t k1_emu_fixture_random_u32(void) {
+  uint32_t x = s_rng;
+  x ^= x << 13;
+  x ^= x >> 17;
+  x ^= x << 5;
+  s_rng = x;
+  s_rng_draws++;
+  return x;
 }
 
 extern "C" uint32_t k1_emu_fixture_time_us(void) { return (uint32_t)k1_emu_fixture_app_us(); }

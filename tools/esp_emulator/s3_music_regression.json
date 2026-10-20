@@ -571,6 +571,16 @@
     ],
     "builds": [
       "k1_hardware"
+    ],
+    "requires_git": [
+      "tests/test_bootloop_guard_static.py",
+      "tests/test_colourlab_static.py",
+      "tests/test_dual_sync_oracle.py",
+      "tests/test_lever2_no_effect_retune_static.py",
+      "tests/test_scheduling_abba_toolchain_pin_receipt.py",
+      "tests/test_scheduling_harness_pin_receipt.py",
+      "tests/test_scheduling_stage_perturbation_pair.py",
+      "tests/test_k1_stage_attribution_abba_compare.py"
     ]
   },
   "fields_doc": {
