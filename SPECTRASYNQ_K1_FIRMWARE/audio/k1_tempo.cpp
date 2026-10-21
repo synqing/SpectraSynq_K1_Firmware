@@ -391,6 +391,17 @@ static float    k1_fw_last_onset_phase = -1.0f; // diagnostic: last detected ons
 static bool     k1_silence_detected = false;
 static float    k1_silence_level = 0.0f;
 
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+// Lane R1 (DEF-001, I9): the producer owns silence. audio.silence is ANDed over the AP frames of one
+// emit window (a single non-silent frame means programme is present, mirroring the novelty peak-hold)
+// and latched for that emit. The tracker keeps its existing history decay; it no longer derives a
+// second silence from novelty contrast.
+static bool     k1_window_all_silent = true;
+static bool     k1_producer_silence = false;
+static uint8_t  k1_tempo_veto = K1_TEMPO_VETO_NONE;       // I1: gates active on the last emit
+static uint8_t  k1_v2_release_cause = K1_TEMPO_VETO_NONE; // release that happened on this emit
+#endif
+
 // Downsample accumulator (peak-hold preserves onset transients).
 static bool     k1_tempo_primed = false;
 static float    k1_accum = 0.0f;
@@ -449,6 +460,13 @@ static void k1_update_scale(float tau) {
 
 // Silence = low contrast across the recent novelty window.
 static void k1_check_silence() {
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  // DEF-001: the contrast test below ran on sqrt-of-sqrt novelty and declared silence on 100 % of
+  // real-music emits while audio.silence was 0, hiding a correct internal lock. Silence now comes
+  // from the producer only (I9); confidence decays through the existing EMA while it holds.
+  k1_silence_detected = k1_producer_silence;
+  k1_silence_level = k1_producer_silence ? 1.0f : 0.0f;
+#else
   // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated short-circuit lived here that
   // disabled this gate entirely and returned early. It was derived from Bench
   // Unit 2 behaviour under a voided mic identity — see audio/k1_audio_profile.h.
@@ -473,6 +491,7 @@ static void k1_check_silence() {
     k1_silence_detected = false;
     k1_silence_level = 0.0f;
   }
+#endif  // K1_TEMPO_SILENCE_FROM_PRODUCER_V1
 }
 
 // Goertzel magnitude + phase for one bin over the novelty ring.
@@ -809,8 +828,14 @@ static inline float k1_conf_score(uint16_t i) {
 // real per-emit elapsed (so alpha is dt-aware); pass <=0 to use the nominal alpha.
 static void k1_update_confidence_v2(float dt_sec) {
   const uint16_t wbin = k1_validate_winner();
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  k1_v2_release_cause = K1_TEMPO_VETO_NONE;
+  const bool k1_v2_measure = k1_acf_valid && !k1_silence_detected;  // silence: quality target 0
+#else
+  const bool k1_v2_measure = k1_acf_valid;
+#endif
 
-  if (k1_acf_valid) {
+  if (k1_v2_measure) {
     // peak = winner's POINT salience (k1_conf_score = un-spread ACF×conf-prior); background =
     // MEAN point salience outside the winner's ±K1_CONF_LOBE lobe; sum = Σ point salience.
     // (Point, not comb: the comb co-activates the winner's harmonic ladder, so a comb peakShare/
@@ -897,15 +922,23 @@ static void k1_update_confidence_v2(float dt_sec) {
   }
 
   if (!k1_locked_v2) {
-    if (k1_conf_ema >= K1_LOCK_CONFIDENCE && warmup_done && k1_v2_beats_seen >= 2) {
+    if (k1_conf_ema >= K1_LOCK_CONFIDENCE && warmup_done && k1_v2_beats_seen >= K1_CONF_V2_MIN_BEATS) {
       k1_locked_v2 = true;
     }
   } else {
-    if (k1_conf_ema < K1_CONF_V2_REL) k1_locked_v2 = false;
+    if (k1_conf_ema < K1_CONF_V2_REL) {
+      k1_locked_v2 = false;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+      k1_v2_release_cause = K1_TEMPO_VETO_CONF_BELOW_RELEASE;
+#endif
+    }
   }
   // Watchdog: a long sub-floor run while LOCKED forces unlock and resets the EMA so a dead winner
   // cannot hold a stale lock (and re-acquisition restarts from scratch).
   if (k1_v2_subfloor >= K1_CONF_V2_WATCHDOG_N) {
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+    k1_v2_release_cause = K1_TEMPO_VETO_WATCHDOG;
+#endif
     k1_locked_v2 = false;
     k1_conf_ema = 0.0f;
     k1_confidence = 0.0f;
@@ -1241,6 +1274,12 @@ static K1TempoEvent k1_build_output() {
   uint16_t w = k1_validate_winner();
   float conf = k1_confidence;
   if (k1_silence_detected) conf *= (1.0f - k1_silence_level);
+#if defined(K1_TEMPO_SILENCE_FROM_PRODUCER_V1) && defined(K1_TEMPO_CONF_V2)
+  // WARMUP veto on confidence (lane R1): until the novelty history is full the ACF sees a
+  // part-zero ring and CONF_V2 reads up to 0.99 on white noise / drone (emulator p15 suite).
+  // The estimator's own window decides, not a tuned number; the veto bit names it (I1).
+  if (k1_v2_updates < K1_CONF_V2_WARMUP_UPDATES) conf = 0.0f;
+#endif
 
   K1TempoEvent e;
   e.bpm = k1_tempi[w].target_bpm;
@@ -1264,6 +1303,22 @@ static K1TempoEvent k1_build_output() {
   e.locked = k1_locked_v2 && !k1_silence_detected;
 #endif
   e.beat_strength = k1_tempi_smooth[w];
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  // I1: name every gate that holds locked / beat_tick / confidence down on this emit.
+  uint8_t veto = K1_TEMPO_VETO_NONE;
+  if (k1_silence_detected) veto |= K1_TEMPO_VETO_PRODUCER_SILENCE;
+#ifdef K1_TEMPO_CONF_V2
+  veto |= k1_v2_release_cause;
+  if (k1_v2_updates < K1_CONF_V2_WARMUP_UPDATES) veto |= K1_TEMPO_VETO_WARMUP;  // also zeroes confidence
+  if (!k1_locked_v2) {
+    if (k1_v2_beats_seen < K1_CONF_V2_MIN_BEATS) veto |= K1_TEMPO_VETO_BEATS_SEEN_LT_2;
+    if (k1_conf_ema < K1_LOCK_CONFIDENCE) veto |= K1_TEMPO_VETO_CONF_BELOW_ENTER;
+  }
+#else
+  if (!(conf > K1_LOCK_CONFIDENCE)) veto |= K1_TEMPO_VETO_CONF_BELOW_ENTER;
+#endif
+  k1_tempo_veto = veto;
+#endif
   return e;
 }
 
@@ -1368,6 +1423,12 @@ void k1_tempo_reset() {
 #endif
   k1_silence_detected = false;
   k1_silence_level = 0.0f;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  k1_window_all_silent = true;
+  k1_producer_silence = false;
+  k1_tempo_veto = K1_TEMPO_VETO_NONE;
+  k1_v2_release_cause = K1_TEMPO_VETO_NONE;
+#endif
   k1_tempo_primed = false;
   k1_accum = 0.0f;
   k1_last_emit_ms = 0;
@@ -1397,6 +1458,9 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   float novelty = k1_t_clamp(audio.novelty, 0.0f, 1.0f);
 #endif
   if (audio.silence) novelty = 0.0f;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  k1_window_all_silent = k1_window_all_silent && audio.silence;
+#endif
   // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated `novelty *= 4.0f` boost lived
   // here. The multiplier was fitted by trial (x2.5 then x4.0) against Bench Unit
   // 2 under a voided mic identity, so it is deleted rather than carried — see
@@ -1436,6 +1500,10 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
     return;  // not an emit frame — cheap path (still peak-holding novelty)
   }
   k1_frame_ctr = 0;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  k1_producer_silence = k1_window_all_silent;
+  k1_window_all_silent = true;
+#endif
 
   // delta_sec (phase advance) uses the REAL wall-clock elapsed between emits.
   uint32_t elapsed = (now_ms >= k1_last_emit_ms) ? (now_ms - k1_last_emit_ms) : 0;
@@ -1543,6 +1611,20 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   k1_dbg_emit_elapsed_us = (uint32_t)(k1_dbg_stage_end_us - k1_dbg_emit_start_us);
 #endif
 }
+
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+K1TempoGate k1_tempo_gate_read() {
+  K1TempoGate g;
+  g.veto = k1_tempo_veto;
+#ifdef K1_TEMPO_CONF_V2
+  g.internal_locked = k1_locked_v2 ? 1 : 0;
+#else
+  g.internal_locked = (k1_confidence > K1_LOCK_CONFIDENCE) ? 1 : 0;
+#endif
+  g.producer_silence = k1_producer_silence ? 1 : 0;
+  return g;
+}
+#endif
 
 K1TempoEvent k1_tempo_read() {
   K1TempoEvent e;
@@ -1670,6 +1752,9 @@ K1TempoDebugSnapshot k1_tempo_debug_read() {
   d.acf_spread_active = false;
   d.acf_lag_cursor = 0;
   d.acf_publish_count = 0;
+#endif
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  d.veto = k1_tempo_veto;
 #endif
   return d;
 }

@@ -1,0 +1,21 @@
+{
+ "clips": {
+  "r3:r3_music_linear": {
+   "file": "r3_r3_music_linear.tsv",
+   "gens": 2934,
+   "sha256": "fd9fb0833a4aeb8048a81b2d36004ad1305bc42f3eefb70e723318156d2a4827",
+   "source_uart": "esp-emulator/tempo-lock-r1/fx-r1/r3_music_linear.uart.txt",
+   "source_uart_sha256": "e38e8d6ac35c8138c5763019d5f0f2f002fb4b402a39ddbdb7f3851b85690c1c"
+  },
+  "r3:r3_music_sqrt": {
+   "file": "r3_r3_music_sqrt.tsv",
+   "gens": 2934,
+   "sha256": "daf5858c5c6f556a7c7d9642874565f6175a8cd7f5259c1c36cbf9931b5e17e5",
+   "source_uart": "esp-emulator/tempo-lock-r1/fx-shipped/r3_music_sqrt.uart.txt",
+   "source_uart_sha256": "3e9d8b82fb4e714b40d152f29bff15b57820edf15380f9a84ba45c54a29b5093"
+  }
+ },
+ "note": "R3 music-a (loreen_127) N lines from the real emulated firmware. r3:r3_music_linear = k1_main_rpl_emu_tempo_r1 (tempo_novelty, linear tap); r3:r3_music_sqrt = k1_main_rpl_emu (shipped sqrt novelty_curve).",
+ "schema": "k1-tempo-fixture-set/1",
+ "source_dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/fx-r1"
+}

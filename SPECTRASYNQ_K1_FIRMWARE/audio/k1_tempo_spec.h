@@ -121,6 +121,10 @@ static const int      K1_CONF_LOBE = 6;
 #ifndef K1_CONF_V2_TAU_S
 #define K1_CONF_V2_TAU_S 0.150f
 #endif
+// @prov K1_CONF_V2_MIN_BEATS value=2 mic=none fixture=UNPROVENANCED date=2026-06-05 tuned_on=judgement (two observed beats before a lock may acquire)
+#ifndef K1_CONF_V2_MIN_BEATS
+#define K1_CONF_V2_MIN_BEATS 2
+#endif
 // @prov K1_CONF_V2_WARMUP_UPDATES value=512 mic=none fixture=UNPROVENANCED date=2026-06-05 tuned_on=history length (arithmetic: ring must fill)
 #ifndef K1_CONF_V2_WARMUP_UPDATES
 #define K1_CONF_V2_WARMUP_UPDATES 512

@@ -28,6 +28,27 @@ struct K1TempoEvent {
   float beat_strength;  // smoothed magnitude of the winning bin
 };
 
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+// Lane R1 (DEF-001, invariant I1): every gate that can clear a published decision (locked,
+// beat_tick, confidence) sets one of these bits, so no decision is hidden silently.
+// K1TempoEvent is unchanged (rule R5); the veto travels in K1TempoGate and the debug snapshot.
+enum K1TempoVeto : uint8_t {
+  K1_TEMPO_VETO_NONE = 0,
+  K1_TEMPO_VETO_PRODUCER_SILENCE = 1u << 0,    // audio.silence (the producer owns silence, I9)
+  K1_TEMPO_VETO_WARMUP = 1u << 1,              // history not yet full (CONF_V2 warm-up)
+  K1_TEMPO_VETO_CONF_BELOW_ENTER = 1u << 2,    // unlocked and conf_ema < K1_LOCK_CONFIDENCE
+  K1_TEMPO_VETO_CONF_BELOW_RELEASE = 1u << 3,  // lock released this emit: conf_ema < K1_CONF_V2_REL
+  K1_TEMPO_VETO_WATCHDOG = 1u << 4,            // lock released this emit by the sub-floor watchdog
+  K1_TEMPO_VETO_BEATS_SEEN_LT_2 = 1u << 5,     // fewer than two observed beats since reset
+};
+struct K1TempoGate {
+  uint8_t veto;              // K1TempoVeto bits of the last emit
+  uint8_t internal_locked;   // the tracker's own lock decision (k1_locked_v2) before output gates
+  uint8_t producer_silence;  // audio.silence latched for the last emit
+};
+K1TempoGate k1_tempo_gate_read();  // Core-0 (producer) side only, like k1_tempo_update
+#endif
+
 void k1_tempo_init();                              // compute Goertzel coeffs, clear state
 void k1_tempo_update(const K1AudioSnapshot& audio);// call once per AP frame (Core-0)
 K1TempoEvent k1_tempo_read();                      // safe value-copy read (any core)
@@ -108,6 +129,9 @@ struct K1TempoDebugSnapshot {
   bool acf_spread_active;
   uint16_t acf_lag_cursor;
   uint32_t acf_publish_count;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  uint8_t veto;  // K1TempoVeto bits of the last emit (lane R1, I1)
+#endif
 };
 
 K1TempoDebugSnapshot k1_tempo_debug_read();

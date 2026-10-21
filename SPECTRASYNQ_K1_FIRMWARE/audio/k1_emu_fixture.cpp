@@ -230,6 +230,19 @@ struct NoveltyRecord {
 };
 NoveltyRecord* s_nov = nullptr;
 uint32_t s_nov_count = 0;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+// Lane R1 (DEF-001, I1): the tracker's veto bits, internal lock and latched producer silence for
+// every publication, with the published K1TempoEvent fields, printed as K lines after the N lines
+// (only when the novelty trace is on): K,gen,veto,internal_locked,producer_silence,locked,beat_tick,conf,bpm
+struct GateRecord {
+  K1TempoGate gate;
+  float bpm;
+  float confidence;
+  uint8_t locked;
+  uint8_t beat_tick;
+};
+GateRecord* s_gate = nullptr;
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
 // Measurement probe only (env k1_main_rpl_emu_tempo_probe, tempo lane R1, 2026-10-21).
 // Per generation: loud-guard state of the hop just published, and the tempo tracker's
@@ -398,6 +411,20 @@ void print_counters(const char* reason, const char* where) {
       }
     }
   }
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  if (s_gate != nullptr) {
+    for (uint32_t i = 0; i < s_nov_count; i++) {
+      const GateRecord& k = s_gate[i];
+      K1_EMU_LOG.printf("K,%lu,%u,%u,%u,%u,%u,%.5f,%.1f\n", (unsigned long)(i + 1), (unsigned)k.gate.veto,
+                        (unsigned)k.gate.internal_locked, (unsigned)k.gate.producer_silence,
+                        (unsigned)k.locked, (unsigned)k.beat_tick, k.confidence, k.bpm);
+      if ((i & 0xFF) == 0xFF) {
+        feedLoopWDT();
+        vTaskDelay(1);
+      }
+    }
+  }
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
   if (s_probe != nullptr) {
     for (uint32_t i = 0; i < s_nov_count; i++) {
@@ -565,6 +592,10 @@ void k1_emu_fixture_begin(void) {
   if (s_valid && (s_flags & kFlagNoveltyTrace)) {
     s_nov = (NoveltyRecord*)ps_malloc(sizeof(NoveltyRecord) * kMaxNovelty);
     if (s_nov == nullptr) fail_scenario("novelty_psram");
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+    s_gate = (GateRecord*)ps_malloc(sizeof(GateRecord) * kMaxNovelty);
+    if (s_gate == nullptr) fail_scenario("gate_psram");
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
     s_probe = (ProbeRecord*)ps_malloc(sizeof(ProbeRecord) * kMaxNovelty);
     if (s_probe == nullptr) fail_scenario("probe_psram");
@@ -668,6 +699,13 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
     s_nov[generation - 1] = {snap.tempo_novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
 #else
     s_nov[generation - 1] = {snap.novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
+#endif
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+    if (s_gate != nullptr) {
+      const K1TempoEvent ev = k1_tempo_read();
+      s_gate[generation - 1] = {k1_tempo_gate_read(), ev.bpm, ev.confidence, (uint8_t)(ev.locked ? 1 : 0),
+                                (uint8_t)(ev.beat_tick ? 1 : 0)};
+    }
 #endif
 #ifdef K1_EMU_TEMPO_PROBE
     if (s_probe != nullptr) {

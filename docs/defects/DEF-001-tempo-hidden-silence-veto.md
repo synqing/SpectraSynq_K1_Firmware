@@ -1,6 +1,6 @@
 # DEF-001 — Tempo tracker hidden silence veto (k1_tempo.cpp)
 
-Status: OPEN · Opened: 2026-10-21 · Builds affected: k1_main_rpl_im69d (and any build where the
+Status: FIX-IN-LANE (partial: A3 noise/drone/sweep/release open) · Opened: 2026-10-21 · Builds affected: k1_main_rpl_im69d (and any build where the
 tracker's contrast silence gate runs on sqrt-domain novelty) · Owner lane: lane/k1-tempo-lock-r1
 
 ## Mechanism (FACT, source-verified)
@@ -51,3 +51,4 @@ silence/drone/noise/release tests, off-flag byte-identical).
 | Date | Status | Evidence |
 |---|---|---|
 | 2026-10-21 | OPEN — Phase 0 measured | R9 level sweep (docs/receipts/tempo-lock-r1/p0.1-level-sweep.json): clipping falls to 0 at -6 dB and below, tracker-internal silence stays 100 % and published lock 0 at every level → not a fixture-clipping artefact. |
+| 2026-10-21 | FIX-IN-LANE (partial) | Phase 1 on lane/k1-tempo-lock-r1: R3 music PASS_timing_and_tempo, silence dark, M1/M2 green (p1.3-*, p1.4-*, p1.5-*). Still red: noise 0.46 / drone 0.52 confidence, log-sweep lock, release 5.94 s (p1.5-behaviour-lane.json). Not closable until A3 passes. |

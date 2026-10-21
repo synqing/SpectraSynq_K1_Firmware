@@ -170,10 +170,49 @@ hybrid, is the recorded route and is a tracker change with its own gate. Thresho
 touched. Stale facts corrected here: the tempo history is 512 emits at 44.44 Hz = 11.52 s
 (not 10.24 s at 50 Hz), so the emulator's 12 s preroll clears warm-up by ~0.5 s.
 
+## Update — 2026-10-21: lane R1 Phase 0 and Phase 1 (DEF-001 / DEF-002)
+
+Branch `lane/k1-tempo-lock-r1`. Receipts: `docs/receipts/tempo-lock-r1/` (each = exit status of the
+real command). All measurements are simulated (emulator, esp-emu 0.49.0) or host; none is silicon.
+
+**Phase 0.** (a) Level sweep R9, R3 music case 0 to -24 dB through the real emulated firmware:
+clipping 11 % of hops at 0 dB and 0 % from -6 dB, loud-guard input trim back to 1.0 from -12 dB, yet
+tracker-internal silence 100 %, internal lock 100 % and published lock 0 at every level. The false
+silence is not a fixture-clipping artefact. (b) Cost, shipped tracker, emulated time: emit p50 547 us,
+p95 633 us, max 662 us (the 2x ceiling). (c) Frozen scorer + dev manifest reproduce the corpus exactly
+(shipped 19/36 correct, 2 locks 1/1; pre-sqrt 27 locks 13 right 14 wrong); 3:2 among the wrong locks
+is 7, not 8 (one clip at 6.4 % from 2/3). (d) Draft AGENTS.md invariants I1-I10:
+`docs/patches/agents-md-tempo-invariants.patch` (Captain applies).
+
+**Phase 1 (flags K1_TEMPO_NOVELTY_LINEAR_V1 + K1_TEMPO_SILENCE_FROM_PRODUCER_V1, emulator env
+`k1_main_rpl_emu_tempo_r1`).** Every gating constant moved to `audio/k1_tempo_spec.h` with provenance
+(byte-identical, provenance pinned). Veto bits (K1TempoVeto) on every output gate; WARMUP also holds
+published confidence at 0 until the history is full. Results:
+- R3 music: PASS_timing_and_tempo, lock 1.00 at 127 BPM, 21 ticks. Silence: no lock, confidence 0.
+- M1 veto observability holds on 43 emulator streams; the shipped build violates it at generation 2047.
+- M2 contrast invariance holds (x1/2, x1/4, ^2, ^1/2 keep lock and 127 BPM); shipped fails at ^2.
+- Host replay equals the emulated firmware on 120,024 generations (lock, tick, BPM, veto).
+- Dev corpus: 27 locks, 13 right / 14 wrong (the known state; DEF-002 is selection).
+- Cost: emit p50 493 us, max 608 us (cheaper than shipped: the contrast loop is gone).
+- **Red at L1:** white noise confidence 0.46, pink drone 0.52 (limit 0.30); a 3.3-octave log sweep
+  (one semitone bin every 0.75 s, an 80 BPM onset train in GDFT space) locks; release after music
+  5.94 s (the producer's SILENCE_DWELL_MS = 5000 plus the EMA; limit 3 s). In the shipped build these
+  were suppressed only by the hidden contrast gate (`confidence x (1 - silence_level)`).
+
+**Emotiscope 1.2 reference (Captain pointer).** Emotiscope's `check_silence` takes ONE sqrt of linear
+spectral-flux novelty; K1 applied it to novelty already sqrt-compressed by the producer (the porting
+defect behind DEF-001). Replaying the lane streams with the tap and the contrast gate kept (Emotiscope
+-faithful) passes noise 0.22, drone 0.25, sweep 0.25 (no lock) and releases in 2.83 s, with the same
+27/13/14 dev result — but fails M2 at ^1/2 (one more compression anywhere upstream re-creates DEF-001)
+and conflicts with ruling R7 / I9. Recommended route: keep R7, and deliver noise/drone/release
+rejection through the Phase 3 beat-prediction hit-rate term, which reads peak positions relative to
+predicted beats and is invariant to scale and compression. Decision with the Captain.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
+| 2026-10-21 | agent:claude-code (lane R1) | Update: Phase 0 (level sweep, cost, frozen scorer) and Phase 1 (linear tap + producer silence + veto bits): music passes, noise/drone/sweep/release red at L1; Emotiscope 1.2 comparison and recommended route. |
 | 2026-10-20 | agent:claude-code (next phase) | Update: Main RPL weak lock = tracker-internal false silence on sqrt-compressed novelty; pre-sqrt candidate fixes the music passage end to end but fails the 36-track corpus gate (wrong-tempo locks 1→14); not merged. |
 | 2026-06-03 | agent:claude-opus | Update (PM): real-music baseline MEASURED via the digital pipe — premise revised. Dominant failure is the Goertzel tempo SPECTRUM (Acc2 14–17% vs autocorrelation ceiling 50% on the same novelty), not octave error (~6%). Step 2 implemented in sb_tempo.cpp: log-Gaussian tactus prior (octave-err→0) + Goertzel un-clamp (the real ~2× win: in-range Acc1 9.4→25%, Acc2 15.6→28%). Metronome lock preserved; ESP32 build SUCCESS. Remaining gap is architectural (Fourier vs ACF); recommend ACF-salience+prior hybrid next. |
