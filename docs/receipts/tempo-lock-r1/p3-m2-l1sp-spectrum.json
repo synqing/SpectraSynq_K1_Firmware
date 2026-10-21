@@ -1,0 +1,61 @@
+{
+ "gate": "p3-m2-l1sp-spectrum-transformed",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_gates.py m2 --fixtures tests/fixtures/tempo_corpus/streams/index.json --clip r3:r3_music_spec --variant l1sp",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/streams/index.json": "0e0c590a5790b96e6f85eb45294c9a1cf89aea4d9991dc32a64860d56f384d90",
+  "tests/fixtures/tempo_corpus/streams/r3_r3_music_spec.tsv": "9818deb12592d6ccefca79e0996997666c40c3e173f0ec29350ef4522c3804a6"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "{",
+  " \"clip\": \"r3:r3_music_spec\",",
+  " \"variant\": \"l1sp\",",
+  " \"tolerance_lock_frac\": 0.05,",
+  " \"results\": {",
+  "  \"x1\": {",
+  "   \"lock_frac\": 1.0,",
+  "   \"settled_bpm\": 127",
+  "  },",
+  "  \"scale:0.5\": {",
+  "   \"lock_frac\": 1.0,",
+  "   \"settled_bpm\": 127",
+  "  },",
+  "  \"scale:0.25\": {",
+  "   \"lock_frac\": 1.0,",
+  "   \"settled_bpm\": 127",
+  "  },",
+  "  \"pow:2\": {",
+  "   \"lock_frac\": 0.985,",
+  "   \"settled_bpm\": 127",
+  "  },",
+  "  \"pow:0.5\": {",
+  "   \"lock_frac\": 1.0,",
+  "   \"settled_bpm\": 127",
+  "  }",
+  " },",
+  " \"failing\": [],",
+  " \"fixture_sha256\": \"9818deb12592d6ccefca79e0996997666c40c3e173f0ec29350ef4522c3804a6\",",
+  " \"spectrum_transformed\": true",
+  "}"
+ ],
+ "utc": "2026-10-21T08:33:14+00:00",
+ "git_sha": "d63b476de9a98208aaa8455a23a583e99d934346",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/fixtures/tempo_corpus/streams/index.json",
+  "tests/test_tempo_lane_class_gates.py",
+  "tests/fixtures/tempo_corpus/streams/r3_r3_music_spec.tsv",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

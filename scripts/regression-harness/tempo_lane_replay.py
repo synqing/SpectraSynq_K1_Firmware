@@ -192,7 +192,25 @@ def transform(value: float, spec: str | None) -> float:
         return value * x
     if kind == "pow":
         return value ** x if value > 0.0 else 0.0
+    if kind == "speczero":          # broken-input control: novelty kept, spectrum evidence erased
+        return value
     raise SystemExit(f"unknown transform {spec}")
+
+
+def transform_spectrum(hexs: str, spec: str | None) -> str:
+    """The same monotonic transform on every per-note spectrum bin (16-bit, [0,1]), re-quantised as the
+    emulator's P-line probe does. M2 transforms the whole producer output, novelty and spectrum alike."""
+    if not spec or not hexs:
+        return hexs
+    n = len(hexs) // 4
+    if spec.split(":")[0] == "speczero":
+        return "0000" * n
+    out = []
+    for b in range(n):
+        v = transform(int(hexs[4 * b:4 * b + 4], 16) / 65535.0, spec)
+        v = 0.0 if v < 0.0 else (1.0 if v > 1.0 else v)
+        out.append(f"{int(v * 65535.0 + 0.5):04x}")
+    return "".join(out)
 
 
 def load_fixture(index_path: Path, cid: str, meta: dict) -> list[tuple[int, float, int]]:
@@ -207,8 +225,8 @@ def load_fixture(index_path: Path, cid: str, meta: dict) -> list[tuple[int, floa
 
 
 def replay_rows(binary: Path, rows, spec: str | None, debug: bool) -> dict:
-    feed = "".join(f"{r[0]} {frame_ms(r[0])} {transform(r[1], spec):.9g} {r[2]}" + (f" {r[3]}" if len(r) > 3 else "") + "\n"
-                   for r in rows)
+    feed = "".join(f"{r[0]} {frame_ms(r[0])} {transform(r[1], spec):.9g} {r[2]}"
+                   + (f" {transform_spectrum(r[3], spec)}" if len(r) > 3 else "") + "\n" for r in rows)
     r = subprocess.run([str(binary)], input=feed, capture_output=True, text=True)
     if r.returncode != 0:
         raise SystemExit(f"replay failed: {r.stderr[-500:]}")

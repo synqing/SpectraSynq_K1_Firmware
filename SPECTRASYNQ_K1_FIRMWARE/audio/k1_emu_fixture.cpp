@@ -271,6 +271,9 @@ struct ProbeRecord {
   uint8_t locked_internal;
   float conf_ema;
   uint32_t us_silence, us_acf, us_update, us_phase, us_publish, us_emit;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  uint32_t us_presence;  // per-frame presence cost summed over the emit window (17th G field)
+#endif
 };
 ProbeRecord* s_probe = nullptr;
 #endif
@@ -459,12 +462,16 @@ void print_counters(const char* reason, const char* where) {
   if (s_probe != nullptr) {
     for (uint32_t i = 0; i < s_nov_count; i++) {
       const ProbeRecord& p = s_probe[i];
-      K1_EMU_LOG.printf("G,%lu,%.6f,%.6f,%u,%u,%lu,%u,%u,%.6f,%lu,%lu,%lu,%lu,%lu,%lu\n",
+      K1_EMU_LOG.printf("G,%lu,%.6f,%.6f,%u,%u,%lu,%u,%u,%.6f,%lu,%lu,%lu,%lu,%lu,%lu",
                         (unsigned long)(i + 1), p.input_trim, p.gdft_trim, (unsigned)p.clip_count,
                         (unsigned)p.sample_count, (unsigned long)p.emit_count, (unsigned)p.silence_internal,
                         (unsigned)p.locked_internal, p.conf_ema, (unsigned long)p.us_silence,
                         (unsigned long)p.us_acf, (unsigned long)p.us_update, (unsigned long)p.us_phase,
                         (unsigned long)p.us_publish, (unsigned long)p.us_emit);
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+      K1_EMU_LOG.printf(",%lu", (unsigned long)p.us_presence);
+#endif
+      K1_EMU_LOG.printf("\n");
       if ((i & 0xFF) == 0xFF) {
         feedLoopWDT();
         vTaskDelay(1);
@@ -776,6 +783,9 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
       p.us_phase = d.phase_elapsed_us;
       p.us_publish = d.publish_elapsed_us;
       p.us_emit = d.emit_elapsed_us;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+      p.us_presence = d.presence_elapsed_us;
+#endif
     }
 #endif
     if (generation > s_nov_count) s_nov_count = generation;

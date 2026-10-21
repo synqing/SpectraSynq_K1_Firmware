@@ -127,6 +127,9 @@ struct K1TempoDebugSnapshot {
   uint32_t phase_elapsed_us;
   uint32_t publish_elapsed_us;
   uint32_t emit_elapsed_us;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  uint32_t presence_elapsed_us;  // per-frame presence cost summed over the emit window (lane R1, A7)
+#endif
   bool acf_spread_active;
   uint16_t acf_lag_cursor;
   uint32_t acf_publish_count;

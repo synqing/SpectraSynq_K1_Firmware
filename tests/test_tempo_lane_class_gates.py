@@ -65,6 +65,21 @@ def test_m2_catches_the_shipped_compression_dependence():
     assert r.returncode == 1, r.stdout
 
 
+def test_m2_spectral_presence_build_is_invariant_with_the_spectrum_transformed():
+    # Same transforms on the novelty AND on every per-note spectrum bin (the whole producer output).
+    r = _run(GATES, "m2", "--fixtures", STREAMS, "--clip", "r3:r3_music_spec", "--variant", "l1sp")
+    assert r.returncode == 0, r.stdout
+    import json
+    assert json.loads(r.stdout)["spectrum_transformed"] is True
+
+
+def test_m2_sees_the_spectrum_path_erased_evidence_must_fail():
+    # Broken input: spectrum zeroed, novelty kept. A gate that did not exercise the presence path would pass.
+    r = _run(GATES, "m2", "--fixtures", STREAMS, "--clip", "r3:r3_music_spec", "--variant", "l1sp",
+             "--transforms", "speczero:1")
+    assert r.returncode == 1, r.stdout
+
+
 # ---------------------------------------------------------------- M5 metrical trap suite (I6)
 TRAPS = HARNESS / "tempo_trap_suite.py"
 TRAP_BASELINE = ROOT / "tests/fixtures/tempo_corpus/traps/baseline_shipped_selection.json"

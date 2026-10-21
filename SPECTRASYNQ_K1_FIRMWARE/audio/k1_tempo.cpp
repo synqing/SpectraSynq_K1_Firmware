@@ -475,6 +475,12 @@ static uint32_t k1_dbg_update_elapsed_us = 0;
 static uint32_t k1_dbg_phase_elapsed_us = 0;
 static uint32_t k1_dbg_publish_elapsed_us = 0;
 static uint32_t k1_dbg_emit_elapsed_us = 0;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+// Presence runs on every AP frame, outside the emit timer: sum its cost over the frames of one emit
+// window and latch it at the emit, so the A7 cost covers all tempo work (lane R1, probe builds only).
+static uint32_t k1_dbg_presence_window_us = 0;
+static uint32_t k1_dbg_presence_elapsed_us = 0;
+#endif
 #endif
 
 static portMUX_TYPE k1_tempo_mux = portMUX_INITIALIZER_UNLOCKED;
@@ -1577,6 +1583,10 @@ void k1_tempo_reset() {
   k1_dbg_phase_elapsed_us = 0;
   k1_dbg_publish_elapsed_us = 0;
   k1_dbg_emit_elapsed_us = 0;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  k1_dbg_presence_window_us = 0;
+  k1_dbg_presence_elapsed_us = 0;
+#endif
 #endif
   K1TempoEvent empty = {};
   k1_tempo_publish(empty);
@@ -1594,7 +1604,13 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   k1_window_all_silent = k1_window_all_silent && audio.silence;
 #endif
 #ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+#if ENABLE_TEMPO_STREAM
+  const int64_t k1_dbg_presence_start_us = k1_tempo_diag_time_us();
+#endif
   k1_spectral_presence_frame(audio);
+#if ENABLE_TEMPO_STREAM
+  k1_dbg_presence_window_us += (uint32_t)(k1_tempo_diag_time_us() - k1_dbg_presence_start_us);
+#endif
 #endif
   // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated `novelty *= 4.0f` boost lived
   // here. The multiplier was fitted by trial (x2.5 then x4.0) against Bench Unit
@@ -1635,6 +1651,10 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
     return;  // not an emit frame — cheap path (still peak-holding novelty)
   }
   k1_frame_ctr = 0;
+#if ENABLE_TEMPO_STREAM && defined(K1_TEMPO_SPECTRAL_PRESENCE_V1)
+  k1_dbg_presence_elapsed_us = k1_dbg_presence_window_us;
+  k1_dbg_presence_window_us = 0;
+#endif
 #ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
   k1_producer_silence = k1_window_all_silent;
   k1_window_all_silent = true;
@@ -1879,6 +1899,9 @@ K1TempoDebugSnapshot k1_tempo_debug_read() {
   d.phase_elapsed_us = k1_dbg_phase_elapsed_us;
   d.publish_elapsed_us = k1_dbg_publish_elapsed_us;
   d.emit_elapsed_us = k1_dbg_emit_elapsed_us;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  d.presence_elapsed_us = k1_dbg_presence_elapsed_us;
+#endif
 #if K1_TEMPO_ACF_SPREAD_PROBE
   d.acf_spread_active = k1_acf_spread_active;
   d.acf_lag_cursor = k1_acf_spread_cursor;

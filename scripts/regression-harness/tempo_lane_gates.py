@@ -10,6 +10,9 @@ against a rule and exits non-zero on failure; none of them regenerates its input
   m2   contrast invariance (I2): replay one captured tempo-input stream at x1, x1/2, x1/4, ^2, ^1/2
        through the host tracker; every transform must keep lock_frac within --tol of x1 and the same
        settled BPM (mode, last 50 %). --fixtures INDEX --clip ID --variant VAR [--tol 0.05]
+       A clip captured with the per-note spectrum gets the same transform on every spectrum bin
+       (the whole producer output moves). --transforms overrides the set; `speczero:1` (spectrum
+       erased, novelty kept) is the broken-input control that must fail for a spectrum-reading build.
   p15  Phase 1.5 behaviour on emulator cases (tempo_lane_emu.py p15 suite): --cases DIR/cases.json
        silence: no lock and published confidence 0 throughout; noise / tone / drone / sweep:
        published confidence < 0.30 and 0 beat ticks; music then silence: lock released <= 3.0 s
@@ -111,14 +114,14 @@ def cmd_m2(a) -> int:
         base = tlr.replay_rows(binary, rows, None, False)
         res = {"x1": {"lock_frac": round(_lock_frac(base), 4), "settled_bpm": _settled(base)}}
         bad = []
-        for t in TRANSFORMS:
+        for t in (a.transforms or TRANSFORMS):
             c = tlr.replay_rows(binary, rows, t, False)
             lf, bpm = _lock_frac(c), _settled(c)
             res[t] = {"lock_frac": round(lf, 4), "settled_bpm": bpm}
             if abs(lf - res["x1"]["lock_frac"]) > a.tol or bpm != res["x1"]["settled_bpm"]:
                 bad.append(t)
     out = {"clip": a.clip, "variant": a.variant, "tolerance_lock_frac": a.tol, "results": res, "failing": bad,
-           "fixture_sha256": meta["sha256"]}
+           "fixture_sha256": meta["sha256"], "spectrum_transformed": len(rows[0]) > 3}
     if a.json:
         Path(a.json).write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
@@ -193,6 +196,7 @@ def main(argv=None) -> int:
     m2.add_argument("--clip", required=True)
     m2.add_argument("--variant", default="l1")
     m2.add_argument("--tol", type=float, default=0.05)
+    m2.add_argument("--transforms", nargs="+")
     m2.add_argument("--json")
     p15 = sub.add_parser("p15")
     p15.add_argument("--cases", required=True)
