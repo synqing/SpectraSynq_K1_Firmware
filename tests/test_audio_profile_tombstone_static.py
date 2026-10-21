@@ -20,6 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 FW = ROOT / "SPECTRASYNQ_K1_FIRMWARE"
 PROFILE = FW / "audio" / "k1_audio_profile.h"
 TEMPO = FW / "audio" / "k1_tempo.cpp"
+# Lane R1 (2026-10-21, I10): the tracker's gating constants moved into k1_tempo_spec.h; every
+# tripwire below covers both files so a reinstatement in either is caught.
+TEMPO_SPEC = FW / "audio" / "k1_tempo_spec.h"
 GLOBALS = FW / "system" / "globals.h"
 EFFECT = FW / "effects" / "light_mode_waveform_tempo.cpp"
 PIO = ROOT / "platformio.ini"
@@ -54,6 +57,8 @@ def test_globals_includes_the_guard_so_every_tu_compiles_it():
 @pytest.mark.parametrize("path,pattern,what", [
     (TEMPO,   r"K1_LOCK_CONFIDENCE\s*=\s*0\.28f",       "lock floor 0.28"),
     (TEMPO,   r"K1_CONF_V2_REL\s+0\.18f",               "lock-release 0.18"),
+    (TEMPO_SPEC, r"K1_LOCK_CONFIDENCE\s*=\s*0\.28f",    "lock floor 0.28 (spec header)"),
+    (TEMPO_SPEC, r"K1_CONF_V2_REL\s+0\.18f",            "lock-release 0.18 (spec header)"),
     (TEMPO,   r"novelty\s*\*\s*4\.0f",                  "novelty x4.0 boost"),
     (GLOBALS, r"K1_SILENCE_RMS_ENTER\s*=\s*0\.001f",    "silence RMS enter 0.001"),
     (GLOBALS, r"K1_SILENCE_RMS_EXIT\s*=\s*0\.003f",     "silence RMS exit 0.003"),
@@ -71,7 +76,7 @@ def test_voided_constant_is_not_reinstated(path, pattern, what):
 
 def test_no_mic_gated_calibration_branches_remain_in_the_tempo_path():
     """The tempo/silence path must be mic-agnostic until a profile is derived."""
-    for path in (TEMPO, EFFECT):
+    for path in (TEMPO, TEMPO_SPEC, EFFECT):
         assert "K1_MIC_IM73D_PDM_V1" not in path.read_text(encoding="utf-8"), (
             f"{path.name} must carry no mic-gated calibration branch. Mic "
             "PLUMBING (pin maps, driver mode, buffers) legitimately lives behind "
@@ -80,7 +85,7 @@ def test_no_mic_gated_calibration_branches_remain_in_the_tempo_path():
 
 
 def test_sph_reference_values_survive_unconditionally():
-    t = TEMPO.read_text(encoding="utf-8")
+    t = TEMPO_SPEC.read_text(encoding="utf-8") + TEMPO.read_text(encoding="utf-8")
     assert re.search(r"K1_LOCK_CONFIDENCE\s*=\s*0\.60f", t)
     assert re.search(r"K1_CONF_V2_REL\s+0\.42f", t)
     g = GLOBALS.read_text(encoding="utf-8")

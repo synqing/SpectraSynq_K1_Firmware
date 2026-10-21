@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "config_types.h"
+#include "k1_tempo_spec.h"  // every fixed gating constant + its provenance (lane R1, I3/I10)
 
 #if ENABLE_TEMPO_STREAM
 #if __has_include(<esp_timer.h>)
@@ -79,7 +80,7 @@ static const uint16_t K1_HISTORY_LENGTH = 512;
 #endif
 
 // Per-emit decay so the Goertzel weights recent novelty more (fades stale beats).
-static const float    K1_NOVELTY_DECAY = 0.999f;
+// K1_NOVELTY_DECAY: k1_tempo_spec.h
 
 // Phase shift for beat alignment (fraction of pi).
 static const float    K1_BEAT_SHIFT_PERCENT = 0.08f;
@@ -93,12 +94,12 @@ static const float    K1_BEAT_SHIFT_PERCENT = 0.08f;
 // measured on Bench Unit 2 under a mic identity that correction 2026-08-10
 // voided. Deleted rather than carried — see audio/k1_audio_profile.h. 0.60 is
 // the SPH0645 calibration and is now unconditional.
-static const float    K1_LOCK_CONFIDENCE = 0.60f;
+// K1_LOCK_CONFIDENCE: k1_tempo_spec.h
 
 // Confidence main-lobe half-width (bins). The tempo Goertzel's main lobe spans ~5 BPM, so
 // bins within +/-this of the winner are the SAME peak; only energy OUTSIDE counts against
 // confidence. Lets a real isolated tempo read ~1.0 while a broad/flat spectrum reads low.
-static const int      K1_CONF_LOBE = 6;
+// K1_CONF_LOBE: k1_tempo_spec.h
 
 // ----------------------------------------------------------------------------------------
 // Log-Gaussian tactus prior (winner SELECTION only — Step 2 octave defence)
@@ -125,9 +126,7 @@ static const int      K1_CONF_LOBE = 6;
 // CONFIDENCE is preserved unchanged: it reads a SEPARATE broad 120-centred prior on the POINT
 // (un-spread) ACF salience (k1_conf_score), so the comb's ladder-spreading does not dilute the
 // concentration metric and the tempo_replay clean cases lock exactly as before (120 conf 0.83).
-#ifndef K1_TACTUS_BPM
-#define K1_TACTUS_BPM   88.0f
-#endif
+// K1_TACTUS_BPM: k1_tempo_spec.h
 
 // ----------------------------------------------------------------------------------------
 // Selection anti-pinning (Proposal 1) — compile-gated, SELECTION path only.
@@ -141,23 +140,7 @@ static const int      K1_CONF_LOBE = 6;
 #ifndef K1_TEMPO_ANTI_PIN_V1
 #define K1_TEMPO_ANTI_PIN_V1 0
 #endif
-#if K1_TEMPO_ANTI_PIN_V1
-#ifndef K1_AP_UP_RATIO
-#define K1_AP_UP_RATIO          1.08f
-#endif
-#ifndef K1_AP_UP_FRAMES
-#define K1_AP_UP_FRAMES         4
-#endif
-#ifndef K1_AP_BASE_RATIO
-#define K1_AP_BASE_RATIO        1.10f
-#endif
-#ifndef K1_AP_BASE_FRAMES
-#define K1_AP_BASE_FRAMES       5
-#endif
-#endif  // K1_TEMPO_ANTI_PIN_V1
-#ifndef K1_TACTUS_SIGMA
-#define K1_TACTUS_SIGMA 0.75f
-#endif
+// K1_AP_UP_RATIO / K1_AP_UP_FRAMES / K1_AP_BASE_RATIO / K1_AP_BASE_FRAMES / K1_TACTUS_SIGMA: k1_tempo_spec.h
 static const float    K1_TACTUS_BPM_V   = K1_TACTUS_BPM;
 static const float    K1_TACTUS_SIGMA_V = K1_TACTUS_SIGMA;   // octaves
 static float          k1_tempo_prior[K1_NUM_TEMPI];
@@ -167,12 +150,7 @@ static float          k1_tempo_prior[K1_NUM_TEMPI];
 // different question ("is the winner an isolated peak?") and must read near-maximal for ANY clean
 // lock, so it keeps the broad, tactus-centred shape that symmetrically suppresses a clean train's
 // sub/super-multiple ACF peaks WITHOUT the selection prior's low-centre bias against fast tempi.
-#ifndef K1_CONF_BPM
-#define K1_CONF_BPM   120.0f
-#endif
-#ifndef K1_CONF_SIGMA
-#define K1_CONF_SIGMA 0.9f
-#endif
+// K1_CONF_BPM / K1_CONF_SIGMA: k1_tempo_spec.h
 static const float    K1_CONF_BPM_V   = K1_CONF_BPM;
 static const float    K1_CONF_SIGMA_V = K1_CONF_SIGMA;
 static float          k1_conf_prior[K1_NUM_TEMPI];
@@ -291,40 +269,22 @@ static float    k1_confidence = 0.0f;
 // fraction of in-range music whose settled conf crosses 0.60 while holding noise/silence conf
 // below 0.60). Chosen point: LO=0.01 HI=0.04 W=0.40/0.35/0.25 -> 69% of in-range tracks settle
 // >=0.60, music median settled conf 0.041 -> ~0.71, worst-case synthetic-negative conf 0.468.
-#ifndef K1_CONF_V2_LO
-#define K1_CONF_V2_LO 0.01f          // point-peakShare at quality-floor (CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_HI
-#define K1_CONF_V2_HI 0.04f          // point-peakShare at quality-ceiling (CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_W1
-#define K1_CONF_V2_W1 0.40f          // histShareNorm weight (CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_W2
-#define K1_CONF_V2_W2 0.35f          // prominence (peak-above-background) weight (CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_W3
-#define K1_CONF_V2_W3 0.25f          // periodicity weight (CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_REL
+// K1_CONF_V2_LO: k1_tempo_spec.h
+// K1_CONF_V2_HI: k1_tempo_spec.h
+// K1_CONF_V2_W1: k1_tempo_spec.h
+// K1_CONF_V2_W2: k1_tempo_spec.h
+// K1_CONF_V2_W3: k1_tempo_spec.h
+// K1_CONF_V2_REL: k1_tempo_spec.h
 // TOMBSTONE 2026-08-11: IM73D override 0.18 deleted (k1_audio_profile.h).
-#define K1_CONF_V2_REL 0.42f         // lock-release threshold (hysteresis below 0.60; CALIBRATED)
-#endif
-#ifndef K1_CONF_V2_FLOOR
-#define K1_CONF_V2_FLOOR 0.20f       // watchdog conf floor (above worst settled-music dips,
-                                     // below the noise/silence band so a dead winner unlocks)
-#endif
-#ifndef K1_CONF_V2_WATCHDOG_N
-#define K1_CONF_V2_WATCHDOG_N 12     // consecutive sub-floor updates -> force unlock + reset
-#endif
+// K1_CONF_V2_FLOOR: k1_tempo_spec.h
+//   below the noise/silence band so a dead winner unlocks)
+// K1_CONF_V2_WATCHDOG_N: k1_tempo_spec.h
 // EMA smoothing time-constant 150 ms (donor used 0.12/update @50 Hz; that is donor-rate-
 // specific). At the fork's K1_NOVELTY_RATE_HZ (44.44 Hz) emit rate, the rate-derived alpha is
 //   alpha = 1 - exp(-(1/44.44)/0.150) = 1 - exp(-0.1500) ≈ 0.1393.
 // If a per-call dt is available we use 1 - exp(-dt/0.150) per update; this constant is the
 // nominal fallback. STATED, not a hardcoded donor 0.12. (Rounded to 0.139.)
-#ifndef K1_CONF_V2_TAU_S
-#define K1_CONF_V2_TAU_S 0.150f      // EMA time-constant (seconds)
-#endif
+// K1_CONF_V2_TAU_S: k1_tempo_spec.h
 static const float K1_CONF_V2_ALPHA_NOMINAL =
     1.0f - expf(-(1.0f / K1_NOVELTY_RATE_HZ) / K1_CONF_V2_TAU_S);  // ≈0.1393 @44.44 Hz
 
@@ -333,11 +293,9 @@ static bool     k1_locked_v2 = false;
 static uint16_t k1_v2_updates = 0;        // total V2 confidence updates (warmup counter)
 static uint16_t k1_v2_subfloor = 0;       // consecutive sub-FLOOR updates (watchdog)
 static uint16_t k1_v2_beats_seen = 0;     // beat_tick observations since reset (>=2 to acquire)
-#ifndef K1_CONF_V2_WARMUP_UPDATES
+// K1_CONF_V2_WARMUP_UPDATES: k1_tempo_spec.h
 // Warmup: the ACF ring must fill before the comb/sel salience is meaningful. History is 512
 // novelty samples; require that many V2 updates (1 per emit) before a lock can acquire.
-#define K1_CONF_V2_WARMUP_UPDATES 512
-#endif
 // Last-computed raw components, for -DK1_TEMPO_CONF_DUMP introspection / calibration.
 static float    k1_v2_histShareNorm = 0.0f;
 static float    k1_v2_prominence    = 0.0f;
@@ -396,36 +354,20 @@ static uint32_t k1_time_ms = 0;
 //     (tempo_flywheel_calibrate.py); the values below are the calibrated point.
 
 // --- calibratable constants (all -D-overridable so the harness can sweep) ---
-#ifndef K1_FW_KP
-#define K1_FW_KP 0.25f            // proportional phase-correction gain per onset (CALIBRATED:
-                                  // synthetic clean-train phase-lock needs Kp>=0.20 to converge
-                                  // the steady-state onset offset to <70 ms; 0.25 gives beat-F
-                                  // 1.000 on 90/120 trains; corpus density-in-band holds 97%.)
-#endif
-#ifndef K1_FW_KI
-#define K1_FW_KI 0.002f           // integral freq-slew gain per onset (CALIBRATED; tiny — kills
-                                  // residual phase drift without leaving the winner's octave)
-#endif
-#ifndef K1_FW_MAX_CORR
-#define K1_FW_MAX_CORR 0.10f      // |phase correction| cap per onset, in beats (inertia; CALIBRATED:
-                                  // 0.10 lets the PLL acquire in a few beats yet rejects single
-                                  // spurious onsets — one bad onset moves the grid <=0.10 beat)
-#endif
-#ifndef K1_FW_FREQ_PULL
-#define K1_FW_FREQ_PULL 0.04f     // max fractional run_bpm deviation from the winner (+/-4%; octave-safe)
-#endif
-#ifndef K1_FW_ONSET_K
-#define K1_FW_ONSET_K 1.20f       // onset threshold = floor_mean + K*floor_mad (CALIBRATED)
-#endif
-#ifndef K1_FW_ONSET_FLOOR_TAU_S
-#define K1_FW_ONSET_FLOOR_TAU_S 0.30f   // adaptive onset-floor EMA time-constant (seconds)
-#endif
-#ifndef K1_FW_COAST_BEATS
-#define K1_FW_COAST_BEATS 8       // coast this many beats after lock loss, then stop emitting (flywheel)
-#endif
-#ifndef K1_FW_REFRACTORY
-#define K1_FW_REFRACTORY 0.45f    // min phase advance (in beats) since last tick before another can fire
-#endif
+// K1_FW_KP: k1_tempo_spec.h
+//   synthetic clean-train phase-lock needs Kp>=0.20 to converge
+//   the steady-state onset offset to <70 ms; 0.25 gives beat-F
+//   1.000 on 90/120 trains; corpus density-in-band holds 97%.)
+// K1_FW_KI: k1_tempo_spec.h
+//   residual phase drift without leaving the winner's octave)
+// K1_FW_MAX_CORR: k1_tempo_spec.h
+//   0.10 lets the PLL acquire in a few beats yet rejects single
+//   spurious onsets — one bad onset moves the grid <=0.10 beat)
+// K1_FW_FREQ_PULL: k1_tempo_spec.h
+// K1_FW_ONSET_K: k1_tempo_spec.h
+// K1_FW_ONSET_FLOOR_TAU_S: k1_tempo_spec.h
+// K1_FW_COAST_BEATS: k1_tempo_spec.h
+// K1_FW_REFRACTORY: k1_tempo_spec.h
 static const float K1_FW_FLOOR_ALPHA =
     1.0f - expf(-(1.0f / K1_NOVELTY_RATE_HZ) / K1_FW_ONSET_FLOOR_TAU_S);  // ~0.0723 @44.44 Hz
 
@@ -513,8 +455,8 @@ static void k1_check_silence() {
   // The novelty-contrast gate now runs for every build.
   float min_val = 1.0f;
   float max_val = 0.0f;
-  for (uint16_t i = 0; i < 128; i++) {
-    uint16_t idx = (uint16_t)((K1_HISTORY_LENGTH + k1_spectral_index - 128 + i) % K1_HISTORY_LENGTH);
+  for (uint16_t i = 0; i < K1_SILENCE_CONTRAST_WINDOW; i++) {
+    uint16_t idx = (uint16_t)((K1_HISTORY_LENGTH + k1_spectral_index - K1_SILENCE_CONTRAST_WINDOW + i) % K1_HISTORY_LENGTH);
     float scaled = k1_t_clamp(k1_spectral_curve[idx] * k1_novelty_scale, 0.0f, 1.0f);
     float processed = (scaled < 0.5f ? scaled : 0.5f) * 2.0f;
     float s = sqrtf(processed);
@@ -523,7 +465,7 @@ static void k1_check_silence() {
   }
   float contrast = fabsf(max_val - min_val);
   float silence_raw = 1.0f - contrast;
-  const float silence_enter = 0.5f;
+  const float silence_enter = K1_SILENCE_CONTRAST_ENTER;
   if (silence_raw > silence_enter) {
     k1_silence_detected = true;
     k1_silence_level = k1_t_clamp((silence_raw - silence_enter) / fmaxf(1.0f - silence_enter, 1e-6f), 0.0f, 1.0f);
@@ -637,22 +579,14 @@ static float k1_compute_magnitude_from_window(uint16_t bin) {
 // Teeth lags reach K * lag(60 BPM) ~= 4*44 = 178 samples; the ACF band is widened to cover them.
 // acf(k*T) is read by 3-point parabolic interpolation off the integer-lag ACF (sub-lag interp is
 // load-bearing at 44.44 Hz — see the array comment), so fractional ladder lags are sampled cleanly.
-#ifndef K1_COMB_TEETH
-#define K1_COMB_TEETH 4             // harmonic ladder depth (T,2T,3T,4T)
-#endif
+// K1_COMB_TEETH: k1_tempo_spec.h
 // Tooth weights — FLATTER than 1/k (host-swept: 1/k gave Acc1 34%, this gives 37%+ then the
 // prior reshape lifts it further). A slow decay keeps the every-other-/-third-/-fourth-beat
 // teeth heavy enough to assert the fundamental over a sub-multiple, without over-weighting a
 // long noisy tail (steeper than this collapsed back toward the point-ACF doubling).
-#ifndef K1_COMB_W2
-#define K1_COMB_W2 0.8f            // every-other-beat tooth (2T)
-#endif
-#ifndef K1_COMB_W3
-#define K1_COMB_W3 0.7f            // every-third-beat tooth (3T)
-#endif
-#ifndef K1_COMB_W4
-#define K1_COMB_W4 0.6f            // every-fourth-beat tooth (4T)
-#endif
+// K1_COMB_W2: k1_tempo_spec.h
+// K1_COMB_W3: k1_tempo_spec.h
+// K1_COMB_W4: k1_tempo_spec.h
 
 // 3-point parabolic sample of the integer-lag ACF table at a real lag (table covers
 // [lag_lo .. lag_lo+nlag-1]); returns 0 outside the table. Shared by the comb teeth.
@@ -1013,8 +947,8 @@ static void k1_update_winner() {
       need_frames = (uint8_t)K1_AP_UP_FRAMES;
     }
 #else
-    const float need_ratio = 1.1f;
-    const uint8_t need_frames = 5;
+    const float need_ratio = K1_WIN_SWITCH_RATIO;
+    const uint8_t need_frames = K1_WIN_SWITCH_FRAMES;
 #endif
     if (best_mag > current_mag * need_ratio) {
       if (best_bin == k1_candidate_bin) {

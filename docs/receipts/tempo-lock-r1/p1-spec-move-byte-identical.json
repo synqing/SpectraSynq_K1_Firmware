@@ -1,0 +1,32 @@
+{
+ "gate": "p1-spec-move-byte-identical",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_bytecheck.py compare _scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-before-repro _scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-after-repro",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-before-repro/snapshot.json": "60c3f9b1524d3523d7074f9f60f7846a99de226b9be61e6b489ba3dfd0dc41bd",
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-after-repro/snapshot.json": "25f2a75bff632ffe9523561e233465694178861677634eaaaf641be27cfc32f1"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "objects compared=261 differing=0",
+  "elf alloc sections differing=0 []"
+ ],
+ "utc": "2026-10-21T01:59:20+00:00",
+ "git_sha": "aeb0322f487a5c0944de061eef83c3536bbc3a74",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "tests/test_audio_profile_tombstone_static.py",
+  "tests/test_rate_consistency.py",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_lane_bytecheck.py",
+  "tests/test_tempo_spec_provenance.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}
