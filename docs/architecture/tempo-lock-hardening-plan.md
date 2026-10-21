@@ -516,6 +516,28 @@ recommendation above. That recommendation and its prediction (E1 fails) stand an
   sha256 `b28cc067…7531`, md5 `4c13f740…a336`. This is NOT verified against a published checksum: the GitHub API
   was not usable from this machine. Receipt `e1-validation-manifest`.
 
+## E2 learned lock score — pre-registration, 2026-10-22 (written while the E1 V1 capture was running, before its result was seen)
+
+- **Question.** Can a lock gate built from signals the lane already computes publish right locks on at least a
+  quarter of tracks while keeping wrong locks rare? E1 used one signal (agreement) and a clip-length-dependent hold.
+- **Candidate.** `tempo_lock_score.py`: a standardised logistic regression (L2 = 1) over 10 per-emit features, each
+  read over a fixed trailing 4 s window or at the current emit (so independent of clip length). The features are
+  tracker-estimator agreement fraction, tracker and estimator tempo stability, estimator posterior mass, 3:2 margin
+  and phase peak, and tracker confidence, quality, tooth consistency and comb/point-ACF/Goertzel votes. Label: the
+  tracker's current tempo is CORRECT by the scorer's rule. Lock = tracker confidence >= 0.30 (never from the NONE
+  band) and producer not silent and score >= THETA. The tracker's BPM passes through unchanged. Tracker and
+  estimator are frozen as in E1.
+- **Training material.** The 36 development clips plus GTZAN V1 (516), which becomes development data only after E1
+  has been judged on it. V2 (483) stays sealed.
+- **THETA, fixed by rule.** Grid 0.500-0.990 in steps of 0.005. Five folds grouped by clip (seed 20261022), so every
+  clip is scored by a model that never saw it. THETA = the smallest grid value whose cross-validated track result
+  has a Wilson upper bound <= 10 %. The final model is refit on all training clips with that THETA.
+- **Development entry bar (before V2 may be used).** In cross-validation on the training material: Wilson upper
+  <= 10 % AND right locks >= 25 % of clips. If either fails, E2 fails on development and V2 stays sealed.
+- **Screen.** If the entry bar is met: one run on V2, the same three criteria as E1 (`tempo_lock_verdict.py`), no re-pick.
+- **Then.** A V2 pass freezes E2 for the single held-out acceptance run (A2 and the rest of A1-A9). A V2 failure leaves
+  the lock-off fallback in place.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
