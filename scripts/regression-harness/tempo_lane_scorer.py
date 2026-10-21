@@ -14,7 +14,12 @@ Frozen definitions (lane R1 brief, 2026-10-21; change only with a dated changelo
   3:2             detected/gold within +/-6 % of 2/3 or 4/3
 
 Exit codes: 0 ok / criterion met, 1 criterion not met (or self-test failure), 2 malformed or
-incomplete input, 3 an acceptance verdict was requested over a dev-role clip (refused).
+incomplete input, 3 an acceptance verdict was requested over a dev- or validation-role clip (refused).
+
+Changelog:
+  2026-10-22  Role "validation" added (GTZAN screening set for lock candidates, tempo_validation_corpus.py).
+              It scores like any role; --acceptance refuses it exactly as it refuses dev. Definitions
+              above unchanged.
 
 Usage:
   tempo_lane_scorer.py score   --manifest M --traj T.json [--role dev|heldout|all] [--out R.json]
@@ -41,6 +46,8 @@ TOL_32 = 0.06
 RATIOS_32 = (2.0 / 3.0, 4.0 / 3.0)
 
 EXIT_OK, EXIT_FAIL, EXIT_INPUT, EXIT_DEV_REFUSED = 0, 1, 2, 3
+ROLES = ("dev", "heldout", "validation")
+NOT_ACCEPTANCE_ROLES = ("dev", "validation")   # tune / screen; never accept
 
 
 class InputError(Exception):
@@ -63,7 +70,7 @@ def load_manifest(path: Path) -> dict[str, dict]:
         for k in ("id", "path", "sha256", "gold_bpm", "role", "source"):
             if k not in r:
                 raise InputError(f"manifest row {r.get('id')!r} lacks {k!r}")
-        if r["role"] not in ("dev", "heldout"):
+        if r["role"] not in ROLES:
             raise InputError(f"manifest row {r['id']!r} has role {r['role']!r}")
         if r["id"] in out:
             raise InputError(f"manifest row {r['id']!r} duplicated")
@@ -174,9 +181,11 @@ def cmd_compare(a) -> int:
         _write(a.out, doc)
         return EXIT_INPUT
     if a.acceptance:
-        dev = sorted(cid for cid, r in cand["per_clip"].items() if r["role"] == "dev")
+        dev = sorted(cid for cid, r in cand["per_clip"].items() if r["role"] in NOT_ACCEPTANCE_ROLES)
         if dev:
-            doc["refused"] = f"acceptance verdict requested over {len(dev)} dev-role clip(s), e.g. {dev[:3]}"
+            roles = sorted({cand["per_clip"][cid]["role"] for cid in dev})
+            doc["refused"] = (f"acceptance verdict requested over {len(dev)} {'/'.join(roles)}-role clip(s), "
+                              f"e.g. {dev[:3]}")
             _write(a.out, doc)
             return EXIT_DEV_REFUSED
         doc["acceptance"] = acceptance(base, cand)
@@ -223,6 +232,12 @@ def self_test() -> int:
     hc = score(m, {"clips": {"ho:b": _synthetic(120.0, 1)}}, "heldout")
     check(acceptance(hb, hc)["met"], "a correct new lock on held-out must meet acceptance")
     check(not acceptance(hc, hb)["met"], "losing the correct lock must fail acceptance")
+    # a validation clip screens a candidate; acceptance over it must refuse like dev
+    m["va:c"] = {"id": "va:c", "path": "-", "sha256": "-", "gold_bpm": 120.0, "role": "validation", "source": "synthetic"}
+    vc = score(m, {"clips": {"va:c": _synthetic(120.0, 1)}}, "validation")
+    check([r["role"] for r in vc["per_clip"].values()] == ["validation"]
+          and all(r["role"] in NOT_ACCEPTANCE_ROLES for r in vc["per_clip"].values()),
+          "validation clip must be visible to the refusal check")
     # clip not in the manifest is not scored
     rep = score(m, {"clips": {"zz:x": _synthetic(120.0, 1)}}, "all")
     check(rep["summary"]["n"] == 0 and rep["unscored_not_in_manifest"] == ["zz:x"], "unknown clip must be unscored")
@@ -238,13 +253,13 @@ def main(argv=None) -> int:
     s = sub.add_parser("score")
     s.add_argument("--manifest", required=True, type=Path)
     s.add_argument("--traj", required=True, type=Path)
-    s.add_argument("--role", default="all", choices=("dev", "heldout", "all"))
+    s.add_argument("--role", default="all", choices=(*ROLES, "all"))
     s.add_argument("--out", type=Path)
     c = sub.add_parser("compare")
     c.add_argument("--manifest", required=True, type=Path)
     c.add_argument("--baseline", required=True, type=Path)
     c.add_argument("--candidate", required=True, type=Path)
-    c.add_argument("--role", default="all", choices=("dev", "heldout", "all"))
+    c.add_argument("--role", default="all", choices=(*ROLES, "all"))
     c.add_argument("--acceptance", action="store_true")
     c.add_argument("--out", type=Path)
     sub.add_parser("self-test")

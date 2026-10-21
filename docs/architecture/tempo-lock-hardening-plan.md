@@ -484,6 +484,38 @@ or scored on fixed-length windows).
 
 DEF-001 stays FIX-IN-LANE (A1 needs a lock, so it cannot close under the fallback); DEF-002 stays OPEN.
 
+## E1 validation run — pre-registration, 2026-10-22 (written and committed BEFORE any validation clip was run)
+
+The Captain ordered execution rather than a hand-off, so the lane runs E1 to its end instead of stopping at the
+recommendation above. That recommendation and its prediction (E1 fails) stand and are tested here.
+
+- **Validation material.** GTZAN Genre (1,000 x 30 s, 10 genres) with the gtzan_tempo_beat tempo annotations
+  (Marchand & Peeters 2015). It is disjoint from HarmonixSet, Ballroom and GiantSteps. Builder:
+  `tempo_validation_corpus.py`; gold folded by octave into 60-155 exactly like the held-out loader.
+- **Split.** V1 if the first byte of sha256(row id) is even, else V2. E1 is judged on V1 only. V2 stays
+  untouched for the next lock candidate, and its manifest hash is recorded when it is written.
+- **Frozen candidate.** Tracker: the lane image's host replay `--variant l1sp` (linear tap, producer silence,
+  spectral presence; locks published). Estimator: `tempo_joint_estimator.py run` with the p2.6 frozen settings
+  (pointer model, kappa 8, lambda 8, tempo_q 0.02, novelty input). Gate: `gate --hold-s 4`. The dev pick tied 2 s
+  and 4 s at 1 right lock; the tie-break is fewer wrong locks (4 s: 0, 2 s: 1). No other setting is tried.
+- **Capture.** Through the real emulated firmware, image `k1_main_rpl_emu_tempo_r1_spec`, `tempo_lane_emu.py run
+  --manifest V1 --role validation`, then `tempo_lane_replay.py extract`, the same chain as the development clips.
+- **Scoring.** The frozen `tempo_lane_scorer.py` (validation role added 2026-10-22; definitions unchanged). The
+  scored window is generation 1601 onwards, so a 30 s clip gives about 18 s.
+- **Pre-registered success.** All three must hold on V1: wrong locks <= 10 % of locked tracks at the upper
+  two-sided 95 % Wilson bound; right locks >= 25 % of scored tracks; no new trap-suite attractor (the gate passes
+  the tracker's BPM through unchanged; checked on the output). Otherwise E1 fails and the lock-off fallback stands.
+- **Reported alongside, not used to decide.** The same V1 numbers for the lane tracker without the gate and for
+  D = 0, so the effect of the hold can be read.
+- **Prediction recorded before the run.** E1 fails on the coverage criterion (development: 1 of 36).
+- **Manifests as written (still before any run).** Row id `gz:<genre>_<number>` (e.g. `gz:blues_00000`; no dot,
+  because `tempo_lane_replay.py extract` cuts clip ids at the first dot). V1
+  `tests/fixtures/tempo_corpus/validation_gtzan_v1.json`: 516 clips, sha256 `77d6bf2a…20cd6`. V2
+  `validation_gtzan_v2.json`: 483 clips, sha256 `19b3100d…e24c` (sealed: not run). 1 clip excluded (reggae.00086 has no
+  tempo annotation). Archive `genres.tar.gz` (the Hugging Face marsyas/gtzan copy, 1,000 mono 22.05 kHz WAV files)
+  sha256 `b28cc067…7531`, md5 `4c13f740…a336`. This is NOT verified against a published checksum: the GitHub API
+  was not usable from this machine. Receipt `e1-validation-manifest`.
+
 ---
 **Document Changelog**
 | Date | Author | Change |

@@ -1,0 +1,36 @@
+{
+ "gate": "e1-validation-manifest",
+ "cmd": "python3 scripts/regression-harness/tempo_validation_corpus.py prepare --audio _scratch/esp-emulator/tempo-lock-r1/validation/raw/genres --annotations _scratch/esp-emulator/tempo-lock-r1/validation/raw/gtzan_tempo_beat-main/tempo --out-v1 tests/fixtures/tempo_corpus/validation_gtzan_v1.json --out-v2 tests/fixtures/tempo_corpus/validation_gtzan_v2.json --excluded _scratch/esp-emulator/tempo-lock-r1/validation/excluded.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/validation/raw/genres.tar.gz": "b28cc067ff6199bd826f5d1a6931458586d64acae7f44b2e882b7a97af057531",
+  "_scratch/esp-emulator/tempo-lock-r1/validation/raw/gtzan_tempo_beat.tar.gz": "ede77b1bcda4f4f5a9261181f55a0098c9058d1602cdbd39f04801606aef50da"
+ },
+ "sha256_outputs": {
+  "tests/fixtures/tempo_corpus/validation_gtzan_v1.json": "77d6bf2a9e38c1c95702c45cd1da6e5cb4d4c5ee509ac7d84188df598af20cd6",
+  "tests/fixtures/tempo_corpus/validation_gtzan_v2.json": "19b3100d54ff403645635c2f15c48aaf042ab6e1424c3cf49b0897f68d89e24c",
+  "_scratch/esp-emulator/tempo-lock-r1/validation/excluded.json": "0277a8ffd066fe49ee58187c504a12b5b1cc87d09e4dd3f56bf3bd2737b30314"
+ },
+ "stdout_tail": [
+  "V1=516 V2=483 excluded=1"
+ ],
+ "utc": "2026-10-21T18:39:11+00:00",
+ "git_sha": "f2596f7bf1c025657f30832dbf6315e720d65776",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_lane_scorer.py",
+  "scripts/regression-harness/tempo_validation_corpus.py",
+  "scripts/regression-harness/tempo_lock_score.py",
+  "scripts/regression-harness/tempo_lock_verdict.py",
+  "tests/fixtures/tempo_corpus/validation_gtzan_v1.json",
+  "tests/fixtures/tempo_corpus/validation_gtzan_v2.json",
+  "tests/test_tempo_lock_verdict.py",
+  "tests/test_tempo_validation_corpus.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}
