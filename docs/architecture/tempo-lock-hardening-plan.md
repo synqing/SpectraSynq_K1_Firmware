@@ -208,11 +208,34 @@ and conflicts with ruling R7 / I9. Recommended route: keep R7, and deliver noise
 rejection through the Phase 3 beat-prediction hit-rate term, which reads peak positions relative to
 predicted beats and is invariant to scale and compression. Decision with the Captain.
 
+## Update — 2026-10-21 (later): lane R1 Phase 2 and Phase 3, development side only
+
+No held-out data has been run (the corpus awaits the Captain's approval, rule R8).
+
+**Trap suite (M5).** 32 synthetic trains (72/96/120/144 BPM x clean, swing, triplet fills, dotted,
+tresillo, hemiola, backbeat, tempo change). The shipped selection fails hemiola at 96/120/144 by
+locking at 2/3 of the truth with lock 1.00 — DEF-002's 3:2 mechanism reproduced synthetically.
+
+**Selection ablation (dev, 36 linear streams from the lane emulator image).** Shipped selection: Acc2
+19/36, 27 locks, 13 right / 14 wrong (7 at 3:2). Geometric comb 16 / 13-15; min-tooth comb 16 / 12-10
+(4 at 3:2); prior 110/0.9 14 / 12-18; flat prior 16 / 13-16; anti-3:2 17 / 15-16; anti-3:2+geometric
+17 / 15-13. No variant raises Acc2; every variant still fails the hemiola trap; clean trains lock at
+warm-up end under all of them. Dev pick by the R1 order (fewest wrong locks): min-tooth comb
+(K1_TEMPO_COMB_PRODUCT_V1=2), which already trips the "Acc2 falls" falsifier on dev. Selection by comb
+shape does not close DEF-002; the joint tempo+phase estimator (2.6) is the next measurement if the
+held-out run confirms.
+
+**Correctness terms (3.1, dev).** Track AUC right-vs-wrong: hit-rate 0.51, estimator agreement 0.44,
+winner stability 0.61, CONF_V2 0.53 (emit AUC 0.49 / 0.55 / 0.67 / 0.58). None reaches the 0.8 bar.
+Unless a better-formed term clears 0.8 on dev and held-out, rule 3.3 applies: lock stays OFF under
+the flag set, the tentative band is published, no threshold is lowered.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
+| 2026-10-21 | agent:claude-code (lane R1, later) | Update: Phase 2 trap suite + dev selection ablation (no variant raises Acc2) and Phase 3.1 dev AUCs (none >= 0.8). |
 | 2026-10-21 | agent:claude-code (lane R1) | Update: Phase 0 (level sweep, cost, frozen scorer) and Phase 1 (linear tap + producer silence + veto bits): music passes, noise/drone/sweep/release red at L1; Emotiscope 1.2 comparison and recommended route. |
 | 2026-10-20 | agent:claude-code (next phase) | Update: Main RPL weak lock = tracker-internal false silence on sqrt-compressed novelty; pre-sqrt candidate fixes the music passage end to end but fails the 36-track corpus gate (wrong-tempo locks 1→14); not merged. |
 | 2026-06-03 | agent:claude-opus | Update (PM): real-music baseline MEASURED via the digital pipe — premise revised. Dominant failure is the Goertzel tempo SPECTRUM (Acc2 14–17% vs autocorrelation ceiling 50% on the same novelty), not octave error (~6%). Step 2 implemented in sb_tempo.cpp: log-Gaussian tactus prior (octave-err→0) + Goertzel un-clamp (the real ~2× win: in-range Acc1 9.4→25%, Acc2 15.6→28%). Metronome lock preserved; ESP32 build SUCCESS. Remaining gap is architectural (Fourier vs ACF); recommend ACF-salience+prior hybrid next. |

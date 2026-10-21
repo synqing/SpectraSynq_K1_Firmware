@@ -44,6 +44,7 @@ VARIANTS = {
 DRIVER = r"""
 #include "k1_tempo.h"
 #include <cstdio>
+void k1_tempo_debug_dump(float*, int, int*, float*, float*);
 int main() {
   k1_tempo_init();
   char line[256];
@@ -68,6 +69,9 @@ int main() {
 #else
     std::printf(" -1");
 #endif
+    int gw = 0;
+    k1_tempo_debug_dump(nullptr, 0, &gw, nullptr, nullptr);
+    std::printf(" %.0f %.0f %.0f %.4f", s.top_comb_bpm, s.top_point_bpm, 60.0f + (float)gw, s.v2_quality);
 #endif
     std::printf("\n");
   }
@@ -169,13 +173,15 @@ def replay_rows(binary: Path, rows, spec: str | None, debug: bool) -> dict:
         raise SystemExit(f"replay failed: {r.stderr[-500:]}")
     keys = ["gen", "bpm", "conf", "lock", "tick", "phase"]
     if debug:
-        keys += ["int_lock", "int_silence", "conf_ema", "emit_count", "veto"]
+        keys += ["int_lock", "int_silence", "conf_ema", "emit_count", "veto",
+                 "comb_bpm", "point_bpm", "goertzel_bpm", "quality"]
     c = {k: [] for k in keys}
     c["producer_silence"] = []
     for (g, _nov, sil), ln in zip(rows, (x for x in r.stdout.splitlines() if x.startswith("F "))):
         p = ln.split()[1:]
         for k, v in zip(keys, p):
-            c[k].append(float(v) if k in ("bpm", "conf", "phase", "conf_ema") else int(v))
+            c[k].append(float(v) if k in ("bpm", "conf", "phase", "conf_ema", "comb_bpm", "point_bpm",
+                                          "goertzel_bpm", "quality") else int(v))
         c["producer_silence"].append(sil)
     if len(c["gen"]) != len(rows):
         raise SystemExit("replay produced a different number of frames than it was fed")
