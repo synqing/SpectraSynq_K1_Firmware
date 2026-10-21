@@ -1,0 +1,57 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 7abdefd..0e8b8ff 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -517,6 +517,44 @@ Before implementing production behavior for timing, performance, frame-drop reco
+    - Then ESP-IDF / Arduino best practices
+    - When a fallback is explicitly required, state the native alternative and make the path durable, multi-instance safe, and atomic under concurrency
+ 
++## Audio Pipeline Invariants (tempo lane R1, DEF-001 / DEF-002)
++
++These bind every change to the audio producer, the tempo tracker and anything that gates a
++published audio decision. They exist because one fault (a hidden silence veto on twice-compressed
++novelty) was diagnosed, patched symptomatically, tombstoned and lost in August 2026, then found
++again 70 days later (`docs/defects/DEF-001-tempo-hidden-silence-veto.md`). Each invariant names
++the gate that enforces it; `pytest -m tempo_gates` runs them all.
++
++- **I1 Published decisions carry their vetoes. No silent gate.** Every gate that can clear a
++  published decision (`locked`, `beat_tick`, confidence) sets a named veto bit (`K1TempoVeto`),
++  observable in `K1TempoDebugSnapshot` and the emulator stream. Gate: M1 veto observability.
++- **I2 One compression per signal.** `novelty_curve` is sqrt-domain for visuals; tempo reads its
++  own linear-domain field. No consumer re-compresses a shared signal. Gate: M2 contrast invariance.
++- **I3 Every fixed threshold names its calibration** (mic, distribution, fixture hash, date) in
++  the spec header (`audio/k1_tempo_spec.h`). A threshold without provenance is a defect, not a
++  constant.
++- **I4 A metric gates a published decision only with a committed held-out AUC receipt**
++  (`docs/receipts/tempo-lock-r1/conf_auc.json`, AUC >= 0.8 on dev and held-out). Gate: M3.
++- **I5 Corpus files carry a role** (`tests/fixtures/tempo_corpus/manifest.json`, `dev` |
++  `heldout`). The scorer refuses an acceptance verdict on dev-role files (exit 3); a tuned constant
++  records the manifest hash it was tuned on. Gate: M4.
++- **I6 Selection or confidence changes run the metrical trap suite.** A new attractor ratio
++  (2/3, 3/4, 4/3, 3/2, 3) is a regression even when Acc2 rises. Gate: M5.
++- **I7 Fixture bytes are captured from the production chain and shared**, never re-derived on
++  both sides (emulator `N` lines -> `scripts/regression-harness/tempo_lane_replay.py`).
++- **I8 A defect gets a ledger entry with a reproduction BEFORE any fix** (`docs/defects/`).
++  A tombstone closes a fix, never a defect; it must cite the DEF it leaves open.
++- **I9 The silence decision belongs to the producer** (`audio.silence`). The tracker may decay
++  history on silence; it may not invent a second silence from contrast.
++- **I10 Off-flag builds are byte-identical.** Every lane is a compile flag; constants live once,
++  in the spec header, and are edited by symbol (never by digit; each substituted token must
++  appear exactly once).
++
++**Known non-fixes (never repeat; commit 7d932083, tombstoned in 1bdf54d0):** scaling novelty by a
++constant to raise contrast; lowering `K1_LOCK_CONFIDENCE` or `K1_CONF_V2_REL` to obtain a lock;
++disabling the silence gate without replacing the silence source; gating any of these behind a
++mic identity.
++
+ ## Commands Reference
+ 
+ | Command | Description |
+@@ -666,6 +704,7 @@ Before coding, scan the user's prompt for relevant skills and production-risk si
+ 
+ | Date | Author | Change |
+ |------|--------|--------|
++| 2026-10-21 | Captain (drafted by agent:claude-code, lane R1) | Added Audio Pipeline Invariants I1-I10 and the tombstone rule (DEF-001/DEF-002); applied by the Captain at the Phase 0.5 stop. |
+ | 2026-10-20 | agent:claude-code | Added the Emulator replay section: contract, skill k1-esp-emulator-replay, lessons inventory in the ESP-Emulator workspace, seams ratchet test. |
+ | 2026-06-15 | agent:codex | Corrected root authority docs after Tab5 strict harness/gate commits: restored spec-index routing, updated pytest count to 54 files / 427 tests, corrected audio timing to 96-sample chunks at 12.8 kHz, described 30 enumerated / 22 enabled lightshow modes from config_types.h, and removed contradictory K1 STA fallback wording. |
+ | 2026-06-11 | agent:claude-code | Fixed critical inaccuracies: corrected test file count from 23 to 53; corrected effect count from 20 to 25; clarified GDFT as 80-bin spectrum mapped to 24 perceptual octaves (not "24 octave bands"); added network and control directories to structure; updated build flags to include SB_CHORD_HUE_V1 and SB_DROP_CUT_V1 (impact lane); updated Platform-Native Production Patterns section to be ESP32-specific (hard real-time audio, soft real-time visual, DMA, FreeRTOS, volatile primitives); verified all technical claims against platformio.ini build_flags, directory listing, and git history |

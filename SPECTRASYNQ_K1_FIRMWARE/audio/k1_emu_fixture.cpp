@@ -230,6 +230,27 @@ struct NoveltyRecord {
 };
 NoveltyRecord* s_nov = nullptr;
 uint32_t s_nov_count = 0;
+#ifdef K1_EMU_TEMPO_PROBE
+// Measurement probe only (env k1_main_rpl_emu_tempo_probe, tempo lane R1, 2026-10-21).
+// Per generation: loud-guard state of the hop just published, and the tempo tracker's
+// internal state + ENABLE_TEMPO_STREAM stage timers (emulated time, not silicon).
+// Printed as G lines after the N lines. Never compiled into a product env.
+#if !ENABLE_TEMPO_STREAM
+#error "K1_EMU_TEMPO_PROBE needs ENABLE_TEMPO_STREAM=1 (stage timers + debug snapshot)"
+#endif
+struct ProbeRecord {
+  float input_trim;
+  float gdft_trim;
+  uint16_t clip_count;
+  uint16_t sample_count;
+  uint32_t emit_count;
+  uint8_t silence_internal;
+  uint8_t locked_internal;
+  float conf_ema;
+  uint32_t us_silence, us_acf, us_update, us_phase, us_publish, us_emit;
+};
+ProbeRecord* s_probe = nullptr;
+#endif
 Meaning s_last_consumed = {};
 int32_t s_pending_lim_idx = -1;
 uint32_t s_captured = 0;
@@ -377,6 +398,23 @@ void print_counters(const char* reason, const char* where) {
       }
     }
   }
+#ifdef K1_EMU_TEMPO_PROBE
+  if (s_probe != nullptr) {
+    for (uint32_t i = 0; i < s_nov_count; i++) {
+      const ProbeRecord& p = s_probe[i];
+      K1_EMU_LOG.printf("G,%lu,%.6f,%.6f,%u,%u,%lu,%u,%u,%.6f,%lu,%lu,%lu,%lu,%lu,%lu\n",
+                        (unsigned long)(i + 1), p.input_trim, p.gdft_trim, (unsigned)p.clip_count,
+                        (unsigned)p.sample_count, (unsigned long)p.emit_count, (unsigned)p.silence_internal,
+                        (unsigned)p.locked_internal, p.conf_ema, (unsigned long)p.us_silence,
+                        (unsigned long)p.us_acf, (unsigned long)p.us_update, (unsigned long)p.us_phase,
+                        (unsigned long)p.us_publish, (unsigned long)p.us_emit);
+      if ((i & 0xFF) == 0xFF) {
+        feedLoopWDT();
+        vTaskDelay(1);
+      }
+    }
+  }
+#endif
   print_counters(reason, where);
   char dump_arg[] = "1";
   k1_render_trace_dispatch("rtrace_dump", dump_arg);
@@ -527,6 +565,10 @@ void k1_emu_fixture_begin(void) {
   if (s_valid && (s_flags & kFlagNoveltyTrace)) {
     s_nov = (NoveltyRecord*)ps_malloc(sizeof(NoveltyRecord) * kMaxNovelty);
     if (s_nov == nullptr) fail_scenario("novelty_psram");
+#ifdef K1_EMU_TEMPO_PROBE
+    s_probe = (ProbeRecord*)ps_malloc(sizeof(ProbeRecord) * kMaxNovelty);
+    if (s_probe == nullptr) fail_scenario("probe_psram");
+#endif
   }
   if (s_valid) {
     s_total_hops = (s_real_samples + kHop - 1) / kHop + s_pad_samples / kHop;
@@ -623,6 +665,33 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
     crc = esp_crc32_le(crc, (const uint8_t*)spectrogram_smooth, sizeof(SQ15x16) * NUM_FREQS);
     crc = esp_crc32_le(crc, (const uint8_t*)chromagram_smooth, sizeof(SQ15x16) * 12);
     s_nov[generation - 1] = {snap.novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
+#ifdef K1_EMU_TEMPO_PROBE
+    if (s_probe != nullptr) {
+      const K1TempoDebugSnapshot d = k1_tempo_debug_read();
+      ProbeRecord& p = s_probe[generation - 1];
+#ifdef K1_LOUD_GUARD_V1
+      p.input_trim = k1_loud_input_trim;
+      p.gdft_trim = k1_loud_gdft_trim;
+      p.clip_count = k1_loud_frame_clip_count;
+      p.sample_count = k1_loud_frame_sample_count;
+#else
+      p.input_trim = -1.0f;
+      p.gdft_trim = -1.0f;
+      p.clip_count = 0;
+      p.sample_count = 0;
+#endif
+      p.emit_count = d.emit_count;
+      p.silence_internal = d.silence_detected ? 1 : 0;
+      p.locked_internal = d.v2_locked ? 1 : 0;
+      p.conf_ema = d.v2_conf_ema;
+      p.us_silence = d.silence_elapsed_us;
+      p.us_acf = d.acf_elapsed_us;
+      p.us_update = d.update_elapsed_us;
+      p.us_phase = d.phase_elapsed_us;
+      p.us_publish = d.publish_elapsed_us;
+      p.us_emit = d.emit_elapsed_us;
+    }
+#endif
     if (generation > s_nov_count) s_nov_count = generation;
   }
   s_last_pub_gen = generation;

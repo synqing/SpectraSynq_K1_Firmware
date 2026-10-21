@@ -1,0 +1,48 @@
+{
+ "gate": "p0.1-level-sweep",
+ "cmd": "python3 _scratch/esp-emulator/tempo-lock-r1/level_sweep.py table _scratch/esp-emulator/tempo-lock-r1/level-sweep",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/level-sweep/runs.json": "298d2374c365aa81943a0bcd907fec34be16a6b44897871fcfbaaab0b0a30f7d",
+  "_scratch/esp-emulator/tempo-lock-r1/level-sweep/runs/music-lvl-m0/uart.txt": "326942ae399e9154b5671e204b7a9da953bccee5778cb7356b460da404727c1b",
+  "_scratch/esp-emulator/tempo-lock-r1/level-sweep/runs/music-lvl-m24/uart.txt": "114ac47c35b77698f55ce5ba07de724c3abac6d01e39a4424a0f243dbfd9e01f"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/level-sweep/level_sweep.json": "04b9a0b3eeaf83cf1b76fb415791ea4e398fe81dd662933afc96a93f48f92ef0",
+  "_scratch/esp-emulator/tempo-lock-r1/level-sweep/level_sweep.md": "9abfbd2e5284fcd8f716e0765d7d8d67de55b0c1fd76c194c4cf2b4b5dd0e060"
+ },
+ "stdout_tail": [
+  "| db | status | peak_pcm | scored_gens | loud_input_trim_mean | loud_gdft_trim_mean | clip_sample_fraction | clip_hop_fraction | producer_silence_fraction | tracker_internal_silence_fraction | k1_locked_v2_fraction | conf_ema_mean | published_lock_frac | published_conf_max | published_bpm_median | novelty_p90_p10 |",
+  "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+  "| 0 | PASS | 4096 | 1334 | 0.4866 | 0.6804 | 0.00322 | 0.1132 | 0.0 | 1.0 | 1.0 | 0.8145 | 0.0 | 0.6641 | 127.0 | 2.615 |",
+  "| -6 | PASS | 2053 | 1334 | 0.7818 | 0.7235 | 0.0 | 0.0 | 0.0 | 1.0 | 1.0 | 0.8557 | 0.0 | 0.5588 | 127.0 | 2.603 |",
+  "| -12 | PASS | 1029 | 1334 | 1.0 | 0.7331 | 0.0 | 0.0 | 0.0 | 1.0 | 1.0 | 0.9263 | 0.0 | 0.3849 | 127.0 | 2.553 |",
+  "| -18 | PASS | 516 | 1334 | 1.0 | 0.7337 | 0.0 | 0.0 | 0.0 | 1.0 | 1.0 | 0.9276 | 0.0 | 0.397 | 127.0 | 2.707 |",
+  "| -24 | PASS | 258 | 1334 | 1.0 | 0.734 | 0.0 | 0.0 | 0.0 | 1.0 | 1.0 | 0.8025 | 0.0 | 0.4397 | 127.0 | 2.783 |",
+  "plot skipped: dlopen(/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/lib-dynload/pyexpat.cpython-314-darwin.so, 0x0002): Symbol not found: _XML_SetAllocTrackerActivationThreshold",
+  "  Referenced from: <3E5EDC6B-FAC1-3077-AFE0-E21F8A8894A1> /opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/lib-dynload/pyexpat.cpython-314-darwin.so",
+  "  Expected in:     <850FB22F-BB06-316B-B5F4-FCD1C0385184> /usr/lib/libexpat.1.dylib"
+ ],
+ "utc": "2026-10-21T01:22:21+00:00",
+ "git_sha": "0bddfaedbb6d15b1e5f9c6467ef19072110a9d6a",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "tests/conftest.py",
+  "scripts/regression-harness/tempo_corpus_manifest.py",
+  "scripts/regression-harness/tempo_lane_receipt.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "scripts/regression-harness/tempo_lane_scorer.py",
+  "tests/fixtures/tempo_corpus/",
+  "tests/test_tempo_lane_scorer_gate.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}
