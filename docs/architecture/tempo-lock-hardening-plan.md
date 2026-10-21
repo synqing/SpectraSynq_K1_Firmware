@@ -381,7 +381,24 @@ wraps but only to glide its palette one step per bar (no beat event drawn) — a
   one shared file, so most runs started with no or truncated PCM (logs kept in stress/race-evidence).
   `stress_repeat.py` now decodes per run into its own folder and passes the PCM through run_case's asset cache;
   it also gains `--no-trace` for the without-diagnostics set.
-- Off-flag byte identity and the clean export: receipts a6-* and a5-* (run on the committed code).
+- Off-flag byte identity (A6), base 0bddfaed against b1f48bbc, both as git-archive exports built with pinned
+  provenance (git 0000000, epoch 1760000000): k1_main_rpl_im69d and k1_hardware, every allocated ELF section
+  identical. Object level: 138 objects identical by path; the rest sit in two PlatformIO library folders whose
+  names are a hash of the project path (the exports live at different paths): FastLED libe6f -> libe79 and one
+  single-object library lib1e6 -> libf98 (k1_hardware: lib4d5 -> lib847, libe53 -> liba23). With those folders
+  mapped, 261 of 261 objects identical (a6-byte-identity-*-normalised); unmapped receipts kept (a6-byte-identity-*).
+- Clean export (A5) of b1f48bbc (git archive, no .git, all of .pio/libdeps copied in, source identity file,
+  pinned esp-emu): `run.py` on s3_music_regression.json reports SOFTWARE COMPLETE, SW07 (host pytest 1665 passed,
+  21 skipped, 8 git-history files run in the checkout; k1_hardware builds) and SW11 (clean export) PASS, all 22
+  cases and 14 comparisons PASS (a5-export-r3-contract). Inside the export the lane also passes: tempo_gates
+  pytest 28 passed, both lane images build, the consumer gap is visible on the unrepaired image and clean on the
+  lock-off image, p15 --lockoff green (a5-export-*). The first attempt reported SOFTWARE INCOMPLETE: I had copied
+  only five envs' libdeps, and tests/test_b489_legacy_power_host.py reads FastLED from k1_bench_im69d_led150's;
+  copying the whole .pio/libdeps (as rule 7 says) fixed it, on a fresh export. Full pytest in the checkout at
+  b1f48bbc: 1898 passed, 15 skipped (a8-full-pytest-b1f48bbc). Observation for the report tool's owner: at
+  400 px the R3 report.html clips long evidence lines at the right edge (desktop is fine); not changed here.
+- Correction: the b1f48bbc commit message says host == emulator on "176,892" generations; the correct total is
+  175,892 (27,868 + 28,000 + 120,024), as the receipts show.
 
 **Item 4, proposed bounded host-only experiment (PROPOSAL — NOT APPROVED).**
 E1 "agreement-gated lock, frozen on development, judged once on separate validation".

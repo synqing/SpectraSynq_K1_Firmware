@@ -1,0 +1,40 @@
+{
+ "gate": "a6-offflag-byte-identity-k1_hardware-0bddfaed-vs-b1f48bbc",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_bytecheck.py compare _scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-base-k1_hardware _scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-final-k1_hardware --json _scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-k1_hardware.json",
+ "exit_code": 1,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-base-k1_hardware/snapshot.json": "12e0c4a397db3ab8f441de28272076e919ba643d490f298e1cbf1990d26c9454",
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-final-k1_hardware/snapshot.json": "4e91e043a024c347408ad4009996e879308be6fa26efdebd51c4053aadc7c445"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "objects compared=138 differing=246",
+  "  OBJ {'object': 'lib4d5/FastLED/FastLED.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/bitswap.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/cled_controller.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/colorpalettes.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/crgb.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/allocator.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/async.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/audio.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/audio_input.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/audio_reactive.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/bitset.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/blur.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/bytestreammemory.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/colorutils.cpp.o', 'why': 'present in only one snapshot'}",
+  "  OBJ {'object': 'lib4d5/FastLED/fl/corkscrew.cpp.o', 'why': 'present in only one snapshot'}",
+  "elf alloc sections differing=0 []"
+ ],
+ "utc": "2026-10-21T16:34:55+00:00",
+ "git_sha": "b1f48bbc8ca53f88e509e64c9bfe228c0b1443ef",
+ "git_dirty_paths": [
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}
