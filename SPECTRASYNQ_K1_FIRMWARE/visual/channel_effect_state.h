@@ -150,6 +150,10 @@ struct ChannelEffectState {
   float    tcanta_beat_phase;         // internal flywheel beat phase 0..1
   float    tcanta_locked_bpm;         // smoothed locked BPM for free-run
   uint16_t tcanta_coast_beats;        // beats since last confident lock
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+  uint32_t tcanta_last_event_id;      // bass-onset edge-detect (TENTATIVE band launches, lane R1)
+  uint8_t  tcanta_free[COMET_MAX];    // 1 = onset-launched: free linear travel, no beat-pinned arrival
+#endif
 
   // light_mode_river_surge() — Spectrum River v2 + VP-side macro-dynamics axis.
   float    rsurge_tide_env;           // own tide EMA (no bleed with river_tide_env)

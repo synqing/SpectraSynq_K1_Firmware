@@ -10,7 +10,8 @@ the raw uart and extracts the per-generation streams the lane gates read:
   P  spectrum-trace probe only: per-note spectrum, 80 bins x uint16 hex
 Captured streams are the shared fixtures (I7); host replay and scorers read them, never re-derive.
 
-  tempo_lane_emu.py run --env ENV --suite p15|music --out DIR [--parallel N]
+  tempo_lane_emu.py run --env ENV --suite p15|music|neg|consumer --out DIR [--parallel N]
+  (consumer: Tempo Comet on edge A + Anticipate on edge B via set_mode / secondary_mode at hop 0)
   tempo_lane_emu.py run --env ENV --manifest M --role dev|heldout --out DIR [--limit K] [--parallel N]
 
 Synthetic generators are deterministic (fixed seeds) and normalised like run.py load_asset
@@ -154,6 +155,30 @@ def suite(name: str) -> list[dict]:
                 mk("pink-drone-s77", gen="pink_drone", seed=77), mk("pink-drone-s5", gen="pink_drone", seed=5),
                 mk("brown-noise-s555", gen="brown", seed=555), mk("chord-a-minor", gen="chord"),
                 mk("sweep-slow-1oct", gen="sweep", f0=440.0, f1=880.0)]
+    if name == "consumer":
+        # Tempo-consumer reproduction (Captain 2026-10-21 supplement, item 1): Tempo Comet on edge A and Tempo
+        # Comet Anticipate on edge B through the production command parser at hop 0, on the R3 case, music
+        # then silence (release), brown noise (the known presence limit), silence, the 11 dev clips the lane
+        # tracker locks WRONG (score dev_l1sp, wrong_lock) and 3 it locks right (useful-behaviour control).
+        modes = [{"hop": 0, "text": "set_mode=20"}, {"hop": 0, "text": "secondary_mode=27"}]
+        dev_wrong = ["hx:0FOjmV66zf8", "hx:5m-GUCSNxmc", "hx:7vevOMWY6MY", "hx:8gyLR4NfMiI", "hx:9VZhI5iafH0",
+                     "hx:T-sxSd1uwoU", "hx:WxnN05vOuSM", "hx:XtE1TmikgIQ", "hx:bx1Bh8ZvH84", "hx:pguzToB6I7g",
+                     "hx:r9DBFTZTKPI"]
+        dev_right = ["hx:2Abk1jAONjw", "hx:CfFlO6lHZ2g", "hx:DkoeNLuMbcI"]
+        rows = {c["id"]: c for c in manifest_cases(ROOT / "tests/fixtures/tempo_corpus/manifest.json", "dev", None)}
+        cases = [
+            {"id": "music-a", "source": {"kind": "music_a"},
+             "capture": {"start_hop": 1600, "end_hop": 2934, "every": 1}, "expected_bpm": 127},
+            {"id": "music-then-silence", "source": {"kind": "music_then_silence", "silence_s": 15},
+             "capture": {"start_hop": 1600, "end_hop": None, "every": 2}},
+            {"id": "brown-noise-s555", "source": {"kind": "synthetic", "gen": "brown", "seed": 555, "seconds": 30},
+             "capture": full},
+            {"id": "silence-30s", "source": {"kind": "synthetic", "gen": "silence", "seconds": 30}, "capture": full},
+        ] + [dict(rows[c], role_note="dev-wrong-lock") for c in dev_wrong] + \
+            [dict(rows[c], role_note="dev-right-lock") for c in dev_right]
+        for c in cases:
+            c["commands"] = modes
+        return cases
     raise SystemExit(f"unknown suite {name}")
 
 
@@ -210,6 +235,8 @@ def _run_one(args) -> dict:
     sc["cases"][cid] = {"purpose": f"tempo lane R1: {case['id']}", "pcm": aid,
                         "epoch": {"policy": "declared", "us": 1000000}, "capture": cap,
                         "partial_hop": "zero_pad", "trace_novelty": True}
+    if case.get("commands"):                       # production commands through parse_command (no overrides)
+        sc["cases"][cid]["commands"] = case["commands"]
     assets = {aid: (pcm, {"id": aid, "samples": len(pcm) // 2, "sha256": run.sha256_bytes(pcm), **meta})}
     lock = json.loads((run.HERE / "tool-lock.json").read_text())
     emu, _ = run.resolve_esp_emu(lock)

@@ -311,10 +311,104 @@ Under this flag A1 (PASS_timing_and_tempo needs a lock) cannot pass, and DEF-001
   hemiola trap. The flag stays in source, default OFF, for the record.
 - (d) Tooth consistency 3.1b: measured, AUC 0.70.
 
+## Captain supplement — 2026-10-21 (after the evening stop), verbatim
+
+> Proceed towards a qualified lock-off fallback. This supplements the original brief; it does not replace its assignments or acceptance criteria.
+>
+> 1. Before freezing, reproduce the consumer gap: Tempo Comet and Anticipate can reconstruct predicted beats from tentative confidence despite locked=false and beat_tick=false. Use the final lock-off emulator image and capture actual rendered output on wrong-tempo development clips, brown noise, the R3 music case and silence/release.
+>
+> 2. I authorise a narrow extension of R4 to make the affected tempo consumers honour the distinction between tentative motion and validated beat cues. Preserve useful reactive behaviour and the graded middle ground. No broad effect redesign. Demonstrate the failure before the repair and its removal afterwards.
+>
+> 3. Qualify that fallback with the required behaviour checks, host/emulator agreement, off-flag byte identity, 20 repeats under load with and without diagnostics, and clean export from the final commit. Keep DEF-001 FIX-IN-LANE and DEF-002 OPEN until their actual closure requirements are met.
+>
+> 4. Preserve A1/A2 and the untouched 1,359-clip acceptance corpus. Do not port the agreement estimator yet. Propose one bounded host-only experiment using separate development/validation material, aimed at improving reliable lock coverage while reducing wrong locks.
+>
+> 5. Once a tempo candidate clears development requirements, freeze it and run the full acceptance corpus once, without re-picking. Product defaults and deployment remain separate Captain decisions; this lane retains its no-hardware boundary.
+
+## Update — 2026-10-21 (night): qualified lock-off fallback, consumer repair, experiment proposal
+
+All emulator results are simulated (esp-emu 0.49.0) and host results are host; none is silicon. Receipts:
+`docs/receipts/tempo-lock-r1/` (c1-*, c2-*, q-*).
+
+**Images (emulator only, upload-blocked).** `k1_main_rpl_emu_tempo_r1_lockoff` = the lane flags +
+K1_TEMPO_LOCK_OFF_V1 + K1_TEMPO_CONSUMER_BANDS_V1 + K1_EMU_ONSET_TRACE (the qualified fallback);
+`..._lockoff_probe` = the same + stage timers / G lines; `..._lockoff_unrepaired` = lock-off + onset trace without
+the consumer repair (the failure-demonstration image, kept so the "before" state reproduces from any commit).
+K1_EMU_ONSET_TRACE prints, per captured frame, the onset event the effects read (O lines; fixture only).
+
+**Item 1, the consumer gap, reproduced on rendered output (FACT, simulated).** Tempo Comet (mode 20) and Tempo
+Comet Anticipate (mode 27) read only `confidence` and `phase01`: confidence >= 0.45 (the midpoint of their
+0.30-0.60 ramp) counts as "confident", so they learn the tempo, phase-lock an internal beat clock and launch a
+comet on every predicted beat, never reading `locked` or `beat_tick`. Lock-off caps confidence at 0.5999, so the
+predicted beats continue. Suite `tempo_lane_emu.py --suite consumer` (A = Tempo Comet, B = Anticipate via
+set_mode / secondary_mode at hop 0): R3 music, music then silence, brown noise, silence, the 11 dev clips the
+lane tracker locks wrong and 3 it locks right. `tempo_consumer_cues.py` finds launches in the captured pixels and
+ties each to the bass onset the effects read; a launch with lock 0 and no onset in the 60 ms before it is a
+predicted cue. Unrepaired image: Tempo Comet 203 launches, 133 predicted without a lock; Anticipate 84 / 55;
+gap visible on R3 and on 10 of the 11 wrong-tempo clips; brown noise 5; silence 0. Known detector limit: the
+rule under-counts (it attributes 60 ms after a launch to the same head and requires the core on the spawn pixel);
+on R3 it detects 0 of Anticipate's eased launches although the frames show them, so the R3 evidence rests on
+Tempo Comet. The rule was refined twice on observed pixels (colour drift near the centre; off-centre colour
+shifts) and is applied identically to both images.
+
+**Item 2, the repair (R4 extension; K1_TEMPO_CONSUMER_BANDS_V1, default OFF).** In both effects the beat grid
+(learned tempo, phase lock, launches on predicted beats, Anticipate's arrival pinned to the next beat) now follows
+the published `locked`, not confidence. In the TENTATIVE band (each effect's own existing 0.30 edge, not locked)
+a comet launches on a fresh bass onset (the original Comet's event) and the tentative tempo only sets its speed;
+Anticipate's onset comets travel freely with no slew to the phase and no park-and-land. The NONE band is
+unchanged (the effect stands down). A coast of up to 8 predicted beats after a real validated lock is lost is
+kept, matching the tracker's own post-lock coast; it cannot occur under lock-off. Repaired image: Tempo Comet
+204 launches, 204 on a bass onset, 0 predicted; Anticipate 205 / 205 / 0; the effects still launch on every
+music case (reactive behaviour kept) and stay dark in silence. Other tempo consumers audited and left alone:
+Pulse Prism and the effect queue already require `locked && beat_tick`; Tempo River, Snapwave, Dense Forge,
+Dense Forge Chord and Waveform Tempo use phase / confidence as continuous motion; Tempo River Walk counts phase
+wraps but only to glide its palette one step per bar (no beat event drawn) — a judgement recorded here.
+
+**Item 3, qualification of the fallback (FACT, simulated / host).**
+- Behaviour (`tempo_lane_gates.py p15 --lockoff`): music-a timing classification passes with 100 % of the scored
+  window TENTATIVE and no lock or tick; silence, white / pink noise, tone, chord, both sweeps confidence 0;
+  release: TENTATIVE ends 1.51 s after the music (limit 3 s); brown noise reaches TENTATIVE (known limit), no
+  lock. Must-fail: the lock-publishing lane image fails the same gate.
+- Host == emulator (`tempo_lane_gates.py fidelity`, lock, tick, BPM, veto and confidence): p15 27,868 and
+  negatives 28,000 and dev 120,024 generations, 0 differing. Must-fail: the lock-on host build against the
+  lock-off emulator runs differs on 27,847 generations.
+- Cost (A7 method, probe image): emit + presence p50 524 us, max 645 us vs shipped 547 / 662 (0.96 / 0.97).
+- Determinism under load (`stress_repeat.py`, R3 music-a with Tempo Comet on A and Anticipate on B, 20 runs at
+  8 in parallel each): lock-off image with the trace_novelty diagnostic 0/20 diverged; without it 0/20; the probe
+  image (stage timers + G lines) with the trace 0/20. All 60 runs give the same rendered payload. Rule of three:
+  true divergence rate below about 0.15 per set at 95 %. Must-fail: one foreign run in the set is reported.
+  The first attempt exposed a harness race, not a firmware one: parallel workers decoded the music asset into
+  one shared file, so most runs started with no or truncated PCM (logs kept in stress/race-evidence).
+  `stress_repeat.py` now decodes per run into its own folder and passes the PCM through run_case's asset cache;
+  it also gains `--no-trace` for the without-diagnostics set.
+- Off-flag byte identity and the clean export: receipts a6-* and a5-* (run on the committed code).
+
+**Item 4, proposed bounded host-only experiment (PROPOSAL — NOT APPROVED).**
+E1 "agreement-gated lock, frozen on development, judged once on separate validation".
+- Question: does publishing a lock only while the comb tracker and the bar-pointer joint estimator agree (same
+  tempo within 4 % up to an octave) continuously for D seconds raise reliable lock coverage above the fallback
+  (0 locks) while keeping wrong locks rare? It is the one rule measured so far that moved the right/wrong ratio
+  (dev 8 / 2 against the lane's 11 / 11), and its two halves fail differently (the estimator rarely lands on 3:2).
+- Material: development = the 36 HarmonixSet clips (choose D in {0, 2, 4} s by "most right locks with at most
+  1 wrong"; estimator settings stay as frozen in p2.6). Validation = a separate annotated set the Captain approves,
+  disjoint from HarmonixSet, Ballroom and GiantSteps (candidates: SMC_MIREX, about 217 beat-annotated excerpts;
+  or GTZAN with the published tempo annotations). Nothing on this machine qualifies today (GTZAN folder holds one
+  file). Validation is used once and is not the acceptance corpus.
+- Pre-registered success on validation: wrong locks <= 10 % of locked tracks at the upper 95 % (Wilson) bound,
+  right locks >= 25 % of tracks, and no new trap-suite attractor. Otherwise the fallback stands.
+- Bounds: host-only (emulator used only to capture the validation tracker input, as for dev); no firmware
+  change, no port; one validation run; no re-pick; about half a day of compute.
+
+**Item 5, the acceptance corpus (HELD).** No lock candidate has cleared the development requirements (no
+correctness term >= 0.8; the fallback publishes no lock, so A1 and A2 cannot pass by construction). Spending the
+single held-out run on the fallback would leave no untouched corpus for a lock candidate. Whether the fallback
+alone should take the held-out run is put to the Captain.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-10-21 | agent:claude-code (lane R1, night) | Captain supplement recorded verbatim; consumer gap reproduced on rendered output and repaired behind K1_TEMPO_CONSUMER_BANDS_V1; lock-off fallback qualified (behaviour, host == emulator, cost, byte identity, repeats, clean export); experiment E1 proposed; held-out run held for the Captain. |
 | 2026-10-21 | agent:claude-code (lane R1, evening) | Update: A7 cost incl. per-frame presence (0.96x shipped), M2 with the spectrum transformed, Phase 2.6 joint estimator (dev Acc2 20/36, 3:2 1; agreement-gated lock 8/2), rule 3.3 implemented behind K1_TEMPO_LOCK_OFF_V1, entry gates (b) lock-OFF documented, (c) min-tooth comb rejected; STOP for the Captain's lock decision. |
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
 | 2026-10-21 | agent:claude-code (lane R1, later) | Update: Phase 2 trap suite + dev selection ablation (no variant raises Acc2) and Phase 3.1 dev AUCs (none >= 0.8). |

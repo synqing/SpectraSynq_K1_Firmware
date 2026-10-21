@@ -1,0 +1,55 @@
+{
+ "gate": "c2-consumer-analyse-repaired",
+ "cmd": "python3 scripts/regression-harness/tempo_consumer_cues.py analyse --cases _scratch/esp-emulator/tempo-lock-r1/consumer-after/cases.json --out _scratch/esp-emulator/tempo-lock-r1/consumer-after/cues.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/consumer-after/cases.json": "75e9d8a2b7afaccd2b3b493665a1cdeba651faaef733222cde472fbd75cf63b9"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/consumer-after/cues.json": "cb57ff12167626aab7aa20346fa9e66196c604c3be7a58db5bf7abfa42e2805f"
+ },
+ "stdout_tail": [
+  "music-a | lock | 0.0 | tent | 0.9895 | bass | 33 | tempo_comet: launches 17 unlocked 17 predicted 0 align 1.0 | tempo_comet_anticipate: launches 17 unlocked 17 predicted 0 align 1.0",
+  "music-then-silence | lock | 0.0 | tent | 0.4763 | bass | 83 | tempo_comet: launches 19 unlocked 19 predicted 0 align 1.0 | tempo_comet_anticipate: launches 19 unlocked 19 predicted 0 align 1.0",
+  "brown-noise-s555 | lock | 0.0 | tent | 0.476 | bass | 372 | tempo_comet: launches 20 unlocked 20 predicted 0 align 1.0 | tempo_comet_anticipate: launches 20 unlocked 20 predicted 0 align 1.0",
+  "silence-30s | lock | 0.0 | tent | 0.0 | bass | 0 | tempo_comet: launches 0 unlocked 0 predicted 0 align None | tempo_comet_anticipate: launches 0 unlocked 0 predicted 0 align None",
+  "hx:0FOjmV66zf8 | lock | 0.0 | tent | 0.9931 | bass | 52 | tempo_comet: launches 19 unlocked 19 predicted 0 align 1.0 | tempo_comet_anticipate: launches 20 unlocked 20 predicted 0 align 1.0",
+  "hx:5m-GUCSNxmc | lock | 0.0 | tent | 0.7399 | bass | 35 | tempo_comet: launches 12 unlocked 12 predicted 0 align 1.0 | tempo_comet_anticipate: launches 12 unlocked 12 predicted 0 align 1.0",
+  "hx:7vevOMWY6MY | lock | 0.0 | tent | 0.9539 | bass | 38 | tempo_comet: launches 14 unlocked 14 predicted 0 align 1.0 | tempo_comet_anticipate: launches 15 unlocked 15 predicted 0 align 1.0",
+  "hx:8gyLR4NfMiI | lock | 0.0 | tent | 0.7491 | bass | 22 | tempo_comet: launches 2 unlocked 2 predicted 0 align 1.0 | tempo_comet_anticipate: launches 2 unlocked 2 predicted 0 align 1.0",
+  "hx:9VZhI5iafH0 | lock | 0.0 | tent | 0.4902 | bass | 43 | tempo_comet: launches 6 unlocked 6 predicted 0 align 1.0 | tempo_comet_anticipate: launches 5 unlocked 5 predicted 0 align 1.0",
+  "hx:T-sxSd1uwoU | lock | 0.0 | tent | 0.985 | bass | 46 | tempo_comet: launches 12 unlocked 12 predicted 0 align 1.0 | tempo_comet_anticipate: launches 13 unlocked 13 predicted 0 align 1.0",
+  "hx:WxnN05vOuSM | lock | 0.0 | tent | 0.6407 | bass | 20 | tempo_comet: launches 4 unlocked 4 predicted 0 align 1.0 | tempo_comet_anticipate: launches 3 unlocked 3 predicted 0 align 1.0",
+  "hx:XtE1TmikgIQ | lock | 0.0 | tent | 0.4614 | bass | 46 | tempo_comet: launches 9 unlocked 9 predicted 0 align 1.0 | tempo_comet_anticipate: launches 9 unlocked 9 predicted 0 align 1.0",
+  "hx:bx1Bh8ZvH84 | lock | 0.0 | tent | 0.8495 | bass | 35 | tempo_comet: launches 10 unlocked 10 predicted 0 align 1.0 | tempo_comet_anticipate: launches 9 unlocked 9 predicted 0 align 1.0",
+  "hx:pguzToB6I7g | lock | 0.0 | tent | 0.5548 | bass | 41 | tempo_comet: launches 4 unlocked 4 predicted 0 align 1.0 | tempo_comet_anticipate: launches 4 unlocked 4 predicted 0 align 1.0",
+  "hx:r9DBFTZTKPI | lock | 0.0 | tent | 0.6753 | bass | 31 | tempo_comet: launches 15 unlocked 15 predicted 0 align 1.0 | tempo_comet_anticipate: launches 15 unlocked 15 predicted 0 align 1.0",
+  "hx:2Abk1jAONjw | lock | 0.0 | tent | 0.5213 | bass | 31 | tempo_comet: launches 14 unlocked 14 predicted 0 align 1.0 | tempo_comet_anticipate: launches 14 unlocked 14 predicted 0 align 1.0",
+  "hx:CfFlO6lHZ2g | lock | 0.0 | tent | 0.8149 | bass | 47 | tempo_comet: launches 12 unlocked 12 predicted 0 align 1.0 | tempo_comet_anticipate: launches 12 unlocked 12 predicted 0 align 1.0",
+  "hx:DkoeNLuMbcI | lock | 0.0 | tent | 0.9452 | bass | 41 | tempo_comet: launches 15 unlocked 15 predicted 0 align 1.0 | tempo_comet_anticipate: launches 16 unlocked 16 predicted 0 align 1.0"
+ ],
+ "utc": "2026-10-21T12:21:08+00:00",
+ "git_sha": "74b59909e964d018f0b92a23b0948ac6343e5a32",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "scripts/regression-harness/tempo_lane_emu.py",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "tools/esp_emulator/stress_repeat.py",
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_lane_stress_scenario.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

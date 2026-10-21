@@ -110,7 +110,15 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
 
   // 2. BEAT FLYWHEEL (own copy — identical mechanism to the original) ──────────
   const float gate   = tca_smoothstep(TCA_CONF_LO, TCA_CONF_HI, t.confidence);
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+  // Lane R1 (Captain 2026-10-21, R4 extension): launches on the beat grid and arrivals pinned to the next
+  // beat are VALIDATED cues, so the grid follows the published lock. TENTATIVE (gate > 0, not locked):
+  // bass-onset launches that travel freely (no beat-pinned arrival); see 3b and the free branch in 4.
+  const bool  confident = t.locked;
+  const bool  tentative = !t.locked && gate > 0.0f;
+#else
   const bool  confident = gate >= 0.5f;
+#endif
   float bpm = t.bpm; if (bpm < 40.0f) bpm = 40.0f; if (bpm > 200.0f) bpm = 200.0f;
 
   // Learn/hold the locked BPM only when confident; HOLD through octave flips (ratio
@@ -170,11 +178,42 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
       fx.tcanta_t[slot]      = 0.0f;
       fx.tcanta_size[slot]   = TCA_SIZE * (0.80f + 0.40f * strength);
       fx.tcanta_life[slot]   = 1.0f;
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+      fx.tcanta_free[slot]   = 0;                                         // beat-grid comet: pinned arrival
+#endif
     } else {
       // stood down: forget the tempo so the flywheel re-locks cleanly on the next section
       fx.tcanta_locked_bpm = 0.0f;
     }
   }
+
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+  // 3b. TENTATIVE band: launch on a fresh BASS onset (a real event), never on a predicted beat. The comet is
+  //     FREE: it travels at the tentative tempo's speed but its arrival is not pinned to a predicted beat
+  //     (no slew toward phase01, no park-and-land), so no beat-instant cue is drawn without a lock.
+  {
+    const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+    const bool fresh = (ev.event_id != fx.tcanta_last_event_id);
+    fx.tcanta_last_event_id = ev.event_id;
+    const bool grid_running = (fx.tcanta_locked_bpm > 0.0f) && (fx.tcanta_coast_beats <= (uint16_t)TCA_COAST_BEATS);
+    if (fresh && ev.bass_onset && tentative && !grid_running && !probe) {
+      float strength = ev.bass_onset_strength; if (strength < 0.0f) strength = 0.0f; if (strength > 1.0f) strength = 1.0f;
+      if (strength < TCA_STRENGTH_FLOOR) strength = TCA_STRENGTH_FLOOR;
+      const float reach_fr = TCA_REACH_MIN + (TCA_REACH_FRAC - TCA_REACH_MIN) * strength;
+      uint8_t slot = 0; float min_life = fx.tcanta_life[0];
+      for (uint8_t i = 1; i < COMET_MAX; i++) {
+        if (fx.tcanta_life[i] < min_life) { min_life = fx.tcanta_life[i]; slot = i; }
+      }
+      fx.tcanta_launch[slot] = float(NATIVE_RESOLUTION / 2);
+      fx.tcanta_target[slot] = reach_fr * (float(NATIVE_RESOLUTION) * 0.5f);
+      fx.tcanta_period[slot] = 60.0f / bpm;
+      fx.tcanta_t[slot]      = 0.0f;
+      fx.tcanta_size[slot]   = TCA_SIZE * (0.80f + 0.40f * strength);
+      fx.tcanta_life[slot]   = 1.0f;
+      fx.tcanta_free[slot]   = 1;
+    }
+  }
+#endif
 
   // 4. Advance (ease-out toward the beat) + draw each live comet.
   // PALETTE-CRUSH FIX (2026-06-11): colour is per-comet, not per-frame — each
@@ -192,6 +231,35 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
     // gently toward the flywheel's ideal t_ideal = phase01 * T so phase drift /
     // tempo changes glide instead of snapping. Error is wrapped to [-T/2, T/2)
     // so the flywheel's wrap (phase 1 -> 0 at arrival) does not yank t backward.
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+    if (fx.tcanta_free[i]) {
+      // FREE (onset-launched, TENTATIVE): constant-speed travel D/T px/s from the launch, no slew toward the
+      // flywheel phase and no arrival park; it leaves the strip or fades like Tempo Comet's heads.
+      fx.tcanta_t[i] += dt;
+      const float pos = fx.tcanta_launch[i] + fx.tcanta_target[i] * (fx.tcanta_t[i] / T);
+      if (pos < 0.0f || pos >= float(NATIVE_RESOLUTION)) { fx.tcanta_life[i] = 0.0f; continue; }
+      float uf = fx.tcanta_t[i] / T;
+      if (uf > 1.0f) uf = 1.0f;
+      const CRGB16 colf = effect_particle_colour(rp, render_secondary, uf * TCA_PALETTE_SPREAD, SQ15x16(1.0f));
+      const float lifef   = fx.tcanta_life[i];
+      const float radiusf = fx.tcanta_size[i];
+      const int   centref = int(pos + 0.5f);
+      const int   reachf  = int(radiusf) + TCA_GLOW;
+      for (int d = -reachf; d <= reachf; d++) {
+        const int idx = centref + d;
+        if (idx < 0 || idx >= NATIVE_RESOLUTION) continue;
+        const float ad = (d < 0) ? float(-d) : float(d);
+        const float span = (d < 0) ? (radiusf * TCA_WAKE_STRETCH) : (radiusf * 0.7f);
+        float f = 1.0f - (ad / (span + 1.0f));
+        if (f < 0.0f) f = 0.0f;
+        if (d == 0) f = 1.0f;
+        const SQ15x16 w = SQ15x16(lifef * f * TCA_HEAD_GAIN);
+        leds_16[idx].r += colf.r * w; leds_16[idx].g += colf.g * w; leds_16[idx].b += colf.b * w;
+      }
+      fx.tcanta_life[i] *= (1.0f - TCA_LIFE_DECAY * frame);
+      continue;
+    }
+#endif
     if (fx.tcanta_t[i] < T) {
       fx.tcanta_t[i] += dt;
       const float t_ideal = fx.tcanta_beat_phase * T;

@@ -1,0 +1,37 @@
+{
+ "gate": "q-fidelity-lock-build-vs-lockoff-emulator-expected-red",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_gates.py fidelity --traj _scratch/esp-emulator/tempo-lock-r1/traj/p15_spec_r1_l1sp.json --cases _scratch/esp-emulator/tempo-lock-r1/q-p15/cases.json",
+ "exit_code": 1,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/traj/p15_spec_r1_l1sp.json": "2cef7ad5e6485bceb8e8965c3a478653ee92c4f1dd37f67f054f5a3e2f0f8c5d",
+  "_scratch/esp-emulator/tempo-lock-r1/q-p15/cases.json": "a4452248b51ec697e837e72715fda0fc397931391f2c7f4ea86508596c4fb569"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "generations compared 27868 differing 27847 first [\"music-a gen 4: ['veto']\", \"music-a gen 5: ['veto']\", \"music-a gen 6: ['veto']\", \"music-a gen 7: ['veto']\", \"music-a gen 8: ['veto']\"]"
+ ],
+ "utc": "2026-10-21T16:22:59+00:00",
+ "git_sha": "74b59909e964d018f0b92a23b0948ac6343e5a32",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "scripts/regression-harness/tempo_lane_emu.py",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "tools/esp_emulator/stress_repeat.py",
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_lane_stress_scenario.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

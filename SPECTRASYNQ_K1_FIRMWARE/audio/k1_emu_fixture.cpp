@@ -13,6 +13,9 @@
 #include "k1_audio_frame.h"
 #include "k1_tempo.h"
 #include "k1_audio_snapshot.h"
+#ifdef K1_EMU_ONSET_TRACE
+#include "k1_vp_audio_access.h"   // the onset event the effects read (lane R1 consumer O lines)
+#endif
 #include "globals.h"
 #include "../control/k1_show_state.h"
 
@@ -220,6 +223,12 @@ struct CapRecord {
   Meaning producer;
   Meaning consumed;
   uint32_t render_state[7];  // raw bits of render-thread globals at store time
+#ifdef K1_EMU_ONSET_TRACE
+  // Lane R1 consumer check (K1_EMU_ONSET_TRACE, emulator only): the onset event the effects read this
+  // frame (k1_vp_onset_beat_read), so a comet launch can be tied to the bass onset behind it (O line).
+  uint32_t onset_event_id;
+  uint8_t bass_onset;
+#endif
 };
 CapRecord* s_cap = nullptr;
 struct NoveltyRecord {
@@ -858,6 +867,13 @@ void k1_emu_fixture_on_render_store(uint32_t capture_index) {
     memcpy(&c.render_state[5], &vu, 4);
     memcpy(&c.render_state[6], &peak, 4);
   }
+#ifdef K1_EMU_ONSET_TRACE
+  {
+    const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+    c.onset_event_id = ev.event_id;
+    c.bass_onset = ev.bass_onset ? 1 : 0;
+  }
+#endif
   s_pending_lim_idx = (int32_t)capture_index;
   s_captured = capture_index + 1;
 }
@@ -926,6 +942,10 @@ void k1_emu_fixture_write_sidecar(uint32_t capture_index) {
                     (unsigned long)c.onset_seq, (unsigned long)c.beat_seq, c.onset_strength, c.bpm,
                     c.phase01, c.confidence, c.locked ? 1 : 0, c.beat_tick ? 1 : 0);
   const CapRecord& s = s_cap[capture_index];
+#ifdef K1_EMU_ONSET_TRACE
+  K1_EMU_LOG.printf("O,%lu,%lu,%u\n", (unsigned long)capture_index, (unsigned long)s.onset_event_id,
+                    (unsigned)s.bass_onset);
+#endif
   K1_EMU_LOG.printf("R,%lu,%08lx,%08lx,%08lx,%08lx,%08lx,%08lx,%08lx\n", (unsigned long)capture_index,
                     (unsigned long)s.render_state[0], (unsigned long)s.render_state[1],
                     (unsigned long)s.render_state[2], (unsigned long)s.render_state[3],

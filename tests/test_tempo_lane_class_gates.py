@@ -109,6 +109,52 @@ def test_rule33_rule_flags_each_withheld_output():
     assert "veto bit missing" in g.lockoff_check(dict(ok, veto=[0, 4]))
 
 
+# ---------------------------------------------------------------- host == emulator (fidelity)
+def test_fidelity_rule_counts_every_field_both_ways(tmp_path):
+    import json
+    import tempo_lane_gates as g
+    streams = tmp_path / "streams.json"
+    # K,gen,veto,internal_locked,producer_silence,locked,beat_tick,conf,bpm
+    streams.write_text(json.dumps({"K": [[5, 128, 1, 0, 0, 0, 0.5999, 127.0], [6, 128, 1, 0, 0, 0, 0.5, 127.0]]}))
+    cases = [{"id": "x", "streams": str(streams)}]
+    host = {"x": {"gen": [5, 6], "lock": [0, 0], "tick": [0, 0], "bpm": [127.0, 127.0], "veto": [128, 128],
+                  "conf": [0.5999, 0.5]}}
+    assert g.fidelity_mismatches(host, cases, 0.0011)[:2] == (2, 0)
+    for field, bad in (("lock", [0, 1]), ("tick", [1, 0]), ("bpm", [127.0, 129.0]), ("veto", [128, 0]),
+                       ("conf", [0.5999, 0.52])):
+        broken = {"x": dict(host["x"], **{field: bad})}
+        assert g.fidelity_mismatches(broken, cases, 0.0011)[1] == 1, field
+
+
+# ---------------------------------------------------------------- tempo consumers (Captain 2026-10-21 R4 extension)
+CUES = HARNESS / "tempo_consumer_cues.py"
+
+
+def _cue_report(tmp_path, predicted_r3=0, predicted_wrong=0, launches_right=5):
+    import json
+    edge = lambda p, n=5: {"launches": n, "launches_while_unlocked": n, "explained_by_bass_onset": n - p,
+                           "predicted_cues_unlocked": p, "alignment": None, "launch_ms": [], "predicted_ms": []}
+    row = lambda cid, role, p, n=5: {"id": cid, "role": role, "tempo_comet": edge(p, n),
+                                      "tempo_comet_anticipate": edge(0, n)}
+    rep = {"cases": [row("music-a", "music-a", predicted_r3), row("hx:w", "dev-wrong-lock", predicted_wrong),
+                     row("hx:r", "dev-right-lock", 0, launches_right)]}
+    p = tmp_path / "cues.json"
+    p.write_text(json.dumps(rep))
+    return p
+
+
+def test_consumer_clean_gate_passes_only_without_predicted_cues_and_with_reactive_launches(tmp_path):
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path), "--expect", "clean").returncode == 0
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path, predicted_wrong=1), "--expect", "clean").returncode == 1
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path, launches_right=0), "--expect", "clean").returncode == 1
+
+
+def test_consumer_gap_gate_requires_the_failure_to_be_visible(tmp_path):
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path, 3, 2), "--expect", "gap").returncode == 0
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path, 0, 2), "--expect", "gap").returncode == 1
+    assert _run(CUES, "gate", "--report", _cue_report(tmp_path, 3, 0), "--expect", "gap").returncode == 1
+
+
 # ---------------------------------------------------------------- M5 metrical trap suite (I6)
 TRAPS = HARNESS / "tempo_trap_suite.py"
 TRAP_BASELINE = ROOT / "tests/fixtures/tempo_corpus/traps/baseline_shipped_selection.json"

@@ -17,6 +17,11 @@ against a rule and exits non-zero on failure; none of them regenerates its input
        silence: no lock and published confidence 0 throughout; noise / tone / drone / sweep:
        published confidence < 0.30 and 0 beat ticks; music then silence: lock released <= 3.0 s
        after the music ends; music-a: k1_av_layer_classifier PASS_timing_and_tempo.
+       --lockoff (rule 3.3 fallback image): no lock / tick anywhere, confidence < 0.60 and the NO_VALIDATED_LOCK
+       bit from the first emit on; music-a: timing classification passes and >= 50 % of the scored window is
+       TENTATIVE (>= 0.30); music then silence: TENTATIVE ends <= 3.0 s after the music and stays below 0.30.
+  fidelity  host replay (--debug) == emulator K lines of the same captures: published lock, tick, BPM,
+       veto and confidence (--conf-tol, default 0.0011 for the 4-decimal print). --traj T --cases C.
   lockoff  rule 3.3 outcome on a host replay with --debug (--traj T.json): on every emit no published
        lock, no beat tick, confidence below the LOCKED band (0.60) and the NO_VALIDATED_LOCK veto bit
        set; reports how much of the scored window sits in the TENTATIVE band (>= 0.30) per clip.
@@ -155,14 +160,42 @@ def cmd_p15(a) -> int:
              "lock_frac_all": round(sum(k["lock"]) / len(k["lock"]), 4),
              "producer_silence_frac": round(sum(k["psil"]) / len(k["psil"]), 4)}
         cid = c["id"]
-        if cid == "music-a":
+        if a.lockoff:
+            # Rule 3.3 fallback (K1_TEMPO_LOCK_OFF_V1): on every case no published lock / tick, confidence below
+            # the LOCKED band, and the NO_VALIDATED_LOCK bit on every K line from the first emit on.
+            first = next((i for i, v in enumerate(k["veto"]) if v), None)
+            bit_ok = first is not None and all(v & 0x80 for v in k["veto"][first:]) and k["gen"][first] <= 10
+            r["lockoff_ok"] = sum(k["lock"]) == 0 and r["ticks"] == 0 and r["max_conf"] < 0.60 and bit_ok
+        if cid == "music-a" and a.lockoff:
+            tl = c.get("tempo_lane") or {}
+            r["classification"] = tl.get("classification")
+            scored = [x for g, x in zip(k["gen"], k["conf"]) if g >= SCORE_FROM_GEN]
+            r["tentative_frac_scored"] = round(sum(1 for x in scored if x >= CONF_QUIET) / max(1, len(scored)), 4)
+            # Timing must still pass (tempo near target); the lock half of A1 is withheld by design (rule 3.3).
+            r["ok"] = (tl.get("classification") in ("PASS_timing_but_weak_lock", "PASS_timing_and_tempo")
+                       and r["tentative_frac_scored"] >= 0.5 and r["lockoff_ok"])
+        elif cid == "music-a":
             tl = c.get("tempo_lane") or {}
             r["classification"] = tl.get("classification")
             r["ok"] = tl.get("classification") == "PASS_timing_and_tempo"
+        elif cid == "music-then-silence" and a.lockoff:
+            end_gen = -(-c["music_samples"] // 96)
+            tent_before = [g for g, x in zip(k["gen"], k["conf"]) if g <= end_gen and x >= CONF_QUIET]
+            last_tent = max((g for g, x in zip(k["gen"], k["conf"]) if g > end_gen and x >= CONF_QUIET), default=end_gen)
+            r.update(music_end_gen=end_gen, tentative_before_end=bool(tent_before),
+                     tentative_release_s_after_music=round((last_tent - end_gen) * HOP_MS / 1000.0, 3),
+                     conf_at_end=k["conf"][-1])
+            r["ok"] = (bool(tent_before) and r["tentative_release_s_after_music"] <= RELEASE_MAX_S
+                       and k["conf"][-1] < CONF_QUIET and r["lockoff_ok"])
         elif cid == "silence-30s":
             r["ok"] = sum(k["lock"]) == 0 and r["max_conf"] == 0.0 and r["ticks"] == 0
-        elif cid in ("white-noise-30s", "tone440-30s", "pink-drone-30s", "sweep-30s"):
+        elif cid in ("white-noise-30s", "tone440-30s", "pink-drone-30s", "sweep-30s", "white-noise-s99",
+                     "white-noise-s7", "pink-drone-s77", "pink-drone-s5", "chord-a-minor", "sweep-slow-1oct"):
             r["ok"] = r["max_conf"] < CONF_QUIET and r["ticks"] == 0 and sum(k["lock"]) == 0
+        elif cid == "brown-noise-s555" and a.lockoff:
+            # Known limit of spectral presence (brown noise reaches TENTATIVE): held to the lock-off rules only.
+            r["known_limit"] = "brown noise reaches the TENTATIVE band (spectral presence limit)"
+            r["ok"] = r["lockoff_ok"]
         elif cid == "music-then-silence":
             end_gen = -(-c["music_samples"] // 96)
             locked_at_end = [g for g, l in zip(k["gen"], k["lock"]) if l and g <= end_gen]
@@ -177,6 +210,8 @@ def cmd_p15(a) -> int:
             r["ok"] = bool(locked_at_end) and release_s <= RELEASE_MAX_S and r["unlocked_at_end"]
         else:
             r["ok"] = None
+        if a.lockoff and r["ok"] is not None:
+            r["ok"] = r["ok"] and r["lockoff_ok"]
         rows.append(r)
         if r["ok"] is False:
             fails.append(cid)
@@ -185,6 +220,43 @@ def cmd_p15(a) -> int:
         Path(a.json).write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
     return 1 if fails else 0
+
+
+# ------------------------------------------------------------------ host == emulator
+def fidelity_mismatches(traj_clips: dict, cases: list, conf_tol: float) -> tuple[int, int, list]:
+    """Per generation: published lock, tick, BPM (0.5), veto and confidence (conf_tol) of the host replay
+    against the emulator K lines of the same captured input. Returns (compared, differing, first few)."""
+    tot, bad, first = 0, 0, []
+    for c in cases:
+        K = {k[0]: k for k in json.loads(Path(c["streams"]).read_text())["K"]}
+        t = traj_clips.get(c["id"])
+        if t is None:
+            raise KeyError(f"host trajectory lacks {c['id']}")
+        for i, g in enumerate(t["gen"]):
+            k = K.get(g)
+            if k is None:
+                continue
+            tot += 1
+            diff = [n for n, d in (("lock", k[4] != t["lock"][i]), ("tick", k[5] != t["tick"][i]),
+                                   ("bpm", abs(k[7] - t["bpm"][i]) > 0.5), ("veto", k[1] != t["veto"][i]),
+                                   ("conf", abs(k[6] - t["conf"][i]) > conf_tol)) if d]
+            if diff:
+                bad += 1
+                if len(first) < 5:
+                    first.append(f"{c['id']} gen {g}: {diff}")
+    return tot, bad, first
+
+
+def cmd_fidelity(a) -> int:
+    traj = json.loads(Path(a.traj).read_text())["clips"]
+    cases = json.loads(Path(a.cases).read_text())["cases"]
+    try:
+        tot, bad, first = fidelity_mismatches(traj, cases, a.conf_tol)
+    except KeyError as exc:
+        print(f"FIDELITY INPUT: {exc}")
+        return 2
+    print(f"generations compared {tot} differing {bad}" + (f" first {first}" if first else ""))
+    return 0 if tot and not bad else (2 if not tot else 1)
 
 
 # ------------------------------------------------------------------ rule 3.3 lock-off
@@ -244,11 +316,18 @@ def main(argv=None) -> int:
     p15 = sub.add_parser("p15")
     p15.add_argument("--cases", required=True)
     p15.add_argument("--json")
+    p15.add_argument("--lockoff", action="store_true",
+                     help="rule 3.3 fallback criteria: no lock anywhere, music-a timing + TENTATIVE, "
+                          "release = TENTATIVE ends within 3 s")
+    fi = sub.add_parser("fidelity")
+    fi.add_argument("--traj", required=True, help="host replay with --debug")
+    fi.add_argument("--cases", required=True, help="tempo_lane_emu.py cases.json of the same captures")
+    fi.add_argument("--conf-tol", type=float, default=0.0011)
     lo = sub.add_parser("lockoff")
     lo.add_argument("--traj", required=True)
     lo.add_argument("--json")
     a = p.parse_args(argv)
-    return {"m1": cmd_m1, "m2": cmd_m2, "p15": cmd_p15, "lockoff": cmd_lockoff}[a.cmd](a)
+    return {"m1": cmd_m1, "m2": cmd_m2, "p15": cmd_p15, "lockoff": cmd_lockoff, "fidelity": cmd_fidelity}[a.cmd](a)
 
 
 if __name__ == "__main__":

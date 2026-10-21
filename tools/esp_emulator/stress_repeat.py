@@ -11,7 +11,7 @@ two cores differently under host load. The render path once depended on wall tim
 startup ordering and esp_random() and diverged in about 1 run in 8, only when loaded.
 
 `run` builds nothing. It uses the already built emulator env, forces trace_novelty
-on so producer CRCs exist, and runs N copies through run.run_case (the same
+on so producer CRCs exist (--no-trace runs without it), and runs N copies through run.run_case (the same
 acceptance as the suite) with P worker processes. It then groups the native
 payloads and, for each run that differs from the majority, reports where it first
 diverged:
@@ -41,17 +41,26 @@ RENDER_FIELDS = ("hue_position", "hue_shifting_mix", "MASTER_BRIGHTNESS", "silen
                  "audio_vu_level", "waveform_peak_scaled")
 
 
-def _one(args: tuple[str, str, str, int]) -> dict:
-    scenario, case, out, index = args
+def _one(args: tuple) -> dict:
+    scenario, case, out, index = args[:4]
+    trace = args[4] if len(args) > 4 else True
     import run as runner  # noqa: WPS433 - each worker process imports its own copy
     sc = runner.load_scenario(Path(scenario))
     name = f"{case}-r{index:02d}"
     sc["cases"][name] = copy.deepcopy(sc["cases"][case])
-    sc["cases"][name]["trace_novelty"] = True
+    sc["cases"][name]["trace_novelty"] = trace   # --no-trace: the run without the N-line diagnostic
     lock = json.loads((HERE / "tool-lock.json").read_text())
     emu, _ = runner.resolve_esp_emu(lock)
     build_dir = runner.REPO / ".pio/build" / sc["profile"]["env"]
-    rec = runner.run_case(sc, name, Path(out), emu, build_dir, {}, {})
+    # Decode the case's PCM in a per-run folder first and hand it to run_case through its asset cache.
+    # run_case decodes inventory_excerpt assets into its output folder; parallel workers sharing that folder
+    # raced on the same ffmpeg target ("already exists") and the losers ran with no valid PCM (lane R1,
+    # 2026-10-21: 20/20 FAIL scenario_invalid on music-a at --parallel 8).
+    work = Path(out) / f"{name}.asset"
+    work.mkdir(parents=True, exist_ok=True)
+    cache: dict = {}
+    runner.load_asset(sc, sc["cases"][name]["pcm"], cache, work)
+    rec = runner.run_case(sc, name, Path(out), emu, build_dir, cache, {})
     return {"name": name, "status": rec["status"], "reasons": rec.get("reasons", [])[:3],
             "uart": str(Path(out) / name / "uart.txt")}
 
@@ -124,6 +133,8 @@ def main() -> int:
     r.add_argument("--runs", type=int, default=20)
     r.add_argument("--parallel", type=int, default=4)
     r.add_argument("--output", required=True)
+    r.add_argument("--no-trace", action="store_true",
+                   help="run without the trace_novelty diagnostic (localisation then stops at handoff/render)")
     a = sub.add_parser("analyse")
     a.add_argument("uart", nargs="+")
     args = ap.parse_args()
@@ -134,7 +145,8 @@ def main() -> int:
         if out.exists():
             raise SystemExit(f"output already exists: {out}")
         out.mkdir(parents=True)
-        jobs = [(str(Path(args.scenario).resolve()), args.case, str(out), i) for i in range(args.runs)]
+        jobs = [(str(Path(args.scenario).resolve()), args.case, str(out), i, not args.no_trace)
+                for i in range(args.runs)]
         with cf.ProcessPoolExecutor(max_workers=args.parallel) as pool:
             runs = list(pool.map(_one, jobs))
         report = analyse([x["uart"] for x in runs])
