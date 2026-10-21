@@ -1457,7 +1457,11 @@ void k1_tempo_reset() {
 
 void k1_tempo_update(const K1AudioSnapshot& audio) {
   uint32_t now_ms = audio.frame_ms;
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+  float novelty = k1_t_clamp(audio.tempo_novelty, 0.0f, 1.0f);
+#else
   float novelty = k1_t_clamp(audio.novelty, 0.0f, 1.0f);
+#endif
   if (audio.silence) novelty = 0.0f;
   // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated `novelty *= 4.0f` boost lived
   // here. The multiplier was fitted by trial (x2.5 then x4.0) against Bench Unit

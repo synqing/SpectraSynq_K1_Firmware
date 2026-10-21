@@ -664,7 +664,11 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
     crc = esp_crc32_le(crc, (const uint8_t*)spectrogram, sizeof(spectrogram));
     crc = esp_crc32_le(crc, (const uint8_t*)spectrogram_smooth, sizeof(SQ15x16) * NUM_FREQS);
     crc = esp_crc32_le(crc, (const uint8_t*)chromagram_smooth, sizeof(SQ15x16) * 12);
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+    s_nov[generation - 1] = {snap.tempo_novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
+#else
     s_nov[generation - 1] = {snap.novelty, snap.vu_level, (uint8_t)(snap.silence ? 1 : 0), crc};
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
     if (s_probe != nullptr) {
       const K1TempoDebugSnapshot d = k1_tempo_debug_read();

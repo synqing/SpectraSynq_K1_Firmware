@@ -103,6 +103,10 @@ extern SQ15x16 chromagram_pregate[12];          // Row 3 → globals.cpp — pos
 
 inline SQ15x16 spectral_history[SPECTRAL_HISTORY_LENGTH][NUM_FREQS];
 inline SQ15x16 novelty_curve[SPECTRAL_HISTORY_LENGTH] = { 0.0 };
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+// Candidate (uncommitted evidence): the tempo tracker's input before the sqrtf.
+inline float novelty_linear_curve[SPECTRAL_HISTORY_LENGTH] = { 0.0f };
+#endif
 
 inline uint8_t spectral_history_index = 0;
 

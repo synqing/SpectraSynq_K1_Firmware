@@ -1,0 +1,37 @@
+{
+ "gate": "p1.1-tap-hunks-match-patch",
+ "cmd": "python3 _scratch/esp-emulator/tempo-lock-r1/verify_tap_hunks.py _scratch/esp-emulator/next-phase-tempo-candidate-001/candidate-K1_TEMPO_NOVELTY_LINEAR_V1.patch HEAD",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/next-phase-tempo-candidate-001/candidate-K1_TEMPO_NOVELTY_LINEAR_V1.patch": "76df31469a5a34c3a81bef5a3500f66c9b96b890805fe96953bc49dbcaac52fb"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "SAME SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.cpp patch=d39b589568781672 applied=d39b589568781672 lines=3/3",
+  "SAME SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.h patch=8a15f93c1efbc726 applied=8a15f93c1efbc726 lines=3/3",
+  "SAME SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp patch=31d92da85390b964 applied=31d92da85390b964 lines=4/4",
+  "SAME SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp patch=31f53203be42355c applied=31f53203be42355c lines=3/3",
+  "SAME SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp patch=d10df26a4d16958b applied=d10df26a4d16958b lines=4/4",
+  "SAME SPECTRASYNQ_K1_FIRMWARE/system/globals.h patch=1ab1229920d0a562 applied=1ab1229920d0a562 lines=4/4",
+  "SKIP platformio.ini (product define set: separate proposal)",
+  "files_differing=0"
+ ],
+ "utc": "2026-10-21T01:37:39+00:00",
+ "git_sha": "827beb649227fd3ff30c700774bd7bb432d695f7",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/system/globals.h",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}
