@@ -7,6 +7,7 @@ the raw uart and extracts the per-generation streams the lane gates read:
   K  gen, veto, internal lock, producer silence, published lock/tick/conf/bpm   (lane flags only)
   V  render-thread consumed tempo view for the captured frames
   G  probe envs only: loud-guard state + tracker stage timers
+  P  spectrum-trace probe only: per-note spectrum, 80 bins x uint16 hex
 Captured streams are the shared fixtures (I7); host replay and scorers read them, never re-derive.
 
   tempo_lane_emu.py run --env ENV --suite p15|music --out DIR [--parallel N]
@@ -69,6 +70,19 @@ def gen_pink_drone(seconds, seed=4321):
     return _to_pcm(out)
 
 
+def gen_brown(seconds, seed=555):
+    r = random.Random(seed)
+    x, out = 0.0, []
+    for _ in range(int(seconds * RATE)):
+        x = 0.995 * x + r.uniform(-1, 1)
+        out.append(x)
+    return _to_pcm(out)
+
+
+def gen_chord(seconds, hz=(220.0, 277.18, 329.63)):
+    return _to_pcm([sum(math.sin(2 * math.pi * f * n / RATE) for f in hz) for n in range(int(seconds * RATE))])
+
+
 def gen_sweep(seconds, f0=200.0, f1=2000.0):
     n_total = int(seconds * RATE)
     k = math.log(f1 / f0) / seconds
@@ -108,8 +122,9 @@ def case_pcm(case: dict, work: Path) -> tuple[bytes, dict]:
                                                    "music_samples": len(pcm) // 2}
     if s["kind"] == "synthetic":
         fn = {"silence": gen_silence, "white_noise": gen_white_noise, "tone": gen_tone,
-              "pink_drone": gen_pink_drone, "sweep": gen_sweep}[s["gen"]]
-        return fn(s["seconds"]), {"source": f"synthetic {s['gen']} {s['seconds']} s"}
+              "pink_drone": gen_pink_drone, "sweep": gen_sweep, "brown": gen_brown, "chord": gen_chord}[s["gen"]]
+        kw = {k: v for k, v in s.items() if k in ("seed", "f0", "f1", "hz")}
+        return fn(s["seconds"], **kw), {"source": f"synthetic {s['gen']} {s['seconds']} s {kw}"}
     if s["kind"] == "wav":
         return decode_like_run(s["path"], s.get("start_ms", 0), s.get("duration_ms"), work)
     raise SystemExit(f"unknown source {s}")
@@ -133,6 +148,12 @@ def suite(name: str) -> list[dict]:
             {"id": "music-then-silence", "source": {"kind": "music_then_silence", "silence_s": 15},
              "capture": {"start_hop": 0, "end_hop": None, "every": 3}},
         ]
+    if name == "neg":   # calibration negatives for rhythm-presence evidence (lane R1, Phase 3)
+        mk = lambda cid, **src: {"id": cid, "source": {"kind": "synthetic", "seconds": 30, **src}, "capture": full}
+        return [mk("white-noise-s99", gen="white_noise", seed=99), mk("white-noise-s7", gen="white_noise", seed=7),
+                mk("pink-drone-s77", gen="pink_drone", seed=77), mk("pink-drone-s5", gen="pink_drone", seed=5),
+                mk("brown-noise-s555", gen="brown", seed=555), mk("chord-a-minor", gen="chord"),
+                mk("sweep-slow-1oct", gen="sweep", f0=440.0, f1=880.0)]
     raise SystemExit(f"unknown suite {name}")
 
 
@@ -152,7 +173,7 @@ def manifest_cases(manifest: Path, role: str, limit: int | None) -> list[dict]:
 
 # ------------------------------------------------------------------ streams
 def extract(uart: str) -> dict:
-    N, K, V, G = [], [], [], []
+    N, K, V, G, P = [], [], [], [], []
     for ln in uart.splitlines():
         p = ln.split(",")
         if ln.startswith("N,"):
@@ -161,9 +182,11 @@ def extract(uart: str) -> dict:
             K.append([int(p[1]), int(p[2]), int(p[3]), int(p[4]), int(p[5]), int(p[6]), float(p[7]), float(p[8])])
         elif ln.startswith("V,"):
             V.append([int(p[2]), float(p[15]), float(p[17]), int(p[18])])
+        elif ln.startswith("P,"):
+            P.append([int(p[1]), p[2]])
         elif ln.startswith("G,"):
             G.append([int(x) if i not in (1, 2, 8) else float(x) for i, x in enumerate(p[1:])])
-    return {"N": N, "K": K, "V": V, "G": G}
+    return {"N": N, "K": K, "V": V, "G": G, "P": P}
 
 
 def _run_one(args) -> dict:

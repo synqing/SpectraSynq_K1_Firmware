@@ -40,6 +40,7 @@ enum K1TempoVeto : uint8_t {
   K1_TEMPO_VETO_CONF_BELOW_RELEASE = 1u << 3,  // lock released this emit: conf_ema < K1_CONF_V2_REL
   K1_TEMPO_VETO_WATCHDOG = 1u << 4,            // lock released this emit by the sub-floor watchdog
   K1_TEMPO_VETO_BEATS_SEEN_LT_2 = 1u << 5,     // fewer than two observed beats since reset
+  K1_TEMPO_VETO_NO_RHYTHM_EVIDENCE = 1u << 6,  // no broadband onsets in the recent window (spectral presence)
 };
 struct K1TempoGate {
   uint8_t veto;              // K1TempoVeto bits of the last emit

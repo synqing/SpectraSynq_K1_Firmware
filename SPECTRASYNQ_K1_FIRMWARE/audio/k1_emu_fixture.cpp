@@ -243,6 +243,16 @@ struct GateRecord {
 };
 GateRecord* s_gate = nullptr;
 #endif
+#ifdef K1_EMU_SPECTRUM_TRACE
+// Measurement probe only (env k1_main_rpl_emu_tempo_r1_spec, lane R1 Phase 3 feasibility): the
+// snapshot's per-note spectrum (K1_ONSET_V2, post-AGC, [0,1]) for every publication, 16-bit
+// quantised, printed as P lines after the N lines. Capped at kMaxSpectrum generations (PSRAM).
+#ifndef K1_ONSET_V2
+#error "K1_EMU_SPECTRUM_TRACE needs K1_ONSET_V2 (snapshot spectrum)"
+#endif
+constexpr uint32_t kMaxSpectrum = 4200;
+uint16_t* s_spec = nullptr;
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
 // Measurement probe only (env k1_main_rpl_emu_tempo_probe, tempo lane R1, 2026-10-21).
 // Per generation: loud-guard state of the hop just published, and the tempo tracker's
@@ -425,6 +435,26 @@ void print_counters(const char* reason, const char* where) {
     }
   }
 #endif
+#ifdef K1_EMU_SPECTRUM_TRACE
+  if (s_spec != nullptr) {
+    char line[16 + 4 * K1_ONSET_SPECTRUM_BINS + 2];
+    const uint32_t n = s_nov_count < kMaxSpectrum ? s_nov_count : kMaxSpectrum;
+    for (uint32_t i = 0; i < n; i++) {
+      const uint16_t* v = &s_spec[i * K1_ONSET_SPECTRUM_BINS];
+      size_t o = 0;
+      for (uint32_t b = 0; b < K1_ONSET_SPECTRUM_BINS; b++) {
+        line[o++] = hexc[(v[b] >> 12) & 15]; line[o++] = hexc[(v[b] >> 8) & 15];
+        line[o++] = hexc[(v[b] >> 4) & 15];  line[o++] = hexc[v[b] & 15];
+      }
+      line[o] = 0;
+      K1_EMU_LOG.printf("P,%lu,%s\n", (unsigned long)(i + 1), line);
+      if ((i & 0x3F) == 0x3F) {
+        feedLoopWDT();
+        vTaskDelay(1);
+      }
+    }
+  }
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
   if (s_probe != nullptr) {
     for (uint32_t i = 0; i < s_nov_count; i++) {
@@ -596,6 +626,10 @@ void k1_emu_fixture_begin(void) {
     s_gate = (GateRecord*)ps_malloc(sizeof(GateRecord) * kMaxNovelty);
     if (s_gate == nullptr) fail_scenario("gate_psram");
 #endif
+#ifdef K1_EMU_SPECTRUM_TRACE
+    s_spec = (uint16_t*)ps_malloc(sizeof(uint16_t) * K1_ONSET_SPECTRUM_BINS * kMaxSpectrum);
+    if (s_spec == nullptr) fail_scenario("spectrum_psram");
+#endif
 #ifdef K1_EMU_TEMPO_PROBE
     s_probe = (ProbeRecord*)ps_malloc(sizeof(ProbeRecord) * kMaxNovelty);
     if (s_probe == nullptr) fail_scenario("probe_psram");
@@ -705,6 +739,16 @@ void k1_emu_fixture_note_publication(const K1AudioFrame& frame) {
       const K1TempoEvent ev = k1_tempo_read();
       s_gate[generation - 1] = {k1_tempo_gate_read(), ev.bpm, ev.confidence, (uint8_t)(ev.locked ? 1 : 0),
                                 (uint8_t)(ev.beat_tick ? 1 : 0)};
+    }
+#endif
+#ifdef K1_EMU_SPECTRUM_TRACE
+    if (s_spec != nullptr && generation <= kMaxSpectrum) {
+      uint16_t* v = &s_spec[(generation - 1) * K1_ONSET_SPECTRUM_BINS];
+      for (uint32_t b = 0; b < K1_ONSET_SPECTRUM_BINS; b++) {
+        float x = snap.spectrum[b];
+        x = x < 0.0f ? 0.0f : (x > 1.0f ? 1.0f : x);
+        v[b] = (uint16_t)(x * 65535.0f + 0.5f);
+      }
     }
 #endif
 #ifdef K1_EMU_TEMPO_PROBE

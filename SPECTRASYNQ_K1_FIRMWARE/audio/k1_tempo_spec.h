@@ -24,6 +24,23 @@ static const float    K1_NOVELTY_DECAY = 0.999f;
 // @prov K1_SILENCE_CONTRAST_ENTER value=0.5 mic=none fixture=UNPROVENANCED date=2026-06-03 tuned_on=donor default; applied to sqrt-of-sqrt novelty (DEF-001 mechanism)
 static const float    K1_SILENCE_CONTRAST_ENTER = 0.5f;
 
+// ---------------------------------------------------------------- spectral rhythm presence (K1_TEMPO_SPECTRAL_PRESENCE_V1)
+// Tuned 2026-10-21 on the lane emulator captures of the 36 dev clips (tests/fixtures/tempo_corpus/manifest.json
+// sha256 807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee, role dev) and the synthetic negatives
+// (tempo_lane_emu.py suites p15 + neg). Not yet confirmed on held-out data.
+// @prov K1_SP_BINS value=70 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=Nyquist-safe bin count at 12.8 kHz / NOTE_OFFSET 12 (arithmetic)
+#define K1_SP_BINS 70
+// @prov K1_SP_QUANTILE value=0.9 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=dev + negatives sweep (spec_breadth.py); per-bin onset = flux above its own 90th percentile
+#define K1_SP_QUANTILE 0.9f
+// @prov K1_SP_STEP value=0.05 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=judgement (Robbins-Monro step relative to the bin's mean flux; convergence within ~1 s)
+#define K1_SP_STEP 0.05f
+// @prov K1_SP_BREADTH value=0.40 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=dev 36 + negatives: 0.30 admitted chord/sweep/brown, 0.45 dropped 6 dev tracks
+#define K1_SP_BREADTH 0.40f
+// @prov K1_SP_WINDOW_FRAMES value=267 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=2.0 s at 133.33 Hz (release must stay within 3 s)
+#define K1_SP_WINDOW_FRAMES 267
+// @prov K1_SP_MIN_EVENTS value=2 mic=IM69D130-emulated fixture=UNPROVENANCED date=2026-10-21 tuned_on=judgement (two broadband onsets within the window)
+#define K1_SP_MIN_EVENTS 2
+
 // ---------------------------------------------------------------- lock threshold
 // @prov K1_LOCK_CONFIDENCE value=0.60 mic=UNSTATED fixture=UNPROVENANCED date=2026-06-03 tuned_on=host tempo_replay synthetic (clean 0.999 vs drone 0.47); the 2026-08-11 tombstone calls it "the SPH0645 calibration" but no SPH0645 fixture is recorded; never measured on IM69D
 static const float    K1_LOCK_CONFIDENCE = 0.60f;

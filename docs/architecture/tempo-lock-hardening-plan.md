@@ -230,6 +230,21 @@ winner stability 0.61, CONF_V2 0.53 (emit AUC 0.49 / 0.55 / 0.67 / 0.58). None r
 Unless a better-formed term clears 0.8 on dev and held-out, rule 3.3 applies: lock stays OFF under
 the flag set, the tentative band is published, no threshold is lowered.
 
+## Captain rulings — 2026-10-21 (Phase 0.6 stop)
+
+- Held-out corpus: Ballroom (698) + GiantSteps Tempo (661) approved in principle as the full
+  1,359-clip acceptance corpus; no subsample. Acceptance execution is HELD until the development entry
+  gates pass; then freeze candidate, scorer, configuration and manifest and run all 1,359 clips once
+  under the declared evaluation plan.
+- Silence: keep R7 (producer owns silence). Keep the compression-invariance requirement (M2). Develop a
+  qualified confidence for noise / drone rejection. The Emotiscope-faithful contrast route is rejected
+  (fails M2, overrides R7/I9).
+- Release: keep the 3 s requirement; leave the producer's shared 5 s SILENCE_DWELL_MS unchanged.
+- K1TempoEvent: unchanged (R5). Veto reasons stay in K1TempoGate, the debug snapshot and emulator K lines.
+- Development entry gates before the held-out run: Phase 1.5 behaviour green; a confidence term with
+  dev AUC >= 0.8 (or the lock-OFF outcome of rule 3.3 documented); the min-tooth comb trade-off
+  (fewer wrong locks, lower Acc2) resolved; the deferred tooth-consistency term (3.1b) measured.
+
 ---
 **Document Changelog**
 | Date | Author | Change |

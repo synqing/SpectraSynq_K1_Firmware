@@ -391,6 +391,61 @@ static float    k1_fw_last_onset_phase = -1.0f; // diagnostic: last detected ons
 static bool     k1_silence_detected = false;
 static float    k1_silence_level = 0.0f;
 
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+// Lane R1 (DEF-001 / A3): rhythm-presence evidence from the snapshot's per-note spectrum
+// (K1_ONSET_V2, an existing field; no producer change). A beat is broadband: many bins rise together.
+// Independent noise lifts bins independently; a tone, chord or sweep moves a few bins. Per bin, the
+// positive flux is compared with a streaming estimate of that bin's own 90th percentile (Robbins-Monro,
+// step proportional to the bin's mean flux), so the test is a per-bin rank: invariant to scale and to
+// monotonic compression (M2). Breadth = fraction of bins above their threshold; a local breadth peak
+// >= K1_SP_BREADTH is an onset event; presence = at least K1_SP_MIN_EVENTS events in the last
+// K1_SP_WINDOW_FRAMES frames. Without presence the confidence quality target is 0 (EMA decays) and the
+// NO_RHYTHM_EVIDENCE veto bit names it. Digital silence after music empties presence within the window.
+#ifndef K1_ONSET_V2
+#error "K1_TEMPO_SPECTRAL_PRESENCE_V1 reads K1AudioSnapshot::spectrum (needs K1_ONSET_V2)"
+#endif
+static float    k1_sp_prev[K1_SP_BINS];
+static float    k1_sp_thr[K1_SP_BINS];
+static float    k1_sp_scale[K1_SP_BINS];
+static float    k1_sp_b1 = 0.0f;        // breadth one frame ago
+static float    k1_sp_b2 = 0.0f;        // breadth two frames ago
+static uint32_t k1_sp_frame = 0;
+static uint32_t k1_sp_event_frame[K1_SP_MIN_EVENTS];
+static uint8_t  k1_sp_event_head = 0;
+static bool     k1_sp_presence = false;
+
+static void k1_spectral_presence_frame(const K1AudioSnapshot& a) {
+  k1_sp_frame++;
+  const float alpha = 1.0f / (float)K1_SP_WINDOW_FRAMES;
+  uint16_t above = 0;
+  for (uint16_t b = 0; b < K1_SP_BINS; b++) {
+    const float s = a.spectrum[b];
+    float f = s - k1_sp_prev[b];
+    k1_sp_prev[b] = s;
+    if (f < 0.0f) f = 0.0f;
+    k1_sp_scale[b] += alpha * (f - k1_sp_scale[b]);
+    const bool hit = f > k1_sp_thr[b];
+    if (hit) above++;
+    k1_sp_thr[b] += K1_SP_STEP * k1_sp_scale[b] * ((hit ? 1.0f : 0.0f) - (1.0f - K1_SP_QUANTILE));
+    if (k1_sp_thr[b] < 0.0f) k1_sp_thr[b] = 0.0f;
+  }
+  const float breadth = (float)above / (float)K1_SP_BINS;
+  // The previous frame is an event if it is a local breadth maximum at or above the threshold.
+  if (k1_sp_b1 >= K1_SP_BREADTH && k1_sp_b1 >= k1_sp_b2 && k1_sp_b1 > breadth) {
+    k1_sp_event_frame[k1_sp_event_head] = k1_sp_frame - 1u;
+    k1_sp_event_head = (uint8_t)((k1_sp_event_head + 1u) % K1_SP_MIN_EVENTS);
+  }
+  k1_sp_b2 = k1_sp_b1;
+  k1_sp_b1 = breadth;
+  bool present = k1_sp_frame >= (uint32_t)K1_SP_WINDOW_FRAMES;
+  for (uint8_t i = 0; i < K1_SP_MIN_EVENTS && present; i++) {
+    const uint32_t ef = k1_sp_event_frame[i];
+    present = ef != 0u && (k1_sp_frame - ef) <= (uint32_t)K1_SP_WINDOW_FRAMES;
+  }
+  k1_sp_presence = present;
+}
+#endif
+
 #ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
 // Lane R1 (DEF-001, I9): the producer owns silence. audio.silence is ANDed over the AP frames of one
 // emit window (a single non-silent frame means programme is present, mirroring the novelty peak-hold)
@@ -892,7 +947,11 @@ static void k1_update_confidence_v2(float dt_sec) {
   const uint16_t wbin = k1_validate_winner();
 #ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
   k1_v2_release_cause = K1_TEMPO_VETO_NONE;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  const bool k1_v2_measure = k1_acf_valid && !k1_silence_detected && k1_sp_presence;  // no evidence: target 0
+#else
   const bool k1_v2_measure = k1_acf_valid && !k1_silence_detected;  // silence: quality target 0
+#endif
 #else
   const bool k1_v2_measure = k1_acf_valid;
 #endif
@@ -1369,6 +1428,9 @@ static K1TempoEvent k1_build_output() {
   // I1: name every gate that holds locked / beat_tick / confidence down on this emit.
   uint8_t veto = K1_TEMPO_VETO_NONE;
   if (k1_silence_detected) veto |= K1_TEMPO_VETO_PRODUCER_SILENCE;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  if (!k1_sp_presence) veto |= K1_TEMPO_VETO_NO_RHYTHM_EVIDENCE;
+#endif
 #ifdef K1_TEMPO_CONF_V2
   veto |= k1_v2_release_cause;
   if (k1_v2_updates < K1_CONF_V2_WARMUP_UPDATES) veto |= K1_TEMPO_VETO_WARMUP;  // also zeroes confidence
@@ -1491,6 +1553,14 @@ void k1_tempo_reset() {
   k1_tempo_veto = K1_TEMPO_VETO_NONE;
   k1_v2_release_cause = K1_TEMPO_VETO_NONE;
 #endif
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  for (uint16_t b = 0; b < K1_SP_BINS; b++) { k1_sp_prev[b] = 0.0f; k1_sp_thr[b] = 0.0f; k1_sp_scale[b] = 0.0f; }
+  for (uint8_t i = 0; i < K1_SP_MIN_EVENTS; i++) k1_sp_event_frame[i] = 0u;
+  k1_sp_b1 = k1_sp_b2 = 0.0f;
+  k1_sp_frame = 0;
+  k1_sp_event_head = 0;
+  k1_sp_presence = false;
+#endif
   k1_tempo_primed = false;
   k1_accum = 0.0f;
   k1_last_emit_ms = 0;
@@ -1522,6 +1592,9 @@ void k1_tempo_update(const K1AudioSnapshot& audio) {
   if (audio.silence) novelty = 0.0f;
 #ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
   k1_window_all_silent = k1_window_all_silent && audio.silence;
+#endif
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  k1_spectral_presence_frame(audio);
 #endif
   // TOMBSTONE 2026-08-11 (Captain): an IM73D-gated `novelty *= 4.0f` boost lived
   // here. The multiplier was fitted by trial (x2.5 then x4.0) against Bench Unit

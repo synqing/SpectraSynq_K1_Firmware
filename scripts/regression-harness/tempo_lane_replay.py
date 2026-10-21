@@ -39,19 +39,53 @@ VARIANTS = {
     "linear": ["K1_TEMPO_NOVELTY_LINEAR_V1"],
     "l1": ["K1_TEMPO_NOVELTY_LINEAR_V1", "K1_TEMPO_SILENCE_FROM_PRODUCER_V1"],
     "silence_only": ["K1_TEMPO_SILENCE_FROM_PRODUCER_V1"],
+    "l1sp": ["K1_TEMPO_NOVELTY_LINEAR_V1", "K1_TEMPO_SILENCE_FROM_PRODUCER_V1", "K1_ONSET_V2",
+             "K1_TEMPO_SPECTRAL_PRESENCE_V1"],
 }
 
 DRIVER = r"""
 #include "k1_tempo.h"
 #include <cstdio>
 void k1_tempo_debug_dump(float*, int, int*, float*, float*);
+void k1_tempo_debug_dump_acf_lags(float*, int, int*, int*);
+// Tooth consistency at the published winner (lane R1 term 3.1b): min / mean of the four comb teeth
+// read from the tracker's own lag table (parabolic, rectified; teeth past the table excluded).
+static float tooth_consistency(float bpm) {
+  float tab[200]; int nl = 0, lm = 0;
+  k1_tempo_debug_dump_acf_lags(tab, 200, &nl, &lm);
+  if (bpm < 1.0f || nl < 3) return 0.0f;
+  const float lag = (12800.0f / 96.0f / 3.0f) * 60.0f / bpm;
+  float mn = 3.0e38f, sum = 0.0f; int n = 0;
+  for (int k = 1; k <= 4; k++) {
+    const float L = lag * (float)k;
+    const int L0 = (int)L; const float fr = L - (float)L0; const int c = L0 - lm;
+    if (c < 1 || c >= nl - 1) break;
+    float v = tab[c] + 0.5f * fr * (tab[c + 1] - tab[c - 1]) + 0.5f * fr * fr * (tab[c + 1] - 2.0f * tab[c] + tab[c - 1]);
+    if (v < 0.0f) v = 0.0f;
+    if (v < mn) mn = v;
+    sum += v; n++;
+  }
+  if (n == 0 || sum <= 0.0f) return 0.0f;
+  return mn / (sum / (float)n);
+}
 int main() {
   k1_tempo_init();
-  char line[256];
+  char line[1024];
   while (std::fgets(line, sizeof(line), stdin)) {
-    unsigned gen = 0, ms = 0; float nov = 0.0f; int sil = 0;
-    if (std::sscanf(line, "%u %u %f %d", &gen, &ms, &nov, &sil) < 4) continue;
+    unsigned gen = 0, ms = 0; float nov = 0.0f; int sil = 0; char hex[400] = {0};
+    const int nf = std::sscanf(line, "%u %u %f %d %399s", &gen, &ms, &nov, &sil, hex);
+    if (nf < 4) continue;
     K1AudioSnapshot a = {};
+#ifdef K1_ONSET_V2
+    // Per-note spectrum from the emulator P lines (16-bit quantised, [0,1]); zeros when absent.
+    if (nf == 5) {
+      for (int b = 0; b < K1_ONSET_SPECTRUM_BINS; b++) {
+        unsigned v = 0;
+        std::sscanf(hex + 4 * b, "%4x", &v);
+        a.spectrum[b] = (float)v / 65535.0f;
+      }
+    }
+#endif
     a.frame_ms = ms;
     a.novelty = nov;
 #ifdef K1_TEMPO_NOVELTY_LINEAR_V1
@@ -71,7 +105,8 @@ int main() {
 #endif
     int gw = 0;
     k1_tempo_debug_dump(nullptr, 0, &gw, nullptr, nullptr);
-    std::printf(" %.0f %.0f %.0f %.4f", s.top_comb_bpm, s.top_point_bpm, 60.0f + (float)gw, s.v2_quality);
+    std::printf(" %.0f %.0f %.0f %.4f %.4f", s.top_comb_bpm, s.top_point_bpm, 60.0f + (float)gw, s.v2_quality,
+                tooth_consistency(e.bpm));
 #endif
     std::printf("\n");
   }
@@ -109,12 +144,17 @@ def build(workdir: Path, defines: list[str], debug: bool, extra: list[str] | Non
     return binary
 
 
-def parse_n_lines(text: str) -> list[tuple[int, str, int]]:
-    rows = []
+def parse_n_lines(text: str, with_spectrum: bool = False) -> list[tuple]:
+    rows, spec = [], {}
     for ln in text.splitlines():
         if ln.startswith("N,"):
             p = ln.split(",")
             rows.append((int(p[1]), p[2], int(p[4])))
+        elif with_spectrum and ln.startswith("P,"):
+            p = ln.split(",")
+            spec[int(p[1])] = p[2]
+    if with_spectrum:
+        rows = [(g, nov, sil, spec.get(g, "")) for g, nov, sil in rows]
     return rows
 
 
@@ -125,7 +165,7 @@ def cmd_extract(a) -> int:
              "note": a.note or "", "clips": {}}
     for u in sorted(Path(a.uart_dir).glob(a.glob)):
         raw = u.read_bytes()
-        rows = parse_n_lines(raw.decode(errors="replace"))
+        rows = parse_n_lines(raw.decode(errors="replace"), a.with_spectrum)
         if not rows:
             print(f"no N lines in {u}", file=sys.stderr)
             return 2
@@ -133,7 +173,7 @@ def cmd_extract(a) -> int:
         if a.strip_prefix and stem.startswith(a.strip_prefix):
             stem = stem[len(a.strip_prefix):]
         cid = f"{a.id_prefix}{stem}"
-        body = "".join(f"{g} {nov} {sil}\n" for g, nov, sil in rows).encode()
+        body = "".join(" ".join(str(x) for x in r if x != "") + "\n" for r in rows).encode()
         f = out / f"{cid.replace(':', '_')}.tsv"
         f.write_bytes(body)
         index["clips"][cid] = {"file": f.name, "sha256": sha256_bytes(body), "gens": len(rows),
@@ -161,27 +201,29 @@ def load_fixture(index_path: Path, cid: str, meta: dict) -> list[tuple[int, floa
         raise SystemExit(f"fixture {cid} sha256 mismatch")
     rows = []
     for ln in body.decode().splitlines():
-        g, nov, sil = ln.split()
-        rows.append((int(g), float(nov), int(sil)))
+        f = ln.split()
+        rows.append((int(f[0]), float(f[1]), int(f[2])) + ((f[3],) if len(f) > 3 else ()))
     return rows
 
 
 def replay_rows(binary: Path, rows, spec: str | None, debug: bool) -> dict:
-    feed = "".join(f"{g} {frame_ms(g)} {transform(nov, spec):.9g} {sil}\n" for g, nov, sil in rows)
+    feed = "".join(f"{r[0]} {frame_ms(r[0])} {transform(r[1], spec):.9g} {r[2]}" + (f" {r[3]}" if len(r) > 3 else "") + "\n"
+                   for r in rows)
     r = subprocess.run([str(binary)], input=feed, capture_output=True, text=True)
     if r.returncode != 0:
         raise SystemExit(f"replay failed: {r.stderr[-500:]}")
     keys = ["gen", "bpm", "conf", "lock", "tick", "phase"]
     if debug:
         keys += ["int_lock", "int_silence", "conf_ema", "emit_count", "veto",
-                 "comb_bpm", "point_bpm", "goertzel_bpm", "quality"]
+                 "comb_bpm", "point_bpm", "goertzel_bpm", "quality", "tooth"]
     c = {k: [] for k in keys}
     c["producer_silence"] = []
-    for (g, _nov, sil), ln in zip(rows, (x for x in r.stdout.splitlines() if x.startswith("F "))):
+    for row, ln in zip(rows, (x for x in r.stdout.splitlines() if x.startswith("F "))):
+        sil = row[2]
         p = ln.split()[1:]
         for k, v in zip(keys, p):
             c[k].append(float(v) if k in ("bpm", "conf", "phase", "conf_ema", "comb_bpm", "point_bpm",
-                                          "goertzel_bpm", "quality") else int(v))
+                                          "goertzel_bpm", "quality", "tooth") else int(v))
         c["producer_silence"].append(sil)
     if len(c["gen"]) != len(rows):
         raise SystemExit("replay produced a different number of frames than it was fed")
@@ -224,6 +266,7 @@ def main(argv=None) -> int:
     e.add_argument("--strip-prefix", default="")
     e.add_argument("--out-dir", required=True)
     e.add_argument("--note")
+    e.add_argument("--with-spectrum", action="store_true", help="also keep the P-line spectrum per generation")
     r = sub.add_parser("replay")
     r.add_argument("--fixtures", required=True)
     r.add_argument("--variant", default="shipped", choices=sorted(VARIANTS))
