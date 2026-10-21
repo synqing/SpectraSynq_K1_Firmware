@@ -1,0 +1,30 @@
+{
+ "gate": "p3.3-tempo-gates-pytest",
+ "cmd": "python3 -m pytest tests -q -m tempo_gates",
+ "exit_code": 0,
+ "sha256_inputs": {},
+ "sha256_outputs": {},
+ "stdout_tail": [
+  ".........................                                                [100%]",
+  "25 passed, 1885 deselected in 8.14s"
+ ],
+ "utc": "2026-10-21T08:50:52+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

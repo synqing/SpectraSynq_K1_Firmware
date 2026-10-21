@@ -41,6 +41,9 @@ VARIANTS = {
     "silence_only": ["K1_TEMPO_SILENCE_FROM_PRODUCER_V1"],
     "l1sp": ["K1_TEMPO_NOVELTY_LINEAR_V1", "K1_TEMPO_SILENCE_FROM_PRODUCER_V1", "K1_ONSET_V2",
              "K1_TEMPO_SPECTRAL_PRESENCE_V1"],
+    # rule 3.3 outcome: the l1sp tracker with the LOCKED band withheld (no lock, no ticks, tentative confidence)
+    "l1sp_lockoff": ["K1_TEMPO_NOVELTY_LINEAR_V1", "K1_TEMPO_SILENCE_FROM_PRODUCER_V1", "K1_ONSET_V2",
+                     "K1_TEMPO_SPECTRAL_PRESENCE_V1", "K1_TEMPO_LOCK_OFF_V1"],
 }
 
 DRIVER = r"""

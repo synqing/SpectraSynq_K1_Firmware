@@ -1,0 +1,72 @@
+{
+ "gate": "p3.3-lockoff-gate-dev_spec_r1",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_gates.py lockoff --traj _scratch/esp-emulator/tempo-lock-r1/traj/dev_spec_r1_lockoff.json --json _scratch/esp-emulator/tempo-lock-r1/score/dev_spec_r1_lockoff.gate.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_spec_r1_lockoff.json": "e96691389a47f0761f43916887a316fec4b074f9134599473f6b30ef1de3f490"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/score/dev_spec_r1_lockoff.gate.json": "2c2b19b5bd60a1edaea1262794072a4ba87367e3a0c6c53f478307e7f734f141"
+ },
+ "stdout_tail": [
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:r9DBFTZTKPI\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.6753",
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:rNqrKAyuA6M\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.1551",
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:vDWhfsQHq1o\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.8668",
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:wCDIYvFmgW8\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.7855",
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:ySzrJ4GRF7s\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.7653",
+  "  },",
+  "  {",
+  "   \"clip\": \"hx:zJHqN_ND7xI\",",
+  "   \"violation\": null,",
+  "   \"max_conf\": 0.5999,",
+  "   \"tentative_frac_scored\": 0.342",
+  "  }",
+  " ],",
+  " \"failing\": []",
+  "}"
+ ],
+ "utc": "2026-10-21T08:50:40+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

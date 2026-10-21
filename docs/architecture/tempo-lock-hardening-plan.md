@@ -245,10 +245,77 @@ the flag set, the tentative band is published, no threshold is lowered.
   dev AUC >= 0.8 (or the lock-OFF outcome of rule 3.3 documented); the min-tooth comb trade-off
   (fewer wrong locks, lower Acc2) resolved; the deferred tooth-consistency term (3.1b) measured.
 
+## Update — 2026-10-21 (evening): A7 cost, M2 with spectrum, Phase 2.6 joint estimator, rule 3.3, entry gates
+
+All numbers are simulated (emulator) or host; none is silicon. Development data only; no held-out clip has
+been run. Receipts: `docs/receipts/tempo-lock-r1/` (a7-*, p3-m2-l1sp-*, p2.6-*, p3.3-*).
+
+**A7 cost (FACT, emulated time).** The spectral-presence step runs on every AP frame, outside the emit stage
+timer, so the Phase 0.2 method could not see it. Probe builds now sum it per emit window (17th G field).
+Lane image (linear tap + producer silence + spectral presence), music-a: emit + presence p50 525 us, max 646 us
+(presence alone p50 32 us) against shipped 547 / 662 us: ratio 0.96 / 0.98, ceiling 2.0. Comparator
+`tempo_lane_cost.py`; must-fail at a 0.5x ceiling exits 1.
+
+**M2 with the spectrum (FACT, host).** The R3 capture with the per-note spectrum is committed
+(`r3:r3_music_spec`); the M2 transforms now move every spectrum bin as well as the novelty. The l1sp build
+holds (x1/2, x1/4, ^1/2: lock 1.00; ^2: 0.985; all 127 BPM; tolerance 0.05). Erasing the spectrum
+(`speczero:1`) drops lock to 0 and fails the gate, so the gate exercises the presence path.
+
+**Phase 2.6 joint tempo-and-phase estimator (host-only prototype, `tempo_joint_estimator.py`).**
+- First state space (fractional phase shift at the 44.4 Hz emit rate) drifted to 60-75 BPM: its linear
+  interpolation blurs phase more per beat at slow tempi, which makes slow hypotheses more forgiving
+  (dev Acc2 9/36). Replaced by a bar pointer at the AP frame rate (Krebs/Boeck/Widmer 2015): exact
+  integer periods 52-133 frames, 7,585 states, tempo steps only at a beat, rank-normalised novelty
+  (invariant to monotonic transforms by construction), Gaussian beat window of exactly 1/lambda of the
+  period at every tempo (a rounded hard window covered 9.6 % of a fast period but 6.8 % of a slow one,
+  a second slow bias).
+- Dev result, best of a 108-point grid (in-sample, so optimistic): Acc2 20/36 with 1 detected at 3:2,
+  against the lane tracker's 19/36 with 7. It does not raise Acc2; it changes the error type away from
+  3:2. Low-band (110-208 Hz) and full spectral flux observations did not beat the novelty.
+- Correctness (bar 0.8, dev). As a term for the lane tracker's own choices, the best is tracker-estimator
+  agreement (same tempo within 4 % up to an octave), track AUC 0.75 (15 right / 5 wrong agree); nothing
+  reaches 0.8. On the estimator's own choices, 2 of the grid's 648 AUC values reach the bar: posterior
+  mass with low-band (110-208 Hz) flux input, 0.819 and 0.838 (p2.6-joint-lowflux-auc-dev). Read with
+  care: (1) it is the maximum of 648 correlated comparisons on 36 clips; a random-label simulation with
+  648 independent comparisons puts the chance maximum at a median of 0.80 (5th percentile 0.76), and
+  correlation lowers that, so 0.838 is not clearly separated from selection noise; (2) that setting picks
+  the right tempo on only 14/36; (3) the right and wrong means are 0.991 and 0.969, so a lock needs a
+  threshold near 0.98, where it publishes 14 right / 7 wrong (0.985: 12 / 5). It meets the dev bar
+  literally and fails rule R1 in practice. Held-out data would settle it (admission needs >= 0.8 on both).
+- Agreement-gated lock (the lane's published lock kept only on emits where the two agree), frozen scorer,
+  dev: 10 locks, 8 right / 2 wrong (1 at 3:2), against the lane's 22 locks, 11 / 11, and shipped 1 / 1.
+- Host cost (C, same state space, window weights quantised to 1/16): 6.3 us per AP frame on the host
+  (about 19 us per emit) with a naive modulo-per-state loop and full renormalisation; 42.6 KB of floats.
+  ESP32-S3 not measured; arithmetic estimate with incremental slot pointers and lazy normalisation
+  160-220 us per emit, inside the 2x headroom (about 570 us). Not on silicon, not in the emulator.
+
+**Rule 3.3 implemented (K1_TEMPO_LOCK_OFF_V1, default OFF).** No term for the lane tracker reached AUC
+0.8 on dev (the one estimator-side value above 0.8 is the selection-noise case described above), so the
+flag withholds the LOCKED band: `locked` and `beat_tick` stay false, confidence is capped at
+K1_CONF_BAND_TENTATIVE_TOP (0.5999), and the new K1_TEMPO_VETO_NO_VALIDATED_LOCK bit is set on every emit;
+the internal lock, tempo and phase keep running (M1 holds). Bands documented in `k1_tempo.h`. Host
+replays: music-a 100 % of the scored window TENTATIVE; silence, white/pink noise, tone, chord, sweeps 0;
+brown noise 62 % TENTATIVE (the known limit). Dev: 0 locks; right tracks sit TENTATIVE 66.7 % of the
+window, wrong tracks 68.6 %: the tentative band says "a beat is present", not "this tempo is right".
+Under this flag A1 (PASS_timing_and_tempo needs a lock) cannot pass, and DEF-001 closure depends on A1.
+**STOP: lock-ON versus lock-OFF is the Captain's decision before the freeze.**
+
+**Development entry gates (Captain rulings 2026-10-21).**
+- (a) Phase 1.5 behaviour: green (p3-sp-p15-behaviour).
+- (b) Confidence term with dev AUC >= 0.8: no term for the lane tracker meets it (best 0.75, agreement
+  with the joint estimator); one estimator-side setting meets it literally (0.838, best of 648, fails R1
+  in practice, see above). The rule 3.3 outcome is implemented and documented; which branch the gate
+  closes on (lock-OFF, or carrying a candidate term into the held-out run) is the Captain's call.
+- (c) Minimum-tooth comb (K1_TEMPO_COMB_PRODUCT_V1=2): REJECTED. It cuts wrong locks 14 -> 10 but Acc2
+  falls 19 -> 16, which trips the brief's own falsifier (2.5: "Acc2 falls"), and it still fails the
+  hemiola trap. The flag stays in source, default OFF, for the record.
+- (d) Tooth consistency 3.1b: measured, AUC 0.70.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-10-21 | agent:claude-code (lane R1, evening) | Update: A7 cost incl. per-frame presence (0.96x shipped), M2 with the spectrum transformed, Phase 2.6 joint estimator (dev Acc2 20/36, 3:2 1; agreement-gated lock 8/2), rule 3.3 implemented behind K1_TEMPO_LOCK_OFF_V1, entry gates (b) lock-OFF documented, (c) min-tooth comb rejected; STOP for the Captain's lock decision. |
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
 | 2026-10-21 | agent:claude-code (lane R1, later) | Update: Phase 2 trap suite + dev selection ablation (no variant raises Acc2) and Phase 3.1 dev AUCs (none >= 0.8). |
 | 2026-10-21 | agent:claude-code (lane R1) | Update: Phase 0 (level sweep, cost, frozen scorer) and Phase 1 (linear tap + producer silence + veto bits): music passes, noise/drone/sweep/release red at L1; Emotiscope 1.2 comparison and recommended route. |

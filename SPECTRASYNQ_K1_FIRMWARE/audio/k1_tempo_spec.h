@@ -44,6 +44,10 @@ static const float    K1_SILENCE_CONTRAST_ENTER = 0.5f;
 // ---------------------------------------------------------------- lock threshold
 // @prov K1_LOCK_CONFIDENCE value=0.60 mic=UNSTATED fixture=UNPROVENANCED date=2026-06-03 tuned_on=host tempo_replay synthetic (clean 0.999 vs drone 0.47); the 2026-08-11 tombstone calls it "the SPH0645 calibration" but no SPH0645 fixture is recorded; never measured on IM69D
 static const float    K1_LOCK_CONFIDENCE = 0.60f;
+// @prov K1_CONF_BAND_TENTATIVE value=0.30 mic=none fixture=UNPROVENANCED date=2026-10-21 tuned_on=Captain lane R1 brief default bands (below 0.30 none, 0.30 to K1_LOCK_CONFIDENCE tentative, at or above locked); a band edge, not a fit
+#define K1_CONF_BAND_TENTATIVE 0.30f
+// @prov K1_CONF_BAND_TENTATIVE_TOP value=0.5999 mic=none fixture=UNPROVENANCED date=2026-10-21 tuned_on=band edge (arithmetic): the largest 4-decimal value below K1_LOCK_CONFIDENCE, so every telemetry print of a capped confidence reads TENTATIVE; used only by K1_TEMPO_LOCK_OFF_V1
+#define K1_CONF_BAND_TENTATIVE_TOP 0.5999f
 // @prov K1_CONF_LOBE value=6 mic=none fixture=UNPROVENANCED date=2026-06-03 tuned_on=Goertzel main-lobe width ~5 BPM (arithmetic, not a fit)
 static const int      K1_CONF_LOBE = 6;
 

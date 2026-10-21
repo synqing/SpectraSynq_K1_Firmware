@@ -80,6 +80,35 @@ def test_m2_sees_the_spectrum_path_erased_evidence_must_fail():
     assert r.returncode == 1, r.stdout
 
 
+# ---------------------------------------------------------------- rule 3.3 lock-off (K1_TEMPO_LOCK_OFF_V1)
+def test_rule33_lockoff_withholds_lock_and_ticks_and_names_the_gate(tmp_path):
+    out = tmp_path / "lockoff.json"
+    r = _run(REPLAY, "replay", "--fixtures", STREAMS, "--variant", "l1sp_lockoff", "--debug",
+             "--only", "r3:r3_music_spec", "--out", out)
+    assert r.returncode == 0, r.stderr
+    g = _run(GATES, "lockoff", "--traj", out)
+    assert g.returncode == 0, g.stdout
+    import json
+    assert json.loads(g.stdout)["clips"][0]["tentative_frac_scored"] > 0.5   # music still reads TENTATIVE
+    assert _run(GATES, "m1", "--traj", out).returncode == 0                   # internal lock is named (I1)
+
+
+def test_rule33_gate_fails_on_the_lock_publishing_build(tmp_path):
+    out = _replay(tmp_path, "l1sp", "r3:r3_music_spec")
+    g = _run(GATES, "lockoff", "--traj", out)
+    assert g.returncode == 1, g.stdout
+
+
+def test_rule33_rule_flags_each_withheld_output():
+    import tempo_lane_gates as g
+    ok = {"gen": [1, 2], "lock": [0, 0], "tick": [0, 0], "conf": [0.0, 0.5999], "veto": [0, 128 | 4], "emit_count": [0, 1]}
+    assert g.lockoff_check(ok) is None
+    assert "lock" in g.lockoff_check(dict(ok, lock=[0, 1]))
+    assert "tick" in g.lockoff_check(dict(ok, tick=[0, 1]))
+    assert "LOCKED band" in g.lockoff_check(dict(ok, conf=[0.0, 0.6]))
+    assert "veto bit missing" in g.lockoff_check(dict(ok, veto=[0, 4]))
+
+
 # ---------------------------------------------------------------- M5 metrical trap suite (I6)
 TRAPS = HARNESS / "tempo_trap_suite.py"
 TRAP_BASELINE = ROOT / "tests/fixtures/tempo_corpus/traps/baseline_shipped_selection.json"

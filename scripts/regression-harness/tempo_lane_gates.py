@@ -17,6 +17,9 @@ against a rule and exits non-zero on failure; none of them regenerates its input
        silence: no lock and published confidence 0 throughout; noise / tone / drone / sweep:
        published confidence < 0.30 and 0 beat ticks; music then silence: lock released <= 3.0 s
        after the music ends; music-a: k1_av_layer_classifier PASS_timing_and_tempo.
+  lockoff  rule 3.3 outcome on a host replay with --debug (--traj T.json): on every emit no published
+       lock, no beat tick, confidence below the LOCKED band (0.60) and the NO_VALIDATED_LOCK veto bit
+       set; reports how much of the scored window sits in the TENTATIVE band (>= 0.30) per clip.
 Exit: 0 pass, 1 rule violated, 2 input lacks the fields the rule needs.
 """
 from __future__ import annotations
@@ -184,6 +187,46 @@ def cmd_p15(a) -> int:
     return 1 if fails else 0
 
 
+# ------------------------------------------------------------------ rule 3.3 lock-off
+VETO_NO_VALIDATED_LOCK = 1 << 7
+CONF_LOCKED = 0.60
+
+
+def lockoff_check(clip: dict) -> str | None:
+    """First violation of the rule 3.3 outcome on one replayed clip, or None."""
+    for g, l, t, c, v, n in zip(clip["gen"], clip["lock"], clip["tick"], clip["conf"], clip["veto"],
+                                clip["emit_count"]):
+        if l:
+            return f"published lock at generation {g}"
+        if t:
+            return f"beat tick at generation {g}"
+        if c >= CONF_LOCKED:
+            return f"confidence {c} in the LOCKED band at generation {g}"
+        if n > 0 and not (v >= 0 and v & VETO_NO_VALIDATED_LOCK):   # the veto is written at the first emit
+            return f"NO_VALIDATED_LOCK veto bit missing at generation {g} (veto {v})"
+    return None
+
+
+def cmd_lockoff(a) -> int:
+    doc = json.loads(Path(a.traj).read_text())
+    rows, bad = [], []
+    for cid, c in sorted(doc["clips"].items()):
+        if "veto" not in c:
+            print(f"LOCKOFF INPUT: {cid} has no veto field (replay with --debug)")
+            return 2
+        scored = [x for g, x in zip(c["gen"], c["conf"]) if g >= SCORE_FROM_GEN]
+        v = lockoff_check(c)
+        rows.append({"clip": cid, "violation": v, "max_conf": max(c["conf"]),
+                     "tentative_frac_scored": round(sum(1 for x in scored if x >= CONF_QUIET) / max(1, len(scored)), 4)})
+        if v:
+            bad.append(cid)
+    out = {"traj": a.traj, "variant": doc.get("variant"), "clips": rows, "failing": bad}
+    if a.json:
+        Path(a.json).write_text(json.dumps(out, indent=1))
+    print(json.dumps(out, indent=1))
+    return 1 if bad else 0
+
+
 def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -201,8 +244,11 @@ def main(argv=None) -> int:
     p15 = sub.add_parser("p15")
     p15.add_argument("--cases", required=True)
     p15.add_argument("--json")
+    lo = sub.add_parser("lockoff")
+    lo.add_argument("--traj", required=True)
+    lo.add_argument("--json")
     a = p.parse_args(argv)
-    return {"m1": cmd_m1, "m2": cmd_m2, "p15": cmd_p15}[a.cmd](a)
+    return {"m1": cmd_m1, "m2": cmd_m2, "p15": cmd_p15, "lockoff": cmd_lockoff}[a.cmd](a)
 
 
 if __name__ == "__main__":

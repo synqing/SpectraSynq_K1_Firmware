@@ -24,3 +24,9 @@ Falsified if: held-out 3:2 rate is not below shipped, or clean-train (90/120/144
 
 ## Fix direction (lane R1, Phases 2–3) — see the handover of 2026-10-21 and
 docs/architecture/tempo-lock-hardening-plan.md.
+
+## Status log
+| Date | Status | Evidence |
+|---|---|---|
+| 2026-10-21 | OPEN — dev measured | Hypothesis above tested on dev: no comb variant raises Acc2; min-tooth cuts wrong locks 14 -> 10 but Acc2 19 -> 16, rejected (p2.2-selection-ablation-dev). Trap suite reproduces the 2/3 attractor (p2.1-trap-baseline). No correctness term for the tracker reaches dev AUC 0.8 (p3.1-terms-dev; best 0.75 in p2.6-joint-auc-dev); one estimator-side value of 0.838 is the best of 648 grid comparisons and gives 12-14 right / 5-7 wrong locks (p2.6-joint-lowflux-auc-dev). |
+| 2026-10-21 | OPEN — Phase 2.6 measured, rule 3.3 implemented | Host joint tempo+phase estimator: dev Acc2 20/36, 1 at 3:2 (lane tracker 19/36, 7) — selection error type changes, Acc2 does not rise (p2.6-joint-score-dev). Agreement-gated lock dev 8 right / 2 wrong vs lane 11 / 11 (p2.6-agreement-gate-vs-lane-dev); in-sample, not held-out. K1_TEMPO_LOCK_OFF_V1 withholds the LOCKED band (p3.3-*). Lock-ON vs lock-OFF awaits the Captain. |

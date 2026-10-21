@@ -19,10 +19,17 @@
 
 #include "k1_audio_snapshot.h"
 
+// Confidence bands (lane R1, rule R1 "no pulse beats a confident wrong pulse"; constants in k1_tempo_spec.h):
+//   confidence <  K1_CONF_BAND_TENTATIVE (0.30)              NONE      effects use the reactive layer only
+//   K1_CONF_BAND_TENTATIVE <= confidence < K1_LOCK_CONFIDENCE TENTATIVE phase usable for cross-fades; no ticks
+//   confidence >= K1_LOCK_CONFIDENCE (0.60)                   LOCKED    validated tempo; beat ticks
+// Under K1_TEMPO_LOCK_OFF_V1 (rule 3.3: no confidence term has a held-out AUC >= 0.8 receipt) the LOCKED
+// band is never published: `locked` and `beat_tick` stay false, confidence is capped below 0.60, and the
+// K1_TEMPO_VETO_NO_VALIDATED_LOCK bit names the gate on every emit.
 struct K1TempoEvent {
   float bpm;            // detected tempo (BPM); winner bin centre
   float phase01;        // beat phase in [0,1); 0 == beat instant
-  float confidence;     // [0,1]; how dominant the winning tempo is
+  float confidence;     // [0,1]; how dominant the winning tempo is (bands above)
   bool  beat_tick;      // true for one update at the beat instant
   bool  locked;         // confidence above lock threshold and not silent
   float beat_strength;  // smoothed magnitude of the winning bin
@@ -41,6 +48,7 @@ enum K1TempoVeto : uint8_t {
   K1_TEMPO_VETO_WATCHDOG = 1u << 4,            // lock released this emit by the sub-floor watchdog
   K1_TEMPO_VETO_BEATS_SEEN_LT_2 = 1u << 5,     // fewer than two observed beats since reset
   K1_TEMPO_VETO_NO_RHYTHM_EVIDENCE = 1u << 6,  // no broadband onsets in the recent window (spectral presence)
+  K1_TEMPO_VETO_NO_VALIDATED_LOCK = 1u << 7,   // rule 3.3 (K1_TEMPO_LOCK_OFF_V1): lock and ticks withheld
 };
 struct K1TempoGate {
   uint8_t veto;              // K1TempoVeto bits of the last emit

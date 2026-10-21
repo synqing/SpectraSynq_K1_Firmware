@@ -5,6 +5,10 @@
 #include "config_types.h"
 #include "k1_tempo_spec.h"  // every fixed gating constant + its provenance (lane R1, I3/I10)
 
+#if defined(K1_TEMPO_LOCK_OFF_V1) && !defined(K1_TEMPO_SILENCE_FROM_PRODUCER_V1)
+#error "K1_TEMPO_LOCK_OFF_V1 names its gate with a K1TempoVeto bit (needs K1_TEMPO_SILENCE_FROM_PRODUCER_V1)"
+#endif
+
 #if ENABLE_TEMPO_STREAM
 #if __has_include(<esp_timer.h>)
 #include <esp_timer.h>
@@ -1446,6 +1450,15 @@ static K1TempoEvent k1_build_output() {
   }
 #else
   if (!(conf > K1_LOCK_CONFIDENCE)) veto |= K1_TEMPO_VETO_CONF_BELOW_ENTER;
+#endif
+#ifdef K1_TEMPO_LOCK_OFF_V1
+  // Rule 3.3 (lane R1, DEF-002): no confidence term has a held-out AUC >= 0.8 receipt, so no lock is
+  // published. The tracker keeps running (internal lock, phase, tempo) and confidence stays usable in the
+  // TENTATIVE band; the LOCKED band, `locked` and `beat_tick` are withheld and the veto bit names it (I1).
+  e.locked = false;
+  e.beat_tick = false;
+  if (e.confidence > K1_CONF_BAND_TENTATIVE_TOP) e.confidence = K1_CONF_BAND_TENTATIVE_TOP;
+  veto |= K1_TEMPO_VETO_NO_VALIDATED_LOCK;
 #endif
   k1_tempo_veto = veto;
 #endif
