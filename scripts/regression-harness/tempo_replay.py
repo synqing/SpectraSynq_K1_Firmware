@@ -61,6 +61,9 @@ static K1AudioSnapshot mk(uint32_t ms, float novelty, bool silence) {
   K1AudioSnapshot a = {};
   a.frame_ms = ms;
   a.novelty = novelty;
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+  a.tempo_novelty = novelty;  // lane R1: under the linear tap the tracker reads this field
+#endif
   a.silence = silence;
   return a;
 }

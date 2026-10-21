@@ -63,6 +63,14 @@ static const int      K1_CONF_LOBE = 6;
 #ifndef K1_COMB_W4
 #define K1_COMB_W4 0.6f
 #endif
+// @prov K1_TEMPO_COMB_LOG_FLOOR value=1e-4 mic=none fixture=UNPROVENANCED date=2026-10-21 tuned_on=numerical guard only (geometric comb log floor relative to the ACF table maximum; flag K1_TEMPO_COMB_PRODUCT_V1=1)
+#ifndef K1_TEMPO_COMB_LOG_FLOOR
+#define K1_TEMPO_COMB_LOG_FLOOR 1e-4f
+#endif
+// @prov K1_TEMPO_ANTI32_LAMBDA value=0.5 mic=none fixture=UNPROVENANCED date=2026-10-21 tuned_on=initial judgement; any dev sweep records the dev manifest sha256 here (flag K1_TEMPO_COMB_ANTI32_V1)
+#ifndef K1_TEMPO_ANTI32_LAMBDA
+#define K1_TEMPO_ANTI32_LAMBDA 0.5f
+#endif
 // @prov K1_WIN_SWITCH_RATIO value=1.1 mic=none fixture=UNPROVENANCED date=2026-06-03 tuned_on=donor default (challenger +10 %)
 #define K1_WIN_SWITCH_RATIO 1.1f
 // @prov K1_WIN_SWITCH_FRAMES value=5 mic=none fixture=UNPROVENANCED date=2026-06-03 tuned_on=donor default (5 consecutive emits)

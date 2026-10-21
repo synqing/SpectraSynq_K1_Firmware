@@ -658,6 +658,48 @@ static uint16_t k1_acf_compute_lag_rows(float* ac, int lag_min, int nlag, uint16
   return next;
 }
 
+#if defined(K1_TEMPO_COMB_PRODUCT_V1) || defined(K1_TEMPO_COMB_ANTI32_V1)
+// Lane R1, DEF-002 selection variants (default OFF; host ablation picks on dev, held-out confirms).
+// Comb over the in-table teeth of one period. Mode (K1_TEMPO_COMB_PRODUCT_V1):
+//   unset / 0  weighted SUM (shipped arithmetic; a 3T/2 candidate gets the true 3T tooth for free)
+//   1          weighted GEOMETRIC mean (one empty tooth collapses the ladder)
+//   2          MIN tooth
+// Teeth past the lag table are excluded (not counted as zero) so slow bins are not punished by
+// ring length. `floor` keeps log() finite; it is relative to the table's own maximum.
+#ifndef K1_TEMPO_COMB_PRODUCT_V1
+#define K1_TEMPO_COMB_PRODUCT_V1 0
+#endif
+static float k1_comb_at_lag(const float* ac, int nlag, int lag_min, float lag_real, float floor_v, float* point_out) {
+  const float tooth_w[K1_COMB_TEETH] = { 1.0f, K1_COMB_W2, K1_COMB_W3, K1_COMB_W4 };
+  const float lag_hi = (float)(lag_min + nlag - 2);   // parabolic read needs one lag of margin
+  float sum = 0.0f, wsum = 0.0f, logsum = 0.0f, mn = 3.0e38f, point = 0.0f;
+  int n = 0;
+  for (int k = 0; k < K1_COMB_TEETH; k++) {
+    const float lag = lag_real * (float)(k + 1);
+    if (lag > lag_hi) break;
+    float v = k1_acf_at(ac, nlag, lag_min, lag);
+    if (v < 0.0f) v = 0.0f;
+    if (k == 0) point = v;
+    sum += tooth_w[k] * v;
+    wsum += tooth_w[k];
+    logsum += tooth_w[k] * logf(v + floor_v);
+    if (v < mn) mn = v;
+    n++;
+  }
+  if (point_out) *point_out = point;
+  if (n == 0) return 0.0f;
+#if K1_TEMPO_COMB_PRODUCT_V1 == 1
+  return expf(logsum / wsum);
+#elif K1_TEMPO_COMB_PRODUCT_V1 == 2
+  (void)sum; (void)logsum; (void)wsum;
+  return mn;
+#else
+  (void)logsum; (void)wsum; (void)mn;
+  return sum;
+#endif
+}
+#endif
+
 static void k1_acf_publish_salience(const float* ac, int nlag, int lag_min) {
   // Biased ACF over the lag band that now spans BOTH the BPM range AND the harmonic-comb
   // teeth: the slowest bin (60 BPM ~= lag 44 @ 44.44 Hz) needs teeth out to K*lag ~= 178,
@@ -669,18 +711,38 @@ static void k1_acf_publish_salience(const float* ac, int nlag, int lag_min) {
   const float tooth_w[K1_COMB_TEETH] = { 1.0f, K1_COMB_W2, K1_COMB_W3, K1_COMB_W4 };
   float smax = 1e-12f;   // comb max (for selection)
   float pmax = 1e-12f;   // point max (for confidence)
+#if defined(K1_TEMPO_COMB_PRODUCT_V1) || defined(K1_TEMPO_COMB_ANTI32_V1)
+  (void)tooth_w;
+  float ac_max = 1e-30f;
+  for (int j = 0; j < nlag; j++) if (ac[j] > ac_max) ac_max = ac[j];
+  const float floor_v = ac_max * K1_TEMPO_COMB_LOG_FLOOR;
+#endif
   for (uint16_t i = 0; i < K1_NUM_TEMPI; i++) {
     float bpm = k1_tempi[i].target_bpm;
     if (bpm < 1.0f) { k1_acf_salience[i] = 0.0f; k1_acf_point[i] = 0.0f; continue; }
     float lag_real = K1_NOVELTY_RATE_HZ * 60.0f / bpm;
     float comb = 0.0f;
     float point = 0.0f;
+#if defined(K1_TEMPO_COMB_PRODUCT_V1) || defined(K1_TEMPO_COMB_ANTI32_V1)
+    comb = k1_comb_at_lag(ac, nlag, lag_min, lag_real, floor_v, &point);
+#ifdef K1_TEMPO_COMB_ANTI32_V1
+    // Subtract the comb of the two 3:2 neighbours (tempo x 3/2 and x 2/3) so a candidate is not
+    // credited with a ladder that a 3:2-related period explains at least as well.
+    {
+      const float c_fast = k1_comb_at_lag(ac, nlag, lag_min, lag_real * (2.0f / 3.0f), floor_v, nullptr);
+      const float c_slow = k1_comb_at_lag(ac, nlag, lag_min, lag_real * 1.5f, floor_v, nullptr);
+      comb -= K1_TEMPO_ANTI32_LAMBDA * (c_fast > c_slow ? c_fast : c_slow);
+      if (comb < 0.0f) comb = 0.0f;
+    }
+#endif
+#else
     for (int k = 0; k < K1_COMB_TEETH; k++) {
       float v = k1_acf_at(ac, nlag, lag_min, lag_real * (float)(k + 1));
       if (v < 0.0f) v = 0.0f;                 // rectify (anti-correlation is not evidence)
       if (k == 0) point = v;                  // k=1 tooth IS the point ACF salience
       comb += tooth_w[k] * v;
     }
+#endif
     k1_acf_salience[i] = comb;
     k1_acf_point[i]    = point;
     if (comb  > smax) smax = comb;

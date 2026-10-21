@@ -1,0 +1,387 @@
+{
+ "variant": "l1",
+ "defines": [
+  "K1_TEMPO_CONF_V2",
+  "K1_TEMPO_FLYWHEEL_V2",
+  "K1_TEMPO_ACF_SPREAD_V1=1",
+  "DEFAULT_SAMPLE_RATE=12800",
+  "DEFAULT_SAMPLES_PER_CHUNK=96",
+  "K1_TEMPO_NOVELTY_DECIMATION=3U",
+  "K1_TEMPO_NOVELTY_LINEAR_V1",
+  "K1_TEMPO_SILENCE_FROM_PRODUCER_V1"
+ ],
+ "cases": [
+  {
+   "pattern": "clean",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  },
+  {
+   "pattern": "clean",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  },
+  {
+   "pattern": "clean",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 120,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.997
+  },
+  {
+   "pattern": "clean",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.947
+  },
+  {
+   "pattern": "swing",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.99
+  },
+  {
+   "pattern": "swing",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.979
+  },
+  {
+   "pattern": "swing",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 120,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.99
+  },
+  {
+   "pattern": "swing",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.937
+  },
+  {
+   "pattern": "triplet",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.999
+  },
+  {
+   "pattern": "triplet",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.989
+  },
+  {
+   "pattern": "triplet",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 120,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.994
+  },
+  {
+   "pattern": "triplet",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.942
+  },
+  {
+   "pattern": "dotted",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.992
+  },
+  {
+   "pattern": "dotted",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.977
+  },
+  {
+   "pattern": "dotted",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 120,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.982
+  },
+  {
+   "pattern": "dotted",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.932
+  },
+  {
+   "pattern": "tresillo",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.987
+  },
+  {
+   "pattern": "tresillo",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.996
+  },
+  {
+   "pattern": "tresillo",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 120,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.99
+  },
+  {
+   "pattern": "tresillo",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.927
+  },
+  {
+   "pattern": "hemiola",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.971
+  },
+  {
+   "pattern": "hemiola",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 64,
+   "ratio": 0.6667,
+   "verdict": "FAIL_2/3",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.979
+  },
+  {
+   "pattern": "hemiola",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 80,
+   "ratio": 0.6667,
+   "verdict": "FAIL_2/3",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.977
+  },
+  {
+   "pattern": "hemiola",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 96,
+   "ratio": 0.6667,
+   "verdict": "FAIL_2/3",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.968
+  },
+  {
+   "pattern": "backbeat",
+   "bpm": 72.0,
+   "truth": 72.0,
+   "settled": 72,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.952
+  },
+  {
+   "pattern": "backbeat",
+   "bpm": 96.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.994
+  },
+  {
+   "pattern": "backbeat",
+   "bpm": 120.0,
+   "truth": 120.0,
+   "settled": 60,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.964
+  },
+  {
+   "pattern": "backbeat",
+   "bpm": 144.0,
+   "truth": 144.0,
+   "settled": 72,
+   "ratio": 0.5,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 0.97
+  },
+  {
+   "pattern": "change",
+   "bpm": 72.0,
+   "truth": 90.0,
+   "settled": 90,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  },
+  {
+   "pattern": "change",
+   "bpm": 96.0,
+   "truth": 76.80000000000001,
+   "settled": 77,
+   "ratio": 1.0026,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  },
+  {
+   "pattern": "change",
+   "bpm": 120.0,
+   "truth": 96.0,
+   "settled": 96,
+   "ratio": 1.0,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  },
+  {
+   "pattern": "change",
+   "bpm": 144.0,
+   "truth": 115.2,
+   "settled": 115,
+   "ratio": 0.9983,
+   "verdict": "PASS",
+   "lock_frac": 1.0,
+   "acquire_beats_after_warmup": 0.0,
+   "max_conf": 1.0
+  }
+ ],
+ "failing": [
+  [
+   "hemiola",
+   96.0,
+   "FAIL_2/3"
+  ],
+  [
+   "hemiola",
+   120.0,
+   "FAIL_2/3"
+  ],
+  [
+   "hemiola",
+   144.0,
+   "FAIL_2/3"
+  ]
+ ],
+ "failing_ratio_classes": [
+  "FAIL_2/3"
+ ]
+}

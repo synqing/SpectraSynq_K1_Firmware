@@ -63,3 +63,33 @@ def test_m2_lane_lock_is_invariant_to_scale_and_compression():
 def test_m2_catches_the_shipped_compression_dependence():
     r = _run(GATES, "m2", "--fixtures", STREAMS, "--clip", "r3:r3_music_sqrt", "--variant", "shipped")
     assert r.returncode == 1, r.stdout
+
+
+# ---------------------------------------------------------------- M5 metrical trap suite (I6)
+TRAPS = HARNESS / "tempo_trap_suite.py"
+TRAP_BASELINE = ROOT / "tests/fixtures/tempo_corpus/traps/baseline_shipped_selection.json"
+
+
+def test_m5_lane_flag_set_adds_no_new_attractor_ratio(tmp_path):
+    cand = tmp_path / "lane.json"
+    r = _run(TRAPS, "run", "--variant", "l1", "--out", cand)
+    assert r.returncode in (0, 1), r.stderr          # 1 = some trap fails (the baseline already does)
+    c = _run(TRAPS, "compare", "--baseline", TRAP_BASELINE, "--candidate", cand)
+    assert c.returncode == 0, c.stdout
+
+
+def test_m5_flags_a_new_attractor_ratio(tmp_path):
+    import json
+    base = json.loads(TRAP_BASELINE.read_text())
+    bad = dict(base, failing=base["failing"] + [["clean", 120.0, "FAIL_3/2"]],
+               failing_ratio_classes=sorted(set(base["failing_ratio_classes"]) | {"FAIL_3/2"}))
+    p = tmp_path / "bad.json"
+    p.write_text(json.dumps(bad))
+    c = _run(TRAPS, "compare", "--baseline", TRAP_BASELINE, "--candidate", p)
+    assert c.returncode == 1, c.stdout
+
+
+def test_m5_suite_can_see_the_def002_mechanism():
+    import json
+    base = json.loads(TRAP_BASELINE.read_text())
+    assert "FAIL_2/3" in base["failing_ratio_classes"], "the trap suite must reproduce the 3:2 attractor"

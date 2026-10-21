@@ -1,0 +1,42 @@
+{
+ "gate": "p2.2-selection-ablation-dev",
+ "cmd": "python3 _scratch/esp-emulator/tempo-lock-r1/ablation.py _scratch/esp-emulator/tempo-lock-r1/ablation2",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "1acb9b80ee6ac6715d60959ed52a2470faff61e79f1caa9e31a5ed3a3ba18ac7",
+  "_scratch/esp-emulator/tempo-lock-r1/fixtures/dev_linear_r1/index.json": "9d37b6593de786d59939881ee8c3e1903ea97418e55a6058591fc215cd5cae6b"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/ablation2/ablation.json": "18744ba96b718c481dd62a290b4a8b25dacacb593c3aaf0a5508f0bb88f032ba"
+ },
+ "stdout_tail": [
+  "{\"variant\": \"V0_ship_select\", \"defines\": [], \"correct\": 19, \"locked\": 27, \"locked_correct\": 13, \"locked_wrong\": 14, \"locked_wrong_32\": 7, \"detected_32\": 7, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\", \"FAIL: FW steady 90: >=80% matched within +-70ms\"]}",
+  "{\"variant\": \"V1_comb_geo\", \"defines\": [\"K1_TEMPO_COMB_PRODUCT_V1=1\"], \"correct\": 16, \"locked\": 28, \"locked_correct\": 13, \"locked_wrong\": 15, \"locked_wrong_32\": 8, \"detected_32\": 9, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\"]}",
+  "{\"variant\": \"V2_comb_min\", \"defines\": [\"K1_TEMPO_COMB_PRODUCT_V1=2\"], \"correct\": 16, \"locked\": 22, \"locked_correct\": 12, \"locked_wrong\": 10, \"locked_wrong_32\": 4, \"detected_32\": 5, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\"]}",
+  "{\"variant\": \"V3_prior_110\", \"defines\": [\"K1_TACTUS_BPM=110.0f\", \"K1_TACTUS_SIGMA=0.9f\"], \"correct\": 14, \"locked\": 30, \"locked_correct\": 12, \"locked_wrong\": 18, \"locked_wrong_32\": 7, \"detected_32\": 8, \"trap_fail\": 2, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: FW steady 90: >=80% matched within +-70ms\"]}",
+  "{\"variant\": \"V4_prior_flat\", \"defines\": [\"K1_TACTUS_SIGMA=100.0f\"], \"correct\": 16, \"locked\": 29, \"locked_correct\": 13, \"locked_wrong\": 16, \"locked_wrong_32\": 6, \"detected_32\": 6, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\", \"FAIL: FW steady 90: >=80% matched within +-70ms\"]}",
+  "{\"variant\": \"V5_anti32\", \"defines\": [\"K1_TEMPO_COMB_ANTI32_V1\"], \"correct\": 17, \"locked\": 31, \"locked_correct\": 15, \"locked_wrong\": 16, \"locked_wrong_32\": 5, \"detected_32\": 5, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\", \"FAIL: FW steady 90: >=80% matched within +-70ms\"]}",
+  "{\"variant\": \"V6_geo_prior110\", \"defines\": [\"K1_TEMPO_COMB_PRODUCT_V1=1\", \"K1_TACTUS_BPM=110.0f\", \"K1_TACTUS_SIGMA=0.9f\"], \"correct\": 14, \"locked\": 30, \"locked_correct\": 14, \"locked_wrong\": 16, \"locked_wrong_32\": 7, \"detected_32\": 8, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": true, \"tempo_replay_fails\": []}",
+  "{\"variant\": \"V7_geo_flat\", \"defines\": [\"K1_TEMPO_COMB_PRODUCT_V1=1\", \"K1_TACTUS_SIGMA=100.0f\"], \"correct\": 16, \"locked\": 29, \"locked_correct\": 14, \"locked_wrong\": 15, \"locked_wrong_32\": 6, \"detected_32\": 6, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\"]}",
+  "{\"variant\": \"V8_min_prior110\", \"defines\": [\"K1_TEMPO_COMB_PRODUCT_V1=2\", \"K1_TACTUS_BPM=110.0f\", \"K1_TACTUS_SIGMA=0.9f\"], \"correct\": 16, \"locked\": 24, \"locked_correct\": 12, \"locked_wrong\": 12, \"locked_wrong_32\": 6, \"detected_32\": 8, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": true, \"tempo_replay_fails\": []}",
+  "{\"variant\": \"V9_anti32_geo\", \"defines\": [\"K1_TEMPO_COMB_ANTI32_V1\", \"K1_TEMPO_COMB_PRODUCT_V1=1\"], \"correct\": 17, \"locked\": 28, \"locked_correct\": 15, \"locked_wrong\": 13, \"locked_wrong_32\": 5, \"detected_32\": 5, \"trap_fail\": 3, \"trap_classes\": [\"FAIL_2/3\"], \"clean_lock_min\": 1.0, \"clean_acq_beats_max\": 0.0, \"tempo_replay_ok\": false, \"tempo_replay_fails\": [\"FAIL: 144 BPM clean train detected as ~144 (upper range)\"]}"
+ ],
+ "utc": "2026-10-21T02:31:58+00:00",
+ "git_sha": "f732d9cbb43c976287f1f1f6bd10978e6009bbc6",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_trap_suite.py",
+  "tests/fixtures/tempo_corpus/traps/",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}
