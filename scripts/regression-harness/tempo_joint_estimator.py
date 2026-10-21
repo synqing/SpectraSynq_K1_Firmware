@@ -27,8 +27,9 @@ candidates read off the same posterior:
   tempo_joint_estimator.py auc --manifest M --traj TRAJ.json [--tracker-traj T.json] [--out R.json]
      AUC of each per-track candidate (mean over the scored window) for CORRECT vs WRONG, on the
      estimator's own choices and, with --tracker-traj, as a correctness term for the tracker's choices.
-  tempo_joint_estimator.py gate --tracker-traj T.json --estimator-traj E.json --out G.json
-     the tracker's published lock kept only on emits where its BPM agrees with the estimator's.
+  tempo_joint_estimator.py gate --tracker-traj T.json --estimator-traj E.json --out G.json [--hold-s D]
+     the tracker's published lock kept only on emits where its BPM agrees with the estimator's, and with
+     --hold-s only after lock and agreement have held continuously for D seconds (experiment E1).
 Host cost: tempo_joint_pointer_bench.c (same state space in C, window weights quantised to 1/16).
 
 Two state spaces are kept for the record. `--model pointer` (default) is the measured one. `--model emit`
@@ -391,18 +392,35 @@ def cmd_auc(a) -> int:
     return 0
 
 
+GEN_S = 1.0 / AP_HZ                           # one trajectory row (generation) = one AP frame = 7.5 ms
+
+
+def hold(cond, hold_s):
+    """1 on a generation only once `cond` has been true on every generation of the last `hold_s` seconds
+    (this one included); 0 resets the run. hold_s = 0 returns `cond` unchanged."""
+    out, run = [], 0
+    for x in cond:
+        run = run + 1 if x else 0
+        out.append(int(bool(x) and run * GEN_S >= hold_s))
+    return out
+
+
 def cmd_gate(a) -> int:
     """Agreement-gated lock: the tracker's published lock survives an emit only while its BPM agrees with
-    the estimator's (within 4 % up to an octave). Writes a trajectory for the frozen scorer."""
+    the estimator's (within 4 % up to an octave), and, with --hold-s D (experiment E1), only once lock and
+    agreement have held continuously for D seconds. Writes a trajectory for the frozen scorer."""
     est = json.loads(Path(a.estimator_traj).read_text())["clips"]
     trk = json.loads(Path(a.tracker_traj).read_text())
-    out = {"variant": f"{trk.get('variant')}+agreement-gate", "producer": {
+    variant = f"{trk.get('variant')}+agreement-gate" + (f"-hold{a.hold_s:g}s" if a.hold_s > 0 else "")
+    out = {"variant": variant, "producer": {
         "tool": "tempo_joint_estimator.py gate", "tracker_traj": a.tracker_traj,
         "tracker_sha256": tls.sha256_file(Path(a.tracker_traj)), "estimator_traj": a.estimator_traj,
         "estimator_sha256": tls.sha256_file(Path(a.estimator_traj))}, "clips": {}}
+    if a.hold_s > 0:                           # absent at 0 so the p2.6 output stays byte-identical
+        out["producer"]["hold_s"] = a.hold_s
     for cid, c in trk["clips"].items():
         eb = dict(zip(est[cid]["gen"], est[cid]["bpm"]))
-        lock = [int(bool(l) and agree(b, eb[g])) for g, b, l in zip(c["gen"], c["bpm"], c["lock"])]
+        lock = hold([bool(l) and agree(b, eb[g]) for g, b, l in zip(c["gen"], c["bpm"], c["lock"])], a.hold_s)
         out["clips"][cid] = {"gen": c["gen"], "bpm": c["bpm"], "lock": lock, "conf": c.get("conf", [0.0] * len(lock))}
     Path(a.out).write_text(json.dumps(out, separators=(",", ":")) + "\n")
     print(f"gated {len(out['clips'])} clips -> {a.out}")
@@ -416,6 +434,7 @@ def main(argv=None) -> int:
     gt.add_argument("--tracker-traj", required=True)
     gt.add_argument("--estimator-traj", required=True)
     gt.add_argument("--out", required=True)
+    gt.add_argument("--hold-s", dest="hold_s", type=float, default=0.0)
     r = sub.add_parser("run")
     r.add_argument("--fixtures", action="append", required=True)
     r.add_argument("--only", nargs="*")

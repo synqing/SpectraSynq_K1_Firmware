@@ -1,0 +1,54 @@
+{
+ "gate": "e1-dev-score-hold2s",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_scorer.py compare --manifest tests/fixtures/tempo_corpus/manifest.json --role dev --baseline _scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json --candidate _scratch/esp-emulator/tempo-lock-r1/e1/dev_agree_hold2s.json --out _scratch/esp-emulator/tempo-lock-r1/e1/dev_score_hold2s.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee",
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json": "60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c",
+  "_scratch/esp-emulator/tempo-lock-r1/e1/dev_agree_hold2s.json": "1a9a87539961b7a550c39c709eb817785e62a7deac31aea1bdea7946a3f4f4cf"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/e1/dev_score_hold2s.json": "41961e0db4f5635e0ec0bec1bf06b8189ba051fae11f294672c5dfe0d25f6d6e"
+ },
+ "stdout_tail": [
+  "{",
+  " \"baseline\": {",
+  "  \"correct\": 19,",
+  "  \"detected_32\": 7,",
+  "  \"locked\": 22,",
+  "  \"locked_correct\": 11,",
+  "  \"locked_wrong\": 11,",
+  "  \"locked_wrong_32\": 5,",
+  "  \"mean_lock_frac\": 0.5778,",
+  "  \"n\": 36",
+  " },",
+  " \"baseline_sha256\": \"60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c\",",
+  " \"candidate\": {",
+  "  \"correct\": 19,",
+  "  \"detected_32\": 7,",
+  "  \"locked\": 2,",
+  "  \"locked_correct\": 1,",
+  "  \"locked_wrong\": 1,",
+  "  \"locked_wrong_32\": 0,",
+  "  \"mean_lock_frac\": 0.1265,",
+  "  \"n\": 36",
+  " },",
+  " \"candidate_sha256\": \"1a9a87539961b7a550c39c709eb817785e62a7deac31aea1bdea7946a3f4f4cf\",",
+  " \"manifest_sha256\": \"807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee\",",
+  " \"role_filter\": \"dev\"",
+  "}"
+ ],
+ "utc": "2026-10-21T17:30:07+00:00",
+ "git_sha": "325b87dadbb9860fa0500fb0b4b74120298e3cce",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

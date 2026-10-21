@@ -1,0 +1,28 @@
+{
+ "gate": "e1-dev-gate-hold0s",
+ "cmd": "python3 scripts/regression-harness/tempo_joint_estimator.py gate --tracker-traj _scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json --estimator-traj _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json --hold-s 0 --out _scratch/esp-emulator/tempo-lock-r1/e1/dev_agree_hold0s.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json": "60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c",
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json": "15fca1bad22cfd020367dd324bbebd490b0f9aeb58a696abe48953503d1c4c71"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/e1/dev_agree_hold0s.json": "bfaf34811fb34b530a75ba6fc616c0ad5f672c63e4fb983a76323a2340abc98e"
+ },
+ "stdout_tail": [
+  "gated 36 clips -> _scratch/esp-emulator/tempo-lock-r1/e1/dev_agree_hold0s.json"
+ ],
+ "utc": "2026-10-21T17:30:06+00:00",
+ "git_sha": "325b87dadbb9860fa0500fb0b4b74120298e3cce",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

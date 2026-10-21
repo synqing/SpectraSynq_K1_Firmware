@@ -18,8 +18,14 @@ captured frames.
               HEAD_GENS generations up to and including the launch frame.
   predicted   a launch while the render thread's consumed lock (V line c_locked) is 0 and nothing explains
               it: a beat drawn from the effect's own clock without a validated lock (the consumer gap).
-Both biases of the 60 ms windows run towards UNDER-counting predicted cues, never towards hiding them only
-after the repair: the same rule is applied to the unrepaired and the repaired image.
+Both biases of the 60 ms windows run towards UNDER-counting predicted cues. Applying the same rule to the
+unrepaired and the repaired image does NOT make the miss rate equal: a repair that changes how a launch looks
+can move launches into the blind spot (on R3 the rule sees 0 of Anticipate's eased launches). So a clean
+result supports "zero DETECTED predicted cues", not "zero predicted cues". The stronger claim for the
+lock-off image rests on the code instead (K1_TEMPO_CONSUMER_BANDS_V1): the beat grid learns a tempo only
+while `locked`, which lock-off never sets, so the predicted-launch path cannot run. A lock-enabled image has
+no such argument (the repair keeps an up-to-8-beat coast after a validated lock is lost) and needs its own
+check.
 
   tempo_consumer_cues.py analyse --cases RUN/cases.json --out REPORT.json
   tempo_consumer_cues.py gate    --report REPORT.json [--expect gap|clean]

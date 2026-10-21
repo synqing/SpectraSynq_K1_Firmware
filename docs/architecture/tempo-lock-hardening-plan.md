@@ -421,10 +421,74 @@ correctness term >= 0.8; the fallback publishes no lock, so A1 and A2 cannot pas
 single held-out run on the fallback would leave no untouched corpus for a lock candidate. Whether the fallback
 alone should take the held-out run is put to the Captain.
 
+## Update — 2026-10-22: E1 development side, and three corrections from an independent review
+
+Host only, development data only. No held-out or validation clip has been run, and nothing was downloaded.
+Receipts: `docs/receipts/tempo-lock-r1/e1-*`.
+
+**Item 5 above is already answered.** The Captain's supplement (items 4 and 5, verbatim above) keeps the 1,359-clip
+corpus untouched and sends a candidate to it only once it clears the development requirements. The lock-off
+fallback publishes no lock, so it does not take the held-out run. Only the E1 validation set remains a decision,
+and the result below changes what it is worth.
+
+**E1 development pick (FACT, host).** `tempo_joint_estimator.py gate` gains `--hold-s D`: the lane tracker's lock is
+published only after lock and estimator agreement have both held continuously for D seconds. With D = 0 the output
+is byte-identical to the p2.6 agreement-gate trajectory (sha256 `bfaf3481…`), so the existing result reproduces.
+Estimator settings are those frozen in p2.6 (`dev_joint_best`: pointer model, kappa 8, lambda 8, tempo_q 0.02).
+Frozen scorer, 36 development clips:
+
+| D | locked | right | wrong | wrong at 3:2 | eligible (at most 1 wrong) |
+|---|---|---|---|---|---|
+| 0 s | 10 | 8 | 2 | 1 | no |
+| 2 s | 2 | 1 | 1 | 0 | yes |
+| 4 s | 1 | 1 | 0 | 0 | yes |
+
+The pick rule ("most right locks with at most 1 wrong") gives a tie between 2 s and 4 s that the proposal did not
+pre-register a tie-break for. Either way the candidate locks right on **1 of 36 tracks (2.8 %)**. The pre-registered
+validation bar is right locks on at least 25 % of tracks. Development numbers are in-sample and so optimistic, so
+validation cannot be expected to do nine times better. Even D = 0, which is not eligible, covers only 22 %.
+**E1 as proposed is falsified on development data. Spending a validation set on it would not answer anything.**
+
+**Why the hold collapses coverage (FACT, host; INFERENCE on the mechanism).** The development clips leave a 13 s
+scored window (25 s clip minus 12 s warm-up), and a track counts as LOCKED only at a lock fraction of at least 0.5. Each
+run of agreement loses its first D seconds, so a 4 s hold removes about 31 % of the window per run. Agreement on
+right tracks comes in runs of 2-13 s, but wrong tracks have long runs as well (6.65 s and 7.74 s on two wrong locks).
+So D mostly removes locks through window length and does not separate right from wrong. D also would not transfer to
+validation clips of other lengths (SMC_MIREX excerpts are about 40 s, GTZAN 30 s). This was a design flaw in the E1 proposal.
+
+**Sample size the validation criterion needs (arithmetic).** For the two-sided 95 % Wilson upper bound on the
+wrong-lock rate to fall to 10 % or below, a set needs at least 35 locked tracks with 0 wrong, 53 with 1, 69 with 2,
+84 with 3. That is an observed wrong rate of about 2-4 %, against 20 % on development (2 of 10 at D = 0). At the
+development lock rate (10 of 36) that is at least 126 validation clips just to reach 35 locks. Any future lock
+experiment should state this calculation against the size of the proposed set before it asks for material.
+
+**Recommendation (PROPOSAL — NOT APPROVED).** Do not approve validation material for E1. Keep the qualified
+lock-off fallback as the baseline. A future lock candidate is worth a validation set only if (1) it meets its own
+pre-registered success bar on development first, (2) it has a sample-size calculation like the one above, and
+(3) its parameters are defined in a way that does not depend on clip length (for example a fraction of the window,
+or scored on fixed-length windows).
+
+**Corrections from the independent review of 325b87da.**
+- Detector claim (`tempo_consumer_cues.py` docstring). The old text said the detector's biases could never hide
+  predicted cues only after the repair, because the same rule judges both images. That does not follow: under-counting
+  can also miss failures after a repair, if the repair changes how a launch looks. Reworded: a clean result supports
+  "zero *detected* predicted cues". The stronger claim for the lock-off image rests on the code. Under
+  K1_TEMPO_CONSUMER_BANDS_V1 the beat grid learns a tempo only while `locked` is set (`light_mode_tempo_comet.cpp:103-123`
+  and the matching lines in Anticipate), lock-off never sets it, so the predicted-launch path cannot run.
+- Lock-enabled images need their own consumer check. The repair keeps a coast of up to 8 predicted beats after a
+  validated lock is lost. That cannot happen under lock-off, so none of the c2-* or q-* receipts exercises it. Before
+  any lock-enabled image is qualified, the consumer suite must run on a lock-publishing build, including music
+  followed by silence and a lock lost mid-track. Coast cues must be counted and judged against rule R1, not merged
+  into the "0 predicted" figure.
+- Commit-message total: 175,892 host-equals-emulator generations, not 176,892 (already corrected in the night update).
+
+DEF-001 stays FIX-IN-LANE (A1 needs a lock, so it cannot close under the fallback); DEF-002 stays OPEN.
+
 ---
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-10-22 | agent:claude-code (lane R1) | Update: E1 development pick (D 0/2/4 s → 8/2, 1/1, 1/0; best eligible covers 1 of 36 tracks against a 25 % bar), so E1 is falsified on development and no validation set is recommended; the clip-length flaw in D and the Wilson sample-size table are recorded; the held-out question is marked already answered by the supplement; the detector wording is corrected and a lock-enabled consumer check is made an entry requirement. |
 | 2026-10-21 | agent:claude-code (lane R1, night) | Captain supplement recorded verbatim; consumer gap reproduced on rendered output and repaired behind K1_TEMPO_CONSUMER_BANDS_V1; lock-off fallback qualified (behaviour, host == emulator, cost, byte identity, repeats, clean export); experiment E1 proposed; held-out run held for the Captain. |
 | 2026-10-21 | agent:claude-code (lane R1, evening) | Update: A7 cost incl. per-frame presence (0.96x shipped), M2 with the spectrum transformed, Phase 2.6 joint estimator (dev Acc2 20/36, 3:2 1; agreement-gated lock 8/2), rule 3.3 implemented behind K1_TEMPO_LOCK_OFF_V1, entry gates (b) lock-OFF documented, (c) min-tooth comb rejected; STOP for the Captain's lock decision. |
 | 2026-06-03 | agent:claude-opus | Created — tempo-lock hardening spec from the prior-art trawl + algorithm-design swarm (3/5 reports). Captures the COMBINE plan (out-of-lobe confidence + octave defence + lock state machine + log-novelty) and the on-disk HarmonixSet real-music validation path, before context compaction. |
