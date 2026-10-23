@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #14120f; overflow: hidden; }
+  #stage {
+    position: relative; overflow: hidden; background: #14120f; color: #f3efe6;
+    font-family: "Arial", sans-serif;
+  }
+  @font-face { font-family: "Arial"; src: url("fonts/Arial.ttf") format("truetype"); font-weight: 400; }
+  @font-face { font-family: "Arial"; src: url("fonts/ArialBold.ttf") format("truetype"); font-weight: 700; }
+  .abs { position: absolute; margin: 0; white-space: nowrap; }
+  canvas.leds {
+    position: absolute; width: 800px; height: 80px;
+    image-rendering: pixelated; background: #000;
+  }
+  .badge {
+    position: absolute; width: 280px; height: 36px; line-height: 36px;
+    text-align: center; font-size: 16px; font-weight: 700; letter-spacing: .04em;
+    background: #3a2a16; color: #f0c27a;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <p class="abs" id="kicker" style="left:64px;top:28px;font-size:15px;letter-spacing:.16em;font-weight:700;color:#a39886">RECORDED DIGITAL OUTPUT · EMULATOR</p>
+  <p class="abs" id="title" style="left:64px;top:54px;font-size:36px;font-weight:700;letter-spacing:-.02em">Why turning lock off did not stop false beat cues</p>
+  <p class="abs" id="coord" style="left:64px;top:108px;font-size:16px;color:#a39886"></p>
+  <p class="abs" id="totals" style="left:64px;top:134px;font-size:16px;color:#f3efe6"></p>
+
+  <div class="abs" id="ruler" style="left:64px;top:176px;width:1792px;height:48px;background:#1d1a16"></div>
+  <div class="abs" id="cursor" style="left:64px;top:176px;width:2px;height:48px;background:#f3efe6"></div>
+  <p class="abs" id="clock" style="left:64px;top:232px;font-size:15px;color:#a39886"></p>
+
+  <p class="abs" id="h-before" style="left:64px;top:268px;font-size:22px;font-weight:700">BEFORE · lock-off, consumer not repaired</p>
+  <p class="abs" id="h-after" style="left:1056px;top:268px;font-size:22px;font-weight:700">AFTER · lock-off, consumer repaired</p>
+  <div class="badge" id="lock-before" style="left:64px;top:308px"></div>
+  <div class="badge" id="lock-after" style="left:1056px;top:308px"></div>
+  <p class="abs" id="est-before" style="left:360px;top:314px;font-size:16px;color:#a39886"></p>
+  <p class="abs" id="est-after" style="left:1352px;top:314px;font-size:16px;color:#a39886"></p>
+
+  <p class="abs" id="la-a" style="left:64px;top:368px;font-size:15px;color:#a39886">A · Tempo Comet · logical pixels 0–159 · spawn index 80</p>
+  <p class="abs" id="ra-a" style="left:1056px;top:368px;font-size:15px;color:#a39886">A · Tempo Comet · logical pixels 0–159 · spawn index 80</p>
+  <canvas class="leds" id="led-ba" width="160" height="16" style="left:64px;top:394px"></canvas>
+  <canvas class="leds" id="led-aa" width="160" height="16" style="left:1056px;top:394px"></canvas>
+  <div class="abs" id="mark-ba" style="left:463px;top:394px;width:2px;height:80px;background:rgba(243,239,230,.45)"></div>
+  <div class="abs" id="mark-aa" style="left:1455px;top:394px;width:2px;height:80px;background:rgba(243,239,230,.45)"></div>
+
+  <p class="abs" id="la-b" style="left:64px;top:496px;font-size:15px;color:#a39886"></p>
+  <p class="abs" id="ra-b" style="left:1056px;top:496px;font-size:15px;color:#a39886"></p>
+  <canvas class="leds" id="led-bb" width="160" height="16" style="left:64px;top:522px"></canvas>
+  <canvas class="leds" id="led-ab" width="160" height="16" style="left:1056px;top:522px"></canvas>
+  <div class="abs" id="mark-bb" style="left:463px;top:522px;width:2px;height:80px;background:rgba(243,239,230,.45)"></div>
+  <div class="abs" id="mark-ab" style="left:1455px;top:522px;width:2px;height:80px;background:rgba(243,239,230,.45)"></div>
+  <p class="abs" id="blind" style="left:64px;top:616px;width:900px;font-size:15px;color:#c4b39a;white-space:normal">0 detected Anticipate launches on the unrepaired side. This detector misses eased heads, so zero is not proof the edge was idle.</p>
+
+  <p class="abs" id="cap-before" style="left:64px;top:668px;font-size:26px;font-weight:700;color:#f0c27a"></p>
+  <p class="abs" id="cap-after" style="left:1056px;top:668px;font-size:26px;font-weight:700;color:#d7ebf6"></p>
+  <p class="abs" id="ending" style="left:64px;top:760px;font-size:32px;font-weight:700;white-space:normal;width:1700px;line-height:1.25"></p>
+  <p class="abs" id="legend" style="left:64px;top:900px;font-size:15px;color:#a39886">Time ruler: blue ticks are consumed bass onsets · red ticks are detected predicted cues · the white bar is the shared source-time cursor. Edges are logical names, not a claim about the physical plate.</p>
+  <p class="abs" id="open" style="left:64px;top:940px;font-size:16px;color:#a39886">DEF-002 stays open. This film does not show a recovered tempo lock.</p>
+</div>
+<script src="motion.js"></script>
+<script src="annotations.js"></script>
+<script src="evidence.js"></script>
+<script src="comp.js"></script>
+</body>
+</html>
