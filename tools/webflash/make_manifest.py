@@ -43,6 +43,7 @@ LABELS = {
     "k1_main_rpl_im69d": "Main RPL · 9087 · WS2816 160 GPIO15/16+17/18",
     "k1_bench_im69d_led150": "Bench K1v2 · B489 · WS2812 150 GPIO39/40",
     "k1_unit2_im69d_right": "Bench Unit 2 · 0C54 · WS2812 206 GPIO4/5 PDM CLK39/DATA38",
+    "k1_fe": "K1 Founders' Edition",
 }
 
 # ESP32-S3 ROM constants (chip-fixed, not project-tunable).
@@ -255,6 +256,8 @@ def build_variant(env, boot_app0_src):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--envs", help="comma-separated env list (overrides curated list)")
+    ap.add_argument("--simple-env", default=SIMPLE_ENV,
+                    help="env that ?mode=simple flashes (default %(default)s; FE release: k1_fe)")
     args = ap.parse_args()
     envs = [e.strip() for e in args.envs.split(",")] if args.envs else CURATED_ENVS
 
@@ -262,6 +265,8 @@ def main():
     print(f"boot_app0: {boot_app0_src} (md5 {md5_of(boot_app0_src)})")
 
     variants = [v for v in (build_variant(e, boot_app0_src) for e in envs) if v]
+    if args.simple_env not in [v["env"] for v in variants]:
+        sys.exit(f"ERROR: --simple-env {args.simple_env} is not among the packaged variants.")
     if not variants:
         sys.exit("ERROR: no variants produced — build the curated envs first (pio run -e <env>).")
 
@@ -280,7 +285,7 @@ def main():
         "git": git_stamp(),
         "identityPolicy": {
             "unknownMac": "refuse",
-            "simpleEnv": SIMPLE_ENV,
+            "simpleEnv": args.simple_env,
         },
         "knownDevices": known_devices_for_page(identities, envs),
         "quarantinedUsbSerials": quarantined_serials(identities),

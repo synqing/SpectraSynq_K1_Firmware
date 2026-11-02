@@ -34,7 +34,7 @@
 void k1_pcm1808_begin();
 void k1_pcm1808_poll_telemetry(uint32_t t_now);
 int k1_pcm1808_clock_gate_pass();
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_CANONICAL
 struct K1PcmCanonicalReadTiming {
   uint64_t wait_start_us;
   uint64_t ready_us;
@@ -48,8 +48,10 @@ struct K1PcmCanonicalReadTiming {
 void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now);
 K1PcmCanonicalReadTiming k1_pcm1808_last_canonical_read_timing();
 #endif
-#if K1_PCM1808_SHADOW
+#if K1_PCM1808_SHADOW || K1_PCM1808_LINE_SWITCH
 void k1_pcm1808_shadow_drain();
+#endif
+#if K1_PCM1808_SHADOW
 void k1_pcm1808_pair_hop_begin();
 void k1_pcm1808_pair_hop_end();
 void k1_pcm1808_pair_note_mic(const int16_t *samples96, int i2s_ok);

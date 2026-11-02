@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "b4f00edeb91ad86a3b5596392435a9e35dffdcbb"
+TYPED_DEF_BLOB_SHA = "6ee407d77a6798c24cc63b7de697d484200454c4"
 BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
@@ -130,6 +130,7 @@ PERSISTING_COMMANDS = frozenset({
     "note_offset",
     "palette_index",
     "palette_mode",
+    "pd_nvm_write",
     "photons",
     "preset",
     "prism_count",
@@ -253,6 +254,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "apcad_soak_status",
     "apcad_status",
     "apdbg",
+    "audio_src",
     "beat_director",
     "ble_stream",
     "build",
@@ -277,6 +279,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "edge_uniform",
     "edge_xform",
     "event_status",
+    "fe_status",
     "fps",
     "frame_dump",
     "gdft_agc_probe",
@@ -310,6 +313,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "paint_stops",
     "paint_sv",
     "paint_target",
+    "pd_status",
     "pcmraw_arm",
     "pcmraw_dump",
     "pcmraw_status",

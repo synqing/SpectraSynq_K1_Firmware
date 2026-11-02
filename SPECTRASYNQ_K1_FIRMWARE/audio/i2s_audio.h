@@ -33,6 +33,12 @@
 #if K1_PCM1808_PRESENT
 #include "k1_pcm1808_input.h"
 #endif
+#if K1_PCM1808_LINE_SWITCH
+#ifndef K1_FE_BOARD_V1
+#error "K1_PCM1808_LINE_SWITCH is the FE jack switch; it needs K1_FE_BOARD_V1"
+#endif
+#include "k1_fe_board.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -476,7 +482,29 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
   return;
 #endif
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_CANONICAL
+#if K1_PCM1808_LINE_SWITCH
+  // FE jack switch (Captain ruling 1 Sep 2026): plug in = PCM1808 line-in owns
+  // this hop through the same canonical path the P6 probe validated; plug out =
+  // the microphone tail below. Only the mic's own follower is kept across a
+  // line-in session so unplugging returns the mic to its pre-plug envelope.
+  static bool k1_fe_line_prev = false;
+  static float k1_fe_mic_follower = 1.0f;
+  const bool k1_fe_line = k1_fe_audio_line_hop_begin();
+  if (k1_fe_line != k1_fe_line_prev) {
+    if (k1_fe_line) {
+      k1_fe_mic_follower = max_waveform_val_follower;
+      // The canonical path never writes the mic's silence latch; start line-in
+      // from the state the P6 line build always ran in.
+      silence = false;
+      silent_scale = 1.0f;
+    } else {
+      max_waveform_val_follower = k1_fe_mic_follower;
+    }
+    k1_fe_line_prev = k1_fe_line;
+  }
+  if (k1_fe_line) {
+#endif
   int16_t pcm_hop[96];
   k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
@@ -501,6 +529,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   k1_audio_commit_canonical_frame(pcm_hop, t_now);
   k1_pcm1808_poll_telemetry(t_now);
   return;
+#if K1_PCM1808_LINE_SWITCH
+  }
+#endif
 #endif
 #if K1_AUDIO_SOURCE_MIC
 #if K1_PCM1808_SHADOW
@@ -632,6 +663,11 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
   k1_pcm1808_shadow_drain();
   k1_pcm1808_poll_telemetry(t_now);
+#endif
+#if K1_PCM1808_LINE_SWITCH
+  // Mic owns this hop: keep the PCM1808 ring under one hop so a jack insert
+  // starts line-in without a backlog (same drain the P4 shadow soak proved).
+  k1_pcm1808_shadow_drain();
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   const uint64_t i2s_read_return_us = (uint64_t)esp_timer_get_time();

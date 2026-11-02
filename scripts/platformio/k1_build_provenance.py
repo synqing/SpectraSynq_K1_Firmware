@@ -50,19 +50,51 @@ def _git_short_hash() -> str:
         return "unknown"
 
 
+def _release_tag(prefix: str) -> str:
+    """Return the release tag on HEAD that starts with ``prefix``.
+
+    "untagged" when HEAD carries no such tag, "dirty" appended when tracked
+    firmware sources differ from HEAD. Never raises.
+    """
+    project_dir = env.subst("$PROJECT_DIR")  # noqa: F821
+    try:
+        out = subprocess.check_output(
+            ["git", "tag", "--points-at", "HEAD", "--list", prefix + "*"],
+            cwd=project_dir,
+            stderr=subprocess.DEVNULL,
+        )
+        tags = sorted(t for t in out.decode("utf-8", "replace").split() if t)
+        tag = tags[-1] if tags else "untagged"
+        dirty = subprocess.run(
+            ["git", "diff", "--quiet", "HEAD", "--",
+             "SPECTRASYNQ_K1_FIRMWARE", "platformio.ini"],
+            cwd=project_dir,
+            stderr=subprocess.DEVNULL,
+        ).returncode
+        return tag + ("-dirty" if dirty else "")
+    except Exception:
+        return "unknown"
+
+
 _GIT_HASH = _git_short_hash()
 _EPOCH = int(time.time())
 _PIOENV = env.subst("$PIOENV") or "unknown"  # noqa: F821
 
-env.Append(  # noqa: F821
-    CPPDEFINES=[
-        ("K1_BUILD_GIT_HASH", '\\"%s\\"' % _GIT_HASH),
-        ("K1_BUILD_EPOCH", str(_EPOCH)),
-        ("K1_BUILD_ENV", '\\"%s\\"' % _PIOENV),
-    ]
-)
+_DEFINES = [
+    ("K1_BUILD_GIT_HASH", '\\"%s\\"' % _GIT_HASH),
+    ("K1_BUILD_EPOCH", str(_EPOCH)),
+    ("K1_BUILD_ENV", '\\"%s\\"' % _PIOENV),
+]
+# Release envs only (e.g. k1_fe: custom_release_tag_prefix = fe-). Other envs
+# get no K1_BUILD_TAG, so their command lines and binaries are unchanged.
+_TAG_PREFIX = env.GetProjectOption("custom_release_tag_prefix", "")  # noqa: F821
+_TAG = _release_tag(_TAG_PREFIX) if _TAG_PREFIX else None
+if _TAG is not None:
+    _DEFINES.append(("K1_BUILD_TAG", '\\"%s\\"' % _TAG))
+
+env.Append(CPPDEFINES=_DEFINES)  # noqa: F821
 
 print(
-    "[k1-build-provenance] env=%s git=%s epoch=%d"
-    % (_PIOENV, _GIT_HASH, _EPOCH)
+    "[k1-build-provenance] env=%s git=%s epoch=%d%s"
+    % (_PIOENV, _GIT_HASH, _EPOCH, (" tag=%s" % _TAG) if _TAG is not None else "")
 )

@@ -8,6 +8,7 @@
 #endif
 #if K1_PCM1808_PRESENT
 #include "k1_pcm1808_input.h"
+#include "k1_fe_board.h"
 #endif
 #ifdef K1_ST25_PROBE_V1
 #include "k1_st25_probe.h"
@@ -627,6 +628,9 @@ void init_system() {
   init_i2s();
 #if K1_PCM1808_PRESENT
   k1_pcm1808_begin();
+#endif
+#ifdef K1_FE_BOARD_V1
+  k1_fe_board_begin();  // after PCM1808 so the line-in gate result is known
 #endif
 #ifdef K1_ST25_PROBE_V1
   k1_st25_begin();

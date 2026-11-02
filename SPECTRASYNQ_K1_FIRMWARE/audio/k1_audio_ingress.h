@@ -42,7 +42,9 @@ static inline void k1_usb_update_waveform_peak_envelope(void) {
   max_waveform_val = drive;
 
   if (!s_usb_env_started) {
+#if !K1_PCM1808_LINE_SWITCH
     CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
+#endif  // FE: the mic returns on unplug and CONFIG may be saved; keep its calibrated floor.
     max_waveform_val_follower = (drive > 1.0f) ? drive : 1.0f;
     waveform_peak_scaled = 0.0f;
     s_usb_env_started = true;

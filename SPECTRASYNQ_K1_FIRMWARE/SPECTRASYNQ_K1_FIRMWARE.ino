@@ -950,6 +950,9 @@ void loop() {
 #ifdef K1_BLE_REMOTED
   k1_ble_remoted_poll(t_now);
 #endif
+#ifdef K1_FE_BOARD_V1
+  k1_fe_board_poll(t_now);  // FE jack switch + 20 V power policy (system/k1_fe_board.h)
+#endif
 #ifdef SB_K1_SYNC_PROBE
   k1_sync::poll();
 #endif
@@ -1030,6 +1033,10 @@ void loop() {
 #endif
 #if K1_AUDIO_SOURCE_MIC
 #ifdef K1_LOUD_GUARD_V1
+#if K1_PCM1808_LINE_SWITCH
+  // Loud guard trims the microphone; the P6 line-in path never ran it.
+  if (!k1_fe_audio_line_active())
+#endif
   k1_loud_guard_update(t_now);
 #endif
 #ifdef K1_MIC_AUTO_SENSE_V1
@@ -1417,6 +1424,9 @@ void led_thread(void* arg) {
 #endif
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
+#ifdef K1_FE_BOARD_V1
+      k1_fe_heartbeat_tick(vp_frame_start_us);  // OI-19: 1 Hz from the render task
+#endif
 #ifdef K1_AUDIO_FRAME_V1
       {
         K1AudioFrame vp_frame = {};

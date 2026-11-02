@@ -484,7 +484,7 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SWEET_SPOT_CENTER_PIN (-1)
     #define SWEET_SPOT_RIGHT_PIN (-1)
 
-    #define RNG_SEED_PIN 10
+    #define RNG_SEED_PIN 10  // FE board: GPIO10 is PCM1808 DOUT; no analogRead consumer, harmless (OI-09).
 
   #elif defined(K1_BENCH_REFERENCE_PINMAP)
     // K1 bench-reference GPIO map.

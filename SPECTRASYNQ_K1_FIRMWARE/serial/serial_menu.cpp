@@ -115,6 +115,9 @@ extern void ap_capture_arm(uint32_t ms);
 #ifdef K1_COLOUR_LAB_V1
 #include "k1_colour_lab.h"
 #endif
+#ifdef K1_FE_BOARD_V1
+#include "k1_fe_board.h"
+#endif
 
 extern bool benchmark_running;
 extern uint32_t benchmark_start_time;
@@ -2285,6 +2288,10 @@ void cmd_build() {
 #else
   USBSerial.print("unknown");
 #endif
+#ifdef K1_BUILD_TAG
+  USBSerial.print(" tag=");  // release envs only (custom_release_tag_prefix)
+  USBSerial.print(K1_BUILD_TAG);
+#endif
   USBSerial.println();
   tx_end();
 }
@@ -2871,6 +2878,19 @@ void parse_command(char* command_buf) {
       }
     }
 #endif
+#ifdef K1_FE_BOARD_V1
+    // FE bring-up / QC commands take no `=value` (system/k1_fe_board.h).
+    if (strcmp(command_buf, "fe_status") == 0 ||
+        strcmp(command_buf, "pd_status") == 0 ||
+        strcmp(command_buf, "pd_nvm_write") == 0) {
+      const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_buf);
+      if (typed != nullptr) {
+        char empty_data[1] = {0};
+        (void)serial_dispatch_typed_setter(typed, command_buf, empty_data);
+        return;
+      }
+    }
+#endif
     // Trailing space+token, e.g. `factory_reset CONFIRM`. This branch is scoped
     // to SC_FORBIDDEN_SINGLE_BYTE rows ONLY — those are the only commands that
     // take an argument (the CONFIRM token, D6). For any other head row (SAFE /
@@ -3128,6 +3148,12 @@ void parse_command(char* command_buf) {
 #ifdef K1_COLOUR_LAB_V1
     else if (k1_colour_lab_dispatch(command_type, command_data)) {
       // paint / tune — Colour Lab product surface
+    }
+#endif
+
+#ifdef K1_FE_BOARD_V1
+    else if (k1_fe_board_dispatch(command_type, command_data)) {
+      // audio_src=auto|mic|line — FE board support
     }
 #endif
 

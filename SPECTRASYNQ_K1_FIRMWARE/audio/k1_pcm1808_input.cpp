@@ -398,7 +398,7 @@ void k1_pcm1808_begin() {
   s_rmin = 8388607;
   s_rmax = -8388608;
   k1_pcm_src_reset(&s_src);
-  k1_pcm_hold_nfc_inert();
+  k1_pcm_hold_nfc_inert();  // FE board: GPIO4 is unconnected (OI-09), so this hold drives nothing.
 
   int32_t lrck_n = 0, bclk_n = 0;
   int64_t lrck_us = 0, bclk_us = 0;
@@ -445,6 +445,8 @@ void k1_pcm1808_begin() {
   }
 #if K1_PCM1808_SHADOW
   USBSerial.println("[PCMING] source=im69d shadow=pcm1808 canonical_hz=12800 hop=96");
+#elif K1_PCM1808_LINE_SWITCH
+  USBSerial.println("[PCMING] source=im69d line=pcm1808 switch=jack canonical_hz=12800 hop=96");
 #else
   USBSerial.println("[PCMING] source=pcm1808 canonical_hz=12800 hop=96");
 #endif
@@ -497,7 +499,7 @@ static void k1_pcm_note_sample(int32_t l, int32_t r) {
   }
 }
 
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_CANONICAL
 static K1PcmCanonicalReadTiming s_canon_read_timing = {};
 static uint64_t s_canon_sumsq = 0;
 static uint32_t s_canon_n = 0;
@@ -592,9 +594,9 @@ void k1_pcm1808_take_canonical_samples(int16_t *out96, uint32_t t_now) {
     s_canon_n++;
   }
 }
-#endif  // K1_AUDIO_SOURCE_PCM1808
+#endif  // K1_PCM1808_CANONICAL
 
-#if K1_PCM1808_SHADOW
+#if K1_PCM1808_SHADOW || K1_PCM1808_LINE_SWITCH
 void k1_pcm1808_shadow_drain() {
   if (!s_gate_pass) {
     return;
@@ -606,7 +608,9 @@ void k1_pcm1808_shadow_drain() {
     n++;
   }
 }
+#endif  // K1_PCM1808_SHADOW || K1_PCM1808_LINE_SWITCH
 
+#if K1_PCM1808_SHADOW
 void k1_pcm1808_pair_hop_begin() {
 #ifdef K1_PCM1808_PROBE_V1
   s_pair_hop_t0_us = esp_timer_get_time();
@@ -703,7 +707,7 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   s_rate_poll_acq0 = acq;
   s_rate_poll_cons0 = s_pop_frames;
   s_rate_poll_canon0 = s_src_blocks;
-#if K1_AUDIO_SOURCE_PCM1808
+#if K1_PCM1808_CANONICAL
   if (s_canon_n > 0) {
     const double canon_rms = sqrt((double)s_canon_sumsq / (double)s_canon_n);
     const char *mono_name =

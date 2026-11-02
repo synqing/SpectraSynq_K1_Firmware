@@ -16,9 +16,16 @@
 #ifndef K1_PCM1808_SHADOW
 #define K1_PCM1808_SHADOW 0
 #endif
+// FE board (k1_fe): microphone is the default AP source; the 3.5 mm jack hands
+// ingress to the PCM1808 canonical path at runtime (system/k1_fe_board.h).
+#ifndef K1_PCM1808_LINE_SWITCH
+#define K1_PCM1808_LINE_SWITCH 0
+#endif
 
-// Hardware present on I2S1 (ingress owner OR continuous shadow capture).
-#define K1_PCM1808_PRESENT (K1_AUDIO_SOURCE_PCM1808 || K1_PCM1808_SHADOW)
+// Hardware present on I2S1 (ingress owner, continuous shadow capture, or FE jack switch).
+#define K1_PCM1808_PRESENT (K1_AUDIO_SOURCE_PCM1808 || K1_PCM1808_SHADOW || K1_PCM1808_LINE_SWITCH)
+// The PCM1808 canonical 12.8 kHz / 96 hop can feed AP (always, or when the jack selects it).
+#define K1_PCM1808_CANONICAL (K1_AUDIO_SOURCE_PCM1808 || K1_PCM1808_LINE_SWITCH)
 
 #if K1_AUDIO_SOURCE_USB && K1_AUDIO_SOURCE_MIC
 #error "K1 USB and microphone capture cannot both own ingress in this build"
@@ -37,6 +44,9 @@
 #endif
 #if K1_PCM1808_SHADOW && !K1_AUDIO_SOURCE_MIC
 #error "K1_PCM1808_SHADOW requires the microphone to remain the AP source"
+#endif
+#if K1_PCM1808_LINE_SWITCH && (!K1_AUDIO_SOURCE_MIC || K1_AUDIO_SOURCE_PCM1808 || K1_PCM1808_SHADOW || K1_AUDIO_SOURCE_USB)
+#error "K1_PCM1808_LINE_SWITCH needs the microphone as default source and no other PCM/USB mode"
 #endif
 #if !K1_AUDIO_SOURCE_USB && !K1_AUDIO_SOURCE_MIC && !K1_AUDIO_SOURCE_PCM1808
 #error "No K1 audio source selected"
