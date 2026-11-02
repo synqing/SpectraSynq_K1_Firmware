@@ -1,0 +1,24 @@
+bundle: _scratch/fe-rc1/k1-webflash-bundle-fe-1.0.0-rc1.zip
+d9b6b5e47404043f89e447289f5b84e6956514fcd11fc0786f19d9a6f9d693db  _scratch/fe-rc1/k1-webflash-bundle-fe-1.0.0-rc1.zip
+Archive:  _scratch/fe-rc1/k1-webflash-bundle-fe-1.0.0-rc1.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  11-03-2026 06:36   firmware/
+        0  11-03-2026 06:36   firmware/k1_fe/
+     3072  11-03-2026 06:36   firmware/k1_fe/partitions.bin
+     8192  11-03-2026 06:36   firmware/k1_fe/boot_app0.bin
+   753216  11-03-2026 06:36   firmware/k1_fe/firmware.bin
+    20208  11-03-2026 06:36   firmware/k1_fe/bootloader.bin
+    44748  11-03-2026 06:36   index.html
+     3097  11-03-2026 06:36   manifest.json
+        0  11-03-2026 06:36   assets/
+     8192  11-03-2026 06:36   assets/boot_app0.bin
+   218551  11-03-2026 06:36   assets/esptool-js-0.6.1.bundle.js
+    48316  11-03-2026 06:36   assets/crypto-js-4.1.1.min.js
+---------                     -------
+  1107592                     12 files
+variants ['k1_fe'] label K1 Founders' Edition simpleEnv k1_fe git {'sha': '6b313500', 'dirty': False}
+bootloader.bin 0x0 md5 MATCH
+partitions.bin 0x8000 md5 MATCH
+boot_app0.bin 0xe000 md5 e6327541e2dc394ca2c3b3280ac0f39f
+firmware.bin 0x10000 md5 MATCH

@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "name": "SpectraSynq K1",
+  "chipFamily": "ESP32-S3",
+  "flash": {
+    "size": "keep",
+    "mode": "keep",
+    "freq": "keep"
+  },
+  "generatedAt": "2026-11-02T22:36:11+00:00",
+  "git": {
+    "sha": "6b313500",
+    "dirty": false
+  },
+  "identityPolicy": {
+    "unknownMac": "refuse",
+    "simpleEnv": "k1_fe"
+  },
+  "knownDevices": [
+    {
+      "chipId": "F887A500",
+      "usbSerial": "B4:3A:45:A5:87:F8",
+      "role": "main K1",
+      "allowedCuratedEnvs": []
+    },
+    {
+      "chipId": "9087A500",
+      "usbSerial": "B4:3A:45:A5:87:90",
+      "role": "Main RPL (main K1 replacement)",
+      "allowedCuratedEnvs": [
+        "k1_fe"
+      ]
+    },
+    {
+      "chipId": "B489A500",
+      "usbSerial": "B4:3A:45:A5:89:B4",
+      "role": "2nd bench K1",
+      "allowedCuratedEnvs": []
+    },
+    {
+      "chipId": "0C54FC00",
+      "usbSerial": "AC:A7:04:FC:54:0C",
+      "role": "K1 Bench Unit 2",
+      "allowedCuratedEnvs": []
+    },
+    {
+      "chipId": "0743E200",
+      "usbSerial": "5AAF278179",
+      "role": "Waveshare ESP32-P4-WIFI6 lab (ADR-0007)",
+      "allowedCuratedEnvs": []
+    }
+  ],
+  "quarantinedUsbSerials": [
+    "FC:01:2C:DA:2B:38"
+  ],
+  "variants": [
+    {
+      "env": "k1_fe",
+      "label": "K1 Founders' Edition",
+      "builtAt": "2026-11-02T22:33:13+00:00",
+      "parts": [
+        {
+          "path": "firmware/k1_fe/bootloader.bin",
+          "offset": 0,
+          "size": 20208,
+          "md5": "3a1751f965c8e51e47513a9c42a7d3c8"
+        },
+        {
+          "path": "firmware/k1_fe/partitions.bin",
+          "offset": 32768,
+          "size": 3072,
+          "md5": "118cbdbfce82eb12bbdeb7c59af2fce8"
+        },
+        {
+          "path": "firmware/k1_fe/boot_app0.bin",
+          "offset": 57344,
+          "size": 8192,
+          "md5": "e6327541e2dc394ca2c3b3280ac0f39f"
+        },
+        {
+          "path": "firmware/k1_fe/firmware.bin",
+          "offset": 65536,
+          "size": 753216,
+          "md5": "dbc201b53833d4a13cf2d03a4174834f"
+        }
+      ],
+      "partitionMap": [
+        {
+          "name": "nvs",
+          "subtype": "nvs",
+          "offset": 36864,
+          "size": 20480
+        },
+        {
+          "name": "otadata",
+          "subtype": "otadata",
+          "offset": 57344,
+          "size": 8192
+        },
+        {
+          "name": "app0",
+          "subtype": "ota_0",
+          "offset": 65536,
+          "size": 6553600
+        },
+        {
+          "name": "app1",
+          "subtype": "ota_1",
+          "offset": 6619136,
+          "size": 6553600
+        },
+        {
+          "name": "spiffs",
+          "subtype": "spiffs",
+          "offset": 13172736,
+          "size": 3538944
+        },
+        {
+          "name": "coredump",
+          "subtype": "coredump",
+          "offset": 16711680,
+          "size": 65536
+        }
+      ],
+      "otaSeedOffset": 6619136,
+      "firmwareVersion": 40103,
+      "permittedChipIds": [
+        "9087A500"
+      ],
+      "usbSerial": [
+        "B4:3A:45:A5:87:90"
+      ],
+      "role": "Main RPL (main K1 replacement)"
+    }
+  ]
+}
