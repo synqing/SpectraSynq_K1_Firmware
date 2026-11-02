@@ -33,6 +33,9 @@
 #if K1_PCM1808_PRESENT
 void k1_pcm1808_begin();
 void k1_pcm1808_poll_telemetry(uint32_t t_now);
+#if K1_PCM1808_LINE_SWITCH
+void k1_pcm1808_print_telemetry();  // FE: on-demand (:fe_status), never streamed
+#endif
 int k1_pcm1808_clock_gate_pass();
 #if K1_PCM1808_CANONICAL
 struct K1PcmCanonicalReadTiming {

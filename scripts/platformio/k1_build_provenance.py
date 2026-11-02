@@ -53,8 +53,8 @@ def _git_short_hash() -> str:
 def _release_tag(prefix: str) -> str:
     """Return the release tag on HEAD that starts with ``prefix``.
 
-    "untagged" when HEAD carries no such tag, "dirty" appended when tracked
-    firmware sources differ from HEAD. Never raises.
+    "untagged" when HEAD carries no such tag, "-dirty" appended when firmware
+    sources or platformio.ini differ from HEAD (untracked files count). Never raises.
     """
     project_dir = env.subst("$PROJECT_DIR")  # noqa: F821
     try:
@@ -65,12 +65,12 @@ def _release_tag(prefix: str) -> str:
         )
         tags = sorted(t for t in out.decode("utf-8", "replace").split() if t)
         tag = tags[-1] if tags else "untagged"
-        dirty = subprocess.run(
-            ["git", "diff", "--quiet", "HEAD", "--",
+        dirty = subprocess.check_output(
+            ["git", "status", "--porcelain", "--untracked-files=all", "--",
              "SPECTRASYNQ_K1_FIRMWARE", "platformio.ini"],
             cwd=project_dir,
             stderr=subprocess.DEVNULL,
-        ).returncode
+        ).strip()
         return tag + ("-dirty" if dirty else "")
     except Exception:
         return "unknown"

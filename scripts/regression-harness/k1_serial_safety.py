@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "6ee407d77a6798c24cc63b7de697d484200454c4"
+TYPED_DEF_BLOB_SHA = "1036d29e3cf36282d883f54b8caca09a952ad079"
 BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
@@ -87,6 +87,7 @@ BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 #: Rows whose flags contain CMD_DISRUPTIVE — these reboot the device.
 DISRUPTIVE_COMMANDS = frozenset({
+    "audio_src",
     "bass_mode",
     "boot_animation",
     "bootloop_inject",
@@ -254,7 +255,6 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "apcad_soak_status",
     "apcad_status",
     "apdbg",
-    "audio_src",
     "beat_director",
     "ble_stream",
     "build",

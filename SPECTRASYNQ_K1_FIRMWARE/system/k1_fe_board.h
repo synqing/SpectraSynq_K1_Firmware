@@ -73,13 +73,14 @@ void k1_fe_board_poll(uint32_t t_now_ms);
 void k1_fe_heartbeat_tick(int64_t now_us);
 
 // Called by acquire_sample_chunk() at the top of every hop. Latches and
-// returns true when the PCM1808 line-in owns this hop.
-bool k1_fe_audio_line_hop_begin();
+// returns true when the PCM1808 line-in owns this hop. hold_mic (noise
+// calibration running) keeps the microphone so calibration never learns line-in.
+bool k1_fe_audio_line_hop_begin(bool hold_mic);
 
 // The value latched by the last k1_fe_audio_line_hop_begin().
 bool k1_fe_audio_line_active();
 
-// Serial: fe_status, pd_status, pd_nvm_write, audio_src=auto|mic|line.
+// Serial: fe_status, pd_status, pd_nvm_write[=golden], audio_src=auto|mic|line.
 bool k1_fe_board_dispatch(const char *command_type, char *command_data);
 
 #endif  // K1_FE_BOARD_V1

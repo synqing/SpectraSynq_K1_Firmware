@@ -244,5 +244,5 @@ SERIAL_TYPED_CMD("tune_status", serial_typed_wrap_colour_lab, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("fe_status", serial_typed_wrap_fe_board, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("pd_status", serial_typed_wrap_fe_board, SC_TYPED_ONLY, 0)
 SERIAL_TYPED_CMD("pd_nvm_write", serial_typed_wrap_fe_board, SC_TYPED_ONLY, CMD_PERSISTS)
-SERIAL_TYPED_CMD("audio_src", serial_typed_wrap_fe_board, SC_TYPED_ONLY, 0)
+SERIAL_TYPED_CMD("audio_src", serial_typed_wrap_fe_board, SC_TYPED_ONLY, CMD_DISRUPTIVE)
 #endif

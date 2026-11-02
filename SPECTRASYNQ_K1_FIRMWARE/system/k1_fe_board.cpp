@@ -24,6 +24,8 @@ static const uint32_t K1_FE_LED_PG_READ_MS = 150;     // eFuse + buck soft-start
 static const uint32_t K1_FE_JACK_STABLE_MS = 100;     // jack contact debounce
 static const uint32_t K1_FE_DARK_REMINDER_MS = 60000; // repeat the "why dark" line while 5 V-only
 static const int64_t K1_FE_HEARTBEAT_HALF_US = 500000; // 1 Hz blink
+static const int K1_FE_PG_DROP_LATCH_COUNT = 3;        // this many 20 V drops while lit ...
+static const uint32_t K1_FE_PG_DROP_LATCH_WINDOW_MS = 10000; // ... inside this window latch the LEDs off
 
 // ── STUSB4500 registers (ST usb-c/STUSB4500 USB_PD_defines_STUSB-GEN1S.h;
 //    NVM sequence follows ST NVM_Flasher as ported by SparkFun_STUSB4500) ────
@@ -51,6 +53,16 @@ static const uint8_t FTP_OP_SOFT_PROG_SECTOR = 0x07;
 static const uint8_t FTP_ALL_SECTORS = 0x1F;
 static const int K1_FE_NVM_SECTORS = 5;
 static const int K1_FE_NVM_SECTOR_BYTES = 8;
+// ST factory NVM image (SparkFun_STUSB4500 write(defaultVals), decodes to
+// 5 V 1.5 A / 15 V 1.5 A / 20 V 1.0 A, GPIO_CFG = error recovery). The FE image
+// is this plus the PDO fields, so a write never carries forward unknown bytes.
+static const uint8_t K1_FE_ST_FACTORY_NVM[5][8] = {
+    {0x00, 0x00, 0xB0, 0xAA, 0x00, 0x45, 0x00, 0x00},
+    {0x10, 0x40, 0x9C, 0x1C, 0xFF, 0x01, 0x3C, 0xDF},
+    {0x02, 0x40, 0x0F, 0x00, 0x32, 0x00, 0xFC, 0xF1},
+    {0x00, 0x19, 0x56, 0xAF, 0xF5, 0x35, 0x5F, 0x00},
+    {0x00, 0x4B, 0x90, 0x21, 0x43, 0x00, 0x40, 0xFB},
+};
 
 // ── FE sink profile (OI-11; R3 power-connections.json "NVM5V0.5A /20V3A /20V5A") ─
 static const uint32_t K1_FE_PD_PDO1_MA = 500;
@@ -94,6 +106,10 @@ static int s_led_pg_b = -1;
 static int s_pd_fault_n = -1;
 static uint32_t s_dark_reported_at;
 static bool s_dark_reported;
+static bool s_latched_off;      // 20 V input kept dropping while lit: LEDs stay off until reboot
+static uint32_t s_pg_drop_at[K1_FE_PG_DROP_LATCH_COUNT];
+static int s_pg_drop_n;
+static bool s_cal_hold_reported;
 
 static bool s_jack_raw;
 static bool s_jack_stable;
@@ -229,7 +245,10 @@ static void pd_profile_print(const char *tag, const uint8_t s[K1_FE_NVM_SECTORS]
   }
 }
 
-static void k1_fe_pd_nvm_write() {
+// golden = operator recovery (`:pd_nvm_write=golden`): write the FE image even
+// when the chip holds neither the ST factory image nor the FE image (e.g. a
+// write that was interrupted part-way).
+static void k1_fe_pd_nvm_write(bool golden) {
   if (!s_board) {
     USBSerial.println("[PDNVM] FAIL reason=stusb4500_not_detected");
     return;
@@ -241,15 +260,21 @@ static void k1_fe_pd_nvm_write() {
   }
   pd_profile_print("before", before);
   uint8_t target[K1_FE_NVM_SECTORS][K1_FE_NVM_SECTOR_BYTES];
-  memcpy(target, before, sizeof(target));
+  memcpy(target, K1_FE_ST_FACTORY_NVM, sizeof(target));
   pd_profile_apply(target);
   const bool already = (memcmp(target, before, sizeof(target)) == 0);
+  const bool factory = (memcmp(K1_FE_ST_FACTORY_NVM, before, sizeof(before)) == 0);
   if (already) {
     USBSerial.println("[PDNVM] already_programmed=1 write=SKIPPED");
+  } else if (!factory && !golden) {
+    USBSerial.println("[PDNVM] FAIL reason=unrecognised_nvm_image (neither ST factory nor FE profile); "
+                      "nothing written. Review the sectors above; recovery: :pd_nvm_write=golden");
+    return;
   } else {
-    USBSerial.println("[PDNVM] writing (show pauses about 1 s)...");
+    USBSerial.printf("[PDNVM] writing %s (show pauses about 1 s)...\n",
+                     factory ? "factory->FE" : "GOLDEN over unrecognised image");
     if (!pd_nvm_write_all(target)) {
-      USBSerial.println("[PDNVM] FAIL reason=nvm_write");
+      USBSerial.println("[PDNVM] FAIL reason=nvm_write (rerun :pd_nvm_write=golden)");
       return;
     }
   }
@@ -325,6 +350,18 @@ static void k1_fe_power_poll(uint32_t t_now) {
       k1_fe_set_power(false, false);
       s_led_pg_a = s_led_pg_b = -1;
       USBSerial.println("[FEPWR] INPUT_20V_PG fell: led_enable=0 permit=0");
+      // Strobe guard: a supply that sags under LED load would otherwise cycle
+      // the whole plate on and off every ~270 ms.
+      const int slot = s_pg_drop_n % K1_FE_PG_DROP_LATCH_COUNT;
+      const uint32_t oldest = s_pg_drop_at[slot];
+      s_pg_drop_at[slot] = t_now;
+      s_pg_drop_n++;
+      if (s_pg_drop_n >= K1_FE_PG_DROP_LATCH_COUNT && (t_now - oldest) <= K1_FE_PG_DROP_LATCH_WINDOW_MS) {
+        s_latched_off = true;
+        USBSerial.printf("[FEPWR] LATCHED OFF: 20 V input dropped %d times in %u ms while lit; LEDs stay off "
+                         "until the board is unplugged and replugged. Use a stronger 20 V USB-C PD supply.\n",
+                         K1_FE_PG_DROP_LATCH_COUNT, (unsigned)K1_FE_PG_DROP_LATCH_WINDOW_MS);
+      }
       k1_fe_report_dark(t_now);
     } else if (!s_dark_reported || (t_now - s_dark_reported_at) >= K1_FE_DARK_REMINDER_MS) {
       k1_fe_report_dark(t_now);
@@ -333,7 +370,9 @@ static void k1_fe_power_poll(uint32_t t_now) {
     if (s_pg_high_since == 0) {
       s_pg_high_since = t_now ? t_now : 1;
     }
-    if (!s_permit && (t_now - s_pg_high_since) >= K1_FE_PG_RISE_STABLE_MS) {
+    if (s_latched_off) {
+      // stay dark; logged once when the latch tripped
+    } else if (!s_permit && (t_now - s_pg_high_since) >= K1_FE_PG_RISE_STABLE_MS) {
       k1_fe_set_power(true, false);
       s_permit_at = t_now;
     } else if (s_permit && !s_led_enable && (t_now - s_permit_at) >= K1_FE_PERMIT_TO_LED_MS) {
@@ -466,7 +505,7 @@ void k1_fe_board_begin() {
 
   // Boot power: if 20 V is already stable, light the rails now so the intro is visible.
   bool pg_stable = true;
-  for (int i = 0; i < 5 && pg_stable; i++) {
+  for (uint32_t i = 0; i < K1_FE_PG_RISE_STABLE_MS / 10u && pg_stable; i++) {
     pg_stable = digitalRead(K1_FE_INPUT_20V_PG_PIN) != 0;
     delay(10);
   }
@@ -506,7 +545,16 @@ void k1_fe_heartbeat_tick(int64_t now_us) {
   }
 }
 
-bool k1_fe_audio_line_hop_begin() {
+bool k1_fe_audio_line_hop_begin(bool hold_mic) {
+  if (hold_mic && s_line_selected) {
+    if (!s_cal_hold_reported) {
+      USBSerial.println("[FEAUD] noise calibration running: holding the mic until it finishes");
+      s_cal_hold_reported = true;
+    }
+    s_line_active = false;
+    return false;
+  }
+  s_cal_hold_reported = false;
   s_line_active = s_line_selected;
   return s_line_active;
 }
@@ -526,6 +574,12 @@ static void k1_fe_status() {
                    s_override == K1_FE_SRC_LINE ? "line" : s_override == K1_FE_SRC_MIC ? "mic" : "auto",
                    s_board ? (s_jack_stable ? "in" : "out") : "n/a",
                    k1_pcm1808_clock_gate_pass() ? "PASS" : "FAIL");
+  if (s_latched_off) {
+    USBSerial.println("[FESTATUS] power=LATCHED_OFF (20 V input unstable; replug to retry)");
+  }
+  if (k1_pcm1808_clock_gate_pass()) {
+    k1_pcm1808_print_telemetry();  // line-in stats since the last print (on demand only)
+  }
 }
 
 bool k1_fe_board_dispatch(const char *command_type, char *command_data) {
@@ -538,7 +592,11 @@ bool k1_fe_board_dispatch(const char *command_type, char *command_data) {
     return true;
   }
   if (strcmp(command_type, "pd_nvm_write") == 0) {
-    k1_fe_pd_nvm_write();
+    if (command_data[0] != 0 && strcmp(command_data, "golden") != 0) {
+      USBSerial.println("[PDNVM] usage: pd_nvm_write  |  pd_nvm_write=golden (recovery)");
+      return true;
+    }
+    k1_fe_pd_nvm_write(strcmp(command_data, "golden") == 0);
     return true;
   }
   if (strcmp(command_type, "audio_src") == 0) {

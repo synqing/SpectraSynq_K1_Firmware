@@ -662,6 +662,8 @@ void k1_pcm1808_pair_note_mic(const int16_t *samples96, int i2s_ok) {
 }
 #endif  // K1_PCM1808_SHADOW
 
+static void k1_pcm_print_telemetry(void);
+
 void k1_pcm1808_poll_telemetry(uint32_t t_now) {
   static uint32_t last;
 #ifdef K1_PCM1808_PROBE_V1
@@ -673,6 +675,14 @@ void k1_pcm1808_poll_telemetry(uint32_t t_now) {
     return;
   }
   last = t_now;
+  k1_pcm_print_telemetry();
+}
+
+#if K1_PCM1808_LINE_SWITCH
+void k1_pcm1808_print_telemetry() { k1_pcm_print_telemetry(); }
+#endif
+
+static void k1_pcm_print_telemetry(void) {
   const float n = (s_stat_n > 0) ? (float)s_stat_n : 1.0f;
   const float lmean = (float)s_lsum / n;
   const float rmean = (float)s_rsum / n;
