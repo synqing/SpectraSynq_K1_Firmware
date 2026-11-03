@@ -452,7 +452,8 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #define SECONDARY_LED_CLOCK_PIN 18
 
     #ifdef K1_MIC_IM69D_PDM_V1
-      #if defined(K1_B489_WS2816_V1) && !defined(K1_MAIN_RPL_PINMAP_V1)
+      // K1_FE_BENCH_B489_V1: the k1_fe image on the B489 bench loom (same mic pins).
+      #if (defined(K1_B489_WS2816_V1) && !defined(K1_MAIN_RPL_PINMAP_V1)) || defined(K1_FE_BENCH_B489_V1)
         // Captain-confirmed B489 reference wiring, 13 October 2026.
         // The four LED DINs match RPL; its microphone pin map does not.
         // Main RPL keeps DATA=8 / CLK=9 even when the shared WS2816 packer is on.
@@ -527,7 +528,13 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #ifdef K1_MIC_IM69D_PDM_V1
       // IM69D130 dual-mic paths. SELECT is static hardware truth and is never
       // driven by firmware in either profile.
-      #ifndef K1_UNIT2_IM69D_V1
+      #if defined(K1_IM69D_WIREDIAG_SWAP_V1) && !defined(K1_UNIT2_IM69D_V1)
+      // NON-SHIPPABLE wiring diagnostic (FE FW lead, 2026-11-03): tests whether
+      // the bench loom has CLK and DATA crossed. Only k1_bench_im69d_wirediag_swap.
+      #define K1_PDM_CLK_PIN 13
+      #define K1_PDM_DIN_PIN 14
+      #define K1_IM69_PDM_SEL_PIN 12
+      #elif !defined(K1_UNIT2_IM69D_V1)
       // IM69D130 dual-mic PCB3 on SPH pads (bench eval, 2026-08-05).
       // CLK=GPIO14 / DATA=GPIO13. SELECT is hard-strapped on-board (IM1 HIGH /
       // IM2 LOW) — firmware does NOT drive GPIO12 as LR. Escape-hatch pin only.

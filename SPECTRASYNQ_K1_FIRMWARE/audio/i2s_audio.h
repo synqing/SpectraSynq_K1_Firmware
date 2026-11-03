@@ -379,6 +379,12 @@ void init_i2s() {
 #elif defined(K1_MIC_IM69D_SLOT_LEFT)
   USBSerial.println(" slot=LEFT");
 #endif
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): a floating DATA line reads
+  // +full scale with the pull-up; a mic actually driving it reads audio.
+  gpio_pullup_en((gpio_num_t)K1_PDM_DIN_PIN);
+  USBSerial.printf("[WIREDIAG] pdm clk=%d din=%d din_pullup=1\n", K1_PDM_CLK_PIN, K1_PDM_DIN_PIN);
+#endif
 #ifdef K1_MIC_IM69D_STEREO_V1
   k1_stereo_probe_init();  // PSRAM ring for the Stage 2 capture instrument
 #endif
