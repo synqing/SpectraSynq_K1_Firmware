@@ -302,6 +302,29 @@ void init_i2s() {
 #endif
   esp_err_t result;
 
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): before the PDM clock runs,
+  // a pin that follows the internal pull is floating; one that does not is held.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_reset_pin(wp);
+      gpio_set_direction(wp, GPIO_MODE_INPUT);
+      gpio_set_pull_mode(wp, GPIO_PULLUP_ONLY);
+      delay(5);
+      const int with_pu = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_PULLDOWN_ONLY);
+      delay(5);
+      const int with_pd = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_FLOATING);
+      USBSerial.printf("[WIREDIAG] static gpio=%d pullup_reads=%d pulldown_reads=%d -> %s\n",
+                       (int)wp, with_pu, with_pd,
+                       (with_pu == 1 && with_pd == 0) ? "FLOATING" : (with_pu ? "HELD_HIGH" : "HELD_LOW"));
+    }
+  }
+#endif
+
   // RX channel — mirror legacy dma_buf_count=2, dma_buf_len=SAMPLES_PER_CHUNK.
   i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT, I2S_ROLE_MASTER);
   chan_cfg.dma_desc_num  = K1_I2S_DMA_DESC_NUM;
@@ -447,6 +470,25 @@ void init_i2s() {
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // With the PDM clock running: count pad-level changes on CLK and DATA.
+  // A live clock and a talking mic both toggle; a dead line shows 0 changes.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_input_enable(wp);
+      int last = gpio_get_level(wp), changes = 0, ones = 0;
+      for (int n = 0; n < 20000; n++) {
+        const int v = gpio_get_level(wp);
+        changes += (v != last);
+        ones += v;
+        last = v;
+      }
+      USBSerial.printf("[WIREDIAG] live gpio=%d reads=20000 ones=%d changes=%d\n", (int)wp, ones, changes);
+    }
+  }
+#endif
 #endif
 #endif
 }
