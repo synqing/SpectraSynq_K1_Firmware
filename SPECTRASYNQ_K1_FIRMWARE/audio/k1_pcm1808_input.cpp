@@ -24,6 +24,14 @@
 #include "esp_task_wdt.h"
 #endif
 
+#if defined(K1_PDM_CLK_PIN) && defined(K1_PDM_DIN_PIN)
+// A PCM1808 pin on a mic pin compiles silently and kills both inputs.
+static_assert(K1_PCM1808_DIN_PIN != K1_PDM_CLK_PIN && K1_PCM1808_DIN_PIN != K1_PDM_DIN_PIN &&
+              K1_PCM1808_BCLK_PIN != K1_PDM_CLK_PIN && K1_PCM1808_BCLK_PIN != K1_PDM_DIN_PIN &&
+              K1_PCM1808_LRCK_PIN != K1_PDM_CLK_PIN && K1_PCM1808_LRCK_PIN != K1_PDM_DIN_PIN,
+              "PCM1808 pins must not share a GPIO with the PDM mic");
+#endif
+
 #ifndef DEFAULT_SAMPLE_RATE
 #define DEFAULT_SAMPLE_RATE 12800
 #endif

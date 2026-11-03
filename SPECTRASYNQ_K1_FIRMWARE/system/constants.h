@@ -528,7 +528,9 @@ static inline uint8_t k1_gdft_clamp_bin_hi_to_nyquist(uint8_t lo, uint8_t hi,
     #ifdef K1_MIC_IM69D_PDM_V1
       // IM69D130 dual-mic paths. SELECT is static hardware truth and is never
       // driven by firmware in either profile.
-      #if defined(K1_IM69D_WIREDIAG_SWAP_V1) && !defined(K1_UNIT2_IM69D_V1)
+      #if defined(K1_IM69D_WIREDIAG_SWAP_V1) && defined(K1_UNIT2_IM69D_V1)
+      #error "K1_IM69D_WIREDIAG_SWAP_V1 is for the B489 bench loom only, not Unit 2"
+      #elif defined(K1_IM69D_WIREDIAG_SWAP_V1) && !defined(K1_UNIT2_IM69D_V1)
       // NON-SHIPPABLE wiring diagnostic (FE FW lead, 2026-11-03): tests whether
       // the bench loom has CLK and DATA crossed. Only k1_bench_im69d_wirediag_swap.
       #define K1_PDM_CLK_PIN 13

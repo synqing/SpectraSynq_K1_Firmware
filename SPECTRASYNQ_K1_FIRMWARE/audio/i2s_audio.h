@@ -305,6 +305,8 @@ void init_i2s() {
 #ifdef K1_IM69D_WIREDIAG_PULLUP_V1
   // NON-SHIPPABLE wiring diagnostic (2026-11-03): before the PDM clock runs,
   // a pin that follows the internal pull is floating; one that does not is held.
+  // FLOATING is the normal result on both pins (unclocked mic data is hi-Z, the
+  // mic clock pin is an input). HELD_* on DATA, or 0 live changes, is the fault.
   {
     const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
     for (int wi = 0; wi < 2; wi++) {

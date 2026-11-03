@@ -405,3 +405,23 @@ def test_scap_dispatch_reaches_the_parse_command_ladder():
         "the gated hop must call k1_stereo_probe_dispatch — the table row alone "
         "does not dispatch"
     )
+
+
+def _envs_defining(flag):
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    sections = _env_sections(text)
+    return {
+        env_name for env_name in sections
+        if flag in _effective_defines(env_name, sections)
+    }
+
+
+def test_b489_bench_only_flags_stay_in_their_bench_envs():
+    """2026-11-03 B489 bench flags: pin-probe, CLK/DATA swap and the FE bench
+    pin map must never reach a shipping env (k1_fe, k1_main_rpl_im69d, ...)."""
+    assert _envs_defining("K1_IM69D_WIREDIAG_PULLUP_V1") == {
+        "k1_bench_im69d_wirediag_pullup",
+        "k1_bench_im69d_wirediag_swap",
+    }
+    assert _envs_defining("K1_IM69D_WIREDIAG_SWAP_V1") == {"k1_bench_im69d_wirediag_swap"}
+    assert _envs_defining("K1_FE_BENCH_B489_V1") == {"k1_fe_bench_b489"}
