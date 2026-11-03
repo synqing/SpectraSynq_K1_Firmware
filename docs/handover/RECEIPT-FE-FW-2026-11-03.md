@@ -1,5 +1,53 @@
 ---
-abstract: "FW lead receipt, 3 Nov 2026 AWST: K1 FE firmware release candidate fe-1.0.0-rc1 (env k1_fe) built, reviewed and tagged on lane/k1-fe-release; web-flasher FE bundle built and its customer mode checked in a browser; G5 bring-up sheet written. Nothing was flashed: no K1 was plugged into the Mac, so every on-device proof is still open."
+abstract: "FW lead receipt, 3 Nov 2026 AWST. Session 1 (06:40): fe-1.0.0-rc1 (env k1_fe) built, reviewed and tagged; web-flasher bundle checked in a browser; G5 bring-up sheet written; nothing flashed. Session 2 (20:30): on the bench K1 B489A500 the FE image (k1_fe_bench_b489) boots and behaves correctly on silicon; the bench microphone failure is proven to be wiring (DATA line held at 0 V), not firmware; line-in still unproven because the PCM1808 module is not wired. One wiring sitting for the Captain is drawn in b489-bench-wiring.png."
+---
+
+## Session 2 — bench proof on B489 (3 Nov 2026, 20:30 AWST)
+
+Brief: charter section "Session 2 brief". Commits `1517ca17`, `6d47d9a8` (both through the full commit gate: 1928 passed, `k1_hardware` SUCCESS) plus the docs commit with this section. Nothing pushed.
+
+### What happened, in plain English
+- **The FE firmware now runs on a real chip.** On the bench K1 it starts cleanly, every start-up step passes, the light show renders at about 150 frames a second and the audio loop runs at its normal 133 a second. It correctly sees there is no FE power chip on this board and leaves the FE power pins switched off. Asked for line-in, it refuses cleanly because no line-in board is wired yet.
+- **Why the bench mic "failed last time": it is the wiring, not the firmware.** The known-good bench build reads the same dead value (−30935, constant) as the October build. Both mic channels are dead. A direct pin check shows the clock wire works (it toggles), but the data wire (GPIO13) sits at 0 V even when the chip tries to pull it up, and never moves while the mics are clocked. On the mic board's 6-pin plug, the data pin (5) sits between two ground pins (4 and 6), and pin 4 used to be a signal on the older map. So the data wire is on a ground pin, or the mic board is not getting 3.3 V. The same dead value was already on the board before any flash in October.
+- **Line-in is not proven yet.** The PCM1808 board is not wired. The exact five wires are drawn in the picture below.
+- The board is left running the FE bench image, so the next session only has to capture.
+
+![B489 bench wiring](../forensics/runtime-evidence/20261103-fe-bench-b489/b489-bench-wiring.png)
+
+### Steps and evidence (all in `docs/forensics/runtime-evidence/20261103-fe-bench-b489/`)
+| # | Step | Result | File |
+|---|---|---|---|
+| 0 | Identify chip before any write | esptool: ESP32-S3, MAC `b4:3a:45:a5:89:b4` = `B489A500`, `/dev/cu.usbmodem101` | `flashlog_*.txt` (guard re-checks before and after every flash) |
+| 1 | Read what was running | `f3ee66e8` `k1_b489_ws2816_reference_capture`; mic `raw_min=raw_max=-30935` | `01_before_f3ee66e8_reference_capture.txt` |
+| 2 | Flash known-good `k1_bench_im69d` (brief step 1) | `IDENTITY OK git=c2928534`; `I2S PDM RX INIT: PASS slot=RIGHT`; `cal_source=persisted_profile cal_valid=1 SSL=179`; `raw_i16_rms=30935.0` constant | `02_k1_bench_im69d_known_good.txt` |
+| 3 | Stereo read of both mic slots (`k1_bench_im69d_stereo`, 2 s capture, CRC checked) | RIGHT and LEFT both one value, −30935, stdev 0 | `03_…`, `scap_analysis.txt` |
+| 4 | Internal pull-up on DATA (`k1_bench_im69d_wirediag_pullup`) | still −30935 on both slots | `04_…` |
+| 5 | CLK/DATA swapped (`…_wirediag_swap`) | still −30935: crossed wires ruled out | `05_…` |
+| 6 | Direct pin levels (`…_wirediag_pullup` @ `6d47d9a8`) | `gpio=14 pullup_reads=1 pulldown_reads=0 -> FLOATING`, `gpio=13 pullup_reads=0 pulldown_reads=0 -> HELD_LOW`; clock running: `gpio=14 ones=10006 changes=13114`, `gpio=13 ones=0 changes=0` | `06_wirediag_pin_levels_boot.txt` |
+| 7 | Flash FE image `k1_fe_bench_b489` (brief step 2) | `IDENTITY OK git=6d47d9a8 env=k1_fe_bench_b489`; all INIT PASS; `[FEBOARD] stusb4500=absent … outputs=passive`; `[PCMCLK] gate=FAIL reason=NO_CLOCK`; `:audio_src=line` → `UNAVAILABLE … staying on mic`; SYSTEM_FPS 133.1, LED_FPS 149.6; `firmware.bin` SHA-256 `55c720d1…09ac` (753 216 B) | `07_k1_fe_bench_b489_boot_and_commands.txt` |
+| 8 | Registry | §1 permitted envs and §2 deployed state updated; changelog line added | `docs/hardware/device-build-registry.md` |
+
+Capture scripts used (kept with the evidence): `ser.py` (no-reset capture), `bootcap.py` (reset-and-capture), `scap.py` (stereo dump decoder, CRC-checked), `usb_reset.py` (USB re-enumeration, below).
+
+### New envs (non-shippable, B489A500 allowlist only; shipping envs untouched)
+- `k1_fe_bench_b489` = `k1_fe` + `-DK1_FE_BENCH_B489_V1` (mic CLK14/DATA13 in `constants.h`) + PCM1808 pins DOUT10/BCK11/LRCK9 as build flags. Same AP/VP maths as `k1_fe`. Builds: RAM 44.1 %, flash 11.5 %.
+- `k1_bench_im69d_wirediag_pullup` / `_swap`: stereo build + pin-level readout (and pin swap). Code under `K1_IM69D_WIREDIAG_*_V1` only.
+- `tests/test_im69d_env_static.py` now allows the stereo flag in the stereo probe and these two diagnostics; it still fails if any other env carries it.
+
+### Incident (my method, recovered)
+- After the first pull-up flash, my capture script's port open reset the chip and the Mac's USB link to it wedged: the port stayed listed but nothing answered, and the next flash failed (`No serial data received`). The chip was fine. A software USB re-enumeration (`usb_reset.py`, libusb reset of VID 0x303A / PID 0x1001) brought it back with no physical action; esptool then read the MAC and the flash was repeated. The failed attempt's log was overwritten by the successful retry.
+
+### Could NOT be proven this session (named, not claimed)
+- **Line-in on silicon (PCM1808 classifier PASS):** the module is not wired. Needs the five wires in the picture.
+- **Mic path CAL/RMS in range on the FE image:** blocked by the bench mic wiring fault. Needs the mic DATA wire fixed.
+- **Web flasher flashing a K1 in ≤3 clicks:** not attempted. The page has only the `k1_fe` variant, which is not allowed on B489 (wrong pin map), and driving the Captain's real Chrome is blocked by the desktop-driving rule; headless Chromium cannot pick a Web Serial port. This needs an FE board (G5) or the Main RPL.
+- **G5 items** (LED_ENABLE/POWER_PERMIT, LED_PG, jack detect, STUSB4500 NVM write, heartbeat, FE line-in trim): unchanged, need an FE board.
+
+### Next session (agent, after the Captain's wiring sitting)
+1. Identify the chip (`read_mac`), then `bootcap.py` a reset boot of the running `k1_fe_bench_b489`: expect `[PCMCLK] mode=48K_MASTER_I2S24 gate=PASS` and `[PCM1808] init=PASS i2s=1 pins=10,11,9`.
+2. Quiet room, no music: `[AP]` `raw_i16_rms` must move off 30935 into the Main RPL quiet range (6.9–20.9) and rise on a clap. Do not run any calibration.
+3. Music into the jack, `:audio_src=line`, `:fe_status` twice: `source=line`, `[PCMCAN] rms>0` following the music, `[PCMOVF] ovf=0`. Save all three captures beside this session's.
+
 ---
 
 # Receipt — FW lead, K1 FE firmware release (3 Nov 2026, 06:40 AWST)
@@ -79,16 +127,21 @@ Fresh-context verifier subagent. It built from `git archive` exports in /tmp and
 - `tools/webflash/manifest.json` (git-ignored) was overwritten by the FE run. It was restored from the tracked `dist/webflash-deploy/manifest.json` (git `8ed45e9c`, three homes); all 12 image MD5s match the copies in `tools/webflash/firmware/`.
 - No device was flashed, so `device-build-registry.md` §2 is unchanged.
 
-## Needs Captain
-1. **Plug the Main RPL bench K1 (chip `9087A500`, the unit with the PCM1808 line-in module) into this Mac with USB-C.** Physical action only; the agent does the rest. With it attached, the next FW session flashes `fe-1.0.0-rc1` with `bash scripts/agent/k1-flash-verified.sh k1_fe --port <port>`, captures the classifier, mic and line-in lines to `docs/forensics/runtime-evidence/<date>-fe-rc1/`, and drives the web flasher in Chrome by computer use. The Main RPL product restore afterwards is `k1_main_rpl_im69d`.
+## Needs Captain (as of session 2, one wiring sitting; follow `b489-bench-wiring.png`)
+Bench K1 B489 stays plugged into the Mac by USB. Unplug USB while moving wires, plug it back after.
+1. **Mic plug:** the wire from GPIO13 (left header, pin 19 from the top) must sit on the mic board's plug **pin 5**, counting from pin 1 (3.3 V in). Not pin 4 or pin 6: those are ground. Pin 1 of the plug must go to 3V3 (left header pin 1).
+2. **Line-in board, five wires:** VCC/5V → left header pin 21 (5V) · GND → pin 22 (G) · BCK → pin 17 (GPIO11) · LRCK → pin 15 (GPIO9) · DOUT → pin 16 (GPIO10). Leave SCK/MCLK empty. Pad OP2 bridged, OP1 and OP3 open.
+3. Plug a music source into the line-in board's 3.5 mm jack (no music playing until the agent says).
+Superseded: session 1's "plug in the Main RPL" is no longer needed for the line-in and mic proof; the bench board covers it.
 
 ## Ship path (what "shipped" means for this firmware)
 1. Already in source: `fe-1.0.0-rc1` on `lane/k1-fe-release` (local tag, not pushed).
-2. Remaining: (a) bench proof on Main RPL once it is plugged in (FW lead); (b) Ops decisions 1–2 above (Operations Manager); (c) G5: flash each FE board, register its MAC, run the three checks in `FE-BRINGUP.md`, set the line-in trim, fix anything found (FW lead with the HW/Build leads); (d) merge to main on host gates and push the branch and tag (Operations Manager's call; nothing has been pushed).
-3. Who acts: the Captain only for the plug-in in "Needs Captain"; everything else is agent work.
+2. Remaining: (a) bench line-in and mic proof on B489 once the Captain's wiring sitting is done; the FE image is already on it and boots clean (FW lead, session 2 result); (b) Ops decisions 1–2 above (Operations Manager); (c) G5: flash each FE board, register its MAC, run the three checks in `FE-BRINGUP.md`, set the line-in trim, fix anything found (FW lead with the HW/Build leads); (d) merge to main on host gates and push the branch and tag (Operations Manager's call; nothing has been pushed).
+3. Who acts: the Captain only for the wiring sitting in "Needs Captain"; everything else is agent work.
 4. Shipped = an FE board running a tagged `fe-1.0.0` (no `-rc`) whose `:build` reports that tag, with all three checks in `FE-BRINGUP.md` passing and recorded in the device registry.
 
 ---
 | Date | Author | Change |
 |------|--------|--------|
 | 2026-11-03 | agent:claude (FW lead) | Created. |
+| 2026-11-03 | agent:claude (FW lead) | Session 2: B489 bench proof section, Needs Captain replaced by the one wiring sitting, ship path step (a) updated. |
