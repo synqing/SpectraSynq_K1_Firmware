@@ -43,8 +43,13 @@ Capture scripts used (kept with the evidence): `ser.py` (no-reset capture), `boo
 - **Web flasher flashing a K1 in ≤3 clicks:** not attempted. The page has only the `k1_fe` variant, which is not allowed on B489 (wrong pin map), and driving the Captain's real Chrome is blocked by the desktop-driving rule; headless Chromium cannot pick a Web Serial port. This needs an FE board (G5) or the Main RPL.
 - **G5 items** (LED_ENABLE/POWER_PERMIT, LED_PG, jack detect, STUSB4500 NVM write, heartbeat, FE line-in trim): unchanged, need an FE board.
 
+### Independent review and verification (after the bench work)
+- **Verifier** (fresh context, read-only): all 9 claims PASS against the raw files, including a re-run of the stereo decoder with CRC checks. It found three wording faults in this receipt; all three were corrected in `70330d72`.
+- **Reviewer** (fresh context, read-only): no blocking defects; shipping envs unaffected, no pin clashes on the bench loom, the diagnostic does not break the I2S pin routing. Five gaps, all fixed in `1ad4104f` (gate: 1929 passed, `k1_hardware` SUCCESS): exact-set test keeping the three bench flags out of shipping envs; compile-time check that PCM1808 pins never share a mic pin; no FE release tag on the bench image; bench env ports default to B489's port, not the Main RPL's; `#error` if the swap flag meets Unit 2; comment that a static FLOATING reading is normal. All six envs that compile the line-in code (`k1_fe`, `k1_fe_bench_b489`, three `k1_main_rpl_pcm1808_*` probes, the swap diagnostic) build clean.
+- **`1ad4104f` is NOT on the board.** At about 20:44 AWST, B489 left the USB bus completely (no `/dev/cu.usbmodem*`, no Espressif USB device in `ioreg`, for over 30 s). The upload guard refused before writing (`not currently enumerated`), so the board still holds `k1_fe_bench_b489` @ `6d47d9a8` as the registry says. The only image change is the tag stamp and a compile-time check; behaviour is identical. Next session: flash `1ad4104f` first.
+
 ### Next session (agent, after the Captain's wiring sitting)
-1. Identify the chip (`read_mac`), then `bootcap.py` a reset boot of the running `k1_fe_bench_b489`: expect `[PCMCLK] mode=48K_MASTER_I2S24 gate=PASS` and `[PCM1808] init=PASS i2s=1 pins=10,11,9`.
+1. Identify the chip (`read_mac`), flash `k1_fe_bench_b489` at `1ad4104f` or later (`bash scripts/agent/k1-flash-verified.sh k1_fe_bench_b489 --port <verified port>`), update the registry, then `bootcap.py` a reset boot: expect `[PCMCLK] mode=48K_MASTER_I2S24 gate=PASS` and `[PCM1808] init=PASS i2s=1 pins=10,11,9`.
 2. Quiet room, no music: `[AP]` `raw_i16_rms` must move off 30935 into the Main RPL quiet range (6.9–20.9) and rise on a clap. Do not run any calibration.
 3. Music into the jack, `:audio_src=line`, `:fe_status` twice: `source=line`, `[PCMCAN] rms>0` following the music, `[PCMOVF] ovf=0`. Save all three captures beside this session's.
 
@@ -146,3 +151,4 @@ Superseded: session 1's "plug in the Main RPL" is no longer needed for the line-
 | 2026-11-03 | agent:claude (FW lead) | Created. |
 | 2026-11-03 | agent:claude (FW lead) | Session 2: B489 bench proof section, Needs Captain replaced by the one wiring sitting, ship path step (a) updated. |
 | 2026-11-03 | agent:claude (FW lead) | Session 2 corrections from the independent verifier: stale session-1 registry line marked, October claim cited to the debrief, wiring cause labelled as inference. |
+| 2026-11-03 | agent:claude (FW lead) | Reviewer's five gaps fixed (`1ad4104f`); B489 left USB before the reflash, recorded. |
