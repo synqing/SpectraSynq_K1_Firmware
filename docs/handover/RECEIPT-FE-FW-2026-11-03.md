@@ -8,7 +8,7 @@ Brief: charter section "Session 2 brief". Commits `1517ca17`, `6d47d9a8` (both t
 
 ### What happened, in plain English
 - **The FE firmware now runs on a real chip.** On the bench K1 it starts cleanly, every start-up step passes, the light show renders at about 150 frames a second and the audio loop runs at its normal 133 a second. It correctly sees there is no FE power chip on this board and leaves the FE power pins switched off. Asked for line-in, it refuses cleanly because no line-in board is wired yet.
-- **Why the bench mic "failed last time": it is the wiring, not the firmware.** The known-good bench build reads the same dead value (−30935, constant) as the October build. Both mic channels are dead. A direct pin check shows the clock wire works (it toggles), but the data wire (GPIO13) sits at 0 V even when the chip tries to pull it up, and never moves while the mics are clocked. On the mic board's 6-pin plug, the data pin (5) sits between two ground pins (4 and 6), and pin 4 used to be a signal on the older map. So the data wire is on a ground pin, or the mic board is not getting 3.3 V. The same dead value was already on the board before any flash in October.
+- **Why the bench mic "failed last time": it is the wiring, not the firmware.** The known-good bench build reads the same dead value (−30935, constant) as the October build. Both mic channels are dead. A direct pin check shows the clock wire works (it toggles), but the data wire (GPIO13) sits at 0 V even when the chip tries to pull it up, and never moves while the mics are clocked. On the mic board's 6-pin plug, the data pin (5) sits between two ground pins (4 and 6), and pin 4 used to be a signal on the older map. Measured: GPIO13 is held low and never toggles. Inferred from the mic board's documented plug map (`docs/hardware/im69d130-board-wiring-from-eda-2026-08-05.md`), not measured on the board: the data wire is on a ground pin, or the mic board is not getting 3.3 V. The same dead value is on the image running since 14 Oct, and the October debrief (`DEBRIEF_2026-10-14_B489_REFERENCE_CONTINUATION.md` §9) records it on the earlier image `eff9bf47` too.
 - **Line-in is not proven yet.** The PCM1808 board is not wired. The exact five wires are drawn in the picture below.
 - The board is left running the FE bench image, so the next session only has to capture.
 
@@ -125,7 +125,7 @@ Fresh-context verifier subagent. It built from `git archive` exports in /tmp and
 ## Workspace state left behind
 - The checkout is on `lane/k1-fe-release`. Another lane's uncommitted work was found in the tree: mode-32 `wfhyb_sat_ema` edits, position-smooth probe envs, 22 deleted capture/deploy files, and a skill file. It was set aside only for the commits and release builds, then restored byte-for-byte (`cmp` against `_scratch/fe-rc1/foreign-backup/`). It is still uncommitted in the working tree. `lane/k1-tempo-lock-r1` is unchanged at `59757c62`.
 - `tools/webflash/manifest.json` (git-ignored) was overwritten by the FE run. It was restored from the tracked `dist/webflash-deploy/manifest.json` (git `8ed45e9c`, three homes); all 12 image MD5s match the copies in `tools/webflash/firmware/`.
-- No device was flashed, so `device-build-registry.md` §2 is unchanged.
+- Session 1: no device was flashed, so `device-build-registry.md` §2 was unchanged then. (Session 2 flashed B489 six times and updated §2; see above.)
 
 ## Needs Captain (as of session 2, one wiring sitting; follow `b489-bench-wiring.png`)
 Bench K1 B489 stays plugged into the Mac by USB. Unplug USB while moving wires, plug it back after.
@@ -145,3 +145,4 @@ Superseded: session 1's "plug in the Main RPL" is no longer needed for the line-
 |------|--------|--------|
 | 2026-11-03 | agent:claude (FW lead) | Created. |
 | 2026-11-03 | agent:claude (FW lead) | Session 2: B489 bench proof section, Needs Captain replaced by the one wiring sitting, ship path step (a) updated. |
+| 2026-11-03 | agent:claude (FW lead) | Session 2 corrections from the independent verifier: stale session-1 registry line marked, October claim cited to the debrief, wiring cause labelled as inference. |
