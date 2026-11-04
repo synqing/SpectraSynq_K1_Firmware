@@ -2628,9 +2628,9 @@ void cmd_stop() {
 #if FEATURE_MABUTRACE
 void cmd_trace_dump() {
   USBSerial.println("[TRACE] Flushing trace buffer...");
-  K1_TRACE_DUMP_JSON(USBSerial);
+  const bool ok = K1_TRACE_DUMP_JSON(USBSerial);
   USBSerial.println();
-  USBSerial.println("[TRACE] Done.");
+  USBSerial.println(ok ? "[TRACE] Done." : "[TRACE] Export failed.");
 }
 #endif
 void cmd_fps() {

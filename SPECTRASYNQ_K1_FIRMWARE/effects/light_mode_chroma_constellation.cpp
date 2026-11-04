@@ -132,7 +132,7 @@ void light_mode_chroma_constellation(CRGB16* leds_prev_buffer, ChannelEffectStat
   if (!hard_gate) {
     const SQ15x16 transport_alpha =
         SQ15x16(presence_ok ? CC_TRANSPORT_ALPHA : CC_QUIET_ALPHA);
-    draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
+    draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
                 drift, transport_alpha);
   }
 

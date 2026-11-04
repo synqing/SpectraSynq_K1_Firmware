@@ -53,7 +53,7 @@ void light_mode_ember(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   //    a touch faster when loud. Constant persistence (no holding).
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   const float drift = EMBER_DRIFT_BASE * (EMBER_DRIFT_FLOOR + EMBER_DRIFT_SURGE * energy) * (float(NATIVE_RESOLUTION) / 128.0f);
-  draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(EMBER_ALPHA));
+  draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(EMBER_ALPHA));
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
   // 2. Inject the ember bloom: its REACH (extent from centre) and brightness swell

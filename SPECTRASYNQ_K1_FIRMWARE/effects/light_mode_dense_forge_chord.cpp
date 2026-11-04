@@ -191,7 +191,7 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   if (!hard_gate) {
     const SQ15x16 transport_alpha =
         SQ15x16(presence_ok ? DFORGE_TRANSPORT_ALPHA : DFORGE_QUIET_ALPHA);
-    draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
+    draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
                 transport_drift, transport_alpha);
   }
 

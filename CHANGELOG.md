@@ -8,6 +8,11 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Fixed — 2026-11-05
 
+- Avoid discarded lower-half sprite calculations in nine centre-authoritative
+  effects, preserving their retained arithmetic and transport boundary.
+- Diagnostic trace export retries short writes and reports stalled exports as
+  failures. Separate channel dispatch spans include history seeding and bound
+  effect work without treating the larger colour-processing span as effect code.
 - Re-prime the V2 onset spectrum on return from exact digital quiet, preventing
   the boundary jump from inflating its adaptive threshold and suppressing later
   attacks. Continuous programme and detector thresholds are unchanged.

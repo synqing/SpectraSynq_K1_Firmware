@@ -2673,6 +2673,56 @@ inline void draw_sprite(CRGB16 dest[], CRGB16 sprite[], uint32_t dest_length, ui
   }
 }
 
+// Upper-half transport for the nine effects that discard the lower half before
+// reading it. Contract: separate 160-pixel source and destination buffers; this
+// does not clear the lower half. Keep their existing clear/discard operations.
+// Source pixel 79 may still contribute to destination 80; preserve the original
+// iteration, fixed-point arithmetic and accumulation order exactly.
+inline void draw_sprite_upper(CRGB16 dest[], CRGB16 sprite[], uint32_t dest_length, uint32_t sprite_length, float position, SQ15x16 alpha) {
+  int32_t position_whole = position;  // Downcast to integer accuracy
+  float position_fract = position - position_whole;
+  SQ15x16 mix_right = position_fract;
+  SQ15x16 mix_left = 1.0 - mix_right;
+
+  for (uint16_t i = 0; i < sprite_length; i++) {
+    int32_t pos_left = i + position_whole;
+    int32_t pos_right = i + position_whole + 1;
+
+    bool skip_left = false;
+    bool skip_right = false;
+
+    if (pos_left < 0) {
+      pos_left = 0;
+      skip_left = true;
+    }
+    if (pos_left > dest_length - 1) {
+      pos_left = dest_length - 1;
+      skip_left = true;
+    }
+
+    if (pos_right < 0) {
+      pos_right = 0;
+      skip_right = true;
+    }
+    if (pos_right > dest_length - 1) {
+      pos_right = dest_length - 1;
+      skip_right = true;
+    }
+
+    if (skip_left == false && pos_left >= 80) {
+      dest[pos_left].r += sprite[i].r * mix_left * alpha;
+      dest[pos_left].g += sprite[i].g * mix_left * alpha;
+      dest[pos_left].b += sprite[i].b * mix_left * alpha;
+    }
+
+    if (skip_right == false && pos_right >= 80) {
+      dest[pos_right].r += sprite[i].r * mix_right * alpha;
+      dest[pos_right].g += sprite[i].g * mix_right * alpha;
+      dest[pos_right].b += sprite[i].b * mix_right * alpha;
+    }
+  }
+}
+
 inline CRGB16 force_saturation_16(CRGB16 rgb, SQ15x16 saturation) {
   // Convert RGB to HSV
   SQ15x16 max_val = fmax_fixed(rgb.r, fmax_fixed(rgb.g, rgb.b));

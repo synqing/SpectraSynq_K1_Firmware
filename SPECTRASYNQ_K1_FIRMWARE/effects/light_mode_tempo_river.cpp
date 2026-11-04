@@ -107,7 +107,7 @@ void light_mode_tempo_river(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   // 1. Flow the previous river OUTWARD by the tempo-locked drift, with decay.
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
-  draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
+  draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
               drift, SQ15x16(TR_TRAIL_ALPHA));
 
   // Keep the river in the upper (mirror-authoritative) half; clear cross-centre bleed.

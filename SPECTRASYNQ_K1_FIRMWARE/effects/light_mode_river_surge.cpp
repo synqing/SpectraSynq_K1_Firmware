@@ -174,7 +174,7 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   const float drift = RSURGE_DRIFT_BASE * (RSURGE_DRIFT_FLOOR + RSURGE_DRIFT_SURGE * tide) * m * (float(NATIVE_RESOLUTION) / 128.0f);
 
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
-  draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(RSURGE_ALPHA));
+  draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(RSURGE_ALPHA));
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
   // 2. Inject the live spectrum (identical to SR v2: bin k -> pixel HALF+k,

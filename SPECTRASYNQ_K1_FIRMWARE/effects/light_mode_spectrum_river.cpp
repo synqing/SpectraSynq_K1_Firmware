@@ -40,7 +40,7 @@ void light_mode_spectrum_river(CRGB16* leds_prev_buffer) {
   // 1. Flow: transport the previous river OUTWARD (toward the +end) with decay.
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   const float drift = RIVER_DRIFT_BASE * (float(NATIVE_RESOLUTION) / 128.0f);
-  draw_sprite(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
+  draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
               drift, SQ15x16(RIVER_TRAIL_ALPHA));
 
   // Keep the river in the upper half only (the mirror-authoritative half); clear

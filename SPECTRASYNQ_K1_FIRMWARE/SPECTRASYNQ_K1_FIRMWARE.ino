@@ -424,6 +424,9 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
 // dispatch_legacy_lightshow() so the K1 effect-framework adapter can reuse the
 // identical code path (see effects/framework/LegacyEffectAdapter).
 void render_lightshow_for_channel(uint8_t mode, RenderChannelState& channel) {
+  // Static labels survive the buffered export; release builds compile this out.
+  K1_TRACE_SCOPE(channel.seed_history_before_render
+                     ? "vp_secondary_effect_body" : "vp_primary_effect_body");
   bool history_seeded = false;
   if (channel.seed_history_before_render) {
     {
