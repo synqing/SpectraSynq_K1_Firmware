@@ -424,4 +424,8 @@ def test_b489_bench_only_flags_stay_in_their_bench_envs():
         "k1_bench_im69d_wirediag_swap",
     }
     assert _envs_defining("K1_IM69D_WIREDIAG_SWAP_V1") == {"k1_bench_im69d_wirediag_swap"}
-    assert _envs_defining("K1_FE_BENCH_B489_V1") == {"k1_fe_bench_b489"}
+    assert _envs_defining("K1_FE_BENCH_B489_V1") == {
+        "k1_fe_bench_b489",
+        "k1_fe_bench_b489_perf_probe",
+        "k1_fe_bench_b489_scalar_probe",
+    }
