@@ -38,7 +38,8 @@ class K1UploadGuardTest(unittest.TestCase):
         ]
 
     def test_fe_performance_probes_are_b489_only(self):
-        for env in ("k1_fe_bench_b489_perf_probe", "k1_fe_bench_b489_scalar_probe"):
+        for env in ("k1_fe_bench_b489_perf_probe", "k1_fe_bench_b489_scalar_probe",
+                    "k1_fe_bench_b489_trace_dev"):
             ok, message = self.guard.validate_upload_target(
                 env, "/dev/cu.usbmodem12201", self.ports)
             self.assertTrue(ok, message)
