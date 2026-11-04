@@ -19,14 +19,44 @@
 
 #include "k1_audio_snapshot.h"
 
+// Confidence bands (lane R1, rule R1 "no pulse beats a confident wrong pulse"; constants in k1_tempo_spec.h):
+//   confidence <  K1_CONF_BAND_TENTATIVE (0.30)              NONE      effects use the reactive layer only
+//   K1_CONF_BAND_TENTATIVE <= confidence < K1_LOCK_CONFIDENCE TENTATIVE phase usable for cross-fades; no ticks
+//   confidence >= K1_LOCK_CONFIDENCE (0.60)                   LOCKED    validated tempo; beat ticks
+// Under K1_TEMPO_LOCK_OFF_V1 (rule 3.3: no confidence term has a held-out AUC >= 0.8 receipt) the LOCKED
+// band is never published: `locked` and `beat_tick` stay false, confidence is capped below 0.60, and the
+// K1_TEMPO_VETO_NO_VALIDATED_LOCK bit names the gate on every emit.
 struct K1TempoEvent {
   float bpm;            // detected tempo (BPM); winner bin centre
   float phase01;        // beat phase in [0,1); 0 == beat instant
-  float confidence;     // [0,1]; how dominant the winning tempo is
+  float confidence;     // [0,1]; how dominant the winning tempo is (bands above)
   bool  beat_tick;      // true for one update at the beat instant
   bool  locked;         // confidence above lock threshold and not silent
   float beat_strength;  // smoothed magnitude of the winning bin
 };
+
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+// Lane R1 (DEF-001, invariant I1): every gate that can clear a published decision (locked,
+// beat_tick, confidence) sets one of these bits, so no decision is hidden silently.
+// K1TempoEvent is unchanged (rule R5); the veto travels in K1TempoGate and the debug snapshot.
+enum K1TempoVeto : uint8_t {
+  K1_TEMPO_VETO_NONE = 0,
+  K1_TEMPO_VETO_PRODUCER_SILENCE = 1u << 0,    // audio.silence (the producer owns silence, I9)
+  K1_TEMPO_VETO_WARMUP = 1u << 1,              // history not yet full (CONF_V2 warm-up)
+  K1_TEMPO_VETO_CONF_BELOW_ENTER = 1u << 2,    // unlocked and conf_ema < K1_LOCK_CONFIDENCE
+  K1_TEMPO_VETO_CONF_BELOW_RELEASE = 1u << 3,  // lock released this emit: conf_ema < K1_CONF_V2_REL
+  K1_TEMPO_VETO_WATCHDOG = 1u << 4,            // lock released this emit by the sub-floor watchdog
+  K1_TEMPO_VETO_BEATS_SEEN_LT_2 = 1u << 5,     // fewer than two observed beats since reset
+  K1_TEMPO_VETO_NO_RHYTHM_EVIDENCE = 1u << 6,  // no broadband onsets in the recent window (spectral presence)
+  K1_TEMPO_VETO_NO_VALIDATED_LOCK = 1u << 7,   // rule 3.3 (K1_TEMPO_LOCK_OFF_V1): lock and ticks withheld
+};
+struct K1TempoGate {
+  uint8_t veto;              // K1TempoVeto bits of the last emit
+  uint8_t internal_locked;   // the tracker's own lock decision (k1_locked_v2) before output gates
+  uint8_t producer_silence;  // audio.silence latched for the last emit
+};
+K1TempoGate k1_tempo_gate_read();  // Core-0 (producer) side only, like k1_tempo_update
+#endif
 
 void k1_tempo_init();                              // compute Goertzel coeffs, clear state
 void k1_tempo_update(const K1AudioSnapshot& audio);// call once per AP frame (Core-0)
@@ -105,9 +135,15 @@ struct K1TempoDebugSnapshot {
   uint32_t phase_elapsed_us;
   uint32_t publish_elapsed_us;
   uint32_t emit_elapsed_us;
+#ifdef K1_TEMPO_SPECTRAL_PRESENCE_V1
+  uint32_t presence_elapsed_us;  // per-frame presence cost summed over the emit window (lane R1, A7)
+#endif
   bool acf_spread_active;
   uint16_t acf_lag_cursor;
   uint32_t acf_publish_count;
+#ifdef K1_TEMPO_SILENCE_FROM_PRODUCER_V1
+  uint8_t veto;  // K1TempoVeto bits of the last emit (lane R1, I1)
+#endif
 };
 
 K1TempoDebugSnapshot k1_tempo_debug_read();

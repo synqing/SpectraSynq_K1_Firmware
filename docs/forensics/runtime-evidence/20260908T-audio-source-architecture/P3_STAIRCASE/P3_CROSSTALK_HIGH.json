@@ -1,0 +1,59 @@
+{
+  "mac": {
+    "output_volume": 100,
+    "route": "External Headphones"
+  },
+  "xtalk": {
+    "left": {
+      "PASS": true,
+      "fill": {
+        "ovf_delta_fill": 0,
+        "drop_delta_fill": 0,
+        "hw_fill": 2040,
+        "filled": 48000,
+        "target": 48000
+      },
+      "rms_slot0_RIGHT": 1893.470075648147,
+      "rms_slot1_LEFT": 681193.8331443969,
+      "pre": {
+        "rms_slot0": 970.3208076939039,
+        "rms_slot1": 976.0855630559495,
+        "peak_slot0": 2764,
+        "peak_slot1": 2711,
+        "frames": 19200,
+        "crc_ok": true,
+        "ovf": 0,
+        "ring_drop": 249720,
+        "ovf_delta_fill": 0,
+        "drop_delta_fill": 0,
+        "settle_tries": 1
+      }
+    },
+    "right": {
+      "PASS": true,
+      "fill": {
+        "ovf_delta_fill": 0,
+        "drop_delta_fill": 0,
+        "hw_fill": 2040,
+        "filled": 48000,
+        "target": 48000
+      },
+      "rms_slot0_RIGHT": 679078.6400022912,
+      "rms_slot1_LEFT": 1024.4778207701718,
+      "pre": {
+        "rms_slot0": 2804.740650304186,
+        "rms_slot1": 2821.0612612248133,
+        "peak_slot0": 9978,
+        "peak_slot1": 10021,
+        "frames": 19200,
+        "crc_ok": true,
+        "ovf": 0,
+        "ring_drop": 289500,
+        "ovf_delta_fill": 0,
+        "drop_delta_fill": 0,
+        "settle_tries": 1
+      }
+    }
+  },
+  "label": "END_TO_END_LINE_LANE_METRIC"
+}

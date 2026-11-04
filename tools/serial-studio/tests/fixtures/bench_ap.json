@@ -1,0 +1,49 @@
+{
+  "id": "bench_ap",
+  "schema_lock": "1.2",
+  "note": "Typical Bench [AP] line (firmware i2s_audio.h shape). Device fields only; lg_mode is not lightshow.",
+  "lines": [
+    "[AP] SSL=224 DC=-32767 max_raw=5000 follower=8000 peak_scaled=0.350 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=421 rms_raw=0.0123 pky=1.20 dim=0 cal_source=config cal_valid=1 cal_reason=none | bpm=128.0 conf=0.60 lock=1 phase=0.20 beat=0 bstr=0.30 | onset=1 bass=0 ostr=0.25 | k1_loud=0 input_trim=1.000 gdft_trim=0.800 agc_gain=0.072 agc_env=0.0100 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 1,
+      "host_parse_seq": 1,
+      "values": {
+        "bpm": 128.0,
+        "conf": 0.6,
+        "lock": 1,
+        "beat": 0,
+        "onset": 1,
+        "bass": 0,
+        "silence": 0,
+        "agc_gain": 0.072,
+        "peak_scaled": 0.35,
+        "ssl": 224,
+        "lightshow": 32,
+        "phase": 0.2,
+        "orbit_x": 0.1081559480312316,
+        "orbit_y": 0.3328697807033037
+      },
+      "written": [
+        "bpm",
+        "conf",
+        "lock",
+        "beat",
+        "onset",
+        "bass",
+        "silence",
+        "agc_gain",
+        "peak_scaled",
+        "ssl",
+        "lightshow",
+        "phase",
+        "orbit_x",
+        "orbit_y",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "clean": true,
+  "fill_ok": true,
+  "ovf_epoch": 0,
+  "ring_drop_epoch": 0,
+  "mic_err_epoch": 0,
+  "alignment": {
+    "ambiguous": false,
+    "ambiguity_note": "peak is well separated from sidelobes",
+    "lag_env_samples": 5.657038525322546,
+    "lag_ms": 5.657038525322546,
+    "lag_line_samples": 271.53784921548225,
+    "lag_mic_samples": 72.4100931241286,
+    "peak_correlation": 0.6767290580150582,
+    "peak_to_sidelobe": 1.6823727335934064,
+    "valid": true,
+    "env_hz": 1000,
+    "band_hz": [
+      120.0,
+      5000.0
+    ],
+    "reference": "LINE",
+    "note": "positive lag means MIC arrives later than LINE, which is the expected sign"
+  },
+  "drift": {
+    "valid": true,
+    "head_lag_ms": 5.503078290476738,
+    "tail_lag_ms": 5.817401071246065,
+    "delta_lag_ms": 0.3143227807693272,
+    "span_s": 2.8,
+    "drift_ppm": 112.25813598904543,
+    "head_peak": 0.6348310368348472,
+    "tail_peak": 0.7441201154876927,
+    "note": "ppm is the MIC clock domain relative to the LINE clock domain over the capture"
+  }
+}

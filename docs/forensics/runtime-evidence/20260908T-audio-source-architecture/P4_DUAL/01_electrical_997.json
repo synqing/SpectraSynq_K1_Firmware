@@ -1,0 +1,52 @@
+{
+  "name": "01_electrical_997",
+  "route": "External Headphones",
+  "volume": {
+    "output_volume": 56,
+    "route": "External Headphones"
+  },
+  "wav": "tools/pcm1808/fixtures/both_1khz_minus18db.wav",
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "filled": 96000,
+    "target": 96000,
+    "mic_err_epoch": 0,
+    "epoch_valid": 1,
+    "hop": {
+      "hop_n": 267,
+      "hop_mean": 5634,
+      "hop_p95": 6387,
+      "hop_p99": 7390,
+      "hop_max": 7680
+    }
+  },
+  "pcm_rms_slot0": 108153.23663469915,
+  "pcm_rms_slot1": 108564.0671406041,
+  "mic_rms": 14.868815678711604,
+  "decoded": {
+    "epoch_valid": true,
+    "fill_ok": true,
+    "ovf_epoch": 0,
+    "ring_drop_epoch": 0,
+    "mic_err_epoch": 0,
+    "dur_us": 2000103,
+    "pcm_frames": 96000,
+    "mic_samples": 25600,
+    "hop_n": 267,
+    "hop_mean": 5634,
+    "hop_p95": 6387,
+    "hop_p99": 7390,
+    "hop_max": 7680,
+    "cap_read_us": 1963755,
+    "mic_only": false,
+    "fixture": "electrical_997",
+    "ap_source": "im69d",
+    "slot0_physical": "RIGHT",
+    "slot1_physical": "LEFT",
+    "pcm_crc_ok": true,
+    "mic_crc_ok": true,
+    "hop_n_decoded": 267,
+    "clean": true
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "K1 visual pipeline",
+    "quality_profile": "standard",
+    "viewBox": [1100, 500]
+  },
+  "stages": [
+    { "label": "Intake" },
+    { "label": "Prepare" },
+    { "label": "Decide" },
+    { "label": "Paint" },
+    { "label": "Emit" }
+  ],
+  "nodes": [
+    { "id": "frame", "type": "messagebus", "label": "Audio frame", "sublabel": "Read-only, Core 1", "stage": 0, "row": 0, "tag": "from audio" },
+    { "id": "controls", "type": "external", "label": "Controls", "sublabel": "Knobs, serial, BLE", "stage": 0, "row": 2, "tag": "side input" },
+    { "id": "gates", "type": "backend", "label": "Frame gates", "sublabel": "Park, fade, queue", "stage": 1, "row": 0, "tag": "before paint" },
+    { "id": "smooth", "type": "backend", "label": "Smoothed spectrum", "sublabel": "Spectrum and chroma", "stage": 1, "row": 1, "tag": "from frame" },
+    { "id": "mode", "type": "backend", "label": "Mode choice", "sublabel": "Configured show", "stage": 2, "row": 2, "tag": "one mode" },
+    { "id": "primary", "type": "backend", "label": "Primary effect", "sublabel": "One lightshow", "stage": 3, "row": 0, "tag": "plate" },
+    { "id": "overlays", "type": "backend", "label": "Overlays", "sublabel": "Prism and crossfade", "stage": 3, "row": 1, "tag": "after effect" },
+    { "id": "secondary", "type": "backend", "label": "Second edge", "sublabel": "Second strip, on", "stage": 3, "row": 2, "tag": "boot enables" },
+    { "id": "post", "type": "backend", "label": "Colour post", "sublabel": "Brightness, quantise", "stage": 4, "row": 1, "tag": "before wire" },
+    { "id": "leds", "type": "external", "label": "LED send", "sublabel": "FastLED.show", "stage": 4, "row": 2, "tag": "ESP32 path" }
+  ],
+  "flows": [
+    { "from": "frame", "to": "gates", "label": "acquire", "variant": "emphasis" },
+    { "from": "gates", "to": "smooth", "label": "spectrum", "variant": "emphasis", "labelDy": 22 },
+    { "from": "controls", "to": "mode", "label": "settings", "variant": "emphasis" },
+    { "from": "gates", "to": "mode", "label": "scene", "variant": "default", "route": "vertical-channel", "channelX": 420 },
+    { "from": "mode", "to": "primary", "label": "one show", "variant": "emphasis", "route": "vertical-channel", "channelX": 640 },
+    { "from": "smooth", "to": "primary", "label": "bands", "variant": "emphasis", "route": "vertical-channel", "channelX": 668 },
+    { "from": "primary", "to": "overlays", "label": "buffer", "variant": "emphasis", "labelDy": 22 },
+    { "from": "overlays", "to": "secondary", "label": "second", "variant": "emphasis", "labelDy": 22 },
+    { "from": "secondary", "to": "post", "label": "clipped", "variant": "emphasis", "route": "vertical-channel", "channelX": 860 },
+    { "from": "post", "to": "leds", "label": "show", "variant": "emphasis", "labelDy": 22 }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "What Core 1 does",
+      "items": [
+        "Takes the audio frame, paints one configured show, then sends the LEDs",
+        "It can drop a frame. It does not block the audio core"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Build differences",
+      "items": [
+        "k1_hardware does not compile the effect framework. Edge mix is Main RPL and STM only",
+        "P4 has its own emitter. WS2816 pack is a Main RPL build, not the default show"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Not this plate",
+      "items": [
+        "Sweet-spot lamps are on the audio side. Traces and motion-lab builds are not production",
+        "Drop-cut, attack snap, and chord hue sit inside the show. An authored source can freeze the spectrum"
+      ]
+    }
+  ]
+}

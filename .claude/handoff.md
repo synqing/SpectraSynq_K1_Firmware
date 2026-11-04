@@ -1,26 +1,45 @@
+<!-- Current scoped Captain assignment,13October2026: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md on fix/b489-ws2816-reference-capture. Historical assignments below remain preserved. -->
+
 # ACTIVE LANE POINTER
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** pull Captain into LED/plate visual inspection. Use rtrace / LED-buffer dump (`/instrument-not-captain-eyes`). Occupancy and “what did we emit” close with a scored dump, not eyes-on.
 
 **STANDING ORDER (Captain 2026-08-22, HARD FAIL):** do **not** re-request approval after it is given or implied (`/no-reapprove-already-given`). Execute.
 
-**COLOUR LAB SHIPPED LANE (2026-08-28):** Production Preview R1.1 and the
-two-device no-flash programme passed. `COLOUR_LAB_WEB_UI_HARDWARE_PASS` is
-recorded in `tools/colourlab/VERIFICATION.md`. Main `9087A500` was left Paint
-off with slot 15 deliberately identity-saved; Bench `B489A500` was left Paint
-off with Tune unavailable. Product rtrace is unavailable, so wire truth is not
-claimed. The isolated Colour Lab integration is the merge authority; the
-unrelated USB-audio/Webflash ancestry of `lane/colourlab-bench` is excluded.
+**ACTIVE LANE (2026-09-08): PCM1808_ST25R3916B_BRINGUP** — branch `lane/pcm1808-st25r3916b-bringup`.
+Authority: **`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`**.
+Continuation evidence: **`docs/forensics/runtime-evidence/20260908T-audio-source-architecture/`**.
+Silicon: Main RPL `9087A500` / `k1_main_rpl_pcm1808_shadow` @ **`a08dc10e`**
+(epoch `1788847940`). IM69 remains the AP source; PCM I2S1 runs in shadow.
+P1/P2/P3 still hold. P4 instrument is on silicon: dump-after-freeze, `fill_ok`
+requires ovf=0 **and** ring-drop=0, dump refused while armed. Electrical AUX
+PASS. Acoustic/room path did not couple on this bench (MIC stayed at quiet
+floor on speakers, DELL, and Multi-Output). Alignment/drift not scored.
+Shadow AP cost +162 µs p99 vs MIC-only, still under 8 ms. NFC parked.
+Product restore still `k1_main_rpl_im69d` @ `acaecaa8`.
+Evidence: `docs/forensics/runtime-evidence/20260908T-audio-source-architecture/P4_DUAL/`.
+
+**P4 NOT CLOSED.** Next: a speaker the IM69 can hear on the same programme as
+the AUX cable, then jittered-transient lag/drift, then P5. Do not invent
+AudioSourceManager. Do not leak Mac volume 56 into firmware.
+
+Previous lane Colour Lab remains **ready_for_merge** on `lane/colourlab-bench`
+(`tools/colourlab/EXECUTION.md`). Do not merge it from this branch. Unrelated
+Colour Lab / BLE-iPhone dirty files travel with the working tree; do not commit
+them into this bring-up.
 
 **READ FIRST:**
 `docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md`
 
 **Dual-target (2026-08-21, not flash GO):** [ADR-0007](../docs/architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) — `env:k1_p4_wifi6` in this tree; P4-Nano donor-only. Does **not** displace the silicon stamps below.
 
-**Live devices verified 2026-08-28:** Main RPL `9087A500` is
-`k1_main_rpl_im69d @ acaecaa8`; Bench `B489A500` is
-`k1_bench_im69d_led150 @ f2014c29`. Both were left Paint off. No flash and no
-calibration command occurred in the Colour Lab verification programme.
+**Live lane (2026-08-25):** Main RPL `9087A500` is **`k1_main_rpl_im69d` @
+`b625e89a`** (`IDENTITY` epoch `1787591762`) after USB-audio diagnostic PASS
+and product restore. Probe `k1_usb_audio_mac_probe` @ `0136de67` is off
+silicon. No `K1_STM` second probe. **ADR-0008:** keep 12.8 kHz AP. B489
+`B489A500` on `/dev/cu.usbmodem11401` now **`k1_bench_im69d_led150` @
+`8ed45e9c`** (`IDENTITY` epoch `1787639868`, 150-px GPIO39/40). Not the Main
+RPL binary. G8 **CLOSED on bench**. F887 OFFSITE. No cal.
 
 **Occupancy (2026-08-22, KEEP packer + hsv paint + native music):** packed-wire dump
 `docs/forensics/runtime-evidence/20260822T-rtrace-occupancy-9087/RESULT.md`
@@ -61,10 +80,11 @@ Production honour is on `k1_hardware` as of `69e21140`. The other five
 colour-fix flags stay leak-blocked.
 
 **Main RPL = ON SILICON @ `b625e89a` / `k1_main_rpl_im69d`**
-(USB `B4:3A:45:A5:87:90`, `/dev/cu.usbmodem1401`).
-`IDENTITY OK: git=b625e89a env=k1_main_rpl_im69d epoch=1787400761`.
-Look library on. Native music occupancy KEEP. Cal inherited. Do
-**not** re-fire `start_noise_cal`. Prior stamp `c2738b88` / look-lib `38428a82`.
+(USB `B4:3A:45:A5:87:90`, Serial-JTAG `/dev/cu.usbmodem112401` after restore).
+`IDENTITY OK: git=b625e89a env=k1_main_rpl_im69d epoch=1787591762`.
+Look library on. Native music occupancy KEEP. Cal inherited SSL=157. Do
+**not** re-fire `start_noise_cal`. USB-audio diagnostic taken off after PASS.
+Prior product epoch `1787400761`. Prior stamp `c2738b88` / look-lib `38428a82`.
 F887 not touched. B489 later @ `69e21140` on `/dev/cu.usbmodem1101`.
 **LED-buffer rtrace PASS** closes the resolver
 (`docs/forensics/runtime-evidence/20260820T-palette-resolver-rtrace/RESULT.md`).

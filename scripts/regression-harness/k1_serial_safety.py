@@ -78,7 +78,7 @@ __all__ = [
 
 TYPED_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def"
 BARE_DEF_PATH = "SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_table.def"
-TYPED_DEF_BLOB_SHA = "49552843b2af399229b36482f53add4fc1e24b26"
+TYPED_DEF_BLOB_SHA = "1036d29e3cf36282d883f54b8caca09a952ad079"
 BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 # --------------------------------------------------------------------------
@@ -87,6 +87,7 @@ BARE_DEF_BLOB_SHA = "7d13ad05eed1af875563d9d46a5e8515ebe3aac5"
 
 #: Rows whose flags contain CMD_DISRUPTIVE — these reboot the device.
 DISRUPTIVE_COMMANDS = frozenset({
+    "audio_src",
     "bass_mode",
     "boot_animation",
     "bootloop_inject",
@@ -130,6 +131,7 @@ PERSISTING_COMMANDS = frozenset({
     "note_offset",
     "palette_index",
     "palette_mode",
+    "pd_nvm_write",
     "photons",
     "preset",
     "prism_count",
@@ -277,6 +279,7 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "edge_uniform",
     "edge_xform",
     "event_status",
+    "fe_status",
     "fps",
     "frame_dump",
     "gdft_agc_probe",
@@ -310,6 +313,13 @@ FLAG_CLEAN_COMMANDS = frozenset({
     "paint_stops",
     "paint_sv",
     "paint_target",
+    "pd_status",
+    "pcmraw_arm",
+    "pcmraw_dump",
+    "pcmraw_status",
+    "pcmpair_arm",
+    "pcmpair_dump",
+    "pcmpair_status",
     "reset_reason",
     "rtrace_arm",
     "rtrace_dump",

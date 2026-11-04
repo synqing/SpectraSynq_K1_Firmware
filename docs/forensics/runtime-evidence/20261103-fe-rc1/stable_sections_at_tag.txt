@@ -1,0 +1,9 @@
+# In-checkout builds at 6b313500 (fe-1.0.0-rc1). The git-hash string reaches .dram0.data/.iram0.text, so a build outside git (git=unknown) differs there; see docs/handover/RECEIPT-FE-FW-2026-11-03.md "Verifier".
+== k1_fe
+.dram0.data 5cb65c08a28230e6b15f6951ece72245795c9b2ed8913a1d6f8dff817385a3c8
+.iram0.text f92876a48397464ce8e9341dc722df95ce071130a23c9b326dcdd130f7acefa6
+.iram0.vectors c3134b1442f65ea930ca14362e411ab259c12a17013702bd866c28089a7ee992
+== k1_main_rpl_im69d
+.dram0.data 9b9e5aa51db6b5db6e19e50bba99f69e1a08ce327042a13634b7f2a1929c5413
+.iram0.text 13bd6ac7992c848b6c568f9cf8c2e34a952892394efdff52fa38670374ea6c89
+.iram0.vectors 0a38b8c1ab8819732367eb896cbe60a443dd71acd3f428d09345a709a9a37704

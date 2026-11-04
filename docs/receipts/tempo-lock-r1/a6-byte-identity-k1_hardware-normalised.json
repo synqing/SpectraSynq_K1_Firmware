@@ -1,0 +1,25 @@
+{
+ "gate": "a6-offflag-byte-identity-k1_hardware-path-hashed-libdir-names-normalised",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_bytecheck.py compare _scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-base-k1_hardware _scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-final-k1_hardware-libnames-as-base",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-base-k1_hardware/snapshot.json": "12e0c4a397db3ab8f441de28272076e919ba643d490f298e1cbf1990d26c9454",
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/a6-final-k1_hardware/snapshot.json": "4e91e043a024c347408ad4009996e879308be6fa26efdebd51c4053aadc7c445"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "objects compared=261 differing=0",
+  "elf alloc sections differing=0 []"
+ ],
+ "utc": "2026-10-21T16:35:22+00:00",
+ "git_sha": "b1f48bbc8ca53f88e509e64c9bfe228c0b1443ef",
+ "git_dirty_paths": [
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

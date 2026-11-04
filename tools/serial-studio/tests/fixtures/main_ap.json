@@ -1,0 +1,49 @@
+{
+  "id": "main_ap",
+  "schema_lock": "1.2",
+  "note": "Same [AP] shape if Main emits [AP]. Different device values from bench_ap. No invented Main-only fields.",
+  "lines": [
+    "[AP] SSL=421 DC=-12 max_raw=231 follower=400 peak_scaled=0.180 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=200 rms_raw=0.0080 pky=0.90 dim=0 cal_source=config cal_valid=1 cal_reason=none | bpm=70.0 conf=0.56 lock=1 phase=0.10 beat=1 bstr=0.40 | onset=0 bass=1 ostr=0.10 | k1_loud=0 input_trim=1.000 gdft_trim=0.800 agc_gain=0.100 agc_env=0.0200 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=0 lightshow=8"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 1,
+      "host_parse_seq": 1,
+      "values": {
+        "bpm": 70.0,
+        "conf": 0.56,
+        "lock": 1,
+        "beat": 1,
+        "onset": 0,
+        "bass": 1,
+        "silence": 0,
+        "agc_gain": 0.1,
+        "peak_scaled": 0.18,
+        "ssl": 421,
+        "lightshow": 8,
+        "phase": 0.1,
+        "orbit_x": 0.14562305898749053,
+        "orbit_y": 0.10580134541264516
+      },
+      "written": [
+        "bpm",
+        "conf",
+        "lock",
+        "beat",
+        "onset",
+        "bass",
+        "silence",
+        "agc_gain",
+        "peak_scaled",
+        "ssl",
+        "lightshow",
+        "phase",
+        "orbit_x",
+        "orbit_y",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

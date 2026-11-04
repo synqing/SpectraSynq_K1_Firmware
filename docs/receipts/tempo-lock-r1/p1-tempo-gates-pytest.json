@@ -1,0 +1,34 @@
+{
+ "gate": "p1-tempo-gates-pytest",
+ "cmd": "python3 -m pytest tests -q -m tempo_gates",
+ "exit_code": 0,
+ "sha256_inputs": {},
+ "sha256_outputs": {},
+ "stdout_tail": [
+  ".................                                                        [100%]",
+  "17 passed, 1885 deselected in 2.69s"
+ ],
+ "utc": "2026-10-21T02:19:25+00:00",
+ "git_sha": "9088993477d1f290d7c79c6b139e4a162cc36b96",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_lane_emu.py",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "tests/fixtures/tempo_corpus/streams/",
+  "tests/test_tempo_lane_class_gates.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

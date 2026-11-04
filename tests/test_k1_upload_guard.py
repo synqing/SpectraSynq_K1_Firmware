@@ -59,6 +59,7 @@ class K1UploadGuardTest(unittest.TestCase):
             "k1_bench_im73d_dsr16",  # IM73D DSR_16S eval - bench B489A500 only
             "k1_bench_im69d",  # IM69D130 dual-mic PCB3 PDM eval — bench B489A500 only
             "k1_bench_im69d_led150",  # 150-px WS2812 on GPIO39/40 — bench B489A500 only
+            "k1_b489_ws2816_reference_capture",  # Four-DIN reference repair stays B489-only.
             "k1_bench_im69d_ble",  # IM69D + BLE-MIDI Deck16 P0 baseline — bench B489A500 only
         ):
             with self.subTest(env_name=env_name):
@@ -186,6 +187,7 @@ class K1UploadGuardTest(unittest.TestCase):
             ("k1_bench_im73d_mic_auto_telemetry", "/dev/tty.usbmodem1401"),  # mic auto-sense telemetry must reject the main K1 port
             ("k1_bench_im73d_dsr16", "/dev/tty.usbmodem1401"),  # DSR eval must reject the main K1 port
             ("k1_bench_im69d", "/dev/tty.usbmodem1401"),  # IM69D eval must reject the main K1 port
+            ("k1_b489_ws2816_reference_capture", "/dev/tty.usbmodem1401"),
             ("k1_bench_im69d_ble", "/dev/tty.usbmodem1401"),  # Deck16 P0 radio baseline must reject the main K1 port
             # k1_prod_im73d is upload-blocked outright (628f69b) — covered by blocked-env tests.
             ("k1_sync_probe_main", "/dev/tty.usbmodem12201"),  # sync LEADER must reject the bench port

@@ -735,6 +735,9 @@ void calculate_novelty(uint32_t t_now) {
 
   // Append new novelty measurement to novelty curve history
   novelty_curve[spectral_history_index] = sqrtf((float)novelty_now); // Phase 1 2026-05-20: sqrt→sqrtf for S2 soft-float
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+  novelty_linear_curve[spectral_history_index] = (float)novelty_now;
+#endif
 
   spectral_history_index++;
   if (spectral_history_index >= SPECTRAL_HISTORY_LENGTH) {

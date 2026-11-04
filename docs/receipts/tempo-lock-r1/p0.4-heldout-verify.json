@@ -1,0 +1,27 @@
+{
+ "gate": "p0.4-heldout-rows-verify",
+ "cmd": "python3 scripts/regression-harness/tempo_heldout_corpus.py verify --rows _scratch/esp-emulator/tempo-lock-r1/heldout/heldout_rows.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/heldout/heldout_rows.json": "7f7564f1645cc950de3aaf64f34e9c3e72673771a296c739bf86002d4e6ed8da",
+  "_scratch/esp-emulator/tempo-lock-r1/heldout/PROVENANCE.md": "84c7539765e978e110827087377201235a574937777f1e0e8f17bb47dca664c0",
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "OK: 1359 rows verified against _scratch/esp-emulator/tempo-lock-r1/heldout/heldout_rows.json"
+ ],
+ "utc": "2026-10-21T03:57:00+00:00",
+ "git_sha": "e91352f243cdf1f65be052852b6bd70171d944d7",
+ "git_dirty_paths": [
+  "tests/fixtures/tempo_corpus/manifest.json",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

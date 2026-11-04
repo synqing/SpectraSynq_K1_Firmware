@@ -1,0 +1,53 @@
+{
+  "route": "MacBook Pro Speakers",
+  "volume": {
+    "output_volume": 100,
+    "route": "MacBook Pro Speakers"
+  },
+  "ms": 2000,
+  "wav": "tools/pcm1808/fixtures/guarded/10_amp_100_997hz_guarded.wav",
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "filled": 96000,
+    "target": 96000,
+    "mic_err_epoch": 0,
+    "epoch_valid": 1,
+    "hop": {
+      "hop_n": 266,
+      "hop_mean": 5685,
+      "hop_p95": 6546,
+      "hop_p99": 6599,
+      "hop_max": 8376
+    }
+  },
+  "fill_is_clean": true,
+  "decoded": {
+    "epoch_valid": true,
+    "fill_ok": true,
+    "ovf_epoch": 0,
+    "ring_drop_epoch": 0,
+    "mic_err_epoch": 0,
+    "dur_us": 2000247,
+    "pcm_frames": 96000,
+    "mic_samples": 25600,
+    "hop_n": 266,
+    "hop_mean": 5685,
+    "hop_p95": 6546,
+    "hop_p99": 6599,
+    "hop_max": 8376,
+    "cap_read_us": 1963899,
+    "mic_only": false,
+    "fixture": "9f0e6517ce494a86",
+    "ap_source": "im69d",
+    "slot0_physical": "RIGHT",
+    "slot1_physical": "LEFT",
+    "pcm_crc_ok": true,
+    "mic_crc_ok": true,
+    "hop_n_decoded": 266,
+    "clean": true
+  },
+  "pcm_rms_slot0": 4530.247049642179,
+  "pcm_rms_slot1": 4566.577135764315,
+  "mic_rms": 66.34788376193697
+}

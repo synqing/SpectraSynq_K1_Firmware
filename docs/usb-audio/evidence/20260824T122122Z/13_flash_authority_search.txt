@@ -1,0 +1,111 @@
+=== k1_upload_guard / identities / registry ===
+scripts/platformio/k1_device_identities.json:3:    "_comment": "Single structured source of K1 device identity for k1_upload_guard.py. Identity-by-USB-serial GOVERNS; advisory_port is operator convenience only and never overrides the serial check. Quarantined units are refused on every K1 env. See docs/hardware/device-build-registry.md. Edit here, not in code.",
+scripts/platformio/k1_device_identities.json:4:    "authorized": [
+scripts/platformio/k1_device_identities.json:6:            "chip_id": "F887A500",
+scripts/platformio/k1_device_identities.json:11:            "_note_2026_08_18": "F887 sent to product consultancy. Port /dev/cu.usbmodem1401 is now Main RPL (B4:3A:45:A5:87:90). Do not flash any other unit as F887.",
+scripts/platformio/k1_device_identities.json:59:            "chip_id": "9087A500",
+scripts/platformio/k1_device_identities.json:63:            "advisory_port": "/dev/tty.usbmodem1401",
+scripts/platformio/k1_device_identities.json:64:            "_registration_2026_08_18": "Captain named unit Main RPL. Pin receipt: docs/hardware/main-rpl-pin-receipt-2026-08-18.md. Chip ID LOCKED live 2026-08-18: :chip_id / :dump on /dev/cu.usbmodem1401 printed CHIP ID: 9087A500. MAIN_RPL_FIRST_LIGHT_PASS. CAL measured SSL=173 DC=-265. Do not re-fire start_noise_cal.",
+scripts/platformio/k1_device_identities.json:73:            "chip_id": "B489A500",
+scripts/platformio/k1_device_identities.json:77:            "_g1_input_contract_2026_08_15": "For every active mono IM69D env on B489A500: physical IM1 / board-left / SELECT HIGH = ESP-IDF PDM RIGHT = K1_MIC_IM69D_SLOT_RIGHT. Stereo diagnostic order with clk_inv=false is RIGHT then LEFT. Historical micb/hpf_slotr aliases are retired. This is an upload-route contract, not a deployed-state claim.",
+scripts/platformio/k1_device_identities.json:78:            "advisory_port": "/dev/tty.usbmodem12201",
+scripts/platformio/k1_device_identities.json:124:            "chip_id": "0C54FC00",
+scripts/platformio/k1_device_identities.json:128:            "advisory_port": "/dev/tty.usbmodem1101",
+scripts/platformio/k1_device_identities.json:137:            "chip_id": "0743E200",
+scripts/platformio/k1_device_identities.json:141:            "advisory_port": "/dev/tty.wchusbserial5AAF2781791",
+scripts/platformio/k1_device_identities.json:142:            "_registration_2026_08_21": "Live pyserial USB serial is 5AAF278179; macOS device node appends a trailing 1. Live :dump CHIP ID 0743E200 on 2026-08-22. Never usbmodem (Tab5/S3). Flash 115200. Console is UART0 @ 115200, DTR deasserted. Do not start_noise_cal without Captain.",
+scripts/platformio/k1_device_identities.json:152:            "chip_id": null,
+scripts/platformio/k1_device_identities.json:156:            "reason": "unknown bench device, not authorized for K1 env upload"
+scripts/platformio/k1_device_identities.json:161:        "k1_prod_im73d": "production IM73D env inherits the k1_hardware production LED GPIO map (6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A 2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed un-block) after the forensic root-cause of the bench audio+LED corruption. Unblock only when a correctly-wired production IM73D unit exists.",
+scripts/platformio/k1_upload_guard.py:1:"""PlatformIO upload guard for K1 GPIO pin-map targets.
+scripts/platformio/k1_upload_guard.py:4:environment must be matched to the physical USB serial before any upload.
+scripts/platformio/k1_upload_guard.py:8:convenience only and never grants a pass. The guard fails CLOSED for protected
+scripts/platformio/k1_upload_guard.py:47:    upload_port: str  # advisory only — identity-by-serial governs
+scripts/platformio/k1_upload_guard.py:49:    chip_id: str
+scripts/platformio/k1_upload_guard.py:60:    """Load (authorized targets, quarantined-by-serial, blocked envs) from the manifest."""
+scripts/platformio/k1_upload_guard.py:64:            f"k1_upload_guard: identity manifest not found at {path}. "
+scripts/platformio/k1_upload_guard.py:72:            upload_port=entry["advisory_port"],
+scripts/platformio/k1_upload_guard.py:74:            chip_id=entry["chip_id"],
+scripts/platformio/k1_upload_guard.py:77:        for entry in data.get("authorized", [])
+scripts/platformio/k1_upload_guard.py:115:        # Native ESP32-S3 CDC enumerates as usbmodem*; CH9102/CH340 UART bridges
+scripts/platformio/k1_upload_guard.py:116:        # (custom dual-206 board) enumerate as wchusbserial*.
+scripts/platformio/k1_upload_guard.py:117:        if "usbmodem" not in device and "wchusbserial" not in device:
+scripts/platformio/k1_upload_guard.py:131:def find_port(upload_port: str, ports: Iterable[dict[str, str | None]]) -> dict[str, str | None] | None:
+scripts/platformio/k1_upload_guard.py:132:    expected = _normalise_port(upload_port)
+scripts/platformio/k1_upload_guard.py:139:def validate_upload_target(
+scripts/platformio/k1_upload_guard.py:141:    upload_port: str,
+scripts/platformio/k1_upload_guard.py:148:    """Validate that the device at `upload_port` is authorized for `pioenv`.
+scripts/platformio/k1_upload_guard.py:150:    Fails CLOSED for protected (mapped) K1 envs. `upload_port` only LOCATES the
+scripts/platformio/k1_upload_guard.py:160:        return False, f"{pioenv}: upload blocked: {blocked[pioenv]}"
+scripts/platformio/k1_upload_guard.py:165:            return False, f"{pioenv}: unmapped sync probe environment; upload blocked"
+scripts/platformio/k1_upload_guard.py:167:            return False, f"{pioenv}: unmapped K1 environment; upload blocked"
+scripts/platformio/k1_upload_guard.py:168:        return True, f"{pioenv}: no K1 upload mapping enforced"
+scripts/platformio/k1_upload_guard.py:173:    port = find_port(upload_port, port_list)
+scripts/platformio/k1_upload_guard.py:175:        return False, f"{pioenv}: {upload_port} is not currently enumerated"
+scripts/platformio/k1_upload_guard.py:177:    device = str(port.get("device") or upload_port)
+scripts/platformio/k1_upload_guard.py:179:        if "usbmodem" in device:
+scripts/platformio/k1_upload_guard.py:183:                    f"{pioenv}: {upload_port} is native USB CDC (usbmodem) — "
+scripts/platformio/k1_upload_guard.py:184:                    "refuses Tab5 and S3. P4-WIFI6 lab upload is wchusbserial only "
+scripts/platformio/k1_upload_guard.py:188:        if "wchusbserial" not in device:
+scripts/platformio/k1_upload_guard.py:192:                    f"{pioenv}: {upload_port} is not a WCH UART bridge; "
+scripts/platformio/k1_upload_guard.py:193:                    "P4-WIFI6 upload is wchusbserial only (ADR-0007)."
+scripts/platformio/k1_upload_guard.py:196:    elif "wchusbserial" in device:
+scripts/platformio/k1_upload_guard.py:200:                f"{pioenv}: {upload_port} is a P4 WCH UART bridge; "
+scripts/platformio/k1_upload_guard.py:201:                "S3 K1 envs refuse wchusbserial (ADR-0007)."
+scripts/platformio/k1_upload_guard.py:215:                f"{pioenv}: {upload_port} verified as {matched.role} "
+scripts/platformio/k1_upload_guard.py:216:                f"({matched.usb_serial}, chip {matched.chip_id}, {matched.pinmap})"
+scripts/platformio/k1_upload_guard.py:225:                f"{pioenv}: {upload_port} is {q.get('usb_serial', actual)} = "
+scripts/platformio/k1_upload_guard.py:227:                f"not authorized for {target.role} ({pioenv})"
+scripts/platformio/k1_upload_guard.py:235:            f"{pioenv}: {upload_port} has USB serial {actual or '<missing>'}; "
+scripts/platformio/k1_upload_guard.py:237:            f"configured default is {target.upload_port}"
+scripts/platformio/k1_upload_guard.py:255:            f"  {t.role}: serial {t.usb_serial} (chip {t.chip_id}), "
+scripts/platformio/k1_upload_guard.py:256:            f"advisory_port {t.upload_port}, {t.pinmap}, {len(t.envs)} env(s)"
+scripts/platformio/k1_upload_guard.py:272:def _guard_upload_action(source, target, env) -> None:  # pragma: no cover - exercised by PlatformIO
+scripts/platformio/k1_upload_guard.py:274:    upload_port = env.subst("$UPLOAD_PORT")
+scripts/platformio/k1_upload_guard.py:275:    ok, message = validate_upload_target(pioenv, upload_port)
+scripts/platformio/k1_upload_guard.py:276:    prefix = "[k1-upload-guard] "
+scripts/platformio/k1_upload_guard.py:287:    env.AddPreAction("upload", _guard_upload_action)  # type: ignore[name-defined]  # noqa: F821
+scripts/platformio/k1_upload_guard.py:291:    parser = argparse.ArgumentParser(description="Validate K1 PlatformIO upload target mapping.")
+scripts/platformio/k1_upload_guard.py:293:    parser.add_argument("--upload-port")
+scripts/platformio/k1_upload_guard.py:306:    if not args.pioenv or not args.upload_port:
+scripts/platformio/k1_upload_guard.py:307:        parser.error("--env and --upload-port are required unless --list-identities is given")
+scripts/platformio/k1_upload_guard.py:313:    ok, message = validate_upload_target(args.pioenv, args.upload_port, ports)
+platformio.ini:7:;        built against; the K1 hardware also needs the full N16R8 flash budget
+platformio.ini:24:; OPI PSRAM — both knobs required; flash size = full N16R8 budget.
+platformio.ini:27:board_build.flash_mode          = qio
+platformio.ini:28:board_build.flash_size          = 16MB
+platformio.ini:29:board_upload.flash_size         = 16MB
+platformio.ini:47:upload_speed  = 921600
+platformio.ini:49:; on the main K1 only: /dev/tty.usbmodem1401, USB serial
+platformio.ini:50:; B4:3A:45:A5:87:F8, chip F887A500. The pre-upload guard below refuses a
+platformio.ini:52:upload_port   = /dev/tty.usbmodem1401
+
+k1_usb_audio_mac_probe in identities:
+ABSENT_FROM_IDENTITIES
+
+=== pio device list ===
+/dev/cu.debug-console
+---------------------
+Hardware ID: n/a
+Description: n/a
+
+/dev/cu.Bluetooth-Incoming-Port
+-------------------------------
+Hardware ID: n/a
+Description: n/a
+
+/dev/cu.usbmodem183912401
+-------------------------
+Hardware ID: USB VID:PID=16C0:0483 SER=18391240 LOCATION=0-1
+Description: USB Serial
+
+
+
+=== serial nodes ===
+crw-rw-rw-  1 root  wheel  0x9000003 Aug 21 18:17 /dev/cu.Bluetooth-Incoming-Port
+crw-rw-rw-  1 root  wheel  0x9000001 Aug 21 18:16 /dev/cu.debug-console
+crw-rw-rw-  1 root  wheel  0x9000005 Aug 24 22:36 /dev/cu.usbmodem183912401
+crw-rw-rw-  1 root  wheel  0x9000004 Aug 24 22:36 /dev/tty.usbmodem183912401
+
+DEVICE_FLASH = HOLD_NO_AUTHORISED_TARGET
+Never F887A500. Never 9087A500 with k1_usb_audio_mac_probe (OTG).

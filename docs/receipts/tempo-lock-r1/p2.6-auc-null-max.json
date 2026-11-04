@@ -1,0 +1,32 @@
+{
+ "gate": "p2.6-auc-null-max-of-648-arithmetic",
+ "cmd": "python3 _scratch/esp-emulator/tempo-lock-r1/joint/null_max_auc.py _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json mass 648 200",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json": "30a95e8b6750233593a16cb4c210876dd1ae6c8e891511716f6b150d9f3b512c",
+  "_scratch/esp-emulator/tempo-lock-r1/joint/null_max_auc.py": "e49736778e03952a5f5827174b75a866839fe6f7558eacb58a669f83313aefb2"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "{\"traj\": \"_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json\", \"feature\": \"mass\", \"k\": 648, \"trials\": 200, \"n\": 36, \"n_right\": 14, \"observed_auc\": 0.8377, \"null_max_median\": 0.8019, \"null_max_p05\": 0.763}"
+ ],
+ "utc": "2026-10-21T08:54:07+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

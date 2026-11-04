@@ -19,6 +19,9 @@
 #endif
 #include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
 #include "k1_persistence_request.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"  // emulator replay only: trace port
+#endif
 
 extern void reboot(); // system.h
 
@@ -216,6 +219,9 @@ void save_config() {
   }
   file.close();
   unlock_leds();
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_note_save("config", true);
+#endif
 }
 
 // Save configuration to LittleFS a few seconds from now
@@ -635,16 +641,31 @@ bool clear_calibration_profile() {
 void init_fs() {
   lock_leds();
   USBSerial.print("INIT FILESYSTEM: ");
-  USBSerial.println(LittleFS.begin(true) == true ? K1_PASS : K1_FAIL);
+  const bool k1_fs_ok = LittleFS.begin(true);
+  USBSerial.println(k1_fs_ok == true ? K1_PASS : K1_FAIL);
+#ifdef K1_EMU_FIXTURE
+#ifdef K1_EMU_UART0
+  K1_EMU_LOG.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
+#else
+  USBSerial.printf("EMU_FS_BEGIN %s\n", k1_fs_ok ? "PASS" : "FAIL");
+#endif
+#endif
 
   update_config_filename(FIRMWARE_VERSION);
 
+#if defined(K1_EMU_FIXTURE) && !defined(K1_EMU_UART0)
+  // Physical PCM replay boots the compiled defaults, same as the emulator's
+  // blank filesystem. The saved show and calibration files stay on flash.
+  load_ambient_noise_calibration();
+  k1_apply_boot_palette_lock();
+#else
   load_ambient_noise_calibration();
   load_config();
   // Soft restore of secondary/edge/show overlay; missing or corrupt file is a
   // no-op (primary CONFIG from load_config() remains authoritative alone).
   (void)k1_show_state_load();
   load_calibration_profile_if_config_invalid();
+#endif
   unlock_leds();
 }
 

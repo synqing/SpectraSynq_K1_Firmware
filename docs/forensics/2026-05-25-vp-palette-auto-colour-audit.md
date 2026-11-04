@@ -14,7 +14,17 @@ abstract: "Read-only audit of VP palette mode, auto colour shift, and chromatic 
 
 ## Doctrine Gate
 
-[FACT] Project law requires centre-origin visual behaviour, no rainbow cycling, no heap in render, 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, sub-8 ms audio-to-visual latency, AP-only WiFi, British English, serial-port discipline, and no compile/upload-as-runtime-proof claims. Sources: `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/skills/sensorybridge-doctrine/SKILL.md`.
+[FACT] Project law requires centre-origin visual behaviour, no rainbow cycling, no heap in render, 120 FPS / 2.0 ms render ceiling, dt-correct smoothing, a `<50 ms` audio-to-LED latency budget, AP-only WiFi, British English, serial-port discipline, and no compile/upload-as-runtime-proof claims. Sources: `AGENTS.md`, `.claude/CLAUDE.md`, `.claude/skills/sensorybridge-doctrine/SKILL.md`.
+
+> **Corrected 2026-09-10.** This line previously read "sub-8 ms audio-to-visual
+> latency" and cited `AGENTS.md` for it. `AGENTS.md:310` says
+> `<50 ms (audio capture → LED update)` and has never said 8 ms — the citation
+> was fabricated and propagated from this repo's first commit. Measured on
+> hardware 2026-09-10: **11,596 µs p50, 15,444 µs p99** newest sample to
+> `rmt_complete`. See
+> `docs/forensics/runtime-evidence/20260910T-audio-to-led-latency/RESULT.md`.
+> The 8 ms figure that is real is `ap_publication_freshness` — the audio frame to
+> analysis publish leg only — which measured 7,144 µs p99 and passes its gate.
 
 [FACT] K1-local north star: architecture is subordinate to visual/musical output; regressions include weaker musical responsiveness, independent dual-channel behaviour, colour clarity, or motion memory.
 

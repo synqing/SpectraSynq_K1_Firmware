@@ -1,17 +1,22 @@
 ---
 abstract: "Canonical spec routing index for SensoryBridge K1 — active lanes, handover authority, device map, claude-mem recall conventions, and evidence bundles. Version-proof (survives claude-mem upgrades). Update when lane status or authority docs change."
-active_lane: COLOUR_LAB_PALETTE_BENCH_20260827
-active_authority: tools/colourlab/EXECUTION.md
-active_branch: lane/colourlab-bench
-previous_lane: K1_SCHEDULING_HARDENING_20260815 (authority docs/handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md, branch feat/k1-scheduling-generation-hardening)
+active_lane: B489_WS2816_REFERENCE_20261013
+active_authority: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md
+active_branch: fix/b489-ws2816-reference-capture
+previous_lane: COLOUR_LAB_PALETTE_BENCH_20260827 (authority tools/colourlab/EXECUTION.md, branch lane/colourlab-bench, status ready_for_merge)
 merged_lane: fix/tab5-phase1-softkey-wiring (merged to main 2026-08-11, Captain-authorised)
-lane_branch: lane/colourlab-bench
-last_verified: 2026-08-28
+lane_branch: lane/pcm1808-st25r3916b-bringup
+last_verified: 2026-09-07
 ---
 
 <!-- british-english-guard: ignore — `artifacts/` is the literal on-disk directory name in this
      repo, so every path and link must spell it that way or the link breaks. Prose in this file
      uses "artefacts". -->
+
+**Current authority (2026-09-07):** Main RPL PCM1808 + ST25R3916B bench bring-up —
+[`docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`](handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md)
+· evidence [`docs/forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md`](forensics/runtime-evidence/20260907T-pcm1808-st25-bringup/PREFLIGHT.md).
+Colour Lab (`tools/colourlab/EXECUTION.md`) is **ready_for_merge**, not this lane.
 
 # SensoryBridge K1 — Spec Index
 
@@ -125,6 +130,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Lane | Authority doc | Status | Evidence anchor |
 |------|---------------|--------|-----------------|
+| **K1 USB-audio 12.8 kHz hop** | **[ADR-0008](architecture/ADR-0008-usb-audio-keeps-12800-ap.md)** · [prototype](usb-audio/K1_USB_AUDIO_PROTOTYPE.md) | **ACCEPTED architecture. Diagnostic PASS 2026-08-25**, then product restored on Main RPL (`k1_main_rpl_im69d` @ `b625e89a`). UAC stays 12.8 kHz/96/7.5 ms. Not promotion. | [`20260825T073600Z-amendment-diagnostic/RESULT.md`](usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md) |
 | **K1 full-parity dual-target (S3 + P4-WIFI6)** | **[ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md)** | **ACCEPTED architecture.** `env:k1_p4_wifi6` in this tree. P4-Nano is donor-only. Not complete until both targets run the same K1. Lab loom is two WS2812 160-px strips on GPIO4/5 (data only). | `platformio.ini` `[env:k1_p4_wifi6]`; `SPECTRASYNQ_K1_FIRMWARE/platform/`; `scripts/platformio/k1_device_identities.json` |
 | **K1 scheduling hardening** | [active handover](handover/HANDOVER_2026-08-15_SCHEDULING_HARDENING_IMPLEMENTATION.md) · [Gate 0-8 plan](forensics/2026-08-15-freertos-scheduling-audit/EXECUTION_PLAN.md) | **CURRENT. G2+G3+G7B CLOSED. G8 host GREEN on `1d457740`. G8 device = bench `B489A500` (Captain 2026-08-17); awaiting G8 PASS. F887 copy deferred until a replacement main unit.** AP0/VP1 locked. | `docs/forensics/2026-08-15-freertos-scheduling-audit/` |
 | **K1 AP input integrity** | [handover](handover/HANDOVER_2026-08-14b_AP_INPUT_INTEGRITY.md) · [Rev B plan](plans/AP_INPUT_INTEGRITY_PLAN_2026-08-14.md) · [G1 receipt](forensics/G1_AP_INPUT_SLOT_RATIFICATION_2026-08-15.md) | **PARALLEL AUTHORITY. G1 RATIFIED; T0.3 COMPLETE.** No further physical mic test; AP P4 slot/health promotion remains open and separate. | `_scratch/p0_stereo_20260814/`; `scripts/tools/probe_diff.py`; `scripts/regression-harness/mic_stable_byte_gate.sh` |
@@ -154,6 +160,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Doc | Use for | Do **not** use for |
 |-----|---------|-------------------|
+| [ADR-0008](architecture/ADR-0008-usb-audio-keeps-12800-ap.md) | USB prototype stays 12.8 kHz AP; Mac SRC; future 48 kHz transport only off Core 0 | Setting `DEFAULT_SAMPLE_RATE=48000`; SRC in AP or the UAC callback; treating Multi-Output as a guaranteed 12.8↔48 converter |
 | [ADR-0007](architecture/ADR-0007-k1-full-parity-dual-target-s3-p4.md) | Dual-target K1 on S3 + Waveshare ESP32-P4-WIFI6; `env:k1_p4_wifi6`; P4-Nano as donor | Finishing P4-Nano as K1; retargeting `k1_hardware`; flashing Tab5; treating compile/first-light as shipped |
 | `2026-06-07-vmewt-transport-incident.md` | VME hardware-capture stop order, invalid-evidence correction, transport reopen gate | Payload proof, production VME promotion, or survivor-row analysis |
 | `2026-06-07-vme-l1-waveform-sandbox-handover.md` | VME Level 1 Waveform-family sandbox start, target modes 7/8/18, quarantine rules | Production VME promotion or dirty-lane acceptance |
@@ -171,7 +178,7 @@ clean-clone-buildable, CI-compiled target; "source-only CI" is not a destination
 
 | Device | Chip ID | Permitted envs by configured route |
 |--------|---------|------------------------------------|
-| 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only.** Current silicon `b625e89a` epoch `1787400761`. Never `k1_hardware`. |
+| 1401 (Main RPL) | `9087A500` (USB `B4:3A:45:A5:87:90`) | **`k1_main_rpl_im69d` only.** Current silicon `b625e89a` epoch `1787591762` after USB-audio diagnostic PASS. Never `k1_hardware`. |
 | F887 (OFFSITE) | `F887A500` | Historical `k1_hardware` allowlist. Do not flash any other serial as F887. |
 | 12201 (bench K1v2) | `B489A500` (USB `B4:3A:45:A5:89:B4`, live 2026-08-25 `/dev/cu.usbmodem11401`) | Current silicon **`k1_bench_im69d_led150` @ `8ed45e9c`** epoch `1787639868` (150-px WS2812 GPIO39/40). Permitted: `k1_bench_reference` and bench IM69/IM73 variants including `k1_bench_im69d_led150`. Never `k1_main_rpl_im69d`. |
 | Waveshare ESP32-P4-WIFI6 (lab) | `0743E200` (USB serial `5AAF278179`) | **`k1_p4_wifi6`** (GPIO4/5, 160/160). Child **`k1_p4_wifi6_led150`** (GPIO39/40, 150/150) exists in source, not on silicon until flash GO. Never Tab5, never S3 `usbmodem*`. Flash 115200 on `wchusbserial*`. Deployed `61787c86` 2026-08-22. |

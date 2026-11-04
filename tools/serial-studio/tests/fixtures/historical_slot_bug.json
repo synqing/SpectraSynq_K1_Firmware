@@ -1,0 +1,41 @@
+{
+  "id": "historical_slot_bug",
+  "schema_lock": "1.2",
+  "note": "device_ms is parser slot 16 (1-based), array index 15. Dashboard leftover unused_slot_16 / unused_slot_17 in K1-Dual-UART-Observability.ssproj are New Dataset remnants (dataset index 0) and must not receive this value. Expected vector length 24.",
+  "lines": [
+    "EVENT_STATUS,t=4242,frame_ms=4200,age=10,onset=0,bass=0,beat=0,ostr=0.000,bstr=0.000,phase=0.000,conf=0.200,tid=7,energy=0.100,nov=0.050,sil=0"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 2,
+      "host_parse_seq": 1,
+      "values": {
+        "device_ms": 4242,
+        "frame_ms": 4200,
+        "event_tid": 7,
+        "conf": 0.2,
+        "phase": 0.0,
+        "orbit_x": 0.0,
+        "orbit_y": 0.0
+      },
+      "written": [
+        "conf",
+        "beat",
+        "onset",
+        "bass",
+        "silence",
+        "energy",
+        "nov",
+        "device_ms",
+        "frame_ms",
+        "event_tid",
+        "phase",
+        "orbit_x",
+        "orbit_y",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

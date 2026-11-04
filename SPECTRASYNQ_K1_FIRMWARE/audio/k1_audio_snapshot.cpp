@@ -31,6 +31,9 @@ void k1_audio_snapshot_update(uint32_t frame_ms) {
   next.peak_scaled = k1_clamp_nonnegative(waveform_peak_scaled);
   next.vu_level = k1_clamp_nonnegative(float(audio_vu_level));
   next.novelty = k1_clamp_nonnegative(float(novelty_curve[k1_previous_spectral_history_index()]));
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+  next.tempo_novelty = k1_clamp_nonnegative(novelty_linear_curve[k1_previous_spectral_history_index()]);
+#endif
   next.silence = silence;
 
   float low_sum = 0.0f;

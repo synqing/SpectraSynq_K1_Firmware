@@ -8,8 +8,10 @@ step.
 ## Local use (today)
 
 ```sh
-# 1. Build the curated env(s)
-pio run -e k1_main_rpl_im69d
+# 1. Build the curated homes from one git tree
+bash scripts/agent/pio-build.sh k1_main_rpl_im69d
+bash scripts/agent/pio-build.sh k1_bench_im69d_led150
+bash scripts/agent/pio-build.sh k1_unit2_im69d_right
 
 # 2. Generate manifest.json and copy binaries into firmware/<env>/
 python3 tools/webflash/make_manifest.py
@@ -32,6 +34,19 @@ Pages enabled — same origin for page and binaries, so no CORS, no tokens, no
 GitHub API. Nothing else in the private firmware repo needs to go public.
 
 A different manifest can also be pointed at with `?manifest=<url>`.
+
+The variant dropdown is a **Captain-ticked shortlist**, not the ~97
+`[env:k1_*]` rows in `platformio.ini`. Captain curates
+`CURATED_ENVS` in `make_manifest.py` (ruled 2026-08-18; shortlist 2026-08-26).
+Today that is the three homes: Main RPL (`k1_main_rpl_im69d`), bench 150-px
+(`k1_bench_im69d_led150`), and Bench Unit 2 (`k1_unit2_im69d_right`). The
+device-build registry remains canonical for PlatformIO upload;
+this page consumes that subset only. ESP32-P4 images are a different chip
+family and are not hosted here.
+
+`?mode=simple` ignores the dropdown and always flashes Main RPL, still
+MAC-gated to that unit. Advanced mode shows the ticked homes with
+device-plain labels (chip + pin fact).
 
 ## Identify and boot verification
 
@@ -86,9 +101,13 @@ Offsets are parsed from each env's actual `partitions.bin` by
 
 - **Erase** wipes the full flash including NVS (persisted K1 config and
   calibration). The page warns about this; it is deliberate.
-- The web flasher does **not** enforce `k1_upload_guard.py` / the device
-  identity registry (Captain-ruled 2026-08-18). Any connected S3 can be
-  flashed — check which unit is on the port before clicking Flash.
+- After esptool sync the page reads the chip **MAC** and enforces the
+  device identity registry (`k1_device_identities.json`, stamped onto
+  `manifest.json` by `make_manifest.py`). A known unit cannot take a
+  variant that is not in its allowlist (GPIO39 LED-data vs PDM-clock is
+  the fatal pair). An unknown or quarantined MAC is refused. This is the
+  browser analogue of `k1_upload_guard.py`; PlatformIO upload still uses
+  the Python guard.
 - `assets/boot_app0.bin` is vendored from arduino-esp32 3.2.0
   (md5 `e6327541e2dc394ca2c3b3280ac0f39f`); the generator prefers the local
   framework copy in `~/.platformio` when present.

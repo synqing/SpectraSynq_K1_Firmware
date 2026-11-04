@@ -1,0 +1,32 @@
+{
+ "gate": "p1-spec-move-planted-fault-must-differ",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_bytecheck.py compare _scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-before-repro _scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-planted-fault",
+ "exit_code": 1,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/bytecheck/spec-planted-fault/snapshot.json": "3ecd29c7bc0d1577608a4d09feebf00e8ed3d84a06ed49aca79367ed9b548b4f"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "objects compared=261 differing=1",
+  "  OBJ {'object': 'src/audio/k1_tempo.cpp.o', 'sections': ['.literal._Z15k1_tempo_updateRK15K1AudioSnapshot'], 'relocs': [], 'symbols_differ': False}",
+  "elf alloc sections differing=4 ['.dram0.data', '.flash.rodata', '.flash.text', '.iram0.text']"
+ ],
+ "utc": "2026-10-21T01:59:20+00:00",
+ "git_sha": "aeb0322f487a5c0944de061eef83c3536bbc3a74",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "tests/test_audio_profile_tombstone_static.py",
+  "tests/test_rate_consistency.py",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_lane_bytecheck.py",
+  "tests/test_tempo_spec_provenance.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

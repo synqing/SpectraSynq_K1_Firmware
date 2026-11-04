@@ -1,25 +1,123 @@
+<!-- Current scoped Captain assignment,13October2026: docs/handover/HANDOVER_2026-10-13_B489_WS2816_REFERENCE.md on fix/b489-ws2816-reference-capture. Historical assignments below remain preserved. -->
+
 # K1 SensoryBridge Rolling Progress
 
 **Started:** 2026-05-25
 
-## 2026-08-28 — Colour Lab shipped slice passed and isolated for main
+## 2026-09-07 — Main RPL PCM1808 + ST25 bring-up preflight
 
-Production Preview R1.1, the browser/state matrix and the no-flash programme on
-both connected K1s passed. Main `9087A500` was left Paint off with slot 15
-identity-saved. Bench `B489A500` was left Paint off with Tune unavailable.
-Product rtrace is unavailable, so no wire/LED-buffer claim was made.
+**Active authority:** `docs/handover/HANDOVER_2026-09-07_PCM1808_ST25R3916B_BRINGUP.md`
+**Lane:** `PCM1808_ST25R3916B_BRINGUP_20260907` on `lane/pcm1808-st25r3916b-bringup`
 
-The integration excludes unrelated USB-audio and Webflash ancestry from the
-Colour Lab lane. Authority and evidence: `tools/colourlab/EXECUTION.md` and
-`tools/colourlab/VERIFICATION.md`.
+Live Main RPL on `/dev/cu.usbmodem1101` is chip `9087A500`, USB `B4:3A:45:A5:87:90`,
+running `k1_main_rpl_im69d` @ `acaecaa8` epoch `1788173468`. Hop is still 12.8 kHz / 96.
+I2S0 is the IM69 PDM mic on GPIO 8/9. I2S1 is free. Candidate PCM pins 13/14/10 are
+free on this env. Candidate NFC pins 7/6/5/4/2 are free on this env and **not** on
+`k1_hardware` (6/7 are LEDs there). PCM firmware is not written. Next step is a
+human 96 kHz clock measurement on the untouched module.
+
+Colour Lab stays ready_for_merge; it is not this lane.
+
+## 2026-08-28 — Colour Lab production Preview and hardware gate passed
+
+**Active authority:** `tools/colourlab/EXECUTION.md`
+**Lane:** `COLOUR_LAB_PALETTE_BENCH_20260827` on `lane/colourlab-bench`
+
+Production Preview R1.1 is accepted, the residual Source/Tune step numbers are removed, and the
+UI design lane is frozen. The browser slice is committed and pushed on the lane. The no-flash
+programme on `9087A500` and `B489A500` passed. Merge remains a separate explicit action.
+
+### Hardware close
+
+`COLOUR_LAB_WEB_UI_HARDWARE_PASS` is now **PASS** on `9087A500` and `B489A500`.
+Main was left Paint off with slot 15 identity-saved; Bench was left Paint off with Tune hidden
+and unavailable. Production rtrace is unavailable, so no wire/LED-buffer claim was made.
+Branch is ready for merge after the final evidence commit and push; `main` remains untouched.
+
+## 2026-08-27 — Colour Lab paint and tungsten grey closed
+
+Both devices ran a known colour card through the real look path. The dumps
+were scored offline. Main RPL dual-channel grey at 140 tripped the watchdog;
+primary-only full-scale card was the measurement path. Product restore on
+Main RPL is clean `acaecaa8` with a 0.30 both-target scale so default
+`paint=card` no longer resets the unit. The 150-LED bench is product
+`f2014c29`. Calibration inherited. No `start_noise_cal`.
 
 ```text
-COLOUR_LAB_WEB_UI_HARDWARE_PASS = PASS
-MAIN_PAINT                       = OFF
-BENCH_PAINT                      = OFF
-MAIN_SLOT15_LEAVE_STATE          = IDENTITY_SAVED
-WIRE_TRUTH                       = NOT_CLAIMED
+COLOUR_JOB_PARITY      = PASS_JOB_ONLY
+WS2816_TRUE16          = PASS_TRUE16
+TUNGSTEN_GREY          = PASS
+COLOUR_LAB_PAINT_RPL   = PASS
+COLOUR_LAB_PAINT_BENCH = PASS
+RUNTIME_SLOT15_RPL     = PASS
+PHOTON_PARITY          = NOT_CLAIMED
 ```
+
+Live: 9087 `IDENTITY OK: git=acaecaa8 env=k1_main_rpl_im69d epoch=1787773671`
+on `/dev/cu.usbmodem1101`.  B489 `git=f2014c29 env=k1_bench_im69d_led150
+epoch=1787771217` on `/dev/cu.usbmodem1401`. Evidence:
+`docs/forensics/colour-lab-rtrace-20260827/VERDICT.md`.
+
+## 2026-08-26 — Eight looks on the 150-LED bench
+
+The 150-LED bench now runs eight real colour prints. `z` / `:look=0..7` name
+identity, gold restore, tungsten, amber, daylight, moon, punch, crush.
+Slot 8 is refused. Parked on identity. Main RPL was not touched. Calibration
+was inherited.
+
+Live: `IDENTITY OK: git=9b48ce5f env=k1_bench_im69d_led150 epoch=1787757776`
+on `/dev/cu.usbmodem1401` (USB `B4:3A:45:A5:89:B4`). The git stamp is HEAD;
+the eight-print roster was uncommitted source in this tree. App SHA-256
+`8c7a692cbf8d038ebf51a95935b5eb5f928e9754100d33e64a4fc60b59824757`.
+`LED_BUFFER_DIFF = NOT_RUN`. No `start_noise_cal`.
+
+Four-slot proof stub epoch `1787752658` (`637c5f18`) is superseded.
+
+## 2026-08-26 — WS2812 look library committed on the 150-LED bench
+
+The 150-LED bench now runs the committed 8-bit look library. Colon commands
+`:look=`, `:look_status` and `:secondary_look=` work. Hotkey `z` still steps
+identity, proof look, two reserved identity slots, and back. Main RPL was
+not touched. Calibration was inherited. The device is parked on slot 0.
+
+Live: `IDENTITY OK: git=637c5f18 env=k1_bench_im69d_led150 epoch=1787752658`
+on `/dev/cu.usbmodem1401` (USB `B4:3A:45:A5:89:B4`). App SHA-256
+`f8727a7755ae6a47c8626f28cec7e0caa3870c312fd43d3f9c02b2928a7cb5a6`.
+`LED_BUFFER_DIFF = NOT_RUN`. No `start_noise_cal`.
+
+Dirty-source bring-up epoch `1787703514` (`8ed45e9c` on the chip while the
+library was uncommitted) is superseded.
+
+## 2026-08-25 — Bench 150-LED testbed flashed (B489)
+
+Captain: put the current-tree 150-LED sibling of Main RPL firmware on the
+testbed at `/dev/tty.usbmodem11401`. Guard confirmed chip `B489A500` /
+USB `B4:3A:45:A5:89:B4`. Cursor Serial Monitor held CDC, so UART esptool
+could not take the port. Write used OpenOCD JTAG `program_esp` @ `0x10000`
+bound to that USB serial only. **Verify OK.** Live
+`IDENTITY OK: git=8ed45e9c env=k1_bench_im69d_led150 epoch=1787639868`.
+Main RPL `9087A500` on `112401` not opened. Cal inherited. No
+`start_noise_cal`. This is not `k1_main_rpl_im69d` @ `b625e89a` (wrong map).
+
+## 2026-08-25 — USB-audio diagnostic PASS; product restored
+
+Captain closed the USB ingress diagnostic on Main RPL `9087A500`.
+`k1_usb_audio_mac_probe` @ `0136de67` factory SHA `fc5854a5…` proved 12.8 kHz
+mono delivery, matched frames, steady-state drops/underflows 0, and a moving
+waveform envelope. `loudness=BLOCKED` is N/A (`K1_STM` not in the probe).
+No second probe flash. Product restored: **`k1_main_rpl_im69d` @ `b625e89a`**
+epoch `1787591762`. Live `:build` matches. IM69 PDM RIGHT and both LED inits
+PASS. TinyUSB UAC gone. Evidence:
+`docs/usb-audio/evidence/20260825T073600Z-amendment-diagnostic/RESULT.md`.
+
+## 2026-08-24 — USB-audio corrected parent gated, product restored
+
+Main RPL `9087A500` ran `k1_usb_audio_mac_probe` @ `c1b53860` (Main RPL parent,
+isolated PIO 3.3.11), then was restored to **`k1_main_rpl_im69d` @ `b625e89a`**
+epoch `1787591762`. USB prototype is **not** A16–A26 PASS (onset serial FAIL,
+soak lost UAC at ~16 min). Evidence:
+`docs/usb-audio/evidence/20260824T165900Z-corrected-parent/RESULT.md`.
+Not pushed. Do not reflash USB without a new Captain GO.
 
 ## 2026-08-21 — ADR-0007 K1 full-parity dual-target (S3 + P4-WIFI6)
 

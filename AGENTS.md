@@ -589,6 +589,16 @@ ls /dev/cu.usbmodem*
 
 Full rules and rationale: **[`.claude/CLAUDE.md`](./.claude/CLAUDE.md)**
 
+## Emulator replay (no hardware)
+
+`tools/esp_emulator/README.md` is the contract for the offline ESP32-S3
+replay of `k1_main_rpl_im69d` (env `k1_main_rpl_emu`, never uploadable).
+Before changing it, or adding any time/random read to the render path, load
+the skill `k1-esp-emulator-replay` and read
+`/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/docs/LESSONS.md`.
+`tests/test_esp_emulator_seams_static.py` enforces the determinism seams in
+the commit gate.
+
 ## Additional Resources
 
 - **Audio Forensics:** `@docs/forensics/tempo_tracking_refactor/` (beat tracking evidence, metrics, v2 validation)
@@ -656,6 +666,7 @@ Before coding, scan the user's prompt for relevant skills and production-risk si
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-10-20 | agent:claude-code | Added the Emulator replay section: contract, skill k1-esp-emulator-replay, lessons inventory in the ESP-Emulator workspace, seams ratchet test. |
 | 2026-06-15 | agent:codex | Corrected root authority docs after Tab5 strict harness/gate commits: restored spec-index routing, updated pytest count to 54 files / 427 tests, corrected audio timing to 96-sample chunks at 12.8 kHz, described 30 enumerated / 22 enabled lightshow modes from config_types.h, and removed contradictory K1 STA fallback wording. |
 | 2026-06-11 | agent:claude-code | Fixed critical inaccuracies: corrected test file count from 23 to 53; corrected effect count from 20 to 25; clarified GDFT as 80-bin spectrum mapped to 24 perceptual octaves (not "24 octave bands"); added network and control directories to structure; updated build flags to include SB_CHORD_HUE_V1 and SB_DROP_CUT_V1 (impact lane); updated Platform-Native Production Patterns section to be ESP32-specific (hard real-time audio, soft real-time visual, DMA, FreeRTOS, volatile primitives); verified all technical claims against platformio.ini build_flags, directory listing, and git history |
 | 2026-06-06 | agent:claude-code | Improved CLAUDE.md: updated abstract to clarify "136-test pytest" and "23 test files" distinction; confirmed 20 effects count; added k1_ap_frontend_probe environment (2026-06-06); expanded Platform-Native Production Patterns with multi-core concurrency details (volatile semantics, non-blocking Core 0 guarantee); added effect mode examples (Tempo River 19, Tempo Comet 20); verified all technical details match current platformio.ini and git history |

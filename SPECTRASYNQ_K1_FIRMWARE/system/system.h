@@ -3,6 +3,16 @@
 #include <FastLED.h>
 #include <esp_system.h> // For ESP.restart()
 #include "globals.h" // For global variables like MASTER_BRIGHTNESS, debug_mode, frequencies etc.
+#if defined(K1_USB_AUDIO_PROTOTYPE)
+#include "k1_usb_audio_input.h"
+#endif
+#if K1_PCM1808_PRESENT
+#include "k1_pcm1808_input.h"
+#include "k1_fe_board.h"
+#endif
+#ifdef K1_ST25_PROBE_V1
+#include "k1_st25_probe.h"
+#endif
 #include "constants.h" // For band definitions, NUM_FREQS etc.
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
@@ -169,6 +179,9 @@ void enable_usb_update_mode() {
 #endif
 
 void init_usb() {
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  k1_usb_audio_start();
+#else
 #if K1_USB_CUSTOM_DESCRIPTORS
   USB.productName("SpectraSynq SB");
   USB.manufacturerName("SpectraSynq");
@@ -185,6 +198,7 @@ void init_usb() {
 #else
   USB.begin();
   USBSerial.begin();
+#endif
 #endif
 }
 
@@ -459,9 +473,15 @@ void init_system() {
   // NVS must not revive NEOPIXEL_X2 (80/80).
   CONFIG.LED_TYPE = LED_NEOPIXEL;
 #endif
-#ifdef K1_MAIN_RPL_PINMAP_V1
+#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
   // Centre-split DIN-A/B on both WS2816 PCBs — NVS must not revive single-wire NEOPIXEL.
   CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
+#endif
+#ifdef K1_FE_BENCH_B489_V1
+  // B489 FE bench: two single-wire WS2812 strips (GPIO4/5). Settings saved by the
+  // earlier WS2816 images must not revive the 80/80 split or a packed colour order.
+  CONFIG.LED_TYPE = LED_NEOPIXEL;
+  CONFIG.LED_COLOR_ORDER = GRB;
 #endif
 #if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
   // Keep the FastLED power cap at 2.5 A total @ 5 V even if a persisted save
@@ -510,7 +530,12 @@ void init_system() {
   // PDM cal persistence: scrub removed SPH-file-derived state; restore last
   // accepted PDM cal from CAL_PROFILE_FILE (never an SPH file).
   CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
+#if defined(K1_EMU_FIXTURE) && !defined(K1_EMU_UART0)
+  // Keep the blank-boot fallback. Do not read or rewrite the saved profile.
+  if (false) {
+#else
   if (load_calibration_profile_if_config_invalid()) {
+#endif
     max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;  // persisted SSL (cal_valid=1, source=persisted_profile)
   } else {
     CONFIG.SWEET_SPOT_MIN_LEVEL = NOISE_CAL_SSL_BOOT_FALLBACK_RAW;   // no/invalid profile -> fallback, NEVER 0
@@ -607,6 +632,15 @@ void init_system() {
 #endif
 
   init_i2s();
+#if K1_PCM1808_PRESENT
+  k1_pcm1808_begin();
+#endif
+#ifdef K1_FE_BOARD_V1
+  k1_fe_board_begin();  // after PCM1808 so the line-in gate result is known
+#endif
+#ifdef K1_ST25_PROBE_V1
+  k1_st25_begin();
+#endif
   generate_a_weights();
   generate_window_lookup();
   precompute_goertzel_constants();

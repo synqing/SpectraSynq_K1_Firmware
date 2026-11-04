@@ -1,0 +1,57 @@
+{
+  "route": "Multi-Output Device",
+  "volume": {
+    "output_volume": -1,
+    "route": "Multi-Output Device"
+  },
+  "wav": "tools/pcm1808/fixtures/p4_align_transients_jittered_fullscale.wav",
+  "fixture_sha256": "00cc5d54142441182e98049a4da2d15849bdc8a77331a8f01bdadd30640643fc",
+  "play_lead_s": 1.02,
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "filled": 192000,
+    "target": 192000,
+    "mic_err_epoch": 0,
+    "epoch_valid": 1,
+    "hop": {
+      "hop_n": 533,
+      "hop_mean": 5563,
+      "hop_p95": 6498,
+      "hop_p99": 6598,
+      "hop_max": 7764
+    }
+  },
+  "fill_is_clean": true,
+  "pcm_rms_slot0": 112651.39478703753,
+  "pcm_rms_slot1": 112883.64237139505,
+  "mic_rms": 22.374001374363058,
+  "pcm_peak_slot0": 2158396,
+  "pcm_peak_slot1": 2162813,
+  "mic_peak": 235,
+  "decoded": {
+    "epoch_valid": true,
+    "fill_ok": true,
+    "ovf_epoch": 0,
+    "ring_drop_epoch": 0,
+    "mic_err_epoch": 0,
+    "dur_us": 4000578,
+    "pcm_frames": 192000,
+    "mic_samples": 51200,
+    "hop_n": 533,
+    "hop_mean": 5563,
+    "hop_p95": 6498,
+    "hop_p99": 6598,
+    "hop_max": 7764,
+    "cap_read_us": 3928323,
+    "mic_only": false,
+    "fixture": "00cc5d5414244118",
+    "ap_source": "im69d",
+    "slot0_physical": "RIGHT",
+    "slot1_physical": "LEFT",
+    "pcm_crc_ok": true,
+    "mic_crc_ok": true,
+    "hop_n_decoded": 533,
+    "clean": true
+  }
+}

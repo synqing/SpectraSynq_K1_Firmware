@@ -1,0 +1,53 @@
+{
+  "id": "held_value",
+  "schema_lock": "1.2",
+  "note": "AP bpm=120 then SYSTEM_FPS: 30. Dashboard vector may still show 120; record_kind=3 and bpm update_mask bit MUST be 0. Scorer must not treat held bpm as a new sample.",
+  "lines": [
+    "[AP] SSL=100 peak_scaled=0.200 silence=0 | bpm=120.0 conf=0.50 lock=0 beat=0 | onset=0 bass=0 | agc_gain=1.000 lightshow=1",
+    "SYSTEM_FPS: 30"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 1,
+      "host_parse_seq": 1,
+      "values": {
+        "bpm": 120.0,
+        "conf": 0.5,
+        "orbit_x": 0.2,
+        "orbit_y": 0.0
+      },
+      "written": [
+        "bpm",
+        "conf",
+        "lock",
+        "beat",
+        "onset",
+        "bass",
+        "silence",
+        "agc_gain",
+        "peak_scaled",
+        "ssl",
+        "lightshow",
+        "orbit_x",
+        "orbit_y",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    },
+    {
+      "record_kind": 3,
+      "host_parse_seq": 2,
+      "values": {
+        "bpm": 120.0,
+        "system_fps": 30
+      },
+      "written": [
+        "system_fps",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

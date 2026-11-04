@@ -1,0 +1,62 @@
+{
+ "gate": "p2.1-trap-suite-baseline-shipped-selection-expected-red",
+ "cmd": "python3 scripts/regression-harness/tempo_trap_suite.py run --variant l1 --out _scratch/esp-emulator/tempo-lock-r1/traps/p21_baseline.json",
+ "exit_code": 1,
+ "sha256_inputs": {},
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/traps/p21_baseline.json": "b08e2a638708f11b8490e4fc8adbed48afb17af6d75269ed8adea3ce6455ce6e"
+ },
+ "stdout_tail": [
+  "clean        72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "clean        96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "clean       120 truth 120.0 -> 120 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "clean       144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "swing        72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "swing        96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "swing       120 truth 120.0 -> 120 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "swing       144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "triplet      72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "triplet      96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "triplet     120 truth 120.0 -> 120 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "triplet     144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "dotted       72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "dotted       96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "dotted      120 truth 120.0 -> 120 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "dotted      144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "tresillo     72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "tresillo     96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "tresillo    120 truth 120.0 -> 120 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "tresillo    144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "hemiola      72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "hemiola      96 truth  96.0 ->  64 ratio 0.667 FAIL_2/3   lock 1.00 acq 0.0",
+  "hemiola     120 truth 120.0 ->  80 ratio 0.667 FAIL_2/3   lock 1.00 acq 0.0",
+  "hemiola     144 truth 144.0 ->  96 ratio 0.667 FAIL_2/3   lock 1.00 acq 0.0",
+  "backbeat     72 truth  72.0 ->  72 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "backbeat     96 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "backbeat    120 truth 120.0 ->  60 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "backbeat    144 truth 144.0 ->  72 ratio 0.500 PASS       lock 1.00 acq 0.0",
+  "change       72 truth  90.0 ->  90 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "change       96 truth  76.8 ->  77 ratio 1.003 PASS       lock 1.00 acq 0.0",
+  "change      120 truth  96.0 ->  96 ratio 1.000 PASS       lock 1.00 acq 0.0",
+  "change      144 truth 115.2 -> 115 ratio 0.998 PASS       lock 1.00 acq 0.0",
+  "failing 3/32 classes ['FAIL_2/3']"
+ ],
+ "utc": "2026-10-21T02:31:20+00:00",
+ "git_sha": "f732d9cbb43c976287f1f1f6bd10978e6009bbc6",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_trap_suite.py",
+  "tests/fixtures/tempo_corpus/traps/",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

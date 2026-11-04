@@ -1,0 +1,22 @@
+{
+  "id": "version_build",
+  "schema_lock": "1.2",
+  "note": "BUILD = VERSION: prefix. Numeric version is on the wire but SCHEMA_LOCK has no slot for it; kind=5 only. Do not write lightshow.",
+  "lines": [
+    "VERSION: 40103"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 5,
+      "host_parse_seq": 1,
+      "values": {
+        "lightshow": 0
+      },
+      "written": [
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

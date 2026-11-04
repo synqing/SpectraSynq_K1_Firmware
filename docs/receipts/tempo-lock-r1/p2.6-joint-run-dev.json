@@ -1,0 +1,27 @@
+{
+ "gate": "p2.6-joint-run-dev",
+ "cmd": "python3 scripts/regression-harness/tempo_joint_estimator.py run --fixtures _scratch/esp-emulator/tempo-lock-r1/fixtures/dev_spec_r1/index.json --kappa 8 --lam 8 --tempo-q 0.02 --out _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/fixtures/dev_spec_r1/index.json": "30399b8c6cfaa8a3d5fcd29696f2d2dbb0cdba6b8ed486adf4cf71acec101e43"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json": "15fca1bad22cfd020367dd324bbebd490b0f9aeb58a696abe48953503d1c4c71"
+ },
+ "stdout_tail": [
+  "clips=36 emits=120024 wall_s=4.9 -> _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json"
+ ],
+ "utc": "2026-10-21T08:47:12+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

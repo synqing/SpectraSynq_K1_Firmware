@@ -31,6 +31,9 @@
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"
 #endif
+#ifdef K1_PCM1808_PROBE_V1
+#include "k1_pcm1808_input.h"
+#endif
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h"
 #endif
@@ -50,6 +53,9 @@
 #endif
 #ifdef K1_COLOUR_LAB_V1
 #include "k1_colour_lab.h"
+#endif
+#ifdef K1_FE_BOARD_V1
+#include "k1_fe_board.h"
 #endif
 
 extern void check_current_function();
@@ -152,6 +158,11 @@ bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data
   return k1_stereo_probe_dispatch(command_type, command_data);
 }
 #endif
+#ifdef K1_PCM1808_PROBE_V1
+bool serial_typed_wrap_pcmraw(const char* command_type, char* command_data) {
+  return k1_pcm1808_dispatch(command_type, command_data);
+}
+#endif
 #ifdef K1_RENDER_TRACE_V1
 bool serial_typed_wrap_render_trace(const char* command_type, char* command_data) {
   return k1_render_trace_dispatch(command_type, command_data);
@@ -160,6 +171,11 @@ bool serial_typed_wrap_render_trace(const char* command_type, char* command_data
 #ifdef K1_COLOUR_LAB_V1
 bool serial_typed_wrap_colour_lab(const char* command_type, char* command_data) {
   return k1_colour_lab_dispatch(command_type, command_data);
+}
+#endif
+#ifdef K1_FE_BOARD_V1
+bool serial_typed_wrap_fe_board(const char* command_type, char* command_data) {
+  return k1_fe_board_dispatch(command_type, command_data);
 }
 #endif
 #if K1_EFFECT_FRAMEWORK_V1

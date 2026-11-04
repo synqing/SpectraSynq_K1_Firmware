@@ -1,0 +1,32 @@
+{
+  "route": "Multi-Output Device",
+  "volume": {
+    "output_volume": -1,
+    "route": "Multi-Output Device"
+  },
+  "wav": "tools/pcm1808/fixtures/p4_align_transients_jittered_fullscale.wav",
+  "fixture_sha256": "00cc5d54142441182e98049a4da2d15849bdc8a77331a8f01bdadd30640643fc",
+  "play_lead_s": 1.02,
+  "fill": {
+    "ovf_delta_fill": 0,
+    "drop_delta_fill": 0,
+    "filled": 192000,
+    "target": 192000,
+    "mic_err_epoch": 0,
+    "epoch_valid": 1,
+    "hop": {
+      "hop_n": 533,
+      "hop_mean": 5683,
+      "hop_p95": 6570,
+      "hop_p99": 6993,
+      "hop_max": 7859
+    }
+  },
+  "fill_is_clean": true,
+  "pcm_rms_slot0": 115511.86056316164,
+  "pcm_rms_slot1": 115749.63971304365,
+  "mic_rms": 22.598588261354955,
+  "pcm_peak_slot0": 2157314,
+  "pcm_peak_slot1": 2161734,
+  "mic_peak": 229
+}

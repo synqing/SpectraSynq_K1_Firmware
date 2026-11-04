@@ -1,0 +1,20 @@
+acquire=acquire_sample_chunk @ i2s_audio.h:413
+init_i2s=init_i2s @ i2s_audio.h:272
+usbserial=#define USBSerial Serial @ globals.h:1041 when K1_HARDWARE
+init_usb=init_usb @ system.h:171 (K1_HARDWARE does not USB.begin)
+canonical=waveform[] after clamp and CONFIG.DC_OFFSET @ i2s_audio.h:742
+im69_gain=K1_MIC_IM69D_INPUT_GAIN 8.0f @ constants.h
+rate=DEFAULT_SAMPLE_RATE 12800 DEFAULT_SAMPLES_PER_CHUNK 96
+history=waveform_history_index wrap 4 @ i2s_audio.h:710
+window=sample_window[SAMPLE_HISTORY_LENGTH] SAMPLE_HISTORY_LENGTH=4096
+gain=audio_response_gain_apply_sample @ i2s_audio.h:265
+fixed=waveform_fixed_point @ i2s_audio.h:1256
+tail=i2s_audio.h:1249-1259
+loop_delay=vTaskDelay(1) @ .ino ~1300
+auto_sense=.ino:1007-1008 under K1_MIC_AUTO_SENSE_V1
+im69_error=IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver
+usb_flags=-DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=1
+src_filter=+<audio/k1_*.cpp> -<audio/k1_mic_auto_sense.cpp>
+platform=54.03.20/platform-espressif32.zip
+default_envs=k1_hardware
+p4_unflag=platformio.ini ARDUINO_USB_MODE=1 then =0

@@ -12,6 +12,8 @@
 
 # PlatformIO build output + generated compile DB
 .pio/
+# Isolated USB-audio PlatformIO workspace (Arduino 3.3.11 / 55.03.311)
+.pio-usb-audio/
 compile_commands.json
 # PIO preprocesses the sketch to <Sketch>.ino.cpp inside src_dir on every build
 *.ino.cpp
@@ -141,3 +143,21 @@ tab5_firmware/_retired_fonts_pre_countach/
 *.orig
 *.hardened.bak
 *.working
+
+# Generated PCM1808 bring-up WAV fixtures (regenerate via tools/pcm1808/gen_wav_fixtures.py)
+tools/pcm1808/fixtures/
+
+# --- session hygiene 2026-09-10 ---
+# Unrelated agent-twitter-client-mcp service logs (85 MB, contain auth failures)
+/error.log
+/combined.log
+# Build artefacts
+/build/
+# Bulk raw serial captures (tooling is tracked, captures are not)
+/tools/serial-studio/captures/
+.pytest_cache/
+# Staging area pending deletion
+/_to_delete/
+
+# Machine-local pointer to the pinned esp-emu executable (tools/esp_emulator/README.md)
+tools/esp_emulator/esp-emu.local.json

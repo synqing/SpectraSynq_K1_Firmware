@@ -40,9 +40,19 @@ ENV="$1"
 # K1_LOOK_LIB_WS2812_V1. Build-only here; identity still k1_upload_guard.py.
 # k1_bench_im69d_led150_rtrace = WS2812 look-lib rtrace probe (2026-08-26);
 # K1_LOOK_LIB_WS2812_V1 + K1_RENDER_TRACE_V1. B489A500 only. Non-shippable.
-ALLOWED_ENVS="k1_hardware k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench k1_bench_scheduling_stage_min_probe k1_bench_scheduling_stage_full_probe k1_bench_scheduling_gdft_cross40_lane4_full_probe k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe k1_bench_im69d_wfhyb_fade k1_main_rpl_im69d k1_main_rpl_i2sled_probe k1_main_rpl_rtrace_probe k1_bench_im69d_led150 k1_bench_im69d_led150_rtrace"
+# k1_unit2_im69d_right = Bench Unit 2 product (0C54FC00, dual-206). Build-only
+# here; identity still k1_upload_guard.py.
+# k1_main_rpl_emu = emulator-only replay of k1_main_rpl_im69d (R3 2026-10-20,
+# tools/esp_emulator). Build-only; the upload guard blocks it on every board.
+# k1_main_rpl_emu_tempo_probe = emulator-only tempo lane R1 measurement probe
+# (stage timers + G lines). Build-only; the upload guard blocks it.
+# k1_main_rpl_emu_tempo_r1[_probe] = emulator-only tempo lane R1 flag set (+ probe).
+# Build-only; the upload guard blocks both.
+# Mode32 s2ps is an existing flag-on bench env; the Main RPL pair below is
+# build-only and upload-blocked for dual-channel candidate evaluation.
+ALLOWED_ENVS="k1_hardware k1_fe k1_bench_reference k1_bench_im73d k1_bench_im73d_mic_auto_telemetry k1_bench_im73d_dsr16 k1_bench_im69d k1_bench_im69d_ble k1_bench_im73d_ble k1_custom k1_sync_probe_main k1_sync_probe_main_sync_only k1_sync_probe_bench k1_bench_scheduling_stage_min_probe k1_bench_scheduling_stage_full_probe k1_bench_scheduling_gdft_cross40_lane4_full_probe k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe k1_bench_im69d_wfhyb_fade k1_bench_im69d_hueaud_s2ps k1_main_rpl_im69d k1_main_rpl_im69d_position_smooth_probe k1_main_rpl_i2sled_probe k1_main_rpl_rtrace_probe k1_main_rpl_pcm1808_probe k1_main_rpl_pcm1808_shadow k1_main_rpl_im69d_p5_probe k1_main_rpl_pcm1808_shadow_p5_probe k1_main_rpl_pcm1808_line_p5_probe k1_main_rpl_pcm1808_p6_probe k1_main_rpl_st25_probe k1_usb_audio_mac_probe k1_bench_im69d_led150 k1_bench_im69d_led150_rtrace k1_b489_ws2816_reference_capture k1_unit2_im69d_right k1_main_rpl_emu k1_main_rpl_emu_position_smooth_probe k1_main_rpl_emu_tempo_probe k1_main_rpl_emu_tempo_r1 k1_main_rpl_emu_tempo_r1_probe k1_main_rpl_emu_tempo_r1_spec k1_main_rpl_emu_tempo_r1_lockoff k1_main_rpl_emu_tempo_r1_lockoff_probe k1_main_rpl_emu_tempo_r1_lockoff_unrepaired"
 case "$ENV" in
-  k1_hardware|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench|k1_bench_scheduling_stage_min_probe|k1_bench_scheduling_stage_full_probe|k1_bench_scheduling_gdft_cross40_lane4_full_probe|k1_bench_im69d_wfhyb_fade|k1_main_rpl_im69d|k1_main_rpl_i2sled_probe|k1_main_rpl_rtrace_probe|k1_bench_im69d_led150|k1_bench_im69d_led150_rtrace|k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe)
+  k1_hardware|k1_fe|k1_bench_reference|k1_bench_im73d|k1_bench_im73d_mic_auto_telemetry|k1_bench_im73d_dsr16|k1_bench_im69d|k1_bench_im69d_ble|k1_bench_im73d_ble|k1_custom|k1_sync_probe_main|k1_sync_probe_main_sync_only|k1_sync_probe_bench|k1_bench_scheduling_stage_min_probe|k1_bench_scheduling_stage_full_probe|k1_bench_scheduling_gdft_cross40_lane4_full_probe|k1_bench_im69d_wfhyb_fade|k1_bench_im69d_hueaud_s2ps|k1_main_rpl_im69d|k1_main_rpl_im69d_position_smooth_probe|k1_main_rpl_i2sled_probe|k1_main_rpl_rtrace_probe|k1_main_rpl_pcm1808_probe|k1_main_rpl_pcm1808_shadow|k1_main_rpl_im69d_p5_probe|k1_main_rpl_pcm1808_shadow_p5_probe|k1_main_rpl_pcm1808_line_p5_probe|k1_main_rpl_pcm1808_p6_probe|k1_main_rpl_st25_probe|k1_usb_audio_mac_probe|k1_bench_im69d_led150|k1_bench_im69d_led150_rtrace|k1_b489_ws2816_reference_capture|k1_unit2_im69d_right|k1_main_rpl_emu|k1_main_rpl_emu_position_smooth_probe|k1_main_rpl_emu_tempo_probe|k1_main_rpl_emu_tempo_r1|k1_main_rpl_emu_tempo_r1_probe|k1_main_rpl_emu_tempo_r1_spec|k1_main_rpl_emu_tempo_r1_lockoff|k1_main_rpl_emu_tempo_r1_lockoff_probe|k1_main_rpl_emu_tempo_r1_lockoff_unrepaired|k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe)
     : ;;
   *)
     echo "ERROR: env '$ENV' is not in allowed list: $ALLOWED_ENVS" >&2
@@ -68,6 +78,12 @@ if [[ "$ENV" == *"upload"* ]] || \
    [[ "$ENV" == *$'\n'* ]]; then
   echo "ERROR: env argument contains forbidden token" >&2
   exit 1
+fi
+
+# USB probe must not install Arduino 3.3.11 into the shared production package
+# store. Route it through the isolated wrapper.
+if [[ "$ENV" == "k1_usb_audio_mac_probe" ]]; then
+  exec bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/pio-build-usb-audio.sh"
 fi
 
 # Execute the narrowly-scoped build command only.

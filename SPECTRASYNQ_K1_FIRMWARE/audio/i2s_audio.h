@@ -23,6 +23,22 @@
 #ifdef K1_MIC_IM69D_STEREO_V1
 #include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
 #endif
+#include "k1_audio_source.h"
+#ifdef K1_EMU_FIXTURE
+#include "k1_emu_fixture.h"
+#endif
+#if K1_AUDIO_SOURCE_USB
+#include "k1_usb_audio_input.h"
+#endif
+#if K1_PCM1808_PRESENT
+#include "k1_pcm1808_input.h"
+#endif
+#if K1_PCM1808_LINE_SWITCH
+#ifndef K1_FE_BOARD_V1
+#error "K1_PCM1808_LINE_SWITCH is the FE jack switch; it needs K1_FE_BOARD_V1"
+#endif
+#include "k1_fe_board.h"
+#endif
 
 // PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
 // Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
@@ -62,16 +78,21 @@
 //      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
 #include <driver/i2s_std.h>
 #ifdef K1_MIC_PDM_RX_ANY_V1
+#if K1_AUDIO_SOURCE_MIC
 #include <driver/i2s_pdm.h>   // PDM RX (IM73D / IM69); flag-OFF token stream unchanged
 #include <math.h>             // isfinite() for the PDM follower/NaN guard
+#endif
 #endif
 #ifdef K1_MIC_IM69D_PDM_V1
 #include <esp_idf_version.h>
 #ifndef K1_PLATFORM_P4
+#if K1_AUDIO_SOURCE_MIC
 #if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
 #error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
 #endif
 #endif
+#endif
+#if K1_AUDIO_SOURCE_MIC
 // ESP-IDF PDM electrical naming is the inverse of Infineon's microphone naming:
 // RIGHT means SELECT HIGH; LEFT means SELECT LOW. With clk_inv=false, stereo DMA
 // order is RIGHT then LEFT. These assertions turn a driver-definition change red.
@@ -80,6 +101,7 @@ static_assert((int)I2S_PDM_SLOT_RIGHT == 1,
 static_assert((int)I2S_PDM_SLOT_LEFT == 2,
               "ESP-IDF PDM LEFT must mean SELECT LOW / stereo PCM index 1");
 #define K1_IM69D_PDM_CLK_INV false
+#endif
 #endif
 #ifdef K1_MIC_IM73D_PDM_V1
 #include <driver/gpio.h>      // LR-select GPIO drive (IM73D only; IM69 SELECT is hard-strapped)
@@ -269,11 +291,41 @@ static inline int16_t audio_response_gain_apply_sample(int32_t sample) {
   return (int16_t)scaled;
 }
 
+#include "k1_audio_ingress.h"
+
 void init_i2s() {
+#if !K1_AUDIO_SOURCE_MIC
+  return;
+#else
 #ifdef K1_MIC_HEALTH_V1
   k1_mic_health_reset(millis());
 #endif
   esp_err_t result;
+
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): before the PDM clock runs,
+  // a pin that follows the internal pull is floating; one that does not is held.
+  // FLOATING is the normal result on both pins (unclocked mic data is hi-Z, the
+  // mic clock pin is an input). HELD_* on DATA, or 0 live changes, is the fault.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_reset_pin(wp);
+      gpio_set_direction(wp, GPIO_MODE_INPUT);
+      gpio_set_pull_mode(wp, GPIO_PULLUP_ONLY);
+      delay(5);
+      const int with_pu = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_PULLDOWN_ONLY);
+      delay(5);
+      const int with_pd = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_FLOATING);
+      USBSerial.printf("[WIREDIAG] static gpio=%d pullup_reads=%d pulldown_reads=%d -> %s\n",
+                       (int)wp, with_pu, with_pd,
+                       (with_pu == 1 && with_pd == 0) ? "FLOATING" : (with_pu ? "HELD_HIGH" : "HELD_LOW"));
+    }
+  }
+#endif
 
   // RX channel — mirror legacy dma_buf_count=2, dma_buf_len=SAMPLES_PER_CHUNK.
   i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT, I2S_ROLE_MASTER);
@@ -352,6 +404,12 @@ void init_i2s() {
 #elif defined(K1_MIC_IM69D_SLOT_LEFT)
   USBSerial.println(" slot=LEFT");
 #endif
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): a floating DATA line reads
+  // +full scale with the pull-up; a mic actually driving it reads audio.
+  gpio_pullup_en((gpio_num_t)K1_PDM_DIN_PIN);
+  USBSerial.printf("[WIREDIAG] pdm clk=%d din=%d din_pullup=1\n", K1_PDM_CLK_PIN, K1_PDM_DIN_PIN);
+#endif
 #ifdef K1_MIC_IM69D_STEREO_V1
   k1_stereo_probe_init();  // PSRAM ring for the Stage 2 capture instrument
 #endif
@@ -405,12 +463,137 @@ void init_i2s() {
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
 #endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
 
+#ifdef K1_EMU_FIXTURE
+  // esp-emu 0.49.0 never clears I2S_RX_UPDATE, so channel start spins.
+  // Fixture mode skips that setup. The samples below are still production PCM.
+  result = ESP_OK;
+  USBSerial.println("I2S ENABLE: FIXTURE_SKIP");
+#else
   result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
   USBSerial.print("I2S ENABLE: ");
   USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // With the PDM clock running: count pad-level changes on CLK and DATA.
+  // A live clock and a talking mic both toggle; a dead line shows 0 changes.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_input_enable(wp);
+      int last = gpio_get_level(wp), changes = 0, ones = 0;
+      for (int n = 0; n < 20000; n++) {
+        const int v = gpio_get_level(wp);
+        changes += (v != last);
+        ones += v;
+        last = v;
+      }
+      USBSerial.printf("[WIREDIAG] live gpio=%d reads=20000 ones=%d changes=%d\n", (int)wp, ones, changes);
+    }
+  }
+#endif
+#endif
+#endif
 }
 
 void acquire_sample_chunk(uint32_t t_now) {
+#if K1_AUDIO_SOURCE_USB
+  int16_t usb_pcm[96];
+  k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
+  k1_audio_commit_canonical_frame(usb_pcm, t_now);
+#ifdef K1_STM
+  // Source-neutral loudness for USB: normalise the digital peak of the canonical
+  // hop to [0,1]. NOT mic IM69 raw RMS, NOT SSL floor.
+  // EdgeMixer STM reads agc_loudness_norm; without this write modulation depth
+  // stays 0.0 on USB (USB-dead STM bug). mic path writes this from pre-AGC raw
+  // RMS at i2s_audio.h ~681. This block is USB-only; K1_STM guards the variable.
+  {
+    float usb_peak_norm = max_waveform_val_raw / 32768.0f;
+    if (usb_peak_norm < 0.0f) usb_peak_norm = 0.0f;
+    if (usb_peak_norm > 1.0f) usb_peak_norm = 1.0f;
+    agc_loudness_norm = SQ15x16(usb_peak_norm);
+  }
+#endif
+  k1_usb_audio_poll_telemetry(t_now);
+  {
+    static uint32_t s_usb_wf_dbg_ms = 0;
+    if ((t_now - s_usb_wf_dbg_ms) >= 1000) {
+      s_usb_wf_dbg_ms = t_now;
+#ifdef K1_STM
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=%.3f\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL,
+                       float(agc_loudness_norm));
+#else
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=BLOCKED\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL);
+#endif
+    }
+  }
+  return;
+#endif
+#if K1_PCM1808_CANONICAL
+#if K1_PCM1808_LINE_SWITCH
+  // FE jack switch (Captain ruling 1 Sep 2026): plug in = PCM1808 line-in owns
+  // this hop through the same canonical path the P6 probe validated; plug out =
+  // the microphone tail below. Only the mic's own follower is kept across a
+  // line-in session so unplugging returns the mic to its pre-plug envelope.
+  static bool k1_fe_line_prev = false;
+  static float k1_fe_mic_follower = 1.0f;
+  static float k1_fe_line_follower = 0.0f;  // 0 = first session: the canonical commit seeds it
+  const bool k1_fe_line = k1_fe_audio_line_hop_begin(noise_complete == false);
+  if (k1_fe_line != k1_fe_line_prev) {
+    if (k1_fe_line) {
+      k1_fe_mic_follower = max_waveform_val_follower;
+      if (k1_fe_line_follower > 0.0f) {
+        max_waveform_val_follower = k1_fe_line_follower;
+      }
+      // The canonical path never writes the mic's silence latch; start line-in
+      // from the state the P6 line build always ran in.
+      silence = false;
+      silent_scale = 1.0f;
+    } else {
+      k1_fe_line_follower = max_waveform_val_follower;
+      max_waveform_val_follower = k1_fe_mic_follower;
+    }
+    k1_fe_line_prev = k1_fe_line;
+  }
+  if (k1_fe_line) {
+#endif
+  int16_t pcm_hop[96];
+  k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  {
+    static uint32_t k1_pcm_capture_sequence = 0;
+    const K1PcmCanonicalReadTiming rt = k1_pcm1808_last_canonical_read_timing();
+    k1_audio_i2s_read_debug.read_start_us = rt.wait_start_us;
+    k1_audio_i2s_read_debug.read_return_us = rt.ready_us;
+    k1_audio_i2s_read_debug.newest_sample_estimate_us = rt.newest_sample_estimate_us;
+    k1_audio_i2s_read_debug.oldest_sample_estimate_us = rt.oldest_sample_estimate_us;
+    k1_audio_i2s_read_debug.ap_publish_us = 0;
+    k1_audio_i2s_read_debug.capture_sequence = ++k1_pcm_capture_sequence;
+    k1_audio_i2s_read_debug.samples_read = 96U;
+    k1_audio_i2s_read_debug.bytes_requested = rt.frames_requested * 6U;
+    k1_audio_i2s_read_debug.bytes_read = rt.frames_read * 6U;
+    k1_audio_i2s_read_debug.status = rt.status;
+    k1_audio_i2s_read_debug.elapsed_us = rt.wait_us;
+    // Assumption 2: PCM sample time inferred from ring backlog at the proven ~48 kHz source rate.
+    k1_audio_i2s_read_debug.sample_time_assumption_id = 2U;
+  }
+#endif
+  k1_audio_commit_canonical_frame(pcm_hop, t_now);
+#if !K1_PCM1808_LINE_SWITCH || defined(K1_PCM1808_PROBE_V1)
+  k1_pcm1808_poll_telemetry(t_now);  // FE ships without the 2 s probe stream (:fe_status prints it)
+#endif
+  return;
+#if K1_PCM1808_LINE_SWITCH
+  }
+#endif
+#endif
+#if K1_AUDIO_SOURCE_MIC
+#if K1_PCM1808_SHADOW
+  k1_pcm1808_pair_hop_begin();
+#endif
   static int8_t sweet_spot_state_last = 0;
   static bool silence_temp = false;
   static uint32_t silence_switched = 0;
@@ -463,7 +646,11 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
   }
   #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+#endif
   if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
     const size_t samples_got = bytes_read / sizeof(int16_t);
     for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
@@ -487,7 +674,11 @@ void acquire_sample_chunk(uint32_t t_now) {
   #ifdef K1_MIC_IM69D_STEREO_V1
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, portMAX_DELAY);
   #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+#endif
   #endif
   #else
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
@@ -503,12 +694,37 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
   k1_stereo_probe_on_chunk(im69d_samples_i16_stereo, CONFIG.SAMPLES_PER_CHUNK);
 #endif
+#ifdef K1_B489_WS2816_V1
+  ++b489_i2s_read_sequence;
+  b489_i2s_last_status = (int32_t)i2s_read_status;
+  b489_i2s_last_bytes = (uint32_t)bytes_read;
+  b489_i2s_expected_bytes = (uint32_t)bytes_requested;
+  b489_i2s_raw_min = 32767;
+  b489_i2s_raw_max = -32768;
+#endif
 #ifdef K1_MIC_AUTO_SENSE_V1
   k1_mic_auto_sense_note_i2s_result(
     i2s_read_status == ESP_OK && bytes_read >= bytes_requested,
     (uint32_t)bytes_read,
     (uint32_t)bytes_requested,
     t_now);
+#endif
+#if K1_PCM1808_SHADOW
+  // IM69 tap is the hardware-decimated 12.8 kHz buffer BEFORE mic gain.
+  // Shadow drain pops the 48 kHz ring so I2S1 cannot overflow while AP
+  // continues to own ingress.
+#ifdef K1_MIC_IM69D_PDM_V1
+  k1_pcm1808_pair_note_mic(
+      im69d_samples_i16,
+      i2s_read_status == ESP_OK && bytes_read >= bytes_requested);
+#endif
+  k1_pcm1808_shadow_drain();
+  k1_pcm1808_poll_telemetry(t_now);
+#endif
+#if K1_PCM1808_LINE_SWITCH
+  // Mic owns this hop: keep the PCM1808 ring under one hop so a jack insert
+  // starts line-in without a backlog (same drain the P4 shadow soak proved).
+  k1_pcm1808_shadow_drain();
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   const uint64_t i2s_read_return_us = (uint64_t)esp_timer_get_time();
@@ -572,6 +788,10 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
   for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
     const int32_t raw_sample = (int32_t)im69d_samples_i16[i];
+#ifdef K1_B489_WS2816_V1
+    if (raw_sample < b489_i2s_raw_min) b489_i2s_raw_min = (int16_t)raw_sample;
+    if (raw_sample > b489_i2s_raw_max) b489_i2s_raw_max = (int16_t)raw_sample;
+#endif
     const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
     if (raw_mag > im69d_raw_peak) im69d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
     if (raw_mag >= K1_MIC_IM69D_RAW_I16_NEAR_RAIL) im69d_raw_near_count++;
@@ -1453,6 +1673,7 @@ void acquire_sample_chunk(uint32_t t_now) {
     USBSerial.println();
     last_ap_dbg = millis();
   }
+#endif
 }
 
 #ifdef ENABLE_AP_STREAM

@@ -113,7 +113,7 @@ def test_main_rpl_led_init_is_ws2816_contiguous_dual_din():
     led = (ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "visual" / "led_utilities.h").read_text(
         encoding="utf-8"
     )
-    marker = "#ifdef K1_MAIN_RPL_PINMAP_V1"
+    marker = "#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)"
     first = led.find(marker)
     second = led.find(marker, first + 1) if first >= 0 else -1
     generic = led.find("if (CONFIG.LED_TYPE == LED_NEOPIXEL)", first)

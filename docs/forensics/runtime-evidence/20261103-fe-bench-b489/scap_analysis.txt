@@ -1,0 +1,23 @@
+== 03_k1_bench_im69d_stereo_scap
+I2S PDM RX INIT: PASS slot=STEREO order=RIGHT,LEFT clk_inv=false
+BUILD: version=40103 git=c2928534 epoch=1793706606 env=k1_bench_im69d_stereo
+[SCAP] ARMED: 25600 frames (2 s)
+bytes 102400 crc_ok True
+RIGHT(idx0) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0
+LEFT(idx1) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0
+== 04_wirediag_pullup_scap
+I2S PDM RX INIT: PASS slot=STEREO order=RIGHT,LEFT clk_inv=false
+[WIREDIAG] pdm clk=14 din=13 din_pullup=1
+BUILD: version=40103 git=1517ca17 epoch=1793707534 env=k1_bench_im69d_wirediag_pullup
+[SCAP] ARMED: 25600 frames (2 s)
+bytes 102400 crc_ok True
+RIGHT(idx0) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0
+LEFT(idx1) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0
+== 05_wirediag_swap_scap
+I2S PDM RX INIT: PASS slot=STEREO order=RIGHT,LEFT clk_inv=false
+[WIREDIAG] pdm clk=13 din=14 din_pullup=1
+BUILD: version=40103 git=1517ca17 epoch=1793707866 env=k1_bench_im69d_wirediag_swap
+[SCAP] ARMED: 25600 frames (2 s)
+bytes 102400 crc_ok True
+RIGHT(idx0) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0
+LEFT(idx1) min -30935 max -30935 uniq 1 mean -30935 pstdev 0.0

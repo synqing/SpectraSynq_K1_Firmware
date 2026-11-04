@@ -19,6 +19,8 @@ from collections import Counter
 from pathlib import Path
 
 import serial
+
+from apcad_worst_row_drain import WorstRowDrainError, drain_declared_worst_rows
 from serial.tools import list_ports
 
 
@@ -1968,15 +1970,20 @@ def main() -> int:
             )
             ensure_player_running(afplay, "compact window")
             send_action("apcad_soak_status=1", "paired_compact")
-            compact_done, compact_done_lines = read_until_done(
-                ser,
-                "APCAD_SOAK_DONE",
-                15.0,
-            )
+            compact_done_lines: list[str] = []
+            try:
+                drain_declared_worst_rows(
+                    lambda: ser.read(ser.in_waiting or 1),
+                    compact_done_lines,
+                    timeout_s=15.0,
+                )
+                compact_done = True
+            except WorstRowDrainError as exc:
+                raw_lines.extend(compact_done_lines)
+                raw_lines.append(f"# apcad_soak_status_error={exc}")
+                raise RuntimeError(f"paired compact status incomplete: {exc}") from exc
             raw_lines.extend(compact_done_lines)
             raw_lines.append(f"# apcad_soak_status_done={compact_done}")
-            if not compact_done:
-                raise RuntimeError("paired compact status did not reach APCAD_SOAK_DONE")
             raw_lines.append(
                 paired_phase_marker(
                     "paired_compact", "end", pair_id, serial_session_id
@@ -2152,9 +2159,20 @@ def main() -> int:
             time.sleep(args.post_wait_ms / 1000.0)
             if args.compact_soak:
                 send_action("apcad_soak_status=1")
-                done, dump_lines = read_until_done(ser, "APCAD_SOAK_DONE", 15.0)
+                dump_lines: list[str] = []
+                try:
+                    drain_declared_worst_rows(
+                        lambda: ser.read(ser.in_waiting or 1),
+                        dump_lines,
+                        timeout_s=15.0,
+                    )
+                    done = True
+                except WorstRowDrainError as exc:
+                    raw_lines.extend(dump_lines)
+                    raw_lines.append(f"# apcad_soak_status_error={exc}")
+                    raise RuntimeError(f"compact soak status incomplete: {exc}") from exc
                 raw_lines.extend(dump_lines)
-                raw_lines.extend(read_lines(ser, 1.0))
+                raw_lines.extend(read_lines(ser, 0.05))
                 raw_lines.append(f"# apcad_soak_status_done={done}")
                 send_action("vp_perf=start")
                 raw_lines.extend(read_lines(ser, 1.2))

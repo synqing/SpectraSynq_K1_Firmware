@@ -1,0 +1,32 @@
+{
+  "id": "missing_optional",
+  "schema_lock": "1.2",
+  "note": "[AP] with bpm+conf only. Absent optionals must not set update_mask bits (held zeros are not writes).",
+  "lines": [
+    "[AP] bpm=96.0 conf=0.40"
+  ],
+  "expected_rows": [
+    {
+      "record_kind": 1,
+      "host_parse_seq": 1,
+      "values": {
+        "bpm": 96.0,
+        "conf": 0.4,
+        "lock": 0,
+        "silence": 0,
+        "lightshow": 0,
+        "orbit_x": 0.0,
+        "orbit_y": 0.0
+      },
+      "written": [
+        "bpm",
+        "conf",
+        "orbit_x",
+        "orbit_y",
+        "host_parse_seq",
+        "record_kind",
+        "update_mask"
+      ]
+    }
+  ]
+}

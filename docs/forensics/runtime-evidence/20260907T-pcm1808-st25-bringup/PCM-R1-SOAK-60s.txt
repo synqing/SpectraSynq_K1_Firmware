@@ -1,0 +1,48 @@
+soak_s=62 n_pcmraw=41 port=/dev/cu.usbmodem1101
+NOTE: first 10 PCMRAW lines arrived in one USB burst at t=0.3 (CDC backlog). Live window is t=2.1..62.2.
+frames_live0=6510240 frames_live1=9321840 delta=2811600 tspan=60.1 dma_hz=46782
+sum_err=0 sum_short=0 sum_clip=0
+PASS_STREAM=1
+boot_pcnt_lrck_hz=47985.9 boot_dma_hz=47997.9
+stale_burst_included_would_fake_60khz=yes
+t=0.3 frames=5572800 rmsL=31570 rmsR=34226 err=0 short=0 clip=0
+t=0.3 frames=5666400 rmsL=40808 rmsR=44006 err=0 short=0 clip=0
+t=0.3 frames=5760000 rmsL=53270 rmsR=56526 err=0 short=0 clip=0
+t=0.3 frames=5853960 rmsL=52462 rmsR=56383 err=0 short=0 clip=0
+t=0.3 frames=5947560 rmsL=50424 rmsR=53983 err=0 short=0 clip=0
+t=0.3 frames=6041160 rmsL=51054 rmsR=54875 err=0 short=0 clip=0
+t=0.3 frames=6134760 rmsL=49889 rmsR=54685 err=0 short=0 clip=0
+t=0.3 frames=6228720 rmsL=54384 rmsR=57999 err=0 short=0 clip=0
+t=0.3 frames=6322680 rmsL=53122 rmsR=55670 err=0 short=0 clip=0
+t=0.3 frames=6416280 rmsL=53395 rmsR=56223 err=0 short=0 clip=0
+t=2.1 frames=6510240 rmsL=48597 rmsR=52106 err=0 short=0 clip=0
+t=4.3 frames=6603840 rmsL=52622 rmsR=57396 err=0 short=0 clip=0
+t=6.1 frames=6697440 rmsL=50443 rmsR=54628 err=0 short=0 clip=0
+t=8.2 frames=6791040 rmsL=50293 rmsR=54716 err=0 short=0 clip=0
+t=10.3 frames=6884640 rmsL=50262 rmsR=54371 err=0 short=0 clip=0
+t=12.2 frames=6978240 rmsL=49282 rmsR=52298 err=0 short=0 clip=0
+t=14.3 frames=7071840 rmsL=53088 rmsR=56517 err=0 short=0 clip=0
+t=16.1 frames=7165440 rmsL=50418 rmsR=55550 err=0 short=0 clip=0
+t=18.2 frames=7259400 rmsL=49954 rmsR=54192 err=0 short=0 clip=0
+t=20.4 frames=7353000 rmsL=53058 rmsR=57264 err=0 short=0 clip=0
+t=22.2 frames=7446600 rmsL=49447 rmsR=52948 err=0 short=0 clip=0
+t=24.3 frames=7540560 rmsL=46454 rmsR=50152 err=0 short=0 clip=0
+t=26.1 frames=7634160 rmsL=29650 rmsR=28733 err=0 short=0 clip=0
+t=28.3 frames=7727760 rmsL=42916 rmsR=50062 err=0 short=0 clip=0
+t=30.4 frames=7821720 rmsL=46948 rmsR=53968 err=0 short=0 clip=0
+t=32.2 frames=7915680 rmsL=45400 rmsR=52201 err=0 short=0 clip=0
+t=34.3 frames=8009640 rmsL=47276 rmsR=53358 err=0 short=0 clip=0
+t=36.1 frames=8103240 rmsL=49555 rmsR=57223 err=0 short=0 clip=0
+t=38.3 frames=8196840 rmsL=48009 rmsR=55503 err=0 short=0 clip=0
+t=40.4 frames=8290800 rmsL=53481 rmsR=60282 err=0 short=0 clip=0
+t=42.2 frames=8384760 rmsL=50827 rmsR=57837 err=0 short=0 clip=0
+t=44.3 frames=8478720 rmsL=50571 rmsR=59563 err=0 short=0 clip=0
+t=46.2 frames=8572680 rmsL=51601 rmsR=59796 err=0 short=0 clip=0
+t=48.3 frames=8666280 rmsL=50236 rmsR=56428 err=0 short=0 clip=0
+t=50.4 frames=8759520 rmsL=31895 rmsR=38393 err=0 short=0 clip=0
+t=52.2 frames=8853120 rmsL=28923 rmsR=33923 err=0 short=0 clip=0
+t=54.4 frames=8946360 rmsL=27360 rmsR=30967 err=0 short=0 clip=0
+t=56.2 frames=9040320 rmsL=26440 rmsR=32319 err=0 short=0 clip=0
+t=58.3 frames=9133920 rmsL=29490 rmsR=37347 err=0 short=0 clip=0
+t=60.4 frames=9227880 rmsL=29241 rmsR=38487 err=0 short=0 clip=0
+t=62.2 frames=9321840 rmsL=33752 rmsR=43181 err=0 short=0 clip=0

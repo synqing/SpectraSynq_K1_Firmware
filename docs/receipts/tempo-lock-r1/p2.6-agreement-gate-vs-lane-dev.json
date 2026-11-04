@@ -1,0 +1,52 @@
+{
+ "gate": "p2.6-agreement-gate-vs-lane-dev",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_scorer.py compare --manifest tests/fixtures/tempo_corpus/manifest.json --role dev --baseline _scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json --candidate _scratch/esp-emulator/tempo-lock-r1/joint/dev_l1sp_agreegate.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee",
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json": "60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c",
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_l1sp_agreegate.json": "bfaf34811fb34b530a75ba6fc616c0ad5f672c63e4fb983a76323a2340abc98e"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "{",
+  " \"baseline\": {",
+  "  \"correct\": 19,",
+  "  \"detected_32\": 7,",
+  "  \"locked\": 22,",
+  "  \"locked_correct\": 11,",
+  "  \"locked_wrong\": 11,",
+  "  \"locked_wrong_32\": 5,",
+  "  \"mean_lock_frac\": 0.5778,",
+  "  \"n\": 36",
+  " },",
+  " \"baseline_sha256\": \"60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c\",",
+  " \"candidate\": {",
+  "  \"correct\": 19,",
+  "  \"detected_32\": 7,",
+  "  \"locked\": 10,",
+  "  \"locked_correct\": 8,",
+  "  \"locked_wrong\": 2,",
+  "  \"locked_wrong_32\": 1,",
+  "  \"mean_lock_frac\": 0.3104,",
+  "  \"n\": 36",
+  " },",
+  " \"candidate_sha256\": \"bfaf34811fb34b530a75ba6fc616c0ad5f672c63e4fb983a76323a2340abc98e\",",
+  " \"manifest_sha256\": \"807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee\",",
+  " \"role_filter\": \"dev\"",
+  "}"
+ ],
+ "utc": "2026-10-21T08:47:13+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

@@ -66,6 +66,9 @@ struct K1AudioSnapshot {
   float peak_scaled;
   float vu_level;
   float novelty;
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+  float tempo_novelty;  // candidate: pre-sqrt novelty, read only by k1_tempo_update
+#endif
   float spectral_energy;
   float low_energy;
   float mid_energy;

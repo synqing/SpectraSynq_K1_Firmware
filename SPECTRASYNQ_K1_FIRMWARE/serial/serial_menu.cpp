@@ -55,6 +55,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "k1_stereo_probe.h"  // scap_* dispatch (Stage 2 probe env only)
 #include "k1_render_trace.h"  // rtrace_* dispatch (colour-fix-lane env only)
 #endif
+#ifdef K1_PCM1808_PROBE_V1
+#include "k1_pcm1808_input.h"  // pcmraw_* dispatch (PCM1808 probe env only)
+#endif
 #include "k1_mode_selection.h"
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
@@ -70,6 +73,9 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 #include "serial_tx.h"
 #include "serial_parse_helpers.h"
 #include "serial_cmd_handlers.h"
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"  // emulator replay only: client command observation
+#endif
 #ifdef ENABLE_AP_STREAM
 extern void ap_capture_arm(uint32_t ms);
 #endif
@@ -108,6 +114,9 @@ extern void ap_capture_arm(uint32_t ms);
 #endif
 #ifdef K1_COLOUR_LAB_V1
 #include "k1_colour_lab.h"
+#endif
+#ifdef K1_FE_BOARD_V1
+#include "k1_fe_board.h"
 #endif
 
 extern bool benchmark_running;
@@ -652,13 +661,23 @@ void k1_print_smart_status() {
 bool TEMPO_STREAM_ENABLED = (TEMPO_STREAM_DEFAULT_ON != 0);
 #endif
 void init_serial(uint32_t baud_rate) {
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  if (!USBSerial) {
+    USBSerial.begin(baud_rate);
+  }
+#else
   USBSerial.begin(baud_rate);  // Default 500,000 baud
+#endif
   bool timeout = false;
   bool serial_started = true;
   uint32_t t_start = millis();
   uint32_t t_timeout = t_start + 250;
 
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+  while (!USBSerial && timeout == false) {
+#else
   while (!Serial && timeout == false) {
+#endif
     if (millis() >= t_timeout) {
       timeout = true;  // Must not be connected to PC
       serial_started = false;
@@ -682,6 +701,23 @@ void dump_info() {
 
   USBSerial.print("CHIP ID: ");
   print_chip_id();
+
+#ifdef K1_B489_WS2816_V1
+  // Report the compiled electrical profile alongside the saved settings. These
+  // values identify the requested driver setup, not a physical wiring test.
+  USBSerial.printf("LED_PROFILE: protocol=WS2816 bits_per_channel=16 edges=2 pixels_per_edge=%u pixels_per_din=%u lower_din=%u,%u upper_din=%u,%u\n",
+                   (unsigned)CONFIG.LED_COUNT, (unsigned)(CONFIG.LED_COUNT / 2U),
+                   (unsigned)LED_DATA_PIN, (unsigned)LED_CLOCK_PIN,
+                   (unsigned)SECONDARY_LED_DATA_PIN, (unsigned)SECONDARY_LED_CLOCK_PIN);
+  USBSerial.printf("MIC_PROFILE: device=IM69D130 mode=PDM data_gpio=%u clock_gpio=%u pcm_hz=%u pcm_bits=16 dsr=16s slots=RIGHT programme=IM1 select=hardware_strap\n",
+                   (unsigned)K1_PDM_DIN_PIN, (unsigned)K1_PDM_CLK_PIN,
+                   (unsigned)CONFIG.SAMPLE_RATE);
+  USBSerial.printf("MIC_LAST_READ: sequence=%lu status=%ld bytes=%lu expected=%lu raw_min=%d raw_max=%d\n",
+                   (unsigned long)b489_i2s_read_sequence,
+                   (long)b489_i2s_last_status, (unsigned long)b489_i2s_last_bytes,
+                   (unsigned long)b489_i2s_expected_bytes,
+                   (int)b489_i2s_raw_min, (int)b489_i2s_raw_max);
+#endif
 
 #if defined(K1_LOOK_LIB_V1) || defined(K1_LOOK_LIB_WS2812_V1)
   {
@@ -2252,6 +2288,10 @@ void cmd_build() {
 #else
   USBSerial.print("unknown");
 #endif
+#ifdef K1_BUILD_TAG
+  USBSerial.print(" tag=");  // release envs only (custom_release_tag_prefix)
+  USBSerial.print(K1_BUILD_TAG);
+#endif
   USBSerial.println();
   tx_end();
 }
@@ -2573,6 +2613,13 @@ void cmd_save_show() {
   }
   USBSerial.println();
   tx_end();
+#ifdef K1_EMU_FIXTURE
+#ifdef K1_EMU_UART0
+  K1_EMU_LOG.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
+#else
+  USBSerial.printf("EMU_SHOW_COMMIT %s\n", ok ? "OK" : "FAIL");
+#endif
+#endif
 }
 void cmd_stop() {
   stop_streams();
@@ -2831,6 +2878,19 @@ void parse_command(char* command_buf) {
       }
     }
 #endif
+#ifdef K1_FE_BOARD_V1
+    // FE bring-up / QC commands take no `=value` (system/k1_fe_board.h).
+    if (strcmp(command_buf, "fe_status") == 0 ||
+        strcmp(command_buf, "pd_status") == 0 ||
+        strcmp(command_buf, "pd_nvm_write") == 0) {
+      const serial_typed_cmd_row_t* typed = serial_typed_cmd_lookup(command_buf);
+      if (typed != nullptr) {
+        char empty_data[1] = {0};
+        (void)serial_dispatch_typed_setter(typed, command_buf, empty_data);
+        return;
+      }
+    }
+#endif
     // Trailing space+token, e.g. `factory_reset CONFIRM`. This branch is scoped
     // to SC_FORBIDDEN_SINGLE_BYTE rows ONLY — those are the only commands that
     // take an argument (the CONFIRM token, D6). For any other head row (SAFE /
@@ -3074,9 +3134,26 @@ void parse_command(char* command_buf) {
     }
 #endif
 
+#ifdef K1_PCM1808_PROBE_V1
+    // pcmraw_arm / pcmraw_status / pcmraw_dump / pcmpair_* — timed capture from
+    // the continuous PCM task (audio/k1_pcm1808_input.cpp). GATE-MATCHED: rows in
+    // serial_typed_cmd_table.def, wrapper in serial_typed_dispatch.cpp, and this
+    // call-site all sit behind K1_PCM1808_PROBE_V1. The typed table is safety
+    // metadata; without this hop the commands compile and answer Bad command.
+    else if (k1_pcm1808_dispatch(command_type, command_data)) {
+      // handled by the PCM1808 raw-capture / P4 pair instrument
+    }
+#endif
+
 #ifdef K1_COLOUR_LAB_V1
     else if (k1_colour_lab_dispatch(command_type, command_data)) {
       // paint / tune — Colour Lab product surface
+    }
+#endif
+
+#ifdef K1_FE_BOARD_V1
+    else if (k1_fe_board_dispatch(command_type, command_data)) {
+      // audio_src=auto|mic|line — FE board support
     }
 #endif
 
@@ -4071,7 +4148,13 @@ void check_serial(uint32_t t_now) {
       if (byte == '\r' || byte == '\n') {
         if (command_buf_index > 0) {
           command_buf[command_buf_index] = '\0';
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_begin(command_buf);
+#endif
           parse_command(command_buf);
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_end();
+#endif
         }
         memset(&command_buf, 0, sizeof(char) * 128);
         command_buf_index = 0;
@@ -4080,7 +4163,13 @@ void check_serial(uint32_t t_now) {
         command_buf[command_buf_index++] = byte;
         if (command_buf_index >= 127) {
           command_buf[127] = '\0';
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_begin(command_buf);
+#endif
           parse_command(command_buf);
+#ifdef K1_EMU_FIXTURE
+          k1_emu_fixture_host_command_end();
+#endif
           memset(&command_buf, 0, sizeof(char) * 128);
           command_buf_index = 0;
           command_mode = false;

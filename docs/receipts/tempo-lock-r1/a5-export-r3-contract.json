@@ -1,0 +1,24 @@
+{
+ "gate": "a5-clean-export-b1f48bbc-r3-contract",
+ "cmd": "python3 -c '\nimport json,sys\nd=json.load(open('\"'\"'_scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-r3/r3-result.json'\"'\"')); ident=json.load(open('\"'\"'_scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-r3/.k1-source-identity.json'\"'\"'))\ncrit={c['\"'\"'id'\"'\"']:c['\"'\"'status'\"'\"'] for c in d['\"'\"'criteria'\"'\"']}\nprint('\"'\"'overall'\"'\"', d['\"'\"'overall'\"'\"'], '\"'\"'source'\"'\"', d['\"'\"'source'\"'\"'].get('\"'\"'head'\"'\"'), '\"'\"'kind'\"'\"', d['\"'\"'source'\"'\"'].get('\"'\"'kind'\"'\"'), '\"'\"'SW07'\"'\"', crit.get('\"'\"'SW07'\"'\"'), '\"'\"'SW11'\"'\"', crit.get('\"'\"'SW11'\"'\"'))\nsys.exit(0 if d['\"'\"'overall'\"'\"']=='\"'\"'SOFTWARE COMPLETE'\"'\"' and d['\"'\"'source'\"'\"'].get('\"'\"'kind'\"'\"')=='\"'\"'export'\"'\"' and d['\"'\"'source'\"'\"'].get('\"'\"'head'\"'\"')==ident['\"'\"'commit'\"'\"'] and ident['\"'\"'commit'\"'\"'].startswith('\"'\"'b1f48bbc'\"'\"') else 1)'",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-r3/r3-result.json": "03cce9d16bfad3d63c1c3f91d181357a82da83be7ce0e0779c768b8edbe6bc6e",
+  "_scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-r3/.k1-source-identity.json": "b5c9c99b30931d0b6119753aa44979fcb1fbab1b8c0e406cc0ed3c3ef6c5f839"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "overall SOFTWARE COMPLETE source b1f48bbc8ca53f88e509e64c9bfe228c0b1443ef kind export SW07 PASS SW11 PASS"
+ ],
+ "utc": "2026-10-21T17:02:16+00:00",
+ "git_sha": "b1f48bbc8ca53f88e509e64c9bfe228c0b1443ef",
+ "git_dirty_paths": [
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

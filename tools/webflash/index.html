@@ -4,297 +4,317 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SpectraSynq K1 — Web Flasher</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2335e0c8'/%3E%3Cstop offset='1' stop-color='%238b5cf6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='%2307090d'/%3E%3Cpath d='M8 22 L14 10 L18 18 L24 8' stroke='url(%23g)' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23060606'/%3E%3Cpath d='M8 22 L14 10 L18 18 L24 8' stroke='%23FFB84D' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #07090d;
-      --card: #0d1117;
-      --accent: #35e0c8;
-      --accent-2: #8b5cf6;
-      --text: #e9eef6;
-      --muted: #8b98ab;
-      --border: rgba(255, 255, 255, 0.08);
-      --success: #5af29e;
-      --error: #ff6b6b;
-      --warn: #ffb454;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(53, 224, 200, 0.07), transparent 32%),
-        radial-gradient(circle at 85% 0%, rgba(139, 92, 246, 0.09), transparent 34%),
-        var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 32px 18px 64px;
-      font-size: 14px;
-    }
-    .container { max-width: 1200px; margin: 0 auto; display: grid; gap: 18px; }
-    header {
-      background: linear-gradient(135deg, rgba(53, 224, 200, 0.07), rgba(139, 92, 246, 0.06));
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 24px 24px 26px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
-    }
-    .eyebrow {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 12px; padding: 6px 12px; border-radius: 999px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.04);
-      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
-    }
-    h1 {
-      margin: 12px 0 8px;
-      font-family: "Saira Condensed", sans-serif;
-      font-weight: 700;
-      font-size: clamp(34px, 4.4vw, 52px);
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      line-height: 1.02;
-    }
-    h1 .spectral {
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    header p { margin: 0; max-width: 780px; color: var(--muted); line-height: 1.55; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-    .card {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 18px; box-shadow: 0 12px 36px rgba(0,0,0,0.35);
-    }
-    .card h2 {
-      margin: 0 0 10px;
-      font-family: "Saira Condensed", sans-serif;
-      font-weight: 600; font-size: 19px;
-      letter-spacing: 0.06em; text-transform: uppercase;
-    }
-    .card p { margin: 0; color: var(--muted); line-height: 1.55; }
-    .controls { display: flex; flex-direction: column; gap: 14px; }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    select {
-      border-radius: 10px; border: 1px solid rgba(255,255,255,0.14);
-      background: rgba(255,255,255,0.04); color: var(--text);
-      padding: 10px 12px; font-size: 13px; font-weight: 500;
-      font-family: inherit; appearance: none;
-      max-width: 100%;
-    }
-    select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(53,224,200,0.2); }
-    .text-input {
-      flex: 1; min-width: 220px; border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);
-      color: var(--text); padding: 11px 12px; font-size: 13px; font-family: inherit;
-    }
-    .text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(53,224,200,0.2); }
-    .check {
-      display: inline-flex; align-items: center; gap: 9px;
-      padding: 10px 12px; border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.04);
-      color: var(--text); font-size: 13px; font-weight: 500;
-      user-select: none; cursor: pointer;
-    }
-    .check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
-    button {
-      border: none; cursor: pointer; font-size: 14px; padding: 12px 20px;
-      border-radius: 10px; font-weight: 700; font-family: inherit; color: #06110f;
-      background: linear-gradient(135deg, var(--accent), #4fd0ff);
-      box-shadow: 0 12px 32px rgba(53, 224, 200, 0.28);
-      transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.2s;
-    }
-    button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
-    button:hover:not(:disabled) { transform: translateY(-1px); }
-    .ghost { background: rgba(255,255,255,0.05); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
-    .status-line { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; color: var(--muted); font-size: 13.5px; align-items: center; }
-    .hint {
-      margin-top: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.5;
-      padding: 10px 12px; border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.10); background: rgba(255,255,255,0.02);
-    }
-    .hint strong { color: var(--text); }
-    .hint .warn { color: var(--warn); }
-    .pill {
-      display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px;
-      border-radius: 8px; border: 1px solid var(--border);
-      background: rgba(255,255,255,0.03); font-size: 12.5px; color: var(--muted);
-    }
-    .pill strong { color: var(--text); }
-    .log {
-      background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px; min-height: 140px; max-height: 240px; overflow-y: auto;
-      font-size: 12.5px; color: #aebdd6; line-height: 1.45;
-      white-space: pre-wrap; word-break: break-word;
-    }
-    .progress {
-      width: 100%; height: 10px; border-radius: 999px;
-      background: rgba(255,255,255,0.05); overflow: hidden;
-      border: 1px solid var(--border); margin-top: 8px;
-    }
-    .progress span {
-      display: block; height: 100%; width: 0%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      transition: width 0.12s ease;
-    }
-    .split { display: grid; grid-template-columns: 1.3fr 1fr; gap: 14px; }
-    .stack { display: grid; gap: 14px; align-content: start; }
-    .steps { display: grid; gap: 8px; margin: 8px 0 0; padding: 0; }
-    .steps li {
-      list-style: none; padding: 10px 12px; border-radius: 10px;
-      border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-      color: var(--muted); line-height: 1.5; font-size: 12.5px;
-    }
-    .steps li strong { color: var(--text); }
-    .badge {
-      display: inline-block; padding: 2px 10px; border-radius: 999px;
-      background: rgba(90, 242, 158, 0.12); color: var(--success);
-      font-size: 12px; border: 1px solid rgba(90, 242, 158, 0.4);
-    }
-    table.map { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
-    table.map th, table.map td {
-      text-align: left; padding: 5px 8px;
-      border-bottom: 1px solid rgba(255,255,255,0.06); color: var(--muted);
-    }
-    table.map th { color: var(--text); font-weight: 500; letter-spacing: 0.04em; }
-    table.map td.num { color: var(--accent); }
-    .error { color: var(--error); }
-    .warn-text { color: var(--warn); }
-    .ok-text { color: var(--success); }
-    .mono { font-family: inherit; }
-    /* Simple (customer) mode — enabled with ?mode=simple */
-    .update-hero { display: none; }
-    body.simple .advanced { display: none !important; }
-    body.simple .update-hero {
-      display: block; width: 100%;
-      font-family: "Saira Condensed", sans-serif;
-      font-size: 27px; font-weight: 700; letter-spacing: 0.1em;
-      text-transform: uppercase; padding: 20px 18px; border-radius: 14px;
-    }
-    code { color: var(--accent); font-family: inherit; font-size: 0.95em; }
-    footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; text-align: center; }
-    @media (max-width: 980px) {
-      body { padding: 20px 14px 60px; }
-      .split { grid-template-columns: 1fr; }
-    }
+/* Live room = locked proposal: A Console · 4 Inspect · D Dots · 2 Mid. */
+:root {
+  --void: #060606;
+  --gold: #FFB84D;
+  --ink: #F2F2F2;
+  --muted: #A3A3A3;
+  --line: rgba(255, 255, 255, 0.08);
+  --err: #FF4D4D;
+  --ok: #F2F2F2;
+  --pitch: 20px;
+  --dot-r: 0.82px;
+  --dot-t: 1.00px;
+  --dot-a: 0.34;
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --press: 140ms;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--void);
+  color: var(--ink);
+  font: 12.5px/1.4 "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+.floor {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-color: var(--void);
+  background-image: radial-gradient(circle, rgba(255,255,255,var(--dot-a)) var(--dot-r), transparent var(--dot-t));
+  background-size: var(--pitch) var(--pitch);
+  background-repeat: repeat;
+  background-position: 0 0;
+}
+.lg-inspect { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.lg-inspect .sky {
+  position: absolute; left: 0; right: 0; top: 0; height: 42%;
+  background: radial-gradient(ellipse at 50% -12%, rgba(255,255,255,0.2), transparent 70%);
+  mix-blend-mode: screen;
+}
+.lg-inspect .lintel {
+  position: absolute; left: 8%; right: 8%; top: 0; height: 10px;
+  background: #141414; box-shadow: 0 12px 40px rgba(255,255,255,0.06);
+}
+.page-rail {
+  position: fixed; left: 14px; bottom: 28px; z-index: 8;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255,184,77,0.5); pointer-events: none; user-select: none;
+}
+.page { position: relative; z-index: 3; padding: 36px 28px 96px; }
+.console {
+  width: min(100%, 1430px);
+  margin: 4vh auto 0;
+  display: grid;
+  grid-template-columns: minmax(0, 840px) 510px;
+  gap: 80px;
+  align-items: start;
+}
+.well {
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.1) 0.55px, transparent 0.7px),
+    linear-gradient(#171717, #0e0e0e);
+  background-size: 4px 4px, auto;
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.1),
+    inset 0 -2px 8px rgba(0,0,0,0.82),
+    0 0 0 1px #1c1c1c,
+    0 28px 56px -18px rgba(0,0,0,0.92);
+  position: relative;
+}
+.well::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.03) 50%, #090909);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.kicker {
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold);
+}
+.kicker::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); margin-right: 8px; box-shadow: 0 0 8px var(--gold); vertical-align: 1px;
+}
+h1 {
+  margin: 8px 0 6px;
+  font: 700 clamp(28px, 3.6vw, 44px)/1.02 "Saira Condensed", sans-serif;
+  letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink);
+  text-wrap: balance;
+}
+h1 em {
+  font-style: normal;
+  background: linear-gradient(180deg, #fff6e4, #FFB84D 42%, #7a4e10 58%, #ffe3b0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.quiet { color: var(--muted); margin: 0 0 12px; }
+h2 {
+  margin: 0 0 8px;
+  font: 600 15px/1 "Saira Condensed", sans-serif;
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+.btns { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; align-items: center; }
+button {
+  border: 0; border-radius: 10px; padding: 10px 16px; font-weight: 700;
+  font-family: inherit; cursor: pointer; color: #f4f4f4;
+  background: linear-gradient(#2e2e2e, #141414);
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.15), inset 0 -2px 8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.16);
+  transition: transform var(--press) var(--ease);
+}
+button:disabled { opacity: 0.55; cursor: not-allowed; }
+button:active:not(:disabled) { transform: scale(0.97); }
+button:focus-visible { outline: 1px solid var(--gold); outline-offset: 3px; }
+#connectBtn {
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.15), inset 0 -2px 8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,184,77,0.45);
+}
+.ghost {
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.1), 0 0 0 1px rgba(255,255,255,0.14);
+}
+.check {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12); background: linear-gradient(#161616,#0c0c0c);
+  color: var(--ink); font-size: 13px; cursor: pointer; user-select: none;
+}
+.check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--ink); cursor: pointer; }
+select, .text-input {
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.12);
+  background: linear-gradient(#161616,#0c0c0c); color: var(--ink);
+  font-family: inherit; padding: 9px 12px; font-size: 13px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.55);
+}
+select { appearance: none; max-width: 100%; }
+.text-input { flex: 1; min-width: 180px; }
+select:focus, .text-input:focus { outline: 1px solid var(--ink); outline-offset: 2px; }
+.term {
+  min-height: 40px; background: #050505; border-radius: 10px;
+  border: 1px solid rgba(255,184,77,0.28);
+  box-shadow: inset 0 0 24px rgba(255,255,255,0.04);
+  padding: 8px 10px; color: #8a8a8a; font-size: 11px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.log {
+  display: block; min-height: 120px; max-height: 220px; overflow-y: auto;
+  white-space: pre-wrap; word-break: break-word; line-height: 1.45; color: #c4c4c4;
+}
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px;
+  border-radius: 8px; border: 1px solid var(--line); background: #0c0c0c;
+  font-size: 11px; color: var(--muted);
+}
+.progress {
+  width: 100%; height: 8px; border-radius: 999px; background: #1d1d1d;
+  overflow: hidden; border: 1px solid rgba(255,255,255,0.11); margin: 8px 0;
+}
+.progress span { display: block; height: 100%; width: 0%; background: var(--ink); }
+.pockets { display: grid; gap: 10px; }
+.pockets.two { grid-template-columns: 1fr 1fr; }
+.pocket {
+  background: #0a0a0a; border-radius: 12px; padding: 12px 14px;
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.pocket b {
+  display: block; margin: 0 0 6px;
+  font: 600 12px/1 "Saira Condensed", sans-serif;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink);
+}
+.pocket.warn b { color: var(--gold); }
+.pocket ol, .pocket ul { margin: 0; padding: 0 0 0 16px; color: var(--muted); }
+.pocket li { margin: 0 0 3px; }
+.tiny { color: var(--muted); font-size: 11px; margin-top: 12px; }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 999px;
+  background: #0c0c0c; color: var(--ink); font-size: 11px; border: 1px solid var(--line);
+}
+table.map { width: 100%; border-collapse: collapse; margin: 8px 0 16px; font-size: 12px; }
+table.map th, table.map td {
+  text-align: left; padding: 5px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); color: var(--muted);
+}
+table.map th { color: var(--ink); font-weight: 500; letter-spacing: 0.04em; }
+table.map td.num { color: var(--gold); }
+.error { color: var(--err); }
+code { color: var(--ink); font-family: inherit; font-size: 0.95em; }
+.update-hero { display: none; }
+body.simple .advanced { display: none !important; }
+body.simple .update-hero {
+  display: block; width: 100%;
+  font-family: "Saira Condensed", sans-serif;
+  font-size: 27px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 16px 14px; border-radius: 10px; margin-bottom: 12px;
+}
+@media (max-width: 980px) {
+  .console { grid-template-columns: 1fr; gap: 24px; margin: 2vh auto 0; }
+  .pockets.two { grid-template-columns: 1fr; }
+  .page { padding: 24px 16px 80px; }
+  .page-rail { left: 8px; }
+}
   </style>
-  <!-- Vendored (pinned, works offline): crypto-js 4.1.1 + esptool-js 0.6.1 -->
   <script src="assets/crypto-js-4.1.1.min.js"></script>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="eyebrow">SpectraSynq · K1 · ESP32-S3</div>
-      <h1>Flash the <span class="spectral">K1</span> straight from your browser</h1>
-      <p>Web Serial flasher powered by esptool-js. Pick a firmware variant, connect the K1 over USB, and flash — offsets, images and MD5 checksums come from <code>manifest.json</code>, generated from the real build outputs and the real partition table.</p>
-    </header>
-
-    <div class="split">
-      <div class="stack">
-        <div class="card">
-          <h2>Control</h2>
-          <div class="controls">
-            <button id="updateBtn" class="update-hero">Update K1</button>
-            <div class="actions advanced">
-              <button id="connectBtn">Connect</button>
-              <button id="flashBtn" class="ghost" disabled>Flash</button>
-              <label class="check" title="Full flash erase before writing (esptool erase-flash)">
-                <input id="eraseAll" type="checkbox">
-                Erase
-              </label>
-              <label class="check" title="Also write the app image to the ota_1 slot">
-                <input id="seedOta1" type="checkbox">
-                Seed OTA-1
-              </label>
-              <select id="variantSelect" aria-label="Firmware variant">
-                <option value="">Loading variants…</option>
-              </select>
-              <select id="baudSelect" aria-label="Baud rate">
-                <option value="460800">460800 baud</option>
-                <option value="921600">921600 baud</option>
-                <option value="115200">115200 baud</option>
-              </select>
-            </div>
-            <div class="status-line">
-              <span id="statusText">Ready to connect.</span>
-              <span id="chipText" class="pill" style="display:none;"></span>
-              <span id="identityText" class="pill" style="display:none;"></span>
-              <span id="manifestText" class="pill" style="display:none;"></span>
-            </div>
-            <div class="hint advanced">
-              <strong>Erase</strong> performs a full flash erase before writing.
-              <span class="warn">It wipes NVS — persisted K1 configuration and calibration state go with it.</span>
-              Only use it to clear boot-loops or OTA slot errors.
-              <strong>Seed OTA-1</strong> additionally writes the app to the second OTA slot so a failed future OTA always has a sane fallback.
-              Every image is MD5-verified against the manifest before it is written, and esptool verifies MD5 on-chip after writing.
-            </div>
-            <div class="progress" aria-label="Flash progress"><span id="progressBar"></span></div>
-            <div class="log" id="log"></div>
-          </div>
+  <div class="floor" aria-hidden="true"></div>
+  <div class="lg-inspect" aria-hidden="true"><i class="lintel"></i><i class="sky"></i></div>
+  <div class="page-rail">SpectraSynq · K1 · Web Serial</div>
+  <div class="page">
+    <div class="console">
+      <div class="well role-hands">
+        <div class="kicker">SpectraSynq · K1 · ESP32-S3</div>
+        <h1>Flash the <em>K1</em> from your browser</h1>
+        <p class="quiet">Web Serial. USB. Real build images.</p>
+        <button id="updateBtn" class="update-hero">Update K1</button>
+        <h2>Control</h2>
+        <div class="btns advanced">
+          <button id="connectBtn" type="button">Connect</button>
+          <button id="flashBtn" class="ghost" type="button" disabled>Flash</button>
+          <label class="check" title="Full flash erase before writing (esptool erase-flash)">
+            <input id="eraseAll" type="checkbox"> Erase
+          </label>
+          <label class="check" title="Also write the app image to the ota_1 slot">
+            <input id="seedOta1" type="checkbox"> Seed OTA-1
+          </label>
+          <select id="variantSelect" aria-label="Firmware variant">
+            <option value="">Loading variants…</option>
+          </select>
+          <select id="baudSelect" aria-label="Baud rate">
+            <option value="460800">460800 baud</option>
+            <option value="921600">921600 baud</option>
+            <option value="115200">115200 baud</option>
+          </select>
         </div>
-
-        <div class="card advanced">
-          <h2>Serial monitor</h2>
-          <p>Independent UART terminal. K1 talks at 115200 — serial tokens can be sent directly from here.</p>
-          <div class="controls" style="margin-top:12px;">
-            <div class="actions">
-              <button id="monitorBtn" class="ghost">Monitor</button>
-              <select id="monitorBaudSelect" aria-label="Monitor baud rate">
-                <option value="115200">115200 baud</option>
-                <option value="460800">460800 baud</option>
-                <option value="921600">921600 baud</option>
-              </select>
-              <button id="clearMonitorBtn" class="ghost">Clear</button>
-            </div>
-            <div class="status-line">
-              <span id="monitorStatusText">Monitor disconnected.</span>
-            </div>
-            <div class="log" id="monitorLog"></div>
-            <div class="actions">
-              <input id="monitorInput" class="text-input" type="text" placeholder="Type text to send over UART">
-              <button id="monitorSendBtn" class="ghost" disabled>Send</button>
-            </div>
+        <div class="term">
+          <span id="statusText">Ready to connect.</span>
+          <span id="chipText" class="pill" style="display:none;"></span>
+          <span id="identityText" class="pill" style="display:none;"></span>
+          <span id="manifestText" class="pill" style="display:none;"></span>
+        </div>
+        <div class="progress" aria-label="Flash progress"><span id="progressBar"></span></div>
+        <div class="term log" id="log"></div>
+        <div class="advanced">
+          <h2 style="margin-top:14px">Serial monitor</h2>
+          <p class="quiet">Independent UART terminal. K1 talks at 115200 — serial tokens can be sent directly from here.</p>
+          <div class="btns">
+            <button id="monitorBtn" class="ghost" type="button">Monitor</button>
+            <select id="monitorBaudSelect" aria-label="Monitor baud rate">
+              <option value="115200">115200 baud</option>
+              <option value="460800">460800 baud</option>
+              <option value="921600">921600 baud</option>
+            </select>
+            <button id="clearMonitorBtn" class="ghost" type="button">Clear</button>
+          </div>
+          <div class="term"><span id="monitorStatusText">Monitor disconnected.</span></div>
+          <div class="term log" id="monitorLog" style="margin-top:8px"></div>
+          <div class="btns" style="margin-top:8px">
+            <input id="monitorInput" class="text-input" type="text" placeholder="Type text to send over UART">
+            <button id="monitorSendBtn" class="ghost" type="button" disabled>Send</button>
           </div>
         </div>
       </div>
-
-      <div class="stack">
-        <div class="card">
-          <h2>Build info</h2>
-          <p id="releaseInfo">Loading manifest…</p>
-          <table class="map" id="flashMap" style="display:none;">
-            <thead><tr><th>Image</th><th>Offset</th><th>Size</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="card">
-          <h2>How to flash</h2>
-          <div class="steps">
-            <li><strong>Normal flow:</strong> plug the K1 in over USB, click Connect, pick the port. The S3's native USB usually drops into the bootloader automatically.</li>
-            <li><strong>ROM mode:</strong> if sync fails, hold BOOT, tap RESET, release BOOT — the flasher retries for 20 seconds.</li>
-            <li><strong>Close serial hogs:</strong> quit <code>pio device monitor</code> or anything else holding the port.</li>
-            <li><strong>After flashing:</strong> the board resets itself; press RESET if it doesn't.</li>
+      <div class="well role-guide">
+        <h2>Build</h2>
+        <p class="quiet" id="releaseInfo">Loading manifest…</p>
+        <table class="map" id="flashMap" style="display:none;">
+          <thead><tr><th>Image</th><th>Offset</th><th>Size</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <h2>How to flash</h2>
+        <div class="pockets two">
+          <div class="pocket">
+            <b>Normal</b>
+            <ol>
+              <li>Plug in over USB.</li>
+              <li>Connect, pick the port.</li>
+              <li>S3 USB usually finds the bootloader.</li>
+              <li>Quit <code>pio device monitor</code> if the port is held.</li>
+            </ol>
+          </div>
+          <div class="pocket">
+            <b>If sync fails</b>
+            <ol>
+              <li>Hold BOOT, tap RESET, release BOOT.</li>
+              <li>Retries for 20 seconds.</li>
+              <li>After flashing, the board resets; press RESET if it does not.</li>
+            </ol>
+          </div>
+          <div class="pocket warn">
+            <b>Erase</b>
+            <ul>
+              <li>Full chip erase before write.</li>
+              <li>Wipes NVS — config and calibration go.</li>
+              <li>Only for boot-loops or OTA slot errors.</li>
+            </ul>
+          </div>
+          <div class="pocket warn">
+            <b>Seed OTA-1</b>
+            <ul>
+              <li>Writes the app to the second slot.</li>
+              <li>A failed later OTA still rolls back.</li>
+              <li>Every image is MD5-checked before and after write.</li>
+            </ul>
           </div>
         </div>
-        <div class="card advanced">
-          <h2>What happens</h2>
-          <p>esptool-js enters the ROM stub, raises the baud rate, then writes each image at the offset recorded in <code>manifest.json</code> — bootloader, partition table, OTA data seed and app. Flash header parameters are kept exactly as built (<code>keep</code>).</p>
-        </div>
-        <div class="card advanced">
-          <h2>Prefer the CLI?</h2>
-          <p>The same images live in <code>firmware/&lt;env&gt;/</code> — flash with <code>pio run -e &lt;env&gt; -t upload</code> from the repo (which also enforces the device-identity guard), or with plain esptool at the manifest offsets.</p>
-        </div>
-        <div class="card">
-          <h2>Browser support</h2>
-          <p>Chrome or Edge on desktop, over HTTPS or localhost. Web Serial is required — other browsers will show a warning here.</p>
-        </div>
+        <p class="tiny">Chrome or Edge · desktop · HTTPS or localhost. <span id="pageVersion" class="mono">Web flasher v1.0.0</span></p>
       </div>
     </div>
   </div>
-  <footer>
-    SpectraSynq K1 firmware — <span id="pageVersion" class="mono">Web flasher v1.0.0</span>
-  </footer>
 
   <script type="module">
     import { ESPLoader, Transport } from "./assets/esptool-js-0.6.1.bundle.js";
@@ -334,6 +354,7 @@
       transport: null,
       esploader: null,
       chip: null,
+      mac: null,
       connected: false,
       isFlashing: false,
       autoFlash: false,
@@ -346,7 +367,8 @@
       monitorConnected: false,
     };
 
-    const PAGE_VERSION = "1.1.0";
+    const PAGE_VERSION = "1.2.0";
+    const SIMPLE_ENV = "k1_main_rpl_im69d";
     const CONNECT_TIMEOUT_MS = 20000;
     const CONNECT_RETRY_DELAY_MS = 500;
     // K1 build-identity handshake (firmware `build` serial command, stamped by
@@ -435,6 +457,11 @@
         }
         log(`Identified running firmware: ${identityLabel(res.identity)}`);
         showIdentity(res.identity);
+        // Do not auto-select from running env= — a probe must not appear as a home.
+        const homes = (state.manifest?.variants || []).map((v) => v.env);
+        if (res.identity.env && !homes.includes(res.identity.env)) {
+          log(`Running env ${res.identity.env} is not a webflash home; leaving the selected variant unchanged.`);
+        }
         const v = selectedVariant();
         const mGit = state.manifest?.git?.sha;
         if (v && mGit && res.identity.git === mGit && res.identity.env === v.env) {
@@ -464,6 +491,7 @@
       state.transport = null;
       state.esploader = null;
       state.chip = null;
+      state.mac = null;
       state.connected = false;
       ui.chip.style.display = "none";
       ui.connectBtn.textContent = "Connect";
@@ -589,10 +617,94 @@
       }
     };
 
+    const simpleEnv = () =>
+      (state.manifest?.identityPolicy?.simpleEnv || SIMPLE_ENV);
+
     const selectedVariant = () => {
       if (!state.manifest) return null;
-      return (state.manifest.variants || []).find((v) => v.env === ui.variant.value)
-        || (state.manifest.variants || [])[0] || null;
+      const variants = state.manifest.variants || [];
+      if (state.simpleMode) {
+        return variants.find((v) => v.env === simpleEnv()) || null;
+      }
+      return variants.find((v) => v.env === ui.variant.value) || variants[0] || null;
+    };
+
+    const normMac = (value) =>
+      String(value || "").trim().toUpperCase().replace(/-/g, ":");
+
+    const lookupKnownDevice = (mac) => {
+      const want = normMac(mac);
+      return (state.manifest?.knownDevices || []).find((d) => normMac(d.usbSerial) === want) || null;
+    };
+
+    const identityVerdict = () => {
+      const variant = selectedVariant();
+      if (!variant) {
+        return { ok: false, message: "No firmware variant selected.", log: "Identity gate: no variant." };
+      }
+      const mac = state.mac;
+      if (!mac) {
+        return {
+          ok: false,
+          message: "Could not read chip MAC. Flash blocked.",
+          log: "Identity gate: no MAC after esptool sync — refusing.",
+        };
+      }
+      const quarantined = (state.manifest?.quarantinedUsbSerials || []).map(normMac);
+      if (quarantined.includes(normMac(mac))) {
+        return {
+          ok: false,
+          message: "This serial is quarantined. Flash blocked.",
+          log: `Identity gate: MAC ${mac} is quarantined.`,
+        };
+      }
+      const device = lookupKnownDevice(mac);
+      if (!device) {
+        return {
+          ok: false,
+          message: "Unknown chip. Public flasher refuses unregistered units.",
+          log: `Identity gate: MAC ${mac} is not in the device registry. Refusing by default.`,
+        };
+      }
+      const allowed = device.allowedCuratedEnvs || [];
+      if (!allowed.includes(variant.env)) {
+        const who = device.role || device.chipId || mac;
+        return {
+          ok: false,
+          message: `This chip is ${who}. ${variant.label || variant.env} is not allowed.`,
+          log: `Identity gate: MAC ${mac} (${who}) is not allowed ${variant.env}. Permitted on this page: ${allowed.join(", ") || "(none)"}. Flash blocked.`,
+        };
+      }
+      return { ok: true, device, variant };
+    };
+
+    const applyIdentityGate = () => {
+      if (!state.connected) return false;
+      const verdict = identityVerdict();
+      if (!verdict.ok) {
+        ui.flashBtn.disabled = true;
+        setStatus(verdict.message, "error");
+        if (verdict.log) log(verdict.log);
+        return false;
+      }
+      ui.flashBtn.disabled = false;
+      const who = verdict.device?.role || state.mac;
+      setStatus(`Connected · ${who}. Ready to flash ${verdict.variant.label || verdict.variant.env}.`);
+      return true;
+    };
+
+    const readConnectedMac = async () => {
+      try {
+        const chip = state.esploader?.chip;
+        if (!chip || typeof chip.readMac !== "function") {
+          throw new Error("esptool has no readMac");
+        }
+        const raw = await chip.readMac(state.esploader);
+        return normMac(raw);
+      } catch (err) {
+        log(`MAC read failed: ${err?.message || err}`);
+        return null;
+      }
     };
 
     const renderVariant = () => {
@@ -632,6 +744,12 @@
         const manifest = await res.json();
         if (!Array.isArray(manifest.variants) || manifest.variants.length === 0) {
           throw new Error("Manifest has no variants");
+        }
+        if (state.simpleMode) {
+          const want = manifest.identityPolicy?.simpleEnv || SIMPLE_ENV;
+          if (!manifest.variants.some((v) => v.env === want)) {
+            throw new Error(`Simple mode requires ${want} in the manifest`);
+          }
         }
         state.manifest = manifest;
         ui.variant.innerHTML = "";
@@ -715,16 +833,20 @@
         }
         if (lastErr) throw lastErr;
         state.connected = true;
+        state.mac = await readConnectedMac();
         ui.chip.style.display = "inline-flex";
-        ui.chip.textContent = `Chip ${state.chip}`;
+        ui.chip.textContent = state.mac
+          ? `Chip ${state.chip} · MAC ${state.mac}`
+          : `Chip ${state.chip}`;
         ui.connectBtn.textContent = "Disconnect";
-        setStatus(`Connected to ${state.chip}. Ready to flash.`);
-        log(`Connected: ${state.chip}`);
-        ui.flashBtn.disabled = false;
+        log(`Connected: ${state.chip}${state.mac ? " MAC " + state.mac : ""}`);
+        const gated = applyIdentityGate();
 
-        if (state.autoFlash && !state.autoFlashTriggered && !state.isFlashing) {
+        if (gated && state.autoFlash && !state.autoFlashTriggered && !state.isFlashing) {
           state.autoFlashTriggered = true;
           await flash();
+        } else if (!gated && state.autoFlash) {
+          log("Auto-flash skipped: identity gate blocked.");
         }
       } catch (err) {
         console.error(err);
@@ -771,6 +893,11 @@
     const flash = async () => {
       ensureSupport();
       if (!state.esploader) await connect();
+      const verdict = identityVerdict();
+      if (!verdict.ok) {
+        applyIdentityGate();
+        throw new Error(verdict.message);
+      }
       ui.flashBtn.disabled = true;
       ui.connectBtn.disabled = true;
       ui.variant.disabled = true;
@@ -805,9 +932,10 @@
         log(`Error: ${err.message || err}`);
       } finally {
         state.isFlashing = false;
-        ui.flashBtn.disabled = false;
         ui.connectBtn.disabled = false;
         ui.variant.disabled = false;
+        if (state.connected) applyIdentityGate();
+        else ui.flashBtn.disabled = true;
       }
     };
 
@@ -906,6 +1034,7 @@
       state.transport = null;
       state.esploader = null;
       state.chip = null;
+      state.mac = null;
       state.connected = false;
       ui.chip.style.display = "none";
       ui.flashBtn.disabled = true;
@@ -919,7 +1048,10 @@
       ui.updateBtn.disabled = true;
       connect().catch(() => {}).finally(() => { ui.updateBtn.disabled = false; });
     });
-    ui.variant.addEventListener("change", renderVariant);
+    ui.variant.addEventListener("change", () => {
+      renderVariant();
+      if (state.connected) applyIdentityGate();
+    });
     ui.monitorBtn.addEventListener("click", () => connectMonitor().catch(() => {}));
     ui.clearMonitorBtn.addEventListener("click", () => { ui.monitorLog.textContent = ""; });
     ui.monitorSendBtn.addEventListener("click", () => sendMonitor().catch((err) => {

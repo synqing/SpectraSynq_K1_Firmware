@@ -1,0 +1,22 @@
+unflags=
+  -DARDUINO_RUNNING_CORE=1
+  -DARDUINO_USB_MODE=1
+  -DARDUINO_USB_CDC_ON_BOOT=1
+
+only_on_probe=
+  -DARDUINO_USB_CDC_ON_BOOT=0
+  -DARDUINO_USB_DFU_ON_BOOT=0
+  -DARDUINO_USB_MODE=0
+  -DARDUINO_USB_MSC_ON_BOOT=0
+  -DK1_AUDIO_SOURCE_MIC=0
+  -DK1_AUDIO_SOURCE_USB=1
+  -DK1_USB_AUDIO_BITS_PER_SAMPLE=16u
+  -DK1_USB_AUDIO_CHANNELS=1u
+  -DK1_USB_AUDIO_PROTOTYPE=1
+  -DK1_USB_AUDIO_SAMPLE_RATE=12800u
+
+only_on_rpl=
+  (none)
+
+probe_platform=https://github.com/pioarduino/platform-espressif32/releases/download/55.03.311/platform-espressif32.zip
+rpl_platform_inherited=k1_hardware 54.03.20 unless overridden

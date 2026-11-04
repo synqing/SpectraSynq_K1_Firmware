@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "K1 Decision Landscape",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1140,
+      440
+    ],
+    "views": [
+      {
+        "id": "compute-now",
+        "label": "Compute core: where it is",
+        "focus": [
+          "ap_engine",
+          "features",
+          "vp_engine",
+          "harness"
+        ],
+        "note": "RT1062 owns audio, features and render; the harness gates every port."
+      },
+      {
+        "id": "control-deck",
+        "label": "Control plane and deck",
+        "focus": [
+          "s3_radio",
+          "registry",
+          "tab5",
+          "vp_engine"
+        ],
+        "note": "BLE-MIDI link proven; registry v2 and schema transport are the blockers."
+      },
+      {
+        "id": "oracles",
+        "label": "Oracles and ancestry",
+        "focus": [
+          "legacy_s3",
+          "ancestors",
+          "harness",
+          "ap_engine"
+        ],
+        "note": "Legacy S3 is the parity oracle; Emotiscope C is the candidate tempo-field oracle."
+      },
+      {
+        "id": "hardware-gate",
+        "label": "Hardware gate",
+        "focus": [
+          "pcb_core",
+          "ap_engine",
+          "vp_engine",
+          "s3_radio"
+        ],
+        "note": "Fork B vs C, mic path, four LED lanes and version straps wait on one ruling."
+      },
+      {
+        "id": "fields-flow",
+        "label": "Where the fields go",
+        "focus": [
+          "features",
+          "vp_engine",
+          "mi_lab",
+          "tab5"
+        ],
+        "note": "Fields, not decisions: renderers, the learned layer and the deck consume them."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "legacy_s3",
+      "type": "external",
+      "label": "Legacy S3 monolith",
+      "sublabel": "parity oracle, frozen",
+      "tag": "read-only",
+      "pos": [
+        40,
+        30
+      ],
+      "size": [
+        170,
+        58
+      ]
+    },
+    {
+      "id": "harness",
+      "type": "security",
+      "label": "Differential harness",
+      "sublabel": "9 features, post-link gate",
+      "tag": "gatekeeper",
+      "pos": [
+        290,
+        30
+      ],
+      "size": [
+        170,
+        58
+      ]
+    },
+    {
+      "id": "ancestors",
+      "type": "external",
+      "label": "SB 4.1.1 / Emotiscope",
+      "sublabel": "borrow source, inherited defects",
+      "tag": "reviewed 02 Sep",
+      "pos": [
+        540,
+        30
+      ],
+      "size": [
+        180,
+        58
+      ]
+    },
+    {
+      "id": "mi_lab",
+      "type": "external",
+      "label": "EdgeAI-Lab / MI",
+      "sublabel": "learned layer on fields (MLP)",
+      "tag": "research",
+      "pos": [
+        920,
+        30
+      ],
+      "size": [
+        190,
+        58
+      ]
+    },
+    {
+      "id": "ap_engine",
+      "type": "backend",
+      "label": "Audio Processing (AP)",
+      "sublabel": "GDFT 80 bins, tempo 96",
+      "tag": "12.8k to 24k pending",
+      "pos": [
+        40,
+        170
+      ],
+      "size": [
+        160,
+        58
+      ]
+    },
+    {
+      "id": "features",
+      "type": "messagebus",
+      "label": "AudioFeaturesV1",
+      "sublabel": "fields, kValidTempi pending",
+      "tag": "contract",
+      "pos": [
+        380,
+        170
+      ],
+      "size": [
+        160,
+        58
+      ]
+    },
+    {
+      "id": "vp_engine",
+      "type": "backend",
+      "label": "Visual Processing (VP)",
+      "sublabel": "float pipeline, WS2816 16-bit",
+      "tag": "WP1 next",
+      "pos": [
+        720,
+        170
+      ],
+      "size": [
+        170,
+        58
+      ]
+    },
+    {
+      "id": "pcb_core",
+      "type": "cloud",
+      "label": "K1-CORE PCB",
+      "sublabel": "fork B vs C, straps",
+      "tag": "ruling pending",
+      "pos": [
+        40,
+        310
+      ],
+      "size": [
+        160,
+        58
+      ]
+    },
+    {
+      "id": "registry",
+      "type": "database",
+      "label": "Control registry",
+      "sublabel": "68 frozen, v2 blocked",
+      "tag": "descriptor spike",
+      "pos": [
+        380,
+        310
+      ],
+      "size": [
+        160,
+        58
+      ]
+    },
+    {
+      "id": "s3_radio",
+      "type": "backend",
+      "label": "K1BR slave + BLE-MIDI",
+      "sublabel": "13 msg types frozen, link proven",
+      "tag": "K1-DM-040 gated",
+      "pos": [
+        720,
+        310
+      ],
+      "size": [
+        170,
+        58
+      ]
+    },
+    {
+      "id": "tab5",
+      "type": "frontend",
+      "label": "Tab5 deck",
+      "sublabel": "LVGL, UI v4, needs registry v2",
+      "tag": "P4 UI lane",
+      "pos": [
+        950,
+        310
+      ],
+      "size": [
+        150,
+        58
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "process, oracles and research",
+      "wraps": [
+        "legacy_s3",
+        "harness",
+        "ancestors",
+        "mi_lab"
+      ],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "RT1062 (Teensy 4.1) - owns AP + VP + render",
+      "wraps": [
+        "ap_engine",
+        "features",
+        "vp_engine"
+      ],
+      "pad": 22
+    },
+    {
+      "kind": "region",
+      "label": "ESP32-S3 - radio-only bridge",
+      "wraps": [
+        "registry",
+        "s3_radio"
+      ],
+      "pad": 22
+    }
+  ],
+  "connections": [
+    {
+      "from": "legacy_s3",
+      "to": "harness",
+      "label": "parity oracle",
+      "variant": "security"
+    },
+    {
+      "from": "ancestors",
+      "to": "harness",
+      "label": "host oracle",
+      "variant": "dashed"
+    },
+    {
+      "from": "harness",
+      "to": "ap_engine",
+      "label": "gates every DSP port",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "via": [
+        [
+          375,
+          116
+        ],
+        [
+          120,
+          116
+        ]
+      ],
+      "labelSegment": 1
+    },
+    {
+      "from": "ap_engine",
+      "to": "features",
+      "label": "publishes fields",
+      "variant": "emphasis"
+    },
+    {
+      "from": "features",
+      "to": "vp_engine",
+      "label": "zero wire cost",
+      "variant": "emphasis"
+    },
+    {
+      "from": "features",
+      "to": "mi_lab",
+      "label": "fields feed the learned layer",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "via": [
+        [
+          460,
+          134
+        ],
+        [
+          1015,
+          134
+        ]
+      ],
+      "labelSegment": 1
+    },
+    {
+      "from": "pcb_core",
+      "to": "ap_engine",
+      "label": "mic path: PDM to SAI",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [
+        232,
+        269
+      ]
+    },
+    {
+      "from": "s3_radio",
+      "to": "vp_engine",
+      "label": "K1BR: commands and state only",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom",
+      "labelAt": [
+        912,
+        269
+      ]
+    },
+    {
+      "from": "registry",
+      "to": "s3_radio",
+      "label": "generates BLE-MIDI map"
+    },
+    {
+      "from": "s3_radio",
+      "to": "tab5",
+      "label": "BLE-MIDI",
+      "variant": "emphasis"
+    },
+    {
+      "from": "registry",
+      "to": "tab5",
+      "label": "schema broadcast (SysEx or GATT)",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          460,
+          410
+        ],
+        [
+          1025,
+          410
+        ]
+      ],
+      "labelSegment": 1
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Where things are (verified)",
+      "items": [
+        "RT1062 owns AP, VP and render; S3 is radio-only over K1BR (13 frozen message types)",
+        "Legacy S3 frozen as parity oracle (~22 us headroom); Tab5 BLE-MIDI link proven 07 Aug",
+        "WP0 dither closed; WP1 emit next on the Teensy 4.1; both ancestor reviews in docs/research"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Rulings that unblock lanes",
+      "items": [
+        "D1 sample rate: 12.8k/96 (an S2 artefact) or 24k/180 keeping 133 Hz; decide before the parity port",
+        "D2 schema transport, SysEx or GATT: unblocks registry v2, name-keyed presets, serial-menu shrink",
+        "D3 replace or fence sweet-spot calibration; D4 fork B/C + version straps; D5 multi-unit, MSC, acoustic: in or out"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Cascade and counter-case",
+      "items": [
+        "D1 changes every golden vector; the tempo field is free on the wire but adds a contract block to golden",
+        "One mode-kind enum unblocks ambient mode and self-test; a sampling profiler retires the ENABLE_* macros",
+        "Steel-man 'finish the S3 first' closed 27 Aug (Q0-A); Emotiscope 2.0 never shipped this rewrite shape; nothing here ran on hardware"
+      ]
+    }
+  ]
+}

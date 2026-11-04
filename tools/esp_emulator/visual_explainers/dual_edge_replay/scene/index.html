@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #12141a; overflow: hidden; }
+  #stage {
+    position: relative; overflow: hidden; background: #12141a; color: #ece7dc;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+  .layer { position: absolute; inset: 0; pointer-events: none; }
+  h1, p, div { margin: 0; font-weight: 500; }
+  #title { position: absolute; left: 80px; top: 36px; font-size: 40px; letter-spacing: -0.03em; font-weight: 650; }
+  #badge {
+    position: absolute; right: 80px; top: 44px; font-size: 18px; letter-spacing: 0.04em;
+    color: #c8c2b6; border: 1px solid #3a3e48; padding: 8px 12px;
+  }
+  #sub { position: absolute; left: 80px; top: 92px; font-size: 20px; color: #b7b1a6; max-width: 1500px; }
+  #clock { position: absolute; left: 80px; top: 128px; width: 1760px; font-size: 22px; line-height: 1.35; font-variant-numeric: tabular-nums; white-space: pre; }
+  canvas { position: absolute; left: 80px; image-rendering: pixelated; }
+  #wave { top: 196px; }
+  #edgeA { top: 376px; }
+  #edgeB { top: 564px; }
+  .lab { position: absolute; left: 80px; font-size: 18px; letter-spacing: 0.08em; color: #d9d3c8; }
+  #labA { top: 344px; }
+  #labB { top: 532px; }
+  #ticksA { top: 472px; }
+  #ticksB { top: 660px; }
+  .ticks { position: absolute; left: 80px; width: 1760px; height: 28px; font-size: 14px; color: #9b958a; font-variant-numeric: tabular-nums; }
+  .tick { position: absolute; top: 0; transform: translateX(-50%); }
+  #callout {
+    position: absolute; left: 80px; top: 712px; width: 1500px; font-size: 30px;
+    line-height: 1.35; letter-spacing: -0.02em; color: #f4efe6;
+  }
+  #native {
+    position: absolute; left: 80px; top: 860px; font-size: 16px; line-height: 1.5;
+    color: #c9c3b6; font-family: ui-monospace, Menlo, monospace; white-space: pre;
+  }
+  #foot {
+    position: absolute; left: 80px; top: 1016px; font-size: 16px; color: #8f8a80;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <h1 id="title"></h1>
+  <div id="badge"></div>
+  <p id="sub"></p>
+  <p id="clock"></p>
+  <div class="lab" id="labA"></div>
+  <canvas id="wave" width="1760" height="120"></canvas>
+  <canvas id="edgeA" width="1760" height="88"></canvas>
+  <div class="ticks" id="ticksA"></div>
+  <div class="lab" id="labB"></div>
+  <canvas id="edgeB" width="1760" height="88"></canvas>
+  <div class="ticks" id="ticksB"></div>
+  <p id="callout"></p>
+  <p id="native"></p>
+  <p id="foot"></p>
+</div>
+<script src="motion.js"></script>
+<script src="comp.js"></script>
+</body>
+</html>

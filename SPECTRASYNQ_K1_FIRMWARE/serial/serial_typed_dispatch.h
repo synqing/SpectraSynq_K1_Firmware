@@ -39,6 +39,9 @@ bool serial_typed_wrap_gdft_harness(const char* command_type, char* command_data
 #ifdef K1_MIC_IM69D_STEREO_V1
 bool serial_typed_wrap_stereo_probe(const char* command_type, char* command_data);
 #endif
+#ifdef K1_PCM1808_PROBE_V1
+bool serial_typed_wrap_pcmraw(const char* command_type, char* command_data);
+#endif
 #ifdef K1_RENDER_TRACE_V1
 bool serial_typed_wrap_render_trace(const char* command_type, char* command_data);
 #endif
@@ -124,6 +127,9 @@ bool serial_typed_wrap_look(const char* command_type, char* command_data);
 #endif
 #ifdef K1_COLOUR_LAB_V1
 bool serial_typed_wrap_colour_lab(const char* command_type, char* command_data);
+#endif
+#ifdef K1_FE_BOARD_V1
+bool serial_typed_wrap_fe_board(const char* command_type, char* command_data);
 #endif
 
 #endif // SERIAL_TYPED_DISPATCH_H

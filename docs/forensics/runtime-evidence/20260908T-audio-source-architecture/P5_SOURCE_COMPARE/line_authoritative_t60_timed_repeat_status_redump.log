@@ -1,0 +1,31 @@
+AP_STREAM: on
+HOTKEY primary mood: 0.700
+AP_STREAM: off
+STREAM_AGC_DEBUG: on
+sbr{{
+EDGE_STRENGTH: 0.550
+}}
+VP_STREAM: on
+HOTKEY primary chroma: 0.100
+AP_STREAM: on
+HOTKEY primary prism: 1.25
+sbr{{
+EDGE_STRENGTH: 0.450
+}}
+VP_STREAM: off
+VP_BLOOM_ALPHA: 0.9950
+AP_STREAM: off
+VP_BLOOM_ALPHA: 1.0000
+sbr{{
+EDGE_ROTATION: faithful
+}}
+VP_STREAM: on
+sbr{{
+EDGE_SPREAD: 38
+}}
+SLOT 1 EMPTY - nothing loaded
+[VP] profile=custom fix=111011 chroma_seq=37232 chroma_flatness=0.1180 chroma_norm_max=0.8962 chroma_norm_mean=0.7782 chroma_final_max=0.1515 chroma_final_mean=0.1290 agc_gain=1.6006 bloom_alpha=1.0000 bloom_shift=1.0000 wave_idle=0.9850 wave_raw_margin=1.1000 wave_peak_floor=0.0800 wave_vu_floor=0.0200 wave_shift=120.0000 render_us=6944 render_avg=4170 render_max=6944
+[PCMRAW] frames=12822120 short=0 err=0 rmsL=23161 rmsR=23549 minL=-53102 maxL=58350 minR=-53882 maxR=59338 clip=0 n=96120
+[PCMRS] in=12822120 out=3419232 blocks=35617 invariant=PASS
+[PCMOVF] ovf=0 ovf_bytes=0 dropped_frames_signaled=0 dropped_exact=UNKNOWN ring_drop=0 acq=12870180 cons=12822120 canon=35617 hw=1440
+[PCMRATE2] dt_s=2.003 acq_hz=47993.6 cons_hz=47993.6 canon_hz=133.32 lrck_hz=47981.8 authority=esp_timer

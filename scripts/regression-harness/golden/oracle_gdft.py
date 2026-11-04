@@ -63,7 +63,7 @@ COMMON_SOURCES = [
 
 # Compiler preference order (GCC, for FixedPoints SQ15x16 compound-literal compat;
 # mirrors oracle_render.py).
-_GPP_CANDIDATES = ["g++-15", "g++-14", "g++-13", "g++-12", "g++"]
+_GPP_CANDIDATES = ["g++-16", "g++-15", "g++-14", "g++-13", "g++-12", "g++"]
 
 # ---------------------------------------------------------------------------
 # Oracle identity

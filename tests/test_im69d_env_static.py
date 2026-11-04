@@ -306,14 +306,19 @@ def test_stereo_env_sets_stereo_flag_and_no_mono_slot():
 
 
 def test_stereo_flag_absent_from_production_and_all_other_envs():
-    """K1_MIC_IM69D_STEREO_V1 may appear in exactly one env: the stereo probe."""
+    """K1_MIC_IM69D_STEREO_V1 may appear only in the stereo probe and its two
+    B489 wiring diagnostics (2026-11-03), never in a shipping env."""
     text = PLATFORMIO.read_text(encoding="utf-8")
     sections = _env_sections(text)
     stereo_envs = {
         env_name for env_name in sections
         if "K1_MIC_IM69D_STEREO_V1" in _effective_defines(env_name, sections)
     }
-    assert stereo_envs == {"k1_bench_im69d_stereo"}
+    assert stereo_envs == {
+        "k1_bench_im69d_stereo",
+        "k1_bench_im69d_wirediag_pullup",
+        "k1_bench_im69d_wirediag_swap",
+    }
 
 
 def test_stereo_init_mutually_excludes_mono_slot_selects():
@@ -400,3 +405,23 @@ def test_scap_dispatch_reaches_the_parse_command_ladder():
         "the gated hop must call k1_stereo_probe_dispatch — the table row alone "
         "does not dispatch"
     )
+
+
+def _envs_defining(flag):
+    text = PLATFORMIO.read_text(encoding="utf-8")
+    sections = _env_sections(text)
+    return {
+        env_name for env_name in sections
+        if flag in _effective_defines(env_name, sections)
+    }
+
+
+def test_b489_bench_only_flags_stay_in_their_bench_envs():
+    """2026-11-03 B489 bench flags: pin-probe, CLK/DATA swap and the FE bench
+    pin map must never reach a shipping env (k1_fe, k1_main_rpl_im69d, ...)."""
+    assert _envs_defining("K1_IM69D_WIREDIAG_PULLUP_V1") == {
+        "k1_bench_im69d_wirediag_pullup",
+        "k1_bench_im69d_wirediag_swap",
+    }
+    assert _envs_defining("K1_IM69D_WIREDIAG_SWAP_V1") == {"k1_bench_im69d_wirediag_swap"}
+    assert _envs_defining("K1_FE_BENCH_B489_V1") == {"k1_fe_bench_b489"}

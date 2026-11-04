@@ -1,0 +1,62 @@
+{
+ "gate": "p2.6-joint-lowflux-k8-auc-dev-max-of-grid",
+ "cmd": "python3 scripts/regression-harness/tempo_joint_estimator.py auc --manifest tests/fixtures/tempo_corpus/manifest.json --traj _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json --tracker-traj _scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json --out _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.auc.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee",
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json": "30a95e8b6750233593a16cb4c210876dd1ae6c8e891511716f6b150d9f3b512c",
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json": "60b34515b700d9974c27d07cce426e24f306731078e8e6ec5d9cff4f6e89f46c"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.auc.json": "9fa71bc981e6974aaf91c1bb5b2264a8113b4a539a58865e7e602e290e1bb7ac"
+ },
+ "stdout_tail": [
+  "{",
+  " \"estimator\": {",
+  "  \"auc_own_choice\": {",
+  "   \"mass\": 0.8376623376623377,",
+  "   \"phase_peak\": 0.5292207792207793,",
+  "   \"ratio32\": 0.6461038961038961",
+  "  },",
+  "  \"correct_acc2\": 14,",
+  "  \"detected_32\": 8,",
+  "  \"n\": 36",
+  " },",
+  " \"manifest_sha256\": \"807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee\",",
+  " \"tracker\": {",
+  "  \"agree_and_correct\": 10,",
+  "  \"agree_and_wrong\": 5,",
+  "  \"agreement_auc\": 0.6160990712074303,",
+  "  \"auc_joint_features_on_tracker_choice\": {",
+  "   \"mass\": 0.544891640866873,",
+  "   \"phase_peak\": 0.5851393188854489,",
+  "   \"ratio32\": 0.4953560371517028",
+  "  },",
+  "  \"correct\": 19,",
+  "  \"n\": 36,",
+  "  \"tracker_traj\": \"_scratch/esp-emulator/tempo-lock-r1/traj/dev_l1sp.json\"",
+  " },",
+  " \"traj\": \"_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_lowflux_k8.json\",",
+  " \"traj_sha256\": \"30a95e8b6750233593a16cb4c210876dd1ae6c8e891511716f6b150d9f3b512c\"",
+  "}"
+ ],
+ "utc": "2026-10-21T08:53:33+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

@@ -1,0 +1,67 @@
+{
+ "gate": "p2.6-joint-score-dev",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_scorer.py score --manifest tests/fixtures/tempo_corpus/manifest.json --role dev --traj _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json --out _scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.score.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee",
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.json": "15fca1bad22cfd020367dd324bbebd490b0f9aeb58a696abe48953503d1c4c71"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/joint/dev_joint_best.score.json": "5b2b5f201342850182749921bf2d14c0f628889b1eaad1f8b25f7d3964c8fbc5"
+ },
+ "stdout_tail": [
+  "    \"fixtures\": \"/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/fixtures/dev_spec_r1/index.json\",",
+  "    \"sha256\": \"30399b8c6cfaa8a3d5fcd29696f2d2dbb0cdba6b8ed486adf4cf71acec101e43\"",
+  "   }",
+  "  ],",
+  "  \"lock_note\": \"lock is not modelled here (0 everywhere); the scorer is read for detected tempo, and correctness candidates go through `auc`\",",
+  "  \"params\": {",
+  "   \"eps\": 0.004,",
+  "   \"floor\": 0.001,",
+  "   \"input\": \"novelty\",",
+  "   \"kappa\": 8.0,",
+  "   \"lam\": 8.0,",
+  "   \"model\": \"pointer\",",
+  "   \"nphase\": 64,",
+  "   \"prior_sigma\": 0.0,",
+  "   \"rank_win\": 1536,",
+  "   \"tempo_q\": 0.02",
+  "  },",
+  "  \"state_updates_per_emit\": 18432,",
+  "  \"tool\": \"tempo_joint_estimator.py\",",
+  "  \"tool_sha256\": \"8270df1a919ad0d20eed628a28f3cc164d0555bd7130de44977577304052b5f7\",",
+  "  \"wall_s_numpy\": 4.94",
+  " },",
+  " \"role_filter\": \"dev\",",
+  " \"roles_scored\": [",
+  "  \"dev\"",
+  " ],",
+  " \"summary\": {",
+  "  \"correct\": 20,",
+  "  \"detected_32\": 1,",
+  "  \"locked\": 0,",
+  "  \"locked_correct\": 0,",
+  "  \"locked_wrong\": 0,",
+  "  \"locked_wrong_32\": 0,",
+  "  \"mean_lock_frac\": 0.0,",
+  "  \"n\": 36",
+  " },",
+  " \"traj_sha256\": \"15fca1bad22cfd020367dd324bbebd490b0f9aeb58a696abe48953503d1c4c71\",",
+  " \"unscored_not_in_manifest\": [],",
+  " \"variant\": \"joint-modelpointer-nphase64-lam8.0-kappa8.0-eps0.004-rank_win1536-floor0.001-tempo_q0.02-prior_sigma0.0-inputnovelty\"",
+  "}"
+ ],
+ "utc": "2026-10-21T08:47:12+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

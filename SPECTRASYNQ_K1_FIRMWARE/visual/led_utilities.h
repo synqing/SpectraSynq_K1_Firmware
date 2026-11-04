@@ -19,6 +19,9 @@
 #endif
 #ifdef K1_RENDER_TRACE_V1
 #include "k1_render_trace.h" // rtrace_* LED-level capture (colour-fix-lane env only)
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"
+#endif
 #endif
 #ifdef K1_SCHEDULING_TRACE_V1
 #include "k1_scheduling_trace_telemetry.h"
@@ -34,6 +37,9 @@
 #endif
 #ifdef K1_WS2816_LEVER2_V1
 #include "k1_lever2_emit.h"
+#ifdef K1_B489_WS2816_V1
+#include "k1_b489_legacy_power.h"
+#endif
 #endif
 #ifdef K1_LOOK_LIB_WS2812_V1
 #include "k1_look_ws2812.h"
@@ -286,6 +292,54 @@ inline void clip_led_values_count(CRGB16* buffer, uint16_t count) {
 inline void clip_led_values(CRGB16* buffer) {
   clip_led_values_count(buffer, NATIVE_RESOLUTION);
 }
+
+#ifdef K1_B489_WS2816_V1
+// Cache post-look, pre-limit logical pixels. Keeping the held secondary in this
+// domain avoids compounding attenuation when its renderer is disabled.
+inline Pixel16 k1_b489_native_primary[LED_COUNT_VALUE] = {};
+inline Pixel16 k1_b489_native_secondary[SECONDARY_LED_COUNT_VALUE] = {};
+
+inline void k1_b489_prepare_native(const CRGB16* scaled, uint16_t count,
+                                    Pixel16* native, SQ15x16 inc_r,
+                                    SQ15x16 inc_g, SQ15x16 inc_b,
+                                    uint8_t look_slot) {
+#ifndef K1_LOOK_LIB_V1
+  (void)look_slot;
+#endif
+  for (uint16_t i = 0; i < count; ++i) {
+    native[i].r = k1_lever2_sq_to_u16(scaled[i].r, inc_r);
+    native[i].g = k1_lever2_sq_to_u16(scaled[i].g, inc_g);
+    native[i].b = k1_lever2_sq_to_u16(scaled[i].b, inc_b);
+#ifdef K1_LOOK_LIB_V1
+    k1_look_apply_u16(&native[i].r, &native[i].g, &native[i].b, look_slot);
+#endif
+  }
+}
+
+inline void k1_b489_pack_limited(const Pixel16* native, uint16_t count,
+                                  CRGB* wire, uint16_t scale_q16) {
+  for (uint16_t i = 0; i < count; ++i) {
+    ws2816_pack_pixel(wire, i,
+        k1_b489_legacy_power_apply(native[i].r, scale_q16),
+        k1_b489_legacy_power_apply(native[i].g, scale_q16),
+        k1_b489_legacy_power_apply(native[i].b, scale_q16));
+  }
+}
+
+// Reverse complete 48-bit pixels, never the RGB carrier slots inside a pixel.
+// This keeps both DIN halves in the WS2816 format for every reverse setting.
+inline void k1_b489_reverse_packed_pixels(uint8_t* wire, uint16_t count) {
+  for (uint16_t i = 0; i < count / 2; ++i) {
+    const size_t left = (size_t)i * 6;
+    const size_t right = (size_t)(count - 1 - i) * 6;
+    for (uint8_t channel_byte = 0; channel_byte < 6; ++channel_byte) {
+      const uint8_t tmp = wire[left + channel_byte];
+      wire[left + channel_byte] = wire[right + channel_byte];
+      wire[right + channel_byte] = tmp;
+    }
+  }
+}
+#endif
 
 inline void reverse_leds(CRGB arr[], uint16_t size) {
   uint16_t start = 0;
@@ -1190,7 +1244,11 @@ inline void show_leds() {
   // Explicit 48-bit packer + WS2812B RGB. On Main RPL this is the dual-DIN
   // emit (160 logical pixels → 320 wire slots, two 160-slot halves). Do not
   // consult LED_TYPE here — persisted X2 must not skip the packer.
-  if (CONFIG.REVERSE_ORDER == false && ws2816_wire != nullptr) {
+  if (ws2816_wire != nullptr
+#ifndef K1_B489_WS2816_V1
+      && CONFIG.REVERSE_ORDER == false
+#endif
+  ) {
 #ifdef K1_LED_I2S_DIRECT_V1
     k1_i2s_apply_pattern_if_armed(leds_scaled, CONFIG.LED_COUNT);
 #endif
@@ -1215,12 +1273,39 @@ inline void show_leds() {
     // Product paint wins over the harness stim so paint=card dumps stay honest.
     k1_colour_lab_apply_primary(leds_scaled, CONFIG.LED_COUNT);
 #endif
+#ifndef K1_B489_WS2816_V1
     const uint64_t budget_proxy =
         (uint64_t)CONFIG.LED_COUNT * 3ull * 65535ull;
+#endif
 #if ENABLE_VP_PERF_AUDIT
     const int64_t vp_perf_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#ifdef K1_B489_WS2816_V1
+    k1_b489_prepare_native(leds_scaled, CONFIG.LED_COUNT,
+                           k1_b489_native_primary, k1_inc_r, k1_inc_g, k1_inc_b,
+#ifdef K1_LOOK_LIB_V1
+                           k1_look_slot);
+#else
+                           0);
+#endif
+    const uint16_t secondary_count =
+        ws2816_wire_secondary != nullptr ? SECONDARY_LED_COUNT : 0;
+    // Preserve the legacy FastLED estimate policy on logical pixels, not wire
+    // carriers. This is an uncalibrated WS2816 estimate, not measured current.
+    const K1B489LegacyPowerLimit limit = k1_b489_legacy_power_limit(
+        k1_b489_native_primary, CONFIG.LED_COUNT,
+        k1_b489_native_secondary, secondary_count, CONFIG.MAX_CURRENT_MA);
+    k1_b489_pack_limited(k1_b489_native_primary, CONFIG.LED_COUNT,
+                          ws2816_wire, limit.scale_q16);
+    if (secondary_count != 0) {
+      k1_b489_pack_limited(k1_b489_native_secondary, secondary_count,
+                            ws2816_wire_secondary, limit.scale_q16);
+      if (SECONDARY_REVERSE_ORDER) {
+        k1_b489_reverse_packed_pixels((uint8_t*)ws2816_wire_secondary, secondary_count);
+      }
+    }
+#else
 #ifdef K1_LOOK_LIB_V1
     k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
                          budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b,
@@ -1228,6 +1313,12 @@ inline void show_leds() {
 #else
     k1_lever2_pack_frame(leds_scaled, CONFIG.LED_COUNT, ws2816_wire,
                          budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b, 0);
+#endif
+#endif
+#ifdef K1_B489_WS2816_V1
+    if (CONFIG.REVERSE_ORDER) {
+      k1_b489_reverse_packed_pixels((uint8_t*)ws2816_wire, CONFIG.LED_COUNT);
+    }
 #endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_pack_start_us != 0) {
@@ -1243,8 +1334,40 @@ inline void show_leds() {
 #ifdef K1_RENDER_TRACE_V1
     // Artefact tap: packed WS2816 wire (6 bytes/logical LED). Must sit
     // before this block's return — leds_out is never filled on Lever-2.
+#ifdef K1_B489_WS2816_V1
+    // Capture both submitted buffers with one frame/time before submission.
+    // A disabled secondary still submits its held wire buffer, so retain it too.
+    k1_render_trace_on_frame16_dual((const uint8_t*)ws2816_wire,
+                                    (const uint8_t*)ws2816_wire_secondary,
+                                    CONFIG.LED_COUNT,
+                                    (uint8_t)CONFIG.LIGHTSHOW_MODE);
+#elif defined(K1_EMU_FIXTURE)
+    // Emulator replay of the normal path: both packed edges, after the
+    // secondary pack in show_secondary_leds() and the primary pack above,
+    // before submission. The secondary buffer is the one submitted even when
+    // ENABLE_SECONDARY_LEDS is off, so retain it as held.
+    if (ws2816_wire_secondary != nullptr) {
+      k1_render_trace_on_frame16_dual((const uint8_t*)ws2816_wire,
+                                      (const uint8_t*)ws2816_wire_secondary,
+                                      CONFIG.LED_COUNT,
+                                      (uint8_t)CONFIG.LIGHTSHOW_MODE);
+    } else {
+      k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
+                                 (uint8_t)CONFIG.LIGHTSHOW_MODE);
+    }
+#else
     k1_render_trace_on_frame16((const uint8_t*)ws2816_wire, CONFIG.LED_COUNT,
                                (uint8_t)CONFIG.LIGHTSHOW_MODE);
+#endif
+#endif
+#ifdef K1_SCHEDULING_TRACE_V1
+    // Same reason as the render tap above: this block RETURNS before the
+    // common seam at the bottom of the function, so the scheduling trace was
+    // never armed on the Lever-2 lane and every WS2816 capture came back with
+    // request still pending, active=0, frames=0 and zero confirmed
+    // completions — while p_submit climbed, because the linker wrapper sees
+    // submits regardless of the hook. Measured 2026-09-10 on 9087A500.
+    k1_scheduling_trace_before_fastled_show();
 #endif
 #ifdef K1_LED_I2S_DIRECT_V1
     if (!k1_i2s_emit_ready()) {
@@ -1255,8 +1378,16 @@ inline void show_leds() {
     }
     k1_i2s_emit_show();
 #else
+#ifdef K1_EMU_SKIP_EMIT
+    // Packed bytes are already retained. esp-emu does not complete RMT shows.
+    // Record the scale an installed FastLED power limit would apply here.
+#ifdef K1_EMU_FIXTURE
+    k1_emu_fixture_note_submission();
+#endif
+#else
     FastLED.setDither(DISABLE_DITHER);
     FastLED.show();
+#endif
 #endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_lever2_show_start_us != 0) {
@@ -1266,6 +1397,9 @@ inline void show_leds() {
 #endif
     return;
   }
+#ifdef K1_B489_WS2816_V1
+  return;  // No packed buffer: do not emit an incompatible RGB8 frame.
+#endif
 #endif
   
 #if ENABLE_VPAB_PROBE
@@ -1457,7 +1591,7 @@ inline void init_leds() {
   return;
 #else
 
-#ifdef K1_MAIN_RPL_PINMAP_V1
+#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
 #ifdef K1_WS2816_LEVER2_V1
   // Lever-2 on Main RPL: keep the dual-DIN split (aa0b57c2 geometry) but emit
   // with the proven packer + WS2812B RGB — not a native WS2816 controller
@@ -1470,7 +1604,13 @@ inline void init_leds() {
     ws2816_wire = (region != nullptr) ? (CRGB*)region : nullptr;
     ws2816_wire_secondary =
         (region != nullptr) ? ((CRGB*)region + (CONFIG.LED_COUNT * 2)) : nullptr;
-    if (CONFIG.REVERSE_ORDER == false) {
+    if (
+#ifdef K1_B489_WS2816_V1
+        true
+#else
+        CONFIG.REVERSE_ORDER == false
+#endif
+    ) {
       show_leds();
       leds_started = true;
       USBSerial.print("INIT_LEDS: ");
@@ -1480,7 +1620,13 @@ inline void init_leds() {
   }
 #else
   ws2816_wire = new CRGB[CONFIG.LED_COUNT * 2];
-  if (CONFIG.REVERSE_ORDER == false) {
+  if (
+#ifdef K1_B489_WS2816_V1
+        true
+#else
+        CONFIG.REVERSE_ORDER == false
+#endif
+    ) {
     FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT);
     FastLED.addLeds<WS2812B, LED_CLOCK_PIN, RGB>(
         ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
@@ -1929,7 +2075,11 @@ inline void intro_animation() {
   for (uint16_t frame = 0; frame < frame_count; frame++) {
     vp_intro_render_frame(frame, frame_count);
     show_leds();
+#ifdef K1_EMU_SKIP_EMIT
+    delay(2);  // FastLED.delay() would submit again; submission is suppressed.
+#else
     FastLED.delay(2);
+#endif
   }
 
   clear_intro_led_buffers();
@@ -2698,7 +2848,7 @@ inline void init_secondary_leds() {
   return;
 #else
 
-#ifdef K1_MAIN_RPL_PINMAP_V1
+#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
 #ifdef K1_WS2816_LEVER2_V1
   // Both Main RPL PCBs are WS2816. Apply the same packer + WS2812B RGB
   // dual-DIN emit as primary (skill's "secondary stays 8-bit" is the
@@ -2818,7 +2968,11 @@ inline void show_secondary_leds() {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }
 #ifdef K1_WS2816_LEVER2_V1
-  if (ws2816_wire_secondary != nullptr && CONFIG.REVERSE_ORDER == false) {
+  if (ws2816_wire_secondary != nullptr
+#ifndef K1_B489_WS2816_V1
+      && CONFIG.REVERSE_ORDER == false
+#endif
+  ) {
 #ifdef K1_LED_I2S_DIRECT_V1
     k1_i2s_apply_pattern_if_armed(leds_scaled_secondary, SECONDARY_LED_COUNT);
 #endif
@@ -2833,12 +2987,23 @@ inline void show_secondary_leds() {
       k1_inc_g = inv + mix * incandescent_lookup.g;
       k1_inc_b = inv + mix * incandescent_lookup.b;
     }
+#ifndef K1_B489_WS2816_V1
     const uint64_t budget_proxy =
         (uint64_t)SECONDARY_LED_COUNT * 3ull * 65535ull;
+#endif
 #if ENABLE_VP_PERF_AUDIT
     const int64_t vp_perf_sec_pack_start_us =
         vp_perf.running ? esp_timer_get_time() : 0;
 #endif
+#ifdef K1_B489_WS2816_V1
+    k1_b489_prepare_native(leds_scaled_secondary, SECONDARY_LED_COUNT,
+                           k1_b489_native_secondary, k1_inc_r, k1_inc_g, k1_inc_b,
+#ifdef K1_LOOK_LIB_V1
+                           k1_look_effective_sec());
+#else
+                           0);
+#endif
+#else
 #ifdef K1_LOOK_LIB_V1
     k1_lever2_pack_frame(leds_scaled_secondary, SECONDARY_LED_COUNT,
                          ws2816_wire_secondary, budget_proxy, k1_inc_r,
@@ -2848,6 +3013,7 @@ inline void show_secondary_leds() {
                          ws2816_wire_secondary, budget_proxy, k1_inc_r,
                          k1_inc_g, k1_inc_b, 0);
 #endif
+#endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_sec_pack_start_us != 0) {
       vp_perf_pack_accum_us +=
@@ -2856,6 +3022,9 @@ inline void show_secondary_leds() {
 #endif
     return;
   }
+#ifdef K1_B489_WS2816_V1
+  return;  // No packed buffer: do not emit an incompatible RGB8 frame.
+#endif
 #endif
   // Quantization needs to happen *after* filtering if filter uses scaled values
   // quantize_color_secondary(CONFIG.TEMPORAL_DITHERING); // Moved down

@@ -35,6 +35,7 @@ HARNESS = ROOT / "scripts" / "regression-harness"
 FW_AUDIO = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "audio"
 FW_SYSTEM = ROOT / "SPECTRASYNQ_K1_FIRMWARE" / "system"
 K1_TEMPO_CPP = FW_AUDIO / "k1_tempo.cpp"
+K1_TEMPO_SPEC_H = FW_AUDIO / "k1_tempo_spec.h"  # lane R1: gating constants live here (I10)
 K1_ONSET_CPP = FW_AUDIO / "k1_onset_beat.cpp"
 K1_SEMANTIC_CPP = FW_AUDIO / "k1_semantic_state.cpp"
 CONFIG_TYPES_H = FW_SYSTEM / "config_types.h"
@@ -109,7 +110,8 @@ def _alpha_from_tau(rate_hz, tau_s):
 class RateConsistencyTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.cpp = _read(K1_TEMPO_CPP)
+        # The tempo translation unit as compiled: spec header (constants) + k1_tempo.cpp.
+        cls.cpp = _read(K1_TEMPO_SPEC_H) + "\n" + _read(K1_TEMPO_CPP)
         cls.config_types = _read(CONFIG_TYPES_H)
         macro_env = {
             "DEFAULT_SAMPLE_RATE": _grep_define(cls.config_types, "DEFAULT_SAMPLE_RATE"),

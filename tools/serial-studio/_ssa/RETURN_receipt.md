@@ -1,0 +1,6 @@
+STATUS: DONE
+CLAIM: Instrument receipts hash a closed sqlite3.Connection.backup() copy, not the live WAL .db; --no-snapshot labels that digest live_db_fingerprint (evidence_class=LIVE_DB_FINGERPRINT). Verdicts are INSTRUMENT_ARCHIVED | INSTRUMENT_LIVE_SNAPSHOT only.
+EVIDENCE: tools/serial-studio/scorer/session_receipt.py schema k1.serial-studio.instrument_receipt.v2; tools/serial-studio/tests/test_session_receipt.py (synthetic WAL historian, no live 80MB DB); pytest 8 passed; captures/latest.receipt.json untouched (still v1 ARCHIVED).
+COMMAND: python3 -m pytest /Users/spectrasynq/SpectraSynq_K1_Firmware/tools/serial-studio/tests/test_session_receipt.py -q
+METHOD_RISK: backup() is committed-state at copy time (uncommitted writer pages omitted). live_db_fingerprint omits WAL by construction. INSTRUMENT_CONFIG_DRIFT is UNKNOWN unless both JSON parse and contain groups. dest-only wal_checkpoint; source is never checkpointed.
+NEXT: CLI against live Historian is `python3 tools/serial-studio/scorer/session_receipt.py --db "<live.db>" --snapshot` (writes captures/snapshots/, gitignored). Gate scoring waits on emit_gate_receipt(scoring_profile_id=...) — not implemented, no thresholds invented.

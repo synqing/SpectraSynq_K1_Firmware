@@ -18,6 +18,7 @@ _SRC = env.subst("$PROJECT_SRC_DIR")  # noqa: F821
 _SUBDIRS = (
     "audio", "visual", "effects", "director", "control", "network",
     "serial", "system", "persistence", "calibration", "diag", "platform",
+    "nfc",
 )
 env.Append(CPPPATH=[os.path.join(_SRC, d) for d in _SUBDIRS])  # noqa: F821
 

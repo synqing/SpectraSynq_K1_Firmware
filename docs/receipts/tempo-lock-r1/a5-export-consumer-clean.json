@@ -1,0 +1,23 @@
+{
+ "gate": "a5-export-b1f48bbc-consumer-clean-lockoff",
+ "cmd": "python3 scripts/regression-harness/tempo_consumer_cues.py gate --report _scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-lane/cues-after.json --expect clean",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/a5-export-b1f48bbc-lane/cues-after.json": "435b6c327f40c8b2ec001a2ea427c47ee0793d830b0e6073b8cbed939948e91c"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "expect=clean violations=0"
+ ],
+ "utc": "2026-10-21T16:52:48+00:00",
+ "git_sha": "b1f48bbc8ca53f88e509e64c9bfe228c0b1443ef",
+ "git_dirty_paths": [
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

@@ -1,0 +1,73 @@
+{
+ "gate": "p3.3-lockoff-dev-score",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_scorer.py score --manifest tests/fixtures/tempo_corpus/manifest.json --role dev --traj _scratch/esp-emulator/tempo-lock-r1/traj/dev_spec_r1_lockoff.json --out _scratch/esp-emulator/tempo-lock-r1/score/dev_lockoff.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/manifest.json": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee",
+  "_scratch/esp-emulator/tempo-lock-r1/traj/dev_spec_r1_lockoff.json": "e96691389a47f0761f43916887a316fec4b074f9134599473f6b30ef1de3f490"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/score/dev_lockoff.json": "076fbd6d1c9998b126d688bd33a3a1b80bd024fc695b6915058eed1e02c0b1c9"
+ },
+ "stdout_tail": [
+  "  \"build_cmd\": \"clang++ -std=c++17 -O2 -ffp-contract=off -DK1_TEMPO_HOST_TEST -DK1_TEMPO_CONF_V2 -DK1_TEMPO_FLYWHEEL_V2 -DK1_TEMPO_ACF_SPREAD_V1=1 -DDEFAULT_SAMPLE_RATE=12800 -DDEFAULT_SAMPLES_PER_CHUNK=96 -DK1_TEMPO_NOVELTY_DECIMATION=3U -DK1_TEMPO_NOVELTY_LINEAR_V1 -DK1_TEMPO_SILENCE_FROM_PRODUCER_V1 -DK1_ONSET_V2 -DK1_TEMPO_SPECTRAL_PRESENCE_V1 -DK1_TEMPO_LOCK_OFF_V1 -DENABLE_TEMPO_STREAM=1 -I /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/tmp0vep5ozq/stub -I /Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE -I /Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE/audio -I /Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE/system /Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/tmp0vep5ozq/lane_driver.cpp -o /var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/tmp0vep5ozq/lane_driver\",",
+  "  \"debug\": true,",
+  "  \"defines\": [",
+  "   \"K1_TEMPO_CONF_V2\",",
+  "   \"K1_TEMPO_FLYWHEEL_V2\",",
+  "   \"K1_TEMPO_ACF_SPREAD_V1=1\",",
+  "   \"DEFAULT_SAMPLE_RATE=12800\",",
+  "   \"DEFAULT_SAMPLES_PER_CHUNK=96\",",
+  "   \"K1_TEMPO_NOVELTY_DECIMATION=3U\",",
+  "   \"K1_TEMPO_NOVELTY_LINEAR_V1\",",
+  "   \"K1_TEMPO_SILENCE_FROM_PRODUCER_V1\",",
+  "   \"K1_ONSET_V2\",",
+  "   \"K1_TEMPO_SPECTRAL_PRESENCE_V1\",",
+  "   \"K1_TEMPO_LOCK_OFF_V1\"",
+  "  ],",
+  "  \"fixtures\": \"/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/fixtures/dev_spec_r1/index.json\",",
+  "  \"fixtures_sha256\": \"30399b8c6cfaa8a3d5fcd29696f2d2dbb0cdba6b8ed486adf4cf71acec101e43\",",
+  "  \"git_head\": \"101a96f858c5f5b2c98f6b5e4252b1da5991bd67\",",
+  "  \"k1_tempo_cpp_sha256\": \"b7d4a0d185270018234063aa05a4197f3401e6cf6053e7539e518ff49f0c2356\",",
+  "  \"tool\": \"tempo_lane_replay.py\",",
+  "  \"transform\": null",
+  " },",
+  " \"role_filter\": \"dev\",",
+  " \"roles_scored\": [",
+  "  \"dev\"",
+  " ],",
+  " \"summary\": {",
+  "  \"correct\": 19,",
+  "  \"detected_32\": 7,",
+  "  \"locked\": 0,",
+  "  \"locked_correct\": 0,",
+  "  \"locked_wrong\": 0,",
+  "  \"locked_wrong_32\": 0,",
+  "  \"mean_lock_frac\": 0.0,",
+  "  \"n\": 36",
+  " },",
+  " \"traj_sha256\": \"e96691389a47f0761f43916887a316fec4b074f9134599473f6b30ef1de3f490\",",
+  " \"unscored_not_in_manifest\": [],",
+  " \"variant\": \"l1sp_lockoff\"",
+  "}"
+ ],
+ "utc": "2026-10-21T08:50:43+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "scripts/regression-harness/tempo_lane_replay.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

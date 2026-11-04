@@ -15,6 +15,9 @@
 
 #include "globals.h"  // ENABLE_SECONDARY_LEDS, CONFIG / SECONDARY_* via capture
 #include "Palettes.h" // gGradientPaletteCount
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"
+#endif
 #ifdef K1_EFFECT_REGISTRY_V1
 #include "EffectRegistry.h"
 #endif
@@ -264,6 +267,9 @@ bool k1_show_state_save() {
   if (wrote != n) {
     return false;
   }
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_note_save("show", true);
+#endif
   // Immediate primary CONFIG flush (not delayed) so reboot sees both blobs.
   save_config();
   return true;

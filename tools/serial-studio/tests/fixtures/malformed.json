@@ -1,0 +1,14 @@
+{
+  "id": "malformed",
+  "schema_lock": "1.2",
+  "note": "Garbage, partial bpm=, empty, banner ----. Malformed/unknown must not publish a held vector.",
+  "lines": [
+    "not a telemetry line",
+    "bpm=120 conf=0.5",
+    "",
+    "----",
+    "==== Sensory Bridge ====",
+    "[AP"
+  ],
+  "expected_rows": []
+}

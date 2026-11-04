@@ -1,0 +1,36 @@
+{
+ "gate": "c2-consumer-clean-repaired",
+ "cmd": "python3 scripts/regression-harness/tempo_consumer_cues.py gate --report _scratch/esp-emulator/tempo-lock-r1/consumer-after/cues.json --expect clean",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/consumer-after/cues.json": "cb57ff12167626aab7aa20346fa9e66196c604c3be7a58db5bf7abfa42e2805f"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "expect=clean violations=0"
+ ],
+ "utc": "2026-10-21T12:21:08+00:00",
+ "git_sha": "74b59909e964d018f0b92a23b0948ac6343e5a32",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "scripts/regression-harness/tempo_lane_emu.py",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "tests/test_tempo_lane_class_gates.py",
+  "tools/esp_emulator/stress_repeat.py",
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_lane_stress_scenario.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

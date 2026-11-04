@@ -1,0 +1,10 @@
+Re-check after blocking k1_usb_audio_mac_probe and restoring the tempo-inc allowlist suffix:
+
+python3 -m pytest -q \
+  tests/test_k1_usb_audio_static.py \
+  tests/test_k1_upload_guard.py::K1UploadGuardTest::test_all_k1_chip_bound_envs_are_registered_in_guard \
+  tests/test_tempo_emit_exact_residual_v1.py::test_candidate_env_is_in_pio_build_wrapper_and_rejects_upload_token
+
+12 passed in 0.03s
+
+DEVICE_FLASH remains HOLD_NO_AUTHORISED_TARGET.

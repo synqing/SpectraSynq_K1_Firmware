@@ -1,0 +1,25 @@
+{
+ "gate": "e1-tempo-gates-pytest",
+ "cmd": "python3 -m pytest -q -m tempo_gates tests/",
+ "exit_code": 0,
+ "sha256_inputs": {},
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "..................................                                       [100%]",
+  "34 passed, 1885 deselected in 8.77s"
+ ],
+ "utc": "2026-10-21T17:31:44+00:00",
+ "git_sha": "325b87dadbb9860fa0500fb0b4b74120298e3cce",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_consumer_cues.py",
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "tests/test_tempo_joint_gate_hold.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

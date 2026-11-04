@@ -1,0 +1,36 @@
+{
+ "gate": "p1.3-m1-lane-emulator-streams",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_gates.py m1 --streams _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-music-a/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-music-then-silence/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-pink-drone-30s/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-silence-30s/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-sweep-30s/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-tone440-30s/streams.json _scratch/esp-emulator/tempo-lock-r1/p15-r1b/runs/lane-white-noise-30s/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_0FOjmV66zf8/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_2Abk1jAONjw/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_5m-GUCSNxmc/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_7vevOMWY6MY/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_8BRdY0NR08g/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_8ESdn0MuJWQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_8gyLR4NfMiI/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_9VZhI5iafH0/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_bx1Bh8ZvH84/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_c7tOAGY59uQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_CfFlO6lHZ2g/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_DkoeNLuMbcI/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_ekAXPCphKXQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_eQFIKP9rGhQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_gte3BoXKwP0/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_k6M5C-oKw9k/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_MYRNGeIJMiQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_nvfejaHz-o0/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_ocDlOD1Hw9k/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_p-Z3YrHJ1sU/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_pguzToB6I7g/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_phOW-CZJWT0/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_Qa1AqKxakRM/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_r9DBFTZTKPI/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_rNqrKAyuA6M/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_SOPdS8jGaeI/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_T-sxSd1uwoU/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_Urdlvw0SSEc/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_vDWhfsQHq1o/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_WBKnpyoFEBo/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_wCDIYvFmgW8/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_WxnN05vOuSM/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_XtE1TmikgIQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_Ys7-6_t7OEQ/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_ySzrJ4GRF7s/streams.json _scratch/esp-emulator/tempo-lock-r1/dev-r1/runs/lane-hx_zJHqN_ND7xI/streams.json",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/p15-r1b/cases.json": "65f2564a82fc4597e8a9ad14a4f3a443b51e3f9d0e030001aee452a502b0dc80",
+  "_scratch/esp-emulator/tempo-lock-r1/dev-r1/cases.json": "1ede20545c49f4e445508750e610891a41015b1d85b14eebaa27eca4b65eb3eb"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "M1 holds on 43 emulator stream(s)"
+ ],
+ "utc": "2026-10-21T02:19:19+00:00",
+ "git_sha": "9088993477d1f290d7c79c6b139e4a162cc36b96",
+ "git_dirty_paths": [
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h",
+  "SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h",
+  "platformio.ini",
+  "scripts/agent/pio-build.sh",
+  "scripts/platformio/k1_device_identities.json",
+  "scripts/regression-harness/tempo_heldout_corpus.py",
+  "scripts/regression-harness/tempo_lane_emu.py",
+  "scripts/regression-harness/tempo_lane_gates.py",
+  "tests/fixtures/tempo_corpus/streams/",
+  "tests/test_tempo_lane_class_gates.py",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

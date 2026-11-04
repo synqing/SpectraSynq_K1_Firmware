@@ -182,6 +182,16 @@
 #endif
 #endif
 
+// This assembly has four independent 80-pixel WS2816 DIN halves. Reject a
+// conflicting old loom flag at build time instead of silently downsampling it.
+#ifdef K1_B489_WS2816_V1
+static_assert(LED_COUNT_VALUE == 160 && SECONDARY_LED_COUNT_VALUE == 160,
+              "B489 WS2816 reference requires two 160-pixel edges");
+#ifndef K1_WS2816_LEVER2_V1
+#error "B489 WS2816 reference requires the 48-bit output packer"
+#endif
+#endif
+
 enum led_types {
   LED_NEOPIXEL,
   LED_NEOPIXEL_X2,

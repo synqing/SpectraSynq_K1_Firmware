@@ -466,7 +466,11 @@ void render_channel_via_framework(uint8_t mode, RenderChannelState& channel) {
   fw_beat_event = k1_vp_onset_beat_read();
 
   // Real frame delta (P2 NEXT item): measured µs since the last VP frame.
+#ifdef K1_EMU_FIXTURE
+  const int64_t now_us = (int64_t)k1_emu_fixture_app_us();  // frame app time (producer blocked)
+#else
   const int64_t now_us = esp_timer_get_time();
+#endif
   const int64_t dt_us = (last_frame_us > 0) ? (now_us - (int64_t)last_frame_us) : 8000;
   const float dt_s = (dt_us > 0) ? (float)dt_us / 1000000.0f : 0.008f;
 
@@ -651,6 +655,14 @@ void attempt_rotate8_init(bool verbose) {
 
 // Setup, runs only one time ---------------------------------------------------------
 void setup() {
+#ifdef K1_EMU_UART0
+  Serial0.begin(115200);
+#endif
+#ifdef K1_EMU_FIXTURE
+  // Read the run-owned scenario first: it selects the pre-audio clock policy
+  // that every millis()/micros() call in setup observes.
+  k1_emu_fixture_begin();
+#endif
 #ifdef K1_BOOTLOOP_GUARD_V1
   // N2b boot-loop guard: evaluate the crash streak BEFORE the first heap alloc below
   // (which can itself crash) and BEFORE init_system()/load_config() consume safe mode.
@@ -779,6 +791,11 @@ void setup() {
 #endif
 #endif
 
+#ifdef K1_EMU_FIXTURE
+  // Startup, mode, brightness and current budget are left exactly as the
+  // product sets them; the scenario changes state only through scheduled
+  // production commands (k1_emu_fixture_poll).
+#endif
   // Create thread specifically for LED updates
   BaseType_t led_task_create_result = xTaskCreatePinnedToCore(
     led_thread, "led_task", 8192, NULL, tskIDLE_PRIORITY + 1, &led_task, K1_LED_TASK_CORE);
@@ -873,8 +890,16 @@ void loop() {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
   feedLoopWDT();  // N2: feed the audio-loop watchdog every iteration (~133 Hz << 5s)
 #endif
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_poll();
+#endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
   uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
+#ifdef K1_EMU_FIXTURE
+  // Hop-end application time of the hop staged by k1_emu_fixture_poll().
+  t_now_us = k1_emu_fixture_time_us();
+  t_now = k1_emu_fixture_time_ms();
+#endif
 #ifdef K1_BOOTLOOP_GUARD_V1
   // N2b: once the device has run K1_BOOTLOOP_STABLE_MS without crashing, this boot is
   // "good" — clear the crash streak so the next reboot starts clean. Fires once, and
@@ -924,6 +949,9 @@ void loop() {
 #endif
 #ifdef K1_BLE_REMOTED
   k1_ble_remoted_poll(t_now);
+#endif
+#ifdef K1_FE_BOARD_V1
+  k1_fe_board_poll(t_now);  // FE jack switch + 20 V power policy (system/k1_fe_board.h)
 #endif
 #ifdef SB_K1_SYNC_PROBE
   k1_sync::poll();
@@ -993,6 +1021,9 @@ void loop() {
   }
 #endif
   process_GDFT();  // (GDFT.h)
+#if K1_PCM1808_SHADOW
+  k1_pcm1808_pair_hop_end();
+#endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   if (ap_cadence_timing_active) {
     const int64_t stage_end_us = esp_timer_get_time();
@@ -1000,7 +1031,12 @@ void loop() {
     ap_cadence_stage_timing.gdft_end_us = (uint64_t)stage_end_us;
   }
 #endif
+#if K1_AUDIO_SOURCE_MIC
 #ifdef K1_LOUD_GUARD_V1
+#if K1_PCM1808_LINE_SWITCH
+  // Loud guard trims the microphone; the P6 line-in path never ran it.
+  if (!k1_fe_audio_line_active())
+#endif
   k1_loud_guard_update(t_now);
 #endif
 #ifdef K1_MIC_AUTO_SENSE_V1
@@ -1009,6 +1045,7 @@ void loop() {
 #ifdef K1_MIC_AUTO_SENSE_V1
   k1_mic_auto_sense_update_frame(t_now);
   k1_mic_auto_sense_update(t_now);
+#endif
 #endif
 #endif
 #ifdef K1_PIN_EVIDENCE_V1
@@ -1196,7 +1233,13 @@ void loop() {
       audio_semantic_read(&producer_next.semantic);
 #endif
       producer_next.ap_publish_us = (uint32_t)esp_timer_get_time();
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_note_publication(producer_next);
+#endif
       k1_audio_frame_publish(producer_next);
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_wait_shown(producer_next.ap_generation);
+#endif
     }
 #endif
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
@@ -1340,6 +1383,9 @@ void led_thread(void* arg) {
     esp_task_wdt_add(NULL);  // N2: subscribe led_task (core 1) to the TWDT
   }
 #endif
+#ifdef K1_EMU_FIXTURE
+  k1_emu_fixture_note_render_loop();  // startup done; the replay may stage hop 0
+#endif
   while (true) {
 #ifdef K1_AUDIO_FREEZE_GUARD_V1
     esp_task_wdt_reset();  // N2: feed the render-task watchdog each frame
@@ -1373,14 +1419,38 @@ void led_thread(void* arg) {
     render_thread_parked = false;
 #endif
     if (led_thread_halt == false) {
+#ifdef K1_EMU_FIXTURE
+      uint32_t k1_emu_show_generation = 0;
+#endif
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
+#ifdef K1_FE_BOARD_V1
+      k1_fe_heartbeat_tick(vp_frame_start_us);  // OI-19: 1 Hz from the render task
+#endif
 #ifdef K1_AUDIO_FRAME_V1
       {
         K1AudioFrame vp_frame = {};
-        if (k1_audio_frame_acquire(&vp_frame)) {
+        const bool k1_af_got = k1_audio_frame_acquire(&vp_frame);
+        if (k1_af_got) {
           k1_vp_bundle_begin_frame(vp_frame);
         }
+#ifdef K1_EMU_FIXTURE
+        // One show per published hop. A repeat of the generation already shown
+        // would make the emulator and the lamp disagree once FastLED.show takes time.
+        if (!k1_af_got || vp_frame.ap_generation == 0 ||
+            vp_frame.ap_generation == k1_emu_fixture_shown()) {
+          vTaskDelay(1);
+          continue;
+        }
+        k1_emu_fixture_note_consumed(vp_frame);
+        k1_emu_show_generation = vp_frame.ap_generation;
+        // Application-time seam for functional frame timing (directors, effects
+        // queue, LED_FPS dt correction). Sampled here, after the new generation
+        // is accepted, while the producer is blocked in k1_emu_fixture_wait_shown():
+        // it is exactly the hop-end time of this frame's hop. Perf counters keep
+        // the emulator timer (vp_render_start_us).
+        vp_frame_start_us = (int64_t)k1_emu_fixture_app_us();
+#endif
       }
 #endif
 #ifdef K1_COMMAND_CHANNELS_V1
@@ -1729,14 +1799,23 @@ void led_thread(void* arg) {
 #else
       show_leds();
 #endif
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_note_shown(k1_emu_show_generation);
+#endif
 #if ENABLE_VP_PERF_AUDIT
       if (vp_perf.running) {
         vp_perf_note_frame_total(uint32_t(esp_timer_get_time() - vp_frame_start_us));
       }
 #endif
       
+#ifdef K1_EMU_FIXTURE
+      // Same seam: one frame per hop, so the measured rate is the replay rate.
+      LED_FPS = 0.95 * LED_FPS + 0.05 * (1000000.0 / (double)(vp_frame_start_us - (int64_t)last_frame_us));
+      last_frame_us = (uint32_t)vp_frame_start_us;
+#else
       LED_FPS = 0.95 * LED_FPS + 0.05 * (1000000.0 / (esp_timer_get_time() - last_frame_us));
       last_frame_us = esp_timer_get_time();
+#endif
     }
     vTaskDelay(1);
   }

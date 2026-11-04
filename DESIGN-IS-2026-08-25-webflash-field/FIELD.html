@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <title>K1 webflash — field audit (to scale)</title>
+  <style>
+    :root { --void:#060606; --ink:#F2F2F2; --muted:#A3A3A3; --gold:#FFB84D; --dead:#FF4D4D; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--void); color: var(--ink); font: 13px/1.4 "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+    header { padding: 28px 36px 12px; max-width: 1100px; }
+    h1 { margin: 0 0 8px; font: 700 28px/1.05 "Saira Condensed", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
+    h1 em { font-style: normal; color: var(--gold); }
+    .lede { color: var(--muted); max-width: 78ch; }
+    .score { color: var(--gold); margin: 10px 0 0; }
+    section { padding: 8px 36px 28px; }
+    h2 { font: 600 14px/1 "Saira Condensed", sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+    .scale { color: var(--muted); font-size: 11px; margin: 0 0 10px; }
+    svg { display: block; width: min(960px, 100%); height: auto; background: #080808; border: 1px solid #1c1c1c; }
+    .pick { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; max-width: 1100px; }
+    .pick article { background: #101010; border: 1px solid #222; padding: 14px 16px; }
+    .pick h3 { margin: 0 0 6px; font: 600 15px/1 "Saira Condensed", sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+    .pick p { margin: 0; color: var(--muted); }
+    footer { padding: 0 36px 40px; color: var(--muted); font-size: 11px; max-width: 1100px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>The panels are parked right. The left is leftover, not a <em>field</em>.</h1>
+    <p class="lede">Live rule: <code>max-width: 1180px; margin: 4vh 0 0 auto</code>. Hands 590 · gutter 80 · guide 510. Right pad stays 28. Left void is <code>V − 1208</code>. That is what you photographed.</p>
+    <p class="score">Rams 13/30 · REDESIGN the field · #3 aesthetic 0. Tokens, two-well IA, and flash JS stay.</p>
+  </header>
+
+  <section>
+    <h2>Now — 1920 CSS px · scale 1:2</h2>
+    <p class="scale">1 SVG px = 2 CSS px. Red = unstructured leftover. Gold tick = the only named 80px module (between wells).</p>
+    <svg viewBox="0 0 960 220" role="img" aria-label="1920 viewport: 712 left leftover, 1180 instrument, 28 right pad">
+      <rect width="960" height="220" fill="#060606"/>
+      <rect x="0" y="20" width="356" height="160" fill="#3a1010"/>
+      <rect x="356" y="20" width="295" height="160" fill="#171717" stroke="#2a2a2a"/>
+      <rect x="651" y="20" width="40" height="160" fill="#FFB84D" fill-opacity="0.35"/>
+      <rect x="691" y="20" width="255" height="124" fill="#141414" stroke="#2a2a2a"/>
+      <rect x="946" y="20" width="14" height="160" fill="#1a1a1a"/>
+      <text x="8" y="14" fill="#A3A3A3" font-size="10">1920</text>
+      <text x="48" y="104" fill="#FF4D4D" font-size="11">LEFT VOID 712 · 8.9 × 80</text>
+      <text x="430" y="104" fill="#F2F2F2" font-size="11">HANDS 590</text>
+      <text x="658" y="196" fill="#FFB84D" font-size="10">80</text>
+      <text x="740" y="86" fill="#F2F2F2" font-size="11">GUIDE 510</text>
+      <text x="720" y="158" fill="#A3A3A3" font-size="9">187 empty metal @1440</text>
+      <text x="948" y="104" fill="#A3A3A3" font-size="9">28</text>
+    </svg>
+  </section>
+
+  <section>
+    <h2>Now — 1440 CSS px · scale 1:2</h2>
+    <p class="scale">Same instrument. Leftover already 232 / 2.9 modules — not an integer 80.</p>
+    <svg viewBox="0 0 720 180" role="img" aria-label="1440 viewport: 232 left leftover, 1180 instrument, 28 right pad">
+      <rect width="720" height="180" fill="#060606"/>
+      <rect x="0" y="16" width="116" height="132" fill="#3a1010"/>
+      <rect x="116" y="16" width="295" height="132" fill="#171717" stroke="#2a2a2a"/>
+      <rect x="411" y="16" width="40" height="132" fill="#FFB84D" fill-opacity="0.35"/>
+      <rect x="451" y="16" width="255" height="104" fill="#141414" stroke="#2a2a2a"/>
+      <rect x="706" y="16" width="14" height="132" fill="#1a1a1a"/>
+      <text x="8" y="12" fill="#A3A3A3" font-size="10">1440</text>
+      <text x="36" y="86" fill="#FF4D4D" font-size="10">232</text>
+      <text x="190" y="86" fill="#F2F2F2" font-size="11">590</text>
+      <text x="418" y="164" fill="#FFB84D" font-size="10">80</text>
+      <text x="510" y="72" fill="#F2F2F2" font-size="11">510</text>
+    </svg>
+  </section>
+
+  <section>
+    <h2>Captain names one field</h2>
+    <div class="pick">
+      <article>
+        <h3>F1 Centre</h3>
+        <p>Same 1180 (or a taller cap). <code>margin-inline: auto</code>. Leftover splits. At 1920 each side is 370, not 712 / 28.</p>
+      </article>
+      <article>
+        <h3>F2 Fill · 12-col</h3>
+        <p>Named <code>--cols 12 --gutter 80 --margin</code>. Wells take spans. Leftover is empty columns you can count, not wallpaper.</p>
+      </article>
+      <article>
+        <h3>F3 Typed rail</h3>
+        <p>Left remainder becomes an N×80 type column (title lives there). Dots recede behind work, they are not the work.</p>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    Measured live at 8766: 1440 → console x=232 w=1180; 1920 → x=712 w=1180. Hands 590 / guide 510 / gap 80 at both. Source <code>tools/webflash/index.html:62-65</code>.
+    Audit pack: DESIGN-IS-2026-08-25-webflash-field. Optical gate before any look edit. Do not deploy until named.
+  </footer>
+</body>
+</html>

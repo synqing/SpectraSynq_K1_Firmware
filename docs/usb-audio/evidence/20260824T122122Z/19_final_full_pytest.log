@@ -1,0 +1,95 @@
+........................................................................ [  4%]
+........................................................................ [  9%]
+........................................................................ [ 14%]
+........................................................................ [ 19%]
+........................................................................ [ 23%]
+........................................................................ [ 28%]
+........................................................................ [ 33%]
+........................................................................ [ 38%]
+........................................................................ [ 42%]
+.................s...................................................... [ 47%]
+........................................................................ [ 52%]
+....................................F................................... [ 57%]
+........................................................................ [ 61%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+........................................................................ [ 76%]
+........................................................................ [ 81%]
+........................................................................ [ 85%]
+...........................................................F............ [ 90%]
+........................................................................ [ 95%]
+......................................................................   [100%]
+=================================== FAILURES ===================================
+____ K1UploadGuardTest.test_all_k1_chip_bound_envs_are_registered_in_guard _____
+
+self = <test_k1_upload_guard.K1UploadGuardTest testMethod=test_all_k1_chip_bound_envs_are_registered_in_guard>
+
+    def test_all_k1_chip_bound_envs_are_registered_in_guard(self):
+        # DRIFT-CATCHER (2026-06-30): any env whose `extends` chain roots at
+        # k1_hardware or k1_bench_reference is GPIO-pin-bound to a specific chip;
+        # if it is not in the guard's K1_TARGETS map the guard fail-OPENS ("no K1
+        # upload mapping enforced") and a cross-flash to the wrong unit (or the
+        # K718 on the shared bus) is NOT blocked. This asserts full coverage so a
+        # future probe env added without registration fails the gate, not the chip.
+        import re
+    
+        text = PLATFORMIO.read_text()
+        parent: dict[str, str] = {}
+        envs: list[str] = []
+        for chunk in re.split(r"(?m)^\[", text):
+            m = re.match(r"env:([A-Za-z0-9_.]+)\]", chunk)
+            if not m:
+                continue
+            name = m.group(1)
+            envs.append(name)
+            pm = re.search(r"(?m)^\s*extends\s*=\s*env:([A-Za-z0-9_.]+)", chunk)
+            if pm:
+                parent[name] = pm.group(1)
+    
+        def root_of(env: str) -> str:
+            seen: set[str] = set()
+            while env in parent and env not in seen:
+                seen.add(env)
+                env = parent[env]
+            return env
+    
+        mapped: set[str] = set()
+        for target in self.guard.K1_TARGETS:
+            mapped.update(target.envs)
+        # A BLOCKED env is also covered: validate_upload_target() hard-blocks it
+        # (returns False) BEFORE the fail-open path, so it can never cross-flash.
+        mapped.update(self.guard.BLOCKED_UPLOAD_ENVS)
+    
+        K1_ROOTS = {"k1_hardware", "k1_bench_reference"}
+        missing = sorted(
+            e for e in envs if root_of(e) in K1_ROOTS and e not in mapped
+        )
+>       self.assertEqual(
+            missing,
+            [],
+            "K1 chip-bound envs missing from upload-guard K1_TARGETS "
+            f"(cross-flash brick risk — register them): {missing}",
+        )
+E       AssertionError: Lists differ: ['k1_usb_audio_mac_probe'] != []
+E       
+E       First list contains 1 additional elements.
+E       First extra element 0:
+E       'k1_usb_audio_mac_probe'
+E       
+E       - ['k1_usb_audio_mac_probe']
+E       + [] : K1 chip-bound envs missing from upload-guard K1_TARGETS (cross-flash brick risk — register them): ['k1_usb_audio_mac_probe']
+
+tests/test_k1_upload_guard.py:261: AssertionError
+_____ test_candidate_env_is_in_pio_build_wrapper_and_rejects_upload_token ______
+
+    def test_candidate_env_is_in_pio_build_wrapper_and_rejects_upload_token():
+        wrapper = PIO_BUILD.read_text(encoding="utf-8")
+        assert CANDIDATE_ENV in wrapper
+>       assert f"|{CANDIDATE_ENV})" in wrapper
+E       assert '|k1_bench_scheduling_gdft_cross40_lane4_tempo_inc_full_probe)' in '#!/usr/bin/env bash\n# Tight wrapper around `pio run -e <env>` for agent use.\n# Accepts exactly one env argument and...ains forbidden token" >&2\n  exit 1\nfi\n\n# Execute the narrowly-scoped build command only.\nexec pio run -e "$ENV"\n'
+
+tests/test_tempo_emit_exact_residual_v1.py:66: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_k1_upload_guard.py::K1UploadGuardTest::test_all_k1_chip_bound_envs_are_registered_in_guard
+FAILED tests/test_tempo_emit_exact_residual_v1.py::test_candidate_env_is_in_pio_build_wrapper_and_rejects_upload_token
+2 failed, 1507 passed, 1 skipped in 256.35s (0:04:16)

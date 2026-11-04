@@ -95,7 +95,16 @@ void light_mode_tempo_comet(ChannelEffectState& fx) {
 
   // 2. BEAT FLYWHEEL ──────────────────────────────────────────────────────────
   const float gate   = tc_smoothstep(TC_CONF_LO, TC_CONF_HI, t.confidence);
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+  // Lane R1 (Captain 2026-10-21, R4 extension): the beat grid is a VALIDATED cue, so it follows the
+  // published lock, not confidence. Without it the flywheel reconstructed predicted beats from TENTATIVE
+  // confidence while locked == false (rendered gap, receipts c1-*). TENTATIVE (gate > 0, not locked) keeps
+  // the effect alive on real bass onsets below, with the tentative tempo setting only their speed.
+  const bool  confident = t.locked;
+  const bool  tentative = !t.locked && gate > 0.0f;
+#else
   const bool  confident = gate >= 0.5f;
+#endif
   float bpm = t.bpm; if (bpm < 40.0f) bpm = 40.0f; if (bpm > 200.0f) bpm = 200.0f;
 
   // Learn/hold the locked BPM only when confident; HOLD through octave flips (ratio
@@ -157,6 +166,32 @@ void light_mode_tempo_comet(ChannelEffectState& fx) {
       fx.tcomet_locked_bpm = 0.0f;
     }
   }
+
+#ifdef K1_TEMPO_CONSUMER_BANDS_V1
+  // 3b. TENTATIVE band: launch on a fresh BASS onset (a real event, as Comet does), never on a predicted
+  //     beat. The tentative tempo only scales the travel speed (motion). Inert while the beat grid runs.
+  {
+    const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+    const bool fresh = (ev.event_id != fx.tcomet_last_event_id);
+    fx.tcomet_last_event_id = ev.event_id;
+    const bool grid_running = (fx.tcomet_locked_bpm > 0.0f) && (fx.tcomet_coast_beats <= (uint16_t)TC_COAST_BEATS);
+    if (fresh && ev.bass_onset && tentative && !grid_running && !probe) {
+      float strength = ev.bass_onset_strength; if (strength < 0.0f) strength = 0.0f; if (strength > 1.0f) strength = 1.0f;
+      if (strength < TC_STRENGTH_FLOOR) strength = TC_STRENGTH_FLOOR;
+      const float beat_s   = 60.0f / bpm;
+      const float reach_fr = TC_REACH_MIN + (TC_REACH_FRAC - TC_REACH_MIN) * strength;
+      const float vel_px_s = reach_fr * (float(NATIVE_RESOLUTION) * 0.5f) / beat_s;
+      uint8_t slot = 0; float min_life = fx.tcomet_life[0];
+      for (uint8_t i = 1; i < COMET_MAX; i++) {
+        if (fx.tcomet_life[i] < min_life) { min_life = fx.tcomet_life[i]; slot = i; }
+      }
+      fx.tcomet_pos[slot]  = float(NATIVE_RESOLUTION / 2);
+      fx.tcomet_vel[slot]  = vel_px_s;
+      fx.tcomet_size[slot] = TC_SIZE * (0.80f + 0.40f * strength);
+      fx.tcomet_life[slot] = 1.0f;
+    }
+  }
+#endif
 
   // 4. Advance + draw each live comet (bright core + trailing wake + glow).
   for (uint8_t i = 0; i < COMET_MAX; i++) {

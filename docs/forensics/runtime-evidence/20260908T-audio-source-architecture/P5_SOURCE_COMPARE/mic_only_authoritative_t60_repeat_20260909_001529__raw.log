@@ -1,0 +1,114 @@
+# capture_start=2026-09-09T00:15:29+0800
+# port=/dev/cu.usbmodem1101 baud=115200 duration_ms=30000
+# track=build/audio-source-p5/demo_track1_t60_45s.wav
+# track_sha256=2c561dacb4fbbd9dc3a4e071e8b5ec472f2cf3dc9f83d81ca89f21c18bd017d0
+# player=afplay start_ms=0 playback_gain_db=0.0
+# non_actions=no calibration,no tempo tuning,no production DSP change
+# observed_output_device=Multi-Output Device
+# pre_roll_seconds=8.0
+# serial_identity={"description": "USB JTAG/serial debug unit", "device": "/dev/cu.usbmodem1101", "hwid": "USB VID:PID=303A:1001 SER=B4:3A:45:A5:87:90 LOCATION=1-1", "location": "1-1", "manufacturer": "Espressif", "pid": 4097, "product": "USB JTAG/serial debug unit", "serial_number": "B4:3A:45:A5:87:90", "vid": 12346}
+# action_ts_monotonic_ms=34193946 action=stop
+K1OK
+# action_ts_monotonic_ms=34194386 action=version
+sbr{{
+VERSION: 40103
+}}
+# action_ts_monotonic_ms=34195400 action=build
+sbr{{
+BUILD: version=40103 git=f74199f4 epoch=1788883961 env=k1_main_rpl_im69d_p5_probe
+}}
+# action_ts_monotonic_ms=34196426 action=image_id
+sbr{{
+IMAGE_ID: app_elf_sha256=0094f44d927bd9b5165204cc0b030bb0870391055d15ea5abb02eb54d3152685
+}}
+# action_ts_monotonic_ms=34197450 action=runtime_id
+sbr{{
+RUNTIME_ID: boot_nonce=b360c31713ba5b37 uptime_ms=151473 reset_reason=11
+}}
+# action_ts_monotonic_ms=34198480 action=apcad_abort=1
+sbr{{
+APCAD_ABORT: stopped
+}}
+# action_ts_monotonic_ms=34198809 action=apcad_clear=1
+sbr{{
+APCAD_CAPTURE: active=off count=0 capacity=2304 dropped=0 start_ms=0 end_ms=0 alloc=none
+}}
+# action_ts_monotonic_ms=34199239 action=vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 2
+VP_PERF_FRAME: avg=6237 max=7358 over=0 dropped=0
+VP_PERF_INTERVAL: avg=7260 max=8517
+VP_PERF_PACK: avg=626 max=871
+VP_PERF_SHOW: avg=1116 max=1407
+VP_PERF_STACK_HWM_WORDS: ap=4416 vp=4356
+VP_PERF_HEAP: 118304
+}}
+# action_ts_monotonic_ms=34199678 action=apdbg=off
+sbr{{
+AP_FRONTEND_DEBUG: off
+}}
+# action_ts_monotonic_ms=34200006 action=tempo_stream=off
+sbr{{
+TEMPO_STREAM: off
+}}
+# action_ts_monotonic_ms=34200329 action=ap_stream=off
+sbr{{
+AP_STREAM: off
+}}
+# playback_cmd=/usr/bin/afplay build/audio-source-p5/demo_track1_t60_45s.wav
+# action_ts_monotonic_ms=34200661 action=playback_start
+# host_capture_window_start_monotonic_ms=34208689
+# action_ts_monotonic_ms=34208689 action=apcad_soak=30000
+sbr{{
+APCAD_SOAK: armed 30000 ms compact=1
+APCAD_SOAK_BEGIN,schema_ver=2,stage_detail=0,duration_ms=30000,compact=1
+}}
+# host_capture_window_end_monotonic_ms=34239225
+# action_ts_monotonic_ms=34240228 action=apcad_soak_status=1
+APCAD_SOAK_DONE,schema_ver=2,stage_detail=0,active=0,rows=3999,emitted=1333,start_ms=162715,end_ms=192715,requested_duration_ms=30000,first_frame_ms=162723,last_frame_ms=192708,observed_duration_ms=29985,sample_rate=12800,samples_per_chunk=96,tempo_decim=3,hist_bucket_us=32,hist_bucket_count=512,meas_ap_hz=133.333,meas_nov_hz=44.444,i2s_not_ok=0,bytes_mismatch=0,frame_gap=0,timestamp_regression=0,core_bad=0,active_over_7500=0,emitted_active_over_7500=0,active_p95_us=4576,active_ap_work_p50_low_us=3200,active_ap_work_p50_high_us=3232,active_ap_work_p95_low_us=4544,active_ap_work_p95_high_us=4576,active_ap_work_p99_low_us=4640,active_ap_work_p99_high_us=4672,active_ap_work_hist_saturation=0,active_ap_work_max_us=4785,newest_sample_to_ap_publish_p50_low_us=2976,newest_sample_to_ap_publish_p50_high_us=3008,newest_sample_to_ap_publish_p95_low_us=4352,newest_sample_to_ap_publish_p95_high_us=4384,newest_sample_to_ap_publish_p99_low_us=4448,newest_sample_to_ap_publish_p99_high_us=4480,newest_sample_to_ap_publish_hist_saturation=0,newest_sample_to_ap_publish_max_us=4587,ap_read_return_interval_p50_low_us=7488,ap_read_return_interval_p50_high_us=7520,ap_read_return_interval_p95_low_us=7488,ap_read_return_interval_p95_high_us=7520,ap_read_return_interval_p99_low_us=7488,ap_read_return_interval_p99_high_us=7520,ap_read_return_interval_hist_saturation=0,ap_read_return_interval_max_us=7515,active_max_us=4785,active_sum_us=14193322,active_mean_us=3549.218,max_consecutive_active_over_7500=0,worst_count=16
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=0,frame=24222,t=181803,active_us=4711,total_us=8424,i2s_us=3713,gdft_us=1708,novelty_us=34,tempo_acf_us=713,tempo_update_us=593,tempo_emit_us=1464,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=621,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=1,frame=25158,t=188823,active_us=4707,total_us=8424,i2s_us=3717,gdft_us=1713,novelty_us=31,tempo_acf_us=710,tempo_update_us=596,tempo_emit_us=1460,emitted=1,acf_spread=1,acf_lag_cursor=16,a
+cf_pub=645,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=2,frame=23949,t=179756,active_us=4736,total_us=7943,i2s_us=3207,gdft_us=1716,novelty_us=26,tempo_acf_us=715,tempo_update_us=590,tempo_emit_us=1465,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=614,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=3,frame=25041,t=187946,active_us=4708,total_us=7858,i2s_us=3150,gdft_us=1713,novelty_us=26,tempo_acf_us=707,tempo_update_us=560,tempo_emit_us=1415,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=642,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=4,frame=25548,t=191748,active_us=4725,total_us=8437,i2s_us=3712,gdft_us=1697,novelty_us=32,tempo_acf_us=710,tempo_update_us=643,tempo_emit_us=1535,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=655,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=5,frame=23208,t=174198,active_us=4748,total_us=8463,i2s_us=3715,gdft_us=1704,novelty_us=29,tempo_acf_us=718,tempo_update_us=615,tempo_emit_us=1526,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=595,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=6,frame=25080,t=188238,active_us=4714,total_us=8414,i2s_us=3700,gdft_us=1699,novelty_us=36,tempo_acf_us=705,tempo_update_us=608,tempo_emit_us=1507,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=643,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=7,frame=25119,t=188531,active_us=4735,total_us=7945,i2s_us=3210,gdft_us=1713,novelty_us=27,tempo_acf_us=724,tempo_update_us=621,tempo_emit_us=1520,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=644,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=8,frame=23364,t=175368,active_us=4742,total_us=8458,i2s_us=3716,gdft_us=1703,novelty_us=32,tempo_acf_us=716,tempo_update_us=574,tempo_emit_us=1464,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=599,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=9,frame=25002,t=187653,active_us=4747,total_us=8459,i2s_us=3712,gdft_us=1700,novelty_us=33,tempo_acf_us=713,tempo_update_us=597,tempo_emit_us=1490,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=641,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=10,frame=24573,t=184436,active_us=4731,total_us=7939,i2s_us=3208,gdft_us=1724,novelty_us=25,tempo_acf_us=715,tempo_update_us=603,tempo_emit_us=1483,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=630,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=11,frame=25197,t=189116,active_us=4716,total_us=7927,i2s_us=3211,gdft_us=1719,novelty_us=32,tempo_acf_us=710,tempo_update_us=589,tempo_emit_us=1458,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=646,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=12,frame=23403,t=175661,active_us=4708,total_us=7902,i2s_us=3194,gdft_us=1709,novelty_us=30,tempo_acf_us=702,tempo_update_us=567,tempo_emit_us=1418,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=600,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=13,frame=24378,t=182973,active_us=4753,total_us=8462,i2s_us=3709,gdft_us=1697,novelty_us=23,tempo_acf_us=715,tempo_update_us=607,tempo_emit_us=1516,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=625,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=14,frame=25587,t=192041,active_us=4715,total_us=7920,i2s_us=3205,gdft_us=1708,novelty_us=21,tempo_acf_us=719,tempo_update_us=617,tempo_emit_us=1493,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=656,win_bpm=64.00000,top1_bpm=64.00000
+APCAD_SOAK_WORST,schema_ver=2,stage_detail=0,rank=15,frame=23286,t=174783,active_us=4785,total_us=8462,i2s_us=3677,gdft_us=1710,novelty_us=30,tempo_acf_us=717,tempo_update_us=582,tempo_emit_us=1472,emitted=1,acf_spread=1,acf_lag_cursor=16,acf_pub=597,win_bpm=64.00000,top1_bpm=64.00000
+# apcad_soak_status_done=True
+# action_ts_monotonic_ms=34241266 action=vp_perf=start
+sbr{{
+VP_PERF: start budget_us=8333 render_budget_us=2000
+}}
+VPF,ver=1,seq=1,mode=18,smode=18,sec=1,acq_us=4083/4083,vu_us=26/26,gdft_us=1765/1765,smooth_us=361/361,pri_render_us=1587/1587,sec_render_us=0/0,pri_prep_us=0/0,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=621/621,show_us=997/997,interval_us=0/0,frame_us=6725/6725,over=0,dropped=0,heap=118304,ap_stack_hwm_words=4416,vp_stack_hwm_words=4356
+VPF,ver=1,seq=2,mode=18,smode=18,sec=1,acq_us=3830/4644,vu_us=28/51,gdft_us=1762/1808,smooth_us=311/525,pri_render_us=1603/2109,sec_render_us=1885/2481,pri_prep_us=220/301,sec_prep_us=0/0,quant_pri_us=0/0,quant_sec_us=0/0,pack_us=643/890,show_us=1085/1370,interval_us=7275/8062,frame_us=6183/7050,over=0,dropped=0,heap=118304,ap_stack_hwm_words=4416,vp_stack_hwm_words=4356
+# action_ts_monotonic_ms=34242497 action=vp_perf=stop
+sbr{{
+VP_PERF: stopped
+VP_PERF_SEQ: 2
+VP_PERF_FRAME: avg=6145 max=7050 over=0 dropped=0
+VP_PERF_INTERVAL: avg=7254 max=8062
+VP_PERF_PACK: avg=649 max=890
+VP_PERF_SHOW: avg=1092 max=1474
+VP_PERF_STACK_HWM_WORDS: ap=4416 vp=4356
+VP_PERF_HEAP: 118304
+}}
+# action_ts_monotonic_ms=34243350 action=runtime_id
+sbr{{
+RUNTIME_ID: boot_nonce=b360c31713ba5b37 uptime_ms=197381 reset_reason=11
+}}
+# action_ts_monotonic_ms=34244159 action=apcad_abort=1
+sbr{{
+APCAD_ABORT: stopped
+}}
+# action_ts_monotonic_ms=34244487 action=stop
+K1OK

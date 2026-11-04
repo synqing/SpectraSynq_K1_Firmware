@@ -1,0 +1,25 @@
+{
+ "gate": "p2.6-joint-host-cost",
+ "cmd": "_scratch/esp-emulator/tempo-lock-r1/joint/tempo_joint_pointer_bench 400000",
+ "exit_code": 0,
+ "sha256_inputs": {
+  "scripts/regression-harness/tempo_joint_pointer_bench.c": "5e816520a262db9d1f64ea54c22a1c41db7408bce3712acd19a1ba52543cacc7"
+ },
+ "sha256_outputs": {},
+ "stdout_tail": [
+  "{\"states\": 7585, \"window_mults_per_frame\": 1992.0, \"host_ns_per_frame\": 6304.9, \"host_us_per_emit\": 18.915, \"floats_ram_bytes\": 42628, \"sink\": 54.4783}"
+ ],
+ "utc": "2026-10-21T08:47:17+00:00",
+ "git_sha": "101a96f858c5f5b2c98f6b5e4252b1da5991bd67",
+ "git_dirty_paths": [
+  "scripts/regression-harness/tempo_joint_estimator.py",
+  "scripts/regression-harness/tempo_joint_pointer_bench.c",
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "host"
+}

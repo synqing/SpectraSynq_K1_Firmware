@@ -103,6 +103,10 @@ extern SQ15x16 chromagram_pregate[12];          // Row 3 → globals.cpp — pos
 
 inline SQ15x16 spectral_history[SPECTRAL_HISTORY_LENGTH][NUM_FREQS];
 inline SQ15x16 novelty_curve[SPECTRAL_HISTORY_LENGTH] = { 0.0 };
+#ifdef K1_TEMPO_NOVELTY_LINEAR_V1
+// Candidate (uncommitted evidence): the tempo tracker's input before the sqrtf.
+inline float novelty_linear_curve[SPECTRAL_HISTORY_LENGTH] = { 0.0f };
+#endif
 
 inline uint8_t spectral_history_index = 0;
 
@@ -165,6 +169,16 @@ inline DRAM_ATTR int16_t im69d_samples_i16[1024]    = { 0 };
 inline uint16_t im69d_raw_i16_abs_peak = 0;
 inline float    im69d_raw_i16_rms = 0.0f;
 inline float    im69d_raw_i16_near_pct = 0.0f;
+#ifdef K1_B489_WS2816_V1
+// Audio task also owns the serial reader. These last-read observations explain
+// invalid input without changing samples, calibration or admission.
+inline uint32_t b489_i2s_read_sequence = 0;
+inline int32_t b489_i2s_last_status = 0;
+inline uint32_t b489_i2s_last_bytes = 0;
+inline uint32_t b489_i2s_expected_bytes = 0;
+inline int16_t b489_i2s_raw_min = 0;
+inline int16_t b489_i2s_raw_max = 0;
+#endif
 #ifdef K1_MIC_IM69D_STEREO_V1
 // Stage 2 stereo probe (2026-08-12, design im69d130-dual-mic-eval §5): interleaved
 // ESP-IDF RIGHT/LEFT landing buffer + LEFT-slot de-interleave target. Bench probe
@@ -1037,7 +1051,11 @@ inline uint8_t brightness_levels[NUM_FREQS] = { 0 };
 #if K1_ENABLE_USB_MSC_UPDATE
 inline FirmwareMSC MSC_Update;
 #endif
-#if defined(K1_HARDWARE)
+#if defined(K1_USB_AUDIO_PROTOTYPE) && K1_USB_AUDIO_PROTOTYPE
+#include <USB.h>
+#include <USBCDC.h>
+extern USBCDC USBSerial;
+#elif defined(K1_HARDWARE)
 #define USBSerial Serial
 #else
 inline USBCDC USBSerial;
@@ -1124,7 +1142,7 @@ inline CRGB *leds_out_secondary;              // Final output buffer
 #ifndef SECONDARY_LED_DATA_PIN
 inline const uint8_t SECONDARY_LED_DATA_PIN = LED_CLOCK_PIN;  // Use board LED clock pin for secondary strip
 #endif
-#ifdef K1_MAIN_RPL_PINMAP_V1
+#if defined(K1_MAIN_RPL_PINMAP_V1) || defined(K1_B489_WS2816_V1)
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL_X2;
 #else
 inline const uint8_t SECONDARY_LED_TYPE = LED_NEOPIXEL;

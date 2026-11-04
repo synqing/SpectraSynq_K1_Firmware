@@ -22,6 +22,9 @@
 #include "globals.h"               // CONFIG, CONFIG_DEFAULTS, USBSerial, FastLED, gGradientPaletteCount
 #include "constants.h"             // NUM_FREQS, CHROMA_PROFILE_*, SAMPLE_HISTORY_LENGTH
 #include "serial_tx.h"             // tx_begin / tx_end / bad_command
+#ifdef K1_EMU_FIXTURE
+#include "../audio/k1_emu_fixture.h"  // emulator replay only: report the installed power limit
+#endif
 #include "serial_parse_helpers.h"  // vp_parse_bool / vp_parse_float
 #include "k1_effect_queue.h"        // k1_queue_* setters/getters + K1_QUEUE_* enums (queue family)
 #include "k1_smart_director.h"      // K1SmartDirectorConfig + k1_smart_director_config/set_config (smart_director)
@@ -412,6 +415,9 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       }
 
       FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
+#ifdef K1_EMU_FIXTURE
+      k1_emu_fixture_note_power_limit_mw((uint32_t)(5 * CONFIG.MAX_CURRENT_MA));
+#endif
 
       save_config_delayed();
       tx_begin();

@@ -30,11 +30,11 @@ This is the memory/recall counterpart to `/thinking-model-router`.
 |-----------------------|--------|--------|
 | New session, context reset, "what's the active lane?" | `/spec-recall` | mem-search as current truth |
 | Before firmware edit / flash / forensic work | `/spec-recall` then `/mem-search` | skip on-disk handover |
-| "Did we already fix X?" / prior bug / failed attempt | `/mem-search` | timeline-report |
+| "What was decided / did we already / prior failure" | Hindsight `recall` first (`/hindsight-memory`); `/mem-search` only for history before 2026-09-27 (claude-mem frozen read-only) | timeline-report |
 | Recurrence pattern / "how did we solve this last time?" | `/mem-search` (search→timeline→get_observations) | fetch all IDs unfiltered |
 | Need code structure without reading whole files | `/smart-explore` | learn-codebase |
 | Unfamiliar tree / empty memory seed / "prime the repo" | `/learn-codebase` | every session |
-| Theme corpus Q&A ("everything about IM73D decisions") | `/knowledge-agent` | weekly-digests |
+| Theme corpus Q&A ("everything about IM73D decisions") | `/mem-search` — one term per call (`IM73D`, then `decision`), merge, then `timeline` | `/knowledge-agent` (corpus tools are not a supported path in claude-mem 13.6.0 worker mode — see `~/.claude/CLAUDE.md` § Claude-Mem Operational Hardening) |
 | One sweeping "Journey Into …" narrative | `/timeline-report` | weekly-digests |
 | Week-by-week / serial chapters / "story by week" | `/weekly-digests` | timeline-report |
 | "How does claude-mem work?" / injection / where data lives | `/how-it-works` | spec-recall |
