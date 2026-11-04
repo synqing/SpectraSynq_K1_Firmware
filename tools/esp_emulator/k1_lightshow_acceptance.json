@@ -1,0 +1,124 @@
+{
+  "schema": "k1-lightshow-acceptance/1",
+  "authority": "Captain approval, tasks1\u20134, 5 November2026",
+  "product_env": "k1_fe",
+  "bench_env": "k1_fe_bench_b489",
+  "geometry": {
+    "edges": 2,
+    "pixels_per_edge": 160,
+    "centre_indices": [
+      79,
+      80
+    ]
+  },
+  "scope": "Software/audio/render qualification and S3 design comparison; optical/electrical and extended loaded-product qualification are separate.",
+  "references": [
+    {
+      "path": "docs/agent/AGENT_EXECUTION_STANDARD.md",
+      "sha256": "02c25b25595c61a67ec77548f835df061c00264e806b21dfa1ab1876e55a70a4"
+    },
+    {
+      "path": "docs/architecture/waveform-mode-design-rationale.md",
+      "sha256": "7b7875443e252edf60a64ac972ffd1d7c5d270f536ec88340708ee328e228e6d"
+    },
+    {
+      "path": "docs/canon/SESSION_CANON_2026-08-07_im69d_peakiness_deck16_boot.md",
+      "sha256": "51a4b920654b613df38efce894ec1d67cd4f5544ebf146033b05126cc095e071"
+    },
+    {
+      "path": "SPECTRASYNQ_K1_FIRMWARE/system/config_types.h",
+      "sha256": "20496fa55516231132ef600a9a1ed01ddcd6f2d8dc4b5054e2a4286fa660abdf"
+    },
+    {
+      "path": "SPECTRASYNQ_K1_FIRMWARE/system/constants.h",
+      "sha256": "41f966cd455a7f7870b4b0f32e996c540c3d7f94522b0077276aeae2fba1f6f9"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "LS01",
+      "meaning": "Music causes meaningful fresh state; do not mistake retained state or manual performance for analysis.",
+      "boundary": "audio producer -> acquired render snapshot -> final frame",
+      "pass_rule": "Known tone/onset/beat fixtures compare actual code with independent input truth; actual music results report lock/beat failures explicitly."
+    },
+    {
+      "id": "LS02",
+      "meaning": "Authored palettes and colour clarity survive the output chain.",
+      "boundary": "both native output buffers",
+      "pass_rule": "Channel arithmetic matches independent vectors including zero, near-black and maximum; forbidden rainbow defaults absent; output preserves intended per-edge parameters."
+    },
+    {
+      "id": "LS03",
+      "meaning": "Two independently playable edges and faithful persistence.",
+      "boundary": "production command -> state -> both output buffers -> save/reboot",
+      "pass_rule": "Changing edgeA leaves edgeB unchanged and vice versa under deterministic input; saved composition recovers without replaying setup commands."
+    },
+    {
+      "id": "LS04",
+      "meaning": "Preserve each existing effect identity and centre-referenced geometry.",
+      "boundary": "actual supported dispatch modes -> rendered pixels over time",
+      "pass_rule": "Enumerate current enabled modes; compare to their specified mapping/motion. No silent disable, new linear sweep, or replacement with a common generic effect."
+    },
+    {
+      "id": "LS05",
+      "meaning": "Smooth movement, musical persistence and honest silence.",
+      "boundary": "final pixels over time",
+      "pass_rule": "Matched output captures expose discontinuity, unintended brightness modulation, hard-black loss and silence/return behaviour; distinguish diagnostics from natural musical quiet. No invented global appeal score."
+    },
+    {
+      "id": "LS06",
+      "meaning": "Fit the S3 without sacrificing output.",
+      "boundary": "actual target timings and output parity",
+      "pass_rule": "Per-effect budget2000us and frame budget8333us apply to correct spans; audio service p99<=8000us; compare candidate cost/RAM with baseline, preserve meaning/pixels or justify intended repair."
+    },
+    {
+      "id": "LS07",
+      "meaning": "Instrumentation and scorers can detect their claimed failures.",
+      "boundary": "independent negative controls",
+      "pass_rule": "Reject changed pixels, wrong clock/source/generation, corrupted/partial captures and invalid counters. Software PASS alone cannot certify optical output or musical appeal."
+    },
+    {
+      "id": "LS08",
+      "meaning": "Keep the supported performance controls and product feature set.",
+      "boundary": "source dispatch/dependencies and exercised command path",
+      "pass_rule": "No render heap/blocking I/O, no feature removal, no unsolicited radio-mode changes; changed implementation must preserve enabled modes and relevant control transactions."
+    }
+  ],
+  "comparison_policy": "Use actual accepted Waveform lineage as design reference; historical pending-viewing prototypes are not accepted reference light shows. Optimisations require unchanged output; corrections require targeted independent expected results.",
+  "budgets": {
+    "effect_us": 2000,
+    "frame_us": 8333,
+    "audio_service_p99_us": 8000,
+    "audio_rate_hz": 12800,
+    "hop_samples": 96
+  },
+  "audio_criteria": {
+    "spectral_arithmetic": {
+      "method": "Actual deployed coefficient/window recurrence against independent complex DFT on identical integer PCM; derived rounding bounds per bin.",
+      "required": "All71Nyquist-safe bins within their derived bounds;9unsafe slots zero; zeroedstrongtone and +1Nyquist mutations rejected."
+    },
+    "onset_return": {
+      "method": "Actual producer and captured real spectra, declared exact-zero boundary, continuous-programme counterfactual.",
+      "required": "No boundary-created attack or threshold poisoning; subsequent controlled attack detected at specified causal hop; steady spectra/quiet emit no events; continuous programme unchanged."
+    },
+    "tempo_lock": {
+      "reference": "docs/architecture/tempo-lock-hardening-plan.md E1/E2; frozen before V2.",
+      "wrong_lock_wilson_upper95_max": 0.1,
+      "right_track_coverage_min": 0.25,
+      "confidence_auc_min": 0.8,
+      "new_nonmusic_locked_frames_max": 0,
+      "required": "Unchanged BPM, untouched held-out acceptance once entry clears; report every input/error. Neither confidence nor correct tempo alone establishes beat position."
+    },
+    "beat_position": {
+      "method": "Preregistered independent beat annotations; actual published ticks at sample hop-end times; no fitted phase offset.",
+      "required": "Report fixed-tolerance precision/recall and signed timing error, including missing and false ticks. Zero ticks cannot pass a phase qualification. BPM-only scoring is insufficient."
+    },
+    "harmonic_and_energy": {
+      "required": "Separate numerical band/chroma/triad conformance from real-audio recognition and calibrated loudness; root-dominant synthetic triads cannot establish general chord accuracy. Retain flat/unison failures."
+    }
+  },
+  "latency_definition": {
+    "audio_service": "Correctly bounded AP work span; p99<=8000us is a service budget, not an audio-to-light measurement.",
+    "end_to_end": "Sub8ms requirement concerns acquisition-to-emission delivery. Firmware timestamps must identify sample-age assumptions and show submission; physical LED/protocol/optical delay needs separate measurement. Do not substitute service timing for this gate."
+  }
+}

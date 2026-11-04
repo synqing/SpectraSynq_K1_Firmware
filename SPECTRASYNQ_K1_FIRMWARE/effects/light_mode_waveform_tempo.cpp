@@ -253,6 +253,9 @@ void light_mode_waveform_tempo(ChannelEffectState& fx) {
       }
     }
 #endif
+    // Scrolling can move the two halves apart even while draining. Preserve
+    // the requested centre mirror before returning without a new colour seed.
+    if (rp->MIRROR_ENABLED) mirror_image_downwards(leds_16);
     return;  // drain only — do not repaint stale history from chroma/palette
   }
 

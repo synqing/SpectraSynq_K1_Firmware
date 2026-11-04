@@ -397,7 +397,7 @@ def test_fe_profile_preserves_scenario_and_declares_hardware_boundary():
     assert runner.select_profile(sc, 'scenario') is sc
     assert fe['profile']['env'] == 'k1_fe_emu'
     assert fe['profile']['product_env'] == 'k1_fe'
-    assert set(fe['profile']['adapter_flags']) - set(sc['profile']['adapter_flags']) == {'K1_EMU_FE_MIC_ONLY'}
+    assert set(fe['profile']['adapter_flags']) - set(sc['profile']['adapter_flags']) == {'K1_EMU_FE_MIC_ONLY', 'K1_EMU_ONSET_TRACE', 'K1_EMU_SPECTRUM_TRACE'}
     assert 'K1_EMU_FE_MIC_ONLY' in fe['profile']['forbidden_in_product']
     assert 'Physical PCM1808 capture/resampling' in fe['description']
     assert 'jack switching' in fe['description']

@@ -112,6 +112,7 @@ struct BandState {
 struct DetectorV2 {
   float    prev_spec[K1V2_BINS] = {};
   bool     has_prev            = false;
+  bool     previous_spectrum_empty = false;
 
   float    flux_ring[K1V2_FLUX_RING] = {};
   uint8_t  flux_widx          = 0;
@@ -236,13 +237,24 @@ void sbv2_reset() {
 // the legacy IOI path own those). Returns true if a fresh transient fired.
 bool sbv2_run(const K1AudioSnapshot& audio, K1OnsetBeatEvent& event) {
   const float* spec = audio.spectrum;
+  bool spectrum_empty = true;
+  for (uint8_t i = 0; i < K1V2_BINS; ++i) {
+    if (spec[i] > 0.0f) { spectrum_empty = false; break; }
+  }
+  const bool programme_return = g_v2.previous_spectrum_empty && !spectrum_empty;
+  g_v2.previous_spectrum_empty = spectrum_empty;
 
   // Silence / first frame: force a clean re-prime on the NEXT real frame (donor
   // m_hasPrevMag=false semantics) rather than comparing against a stale/zero
   // spectrum. Crucially this injects NO zeros into the median ring or band EMA
   // (gate-permission-only invariant) AND leaves prev_spec untouched so a brief
   // gate does not fabricate a giant post-gate flux spike against zeros.
-  if (!g_v2.has_prev || audio.silence) {
+  // Exact digital quiet can precede the input classifier's silence dwell.
+  // Treat its return like the first spectrum: log(EPS)->log(programme) is an
+  // acquisition boundary, not a musical attack. Otherwise that jump poisons
+  // the band EMA and suppresses subsequent real attacks. Empty frames still
+  // update detector statistics normally; no threshold/history is reset.
+  if (!g_v2.has_prev || audio.silence || programme_return) {
     if (audio.silence) {
       g_v2.has_prev = false;          // next real frame re-primes, no flux
     } else {

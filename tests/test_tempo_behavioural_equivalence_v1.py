@@ -92,9 +92,17 @@ def _build(defines: list[str], workdir: Path) -> Path:
 
 
 def _replay(binary: Path, text: str) -> tuple[list[dict], list[float]]:
-    result = subprocess.run(
-        [str(binary)], cwd=ROOT, text=True, input=text, capture_output=True
-    )
+    with tempfile.TemporaryFile(mode="w+") as src, \
+            tempfile.TemporaryFile(mode="w+") as dst, \
+            tempfile.TemporaryFile(mode="w+") as err:
+        src.write(text)
+        src.seek(0)
+        proc = subprocess.run([str(binary)], cwd=ROOT, stdin=src,
+                              stdout=dst, stderr=err, timeout=30)
+        dst.seek(0)
+        err.seek(0)
+        result = subprocess.CompletedProcess(proc.args, proc.returncode,
+                                             dst.read(), err.read())
     assert result.returncode == 0, result.stderr
     rows = []
     raw: list[float] = []

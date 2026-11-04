@@ -361,6 +361,22 @@ hop/field/pixels), and prints the 3/N bound. Exit status is 0 only for zero
 divergences with every run accepted. `tests/test_esp_emulator_seams_static.py`
 ratchets the seams that make replays deterministic.
 
+## S3 qualification
+
+The source-bound light-show requirements and budgets are in
+[`k1_lightshow_acceptance.json`](k1_lightshow_acceptance.json).
+`s3_visual_qualification.py` exercises the compiled FE roster, paired output,
+modifiers and full-cadence quiet/return cases against a separately built FE image.
+Its output checks do not establish optical appeal or musical beat accuracy.
+`s3_architecture_audit.py` inventories the supplied S3 ELF and retains the exact
+identity and workload of existing target timing windows.
+
+The `scripts/regression-harness/s3_*qualification*.py` tools check actual spectral
+arithmetic, captured audio, frozen tempo candidates and independently annotated
+beat positions. `s3_audio_validation_verify.py` publishes a fixture index only
+after every frozen input, executed image, PCM payload and complete audio stream
+has been checked. Musical scores and data-integrity verdicts are separate.
+
 ## Lessons and traps (read before changing anything here)
 
 `/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/docs/LESSONS.md`

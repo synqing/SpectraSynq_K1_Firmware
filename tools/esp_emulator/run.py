@@ -101,6 +101,7 @@ SUPPORTED_COMMANDS = {
     "prism_count", "secondary_prism_count", "mirror_enabled", "secondary_mirror_enabled",
     "reverse_order", "secondary_reverse_order", "base_coat", "secondary_base_coat",
     "incandescent_filter", "auto_color_shift", "secondary_auto_color_shift",
+    "temporal_dithering", "incandescent_mode", "secondary_incandescent_mode", "look", "secondary_look",
     "secondary_enabled", "edge_enabled", "edge_mode", "edge_strength", "edge_spread",
     "edge_rotation", "edge_uniform", "edge_dual", "max_current_ma", "save_show",
 }
@@ -1153,8 +1154,8 @@ def select_profile(sc: dict, profile: str) -> dict:
         "analysis, publication, effects and 48-bit packing without changing those product stages.")
     sc["profile"]["env"] = "k1_fe_emu"
     sc["profile"]["product_env"] = "k1_fe"
-    sc["profile"]["adapter_flags"].append("K1_EMU_FE_MIC_ONLY")
-    sc["profile"]["forbidden_in_product"].append("K1_EMU_FE_MIC_ONLY")
+    sc["profile"]["adapter_flags"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
+    sc["profile"]["forbidden_in_product"].extend(["K1_EMU_FE_MIC_ONLY", "K1_EMU_ONSET_TRACE", "K1_EMU_SPECTRUM_TRACE"])
     sc["compositions"]["fe_reverse_base"] = {
         "commands": ["set_mode=32", "secondary_mode=32", "mirror_enabled=false",
                      "secondary_mirror_enabled=false", "secondary_enabled=true"],

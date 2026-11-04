@@ -230,7 +230,17 @@ def load_fixture(index_path: Path, cid: str, meta: dict) -> list[tuple[int, floa
 def replay_rows(binary: Path, rows, spec: str | None, debug: bool) -> dict:
     feed = "".join(f"{r[0]} {frame_ms(r[0])} {transform(r[1], spec):.9g} {r[2]}"
                    + (f" {transform_spectrum(r[3], spec)}" if len(r) > 3 else "") + "\n" for r in rows)
-    r = subprocess.run([str(binary)], input=feed, capture_output=True, text=True)
+    with tempfile.TemporaryFile(mode="w+") as src, \
+            tempfile.TemporaryFile(mode="w+") as dst, \
+            tempfile.TemporaryFile(mode="w+") as err:
+        src.write(feed)
+        src.seek(0)
+        proc = subprocess.run([str(binary)], stdin=src, stdout=dst,
+                              stderr=err, timeout=30)
+        dst.seek(0)
+        err.seek(0)
+        r = subprocess.CompletedProcess(proc.args, proc.returncode,
+                                        dst.read(), err.read())
     if r.returncode != 0:
         raise SystemExit(f"replay failed: {r.stderr[-500:]}")
     keys = ["gen", "bpm", "conf", "lock", "tick", "phase"]

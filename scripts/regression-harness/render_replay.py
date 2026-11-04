@@ -671,8 +671,18 @@ def replay_frames(binary, frames, params=None, dual=False, secondary_params=None
     if dual:
         text += _secondary_params_line(secondary_params)
     text += _frames_to_stdin(frames)
-    r = subprocess.run([str(binary)], cwd=ROOT, text=True, input=text,
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # Large per-frame input and output must not compete for bounded pipe space.
+    with tempfile.TemporaryFile(mode="w+") as src, \
+            tempfile.TemporaryFile(mode="w+") as dst, \
+            tempfile.TemporaryFile(mode="w+") as err:
+        src.write(text)
+        src.seek(0)
+        proc = subprocess.run([str(binary)], cwd=ROOT, stdin=src,
+                              stdout=dst, stderr=err, timeout=30)
+        dst.seek(0)
+        err.seek(0)
+        r = subprocess.CompletedProcess(proc.args, proc.returncode,
+                                        dst.read(), err.read())
     hexes = []
     sec_hexes = []
     for ln in r.stdout.splitlines():

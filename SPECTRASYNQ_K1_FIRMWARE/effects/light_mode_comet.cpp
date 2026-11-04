@@ -102,7 +102,14 @@ void light_mode_comet(ChannelEffectState& fx) {
     float strength = ev.bass_onset_strength;
     if (strength < 0.0f) strength = 0.0f;
     if (strength > 1.0f) strength = 1.0f;
-    if (strength >= COMET_MIN_STRENGTH) {  // low floor: catch EVERY clear kick (no relative gate)
+#ifdef K1_ONSET_V2
+    // V2 has already qualified this fresh kick against its adaptive threshold.
+    // Its strength is normalised log-spectral flux, not the legacy scaled
+    // energy delta. Applying the legacy 0.06 floor discards real V2 kicks.
+    if (strength > 0.0f) {
+#else
+    if (strength >= COMET_MIN_STRENGTH) {  // legacy scaled-energy floor
+#endif
       uint8_t slot = 0;
       float min_life = fx.comet_life[0];
       for (uint8_t i = 1; i < COMET_MAX; i++) {

@@ -432,16 +432,24 @@ def _make_stdin() -> str:
 def _run_driver(binary: Path) -> str:
     """Feed the deterministic stdin to the compiled binary and return stdout."""
     stdin_text = _make_stdin()
-    r = subprocess.run(
-        [str(binary)], cwd=str(ROOT), text=True, input=stdin_text,
-        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-    )
+    # Keep large bidirectional replay traffic out of bounded pipes. Both the
+    # driver and its parent can otherwise block writing before either drains.
+    with tempfile.TemporaryFile(mode="w+") as src, \
+            tempfile.TemporaryFile(mode="w+") as dst, \
+            tempfile.TemporaryFile(mode="w+") as err:
+        src.write(stdin_text)
+        src.seek(0)
+        r = subprocess.run([str(binary)], cwd=str(ROOT), stdin=src,
+                           stdout=dst, stderr=err, timeout=30)
+        dst.seek(0)
+        err.seek(0)
+        stdout, stderr = dst.read(), err.read()
     if r.returncode != 0:
         raise RuntimeError(
             f"oracle_render runtime failed (rc={r.returncode}):\n"
-            f"STDERR:\n{r.stderr}\nSTDOUT:\n{r.stdout}"
+            f"STDERR:\n{stderr}\nSTDOUT:\n{stdout}"
         )
-    return r.stdout
+    return stdout
 
 
 def _parse_output(stdout: str) -> list:

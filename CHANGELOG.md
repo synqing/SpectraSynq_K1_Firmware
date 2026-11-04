@@ -6,6 +6,18 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ## [Unreleased]
 
+### Fixed — 2026-11-05
+
+- Re-prime the V2 onset spectrum on return from exact digital quiet, preventing
+  the boundary jump from inflating its adaptive threshold and suppressing later
+  attacks. Continuous programme and detector thresholds are unchanged.
+- Comet accepts fresh V2 bass events in their log-flux strength units; the legacy
+  detector retains its original strength floor. Drawing and movement are unchanged.
+- Waveform Tempo applies its requested centre mirror during the quiet drain.
+- FE enables the existing tempo consumer bands: predicted beat cues require a
+  published lock; tentative motion uses fresh bass events. This does not promote
+  an experimental tempo estimator or establish musical beat accuracy.
+
 ### Added
 
 - **PCM1808 Main RPL probe env** `k1_main_rpl_pcm1808_probe`: PCNT digital clock gate on GPIO14/13, I2S1 24-in-32 Philips slave RX on GPIO10/13/14, 4/15 polyphase SRC into the existing 12.8 kHz / 96 hop. Isolated from `k1_main_rpl_im69d`. Chip `9087A500` only.
