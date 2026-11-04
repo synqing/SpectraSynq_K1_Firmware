@@ -1,0 +1,65 @@
+{
+ "gate": "e1-v1-capture",
+ "cmd": "python3 scripts/regression-harness/tempo_lane_emu.py run --env k1_main_rpl_emu_tempo_r1_spec --manifest tests/fixtures/tempo_corpus/validation_gtzan_v1.json --role validation --out _scratch/esp-emulator/tempo-lock-r1/val-v1 --parallel 12",
+ "exit_code": 1,
+ "sha256_inputs": {
+  "tests/fixtures/tempo_corpus/validation_gtzan_v1.json": "77d6bf2a9e38c1c95702c45cd1da6e5cb4d4c5ee509ac7d84188df598af20cd6",
+  ".pio/build/k1_main_rpl_emu_tempo_r1_spec/firmware.bin": "63b4846b9c5c9ab4e303aca6cf7fe027f7cbd1ccc7816ff43eccc69ee940e655"
+ },
+ "sha256_outputs": {
+  "_scratch/esp-emulator/tempo-lock-r1/val-v1/cases.json": null
+ },
+ "stdout_tail": [
+  "Error opening input file /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/validation/raw/genres/jazz/jazz.00054.wav.",
+  "Error opening input files: Invalid data found when processing input",
+  "multiprocessing.pool.RemoteTraceback: ",
+  "\"\"\"",
+  "Traceback (most recent call last):",
+  "  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/pool.py\", line 125, in worker",
+  "    result = (True, func(*args, **kwds))",
+  "                    ~~~~^^^^^^^^^^^^^^^",
+  "  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/pool.py\", line 48, in mapstar",
+  "    return list(map(*args))",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 224, in _run_one",
+  "    pcm, meta = case_pcm(case, work)",
+  "                ~~~~~~~~^^^^^^^^^^^^",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 130, in case_pcm",
+  "    return decode_like_run(s[\"path\"], s.get(\"start_ms\", 0), s.get(\"duration_ms\"), work)",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 106, in decode_like_run",
+  "    subprocess.run(cmd, check=True)",
+  "    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^",
+  "  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/subprocess.py\", line 578, in run",
+  "    raise CalledProcessError(retcode, process.args,",
+  "                             output=stdout, stderr=stderr)",
+  "subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-v', 'error', '-ss', '0.000', '-i', '/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/validation/raw/genres/jazz/jazz.00054.wav', '-map', '0:a:0', '-ac', '1', '-ar', '12800', '-af', 'anull', '-f', 's16le', '-acodec', 'pcm_s16le', '_scratch/esp-emulator/tempo-lock-r1/val-v1/work/gz_jazz_00054/decode_3543000295944146261.s16le']' returned non-zero exit status 183.",
+  "\"\"\"",
+  "",
+  "The above exception was the direct cause of the following exception:",
+  "",
+  "Traceback (most recent call last):",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 301, in <module>",
+  "    sys.exit(main())",
+  "             ~~~~^^",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 297, in main",
+  "    return cmd_run(a)",
+  "  File \"/Users/spectrasynq/SpectraSynq_K1_Firmware/scripts/regression-harness/tempo_lane_emu.py\", line 273, in cmd_run",
+  "    results = pool.map(_run_one, [(c, a.env, str(out)) for c in cases], chunksize=1)",
+  "  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/pool.py\", line 367, in map",
+  "    return self._map_async(func, iterable, mapstar, chunksize).get()",
+  "           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^",
+  "  File \"/opt/homebrew/Cellar/python@3.14/3.14.8/Frameworks/Python.framework/Versions/3.14/lib/python3.14/multiprocessing/pool.py\", line 774, in get",
+  "    raise self._value",
+  "subprocess.CalledProcessError: Command '['ffmpeg', '-nostdin', '-v', 'error', '-ss', '0.000', '-i', '/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/esp-emulator/tempo-lock-r1/validation/raw/genres/jazz/jazz.00054.wav', '-map', '0:a:0', '-ac', '1', '-ar', '12800', '-af', 'anull', '-f', 's16le', '-acodec', 'pcm_s16le', '_scratch/esp-emulator/tempo-lock-r1/val-v1/work/gz_jazz_00054/decode_3543000295944146261.s16le']' returned non-zero exit status 183."
+ ],
+ "utc": "2026-10-21T20:23:13+00:00",
+ "git_sha": "46c5fb6213df899dbabc31eb9d8e4b0bca254e2d",
+ "git_dirty_paths": [
+  "tools/k1live/"
+ ],
+ "toolchain": {
+  "python": "3.14.8",
+  "clang": "Apple clang version 17.0.0 (clang-1700.6.3.2)",
+  "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+ },
+ "target": "emulator"
+}

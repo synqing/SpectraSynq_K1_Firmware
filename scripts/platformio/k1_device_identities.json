@@ -181,6 +181,8 @@
         "k1_prod_im73d": "production IM73D env inherits the k1_hardware production LED GPIO map (6/7); no production-LED-wired (6/7) IM73D unit physically exists yet. A 2026-07-07 misflash onto the 4/5-wired bench darkened both LED channels. Re-blocked 2026-07-08 (restores the b735524 posture; reverses the 46525ed un-block) after the forensic root-cause of the bench audio+LED corruption. Unblock only when a correctly-wired production IM73D unit exists.",
         "k1_b489_ws2816_emu_fixture": "Emulator-only image. It skips LED emission and logs on UART0. Never flash it onto a board.",
         "k1_main_rpl_emu": "Emulator-only replay of k1_main_rpl_im69d. It reads its scenario from the ota_1 partition, skips LED emission and logs on UART0. Never flash it onto a board.",
+        "k1_main_rpl_im69d_position_smooth_probe": "Build-only, non-shippable Main RPL Mode32 position-smoothing proof. Never flash it onto a board.",
+        "k1_main_rpl_emu_position_smooth_probe": "Emulator-only Mode32 position-smoothing proof. It skips LED emission and reads scenario PCM. Never flash it onto a board.",
         "k1_main_rpl_emu_tempo_probe": "Emulator-only tempo lane R1 measurement probe (k1_main_rpl_emu + ENABLE_TEMPO_STREAM + G lines). Never flash it onto a board.",
         "k1_main_rpl_emu_tempo_r1": "Emulator-only tempo lane R1 evaluation image (lane flags on). Never flash it onto a board.",
         "k1_main_rpl_emu_tempo_r1_probe": "Emulator-only tempo lane R1 measurement probe (lane flags + G lines). Never flash it onto a board.",

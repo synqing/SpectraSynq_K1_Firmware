@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "K1 audio pipeline",
+    "quality_profile": "standard",
+    "viewBox": [1100, 500],
+    "legend": {
+      "entries": {
+        "emphasis": { "label": "shipping path" },
+        "default": { "label": "level only" },
+        "dashed": { "label": "other build" },
+        "database": { "label": "snapshot" }
+      }
+    }
+  },
+  "stages": [
+    { "label": "Capture" },
+    { "label": "Level" },
+    { "label": "Spectrum" },
+    { "label": "Musical events" },
+    { "label": "Hand-off" }
+  ],
+  "nodes": [
+    { "id": "mic", "type": "external", "label": "SPH0645 mic", "sublabel": "I2S, 12.8 kHz, 96", "stage": 0, "row": 0, "tag": "default" },
+    { "id": "im69", "type": "external", "label": "IM69D130 build", "sublabel": "PDM, not default", "stage": 0, "row": 1, "tag": "other build" },
+    { "id": "usb", "type": "external", "label": "USB audio", "sublabel": "Replaces the mic", "stage": 0, "row": 2, "tag": "exclusive" },
+    { "id": "acquire", "type": "backend", "label": "Chunk and floor", "sublabel": "DMA read, silence", "stage": 1, "row": 0, "tag": "Core 0" },
+    { "id": "vu", "type": "backend", "label": "Loudness", "sublabel": "RMS vs noise floor", "stage": 1, "row": 1, "tag": "not the gain" },
+    { "id": "spectrum", "type": "backend", "label": "Goertzel spectrum", "sublabel": "80 bins, Lane-4", "stage": 2, "row": 0, "tag": "133 Hz" },
+    { "id": "agc", "type": "backend", "label": "Per-band gain", "sublabel": "Four bands, on", "stage": 2, "row": 1, "tag": "shipping" },
+    { "id": "novelty", "type": "backend", "label": "Spectral novelty", "sublabel": "Spectrum change", "stage": 2, "row": 2, "tag": "flux" },
+    { "id": "snapshot", "type": "database", "label": "Audio snapshot", "sublabel": "Live or authored", "stage": 3, "row": 0, "tag": "read-only" },
+    { "id": "onset", "type": "backend", "label": "Onset and beat", "sublabel": "Log-flux, per band", "stage": 3, "row": 1, "tag": "v2" },
+    { "id": "saliency", "type": "backend", "label": "Musical saliency", "sublabel": "Four musical axes", "stage": 3, "row": 2, "tag": "after onset" },
+    { "id": "tempo", "type": "backend", "label": "Tempo lock", "sublabel": "Phase lock, ~50 Hz", "stage": 4, "row": 0, "tag": "PLL" },
+    { "id": "frame", "type": "messagebus", "label": "Picture frame", "sublabel": "Bundle to Core 1", "stage": 4, "row": 1, "tag": "hand-off" },
+    { "id": "hue", "type": "backend", "label": "Hue shift", "sublabel": "Only if auto hue", "stage": 4, "row": 2, "tag": "optional" }
+  ],
+  "flows": [
+    { "from": "mic", "to": "acquire", "label": "I2S chunk", "variant": "emphasis" },
+    { "from": "im69", "to": "acquire", "label": "PDM", "variant": "dashed", "route": "vertical-channel", "channelX": 186, "labelSegment": 0, "labelDy": -16 },
+    { "from": "usb", "to": "acquire", "label": "USB", "variant": "dashed", "route": "vertical-channel", "channelX": 214, "labelSegment": 0, "labelDy": -16 },
+    { "from": "acquire", "to": "vu", "label": "raw level", "variant": "default", "labelDy": 22 },
+    { "from": "vu", "to": "spectrum", "label": "same chunk", "variant": "emphasis", "route": "vertical-channel", "channelX": 420 },
+    { "from": "spectrum", "to": "agc", "label": "80 bins", "variant": "emphasis", "labelDy": 22 },
+    { "from": "agc", "to": "novelty", "label": "gained", "variant": "emphasis", "labelDy": 22 },
+    { "from": "novelty", "to": "snapshot", "label": "publish", "variant": "emphasis", "route": "vertical-channel", "channelX": 640 },
+    { "from": "snapshot", "to": "onset", "label": "read", "variant": "emphasis", "labelDy": 22 },
+    { "from": "onset", "to": "saliency", "label": "events", "variant": "emphasis", "labelDy": 22 },
+    { "from": "saliency", "to": "tempo", "label": "clock", "variant": "emphasis", "route": "vertical-channel", "channelX": 860 },
+    { "from": "tempo", "to": "frame", "label": "bundle", "variant": "emphasis", "labelDy": 22 },
+    { "from": "frame", "to": "hue", "label": "optional", "variant": "dashed", "labelDy": 22 }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Shipping order on Core 0",
+      "items": [
+        "SPH0645, floor, loudness, 80-bin Goertzel, per-band gain, novelty, snapshot, onset, saliency, tempo, then the picture frame",
+        "12.8 kHz, 96 samples, about 133 frames a second. Per-band gain is on"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "One capture owner",
+      "items": [
+        "Dual IM69D130 is a PDM build, not the default. USB audio and PCM1808 each replace the mic",
+        "A short read becomes silence. Noise calibration is a confirmed-silence side path into the floor"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Beside the line",
+      "items": [
+        "Sweet-spot lamps are not the plate. Loud-room guard affects a later chunk. Mic auto-sense is off",
+        "Chord is a snapshot field. Hue moves only when auto colour shift is on"
+      ]
+    }
+  ]
+}
