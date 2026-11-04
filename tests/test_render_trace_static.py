@@ -26,6 +26,7 @@ RTRACE_DIAG_ENVS = {
     "env:k1_bench_im69d_hueaud]",
     "env:k1_main_rpl_rtrace_probe]",
     "env:k1_bench_im69d_led150_rtrace]",
+    "env:k1_fe_bench_b489]",
     "env:k1_b489_ws2816_reference_capture]",
     "env:k1_main_rpl_pcm_replay]",
     "env:k1_main_rpl_emu]",
