@@ -243,13 +243,11 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
     fx.wfhyb_dot_r += (float(raw_col.r) - fx.wfhyb_dot_r) * a_col;
     fx.wfhyb_dot_g += (float(raw_col.g) - fx.wfhyb_dot_g) * a_col;
     fx.wfhyb_dot_b += (float(raw_col.b) - fx.wfhyb_dot_b) * a_col;
-    // input saturation, EMA'd with the same tau (per-channel static state:
-    // primary/secondary render on distinct fx instances via this function).
+    // Input saturation follows this channel's resettable effect state.
     const float cmx = fmaxf(fmaxf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
     const float cmn = fminf(fminf(float(raw_col.r), float(raw_col.g)), float(raw_col.b));
     const float cur_sat = (cmx > 0.001f) ? (1.0f - cmn / cmx) : 0.0f;
-    static float sat_ema_prim = 0.0f, sat_ema_sec = 0.0f;
-    float& sat_ema = render_secondary ? sat_ema_sec : sat_ema_prim;
+    float& sat_ema = fx.wfhyb_sat_ema;
     sat_ema += (cur_sat - sat_ema) * a_col;
     // re-saturate the EMA'd colour: pull the two lower channels toward the
     // level that yields sat_ema, preserving the max channel (hue + level).

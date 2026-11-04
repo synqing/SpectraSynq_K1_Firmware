@@ -3,6 +3,8 @@
 C1 (2026-08-22) retired ColorFromPalette on seven live modes via
 palette_manual_colour. Those files are no longer in FORBIDDEN.
 Waveform / bloom / framework stay frozen until a named rewrite.
+light_mode_waveform_hybrid_k1.cpp was unfrozen by the Captain on 2026-11-04
+("Unfreeze waveform hybrid").
 """
 
 from __future__ import annotations
@@ -18,7 +20,6 @@ FORBIDDEN = [
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_fast.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid.cpp",
-    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_tempo.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_bloom.cpp",
     "SPECTRASYNQ_K1_FIRMWARE/effects/framework/effect_lgp_transient_lattice.cpp",

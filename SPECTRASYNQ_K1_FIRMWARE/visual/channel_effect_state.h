@@ -183,6 +183,7 @@ struct ChannelEffectState {
   float    wfhyb_dot_r;               // temporal RGB EMA (red) — hybrid colour signature
   float    wfhyb_dot_g;               // temporal RGB EMA (green)
   float    wfhyb_dot_b;               // temporal RGB EMA (blue)
+  float    wfhyb_sat_ema;             // input saturation EMA; reset with this channel
   float    wfhyb_hold_env;            // signal-presence hold envelope (audioConfidence analogue)
   float    wfhyb_sil_scale;           // silence gate envelope (silentScale analogue)
 };
