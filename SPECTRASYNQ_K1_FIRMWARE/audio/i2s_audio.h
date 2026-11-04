@@ -1003,6 +1003,7 @@ void acquire_sample_chunk(uint32_t t_now) {
       k1_subsonic_hpf_y = k1_subsonic_hpf_a * (k1_subsonic_hpf_y + x - k1_subsonic_hpf_x1);
       k1_subsonic_hpf_x1 = x;
       const float hp = k1_subsonic_hpf_y;
+      k1_subsonic_hp_wave[i] = hp;
       uint32_t sample_abs = (uint32_t)(hp < 0.0f ? -hp : hp);
       if (sample_abs > max_waveform_val_raw) {
         max_waveform_val_raw = sample_abs;
@@ -1015,6 +1016,9 @@ void acquire_sample_chunk(uint32_t t_now) {
     }
 #endif
   }
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  k1_subsonic_hp_wave_fresh = true;
+#endif
 
   // Apply smoothing to the raw max value
   const float smoothing_factor = 0.2; // Adjust as needed (lower = smoother)
@@ -1852,6 +1856,20 @@ void calculate_vu() {
 
   float sum = 0.0;
 
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  // Measure VU (and so the silence RMS below) on the same band as the drive
+  // peak. Full-band, sub-110 Hz drift the plate cannot show held the VU over
+  // Mode 32's presence floor in a quiet room (B489, 4 Nov 2026: 30% of LED
+  // frames lit with peak_scaled at 0). Mic hops only; others keep full band.
+  if (k1_subsonic_hp_wave_fresh) {
+    k1_subsonic_hp_wave_fresh = false;
+    for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+      const float v = float(audio_response_gain_apply_sample((int32_t)k1_subsonic_hp_wave[i])) *
+                      (1.0f / 32768.0f);
+      sum += v * v;
+    }
+  } else
+#endif
   for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
     sum += float(waveform_fixed_point[i] * waveform_fixed_point[i]);
   }

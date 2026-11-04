@@ -257,6 +257,12 @@ inline float   k1_subsonic_hpf_x1 = 0.0f;
 inline float   k1_subsonic_hpf_y  = 0.0f;
 inline float   k1_subsonic_hpf_a  = 0.0f;   // 0 = not yet derived
 inline int16_t k1_subsonic_hpf_note_offset_cached = -32768;
+// High-passed copy of this hop's mic samples, so the VU level and the silence
+// RMS are measured on the same band as the drive peak. `fresh` is set by the mic
+// peak loop and cleared by calculate_vu() and by canonical (line-in/USB) hops,
+// which never run the filter and keep the full-band VU.
+inline float   k1_subsonic_hp_wave[1024] = {0};
+inline bool    k1_subsonic_hp_wave_fresh = false;
 
 // Lowest GDFT bin for the live NOTE_OFFSET; the filter must never reach above it.
 inline float k1_subsonic_hpf_cutoff_hz(int16_t note_offset) {

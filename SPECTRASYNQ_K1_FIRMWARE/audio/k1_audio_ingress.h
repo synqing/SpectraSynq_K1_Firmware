@@ -119,6 +119,9 @@ static inline void k1_audio_commit_canonical_frame(const int16_t samples[K1_USB_
     }
   }
   max_waveform_val_raw = (float)peak;
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  k1_subsonic_hp_wave_fresh = false;  // canonical hops keep the full-band VU
+#endif
   // USB has no SSL floor. Drive peak equals raw peak so VU/GDFT still see energy.
   max_waveform_val = (float)peak;
 
