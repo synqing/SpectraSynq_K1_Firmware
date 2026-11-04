@@ -15,6 +15,9 @@
 #include <Print.h>
 #include <mabutrace.h>
 
+// Diagnostic render-thread count, reset at each legacy channel dispatch.
+inline uint32_t k1_trace_saturated_pixels = 0;
+
 #define K1_TRACE_SCOPE(name) TRACE_SCOPE(name)
 #define K1_TRACE_COUNTER(name, value) TRACE_COUNTER(name, value)
 #define K1_TRACE_INSTANT(name) TRACE_INSTANT(name)

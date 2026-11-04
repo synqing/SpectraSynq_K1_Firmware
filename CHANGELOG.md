@@ -8,6 +8,9 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Fixed — 2026-11-05
 
+- Saturation-preserving colour scaling uses an exact 32-bit unit quotient in
+  place of the equivalent software 64-bit division; channel values and ordering
+  are unchanged.
 - Normal primary dispatch uses the existing parameter snapshot stack once per
   dispatch, matching the secondary path. RenderParams queries remain coherent
   during dispatch; direct global reads retain their existing behaviour.

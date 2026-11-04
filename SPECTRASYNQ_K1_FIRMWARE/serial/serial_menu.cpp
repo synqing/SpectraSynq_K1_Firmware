@@ -34,6 +34,10 @@ static inline esp_reset_reason_t esp_reset_reason() { return ESP_RST_POWERON; }
 
 #include "globals.h"    // CONFIG + global state (serial_menu.h:8)
 #include "constants.h"  // NUM_AGC_BANDS etc. (serial_menu.h:9)
+#if ENABLE_VP_PERF_AUDIT && !defined(K1_SERIAL_REPLAY_HOST)
+#include <esp_flash.h>
+#include <esp_psram.h>
+#endif
 #include "k1_trace.h"   // (serial_menu.h:10)
 #include "k1_prsm.h"
 #include "k1_authored_source.h"
@@ -1161,10 +1165,41 @@ void vp_perf_print_status() {
 #endif
   tx_end();
 }
+#if ENABLE_VP_PERF_AUDIT && !defined(K1_SERIAL_REPLAY_HOST)
+static void vp_perf_print_hardware_once() {
+  static bool emitted = false;
+  if (emitted) return;
+  emitted = true;
+  uint32_t raw_id = 0, physical_bytes = 0;
+  const esp_err_t id_rc = esp_flash_read_id(esp_flash_default_chip, &raw_id);
+  const esp_err_t size_rc = esp_flash_get_physical_size(esp_flash_default_chip,
+                                                     &physical_bytes);
+  char id_text[11] = "unknown";
+  char size_text[16] = "unknown";
+  if (id_rc == ESP_OK) snprintf(id_text, sizeof(id_text), "0x%06lX",
+                                static_cast<unsigned long>(raw_id));
+  if (size_rc == ESP_OK) snprintf(size_text, sizeof(size_text), "%lu",
+                                  static_cast<unsigned long>(physical_bytes));
+  const bool psram_initialised = esp_psram_is_initialized();
+  const size_t psram_bytes = esp_psram_get_size();
+  const uint32_t cpu_mhz = ESP.getCpuFreqMHz();
+  tx_begin();
+  USBSerial.printf("[VPF_HW] flash_raw_id=%s flash_id_rc=%ld flash_physical_bytes=%s flash_size_rc=%ld cpu_mhz=%lu psram_initialised=%u psram_bytes=%lu\n",
+                   id_text, static_cast<long>(id_rc), size_text,
+                   static_cast<long>(size_rc), static_cast<unsigned long>(cpu_mhz),
+                   static_cast<unsigned>(psram_initialised),
+                   static_cast<unsigned long>(psram_bytes));
+  tx_end();
+}
+#endif
 void vp_perf_command(const char* command_type, const char* command_data) {
 #if ENABLE_VP_PERF_AUDIT
   if (strcmp(command_data, "start") == 0) {
     bool was_running = vp_perf.running;
+#ifndef K1_SERIAL_REPLAY_HOST
+    vp_perf.running = false;
+    vp_perf_print_hardware_once();
+#endif
     vp_perf_clear_counters();
     (void)was_running;
     vp_perf.running = true;

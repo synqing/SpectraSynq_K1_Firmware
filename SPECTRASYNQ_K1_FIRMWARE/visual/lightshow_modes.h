@@ -8,6 +8,7 @@
 #include "render_params.h" // RenderParams visible to all light_mode_*.cpp
 #include "channel_effect_state.h" // Per-channel effect state for vu_dot/kaleidoscope
 #include "k1_vp_audio_access.h"
+#include "k1_trace.h"
 #ifdef K1_EDGE_PALETTE_HONOUR_V1
 #include "k1_palette_edge_bridge.h"
 #endif
@@ -93,7 +94,14 @@ inline CRGB16 clamp_crgb16_preserve_sat(CRGB16 color) {
   if (color.b > max_channel) max_channel = color.b;
 
   if (max_channel > SQ15x16(1.0)) {
-    const SQ15x16 scale = SQ15x16(1.0) / max_channel;
+#if FEATURE_MABUTRACE && FEATURE_TRACE_RENDER
+    ++k1_trace_saturated_pixels;
+#endif
+    // Here 65536 < d <= INT32_MAX after negative channels were clamped.
+    // floor(2^32/d) equals floor((2^32-1)/d), plus one iff d divides 2^32.
+    const uint32_t d = static_cast<uint32_t>(max_channel.getInternal());
+    const uint32_t q = UINT32_MAX / d + ((d & (d - 1u)) == 0u);
+    const SQ15x16 scale = SQ15x16::fromInternal(static_cast<int32_t>(q));
     color.r *= scale;
     color.g *= scale;
     color.b *= scale;

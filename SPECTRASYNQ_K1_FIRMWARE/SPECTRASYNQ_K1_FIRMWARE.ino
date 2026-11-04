@@ -424,6 +424,9 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
 // dispatch_legacy_lightshow() so the K1 effect-framework adapter can reuse the
 // identical code path (see effects/framework/LegacyEffectAdapter).
 void render_lightshow_for_channel(uint8_t mode, RenderChannelState& channel) {
+#if FEATURE_MABUTRACE && FEATURE_TRACE_RENDER
+  k1_trace_saturated_pixels = 0;
+#endif
   K1_TRACE_COUNTER(channel.seed_history_before_render
                        ? "vp_secondary_mode" : "vp_primary_mode", mode);
   // Static labels survive the buffered export; release builds compile this out.
@@ -438,6 +441,11 @@ void render_lightshow_for_channel(uint8_t mode, RenderChannelState& channel) {
     history_seeded = true;
   }
   dispatch_legacy_lightshow(mode, channel, history_seeded);
+#if FEATURE_MABUTRACE && FEATURE_TRACE_RENDER
+  K1_TRACE_COUNTER(channel.seed_history_before_render
+                       ? "vp_secondary_saturated_pixels" : "vp_primary_saturated_pixels",
+                   k1_trace_saturated_pixels);
+#endif
 }
 
 #ifdef K1_EFFECT_FRAMEWORK_V1
