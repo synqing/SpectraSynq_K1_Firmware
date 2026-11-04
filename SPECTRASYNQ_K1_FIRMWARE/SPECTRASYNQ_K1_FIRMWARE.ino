@@ -1659,7 +1659,7 @@ void led_thread(void* arg) {
         render_bulb_cover();
       }
 #if ENABLE_VP_PERF_AUDIT
-      if (vp_perf.running) {
+      if (vp_perf.running && vp_perf_stage_start_us != 0) {
         vp_perf_record(vp_perf.primary_render, uint32_t(esp_timer_get_time() - vp_perf_stage_start_us));
       }
 #endif
@@ -1758,7 +1758,7 @@ void led_thread(void* arg) {
         }
 
 #if ENABLE_VP_PERF_AUDIT
-        if (vp_perf.running) {
+        if (vp_perf.running && vp_perf_secondary_start_us != 0) {
           vp_perf_record(vp_perf.secondary_render, uint32_t(esp_timer_get_time() - vp_perf_secondary_start_us));
         }
 #endif
