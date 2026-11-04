@@ -62,7 +62,7 @@ class CaptureLock {
   CaptureLock& operator=(const CaptureLock&) = delete;
 };
 
-#ifdef K1_RTRACE_DUAL
+#if defined(K1_RTRACE_DUAL) || defined(K1_FE_BENCH_B489_V1)
 // The serial command runs on the audio owner. Drain on an idle-priority task,
 // otherwise a multi-megabyte USB write would prevent new microphone hops.
 // Created once from the command path; no task/heap operations in render.
@@ -196,7 +196,7 @@ static void rtrace_status() {
 }
 
 static void rtrace_arm(char* args) {
-#ifdef K1_RTRACE_DUAL
+#if defined(K1_RTRACE_DUAL) || defined(K1_FE_BENCH_B489_V1)
   bool busy;
   { const CaptureLock lock; busy = s_drain_busy; }
   if (busy) { USBSerial.println("[RTRACE] ARM FAIL: drain busy"); return; }
@@ -310,7 +310,7 @@ static void rtrace_write_dump() {
   USBSerial.println("[RTRACE-END]");
 }
 
-#ifdef K1_RTRACE_DUAL
+#if defined(K1_RTRACE_DUAL) || defined(K1_FE_BENCH_B489_V1)
 static void rtrace_drain_once() {
   rtrace_write_dump();
   const CaptureLock lock;
@@ -319,7 +319,7 @@ static void rtrace_drain_once() {
 #endif
 
 static void rtrace_dump() {
-#ifdef K1_RTRACE_DUAL
+#if defined(K1_RTRACE_DUAL) || defined(K1_FE_BENCH_B489_V1)
   if (!rtrace_init_drain()) {
     USBSerial.println("[RTRACE] DUMP FAIL: drain task unavailable");
     return;
