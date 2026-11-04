@@ -239,7 +239,16 @@ static void k1_pcm_capture_task(void *) {
   }
 }
 
+#if defined(LED_DATA_PIN) && defined(LED_CLOCK_PIN)
+// The hold drives its pin as a GPIO output after init_leds(), so on an LED pin it
+// would steal that strip. A bench loom with no NFC header sets the pin to -1.
+static_assert(K1_PCM1808_NFC_CS_HOLD_PIN < 0 ||
+                  (K1_PCM1808_NFC_CS_HOLD_PIN != LED_DATA_PIN && K1_PCM1808_NFC_CS_HOLD_PIN != LED_CLOCK_PIN),
+              "PCM1808 NFC CS hold must not share a GPIO with an LED data line");
+#endif
+
 static void k1_pcm_hold_nfc_inert(void) {
+#if K1_PCM1808_NFC_CS_HOLD_PIN >= 0
   gpio_config_t io = {};
   io.pin_bit_mask = 1ULL << K1_PCM1808_NFC_CS_HOLD_PIN;
   io.mode = GPIO_MODE_OUTPUT;
@@ -248,6 +257,7 @@ static void k1_pcm_hold_nfc_inert(void) {
   io.intr_type = GPIO_INTR_DISABLE;
   gpio_config(&io);
   gpio_set_level((gpio_num_t)K1_PCM1808_NFC_CS_HOLD_PIN, 1);
+#endif
 }
 
 static int k1_pcm_pcnt_measure(int gpio, int window_ms, int32_t *edges, int64_t *elapsed_us) {

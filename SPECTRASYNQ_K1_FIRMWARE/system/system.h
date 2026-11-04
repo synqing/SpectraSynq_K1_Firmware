@@ -477,6 +477,12 @@ void init_system() {
   // Centre-split DIN-A/B on both WS2816 PCBs — NVS must not revive single-wire NEOPIXEL.
   CONFIG.LED_TYPE = LED_NEOPIXEL_X2;
 #endif
+#ifdef K1_FE_BENCH_B489_V1
+  // B489 FE bench: two single-wire WS2812 strips (GPIO4/5). Settings saved by the
+  // earlier WS2816 images must not revive the 80/80 split or a packed colour order.
+  CONFIG.LED_TYPE = LED_NEOPIXEL;
+  CONFIG.LED_COLOR_ORDER = GRB;
+#endif
 #if defined(K1_CUSTOM_LED_V1) || defined(K1_UNIT2_IM69D_V1)
   // Keep the FastLED power cap at 2.5 A total @ 5 V even if a persisted save
   // carried a lower product default. Matches dual-214 precedent.
