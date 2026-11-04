@@ -1244,11 +1244,7 @@ inline void show_leds() {
   // Explicit 48-bit packer + WS2812B RGB. On Main RPL this is the dual-DIN
   // emit (160 logical pixels → 320 wire slots, two 160-slot halves). Do not
   // consult LED_TYPE here — persisted X2 must not skip the packer.
-  if (ws2816_wire != nullptr
-#ifndef K1_B489_WS2816_V1
-      && CONFIG.REVERSE_ORDER == false
-#endif
-  ) {
+  if (ws2816_wire != nullptr) {
 #ifdef K1_LED_I2S_DIRECT_V1
     k1_i2s_apply_pattern_if_armed(leds_scaled, CONFIG.LED_COUNT);
 #endif
@@ -1315,11 +1311,9 @@ inline void show_leds() {
                          budget_proxy, k1_inc_r, k1_inc_g, k1_inc_b, 0);
 #endif
 #endif
-#ifdef K1_B489_WS2816_V1
     if (CONFIG.REVERSE_ORDER) {
-      k1_b489_reverse_packed_pixels((uint8_t*)ws2816_wire, CONFIG.LED_COUNT);
+      ws2816_reverse_packed_pixels(ws2816_wire, CONFIG.LED_COUNT);
     }
-#endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_pack_start_us != 0) {
       vp_perf_record(
@@ -1604,13 +1598,7 @@ inline void init_leds() {
     ws2816_wire = (region != nullptr) ? (CRGB*)region : nullptr;
     ws2816_wire_secondary =
         (region != nullptr) ? ((CRGB*)region + (CONFIG.LED_COUNT * 2)) : nullptr;
-    if (
-#ifdef K1_B489_WS2816_V1
-        true
-#else
-        CONFIG.REVERSE_ORDER == false
-#endif
-    ) {
+    if (ws2816_wire != nullptr) {
       show_leds();
       leds_started = true;
       USBSerial.print("INIT_LEDS: ");
@@ -1620,13 +1608,7 @@ inline void init_leds() {
   }
 #else
   ws2816_wire = new CRGB[CONFIG.LED_COUNT * 2];
-  if (
-#ifdef K1_B489_WS2816_V1
-        true
-#else
-        CONFIG.REVERSE_ORDER == false
-#endif
-    ) {
+  if (ws2816_wire != nullptr) {
     FastLED.addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire, 0, CONFIG.LED_COUNT);
     FastLED.addLeds<WS2812B, LED_CLOCK_PIN, RGB>(
         ws2816_wire, CONFIG.LED_COUNT, CONFIG.LED_COUNT);
@@ -2968,11 +2950,7 @@ inline void show_secondary_leds() {
     force_incandescent_colour(leds_scaled_secondary, SECONDARY_LED_COUNT);
   }
 #ifdef K1_WS2816_LEVER2_V1
-  if (ws2816_wire_secondary != nullptr
-#ifndef K1_B489_WS2816_V1
-      && CONFIG.REVERSE_ORDER == false
-#endif
-  ) {
+  if (ws2816_wire_secondary != nullptr) {
 #ifdef K1_LED_I2S_DIRECT_V1
     k1_i2s_apply_pattern_if_armed(leds_scaled_secondary, SECONDARY_LED_COUNT);
 #endif
@@ -3013,6 +2991,9 @@ inline void show_secondary_leds() {
                          ws2816_wire_secondary, budget_proxy, k1_inc_r,
                          k1_inc_g, k1_inc_b, 0);
 #endif
+    if (SECONDARY_REVERSE_ORDER) {
+      ws2816_reverse_packed_pixels(ws2816_wire_secondary, SECONDARY_LED_COUNT);
+    }
 #endif
 #if ENABLE_VP_PERF_AUDIT
     if (vp_perf.running && vp_perf_sec_pack_start_us != 0) {
@@ -3048,7 +3029,7 @@ inline void show_secondary_leds() {
       uint8_t blue_reduction = blue_reduction_fp >> 8; // Divide by 256
 
       // Scale green reduction based on blue reduction using integer math
-      uint16_t green_reduction_fp = uint16_t(g_raw) * uint16_t(blue_reduction) * uint16_t((filter_strength * 255).getInteger());
+      uint32_t green_reduction_fp = uint32_t(g_raw) * uint32_t(blue_reduction) * uint32_t((filter_strength * 255).getInteger());
       // Need to divide by 255*256 - approximate by dividing by 2^16 (>> 16)
       uint8_t green_reduction = (green_reduction_fp >> 16);
 

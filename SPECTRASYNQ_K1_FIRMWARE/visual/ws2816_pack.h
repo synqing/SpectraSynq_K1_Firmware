@@ -58,3 +58,16 @@ static inline void ws2816_pack_from_8bit(const CRGB *leds, CRGB *wire,
                       ws2816_map8_to_16(c.g), ws2816_map8_to_16(c.b));
   }
 }
+
+// Reverse whole 48-bit pixels, preserving channel order and high/low bytes.
+static inline void ws2816_reverse_packed_pixels(CRGB *wire, uint16_t count) {
+  for (uint16_t i = 0; i < count / 2; ++i) {
+    const uint16_t j = count - 1 - i;
+    const CRGB hi = wire[2 * i];
+    const CRGB lo = wire[2 * i + 1];
+    wire[2 * i] = wire[2 * j];
+    wire[2 * i + 1] = wire[2 * j + 1];
+    wire[2 * j] = hi;
+    wire[2 * j + 1] = lo;
+  }
+}

@@ -114,7 +114,7 @@ def test_init_leds_lever2_skips_max_power():
     init_block = next(b for b in blocks if "addLeds<WS2812B, LED_DATA_PIN, RGB>(ws2816_wire" in b)
     assert "setMaxPower" not in init_block
     assert "DISABLE_DITHER" in init_block
-    assert "REVERSE_ORDER" in init_block
+    assert "CONFIG.REVERSE_ORDER == false" not in init_block
 
 
 def test_ws2816_wire_symbol_is_flag_gated():

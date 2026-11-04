@@ -21,7 +21,9 @@ typedef struct {
 } K1PcmRing;
 
 static inline uint32_t k1_pcm_ring_used(const K1PcmRing *q) {
-  return q->w - q->r;
+  const uint32_t r = __atomic_load_n(&q->r, __ATOMIC_ACQUIRE);
+  const uint32_t w = __atomic_load_n(&q->w, __ATOMIC_ACQUIRE);
+  return w - r;
 }
 
 static inline uint32_t k1_pcm_ring_free(const K1PcmRing *q) {
@@ -55,7 +57,7 @@ static inline uint32_t k1_pcm_ring_push(K1PcmRing *q, const uint8_t *src, uint32
     idx = (idx + chunk) % q->cap_frames;
     left -= chunk;
   }
-  q->w += frames;
+  __atomic_store_n(&q->w, q->w + frames, __ATOMIC_RELEASE);
   const uint32_t used = k1_pcm_ring_used(q);
   if (used > q->high_water) {
     q->high_water = used;
@@ -70,7 +72,7 @@ static inline uint32_t k1_pcm_ring_discard(K1PcmRing *q, uint32_t frames) {
   if (frames > used) {
     frames = used;
   }
-  q->r += frames;
+  __atomic_store_n(&q->r, q->r + frames, __ATOMIC_RELEASE);
   return frames;
 }
 
@@ -93,6 +95,6 @@ static inline uint32_t k1_pcm_ring_pop(K1PcmRing *q, uint8_t *dst, uint32_t fram
     idx = (idx + chunk) % q->cap_frames;
     left -= chunk;
   }
-  q->r += frames;
+  __atomic_store_n(&q->r, q->r + frames, __ATOMIC_RELEASE);
   return frames;
 }

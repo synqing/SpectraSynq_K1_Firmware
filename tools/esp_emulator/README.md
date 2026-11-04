@@ -13,6 +13,16 @@ python3 tools/esp_emulator/run.py \
   --output _scratch/esp-emulator/<fresh-name>
 ```
 
+Add `--profile fe` to build `k1_fe_emu` against the current `k1_fe` product
+configuration. This profile replays microphone PCM only: it skips physical
+PCM1808 initialisation and FE power/jack detection with the declared
+`K1_EMU_FE_MIC_ONLY` adapter. It does not qualify line-input acquisition,
+resampling, automatic jack switching, power sequencing or LED transmission.
+All product flags remain present; the runner checks that only the declared
+adapters differ. The selected scenario is saved and hashed separately from
+its source. FE also checks each edge's complete 48-bit pixel reversal and
+reversed settings across save/reboot. The default profile remains unchanged.
+
 `--suite` selects a suite declared in the scenario. The default is `default`.
 The output directory must not exist yet. Exit status is 0 only when every
 enabled software criterion passes. The final line is `SOFTWARE COMPLETE` or

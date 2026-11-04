@@ -119,6 +119,8 @@ static i2s_chan_handle_t rx_chan = NULL;
 // constants without including this monolithic impl header. Definitions are
 // unchanged — exactly one definition each, here via the include.
 #include "k1_i2s_capture_types.h"
+#include "k1_audio_input_state.h"
+static K1AudioCaptureTiming k1_audio_capture_timing = {};
 
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
 static K1AudioI2SReadDebug k1_audio_i2s_read_debug = {};
@@ -496,6 +498,9 @@ void init_i2s() {
 }
 
 void acquire_sample_chunk(uint32_t t_now) {
+  const uint32_t capture_sequence = k1_audio_capture_timing.sequence + 1u;
+  k1_audio_capture_timing = {};
+  k1_audio_capture_timing.sequence = capture_sequence;
 #if K1_AUDIO_SOURCE_USB
   int16_t usb_pcm[96];
   k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
@@ -539,10 +544,12 @@ void acquire_sample_chunk(uint32_t t_now) {
   // the microphone tail below. Only the mic's own follower is kept across a
   // line-in session so unplugging returns the mic to its pre-plug envelope.
   static bool k1_fe_line_prev = false;
+  static K1LineSilenceState k1_fe_line_silence = {};
   static float k1_fe_mic_follower = 1.0f;
   static float k1_fe_line_follower = 0.0f;  // 0 = first session: the canonical commit seeds it
   const bool k1_fe_line = k1_fe_audio_line_hop_begin(noise_complete == false);
   if (k1_fe_line != k1_fe_line_prev) {
+    k1_fe_line_silence = {};
     if (k1_fe_line) {
       k1_fe_mic_follower = max_waveform_val_follower;
       if (k1_fe_line_follower > 0.0f) {
@@ -562,6 +569,13 @@ void acquire_sample_chunk(uint32_t t_now) {
 #endif
   int16_t pcm_hop[96];
   k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
+  const K1PcmCanonicalReadTiming pcm_read = k1_pcm1808_last_canonical_read_timing();
+  k1_audio_capture_timing.read_return_us = (uint32_t)pcm_read.ready_us;
+  if (pcm_read.status == 0) {
+    k1_audio_capture_timing.newest_us = (uint32_t)pcm_read.newest_sample_estimate_us;
+    k1_audio_capture_timing.oldest_us = (uint32_t)pcm_read.oldest_sample_estimate_us;
+    k1_audio_capture_timing.assumption = 2;  // Ring-backlog estimate at 48 kHz, not hardware capture time.
+  }
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
   {
     static uint32_t k1_pcm_capture_sequence = 0;
@@ -582,6 +596,9 @@ void acquire_sample_chunk(uint32_t t_now) {
   }
 #endif
   k1_audio_commit_canonical_frame(pcm_hop, t_now);
+#if K1_PCM1808_LINE_SWITCH
+  silence = k1_line_silence_update(k1_fe_line_silence, pcm_hop, 96u, t_now, SILENCE_DWELL_MS);
+#endif
 #if !K1_PCM1808_LINE_SWITCH || defined(K1_PCM1808_PROBE_V1)
   k1_pcm1808_poll_telemetry(t_now);  // FE ships without the 2 s probe stream (:fe_status prints it)
 #endif
@@ -684,6 +701,27 @@ void acquire_sample_chunk(uint32_t t_now) {
   const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
   #endif
 #endif
+  // Capture the read boundary before any front-end or DSP work. DMA residence
+  // remains unknown: assumption 1 is explicitly a read-return estimate.
+#ifdef K1_EMU_FIXTURE
+  const uint64_t capture_return_us = k1_emu_fixture_app_us();
+#else
+  const uint64_t capture_return_us = (uint64_t)esp_timer_get_time();
+#endif
+  k1_audio_capture_timing.read_return_us = (uint32_t)capture_return_us;
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const uint32_t capture_samples = (uint32_t)(bytes_read / (2u * sizeof(int16_t)));
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
+  const uint32_t capture_samples = (uint32_t)(bytes_read / sizeof(int16_t));
+#else
+  const uint32_t capture_samples = (uint32_t)(bytes_read / sizeof(int32_t));
+#endif
+  if (i2s_read_status == ESP_OK && capture_samples != 0u) {
+    k1_audio_capture_timing.newest_us = (uint32_t)capture_return_us;
+    k1_audio_capture_timing.oldest_us = (uint32_t)k1_i2s_estimate_oldest_sample_us(
+        capture_return_us, capture_samples, CONFIG.SAMPLE_RATE);
+    k1_audio_capture_timing.assumption = 1;
+  }
 #if defined(K1_MIC_IM69D_STEREO_V1)
   // De-interleave the active ESP-IDF 5.4.1 order with clk_inv=false. The DSP
   // consumes index 0: ESP-IDF RIGHT / physical IM1 / SELECT HIGH. Index 1 is

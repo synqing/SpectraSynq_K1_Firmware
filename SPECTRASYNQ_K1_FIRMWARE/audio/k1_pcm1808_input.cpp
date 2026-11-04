@@ -394,6 +394,13 @@ static int k1_pcm_dma_rate_proof(void) {
 }
 
 void k1_pcm1808_begin() {
+#ifdef K1_EMU_FE_MIC_ONLY
+#ifndef K1_EMU_FIXTURE
+#error "K1_EMU_FE_MIC_ONLY requires the non-uploadable replay fixture"
+#endif
+  // The replay supplies microphone PCM; it does not model FE peripherals.
+  return;
+#endif
   s_gate_pass = 0;
   s_hop_fill = 0;
   s_snap_armed = 1;

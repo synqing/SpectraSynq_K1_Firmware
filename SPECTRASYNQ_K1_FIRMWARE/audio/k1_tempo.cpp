@@ -76,6 +76,10 @@ static const uint16_t K1_HISTORY_LENGTH = 512;
 #ifndef K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH
 #define K1_TEMPO_ACF_SKIP_UPDATE_ON_PUBLISH 0
 #endif
+// Share only the two Goertzel gathers; ACF algorithm/cadence stay unchanged.
+#ifndef K1_TEMPO_SHARED_WINDOW_V1
+#define K1_TEMPO_SHARED_WINDOW_V1 1
+#endif
 #ifndef K1_TEMPO_ACF_INCREMENTAL_V1
 #define K1_TEMPO_ACF_INCREMENTAL_V1 0
 #endif
@@ -202,6 +206,8 @@ static float      k1_acf_lag_table[200];
 // each emit costs O(nlag) instead of O(nlag_slice * HISTORY). Mean-subtraction
 // and novelty_scale are applied only at publish via the algebraic identity.
 static float      k1_acf_r[200];
+#endif
+#if K1_TEMPO_SHARED_WINDOW_V1 || K1_TEMPO_ACF_INCREMENTAL_V1
 static float      k1_goertzel_window[K1_HISTORY_LENGTH];
 #endif
 static bool       k1_acf_valid = false;
@@ -595,7 +601,7 @@ static float k1_compute_magnitude(uint16_t bin) {
   return sqrtf(mag_sq) / ((float)block_size * 0.5f);
 }
 
-#if K1_TEMPO_ACF_INCREMENTAL_V1
+#if K1_TEMPO_SHARED_WINDOW_V1 || K1_TEMPO_ACF_INCREMENTAL_V1
 // Linearise the ring oldest->newest once per emit and apply the same 4.0 clamp
 // as k1_compute_magnitude. Both Goertzel bins share this window, so the gather
 // is not paid twice. Index order matches block_size == HISTORY:
@@ -1139,7 +1145,7 @@ static void k1_update_winner() {
 static void k1_update_tempo(float delta_sec) {
   uint16_t bin0 = k1_calc_bin;
   uint16_t bin1 = (uint16_t)((k1_calc_bin + 1) % K1_NUM_TEMPI);
-#if K1_TEMPO_ACF_INCREMENTAL_V1
+#if K1_TEMPO_SHARED_WINDOW_V1 || K1_TEMPO_ACF_INCREMENTAL_V1
   k1_goertzel_fill_window();
   k1_tempi[bin0].magnitude_raw = k1_compute_magnitude_from_window(bin0);
   k1_tempi[bin1].magnitude_raw = k1_compute_magnitude_from_window(bin1);

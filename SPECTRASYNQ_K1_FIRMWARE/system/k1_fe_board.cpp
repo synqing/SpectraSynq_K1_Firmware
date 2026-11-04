@@ -469,6 +469,13 @@ static void k1_fe_output_low(int pin) {
 }
 
 void k1_fe_board_begin() {
+#ifdef K1_EMU_FE_MIC_ONLY
+#ifndef K1_EMU_FIXTURE
+#error "K1_EMU_FE_MIC_ONLY requires the non-uploadable replay fixture"
+#endif
+  // The replay supplies microphone PCM; it does not model FE peripherals.
+  return;
+#endif
   s_board = false;
   if (Wire.begin(K1_FE_PD_SDA_PIN, K1_FE_PD_SCL_PIN, 100000)) {
     for (int attempt = 0; attempt < 3 && !s_board; attempt++) {

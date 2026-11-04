@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import array
+import copy
 import datetime as dt
 import glob
 import hashlib
@@ -89,7 +90,7 @@ EPOCH_KEYS = {"policy", "us"}
 COMPARISON_KEYS = {"id", "kind", "a", "b", "edge", "from_hop", "criterion", "label", "before_case",
                    "default_case", "note", "expect"}
 COMPARISON_KINDS = {"equal", "isolation", "limit_coupling", "recovery_state", "fallback_state",
-                    "differs", "case", "startup_quiet_return", "tempo_lane", "semantic_continuity"}
+                    "differs", "case", "startup_quiet_return", "tempo_lane", "semantic_continuity", "reverse"}
 
 # Production command names the scenario may schedule (production parser vocabulary;
 # serial_cmd_handlers.cpp / serial_menu.cpp). Anything else is rejected up front.
@@ -209,6 +210,8 @@ def load_scenario(path: Path) -> dict:
         _check_keys(case.get("expect", {}), EXPECT_KEYS, f"{where}.expect")
     for comp in sc.get("comparisons", []):
         _check_keys(comp, COMPARISON_KEYS, "comparisons")
+        if comp.get("kind") == "recovery_state" and "before_case" not in comp:
+            raise ScenarioError(f"comparison {comp.get('id')}: recovery_state requires before_case")
         if comp["kind"] not in COMPARISON_KINDS:
             raise ScenarioError(f"comparison {comp.get('id')}: unknown kind {comp['kind']!r}")
         for key in ("a", "b", "before_case", "default_case"):
@@ -764,6 +767,8 @@ FIELD_OF_COMMAND = {
     "saturation": ("primary", "saturation"), "secondary_saturation": ("secondary", "saturation"),
     "edge_enabled": ("edge", "enabled"), "edge_strength": ("edge", "strength"), "edge_spread": ("edge", "spread"),
     "secondary_enabled": (None, "enable_secondary"),
+    "reverse_order": ("primary", "reverse_order"),
+    "secondary_reverse_order": ("secondary", "reverse_order"),
 }
 
 
@@ -822,6 +827,27 @@ def evaluate_comparison(comp: dict, results: dict, hop_samples: int) -> dict:
             f"published={end.get('published')} shown={end.get('last_shown')} captured={end.get('captured')}; "
             f"epoch {ep.get('policy')} {ep.get('epoch_us')} us; first captured hop app_us={first.app_us if first else None} "
             f"(processed {first.processed if first else None})"))
+        return out
+    if kind == "reverse":
+        edge = comp["edge"]
+        other = "B" if edge == "A" else "A"
+        start = comp["from_hop"]
+        fa, fb = _by_hop(ca, hop_samples), _by_hop(cb, hop_samples)
+        bad = []
+        changed = 0
+        for hop in sorted(fa.keys() & fb.keys()):
+            original = getattr(fa[hop], edge)
+            # Independent wire oracle: permute complete G16/R16/B16 pixels,
+            # never reverse bytes within a channel or alter the other edge.
+            expected = b"".join(original[i:i + 6] for i in range(len(original) - 6, -1, -6)) if hop >= start else original
+            if hop >= start and expected != original:
+                changed += 1
+            if getattr(fb[hop], edge) != expected or getattr(fb[hop], other) != getattr(fa[hop], other):
+                bad.append(hop)
+        ok = bool(fa) and fa.keys() == fb.keys() and not bad and changed > 0
+        out.update(status="PASS" if ok else "FAIL", detail=(
+            f"edge {edge}: full 48-bit pixel reversal from hop {start}; "
+            f"asymmetric frames={changed}, mismatch hops={bad[:10]}, other edge unchanged required"))
         return out
     if kind == "semantic_continuity":
         frames = ca.frames
@@ -1111,17 +1137,73 @@ def host_checks(sc: dict, out: Path) -> dict:
 # Main
 # --------------------------------------------------------------------------
 
+def select_profile(sc: dict, profile: str) -> dict:
+    """Select FE microphone replay without changing the maintained RPL scenario."""
+    if profile == "scenario":
+        return sc
+    if profile != "fe":
+        raise ScenarioError(f"unknown replay profile {profile!r}")
+    if (sc["profile"]["env"], sc["profile"]["product_env"]) != ("k1_main_rpl_emu", "k1_main_rpl_im69d"):
+        raise ScenarioError("FE selection requires the maintained Main RPL base profile")
+    sc = copy.deepcopy(sc)
+    sc["name"] += "-fe-mic"
+    sc["description"] = ("Founders' Edition microphone-path replay of k1_fe. "
+        "Physical PCM1808 capture/resampling, jack switching, power hardware and LED transmission "
+        "are outside this replay. Identified PCM runs through the FE microphone gain, "
+        "analysis, publication, effects and 48-bit packing without changing those product stages.")
+    sc["profile"]["env"] = "k1_fe_emu"
+    sc["profile"]["product_env"] = "k1_fe"
+    sc["profile"]["adapter_flags"].append("K1_EMU_FE_MIC_ONLY")
+    sc["profile"]["forbidden_in_product"].append("K1_EMU_FE_MIC_ONLY")
+    sc["compositions"]["fe_reverse_base"] = {
+        "commands": ["set_mode=32", "secondary_mode=32", "mirror_enabled=false",
+                     "secondary_mirror_enabled=false", "secondary_enabled=true"],
+        "note": "Asymmetric centre-out half-scenes expose reversed whole-pixel order."}
+    sc["cases"]["fe-reverse-base"] = {**copy.deepcopy(sc["cases"]["smoke-a"]),
+        "purpose": "Asymmetric source for independent 48-bit reversal comparison.", "composition": "fe_reverse_base"}
+    new_cases = ["fe-reverse-base"]
+    for edge, cmd in (("a", "reverse_order"), ("b", "secondary_reverse_order")):
+        cid = f"fe-reverse-{edge}"
+        sc["cases"][cid] = {**copy.deepcopy(sc["cases"]["fe-reverse-base"]),
+            "purpose": f"Reverse only edge {edge.upper()} at hop 40 through the product parser.",
+            "commands": [{"hop": 40, "text": f"{cmd}=true"}]}
+        sc["comparisons"].append({"id": cid, "kind": "reverse", "a": "fe-reverse-base", "b": cid,
+            "edge": edge.upper(), "from_hop": 40, "criterion": "SW05", "label": "48-bit reversal and edge isolation"})
+        new_cases.append(cid)
+    sc["compositions"]["fe_reverse_saved"] = copy.deepcopy(sc["compositions"]["studio_ab"])
+    sc["compositions"]["fe_reverse_saved"]["commands"] += ["reverse_order=true", "secondary_reverse_order=true"]
+    for suffix in ("save", "ref", "recover"):
+        cid = f"fe-reverse-{suffix}"
+        sc["cases"][cid] = copy.deepcopy(sc["cases"][f"comp-{suffix}"])
+        sc["cases"][cid]["purpose"] = f"Both edges reversed: {suffix} through product show persistence."
+        if suffix == "recover":
+            sc["cases"][cid]["flash"]["from"] = "fe-reverse-save"
+        else:
+            sc["cases"][cid]["composition"] = "fe_reverse_saved"
+        new_cases.append(cid)
+    for kind, a in (("recovery_state", "fe-reverse-save"), ("equal", "fe-reverse-ref")):
+        comp = {"id": f"fe-reverse-boot-{kind}", "kind": kind,
+                "a": a, "b": "fe-reverse-recover", "criterion": "SW06",
+                "label": "Reversed edges survive boot and emit current frames"}
+        if kind == "recovery_state":
+            comp["before_case"] = "fe-reverse-save"
+        sc["comparisons"].append(comp)
+    sc["suites"]["default"].extend(new_cases)
+    return sc
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--scenario", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--suite", default="default")
+    parser.add_argument("--profile", choices=("scenario", "fe"), default="scenario")
     args = parser.parse_args()
     scenario_path = Path(args.scenario)
     if not scenario_path.is_absolute():
         scenario_path = (Path.cwd() / scenario_path).resolve()
     try:
-        sc = load_scenario(scenario_path)
+        sc = select_profile(load_scenario(scenario_path), args.profile)
     except (ScenarioError, KeyError, json.JSONDecodeError) as exc:
         raise SystemExit(f"scenario rejected before build/run: {exc}")
     if args.suite not in sc["suites"]:
@@ -1139,7 +1221,10 @@ def main() -> int:
     emu, tried = resolve_esp_emu(lock)
     nm = find_nm()
     identity = source_identity()
-    shutil.copy(scenario_path, out / "scenario.json")
+    if args.profile == "scenario":
+        shutil.copy(scenario_path, out / "scenario.json")
+    else:
+        (out / "scenario.json").write_text(json.dumps(sc, indent=2) + "\n")
     print(f"invocation {invocation} source {identity['head'][:12]} dirty_inputs {identity['dirty_inputs_sha256'][:12]}")
     emu_build = build(sc["profile"]["env"], out / "build-emu.log")
     if emu_build["exit_code"] != 0:
@@ -1169,7 +1254,8 @@ def main() -> int:
         "schema": "k1-emu-result/3", "invocation_id": invocation, "started_utc": started,
         "finished_utc": dt.datetime.now(dt.timezone.utc).isoformat(), "overall": overall,
         "suite": args.suite, "hardware_accessed": False,
-        "scenario": {"path": str(scenario_path), "sha256": sha256_file(scenario_path), "name": sc["name"]},
+        "scenario": {"path": str(scenario_path), "sha256": sha256_file(out / "scenario.json"),
+                     "source_sha256": sha256_file(scenario_path), "profile_selection": args.profile, "name": sc["name"]},
         "tool": {"lock": str(lock_path), "lock_sha256": sha256_file(lock_path), "executable": str(emu),
                  "executable_sha256": lock["executable_sha256"], "version": lock["version"], "rejected_candidates": tried},
         "source": identity, "emu_build": emu_build, "profile": sc["profile"],

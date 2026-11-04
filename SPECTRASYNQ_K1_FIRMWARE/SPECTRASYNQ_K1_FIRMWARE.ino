@@ -894,7 +894,7 @@ void loop() {
   k1_emu_fixture_poll();
 #endif
   uint32_t t_now_us = micros();        // Timestamp for this loop, used by some core functions
-  uint32_t t_now = t_now_us / 1000.0;  // Millisecond version
+  uint32_t t_now = millis();         // Independent 32-bit ms clock; micros wraps every 71 minutes
 #ifdef K1_EMU_FIXTURE
   // Hop-end application time of the hop staged by k1_emu_fixture_poll().
   t_now_us = k1_emu_fixture_time_us();
@@ -1204,29 +1204,33 @@ void loop() {
       static uint32_t s_beat_sequence = 0;
       static uint32_t s_onset_epoch = 1;
       static uint32_t s_beat_epoch = 1;
+      static uint32_t s_last_onset_us = 0;
+      static float s_last_onset_strength = 0.0f;
+      static uint32_t s_last_beat_us = 0;
       K1AudioFrame producer_next = {};
       producer_next.boot_epoch = 1;
       producer_next.ap_generation = ++s_af_generation;
-      producer_next.capture_sequence = producer_next.ap_generation;
+      producer_next.capture_sequence = k1_audio_capture_timing.sequence;
       const uint32_t now_us = (uint32_t)esp_timer_get_time();
-      producer_next.i2s_read_return_us = now_us;
-      producer_next.newest_sample_estimate_us = now_us;
-      producer_next.oldest_sample_estimate_us =
-          now_us - (uint32_t)((CONFIG.SAMPLES_PER_CHUNK > 1 ? (CONFIG.SAMPLES_PER_CHUNK - 1) : 0) *
-                              (1000000u / (CONFIG.SAMPLE_RATE ? CONFIG.SAMPLE_RATE : 12800)));
-      producer_next.sample_time_assumption_id = 1;
+      producer_next.i2s_read_return_us = k1_audio_capture_timing.read_return_us;
+      producer_next.newest_sample_estimate_us = k1_audio_capture_timing.newest_us;
+      producer_next.oldest_sample_estimate_us = k1_audio_capture_timing.oldest_us;
+      producer_next.sample_time_assumption_id = k1_audio_capture_timing.assumption;
       if (k1_onset_beat_event.onset) {
         s_onset_sequence++;
-        producer_next.last_onset_time_us = now_us;
-        producer_next.last_onset_strength = k1_onset_beat_event.onset_strength;
+        s_last_onset_us = now_us;
+        s_last_onset_strength = k1_onset_beat_event.onset_strength;
       }
+      producer_next.last_onset_time_us = s_last_onset_us;
+      producer_next.last_onset_strength = s_last_onset_strength;
       producer_next.onset_epoch = s_onset_epoch;
       producer_next.onset_sequence_total = s_onset_sequence;
       const K1TempoEvent tempo_ev = k1_tempo_read();
       if (tempo_ev.beat_tick) {
         s_beat_sequence++;
-        producer_next.last_beat_time_us = now_us;
+        s_last_beat_us = now_us;
       }
+      producer_next.last_beat_time_us = s_last_beat_us;
       producer_next.beat_epoch = s_beat_epoch;
       producer_next.beat_sequence_total = s_beat_sequence;
 #ifdef K1_SEMANTIC_STATE
