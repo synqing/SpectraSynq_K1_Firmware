@@ -424,6 +424,8 @@ void dispatch_legacy_lightshow(uint8_t mode, RenderChannelState& channel, bool h
 // dispatch_legacy_lightshow() so the K1 effect-framework adapter can reuse the
 // identical code path (see effects/framework/LegacyEffectAdapter).
 void render_lightshow_for_channel(uint8_t mode, RenderChannelState& channel) {
+  K1_TRACE_COUNTER(channel.seed_history_before_render
+                       ? "vp_secondary_mode" : "vp_primary_mode", mode);
   // Static labels survive the buffered export; release builds compile this out.
   K1_TRACE_SCOPE(channel.seed_history_before_render
                      ? "vp_secondary_effect_body" : "vp_primary_effect_body");
@@ -1643,11 +1645,14 @@ void led_thread(void* arg) {
 #endif
         pop_render_params();
       } else {
+        RenderParams primary_params = build_primary_render_params();
+        push_render_params(&primary_params);
 #ifdef K1_EFFECT_FRAMEWORK_V1
         render_channel_via_framework(CONFIG.LIGHTSHOW_MODE, primary_channel);
 #else
         render_lightshow_for_channel(CONFIG.LIGHTSHOW_MODE, primary_channel);
 #endif
+        pop_render_params();
       }
 
       if (!VP_FIX_PRISM_DEFAULT_OFF && CONFIG.PRISM_COUNT > 0) {

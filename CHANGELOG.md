@@ -8,6 +8,9 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ### Fixed — 2026-11-05
 
+- Normal primary dispatch uses the existing parameter snapshot stack once per
+  dispatch, matching the secondary path. RenderParams queries remain coherent
+  during dispatch; direct global reads retain their existing behaviour.
 - Avoid discarded lower-half sprite calculations in nine centre-authoritative
   effects, preserving their retained arithmetic and transport boundary.
 - Diagnostic trace export retries short writes and reports stalled exports as

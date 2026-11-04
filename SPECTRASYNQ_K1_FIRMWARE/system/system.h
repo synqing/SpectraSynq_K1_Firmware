@@ -17,6 +17,7 @@
 #include "k1_spectral_honesty.h" // Shared Hann + DFT measurement-honesty primitives
 #include "led_utilities.h" // For lock_leds, show_leds
 #include "k1_led_emit.h"
+#include "k1_trace.h"
 
 uint32_t timing_start = 0;
 extern void run_sweet_spot();
@@ -698,6 +699,7 @@ void check_settings(uint32_t t_now) {
       // re-arms settings_updated + next_save_time, and that re-arm must survive
       // this cycle so the write retries. Clearing after would cancel the retry.
       settings_updated = false;
+      K1_TRACE_SCOPE("persist_config");
       save_config();
     }
   }
