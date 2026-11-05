@@ -5,6 +5,13 @@
 #include "k1_vp_audio_access.h"
 #include "k1_trace.h"
 
+#ifndef K1_BENCH_FX_LITE_21
+#define K1_BENCH_FX_LITE_21 0
+#endif
+#if K1_BENCH_FX_LITE_21 && (!FEATURE_MABUTRACE || !defined(K1_FE_BENCH_B489_V1))
+#error "Forge lite is restricted to the B489 trace bench"
+#endif
+
 // ============================================================================
 // light_mode_dense_forge — "Dense Forge": Novelty Shear Lattice motion engine.
 // ----------------------------------------------------------------------------
@@ -80,6 +87,9 @@ static void dforge_streak_px(CRGB16* layer, float pos_norm, float last_norm, CRG
 }
 
 void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
+#if FEATURE_MABUTRACE
+  auto setup_trace = trace_begin("df21_setup", 0);
+#endif
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
   const CRGBPalette16& pal =
@@ -139,6 +149,10 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   const float kappa = DFORGE_KAPPA0 * novelty * conf_scale * (0.35f + 0.65f * activity);
 
+#if FEATURE_MABUTRACE
+  trace_end(&setup_trace);
+#endif
+
   {
     K1_TRACE_SCOPE("df21_lattice");
   for (uint8_t i = 0; i < bands; i++) {
@@ -149,12 +163,28 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     force += DFORGE_IMPULSE * transient * (tau[i] - fx.dforge_lat_pos[i]);
 
     if (kappa > 0.001f) {
+#if K1_BENCH_FX_LITE_21
+      // Bench design: local springs replace the all-to-all phase network.
+      // Keep all eight spectrum targets, velocities and transient impulses.
+      float coupling = 0.0f;
+      uint8_t neighbours = 0;
+      if (i > 0) {
+        coupling += fx.dforge_lat_pos[i - 1] - fx.dforge_lat_pos[i];
+        ++neighbours;
+      }
+      if (i + 1 < bands) {
+        coupling += fx.dforge_lat_pos[i + 1] - fx.dforge_lat_pos[i];
+        ++neighbours;
+      }
+      force += kappa * coupling / float(neighbours);
+#else
       float coupling = 0.0f;
       for (uint8_t j = 0; j < bands; j++) {
         if (j == i) continue;
         coupling += sinf(fx.dforge_lat_pos[j] - fx.dforge_lat_pos[i]);
       }
       force += kappa * coupling / float(bands - 1);
+#endif
     }
 
     force *= DFORGE_OMEGA[i];
@@ -175,6 +205,9 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   }
 
+#if FEATURE_MABUTRACE
+  auto transport_setup_trace = trace_begin("df21_transport_setup", 0);
+#endif
   const float frame = dt * 120.0f;
   const float mood = dforge_clamp01(float(rp->MOOD));
   const float nr_scale = float(NATIVE_RESOLUTION) / 128.0f;
@@ -185,6 +218,9 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       nr_scale *
       frame;
 
+#if FEATURE_MABUTRACE
+  trace_end(&transport_setup_trace);
+#endif
   {
     K1_TRACE_SCOPE("df21_transport");
   // MOTION: transport previous frame every valid rendered frame.
@@ -198,11 +234,46 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   }
 
+#if FEATURE_MABUTRACE
+  auto colour_trace = trace_begin("df21_colour", 0);
+#endif
   const float centroid = chromagram_centroid_hue();
   const float phase_b = tempo.phase01 * conf * 6.2831853f;
 
+#if FEATURE_MABUTRACE
+  trace_end(&colour_trace);
+#endif
   {
     K1_TRACE_SCOPE("df21_moire");
+#if K1_BENCH_FX_LITE_21
+  // Bench design: one colour and interference sample per four-pixel cell.
+  // Mean spectrum energy keeps every bin contributing; transport still moves
+  // every pixel every frame. This is a coarser texture, not a byte optimisation.
+  constexpr uint16_t cell_width = 4;
+  for (uint16_t k = 0; k < HALF; k += cell_width) {
+    const uint16_t end = (k + cell_width < HALF) ? k + cell_width : HALF;
+    float e = 0.0f;
+    for (uint16_t j = k; j < end; ++j) {
+      const uint16_t bin = j < analysis_bins ? j : (analysis_bins > 0 ? analysis_bins - 1 : 0);
+      e += dforge_clamp01(float(spectrogram_smooth[bin]));
+    }
+    e /= float(end - k);
+    if (inject_scale == 0.0f || e < DFORGE_FLOOR * 2.0f) continue;
+    const float u = (float(k) + 0.5f * float(end - k - 1)) / float(HALF > 1 ? HALF - 1 : 1);
+    const float moire = sinf(6.2831853f * (u * 2.17f + fx.dforge_carrier)) *
+        sinf(6.2831853f * (u * 3.61f - phase_b));
+    const float envelope = (0.35f + 0.65f * activity) * (0.5f + 0.5f * moire);
+    e *= envelope * DFORGE_MOIRE_GAIN * inject_scale;
+    if (e < DFORGE_FLOOR) continue;
+    const float hue = centroid + u * 0.30f;
+    const CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e));
+    for (uint16_t j = k; j < end; ++j) {
+      leds_16[HALF + j].r += col.r;
+      leds_16[HALF + j].g += col.g;
+      leds_16[HALF + j].b += col.b;
+    }
+  }
+#else
   // Moiré interference inject — spatial texture without advection.
   // Bound recurrence to small phases: at large carrier values the original
   // per-pixel float additions have quantised spacing, not a constant step.
@@ -257,6 +328,7 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     leds_16[idx].b += col.b;
   }
 
+#endif
   }
 
   {
