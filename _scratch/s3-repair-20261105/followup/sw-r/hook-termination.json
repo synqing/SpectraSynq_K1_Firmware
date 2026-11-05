@@ -1,0 +1,11 @@
+{
+  "command": "git commit pre-commit pytest tests/ -q",
+  "result": "terminated to avoid duplicate full suite owned by H",
+  "signal": "SIGTERM",
+  "pids": [
+    16852,
+    16851,
+    16814,
+    16813
+  ]
+}

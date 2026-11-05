@@ -1,0 +1,13 @@
+{
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "command": [
+    "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "-c",
+    "import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if all(x['keep_criterion_satisfied'] for x in r['rows'].values()) else 1)",
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-noise-table.json"
+  ],
+  "exit_code": 1,
+  "criterion": "brief 3.3, all five modes faster beyond measured repeat noise",
+  "baseline_git": "f6e9d52f",
+  "candidate_git": "54480cae"
+}

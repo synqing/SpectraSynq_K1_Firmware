@@ -1,0 +1,23 @@
+{
+  "stream": "F",
+  "commit": "677d3abfb5f0e6b1cf0675bbbf5c665ab5b8f4ad",
+  "branch": "followup/f",
+  "variant": 1,
+  "modes": [
+    21,
+    24
+  ],
+  "env": "k1_fe_bench_b489_trace_dev",
+  "flags": [
+    "K1_BENCH_FX_LITE_21=1",
+    "K1_BENCH_FX_LITE_24=1"
+  ],
+  "recipe": "followup/capture-recipe.json; identical stock/lite clip,start,route,volume,look,duration; secondary18",
+  "requests": [
+    "Capture stock flags off with new setup/transport_setup/colour sections (all effect code now scoped).",
+    "Capture lite flags on for21/24 under same recipe; save native/RGB8 frames for24-row visual sheets.",
+    "Report full-effect max/p99, section max/p99/share, cadence p99/mean/consecutive/recovery."
+  ],
+  "sanity": "Music-lit moving spring streaks, outward transport retained, centroid/chord colour retained; quiet drains and return relights. Coarser moire intentionally changes bytes.",
+  "host": "Two builds exit0;28 focusedtests exit0; flag-off frozen-stock replay in progress."
+}

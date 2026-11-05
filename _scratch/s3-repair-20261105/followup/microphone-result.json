@@ -1,0 +1,36 @@
+{
+  "first": {
+    "quiet_before": [
+      9,
+      100
+    ],
+    "music": [
+      90,
+      90
+    ],
+    "quiet_after": [
+      0,
+      99
+    ],
+    "exit_code": 1,
+    "receipt": "mic-check/result.json"
+  },
+  "telemetry_repeat": {
+    "quiet_before": [
+      0,
+      100
+    ],
+    "music": [
+      77,
+      91
+    ],
+    "quiet_after": [
+      0,
+      99
+    ],
+    "exit_code": 0,
+    "receipt": "mic-telemetry/result.json"
+  },
+  "scope": "mode32 normal8accab34 functional microphone check; first tail cause not isolated, no timing claim; protected microphone producers and calibration constants unchanged",
+  "restoration": "45 settings and look/source/AP/route/volume comparison exit0"
+}

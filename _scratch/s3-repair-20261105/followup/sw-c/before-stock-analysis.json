@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "analysis_status": "complete",
+  "evidence_kind": "host analysis of silicon trace",
+  "tag": "before-stock",
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "identity": {
+    "expected_git": "9f3eb18e",
+    "env": "k1_fe_bench_b489_trace_dev",
+    "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+    "version": "40103",
+    "git": "9f3eb18e",
+    "epoch": "1793866695"
+  },
+  "cpu_mhz": 240,
+  "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+  "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+  "capture_metadata": {
+    "identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "original_route": "External Headphones",
+    "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+    "cpu_mhz": 240,
+    "flags_file": "../build-flags.ini",
+    "measurement": "measured on silicon"
+  },
+  "measurement": "measured on silicon",
+  "result_sha256": "900b2eb30e91f54bb93842fee2bd2d3610413814550bcdc9f1a6c2ec0f539eda",
+  "contract_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/tests/fixtures/scheduling_gate0/g0r_selection/contract.json",
+  "contract_sha256": "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0",
+  "method": {
+    "percentile": "nearest rank ceil(0.99*n)",
+    "mean": "arithmetic",
+    "units": "microseconds",
+    "independent_unit": "capture run, not individual serially dependent frames",
+    "uncertainty": "descriptive only; no confidence interval inferred",
+    "recovery": "miss run length plus first on-time interval; right-censored terminal run separately reported"
+  },
+  "environment": {
+    "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+  },
+  "modes": {
+    "14": {
+      "primary_body_us": {
+        "n": 145,
+        "max": 2260,
+        "p99": 2258,
+        "mean": 2075.386206896552
+      },
+      "secondary_body_us": {
+        "n": 144,
+        "max": 683,
+        "p99": 658,
+        "mean": 525.9791666666666
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 145,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-14.json",
+      "trace_sha256": "b94dbc6956be91e2fd0a7225aa4971b2d5c1269331abb773eb6ae5b25be709c8",
+      "analysis_window": {
+        "start_us": 69794038,
+        "end_us": 70794038,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 68095908,
+        "raw_end_us": 70798872,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 2019,
+      "trace_window_us": 999162,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "15": {
+      "primary_body_us": {
+        "n": 145,
+        "max": 2283,
+        "p99": 2276,
+        "mean": 2084.4206896551723
+      },
+      "secondary_body_us": {
+        "n": 144,
+        "max": 686,
+        "p99": 640,
+        "mean": 514.5763888888889
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 145,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-15.json",
+      "trace_sha256": "79ba2184e5cd130502811c3faa0bfb9132f07c391c07b6ab61a83c2abbe5e022",
+      "analysis_window": {
+        "start_us": 102673082,
+        "end_us": 103673082,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 100974894,
+        "raw_end_us": 103677957,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 2019,
+      "trace_window_us": 999140,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "19": {
+      "primary_body_us": {
+        "n": 143,
+        "max": 2396,
+        "p99": 2390,
+        "mean": 2158.4825174825173
+      },
+      "secondary_body_us": {
+        "n": 143,
+        "max": 669,
+        "p99": 626,
+        "mean": 500.3286713286713
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 143,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-19.json",
+      "trace_sha256": "931bd308c6731fe7ccb7f98948612490ace4c1df2841065f9ce9abbf27c46d77",
+      "analysis_window": {
+        "start_us": 136110974,
+        "end_us": 137110974,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 134389127,
+        "raw_end_us": 137112145,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 2003,
+      "trace_window_us": 999040,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "21": {
+      "primary_body_us": {
+        "n": 119,
+        "max": 4797,
+        "p99": 4703,
+        "mean": 4180.470588235294
+      },
+      "secondary_body_us": {
+        "n": 119,
+        "max": 524,
+        "p99": 504,
+        "mean": 332.9159663865546
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 119,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-21.json",
+      "trace_sha256": "6f96313f3a4655af22015625f9e0d8f1b6af1edc8c1b0bf90ad1ed48326d8595",
+      "analysis_window": {
+        "start_us": 235554250,
+        "end_us": 236554250,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 233481950,
+        "raw_end_us": 236558990,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 1667,
+      "trace_window_us": 998972,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "24": {
+      "primary_body_us": {
+        "n": 119,
+        "max": 4593,
+        "p99": 4535,
+        "mean": 4164.016806722689
+      },
+      "secondary_body_us": {
+        "n": 119,
+        "max": 564,
+        "p99": 513,
+        "mean": 342.5378151260504
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 119,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-24.json",
+      "trace_sha256": "fec1052807f25bf3d91f09ab225a4aa28eb1547796cf0e7214af4e9339da57c4",
+      "analysis_window": {
+        "start_us": 268262017,
+        "end_us": 269262017,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 265992899,
+        "raw_end_us": 269265902,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 1667,
+      "trace_window_us": 998976,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "28": {
+      "primary_body_us": {
+        "n": 144,
+        "max": 2362,
+        "p99": 2360,
+        "mean": 2148.3055555555557
+      },
+      "secondary_body_us": {
+        "n": 143,
+        "max": 685,
+        "p99": 662,
+        "mean": 527.1538461538462
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 144,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-28.json",
+      "trace_sha256": "84ae1e07c9d612169a1ce1c5916c852ddcef628a4257190a6a81a04e3cafc15d",
+      "analysis_window": {
+        "start_us": 168957076,
+        "end_us": 169957076,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 167248010,
+        "raw_end_us": 169961938,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 2006,
+      "trace_window_us": 999206,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "29": {
+      "primary_body_us": {
+        "n": 143,
+        "max": 2423,
+        "p99": 2421,
+        "mean": 2193.230769230769
+      },
+      "secondary_body_us": {
+        "n": 143,
+        "max": 652,
+        "p99": 648,
+        "mean": 495.67832167832165
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 143,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": null,
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/before-stock/trace-29.json",
+      "trace_sha256": "8e79b202f82e6f497169bc07c5b75ccff43401a843b981b985811d602ea228cf",
+      "analysis_window": {
+        "start_us": 202276088,
+        "end_us": 203276088,
+        "duration_us": 1000000,
+        "anchor": "end of final complete primary body",
+        "complete_events_only": true,
+        "raw_start_us": 200550795,
+        "raw_end_us": 203277312,
+        "raw_metrics_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json"
+      },
+      "event_count": 2003,
+      "trace_window_us": 999609,
+      "available_counter_names": [
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    }
+  },
+  "limitations": [
+    "Rolling trace covers only the recorded tail; no whole-playback cadence claim.",
+    "Timing spans include interruptions and trace perturbation; no optical or production-build claim.",
+    "Common final 1,000,000-us window is analysis normalisation only; frozen recipe unchanged. Clip alignment is software-timed, not physical sample-locked.",
+    "Before-stock cadence unavailable unless the exact frame-start counter or equivalent verified boundary exists."
+  ]
+}

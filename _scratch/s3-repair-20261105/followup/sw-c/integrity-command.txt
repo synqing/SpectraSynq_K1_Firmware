@@ -1,0 +1,36 @@
+python3 -  <<'PY'
+import pathlib,json,hashlib,collections,math,sys,statistics
+b=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup');w=b/'sw-c'
+failures=[];checked=0
+for p in w.glob('*-analysis.json'):
+ r=json.loads(p.read_text())
+ if r['flags_sha256']!=hashlib.sha256(pathlib.Path(r['flags_file']).read_bytes()).hexdigest():failures.append(str(p)+' flags hash')
+ for m,v in r['modes'].items():
+  q=pathlib.Path(v['trace_file'])
+  if v['trace_sha256']!=hashlib.sha256(q.read_bytes()).hexdigest():failures.append(str(q)+' trace hash')
+  events=[e for e in json.loads(q.read_text())['traceEvents'] if 'ts' in e]
+  if 'analysis_window' in v:
+   a,z=v['analysis_window']['start_us'],v['analysis_window']['end_us']
+   assert z-a==1000000
+   events=[e for e in events if a<=e['ts'] and e['ts']+e.get('dur',0)<=z]
+  for name,key in [('vp_primary_effect_body','primary_body_us'),('vp_secondary_effect_body','secondary_body_us')]:
+   values=[e['dur'] for e in events if e['name']==name and e['ph']=='X'];hist=collections.Counter(values);count=0;quant=None
+   for x,n in sorted(hist.items()):
+    count+=n
+    if quant is None and count>=math.ceil(.99*len(values)):quant=x
+   actual=v[key]
+   if (len(values),max(values),quant)!=(actual['n'],actual['max'],actual['p99']):failures.append(f'{p.name} {m} {key} quantile')
+   if abs(statistics.fmean(values)-actual['mean'])>1e-9:failures.append(f'{p.name} {m} {key} mean')
+  if abs(sum(x['share_of_body'] for x in v['sections'].values())-v['coverage']['total_exclusive_scoped_share'])>1e-10:failures.append(f'{p.name} {m} exclusive coverage sum')
+  checked+=1
+t=json.loads((b/'effect-cost-table.json').read_text())
+expected={'14':'lite','15':'lite','19':'lite','21':'lite-forge2','24':'lite-forge3','28':'lite','29':'lite'}
+for m,tag in expected.items():
+ v=t['modes'][m]['lite'];assert v['capture_tag']==tag
+ assert v['source_identity']==t['sources'][tag]['identity']
+ assert t['modes'][m]['stock']['source_identity']['git']=='0715cb4b'
+output={'recipe_sha256':t['recipe_sha256'],'analysis_rows_checked':checked,'method':'Independent histogram cumulative-rank quantile and statistics.fmean; trace and flags hashes re-read; section shares sum checked; selected per-mode source identities verified.','failures':failures}
+(w/'integrity-validation.json').write_text(json.dumps(output,indent=2)+'\n')
+print(json.dumps(output));sys.exit(bool(failures))
+
+PY

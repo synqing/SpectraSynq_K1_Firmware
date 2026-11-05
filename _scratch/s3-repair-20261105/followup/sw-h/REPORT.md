@@ -1,5 +1,5 @@
 # 1. Changed artefacts
-- `scripts/regression-harness/golden/harness_selftest.py`: excludes transient generated `*.ino.cpp` from mutation copies. Uncommitted; orchestrator owns commit.
+- `scripts/regression-harness/golden/harness_selftest.py`: excludes transient generated `*.ino.cpp` from mutation copies. Committed as `1c9478e6`; committed file hash matches the tested repair.
 - `sw-h/receipt.json`, `focused-receipt.json`, `final-receipt.json`, `gates.json`, `repair.diff`: full-run failure, focused repair and full rerun evidence.
 
 # 2. Gates
@@ -23,4 +23,4 @@
 - No other copytrees changed; no hardware touched.
 
 # 5. Decisions
-- None for Captain. Orchestrator reviews and commits the verified repair.
+- None for Captain. Verified repair committed as `1c9478e6`; no further tests run for this receipt update.

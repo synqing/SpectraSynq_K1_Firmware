@@ -1,0 +1,73 @@
+/Users/spectrasynq/miniforge3/bin/python - <<'PY'
+import json,re,zlib,hashlib
+from pathlib import Path
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+p=Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup')
+out=p/'visual'; out.mkdir(exist_ok=True)
+cost=json.loads((p/'effect-cost-table.json').read_text())
+modes=[14,15,19,21,24,28,29]
+names={14:'Spectrum River',15:'Spectrum River V2',19:'Tempo River',21:'Dense Forge',24:'Dense Forge Chord',28:'River Surge',29:'Tempo River Walk'}
+manifest={'scope':'Actual primary submitted RGB8; direct code values, not an optical recording. Same capture recipe, independently replayed audio. Timestamp matching is relative to each capture start, not exact stimulus parity. Timing is the final-one-second rolling-trace aggregate, not measured cost of an individual shown RGB8 frame.','recipe_sha256':cost['recipe_sha256'],'cost_table_sha256':hashlib.sha256((p/'effect-cost-table.json').read_bytes()).hexdigest(),'modes':{}}
+for mode in modes:
+ records={}
+ for variant in ['stock','lite']:
+  tag=('lite-forge2' if mode==21 else 'lite-forge3' if mode==24 else 'lite') if variant=='lite' else 'stock'
+  f=p/tag/f'mode-{mode}-music.txt'; raw=f.read_text()
+  h=dict(t.split('=') for t in re.search(r'\[RTRACE-BEGIN ([^\]]+)\]',raw)[1].split())
+  rows=[l.split(',') for l in raw.splitlines() if l.startswith('F,')]
+  b=[bytes.fromhex(r[4]) for r in rows]; crc=0
+  for i,(r,frame) in enumerate(zip(rows,b)):
+   assert int(r[1])==i and int(r[3])==mode and len(frame)==480
+   crc=zlib.crc32(frame+bytes(480),crc)
+  assert len(rows)==int(h['frames']) and crc==int(h['crc32'],16)
+  img=np.stack([np.frombuffer(t,dtype=np.uint8).reshape(160,3) for t in b])
+  times=np.array([int(r[2]) for r in rows]); rel=(times-times[0])/1000
+  timing=cost['modes'][str(mode)][tag]['primary_body_us']
+  source=cost['sources'][tag]
+  assert source['recipe_sha256']==cost['recipe_sha256']
+  assert cost['modes'][str(mode)][tag]['analysis_window']['duration_us']==1000000
+  assert np.all(np.diff(times)>0)
+  records[variant]={'frames':img,'times':times,'relative':rel,'timing':timing,'source':source,'full_retained_body_us':cost['modes'][str(mode)][tag]['full_retained_trace']['primary_body_us'],'path':str(f),'sha256':hashlib.sha256(f.read_bytes()).hexdigest()}
+ assert records['stock']['source']['identity']['git']!=records['lite']['source']['identity']['git']
+ end=min(x['relative'][-1] for x in records.values())
+ targets=np.linspace(0,end,24)
+ fig,axes=plt.subplots(2,1,figsize=(15,17),facecolor='#16191e')
+ fig.subplots_adjust(left=.055,right=.625,top=.88,bottom=.10,hspace=.23)
+ selected={}
+ panel={'common_relative_window_seconds':[0,float(end)],'target_relative_seconds':targets.tolist(),'variants':{}}
+ for ax,variant in zip(axes,['stock','lite']):
+  d=records[variant]; indices=np.array([np.argmin(abs(d['relative']-t)) for t in targets]); assert len(set(indices))==24
+  arr=d['frames'][indices]; selected[variant]=arr
+  ax.imshow(arr,interpolation='nearest',aspect='auto')
+  ax.axvline(79.5,color='white',linestyle=':',linewidth=.5,alpha=.65)
+  ax.set_xticks([0,79.5,159],['0','centre','159']);ax.set_yticks([])
+  ax.tick_params(colors='#cdd0d5',labelsize=10)
+  timing=d['timing']
+  ax.set_title(f"{variant.upper()}  ·  {len(d['frames'])} captured frames  ·  body p99 {timing['p99']:,} µs / max {timing['max']:,} µs",loc='left',fontsize=13,color='white',pad=17)
+  ax.text(1.025,1.025,'Capture t   Device ms     Aggregate p99 / max µs',transform=ax.transAxes,color='#cdd0d5',fontsize=9,fontfamily='monospace')
+  for row,idx in enumerate(indices):
+   ax.text(1.025,1-(row+.5)/24,f"{d['relative'][idx]:6.3f}s   {d['times'][idx]:9d}     {timing['p99']:5d} / {timing['max']:5d}",transform=ax.transAxes,color='#e0e3e8',fontsize=9,va='center',fontfamily='monospace')
+  whole=d['frames']
+  panel['variants'][variant]={'raw_path':d['path'],'sha256':d['sha256'],'frames':len(whole),'crc_verified':True,'selected_indices':indices.tolist(),'selected_device_ms':d['times'][indices].tolist(),'selected_relative_seconds':d['relative'][indices].tolist(),'timing_aggregate_us':timing,'full_retained_body_us':d['full_retained_body_us'],'build_identity':d['source']['identity'],'flags_file':d['source']['flags_file'],'flags_sha256':d['source']['flags_sha256'],'lit_frames':int(np.count_nonzero(np.any(whole>0,axis=(1,2)))),'unique_frames':int(len(np.unique(whole.reshape(len(whole),-1),axis=0))),'changed_adjacent_frames':int(np.count_nonzero(np.any(whole[1:]!=whole[:-1],axis=(1,2))))}
+ delta=abs(selected['stock'].astype(int)-selected['lite'].astype(int))
+ panel['informational_diff']={'bytes':int(delta.size),'different_bytes':int(np.count_nonzero(delta)),'different_percent':float(np.count_nonzero(delta)/delta.size*100),'max_abs_byte_delta':int(delta.max()),'mean_abs_byte_delta':float(delta.mean()),'exact_stimulus_parity':False}
+ panel['limited_music_sanity']={v:(d['lit_frames']>0 and d['unique_frames']>1 and d['changed_adjacent_frames']>0) for v,d in panel['variants'].items()}
+ fig.suptitle(f"{mode}  ·  {names[mode]}\nStock vs lite · 24 timestamp-spaced primary LED strips per variant",fontsize=20,color='white',y=.968)
+ fig.text(.055,.916,'Same recipe · independently replayed music · 160 pixels across each strip\nTiming labels repeat the final-one-second trace aggregate; they are not per-row measurements.',color='#cdd0d5',fontsize=11)
+ fig.text(.055,.018,f"RGB8 buffer evidence, not optical output. Relative timestamp matching does not prove exact stimulus parity.\nInformational byte difference: {panel['informational_diff']['different_percent']:.2f}% changed; maximum delta {delta.max()}/255. Recipe {cost['recipe_sha256'][:12]}.\n{records['stock']['source']['identity']['env']} · 240 MHz · measured on silicon\nStock {records['stock']['source']['identity']['git']} · flags {Path(records['stock']['source']['flags_file']).name}\nLite {records['lite']['source']['identity']['git']} · flags {Path(records['lite']['source']['flags_file']).name}",color='#cdd0d5',fontsize=10)
+ dest=out/f'{mode}-stock-vs-lite.png';fig.savefig(dest,dpi=120,facecolor=fig.get_facecolor());plt.close(fig)
+ panel['png']=str(dest);panel['png_sha256']=hashlib.sha256(dest.read_bytes()).hexdigest();manifest['modes'][str(mode)]=panel
+fig,axes=plt.subplots(2,4,figsize=(24,14.8),facecolor='#16191e')
+fig.subplots_adjust(left=.01,right=.99,top=.93,bottom=.03,wspace=.025,hspace=.07)
+for ax,mode in zip(axes.flat,modes):
+ ax.imshow(plt.imread(out/f'{mode}-stock-vs-lite.png'));ax.axis('off')
+axes.flat[-1].axis('off');axes.flat[-1].text(.04,.8,'Choose per effect\n\nShip stock\nShip lite\nRedesign later\n\nOpen each numbered PNG\nfor readable timestamps.\n\nActual RGB8 buffer captures.\nNot an optical recording.\nTiming is trace aggregate.',color='white',fontsize=21,va='top')
+fig.suptitle('K1 · stock vs lite · seven measured effect comparisons',color='white',fontsize=25,y=.975)
+fig.savefig(out/'index.png',dpi=120,facecolor=fig.get_facecolor());plt.close(fig)
+(out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+print(json.dumps({'png_count':len(list(out.glob('*.png'))),'modes':{k:{'sanity':v['limited_music_sanity'],'diff':v['informational_diff']} for k,v in manifest['modes'].items()}},indent=2))
+
+PY

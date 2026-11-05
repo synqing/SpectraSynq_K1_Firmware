@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "analysis_status": "complete",
+  "evidence_kind": "host analysis of silicon trace",
+  "tag": "river-b2",
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "identity": {
+    "expected_git": "f6e9d52f",
+    "env": "k1_fe_bench_b489_trace_dev",
+    "firmware_sha256": "c2c9aef62fbd29d7cc462c9a9ebb9cde88933a9129d65f24236837d03f998c9a",
+    "version": "40103",
+    "git": "f6e9d52f",
+    "epoch": "1793866122"
+  },
+  "cpu_mhz": 240,
+  "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+  "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+  "capture_metadata": {
+    "identity": {
+      "expected_git": "f6e9d52f",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "c2c9aef62fbd29d7cc462c9a9ebb9cde88933a9129d65f24236837d03f998c9a",
+      "version": "40103",
+      "git": "f6e9d52f",
+      "epoch": "1793866122"
+    },
+    "original_route": "External Headphones",
+    "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+    "cpu_mhz": 240,
+    "flags_file": "../build-flags.ini",
+    "measurement": "measured on silicon"
+  },
+  "measurement": "measured on silicon",
+  "result_sha256": "1d9386850b79ce2fc854dd1c04f44040f3d89d9a4b32ea18b9dff30deae31bfc",
+  "contract_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/tests/fixtures/scheduling_gate0/g0r_selection/contract.json",
+  "contract_sha256": "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0",
+  "method": {
+    "percentile": "nearest rank ceil(0.99*n)",
+    "mean": "arithmetic",
+    "units": "microseconds",
+    "independent_unit": "capture run, not individual serially dependent frames",
+    "uncertainty": "descriptive only; no confidence interval inferred",
+    "recovery": "miss run length plus first on-time interval; right-censored terminal run separately reported"
+  },
+  "environment": {
+    "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+  },
+  "modes": {
+    "14": {
+      "primary_body_us": {
+        "n": 251,
+        "max": 2369,
+        "p99": 2355,
+        "mean": 2131.605577689243
+      },
+      "secondary_body_us": {
+        "n": 251,
+        "max": 708,
+        "p99": 675,
+        "mean": 543.3784860557769
+      },
+      "sections": {
+        "river14_finalise": {
+          "exclusive_per_call_us": {
+            "n": 251,
+            "max": 86,
+            "p99": 84,
+            "mean": 61.42231075697211
+          },
+          "exclusive_invocation_us": {
+            "n": 251,
+            "max": 86,
+            "p99": 84,
+            "mean": 61.42231075697211
+          },
+          "share_of_body": 0.02881504505329578
+        },
+        "river14_injection": {
+          "exclusive_per_call_us": {
+            "n": 251,
+            "max": 2026,
+            "p99": 1993,
+            "mean": 1766.7011952191235
+          },
+          "exclusive_invocation_us": {
+            "n": 251,
+            "max": 2026,
+            "p99": 1993,
+            "mean": 1766.7011952191235
+          },
+          "share_of_body": 0.8288124283922674
+        },
+        "river14_transport": {
+          "exclusive_per_call_us": {
+            "n": 251,
+            "max": 182,
+            "p99": 180,
+            "mean": 142.70119521912352
+          },
+          "exclusive_invocation_us": {
+            "n": 251,
+            "max": 182,
+            "p99": 180,
+            "mean": 142.70119521912352
+          },
+          "share_of_body": 0.06694540336764275
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9245728768132059,
+        "minimum_call_scoped_share": 0.896462018730489,
+        "body_calls": 251,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 251,
+          "max": 7472,
+          "p99": 7030,
+          "mean": 6987.97609561753
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7472,
+        "trace_elapsed_us": 1753988,
+        "counter_elapsed_us": 1753982,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/river-b2/trace-14.json",
+      "trace_sha256": "da604c7102f2ba032a10b87c9bb317ababe4faaaa7f0dde633ea92ac6afb88bf",
+      "event_count": 5461,
+      "trace_window_us": 1757900,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "15": {
+      "primary_body_us": {
+        "n": 291,
+        "max": 2336,
+        "p99": 2306,
+        "mean": 2090.4707903780068
+      },
+      "secondary_body_us": {
+        "n": 292,
+        "max": 700,
+        "p99": 687,
+        "mean": 539.5376712328767
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 291,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 291,
+          "max": 7502,
+          "p99": 7473,
+          "mean": 6975.9862542955325
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7502,
+        "trace_elapsed_us": 2030008,
+        "counter_elapsed_us": 2030012,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/river-b2/trace-15.json",
+      "trace_sha256": "32f71efffd8073b3e86c78f089824f3d69f2345e2fab45203ea1126ed8f3e588",
+      "event_count": 5461,
+      "trace_window_us": 2034871,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "19": {
+      "primary_body_us": {
+        "n": 291,
+        "max": 2398,
+        "p99": 2385,
+        "mean": 2158.5807560137455
+      },
+      "secondary_body_us": {
+        "n": 292,
+        "max": 650,
+        "p99": 625,
+        "mean": 500.4349315068493
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 291,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 290,
+          "max": 7051,
+          "p99": 7048,
+          "mean": 6993.041379310344
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7051,
+        "trace_elapsed_us": 2027994,
+        "counter_elapsed_us": 2027982,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/river-b2/trace-19.json",
+      "trace_sha256": "cb1fa99dc039d489e8c889f9a02544930ebf6c774172c042f709287b8cdd330f",
+      "event_count": 5461,
+      "trace_window_us": 2036384,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "28": {
+      "primary_body_us": {
+        "n": 292,
+        "max": 2381,
+        "p99": 2362,
+        "mean": 2137.3630136986303
+      },
+      "secondary_body_us": {
+        "n": 292,
+        "max": 711,
+        "p99": 663,
+        "mean": 533.445205479452
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 292,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 290,
+          "max": 7485,
+          "p99": 7477,
+          "mean": 6982.744827586207
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7485,
+        "trace_elapsed_us": 2025003,
+        "counter_elapsed_us": 2024996,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/river-b2/trace-28.json",
+      "trace_sha256": "a131457fc1d3b1dbd6e1797c96ac0cb01c3e33b27f31bd99149f769020e37b05",
+      "event_count": 5461,
+      "trace_window_us": 2035954,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "29": {
+      "primary_body_us": {
+        "n": 291,
+        "max": 2431,
+        "p99": 2413,
+        "mean": 2175.72852233677
+      },
+      "secondary_body_us": {
+        "n": 292,
+        "max": 679,
+        "p99": 646,
+        "mean": 503.8390410958904
+      },
+      "sections": {},
+      "coverage": {
+        "total_exclusive_scoped_share": 0.0,
+        "minimum_call_scoped_share": 0.0,
+        "body_calls": 291,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 290,
+          "max": 7482,
+          "p99": 7051,
+          "mean": 6993.062068965517
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7482,
+        "trace_elapsed_us": 2027981,
+        "counter_elapsed_us": 2027988,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/river-b2/trace-29.json",
+      "trace_sha256": "4cd621fe1f1f7cd58f4704295746d9f47cb58590810b426d9fc0a30bf27af19f",
+      "event_count": 5461,
+      "trace_window_us": 2036647,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    }
+  },
+  "limitations": [
+    "Rolling trace covers only the recorded tail; no whole-playback cadence claim.",
+    "Timing spans include interruptions and trace perturbation; no optical or production-build claim.",
+    "Before-stock cadence unavailable unless the exact frame-start counter or equivalent verified boundary exists."
+  ]
+}

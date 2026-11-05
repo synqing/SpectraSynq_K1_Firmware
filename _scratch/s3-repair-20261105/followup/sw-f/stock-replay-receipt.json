@@ -1,0 +1,386 @@
+{
+  "source": {
+    "repository": "/Users/spectrasynq/k1-followup-f",
+    "branch": "followup/f",
+    "head": "677d3abfb5f0e6b1cf0675bbbf5c665ab5b8f4ad",
+    "dirty_paths": [],
+    "dirty_inputs_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "untracked_inputs": [],
+    "identity_paths": [
+      "SPECTRASYNQ_K1_FIRMWARE",
+      "platformio.ini",
+      "tools/esp_emulator",
+      "scripts/platformio",
+      "tests/test_esp_emulator_acceptance.py",
+      "tests/test_esp_emulator_report.py"
+    ]
+  },
+  "cases": {
+    "long_21": {
+      "case": "long_21",
+      "purpose": "Full-cadence active 6s / declared zero 6s / return 2s; output arithmetic and motion observations, no aesthetic threshold.",
+      "dir": "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_21",
+      "pcm": {
+        "id": "mode_quiet_return",
+        "kind": "concat",
+        "qualification": "diagnostic_composite",
+        "origin": null,
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 947200,
+            "to_sample": 1024000,
+            "label": "approved Loreen active"
+          },
+          {
+            "zeros_samples": 76800,
+            "label": "declared diagnostic zeros; not natural quiet"
+          },
+          {
+            "asset": "loreen_src",
+            "from_sample": 947200,
+            "to_sample": 972800,
+            "label": "same approved Loreen return"
+          }
+        ],
+        "samples": 179200,
+        "sha256": "e31a0d5c67cca2e2ad817c685f4757f4ee99187d0b5d54494d726061f152e3b9"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "143a92047bc04371830df8c2a5f3fbcf",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_21/flash-run.bin",
+        "--elf",
+        "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_21/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 19.09,
+      "executed": {
+        "flash_sha256": "7ba6de853fca2e087d0c457f6072fa475cb481200bfd846615f4d950cd029e00",
+        "app_region_matches_build": true,
+        "app_sha256": "e8f38c20c48a75b7bc1efa17200750b94ede0c6b0801871924c168bbe71bdcf5",
+        "scenario_blob_sha256": "073f543fe739a1a08c7ee5e08cb452a5cf768cd71f08718b972b9b22d03618e4",
+        "payload_crc32": "37323e67",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 179200,
+        "tail_hops": 0,
+        "total_hops": 1867,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 1867,
+          "every": 1,
+          "frames": 1867
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "base_coat=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_base_coat=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "set_mode=21",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=21",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1867,
+        "payload_sha256": "e06d64635ffe84ea5f91cfdeb647d8bd9390ea5c882c501c16caf891d5d4c357",
+        "header": {
+          "frames": "1867",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "952ce3fb"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "143a92047bc04371830df8c2a5f3fbcf",
+          "admitted": "179200",
+          "processed": "179232",
+          "staged_hops": "1867",
+          "total_hops": "1867",
+          "published": "1867",
+          "last_generation": "1867",
+          "consumed": "1867",
+          "shown": "1867",
+          "last_shown": "1867",
+          "pre_audio_shows": "113",
+          "captured": "1867",
+          "commands": "6",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "3",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "15002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "343804",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1150,
+          "B": 1150
+        }
+      }
+    },
+    "long_24": {
+      "case": "long_24",
+      "purpose": "Full-cadence active 6s / declared zero 6s / return 2s; output arithmetic and motion observations, no aesthetic threshold.",
+      "dir": "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_24",
+      "pcm": {
+        "id": "mode_quiet_return",
+        "kind": "concat",
+        "qualification": "diagnostic_composite",
+        "origin": null,
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 947200,
+            "to_sample": 1024000,
+            "label": "approved Loreen active"
+          },
+          {
+            "zeros_samples": 76800,
+            "label": "declared diagnostic zeros; not natural quiet"
+          },
+          {
+            "asset": "loreen_src",
+            "from_sample": 947200,
+            "to_sample": 972800,
+            "label": "same approved Loreen return"
+          }
+        ],
+        "samples": 179200,
+        "sha256": "e31a0d5c67cca2e2ad817c685f4757f4ee99187d0b5d54494d726061f152e3b9"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "f69b5a0826614aef90b70c9cf32c89d1",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_24/flash-run.bin",
+        "--elf",
+        "_scratch/s3-repair-20261105/followup/sw-f/stock-replay-second/long_24/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 14.4,
+      "executed": {
+        "flash_sha256": "afe5ae78102df7eae79b19f13c29bee64da33e1a64adea3d57892c1a3552b49c",
+        "app_region_matches_build": true,
+        "app_sha256": "e8f38c20c48a75b7bc1efa17200750b94ede0c6b0801871924c168bbe71bdcf5",
+        "scenario_blob_sha256": "1950e26db7dbe818b3ae46c85c2e8f99b51b7de30348af8352f8dbe50e416337",
+        "payload_crc32": "f2ee7192",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 179200,
+        "tail_hops": 0,
+        "total_hops": 1867,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 1867,
+          "every": 1,
+          "frames": 1867
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "base_coat=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_base_coat=false",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "set_mode=24",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=24",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1867,
+        "payload_sha256": "1378d3ad129edad090c30d2ff63d677d69796fcaadf7252dfe05e11ed12abf31",
+        "header": {
+          "frames": "1867",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "771f99af"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "f69b5a0826614aef90b70c9cf32c89d1",
+          "admitted": "179200",
+          "processed": "179232",
+          "staged_hops": "1867",
+          "total_hops": "1867",
+          "published": "1867",
+          "last_generation": "1867",
+          "consumed": "1867",
+          "shown": "1867",
+          "last_shown": "1867",
+          "pre_audio_shows": "113",
+          "captured": "1867",
+          "commands": "6",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "3",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "15002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "343804",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1150,
+          "B": 1150
+        }
+      }
+    }
+  },
+  "gates": [
+    {
+      "mode": 21,
+      "bytes": 1792320,
+      "different": 34,
+      "max_abs": 1,
+      "changed_masks": 0,
+      "baseline_sha256": "5b623d4a54f40fb81eab0490f742767d78fb264a564b6257d6e4aac624826b87",
+      "candidate_sha256": "e06d64635ffe84ea5f91cfdeb647d8bd9390ea5c882c501c16caf891d5d4c357",
+      "exit_code": 0
+    },
+    {
+      "mode": 24,
+      "bytes": 1792320,
+      "different": 52,
+      "max_abs": 1,
+      "changed_masks": 0,
+      "baseline_sha256": "99fe71bcd1e38aa882804c7896c318f49fe4723cf636974f0f851ebf59d8dc0b",
+      "candidate_sha256": "1378d3ad129edad090c30d2ff63d677d69796fcaadf7252dfe05e11ed12abf31",
+      "exit_code": 0
+    }
+  ]
+}

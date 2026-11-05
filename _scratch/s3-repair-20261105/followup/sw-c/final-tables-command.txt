@@ -1,0 +1,47 @@
+python3 - <<'PY'
+import json,pathlib,math,subprocess,sys
+w=pathlib.Path('/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c')
+base=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup')
+tags=['before-stock','stock','lite']
+runs={t:json.loads((w/(t+'-analysis.json')).read_text()) for t in tags if (w/(t+'-analysis.json')).exists()}
+modes=['14','15','19','21','24','28','29']
+assert all(m in runs['stock']['modes'] for m in modes)
+provenance={t:{k:v for k,v in r.items() if k!='modes'} for t,r in runs.items()}
+table={'schema_version':1,'recipe_sha256':runs['stock']['recipe_sha256'],'analysis_status':'complete' if 'lite' in runs and all(m in runs['lite']['modes'] for m in modes) else 'partial','unit':'microseconds','method':runs['stock']['method'],'sources':provenance,'modes':{m:{t:r['modes'].get(m) for t,r in runs.items()} for m in modes},'limitations':['Rolling trace tails only; actual window and sample count included for every mode.','Primary/secondary body spans are separate effect calls; frame cadence includes both primary and fixed secondary mode 18.','Scope tracing adds overhead; before/final timing difference includes added instrumentation. No uninstrumented production timing claim.','Section shares are exclusive matched per-call sums / matched full-body sums, never sums of maxima.','Before-stock has no exact frame-start counter; its cadence is unverified.','Lite is a design treatment, not a byte-identical optimisation; visual and byte-difference assessment owned by Stream V.']}
+(base/'effect-cost-table.json').write_text(json.dumps(table,indent=2)+'\n')
+ceilings={'schema_version':1,'recipe_sha256':table['recipe_sha256'],'source':provenance['stock'],'meaning':'Smallest integer ceiling covering observed stock nearest-rank p99; this is a decision table, not amendment or satisfaction of the existing 2000-us hard-maximum contract.','modes':{}}
+for m in modes:
+ v=runs['stock']['modes'][m];cad=v['cadence']
+ ceilings['modes'][m]={'stock_observed_max_us':v['primary_body_us']['max'],'stock_p99_us':v['primary_body_us']['p99'],'smallest_integer_p99_ceiling_us':math.ceil(v['primary_body_us']['p99']),'primary_calls':v['primary_body_us']['n'],'secondary_mode':18,'secondary_body_us':v['secondary_body_us'],'frame_start_p99_us':cad['frame_start_delta_us']['p99'] if cad else None,'frame_p99_with_secondary18_meets_8333':cad['frame_start_delta_us']['p99']<=8333 if cad else None,'cadence':cad,'trace_file':v['trace_file'],'trace_sha256':v['trace_sha256']}
+(base/'ceiling-option.json').write_text(json.dumps(ceilings,indent=2)+'\n')
+gatecode=r'''import json,sys
+p,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'14','15','19','21','24','28','29'};errors=[]
+if not expected<=set(r['modes']):errors.append('missing modes')
+for m in sorted(expected & set(r['modes'])):
+ v=r['modes'][m]
+ if kind=='coverage':
+  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:
+   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v["coverage"][key]}')
+ elif kind=='cadence':
+  d=v['cadence']
+  if d is None:errors.append(f'{m} cadence unverified');continue
+  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}
+  errors.extend(f'{m} {k} {x}>{contract["admission"][k]}' for k,x in values.items() if x>contract['admission'][k])
+  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')
+ else:
+  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']
+  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v["primary_body_us"]["max"]}>{limit}')
+print(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))
+sys.exit(bool(errors))
+'''
+gates=[]
+for t,k in [('stock','coverage'),('stock','cadence'),('stock','hard_ceiling'),('before-stock','cadence'),('lite','cadence'),('lite','lite_target')]:
+ if t not in runs:continue
+ command=[sys.executable,'-c',gatecode,str(w/(t+'-analysis.json')),k]
+ proc=subprocess.run(command,text=True,capture_output=True)
+ gates.append({'item':f'C {t} {k}','command':command,'exit_code':proc.returncode,'stdout':json.loads(proc.stdout),'receipt':str(w/(t+'-analysis.json')),'baseline_identity':runs['before-stock']['identity'],'candidate_identity':runs[t]['identity'],'scope':'Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.'})
+(w/'gates-fragment.json').write_text(json.dumps(gates,indent=2)+'\n')
+print('gates',[(g['item'],g['exit_code'],g['stdout']['errors']) for g in gates])
+print('stock ceiling rows', {m:(v['stock_observed_max_us'],v['smallest_integer_p99_ceiling_us'],v['frame_start_p99_us']) for m,v in ceilings['modes'].items()})
+
+PY

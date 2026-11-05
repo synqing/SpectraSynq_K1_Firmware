@@ -1,0 +1,45 @@
+{
+  "inspection": "Direct tool image view of both final21/24 sheets; compare stock/lite panels",
+  "selected": {
+    "21": "f87fe1f2 F2",
+    "24": "8accab34 F3"
+  },
+  "verdict": "Limited music sanity satisfied: lit changing streaks; coarse texture visibly changes appearance. Source preserves colour driver and transport direction.",
+  "not_verified": [
+    "optical appearance",
+    "same instantaneous waveform or sample-exact alignment",
+    "lite quiet/return"
+  ],
+  "images": {
+    "21": {
+      "sha256": "9ec1628cbf9317817b6785bdd98ff515d196bf202f2b08de4dad9f4f4bd961d4",
+      "limited_music_sanity": {
+        "stock": true,
+        "lite": true
+      },
+      "diff": {
+        "bytes": 11520,
+        "different_bytes": 8028,
+        "different_percent": 69.6875,
+        "max_abs_byte_delta": 140,
+        "mean_abs_byte_delta": 15.302256944444444,
+        "exact_stimulus_parity": false
+      }
+    },
+    "24": {
+      "sha256": "a06c820bae16c40c2935ea62c1f504f06a001a5b8ba9e407dd197503ac5bbed0",
+      "limited_music_sanity": {
+        "stock": true,
+        "lite": true
+      },
+      "diff": {
+        "bytes": 11520,
+        "different_bytes": 8285,
+        "different_percent": 71.91840277777779,
+        "max_abs_byte_delta": 188,
+        "mean_abs_byte_delta": 23.773350694444446,
+        "exact_stimulus_parity": false
+      }
+    }
+  }
+}

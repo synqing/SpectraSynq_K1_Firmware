@@ -1,0 +1,19 @@
+python3 -  <<'PY'
+import json,pathlib,subprocess,sys
+w=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c')
+a,b,c=[json.loads((w/(t+'-analysis.json')).read_text()) for t in ['river-a','river-b1','river-b2']]
+rows={}
+assert a['identity']['git']!=b['identity']['git']==c['identity']['git']
+assert a['recipe_sha256']==b['recipe_sha256']==c['recipe_sha256']
+for m in ['14','15','19','28','29']:
+ av,bv,cv=[r['modes'][m]['primary_body_us'] for r in [a,b,c]]
+ maxnoise=abs(bv['max']-cv['max']);p99noise=abs(bv['p99']-cv['p99']);noise=max(maxnoise,p99noise)
+ rows[m]={'a':av,'b1':bv,'b2':cv,'max_repeat_noise_us':maxnoise,'p99_repeat_noise_us':p99noise,'conservative_noise_us':noise,'a_max_improvement_vs_b1_us':bv['max']-av['max'],'a_max_improvement_vs_b2_us':cv['max']-av['max'],'keep_criterion_satisfied':min(bv['max'],cv['max'])-av['max']>noise}
+result={'recipe_sha256':a['recipe_sha256'],'identities':{r['tag']:r['identity'] for r in [a,b,c]},'source_analysis_files':[str(w/(r['tag']+'-analysis.json')) for r in [a,b,c]],'method':'A max must improve on both B maxima by more than max(abs(B1max-B2max),abs(B1p99-B2p99)) for every mode. Both repeat noise deltas shown. One A run, two B runs; descriptive decision, no statistical confidence claimed.','rows':rows,'decision':'keep' if all(v['keep_criterion_satisfied'] for v in rows.values()) else 'revert'}
+(w/'river-noise-table.json').write_text(json.dumps(result,indent=2)+'\n')
+code="import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if all(x['keep_criterion_satisfied'] for x in r['rows'].values()) else 1)"
+proc=subprocess.run([sys.executable,'-c',code,str(w/'river-noise-table.json')])
+(w/'river-retention-gate.json').write_text(json.dumps({'recipe_sha256':a['recipe_sha256'],'command':[sys.executable,'-c',code,str(w/'river-noise-table.json')],'exit_code':proc.returncode,'criterion':'brief 3.3, all five modes faster beyond measured repeat noise','baseline_git':b['identity']['git'],'candidate_git':a['identity']['git']},indent=2)+'\n')
+print(json.dumps(result,indent=2));print('actual_retention_gate_exit',proc.returncode)
+
+PY

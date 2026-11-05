@@ -1,0 +1,23 @@
+{
+  "recorded_before_variant_edit": true,
+  "baseline_sha": "f6e9d52f64238b00d7c5459b96b7fae411b40862",
+  "modes": [
+    14,
+    15,
+    19,
+    28,
+    29
+  ],
+  "design": "Pair adjacent frequency bins; use their maximum energy and the stronger bin frequency colour for both pixels. One palette evaluation per pair; full-rate outward history transport unchanged.",
+  "expected": "Broader two-pixel spectral filaments; music remains lit, quiet decays, outward motion continuous. Bass tide (15), tempo pulse (19), drop wavefront (28), and bar colour walk (29) unchanged.",
+  "sanity_rules": [
+    "Outward transport position and speed calculations remain identical to stock.",
+    "Every input frequency bin contributes to its pair, including an odd final bin.",
+    "Palette hue follows the stronger member of each pair, plus unchanged bar offset for 29.",
+    "Normal and flag-off outputs byte-identical to separate Build B native replay."
+  ],
+  "guard": "FEATURE_MABUTRACE && K1_BENCH_FX_LITE_<MODE> == 1",
+  "target_effect_us": 1800,
+  "timing_proof": "root captures identical frozen recipe; no host timing claim",
+  "cost_scopes": "setup, transport, injection, finalise (including mirror); mode28 wavefront additionally"
+}

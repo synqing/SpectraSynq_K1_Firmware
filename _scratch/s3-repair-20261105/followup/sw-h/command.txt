@@ -1,0 +1,1 @@
+cd /Users/spectrasynq/SpectraSynq_K1_Firmware && nohup /bin/sh -c 'python3 -m pytest tests -q > _scratch/s3-repair-20261105/followup/host-suite.log 2>&1; rc=$?; printf "%s\n" "$rc" > _scratch/s3-repair-20261105/followup/sw-h/host-suite.exit' > _scratch/s3-repair-20261105/followup/sw-h/launcher.log 2>&1 < /dev/null &

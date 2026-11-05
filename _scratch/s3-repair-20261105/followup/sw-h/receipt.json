@@ -1,0 +1,29 @@
+{
+  "state": "finished",
+  "run": 1,
+  "git_sha": "19992ad7923efc18ff4e7ad8b60ae010531c3fb4",
+  "branch": "lane/k1-fe-release",
+  "scope": "host tests only; no firmware timing or silicon claim",
+  "command": "python3 -m pytest tests -q",
+  "launcher_command_file": "_scratch/s3-repair-20261105/followup/sw-h/command.txt",
+  "log": "_scratch/s3-repair-20261105/followup/host-suite.log",
+  "exit_file": "_scratch/s3-repair-20261105/followup/sw-h/host-suite.exit",
+  "observed_at_awst": "2026-11-05T15:48:10.900896+08:00",
+  "pid": 74997,
+  "product_files_changed": [],
+  "exit_code": 1,
+  "counts": {
+    "failed": 1,
+    "passed": 2027,
+    "skipped": 2
+  },
+  "failure": "tests/test_harness_selftest.py::test_harness_catches_injected_regressions",
+  "cause": "shutil.copytree raced PlatformIO removing generated SPECTRASYNQ_K1_FIRMWARE.ino.cpp; source listing succeeded, copying failed with ENOENT.",
+  "evidence": [
+    ".gitignore:18-19",
+    "scripts/regression-harness/golden/harness_selftest.py:147"
+  ],
+  "repair": "Orchestrator will provide a build-free window for run 2. No test or product edits.",
+  "log_sha256": "d69a92bf25f50e7bc476e6071673f5455ba72a6e2ed070ba9596f33396413134",
+  "finished_observed_at_awst": "2026-11-05T15:53:16.434191+08:00"
+}

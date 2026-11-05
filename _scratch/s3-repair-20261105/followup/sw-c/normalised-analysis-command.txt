@@ -1,0 +1,70 @@
+python3 - river-a river-b1 river-b2 before-stock stock lite lite-forge2 lite-forge3 <<'PY'
+import json, pathlib, math, hashlib, sys, platform, collections
+root=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware')
+base=root/'_scratch/s3-repair-20261105/followup'
+out=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c')
+out.mkdir(parents=True,exist_ok=True)
+contract_path=root/'tests/fixtures/scheduling_gate0/g0r_selection/contract.json'
+contract=json.loads(contract_path.read_text())['vp_contract']
+recipe='5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3'
+def stats(a):
+ if not a:return None
+ return dict(n=len(a),max=max(a),p99=sorted(a)[math.ceil(.99*len(a))-1],mean=sum(a)/len(a))
+def union_len(intervals):
+ total=0; end=-math.inf
+ for a,b in sorted(intervals):
+  total+=max(0,b-max(a,end));end=max(end,b)
+ return total
+def digest(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+tags=sys.argv[1:]
+for tag in tags:
+ folder=base/tag
+ if not (folder/'result.json').exists():continue
+ rec=json.loads((folder/'result.json').read_text())
+ assert rec['recipe_sha256']==recipe
+ modes={}
+ for path in sorted(folder.glob('trace-*.json')):
+  mode=int(path.stem.split('-')[1]);events=[e for e in json.loads(path.read_text())['traceEvents'] if 'ts' in e]
+  raw_start=min(e['ts'] for e in events)
+  raw_end=max(e['ts']+e.get('dur',0) for e in events)
+  window_end=max(e['ts']+e['dur'] for e in events if e['name']=='vp_primary_effect_body' and e['ph']=='X')
+  window_start=window_end-1000000
+  assert window_start>=raw_start, (tag,mode,'less than 1 second retained')
+  events=[e for e in events if window_start<=e['ts'] and e['ts']+e.get('dur',0)<=window_end]
+  x=[e for e in events if e['ph']=='X']
+  bodies=sorted([e for e in x if e['name']=='vp_primary_effect_body'],key=lambda e:e['ts'])
+  primary=stats([e['dur'] for e in bodies])
+  secondary=stats([e['dur'] for e in x if e['name']=='vp_secondary_effect_body'])
+  secs=collections.defaultdict(list); invocations=collections.defaultdict(list); percall=[]; calls=[]
+  for body in bodies:
+   a=body['ts'];b=a+body['dur']
+   children=[e for e in x if e is not body and e.get('tid')==body.get('tid') and a<=e['ts'] and e['ts']+e['dur']<=b and not e['name'].startswith('vp_primary_effect_body')]
+   intervals=[(e['ts'],e['ts']+e['dur']) for e in children]
+   cov=union_len(intervals);percall.append(cov/body['dur'])
+   totals=collections.defaultdict(int)
+   for e in children:
+    nested=[(c['ts'],c['ts']+c['dur']) for c in children if c is not e and e['ts']<=c['ts'] and c['ts']+c['dur']<=e['ts']+e['dur'] and (c['ts']>e['ts'] or c['dur']<e['dur'])]
+    exclusive=e['dur']-union_len(nested)
+    totals[e['name']]+=exclusive
+    invocations[e['name']].append(exclusive)
+   calls.append(dict(totals))
+  for name in sorted(set(k for c in calls for k in c)):
+   vals=[c.get(name,0) for c in calls]
+   secs[name]=dict(exclusive_per_call_us=stats(vals),exclusive_invocation_us=stats(invocations[name]),share_of_body=sum(vals)/sum(b['dur'] for b in bodies))
+  starts=sorted([e for e in events if e['name']=='vp_frame_start_us' and e['ph']=='C'],key=lambda e:e['ts'])
+  cadence=None
+  if len(starts)>=2:
+   values=[e['args']['value'] for e in starts]
+   assert all(isinstance(v,int) and -(1<<23)<=v<(1<<23) for v in values)
+   deltas=[(b-a)%(1<<24) for a,b in zip(values,values[1:])]
+   run=maxrun=0; recover=[]
+   for d in deltas:
+    if d>contract['target_period_us']:run+=1;maxrun=max(maxrun,run)
+    elif run:recover.append(run+1);run=0
+   cadence=dict(frame_start_delta_us=stats(deltas),max_consecutive_misses=maxrun,recovery_frames_max=max(recover,default=0),trailing_miss_run=run,recovery_right_censored=bool(run),max_gap_us=max(deltas),trace_elapsed_us=starts[-1]['ts']-starts[0]['ts'],counter_elapsed_us=sum(deltas),misses=sum(d>contract['target_period_us'] for d in deltas),source='vp_frame_start_us signed24 counter deltas modulo 2^24')
+  modes[str(mode)]=dict(primary_body_us=primary,secondary_body_us=secondary,sections=secs,coverage=dict(total_exclusive_scoped_share=sum(sum(c.values()) for c in calls)/sum(b['dur'] for b in bodies) if bodies else None,minimum_call_scoped_share=min(percall,default=None),body_calls=len(bodies),method='Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero'),cadence=cadence,trace_file=str(path),trace_sha256=digest(path),analysis_window=dict(start_us=window_start,end_us=window_end,duration_us=1000000,anchor='end of final complete primary body',complete_events_only=True,raw_start_us=raw_start,raw_end_us=raw_end,raw_metrics_file=str(out/(tag+'-raw-analysis.json'))),event_count=len(events),trace_window_us=max((e['ts']+e.get('dur',0) for e in events),default=0)-min((e['ts'] for e in events),default=0),available_counter_names=sorted(set(e['name'] for e in events if e['ph']=='C')))
+ result=dict(schema_version=1,analysis_status='complete',evidence_kind='host analysis of silicon trace',tag=tag,recipe_sha256=recipe,identity=rec['identity'],cpu_mhz=rec.get('cpu_mhz'),flags_file=str((folder/rec.get('flags_file','../build-flags.ini')).resolve()),flags_sha256=digest((folder/rec.get('flags_file','../build-flags.ini')).resolve()),capture_metadata={k:v for k,v in rec.items() if k!='cases'},measurement=rec.get('measurement'),result_sha256=digest(folder/'result.json'),contract_file=str(contract_path),contract_sha256=digest(contract_path),method=dict(percentile='nearest rank ceil(0.99*n)',mean='arithmetic',units='microseconds',independent_unit='capture run, not individual serially dependent frames',uncertainty='descriptive only; no confidence interval inferred',recovery='miss run length plus first on-time interval; right-censored terminal run separately reported'),environment=dict(python=sys.version,executable=sys.executable,platform=platform.platform()),modes=modes,limitations=['Rolling trace covers only the recorded tail; no whole-playback cadence claim.','Timing spans include interruptions and trace perturbation; no optical or production-build claim.','Common final 1,000,000-us window is analysis normalisation only; frozen recipe unchanged. Clip alignment is software-timed, not physical sample-locked.','Before-stock cadence unavailable unless the exact frame-start counter or equivalent verified boundary exists.'])
+ (out/(tag+'-analysis.json')).write_text(json.dumps(result,indent=2)+'\n')
+ print(tag,{m:dict(body=v['primary_body_us'],coverage=v['coverage']['total_exclusive_scoped_share'],cadence=v['cadence']) for m,v in modes.items()})
+
+PY

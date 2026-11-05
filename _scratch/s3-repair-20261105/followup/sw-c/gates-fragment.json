@@ -1,0 +1,1268 @@
+[
+  {
+    "item": "C stock coverage common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+      "coverage"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "coverage",
+      "tag": "stock",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C stock coverage full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+      "coverage"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "coverage",
+      "tag": "stock",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C stock cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "stock",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C stock cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "stock",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C stock hard_ceiling common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+      "hard_ceiling"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "hard_ceiling",
+      "tag": "stock",
+      "errors": [
+        "14 max 2350>2000",
+        "15 max 2356>2000",
+        "19 max 2545>2000",
+        "21 max 3814>2000",
+        "24 max 3802>2000",
+        "28 max 2476>2000",
+        "29 max 2585>2000"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C stock hard_ceiling full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+      "hard_ceiling"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "hard_ceiling",
+      "tag": "stock",
+      "errors": [
+        "14 max 2354>2000",
+        "15 max 2374>2000",
+        "19 max 2545>2000",
+        "21 max 3814>2000",
+        "24 max 3803>2000",
+        "28 max 2492>2000",
+        "29 max 2585>2000"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/stock-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C before-stock cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "before-stock",
+      "errors": [
+        "14 cadence unverified",
+        "15 cadence unverified",
+        "19 cadence unverified",
+        "21 cadence unverified",
+        "24 cadence unverified",
+        "28 cadence unverified",
+        "29 cadence unverified"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C before-stock cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "before-stock",
+      "errors": [
+        "14 cadence unverified",
+        "15 cadence unverified",
+        "19 cadence unverified",
+        "21 cadence unverified",
+        "24 cadence unverified",
+        "28 cadence unverified",
+        "29 cadence unverified"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/before-stock-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "85da2224",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+      "version": "40103",
+      "git": "85da2224",
+      "epoch": "1793867434"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-raw-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "85da2224",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+      "version": "40103",
+      "git": "85da2224",
+      "epoch": "1793867434"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite lite_target common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite",
+      "errors": [
+        "21 max 2666>1800",
+        "24 max 2817>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "85da2224",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+      "version": "40103",
+      "git": "85da2224",
+      "epoch": "1793867434"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite lite_target full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-raw-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite",
+      "errors": [
+        "21 max 2666>1800",
+        "24 max 2882>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "85da2224",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+      "version": "40103",
+      "git": "85da2224",
+      "epoch": "1793867434"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge2 cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite-forge2",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "f87fe1f2",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+      "version": "40103",
+      "git": "f87fe1f2",
+      "epoch": "1793867894"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge2 cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-raw-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite-forge2",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "f87fe1f2",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+      "version": "40103",
+      "git": "f87fe1f2",
+      "epoch": "1793867894"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge2 lite_target common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite-forge2",
+      "errors": [
+        "24 max 1983>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "f87fe1f2",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+      "version": "40103",
+      "git": "f87fe1f2",
+      "epoch": "1793867894"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge2 lite_target full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-raw-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite-forge2",
+      "errors": [
+        "24 max 1990>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge2-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "f87fe1f2",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+      "version": "40103",
+      "git": "f87fe1f2",
+      "epoch": "1793867894"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge3 cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite-forge3",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "8accab34",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+      "version": "40103",
+      "git": "8accab34",
+      "epoch": "1793868705"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge3 cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-raw-analysis.json",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "kind": "cadence",
+      "tag": "lite-forge3",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "8accab34",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+      "version": "40103",
+      "git": "8accab34",
+      "epoch": "1793868705"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge3 lite_target common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite-forge3",
+      "errors": [
+        "24 max 1807>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "8accab34",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+      "version": "40103",
+      "git": "8accab34",
+      "epoch": "1793868705"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C lite-forge3 lite_target full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\np,kind=sys.argv[1:];r=json.load(open(p));contract=json.load(open(r['contract_file']))['vp_contract'];expected={'24'} if r['tag']=='lite-forge3' else {'14','15','19','21','24','28','29'};errors=[]\nif not expected<=set(r['modes']):errors.append('missing modes')\nfor m in sorted(expected & set(r['modes'])):\n v=r['modes'][m]\n if kind=='coverage':\n  for key in ['total_exclusive_scoped_share','minimum_call_scoped_share']:\n   if v['coverage'][key] is None or not .90<=v['coverage'][key]<=1:errors.append(f'{m} {key} {v[\"coverage\"][key]}')\n elif kind=='cadence':\n  d=v['cadence']\n  if d is None:errors.append(f'{m} cadence unverified');continue\n  values={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{contract[\"admission\"][k]}' for k,x in values.items() if x>contract['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} recovery right censored')\n else:\n  limit=1800 if kind=='lite_target' else contract['effect_code_hard_ceiling_us']\n  if v['primary_body_us']['max']>limit:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{limit}')\nprint(json.dumps({'kind':kind,'tag':r['tag'],'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-raw-analysis.json",
+      "lite_target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "kind": "lite_target",
+      "tag": "lite-forge3",
+      "errors": [
+        "24 max 1807>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/lite-forge3-raw-analysis.json",
+    "baseline_identity": {
+      "expected_git": "9f3eb18e",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+      "version": "40103",
+      "git": "9f3eb18e",
+      "epoch": "1793866695"
+    },
+    "candidate_identity": {
+      "expected_git": "8accab34",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+      "version": "40103",
+      "git": "8accab34",
+      "epoch": "1793868705"
+    },
+    "scope": "Recorded silicon diagnostic trace only; contract or brief absolute criterion, no implied before/after cadence equivalence.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite target common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "common1s",
+      "target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "window": "common1s",
+      "kind": "target",
+      "errors": [
+        "24 max 1807>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite hard_ceiling common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "common1s",
+      "hard_ceiling"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "window": "common1s",
+      "kind": "hard_ceiling",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite cadence common1s",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "common1s",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "window": "common1s",
+      "kind": "cadence",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite target full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "full_retained",
+      "target"
+    ],
+    "exit_code": 1,
+    "stdout": {
+      "window": "full_retained",
+      "kind": "target",
+      "errors": [
+        "24 max 1807>1800"
+      ]
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite hard_ceiling full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "full_retained",
+      "hard_ceiling"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "window": "full_retained",
+      "kind": "hard_ceiling",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  },
+  {
+    "item": "C selected lite cadence full_retained",
+    "command": [
+      "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "-c",
+      "import json,sys\ntable=json.load(open(sys.argv[1]));window=sys.argv[2];kind=sys.argv[3];c=json.load(open(table['sources']['stock']['contract_file']))['vp_contract'];errors=[]\nassert set(table['modes'])=={'14','15','19','21','24','28','29'}\nfor m,row in table['modes'].items():\n v=row['lite'] if window=='common1s' else row['lite']['full_retained_trace']\n if kind=='target':\n  if v['primary_body_us']['max']>1800:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>1800')\n elif kind=='hard_ceiling':\n  if v['primary_body_us']['max']>c['effect_code_hard_ceiling_us']:errors.append(f'{m} max {v[\"primary_body_us\"][\"max\"]}>{c[\"effect_code_hard_ceiling_us\"]}')\n else:\n  d=v['cadence'];assert d is not None\n  vals={'frame_start_delta_p99_max_us':d['frame_start_delta_us']['p99'],'arithmetic_mean_max_us':d['frame_start_delta_us']['mean'],'max_consecutive_misses':d['max_consecutive_misses'],'recovery_frames_max':d['recovery_frames_max']}\n  errors.extend(f'{m} {k} {x}>{c[\"admission\"][k]}' for k,x in vals.items() if x>c['admission'][k])\n  if d['recovery_right_censored']:errors.append(f'{m} right-censored recovery')\nprint(json.dumps({'window':window,'kind':kind,'errors':errors}))\nsys.exit(bool(errors))\n",
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+      "full_retained",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stdout": {
+      "window": "full_retained",
+      "kind": "cadence",
+      "errors": []
+    },
+    "receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/effect-cost-table.json",
+    "baseline_identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "candidate_identities": {
+      "14": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "15": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "19": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "21": {
+        "expected_git": "f87fe1f2",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+        "version": "40103",
+        "git": "f87fe1f2",
+        "epoch": "1793867894"
+      },
+      "24": {
+        "expected_git": "8accab34",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+        "version": "40103",
+        "git": "8accab34",
+        "epoch": "1793868705"
+      },
+      "28": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      },
+      "29": {
+        "expected_git": "85da2224",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+        "version": "40103",
+        "git": "85da2224",
+        "epoch": "1793867434"
+      }
+    },
+    "scope": "Explicitly selected source per mode; comparisons retain all raw observed maxima.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3"
+  }
+]

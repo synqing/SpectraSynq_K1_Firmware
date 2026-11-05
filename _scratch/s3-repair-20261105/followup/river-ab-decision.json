@@ -27,33 +27,33 @@
     }
   },
   "source_analysis_files": [
-    "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-a-analysis.json",
-    "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-b1-analysis.json",
-    "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-b2-analysis.json"
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-a-analysis.json",
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-b1-analysis.json",
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-b2-analysis.json"
   ],
   "method": "A max must improve on both B maxima by more than max(abs(B1max-B2max),abs(B1p99-B2p99)) for every mode. Both repeat noise deltas shown. One A run, two B runs; descriptive decision, no statistical confidence claimed.",
   "rows": {
     "14": {
       "a": {
-        "n": 251,
+        "n": 144,
         "max": 2345,
-        "p99": 2307,
-        "mean": 2105.3824701195217
+        "p99": 2320,
+        "mean": 2112.0555555555557
       },
       "b1": {
-        "n": 251,
+        "n": 143,
         "max": 2328,
-        "p99": 2325,
-        "mean": 2111.4940239043826
+        "p99": 2326,
+        "mean": 2113.5384615384614
       },
       "b2": {
-        "n": 251,
+        "n": 143,
         "max": 2369,
-        "p99": 2355,
-        "mean": 2131.605577689243
+        "p99": 2358,
+        "mean": 2129.195804195804
       },
       "max_repeat_noise_us": 41,
-      "p99_repeat_noise_us": 30,
+      "p99_repeat_noise_us": 32,
       "conservative_noise_us": 41,
       "a_max_improvement_vs_b1_us": -17,
       "a_max_improvement_vs_b2_us": 24,
@@ -61,25 +61,25 @@
     },
     "15": {
       "a": {
-        "n": 291,
+        "n": 144,
         "max": 2308,
-        "p99": 2295,
-        "mean": 2082.4570446735397
+        "p99": 2305,
+        "mean": 2085.6388888888887
       },
       "b1": {
-        "n": 292,
+        "n": 144,
         "max": 2309,
         "p99": 2299,
-        "mean": 2096.8253424657532
+        "mean": 2115.8194444444443
       },
       "b2": {
-        "n": 291,
+        "n": 144,
         "max": 2336,
-        "p99": 2306,
-        "mean": 2090.4707903780068
+        "p99": 2304,
+        "mean": 2098.2361111111113
       },
       "max_repeat_noise_us": 27,
-      "p99_repeat_noise_us": 7,
+      "p99_repeat_noise_us": 5,
       "conservative_noise_us": 27,
       "a_max_improvement_vs_b1_us": 1,
       "a_max_improvement_vs_b2_us": 28,
@@ -87,95 +87,97 @@
     },
     "19": {
       "a": {
-        "n": 292,
-        "max": 2390,
-        "p99": 2379,
-        "mean": 2145.5582191780823
+        "n": 144,
+        "max": 2374,
+        "p99": 2364,
+        "mean": 2154.5694444444443
       },
       "b1": {
-        "n": 291,
+        "n": 143,
         "max": 2409,
-        "p99": 2400,
-        "mean": 2158.487972508591
+        "p99": 2407,
+        "mean": 2157.5524475524476
       },
       "b2": {
-        "n": 291,
-        "max": 2398,
-        "p99": 2385,
-        "mean": 2158.5807560137455
+        "n": 143,
+        "max": 2393,
+        "p99": 2381,
+        "mean": 2152.5174825174827
       },
-      "max_repeat_noise_us": 11,
-      "p99_repeat_noise_us": 15,
-      "conservative_noise_us": 15,
-      "a_max_improvement_vs_b1_us": 19,
-      "a_max_improvement_vs_b2_us": 8,
+      "max_repeat_noise_us": 16,
+      "p99_repeat_noise_us": 26,
+      "conservative_noise_us": 26,
+      "a_max_improvement_vs_b1_us": 35,
+      "a_max_improvement_vs_b2_us": 19,
       "keep_criterion_satisfied": false
     },
     "28": {
       "a": {
-        "n": 292,
-        "max": 2352,
-        "p99": 2343,
-        "mean": 2122.551369863014
+        "n": 144,
+        "max": 2343,
+        "p99": 2339,
+        "mean": 2125.284722222222
       },
       "b1": {
-        "n": 292,
-        "max": 2403,
-        "p99": 2361,
-        "mean": 2129.7568493150684
+        "n": 143,
+        "max": 2337,
+        "p99": 2337,
+        "mean": 2134.713286713287
       },
       "b2": {
-        "n": 292,
-        "max": 2381,
-        "p99": 2362,
-        "mean": 2137.3630136986303
+        "n": 143,
+        "max": 2357,
+        "p99": 2350,
+        "mean": 2138.923076923077
       },
-      "max_repeat_noise_us": 22,
-      "p99_repeat_noise_us": 1,
-      "conservative_noise_us": 22,
-      "a_max_improvement_vs_b1_us": 51,
-      "a_max_improvement_vs_b2_us": 29,
-      "keep_criterion_satisfied": true
+      "max_repeat_noise_us": 20,
+      "p99_repeat_noise_us": 13,
+      "conservative_noise_us": 20,
+      "a_max_improvement_vs_b1_us": -6,
+      "a_max_improvement_vs_b2_us": 14,
+      "keep_criterion_satisfied": false
     },
     "29": {
       "a": {
-        "n": 291,
+        "n": 144,
         "max": 2455,
-        "p99": 2426,
-        "mean": 2198.907216494845
+        "p99": 2424,
+        "mean": 2203.2916666666665
       },
       "b1": {
-        "n": 291,
-        "max": 2465,
-        "p99": 2451,
-        "mean": 2189.2439862542956
+        "n": 143,
+        "max": 2424,
+        "p99": 2406,
+        "mean": 2185.671328671329
       },
       "b2": {
-        "n": 291,
+        "n": 143,
         "max": 2431,
-        "p99": 2413,
-        "mean": 2175.72852233677
+        "p99": 2410,
+        "mean": 2171.3006993006993
       },
-      "max_repeat_noise_us": 34,
-      "p99_repeat_noise_us": 38,
-      "conservative_noise_us": 38,
-      "a_max_improvement_vs_b1_us": 10,
+      "max_repeat_noise_us": 7,
+      "p99_repeat_noise_us": 4,
+      "conservative_noise_us": 7,
+      "a_max_improvement_vs_b1_us": -31,
       "a_max_improvement_vs_b2_us": -24,
       "keep_criterion_satisfied": false
     }
   },
   "decision": "revert",
   "gate": {
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
     "command": [
       "/opt/homebrew/opt/python@3.14/bin/python3.14",
       "-c",
       "import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if all(x['keep_criterion_satisfied'] for x in r['rows'].values()) else 1)",
-      "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-noise-table.json"
+      "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-noise-table.json"
     ],
     "exit_code": 1,
     "criterion": "brief 3.3, all five modes faster beyond measured repeat noise",
     "baseline_git": "f6e9d52f",
     "candidate_git": "54480cae"
   },
-  "reproduction_command_receipt": "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-noise-command.txt"
+  "reproduction_command_receipt": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-noise-command.txt",
+  "analysis_normalisation": "Final 1,000,000 us ending final complete primary body; complete events only. Recipe unchanged. Software-timed clip alignment, not physical sample lock."
 }

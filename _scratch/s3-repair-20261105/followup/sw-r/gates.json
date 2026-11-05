@@ -1,0 +1,64 @@
+[
+  {
+    "gate": "revert diff whitespace",
+    "command": "git diff --cached --check",
+    "exit_code": 0
+  },
+  {
+    "gate": "full suite precommit",
+    "command": "git commit pre-commit pytest tests/ -q",
+    "exit_code": null,
+    "result": "SIGTERM to avoid duplicate H-owned full suite",
+    "receipt": "hook-termination.json"
+  },
+  {
+    "gate": "Build B trace build",
+    "command": "pio run -e k1_fe_bench_b489_trace_dev",
+    "exit_code": 0,
+    "receipt": "build-b.log"
+  },
+  {
+    "gate": "independent B native parity five modes",
+    "command": "cmp previous-b779e561/mode.bin baseline-native/mode.bin",
+    "exit_code": 0,
+    "receipt": "baseline-native-independent-parity.json"
+  },
+  {
+    "gate": "17 focused tests",
+    "command": "python3 -m pytest tests/test_sprite_upper_transport.py tests/test_palette_hd_static.py tests/test_snapwave_pulse_static.py -q",
+    "exit_code": 0,
+    "receipt": "focused.json"
+  },
+  {
+    "gate": "stock scopes trace build",
+    "command": "pio run -e k1_fe_bench_b489_trace_dev",
+    "exit_code": 0,
+    "receipt": "stock-scopes-build.log"
+  },
+  {
+    "gate": "flag-off native parity five modes",
+    "command": "existing long_scenario/run_case; cmp baseline-native/mode.bin flagoff-native/mode.bin",
+    "exit_code": 0,
+    "receipt": "flagoff-native/receipt.json"
+  },
+  {
+    "gate": "compile guard expected outcomes",
+    "command": "clang++ -E -x c++ on actual source guard in 4 contexts per mode",
+    "exit_code": 0,
+    "receipt": "compile-guard.json",
+    "expected_negative_compile_exit": 1
+  },
+  {
+    "gate": "river lookup retention",
+    "command": "independent A/B1/B2 strict improvement gate",
+    "exit_code": 1,
+    "receipt": "../river-ab-decision.json",
+    "action": "whole lookup and reciprocal reverted"
+  },
+  {
+    "gate": "river target/cadence/coverage/sanity",
+    "command": "assert every river lite max <=1800 and cadence p99/mean<=8333, consecutive misses<=1, recovery<=2 in both common1s/full-tail windows; stock scoped share>=0.90; existing frame sanity true",
+    "exit_code": 0,
+    "receipt": "measured-gates.json"
+  }
+]

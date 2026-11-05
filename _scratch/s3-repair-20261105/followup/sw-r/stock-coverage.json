@@ -1,0 +1,42 @@
+{
+  "source": "../effect-cost-table.json",
+  "command": "assert aggregate and minimum per-call section share >=0.90 for five river modes",
+  "exit_code": 0,
+  "rows": [
+    {
+      "mode": 14,
+      "total_exclusive_scoped_share": 0.9537155337795334,
+      "minimum_call_scoped_share": 0.9334883720930233,
+      "body_calls": 240,
+      "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+    },
+    {
+      "mode": 15,
+      "total_exclusive_scoped_share": 0.9558884008939103,
+      "minimum_call_scoped_share": 0.9383910386965377,
+      "body_calls": 240,
+      "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+    },
+    {
+      "mode": 19,
+      "total_exclusive_scoped_share": 0.9531540400873695,
+      "minimum_call_scoped_share": 0.9313052011776252,
+      "body_calls": 240,
+      "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+    },
+    {
+      "mode": 28,
+      "total_exclusive_scoped_share": 0.9426363680599484,
+      "minimum_call_scoped_share": 0.9231770833333334,
+      "body_calls": 230,
+      "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+    },
+    {
+      "mode": 29,
+      "total_exclusive_scoped_share": 0.9454276661591512,
+      "minimum_call_scoped_share": 0.9247747747747748,
+      "body_calls": 240,
+      "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+    }
+  ]
+}

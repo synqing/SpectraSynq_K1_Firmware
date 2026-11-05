@@ -1,0 +1,49 @@
+{
+  "identity": {
+    "expected_git": "8accab34",
+    "env": "k1_fe_bench_b489_trace_dev",
+    "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+    "version": "40103",
+    "git": "8accab34",
+    "epoch": "1793868705"
+  },
+  "original_route": "External Headphones",
+  "cases": {
+    "24": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=2263200 short=0 err=0 rmsL=49493 rmsR=49380 minL=-229279 maxL=225469 minR=-221351 maxR=226467 clip=0 n=1121400\n[PCMRS] in=1121400 out=299040 blocks=3115 invariant=PASS\n[PCMOVF] ovf=26 ovf_bytes=9360 dropped_frames_signaled=1560 dropped_exact=UNKNOWN ring_drop=30960 acq=2312820 cons=2232000 canon=3115 hw=2040\n[PCMCAN] rms=10.8 peak=55 n=299040 trim_q15=2048 mono=MID\n[PCMSNAP] frames=2048 bytes=12288 dump=hex24le\n[PCMSNAP] 0 54FFFF 89FEFF\n[PCMSNAP] 1 14FFFF 210000\n[PCMSNAP] 2 3CFFFF 41FFFF\n[PCMSNAP] 3 1CFEFF 19FFFF\n[PCMSNAP] 4 ECFFFF A1FFFF\n[PCMSNAP] 5 0CFFFF 29FFFF\n[PCMSNAP] 6 B4FFFF B1FFFF\n[PCMSNAP] 7 E4FDFF 19FFFF\n[PCMSNAP] 8 E4FEFF 59FFFF\n[PCMSNAP] 9 74FFFF E1FEFF\n[PCMSNAP] 10 DCFFFF 090100\n[PCMSNAP] 11 ECFFFF E9FEFF\n[PCMSNAP] 12 FCFDFF 39FFFF\n[PCMSNAP] 13 8CFEFF 41FFFF\n[PCMSNAP] 14 1CFEFF 31FFFF\n[PCMSNAP] 15 F5FEFF 62FFFF\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=2289120 short=0 err=0 rmsL=86076 rmsR=82596 minL=-218184 maxL=219390 minR=-217833 maxR=220374 clip=0 n=25920\n[PCMRS] in=1147320 out=305952 blocks=3187 invariant=PASS\n[PCMOVF] ovf=26 ovf_bytes=9360 dropped_frames_signaled=1560 dropped_exact=UNKNOWN ring_drop=30960 acq=2338740 cons=2257920 canon=3187 hw=2040\n[PCMRATE2] dt_s=0.540 acq_hz=48000.5 cons_hz=48000.5 canon_hz=133.33 lrck_hz=47996.1 authority=esp_timer\n[PCMCAN] rms=20.1 peak=53 n=6912 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-24-music.txt",
+        "header": {
+          "frames": "79",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "f763d90a"
+        },
+        "frames": 79,
+        "nonzero_frames": 79,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    }
+  },
+  "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "cpu_mhz": 240,
+  "flags_file": "../lite-build-flags.ini",
+  "measurement": "measured on silicon",
+  "common_flags_file": "../build-flags.ini",
+  "treatment_flags": [
+    "-DK1_BENCH_FX_LITE_14=1",
+    "-DK1_BENCH_FX_LITE_15=1",
+    "-DK1_BENCH_FX_LITE_19=1",
+    "-DK1_BENCH_FX_LITE_21=1",
+    "-DK1_BENCH_FX_LITE_24=1",
+    "-DK1_BENCH_FX_LITE_28=1",
+    "-DK1_BENCH_FX_LITE_29=1"
+  ],
+  "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2"
+}

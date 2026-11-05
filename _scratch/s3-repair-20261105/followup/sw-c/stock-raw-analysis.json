@@ -1,0 +1,1005 @@
+{
+  "schema_version": 1,
+  "analysis_status": "complete",
+  "evidence_kind": "host analysis of silicon trace",
+  "tag": "stock",
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "identity": {
+    "expected_git": "0715cb4b",
+    "env": "k1_fe_bench_b489_trace_dev",
+    "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+    "version": "40103",
+    "git": "0715cb4b",
+    "epoch": "1793867096"
+  },
+  "cpu_mhz": 240,
+  "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+  "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+  "capture_metadata": {
+    "identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "original_route": "External Headphones",
+    "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+    "cpu_mhz": 240,
+    "flags_file": "../build-flags.ini",
+    "measurement": "measured on silicon"
+  },
+  "measurement": "measured on silicon",
+  "result_sha256": "21c8f4ee4da98d432822cb98f86d3a281a531ea46563e255427ce2fda1fb99a7",
+  "contract_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/tests/fixtures/scheduling_gate0/g0r_selection/contract.json",
+  "contract_sha256": "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0",
+  "method": {
+    "percentile": "nearest rank ceil(0.99*n)",
+    "mean": "arithmetic",
+    "units": "microseconds",
+    "independent_unit": "capture run, not individual serially dependent frames",
+    "uncertainty": "descriptive only; no confidence interval inferred",
+    "recovery": "miss run length plus first on-time interval; right-censored terminal run separately reported"
+  },
+  "environment": {
+    "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+    "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+    "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+  },
+  "modes": {
+    "14": {
+      "primary_body_us": {
+        "n": 240,
+        "max": 2354,
+        "p99": 2346,
+        "mean": 2132.825
+      },
+      "secondary_body_us": {
+        "n": 240,
+        "max": 711,
+        "p99": 667,
+        "mean": 537.6458333333334
+      },
+      "sections": {
+        "river14_finalise": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 114,
+            "p99": 111,
+            "mean": 85.62083333333334
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 114,
+            "p99": 111,
+            "mean": 85.62083333333334
+          },
+          "share_of_body": 0.04014433126643458
+        },
+        "river14_injection": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 1990,
+            "p99": 1974,
+            "mean": 1750.1333333333334
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 1990,
+            "p99": 1974,
+            "mean": 1750.1333333333334
+          },
+          "share_of_body": 0.8205705265707844
+        },
+        "river14_setup": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 101,
+            "p99": 84,
+            "mean": 57.05
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 101,
+            "p99": 84,
+            "mean": 57.05
+          },
+          "share_of_body": 0.026748561180593815
+        },
+        "river14_transport": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 192,
+            "p99": 184,
+            "mean": 141.30416666666667
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 192,
+            "p99": 184,
+            "mean": 141.30416666666667
+          },
+          "share_of_body": 0.06625211476172056
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9537155337795334,
+        "minimum_call_scoped_share": 0.9334883720930233,
+        "body_calls": 240,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 240,
+          "max": 7478,
+          "p99": 7041,
+          "mean": 6954.166666666667
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7478,
+        "trace_elapsed_us": 1668999,
+        "counter_elapsed_us": 1669000,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-14.json",
+      "trace_sha256": "4ea96a60396b98b73033307c9e05f2c199874ee9e09ed19cb65487cc46fb5fcf",
+      "event_count": 5461,
+      "trace_window_us": 1674156,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "15": {
+      "primary_body_us": {
+        "n": 240,
+        "max": 2374,
+        "p99": 2356,
+        "mean": 2147.866666666667
+      },
+      "secondary_body_us": {
+        "n": 241,
+        "max": 703,
+        "p99": 687,
+        "mean": 529.792531120332
+      },
+      "sections": {
+        "river15_finalise": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 110,
+            "p99": 105,
+            "mean": 85.425
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 110,
+            "p99": 105,
+            "mean": 85.425
+          },
+          "share_of_body": 0.039772021851139115
+        },
+        "river15_injection": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 1959,
+            "p99": 1955,
+            "mean": 1748.0875
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 1959,
+            "p99": 1955,
+            "mean": 1748.0875
+          },
+          "share_of_body": 0.8138715159227761
+        },
+        "river15_setup": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 107,
+            "p99": 103,
+            "mean": 72.45833333333333
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 107,
+            "p99": 103,
+            "mean": 72.45833333333333
+          },
+          "share_of_body": 0.03373502389968341
+        },
+        "river15_transport": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 193,
+            "p99": 191,
+            "mean": 147.15
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 193,
+            "p99": 191,
+            "mean": 147.15
+          },
+          "share_of_body": 0.06850983922031163
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9558884008939103,
+        "minimum_call_scoped_share": 0.9383910386965377,
+        "body_calls": 240,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 239,
+          "max": 7054,
+          "p99": 7049,
+          "mean": 6964.514644351464
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7054,
+        "trace_elapsed_us": 1664517,
+        "counter_elapsed_us": 1664519,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-15.json",
+      "trace_sha256": "2e8f1bef37b8545b1d32b20b6838904be4b60d1830c633bfc663732c6f052660",
+      "event_count": 5461,
+      "trace_window_us": 1673917,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "19": {
+      "primary_body_us": {
+        "n": 240,
+        "max": 2545,
+        "p99": 2468,
+        "mean": 2226.179166666667
+      },
+      "secondary_body_us": {
+        "n": 240,
+        "max": 709,
+        "p99": 668,
+        "mean": 499.10833333333335
+      },
+      "sections": {
+        "river19_finalise": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 117,
+            "p99": 113,
+            "mean": 86.2625
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 117,
+            "p99": 113,
+            "mean": 86.2625
+          },
+          "share_of_body": 0.03874912733513887
+        },
+        "river19_injection": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 1973,
+            "p99": 1962,
+            "mean": 1754.075
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 1973,
+            "p99": 1962,
+            "mean": 1754.075
+          },
+          "share_of_body": 0.7879307408246191
+        },
+        "river19_setup": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 220,
+            "p99": 214,
+            "mean": 137.77083333333334
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 220,
+            "p99": 214,
+            "mean": 137.77083333333334
+          },
+          "share_of_body": 0.06188667803392584
+        },
+        "river19_transport": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 184,
+            "p99": 183,
+            "mean": 143.78333333333333
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 184,
+            "p99": 183,
+            "mean": 143.78333333333333
+          },
+          "share_of_body": 0.06458749389368555
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9531540400873695,
+        "minimum_call_scoped_share": 0.9313052011776252,
+        "body_calls": 240,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 239,
+          "max": 7049,
+          "p99": 7033,
+          "mean": 7000.050209205021
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7049,
+        "trace_elapsed_us": 1673016,
+        "counter_elapsed_us": 1673012,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-19.json",
+      "trace_sha256": "729bef961e3180402df9bc5501602fcf97f5d9decc71477f5a291f1cd7d73688",
+      "event_count": 5461,
+      "trace_window_us": 1681872,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "21": {
+      "primary_body_us": {
+        "n": 202,
+        "max": 3814,
+        "p99": 3670,
+        "mean": 3342.960396039604
+      },
+      "secondary_body_us": {
+        "n": 201,
+        "max": 657,
+        "p99": 523,
+        "mean": 329.12935323383084
+      },
+      "sections": {
+        "df21_colour": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 251,
+            "p99": 235,
+            "mean": 177.33663366336634
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 251,
+            "p99": 235,
+            "mean": 177.33663366336634
+          },
+          "share_of_body": 0.05304778180245765
+        },
+        "df21_finalise": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 94,
+            "p99": 86,
+            "mean": 55.45049504950495
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 94,
+            "p99": 86,
+            "mean": 55.45049504950495
+          },
+          "share_of_body": 0.016587242587497296
+        },
+        "df21_lattice": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 170,
+            "p99": 170,
+            "mean": 127.60396039603961
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 170,
+            "p99": 170,
+            "mean": 127.60396039603961
+          },
+          "share_of_body": 0.038170945891914144
+        },
+        "df21_moire": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 2859,
+            "p99": 2632,
+            "mean": 2315.0940594059407
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 2859,
+            "p99": 2632,
+            "mean": 2315.0940594059407
+          },
+          "share_of_body": 0.69252811434698
+        },
+        "df21_setup": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 263,
+            "p99": 241,
+            "mean": 181.8861386138614
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 263,
+            "p99": 241,
+            "mean": 181.8861386138614
+          },
+          "share_of_body": 0.0544087027861118
+        },
+        "df21_streak": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 330,
+            "p99": 318,
+            "mean": 183.5990099009901
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 330,
+            "p99": 318,
+            "mean": 183.5990099009901
+          },
+          "share_of_body": 0.05492108435340704
+        },
+        "df21_transport": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 203,
+            "p99": 196,
+            "mean": 147.4851485148515
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 203,
+            "p99": 196,
+            "mean": 147.4851485148515
+          },
+          "share_of_body": 0.04411812616433528
+        },
+        "df21_transport_setup": {
+          "exclusive_per_call_us": {
+            "n": 202,
+            "max": 21,
+            "p99": 19,
+            "mean": 9.732673267326733
+          },
+          "exclusive_invocation_us": {
+            "n": 202,
+            "max": 21,
+            "p99": 19,
+            "mean": 9.732673267326733
+          },
+          "share_of_body": 0.002911393529775885
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9566933914624791,
+        "minimum_call_scoped_share": 0.9398235664776308,
+        "body_calls": 202,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 201,
+          "max": 8509,
+          "p99": 8045,
+          "mean": 7596.805970149254
+        },
+        "max_consecutive_misses": 1,
+        "recovery_frames_max": 2,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8509,
+        "trace_elapsed_us": 1526949,
+        "counter_elapsed_us": 1526958,
+        "misses": 1,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-21.json",
+      "trace_sha256": "792e5bc45c2f296f047501a15a06496581483bc80c73f00dba63988b83ac4977",
+      "event_count": 5461,
+      "trace_window_us": 1533673,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "24": {
+      "primary_body_us": {
+        "n": 201,
+        "max": 3803,
+        "p99": 3726,
+        "mean": 3367.313432835821
+      },
+      "secondary_body_us": {
+        "n": 202,
+        "max": 546,
+        "p99": 487,
+        "mean": 338.1237623762376
+      },
+      "sections": {
+        "df24_colour": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 277,
+            "p99": 275,
+            "mean": 212.32835820895522
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 277,
+            "p99": 275,
+            "mean": 212.32835820895522
+          },
+          "share_of_body": 0.06305571561544258
+        },
+        "df24_finalise": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 114,
+            "p99": 100,
+            "mean": 56.38308457711443
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 114,
+            "p99": 100,
+            "mean": 56.38308457711443
+          },
+          "share_of_body": 0.016744234150377495
+        },
+        "df24_lattice": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 168,
+            "p99": 162,
+            "mean": 121.35820895522389
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 168,
+            "p99": 162,
+            "mean": 121.35820895522389
+          },
+          "share_of_body": 0.03604006914587119
+        },
+        "df24_moire": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 2830,
+            "p99": 2631,
+            "mean": 2321.6069651741295
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 2830,
+            "p99": 2631,
+            "mean": 2321.6069651741295
+          },
+          "share_of_body": 0.6894537771670878
+        },
+        "df24_setup": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 221,
+            "p99": 218,
+            "mean": 174.09950248756218
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 221,
+            "p99": 218,
+            "mean": 174.09950248756218
+          },
+          "share_of_body": 0.05170279095193771
+        },
+        "df24_streak": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 301,
+            "p99": 283,
+            "mean": 178.1592039800995
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 301,
+            "p99": 283,
+            "mean": 178.1592039800995
+          },
+          "share_of_body": 0.052908411270186015
+        },
+        "df24_transport": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 211,
+            "p99": 206,
+            "mean": 147.7810945273632
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 211,
+            "p99": 206,
+            "mean": 147.7810945273632
+          },
+          "share_of_body": 0.043886943545646616
+        },
+        "df24_transport_setup": {
+          "exclusive_per_call_us": {
+            "n": 201,
+            "max": 19,
+            "p99": 19,
+            "mean": 8.338308457711443
+          },
+          "exclusive_invocation_us": {
+            "n": 201,
+            "max": 19,
+            "p99": 19,
+            "mean": 8.338308457711443
+          },
+          "share_of_body": 0.0024762495752256846
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.956268191421775,
+        "minimum_call_scoped_share": 0.9396970563018006,
+        "body_calls": 201,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 201,
+          "max": 8490,
+          "p99": 8043,
+          "mean": 7646.63184079602
+        },
+        "max_consecutive_misses": 1,
+        "recovery_frames_max": 2,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8490,
+        "trace_elapsed_us": 1536983,
+        "counter_elapsed_us": 1536973,
+        "misses": 1,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-24.json",
+      "trace_sha256": "d0c2cd0a433f1830dab7af212c13438f96fa404a5492928e97f2698cdf7d83c0",
+      "event_count": 5461,
+      "trace_window_us": 1541660,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "28": {
+      "primary_body_us": {
+        "n": 230,
+        "max": 2492,
+        "p99": 2466,
+        "mean": 2233.804347826087
+      },
+      "secondary_body_us": {
+        "n": 230,
+        "max": 659,
+        "p99": 651,
+        "mean": 523.591304347826
+      },
+      "sections": {
+        "river28_finalise": {
+          "exclusive_per_call_us": {
+            "n": 230,
+            "max": 129,
+            "p99": 124,
+            "mean": 90.54782608695652
+          },
+          "exclusive_invocation_us": {
+            "n": 230,
+            "max": 129,
+            "p99": 124,
+            "mean": 90.54782608695652
+          },
+          "share_of_body": 0.040535253758941174
+        },
+        "river28_injection": {
+          "exclusive_per_call_us": {
+            "n": 230,
+            "max": 2012,
+            "p99": 1978,
+            "mean": 1749.9565217391305
+          },
+          "exclusive_invocation_us": {
+            "n": 230,
+            "max": 2012,
+            "p99": 1978,
+            "mean": 1749.9565217391305
+          },
+          "share_of_body": 0.7833974015862974
+        },
+        "river28_setup": {
+          "exclusive_per_call_us": {
+            "n": 230,
+            "max": 172,
+            "p99": 166,
+            "mean": 109.14782608695653
+          },
+          "exclusive_invocation_us": {
+            "n": 230,
+            "max": 172,
+            "p99": 166,
+            "mean": 109.14782608695653
+          },
+          "share_of_body": 0.04886185587076055
+        },
+        "river28_transport": {
+          "exclusive_per_call_us": {
+            "n": 230,
+            "max": 200,
+            "p99": 197,
+            "mean": 144.3217391304348
+          },
+          "exclusive_invocation_us": {
+            "n": 230,
+            "max": 200,
+            "p99": 197,
+            "mean": 144.3217391304348
+          },
+          "share_of_body": 0.06460804827015718
+        },
+        "river28_wavefront": {
+          "exclusive_per_call_us": {
+            "n": 230,
+            "max": 25,
+            "p99": 22,
+            "mean": 11.691304347826087
+          },
+          "exclusive_invocation_us": {
+            "n": 230,
+            "max": 25,
+            "p99": 22,
+            "mean": 11.691304347826087
+          },
+          "share_of_body": 0.00523380857379203
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9426363680599484,
+        "minimum_call_scoped_share": 0.9231770833333334,
+        "body_calls": 230,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 229,
+          "max": 7050,
+          "p99": 7036,
+          "mean": 6999.903930131004
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7050,
+        "trace_elapsed_us": 1602979,
+        "counter_elapsed_us": 1602978,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-28.json",
+      "trace_sha256": "9f877dc8829b8f75f193fa784f0cccf51c056e3d894ed479d3b331a6a482facb",
+      "event_count": 5461,
+      "trace_window_us": 1610031,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    },
+    "29": {
+      "primary_body_us": {
+        "n": 240,
+        "max": 2585,
+        "p99": 2517,
+        "mean": 2263.204166666667
+      },
+      "secondary_body_us": {
+        "n": 240,
+        "max": 630,
+        "p99": 612,
+        "mean": 478.6666666666667
+      },
+      "sections": {
+        "river29_finalise": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 111,
+            "p99": 110,
+            "mean": 87.77916666666667
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 111,
+            "p99": 110,
+            "mean": 87.77916666666667
+          },
+          "share_of_body": 0.038785350415800605
+        },
+        "river29_injection": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 1973,
+            "p99": 1960,
+            "mean": 1743.3333333333333
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 1973,
+            "p99": 1960,
+            "mean": 1743.3333333333333
+          },
+          "share_of_body": 0.770294328284567
+        },
+        "river29_setup": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 231,
+            "p99": 225,
+            "mean": 161.3875
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 231,
+            "p99": 225,
+            "mean": 161.3875
+          },
+          "share_of_body": 0.0713092978428445
+        },
+        "river29_transport": {
+          "exclusive_per_call_us": {
+            "n": 240,
+            "max": 181,
+            "p99": 180,
+            "mean": 147.19583333333333
+          },
+          "exclusive_invocation_us": {
+            "n": 240,
+            "max": 181,
+            "p99": 180,
+            "mean": 147.19583333333333
+          },
+          "share_of_body": 0.06503868961593906
+        }
+      },
+      "coverage": {
+        "total_exclusive_scoped_share": 0.9454276661591512,
+        "minimum_call_scoped_share": 0.9247747747747748,
+        "body_calls": 240,
+        "method": "Timestamp-contained subscopes; nested time removed per call; sum exclusive durations / sum matched body durations; absent conditional section = zero"
+      },
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 240,
+          "max": 7478,
+          "p99": 7032,
+          "mean": 6995.945833333333
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7478,
+        "trace_elapsed_us": 1679027,
+        "counter_elapsed_us": 1679027,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-29.json",
+      "trace_sha256": "53898f0984197da2835bc8ebf270a1aaeb5a4469a55896bd4675baed89a4f005",
+      "event_count": 5461,
+      "trace_window_us": 1682393,
+      "available_counter_names": [
+        "line_floor",
+        "line_pcm_peak",
+        "line_quiet_age_ms",
+        "line_silence",
+        "vp_frame_start_us",
+        "vp_primary_mode",
+        "vp_primary_render_us",
+        "vp_primary_saturated_pixels",
+        "vp_secondary_mode",
+        "vp_secondary_render_us",
+        "vp_secondary_saturated_pixels"
+      ]
+    }
+  },
+  "limitations": [
+    "Rolling trace covers only the recorded tail; no whole-playback cadence claim.",
+    "Timing spans include interruptions and trace perturbation; no optical or production-build claim.",
+    "Before-stock cadence unavailable unless the exact frame-start counter or equivalent verified boundary exists."
+  ]
+}

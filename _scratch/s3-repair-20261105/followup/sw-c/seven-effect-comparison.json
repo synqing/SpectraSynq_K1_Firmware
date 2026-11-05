@@ -1,0 +1,937 @@
+{
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "scope": "Common final 1 s effect comparison; full-retained observed maxima and cadence supplement every row; stock labelled original0715cb4b capture, not relabelled final build.",
+  "rows": {
+    "14": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 145,
+          "max": 2260,
+          "p99": 2258,
+          "mean": 2075.386206896552
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 2262,
+          "p99": 2257,
+          "mean": 2067.35641025641
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 744,
+          "p99": 692,
+          "mean": 538.0820512820513
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 144,
+          "max": 2350,
+          "p99": 2346,
+          "mean": 2131.7569444444443
+        },
+        "full_retained_primary_body_us": {
+          "n": 240,
+          "max": 2354,
+          "p99": 2346,
+          "mean": 2132.825
+        },
+        "full_retained_secondary_body_us": {
+          "n": 240,
+          "max": 711,
+          "p99": 667,
+          "mean": 537.6458333333334
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 240,
+            "max": 7478,
+            "p99": 7041,
+            "mean": 6954.166666666667
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7478,
+          "trace_elapsed_us": 1668999,
+          "counter_elapsed_us": 1669000,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite",
+        "identity": {
+          "expected_git": "85da2224",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+          "version": "40103",
+          "git": "85da2224",
+          "epoch": "1793867434"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 159,
+          "max": 1475,
+          "p99": 1458,
+          "mean": 1336.622641509434
+        },
+        "full_retained_primary_body_us": {
+          "n": 244,
+          "max": 1475,
+          "p99": 1458,
+          "mean": 1336.8852459016393
+        },
+        "full_retained_secondary_body_us": {
+          "n": 244,
+          "max": 730,
+          "p99": 720,
+          "mean": 546.1598360655738
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 243,
+            "max": 7475,
+            "p99": 7468,
+            "mean": 6333.3292181069955
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7475,
+          "trace_elapsed_us": 1539009,
+          "counter_elapsed_us": 1538999,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "15": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 145,
+          "max": 2283,
+          "p99": 2276,
+          "mean": 2084.4206896551723
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 2290,
+          "p99": 2283,
+          "mean": 2083.723076923077
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 733,
+          "p99": 686,
+          "mean": 530.1205128205128
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 144,
+          "max": 2356,
+          "p99": 2356,
+          "mean": 2148.2569444444443
+        },
+        "full_retained_primary_body_us": {
+          "n": 240,
+          "max": 2374,
+          "p99": 2356,
+          "mean": 2147.866666666667
+        },
+        "full_retained_secondary_body_us": {
+          "n": 241,
+          "max": 703,
+          "p99": 687,
+          "mean": 529.792531120332
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 239,
+            "max": 7054,
+            "p99": 7049,
+            "mean": 6964.514644351464
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7054,
+          "trace_elapsed_us": 1664517,
+          "counter_elapsed_us": 1664519,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite",
+        "identity": {
+          "expected_git": "85da2224",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+          "version": "40103",
+          "git": "85da2224",
+          "epoch": "1793867434"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 157,
+          "max": 1521,
+          "p99": 1504,
+          "mean": 1359.5796178343949
+        },
+        "full_retained_primary_body_us": {
+          "n": 244,
+          "max": 1521,
+          "p99": 1494,
+          "mean": 1359.905737704918
+        },
+        "full_retained_secondary_body_us": {
+          "n": 244,
+          "max": 807,
+          "p99": 751,
+          "mean": 536.7868852459017
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 242,
+            "max": 7052,
+            "p99": 7037,
+            "mean": 6359.528925619835
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7052,
+          "trace_elapsed_us": 1539016,
+          "counter_elapsed_us": 1539006,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "19": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 143,
+          "max": 2396,
+          "p99": 2390,
+          "mean": 2158.4825174825173
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 2398,
+          "p99": 2379,
+          "mean": 2153.0923076923077
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 810,
+          "p99": 669,
+          "mean": 508.7282051282051
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 143,
+          "max": 2545,
+          "p99": 2490,
+          "mean": 2226.3076923076924
+        },
+        "full_retained_primary_body_us": {
+          "n": 240,
+          "max": 2545,
+          "p99": 2468,
+          "mean": 2226.179166666667
+        },
+        "full_retained_secondary_body_us": {
+          "n": 240,
+          "max": 709,
+          "p99": 668,
+          "mean": 499.10833333333335
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 239,
+            "max": 7049,
+            "p99": 7033,
+            "mean": 7000.050209205021
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7049,
+          "trace_elapsed_us": 1673016,
+          "counter_elapsed_us": 1673012,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite",
+        "identity": {
+          "expected_git": "85da2224",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+          "version": "40103",
+          "git": "85da2224",
+          "epoch": "1793867434"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 156,
+          "max": 1591,
+          "p99": 1589,
+          "mean": 1456.5833333333333
+        },
+        "full_retained_primary_body_us": {
+          "n": 244,
+          "max": 1613,
+          "p99": 1589,
+          "mean": 1450.1639344262296
+        },
+        "full_retained_secondary_body_us": {
+          "n": 244,
+          "max": 706,
+          "p99": 664,
+          "mean": 505.22131147540983
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 242,
+            "max": 7489,
+            "p99": 7017,
+            "mean": 6409.024793388429
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7489,
+          "trace_elapsed_us": 1550984,
+          "counter_elapsed_us": 1550984,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "21": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 119,
+          "max": 4797,
+          "p99": 4703,
+          "mean": 4180.470588235294
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 4797,
+          "p99": 4559,
+          "mean": 3645.0641025641025
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 630,
+          "p99": 571,
+          "mean": 344.74615384615385
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 132,
+          "max": 3814,
+          "p99": 3667,
+          "mean": 3334.8636363636365
+        },
+        "full_retained_primary_body_us": {
+          "n": 202,
+          "max": 3814,
+          "p99": 3670,
+          "mean": 3342.960396039604
+        },
+        "full_retained_secondary_body_us": {
+          "n": 201,
+          "max": 657,
+          "p99": 523,
+          "mean": 329.12935323383084
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 201,
+            "max": 8509,
+            "p99": 8045,
+            "mean": 7596.805970149254
+          },
+          "max_consecutive_misses": 1,
+          "recovery_frames_max": 2,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 8509,
+          "trace_elapsed_us": 1526949,
+          "counter_elapsed_us": 1526958,
+          "misses": 1,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite-forge2",
+        "identity": {
+          "expected_git": "f87fe1f2",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+          "version": "40103",
+          "git": "f87fe1f2",
+          "epoch": "1793867894"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 156,
+          "max": 1740,
+          "p99": 1740,
+          "mean": 1569.2371794871794
+        },
+        "full_retained_primary_body_us": {
+          "n": 206,
+          "max": 1742,
+          "p99": 1740,
+          "mean": 1565.490291262136
+        },
+        "full_retained_secondary_body_us": {
+          "n": 206,
+          "max": 839,
+          "p99": 765,
+          "mean": 517.0873786407767
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 206,
+            "max": 7475,
+            "p99": 7036,
+            "mean": 6441.825242718447
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7475,
+          "trace_elapsed_us": 1327000,
+          "counter_elapsed_us": 1327016,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "24": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 119,
+          "max": 4593,
+          "p99": 4535,
+          "mean": 4164.016806722689
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 4670,
+          "p99": 4584,
+          "mean": 4165.751282051282
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 564,
+          "p99": 523,
+          "mean": 343.2846153846154
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 131,
+          "max": 3802,
+          "p99": 3725,
+          "mean": 3390.5190839694656
+        },
+        "full_retained_primary_body_us": {
+          "n": 201,
+          "max": 3803,
+          "p99": 3726,
+          "mean": 3367.313432835821
+        },
+        "full_retained_secondary_body_us": {
+          "n": 202,
+          "max": 546,
+          "p99": 487,
+          "mean": 338.1237623762376
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 201,
+            "max": 8490,
+            "p99": 8043,
+            "mean": 7646.63184079602
+          },
+          "max_consecutive_misses": 1,
+          "recovery_frames_max": 2,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 8490,
+          "trace_elapsed_us": 1536983,
+          "counter_elapsed_us": 1536973,
+          "misses": 1,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite-forge3",
+        "identity": {
+          "expected_git": "8accab34",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "9acc0100d19b3b385cc11977c0eadddb2768b7430eab70b9666a51a28ab2b019",
+          "version": "40103",
+          "git": "8accab34",
+          "epoch": "1793868705"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 159,
+          "max": 1807,
+          "p99": 1799,
+          "mean": 1470.880503144654
+        },
+        "full_retained_primary_body_us": {
+          "n": 207,
+          "max": 1807,
+          "p99": 1796,
+          "mean": 1463.1545893719806
+        },
+        "full_retained_secondary_body_us": {
+          "n": 207,
+          "max": 796,
+          "p99": 767,
+          "mean": 509.85990338164254
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 206,
+            "max": 7036,
+            "p99": 7013,
+            "mean": 6301.101941747573
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7036,
+          "trace_elapsed_us": 1298032,
+          "counter_elapsed_us": 1298027,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "28": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 144,
+          "max": 2362,
+          "p99": 2360,
+          "mean": 2148.3055555555557
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 2378,
+          "p99": 2361,
+          "mean": 2137.4641025641026
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 786,
+          "p99": 685,
+          "mean": 532.3051282051282
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 143,
+          "max": 2476,
+          "p99": 2466,
+          "mean": 2230.2517482517483
+        },
+        "full_retained_primary_body_us": {
+          "n": 230,
+          "max": 2492,
+          "p99": 2466,
+          "mean": 2233.804347826087
+        },
+        "full_retained_secondary_body_us": {
+          "n": 230,
+          "max": 659,
+          "p99": 651,
+          "mean": 523.591304347826
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 229,
+            "max": 7050,
+            "p99": 7036,
+            "mean": 6999.903930131004
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7050,
+          "trace_elapsed_us": 1602979,
+          "counter_elapsed_us": 1602978,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite",
+        "identity": {
+          "expected_git": "85da2224",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+          "version": "40103",
+          "git": "85da2224",
+          "epoch": "1793867434"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 155,
+          "max": 1586,
+          "p99": 1582,
+          "mean": 1443.8129032258064
+        },
+        "full_retained_primary_body_us": {
+          "n": 233,
+          "max": 1599,
+          "p99": 1582,
+          "mean": 1444.3047210300429
+        },
+        "full_retained_secondary_body_us": {
+          "n": 233,
+          "max": 785,
+          "p99": 775,
+          "mean": 544.6480686695279
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 232,
+            "max": 7040,
+            "p99": 7035,
+            "mean": 6439.6551724137935
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7040,
+          "trace_elapsed_us": 1494003,
+          "counter_elapsed_us": 1494000,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    },
+    "29": {
+      "before-stock": {
+        "capture_tag": "before-stock",
+        "identity": {
+          "expected_git": "9f3eb18e",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "6d20b9a9ce06937857cefc769507a74a60b475893a64c354529dc5b7c5e1bcfd",
+          "version": "40103",
+          "git": "9f3eb18e",
+          "epoch": "1793866695"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 143,
+          "max": 2423,
+          "p99": 2421,
+          "mean": 2193.230769230769
+        },
+        "full_retained_primary_body_us": {
+          "n": 390,
+          "max": 2438,
+          "p99": 2421,
+          "mean": 2181.902564102564
+        },
+        "full_retained_secondary_body_us": {
+          "n": 390,
+          "max": 758,
+          "p99": 665,
+          "mean": 507.1307692307692
+        },
+        "full_retained_cadence": null
+      },
+      "stock": {
+        "capture_tag": "stock",
+        "identity": {
+          "expected_git": "0715cb4b",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+          "version": "40103",
+          "git": "0715cb4b",
+          "epoch": "1793867096"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+        "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+        "common1s_primary_body_us": {
+          "n": 143,
+          "max": 2585,
+          "p99": 2517,
+          "mean": 2260.909090909091
+        },
+        "full_retained_primary_body_us": {
+          "n": 240,
+          "max": 2585,
+          "p99": 2517,
+          "mean": 2263.204166666667
+        },
+        "full_retained_secondary_body_us": {
+          "n": 240,
+          "max": 630,
+          "p99": 612,
+          "mean": 478.6666666666667
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 240,
+            "max": 7478,
+            "p99": 7032,
+            "mean": 6995.945833333333
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7478,
+          "trace_elapsed_us": 1679027,
+          "counter_elapsed_us": 1679027,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      },
+      "lite": {
+        "capture_tag": "lite",
+        "identity": {
+          "expected_git": "85da2224",
+          "env": "k1_fe_bench_b489_trace_dev",
+          "firmware_sha256": "7cdf5c54b1bf658320ff6a419a51f2b2e2e5ede0fb32550e0f7f80cdb208e9fe",
+          "version": "40103",
+          "git": "85da2224",
+          "epoch": "1793867434"
+        },
+        "cpu_mhz": 240,
+        "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+        "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2",
+        "common1s_primary_body_us": {
+          "n": 156,
+          "max": 1655,
+          "p99": 1640,
+          "mean": 1482.4358974358975
+        },
+        "full_retained_primary_body_us": {
+          "n": 243,
+          "max": 1655,
+          "p99": 1629,
+          "mean": 1479.4362139917696
+        },
+        "full_retained_secondary_body_us": {
+          "n": 243,
+          "max": 801,
+          "p99": 743,
+          "mean": 512.4609053497942
+        },
+        "full_retained_cadence": {
+          "frame_start_delta_us": {
+            "n": 243,
+            "max": 7058,
+            "p99": 7050,
+            "mean": 6440.378600823045
+          },
+          "max_consecutive_misses": 0,
+          "recovery_frames_max": 0,
+          "trailing_miss_run": 0,
+          "recovery_right_censored": false,
+          "max_gap_us": 7058,
+          "trace_elapsed_us": 1565022,
+          "counter_elapsed_us": 1565012,
+          "misses": 0,
+          "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+        }
+      }
+    }
+  }
+}

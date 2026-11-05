@@ -1,0 +1,30 @@
+{
+  "stream": "R",
+  "source_sha": "838a3951e80e4ce7549639b3aeb25958316a28fc",
+  "modes": [
+    14,
+    15,
+    19,
+    28,
+    29
+  ],
+  "captures": [
+    "stock scopes flags off",
+    "paired-bin lite flags on"
+  ],
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "functions": [
+    "line_presence_current.py::cmd",
+    "line_presence_current.py::read_for",
+    "line_presence_current.py::window",
+    "k1_trace_capture.py::capture_trace_bytes",
+    "k1_trace_capture.py::extract_trace_json"
+  ],
+  "execution": "Root only; already queued integrated stock and lite seven-mode captures",
+  "requirements": [
+    "same recipe start/route/volume/look/secondary18",
+    "RGB8 frames and trace sections",
+    "max/p99 effect plus four cadence numbers",
+    "target1800us and visual sanity per sw-r/expected.json"
+  ]
+}

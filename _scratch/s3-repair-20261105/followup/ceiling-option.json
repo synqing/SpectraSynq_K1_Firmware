@@ -1,0 +1,442 @@
+{
+  "schema_version": 1,
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "source": {
+    "schema_version": 1,
+    "analysis_status": "complete",
+    "evidence_kind": "host analysis of silicon trace",
+    "tag": "stock",
+    "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+    "identity": {
+      "expected_git": "0715cb4b",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+      "version": "40103",
+      "git": "0715cb4b",
+      "epoch": "1793867096"
+    },
+    "cpu_mhz": 240,
+    "flags_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/build-flags.ini",
+    "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e",
+    "capture_metadata": {
+      "identity": {
+        "expected_git": "0715cb4b",
+        "env": "k1_fe_bench_b489_trace_dev",
+        "firmware_sha256": "d1e6781b60be4958347b66a0cb4761845bd372ea492adcc1d216910e87f89083",
+        "version": "40103",
+        "git": "0715cb4b",
+        "epoch": "1793867096"
+      },
+      "original_route": "External Headphones",
+      "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+      "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+      "cpu_mhz": 240,
+      "flags_file": "../build-flags.ini",
+      "measurement": "measured on silicon"
+    },
+    "measurement": "measured on silicon",
+    "result_sha256": "21c8f4ee4da98d432822cb98f86d3a281a531ea46563e255427ce2fda1fb99a7",
+    "contract_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/tests/fixtures/scheduling_gate0/g0r_selection/contract.json",
+    "contract_sha256": "3f6f8856ae8a90bdc91347043d8d60fb91ecdbc5689092d08b249ca69aabbef0",
+    "method": {
+      "percentile": "nearest rank ceil(0.99*n)",
+      "mean": "arithmetic",
+      "units": "microseconds",
+      "independent_unit": "capture run, not individual serially dependent frames",
+      "uncertainty": "descriptive only; no confidence interval inferred",
+      "recovery": "miss run length plus first on-time interval; right-censored terminal run separately reported"
+    },
+    "environment": {
+      "python": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
+      "executable": "/opt/homebrew/opt/python@3.14/bin/python3.14",
+      "platform": "Darwin-25.1.0-arm64-arm-64bit-Mach-O"
+    },
+    "limitations": [
+      "Rolling trace covers only the recorded tail; no whole-playback cadence claim.",
+      "Timing spans include interruptions and trace perturbation; no optical or production-build claim.",
+      "Common final 1,000,000-us window is analysis normalisation only; frozen recipe unchanged. Clip alignment is software-timed, not physical sample-locked.",
+      "Before-stock cadence unavailable unless the exact frame-start counter or equivalent verified boundary exists."
+    ]
+  },
+  "meaning": "Smallest integer ceiling covering observed stock nearest-rank p99 in the common 1-second comparison; full-retained p99 ceiling and maximum shown separately; this is a decision table, not amendment or satisfaction of the existing 2000-us hard-maximum contract.",
+  "modes": {
+    "14": {
+      "stock_full_retained_max_us": 2354,
+      "stock_full_retained_p99_us": 2346,
+      "smallest_integer_full_retained_p99_ceiling_us": 2346,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 240,
+          "max": 7478,
+          "p99": 7041,
+          "mean": 6954.166666666667
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7478,
+        "trace_elapsed_us": 1668999,
+        "counter_elapsed_us": 1669000,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 2350,
+      "stock_p99_us": 2346,
+      "smallest_integer_p99_ceiling_us": 2346,
+      "primary_calls": 144,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 143,
+        "max": 667,
+        "p99": 659,
+        "mean": 538.993006993007
+      },
+      "frame_start_p99_us": 7041,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 143,
+          "max": 7477,
+          "p99": 7041,
+          "mean": 6950.9510489510485
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7477,
+        "trace_elapsed_us": 993985,
+        "counter_elapsed_us": 993986,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-14.json",
+      "trace_sha256": "4ea96a60396b98b73033307c9e05f2c199874ee9e09ed19cb65487cc46fb5fcf"
+    },
+    "15": {
+      "stock_full_retained_max_us": 2374,
+      "stock_full_retained_p99_us": 2356,
+      "smallest_integer_full_retained_p99_ceiling_us": 2356,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 239,
+          "max": 7054,
+          "p99": 7049,
+          "mean": 6964.514644351464
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7054,
+        "trace_elapsed_us": 1664517,
+        "counter_elapsed_us": 1664519,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 2356,
+      "stock_p99_us": 2356,
+      "smallest_integer_p99_ceiling_us": 2356,
+      "primary_calls": 144,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 143,
+        "max": 703,
+        "p99": 690,
+        "mean": 529.06993006993
+      },
+      "frame_start_p99_us": 7046,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 143,
+          "max": 7050,
+          "p99": 7046,
+          "mean": 6954.5944055944055
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7050,
+        "trace_elapsed_us": 994495,
+        "counter_elapsed_us": 994507,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-15.json",
+      "trace_sha256": "2e8f1bef37b8545b1d32b20b6838904be4b60d1830c633bfc663732c6f052660"
+    },
+    "19": {
+      "stock_full_retained_max_us": 2545,
+      "stock_full_retained_p99_us": 2468,
+      "smallest_integer_full_retained_p99_ceiling_us": 2468,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 239,
+          "max": 7049,
+          "p99": 7033,
+          "mean": 7000.050209205021
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7049,
+        "trace_elapsed_us": 1673016,
+        "counter_elapsed_us": 1673012,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 2545,
+      "stock_p99_us": 2490,
+      "smallest_integer_p99_ceiling_us": 2490,
+      "primary_calls": 143,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 142,
+        "max": 709,
+        "p99": 679,
+        "mean": 502.98591549295776
+      },
+      "frame_start_p99_us": 7033,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 142,
+          "max": 7043,
+          "p99": 7033,
+          "mean": 6999.957746478874
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7043,
+        "trace_elapsed_us": 994000,
+        "counter_elapsed_us": 993994,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-19.json",
+      "trace_sha256": "729bef961e3180402df9bc5501602fcf97f5d9decc71477f5a291f1cd7d73688"
+    },
+    "21": {
+      "stock_full_retained_max_us": 3814,
+      "stock_full_retained_p99_us": 3670,
+      "smallest_integer_full_retained_p99_ceiling_us": 3670,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 201,
+          "max": 8509,
+          "p99": 8045,
+          "mean": 7596.805970149254
+        },
+        "max_consecutive_misses": 1,
+        "recovery_frames_max": 2,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8509,
+        "trace_elapsed_us": 1526949,
+        "counter_elapsed_us": 1526958,
+        "misses": 1,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 3814,
+      "stock_p99_us": 3667,
+      "smallest_integer_p99_ceiling_us": 3667,
+      "primary_calls": 132,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 131,
+        "max": 657,
+        "p99": 539,
+        "mean": 336.0
+      },
+      "frame_start_p99_us": 8051,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 131,
+          "max": 8509,
+          "p99": 8051,
+          "mean": 7587.618320610687
+        },
+        "max_consecutive_misses": 1,
+        "recovery_frames_max": 2,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8509,
+        "trace_elapsed_us": 993984,
+        "counter_elapsed_us": 993978,
+        "misses": 1,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-21.json",
+      "trace_sha256": "792e5bc45c2f296f047501a15a06496581483bc80c73f00dba63988b83ac4977"
+    },
+    "24": {
+      "stock_full_retained_max_us": 3803,
+      "stock_full_retained_p99_us": 3726,
+      "smallest_integer_full_retained_p99_ceiling_us": 3726,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 201,
+          "max": 8490,
+          "p99": 8043,
+          "mean": 7646.63184079602
+        },
+        "max_consecutive_misses": 1,
+        "recovery_frames_max": 2,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8490,
+        "trace_elapsed_us": 1536983,
+        "counter_elapsed_us": 1536973,
+        "misses": 1,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 3802,
+      "stock_p99_us": 3725,
+      "smallest_integer_p99_ceiling_us": 3725,
+      "primary_calls": 131,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 130,
+        "max": 487,
+        "p99": 461,
+        "mean": 331.3692307692308
+      },
+      "frame_start_p99_us": 8043,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 130,
+          "max": 8055,
+          "p99": 8043,
+          "mean": 7638.423076923077
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 8055,
+        "trace_elapsed_us": 993005,
+        "counter_elapsed_us": 992995,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-24.json",
+      "trace_sha256": "d0c2cd0a433f1830dab7af212c13438f96fa404a5492928e97f2698cdf7d83c0"
+    },
+    "28": {
+      "stock_full_retained_max_us": 2492,
+      "stock_full_retained_p99_us": 2466,
+      "smallest_integer_full_retained_p99_ceiling_us": 2466,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 229,
+          "max": 7050,
+          "p99": 7036,
+          "mean": 6999.903930131004
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7050,
+        "trace_elapsed_us": 1602979,
+        "counter_elapsed_us": 1602978,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 2476,
+      "stock_p99_us": 2466,
+      "smallest_integer_p99_ceiling_us": 2466,
+      "primary_calls": 143,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 142,
+        "max": 659,
+        "p99": 652,
+        "mean": 523.556338028169
+      },
+      "frame_start_p99_us": 7043,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 142,
+          "max": 7050,
+          "p99": 7043,
+          "mean": 6999.760563380281
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7050,
+        "trace_elapsed_us": 993970,
+        "counter_elapsed_us": 993966,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-28.json",
+      "trace_sha256": "9f877dc8829b8f75f193fa784f0cccf51c056e3d894ed479d3b331a6a482facb"
+    },
+    "29": {
+      "stock_full_retained_max_us": 2585,
+      "stock_full_retained_p99_us": 2517,
+      "smallest_integer_full_retained_p99_ceiling_us": 2517,
+      "full_retained_cadence": {
+        "frame_start_delta_us": {
+          "n": 240,
+          "max": 7478,
+          "p99": 7032,
+          "mean": 6995.945833333333
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7478,
+        "trace_elapsed_us": 1679027,
+        "counter_elapsed_us": 1679027,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "stock_observed_max_us": 2585,
+      "stock_p99_us": 2517,
+      "smallest_integer_p99_ceiling_us": 2517,
+      "primary_calls": 143,
+      "secondary_mode": 18,
+      "secondary_body_us": {
+        "n": 142,
+        "max": 630,
+        "p99": 612,
+        "mean": 481.2535211267606
+      },
+      "frame_start_p99_us": 7027,
+      "frame_p99_with_secondary18_meets_8333": true,
+      "cadence": {
+        "frame_start_delta_us": {
+          "n": 142,
+          "max": 7032,
+          "p99": 7027,
+          "mean": 6999.957746478874
+        },
+        "max_consecutive_misses": 0,
+        "recovery_frames_max": 0,
+        "trailing_miss_run": 0,
+        "recovery_right_censored": false,
+        "max_gap_us": 7032,
+        "trace_elapsed_us": 993984,
+        "counter_elapsed_us": 993994,
+        "misses": 0,
+        "source": "vp_frame_start_us signed24 counter deltas modulo 2^24"
+      },
+      "trace_file": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/stock/trace-29.json",
+      "trace_sha256": "53898f0984197da2835bc8ebf270a1aaeb5a4469a55896bd4675baed89a4f005"
+    }
+  }
+}

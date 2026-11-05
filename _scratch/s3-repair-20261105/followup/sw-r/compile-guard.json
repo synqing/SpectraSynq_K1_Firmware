@@ -1,0 +1,322 @@
+[
+  {
+    "mode": 14,
+    "case": "product-lite",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_14=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 14,
+    "case": "trace-without-bench",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_14=1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 14,
+    "case": "bench-without-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_14=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 14,
+    "case": "bench-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_14=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "mode": 15,
+    "case": "product-lite",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_15=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 15,
+    "case": "trace-without-bench",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_15=1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 15,
+    "case": "bench-without-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_15=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 15,
+    "case": "bench-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_15=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "mode": 19,
+    "case": "product-lite",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_19=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 19,
+    "case": "trace-without-bench",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_19=1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 19,
+    "case": "bench-without-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_19=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 19,
+    "case": "bench-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_19=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "mode": 28,
+    "case": "product-lite",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_28=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 28,
+    "case": "trace-without-bench",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_28=1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 28,
+    "case": "bench-without-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_28=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 28,
+    "case": "bench-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_28=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "mode": 29,
+    "case": "product-lite",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_29=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 29,
+    "case": "trace-without-bench",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_29=1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 29,
+    "case": "bench-without-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_29=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-"
+    ],
+    "exit_code": 1,
+    "expected_exit_code": 1,
+    "stderr": "<stdin>:3:2: error: \"K1 river lite variants require the B489 trace development build\"\n    3 | #error \"K1 river lite variants require the B489 trace development build\"\n      |  ^\n1 error generated.\n"
+  },
+  {
+    "mode": 29,
+    "case": "bench-trace",
+    "command": [
+      "clang++",
+      "-E",
+      "-x",
+      "c++",
+      "-DK1_BENCH_FX_LITE_29=1",
+      "-DK1_FE_BENCH_B489_V1",
+      "-DFEATURE_MABUTRACE=1",
+      "-"
+    ],
+    "exit_code": 0,
+    "expected_exit_code": 0,
+    "stderr": ""
+  }
+]

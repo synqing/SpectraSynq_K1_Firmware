@@ -1,0 +1,36 @@
+python3 -  <<'PY'
+import json,pathlib
+b=pathlib.Path('/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup');w=b/'sw-c'
+table=json.loads((b/'effect-cost-table.json').read_text())
+rawruns={p.name.removesuffix('-raw-analysis.json'):json.loads(p.read_text()) for p in sorted(w.glob('*-raw-analysis.json'))}
+cadence={'recipe_sha256':table['recipe_sha256'],'scope':'Whole retained raw silicon diagnostic trace; no discarded excursions. Before-stock frame-start cadence unverified.','units':'microseconds except miss-run/recovery counts','sources':{},'rows':[]}
+for tag,r in rawruns.items():
+ cadence['sources'][tag]={k:r[k] for k in ['identity','cpu_mhz','flags_file','flags_sha256','measurement','result_sha256']}
+ for m,v in r['modes'].items():
+  c=v['cadence']
+  cadence['rows'].append({'capture':tag,'mode':int(m),'p99_us':c['frame_start_delta_us']['p99'] if c else None,'arithmetic_mean_us':c['frame_start_delta_us']['mean'] if c else None,'max_consecutive_misses':c['max_consecutive_misses'] if c else None,'recovery_frames_max':c['recovery_frames_max'] if c else None,'max_gap_us':c['max_gap_us'] if c else None,'intervals':c['frame_start_delta_us']['n'] if c else None,'counter_elapsed_us':c['counter_elapsed_us'] if c else None,'trace_file':v['trace_file'],'verification':'measured' if c else 'unverified: no exact frame-start trace counter'})
+(w/'all-capture-cadence.json').write_text(json.dumps(cadence,indent=2)+'\n')
+comparison={'recipe_sha256':table['recipe_sha256'],'scope':'Common final 1 s effect comparison; full-retained observed maxima and cadence supplement every row; stock labelled original0715cb4b capture, not relabelled final build.','rows':{}}
+for m,v in table['modes'].items():
+ row={}
+ for key in ['before-stock','stock','lite']:
+  q=v[key];row[key]={'capture_tag':q['capture_tag'],'identity':q['source_identity'],'cpu_mhz':table['sources'][q['capture_tag']]['cpu_mhz'],'flags_file':q['flags_file'],'flags_sha256':q['flags_sha256'],'common1s_primary_body_us':q['primary_body_us'],'full_retained_primary_body_us':q['full_retained_trace']['primary_body_us'],'full_retained_secondary_body_us':q['full_retained_trace']['secondary_body_us'],'full_retained_cadence':q['full_retained_trace']['cadence']}
+ comparison['rows'][m]=row
+(w/'seven-effect-comparison.json').write_text(json.dumps(comparison,indent=2)+'\n')
+lines=['# Stream C — completed analysis','', '- Changed only requested analysis artefacts; no product edits, device access or commits.',f'- Recipe: {table["recipe_sha256"]}.','- Measurement: silicon, diagnostic environment k1_fe_bench_b489_trace_dev, 240 MHz; host arithmetic only.','- 99th percentile (p99): nearest rank. Mean: arithmetic. All times below are microseconds (µs).','- Comparisons use complete calls in the final 1,000,000 µs ending the last complete primary call. Original full-tail maxima and cadence still gate acceptance.','- Recipe unchanged. Clip alignment is software-timed, not physically sample-locked. Instrumentation overhead differs between old baseline and scoped stock; no pure-computation speedup claim.','', '| Mode | Before max/p99 | Stock max/p99 | Selected lite max/p99 | Stock raw max | Lite raw max | Selected lite source |','|---|---:|---:|---:|---:|---:|---|']
+for m,v in table['modes'].items():
+ pair=lambda tag:'/'.join(str(v[tag]['primary_body_us'][k]) for k in ['max','p99'])
+ lines.append(f'| {m} | {pair("before-stock")} | {pair("stock")} | {pair("lite")} | {v["stock"]["full_retained_trace"]["primary_body_us"]["max"]} | {v["lite"]["full_retained_trace"]["primary_body_us"]["max"]} | {v["lite"]["capture_tag"]} {v["lite"]["source_identity"]["git"]} |')
+lines+=['','- Stock is measured source 0715cb4b; never relabelled as final source. First three timing columns are common 1 s; raw maxima are supplemental admission evidence.','- Selected-lite 2,000 µs hard ceiling and four cadence conditions: actual exits 0 in both windows.','- Selected-lite 1,800 µs design target: actual exit 1 in both windows, only mode 24 at 1,807 µs.','- Mode24 attempts retained: F1 raw 2,882 µs; F2 raw 1,990 µs; F3 raw 1,807 µs. Three attempts exhausted; F3 fastest, target remains OPEN by 7 µs.','- Stock 2,000 µs hard ceiling: actual exit 1, all seven effects. Stock section coverage: actual exit 0, both aggregate and minimum individual-call >=90%, both windows.','- Selected Forge variant subsection coverage is below 90% after the body shrinks (21 about 89.46%,24 about 89.00% raw); no coverage inflated or slow calls excluded. Requested stock-section table remains >=90%.','- A/B retention: actual exit 1 against different-build B baseline. Common1s clears zero of five; all lookup reverted by root. Raw full-tail decision also failed and remains preserved.','- Gate commands, actual exits, failures and identities: gates-fragment.json; river gate: river-retention-gate.json.','- Exact inline command receipts: raw-analysis-command.txt, normalised-analysis-command.txt, normalised-tables-command.txt, river-noise-command.txt. No new executable analysis tools.','- Section coverage matches nested timestamp intervals per complete primary call, removes nested time, and divides summed exclusive durations by summed body duration. Never sums maxima.','- Cadence uses signed 24-bit counter deltas modulo 2^24. Miss is >8,333µs. Recovery includes first missed interval through first on-time interval; censored runs rejected.','', '## All-capture retained cadence','']
+for tag,r in rawruns.items():
+ lines+=[f'**{tag}** — {r["identity"]["env"]}, source {r["identity"]["git"]}, {r["cpu_mhz"]} MHz, silicon; flags {r["flags_file"]} (SHA-256 {r["flags_sha256"]}).','', '| Mode | p99 | Mean | Miss run | Recovery | Max gap |','|---|---:|---:|---:|---:|---:|']
+ for row in cadence['rows']:
+  if row['capture']!=tag:continue
+  vals=[row['p99_us'],round(row['arithmetic_mean_us'],3) if row['arithmetic_mean_us'] is not None else None,row['max_consecutive_misses'],row['recovery_frames_max'],row['max_gap_us']]
+  lines.append('| '+str(row['mode'])+' | '+' | '.join('unverified' if x is None else str(x) for x in vals)+' |')
+ lines.append('')
+lines+=['## Files and limits','', '- Main outputs: followup/effect-cost-table.json, followup/ceiling-option.json, followup/river-ab-decision.json.','- Compact tables: sw-c/seven-effect-comparison.json, sw-c/all-capture-cadence.json; all raw/common receipts consolidated in sw-c/.','- Before cadence unverified after three checks: exported counter/event inventory; historical source boundary inspection; serial capture/alternate telemetry search. No exact frame-start event exists. Later mode/body timestamps are not substitutes.','- No whole-playback, uninstrumented normal-build, optical or physical sample-lock claim. Frames within a run are serially dependent, not independent replicate trials.','- Root owns visual sanity/byte-difference evidence, normal-build flash/readback and final delivery. No remaining host-analysis dependency.']
+(w/'REPORT.md').write_text('\n'.join(lines)+'\n')
+print('wrote REPORT.md, all-capture-cadence.json, seven-effect-comparison.json')
+
+PY

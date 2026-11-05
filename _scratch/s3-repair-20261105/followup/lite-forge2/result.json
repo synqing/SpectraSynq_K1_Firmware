@@ -1,0 +1,169 @@
+{
+  "identity": {
+    "expected_git": "f87fe1f2",
+    "env": "k1_fe_bench_b489_trace_dev",
+    "firmware_sha256": "4a69fdb71001aa96ef8dcc778f5e652d24f3a08d5cd886c5b539c6f0584fa243",
+    "version": "40103",
+    "git": "f87fe1f2",
+    "epoch": "1793867894"
+  },
+  "original_route": "External Headphones",
+  "cases": {
+    "14": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=7832220 short=0 err=0 rmsL=56040 rmsR=55798 minL=-221735 maxL=220830 minR=-224816 maxR=220356 clip=0 n=1126080\n[PCMRS] in=1126080 out=300288 blocks=3128 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=30060 acq=7881780 cons=7801920 canon=3128 hw=2040\n[PCMCAN] rms=12.3 peak=53 n=300288 trim_q15=2048 mono=MID\n[PCMSNAP] frames=2048 bytes=12288 dump=hex24le\n[PCMSNAP] 0 BDFCFF 2BFCFF\n[PCMSNAP] 1 75FBFF 4BFBFF\n[PCMSNAP] 2 85FBFF 53FBFF\n[PCMSNAP] 3 05FCFF 6BFBFF\n[PCMSNAP] 4 6DFBFF 1BFBFF\n[PCMSNAP] 5 EDFAFF 8BFAFF\n[PCMSNAP] 6 1DFCFF 8CFBFF\n[PCMSNAP] 7 3EFCFF 4CFCFF\n[PCMSNAP] 8 D6FCFF 34FBFF\n[PCMSNAP] 9 B6FBFF 74FCFF\n[PCMSNAP] 10 DEFBFF 7CFBFF\n[PCMSNAP] 11 0EFCFF FCFBFF\n[PCMSNAP] 12 2EFBFF 4DFBFF\n[PCMSNAP] 13 1EFBFF 7DFBFF\n[PCMSNAP] 14 17FCFF 35FCFF\n[PCMSNAP] 15 A7FBFF 4DFBFF\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=7856700 short=0 err=0 rmsL=87948 rmsR=87578 minL=-214140 maxL=217244 minR=-215055 maxR=218792 clip=0 n=24480\n[PCMRS] in=1150560 out=306816 blocks=3196 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=30060 acq=7906260 cons=7826400 canon=3196 hw=2040\n[PCMRATE2] dt_s=0.510 acq_hz=48010.5 cons_hz=48010.5 canon_hz=133.36 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=20.4 peak=52 n=6528 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-14-music.txt",
+        "header": {
+          "frames": "78",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "e913030e"
+        },
+        "frames": 78,
+        "nonzero_frames": 78,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "15": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=9422700 short=0 err=0 rmsL=51094 rmsR=51083 minL=-220940 maxL=220877 minR=-222965 maxR=221231 clip=0 n=1536120\n[PCMRS] in=2686680 out=716448 blocks=7463 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=58680 acq=9472260 cons=9362520 canon=7463 hw=2040\n[PCMRATE2] dt_s=32.624 acq_hz=48001.5 cons_hz=47085.6 canon_hz=130.79 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.3 peak=53 n=409632 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=9447300 short=0 err=0 rmsL=84068 rmsR=83514 minL=-212728 maxL=216831 minR=-214676 maxR=218229 clip=0 n=25920\n[PCMRS] in=2712600 out=723360 blocks=7535 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=58680 acq=9496920 cons=9388440 canon=7535 hw=2040\n[PCMRATE2] dt_s=0.513 acq_hz=48041.5 cons_hz=50496.2 canon_hz=140.27 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=19.1 peak=49 n=6912 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-15-music.txt",
+        "header": {
+          "frames": "78",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "92d111d3"
+        },
+        "frames": 78,
+        "nonzero_frames": 78,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "19": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=11027340 short=0 err=0 rmsL=51692 rmsR=51716 minL=-221830 maxL=221593 minR=-221965 maxR=222173 clip=0 n=1551240\n[PCMRS] in=4263840 out=1137024 blocks=11844 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=87360 acq=11076900 cons=10939680 canon=11844 hw=2040\n[PCMRATE2] dt_s=32.916 acq_hz=48000.4 cons_hz=47127.3 canon_hz=130.91 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.4 peak=53 n=413664 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=11052840 short=0 err=0 rmsL=89087 rmsR=88589 minL=-215840 maxL=219310 minR=-213933 maxR=215099 clip=0 n=25560\n[PCMRS] in=4289400 out=1143840 blocks=11915 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=87360 acq=11102400 cons=10965240 canon=11915 hw=2040\n[PCMRATE2] dt_s=0.531 acq_hz=48028.1 cons_hz=48141.1 canon_hz=133.73 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=20.7 peak=52 n=6816 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-19-music.txt",
+        "header": {
+          "frames": "78",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "b886ac24"
+        },
+        "frames": 78,
+        "nonzero_frames": 78,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "28": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=12619320 short=0 err=0 rmsL=51319 rmsR=51347 minL=-221485 maxL=224741 minR=-224862 maxR=219604 clip=0 n=1537920\n[PCMRS] in=5827320 out=1553952 blocks=16187 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=115920 acq=12668880 cons=12503160 canon=16187 hw=2040\n[PCMRATE2] dt_s=32.634 acq_hz=48001.5 cons_hz=47126.3 canon_hz=130.91 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.3 peak=53 n=410112 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=12644580 short=0 err=0 rmsL=88648 rmsR=87956 minL=-214375 maxL=215469 minR=-215747 maxR=218636 clip=0 n=25200\n[PCMRS] in=5852520 out=1560672 blocks=16257 invariant=PASS\n[PCMOVF] ovf=25 ovf_bytes=9000 dropped_frames_signaled=1500 dropped_exact=UNKNOWN ring_drop=115920 acq=12694140 cons=12528360 canon=16257 hw=2040\n[PCMRATE2] dt_s=0.526 acq_hz=48023.8 cons_hz=47909.7 canon_hz=133.08 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=20.5 peak=53 n=6720 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-28-music.txt",
+        "header": {
+          "frames": "77",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "51f19686"
+        },
+        "frames": 77,
+        "nonzero_frames": 77,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "29": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=14213700 short=0 err=0 rmsL=51285 rmsR=51311 minL=-221962 maxL=222051 minR=-221821 maxR=220860 clip=0 n=1540440\n[PCMRS] in=7392960 out=1971456 blocks=20536 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=144720 acq=14264820 cons=14068800 canon=20536 hw=2040\n[PCMRATE2] dt_s=32.721 acq_hz=48002.1 cons_hz=47078.0 canon_hz=130.77 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.3 peak=53 n=410784 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=14238600 short=0 err=0 rmsL=88590 rmsR=87720 minL=-214528 maxL=218369 minR=-213631 maxR=214988 clip=0 n=24840\n[PCMRS] in=7417800 out=1978080 blocks=20605 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=144720 acq=14289660 cons=14093640 canon=20605 hw=2040\n[PCMRATE2] dt_s=0.518 acq_hz=47967.4 cons_hz=47967.4 canon_hz=133.24 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=20.5 peak=53 n=6624 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-29-music.txt",
+        "header": {
+          "frames": "77",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "d1abb9b4"
+        },
+        "frames": 77,
+        "nonzero_frames": 77,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "21": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=15801360 short=0 err=0 rmsL=51202 rmsR=51175 minL=-220722 maxL=221816 minR=-223301 maxR=221886 clip=0 n=1534320\n[PCMRS] in=8952120 out=2387232 blocks=24867 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=173160 acq=15852480 cons=15627960 canon=24867 hw=2040\n[PCMRATE2] dt_s=32.557 acq_hz=48002.1 cons_hz=47126.7 canon_hz=130.91 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.3 peak=53 n=409152 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=15826500 short=0 err=0 rmsL=84873 rmsR=84400 minL=-212721 maxL=215724 minR=-214489 maxR=215909 clip=0 n=25200\n[PCMRS] in=8977320 out=2393952 blocks=24937 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=173160 acq=15877620 cons=15653160 canon=24937 hw=2040\n[PCMRATE2] dt_s=0.524 acq_hz=47990.8 cons_hz=48105.4 canon_hz=133.63 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=19.3 peak=50 n=6720 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-21-music.txt",
+        "header": {
+          "frames": "78",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "a9e25a0e"
+        },
+        "frames": 78,
+        "nonzero_frames": 78,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    },
+    "24": {
+      "music": {
+        "status_before": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=17384760 short=0 err=0 rmsL=50996 rmsR=51082 minL=-221243 maxL=220983 minR=-222586 maxR=220305 clip=0 n=1529640\n[PCMRS] in=10506960 out=2801856 blocks=29186 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=201720 acq=17435820 cons=17182800 canon=29186 hw=2040\n[PCMRATE2] dt_s=32.462 acq_hz=48000.7 cons_hz=47120.9 canon_hz=130.89 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=11.3 peak=53 n=407904 trim_q15=2048 mono=MID\n",
+        "telemetry_scope": "RMS/peak are approximate or cumulative status observations, not per-render gates.",
+        "status_after": "[FESTATUS] fe_board=0 stusb4500=absent permit=0 led_enable=0 input_20v_pg=-1 led_pg_a=-1 led_pg_b=-1 pd_fault_n=-1\n[FESTATUS] source=line override=line jack=n/a pcm1808_gate=PASS\n[PCMRAW] frames=17409960 short=0 err=0 rmsL=88275 rmsR=87704 minL=-214884 maxL=216920 minR=-213524 maxR=218734 clip=0 n=25200\n[PCMRS] in=10532160 out=2808576 blocks=29256 invariant=PASS\n[PCMOVF] ovf=50 ovf_bytes=18000 dropped_frames_signaled=3000 dropped_exact=UNKNOWN ring_drop=201720 acq=17461080 cons=17208000 canon=29256 hw=2040\n[PCMRATE2] dt_s=0.526 acq_hz=48036.5 cons_hz=47922.4 canon_hz=133.12 lrck_hz=47991.3 authority=esp_timer\n[PCMCAN] rms=20.5 peak=52 n=6720 trim_q15=2048 mono=MID\n",
+        "raw_capture": "mode-24-music.txt",
+        "header": {
+          "frames": "77",
+          "every": "4",
+          "px": "160",
+          "fmt": "rgb8hex",
+          "bpp": "8",
+          "crc32": "4dd1ef94"
+        },
+        "frames": 77,
+        "nonzero_frames": 77,
+        "crc_verified": true,
+        "pass_presence": true
+      }
+    }
+  },
+  "scope": "Same frozen recipe; rolling MabuTrace spans and primary submitted RGB8. No optical claim.",
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "cpu_mhz": 240,
+  "flags_file": "../lite-build-flags.ini",
+  "measurement": "measured on silicon",
+  "common_flags_file": "../build-flags.ini",
+  "treatment_flags": [
+    "-DK1_BENCH_FX_LITE_14=1",
+    "-DK1_BENCH_FX_LITE_15=1",
+    "-DK1_BENCH_FX_LITE_19=1",
+    "-DK1_BENCH_FX_LITE_21=1",
+    "-DK1_BENCH_FX_LITE_24=1",
+    "-DK1_BENCH_FX_LITE_28=1",
+    "-DK1_BENCH_FX_LITE_29=1"
+  ],
+  "flags_sha256": "7d10214efca6b681f8008350629e87c51765db4f41895eda0d54979d7b9370c2"
+}

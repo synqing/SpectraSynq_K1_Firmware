@@ -1,0 +1,18 @@
+{
+  "written_before_edit": true,
+  "variant": 1,
+  "modes": [
+    21,
+    24
+  ],
+  "design": "Four-pixel moire cells, mean spectrum energy per cell, unchanged palette and phase expression; neighbour-only linear spring coupling instead of all-to-all sine coupling. Transport and eight streak agents retained.",
+  "sanity_rule": [
+    "Music produces lit frames and moving streaks; no frozen output across active interval.",
+    "Outward transport speed/direction, per-band spring target, transient driver and palette remain unchanged.",
+    "Mode24 retains exact held-chord hue calculation.",
+    "Declared quiet drains to black; return relights.",
+    "Flag-off replay meets frozen-stock RGB8 tolerance: max1, <=0.1% differing bytes, identical lit masks."
+  ],
+  "target_us": 1800,
+  "authority": "brief sections0,1,5,7,8; device measurements owned by root"
+}

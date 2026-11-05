@@ -1,0 +1,85 @@
+{
+  "render_exit_code": 0,
+  "validation_exit_code": 0,
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "source_renderer": "../existing-frame-render-command.txt",
+  "executed_command": "render-command.txt",
+  "inspection": "Agent opened all seven final sheets and index. Readable labels; no observed clipping. Stock above lite,24 distinct frames each,160 RGB8 pixels per strip.",
+  "images": [
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/14-stock-vs-lite.png",
+      "sha256": "b525c2eca9a3689457de9a1609c5c79f3089238f68304961dd29e54e92fadd55",
+      "bytes": 290781
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/21-stock-vs-lite.png",
+      "sha256": "9ec1628cbf9317817b6785bdd98ff515d196bf202f2b08de4dad9f4f4bd961d4",
+      "bytes": 295592
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/index.png",
+      "sha256": "4995a8e5b73720c3e9381cbb7d3c973480ed2bc3dc8c1fcf0fb1cdd9f48c57ad",
+      "bytes": 971459
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/15-stock-vs-lite.png",
+      "sha256": "863e97ad7ee84520782b7a183aa8d4fe2ab1028817ae056680b55cd992e07b97",
+      "bytes": 286470
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/24-stock-vs-lite.png",
+      "sha256": "a06c820bae16c40c2935ea62c1f504f06a001a5b8ba9e407dd197503ac5bbed0",
+      "bytes": 295576
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/19-stock-vs-lite.png",
+      "sha256": "bc64861214e186e22be30fca7e4b78cc91afd4b255720dfaa6b4c62d435e576c",
+      "bytes": 291549
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/28-stock-vs-lite.png",
+      "sha256": "bb6a212af26e0ce06e72b8d78b20468b93c5112b7a63519ef8722a3f0cbb1f76",
+      "bytes": 289419
+    },
+    {
+      "path": "_scratch/s3-repair-20261105/followup/visual/29-stock-vs-lite.png",
+      "sha256": "1dc78b9f850a585b76e40c1de9e2da441e93d2844600dc506dd10ba61bfd362f",
+      "bytes": 292960
+    }
+  ],
+  "mode29_chat_correction": "Earlier chat 80.84 was transcription error; PNG and JSON consistently88.03819444444444 percent.",
+  "limitations": [
+    "Lit/changing output only; no optical claim, exact stimulus parity, quiet/drain verification or causal preservation of all musical drivers from these sheets.",
+    "Frame timestamps are actual device milliseconds plus capture-relative seconds. Printed timing is adjacent one-second trace aggregate, not per-row cost."
+  ],
+  "selected": {
+    "14": {
+      "stock": "0715cb4b",
+      "lite": "85da2224"
+    },
+    "15": {
+      "stock": "0715cb4b",
+      "lite": "85da2224"
+    },
+    "19": {
+      "stock": "0715cb4b",
+      "lite": "85da2224"
+    },
+    "21": {
+      "stock": "0715cb4b",
+      "lite": "f87fe1f2"
+    },
+    "24": {
+      "stock": "0715cb4b",
+      "lite": "8accab34"
+    },
+    "28": {
+      "stock": "0715cb4b",
+      "lite": "85da2224"
+    },
+    "29": {
+      "stock": "0715cb4b",
+      "lite": "85da2224"
+    }
+  }
+}

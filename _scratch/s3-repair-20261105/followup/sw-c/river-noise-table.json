@@ -1,0 +1,168 @@
+{
+  "recipe_sha256": "5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3",
+  "identities": {
+    "river-a": {
+      "expected_git": "54480cae",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "5e89b75b6b4224712b1c97b533a321ced8df84bacf19cbcf6ce4ec132fe9a634",
+      "version": "40103",
+      "git": "54480cae",
+      "epoch": "1793865831"
+    },
+    "river-b1": {
+      "expected_git": "f6e9d52f",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "c2c9aef62fbd29d7cc462c9a9ebb9cde88933a9129d65f24236837d03f998c9a",
+      "version": "40103",
+      "git": "f6e9d52f",
+      "epoch": "1793866122"
+    },
+    "river-b2": {
+      "expected_git": "f6e9d52f",
+      "env": "k1_fe_bench_b489_trace_dev",
+      "firmware_sha256": "c2c9aef62fbd29d7cc462c9a9ebb9cde88933a9129d65f24236837d03f998c9a",
+      "version": "40103",
+      "git": "f6e9d52f",
+      "epoch": "1793866122"
+    }
+  },
+  "source_analysis_files": [
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-a-analysis.json",
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-b1-analysis.json",
+    "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/followup/sw-c/river-b2-analysis.json"
+  ],
+  "method": "A max must improve on both B maxima by more than max(abs(B1max-B2max),abs(B1p99-B2p99)) for every mode. Both repeat noise deltas shown. One A run, two B runs; descriptive decision, no statistical confidence claimed.",
+  "rows": {
+    "14": {
+      "a": {
+        "n": 144,
+        "max": 2345,
+        "p99": 2320,
+        "mean": 2112.0555555555557
+      },
+      "b1": {
+        "n": 143,
+        "max": 2328,
+        "p99": 2326,
+        "mean": 2113.5384615384614
+      },
+      "b2": {
+        "n": 143,
+        "max": 2369,
+        "p99": 2358,
+        "mean": 2129.195804195804
+      },
+      "max_repeat_noise_us": 41,
+      "p99_repeat_noise_us": 32,
+      "conservative_noise_us": 41,
+      "a_max_improvement_vs_b1_us": -17,
+      "a_max_improvement_vs_b2_us": 24,
+      "keep_criterion_satisfied": false
+    },
+    "15": {
+      "a": {
+        "n": 144,
+        "max": 2308,
+        "p99": 2305,
+        "mean": 2085.6388888888887
+      },
+      "b1": {
+        "n": 144,
+        "max": 2309,
+        "p99": 2299,
+        "mean": 2115.8194444444443
+      },
+      "b2": {
+        "n": 144,
+        "max": 2336,
+        "p99": 2304,
+        "mean": 2098.2361111111113
+      },
+      "max_repeat_noise_us": 27,
+      "p99_repeat_noise_us": 5,
+      "conservative_noise_us": 27,
+      "a_max_improvement_vs_b1_us": 1,
+      "a_max_improvement_vs_b2_us": 28,
+      "keep_criterion_satisfied": false
+    },
+    "19": {
+      "a": {
+        "n": 144,
+        "max": 2374,
+        "p99": 2364,
+        "mean": 2154.5694444444443
+      },
+      "b1": {
+        "n": 143,
+        "max": 2409,
+        "p99": 2407,
+        "mean": 2157.5524475524476
+      },
+      "b2": {
+        "n": 143,
+        "max": 2393,
+        "p99": 2381,
+        "mean": 2152.5174825174827
+      },
+      "max_repeat_noise_us": 16,
+      "p99_repeat_noise_us": 26,
+      "conservative_noise_us": 26,
+      "a_max_improvement_vs_b1_us": 35,
+      "a_max_improvement_vs_b2_us": 19,
+      "keep_criterion_satisfied": false
+    },
+    "28": {
+      "a": {
+        "n": 144,
+        "max": 2343,
+        "p99": 2339,
+        "mean": 2125.284722222222
+      },
+      "b1": {
+        "n": 143,
+        "max": 2337,
+        "p99": 2337,
+        "mean": 2134.713286713287
+      },
+      "b2": {
+        "n": 143,
+        "max": 2357,
+        "p99": 2350,
+        "mean": 2138.923076923077
+      },
+      "max_repeat_noise_us": 20,
+      "p99_repeat_noise_us": 13,
+      "conservative_noise_us": 20,
+      "a_max_improvement_vs_b1_us": -6,
+      "a_max_improvement_vs_b2_us": 14,
+      "keep_criterion_satisfied": false
+    },
+    "29": {
+      "a": {
+        "n": 144,
+        "max": 2455,
+        "p99": 2424,
+        "mean": 2203.2916666666665
+      },
+      "b1": {
+        "n": 143,
+        "max": 2424,
+        "p99": 2406,
+        "mean": 2185.671328671329
+      },
+      "b2": {
+        "n": 143,
+        "max": 2431,
+        "p99": 2410,
+        "mean": 2171.3006993006993
+      },
+      "max_repeat_noise_us": 7,
+      "p99_repeat_noise_us": 4,
+      "conservative_noise_us": 7,
+      "a_max_improvement_vs_b1_us": -31,
+      "a_max_improvement_vs_b2_us": -24,
+      "keep_criterion_satisfied": false
+    }
+  },
+  "decision": "revert"
+}

@@ -1,0 +1,39 @@
+{
+  "review": "Orchestrator personally opened all seven final stock/lite sheets and final index; inspected all worker reports, gate receipts and product diffs. Coarser river filaments; mode29 band positions differ; mode24 orange centre field absent in sampled lite window. No optical equivalence claim.",
+  "images": {
+    "visual/14-stock-vs-lite.png": "b525c2eca9a3689457de9a1609c5c79f3089238f68304961dd29e54e92fadd55",
+    "visual/15-stock-vs-lite.png": "863e97ad7ee84520782b7a183aa8d4fe2ab1028817ae056680b55cd992e07b97",
+    "visual/19-stock-vs-lite.png": "bc64861214e186e22be30fca7e4b78cc91afd4b255720dfaa6b4c62d435e576c",
+    "visual/21-stock-vs-lite.png": "9ec1628cbf9317817b6785bdd98ff515d196bf202f2b08de4dad9f4f4bd961d4",
+    "visual/24-stock-vs-lite.png": "a06c820bae16c40c2935ea62c1f504f06a001a5b8ba9e407dd197503ac5bbed0",
+    "visual/28-stock-vs-lite.png": "bb6a212af26e0ce06e72b8d78b20468b93c5112b7a63519ef8722a3f0cbb1f76",
+    "visual/29-stock-vs-lite.png": "1dc78b9f850a585b76e40c1de9e2da441e93d2844600dc506dd10ba61bfd362f",
+    "visual/index.png": "4995a8e5b73720c3e9381cbb7d3c973480ed2bc3dc8c1fcf0fb1cdd9f48c57ad"
+  },
+  "source": "8accab345c04c8b5bffdde9440ea8733f21a9286",
+  "protected_file_diff": [
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp",
+    "SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h",
+    "_scratch/s3-repair-20261105/followup/brief.md",
+    "_scratch/s3-repair-20261105/followup/build-flags.ini",
+    "_scratch/s3-repair-20261105/followup/capture-recipe.json",
+    "_scratch/s3-repair-20261105/followup/gates.json",
+    "_scratch/s3-repair-20261105/followup/lite-build-flags.ini",
+    "_scratch/s3-repair-20261105/followup/mode27-correction-expected.json",
+    "_scratch/s3-repair-20261105/followup/river-ab-decision.json",
+    "_scratch/s3-repair-20261105/followup/sw-h/REPORT.md",
+    "_scratch/s3-repair-20261105/followup/sw-h/final-receipt.json",
+    "_scratch/s3-repair-20261105/followup/sw-h/gates.json",
+    "_scratch/s3-repair-20261105/followup/triage-result.json",
+    "_scratch/s3-repair-20261105/followup/vu-history.json",
+    "platformio.ini",
+    "scripts/regression-harness/golden/harness_selftest.py"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "command": "python3 -m pytest tests/test_harness_selftest.py -q",
+  "exit_code": 0,
+  "counts": {
+    "passed": 1,
+    "failed": 0
+  },
+  "git_sha": "8a07b5deb7872c07620ec4a642e736558f208505",
+  "uncommitted_changed_file": "scripts/regression-harness/golden/harness_selftest.py",
+  "changed_file_sha256": "5457c41022084924a231de75d098faa90c8f6653e16f96a1975decd1dccbff14",
+  "scope": "host mutation regression self-test; no silicon measurement",
+  "reason": "Exclude transient generated *.ino.cpp translation units from source mutation copies; .gitignore:18-19 documents PlatformIO creates these within the source directory. First full run failed when PlatformIO removed one between enumeration and copying. Authored .ino/.cpp/.h remain copied and all registered mutation checks remain active.",
+  "observed_at_awst": "2026-11-05T15:57:20.682471+08:00",
+  "log": "_scratch/s3-repair-20261105/followup/sw-h/focused-selftest.log"
+}

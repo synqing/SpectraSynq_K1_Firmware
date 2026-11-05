@@ -1,0 +1,18 @@
+{
+  "written_before_edit": true,
+  "variant": 2,
+  "modes": [
+    21,
+    24
+  ],
+  "trigger": "F1 measured mode21 max2666us/p992587; moire max1546/p991516us; dominant52.56% body. Main lite/trace-21.json examined.",
+  "design": "Sixteen-pixel moire cells: five colour/interference samples across80-pixel half, replacing20 samples; every spectrum bin still contributes to cell mean. Keep all eight moving streak agents, exact phase/colour/driver and pixel transport.",
+  "sanity_rule": [
+    "Music lit and moving streaks; no frozen active interval.",
+    "Same outward transport speed/direction and centroid/chord source.",
+    "Coarser five-cell moire layer acceptable as visible bench option; stock flag-off unchanged.",
+    "Quiet drains to black and return relights."
+  ],
+  "target_raw_max_us": 1800,
+  "estimate_not_measurement": "20 to5 expensive moire/palette evaluations; remaining spectrum averaging/pixel additions unchanged. No timing claim until capture."
+}
