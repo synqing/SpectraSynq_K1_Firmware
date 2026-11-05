@@ -84,7 +84,7 @@
       "pass_rule": "No render heap/blocking I/O, no feature removal, no unsolicited radio-mode changes; changed implementation must preserve enabled modes and relevant control transactions."
     }
   ],
-  "comparison_policy": "Use actual accepted Waveform lineage as design reference; historical pending-viewing prototypes are not accepted reference light shows. Optimisations require unchanged output; corrections require targeted independent expected results.",
+  "comparison_policy": "Use actual accepted Waveform lineage as design reference; historical pending-viewing prototypes are not accepted reference light shows. Performance-only optimisations use the frozen pre-change baseline on identical fixed input and the RGB8 tolerance below; corrections require separate targeted independent expected results.",
   "budgets": {
     "effect_us": 2000,
     "audio_service_p99_us": 8000,
@@ -125,5 +125,15 @@
   "latency_definition": {
     "audio_service": "Correctly bounded AP work span; p99<=8000us is a service budget, not an audio-to-light measurement.",
     "end_to_end": "Sub8ms requirement concerns acquisition-to-emission delivery. Firmware timestamps must identify sample-age assumptions and show submission; physical LED/protocol/optical delay needs separate measurement. Do not substitute service timing for this gate."
+  },
+  "performance_output_tolerance": {
+    "authority": "Captain correction, 5 November 2026",
+    "format": "RGB8 (8-bit red, green and blue channels)",
+    "max_absolute_byte_difference": 1,
+    "lit_pixel_mask_identical_per_frame": true,
+    "max_differing_byte_fraction": 0.001,
+    "baseline": "Frozen pre-change build on the same fixed input bytes; record baseline SHA-256; never regenerate expectation from the changed build.",
+    "native16_projection": "When comparing preserved native16 replay output, use existing tools/esp_emulator/player.py proj: round(c16 * 255 / 65535). Report this as a display projection, not measured hardware RGB8 output.",
+    "corrections": "Require a separate independent expected result."
   }
 }
