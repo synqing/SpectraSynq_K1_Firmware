@@ -1,0 +1,28 @@
+{
+  "environment": "k1_fe_bench_b489_trace_dev",
+  "audio_file": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "audio_sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+  "start_offset_seconds": 56,
+  "route": "External Headphones",
+  "volume_percent": 25,
+  "source": "line",
+  "secondary_mode": 18,
+  "look": {
+    "slot": 1,
+    "name": "GOLD_LIFT",
+    "secondary": "inherit"
+  },
+  "settings_baseline": "../initial-state.txt",
+  "quiet_before_seconds": 8,
+  "music_warmup_seconds": 10,
+  "render_capture_seconds": 2,
+  "render_sample_every_frames": 4,
+  "trace_request_at_seconds_after_playback_start": 12.5,
+  "quiet_after_seconds": 8,
+  "audio_streaming": false,
+  "measurement_scope": "Trace is the existing rolling buffer ending at the fixed request time; RGB8 capture is the preceding two-second window. Report actual trace coverage; no whole-playback cadence claim. All builds use identical recipe; primary mode is the only per-effect parameter.",
+  "cpu_mhz": 240,
+  "flags_file": "build-flags.ini",
+  "flags_policy": "Frozen current platformio.ini used on both baseline and current builds; later lite defines recorded separately as the treatment.",
+  "flags_sha256": "4f8da2c96abaca8f91fe1a3c2b26918ba97b3ed3efd02b060bf26f05f3b1eb3e"
+}
