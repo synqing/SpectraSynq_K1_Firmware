@@ -1,0 +1,8 @@
+[
+{"item": "1 recipe", "command": "sha256 capture-recipe.json and frozen platformio.ini", "exit_code": 0, "receipt": "capture-recipe.json", "scope": "Frozen before first capture; not a performance acceptance gate"},
+{"item": "2 mode27 HEAD capture", "command": "existing line_presence_current.py functions, inline orchestration", "exit_code": 0, "receipt": "head-27/result.json"},
+{"item": "2 mode27 baseline capture", "command": "same existing functions and frozen recipe", "exit_code": 0, "receipt": "before-27/result.json"},
+{"item": "2 VU history", "command": "git log -G / git show ed56dfb5 config_types.h", "exit_code": 0, "receipt": "vu-history.json"},
+{"item": "2 mode27", "receipt": "triage-result.json", "command": "python expected quiet/music assertion against mode27-correction-expected.json", "exit_code": 0},
+{"item": "2 mode27", "receipt": "triage-result.json", "command": "python \u00b110% baseline-count assertion against mode27-correction-expected.json", "exit_code": 1}
+]

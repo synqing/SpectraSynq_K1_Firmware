@@ -2,6 +2,7 @@
 #include "k1_tempo.h"
 #include <math.h>
 #include "k1_vp_audio_access.h"
+#include "k1_audio_input_state.h"
 
 // ============================================================================
 // light_mode_tempo_comet_anticipate — "Tempo Comet Anticipate" (mode 27):
@@ -86,6 +87,22 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
 
   // ── dt + frozen, deterministic path under the VP probe ───────────────────────
   const bool probe = led_thread_halt;
+  bool line_programme = false;
+#if K1_PCM1808_LINE_SWITCH
+  if (!probe && k1_fe_audio_line_active()) {
+    const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+    if (audio.silence) {
+      // A coasting beat is not evidence of line-input programme audio.
+      // Forget the pool as well as the pixels so silence cannot repaint it.
+      for (uint16_t i = 0; i < NATIVE_RESOLUTION; ++i) leds_16[i] = CRGB16(0, 0, 0);
+      for (uint8_t i = 0; i < COMET_MAX; ++i) fx.tcanta_life[i] = 0.0f;
+      fx.tcanta_locked_bpm = 0.0f;
+      fx.tcanta_last_ms = millis();
+      return;
+    }
+    line_programme = true;
+  }
+#endif
   uint32_t now_ms = probe ? 0u : millis();
   float dt = (fx.tcanta_last_ms != 0) ? float(now_ms - fx.tcanta_last_ms) * 0.001f : (1.0f / 120.0f);
   if (probe) dt = 1.0f / 120.0f; else fx.tcanta_last_ms = now_ms;
@@ -115,7 +132,9 @@ void light_mode_tempo_comet_anticipate(ChannelEffectState& fx) {
   // beat are VALIDATED cues, so the grid follows the published lock. TENTATIVE (gate > 0, not locked):
   // bass-onset launches that travel freely (no beat-pinned arrival); see 3b and the free branch in 4.
   const bool  confident = t.locked;
-  const bool  tentative = !t.locked && gate > 0.0f;
+  // Fresh bass onsets are observed events, including while a quiet-started
+  // line tracker is warming up. They still use free flight, never a beat cue.
+  const bool  tentative = !t.locked && (gate > 0.0f || line_programme);
 #else
   const bool  confident = gate >= 0.5f;
 #endif

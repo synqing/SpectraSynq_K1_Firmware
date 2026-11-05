@@ -1,0 +1,11 @@
+{
+  "written_before_fix": true,
+  "baseline": "before-27/result.json",
+  "music_lit_frames": {
+    "baseline": 56,
+    "fraction_tolerance": 0.1
+  },
+  "quiet_lit_frames": 0,
+  "intended_change": "On line input honour authoritative silence and allow fresh bass-onset free-flight while the tracker warms from genuine silence; do not invent beat-grid confidence. Microphone path unchanged.",
+  "protected_tracker": "No changes"
+}

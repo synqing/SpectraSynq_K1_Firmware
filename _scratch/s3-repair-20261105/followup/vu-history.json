@@ -1,0 +1,21 @@
+{
+  "head": "19992ad7",
+  "mode_ids": {
+    "VU": 10,
+    "VU_DOT": 4,
+    "KALEIDOSCOPE": 5,
+    "BLOOM_FAST": 9
+  },
+  "disabled_in_initial_fork": "ed56dfb5",
+  "source": "SPECTRASYNQ_K1_FIRMWARE/system/config_types.h",
+  "reason_in_source": "Modes removed from product by Captain 2026-06-02: unfit for purpose",
+  "action": "Leave pre-existing disabled VU modes disabled under section2.2; do not relabel mode5 or9 as VU.",
+  "commands": [
+    "git log --oneline -G \"case LIGHT_MODE_VU\" -- SPECTRASYNQ_K1_FIRMWARE/system/config_types.h",
+    "git show ed56dfb5:SPECTRASYNQ_K1_FIRMWARE/system/config_types.h"
+  ],
+  "exit_codes": [
+    0,
+    0
+  ]
+}

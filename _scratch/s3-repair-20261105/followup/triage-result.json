@@ -1,0 +1,35 @@
+{
+  "status": "OPEN: baseline lit-count tolerance",
+  "approaches": [
+    {
+      "method": "matched baseline/current capture",
+      "before": "before-27/result.json",
+      "current": "head-27/result.json",
+      "finding": "56/98 lit baseline;0/99 current; old quiet lit too"
+    },
+    {
+      "method": "historical source bisection",
+      "receipts": [
+        "triage83-27/result.json",
+        "triage-d143-27/result.json"
+      ],
+      "finding": "83 flag move lit20/99;d143 initial presence lit0/99. Exact producer-state causal mechanism not isolated; tracker code unchanged."
+    },
+    {
+      "method": "line-only consumer correction",
+      "receipt": "mode27-fixed/result.json",
+      "finding": "83/83 music lit;bothquiet0/99; \u00b110%count requirement notmet. Fresh observed bass onsets permitted during confidencewarmup; silenceclearsstalecomets."
+    }
+  ],
+  "gates": [
+    {
+      "command": "python expected quiet/music assertion against mode27-correction-expected.json",
+      "exit_code": 0
+    },
+    {
+      "command": "python \u00b110% baseline-count assertion against mode27-correction-expected.json",
+      "exit_code": 1
+    }
+  ],
+  "microphone": "Branch only active for k1_fe_audio_line_active(); unchanged original tentative gate for microphone; hardware mic follow-up not yet run."
+}
