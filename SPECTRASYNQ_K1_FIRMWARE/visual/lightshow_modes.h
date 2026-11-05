@@ -249,28 +249,6 @@ inline uint8_t palette_index_with_phase(uint8_t palette_index, const RenderParam
   return palette_index_with_phase(palette_index, render_params_auto_colour_shift(rp, render_secondary));
 }
 
-// River frequency coordinates are ratios of integer bin indices. Preserve the
-// original division rounding (including the exact wrapping endpoint) while
-// removing software float division from every active pixel. All legal bin
-// counts are represented; the triangular table occupies read-only flash.
-struct RiverFrequencyHues {
-  float values[NUM_FREQS * (NUM_FREQS + 1) / 2] = {};
-  constexpr RiverFrequencyHues() {
-    for (uint16_t denominator = 1; denominator < NUM_FREQS; ++denominator) {
-      for (uint16_t bin = 0; bin <= denominator; ++bin) {
-        values[denominator * (denominator + 1) / 2 + bin] =
-            float(bin) / float(denominator);
-      }
-    }
-  }
-};
-
-inline float river_frequency_hue(uint16_t bin, uint8_t analysis_bins) {
-  static constexpr RiverFrequencyHues hues;
-  const uint16_t denominator = (analysis_bins > 1) ? analysis_bins - 1 : 1;
-  return hues.values[denominator * (denominator + 1) / 2 + bin];
-}
-
 inline CRGB16 palette_manual_colour(const CRGBPalette16& pal, SQ15x16 hue, SQ15x16 brightness) {
   // HD PALETTE SAMPLING (2026-06-11): evaluate the true gradient stops in float
   // (full stop list, native CRGB16 out) instead of the 16-entry CRGBPalette16 +
