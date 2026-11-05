@@ -1,0 +1,24 @@
+docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md:18:Falsified if: held-out 3:2 rate is not below shipped, or clean-train (90/120/144) lock is lost, or Acc2 falls.
+docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md:21:- Confidence may gate `locked` only with a committed held-out AUC ≥ 0.8 receipt.
+docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md:22:- Dev corpus (the 36) tunes; acceptance only on a Captain-approved held-out corpus.
+docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md:32:| 2026-10-21 | OPEN — Phase 2.6 measured, rule 3.3 implemented | Host joint tempo+phase estimator: dev Acc2 20/36, 1 at 3:2 (lane tracker 19/36, 7) — selection error type changes, Acc2 does not rise (p2.6-joint-score-dev). Agreement-gated lock dev 8 right / 2 wrong vs lane 11 / 11 (p2.6-agreement-gate-vs-lane-dev); in-sample, not held-out. K1_TEMPO_LOCK_OFF_V1 withholds the LOCKED band (p3.3-*). Lock-ON vs lock-OFF awaits the Captain. |
+docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md:34:| 2026-10-22 | OPEN — E1 falls short on development data | E1's development pick (hold D in {0, 2, 4} s, frozen scorer, 36 dev clips): D 0 = 8 right / 2 wrong (not eligible, more than 1 wrong); D 2 = 1 / 1; D 4 = 1 / 0 (e1-dev-score-hold*). The best eligible result covers 1 of 36 tracks against the pre-registered validation bar of 25 %. Recommendation: no validation material for E1 (plan, update 2026-10-22). No held-out or validation clip run. |
+docs/architecture/tempo-lock-hardening-plan.md:213:No held-out data has been run (the corpus awaits the Captain's approval, rule R8).
+docs/architecture/tempo-lock-hardening-plan.md:226:held-out run confirms.
+docs/architecture/tempo-lock-hardening-plan.md:230:Unless a better-formed term clears 0.8 on dev and held-out, rule 3.3 applies: lock stays OFF under
+docs/architecture/tempo-lock-hardening-plan.md:235:- Held-out corpus: Ballroom (698) + GiantSteps Tempo (661) approved in principle as the full
+docs/architecture/tempo-lock-hardening-plan.md:244:- Development entry gates before the held-out run: Phase 1.5 behaviour green; a confidence term with
+docs/architecture/tempo-lock-hardening-plan.md:250:All numbers are simulated (emulator) or host; none is silicon. Development data only; no held-out clip has
+docs/architecture/tempo-lock-hardening-plan.md:284:  literally and fails rule R1 in practice. Held-out data would settle it (admission needs >= 0.8 on both).
+docs/architecture/tempo-lock-hardening-plan.md:308:  closes on (lock-OFF, or carrying a candidate term into the held-out run) is the Captain's call.
+docs/architecture/tempo-lock-hardening-plan.md:314:## Captain supplement — 2026-10-21 (after the evening stop), verbatim
+docs/architecture/tempo-lock-hardening-plan.md:403:**Item 4, proposed bounded host-only experiment (PROPOSAL — NOT APPROVED).**
+docs/architecture/tempo-lock-hardening-plan.md:421:single held-out run on the fallback would leave no untouched corpus for a lock candidate. Whether the fallback
+docs/architecture/tempo-lock-hardening-plan.md:422:alone should take the held-out run is put to the Captain.
+docs/architecture/tempo-lock-hardening-plan.md:426:Host only, development data only. No held-out or validation clip has been run, and nothing was downloaded.
+docs/architecture/tempo-lock-hardening-plan.md:431:fallback publishes no lock, so it does not take the held-out run. Only the E1 validation set remains a decision,
+docs/architecture/tempo-lock-hardening-plan.md:465:**Recommendation (PROPOSAL — NOT APPROVED).** Do not approve validation material for E1. Keep the qualified
+docs/architecture/tempo-lock-hardening-plan.md:494:  `tempo_validation_corpus.py`; gold folded by octave into 60-155 exactly like the held-out loader.
+docs/architecture/tempo-lock-hardening-plan.md:538:- **Then.** A V2 pass freezes E2 for the single held-out acceptance run (A2 and the rest of A1-A9). A V2 failure leaves
+docs/architecture/tempo-lock-hardening-plan.md:545:| 2026-10-22 | agent:claude-code (lane R1) | Update: E1 development pick (D 0/2/4 s → 8/2, 1/1, 1/0; best eligible covers 1 of 36 tracks against a 25 % bar), so E1 is falsified on development and no validation set is recommended; the clip-length flaw in D and the Wilson sample-size table are recorded; the held-out question is marked already answered by the supplement; the detector wording is corrected and a lock-enabled consumer check is made an entry requirement. |
+docs/architecture/tempo-lock-hardening-plan.md:546:| 2026-10-21 | agent:claude-code (lane R1, night) | Captain supplement recorded verbatim; consumer gap reproduced on rendered output and repaired behind K1_TEMPO_CONSUMER_BANDS_V1; lock-off fallback qualified (behaviour, host == emulator, cost, byte identity, repeats, clean export); experiment E1 proposed; held-out run held for the Captain. |

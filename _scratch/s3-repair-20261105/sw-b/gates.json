@@ -1,0 +1,23 @@
+[
+  {
+    "gate": "held-out authority search (not qualification)",
+    "command": "/opt/homebrew/bin/rg -n -i held.?out|approved|Captain supplement docs/architecture/tempo-lock-hardening-plan.md docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md",
+    "exit_code": 0,
+    "receipt": "_scratch/s3-repair-20261105/sw-b/authority-search.log"
+  },
+  {
+    "gate": "held-out shipping beat qualification",
+    "command": null,
+    "exit_code": null,
+    "status": "NOT_RUN",
+    "receipt": "_scratch/s3-repair-20261105/beat-heldout.json",
+    "reason": "No approved executable held-out beat corpus; step not run. A tempo corpus exists with conditional approval, but its execution remains reserved."
+  },
+  {
+    "gate": "decision-directory discovery",
+    "command": "ls docs/decisions",
+    "exit_code": 1,
+    "receipt": "_scratch/s3-repair-20261105/beat-heldout.json",
+    "reason": "Directory absent; alternate authority paths inspected."
+  }
+]
