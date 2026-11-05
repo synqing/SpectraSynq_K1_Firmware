@@ -259,6 +259,12 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   // Moiré interference inject — spatial texture without advection.
   for (uint16_t k = 0; k < HALF; k++) {
     const float u = float(k) / float(HALF > 1 ? HALF - 1 : 1);
+    const float source_energy = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
+    // Gain 0.48 and envelope <= 1 keep these pixels below 0.96 * floor.
+    // Preserve the original expressions below for every contributing pixel.
+    if (isfinite(fx.dforge_carrier) && fabsf(fx.dforge_carrier) < 1e30f &&
+        isfinite(phase_b) && fabsf(phase_b) < 1e30f &&
+        (inject_scale == 0.0f || (isfinite(source_energy) && source_energy < DFORGE_FLOOR * 2.0f))) continue;
     const float moire =
         sinf(6.2831853f * (u * 2.17f + fx.dforge_carrier)) *
         sinf(6.2831853f * (u * 3.61f - phase_b));
