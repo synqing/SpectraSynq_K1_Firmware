@@ -13,15 +13,17 @@ struct K1AudioCaptureTiming {
   uint8_t assumption;
 };
 
-// Measured line idle: signed 24-bit RMS 404, absolute peak 2263 (grounded
-// B489, 20261104/09_linein_extra_ground_3919a273.txt). Add one RMS to the
-// observed peak, convert through canonical trim and 24->16 bit scaling, then
-// allow one canonical count for rounding. At trim 2048: floor = 2 counts.
+// Grounded dark idle was signed24 RMS404/peak2263 (20261104 receipt).
+// Post-stop with mode32 still lit measured RMS8033/absolute peak39247 in
+// presence-energy/result.json (20261105, 7cf8a315). The dark-only bound did
+// not cover this condition: decision trace showed silence false for 241 hops.
+// Use observed peak + one RMS, convert through trim and 24->16 scaling, then
+// allow one canonical rounding count. At trim2048 the bound is 13 counts.
 #ifndef K1_PCM1808_CANON_TRIM_Q15
 #define K1_PCM1808_CANON_TRIM_Q15 32768
 #endif
 static constexpr uint16_t K1_LINE_PRESENCE_FLOOR =
-    uint16_t(((2667ULL * K1_PCM1808_CANON_TRIM_Q15 + 8388607ULL) / 8388608ULL) + 1ULL);
+    uint16_t(((47280ULL * K1_PCM1808_CANON_TRIM_Q15 + 8388607ULL) / 8388608ULL) + 1ULL);
 static_assert(K1_LINE_PRESENCE_FLOOR > 0, "Line floor must never be zero");
 
 #if K1_PCM1808_LINE_SWITCH
