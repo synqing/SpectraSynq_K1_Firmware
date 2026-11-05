@@ -66,9 +66,11 @@ def test_acceptance_budgets_match_current_constants():
     assert j['budgets']['audio_service_p99_us']==8000
 
 
-def test_fe_consumers_honour_published_lock_and_emu_onset_trace_stays_private():
+def test_consumer_repair_stays_on_bench_and_emu_onset_trace_stays_private():
     flags=runner.flag_names(runner.effective_env('k1_fe').get('build_flags',[]))
-    assert 'K1_TEMPO_CONSUMER_BANDS_V1'in flags
+    assert 'K1_TEMPO_CONSUMER_BANDS_V1'not in flags
+    bench_flags=runner.flag_names(runner.effective_env('k1_fe_bench_b489').get('build_flags',[]))
+    assert 'K1_TEMPO_CONSUMER_BANDS_V1'in bench_flags
     assert 'K1_EMU_ONSET_TRACE'not in flags
     assert 'K1_TEMPO_LOCK_OFF_V1'not in flags
     assert 'K1_TEMPO_SILENCE_FROM_PRODUCER_V1'not in flags
