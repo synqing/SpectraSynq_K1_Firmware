@@ -839,10 +839,12 @@ inline float    SILENCE_ENTER_SSL_FRAC = 0.35f;   // enter silence below this * 
 inline float    SILENCE_EXIT_SSL_FRAC  = 0.55f;   // leave silence above this * SSL (Schmitt gap: exit > enter)
 #ifdef K1_FE_BENCH_B489_V1
 // Bench silence-return trial: keep the classifier and calibration unchanged.
-inline uint32_t SILENCE_DWELL_MS       = 1000;
+#define K1_SILENCE_DWELL_DEFAULT_MS 1000
 #else
-inline uint32_t SILENCE_DWELL_MS       = 5000;    // continuous quiet (ms) before the plate darkens
+#define K1_SILENCE_DWELL_DEFAULT_MS 5000
 #endif
+inline uint32_t SILENCE_DWELL_MS       = K1_SILENCE_DWELL_DEFAULT_MS;    // continuous quiet (ms) before the plate darkens
+#undef K1_SILENCE_DWELL_DEFAULT_MS
 inline float    SILENT_FADE_DOWN_ALPHA = 0.03f;   // slow fade to black (~1-2 s)
 inline float    SILENT_FADE_UP_ALPHA   = 0.60f;   // near-instant wake on first sound
 
