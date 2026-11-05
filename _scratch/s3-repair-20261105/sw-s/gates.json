@@ -1,0 +1,15 @@
+[
+  {
+    "gate": "save-path-focused",
+    "command": "python3 -m pytest tests/test_k1_persist_park_static.py tests/test_k1_persistence_request_boundary.py -q",
+    "exit_code": 0,
+    "receipt": "_scratch/s3-repair-20261105/sw-s/host.log"
+  },
+  {
+    "gate": "save-silence-and-fallback-silicon",
+    "command": "Existing k1_trace_capture functions; queue/s-1.json",
+    "exit_code": null,
+    "receipt": "queue/s-1.result.json pending",
+    "status": "OPEN until capture"
+  }
+]

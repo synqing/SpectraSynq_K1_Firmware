@@ -1,0 +1,40 @@
+{
+  "stream": "s",
+  "source_revision": "b779e56174cd7b36fae1741cd068a3bca37feb79",
+  "source_hashes": {
+    "SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h": "5212e51733fde914c19b284e8b06f7e18b1ba5a2628cc4caa410939d1905f48e",
+    "SPECTRASYNQ_K1_FIRMWARE/system/system.h": "68d48d4ecfaf1bd976bf8dccc1d2a8923c1e38c51c7a36fbb67c0dbf478a2cc0",
+    "SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino": "742e18fec6ff1d2b6d70e4d9199872f48bfdd0426bc224170c1009134d773d67"
+  },
+  "source_findings": {
+    "retained_handle": "bridge_fs.h105-122; prepare before render task at sketch703",
+    "single_record": "bridge_fs.h208-211,253 writes512bytes once",
+    "render_park_retained": "bridge_fs.h214-215 and all observed return paths unlock",
+    "save_control_owner": "sketch954 calls check_settings outside led_thread",
+    "silence_and_fallback": "system.h708-719 selects silence+debounce or60000ms since first observed pending",
+    "retry": "system.h710-721 independent5000ms retry after failure; bridge re-arms failures",
+    "sector_erase": "not observable via existing exposed telemetry"
+  },
+  "changes": [],
+  "host_gate": {
+    "command": "python3 -m pytest tests/test_k1_persist_park_static.py tests/test_k1_persistence_request_boundary.py -q",
+    "exit_code": 0,
+    "passed": 8,
+    "receipt": "_scratch/s3-repair-20261105/sw-s/host.log",
+    "scope": "Existing park/static paths and request boundary; not hardware save/cadence proof"
+  },
+  "hardware": {
+    "status": "pending orchestrator capture",
+    "request": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/s3-repair-20261105/queue/s-1.json",
+    "limits": [
+      "Existing rolling trace retains event windows, not whole40/75s sessions.",
+      "Silence sampled telemetry cannot exclude unsampled quiet edges duringmusic."
+    ]
+  },
+  "attempts": [
+    {
+      "approach": "existing buffered retained-handle save",
+      "result": "source verified; host exit0; hardware pending"
+    }
+  ]
+}
