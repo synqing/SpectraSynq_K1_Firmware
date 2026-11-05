@@ -107,171 +107,118 @@ Ports are badly scrambled vs the typical map; verified by chip type + MAC:
 
 <!-- BEGIN S3 REPAIR RESULTS -->
 <a id="s3-repair-2026-11-05"></a>
-### 5 November S3 repair — tested source `36607a8f`
+### 5 November same-conditions follow-up
 
-Silicon captures and the single full suite used `36607a8f`. Final product
-source is `e42eec55`, integrating `80bf7aa8`: one silence-dwell declaration
-replaces duplicate conditional declarations. Bench 1,000 ms and product
-5,000 ms defaults are unchanged; the generated registry header is unchanged.
-The four focused registry tests passed after that repair. The full suite was
-not rerun, and the earlier captures are not relabelled as a later-source run.
+Receipts below are under `_scratch/s3-repair-20261105/followup/`.
+Recipe SHA-256 (Secure Hash Algorithm, 256-bit):
+`5e65de9f0bf342bbb3dbfd7c3033ee4a1901df57378ff77dc0645986185fd1d3`.
+Same clip offset, line route, volume 25, secondary mode 18 and look. Timing is
+**measured on silicon**, environment `k1_fe_bench_b489_trace_dev`, configured
+central processing unit (CPU) 240 megahertz (MHz). Before `9f3eb18e` and stock
+`0715cb4b` use `build-flags.ini`; selected lite rivers `85da2224`, mode 21
+`f87fe1f2`, mode 24 `8accab34` use `lite-build-flags.ini`. The normal/product
+build flags are unchanged. Lite flags exist only in the diagnostic environment.
 
-After the final documentation commit, the orchestrator flashes the normal
-image and writes `_scratch/s3-repair-20261105/final-build-handshake.json`.
-Consult that receipt for the final running commit and epoch. This document
-does not claim that post-documentation flash has already been observed.
-Receipt names below are relative to `_scratch/s3-repair-20261105/` unless
-an explicit repository path is supplied.
+All table times are microseconds (µs); p99 means 99th percentile. Effect comparisons
+use the common final one-second trace window. Full retained maxima are separate;
+all cadence gates also check the full retained trace. Software playback is not
+physically sample-locked; added scopes alter measurement overhead. Stock capture
+is honestly labelled `0715cb4b`, not a later final-commit measurement. Flag-off
+native replay/source parity receipts establish unchanged stock branches.
 
-| Identity and measurement context | Final value |
-|---|---|
-| Unit and serial port | B489A500; `/dev/cu.usbmodem101`; final readback in `final-build-handshake.json` |
-| Normal environment | `k1_fe_bench_b489` |
-| Firmware source commit / final normal build epoch / flash exit code | Tested source `36607a8f`, normal capture epoch `1793861288`; normal upload exit 0; final documentation-commit identity in `final-build-handshake.json` |
-| Processor frequency / exact build-flags file | Configured 240 MHz / `_scratch/s3-repair-20261105/effective-build-flags.json` |
-| Silicon capture receipt / final `build` handshake receipt | `_scratch/s3-repair-20261105/final-normal-28-complete/result.json` / `final-build-handshake.json` |
-| Host suite command, commit and receipt | `python -m pytest tests -q`, product source `36607a8f`, `_scratch/s3-repair-20261105/final-host-suite.log`; 2,027 passed, two skipped, one failed; exit 1 |
-| Date | 5 November 2026, Australian Western Standard Time (AWST); precise capture epochs in receipts |
+| Mode | Fresh 9f3eb18e max | Stock max / p99 | Lite max / p99 | Lite full-tail max | Lite cadence p99 / mean / miss run / recovery / gap |
+|---|---:|---:|---:|---:|---|
+| 14 | 2260 | 2350 / 2346 | 1475 / 1458 | 1475 | 7468 / 6333.33 / 0 / 0 / 7475 |
+| 15 | 2283 | 2356 / 2356 | 1521 / 1504 | 1521 | 7037 / 6359.53 / 0 / 0 / 7052 |
+| 19 | 2396 | 2545 / 2490 | 1591 / 1589 | 1613 | 7017 / 6409.02 / 0 / 0 / 7489 |
+| 21 | 4797 | 3814 / 3667 | 1740 / 1740 | 1742 | 7036 / 6441.83 / 0 / 0 / 7475 |
+| 24 | 4593 | 3802 / 3725 | 1807 / 1799 | 1807 | 7013 / 6301.10 / 0 / 0 / 7036 |
+| 28 | 2362 | 2476 / 2466 | 1586 / 1582 | 1599 | 7035 / 6439.66 / 0 / 0 / 7040 |
+| 29 | 2423 | 2585 / 2517 | 1655 / 1640 | 1655 | 7050 / 6440.38 / 0 / 0 / 7058 |
 
-The historical `all-mode-final.json` is native-emulator output, not a silicon
-capture. Historical silicon campaigns used `device_measure_reciprocal.py`
-(performance probe) and `trace_reciprocal.py` (diagnostic trace image). Final
-normal-image render traces cannot establish individual effect duration; keep
-any diagnostic timing figures separately labelled. Receipts remain under `_scratch/s3-qualification-20261105/`.
+All seven selected variants meet the existing 2,000 µs hard ceiling and the four
+cadence limits in both analysis windows (Python exit 0). Mode 24's stricter
+1,800 µs design target remains OPEN after three variants: full-tail maxima
+2,882, 1,990, 1,807 µs. Mode 21's first variant failed; its second was retained.
+These measurements use the diagnostic identities and flags stated above.
+Stock still exceeds the hard ceiling in all seven modes. Stock cadence meets
+all four limits, including its isolated misses. Full per-section max, p99 and
+shares: `effect-cost-table.json`; stock scoped coverage exceeds 90%.
+Every capture's four cadence figures and max gap: `sw-c/all-capture-cadence.json`.
 
-For each timing capture, retain its own environment, source commit, processor
-frequency, build-flags file and **measured on silicon** or **measured on host**
-label. Host timing cannot fill a silicon result. The table below separates measured results from unobservable checks.
+#### River lookup decision
 
-| Final capture or check | Result | Command exit code | Receipt |
-|---|---|---|---|
-| Normal-image 28-mode render trace (RTRACE) | Complete; primary red/green/blue eight-bit (RGB8) frames and cyclic redundancy checks (CRC) verified. Mode 27 is dark in 99/99 captured frames. No secondary-output or individual-effect timing claim | 0 | `final-normal-28-complete/result.json`, `final-normal-28-gate.log` |
-| Normal-image primary / secondary effect maximum µs | Unobservable: normal image has no pure-effect trace or performance telemetry | Not run | Not available |
-| Diagnostic-only primary / secondary effect maximum µs | All seven primary maxima above 2,000 µs; values below | 1 for all seven corrected comparisons | `final-effect-metrics.json` |
-| Normal-image whole-capture cadence | OPEN: primary-only output-store timestamps in milliseconds are not dispatch starts; all required cadence fields unobservable | Not run | Normal RTRACE cannot establish this gate |
-| Silence-edge save and whole-save-capture coverage | OPEN: no complete quiet-save span; rolling buffer cannot cover whole session | Quiet-span gate 1 | `save-closeout-metrics.json`, `queue/s-1.result.json` |
-| Music-playing 60-second fallback save | Observed at 60.1377 s; event-window cadence within limits; see measured context below | 0 | `_scratch/s3-repair-20261105/save-closeout-metrics.json`, `queue/s-1.result.json` |
-| Modes 21 / 24: effect ceiling, byte comparison and motion | Primary ceiling exceeded; byte gate exits 0; elapsed-time motion OPEN | Effect gates 1; byte gate 0 | `final-effect-metrics.json`, `final-seven-replay.log` |
-| Modes 14 / 15 / 19 / 28 / 29: effect ceiling, byte comparison and motion | Primary ceiling exceeded; byte gate exits 0; elapsed-time motion OPEN | Effect gates 1; byte gate 0 | `final-effect-metrics.json`, `final-seven-replay.log` |
-| Modes 7 / 11 / 32 diagnostic line presence | All nine windows satisfy quiet dark / music lit / quiet dark; sampled windows do not prove same-hop return latency | 0 | `_scratch/s3-repair-20261105/presence-final.log`, `presence-final/result.json` |
-| Microphone regression / rendered volume unit (VU) | Mode 32 microphone quiet dark / music lit / quiet dark; rendered VU OPEN because its modes remain disabled | Microphone 0 | `mic-final.log`, `mic-final/result.json` |
-| Approved held-out beat corpus qualification | HELD: conditional corpus execution not run; existing scorer ±70 ms, five-second warm-up | Not run | `_scratch/s3-repair-20261105/beat-heldout.json` |
-| Single full host regression | 2,027 passed / two skipped / one failed: generated tunables registry mismatch | 1 | `final-host-suite.log` |
-| Registry repair focused check | Four passed after declaration-only repair; no full-suite rerun | 0 | `tunables-repair-host.log` |
-| Settings restoration comparison | 45 fields identical; look 1 / GOLD_LIFT / inherit; calibration 108/57; mic/auto; access-point stream on; External Headphones at volume 25 | 0 | `final-restoration-result.json`, `final-restoration.log` |
+Same diagnostic environment, configured CPU 240 MHz, `build-flags.ini`, measured
+on silicon. A `54480cae`; B runs `f6e9d52f`. Common one-second maxima below.
+Noise is the larger absolute B-repeat difference in max and p99. No mode clears
+that noise against both B runs; whole lookup/reciprocal reverted in `56591056`.
 
-Cadence authority is `tests/fixtures/scheduling_gate0/g0r_selection/contract.json`
-→ `vp_contract.admission`: frame-start 99th percentile and mean each ≤8,333 µs,
-maximum consecutive misses ≤1 and recovery ≤2 frames. One effect call has a
-2,000 µs ceiling. These are acceptance limits, not measurements. A larger
-show-interval gap alone does not establish a cadence failure.
+| Mode | A max µs | B1 max µs | B2 max µs | Noise µs |
+|---|---:|---:|---:|---:|
+| 14 | 2345 | 2328 | 2369 | 41 |
+| 15 | 2308 | 2309 | 2336 | 27 |
+| 19 | 2374 | 2409 | 2393 | 26 |
+| 28 | 2343 | 2337 | 2357 | 20 |
+| 29 | 2455 | 2424 | 2431 | 7 |
 
-Comparison with the earlier assessment: line modes 7 and 11 now light
-throughout their sampled music windows; mode 32 now drains to zero in sampled
-quiet windows. All seven primary effect ceiling failures remain. Final timing
-coverage is seven diagnostic rolling windows, not a replacement all-mode
-cadence campaign. Held-out beat qualification remains unrun.
+#### Functional checks and restoration
 
-Diagnostic line presence, measured on silicon: `k1_fe_bench_b489_trace_dev`,
-`36607a8f`, epoch `1793860860`. Counts below are nonzero primary frames / captured
-frames; all captured checksums verified. No optical or secondary-output claim.
+Normal environment `k1_fe_bench_b489`, source `8accab34`, capture epoch
+`1793868822`: 28 enabled modes captured; independent roster and cyclic redundancy
+check (CRC) exit 0. Mode 27: 85/85 music frames lit. Mode 20: 0/100 lit in its
+sampled window; no all-modes-lit claim. Volume-unit (VU) modes are 10 and 4,
+not 5 and 9; they were disabled in initial fork `ed56dfb5`, before this lane.
+Their pre-existing disabled state is retained under the brief's section 2.2.
+Normal-image effect and dispatch timing are unavailable: its existing render
+trace records output-store milliseconds, not effect-call microseconds.
 
-| Mode | Quiet before | Music | Quiet after |
-|---|---:|---:|---:|
-| 7 | 0/94 | 89/89 | 0/95 |
-| 11 | 0/95 | 84/84 | 0/95 |
-| 32 | 0/90 | 83/83 | 0/90 |
+Mode 27's line-only consumer correction (`54480cae`) produced quiet 0/99,
+music 83/83, quiet 0/99. The requested ±10% baseline count remains OPEN
+(baseline 56/98); attempts were matched captures, historical bisection and the
+line-only consumer correction. Exact upstream causal mechanism was not isolated.
+Microphone producers, tracker files and saved calibration constants were untouched.
+Normal mode-32 microphone check initially failed quiet-before (9/100 lit), with
+music 90/90 and quiet-after 0/99. Existing audio telemetry repeat: quiet 0/100,
+music 77/91, quiet 0/99; exit 0. The first tail's cause is not isolated.
+No general microphone or optical qualification is claimed.
 
-Fallback save, measured on silicon: `k1_fe_bench_b489_trace_dev`, `ec7c9bc9`,
-configured 240 MHz, flags `_scratch/s3-repair-20261105/repair-trace-preamble.json`.
-Event-window 99th percentile 6,460 µs; mean 5,798.373 µs; consecutive misses 1;
-recovery 2 frames; maximum gap 9,967 µs; save duration 7,592 µs. This rolling
-window does not establish whole-session cadence or quiet-edge save duration.
+Full host suite: `python3 -m pytest tests -q`, exit 0, **2,028 passed, 2 skipped,
+0 failed**, tested `85da2224` plus the exact self-test copy fix committed in
+`1c9478e6`. First run: 2,027 passed, 2 skipped, 1 failed; generated sketch copy
+race repaired. An accidental duplicate commit-hook run was terminated without a
+complete result. Later bench cell-size changes have focused/source-parity checks;
+the suite is not relabelled as a final-commit run.
 
-Orchestration failures retained: initial diagnostic build/upload exit 1
-(missing FastLED object), retry exit 0; integrated replay exit 1 (missing
-bootloader after concurrent builds), retry exit 1 (existing run directory).
-These are execution failures, not product timing results. Receipts:
-`final-trace-upload.log`, `final-trace-upload-retry.log`, `final-seven.log`,
-`final-seven-retry.log`, all in `_scratch/s3-repair-20261105/`.
+Settings comparison exit 0: all 45 fields, look, calibration 108/57,
+microphone/auto, audio-processing stream, External Headphones route and volume 25
+restored. `final-restoration-result.json` records the pre-documentation check.
+After the documentation commit, `final-build-handshake.json` and
+`post-doc-restoration-result.json` bind the final normal flash/readback. This
+paragraph does not pre-claim that subsequent flash.
 
-Final diagnostic effect timings, **measured on silicon**:
-`k1_fe_bench_b489_trace_dev`, `36607a8f`, configured 240 MHz; flags and context
-in `_scratch/s3-repair-20261105/final-preamble.json`. Rolling windows only.
-Every primary effect maximum exceeds 2,000 µs. Initial effect gate commands
-failed with a missing-contract-key error (retained in
-`final-effect-gates-keyerror.json`); corrected fixture comparisons exit 1
-for all seven effects (`final-effect-gates.json`). Cadence comparisons are valid: mode 24 fails; the other six exit 0.
+#### Decision pack and remaining boundaries
 
-| Primary mode | Primary max µs | Secondary max µs | Cadence p99 µs | Mean µs | Consecutive misses | Recovery frames | Max gap µs |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| 14 | 2348 | 737 | 7036 | 6988.152 | 0 | 0 | 7044 |
-| 15 | 2330 | 737 | 7487 | 6962.182 | 0 | 0 | 7494 |
-| 19 | 2436 | 709 | 7034 | 6996.572 | 0 | 0 | 7040 |
-| 21 | 3390 | 636 | 8014 | 7263.386 | 0 | 0 | 8018 |
-| 24 | 3984 | 667 | 8480 | 7765.398 | 1 | 2 | 8493 |
-| 28 | 2360 | 696 | 7034 | 6986.210 | 0 | 0 | 7474 |
-| 29 | 2481 | 708 | 7029 | 7000.065 | 0 | 0 | 7034 |
+Open `visual/index.png` and the seven numbered Portable Network Graphics (PNG)
+sheets: 24 captured 8-bit red/green/blue (RGB8) strips per stock/lite side, actual
+timestamps, aggregate trace costs. Images were opened and inspected. Coarser
+filaments and changed colour-band positions are visible; mode 24's sampled lite
+window lacks the stock orange centre. They are buffer evidence, not optical footage.
+The byte differences are informational design changes, not performance parity.
 
-Historical baseline primary full-effect maxima versus final diagnostic maxima:
-
-| Mode | Baseline µs | Final µs |
-|---|---:|---:|
-| 14 | 2410 | 2348 |
-| 15 | 2237 | 2330 |
-| 19 | 2414 | 2436 |
-| 21 | 3471 | 3390 |
-| 24 | 4674 | 3984 |
-| 28 | 2325 | 2360 |
-| 29 | 2433 | 2481 |
-
-Baseline: measured on silicon, `k1_fe_bench_b489_trace_dev`, `9f3eb18e`,
-configured 240 MHz; flags `_scratch/s3-repair-20261105/baseline-build-flags.ini`;
-measurements `_scratch/s3-qualification-20261105/result.json`,
-`actual_failed_budgets.dispatch_failures`. The baseline used the same mode
-for primary and secondary; the final seven captures used secondary mode 18.
-They are separate campaigns with different secondary loads, not a paired
-speed-improvement experiment.
-All seven primary ceiling failures remain. Earlier 2,397/2,416 µs Forge values
-were moiré sub-scopes, not full-effect maxima. Final cadence covers seven
-rolling diagnostic windows, so its one failing window cannot be compared as
-a like-for-like improvement over the earlier eight-failure all-mode campaign.
-
-Timing receipt: `_scratch/s3-repair-20261105/final-effect-metrics.json`.
-Integrated native replay meets the permitted RGB8 byte/mask comparison for
-all seven modes (exit 0, `final-seven-replay.log` and `final-seven/byte-gate.json`).
-This is host projection of native output, not measured WS2812 bytes.
-The initial missing-bootloader and existing-directory replay failures remain
-recorded; the third replay succeeded using the built image.
-
-Diagnostic microphone check, same `36607a8f` trace image: mode 32 quiet-before
-0/92 nonzero frames, music 81/84, quiet-after 0/92; exit 0 in `mic-final.log`.
-Independent comparison against the prewritten presence expectation also exits
-0 (`presence-root-gate.log`). Integrated focused host tests: 62 passed, exit 0
-(`integrated-focused.log`). Paths are under `_scratch/s3-repair-20261105/`.
-
-Remaining product verification: the orchestrator records the actual repair
-outcome, then the product owner schedules physical WS2816 output, measured
-end-to-end latency and extended loaded operation on the intended product.
-B489 repair evidence alone cannot close those product checks.
-
-First normal 28-mode attempt ended after 23 completed modes when the finite
-music file ended; `final-normal-28.log` exits 1. Cleanup restored settings.
-The second full campaign uses existing playback loop support and completes
-all 28 modes; the independent roster/CRC comparison exits 0.
-Normal upload itself exits 0 (`final-normal-upload.log`).
-
-Exact silence-edge-to-black within 1.5 seconds and music return within one
-hop remain OPEN: settled presence windows do not measure these transitions.
-Paired ten-second elapsed-time motion is also OPEN; frame-index replay does
-not establish that timing. Microphone regression covers mode 32 only.
+`ceiling-option.json` lists the smallest observed p99 ceilings and cadence with
+secondary 18. It does not amend the hard-maximum contract. Captain chooses stock,
+lite or later redesign per effect, and separately whether to amend named ceilings.
+Before-build cadence remains unverified after counter, source-boundary and serial
+telemetry checks; no exact frame-start counter existed. The follow-up did not
+requalify save timing, beat accuracy, silence-edge latency or ten-second motion.
+See `gates.json` for failures and receipts; no push performed.
 <!-- END S3 REPAIR RESULTS -->
 
 ## 2. Deployed state (UPDATE ON EVERY FLASH)
 
 | Device | Commit | Build/env | Why | Since |
 |---|---|---|---|---|
-| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | Silicon-tested `36607a8f`; final product source `e42eec55`; final documentation-commit deployed identity: `_scratch/s3-repair-20261105/final-build-handshake.json` | **`k1_fe_bench_b489`** normal image; tested capture epoch `1793861288`. Post-documentation flash must be verified through the linked handshake. | 28-mode primary-output capture and independent CRC/roster check exit 0; 45 settings restored. Diagnostic presence windows corrected. Seven diagnostic effect ceilings remain exceeded; mode 24 diagnostic cadence fails. Full suite: 2,027 passed, two skipped, one failed; declaration repair then four focused tests passed. Detailed results and OPEN boundaries above. | **2026-11-05 repair record**; final deployed identity is receipt-bound. |
+| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | Normal capture `8accab34`; final documentation-commit identity in `_scratch/s3-repair-20261105/followup/final-build-handshake.json` | **`k1_fe_bench_b489`**; capture epoch `1793868822`; final flash receipt-bound | 28-mode CRC/roster gate exit 0; mode 27 lit; mode 20 dark in sampled window. 45 settings restored. Same-conditions decision pack above; stock ceilings unresolved. Full suite 2,028 passed, 2 skipped, zero failed at recorded revision. | **2026-11-05 follow-up**, Australian Western Standard Time (AWST) |
 | **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` firmware source **`9f3eb18e`**, epoch `1793835592`, flashed and identity-verified 2026-11-05 | **`k1_fe_bench_b489` normal image**, restored after registered performance/trace probes. WS2812 dual 160 on GPIO4/5; IM69 CLK14/DATA13; PCM1808 LRCK9/DOUT10/BCLK11. | Safe onset-return, Comet and mirror repairs; nine exact sprite callers, primary parameter reuse and exact saturation quotient. Host: **2,028 passed, 2 existing skips**; native output parity retained. Final instrumented campaign: **28 modes / 2,244 CRC-verified primary frames**; line 8,000 / mic 7,999 rows, zero listed acquisition errors, audio-service p99 upper bounds 5,184 / 4,768 us. **FAIL**: seven effect modes exceed 2 ms; three compute-frame and eight cadence failures. A 24,892 us dispatch gap contains an 18,641 us automatic save. Normal-image line test: **861 frames / nine windows**; Mode32 quiet output remains nonzero in 176/176 frames. No guessed analogue threshold adopted. Final normal microphone observation: **90/90 nonzero CRC-verified frames over 12.202 s**. All 32 primary / 13 secondary saved fields, look, modes32/18, SSL108/DC57, mic/auto, AP stream and Bose route restored. Local receipts: `_scratch/s3-qualification-20261105/result.json`, `design-comparison.json`, `device-reciprocal/`, `trace-reciprocal/`, `line-presence-current/`, `normal-final-closure/`. This is **not product qualification**; WS2816 electrical/optical output, true end-to-end latency and extended loaded operation remain unqualified. | **2026-11-05 historical**; superseded by the repair record above. |
 | **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` @ **`3919a273`**, epoch `1793808535`, flashed and identity-verified 2026-11-05 | **`k1_fe_bench_b489`** normal image restored after non-shippable scalar, shared-window and trace probes. Current 4 Nov WS2812 GPIO4/5, IM69 CLK14/DATA13 and PCM1808 LRCK9/DOUT10/BCLK11 wiring retained. | Corrected-build physical checks: 16,000 line-input and 8,000 microphone audio rows; zero acquisition errors; audio work p99 upper bounds 5,184 / 4,736 us. Frame maxima 5,393 / 5,285 us, zero overruns/drops. Six disjoint trace windows cover 23.572 s: 4,096 secondary-effect samples, maximum 850 us; primary composite maximum 1,307 us. Both bound the tested effect work below 2 ms (primary mode 32, secondary mode 18); these are not end-to-end latency or electrical timing measurements. The diagnostic start race that reported uptime as render duration was fixed and repeated; failed evidence retained. All 32 saved controls, mic/auto and Mac output route restored. Receipts: `_scratch/fe-s3-performance-20261104/scored.json`, `final-state.json`, raw captures and flash logs alongside. WS2816 software verified in `_scratch/esp-emulator/fe-final-export-20261104/_out/fe-final/result.json`; Main RPL unavailable by Captain direction, so physical WS2816 output is outside this connected-S3 verification. | **2026-11-05 historical**; superseded by the 9f3eb18e normal-image restore. |
 | **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` @ **`cc039484`**, flashed and identity-verified 2026-11-04 | **`k1_fe_bench_b489`** on the 4 Nov WS2812 GPIO4/5 and IM69/PCM1808 bench wiring below. Includes `b3a415ef` audio/colour repairs and asynchronous single-edge trace drain. | Physical 50 s capture with 35 s real music; 1,110 RGB8 primary-edge frames, CRC verified. Ring-drop counter stayed 720 throughout capture and download; all five overflow readings zero. Audio updates 134.16–138.71 Hz, LED updates 175.82–200.46 Hz at three status snapshots. These are cadence readings, not per-stage latency or wire timing. Source returned to mic/auto; all 32 saved control fields and Mac output route restored. Receipt: `_scratch/fe-device-closure-20261104/async/scored.json`; full raw log and flash receipt alongside. The preceding synchronous dump added 57,420 ring drops; that failed run is retained in the parent folder. WS2816 electrical output remains unverified: Main RPL was absent from live USB inventory. | **2026-11-04 historical**; superseded by the 5 Nov normal-image restore. |

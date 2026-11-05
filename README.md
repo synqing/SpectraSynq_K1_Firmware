@@ -31,23 +31,23 @@ LED channels diffused through a sealed light-guide plate.
   output. Audio service timing alone does not establish that latency.
 
 <!-- BEGIN S3 REPAIR RESULTS -->
-## 5 November S3 repair
+## 5 November S3 follow-up
 
-Silicon-tested source: `36607a8f`; final source `e42eec55` adds only the
-registry-compatible silence-dwell declaration repair. The diagnostic B489 capture shows modes 7, 11 and
-32 dark in both quiet windows and lit throughout their music windows. The
-seven targeted effects still exceed the 2 ms ceiling; mode 24 also fails the
-diagnostic cadence gate. The sixty-second settings-save fallback was captured; quiet-edge save timing and
-whole-session save cadence remain OPEN. Held-out beat qualification was not run.
+The same-conditions decision pack is complete; shipping effect ceilings remain
+unresolved. Seven cheaper designs are isolated to the diagnostic bench build.
+The normal bench build retains stock designs. Mode 27's line-input rendering was
+repaired; its strict baseline lit-count tolerance remains open. The river lookup
+was reverted after the paired measurement failed its retention criterion.
 
-The normal-image 28-mode capture completed and its primary-output checksums
-were independently verified; mode 27 remained dark in its sampled window.
-The single full suite returned **2,027 passed, two skipped, one failed**.
-The registry-sync failure was repaired and four focused tests passed; the full
-suite was not rerun. All 45 saved settings matched after restoration. Normal-image per-effect timing and frame-start cadence
-remain **OPEN**: its primary-only render trace records output-store timestamps
-in milliseconds, not effect calls or dispatch starts. Diagnostic timing is
-reported separately in the [device registry](./docs/hardware/device-build-registry.md#s3-repair-2026-11-05).
+Full host suite: **2,028 passed, two skipped, zero failed** at the recorded test
+revision. Normal capture source `8accab34`: 28 modes captured, mode 27 lit in 85/85
+music frames; mode 20 dark in its sampled window. All 45 saved settings matched
+on restoration. Normal-image microsecond timing is not available from its trace.
+
+Open the [seven-effect visual comparison](./_scratch/s3-repair-20261105/followup/visual/index.png)
+and [ceiling options](./_scratch/s3-repair-20261105/followup/ceiling-option.json).
+Exact identities, timings, failed gates and final deployment receipt pointers are
+in the [device registry](./docs/hardware/device-build-registry.md#s3-repair-2026-11-05).
 <!-- END S3 REPAIR RESULTS -->
 
 ## Hardware
