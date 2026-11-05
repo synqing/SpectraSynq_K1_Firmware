@@ -1,0 +1,21 @@
+{
+  "state": "finished",
+  "run": 2,
+  "git_sha": "85da22248da22514a209c946ec5f0761d7f97933",
+  "command": "python3 -m pytest tests -q",
+  "log": "_scratch/s3-repair-20261105/followup/host-suite-final.log",
+  "exit_file": "_scratch/s3-repair-20261105/followup/sw-h/host-suite-final.exit",
+  "uncommitted_selftest_fix_sha256": "5457c41022084924a231de75d098faa90c8f6653e16f96a1975decd1dccbff14",
+  "scope": "host test suite; no silicon timing claim",
+  "observed_at_awst": "2026-11-05T16:36:12.898770+08:00",
+  "build_free_window": "Root confirmed no PlatformIO build in main checkout until suite completes.",
+  "exit_code": 0,
+  "counts": {
+    "passed": 2028,
+    "skipped": 2,
+    "failed": 0
+  },
+  "log_sha256": "75e9644c75c4c31c6d949f2438d41dd8f1cb63387ad74f24f2a23db4cabd7269",
+  "finished_observed_at_awst": "2026-11-05T16:43:28.848577+08:00",
+  "head_at_completion": "85da22248da22514a209c946ec5f0761d7f97933"
+}

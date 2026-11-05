@@ -144,7 +144,9 @@ def _mutated_capture(mod, pattern, replacement):
     patterns = [(pattern, replacement)] + _routing_sever_companions(pattern, replacement)
     with tempfile.TemporaryDirectory() as td:
         dst = Path(td) / "SPECTRASYNQ_K1_FIRMWARE"
-        shutil.copytree(FIRMWARE, dst)
+        # PlatformIO creates/removes these generated files during a build;
+        # copy the source tree, not its transient sketch translation units.
+        shutil.copytree(FIRMWARE, dst, ignore=shutil.ignore_patterns("*.ino.cpp"))
         targets = []
         for f in dst.rglob("*"):
             if f.suffix in (".cpp", ".h") and f.is_file():

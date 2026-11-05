@@ -1,0 +1,30 @@
+[
+  {
+    "gate": "full-host-suite-run-1",
+    "command": "python3 -m pytest tests -q",
+    "exit_code": 1,
+    "receipt": "_scratch/s3-repair-20261105/followup/sw-h/receipt.json",
+    "status": "failed",
+    "reason": "shutil.copytree raced PlatformIO removing generated SPECTRASYNQ_K1_FIRMWARE.ino.cpp; source listing succeeded, copying failed with ENOENT."
+  },
+  {
+    "gate": "focused-harness-selftest",
+    "command": "python3 -m pytest tests/test_harness_selftest.py -q",
+    "exit_code": 0,
+    "receipt": "_scratch/s3-repair-20261105/followup/sw-h/focused-receipt.json"
+  },
+  {
+    "gate": "R-accidental-hook-full-suite",
+    "command": "git commit pre-commit pytest tests/ -q",
+    "exit_code": null,
+    "state": "terminated before completion",
+    "receipt": "_scratch/s3-repair-20261105/followup/sw-r/hook-termination.json",
+    "note": "SIGTERM recorded; no full-suite result or exit code available."
+  },
+  {
+    "gate": "full-host-suite-run-2",
+    "command": "python3 -m pytest tests -q",
+    "exit_code": 0,
+    "receipt": "_scratch/s3-repair-20261105/followup/sw-h/final-receipt.json"
+  }
+]
