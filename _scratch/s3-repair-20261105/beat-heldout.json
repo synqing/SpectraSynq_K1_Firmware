@@ -1,0 +1,72 @@
+{
+  "schema": "k1-s3-beat-heldout-report/1",
+  "recorded_awst": "2026-11-05T14:00:55.299969+08:00",
+  "worktree": "/Users/spectrasynq/k1-sw-b",
+  "source_git_sha": "b779e56174cd7b36fae1741cd068a3bca37feb79",
+  "status": "NOT_RUN",
+  "summary": "No approved executable held-out beat corpus; step not run. A tempo corpus exists with conditional approval, but its execution remains reserved.",
+  "authority_findings": [
+    {
+      "path": "docs/architecture/tempo-lock-hardening-plan.md",
+      "lines": "233-246",
+      "finding": "Ballroom 698 + GiantSteps Tempo 661 approved in principle; execution held until development entry gates pass, then all 1359 once."
+    },
+    {
+      "path": "docs/architecture/tempo-lock-hardening-plan.md",
+      "lines": "314-326,429-432",
+      "finding": "Captain supplement explicitly preserves untouched acceptance corpus until qualified candidate clears development requirements; lock-off fallback does not take this run."
+    },
+    {
+      "path": "_scratch/s3-qualification-20261105/audio/v2-preregistration.json",
+      "lines": "30",
+      "finding": "1359 held-out clips remain untouched; original gate not waived."
+    },
+    {
+      "path": "_scratch/s3-qualification-20261105/audio/phase-native-preregistration.json",
+      "finding": "Earlier ten beat-scored clips are V1 validation, not held-out acceptance."
+    }
+  ],
+  "manifest_roles": {
+    "heldout": 1359,
+    "dev": 36
+  },
+  "matching_tolerance_ms": 70.0,
+  "matching_tolerance_source": "scripts/regression-harness/s3_audio_qualification_beats.py:15",
+  "matching_method": "One-to-one ordered matches within inclusive +/-70 ms; no phase fitting; 5 s warm-up. Method read only; no clips scored.",
+  "requested_wrong_tempo_classification": {
+    "three_to_two": "failure",
+    "half_or_double": "acceptable"
+  },
+  "requested_bpm_range": [
+    60,
+    155
+  ],
+  "clips": [],
+  "hardware_accessed": false,
+  "tracker_edited": false,
+  "new_tooling": false,
+  "evidence": [
+    {
+      "path": "docs/architecture/tempo-lock-hardening-plan.md",
+      "sha256": "ea8ddfb830daf365cceb8f963db99bd8593c9e0e5940ad80069849eadc5c1f5c"
+    },
+    {
+      "path": "docs/defects/DEF-002-tempo-3to2-winner-and-sharpness-confidence.md",
+      "sha256": "402002246632c6a86449d4b8bd05e2295f58753b64791033cf01a620115752e4"
+    },
+    {
+      "path": "tests/fixtures/tempo_corpus/manifest.json",
+      "sha256": "807751a40e676a7d443c9f985fe831fb8c06ce37adfea4f13110e2543c7918ee"
+    },
+    {
+      "path": "scripts/regression-harness/s3_audio_qualification_beats.py",
+      "sha256": "586b8f0a85db6da6602367e87b87d110d48c648b58e0ea229d08e7f30f5613a4"
+    }
+  ],
+  "limitations": [
+    "No current-build published ticks, matches, precision, recall, tempo-lock classifications or range validation measured.",
+    "docs/decisions does not exist; inspected docs/defects, architecture rulings, tests/fixtures manifest and relevant scratch authority records.",
+    "No development/483-clip substitution; no held-out audio decoded or replayed."
+  ],
+  "recommendation": "Keep beat qualification OPEN and preserve the reserved corpus; continue the repair lane."
+}
