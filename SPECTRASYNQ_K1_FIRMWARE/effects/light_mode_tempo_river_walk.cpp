@@ -1,4 +1,10 @@
 #include "lightshow_modes.h"
+#if defined(K1_BENCH_FX_LITE_29) && K1_BENCH_FX_LITE_29 == 1
+#if !FEATURE_MABUTRACE || !defined(K1_FE_BENCH_B489_V1)
+#error "K1 river lite variants require the B489 trace development build"
+#endif
+#endif
+
 #include "k1_tempo.h"
 #include <math.h>
 #include "k1_vp_audio_access.h"
@@ -82,6 +88,7 @@ static inline float tr_smoothstep(float lo, float hi, float x) {
 }
 
 void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
+  RiverEffectSections sections("river29_setup");
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
   const CRGBPalette16& pal =
@@ -154,6 +161,7 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
   }
 
   // 1. Flow the previous river OUTWARD by the tempo-locked drift, with decay.
+  sections.next("river29_transport");
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
               drift, SQ15x16(TR_TRAIL_ALPHA));
@@ -161,6 +169,7 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
   // Keep the river in the upper (mirror-authoritative) half; clear cross-centre bleed.
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
+  sections.next("river29_injection");
   // 2. Inject the live spectrum: bin k -> pixel HALF+k, colour BY FREQUENCY,
   //    palette position walked by the slewed bar offset (amplitude untouched).
   //    Nyquist ghosts retired — analysis_bins only.
@@ -169,18 +178,44 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
-  for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_29) && K1_BENCH_FX_LITE_29 == 1 && defined(K1_FE_BENCH_B489_V1)
+  // Bench design: paired spectral filaments; the stronger bin supplies colour.
+  constexpr uint16_t bin_stride = 2;
+#else
+  constexpr uint16_t bin_stride = 1;
+#endif
+  for (uint16_t k = 0; k < analysis_bins && k < HALF; k += bin_stride) {
     float e = float(spectrogram_smooth[k]);
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_29) && K1_BENCH_FX_LITE_29 == 1 && defined(K1_FE_BENCH_B489_V1)
+    uint16_t colour_bin = k;
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      const float neighbour = float(spectrogram_smooth[k + 1]);
+      if (isfinite(neighbour) && neighbour > e) {
+        e = neighbour;
+        colour_bin = k + 1;
+      }
+    }
+#else
+    const uint16_t colour_bin = k;
+#endif
     if (!isfinite(e) || e < 0.0f) e = 0.0f; if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;               // contrast (square-iter)
     if (e < TR_FLOOR) continue;
-    float hue = float(k) / hue_denom + fx.trwalk_offset;  // frequency -> palette position + walk
+    float hue = float(colour_bin) / hue_denom + fx.trwalk_offset;  // frequency -> palette position + walk
     hue -= floorf(hue);                                        // wrap [0,1)
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * TR_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r; leds_16[idx].g += col.g; leds_16[idx].b += col.b;
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_29) && K1_BENCH_FX_LITE_29 == 1 && defined(K1_FE_BENCH_B489_V1)
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      leds_16[idx + 1].r += col.r;
+      leds_16[idx + 1].g += col.g;
+      leds_16[idx + 1].b += col.b;
+    }
+#endif
   }
 
+  sections.next("river29_finalise");
   // 3. Bound additive overflow before it becomes next frame's trail state.
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
 

@@ -21,6 +21,35 @@
 void tx_begin(bool error);
 void tx_end(bool error);
 
+// Consecutive diagnostic sections cover the whole river body without nesting.
+// Normal builds compile these calls away; no render-time allocation is used.
+class RiverEffectSections {
+#if FEATURE_MABUTRACE
+  profiler_duration_handle_t handle;
+#endif
+public:
+  explicit RiverEffectSections(const char* name) {
+#if FEATURE_MABUTRACE
+    handle = trace_begin(name, COLOR_UNDEFINED);
+#else
+    (void)name;
+#endif
+  }
+  void next(const char* name) {
+#if FEATURE_MABUTRACE
+    trace_end(&handle);
+    handle = trace_begin(name, COLOR_UNDEFINED);
+#else
+    (void)name;
+#endif
+  }
+  ~RiverEffectSections() {
+#if FEATURE_MABUTRACE
+    trace_end(&handle);
+#endif
+  }
+};
+
 inline void get_smooth_spectrogram() {
   static SQ15x16 spectrogram_smooth_last[NUM_FREQS];
 
