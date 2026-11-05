@@ -169,12 +169,13 @@ void light_mode_tempo_river_walk(CRGB16* leds_prev_buffer, ChannelEffectState& f
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
+  const float hue_scale = 1.0f / hue_denom;
   for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
     float e = float(spectrogram_smooth[k]);
     if (!isfinite(e) || e < 0.0f) e = 0.0f; if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;               // contrast (square-iter)
     if (e < TR_FLOOR) continue;
-    float hue = float(k) / hue_denom + fx.trwalk_offset;  // frequency -> palette position + walk
+    float hue = float(k) * hue_scale + fx.trwalk_offset;  // frequency -> palette position + walk
     hue -= floorf(hue);                                        // wrap [0,1)
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * TR_INJECT_GAIN));
     const uint16_t idx = HALF + k;
