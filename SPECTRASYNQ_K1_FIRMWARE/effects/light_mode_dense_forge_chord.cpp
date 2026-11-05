@@ -257,7 +257,12 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   {
     K1_TRACE_SCOPE("df24_moire");
   // Moiré interference inject — spatial texture without advection.
-  // Re-anchor every eight pixels to bound recurrence round-off.
+  // Bound recurrence to small phases: at large carrier values the original
+  // per-pixel float additions have quantised spacing, not a constant step.
+  const bool use_recurrence = isfinite(fx.dforge_carrier) &&
+      fabsf(fx.dforge_carrier) <= 128.0f && isfinite(phase_b) &&
+      fabsf(phase_b) <= 6.2831853f;
+  // Re-anchor every eight pixels within that bounded phase range.
   const float phase_step_a = 6.2831853f * 2.17f / float(HALF > 1 ? HALF - 1 : 1);
   const float phase_step_b = 6.2831853f * 3.61f / float(HALF > 1 ? HALF - 1 : 1);
   const float step_sin_a = sinf(phase_step_a), step_cos_a = cosf(phase_step_a);
@@ -266,21 +271,27 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   float wave_sin_b = 0.0f, wave_cos_b = 0.0f;
   for (uint16_t k = 0; k < HALF; k++) {
     const float u = float(k) / float(HALF > 1 ? HALF - 1 : 1);
-    if ((k & 7u) == 0u) {
+    if (use_recurrence && (k & 7u) == 0u) {
       const float angle_a = 6.2831853f * (u * 2.17f + fx.dforge_carrier);
       const float angle_b = 6.2831853f * (u * 3.61f - phase_b);
       wave_sin_a = sinf(angle_a); wave_cos_a = cosf(angle_a);
       wave_sin_b = sinf(angle_b); wave_cos_b = cosf(angle_b);
     }
-    const float moire = wave_sin_a * wave_sin_b;
-    const float next_sin_a = wave_sin_a * step_cos_a + wave_cos_a * step_sin_a;
-    const float next_sin_b = wave_sin_b * step_cos_b + wave_cos_b * step_sin_b;
-    wave_cos_a = wave_cos_a * step_cos_a - wave_sin_a * step_sin_a;
-    wave_cos_b = wave_cos_b * step_cos_b - wave_sin_b * step_sin_b;
-    wave_sin_a = next_sin_a; wave_sin_b = next_sin_b;
+    float moire;
+    if (use_recurrence) {
+      moire = wave_sin_a * wave_sin_b;
+      const float next_sin_a = wave_sin_a * step_cos_a + wave_cos_a * step_sin_a;
+      const float next_sin_b = wave_sin_b * step_cos_b + wave_cos_b * step_sin_b;
+      wave_cos_a = wave_cos_a * step_cos_a - wave_sin_a * step_sin_a;
+      wave_cos_b = wave_cos_b * step_cos_b - wave_sin_b * step_sin_b;
+      wave_sin_a = next_sin_a; wave_sin_b = next_sin_b;
+    } else {
+      moire = sinf(6.2831853f * (u * 2.17f + fx.dforge_carrier)) *
+          sinf(6.2831853f * (u * 3.61f - phase_b));
+    }
     const float source_energy = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
     // Gain 0.48 and envelope <= 1 keep these pixels below 0.96 * floor.
-    // Preserve the original expressions below for every contributing pixel.
+    // This skip removes only values below the unchanged injection floor.
     if (isfinite(fx.dforge_carrier) && fabsf(fx.dforge_carrier) < 1e30f &&
         isfinite(phase_b) && fabsf(phase_b) < 1e30f &&
         (inject_scale == 0.0f || (isfinite(source_energy) && source_energy < DFORGE_FLOOR * 2.0f))) continue;
