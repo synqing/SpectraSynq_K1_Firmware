@@ -38,6 +38,7 @@ static const float   RIVERV2_INJECT_GAIN  = 0.90f; // == SR v1 (do not raise)
 static const uint8_t RIVERV2_MAX_ITERS    = 4;
 
 void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
+  RiverEffectSections sections("river15_setup");
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
   const CRGBPalette16& pal =
@@ -58,10 +59,12 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
   //    Persistence is CONSTANT (== v1) — never raised, so it never "holds".
   const float drift = RIVERV2_DRIFT_BASE * (RIVERV2_DRIFT_FLOOR + RIVERV2_DRIFT_SURGE * tide) * (float(NATIVE_RESOLUTION) / 128.0f);
 
+  sections.next("river15_transport");
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(RIVERV2_ALPHA));
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
+  sections.next("river15_injection");
   // 2. Inject the live spectrum (identical to SR v1: bin k -> pixel HALF+k,
   //    colour by frequency, brightness by contrast-enhanced energy).
   uint8_t iters = (uint8_t)rp->SQUARE_ITER;
@@ -70,20 +73,47 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
-  for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+  // Bench design: paired spectral filaments retain every input bin, with one
+  // palette sample for each pair. The stronger bin supplies energy and colour.
+  constexpr uint16_t bin_stride = 2;
+#else
+  constexpr uint16_t bin_stride = 1;
+#endif
+  for (uint16_t k = 0; k < analysis_bins && k < HALF; k += bin_stride) {
     float e = float(spectrogram_smooth[k]);
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+    uint16_t colour_bin = k;
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      const float neighbour = float(spectrogram_smooth[k + 1]);
+      if (isfinite(neighbour) && neighbour > e) {
+        e = neighbour;
+        colour_bin = k + 1;
+      }
+    }
+#else
+    const uint16_t colour_bin = k;
+#endif
     if (!isfinite(e) || e < 0.0f) e = 0.0f;
     if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;
     if (e < RIVERV2_FLOOR) continue;
-    const float hue = float(k) / hue_denom;
+    const float hue = float(colour_bin) / hue_denom;
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * RIVERV2_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r;
     leds_16[idx].g += col.g;
     leds_16[idx].b += col.b;
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      leds_16[idx + 1].r += col.r;
+      leds_16[idx + 1].g += col.g;
+      leds_16[idx + 1].b += col.b;
+    }
+#endif
   }
 
+  sections.next("river15_finalise");
   // 3. Bound additive overflow before it becomes next frame's flow.
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
 

@@ -81,6 +81,7 @@ static const float   RSURGE_WF_HALF_W    = 3.0f;  // half-width in px (~6 px ban
 static const float   RSURGE_WF_GAIN      = 0.95f; // wavefront injection brightness cap
 
 void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
+  RiverEffectSections sections("river28_setup");
   const RenderParams* rp = active_render_params();
   const bool render_secondary = vp_render_secondary_channel;
   const CRGBPalette16& pal =
@@ -173,10 +174,12 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   //    bass tide AND the macro arc multiplier m. Persistence CONSTANT (== v2).
   const float drift = RSURGE_DRIFT_BASE * (RSURGE_DRIFT_FLOOR + RSURGE_DRIFT_SURGE * tide) * m * (float(NATIVE_RESOLUTION) / 128.0f);
 
+  sections.next("river28_transport");
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION, drift, SQ15x16(RSURGE_ALPHA));
   for (uint16_t i = 0; i < HALF; i++) { leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0; }
 
+  sections.next("river28_injection");
   // 2. Inject the live spectrum (identical to SR v2: bin k -> pixel HALF+k,
   //    colour by frequency, brightness by contrast-enhanced energy).
   //    Nyquist ghosts retired — analysis_bins only.
@@ -186,20 +189,46 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
-  for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_28) && K1_BENCH_FX_LITE_28 == 1
+  // Bench design: paired spectral filaments; the stronger bin supplies colour.
+  constexpr uint16_t bin_stride = 2;
+#else
+  constexpr uint16_t bin_stride = 1;
+#endif
+  for (uint16_t k = 0; k < analysis_bins && k < HALF; k += bin_stride) {
     float e = float(spectrogram_smooth[k]);
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_28) && K1_BENCH_FX_LITE_28 == 1
+    uint16_t colour_bin = k;
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      const float neighbour = float(spectrogram_smooth[k + 1]);
+      if (isfinite(neighbour) && neighbour > e) {
+        e = neighbour;
+        colour_bin = k + 1;
+      }
+    }
+#else
+    const uint16_t colour_bin = k;
+#endif
     if (!isfinite(e) || e < 0.0f) e = 0.0f;
     if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;
     if (e < RSURGE_FLOOR) continue;
-    const float hue = float(k) / hue_denom;
+    const float hue = float(colour_bin) / hue_denom;
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * RSURGE_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r;
     leds_16[idx].g += col.g;
     leds_16[idx].b += col.b;
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_28) && K1_BENCH_FX_LITE_28 == 1
+    if (k + 1 < analysis_bins && k + 1 < HALF) {
+      leds_16[idx + 1].r += col.r;
+      leds_16[idx + 1].g += col.g;
+      leds_16[idx + 1].b += col.b;
+    }
+#endif
   }
 
+  sections.next("river28_wavefront");
   // 2b. Drop wavefront: ONE localised ~6 px band riding outward at 2.5x the
   //     river's own speed, intensity decaying over its life, coloured by the
   //     river's frequency->palette contract at its position. Injected before
@@ -230,6 +259,7 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     }
   }
 
+  sections.next("river28_finalise");
   // 3. Bound additive overflow before it becomes next frame's flow.
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
 
