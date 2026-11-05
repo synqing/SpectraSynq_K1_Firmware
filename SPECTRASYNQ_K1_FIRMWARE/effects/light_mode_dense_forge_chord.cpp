@@ -299,10 +299,10 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   {
     K1_TRACE_SCOPE("df24_moire");
 #if K1_BENCH_FX_LITE_24
-  // Bench design: five colour/interference samples across the 80-pixel half.
+  // Bench design: two colour/interference samples across the 80-pixel half.
   // Mean spectrum energy keeps every bin contributing; transport still moves
   // every pixel every frame. This is a coarser texture, not a byte optimisation.
-  constexpr uint16_t cell_width = 16;
+  constexpr uint16_t cell_width = 40;
   for (uint16_t k = 0; k < HALF; k += cell_width) {
     const uint16_t end = (k + cell_width < HALF) ? k + cell_width : HALF;
     float e = 0.0f;
