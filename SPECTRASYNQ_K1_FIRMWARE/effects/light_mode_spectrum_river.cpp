@@ -1,4 +1,5 @@
 #include "lightshow_modes.h"
+#include "k1_trace.h"
 
 // ============================================================================
 // light_mode_spectrum_river — "Spectrum River": the GDFT spectrum mapped to
@@ -38,6 +39,8 @@ void light_mode_spectrum_river(CRGB16* leds_prev_buffer) {
   const uint16_t HALF = NATIVE_RESOLUTION / 2;   // 80
 
   // 1. Flow: transport the previous river OUTWARD (toward the +end) with decay.
+  {
+    K1_TRACE_SCOPE("river14_transport");
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   const float drift = RIVER_DRIFT_BASE * (float(NATIVE_RESOLUTION) / 128.0f);
   draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
@@ -49,6 +52,10 @@ void light_mode_spectrum_river(CRGB16* leds_prev_buffer) {
     leds_16[i].r = 0; leds_16[i].g = 0; leds_16[i].b = 0;
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("river14_injection");
   // 2. Inject the live spectrum: bin k -> pixel (HALF + k). Colour from the
   //    palette BY FREQUENCY (bass -> palette start, treble -> palette end;
   //    palette_manual_colour folds in the auto-colour-shift phase), brightness
@@ -74,8 +81,14 @@ void light_mode_spectrum_river(CRGB16* leds_prev_buffer) {
     leds_16[idx].b += col.b;
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("river14_finalise");
   // 3. Bound additive overflow before it becomes next frame's trail state.
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
+
+  }
 
   // 4. Centre-origin mirror (upper half -> lower half).
   if (rp->MIRROR_ENABLED) {
