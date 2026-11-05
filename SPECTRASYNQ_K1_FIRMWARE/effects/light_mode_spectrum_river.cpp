@@ -67,13 +67,14 @@ void light_mode_spectrum_river(CRGB16* leds_prev_buffer) {
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
+  const float hue_scale = 1.0f / hue_denom;
   for (uint16_t k = 0; k < analysis_bins && k < HALF; k++) {
     float e = float(spectrogram_smooth[k]);
     if (!isfinite(e) || e < 0.0f) e = 0.0f;
     if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;     // contrast (square-iter), family convention
     if (e < RIVER_FLOOR) continue;
-    const float hue = float(k) / hue_denom;   // frequency -> palette position
+    const float hue = float(k) * hue_scale;   // frequency -> palette position
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * RIVER_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r;
