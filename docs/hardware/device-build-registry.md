@@ -1,5 +1,5 @@
 ---
-abstract: "CANONICAL device↔env↔build registry for the registered K1 units: Main RPL (CHIP ID 9087A500 / USB B4:3A:45:A5:87:90 — product k1_main_rpl_im69d @ clean acaecaa8 after Colour Lab rtrace 2026-08-27; on /dev/cu.usbmodem1101), bench K1v2 B489A500 on usbmodem1401 — k1_bench_im69d_led150 @ clean f2014c29 (eight-print look-lib; 150-px WS2812 GPIO39/40). COLOUR_LAB_WEB_UI_HARDWARE_PASS 2026-08-28 on both units: Paint off on both; Main slot 15 deliberately identity-saved; Bench Tune unavailable. TUNGSTEN_GREY PASS; RUNTIME_SLOT15 PASS on Main RPL only. I2S/LCD_CAM eval PARKED. k1_hardware carries K1_EDGE_PALETTE_HONOUR_V1. F887A500 OFFSITE. Verify against live git/device before trusting the deployed-state table; update the table on every flash."
+abstract: "Canonical registered-device and build registry. B489 repair silicon captures use 36607a8f; final product source e42eec55 adds the registry-compatible dwell declaration repair. Final deployed documentation-commit identity is recorded by final-build-handshake.json. Normal 28-mode primary output captured; seven effect ceilings and other bounded checks remain open. Full suite had one failure; focused repair passed. Older rows are historical."
 ---
 
 # K1 Device ↔ Build Registry (canonical)
@@ -28,7 +28,7 @@ in [`../spec-index.md`](../spec-index.md).
 |---|---|---|---|---|
 | **1401** | **Main RPL** (main K1 replacement) | `9087A500` (**locked** live `:dump` 2026-08-18: `CHIP ID: 9087A500`) | `/dev/cu.usbmodem1401` (historical CDC; live 2026-08-25 Serial-JTAG `/dev/cu.usbmodem112401` after product restore). USB `B4:3A:45:A5:87:90` | **`k1_main_rpl_im69d` only** (standing). USB-audio probe taken off after `K1_USB_AUDIO_DIAGNOSTIC=PASS`. Current silicon **`k1_main_rpl_im69d` @ `b625e89a`**. Pin receipt [`main-rpl-pin-receipt-2026-08-18.md`](./main-rpl-pin-receipt-2026-08-18.md): each WS2816 PCB = one continuous 160-LED strip, DIN-A leds **1–80** / DIN-B leds **81–160**; **primary 15/16**, **secondary 17/18**; dual IM69D130 DATA=**8** CLK=**9**, `SLOT_RIGHT`. I2C 17/18 displaced; encoders stay dead. Never `k1_hardware` / never bench LED map. |
 | **F887 (OFFSITE)** | Former main K1 | `F887A500` | none (consultancy) | Historical `k1_hardware` allowlist retained in identities JSON for when/if the unit returns. **Do not flash any other serial as F887.** |
-| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem12201` / currently (2026-08-26) `/dev/cu.usbmodem1401` (Serial-JTAG; USB `B4:3A:45:A5:89:B4`) | `k1_bench_reference`; non-shippable bench variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_bench_im69d`, `k1_bench_im69d_led150` (150-px WS2812 on GPIO39/40), `k1_bench_im69d_wfhyb_fade`, `k1_bench_im69d_ble`; AP input-integrity diagnostics `k1_bench_im69d_ap_integrity_probe` and deliberate RED mutation `k1_bench_im69d_ap_integrity_bad_probe`; `k1_sync_probe_bench` (dual-K1 sync Phase-0 FOLLOWER, non-shippable, F5 grant 2026-07-08); FE bench proof `k1_fe_bench_b489` and mic wiring diagnostics `k1_bench_im69d_wirediag_pullup` / `_swap` (2026-11-03, non-shippable). **`k1_custom` is NOT permitted here** (BLOCKED everywhere in the guard since 2026-08-12 — no nominated device; recomposed off *im73d* onto `k1_bench_im69d_ble`, P2.B). |
+| **12201** | Bench K1v2 | `B489A500` | `/dev/cu.usbmodem101` (live 2026-11-05; older `12201` / `1401` hints are historical; USB `B4:3A:45:A5:89:B4`) | `k1_bench_reference`; non-shippable bench variants `k1_bench_im73d`, `k1_bench_im73d_ble`, `k1_bench_im69d`, `k1_bench_im69d_led150` (150-px WS2812 on GPIO39/40), `k1_bench_im69d_wfhyb_fade`, `k1_bench_im69d_ble`; AP input-integrity diagnostics `k1_bench_im69d_ap_integrity_probe` and deliberate RED mutation `k1_bench_im69d_ap_integrity_bad_probe`; `k1_sync_probe_bench` (dual-K1 sync Phase-0 FOLLOWER, non-shippable, F5 grant 2026-07-08); FE bench proof `k1_fe_bench_b489` and mic wiring diagnostics `k1_bench_im69d_wirediag_pullup` / `_swap` (2026-11-03, non-shippable). **`k1_custom` is NOT permitted here** (BLOCKED everywhere in the guard since 2026-08-12 — no nominated device; recomposed off *im73d* onto `k1_bench_im69d_ble`, P2.B). |
 | **Bench Unit 2** | **K1 Bench Unit 2** (dual-206 custom) | `0C54FC00` (ESP MAC `AC:A7:04:FC:54:0C`) | `/dev/cu.usbmodem1101` (USB serial = MAC `AC:A7:04:FC:54:0C`; was WCH `5B7A114793`) | **`k1_unit2_im69d_right` only** — extends `k1_bench_im69d`; **never any `*im73d*` env**. **Physical mic = dual IM69D130** (Captain correction 2026-08-10). **PDM pins AUTHORISED: `CLK=GPIO39` / `DATA=GPIO38`, RIGHT slot**, under **`CAPTAIN_PIN_AUTH` 2026-08-11** — evidence [`im69d130-unit2-pin-receipt-2026-08-11.md`](./im69d130-unit2-pin-receipt-2026-08-11.md). **SELECT is static hardware truth and is never driven by firmware** (`constants.h`; GPIO12 is an escape-hatch pin only). Dual 206-px WS2812B on LED GPIO `4/5`, render canvas 160 — `K1_CUSTOM_LED_V1` is deliberately **NOT** set (it drops the secondary strip and would break 206/206). **⚠ Dual-capsule topology is UNPROVEN** — no complementary SELECT measurement, no shared-DATA contention proof, no per-capsule VDD/ground/clock record; only the RIGHT capsule path is evidenced. **Not** covered by the "two K1s are identical hardware" statement below. Distinct from Bench K1v2 (`B489A500`). |
 | **K718** | Remoted BLE-MIDI dial (Guition JC3636K718_P, **separate product**, not a K1) | MAC `ac:a7:04:ee:57:7c` (ESP32-S3R8, 8MB PSRAM, 16MB flash) | `/dev/cu.usbmodem101` (2026-06-30; drifts) | arduino-cli `JC3636_K718_REMOTED_BLE_V1` (knob repo) — **never a K1 pio env** |
 | **P4-WIFI6 lab** | Waveshare ESP32-P4-WIFI6 (ADR-0007 dual-target) | `0743E200` (live `:dump` 2026-08-22; MAC `30:ed:a0:e2:43:07`) | `/dev/cu.wchusbserial5AAF2781791` (USB `5AAF278179`) | **`k1_p4_wifi6`** (default loom: two WS2812 160-px, GPIO4/5). Child **`k1_p4_wifi6_led150`** is the 150-px/channel proto on GPIO39/40 (SD DAT0/DAT1 — leave TF empty); **not on silicon until Captain flash GO**. Never Tab5 `usbmodem*`, never S3, never `k1_hardware`. Flash 115200. Console UART0 115200, DTR deasserted. |
@@ -105,13 +105,177 @@ Ports are badly scrambled vs the typical map; verified by chip type + MAC:
   demo env to the bench (guard-verified `B489A500` on `1101`) — see §2 top row +
   `docs/hardware/im73d-ble-midi-demo-build-2026-07-04.md`.
 
+<!-- BEGIN S3 REPAIR RESULTS -->
+<a id="s3-repair-2026-11-05"></a>
+### 5 November S3 repair — tested source `36607a8f`
+
+Silicon captures and the single full suite used `36607a8f`. Final product
+source is `e42eec55`, integrating `80bf7aa8`: one silence-dwell declaration
+replaces duplicate conditional declarations. Bench 1,000 ms and product
+5,000 ms defaults are unchanged; the generated registry header is unchanged.
+The four focused registry tests passed after that repair. The full suite was
+not rerun, and the earlier captures are not relabelled as a later-source run.
+
+After the final documentation commit, the orchestrator flashes the normal
+image and writes `_scratch/s3-repair-20261105/final-build-handshake.json`.
+Consult that receipt for the final running commit and epoch. This document
+does not claim that post-documentation flash has already been observed.
+Receipt names below are relative to `_scratch/s3-repair-20261105/` unless
+an explicit repository path is supplied.
+
+| Identity and measurement context | Final value |
+|---|---|
+| Unit and serial port | B489A500; `/dev/cu.usbmodem101`; final readback in `final-build-handshake.json` |
+| Normal environment | `k1_fe_bench_b489` |
+| Firmware source commit / final normal build epoch / flash exit code | Tested source `36607a8f`, normal capture epoch `1793861288`; normal upload exit 0; final documentation-commit identity in `final-build-handshake.json` |
+| Processor frequency / exact build-flags file | Configured 240 MHz / `_scratch/s3-repair-20261105/effective-build-flags.json` |
+| Silicon capture receipt / final `build` handshake receipt | `_scratch/s3-repair-20261105/final-normal-28-complete/result.json` / `final-build-handshake.json` |
+| Host suite command, commit and receipt | `python -m pytest tests -q`, product source `36607a8f`, `_scratch/s3-repair-20261105/final-host-suite.log`; 2,027 passed, two skipped, one failed; exit 1 |
+| Date | 5 November 2026, Australian Western Standard Time (AWST); precise capture epochs in receipts |
+
+The historical `all-mode-final.json` is native-emulator output, not a silicon
+capture. Historical silicon campaigns used `device_measure_reciprocal.py`
+(performance probe) and `trace_reciprocal.py` (diagnostic trace image). Final
+normal-image render traces cannot establish individual effect duration; keep
+any diagnostic timing figures separately labelled. Receipts remain under `_scratch/s3-qualification-20261105/`.
+
+For each timing capture, retain its own environment, source commit, processor
+frequency, build-flags file and **measured on silicon** or **measured on host**
+label. Host timing cannot fill a silicon result. The table below separates measured results from unobservable checks.
+
+| Final capture or check | Result | Command exit code | Receipt |
+|---|---|---|---|
+| Normal-image 28-mode render trace (RTRACE) | Complete; primary red/green/blue eight-bit (RGB8) frames and cyclic redundancy checks (CRC) verified. Mode 27 is dark in 99/99 captured frames. No secondary-output or individual-effect timing claim | 0 | `final-normal-28-complete/result.json`, `final-normal-28-gate.log` |
+| Normal-image primary / secondary effect maximum µs | Unobservable: normal image has no pure-effect trace or performance telemetry | Not run | Not available |
+| Diagnostic-only primary / secondary effect maximum µs | All seven primary maxima above 2,000 µs; values below | 1 for all seven corrected comparisons | `final-effect-metrics.json` |
+| Normal-image whole-capture cadence | OPEN: primary-only output-store timestamps in milliseconds are not dispatch starts; all required cadence fields unobservable | Not run | Normal RTRACE cannot establish this gate |
+| Silence-edge save and whole-save-capture coverage | OPEN: no complete quiet-save span; rolling buffer cannot cover whole session | Quiet-span gate 1 | `save-closeout-metrics.json`, `queue/s-1.result.json` |
+| Music-playing 60-second fallback save | Observed at 60.1377 s; event-window cadence within limits; see measured context below | 0 | `_scratch/s3-repair-20261105/save-closeout-metrics.json`, `queue/s-1.result.json` |
+| Modes 21 / 24: effect ceiling, byte comparison and motion | Primary ceiling exceeded; byte gate exits 0; elapsed-time motion OPEN | Effect gates 1; byte gate 0 | `final-effect-metrics.json`, `final-seven-replay.log` |
+| Modes 14 / 15 / 19 / 28 / 29: effect ceiling, byte comparison and motion | Primary ceiling exceeded; byte gate exits 0; elapsed-time motion OPEN | Effect gates 1; byte gate 0 | `final-effect-metrics.json`, `final-seven-replay.log` |
+| Modes 7 / 11 / 32 diagnostic line presence | All nine windows satisfy quiet dark / music lit / quiet dark; sampled windows do not prove same-hop return latency | 0 | `_scratch/s3-repair-20261105/presence-final.log`, `presence-final/result.json` |
+| Microphone regression / rendered volume unit (VU) | Mode 32 microphone quiet dark / music lit / quiet dark; rendered VU OPEN because its modes remain disabled | Microphone 0 | `mic-final.log`, `mic-final/result.json` |
+| Approved held-out beat corpus qualification | HELD: conditional corpus execution not run; existing scorer ±70 ms, five-second warm-up | Not run | `_scratch/s3-repair-20261105/beat-heldout.json` |
+| Single full host regression | 2,027 passed / two skipped / one failed: generated tunables registry mismatch | 1 | `final-host-suite.log` |
+| Registry repair focused check | Four passed after declaration-only repair; no full-suite rerun | 0 | `tunables-repair-host.log` |
+| Settings restoration comparison | 45 fields identical; look 1 / GOLD_LIFT / inherit; calibration 108/57; mic/auto; access-point stream on; External Headphones at volume 25 | 0 | `final-restoration-result.json`, `final-restoration.log` |
+
+Cadence authority is `tests/fixtures/scheduling_gate0/g0r_selection/contract.json`
+→ `vp_contract.admission`: frame-start 99th percentile and mean each ≤8,333 µs,
+maximum consecutive misses ≤1 and recovery ≤2 frames. One effect call has a
+2,000 µs ceiling. These are acceptance limits, not measurements. A larger
+show-interval gap alone does not establish a cadence failure.
+
+Comparison with the earlier assessment: line modes 7 and 11 now light
+throughout their sampled music windows; mode 32 now drains to zero in sampled
+quiet windows. All seven primary effect ceiling failures remain. Final timing
+coverage is seven diagnostic rolling windows, not a replacement all-mode
+cadence campaign. Held-out beat qualification remains unrun.
+
+Diagnostic line presence, measured on silicon: `k1_fe_bench_b489_trace_dev`,
+`36607a8f`, epoch `1793860860`. Counts below are nonzero primary frames / captured
+frames; all captured checksums verified. No optical or secondary-output claim.
+
+| Mode | Quiet before | Music | Quiet after |
+|---|---:|---:|---:|
+| 7 | 0/94 | 89/89 | 0/95 |
+| 11 | 0/95 | 84/84 | 0/95 |
+| 32 | 0/90 | 83/83 | 0/90 |
+
+Fallback save, measured on silicon: `k1_fe_bench_b489_trace_dev`, `ec7c9bc9`,
+configured 240 MHz, flags `_scratch/s3-repair-20261105/repair-trace-preamble.json`.
+Event-window 99th percentile 6,460 µs; mean 5,798.373 µs; consecutive misses 1;
+recovery 2 frames; maximum gap 9,967 µs; save duration 7,592 µs. This rolling
+window does not establish whole-session cadence or quiet-edge save duration.
+
+Orchestration failures retained: initial diagnostic build/upload exit 1
+(missing FastLED object), retry exit 0; integrated replay exit 1 (missing
+bootloader after concurrent builds), retry exit 1 (existing run directory).
+These are execution failures, not product timing results. Receipts:
+`final-trace-upload.log`, `final-trace-upload-retry.log`, `final-seven.log`,
+`final-seven-retry.log`, all in `_scratch/s3-repair-20261105/`.
+
+Final diagnostic effect timings, **measured on silicon**:
+`k1_fe_bench_b489_trace_dev`, `36607a8f`, configured 240 MHz; flags and context
+in `_scratch/s3-repair-20261105/final-preamble.json`. Rolling windows only.
+Every primary effect maximum exceeds 2,000 µs. Initial effect gate commands
+failed with a missing-contract-key error (retained in
+`final-effect-gates-keyerror.json`); corrected fixture comparisons exit 1
+for all seven effects (`final-effect-gates.json`). Cadence comparisons are valid: mode 24 fails; the other six exit 0.
+
+| Primary mode | Primary max µs | Secondary max µs | Cadence p99 µs | Mean µs | Consecutive misses | Recovery frames | Max gap µs |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 14 | 2348 | 737 | 7036 | 6988.152 | 0 | 0 | 7044 |
+| 15 | 2330 | 737 | 7487 | 6962.182 | 0 | 0 | 7494 |
+| 19 | 2436 | 709 | 7034 | 6996.572 | 0 | 0 | 7040 |
+| 21 | 3390 | 636 | 8014 | 7263.386 | 0 | 0 | 8018 |
+| 24 | 3984 | 667 | 8480 | 7765.398 | 1 | 2 | 8493 |
+| 28 | 2360 | 696 | 7034 | 6986.210 | 0 | 0 | 7474 |
+| 29 | 2481 | 708 | 7029 | 7000.065 | 0 | 0 | 7034 |
+
+Historical baseline primary full-effect maxima versus final diagnostic maxima:
+
+| Mode | Baseline µs | Final µs |
+|---|---:|---:|
+| 14 | 2410 | 2348 |
+| 15 | 2237 | 2330 |
+| 19 | 2414 | 2436 |
+| 21 | 3471 | 3390 |
+| 24 | 4674 | 3984 |
+| 28 | 2325 | 2360 |
+| 29 | 2433 | 2481 |
+
+Baseline: measured on silicon, `k1_fe_bench_b489_trace_dev`, `9f3eb18e`,
+configured 240 MHz; flags `_scratch/s3-repair-20261105/baseline-build-flags.ini`;
+measurements `_scratch/s3-qualification-20261105/result.json`,
+`actual_failed_budgets.dispatch_failures`. The baseline used the same mode
+for primary and secondary; the final seven captures used secondary mode 18.
+They are separate campaigns with different secondary loads, not a paired
+speed-improvement experiment.
+All seven primary ceiling failures remain. Earlier 2,397/2,416 µs Forge values
+were moiré sub-scopes, not full-effect maxima. Final cadence covers seven
+rolling diagnostic windows, so its one failing window cannot be compared as
+a like-for-like improvement over the earlier eight-failure all-mode campaign.
+
+Timing receipt: `_scratch/s3-repair-20261105/final-effect-metrics.json`.
+Integrated native replay meets the permitted RGB8 byte/mask comparison for
+all seven modes (exit 0, `final-seven-replay.log` and `final-seven/byte-gate.json`).
+This is host projection of native output, not measured WS2812 bytes.
+The initial missing-bootloader and existing-directory replay failures remain
+recorded; the third replay succeeded using the built image.
+
+Diagnostic microphone check, same `36607a8f` trace image: mode 32 quiet-before
+0/92 nonzero frames, music 81/84, quiet-after 0/92; exit 0 in `mic-final.log`.
+Independent comparison against the prewritten presence expectation also exits
+0 (`presence-root-gate.log`). Integrated focused host tests: 62 passed, exit 0
+(`integrated-focused.log`). Paths are under `_scratch/s3-repair-20261105/`.
+
+Remaining product verification: the orchestrator records the actual repair
+outcome, then the product owner schedules physical WS2816 output, measured
+end-to-end latency and extended loaded operation on the intended product.
+B489 repair evidence alone cannot close those product checks.
+
+First normal 28-mode attempt ended after 23 completed modes when the finite
+music file ended; `final-normal-28.log` exits 1. Cleanup restored settings.
+The second full campaign uses existing playback loop support and completes
+all 28 modes; the independent roster/CRC comparison exits 0.
+Normal upload itself exits 0 (`final-normal-upload.log`).
+
+Exact silence-edge-to-black within 1.5 seconds and music return within one
+hop remain OPEN: settled presence windows do not measure these transitions.
+Paired ten-second elapsed-time motion is also OPEN; frame-index replay does
+not establish that timing. Microphone regression covers mode 32 only.
+<!-- END S3 REPAIR RESULTS -->
+
 ## 2. Deployed state (UPDATE ON EVERY FLASH)
 
 | Device | Commit | Build/env | Why | Since |
 |---|---|---|---|---|
-| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` @ **`3919a273`**, epoch `1793808535`, flashed and identity-verified 2026-11-05 | **`k1_fe_bench_b489`** normal image restored after non-shippable scalar, shared-window and trace probes. Current 4 Nov WS2812 GPIO4/5, IM69 CLK14/DATA13 and PCM1808 LRCK9/DOUT10/BCLK11 wiring retained. | Corrected-build physical checks: 16,000 line-input and 8,000 microphone audio rows; zero acquisition errors; audio work p99 upper bounds 5,184 / 4,736 us. Frame maxima 5,393 / 5,285 us, zero overruns/drops. Six disjoint trace windows cover 23.572 s: 4,096 secondary-effect samples, maximum 850 us; primary composite maximum 1,307 us. Both bound the tested effect work below 2 ms (primary mode 32, secondary mode 18); these are not end-to-end latency or electrical timing measurements. The diagnostic start race that reported uptime as render duration was fixed and repeated; failed evidence retained. All 32 saved controls, mic/auto and Mac output route restored. Receipts: `_scratch/fe-s3-performance-20261104/scored.json`, `final-state.json`, raw captures and flash logs alongside. WS2816 software verified in `_scratch/esp-emulator/fe-final-export-20261104/_out/fe-final/result.json`; Main RPL unavailable by Captain direction, so physical WS2816 output is outside this connected-S3 verification. | **2026-11-05 current**; supersedes older B489 rows below. |
+| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | Silicon-tested `36607a8f`; final product source `e42eec55`; final documentation-commit deployed identity: `_scratch/s3-repair-20261105/final-build-handshake.json` | **`k1_fe_bench_b489`** normal image; tested capture epoch `1793861288`. Post-documentation flash must be verified through the linked handshake. | 28-mode primary-output capture and independent CRC/roster check exit 0; 45 settings restored. Diagnostic presence windows corrected. Seven diagnostic effect ceilings remain exceeded; mode 24 diagnostic cadence fails. Full suite: 2,027 passed, two skipped, one failed; declaration repair then four focused tests passed. Detailed results and OPEN boundaries above. | **2026-11-05 repair record**; final deployed identity is receipt-bound. |
+| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` firmware source **`9f3eb18e`**, epoch `1793835592`, flashed and identity-verified 2026-11-05 | **`k1_fe_bench_b489` normal image**, restored after registered performance/trace probes. WS2812 dual 160 on GPIO4/5; IM69 CLK14/DATA13; PCM1808 LRCK9/DOUT10/BCLK11. | Safe onset-return, Comet and mirror repairs; nine exact sprite callers, primary parameter reuse and exact saturation quotient. Host: **2,028 passed, 2 existing skips**; native output parity retained. Final instrumented campaign: **28 modes / 2,244 CRC-verified primary frames**; line 8,000 / mic 7,999 rows, zero listed acquisition errors, audio-service p99 upper bounds 5,184 / 4,768 us. **FAIL**: seven effect modes exceed 2 ms; three compute-frame and eight cadence failures. A 24,892 us dispatch gap contains an 18,641 us automatic save. Normal-image line test: **861 frames / nine windows**; Mode32 quiet output remains nonzero in 176/176 frames. No guessed analogue threshold adopted. Final normal microphone observation: **90/90 nonzero CRC-verified frames over 12.202 s**. All 32 primary / 13 secondary saved fields, look, modes32/18, SSL108/DC57, mic/auto, AP stream and Bose route restored. Local receipts: `_scratch/s3-qualification-20261105/result.json`, `design-comparison.json`, `device-reciprocal/`, `trace-reciprocal/`, `line-presence-current/`, `normal-final-closure/`. This is **not product qualification**; WS2816 electrical/optical output, true end-to-end latency and extended loaded operation remain unqualified. | **2026-11-05 historical**; superseded by the repair record above. |
+| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` @ **`3919a273`**, epoch `1793808535`, flashed and identity-verified 2026-11-05 | **`k1_fe_bench_b489`** normal image restored after non-shippable scalar, shared-window and trace probes. Current 4 Nov WS2812 GPIO4/5, IM69 CLK14/DATA13 and PCM1808 LRCK9/DOUT10/BCLK11 wiring retained. | Corrected-build physical checks: 16,000 line-input and 8,000 microphone audio rows; zero acquisition errors; audio work p99 upper bounds 5,184 / 4,736 us. Frame maxima 5,393 / 5,285 us, zero overruns/drops. Six disjoint trace windows cover 23.572 s: 4,096 secondary-effect samples, maximum 850 us; primary composite maximum 1,307 us. Both bound the tested effect work below 2 ms (primary mode 32, secondary mode 18); these are not end-to-end latency or electrical timing measurements. The diagnostic start race that reported uptime as render duration was fixed and repeated; failed evidence retained. All 32 saved controls, mic/auto and Mac output route restored. Receipts: `_scratch/fe-s3-performance-20261104/scored.json`, `final-state.json`, raw captures and flash logs alongside. WS2816 software verified in `_scratch/esp-emulator/fe-final-export-20261104/_out/fe-final/result.json`; Main RPL unavailable by Captain direction, so physical WS2816 output is outside this connected-S3 verification. | **2026-11-05 historical**; superseded by the 9f3eb18e normal-image restore. |
 | **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem101` | `lane/k1-fe-release` @ **`cc039484`**, flashed and identity-verified 2026-11-04 | **`k1_fe_bench_b489`** on the 4 Nov WS2812 GPIO4/5 and IM69/PCM1808 bench wiring below. Includes `b3a415ef` audio/colour repairs and asynchronous single-edge trace drain. | Physical 50 s capture with 35 s real music; 1,110 RGB8 primary-edge frames, CRC verified. Ring-drop counter stayed 720 throughout capture and download; all five overflow readings zero. Audio updates 134.16–138.71 Hz, LED updates 175.82–200.46 Hz at three status snapshots. These are cadence readings, not per-stage latency or wire timing. Source returned to mic/auto; all 32 saved control fields and Mac output route restored. Receipt: `_scratch/fe-device-closure-20261104/async/scored.json`; full raw log and flash receipt alongside. The preceding synchronous dump added 57,420 ring drops; that failed run is retained in the parent folder. WS2816 electrical output remains unverified: Main RPL was absent from live USB inventory. | **2026-11-04 historical**; superseded by the 5 Nov normal-image restore. |
-| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4` (esptool MAC read 2026-11-04), `/dev/cu.usbmodem101` | `main` = `lane/k1-fe-release` @ **`2aa7422a`** (epoch `1793793411`, flashed 2026-11-04 via `k1-flash-verified.sh`; exit 0; before-flash `bab7d528` epoch `1793790080`). `2aa7422a` adds only the Mode 32 saturation-EMA channel state. Its first two boots read `[PCMCLK] lrck_hz=0.0 bclk_hz=0.0 gate=FAIL reason=NO_CLOCK`, the next two `gate=PASS` 48 kHz on the same image: intermittent PCM1808 clock, cause not proven (suspect module power/wiring) | **`k1_fe_bench_b489`** (NON-SHIPPABLE: the `k1_fe` image on the Captain's 4 Nov bench wiring — two single-wire WS2812 strips, 160 px each, primary GPIO4 / secondary GPIO5 (bench-reference pin map, no WS2816 packer, WS2812 look library); dual IM69D130 CLK14/DATA13; PCM1808 LRCK9/DOUT10/BCK11, its line input fed from the MacBook Pro headphone/AUX output; PCM1808 NFC hold off). `IDENTITY OK: git=bab7d528 env=k1_fe_bench_b489 epoch=1793790080` (before-flash `8f6d4348`, epoch `1793778034`, flashed earlier the same day). On `8f6d4348`: every INIT PASS, `CONFIG.LED_TYPE: 0`, `LED_COUNT: 160`, `LED_COLOR_ORDER: 66` (GRB), SYSTEM_FPS 134.5, LED_FPS 197.8; `[PCMCLK] mode=48K_MASTER_I2S24 gate=PASS`, `[PCM1808] init=PASS i2s=1 pins=10,11,9`; mic live. On `bab7d528`, line-in from the Mac (`:audio_src=line`): `[PCMCAN] rms` 0.8 silent → 110–118 on a 1 kHz tone → 41–149 on music, `[PCMOVF] ovf=0 ring_drop=0` throughout; `:audio_src=auto` returns to the mic. Mic does not pick up the AUX tone (median `raw_i16_rms` 9.0 before, 4.4 during). A slow mic DC wander (peak≈rms, up to ~200 after reset, a ~50 bump at 80 s) also occurs with no audio at all: cause not identified. Persisted IM69 cal inherited (`SSL=179 persisted_profile`). Do not fire `start_noise_cal`. Evidence: `docs/forensics/runtime-evidence/20261104-fe-bench-b489-ws2812-gpio45/`. | FE bench on the 4 Nov wiring; line-in proven from the Mac. Restore targets unchanged (pinned saved-app profile `b489-original-app0-20261013`). | 2026-11-04 current |
+| **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4` (esptool MAC read 2026-11-04), `/dev/cu.usbmodem101` | `main` = `lane/k1-fe-release` @ **`2aa7422a`** (epoch `1793793411`, flashed 2026-11-04 via `k1-flash-verified.sh`; exit 0; before-flash `bab7d528` epoch `1793790080`). `2aa7422a` adds only the Mode 32 saturation-EMA channel state. Its first two boots read `[PCMCLK] lrck_hz=0.0 bclk_hz=0.0 gate=FAIL reason=NO_CLOCK`, the next two `gate=PASS` 48 kHz on the same image: intermittent PCM1808 clock, cause not proven (suspect module power/wiring) | **`k1_fe_bench_b489`** (NON-SHIPPABLE: the `k1_fe` image on the Captain's 4 Nov bench wiring — two single-wire WS2812 strips, 160 px each, primary GPIO4 / secondary GPIO5 (bench-reference pin map, no WS2816 packer, WS2812 look library); dual IM69D130 CLK14/DATA13; PCM1808 LRCK9/DOUT10/BCK11, its line input fed from the MacBook Pro headphone/AUX output; PCM1808 NFC hold off). `IDENTITY OK: git=bab7d528 env=k1_fe_bench_b489 epoch=1793790080` (before-flash `8f6d4348`, epoch `1793778034`, flashed earlier the same day). On `8f6d4348`: every INIT PASS, `CONFIG.LED_TYPE: 0`, `LED_COUNT: 160`, `LED_COLOR_ORDER: 66` (GRB), SYSTEM_FPS 134.5, LED_FPS 197.8; `[PCMCLK] mode=48K_MASTER_I2S24 gate=PASS`, `[PCM1808] init=PASS i2s=1 pins=10,11,9`; mic live. On `bab7d528`, line-in from the Mac (`:audio_src=line`): `[PCMCAN] rms` 0.8 silent → 110–118 on a 1 kHz tone → 41–149 on music, `[PCMOVF] ovf=0 ring_drop=0` throughout; `:audio_src=auto` returns to the mic. Mic does not pick up the AUX tone (median `raw_i16_rms` 9.0 before, 4.4 during). A slow mic DC wander (peak≈rms, up to ~200 after reset, a ~50 bump at 80 s) also occurs with no audio at all: cause not identified. Persisted IM69 cal inherited (`SSL=179 persisted_profile`). Do not fire `start_noise_cal`. Evidence: `docs/forensics/runtime-evidence/20261104-fe-bench-b489-ws2812-gpio45/`. | FE bench on the 4 Nov wiring; line-in proven from the Mac. Restore targets unchanged (pinned saved-app profile `b489-original-app0-20261013`). | 2026-11-04 historical; superseded by 9f3eb18e |
 | **Bench K1v2 `B489A500`**, USB `B4:3A:45:A5:89:B4` (esptool MAC read 2026-11-03), `/dev/cu.usbmodem101` (advisory) | `lane/k1-fe-release` @ **`6d47d9a8`** (epoch `1793708415`, flashed 2026-11-03 via `k1-flash-verified.sh`; exit 0) | **`k1_fe_bench_b489`** (NON-SHIPPABLE: the `k1_fe` image with only the bench pins changed — IM69D130 CLK14/DATA13, PCM1808 DOUT10/BCK11/LRCK9; LEDs 15/16+17/18). `IDENTITY OK: git=6d47d9a8 env=k1_fe_bench_b489 epoch=1793708415`. `firmware.bin` `55c720d1f9c7f5573c7e06656855b39754e09351dc3f230285f27429ec6909ac` (753216 B). Boot: every INIT PASS, `[FEBOARD] stusb4500=absent … outputs=passive`, `[PCMCLK] gate=FAIL reason=NO_CLOCK` (module not wired), SYSTEM_FPS 133, LED_FPS ~150. Same session, in order: `k1_bench_im69d` @ `c2928534` (epoch `1793706510`), `k1_bench_im69d_stereo` @ `c2928534` (`1793706606`), `k1_bench_im69d_wirediag_pullup` @ `1517ca17` (`1793707534`), `k1_bench_im69d_wirediag_swap` @ `1517ca17` (`1793707866`), `k1_bench_im69d_wirediag_pullup` @ `6d47d9a8` (`1793708320`). **Mic fault is wiring, not firmware:** every image reads constant −30935 on both PDM slots; GPIO13 (DATA) is HELD_LOW against the internal pull-up and shows 0 changes while GPIO14 (CLK) toggles. Persisted IM69 cal inherited (`SSL=179 persisted_profile`). Do not fire `start_noise_cal`. Evidence: `docs/forensics/runtime-evidence/20261103-fe-bench-b489/`. | FE FW lead session 2: FE image proven on silicon; bench mic wiring diagnosed. Restore targets unchanged (pinned saved-app profile `b489-original-app0-20261013`). | 2026-11-03 superseded 2026-11-04 by `8f6d4348` |
 | *(superseded 2026-11-03 by FE bench proof flashes)* Bench K1v2 `B489A500` (app `:dump` CHIP ID), USB `B4:3A:45:A5:89:B4`, `/dev/cu.usbmodem11301` (advisory) | `fix/b489-ws2816-reference-capture` @ **`f3ee66e8`** (epoch `1791917615`, flashed 2026-10-14T18:54Z via `k1-flash-verified.sh`; FORWARD_EXIT=0) | **`k1_b489_ws2816_reference_capture`** (NON-SHIPPABLE measurement image: WS2816 2×160 px, DIN 15/16 + 17/18, `K1_RENDER_TRACE_V1`). `IDENTITY OK: git=f3ee66e8 env=k1_b489_ws2816_reference_capture epoch=1791917615`. `firmware.bin` `5fbf34efaed1fe3db20485ee63560a369d6e460e92fca283df0bb7f55f97369b` (730816 B); app-descriptor ELF = `firmware.elf` `b3c12ee16bbc1234bb151dc484b645fb7c4d7a5a196f4c6439f470f02cf771a8`. Upload pre-action bound bootloader `12c9a10f…`, partitions `bd0f7954…`, boot_app0 `f94c5d78…` = saved-app pins. Restore target retained: `eff9bf47` / `k1_bench_im69d_led150` app0 `3d3b929e…` (controlled restore exit 0 at 18:52Z). Evidence: `_scratch/b489-ws2816-reference-20261013/resume-20261014/deploy-20261014/`. Mic input reads constant −30935 (unresolved, no music claim). | Dual-edge final-render capture repair; rtrace both packed edges PASS (CRC, 11×2×160 RGB16). Not a production promotion. | 2026-10-14 superseded |
 | **P4-WIFI6 lab (`0743E200`)**, USB `5AAF278179`, `/dev/cu.wchusbserial5AAF2781791` | `feat/k1-scheduling-generation-hardening` @ **`61787c86`** (epoch `1787395821`, flashed 2026-08-22 via `k1-flash-verified.sh`) | **`k1_p4_wifi6`**. Guard: *verified as Waveshare ESP32-P4-WIFI6 lab (ADR-0007) (5AAF278179, chip 0743E200)*. `IDENTITY OK: git=61787c86 env=k1_p4_wifi6 epoch=1787395821`. Hop `12800/96/d3`. AP service p99 **PASS** (`p99_high_us=1856` on probe soak, gate ≤ 8000). Do not fire `start_noise_cal`. `k1_hardware` remains S3 authority. Evidence: `docs/forensics/runtime-evidence/20260822T-p4-wifi6-hop-p99/RESULT.md`. | Product env restored after apcad probe. Two WS2812 160s, GPIO4/5 data only. Radio/C6 still off. | 2026-08-22 current |
@@ -420,6 +584,7 @@ flash records.
 **Document Changelog**
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-11-05 | agent:codex | Completed the authorised acceptance, audio/visual audits and S3 comparison with retained failures. Four source commits through `9f3eb18e` built, reviewed, flashed and observed on B489 only. Normal image restored with controls unchanged; line-input noise policy, beat accuracy, rendering deadlines and durable-save pacing remain unresolved design/qualification work. Exact local evidence is linked in the current deployed-state row. Main RPL and parked Titan targets untouched. |
 | 2026-11-04 | agent:claude (FE FW lead) | **B489A500 → `2aa7422a`** (Mode 32 saturation EMA unfrozen, Captain). `IDENTITY OK`. PCM1808 clock intermittent on this image: 2 boots NO_CLOCK, then 2 boots PASS; firmware ruled out by same-image recovery. |
 | 2026-11-04 | agent:claude (FE FW lead) | **B489A500 → `bab7d528`** (WS2812 look library instead of the WS2816 one, from the independent review). Line-in proven from the MacBook AUX output: tone and music reach `[PCMCAN]` with zero overflow; mic unaffected by the AUX line. |
 | 2026-11-04 | agent:claude (FE FW lead) | **B489A500: `k1_fe_bench_b489` moved to the Captain's 4 Nov wiring and flashed.** Two single-wire WS2812 strips, 160 px each, primary GPIO4 / secondary GPIO5 (bench-reference pin map; Main RPL WS2816 map and Lever-2 packer unflagged; PCM1808 NFC hold off). Mic CLK14/DATA13 and PCM1808 LRCK9/DOUT10/BCK11 unchanged. Commit `8f6d4348`, `IDENTITY OK` before and after. Mic now live; PCM1808 clock gate PASS. Evidence `docs/forensics/runtime-evidence/20261104-fe-bench-b489-ws2812-gpio45/`. |

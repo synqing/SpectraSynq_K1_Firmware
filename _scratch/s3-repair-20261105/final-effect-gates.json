@@ -1,0 +1,198 @@
+[
+  {
+    "gate": "21 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-21",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "21 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-21",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 229, 'max': 3390, 'mean': 2987.362445414847}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "24 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-24",
+      "cadence"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\n                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'p99_us': 8480, 'mean_us': 7765.398230088495, 'max_consecutive_misses': 1, 'recovery_frames': 2, 'max_gap_us': 8493}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "24 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-24",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 226, 'max': 3984, 'mean': 3365.6946902654868}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "14 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-14",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "14 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-14",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 252, 'max': 2348, 'mean': 2108.0119047619046}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "15 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-15",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "15 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-15",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 291, 'max': 2330, 'mean': 2060.9690721649486}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "19 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-19",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "19 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-19",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 291, 'max': 2436, 'mean': 2140.618556701031}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "28 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-28",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "28 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-28",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 291, 'max': 2360, 'mean': 2110.0652920962198}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "29 cadence",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=c['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-29",
+      "cadence"
+    ],
+    "exit_code": 0,
+    "stderr": "",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  },
+  {
+    "gate": "29 effect",
+    "command_argv": [
+      "python3",
+      "-c",
+      "import json,sys\nfrom pathlib import Path\nc=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['admission']\nd=json.loads(Path(sys.argv[1]).read_text())[sys.argv[2]]\nif sys.argv[3]=='cadence':\n m=d['cadence'];assert m['p99_us']<=c['frame_start_delta_p99_max_us'] and m['mean_us']<=c['arithmetic_mean_max_us'] and m['max_consecutive_misses']<=c['max_consecutive_misses'] and m['recovery_frames'] is not None and m['recovery_frames']<=c['recovery_frames_max'],m\nelse:\n assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n",
+      "_scratch/s3-repair-20261105/final-effect-metrics.json",
+      "final-mode-29",
+      "effect"
+    ],
+    "exit_code": 1,
+    "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 8, in <module>\n    assert d['scopes']['vp_primary_effect_body']['max']<=json.loads(Path('tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())['vp_contract']['effect_code_hard_ceiling_us'],d['scopes']['vp_primary_effect_body']\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: {'n': 292, 'max': 2481, 'mean': 2196.195205479452}\n",
+    "receipt": "_scratch/s3-repair-20261105/final-effect-metrics.json"
+  }
+]

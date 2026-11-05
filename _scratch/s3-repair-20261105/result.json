@@ -1,0 +1,43 @@
+{
+  "recorded_awst": "2026-11-05T15:13:05.093735+08:00",
+  "source_commit": "e42eec55",
+  "silicon_capture_commit": "36607a8f",
+  "qualified": false,
+  "normal_modes_captured": 28,
+  "presence": "line7/11/32 quiet dark and music lit; mic32 quiet dark and music lit",
+  "host_full": {
+    "passed": 2027,
+    "skipped": 2,
+    "failed": 1,
+    "exit_code": 1
+  },
+  "host_repair": {
+    "test": "tests/test_tunables_registry.py",
+    "passed": 4,
+    "exit_code": 0
+  },
+  "open": [
+    "exact silence assertion/wake latency",
+    "quiet-edge save span and whole-save cadence",
+    "all seven effect ceilings; mode24 cadence",
+    "elapsed-time paired motion",
+    "normal-image per-effect and dispatch-start timing",
+    "rendered VU disabled",
+    "post-repair full suite not rerun under once-only instruction",
+    "mode27 dark normal window; unmatched programme prevents regression attribution",
+    "held-out beat execution remains reserved"
+  ],
+  "receipts": {
+    "normal28": "final-normal-28-complete/result.json",
+    "diagnostic7": "final-effect-metrics.json",
+    "colour": "final-seven/byte-gate.json",
+    "presence": "presence-final/result.json",
+    "microphone": "mic-final/result.json",
+    "save": "save-closeout-metrics.json",
+    "restoration": "final-restoration-result.json",
+    "final_running_identity": "final-build-handshake.json",
+    "gates": "gates.json"
+  },
+  "restoration_fields": 45,
+  "push": false
+}
