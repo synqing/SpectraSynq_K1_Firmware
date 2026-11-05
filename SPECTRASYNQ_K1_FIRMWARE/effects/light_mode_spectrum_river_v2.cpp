@@ -1,4 +1,10 @@
 #include "lightshow_modes.h"
+#if defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+#if !FEATURE_MABUTRACE || !defined(K1_FE_BENCH_B489_V1)
+#error "K1 river lite variants require the B489 trace development build"
+#endif
+#endif
+
 #include "k1_audio_snapshot.h"
 #include "k1_vp_audio_access.h"
 
@@ -73,7 +79,7 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
       sb_gdft_nyquist_safe_bin_hi(CONFIG.SAMPLE_RATE, CONFIG.NOTE_OFFSET);
   const float hue_denom =
       float((analysis_bins > 1) ? (analysis_bins - 1) : 1);
-#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1 && defined(K1_FE_BENCH_B489_V1)
   // Bench design: paired spectral filaments retain every input bin, with one
   // palette sample for each pair. The stronger bin supplies energy and colour.
   constexpr uint16_t bin_stride = 2;
@@ -82,7 +88,7 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
 #endif
   for (uint16_t k = 0; k < analysis_bins && k < HALF; k += bin_stride) {
     float e = float(spectrogram_smooth[k]);
-#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1 && defined(K1_FE_BENCH_B489_V1)
     uint16_t colour_bin = k;
     if (k + 1 < analysis_bins && k + 1 < HALF) {
       const float neighbour = float(spectrogram_smooth[k + 1]);
@@ -104,7 +110,7 @@ void light_mode_spectrum_river_v2(CRGB16* leds_prev_buffer, ChannelEffectState& 
     leds_16[idx].r += col.r;
     leds_16[idx].g += col.g;
     leds_16[idx].b += col.b;
-#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1
+#if FEATURE_MABUTRACE && defined(K1_BENCH_FX_LITE_15) && K1_BENCH_FX_LITE_15 == 1 && defined(K1_FE_BENCH_B489_V1)
     if (k + 1 < analysis_bins && k + 1 < HALF) {
       leds_16[idx + 1].r += col.r;
       leds_16[idx + 1].g += col.g;
