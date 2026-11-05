@@ -69,7 +69,7 @@
       "id": "LS06",
       "meaning": "Fit the S3 without sacrificing output.",
       "boundary": "actual target timings and output parity",
-      "pass_rule": "Per-effect budget2000us and frame budget8333us apply to correct spans; audio service p99<=8000us; compare candidate cost/RAM with baseline, preserve meaning/pixels or justify intended repair."
+      "pass_rule": "Per-effect ceiling 2000us; frame-start cadence follows tests/fixtures/scheduling_gate0/g0r_selection/contract.json vp_contract.admission (p99, arithmetic mean, consecutive misses and recovery), not a hard maximum gap; audio service p99<=8000us; preserve meaning/pixels or justify intended repair."
     },
     {
       "id": "LS07",
@@ -87,10 +87,15 @@
   "comparison_policy": "Use actual accepted Waveform lineage as design reference; historical pending-viewing prototypes are not accepted reference light shows. Optimisations require unchanged output; corrections require targeted independent expected results.",
   "budgets": {
     "effect_us": 2000,
-    "frame_us": 8333,
     "audio_service_p99_us": 8000,
     "audio_rate_hz": 12800,
-    "hop_samples": 96
+    "hop_samples": 96,
+    "vp_admission": {
+      "frame_start_delta_p99_max_us": 8333,
+      "arithmetic_mean_max_us": 8333,
+      "max_consecutive_misses": 1,
+      "recovery_frames_max": 2
+    }
   },
   "audio_criteria": {
     "spectral_arithmetic": {

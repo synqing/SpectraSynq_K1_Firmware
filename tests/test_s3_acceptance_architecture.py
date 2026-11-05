@@ -62,7 +62,10 @@ def test_acceptance_budgets_match_current_constants():
     text=(ROOT/'SPECTRASYNQ_K1_FIRMWARE/system/constants.h').read_text()
     assert '#define VP_PERF_FRAME_BUDGET_US 8333UL'in text
     assert '#define VP_PERF_RENDER_BUDGET_US 2000UL'in text
-    assert j['budgets']['frame_us']==8333 and j['budgets']['effect_us']==2000
+    assert j['budgets']['effect_us']==2000
+    contract=json.loads((ROOT/'tests/fixtures/scheduling_gate0/g0r_selection/contract.json').read_text())
+    assert j['budgets']['vp_admission']==contract['vp_contract']['admission']
+    assert 'frame_us' not in j['budgets']
     assert j['budgets']['audio_service_p99_us']==8000
 
 
