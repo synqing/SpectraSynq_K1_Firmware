@@ -63,6 +63,21 @@ def test_line_silence_dwell_wake_reset_and_wrap(tmp_path):
       s = {};
       assert(!k1_line_silence_update(s, pcm, 96, UINT32_MAX - 99, 5000));
       assert(k1_line_silence_update(s, pcm, 96, 4900, 5000));
+      // Measured idle can have sparse peaks 3..7 despite interval RMS <2.
+      // Independent expected criterion: 95*1 + 7*7 =144 <=96*2*2=384.
+      s = {};
+      for (int i=0;i<96;++i) pcm[i]=(i%2) ? 1 : -1;
+      pcm[95]=7;
+      assert(!k1_line_silence_update(s, pcm, 96, 100, 1000));
+      assert(k1_line_silence_update(s, pcm, 96, 1100, 1000));
+      // Sustained above-floor programme: 96*3*3=864 >384; same-hop wake.
+      for (int i=0;i<96;++i) pcm[i]=(i%2) ? 3 : -3;
+      assert(!k1_line_silence_update(s, pcm, 96, 1101, 1000));
+      for (int i=0;i<96;++i) pcm[i]=0;
+      assert(!k1_line_silence_update(s, pcm, 96, 1200, 1000));
+      assert(k1_line_silence_update(s, pcm, 96, 2200, 1000));
+      pcm[95]=-32768;
+      assert(!k1_line_silence_update(s, pcm, 96, 2201, 1000));
     }
     ''')
 

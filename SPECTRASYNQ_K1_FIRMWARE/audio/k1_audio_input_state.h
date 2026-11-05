@@ -34,8 +34,9 @@ static inline float k1_audio_presence_floor(float microphone_floor) {
   return microphone_floor;
 }
 
-// Analogue line idle is not exact digital zero. Above-floor programme audio
-// clears silence on this hop; below-floor input must complete the dwell.
+// Analogue line idle is not exact digital zero. Compare hop energy against
+// the canonical floor: isolated converter spikes must not restart the dwell.
+// Above-floor programme energy clears silence on this hop; microphone unchanged.
 struct K1LineSilenceState {
   uint32_t quiet_since_ms;
   bool quiet_pending;
@@ -54,9 +55,15 @@ static inline bool k1_line_silence_update(K1LineSilenceState& state,
   K1_TRACE_COUNTER("line_pcm_peak", trace_peak);
   K1_TRACE_COUNTER("line_floor", K1_LINE_PRESENCE_FLOOR);
 #endif
+  // RMS <= floor, without sqrt or floating point. Widen the accumulator so
+  // full-scale int16 input cannot overflow; early exit on programme energy.
+  const uint64_t quiet_energy_limit = uint64_t(count) * K1_LINE_PRESENCE_FLOOR *
+                                      K1_LINE_PRESENCE_FLOOR;
+  uint64_t energy = 0;
   for (size_t i = 0; i < count; ++i) {
-    if (int32_t(samples[i]) > K1_LINE_PRESENCE_FLOOR ||
-        int32_t(samples[i]) < -int32_t(K1_LINE_PRESENCE_FLOOR)) {
+    const int32_t sample = samples[i];
+    energy += uint32_t(sample * sample);
+    if (energy > quiet_energy_limit) {
       state.quiet_pending = false;
       K1_TRACE_COUNTER("line_quiet_age_ms", 0u);
       K1_TRACE_COUNTER("line_silence", 0u);
