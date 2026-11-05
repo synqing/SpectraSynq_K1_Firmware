@@ -700,6 +700,7 @@ void setup() {
   }
 
   init_system();  // (system.h) Initialize all hardware and arrays
+  prepare_config_save_file();  // Open once before the render task starts.
 #ifdef K1_COLOUR_LAB_V1
   k1_colour_lab_boot();
 #endif
@@ -1441,6 +1442,7 @@ void led_thread(void* arg) {
 #endif
       int64_t vp_frame_start_us = esp_timer_get_time();
       int64_t vp_render_start_us = vp_frame_start_us;
+      K1_TRACE_COUNTER("vp_frame_start_us", uint32_t(vp_frame_start_us));
 #ifdef K1_FE_BOARD_V1
       k1_fe_heartbeat_tick(vp_frame_start_us);  // OI-19: 1 Hz from the render task
 #endif

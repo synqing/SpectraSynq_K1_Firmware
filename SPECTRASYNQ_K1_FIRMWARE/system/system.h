@@ -690,18 +690,35 @@ void log_fps(uint32_t t_now_us) {
 // the flash with changes. This helps in scenarios where
 // you're rapidly cycling through modes for example.
 void check_settings(uint32_t t_now) {
-  if (settings_updated) {
-    if (t_now >= next_save_time) {
-      if(debug_mode == true){
-        USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
-      }
-      // Clear BEFORE the save: if save_config() defers on low internal RAM it
-      // re-arms settings_updated + next_save_time, and that re-arm must survive
-      // this cycle so the write retries. Clearing after would cancel the retry.
-      settings_updated = false;
+  // All control producers converge here, including wired encoders which set
+  // settings_updated directly. Their debounce cannot extend the dirty deadline.
+  static bool pending_observed = false;
+  static uint32_t pending_since_ms = 0;
+  static bool retry_wait = false;
+  static uint32_t last_attempt_ms = 0;
+  if (!settings_updated) {
+    pending_observed = false;
+    retry_wait = false;
+    return;
+  }
+  if (!pending_observed) {
+    pending_since_ms = t_now;
+    pending_observed = true;
+  }
+  const bool maximum_deferral_reached = uint32_t(t_now - pending_since_ms) >= 60000U;
+  const bool quiet_save_due = silence && int32_t(t_now - next_save_time) >= 0;
+  // Failed writes keep their backoff even if another control change arrives.
+  if (retry_wait && uint32_t(t_now - last_attempt_ms) < 5000U) return;
+  if (maximum_deferral_reached || quiet_save_due) {
+    if (debug_mode) USBSerial.println("QUEUED CONFIG SAVE TRIGGERED");
+    settings_updated = false;
+    last_attempt_ms = t_now;
+    {
       K1_TRACE_SCOPE("persist_config");
       save_config();
     }
+    retry_wait = settings_updated;
+    if (!settings_updated) pending_observed = false;
   }
 }
 

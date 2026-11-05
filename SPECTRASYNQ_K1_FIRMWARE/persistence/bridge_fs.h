@@ -19,6 +19,7 @@
 #endif
 #include <esp_heap_caps.h> // heap_caps_* — internal-RAM precondition for LittleFS opens
 #include "k1_persistence_request.h"
+#include "k1_trace.h"
 #ifdef K1_EMU_FIXTURE
 #include "../audio/k1_emu_fixture.h"  // emulator replay only: trace port
 #endif
@@ -95,6 +96,26 @@ void update_config_filename(uint32_t input) {
 #endif
 }
 
+// Owned by the audio/control loop. Prepare before starting rendering so regular
+// automatic saves do not repeatedly open and synchronise the same directory.
+static File config_save_file;
+static char config_save_filename[24] = {};
+
+void prepare_config_save_file() {
+  if (config_save_file && strcmp(config_save_filename, config_filename) == 0) return;
+  config_save_file.close();
+  if (!bridge_fs_internal_heap_ok("prepare_config_save_file")) return;
+  config_save_file = LittleFS.open(config_filename,
+                                 LittleFS.exists(config_filename) ? "r+" : FILE_WRITE);
+  if (config_save_file && config_save_file.size() != 512) {
+    config_save_file.close();
+    config_save_file = LittleFS.open(config_filename, FILE_WRITE);
+  }
+  if (config_save_file) {
+    memcpy(config_save_filename, config_filename, sizeof(config_save_filename));
+  }
+}
+
 // Restore all defaults defined in globals.h by removing saved data and rebooting.
 // Under K1_MIC_IM73D_PDM_V1 (un-frozen 2026-07-04): config_filename and
 // CAL_PROFILE_FILE are PDM-namespaced, so this clears ONLY the PDM state.
@@ -103,6 +124,7 @@ void update_config_filename(uint32_t input) {
 // saves frozen under the flag, a deletion there would be unrecoverable.
 void factory_reset() {
   lock_leds();
+  config_save_file.close();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);
   USBSerial.print(": ");
@@ -154,6 +176,7 @@ void factory_reset() {
 // SPH config is unreachable here.
 void restore_defaults() {
   lock_leds();
+  config_save_file.close();
   USBSerial.print("Deleting ");
   USBSerial.print(config_filename);
   USBSerial.print(": ");
@@ -174,18 +197,32 @@ void restore_defaults() {
 // system.h scrubs them and the cal profile file is the cal authority.
 void save_config() {
   // Crash-safety: never open the config file when internal RAM can't afford it
-  // (would abort() inside fopen, before the `if (!file)` guard). Re-arm the
+  // (would abort() inside fopen, before the failed-open guard). Re-arm the
   // check_settings() deferred-save so it retries once heap recovers.
   if (!bridge_fs_internal_heap_ok("save_config")) {
     next_save_time = millis() + 5000;
     settings_updated = true;
     return;
   }
-  lock_leds();
+  // Build the unchanged record before parking rendering. No flash access here.
+  uint8_t config_buffer[512] = {};
+  ConfigBlobHeader header;
+  bridge_fs_fill_header(&header, reinterpret_cast<const uint8_t*>(&CONFIG), sizeof(CONFIG));
+  memcpy(config_buffer, &header, sizeof(header));
+  memcpy(config_buffer + sizeof(header), &CONFIG, sizeof(CONFIG));
+  {
+    K1_TRACE_SCOPE("persist_park_wait");
+    lock_leds();
+  }
+  K1_TRACE_SCOPE("persist_filesystem");
   if (debug_mode) {
     USBSerial.print("LITTLEFS: ");
   }
-  File file = LittleFS.open(config_filename, FILE_WRITE);
+  {
+    K1_TRACE_SCOPE("persist_open");
+    prepare_config_save_file();
+  }
+  File& file = config_save_file;
   if (!file) {
     if (debug_mode) {
       USBSerial.print("Failed to open ");
@@ -193,22 +230,34 @@ void save_config() {
       USBSerial.println(" for writing!");
     }
     unlock_leds();
+    next_save_time = millis() + 5000;
+    settings_updated = true;
     return;
   } else {
-    file.seek(0);
+    if (!file.seek(0)) {
+      file.close();
+      unlock_leds();
+      next_save_time = millis() + 5000;
+      settings_updated = true;
+      return;
+    }
     // N1: write [ConfigBlobHeader][raw CONFIG bytes] zero-padded to 512. The
     // header (magic+version+length+crc32) lets load_config() detect a truncated
     // or corrupt file instead of memcpy'ing garbage into the live CONFIG. File
     // size stays 512 for compatibility with the existing fixed-size read.
-    uint8_t config_buffer[512];
-    memset(config_buffer, 0, sizeof(config_buffer));
-    ConfigBlobHeader header;
-    bridge_fs_fill_header(&header, reinterpret_cast<const uint8_t*>(&CONFIG), sizeof(CONFIG));
-    memcpy(config_buffer, &header, sizeof(header));
-    memcpy(config_buffer + sizeof(header), &CONFIG, sizeof(CONFIG));
-
-    for (uint16_t i = 0; i < 512; i++) {
-      file.write(config_buffer[i]);
+    // One buffered transaction avoids 512 filesystem and mutex round trips
+    // while the render task is parked. Retain exactly the same on-disk bytes.
+    size_t written;
+    {
+      K1_TRACE_SCOPE("persist_write");
+      written = file.write(config_buffer, sizeof(config_buffer));
+    }
+    if (written != sizeof(config_buffer)) {
+      file.close();
+      unlock_leds();
+      next_save_time = millis() + 5000;
+      settings_updated = true;
+      return;
     }
 
     if (debug_mode) {
@@ -217,7 +266,10 @@ void save_config() {
       USBSerial.println(" SUCCESSFULLY");
     }
   }
-  file.close();
+  {
+    K1_TRACE_SCOPE("persist_flush");
+    file.flush();
+  }
   unlock_leds();
 #ifdef K1_EMU_FIXTURE
   k1_emu_fixture_note_save("config", true);
@@ -229,7 +281,7 @@ void save_config_delayed() {
   if(debug_mode == true){
     USBSerial.println("CONFIG SAVE QUEUED");
   }
-  next_save_time = millis()+5000;
+  next_save_time = millis() + 5000;
   settings_updated = true;
   static uint32_t s_persist_seq = 0;
   K1PersistRequest req = {};
