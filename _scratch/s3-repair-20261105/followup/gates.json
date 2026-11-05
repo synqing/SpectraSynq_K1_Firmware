@@ -4,5 +4,6 @@
 {"item": "2 mode27 baseline capture", "command": "same existing functions and frozen recipe", "exit_code": 0, "receipt": "before-27/result.json"},
 {"item": "2 VU history", "command": "git log -G / git show ed56dfb5 config_types.h", "exit_code": 0, "receipt": "vu-history.json"},
 {"item": "2 mode27", "receipt": "triage-result.json", "command": "python expected quiet/music assertion against mode27-correction-expected.json", "exit_code": 0},
-{"item": "2 mode27", "receipt": "triage-result.json", "command": "python \u00b110% baseline-count assertion against mode27-correction-expected.json", "exit_code": 1}
+{"item": "2 mode27", "receipt": "triage-result.json", "command": "python \u00b110% baseline-count assertion against mode27-correction-expected.json", "exit_code": 1},
+{"item": "3 riverlookup retention", "command": ["/opt/homebrew/opt/python@3.14/bin/python3.14", "-c", "import json,sys; r=json.load(open(sys.argv[1])); sys.exit(0 if all(x['keep_criterion_satisfied'] for x in r['rows'].values()) else 1)", "/Users/spectrasynq/k1-followup-c/_scratch/s3-repair-20261105/followup/sw-c/river-noise-table.json"], "exit_code": 1, "receipt": "river-ab-decision.json", "action": "Whole lookup reverted; onlymode28 exceededrepeatnoise."}
 ]

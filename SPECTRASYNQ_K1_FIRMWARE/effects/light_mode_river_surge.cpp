@@ -192,7 +192,7 @@ void light_mode_river_surge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     if (e > 1.0f) e = 1.0f;
     for (uint8_t s = 0; s < iters; s++) e *= e;
     if (e < RSURGE_FLOOR) continue;
-    const float hue = river_frequency_hue(k, analysis_bins);
+    const float hue = float(k) / hue_denom;
     CRGB16 col = palette_manual_colour(pal, SQ15x16(hue), SQ15x16(e * RSURGE_INJECT_GAIN));
     const uint16_t idx = HALF + k;
     leds_16[idx].r += col.r;
