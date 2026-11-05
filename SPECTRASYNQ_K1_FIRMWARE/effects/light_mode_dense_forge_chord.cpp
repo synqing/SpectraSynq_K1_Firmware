@@ -3,6 +3,7 @@
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
 #include "k1_vp_audio_access.h"
+#include "k1_trace.h"
 
 // ============================================================================
 // light_mode_dense_forge_chord — "Dense Forge Chord": Dense Forge variant with
@@ -144,6 +145,8 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
 
   const float kappa = DFORGE_KAPPA0 * novelty * conf_scale * (0.35f + 0.65f * activity);
 
+  {
+    K1_TRACE_SCOPE("df24_lattice");
   for (uint8_t i = 0; i < bands; i++) {
     fx.dforge_lat_last[i] = fx.dforge_lat_pos[i];
 
@@ -176,6 +179,8 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
     }
   }
 
+  }
+
   const float frame = dt * 120.0f;
   const float mood = dforge_clamp01(float(rp->MOOD));
   const float nr_scale = float(NATIVE_RESOLUTION) / 128.0f;
@@ -186,6 +191,8 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
       nr_scale *
       frame;
 
+  {
+    K1_TRACE_SCOPE("df24_transport");
   // MOTION: transport previous frame every valid rendered frame.
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   if (!hard_gate) {
@@ -193,6 +200,8 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
         SQ15x16(presence_ok ? DFORGE_TRANSPORT_ALPHA : DFORGE_QUIET_ALPHA);
     draw_sprite_upper(leds_16, leds_prev_buffer, NATIVE_RESOLUTION, NATIVE_RESOLUTION,
                 transport_drift, transport_alpha);
+  }
+
   }
 
   const float centroid = chromagram_centroid_hue();
@@ -245,6 +254,8 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
 #endif
   const float phase_b = tempo.phase01 * conf * 6.2831853f;
 
+  {
+    K1_TRACE_SCOPE("df24_moire");
   // Moiré interference inject — spatial texture without advection.
   for (uint16_t k = 0; k < HALF; k++) {
     const float u = float(k) / float(HALF > 1 ? HALF - 1 : 1);
@@ -266,6 +277,10 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
     leds_16[idx].b += col.b;
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("df24_streak");
   // Spring-lattice streak agents — differential slip (Whitney detune).
   for (uint8_t i = 0; i < bands; i++) {
     const float u_pos = fx.dforge_lat_pos[i];
@@ -281,6 +296,10 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
     dforge_streak_px(leds_16, pos_norm, last_norm, col);
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("df24_finalise");
   for (uint16_t i = 0; i < HALF; i++) {
     leds_16[i].r = 0;
     leds_16[i].g = 0;
@@ -290,5 +309,7 @@ void light_mode_dense_forge_chord(CRGB16* leds_prev_buffer, ChannelEffectState& 
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
   if (rp->MIRROR_ENABLED) {
     mirror_image_downwards(leds_16);
-  }
+  }  }
+
+
 }

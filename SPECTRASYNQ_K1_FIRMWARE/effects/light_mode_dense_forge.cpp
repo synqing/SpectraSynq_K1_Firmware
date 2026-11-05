@@ -3,6 +3,7 @@
 #include "k1_onset_beat.h"
 #include "k1_tempo.h"
 #include "k1_vp_audio_access.h"
+#include "k1_trace.h"
 
 // ============================================================================
 // light_mode_dense_forge — "Dense Forge": Novelty Shear Lattice motion engine.
@@ -138,6 +139,8 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
 
   const float kappa = DFORGE_KAPPA0 * novelty * conf_scale * (0.35f + 0.65f * activity);
 
+  {
+    K1_TRACE_SCOPE("df21_lattice");
   for (uint8_t i = 0; i < bands; i++) {
     fx.dforge_lat_last[i] = fx.dforge_lat_pos[i];
 
@@ -170,6 +173,8 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     }
   }
 
+  }
+
   const float frame = dt * 120.0f;
   const float mood = dforge_clamp01(float(rp->MOOD));
   const float nr_scale = float(NATIVE_RESOLUTION) / 128.0f;
@@ -180,6 +185,8 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
       nr_scale *
       frame;
 
+  {
+    K1_TRACE_SCOPE("df21_transport");
   // MOTION: transport previous frame every valid rendered frame.
   memset(leds_16, 0, sizeof(CRGB16) * NATIVE_RESOLUTION);
   if (!hard_gate) {
@@ -189,9 +196,13 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
                 transport_drift, transport_alpha);
   }
 
+  }
+
   const float centroid = chromagram_centroid_hue();
   const float phase_b = tempo.phase01 * conf * 6.2831853f;
 
+  {
+    K1_TRACE_SCOPE("df21_moire");
   // Moiré interference inject — spatial texture without advection.
   for (uint16_t k = 0; k < HALF; k++) {
     const float u = float(k) / float(HALF > 1 ? HALF - 1 : 1);
@@ -213,6 +224,10 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     leds_16[idx].b += col.b;
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("df21_streak");
   // Spring-lattice streak agents — differential slip (Whitney detune).
   for (uint8_t i = 0; i < bands; i++) {
     const float u_pos = fx.dforge_lat_pos[i];
@@ -228,6 +243,10 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
     dforge_streak_px(leds_16, pos_norm, last_norm, col);
   }
 
+  }
+
+  {
+    K1_TRACE_SCOPE("df21_finalise");
   for (uint16_t i = 0; i < HALF; i++) {
     leds_16[i].r = 0;
     leds_16[i].g = 0;
@@ -237,5 +256,7 @@ void light_mode_dense_forge(CRGB16* leds_prev_buffer, ChannelEffectState& fx) {
   finalize_additive_frame(leds_16, leds_prev_buffer, true);
   if (rp->MIRROR_ENABLED) {
     mirror_image_downwards(leds_16);
-  }
+  }  }
+
+
 }
