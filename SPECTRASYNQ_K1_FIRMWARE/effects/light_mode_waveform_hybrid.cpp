@@ -1,4 +1,5 @@
 #include "lightshow_modes.h"
+#include "k1_audio_input_state.h"
 
 static const float WAVEFORM_HYBRID_FALLBACK_PALETTE_OFFSET = 0.22f;
 
@@ -29,7 +30,7 @@ void light_mode_waveform_hybrid(CRGB16* leds_previous, CRGB16& last_color, float
   if (vu_level < 0.0f) vu_level = 0.0f;
   if (vu_level > 1.0f) vu_level = 1.0f;
 
-  float waveform_reactive_raw_floor = float(rp->SWEET_SPOT_MIN_LEVEL) * VP_WAVEFORM_REACTIVE_RAW_MARGIN;
+  float waveform_reactive_raw_floor = k1_audio_presence_floor(float(rp->SWEET_SPOT_MIN_LEVEL) * VP_WAVEFORM_REACTIVE_RAW_MARGIN);
   bool raw_active = max_waveform_val_raw > waveform_reactive_raw_floor;
   bool peak_active = abs_amp >= VP_WAVEFORM_REACTIVE_PEAK_FLOOR;
   bool vu_active = vu_level >= VP_WAVEFORM_VU_FLOOR;

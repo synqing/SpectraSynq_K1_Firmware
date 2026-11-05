@@ -1,4 +1,5 @@
 #include "lightshow_modes.h"
+#include "k1_audio_input_state.h"
 
 static const float WAVEFORM_FAST_FALLBACK_PALETTE_OFFSET = 0.18f;
 
@@ -48,7 +49,7 @@ void light_mode_waveform_fast(CRGB16* leds_previous, CRGB16& last_color, float& 
   waveform_peak_scaled_last = float(smoothed_peak_fixed);
   float abs_amp = fabsf(waveform_peak_scaled);
   if (abs_amp > 1.0f) abs_amp = 1.0f;
-  float waveform_reactive_raw_floor = float(rp->SWEET_SPOT_MIN_LEVEL) * WAVEFORM_REACTIVE_RAW_MARGIN;
+  float waveform_reactive_raw_floor = k1_audio_presence_floor(float(rp->SWEET_SPOT_MIN_LEVEL) * WAVEFORM_REACTIVE_RAW_MARGIN);
   bool waveform_reactive = (max_waveform_val_raw > waveform_reactive_raw_floor) && (abs_amp >= WAVEFORM_REACTIVE_PEAK_FLOOR);
 
   CRGB16 current_sum_color = {0,0,0};

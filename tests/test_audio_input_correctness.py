@@ -12,7 +12,7 @@ def compile_run(tmp_path, source):
     path = tmp_path / "input.cpp"
     exe = tmp_path / "input"
     path.write_text(source)
-    subprocess.run(["c++", "-std=c++17", "-O2", "-pthread", "-I", str(FW / "audio"), str(path), "-o", str(exe)], check=True)
+    subprocess.run(["c++", "-std=c++17", "-O2", "-pthread", "-I", str(FW / "audio"), "-I", str(FW / "system"), str(path), "-o", str(exe)], check=True)
     subprocess.run([str(exe)], check=True, timeout=20)
 
 
@@ -36,14 +36,27 @@ def test_loop_milliseconds_do_not_wrap_with_microseconds(tmp_path):
 
 def test_line_silence_dwell_wake_reset_and_wrap(tmp_path):
     compile_run(tmp_path, r'''
+    #define K1_PCM1808_CANON_TRIM_Q15 2048
+    #define K1_PCM1808_LINE_SWITCH 1
+    #define K1_FE_BOARD_V1 1
     #include "k1_audio_input_state.h"
     #include <assert.h>
+    bool line_active = false;
+    bool k1_fe_audio_line_active() { return line_active; }
     int main() {
+      static_assert(K1_LINE_PRESENCE_FLOOR == 2, "Grounded B489 canonical floor");
+      assert(k1_audio_presence_floor(108.0f) == 108.0f);
+      line_active = true;
+      assert(k1_audio_presence_floor(108.0f) == 2.0f);
+      line_active = false;
+      assert(k1_audio_presence_floor(57.0f) == 57.0f);
       K1LineSilenceState s = {}; int16_t pcm[96] = {};
+      // The measured canonical idle includes nonzero samples on every hop.
+      for (int i=0;i<96;++i) pcm[i]=(i%2) ? K1_LINE_PRESENCE_FLOOR : -int16_t(K1_LINE_PRESENCE_FLOOR);
       assert(!k1_line_silence_update(s, pcm, 96, 100, 5000));
       assert(!k1_line_silence_update(s, pcm, 96, 5099, 5000));
       assert(k1_line_silence_update(s, pcm, 96, 5100, 5000));
-      pcm[95] = -1;
+      pcm[95] = -int16_t(K1_LINE_PRESENCE_FLOOR + 1);
       assert(!k1_line_silence_update(s, pcm, 96, 5101, 5000));
       pcm[95] = 0;
       assert(!k1_line_silence_update(s, pcm, 96, 5102, 5000));

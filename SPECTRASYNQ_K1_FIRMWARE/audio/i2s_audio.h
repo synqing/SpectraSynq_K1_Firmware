@@ -1928,14 +1928,26 @@ void calculate_vu() {
       CONFIG.VU_LEVEL_FLOOR = float(audio_vu_level * 1.5);
     }
   } else {
-    audio_vu_level -= CONFIG.VU_LEVEL_FLOOR;
+    float vu_floor = CONFIG.VU_LEVEL_FLOOR;
+#if K1_PCM1808_LINE_SWITCH
+    if (k1_fe_audio_line_active()) {
+      // Canonical sample counts -> normalised RMS, in the same response-gain
+      // domain as waveform_fixed_point. Never modify the saved mic profile.
+      vu_floor = min(0.99f, float(K1_LINE_PRESENCE_FLOOR) *
+          k1_audio_response_gain_effective() / 32768.0f);
+    }
+#endif
+    audio_vu_level -= vu_floor;
 
     if (audio_vu_level < 0.0) {
       audio_vu_level = 0.0;
     }
 
-    CONFIG.VU_LEVEL_FLOOR = min(0.99f, CONFIG.VU_LEVEL_FLOOR);
-    audio_vu_level /= (1.0 - CONFIG.VU_LEVEL_FLOOR);
+#if K1_PCM1808_LINE_SWITCH
+    if (!k1_fe_audio_line_active())
+#endif
+      CONFIG.VU_LEVEL_FLOOR = min(0.99f, CONFIG.VU_LEVEL_FLOOR);
+    audio_vu_level /= (1.0 - min(0.99f, vu_floor));
   }
 
   audio_vu_level_average = (audio_vu_level + audio_vu_level_last) / (2.0);
