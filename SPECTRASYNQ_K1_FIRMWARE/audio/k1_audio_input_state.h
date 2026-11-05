@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stddef.h>
+#include "../diag/k1_trace.h"
 
 // Acquisition-owned metadata, copied to the published frame after DSP. A zero
 // assumption means no valid sample timestamp (e.g. a failed source read).
@@ -42,10 +43,23 @@ struct K1LineSilenceState {
 
 static inline bool k1_line_silence_update(K1LineSilenceState& state,
     const int16_t* samples, size_t count, uint32_t now_ms, uint32_t dwell_ms) {
+#if FEATURE_MABUTRACE
+  // Diagnostic-only full-hop peak: normal builds keep their early exit.
+  uint32_t trace_peak = 0;
+  for (size_t i = 0; i < count; ++i) {
+    const int32_t sample = samples[i];
+    const uint32_t magnitude = uint32_t(sample < 0 ? -sample : sample);
+    if (magnitude > trace_peak) trace_peak = magnitude;
+  }
+  K1_TRACE_COUNTER("line_pcm_peak", trace_peak);
+  K1_TRACE_COUNTER("line_floor", K1_LINE_PRESENCE_FLOOR);
+#endif
   for (size_t i = 0; i < count; ++i) {
     if (int32_t(samples[i]) > K1_LINE_PRESENCE_FLOOR ||
         int32_t(samples[i]) < -int32_t(K1_LINE_PRESENCE_FLOOR)) {
       state.quiet_pending = false;
+      K1_TRACE_COUNTER("line_quiet_age_ms", 0u);
+      K1_TRACE_COUNTER("line_silence", 0u);
       return false;
     }
   }
@@ -53,5 +67,9 @@ static inline bool k1_line_silence_update(K1LineSilenceState& state,
     state.quiet_since_ms = now_ms;
     state.quiet_pending = true;
   }
-  return (uint32_t)(now_ms - state.quiet_since_ms) >= dwell_ms;
+  const uint32_t quiet_age_ms = uint32_t(now_ms - state.quiet_since_ms);
+  const bool is_silent = quiet_age_ms >= dwell_ms;
+  K1_TRACE_COUNTER("line_quiet_age_ms", quiet_age_ms);
+  K1_TRACE_COUNTER("line_silence", is_silent ? 1u : 0u);
+  return is_silent;
 }
