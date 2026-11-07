@@ -148,3 +148,83 @@ def test_host_parse_good_file_bad_magic_bad_crc_type0():
         run = subprocess.run([str(binp)], text=True, capture_output=True)
         assert run.returncode == 0, run.stdout + run.stderr
         assert run.stdout.strip() == "ok"
+
+
+def test_parse_rejects_payload_bytes_that_wrap_32bit_sum():
+    """Forged payload_bytes must not pass via HEADER+4+len wrap on ESP32.
+
+    On 32-bit size_t, `len < 20 + 0xFFFFFFEC` wraps need→0 and would accept.
+    Overflow-safe compare (`payload_bytes > len - 20`) must reject.
+    """
+    src = HEADER.read_text(encoding="utf-8")
+    assert "h.payload_bytes > (len - K1LT_HEADER_SIZE - 4U)" in src
+    assert "payload_bytes > (out_n - K1LT_HEADER_SIZE - 4U)" in src
+    # Old wrapping sum must not return as the length gate.
+    assert "len < K1LT_HEADER_SIZE + 4U + (size_t)h.payload_bytes" not in src
+
+    cxx = _find_compiler()
+    assert cxx
+    import subprocess
+    import tempfile
+
+    driver = r"""
+#define K1_LOOK_LIB_V1 1
+#include "k1_look_file.h"
+#include <cstdio>
+#include <cstring>
+int main() {
+  uint8_t buf[64];
+  std::memset(buf, 0, sizeof(buf));
+  // Valid magic/version/type MATRIX_3X4, forged payload_bytes that wraps
+  // HEADER+4+payload on 32-bit size_t (20 + 0xFFFFFFEC == 0).
+  uint32_t magic = 0x4B314C54UL;
+  uint16_t version = 1;
+  uint8_t type = 3;
+  uint8_t flags = 0;
+  uint16_t node_n = 0;
+  uint16_t reserved = 0;
+  uint32_t payload_bytes = 0xFFFFFFECUL;
+  std::memcpy(buf + 0, &magic, 4);
+  std::memcpy(buf + 4, &version, 2);
+  buf[6] = type;
+  buf[7] = flags;
+  std::memcpy(buf + 8, &node_n, 2);
+  std::memcpy(buf + 10, &reserved, 2);
+  std::memcpy(buf + 12, &payload_bytes, 4);
+  K1LookParsed p;
+  if (k1_look_parse_k1lt(buf, sizeof(buf), &p)) {
+    std::printf("wrap_accepted\n");
+    return 1;
+  }
+  // Also reject a merely oversized-but-non-wrapping claim.
+  payload_bytes = 1000;
+  std::memcpy(buf + 12, &payload_bytes, 4);
+  if (k1_look_parse_k1lt(buf, sizeof(buf), &p)) {
+    std::printf("oversize_accepted\n");
+    return 1;
+  }
+  std::printf("ok\n");
+  return 0;
+}
+"""
+    with tempfile.TemporaryDirectory() as td:
+        srcp = Path(td) / "drv.cpp"
+        srcp.write_text('#include <cstdint>\n' + driver, encoding="utf-8")
+        binp = Path(td) / "drv"
+        cmd = [
+            cxx,
+            "-std=c++17",
+            "-DK1_LOOK_LIB_V1=1",
+            "-I",
+            str(FW / "visual"),
+            "-I",
+            str(FW / "persistence"),
+            str(srcp),
+            "-o",
+            str(binp),
+        ]
+        r = subprocess.run(cmd, text=True, capture_output=True)
+        assert r.returncode == 0, r.stderr
+        run = subprocess.run([str(binp)], text=True, capture_output=True)
+        assert run.returncode == 0, run.stdout + run.stderr
+        assert run.stdout.strip() == "ok"
