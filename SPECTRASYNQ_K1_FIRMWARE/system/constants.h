@@ -7,6 +7,16 @@
 #include "config_types.h" // PIO-SPIKE2: ODR-safe enums/macros (LED_STRIP_MODE, LED_COUNT_VALUE, DEFAULT_SAMPLE_RATE, led_types, lightshow_modes) + struct conf, shared with globals_config.cpp
 #include "k1_platform.h"  // ADR-0007 dual-target chip guard
 
+// The product builds with -ffast-math, which implies -ffinite-math-only and lets
+// GCC fold every isnan()/isfinite() guard to a constant without a warning.
+// platformio.ini restores them with a later -fno-finite-math-only. Verified on
+// xtensa GCC 14.2: in that order isnan() is a real test; reversed, it becomes 0.
+// This fails the build of any file that includes this header with the guards
+// erased; serial/serial_parse_helpers.cpp carries the same check directly.
+#if defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__
+#error "NaN/Inf guards would be compiled out: -fno-finite-math-only must follow -ffast-math"
+#endif
+
 // Coarse firmware version echoed on serial (:version/:build) and in NVS config paths.
 #ifndef FIRMWARE_VERSION
 #define FIRMWARE_VERSION 40103
@@ -344,6 +354,15 @@ const float notes[] = {
   3520.000, 3729.310, 3951.065, 4186.009, 4434.922, 4698.636, 4978.032, 5274.041, 5587.652, 5919.911, 6271.927, 6644.875,
   7040.000, 7458.620, 7902.130, 8372.018, 8869.844, 9397.272, 9956.064, 10548.08, 11175.30, 11839.82, 12543.85, 13289.75
 };
+
+// precompute_goertzel_constants() reads notes[NUM_FREQS - 1 + NOTE_OFFSET], so
+// this is the largest NOTE_OFFSET that stays inside the table (16 today).
+static_assert(sizeof(notes) / sizeof(notes[0]) >= NUM_FREQS + 12,
+              "notes[] must cover every GDFT bin at the default NOTE_OFFSET of 12");
+static constexpr uint8_t K1_NOTE_OFFSET_MAX =
+    uint8_t(sizeof(notes) / sizeof(notes[0]) - NUM_FREQS);
+static_assert(NATIVE_RESOLUTION == 2 * NUM_FREQS,
+              "each GDFT bin maps to one canvas pixel before the mirror fill");
 
 // Analysis authority: first GDFT bin index whose target_freq is above fs/2.
 // Canvas/LED width stays NUM_FREQS (NATIVE_RESOLUTION/2); bins [hi, NUM_FREQS)

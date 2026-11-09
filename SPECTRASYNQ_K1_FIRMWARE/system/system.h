@@ -267,6 +267,11 @@ void generate_window_lookup() {
 }
 
 void precompute_goertzel_constants() {
+  // A saved offset from before the setter bound (up to 32) would read past
+  // notes[]. Valid saved values (0..K1_NOTE_OFFSET_MAX) are unchanged.
+  if (CONFIG.NOTE_OFFSET > K1_NOTE_OFFSET_MAX) {
+    CONFIG.NOTE_OFFSET = K1_NOTE_OFFSET_MAX;
+  }
   for (uint16_t i = 0; i < NUM_FREQS; i++) {
     int16_t n = i;
     frequencies[i].target_freq = notes[n + CONFIG.NOTE_OFFSET];

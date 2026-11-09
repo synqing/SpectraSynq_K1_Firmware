@@ -808,8 +808,9 @@ MUTATIONS = [
     #    field-routing regression the echo-text channel cannot see. Channel (b).
     #    Anchored on the constrain bounds (6400, 44100) unique to sample_rate.
     (
-        r"CONFIG\.SAMPLE_RATE = constrain\(atol\(command_data\), 6400, 44100\);",
-        r"CONFIG.LED_COUNT = constrain(atol(command_data), 6400, 44100);",
+        # Setter parses with vp_parse_i32 first (2026-11-10); same misroute.
+        r"CONFIG\.SAMPLE_RATE = constrain\(value, 6400, 44100\);",
+        r"CONFIG.LED_COUNT = constrain(value, 6400, 44100);",
         "sample_rate_write_misrouted_to_LED_COUNT (field-routing divergence text hides)",
     ),
     # 8. SWAP led_count's IMMEDIATE save_config() for save_config_delayed(). Echo +
@@ -881,8 +882,9 @@ MUTATIONS = [
     #     correct clamped 4.0 — diverges config_delta AND the echoed value on the
     #     boundary corpus entry. Channel (b).
     (
-        r"audio_response_gain = serial_clamp_float\(atof\(command_data\), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX\);",
-        r"audio_response_gain = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, 2.0f);",
+        # Setter validates with vp_parse_float_clamped (2026-11-10); same 2.0 cap.
+        r"vp_parse_float_clamped\(command_data, AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX, &value\)",
+        r"vp_parse_float_clamped(command_data, AUDIO_RESPONSE_GAIN_MIN, 2.0f, &value)",
         "response_gain_clamp_upper_4.0_to_2.0 (CONFIG-delta + echo divergence on boundary entry)",
     ),
     # R2. MIS-ROUTE the response_gain write to VP_VIVID_BLACK_LEVEL. "response_gain=2.0"
@@ -892,8 +894,8 @@ MUTATIONS = [
     #     is exactly the field-routing regression echo text alone would miss were the
     #     echo not derived from the global. Channel (b).
     (
-        r"audio_response_gain = serial_clamp_float\(atof\(command_data\), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX\);",
-        r"VP_VIVID_BLACK_LEVEL = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);",
+        r"audio_response_gain = value;",
+        r"VP_VIVID_BLACK_LEVEL = value;",
         "response_gain_write_misrouted_to_VP_VIVID_BLACK_LEVEL (field-routing divergence)",
     ),
     # ===================================================================
@@ -910,8 +912,10 @@ MUTATIONS = [
     #     records SECONDARY_PHOTONS=0.5 instead of the correct clamped 1.0 — diverges
     #     config_delta AND the echoed value on the boundary entry. Channel (b).
     (
-        r"SECONDARY_PHOTONS = constrain\(atof\(command_data\), 0\.0, 1\.0\);",
-        r"SECONDARY_PHOTONS = constrain(atof(command_data), 0.0, 0.5);",
+        # The setter validates with vp_parse_float_clamped (2026-11-10); the
+        # injected regression still caps the stored value at 0.5.
+        r"SECONDARY_PHOTONS = value;",
+        r"SECONDARY_PHOTONS = (value > 0.5f) ? 0.5f : value;",
         "secondary_photons_clamp_upper_1.0_to_0.5 (CONFIG-delta + echo divergence)",
     ),
     # S2. MIS-ROUTE the secondary_chroma write to SECONDARY_MOOD. "secondary_chroma=0.5"
@@ -919,8 +923,8 @@ MUTATIONS = [
     #     lands on SECONDARY_MOOD (SECONDARY_CHROMA unchanged). Field-routing regression
     #     the echo channel cannot see. Channel (b).
     (
-        r"SECONDARY_CHROMA = constrain\(atof\(command_data\), 0\.0, 1\.0\);",
-        r"SECONDARY_MOOD = constrain(atof(command_data), 0.0, 1.0);",
+        r"SECONDARY_CHROMA = value;",
+        r"SECONDARY_MOOD = value;",
         "secondary_chroma_write_misrouted_to_SECONDARY_MOOD (field-routing divergence)",
     ),
     # S3. BREAK the secondary_control echo label (the ENABLED arm — unique to the setter;

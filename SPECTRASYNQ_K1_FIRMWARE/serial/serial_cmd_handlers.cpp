@@ -199,7 +199,12 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SQUARE_ITER = CONFIG_DEFAULTS.SQUARE_ITER;
       } else {
-        CONFIG.SQUARE_ITER = constrain(atol(command_data), 0, 10);
+        int32_t value = 0;  // atol() turned non-numeric text into 0 and saved it
+        if (!vp_parse_i32(command_data, &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        CONFIG.SQUARE_ITER = constrain(value, 0, 10);
       }
       save_config_delayed();
 
@@ -338,7 +343,14 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SWEET_SPOT_MIN_LEVEL = CONFIG_DEFAULTS.SWEET_SPOT_MIN_LEVEL;
       } else {
-        CONFIG.SWEET_SPOT_MIN_LEVEL = constrain(atof(command_data), 0, uint32_t(-1));
+        // Validate before narrowing: NaN (which constrain() passed through)
+        // has no defined conversion to the uint32_t field.
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, SERIAL_U32_FLOAT_MAX, &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        CONFIG.SWEET_SPOT_MIN_LEVEL = uint32_t(value);
       }
 
       save_config_delayed();
@@ -353,7 +365,12 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SWEET_SPOT_MAX_LEVEL = CONFIG_DEFAULTS.SWEET_SPOT_MAX_LEVEL;
       } else {
-        CONFIG.SWEET_SPOT_MAX_LEVEL = constrain(atof(command_data), 0, uint32_t(-1));
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, SERIAL_U32_FLOAT_MAX, &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        CONFIG.SWEET_SPOT_MAX_LEVEL = uint32_t(value);
       }
 
       save_config_delayed();
@@ -368,7 +385,12 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.CHROMAGRAM_RANGE = CONFIG_DEFAULTS.CHROMAGRAM_RANGE;
       } else {
-        CONFIG.CHROMAGRAM_RANGE = constrain(atof(command_data), 1, NUM_FREQS);
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 1.0f, float(NUM_FREQS), &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        CONFIG.CHROMAGRAM_RANGE = uint8_t(value);
       }
 
       save_config_delayed();
@@ -411,7 +433,12 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.MAX_CURRENT_MA = CONFIG_DEFAULTS.MAX_CURRENT_MA;
       } else {
-        CONFIG.MAX_CURRENT_MA = constrain(atof(command_data), 0, uint32_t(-1));
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, SERIAL_U32_FLOAT_MAX, &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        CONFIG.MAX_CURRENT_MA = uint32_t(value);
       }
 
       FastLED.setMaxPowerInVoltsAndMilliamps(5.0, CONFIG.MAX_CURRENT_MA);
@@ -456,12 +483,13 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.INCANDESCENT_FILTER = CONFIG_DEFAULTS.INCANDESCENT_FILTER;
       } else {
-        CONFIG.INCANDESCENT_FILTER = atof(command_data);
-        if (CONFIG.INCANDESCENT_FILTER < 0.0) {
-          CONFIG.INCANDESCENT_FILTER = 0.0;
-        } else if (CONFIG.INCANDESCENT_FILTER > 1.0) {
-          CONFIG.INCANDESCENT_FILTER = 1.0;
+        // NaN passes both comparisons; reject it before committing.
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+          bad_command(command_type, command_data);
+          return true;
         }
+        CONFIG.INCANDESCENT_FILTER = value;
       }
 
       save_config_delayed();
@@ -501,12 +529,13 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.BULB_OPACITY = CONFIG_DEFAULTS.BULB_OPACITY;
       } else {
-        CONFIG.BULB_OPACITY = atof(command_data);
-        if (CONFIG.BULB_OPACITY < 0.0) {
-          CONFIG.BULB_OPACITY = 0.0;
-        } else if (CONFIG.BULB_OPACITY > 1.0) {
-          CONFIG.BULB_OPACITY = 1.0;
+        // NaN passes both comparisons below; reject it before committing.
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+          bad_command(command_type, command_data);
+          return true;
         }
+        CONFIG.BULB_OPACITY = value;
       }
 
       save_config_delayed();
@@ -521,12 +550,12 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SATURATION = CONFIG_DEFAULTS.SATURATION;
       } else {
-        CONFIG.SATURATION = atof(command_data);
-        if (CONFIG.SATURATION < 0.0) {
-          CONFIG.SATURATION = 0.0;
-        } else if (CONFIG.SATURATION > 1.0) {
-          CONFIG.SATURATION = 1.0;
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+          bad_command(command_type, command_data);
+          return true;
         }
+        CONFIG.SATURATION = value;
       }
 
       save_config_delayed();
@@ -543,8 +572,13 @@ bool serial_cmd_dispatch_pure_setter(const char* command_type, char* command_dat
         good = true;
         CONFIG.PRISM_COUNT = CONFIG_DEFAULTS.PRISM_COUNT;
       } else {
-        good = true;
-        CONFIG.PRISM_COUNT = constrain(atol(command_data), 0, 10);
+        int32_t value = 0;
+        good = vp_parse_i32(command_data, &value);
+        if (good) {
+          CONFIG.PRISM_COUNT = constrain(value, 0, 10);
+        } else {
+          bad_command(command_type, command_data);
+        }
       }
 
       if (good) {
@@ -583,8 +617,13 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
         good = true;
         CONFIG.SAMPLE_RATE = CONFIG_DEFAULTS.SAMPLE_RATE;
       } else {
-        good = true;
-        CONFIG.SAMPLE_RATE = constrain(atol(command_data), 6400, 44100);
+        int32_t value = 0;
+        good = vp_parse_i32(command_data, &value);
+        if (good) {
+          CONFIG.SAMPLE_RATE = constrain(value, 6400, 44100);
+        } else {
+          bad_command(command_type, command_data);  // no save, no reboot
+        }
       }
 
       if (good) {
@@ -602,7 +641,16 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
       if (strcmp(command_data, "default") == 0) {
         CONFIG.NOTE_OFFSET = CONFIG_DEFAULTS.NOTE_OFFSET;
       } else {
-        CONFIG.NOTE_OFFSET = constrain(atol(command_data), 0, 32);
+        // Validate first: atol() turned text (or a bare read) into 0, which was
+        // saved and rebooted into the 55 Hz profile. notes[] has
+        // K1_NOTE_OFFSET_MAX + NUM_FREQS entries; a larger offset made
+        // precompute_goertzel_constants() read past the table every boot.
+        int32_t value = 0;
+        if (!vp_parse_i32(command_data, &value)) {
+          bad_command(command_type, command_data);
+          return true;  // handled: nothing stored, no reboot
+        }
+        CONFIG.NOTE_OFFSET = uint8_t(constrain(value, 0, (int32_t)K1_NOTE_OFFSET_MAX));
       }
       save_config();
       tx_begin();
@@ -644,11 +692,22 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
 
     // Set LED Count ------------------------------------
     else if (strcmp(command_type, "led_count") == 0) {
+      // The LED buffers are allocated once at boot for LED_COUNT_VALUE and
+      // init_system() forces CONFIG.LED_COUNT back to it on every boot, so no
+      // other count can ever take effect. Storing one anyway let the render
+      // task and reboot()'s fade loop past the boot-sized buffers before the
+      // restart. Validate before committing; anything else changes nothing.
+      uint32_t requested = 0;
       if (strcmp(command_data, "default") == 0) {
-        CONFIG.LED_COUNT = CONFIG_DEFAULTS.LED_COUNT;
-      } else {
-        CONFIG.LED_COUNT = constrain(atol(command_data), 1, 10000);
+        requested = LED_COUNT_VALUE;
+      } else if (!vp_parse_u32(command_data, &requested)) {
+        requested = 0;
       }
+      if (requested != LED_COUNT_VALUE) {
+        bad_command(command_type, command_data);
+        return true;  // handled: rejected, nothing stored, no reboot
+      }
+      CONFIG.LED_COUNT = LED_COUNT_VALUE;
 
       save_config();
       tx_begin();
@@ -692,7 +751,12 @@ bool serial_cmd_dispatch_reboot_setter(const char* command_type, char* command_d
       if (strcmp(command_data, "default") == 0) {
         CONFIG.SAMPLES_PER_CHUNK = CONFIG_DEFAULTS.SAMPLES_PER_CHUNK;
       } else {
-        CONFIG.SAMPLES_PER_CHUNK = constrain(atol(command_data), 0, SAMPLE_HISTORY_LENGTH);
+        int32_t value = 0;
+        if (!vp_parse_i32(command_data, &value)) {
+          bad_command(command_type, command_data);
+          return true;  // handled: nothing stored, no reboot
+        }
+        CONFIG.SAMPLES_PER_CHUNK = constrain(value, 0, (int32_t)SAMPLE_HISTORY_LENGTH);
       }
 
       save_config();
@@ -848,7 +912,14 @@ bool serial_cmd_dispatch_response_gain(const char* command_type, char* command_d
       if (strcmp(command_data, "default") == 0) {
         audio_response_gain = DEFAULT_AUDIO_RESPONSE_GAIN;
       } else {
-        audio_response_gain = serial_clamp_float(atof(command_data), AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX);
+        // NaN passes serial_clamp_float and reaches the core-0 sample path
+        // (float-to-int16 per sample); validate before committing.
+        float value = 0.0f;
+        if (!vp_parse_float_clamped(command_data, AUDIO_RESPONSE_GAIN_MIN, AUDIO_RESPONSE_GAIN_MAX, &value)) {
+          bad_command(command_type, command_data);
+          return true;
+        }
+        audio_response_gain = value;
       }
 
       tx_begin();
@@ -1430,7 +1501,14 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
     }
 
     else if (strcmp(command_type, "secondary_photons") == 0) {
-      SECONDARY_PHOTONS = constrain(atof(command_data), 0.0, 1.0);
+      // Arduino constrain() passes NaN through, and the render path converts
+      // these to SQ15x16; reject non-numeric/non-finite text like the primary setters.
+      float value = 0.0f;
+      if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      SECONDARY_PHOTONS = value;
 
       tx_begin();
       USBSerial.print("SECONDARY_PHOTONS: ");
@@ -1439,7 +1517,12 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
     }
 
     else if (strcmp(command_type, "secondary_chroma") == 0) {
-      SECONDARY_CHROMA = constrain(atof(command_data), 0.0, 1.0);
+      float value = 0.0f;
+      if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      SECONDARY_CHROMA = value;
 
       tx_begin();
       USBSerial.print("SECONDARY_CHROMA: ");
@@ -1448,7 +1531,12 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
     }
 
     else if (strcmp(command_type, "secondary_mood") == 0) {
-      SECONDARY_MOOD = constrain(atof(command_data), 0.0, 1.0);
+      float value = 0.0f;
+      if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      SECONDARY_MOOD = value;
 
       tx_begin();
       USBSerial.print("SECONDARY_MOOD: ");
@@ -1457,7 +1545,12 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
     }
 
     else if (strcmp(command_type, "secondary_saturation") == 0) {
-      SECONDARY_SATURATION = constrain(atof(command_data), 0.0, 1.0);
+      float value = 0.0f;
+      if (!vp_parse_float_clamped(command_data, 0.0f, 1.0f, &value)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      SECONDARY_SATURATION = value;
 
       tx_begin();
       USBSerial.print("SECONDARY_SATURATION: ");
@@ -1466,7 +1559,12 @@ bool serial_cmd_dispatch_secondary(const char* command_type, char* command_data)
     }
 
     else if (strcmp(command_type, "secondary_prism_count") == 0) {
-      SECONDARY_PRISM_COUNT = constrain(atof(command_data), 0.0, 10.0);
+      float value = 0.0f;
+      if (!vp_parse_float_clamped(command_data, 0.0f, 10.0f, &value)) {
+        bad_command(command_type, command_data);
+        return true;
+      }
+      SECONDARY_PRISM_COUNT = value;
 
       tx_begin();
       USBSerial.print("SECONDARY_PRISM_COUNT: ");

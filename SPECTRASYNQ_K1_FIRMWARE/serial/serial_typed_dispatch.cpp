@@ -728,32 +728,55 @@ bool serial_typed_standby_dimming(const char* command_type, char* command_data) 
   return true;
 }
 
+// Silence classifier tunables. Validate before committing: atof/atol turned
+// text into 0 (or NaN) and silently changed the classifier that also gates
+// automatic saves. Valid numbers keep their previous unclamped behaviour.
+static bool serial_typed_parse_or_reject(const char* command_type, char* command_data,
+                                         float* out_value) {
+  if (vp_parse_float(command_data, out_value)) return true;
+  bad_command(command_type, command_data);
+  return false;
+}
+
 bool serial_typed_silence_enter(const char* command_type, char* command_data) {
-  SILENCE_ENTER_SSL_FRAC = (float)atof(command_data);
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  SILENCE_ENTER_SSL_FRAC = value;
       tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();
   return true;
 }
 
 bool serial_typed_silence_exit(const char* command_type, char* command_data) {
-  SILENCE_EXIT_SSL_FRAC = (float)atof(command_data);
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  SILENCE_EXIT_SSL_FRAC = value;
       tx_begin(); USBSerial.print("SILENCE_EXIT_SSL_FRAC: "); USBSerial.println(SILENCE_EXIT_SSL_FRAC, 3); tx_end();
   return true;
 }
 
 bool serial_typed_silence_dwell(const char* command_type, char* command_data) {
-  SILENCE_DWELL_MS = (uint32_t)atol(command_data);
+  uint32_t value = 0;
+  if (!vp_parse_u32(command_data, &value)) {
+    bad_command(command_type, command_data);
+    return true;
+  }
+  SILENCE_DWELL_MS = value;
       tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
   return true;
 }
 
 bool serial_typed_silence_rms_enter(const char* command_type, char* command_data) {
-  K1_SILENCE_RMS_ENTER = (float)atof(command_data);
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  K1_SILENCE_RMS_ENTER = value;
       tx_begin(); USBSerial.print("K1_SILENCE_RMS_ENTER: "); USBSerial.println(K1_SILENCE_RMS_ENTER, 3); tx_end();
   return true;
 }
 
 bool serial_typed_silence_rms_exit(const char* command_type, char* command_data) {
-  K1_SILENCE_RMS_EXIT = (float)atof(command_data);
+  float value = 0.0f;
+  if (!serial_typed_parse_or_reject(command_type, command_data, &value)) return true;
+  K1_SILENCE_RMS_EXIT = value;
       tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
   return true;
 }

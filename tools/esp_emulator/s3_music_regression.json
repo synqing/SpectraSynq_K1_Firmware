@@ -389,14 +389,14 @@
       }
     },
     "cfg-save": {
-      "purpose": "Primary-only commands at hop 0; the product's delayed CONFIG save fires 5 s later (declared 600-hop zero tail). No show-state file is written.",
+      "purpose": "Primary-only commands at hop 0. Since 7a7507b2 the product's delayed CONFIG save waits for the silence classifier (SILENCE_DWELL_MS 5000 after the smoke music ends at hop 128) as well as the 5 s debounce, so the save is due near app 7 s. The declared 1200-hop zero tail (app end 10.96 s) admits it with margin. Exactly one save is still required. No show-state file is written.",
       "pcm": "smoke",
       "epoch": {
         "policy": "declared",
         "us": 1000000
       },
       "composition": "primary_only",
-      "tail_hops": 600,
+      "tail_hops": 1200,
       "capture": {
         "start_hop": 0,
         "end_hop": 128,

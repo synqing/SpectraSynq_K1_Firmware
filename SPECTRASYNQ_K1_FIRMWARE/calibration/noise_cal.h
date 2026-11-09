@@ -1,3 +1,5 @@
+#include <atomic>
+
 void clear_spectral_noise_samples() {
   for (uint16_t i = 0; i < NUM_FREQS; i++) {
     noise_samples[i] = 0;
@@ -137,10 +139,26 @@ void start_noise_cal() {
   CONFIG.SWEET_SPOT_MIN_LEVEL = 0;
   calibration_refresh_status(CAL_SOURCE_DEFAULT_INVALID);
   clear_spectral_noise_samples();
-  for (uint8_t i = 0; i < NATIVE_RESOLUTION; i++) {
-    ui_mask[i] = 0;
-  }
+  // ui_mask (the progress bar) is render-owned; the render task clears it
+  // before calling request_noise_cal_start().
   USBSerial.println("STARTING NOISE CAL");
+}
+
+// start_noise_cal() resets audio-owned state (dc_offset_sum is 64-bit, plus the
+// SSL/DC/noise_samples accumulators) that loop() updates on core 0 every hop.
+// The confirmed calibration trigger is consumed by the render task on core 1,
+// so it only raises this request; loop() starts the calibration between hops.
+static std::atomic<bool> noise_cal_start_requested{false};
+
+void request_noise_cal_start() {
+  noise_cal_start_requested.store(true, std::memory_order_release);
+}
+
+// Core 0 only (loop(), before acquire_sample_chunk()).
+void service_noise_cal_start_request() {
+  if (noise_cal_start_requested.exchange(false, std::memory_order_acq_rel)) {
+    start_noise_cal();
+  }
 }
 
 void clear_noise_cal() {

@@ -980,6 +980,7 @@ void loop() {
     ap_cadence_stage_timing.pre_i2s_end_us = (uint64_t)esp_timer_get_time();
   }
 #endif
+  service_noise_cal_start_request();  // (noise_cal.h) audio-owned reset, between hops
   acquire_sample_chunk(t_now);  // (i2s_audio.h)
 #if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG && K1_AP_STAGE_ATTRIBUTION_DETAIL
   if (ap_cadence_timing_active) {

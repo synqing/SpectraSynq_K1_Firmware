@@ -45,6 +45,7 @@ static const float    K1_TEMPO_LOW = 60.0f;
 #endif
 static const float    K1_AP_FRAME_HZ        = K1_TEMPO_AP_FRAME_HZ;                         // default: 133.333 Hz
 static const uint16_t K1_NOVELTY_DECIMATION = K1_TEMPO_NOVELTY_DECIMATION;                  // default: every 3rd AP frame
+static_assert(K1_TEMPO_NOVELTY_DECIMATION >= 1U, "the novelty rate divides the AP frame rate by this");
 static const float    K1_NOVELTY_RATE_HZ    = K1_AP_FRAME_HZ / (float)K1_NOVELTY_DECIMATION; // 44.444 Hz (TRUE emit rate)
 
 // 512 samples @ 50 Hz ~= 10.2 s novelty window.
@@ -423,6 +424,9 @@ static uint32_t k1_sp_frame = 0;
 static uint32_t k1_sp_event_frame[K1_SP_MIN_EVENTS];
 static uint8_t  k1_sp_event_head = 0;
 static bool     k1_sp_presence = false;
+
+static_assert(K1_SP_BINS <= sizeof(K1AudioSnapshot::spectrum) / sizeof(K1AudioSnapshot::spectrum[0]),
+              "spectral presence indexes a.spectrum[b] for b < K1_SP_BINS");
 
 static void k1_spectral_presence_frame(const K1AudioSnapshot& a) {
   k1_sp_frame++;

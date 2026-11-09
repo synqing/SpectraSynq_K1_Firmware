@@ -2961,9 +2961,12 @@ void parse_command(char* command_buf) {
 
     // PARSER #############################
     // Parse command type
+    // Both copies stop one byte short so the zero terminator survives a long
+    // or '='-less line (check_serial buffers up to 127 bytes). The longest
+    // command name is 27 characters, so no valid command changes.
     char command_type[32] = { 0 };
     uint8_t reading_index = 0;
-    for (uint8_t i = 0; i < 32; i++) {
+    for (uint8_t i = 0; i < sizeof(command_type) - 1; i++) {
       reading_index++;
       if (command_buf[i] != '=') {
         command_type[i] = command_buf[i];
@@ -2974,7 +2977,7 @@ void parse_command(char* command_buf) {
 
     // Then parse command data
     char command_data[94] = { 0 };
-    for (uint8_t i = 0; i < 94; i++) {
+    for (uint8_t i = 0; i < sizeof(command_data) - 1; i++) {
       if (command_buf[reading_index + i] != 0) {
         command_data[i] = command_buf[reading_index + i];
       } else {
@@ -3634,17 +3637,34 @@ void parse_command(char* command_buf) {
 #endif
 
     // STANDBY_DIMMING STRUCK 2026-08-09 — legacy A/B toggle removed from available options.
+    // Validate before committing: atof/atol turned text into 0 (or NaN), which
+    // silently changed the silence classifier that also gates automatic saves.
     else if (strcmp(command_type, "silence_enter") == 0) {
-      SILENCE_ENTER_SSL_FRAC = (float)atof(command_data);
-      tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();
+      float value = 0.0f;
+      if (!vp_parse_float(command_data, &value)) {
+        bad_command(command_type, command_data);
+      } else {
+        SILENCE_ENTER_SSL_FRAC = value;
+        tx_begin(); USBSerial.print("SILENCE_ENTER_SSL_FRAC: "); USBSerial.println(SILENCE_ENTER_SSL_FRAC, 3); tx_end();
+      }
     }
     else if (strcmp(command_type, "silence_exit") == 0) {
-      SILENCE_EXIT_SSL_FRAC = (float)atof(command_data);
-      tx_begin(); USBSerial.print("SILENCE_EXIT_SSL_FRAC: "); USBSerial.println(SILENCE_EXIT_SSL_FRAC, 3); tx_end();
+      float value = 0.0f;
+      if (!vp_parse_float(command_data, &value)) {
+        bad_command(command_type, command_data);
+      } else {
+        SILENCE_EXIT_SSL_FRAC = value;
+        tx_begin(); USBSerial.print("SILENCE_EXIT_SSL_FRAC: "); USBSerial.println(SILENCE_EXIT_SSL_FRAC, 3); tx_end();
+      }
     }
     else if (strcmp(command_type, "silence_dwell") == 0) {
-      SILENCE_DWELL_MS = (uint32_t)atol(command_data);
-      tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
+      uint32_t value = 0;
+      if (!vp_parse_u32(command_data, &value)) {
+        bad_command(command_type, command_data);
+      } else {
+        SILENCE_DWELL_MS = value;
+        tx_begin(); USBSerial.print("SILENCE_DWELL_MS: "); USBSerial.println(SILENCE_DWELL_MS); tx_end();
+      }
     }
 #ifdef K1_TUNABLE_REGISTRY_V1
     // Generic AP/VP parameter access, so any threshold under suspicion can be moved
@@ -3704,12 +3724,22 @@ void parse_command(char* command_buf) {
     // Raw-RMS absolute go-dark thresholds (firmware-v3 pre-gate port). Calibrate live from
     // [AP] rms_raw in a quiet room, then set enter above the floor with margin (exit > enter).
     else if (strcmp(command_type, "silence_rms_enter") == 0) {
-      K1_SILENCE_RMS_ENTER = (float)atof(command_data);
-      tx_begin(); USBSerial.print("K1_SILENCE_RMS_ENTER: "); USBSerial.println(K1_SILENCE_RMS_ENTER, 3); tx_end();
+      float value = 0.0f;
+      if (!vp_parse_float(command_data, &value)) {
+        bad_command(command_type, command_data);
+      } else {
+        K1_SILENCE_RMS_ENTER = value;
+        tx_begin(); USBSerial.print("K1_SILENCE_RMS_ENTER: "); USBSerial.println(K1_SILENCE_RMS_ENTER, 3); tx_end();
+      }
     }
     else if (strcmp(command_type, "silence_rms_exit") == 0) {
-      K1_SILENCE_RMS_EXIT = (float)atof(command_data);
-      tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
+      float value = 0.0f;
+      if (!vp_parse_float(command_data, &value)) {
+        bad_command(command_type, command_data);
+      } else {
+        K1_SILENCE_RMS_EXIT = value;
+        tx_begin(); USBSerial.print("K1_SILENCE_RMS_EXIT: "); USBSerial.println(K1_SILENCE_RMS_EXIT, 3); tx_end();
+      }
     }
 #ifdef K1_MIC_AUTO_SENSE_V1
     // Runtime-only mic auto-sense supervisor. Never persists; never fires noise cal.

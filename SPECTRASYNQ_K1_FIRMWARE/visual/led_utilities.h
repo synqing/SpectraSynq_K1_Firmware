@@ -52,7 +52,7 @@
 #endif
 #include "k1_led_emit.h"
 
-extern void start_noise_cal();
+extern void request_noise_cal_start();  // calibration/noise_cal.h: core 0 starts it
 
 #ifndef K1_LED_TASK_CORE
 #define K1_LED_TASK_CORE 1
@@ -2101,7 +2101,12 @@ inline void run_transition_fade() {
       if (debug_mode) {
         USBSerial.println("COLLECTING AMBIENT NOISE SAMPLES...");
       }
-      start_noise_cal();
+      // This runs on the render task (core 1). Clear the render-owned progress
+      // mask here, then hand the audio-owned reset to loop() on core 0.
+      for (uint8_t i = 0; i < NATIVE_RESOLUTION; i++) {
+        ui_mask[i] = 0;
+      }
+      request_noise_cal_start();
     }
   }
 }

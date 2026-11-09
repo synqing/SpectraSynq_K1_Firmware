@@ -396,7 +396,7 @@ CRGB leds_aux [160];
 CRGB leds_fade[160];
 */
 
-inline CRGB16  leds_16[160];
+inline CRGB16  leds_16[NATIVE_RESOLUTION];  // loops index it to NATIVE_RESOLUTION (was a literal 160)
 inline CRGB16  leds_16_prev[160];
 inline CRGB16  leds_16_prev_secondary[160]; // Buffer for secondary bloom state
 inline CRGB16  leds_16_primary_snapshot[160];
@@ -1147,7 +1147,7 @@ inline void unlock_leds(){
 #endif
 
 // New buffers for secondary LED strip
-inline CRGB16  leds_16_secondary[160];        // Main buffer for secondary strip
+inline CRGB16  leds_16_secondary[NATIVE_RESOLUTION];  // Main buffer for secondary strip
 inline CRGB16 *leds_scaled_secondary;         // For scaling to actual LED count
 inline CRGB *leds_out_secondary;              // Final output buffer
 
