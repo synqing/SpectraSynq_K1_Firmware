@@ -1,0 +1,35 @@
+{
+ "run": "S0_m32_live_silent",
+ "capture_s": 40,
+ "player_args": [],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-09T13:09:18Z",
+   "mono": 772813.8155765,
+   "rc": 0,
+   "out": ".5 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=2.636 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.071 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-09T13:09:18Z",
+   "mono": 772813.8184495
+  },
+  "idle_start": {
+   "utc": "2026-11-09T13:09:19Z",
+   "mono": 772815.319896375
+  },
+  "idle_end": {
+   "utc": "2026-11-09T13:09:39Z",
+   "mono": 772835.3242015
+  },
+  "camera_stop": {
+   "utc": "2026-11-09T13:09:41Z",
+   "mono": 772836.720971958,
+   "rc": 0
+  },
+  "dump": {
+   "utc": "2026-11-09T13:09:45Z",
+   "mono": 772841.171631166,
+   "rc": 0
+  }
+ }
+}

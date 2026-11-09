@@ -1,0 +1,11 @@
+BENCH-ELIGIBLE ../lane-c-emu/stream/loreen_75_155_120hz.prsm frames=9600/9600 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B guard=30B
+exit=0
+NOT ELIGIBLE fixtures/bad_magic.prsm frames=5/24 hotkeys=18 cmd_entries=11 cmd_swallowed=1101 cmds_executed=10 preamble=34B guard=30B
+  - 18 byte(s) reach immediate hotkeys, first at 402 ('0')
+  - 11 ':' command-mode entr(y/ies), first at 409
+  - 1101 byte(s) swallowed by command mode, first at 410
+  - 10 command line(s) executed, first ending at 536
+  - 71 stream byte(s) not consumed by the PRSM scanner, first at 387
+  - device accepts 5 of 24 stream frames
+  - end state fill=0 command_mode=1
+exit=1

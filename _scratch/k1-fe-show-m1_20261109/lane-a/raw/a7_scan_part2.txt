@@ -1,0 +1,131 @@
+=== effects/light_mode_bloom.cpp
+31:LIVE: SQ15x16 bin = chromagram_smooth[i];
+68:LIVE: SQ15x16 led_hue = chroma_val + hue_position + SQ15x16(0.05);
+=== effects/light_mode_waveform_fast.cpp
+48:LIVE: SQ15x16 smoothed_peak_fixed = SQ15x16(waveform_peak_scaled) * 0.05 + SQ15x16(waveform_peak_scaled_last) * 0.95;
+50:LIVE: float abs_amp = fabsf(waveform_peak_scaled);
+53:LIVE: bool waveform_reactive = (max_waveform_val_raw > waveform_reactive_raw_floor) && (abs_amp >= WAVEFORM_REACTIVE_PEAK_FLOOR);
+63:LIVE: float bin = float(chromagram_smooth[c]);
+95:LIVE: current_sum_color = hsv(chroma_val + hue_position, SQ15x16(rp->SATURATION), SQ15x16(brightness_sum));
+106:LIVE: for (uint8_t c = 0; c < 12; c++) chromagram_energy += float(chromagram_smooth[c]);
+152:LIVE: float amp = waveform_peak_scaled;
+=== effects/light_mode_waveform.cpp
+9:LIVE: SQ15x16 smoothed_peak_fixed = SQ15x16(waveform_peak_scaled) * 0.08 + SQ15x16(waveform_peak_scaled_last) * 0.92;
+21:LIVE: float bin = float(chromagram_smooth[c]);
+49:LIVE: if (total_magnitude < 0.01 && audio_vu_level > 0.02) {
+50:LIVE: float failsafe_bright = float(audio_vu_level);
+51:LIVE: SQ15x16 fallback_hue = SQ15x16(rp->CHROMA) + hue_position;
+66:LIVE: current_sum_color = hsv(chroma_val + hue_position, SQ15x16(rp->SATURATION), total_magnitude);
+74:LIVE: float abs_amp = fabsf(waveform_peak_scaled);
+=== effects/light_mode_waveform_hybrid.cpp
+22:LIVE: SQ15x16 smoothed_peak_fixed = SQ15x16(waveform_peak_scaled) * 0.08 + SQ15x16(waveform_peak_scaled_last) * 0.92;
+25:LIVE: float abs_amp = fabsf(waveform_peak_scaled);
+29:LIVE: float vu_level = float(audio_vu_level_average);
+34:LIVE: bool raw_active = max_waveform_val_raw > waveform_reactive_raw_floor;
+52:LIVE: float bin = float(chromagram_smooth[c]);
+82:LIVE: current_sum_color = hsv(chroma_val + hue_position, SQ15x16(rp->SATURATION), SQ15x16(brightness_sum));
+87:LIVE: chromagram_energy += float(chromagram_smooth[c]);
+155:LIVE: (waveform_history != nullptr) &&
+164:LIVE: float waveform_norm = max_waveform_val_raw;
+179:LIVE: int32_t sample = waveform_history[frame][idx];
+=== effects/light_mode_aurora.cpp
+=== effects/light_mode_comet.cpp
+98:BUS: const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+=== effects/light_mode_spectrum_river.cpp
+81:LIVE: float e = float(spectrogram_smooth[k]);
+85:LIVE: const float neighbour = float(spectrogram_smooth[k + 1]);
+=== effects/light_mode_spectrum_river_v2.cpp
+55:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+56:SNAP: float low = snap.low_energy;
+90:LIVE: float e = float(spectrogram_smooth[k]);
+94:LIVE: const float neighbour = float(spectrogram_smooth[k + 1]);
+=== effects/light_mode_ember.cpp
+44:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+45:SNAP: float energy = snap.spectral_energy;
+=== effects/light_mode_waveform_tempo.cpp
+84:SNAP: const float level = fmaxf(peak, snap.vu_level);
+88:SNAP: if (snap.spectral_energy < 0.08f && snap.novelty < 0.08f && level < 0.08f) {
+170:SNAP: a.frame_ms = 0; a.peak_scaled = 0.45f; a.vu_level = 0.35f; a.novelty = 0.5f;
+171:SNAP: a.spectral_energy = 0.5f; a.low_energy = 0.5f; a.mid_energy = 0.5f;
+172:SNAP: a.high_energy = 0.5f; a.chroma_strength = 0.5f; a.silence = false;
+174:BUS: t = k1_vp_tempo_read();
+175:SNAP: a = k1_vp_audio_snapshot_read();
+192:SNAP: float idle_px_s = a.silence ? 0.0f : TEMPO_IDLE_RATE;
+211:SNAP: const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+215:LIVE,SNAP: tempo_clamp01(fmaxf(snap.peak_scaled, (float)waveform_peak_scaled));
+219:SNAP: const bool dark_gate = (snap.silence && peak < TEMPO_PRESENCE_FLOOR) || !presence;
+246:BUS: const K1TempoEvent te = k1_vp_tempo_read();
+249:LIVE: "silence=%d presence=%d conf=%.2f lock=%d phase=%.2f bpm=%.1f\n",
+250:LIVE,SNAP: peak, snap.vu_level, (float)waveform_peak_scaled,
+251:SNAP: snap.silence ? 1 : 0, presence ? 1 : 0, te.confidence,
+297:BUS: const K1TempoEvent te = k1_vp_tempo_read();
+300:LIVE: "pos=%u col=%.3f/%.3f/%.3f colmax=%.3f silence=%d presence=%d "
+302:LIVE,SNAP: led_max, peak, snap.vu_level, (float)waveform_peak_scaled, amp,
+304:SNAP: snap.silence ? 1 : 0, presence ? 1 : 0, te.confidence,
+=== effects/light_mode_tempo_river.cpp
+95:BUS: t = k1_vp_tempo_read();
+139:LIVE: float e = float(spectrogram_smooth[k]);
+143:LIVE: const float neighbour = float(spectrogram_smooth[k + 1]);
+=== effects/light_mode_tempo_comet.cpp
+85:BUS: t = k1_vp_tempo_read();
+174:BUS: const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+=== effects/light_mode_dense_forge.cpp
+55:SNAP: return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
+64:LIVE: float e = float(spectrogram_smooth[k]);
+110:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+111:BUS: K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+112:BUS: K1TempoEvent tempo = k1_vp_tempo_read();
+114:SNAP: const float novelty = dforge_clamp01(snap.novelty);
+115:SNAP: const float energy = dforge_clamp01(snap.spectral_energy);
+118:SNAP: const bool hard_gate = snap.silence;
+258:LIVE: e += dforge_clamp01(float(spectrogram_smooth[bin]));
+310:LIVE: const float source_energy = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
+317:LIVE: float e = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
+=== effects/light_mode_pulse_prism.cpp
+68:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+69:BUS: K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+70:BUS: K1TempoEvent tempo = k1_vp_tempo_read();
+74:SNAP: const float bed_target = prism_clamp01(0.55f * snap.vu_level + 0.45f * snap.low_energy);
+=== effects/light_mode_dense_forge_chord.cpp
+61:SNAP: return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
+70:LIVE: float e = float(spectrogram_smooth[k]);
+116:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+117:BUS: K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+118:BUS: K1TempoEvent tempo = k1_vp_tempo_read();
+120:SNAP: const float novelty = dforge_clamp01(snap.novelty);
+121:SNAP: const float energy = dforge_clamp01(snap.spectral_energy);
+124:SNAP: const bool hard_gate = snap.silence;
+253:SNAP: const uint8_t root = snap.chord.rootNote;
+254:SNAP: const bool chord_ok = (snap.chord.type != K1ChordType::NONE);
+272:SNAP: float k = (snap.chord.confidence - 0.625f) / 0.375f;
+311:LIVE: e += dforge_clamp01(float(spectrogram_smooth[bin]));
+363:LIVE: const float source_energy = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
+370:LIVE: float e = float(spectrogram_smooth[k < analysis_bins ? k : (analysis_bins > 0 ? analysis_bins - 1 : 0)]);
+=== effects/light_mode_chroma_constellation.cpp
+77:SNAP: return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
+95:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+97:SNAP: const float energy = cc_clamp01(snap.spectral_energy);
+98:SNAP: const bool hard_gate = snap.silence;
+106:SNAP: chroma[pc] = cc_clamp01(snap.chroma_pc[pc]);
+114:LIVE: chroma[pc] = cc_clamp01(float(chromagram_smooth[pc]));
+=== effects/light_mode_percussion_burst.cpp
+71:SNAP: return !(snap.spectral_energy < 0.08f && snap.novelty < 0.08f);
+129:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+130:BUS: K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+132:SNAP: const bool hard_gate = snap.silence;
+=== effects/light_mode_tempo_comet_anticipate.cpp
+93:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+94:SNAP: if (audio.silence) {
+117:BUS: t = k1_vp_tempo_read();
+214:BUS: const K1OnsetBeatEvent ev = k1_vp_onset_beat_read();
+=== effects/light_mode_river_surge.cpp
+105:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+109:SNAP: float low = snap.low_energy;
+118:SNAP: float energy = snap.spectral_energy;
+168:SNAP: if (!fx.rsurge_wf_active && !snap.silence &&
+205:LIVE: float e = float(spectrogram_smooth[k]);
+209:LIVE: const float neighbour = float(spectrogram_smooth[k + 1]);
+=== effects/light_mode_tempo_river_walk.cpp
+116:BUS: t = k1_vp_tempo_read();
+188:LIVE: float e = float(spectrogram_smooth[k]);
+192:LIVE: const float neighbour = float(spectrogram_smooth[k + 1]);

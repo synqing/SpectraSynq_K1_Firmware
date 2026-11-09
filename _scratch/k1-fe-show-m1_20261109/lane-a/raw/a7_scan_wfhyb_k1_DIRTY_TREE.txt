@@ -1,0 +1,11 @@
+=== effects/light_mode_waveform_hybrid_k1.cpp
+115:SNAP: const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+116:LIVE,SNAP: const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+117:LIVE,SNAP: const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
+122:SNAP: (peak > WFHYB_PRESENCE_FLOOR || snap.vu_level > WFHYB_PRESENCE_FLOOR) ? 1.0f : 0.0f;
+126:LIVE: const float sil_target = silence ? 0.0f : 1.0f;
+142:LIVE: float bin = wfhyb_clamp01(float(chromagram_smooth[c]));
+167:SNAP: const float vu = wfhyb_clamp01(snap.vu_level);
+391:LIVE: "silence=%d pal=%d dot=%.3f/%.3f/%.3f fb=%.3f mirror=%d\n",
+393:LIVE: (float)waveform_peak_scaled, amp, pos_i,
+394:LIVE: col_gain, confidence, sil_scale, silence ? 1 : 0,

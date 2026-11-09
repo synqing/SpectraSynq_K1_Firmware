@@ -1,0 +1,35 @@
+{
+ "run": "D5_restore_live_silent_m22",
+ "capture_s": 30,
+ "player_args": [],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-09T13:42:10Z",
+   "mono": 774785.997478166,
+   "rc": 0,
+   "out": ".2 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=3.056 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=22\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-09T13:42:10Z",
+   "mono": 774786.002753208
+  },
+  "idle_start": {
+   "utc": "2026-11-09T13:42:11Z",
+   "mono": 774787.502895541
+  },
+  "idle_end": {
+   "utc": "2026-11-09T13:42:26Z",
+   "mono": 774802.509960791
+  },
+  "camera_stop": {
+   "utc": "2026-11-09T13:42:28Z",
+   "mono": 774804.169472875,
+   "rc": 0
+  },
+  "dump": {
+   "utc": "2026-11-09T13:42:32Z",
+   "mono": 774808.358701791,
+   "rc": 0
+  }
+ }
+}

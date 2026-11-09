@@ -1,0 +1,28 @@
+{
+ "summary": {
+  "frames": 9600,
+  "guard": 30,
+  "packet_len": 64,
+  "events": 614336,
+  "dirty_events": 249394,
+  "unresolved_within_64_packets": 0
+ },
+ "dirty_events_classified": 249394,
+ "outcome_counts": {
+  "garbage_frame_accepted": 249394
+ },
+ "hotkey_byte_counts": {},
+ "command_line_classes": {},
+ "critical_or_persist_events_by_truncation_i": {},
+ "worst_by_class": {
+  "garbage_frame_accepted": {
+   "score": 0,
+   "k": 0,
+   "i": 36,
+   "keys": "",
+   "commands": 0,
+   "packets_to_resync": 2
+  }
+ },
+ "command_names_considered": 231
+}

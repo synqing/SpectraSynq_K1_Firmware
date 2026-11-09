@@ -1,0 +1,63 @@
+{
+ "run": "M0_m32_live_music",
+ "capture_s": 92,
+ "player_args": [
+  "--stream",
+  "stream/loreen_75_155_120hz_v2.prsm",
+  "--asset",
+  "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "--allow-line",
+  "[AP]",
+  "--start-delay-s",
+  "1",
+  "--log",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/M0_m32_live_music/player.jsonl",
+  "--audio-only"
+ ],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-09T13:27:29Z",
+   "mono": 773905.63921075,
+   "rc": 0,
+   "out": ".4 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.835 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.014 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-09T13:27:29Z",
+   "mono": 773905.640633875
+  },
+  "player_start": {
+   "utc": "2026-11-09T13:27:31Z",
+   "mono": 773907.14569975
+  },
+  "player_end": {
+   "utc": "2026-11-09T13:28:48Z",
+   "mono": 773984.493184916,
+   "rc": 2
+  },
+  "camera_stop": {
+   "utc": "2026-11-09T13:28:50Z",
+   "mono": 773985.7809385,
+   "rc": 0
+  },
+  "dump": {
+   "utc": "2026-11-09T13:28:57Z",
+   "mono": 773993.664388791,
+   "rc": 0
+  }
+ },
+ "player_cmd": [
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/.venv/bin/python",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/player/show_player.py",
+  "--stream",
+  "stream/loreen_75_155_120hz_v2.prsm",
+  "--asset",
+  "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "--allow-line",
+  "[AP]",
+  "--start-delay-s",
+  "1",
+  "--log",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/M0_m32_live_music/player.jsonl",
+  "--audio-only"
+ ]
+}

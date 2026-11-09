@@ -1,0 +1,219 @@
+{
+  "constant": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "ramp": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "single_impact": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "simultaneous_top_bottom": {
+    "host": "UNSUPPORTED",
+    "rule": "EDGE_ADDRESSING_UNSUPPORTED",
+    "frame": 10,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "silence_section": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "invalid_hz_0": {
+    "host": "INVALID",
+    "rule": "DEVICE_HZ_RANGE",
+    "frame": 5,
+    "device_rejects": [
+      5
+    ],
+    "device_accepts": 23
+  },
+  "invalid_hz_241": {
+    "host": "INVALID",
+    "rule": "DEVICE_HZ_RANGE",
+    "frame": 5,
+    "device_rejects": [
+      5
+    ],
+    "device_accepts": 23
+  },
+  "bad_magic": {
+    "host": "INVALID",
+    "rule": "DEVICE_MAGIC",
+    "frame": 5,
+    "device_rejects": [
+      5
+    ],
+    "device_accepts": 23
+  },
+  "bad_version": {
+    "host": "INVALID",
+    "rule": "DEVICE_VERSION",
+    "frame": 5,
+    "device_rejects": [
+      5
+    ],
+    "device_accepts": 23
+  },
+  "truncated": {
+    "host": "INVALID",
+    "rule": "TRUNCATED",
+    "frame": 23,
+    "device_rejects": [],
+    "device_accepts": 23
+  },
+  "truncated_mid_stream": {
+    "host": "INVALID",
+    "rule": "DEVICE_MAGIC",
+    "frame": 11,
+    "device_rejects": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22
+    ],
+    "device_accepts": 11
+  },
+  "non_monotonic_t_us": {
+    "host": "INVALID",
+    "rule": "T_US_NOT_NEXT_TICK",
+    "frame": 10,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "seq_discontinuity_undeclared": {
+    "host": "INVALID",
+    "rule": "SEQ_DISCONTINUITY",
+    "frame": 12,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "seq_gap_2_undeclared": {
+    "host": "INVALID",
+    "rule": "SEQ_DISCONTINUITY",
+    "frame": 12,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "seq_discontinuity_declared": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "backward_seek": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "backward_seek_undeclared": {
+    "host": "INVALID",
+    "rule": "T_US_NOT_NEXT_TICK",
+    "frame": 12,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "forward_seek": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "epoch_change": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "epoch_start_seq_wrong": {
+    "host": "INVALID",
+    "rule": "EPOCH_START_SEQ",
+    "frame": 12,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "hz_mismatch": {
+    "host": "INVALID",
+    "rule": "HZ_MISMATCH",
+    "frame": 5,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "off_grid_t_us": {
+    "host": "INVALID",
+    "rule": "T_US_OFF_GRID",
+    "frame": 7,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "beyond_asset": {
+    "host": "INVALID",
+    "rule": "T_US_BEYOND_ASSET",
+    "frame": 12,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "before_passage": {
+    "host": "INVALID",
+    "rule": "T_US_BEFORE_PASSAGE",
+    "frame": 0,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "stream_sha_mismatch": {
+    "host": "INVALID",
+    "rule": "STREAM_SHA256",
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "missing_sidecar": {
+    "host": "INVALID",
+    "rule": "SIDECAR_MISSING",
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "bad_asset_identity": {
+    "host": "INVALID",
+    "rule": "ASSET_IDENTITY",
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  },
+  "unconsumed_dims": {
+    "host": "VALID",
+    "rule": null,
+    "frame": null,
+    "device_rejects": [],
+    "device_accepts": 24
+  }
+}

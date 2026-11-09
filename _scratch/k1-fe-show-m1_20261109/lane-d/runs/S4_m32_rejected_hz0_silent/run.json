@@ -1,0 +1,50 @@
+{
+ "run": "S4_m32_rejected_hz0_silent",
+ "capture_s": 90,
+ "player_args": [
+  "SILENT",
+  "../lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+  "runs/S4_m32_rejected_hz0_silent/stream.jsonl",
+  "--rejected",
+  "hz0"
+ ],
+ "steps": {
+  "armed": {
+   "utc": "2026-11-09T13:23:56Z",
+   "mono": 773692.082158875,
+   "rc": 0,
+   "out": ".8 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=0.926 agc_gain=1.304 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.094 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=32\n\n"
+  },
+  "camera_start": {
+   "utc": "2026-11-09T13:23:56Z",
+   "mono": 773692.273611291
+  },
+  "player_start": {
+   "utc": "2026-11-09T13:23:58Z",
+   "mono": 773693.778698
+  },
+  "player_end": {
+   "utc": "2026-11-09T13:25:20Z",
+   "mono": 773776.499234083,
+   "rc": 0
+  },
+  "camera_stop": {
+   "utc": "2026-11-09T13:25:22Z",
+   "mono": 773778.001123166,
+   "rc": 0
+  },
+  "dump": {
+   "utc": "2026-11-09T13:25:31Z",
+   "mono": 773786.687688833,
+   "rc": 0
+  }
+ },
+ "player_cmd": [
+  "/opt/homebrew/opt/python@3.13/bin/python3.13",
+  "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/silent_stream.py",
+  "../lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+  "runs/S4_m32_rejected_hz0_silent/stream.jsonl",
+  "--rejected",
+  "hz0"
+ ]
+}

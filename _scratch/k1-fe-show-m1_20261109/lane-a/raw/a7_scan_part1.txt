@@ -1,0 +1,27 @@
+=== effects/light_mode_waveform_hybrid_k1.cpp
+115:SNAP: const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+116:LIVE,SNAP: const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+117:LIVE,SNAP: const bool silence = snap.silence;
+122:LIVE,SNAP: (!silence && (peak > WFHYB_PRESENCE_FLOOR || snap.vu_level > WFHYB_PRESENCE_FLOOR)) ? 1.0f : 0.0f;
+126:LIVE: const float sil_target = silence ? 0.0f : 1.0f;
+142:LIVE: float bin = wfhyb_clamp01(float(chromagram_smooth[c]));
+167:SNAP: const float vu = wfhyb_clamp01(snap.vu_level);
+171:LIVE: !silence && ((peak > WFHYB_PRESENCE_FLOOR) || (vu > WFHYB_PRESENCE_FLOOR));
+278:LIVE: const float quiet_factor = silence ? 0.0f :
+280:LIVE: float col_gain = silence ? 0.0f : confidence * sil_scale;
+386:LIVE: "silence=%d pal=%d dot=%.3f/%.3f/%.3f fb=%.3f mirror=%d\n",
+388:LIVE: (float)waveform_peak_scaled, amp, pos_i,
+389:LIVE: col_gain, confidence, sil_scale, silence ? 1 : 0,
+=== effects/light_mode_wfhyb_k1_variants.cpp
+151:SNAP: const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+152:LIVE,SNAP: const float peak = wfvar_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+153:LIVE,SNAP: const bool  silence = snap.silence && (peak < WFVAR_PRESENCE_FLOOR);
+156:SNAP: (peak > WFVAR_PRESENCE_FLOOR || snap.vu_level > WFVAR_PRESENCE_FLOOR) ? 1.0f : 0.0f;
+159:LIVE: const float sil_target = silence ? 0.0f : 1.0f;
+173:LIVE: bins[c] = wfvar_clamp01(float(chromagram_smooth[c]));
+190:SNAP: const float vu = wfvar_clamp01(snap.vu_level);
+=== effects/light_mode_snapwave.cpp
+55:SNAP: K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+56:BUS: K1TempoEvent tempo = k1_vp_tempo_read();
+58:SNAP: const float peak = snap_clamp01(snap.peak_scaled);
+69:LIVE: float c = float(chromagram_smooth[i]);

@@ -1,0 +1,65 @@
+{
+ "stream": "../lane-c-emu/stream/loreen_75_155_120hz_v2.prsm",
+ "runs": {
+  "live": {
+   "host_start_hint_s": null,
+   "frames": 808,
+   "duration_s": 25.48,
+   "modes": [
+    32
+   ],
+   "mean_luma": 10.712218284606934,
+   "luma_p95": 28.614896774291992,
+   "dark_frac_luma_lt1": 0.36633663366336633,
+   "best_offset_s": 0.5200000000000031,
+   "r_luma_vs_pressure": 0.23254183995518302
+  },
+  "auth1": {
+   "host_start_hint_s": 3.653157458989881,
+   "frames": 2828,
+   "duration_s": 88.513,
+   "modes": [
+    32
+   ],
+   "mean_luma": 28.676353454589844,
+   "luma_p95": 35.83124923706055,
+   "dark_frac_luma_lt1": 0.06647807637906648,
+   "best_offset_s": 3.5431574589898704,
+   "r_luma_vs_pressure": -0.16206394851960354
+  },
+  "auth2": {
+   "host_start_hint_s": 3.2618104580324143,
+   "frames": 2773,
+   "duration_s": 87.81,
+   "modes": [
+    32
+   ],
+   "mean_luma": 28.034090042114258,
+   "luma_p95": 35.89249801635742,
+   "dark_frac_luma_lt1": 0.07681211684096646,
+   "best_offset_s": 2.681810458032414,
+   "r_luma_vs_pressure": -0.16528106230826606
+  },
+  "auth3": {
+   "host_start_hint_s": 3.236245666979812,
+   "frames": 2757,
+   "duration_s": 87.824,
+   "modes": [
+    32
+   ],
+   "mean_luma": 28.8326416015625,
+   "luma_p95": 35.940834045410156,
+   "dark_frac_luma_lt1": 0.028654334421472614,
+   "best_offset_s": 3.5862456669797917,
+   "r_luma_vs_pressure": -0.11019723753179415
+  }
+ },
+ "pairwise_r_luma": {
+  "live~auth1": -0.06475407682746119,
+  "live~auth2": 0.08408256420220113,
+  "live~auth3": -0.04674673738882028,
+  "auth1~auth2": 0.6264870879225095,
+  "auth1~auth3": 0.6441731314485031,
+  "auth2~auth3": 0.6086165654885071
+ }
+}

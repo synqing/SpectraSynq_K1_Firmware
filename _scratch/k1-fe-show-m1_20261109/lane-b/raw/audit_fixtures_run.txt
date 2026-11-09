@@ -1,0 +1,48 @@
+BENCH-ELIGIBLE fixtures/constant.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/ramp.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/single_impact.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/silence_section.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/unconsumed_dims.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/seq_discontinuity_declared.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/backward_seek.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/forward_seek.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+BENCH-ELIGIBLE fixtures/epoch_change.prsm frames=24/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+exit=0
+NOT ELIGIBLE fixtures/bad_magic.prsm frames=5/24 hotkeys=26 cmd_entries=6 cmd_swallowed=550 cmds_executed=5 preamble=34B
+  - 26 byte(s) reach immediate hotkeys, first at 222 ('0')
+  - 6 ':' command-mode entr(y/ies), first at 229
+  - 550 byte(s) swallowed by command mode, first at 230
+  - 5 command line(s) executed, first ending at 356
+  - 87 stream byte(s) not consumed by the PRSM scanner, first at 207
+  - device accepts 5 of 24 stream frames
+  - end state fill=0 command_mode=1
+exit=1
+NOT ELIGIBLE fixtures/truncated_mid_stream.prsm frames=11/23 hotkeys=17 cmd_entries=4 cmd_swallowed=374 cmds_executed=3 preamble=34B
+  - 17 byte(s) reach immediate hotkeys, first at 412 ('0')
+  - 4 ':' command-mode entr(y/ies), first at 419
+  - 374 byte(s) swallowed by command mode, first at 420
+  - 3 command line(s) executed, first ending at 468
+  - 50 stream byte(s) not consumed by the PRSM scanner, first at 408
+  - stream length not a multiple of 34 (20 trailing bytes)
+  - device accepts 11 of 23 stream frames
+  - end state fill=0 command_mode=1
+exit=1
+NOT ELIGIBLE fixtures/truncated.prsm frames=23/23 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+  - stream length not a multiple of 34 (20 trailing bytes)
+  - end state fill=20 command_mode=0
+exit=1
+NOT ELIGIBLE fixtures/bad_version.prsm frames=23/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+  - 1 FRAME_BAD in stream, first ending at 237
+  - device accepts 23 of 24 stream frames
+exit=1
+NOT ELIGIBLE fixtures/invalid_hz_0.prsm frames=23/24 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=34B
+  - device accepts 23 of 24 stream frames
+exit=1

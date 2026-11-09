@@ -1,0 +1,7 @@
+frames 9600
+magic_header(1-5) {'frames_with_persist_key': 9600, 'frames_with_N': 0, 'frames_with_Y': 0, 'frames_with_colon': 0}
+seq(6-9) {'frames_with_persist_key': 5527, 'frames_with_N': 38, 'frames_with_Y': 38, 'frames_with_colon': 293}
+t_us(10-17) {'frames_with_persist_key': 3422, 'frames_with_N': 67, 'frames_with_Y': 68, 'frames_with_colon': 78}
+prim8(18-33) {'frames_with_persist_key': 6453, 'frames_with_N': 233, 'frames_with_Y': 254, 'frames_with_colon': 239}
+magic bytes 1..3: b'RSM' -> 'R' (bloom shift, RAM) and 'S' (SHOW STATE SAVE, persistent) in every frame
+seq range 9000 18599 t_us range 75000000 154991667

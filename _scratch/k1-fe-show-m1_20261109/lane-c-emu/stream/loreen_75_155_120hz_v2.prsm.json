@@ -1,0 +1,130 @@
+{
+  "schema": "k1-prim8-stream/0",
+  "asset": {
+    "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+    "sample_rate": 44100,
+    "sample_count": 9874432,
+    "channels": 2,
+    "path_hint": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3"
+  },
+  "timebase": {
+    "origin": "asset sample 0 == ShowBundle t_us 0 == Trinity contract t=0.0 s",
+    "tick_time_us": "(i*1000000 + hz//2) // hz  (PRISM.studio src/vm.js:140-145)",
+    "sample_to_us": "(2*n*1000000 + R) // (2*R)  (round half up)",
+    "us_to_sample": "(2*t_us*R + 1000000) // 2000000  (round half up)",
+    "device_note": "device ignores t_us for scheduling; uses arrival time (k1_authored_source.cpp:48-50)"
+  },
+  "passage_start_sample": 3307500,
+  "hz": 120,
+  "frame_len": 34,
+  "frame_count": 9600,
+  "trailing_bytes": 0,
+  "epoch_id": "e0",
+  "epochs": [
+    {
+      "epoch_id": "e0",
+      "first_frame": 0,
+      "kind": "start",
+      "seq_start": 9000
+    }
+  ],
+  "stream_sha256": "eafb72aecbccedba880364930898420a727d284dbe21182f18c6bff3f1258fdd",
+  "prim8": [
+    {
+      "index": 0,
+      "name": "pressure",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "vu_level, peak_scaled, spectral_energy (also silence term)"
+    },
+    {
+      "index": 1,
+      "name": "impact",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "novelty (also silence term)"
+    },
+    {
+      "index": 2,
+      "name": "mass",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "low_energy (also silence term)"
+    },
+    {
+      "index": 3,
+      "name": "momentum",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "mid_energy"
+    },
+    {
+      "index": 4,
+      "name": "heat",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 5,
+      "name": "space",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 6,
+      "name": "texture",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "high_energy"
+    },
+    {
+      "index": 7,
+      "name": "gravity",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    }
+  ],
+  "edge_addressing": "none: one stream drives both edges (no per-edge field in PRSM v1)",
+  "source": {
+    "tool": "lane-c-emu/stream/make_stream.py",
+    "analysis": "offline prepared analysis of the original recording",
+    "decode": "ffmpeg s16le at 44100 Hz, mono = mean(L,R)",
+    "window": "2048-sample Hann centred on tick time",
+    "method": "analysis frame   2048-sample Hann window centred on the tick time (46.4 ms at 44.1 kHz)\n  pressure  (0)    RMS of the window in dBFS mapped linearly FLOOR dBFS -> 0, -6 dBFS -> 1 (v1 FLOOR=-48:\n                   rejected, breakdown only fell to ~0.5; v2 FLOOR=-30, the frozen C3 stream);\n                   follower attack instant, release tau 300 ms (\"hit hard, let go slow\");\n                   floor 0.02 while the window is above -60 dBFS (\"never a gap\")\n  impact    (1)    log-magnitude spectral flux (half-wave rectified) between consecutive\n                   ticks; adaptive threshold = median over +-250 ms + 0.5 x MAD-scaled\n                   spread; an onset is a local maximum over +-50 ms above threshold; its\n                   strength = excess / p95(excess over the passage), clipped to 1; the\n                   channel is the max of onset pulses each decaying with tau 120 ms\n  mass      (2)    band power 20-150 Hz, dB, normalised p05..p99 over the passage,\n                   follower release tau 200 ms\n  momentum  (3)    band power 150-2000 Hz, same normalisation and follower\n  texture   (6)    band power 2000-16000 Hz, same normalisation and follower\n  heat, space, gravity (4, 5, 7)  constant 0 (no device consumer on FE firmware 407fdf6f)",
+    "seq_rule": "seq == global tick index i (start offset or seek is a seq jump by construction)",
+    "onsets": 648,
+    "onset_flux_excess_p95": 536.5664793800256,
+    "band_norm": {
+      "low": {
+        "p05_db": 12.13401552047718,
+        "p99_db": 53.73524933547947
+      },
+      "mid": {
+        "p05_db": 32.1783449220542,
+        "p99_db": 48.77715601443119
+      },
+      "high": {
+        "p05_db": 12.963747378535725,
+        "p99_db": 41.61486254474023
+      }
+    },
+    "passage_s": [
+      75.0,
+      155.0
+    ],
+    "transition_s": 137.0,
+    "constants": {
+      "heat": 0,
+      "space": 0,
+      "gravity": 0
+    },
+    "pressure_map_dbfs": [
+      -30.0,
+      -6.0
+    ]
+  },
+  "notes": "Lane C-emu C3. Approval label: APPROVED (source: tools/esp_emulator/s3_"
+}

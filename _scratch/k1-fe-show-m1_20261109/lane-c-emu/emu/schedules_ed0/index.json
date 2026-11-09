@@ -1,0 +1,54 @@
+{
+  "arrival_model": "C4 on the resident source ed0aa984 (PROTOTYPE ADAPTER) with Lane B's bench wire format.\n\nBench-equivalent bytes: every frame is one 64-byte guarded packet (lane-b prim8_stream.wire_packets:\n30 NUL + 34-byte frame), and RESYNC_PREAMBLE (64 B) precedes the first frame of the session and\nof every seek epoch. The adapter delivers these bytes through the production check_serial() byte\nloop, ahead of USBSerial, not through the USB peripheral itself.\nArrival model (unchanged): the bytes for a frame at original time T are consumed before hop\nceil((T - 75 s) / 7.5 ms) - 1. Record = {u32 hop, u32 len, u8 bytes[128]} (136 B), one per hop.\nRejected-input set (lead, 9 Nov): hz=0, hz=241, version=2. Bad magic is a finding, not a case.",
+  "stop_hop": 6666,
+  "schedules": {
+    "authored": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+      "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+      "hops": 9600,
+      "frames": 9600,
+      "bytes": 614464,
+      "max_bytes_per_hop": 128
+    },
+    "hz0": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz0.rx",
+      "sha256": "cb9f95b342358ba23ec47bc04e6467d122d0eae4f715b88249e016c77e91d44e",
+      "hops": 9600,
+      "frames": 9600,
+      "bytes": 614464,
+      "max_bytes_per_hop": 128
+    },
+    "hz241": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz241.rx",
+      "sha256": "0bb506e59c03b5128087d4abef74a7ede35fe35d20b98aff2c04a9ab412657fa",
+      "hops": 9600,
+      "frames": 9600,
+      "bytes": 614464,
+      "max_bytes_per_hop": 128
+    },
+    "ver2": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/ver2.rx",
+      "sha256": "c97ffab1b5a39b4916b11623cdbf69315436a4160ea71f33391a7be1cad78db9",
+      "hops": 9600,
+      "frames": 9600,
+      "bytes": 614464,
+      "max_bytes_per_hop": 128
+    },
+    "seek": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/seek.rx",
+      "sha256": "f6f3c7792e2974d3634bb2aa140eb693186a83eb57e69e9b64b673ec579408ab",
+      "hops": 9600,
+      "frames": 9600,
+      "bytes": 614592,
+      "max_bytes_per_hop": 128
+    },
+    "stop": {
+      "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/stop.rx",
+      "sha256": "76d06008d2644c6ff218e1b5c6e46187ec39658a35e1274e6518cdead007f80c",
+      "hops": 6000,
+      "frames": 6000,
+      "bytes": 384064,
+      "max_bytes_per_hop": 128
+    }
+  }
+}

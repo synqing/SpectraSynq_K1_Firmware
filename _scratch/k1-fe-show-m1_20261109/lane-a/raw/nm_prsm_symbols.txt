@@ -1,0 +1,47 @@
+== k1_fe_bench_b489 74563f3bab14836d7966317a2fb07eef24be8f1a4d8691d915c5968ae0242d72
+4202b9a8 T check_serial(unsigned long)
+42027d20 T k1_print_smart_status()
+3fcb731b b check_serial(unsigned long)::command_mode
+3fcb72f8 b check_serial(unsigned long)::prsm_scanner
+3c0993c8 d k1_prsm_scanner_push::magic
+4200e2d4 T k1_authored_intent
+4200e128 T k1_authored_map_prim8
+4200e1ec T k1_authored_on_frame
+4200e2b8 T k1_authored_suppresses_live_update
+4200e274 T k1_authored_tick
+42010654 T k1_prsm_parse
+420106ec T k1_prsm_scanner_push
+== k1_fe 09ec7f21b3efe7e6298e7d83677a63d7a748bad4095344cceeb42ee0c6d0ad18
+4202aca4 T check_serial(unsigned long)
+4202703c T k1_print_smart_status()
+3fcb6403 b check_serial(unsigned long)::command_mode
+3fcb63e0 b check_serial(unsigned long)::prsm_scanner
+3c09830c d k1_prsm_scanner_push::magic
+4200d7bc T k1_authored_intent
+4200d610 T k1_authored_map_prim8
+4200d6d4 T k1_authored_on_frame
+4200d7a0 T k1_authored_suppresses_live_update
+4200d75c T k1_authored_tick
+4200fb60 T k1_prsm_parse
+4200fbf8 T k1_prsm_scanner_push
+== k1_fe_bench_b489 @ ed0aa984
+420208c8 t _GLOBAL__sub_I__Z19light_mode_fx_orbitP6CRGB16R18ChannelEffectState
+42039058 t _GLOBAL__sub_I__Z24k1_render_trace_on_framePKhth
+42035d88 T check_serial(unsigned long)
+4201fe38 T light_mode_fx_orbit(CRGB16*, ChannelEffectState&)
+42038da0 T k1_render_trace_dispatch(char const*, char*)
+42038d8c T k1_render_trace_on_frame(unsigned char const*, unsigned short, unsigned char)
+42038a38 t _ZL12rtrace_storePKhS0_thh$constprop$0
+42038b58 t rtrace_drain_task(void*)
+420389f4 t rtrace_init_drain()
+3fcc03f7 b check_serial(unsigned long)::command_mode
+3fcc03d4 b check_serial(unsigned long)::prsm_scanner
+3c0993c8 d k1_prsm_scanner_push::magic
+3fcc11e4 b rtrace_write_dump()::line
+4200d994 T k1_authored_intent
+4200d7e8 T k1_authored_map_prim8
+4200d8ac T k1_authored_on_frame
+4200d978 T k1_authored_suppresses_live_update
+4200d934 T k1_authored_tick
+4200fd14 T k1_prsm_parse
+4200fdac T k1_prsm_scanner_push

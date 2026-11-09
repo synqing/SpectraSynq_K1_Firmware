@@ -1,0 +1,3995 @@
+{
+  "schema": "k1-emu-result/3",
+  "invocation_id": "e366141744714bb5b965a1285e32cd6f",
+  "started_utc": "2026-11-09T12:57:06.622226+00:00",
+  "finished_utc": "2026-11-09T13:17:38.963144+00:00",
+  "overall": "SOFTWARE INCOMPLETE",
+  "suite": "ed0",
+  "hardware_accessed": false,
+  "scenario": {
+    "path": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/src-ed0aa984/tools/esp_emulator/c4_scenario_ed0.json",
+    "sha256": "d2b5baf851546fce38063eecde65b7f1975f787c5ccf143f00a5f397f1bc3cf9",
+    "source_sha256": "76dcd68c3430a78d6caf0394d6e0fa54c99071e68fdafb8e3548bb3cea3e6b36",
+    "profile_selection": "fe",
+    "name": "k1-fe-show-m1-c4-ed0aa984-prototype-adapter-fe-mic"
+  },
+  "tool": {
+    "lock": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/src-ed0aa984/tools/esp_emulator/tool-lock.json",
+    "lock_sha256": "dab17a5f75959c7a2c908ba65c496e3f5a052e5967550f90be43f5e782c92212",
+    "executable": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/tools/esp-emu-pin/bin/esp-emu",
+    "executable_sha256": "dea564e36990fcea727eb11e33c5430eccdfe673fc5462c0604e0001d25d84a0",
+    "version": "0.49.0",
+    "rejected_candidates": []
+  },
+  "source": {
+    "repository": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/src-ed0aa984",
+    "kind": "export",
+    "head": "ed0aa984",
+    "branch": "lane/k1-fe-release",
+    "dirty_paths": [],
+    "dirty_inputs_sha256": "c8fbc5d84402a5145cdaffd46c7039a58a1a2f8c62345aaa85029a938bdd5359",
+    "export_tree_sha256": "c8fbc5d84402a5145cdaffd46c7039a58a1a2f8c62345aaa85029a938bdd5359",
+    "identity_paths": [
+      "SPECTRASYNQ_K1_FIRMWARE",
+      "platformio.ini",
+      "tools/esp_emulator",
+      "scripts/platformio",
+      "tests/test_esp_emulator_acceptance.py",
+      "tests/test_esp_emulator_report.py"
+    ]
+  },
+  "emu_build": {
+    "env": "k1_fe_emu",
+    "exit_code": 0,
+    "seconds": 28.9,
+    "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/build-emu.log",
+    "command": "bash scripts/agent/pio-build.sh k1_fe_emu",
+    "firmware.elf_sha256": "3df55f1df265b5af38ae938b8349a699853d16f8b1e4b20951e91c9274a56ca4",
+    "firmware.bin_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+    "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+    "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+  },
+  "profile": {
+    "env": "k1_fe_emu",
+    "product_env": "k1_fe",
+    "adapter_flags": [
+      "K1_RENDER_TRACE_V1",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY",
+      "K1_EMU_FE_MIC_ONLY",
+      "K1_EMU_ONSET_TRACE",
+      "K1_EMU_SPECTRUM_TRACE"
+    ],
+    "forbidden_in_product": [
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_RENDER_TRACE_V1",
+      "K1_B489_WS2816_V1",
+      "K1_EMU_FE_MIC_ONLY",
+      "K1_EMU_ONSET_TRACE",
+      "K1_EMU_SPECTRUM_TRACE"
+    ],
+    "trace": {
+      "edges": [
+        "A",
+        "B"
+      ],
+      "px": 160,
+      "bpp": 16,
+      "fmt": "rgb16hex",
+      "native_order": "per logical pixel G16BE R16BE B16BE (Lever-2 ws2816_pack_pixel); the rgb16hex dump is R16 G16 B16, a lossless reorder",
+      "boundary": "ws2816_wire and ws2816_wire_secondary after show_secondary_leds() and the primary Lever-2 pack, before FastLED.show() (submission suppressed by K1_EMU_SKIP_EMIT)"
+    },
+    "limiter": "Main RPL Lever-2 packs each edge with budget_proxy = n*3*65535 (identity) and init_leds() returns before FastLED.setMaxPowerInVoltsAndMilliamps(), so the compiled 2500 mA default installs no limit. The production max_current_ma command installs FastLED's shared power limit; the fixture records the scale FastLED would apply at submission per captured frame (limit_scale, power_mw).",
+    "emulator": {
+      "chip": "esp32s3",
+      "psram": "8M",
+      "batch_size": 2000000,
+      "timeout_s": 600
+    }
+  },
+  "effective_emu_env": {
+    "extends": [
+      "env:k1_fe"
+    ],
+    "build_flags": [
+      "-DARDUINO_USB_MODE=1",
+      "-DARDUINO_USB_CDC_ON_BOOT=1",
+      "-DARDUINO_RUNNING_CORE=0",
+      "-DBOARD_HAS_PSRAM",
+      "-DK1_HARDWARE",
+      "-DK1_LED_TASK_CORE=1",
+      "-DK1_I2S_DMA_DESC_NUM_VALUE=3",
+      "-DDEFAULT_SAMPLE_RATE=12800",
+      "-DDEFAULT_SAMPLES_PER_CHUNK=96",
+      "-DK1_TEMPO_NOVELTY_DECIMATION=3U",
+      "-DK1_GDFT_INT64_MAGNITUDE_V1",
+      "-DK1_GDFT_INT64_RECURRENCE_V1",
+      "-DK1_GDFT_X2_CROSSOVER_BIN=40u",
+      "-DK1_GDFT_LANE4_V1=1",
+      "-DK1_AUDIO_FRAME_V1=1",
+      "-DK1_COMMAND_CHANNELS_V1=1",
+      "-DK1_PERSIST_PARK_V1=1",
+      "-DDEFAULT_AUDIO_RESPONSE_GAIN=1.0f",
+      "-DESP32_ARDUINO_NO_RGB_BUILTIN",
+      "-O3",
+      "-ffast-math",
+      "-fno-finite-math-only",
+      "-Wno-deprecated-declarations",
+      "-Wno-narrowing",
+      "-DK1_TEMPO_CONF_V2",
+      "-DK1_TEMPO_FLYWHEEL_V2",
+      "-DK1_ONSET_V2",
+      "-DK1_CHORD_V2",
+      "-DK1_SEMANTIC_STATE",
+      "-DK1_CHORD_HUE_V1",
+      "-DK1_DROP_CUT_V1",
+      "-DK1_PEAK_ASYM_ENV",
+      "-DK1_VIVID_PRECOMP_V1",
+      "-DK1_LOUD_GUARD_V1",
+      "-DK1_AUDIO_FREEZE_GUARD_V1",
+      "-DK1_TEMPO_ACF_SPREAD_V1=1",
+      "-DK1_AGC_PERBAND_V1=1",
+      "-DK1_BOOTLOOP_GUARD_V1",
+      "-DK1_PALETTE_VIBRANCY_V1",
+      "-DK1_EDGE_PALETTE_HONOUR_V1",
+      "-DK1_MAIN_RPL_PINMAP_V1=1",
+      "-DK1_MIC_IM69D_PDM_V1",
+      "-DK1_MIC_IM69D_DSR_16S_V1",
+      "-DK1_MIC_IM69D_SLOT_RIGHT",
+      "-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1",
+      "-DK1_WFHYB_M32_VARIANTS_V1",
+      "-DK1_EDGE_PALETTE_HONOUR_V1",
+      "-DK1_WS2816_LEVER2_V1",
+      "-DK1_LOOK_LIB_V1",
+      "-DK1_COLOUR_LAB_V1",
+      "-DK1_RMT_ALLOC_ON_VP_CORE_V1=1",
+      "-DK1_FE_BOARD_V1",
+      "-DK1_PCM1808_LINE_SWITCH=1",
+      "-DK1_PCM1808_MONO_POLICY=K1_PCM1808_MONO_MID",
+      "-DK1_PCM1808_CANON_TRIM_Q15=2048",
+      "-DK1_RENDER_TRACE_V1",
+      "-DK1_EMU_FIXTURE",
+      "-DK1_EMU_SKIP_EMIT",
+      "-DK1_EMU_UART0",
+      "-DK1_EMU_FE_MIC_ONLY",
+      "-DK1_EMU_ONSET_TRACE",
+      "-DK1_EMU_SPECTRUM_TRACE",
+      "-DK1_AP_SUBSONIC_HPF_V1",
+      "-DK1_TEMPO_CONSUMER_BANDS_V1",
+      "-DK1_FX_BATTERY=1"
+    ],
+    "build_src_flags": [
+      "-include k1_emu_clock_force.h"
+    ],
+    "custom_release_tag_prefix": "fe-",
+    "build_src_filter": [
+      "+<*.ino> +<*.ino.cpp> +<system/globals_config.cpp> +<system/globals.cpp> +<system/k1_startup_ratchet.cpp> +<visual/Palettes.cpp> +<visual/render_params.cpp> +<visual/k1_render_trace.cpp> +<visual/k1_colour_lab.cpp> +<visual/k1_i2s_emit.cpp> +<effects/light_mode_*.cpp> +<audio/k1_*.cpp> -<audio/k1_mic_auto_sense.cpp> -<audio/k1_usb_audio_input.cpp> -<audio/k1_pcm1808_input.cpp> +<director/k1_*.cpp> +<control/k1_*.cpp> +<persistence/k1_persistence_request.cpp> +<serial/*.cpp>",
+      "+<director/k1_edgemixer.cpp>",
+      "+<audio/k1_pcm1808_input.cpp>",
+      "+<system/k1_fe_board.cpp>"
+    ],
+    "upload_port": "/dev/tty.usbmodem1401",
+    "monitor_port": "/dev/tty.usbmodem1401",
+    "platform": "https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip",
+    "board": "esp32-s3-devkitc1-n16r8",
+    "framework": [
+      "arduino"
+    ],
+    "board_build.arduino.memory_type": "qio_opi",
+    "board_build.psram_type": "opi",
+    "board_build.flash_mode": "qio",
+    "board_build.flash_size": "16MB",
+    "board_upload.flash_size": "16MB",
+    "board_build.partitions": "default_16MB.csv",
+    "monitor_speed": 115200,
+    "upload_speed": 921600,
+    "extra_scripts": [
+      "pre:scripts/platformio/k1_src_includes.py",
+      "pre:scripts/platformio/k1_upload_guard.py",
+      "pre:scripts/platformio/k1_build_provenance.py",
+      "pre:scripts/platformio/k1_i2s_emit_skip_fastled_wrapper.py"
+    ],
+    "build_unflags": [
+      "-DARDUINO_RUNNING_CORE=1"
+    ],
+    "lib_deps": [
+      "fastled/FastLED@3.10.3",
+      "file://libraries/FixedPoints",
+      "file://libraries/M5ROTATE8"
+    ]
+  },
+  "normal_build": {
+    "status": "PASS",
+    "build": {
+      "env": "k1_fe",
+      "exit_code": 0,
+      "seconds": 24.2,
+      "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/build-product.log",
+      "command": "bash scripts/agent/pio-build.sh k1_fe",
+      "firmware.elf_sha256": "b462e1af76364062a27bdca60ddc7c071a7c9888325ef8d0d5e91f57d2959fb2",
+      "firmware.bin_sha256": "5879325548cad0e3a72d189b273c0381c7fa7f3d6b250cbb1131649296a01871",
+      "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+      "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+    },
+    "product_flags_forbidden_present": [],
+    "product_forced_clock_include": false,
+    "emu_minus_product_flags": [
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_EMU_FE_MIC_ONLY",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_ONSET_TRACE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_SPECTRUM_TRACE",
+      "K1_EMU_UART0",
+      "K1_FX_BATTERY",
+      "K1_RENDER_TRACE_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1"
+    ],
+    "product_minus_emu_flags": [],
+    "declared_adapter_flags": [
+      "K1_RENDER_TRACE_V1",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_AP_SUBSONIC_HPF_V1",
+      "K1_TEMPO_CONSUMER_BANDS_V1",
+      "K1_FX_BATTERY",
+      "K1_EMU_FE_MIC_ONLY",
+      "K1_EMU_ONSET_TRACE",
+      "K1_EMU_SPECTRUM_TRACE"
+    ],
+    "product_fixture_symbols": [],
+    "product_fixture_strings": [],
+    "positive_control_emu_symbols": 18,
+    "positive_control_emu_strings": [
+      "EMU_FIXTURE_ARMED",
+      "K1EMUSC2",
+      "EMU_END reason",
+      "RTRACE-BEGIN"
+    ],
+    "emu_env_upload_blocked": true,
+    "nm": "/Users/spectrasynq/.platformio/packages/toolchain-xtensa-esp-elf/bin/xtensa-esp32s3-elf-nm"
+  },
+  "host_checks": {
+    "status": "FAIL",
+    "exit_code": 1,
+    "tests": [
+      "tests/test_esp_emulator_seams_static.py"
+    ],
+    "summary": "/opt/homebrew/opt/python@3.13/bin/python3.13: No module named pytest; 8 git-history test file(s) excluded in this export (run in the checkout)",
+    "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/host-pytest.log",
+    "builds": [],
+    "excluded_without_git": [
+      "tests/test_bootloop_guard_static.py",
+      "tests/test_colourlab_static.py",
+      "tests/test_dual_sync_oracle.py",
+      "tests/test_lever2_no_effect_retune_static.py",
+      "tests/test_scheduling_abba_toolchain_pin_receipt.py",
+      "tests/test_scheduling_harness_pin_receipt.py",
+      "tests/test_scheduling_stage_perturbation_pair.py",
+      "tests/test_k1_stage_attribution_abba_compare.py"
+    ]
+  },
+  "cases": {
+    "smoke-a": {
+      "case": "smoke-a",
+      "purpose": "Corrected normal-profile smoke replay: compiled defaults, normal startup animation and fade, declared epoch 1.0 s (the product's own fade gate), 128 real hops, no tail.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/smoke-a",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "a8ccc6a2bbd3413d8556d35847060888",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/smoke-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/smoke-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.15,
+      "executed": {
+        "flash_sha256": "e4798186d4ba321d65f154105c75c4b9db395882093af08bf35f67052062c935",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "e42865de446f8d3dd8e74b4c38e30367fd5e29159987ea0eb46cb940f2bde9bd",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "26417cbc514f68c248374a32b8a584d87d0e75ec4e1f4ec9f0c033f45cbe0121",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "5da43873"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "a8ccc6a2bbd3413d8556d35847060888",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "311737",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "wfh-base": {
+      "case": "wfh-base",
+      "purpose": "Live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "2e0cc997a7f84f72898b36150ac4c3ff",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 63.95,
+      "executed": {
+        "flash_sha256": "3599d13955091752a215dd4d21b3b6841d2f58144c7b3ad193590357ada60eaf",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "1c46706ee51587036df801282f5366d03bd5c0ba47d7541e2ccbc683957c5ce6",
+        "payload_crc32": "328a9b33",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "dbf338b08a59fe7cfce33a126537372c5c26160ef1747dcac0d3b4a8a3cd6130",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fb050f54"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "2e0cc997a7f84f72898b36150ac4c3ff",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "506514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-auth-1": {
+      "case": "wfh-auth-1",
+      "purpose": "Authored (guarded packets) repeat 1.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-1",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "38d88a34876e40c39c16a348623f070d",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-1/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-1/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 63.83,
+      "executed": {
+        "flash_sha256": "f9be0c48ffd2d3d446aefe314e20c7399ab77833242f56281cbd710c3e46acdc",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "a268075b9de824e173d1b8e3f2c23f68db06216a951137b00324bbf468399101",
+        "payload_crc32": "93799e53",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "7dcb0d32a5558637b5bbffd8b202af9732a2411c1c235b48e7a74a76ee7ca4b0",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "0b96e36f"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "38d88a34876e40c39c16a348623f070d",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-auth-2": {
+      "case": "wfh-auth-2",
+      "purpose": "Authored (guarded packets) repeat 2.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-2",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "6cc563f0d8c54ba496e651642510044c",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-2/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-2/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 65.63,
+      "executed": {
+        "flash_sha256": "d6a3ac4656a145cfb047c25afd2225073cf2351bc2bddbcd6108704352ff2932",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "c3b49ff9c03df9256b41aaf0301910c698e6428799aa92fb61a4f4f40b3b6181",
+        "payload_crc32": "93799e53",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "7dcb0d32a5558637b5bbffd8b202af9732a2411c1c235b48e7a74a76ee7ca4b0",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "0b96e36f"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "6cc563f0d8c54ba496e651642510044c",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-auth-3": {
+      "case": "wfh-auth-3",
+      "purpose": "Authored (guarded packets) repeat 3.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-3",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "2a9c60f11528459095b61b5ec8f9a86b",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-3/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-3/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 63.11,
+      "executed": {
+        "flash_sha256": "4bf40bed34f8f3978fd7de63950abe04a2b045df8a92792d08274c9d46cdb950",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "ee392b8c87c1c01abdd3f12d1614e83dcaecd52b6438d81e59a6808368d92aa0",
+        "payload_crc32": "93799e53",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "7dcb0d32a5558637b5bbffd8b202af9732a2411c1c235b48e7a74a76ee7ca4b0",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "0b96e36f"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "2a9c60f11528459095b61b5ec8f9a86b",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-rej-hz0": {
+      "case": "wfh-rej-hz0",
+      "purpose": "Every frame hz0; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz0",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz0.rx",
+        "sha256": "cb9f95b342358ba23ec47bc04e6467d122d0eae4f715b88249e016c77e91d44e",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "7277e4c05047487a962ffbb9380c9fe8",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz0/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz0/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 64.47,
+      "executed": {
+        "flash_sha256": "5d05a8ae817fef5f2028b011f3dd7c96611ab5203413fb9f4b8ef48857b9f1d1",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "8fe686752cc844909617b906602f2a2e78861cf29e053d6540507dff5258fd25",
+        "payload_crc32": "698215cb",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "dbf338b08a59fe7cfce33a126537372c5c26160ef1747dcac0d3b4a8a3cd6130",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fb050f54"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "7277e4c05047487a962ffbb9380c9fe8",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-rej-hz241": {
+      "case": "wfh-rej-hz241",
+      "purpose": "Every frame hz241; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz241",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz241.rx",
+        "sha256": "0bb506e59c03b5128087d4abef74a7ede35fe35d20b98aff2c04a9ab412657fa",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "6cfb7e3597ee428eb06c735176e7f6d9",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz241/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-hz241/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 66.41,
+      "executed": {
+        "flash_sha256": "1d990dc044633490002a94c9e4570ebf84ebff65a697f1b33dcd90ca57173a06",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "d285ed129ed1a40b146f081d0fb77d625a9d637a420ea35443c34b0805b1674e",
+        "payload_crc32": "2889956a",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "dbf338b08a59fe7cfce33a126537372c5c26160ef1747dcac0d3b4a8a3cd6130",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fb050f54"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "6cfb7e3597ee428eb06c735176e7f6d9",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-rej-ver2": {
+      "case": "wfh-rej-ver2",
+      "purpose": "Every frame ver2; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-ver2",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/ver2.rx",
+        "sha256": "c97ffab1b5a39b4916b11623cdbf69315436a4160ea71f33391a7be1cad78db9",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "f0df7c3f8a914237adec388d8130b1b6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-ver2/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-rej-ver2/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 65.08,
+      "executed": {
+        "flash_sha256": "3d3c830ab94dda5eb86055c62701e0a48a0d433adfeca861bfe03e574aefd3d2",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "03e85ec0606ca124d42c0c60953f361bdad4571d8d0a0aa5f183ea387456fabc",
+        "payload_crc32": "c3cc79dd",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "dbf338b08a59fe7cfce33a126537372c5c26160ef1747dcac0d3b4a8a3cd6130",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fb050f54"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "f0df7c3f8a914237adec388d8130b1b6",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-auth-zeropcm": {
+      "case": "wfh-auth-zeropcm",
+      "purpose": "Same authored stream over all-zero PCM (live-leak control).",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-zeropcm",
+      "pcm": {
+        "id": "zero_passage",
+        "kind": "concat",
+        "qualification": "diagnostic_composite",
+        "origin": "live-leak control",
+        "segments": [
+          {
+            "zeros_samples": 1024000,
+            "label": "declared all-zero PCM, passage length"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "e09534d59390e996d03db62710722cd319f787613231ec0ab6b4d53b0837c94f"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "80c383c6bb4644b59345aa0a0910cc86",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-zeropcm/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-auth-zeropcm/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 62.39,
+      "executed": {
+        "flash_sha256": "dc3599611bda927ac309f7294f06139bf9934f2faa44fd0a0f24b8c677ef76ad",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "3347f8b1fc32a4c11616bc673782244e3f99039b84eeb1d5587c10f07cbbadda",
+        "payload_crc32": "2e5cd4df",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "71cc286274efcbe4bf2c4226b9b68409e7372c9bb1a7adcedd56365f9d95f549",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "63184433"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "80c383c6bb4644b59345aa0a0910cc86",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "735"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-seek": {
+      "case": "wfh-seek",
+      "purpose": "Seek fwd 100->110 s, back 120->105 s; preamble at each epoch; audio linear.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-seek",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/seek.rx",
+        "sha256": "f6f3c7792e2974d3634bb2aa140eb693186a83eb57e69e9b64b673ec579408ab",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "69676baa8c81451a9c879c8be790f93f",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-seek/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-seek/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 63.86,
+      "executed": {
+        "flash_sha256": "45f89fdfc9de12d964b269c14554900cb12dc3d3351dd190e024feb783da3a6e",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "ce5c678201c7c0187ce92697bcc3926bf7ff53a867a12b4edc59f2c2537c4ebe",
+        "payload_crc32": "a003d9a5",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "5e9ff48eaac7078a4948e4b8cd0f7f461eab91b098bc526dfd6481d8275e0c87",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "b29be398"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "69676baa8c81451a9c879c8be790f93f",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1778,
+          "B": 1778
+        }
+      }
+    },
+    "wfh-stop": {
+      "case": "wfh-stop",
+      "purpose": "Stream stops at 125 s; dense capture.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-stop",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/stop.rx",
+        "sha256": "76d06008d2644c6ff218e1b5c6e46187ec39658a35e1274e6518cdead007f80c",
+        "records": 6000
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "ef7d961094fe43e7baa6b9a1b6c081f6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-stop/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-stop/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 63.18,
+      "executed": {
+        "flash_sha256": "daf8d6b99abe5a964d161d50a5d4b54062dfe537b27d3f0b50324dc3718a62e1",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "31bdf7e3e81ca4892036056c0948d4faae4040f2fb90f112430041488dc2d0af",
+        "payload_crc32": "45368cce",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 6466,
+          "end_hop": 8366,
+          "every": 1,
+          "frames": 1900
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1900,
+        "payload_sha256": "ae1b0a081f846a1df15f2f8e571041b36cd3078e785894f683a96fd3ef454d60",
+        "header": {
+          "frames": "1900",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "8fdd5d28"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "ef7d961094fe43e7baa6b9a1b6c081f6",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1900",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "585514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1900,
+          "B": 1900
+        }
+      }
+    },
+    "wfh-base-dense": {
+      "case": "wfh-base-dense",
+      "purpose": "Live baseline, dense window.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base-dense",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "e6d07ac0b57a441ba5db659fb53e5f90",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base-dense/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/wfh-base-dense/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 64.15,
+      "executed": {
+        "flash_sha256": "8b59720726279ac476be913bc50538867a4f91565b99734115f375034b14f3f2",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "0d0d79a62797c47f068ad64dc7c1660da78befea7970098dab7ede166247687b",
+        "payload_crc32": "328a9b33",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 6466,
+          "end_hop": 8366,
+          "every": 1,
+          "frames": 1900
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1900,
+        "payload_sha256": "ae9fc1ec77e98df9c61f0a6cb783be852741f6c2a4834ce74c18883557af97bd",
+        "header": {
+          "frames": "1900",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fe8fba78"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "e6d07ac0b57a441ba5db659fb53e5f90",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1900",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "506514",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1900,
+          "B": 1900
+        }
+      }
+    },
+    "snap-base": {
+      "case": "snap-base",
+      "purpose": "Live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-base",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "99fa0b8ba2a445819378e5d22a655197",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-base/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-base/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 57.47,
+      "executed": {
+        "flash_sha256": "f5241b6ab5aeb9b213639dc24d78246657e65b853c1fa154142e63adcc3f1fe2",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "f5f9522dca51c8da922020d2e040c856c8f828e08660e0375a3d7552c70fac13",
+        "payload_crc32": "1f5d4b08",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "30eda5a53b4ad2d2d2397432f8429c7fd5d0f3490bcdc6ac58cd2a82024aecfe",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fa8f3c9e"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "99fa0b8ba2a445819378e5d22a655197",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "506513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-auth-1": {
+      "case": "snap-auth-1",
+      "purpose": "Authored (guarded packets) repeat 1.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-1",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "e7cb1767c5ef466d94f41626204dcd85",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-1/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-1/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 57.38,
+      "executed": {
+        "flash_sha256": "c9513d0317e96dcf8a3ac32c46d64093ee9b1afde633a0a661b90d58b475afcc",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "e64d3f8a5f910375edd493c18e7b92eba47a32cfbf342fd253989441e14a35ef",
+        "payload_crc32": "284cf217",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "faef042e313aaedad9fc869d426cfcb5ace3b63d919319e078b47ec1e0f006d5",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "5cb1e1e3"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "e7cb1767c5ef466d94f41626204dcd85",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-auth-2": {
+      "case": "snap-auth-2",
+      "purpose": "Authored (guarded packets) repeat 2.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-2",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "a5017698e9964f8298726d3165c1a7a6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-2/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-2/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 55.9,
+      "executed": {
+        "flash_sha256": "15bc0c4c33a60602201ea51aa67f48f2187697dc11baa7c358b167dca9ca71c8",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "04c0886ab714d779974a07a9d57d2727f97f0076aa8c1f32c57c55c765cbee9f",
+        "payload_crc32": "284cf217",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "faef042e313aaedad9fc869d426cfcb5ace3b63d919319e078b47ec1e0f006d5",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "5cb1e1e3"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "a5017698e9964f8298726d3165c1a7a6",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-auth-3": {
+      "case": "snap-auth-3",
+      "purpose": "Authored (guarded packets) repeat 3.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-3",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "15f2f2c1e04642f6bcea581edde294ee",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-3/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-3/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 56.56,
+      "executed": {
+        "flash_sha256": "aab6d3fe213d55ccc7c6234a2beac1097c58f73756e2813ebe3b4996214501d4",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "e1e26639022f3c42cfc265ee112a3ce8a6a34251428efcc6db57f6f3f307ec9b",
+        "payload_crc32": "284cf217",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "faef042e313aaedad9fc869d426cfcb5ace3b63d919319e078b47ec1e0f006d5",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "5cb1e1e3"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "15f2f2c1e04642f6bcea581edde294ee",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-rej-hz0": {
+      "case": "snap-rej-hz0",
+      "purpose": "Every frame hz0; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz0",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz0.rx",
+        "sha256": "cb9f95b342358ba23ec47bc04e6467d122d0eae4f715b88249e016c77e91d44e",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "d6bbe01b979c4d9686182088de509ac7",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz0/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz0/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 60.72,
+      "executed": {
+        "flash_sha256": "e76c17dde62e48ed3ad47fe3b8446798d9c286d3b38d17bcd09f0b826dc5d52a",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "830959d186c4eadf878f660b363b24247e4620f9d4425dd356652c4645963b0d",
+        "payload_crc32": "d2b7798f",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "30eda5a53b4ad2d2d2397432f8429c7fd5d0f3490bcdc6ac58cd2a82024aecfe",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fa8f3c9e"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "d6bbe01b979c4d9686182088de509ac7",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-rej-hz241": {
+      "case": "snap-rej-hz241",
+      "purpose": "Every frame hz241; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz241",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/hz241.rx",
+        "sha256": "0bb506e59c03b5128087d4abef74a7ede35fe35d20b98aff2c04a9ab412657fa",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "de7365f129a74519bab3189dd2d23ad6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz241/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-hz241/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 59.75,
+      "executed": {
+        "flash_sha256": "40a2e8d4a9211c36259cfcf2f2af3e2ed80dce17598f451b8536a66da796b1f1",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "be7e0b3aa9b35e2db3574d41a21b142b40e2686fccd042f1be26187ac8703bd9",
+        "payload_crc32": "93bcf92e",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "30eda5a53b4ad2d2d2397432f8429c7fd5d0f3490bcdc6ac58cd2a82024aecfe",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fa8f3c9e"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "de7365f129a74519bab3189dd2d23ad6",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-rej-ver2": {
+      "case": "snap-rej-ver2",
+      "purpose": "Every frame ver2; guarded packets; must equal live baseline.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-ver2",
+      "pcm": {
+        "id": "show_passage",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "lane-a passage inside loreen_src",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 243200,
+            "to_sample": 1267200,
+            "label": "original 75.0-155.0 s (lane-a ASSET.json); transition 137.0 s = hop 8266"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "ce0c535ecb623ade5f2f31e9d72a871200c187333bdb0adc10ef6ef152f6c2bf"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/ver2.rx",
+        "sha256": "c97ffab1b5a39b4916b11623cdbf69315436a4160ea71f33391a7be1cad78db9",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "a5da60c3e90147f8a210cb9c526825b3",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-ver2/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-rej-ver2/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 59.15,
+      "executed": {
+        "flash_sha256": "dad56dc2583e345e28ef1f2284ecaf5c26013f18836701b3ed0b66c0b16bdcba",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "c76e0f78c9162ffb859b02b90776a660564621a6295145c13c0ef9139cc9697c",
+        "payload_crc32": "78f91599",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "30eda5a53b4ad2d2d2397432f8429c7fd5d0f3490bcdc6ac58cd2a82024aecfe",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "fa8f3c9e"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "a5da60c3e90147f8a210cb9c526825b3",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "8001"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    },
+    "snap-auth-zeropcm": {
+      "case": "snap-auth-zeropcm",
+      "purpose": "Same authored stream over all-zero PCM (live-leak control).",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-zeropcm",
+      "pcm": {
+        "id": "zero_passage",
+        "kind": "concat",
+        "qualification": "diagnostic_composite",
+        "origin": "live-leak control",
+        "segments": [
+          {
+            "zeros_samples": 1024000,
+            "label": "declared all-zero PCM, passage length"
+          }
+        ],
+        "samples": 1024000,
+        "sha256": "e09534d59390e996d03db62710722cd319f787613231ec0ab6b4d53b0837c94f"
+      },
+      "rx_stream": {
+        "schedule": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/emu/schedules_ed0/authored.rx",
+        "sha256": "91d6d2405df091155fb0d358c8262e8b1e2392d6bf7a5476b58e125ab6cff1dc",
+        "records": 9600
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "018eff5ace3c4bbc807f082c7215708d",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-zeropcm/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-c-emu/runs/c4-ed0-001/snap-auth-zeropcm/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 56.37,
+      "executed": {
+        "flash_sha256": "1dd126cb201d1c12fd03c919763b145dae5636ee90f79dda5447284f6fc41b35",
+        "app_region_matches_build": true,
+        "app_sha256": "94f5495570b8f36639f0986309541483a9b32c5039c5c43c59ac0874bd2efbd8",
+        "scenario_blob_sha256": "ed046571e1ad5755a2f0373510722a76a840e6912889fd696871ff119d1e27ad",
+        "payload_crc32": "9569b89b",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 1024000,
+        "tail_hops": 0,
+        "total_hops": 10667,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 10667,
+          "every": 6,
+          "frames": 1778
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=22",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1778,
+        "payload_sha256": "a689af7515e874bdb354994a6991fd1af39195916fbb419051cdf4c7ff19b001",
+        "header": {
+          "frames": "1778",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "c42dab2c"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "018eff5ace3c4bbc807f082c7215708d",
+          "admitted": "1024000",
+          "processed": "1024032",
+          "staged_hops": "10667",
+          "total_hops": "10667",
+          "published": "10667",
+          "last_generation": "10667",
+          "consumed": "10667",
+          "shown": "10667",
+          "last_shown": "10667",
+          "pre_audio_shows": "113",
+          "captured": "1778",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "81002500"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "632513",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "735"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1777,
+          "B": 1778
+        }
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "id": "repeat-smoke",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW02",
+      "label": "fresh repeat, strict equivalence",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['smoke-b']"
+    },
+    {
+      "id": "time-zero-tail",
+      "kind": "case",
+      "a": "time-zero-tail",
+      "b": null,
+      "criterion": "SW03",
+      "label": "zero epoch hop-end time and declared zero tail",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['time-zero-tail']"
+    },
+    {
+      "id": "stall",
+      "kind": "case",
+      "a": "stall-probe",
+      "b": null,
+      "criterion": "SW03",
+      "label": "stalled run ends as a reported failure",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['stall-probe']"
+    },
+    {
+      "id": "repeat-time",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW03",
+      "label": "identical declared-epoch progression",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['smoke-b']"
+    },
+    {
+      "id": "iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-a",
+      "criterion": "SW05",
+      "label": "intended A-only photons change (nonbinding limit)",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['ctl-a']"
+    },
+    {
+      "id": "iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-b",
+      "criterion": "SW05",
+      "label": "intended B-only photons change (nonbinding limit)",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['ctl-b']"
+    },
+    {
+      "id": "limit-coupling",
+      "kind": "limit_coupling",
+      "a": "limit-base",
+      "b": "limit-a",
+      "criterion": "SW05",
+      "label": "binding shared FastLED power limit",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['limit-base', 'limit-a']"
+    },
+    {
+      "id": "reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "reject",
+      "criterion": "SW06",
+      "label": "rejected input leaves both outputs unchanged",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['reject']"
+    },
+    {
+      "id": "recovery-state",
+      "kind": "recovery_state",
+      "a": "comp-save",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "every serialized K1ShowState field recovered before any intervention",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['comp-save', 'comp-recover', 'comp-save']"
+    },
+    {
+      "id": "recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "recovered composition output == equivalent reference",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['comp-ref', 'comp-recover']"
+    },
+    {
+      "id": "fallback-missing-show",
+      "kind": "fallback_state",
+      "a": "cfg-save",
+      "b": "cfg-recover",
+      "criterion": "SW06",
+      "label": "missing show-state file follows the implementation fallback",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['cfg-save', 'cfg-recover', 'cfg-save']"
+    },
+    {
+      "id": "repeat-music",
+      "kind": "equal",
+      "a": "music-a",
+      "b": "music-b",
+      "criterion": "SW08",
+      "label": "real-music passage repeats exactly",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['music-a', 'music-b']"
+    },
+    {
+      "id": "startup-quiet-return",
+      "kind": "startup_quiet_return",
+      "a": "startup-sqr",
+      "b": null,
+      "criterion": "SW08",
+      "label": "normal startup, active music, declared zero section, return",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['startup-sqr']"
+    },
+    {
+      "id": "music-tempo-lane",
+      "kind": "tempo_lane",
+      "a": "music-a",
+      "b": null,
+      "criterion": "SW08",
+      "label": "sustained beat response on real music: existing production tempo-lane rule",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['music-a']"
+    },
+    {
+      "id": "music-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "music-a",
+      "b": null,
+      "criterion": "SW09",
+      "label": "tempo/onset/beat meaning reaches the render thread at the same generation",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['music-a']"
+    },
+    {
+      "id": "startup-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "startup-sqr",
+      "b": null,
+      "criterion": "SW09",
+      "label": "meaning continuity across startup, zero section and return",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['startup-sqr']"
+    },
+    {
+      "id": "client-a-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-a",
+      "b": "client-a",
+      "criterion": "SW13",
+      "label": "client-delivered A change == the same change scheduled at the same hop",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['ctl-a', 'client-a']"
+    },
+    {
+      "id": "client-iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-a",
+      "criterion": "SW13",
+      "label": "client A-only intervention changes only edge A from hop 40 (nonbinding limit)",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['client-a']"
+    },
+    {
+      "id": "client-b-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-b",
+      "b": "client-b",
+      "criterion": "SW13",
+      "label": "client-delivered B change == the same change scheduled at the same hop",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['ctl-b', 'client-b']"
+    },
+    {
+      "id": "client-iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-b",
+      "criterion": "SW13",
+      "label": "client B-only intervention changes only edge B from hop 40 (nonbinding limit)",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['client-b']"
+    },
+    {
+      "id": "client-reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "client-reject",
+      "criterion": "SW13",
+      "label": "client-delivered rejected input leaves both outputs unchanged",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['client-reject']"
+    },
+    {
+      "id": "client-recovery-state",
+      "kind": "recovery_state",
+      "a": "client-comp-save",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "client-applied composition: every serialized K1ShowState field recovered with zero commands",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['client-comp-save', 'client-comp-recover', 'client-comp-save']"
+    },
+    {
+      "id": "client-recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "recovered client-applied composition output == equivalent reference",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['comp-ref', 'client-comp-recover']"
+    },
+    {
+      "id": "wfh-auth-1-differs",
+      "kind": "differs",
+      "a": "wfh-base",
+      "b": "wfh-auth-1",
+      "criterion": "SW02",
+      "label": "authored differs from live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=False frames=1778/1778 sha dbf338b08a59/7dcb0d32a555"
+    },
+    {
+      "id": "wfh-auth-2-equal",
+      "kind": "equal",
+      "a": "wfh-auth-1",
+      "b": "wfh-auth-2",
+      "criterion": "SW02",
+      "label": "repeat 1 == 2",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha 7dcb0d32a555/7dcb0d32a555"
+    },
+    {
+      "id": "wfh-auth-3-equal",
+      "kind": "equal",
+      "a": "wfh-auth-1",
+      "b": "wfh-auth-3",
+      "criterion": "SW02",
+      "label": "repeat 1 == 3",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha 7dcb0d32a555/7dcb0d32a555"
+    },
+    {
+      "id": "wfh-rej-hz0-equal",
+      "kind": "equal",
+      "a": "wfh-base",
+      "b": "wfh-rej-hz0",
+      "criterion": "SW03",
+      "label": "hz0 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59"
+    },
+    {
+      "id": "wfh-rej-hz241-equal",
+      "kind": "equal",
+      "a": "wfh-base",
+      "b": "wfh-rej-hz241",
+      "criterion": "SW03",
+      "label": "hz241 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59"
+    },
+    {
+      "id": "wfh-rej-ver2-equal",
+      "kind": "equal",
+      "a": "wfh-base",
+      "b": "wfh-rej-ver2",
+      "criterion": "SW03",
+      "label": "ver2 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59"
+    },
+    {
+      "id": "snap-auth-1-differs",
+      "kind": "differs",
+      "a": "snap-base",
+      "b": "snap-auth-1",
+      "criterion": "SW02",
+      "label": "authored differs from live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=False frames=1778/1778 sha 30eda5a53b4a/faef042e313a"
+    },
+    {
+      "id": "snap-auth-2-equal",
+      "kind": "equal",
+      "a": "snap-auth-1",
+      "b": "snap-auth-2",
+      "criterion": "SW02",
+      "label": "repeat 1 == 2",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha faef042e313a/faef042e313a"
+    },
+    {
+      "id": "snap-auth-3-equal",
+      "kind": "equal",
+      "a": "snap-auth-1",
+      "b": "snap-auth-3",
+      "criterion": "SW02",
+      "label": "repeat 1 == 3",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha faef042e313a/faef042e313a"
+    },
+    {
+      "id": "snap-rej-hz0-equal",
+      "kind": "equal",
+      "a": "snap-base",
+      "b": "snap-rej-hz0",
+      "criterion": "SW03",
+      "label": "hz0 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a"
+    },
+    {
+      "id": "snap-rej-hz241-equal",
+      "kind": "equal",
+      "a": "snap-base",
+      "b": "snap-rej-hz241",
+      "criterion": "SW03",
+      "label": "hz241 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a"
+    },
+    {
+      "id": "snap-rej-ver2-equal",
+      "kind": "equal",
+      "a": "snap-base",
+      "b": "snap-rej-ver2",
+      "criterion": "SW03",
+      "label": "ver2 equals live",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a"
+    },
+    {
+      "id": "fe-reverse-a",
+      "kind": "reverse",
+      "a": "fe-reverse-base",
+      "b": "fe-reverse-a",
+      "criterion": "SW05",
+      "label": "48-bit reversal and edge isolation",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['fe-reverse-base', 'fe-reverse-a']"
+    },
+    {
+      "id": "fe-reverse-b",
+      "kind": "reverse",
+      "a": "fe-reverse-base",
+      "b": "fe-reverse-b",
+      "criterion": "SW05",
+      "label": "48-bit reversal and edge isolation",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['fe-reverse-base', 'fe-reverse-b']"
+    },
+    {
+      "id": "fe-reverse-boot-recovery_state",
+      "kind": "recovery_state",
+      "a": "fe-reverse-save",
+      "b": "fe-reverse-recover",
+      "criterion": "SW06",
+      "label": "Reversed edges survive boot and emit current frames",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['fe-reverse-save', 'fe-reverse-recover', 'fe-reverse-save']"
+    },
+    {
+      "id": "fe-reverse-boot-equal",
+      "kind": "equal",
+      "a": "fe-reverse-ref",
+      "b": "fe-reverse-recover",
+      "criterion": "SW06",
+      "label": "Reversed edges survive boot and emit current frames",
+      "status": "NOT_RUN",
+      "detail": "case(s) not in this suite: ['fe-reverse-ref', 'fe-reverse-recover']"
+    }
+  ],
+  "planted": [
+    {
+      "name": "r2-malformed-counterexample",
+      "rejected": true,
+      "expected_reason": "header px",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "process exit code 1",
+        "emulator did not report the exit-on terminal string",
+        "header px='999' != 160",
+        "header bpp='8' != 16"
+      ]
+    },
+    {
+      "name": "missing-sidecar",
+      "rejected": true,
+      "expected_reason": "without a sidecar",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "frames without a sidecar: [0]"
+      ]
+    },
+    {
+      "name": "duplicate-sidecar",
+      "rejected": true,
+      "expected_reason": "duplicate sidecar",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: duplicate sidecar 0"
+      ]
+    },
+    {
+      "name": "missing-channel",
+      "rejected": true,
+      "expected_reason": "two edges",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: frame line has 5 fields, expected 6 (two edges)"
+      ]
+    },
+    {
+      "name": "corrupted-payload",
+      "rejected": true,
+      "expected_reason": "native crc",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "native crc fb5a814c != header 5da43873"
+      ]
+    },
+    {
+      "name": "wrong-invocation",
+      "rejected": true,
+      "expected_reason": "armed run=",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "armed run='a8ccc6a2bbd3413d8556d35847060888' != '12b8ac62a5094e5eaf63bf558c760ff2'",
+        "end run='a8ccc6a2bbd3413d8556d35847060888' != '12b8ac62a5094e5eaf63bf558c760ff2'"
+      ]
+    },
+    {
+      "name": "failed-process",
+      "rejected": true,
+      "expected_reason": "process exit code 1",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "process exit code 1"
+      ]
+    },
+    {
+      "name": "missing-terminal",
+      "rejected": true,
+      "expected_reason": "RTRACE-END count",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "RTRACE-END count 0 != 1"
+      ]
+    },
+    {
+      "name": "duplicate-header-key",
+      "rejected": true,
+      "expected_reason": "duplicate key px",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: RTRACE-BEGIN: duplicate key px"
+      ]
+    },
+    {
+      "name": "historical-receipt-substituted",
+      "rejected": true,
+      "expected_reason": "armed run=",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "armed run='physical-rpl-004' != 'a8ccc6a2bbd3413d8556d35847060888'",
+        "end run='physical-rpl-004' != 'a8ccc6a2bbd3413d8556d35847060888'"
+      ]
+    }
+  ],
+  "criteria": [
+    {
+      "id": "SW01",
+      "status": "PASS",
+      "evidence": "20/20 runs accepted with firmware-observed run id, scenario CRC and counters; executed app region == built firmware.bin; image never patched"
+    },
+    {
+      "id": "SW02",
+      "status": "NOT_RUN",
+      "evidence": "repeat-smoke: NOT_RUN case(s) not in this suite: ['smoke-b'] | wfh-auth-1-differs: PASS deterministic payload+source metadata equal=False frames=1778/1778 sha dbf338b08a59/7dcb0d32a555 | wfh-auth-2-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha 7dcb0d32a555/7dcb0d32a555 | wfh-auth-3-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha 7dcb0d32a555/7dcb0d32a555 | snap-auth-1-differs: PASS deterministic payload+source metadata equal=False frames=1778/1778 sha 30eda5a53b4a/faef042e313a | snap-auth-2-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha faef042e313a/faef042e313a | snap-auth-3-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha faef042e313a/faef042e313a"
+    },
+    {
+      "id": "SW03",
+      "status": "NOT_RUN",
+      "evidence": "time-zero-tail: NOT_RUN case(s) not in this suite: ['time-zero-tail'] | stall: NOT_RUN case(s) not in this suite: ['stall-probe'] | repeat-time: NOT_RUN case(s) not in this suite: ['smoke-b'] | wfh-rej-hz0-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59 | wfh-rej-hz241-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59 | wfh-rej-ver2-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha dbf338b08a59/dbf338b08a59 | snap-rej-hz0-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a | snap-rej-hz241-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a | snap-rej-ver2-equal: PASS deterministic payload+source metadata equal=True frames=1778/1778 sha 30eda5a53b4a/30eda5a53b4a"
+    },
+    {
+      "id": "SW04",
+      "status": "PASS",
+      "evidence": "10/10 planted captures rejected for the stated reason through ec.accept; "
+    },
+    {
+      "id": "SW05",
+      "status": "NOT_RUN",
+      "evidence": "iso-a: NOT_RUN case(s) not in this suite: ['ctl-a'] | iso-b: NOT_RUN case(s) not in this suite: ['ctl-b'] | limit-coupling: NOT_RUN case(s) not in this suite: ['limit-base', 'limit-a'] | fe-reverse-a: NOT_RUN case(s) not in this suite: ['fe-reverse-base', 'fe-reverse-a'] | fe-reverse-b: NOT_RUN case(s) not in this suite: ['fe-reverse-base', 'fe-reverse-b']"
+    },
+    {
+      "id": "SW06",
+      "status": "NOT_RUN",
+      "evidence": "reject-unchanged: NOT_RUN case(s) not in this suite: ['reject'] | recovery-state: NOT_RUN case(s) not in this suite: ['comp-save', 'comp-recover', 'comp-save'] | recovery-output: NOT_RUN case(s) not in this suite: ['comp-ref', 'comp-recover'] | fallback-missing-show: NOT_RUN case(s) not in this suite: ['cfg-save', 'cfg-recover', 'cfg-save'] | fe-reverse-boot-recovery_state: NOT_RUN case(s) not in this suite: ['fe-reverse-save', 'fe-reverse-recover', 'fe-reverse-save'] | fe-reverse-boot-equal: NOT_RUN case(s) not in this suite: ['fe-reverse-ref', 'fe-reverse-recover']"
+    },
+    {
+      "id": "SW07",
+      "status": "FAIL",
+      "evidence": "pio run -e k1_fe exit=0; forbidden flags=[]; fixture symbols=0; emu-only flags=['K1_AP_SUBSONIC_HPF_V1', 'K1_EMU_FE_MIC_ONLY', 'K1_EMU_FIXTURE', 'K1_EMU_ONSET_TRACE', 'K1_EMU_SKIP_EMIT', 'K1_EMU_SPECTRUM_TRACE', 'K1_EMU_UART0', 'K1_FX_BATTERY', 'K1_RENDER_TRACE_V1', 'K1_TEMPO_CONSUMER_BANDS_V1']; positive control symbols=18; upload blocked=True; host tests FAIL (/opt/homebrew/opt/python@3.13/bin/python3.13: No module named pytest; 8 git-history test file(s) excluded in this export (run in the checkout))"
+    },
+    {
+      "id": "SW08",
+      "status": "NOT_RUN",
+      "evidence": "repeat-music: NOT_RUN case(s) not in this suite: ['music-a', 'music-b'] | startup-quiet-return: NOT_RUN case(s) not in this suite: ['startup-sqr'] | music-tempo-lane: NOT_RUN case(s) not in this suite: ['music-a']"
+    },
+    {
+      "id": "SW09",
+      "status": "NOT_RUN",
+      "evidence": "music-semantic-continuity: NOT_RUN case(s) not in this suite: ['music-a'] | startup-semantic-continuity: NOT_RUN case(s) not in this suite: ['startup-sqr']"
+    },
+    {
+      "id": "SW10",
+      "status": "NOT_RUN",
+      "evidence": "report.html from this invocation; smoke-a/smoke-b not in this suite"
+    },
+    {
+      "id": "SW11",
+      "status": "FAIL",
+      "evidence": "invocation ran from a clean export of the committed candidate (no .git, no prior outputs, no emulator-workspace sources); tool via K1_ESP_EMU, hash-checked"
+    },
+    {
+      "id": "SW12",
+      "status": "NOT_APPLICABLE",
+      "evidence": "no learned-model runtime in the product ELF (no tflite/tensorflow/interpreter/esp_nn/MicroInterpreter symbols); model inference is not active on k1_main_rpl_im69d"
+    },
+    {
+      "id": "SW13",
+      "status": "FAIL",
+      "evidence": "local client chain (existing client -> run-owned pty -> esp-emu USB-Serial/JTAG -> production parser), not physical USB; client cases [] client-a-matches-scheduled: NOT_RUN case(s) not in this suite: ['ctl-a', 'client-a'] | client-iso-a: NOT_RUN case(s) not in this suite: ['client-a'] | client-b-matches-scheduled: NOT_RUN case(s) not in this suite: ['ctl-b', 'client-b'] | client-iso-b: NOT_RUN case(s) not in this suite: ['client-b'] | client-reject-unchanged: NOT_RUN case(s) not in this suite: ['client-reject'] | client-recovery-state: NOT_RUN case(s) not in this suite: ['client-comp-save', 'client-comp-recover', 'client-comp-save'] | client-recovery-output: NOT_RUN case(s) not in this suite: ['comp-ref', 'client-comp-recover']"
+    },
+    {
+      "id": "EX01",
+      "status": "DEFERRED_EXTERNAL",
+      "evidence": "physical parity, device/optical/AV/leave-state evidence: shelved by the Captain's R3 instruction; no hardware accessed"
+    },
+    {
+      "id": "EX02",
+      "status": "DEFERRED_EXTERNAL",
+      "evidence": "hosted CI/publication: no push authorised; no Linux-pinned esp-emu executable hash exists, so CI only builds k1_main_rpl_im69d and k1_main_rpl_emu"
+    }
+  ],
+  "historical_references": [
+    {
+      "id": "R2-continuation-r1-007-R0-a",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/continuation-r1-007/R0-a/uart.txt",
+      "profile": "B489 preparation on emulator, forced brightness/mode/current (R2)",
+      "role": "historical reference only",
+      "status": "decoded",
+      "pairs": 135,
+      "crc32": "0b550234",
+      "header_crc32": "0b550234",
+      "paired_native_sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f",
+      "matches_recorded": true
+    },
+    {
+      "id": "R2-physical-rpl-004",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/physical-rpl-004/uart.txt",
+      "profile": "B489 preparation on Main RPL hardware (R2)",
+      "role": "historical reference only",
+      "status": "decoded",
+      "pairs": 135,
+      "crc32": "0b550234",
+      "header_crc32": "0b550234",
+      "paired_native_sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f",
+      "matches_recorded": true
+    }
+  ],
+  "deferred": [],
+  "report_checks": {
+    "status": "NOT_RUN",
+    "detail": "smoke-a/smoke-b not in this suite"
+  }
+}

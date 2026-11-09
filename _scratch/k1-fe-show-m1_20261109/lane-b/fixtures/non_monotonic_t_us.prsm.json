@@ -1,0 +1,94 @@
+{
+  "schema": "k1-prim8-stream/0",
+  "asset": {
+    "sha256": "5d7da43cf0d0610a14c30f97f5a4a8bdaac1d03f52fa1779dc15b8c8e6385878",
+    "sample_rate": 48000,
+    "sample_count": 28800000,
+    "channels": 2,
+    "path_hint": "FIXTURE ONLY - no audio file"
+  },
+  "timebase": {
+    "origin": "asset sample 0 == ShowBundle t_us 0 == Trinity contract t=0.0 s",
+    "tick_time_us": "(i*1000000 + hz//2) // hz  (PRISM.studio src/vm.js:140-145)",
+    "sample_to_us": "(2*n*1000000 + R) // (2*R)  (round half up)",
+    "us_to_sample": "(2*t_us*R + 1000000) // 2000000  (round half up)",
+    "device_note": "device ignores t_us for scheduling; uses arrival time (k1_authored_source.cpp:48-50)"
+  },
+  "passage_start_sample": 1440017,
+  "hz": 120,
+  "frame_len": 34,
+  "frame_count": 24,
+  "trailing_bytes": 0,
+  "epoch_id": "e0",
+  "epochs": [
+    {
+      "epoch_id": "e0",
+      "first_frame": 0,
+      "kind": "start"
+    }
+  ],
+  "stream_sha256": "a7ab739668bdc1b6f8ea36aa9649d808a416e6b6c99fd00db042692cbbae5b9c",
+  "prim8": [
+    {
+      "index": 0,
+      "name": "pressure",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "vu_level, peak_scaled, spectral_energy (also silence term)"
+    },
+    {
+      "index": 1,
+      "name": "impact",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "novelty (also silence term)"
+    },
+    {
+      "index": 2,
+      "name": "mass",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "low_energy (also silence term)"
+    },
+    {
+      "index": 3,
+      "name": "momentum",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "mid_energy"
+    },
+    {
+      "index": 4,
+      "name": "heat",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 5,
+      "name": "space",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    },
+    {
+      "index": 6,
+      "name": "texture",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": true,
+      "device_consumer": "high_energy"
+    },
+    {
+      "index": 7,
+      "name": "gravity",
+      "unit": "u16 linear; 0 = none, 65535 = full scale (device maps v/65535 to float 0..1)",
+      "consumed_on_device": false,
+      "device_consumer": "UNCONSUMED on FE firmware 407fdf6f"
+    }
+  ],
+  "edge_addressing": "none: one stream drives both edges (no per-edge field in PRSM v1)",
+  "source": {
+    "generator": "lane-b/make_fixtures.py"
+  },
+  "notes": "frame 10 t_us steps back two ticks; seq continuous"
+}

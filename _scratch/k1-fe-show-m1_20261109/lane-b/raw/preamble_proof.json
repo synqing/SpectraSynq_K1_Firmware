@@ -1,0 +1,2746 @@
+{
+ "stream": "fixtures/constant.prsm (24 frames)",
+ "preamble_hex": "0a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+ "without_preamble": {
+  "frame/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill2": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill4": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "4 stream byte(s) not consumed by the PRSM scanner, first at 30",
+    "1 FRAME_BAD in stream, first ending at 29",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "frame/fill5": {
+   "eligible": false,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "5 stream byte(s) not consumed by the PRSM scanner, first at 29"
+   ]
+  },
+  "frame/fill6": {
+   "eligible": false,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "6 stream byte(s) not consumed by the PRSM scanner, first at 28"
+   ]
+  },
+  "frame/fill7": {
+   "eligible": false,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "7 stream byte(s) not consumed by the PRSM scanner, first at 27"
+   ]
+  },
+  "frame/fill8": {
+   "eligible": false,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "8 stream byte(s) not consumed by the PRSM scanner, first at 26"
+   ]
+  },
+  "frame/fill9": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 26,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "26 byte(s) reach immediate hotkeys, first at 154 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "73 stream byte(s) not consumed by the PRSM scanner, first at 153",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill10": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 26,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "26 byte(s) reach immediate hotkeys, first at 154 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "74 stream byte(s) not consumed by the PRSM scanner, first at 24",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill11": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 27,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "27 byte(s) reach immediate hotkeys, first at 23 ('N')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "75 stream byte(s) not consumed by the PRSM scanner, first at 23",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill12": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "76 stream byte(s) not consumed by the PRSM scanner, first at 22",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill13": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "77 stream byte(s) not consumed by the PRSM scanner, first at 21",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill14": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "78 stream byte(s) not consumed by the PRSM scanner, first at 20",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill15": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 29,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "29 byte(s) reach immediate hotkeys, first at 19 ('u')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "79 stream byte(s) not consumed by the PRSM scanner, first at 19",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill16": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "80 stream byte(s) not consumed by the PRSM scanner, first at 18",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill17": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "81 stream byte(s) not consumed by the PRSM scanner, first at 17",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill18": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "82 stream byte(s) not consumed by the PRSM scanner, first at 16",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill19": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "83 stream byte(s) not consumed by the PRSM scanner, first at 15",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill20": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "84 stream byte(s) not consumed by the PRSM scanner, first at 14",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill21": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "85 stream byte(s) not consumed by the PRSM scanner, first at 13",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill22": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "86 stream byte(s) not consumed by the PRSM scanner, first at 12",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill23": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "87 stream byte(s) not consumed by the PRSM scanner, first at 11",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill24": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "88 stream byte(s) not consumed by the PRSM scanner, first at 10",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill25": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "89 stream byte(s) not consumed by the PRSM scanner, first at 9",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill26": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "90 stream byte(s) not consumed by the PRSM scanner, first at 8",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill27": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "91 stream byte(s) not consumed by the PRSM scanner, first at 7",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill28": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "92 stream byte(s) not consumed by the PRSM scanner, first at 6",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill29": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "93 stream byte(s) not consumed by the PRSM scanner, first at 5",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill30": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "94 stream byte(s) not consumed by the PRSM scanner, first at 4",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill31": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "95 stream byte(s) not consumed by the PRSM scanner, first at 3",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill32": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 31,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "31 byte(s) reach immediate hotkeys, first at 2 ('S')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "96 stream byte(s) not consumed by the PRSM scanner, first at 2",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "frame/fill33": {
+   "eligible": false,
+   "frames_accepted": 1,
+   "actionable_hotkeys": 32,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "32 byte(s) reach immediate hotkeys, first at 1 ('R')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "97 stream byte(s) not consumed by the PRSM scanner, first at 1",
+    "device accepts 1 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill2": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill4": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "4 stream byte(s) not consumed by the PRSM scanner, first at 30",
+    "1 FRAME_BAD in stream, first ending at 29",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "ff/fill5": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "5 stream byte(s) not consumed by the PRSM scanner, first at 29",
+    "1 FRAME_BAD in stream, first ending at 28",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "ff/fill6": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "6 stream byte(s) not consumed by the PRSM scanner, first at 28",
+    "1 FRAME_BAD in stream, first ending at 27",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "ff/fill7": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "7 stream byte(s) not consumed by the PRSM scanner, first at 27",
+    "1 FRAME_BAD in stream, first ending at 26",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "ff/fill8": {
+   "eligible": false,
+   "frames_accepted": 23,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": [
+    "8 stream byte(s) not consumed by the PRSM scanner, first at 26",
+    "1 FRAME_BAD in stream, first ending at 25",
+    "device accepts 23 of 24 stream frames"
+   ]
+  },
+  "ff/fill9": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 26,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "26 byte(s) reach immediate hotkeys, first at 154 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "73 stream byte(s) not consumed by the PRSM scanner, first at 153",
+    "1 FRAME_BAD in stream, first ending at 24",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill10": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 26,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "26 byte(s) reach immediate hotkeys, first at 154 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "74 stream byte(s) not consumed by the PRSM scanner, first at 24",
+    "1 FRAME_BAD in stream, first ending at 23",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill11": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 27,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "27 byte(s) reach immediate hotkeys, first at 23 ('N')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "75 stream byte(s) not consumed by the PRSM scanner, first at 23",
+    "1 FRAME_BAD in stream, first ending at 22",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill12": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "76 stream byte(s) not consumed by the PRSM scanner, first at 22",
+    "1 FRAME_BAD in stream, first ending at 21",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill13": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "77 stream byte(s) not consumed by the PRSM scanner, first at 21",
+    "1 FRAME_BAD in stream, first ending at 20",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill14": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 28,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "28 byte(s) reach immediate hotkeys, first at 22 (' ')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "78 stream byte(s) not consumed by the PRSM scanner, first at 20",
+    "1 FRAME_BAD in stream, first ending at 19",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill15": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 29,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "29 byte(s) reach immediate hotkeys, first at 19 ('u')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "79 stream byte(s) not consumed by the PRSM scanner, first at 19",
+    "1 FRAME_BAD in stream, first ending at 18",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill16": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "80 stream byte(s) not consumed by the PRSM scanner, first at 18",
+    "1 FRAME_BAD in stream, first ending at 17",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill17": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "81 stream byte(s) not consumed by the PRSM scanner, first at 17",
+    "1 FRAME_BAD in stream, first ending at 16",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill18": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "82 stream byte(s) not consumed by the PRSM scanner, first at 16",
+    "1 FRAME_BAD in stream, first ending at 15",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill19": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "83 stream byte(s) not consumed by the PRSM scanner, first at 15",
+    "1 FRAME_BAD in stream, first ending at 14",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill20": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "84 stream byte(s) not consumed by the PRSM scanner, first at 14",
+    "1 FRAME_BAD in stream, first ending at 13",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill21": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "85 stream byte(s) not consumed by the PRSM scanner, first at 13",
+    "1 FRAME_BAD in stream, first ending at 12",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill22": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "86 stream byte(s) not consumed by the PRSM scanner, first at 12",
+    "1 FRAME_BAD in stream, first ending at 11",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill23": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "87 stream byte(s) not consumed by the PRSM scanner, first at 11",
+    "1 FRAME_BAD in stream, first ending at 10",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill24": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "88 stream byte(s) not consumed by the PRSM scanner, first at 10",
+    "1 FRAME_BAD in stream, first ending at 9",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill25": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "89 stream byte(s) not consumed by the PRSM scanner, first at 9",
+    "1 FRAME_BAD in stream, first ending at 8",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill26": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "90 stream byte(s) not consumed by the PRSM scanner, first at 8",
+    "1 FRAME_BAD in stream, first ending at 7",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill27": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "91 stream byte(s) not consumed by the PRSM scanner, first at 7",
+    "1 FRAME_BAD in stream, first ending at 6",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill28": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "92 stream byte(s) not consumed by the PRSM scanner, first at 6",
+    "1 FRAME_BAD in stream, first ending at 5",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill29": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "93 stream byte(s) not consumed by the PRSM scanner, first at 5",
+    "1 FRAME_BAD in stream, first ending at 4",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill30": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "94 stream byte(s) not consumed by the PRSM scanner, first at 4",
+    "1 FRAME_BAD in stream, first ending at 3",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill31": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "95 stream byte(s) not consumed by the PRSM scanner, first at 3",
+    "1 FRAME_BAD in stream, first ending at 2",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill32": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 31,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "31 byte(s) reach immediate hotkeys, first at 2 ('S')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "96 stream byte(s) not consumed by the PRSM scanner, first at 2",
+    "1 FRAME_BAD in stream, first ending at 1",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "ff/fill33": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 32,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 711,
+   "pre_existing_line_executed": false,
+   "ours_executed": 6,
+   "stale_frames": [],
+   "reasons": [
+    "32 byte(s) reach immediate hotkeys, first at 1 ('R')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "711 byte(s) swallowed by command mode, first at 26",
+    "6 command line(s) executed, first ending at 152",
+    "97 stream byte(s) not consumed by the PRSM scanner, first at 1",
+    "1 FRAME_BAD in stream, first ending at 0",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  }
+ },
+ "with_preamble": {
+  "frame/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill2": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "frame/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     0,
+     10
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill7": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill8": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill9": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill10": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill11": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill12": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill13": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill14": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill15": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill16": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill17": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill19": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill21": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill22": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill23": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill24": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill25": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill26": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill27": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill28": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill29": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill30": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill31": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill32": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "frame/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "ff/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill2": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill7": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill8": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill9": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill10": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill11": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill12": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill13": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill14": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill15": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill16": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill17": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill19": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill21": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill22": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill23": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill24": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill25": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill26": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill27": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill28": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill29": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill30": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill31": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill32": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "ff/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  }
+ },
+ "command_mode_with_preamble": {
+  "pending0/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending0/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending0/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending0/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending0/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     0,
+     0
+    ]
+   ],
+   "reasons": []
+  },
+  "pending0/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending0/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending0/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending0/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": false,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending1/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending1/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending1/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending1/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending1/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     0,
+     0
+    ]
+   ],
+   "reasons": []
+  },
+  "pending1/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending1/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending1/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending1/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending20/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending20/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending20/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending20/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending20/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     0,
+     0
+    ]
+   ],
+   "reasons": []
+  },
+  "pending20/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending20/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending20/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending20/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending126/fill0": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending126/fill1": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending126/fill3": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending126/fill4": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [],
+   "reasons": []
+  },
+  "pending126/fill5": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     0,
+     0
+    ]
+   ],
+   "reasons": []
+  },
+  "pending126/fill6": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending126/fill18": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending126/fill20": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  },
+  "pending126/fill33": {
+   "eligible": true,
+   "frames_accepted": 24,
+   "actionable_hotkeys": 0,
+   "command_mode_entries": 0,
+   "command_mode_bytes_swallowed": 0,
+   "pre_existing_line_executed": true,
+   "ours_executed": 0,
+   "stale_frames": [
+    [
+     1,
+     120
+    ]
+   ],
+   "reasons": []
+  }
+ },
+ "command_mode_without_preamble": {
+  "pending0": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 722,
+   "pre_existing_line_executed": false,
+   "ours_executed": 7,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "722 byte(s) swallowed by command mode, first at 0",
+    "7 command line(s) executed, first ending at 10",
+    "87 stream byte(s) not consumed by the PRSM scanner, first at 11",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  },
+  "pending20": {
+   "eligible": false,
+   "frames_accepted": 0,
+   "actionable_hotkeys": 30,
+   "command_mode_entries": 7,
+   "command_mode_bytes_swallowed": 722,
+   "pre_existing_line_executed": false,
+   "ours_executed": 7,
+   "stale_frames": [],
+   "reasons": [
+    "30 byte(s) reach immediate hotkeys, first at 18 ('0')",
+    "7 ':' command-mode entr(y/ies), first at 25",
+    "722 byte(s) swallowed by command mode, first at 0",
+    "7 command line(s) executed, first ending at 10",
+    "87 stream byte(s) not consumed by the PRSM scanner, first at 11",
+    "device accepts 0 of 24 stream frames",
+    "end state fill=0 command_mode=1"
+   ]
+  }
+ },
+ "verdict": {
+  "with_preamble_all_68_states_eligible": true,
+  "with_preamble_max_hotkeys": 0,
+  "command_mode_all_states_eligible": true,
+  "command_mode_pre_existing_line_executed_when_pending": [
+   "pending1",
+   "pending126",
+   "pending20"
+  ],
+  "without_preamble_unsafe_states": [
+   "ff/fill10",
+   "ff/fill11",
+   "ff/fill12",
+   "ff/fill13",
+   "ff/fill14",
+   "ff/fill15",
+   "ff/fill16",
+   "ff/fill17",
+   "ff/fill18",
+   "ff/fill19",
+   "ff/fill20",
+   "ff/fill21",
+   "ff/fill22",
+   "ff/fill23",
+   "ff/fill24",
+   "ff/fill25",
+   "ff/fill26",
+   "ff/fill27",
+   "ff/fill28",
+   "ff/fill29",
+   "ff/fill30",
+   "ff/fill31",
+   "ff/fill32",
+   "ff/fill33",
+   "ff/fill4",
+   "ff/fill5",
+   "ff/fill6",
+   "ff/fill7",
+   "ff/fill8",
+   "ff/fill9",
+   "frame/fill10",
+   "frame/fill11",
+   "frame/fill12",
+   "frame/fill13",
+   "frame/fill14",
+   "frame/fill15",
+   "frame/fill16",
+   "frame/fill17",
+   "frame/fill18",
+   "frame/fill19",
+   "frame/fill20",
+   "frame/fill21",
+   "frame/fill22",
+   "frame/fill23",
+   "frame/fill24",
+   "frame/fill25",
+   "frame/fill26",
+   "frame/fill27",
+   "frame/fill28",
+   "frame/fill29",
+   "frame/fill30",
+   "frame/fill31",
+   "frame/fill32",
+   "frame/fill33",
+   "frame/fill4",
+   "frame/fill5",
+   "frame/fill6",
+   "frame/fill7",
+   "frame/fill8",
+   "frame/fill9"
+  ],
+  "stale_frame_accepted_states_with_preamble": [
+   "frame/fill10",
+   "frame/fill11",
+   "frame/fill12",
+   "frame/fill13",
+   "frame/fill14",
+   "frame/fill15",
+   "frame/fill16",
+   "frame/fill17",
+   "frame/fill18",
+   "frame/fill19",
+   "frame/fill20",
+   "frame/fill21",
+   "frame/fill22",
+   "frame/fill23",
+   "frame/fill24",
+   "frame/fill25",
+   "frame/fill26",
+   "frame/fill27",
+   "frame/fill28",
+   "frame/fill29",
+   "frame/fill30",
+   "frame/fill31",
+   "frame/fill32",
+   "frame/fill33",
+   "frame/fill6",
+   "frame/fill7",
+   "frame/fill8",
+   "frame/fill9"
+  ]
+ }
+}

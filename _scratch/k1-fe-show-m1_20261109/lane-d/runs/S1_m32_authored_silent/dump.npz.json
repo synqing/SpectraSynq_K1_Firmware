@@ -1,0 +1,38 @@
+{
+ "raw": "runs/S1_m32_authored_silent/dump.txt",
+ "npz": "runs/S1_m32_authored_silent/dump.npz",
+ "begin": {
+  "frames": "2842",
+  "every": "6",
+  "px": "160",
+  "fmt": "rgb8hex",
+  "bpp": "8",
+  "crc32": "dd165807"
+ },
+ "frames_declared": 2842,
+ "frames_decoded": 2828,
+ "lines_rejected": 3,
+ "missing_indices": 14,
+ "missing_first": [
+  1685,
+  1902,
+  1903,
+  1904,
+  1905,
+  1906,
+  1907,
+  1911,
+  2000,
+  2001
+ ],
+ "end_marker": true,
+ "crc_declared": "dd165807",
+ "crc_calculated": "e66a2297",
+ "crc_ok": false,
+ "ms_first": 245424820,
+ "ms_last": 245513333,
+ "modes": [
+  32
+ ],
+ "mean_luma": 28.676353454589844
+}

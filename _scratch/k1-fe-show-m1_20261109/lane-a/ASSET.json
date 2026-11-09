@@ -1,0 +1,36 @@
+{
+  "schema": "k1-fe-show-m1/asset/1",
+  "written": "2026-11-09 (AWST), Lane A task A5",
+  "path": "/Users/spectrasynq/Downloads/Loreen-My-Heart-Is-Refusing-Me.mp3",
+  "sha256": "a62e1f095de9c3e06563b40d0842acf64ca1bf6fece341a15190cb1c11ab9b0f",
+  "container": "MP3 (MPEG-1 Layer III), 364 kbit/s, embedded PNG cover art stream ignored",
+  "sample_rate": 44100,
+  "channels": 2,
+  "frames": 9874432,
+  "frames_note": "Sample frames decoded by ffmpeg (Homebrew) to s16le: 39,497,728 bytes / 4 = 9,874,432 frames. ffprobe stream duration 223.910023 s; 9874432/44100 = 223.910023 s (agree).",
+  "duration_s": 223.910023,
+  "passage_start_s": 75.0,
+  "passage_end_s": 155.0,
+  "passage_length_s": 80.0,
+  "transition_s": 137.0,
+  "transition_description": "Chorus to breakdown: mean level falls about 18 dB within 2 s (−8.4 dBFS at 134 s to −26.2 dBFS at 139 s) and the kick (energy below 150 Hz) drops out (low-band share 0.72 to 0.01). Strongest boundary in the 56–155 s range.",
+  "secondary_boundaries_s": [107.5, 121.0, 149.0],
+  "secondary_boundaries_note": "107.5 s short dip (−9.7), 121.0 s return (+10.6), 149.0 s build-back after the breakdown (+7.8). Present inside the window; the 137.0 s breakdown is the one designated transition.",
+  "emulator_coordinates": {
+    "asset_id": "loreen_src (tools/esp_emulator/s3_music_regression.json)",
+    "excerpt_start_ms_in_original": 56000,
+    "passage_in_excerpt_s": [19.0, 99.0],
+    "transition_in_excerpt_s": 81.0,
+    "note": "The whole passage lies inside the emulator's existing loreen_src excerpt (original 56.0–155.0 s), so Lane C-emu can reuse that conversion (ffmpeg, mono mean, 12800 Hz, peak 4096) without a new asset."
+  },
+  "approval_label": "APPROVED (source: tools/esp_emulator/s3_music_regression.json assets.loreen_src qualification real_music; scripts/regression-harness/fixtures/k1_av_regression_fixtures.template.json fixture loreen_127 status active, required, known_real_music, 127 BPM)",
+  "approval_source": "Repository-recorded approval of this exact file (sha256 matches loreen_src.source_sha256) as the emulator's maintained real-music fixture and a required AV regression fixture. No separate Captain statement approving it for M1 was found; this is a regression-fixture approval, not a show-content sign-off.",
+  "genre_note": "Dance-pop / EDM at 127 BPM (inventory expected_bpm). Not trance. The repo's trance/EDM reference used on B489 (BOOM, Tiësto & Sevenn, ~/Downloads/Tiësto-&-Sevenn-MrBlack-BOOM.mp3 sha256 3d60c58e…) has no emulator conversion or approval record for this purpose; its 0–75 s PCM excerpt was used for the 14 Oct B489 room run (CHECKPOINT.md:287). Kept as an alternative, not chosen.",
+  "rejected_candidates": [
+    {"path": "/Users/spectrasynq/Downloads/Tiësto-&-Sevenn-MrBlack-BOOM.mp3", "sha256": "3d60c58eccef198bb8062bef68df4d882c1b49c8f246623c4ba88d337cad8e4d", "reason": "Used before as a room-audio fixture but not in the emulator's maintained scenario; would need a new emulator conversion. UNAPPROVED for M1 — comparison only."},
+    {"path": "/Users/spectrasynq/Workspace_Management/Software/YT_Saver/Download/Dopex.mp3", "sha256": "not computed", "reason": "Titan-lane fixture (Kx-Titan _scratch passages/dopex_60_80.wav); no FE-repo approval record. Not chosen."},
+    {"path": "song-0", "reason": "Banned fixture; never used."}
+  ],
+  "method": "ffprobe for container facts; ffmpeg -f s16le -acodec pcm_s16le decode; lane-a/raw/asset_envelope.py: mono = mean(L,R), 0.5 s windows, RMS dBFS and share of power below 150 Hz (Hann-windowed FFT); boundary score = (mean dB of next 4 s − mean dB of previous 4 s) + 10 × (same difference of low-band share); strongest boundaries in 56–155 s listed in lane-a/raw/asset_envelope_loreen.txt. Window chosen to sit inside the emulator excerpt and to contain the strongest boundary with ≥ 38 s of lead-in and 18 s of tail.",
+  "song_0_used": false
+}

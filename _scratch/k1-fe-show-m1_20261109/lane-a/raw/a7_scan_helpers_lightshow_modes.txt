@@ -1,0 +1,47 @@
+=== visual/lightshow_modes.h
+57:BUS: SQ15x16 note_brightness = k1_vp_spectrogram[bin];
+60:LIVE: if (spectrogram_smooth[bin] < note_brightness) {
+61:LIVE: SQ15x16 distance = note_brightness - spectrogram_smooth[bin];
+62:LIVE: spectrogram_smooth[bin] += distance * SQ15x16(SPECTROGRAM_SMOOTH_ATTACK);
+64:LIVE: } else if (spectrogram_smooth[bin] > note_brightness) {
+65:LIVE: SQ15x16 distance = spectrogram_smooth[bin] - note_brightness;
+66:LIVE: spectrogram_smooth[bin] -= distance * SQ15x16(SPECTROGRAM_SMOOTH_RELEASE);
+76:LIVE: float bright = note_chromagram[i];
+268:LIVE: return palette_index + uint8_t(float(hue_position) * 255.0f);
+294:LIVE: h += float(hue_position);
+374:LIVE: float raw_bin = float(chromagram_pregate[c]);
+376:LIVE: float raw_bin = float(chromagram_smooth[c]);
+522:LIVE: if (hd_s2.count > 0 && !silence && energy > 0.35f) {
+589:LIVE: SQ15x16 bin  = chromagram_smooth[i];
+606:LIVE: SQ15x16 led_hue = chroma_val + hue_position + SQ15x16(0.05);
+626:LIVE: float b = float(chromagram_pregate[c]);
+628:LIVE: float b = float(chromagram_smooth[c]);
+941:LIVE: spectrogram_smooth[i] = SQ15x16(0.08f + (phase * 0.62f));
+945:LIVE: chromagram_smooth[i] = SQ15x16(0.10f + (phase * 0.70f));
+947:LIVE: max_waveform_val_raw = float(CONFIG.SWEET_SPOT_MIN_LEVEL) * 2.0f;
+948:LIVE: waveform_peak_scaled = 0.45f;
+949:LIVE: audio_vu_level_average = SQ15x16(0.35f);
+951:LIVE: if (waveform_history != nullptr) {
+955:LIVE: waveform_history[frame][i] = (frame & 1) ? -centred : centred;
+987:LIVE: hue_position = hue_offset;
+988:LIVE: hue_shifting_mix = SQ15x16(0.35f);
+1172:LIVE: SQ15x16 saved_hue_position = hue_position;
+1173:LIVE: SQ15x16 saved_hue_shifting_mix = hue_shifting_mix;
+1176:LIVE: float saved_waveform_peak_scaled = waveform_peak_scaled;
+1177:LIVE: float saved_max_waveform_val_raw = max_waveform_val_raw;
+1178:LIVE: SQ15x16 saved_audio_vu = audio_vu_level_average;
+1245:LIVE: hue_position = saved_hue_position;
+1246:LIVE: hue_shifting_mix = saved_hue_shifting_mix;
+1249:LIVE: waveform_peak_scaled = saved_waveform_peak_scaled;
+1250:LIVE: max_waveform_val_raw = saved_max_waveform_val_raw;
+1251:LIVE: audio_vu_level_average = saved_audio_vu;
+1325:LIVE: SQ15x16 saved_hue_position = hue_position;
+1326:LIVE: SQ15x16 saved_hue_shifting_mix = hue_shifting_mix;
+1329:LIVE: float saved_waveform_peak_scaled = waveform_peak_scaled;
+1330:LIVE: float saved_max_waveform_val_raw = max_waveform_val_raw;
+1331:LIVE: SQ15x16 saved_audio_vu = audio_vu_level_average;
+1425:LIVE: hue_position = saved_hue_position;
+1426:LIVE: hue_shifting_mix = saved_hue_shifting_mix;
+1429:LIVE: waveform_peak_scaled = saved_waveform_peak_scaled;
+1430:LIVE: max_waveform_val_raw = saved_max_waveform_val_raw;
+1431:LIVE: audio_vu_level_average = saved_audio_vu;

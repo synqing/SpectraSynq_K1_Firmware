@@ -1,0 +1,168 @@
+=== effects/light_mode_fx_accumulate_cascade.cpp
+37:LIVE: const bool raw_active = finite(max_waveform_val_raw) && max_waveform_val_raw > raw_floor;
+38:SNAP: const float target = audio.silence || !raw_active ? 0.0f : unit(audio.vu_level * 0.75f + audio.peak_scaled * 0.25f);
+39:SNAP: const bool quiet = audio.silence || !raw_active || target == 0.0f;
+40:LIVE: K1_TRACE_COUNTER("fx39_raw_peak", max_waveform_val_raw);
+50:SNAP: const float inputs[3]{unit(audio.low_energy), unit(audio.mid_energy), unit(audio.high_energy)};
+137:SNAP: cascade_update(s, k1_vp_audio_snapshot_read(), dt);
+=== effects/light_mode_fx_bounce.cpp
+33:SNAP: const float rms = k1motion::unit(audio.vu_level);
+34:SNAP: const float bands = k1motion::unit(0.50f * k1motion::unit(audio.low_energy) +
+35:SNAP: 0.32f * k1motion::unit(audio.mid_energy) + 0.18f * k1motion::unit(audio.high_energy));
+36:SNAP: const float target = audio.silence ? 0.0f : k1motion::unit(0.68f * rms + 0.32f * bands);
+39:SNAP: s.quiet = audio.silence ? s.quiet + dt : 0.0f;
+40:SNAP: const k1motion::Drive drive{s.drive, 0.0f, 0.80f + 0.80f * s.drive, 0.0f, audio.silence};
+43:SNAP: if (!audio.silence) {
+74:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+84:SNAP: const float fade = audio.silence ? k1motion::unit(1.0f - 11.0f * dt) :
+88:SNAP: if (!audio.silence) {
+=== effects/light_mode_fx_chain.cpp
+42:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+43:BUS: const K1OnsetBeatEvent onset = k1_vp_onset_beat_read();
+44:BUS: const K1TempoEvent tempo = k1_vp_tempo_read();
+45:SNAP: const float low = chain_unit(audio.low_energy);
+46:SNAP: const float mid = chain_unit(audio.mid_energy);
+47:SNAP: const float high = chain_unit(audio.high_energy);
+48:SNAP: const float target = audio.silence ? 0.0f : chain_unit(
+49:SNAP: 0.55f * chain_unit(audio.vu_level) + 0.25f * low + 0.15f * mid + 0.05f * high);
+57:SNAP: s.low = chain_unit(s.low + ((audio.silence ? 0.0f : low) - s.low) * coefficient);
+58:SNAP: s.mid = chain_unit(s.mid + ((audio.silence ? 0.0f : mid) - s.mid) * coefficient);
+59:SNAP: s.high = chain_unit(s.high + ((audio.silence ? 0.0f : high) - s.high) * coefficient);
+65:SNAP: if (!audio.silence) s.phase = k1motion::wrap(s.phase + dt * rate);
+84:SNAP: if (!audio.silence) {
+95:SNAP: const k1motion::Drive drive{s.level, step == 0 ? kick : 0.0f, rate, s.phase, audio.silence};
+=== effects/light_mode_fx_dilate_recoil.cpp
+60:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+61:BUS: const K1OnsetBeatEvent event = k1_vp_onset_beat_read();
+62:SNAP: const float rms = k1motion::unit(audio.vu_level);
+63:SNAP: const float snapshot_peak = k1motion::unit(k1motion::absf(audio.peak_scaled));
+64:LIVE: const float live_peak = k1motion::unit(k1motion::absf(float(waveform_peak_scaled)));
+67:SNAP: const bool quiet = audio.silence || (peak <= 0.02f && rms <= 0.02f);
+68:SNAP: const float chroma = k1motion::unit(audio.chroma_strength);
+71:SNAP: const float confidence = k1motion::unit(audio.chord.confidence);
+74:SNAP: k1motion::unit(audio.chord.rootStrength) * 0.20f);
+85:SNAP: if (!audio.silence && event.transient && event.transient_event_id != state.last_event) {
+90:SNAP: if (!audio.silence && event.onset && event.event_id != state.last_event) {
+=== effects/light_mode_fx_front_ca.cpp
+56:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+59:SNAP: const float vu = k1motion::unit(audio.vu_level);
+60:SNAP: const float peak = k1motion::unit(audio.peak_scaled);
+61:SNAP: const float low = k1motion::unit(audio.low_energy);
+62:SNAP: const float mid = k1motion::unit(audio.mid_energy);
+63:SNAP: const float high = k1motion::unit(audio.high_energy);
+64:SNAP: const float flux = k1motion::unit(audio.novelty);
+65:SNAP: const float spectral = k1motion::unit(audio.spectral_energy);
+68:LIVE,SNAP: const bool silence = audio.silence || !k1motion::finite(max_waveform_val_raw) || max_waveform_val_raw <= floor || (vu < 0.003f && peak < 0.003f && sum < 0.003f);
+72:LIVE: const float target = silence ? 0.0f : k1motion::unit(0.36f * vu + 0.24f * spectral + 0.40f * flux);
+74:LIVE: s.quiet = silence ? s.quiet + dt : 0.0f;
+75:LIVE: const k1motion::Drive drive{silence ? 0.0f : 0.40f + 0.60f * s.followed, 0.0f,
+76:LIVE: 1.05f + 0.35f * s.followed + 0.20f * s.centroid, s.chrono.phase, silence};
+77:LIVE: if (!silence && !s.cells.seeded) {
+=== effects/light_mode_fx_front_refractory.cpp
+41:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+42:BUS: const K1OnsetBeatEvent onset = k1_vp_onset_beat_read();
+43:SNAP: const float vu = k1motion::unit(audio.vu_level);
+44:SNAP: const float peak = k1motion::unit(audio.peak_scaled);
+45:SNAP: const float novelty = k1motion::unit(audio.novelty);
+46:LIVE,SNAP: const bool silence = audio.silence || (vu < 0.003f && peak < 0.003f);
+62:LIVE: const float target = silence ? 0.0f : k1motion::unit(vu * 0.55f + peak * 0.30f + novelty * 0.15f);
+64:LIVE: s.quiet = silence ? s.quiet + dt : 0.0f;
+66:LIVE: if (fresh && !silence) s.density = k1motion::unit(s.density + 0.28f + hit * 0.35f);
+67:LIVE: k1motion::Drive drive{s.followed, fresh && !silence ? 1.0f : 0.0f,
+68:LIVE: 0.35f + s.followed, s.chrono.phase, silence};
+73:LIVE: if (!silence) {
+82:LIVE: if (!s.seeded && !silence) {
+=== effects/light_mode_fx_infall.cpp
+57:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+58:BUS: const K1OnsetBeatEvent event = k1_vp_onset_beat_read();
+59:SNAP: const float rms = k1motion::unit(audio.vu_level);
+60:SNAP: const float snapshot_peak = k1motion::unit(k1motion::absf(audio.peak_scaled));
+61:LIVE: const float live_peak = k1motion::unit(k1motion::absf(float(waveform_peak_scaled)));
+64:SNAP: const bool quiet = audio.silence || (peak <= 0.02f && rms <= 0.02f);
+67:SNAP: k1motion::unit(audio.low_energy) * 0.27f +
+68:SNAP: k1motion::unit(audio.mid_energy) * 0.17f);
+74:SNAP: if (!audio.silence && event.kick && event.kick_event_id != state.last_event) {
+79:SNAP: if (!audio.silence && event.bass_onset && event.event_id != state.last_event) {
+=== effects/light_mode_fx_lob_return.cpp
+37:LIVE: const bool raw_active = finite(max_waveform_val_raw) && max_waveform_val_raw > raw_floor;
+38:SNAP: const float target = audio.silence || !raw_active ? 0.0f : unit(audio.vu_level * 0.65f + audio.peak_scaled * 0.35f);
+39:SNAP: const bool quiet = audio.silence || !raw_active || target == 0.0f;
+40:LIVE: K1_TRACE_COUNTER("fx38_raw_peak", max_waveform_val_raw);
+140:BUS,SNAP: lob_update(s, k1_vp_audio_snapshot_read(), k1_vp_onset_beat_read(), dt);
+=== effects/light_mode_fx_orbit.cpp
+64:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+69:SNAP: const float vu = k1motion::unit(audio.vu_level);
+70:SNAP: const float peak = k1motion::unit(audio.peak_scaled);
+71:SNAP: const float live_bands[3]{k1motion::unit(audio.low_energy),
+72:SNAP: k1motion::unit(audio.mid_energy), k1motion::unit(audio.high_energy)};
+75:LIVE,SNAP: const bool silence = audio.silence || !k1motion::finite(max_waveform_val_raw) || max_waveform_val_raw <= floor || (vu < 0.003f && peak < 0.003f && band_sum < 0.003f);
+77:LIVE: const float target = silence ? 0.0f : k1motion::unit(0.64f * vu + band_sum * 0.12f);
+80:LIVE: s.quiet = silence ? s.quiet + dt : 0.0f;
+86:LIVE: s.bands[b] += ((silence ? 0.0f : live_bands[b]) - s.bands[b]) * band_mix;
+88:LIVE: const k1motion::Drive drive{s.followed, 0.0f, 0.80f + 2.40f * s.followed, 0.0f, silence};
+96:LIVE: if (!silence) {
+=== effects/light_mode_fx_pass_through.cpp
+56:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+57:BUS: const K1TempoEvent tempo = k1_vp_tempo_read();
+58:SNAP: s.silent = audio.silence;
+59:SNAP: const float low = k1motion::unit(audio.low_energy);
+60:SNAP: const float mid = k1motion::unit(audio.mid_energy);
+61:SNAP: const float high = k1motion::unit(audio.high_energy);
+64:SNAP: const float novelty = k1motion::unit(audio.novelty);
+70:SNAP: 0.29f * mid + 0.20f * high + 0.15f * k1motion::unit(audio.vu_level));
+=== effects/light_mode_fx_reverse.cpp
+48:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+49:BUS: const K1OnsetBeatEvent onset = k1_vp_onset_beat_read();
+50:SNAP: const float vu = k1motion::unit(audio.vu_level);
+51:SNAP: const float peak = k1motion::unit(audio.peak_scaled);
+52:SNAP: const float novelty = k1motion::unit(audio.novelty);
+53:LIVE,SNAP: const bool silence = audio.silence || (vu < 0.003f && peak < 0.003f);
+66:LIVE: const float target = silence ? 0.0f : k1motion::unit(vu * 0.50f + peak * 0.30f + novelty * 0.20f);
+68:LIVE: s.quiet = silence ? s.quiet + dt : 0.0f;
+69:LIVE: k1motion::Drive drive{s.followed, fresh && !silence ? 1.0f : 0.0f,
+70:LIVE: 0.30f + s.followed * 0.65f, s.chrono.phase, silence};
+72:LIVE: if (!silence && (fresh || !s.seeded)) {
+78:LIVE: if (!silence && living < 3) reverse_birth_trio(s);
+=== effects/light_mode_fx_scan.cpp
+45:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+46:BUS: const K1TempoEvent tempo = k1_vp_tempo_read();
+47:SNAP: const float low = scan_unit(audio.low_energy);
+48:SNAP: const float mid = scan_unit(audio.mid_energy);
+49:SNAP: const float high = scan_unit(audio.high_energy);
+50:SNAP: const float rms = scan_unit(audio.vu_level);
+51:SNAP: const float target = audio.silence ? 0.0f :
+60:SNAP: s.low = scan_unit(s.low + ((audio.silence ? 0.0f : low) - s.low) * coefficient);
+61:SNAP: s.mid = scan_unit(s.mid + ((audio.silence ? 0.0f : mid) - s.mid) * coefficient);
+62:SNAP: s.high = scan_unit(s.high + ((audio.silence ? 0.0f : high) - s.high) * coefficient);
+68:SNAP: const k1motion::Drive drive{s.level, 0.0f, rate, 0.0f, audio.silence};
+=== effects/light_mode_fx_split_merge.cpp
+33:SNAP: const float chroma = k1motion::unit(audio.chroma_strength);
+36:SNAP: harmonic = k1motion::unit(0.55f * chroma + 0.45f * k1motion::unit(audio.chord.confidence));
+40:SNAP: const float target = audio.silence ? 0.0f : k1motion::unit(
+41:SNAP: 0.62f * harmonic + 0.28f * k1motion::unit(audio.vu_level) +
+42:SNAP: 0.10f * k1motion::unit(audio.mid_energy));
+44:SNAP: s.quiet = audio.silence ? s.quiet + dt : 0.0f;
+45:SNAP: const k1motion::Drive drive{s.drive, 0.0f, 0.35f + 0.95f * s.drive, 0.0f, audio.silence};
+48:SNAP: if (!audio.silence) {
+89:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+100:SNAP: const float fade = audio.silence ? k1motion::unit(1.0f - 11.0f * dt) :
+110:SNAP: const float value = audio.silence ? 0.0f : coverage * gain;
+=== effects/light_mode_fx_stretch.cpp
+52:SNAP: const K1AudioSnapshot audio = k1_vp_audio_snapshot_read();
+53:BUS: const K1OnsetBeatEvent onset = k1_vp_onset_beat_read();
+54:BUS: const K1TempoEvent tempo = k1_vp_tempo_read();
+55:SNAP: s.silent = audio.silence;
+56:SNAP: const float low = k1motion::unit(audio.low_energy);
+57:SNAP: const float level = k1motion::unit(audio.vu_level);
+58:SNAP: const float novelty = k1motion::unit(audio.novelty);
+=== effects/light_mode_waveform_hybrid_k1.cpp
+115:SNAP: const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
+116:LIVE,SNAP: const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
+117:LIVE,SNAP: const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
+122:SNAP: (peak > WFHYB_PRESENCE_FLOOR || snap.vu_level > WFHYB_PRESENCE_FLOOR) ? 1.0f : 0.0f;
+126:LIVE: const float sil_target = silence ? 0.0f : 1.0f;
+142:LIVE: float bin = wfhyb_clamp01(float(chromagram_smooth[c]));
+167:SNAP: const float vu = wfhyb_clamp01(snap.vu_level);
+391:LIVE: "silence=%d pal=%d dot=%.3f/%.3f/%.3f fb=%.3f mirror=%d\n",
+393:LIVE: (float)waveform_peak_scaled, amp, pos_i,
+394:LIVE: col_gain, confidence, sil_scale, silence ? 1 : 0,

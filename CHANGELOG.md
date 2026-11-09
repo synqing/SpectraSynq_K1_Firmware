@@ -6,6 +6,17 @@ versions firmware via `FIRMWARE_VERSION` and tagged releases.
 
 ## [Unreleased]
 
+### Added — 2026-11-09 (lane/k1-fe-show-m1, no firmware source change)
+
+- K1-FE-SHOW-M1 Rev 2 evidence under `_scratch/k1-fe-show-m1_20261109/`: prepared
+  Prim8 (PRSM) stream proof on bench K1 B489A500 (resident `ed0aa984`). The stream
+  drives the renderer, repeats, rejected frames have no effect, seek and stop behave
+  and the live baseline was restored; fine audio-to-light timing (A06) is blocked
+  for want of a common-clock sensor, so M1 is partial. Includes the Prim8 stream
+  contract, validator and byte-safety audit, the emulator RX-adapter prototype,
+  the bench player and tools, and ranked firmware change requests
+  (`CHANGE-REQUESTS-FW-LEAD.md`).
+
 ### Fixed — 2026-11-05
 
 - Saturation-preserving colour scaling uses an exact 32-bit unit quotient in
