@@ -114,12 +114,12 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   // (Bench Unit 2 2026-08-09: silence cleared, peak~0.7, glass still looked dead).
   const K1AudioSnapshot snap = k1_vp_audio_snapshot_read();
   const float peak = wfhyb_clamp01(fmaxf(snap.peak_scaled, waveform_peak_scaled));
-  const bool silence = snap.silence;
+  const bool  silence = snap.silence && (peak < WFHYB_PRESENCE_FLOOR);
 
   // Signal-presence envelope (audioConfidence analogue): fast rise, ~500 ms
   // hold-decay so the effect does not cut during inter-beat gaps.
   const float presence_target =
-      (!silence && (peak > WFHYB_PRESENCE_FLOOR || snap.vu_level > WFHYB_PRESENCE_FLOOR)) ? 1.0f : 0.0f;
+      (peak > WFHYB_PRESENCE_FLOOR || snap.vu_level > WFHYB_PRESENCE_FLOOR) ? 1.0f : 0.0f;
   fx.wfhyb_hold_env = wfhyb_follow(fx.wfhyb_hold_env, presence_target, dt,
                                    WFHYB_TAU_PRESENCE_UP, WFHYB_TAU_PRESENCE_DN);
   // silentScale analogue: eases to 0 on true silence, darkening the plate.
@@ -168,7 +168,7 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   if (vu > seed_level) seed_level = vu;
   seed_level = wfhyb_clamp01(seed_level);
   const bool seed_active =
-      !silence && ((peak > WFHYB_PRESENCE_FLOOR) || (vu > WFHYB_PRESENCE_FLOOR));
+      (peak > WFHYB_PRESENCE_FLOOR) || (vu > WFHYB_PRESENCE_FLOOR);
   const float fallback_bright =
       seed_active ? wfhyb_clamp01(seed_level * VP_WAVEFORM_FALLBACK_BRIGHTNESS) : 0.0f;
 
@@ -273,11 +273,16 @@ void light_mode_waveform_hybrid_k1(CRGB16* leds_prev_buffer, ChannelEffectState&
   fx.wfhyb_dot_b += (float(raw_col.b) - fx.wfhyb_dot_b) * a_col;
 #endif
 
-  // The source silence decision owns quiet: stale normalised peak/chroma must
-  // never re-seed the wake. Music may seed on the first non-silent hop.
-  const float quiet_factor = silence ? 0.0f :
+  // Gate the smoothed dot by confidence * silentScale (source order), FLOORED
+  // while a real signal is present. `silence` latches true after 10 s of
+  // sweet_spot_state == -1 (i2s_audio.h:795–802) and is a purely multiplicative
+  // kill here — a second, independent path to a black plate that survives any
+  // colour fix. Modes 8/11 carry no such gate (they key on max_waveform_val_raw
+  // / peak / VU), which is why they stayed lit on the very same audio. A latched
+  // flag must never zero a live signal.
+  const float quiet_factor =
       fmaxf(fminf(confidence, sil_scale), seed_active ? seed_level : 0.0f);
-  float col_gain = silence ? 0.0f : confidence * sil_scale;
+  float col_gain = confidence * sil_scale;
   if (seed_active && col_gain < seed_level) col_gain = seed_level;
   CRGB16 dot_col;
   dot_col.r = SQ15x16(fx.wfhyb_dot_r * col_gain);

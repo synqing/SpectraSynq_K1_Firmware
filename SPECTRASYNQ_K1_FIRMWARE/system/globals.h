@@ -839,7 +839,7 @@ inline float    SILENCE_ENTER_SSL_FRAC = 0.35f;   // enter silence below this * 
 inline float    SILENCE_EXIT_SSL_FRAC  = 0.55f;   // leave silence above this * SSL (Schmitt gap: exit > enter)
 #ifdef K1_FE_BENCH_B489_V1
 // Bench silence-return trial: keep the classifier and calibration unchanged.
-#define K1_SILENCE_DWELL_DEFAULT_MS 1000
+#define K1_SILENCE_DWELL_DEFAULT_MS 5000  // bench 1000 ms trial reverted 2026-11-06: cut mode 32 in and out
 #else
 #define K1_SILENCE_DWELL_DEFAULT_MS 5000
 #endif
