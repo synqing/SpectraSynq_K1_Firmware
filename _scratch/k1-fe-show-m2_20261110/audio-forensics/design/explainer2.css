@@ -46,3 +46,16 @@ ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;f
 .refs{font-size:12.5px;color:var(--ink-2);columns:2;column-gap:32px;margin:0;padding-left:18px} .refs li{break-inside:avoid;margin-bottom:6px} .refs a{color:var(--new)}
 @media (max-width:980px){ .toc{grid-template-columns:repeat(2,minmax(0,1fr))} .kv{grid-template-columns:repeat(2,minmax(0,1fr))} .grid3,.cols2{grid-template-columns:minmax(0,1fr)} .refs{columns:1} }
 @media (max-width:520px){ .toc{grid-template-columns:minmax(0,1fr)} }
+/* Phone width: every wide block scrolls inside its own frame; nothing may widen the page. */
+.card,.fig,.stack,.kv,.cols2,.grid3,.keo,.toc{min-width:0;max-width:100%}
+.fig>*,.stack>*,.card>*,.keo>*{min-width:0;max-width:100%}
+.eq,pre.code,.scroller,.tw{max-width:100%}
+.keo figure{grid-template-columns:minmax(0,86px) minmax(0,1fr)}
+@media (max-width:520px){ .keo figure{grid-template-columns:minmax(0,1fr)} .card{padding:16px} }
+.simc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 20px;font-size:13px;color:var(--ink-2)}
+.simc label{display:flex;flex-direction:column;gap:4px;min-width:0} .simc input[type=range]{width:100%;accent-color:var(--new)} .simc output{font-family:var(--f-mono);font-size:12px;color:var(--ink)}
+.simc select,.simc button{font:inherit;color:var(--ink);background:var(--band);border:1px solid var(--rule);border-radius:8px;padding:7px 10px;min-width:0;max-width:100%}
+.simc button{align-self:end;cursor:pointer} .simc button:hover{border-color:var(--new)} .simc :focus-visible{outline:2px solid var(--new);outline-offset:2px}
+.simcv{display:block;width:100%;height:420px}
+.sec>h3{margin-top:6px}
+@media (max-width:980px){ .simc{grid-template-columns:repeat(2,minmax(0,1fr))} }

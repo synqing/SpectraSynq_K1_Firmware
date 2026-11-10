@@ -8,6 +8,10 @@ HERE = Path(__file__).resolve().parent
 ap = argparse.ArgumentParser(); ap.add_argument("--export", type=Path, required=True); ap.add_argument("--out", type=Path, required=True); a = ap.parse_args()
 D = json.loads((HERE / "explainer_data.json").read_text())
 E = html.escape
+TRK = json.loads((HERE.parent / "emu" / "analysis-tracks" / "tracks.json").read_text())
+BAB = json.loads((HERE.parent.parent.parent / "k1-fe-show-m1_20261109" / "lane-d" / "runs" / "B_M1_bench_ab.json").read_text())
+SIMV = json.loads((HERE / "sim_validation.json").read_text())
+PYT = (HERE / "pytest_final.txt").read_text().strip() if (HERE / "pytest_final.txt").exists() else "not re-run"
 
 # ------------------------------------------------------------------ chart helpers
 def chart(series, w=600, h=220, logx=False, x0=None, x1=None, y0=0.0, y1=None, xt=None, yt=None, xlab="", bands=(), hlines=(), vlines=(), legend=(), ylab="", yfmt="{:g}"):
@@ -175,6 +179,25 @@ al = D["alphas"]; co = hp["coeffs"]
 i03 = min(range(len(tr["f"])), key=lambda i: abs(tr["f"][i] - 0.03)); beat = [v for f_, v in zip(tr["f"], tr["old"]) if 0.5 <= f_ <= 3.5]
 T_OLD, T_NEW, T_TOT = tr["old"][i03], tr["new"][i03], tr["tot"][i03]
 
+TNAMES = [("loreen", "Loreen - My Heart Is Refusing Me", "pop"), ("stay", "Naeleck - Stay", "dense EDM"), ("rideit", "Regard - Ride It", "steady groove"), ("secret", "Ania Kanwan - The Secret Game", "film song"), ("mammoth", "Dimitri Vegas and Like Mike - Mammoth", "big room")]
+tc = TRK["cases"]; pairs = [(k, m) for k, _, _ in TNAMES for m in (22, 32)]
+n_better = sum(1 for k, m in pairs if tc[f"{k}-m{m}-on"]["r"] > tc[f"{k}-m{m}-off"]["r"] and tc[f"{k}-m{m}-on"]["contrast"] > tc[f"{k}-m{m}-off"]["contrast"])
+kept = [100 * tc[f"{k}-m{m}-on"]["movement_kept"] for k, m in pairs]
+slope_on = [tc[f"{k}-m{m}-on"]["slope_db_per_db"] for k, m in pairs]; slope_off = [tc[f"{k}-m{m}-off"]["slope_db_per_db"] for k, m in pairs]
+def trow(k, name, kind, m):
+    o, n = tc[f"{k}-m{m}-off"], tc[f"{k}-m{m}-on"]; g = tc.get(f"{k}-m{m}-g2")
+    g2 = f"{g['slope_db_per_db']:+.2f} · {g['contrast']:.2f}" if g else ""
+    return f'<tr><th scope="row">{E(name)}</th><td>{kind}</td><td class="m">{m}</td><td class="m">{o["loud_minus_quiet_db"]:.1f}</td><td class="m">{o["r"]:+.2f} → {n["r"]:+.2f}</td><td class="m">{o["slope_db_per_db"]:+.2f} → {n["slope_db_per_db"]:+.2f}</td><td class="m">{o["contrast"]:.2f} → {n["contrast"]:.2f}</td><td class="m">{100 * n["movement_kept"]:.0f} %</td><td class="m">{g2}</td></tr>'
+five_rows = "".join(trow(k, n, kd, m) for k, n, kd in TNAMES for m in (22, 32))
+def trkchart(k, m=32):
+    a_, b_ = TRK["series"][f"{k}-m{m}-off"], TRK["series"][f"{k}-m{m}-on"]
+    return chart([(a_["t"], a_["light"], "old"), (b_["t"], b_["light"], "new")], w=400, h=210, x0=a_["t"][0], x1=a_["t"][-1], y0=0, xt=[(a_["t"][0] + i * 12, str(int(24 + i * 12))) for i in range(6)],
+                 vlines=((a_["t"][0] + 36, "return", 0),), xlab="seconds into the passage", legend=(("ln-old", "off"), ("ln-new", "on")), ylab="light %", yfmt="{:.1f}")
+five_charts = "".join(f'<figure class="card fig"><h3>{E(n.split(" - ")[-1])}</h3>{trkchart(k)}</figure>' for k, n, _ in TNAMES)
+bt = [i * 0.5 for i in range(len(BAB["off"]["rgb_series"]))]
+f_bab = chart([(bt, [v * 100 for v in BAB["off"]["rgb_series"]], "old"), (bt, [v * 100 for v in BAB["on"]["rgb_series"]], "new")], w=1180, h=240, x0=0, x1=86, y0=0, xt=[(v, str(v)) for v in range(0, 87, 10)],
+              bands=((20, 34, "loud"), (66, 78, "breakdown")), xlab="seconds into the capture", legend=(("ln-old", "stage off"), ("ln-new", "stage on")), ylab="mean light output, edge 1, % of full scale (1.5 s mean)", yfmt="{:.1f}")
+BR = lambda st_, e: BAB[st_][e]["ratio"]
 # ------------------------------------------------------------------ tables
 OLD = [  # name, operation, constants / time constants, telemetry, source, kind, effect
  ("PDM read", "96 × int16 per hop; a short read is zero-filled", "12.8 kHz · timeout 100 ms", "", "i2s_audio.h:669", "", "none"),
@@ -233,9 +256,11 @@ VER = [("The firmware module implements the specification", "Independent Python 
        ("The meter sees the samples the model assumes", "Published level in the emulator against model envelope × reference how_much", f"r 0.99999, mean error 0.0017 (level-path case)", "one track", "ok"),
        ("The model of the old level signal is right", "Model against the firmware's own trace", f"r {mv['pearson_r']:.4f}, mean error {mv['mean_abs_error']:.4f}", "15 s window", "ok"),
        ("Sections become visible in the light", "Emulator LED output, final chorus ÷ breakdown", f"{rr('22')[0]:.2f} → {rr('22')[1]:.2f}, {rr('32')[0]:.2f} → {rr('32')[1]:.2f}, {rr('18')[0]:.2f} → {rr('18')[1]:.2f}", "one track, one transition", "ok"),
-       ("It works on the real unit", "Main RPL, real microphone, LED capture (1,998 of 2,000 frames)", "loud ÷ breakdown 3.0 (edge 1), 2.5 (edge 2); how_much 0.25–1.00", "one passage at −10 dB; no same-session capture with the stage off", "ok"),
-       ("Nothing else regressed", "Repository test suite in an export", "2,074 passed, 4 failed on the first run; 3 were pinned checks this change must update (now passing); 1 needs another build's library files", "the full suite was not re-run after the three fixes", "part"),
-       ("Prepared shows are unaffected", "Three gate runs (G1–G4) on the commit", "in progress when this page was built", "", "no"),
+       ("Sections become visible on other music", "Emulator LED output, five tracks × modes 22 and 32, 60 s captures", f"tracking and contrast both up in {n_better} of {len(pairs)}; r from {min(tc[f'{k}-m{m}-off']['r'] for k, m in pairs):+.2f}…{max(tc[f'{k}-m{m}-off']['r'] for k, m in pairs):+.2f} to {min(tc[f'{k}-m{m}-on']['r'] for k, m in pairs):+.2f}…{max(tc[f'{k}-m{m}-on']['r'] for k, m in pairs):+.2f}; movement kept {min(kept):.0f}–{max(kept):.0f} %", "one transition per track; three of five tracks are electronic", "ok"),
+       ("It works on the real unit", "Main RPL, real microphone, two-edge LED capture, stage off then on in one session", f"loud ÷ breakdown {BR('off','rgb'):.2f} → {BR('on','rgb'):.2f} (edge 1), {BR('off','rgb_secondary'):.2f} → {BR('on','rgb_secondary'):.2f} (edge 2)", "one passage at −10 dB; the two runs are consecutive, not simultaneous", "ok"),
+       ("The meter is cheap enough", "On-device probe around the meter, 1 Hz telemetry, 176 lines", f"mean {BAB['on']['afe_us_mean']:.0f} µs, worst {max(BAB['on']['afe_us_max'], BAB['off']['afe_us_max']):.0f} µs per 7,500 µs hop", "measured with telemetry on", "ok"),
+       ("Nothing else regressed", "Repository test suite on a clean export of a6113aaf", PYT, "", "ok" if "0 failed" in PYT or (" passed" in PYT and "failed" not in PYT) else "part"),
+       ("Prepared shows are unaffected", "Three gate runs (G1–G4) on 7ea24446", "3 of 3 exit 0 (fe mode 32, scenario modes 32 and 18)", "run on stage 1; a6113aaf adds only a telemetry-time probe", "ok"),
        ("It looks right", "The Captain's eye on the plate", "not yet done", "", "no")]
 vk = {"ok": '<span class="k ok">shown</span>', "part": '<span class="k a">partly</span>', "no": '<span class="k no">open</span>'}
 ver_rows = "".join(f'<tr><th scope="row">{c}</th><td>{m}</td><td class="m">{r}</td><td>{l}</td><td>{vk[s]}</td></tr>' for c, m, r, l, s in VER)
@@ -249,7 +274,7 @@ CMP = [("Stages that adapt level by themselves", f"{n_adapt}", f"{n_adapt + 1}",
        ("Level reference", "the signal's own last 2 s", "old, plus section against a 60 s anchor", "anchor only"), ("Meter input", "after ×21.6, clamp and DC", "old, plus raw samples above 110 Hz", "raw samples"),
        ("Section-scale gain (0.03 Hz)", f"{T_OLD:.2f} dB/dB", f"{T_TOT:.2f} dB/dB as a product", "≈ 1 by design"), ("Clip point", "103 dB SPL sine peak", "unchanged", "130 dB SPL (microphone)"),
        ("Overload sensor", "level-free envelope", "unchanged", "none needed"), ("Spectrum gain", "four bands, 0.49 s", "unchanged", "one gain from the anchor"), ("Silence test", "crest and RMS, 5 s", "unchanged", "section level under a floor"),
-       ("Calibration ritual", "required", "required", "not required"), ("User control", "sensitivity", "sensitivity, γ, floor", "exposure trim, γ, floor"), ("State added", "", "76 bytes, about 1,100 float operations per hop (estimated, not measured on the device)", "")]
+       ("Calibration ritual", "required", "required", "not required"), ("User control", "sensitivity", "sensitivity, γ, floor", "exposure trim, γ, floor"), ("State added", "", f"76 bytes; measured on the unit: {BAB['on']['afe_us_mean']:.0f} µs mean, {max(BAB['on']['afe_us_max'], BAB['off']['afe_us_max']):.0f} µs worst per 7,500 µs hop", "")]
 cmp_rows = "".join(f'<tr><th scope="row">{d}</th><td>{o}</td><td>{n}</td><td>{t}</td></tr>' for d, o, n, t in CMP)
 
 PRIOR = [("Sensory Bridge 4.1.1", "one gain for all bands", "1.5 s ↑ · 3 s ↓, floor 4.0", "calibration button, sensitivity", "No multi-band AGC and no loud guard in any release 1.0.0–4.1.1. Its waveform follower is not used for output."),
@@ -283,7 +308,7 @@ code = E("\n".join(l for l in src[i0:i1 + 1] if "isfinite" not in l and l.strip(
 code = E("\n".join(src[i0:i1 + 1]))
 
 SECS = [("summary", "Summary"), ("old", "The old chain"), ("budget", "Level budget"), ("time", "Time scales and transfer"), ("design", "AFE2 design"), ("behaviour", "Behaviour"),
-        ("impl", "Implementation"), ("verify", "Verification"), ("compare", "Comparison"), ("context", "Science and prior art"), ("road", "Roadmap and open items"), ("refs", "Sources")]
+        ("try", "Interactive model"), ("impl", "Implementation"), ("verify", "Verification"), ("compare", "Comparison"), ("context", "Science and prior art"), ("road", "Roadmap and open items"), ("refs", "Sources")]
 toc = "".join(f'<li><a href="#{i}"><b>{n+1}</b>{t}</a></li>' for n, (i, t) in enumerate(SECS))
 def H(i): n = [s[0] for s in SECS].index(i); return f'<h2 id="{i}"><span class="n">{n+1}</span>{SECS[n][1]}</h2>'
 fig = [0]
@@ -298,7 +323,7 @@ P.append(f'''<title>K1 Audio Front End</title>
 <style>{CSS}</style>
 <div class="wrap">
 <header class="mast">
-  <p class="eyebrow">K1 Main RPL (ESP32-S3, IM69D130 PDM microphone, 2 × 160 LEDs) · before: a6bad318 · AFE2 stage 1: 7ea24446 on fe/k1-afe2 · measured 10–11 Nov 2026</p>
+  <p class="eyebrow">K1 Main RPL (ESP32-S3, IM69D130 PDM microphone, 2 × 160 LEDs) · before: a6bad318 · AFE2 stage 1: 7ea24446 and a6113aaf on fe/k1-afe2 · measured 10–11 Nov 2026</p>
   <h1>K1 Audio Front End</h1>
   <p class="dek">A technical account of the level-control path between the microphone and the light effects: what it was, why it could not show a song's sections, the replacement design, and the evidence for each claim. Every number is from the source, the emulator running the real binary, or the bench unit.</p>
 </header>
@@ -307,8 +332,8 @@ P.append(f'''<title>K1 Audio Front End</title>
 <section class="sec">{H("summary")}
   <div class="kv"><div><b>{n_adapt} → 1</b><span>stages that adapt level by themselves: before, and the design target. Stage 1 adds the new one and removes none yet.</span></div>
   <div><b>{T_OLD:.2f} → {T_TOT:.2f}</b><span>dB out per dB in at 0.03 Hz (a 30 s section), old level signal against the product with AFE2. Seven tracks.</span></div>
-  <div><b>{rr("32")[0]:.2f} → {rr("32")[1]:.2f}</b><span>final chorus ÷ breakdown light output, mode 32, real firmware in the emulator. Mode 22: {rr("22")[0]:.2f} → {rr("22")[1]:.2f}.</span></div>
-  <div><b>0 bytes</b><span>difference in LED output with the stage switched off, against the previous build, in three modes.</span></div></div>
+  <div><b>{BR("off", "rgb"):.2f} → {BR("on", "rgb"):.2f}</b><span>loud ÷ breakdown light output on the real unit, stage off then on, same passage, same session. Second edge: {BR("off", "rgb_secondary"):.2f} → {BR("on", "rgb_secondary"):.2f}.</span></div>
+  <div><b>{n_better} of {len(pairs)}</b><span>track × mode cases where both tracking and contrast of the LED output improved (five tracks, modes 22 and 32, real firmware). Off is byte-identical to the previous build.</span></div></div>
   <div class="cols2"><div class="card stack"><h3>What was wrong</h3><ul class="tight">
     <li><b>Every adaptive stage is faster than a section.</b> Follower 2 s, AGC 0.49 s, pitch normaliser 10 s. Each divides the signal by its own recent past.</li>
     <li><b>The level signal keeps the beats and loses the sections.</b> Its gain is {min(beat):.2f}–{max(beat):.2f} at beat rates (0.5–3.5 Hz) and {T_OLD:.2f} at 0.03 Hz. Every beat peaks at 1.0 whatever the section.</li>
@@ -382,10 +407,27 @@ how    = clamp((S / A)^(γ/2), floor, 1)
   </div>
 </section>
 
+<section class="sec">{H("try")}
+  <p class="lede">The same update as the firmware, running in this page on the seven tracks. Move a control and the result is recomputed.</p>
+  <div class="card stack">
+    <div class="simc"><label>Track <select id="sim-track"></select></label>
+      <label>γ <input id="sim-gamma" type="range" min="0" max="2" step="0.05"><output id="sim-gamma-v"></output></label>
+      <label>floor <input id="sim-floor" type="range" min="0" max="0.6" step="0.01"><output id="sim-floor-v"></output></label>
+      <label>anchor fall τ (s) <input id="sim-slow" type="range" min="5" max="180" step="1"><output id="sim-slow-v"></output></label>
+      <label>re-anchor after (s) <input id="sim-hold" type="range" min="5" max="120" step="1"><output id="sim-hold-v"></output></label>
+      <label>anchor rise τ (s) <input id="sim-up" type="range" min="0.3" max="10" step="0.1"><output id="sim-up-v"></output></label>
+      <label>meter release τ (s) <input id="sim-rel" type="range" min="0.2" max="5" step="0.1"><output id="sim-rel-v"></output></label>
+      <button id="sim-reset" type="button">Reset to the flashed values</button></div>
+    <canvas id="sim-cv" class="simcv" role="img" aria-label="Section loudness, the old level signal, AFE2 how_much and their product for the chosen track"></canvas>
+    <p id="sim-out" class="cap" aria-live="polite"></p>
+  </div>
+  <p class="cap">Dashed blue in the top panel is the anchor. The model runs at 10 samples per second for size; the firmware runs at 133. Against the full-rate reference its how_much differs by {SIMV["ten_hz_vs_hop_rate_mean"]:.3f} on average. The JavaScript equals the Python reference on the same samples to {SIMV["js_vs_python_max_abs"]:.0e}. It models the level signal, not what an effect draws.</p>
+</section>
+
 <section class="sec">{H("impl")}
   <div class="card tw"><table class="spec narrow"><thead><tr><th>File</th><th>Lines</th><th>Change</th></tr></thead><tbody>{integ_rows}</tbody></table></div>
   <div class="card tw"><table class="spec narrow"><thead><tr><th>Interface</th><th>Kind</th><th>Meaning</th></tr></thead><tbody>{iface_rows}</tbody></table></div>
-  <p class="cap">Commit 7ea24446: 14 files, +554 −10. Revert: delete the one -D line (boot state), or :k1_afe=off at run time. Settings are RAM only; a reboot returns to the build default. Not covered yet: the FE board's line input (audio/k1_audio_ingress.h) has no meter, so how_much stays 1 there.</p>
+  <p class="cap">Commits 7ea24446 (14 files, +554 −10) and a6113aaf (timing probe and emulator allow-list, +26). Revert: delete the one -D line (boot state), or :k1_afe=off at run time. Settings are RAM only; a reboot returns to the build default. Not covered yet: the FE board's line input (audio/k1_audio_ingress.h) has no meter, so how_much stays 1 there.</p>
 </section>
 
 <section class="sec">{H("verify")}
@@ -406,6 +448,13 @@ how    = clamp((S / A)^(γ/2), floor, 1)
     <figure class="card fig"><h3>Bench: the anchor on a real microphone</h3>{f_bn1}{cap("Main RPL at 7ea24446, 10 dB under the Captain's volume, mode 22. The anchor locks on in about 8 s and holds through the quieter passages. Quiet room: 1.0–1.1 counts.")}</figure>
     <figure class="card fig"><h3>Bench: the factor, and the guard it has not yet replaced</h3>{f_bn2}{cap("Same run. how_much reaches 1.0 in the loud parts and the floor in the breakdown. The old guard still trims (minimum 0.71), and silence was flagged on 11 of 76 music lines: stages 2 and 3.")}</figure>
   </div>
+  <h3>Five tracks in the real firmware</h3>
+  <div class="card tw"><table class="spec"><thead><tr><th>Track</th><th>Kind</th><th>Mode</th><th>Loud − quiet (dB)</th><th>r (light, loudness)</th><th>dB light per dB sound</th><th>Contrast</th><th>Movement kept</th><th>γ = 2: slope · contrast</th></tr></thead><tbody>{five_rows}</tbody></table></div>
+  <p class="cap">Emulator, room level, 84 s passages ending 24 s after a breakdown returns; the last 60 s captured at every fourth hop (2,000 frames). r: correlation of the 3 s mean of light output with section loudness. Slope: least-squares dB of light per dB of sound. Contrast: loudest third ÷ quietest third. Off → on. With the stage off the slope is {min(slope_off):+.2f} to {max(slope_off):+.2f}; on, {min(slope_on):+.2f} to {max(slope_on):+.2f}. At γ = 2 the measured slope is 0.46, not the 1.0 of the static curve: the floor and the meter's 1.5 s release take part of it.</p>
+  <div class="grid3">{five_charts}</div>
+  <p class="cap">Mode 32 light output on each track, stage off and on. The breakdown returns at the dashed line.</p>
+  <figure class="card fig"><h3>Bench A/B on the real unit</h3><div class="scroller">{f_bab}</div>{cap(f"Main RPL at a6113aaf, mode 22, Loreen 75–155 s at 10 dB under the Captain's volume, played twice: stage off (:k1_afe=off), then on. Telemetry confirms the flag on every line of each run. Loud ÷ breakdown: {BR('off','rgb'):.2f} off, {BR('on','rgb'):.2f} on.")}</figure>
+  <h3>Seven tracks, level-signal model</h3>
   <div class="card tw"><table class="spec narrow"><thead><tr><th>Track</th><th>Kind</th><th>Loud − quiet (dB)</th><th>Section tracking r</th><th>Contrast</th><th>AFE2 contrast at −10 / 0 / +10 dB</th><th>Beat movement kept</th></tr></thead><tbody>{trk_rows}</tbody></table></div>
   <p class="cap">Model of the level signal on seven tracks (E against E × how_much), all scaled by one factor so the reference track matches the microphone level measured on the unit. Contrast: mean in the loudest quarter of the track ÷ the quietest quarter. This is a model of a signal, not of LED output.</p>
   <h3>Hypotheses that were tested and failed</h3>
@@ -432,10 +481,10 @@ how    = clamp((S / A)^(γ/2), floor, 1)
       <li><b>Anchor floor.</b> 6 counts against a measured 1.1-count room. Could go lower for very quiet listening.</li>
       <li><b>Where else to apply how_much.</b> Level scaling is right for mode 22's shapes and wrong for mode 32's width. Per-effect use is open.</li></ul></div>
     <div class="card stack"><h3>Limits of the evidence</h3><ul class="tight">
-      <li>Emulator and bench results use one track; the seven-track result is a signal model.</li>
-      <li>Emulator captures are 2,000 frames (15 s). One breakdown-to-chorus transition.</li>
-      <li>No bench capture with the stage off in the same session; the bench comparison is within one run.</li>
-      <li>CPU cost on the device is estimated, not measured.</li>
+      <li>LED evidence covers five tracks and two modes in the emulator; three of the five are electronic. The bench uses one track.</li>
+      <li>One breakdown-to-return transition per track; 22 enabled modes exist and two were measured on five tracks, three on one.</li>
+      <li>The bench A/B is two consecutive plays of one passage at −10 dB, not a simultaneous comparison.</li>
+      <li>The Captain's eye has not judged it. That is the acceptance test, and no measurement here replaces it.</li>
       <li>dB SPL figures assume unity gain in the PDM converter.</li>
       <li>The transfer measurement treats a non-linear, clamped system as linear; read it as a describing gain.</li>
       <li>Until stages 2–5 land the unit runs five self-adjusting stages.</li></ul></div>
@@ -444,7 +493,7 @@ how    = clamp((S / A)^(γ/2), floor, 1)
 
 <section class="sec">{H("refs")}
   <ol class="refs">
-    <li>Firmware: github.com/synqing/SpectraSynq_K1_Firmware, commits a6bad318 and 7ea24446 (branch fe/k1-afe2).</li>
+    <li>Firmware: github.com/synqing/SpectraSynq_K1_Firmware, commits a6bad318, 7ea24446 and a6113aaf (branch fe/k1-afe2).</li>
     <li>Evidence in the repository's lane branch lane/k1-fe-show-m2: source map source/CHAIN-MAP.md, emulator runs emu/runs/afe2, plan AFE2-PLAN-2026-11-10.md, reference design/afe2_reference.py.</li>
     <li>Infineon, IM69D130 datasheet v1.0, 2017, Table 1.</li>
     <li>Robles and Ruggero, "Mechanics of the mammalian cochlea", Physiol Rev 81:1305, 2001. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3590856">PMC3590856</a></li>
@@ -460,4 +509,5 @@ how    = clamp((S / A)^(γ/2), floor, 1)
   </ol>
 </section>
 </div>''')
+P.append("<script>" + (HERE / "afe2_sim.js").read_text() + "\nconst SIM = " + (HERE / "sim_data.json").read_text() + ";\n" + (HERE / "sim_ui.js").read_text() + "</script>")
 a.out.write_text("".join(P)); print(a.out, len("".join(P)))
