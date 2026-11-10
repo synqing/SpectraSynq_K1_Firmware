@@ -1,0 +1,124 @@
+{
+  "schema": "instrument_project_v1",
+  "version": "1.0.0",
+  "mapping_profile_id": "prim8_natural_v2_ui_b",
+  "organs_lock_sha256": "4e57063c47045728ed5d2a90a232a326e6cc7b7a00a365a88061bf1897373fb5",
+  "inputs": {
+    "contract_path": "inputs/contract.json",
+    "contract_sha256": "f17a0c052f6ba03b51d6820a596df6f55a06ce3f42e1e59e7cf06a705909e793",
+    "stem_features_path": "inputs/stem_features.json",
+    "stem_features_sha256": "9053c7ad7e62e92b88b684b5daff07818039f46fdc46b0623a9ce60d31386052",
+    "contract_schema_sha256_path": "inputs/contract_schema.sha256",
+    "mapping_profile_path": "mapping/prim8_natural_v2_ui_b.json",
+    "mapping_profile_sha256": "4525cbeda3c59673372fbe8e486cd81c5f146aa75d375fb87bc940e030d1af86"
+  },
+  "stream": {
+    "hz": 120,
+    "device_profile": "none",
+    "passage_start_sample": 0
+  },
+  "edits": [
+    {
+      "seq": 1,
+      "layer": "mapping_profile",
+      "from_profile": {
+        "id": "prim8_natural_v1",
+        "sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd"
+      },
+      "to_profile": {
+        "id": "prim8_natural_v2_ui_a",
+        "path": "mapping/prim8_natural_v2_ui_a.json",
+        "sha256": "adda698218bd39a574b36eabee5c6cf448fb8eb85d25e15c3b248cc5698648de"
+      },
+      "changes": [
+        {
+          "path": "schema",
+          "before": "mapping_profile_v1",
+          "after": "mapping_profile_v2"
+        },
+        {
+          "path": "sections",
+          "after": [
+            {
+              "id": "chorus_1",
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 20000
+                  }
+                }
+              },
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              }
+            }
+          ]
+        }
+      ],
+      "note": "UI: create chorus_1 override"
+    },
+    {
+      "seq": 2,
+      "layer": "mapping_profile",
+      "from_profile": {
+        "id": "prim8_natural_v2_ui_a",
+        "sha256": "adda698218bd39a574b36eabee5c6cf448fb8eb85d25e15c3b248cc5698648de"
+      },
+      "to_profile": {
+        "id": "prim8_natural_v2_ui_b",
+        "path": "mapping/prim8_natural_v2_ui_b.json",
+        "sha256": "4525cbeda3c59673372fbe8e486cd81c5f146aa75d375fb87bc940e030d1af86"
+      },
+      "changes": [
+        {
+          "path": "sections",
+          "before": [
+            {
+              "id": "chorus_1",
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 20000
+                  }
+                }
+              },
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              }
+            }
+          ],
+          "after": [
+            {
+              "id": "chorus_1",
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 12000
+                  }
+                }
+              },
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              }
+            }
+          ]
+        }
+      ],
+      "note": "UI: edit chorus_1 override 20000 -> 12000"
+    }
+  ],
+  "outputs": null,
+  "verification": {
+    "status": "UNVERIFIED",
+    "trace_sha256": null
+  }
+}

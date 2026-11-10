@@ -1,0 +1,4824 @@
+{
+  "schema": "k1-emu-result/3",
+  "invocation_id": "632d53a02fba40a292cede0f8948ba8d",
+  "started_utc": "2026-11-10T12:49:49.376666+00:00",
+  "finished_utc": "2026-11-10T12:53:46.939863+00:00",
+  "overall": "SOFTWARE INCOMPLETE",
+  "suite": "default",
+  "hardware_accessed": false,
+  "scenario": {
+    "path": "/private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/live-a6bad318/tools/esp_emulator/s3_music_regression.json",
+    "sha256": "595c4a08d3351671e74ddfa65104d63e1721862a35f9cc78d32870de24d667fd",
+    "source_sha256": "595c4a08d3351671e74ddfa65104d63e1721862a35f9cc78d32870de24d667fd",
+    "profile_selection": "scenario",
+    "name": "s3-music-regression"
+  },
+  "tool": {
+    "lock": "/private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/live-a6bad318/tools/esp_emulator/tool-lock.json",
+    "lock_sha256": "dab17a5f75959c7a2c908ba65c496e3f5a052e5967550f90be43f5e782c92212",
+    "executable": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/tools/esp-emu-pin/bin/esp-emu",
+    "executable_sha256": "dea564e36990fcea727eb11e33c5430eccdfe673fc5462c0604e0001d25d84a0",
+    "version": "0.49.0",
+    "rejected_candidates": []
+  },
+  "source": {
+    "repository": "/private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/live-a6bad318",
+    "kind": "export",
+    "head": "unknown",
+    "branch": null,
+    "dirty_paths": [],
+    "dirty_inputs_sha256": "22661a0f88fcc4f0dd1c7f10d78fd45ff64311626d5ffc91120bd662c2a8d4db",
+    "export_tree_sha256": "22661a0f88fcc4f0dd1c7f10d78fd45ff64311626d5ffc91120bd662c2a8d4db",
+    "identity_paths": [
+      "SPECTRASYNQ_K1_FIRMWARE",
+      "platformio.ini",
+      "tools/esp_emulator",
+      "scripts/platformio",
+      "tests/test_esp_emulator_acceptance.py",
+      "tests/test_esp_emulator_report.py"
+    ]
+  },
+  "emu_build": {
+    "env": "k1_main_rpl_emu",
+    "exit_code": 0,
+    "seconds": 42.2,
+    "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/build-emu.log",
+    "command": "bash scripts/agent/pio-build.sh k1_main_rpl_emu",
+    "firmware.elf_sha256": "4f171aade1d67aafabd989b937d2e3849bfd072f939565ddaace8b5083f24893",
+    "firmware.bin_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+    "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+    "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+  },
+  "profile": {
+    "env": "k1_main_rpl_emu",
+    "product_env": "k1_main_rpl_im69d",
+    "adapter_flags": [
+      "K1_RENDER_TRACE_V1",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0"
+    ],
+    "forbidden_in_product": [
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_RENDER_TRACE_V1",
+      "K1_B489_WS2816_V1"
+    ],
+    "trace": {
+      "edges": [
+        "A",
+        "B"
+      ],
+      "px": 160,
+      "bpp": 16,
+      "fmt": "rgb16hex",
+      "native_order": "per logical pixel G16BE R16BE B16BE (Lever-2 ws2816_pack_pixel); the rgb16hex dump is R16 G16 B16, a lossless reorder",
+      "boundary": "ws2816_wire and ws2816_wire_secondary after show_secondary_leds() and the primary Lever-2 pack, before FastLED.show() (submission suppressed by K1_EMU_SKIP_EMIT)"
+    },
+    "limiter": "Main RPL Lever-2 packs each edge with budget_proxy = n*3*65535 (identity) and init_leds() returns before FastLED.setMaxPowerInVoltsAndMilliamps(), so the compiled 2500 mA default installs no limit. The production max_current_ma command installs FastLED's shared power limit; the fixture records the scale FastLED would apply at submission per captured frame (limit_scale, power_mw).",
+    "emulator": {
+      "chip": "esp32s3",
+      "psram": "8M",
+      "batch_size": 2000000,
+      "timeout_s": 600
+    }
+  },
+  "effective_emu_env": {
+    "extends": [
+      "env:k1_main_rpl_im69d"
+    ],
+    "build_flags": [
+      "-DARDUINO_USB_MODE=1",
+      "-DARDUINO_USB_CDC_ON_BOOT=1",
+      "-DARDUINO_RUNNING_CORE=0",
+      "-DBOARD_HAS_PSRAM",
+      "-DK1_HARDWARE",
+      "-DK1_LED_TASK_CORE=1",
+      "-DK1_I2S_DMA_DESC_NUM_VALUE=3",
+      "-DDEFAULT_SAMPLE_RATE=12800",
+      "-DDEFAULT_SAMPLES_PER_CHUNK=96",
+      "-DK1_TEMPO_NOVELTY_DECIMATION=3U",
+      "-DK1_GDFT_INT64_MAGNITUDE_V1",
+      "-DK1_GDFT_INT64_RECURRENCE_V1",
+      "-DK1_GDFT_X2_CROSSOVER_BIN=40u",
+      "-DK1_GDFT_LANE4_V1=1",
+      "-DK1_AUDIO_FRAME_V1=1",
+      "-DK1_COMMAND_CHANNELS_V1=1",
+      "-DK1_PERSIST_PARK_V1=1",
+      "-DDEFAULT_AUDIO_RESPONSE_GAIN=1.0f",
+      "-DESP32_ARDUINO_NO_RGB_BUILTIN",
+      "-O3",
+      "-ffast-math",
+      "-fno-finite-math-only",
+      "-Wno-deprecated-declarations",
+      "-Wno-narrowing",
+      "-DK1_TEMPO_CONF_V2",
+      "-DK1_TEMPO_FLYWHEEL_V2",
+      "-DK1_ONSET_V2",
+      "-DK1_CHORD_V2",
+      "-DK1_SEMANTIC_STATE",
+      "-DK1_CHORD_HUE_V1",
+      "-DK1_DROP_CUT_V1",
+      "-DK1_PEAK_ASYM_ENV",
+      "-DK1_VIVID_PRECOMP_V1",
+      "-DK1_LOUD_GUARD_V1",
+      "-DK1_AUDIO_FREEZE_GUARD_V1",
+      "-DK1_TEMPO_ACF_SPREAD_V1=1",
+      "-DK1_AGC_PERBAND_V1=1",
+      "-DK1_BOOTLOOP_GUARD_V1",
+      "-DK1_PALETTE_VIBRANCY_V1",
+      "-DK1_EDGE_PALETTE_HONOUR_V1",
+      "-DK1_MAIN_RPL_PINMAP_V1=1",
+      "-DK1_MIC_IM69D_PDM_V1",
+      "-DK1_MIC_IM69D_DSR_16S_V1",
+      "-DK1_MIC_IM69D_SLOT_RIGHT",
+      "-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1",
+      "-DK1_WFHYB_M32_VARIANTS_V1",
+      "-DK1_EDGE_PALETTE_HONOUR_V1",
+      "-DK1_WS2816_LEVER2_V1",
+      "-DK1_LOOK_LIB_V1",
+      "-DK1_COLOUR_LAB_V1",
+      "-DK1_RMT_ALLOC_ON_VP_CORE_V1=1",
+      "-DK1_RENDER_TRACE_V1",
+      "-DK1_EMU_FIXTURE",
+      "-DK1_EMU_SKIP_EMIT",
+      "-DK1_EMU_UART0"
+    ],
+    "build_src_flags": [
+      "-include k1_emu_clock_force.h"
+    ],
+    "upload_port": "/dev/tty.usbmodem1401",
+    "monitor_port": "/dev/tty.usbmodem1401",
+    "build_src_filter": [
+      "+<*.ino> +<*.ino.cpp> +<system/globals_config.cpp> +<system/globals.cpp> +<system/k1_startup_ratchet.cpp> +<visual/Palettes.cpp> +<visual/render_params.cpp> +<visual/k1_render_trace.cpp> +<visual/k1_colour_lab.cpp> +<visual/k1_i2s_emit.cpp> +<effects/light_mode_*.cpp> +<audio/k1_*.cpp> -<audio/k1_mic_auto_sense.cpp> -<audio/k1_usb_audio_input.cpp> -<audio/k1_pcm1808_input.cpp> +<director/k1_*.cpp> +<control/k1_*.cpp> +<persistence/k1_persistence_request.cpp> +<serial/*.cpp>",
+      "+<director/k1_edgemixer.cpp>"
+    ],
+    "platform": "https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip",
+    "board": "esp32-s3-devkitc1-n16r8",
+    "framework": [
+      "arduino"
+    ],
+    "board_build.arduino.memory_type": "qio_opi",
+    "board_build.psram_type": "opi",
+    "board_build.flash_mode": "qio",
+    "board_build.flash_size": "16MB",
+    "board_upload.flash_size": "16MB",
+    "board_build.partitions": "default_16MB.csv",
+    "monitor_speed": 115200,
+    "upload_speed": 921600,
+    "extra_scripts": [
+      "pre:scripts/platformio/k1_src_includes.py",
+      "pre:scripts/platformio/k1_upload_guard.py",
+      "pre:scripts/platformio/k1_build_provenance.py",
+      "pre:scripts/platformio/k1_i2s_emit_skip_fastled_wrapper.py"
+    ],
+    "build_unflags": [
+      "-DARDUINO_RUNNING_CORE=1"
+    ],
+    "lib_deps": [
+      "fastled/FastLED@3.10.3",
+      "file://libraries/FixedPoints",
+      "file://libraries/M5ROTATE8"
+    ]
+  },
+  "normal_build": {
+    "status": "PASS",
+    "build": {
+      "env": "k1_main_rpl_im69d",
+      "exit_code": 0,
+      "seconds": 47.6,
+      "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/build-product.log",
+      "command": "bash scripts/agent/pio-build.sh k1_main_rpl_im69d",
+      "firmware.elf_sha256": "e533ed74d7f7af990b719c4ab07c6972a13e31e4e5668f36f943ff9fa283e30c",
+      "firmware.bin_sha256": "8f51ea06d8f87349bad4d53dc270c1ceeb8ee387a98038b8115e6f28e8294c54",
+      "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+      "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+    },
+    "product_flags_forbidden_present": [],
+    "product_forced_clock_include": false,
+    "emu_minus_product_flags": [
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0",
+      "K1_RENDER_TRACE_V1"
+    ],
+    "product_minus_emu_flags": [],
+    "declared_adapter_flags": [
+      "K1_RENDER_TRACE_V1",
+      "K1_EMU_FIXTURE",
+      "K1_EMU_SKIP_EMIT",
+      "K1_EMU_UART0"
+    ],
+    "product_fixture_symbols": [],
+    "product_fixture_strings": [],
+    "positive_control_emu_symbols": 18,
+    "positive_control_emu_strings": [
+      "EMU_FIXTURE_ARMED",
+      "K1EMUSC2",
+      "EMU_END reason",
+      "RTRACE-BEGIN"
+    ],
+    "emu_env_upload_blocked": true,
+    "nm": "/Users/spectrasynq/.platformio/packages/toolchain-xtensa-esp-elf/bin/xtensa-esp32s3-elf-nm"
+  },
+  "host_checks": {
+    "status": "FAIL",
+    "exit_code": 2,
+    "tests": [
+      "tests/"
+    ],
+    "summary": "1 error in 2.45s; pio run -e k1_hardware exit=0; 8 git-history test file(s) excluded in this export (run in the checkout)",
+    "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/host-pytest.log",
+    "builds": [
+      {
+        "env": "k1_hardware",
+        "exit_code": 0,
+        "seconds": 49.7,
+        "log": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/build-k1_hardware.log",
+        "command": "bash scripts/agent/pio-build.sh k1_hardware",
+        "firmware.elf_sha256": "013544cb3cbc4ad08458a8c7ea884901d024711d153191a5f6ba650cfaf0bc27",
+        "firmware.bin_sha256": "42c9b5264ba04ed924b6c57b8f12a251cec58fa9ef7eb61ee6cfba4b4a38416f",
+        "bootloader.bin_sha256": "12c9a10fef2d95a3f6d74dc6089fa8fedc51a77a487be834c9207b8c687b8761",
+        "partitions.bin_sha256": "bd0f7954aca2ef7d925ee21aaa1f3dc8822d1d6ce5cbbd26a135e5886bfff6ce"
+      }
+    ],
+    "excluded_without_git": [
+      "tests/test_bootloop_guard_static.py",
+      "tests/test_colourlab_static.py",
+      "tests/test_dual_sync_oracle.py",
+      "tests/test_lever2_no_effect_retune_static.py",
+      "tests/test_scheduling_abba_toolchain_pin_receipt.py",
+      "tests/test_scheduling_harness_pin_receipt.py",
+      "tests/test_scheduling_stage_perturbation_pair.py",
+      "tests/test_k1_stage_attribution_abba_compare.py"
+    ]
+  },
+  "cases": {
+    "smoke-a": {
+      "case": "smoke-a",
+      "purpose": "Corrected normal-profile smoke replay: compiled defaults, normal startup animation and fade, declared epoch 1.0 s (the product's own fade gate), 128 real hops, no tail.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-a",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "9c59207ca29e44f199595e55f516f981",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.3,
+      "executed": {
+        "flash_sha256": "9cae1b9873d28358d0d74842f1b59cca7a83fe39b2bb8c3ddbea478036ad6401",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "405b82f468e67d6ebf1793edb3f906b49509728041e562d1780fa905ca9a7c31",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "4ce0379c11ca54254cbbae157a1725d2f659c4526379eaae88622905074ab74c",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "e0b5b3b0"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "9c59207ca29e44f199595e55f516f981",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "smoke-b": {
+      "case": "smoke-b",
+      "purpose": "Fresh repeat of smoke-a in a new process.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-b",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "dcceaa148bec4b989e1f6795699736d3",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-b/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/smoke-b/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.26,
+      "executed": {
+        "flash_sha256": "6520d8da2e6350a20398b59447a972473d39061cd9dfcb0817026088b939d1a4",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "18e9c5d5b98d419256dafdf02d926a473f06338e47810bf2a1407f03ef9a64fe",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "4ce0379c11ca54254cbbae157a1725d2f659c4526379eaae88622905074ab74c",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "e0b5b3b0"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "dcceaa148bec4b989e1f6795699736d3",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "time-zero-tail": {
+      "case": "time-zero-tail",
+      "purpose": "Zero epoch: first real hop is processed sample 96 at 7500 us. Declared 8-hop zero tail advances processed time while admitted stays 12288.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/time-zero-tail",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "d116daace2fc4adc9bced1882411e51b",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/time-zero-tail/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/time-zero-tail/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.32,
+      "executed": {
+        "flash_sha256": "8b6440c63df073458787562cfe94c7684b3a8f9fe6a2249647644d8445d27f7b",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "5c0d8fb94437db7ad3bf9f53befb8cb0c7a49a6e333b0c265f554c28d907ed9a",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 8,
+        "total_hops": 136,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 136,
+          "every": 1,
+          "frames": 136
+        },
+        "epoch": {
+          "policy": "zero"
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 136,
+        "payload_sha256": "6f30b4dba00b5441cba5fa92a57916ce5b09ae3cb457ad0baee8ce8b5d912d34",
+        "header": {
+          "frames": "136",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "c5669d05"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "d116daace2fc4adc9bced1882411e51b",
+          "admitted": "12288",
+          "processed": "13056",
+          "staged_hops": "136",
+          "total_hops": "136",
+          "published": "136",
+          "last_generation": "136",
+          "consumed": "136",
+          "shown": "136",
+          "last_shown": "136",
+          "pre_audio_shows": "113",
+          "captured": "136",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1020000"
+        },
+        "epoch": {
+          "policy": "zero",
+          "epoch_us": "0",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 3,
+          "B": 136
+        }
+      }
+    },
+    "stall-probe": {
+      "case": "stall-probe",
+      "purpose": "Progress deadline: a 1 ms real-time show deadline must end the run as a reported stall with positions and the partial capture.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/stall-probe",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "7dfd80b8ccfb4b7bb4b4372348fecaf2",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/stall-probe/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/stall-probe/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 0.29,
+      "executed": {
+        "flash_sha256": "b1c7c3c073cb61d06173785e46fca36c35154fe94a6ba346009e0fb7cf0ecfd1",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "6c726a5731681be6fa3886768a50c3c452301b70455d80535786e0c5ac56dcce",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 1
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 0,
+        "payload_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "header": {
+          "frames": "0",
+          "crc32": "0"
+        },
+        "end": {
+          "reason": "stall",
+          "where": "startup",
+          "run": "7dfd80b8ccfb4b7bb4b4372348fecaf2",
+          "admitted": "0",
+          "processed": "0",
+          "staged_hops": "0",
+          "total_hops": "128",
+          "published": "0",
+          "last_generation": "0",
+          "consumed": "0",
+          "shown": "0",
+          "last_shown": "0",
+          "pre_audio_shows": "1",
+          "captured": "0",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "85027"
+        },
+        "epoch": null,
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 0,
+          "B": 0
+        }
+      }
+    },
+    "ctl-a": {
+      "case": "ctl-a",
+      "purpose": "A-only brightness: production photons=0.25 at hop 40.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-a",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "6f237e59ccdd4768a6a5393883463956",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.2,
+      "executed": {
+        "flash_sha256": "d684e4b74ac213871c7c2aca17aa9e807b4414a1cf26ee62b1d153664ea02cea",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "0e07deb5bf267904a8990e52f02c06fd8e7067edb3d1f9df7fdf1c7145b1603b",
+        "payload_crc32": "37f95dbb",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 40,
+            "text": "photons=0.25",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "41a8bbf4fc3b1e59bea257d271e565e03afc68ae97829e78a442c373e11c13e5",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "f0777b2c"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "6f237e59ccdd4768a6a5393883463956",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "1",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "ctl-b": {
+      "case": "ctl-b",
+      "purpose": "B-only brightness: production secondary_photons=0.15 at hop 40.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-b",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "0d839a65df1f48f78efedfa5d770d143",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-b/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/ctl-b/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.24,
+      "executed": {
+        "flash_sha256": "e0b8bb7a64480162a04377d91a11fde3f52437827f35a62e849d613d65fc4ee0",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "861716d7fa34be0e465c785a4084367e50db2b9e22b0058973d33613b9683c7e",
+        "payload_crc32": "a085fef0",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 40,
+            "text": "secondary_photons=0.15",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "c30f4d59b1de9240a63afd73ac1c78f07e203da17aa3b07801509319d59d3140",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "cdbf1546"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "0d839a65df1f48f78efedfa5d770d143",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "1",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "reject": {
+      "case": "reject",
+      "purpose": "Known rejected input: photons=not-a-number at hop 30 must be rejected by the production parser and leave both outputs unchanged.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/reject",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "f24d86ce395c44c7abff8e9506dafdca",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/reject/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/reject/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.19,
+      "executed": {
+        "flash_sha256": "7979dda43a0f9a995d1317e20abf82387b0a27545fc3d670a3a34a9047b46e36",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "1be1b1397abafdb033939164922f04c0e68a1670337c9e9782e9701a2cb51ea0",
+        "payload_crc32": "521200b9",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 30,
+            "text": "photons=not-a-number",
+            "expect": "rejected"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "4ce0379c11ca54254cbbae157a1725d2f659c4526379eaae88622905074ab74c",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "e0b5b3b0"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "f24d86ce395c44c7abff8e9506dafdca",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "1",
+          "host_commands": "0",
+          "rejects": "1",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [
+          "photons"
+        ],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "limit-base": {
+      "case": "limit-base",
+      "purpose": "Binding limiter: the production max_current_ma=300 command installs FastLED's shared power limit (5 V x 300 mA).",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-base",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "8ab43341c3574f6fb5d4701d508d9cf6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-base/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-base/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.19,
+      "executed": {
+        "flash_sha256": "131777e19a0b0cd0ba4cc81cc0a1b7870b2e1ddac9faedf83ccae1774408d81e",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "6b5e757dd768b677211c3e78228c3d21c31b40f1fd7d1935524ef23d9191228d",
+        "payload_crc32": "3b149b02",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "max_current_ma=300",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "4ce0379c11ca54254cbbae157a1725d2f659c4526379eaae88622905074ab74c",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "e0b5b3b0"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "8ab43341c3574f6fb5d4701d508d9cf6",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "1",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308272",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [
+          {
+            "installed_mw": "1500"
+          }
+        ],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "limit-a": {
+      "case": "limit-a",
+      "purpose": "Binding limiter plus A-only photons=0.25 at hop 40.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-a",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "cb4a2facd30f475bb6a7e15ccdff4453",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/limit-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.2,
+      "executed": {
+        "flash_sha256": "1c165facb290691f2d5c01c38091c7aeaf3bb8c99a645468e28f64988153f39d",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "09615fb24cc6aa728dfb8c6104a0650783d5ee8ce8872ff4e4151cd3fc8b8eae",
+        "payload_crc32": "607b0308",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "max_current_ma=300",
+            "expect": "applied"
+          },
+          {
+            "hop": 40,
+            "text": "photons=0.25",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "41a8bbf4fc3b1e59bea257d271e565e03afc68ae97829e78a442c373e11c13e5",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "f0777b2c"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "cb4a2facd30f475bb6a7e15ccdff4453",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "2",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308272",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [
+          {
+            "installed_mw": "1500"
+          }
+        ],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "comp-save": {
+      "case": "comp-save",
+      "purpose": "Apply the studio_ab composition through the production parser at hop 0, confirm it applied, then save_show at hop 64 into run-owned emulator flash.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-save",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "21504d0267104e069efef9649013f70d",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-save/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-save/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--save-state",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.41,
+      "executed": {
+        "flash_sha256": "0437450a87f826ae4b85a9b0f378635f150f1c16aacd3983404c894ebec46295",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "e395993e38706974ad239be2171c6a8a76e6cb9d8e3043e3deeff957310a4e0d",
+        "payload_crc32": "a1474a82",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false,
+        "output_littlefs_sha256": "82669435d1e9835575c2395b6b329e88d2a1a18b8edd11eef7c937495d2c18e6",
+        "littlefs_changed": true
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=14",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "palette_index=12",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_palette_index=27",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_photons=0.55",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_chroma=0.80",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_mode=analogous",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_strength=0.60",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_spread=30",
+            "expect": "applied"
+          },
+          {
+            "hop": 64,
+            "text": "save_show",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-save/flash-run.bin",
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "529bc2c971c1f26177c6fc4e596ba9c23159e2332503d51a0385a437bf9aaddc",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "964fc6e5"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "21504d0267104e069efef9649013f70d",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "14",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "2",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "313741",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "show",
+            "ok": "1",
+            "hop": "64"
+          },
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "64"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 127,
+          "B": 128
+        }
+      }
+    },
+    "comp-ref": {
+      "case": "comp-ref",
+      "purpose": "Equivalent reference: the same composition applied before the first hop, same PCM, startup and epoch, no save.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-ref",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "ad53236520a04beb93eb8cfefad1e43f",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-ref/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-ref/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.41,
+      "executed": {
+        "flash_sha256": "b9d616393fd06896c74393a272f519539ae5cd2ae5326be3be252eb24a9487a2",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "39a10f4e1ce74db902ffe61b4b4416973f8d9791d38f77a9d47b656efef64770",
+        "payload_crc32": "5f01fdc0",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=14",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "palette_index=12",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_palette_index=27",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_photons=0.55",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_chroma=0.80",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_mode=analogous",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_strength=0.60",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_spread=30",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "529bc2c971c1f26177c6fc4e596ba9c23159e2332503d51a0385a437bf9aaddc",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "964fc6e5"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "ad53236520a04beb93eb8cfefad1e43f",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "13",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "313740",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 127,
+          "B": 128
+        }
+      }
+    },
+    "comp-recover": {
+      "case": "comp-recover",
+      "purpose": "Fresh process from comp-save's LittleFS: recovery mode issues no command, reapplication or save.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-recover",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "92086a8eae6c404fbf26700958fb8c29",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-recover/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/comp-recover/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.41,
+      "executed": {
+        "flash_sha256": "acce3572a556dbff6ad67503b9a6de6f31e0d0c569ca0071063e25cae61fedc8",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "94b1b1b6f546d139b77d591c3237a98b35541daeb77b3ba3cc269f188f5a518b",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "82669435d1e9835575c2395b6b329e88d2a1a18b8edd11eef7c937495d2c18e6",
+        "input_flash_from": "comp-save",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "comp-save",
+          "recovery": true
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "529bc2c971c1f26177c6fc4e596ba9c23159e2332503d51a0385a437bf9aaddc",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "964fc6e5"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "92086a8eae6c404fbf26700958fb8c29",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "319005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000020013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101019a99193f1e020001011e8485ee",
+        "nonzero_frames": {
+          "A": 127,
+          "B": 128
+        }
+      }
+    },
+    "cfg-save": {
+      "case": "cfg-save",
+      "purpose": "Primary-only commands at hop 0. Since 7a7507b2 the product's delayed CONFIG save waits for the silence classifier (SILENCE_DWELL_MS 5000 after the smoke music ends at hop 128) as well as the 5 s debounce, so the save is due near app 7 s. The declared 1200-hop zero tail (app end 10.96 s) admits it with margin. Exactly one save is still required. No show-state file is written.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-save",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "f068d95e7dac4e5a8ff0b41a921d02cd",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-save/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-save/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--save-state",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 6.47,
+      "executed": {
+        "flash_sha256": "684210ff283b525da5ede5fa60cef5b4e33d74d9c1d555d639019f4bb27b462d",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "054a6e82b9d6118a72988a2c4ebf93a2cfabb280959d469b62ddceb9ae0804e5",
+        "payload_crc32": "63db7244",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false,
+        "output_littlefs_sha256": "351d30ec90d48efec0920656620e3d8c6913bc17fb6724730f65e5095e605f25",
+        "littlefs_changed": true
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 1200,
+        "total_hops": 1328,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "expect": "applied"
+          }
+        ],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-save/flash-run.bin",
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "d590f73e4bcf87ec1a16aee8ce78dffbd1586f04cd09eb7375682a8f4875733b",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "3c2c7435"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "f068d95e7dac4e5a8ff0b41a921d02cd",
+          "admitted": "12288",
+          "processed": "127488",
+          "staged_hops": "1328",
+          "total_hops": "1328",
+          "published": "1328",
+          "last_generation": "1328",
+          "consumed": "1328",
+          "shown": "1328",
+          "last_shown": "1328",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "3",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "1",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "10960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "308895",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "823"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "cfg-recover": {
+      "case": "cfg-recover",
+      "purpose": "Missing show-state fallback: boot from a flash with a saved CONFIG and no SHOW_STATE_V1.BIN.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-recover",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "25cd297c19924bcd9b6939a949b88711",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-recover/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/cfg-recover/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.25,
+      "executed": {
+        "flash_sha256": "cb671cdc065c0351af1a90c544ff1ab0eb3075f9941b6aa1f84edb8d63a10caf",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "915f20ea38619fd15f4391b41073b8fe10ad018250f5fb17db8b29fc880ba9d7",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "351d30ec90d48efec0920656620e3d8c6913bc17fb6724730f65e5095e605f25",
+        "input_flash_from": "cfg-save",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "cfg-save",
+          "recovery": true
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "d590f73e4bcf87ec1a16aee8ce78dffbd1586f04cd09eb7375682a8f4875733b",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "3c2c7435"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "25cd297c19924bcd9b6939a949b88711",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "315005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000020013333333f3333b33ecdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001011f388227",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        }
+      }
+    },
+    "music-a": {
+      "case": "music-a",
+      "purpose": "Real-music passage through the default composition (A BLOOM 3, B WAVEFORM_TEMPO 18) with normal startup. Warm-up comes from the estimator: the tempo novelty window is 512 samples at 50 Hz = 10.24 s (k1_tempo.cpp:45) and lock needs confidence >= 0.60 plus two observed beats (k1_tempo.cpp:282), so hops 0-1599 (12.0 s) are uncaptured preroll and hops 1600-2933 (10.0 s) are scored.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-a",
+      "pcm": {
+        "id": "music_chorus",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "Real music passage: 22.000 s = 281600 samples = 2933.33 hops (final partial hop zero-padded and labelled).",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 0,
+            "to_sample": 281600,
+            "label": "original 56.0-78.0 s: build into sustained chorus"
+          }
+        ],
+        "samples": 281600,
+        "sha256": "36a2713c5d18a8ad78ff115d3da51d93ea23aac14aa949a9307f382533a3718a"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "9fccc62a4cab4a2fa48a981fcd9387a9",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 19.72,
+      "executed": {
+        "flash_sha256": "e50b4cbb9bd8088c91d3f8f4a29b44246a7b56391526f6f786317db62221895a",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "89894b0c68b3a3ebf1204472a64abf11da62b005b725fd32670df3a483841742",
+        "payload_crc32": "fcff581a",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 281600,
+        "tail_hops": 0,
+        "total_hops": 2934,
+        "capture": {
+          "start_hop": 1600,
+          "end_hop": 2934,
+          "every": 1,
+          "frames": 1334
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1334,
+        "payload_sha256": "44c05db3c91aabe07c2703f69ac953ccb8652087e8c777cfd3e6e02e95b24209",
+        "header": {
+          "frames": "1334",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "7673fec6"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "9fccc62a4cab4a2fa48a981fcd9387a9",
+          "admitted": "281600",
+          "processed": "281664",
+          "staged_hops": "2934",
+          "total_hops": "2934",
+          "published": "2934",
+          "last_generation": "2934",
+          "consumed": "2934",
+          "shown": "2934",
+          "last_shown": "2934",
+          "pre_audio_shows": "113",
+          "captured": "1334",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "23005000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "361007",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1334,
+          "B": 1334
+        }
+      }
+    },
+    "music-b": {
+      "case": "music-b",
+      "purpose": "Fresh repeat of music-a.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-b",
+      "pcm": {
+        "id": "music_chorus",
+        "kind": "concat",
+        "qualification": "real_music",
+        "origin": "Real music passage: 22.000 s = 281600 samples = 2933.33 hops (final partial hop zero-padded and labelled).",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 0,
+            "to_sample": 281600,
+            "label": "original 56.0-78.0 s: build into sustained chorus"
+          }
+        ],
+        "samples": 281600,
+        "sha256": "36a2713c5d18a8ad78ff115d3da51d93ea23aac14aa949a9307f382533a3718a"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "3333fcb50389423598a4c7a6384f8c26",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-b/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/music-b/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 19.08,
+      "executed": {
+        "flash_sha256": "2f49c2a5a4a1fd639392b26ca1cf9b0ee22d5ba1f8534e77b474451756930cb3",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "dd2f0d7e9b9e8045edc62939e31d49c60964977ee1dfed37c4a14bdb9955b267",
+        "payload_crc32": "fcff581a",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 281600,
+        "tail_hops": 0,
+        "total_hops": 2934,
+        "capture": {
+          "start_hop": 1600,
+          "end_hop": 2934,
+          "every": 1,
+          "frames": 1334
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1334,
+        "payload_sha256": "44c05db3c91aabe07c2703f69ac953ccb8652087e8c777cfd3e6e02e95b24209",
+        "header": {
+          "frames": "1334",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "7673fec6"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "3333fcb50389423598a4c7a6384f8c26",
+          "admitted": "281600",
+          "processed": "281664",
+          "staged_hops": "2934",
+          "total_hops": "2934",
+          "published": "2934",
+          "last_generation": "2934",
+          "consumed": "2934",
+          "shown": "2934",
+          "last_shown": "2934",
+          "pre_audio_shows": "113",
+          "captured": "1334",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "1",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "23005000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "361007",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 1334,
+          "B": 1334
+        }
+      }
+    },
+    "startup-sqr": {
+      "case": "startup-sqr",
+      "purpose": "Normal startup on the boot-monotonic epoch, then active music, a declared zero section and the return; every second hop captured.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/startup-sqr",
+      "pcm": {
+        "id": "startup_quiet_return",
+        "kind": "concat",
+        "qualification": "diagnostic_composite",
+        "origin": "Diagnostic composite of real music around a declared zero section: 16.000 s = 2133.33 hops (final partial hop zero-padded and labelled).",
+        "segments": [
+          {
+            "asset": "loreen_src",
+            "from_sample": 947200,
+            "to_sample": 1036800,
+            "label": "active: original 130.0-137.0 s"
+          },
+          {
+            "zeros_samples": 38400,
+            "label": "declared diagnostic zero section (not natural musical quiet)"
+          },
+          {
+            "asset": "loreen_src",
+            "from_sample": 1190400,
+            "to_sample": 1267200,
+            "label": "return: original 149.0-155.0 s"
+          }
+        ],
+        "samples": 204800,
+        "sha256": "835ed9b5a3e503ac1e20cb74060bb6fbb9aa55df2f3b8c68984fdcfaaadd0807"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "ecdb4a2c9eff4e1fab16c78d52148464",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/startup-sqr/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/startup-sqr/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 17.9,
+      "executed": {
+        "flash_sha256": "660b91ef0aa0d7730c317d5a607389ba4d3d4d8ea1140614a3b6979e65aa02b3",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "7d8fe7790f8c5f42c737a280664a21650457909ad5e31df3b8fc85a80efc385f",
+        "payload_crc32": "17879f5d",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 204800,
+        "tail_hops": 0,
+        "total_hops": 2134,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 2134,
+          "every": 2,
+          "frames": 1067
+        },
+        "epoch": {
+          "policy": "boot_monotonic"
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 1067,
+        "payload_sha256": "17ff70a34b1b6346b51dd2867c6f847c89f2349d3a11cd1f33757dfcd7b5c26a",
+        "header": {
+          "frames": "1067",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "8c904c63"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "ecdb4a2c9eff4e1fab16c78d52148464",
+          "admitted": "204800",
+          "processed": "204864",
+          "staged_hops": "2134",
+          "total_hops": "2134",
+          "published": "2134",
+          "last_generation": "2134",
+          "consumed": "2134",
+          "shown": "2134",
+          "last_shown": "2134",
+          "pre_audio_shows": "113",
+          "captured": "1067",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "3",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "16351007"
+        },
+        "epoch": {
+          "policy": "boot_monotonic",
+          "epoch_us": "346007",
+          "boot_us": "346007",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 844,
+          "B": 888
+        }
+      }
+    },
+    "client-a": {
+      "case": "client-a",
+      "purpose": "ctl-a delivered by the existing client through the product's USBSerial and production receive loop: photons=0.25 applied before hop 40.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "client_resolution": {
+        "name": "pio device monitor",
+        "declared_argv": [
+          "pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "executable": "/opt/homebrew/bin/pio",
+        "version": [
+          "PlatformIO Core, version 6.1.19"
+        ]
+      },
+      "client": {
+        "transport": "client",
+        "emulator_argv": [
+          "--chip",
+          "esp32s3",
+          "--firmware",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/flash-run.bin",
+          "--elf",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/firmware.elf",
+          "--psram-size",
+          "8M",
+          "--net",
+          "user",
+          "--batch-size",
+          "2000000",
+          "--timeout",
+          "600s",
+          "--console",
+          "usb-jtag",
+          "--uart1-tcp",
+          "127.0.0.1:56501"
+        ],
+        "client_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "client_full_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw",
+          "--project-dir",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/client-project",
+          "--port",
+          "/dev/ttys060"
+        ],
+        "pty": "/dev/ttys060",
+        "trace_port": 56501,
+        "emulator_exit": 0,
+        "client_exit": 0,
+        "terminal_string_observed_on": "uart1-tcp",
+        "bytes": {
+          "trace": 519148,
+          "device_to_client": 2136,
+          "client_to_device": 14,
+          "client_terminal": 2560
+        },
+        "typed": [
+          {
+            "hop": 40,
+            "text": "photons=0.25",
+            "expect": "applied",
+            "terminal_offset": 2520,
+            "ep1_out_offset": 2099
+          }
+        ],
+        "events": [
+          {
+            "t": 0.002,
+            "event": "emulator_started",
+            "pid": 51749
+          },
+          {
+            "t": 0.039,
+            "event": "trace_connected",
+            "port": 56501
+          },
+          {
+            "t": 0.042,
+            "event": "client_started",
+            "pid": 51750,
+            "argv": [
+              "/opt/homebrew/bin/pio",
+              "device",
+              "monitor",
+              "--baud",
+              "115200",
+              "--eol",
+              "LF",
+              "--raw",
+              "--project-dir",
+              "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/client-project",
+              "--port",
+              "/dev/ttys060"
+            ]
+          },
+          {
+            "t": 0.16,
+            "event": "client_port_open"
+          },
+          {
+            "t": 0.16,
+            "event": "ready_sent"
+          },
+          {
+            "t": 0.489,
+            "event": "gate",
+            "hop": 40
+          },
+          {
+            "t": 0.489,
+            "event": "typed",
+            "hop": 40,
+            "text": "photons=0.25"
+          },
+          {
+            "t": 1.178,
+            "event": "terminal_string"
+          },
+          {
+            "t": 1.186,
+            "event": "emulator_stopped",
+            "code": 0
+          },
+          {
+            "t": 2.27,
+            "event": "client_stopped",
+            "code": 0
+          }
+        ],
+        "readback": [
+          {
+            "text": "photons=0.25",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nCONFIG.PHOTONS: 0.250000\r\r\n}}\r\r\n"
+          }
+        ]
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "c91174801dae46748c664bde47050a5a",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-a/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--console",
+        "usb-jtag",
+        "--uart1-tcp",
+        "127.0.0.1:56501"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 2.27,
+      "executed": {
+        "flash_sha256": "468da06e99756ff7528cf75b257826d05f52bbe20beb302b94d9ff81ca09e1c1",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "d17b3f73876fd2d9519bd538f9117ae4e166adf58b61f04c9bc158fa0e196cdd",
+        "payload_crc32": "afa10880",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [
+          {
+            "hop": 40,
+            "text": "photons=0.25",
+            "expect": "applied"
+          }
+        ],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "41a8bbf4fc3b1e59bea257d271e565e03afc68ae97829e78a442c373e11c13e5",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "f0777b2c"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "c91174801dae46748c664bde47050a5a",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "1",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "309005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        },
+        "client_commands": [
+          {
+            "hop": 40,
+            "text": "photons=0.25",
+            "rejected": false,
+            "first_effect_generation": 41,
+            "show_state_hex": "534253530100000003010000803e00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001016e177ddf"
+          }
+        ],
+        "client_gates": [
+          {
+            "hop": "40",
+            "expect": "1"
+          }
+        ]
+      }
+    },
+    "client-b": {
+      "case": "client-b",
+      "purpose": "ctl-b delivered by the existing client: secondary_photons=0.15 applied before hop 40.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "client_resolution": {
+        "name": "pio device monitor",
+        "declared_argv": [
+          "pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "executable": "/opt/homebrew/bin/pio",
+        "version": [
+          "PlatformIO Core, version 6.1.19"
+        ]
+      },
+      "client": {
+        "transport": "client",
+        "emulator_argv": [
+          "--chip",
+          "esp32s3",
+          "--firmware",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/flash-run.bin",
+          "--elf",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/firmware.elf",
+          "--psram-size",
+          "8M",
+          "--net",
+          "user",
+          "--batch-size",
+          "2000000",
+          "--timeout",
+          "600s",
+          "--console",
+          "usb-jtag",
+          "--uart1-tcp",
+          "127.0.0.1:56518"
+        ],
+        "client_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "client_full_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw",
+          "--project-dir",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/client-project",
+          "--port",
+          "/dev/ttys060"
+        ],
+        "pty": "/dev/ttys060",
+        "trace_port": 56518,
+        "emulator_exit": 0,
+        "client_exit": 0,
+        "terminal_string_observed_on": "uart1-tcp",
+        "bytes": {
+          "trace": 519158,
+          "device_to_client": 2139,
+          "client_to_device": 24,
+          "client_terminal": 2563
+        },
+        "typed": [
+          {
+            "hop": 40,
+            "text": "secondary_photons=0.15",
+            "expect": "applied",
+            "terminal_offset": 2520,
+            "ep1_out_offset": 2099
+          }
+        ],
+        "events": [
+          {
+            "t": 0.002,
+            "event": "emulator_started",
+            "pid": 51792
+          },
+          {
+            "t": 0.039,
+            "event": "trace_connected",
+            "port": 56518
+          },
+          {
+            "t": 0.042,
+            "event": "client_started",
+            "pid": 51793,
+            "argv": [
+              "/opt/homebrew/bin/pio",
+              "device",
+              "monitor",
+              "--baud",
+              "115200",
+              "--eol",
+              "LF",
+              "--raw",
+              "--project-dir",
+              "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/client-project",
+              "--port",
+              "/dev/ttys060"
+            ]
+          },
+          {
+            "t": 0.167,
+            "event": "client_port_open"
+          },
+          {
+            "t": 0.167,
+            "event": "ready_sent"
+          },
+          {
+            "t": 0.494,
+            "event": "gate",
+            "hop": 40
+          },
+          {
+            "t": 0.494,
+            "event": "typed",
+            "hop": 40,
+            "text": "secondary_photons=0.15"
+          },
+          {
+            "t": 1.173,
+            "event": "terminal_string"
+          },
+          {
+            "t": 1.177,
+            "event": "emulator_stopped",
+            "code": 0
+          },
+          {
+            "t": 2.267,
+            "event": "client_stopped",
+            "code": 0
+          }
+        ],
+        "readback": [
+          {
+            "text": "secondary_photons=0.15",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_PHOTONS: 0.150000\r\r\n}}\r\r\n"
+          }
+        ]
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "e12df9e15a014a51bf3150d0605601a2",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-b/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--console",
+        "usb-jtag",
+        "--uart1-tcp",
+        "127.0.0.1:56518"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 2.27,
+      "executed": {
+        "flash_sha256": "7bd51fa00a64e87effc62ddec90a7a262bc0a2885289ee270e31808cdc9da671",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "c52524ab8a8c3088a469e52980f28bbbcc9db0e701b75043cf7b6879616a3146",
+        "payload_crc32": "38ddabcb",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [
+          {
+            "hop": 40,
+            "text": "secondary_photons=0.15",
+            "expect": "applied"
+          }
+        ],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "c30f4d59b1de9240a63afd73ac1c78f07e203da17aa3b07801509319d59d3140",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "cdbf1546"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "e12df9e15a014a51bf3150d0605601a2",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "1",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "309005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        },
+        "client_commands": [
+          {
+            "hop": 40,
+            "text": "secondary_photons=0.15",
+            "rejected": false,
+            "first_effect_generation": 41,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112019a99193e00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f210200010188c72766"
+          }
+        ],
+        "client_gates": [
+          {
+            "hop": "40",
+            "expect": "1"
+          }
+        ]
+      }
+    },
+    "client-reject": {
+      "case": "client-reject",
+      "purpose": "reject delivered by the existing client: photons=not-a-number before hop 30 is rejected by the production parser, the client sees the rejection and neither output changes.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "client_resolution": {
+        "name": "pio device monitor",
+        "declared_argv": [
+          "pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "executable": "/opt/homebrew/bin/pio",
+        "version": [
+          "PlatformIO Core, version 6.1.19"
+        ]
+      },
+      "client": {
+        "transport": "client",
+        "emulator_argv": [
+          "--chip",
+          "esp32s3",
+          "--firmware",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/flash-run.bin",
+          "--elf",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/firmware.elf",
+          "--psram-size",
+          "8M",
+          "--net",
+          "user",
+          "--batch-size",
+          "2000000",
+          "--timeout",
+          "600s",
+          "--console",
+          "usb-jtag",
+          "--uart1-tcp",
+          "127.0.0.1:56530"
+        ],
+        "client_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "client_full_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw",
+          "--project-dir",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/client-project",
+          "--port",
+          "/dev/ttys043"
+        ],
+        "pty": "/dev/ttys043",
+        "trace_port": 56530,
+        "emulator_exit": 0,
+        "client_exit": 0,
+        "terminal_string_observed_on": "uart1-tcp",
+        "bytes": {
+          "trace": 519175,
+          "device_to_client": 2147,
+          "client_to_device": 22,
+          "client_terminal": 2571
+        },
+        "typed": [
+          {
+            "hop": 30,
+            "text": "photons=not-a-number",
+            "expect": "rejected",
+            "terminal_offset": 2520,
+            "ep1_out_offset": 2099
+          }
+        ],
+        "events": [
+          {
+            "t": 0.002,
+            "event": "emulator_started",
+            "pid": 51858
+          },
+          {
+            "t": 0.038,
+            "event": "trace_connected",
+            "port": 56530
+          },
+          {
+            "t": 0.042,
+            "event": "client_started",
+            "pid": 51859,
+            "argv": [
+              "/opt/homebrew/bin/pio",
+              "device",
+              "monitor",
+              "--baud",
+              "115200",
+              "--eol",
+              "LF",
+              "--raw",
+              "--project-dir",
+              "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/client-project",
+              "--port",
+              "/dev/ttys043"
+            ]
+          },
+          {
+            "t": 0.162,
+            "event": "client_port_open"
+          },
+          {
+            "t": 0.162,
+            "event": "ready_sent"
+          },
+          {
+            "t": 0.441,
+            "event": "gate",
+            "hop": 30
+          },
+          {
+            "t": 0.441,
+            "event": "typed",
+            "hop": 30,
+            "text": "photons=not-a-number"
+          },
+          {
+            "t": 1.18,
+            "event": "terminal_string"
+          },
+          {
+            "t": 1.183,
+            "event": "emulator_stopped",
+            "code": 0
+          },
+          {
+            "t": 2.272,
+            "event": "client_stopped",
+            "code": 0
+          }
+        ],
+        "readback": [
+          {
+            "text": "photons=not-a-number",
+            "expect": "rejected",
+            "reply": "sberr[[\r\r\nBad command: photons=not-a-number\r\r\n]]\r\r\n"
+          }
+        ]
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "98eccfdd262b43d5b0333c4050ba598b",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-reject/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--console",
+        "usb-jtag",
+        "--uart1-tcp",
+        "127.0.0.1:56530"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 2.27,
+      "executed": {
+        "flash_sha256": "e38222740f265261c2235a0e9ea86ade3bc14ceadb305bc589faed795084da88",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "72b15199ba62760e2e691309ffa1d88d23ae6f1d4ce1a3d8e291c8b27d773369",
+        "payload_crc32": "ca4a5582",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [
+          {
+            "hop": 30,
+            "text": "photons=not-a-number",
+            "expect": "rejected"
+          }
+        ],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "4ce0379c11ca54254cbbae157a1725d2f659c4526379eaae88622905074ab74c",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "e0b5b3b0"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "98eccfdd262b43d5b0333c4050ba598b",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "1",
+          "rejects": "1",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "309005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [
+          "photons"
+        ],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 128,
+          "B": 128
+        },
+        "client_commands": [
+          {
+            "hop": 30,
+            "text": "photons=not-a-number",
+            "rejected": true,
+            "first_effect_generation": 31,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22"
+          }
+        ],
+        "client_gates": [
+          {
+            "hop": "30",
+            "expect": "1"
+          }
+        ]
+      }
+    },
+    "client-comp-save": {
+      "case": "client-comp-save",
+      "purpose": "comp-save delivered by the existing client: the studio_ab composition before hop 0, then save_show before hop 64, into run-owned emulator flash.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "client_resolution": {
+        "name": "pio device monitor",
+        "declared_argv": [
+          "pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "executable": "/opt/homebrew/bin/pio",
+        "version": [
+          "PlatformIO Core, version 6.1.19"
+        ]
+      },
+      "client": {
+        "transport": "client",
+        "emulator_argv": [
+          "--chip",
+          "esp32s3",
+          "--firmware",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/flash-run.bin",
+          "--elf",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/firmware.elf",
+          "--psram-size",
+          "8M",
+          "--net",
+          "user",
+          "--batch-size",
+          "2000000",
+          "--timeout",
+          "600s",
+          "--save-state",
+          "--console",
+          "usb-jtag",
+          "--uart1-tcp",
+          "127.0.0.1:56548"
+        ],
+        "client_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw"
+        ],
+        "client_full_argv": [
+          "/opt/homebrew/bin/pio",
+          "device",
+          "monitor",
+          "--baud",
+          "115200",
+          "--eol",
+          "LF",
+          "--raw",
+          "--project-dir",
+          "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/client-project",
+          "--port",
+          "/dev/ttys043"
+        ],
+        "pty": "/dev/ttys043",
+        "trace_port": 56548,
+        "emulator_exit": 0,
+        "client_exit": 0,
+        "terminal_string_observed_on": "uart1-tcp",
+        "bytes": {
+          "trace": 524705,
+          "device_to_client": 3465,
+          "client_to_device": 263,
+          "client_terminal": 3960
+        },
+        "typed": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied",
+            "terminal_offset": 1988,
+            "ep1_out_offset": 1568
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=14",
+            "expect": "applied",
+            "terminal_offset": 2029,
+            "ep1_out_offset": 1606
+          },
+          {
+            "hop": 0,
+            "text": "palette_index=12",
+            "expect": "applied",
+            "terminal_offset": 2080,
+            "ep1_out_offset": 1654
+          },
+          {
+            "hop": 0,
+            "text": "secondary_palette_index=27",
+            "expect": "applied",
+            "terminal_offset": 2128,
+            "ep1_out_offset": 1699
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "expect": "applied",
+            "terminal_offset": 2188,
+            "ep1_out_offset": 1756
+          },
+          {
+            "hop": 0,
+            "text": "secondary_photons=0.55",
+            "expect": "applied",
+            "terminal_offset": 2228,
+            "ep1_out_offset": 1793
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "expect": "applied",
+            "terminal_offset": 2271,
+            "ep1_out_offset": 1833
+          },
+          {
+            "hop": 0,
+            "text": "secondary_chroma=0.80",
+            "expect": "applied",
+            "terminal_offset": 2310,
+            "ep1_out_offset": 1869
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied",
+            "terminal_offset": 2352,
+            "ep1_out_offset": 1908
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=true",
+            "expect": "applied",
+            "terminal_offset": 2388,
+            "ep1_out_offset": 1941
+          },
+          {
+            "hop": 0,
+            "text": "edge_mode=analogous",
+            "expect": "applied",
+            "terminal_offset": 2637,
+            "ep1_out_offset": 2179
+          },
+          {
+            "hop": 0,
+            "text": "edge_strength=0.60",
+            "expect": "applied",
+            "terminal_offset": 2890,
+            "ep1_out_offset": 2421
+          },
+          {
+            "hop": 0,
+            "text": "edge_spread=30",
+            "expect": "applied",
+            "terminal_offset": 3143,
+            "ep1_out_offset": 2663
+          },
+          {
+            "hop": 64,
+            "text": "save_show",
+            "expect": "applied",
+            "terminal_offset": 3928,
+            "ep1_out_offset": 3436
+          }
+        ],
+        "events": [
+          {
+            "t": 0.002,
+            "event": "emulator_started",
+            "pid": 52031
+          },
+          {
+            "t": 0.039,
+            "event": "trace_connected",
+            "port": 56548
+          },
+          {
+            "t": 0.042,
+            "event": "client_started",
+            "pid": 52032,
+            "argv": [
+              "/opt/homebrew/bin/pio",
+              "device",
+              "monitor",
+              "--baud",
+              "115200",
+              "--eol",
+              "LF",
+              "--raw",
+              "--project-dir",
+              "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/client-project",
+              "--port",
+              "/dev/ttys043"
+            ]
+          },
+          {
+            "t": 0.16,
+            "event": "client_port_open"
+          },
+          {
+            "t": 0.16,
+            "event": "ready_sent"
+          },
+          {
+            "t": 0.294,
+            "event": "gate",
+            "hop": 0
+          },
+          {
+            "t": 0.294,
+            "event": "typed",
+            "hop": 0,
+            "text": "set_mode=32"
+          },
+          {
+            "t": 0.295,
+            "event": "typed",
+            "hop": 0,
+            "text": "secondary_mode=14"
+          },
+          {
+            "t": 0.297,
+            "event": "typed",
+            "hop": 0,
+            "text": "palette_index=12"
+          },
+          {
+            "t": 0.298,
+            "event": "typed",
+            "hop": 0,
+            "text": "secondary_palette_index=27"
+          },
+          {
+            "t": 0.3,
+            "event": "typed",
+            "hop": 0,
+            "text": "photons=0.70"
+          },
+          {
+            "t": 0.301,
+            "event": "typed",
+            "hop": 0,
+            "text": "secondary_photons=0.55"
+          },
+          {
+            "t": 0.302,
+            "event": "typed",
+            "hop": 0,
+            "text": "chroma=0.35"
+          },
+          {
+            "t": 0.303,
+            "event": "typed",
+            "hop": 0,
+            "text": "secondary_chroma=0.80"
+          },
+          {
+            "t": 0.305,
+            "event": "typed",
+            "hop": 0,
+            "text": "secondary_enabled=true"
+          },
+          {
+            "t": 0.306,
+            "event": "typed",
+            "hop": 0,
+            "text": "edge_enabled=true"
+          },
+          {
+            "t": 0.308,
+            "event": "typed",
+            "hop": 0,
+            "text": "edge_mode=analogous"
+          },
+          {
+            "t": 0.309,
+            "event": "typed",
+            "hop": 0,
+            "text": "edge_strength=0.60"
+          },
+          {
+            "t": 0.311,
+            "event": "typed",
+            "hop": 0,
+            "text": "edge_spread=30"
+          },
+          {
+            "t": 0.748,
+            "event": "gate",
+            "hop": 64
+          },
+          {
+            "t": 0.748,
+            "event": "typed",
+            "hop": 64,
+            "text": "save_show"
+          },
+          {
+            "t": 1.422,
+            "event": "terminal_string"
+          },
+          {
+            "t": 1.43,
+            "event": "emulator_stopped",
+            "code": 0
+          },
+          {
+            "t": 2.512,
+            "event": "client_stopped",
+            "code": 0
+          }
+        ],
+        "readback": [
+          {
+            "text": "set_mode=32",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nCONFIG.LIGHTSHOW_MODE: 32\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "secondary_mode=14",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_MODE: 14 (SPECTRUM RIVER)\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "palette_index=12",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nPALETTE: 12 (es_landscape_64_gp)\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "secondary_palette_index=27",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_PALETTE_INDEX: 27 (Pink_Purple_gp)\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "photons=0.70",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nCONFIG.PHOTONS: 0.700000\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "secondary_photons=0.55",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_PHOTONS: 0.550000\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "chroma=0.35",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nCONFIG.CHROMA: 0.350000\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "secondary_chroma=0.80",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_CHROMA: 0.800000\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "secondary_enabled=true",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSECONDARY_ENABLED: 1\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "edge_enabled=true",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nEDGE_ENABLED: on\r\r\nEDGE_MODE: split\r\r\nEDGE_STRENGTH: 0.650\r\r\nEDGE_SPREAD: 33\r\r\nEDGE_ROTATION: oklab\r\r\nEDGE_SPATIAL: masked\r\r\nEDGE_DUAL: split\r\r\nEDGE_EFFECTIVE_SECONDARY: blocked:vocab_cold\r\r\nEDGE_EFFECTIVE_PRIMARY: blocked:vocab_cold\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "edge_mode=analogous",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nEDGE_ENABLED: on\r\r\nEDGE_MODE: analogous\r\r\nEDGE_STRENGTH: 0.650\r\r\nEDGE_SPREAD: 33\r\r\nEDGE_ROTATION: oklab\r\r\nEDGE_SPATIAL: masked\r\r\nEDGE_DUAL: split\r\r\nEDGE_EFFECTIVE_SECONDARY: blocked:vocab_cold\r\r\nEDGE_EFFECTIVE_PRIMARY: blocked:vocab_cold\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "edge_strength=0.60",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nEDGE_ENABLED: on\r\r\nEDGE_MODE: analogous\r\r\nEDGE_STRENGTH: 0.600\r\r\nEDGE_SPREAD: 33\r\r\nEDGE_ROTATION: oklab\r\r\nEDGE_SPATIAL: masked\r\r\nEDGE_DUAL: split\r\r\nEDGE_EFFECTIVE_SECONDARY: blocked:vocab_cold\r\r\nEDGE_EFFECTIVE_PRIMARY: blocked:vocab_cold\r\r\n}}\r\r\n"
+          },
+          {
+            "text": "edge_spread=30",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nEDGE_ENABLED: on\r\r\nEDGE_MODE: analogous\r\r\nEDGE_STRENGTH: 0.600\r\r\nEDGE_SPREAD: 30\r\r\nEDGE_ROTATION: oklab\r\r\nEDGE_SPATIAL: masked\r\r\nEDGE_DUAL: split\r\r\nEDGE_EFFECTIVE_SECONDARY: blocked:vocab_cold\r\r\nEDGE_EFFECTIVE_PRIMARY: blocked:vocab_cold\r\r\n}}\r\r\n[AP] SSL=120 DC=0 max_raw=32767 follower=8252 peak_scaled=2.572 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=6553 rms_raw=0.0000 pky=0.00 dim=0 cal_source=default_invalid cal_valid=0 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=4300 raw_i16_rms=2706.9 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.000 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=3\r\r\n"
+          },
+          {
+            "text": "save_show",
+            "expect": "applied",
+            "reply": "sbr{{\r\r\nSHOW_STATE_SAVED\r\r\n}}\r\r\n"
+          }
+        ]
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "c27f021ba6d249759347fc8b8b8ac6e6",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--save-state",
+        "--console",
+        "usb-jtag",
+        "--uart1-tcp",
+        "127.0.0.1:56548"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 2.51,
+      "executed": {
+        "flash_sha256": "83215e930eb2aeaa825d2214ed62c1916d3568c293b9ffdbb3147d7d72dc8e2b",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "20c37eb62c42b395b7e56a032e2d6167b969e9ac737f3e952ae75d9092559ca3",
+        "payload_crc32": "aad26de5",
+        "input_littlefs_sha256": "e87ff9875359402d0782be2d0ccc6a9bcc6d7bb48d01a6f233c004e481cdf022",
+        "input_flash_from": "blank",
+        "image_patched": false,
+        "output_littlefs_sha256": "82669435d1e9835575c2395b6b329e88d2a1a18b8edd11eef7c937495d2c18e6",
+        "littlefs_changed": true
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=14",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "palette_index=12",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_palette_index=27",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_photons=0.55",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_chroma=0.80",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=true",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_mode=analogous",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_strength=0.60",
+            "expect": "applied"
+          },
+          {
+            "hop": 0,
+            "text": "edge_spread=30",
+            "expect": "applied"
+          },
+          {
+            "hop": 64,
+            "text": "save_show",
+            "expect": "applied"
+          }
+        ],
+        "flash": {
+          "from": "blank",
+          "recovery": false
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/flash-run.bin",
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "529bc2c971c1f26177c6fc4e596ba9c23159e2332503d51a0385a437bf9aaddc",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "964fc6e5"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "c27f021ba6d249759347fc8b8b8ac6e6",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "14",
+          "rejects": "0",
+          "saves": "2",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "350023",
+          "pre_audio_shows": "113"
+        },
+        "saves": [
+          {
+            "kind": "show",
+            "ok": "1",
+            "hop": "64"
+          },
+          {
+            "kind": "config",
+            "ok": "1",
+            "hop": "64"
+          }
+        ],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22",
+        "nonzero_frames": {
+          "A": 127,
+          "B": 128
+        },
+        "client_commands": [
+          {
+            "hop": 0,
+            "text": "set_mode=32",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_mode=14",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f00000000000000010000000028010e010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f210200010121d44480"
+          },
+          {
+            "hop": 0,
+            "text": "palette_index=12",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f0000000000000001000000000c010e010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f210200010115dcb93a"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_palette_index=27",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003010000803f00000000cdcc4c3d0000803f0000803f0000000000000001000000000c010e010000803f00000000cdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f2102000101f45d0a80"
+          },
+          {
+            "hop": 0,
+            "text": "photons=0.70",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f00000000cdcc4c3d0000803f0000803f0000000000000001000000000c010e010000803f00000000cdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f210200010189717364"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_photons=0.55",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f00000000cdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3f00000000cdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f2102000101d3f3416e"
+          },
+          {
+            "hop": 0,
+            "text": "chroma=0.35",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3f00000000cdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f210200010138041e4a"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_chroma=0.80",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f2102000101657ad904"
+          },
+          {
+            "hop": 0,
+            "text": "secondary_enabled=true",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f2102000101657ad904"
+          },
+          {
+            "hop": 0,
+            "text": "edge_enabled=true",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101036666263f2102000101657ad904"
+          },
+          {
+            "hop": 0,
+            "text": "edge_mode=analogous",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101016666263f210200010158aa2c00"
+          },
+          {
+            "hop": 0,
+            "text": "edge_strength=0.60",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101019a99193f21020001018b498e08"
+          },
+          {
+            "hop": 0,
+            "text": "edge_spread=30",
+            "rejected": false,
+            "first_effect_generation": 1,
+            "show_state_hex": "534253530100000003013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101019a99193f1e02000101dc66ff2b"
+          },
+          {
+            "hop": 64,
+            "text": "save_show",
+            "rejected": false,
+            "first_effect_generation": 65,
+            "show_state_hex": "534253530100000020013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101019a99193f1e020001011e8485ee"
+          }
+        ],
+        "client_gates": [
+          {
+            "hop": "0",
+            "expect": "13"
+          },
+          {
+            "hop": "64",
+            "expect": "1"
+          }
+        ]
+      }
+    },
+    "client-comp-recover": {
+      "case": "client-comp-recover",
+      "purpose": "Fresh process from client-comp-save's LittleFS: recovery issues no command (scheduled or client), reapplication or save.",
+      "dir": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-recover",
+      "pcm": {
+        "id": "smoke",
+        "kind": "c_array_inc",
+        "qualification": "synthetic_diagnostic",
+        "origin": "R2 smoke PCM (128 hops at 12800 Hz). Its stated source, tools/pcm1808/fixtures/guarded/09_reference_music_excerpt.wav, is declared SYNTHETIC_DETERMINISTIC_NOT_COMMERCIAL by P3_LINE_FIXTURE_MANIFEST.json, so this is a synthetic diagnostic, not a qualified real-music passage.",
+        "source": "SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_pcm.inc",
+        "samples": 12288,
+        "sha256": "cdaddc0bfd3f3bbe5796ce58f8de4f59d30bb2dcc5c4b709d93db8c2f7a3a4e4"
+      },
+      "status": "PASS",
+      "reasons": [],
+      "run_id": "70c6dab82a7c4b8e90f8a0741ea20985",
+      "argv": [
+        "--chip",
+        "esp32s3",
+        "--firmware",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-recover/flash-run.bin",
+        "--elf",
+        "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-recover/firmware.elf",
+        "--psram-size",
+        "8M",
+        "--net",
+        "user",
+        "--console",
+        "uart0",
+        "--batch-size",
+        "2000000",
+        "--timeout",
+        "600s",
+        "--exit-on",
+        "[RTRACE-END]"
+      ],
+      "exit_code": 0,
+      "exit_on_found": true,
+      "wall_seconds": 1.41,
+      "executed": {
+        "flash_sha256": "014cb3416a680b4f384e1ccfb6b7cb9be83d1f4735b2d4255302d6e9de1640e9",
+        "app_region_matches_build": true,
+        "app_sha256": "91fde978d25dfed9e15c2aa15a3f06ce853dd6143f4df4f9406026724cc6f087",
+        "scenario_blob_sha256": "149e60adb8d07d7f1de7acbd8459b4860054c39d977d13c2588c783e6979911c",
+        "payload_crc32": "1d5bdfb1",
+        "input_littlefs_sha256": "82669435d1e9835575c2395b6b329e88d2a1a18b8edd11eef7c937495d2c18e6",
+        "input_flash_from": "client-comp-save",
+        "image_patched": false
+      },
+      "requested": {
+        "real_samples": 12288,
+        "tail_hops": 0,
+        "total_hops": 128,
+        "capture": {
+          "start_hop": 0,
+          "end_hop": 128,
+          "every": 1,
+          "frames": 128
+        },
+        "epoch": {
+          "policy": "declared",
+          "us": 1000000
+        },
+        "commands": [],
+        "client_commands": [],
+        "flash": {
+          "from": "client-comp-save",
+          "recovery": true
+        },
+        "stall_ms": 20000
+      },
+      "flash_after": null,
+      "observed": {
+        "frames": 128,
+        "payload_sha256": "529bc2c971c1f26177c6fc4e596ba9c23159e2332503d51a0385a437bf9aaddc",
+        "header": {
+          "frames": "128",
+          "every": "1",
+          "px": "160",
+          "fmt": "rgb16hex",
+          "bpp": "16",
+          "edges": "2",
+          "crc32": "964fc6e5"
+        },
+        "end": {
+          "reason": "eof",
+          "where": "poll",
+          "run": "70c6dab82a7c4b8e90f8a0741ea20985",
+          "admitted": "12288",
+          "processed": "12288",
+          "staged_hops": "128",
+          "total_hops": "128",
+          "published": "128",
+          "last_generation": "128",
+          "consumed": "128",
+          "shown": "128",
+          "last_shown": "128",
+          "pre_audio_shows": "113",
+          "captured": "128",
+          "commands": "0",
+          "host_commands": "0",
+          "rejects": "0",
+          "saves": "0",
+          "rng_draws": "0",
+          "unstaged_admits": "0",
+          "publications_without_hop": "0",
+          "app_us": "1960000"
+        },
+        "epoch": {
+          "policy": "declared",
+          "epoch_us": "1000000",
+          "boot_us": "319005",
+          "pre_audio_shows": "113"
+        },
+        "saves": [],
+        "rejects": [],
+        "power_limits": [],
+        "boot_show_state": "534253530100000020013333333f3333b33ecdcc4c3d0000803f0000803f0000000000000001000000000c010e01cdcc0c3fcdcc4c3fcdcc4c3d0000803f0000803f0000003f00000001000000001b0101019a99193f1e020001011e8485ee",
+        "nonzero_frames": {
+          "A": 127,
+          "B": 128
+        }
+      }
+    }
+  },
+  "comparisons": [
+    {
+      "id": "repeat-smoke",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW02",
+      "label": "fresh repeat, strict equivalence",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "time-zero-tail",
+      "kind": "case",
+      "a": "time-zero-tail",
+      "b": null,
+      "criterion": "SW03",
+      "label": "zero epoch hop-end time and declared zero tail",
+      "status": "PASS",
+      "detail": "accepted: end=eof admitted=12288 processed=13056 published=136 shown=136 captured=136; epoch zero 0 us; first captured hop app_us=7500 (processed 96)"
+    },
+    {
+      "id": "stall",
+      "kind": "case",
+      "a": "stall-probe",
+      "b": null,
+      "criterion": "SW03",
+      "label": "stalled run ends as a reported failure",
+      "status": "PASS",
+      "detail": "accepted: end=stall admitted=0 processed=0 published=0 shown=0 captured=0; epoch None None us; first captured hop app_us=None (processed None)"
+    },
+    {
+      "id": "repeat-time",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "smoke-b",
+      "criterion": "SW03",
+      "label": "identical declared-epoch progression",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-a",
+      "criterion": "SW05",
+      "label": "intended A-only photons change (nonbinding limit)",
+      "status": "PASS",
+      "detail": "edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255]"
+    },
+    {
+      "id": "iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "ctl-b",
+      "criterion": "SW05",
+      "label": "intended B-only photons change (nonbinding limit)",
+      "status": "PASS",
+      "detail": "edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255]"
+    },
+    {
+      "id": "limit-coupling",
+      "kind": "limit_coupling",
+      "a": "limit-base",
+      "b": "limit-a",
+      "criterion": "SW05",
+      "label": "binding shared FastLED power limit",
+      "status": "PASS",
+      "detail": "FastLED power limit installed=True; base frames limited=128; untouched edge native frames differing=0; shared submission scale changed in 85 frames after the A-only command (before: 0). The limit is one scale over every registered controller, so an A-only change moves the other edge's emitted brightness."
+    },
+    {
+      "id": "reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "reject",
+      "criterion": "SW06",
+      "label": "rejected input leaves both outputs unchanged",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "recovery-state",
+      "kind": "recovery_state",
+      "a": "comp-save",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "every serialized K1ShowState field recovered before any intervention",
+      "status": "PASS",
+      "detail": "applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record"
+    },
+    {
+      "id": "recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "comp-recover",
+      "criterion": "SW06",
+      "label": "recovered composition output == equivalent reference",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 529bc2c971c1/529bc2c971c1"
+    },
+    {
+      "id": "fallback-missing-show",
+      "kind": "fallback_state",
+      "a": "cfg-save",
+      "b": "cfg-recover",
+      "criterion": "SW06",
+      "label": "missing show-state file follows the implementation fallback",
+      "status": "PASS",
+      "detail": "config saved=True, show file saved=False; recovered == implementation fallback (primary from saved CONFIG, palettes from the boot palette lock, secondary/edge compiled defaults): True"
+    },
+    {
+      "id": "repeat-music",
+      "kind": "equal",
+      "a": "music-a",
+      "b": "music-b",
+      "criterion": "SW08",
+      "label": "real-music passage repeats exactly",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=1334/1334 sha 44c05db3c91a/44c05db3c91a"
+    },
+    {
+      "id": "startup-quiet-return",
+      "kind": "startup_quiet_return",
+      "a": "startup-sqr",
+      "b": null,
+      "criterion": "SW08",
+      "label": "normal startup, active music, declared zero section, return",
+      "status": "PASS",
+      "detail": "{'startup_traversed': True, 'A_dark_below_fade_gate': True, 'A_lit_after_gate': True, 'B_lit_from_first_hop': True, 'both_dark_before_return': True, 'both_lit_on_first_return_hop': True}; startup frames before audio=113; first lit A hop=88 at app 1013507 us; zero section from hop 934 dark from hop 976; first return frame hop 1334"
+    },
+    {
+      "id": "music-tempo-lane",
+      "kind": "tempo_lane",
+      "a": "music-a",
+      "b": null,
+      "criterion": "SW08",
+      "label": "sustained beat response on real music: existing production tempo-lane rule",
+      "status": "PASS",
+      "classification": "PASS_timing_but_weak_lock",
+      "detail": "k1_av_layer_classifier: PASS_timing_but_weak_lock (near-target but no locked-near rows); median bpm 127.0, near-target 1334/1334, locked-near 0, lock_frac 0.00, max_conf 0.664, beat ticks 0, onsets 580"
+    },
+    {
+      "id": "music-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "music-a",
+      "b": null,
+      "criterion": "SW09",
+      "label": "tempo/onset/beat meaning reaches the render thread at the same generation",
+      "status": "PASS",
+      "detail": "1334 frames: producer meaning == render-thread meaning for the same generation on 1334/1334 (first mismatch []); onset/beat sequence monotone=True; onset_seq 559->1139, beat_seq 0->0"
+    },
+    {
+      "id": "startup-semantic-continuity",
+      "kind": "semantic_continuity",
+      "a": "startup-sqr",
+      "b": null,
+      "criterion": "SW09",
+      "label": "meaning continuity across startup, zero section and return",
+      "status": "PASS",
+      "detail": "1067 frames: producer meaning == render-thread meaning for the same generation on 1067/1067 (first mismatch []); onset/beat sequence monotone=True; onset_seq 0->635, beat_seq 0->0"
+    },
+    {
+      "id": "client-a-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-a",
+      "b": "client-a",
+      "criterion": "SW13",
+      "label": "client-delivered A change == the same change scheduled at the same hop",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 41a8bbf4fc3b/41a8bbf4fc3b"
+    },
+    {
+      "id": "client-iso-a",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-a",
+      "criterion": "SW13",
+      "label": "client A-only intervention changes only edge A from hop 40 (nonbinding limit)",
+      "status": "PASS",
+      "detail": "edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255]"
+    },
+    {
+      "id": "client-b-matches-scheduled",
+      "kind": "equal",
+      "a": "ctl-b",
+      "b": "client-b",
+      "criterion": "SW13",
+      "label": "client-delivered B change == the same change scheduled at the same hop",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha c30f4d59b1de/c30f4d59b1de"
+    },
+    {
+      "id": "client-iso-b",
+      "kind": "isolation",
+      "a": "smoke-a",
+      "b": "client-b",
+      "criterion": "SW13",
+      "label": "client B-only intervention changes only edge B from hop 40 (nonbinding limit)",
+      "status": "PASS",
+      "detail": "edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255]"
+    },
+    {
+      "id": "client-reject-unchanged",
+      "kind": "equal",
+      "a": "smoke-a",
+      "b": "client-reject",
+      "criterion": "SW13",
+      "label": "client-delivered rejected input leaves both outputs unchanged",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "client-recovery-state",
+      "kind": "recovery_state",
+      "a": "client-comp-save",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "client-applied composition: every serialized K1ShowState field recovered with zero commands",
+      "status": "PASS",
+      "detail": "applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record"
+    },
+    {
+      "id": "client-recovery-output",
+      "kind": "equal",
+      "a": "comp-ref",
+      "b": "client-comp-recover",
+      "criterion": "SW13",
+      "label": "recovered client-applied composition output == equivalent reference",
+      "status": "PASS",
+      "detail": "deterministic payload+source metadata equal=True frames=128/128 sha 529bc2c971c1/529bc2c971c1"
+    }
+  ],
+  "planted": [
+    {
+      "name": "r2-malformed-counterexample",
+      "rejected": true,
+      "expected_reason": "header px",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "process exit code 1",
+        "emulator did not report the exit-on terminal string",
+        "header px='999' != 160",
+        "header bpp='8' != 16"
+      ]
+    },
+    {
+      "name": "missing-sidecar",
+      "rejected": true,
+      "expected_reason": "without a sidecar",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "frames without a sidecar: [0]"
+      ]
+    },
+    {
+      "name": "duplicate-sidecar",
+      "rejected": true,
+      "expected_reason": "duplicate sidecar",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: duplicate sidecar 0"
+      ]
+    },
+    {
+      "name": "missing-channel",
+      "rejected": true,
+      "expected_reason": "two edges",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: frame line has 5 fields, expected 6 (two edges)"
+      ]
+    },
+    {
+      "name": "corrupted-payload",
+      "rejected": true,
+      "expected_reason": "native crc",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "native crc 464b0a8f != header e0b5b3b0"
+      ]
+    },
+    {
+      "name": "wrong-invocation",
+      "rejected": true,
+      "expected_reason": "armed run=",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "armed run='9c59207ca29e44f199595e55f516f981' != '2c47f9bc8a924ef2aa6c1040c52000a0'",
+        "end run='9c59207ca29e44f199595e55f516f981' != '2c47f9bc8a924ef2aa6c1040c52000a0'"
+      ]
+    },
+    {
+      "name": "failed-process",
+      "rejected": true,
+      "expected_reason": "process exit code 1",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "process exit code 1"
+      ]
+    },
+    {
+      "name": "missing-terminal",
+      "rejected": true,
+      "expected_reason": "RTRACE-END count",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "RTRACE-END count 0 != 1"
+      ]
+    },
+    {
+      "name": "duplicate-header-key",
+      "rejected": true,
+      "expected_reason": "duplicate key px",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "decode: RTRACE-BEGIN: duplicate key px"
+      ]
+    },
+    {
+      "name": "historical-receipt-substituted",
+      "rejected": true,
+      "expected_reason": "armed run=",
+      "reason_matched": true,
+      "ok": true,
+      "reasons": [
+        "armed run='physical-rpl-004' != '9c59207ca29e44f199595e55f516f981'",
+        "end run='physical-rpl-004' != '9c59207ca29e44f199595e55f516f981'"
+      ]
+    }
+  ],
+  "criteria": [
+    {
+      "id": "SW01",
+      "status": "PASS",
+      "evidence": "22/22 runs accepted with firmware-observed run id, scenario CRC and counters; executed app region == built firmware.bin; image never patched"
+    },
+    {
+      "id": "SW02",
+      "status": "PASS",
+      "evidence": "repeat-smoke: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "SW03",
+      "status": "PASS",
+      "evidence": "time-zero-tail: PASS accepted: end=eof admitted=12288 processed=13056 published=136 shown=136 captured=136; epoch zero 0 us; first captured hop app_us=7500 (processed 96) | stall: PASS accepted: end=stall admitted=0 processed=0 published=0 shown=0 captured=0; epoch None None us; first captured hop app_us=None (processed None) | repeat-time: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca"
+    },
+    {
+      "id": "SW04",
+      "status": "PASS",
+      "evidence": "10/10 planted captures rejected for the stated reason through ec.accept; "
+    },
+    {
+      "id": "SW05",
+      "status": "PASS",
+      "evidence": "iso-a: PASS edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | iso-b: PASS edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | limit-coupling: PASS FastLED power limit installed=True; base frames limited=128; untouched edge native frames differing=0; shared submission scale changed in 85 frames after the A-only command (before: 0). The limit is one scale over every registered controller, so an A-only change moves the other edge's emitted brightness."
+    },
+    {
+      "id": "SW06",
+      "status": "PASS",
+      "evidence": "reject-unchanged: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca | recovery-state: PASS applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record | recovery-output: PASS deterministic payload+source metadata equal=True frames=128/128 sha 529bc2c971c1/529bc2c971c1 | fallback-missing-show: PASS config saved=True, show file saved=False; recovered == implementation fallback (primary from saved CONFIG, palettes from the boot palette lock, secondary/edge compiled defaults): True"
+    },
+    {
+      "id": "SW07",
+      "status": "FAIL",
+      "evidence": "pio run -e k1_main_rpl_im69d exit=0; forbidden flags=[]; fixture symbols=0; emu-only flags=['K1_EMU_FIXTURE', 'K1_EMU_SKIP_EMIT', 'K1_EMU_UART0', 'K1_RENDER_TRACE_V1']; positive control symbols=18; upload blocked=True; host tests FAIL (1 error in 2.45s; pio run -e k1_hardware exit=0; 8 git-history test file(s) excluded in this export (run in the checkout))"
+    },
+    {
+      "id": "SW08",
+      "status": "PASS",
+      "evidence": "repeat-music: PASS deterministic payload+source metadata equal=True frames=1334/1334 sha 44c05db3c91a/44c05db3c91a | startup-quiet-return: PASS {'startup_traversed': True, 'A_dark_below_fade_gate': True, 'A_lit_after_gate': True, 'B_lit_from_first_hop': True, 'both_dark_before_return': True, 'both_lit_on_first_return_hop': True}; startup frames before audio=113; first lit A hop=88 at app 1013507 us; zero section from hop 934 dark from hop 976; first return frame hop 1334 | music-tempo-lane: PASS k1_av_layer_classifier: PASS_timing_but_weak_lock (near-target but no locked-near rows); median bpm 127.0, near-target 1334/1334, locked-near 0, lock_frac 0.00, max_conf 0.664, beat ticks 0, onsets 580"
+    },
+    {
+      "id": "SW09",
+      "status": "PASS",
+      "evidence": "music-semantic-continuity: PASS 1334 frames: producer meaning == render-thread meaning for the same generation on 1334/1334 (first mismatch []); onset/beat sequence monotone=True; onset_seq 559->1139, beat_seq 0->0 | startup-semantic-continuity: PASS 1067 frames: producer meaning == render-thread meaning for the same generation on 1067/1067 (first mismatch []); onset/beat sequence monotone=True; onset_seq 0->635, beat_seq 0->0"
+    },
+    {
+      "id": "SW10",
+      "status": "PASS",
+      "evidence": "report.html from this invocation; {'identical_pair': True, 'planted_pixel': True, 'incompatible_rejected': True, 'self_contained': True, 'names_invocation': True}; html 15958302 bytes"
+    },
+    {
+      "id": "SW11",
+      "status": "FAIL",
+      "evidence": "invocation ran from a clean export of the committed candidate (no .git, no prior outputs, no emulator-workspace sources); tool via K1_ESP_EMU, hash-checked"
+    },
+    {
+      "id": "SW12",
+      "status": "NOT_APPLICABLE",
+      "evidence": "no learned-model runtime in the product ELF (no tflite/tensorflow/interpreter/esp_nn/MicroInterpreter symbols); model inference is not active on k1_main_rpl_im69d"
+    },
+    {
+      "id": "SW13",
+      "status": "PASS",
+      "evidence": "local client chain (existing client -> run-owned pty -> esp-emu USB-Serial/JTAG -> production parser), not physical USB; client cases [('client-a', 'PASS'), ('client-b', 'PASS'), ('client-reject', 'PASS'), ('client-comp-save', 'PASS')] client-a-matches-scheduled: PASS deterministic payload+source metadata equal=True frames=128/128 sha 41a8bbf4fc3b/41a8bbf4fc3b | client-iso-a: PASS edge A: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | client-b-matches-scheduled: PASS deterministic payload+source metadata equal=True frames=128/128 sha c30f4d59b1de/c30f4d59b1de | client-iso-b: PASS edge B: pre-command frames differing=0, changed frames=88 (first at hop 40), other-edge frames differing=0, limiter scales=[255] | client-reject-unchanged: PASS deterministic payload+source metadata equal=True frames=128/128 sha 4ce0379c11ca/4ce0379c11ca | client-recovery-state: PASS applied state before save == recovered boot state: True; differing fields=[]; show save ok=True; LittleFS changed=True; recovery commands=0 saves=0; requested composition fields applied before save: True []; 95-byte V1 record | client-recovery-output: PASS deterministic payload+source metadata equal=True frames=128/128 sha 529bc2c971c1/529bc2c971c1"
+    },
+    {
+      "id": "EX01",
+      "status": "DEFERRED_EXTERNAL",
+      "evidence": "physical parity, device/optical/AV/leave-state evidence: shelved by the Captain's R3 instruction; no hardware accessed"
+    },
+    {
+      "id": "EX02",
+      "status": "DEFERRED_EXTERNAL",
+      "evidence": "hosted CI/publication: no push authorised; no Linux-pinned esp-emu executable hash exists, so CI only builds k1_main_rpl_im69d and k1_main_rpl_emu"
+    }
+  ],
+  "historical_references": [
+    {
+      "id": "R2-continuation-r1-007-R0-a",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/continuation-r1-007/R0-a/uart.txt",
+      "profile": "B489 preparation on emulator, forced brightness/mode/current (R2)",
+      "role": "historical reference only",
+      "status": "decoded",
+      "pairs": 135,
+      "crc32": "0b550234",
+      "header_crc32": "0b550234",
+      "paired_native_sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f",
+      "matches_recorded": true
+    },
+    {
+      "id": "R2-physical-rpl-004",
+      "path": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-ESP-Emulator/_scratch/esp-emulator/physical-rpl-004/uart.txt",
+      "profile": "B489 preparation on Main RPL hardware (R2)",
+      "role": "historical reference only",
+      "status": "decoded",
+      "pairs": 135,
+      "crc32": "0b550234",
+      "header_crc32": "0b550234",
+      "paired_native_sha256": "ff8bad3cd736409b12818989ec1add0c46f861bdb988f0237e83a5365484529f",
+      "matches_recorded": true
+    }
+  ],
+  "deferred": [],
+  "report_checks": {
+    "status": "PASS",
+    "checks": {
+      "identical_pair": true,
+      "planted_pixel": true,
+      "incompatible_rejected": true,
+      "self_contained": true,
+      "names_invocation": true
+    },
+    "planted_first_difference": {
+      "hop": 64,
+      "generation": 65,
+      "edge": "A",
+      "pixel": 79,
+      "frame_pos_a": 64,
+      "frame_pos_b": 64,
+      "frame_index_a": 64,
+      "frame_index_b": 64,
+      "a": {
+        "r16": 6490,
+        "g16": 0,
+        "b16": 16824,
+        "wire": "0000195a41b8"
+      },
+      "b": {
+        "r16": 6490,
+        "g16": 1,
+        "b16": 16824,
+        "wire": "0001195a41b8"
+      }
+    },
+    "detail": "{'identical_pair': True, 'planted_pixel': True, 'incompatible_rejected': True, 'self_contained': True, 'names_invocation': True}; html 15958302 bytes"
+  }
+}

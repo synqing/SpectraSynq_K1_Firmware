@@ -1,0 +1,53 @@
+PRISM 849f1cc90d771c2b27b4e7a38bae883a0f6440cf dirty=[]
+[open] server pid=56191 port=62228
+GET /api/state -> HTTP 200
+POST /api/instrument/compile -> HTTP 200
+{
+ "showbundle_sha256": "cae4fbc1a5405dff9c5a9a418261ca6b01d52fef0dfbaa0d5b9707c615eda1e1",
+ "trace_sha256": "9491b071c92f7a82e639c295bf01a05e57d5f4376371a54d311c8e40c23328ce",
+ "stream_sha256": "651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1",
+ "mapping_coverage_sha256": "e6b57dd875c170a75f0174a83e60018ea8911461bf21af862b5e077d87e22301",
+ "compile_manifest_sha256": "919b0e4ac86c5962c7f914f04da8330e9ad332a26aab6d4b32d911e258866a44",
+ "hz": 120,
+ "duration_us": 223910023,
+ "frames": 26870,
+ "compiler": "spectrasynq.compiler.trinity-showbundle/0.4.0",
+ "compiler_commit": "849f1cc90d771c2b27b4e7a38bae883a0f6440cf",
+ "prism_tree_dirty": false
+}
+POST /api/instrument/profile -> HTTP 200
+{"status":200,"profile_sha256":"4847be0b3cccaaacac8e736a0080637859bbd04ae927f9a7c801093ed11313b7","changes":[{"path":"prim8.impact.transform.beat_amp_u16","before":48000,"after":12000}],"profile_path":"mapping/prim8_natural_v1_bar_accent.json"}
+GET /api/bundle -> HTTP 200
+POST /api/bundle -> HTTP 409
+POST /api/instrument/compile -> HTTP 200
+{
+ "showbundle_sha256": "90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b",
+ "trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde",
+ "stream_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+ "mapping_coverage_sha256": "291ba6eb35c082d83df99a421434f8f7c668bdd94b3f414fe4ef7a98341ec170",
+ "compile_manifest_sha256": "f5b0224026348cd93d14e434c7d7dd74bd2d7d984a6fc801613e3029d70f3339",
+ "hz": 120,
+ "duration_us": 223910023,
+ "frames": 26870,
+ "compiler": "spectrasynq.compiler.trinity-showbundle/0.4.0",
+ "compiler_commit": "849f1cc90d771c2b27b4e7a38bae883a0f6440cf",
+ "prism_tree_dirty": false
+}
+[open] server stopped (SIGTERM)
+[open] server log:
+[prism_minimal_editor] listening on 127.0.0.1:62228 (http://127.0.0.1:62228)
+[prism_minimal_editor] bundle: fixtures/compiled_from_trinity_v0.1.json
+[prism_minimal_editor] project: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/b_sectionless/loreen/composition.json
+[prism_minimal_editor] run: npm run prism:dev -- --project <composition.json> | --bundle <path> [--port 7777] [--host 127.0.0.1]
+[reopen] server pid=56570 port=62238
+GET /api/instrument/project -> HTTP 200
+{"status":200,"profile_id":"prim8_natural_v1_bar_accent","profile_sha256":"4847be0b3cccaaacac8e736a0080637859bbd04ae927f9a7c801093ed11313b7","verification":{"status":"VERIFIED","trace_sha256":"8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde"},"bundlePath":"/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/b_sectionless/loreen/out/post_edit/showbundle.json","bundle_is_compiled":true}
+POST /api/instrument/compile -> HTTP 200
+{"ok":true,"diffs":[],"compared":["showbundle_sha256","trace_sha256","stream_sha256","mapping_coverage_sha256","hz","duration_us","compile_manifest_sha256"]}
+[reopen] server stopped (SIGTERM)
+[reopen] server log:
+[prism_minimal_editor] listening on 127.0.0.1:62238 (http://127.0.0.1:62238)
+[prism_minimal_editor] bundle: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/b_sectionless/loreen/out/post_edit/showbundle.json
+[prism_minimal_editor] project: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/b_sectionless/loreen/composition.json
+[prism_minimal_editor] run: npm run prism:dev -- --project <composition.json> | --bundle <path> [--port 7777] [--host 127.0.0.1]
+wrote /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/b_sectionless/loreen/result.json

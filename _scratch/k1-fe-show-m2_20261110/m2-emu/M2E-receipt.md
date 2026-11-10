@@ -34,12 +34,12 @@ All paths are relative to `_scratch/k1-fe-show-m2_20261110/m2-emu/` unless absol
 
 | Gate | FE/B489 configuration, mode 32 | Main RPL configuration (proxy), mode 32 | Main RPL configuration (proxy), mode 18 |
 |---|---|---|---|
-| G1 prepared-stream repeatability | **PASS** | **PASS** | M18_G1 |
-| G2 live-input independence | **FAIL** (expected) | **FAIL** (expected) | M18_G2 |
-| G3 seek reconstruction | **FAIL** (expected) | **FAIL** (expected) | M18_G3 |
-| G4 M2 stream and reopened twin | **PASS** | **PASS** | M18_G4 |
+| G1 prepared-stream repeatability | **PASS** | **PASS** | **PASS** |
+| G2 live-input independence | **FAIL** (expected) | **FAIL** (expected) | **FAIL** (expected; 1,705–1,778/1,778) |
+| G3 seek reconstruction | **FAIL** (expected) | **FAIL** (expected) | **FAIL** (expected; 665–667/667) |
+| G4 M2 stream and reopened twin | **PASS** | **PASS** | **PASS** |
 | Run directory | `runs/fe-ed0aa984-m32-20261110T031959` | `runs/rplproxy-ed0aa984-m32-20261110T031959` | `runs/rplproxy-ed0aa984-m18-20261110T035112` |
-| gates.py exit code | 2 | 2 | M18_EXIT |
+| gates.py exit code | 2 | 2 | 2 |
 
 Earlier runs, kept as history:
 - `runs/ed0aa984-base-20261110T004215`: G1–G3 FE. Byte-identical to the FE row on all 7 shared cases.
@@ -148,7 +148,11 @@ Every result matched. G2 and G3 are real tests that went red on real behaviour; 
 
 ## Mode 18 (Main RPL resident primary), proxy
 
-M18_SECTION
+Run `runs/rplproxy-ed0aa984-m18-20261110T035112`, exit code 2 (filled in by the next lead on 10 Nov 16:25 AWST from that run's `gates.md` and `exit_code.txt`; the placeholder had been left at handover):
+- G1 PASS: 0/1778 per edge; 0/222 against the G3 continuous run.
+- G2 FAIL: passage vs zero 1778/1778, passage vs other music 1705/1778 (first hop 30), zero vs other 1778/1778, both edges.
+- G3 FAIL: 665/667 (continuous vs forward) and 667/667 (both backward pairs) differ after R, both edges; never agrees inside the window.
+- G4 PASS: 0/1778 per edge; `records=9599/9599 consumed=614400 auth_state=2`.
 
 ## Source identity
 

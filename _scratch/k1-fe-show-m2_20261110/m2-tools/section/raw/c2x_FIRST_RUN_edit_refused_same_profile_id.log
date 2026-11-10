@@ -1,0 +1,22 @@
+PRISM 849f1cc90d771c2b27b4e7a38bae883a0f6440cf dirty=[]
+[open] server pid=67276 127.0.0.1:62397
+POST /api/instrument/compile -> HTTP 200
+GET /api/instrument/sections -> HTTP 200
+POST /api/instrument/section -> HTTP 200
+POST /api/instrument/section -> HTTP 400
+POST /api/instrument/section -> HTTP 400
+POST /api/instrument/compile -> HTTP 200
+[open] server stopped (SIGTERM)
+[prism_minimal_editor] listening on 127.0.0.1:62397 (http://127.0.0.1:62397)
+[prism_minimal_editor] bundle: fixtures/compiled_from_trinity_v0.1.json
+[prism_minimal_editor] project: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/c_sectioned/loreen/composition.json
+[prism_minimal_editor] run: npm run prism:dev -- --project <composition.json> | --bundle <path> [--port 7777] [--host 127.0.0.1]
+[reopen] server pid=67748 127.0.0.1:62444
+GET /api/instrument/sections -> HTTP 200
+POST /api/instrument/compile -> HTTP 200
+[reopen] server stopped (SIGTERM)
+[prism_minimal_editor] listening on 127.0.0.1:62444 (http://127.0.0.1:62444)
+[prism_minimal_editor] bundle: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/c_sectioned/loreen/out/sectioned/showbundle.json
+[prism_minimal_editor] project: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/c_sectioned/loreen/composition.json
+[prism_minimal_editor] run: npm run prism:dev -- --project <composition.json> | --bundle <path> [--port 7777] [--host 127.0.0.1]
+wrote /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/section/raw/c2_section_e2e_result.json

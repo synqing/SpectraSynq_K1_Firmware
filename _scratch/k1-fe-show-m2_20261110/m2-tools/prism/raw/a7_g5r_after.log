@@ -1,0 +1,18 @@
+$ /usr/bin/git checkout --detach cc00556d1df2f863c6a0d914ef613886b050a408
+Previous HEAD position was 07eb822 feat: Trinity v0.3 compiler with contract adapter and prim8_natural_v1 (#2)
+HEAD is now at cc00556 fix: Trinity compiler CLI runs after macOS /tmp realpath
+exit 0
+$ /usr/bin/git rev-parse HEAD
+cc00556d1df2f863c6a0d914ef613886b050a408
+$ /usr/bin/git status
+HEAD detached at cc00556
+nothing to commit, working tree clean
+$ /usr/bin/git status --porcelain --ignored
+!! .tmp/
+$ /bin/ls -la .tmp
+total 48
+drwxr-xr-x   5 spectrasynq  staff   160 Aug 16 17:42 .
+drwxr-xr-x@ 26 spectrasynq  staff   832 Nov 10 16:29 ..
+-rw-r--r--@  1 spectrasynq  staff  5960 Aug 16 17:47 golden_trace_120hz_v0.2.jsonl
+-rw-r--r--@  1 spectrasynq  staff  5960 Aug 16 17:47 golden_trace_120hz_v0.3.jsonl
+-rw-r--r--@  1 spectrasynq  staff  5960 Aug 16 17:47 golden_trace_120hz.jsonl

@@ -1,0 +1,10 @@
+full_A/contract_14f207d.json schema PASS schema_sha 3d521f5d
+ version 1.0.0 bpm 126.985 127 tempo {'method': 'steady_run_slope', 'reliable': True, 'steady_interval_fraction': 0.8893709327548807, 'median_ibi_bpm': 125.00000000000267}
+ ts {'numerator': 4, 'denominator': 4, 'method': 'downbeat_spacing_mode', 'basis': 'steady_bars', 'support': 0.98, 'bars': 130, 'bars_voting': 100, 'reliable': True, 'denominator_assumed': True}
+ clamps [{'segment': 14, 'field': 'end', 'original': 223.92, 'clamped': 223.91002267573697, 'delta_sec': -0.009977324263019227}] seg_ok True
+ regions [(0.36, 6.0, 8, 5, '4 bars off the 4-beat metre or steady tempo'), (7.9, 30.58, 56, 27, '26 bars off the 4-beat metre or steady tempo'), (147.76, 149.64, 4, 2, '3 beats in bar')]
+excerpt_A/contract_14f207d.json schema PASS schema_sha 3d521f5d
+ version 1.0.0 bpm 127.175 127 tempo {'method': 'steady_run_slope', 'reliable': True, 'steady_interval_fraction': 0.6770833333333334, 'median_ibi_bpm': 136.36363636363637}
+ ts {'numerator': 4, 'denominator': 4, 'method': 'downbeat_spacing_mode', 'basis': 'steady_bars', 'support': 0.7777777777777778, 'bars': 38, 'bars_voting': 9, 'reliable': True, 'denominator_assumed': True}
+ clamps [{'segment': 4, 'field': 'end', 'original': 45.01, 'clamped': 45.0, 'delta_sec': -0.00999999999999801}] seg_ok True
+ regions [(0.36, 6.0, 8, 5, '4 bars off the 4-beat metre or steady tempo'), (7.9, 30.58, 56, 27, '26 bars off the 4-beat metre or steady tempo')]

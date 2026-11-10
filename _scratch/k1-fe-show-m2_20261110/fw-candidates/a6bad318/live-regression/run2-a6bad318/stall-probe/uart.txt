@@ -1,0 +1,27 @@
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x118c
+load:0x403c8700,len:0x4
+load:0x403c8704,len:0xc20
+load:0x403cb700,len:0x30e0
+entry 0x403c88b8
+E (77) esp_littlefs: ./managed_components/joltwallet__littlefs/src/littlefs/lfs.c:1381:error: Corrupted dir pair at {0x0, 0x1}
+
+E (78) esp_littlefs: mount failed,  (-84)
+E (78) esp_littlefs: Failed to initialize LittleFS
+EMU_FS_BEGIN PASS
+[    74][E][vfs_api.cpp:99] open(): /littlefs/CONFIG_IM69_40103.BIN does not exist, no permits for creation
+[    74][E][vfs_api.cpp:99] open(): /littlefs/SHOW_STATE_V1.BIN does not exist, no permits for creation
+[    74][E][vfs_api.cpp:99] open(): /littlefs/cal_profile_im69d.bin does not exist, no permits for creation
+[RTRACE] INIT PASS: 2000 frames capacity (160 px/frame, stride=6)
+[RTRACE] ARMED: 600 s, every 1 frames (cap 2000)
+EMU_FIXTURE_ARMED run=7dfd80b8ccfb4b7bb4b4372348fecaf2 source=blob valid=1 invalid=- rate=12800 hop=96 real_samples=12288 pad_samples=0 total_hops=128 capture=0..128 every=1 recovery=0 commands=0 client_commands=0 transport=scheduled payload_crc32=1d5bdfb1 stall_ms=1 clock=hop_end_us epoch=declared mode=lockstep rng=xorshift32:9e3779b9
+EMU_STATE photons=1.0000 secondary_photons=1.0000 secondary_mode=18 mode=3 max_current_ma=2500 boot_animation=1
+EMU_SS gen=0 when=boot hop=0 hex=534253530100000003010000803f00000000cdcc4c3d0000803f0000803f000000000000000100000000280112010000803f00000000cdcc4c3d0000803f0000803f0000003f0000000100000000280101036666263f21020001014b01de22
+EMU_RX_END records=0/0 queued=0 consumed=0 auth_state=0
+EMU_END reason=stall where=startup run=7dfd80b8ccfb4b7bb4b4372348fecaf2 admitted=0 processed=0 staged_hops=0 total_hops=128 published=0 last_generation=0 consumed=0 shown=0 last_shown=0 pre_audio_shows=1 captured=0 commands=0 host_commands=0 rejects=0 saves=0 rng_draws=0 unstaged_admits=0 publications_without_hop=0 app_us=85027
+[RTRACE-BEGIN frames=0 crc32=0]
+[RTRACE-END]

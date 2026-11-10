@@ -1,0 +1,32 @@
+== eaa44926 branches:
++ lane/k1-vj-ble-deck8
+  wip/im69d-p0-preserve-2026-08-06
+  remotes/origin/lane/k1-vj-ble-deck8
+  remotes/origin/wip/im69d-p0-preserve-2026-08-06
+   patch-id equivalent in a6bad318 history?
+== af253090 branches:
++ lane/k1-vj-ble-deck8
+  wip/im69d-p0-preserve-2026-08-06
+  remotes/origin/lane/k1-vj-ble-deck8
+  remotes/origin/wip/im69d-p0-preserve-2026-08-06
+   patch-id equivalent in a6bad318 history?
+== 96b5df3d branches:
+  lane/fix-dsr-claim
+  remotes/origin/lane/fix-dsr-claim
+   patch-id equivalent in a6bad318 history?
+== ec18241c branches:
+  lane/loud-norm-generalise
+   patch-id equivalent in a6bad318 history?
+== dead AGC floor chain present in a6bad318 i2s_audio.h?
+1173:    float dynamic_agc_floor_raw = float(min_silent_level_tracker);
+1174:    if (dynamic_agc_floor_raw < AGC_FLOOR_MIN_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MIN_CLAMP_RAW;
+1175:    if (dynamic_agc_floor_raw > AGC_FLOOR_MAX_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MAX_CLAMP_RAW;
+1176:    float dynamic_agc_floor_scaled = dynamic_agc_floor_raw * AGC_FLOOR_SCALING_FACTOR;
+1177:    if (dynamic_agc_floor_scaled < AGC_FLOOR_MIN_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MIN_CLAMP_SCALED;
+1178:    if (dynamic_agc_floor_scaled > AGC_FLOOR_MAX_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MAX_CLAMP_SCALED;
+1179:    // Silence detection: SSL-derived Schmitt (2026-07-10). dynamic_agc_floor_scaled above
+1187:    const float threshold_silence = ap_drive.silence_threshold.raw_peak_enter;
+1188:    const float threshold_silence_exit = ap_drive.silence_threshold.raw_peak_exit;
+1192:    float threshold_silence = SILENCE_ENTER_SSL_FRAC * ssl_f;        // enter-silence line (low)
+1193:    float threshold_silence_exit = SILENCE_EXIT_SSL_FRAC * ssl_f;    // exit-silence line (high)
+1292:    // *** silence boundary: enter -1 below threshold_silence; once silent, only leave ***

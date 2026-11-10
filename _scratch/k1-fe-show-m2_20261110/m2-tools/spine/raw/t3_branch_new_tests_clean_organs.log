@@ -1,0 +1,22 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: node --test tests/instrument_cli_authored.test.js
+# start: 2026-11-10T08:36:19Z
+✔ verify --project builds from the project's own mapping profile and matches its recorded hashes (242.796792ms)
+✔ verify --project writes only under --out, and two runs are byte-identical (260.561958ms)
+✔ build manifest records the compiler version the compiler reported (0.149375ms)
+✔ build-demo --project compiles the authored profile into --out and does not delete that folder (152.192625ms)
+✔ --out also redirects verify --fixture and the G5 project; both still pass their goldens (528.217208ms)
+✔ --out without a value is refused (32.338792ms)
+✔ a profile whose bytes do not match the recorded hash is refused (34.485542ms)
+✔ a profile that fails mapping_profile_v1 validation is refused (34.273416ms)
+✔ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (266.4565ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1705.7245
+# exit: 0
+# end: 2026-11-10T08:36:21Z

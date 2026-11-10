@@ -1,0 +1,150 @@
+{
+  "schema": "mapping_profile_v2",
+  "id": "prim8_natural_v2_chorus1_accent",
+  "version": "2.0.0-s.1",
+  "device_profile": "none",
+  "prim8": {
+    "pressure": {
+      "source": {
+        "type": "stem_feature_aggregate",
+        "feature": "rms",
+        "stems": [
+          "vocals",
+          "drums",
+          "bass",
+          "other"
+        ],
+        "reduce": "mean"
+      },
+      "transform": {
+        "type": "normalise_max_u16",
+        "silence_floor": 0.00001
+      },
+      "provenance": "MAPPED_REAL"
+    },
+    "impact": {
+      "source": {
+        "type": "rhythm_events"
+      },
+      "transform": {
+        "type": "downbeat_accent_u16",
+        "beat_amp_u16": 48000,
+        "downbeat_amp_u16": 65535,
+        "beat_pulse_us": 40000,
+        "downbeat_pulse_us": 60000
+      },
+      "provenance": "MAPPED_REAL"
+    },
+    "mass": {
+      "source": {
+        "type": "stem_feature_ratio",
+        "numerator": {
+          "stem": "bass",
+          "feature": "band_energy_low"
+        },
+        "denominator": {
+          "type": "stem_feature_aggregate",
+          "feature": "band_energy_low",
+          "stems": [
+            "vocals",
+            "drums",
+            "bass",
+            "other"
+          ],
+          "reduce": "sum"
+        }
+      },
+      "transform": {
+        "type": "ratio_u16",
+        "silence_floor": 0.00001
+      },
+      "provenance": "MAPPED_REAL"
+    },
+    "momentum": {
+      "source": {
+        "type": "stem_feature",
+        "stem": "drums",
+        "feature": "onset_strength"
+      },
+      "transform": {
+        "type": "normalise_max_u16",
+        "silence_floor": 0.00001,
+        "rolling_window_frames": 25
+      },
+      "provenance": "MAPPED_REAL",
+      "notes": "Rolling sum of drum onset_strength over 0.5s at 50 fps (25 frames). This is onset density, not drum RMS."
+    },
+    "heat": {
+      "source": {
+        "type": "constant",
+        "value_u16": 0
+      },
+      "transform": {
+        "type": "constant_u16",
+        "value_u16": 0
+      },
+      "provenance": "AUTHORED",
+      "notes": "Authored first-lane default. Not claimed sensor-neutral. No honest heat evidence in stem_features_v1."
+    },
+    "space": {
+      "source": {
+        "type": "constant",
+        "value_u16": 0
+      },
+      "transform": {
+        "type": "constant_u16",
+        "value_u16": 0
+      },
+      "provenance": "AUTHORED",
+      "notes": "Authored first-lane default. No spatial spread evidence in stem_features_v1."
+    },
+    "texture": {
+      "source": {
+        "type": "stem_feature",
+        "stem": "drums",
+        "feature": "onset_strength"
+      },
+      "transform": {
+        "type": "identity_01_to_u16"
+      },
+      "provenance": "MAPPED_REAL"
+    },
+    "gravity": {
+      "source": {
+        "type": "constant",
+        "value_u16": 0
+      },
+      "transform": {
+        "type": "constant_u16",
+        "value_u16": 0
+      },
+      "provenance": "AUTHORED",
+      "notes": "Authored first-lane default. No stereo L-R evidence in stem_features_v1."
+    }
+  },
+  "sections": [
+    {
+      "id": "chorus_1",
+      "note": "First chorus only: off-downbeat pulses quieter so impact marks the bar.",
+      "select": {
+        "segment_indices": [
+          4
+        ],
+        "label": "chorus"
+      },
+      "prim8": {
+        "impact": {
+          "transform": {
+            "beat_amp_u16": 20000
+          }
+        }
+      }
+    }
+  ],
+  "derived_from": {
+    "id": "prim8_natural_v1",
+    "version": "1.0.0",
+    "sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd"
+  },
+  "edit_note": "Create chorus_1 override (impact beat_amp 20000)."
+}

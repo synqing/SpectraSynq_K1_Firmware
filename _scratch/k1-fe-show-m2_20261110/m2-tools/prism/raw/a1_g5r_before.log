@@ -1,0 +1,20 @@
+$ date
+Tue Nov 10 16:26:14 AWST 2026
+$ cat .git/HEAD
+07eb8227f1bc4570351fc00459dfc5b5353e5a0d
+
+$ cat .git/objects/info/alternates
+/Users/spectrasynq/Workspace_Management/Software/PRISM.studio/.git/objects
+
+$ ls -la /Users/spectrasynq/Workspace_Management/Software/PRISM.studio
+ls: /Users/spectrasynq/Workspace_Management/Software/PRISM.studio: No such file or directory
+$ /usr/bin/git status
+error: unable to normalize alternate object path: /Users/spectrasynq/Workspace_Management/Software/PRISM.studio/.git/objects
+error: unable to normalize alternate object path: /Users/spectrasynq/Workspace_Management/Software/PRISM.studio/.git/objects
+error: unable to normalize alternate object path: /Users/spectrasynq/Workspace_Management/Software/PRISM.studio/.git/objects
+error: unable to normalize alternate object path: /Users/spectrasynq/Workspace_Management/Software/PRISM.studio/.git/objects
+fatal: bad object HEAD
+exit 128
+$ /usr/bin/git rev-parse HEAD
+07eb8227f1bc4570351fc00459dfc5b5353e5a0d
+exit 0

@@ -1,0 +1,58 @@
+21265e52625e5a8d29e69d661d5615fb35621487
+✔ section rule cases: base profile is the one the cases were written for (0.826208ms)
+✖ Spine validator gives the recorded verdict on every shared section case (0.771708ms)
+﹣ PRISM src/mapping_profile.js gives the same verdict as the Spine on every shared case (0.11525ms) # resolved PRISM /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio has no src/mapping_profile.js (compiler < 0.4.0)
+✖ build-demo refuses a mapping_profile_v2 project when the PRISM compiler ignores sections (255.654792ms)
+﹣ build-demo and verify --project accept a mapping_profile_v2 project; manifest and trace name the section (0.076916ms) # resolved PRISM /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio does not apply sections
+ℹ tests 5
+ℹ suites 0
+ℹ pass 1
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 701.813417
+
+✖ failing tests:
+
+test at tests/profile_rules_parity.test.js:53:1
+✖ Spine validator gives the recorded verdict on every shared section case (0.771708ms)
+  AssertionError [ERR_ASSERTION]: one section by index and label: schema must be mapping_profile_v1
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/profile_rules_parity.test.js:56:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/profile_rules_parity.test.js:110:1
+✖ build-demo refuses a mapping_profile_v2 project when the PRISM compiler ignores sections (255.654792ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /SECTIONS_NOT_APPLIED: .*full_1/. Input:
+  
+  'PROFILE_INVALID: schema must be mapping_profile_v1\n'
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/profile_rules_parity.test.js:118:14)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PROFILE_INVALID: schema must be mapping_profile_v1\n',
+    expected: /SECTIONS_NOT_APPLIED: .*full_1/,
+    operator: 'match',
+    diff: 'simple'
+  }

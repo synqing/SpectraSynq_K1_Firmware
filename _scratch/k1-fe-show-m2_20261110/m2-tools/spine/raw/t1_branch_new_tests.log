@@ -1,0 +1,46 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: node --test tests/instrument_cli_authored.test.js
+# start: 2026-11-10T08:34:48Z
+✔ verify --project builds from the project's own mapping profile and matches its recorded hashes (281.741ms)
+✔ verify --project writes only under --out, and two runs are byte-identical (275.80875ms)
+✔ build manifest records the compiler version the compiler reported (0.18025ms)
+✔ build-demo --project compiles the authored profile into --out and does not delete that folder (155.990667ms)
+✖ --out also redirects verify --fixture and the G5 project; both still pass their goldens (295.100375ms)
+✔ --out without a value is refused (34.418042ms)
+✔ a profile whose bytes do not match the recorded hash is refused (35.007708ms)
+✔ a profile that fails mapping_profile_v1 validation is refused (36.828625ms)
+✔ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (394.690125ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1718.980458
+
+✖ failing tests:
+
+test at tests/instrument_cli_authored.test.js:116:1
+✖ --out also redirects verify --fixture and the G5 project; both still pass their goldens (295.100375ms)
+  AssertionError [ERR_ASSERTION]: BUILD_MANIFEST_MISMATCH
+  
+  
+  2 !== 0
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+# exit: 1
+# end: 2026-11-10T08:34:50Z

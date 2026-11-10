@@ -1,0 +1,34 @@
+# refetch still fails: two remote-tracking refs point at objects that lived only in the dead alternate; fetch's connectivity check walks every ref. Remote still has both at the same SHAs (ls-remote), so drop the stale tracking refs and fetch them back.
+$ cat .git/packed-refs
+# pack-refs with: peeled fully-peeled sorted 
+4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa refs/remotes/origin/feature/led-async-effects
+526c73e4f75a822d6ed01374846a477538491380 refs/remotes/origin/feature/trinity-compile-v0-3
+07eb8227f1bc4570351fc00459dfc5b5353e5a0d refs/remotes/origin/main
+
+$ /usr/bin/git ls-remote origin refs/heads/feature/led-async-effects refs/heads/feature/trinity-compile-v0-3
+4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa	refs/heads/feature/led-async-effects
+526c73e4f75a822d6ed01374846a477538491380	refs/heads/feature/trinity-compile-v0-3
+$ /usr/bin/git update-ref -d refs/remotes/origin/feature/led-async-effects
+exit 0
+$ /usr/bin/git update-ref -d refs/remotes/origin/feature/trinity-compile-v0-3
+exit 0
+$ /usr/bin/git fetch origin
+From https://github.com/synqing/PRISM.studio
+ * [new branch]      feature/compiler-0.3.1-activity-aware -> origin/feature/compiler-0.3.1-activity-aware
+ * [new branch]      feature/compiler-cli-realpath -> origin/feature/compiler-cli-realpath
+ * [new branch]      feature/led-async-effects -> origin/feature/led-async-effects
+ * [new branch]      feature/one-instrument-product-workflow -> origin/feature/one-instrument-product-workflow
+ * [new branch]      feature/trinity-compile-v0-3 -> origin/feature/trinity-compile-v0-3
+   07eb822..cc00556  main       -> origin/main
+exit 0
+$ /usr/bin/git fsck --connectivity-only
+exit 0
+$ /usr/bin/git for-each-ref
+07eb8227f1bc4570351fc00459dfc5b5353e5a0d commit	refs/heads/main
+cc00556d1df2f863c6a0d914ef613886b050a408 commit	refs/remotes/origin/HEAD
+e293c1a12fa318d295b58e15c39baff46e3fe6df commit	refs/remotes/origin/feature/compiler-0.3.1-activity-aware
+3ae2588c0a0315786c61346a3fa6cc394b8350eb commit	refs/remotes/origin/feature/compiler-cli-realpath
+4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa commit	refs/remotes/origin/feature/led-async-effects
+f7e9b6bc3772c06350f98d314ea2142b57352d31 commit	refs/remotes/origin/feature/one-instrument-product-workflow
+526c73e4f75a822d6ed01374846a477538491380 commit	refs/remotes/origin/feature/trinity-compile-v0-3
+cc00556d1df2f863c6a0d914ef613886b050a408 commit	refs/remotes/origin/main

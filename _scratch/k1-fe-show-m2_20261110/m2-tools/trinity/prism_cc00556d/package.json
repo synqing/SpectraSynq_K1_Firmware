@@ -1,0 +1,30 @@
+{
+  "name": "spectrasynq-showbundle",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "replay": "node tools/showbundle_replay.js",
+    "parity": "node tools/parity_check.js",
+    "golden": "npm run golden:v0.1 && npm run golden:v0.2 && npm run golden:v0.3",
+    "golden:v0.1": "node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.1.json --hz 120 --out .tmp/golden_trace_120hz.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz.jsonl --expect fixtures/golden_trace_120hz.sha256",
+    "golden:v0.2": "node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.2.json --hz 120 --out .tmp/golden_trace_120hz_v0.2.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.2.jsonl --expect fixtures/golden_trace_120hz_v0.2.sha256",
+    "golden:v0.3": "node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.3.json --hz 120 --out .tmp/golden_trace_120hz_v0.3.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.3.jsonl --expect fixtures/golden_trace_120hz_v0.3.sha256",
+    "update-golden": "node tools/update_golden_hash.js --hz 120",
+    "compile:trinity": "node tools/trinity_compile_showbundle_v0_1.js",
+    "compile:trinity:v0.2": "node tools/trinity_compile_showbundle_v0_2.js",
+    "compile:trinity:v0.3": "node tools/trinity_compile_showbundle_v0_3.js",
+    "prism:dev": "node prism_minimal_editor/server.js",
+"k1:flash": "python3 tools/k1_flash.py",
+    "k1:reboot": "python3 tools/k1_reboot_download.py",
+    "k1:ota": "python3 tools/k1_ota_push.py",
+    "k1:cdc-stream": "node tools/intent_cdc_stream.js",
+    "k1:ct": "python3 tools/k1ct.py",
+    "k1:test": "python3 tools/k1_test_platform.py",
+    "k1:test:smoke": "python3 tools/k1_test_platform.py --phase smoke --json",
+    "k1:test:acceptance": "node tools/k1_acceptance_test.js",
+    "test:streaming": "node tools/test_live_streaming.js",
+    "test:e2e": "node tools/test_e2e_pipeline.js",
+    "test:all": "node tools/test_live_streaming.js && node tools/test_e2e_pipeline.js",
+    "check:paramtree": "node tools/paramtree_check.js"
+  }
+}

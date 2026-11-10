@@ -1,0 +1,93 @@
+=== 2026-11-10T08:50:03Z /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python run_cold.py excerpt A
+{
+  "view": "excerpt",
+  "label": "A",
+  "trinity_head": "144b29a1c88b550ebe5c1411988057dbf038dbfa",
+  "decode_matches_m2a": true,
+  "stages": {
+    "decode_s": 0.8,
+    "analyze_track_s": 77.484,
+    "features_export_s": 0.662,
+    "total_s": 78.946
+  },
+  "sha256": {
+    "audio/track.wav": "6d9dfae78bf87baf64720c07f637fb306990e79197230fd645a3708b0ebae751",
+    "analysis.json": "d35bd73e1c993bf663592d4cc7bcb248cd399df14c528959c9233d64ac4dbd40",
+    "stem_features.json": "664aee7083efe6658651ccd2d8268b2edca5f13ded4a04ecd834a7e8541b6a1a",
+    "contract.json": "2197773f03f0946f16ea76e4b3ecb61aedecc711e27d9fbc46a3c907508703ec",
+    "demix/htdemucs/track/vocals.wav": "80ead7ff09c83cb001d0628dd5d987476e58efcb6d41c5e4e2c02c649f3cc926",
+    "demix/htdemucs/track/drums.wav": "cd9fb5cfb68f89be788a155af8c42bc812c45248d81b53b0915c3fc22cace3ca",
+    "demix/htdemucs/track/bass.wav": "a0a580e3b563d40f34b9d40590b37fd52d6c33c40a8c25078349a17fb52db2a3",
+    "demix/htdemucs/track/other.wav": "9143e3c18f3034f9357bd18137a58edb831dfb2ba3379f1daec50dd850677850"
+  }
+}
+=== 2026-11-10T08:51:22Z /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python run_cold.py excerpt B
+{
+  "view": "excerpt",
+  "label": "B",
+  "trinity_head": "144b29a1c88b550ebe5c1411988057dbf038dbfa",
+  "decode_matches_m2a": true,
+  "stages": {
+    "decode_s": 0.322,
+    "analyze_track_s": 78.081,
+    "features_export_s": 0.795,
+    "total_s": 79.199
+  },
+  "sha256": {
+    "audio/track.wav": "6d9dfae78bf87baf64720c07f637fb306990e79197230fd645a3708b0ebae751",
+    "analysis.json": "d35bd73e1c993bf663592d4cc7bcb248cd399df14c528959c9233d64ac4dbd40",
+    "stem_features.json": "664aee7083efe6658651ccd2d8268b2edca5f13ded4a04ecd834a7e8541b6a1a",
+    "contract.json": "2197773f03f0946f16ea76e4b3ecb61aedecc711e27d9fbc46a3c907508703ec",
+    "demix/htdemucs/track/vocals.wav": "80ead7ff09c83cb001d0628dd5d987476e58efcb6d41c5e4e2c02c649f3cc926",
+    "demix/htdemucs/track/drums.wav": "cd9fb5cfb68f89be788a155af8c42bc812c45248d81b53b0915c3fc22cace3ca",
+    "demix/htdemucs/track/bass.wav": "a0a580e3b563d40f34b9d40590b37fd52d6c33c40a8c25078349a17fb52db2a3",
+    "demix/htdemucs/track/other.wav": "9143e3c18f3034f9357bd18137a58edb831dfb2ba3379f1daec50dd850677850"
+  }
+}
+=== 2026-11-10T08:52:41Z /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python run_cold.py full A
+{
+  "view": "full",
+  "label": "A",
+  "trinity_head": "144b29a1c88b550ebe5c1411988057dbf038dbfa",
+  "decode_matches_m2a": true,
+  "stages": {
+    "decode_s": 0.409,
+    "analyze_track_s": 495.728,
+    "features_export_s": 3.374,
+    "total_s": 499.511
+  },
+  "sha256": {
+    "audio/track.wav": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+    "analysis.json": "df07f280e7974330fda32c1ecde7c1035f09f97870f63278b865d951e7d02a79",
+    "stem_features.json": "1e5d954cebead9e13e613240aee67dcf976b05fd4279b1916d901fe11c0a3b35",
+    "contract.json": "31c2422bafd33c4338d8e0cae60deb1972ad43e996c4fac1c1e5e699d0527f47",
+    "demix/htdemucs/track/vocals.wav": "b65567fe3ae596cba69db60c884ce8e9094683d1a1bd6c8d8538e408b5620f27",
+    "demix/htdemucs/track/drums.wav": "208a617a91f9273073847e4852772fb1bbd58877b071056c3b9d6d646baf0eb8",
+    "demix/htdemucs/track/bass.wav": "2ddfdac0bdd0839e24477842b812dc3c358968c19b3e2708e74328668c1ada89",
+    "demix/htdemucs/track/other.wav": "c5a1cd1d9dbeb0f1a31c31ad2d1a5624e2233f975fd8e42049a2ed30f01e7626"
+  }
+}
+=== 2026-11-10T09:01:01Z /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python run_cold.py full B
+{
+  "view": "full",
+  "label": "B",
+  "trinity_head": "144b29a1c88b550ebe5c1411988057dbf038dbfa",
+  "decode_matches_m2a": true,
+  "stages": {
+    "decode_s": 0.317,
+    "analyze_track_s": 456.541,
+    "features_export_s": 3.333,
+    "total_s": 460.192
+  },
+  "sha256": {
+    "audio/track.wav": "b3fafd3392ed5a293181d0259f47f5b52bfcb50172814664a8c737e9bb011415",
+    "analysis.json": "df07f280e7974330fda32c1ecde7c1035f09f97870f63278b865d951e7d02a79",
+    "stem_features.json": "1e5d954cebead9e13e613240aee67dcf976b05fd4279b1916d901fe11c0a3b35",
+    "contract.json": "31c2422bafd33c4338d8e0cae60deb1972ad43e996c4fac1c1e5e699d0527f47",
+    "demix/htdemucs/track/vocals.wav": "b65567fe3ae596cba69db60c884ce8e9094683d1a1bd6c8d8538e408b5620f27",
+    "demix/htdemucs/track/drums.wav": "208a617a91f9273073847e4852772fb1bbd58877b071056c3b9d6d646baf0eb8",
+    "demix/htdemucs/track/bass.wav": "2ddfdac0bdd0839e24477842b812dc3c358968c19b3e2708e74328668c1ada89",
+    "demix/htdemucs/track/other.wav": "c5a1cd1d9dbeb0f1a31c31ad2d1a5624e2233f975fd8e42049a2ed30f01e7626"
+  }
+}
+all-exit=0

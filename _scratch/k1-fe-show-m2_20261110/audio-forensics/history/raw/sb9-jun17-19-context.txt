@@ -1,0 +1,53 @@
+## sb9 log 2026-06-17..06-19
+1f5ad8c 2026-06-20 04:40:43 +0800 | fix(effects): cycle/step navigation reaches native effects (R5 follow-up)
+1864899 2026-06-20 04:06:37 +0800 | feat(effects): R5 dense gap-free light-show numbering (flag-gated)
+d71c091 2026-06-20 00:25:35 +0800 | probe(tempo): gate active-music silence veto for Waveshare validation
+2263f54 2026-06-19 13:51:02 +0800 | feat(tab5): faster K1 link-failure detection + non-blocking antenna probe
+6999f9d 2026-06-19 13:33:42 +0800 | chore(version): bump FIRMWARE_VERSION 40104->40105 on converge lineage
+f0350ad 2026-06-19 13:15:00 +0800 | feat(wireless): runtime CONFIG.WIRELESS_ENABLED toggle on effect-framework lineage, default OFF
+aa5eadf 2026-06-19 12:35:07 +0800 | docs(wireless): K1↔Tab5 lane handover + device evidence (toggle, A/B, 8.5min soak)
+acf79ff 2026-06-19 12:15:02 +0800 | fix: stabilise bifrost72 source switching
+ba55204 2026-06-19 12:08:44 +0800 | fix: account dual mic envelope in loud guard
+34825db 2026-06-19 12:04:15 +0800 | fix: normalise bifrost72 source selection
+7bbb0b8 2026-06-19 12:03:01 +0800 | test(effects): R3 byte-gate + R4 sanitize-equivalence regression (host-only)
+7e26701 2026-06-19 11:58:12 +0800 | test(tab5): make 2 env-only static tests resilient to local-only artifacts
+fec93a1 2026-06-19 11:56:10 +0800 | tune: promote clean waveshare dual mic runtime
+9dfdbc8 2026-06-19 11:51:55 +0800 | feat(effects): R2b rewire remaining consumers to EffectRegistry (flag-gated)
+c92a69d 2026-06-19 11:39:26 +0800 | feat: merge bifrost72 envelope energy safely
+df9622e 2026-06-19 11:36:12 +0800 | test: expose bifrost72 mic health in ap capture
+276cc88 2026-06-19 11:35:52 +0800 | feat(wireless): runtime CONFIG.WIRELESS_ENABLED toggle, default OFF, compiled into production
+3477088 2026-06-19 11:35:00 +0800 | feat(effects): R2-core route render dispatch through EffectRegistry (flag-gated)
+90cc017 2026-06-19 11:29:56 +0800 | fix: stabilise bifrost72 calibration and source gate
+b583d7b 2026-06-19 11:23:42 +0800 | tune: allow filtered bifrost72 mic source
+88b01bd 2026-06-19 11:19:49 +0800 | fix: gate bifrost72 dual mic AP handoff
+9bb22c6 2026-06-19 09:15:20 +0800 | chore: isolate bifrost72 waveshare WIP
+95ef42b 2026-06-19 08:40:25 +0800 | feat(effects): R1 EffectEntry registry foundation (flag-gated, additive)
+e11af08 2026-06-19 06:23:18 +0800 | docs(hardware): record 1401 eyes-on PASS for effect-framework build
+6427228 2026-06-19 06:06:21 +0800 | docs(hardware): record 1401 temporary eyes-on flash (k1_effect_framework, c9d2578)
+c9d2578 2026-06-19 05:58:23 +0800 | feat(effects): P6 serial toggle for beat-aware director (eyes-on A/B)
+4f3676b 2026-06-19 03:37:53 +0800 | feat(effects): P6 beat-aware musical director — un-blocks variety + drives transitions (flag-gated)
+52b3658 2026-06-19 03:25:15 +0800 | fix(effects): Gate-0 close two framework crash classes (CL-1, CL-2) + safety gate
+bbf0626 2026-06-19 02:04:06 +0800 | feat(effects): P5 ZoneComposer — independent dual-channel multi-zone composition (flag-gated)
+c9aff40 2026-06-19 01:48:44 +0800 | feat(effects): P4 TransitionEngine — smooth crossfade transitions (flag-gated)
+2793433 2026-06-19 01:35:36 +0800 | feat(effects): P3 route render path through IEffect dispatch (flag-gated)
+bb95166 2026-06-19 01:23:28 +0800 | feat(effects): P2 EffectContext audio + dual-strip buffer adapters
+484038c 2026-06-18 22:51:19 +0800 | feat(effects): flag-gated effect-framework spine (P1)
+2add150 2026-06-18 18:14:49 +0800 | docs(k1): record default posture deployment
+72cb650 2026-06-18 18:12:14 +0800 | fix(k1): default accepted live posture on
+8f0531e 2026-06-18 13:51:50 +0800 | docs(k1): record response gain deployment
+6d8b8d3 2026-06-18 13:45:31 +0800 | fix(k1): normalise production response gain
+5ec749e 2026-06-18 11:08:38 +0800 | docs(k1): record pin evidence restore
+416930e 2026-06-18 11:04:49 +0800 | test(k1): decode pin evidence coverage
+0538483 2026-06-18 11:00:30 +0800 | test(k1): add loud pin evidence gate
+## registry loud lines @0bb285c
+39:| 1401 | `301e536` | `k1_hardware` built/uploaded to `/dev/tty.usbmodem1101` after runtime identity confirmed chip `F887A500` | Loud-room guard candidate on top of accepted vivid B3: `K1_LOUD_GUARD_V1` compiled in with runtime `:k1_loud_guard=on/off/status`, GDFT/AGC headroom trim, loud-only weak-chroma palette unpin, AP telemetry for trim/pin/saturation, and the accepted vivid pre-comp controls retained. Defaults remain runtime-off after boot; the accepted eyes-on test was run with `K1_LOUD_GUARD=on` and `VIVID_PRECOMP=on`, `VIVID_CHROMA_LEVEL=1.000`, `VIVID_BLACK_LEVEL=0.450`. Host gate: `python3 -m pytest tests/` = 498 passed; `pio run -e k1_hardware` = PASS after `scripts/platformio/k1_src_includes.py` sdkconfig include repair; upload command returned exit 0. Runtime proof on main K1: AP `spec_sat=0.000`, `spec_pin=0.000`, `clip_pct=0.000`, VP `chroma_final_max` mean `0.3764`, render max `976 us`, streams off after capture. Evidence: `_scratch/k1-loud-guard-ssa-20260617/live-vp-unpin-test.log`. Captain eyes-on acceptance: "Looks good to me". | 2026-06-17 18:54 AWST |
+## grep posture all docs @72cb650
+72cb650:docs/forensics/runtime-evidence/20260610T222220-visual-hooks-snare-hihat-runtime-verdict.md:60:## Current live posture
+72cb650:docs/forensics/runtime-evidence/20260610T235050-pulse-prism-percussive-classes-verdict.md:44:Post-capture live posture:
+## repo-wide grep posture HEAD all branches
+2add150 2026-06-18 18:14:49 +0800 | docs(k1): record default posture deployment
+72cb650 2026-06-18 18:12:14 +0800 | fix(k1): default accepted live posture on
+8bb046c 2026-06-03 21:32:00 +0800 | docs(handoff): de-stale VE-Auto-Loop handoff — MVP-0 inner loop is closed
+48c029a 2026-06-03 18:37:25 +0800 | docs(handoff): reconcile tempo-lock git posture + add VE-Auto-Loop handoff
+0514523 2026-06-03 18:37:24 +0800 | docs(speckit): add P0 governance preflight for Spec Kit use
+19e0bb4 2026-06-03 18:36:23 +0800 | chore(speckit): install Spec Kit specification toolchain

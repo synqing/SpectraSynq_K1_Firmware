@@ -1,0 +1,14 @@
+$ cd /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked && /usr/bin/git status --porcelain && /usr/bin/git checkout --detach cc00556d1df2f863c6a0d914ef613886b050a408
+exit 0
+$ /usr/bin/git -C /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked rev-parse HEAD; status; branch tip
+cc00556d1df2f863c6a0d914ef613886b050a408
+       0
+87f0c43c78e73265fe260b08b8e732cdb83499ff
+87f0c43 fix(editor): run the One Instrument creator loop; byte-safe K1 FE playback
+cc00556 fix: Trinity compiler CLI runs after macOS /tmp realpath
+$ /usr/bin/git -C /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio status; rev-parse HEAD
+HEAD detached at cc00556
+nothing to commit, working tree clean
+cc00556d1df2f863c6a0d914ef613886b050a408
+$ ps for leftover editor servers / captures
+none above = clean

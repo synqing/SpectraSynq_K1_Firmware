@@ -1,0 +1,13 @@
+# first fetch failed: stale remote-tracking refs advertised objects that only lived in the dead alternate, so negotiation skipped them; refetch ignores local haves
+$ /usr/bin/git fetch --refetch origin
+fatal: bad object 4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa
+error: https://github.com/synqing/PRISM.studio.git did not send all necessary objects
+exit 1
+$ /usr/bin/git fsck --connectivity-only
+error: refs/remotes/origin/feature/led-async-effects: invalid sha1 pointer 4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa
+error: refs/remotes/origin/feature/trinity-compile-v0-3: invalid sha1 pointer 526c73e4f75a822d6ed01374846a477538491380
+dangling commit cc00556d1df2f863c6a0d914ef613886b050a408
+dangling commit f7e9b6bc3772c06350f98d314ea2142b57352d31
+dangling commit 3ae2588c0a0315786c61346a3fa6cc394b8350eb
+dangling commit e293c1a12fa318d295b58e15c39baff46e3fe6df
+exit 2

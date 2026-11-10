@@ -1,0 +1,13 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 tools/compare_wire_laneb.py full wire/loreen_post_edit_full /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm wire/loreen_post_edit_full
+capture writes=26871 bytes=1719744 sha256=caea7a9e08fa1ba1e189c5e9da19e2b3b03f95a4539205c45a9f7702efd3944e
+write lengths: [64]
+M2 stream frames=26870 sha256=116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+lane-b expected wire bytes=1719744 sha256=caea7a9e08fa1ba1e189c5e9da19e2b3b03f95a4539205c45a9f7702efd3944e
+capture == RESYNC_PREAMBLE + wire_packets(M2): True
+write boundaries == lane-b packet list: True
+de-guarded frames -> wire/loreen_post_edit_full.prsm sha256=116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3 equals M2: True
+RESULT PASS
+exit 0
+$ LANE_B_FW=fw_8b202f46 /opt/homebrew/opt/python@3.13/bin/python3.13 /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-b/audit_prsm_bytes.py wire/loreen_post_edit_full.prsm --guard 30 --json raw/d3_audit_full.json
+BENCH-ELIGIBLE wire/loreen_post_edit_full.prsm frames=26870/26870 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=64B guard=30B
+exit 0

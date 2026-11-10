@@ -1,0 +1,42 @@
+{
+ "frames": 26870,
+ "frames_in_span": 1816,
+ "changed_vs_pre": 116,
+ "predicted_changed": 116,
+ "changed_equals_prediction": true,
+ "changed_byte_positions": [
+  20,
+  21
+ ],
+ "unchanged_vs_pre": 26754,
+ "whole_track_edit_changes_outside_span_left_unchanged": 1466,
+ "stream_sha256": "ffa0dd3b27489cdd827e1d39d47ea0e88585d3e0f7dd84dc17de4568445dd6e2",
+ "predicted_stream_sha256": "ffa0dd3b27489cdd827e1d39d47ea0e88585d3e0f7dd84dc17de4568445dd6e2",
+ "trace_rows_in_span_with_section": 1816,
+ "trace_rows_outside_identical_to_pre": 25054,
+ "reopen": {
+  "showbundle.json": {
+   "identical": true,
+   "sha256": "6f324e1c94756f44e1f6ecff851bfbceda9965512488848ed04b9988c997b6cb"
+  },
+  "trace_120hz.jsonl": {
+   "identical": true,
+   "sha256": "2f682b050d518cb4db96e44fa756ec67b9426683a7edaf6dbb3ca39e05322bb5"
+  },
+  "stream_120hz.prsm": {
+   "identical": true,
+   "sha256": "ffa0dd3b27489cdd827e1d39d47ea0e88585d3e0f7dd84dc17de4568445dd6e2"
+  },
+  "mapping_coverage.json": {
+   "identical": true,
+   "sha256": "624497892e61f16ecfd9554ffe3f5376f67ee8ccc025d64e6a18759930e05c52"
+  },
+  "compile_manifest.json": {
+   "identical": true,
+   "sha256": "aab490f5a9aa4ef352ff4389283afcc937f0d3222dd677987b09293228b746ba"
+  }
+ },
+ "windows": 24,
+ "fails": [],
+ "verdict": "MATCH"
+}

@@ -1,0 +1,201 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: node --test tests/instrument_cli_authored.test.js
+# start: 2026-11-10T08:37:44Z
+✖ verify --project builds from the project's own mapping profile and matches its recorded hashes (110.129ms)
+✖ verify --project writes only under --out, and two runs are byte-identical (0.518083ms)
+✖ build manifest records the compiler version the compiler reported (0.10975ms)
+✖ build-demo --project compiles the authored profile into --out and does not delete that folder (161.263167ms)
+✖ --out also redirects verify --fixture and the G5 project; both still pass their goldens (257.296584ms)
+✖ --out without a value is refused (266.952083ms)
+✖ a profile whose bytes do not match the recorded hash is refused (273.45ms)
+✖ a profile that fails mapping_profile_v1 validation is refused (273.262959ms)
+✖ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (271.643375ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 0
+ℹ fail 9
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1803.864458
+
+✖ failing tests:
+
+test at tests/instrument_cli_authored.test.js:73:1
+✖ verify --project builds from the project's own mapping profile and matches its recorded hashes (110.129ms)
+  AssertionError [ERR_ASSERTION]: fixture inputs missing under /Users/spectrasynq/Workspace_Management/Software/ci_click_3s
+  
+  
+  2 !== 0
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:75:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:85:1
+✖ verify --project writes only under --out, and two runs are byte-identical (0.518083ms)
+  AssertionError [ERR_ASSERTION]: trace under --out
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:87:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:96:1
+✖ build manifest records the compiler version the compiler reported (0.10975ms)
+  AssertionError [ERR_ASSERTION]: fixture inputs missing under /Users/spectrasynq/Workspace_Management/Software/ci_click_3s
+  
+  
+  2 !== 0
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:98:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 2,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:105:1
+✖ build-demo --project compiles the authored profile into --out and does not delete that folder (161.263167ms)
+  Error: ENOENT: no such file or directory, open '/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/spine-authored-JnCFDQ/compile_manifest.json'
+      at readFileSync (node:fs:539:20)
+      at loadJson (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:31:36)
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:110:15)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -2,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: '/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/spine-authored-JnCFDQ/compile_manifest.json'
+  }
+
+test at tests/instrument_cli_authored.test.js:116:1
+✖ --out also redirects verify --fixture and the G5 project; both still pass their goldens (257.296584ms)
+  AssertionError [ERR_ASSERTION]: fixture run under --out
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:120:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:128:1
+✖ --out without a value is refused (266.952083ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be strictly unequal to: 0
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:130:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 0,
+    operator: 'notStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:134:1
+✖ a profile whose bytes do not match the recorded hash is refused (273.45ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /INPUT_HASH_MISMATCH mapping_profile_sha256/. Input:
+  
+  'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n'
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:142:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n',
+    expected: /INPUT_HASH_MISMATCH mapping_profile_sha256/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:148:1
+✖ a profile that fails mapping_profile_v1 validation is refused (273.262959ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PROFILE_INVALID: .*device_profile/. Input:
+  
+  'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n'
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:155:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n',
+    expected: /PROFILE_INVALID: .*device_profile/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/instrument_cli_authored.test.js:161:1
+✖ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (271.643375ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /PROJECT_SHOWBUNDLE_MISMATCH/. Input:
+  
+  'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n'
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/instrument_cli_authored.test.js:168:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'PROJECT_TRACE_MISMATCH: bcdd0c229d4cb77512e0415969b4302afc24c80b46403a03b46cf6ebb51ae2b8 !== 23439c6c9cc0a7448ee35c90c6807b725a179b17631dcf3f72dbd5e1abeaaeb9\n',
+    expected: /PROJECT_SHOWBUNDLE_MISMATCH/,
+    operator: 'match',
+    diff: 'simple'
+  }
+# exit: 1
+# end: 2026-11-10T08:37:46Z

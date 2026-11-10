@@ -1,0 +1,189 @@
+a6bad318 2026-11-10 | fix(fe-show): isolate the prepared-show receiver and renderer
+23622499 2026-11-10 | docs(fe-show): M1 corrections after review, bench tools for any unit, firmware comparison
+e28dd927 2026-11-10 | fix(fe): validate serial input before commit; move noise-cal reset to the audio core
+e2e83e53 2026-11-10 | fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out
+0e9d95d7 2026-11-09 | index on lane/k1-fx-battery: ed0aa984 fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out
+e53fdbec 2026-11-09 | untracked files on lane/k1-fx-battery: ed0aa984 fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out
+ed0aa984 2026-11-06 | fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out
+356de1b0 2026-11-05 | feat(fx): bring k1ease follower kit onto the release lane
+54480cae 2026-11-05 | fix(fe): restore line comet launches and honour silence
+80bf7aa8 2026-11-05 | fix(s3): retain one silence dwell registry declaration
+f67f2b73 2026-11-05 | fix(fe): expose line silence decision in existing trace
+4234aa2d 2026-11-05 | fix(fe): waveform hybrid k1 drains to black on silence
+ec7c9bc9 2026-11-05 | fix(fe): shorten bench silence dwell after playback stops
+7a7507b2 2026-11-05 | fix(persistence): bound quiet-save deferral and buffer the config record
+b3a415ef 2026-11-04 | fix(fe): repair audio and colour paths with target emulator regression
+e04c73bd 2026-11-04 | fix(ap): measure VU and silence RMS on the subsonic-filtered band
+1a1407be 2026-11-04 | test(fe): B489 bench A/B with the subsonic peak HPF on
+6b313500 2026-11-03 | fix(fe): act on independent review of the k1_fe board support
+dc94f988 2026-11-03 | feat(fe): k1_fe env for the K1 Founders' Edition board (jack line-in, 20 V power policy, STUSB4500 NVM tool)
+b1f48bbc 2026-10-22 | feat(tempo): qualified lock-off fallback; Tempo Comet / Anticipate honour validated beats (DEF-001, DEF-002)
+74b59909 2026-10-21 | feat(tempo): Phase 2.6 joint estimator (host-only) and rule 3.3 lock-off behind K1_TEMPO_LOCK_OFF_V1 (DEF-002, DEF-001)
+d63b476d 2026-10-21 | feat(tempo): spectral rhythm-presence evidence behind K1_TEMPO_SPECTRAL_PRESENCE_V1 (DEF-001 A3)
+f732d9cb 2026-10-21 | feat(tempo): producer-owned silence and named veto bits behind K1_TEMPO_SILENCE_FROM_PRODUCER_V1 (DEF-001)
+90889934 2026-10-21 | refactor(tempo): move every gating constant into k1_tempo_spec.h with provenance (DEF-001, DEF-002)
+aeb0322f 2026-10-21 | feat(tempo): tempo-only linear novelty tap behind K1_TEMPO_NOVELTY_LINEAR_V1 (DEF-001)
+827beb64 2026-10-21 | test(tempo): freeze the lane R1 scorer, dev manifest and emulator probe (DEF-001, DEF-002)
+05ace4cb 2026-10-20 | docs(tempo): record the Main RPL false-silence mechanism and the failed corpus gate
+68a684dc 2026-10-20 | fix(emu): keep the scored music loop bright and clock-locked
+0713a2bc 2026-10-20 | fix(emu): boot the physical PCM replay from compiled defaults
+adb4fc37 2026-10-02 | wip(emotiscope): tempo emit-hop sub-stage probe (probe only)
+9294e03d 2026-10-02 | perf(tempo): compute the ACF sweep's lag rows on the non-emit AP hops (bit-exact)
+50a098c1 2026-10-02 | docs(tools): capture harness docstring without the loud input
+890f70c8 2026-10-02 | tools(emotiscope): remove the amplified 'loud' capture input
+13c30d67 2026-10-02 | test: re-anchor DC-offset static tests to subtract-then-clamp (follows fde5cd39)
+b9e08c7a 2026-10-02 | perf(onset): take each bin's log once per frame and keep the previous frame's
+f21cf39e 2026-10-02 | test: re-anchor DC-offset static tests to subtract-then-clamp (follows fde5cd39)
+fde5cd39 2026-10-01 | fix(emotiscope): subtract mic DC offset before clamping, not after
+be6a226e 2026-10-01 | wip(emotiscope): gate histograms for AP service, VP frame and VM (probe only)
+6f077fd9 2026-10-01 | wip(emotiscope): audit probe, acquire / pre-render / tail split
+75e8ea73 2026-09-30 | wip(emotiscope): 128-pixel native canvas, engine identical to PRISM-Core
+24b91ad0 2026-09-29 | docs(live): Emotiscope fff0062d results and registry row
+fff0062d 2026-09-29 | feat(live): Emotiscope mic on the right pins, browser patterns fit and persist
+c2e76ec5 2026-09-29 | wip(live): uploads without source map, no image copy kept in RAM, klv_saveimg, whole-line writes, mic calibrate button
+8ed37a85 2026-09-12 | test(score): prove support cannot create light, and correct the record
+094b63e5 2026-09-12 | feat(score): the foundation stops being a lamp and becomes a gain
+b4c1dd27 2026-09-12 | feat(harness): ask the foundation question at equal output
+f336615c 2026-09-12 | docs(forensics): the foundation presence is a lamp where it should be a gain
+8ad9329f 2026-09-12 | test(harness): widen the foundation question to seven gesture scenarios
+3bac0182 2026-09-12 | feat(harness): sweep foundation-presence shapes on the plate
+f941198b 2026-09-12 | feat(harness): score the Chromatic Score on the PLATE, not the strip
+cede64c4 2026-09-11 | test(bloom): record the real-drive failure the impulse fixtures hid
+daccc54f 2026-09-11 | feat(audio): PCM1808 gain before the signed-16 narrowing
+a4e8d449 2026-09-11 | feat(visual): target output adapter — 16-bit route, joint limit, centred geometry
+3af59e84 2026-09-11 | feat(visual): one board-independent score core, with sustained presence
+433986a1 2026-09-11 | feat(audio): repair the production evidence contract before attaching memory
+bc66d045 2026-09-10 | docs(evidence): correct the RPL 'no audio' claim and land the live-audio capture
+eff9bf47 2026-09-10 | feat(gate): enforce the feature latency budgets, and correct the sub-8 ms record
+95248167 2026-09-02 | docs(handover): B4 — retire the Emotiscope oracle, do the differential
+8a531465 2026-09-02 | docs(research): Emotiscope review §11 — corrections from building the oracle
+0136de67 2026-08-25 | fix(usb-audio): amend hold policy, finaliser seam, silence gate — 2026-08-25
+a30d38e1 2026-08-22 | feat: add silent rtrace stim ramp for Lever-2 occupancy
+e5fb5710 2026-08-20 | test: I2S/LCD_CAM LED emit eval envs after RMT-IRQ conviction probe
+f5039f46 2026-08-19 | docs: stamp 9087A500 fps/agc probe show-skip conviction
+dec5fb53 2026-08-19 | fix: dt-clock AGC at 100 Hz and RPL fps/agc probe
+1be4930a 2026-08-18 | feat: mode-11 origin trail-deposit + mode-32 colour variant pack 33-37
+15d3a85d 2026-08-15 | fix: preserve production silence timer bytes
+a191a244 2026-08-15 | fix: isolate AP silence dwell timer
+fa186b34 2026-08-15 | fix: zero AP drive at classified silence
+d4a6fb87 2026-08-14 | feat(tune): runtime registry — every AP/VP parameter settable live via :tune (#63)
+e4b81f04 2026-08-14 | docs(plan): AP input integrity — end-to-end execution plan (#64)
+96b5df3d 2026-08-14 | fix(ini)+docs: withdraw the DSR probe as a NO-OP; record that the bench IM69D does not track the room
+7e3de332 2026-08-14 | docs(canon)+skill: HF-61 refuted, root cause found — measure the drive on the band the consumer uses (#60)
+b520db2e 2026-08-14 | fix(ap): derive the subsonic HPF cutoff from the live NOTE_OFFSET (#59)
+2b99dd54 2026-08-14 | probe(ap): subsonic HPF on the drive PEAK measurement only (gated, bench) (#58)
+398f19c6 2026-08-14 | fix(cal): partial-commit a validated DC; repair stale byte gate; root cause moves upstream to the mic (#57)
+8d7a78be 2026-08-14 | docs(canon)+skill+ratchets: session canon HF-50..62 — colour fix / twitch / instrumentation lessons, mechanically encoded
+40e9e963 2026-08-13 | fix(colour): rest v2 — absolute novelty floor in the drive + S2 crescendo threshold (gate-calibration-independent)
+a999a6fc 2026-08-13 | fix(colour): silence rest + smooth hue — the full-bore-twitch regression (three causes)
+23825843 2026-08-13 | feat(colour): S3 equalised sweep drive + S1 held-anchor fallback (gated bisect candidates)
+da5c1dc1 2026-08-13 | feat(diag)+docs: capture driver + measured defect baselines (colour fix lane)
+a66b0588 2026-08-13 | docs(mic): canonical dual-IM69D130 end-to-end learnings synthesis
+d1fae012 2026-08-13 | feat(audio)!: populate K1_AUDIO_PROFILE_IM69D130_UNIT2 — Bose round closes floors, Stage 2, and P5.B
+2904c9b9 2026-08-12 | test+docs(mic): P4.A baseline + P4.B behavioural gate + Stage 2 / P5.B receipts
+975071a7 2026-08-12 | chore(mic)!: P2.B — quarantine the IM73D stack; recompose k1_custom off the false-authority inheritance
+a8b1912a 2026-08-12 | fix(audio)!: scope the joint silence gate to IM69D; re-derive the level fraction
+9599714b 2026-08-12 | docs: transfer test RESOLVED — stale calibration, not hardware; eyes-on PASSED
+e4ad1eb4 2026-08-12 | docs(forensics): transfer test closed — the fraction delta is a QUIET-state defect
+e2a39815 2026-08-12 | docs(forensics)+harness: transfer-test QUIET leg — the delta does not appear in quiet
+749a83da 2026-08-12 | docs(hardware): both IM69D units flashed to 39e0943 and identity-verified
+39e0943d 2026-08-12 | docs(forensics): recover the stranded IM69D bring-up evidence onto the lane
+314e89c8 2026-08-12 | docs(handover): IM69D silence-gate lane close-out
+a93fd17c 2026-08-12 | docs(forensics): volume sweep closes P1/P2/P5 at frac 2.5
+3a6098a4 2026-08-12 | fix(audio): joint level fraction 4.0 -> 2.5 after a volume sweep
+20774a05 2026-08-12 | wip(im69d_resolution): checkpoint before worktree retirement
+5cda4e7e 2026-08-12 | wip(unit2_10ms_fast_response): checkpoint before worktree retirement
+ff576bb4 2026-08-12 | wip(unit2_slot_ab): checkpoint before worktree retirement
+4d54f343 2026-08-11 | docs(forensics): joint-gate soak result — P2 passes, P1 misses on the legacy RMS path
+52dedd28 2026-08-11 | fix(audio): derive the joint level fraction from identity-pinned measurement
+b329eceb 2026-08-11 | fix(harness): pin device build identity before trusting any capture
+1bdf54d0 2026-08-11 | feat(audio)!: tombstone the IM73D profile; fail closed on an uncharacterised mic
+1d97dc47 2026-08-11 | fix(audio): SSL-relative joint level term, replacing the absolute floor
+6c6a4f06 2026-08-11 | docs(lane)!: Captain correction - Unit 2 is dual IM69D130
+1fdbb9d0 2026-08-11 | feat(build): add k1_bench_im69d_ble Deck16 radio baseline env
+7d932083 2026-08-11 | feat(audio): retune tempo lock + silence for the quiet IM73D PDM path
+b643b8d6 2026-08-11 | fix(effects): keep the plate lit on quiet-mic units (modes 18 & 32)
+fc82b928 2026-08-11 | fix(diag): rename loud-guard mode= to lg_mode= and emit lightshow=
+d781dd73 2026-08-11 | feat(control)!: strike STANDBY_DIMMING and purge MIRROR from BLE/Deck
+623de886 2026-08-11 | docs(hardware): Unit 2 pin receipt + registry retarget
+12492867 2026-08-11 | fix(audio): require level AND peakiness to break silence
+acd5f813 2026-08-06 | feat(audio): peakiness silence-break gate (provisional 2.10)
+dff1d0d5 2026-08-06 | feat(audio): G=8 revert for IM69D input gain
+3d12916a 2026-08-10 | candidate(sol-p0): M18 WAVEFORM TEMPO peak|vu presence + colour FB + IM73D lock_gate
+e9332b94 2026-08-06 | fix(audio): declare STM loudness bypass when raw RMS unavailable
+248ec796 2026-08-06 | feat(audio): peakiness silence-break gate (provisional 2.10)
+af253090 2026-08-06 | feat(audio): cal corridor 1400/1540 + ratio-gate no-widen note
+395116f2 2026-08-06 | feat(audio): G=8 revert for IM69D input gain
+0ceddeb2 2026-08-06 | docs(agent)+test: canonise the 2026-08-06 defect classes with a static ratchet
+eaa44926 2026-08-06 | refactor(audio): remove the dead AGC-floor chain from the Core-0 path
+f670ffc2 2026-08-06 | docs(forensics): IM69D bringup audio-pipeline regression reconstruction
+cf66e270 2026-08-06 | docs(agent): close AP advice Phases 0–2 session report
+1ae9d4ae 2026-08-05 | feat(audio): close Phase 0 IM69D silence at gain 4
+9013ed90 2026-08-05 | docs(hardware): Phase 0 IM69D G=8 device-proof receipt
+5d5e9e4e 2026-08-05 | test(harness): mic A/B comparison, interrupted-run recovery, IM69D role
+8335b7fc 2026-08-05 | docs(lane): kill and shelve dual-K1 sync; route to IM69D130 mic eval
+8b1a1976 2026-07-26 | fix(waveform-tempo): drain to dark on presence loss instead of freezing
+112767aa 2026-07-26 | docs(refactor): M2.1 R1 status — 5 batches landed (26/104 defs moved), mechanism + landmine map
+23f00afe 2026-07-26 | refactor(serial): M2.1 R1 batch 4 — move loud-guard + beat-director status helpers out of serial_menu.h
+f23bea3c 2026-07-25 | docs: GDFT int64 fix (M1.1) EYES-ON PASS on bench — fully closed
+72956950 2026-07-25 | feat(p2): SENS_V1a mic_auto SENSITIVITY 1.8
+a7dfe3ae 2026-07-25 | feat(gdft): promote int64 overflow fix to shipping binary (audit M1.1)
+21bb998b 2026-07-25 | feat(p2): mic auto-sense slow supervisor (K1_MIC_AUTO_SENSE_V1)
+b909ef2f 2026-07-25 | feat(p2): mic auto-sense slow supervisor (K1_MIC_AUTO_SENSE_V1)
+602c0cc6 2026-07-25 | feat(ws2816): Lever 1b — K1-owned real-mA power gate (K1_WS2816_POWER_V1, bench, non-shippable)
+0d6b9650 2026-07-24 | fix(ws2816): ledtest drives BOTH strips + comprehensive 0-12 pattern suite (bench, non-shippable)
+cb305f22 2026-07-17 | feat(effects): add Melodic Bloom light mode (mid_energy presence bloom)
+b538b145 2026-07-10 | feat(audio): default-flip go-dark ON — Captain hardware-signed 2026-07-10
+8244a7f9 2026-07-10 | test(audio): go-dark dark-proof harness — full-path validated on bench
+3a9724e5 2026-07-10 | feat(k1): add mic auto-sense telemetry proof
+f87709d4 2026-07-10 | wip(audio): go-dark raw-RMS fix — pure-RMS (peak-veto removed) + hardware calibration
+ec18241c 2026-07-10 | wip(audio): mic-agnostic agc_loudness_norm — audio_vu_level tap + running-max ceiling + harness
+e1a88a23 2026-07-10 | wip(audio): silence go-dark scaffolding — SSL-Schmitt detect + dwell + asymmetric fade + runtime tunables + harness
+e47877a2 2026-07-10 | feat(audio): loud-guard release/floor-cut retune — hardware-validated, default mode 2
+a9ff00ca 2026-07-10 | feat(stm): audio-reactive STM via live mic-RMS gate + delete orphaned per-band AGC array
+1dfc9b0b 2026-07-09 | wip(fork): fork-wide de-SB → K1 migration COMPLETE + host-gate-green (checkpoint)
+f6cf78f8 2026-07-08 | feat(stm): Core-0 STM producer re-derived onto the 80-note spectrogram
+1f270967 2026-07-08 | feat(sync): P0.4 K1-SyncLink probe firmware — dual-role NimBLE, replay stream, RTT clock sync, cross-trigger
+5bbbf767 2026-07-08 | feat(sync): register dual-K1 sync Phase-0 probe envs and guards (P0.2)
+92c70fc5 2026-07-06 | docs(audio): design mic auto sensitivity scaling
+32bc384c 2026-07-06 | docs(forensics): canonical record — palette-coordinate colour collapse + K1_PALETTE_VIBRANCY_V1 fix
+482784c3 2026-07-06 | docs(handover): triple-lane handover — consolidation, vibrancy forensics, IM73D productionization
+24e0732a 2026-07-06 | registry(device-proof): IM73D per-band AGC acceptance PASSED on bench
+79d7fdaa 2026-07-06 | registry(device-proof): bench B489A500 on k1_custom BLE wall build @ 78c8bec
+1ac840ad 2026-07-05 | fix(im73d): guard LittleFS writes vs internal-RAM abort on cal-complete
+e2b62b56 2026-07-04 | feat(im73d): un-freeze config persistence under PDM flag via namespaced /CONFIG_PDM_*.BIN
+3e06f9d3 2026-07-03 | tune(im73d): PDM-gated Waveform-Fast reactive margin 1.10->0.95
+85a6dc03 2026-07-03 | feat(im73d): PDM cal persistence — own file, SPH baseline stays frozen
+96d908a1 2026-07-03 | fix(im73d): PDM-domain cal-gate window — Outcome B from 8 measured bench runs
+ae4c6e22 2026-07-02 | registry(device-proof): bench B489A500 reflashed to 95faa9f (freeze build) on drifted port 1101
+95faa9f2 2026-07-02 | docs(im73d): correct stale PDM silence figure from measured G=16 capture
+66e50020 2026-07-02 | registry(device-proof): main K1 on k1_hardware vibrancy fix (ae5d90a)
+ae5d90a3 2026-07-02 | feat(vp): K1_PALETTE_VIBRANCY_V1 — fix palette-coordinate collapse on dense/loud music
+db3597c2 2026-07-02 | fix(im73d): freeze factory_reset/restore_defaults under PDM eval
+b0086feb 2026-07-02 | test(agc): add IM73D-domain per-band AGC operating-range gate
+49b0393c 2026-07-02 | registry(device-proof): bench B489A500 on k1_bench_im73d graft (c3584fa, gain=16)
+c3584fae 2026-07-02 | feat(im73d): bench-characterize K1_MIC_IM73D_INPUT_GAIN 3.0->16.0
+545d331d 2026-07-02 | feat(im73d): flag-gated IM73D122 PDM front-end graft (K1_MIC_IM73D_PDM_V1, bench-only)
+ead83d43 2026-06-30 | docs(handover+registry): production-readiness lanes handover + deployed-state table fix
+bc965301 2026-06-30 | docs(lanes): N8 blocked memo + N9 HELD memo + N1-N9 status reality update (D7)
+980c8a36 2026-06-30 | fix(upload-guard): register all K1 chip-bound envs + add drift-catcher (anti-brick)
+7677e078 2026-06-30 | docs(agc): record SHIPPED — per-band AGC promoted + device-confirmed
+2e2800d1 2026-06-30 | feat(agc): promote per-band AGC to production + A/B probe env (SB_AGC_PERBAND_V1)
+f1e39e8d 2026-06-30 | feat(agc): per-band AGC candidate SB_AGC_PERBAND_V1 (N6, prepare-only, default OFF)
+ca8239f2 2026-06-30 | build(agc): add k1_agc_probe — per-band AGC A/B target on the N2 base
+bdd3084f 2026-06-30 | feat(agc): per-band AGC candidate SB_AGC_PERBAND_V1 (N6, prepare-only, default OFF)
+e2beac53 2026-06-26 | feat(audio): N2 bounded I2S read + task watchdog — unrecoverable-freeze fix (Lane N2)
+9c19b1f6 2026-06-30 | feat(agc): per-band AGC candidate SB_AGC_PERBAND_V1 (N6, prepare-only, default OFF)
+8bc5f5f4 2026-06-27 | docs(build-config): build-config policy + drift-gate rationale (Lane B)
+9982d63c 2026-06-27 | test(build-config): drift-gate for resolved brownout/coredump/WDT policy (Lane B)
+d4de505b 2026-06-27 | harness(ab): validity-admission gates U1–U7 for wireless_ab_bench (no PASS/FAIL from corrupt captures)
+827d73ae 2026-06-26 | feat(audio): N2 bounded I2S read + task watchdog — unrecoverable-freeze fix (Lane N2)
+653c756f 2026-06-26 | docs(probe-lane,handoff): gdft_harness extracted -> DRAFT PR #12; MOTION_PROBE next
+798e44c8 2026-06-26 | refactor(serial): EXTRACT gdft_harness -> serial_cmd_dispatch_gdft_harness (gate-matched, probe lane)
+6425108b 2026-06-26 | test(serial-struct): LOCK gdft_harness family — gated-out diagnostic probe lane
+c1c19f6c 2026-06-26 | refactor(serial): EXTRACT beat_director -> serial_cmd_dispatch_beat_director (gate-matched, Increment B)
+e0f65ca2 2026-06-24 | docs(registry): main K1 device runtime-proof of the modernization refactor (39466fc)
+03d74f33 2026-06-23 | docs(gdft): S2 host pre-characterization — int64 stabilizes resonant bin, dimming negligible
+d5451e67 2026-06-23 | docs(gdft): boundary correction (whole-lift, cal inert) + surface inventory appendix
+ff765b22 2026-06-23 | test(av): skip audio-dependent assertions when fixture not committed
+a2a4da0c 2026-06-23 | ci: install ffmpeg on the runner (AV loudness fixtures)

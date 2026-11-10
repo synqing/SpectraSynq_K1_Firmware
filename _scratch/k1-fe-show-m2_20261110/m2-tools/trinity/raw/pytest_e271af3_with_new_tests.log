@@ -1,0 +1,153 @@
+cmd: /usr/bin/git -C Trinity archive e271af3 analysis | tar -x -C <scratch>; copy branch tests/test_reproducible_contract.py + tests/fixtures/loreen_rhythm_m2a.json; cd <scratch>/analysis && PYTHONPATH=vendor/allin1/src:. /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python -m pytest -p no:cacheprovider
+============================= test session starts ==============================
+platform darwin -- Python 3.11.14, pytest-8.4.2, pluggy-1.6.0 -- /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python
+rootdir: /private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/e271af3/analysis
+configfile: pytest.ini
+testpaths: tests
+plugins: anyio-4.12.1, hydra-core-1.3.2
+collecting ... collected 76 items
+
+tests/test_beat_context.py::TestBeatContextConfig::test_default_values PASSED [  1%]
+tests/test_beat_context.py::TestBeatContextConfig::test_custom_values PASSED [  2%]
+tests/test_beat_context.py::TestBeatContextOutput::test_to_dict_basic PASSED [  3%]
+tests/test_beat_context.py::TestBeatContextOutput::test_to_dict_filters_none PASSED [  5%]
+tests/test_beat_context.py::TestBeatContextOutput::test_to_dict_includes_optional_when_present PASSED [  6%]
+tests/test_beat_context.py::TestCreateBeatContext::test_basic_creation PASSED [  7%]
+tests/test_beat_context.py::TestCreateBeatContext::test_with_downbeats PASSED [  9%]
+tests/test_beat_context.py::TestCreateBeatContext::test_with_beat_positions PASSED [ 10%]
+tests/test_beat_context.py::TestCreateBeatContext::test_with_bpm PASSED  [ 11%]
+tests/test_beat_context.py::TestCreateBeatContext::test_hop_length_calculation_44100 PASSED [ 13%]
+tests/test_beat_context.py::TestCreateBeatContext::test_hop_length_calculation_48000 PASSED [ 14%]
+tests/test_beat_context.py::TestCreateBeatContext::test_frame_ms_calculation PASSED [ 15%]
+tests/test_beat_context.py::TestCreateBeatContext::test_beat_times_ms_conversion PASSED [ 17%]
+tests/test_beat_context.py::TestCreateBeatContext::test_default_config_when_none PASSED [ 18%]
+tests/test_beat_context.py::TestCreateBeatContext::test_beat_frames_with_librosa PASSED [ 19%]
+tests/test_beat_context.py::TestCreateBeatContext::test_beat_frames_fallback_without_librosa PASSED [ 21%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_basic_phase_calculation PASSED [ 22%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_phase_at_boundaries PASSED [ 23%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_empty_beat_frames PASSED [ 25%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_single_beat_frame PASSED [ 26%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_num_frames_less_than_last_beat PASSED [ 27%]
+tests/test_beat_context.py::TestComputeBeatPhasePerFrame::test_output_length_matches_num_frames PASSED [ 28%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_basic_impulse PASSED [ 30%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_impulse_sum_equals_beat_count PASSED [ 31%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_empty_beat_frames PASSED [ 32%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_beat_frame_at_boundary PASSED [ 34%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_negative_beat_frame_ignored PASSED [ 35%]
+tests/test_beat_context.py::TestComputeBeatImpulse::test_output_type_is_numpy PASSED [ 36%]
+tests/test_beat_context.py::TestComputeDownbeatImpulse::test_delegates_to_beat_impulse PASSED [ 38%]
+tests/test_beat_context.py::TestComputeDownbeatImpulse::test_empty_downbeats PASSED [ 39%]
+tests/test_beat_context.py::TestEdgeCases::test_very_fast_tempo_300_bpm PASSED [ 40%]
+tests/test_beat_context.py::TestEdgeCases::test_very_slow_tempo_30_bpm PASSED [ 42%]
+tests/test_beat_context.py::TestEdgeCases::test_fractional_beat_times PASSED [ 43%]
+tests/test_beat_context.py::TestPrismBeatContextV1Contract::test_required_fields_present PASSED [ 44%]
+tests/test_beat_context.py::TestPrismBeatContextV1Contract::test_field_types_match_contract PASSED [ 46%]
+tests/test_k1_lite_macros_not_emitted.py::test_k1_lite_export_blobs_null PASSED [ 47%]
+tests/test_k1_lite_macros_not_emitted.py::test_k1_lite_macros_tier_does_not_write_sinusoid_blob PASSED [ 48%]
+tests/test_no_sinusoid_macros.py::test_export_contract_has_no_sinusoid_placeholder PASSED [ 50%]
+tests/test_no_sinusoid_macros.py::test_derive_macros_from_activations_returns_none PASSED [ 51%]
+tests/test_reproducible_contract.py::test_demucs_gets_explicit_zero_shifts FAILED [ 52%]
+tests/test_reproducible_contract.py::test_demucs_wrapper_refuses_implicit_shifts FAILED [ 53%]
+tests/test_reproducible_contract.py::test_seeded_shift_offsets_repeat FAILED [ 55%]
+tests/test_reproducible_contract.py::test_segments_clamped_to_decoded_duration FAILED [ 56%]
+tests/test_reproducible_contract.py::test_large_segment_overrun_is_an_error FAILED [ 57%]
+tests/test_reproducible_contract.py::test_grid_quantised_beats_give_true_tempo FAILED [ 59%]
+tests/test_reproducible_contract.py::test_loreen_contract_tempo_and_metre FAILED [ 60%]
+tests/test_reproducible_contract.py::test_metre_survives_an_intro_heavy_excerpt FAILED [ 61%]
+tests/test_reproducible_contract.py::test_loreen_unsteady_intro_is_flagged FAILED [ 63%]
+tests/test_reproducible_contract.py::test_contract_keeps_consumer_contract_version PASSED [ 64%]
+tests/test_stem_features.py::TestFeatureConfig::test_default_values PASSED [ 65%]
+tests/test_stem_features.py::TestFeatureConfig::test_custom_values PASSED [ 67%]
+tests/test_stem_features.py::TestMonoHelper::test_mono_passthrough PASSED [ 68%]
+tests/test_stem_features.py::TestMonoHelper::test_stereo_to_mono PASSED  [ 69%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_basic_feature_extraction PASSED [ 71%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_fps_matches_config PASSED [ 72%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_duration_matches_audio PASSED [ 73%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_rms_is_non_negative PASSED [ 75%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_onset_strength_normalized PASSED [ 76%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_band_energy_non_negative PASSED [ 77%]
+tests/test_stem_features.py::TestComputeFeaturesBasic::test_stereo_audio_handled PASSED [ 78%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_with_beat_frames_adds_per_beat_keys PASSED [ 80%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_rms_per_beat_aggregation PASSED [ 81%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_onset_per_beat_aggregation PASSED [ 82%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_band_energy_per_beat_arrays PASSED [ 84%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_empty_beat_frames_graceful PASSED [ 85%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_single_beat_frame_graceful PASSED [ 86%]
+tests/test_stem_features.py::TestComputeFeaturesWithBeatFrames::test_none_beat_frames_graceful PASSED [ 88%]
+tests/test_stem_features.py::TestComputePackFeatures::test_pack_features_schema PASSED [ 89%]
+tests/test_stem_features.py::TestComputePackFeatures::test_pack_features_contains_all_stems PASSED [ 90%]
+tests/test_stem_features.py::TestComputePackFeatures::test_pack_features_fps PASSED [ 92%]
+tests/test_stem_features.py::TestComputePackFeatures::test_pack_features_duration PASSED [ 93%]
+tests/test_stem_features.py::TestComputePackFeatures::test_missing_stem_raises PASSED [ 94%]
+tests/test_stem_features.py::TestEdgeCases::test_very_short_audio PASSED [ 96%]
+tests/test_stem_features.py::TestEdgeCases::test_silent_audio PASSED     [ 97%]
+tests/test_stem_features.py::TestEdgeCases::test_beat_frames_beyond_feature_length PASSED [ 98%]
+tests/test_stem_features.py::TestBeatContextIntegration::test_beat_frames_from_beat_context PASSED [100%]
+
+=================================== FAILURES ===================================
+____________________ test_demucs_gets_explicit_zero_shifts _____________________
+tests/test_reproducible_contract.py:84: in test_demucs_gets_explicit_zero_shifts
+    assert "--shifts" in cmd, cmd
+E   AssertionError: ['/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python', '-m', 'demucs.separate', '--out', '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_demucs_gets_explicit_zero0/demix/_demucs_runs', '--name', ...]
+E   assert '--shifts' in ['/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/env-trinity-repro-20261110/bin/python', '-m', 'demucs.separate', '--out', '/private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_demucs_gets_explicit_zero0/demix/_demucs_runs', '--name', ...]
+_________________ test_demucs_wrapper_refuses_implicit_shifts __________________
+tests/test_reproducible_contract.py:89: in test_demucs_wrapper_refuses_implicit_shifts
+    from demucs_seeded import main
+E   ModuleNotFoundError: No module named 'demucs_seeded'
+_______________________ test_seeded_shift_offsets_repeat _______________________
+tests/test_reproducible_contract.py:96: in test_seeded_shift_offsets_repeat
+    from demucs_seeded import seed_everything
+E   ModuleNotFoundError: No module named 'demucs_seeded'
+__________________ test_segments_clamped_to_decoded_duration ___________________
+tests/test_reproducible_contract.py:111: in test_segments_clamped_to_decoded_duration
+    assert 0.0 <= seg["start"] <= seg["end"] <= dur
+E   assert 223.92 <= 223.91002267573697
+---------------------------- Captured stderr setup -----------------------------
+Exported contract to: /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_segments_clamped_to_decod0/contract.json (13899 bytes)
+Tier: k1-lite
+____________________ test_large_segment_overrun_is_an_error ____________________
+tests/test_reproducible_contract.py:129: in test_large_segment_overrun_is_an_error
+    with pytest.raises(ValueError, match="outside"):
+E   Failed: DID NOT RAISE <class 'ValueError'>
+----------------------------- Captured stderr call -----------------------------
+Exported contract to: /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_large_segment_overrun_is_0/c.json (616 bytes)
+Tier: k1-lite
+__________________ test_grid_quantised_beats_give_true_tempo ___________________
+tests/test_reproducible_contract.py:136: in test_grid_quantised_beats_give_true_tempo
+    from rhythm_metrics import derive_tempo
+E   ModuleNotFoundError: No module named 'rhythm_metrics'
+_____________________ test_loreen_contract_tempo_and_metre _____________________
+tests/test_reproducible_contract.py:147: in test_loreen_contract_tempo_and_metre
+    assert r["bpm"] == pytest.approx(127.0, abs=0.3)
+E   assert 125.00000000000267 == 127.0 ± 0.3
+E     
+E     comparison failed
+E     Obtained: 125.00000000000267
+E     Expected: 127.0 ± 0.3
+---------------------------- Captured stderr setup -----------------------------
+Exported contract to: /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_loreen_contract_tempo_and0/contract.json (13899 bytes)
+Tier: k1-lite
+__________________ test_metre_survives_an_intro_heavy_excerpt __________________
+tests/test_reproducible_contract.py:160: in test_metre_survives_an_intro_heavy_excerpt
+    from rhythm_metrics import rhythm_summary
+E   ModuleNotFoundError: No module named 'rhythm_metrics'
+____________________ test_loreen_unsteady_intro_is_flagged _____________________
+tests/test_reproducible_contract.py:172: in test_loreen_unsteady_intro_is_flagged
+    regions = r["low_confidence_regions"]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: 'low_confidence_regions'
+---------------------------- Captured stderr setup -----------------------------
+Exported contract to: /private/var/folders/r8/1ym0k5l14hg1731f_07vsvt40000gn/T/pytest-of-spectrasynq/pytest-401/test_loreen_unsteady_intro_is_0/contract.json (13899 bytes)
+Tier: k1-lite
+=========================== short test summary info ============================
+FAILED tests/test_reproducible_contract.py::test_demucs_gets_explicit_zero_shifts
+FAILED tests/test_reproducible_contract.py::test_demucs_wrapper_refuses_implicit_shifts
+FAILED tests/test_reproducible_contract.py::test_seeded_shift_offsets_repeat
+FAILED tests/test_reproducible_contract.py::test_segments_clamped_to_decoded_duration
+FAILED tests/test_reproducible_contract.py::test_large_segment_overrun_is_an_error
+FAILED tests/test_reproducible_contract.py::test_grid_quantised_beats_give_true_tempo
+FAILED tests/test_reproducible_contract.py::test_loreen_contract_tempo_and_metre
+FAILED tests/test_reproducible_contract.py::test_metre_survives_an_intro_heavy_excerpt
+FAILED tests/test_reproducible_contract.py::test_loreen_unsteady_intro_is_flagged
+========================= 9 failed, 67 passed in 0.96s =========================
+exit=1

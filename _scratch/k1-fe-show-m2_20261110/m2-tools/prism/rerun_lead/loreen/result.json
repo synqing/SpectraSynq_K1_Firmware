@@ -1,0 +1,139 @@
+{
+  "steps": {
+    "state_open": {
+      "bundlePath": "fixtures/compiled_from_trinity_v0.1.json",
+      "exists": true,
+      "port": 57131,
+      "host": "127.0.0.1",
+      "project": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/rerun_lead/loreen/composition.json",
+      "bundle_is_compiled": false
+    },
+    "compile_pre_edit": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "out_dir": "out/pre_edit",
+        "files": {
+          "showbundle": "out/pre_edit/showbundle.json",
+          "coverage": "out/pre_edit/mapping_coverage.json",
+          "manifest": "out/pre_edit/compile_manifest.json",
+          "trace": "out/pre_edit/trace_120hz.jsonl",
+          "stream": "out/pre_edit/stream_120hz.prsm"
+        },
+        "outputs": {
+          "showbundle_sha256": "cae4fbc1a5405dff9c5a9a418261ca6b01d52fef0dfbaa0d5b9707c615eda1e1",
+          "trace_sha256": "9491b071c92f7a82e639c295bf01a05e57d5f4376371a54d311c8e40c23328ce",
+          "stream_sha256": "651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1",
+          "mapping_coverage_sha256": "e6b57dd875c170a75f0174a83e60018ea8911461bf21af862b5e077d87e22301",
+          "compile_manifest_sha256": "3bb32cf8e45b026c66f1f929b233e6710a8bf71f31b70a25bf6338773b757e1e",
+          "hz": 120,
+          "duration_us": 223910023,
+          "frames": 26870,
+          "compiler": "spectrasynq.compiler.trinity-showbundle/0.3.1",
+          "compiler_commit": "87f0c43c78e73265fe260b08b8e732cdb83499ff",
+          "prism_tree_dirty": false
+        },
+        "recorded": true,
+        "verification": null
+      }
+    },
+    "authored_edit": {
+      "status": 200,
+      "profile_sha256": "4847be0b3cccaaacac8e736a0080637859bbd04ae927f9a7c801093ed11313b7",
+      "changes": [
+        {
+          "path": "prim8.impact.transform.beat_amp_u16",
+          "before": 48000,
+          "after": 12000
+        }
+      ],
+      "profile_path": "mapping/prim8_natural_v1_bar_accent.json"
+    },
+    "save_compiled_bundle": {
+      "status": 409,
+      "error": "COMPILED_BUNDLE_READ_ONLY",
+      "message": "This ShowBundle is compiled output. Edits to it would be overwritten by the next compile. Edit the mapping profile (authored source) and recompile instead."
+    },
+    "compile_post_edit": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "out_dir": "out/post_edit",
+        "files": {
+          "showbundle": "out/post_edit/showbundle.json",
+          "coverage": "out/post_edit/mapping_coverage.json",
+          "manifest": "out/post_edit/compile_manifest.json",
+          "trace": "out/post_edit/trace_120hz.jsonl",
+          "stream": "out/post_edit/stream_120hz.prsm"
+        },
+        "outputs": {
+          "showbundle_sha256": "90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b",
+          "trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde",
+          "stream_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+          "mapping_coverage_sha256": "291ba6eb35c082d83df99a421434f8f7c668bdd94b3f414fe4ef7a98341ec170",
+          "compile_manifest_sha256": "f8f4008af157e78610ee5056149ca457485bf31699cc5d5a242069d1b02eb262",
+          "hz": 120,
+          "duration_us": 223910023,
+          "frames": 26870,
+          "compiler": "spectrasynq.compiler.trinity-showbundle/0.3.1",
+          "compiler_commit": "87f0c43c78e73265fe260b08b8e732cdb83499ff",
+          "prism_tree_dirty": false
+        },
+        "recorded": true,
+        "verification": null
+      }
+    },
+    "reopen_project": {
+      "status": 200,
+      "profile_id": "prim8_natural_v1_bar_accent",
+      "profile_sha256": "4847be0b3cccaaacac8e736a0080637859bbd04ae927f9a7c801093ed11313b7",
+      "verification": {
+        "status": "VERIFIED",
+        "trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde"
+      },
+      "bundlePath": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/rerun_lead/loreen/out/post_edit/showbundle.json",
+      "bundle_is_compiled": true
+    },
+    "recompile_verify": {
+      "status": 200,
+      "body": {
+        "ok": true,
+        "out_dir": "out/reopen",
+        "files": {
+          "showbundle": "out/reopen/showbundle.json",
+          "coverage": "out/reopen/mapping_coverage.json",
+          "manifest": "out/reopen/compile_manifest.json",
+          "trace": "out/reopen/trace_120hz.jsonl",
+          "stream": "out/reopen/stream_120hz.prsm"
+        },
+        "outputs": {
+          "showbundle_sha256": "90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b",
+          "trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde",
+          "stream_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+          "mapping_coverage_sha256": "291ba6eb35c082d83df99a421434f8f7c668bdd94b3f414fe4ef7a98341ec170",
+          "compile_manifest_sha256": "f8f4008af157e78610ee5056149ca457485bf31699cc5d5a242069d1b02eb262",
+          "hz": 120,
+          "duration_us": 223910023,
+          "frames": 26870,
+          "compiler": "spectrasynq.compiler.trinity-showbundle/0.3.1",
+          "compiler_commit": "87f0c43c78e73265fe260b08b8e732cdb83499ff",
+          "prism_tree_dirty": false
+        },
+        "recorded": false,
+        "verification": {
+          "ok": true,
+          "diffs": [],
+          "compared": [
+            "showbundle_sha256",
+            "trace_sha256",
+            "stream_sha256",
+            "mapping_coverage_sha256",
+            "hz",
+            "duration_us",
+            "compile_manifest_sha256"
+          ]
+        }
+      }
+    }
+  }
+}

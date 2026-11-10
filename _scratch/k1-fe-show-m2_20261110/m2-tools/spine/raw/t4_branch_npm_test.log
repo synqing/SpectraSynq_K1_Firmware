@@ -1,0 +1,40 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: npm test
+# start: 2026-11-10T08:36:35Z
+
+> spectrasynq-instrument-spine@0.1.0-g5 test
+> node --test tests/lock.test.js tests/resolve_organs.test.js tests/profile_and_anti_copy.test.js tests/instrument_project.test.js tests/c1_evidence.test.js tests/instrument_cli_authored.test.js
+
+✔ C1 evidence exists (fail closed) (1.7625ms)
+✔ prim8_natural_v1 1.0.0 bytes unchanged vs G5 freeze (0.430042ms)
+✔ G5 ci_click_3s expected hashes unchanged (0.139792ms)
+✔ C1 relationship results record required checks and a legal verdict (1.316417ms)
+✔ draft successor prim8_natural_v1_1 exists and does not overwrite 1.0.0 (0.22075ms)
+✔ compile-twice harness identity for every C1 fixture (0.3295ms)
+✔ verify --project builds from the project's own mapping profile and matches its recorded hashes (260.140667ms)
+✔ verify --project writes only under --out, and two runs are byte-identical (252.3145ms)
+✔ build manifest records the compiler version the compiler reported (0.161916ms)
+✔ build-demo --project compiles the authored profile into --out and does not delete that folder (158.875958ms)
+✔ --out also redirects verify --fixture and the G5 project; both still pass their goldens (595.22425ms)
+✔ --out without a value is refused (41.079666ms)
+✔ a profile whose bytes do not match the recorded hash is refused (34.468375ms)
+✔ a profile that fails mapping_profile_v1 validation is refused (35.828375ms)
+✔ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (261.31525ms)
+✔ rejects VERIFIED with 64-zero trace hash (0.444166ms)
+✔ organs.lock.json validates roles and has no absolute paths (0.630792ms)
+✔ prim8_natural_v1 is structured AUTHORED for heat/space/gravity (1.072167ms)
+✔ proposal prim8_natural_v1_1 validates including noise_gated_bounded_percentile_u16 (0.26075ms)
+✔ coverage IMPACT_ONLY fails when only impact is dynamic (0.143ms)
+✔ anti-copy: no organ source and no web/ (0.138083ms)
+✔ PRISM_ROOT override does not rewrite locked_commit (0.630125ms)
+✔ unrelated clone with a valid SHA is REMOTE_MISMATCH (0.568792ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1810.791625
+# exit: 0
+# end: 2026-11-10T08:36:37Z

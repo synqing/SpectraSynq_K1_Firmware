@@ -1,0 +1,17 @@
+$ /opt/homebrew/opt/python@3.13/bin/python3.13 tools/compare_wire_laneb.py seek wire/loreen_post_edit_seek /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/stream/loreen_post_edit_120hz.prsm wire/loreen_post_edit_seek 9000
+capture writes=363 bytes=23232 sha256=b2641433bed2cf02d502c3832664e4a7c78485eb806c09deb393f49c7bec011f
+write lengths: [64]
+M2 stream frames=26870 sha256=116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+preamble write indices: [0, 122]
+epoch 1: frames=121 wire == RESYNC_PREAMBLE + wire_packets(frames): True
+epoch 2: frames=240 wire == RESYNC_PREAMBLE + wire_packets(frames): True
+epoch 1 frames == M2 frames 0..120: True
+epoch 2 frames == M2 ticks 9000.. (seq continuing from 121): True (0 mismatches)
+RESULT PASS
+exit 0
+$ LANE_B_FW=fw_8b202f46 /opt/homebrew/opt/python@3.13/bin/python3.13 /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-b/audit_prsm_bytes.py wire/loreen_post_edit_seek.e1.prsm --guard 30 --json raw/d4_audit_seek_e1.json
+BENCH-ELIGIBLE wire/loreen_post_edit_seek.e1.prsm frames=121/121 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=64B guard=30B
+exit 0
+$ LANE_B_FW=fw_8b202f46 /opt/homebrew/opt/python@3.13/bin/python3.13 /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-b/audit_prsm_bytes.py wire/loreen_post_edit_seek.e2.prsm --guard 30 --json raw/d4_audit_seek_e2.json
+BENCH-ELIGIBLE wire/loreen_post_edit_seek.e2.prsm frames=240/240 hotkeys=0 cmd_entries=0 cmd_swallowed=0 cmds_executed=0 preamble=64B guard=30B
+exit 0

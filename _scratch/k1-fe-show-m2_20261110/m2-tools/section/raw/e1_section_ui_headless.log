@@ -1,0 +1,47 @@
+{
+  "port": 52201,
+  "steps": [
+    {
+      "step": "create",
+      "list": "chorus_1: 4 chorus 45.68 s–60.81 s — impact.transform.beat_amp_u16 = 20000 EditRemove",
+      "projLog": "Saved section edit → mapping/prim8_natural_v2_ui_a.json (adda698218bd…), mapping_profile_v2, 1 section override(s).\nCompile to regenerate the outputs."
+    },
+    {
+      "step": "edit",
+      "list": "chorus_1: 4 chorus 45.68 s–60.81 s — impact.transform.beat_amp_u16 = 12000 EditRemove",
+      "projLog": "Saved section edit → mapping/prim8_natural_v2_ui_b.json (4525cbeda3c5…), mapping_profile_v2, 1 section override(s).\nCompile to regenerate the outputs."
+    },
+    {
+      "step": "reopen",
+      "list": "chorus_1: 4 chorus 45.68 s–60.81 s — impact.transform.beat_amp_u16 = 12000 EditRemove"
+    }
+  ],
+  "segments": [
+    "0 · start · 0.00 s–0.34 s",
+    "1 · intro · 0.34 s–16.40 s",
+    "2 · verse · 16.40 s–30.57 s",
+    "3 · verse · 30.57 s–45.68 s",
+    "4 · chorus · 45.68 s–60.81 s",
+    "5 · chorus · 60.81 s–75.93 s",
+    "6 · verse · 75.93 s–91.04 s",
+    "7 · verse · 91.04 s–106.16 s",
+    "8 · chorus · 106.16 s–121.28 s",
+    "9 · chorus · 121.28 s–136.39 s",
+    "10 · bridge · 136.39 s–151.51 s",
+    "11 · bridge · 151.51 s–179.86 s",
+    "12 · chorus · 179.86 s–196.87 s",
+    "13 · chorus · 196.87 s–211.99 s",
+    "14 · end · 211.99 s–223.91 s"
+  ],
+  "top_value_hint": "everywhere else: 48000",
+  "saved_profile": {
+    "contract_path": "inputs/contract.json",
+    "contract_sha256": "f17a0c052f6ba03b51d6820a596df6f55a06ce3f42e1e59e7cf06a705909e793",
+    "stem_features_path": "inputs/stem_features.json",
+    "stem_features_sha256": "9053c7ad7e62e92b88b684b5daff07818039f46fdc46b0623a9ce60d31386052",
+    "contract_schema_sha256_path": "inputs/contract_schema.sha256",
+    "mapping_profile_path": "mapping/prim8_natural_v2_ui_b.json",
+    "mapping_profile_sha256": "4525cbeda3c59673372fbe8e486cd81c5f146aa75d375fb87bc940e030d1af86"
+  },
+  "page_errors": []
+}

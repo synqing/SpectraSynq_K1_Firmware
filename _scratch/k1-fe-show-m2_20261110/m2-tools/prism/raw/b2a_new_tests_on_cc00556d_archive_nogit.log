@@ -1,0 +1,213 @@
+# New tests (branch commit 87f0c43c78e73265fe260b08b8e732cdb83499ff) run once against the lock cc00556d. Source tree = git archive cc00556d; test file = git show 87f0c43c78e73265fe260b08b8e732cdb83499ff:tools/test_editor_instrument_loop.js. Expected: every defect test fails; the k1_usb_bridge preservation test passes (old default behaviour).
+# An earlier attempt (same tests minus per-test timeouts) hung in the first engine test because the old engine ignores the write hook; it was stopped, no processes were left. Timeouts and resolve-on-stop are the only change.
+$ cd /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked && /usr/bin/git archive cc00556d1df2f863c6a0d914ef613886b050a408 | tar -x -C <scratch>/prism_cc00556d && /usr/bin/git show 87f0c43c78e73265fe260b08b8e732cdb83499ff:tools/test_editor_instrument_loop.js > <scratch>/prism_cc00556d/tools/test_editor_instrument_loop.js && cd <scratch>/prism_cc00556d && node --test tools/test_editor_instrument_loop.js
+✖ compile endpoint runs compiler 0.3.1 and returns ShowBundle, trace and PRSM stream (136.718875ms)
+✖ compile manifest records the PRISM commit actually running; a different commit is refused (90.864375ms)
+✖ profile endpoint accepts any valid mapping_profile_v1 and rejects invalid ones (118.331292ms)
+✖ loop: compile, authored edit, save, reopen, recompile — compiled ShowBundle edits refused (158.983541ms)
+✖ editor UI wires compile, authored edit, reopen and verify (0.38125ms)
+✖ editor server binds 127.0.0.1 only by default (60.647709ms)
+✖ K1 FE playback: preamble, one guarded 64-byte write per frame, PRSM only (no K1CT) (38.467667ms)
+✖ K1 FE playback: hz outside 30..240 is refused (engine and server) (0.514042ms)
+✖ K1 FE playback: a seek starts a new epoch with a resync preamble and no duplicate frame (75.702042ms)
+✖ K1CT is sent only to the k1_usb_bridge target (legacy firmware path kept) (81.220667ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 0
+ℹ fail 10
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 819.259083
+
+✖ failing tests:
+
+test at tools/test_editor_instrument_loop.js:164:1
+✖ compile endpoint runs compiler 0.3.1 and returns ShowBundle, trace and PRSM stream (136.718875ms)
+  AssertionError [ERR_ASSERTION]: {
+    "error": "compile failed",
+    "detail": "[compile:trinity:v0.3] ERROR: --schema-sha must be 64 lowercase hex characters\n"
+  }
+  
+  
+  500 !== 200
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:169:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:199:1
+✖ compile manifest records the PRISM commit actually running; a different commit is refused (90.864375ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /^[0-9a-f]{40}$/. Input:
+  
+  ''
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:204:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '',
+    expected: /^[0-9a-f]{40}$/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:226:1
+✖ profile endpoint accepts any valid mapping_profile_v1 and rejects invalid ones (118.331292ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'prim8_natural_v1'
+  - 'my_authored_v1'
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:238:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'prim8_natural_v1',
+    expected: 'my_authored_v1',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:264:1
+✖ loop: compile, authored edit, save, reopen, recompile — compiled ShowBundle edits refused (158.983541ms)
+  AssertionError [ERR_ASSERTION]: {
+    "error": "compile failed",
+    "detail": "[compile:trinity:v0.3] ERROR: --schema-sha must be 64 lowercase hex characters\n"
+  }
+  
+  
+  500 !== 200
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:271:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:327:1
+✖ editor UI wires compile, authored edit, reopen and verify (0.38125ms)
+  AssertionError [ERR_ASSERTION]: index.html lacks #btnProjCompile
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:331:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:352:1
+✖ editor server binds 127.0.0.1 only by default (60.647709ms)
+  AssertionError [ERR_ASSERTION]: reachable on ::1 — not loopback-IPv4-only
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:356:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:426:1
+✖ K1 FE playback: preamble, one guarded 64-byte write per frame, PRSM only (no K1CT) (38.467667ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'k1_fe'
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:429:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'k1_fe',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:448:1
+✖ K1 FE playback: hz outside 30..240 is refused (engine and server) (0.514042ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception (RangeError): hz 0
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:451:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:465:1
+✖ K1 FE playback: a seek starts a new epoch with a resync preamble and no duplicate frame (75.702042ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 0
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:469:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tools/test_editor_instrument_loop.js:479:1
+✖ K1CT is sent only to the k1_usb_bridge target (legacy firmware path kept) (81.220667ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(engine.paramSetCount > 0)
+  
+      at TestContext.<anonymous> (file:///private/tmp/claude-501/-Users-spectrasynq-SpectraSynq-K1-Firmware/b846e4d7-9fc6-4e4e-a9b0-64761f909553/scratchpad/prism_cc00556d/tools/test_editor_instrument_loop.js:482:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+exit 1

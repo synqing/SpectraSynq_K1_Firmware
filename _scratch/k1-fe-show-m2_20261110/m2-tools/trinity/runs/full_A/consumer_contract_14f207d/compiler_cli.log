@@ -1,0 +1,12 @@
+cmd: node /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/prism_cc00556d/tools/trinity_compile_showbundle_v0_3.js --in /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/contract_14f207d.json --profile /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/mapping/prim8_natural_v1.json --stems /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/stem_features.json --out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/consumer_contract_14f207d/showbundle.json --coverage-out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/consumer_contract_14f207d/coverage.json --manifest-out /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/consumer_contract_14f207d/compile_manifest.json --compiler-commit cc00556d1df2f863c6a0d914ef613886b050a408 --schema-sha 3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd
+exit: 0
+--- stdout
+[compile:trinity:v0.3] OK
+  contract:  /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/contract_14f207d.json
+  profile:   /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/mapping/prim8_natural_v1.json
+  stems:     /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/stem_features.json
+  out:       /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A/consumer_contract_14f207d/showbundle.json
+  duration:  223910023 us
+
+--- stderr
+

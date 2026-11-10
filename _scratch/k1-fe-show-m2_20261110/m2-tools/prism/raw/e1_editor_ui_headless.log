@@ -1,0 +1,27 @@
+$ node tools/editor_ui_loop_headless.mjs /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/e2e/loreen_ui /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/ui /Users/spectrasynq/.npm/_npx/86170c4cd1c5da32/node_modules/playwright-core /Users/spectrasynq/Library/Caches/ms-playwright/chromium_headless_shell-1228/chrome-headless-shell-mac-arm64/chrome-headless-shell   # headless, no window
+--- compile_pre_edit
+Compiled and recorded → out/editor
+ShowBundle   cae4fbc1a5405dff9c5a9a418261ca6b01d52fef0dfbaa0d5b9707c615eda1e1
+Intent Trace 9491b071c92f7a82e639c295bf01a05e57d5f4376371a54d311c8e40c23328ce
+PRSM stream  651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1 (26870 frames @ 120 Hz)
+compiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff
+--- save_authored_edit
+Saved authored edit → mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)
+  prim8.impact.transform.beat_amp_u16: 48000 → 12000
+Compile to regenerate the outputs.
+--- compile_post_edit
+Compiled and recorded → out/editor
+ShowBundle   90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b
+Intent Trace 8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde
+PRSM stream  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3 (26870 frames @ 120 Hz)
+compiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff
+--- reopen
+Reopened /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/e2e/loreen_ui/composition.json from disk.
+--- recompile_verify
+VERIFIED: recompile matches recorded outputs → out/reopen
+ShowBundle   90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b
+Intent Trace 8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde
+PRSM stream  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3 (26870 frames @ 120 Hz)
+compiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff
+server stopped; wrote /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/ui
+exit 0

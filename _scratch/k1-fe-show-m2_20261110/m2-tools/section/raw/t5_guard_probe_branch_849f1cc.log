@@ -1,0 +1,13 @@
+HEAD 849f1cc90d771c2b27b4e7a38bae883a0f6440cf
+{
+  "root": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked",
+  "composer_param_set": {
+    "status": 409,
+    "body": "{\n  \"error\": \"K1CT_NOT_FOR_K1_FE\",\n  \"message\": \"Composer sends K1CT, which the K1 FE must never receive. It works only when the editor is started with --device-target k1_usb_bridge.\"\n}\n"
+  },
+  "mode_without_confirm": {
+    "status": 409,
+    "body": "{\n  \"error\": \"CONFIRM_REQUIRED\",\n  \"message\": \"Saving the K1 mode writes it to the device's flash. Send confirm: \\\"persist_mode_to_flash\\\" to do that.\",\n  \"mode_id\": 16,\n  \"written\": false\n}\n"
+  },
+  "server_exit": "SIGTERM"
+}

@@ -1,0 +1,30 @@
+## Defect 3 evidence on main@597f315 (source line) and compiler output
+142:    compiler_version: "spectrasynq.compiler.trinity-showbundle/0.3.0",
+compile manifest written by the compiler (M2 Loreen, same compiler):
+"compiler":{"id":"spectrasynq.compiler.trinity-showbundle","version":"0.3.1","commit":"cc00556d1df2f863c6a0d914ef613886b050a408"}
+
+## Defect 5 report: organs.local.json (not edited), state at 2026-11-10T08:41:13Z
+{
+  "schema": "organs.local.v1",
+  "paths": {
+    "trinity": "/Users/spectrasynq/Workspace_Management/Software/.g5r-clean/Trinity",
+    "prism": "/Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio",
+    "k1_product_firmware": "/Users/spectrasynq/SpectraSynq_K1_Firmware/SPECTRASYNQ_K1_FIRMWARE"
+  }
+}
+prism path in organs.local.json: HEAD=cc00556d1df2f863c6a0d914ef613886b050a408 status=[0 changed files] ## HEAD (no branch)
+lock pin: cc00556d1df2f863c6a0d914ef613886b050a408
+m1 locked clone: HEAD=cc00556d1df2f863c6a0d914ef613886b050a408 ## fix/one-instrument-editor-loop ; changed files:  M CHANGELOG.md  M package.json  M prism_minimal_editor/public/app.js  M prism_minimal_editor/public/index.html  M prism_minimal_editor/public/style.css  M prism_minimal_editor/server.js  M src/playback.js  M tools/test_e2e_pipeline.js ?? src/instrument_project.js ?? tools/test_editor_instrument_loop.js 
+
+## Branch summary
+21265e5 fix(cli): build and verify authored projects with their own mapping profile
+ AGENTS.md                                          |   2 +
+ CHANGELOG.md                                       |   9 +
+ docs/GOLDEN_PATH.md                                |   7 +
+ .../authored_bar_accent/instrument_project.json    |  55 +++++
+ .../mapping/prim8_natural_v1_bar_accent.json       | 131 ++++++++++++
+ .../ci_click_3s/expected/build_manifest.sha256     |   2 +-
+ package.json                                       |   2 +-
+ tests/instrument_cli_authored.test.js              | 172 +++++++++++++++
+ tools/instrument.mjs                               | 234 ++++++++++++++++-----
+ 9 files changed, 564 insertions(+), 50 deletions(-)

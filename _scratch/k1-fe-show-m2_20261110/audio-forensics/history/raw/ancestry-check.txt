@@ -1,0 +1,45 @@
+ed56dfb5 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-06-23 chore(fork): initial SpectraSynq K1 firmware — clean-slate rebrand from Sensory Bridge | flags+: K1_CONTROL_TOKEN K1_EFFECT_FRAMEWORK_V1 K1_EFFECT_REGISTRY_V1 K1_GDFT_INT64_MAGNITUDE_V1 K1_GDFT_INT64_RECURRENCE_V1 K1_GDFT_TRUE_CENTER_V1 K1_LOUD_GUARD_V1 K1_PIN_EVIDENCE_H K1_PIN_EVIDENCE_V1 K1_SPECTRAL_HONESTY_H K1_SPECTRAL_WINDOW_V1 
+e47877a2 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-10 feat(audio): loud-guard release/floor-cut retune — hardware-validated, default mode 2 | flags+: K1_AP_STREAM_INTERVAL_MS 
+fc82b928 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 fix(diag): rename loud-guard mode= to lg_mode= and emit lightshow= | flags+: 
+f1e39e8d | anc_a6bad318=YES | anc_8b202f46=YES | 2026-06-30 feat(agc): per-band AGC candidate SB_AGC_PERBAND_V1 (N6, prepare-only, default OFF) | flags+: K1_LOUD_GUARD_V1 
+2e2800d1 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-06-30 feat(agc): promote per-band AGC to production + A/B probe env (SB_AGC_PERBAND_V1) | flags+: 
+7677e078 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-06-30 docs(agc): record SHIPPED — per-band AGC promoted + device-confirmed | flags+: 
+a9ff00ca | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-10 feat(stm): audio-reactive STM via live mic-RMS gate + delete orphaned per-band AGC array | flags+: K1_STM 
+eaa44926 | anc_a6bad318=NO | anc_8b202f46=NO | 2026-08-06 refactor(audio): remove the dead AGC-floor chain from the Core-0 path | flags+: 
+dec5fb53 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-19 fix: dt-clock AGC at 100 Hz and RPL fps/agc probe | flags+: K1_AGC_DT_CLOCK_V1 K1_PEAK_ASYM_ENV K1_SHOW_SKIP_DISCRIMINATOR_V1 
+ae5d90a3 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-02 feat(vp): K1_PALETTE_VIBRANCY_V1 — fix palette-coordinate collapse on dense/loud music | flags+: K1_PALETTE_VIBRANCY_V1 
+b538b145 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-10 feat(audio): default-flip go-dark ON — Captain hardware-signed 2026-07-10 | flags+: 
+acd5f813 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-06 feat(audio): peakiness silence-break gate (provisional 2.10) | flags+: 
+12492867 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 fix(audio): require level AND peakiness to break silence | flags+: 
+1d97dc47 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 fix(audio): SSL-relative joint level term, replacing the absolute floor | flags+: 
+3a6098a4 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-12 fix(audio): joint level fraction 4.0 -> 2.5 after a volume sweep | flags+: 
+a8b1912a | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-12 fix(audio)!: scope the joint silence gate to IM69D; re-derive the level fraction | flags+: K1_MIC_IM69D_PDM_V1 
+52dedd28 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 fix(audio): derive the joint level fraction from identity-pinned measurement | flags+: 
+fa186b34 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-15 fix: zero AP drive at classified silence | flags+: K1_AP_DRIVE_CONTRACT_V1 
+a191a244 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-15 fix: isolate AP silence dwell timer | flags+: 
+15d3a85d | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-15 fix: preserve production silence timer bytes | flags+: K1_AP_DRIVE_CONTRACT_V1 
+e04c73bd | anc_a6bad318=YES | anc_8b202f46=YES | 2026-11-04 fix(ap): measure VU and silence RMS on the subsonic-filtered band | flags+: K1_AP_SUBSONIC_HPF_V1 
+e2e83e53 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-11-10 fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out | flags+: 
+4234aa2d | anc_a6bad318=YES | anc_8b202f46=YES | 2026-11-05 fix(fe): waveform hybrid k1 drains to black on silence | flags+: 
+b643b8d6 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 fix(effects): keep the plate lit on quiet-mic units (modes 18 & 32) | flags+: K1_MIC_IM73D_PDM_V1 
+dff1d0d5 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-06 feat(audio): G=8 revert for IM69D input gain | flags+: 
+1ae9d4ae | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-05 feat(audio): close Phase 0 IM69D silence at gain 4 | flags+: 
+72956950 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-25 feat(p2): SENS_V1a mic_auto SENSITIVITY 1.8 | flags+: K1_MIC_AUTO_DEFAULT_SENSITIVITY 
+21bb998b | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-25 feat(p2): mic auto-sense slow supervisor (K1_MIC_AUTO_SENSE_V1) | flags+: K1_LOUD_GUARD_V1 K1_MIC_AUTO_SENSE_V1 K1_MIC_IM73D_PDM_V1 
+c3584fae | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-02 feat(im73d): bench-characterize K1_MIC_IM73D_INPUT_GAIN 3.0->16.0 | flags+: 
+1bdf54d0 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-11 feat(audio)!: tombstone the IM73D profile; fail closed on an uncharacterised mic | flags+: K1_AUDIO_PROFILE_UNCHARACTERISED_ACK K1_MIC_IM73D_PDM_V1 
+d1fae012 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-13 feat(audio)!: populate K1_AUDIO_PROFILE_IM69D130_UNIT2 — Bose round closes floors, Stage 2, and P5. | flags+: 
+398f19c6 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-14 fix(cal): partial-commit a validated DC; repair stale byte gate; root cause moves upstream to the m | flags+: K1_CAL_PARTIAL_COMMIT_V1 K1_MIC_IM69D_DSR_16S_V1 
+af253090 | anc_a6bad318=NO | anc_8b202f46=NO | 2026-08-06 feat(audio): cal corridor 1400/1540 + ratio-gate no-widen note | flags+: 
+96d908a1 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-03 fix(im73d): PDM-domain cal-gate window — Outcome B from 8 measured bench runs | flags+: 
+e28dd927 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-11-10 fix(fe): validate serial input before commit; move noise-cal reset to the audio core | flags+: 
+2b99dd54 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-14 probe(ap): subsonic HPF on the drive PEAK measurement only (gated, bench) (#58) | flags+: K1_AP_SUBSONIC_HPF_V1 
+b520db2e | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-14 fix(ap): derive the subsonic HPF cutoff from the live NOTE_OFFSET (#59) | flags+: K1_AP_SUBSONIC_HPF_V1 
+7e3de332 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-14 docs(canon)+skill: HF-61 refuted, root cause found — measure the drive on the band the consumer use | flags+: 
+a999a6fc | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-13 fix(colour): silence rest + smooth hue — the full-bore-twitch regression (three causes) | flags+: 
+40e9e963 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-13 fix(colour): rest v2 — absolute novelty floor in the drive + S2 crescendo threshold (gate-calibrati | flags+: 
+d4a6fb87 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-14 feat(tune): runtime registry — every AP/VP parameter settable live via :tune (#63) | flags+: K1_TUNABLE_REGISTRY_V1 
+a7dfe3ae | anc_a6bad318=YES | anc_8b202f46=YES | 2026-07-25 feat(gdft): promote int64 overflow fix to shipping binary (audit M1.1) | flags+: K1_GDFT_INT64_MAGNITUDE_V1 K1_GDFT_INT64_RECURRENCE_V1 
+96b5df3d | anc_a6bad318=NO | anc_8b202f46=NO | 2026-08-14 fix(ini)+docs: withdraw the DSR probe as a NO-OP; record that the bench IM69D does not track the ro | flags+: K1_MIC_IM69D_DSR_16S_V1 
+23825843 | anc_a6bad318=YES | anc_8b202f46=YES | 2026-08-13 feat(colour): S3 equalised sweep drive + S1 held-anchor fallback (gated bisect candidates) | flags+: K1_FALLBACK_HELD_U_V1 K1_HUE_DRIVE_EQ_V1 
+ec18241c | anc_a6bad318=NO | anc_8b202f46=NO | 2026-07-10 wip(audio): mic-agnostic agc_loudness_norm — audio_vu_level tap + running-max ceiling + harness | flags+: K1_STM 

@@ -1,0 +1,14 @@
+Selected model is a bag of 1 models. You will see that many progress bars per track.
+Separated tracks will be stored in /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/work/excerpt/demix/_demucs_runs/htdemucs
+Separating track /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/work/excerpt/audio/track.wav
+  0%|                                                                                   | 0.0/46.8 [00:00<?, ?seconds/s] 12%|█████████▎                                                                | 5.85/46.8 [00:03<00:25,  1.60seconds/s] 25%|██████████████████▌                                                       | 11.7/46.8 [00:06<00:17,  1.96seconds/s] 37%|██████████████████████▍                                     | 17.549999999999997/46.8 [00:09<00:15,  1.87seconds/s] 50%|█████████████████████████████████████                                     | 23.4/46.8 [00:12<00:11,  1.95seconds/s] 62%|█████████████████████████████████████████████▋                           | 29.25/46.8 [00:14<00:08,  2.01seconds/s] 75%|████████████████████████████████████████████▉               | 35.099999999999994/46.8 [00:17<00:05,  2.06seconds/s] 88%|████████████████████████████████████████████████████▌       | 40.949999999999996/46.8 [00:20<00:02,  2.12seconds/s]100%|██████████████████████████████████████████████████████████████████████████| 46.8/46.8 [00:22<00:00,  2.18seconds/s]100%|██████████████████████████████████████████████████████████████████████████| 46.8/46.8 [00:22<00:00,  2.05seconds/s]
+Extracting rhythm with Beat This! (device: cpu)...
+Analyzing structure with allin1 (device: cpu)...
+=> Found 0 tracks already analyzed and 1 tracks to analyze.
+=> Found 1 tracks already demixed, 0 to demix.
+=> Found 0 spectrograms already extracted, 1 to extract.
+Extracting spectrograms:   0%|          | 0/1 [00:00<?, ?it/s]/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/vendor/allin1/src/allin1/spectrogram.py:231: UserWarning: Filterbank produced 83 bins, but spec.n_bins=81. Truncating or padding to match.
+  warnings.warn(
+Extracting spectrograms: 100%|██████████| 1/1 [00:02<00:00,  2.41s/it]Extracting spectrograms: 100%|██████████| 1/1 [00:02<00:00,  2.41s/it]
+  0%|          | 0/1 [00:00<?, ?it/s]Analyzing track.wav:   0%|          | 0/1 [00:00<?, ?it/s]Analyzing track.wav: 100%|██████████| 1/1 [00:45<00:00, 45.03s/it]Analyzing track.wav: 100%|██████████| 1/1 [00:45<00:00, 45.03s/it]
+Analysis complete. Output: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/work/excerpt/analysis.json

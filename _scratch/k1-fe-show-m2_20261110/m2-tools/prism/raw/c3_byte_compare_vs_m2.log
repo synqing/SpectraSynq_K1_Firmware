@@ -1,0 +1,45 @@
+# Byte comparison: editor e2e outputs vs M2 (cmp exit 0 = identical)
+$ cmp EDITOR/out/pre_edit/showbundle.json M2/out/pre_edit/run-a/showbundle.json
+exit 0  cae4fbc1a5405dff9c5a9a418261ca6b01d52fef0dfbaa0d5b9707c615eda1e1
+$ cmp EDITOR/out/pre_edit/trace_120hz.jsonl M2/out/pre_edit/run-a/trace_120hz.jsonl
+exit 0  9491b071c92f7a82e639c295bf01a05e57d5f4376371a54d311c8e40c23328ce
+$ cmp EDITOR/out/pre_edit/mapping_coverage.json M2/out/pre_edit/run-a/mapping_coverage.json
+exit 0  e6b57dd875c170a75f0174a83e60018ea8911461bf21af862b5e077d87e22301
+$ cmp EDITOR/out/pre_edit/stream_120hz.prsm M2/stream/loreen_pre_edit_120hz.prsm
+exit 0  651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1
+$ cmp EDITOR/mapping/prim8_natural_v1_bar_accent.json M2/mapping/prim8_natural_v1_bar_accent.json
+exit 0  4847be0b3cccaaacac8e736a0080637859bbd04ae927f9a7c801093ed11313b7
+$ cmp EDITOR/out/post_edit/showbundle.json M2/out/post_edit/run-a/showbundle.json
+exit 0  90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b
+$ cmp EDITOR/out/post_edit/trace_120hz.jsonl M2/out/post_edit/run-a/trace_120hz.jsonl
+exit 0  8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde
+$ cmp EDITOR/out/post_edit/mapping_coverage.json M2/out/post_edit/run-a/mapping_coverage.json
+exit 0  291ba6eb35c082d83df99a421434f8f7c668bdd94b3f414fe4ef7a98341ec170
+$ cmp EDITOR/out/post_edit/stream_120hz.prsm M2/stream/loreen_post_edit_120hz.prsm
+exit 0  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+$ cmp EDITOR/out/reopen/showbundle.json M2/out/post_edit/run-a/showbundle.json
+exit 0  90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b
+$ cmp EDITOR/out/reopen/trace_120hz.jsonl M2/out/post_edit/run-a/trace_120hz.jsonl
+exit 0  8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde
+$ cmp EDITOR/out/reopen/stream_120hz.prsm M2/stream/loreen_post_edit_120hz.prsm
+exit 0  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3
+$ cmp EDITOR/out/post_edit/compile_manifest.json M2/out/post_edit/run-a/compile_manifest.json
+/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/e2e/loreen/out/post_edit/compile_manifest.json /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-compose/projects/loreen/out/post_edit/run-a/compile_manifest.json differ: char 120, line 1
+exit 1  f8f4008af157e78610ee5056149ca457485bf31699cc5d5a242069d1b02eb262
+# compile_manifest difference (editor vs M2), expected: compiler.commit only
+.compiler.commit editor= 87f0c43c78e73265fe260b08b8e732cdb83499ff  m2= cc00556d1df2f863c6a0d914ef613886b050a408
+# editor outputs.json (post_edit)
+{
+  "showbundle_sha256": "90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b",
+  "trace_sha256": "8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde",
+  "stream_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+  "mapping_coverage_sha256": "291ba6eb35c082d83df99a421434f8f7c668bdd94b3f414fe4ef7a98341ec170",
+  "compile_manifest_sha256": "f8f4008af157e78610ee5056149ca457485bf31699cc5d5a242069d1b02eb262",
+  "hz": 120,
+  "duration_us": 223910023,
+  "frames": 26870,
+  "compiler": "spectrasynq.compiler.trinity-showbundle/0.3.1",
+  "compiler_commit": "87f0c43c78e73265fe260b08b8e732cdb83499ff",
+  "prism_tree_dirty": false
+}
+

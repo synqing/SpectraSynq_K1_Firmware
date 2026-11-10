@@ -1,0 +1,106 @@
+######## 301e536
+301e5363bd6c003e9c2804360521ea067df5d9ef
+SpectraSynq <yeap.elroy@gmail.com>
+2026-06-17 19:01:08 +0800
+
+feat(k1): add loud-room guard candidate
+
+
+ .../SENSORY_BRIDGE_FIRMWARE.ino                    |   3 +
+ SENSORY_BRIDGE_FIRMWARE/audio/GDFT.h               |  30 ++++-
+ SENSORY_BRIDGE_FIRMWARE/audio/i2s_audio.h          | 143 ++++++++++++++++++++-
+ SENSORY_BRIDGE_FIRMWARE/serial/serial_menu.h       |  60 +++++++++
+ SENSORY_BRIDGE_FIRMWARE/system/constants.h         |  21 +++
+ SENSORY_BRIDGE_FIRMWARE/system/globals.h           |  14 ++
+ SENSORY_BRIDGE_FIRMWARE/visual/lightshow_modes.h   |  88 +++++++++++--
+ platformio.ini                                     |   4 +
+ scripts/platformio/k1_src_includes.py              |  12 ++
+ scripts/regression-harness/parse_serial.py         |  26 +++-
+ tests/test_k1_loud_guard_static.py                 | 127 ++++++++++++++++++
+ tests/test_k1_upload_guard.py                      |   8 ++
+ tests/test_vp_probe_mode_coverage_static.py        |  44 +++++++
+ 13 files changed, 560 insertions(+), 20 deletions(-)
+######## 0bb285c
+0bb285c82669d53e6f933532314a9c52075d7f1a
+SpectraSynq <yeap.elroy@gmail.com>
+2026-06-17 19:01:47 +0800
+
+docs(hardware): record loud-room guard deployment
+
+
+ docs/hardware/device-build-registry.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+######## 72cb650
+72cb650adab4181fea7b6fbdb8acb5951b01019c
+SpectraSynq <yeap.elroy@gmail.com>
+2026-06-18 18:12:14 +0800
+
+fix(k1): default accepted live posture on
+
+
+ SENSORY_BRIDGE_FIRMWARE/system/globals.h | 4 ++--
+ tests/test_k1_loud_guard_static.py       | 2 +-
+ tests/test_vivid_precomp_static.py       | 8 ++++----
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+######## 72cb650 diff
+diff --git a/SENSORY_BRIDGE_FIRMWARE/system/globals.h b/SENSORY_BRIDGE_FIRMWARE/system/globals.h
+index d429bd2..6fff5e8 100644
+--- a/SENSORY_BRIDGE_FIRMWARE/system/globals.h
++++ b/SENSORY_BRIDGE_FIRMWARE/system/globals.h
+@@ -111,7 +111,7 @@ extern SQ15x16 chroma_val;                       // Row 3 → globals.cpp
+ inline bool chromatic_mode = true;
+ 
+ #ifdef K1_LOUD_GUARD_V1
+-inline bool     k1_loud_guard_enabled = false;
++inline bool     k1_loud_guard_enabled = true;
+ inline float    k1_loud_input_trim = 1.0f;
+ inline float    k1_loud_gdft_trim = 1.0f;
+ inline float    k1_loud_clip_duty = 0.0f;
+@@ -446,7 +446,7 @@ inline bool VP_FIX_SECONDARY_CLEAN = true;
+ inline float VP_BLOOM_ALPHA = 0.99f;
+ inline float VP_BLOOM_SHIFT_SCALE = 1.0f;
+ inline bool  VP_BLOOM_FORCE_SATURATION = true;
+-inline bool  VP_VIVID_PRECOMP = false;
++inline bool  VP_VIVID_PRECOMP = true;
+ inline float VP_VIVID_CHROMA_LEVEL = 1.0f;
+ inline float VP_VIVID_BLACK_LEVEL = VIVID_BLACK_LEVEL_DEFAULT;
+ 
+diff --git a/tests/test_k1_loud_guard_static.py b/tests/test_k1_loud_guard_static.py
+index 86dfbae..47e20d4 100644
+--- a/tests/test_k1_loud_guard_static.py
++++ b/tests/test_k1_loud_guard_static.py
+@@ -27,7 +27,7 @@ class K1LoudGuardStaticTest(unittest.TestCase):
+     def test_flag_and_runtime_state_use_k1_names(self):
+         self.assertIn("-DK1_LOUD_GUARD_V1", PLATFORMIO)
+         self.assertIn("#ifdef K1_LOUD_GUARD_V1", CONSTANTS)
+-        self.assertIn("inline bool     k1_loud_guard_enabled = false;", GLOBALS)
++        self.assertIn("inline bool     k1_loud_guard_enabled = true;", GLOBALS)
+         self.assertIn("inline float    k1_loud_input_trim = 1.0f;", GLOBALS)
+         self.assertIn("inline float    k1_loud_gdft_trim = 1.0f;", GLOBALS)
+         self.assertNotIn("SB_LOUD", PLATFORMIO + GLOBALS + CONSTANTS + I2S + SERIAL)
+diff --git a/tests/test_vivid_precomp_static.py b/tests/test_vivid_precomp_static.py
+index d8d1c5e..5a46316 100644
+--- a/tests/test_vivid_precomp_static.py
++++ b/tests/test_vivid_precomp_static.py
+@@ -1,7 +1,7 @@
+ """Static gates for SB_VIVID_PRECOMP_V1.
+ 
+-The vivid pre-comp slice is a test-only output-stage A/B control. It must stay
+-render-only, default-off, split chroma from black-depth, and reversible without
++The vivid pre-comp slice is an output-stage A/B control. It must stay
++render-only, default-on for the accepted K1 posture, split chroma from black-depth, and reversible without
+ touching the K1 palette datasets or re-enabling output gamma.
+ """
+ 
+@@ -48,9 +48,9 @@ def _function_body(source: str, name: str) -> str:
+ 
+ 
+ class VividPrecompStaticTest(unittest.TestCase):
+-    def test_production_flag_and_default_off_runtime_state_exist(self):
++    def test_production_flag_and_default_on_runtime_state_exist(self):
+         self.assertIn("-DSB_VIVID_PRECOMP_V1", PIO)
+-        self.assertRegex(GLOBALS, r"inline\s+bool\s+VP_VIVID_PRECOMP\s*=\s*false;")
++        self.assertRegex(GLOBALS, r"inline\s+bool\s+VP_VIVID_PRECOMP\s*=\s*true;")
+         self.assertRegex(GLOBALS, r"inline\s+float\s+VP_VIVID_CHROMA_LEVEL\s*=\s*1\.0f;")
+         self.assertRegex(GLOBALS, r"inline\s+float\s+VP_VIVID_BLACK_LEVEL\s*=\s*VIVID_BLACK_LEVEL_DEFAULT;")
+         self.assertIn("#ifndef VIVID_CHROMA_GAIN_MAX", CONSTANTS)

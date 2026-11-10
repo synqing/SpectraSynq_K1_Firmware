@@ -1,0 +1,24 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: node tools/instrument.mjs doctor
+# start: 2026-11-10T08:36:19Z
+DOCTOR: PASS
+{
+  "trinity": {
+    "locked": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "effective": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "dirty": false
+  },
+  "prism": {
+    "locked": "cc00556d1df2f863c6a0d914ef613886b050a408",
+    "effective": "cc00556d1df2f863c6a0d914ef613886b050a408",
+    "dirty": false
+  },
+  "roles": {
+    "trinity": "analysis",
+    "prism": "authoring_vm_compiler",
+    "k1_product_firmware": "performance_runtime",
+    "k1_usb_bridge": "transport_adapter_reference"
+  }
+}
+# exit: 0
+# end: 2026-11-10T08:36:19Z

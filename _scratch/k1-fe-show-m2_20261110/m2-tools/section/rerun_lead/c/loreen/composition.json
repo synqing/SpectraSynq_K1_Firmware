@@ -1,0 +1,140 @@
+{
+  "schema": "instrument_project_v1",
+  "version": "1.0.0",
+  "mapping_profile_id": "prim8_natural_v2_chorus1_accent_b",
+  "organs_lock_sha256": "4e57063c47045728ed5d2a90a232a326e6cc7b7a00a365a88061bf1897373fb5",
+  "inputs": {
+    "contract_path": "inputs/contract.json",
+    "contract_sha256": "f17a0c052f6ba03b51d6820a596df6f55a06ce3f42e1e59e7cf06a705909e793",
+    "stem_features_path": "inputs/stem_features.json",
+    "stem_features_sha256": "9053c7ad7e62e92b88b684b5daff07818039f46fdc46b0623a9ce60d31386052",
+    "contract_schema_sha256_path": "inputs/contract_schema.sha256",
+    "mapping_profile_path": "mapping/prim8_natural_v2_chorus1_accent_b.json",
+    "mapping_profile_sha256": "fb4fbf0ee7fdee16da299cc8d4a87421f0d8f75dec431a9a3c16760f4962d627"
+  },
+  "stream": {
+    "hz": 120,
+    "device_profile": "none",
+    "passage_start_sample": 0
+  },
+  "edits": [
+    {
+      "seq": 1,
+      "layer": "mapping_profile",
+      "from_profile": {
+        "id": "prim8_natural_v1",
+        "sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd"
+      },
+      "to_profile": {
+        "id": "prim8_natural_v2_chorus1_accent_a",
+        "path": "mapping/prim8_natural_v2_chorus1_accent_a.json",
+        "sha256": "82dd8c901d5d13b822be109d68ed9763cc56a03fb4991a35076f0d9877b77f8c"
+      },
+      "changes": [
+        {
+          "path": "schema",
+          "before": "mapping_profile_v1",
+          "after": "mapping_profile_v2"
+        },
+        {
+          "path": "sections",
+          "after": [
+            {
+              "id": "chorus_1",
+              "note": "First chorus only: off-downbeat pulses quieter so impact marks the bar.",
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              },
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 20000
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "note": "Create chorus_1 override (impact beat_amp 20000)."
+    },
+    {
+      "seq": 2,
+      "layer": "mapping_profile",
+      "from_profile": {
+        "id": "prim8_natural_v2_chorus1_accent_a",
+        "sha256": "82dd8c901d5d13b822be109d68ed9763cc56a03fb4991a35076f0d9877b77f8c"
+      },
+      "to_profile": {
+        "id": "prim8_natural_v2_chorus1_accent_b",
+        "path": "mapping/prim8_natural_v2_chorus1_accent_b.json",
+        "sha256": "fb4fbf0ee7fdee16da299cc8d4a87421f0d8f75dec431a9a3c16760f4962d627"
+      },
+      "changes": [
+        {
+          "path": "sections",
+          "before": [
+            {
+              "id": "chorus_1",
+              "note": "First chorus only: off-downbeat pulses quieter so impact marks the bar.",
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              },
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 20000
+                  }
+                }
+              }
+            }
+          ],
+          "after": [
+            {
+              "id": "chorus_1",
+              "note": "First chorus only: off-downbeat pulses quieter so impact marks the bar.",
+              "select": {
+                "segment_indices": [
+                  4
+                ],
+                "label": "chorus"
+              },
+              "prim8": {
+                "impact": {
+                  "transform": {
+                    "beat_amp_u16": 12000
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "note": "Edit chorus_1 override: impact beat_amp 20000 -> 12000 (the M2 bar-accent edit, first chorus only)."
+    }
+  ],
+  "outputs": {
+    "showbundle_sha256": "6f324e1c94756f44e1f6ecff851bfbceda9965512488848ed04b9988c997b6cb",
+    "trace_sha256": "2f682b050d518cb4db96e44fa756ec67b9426683a7edaf6dbb3ca39e05322bb5",
+    "stream_sha256": "ffa0dd3b27489cdd827e1d39d47ea0e88585d3e0f7dd84dc17de4568445dd6e2",
+    "mapping_coverage_sha256": "624497892e61f16ecfd9554ffe3f5376f67ee8ccc025d64e6a18759930e05c52",
+    "compile_manifest_sha256": "a559f9157e635da38b7346771de004f6f955e8ac742d54295c7784904ce8261b",
+    "hz": 120,
+    "duration_us": 223910023,
+    "frames": 26870,
+    "compiler": "spectrasynq.compiler.trinity-showbundle/0.4.0",
+    "compiler_commit": "f2e73593634f3a296a697eaf7eccfe7f53fe7b0e",
+    "prism_tree_dirty": false,
+    "recorded_from": "out/sectioned"
+  },
+  "verification": {
+    "status": "VERIFIED",
+    "trace_sha256": "2f682b050d518cb4db96e44fa756ec67b9426683a7edaf6dbb3ca39e05322bb5"
+  }
+}

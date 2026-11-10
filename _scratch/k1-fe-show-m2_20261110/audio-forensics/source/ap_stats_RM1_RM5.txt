@@ -1,0 +1,170 @@
+
+=== /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M1_m32_authored_music/player.jsonl.device.jsonl
+complete [AP] lines=82 fragments_skipped=0
+lightshow=[32] lg_mode=[2] (SSL,DC)=[(157, -238)]
+silence=0 lines=68  silence=1 lines=14
+field                    min       p10       p50       p90       max   (silence=0 lines)
+raw_i16_abs_peak      25.000    44.800    95.000   136.800   273.000
+raw_i16_rms           13.000    20.700    41.000    65.050   159.400
+max_raw              496.000   856.400  1910.500  3021.200  5745.000
+sil_pk               464.000  1068.100  2005.500  2923.500  4602.000
+follower             678.000  2431.200  3564.000  4566.500  5140.000
+peak_scaled            0.278     0.388     0.599     0.936     1.151
+peak_pin               0.000     0.017     0.132     0.231     0.633
+spec_pin               0.000     0.000     0.000     0.000     0.033
+spec_sat               0.000     0.000     0.000     0.000     0.000
+gdft_trim              0.336     0.819     0.873     0.976     1.000
+input_trim             1.000     1.000     1.000     1.000     1.000
+agc_gain               0.033     0.080     0.085     0.259     0.750
+agc_env                0.000     0.000     0.000     0.000     0.000
+clip_pct               0.000     0.000     0.000     0.000     0.000
+near_pct               0.000     0.000     0.000     0.000     0.000
+rms_raw                0.005     0.012     0.023     0.043     0.093
+pky                    1.290     1.480     2.115     2.892     3.450
+max_raw/raw_i16_abs_peak (raw>=40): p10=18.06 p50=19.58 p90=23.54  [8*2.7=21.6 before DC shift]
+follower at SSL floor: 0/68 = 0.000
+implied gdft_target share: 0.32:0.015, 0.70:0.029, 0.85:0.500, 1.00:0.456
+gdft_trim<0.999 (floor-cut + ceiling knee ACTIVE): 66/68 = 0.971
+gdft_trim<0.92 (chroma unpin eligible): 54/68 = 0.794
+peak_pin duty>0.12: 37/68 = 0.544; spec_pin>0.04: 0/68
+agc_gain (bass band) within 5% of loud-guard floor: 52/68
+  lowest agc_gain=0.033 at gdft_trim=0.336 floor=0.0219 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.059 at gdft_trim=0.691 floor=0.0636 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.071 at gdft_trim=0.701 floor=0.0648 target_cap=0.25*trim/(env+0.001)
+(max_raw-SSL)/follower instant: p50=0.491 p90=0.825 max=1.215
+
+=== /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M2_m32_authored_music/player.jsonl.device.jsonl
+complete [AP] lines=82 fragments_skipped=0
+lightshow=[32] lg_mode=[2] (SSL,DC)=[(157, -238)]
+silence=0 lines=73  silence=1 lines=9
+field                    min       p10       p50       p90       max   (silence=0 lines)
+raw_i16_abs_peak      13.000    35.800    94.000   161.200   238.000
+raw_i16_rms            9.300    16.800    36.000    72.760   138.000
+max_raw               85.000   608.400  1901.000  3243.600  4902.000
+sil_pk               113.000   655.600  1803.000  3002.200  4302.000
+follower             157.000  1272.600  3437.000  4381.400  4866.000
+peak_scaled            0.012     0.323     0.585     0.983     1.142
+peak_pin               0.000     0.012     0.137     0.238     0.700
+spec_pin               0.000     0.000     0.000     0.000     0.000
+spec_sat               0.000     0.000     0.000     0.000     0.000
+gdft_trim              0.352     0.799     0.870     0.988     1.000
+input_trim             1.000     1.000     1.000     1.000     1.000
+agc_gain               0.041     0.081     0.085     0.482     1.801
+agc_env                0.000     0.000     0.000     0.000     0.000
+clip_pct               0.000     0.000     0.000     0.000     0.000
+near_pct               0.000     0.000     0.000     0.000     0.000
+rms_raw                0.000     0.006     0.022     0.040     0.093
+pky                    1.290     1.522     2.070     3.008     3.270
+max_raw/raw_i16_abs_peak (raw>=40): p10=17.56 p50=19.45 p90=23.20  [8*2.7=21.6 before DC shift]
+follower at SSL floor: 2/73 = 0.027
+implied gdft_target share: 0.32:0.014, 0.70:0.055, 0.85:0.507, 1.00:0.425
+gdft_trim<0.999 (floor-cut + ceiling knee ACTIVE): 69/73 = 0.945
+gdft_trim<0.92 (chroma unpin eligible): 58/73 = 0.795
+peak_pin duty>0.12: 42/73 = 0.575; spec_pin>0.04: 0/73
+agc_gain (bass band) within 5% of loud-guard floor: 51/73
+  lowest agc_gain=0.041 at gdft_trim=0.352 floor=0.0238 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.054 at gdft_trim=0.634 floor=0.0569 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.055 at gdft_trim=0.671 floor=0.0613 target_cap=0.25*trim/(env+0.001)
+(max_raw-SSL)/follower instant: p50=0.526 p90=0.856 max=1.155
+
+=== /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M3_m32_authored_music/player.jsonl.device.jsonl
+complete [AP] lines=83 fragments_skipped=0
+lightshow=[32] lg_mode=[2] (SSL,DC)=[(157, -238)]
+silence=0 lines=66  silence=1 lines=17
+field                    min       p10       p50       p90       max   (silence=0 lines)
+raw_i16_abs_peak      13.000    47.000    87.000   169.500   246.000
+raw_i16_rms            9.500    21.300    38.150    69.500   118.100
+max_raw              109.000   798.000  1727.500  3617.500  5075.000
+sil_pk               111.000  1001.500  1874.000  3220.000  4180.000
+follower             157.000  2130.500  3559.500  4510.000  5068.000
+peak_scaled            0.023     0.344     0.595     0.982     1.150
+peak_pin               0.000     0.018     0.134     0.220     0.546
+spec_pin               0.000     0.000     0.000     0.000     0.021
+spec_sat               0.000     0.000     0.000     0.000     0.000
+gdft_trim              0.369     0.828     0.869     0.976     1.000
+input_trim             1.000     1.000     1.000     1.000     1.000
+agc_gain               0.033     0.081     0.085     0.293     1.818
+agc_env                0.000     0.000     0.000     0.000     0.000
+clip_pct               0.000     0.000     0.000     0.000     0.000
+near_pct               0.000     0.000     0.000     0.000     0.000
+rms_raw                0.000     0.010     0.023     0.047     0.074
+pky                    1.300     1.570     2.095     2.910     3.270
+max_raw/raw_i16_abs_peak (raw>=40): p10=17.34 p50=19.68 p90=23.09  [8*2.7=21.6 before DC shift]
+follower at SSL floor: 1/66 = 0.015
+implied gdft_target share: 0.70:0.030, 0.85:0.515, 1.00:0.455
+gdft_trim<0.999 (floor-cut + ceiling knee ACTIVE): 64/66 = 0.970
+gdft_trim<0.92 (chroma unpin eligible): 51/66 = 0.773
+peak_pin duty>0.12: 36/66 = 0.545; spec_pin>0.04: 0/66
+agc_gain (bass band) within 5% of loud-guard floor: 51/66
+  lowest agc_gain=0.033 at gdft_trim=0.369 floor=0.0258 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.065 at gdft_trim=0.723 floor=0.0674 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.076 at gdft_trim=0.780 floor=0.0741 target_cap=0.25*trim/(env+0.001)
+(max_raw-SSL)/follower instant: p50=0.500 p90=0.899 max=1.220
+
+=== /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M4_m32_rejected_hz0_music/player.jsonl.device.jsonl
+complete [AP] lines=83 fragments_skipped=0
+lightshow=[32] lg_mode=[2] (SSL,DC)=[(157, -238)]
+silence=0 lines=71  silence=1 lines=12
+field                    min       p10       p50       p90       max   (silence=0 lines)
+raw_i16_abs_peak      14.000    44.000    86.000   170.000   252.000
+raw_i16_rms           10.800    19.600    35.800    77.700   148.000
+max_raw               66.000   712.000  1705.000  3541.000  5292.000
+sil_pk               171.000   913.000  1840.000  3352.000  4250.000
+follower             157.000  1974.000  3426.000  4528.000  5034.000
+peak_scaled            0.273     0.329     0.613     0.936     1.071
+peak_pin               0.000     0.021     0.138     0.228     0.468
+spec_pin               0.000     0.000     0.000     0.000     0.000
+spec_sat               0.000     0.000     0.000     0.000     0.000
+gdft_trim              0.392     0.812     0.875     0.980     1.000
+input_trim             1.000     1.000     1.000     1.000     1.000
+agc_gain               0.029     0.082     0.085     0.361     1.420
+agc_env                0.000     0.000     0.000     0.000     0.000
+clip_pct               0.000     0.000     0.000     0.000     0.000
+near_pct               0.000     0.000     0.000     0.000     0.000
+rms_raw                0.001     0.011     0.021     0.047     0.098
+pky                    1.260     1.540     2.170     2.930     3.610
+max_raw/raw_i16_abs_peak (raw>=40): p10=17.54 p50=19.79 p90=23.22  [8*2.7=21.6 before DC shift]
+follower at SSL floor: 1/71 = 0.014
+implied gdft_target share: 0.70:0.056, 0.85:0.549, 1.00:0.394
+gdft_trim<0.999 (floor-cut + ceiling knee ACTIVE): 69/71 = 0.972
+gdft_trim<0.92 (chroma unpin eligible): 54/71 = 0.761
+peak_pin duty>0.12: 43/71 = 0.606; spec_pin>0.04: 0/71
+agc_gain (bass band) within 5% of loud-guard floor: 54/71
+  lowest agc_gain=0.029 at gdft_trim=0.392 floor=0.0285 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.068 at gdft_trim=0.701 floor=0.0648 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.070 at gdft_trim=0.747 floor=0.0702 target_cap=0.25*trim/(env+0.001)
+(max_raw-SSL)/follower instant: p50=0.471 p90=0.867 max=1.070
+
+=== /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-d/runs/R_M5_m32_prism_m2_music/player.jsonl.device.jsonl
+complete [AP] lines=82 fragments_skipped=0
+lightshow=[32] lg_mode=[2] (SSL,DC)=[(157, -238)]
+silence=0 lines=67  silence=1 lines=15
+field                    min       p10       p50       p90       max   (silence=0 lines)
+raw_i16_abs_peak      16.000    36.000    84.000   146.800   250.000
+raw_i16_rms            8.200    15.400    32.600    60.340   136.900
+max_raw              107.000   617.600  1705.000  2932.200  5161.000
+sil_pk               162.000   723.600  1738.000  2862.000  4587.000
+follower             157.000  1987.200  3511.000  4615.000  5438.000
+peak_scaled            0.151     0.290     0.553     0.978     1.108
+peak_pin               0.000     0.015     0.132     0.227     0.658
+spec_pin               0.000     0.000     0.000     0.000     0.036
+spec_sat               0.000     0.000     0.000     0.000     0.000
+gdft_trim              0.431     0.821     0.876     0.991     1.000
+input_trim             1.000     1.000     1.000     1.000     1.000
+agc_gain               0.057     0.082     0.085     0.395     1.919
+agc_env                0.000     0.000     0.000     0.000     0.000
+clip_pct               0.000     0.000     0.000     0.000     0.000
+near_pct               0.000     0.000     0.000     0.000     0.000
+rms_raw                0.001     0.008     0.022     0.042     0.095
+pky                    1.300     1.590     2.140     3.010     4.020
+max_raw/raw_i16_abs_peak (raw>=40): p10=17.55 p50=19.63 p90=23.12  [8*2.7=21.6 before DC shift]
+follower at SSL floor: 3/67 = 0.045
+implied gdft_target share: 0.32:0.015, 0.70:0.045, 0.85:0.507, 1.00:0.433
+gdft_trim<0.999 (floor-cut + ceiling knee ACTIVE): 63/67 = 0.940
+gdft_trim<0.92 (chroma unpin eligible): 50/67 = 0.746
+peak_pin duty>0.12: 38/67 = 0.567; spec_pin>0.04: 0/67
+agc_gain (bass band) within 5% of loud-guard floor: 49/67
+  lowest agc_gain=0.057 at gdft_trim=0.682 floor=0.0626 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.063 at gdft_trim=0.431 floor=0.0331 target_cap=0.25*trim/(env+0.001)
+  lowest agc_gain=0.075 at gdft_trim=0.701 floor=0.0648 target_cap=0.25*trim/(env+0.001)
+(max_raw-SSL)/follower instant: p50=0.420 p90=0.868 max=1.170

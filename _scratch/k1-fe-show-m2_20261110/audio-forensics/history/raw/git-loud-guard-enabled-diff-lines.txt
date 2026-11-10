@@ -1,0 +1,49 @@
+### ed56dfb5
+3847:+++ b/SPECTRASYNQ_K1_FIRMWARE/audio/GDFT.h
+4181:+  if (k1_loud_guard_enabled) {
+4235:+    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
+--
+5057:+++ b/SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h
+5170:+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
+5198:+  if (!k1_loud_guard_enabled) {
+5758:+      k1_loud_guard_enabled ? 1 : 0,
+--
+12518:+++ b/SPECTRASYNQ_K1_FIRMWARE/diag/k1_pin_evidence.cpp
+12739:+  if (k1_loud_guard_enabled) {
+--
+32017:+++ b/SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h
+32567:+  USBSerial.println(vp_bool_text(k1_loud_guard_enabled));
+32585:+  k1_loud_guard_enabled = enabled;
+32586:+  if (!k1_loud_guard_enabled) {
+--
+39134:+++ b/SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+39249:+inline bool     k1_loud_guard_enabled = true;
+--
+### e47877a2
+216:+++ b/docs/research/k1_loud_guard_release_retune_ab_2026-07-10.md
+318:+`platformio.ini:118` comment claimed "Default OFF via k1_loud_guard_enabled=false" — **stale**; `globals.h:123` defaults it `true` (guard ships enabled). To be reconciled in the same change (comment-only) so provenance is honest.
+--
+328:+++ b/platformio.ini
+334:-    ;   Default OFF via k1_loud_guard_enabled=false. REVERT = delete this -D line.
+335:+    ;   Runtime AP headroom + semantic trim. Ships ENABLED: k1_loud_guard_enabled
+### 8e277291
+82248:+++ b/SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h
+82353:+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
+82381:+  if (!k1_loud_guard_enabled) {
+82941:+      k1_loud_guard_enabled ? 1 : 0,
+--
+83077:+++ b/SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp
+83414:+  if (k1_loud_guard_enabled) {
+83468:+    if (k1_loud_guard_enabled && k1_loud_trim < 0.999f) {
+--
+90243:+++ b/SPECTRASYNQ_K1_FIRMWARE/diag/k1_pin_evidence.cpp
+90464:+  if (k1_loud_guard_enabled) {
+--
+113898:+++ b/SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.h
+114259:+  USBSerial.println(vp_bool_text(k1_loud_guard_enabled));
+114277:+  k1_loud_guard_enabled = enabled;
+114278:+  if (!k1_loud_guard_enabled) {
+--
+118971:+++ b/SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+119086:+inline bool     k1_loud_guard_enabled = true;
+--

@@ -1,0 +1,18 @@
+7:+++ b/_scratch/dual-mic-ssa-swarm-20260730/A-map-territory/EVIDENCE.md
+145:+++ b/_scratch/dual-mic-ssa-swarm-20260730/A-map-territory/required-rg.log
+231:+++ b/_scratch/dual-mic-ssa-swarm-20260730/B-hardware-reach/EVIDENCE.md
+379:+++ b/_scratch/dual-mic-ssa-swarm-20260730/C-falsification-queue/EVIDENCE.md
+636:+++ b/_scratch/dual-mic-ssa-swarm-20260730/D-systems-archetypes/EVIDENCE.md
+826:+++ b/_scratch/dual-mic-ssa-swarm-20260730/D-systems-archetypes/required-rg.log
+839:+_scratch/waveshare-polyphony-forensic-20260619/WAVE-POLY-D-tempo-dependent-collapse.md:14:However, source evidence alone does not prove that tempo starvation is the live failure. It also partially refutes a simple "tempo root cause explains everything" diagnosis: Waveform Tempo, Tempo River, and Tempo River Walk still have idle/floor movement and level/spectrum injection paths when tempo conf
+853:+_scratch/waveshare-polyphony-forensic-20260619/WAVE-POLY-E-redteam-hypotheses.md:15:| Loud guard, response gain, or Waveshare visual-gain configuration is over-trimming useful dynamics or confusing metric domains. | Waveshare sets `K1_I2S_MIC_TO_VISUAL_SHIFT=0` and `K1_I2S_MIC_VISUAL_GAIN_NUM=3` in `platformio.ini:323-351`. Dual-mic acquisition clamps selected samples and can raise `max_wavef
+866:+_scratch/waveshare-polyphony-forensic-20260619/WAVE-POLY-B-ap-loud-path.md:24:- Source initialises `k1_loud_guard_enabled = true`; the nearby platform comment says default off, but source and static test assert true: `SENSORY_BRIDGE_FIRMWARE/system/globals.h:113-124`, `tests/test_k1_loud_guard_static.py:26-33`.
+892:+++ b/_scratch/dual-mic-ssa-swarm-20260730/E-mem-archaeology/EVIDENCE.md
+989:+| Q18 | **OPEN** | Loud-guard-neutralised APCAP after stable mono boundary. | Mem #66868/#66870 Priority3. |
+1043:+++ b/_scratch/dual-mic-ssa-swarm-20260730/F-adversarial-redteam/EVIDENCE.md
+1119:+- Further AP gain / chroma-gate / loud-guard / tempo-veto knob tuning without forced-source proof (handoff traps; WAVE-POLY-B).
+1166:+++ b/_scratch/dual-mic-ssa-swarm-20260730/G-product-doe/EVIDENCE.md
+1279:+++ b/_scratch/dual-mic-ssa-swarm-20260730/H-audio-pipeline/EVIDENCE.md
+1301:+| Production `k1_hardware` | **12800** | **96** | ~133.33 Hz | Off (`K1_DUAL_MIC_ENABLED` default 0) | `K1_LOUD_GUARD_V1`; `k1_loud_guard_enabled=true` in `globals.h` |
+1362:+| **Loud-guard spectral kill** | `gdft_trim`↓, floor-cut, sat/peak-pin duty↑; spectrogram flat; novelty weak; Waveform OK | **Yes** — toggle `k1_loud_guard_enabled` / compare trim telemetry | **No** — AP software path; HW only to refute “no signal” |
+1390:+++ b/_scratch/dual-mic-ssa-swarm-20260730/device-20260731/CAPTAIN-CUE.txt

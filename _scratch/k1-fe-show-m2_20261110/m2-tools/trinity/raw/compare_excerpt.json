@@ -1,0 +1,125 @@
+{
+  "a": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/excerpt_A",
+  "b": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/excerpt_B",
+  "files": {
+    "audio/track.wav": {
+      "a": "6d9dfae78bf87baf64720c07f637fb306990e79197230fd645a3708b0ebae751",
+      "b": "6d9dfae78bf87baf64720c07f637fb306990e79197230fd645a3708b0ebae751",
+      "identical": true
+    },
+    "demix/htdemucs/track/vocals.wav": {
+      "a": "80ead7ff09c83cb001d0628dd5d987476e58efcb6d41c5e4e2c02c649f3cc926",
+      "b": "80ead7ff09c83cb001d0628dd5d987476e58efcb6d41c5e4e2c02c649f3cc926",
+      "identical": true
+    },
+    "demix/htdemucs/track/drums.wav": {
+      "a": "cd9fb5cfb68f89be788a155af8c42bc812c45248d81b53b0915c3fc22cace3ca",
+      "b": "cd9fb5cfb68f89be788a155af8c42bc812c45248d81b53b0915c3fc22cace3ca",
+      "identical": true
+    },
+    "demix/htdemucs/track/bass.wav": {
+      "a": "a0a580e3b563d40f34b9d40590b37fd52d6c33c40a8c25078349a17fb52db2a3",
+      "b": "a0a580e3b563d40f34b9d40590b37fd52d6c33c40a8c25078349a17fb52db2a3",
+      "identical": true
+    },
+    "demix/htdemucs/track/other.wav": {
+      "a": "9143e3c18f3034f9357bd18137a58edb831dfb2ba3379f1daec50dd850677850",
+      "b": "9143e3c18f3034f9357bd18137a58edb831dfb2ba3379f1daec50dd850677850",
+      "identical": true
+    },
+    "stem_features.json": {
+      "a": "664aee7083efe6658651ccd2d8268b2edca5f13ded4a04ecd834a7e8541b6a1a",
+      "b": "664aee7083efe6658651ccd2d8268b2edca5f13ded4a04ecd834a7e8541b6a1a",
+      "identical": true
+    },
+    "analysis.json": {
+      "a": "d35bd73e1c993bf663592d4cc7bcb248cd399df14c528959c9233d64ac4dbd40",
+      "b": "d35bd73e1c993bf663592d4cc7bcb248cd399df14c528959c9233d64ac4dbd40",
+      "identical": true
+    },
+    "contract.json": {
+      "a": "2197773f03f0946f16ea76e4b3ecb61aedecc711e27d9fbc46a3c907508703ec",
+      "b": "2197773f03f0946f16ea76e4b3ecb61aedecc711e27d9fbc46a3c907508703ec",
+      "identical": true
+    }
+  },
+  "all_identical": true,
+  "schema": {
+    "file": "/Users/spectrasynq/Workspace_Management/Software/Trinity/analysis/contract_schema.json",
+    "sha256": "3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd",
+    "result": "PASS",
+    "errors": []
+  },
+  "facts": {
+    "version": "1.0.0",
+    "duration_sec": 45.0,
+    "segments_within_duration": true,
+    "last_segment_end": 45.0,
+    "clamps": [
+      {
+        "segment": 4,
+        "field": "end",
+        "original": 45.01,
+        "clamped": 45.0,
+        "delta_sec": -0.00999999999999801
+      }
+    ],
+    "beats": 97,
+    "downbeats": 39,
+    "downbeats_subset_of_beats": true,
+    "bpm": 127.1748135874068,
+    "bpm_rounded": 127,
+    "tempo": {
+      "bpm": 127.1748135874068,
+      "method": "steady_run_slope",
+      "reliable": true,
+      "steady_interval_fraction": 0.6770833333333334,
+      "beats_used": 57,
+      "runs_used": 7,
+      "tolerance": 0.15,
+      "median_ibi_bpm": 136.36363636363637
+    },
+    "time_signature": {
+      "numerator": 1,
+      "denominator": 4,
+      "method": "downbeat_spacing_mode",
+      "support": 0.42105263157894735,
+      "bars": 38,
+      "denominator_assumed": true
+    },
+    "low_confidence_regions": [
+      {
+        "start": 0.36,
+        "end": 9.34,
+        "beats": 15,
+        "downbeats": 7,
+        "inconsistent_bars": 6,
+        "reason": "6 bars off the 1-beat metre or steady tempo"
+      },
+      {
+        "start": 9.78,
+        "end": 24.48,
+        "beats": 37,
+        "downbeats": 15,
+        "inconsistent_bars": 14,
+        "reason": "14 bars off the 1-beat metre or steady tempo"
+      },
+      {
+        "start": 24.9,
+        "end": 43.82,
+        "beats": 43,
+        "downbeats": 17,
+        "inconsistent_bars": 16,
+        "reason": "16 bars off the 1-beat metre or steady tempo"
+      }
+    ],
+    "debug_meta_demucs": {
+      "model": "htdemucs",
+      "shifts": 0,
+      "overlap": 0.25,
+      "two_stems": null,
+      "seed": 0,
+      "shifts_explicit": true
+    }
+  }
+}

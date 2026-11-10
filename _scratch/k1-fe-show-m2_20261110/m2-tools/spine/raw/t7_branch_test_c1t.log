@@ -1,0 +1,48 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: npm run test:c1t
+# start: 2026-11-10T08:36:48Z
+
+> spectrasynq-instrument-spine@0.1.0-g5 test:c1t
+> node --test tests/c1t_relationships.test.js tests/c1t_r_evidence.test.js
+
+✔ C1T-R relationship_results: verdict is PASS (2.323875ms)
+✔ C1T-R relationship_results: owned_audio_ingested is true (0.128041ms)
+✔ C1T-R relationship_results: all three corpus tracks present (0.113583ms)
+✔ C1T-R relationship_results: G5 regression PASS (0.091541ms)
+✔ C1T-R relationship_results: all semantic checks recorded as PASS (0.080167ms)
+✔ C1T-R relationship_results: all tracks byte-identical compile (0.078667ms)
+✔ C1T-R relationship_results: profile under test is the successor 1.1.0 (0.086ms)
+✔ C1T-R compile_twice: all three tracks showbundle byte-identical (0.559916ms)
+✔ C1T-R compile_twice: all three tracks trace byte-identical (0.099667ms)
+✔ C1T-R compile_twice: frozen ShowBundle hashes (0.268416ms)
+✔ C1T-R semantic_checks: all 51 checks present (0.277166ms)
+✔ C1T-R semantic_checks: every check passes (fail-closed) (0.390541ms)
+✔ C1T-R hashes: all tracks have non-trivial SHA256s (0.236333ms)
+✔ C1T-R hashes: compiler commit matches expected 0.3.1 worktree SHA (0.072792ms)
+✔ C1T-R hashes: Trinity commit matches lock (0.058292ms)
+✔ C1T-R demix_provenance: recorded for all tracks (0.145875ms)
+✔ fail-closed: C1T relationship results list required checks (1.881542ms)
+✔ fail-closed: every recorded C1T relationship must pass (0.206292ms)
+✔ C1T verdict is legal; PASS requires owned four-stem packs (0.150166ms)
+✔ prim8_natural_v1 1.0.0 bytes unchanged vs G5 freeze (0.315708ms)
+✔ G5 ci_click_3s expected hashes unchanged (0.118959ms)
+✔ successor profile is PROPOSAL 1.1.0 and validates (1.748833ms)
+✔ product doctor path still points at 1.0.0 not the proposal (1.830583ms)
+✔ C1T-R: relationship_results.json exists and has PASS verdict (0.202458ms)
+✔ C1T-R: no NaN or Infinity in any output (0.168291ms)
+✔ C1T-R: authored heat/space/gravity constant zero on all tracks (0.162166ms)
+✔ C1T-R: compile-twice byte identity on all real-music tracks (0.090041ms)
+✔ C1T-R: pressure ordering — sparse < rave < dense (0.073833ms)
+✔ C1T-R: compile_twice.json exists with 3 tracks all byte-identical (0.105375ms)
+✔ C1T-R: G5 regression — ci_click_3s hashes match freeze (0.06825ms)
+✔ C1T-R: all semantic checks recorded in relationship_results.json pass (0.071458ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56.720625
+# exit: 0
+# end: 2026-11-10T08:36:48Z

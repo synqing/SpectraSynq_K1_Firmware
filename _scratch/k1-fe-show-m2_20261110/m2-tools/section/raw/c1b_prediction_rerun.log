@@ -1,0 +1,48 @@
+2026-11-10T09:34:15Z
+{
+ "segment_index": 4,
+ "segment": {
+  "start": 45.68,
+  "end": 60.81,
+  "label": "chorus"
+ },
+ "span_us": [
+  45680000,
+  60810000
+ ],
+ "frames_total": 26870,
+ "frames_in_span": 1816,
+ "weak_beats_in_span": [
+  46180000,
+  46660000,
+  47140000,
+  48100000,
+  48580000,
+  49040000,
+  49980000,
+  50440000,
+  50920000,
+  51860000,
+  52340000,
+  52800000,
+  53740000,
+  54220000,
+  54700000,
+  55660000,
+  56120000,
+  56580000,
+  57520000,
+  58000000,
+  58460000,
+  59420000,
+  59880000,
+  60340000
+ ],
+ "pulses_straddling_a_boundary_us": [],
+ "P1_equals_P2": true,
+ "rule": "frame i == post[i] if t_i in span else pre[i]; changed = P2 set; only bytes 20..21 (impact) differ",
+ "pre_sha256": "651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1",
+ "post_sha256": "116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3",
+ "expected_stream_sha256": "ffa0dd3b27489cdd827e1d39d47ea0e88585d3e0f7dd84dc17de4568445dd6e2"
+}
+P1 changed 116 P2 changed 116

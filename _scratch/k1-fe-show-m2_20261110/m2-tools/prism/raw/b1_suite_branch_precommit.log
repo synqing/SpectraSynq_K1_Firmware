@@ -1,0 +1,155 @@
+$ lsof -nP -iTCP:7777 -sTCP:LISTEN  (must be empty: suites probe :7777 for device tests)
+$ cd /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/prism-studio-locked && npm test   # branch fix/one-instrument-editor-loop, working tree (pre-commit)
+cc00556d1df2f863c6a0d914ef613886b050a408
+
+> spectrasynq-showbundle@0.1.0 test
+> npm run golden && node --test tools/test_mapping_transforms_v1.js tools/test_trinity_contract_adapter_v1.js tools/test_trinity_compile_v0_3.js tools/test_editor_instrument_loop.js && npm run test:all
+
+
+> spectrasynq-showbundle@0.1.0 golden
+> npm run golden:v0.1 && npm run golden:v0.2 && npm run golden:v0.3
+
+
+> spectrasynq-showbundle@0.1.0 golden:v0.1
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.1.json --hz 120 --out .tmp/golden_trace_120hz.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz.jsonl --expect fixtures/golden_trace_120hz.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+
+> spectrasynq-showbundle@0.1.0 golden:v0.2
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.2.json --hz 120 --out .tmp/golden_trace_120hz_v0.2.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.2.jsonl --expect fixtures/golden_trace_120hz_v0.2.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz_v0.2.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+
+> spectrasynq-showbundle@0.1.0 golden:v0.3
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.3.json --hz 120 --out .tmp/golden_trace_120hz_v0.3.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.3.jsonl --expect fixtures/golden_trace_120hz_v0.3.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz_v0.3.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+✔ compile endpoint runs compiler 0.3.1 and returns ShowBundle, trace and PRSM stream (392.106916ms)
+✔ compile manifest records the PRISM commit actually running; a different commit is refused (260.276292ms)
+✔ profile endpoint accepts any valid mapping_profile_v1 and rejects invalid ones (258.365709ms)
+✔ loop: compile, authored edit, save, reopen, recompile — compiled ShowBundle edits refused (488.870917ms)
+✔ editor UI wires compile, authored edit, reopen and verify (1.286458ms)
+✔ editor server binds 127.0.0.1 only by default (118.423416ms)
+✔ K1 FE playback: preamble, one guarded 64-byte write per frame, PRSM only (no K1CT) (96.686708ms)
+✔ K1 FE playback: hz outside 30..240 is refused (engine and server) (122.578625ms)
+✔ K1 FE playback: a seek starts a new epoch with a resync preamble and no duplicate frame (236.884875ms)
+✔ K1CT is sent only to the k1_usb_bridge target (legacy firmware path kept) (493.15425ms)
+✔ percentile nearest-rank is deterministic (1.736167ms)
+✔ below activity floor yields exact zeros (0.514958ms)
+✔ tiny/tiny does not map to full scale when gain is capped (0.211875ms)
+✔ quiet < normal < loud remains monotonic under bounded gain (0.238041ms)
+✔ inactive frames of a p99-normalised onset series become zero (0.146292ms)
+✔ NaN in source throws (0.423209ms)
+✔ Infinity in source throws (0.141959ms)
+✔ NaN in activity throws (0.236584ms)
+✔ Infinity in activity throws (0.175084ms)
+✔ negative source clamps to 0 (0.244042ms)
+✔ assertFiniteSeries throws with name and index (0.253167ms)
+✔ applyTransform fails closed if a transform series is non-finite (0.3695ms)
+✔ missing profile parameters throw (no hidden defaults) (0.168167ms)
+✔ applyTransform closed enum includes noise_gated_bounded_percentile_u16 (0.271208ms)
+✔ ratio_u16 absolute_denominator_floor zeros residue without changing unset 1.0.0 behaviour (0.197667ms)
+✔ secondsToUs is exact rounding (0.675833ms)
+✔ happy path adapts in-memory contract and stems (0.66075ms)
+✔ rejects in-memory malformed contracts (0.1555ms)
+✔ rejects in-memory malformed stem_features (0.23075ms)
+✔ CI contract adapts beats and downbeats to microseconds (0.446584ms)
+✔ rejects spine malformed contracts (0.530208ms)
+✔ rejects spine malformed stem_features (0.560209ms)
+✔ compile twice is byte-identical bundle, manifest, and trace (5.612167ms)
+✔ bundle is ShowBundle v0.3 without param_curves (3.938542ms)
+✔ gravity is authored zero; impact has downbeat accent (1.364958ms)
+✔ pressure mass texture are dynamically mapped (0.443917ms)
+✔ coverage gate fails when only impact is dynamic (0.187292ms)
+✔ mutated profile missing space fails coverage (0.333208ms)
+✔ manifest has no absolute paths and uses injected commit (0.348958ms)
+✔ CLI missing --compiler-commit exits 2 (53.530583ms)
+✔ CLI with cwd=/tmp still writes injected commit (49.055708ms)
+✔ secondsToUs is exact rounding (1.641792ms)
+✔ happy path adapts in-memory contract and stems (0.635583ms)
+✔ rejects in-memory malformed contracts (0.155333ms)
+✔ rejects in-memory malformed stem_features (0.208875ms)
+✔ CI contract adapts beats and downbeats to microseconds (1.744125ms)
+✔ rejects spine malformed contracts (1.784041ms)
+✔ rejects spine malformed stem_features (2.063875ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 48
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2548.855125
+
+> spectrasynq-showbundle@0.1.0 test:all
+> node tools/test_live_streaming.js && node tools/test_e2e_pipeline.js
+
+
+=== T1. evalFrameAtTime parity with replayToJsonl ===
+  Checked 120 frames — all match
+
+=== T2. normaliseBundleObj matches loadShowBundle ===
+
+=== T3. evalFrameAtTime edge cases ===
+
+=== T4. PRSM packet construction ===
+
+=== T5. PlaybackEngine with mock write ===
+
+=== T6. PlaybackEngine stop mid-stream ===
+
+=== T8. PlaybackEngine.seek() mid-stream ===
+
+=== T9. PlaybackEngine.seek() while stopped ===
+
+=== T7. Editor server API smoke test ===
+  Server not running on port 7777 — skipping API tests
+  (Run 'npm run prism:dev' in another terminal to enable)
+
+==================================================
+Results: 34 passed, 0 failed
+==================================================
+
+=== E2E-1. Bundle duration extension prevents 2.04s cutout ===
+
+=== E2E-2. PlaybackEngine runs 5s on 169s bundle (real audio simulation) ===
+  Bundle: 169.4s (audio: 169.416s)
+  Curve data ends at: 1.00s
+  Running engine for 5s real-time...
+  Ran 5.1s wall, maxTUs=5075000 (5.08s), frames=610
+
+=== E2E-3. evalFrameAtTime holds last value past curve endpoints ===
+
+=== E2E-4. ENXIO stops engine cleanly, no hang ===
+
+=== E2E-5. Transient write errors — engine survives ===
+
+=== E2E-6. v0.3 param_curves emitted during playback (k1_usb_bridge target only) ===
+
+=== E2E-7. Duration extension arithmetic ===
+
+=== E2E-8. Curve-end gating: engine stops CDC writes past curveEnd ===
+  curveEnd: 1.00s, engine ran to: 3.00s
+  File: 7808 bytes = 64-byte preamble + ~121 guarded PRSM frames
+  seq counter: 361 (engine ticks, NOT writes)
+
+────────────────────────────────────────────────────────────
+SOFTWARE: 26 passed, 0 failed
+All software regression tests PASS.
+────────────────────────────────────────────────────────────
+
+  Server not running on port 7777 — skipping device test
+  (Start: npm run prism:dev + connect K1)
+  [WARN] Device test skipped
+
+════════════════════════════════════════════════════════════
+SOFTWARE:  26 passed, 0 failed
+────────────────────────────────────────────────────────────
+TOTAL: 26 passed, 0 failed (1 warnings)
+
+You are NOT in the testing loop. All checks pass.
+════════════════════════════════════════════════════════════
+exit 0

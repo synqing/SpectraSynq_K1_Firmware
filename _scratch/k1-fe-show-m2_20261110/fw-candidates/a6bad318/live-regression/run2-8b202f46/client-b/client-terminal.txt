@@ -1,0 +1,42 @@
+********************************************************************************
+Obsolete PIO Core v6.1.19 is used (previous was 6.2.0)
+Please remove multiple PIO Cores from a system:
+https://docs.platformio.org/en/latest/core/installation/troubleshooting.html
+********************************************************************************
+--- Terminal on /dev/ttys043 | 115200 8-N-1
+--- Available filters and text transformations: debug, default, direct, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+---------------------------
+K1 | VER: 40103
+---------------------------
+
+INIT_SERIAL: PASS
+INIT FILESYSTEM: E (290) esp_littlefs: ./managed_components/joltwallet__littlefs/src/littlefs/lfs.c:1381:error: Corrupted dir pair at {0x0, 0x1}
+
+E (290) esp_littlefs: mount failed,  (-84)
+E (290) esp_littlefs: Failed to initialize LittleFS
+E (290) task_wdt: esp_task_wdt_reset(705): task not found
+E (291) task_wdt: esp_task_wdt_reset(705): task not found
+PASS
+[   180][E][vfs_api.cpp:99] open(): /littlefs/CONFIG_IM69_40103.BIN does not exist, no permits for creation
+[   181][E][vfs_api.cpp:99] open(): /littlefs/SHOW_STATE_V1.BIN does not exist, no permits for creation
+[   181][E][vfs_api.cpp:99] open(): /littlefs/cal_profile_im69d.bin does not exist, no permits for creation
+INIT_LEDS: PASS
+INIT I2S (channel): PASS
+I2S PDM RX INIT: PASS slot=RIGHT
+I2S ENABLE: FIXTURE_SKIP
+GENERATING A-WEIGHTS: DONE IN 0.256 MS
+GENERATING HANN WINDOW LOOKUP TABLE: DONE IN 2.822 MS
+INITIALIZING COCHLEAR AGC: DONE IN 0.030 MS
+SYSTEM INIT COMPLETE!
+BOOT_LOOP_GUARD: reset_reason=1 fail_count=0 safe_mode=0
+WAVEFORM_HISTORY: OK @ 0x3C0FA9C4
+INIT_SECONDARY_LEDS: PASS
+RUNTIME_TIMING_GUARD: timing_ok=1 sample_rate=12800 samples_per_chunk=96 tempo_decim=3 declared_ap_hz=133.333 declared_nov_hz=44.444 response_gain=1.000 dma_desc=3 ap_core=0 vp_core=1 core_ok=1 vp_task_created=1
+INTRO: vp_core
+RMT_ALLOC: first_show core=1
+[AP] SSL=120 DC=0 max_raw=32767 follower=8252 peak_scaled=2.572 response_gain=1.000 silent_scale=1.000 silence=0 sil_pk=6553 rms_raw=0.0000 pky=0.00 dim=0 cal_source=default_invalid cal_valid=0 cal_reason=none | bpm=0.0 conf=0.00 lock=0 phase=0.00 beat=0 bstr=0.00 | onset=0 bass=0 ostr=0.00 | raw_i16_abs_peak=4300 raw_i16_rms=2706.9 raw_i16_near_pct=0.000 | k1_loud=1 input_trim=1.000 gdft_trim=1.000 agc_gain=1.000 agc_env=0.0000 clip_pct=0.000 near_pct=0.000 peak_pin=0.000 spec_pin=0.000 spec_sat=0.000 lg_mode=2 lightshow=3
+sbr{{
+SECONDARY_PHOTONS: 0.150000
+}}

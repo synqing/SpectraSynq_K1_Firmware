@@ -1,0 +1,34 @@
+{
+  "run": "/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/trinity/runs/full_A",
+  "prism_commit": "cc00556d1df2f863c6a0d914ef613886b050a408",
+  "profile": "/Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/mapping/prim8_natural_v1.json",
+  "profile_sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd",
+  "schema_sha256_pinned": "3d521f5d0f9c06ab3e46222f74b92600c802d217324d2ac45a14d9772a8b43fd",
+  "inputs": {
+    "contract_sha256": "23c345c26d1f2e41824d65617ef69248b84aa29fb325f47ffd7e21f250c9f0b5",
+    "stem_features_sha256": "1e5d954cebead9e13e613240aee67dcf976b05fd4279b1916d901fe11c0a3b35"
+  },
+  "correction_layer": "none",
+  "adapter_supported_versions": [
+    "1.0.0"
+  ],
+  "adapter": {
+    "result": "PASS",
+    "duration_us": 223910023,
+    "fps": 50,
+    "beats": 462,
+    "downbeats": 131,
+    "segments": 15,
+    "last_segment_t1_us": 223910023,
+    "frames": 11194,
+    "canonical_evidence_sha256": "63553e9edfa622df077203f8f9c9c9a355a46ee5a13ddd133a2ff5409a95df05"
+  },
+  "compiler_cli": {
+    "exit": 0,
+    "result": "PASS",
+    "stderr_head": "",
+    "showbundle.json_sha256": "bab355026eb4138286064ea2942c422beffa42c291a76ad0a01fc0fd5cbc128a",
+    "coverage.json_sha256": "63ee4c6d07c0128eb351fc13553bbb109f3b85a262bb6fd4a1de93cd93bfd652",
+    "compile_manifest.json_sha256": "8824b5702cbe48c22a02f7840a5e01c38da7b9f4de23a29fcbc13820ee78c3c9"
+  }
+}

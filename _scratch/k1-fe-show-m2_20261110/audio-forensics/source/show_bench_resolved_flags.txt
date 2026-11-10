@@ -1,0 +1,72 @@
+## extends env:k1_main_rpl_im69d
+-DARDUINO_USB_MODE=1
+-DARDUINO_USB_CDC_ON_BOOT=1
+-DARDUINO_RUNNING_CORE=0
+-DBOARD_HAS_PSRAM
+-DK1_HARDWARE
+-DK1_LED_TASK_CORE=1
+-DK1_I2S_DMA_DESC_NUM_VALUE=3
+-DDEFAULT_SAMPLE_RATE=12800
+-DDEFAULT_SAMPLES_PER_CHUNK=96
+-DK1_TEMPO_NOVELTY_DECIMATION=3U
+-DK1_GDFT_INT64_MAGNITUDE_V1
+-DK1_GDFT_INT64_RECURRENCE_V1
+-DK1_GDFT_X2_CROSSOVER_BIN=40u
+-DK1_GDFT_LANE4_V1=1
+-DK1_AUDIO_FRAME_V1=1
+-DK1_COMMAND_CHANNELS_V1=1
+-DK1_PERSIST_PARK_V1=1
+-DDEFAULT_AUDIO_RESPONSE_GAIN=1.0f
+-DESP32_ARDUINO_NO_RGB_BUILTIN
+-O3
+-ffast-math
+-fno-finite-math-only
+-Wno-deprecated-declarations
+-Wno-narrowing
+-DK1_TEMPO_CONF_V2
+-DK1_TEMPO_FLYWHEEL_V2
+-DK1_ONSET_V2
+-DK1_CHORD_V2
+-DK1_SEMANTIC_STATE
+-DK1_CHORD_HUE_V1
+-DK1_DROP_CUT_V1
+-DK1_PEAK_ASYM_ENV
+-DK1_VIVID_PRECOMP_V1
+-DK1_LOUD_GUARD_V1
+-DK1_AUDIO_FREEZE_GUARD_V1
+-DK1_TEMPO_ACF_SPREAD_V1=1
+-DK1_AGC_PERBAND_V1=1
+-DK1_BOOTLOOP_GUARD_V1
+-DK1_PALETTE_VIBRANCY_V1
+-DK1_EDGE_PALETTE_HONOUR_V1
+-DK1_MAIN_RPL_PINMAP_V1=1
+-DK1_MIC_IM69D_PDM_V1
+-DK1_MIC_IM69D_DSR_16S_V1
+-DK1_MIC_IM69D_SLOT_RIGHT
+-DK1_WAVEFORM_HYBRID_TRAIL_DEPOSIT_V1
+-DK1_WFHYB_M32_VARIANTS_V1
+-DK1_EDGE_PALETTE_HONOUR_V1
+-DK1_WS2816_LEVER2_V1
+-DK1_LOOK_LIB_V1
+-DK1_COLOUR_LAB_V1
+-DK1_RMT_ALLOC_ON_VP_CORE_V1=1
+-DK1_MAIN_RPL_REWIRE_20261110
+-DK1_RENDER_TRACE_V1
+-DK1_RTRACE_DUAL_V1
+## upload_port /dev/tty.usbmodem1401
+## monitor_port /dev/tty.usbmodem1401
+## build_src_filter +<*.ino> +<*.ino.cpp> +<system/globals_config.cpp> +<system/globals.cpp> +<system/k1_startup_ratchet.cpp> +<visual/Palettes.cpp> +<visual/render_params.cpp> +<visual/k1_render_trace.cpp> +<visual/k1_colour_lab.cpp> +<visual/k1_i2s_emit.cpp> +<effects/light_mode_*.cpp> +<audio/k1_*.cpp> -<audio/k1_mi
+## platform https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip
+## board esp32-s3-devkitc1-n16r8
+## framework arduino
+## board_build.arduino.memory_type qio_opi
+## board_build.psram_type opi
+## board_build.flash_mode qio
+## board_build.flash_size 16MB
+## board_upload.flash_size 16MB
+## board_build.partitions default_16MB.csv
+## monitor_speed 115200
+## upload_speed 921600
+## extra_scripts pre:scripts/platformio/k1_src_includes.py | pre:scripts/platformio/k1_upload_guard.py | pre:scripts/platformio/k1_build_provenance.py | pre:scripts/platformio/k1_i2s_emit_skip_fastled_wrapper.py
+## build_unflags -DARDUINO_RUNNING_CORE=1
+## lib_deps fastled/FastLED@3.10.3 | file://libraries/FixedPoints | file://libraries/M5ROTATE8

@@ -1,0 +1,61 @@
+{
+  "about": "Shared verdict cases for mapping_profile_v2 section rules. Each case is the base profile mapping/prim8_natural_v1.json (sha256 ec285a50...) with `schema` and `sections` replaced (a missing `sections` key removes it). Spine tests/profile_rules_parity.test.js and PRISM tools/test_per_section_mapping.js carry byte-identical copies of this file and check their validators against `ok`.",
+  "base_profile_sha256": "ec285a50efbb7674ee843381ee8c321684b2241b193d1eb545acc6fd9376f9dd",
+  "cases": [
+    { "name": "one section by index and label", "ok": true, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "chorus_1", "select": { "segment_indices": [4], "label": "chorus" }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "by label only", "ok": true, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "all_choruses", "select": { "label": "chorus" }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "by time range", "ok": true, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "r", "select": { "time_range_us": { "t_us": 45680000, "t1_us": 60810000 } }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "two disjoint sections, two dimensions, a note", "ok": true, "schema": "mapping_profile_v2",
+      "sections": [
+        { "id": "a", "note": "quieter verse accents", "select": { "segment_indices": [1, 2] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 20000 }, "notes": "x" } } },
+        { "id": "b", "select": { "segment_indices": [4] }, "prim8": { "mass": { "transform": { "silence_floor": 0.001 } } } }
+      ] },
+    { "name": "transform type replaced whole", "ok": true, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "flat", "select": { "segment_indices": [0] }, "prim8": { "impact": { "transform": { "type": "beat_pulse_u16", "beat_amp_u16": 30000, "beat_pulse_us": 40000 } } } }] },
+    { "name": "v1 with sections", "ok": false, "schema": "mapping_profile_v1",
+      "sections": [{ "id": "chorus_1", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "v2 without sections", "ok": false, "schema": "mapping_profile_v2" },
+    { "name": "v2 with empty sections", "ok": false, "schema": "mapping_profile_v2", "sections": [] },
+    { "name": "empty prim8 override", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "e", "select": { "segment_indices": [4] }, "prim8": {} }] },
+    { "name": "empty dimension override", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "e", "select": { "segment_indices": [4] }, "prim8": { "impact": {} } }] },
+    { "name": "override equal to top level", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "e", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 48000 } } } }] },
+    { "name": "notes-only override", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "e", "select": { "segment_indices": [4] }, "prim8": { "impact": { "notes": "only words" } } }] },
+    { "name": "overlap: one segment in two sections", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [
+        { "id": "a", "select": { "segment_indices": [3, 4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } },
+        { "id": "b", "select": { "segment_indices": [4] }, "prim8": { "mass": { "transform": { "silence_floor": 0.001 } } } }
+      ] },
+    { "name": "duplicate section id", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [
+        { "id": "a", "select": { "segment_indices": [3] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } },
+        { "id": "a", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }
+      ] },
+    { "name": "provenance changed in a section", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "p", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 }, "provenance": "AUTHORED" } } }] },
+    { "name": "unknown section key", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "colour": 1, "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "unknown select key", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "bars": [1] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "index and time range together", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "segment_indices": [4], "time_range_us": { "t_us": 45680000, "t1_us": 60810000 } }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "empty time range", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "time_range_us": { "t_us": 5, "t1_us": 5 } }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "negative segment index", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "segment_indices": [-1] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "not a Prim8 dimension", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "segment_indices": [4] }, "prim8": { "colour": { "transform": { "beat_amp_u16": 12000 } } } }] },
+    { "name": "override makes an unknown transform type", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "type": "fft_magic" } } } }] },
+    { "name": "override names an unknown feature", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "u", "select": { "segment_indices": [4] }, "prim8": { "mass": { "source": { "numerator": { "stem": "bass", "feature": "spectral_flux" } } } } }] },
+    { "name": "bad section id", "ok": false, "schema": "mapping_profile_v2",
+      "sections": [{ "id": "-x", "select": { "segment_indices": [4] }, "prim8": { "impact": { "transform": { "beat_amp_u16": 12000 } } } }] }
+  ]
+}

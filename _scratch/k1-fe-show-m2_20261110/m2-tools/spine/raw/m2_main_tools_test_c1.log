@@ -1,0 +1,45 @@
+# cwd: /Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine
+# cmd: npm run test:c1
+# start: 2026-11-10T08:37:46Z
+
+> spectrasynq-instrument-spine@0.1.0-g5 test:c1
+> node --test tests/c1_relationships.test.js
+
+✔ fail-closed: C1 relationship results exist and list required checks (1.156542ms)
+✖ fail-closed: every recorded C1 relationship must pass (product-usability gate) (0.781541ms)
+✔ prim8_natural_v1 1.0.0 bytes unchanged vs G5 freeze (0.707833ms)
+✔ G5 ci_click_3s expected hashes unchanged (0.292834ms)
+✔ compile-twice harness identity recorded for every fixture (0.429583ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47.478625
+
+✖ failing tests:
+
+test at tests/c1_relationships.test.js:36:1
+✖ fail-closed: every recorded C1 relationship must pass (product-usability gate) (0.781541ms)
+  AssertionError [ERR_ASSERTION]: near_silence_not_normalised_to_full_scale: pressure_max=65490 texture_max=65535 pressure_pct65535=0 texture_pct65535=0.2777777777777778
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///Users/spectrasynq/Workspace_Management/Software/SpectraSynq-Instrument-Spine/tests/c1_relationships.test.js:39:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+# exit: 1
+# end: 2026-11-10T08:37:46Z

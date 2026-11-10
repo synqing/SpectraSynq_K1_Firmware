@@ -1,0 +1,1954 @@
+/*----------------------------------------
+  K1 I2S FUNCTIONS
+  ----------------------------------------*/
+#include "k1_tempo.h"        // AP_STREAM tempo fields (bpm/conf/lock/phase/beat) — header-guarded
+#include "k1_onset_beat.h"   // AP_STREAM onset fields (onset/bass) — header-guarded
+#ifdef K1_MIC_HEALTH_V1
+#include "k1_mic_health.h"
+#if !defined(K1_MIC_IM69D_PDM_V1)
+#error "K1_MIC_HEALTH_V1 is characterised only for the IM69D diagnostic lane"
+#endif
+#endif
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+#include "k1_ap_drive_contract.h"
+#include "k1_ap_structured_evidence.h"
+#if !defined(K1_MIC_IM69D_PDM_V1)
+#error "K1_AP_DRIVE_CONTRACT_V1 is characterised only for the IM69D diagnostic lane"
+#endif
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
+#include "k1_agc_dt_clock.h"  // follower / peak_scaled α = dt/(τ+dt)
+#ifdef K1_MIC_IM69D_STEREO_V1
+#include "k1_stereo_probe.h"  // Stage 2 stereo capture instrument — probe env only
+#endif
+#include "k1_audio_source.h"
+#ifdef K1_EMU_FIXTURE
+#include "k1_emu_fixture.h"
+#endif
+#if K1_AUDIO_SOURCE_USB
+#include "k1_usb_audio_input.h"
+#endif
+#if K1_PCM1808_PRESENT
+#include "k1_pcm1808_input.h"
+#endif
+#if K1_PCM1808_LINE_SWITCH
+#ifndef K1_FE_BOARD_V1
+#error "K1_PCM1808_LINE_SWITCH is the FE jack switch; it needs K1_FE_BOARD_V1"
+#endif
+#include "k1_fe_board.h"
+#endif
+
+// PIO-MIGRATION-STAGE-3 (2026-05-24): I2S driver migrated to ESP-IDF 5.x i2s_std.
+// Was: legacy driver/i2s.h (i2s_driver_install + i2s_set_pin + i2s_read).
+//      Deprecated under arduino-esp32 3.2.0 / IDF 5.4.1; shimmed but slated for
+//      removal in IDF v6.0.
+// Now: driver/i2s_std.h (i2s_new_channel + i2s_channel_init_std_mode +
+//      i2s_channel_enable + i2s_channel_read).
+//
+// STAGE-7 SLOT-CFG RESOLUTION (2026-05-24): the Philips macro defaults
+// (ws_pol=false, bit_shift=true, slot_mask=BOTH/LEFT-for-mono) do NOT produce
+// correct SPH0645 data on ESP32-S3 with IDF 5.4.1. Five knob attempts on the
+// Philips path (slot_mode, slot_bit_width, mclk_multiple, data_bit_width, then
+// the Philips defaults verbatim) all left the [RAWR] hex pattern truncated to
+// 17-bit-effective with the K1 R magnitudes pegged at the extraction-math
+// negative clamp. The fix that works: hand-built slot_cfg with
+// ws_pol=true + bit_shift=false ("School A" lineage; matches Lixie Labs'
+// Emotiscope src/microphone.h) BUT with slot_mask=LEFT (not RIGHT) — because
+// IDF 5.4.1's slot semantic inverts when ws_pol=true relative to Emotiscope's
+// proven IDF 5.1 config. K1's SPH0645 SEL is wired to 3V3 (physical RIGHT
+// slot) but reads correctly via slot_mask=LEFT under this driver version.
+// Verified 2026-05-24: max_raw varying 4k-10k under music, peak_scaled 0.04-0.49,
+// follower tracking, LEDs visibly responsive.
+//
+// DMA sizing is now the production-candidate AP0/VP1 cadence cushion
+// (dma_desc_num=3, dma_frame_num=96). Read size
+// (SAMPLES_PER_CHUNK*sizeof(int32_t)=384 B) is preserved. The blocking read is
+// BOUNDED under K1_AUDIO_FREEZE_GUARD_V1 (N2: pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS)
+// in acquire_sample_chunk, degrade-to-silence on timeout/short read); undefining
+// the flag restores the original portMAX_DELAY blocking read. Init keeps void return + PASS/FAIL print contract; NO
+// ESP_ERROR_CHECK (init failure must not panic-reboot). Lines below
+// (acquire_sample_chunk extraction, DC calibration, sweet-spot, AGC,
+// calculate_vu) byte-identical to pre-migration except the single
+// i2s_read → i2s_channel_read substitution.
+//
+// See: docs/forensics/2026-05-24-doctrine-gate-pio-migration.md
+//      MIGRATION_PLAN-v2-rebaselined.md §8 Stage 3
+//      https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
+#include <driver/i2s_std.h>
+#ifdef K1_MIC_PDM_RX_ANY_V1
+#if K1_AUDIO_SOURCE_MIC
+#include <driver/i2s_pdm.h>   // PDM RX (IM73D / IM69); flag-OFF token stream unchanged
+#include <math.h>             // isfinite() for the PDM follower/NaN guard
+#endif
+#endif
+#ifdef K1_MIC_IM69D_PDM_V1
+#include <esp_idf_version.h>
+#ifndef K1_PLATFORM_P4
+#if K1_AUDIO_SOURCE_MIC
+#if ESP_IDF_VERSION != ESP_IDF_VERSION_VAL(5, 4, 1)
+#error "IM69D slot/order contract is source-frozen to the active ESP-IDF 5.4.1 driver"
+#endif
+#endif
+#endif
+#if K1_AUDIO_SOURCE_MIC
+// ESP-IDF PDM electrical naming is the inverse of Infineon's microphone naming:
+// RIGHT means SELECT HIGH; LEFT means SELECT LOW. With clk_inv=false, stereo DMA
+// order is RIGHT then LEFT. These assertions turn a driver-definition change red.
+static_assert((int)I2S_PDM_SLOT_RIGHT == 1,
+              "ESP-IDF PDM RIGHT must mean SELECT HIGH / stereo PCM index 0");
+static_assert((int)I2S_PDM_SLOT_LEFT == 2,
+              "ESP-IDF PDM LEFT must mean SELECT LOW / stereo PCM index 1");
+#define K1_IM69D_PDM_CLK_INV false
+#endif
+#endif
+#ifdef K1_MIC_IM73D_PDM_V1
+#include <driver/gpio.h>      // LR-select GPIO drive (IM73D only; IM69 SELECT is hard-strapped)
+#endif
+#include <esp_timer.h>
+
+#ifndef K1_I2S_READ_TIMEOUT_MS
+#define K1_I2S_READ_TIMEOUT_MS 100  // N2: bounded audio read (>> 7.5ms/chunk DMA; bounds a mic/DMA stall)
+#endif
+
+static i2s_chan_handle_t rx_chan = NULL;
+
+// K1_I2S_* slot constants + K1AudioI2SReadDebug moved to a tiny guarded header
+// (Phase A Lane 2, S1) so the AP-capture telemetry TU can share the type/
+// constants without including this monolithic impl header. Definitions are
+// unchanged — exactly one definition each, here via the include.
+#include "k1_i2s_capture_types.h"
+#include "k1_audio_input_state.h"
+static K1AudioCaptureTiming k1_audio_capture_timing = {};
+
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+static K1AudioI2SReadDebug k1_audio_i2s_read_debug = {};
+
+K1AudioI2SReadDebug k1_audio_i2s_read_debug_read() {
+  return k1_audio_i2s_read_debug;
+}
+
+void k1_audio_i2s_debug_note_ap_publish(uint64_t ap_publish_us) {
+  k1_audio_i2s_read_debug.ap_publish_us = ap_publish_us;
+}
+#endif
+
+// Raw I2S frame dump request flag (one-shot diagnostic, fires once and clears).
+// Set by serial_menu.h `dump_raw=silence|tone` handler — see rationale block there.
+//   0 = idle, 1 = silence-phase, 2 = 1 kHz tone-phase
+volatile uint8_t raw_dump_request = 0;
+
+// Fix-D Layer 2 — sample-rail rejection threshold for noise_cal DC accumulation.
+// Post-extraction-math samples are clipped to ±32767 in acquire_sample_chunk; a
+// sample at (or near) the rail is measuring the clipping ceiling, not the noise
+// floor. Averaging rail-pinned samples into dc_offset_sum produces a calibration
+// that points to ±FS, which on next boot subtracts a rail-magnitude offset from
+// every incoming sample and breaks the audio pipeline ("DC_OFFSET poisoning").
+// Threshold sits just below the ±32767 clip so we reject the clipped samples
+// while still accepting all real loud-audio dynamics.
+#define SAMPLE_RAIL_THRESHOLD 32000
+
+#ifdef K1_MIC_AUTO_SENSE_V1
+#include "k1_mic_auto_sense.h"
+#endif
+
+#ifdef K1_LOUD_GUARD_V1
+static inline float k1_loud_guard_clamp_float(float value, float min_value, float max_value) {
+  if (!isfinite(value)) return min_value;
+  if (value < min_value) return min_value;
+  if (value > max_value) return max_value;
+  return value;
+}
+
+static inline float k1_loud_guard_dt(uint32_t now_ms) {
+  static uint32_t last_ms = 0;
+  float dt = (last_ms != 0) ? float(now_ms - last_ms) * 0.001f : 0.01f;
+  last_ms = now_ms;
+  return k1_loud_guard_clamp_float(dt, 0.001f, 0.050f);
+}
+
+static inline float k1_loud_guard_alpha(float dt, float tau_sec) {
+  if (tau_sec <= 0.0f) return 1.0f;
+  return k1_loud_guard_clamp_float(dt / tau_sec, 0.0f, 1.0f);
+}
+
+static inline void k1_loud_guard_track(float* value, float target, float dt, float tau_sec) {
+  *value += (target - *value) * k1_loud_guard_alpha(dt, tau_sec);
+}
+
+static inline float k1_loud_guard_approach(float current, float target, float dt, float attack_sec, float release_sec) {
+  float tau = (target < current) ? attack_sec : release_sec;
+  return current + (target - current) * k1_loud_guard_alpha(dt, tau);
+}
+
+// A/B retune: GDFT release select by k1_loud_guard_mode. Attack is never mode-switched
+// (engage must stay fast; the invariant attack < release must hold). Mode 0 = baseline.
+static inline float k1_loud_guard_gdft_release_sec() {
+  switch (k1_loud_guard_mode) {
+    case 1:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_CONS;
+    case 2:  return K1_LOUD_GUARD_GDFT_RELEASE_SEC_AGGR;
+    default: return K1_LOUD_GUARD_GDFT_RELEASE_SEC;
+  }
+}
+
+static inline float k1_loud_guard_effective_sensitivity() {
+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY;
+  return CONFIG.SENSITIVITY * k1_loud_input_trim;
+}
+
+#ifdef K1_MIC_AUTO_SENSE_V1
+static inline float k1_mic_auto_layered_sensitivity() {
+  const float auto_scale = k1_mic_auto_sense_applied_scale();
+  if (!k1_loud_guard_enabled) return CONFIG.SENSITIVITY * auto_scale;
+  return CONFIG.SENSITIVITY * auto_scale * k1_loud_input_trim;
+}
+#endif
+
+static inline float k1_audio_response_gain_effective() {
+  return audio_response_gain_clamped();
+}
+
+static inline void k1_loud_guard_begin_frame() {
+  k1_loud_frame_clip_count = 0;
+  k1_loud_frame_near_rail_count = 0;
+  k1_loud_frame_sample_count = 0;
+}
+
+static inline void k1_loud_guard_record_preclip(int32_t sample) {
+  k1_loud_frame_sample_count++;
+  const int32_t magnitude = sample < 0 ? -sample : sample;
+  if (magnitude >= int32_t(K1_LOUD_GUARD_NEAR_RAIL_RAW)) {
+    k1_loud_frame_near_rail_count++;
+  }
+  if (sample > 32767 || sample < -32767) {
+    k1_loud_frame_clip_count++;
+  }
+}
+
+static inline void k1_loud_guard_update(uint32_t t_now) {
+  const float dt = k1_loud_guard_dt(t_now);
+
+  if (!k1_loud_guard_enabled) {
+    k1_loud_input_trim = 1.0f;
+    k1_loud_gdft_trim = 1.0f;
+    k1_loud_clip_duty = 0.0f;
+    k1_loud_near_rail_duty = 0.0f;
+    k1_loud_peak_pin_duty = 0.0f;
+    k1_loud_spec_sat_duty = 0.0f;
+    k1_loud_spec_sat_fraction = 0.0f;
+    return;
+  }
+
+  const float sample_count = k1_loud_frame_sample_count > 0 ? float(k1_loud_frame_sample_count) : 1.0f;
+  const float clip_now = float(k1_loud_frame_clip_count) / sample_count;
+  const float near_now = float(k1_loud_frame_near_rail_count) / sample_count;
+  const float peak_pin_now = (waveform_peak_scaled >= K1_LOUD_GUARD_PEAK_PIN_THRESHOLD) ? 1.0f : 0.0f;
+
+  uint16_t spec_sat_bins = 0;
+  for (uint16_t i = 0; i < NUM_FREQS; i++) {
+    if (float(spectrogram[i]) >= K1_LOUD_GUARD_SPEC_SAT_THRESHOLD) {
+      spec_sat_bins++;
+    }
+  }
+  k1_loud_spec_sat_fraction = float(spec_sat_bins) / float(NUM_FREQS);
+  const float spec_sat_now = (k1_loud_spec_sat_fraction >= K1_LOUD_GUARD_SPEC_SAT_FRACTION) ? 1.0f : 0.0f;
+
+  k1_loud_guard_track(&k1_loud_clip_duty, clip_now, dt, K1_LOUD_GUARD_DUTY_TAU_SEC);
+  k1_loud_guard_track(&k1_loud_near_rail_duty, near_now, dt, K1_LOUD_GUARD_DUTY_TAU_SEC);
+  k1_loud_guard_track(&k1_loud_peak_pin_duty, peak_pin_now, dt, K1_LOUD_GUARD_DUTY_TAU_SEC);
+  k1_loud_guard_track(&k1_loud_spec_sat_duty, spec_sat_now, dt, K1_LOUD_GUARD_DUTY_TAU_SEC);
+
+  float input_target = 1.0f;
+  if (clip_now > 0.0f) {
+    input_target = K1_LOUD_GUARD_INPUT_TRIM_MIN;
+  } else if (near_now > 0.020f) {
+    input_target = 0.55f;
+  } else if (near_now > 0.005f) {
+    input_target = 0.75f;
+  }
+
+  float gdft_target = 1.0f;
+  if (k1_loud_spec_sat_duty > 0.35f || k1_loud_peak_pin_duty > 0.60f) {
+    gdft_target = K1_LOUD_GUARD_GDFT_TRIM_MIN;
+  } else if (k1_loud_spec_sat_duty > 0.12f || k1_loud_peak_pin_duty > 0.30f) {
+    gdft_target = 0.70f;
+  } else if (k1_loud_spec_sat_duty > 0.04f || k1_loud_peak_pin_duty > 0.12f) {
+    gdft_target = 0.85f;
+  }
+
+  k1_loud_input_trim = k1_loud_guard_approach(k1_loud_input_trim, input_target, dt, K1_LOUD_GUARD_INPUT_ATTACK_SEC, K1_LOUD_GUARD_INPUT_RELEASE_SEC);
+  k1_loud_gdft_trim = k1_loud_guard_approach(k1_loud_gdft_trim, gdft_target, dt, K1_LOUD_GUARD_GDFT_ATTACK_SEC, k1_loud_guard_gdft_release_sec());
+}
+#else
+static inline float k1_audio_response_gain_effective() {
+  return audio_response_gain_clamped();
+}
+#endif
+
+static inline int16_t audio_response_gain_apply_sample(int32_t sample) {
+  float scaled = (float)sample * k1_audio_response_gain_effective();
+  if (scaled > 32767.0f) return 32767;
+  if (scaled < -32767.0f) return -32767;
+  return (int16_t)scaled;
+}
+
+#include "k1_audio_ingress.h"
+
+void init_i2s() {
+#if !K1_AUDIO_SOURCE_MIC
+  return;
+#else
+#ifdef K1_MIC_HEALTH_V1
+  k1_mic_health_reset(millis());
+#endif
+  esp_err_t result;
+
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): before the PDM clock runs,
+  // a pin that follows the internal pull is floating; one that does not is held.
+  // FLOATING is the normal result on both pins (unclocked mic data is hi-Z, the
+  // mic clock pin is an input). HELD_* on DATA, or 0 live changes, is the fault.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_reset_pin(wp);
+      gpio_set_direction(wp, GPIO_MODE_INPUT);
+      gpio_set_pull_mode(wp, GPIO_PULLUP_ONLY);
+      delay(5);
+      const int with_pu = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_PULLDOWN_ONLY);
+      delay(5);
+      const int with_pd = gpio_get_level(wp);
+      gpio_set_pull_mode(wp, GPIO_FLOATING);
+      USBSerial.printf("[WIREDIAG] static gpio=%d pullup_reads=%d pulldown_reads=%d -> %s\n",
+                       (int)wp, with_pu, with_pd,
+                       (with_pu == 1 && with_pd == 0) ? "FLOATING" : (with_pu ? "HELD_HIGH" : "HELD_LOW"));
+    }
+  }
+#endif
+
+  // RX channel — mirror legacy dma_buf_count=2, dma_buf_len=SAMPLES_PER_CHUNK.
+  i2s_chan_config_t chan_cfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_PORT, I2S_ROLE_MASTER);
+  chan_cfg.dma_desc_num  = K1_I2S_DMA_DESC_NUM;
+  chan_cfg.dma_frame_num = CONFIG.SAMPLES_PER_CHUNK;   // 96
+  chan_cfg.auto_clear    = false;
+  result = i2s_new_channel(&chan_cfg, NULL, &rx_chan); // tx=NULL → RX-only
+  USBSerial.print("INIT I2S (channel): ");
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+
+#ifdef K1_MIC_IM73D_PDM_V1
+  // IM73D122 PDM RX (bench eval, 2026-07-02) — replaces the SPH0645 i2s_std path below.
+  // 16-bit mono, DSR_8S (clk 819.2 kHz), slot LEFT; pins clk=13/din=12/LR=14(LOW). Proven
+  // on B489A500. Reuses the shared chan_cfg prologue above + the enable epilogue below;
+  // assigns the EXISTING `result` (does NOT redeclare it — same function scope).
+  gpio_reset_pin((gpio_num_t)K1_PDM_LR_PIN);                 // clear any residual STD BCLK binding
+  gpio_set_direction((gpio_num_t)K1_PDM_LR_PIN, GPIO_MODE_OUTPUT);
+  gpio_set_level((gpio_num_t)K1_PDM_LR_PIN, 0);             // static LEFT select / falling-edge data
+  i2s_pdm_rx_config_t pdm_cfg = {
+    .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),   // 12800 -> DSR_8S default
+    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+    .gpio_cfg = {
+      .clk = (gpio_num_t)K1_PDM_CLK_PIN,
+      .din = (gpio_num_t)K1_PDM_DIN_PIN,
+      .invert_flags = { .clk_inv = 0 },
+    },
+  };
+#ifdef K1_MIC_IM73D_DSR_16S_V1
+  pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // DSR eval only: +2 dB SNR lever, bench-radio-free measurement gate.
+#endif
+  result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg); // assign existing result; NO redeclare
+  USBSerial.print("I2S PDM RX INIT: ");
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  // IM69D130 PDM RX (bench eval, 2026-08-05) — PCB3 dual-mic on SPH pads.
+  // 16-bit mono, DSR_16S default (1.6384 MHz @ 12.8k). G1 programme source:
+  // physical IM1 / board-left / SELECT HIGH = ESP-IDF PDM RIGHT.
+  // Pins clk=14/din=13. SELECT is hard-strapped on-board — do NOT drive GPIO12.
+  // Every mono IM69D build must select a slot explicitly; there is no default.
+  i2s_pdm_rx_config_t pdm_cfg = {
+    .clk_cfg  = I2S_PDM_RX_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
+    .slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO),
+    .gpio_cfg = {
+      .clk = (gpio_num_t)K1_PDM_CLK_PIN,
+      .din = (gpio_num_t)K1_PDM_DIN_PIN,
+      .invert_flags = { .clk_inv = K1_IM69D_PDM_CLK_INV },
+    },
+  };
+#ifdef K1_MIC_IM69D_DSR_16S_V1
+  pdm_cfg.clk_cfg.dn_sample_mode = I2S_PDM_DSR_16S;  // IM69 default clock band (design §2.5)
+#endif
+#if defined(K1_MIC_IM69D_STEREO_V1) && (defined(K1_MIC_IM69D_SLOT_LEFT) || defined(K1_MIC_IM69D_SLOT_RIGHT))
+#error "IM69D stereo (K1_MIC_IM69D_STEREO_V1) excludes a mono slot select"
+#endif
+#if defined(K1_MIC_IM69D_SLOT_LEFT) && defined(K1_MIC_IM69D_SLOT_RIGHT)
+#error "IM69D diagnostic build must select exactly one PDM slot"
+#elif defined(K1_MIC_IM69D_SLOT_LEFT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_LEFT;
+#elif defined(K1_MIC_IM69D_SLOT_RIGHT)
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_RIGHT;
+#elif defined(K1_MIC_IM69D_STEREO_V1)
+  // Both PDM slots are recovered in active-driver order: RIGHT then LEFT.
+  // PCM index 0 = physical IM1; PCM index 1 = physical IM2.
+  pdm_cfg.slot_cfg = I2S_PDM_RX_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO);
+  pdm_cfg.slot_cfg.slot_mask = I2S_PDM_SLOT_BOTH;
+#else
+#error "Every mono IM69D build requires an explicit LEFT or RIGHT slot"
+#endif
+  result = i2s_channel_init_pdm_rx_mode(rx_chan, &pdm_cfg);
+  USBSerial.print("I2S PDM RX INIT: ");
+  USBSerial.print(result == ESP_OK ? K1_PASS : K1_FAIL);
+#if defined(K1_MIC_IM69D_SLOT_RIGHT)
+  USBSerial.println(" slot=RIGHT");
+#elif defined(K1_MIC_IM69D_STEREO_V1)
+  USBSerial.println(" slot=STEREO order=RIGHT,LEFT clk_inv=false");
+#elif defined(K1_MIC_IM69D_SLOT_LEFT)
+  USBSerial.println(" slot=LEFT");
+#endif
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // NON-SHIPPABLE wiring diagnostic (2026-11-03): a floating DATA line reads
+  // +full scale with the pull-up; a mic actually driving it reads audio.
+  gpio_pullup_en((gpio_num_t)K1_PDM_DIN_PIN);
+  USBSerial.printf("[WIREDIAG] pdm clk=%d din=%d din_pullup=1\n", K1_PDM_CLK_PIN, K1_PDM_DIN_PIN);
+#endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+  k1_stereo_probe_init();  // PSRAM ring for the Stage 2 capture instrument
+#endif
+#else
+  // PIO-MIGRATION-STAGE-7-FIX-6 (2026-05-24): adopt Emotiscope hand-built slot_cfg verbatim.
+  // After 4 failed knob tests on the Philips macro path (slot_mode, slot_bit_width,
+  // mclk_multiple, data_bit_width), the [RAWR] hex pattern remained bits 31..15
+  // active / bits 14..0 zero — confirming the fault is below the Philips-macro
+  // surface. The Philips macro defaults (ws_pol=false, bit_shift=true) are NOT
+  // what Lixie Labs' Emotiscope uses for the SAME SPH0645 mic on the SAME ESP32-S3
+  // hardware with i2s_std. Emotiscope's proven config (Lixie-Labs/Emotiscope
+  // src/microphone.h, commit at clone time 2026-05-24) is hand-built with the
+  // OPPOSITE of Philips defaults: ws_pol=true, bit_shift=false ("School A"
+  // pattern Captain referenced from K1.node2 lineage). Adopting verbatim.
+  //
+  // Reference: https://github.com/Lixie-Labs/Emotiscope/blob/HEAD/src/microphone.h
+  i2s_std_config_t std_cfg = {
+    .clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(CONFIG.SAMPLE_RATE),
+    .slot_cfg = {
+      .data_bit_width  = I2S_DATA_BIT_WIDTH_32BIT,
+      .slot_bit_width  = I2S_SLOT_BIT_WIDTH_32BIT,
+      .slot_mode       = I2S_SLOT_MODE_STEREO,
+      // SOURCE-VERIFIED (test D, 2026-05-24): ESP-IDF v5.4.1
+      //   components/hal/esp32s3/include/hal/i2s_ll.h, doxygen on
+      //   i2s_ll_tx_set_pdm_chan_mod tabulates: ws_idle_pol=0 → mod=1 = LEFT,
+      //   ws_idle_pol=1 → mod=1 = RIGHT. Hardware-level slot inversion under
+      //   ws_pol=true is Espressif-documented; LEFT-mask below is source-
+      //   justified, not empirical. Full lane: LightwaveOS_Official/docs/
+      //   agent-outputs/analysis/2026-05-24-sph0645-truncation-deep-dive/
+      //   lane-D2-slot-mask-ws-pol.md
+      .slot_mask       = I2S_STD_SLOT_LEFT,     // see header note — IDF 5.4.1 ws_pol=true inverts slot semantic; K1 mic (SEL=3V3 / physical RIGHT) is read via LEFT mask here
+      .ws_width        = 32,
+      .ws_pol          = true,                  // Emotiscope/K1.node2 School A lineage
+      .bit_shift       = false,                 // School A: no Philips delay
+      .left_align      = true,
+      .big_endian      = false,
+      .bit_order_lsb   = false,
+    },
+    .gpio_cfg = {
+      .mclk = I2S_GPIO_UNUSED,
+      .bclk = (gpio_num_t)I2S_BCLK_PIN,
+      .ws   = (gpio_num_t)I2S_LRCLK_PIN,
+      .dout = I2S_GPIO_UNUSED,
+      .din  = (gpio_num_t)I2S_DIN_PIN,
+      .invert_flags = { .mclk_inv = false, .bclk_inv = false, .ws_inv = false },
+    },
+  };
+
+  result = i2s_channel_init_std_mode(rx_chan, &std_cfg);
+  USBSerial.print("I2S STD INIT: ");
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#endif  // K1_MIC_IM73D_PDM_V1 / K1_MIC_IM69D_PDM_V1 (mic driver mode select)
+
+#ifdef K1_EMU_FIXTURE
+  // esp-emu 0.49.0 never clears I2S_RX_UPDATE, so channel start spins.
+  // Fixture mode skips that setup. The samples below are still production PCM.
+  result = ESP_OK;
+  USBSerial.println("I2S ENABLE: FIXTURE_SKIP");
+#else
+  result = i2s_channel_enable(rx_chan);   // new driver does NOT auto-start (shared PDM/STD epilogue)
+  USBSerial.print("I2S ENABLE: ");
+  USBSerial.println(result == ESP_OK ? K1_PASS : K1_FAIL);
+#ifdef K1_IM69D_WIREDIAG_PULLUP_V1
+  // With the PDM clock running: count pad-level changes on CLK and DATA.
+  // A live clock and a talking mic both toggle; a dead line shows 0 changes.
+  {
+    const int wd_pins[2] = {K1_PDM_CLK_PIN, K1_PDM_DIN_PIN};
+    for (int wi = 0; wi < 2; wi++) {
+      const gpio_num_t wp = (gpio_num_t)wd_pins[wi];
+      gpio_input_enable(wp);
+      int last = gpio_get_level(wp), changes = 0, ones = 0;
+      for (int n = 0; n < 20000; n++) {
+        const int v = gpio_get_level(wp);
+        changes += (v != last);
+        ones += v;
+        last = v;
+      }
+      USBSerial.printf("[WIREDIAG] live gpio=%d reads=20000 ones=%d changes=%d\n", (int)wp, ones, changes);
+    }
+  }
+#endif
+#endif
+#endif
+}
+
+void acquire_sample_chunk(uint32_t t_now) {
+  const uint32_t capture_sequence = k1_audio_capture_timing.sequence + 1u;
+  k1_audio_capture_timing = {};
+  k1_audio_capture_timing.sequence = capture_sequence;
+#if K1_AUDIO_SOURCE_USB
+  int16_t usb_pcm[96];
+  k1_usb_audio_take_canonical_samples(usb_pcm, t_now);
+  k1_audio_commit_canonical_frame(usb_pcm, t_now);
+#ifdef K1_STM
+  // Source-neutral loudness for USB: normalise the digital peak of the canonical
+  // hop to [0,1]. NOT mic IM69 raw RMS, NOT SSL floor.
+  // EdgeMixer STM reads agc_loudness_norm; without this write modulation depth
+  // stays 0.0 on USB (USB-dead STM bug). mic path writes this from pre-AGC raw
+  // RMS at i2s_audio.h ~681. This block is USB-only; K1_STM guards the variable.
+  {
+    float usb_peak_norm = max_waveform_val_raw / 32768.0f;
+    if (usb_peak_norm < 0.0f) usb_peak_norm = 0.0f;
+    if (usb_peak_norm > 1.0f) usb_peak_norm = 1.0f;
+    agc_loudness_norm = SQ15x16(usb_peak_norm);
+  }
+#endif
+  k1_usb_audio_poll_telemetry(t_now);
+  {
+    static uint32_t s_usb_wf_dbg_ms = 0;
+    if ((t_now - s_usb_wf_dbg_ms) >= 1000) {
+      s_usb_wf_dbg_ms = t_now;
+#ifdef K1_STM
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=%.3f\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL,
+                       float(agc_loudness_norm));
+#else
+      USBSerial.printf("[USB-WF] raw=%.0f follow=%.0f peak_scaled=%.3f ssl=%u loudness=BLOCKED\n",
+                       (float)max_waveform_val_raw, (float)max_waveform_val_follower,
+                       (float)waveform_peak_scaled, (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL);
+#endif
+    }
+  }
+  return;
+#endif
+#if K1_PCM1808_CANONICAL
+#if K1_PCM1808_LINE_SWITCH
+  // FE jack switch (Captain ruling 1 Sep 2026): plug in = PCM1808 line-in owns
+  // this hop through the same canonical path the P6 probe validated; plug out =
+  // the microphone tail below. Only the mic's own follower is kept across a
+  // line-in session so unplugging returns the mic to its pre-plug envelope.
+  static bool k1_fe_line_prev = false;
+  static K1LineSilenceState k1_fe_line_silence = {};
+  static float k1_fe_mic_follower = 1.0f;
+  static float k1_fe_line_follower = 0.0f;  // 0 = first session: the canonical commit seeds it
+  const bool k1_fe_line = k1_fe_audio_line_hop_begin(noise_complete == false);
+  if (k1_fe_line != k1_fe_line_prev) {
+    k1_fe_line_silence = {};
+    if (k1_fe_line) {
+      k1_fe_mic_follower = max_waveform_val_follower;
+      if (k1_fe_line_follower > 0.0f) {
+        max_waveform_val_follower = k1_fe_line_follower;
+      }
+      // The canonical path never writes the mic's silence latch; start line-in
+      // from the state the P6 line build always ran in.
+      silence = false;
+      silent_scale = 1.0f;
+    } else {
+      k1_fe_line_follower = max_waveform_val_follower;
+      max_waveform_val_follower = k1_fe_mic_follower;
+    }
+    k1_fe_line_prev = k1_fe_line;
+  }
+  if (k1_fe_line) {
+#endif
+  int16_t pcm_hop[96];
+  k1_pcm1808_take_canonical_samples(pcm_hop, t_now);
+  const K1PcmCanonicalReadTiming pcm_read = k1_pcm1808_last_canonical_read_timing();
+  k1_audio_capture_timing.read_return_us = (uint32_t)pcm_read.ready_us;
+  if (pcm_read.status == 0) {
+    k1_audio_capture_timing.newest_us = (uint32_t)pcm_read.newest_sample_estimate_us;
+    k1_audio_capture_timing.oldest_us = (uint32_t)pcm_read.oldest_sample_estimate_us;
+    k1_audio_capture_timing.assumption = 2;  // Ring-backlog estimate at 48 kHz, not hardware capture time.
+  }
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  {
+    static uint32_t k1_pcm_capture_sequence = 0;
+    const K1PcmCanonicalReadTiming rt = k1_pcm1808_last_canonical_read_timing();
+    k1_audio_i2s_read_debug.read_start_us = rt.wait_start_us;
+    k1_audio_i2s_read_debug.read_return_us = rt.ready_us;
+    k1_audio_i2s_read_debug.newest_sample_estimate_us = rt.newest_sample_estimate_us;
+    k1_audio_i2s_read_debug.oldest_sample_estimate_us = rt.oldest_sample_estimate_us;
+    k1_audio_i2s_read_debug.ap_publish_us = 0;
+    k1_audio_i2s_read_debug.capture_sequence = ++k1_pcm_capture_sequence;
+    k1_audio_i2s_read_debug.samples_read = 96U;
+    k1_audio_i2s_read_debug.bytes_requested = rt.frames_requested * 6U;
+    k1_audio_i2s_read_debug.bytes_read = rt.frames_read * 6U;
+    k1_audio_i2s_read_debug.status = rt.status;
+    k1_audio_i2s_read_debug.elapsed_us = rt.wait_us;
+    // Assumption 2: PCM sample time inferred from ring backlog at the proven ~48 kHz source rate.
+    k1_audio_i2s_read_debug.sample_time_assumption_id = 2U;
+  }
+#endif
+  k1_audio_commit_canonical_frame(pcm_hop, t_now);
+#if K1_PCM1808_LINE_SWITCH
+  silence = k1_line_silence_update(k1_fe_line_silence, pcm_hop, 96u, t_now, SILENCE_DWELL_MS);
+#endif
+#if !K1_PCM1808_LINE_SWITCH || defined(K1_PCM1808_PROBE_V1)
+  k1_pcm1808_poll_telemetry(t_now);  // FE ships without the 2 s probe stream (:fe_status prints it)
+#endif
+  return;
+#if K1_PCM1808_LINE_SWITCH
+  }
+#endif
+#endif
+#if K1_AUDIO_SOURCE_MIC
+#if K1_PCM1808_SHADOW
+  k1_pcm1808_pair_hop_begin();
+#endif
+  static int8_t sweet_spot_state_last = 0;
+  static bool silence_temp = false;
+  static uint32_t silence_switched = 0;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+  // Dedicated timer for the AP input classifier. The Sweet Spot state machine
+  // below must never reset it: doing so couples two independent hysteresis loops
+  // and can keep confirmed silence visually active forever.
+  static uint32_t ap_silence_candidate_since_ms = 0;
+#endif
+  static float silent_scale_last = 1.0;
+  static uint32_t last_state_change_time = 0;
+  static const uint32_t MIN_STATE_DURATION_MS = 1500; // 1 second minimum in each state
+  static float max_waveform_val_raw_smooth = 0.0; // Added for smoothing
+
+  size_t bytes_read = 0;
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * 2U * sizeof(int16_t);  // PDM stereo: 96*2ch*2 = 384 B (design §5.1)
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
+  const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int16_t);  // PDM: 96*2 = 192 B
+#else
+  const size_t bytes_requested = CONFIG.SAMPLES_PER_CHUNK * sizeof(int32_t);  // SPH0645: 96*4 = 384 B
+#endif
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  const int64_t i2s_read_start_us = esp_timer_get_time();
+#endif
+  // PIO-MIGRATION-STAGE-3 (2026-05-24): i2s_read → i2s_channel_read (rx_chan handle).
+  // Read size unchanged (96 * 4 = 384 B). N2 (K1_AUDIO_FREEZE_GUARD_V1): the
+  // read is now BOUNDED (pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS)) so the audio
+  // loopTask can never block forever on a mic/DMA stall; the #else revert path
+  // keeps the original portMAX_DELAY blocking read byte-for-byte.
+#ifdef K1_AUDIO_FREEZE_GUARD_V1
+  // N2: bounded read so the audio loopTask can never block forever on a mic/DMA
+  // stall. On timeout/short read, degrade to a SILENCE frame (zero-fill the
+  // unfilled tail) instead of re-processing stale DMA bytes.
+  #ifdef K1_MIC_IM73D_PDM_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im73d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      im73d_samples_i16[z] = 0;
+    }
+  }
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  #ifdef K1_MIC_IM69D_STEREO_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < (size_t)CONFIG.SAMPLES_PER_CHUNK * 2U; z++) {
+      im69d_samples_i16_stereo[z] = 0;
+    }
+  }
+  #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+#endif
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int16_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      im69d_samples_i16[z] = 0;
+    }
+  }
+  #endif
+  #else
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, pdMS_TO_TICKS(K1_I2S_READ_TIMEOUT_MS));
+  if (i2s_read_status != ESP_OK || bytes_read < bytes_requested) {
+    const size_t samples_got = bytes_read / sizeof(int32_t);
+    for (size_t z = samples_got; z < CONFIG.SAMPLES_PER_CHUNK; z++) {
+      i2s_samples_raw[z] = 0;
+    }
+  }
+  #endif
+#else
+  #ifdef K1_MIC_IM73D_PDM_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im73d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+  #elif defined(K1_MIC_IM69D_PDM_V1)
+  #ifdef K1_MIC_IM69D_STEREO_V1
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16_stereo, bytes_requested, &bytes_read, portMAX_DELAY);
+  #else
+#ifdef K1_EMU_FIXTURE
+  const esp_err_t i2s_read_status = k1_emu_fixture_admit(im69d_samples_i16, bytes_requested, &bytes_read);
+#else
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, im69d_samples_i16, bytes_requested, &bytes_read, portMAX_DELAY);
+#endif
+  #endif
+  #else
+  const esp_err_t i2s_read_status = i2s_channel_read(rx_chan, i2s_samples_raw, bytes_requested, &bytes_read, portMAX_DELAY);
+  #endif
+#endif
+  // Capture the read boundary before any front-end or DSP work. DMA residence
+  // remains unknown: assumption 1 is explicitly a read-return estimate.
+#ifdef K1_EMU_FIXTURE
+  const uint64_t capture_return_us = k1_emu_fixture_app_us();
+#else
+  const uint64_t capture_return_us = (uint64_t)esp_timer_get_time();
+#endif
+  k1_audio_capture_timing.read_return_us = (uint32_t)capture_return_us;
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const uint32_t capture_samples = (uint32_t)(bytes_read / (2u * sizeof(int16_t)));
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
+  const uint32_t capture_samples = (uint32_t)(bytes_read / sizeof(int16_t));
+#else
+  const uint32_t capture_samples = (uint32_t)(bytes_read / sizeof(int32_t));
+#endif
+  if (i2s_read_status == ESP_OK && capture_samples != 0u) {
+    k1_audio_capture_timing.newest_us = (uint32_t)capture_return_us;
+    k1_audio_capture_timing.oldest_us = (uint32_t)k1_i2s_estimate_oldest_sample_us(
+        capture_return_us, capture_samples, CONFIG.SAMPLE_RATE);
+    k1_audio_capture_timing.assumption = 1;
+  }
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  // De-interleave the active ESP-IDF 5.4.1 order with clk_inv=false. The DSP
+  // consumes index 0: ESP-IDF RIGHT / physical IM1 / SELECT HIGH. Index 1 is
+  // ESP-IDF LEFT / physical IM2 / SELECT LOW and exists only for measurement.
+  for (uint16_t di = 0; di < CONFIG.SAMPLES_PER_CHUNK; di++) {
+    im69d_samples_i16[di]      = im69d_samples_i16_stereo[2U * di];
+    im69d_samples_i16_left[di] = im69d_samples_i16_stereo[2U * di + 1U];
+  }
+  k1_stereo_probe_on_chunk(im69d_samples_i16_stereo, CONFIG.SAMPLES_PER_CHUNK);
+#endif
+#ifdef K1_B489_WS2816_V1
+  ++b489_i2s_read_sequence;
+  b489_i2s_last_status = (int32_t)i2s_read_status;
+  b489_i2s_last_bytes = (uint32_t)bytes_read;
+  b489_i2s_expected_bytes = (uint32_t)bytes_requested;
+  b489_i2s_raw_min = 32767;
+  b489_i2s_raw_max = -32768;
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+  k1_mic_auto_sense_note_i2s_result(
+    i2s_read_status == ESP_OK && bytes_read >= bytes_requested,
+    (uint32_t)bytes_read,
+    (uint32_t)bytes_requested,
+    t_now);
+#endif
+#if K1_PCM1808_SHADOW
+  // IM69 tap is the hardware-decimated 12.8 kHz buffer BEFORE mic gain.
+  // Shadow drain pops the 48 kHz ring so I2S1 cannot overflow while AP
+  // continues to own ingress.
+#ifdef K1_MIC_IM69D_PDM_V1
+  k1_pcm1808_pair_note_mic(
+      im69d_samples_i16,
+      i2s_read_status == ESP_OK && bytes_read >= bytes_requested);
+#endif
+  k1_pcm1808_shadow_drain();
+  k1_pcm1808_poll_telemetry(t_now);
+#endif
+#if K1_PCM1808_LINE_SWITCH
+  // Mic owns this hop: keep the PCM1808 ring under one hop so a jack insert
+  // starts line-in without a backlog (same drain the P4 shadow soak proved).
+  k1_pcm1808_shadow_drain();
+#endif
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+  const uint64_t i2s_read_return_us = (uint64_t)esp_timer_get_time();
+#if defined(K1_MIC_IM69D_STEREO_V1)
+  const uint32_t k1_i2s_samples_read =
+      (uint32_t)(bytes_read / (2U * sizeof(int16_t)));
+#elif defined(K1_MIC_PDM_RX_ANY_V1)
+  const uint32_t k1_i2s_samples_read = (uint32_t)(bytes_read / sizeof(int16_t));
+#else
+  const uint32_t k1_i2s_samples_read = (uint32_t)(bytes_read / sizeof(int32_t));
+#endif
+  static uint32_t k1_i2s_capture_sequence = 0;
+  k1_audio_i2s_read_debug.read_start_us = (uint64_t)i2s_read_start_us;
+  k1_audio_i2s_read_debug.read_return_us = i2s_read_return_us;
+  k1_audio_i2s_read_debug.newest_sample_estimate_us = i2s_read_return_us;
+  k1_audio_i2s_read_debug.oldest_sample_estimate_us =
+      k1_i2s_estimate_oldest_sample_us(
+          i2s_read_return_us, k1_i2s_samples_read, CONFIG.SAMPLE_RATE);
+  k1_audio_i2s_read_debug.ap_publish_us = 0;
+  k1_audio_i2s_read_debug.capture_sequence = ++k1_i2s_capture_sequence;
+  k1_audio_i2s_read_debug.samples_read = k1_i2s_samples_read;
+  k1_audio_i2s_read_debug.bytes_requested = (uint32_t)bytes_requested;
+  k1_audio_i2s_read_debug.bytes_read = (uint32_t)bytes_read;
+  k1_audio_i2s_read_debug.status = (int32_t)i2s_read_status;
+  k1_audio_i2s_read_debug.elapsed_us =
+      (uint32_t)(i2s_read_return_us - (uint64_t)i2s_read_start_us);
+  k1_audio_i2s_read_debug.sample_time_assumption_id = 1U;
+#else
+#ifndef K1_MIC_AUTO_SENSE_V1
+  (void)i2s_read_status;
+  (void)bytes_read;
+#endif
+#endif
+
+#ifdef K1_MIC_IM73D_PDM_V1
+  // Raw pre-conditioning telemetry for mic-purity and DSR comparisons.
+  // This is before K1_MIC_IM73D_INPUT_GAIN, CONFIG.SENSITIVITY, clamp, DC removal,
+  // response_gain, GDFT, and AGC. Keep it O(n), heap-free, and silent except
+  // through the existing 1 Hz AP stream.
+  uint16_t im73d_raw_peak = 0;
+  uint32_t im73d_raw_near_count = 0;
+  uint64_t im73d_raw_sum_sq = 0;
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    const int32_t raw_sample = (int32_t)im73d_samples_i16[i];
+    const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
+    if (raw_mag > im73d_raw_peak) im73d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
+    if (raw_mag >= K1_MIC_IM73D_RAW_I16_NEAR_RAIL) im73d_raw_near_count++;
+    im73d_raw_sum_sq += (uint64_t)raw_mag * (uint64_t)raw_mag;
+  }
+  im73d_raw_i16_abs_peak = im73d_raw_peak;
+  im73d_raw_i16_rms = sqrtf((float)im73d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  im73d_raw_i16_near_pct = (float)im73d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+  uint16_t im69d_raw_peak = 0;
+  uint32_t im69d_raw_near_count = 0;
+  uint64_t im69d_raw_sum_sq = 0;
+#ifdef K1_MIC_HEALTH_V1
+  uint32_t im69d_raw_hash = 2166136261UL;
+  int16_t im69d_raw_min = 32767;
+  int16_t im69d_raw_max = -32768;
+#endif
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    const int32_t raw_sample = (int32_t)im69d_samples_i16[i];
+#ifdef K1_B489_WS2816_V1
+    if (raw_sample < b489_i2s_raw_min) b489_i2s_raw_min = (int16_t)raw_sample;
+    if (raw_sample > b489_i2s_raw_max) b489_i2s_raw_max = (int16_t)raw_sample;
+#endif
+    const uint32_t raw_mag = (raw_sample < 0) ? (uint32_t)(-raw_sample) : (uint32_t)raw_sample;
+    if (raw_mag > im69d_raw_peak) im69d_raw_peak = (raw_mag > 32768U) ? 32768U : (uint16_t)raw_mag;
+    if (raw_mag >= K1_MIC_IM69D_RAW_I16_NEAR_RAIL) im69d_raw_near_count++;
+    im69d_raw_sum_sq += (uint64_t)raw_mag * (uint64_t)raw_mag;
+#ifdef K1_MIC_HEALTH_V1
+    const int16_t raw_i16 = im69d_samples_i16[i];
+    if (raw_i16 < im69d_raw_min) im69d_raw_min = raw_i16;
+    if (raw_i16 > im69d_raw_max) im69d_raw_max = raw_i16;
+    im69d_raw_hash ^= uint8_t(uint16_t(raw_i16) & 0xFFU);
+    im69d_raw_hash *= 16777619UL;
+    im69d_raw_hash ^= uint8_t((uint16_t(raw_i16) >> 8U) & 0xFFU);
+    im69d_raw_hash *= 16777619UL;
+#endif
+  }
+  im69d_raw_i16_abs_peak = im69d_raw_peak;
+  im69d_raw_i16_rms = sqrtf((float)im69d_raw_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  im69d_raw_i16_near_pct = (float)im69d_raw_near_count / (float)CONFIG.SAMPLES_PER_CHUNK;
+#ifdef K1_MIC_HEALTH_V1
+  {
+    const K1MicHealthFrame health_frame = {
+      t_now,
+      im69d_raw_hash,
+      (uint32_t)bytes_read,
+      (uint32_t)bytes_requested,
+      (uint16_t)CONFIG.SAMPLES_PER_CHUNK,
+      (uint16_t)im69d_raw_near_count,
+      im69d_raw_min,
+      im69d_raw_max,
+      im69d_raw_peak,
+      im69d_raw_i16_rms,
+      i2s_read_status == ESP_OK,
+    };
+    k1_mic_health_update(health_frame);
+    if (!k1_mic_health_allows_audio()) {
+      // Fail closed at the earliest shared boundary: health still sees the real raw
+      // frame above, while every calibration/DSP/render consumer below receives zero.
+      for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+        im69d_samples_i16[i] = 0;
+      }
+    }
+  }
+#endif
+#ifdef K1_MIC_IM69D_STEREO_V1
+  // ESP-IDF LEFT / physical IM2 raw telemetry (measurement only; no DSP consumer).
+  {
+    uint16_t left_peak = 0;
+    uint64_t left_sum_sq = 0;
+    for (uint16_t li = 0; li < CONFIG.SAMPLES_PER_CHUNK; li++) {
+      const int32_t left_sample = (int32_t)im69d_samples_i16_left[li];
+      const uint32_t left_mag = (left_sample < 0) ? (uint32_t)(-left_sample) : (uint32_t)left_sample;
+      if (left_mag > left_peak) left_peak = (left_mag > 32768U) ? 32768U : (uint16_t)left_mag;
+      left_sum_sq += (uint64_t)left_mag * (uint64_t)left_mag;
+    }
+    im69d_left_raw_i16_abs_peak = left_peak;
+    im69d_left_raw_i16_rms = sqrtf((float)left_sum_sq / (float)CONFIG.SAMPLES_PER_CHUNK);
+  }
+#endif
+#endif
+#ifdef K1_STM
+  // STM reactivity gate from the LIVE pre-AGC mic RMS. The GDFT broadband AGC
+  // (agc_gain on spectrogram[]) is also live — [AP] agc_gain moves. STM still
+  // uses this RMS because it is beat-discriminating (~8 silence, ~32-60 EDM,
+  // ~144 peaks). Normalise to [0,1]; it spikes on beats, so STM pulses with music.
+  {
+    float raw_rms_for_stm = 0.0f;
+#if defined(K1_MIC_IM73D_PDM_V1)
+    raw_rms_for_stm = im73d_raw_i16_rms;
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    raw_rms_for_stm = im69d_raw_i16_rms;
+#endif
+    float k1_stm_ln = (raw_rms_for_stm - 12.0f) / 50.0f;
+    if (k1_stm_ln < 0.0f) k1_stm_ln = 0.0f;
+    if (k1_stm_ln > 1.0f) k1_stm_ln = 1.0f;
+    agc_loudness_norm = SQ15x16(k1_stm_ln);
+  }
+#endif
+
+  // One-shot raw frame dump (see serial_menu.h dump_raw handler). Prints the
+  // first 32 raw int32 samples as zero-padded hex, tagged for analyst parsing.
+  // ~0.5ms total cost (32 USBSerial.printf calls, async USB CDC TX), safely
+  // under the 7.5ms / 3ms audio chunk window @ 12.8kHz / 32kHz Fs respectively.
+  if (raw_dump_request != 0) {
+    const char* tag = (raw_dump_request == 1) ? "[DUMP-SILENCE]" : "[DUMP-TONE-1KHZ]";
+    USBSerial.println(tag);
+    uint16_t dump_n = CONFIG.SAMPLES_PER_CHUNK < 32 ? CONFIG.SAMPLES_PER_CHUNK : 32;
+    for (uint16_t i = 0; i < dump_n; i++) {
+#ifdef K1_MIC_IM73D_PDM_V1
+      USBSerial.printf("  %d\n", (int)im73d_samples_i16[i]);   // PDM: int16 decimal (silence ±4-18 measured 2026-07-02 @G=16; ±20-40 was pre-characterization pessimism)
+#elif defined(K1_MIC_IM69D_PDM_V1)
+      USBSerial.printf("  %d\n", (int)im69d_samples_i16[i]);
+#else
+      USBSerial.printf("  %08lx\n", (unsigned long)(uint32_t)i2s_samples_raw[i]);
+#endif
+    }
+    USBSerial.println("[DUMP-END]");
+    raw_dump_request = 0;
+  }
+
+  if (debug_mode && (t_now % 5000 == 0)) {
+    USBSerial.print("DEBUG: Bytes read from I2S: ");
+    USBSerial.print(bytes_read);
+    USBSerial.print(" Max raw value: ");
+    USBSerial.println(max_waveform_val_raw);
+  }
+
+  max_waveform_val = 0.0;
+  max_waveform_val_raw = 0.0;
+#ifdef K1_LOUD_GUARD_V1
+  k1_loud_guard_begin_frame();
+  const float k1_effective_sensitivity =
+#ifdef K1_MIC_AUTO_SENSE_V1
+      k1_mic_auto_layered_sensitivity();
+#else
+      k1_loud_guard_effective_sensitivity();
+#endif
+#endif
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  // Derive the subsonic cutoff from the LIVE NOTE_OFFSET once per frame (not per
+  // sample). It must sit at the GDFT's lowest bin so the filter can only ever
+  // remove content the spectrum cannot display — a fixed constant would cut real
+  // bass at NOTE_OFFSET=0. Recompute only when NOTE_OFFSET actually moves.
+  if (k1_subsonic_hpf_note_offset_cached != (int16_t)CONFIG.NOTE_OFFSET ||
+      k1_subsonic_hpf_a <= 0.0f) {
+    k1_subsonic_hpf_note_offset_cached = (int16_t)CONFIG.NOTE_OFFSET;
+    const float fs = (float)CONFIG.SAMPLE_RATE;
+    const float fc = k1_subsonic_hpf_cutoff_hz(k1_subsonic_hpf_note_offset_cached);
+    k1_subsonic_hpf_a = fs / (fs + 6.2831853f * fc);
+    if (!(k1_subsonic_hpf_a > 0.0f) || k1_subsonic_hpf_a >= 1.0f) {
+      k1_subsonic_hpf_a = 0.9488f;  // NaN/degenerate guard: the 110 Hz @ 12.8 kHz value
+    }
+    USBSerial.printf("SUBSONIC HPF: note_offset=%d fc=%.1fHz a=%.5f\n",
+                     (int)k1_subsonic_hpf_note_offset_cached, fc, k1_subsonic_hpf_a);
+  }
+#endif
+  const bool noise_cal_phase_a_active = (!noise_complete && noise_iterations < NOISE_CAL_DC_PHASE_A_FRAMES);
+  waveform_history_index++;
+  if (waveform_history_index >= 4) {
+    waveform_history_index = 0;
+  }
+
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+#ifdef K1_MIC_IM73D_PDM_V1
+    // IM73D PDM: int16 PCM -> working domain via one characterized pre-sensitivity gain.
+    // NO SPH0645 pedestal math (*0.000512 + 56000 - 5120; >>2). Everything below
+    // (k1_effective_sensitivity, clamp, -DC_OFFSET, follower, GDFT) is shared/unchanged.
+    int32_t sample = (int32_t)((float)im73d_samples_i16[i] * K1_MIC_IM73D_INPUT_GAIN);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    // IM69D130 PDM: own gain seed (never inherit K1_MIC_IM73D_INPUT_GAIN).
+    int32_t sample = (int32_t)((float)im69d_samples_i16[i] * K1_MIC_IM69D_INPUT_GAIN);
+#else
+    int32_t sample = (i2s_samples_raw[i] * 0.000512) + 56000 - 5120;
+
+    sample = sample >> 2;  // Helps prevent overflow in fixed-point math coming up
+#endif
+#ifdef K1_LOUD_GUARD_V1
+    sample = (int32_t)((float)sample * k1_effective_sensitivity);
+    k1_loud_guard_record_preclip(sample);
+#else
+    sample *= CONFIG.SENSITIVITY;  // Set sensitivity gain
+#endif
+
+    if (sample > 32767) {
+      sample = 32767;
+    } else if (sample < -32767) {
+      sample = -32767;
+    }
+
+    waveform[i] = sample - CONFIG.DC_OFFSET;
+    if (waveform_history != nullptr) {
+      waveform_history[waveform_history_index][i] = waveform[i];
+    }
+
+    if (noise_cal_phase_a_active) {
+      int32_t dc_sample_abs = abs((int32_t)waveform[i]);
+      if (dc_sample_abs <= SAMPLE_RAIL_THRESHOLD) {
+        dc_offset_sum += (int32_t)waveform[i];
+        dc_offset_samples++;
+      } else {
+        dc_offset_rejected_samples++;
+      }
+    }
+
+    // SINGLE-DOMAIN FIX (2026-05-20): track AC-corrected peak, not DC-biased peak.
+    // Was abs(sample) which carried the MEMS DC bias (~8000 for SPH0645). That
+    // poisoned SSL calibration (DC-domain) and post-cal follower math (AC-domain),
+    // producing the WAVEFORM-kill mutex. After this change, max_waveform_val_raw
+    // is always in the same domain as waveform[i] and downstream math (line 123).
+#ifdef K1_AP_SUBSONIC_HPF_V1
+    // SUBSONIC HPF (2026-08-14) — measure the peak on the band we actually USE.
+    //
+    // The GDFT axis is semitone-spaced from A1=55 Hz and, at the shipped
+    // NOTE_OFFSET=12, its LOWEST bin is 110 Hz. Anything below that contributes
+    // nothing to the spectrum, chromagram, colour or tempo — but it lands in
+    // max_waveform_val_raw at full weight, and that peak is what drives silence
+    // detection, the AGC floor and the follower normaliser.
+    //
+    // Measured on bench B489A500 in a room an independent microphone confirmed
+    // was quiet AND steady (5.0 dB spread): the K1 swung 16.0 dB, and its
+    // waveform was smooth — mean |sample| 5978 against a mean sample-to-sample
+    // step of 277, i.e. dominant content near fs/(2*pi) * 277/5978 = ~94 Hz.
+    // Sub-110 Hz energy (supply ripple / structural coupling) was therefore
+    // setting the peak that the whole gain structure is referenced to.
+    //
+    // waveform[] itself is left untouched, so the GDFT input is unchanged and
+    // this cannot alter spectral behaviour; only the PEAK MEASUREMENT is taken
+    // on the high-passed copy. One-pole, a = RC/(RC+dt), fc = 110 Hz @ 12.8 kHz.
+    {
+      const float x = (float)waveform[i];
+      k1_subsonic_hpf_y = k1_subsonic_hpf_a * (k1_subsonic_hpf_y + x - k1_subsonic_hpf_x1);
+      k1_subsonic_hpf_x1 = x;
+      const float hp = k1_subsonic_hpf_y;
+      k1_subsonic_hp_wave[i] = hp;
+      uint32_t sample_abs = (uint32_t)(hp < 0.0f ? -hp : hp);
+      if (sample_abs > max_waveform_val_raw) {
+        max_waveform_val_raw = sample_abs;
+      }
+    }
+#else
+    uint32_t sample_abs = abs(waveform[i]);
+    if (sample_abs > max_waveform_val_raw) {
+      max_waveform_val_raw = sample_abs;
+    }
+#endif
+  }
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  k1_subsonic_hp_wave_fresh = true;
+#endif
+
+  // Apply smoothing to the raw max value
+  const float smoothing_factor = 0.2; // Adjust as needed (lower = smoother)
+  max_waveform_val_raw_smooth = (max_waveform_val_raw * smoothing_factor) + (max_waveform_val_raw_smooth * (1.0 - smoothing_factor));
+
+  if (stream_audio) {
+    USBSerial.print("sbs((audio=");
+    for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+      USBSerial.print(waveform[i]);
+      if (i < CONFIG.SAMPLES_PER_CHUNK - 1) {
+        USBSerial.print(',');
+      }
+    }
+    USBSerial.println("))");
+  }
+
+  if (!noise_complete) {
+    silent_scale = 1.0;  // Force LEDs on during calibration
+
+    // SINGLE-DOMAIN CAL (2026-05-20): two phases so SSL is sampled AFTER DC_OFFSET
+    // is established. Without this, SSL ends up in DC-biased units (~SSL=8800 for
+    // an ~8000 MEMS bias) while post-cal max_waveform_val_raw is AC-corrected,
+    // making max_waveform_val = max_raw - SSL go permanently negative and clamping
+    // the follower floor up to SSL → waveform_peak_scaled ≈ 0 → WAVEFORM dies.
+    //
+    //   Phase A (iters 0..127):  accumulate dc_offset_sum from every non-rail
+    //                            sample in the DC-biased chunk.
+    //                            DO NOT sample SSL — waveform[i] is not yet AC-corrected.
+    //   At iter 128:             stamp CONFIG.DC_OFFSET = dc_offset_sum / valid_samples.
+    //                            From the NEXT frame onward, waveform[i] = sample - DC_OFFSET
+    //                            is AC-corrected and max_waveform_val_raw lives in AC domain.
+    //   Phase B (iters 129..240): sample SSL from AC-corrected max_waveform_val_raw,
+    //                            rejecting frames that are too loud to be room silence.
+    //   At iter 256 (GDFT.h):    cal completes. DC_OFFSET and SSL are both already
+    //                            correctly stamped — no further correction needed.
+    if (noise_iterations == NOISE_CAL_DC_PHASE_A_FRAMES) {
+      const uint32_t expected_dc_samples = NOISE_CAL_DC_PHASE_A_FRAMES * (uint32_t)CONFIG.SAMPLES_PER_CHUNK;
+      const uint32_t min_dc_samples = (expected_dc_samples * NOISE_CAL_DC_MIN_VALID_RATIO_NUM) / NOISE_CAL_DC_MIN_VALID_RATIO_DEN;
+      if (dc_offset_samples >= min_dc_samples) {
+        int32_t learned_dc_offset = (int32_t)(dc_offset_sum / (int64_t)dc_offset_samples);
+        if (calibration_abs_i32(learned_dc_offset) <= NOISE_CAL_DC_MAX_VALID_ABS) {
+          CONFIG.DC_OFFSET = learned_dc_offset;  // provisional stamp; locked from here
+          noise_cal_dc_valid = true;
+        } else {
+          noise_cal_reject_once(NOISE_CAL_REJECT_DC_RANGE);
+          USBSerial.print("DC_OFFSET cal: learned value out of range=");
+          USBSerial.println(learned_dc_offset);
+        }
+      } else {
+        noise_cal_reject_once(NOISE_CAL_REJECT_DC_SAMPLES);
+        USBSerial.print("DC_OFFSET cal: insufficient valid samples=");
+        USBSerial.print(dc_offset_samples);
+        USBSerial.print("/");
+        USBSerial.println(expected_dc_samples);
+      }
+    }
+    static_assert(NOISE_CAL_SSL_PHASE_B_FRAMES == sizeof(ssl_cal_buf) / sizeof(ssl_cal_buf[0]),
+                  "ssl_cal_buf size must match the Phase-B frame budget");
+    if (noise_iterations >= 129 && noise_iterations <= 240 && noise_cal_dc_valid && noise_cal_reject_reason == NOISE_CAL_REJECT_NONE) {
+      // max_waveform_val_raw is now AC-corrected (DC_OFFSET stamped, waveform[i] re-derived).
+      // ROBUST-SSL (2026-06-11): collect per-frame silence peaks; SSL is stamped from
+      // the 90th percentile at Phase-B end. The previous running-max ×1.10 latched on a
+      // single transient anywhere in the 840 ms window (observed: one ~839 spike in
+      // ~354 ambient → SSL=923 → negative drive). A percentile tolerates isolated
+      // contamination; the coarse gate still rejects frames too loud to be silence.
+      if (max_waveform_val_raw <= NOISE_CAL_SSL_PHASE_B_MAX_RAW) {
+        if (ssl_cal_samples < NOISE_CAL_SSL_PHASE_B_FRAMES) {
+          ssl_cal_buf[ssl_cal_samples] = max_waveform_val_raw;
+        }
+        ssl_cal_samples++;
+      } else {
+        ssl_cal_rejected_samples++;
+      }
+    } else if (noise_iterations == 241) {
+      // Phase-B end: SSL = p90(silence peaks) * 1.10. One-shot insertion sort of
+      // <=112 floats, cal-only (LEDs are forced on; nothing consumes audio here).
+      uint16_t n = ssl_cal_samples;
+      if (n > NOISE_CAL_SSL_PHASE_B_FRAMES) n = NOISE_CAL_SSL_PHASE_B_FRAMES;
+      if (!noise_cal_dc_valid) {
+        noise_cal_reject_once(NOISE_CAL_REJECT_DC_SAMPLES);
+      } else if (n < NOISE_CAL_SSL_PHASE_B_MIN_ACCEPTED_FRAMES) {
+        noise_cal_reject_once(NOISE_CAL_REJECT_SSL_SAMPLES);
+      } else {
+        for (uint16_t i = 1; i < n; i++) {
+          float v = ssl_cal_buf[i];
+          int16_t j = (int16_t)(i - 1);
+          while (j >= 0 && ssl_cal_buf[j] > v) {
+            ssl_cal_buf[j + 1] = ssl_cal_buf[j];
+            j--;
+          }
+          ssl_cal_buf[j + 1] = v;
+        }
+        const float p50 = ssl_cal_buf[(uint16_t)(((uint32_t)(n - 1) * 5U) / 10U)];
+        const float p90 = ssl_cal_buf[(uint16_t)(((uint32_t)(n - 1) * 9U) / 10U)];
+        ssl_cal_p50_raw = p50;
+        ssl_cal_p90_raw = p90;
+        const float p90_to_p50 = (p50 > 1.0f) ? (p90 / p50) : p90;
+        const uint32_t learned_ssl = (uint32_t)(p90 * 1.10f + 0.5f);
+        if (p90 > NOISE_CAL_SSL_TRUSTED_P90_MAX_RAW) {
+          noise_cal_reject_once(NOISE_CAL_REJECT_SSL_TOO_LOUD);
+        } else if (p90_to_p50 > NOISE_CAL_SSL_MAX_P90_TO_P50_RATIO) {
+          noise_cal_reject_once(NOISE_CAL_REJECT_SSL_UNSTABLE);
+        } else if (learned_ssl < NOISE_CAL_SSL_MIN_VALID_RAW || learned_ssl > NOISE_CAL_SSL_MAX_VALID_RAW) {
+          noise_cal_reject_once(NOISE_CAL_REJECT_SSL_RANGE);
+        } else {
+          CONFIG.SWEET_SPOT_MIN_LEVEL = learned_ssl;
+          noise_cal_ssl_valid = true;
+        }
+      }
+    }
+  } else {
+    // Pre-calculate thresholds used multiple times
+    float threshold_loud_break = CONFIG.SWEET_SPOT_MIN_LEVEL * 1.20;
+    float dynamic_agc_floor_raw = float(min_silent_level_tracker);
+    if (dynamic_agc_floor_raw < AGC_FLOOR_MIN_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MIN_CLAMP_RAW;
+    if (dynamic_agc_floor_raw > AGC_FLOOR_MAX_CLAMP_RAW) dynamic_agc_floor_raw = AGC_FLOOR_MAX_CLAMP_RAW;
+    float dynamic_agc_floor_scaled = dynamic_agc_floor_raw * AGC_FLOOR_SCALING_FACTOR;
+    if (dynamic_agc_floor_scaled < AGC_FLOOR_MIN_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MIN_CLAMP_SCALED;
+    if (dynamic_agc_floor_scaled > AGC_FLOOR_MAX_CLAMP_SCALED) dynamic_agc_floor_scaled = AGC_FLOOR_MAX_CLAMP_SCALED;
+    // Silence detection: SSL-derived Schmitt (2026-07-10). dynamic_agc_floor_scaled above
+    // is DEAD (the min-tracker decay was commented out, pinning it at a static 100 that is
+    // decoupled from the learned floor — a quiet room never fell below it, so silence never
+    // latched and the plate never darkened). Derive the thresholds from the calibrated SSL
+    // so they track the real ambient, with a Schmitt gap (enter < exit) to kill chatter.
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    const K1ApDriveContract ap_drive =
+        k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
+    const float threshold_silence = ap_drive.silence_threshold.raw_peak_enter;
+    const float threshold_silence_exit = ap_drive.silence_threshold.raw_peak_exit;
+    max_waveform_val = max_waveform_val_raw - ap_drive.drive_threshold_raw_peak;
+#else
+    const float ssl_f = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+    float threshold_silence = SILENCE_ENTER_SSL_FRAC * ssl_f;        // enter-silence line (low)
+    float threshold_silence_exit = SILENCE_EXIT_SSL_FRAC * ssl_f;    // exit-silence line (high)
+    max_waveform_val = (max_waveform_val_raw - (CONFIG.SWEET_SPOT_MIN_LEVEL));
+#endif
+
+    // AP-DRIVE CLAMP (re-landed 2026-06-11 as the verified pair with ROBUST-SSL above):
+    // sub-floor signal must map to ZERO drive, never negative — fabsf consumers invert
+    // negative drive (quietest frame → brightest) and amplitude→position consumers
+    // underflow. Safe now that Phase-B cal cannot latch SSL above the true floor.
+    if (max_waveform_val < 0.0f) max_waveform_val = 0.0f;
+    const float response_gain = k1_audio_response_gain_effective();
+    max_waveform_val *= response_gain;
+
+#if K1_AGC_DT_CLOCK_V1
+    static int64_t follow_dt_last_us = 0;
+    const float follow_dt_s = k1_agc_measure_dt_s(&follow_dt_last_us);
+    const float follow_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_FOLLOW_TAU_ATTACK_S);
+    const float follow_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_FOLLOW_TAU_RELEASE_S);
+#ifdef K1_PEAK_ASYM_ENV
+    const float peak_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_ATTACK_SNAP_S);
+    const float peak_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_RELEASE_SNAP_S);
+#else
+    const float peak_attack_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_ATTACK_SYM_S);
+    const float peak_release_a =
+        k1_alpha_from_tau_s(follow_dt_s, K1_PEAK_TAU_RELEASE_SYM_S);
+#endif
+#else
+    const float follow_attack_a = 0.25f;
+    const float follow_release_a = 0.005f;
+#ifdef K1_PEAK_ASYM_ENV
+    const float peak_attack_a = 0.65f;
+    const float peak_release_a = 0.15f;
+#else
+    const float peak_attack_a = 0.25f;
+    const float peak_release_a = 0.25f;
+#endif
+#endif
+
+    if (max_waveform_val > max_waveform_val_follower) {
+      float delta = max_waveform_val - max_waveform_val_follower;
+      max_waveform_val_follower += delta * follow_attack_a;
+    } else if (max_waveform_val < max_waveform_val_follower) {
+      float delta = max_waveform_val_follower - max_waveform_val;
+      max_waveform_val_follower -= delta * follow_release_a;
+
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+      if (max_waveform_val_follower < ap_drive.follower_floor_raw_peak) {
+        max_waveform_val_follower = ap_drive.follower_floor_raw_peak;
+#else
+      if (max_waveform_val_follower < CONFIG.SWEET_SPOT_MIN_LEVEL) {
+        max_waveform_val_follower = CONFIG.SWEET_SPOT_MIN_LEVEL;
+#endif
+      }
+    }
+#ifdef K1_MIC_PDM_RX_ANY_V1
+    // PDM cold-boot / failed-cal guard: the follower inits 0.0 and its floor-clamp only
+    // runs in the decay branch, so cold-boot silence divides 0/0 -> NaN. A non-zero SSL
+    // alone does NOT guarantee a non-zero follower. Force the denominator into the PDM
+    // SSL domain (never 0), then clamp any residual non-finite result. Belt to the
+    // SSL-never-0 suspenders in the boot/cal-fail/clear_noise_cal paths.
+    if (!isfinite(max_waveform_val_follower) ||
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+        max_waveform_val_follower < ap_drive.follower_floor_raw_peak) {
+      max_waveform_val_follower = ap_drive.follower_floor_raw_peak;
+#else
+        max_waveform_val_follower < (float)CONFIG.SWEET_SPOT_MIN_LEVEL) {
+      max_waveform_val_follower = (float)CONFIG.SWEET_SPOT_MIN_LEVEL;
+#endif
+    }
+    if (max_waveform_val_follower < 1.0f) max_waveform_val_follower = 1.0f;
+#endif
+    float waveform_peak_scaled_raw = max_waveform_val / max_waveform_val_follower;
+#ifdef K1_MIC_PDM_RX_ANY_V1
+    if (!isfinite(waveform_peak_scaled_raw)) waveform_peak_scaled_raw = 0.0f;
+#endif
+
+    if (waveform_peak_scaled_raw > waveform_peak_scaled) {
+      float delta = waveform_peak_scaled_raw - waveform_peak_scaled;
+      // ATTACK SNAP (2026-06-11): asymmetric envelope when K1_PEAK_ASYM_ENV.
+      // Alphas are dt-derived when K1_AGC_DT_CLOCK_V1 so wall-clock stays put.
+      waveform_peak_scaled += delta * peak_attack_a;
+    } else if (waveform_peak_scaled_raw < waveform_peak_scaled) {
+      float delta = waveform_peak_scaled - waveform_peak_scaled_raw;
+      waveform_peak_scaled -= delta * peak_release_a;
+    }
+
+    // Use the maximum amplitude of the captured frame to set
+    // the Sweet Spot state. Think of this like a coordinate
+    // space where 0 is the center LED, -1 is the left, and
+    // +1 is the right. See run_sweet_spot() in led_utilities.h
+    // for how this value translates to the final LED brightnesses
+
+    int8_t potential_next_state = sweet_spot_state; // Assume current state initially
+
+    // *** Use the SMOOTHED value for state decision, with Schmitt hysteresis on the ***
+    // *** silence boundary: enter -1 below threshold_silence; once silent, only leave ***
+    // *** -1 when the smoothed peak rises above the higher threshold_silence_exit. ***
+    const bool was_silent_state = (sweet_spot_state == -1);
+    if (was_silent_state) {
+        if (max_waveform_val_raw_smooth >= threshold_silence_exit) {
+            potential_next_state = (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) ? 1 : 0;
+        } else {
+            potential_next_state = -1;   // stay silent until we clear the exit line
+        }
+    } else {
+        if (max_waveform_val_raw_smooth <= threshold_silence) {
+            potential_next_state = -1;
+        } else if (max_waveform_val_raw_smooth >= CONFIG.SWEET_SPOT_MAX_LEVEL) {
+            potential_next_state = 1;
+        } else {
+            potential_next_state = 0;
+        }
+    }
+
+    if (potential_next_state != sweet_spot_state) {
+        if ((t_now - last_state_change_time) > MIN_STATE_DURATION_MS) {
+            int8_t previous_state = sweet_spot_state;
+            sweet_spot_state = potential_next_state;
+            last_state_change_time = t_now;
+
+            if (sweet_spot_state == -1) {
+                silence_temp = true;
+                silence_switched = t_now;
+
+                if (previous_state != -1) {
+                     // *** Use RAW value for deadband check ***
+                     float agc_delta = threshold_silence - max_waveform_val_raw; // Use pre-calculated threshold
+                     if (agc_delta > 50.0) {
+                         min_silent_level_tracker = SQ15x16(AGC_FLOOR_INITIAL_RESET);
+                         if (debug_mode) {
+                             USBSerial.print("DEBUG: AGC Floor Tracker Reset (deadband met): raw_val=");
+                             USBSerial.print(max_waveform_val_raw);
+                             USBSerial.print(" threshold=");
+                             USBSerial.println(threshold_silence); // Use pre-calculated threshold
+                         }
+                     } else {
+                         if (debug_mode) {
+                             USBSerial.print("DEBUG: AGC Floor Tracker not reset due to deadband, delta=");
+                             USBSerial.println(agc_delta);
+                         }
+                     }
+                }
+
+                if (debug_mode) {
+                    USBSerial.println("DEBUG: Entered silent state (Hysteresis Passed)");
+                    USBSerial.print("  max_waveform_val_raw: "); USBSerial.print(max_waveform_val_raw);
+                    USBSerial.print("  MIN_LEVEL threshold: "); USBSerial.println(threshold_silence); // Use pre-calculated threshold
+                }
+            } else {
+                if (debug_mode) {
+                   USBSerial.print("DEBUG: Entered ");
+                   USBSerial.print(sweet_spot_state == 1 ? "loud" : "normal");
+                   USBSerial.print(" state (Hysteresis Passed), delta=");
+                   USBSerial.println(max_waveform_val_raw - threshold_silence); // Use pre-calculated threshold
+                }
+            }
+        }
+    }
+
+    if (sweet_spot_state == -1) {
+        // --- REMOVED OLD SINGLE TRACKER UPDATE LOGIC ---
+        // SQ15x16 current_raw_level = SQ15x16(max_waveform_val_raw);
+        // if (current_raw_level < min_silent_level_tracker) {
+        //     min_silent_level_tracker = current_raw_level;
+        // } else {
+        //     min_silent_level_tracker += SQ15x16(AGC_FLOOR_RECOVERY_RATE);
+        //     min_silent_level_tracker = fmin_fixed(min_silent_level_tracker, SQ15x16(AGC_FLOOR_INITIAL_RESET));
+        // }
+        //  if (debug_mode && (t_now % 1000 == 0)) {
+        //      USBSerial.print("DEBUG (Silence): AGC Floor Tracker Value: "); USBSerial.println(float(min_silent_level_tracker));
+        //  }
+        // --- END REMOVED --- 
+    }
+
+    // Go-dark quiet detection: RAW per-frame RMS vs an ABSOLUTE threshold with hysteresis
+    // (firmware-v3 pre-gate port — pure RMS, cf. ControlBus.cpp Stage 7). Replaces the
+    // SSL/sweet_spot_state==-1 gate (smoothed-peak floor sits above SSL in a normal room)
+    // AND deliberately does NOT re-use the peak-based loud_sound_detected veto
+    // (threshold_loud_break = SSL*1.2 ≈ 326 trips on quiet-room peaks 150-870, which would
+    // veto silence every frame). A genuine loud sound spikes rms_raw well past the exit
+    // threshold, so the RMS hysteresis breaks silence on its own. The long SILENCE_DWELL_MS
+    // is what keeps genuinely quiet *music* from darkening the plate.
+    // PEAKINESS (2026-08-06): the second discriminator, because RMS alone is blind
+    // here. MEASURED on this bench: music rms_raw p50 0.0027 vs quiet-room p50
+    // 0.0072 — music's MEDIAN RMS is LOWER than ambient's, and ~75% of music frames
+    // read at or below the loudest ambient frame. The room floor is narrowband hum
+    // (crest ~1.26, RMS ~= peak); music is peaky (RMS << peak). RMS is the one
+    // statistic on which steady hum beats music, so no level threshold can release
+    // the gate on music at any gain — which is exactly the reported failure.
+    // Peak-to-mean remains useful only as one member of a joint classifier. On the
+    // ratified IM1 input, matched captures showed that isolated silence transients
+    // have a higher crest tail than low music. Therefore a one-sided, one-frame
+    // crest test is invalid: wake requires the bounded band and accumulated
+    // time-domain evidence below, together with raw level above the measured
+    // silence ceiling.
+    static float k1_pk_ring[K1_SILENCE_PEAK_WIN];
+    static uint16_t k1_pk_n = 0, k1_pk_i = 0;
+    static float k1_pk_sum = 0.0f;
+    if (k1_pk_n == K1_SILENCE_PEAK_WIN) k1_pk_sum -= k1_pk_ring[k1_pk_i]; else k1_pk_n++;
+    k1_pk_ring[k1_pk_i] = (float)max_waveform_val_raw;
+    k1_pk_sum += k1_pk_ring[k1_pk_i];
+    k1_pk_i = (uint16_t)((k1_pk_i + 1u) % K1_SILENCE_PEAK_WIN);
+    float k1_pk_max = 0.0f;
+    for (uint16_t i = 0; i < k1_pk_n; i++) { if (k1_pk_ring[i] > k1_pk_max) k1_pk_max = k1_pk_ring[i]; }
+    const float k1_pk_mean = (k1_pk_n > 0u) ? (k1_pk_sum / (float)k1_pk_n) : 0.0f;
+    // Ratio is only meaningful on a full window over a non-trivial floor.
+    k1_silence_peakiness = (k1_pk_n == K1_SILENCE_PEAK_WIN && k1_pk_mean >= 1.0f)
+                             ? (k1_pk_max / k1_pk_mean) : 0.0f;
+
+    static bool k1_rms_silent_state = false;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    static K1ApStructuredEvidenceState k1_structured_evidence = {};
+#endif
+#if defined(K1_MIC_IM69D_PDM_V1)
+    // Scope-gated to the IM69D diagnostic lane. The production SPH0645 path retains
+    // its independently characterised Schmitt trigger below. The new contract is
+    // derived from equal-window, Captain-confirmed silence and low-music captures on
+    // B489A500; it is not transferred to another capsule or configuration epoch.
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    const bool k1_structured_candidate =
+        k1_silence_peakiness >= ap_drive.silence_threshold.peakiness_floor &&
+        k1_silence_peakiness <= ap_drive.silence_threshold.peakiness_ceiling &&
+        (float)max_waveform_val_raw >= ap_drive.silence_threshold.structured_break_raw_peak;
+    const bool k1_structured_audio = k1_ap_structured_evidence_tick(
+        k1_structured_evidence,
+        k1_structured_candidate,
+        t_now,
+        ap_drive.silence_threshold.structured_evidence_ms);
+    if (k1_structured_audio) {
+#else
+    if (k1_silence_peakiness >= K1_SILENCE_PEAKINESS_BREAK &&
+        (float)max_waveform_val_raw >=
+            (float)CONFIG.SWEET_SPOT_MIN_LEVEL * K1_SILENCE_JOINT_LEVEL_SSL_FRAC) {
+#endif
+        k1_rms_silent_state = false;             // peaky AND loud enough → structured audio
+    } else
+#endif
+    if (k1_rms_silent_state) {
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+        k1_rms_silent_state = (k1_silence_rms_raw < ap_drive.silence_threshold.rms_exit);
+#else
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_EXIT);   // stay silent until clearly above
+#endif
+    } else {
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+        k1_rms_silent_state = (k1_silence_rms_raw < ap_drive.silence_threshold.rms_enter);
+#else
+        k1_rms_silent_state = (k1_silence_rms_raw < K1_SILENCE_RMS_ENTER);  // enter when below
+#endif
+    }
+
+    if (!k1_rms_silent_state) {
+        if (silence && debug_mode) {
+             USBSerial.println("DEBUG: Silence broken (audio detected)");
+        }
+        silence = false;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+        ap_silence_candidate_since_ms = t_now;
+#else
+        silence_temp = false;
+        silence_switched = t_now;
+#endif
+    } else {
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+         if (t_now - ap_silence_candidate_since_ms >= SILENCE_DWELL_MS) {
+#else
+         silence_temp = true;
+         if (t_now - silence_switched >= SILENCE_DWELL_MS) {
+#endif
+            if (!silence && debug_mode) {
+                USBSerial.println("DEBUG: Extended silence detected (dwell met)");
+            }
+            silence = true;
+         }
+    }
+
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    // `silence` is the input classifier, not a cosmetic dimmer. Once it has
+    // completed its dwell, no residual room-floor excursion is valid programme
+    // drive. Zero the shared drive at that boundary so every renderer sees the
+    // same semantic result; raw samples and the independent wake discriminators
+    // above remain untouched and can still release silence on real programme.
+    if (silence) {
+      max_waveform_val = 0.0f;
+      waveform_peak_scaled = 0.0f;
+    }
+#endif
+
+    if (debug_mode && (t_now % 10000 == 0)) {
+      USBSerial.print("DEBUG: silent_scale=");
+      USBSerial.print(float(silent_scale));
+      USBSerial.print(" silence=");
+      USBSerial.print(silence ? "true" : "false");
+      USBSerial.print(" sweet_spot_state=");
+      USBSerial.println(sweet_spot_state);
+    }
+
+    // STANDBY_DIMMING STRUCK 2026-08-09 (Captain): option permanently removed from
+    // operator-selectable surfaces. Keep silent_scale pinned at Core 0 so NVS/UI
+    // cannot re-enable the IIR fade (silent_scale→0 dark plate). K1_BLE_REMOTED
+    // builds retain the same belt; product behaviour is dimming OFF everywhere.
+    (void)CONFIG.STANDBY_DIMMING;
+    silent_scale      = 1.0f;
+    silent_scale_last = 1.0f;
+
+    sweet_spot_state_last = sweet_spot_state;
+
+    if (debug_mode && (t_now % 2000 == 0)) {
+        USBSerial.print("DEBUG (State): sweet_spot_state="); USBSerial.print(sweet_spot_state);
+        USBSerial.print(" | max_waveform_val_raw="); USBSerial.print(max_waveform_val_raw);
+        USBSerial.print(" | silence_threshold="); USBSerial.println(threshold_silence); // Use pre-calculated threshold
+    }
+  }
+
+  for (int i = 0; i < SAMPLE_HISTORY_LENGTH - CONFIG.SAMPLES_PER_CHUNK; i++) {
+    sample_window[i] = sample_window[i + CONFIG.SAMPLES_PER_CHUNK];
+  }
+  for (int i = SAMPLE_HISTORY_LENGTH - CONFIG.SAMPLES_PER_CHUNK; i < SAMPLE_HISTORY_LENGTH; i++) {
+    sample_window[i] = audio_response_gain_apply_sample(waveform[i - (SAMPLE_HISTORY_LENGTH - CONFIG.SAMPLES_PER_CHUNK)]);
+  }
+
+  const SQ15x16 RECIP_32768 = SQ15x16(1.0 / 32768.0);
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    waveform_fixed_point[i] = SQ15x16(audio_response_gain_apply_sample(waveform[i])) * RECIP_32768;
+  }
+
+  // --- AP instrumentation (2026-05-20) — WAVEFORM-kill isolation telemetry ---
+  // Serial-gated and rate-limited to 1 Hz. Reveals which AP variable
+  // goes degenerate when WAVEFORM dies post-noise-cal. Pair with the AGC-
+  // disabled GDFT.h to diagnose the kill mechanism.
+  //   SSL          — sweet_spot_min_level (silence threshold; should ~hover, not drift)
+  //   DC           — dc_offset (should be stable post-cal, ~8000 for SPH0645)
+  //   max_raw      — peak amplitude this chunk
+  //   follower     — slow-decay envelope (should follow max_raw with hysteresis)
+  //   peak_scaled  — waveform_peak_scaled (the value WAVEFORM mode actually reads)
+  //   silent_scale — silence-dimming multiplier (0.0..1.0; goes to 0 if STANDBY_DIMMING=true and silence==true)
+  //   silence      — extended-silence flag (10 s timeout)
+  //   CAL_SOURCE/CAL_VALID — calibration provenance for harness captures
+  static uint32_t last_ap_dbg = 0;
+  // [AP] stream cadence. Default 1 Hz (production). Override via -DK1_AP_STREAM_INTERVAL_MS
+  // for higher-rate diagnostics (e.g. loud-guard limit-cycle A/B needs ~10 Hz to resolve a
+  // ~1.5 s oscillation without aliasing). Production builds leave the default untouched.
+#ifndef K1_AP_STREAM_INTERVAL_MS
+#define K1_AP_STREAM_INTERVAL_MS 1000
+#endif
+  if (AP_STREAM_ENABLED && millis() - last_ap_dbg > K1_AP_STREAM_INTERVAL_MS) {
+    K1TempoEvent     tev = k1_tempo_read();
+    K1OnsetBeatEvent oev = k1_onset_beat_read();
+    USBSerial.printf("[AP] SSL=%u DC=%d max_raw=%.0f follower=%.0f peak_scaled=%.3f response_gain=%.3f silent_scale=%.3f silence=%d sil_pk=%.0f rms_raw=%.4f pky=%.2f dim=%d cal_source=%s cal_valid=%d cal_reason=%s | bpm=%.1f conf=%.2f lock=%d phase=%.2f beat=%d bstr=%.2f | onset=%d bass=%d ostr=%.2f",
+      CONFIG.SWEET_SPOT_MIN_LEVEL, (int)CONFIG.DC_OFFSET, (float)max_waveform_val_raw,
+      (float)max_waveform_val_follower, (float)waveform_peak_scaled, (float)k1_audio_response_gain_effective(), (float)silent_scale,
+      silence ? 1 : 0, (float)max_waveform_val_raw_smooth, k1_silence_rms_raw, (float)k1_silence_peakiness, CONFIG.STANDBY_DIMMING ? 1 : 0,
+      calibration_source_name(), calibration_valid ? 1 : 0,
+      noise_cal_reject_reason_name(noise_cal_reject_reason),
+      (float)tev.bpm, (float)tev.confidence, tev.locked ? 1 : 0, (float)tev.phase01, tev.beat_tick ? 1 : 0, (float)tev.beat_strength,
+      oev.onset ? 1 : 0, oev.bass_onset ? 1 : 0, (float)oev.bass_onset_strength);
+#ifdef K1_MIC_IM73D_PDM_V1
+    USBSerial.printf(" | raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f",
+      im73d_raw_i16_abs_peak,
+      im73d_raw_i16_rms,
+      im73d_raw_i16_near_pct);
+#elif defined(K1_MIC_IM69D_PDM_V1)
+    USBSerial.printf(" | raw_i16_abs_peak=%u raw_i16_rms=%.1f raw_i16_near_pct=%.3f",
+      im69d_raw_i16_abs_peak,
+      im69d_raw_i16_rms,
+      im69d_raw_i16_near_pct);
+#ifdef K1_MIC_HEALTH_V1
+    {
+      const K1MicHealthContext mh = k1_mic_health_read();
+      USBSerial.printf(" | mic_health=%s mic_reason=%s live=%d challenge=%d inject=%s health_epoch=%lu fault_events=%lu last_fault=%s/%s fault_interrupted_challenge=%d",
+        k1_mic_health_state_name(mh.state),
+        k1_mic_health_reason_name(mh.reason),
+        mh.liveness_proven ? 1 : 0,
+        mh.challenge_active ? 1 : 0,
+        k1_mic_health_injection_name(mh.injection),
+        (unsigned long)mh.epoch,
+        (unsigned long)mh.fault_event_count,
+        k1_mic_health_state_name(mh.last_fault_state),
+        k1_mic_health_reason_name(mh.last_fault_reason),
+        mh.last_fault_interrupted_challenge ? 1 : 0);
+    }
+#endif
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    {
+      const K1ApDriveContract dc =
+          k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
+      USBSerial.printf(" | mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_evidence_ms=%lu follower_floor=%.1f",
+        dc.mic_noise_floor_raw_peak,
+        dc.drive_threshold_raw_peak,
+        dc.silence_threshold.raw_peak_enter,
+        dc.silence_threshold.raw_peak_exit,
+        dc.silence_threshold.rms_enter,
+        dc.silence_threshold.rms_exit,
+        dc.silence_threshold.peakiness_floor,
+        dc.silence_threshold.peakiness_ceiling,
+        dc.silence_threshold.structured_break_raw_peak,
+        (unsigned long)dc.silence_threshold.structured_evidence_ms,
+        dc.follower_floor_raw_peak);
+    }
+#endif
+#endif
+#ifdef K1_MATRIX_AUDIT_V1
+    // P5.B matrix witnesses: final output-buffer state (written on Core 1 in
+    // show_leds; volatile reads here) + DF presence gate. Same 1 Hz cadence.
+    USBSerial.printf(" | mx_pmax=%u mx_plit=%u mx_smax=%u mx_slit=%u mx_dfinj=%.2f mode=%d smode=%d",
+      (unsigned)k1_mx_primary_max, (unsigned)k1_mx_primary_lit,
+      (unsigned)k1_mx_secondary_max, (unsigned)k1_mx_secondary_lit,
+      (double)k1_mx_df_inject, (int)CONFIG.LIGHTSHOW_MODE, (int)SECONDARY_LIGHTSHOW_MODE);
+#endif
+#ifdef K1_HUE_AUDIT_V1
+    // Hue-coverage tap line (own line so scripts/regression-harness/
+    // hue_coverage.py can match it standalone). Counters are cumulative;
+    // the host diffs successive lines. Same 1 Hz cadence as the AP line.
+    {
+      USBSerial.printf("HUEAUD,ver=1,ch=p,lit=%u,mode=%d,pal=%u,pmode=%u,acs=%u,hp=%.4f,pct=%.3f,hdn=%u,hd0=%02x%02x%02x,h=",
+        (unsigned)k1_hue_lit_primary, (int)CONFIG.LIGHTSHOW_MODE,
+        (unsigned)CONFIG.PALETTE_INDEX, CONFIG.PALETTE_MODE_ENABLED ? 1U : 0U,
+        CONFIG.AUTO_COLOR_SHIFT ? 1U : 0U,
+        (double)float(hue_position), (double)k1_hue_sweep_pct,
+        // HD-cache identity fingerprint (MEASURE THE PROPERTY: which palette is
+        // the engine actually sampling?): primary HD stop count + stop-0 RGB,
+        // mirrored from cached_gradient_palette (globals.h).
+        (unsigned)k1_hd_fp_count,
+        (unsigned)((k1_hd_fp_stop0 >> 16) & 0xFF),
+        (unsigned)((k1_hd_fp_stop0 >> 8) & 0xFF),
+        (unsigned)(k1_hd_fp_stop0 & 0xFF));
+      for (uint8_t hb = 0; hb < 24; hb++) {
+        USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_primary[hb]);
+      }
+      // Differential telemetry: PRE-pipeline histogram (leds_16, before
+      // incandescent/scaling) — divergence vs h= names the crushing stage.
+      USBSerial.print(",hpre=");
+      for (uint8_t hb = 0; hb < 24; hb++) {
+        USBSerial.printf(hb == 23 ? "%lu" : "%lu,", (unsigned long)k1_hue_hist_pre[hb]);
+      }
+      USBSerial.println();
+    }
+#endif
+#if defined(K1_GDFT_X2_AB_V1) && (K1_GDFT_X2_AB_V1)
+    // Bench-only: bottom-octave magnitude + simple rise-time estimate for ×2 A/B.
+    {
+      float bass_now = 0.0f;
+      for (uint8_t bi = 0; bi < 12 && bi < NUM_FREQS; bi++) {
+        float m = magnitudes_normalized[bi];
+        if (isfinite(m) && m > bass_now) bass_now = m;
+      }
+      static float bass_prev = 0.0f;
+      static uint32_t rise_t0_ms = 0;
+      static float rise_ms_latched = 0.0f;
+      if (bass_now > 0.15f && bass_prev <= 0.15f) {
+        rise_t0_ms = millis();
+      }
+      if (rise_t0_ms != 0 && bass_now >= bass_prev) {
+        rise_ms_latched = float(millis() - rise_t0_ms);
+      }
+      if (bass_now < 0.08f) {
+        rise_t0_ms = 0;
+      }
+      bass_prev = bass_now;
+      USBSerial.printf(" | x2_cross=%u bass_mag=%.3f rise_ms=%.0f",
+                       (unsigned)k1_gdft_x2_crossover_bin, bass_now, rise_ms_latched);
+    }
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    {
+      const K1MicAutoState& mas = k1_mic_auto_sense_state();
+      USBSerial.printf(" | auto_scale=%.3f auto_rec=%.3f auto_state=%u auto_reason=%u auto_en=%d auto_shadow=%d",
+        (float)k1_mic_auto_sense_applied_scale(),
+        (float)mas.recommended_scale,
+        (unsigned)mas.state,
+        (unsigned)mas.reason,
+        mas.runtime_enabled ? 1 : 0,
+        mas.shadow_only ? 1 : 0);
+    }
+#endif
+#ifdef K1_LOUD_GUARD_V1
+    // lg_mode = loud-guard retune matrix (0/1/2). lightshow = CONFIG.LIGHTSHOW_MODE.
+    // Do NOT label lg_mode as "mode=" — that false-read as lightshow mode 2 on Unit 2
+    // and caused a silence-fix "PASS" while WAVEFORM_HYBRID_K1 (32) stayed dead.
+    USBSerial.printf(" | k1_loud=%d input_trim=%.3f gdft_trim=%.3f agc_gain=%.3f agc_env=%.4f clip_pct=%.3f near_pct=%.3f peak_pin=%.3f spec_pin=%.3f spec_sat=%.3f lg_mode=%d lightshow=%u",
+      k1_loud_guard_enabled ? 1 : 0,
+      k1_loud_input_trim,
+      k1_loud_gdft_trim,
+      (float)agc_bands[0].gain,
+      (float)agc_envelope,
+      k1_loud_clip_duty,
+      k1_loud_near_rail_duty,
+      k1_loud_peak_pin_duty,
+      k1_loud_spec_sat_duty,
+      k1_loud_spec_sat_fraction,
+      k1_loud_guard_mode,
+      (unsigned)CONFIG.LIGHTSHOW_MODE);
+#endif
+#if ENABLE_TEMPO_STREAM && ENABLE_AP_FRONTEND_DEBUG
+    USBSerial.printf(" | i2s_wait_us=%u i2s_seq=%u",
+                     (unsigned)k1_audio_i2s_read_debug.elapsed_us,
+                     (unsigned)k1_audio_i2s_read_debug.capture_sequence);
+#endif
+#ifdef K1_STM
+    {
+      // STM producer readout on the [AP] line (bench K1_STM builds only): proves the
+      // live spectrogram[] -> k1_stm_process -> snapshot wiring emits real spectral-
+      // temporal modulation from the mic (ready + non-zero energies under audio;
+      // ready=0 / zeros in silence). k1_stm_read() is visible via k1_tempo.h ->
+      // k1_audio_snapshot.h. Runs on the AP (Core 0) path, gated to AP telemetry.
+      K1StmResult stm_ap = k1_stm_read();
+      USBSerial.printf(" | stm_loud=%.3f agc_env=%.4f agc_nf=%.4f agc_gated=%d stm_ready=%d stm_tE=%.4f stm_sE=%.4f",
+        float(agc_loudness_norm), float(agc_envelope), float(agc_noise_floor), agc_gated ? 1 : 0,
+        stm_ap.ready ? 1 : 0, stm_ap.temporal_energy, stm_ap.spectral_energy);
+    }
+#endif
+#ifdef K1_MIC_AUTO_SENSE_V1
+    USBSerial.printf(" | mas_state=%u mas_reason=%u mas_window_age_sec=%.1f mas_applied_scale=%.3f",
+      (unsigned)mas.state,
+      (unsigned)mas.reason,
+      mas.window_age_sec,
+      mas.applied_scale);
+#endif
+    USBSerial.println();
+    last_ap_dbg = millis();
+  }
+#endif
+}
+
+#ifdef ENABLE_AP_STREAM
+// PIO-APCAP (2026-05-25): :ap_capture=<ms> windowed AP harness capture. ap_capture_tick()
+// is called once per frame from loop() AFTER process_GDFT, where spectrogram_smooth /
+// chromagram_smooth are fresh (the 1 Hz ap_stream emit above runs inside
+// acquire_sample_chunk, one stage before GDFT, so those arrays are stale there).
+void ap_capture_arm(uint32_t ms) {
+  ap_capture_active = true;
+  ap_capture_end_ms = millis() + ms;
+  ap_capture_frames = 0;
+  ap_capture_max_raw_min = 1e30f;
+  ap_capture_max_raw_max = -1e30f;
+  ap_capture_peak_min = 1e30f;
+  ap_capture_peak_max = -1e30f;
+  ap_capture_follower_sum = 0.0;
+  ap_capture_chroma_sum = 0.0;
+  ap_capture_silence_any = false;
+  for (uint16_t i = 0; i < NUM_FREQS; i++) ap_capture_spec_sum[i] = 0.0f;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+  for (uint16_t i = 0; i < K1_AP_CAPTURE_PEAK_HIST_BINS; i++) ap_capture_peak_hist[i] = 0;
+  for (uint16_t i = 0; i < K1_AP_CAPTURE_RMS_HIST_BINS; i++) ap_capture_rms_hist[i] = 0;
+  for (uint16_t i = 0; i < K1_AP_CAPTURE_PEAKINESS_HIST_BINS; i++) ap_capture_peakiness_hist[i] = 0;
+  ap_capture_silence_frames = 0;
+  ap_capture_structured_candidate_frames = 0;
+#endif
+}
+
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+static uint16_t k1_ap_capture_hist_quantile(const uint16_t* hist, uint16_t bins,
+                                            uint32_t samples, uint8_t percentile) {
+  if (samples == 0 || bins == 0) return 0;
+  uint32_t target = (samples * uint32_t(percentile) + 99U) / 100U;
+  if (target == 0) target = 1;
+  uint32_t seen = 0;
+  for (uint16_t i = 0; i < bins; i++) {
+    seen += hist[i];
+    if (seen >= target) return i;
+  }
+  return uint16_t(bins - 1U);
+}
+#endif
+
+void ap_capture_tick() {
+  if (!ap_capture_active) return;
+
+  float mr = (float)max_waveform_val_raw;
+  float pk = (float)waveform_peak_scaled;
+  float fo = (float)max_waveform_val_follower;
+  if (mr < ap_capture_max_raw_min) ap_capture_max_raw_min = mr;
+  if (mr > ap_capture_max_raw_max) ap_capture_max_raw_max = mr;
+  if (pk < ap_capture_peak_min) ap_capture_peak_min = pk;
+  if (pk > ap_capture_peak_max) ap_capture_peak_max = pk;
+  ap_capture_follower_sum += fo;
+  float chroma_frame = 0.0f;
+  for (uint8_t c = 0; c < 12; c++) chroma_frame += (float)chromagram_smooth[c];
+  ap_capture_chroma_sum += (chroma_frame / 12.0f);
+  for (uint16_t i = 0; i < NUM_FREQS; i++) ap_capture_spec_sum[i] += (float)spectrogram_smooth[i];
+  if (silence) ap_capture_silence_any = true;
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+  {
+    uint16_t peak_bin = uint16_t(mr >= 32760.0f ? (K1_AP_CAPTURE_PEAK_HIST_BINS - 1U)
+                                                 : uint16_t(mr) >> 3U);
+    if (ap_capture_peak_hist[peak_bin] != 0xFFFFU) ap_capture_peak_hist[peak_bin]++;
+    float rms_scaled = k1_silence_rms_raw * 10000.0f;
+    uint16_t rms_bin = uint16_t(rms_scaled <= 0.0f ? 0.0f :
+                                (rms_scaled >= float(K1_AP_CAPTURE_RMS_HIST_BINS - 1U)
+                                   ? float(K1_AP_CAPTURE_RMS_HIST_BINS - 1U)
+                                   : rms_scaled));
+    if (ap_capture_rms_hist[rms_bin] != 0xFFFFU) ap_capture_rms_hist[rms_bin]++;
+    float peakiness_scaled = k1_silence_peakiness * 100.0f;
+    uint16_t peakiness_bin = uint16_t(peakiness_scaled <= 0.0f ? 0.0f :
+        (peakiness_scaled >= float(K1_AP_CAPTURE_PEAKINESS_HIST_BINS - 1U)
+          ? float(K1_AP_CAPTURE_PEAKINESS_HIST_BINS - 1U)
+          : peakiness_scaled));
+    if (ap_capture_peakiness_hist[peakiness_bin] != 0xFFFFU) {
+      ap_capture_peakiness_hist[peakiness_bin]++;
+    }
+    if (silence) ap_capture_silence_frames++;
+    const K1ApDriveContract dc =
+        k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
+    if (k1_silence_peakiness >= dc.silence_threshold.peakiness_floor &&
+        k1_silence_peakiness <= dc.silence_threshold.peakiness_ceiling &&
+        mr >= dc.silence_threshold.structured_break_raw_peak) {
+      ap_capture_structured_candidate_frames++;
+    }
+  }
+#endif
+  ap_capture_frames++;
+
+  if (int32_t(millis() - ap_capture_end_ms) >= 0) {
+    uint16_t argmax = 0;
+    float best = -1.0f;
+    for (uint16_t i = 0; i < NUM_FREQS; i++) {
+      if (ap_capture_spec_sum[i] > best) { best = ap_capture_spec_sum[i]; argmax = i; }
+    }
+    float follower_mean = ap_capture_frames ? (float)(ap_capture_follower_sum / ap_capture_frames) : 0.0f;
+    float chroma_mean   = ap_capture_frames ? (float)(ap_capture_chroma_sum / ap_capture_frames) : 0.0f;
+    USBSerial.printf("[APCAP] frames=%lu max_raw=%.0f/%.0f peak_scaled=%.3f/%.3f follower_mean=%.1f spec_argmax=%u chroma_mean=%.4f silence=%d SSL=%u DC=%d cal_source=%s cal_valid=%d cal_reason=%s\n",
+      (unsigned long)ap_capture_frames,
+      ap_capture_max_raw_min, ap_capture_max_raw_max,
+      ap_capture_peak_min, ap_capture_peak_max,
+      follower_mean, (unsigned)argmax, chroma_mean,
+      ap_capture_silence_any ? 1 : 0,
+      (unsigned)CONFIG.SWEET_SPOT_MIN_LEVEL,
+      (int)CONFIG.DC_OFFSET,
+      calibration_source_name(),
+      calibration_valid ? 1 : 0,
+      noise_cal_reject_reason_name(noise_cal_reject_reason));
+#ifdef K1_AP_DRIVE_CONTRACT_V1
+    {
+      const uint16_t pp05 = k1_ap_capture_hist_quantile(ap_capture_peak_hist, K1_AP_CAPTURE_PEAK_HIST_BINS, ap_capture_frames, 5);
+      const uint16_t pp10 = k1_ap_capture_hist_quantile(ap_capture_peak_hist, K1_AP_CAPTURE_PEAK_HIST_BINS, ap_capture_frames, 10);
+      const uint16_t pp50 = k1_ap_capture_hist_quantile(ap_capture_peak_hist, K1_AP_CAPTURE_PEAK_HIST_BINS, ap_capture_frames, 50);
+      const uint16_t pp95 = k1_ap_capture_hist_quantile(ap_capture_peak_hist, K1_AP_CAPTURE_PEAK_HIST_BINS, ap_capture_frames, 95);
+      const uint16_t pp99 = k1_ap_capture_hist_quantile(ap_capture_peak_hist, K1_AP_CAPTURE_PEAK_HIST_BINS, ap_capture_frames, 99);
+      const uint16_t rp05 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 5);
+      const uint16_t rp10 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 10);
+      const uint16_t rp50 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 50);
+      const uint16_t rp95 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 95);
+      const uint16_t rp99 = k1_ap_capture_hist_quantile(ap_capture_rms_hist, K1_AP_CAPTURE_RMS_HIST_BINS, ap_capture_frames, 99);
+      const uint16_t kp05 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 5);
+      const uint16_t kp10 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 10);
+      const uint16_t kp50 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 50);
+      const uint16_t kp95 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 95);
+      const uint16_t kp99 = k1_ap_capture_hist_quantile(ap_capture_peakiness_hist, K1_AP_CAPTURE_PEAKINESS_HIST_BINS, ap_capture_frames, 99);
+      const K1ApDriveContract dc = k1_ap_drive_contract_resolve((float)CONFIG.SWEET_SPOT_MIN_LEVEL);
+      const float silence_fraction = ap_capture_frames
+          ? float(ap_capture_silence_frames) / float(ap_capture_frames) : 0.0f;
+      const float structured_fraction = ap_capture_frames
+          ? float(ap_capture_structured_candidate_frames) / float(ap_capture_frames) : 0.0f;
+      USBSerial.printf("[APDIST] frames=%lu peak_p05=%u peak_p10=%u peak_p50=%u peak_p95=%u peak_p99=%u rms_p05=%.4f rms_p10=%.4f rms_p50=%.4f rms_p95=%.4f rms_p99=%.4f pky_p05=%.2f pky_p10=%.2f pky_p50=%.2f pky_p95=%.2f pky_p99=%.2f silence_fraction=%.3f structured_fraction=%.3f mic_floor=%.1f drive_threshold=%.1f silence_peak=%.1f/%.1f silence_rms=%.4f/%.4f silence_pky=%.2f/%.2f silence_struct=%.1f silence_evidence_ms=%lu follower_floor=%.1f\n",
+        (unsigned long)ap_capture_frames,
+        unsigned(pp05) * 8U, unsigned(pp10) * 8U, unsigned(pp50) * 8U,
+        unsigned(pp95) * 8U, unsigned(pp99) * 8U,
+        float(rp05) / 10000.0f, float(rp10) / 10000.0f, float(rp50) / 10000.0f,
+        float(rp95) / 10000.0f, float(rp99) / 10000.0f,
+        float(kp05) / 100.0f, float(kp10) / 100.0f, float(kp50) / 100.0f,
+        float(kp95) / 100.0f, float(kp99) / 100.0f, silence_fraction,
+        structured_fraction,
+        dc.mic_noise_floor_raw_peak, dc.drive_threshold_raw_peak,
+        dc.silence_threshold.raw_peak_enter, dc.silence_threshold.raw_peak_exit,
+        dc.silence_threshold.rms_enter, dc.silence_threshold.rms_exit,
+        dc.silence_threshold.peakiness_floor, dc.silence_threshold.peakiness_ceiling,
+        dc.silence_threshold.structured_break_raw_peak,
+        (unsigned long)dc.silence_threshold.structured_evidence_ms,
+        dc.follower_floor_raw_peak);
+    }
+#endif
+    ap_capture_active = false;
+  }
+}
+#endif
+
+void calculate_vu() {
+  /*
+    Calculates perceived audio loudness or Volume Unit (VU). Uses root mean square (RMS) method 
+    for accurate representation of perceived loudness and incorporates a noise floor calibration.
+    If calibration is active, updates noise floor level. If not, subtracts the noise floor from
+    the calculated volume and normalizes the volume level.
+
+    Parameters:
+    - audio_samples[]: Audio samples to process.
+    - sample_count: Number of samples in audio_samples array.
+
+    Global variables:
+    - audio_vu_level: Current VU level.
+    - audio_vu_level_last: Last calculated VU level.
+    - CONFIG.VU_LEVEL_FLOOR: Quietest level considered as audio signal.
+    - audio_vu_level_average: Average of the current and the last VU level.
+    - noise_cal_active: Indicator of active noise floor calibration.
+    */
+
+  // Store last volume level
+  audio_vu_level_last = audio_vu_level;
+
+  float sum = 0.0;
+
+#ifdef K1_AP_SUBSONIC_HPF_V1
+  // Measure VU (and so the silence RMS below) on the same band as the drive
+  // peak. Full-band, sub-110 Hz drift the plate cannot show held the VU over
+  // Mode 32's presence floor in a quiet room (B489, 4 Nov 2026: 30% of LED
+  // frames lit with peak_scaled at 0). Mic hops only; others keep full band.
+  if (k1_subsonic_hp_wave_fresh) {
+    k1_subsonic_hp_wave_fresh = false;
+    for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+      const float v = float(audio_response_gain_apply_sample((int32_t)k1_subsonic_hp_wave[i])) *
+                      (1.0f / 32768.0f);
+      sum += v * v;
+    }
+  } else
+#endif
+  for (uint16_t i = 0; i < CONFIG.SAMPLES_PER_CHUNK; i++) {
+    sum += float(waveform_fixed_point[i] * waveform_fixed_point[i]);
+  }
+
+  SQ15x16 rms = SQ15x16(sqrtf((float)(sum / CONFIG.SAMPLES_PER_CHUNK))); // Phase 1 2026-05-20: sqrt→sqrtf for S2 soft-float
+  audio_vu_level = rms;
+  k1_silence_rms_raw = (float)rms;   // raw pre-floor RMS for go-dark silence detection (firmware-v3 pre-gate port)
+
+  if (!noise_complete) {
+    if (!noise_cal_dc_valid ||
+        noise_cal_reject_reason != NOISE_CAL_REJECT_NONE ||
+        noise_iterations < 129 ||
+        noise_iterations > 240 ||
+        max_waveform_val_raw > NOISE_CAL_SSL_PHASE_B_MAX_RAW) {
+      return;
+    }
+    if (float(audio_vu_level * 1.5) > CONFIG.VU_LEVEL_FLOOR) {
+      CONFIG.VU_LEVEL_FLOOR = float(audio_vu_level * 1.5);
+    }
+  } else {
+    float vu_floor = CONFIG.VU_LEVEL_FLOOR;
+#if K1_PCM1808_LINE_SWITCH
+    if (k1_fe_audio_line_active()) {
+      // Canonical sample counts -> normalised RMS, in the same response-gain
+      // domain as waveform_fixed_point. Never modify the saved mic profile.
+      vu_floor = min(0.99f, float(K1_LINE_PRESENCE_FLOOR) *
+          k1_audio_response_gain_effective() / 32768.0f);
+    }
+#endif
+    audio_vu_level -= vu_floor;
+
+    if (audio_vu_level < 0.0) {
+      audio_vu_level = 0.0;
+    }
+
+#if K1_PCM1808_LINE_SWITCH
+    if (!k1_fe_audio_line_active())
+#endif
+      CONFIG.VU_LEVEL_FLOOR = min(0.99f, CONFIG.VU_LEVEL_FLOOR);
+    audio_vu_level /= (1.0 - min(0.99f, vu_floor));
+  }
+
+  audio_vu_level_average = (audio_vu_level + audio_vu_level_last) / (2.0);
+}

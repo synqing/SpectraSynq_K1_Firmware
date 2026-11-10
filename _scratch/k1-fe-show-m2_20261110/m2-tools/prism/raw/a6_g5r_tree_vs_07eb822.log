@@ -1,0 +1,14 @@
+$ /usr/bin/git rev-parse HEAD
+07eb8227f1bc4570351fc00459dfc5b5353e5a0d
+$ /usr/bin/git status
+HEAD detached at 07eb822
+nothing to commit, working tree clean
+exit 0
+$ /usr/bin/git status --porcelain --ignored
+!! .tmp/
+$ /usr/bin/git diff --stat 07eb822 (working tree vs 07eb822)
+exit 0
+$ /usr/bin/git diff --quiet 07eb822 && echo WORKTREE_EQUALS_07eb822
+WORKTREE_EQUALS_07eb822
+$ /usr/bin/git ls-files --others --exclude-standard (untracked)
+untracked_count=       0

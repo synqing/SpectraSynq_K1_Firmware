@@ -1,0 +1,26 @@
+849f1cc90d771c2b27b4e7a38bae883a0f6440cf
+DOCTOR: PASS
+{
+  "trinity": {
+    "locked": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "effective": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "dirty": false
+  },
+  "prism": {
+    "locked": "cc00556d1df2f863c6a0d914ef613886b050a408",
+    "effective": "849f1cc90d771c2b27b4e7a38bae883a0f6440cf",
+    "dirty": false
+  },
+✔ section rule cases: base profile is the one the cases were written for (1.153459ms)
+✔ Spine validator gives the recorded verdict on every shared section case (2.701458ms)
+✔ PRISM src/mapping_profile.js gives the same verdict as the Spine on every shared case (4.611542ms)
+﹣ build-demo refuses a mapping_profile_v2 project when the PRISM compiler ignores sections (0.077292ms) # resolved PRISM applies sections (see the next test)
+✔ build-demo and verify --project accept a mapping_profile_v2 project; manifest and trace name the section (1231.850541ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 1510.374208

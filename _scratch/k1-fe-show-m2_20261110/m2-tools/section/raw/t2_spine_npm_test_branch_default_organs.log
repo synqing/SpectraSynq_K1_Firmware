@@ -1,0 +1,49 @@
+21265e52625e5a8d29e69d661d5615fb35621487
+ M CHANGELOG.md
+ M package.json
+ M tools/instrument.mjs
+ M tools/validate_profile.mjs
+?? docs/architecture/
+?? schemas/mapping_profile_v2.schema.json
+?? tests/fixtures/
+?? tests/profile_rules_parity.test.js
+
+> spectrasynq-instrument-spine@0.1.0-g5 test
+> node --test tests/lock.test.js tests/resolve_organs.test.js tests/profile_and_anti_copy.test.js tests/instrument_project.test.js tests/c1_evidence.test.js tests/instrument_cli_authored.test.js tests/profile_rules_parity.test.js
+
+✔ C1 evidence exists (fail closed) (1.208459ms)
+✔ prim8_natural_v1 1.0.0 bytes unchanged vs G5 freeze (1.789125ms)
+✔ G5 ci_click_3s expected hashes unchanged (0.799292ms)
+✔ C1 relationship results record required checks and a legal verdict (1.627875ms)
+✔ draft successor prim8_natural_v1_1 exists and does not overwrite 1.0.0 (0.235625ms)
+✔ compile-twice harness identity for every C1 fixture (0.295125ms)
+✔ verify --project builds from the project's own mapping profile and matches its recorded hashes (353.785416ms)
+✔ verify --project writes only under --out, and two runs are byte-identical (298.965959ms)
+✔ build manifest records the compiler version the compiler reported (0.19825ms)
+✔ build-demo --project compiles the authored profile into --out and does not delete that folder (186.912417ms)
+✔ --out also redirects verify --fixture and the G5 project; both still pass their goldens (613.356917ms)
+✔ --out without a value is refused (36.357833ms)
+✔ a profile whose bytes do not match the recorded hash is refused (36.694666ms)
+✔ a profile that fails mapping_profile_v1 validation is refused (36.888958ms)
+✔ a recorded ShowBundle hash that the rebuild does not reproduce is refused (absolute input paths work) (278.348333ms)
+✔ rejects VERIFIED with 64-zero trace hash (0.46575ms)
+✔ organs.lock.json validates roles and has no absolute paths (0.880708ms)
+✔ prim8_natural_v1 is structured AUTHORED for heat/space/gravity (1.145959ms)
+✔ proposal prim8_natural_v1_1 validates including noise_gated_bounded_percentile_u16 (0.379584ms)
+✔ coverage IMPACT_ONLY fails when only impact is dynamic (0.646333ms)
+✔ anti-copy: no organ source and no web/ (0.409333ms)
+✔ section rule cases: base profile is the one the cases were written for (0.619792ms)
+✔ Spine validator gives the recorded verdict on every shared section case (2.508041ms)
+﹣ PRISM src/mapping_profile.js gives the same verdict as the Spine on every shared case (0.048458ms) # resolved PRISM /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio has no src/mapping_profile.js (compiler < 0.4.0)
+✔ build-demo refuses a mapping_profile_v2 project when the PRISM compiler ignores sections (226.416875ms)
+﹣ build-demo and verify --project accept a mapping_profile_v2 project; manifest and trace name the section (0.099959ms) # resolved PRISM /Users/spectrasynq/Workspace_Management/Software/.g5r-clean/PRISM.studio does not apply sections
+✔ PRISM_ROOT override does not rewrite locked_commit (1.841167ms)
+✔ unrelated clone with a valid SHA is REMOTE_MISMATCH (0.6995ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 2106.183875

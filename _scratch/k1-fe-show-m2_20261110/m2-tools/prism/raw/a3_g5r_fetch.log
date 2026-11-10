@@ -1,0 +1,16 @@
+$ mv .git/objects/info/alternates .git/objects/info/alternates.dead-20261110
+exit 0
+total 8
+drwxr-xr-x@ 3 spectrasynq  staff   96 Nov 10 16:26 .
+drwxr-xr-x@ 4 spectrasynq  staff  128 Aug 16 17:47 ..
+-rw-r--r--@ 1 spectrasynq  staff   75 Aug 16 17:41 alternates.dead-20261110
+$ /usr/bin/git fetch origin
+fatal: bad object 4c508c9d563e6b6af359dcaccb7e3e6a7b8c19fa
+error: https://github.com/synqing/PRISM.studio.git did not send all necessary objects
+exit 1
+$ /usr/bin/git cat-file -t 07eb8227f1bc4570351fc00459dfc5b5353e5a0d
+commit
+$ /usr/bin/git cat-file -t cc00556d1df2f863c6a0d914ef613886b050a408
+commit
+$ /usr/bin/git merge-base --is-ancestor 07eb822 cc00556d
+exit 0

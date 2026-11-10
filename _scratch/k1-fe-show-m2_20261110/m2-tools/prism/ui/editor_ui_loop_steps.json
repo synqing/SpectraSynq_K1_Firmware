@@ -1,0 +1,44 @@
+{
+  "port": 55805,
+  "steps": [
+    {
+      "step": "compile_pre_edit",
+      "projLog": "Compiled and recorded → out/editor\nShowBundle   cae4fbc1a5405dff9c5a9a418261ca6b01d52fef0dfbaa0d5b9707c615eda1e1\nIntent Trace 9491b071c92f7a82e639c295bf01a05e57d5f4376371a54d311c8e40c23328ce\nPRSM stream  651432158eedfa9c970ed369413cca0aa1ce7ae8903da1780b89f00c7315eba1 (26870 frames @ 120 Hz)\ncompiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff",
+      "saveDisabled": false,
+      "verification": "UNVERIFIED",
+      "profile": "prim8_natural_v1 1.0.0 — mapping/prim8_natural_v1.json (ec285a50efbb…)"
+    },
+    {
+      "step": "save_authored_edit",
+      "projLog": "Saved authored edit → mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)\n  prim8.impact.transform.beat_amp_u16: 48000 → 12000\nCompile to regenerate the outputs.",
+      "saveDisabled": true,
+      "verification": "UNVERIFIED",
+      "profile": "prim8_natural_v1_bar_accent 1.0.0-m2c.1 — mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)"
+    },
+    {
+      "step": "compile_post_edit",
+      "projLog": "Compiled and recorded → out/editor\nShowBundle   90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b\nIntent Trace 8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde\nPRSM stream  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3 (26870 frames @ 120 Hz)\ncompiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff",
+      "saveDisabled": true,
+      "verification": "UNVERIFIED",
+      "profile": "prim8_natural_v1_bar_accent 1.0.0-m2c.1 — mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)"
+    },
+    {
+      "step": "reopen",
+      "projLog": "Reopened /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/e2e/loreen_ui/composition.json from disk.",
+      "saveDisabled": true,
+      "verification": "VERIFIED — trace 8128452f0547…",
+      "profile": "prim8_natural_v1_bar_accent 1.0.0-m2c.1 — mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)"
+    },
+    {
+      "step": "recompile_verify",
+      "projLog": "VERIFIED: recompile matches recorded outputs → out/reopen\nShowBundle   90855ddee4927439d638c5098b4ae2e32abe812fa6d984d0d936b53a2980801b\nIntent Trace 8128452f0547283263b679fe9113b65cd9636bd6e5ead86b2c17b0657cea1bde\nPRSM stream  116981ee920f9006954357293bc91ff5b2d02ddb06fff72e24de56951b5e97e3 (26870 frames @ 120 Hz)\ncompiler     spectrasynq.compiler.trinity-showbundle/0.3.1 @ 87f0c43c78e73265fe260b08b8e732cdb83499ff",
+      "saveDisabled": true,
+      "verification": "VERIFIED — trace 8128452f0547…",
+      "profile": "prim8_natural_v1_bar_accent 1.0.0-m2c.1 — mapping/prim8_natural_v1_bar_accent.json (4847be0b3ccc…)"
+    },
+    {
+      "consoleErrors": []
+    }
+  ],
+  "serverLog": "[prism_minimal_editor] listening on 127.0.0.1:55805 (http://127.0.0.1:55805)\n[prism_minimal_editor] bundle: fixtures/compiled_from_trinity_v0.1.json\n[prism_minimal_editor] project: /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/m2-tools/prism/e2e/loreen_ui/composition.json\n[prism_minimal_editor] run: npm run prism:dev -- --project <composition.json> | --bundle <path> [--port 7777] [--host 127.0.0.1]\n"
+}

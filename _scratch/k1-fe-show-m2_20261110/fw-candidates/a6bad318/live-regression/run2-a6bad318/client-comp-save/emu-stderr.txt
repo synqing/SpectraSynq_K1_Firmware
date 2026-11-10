@@ -1,0 +1,34 @@
+
+    ╻ ╻ ╻ ╻
+   ┏┻━┻━┻━┻┓    ┏━╸┏━┓┏━┓   ┏━╸┏┳┓╻ ╻
+  ━┫       ┣━   ┣╸ ┗━┓┣━┛╺━╸┣╸ ┃┃┃┃ ┃
+  ━┫ ESP32 ┣━   ┗━╸┗━┛╹     ┗━╸╹ ╹┗━┛
+  ━┫       ┣━
+   ┗┳━┳━┳━┳┛    ESP32 series emulator · v0.49.0
+    ╹ ╹ ╹ ╹     https://github.com/espressif/esp-emulator
+
+[INFO  esp_emu] Loaded firmware: 16777216 bytes
+[INFO  machine] WiFi SoftAP: WPA2/WPA3 transition enabled (PWE Both) for SSID 'myssid'
+[INFO  net_user] user-net: DNS forwarder upstream [172.20.10.1:53], restrict=false
+[INFO  net_user] user-net: backend ready (gateway 192.168.4.1, 0 hostfwd rules)
+[INFO  esp_emu] Network backend: user-mode (smoltcp NAT, 192.168.4.1 -> host loopback)
+[INFO  esp_emu] Loaded ROM ELF: <embedded esp32s3> (949552 bytes)
+[INFO  esp_emu] Booting from real ROM reset vector (use --skip-rom to bypass)
+[INFO  machine] ROM ELF: 5227 symbols loaded
+[INFO  machine] ROM ELF loaded, 10 functions patched for interception
+[INFO  machine] PSRAM configured as 8192 KB
+[INFO  esp_emu] Console forced to UsbJtag
+[INFO  machine] CPU reset at ROM entry: PC=0x40000400, SP=0x3FCEB710
+[INFO  esp_emu] Loaded application ELF: 23547756 bytes
+[INFO  periph::ble_hci] BLE: no VHCI symbols found (firmware may not use Bluetooth)
+[INFO  periph::thread_radio] Thread: no IEEE 802.15.4 symbols found (firmware may not use Thread)
+[INFO  machine] DWARF line info loaded from application ELF
+[INFO  machine] Panic intercept: 'esp_system_abort' at 0x4037DA90
+[INFO  machine] Panic intercept: 'abort' at 0x40383B14
+[INFO  machine] Panic intercept: 'esp_panic_handler' at 0x4203C300
+[INFO  uart_tcp] UART TCP server listening on 127.0.0.1:56548
+[INFO  esp_emu] UART1 bridged to TCP 127.0.0.1:56548
+[INFO  esp_emu] Starting emulation (chip=esp32s3, batch_size=2000000)
+[INFO  uart_tcp] UART TCP client connected: 127.0.0.1:56552
+[INFO  esp_emu] Interrupted (signal)
+[INFO  esp_emu] Flash state saved to '/Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m2_20261110/fw-candidates/a6bad318/live-regression/run2-a6bad318/client-comp-save/flash-run.bin'
