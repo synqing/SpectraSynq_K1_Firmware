@@ -61,6 +61,28 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def place_copy(src: Path, dst: Path) -> None:
+    """Put a copy of src at dst without spending disk space on it where the volume allows.
+
+    On APFS this is a clone: dst is its own file holding the same bytes, and a later write
+    to either file never touches the other. Where a clone is not possible (another volume,
+    another filesystem, another OS) this is an ordinary copy. Either way dst is
+    byte-identical to src and dated now, exactly as shutil.copy leaves it. Every run folder
+    used to hold a full 24 MB copy of the same firmware.elf (2,530 of them on 10 Nov 2026).
+    """
+    try:
+        import ctypes
+        libc = ctypes.CDLL(None, use_errno=True)
+        if dst.exists() or dst.is_symlink():
+            dst.unlink()
+        if libc.clonefile(os.fsencode(src), os.fsencode(dst), 0) == 0:
+            os.utime(dst, None)
+            return
+    except (OSError, AttributeError):
+        pass
+    shutil.copy(src, dst)
+
+
 # --------------------------------------------------------------------------
 # Scenario schema: unknown fields, unsupported commands and bad windows are
 # rejected before anything is built or run.
@@ -628,7 +650,7 @@ def run_case(sc: dict, cid: str, out: Path, emu: Path, build_dir: Path, assets: 
         "input_flash_from": flash_spec["from"], "image_patched": False,
     }
     elf = run_dir / "firmware.elf"
-    shutil.copy(build_dir / "firmware.elf", elf)
+    place_copy(build_dir / "firmware.elf", elf)
     emu_cfg = sc["profile"]["emulator"]
     base = [str(emu), "--chip", emu_cfg["chip"], "--firmware", str(flash_path), "--elf", str(elf),
             "--psram-size", emu_cfg["psram"], "--net", "user",
