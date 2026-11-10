@@ -1,0 +1,48 @@
+/* Technical edition additions: contents, numbered figures, dense spec tables, equations, code, block diagrams. */
+.toc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 22px;list-style:none;margin:0;padding:16px 22px;font-size:13.5px}
+.toc a{color:var(--ink-2);text-decoration:none;display:flex;gap:8px} .toc a:hover,.toc a:focus-visible{color:var(--new);text-decoration:underline}
+.toc b{font-family:var(--f-mono);font-weight:500;color:var(--ink-3);min-width:1.6em}
+.sec>h2{display:flex;gap:12px;align-items:baseline} .sec>h2 .n{font-family:var(--f-mono);font-size:15px;font-weight:500;color:var(--ink-3)}
+.lede{color:var(--ink-2);font-size:15px;max-width:92ch}
+.cap{font-size:13px;color:var(--ink-2);max-width:100ch} .cap b{color:var(--ink);font-weight:650}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px} .grid3>*{min-width:0}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px} .kv>div{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:14px 16px;min-width:0}
+.kv b{display:block;font-family:var(--f-display);font-size:26px;font-weight:740;font-stretch:84%;font-variant-numeric:tabular-nums;line-height:1.1}
+.kv span{font-size:12.5px;color:var(--ink-2);display:block;margin-top:4px}
+.tw{overflow-x:auto;padding:0}
+table.spec{min-width:1080px;font-size:12.5px} table.spec.narrow{min-width:760px}
+table.spec th,table.spec td{padding:8px 12px;line-height:1.4}
+table.spec thead th{position:sticky;top:0;background:var(--surface)}
+table.spec td.m,table.spec th.m,.m{font-family:var(--f-mono);font-size:11.8px;color:var(--ink)}
+table.spec td.src{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);white-space:nowrap}
+table.spec tbody th{width:auto;font-weight:650;white-space:nowrap}
+table.spec tr.adapt>th{box-shadow:inset 3px 0 0 var(--old)} table.spec tr.gate>th{box-shadow:inset 3px 0 0 var(--flag)} table.spec tr.guard>th{box-shadow:inset 3px 0 0 var(--flag)}
+table.spec tr.newrow>th{box-shadow:inset 3px 0 0 var(--new)}
+.k{display:inline-block;border-radius:5px;padding:1px 6px;font-size:10.5px;font-weight:650;letter-spacing:.02em;white-space:nowrap}
+.k.a{background:var(--old);color:var(--surface)} .k.g{background:var(--flag);color:var(--flag-ink)} .k.s{background:var(--band);color:var(--ink-2)} .k.n{background:var(--new);color:var(--surface)}
+.k.ok{background:var(--ok);color:var(--surface)} .k.no{background:transparent;border:1px dashed var(--plan);color:var(--ink-2)}
+.eq{font-family:var(--f-mono);font-size:12.8px;line-height:1.75;background:var(--band);border-radius:10px;padding:14px 16px;overflow-x:auto;white-space:pre;color:var(--ink)}
+pre.code{font-family:var(--f-mono);font-size:12px;line-height:1.55;background:var(--band);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:0;color:var(--ink);tab-size:2}
+.diagram{display:block;width:100%;height:auto;min-width:1100px}
+.diagram .bx{fill:var(--surface);stroke:var(--ink-3);stroke-width:1.3} .diagram .bx.ad{stroke:var(--old);stroke-width:2} .diagram .bx.gt{stroke:var(--flag);stroke-width:2}
+.diagram .bx.nw{stroke:var(--new);stroke-width:2} .diagram .bx.io{fill:var(--band);stroke:var(--ink-3)} .diagram .bx.pl{stroke-dasharray:5 4;stroke:var(--plan)}
+.diagram .bt{font-family:var(--f-body);font-size:12px;font-weight:650;fill:var(--ink)} .diagram .bs{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink-2)}
+.diagram .w{stroke:var(--ink-2);stroke-width:1.5;fill:none} .diagram .ws{stroke:var(--flag);stroke-width:1.5;fill:none;stroke-dasharray:4 3} .diagram .wa{stroke:var(--flag);stroke-width:1.8;fill:none}
+.diagram .wn{stroke:var(--new);stroke-width:2;fill:none} .diagram .lb{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink-2)} .diagram .lf{font-family:var(--f-mono);font-size:10.5px;fill:var(--flag)}
+.diagram .ln2{font-family:var(--f-mono);font-size:10.5px;fill:var(--new)} .diagram .zone{fill:none;stroke:var(--rule);stroke-dasharray:6 5} .diagram .zt{font-family:var(--f-body);font-size:11.5px;fill:var(--ink-3);letter-spacing:.06em;text-transform:uppercase}
+.diagram .ah{fill:var(--ink-2)} .diagram .ahf{fill:var(--flag)} .diagram .ahn{fill:var(--new)}
+.ln.c3{stroke:var(--ok)} .ln.dash{stroke-dasharray:5 4} .ln.thin{stroke-width:1.1;opacity:.75} .ln.flag{stroke:var(--flag)}
+.lg i.ln-c3{background:var(--ok)} .lg i.ln-flag{background:var(--flag)}
+.note-l{font-family:var(--f-body);font-size:11px;fill:var(--ink-2)} .vl{stroke:var(--ink-3);stroke-dasharray:3 3;stroke-width:1}
+.hl-l{stroke:var(--flag);stroke-width:1.2;stroke-dasharray:6 4} .hl-t{font-family:var(--f-body);font-size:11px;fill:var(--flag)}
+.keo{display:flex;flex-direction:column;gap:6px} .keo figure{margin:0;display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;align-items:center}
+.keo img{width:100%;height:64px;display:block;border-radius:4px;image-rendering:auto;object-fit:fill} .keo figcaption{font-size:12px;color:var(--ink-2)}
+.ruler{display:block;width:100%;height:auto;min-width:1100px} .ruler .ax{stroke:var(--ink-2);stroke-width:1.5} .ruler .tkm{stroke:var(--ink-3);stroke-width:1}
+.ruler .mk{stroke-width:2} .ruler .mk.o{stroke:var(--old)} .ruler .mk.f{stroke:var(--flag)} .ruler .mk.n{stroke:var(--new)} .ruler .mk.i{stroke:var(--ink-2)}
+.ruler .rt{font-family:var(--f-body);font-size:11.5px;fill:var(--ink)} .ruler .rs{font-family:var(--f-mono);font-size:10.5px;fill:var(--ink-3)} .ruler .zn{opacity:.55}
+.cols2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px} .cols2>*{min-width:0}
+.stack{display:flex;flex-direction:column;gap:12px}
+ul.tight{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--ink-2)} ul.tight b{color:var(--ink)}
+.refs{font-size:12.5px;color:var(--ink-2);columns:2;column-gap:32px;margin:0;padding-left:18px} .refs li{break-inside:avoid;margin-bottom:6px} .refs a{color:var(--new)}
+@media (max-width:980px){ .toc{grid-template-columns:repeat(2,minmax(0,1fr))} .kv{grid-template-columns:repeat(2,minmax(0,1fr))} .grid3,.cols2{grid-template-columns:minmax(0,1fr)} .refs{columns:1} }
+@media (max-width:520px){ .toc{grid-template-columns:minmax(0,1fr)} }
