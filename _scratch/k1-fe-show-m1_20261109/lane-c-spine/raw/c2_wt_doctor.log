@@ -1,0 +1,20 @@
+DOCTOR: PASS
+{
+  "trinity": {
+    "locked": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "effective": "e271af39229e31c82d387932561ba89a8dd513c5",
+    "dirty": false
+  },
+  "prism": {
+    "locked": "cc00556d1df2f863c6a0d914ef613886b050a408",
+    "effective": "07eb8227f1bc4570351fc00459dfc5b5353e5a0d",
+    "dirty": false
+  },
+  "roles": {
+    "trinity": "analysis",
+    "prism": "authoring_vm_compiler",
+    "k1_product_firmware": "performance_runtime",
+    "k1_usb_bridge": "transport_adapter_reference"
+  }
+}
+exit 0

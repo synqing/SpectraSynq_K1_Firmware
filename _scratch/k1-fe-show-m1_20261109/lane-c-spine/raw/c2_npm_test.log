@@ -1,0 +1,27 @@
+
+> spectrasynq-instrument-spine@0.1.0-g5 test
+> node --test tests/lock.test.js tests/resolve_organs.test.js tests/profile_and_anti_copy.test.js tests/instrument_project.test.js tests/c1_evidence.test.js
+
+✔ C1 evidence exists (fail closed) (2.406375ms)
+✔ prim8_natural_v1 1.0.0 bytes unchanged vs G5 freeze (0.674875ms)
+✔ G5 ci_click_3s expected hashes unchanged (0.809458ms)
+✔ C1 relationship results record required checks and a legal verdict (1.987125ms)
+✔ draft successor prim8_natural_v1_1 exists and does not overwrite 1.0.0 (0.747167ms)
+✔ compile-twice harness identity for every C1 fixture (0.503584ms)
+✔ rejects VERIFIED with 64-zero trace hash (0.71225ms)
+✔ organs.lock.json validates roles and has no absolute paths (1.169875ms)
+✔ prim8_natural_v1 is structured AUTHORED for heat/space/gravity (2.434ms)
+✔ proposal prim8_natural_v1_1 validates including noise_gated_bounded_percentile_u16 (0.8605ms)
+✔ coverage IMPACT_ONLY fails when only impact is dynamic (0.30625ms)
+✔ anti-copy: no organ source and no web/ (0.662625ms)
+✔ PRISM_ROOT override does not rewrite locked_commit (0.795292ms)
+✔ unrelated clone with a valid SHA is REMOTE_MISMATCH (1.64975ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 95.270709
+exit 0

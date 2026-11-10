@@ -34,8 +34,9 @@ LANE_B = HERE.parent / "lane-b"
 sys.path.insert(0, str(LANE_B))
 import prim8_stream as ps  # noqa: E402
 
-PORT = "/dev/cu.usbmodem11301"
-EXPECT_USB = "B4:3A:45:A5:89:B4"
+sys.path.insert(0, str(HERE))
+from units import UNITS, port_for, unit_name  # noqa: E402  (10 Nov: any registered unit; K1_UNIT=b489|rpl)
+
 PY = "/opt/homebrew/opt/python@3.13/bin/python3.13"
 ALLOWED_PREFIXES = ("[AP]",)
 
@@ -81,10 +82,9 @@ def main() -> int:
         print("REFUSED: byte audit failed", au.stdout[-400:], au.stderr[-400:])
         return 2
 
-    sn = {p.device: (p.serial_number or "") for p in list_ports.comports()}
-    if sn.get(PORT, "").upper() != EXPECT_USB:
-        print("REFUSED: port identity", sn.get(PORT))
-        return 2
+    unit = unit_name()
+    PORT = port_for(unit)  # refuses unless exactly one port carries the unit's USB serial
+    header["unit"] = {"name": unit, **UNITS[unit], "port": PORT}
 
     seeks = []
     for s in a.seek:
@@ -125,7 +125,9 @@ def main() -> int:
                 if not armed.is_set():
                     continue
                 if not clean:
-                    clean = True  # this line may have started before arming: skip it
+                    clean = True  # this line may have started before arming: skip it ...
+                    if "NOISE_CAL" in t and incident["line"] is None:  # ... unless it shows calibration activity
+                        incident.update(line=t[:400], mono=m, critical="queued" in t)
                     continue
                 if t and not t.startswith(ALLOWED_PREFIXES) and incident["line"] is None:
                     incident.update(line=t[:400], mono=m, critical=t.startswith("NOISE_CAL: queued"))
@@ -144,6 +146,11 @@ def main() -> int:
             if any(x.get("armed") for x in lines_out):
                 break
             time.sleep(0.01)
+        mono_start = t_end_mono = time.monotonic()
+        if incident["line"] is not None:  # calibration activity before we sent anything: never start
+            rc = 4 if incident["critical"] else 3
+            time.sleep(5.5)
+            raise SystemExit(rc)
         s.write(ps.RESYNC_PREAMBLE)
         s.flush()
         t_start = time.perf_counter()

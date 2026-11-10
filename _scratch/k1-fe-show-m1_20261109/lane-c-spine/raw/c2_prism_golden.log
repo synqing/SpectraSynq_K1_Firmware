@@ -1,0 +1,23 @@
+
+> spectrasynq-showbundle@0.1.0 golden
+> npm run golden:v0.1 && npm run golden:v0.2 && npm run golden:v0.3
+
+
+> spectrasynq-showbundle@0.1.0 golden:v0.1
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.1.json --hz 120 --out .tmp/golden_trace_120hz.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz.jsonl --expect fixtures/golden_trace_120hz.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+
+> spectrasynq-showbundle@0.1.0 golden:v0.2
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.2.json --hz 120 --out .tmp/golden_trace_120hz_v0.2.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.2.jsonl --expect fixtures/golden_trace_120hz_v0.2.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz_v0.2.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+
+> spectrasynq-showbundle@0.1.0 golden:v0.3
+> node tools/showbundle_replay.js --in fixtures/golden_bundle_v0.3.json --hz 120 --out .tmp/golden_trace_120hz_v0.3.jsonl && node tools/parity_check.js --sha256 .tmp/golden_trace_120hz_v0.3.jsonl --expect fixtures/golden_trace_120hz_v0.3.sha256
+
+[showbundle_replay] wrote .tmp/golden_trace_120hz_v0.3.jsonl (5960 bytes)
+[parity] PASS sha256=484da65be508f9a56e8e68f523e8fad12bbad0cabb6810a66003b9f0303cccdf
+exit 0

@@ -40,7 +40,7 @@ def load_stream(path: Path):
 
 def run_series(npz: Path):
     d = np.load(npz)
-    rgb = d["rgb"].astype(np.float32)
+    rgb = d["rgb"].astype(np.float32) / (257.0 if d["rgb"].dtype == np.uint16 else 1.0)  # 16-bit -> 8-bit scale
     ms = d["ms"].astype(np.float64)
     t = (ms - ms[0]) / 1000.0
     luma = rgb.mean(axis=(1, 2))

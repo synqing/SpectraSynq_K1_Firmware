@@ -1,0 +1,173 @@
+sha	date	subject	files	firmware_files	firmware_paths
+ca6795fe	2026-08-26	feat(look): add direct-u8 WS2812 sibling library for led150	21	11	SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h;SPECTRASYNQ_K1_FIRMWARE/serial/k1_look_serial_token.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look_flags.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look_ws2812.h;SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h;platformio.ini
+baccb80b	2026-08-27	test(look): record dual-device colour-job parity evidence	17	1	platformio.ini
+de1df98e	2026-08-27	feat(colour): add deterministic paint and runtime look tuning	22	14	SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look_file.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look_ws2812.h;SPECTRASYNQ_K1_FIRMWARE/visual/k1_look_ws2812_tables.h;SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h;platformio.ini;scripts/platformio/k1_device_identities.json
+f2d27dba	2026-08-27	fix(colour): initialise Colour Lab once across cores	3	3	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.h
+842278df	2026-08-27	fix(colour): cap dual-channel WS2816 paint current	3	2	SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_colour_lab.h
+944ff74e	2026-08-27	test(colour): record Colour Lab and tungsten render-path proof	28	0	
+e3f9e8b5	2026-08-27	feat(colourlab): add web serial Colour Lab instrument and host gates	35	0	
+a580cf61	2026-08-28	feat: rebuild Colour Lab workbench	38	0	
+a5e71961	2026-08-28	fix: close Colour Lab hardware capability gaps	15	0	
+ba756b4e	2026-10-20	feat(emu): replay the normal Main RPL computation offline (R3)	28	14	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/audio/k1_agc_dt_clock.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_frame.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.h;SPECTRASYNQ_K1_FIRMWARE/control/k1_show_state.cpp;SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_cmd_handlers.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_tx.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.h;SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h;platformio.ini;scripts/platformio/k1_device_identities.json
+92b9f8ad	2026-10-20	fix(emu): make long replays repeat exactly under host load	9	4	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.h;SPECTRASYNQ_K1_FIRMWARE/system/utilities.h
+3b43e63f	2026-10-20	fix(emu): accept a stall reported before the first hop	2	0	
+c177e1bd	2026-10-20	fix(emu): show the criteria matrix as a table in the report	2	0	
+20c7e700	2026-10-20	test(emu): ratchet the replay determinism seams; add the stress-repeat tool	5	1	SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
+aaa1f307	2026-10-20	feat(emu): drive the emulated product from the existing client (SW13)	12	5	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.h;SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.cpp
+05ace4cb	2026-10-20	docs(tempo): record the Main RPL false-silence mechanism and the failed corpus gate	1	0	
+0bddfaed	2026-10-21	feat(emu): add a replay player that animates captured frames with the case audio	3	0	
+827beb64	2026-10-21	test(tempo): freeze the lane R1 scorer, dev manifest and emulator probe (DEF-001, DEF-002)	22	3	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;platformio.ini;scripts/platformio/k1_device_identities.json
+aeb0322f	2026-10-21	feat(tempo): tempo-only linear novelty tap behind K1_TEMPO_NOVELTY_LINEAR_V1 (DEF-001)	7	6	SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_snapshot.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+90889934	2026-10-21	refactor(tempo): move every gating constant into k1_tempo_spec.h with provenance (DEF-001, DEF-002)	9	2	SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h
+f732d9cb	2026-10-21	feat(tempo): producer-owned silence and named veto bits behind K1_TEMPO_SILENCE_FROM_PRODUCER_V1 (DEF-001)	25	6	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h;platformio.ini;scripts/platformio/k1_device_identities.json
+e5fa805d	2026-10-21	feat(tempo): metrical trap suite and flag-gated selection variants, dev ablation (DEF-002)	9	2	SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h
+e91352f2	2026-10-21	docs(tempo): record the Phase 2 dev ablation and Phase 3.1 dev AUCs (DEF-002)	3	0	
+64336f49	2026-10-21	test(tempo): held-out corpus rows (Ballroom + GiantSteps) for Captain approval (DEF-002)	3	0	
+d63b476d	2026-10-21	feat(tempo): spectral rhythm-presence evidence behind K1_TEMPO_SPECTRAL_PRESENCE_V1 (DEF-001 A3)	14	6	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h;platformio.ini;scripts/platformio/k1_device_identities.json
+101a96f8	2026-10-21	test(tempo): A7 cost incl. per-frame presence, M2 with the spectrum transformed (DEF-001)	13	3	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h
+74b59909	2026-10-21	feat(tempo): Phase 2.6 joint estimator (host-only) and rule 3.3 lock-off behind K1_TEMPO_LOCK_OFF_V1 (DEF-002, DEF-001)	34	3	SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo_spec.h
+b1f48bbc	2026-10-22	feat(tempo): qualified lock-off fallback; Tempo Comet / Anticipate honour validated beats (DEF-001, DEF-002)	32	6	SPECTRASYNQ_K1_FIRMWARE/audio/k1_emu_fixture.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h;platformio.ini;scripts/platformio/k1_device_identities.json
+325b87da	2026-10-22	docs(tempo): lock-off fallback qualification receipts on b1f48bbc (DEF-001, DEF-002)	13	0	
+f2596f7b	2026-10-22	test(tempo): E1 development pick falsifies the agreement-gated lock before validation (DEF-002)	12	0	
+bd71bb18	2026-10-22	docs(tempo): pre-register the E1 validation run on GTZAN V1 before any clip runs (DEF-002)	9	0	
+9eada332	2026-10-22	docs(tempo): pre-register E2, the learned lock score, before the E1 V1 result is seen (DEF-002)	2	0	
+46c5fb62	2026-10-22	feat(tempo): tempo_audition.py plays exactly what a lane test fed the emulated firmware (DEF-002)	2	0	
+59757c62	2026-10-24	docs(explainer): keep the two Raw Motion evidence exporters	13	0	
+dc94f988	2026-11-03	feat(fe): k1_fe env for the K1 Founders' Edition board (jack line-in, 20 V power policy, STUSB4500 NVM tool)	21	17	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_ingress.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_source.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_dispatch.h;SPECTRASYNQ_K1_FIRMWARE/system/constants.h;SPECTRASYNQ_K1_FIRMWARE/system/k1_fe_board.cpp;SPECTRASYNQ_K1_FIRMWARE/system/k1_fe_board.h;SPECTRASYNQ_K1_FIRMWARE/system/system.h;platformio.ini;scripts/platformio/k1_build_provenance.py;scripts/platformio/k1_device_identities.json
+6b313500	2026-11-03	fix(fe): act on independent review of the k1_fe board support	10	7	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_typed_cmd_table.def;SPECTRASYNQ_K1_FIRMWARE/system/k1_fe_board.cpp;SPECTRASYNQ_K1_FIRMWARE/system/k1_fe_board.h;scripts/platformio/k1_build_provenance.py
+c2928534	2026-11-03	docs(fe): FW lead receipt and host evidence for fe-1.0.0-rc1	11	0	
+1517ca17	2026-11-03	feat(fe): B489 bench envs for the FE mic/line-in proof and a mic wiring diagnostic	5	4	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/system/constants.h;platformio.ini;scripts/platformio/k1_device_identities.json
+6d47d9a8	2026-11-03	feat(diag): B489 wiring diagnostic reads mic pin levels directly	1	1	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h
+f1a3a6b7	2026-11-03	docs(fe): session 2 receipt, B489 bench evidence and registry rows	22	0	
+70330d72	2026-11-03	docs(fe): receipt corrections from the independent verifier	1	0	
+1ad4104f	2026-11-03	fix(fe): act on independent review of the B489 bench envs	5	4	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.cpp;SPECTRASYNQ_K1_FIRMWARE/system/constants.h;platformio.ini
+749ce9fe	2026-11-03	docs(fe): record independent review, its fixes, and the unflashed 1ad4104f	1	0	
+8f6d4348	2026-11-04	feat(fe): B489 FE bench env on the Captain's 4 Nov wiring	4	4	SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.cpp;SPECTRASYNQ_K1_FIRMWARE/system/constants.h;SPECTRASYNQ_K1_FIRMWARE/system/system.h;platformio.ini
+fc0f2de7	2026-11-04	docs(fe): B489 on the 4 Nov wiring, flashed 8f6d4348, boot evidence and registry row	4	0	
+bab7d528	2026-11-04	fix(fe): B489 bench look library for WS2812; un-sweep two foreign envs	1	1	platformio.ini
+3f5dac4e	2026-11-04	docs(fe): B489 on bab7d528, line-in proven from the MacBook AUX output	6	0	
+650fccc8	2026-11-04	chore: commit remaining working tree (Captain order, 4 Nov 2026)	51	2	platformio.ini;scripts/platformio/k1_device_identities.json
+86fed904	2026-11-04	Merge lane/k1-fe-release into main (Captain order, 4 Nov 2026)	1	0	
+2aa7422a	2026-11-04	fix(effects): Mode 32 saturation EMA follows the channel's effect state	3	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/channel_effect_state.h
+52275871	2026-11-04	docs(fe): B489 on 2aa7422a; PCM1808 clock seen intermittent	1	0	
+024389b4	2026-11-04	docs(fe): line-in re-proven after PCM1808 reseat (2aa7422a)	2	0	
+1a1407be	2026-11-04	test(fe): B489 bench A/B with the subsonic peak HPF on	4	1	platformio.ini
+6051ca9e	2026-11-04	test(fe): LED-level render trace on the B489 FE bench image	2	1	platformio.ini
+e04c73bd	2026-11-04	fix(ap): measure VU and silence RMS on the subsonic-filtered band	7	3	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_ingress.h;SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+b3a415ef	2026-11-04	fix(fe): repair audio and colour paths with target emulator regression	19	11	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_input_state.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_input.cpp;SPECTRASYNQ_K1_FIRMWARE/audio/k1_pcm1808_ring.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_tempo.cpp;SPECTRASYNQ_K1_FIRMWARE/system/k1_fe_board.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h;SPECTRASYNQ_K1_FIRMWARE/visual/ws2816_pack.h;platformio.ini;scripts/platformio/k1_device_identities.json
+cc039484	2026-11-04	fix(diag): drain FE bench captures outside the audio task	1	1	SPECTRASYNQ_K1_FIRMWARE/visual/k1_render_trace.cpp
+7a1cc5bf	2026-11-04	docs(hardware): record verified FE bench repair and capture	1	0	
+529f3b65	2026-11-04	test(fe): bind S3 cost comparison probes to the current bench	5	2	platformio.ini;scripts/platformio/k1_device_identities.json
+99810272	2026-11-04	test(fe): isolate effect timing on the B489 trace profile	5	2	platformio.ini;scripts/platformio/k1_device_identities.json
+3919a273	2026-11-04	fix(diag): reject render samples started before timing capture	2	1	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino
+ec931db3	2026-11-05	docs(hardware): record completed B489 performance verification	1	0	
+d1222e95	2026-11-05	docs(fe): line-in re-test with the AUX jack fully seated (3919a273): unchanged	1	0	
+457d899c	2026-11-05	docs(fe): line-in with extra PCM1808-S3 ground: idle noise 4124 -> 404 raw	1	0	
+668f9151	2026-11-05	fix(s3): repair quiet return and qualify audio visual paths	34	4	SPECTRASYNQ_K1_FIRMWARE/audio/k1_onset_beat.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_comet.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_tempo.cpp;platformio.ini
+1cae9023	2026-11-05	perf(s3): skip discarded sprite work and preserve trace bytes	16	13	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/diag/k1_trace.h;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_chroma_constellation.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_ember.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/led_utilities.h
+5dacc3e9	2026-11-05	perf(s3): reuse the primary render parameter context	4	2	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/system/system.h
+9f3eb18e	2026-11-05	perf(s3): preserve saturation with an exact 32-bit quotient	6	4	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/diag/k1_trace.h;SPECTRASYNQ_K1_FIRMWARE/serial/serial_menu.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h
+83c44797	2026-11-05	fix(fe): keep tempo consumer repair on the authorised bench	2	1	platformio.ini
+c1e1745b	2026-11-05	fix(acceptance): mirror the canonical cadence admission block	2	0	
+7a7507b2	2026-11-05	fix(persistence): bound quiet-save deferral and buffer the config record	3	3	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/persistence/bridge_fs.h;SPECTRASYNQ_K1_FIRMWARE/system/system.h
+b779e561	2026-11-05	diag(render): attribute Dense Forge work without changing effect output	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+61ce342b	2026-11-05	fix: record Captain RGB8 optimisation tolerance	1	0	
+7f234358	2026-11-05	docs(fe): record reserved held-out beat qualification	4	0	
+ec7c9bc9	2026-11-05	fix(fe): shorten bench silence dwell after playback stops	1	1	SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+8c6813e1	2026-11-05	docs(fe): record settings save source checks and capture request	4	0	
+97710852	2026-11-05	fix(fe): record settings save source checks and capture limits	0	0	
+4234aa2d	2026-11-05	fix(fe): waveform hybrid k1 drains to black on silence	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp
+cc987e12	2026-11-05	fix(fe): per-source presence floor for line input	5	4	SPECTRASYNQ_K1_FIRMWARE/audio/i2s_audio.h;SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_input_state.h;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_fast.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid.cpp
+d143c3ac	2026-11-05	fix(fe): source-aware line presence and hybrid silence drain	0	0	
+931c6252	2026-11-05	perf(s3): profile river transport and injection separately	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp
+1da623c8	2026-11-05	perf(s3): skip noncontributing dense forge moire pixels	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+f040e2e6	2026-11-05	perf(s3): skip noncontributing dense forge moire pixels	0	0	
+5017a751	2026-11-05	perf(s3): attribute river effect hot sections	0	0	
+1bbdcce7	2026-11-05	docs(fe): record save event measurements and remaining coverage	2	0	
+f67f2b73	2026-11-05	fix(fe): expose line silence decision in existing trace	1	1	SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_input_state.h
+1a588d77	2026-11-05	fix(fe): expose line silence decision with existing trace counters	0	0	
+4840fcab	2026-11-05	perf(s3): hoist river hue division outside pixel loops	5	5	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp
+e56c0923	2026-11-05	fix(fe): record measured settings fallback and open coverage	0	0	
+64fed459	2026-11-05	docs(fe): record held-out beat execution restriction	0	0	
+30450fd7	2026-11-05	perf(s3): reuse anchored dense forge sine recurrence	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+92f76c87	2026-11-05	fix(fe): reject sparse line idle spikes by hop energy	2	1	SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_input_state.h
+9a5e08a8	2026-11-05	fix(fe): reject isolated line idle spikes by hop energy	0	0	
+d02c8ab6	2026-11-05	perf(s3): reduce dense forge trigonometry with bounded recurrence	0	0	
+7cf8a315	2026-11-05	perf(s3): hoist river hue division out of pixel loops	0	0	
+2ff81015	2026-11-05	fix(fe): preserve dense forge large-phase sine behaviour	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+9343fa44	2026-11-05	perf(s3): bound forge recurrence to preserve long-phase output	0	0	
+62d93cca	2026-11-05	fix(fe): bound line presence by measured lit idle floor	2	1	SPECTRASYNQ_K1_FIRMWARE/audio/k1_audio_input_state.h
+106ce8d8	2026-11-05	perf(s3): preserve exact river hue coordinates in flash	6	6	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h
+742b5aeb	2026-11-05	fix(fe): use measured illuminated line idle bound	0	0	
+36607a8f	2026-11-05	perf(s3): preserve river hue division rounding in flash	0	0	
+80bf7aa8	2026-11-05	fix(s3): retain one silence dwell registry declaration	1	1	SPECTRASYNQ_K1_FIRMWARE/system/globals.h
+e42eec55	2026-11-05	fix(fe): keep bench dwell compatible with tunable registry	0	0	
+19992ad7	2026-11-05	docs(fe): record s3 repair lane results	10	0	
+8a07b5de	2026-11-05	docs(fe): freeze same-conditions capture recipe	3	0	
+54480cae	2026-11-05	fix(fe): restore line comet launches and honour silence	5	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_comet_anticipate.cpp
+f6e9d52f	2026-11-05	bench(s3): prepare river lookup revert Build B	6	6	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h
+677d3abf	2026-11-05	bench(s3): add coarse Forge design variants and complete section timings	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+5d2c9337	2026-11-05	bench(s3): integrate guarded Forge design variants	0	0	
+56591056	2026-11-05	revert(s3): river hue lookup slower under same-conditions capture	2	0	
+45d7200d	2026-11-05	bench(s3): add paired-bin river variants and complete timing sections	6	6	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp;SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h
+838a3951	2026-11-05	bench(s3): reject river lite flags outside B489 tracing	5	5	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_river_surge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_spectrum_river_v2.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_tempo_river_walk.cpp
+0715cb4b	2026-11-05	bench(s3): integrate guarded river design variants	0	0	
+85da2224	2026-11-05	bench(s3): enable lite comparisons only on diagnostic B489	2	1	platformio.ini
+0277aca5	2026-11-05	bench(s3): reduce Forge texture to five broad cells	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+1c9478e6	2026-11-05	fix(fe): exclude transient sketches from host self-test copies	4	0	
+4d119161	2026-11-05	bench(s3): retain five-cell Forge comparison variant	0	0	
+5b7feb02	2026-11-05	bench(s3): simplify chord Forge texture to two broad cells	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_dense_forge_chord.cpp
+8accab34	2026-11-05	bench(s3): compare two-cell chord Forge variant	0	0	
+12f69e86	2026-11-05	bench(s3): lite effect variants and visual decision pack	109	0	
+407fdf6f	2026-11-05	docs(fe): same-conditions results and effect decision pack	2	0	
+be2cff2c	2026-11-05	feat(fx): reserve bench motion battery ordinals 38 to 51	1	1	SPECTRASYNQ_K1_FIRMWARE/system/config_types.h
+356de1b0	2026-11-05	feat(fx): bring k1ease follower kit onto the release lane	1	1	SPECTRASYNQ_K1_FIRMWARE/visual/easing.h
+1ccd9cb8	2026-11-05	feat(fx): add motion sample seam render options and drives	3	3	SPECTRASYNQ_K1_FIRMWARE/visual/motion/common.h;SPECTRASYNQ_K1_FIRMWARE/visual/motion/drive.h;SPECTRASYNQ_K1_FIRMWARE/visual/motion/render.h
+5bdacdf7	2026-11-05	feat(fx): infall engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/infall.h
+c94b9054	2026-11-05	feat(fx): lob_return engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/lob_return.h
+195ad010	2026-11-05	feat(fx): reverse engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/reverse.h
+7bcc262a	2026-11-05	feat(fx): bounce engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/bounce.h
+b15ebae4	2026-11-05	feat(fx): pass_through engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/pass_through.h
+9b376a35	2026-11-05	feat(fx): scan engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/scan.h
+b07ae491	2026-11-05	feat(fx): dilate_recoil engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/dilate_recoil.h
+5309fed5	2026-11-05	feat(fx): split_merge engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/split_merge.h
+76bc1449	2026-11-05	feat(fx): chain engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/chain.h
+8fa16d48	2026-11-05	feat(fx): stretch engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/stretch.h
+ada88d34	2026-11-05	feat(fx): front_ca engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/front_ca.h
+35f15017	2026-11-05	feat(fx): front_refractory engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/front_refractory.h
+7b0ada16	2026-11-05	feat(fx): accumulate_cascade engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/accumulate_cascade.h
+47ba45f6	2026-11-05	feat(fx): orbit engine + test	2	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/orbit.h
+968f4dfa	2026-11-05	feat(fx): add lob_return bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_lob_return.cpp
+68bd32d5	2026-11-05	feat(fx): add accumulate_cascade bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_accumulate_cascade.cpp
+6f67cb4f	2026-11-05	feat(fx): add front_refractory bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_front_refractory.cpp
+748a5883	2026-11-05	feat(fx): add reverse bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_reverse.cpp
+7cb27824	2026-11-05	feat(fx): add scan bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_scan.cpp
+db89eb2c	2026-11-05	feat(fx): add chain bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_chain.cpp
+51441124	2026-11-05	feat(fx): add dilate_recoil bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_dilate_recoil.cpp
+e091ca50	2026-11-05	feat(fx): add infall bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_infall.cpp
+f4c20d5e	2026-11-05	feat(fx): add bounce bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_bounce.cpp
+6f854914	2026-11-05	feat(fx): add split_merge bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_split_merge.cpp
+6d07e390	2026-11-05	feat(fx): add stretch bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_stretch.cpp
+fe8d9d55	2026-11-05	feat(fx): add pass_through bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_pass_through.cpp
+2ad8a6a9	2026-11-05	feat(fx): add front_ca bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_front_ca.cpp
+97f69568	2026-11-05	feat(fx): add orbit bench candidate	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_orbit.cpp
+caba5265	2026-11-05	fix(fx): keep inactive lifespan storage zero initialised	1	1	SPECTRASYNQ_K1_FIRMWARE/visual/motion/render.h
+8261caa6	2026-11-05	feat(fx): wire motion battery on the B489 bench only	3	3	SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino;SPECTRASYNQ_K1_FIRMWARE/visual/lightshow_modes.h;platformio.ini
+753441a0	2026-11-05	fix(fx): restrict battery flag to the two audition environments	1	1	platformio.ini
+bee9cdc3	2026-11-05	fix(fx): follow continuous band drives before rendering	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_accumulate_cascade.cpp;SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_orbit.cpp
+c3061475	2026-11-05	perf(fx): refine lob_return candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_lob_return.cpp
+7251150d	2026-11-05	perf(fx): refine accumulate_cascade candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_accumulate_cascade.cpp
+8b42b314	2026-11-05	perf(fx): refine front_refractory candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_front_refractory.cpp
+43177f4a	2026-11-05	perf(fx): refine reverse candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_reverse.cpp
+8fb32142	2026-11-05	perf(fx): refine scan candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_scan.cpp
+7095e4ab	2026-11-05	perf(fx): refine chain candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_chain.cpp
+810a6aa8	2026-11-05	perf(fx): refine dilate_recoil candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_dilate_recoil.cpp
+b5118c32	2026-11-05	perf(fx): refine infall candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_infall.cpp
+59e64890	2026-11-05	perf(fx): refine bounce candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_bounce.cpp
+3322534d	2026-11-05	perf(fx): refine split_merge candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_split_merge.cpp
+fae87d80	2026-11-05	perf(fx): refine stretch candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_stretch.cpp
+95f96993	2026-11-05	perf(fx): refine pass_through candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_pass_through.cpp
+75b80475	2026-11-05	perf(fx): refine front_ca candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_front_ca.cpp
+432986a7	2026-11-05	perf(fx): refine orbit candidate after silicon capture	1	1	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_fx_orbit.cpp
+a66eb38c	2026-11-05	test(fx): preserve flag-off control goldens and authority pins	3	0	
+ed0aa984	2026-11-06	fix(fe): restore mode 32 silence behaviour; mode 32 no longer cuts out	2	2	SPECTRASYNQ_K1_FIRMWARE/effects/light_mode_waveform_hybrid_k1.cpp;SPECTRASYNQ_K1_FIRMWARE/system/globals.h

@@ -1,0 +1,47 @@
+✔ percentile nearest-rank is deterministic (1.861125ms)
+✔ below activity floor yields exact zeros (0.347166ms)
+✔ tiny/tiny does not map to full scale when gain is capped (0.146ms)
+✔ quiet < normal < loud remains monotonic under bounded gain (0.161375ms)
+✔ inactive frames of a p99-normalised onset series become zero (0.089084ms)
+✔ NaN in source throws (0.266833ms)
+✔ Infinity in source throws (0.096ms)
+✔ NaN in activity throws (0.260792ms)
+✔ Infinity in activity throws (0.123875ms)
+✔ negative source clamps to 0 (0.172958ms)
+✔ assertFiniteSeries throws with name and index (0.162917ms)
+✔ applyTransform fails closed if a transform series is non-finite (0.330625ms)
+✔ missing profile parameters throw (no hidden defaults) (0.086458ms)
+✔ applyTransform closed enum includes noise_gated_bounded_percentile_u16 (0.176959ms)
+✔ ratio_u16 absolute_denominator_floor zeros residue without changing unset 1.0.0 behaviour (0.121ms)
+✔ secondsToUs is exact rounding (0.888375ms)
+✔ happy path adapts in-memory contract and stems (0.879292ms)
+✔ rejects in-memory malformed contracts (0.198916ms)
+✔ rejects in-memory malformed stem_features (0.255459ms)
+✔ CI contract adapts beats and downbeats to microseconds (0.631458ms)
+✔ rejects spine malformed contracts (3.830625ms)
+✔ rejects spine malformed stem_features (4.385291ms)
+✔ compile twice is byte-identical bundle, manifest, and trace (10.515333ms)
+✔ bundle is ShowBundle v0.3 without param_curves (2.313333ms)
+✔ gravity is authored zero; impact has downbeat accent (0.658875ms)
+✔ pressure mass texture are dynamically mapped (0.55575ms)
+✔ coverage gate fails when only impact is dynamic (0.24925ms)
+✔ mutated profile missing space fails coverage (0.397875ms)
+✔ manifest has no absolute paths and uses injected commit (0.420792ms)
+✔ CLI missing --compiler-commit exits 2 (68.332541ms)
+✔ CLI with cwd=/tmp still writes injected commit (159.780625ms)
+✔ secondsToUs is exact rounding (2.769583ms)
+✔ happy path adapts in-memory contract and stems (1.275333ms)
+✔ rejects in-memory malformed contracts (0.317666ms)
+✔ rejects in-memory malformed stem_features (0.331291ms)
+✔ CI contract adapts beats and downbeats to microseconds (1.789459ms)
+✔ rejects spine malformed contracts (2.826708ms)
+✔ rejects spine malformed stem_features (5.53625ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 365.852334
+exit 0

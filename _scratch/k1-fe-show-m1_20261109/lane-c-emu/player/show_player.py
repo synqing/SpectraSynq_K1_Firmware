@@ -24,15 +24,17 @@ Wire format (lead decision, 9 Nov; lane-b prim8_stream): every frame is ONE 64-b
 session, of every seek epoch and of every resume after a watchdog pause. A signal only sets a flag:
 the in-flight 64-byte write always completes; no frame is ever abandoned part-way.
 Device-output watchdog (lane-b/B-P1-contract.md table): a reader thread on the same port logs every
-device line (<log>.device.jsonl, monotonic us). NOISE_CAL armed / not armed -> no writes for 5.5 s,
-then preamble + new epoch; NOISE_CAL queued -> stop, exit 4 (CRITICAL); any other listed or
-unexpected line -> stop, exit 2; completed after a pause -> exit 3. It never sends Y, N or ':'.
+device line (<log>.device.jsonl, monotonic us). NOISE_CAL armed / not armed (also in the first,
+pre-boundary line) -> isolation FAILED: no writes for 5.5 s, then the session ENDS, exit 5 (review
+fix 10 Nov: never resume the same stream); NOISE_CAL queued -> stop, exit 4 (CRITICAL); any other
+listed or unexpected line -> stop, exit 2. It never sends Y, N or ':'.
 Pacing: audio (default when audio plays) follows the output stream's DAC position; wall = playback.js.
 
 EXIT CODES: 0 completed | 1 refused before start (pre-flight audit failed, asset/stream sha mismatch,
 other playback running, bad arguments) | 2 stopped (watchdog stop line, unexpected device line,
-signal, serial error) | 3 completed after a NOISE_CAL armed/not-armed pause | 4 CRITICAL: device
-reported "NOISE_CAL: queued" (calibration during music) - recalibrate only under confirmed silence.
+signal, serial error) | 3 (retired 10 Nov: no automatic resume any more) | 4 CRITICAL: device
+reported "NOISE_CAL: queued" (calibration during music) - recalibrate only under confirmed silence |
+5 isolation failure: "NOISE_CAL: armed / not armed" seen; session stopped after a 5.5 s write hold.
 
 Pre-flight: whenever frames are produced, the exact bytes to be sent (after any --rejected
 transform) are written to <log>.sent.prsm and audited with lane-b/audit_prsm_bytes.py --guard 30
@@ -175,8 +177,16 @@ class Audio:
         self.pos += frames
 
     def seek(self, s: float):
+        # Review fix 10 Nov: discard audio already queued in PortAudio so the heard audio jumps
+        # with the stream (abort drops pending buffers; restart maps the new position). Audio held
+        # inside the Bluetooth device itself (~0.16-0.18 s reported) is outside PortAudio's control.
+        try:
+            self.stream.abort()
+        except Exception:
+            pass
         self.pos = int(round(s * self.rate))
         self.map = None
+        self.stream.start()
 
     def target_ns(self, t_us: int):
         """Monotonic time at which content time t_us is at the DAC (latest callback mapping)."""
@@ -201,8 +211,10 @@ class Audio:
 #           critical = stop the show (exit 4); stop = stop the show (exit 2).
 WATCHDOG = [
     ("NOISE_CAL: queued", "critical"),
-    ("NOISE_CAL: armed", "pause"),
-    ("NOISE_CAL: not armed", "pause"),
+    # Review fix 10 Nov: calibration activity means stream isolation FAILED. Stop and investigate;
+    # never resume the same stream. The player holds all writes >= 5.5 s before exiting (exit 5).
+    ("NOISE_CAL: armed", "isolation"),
+    ("NOISE_CAL: not armed", "isolation"),
     ("SHOW_STATE_SAVED", "stop"),
     ("SLOT ", "stop"),
     ("QUEUE: ", "stop"), ("COMMIT", "stop"), ("QUEUE MODE", "stop"),
@@ -218,6 +230,7 @@ WATCHDOG = [
 ]
 PAUSE_NS = 5_500_000_000
 EXIT_OK, EXIT_STOPPED, EXIT_RESUMED_AFTER_INCIDENT, EXIT_CRITICAL = 0, 2, 3, 4
+EXIT_ISOLATION = 5  # NOISE_CAL armed / not armed seen: isolation failure, session stopped
 
 
 def classify(line: str, allow: list[str]) -> str | None:
@@ -266,6 +279,11 @@ class DeviceReader(threading.Thread):
                                               "watchdog": None, "discarded_partial_before_boundary": True}) + "\n")
                     self.fh.flush()
                     self.armed.set()
+                    # Review fix 10 Nov: a calibration reply in that first line still counts —
+                    # a calibration armed just before this session must stop it (substring match,
+                    # because the line may be a tail).
+                    if "NOISE_CAL" in line:
+                        self._incident(line, "critical" if "queued" in line else "isolation")
                     continue
                 now = time.monotonic_ns()
                 kind = classify(line, self.allow)
@@ -493,6 +511,18 @@ def main() -> int:
                 if inc["kind"] == "stop":
                     exit_code = max(exit_code, EXIT_STOPPED)
                     break
+                if inc["kind"] == "isolation":
+                    # no writes for >= 5.5 s so an armed calibration expires, then end the session
+                    until = time.monotonic_ns() + PAUSE_NS
+                    while time.monotonic_ns() < until:
+                        if rd.pending is not None and rd.pending["kind"] == "critical":
+                            exit_code = EXIT_CRITICAL
+                            break
+                        time.sleep(0.01)
+                    if exit_code != EXIT_CRITICAL:
+                        exit_code = EXIT_ISOLATION
+                    log.write(json.dumps({"kind": "isolation_stop", "held_ns": PAUSE_NS}) + "\n")
+                    break
                 # pause: no writes for >= 5.5 s (so an armed calibration expires); never send any key.
                 until = time.monotonic_ns() + PAUSE_NS
                 while time.monotonic_ns() < until:
@@ -541,9 +571,13 @@ def main() -> int:
                 time.sleep((target - now - SPIN_NS) / 1e9)
                 if pacing == "audio":
                     target = a.target_ns(t) or target   # refresh from the newest callback
-            while time.monotonic_ns() < target:
-                if rd is not None and rd.pending is not None:
+            # Review fix 10 Nov: no busy-wait at all. Sleep the remainder (the refreshed audio-clock
+            # target may have moved later); a Python spin holds the GIL the audio callback needs.
+            while True:
+                rem = target - time.monotonic_ns()
+                if rem <= 0 or (rd is not None and rd.pending is not None):
                     break
+                time.sleep(rem / 1e9)
             if state["stop"] or (rd is not None and rd.pending is not None):
                 continue                        # last check before the write: handled at loop top
             seq, pkt = by_t[t]

@@ -46,7 +46,8 @@ def main():
     rep = {}
     idx = np.arange(160) - 79.5
     for ax, (name, t, rgb) in zip(axes[1:], runs):
-        img = np.clip(rgb.astype(np.float32) * 4, 0, 255).astype(np.uint8)  # frames x px x 3
+        rgb = rgb.astype(np.float32) / (257.0 if rgb.dtype == np.uint16 else 1.0)  # 16-bit dumps -> 8-bit scale
+        img = np.clip(rgb * 4, 0, 255).astype(np.uint8)  # frames x px x 3
         ax.imshow(img.transpose(1, 0, 2), aspect="auto", origin="lower",
                   extent=[t[0], t[-1], 0, 160], interpolation="nearest")
         ax.set_ylabel(name, fontsize=8)

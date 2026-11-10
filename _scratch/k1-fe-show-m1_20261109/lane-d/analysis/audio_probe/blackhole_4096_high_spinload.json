@@ -1,0 +1,33 @@
+{
+ "device": "BlackHole 2ch",
+ "rate": 48000,
+ "blocksize": 4096,
+ "latency_req": "high",
+ "reported_latency_s": 0.08533333333333333,
+ "spin": true,
+ "load": true,
+ "music": true,
+ "seconds": 20.0,
+ "callbacks": 234,
+ "flags": {
+  "output_underflow": 0,
+  "output_overflow": 0,
+  "priming_output": 0
+ },
+ "interval_ms_p50": 85.334,
+ "interval_ms_p99": 86.707,
+ "interval_ms_max": 87.005,
+ "late_callbacks": 0,
+ "late_fraction": 0.0,
+ "loopback_samples": 966656,
+ "loopback_zero_runs_ge_2ms": 0,
+ "loopback_first_holes": [],
+ "loopback_exact_check": {
+  "aligned": true,
+  "gain": 0.158489,
+  "samples_compared": 953394,
+  "mismatched_samples": 0,
+  "mismatch_runs": 0,
+  "first_runs_s_ms": []
+ }
+}

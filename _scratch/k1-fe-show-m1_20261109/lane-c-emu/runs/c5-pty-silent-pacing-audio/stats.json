@@ -1,0 +1,34 @@
+{
+  "frames": 12482,
+  "send_err_us": {
+    "p50": 0.0,
+    "p95": 1240.949999999999,
+    "p99": 4093.6700000000983,
+    "max": 61654.0,
+    "min": 0.0
+  },
+  "write_call_us": {
+    "p50": 25.0,
+    "p95": 83.94999999999891,
+    "max": 42002.0
+  },
+  "cumulative_drift_us_end": -112.99166666666666,
+  "duration_s": 105.20168,
+  "linear_fit_slope_ppm": -0.7797332876036123,
+  "frames_skipped_late": 28,
+  "late_counts": {
+    "over_4ms": 129,
+    "over_10ms": 12,
+    "over_25ms": 5
+  },
+  "reader": {
+    "port": "/dev/ttys040",
+    "frames_ok": 12482,
+    "frames_bad_version": 0,
+    "frames_hz_reject": 0,
+    "stray_bytes_to_hotkey_path": 0,
+    "all_frames_byte_identical_to_file": true,
+    "seq_sequence_equals_sent": true,
+    "player_exit": 0
+  }
+}

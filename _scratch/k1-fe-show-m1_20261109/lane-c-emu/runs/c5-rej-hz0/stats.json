@@ -1,0 +1,44 @@
+{
+  "frames": 480,
+  "send_err_us": {
+    "p50": 0.0,
+    "p95": 3.0,
+    "p99": 7.259999999999877,
+    "max": 3087.0,
+    "min": 0.0
+  },
+  "write_call_us": {
+    "p50": 11.0,
+    "p95": 24.0,
+    "max": 1219.0
+  },
+  "cumulative_drift_us_end": -26.783333333333335,
+  "duration_s": 3.991548,
+  "linear_fit_slope_ppm": -6.218417321957048,
+  "frames_skipped_late": 0,
+  "late_counts": {
+    "over_4ms": 0,
+    "over_10ms": 0,
+    "over_25ms": 0
+  },
+  "reader": {
+    "port": "/dev/ttys040",
+    "frames_ok": 0,
+    "frames_bad_version": 0,
+    "frames_hz_reject": 480,
+    "stray_bytes_to_hotkey_path": 0,
+    "ignorable_nul_newline_bytes": 14464,
+    "partial_frame_bytes_at_end": 0,
+    "term_at_s": null,
+    "preambles_seen": 1,
+    "injected": [
+      [
+        0.3,
+        "[AP] SSL=108 boundary"
+      ]
+    ],
+    "all_frames_byte_identical_to_file": true,
+    "seq_sequence_equals_sent": false,
+    "player_exit": 0
+  }
+}

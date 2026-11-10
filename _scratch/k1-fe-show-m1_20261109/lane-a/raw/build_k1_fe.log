@@ -1,0 +1,44 @@
+SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:119:29: warning: ignoring attribute 'section (".iram1.4")' because it conflicts with previous 'section (".iram1.3")' [-Wattributes]
+  119 | void IRAM_ATTR process_GDFT() {
+      |                             ^
+In file included from SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.cpp:30:
+SPECTRASYNQ_K1_FIRMWARE/audio/k1_gdft_core.h:28:16: note: previous declaration here
+   28 | void IRAM_ATTR process_GDFT();
+      |                ^~~~~~~~~~~~
+In file included from /Users/spectrasynq/SpectraSynq_K1_Firmware/_scratch/k1-fe-show-m1_20261109/lane-a/export-407fdf6f/SPECTRASYNQ_K1_FIRMWARE/SPECTRASYNQ_K1_FIRMWARE.ino:48:
+SPECTRASYNQ_K1_FIRMWARE/system/system.h: In function 'void check_current_function()':
+SPECTRASYNQ_K1_FIRMWARE/system/system.h:70:28: warning: '++' expression of 'volatile'-qualified type is deprecated [-Wvolatile]
+   70 |   function_hits[function_id]++;
+      |   ~~~~~~~~~~~~~~~~~~~~~~~~~^
+********************************************************************************
+Obsolete PIO Core v6.1.19 is used (previous was 6.2.0)
+Please remove multiple PIO Cores from a system:
+https://docs.platformio.org/en/latest/core/installation/troubleshooting.html
+********************************************************************************
+Processing k1_fe (platform: https://github.com/pioarduino/platform-espressif32/releases/download/54.03.20/platform-espressif32.zip; board: esp32-s3-devkitc1-n16r8; framework: arduino)
+--------------------------------------------------------------------------------
+Unpacking 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+[k1-build-provenance] env=k1_fe git=407fdf6f epoch=1794225047 tag=untagged
+PLATFORM: Espressif 32 (54.3.20) > Espressif ESP32-S3-DevKitC-1-N16R8V (16 MB Flash Quad, 8 MB PSRAM Octal)
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 16MB Flash
+DEBUG: Current (esp-builtin) On-board (esp-builtin) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.2.0 
+ - framework-arduinoespressif32-libs @ 5.4.0+sha.2f7dcd862a 
+ - tool-esptoolpy @ 4.8.9 
+ - tool-mklittlefs @ 3.2.0 
+ - tool-riscv32-esp-elf-gdb @ 14.2.0+20240403 
+ - tool-xtensa-esp-elf-gdb @ 14.2.0+20240403 
+ - toolchain-riscv32-esp @ 14.2.0+20241119 
+ - toolchain-xtensa-esp-elf @ 14.2.0+20241119
+Converting SPECTRASYNQ_K1_FIRMWARE.ino
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 44 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- FastLED @ 3.10.3
+|-- FixedPoints @ 1.1.2
+|-- M5ROTATE8 @ 0.4.1
+|-- FS @ 3.2.0
+... (39 lines truncated)
+exit=0

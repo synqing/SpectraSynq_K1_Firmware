@@ -1,0 +1,1443 @@
+{
+ "functions_rpl": 3027,
+ "functions_b489": 3208,
+ "only_rpl": [
+  [
+   "CFastLED::setCorrection(CRGB const&)",
+   48
+  ],
+  [
+   "CFastLED::setTemperature(CRGB const&)",
+   48
+  ],
+  [
+   "ClocklessController<2, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::endShowLeds(void*)",
+   14
+  ],
+  [
+   "ClocklessController<2, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<2, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<2, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   74
+  ],
+  [
+   "ClocklessController<2, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<3, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::endShowLeds(void*)",
+   14
+  ],
+  [
+   "ClocklessController<3, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<3, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<3, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   74
+  ],
+  [
+   "ClocklessController<3, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<6, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::endShowLeds(void*)",
+   14
+  ],
+  [
+   "ClocklessController<6, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<6, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<6, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   74
+  ],
+  [
+   "ClocklessController<6, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "WS2812B<(unsigned char)2, (fl::EOrder)10>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)3, (fl::EOrder)10>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)6, (fl::EOrder)10>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)2, (fl::EOrder)10>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)3, (fl::EOrder)10>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)6, (fl::EOrder)10>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "_ZL15k1_look_publishh$isra$0",
+   29
+  ],
+  [
+   "_ZL19k1_look_publish_sech$isra$0",
+   48
+  ],
+  [
+   "_ZL21k1_look_free_slot_ramh$part$0",
+   34
+  ],
+  [
+   "__ieee754_pow",
+   2723
+  ],
+  [
+   "fs::FS::mkdir(char const*)",
+   22
+  ],
+  [
+   "fs::FS::rename(char const*, char const*)",
+   24
+  ],
+  [
+   "k1_colour_lab_curve_u16(unsigned short, float, float)",
+   230
+  ],
+  [
+   "k1_colour_lab_generate_slot15()",
+   780
+  ],
+  [
+   "k1_colour_lab_print_tune()",
+   174
+  ],
+  [
+   "k1_compute_magnitude(unsigned short)",
+   300
+  ],
+  [
+   "k1_lever2_pack_frame(CRGB16 const*, unsigned short, CRGB*, unsigned long long, SFixed<15u, 16u>, SFixed<15u, 16u>, SFixed<15u, 16u>, unsigned char)",
+   443
+  ],
+  [
+   "k1_lever2_sq_to_u16(SFixed<15u, 16u>, SFixed<15u, 16u>)",
+   47
+  ],
+  [
+   "k1_look_apply_u16(unsigned short*, unsigned short*, unsigned short*, unsigned char)",
+   957
+  ],
+  [
+   "k1_look_lerp_1d(unsigned short, unsigned short const*, unsigned short const*)",
+   111
+  ],
+  [
+   "k1_look_lerp_u16(unsigned short, unsigned short, unsigned short)",
+   65
+  ],
+  [
+   "k1_look_parse_k1lt(unsigned char const*, unsigned int, K1LookParsed*)",
+   126
+  ],
+  [
+   "k1_look_publish(unsigned char)",
+   54
+  ],
+  [
+   "k1_look_publish_sec(unsigned char)",
+   69
+  ],
+  [
+   "k1_ws2816_degamma_u16(unsigned short)",
+   121
+  ],
+  [
+   "pow",
+   239
+  ]
+ ],
+ "only_b489": [
+  [
+   "(anonymous namespace)::dilate_update((anonymous namespace)::DilateChannel&, bool, float)",
+   1171
+  ],
+  [
+   "(anonymous namespace)::infall_update((anonymous namespace)::InfallChannel&, bool, float)",
+   1080
+  ],
+  [
+   "(anonymous namespace)::reverse_birth_trio((anonymous namespace)::ReverseEffect&)",
+   130
+  ],
+  [
+   "(anonymous namespace)::stretch_render((anonymous namespace)::StretchVoice&, bool, CRGB16*)",
+   1255
+  ],
+  [
+   "(anonymous namespace)::stretch_stamp(float*, unsigned char*, float, float, float, float, unsigned char)",
+   232
+  ],
+  [
+   "(anonymous namespace)::stretch_update((anonymous namespace)::StretchVoice&, bool)",
+   1069
+  ],
+  [
+   "(anonymous namespace)::through_render((anonymous namespace)::ThroughVoice&, bool, CRGB16*)",
+   1080
+  ],
+  [
+   "(anonymous namespace)::through_stamp(float*, unsigned char*, float, float, float, float, unsigned char)",
+   232
+  ],
+  [
+   "(anonymous namespace)::through_update((anonymous namespace)::ThroughVoice&)",
+   1427
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)10, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::init()",
+   11
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)10, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   15
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)10, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixelsDefault(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   311
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)10, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::~APA102Controller()",
+   18
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)136, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::init()",
+   11
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)136, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixels(PixelController<(fl::EOrder)136, 1, 4294967295ul>&)",
+   15
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)136, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixelsDefault(PixelController<(fl::EOrder)136, 1, 4294967295ul>&)",
+   311
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)136, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::~APA102Controller()",
+   18
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)66, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::init()",
+   11
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)66, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixels(PixelController<(fl::EOrder)66, 1, 4294967295ul>&)",
+   15
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)66, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::showPixelsDefault(PixelController<(fl::EOrder)66, 1, 4294967295ul>&)",
+   311
+  ],
+  [
+   "APA102Controller<(unsigned char)4, (unsigned char)5, (fl::EOrder)66, 40ul, (fl::FiveBitGammaCorrectionMode)0, 0ul, 4278190080ul>::~APA102Controller()",
+   18
+  ],
+  [
+   "AVRSoftwareSPIOutput<(unsigned char)4, (unsigned char)5, 40ul>::init()",
+   26
+  ],
+  [
+   "AVRSoftwareSPIOutput<(unsigned char)4, (unsigned char)5, 40ul>::writeByte(unsigned char)",
+   1443
+  ],
+  [
+   "CLEDController::getRgbw() const",
+   16
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)136, 1, 4294967295ul>::lanes()",
+   7
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)136, 1, 4294967295ul>::show(CRGB const*, int, unsigned char)",
+   138
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)136, 1, 4294967295ul>::showColor(CRGB const&, int, unsigned char)",
+   128
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)136, 1, 4294967295ul>::~CPixelLEDController()",
+   18
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)66, 1, 4294967295ul>::lanes()",
+   7
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)66, 1, 4294967295ul>::show(CRGB const*, int, unsigned char)",
+   138
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)66, 1, 4294967295ul>::showColor(CRGB const&, int, unsigned char)",
+   128
+  ],
+  [
+   "CPixelLEDController<(fl::EOrder)66, 1, 4294967295ul>::~CPixelLEDController()",
+   18
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::endShowLeds(void*)",
+   17
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   76
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::endShowLeds(void*)",
+   17
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::showPixels(PixelController<(fl::EOrder)136, 1, 4294967295ul>&)",
+   76
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::endShowLeds(void*)",
+   17
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::showPixels(PixelController<(fl::EOrder)66, 1, 4294967295ul>&)",
+   76
+  ],
+  [
+   "ClocklessController<4, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::endShowLeds(void*)",
+   17
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::showPixels(PixelController<(fl::EOrder)136, 1, 4294967295ul>&)",
+   76
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)136, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::endShowLeds(void*)",
+   17
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::getMaxRefreshRate() const",
+   8
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::init()",
+   5
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::showPixels(PixelController<(fl::EOrder)66, 1, 4294967295ul>&)",
+   76
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)66, 0, false, 5>::~ClocklessController()",
+   23
+  ],
+  [
+   "PixelController<(fl::EOrder)136, 1, 4294967295ul>::init_binary_dithering()",
+   108
+  ],
+  [
+   "PixelController<(fl::EOrder)66, 1, 4294967295ul>::init_binary_dithering()",
+   108
+  ],
+  [
+   "WS2812B<(unsigned char)4, (fl::EOrder)10>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)4, (fl::EOrder)136>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)4, (fl::EOrder)66>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)5, (fl::EOrder)136>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812B<(unsigned char)5, (fl::EOrder)66>::~WS2812B()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)4, (fl::EOrder)10>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)4, (fl::EOrder)136>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)4, (fl::EOrder)66>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)5, (fl::EOrder)136>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "WS2812Controller800Khz<(unsigned char)5, (fl::EOrder)66>::~WS2812Controller800Khz()",
+   18
+  ],
+  [
+   "_GLOBAL__sub_I__Z16k1_pcm1808_beginv",
+   156
+  ],
+  [
+   "_GLOBAL__sub_I__Z18light_mode_fx_scanP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z19light_mode_fx_chainP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z19light_mode_fx_orbitP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z20light_mode_fx_bounceP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z20light_mode_fx_infallP6CRGB16R18ChannelEffectState",
+   373
+  ],
+  [
+   "_GLOBAL__sub_I__Z21light_mode_fx_reverseP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z21light_mode_fx_stretchP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z22light_mode_fx_front_caP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z24k1_render_trace_on_framePKhth",
+   156
+  ],
+  [
+   "_GLOBAL__sub_I__Z24light_mode_fx_lob_returnP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z25light_mode_fx_split_mergeP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z26light_mode_fx_pass_throughP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z27light_mode_fx_dilate_recoilP6CRGB16R18ChannelEffectState",
+   327
+  ],
+  [
+   "_GLOBAL__sub_I__Z30light_mode_fx_front_refractoryP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_GLOBAL__sub_I__Z32light_mode_fx_accumulate_cascadeP6CRGB16R18ChannelEffectState",
+   270
+  ],
+  [
+   "_ZL12rtrace_storePKhS0_thh$constprop$0",
+   288
+  ],
+  [
+   "_ZL16k1_pcm_ring_usedPK9K1PcmRing$constprop$0",
+   30
+  ],
+  [
+   "_ZL19k1_pcm_pcnt_measureiiPlPx$constprop$0",
+   204
+  ],
+  [
+   "_ZN11CaptureLockC2Ev$constprop$0",
+   16
+  ],
+  [
+   "_ZN20AVRSoftwareSPIOutputILh4ELh5ELm40EE6selectEv$isra$0",
+   16
+  ],
+  [
+   "_ZN20AVRSoftwareSPIOutputILh4ELh5ELm40EE7releaseEv$isra$0",
+   16
+  ],
+  [
+   "_ZN8CFastLED7addLedsI7WS2812BLh4ELN2fl6EOrderE10EEER14CLEDControllerP4CRGBii$isra$0",
+   131
+  ],
+  [
+   "_ZN8CFastLED7addLedsI7WS2812BLh4ELN2fl6EOrderE136EEER14CLEDControllerP4CRGBii$isra$0",
+   131
+  ],
+  [
+   "_ZN8CFastLED7addLedsI7WS2812BLh4ELN2fl6EOrderE66EEER14CLEDControllerP4CRGBii$isra$0",
+   131
+  ],
+  [
+   "_ZN8CFastLED7addLedsI7WS2812BLh5ELN2fl6EOrderE66EEER14CLEDControllerP4CRGBii$isra$0",
+   131
+  ],
+  [
+   "_ZN8k1motion5birthERNS_4PoolEhff$isra$0",
+   76
+  ],
+  [
+   "__digitalRead",
+   24
+  ],
+  [
+   "__ieee754_powf",
+   1493
+  ],
+  [
+   "apply_incandescent_filter()",
+   180
+  ],
+  [
+   "audio_response_gain_apply_sample(long)",
+   62
+  ],
+  [
+   "digitalRead",
+   24
+  ],
+  [
+   "draw_sprite_upper(CRGB16*, CRGB16*, unsigned long, unsigned long, float, SFixed<15u, 16u>)",
+   348
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::advanceData(void*)",
+   23
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::getHdScale(void*, unsigned char*, unsigned char*, unsigned char*, unsigned char*)",
+   29
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::has(void*, int)",
+   18
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::loadAndScaleRGB(void*, unsigned char*, unsigned char*, unsigned char*)",
+   112
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::loadAndScaleRGBW(void*, fl::Rgbw, unsigned char*, unsigned char*, unsigned char*, unsigned char*)",
+   231
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::loadAndScale_WS2816_HD(void*, unsigned short*, unsigned short*, unsigned short*)",
+   185
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::size(void*)",
+   7
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)136, 1, 4294967295ul> >::stepDithering(void*)",
+   41
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::advanceData(void*)",
+   23
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::getHdScale(void*, unsigned char*, unsigned char*, unsigned char*, unsigned char*)",
+   29
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::has(void*, int)",
+   18
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::loadAndScaleRGB(void*, unsigned char*, unsigned char*, unsigned char*)",
+   112
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::loadAndScaleRGBW(void*, fl::Rgbw, unsigned char*, unsigned char*, unsigned char*, unsigned char*)",
+   231
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::loadAndScale_WS2816_HD(void*, unsigned short*, unsigned short*, unsigned short*)",
+   185
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::size(void*)",
+   7
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)66, 1, 4294967295ul> >::stepDithering(void*)",
+   41
+  ],
+  [
+   "fs::FS::exists(char const*)",
+   22
+  ],
+  [
+   "i2s_channel_init_std_mode",
+   470
+  ],
+  [
+   "i2s_channel_register_event_callback",
+   424
+  ],
+  [
+   "i2s_check_set_mclk",
+   109
+  ],
+  [
+   "i2s_gpio_loopback_set",
+   56
+  ],
+  [
+   "i2s_hal_set_tx_clock",
+   400
+  ],
+  [
+   "i2s_hal_std_set_rx_slot",
+   434
+  ],
+  [
+   "i2s_hal_std_set_tx_slot",
+   500
+  ],
+  [
+   "i2s_ll_tx_clk_set_src",
+   87
+  ],
+  [
+   "i2s_std_set_clock",
+   321
+  ],
+  [
+   "i2s_std_set_gpio",
+   479
+  ],
+  [
+   "i2s_std_set_slot",
+   278
+  ],
+  [
+   "k1_agc_measure_dt_s(long long*)",
+   93
+  ],
+  [
+   "k1_compute_magnitude_from_window(unsigned short)",
+   239
+  ],
+  [
+   "k1_fe_audio_line_active()",
+   11
+  ],
+  [
+   "k1_fe_audio_line_hop_begin(bool)",
+   60
+  ],
+  [
+   "k1_fe_board_begin()",
+   321
+  ],
+  [
+   "k1_fe_board_dispatch(char const*, char*)",
+   935
+  ],
+  [
+   "k1_fe_board_poll(unsigned long)",
+   23
+  ],
+  [
+   "k1_fe_heartbeat_tick(long long)",
+   68
+  ],
+  [
+   "k1_fe_input(int)",
+   46
+  ],
+  [
+   "k1_fe_nvm_current_ma(unsigned char)",
+   52
+  ],
+  [
+   "k1_fe_output_low(int)",
+   58
+  ],
+  [
+   "k1_fe_pd_status()",
+   282
+  ],
+  [
+   "k1_fe_power_poll(unsigned long)",
+   432
+  ],
+  [
+   "k1_fe_set_power(bool, bool)",
+   42
+  ],
+  [
+   "k1_fe_source_poll(unsigned long)",
+   231
+  ],
+  [
+   "k1_look_ws2812_apply_u8(unsigned char, unsigned char&, unsigned char&, unsigned char&)",
+   64
+  ],
+  [
+   "k1_pcm1808_begin()",
+   1446
+  ],
+  [
+   "k1_pcm1808_clock_gate_pass()",
+   10
+  ],
+  [
+   "k1_pcm1808_last_canonical_read_timing()",
+   18
+  ],
+  [
+   "k1_pcm1808_print_telemetry()",
+   8
+  ],
+  [
+   "k1_pcm1808_shadow_drain()",
+   67
+  ],
+  [
+   "k1_pcm1808_take_canonical_samples(short*, unsigned long)",
+   1412
+  ],
+  [
+   "k1_pcm_capture_task(void*)",
+   226
+  ],
+  [
+   "k1_pcm_on_recv(i2s_channel_obj_t*, i2s_event_data_t*, void*)",
+   34
+  ],
+  [
+   "k1_pcm_on_recv_q_ovf(i2s_channel_obj_t*, i2s_event_data_t*, void*)",
+   32
+  ],
+  [
+   "k1_pcm_print_clk()",
+   115
+  ],
+  [
+   "k1_pcm_print_telemetry()",
+   784
+  ],
+  [
+   "k1_render_trace_dispatch(char const*, char*)",
+   695
+  ],
+  [
+   "k1_render_trace_on_frame(unsigned char const*, unsigned short, unsigned char)",
+   18
+  ],
+  [
+   "k1motion::accumulate_cascade::step(k1motion::accumulate_cascade::State&, k1motion::Drive const&, float)",
+   593
+  ],
+  [
+   "k1motion::birth(k1motion::Pool&, unsigned char, float, float)",
+   89
+  ],
+  [
+   "k1motion::bounce::step(k1motion::Pool&, k1motion::Drive const&, float)",
+   625
+  ],
+  [
+   "k1motion::chain::step(k1motion::chain::State&, k1motion::Drive const&, float)",
+   503
+  ],
+  [
+   "k1motion::clamp(float, float, float)",
+   48
+  ],
+  [
+   "k1motion::finite(float)",
+   49
+  ],
+  [
+   "k1motion::front_ca::step(k1motion::front_ca::State&, k1motion::Drive const&, float)",
+   404
+  ],
+  [
+   "k1motion::front_refractory::tick(k1motion::front_refractory::State&)",
+   98
+  ],
+  [
+   "k1motion::infall::init(k1motion::Pool&)",
+   18
+  ],
+  [
+   "k1motion::infall::step(k1motion::Pool&, k1motion::Drive const&, float)",
+   547
+  ],
+  [
+   "k1motion::lob_return::step(k1motion::Pool&, k1motion::Drive const&, float)",
+   593
+  ],
+  [
+   "k1motion::negative(float, float)",
+   59
+  ],
+  [
+   "k1motion::orbit::step(k1motion::orbit::State&, k1motion::Drive const&, float)",
+   482
+  ],
+  [
+   "k1motion::pass_through::step(k1motion::pass_through::State&, k1motion::Drive const&, float)",
+   651
+  ],
+  [
+   "k1motion::reverse::step(k1motion::Pool&, k1motion::Drive const&, float)",
+   540
+  ],
+  [
+   "k1motion::stretch::step(k1motion::Pool&, k1motion::Drive const&, float)",
+   599
+  ],
+  [
+   "k1motion::triangle(float)",
+   74
+  ],
+  [
+   "k1motion::unit(float)",
+   20
+  ],
+  [
+   "k1motion::wrap(float)",
+   50
+  ],
+  [
+   "light_mode_fx_accumulate_cascade(CRGB16*, ChannelEffectState&)",
+   1730
+  ],
+  [
+   "light_mode_fx_bounce(CRGB16*, ChannelEffectState&)",
+   2091
+  ],
+  [
+   "light_mode_fx_chain(CRGB16*, ChannelEffectState&)",
+   2390
+  ],
+  [
+   "light_mode_fx_dilate_recoil(CRGB16*, ChannelEffectState&)",
+   2042
+  ],
+  [
+   "light_mode_fx_front_ca(CRGB16*, ChannelEffectState&)",
+   2741
+  ],
+  [
+   "light_mode_fx_front_refractory(CRGB16*, ChannelEffectState&)",
+   2442
+  ],
+  [
+   "light_mode_fx_infall(CRGB16*, ChannelEffectState&)",
+   1861
+  ],
+  [
+   "light_mode_fx_lob_return(CRGB16*, ChannelEffectState&)",
+   2015
+  ],
+  [
+   "light_mode_fx_orbit(CRGB16*, ChannelEffectState&)",
+   2704
+  ],
+  [
+   "light_mode_fx_pass_through(CRGB16*, ChannelEffectState&)",
+   42
+  ],
+  [
+   "light_mode_fx_reverse(CRGB16*, ChannelEffectState&)",
+   2198
+  ],
+  [
+   "light_mode_fx_scan(CRGB16*, ChannelEffectState&)",
+   2040
+  ],
+  [
+   "light_mode_fx_split_merge(CRGB16*, ChannelEffectState&)",
+   1947
+  ],
+  [
+   "light_mode_fx_stretch(CRGB16*, ChannelEffectState&)",
+   40
+  ],
+  [
+   "lrintf",
+   138
+  ],
+  [
+   "pcnt_channel_set_edge_action",
+   168
+  ],
+  [
+   "pcnt_default_isr",
+   295
+  ],
+  [
+   "pcnt_del_channel",
+   198
+  ],
+  [
+   "pcnt_del_unit",
+   181
+  ],
+  [
+   "pcnt_destroy",
+   150
+  ],
+  [
+   "pcnt_hal_init",
+   14
+  ],
+  [
+   "pcnt_new_channel",
+   659
+  ],
+  [
+   "pcnt_new_unit",
+   1051
+  ],
+  [
+   "pcnt_release_group_handle",
+   111
+  ],
+  [
+   "pcnt_unit_clear_count",
+   166
+  ],
+  [
+   "pcnt_unit_disable",
+   189
+  ],
+  [
+   "pcnt_unit_enable",
+   191
+  ],
+  [
+   "pcnt_unit_get_count",
+   121
+  ],
+  [
+   "pcnt_unit_start",
+   161
+  ],
+  [
+   "pcnt_unit_stop",
+   157
+  ],
+  [
+   "pd_ftp_op(unsigned char, unsigned char, unsigned long)",
+   47
+  ],
+  [
+   "pd_nvm_exit()",
+   32
+  ],
+  [
+   "pd_nvm_read(unsigned char (*) [8])",
+   111
+  ],
+  [
+   "pd_profile_print(char const*, unsigned char const (*) [8])",
+   175
+  ],
+  [
+   "pd_read(unsigned char, unsigned char*, unsigned int)",
+   70
+  ],
+  [
+   "pd_wait_req_clear(unsigned long)",
+   64
+  ],
+  [
+   "pd_write(unsigned char, unsigned char const*, unsigned int)",
+   42
+  ],
+  [
+   "pd_write1(unsigned char, unsigned char)",
+   22
+  ],
+  [
+   "powf",
+   201
+  ],
+  [
+   "prepare_config_save_file()",
+   234
+  ],
+  [
+   "ps_malloc",
+   34
+  ],
+  [
+   "rtrace_drain_task(void*)",
+   563
+  ],
+  [
+   "rtrace_init_drain()",
+   51
+  ],
+  [
+   "serial_typed_wrap_fe_board(char const*, char*)",
+   17
+  ],
+  [
+   "serial_typed_wrap_render_trace(char const*, char*)",
+   17
+  ],
+  [
+   "sqrt",
+   90
+  ]
+ ],
+ "size_changed": [
+  [
+   "serial_typed_wrap_look(char const*, char*)",
+   1371,
+   208
+  ],
+  [
+   "acquire_sample_chunk(unsigned long)",
+   4165,
+   5318
+  ],
+  [
+   "check_serial(unsigned long)",
+   1227,
+   290
+  ],
+  [
+   "load_config()",
+   1716,
+   867
+  ],
+  [
+   "light_mode_tempo_comet_anticipate(ChannelEffectState&)",
+   1864,
+   2517
+  ],
+  [
+   "k1_colour_lab_dispatch(char const*, char*)",
+   1817,
+   1238
+  ],
+  [
+   "light_mode_dense_forge_chord(CRGB16*, ChannelEffectState&)",
+   2218,
+   2636
+  ],
+  [
+   "light_mode_dense_forge(CRGB16*, ChannelEffectState&)",
+   1899,
+   2299
+  ],
+  [
+   "init_secondary_leds()",
+   423,
+   123
+  ],
+  [
+   "vp_probe_dispatch_and_hash(unsigned char, unsigned long&)",
+   912,
+   1200
+  ],
+  [
+   "light_mode_spectrum_river(CRGB16*)",
+   731,
+   455
+  ],
+  [
+   "dispatch_legacy_lightshow(unsigned char, RenderChannelState&, bool)",
+   744,
+   968
+  ],
+  [
+   "light_mode_tempo_comet(ChannelEffectState&)",
+   1615,
+   1834
+  ],
+  [
+   "init_leds()",
+   578,
+   789
+  ],
+  [
+   "calculate_vu()",
+   400,
+   557
+  ],
+  [
+   "light_mode_ember(CRGB16*, ChannelEffectState&)",
+   537,
+   417
+  ],
+  [
+   "light_mode_aurora(CRGB16*)",
+   394,
+   274
+  ],
+  [
+   "light_mode_ember_v2(CRGB16*, ChannelEffectState&)",
+   505,
+   385
+  ],
+  [
+   "check_settings(unsigned long)",
+   47,
+   150
+  ],
+  [
+   "save_config()",
+   426,
+   330
+  ],
+  [
+   "show_secondary_leds()",
+   542,
+   446
+  ],
+  [
+   "quantize_color(bool)",
+   341,
+   426
+  ],
+  [
+   "parse_command(char*)",
+   4219,
+   4303
+  ],
+  [
+   "show_leds()",
+   966,
+   882
+  ],
+  [
+   "quantize_color_secondary(bool)",
+   311,
+   392
+  ],
+  [
+   "(anonymous namespace)::sbv2_run(K1AudioSnapshot const&, K1OnsetBeatEvent&)",
+   1138,
+   1214
+  ],
+  [
+   "vp_run_output_probe()",
+   775,
+   847
+  ],
+  [
+   "select_notif_callback_isr",
+   114,
+   182
+  ],
+  [
+   "k1_tempo_update(K1AudioSnapshot const&)",
+   3375,
+   3437
+  ],
+  [
+   "light_mode_waveform_hybrid(CRGB16*, CRGB16&, float&, float&, unsigned long&)",
+   2086,
+   2126
+  ],
+  [
+   "_GLOBAL__sub_I__Z10set_presetPc",
+   276,
+   304
+  ],
+  [
+   "k1_colour_lab_apply(CRGB16*, unsigned short, unsigned char)",
+   858,
+   834
+  ],
+  [
+   "serial_handle_hotkey(char)",
+   2014,
+   1994
+  ],
+  [
+   "light_mode_comet(ChannelEffectState&)",
+   1046,
+   1027
+  ],
+  [
+   "led_thread(void*)",
+   1344,
+   1361
+  ],
+  [
+   "light_mode_waveform_fast(CRGB16*, CRGB16&, float&, float&, unsigned long&)",
+   1627,
+   1643
+  ],
+  [
+   "loop()",
+   1584,
+   1568
+  ],
+  [
+   "k1_look_print_status()",
+   183,
+   171
+  ],
+  [
+   "k1_look_status_type_name(unsigned char)",
+   72,
+   60
+  ],
+  [
+   "light_mode_waveform_tempo(ChannelEffectState&)",
+   1360,
+   1371
+  ],
+  [
+   "init_system()",
+   695,
+   703
+  ],
+  [
+   "finalize_additive_frame(CRGB16*, CRGB16*, bool)",
+   135,
+   127
+  ],
+  [
+   "init_i2s()",
+   188,
+   196
+  ],
+  [
+   "k1_audio_frame_acquire(K1AudioFrame*)",
+   261,
+   254
+  ],
+  [
+   "cmd_image_id()",
+   75,
+   79
+  ],
+  [
+   "factory_reset()",
+   104,
+   108
+  ],
+  [
+   "cmd_reset_reason()",
+   130,
+   134
+  ],
+  [
+   "render_noise_cal()",
+   348,
+   352
+  ],
+  [
+   "restore_defaults()",
+   64,
+   68
+  ],
+  [
+   "k1_parse_edge_mode(char const*, K1EdgeMixerMode*)",
+   162,
+   158
+  ],
+  [
+   "render_chroma_graph()",
+   442,
+   446
+  ],
+  [
+   "clear_calibration_profile()",
+   43,
+   47
+  ],
+  [
+   "transition_ui_mask_to_height(SFixed<15u, 16u>)",
+   137,
+   141
+  ],
+  [
+   "light_mode_waveform_hybrid_k1(CRGB16*, ChannelEffectState&)",
+   1971,
+   1975
+  ],
+  [
+   "hsv(SFixed<15u, 16u>, SFixed<15u, 16u>, SFixed<15u, 16u>)",
+   390,
+   386
+  ],
+  [
+   "fl::PixelControllerVtable<PixelController<(fl::EOrder)10, 1, 4294967295ul> >::loadAndScaleRGBW(void*, fl::Rgbw, unsigned char*, unsigned char*, unsigned char*, unsigned char*)",
+   227,
+   231
+  ],
+  [
+   "serial_typed_vp_all(char const*, char*)",
+   48,
+   45
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::endShowLeds(void*)",
+   14,
+   17
+  ],
+  [
+   "save_calibration_profile(unsigned char)",
+   494,
+   496
+  ],
+  [
+   "render_queue_xfade_overlay(bool)",
+   436,
+   438
+  ],
+  [
+   "serial_toggle_target_palette_mode()",
+   88,
+   90
+  ],
+  [
+   "bridge_fs_crc32(unsigned char const*, unsigned int)",
+   53,
+   51
+  ],
+  [
+   "ClocklessController<5, 250, 625, 375, (fl::EOrder)10, 0, false, 5>::showPixels(PixelController<(fl::EOrder)10, 1, 4294967295ul>&)",
+   74,
+   76
+  ],
+  [
+   "check_knobs(unsigned long)",
+   425,
+   426
+  ],
+  [
+   "generate_a_weights()",
+   309,
+   308
+  ],
+  [
+   "light_mode_river_surge(CRGB16*, ChannelEffectState&)",
+   1306,
+   1307
+  ],
+  [
+   "light_mode_next_enabled(unsigned char, int)",
+   77,
+   78
+  ],
+  [
+   "serial_command_marks_manual_visual_control(char const*)",
+   172,
+   173
+  ],
+  [
+   "draw_line(CRGB16*, SFixed<15u, 16u>, SFixed<15u, 16u>, CRGB16, SFixed<15u, 16u>)",
+   612,
+   613
+  ]
+ ],
+ "objs_only_rpl": [],
+ "objs_only_b489": [
+  "audio/k1_pcm1808_input.cpp",
+  "effects/light_mode_fx_accumulate_cascade.cpp",
+  "effects/light_mode_fx_bounce.cpp",
+  "effects/light_mode_fx_chain.cpp",
+  "effects/light_mode_fx_dilate_recoil.cpp",
+  "effects/light_mode_fx_front_ca.cpp",
+  "effects/light_mode_fx_front_refractory.cpp",
+  "effects/light_mode_fx_infall.cpp",
+  "effects/light_mode_fx_lob_return.cpp",
+  "effects/light_mode_fx_orbit.cpp",
+  "effects/light_mode_fx_pass_through.cpp",
+  "effects/light_mode_fx_reverse.cpp",
+  "effects/light_mode_fx_scan.cpp",
+  "effects/light_mode_fx_split_merge.cpp",
+  "effects/light_mode_fx_stretch.cpp",
+  "system/k1_fe_board.cpp"
+ ],
+ "objs_common": 75
+}

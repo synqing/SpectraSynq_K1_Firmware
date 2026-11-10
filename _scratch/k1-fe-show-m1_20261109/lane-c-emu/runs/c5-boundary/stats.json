@@ -1,0 +1,60 @@
+{
+  "frames": 779,
+  "send_err_us": {
+    "p50": 0.0,
+    "p95": 2.0,
+    "p99": 11.0,
+    "max": 2244.0,
+    "min": 0.0
+  },
+  "write_call_us": {
+    "p50": 11.0,
+    "p95": 25.0,
+    "max": 48.0
+  },
+  "cumulative_drift_us_end": 4.449999999999999,
+  "duration_s": 11.991606,
+  "linear_fit_slope_ppm": -0.21728609633786533,
+  "frames_skipped_late": 0,
+  "late_counts": {
+    "over_4ms": 0,
+    "over_10ms": 0,
+    "over_25ms": 0
+  },
+  "reader": {
+    "port": "/dev/ttys040",
+    "frames_ok": 779,
+    "frames_bad_version": 0,
+    "frames_hz_reject": 0,
+    "stray_bytes_to_hotkey_path": 0,
+    "ignorable_nul_newline_bytes": 23498,
+    "partial_frame_bytes_at_end": 0,
+    "term_at_s": null,
+    "preambles_seen": 2,
+    "injected": [
+      [
+        0.3,
+        "\u0000RAWmax_raw=47 follower=0.41 peak_scaled=0.12"
+      ],
+      [
+        0.8,
+        "[AP] SSL=108 DC=57 max_raw=58 follower=0.40 peak_scaled=0.10"
+      ],
+      [
+        2.0,
+        "[AP] SSL=108 DC=57 max_raw=55 follower=0.40 peak_scaled=0.10"
+      ],
+      [
+        3.0,
+        "[AP] SSL=108 DC=57 max_raw=50 follower=0.40 peak_scaled=0.10"
+      ],
+      [
+        4.5,
+        "NOISE_CAL: armed (5s window)"
+      ]
+    ],
+    "all_frames_byte_identical_to_file": true,
+    "seq_sequence_equals_sent": true,
+    "player_exit": 3
+  }
+}
