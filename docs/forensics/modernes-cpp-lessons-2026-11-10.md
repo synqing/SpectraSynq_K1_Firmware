@@ -109,6 +109,7 @@ GPIO 15–18, and it is in use by the k1-fe-show-m2 lane. An unregistered ESP
 | 2026-11-10 | agent:claude-code (Opus 5.5, next phase) | Abstract corrected (396 unique URLs; 4 of 19 lessons partial). Appended "Next phase" section: closeout corrections, Stages A–F status, evidence. Earlier sections left as written. |
 | 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended "Follow-on — 11 Nov 2026": W1 ownership, W2 look-upload outcome (032a50ee), W3 Gx limit check + export-safe tests (032a50ee, review fixes 77283663), W5 replay/export results, W4 blocked prerequisites. Earlier sections left as written. |
 | 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended "Hardware run on the Main RPL": the Captain ordered testing on available hardware; all W4 checks run on 9087A500; :look_load/:look_clear routing defect found and fixed (bd5d5a83); device restored to a6113aaf. Supersedes the "W4 — hardware: BLOCKED" subsection. |
+| 2026-11-11 | agent:claude-code (Opus 5.5, follow-on) | Appended the Captain's decision approving the Gx 320 mA idle floor; open item 4 closed, no firmware change. |
 
 ## Next phase — 10 Nov 2026, session 2 (handover `docs/plans/MODERNES-CPP-NEXT-PHASE-HANDOVER.md`)
 
@@ -475,4 +476,22 @@ ends where it began.
 Final candidate: `bd5d5a83`. Its difference from `77283663` is only the two
 routing lines and the static test. The FE replay and clean export above are of
 `77283663`; the full host suite ran on `bd5d5a83` in its commit gate.
+
+## Captain decision — Gx 320 mA idle floor (11 Nov 2026)
+
+**Source:** Captain, 11 Nov 2026 ~04:00 (+08), Modernes C++ follow-on session,
+in reply to the explanation of the Gx idle floor — "ROGER THAT. That's actually
+really smart. Alright if that's the case. 320ma is approved"
+
+Open item 4 ("refuse or clamp `max_current_ma` below the Gx idle model") is
+CLOSED: keep the current behaviour.
+- `k1_fe_gx_led_scale()` keeps returning 0 (LEDs off) when the LED budget is
+  at or below the idle model of 1 mA × 320 pixels.
+- Budget = min(`max_current_ma`, USB-C source allowance): 1900 mA from a 3 A
+  source, 800 mA from 1.5 A, 0 mA on default USB.
+- No firmware change. The FE replay keeps `limit-base`/`limit-a` at 500 mA.
+
+Raised at the same time, not changed, and not part of this approval: a
+default USB source gives a 0 mA LED allowance (`k1_fe_gx_source_led_ma`).
+It is untested on a Gx board.
 
