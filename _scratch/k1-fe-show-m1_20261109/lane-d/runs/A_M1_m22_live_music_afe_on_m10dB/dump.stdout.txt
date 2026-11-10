@@ -1,0 +1,34 @@
+{
+ "raw": "runs/A_M1_m22_live_music_afe_on_m10dB/dump.txt",
+ "npz": "runs/A_M1_m22_live_music_afe_on_m10dB/dump.npz",
+ "begin": {
+  "frames": "2000",
+  "every": "6",
+  "px": "160",
+  "fmt": "rgb16hex",
+  "bpp": "16",
+  "edges": "2",
+  "crc32": "158be697"
+ },
+ "fmt": "rgb16hex",
+ "edges": 2,
+ "frames_declared": 2000,
+ "frames_decoded": 1998,
+ "lines_rejected": 2,
+ "missing_indices": 2,
+ "missing_first": [
+  1067,
+  1068
+ ],
+ "end_marker": true,
+ "crc_declared": "158be697",
+ "crc_calculated": "5e7d1204",
+ "crc_ok": false,
+ "ms_first": 63764,
+ "ms_last": 151735,
+ "modes": [
+  22
+ ],
+ "mean_luma_8bit_scale": 10.196273803710938,
+ "ap_stream_restore_reply": true
+}
